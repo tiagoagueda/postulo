@@ -34,6 +34,8 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 
 ## Documentation
 
+- **[The wiki](https://source.tiagoagueda.com/tiagoagueda/postulo/wiki)** — installing,
+  configuring and using Postulo. Authored in [wiki/](wiki/) and published from there.
 - [Implementation plan](docs/PLAN.md) — architecture, data model, and milestones
 
 ## Development

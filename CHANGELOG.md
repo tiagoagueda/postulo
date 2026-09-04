@@ -53,6 +53,9 @@ All notable changes to Postulo are recorded here. The format follows
 - Snapshots of what was actually sent: the PDF frozen at the moment of sending, with the
   text it was built from, never regenerated.
 
+- A user wiki covering installation, configuration, every part of the interface,
+  backups and troubleshooting, authored in `wiki/` and published to Forgejo.
+
 ### Changed
 
 - The default time zone is now `Europe/Paris` rather than UTC.

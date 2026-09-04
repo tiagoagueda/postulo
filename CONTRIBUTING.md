@@ -47,6 +47,15 @@ stylesheet has drifted from its source.
   behaviour is htmx plus plain JavaScript, which is why Alpine.js is not used.
 - Keep commits focused, and describe *why* in the message rather than *what*.
 
+## Documentation
+
+User documentation lives in [wiki/](wiki/) and is published to the project wiki with
+`scripts/publish-wiki.sh`. Editing it here rather than in the wiki interface means
+documentation changes are reviewed alongside the code that caused them.
+
+Please keep it honest: the wiki says plainly what is not built yet, and a page that
+describes a feature which does not exist is a bug.
+
 ## Translations
 
 Postulo is written in British English and translated from there. French and Portuguese
