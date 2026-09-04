@@ -6,6 +6,12 @@
 #
 #   docker compose -f docker/compose.postgres.yml up -d
 
+# Named explicitly. Compose otherwise takes the project name from the directory the
+# file sits in, which here is "docker" — so the container becomes docker-postulo-1
+# and the volume docker_postulo-data, which is unhelpful on a host running anything
+# else. Observed on a real machine, where it sat among a dozen other stacks.
+name: postulo
+
 services:
   postulo:
     build:

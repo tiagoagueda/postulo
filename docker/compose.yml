@@ -10,6 +10,12 @@
 # Put a reverse proxy in front of it to terminate TLS. Do not serve /app/data from that
 # proxy: uploaded CVs are delivered only through an ownership-checked view.
 
+# Named explicitly. Compose otherwise takes the project name from the directory the
+# file sits in, which here is "docker" — so the container becomes docker-postulo-1
+# and the volume docker_postulo-data, which is unhelpful on a host running anything
+# else. Observed on a real machine, where it sat among a dozen other stacks.
+name: postulo
+
 services:
   postulo:
     build:
