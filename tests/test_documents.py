@@ -312,21 +312,61 @@ def test_an_unknown_backend_name_is_refused(settings):
         get_pdf_backend()
 
 
-def test_a_named_but_missing_backend_says_how_to_install_it(settings, monkeypatch):
+def test_a_named_but_unusable_backend_says_what_it_needs(settings, monkeypatch):
     settings.POSTULO_PDF_BACKEND = "weasyprint"
     monkeypatch.setattr(WeasyPrintBackend, "is_available", lambda self: False)
 
-    with pytest.raises(PDFBackendUnavailable, match="uv sync --extra"):
+    with pytest.raises(PDFBackendUnavailable, match="libpango"):
         get_pdf_backend()
 
 
-def test_with_nothing_installed_the_message_explains_the_options(settings, monkeypatch):
+def test_with_nothing_usable_the_message_explains_both_options(settings, monkeypatch):
     settings.POSTULO_PDF_BACKEND = "auto"
     monkeypatch.setattr(WeasyPrintBackend, "is_available", lambda self: False)
     monkeypatch.setattr(ChromiumBackend, "is_available", lambda self: False)
 
-    with pytest.raises(PDFBackendUnavailable, match="No PDF backend is installed"):
+    with pytest.raises(PDFBackendUnavailable, match="No PDF backend is usable"):
         get_pdf_backend()
+
+
+def test_weasyprint_is_preferred_when_both_work(settings, monkeypatch):
+    """It is the default: smaller output, better paged CSS, no browser to launch."""
+    settings.POSTULO_PDF_BACKEND = "auto"
+    monkeypatch.setattr(WeasyPrintBackend, "is_available", lambda self: True)
+    monkeypatch.setattr(ChromiumBackend, "is_available", lambda self: True)
+
+    assert get_pdf_backend().name == "weasyprint"
+
+
+def test_chromium_takes_over_when_weasyprint_cannot_run(settings, monkeypatch):
+    settings.POSTULO_PDF_BACKEND = "auto"
+    monkeypatch.setattr(WeasyPrintBackend, "is_available", lambda self: False)
+    monkeypatch.setattr(ChromiumBackend, "is_available", lambda self: True)
+
+    assert get_pdf_backend().name == "chromium"
+
+
+def test_an_installed_but_unimportable_package_counts_as_unusable(monkeypatch):
+    """The trap WeasyPrint sets on a machine without Pango.
+
+    The package is installed and importable as far as the module finder is concerned,
+    and then raises OSError when the linker cannot find its libraries. Detecting it by
+    presence rather than by importing it would make `auto` choose a backend that fails
+    at render time instead of falling back to one that works.
+    """
+    from postulo.documents import pdf
+
+    pdf._is_importable.cache_clear()
+    monkeypatch.setattr(
+        pdf.importlib,
+        "import_module",
+        lambda name: (_ for _ in ()).throw(OSError("cannot load library 'libgobject-2.0-0'")),
+    )
+
+    try:
+        assert pdf._is_importable("weasyprint") is False
+    finally:
+        pdf._is_importable.cache_clear()
 
 
 def test_a_real_backend_produces_a_real_pdf(cv, settings):

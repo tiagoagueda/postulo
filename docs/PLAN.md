@@ -41,7 +41,7 @@ Every version below was verified against PyPI and installed successfully on Pyth
 | Interface | Django templates, htmx 2, Tailwind v4 | Server-rendered. No SPA, and no API-first tax on an application of this scale. Alpine.js was dropped — see below |
 | Authentication | django-allauth, email as identifier | Invite-only by default via `POSTULO_REGISTRATION_OPEN` |
 | API | **django-ninja** | Pydantic schemas serve double duty as the plugin data contract. Verified working on Python 3.14 with Django 6.1 during M0 |
-| PDF | Pluggable: WeasyPrint on Linux and Docker, Playwright Chromium on Windows | WeasyPrint needs GTK, which Windows lacks. `POSTULO_PDF_BACKEND` overrides the auto-detection |
+| PDF | **WeasyPrint** by default, installed with Postulo; Playwright Chromium as a fallback | WeasyPrint needs Pango, which is trivial on Linux and awkward on Windows. `POSTULO_PDF_BACKEND` overrides the auto-detection |
 | Background work | Django's `django.tasks` API with **`django-tasks-db`** | Django 6.1 ships the API but no worker; this package supplies the ORM-backed backend and the `db_worker` process. No Redis, no Celery |
 | Static files | WhiteNoise | Media is deliberately not served this way — see section 6 |
 | Quality | ruff, pytest, pytest-django, factory-boy, coverage, pre-commit | `filterwarnings = error` stops deprecations from accumulating |
@@ -107,6 +107,10 @@ Two items in the original plan did not survive contact with the packages:
 - **A generic relation carries a real cost.** Two different models can share a primary
   key, so filtering `CVItem` by `object_id` alone matches rows it should not. Every
   query pairs it with the content type. A test caught this the hard way.
+- **"Installed" and "usable" are different questions.** WeasyPrint is a Python package
+  that loads Pango through the system linker, so on a machine without those libraries it
+  is installed, findable, and raises OSError on import. Availability is therefore decided
+  by attempting the import, not by asking whether the package exists.
 
 ## 4. Repository layout
 
@@ -221,10 +225,10 @@ Portuguese translations themselves.
 1. **Docker is untested locally.** The development machine has no Docker CLI, so M6's
    images and compose files will be written to standard practice and validated on the
    target host rather than here.
-2. **Development runs on SQLite with Playwright**, while Docker defaults to PostgreSQL
-   with WeasyPrint. Both paths need CI coverage before v0.1.0. CI currently has no PDF
-   backend at all, so the one test that renders a real PDF skips there; the rest use a
-   stand-in renderer.
+2. **Development runs on SQLite, and on Windows with Chromium**, because WeasyPrint's
+   system libraries are impractical there. Servers and CI use WeasyPrint, which is the
+   default. CI installs Pango so that the one test rendering a real PDF actually runs
+   rather than skipping.
 3. **`django-tasks-db` does not yet declare Django 6.1** in its classifiers, although it
    sets no upper pin and installs and migrates cleanly. Worth re-checking at M5, when
    background work starts to matter.

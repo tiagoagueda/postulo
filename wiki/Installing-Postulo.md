@@ -9,8 +9,9 @@
 - **Python 3.12, 3.13 or 3.14**
 - **[uv](https://docs.astral.sh/uv/)** to install dependencies
 - **git**
-- Optionally, a PDF renderer — see below. Postulo works without one; you simply cannot
-  export PDFs.
+- **Pango**, if you want PDF export. On Debian or Ubuntu:
+  `sudo apt install libpango-1.0-0 libpangoft2-1.0-0`. Postulo works without it; you
+  simply cannot export PDFs. See below.
 
 Node is **not** required. The stylesheet is compiled and committed; Node is only needed
 if you want to change the CSS.
@@ -90,26 +91,35 @@ single-threaded, and not for anything reachable from the internet.
 
 There is no background worker to run. Nothing in Postulo currently queues work.
 
-## PDF rendering (optional)
+## PDF rendering
 
-Export needs one of two renderers.
+**WeasyPrint is the default renderer and is installed with Postulo.** It produces
+smaller, more faithful documents than a browser does, and needs no browser to launch.
 
-**WeasyPrint** — small and excellent at paged CSS, but it needs GTK, which is
-straightforward on Linux and awkward on Windows:
+What it does need is Pango and its companion libraries, which are one package manager
+command away on Linux:
 
 ```sh
-uv sync --extra weasyprint
+sudo apt install libpango-1.0-0 libpangoft2-1.0-0     # Debian and Ubuntu
+sudo dnf install pango                                 # Fedora
+sudo apk add pango                                     # Alpine
 ```
 
-**Headless Chromium via Playwright** — heavier, but it installs anywhere:
+Those libraries are a genuine nuisance on Windows, so a fallback exists — headless
+Chromium, driven by Playwright:
 
 ```sh
 uv sync --extra chromium
 uv run playwright install chromium
 ```
 
-Postulo picks whichever is installed. To be explicit, set `POSTULO_PDF_BACKEND` to
-`weasyprint` or `chromium`.
+Postulo uses whichever actually works, preferring WeasyPrint. "Actually works" means it
+tries to import the renderer rather than merely checking that the package is present:
+WeasyPrint installs perfectly happily on a machine with no Pango and only fails when
+asked to render, so presence is not evidence of anything.
+
+To pin the choice, set `POSTULO_PDF_BACKEND` to `weasyprint` or `chromium`. Export is
+optional throughout: tracking applications and writing letters need no renderer at all.
 
 ## Upgrading
 

@@ -175,9 +175,11 @@ POSTULO_MEDIA_SENDFILE = env.bool("POSTULO_MEDIA_SENDFILE", default=False)
 
 # ------------------------------------------------------------------------ pdf
 
-# auto | weasyprint | chromium. Neither backend is a hard dependency: Postulo is
-# usable without PDF export, so a missing one is reported when export is attempted
-# rather than preventing the application from starting.
+# auto | weasyprint | chromium. WeasyPrint is the default renderer and ships with
+# Postulo; Chromium is a fallback for machines where WeasyPrint's system libraries are
+# impractical. "auto" takes whichever actually works, preferring WeasyPrint. Export is
+# optional, so an unusable renderer is reported when export is attempted rather than
+# preventing the application from starting.
 POSTULO_PDF_BACKEND = env("POSTULO_PDF_BACKEND", default="auto")
 
 STORAGES = {

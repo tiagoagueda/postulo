@@ -52,14 +52,22 @@ uv run manage.py createsuperuser
 uv run manage.py runserver
 ```
 
-PDF export needs a renderer, which is optional — Postulo tracks applications and
-writes letters perfectly well without one:
+PDF export uses **WeasyPrint**, which is installed with Postulo. On Linux it needs
+Pango:
 
 ```sh
-uv sync --extra weasyprint              # Linux and containers; needs GTK
-uv sync --extra chromium                # anywhere
-uv run playwright install chromium      # then fetch the browser
+sudo apt install libpango-1.0-0 libpangoft2-1.0-0     # Debian and Ubuntu
 ```
+
+Those libraries are awkward to obtain on Windows, so a fallback renderer exists there:
+
+```sh
+uv sync --extra chromium
+uv run playwright install chromium
+```
+
+Postulo uses whichever works, preferring WeasyPrint. Export is optional: tracking
+applications and writing letters need no renderer at all.
 
 Node is **not** required to run Postulo: the compiled stylesheet is committed. It is
 only needed to change the CSS, in which case:

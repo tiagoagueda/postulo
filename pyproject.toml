@@ -26,11 +26,15 @@ dependencies = [
     # backend and the `db_worker` process that executes queued tasks.
     "django-tasks-db>=0.13",
     "whitenoise>=6.12",
+    # The default PDF renderer. A small Python dependency, but it loads Pango through
+    # the system linker: see the [chromium] extra for machines where that is awkward.
+    "weasyprint>=69",
 ]
 
 [project.optional-dependencies]
 postgres = ["psycopg[binary]>=3.2"]
-weasyprint = ["weasyprint>=69"]
+# A fallback renderer for machines where WeasyPrint's system libraries are impractical,
+# Windows in particular. Needs `playwright install chromium` afterwards.
 chromium = ["playwright>=1.62"]
 
 [project.urls]

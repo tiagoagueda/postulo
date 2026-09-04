@@ -50,9 +50,9 @@ anyway, or for an anonymised copy.
 - **Export PDF** renders it and keeps the result. Every export is preserved — see
   [Files and what you sent](Files-and-what-you-sent).
 
-Export needs a PDF renderer. If none is installed, Postulo says so and tells you how to
-install one; everything else keeps working. See [Installing
-Postulo](Installing-Postulo#pdf-rendering-optional).
+Export needs a working PDF renderer. WeasyPrint is installed with Postulo and used by
+default; if it cannot run, Postulo says exactly what is missing and everything else keeps
+working. See [Installing Postulo](Installing-Postulo#pdf-rendering).
 
 ## A note on languages
 

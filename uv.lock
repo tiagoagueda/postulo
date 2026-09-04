@@ -973,6 +973,7 @@ dependencies = [
     { name = "django-htmx" },
     { name = "django-ninja" },
     { name = "django-tasks-db" },
+    { name = "weasyprint" },
     { name = "whitenoise" },
 ]
 
@@ -982,9 +983,6 @@ chromium = [
 ]
 postgres = [
     { name = "psycopg", extra = ["binary"] },
-]
-weasyprint = [
-    { name = "weasyprint" },
 ]
 
 [package.dev-dependencies]
@@ -1008,10 +1006,10 @@ requires-dist = [
     { name = "django-tasks-db", specifier = ">=0.13" },
     { name = "playwright", marker = "extra == 'chromium'", specifier = ">=1.62" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'postgres'", specifier = ">=3.2" },
-    { name = "weasyprint", marker = "extra == 'weasyprint'", specifier = ">=69" },
+    { name = "weasyprint", specifier = ">=69" },
     { name = "whitenoise", specifier = ">=6.12" },
 ]
-provides-extras = ["postgres", "weasyprint", "chromium"]
+provides-extras = ["postgres", "chromium"]
 
 [package.metadata.requires-dev]
 dev = [

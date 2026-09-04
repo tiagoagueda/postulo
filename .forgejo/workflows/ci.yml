@@ -32,6 +32,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install WeasyPrint's system libraries
+        # WeasyPrint is the default renderer and loads Pango through the system linker.
+        # With these present the suite exercises real PDF rendering rather than skipping
+        # the one test that needs a working backend.
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libfontconfig1 fonts-dejavu-core
+          rm -rf /var/lib/apt/lists/*
+
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh

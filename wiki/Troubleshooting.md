@@ -1,16 +1,30 @@
 # Troubleshooting
 
-## "No PDF backend is installed"
+## "No PDF backend is usable"
 
-Export needs a renderer, and none is installed. Everything else works without one.
+WeasyPrint is installed with Postulo, so this almost always means its system libraries
+are missing rather than the package:
 
 ```sh
-uv sync --extra chromium && uv run playwright install chromium   # anywhere
-uv sync --extra weasyprint                                       # Linux; needs GTK
+sudo apt install libpango-1.0-0 libpangoft2-1.0-0     # Debian and Ubuntu
 ```
 
-If you installed one and still see the message, check `POSTULO_PDF_BACKEND` — if it names
-a specific backend, only that one is tried.
+On Windows those libraries are impractical; use the fallback renderer instead:
+
+```sh
+uv sync --extra chromium
+uv run playwright install chromium
+```
+
+If you have installed one and still see the message, check `POSTULO_PDF_BACKEND` — when
+it names a specific backend, only that one is tried and no fallback happens.
+
+Everything except export works without any renderer.
+
+## "The weasyprint PDF backend is configured but not usable"
+
+`POSTULO_PDF_BACKEND=weasyprint` is set explicitly, and Pango is missing. Either install
+the libraries above, or set the value to `auto` so that Postulo can fall back.
 
 ## There is no sign-up form
 

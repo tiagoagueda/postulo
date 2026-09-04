@@ -59,3 +59,9 @@ All notable changes to Postulo are recorded here. The format follows
 ### Changed
 
 - The default time zone is now `Europe/Paris` rather than UTC.
+- WeasyPrint is now the default PDF renderer and is installed with Postulo, rather than
+  being one of two optional extras. Chromium remains available as a fallback for machines
+  where WeasyPrint's system libraries are impractical.
+- A backend now counts as available only if it can actually be imported. WeasyPrint is
+  installed but unusable without Pango, and detecting it by presence alone would choose a
+  renderer that fails at export time instead of falling back to one that works.

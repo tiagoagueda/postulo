@@ -51,7 +51,7 @@ for a personal instance.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `POSTULO_PDF_BACKEND` | `auto` | `auto`, `weasyprint` or `chromium`. With `auto`, the first installed renderer wins. |
+| `POSTULO_PDF_BACKEND` | `auto` | `auto`, `weasyprint` or `chromium`. WeasyPrint is the default and ships with Postulo; `auto` prefers it and falls back to Chromium where its system libraries are missing. |
 
 ## Email
 

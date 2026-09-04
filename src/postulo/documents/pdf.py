@@ -1,23 +1,27 @@
 """Turning HTML into PDF.
 
-Two backends, because the obvious choice is different on a server and on a laptop:
+**WeasyPrint is the default.** It is a small Python dependency, it is excellent at paged
+CSS, and it produces the smaller and more faithful document of the two. It is installed
+with Postulo and needs no extra step on a server.
 
-``weasyprint``
-    Pure Python, small, and excellent at paged CSS. It needs GTK, which makes it a poor
-    default on Windows and an easy one inside a container.
+What it does need is Pango and its companion system libraries. Those are a package
+manager away on Linux and inside a container, and a genuine nuisance on Windows — which
+is why a second backend exists:
 
 ``chromium``
-    Playwright driving headless Chromium. A heavier dependency, but it prints what a
-    browser would, and it installs without ceremony everywhere.
+    Playwright driving headless Chromium. Heavier, and it prints what a browser would.
+    Optional, and worth installing on a machine where WeasyPrint's system libraries are
+    not practical.
 
-Neither is a hard dependency. Postulo is perfectly usable without PDF export — you can
-still track applications and write letters — so a missing backend produces a clear
-message rather than an import error at start-up.
+Neither is required to *use* Postulo. Tracking applications and writing letters work
+perfectly well with no renderer at all, so a backend that cannot be used produces a clear
+message rather than an error at start-up.
 """
 
 from __future__ import annotations
 
-import importlib.util
+import functools
+import importlib
 from typing import Protocol
 
 from django.conf import settings
@@ -27,13 +31,45 @@ from django.utils.translation import gettext_lazy as _
 PAGE_FORMAT = "A4"
 PAGE_MARGIN = "18mm"
 
+WEASYPRINT_HINT = _(
+    "WeasyPrint is installed with Postulo, but it needs Pango and its system libraries. "
+    "On Debian or Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. On Windows they "
+    "are awkward to obtain, so use the chromium backend instead. "
+    "See https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
+)
+
+CHROMIUM_HINT = _(
+    "Install it with: uv sync --extra chromium, then: uv run playwright install chromium"
+)
+
 
 class PDFBackendUnavailable(RuntimeError):
-    """Raised when no PDF backend is installed, or the named one is missing."""
+    """Raised when no PDF backend is usable, or the named one is not."""
+
+
+@functools.cache
+def _is_importable(module: str) -> bool:
+    """Whether ``module`` can actually be imported.
+
+    Checking that a package is *installed* is not enough. WeasyPrint is a Python package
+    that loads Pango and its friends through the system linker, so on a machine without
+    those libraries it is present, findable, and completely unusable — importing it
+    raises OSError, not ImportError. Asking the import system to do the work is the only
+    honest answer, and the result is cached because importing WeasyPrint is not cheap.
+    """
+    try:
+        importlib.import_module(module)
+    except Exception:
+        # Deliberately broad: ImportError when the package is absent, OSError when its
+        # native libraries are, and whatever else a C dependency decides to raise on the
+        # way up. Any of them means the same thing here.
+        return False
+    return True
 
 
 class PDFBackend(Protocol):
     name: str
+    install_hint: str
 
     def is_available(self) -> bool: ...
 
@@ -41,26 +77,28 @@ class PDFBackend(Protocol):
 
 
 class WeasyPrintBackend:
-    """Render with WeasyPrint. Preferred where its native dependencies are present."""
+    """Render with WeasyPrint. The default, and preferred wherever it will run."""
 
     name = "weasyprint"
+    install_hint = WEASYPRINT_HINT
 
     def is_available(self) -> bool:
-        return importlib.util.find_spec("weasyprint") is not None
+        return _is_importable("weasyprint")
 
     def render(self, html: str) -> bytes:
-        from weasyprint import HTML  # imported late: an optional dependency
+        from weasyprint import HTML  # imported late: needs system libraries
 
         return HTML(string=html).write_pdf()
 
 
 class ChromiumBackend:
-    """Render with headless Chromium through Playwright."""
+    """Render with headless Chromium through Playwright. The fallback."""
 
     name = "chromium"
+    install_hint = CHROMIUM_HINT
 
     def is_available(self) -> bool:
-        return importlib.util.find_spec("playwright") is not None
+        return _is_importable("playwright")
 
     def render(self, html: str) -> bytes:
         from playwright.sync_api import sync_playwright
@@ -86,15 +124,17 @@ class ChromiumBackend:
                 browser.close()
 
 
-#: Tried in this order when the backend is set to "auto".
+#: Tried in this order when the backend is "auto". WeasyPrint comes first because it is
+#: the default; Chromium exists for machines where WeasyPrint will not run.
 BACKENDS: tuple[type[PDFBackend], ...] = (WeasyPrintBackend, ChromiumBackend)
 
 
 def get_pdf_backend(name: str | None = None) -> PDFBackend:
     """Return a usable backend, or explain why there is not one.
 
-    ``POSTULO_PDF_BACKEND`` may name one explicitly; the default, ``auto``, takes the
-    first that is installed.
+    ``POSTULO_PDF_BACKEND`` may name one explicitly. The default, ``auto``, takes the
+    first that actually works, which is WeasyPrint wherever its system libraries are
+    present and Chromium otherwise.
     """
     requested = (name or getattr(settings, "POSTULO_PDF_BACKEND", "auto") or "auto").lower()
 
@@ -105,11 +145,8 @@ def get_pdf_backend(name: str | None = None) -> PDFBackend:
                 if not backend.is_available():
                     raise PDFBackendUnavailable(
                         str(
-                            _(
-                                "The %(name)s PDF backend is configured but not installed. "
-                                "Install it with: uv sync --extra %(name)s"
-                            )
-                            % {"name": backend.name}
+                            _("The %(name)s PDF backend is configured but not usable. %(hint)s")
+                            % {"name": backend.name, "hint": backend.install_hint}
                         )
                     )
                 return backend
@@ -128,10 +165,10 @@ def get_pdf_backend(name: str | None = None) -> PDFBackend:
     raise PDFBackendUnavailable(
         str(
             _(
-                "No PDF backend is installed, so documents cannot be exported. "
-                "Install one with: uv sync --extra weasyprint (Linux) or "
-                "uv sync --extra chromium (any platform, then: playwright install chromium)."
+                "No PDF backend is usable, so documents cannot be exported. %(weasyprint)s "
+                "Alternatively: %(chromium)s"
             )
+            % {"weasyprint": WEASYPRINT_HINT, "chromium": CHROMIUM_HINT}
         )
     )
 
