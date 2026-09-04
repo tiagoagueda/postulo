@@ -15,9 +15,10 @@ installation; the rest of this page is detail and the alternative without a cont
 
 > **A caveat worth reading.** Each of the image's build steps has been run by hand under
 > production settings, but the image itself has not been run on a real server for a real
-> job search. Continuous integration can build and health-check it, but only where the
-> runner has a Docker daemon, which is not the common case. If something is wrong with
-> it, you may well be the first to find out. Please say so.
+> job search. Continuous integration does not build it either — that needs a runner with
+> a Docker daemon, which is not the common case — so `scripts/check-image.sh` does the
+> same job wherever you do have Docker. If something is wrong with the image, you may
+> well be the first to find out. Please say so.
 
 ## What you need
 
@@ -57,6 +58,14 @@ pulling a new image and restarting.
 Your data lives in the `postulo-data` volume: the database (on SQLite) and every
 uploaded and generated file. That is what to back up — see
 [Backups and your data](Backups-and-your-data).
+
+To check the image builds and runs before trusting it with anything:
+
+```sh
+./scripts/check-image.sh
+```
+
+It builds, starts a container, and waits for the health check to answer.
 
 **Do not point your reverse proxy at the data volume.** Uploaded CVs are delivered only
 through a view that has established who is asking, and serving the directory would
