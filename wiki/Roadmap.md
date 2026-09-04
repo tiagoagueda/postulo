@@ -1,7 +1,7 @@
 # Roadmap
 
-Postulo is pre-alpha. This page says plainly what exists and what does not, so nothing on
-this wiki reads as a promise.
+Postulo is at version 0.1.0. This page says plainly what exists and what does not, so
+nothing on this wiki reads as a promise.
 
 ## Done
 
@@ -13,11 +13,13 @@ this wiki reads as a promise.
 | **M3** | The career record, CV variants, cover letters, uploads, PDF export, snapshots of what you sent |
 | **M4** | Capturing a posting from its address, the plugin interface, and the capture API |
 | **M5** | Insights read from the timeline, and a complete export you can import back |
+| **M6** | A container image and Compose files, and the 0.1.0 release |
 
 ## Still to come
 
-**M6 — packaging.** A container image and Compose files, so installing Postulo stops being
-a manual job. See [Installing Postulo](Installing-Postulo) for what that involves today.
+Nothing is planned before somebody has run this for a while. The next thing worth doing
+is fixing whatever a few months of real use turns up, which no amount of building
+answers in advance.
 
 ## After version 1
 

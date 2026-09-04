@@ -10,7 +10,8 @@ data, on your server.
 
 From the Latin *postulō* — "I apply for". First person, deliberately.
 
-> **Status: pre-alpha.** Under active construction. Not yet usable.
+> **Status: 0.1.0.** Usable, and used. Not yet battle-tested: it has recorded real
+> applications, but by one person, for days rather than months.
 
 ## What it does
 
@@ -45,6 +46,20 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
   configuring and using Postulo. Authored in [wiki/](wiki/) and published from there.
 - [Implementation plan](docs/PLAN.md) — architecture, data model, and milestones
 - [Writing a capture source](docs/PLUGINS.md) — the plugin contract
+
+## Running it
+
+```sh
+git clone https://source.tiagoagueda.com/tiagoagueda/postulo.git
+cd postulo
+cp .env.example .env          # set POSTULO_SECRET_KEY and POSTULO_ALLOWED_HOSTS
+docker compose -f docker/compose.yml up -d
+docker compose -f docker/compose.yml exec postulo python manage.py createsuperuser
+```
+
+Then put a reverse proxy in front of it for TLS. See
+[Installing Postulo](https://source.tiagoagueda.com/tiagoagueda/postulo/wiki/Installing-Postulo)
+for the full instructions, including installing without a container.
 
 ## Development
 

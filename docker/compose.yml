@@ -1,0 +1,31 @@
+# Postulo on SQLite: one container, one volume, nothing else to run.
+#
+# This is the recommended shape for a personal instance. SQLite is a single file, which
+# makes a backup a file copy, and a job search does not produce the kind of load that
+# needs anything more.
+#
+#   cp .env.example .env      # then set POSTULO_SECRET_KEY and POSTULO_ALLOWED_HOSTS
+#   docker compose -f docker/compose.yml up -d
+#
+# Put a reverse proxy in front of it to terminate TLS. Do not serve /app/data from that
+# proxy: uploaded CVs are delivered only through an ownership-checked view.
+
+services:
+  postulo:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: postulo:latest
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      # The database lives in the volume, not in the image.
+      POSTULO_DATABASE_URL: sqlite:////app/data/postulo.sqlite3
+    volumes:
+      - postulo-data:/app/data
+    ports:
+      - "127.0.0.1:8000:8000"
+
+volumes:
+  postulo-data:

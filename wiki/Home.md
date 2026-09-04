@@ -8,9 +8,9 @@ letters, and the record of what actually happened, on hardware you control.
 
 From the Latin *postulō* — "I apply for". First person, deliberately.
 
-> **Status: pre-alpha.** The application works and is usable, but there is no packaged
-> release yet and no upgrade path between versions. See [Roadmap](Roadmap) for what is
-> still missing.
+> **Status: 0.1.0.** Usable, and used — but by one person, for days rather than months.
+> Treat it as a first release that works rather than as a mature one. See
+> [Roadmap](Roadmap).
 
 ## Start here
 

@@ -1,20 +1,65 @@
 # Installing Postulo
 
-> **There is no container image yet.** Docker and Compose files are planned for milestone
-> M6 — see [Roadmap](Roadmap). Until then, installation is manual. It is not difficult,
-> but it is not one command either.
+## The short version
+
+```sh
+git clone https://source.tiagoagueda.com/tiagoagueda/postulo.git
+cd postulo
+cp .env.example .env          # set POSTULO_SECRET_KEY and POSTULO_ALLOWED_HOSTS
+docker compose -f docker/compose.yml up -d
+docker compose -f docker/compose.yml exec postulo python manage.py createsuperuser
+```
+
+Then put a reverse proxy in front of port 8000 to terminate TLS. That is the whole
+installation; the rest of this page is detail and the alternative without a container.
+
+> **A caveat worth reading.** The image is built and health-checked by continuous
+> integration, and each of its build steps has been run by hand, but nobody has yet run
+> it on a real server for a real job search. If something is wrong with it, you may be
+> the first to find out. Please say so.
 
 ## What you need
 
 - **Python 3.12, 3.13 or 3.14**
 - **[uv](https://docs.astral.sh/uv/)** to install dependencies
 - **git**
-- **Pango**, if you want PDF export. On Debian or Ubuntu:
-  `sudo apt install libpango-1.0-0 libpangoft2-1.0-0`. Postulo works without it; you
-  simply cannot export PDFs. See below.
+- **Pango**, if you want PDF export and are installing without a container. On Debian
+  or Ubuntu: `sudo apt install libpango-1.0-0 libpangoft2-1.0-0`. The image already has
+  it. Postulo works without it; you simply cannot export PDFs.
 
 Node is **not** required. The stylesheet is compiled and committed; Node is only needed
 if you want to change the CSS.
+
+## With Docker
+
+The image carries everything Postulo needs, including Pango, so PDF export works out of
+the box.
+
+**SQLite**, which is the right choice for a personal instance — one file to back up, and
+a job search does not produce the kind of load that needs more:
+
+```sh
+docker compose -f docker/compose.yml up -d
+```
+
+**PostgreSQL**, if you already run one and would rather have a single backup regime.
+Set `POSTGRES_PASSWORD` in `.env` first:
+
+```sh
+docker compose -f docker/compose.postgres.yml up -d
+```
+
+Both bind to `127.0.0.1:8000` rather than to every interface, on the assumption that a
+reverse proxy sits in front. Migrations run automatically on start, so upgrading is
+pulling a new image and restarting.
+
+Your data lives in the `postulo-data` volume: the database (on SQLite) and every
+uploaded and generated file. That is what to back up — see
+[Backups and your data](Backups-and-your-data).
+
+**Do not point your reverse proxy at the data volume.** Uploaded CVs are delivered only
+through a view that has established who is asking, and serving the directory would
+bypass that entirely.
 
 ## Trying it on your own machine
 
@@ -123,10 +168,21 @@ optional throughout: tracking applications and writing letters need no renderer 
 
 ## Upgrading
 
-While Postulo is pre-alpha, treat every upgrade as one you might have to undo:
+Back up first — see [Backups and your data](Backups-and-your-data). Postulo is young
+enough that an upgrade is worth being able to undo.
+
+With Docker:
 
 ```sh
-# Back up first — see Backups and your data
+git pull
+docker compose -f docker/compose.yml up -d --build
+```
+
+Migrations run on start, so there is no separate step to remember.
+
+Without:
+
+```sh
 git pull
 uv sync
 uv run manage.py migrate

@@ -1,7 +1,7 @@
 # Postulo — implementation plan
 
-> **Status:** M0 to M5 complete. This is a living document, revised as milestones
-> land and assumptions meet reality.
+> **Status:** every milestone complete; v0.1.0 released. This is a living document,
+> revised as milestones land and assumptions meet reality.
 
 ## 1. Mission
 
@@ -244,7 +244,7 @@ rather than a rewrite.
 | **M3** | Documents: resume content, CV variants with per-variant overrides, cover letters, uploads and versioning, PDF rendering, snapshot on send | **Complete** |
 | **M4** | Capture and plugins: URL fetching, the JSON-LD parser, the plugin registry, the review screen, the capture API and tokens, `docs/PLUGINS.md` | **Complete** |
 | **M5** | Insights and data ownership: funnel and response-rate analytics, time to response, source conversion, search and filters, export and import | **Complete** |
-| **M6** | Ship: Dockerfile, compose files for SQLite and PostgreSQL, health checks, installation documentation, v0.1.0 | Next |
+| **M6** | Ship: Dockerfile, compose files for SQLite and PostgreSQL, health checks, installation documentation, v0.1.0 | **Complete** |
 
 Each milestone ends green: migrations applied, tests passing, and a working interface.
 M2 is the first point at which the application earns its keep, so nothing before it
@@ -256,9 +256,10 @@ Portuguese translations themselves.
 
 ## 9. Open assumptions
 
-1. **Docker is untested locally.** The development machine has no Docker CLI, so M6's
-   images and compose files will be written to standard practice and validated on the
-   target host rather than here.
+1. **Docker is still untested locally**, and this did not change: the development
+   machine has no Docker CLI. The image's individual build steps were each run by hand
+   under production settings, and CI attempts a full build and health check, but nobody
+   has yet run this image in anger on a real server.
 2. **Development runs on SQLite, and on Windows with Chromium**, because WeasyPrint's
    system libraries are impractical there. Servers and CI use WeasyPrint, which is the
    default. CI installs Pango so that the one test rendering a real PDF actually runs

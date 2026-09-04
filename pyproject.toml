@@ -1,6 +1,6 @@
 [project]
 name = "postulo"
-version = "0.0.1"
+version = "0.1.0"
 description = "Self-hosted job application manager, from the applicant's side of the table."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -8,7 +8,7 @@ license = "AGPL-3.0-or-later"
 authors = [{ name = "Tiago Agueda" }]
 keywords = ["django", "self-hosted", "job-search", "job-applications", "cv", "resume"]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Environment :: Web Environment",
     "Framework :: Django",
     "Intended Audience :: End Users/Desktop",
@@ -40,6 +40,8 @@ postgres = ["psycopg[binary]>=3.2"]
 # A fallback renderer for machines where WeasyPrint's system libraries are impractical,
 # Windows in particular. Needs `playwright install chromium` afterwards.
 chromium = ["playwright>=1.62"]
+# What the container runs. Not a development dependency: runserver is Django's own.
+server = ["gunicorn>=23.0"]
 
 [project.urls]
 Homepage = "https://source.tiagoagueda.com/tiagoagueda/postulo"

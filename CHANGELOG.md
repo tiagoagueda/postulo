@@ -6,6 +6,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.0] — 2026-09-04
+
+The first release: a job application manager you can run on your own server, from the
+applicant's side of the table.
+
+Every milestone from the original plan is in it — accounts, tracking, documents,
+capture, insights and packaging. What it is not is battle-tested: it has been used to
+record real applications, but by one person, for days rather than months. Treat it as a
+first release that works rather than as a mature one.
+
 ### Added
 
 - Project skeleton: Django 6.1 on Python 3.12–3.14, split settings, and a custom
@@ -73,6 +85,8 @@ All notable changes to Postulo are recorded here. The format follows
 - A complete export: one zip holding a readable JSON document of every record and every
   file, with an import that reads it back into an empty account.
 - `export_data` and `import_data` management commands.
+- A container image and Compose files for SQLite and PostgreSQL, so installing Postulo
+  is no longer a manual job (M6).
 
 ### Changed
 

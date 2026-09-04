@@ -1,0 +1,46 @@
+# Postulo on PostgreSQL.
+#
+# Worth it if you already run PostgreSQL and would rather have one backup regime than
+# two. For a single-user instance it buys very little over SQLite, and it is a second
+# thing to keep alive.
+#
+#   docker compose -f docker/compose.postgres.yml up -d
+
+services:
+  postulo:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: postulo:latest
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      POSTULO_DATABASE_URL: postgres://postulo:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/postulo
+    volumes:
+      # Media still lives here: the database holds the records, not the files.
+      - postulo-data:/app/data
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postulo
+      POSTGRES_USER: postulo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postulo-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postulo -d postulo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postulo-data:
+  postulo-db:
