@@ -1,0 +1,194 @@
+"""Views for companies, contacts and postings."""
+
+from __future__ import annotations
+
+from django.contrib import messages
+from django.db.models import Count, Q
+from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+
+from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
+
+from .forms import CompanyForm, ContactForm, JobPostingForm
+from .models import Company, Contact, JobPosting
+
+
+class UserFormKwargsMixin:
+    """Hand the signed-in user to the form, so it can scope its own choices."""
+
+    def get_form_kwargs(self) -> dict:
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+
+# ------------------------------------------------------------------- companies
+
+
+class CompanyListView(OwnedObjectMixin, ListView):
+    model = Company
+    template_name = "jobs/company_list.html"
+    context_object_name = "companies"
+    paginate_by = 50
+
+    def get_queryset(self):
+        # Aggregation drops Meta.ordering, and pagination over an unordered queryset
+        # can repeat or skip rows between pages. Say it explicitly.
+        queryset = (
+            super()
+            .get_queryset()
+            .annotate(
+                posting_count=Count("postings", distinct=True),
+                application_count=Count("postings__applications", distinct=True),
+            )
+            .order_by("name")
+        )
+        search = self.request.GET.get("q", "").strip()
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search)
+                | Q(location__icontains=search)
+                | Q(industry__icontains=search)
+            )
+        return queryset
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["search"] = self.request.GET.get("q", "")
+        return context
+
+
+class CompanyDetailView(OwnedObjectMixin, DetailView):
+    model = Company
+    template_name = "jobs/company_detail.html"
+    context_object_name = "company"
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["contacts"] = self.object.contacts.all()
+        context["postings"] = self.object.postings.prefetch_related("applications")
+        return context
+
+
+class CompanyCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):
+    model = Company
+    form_class = CompanyForm
+    template_name = "jobs/company_form.html"
+
+    def form_valid(self, form):
+        messages.success(self.request, _("Company added."))
+        return super().form_valid(form)
+
+
+class CompanyUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+    model = Company
+    form_class = CompanyForm
+    template_name = "jobs/company_form.html"
+
+    def form_valid(self, form):
+        messages.success(self.request, _("Company updated."))
+        return super().form_valid(form)
+
+
+class CompanyDeleteView(OwnedObjectMixin, DeleteView):
+    model = Company
+    template_name = "partials/confirm_delete.html"
+    success_url = reverse_lazy("jobs:company_list")
+
+    def form_valid(self, form):
+        messages.success(self.request, _("Company deleted, along with its postings."))
+        return super().form_valid(form)
+
+
+# -------------------------------------------------------------------- contacts
+
+
+class ContactCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):
+    model = Contact
+    form_class = ContactForm
+    template_name = "jobs/contact_form.html"
+
+    def get_initial(self) -> dict:
+        initial = super().get_initial()
+        company_id = self.request.GET.get("company")
+        if (
+            company_id
+            and Company.objects.for_user(self.request.user).filter(pk=company_id).exists()
+        ):
+            initial["company"] = company_id
+        return initial
+
+    def get_success_url(self) -> str:
+        if self.object.company_id:
+            return reverse("jobs:company_detail", args=[self.object.company_id])
+        return reverse("jobs:company_list")
+
+    def form_valid(self, form):
+        messages.success(self.request, _("Contact added."))
+        return super().form_valid(form)
+
+
+class ContactUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+    model = Contact
+    form_class = ContactForm
+    template_name = "jobs/contact_form.html"
+
+    def get_success_url(self) -> str:
+        if self.object.company_id:
+            return reverse("jobs:company_detail", args=[self.object.company_id])
+        return reverse("jobs:company_list")
+
+
+class ContactDeleteView(OwnedObjectMixin, DeleteView):
+    model = Contact
+    template_name = "partials/confirm_delete.html"
+
+    def get_success_url(self) -> str:
+        if self.object.company_id:
+            return reverse("jobs:company_detail", args=[self.object.company_id])
+        return reverse("jobs:company_list")
+
+
+# -------------------------------------------------------------------- postings
+
+
+class PostingDetailView(OwnedObjectMixin, DetailView):
+    model = JobPosting
+    template_name = "jobs/posting_detail.html"
+    context_object_name = "posting"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("company")
+
+
+class PostingUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+    model = JobPosting
+    form_class = JobPostingForm
+    template_name = "jobs/posting_form.html"
+
+    def form_valid(self, form):
+        messages.success(self.request, _("Posting updated."))
+        return super().form_valid(form)
+
+
+class PostingCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):
+    model = JobPosting
+    form_class = JobPostingForm
+    template_name = "jobs/posting_form.html"
+
+    def get_initial(self) -> dict:
+        initial = super().get_initial()
+        company_id = self.request.GET.get("company")
+        if (
+            company_id
+            and Company.objects.for_user(self.request.user).filter(pk=company_id).exists()
+        ):
+            initial["company"] = company_id
+        return initial
+
+
+class PostingDeleteView(OwnedObjectMixin, DeleteView):
+    model = JobPosting
+    template_name = "partials/confirm_delete.html"
+    success_url = reverse_lazy("jobs:company_list")

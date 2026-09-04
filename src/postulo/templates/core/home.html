@@ -1,70 +1,29 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}
-  {% if user.is_authenticated %}{% translate "Dashboard" %}{% else %}{% translate "Postulo" %}{% endif %}
-{% endblock %}
+{% block title %}{% translate "Postulo" %}{% endblock %}
 
 {% block content %}
-  {% if user.is_authenticated %}
-
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">
-      {% blocktranslate trimmed with name=user.display_name %}
-        Welcome back, {{ name }}
+  <div class="mx-auto max-w-2xl py-10 text-center">
+    <h1 class="mb-3 text-3xl font-semibold tracking-tight">{% translate "Postulo" %}</h1>
+    <p class="mb-8 text-ink-600 dark:text-ink-300">
+      {% blocktranslate trimmed %}
+        A self-hosted job application manager, written from the applicant's side of the
+        table. Your applications, your CVs, your cover letters, on your server.
       {% endblocktranslate %}
-    </h1>
-    <p class="mb-8 text-sm text-ink-500 dark:text-ink-400">
-      {% translate "Your job search lives here." %}
     </p>
-
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="card">
-        <h2 class="mb-1 font-medium">{% translate "Applications" %}</h2>
-        <p class="text-sm text-ink-500 dark:text-ink-400">
-          {% translate "Tracking arrives in the next milestone." %}
-        </p>
-      </div>
-      <div class="card">
-        <h2 class="mb-1 font-medium">{% translate "Documents" %}</h2>
-        <p class="text-sm text-ink-500 dark:text-ink-400">
-          {% translate "CVs and cover letters follow after that." %}
-        </p>
-      </div>
-      <div class="card">
-        <h2 class="mb-1 font-medium">{% translate "Your details" %}</h2>
-        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-          {% translate "The contact block that will appear on your CV." %}
-        </p>
-        <a href="{% url 'accounts:profile' %}" class="btn-secondary">
-          {% translate "Edit details" %}
+    <div class="flex items-center justify-center gap-3">
+      <a href="{% url 'account_login' %}" class="btn-primary">{% translate "Sign in" %}</a>
+      {% if registration_open %}
+        <a href="{% url 'account_signup' %}" class="btn-secondary">
+          {% translate "Create an account" %}
         </a>
-      </div>
-    </div>
-
-  {% else %}
-
-    <div class="mx-auto max-w-2xl py-10 text-center">
-      <h1 class="mb-3 text-3xl font-semibold tracking-tight">{% translate "Postulo" %}</h1>
-      <p class="mb-8 text-ink-600 dark:text-ink-300">
-        {% blocktranslate trimmed %}
-          A self-hosted job application manager, written from the applicant's side of the
-          table. Your applications, your CVs, your cover letters, on your server.
-        {% endblocktranslate %}
-      </p>
-      <div class="flex items-center justify-center gap-3">
-        <a href="{% url 'account_login' %}" class="btn-primary">{% translate "Sign in" %}</a>
-        {% if registration_open %}
-          <a href="{% url 'account_signup' %}" class="btn-secondary">
-            {% translate "Create an account" %}
-          </a>
-        {% endif %}
-      </div>
-      {% if not registration_open %}
-        <p class="mt-6 text-xs text-ink-500 dark:text-ink-400">
-          {% translate "This instance is invite-only." %}
-        </p>
       {% endif %}
     </div>
-
-  {% endif %}
+    {% if not registration_open %}
+      <p class="mt-6 text-xs text-ink-500 dark:text-ink-400">
+        {% translate "This instance is invite-only." %}
+      </p>
+    {% endif %}
+  </div>
 {% endblock %}

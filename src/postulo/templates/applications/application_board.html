@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Board" %}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Board" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Only what is still live. Settled applications live in the table." %}
+      </p>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="{% url 'applications:list' %}" class="btn-secondary">{% translate "Table" %}</a>
+      <a href="{% url 'applications:create' %}" class="btn-primary">{% translate "Record an application" %}</a>
+    </div>
+  </div>
+
+  {% include "applications/partials/filters.html" %}
+
+  <div class="flex gap-4 overflow-x-auto pb-4">
+    {% for column in columns %}
+      <section class="w-72 shrink-0">
+        <div class="mb-2 flex items-baseline justify-between px-1">
+          <h2 class="text-sm font-medium">{{ column.label }}</h2>
+          <span class="text-xs text-ink-400 tabular-nums">{{ column.applications|length }}</span>
+        </div>
+        <div class="flex flex-col gap-2">
+          {% for application in column.applications %}
+            {% include "applications/partials/application_card.html" %}
+          {% empty %}
+            <p class="rounded-lg border border-dashed border-ink-200 px-3 py-6 text-center text-xs
+                      text-ink-400 dark:border-ink-800">
+              {% translate "Empty" %}
+            </p>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+{% endblock %}

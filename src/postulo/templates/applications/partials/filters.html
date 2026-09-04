@@ -1,0 +1,40 @@
+{% load i18n %}
+<form method="get" class="mb-6 flex flex-wrap items-end gap-3">
+  <div>
+    <label class="field-label" for="filter-q">{% translate "Search" %}</label>
+    <input type="search" id="filter-q" name="q" value="{{ search }}"
+           placeholder="{% translate 'Title, company or location' %}" class="field-input w-64">
+  </div>
+  <div>
+    <label class="field-label" for="filter-status">{% translate "Status" %}</label>
+    <select id="filter-status" name="status" class="field-input w-44">
+      <option value="">{% translate "Any" %}</option>
+      {% for value, label in statuses %}
+        <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="field-label" for="filter-state">{% translate "Outcome" %}</label>
+    <select id="filter-state" name="state" class="field-input w-36">
+      <option value="">{% translate "Any" %}</option>
+      <option value="open" {% if selected_state == 'open' %}selected{% endif %}>{% translate "Still live" %}</option>
+      <option value="closed" {% if selected_state == 'closed' %}selected{% endif %}>{% translate "Settled" %}</option>
+    </select>
+  </div>
+  {% if tags %}
+    <div>
+      <label class="field-label" for="filter-tag">{% translate "Tag" %}</label>
+      <select id="filter-tag" name="tag" class="field-input w-40">
+        <option value="">{% translate "Any" %}</option>
+        {% for tag in tags %}
+          <option value="{{ tag.slug }}" {% if tag.slug == selected_tag %}selected{% endif %}>{{ tag.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endif %}
+  <button type="submit" class="btn-secondary">{% translate "Filter" %}</button>
+  {% if search or selected_status or selected_tag or selected_state %}
+    <a href="{{ request.path }}" class="btn-ghost">{% translate "Clear" %}</a>
+  {% endif %}
+</form>

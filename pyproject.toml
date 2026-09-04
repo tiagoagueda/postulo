@@ -80,6 +80,12 @@ select = [
 ]
 ignore = [
     "S101",  # assert is how pytest works
+    # Postulo is written in British English and uses proper typography in the strings
+    # a person actually reads: curly quotes, en dashes in ranges. Ruff reads those as
+    # "ambiguous unicode", which here is the intended text rather than a mistake.
+    "RUF001",
+    "RUF002",
+    "RUF003",
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -89,6 +95,7 @@ ignore = [
 "src/postulo/*/forms.py" = ["RUF012"]
 "src/postulo/*/admin.py" = ["RUF012"]
 "src/postulo/*/views.py" = ["RUF012"]
+"src/postulo/*/models.py" = ["RUF012"]
 "src/postulo/config/settings/*" = ["F403", "F405"]
 
 [tool.ruff.lint.isort]

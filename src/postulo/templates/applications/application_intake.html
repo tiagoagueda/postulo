@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Record an application" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Record an application" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        The company is matched by name and created if it is new. Only the company and the
+        job title are required; everything else can be filled in later.
+      {% endblocktranslate %}
+    </p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="card mb-4">
+        <h2 class="mb-4 font-medium">{% translate "The role" %}</h2>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.company_name %}
+          {% include "partials/field.html" with field=form.title %}
+        </div>
+        {% include "partials/field.html" with field=form.url %}
+        <div class="grid gap-x-4 sm:grid-cols-3">
+          {% include "partials/field.html" with field=form.location %}
+          {% include "partials/field.html" with field=form.remote_type %}
+          {% include "partials/field.html" with field=form.employment_type %}
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h2 class="mb-4 font-medium">{% translate "Money and dates" %}</h2>
+        <div class="grid gap-x-4 sm:grid-cols-4">
+          {% include "partials/field.html" with field=form.salary_min %}
+          {% include "partials/field.html" with field=form.salary_max %}
+          {% include "partials/field.html" with field=form.salary_currency %}
+          {% include "partials/field.html" with field=form.salary_period %}
+        </div>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.closes_at %}
+          {% include "partials/field.html" with field=form.deadline %}
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h2 class="mb-4 font-medium">{% translate "Your application" %}</h2>
+        <div class="grid gap-x-4 sm:grid-cols-3">
+          {% include "partials/field.html" with field=form.status %}
+          {% include "partials/field.html" with field=form.channel %}
+          {% include "partials/field.html" with field=form.priority %}
+        </div>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.source %}
+          {% include "partials/field.html" with field=form.tags %}
+        </div>
+      </div>
+
+      <div class="card mb-6">
+        <h2 class="mb-4 font-medium">{% translate "The posting itself" %}</h2>
+        <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
+          {% translate "Paste the text. Postings vanish from the web; your copy will not." %}
+        </p>
+        {% include "partials/field.html" with field=form.description %}
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+        <a href="{% url 'applications:list' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

@@ -8,6 +8,7 @@ inherits an owner and a queryset that knows how to scope itself.
 
 from django.conf import settings
 from django.db import models
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 
@@ -54,3 +55,37 @@ class OwnedModel(TimeStampedModel):
 
     class Meta:
         abstract = True
+
+
+class Tag(OwnedModel):
+    """A label the applicant invents for themselves.
+
+    Deliberately free-form: everyone organises a job search differently, and a fixed
+    vocabulary would fit nobody. Slugs are unique per owner, so two people may both
+    have a "remote" tag without colliding.
+    """
+
+    name = models.CharField(_("name"), max_length=60)
+    slug = models.SlugField(_("slug"), max_length=60)
+    colour = models.CharField(
+        _("colour"),
+        max_length=20,
+        blank=True,
+        help_text=_("A hint for the interface, such as “amber” or “sky”."),
+    )
+
+    class Meta:
+        verbose_name = _("tag")
+        verbose_name_plural = _("tags")
+        ordering = ("name",)
+        constraints = [
+            models.UniqueConstraint(fields=("owner", "slug"), name="unique_tag_slug_per_owner")
+        ]
+
+    def __str__(self) -> str:
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)[:60]
+        super().save(*args, **kwargs)

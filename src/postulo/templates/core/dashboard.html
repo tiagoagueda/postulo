@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Dashboard" %}{% endblock %}
+
+{% block content %}
+  <h1 class="mb-1 text-2xl font-semibold tracking-tight">
+    {% blocktranslate trimmed with name=user.display_name %}
+      Welcome back, {{ name }}
+    {% endblocktranslate %}
+  </h1>
+  <p class="mb-8 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "Where your job search stands today." %}
+  </p>
+
+  <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <a href="{% url 'applications:list' %}?state=open" class="card hover:border-brand-400">
+      <p class="text-3xl font-semibold tabular-nums">{{ open_count }}</p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Still live" %}</p>
+    </a>
+    <div class="card">
+      <p class="text-3xl font-semibold tabular-nums">{{ interviewing_count }}</p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "In conversation" %}</p>
+    </div>
+    <div class="card">
+      <p class="text-3xl font-semibold tabular-nums">{{ offer_count }}</p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Offers on the table" %}</p>
+    </div>
+    <div class="card">
+      <p class="text-3xl font-semibold tabular-nums">{{ applied_recently }}</p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Applied in the last 30 days" %}</p>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+
+    {# The point of the dashboard: what needs doing, not what has been done. #}
+    <section class="lg:col-span-2">
+      <h2 class="mb-3 font-medium">{% translate "Worth chasing" %}</h2>
+      {% if awaiting_reply %}
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for application in awaiting_reply %}
+              <li class="flex items-center gap-3 px-4 py-3">
+                <div class="min-w-0 flex-1">
+                  <a href="{{ application.get_absolute_url }}"
+                     class="block truncate font-medium hover:underline">
+                    {{ application.posting.title }}
+                  </a>
+                  <p class="truncate text-sm text-ink-500 dark:text-ink-400">
+                    {{ application.posting.company.name }}
+                  </p>
+                </div>
+                <p class="shrink-0 text-sm text-ink-500 tabular-nums dark:text-ink-400">
+                  {% blocktranslate trimmed count days=application.days_since_applied %}
+                    {{ days }} day
+                  {% plural %}
+                    {{ days }} days
+                  {% endblocktranslate %}
+                </p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% if awaiting_reply_count > 10 %}
+          <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed with total=awaiting_reply_count %}
+              Showing 10 of {{ total }}.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed with days=chase_after_days %}
+            Nothing has been waiting more than {{ days }} days. Either you are on top of
+            it, or it is time to send out a few more.
+          {% endblocktranslate %}
+        </div>
+      {% endif %}
+
+      <h2 class="mt-8 mb-3 font-medium">{% translate "Recent activity" %}</h2>
+      {% if recent_events %}
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for event in recent_events %}
+              <li class="px-4 py-3">
+                <div class="flex items-baseline gap-2">
+                  <a href="{{ event.application.get_absolute_url }}"
+                     class="truncate font-medium hover:underline">
+                    {{ event.application.posting.title }}
+                  </a>
+                  <span class="shrink-0 text-xs text-ink-400">
+                    {{ event.occurred_at|date:"j M, H:i" }}
+                  </span>
+                </div>
+                <p class="text-sm text-ink-500 dark:text-ink-400">
+                  {{ event.summary|default:event.get_kind_display }}
+                </p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Nothing recorded yet." %}
+        </div>
+      {% endif %}
+    </section>
+
+    <section>
+      <div class="mb-3 flex items-center justify-between">
+        <h2 class="font-medium">{% translate "Due now" %}</h2>
+        <a href="{% url 'applications:reminder_create' %}" class="text-sm text-brand-600 hover:underline dark:text-brand-400">
+          {% translate "Add" %}
+        </a>
+      </div>
+      {% if due_reminders %}
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for reminder in due_reminders %}
+              <li class="flex items-start gap-3 px-4 py-3">
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium">{{ reminder.summary }}</p>
+                  <p class="text-xs text-ink-500 dark:text-ink-400">
+                    {{ reminder.due_at|date:"j M, H:i" }}
+                  </p>
+                </div>
+                <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{% url 'core:home' %}">
+                  <button type="submit" class="btn-ghost px-2 py-1 text-xs">
+                    {% translate "Done" %}
+                  </button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Nothing due." %}
+        </div>
+      {% endif %}
+
+      <div class="card mt-6">
+        <h2 class="mb-3 font-medium">{% translate "Shortcuts" %}</h2>
+        <div class="flex flex-col gap-2 text-sm">
+          <a href="{% url 'applications:board' %}" class="text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "See the board" %}
+          </a>
+          <a href="{% url 'jobs:company_list' %}" class="text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "Companies you have applied to" %}
+          </a>
+          <a href="{% url 'applications:tag_list' %}" class="text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "Manage tags" %}
+          </a>
+          <a href="{% url 'accounts:profile' %}" class="text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "Your details" %}
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+{% endblock %}

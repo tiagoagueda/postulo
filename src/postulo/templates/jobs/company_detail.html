@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ company.name }}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{{ company.name }}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {{ company.location|default:"" }}{% if company.location and company.industry %} · {% endif %}{{ company.industry|default:"" }}
+      </p>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="{% url 'jobs:company_update' company.pk %}" class="btn-secondary">{% translate "Edit" %}</a>
+      <a href="{% url 'jobs:company_delete' company.pk %}"
+         class="btn-ghost text-red-600 dark:text-red-400">{% translate "Delete" %}</a>
+    </div>
+  </div>
+
+  {% if company.website or company.careers_url %}
+    <div class="mb-6 flex flex-wrap gap-4 text-sm">
+      {% if company.website %}
+        <a href="{{ company.website }}" rel="noopener noreferrer external" target="_blank"
+           class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Website" %}</a>
+      {% endif %}
+      {% if company.careers_url %}
+        <a href="{{ company.careers_url }}" rel="noopener noreferrer external" target="_blank"
+           class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Careers page" %}</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2">
+      <h2 class="mb-3 font-medium">{% translate "Postings" %}</h2>
+      {% if postings %}
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for posting in postings %}
+              <li class="px-4 py-3">
+                <a href="{{ posting.get_absolute_url }}" class="font-medium hover:underline">
+                  {{ posting.title }}
+                </a>
+                <p class="text-sm text-ink-500 dark:text-ink-400">
+                  {{ posting.location|default:"—" }}
+                  {% for application in posting.applications.all %}
+                    ·
+                    <a href="{{ application.get_absolute_url }}" class="hover:underline">
+                      {{ application.get_status_display }}
+                    </a>
+                  {% endfor %}
+                </p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% translate "No postings recorded for this company." %}
+        </div>
+      {% endif %}
+
+      {% if company.notes %}
+        <h2 class="mt-8 mb-3 font-medium">{% translate "Notes" %}</h2>
+        <div class="card whitespace-pre-line text-sm">{{ company.notes }}</div>
+      {% endif %}
+    </div>
+
+    <aside>
+      <div class="mb-3 flex items-center justify-between">
+        <h2 class="font-medium">{% translate "People" %}</h2>
+        <a href="{% url 'jobs:contact_create' %}?company={{ company.pk }}"
+           class="text-sm text-brand-600 hover:underline dark:text-brand-400">{% translate "Add" %}</a>
+      </div>
+      {% if contacts %}
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for contact in contacts %}
+              <li class="px-4 py-3">
+                <div class="flex items-start gap-2">
+                  <div class="min-w-0 flex-1">
+                    <p class="font-medium">{{ contact.name }}</p>
+                    {% if contact.role %}
+                      <p class="text-xs text-ink-500 dark:text-ink-400">{{ contact.role }}</p>
+                    {% endif %}
+                    {% if contact.email %}
+                      <p class="truncate text-xs text-ink-500 dark:text-ink-400">{{ contact.email }}</p>
+                    {% endif %}
+                  </div>
+                  <a href="{% url 'jobs:contact_update' contact.pk %}"
+                     class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Nobody recorded here yet." %}
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

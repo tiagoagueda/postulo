@@ -1,7 +1,7 @@
 # Postulo — implementation plan
 
-> **Status:** M0 and M1 complete. This is a living document, revised as milestones
-> land and assumptions meet reality.
+> **Status:** M0, M1 and M2 complete. This is a living document, revised as
+> milestones land and assumptions meet reality.
 
 ## 1. Mission
 
@@ -73,6 +73,22 @@ Two items in the original plan did not survive contact with the packages:
   `ACCOUNT_USER_MODEL_USERNAME_FIELD = None`. Without it, its forms look for a column
   that does not exist.
 
+### Corrections made during M2
+
+- **The separate `Note` model was dropped.** It would have duplicated the event log,
+  which already stores a timestamped entry with a body. A note is simply an event of
+  kind "note", and companies and contacts keep a plain notes field. One timeline is
+  easier to read, to query and to explain than two overlapping records.
+- **Status transitions go through a service function**, never a signal. A signal fires
+  on fixtures, imports and admin edits, where an automatic timeline entry is usually
+  wrong. Routing the edit form through the same function was necessary too: saving the
+  field directly left a status the log could not account for.
+- **Aggregation drops `Meta.ordering`.** The paginated company list needed an explicit
+  `order_by`, or pagination could repeat and skip rows between pages.
+- **Number grouping is left to Django's locale machinery.** Hard-coding a thousands
+  separator in a project that ships French and Portuguese would have been wrong in two
+  of its three languages.
+
 ## 4. Repository layout
 
 ```
@@ -84,7 +100,7 @@ postulo/
 ├── locale/                   # fr_FR and pt_PT catalogues
 ├── src/postulo/
 │   ├── config/               # settings/{base,dev,prod,test}.py, urls, wsgi, asgi
-│   ├── core/                 # OwnedModel, scoped querysets, Tag, Note, layout
+│   ├── core/                 # OwnedModel, scoped querysets, Tag, layout
 │   ├── accounts/             # User, Profile, invites                           (M1)
 │   ├── resume/               # structured career content                        (M3)
 │   ├── documents/            # CV variants, cover letters, uploads, rendering   (M3)
@@ -167,8 +183,8 @@ rather than a rewrite.
 | --- | --- | --- |
 | **M0** | Repository, toolchain, Django skeleton, split settings, custom user model, i18n wiring, CI, documentation | **Complete** |
 | **M1** | Accounts and foundations: allauth flows, invitations, `OwnedModel` with isolation tests, private media delivery, the Tailwind and htmx layout | **Complete** |
-| **M2** | Jobs and applications: companies, contacts, postings, applications, the event timeline, board and table views, reminders, notes, tags | Next |
-| **M3** | Documents: resume content, CV variants with per-variant overrides, cover letters, uploads and versioning, PDF rendering, snapshot on send | |
+| **M2** | Jobs and applications: companies, contacts, postings, applications, the event timeline, board and table views, reminders, notes, tags | **Complete** |
+| **M3** | Documents: resume content, CV variants with per-variant overrides, cover letters, uploads and versioning, PDF rendering, snapshot on send | Next |
 | **M4** | Capture and plugins: URL fetching, the JSON-LD parser, the plugin registry, the review screen, the capture API and tokens, `docs/PLUGINS.md` | |
 | **M5** | Insights and data ownership: funnel and response-rate analytics, time to response, source conversion, search and filters, export and import | |
 | **M6** | Ship: Dockerfile, compose files for SQLite and PostgreSQL, health checks, installation documentation, v0.1.0 | |

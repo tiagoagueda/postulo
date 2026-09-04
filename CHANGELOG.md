@@ -27,6 +27,19 @@ All notable changes to Postulo are recorded here. The format follows
   nginx (`X-Accel-Redirect`) or Apache (`X-Sendfile`), and a guard against stored paths
   that resolve outside the media root.
 - Interface shell built with Tailwind v4 and htmx, in light and dark themes.
+- Companies, contacts and job postings, with postings kept separate from applications so
+  that a role you decided against still leaves a record (M2).
+- Applications with an append-only event timeline. Status changes are recorded rather
+  than merely stored, including from the edit form, so the log can always account for
+  the status.
+- `Ghosted` as an outcome in its own right: an employer that stops replying is not the
+  same as one that says no, and recording it as a rejection would misstate both their
+  behaviour and your response rate.
+- A board of live applications and a filterable, searchable table of all of them.
+- One-page intake that records company, posting and application together, matching
+  companies by name case-insensitively.
+- Reminders, tags, and a dashboard that leads with what needs chasing.
+- Salary figures grouped by the reader's locale rather than a hard-coded separator.
 
 ### Changed
 

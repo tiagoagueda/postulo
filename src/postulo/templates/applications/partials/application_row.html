@@ -1,0 +1,29 @@
+{% load i18n %}
+<tr id="application-{{ application.pk }}" class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+  <td class="px-4 py-3">
+    <a href="{{ application.get_absolute_url }}" class="font-medium hover:underline">
+      {{ application.posting.title }}
+    </a>
+    {% if application.tags.all %}
+      <div class="mt-1 flex flex-wrap gap-1">
+        {% for tag in application.tags.all %}
+          <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+            {{ tag.name }}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </td>
+  <td class="px-4 py-3">
+    <a href="{{ application.posting.company.get_absolute_url }}" class="hover:underline">
+      {{ application.posting.company.name }}
+    </a>
+  </td>
+  <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ application.posting.location|default:"—" }}</td>
+  <td class="px-4 py-3">
+    {% include "partials/status_badge.html" with status=application.status label=application.get_status_display %}
+  </td>
+  <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+    {{ application.applied_at|date:"j M Y"|default:"—" }}
+  </td>
+</tr>

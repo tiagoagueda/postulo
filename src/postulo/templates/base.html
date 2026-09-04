@@ -7,12 +7,13 @@
     <title>{% block title %}{% translate "Postulo" %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
     <script src="{% static 'js/vendor/htmx.min.js' %}" defer></script>
+    <script src="{% static 'js/app.js' %}" defer></script>
   </head>
 
   <body class="min-h-screen">
     {% block chrome %}
       <header class="border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900">
-        <div class="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
           <a href="{% url 'core:home' %}"
              class="text-lg font-semibold tracking-tight text-ink-900 dark:text-ink-50">
             {% translate "Postulo" %}
@@ -23,6 +24,21 @@
               <a href="{% url 'core:home' %}" class="{% nav_active 'core:home' %}">
                 {% translate "Dashboard" %}
               </a>
+              <a href="{% url 'applications:list' %}"
+                 class="{% nav_active 'applications:list' 'applications:detail' 'applications:create' %}">
+                {% translate "Applications" %}
+              </a>
+              <a href="{% url 'applications:board' %}" class="{% nav_active 'applications:board' %}">
+                {% translate "Board" %}
+              </a>
+              <a href="{% url 'jobs:company_list' %}"
+                 class="{% nav_active 'jobs:company_list' 'jobs:company_detail' %}">
+                {% translate "Companies" %}
+              </a>
+              <a href="{% url 'applications:reminder_list' %}"
+                 class="{% nav_active 'applications:reminder_list' %}">
+                {% translate "Reminders" %}
+              </a>
               {% if user.is_staff %}
                 <a href="{% url 'accounts:invite_list' %}"
                    class="{% nav_active 'accounts:invite_list' 'accounts:invite_create' %}">
@@ -32,6 +48,9 @@
             </nav>
 
             <div class="ml-auto flex items-center gap-1">
+              <a href="{% url 'applications:create' %}" class="btn-primary mr-2">
+                {% translate "Record an application" %}
+              </a>
               <a href="{% url 'accounts:profile' %}" class="{% nav_active 'accounts:profile' %}">
                 {{ user.display_name }}
               </a>
@@ -49,12 +68,12 @@
       </header>
     {% endblock %}
 
-    <main class="mx-auto max-w-6xl px-4 py-8">
+    <main class="mx-auto max-w-7xl px-4 py-8">
       {% include "partials/messages.html" %}
       {% block content %}{% endblock %}
     </main>
 
-    <footer class="mx-auto max-w-6xl px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
+    <footer class="mx-auto max-w-7xl px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed %}
         Postulo — your job search, on your server.
       {% endblocktranslate %}

@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     # postulo
     "postulo.core",
     "postulo.accounts",
+    "postulo.jobs",
+    "postulo.applications",
 ]
 
 MIDDLEWARE = [

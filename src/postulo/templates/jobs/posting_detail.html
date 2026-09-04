@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ posting.title }}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div class="min-w-0">
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        <a href="{{ posting.company.get_absolute_url }}" class="hover:underline">
+          {{ posting.company.name }}
+        </a>
+      </p>
+      <h1 class="text-2xl font-semibold tracking-tight">{{ posting.title }}</h1>
+      <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">
+        {{ posting.location|default:"" }}
+        {% if posting.remote_type %} · {{ posting.get_remote_type_display }}{% endif %}
+        {% if posting.employment_type %} · {{ posting.get_employment_type_display }}{% endif %}
+      </p>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="{% url 'jobs:posting_update' posting.pk %}" class="btn-secondary">{% translate "Edit" %}</a>
+      <a href="{% url 'jobs:posting_delete' posting.pk %}"
+         class="btn-ghost text-red-600 dark:text-red-400">{% translate "Delete" %}</a>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2">
+      <h2 class="mb-3 font-medium">{% translate "Description" %}</h2>
+      {% if posting.description %}
+        <div class="card whitespace-pre-line text-sm">{{ posting.description }}</div>
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Nothing saved. Postings vanish from the web; pasting the text keeps your copy." %}
+        </div>
+      {% endif %}
+    </div>
+
+    <aside>
+      <div class="card mb-6">
+        <dl class="space-y-3 text-sm">
+          {% if posting.salary_display %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Salary" %}</dt>
+              <dd>{{ posting.salary_display }}</dd>
+            </div>
+          {% endif %}
+          {% if posting.source %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Found via" %}</dt>
+              <dd>{{ posting.source }}</dd>
+            </div>
+          {% endif %}
+          {% if posting.closes_at %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Closes" %}</dt>
+              <dd>{{ posting.closes_at|date:"j F Y" }}</dd>
+            </div>
+          {% endif %}
+        </dl>
+        {% if posting.url %}
+          <a href="{{ posting.url }}" rel="noopener noreferrer external" target="_blank"
+             class="mt-4 inline-block text-sm text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "Original posting" %}
+          </a>
+        {% endif %}
+      </div>
+
+      <h2 class="mb-3 font-medium">{% translate "Applications" %}</h2>
+      {% if posting.applications.all %}
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for application in posting.applications.all %}
+              <li class="px-4 py-3">
+                <a href="{{ application.get_absolute_url }}" class="text-sm hover:underline">
+                  {{ application.get_status_display }}
+                </a>
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {{ application.applied_at|date:"j M Y"|default:"—" }}
+                </p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% translate "You have not applied to this one." %}
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ application.posting.title }}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div class="min-w-0">
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        <a href="{{ application.posting.company.get_absolute_url }}" class="hover:underline">
+          {{ application.posting.company.name }}
+        </a>
+      </p>
+      <h1 class="text-2xl font-semibold tracking-tight">{{ application.posting.title }}</h1>
+      <div class="mt-2 flex flex-wrap items-center gap-2">
+        {% include "partials/status_badge.html" with status=application.status label=application.get_status_display %}
+        {% for tag in application.tags.all %}
+          <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+            {{ tag.name }}
+          </span>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="{% url 'applications:update' application.pk %}" class="btn-secondary">
+        {% translate "Edit" %}
+      </a>
+      <a href="{% url 'applications:delete' application.pk %}" class="btn-ghost text-red-600 dark:text-red-400">
+        {% translate "Delete" %}
+      </a>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+
+    <div class="lg:col-span-2">
+
+      <div class="card mb-6">
+        <h2 class="mb-4 font-medium">{% translate "Move it along" %}</h2>
+        <form method="post" action="{% url 'applications:status' application.pk %}"
+              class="flex flex-wrap items-end gap-3">
+          {% csrf_token %}
+          <div>
+            <label class="field-label" for="id_status">{% translate "Status" %}</label>
+            {{ status_form.status }}
+          </div>
+          <div class="min-w-64 flex-1">
+            <label class="field-label" for="id_note">{% translate "Note (optional)" %}</label>
+            {{ status_form.note }}
+          </div>
+          <button type="submit" class="btn-primary">{% translate "Record" %}</button>
+        </form>
+      </div>
+
+      <div class="card mb-6">
+        <h2 class="mb-4 font-medium">{% translate "Add to the timeline" %}</h2>
+        <form method="post" action="{% url 'applications:event_create' application.pk %}">
+          {% csrf_token %}
+          <div class="grid gap-x-4 sm:grid-cols-2">
+            {% include "partials/field.html" with field=event_form.kind %}
+            {% include "partials/field.html" with field=event_form.occurred_at %}
+          </div>
+          {% include "partials/field.html" with field=event_form.summary %}
+          {% include "partials/field.html" with field=event_form.body %}
+          <button type="submit" class="btn-secondary">{% translate "Add entry" %}</button>
+        </form>
+      </div>
+
+      <h2 class="mb-3 font-medium">{% translate "What happened" %}</h2>
+      {% if events %}
+        <ol class="relative border-l border-ink-200 pl-6 dark:border-ink-800">
+          {% for event in events %}
+            <li class="mb-6 last:mb-0">
+              <span class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full
+                           {% if event.kind == 'status_change' %}bg-brand-500{% else %}bg-ink-300 dark:bg-ink-600{% endif %}"></span>
+              <div class="flex flex-wrap items-baseline gap-2">
+                <p class="font-medium">{{ event.summary|default:event.get_kind_display }}</p>
+                <span class="text-xs text-ink-400">{{ event.occurred_at|date:"j M Y, H:i" }}</span>
+                {% if event.kind != 'status_change' %}
+                  <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+                    {{ event.get_kind_display }}
+                  </span>
+                {% endif %}
+              </div>
+              {% if event.body %}
+                <p class="mt-1 whitespace-pre-line text-sm text-ink-600 dark:text-ink-300">{{ event.body }}</p>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Nothing recorded against this one yet." %}
+        </div>
+      {% endif %}
+    </div>
+
+    <aside>
+      <div class="card mb-6">
+        <h2 class="mb-4 font-medium">{% translate "The posting" %}</h2>
+        <dl class="space-y-3 text-sm">
+          {% if application.posting.location %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Location" %}</dt>
+              <dd>{{ application.posting.location }}</dd>
+            </div>
+          {% endif %}
+          {% if application.posting.remote_type %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Working arrangement" %}</dt>
+              <dd>{{ application.posting.get_remote_type_display }}</dd>
+            </div>
+          {% endif %}
+          {% if application.posting.salary_display %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Salary" %}</dt>
+              <dd>{{ application.posting.salary_display }} ({{ application.posting.get_salary_period_display|lower }})</dd>
+            </div>
+          {% endif %}
+          {% if application.channel %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Applied through" %}</dt>
+              <dd>{{ application.get_channel_display }}</dd>
+            </div>
+          {% endif %}
+          {% if application.applied_at %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Applied on" %}</dt>
+              <dd>{{ application.applied_at|date:"j F Y" }}</dd>
+            </div>
+          {% endif %}
+          {% if application.deadline %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Your deadline" %}</dt>
+              <dd>{{ application.deadline|date:"j F Y" }}</dd>
+            </div>
+          {% endif %}
+          {% if application.contact %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Main contact" %}</dt>
+              <dd>{{ application.contact.name }}{% if application.contact.role %} — {{ application.contact.role }}{% endif %}</dd>
+            </div>
+          {% endif %}
+        </dl>
+
+        <div class="mt-4 flex flex-wrap gap-3 text-sm">
+          {% if application.posting.url %}
+            <a href="{{ application.posting.url }}" rel="noopener noreferrer external" target="_blank"
+               class="text-brand-600 hover:underline dark:text-brand-400">
+              {% translate "Original posting" %}
+            </a>
+          {% endif %}
+          <a href="{% url 'jobs:posting_detail' application.posting.pk %}"
+             class="text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "Posting details" %}
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="font-medium">{% translate "Reminders" %}</h2>
+          <a href="{% url 'applications:reminder_create' %}?application={{ application.pk }}"
+             class="text-sm text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "Add" %}
+          </a>
+        </div>
+        {% if reminders %}
+          <ul class="space-y-3">
+            {% for reminder in reminders %}
+              <li class="flex items-start gap-3">
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm">{{ reminder.summary }}</p>
+                  <p class="text-xs {% if reminder.is_overdue %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
+                    {{ reminder.due_at|date:"j M Y, H:i" }}
+                  </p>
+                </div>
+                <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ application.get_absolute_url }}">
+                  <button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Done" %}</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "None outstanding." %}</p>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Edit application" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Edit application" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {{ application.posting.title }} — {{ application.posting.company.name }}
+    </p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        {% for field in form %}
+          {% include "partials/field.html" with field=field %}
+        {% endfor %}
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+        <a href="{{ application.get_absolute_url }}" class="btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+
+    <p class="mt-6 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "A status changed here is recorded on the timeline, the same as anywhere else." %}
+    </p>
+  </div>
+{% endblock %}
