@@ -94,10 +94,16 @@ jobs:
             || (echo "::error::app.css is stale. Run 'npm run build:css' and commit the result." && exit 1)
 
   image:
-    # Whether this runs at all depends on the runner having a Docker daemon it is allowed
-    # to talk to, which is not the default for forgejo-runner. The first step says so
-    # plainly rather than failing later with something cryptic. If your runner cannot do
-    # this, delete the job: the image is still buildable by hand, and CI covers the code.
+    # Dormant unless the repository variable DOCKER_AVAILABLE is set to "true".
+    #
+    # Building the image needs the runner to have a Docker daemon it is allowed to talk
+    # to, which is not the default for forgejo-runner. Left ungated, this job fails on
+    # every push and turns the badge red for a reason that has nothing to do with the
+    # code — which is worse than not checking at all, because a red build everybody
+    # ignores is a red build that hides the next real failure.
+    #
+    # To turn it on: Settings -> Actions -> Variables, add DOCKER_AVAILABLE = true.
+    if: vars.DOCKER_AVAILABLE == 'true'
     runs-on: ubuntu-latest
     container:
       image: docker:27-cli

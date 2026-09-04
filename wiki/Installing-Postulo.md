@@ -13,10 +13,11 @@ docker compose -f docker/compose.yml exec postulo python manage.py createsuperus
 Then put a reverse proxy in front of port 8000 to terminate TLS. That is the whole
 installation; the rest of this page is detail and the alternative without a container.
 
-> **A caveat worth reading.** The image is built and health-checked by continuous
-> integration, and each of its build steps has been run by hand, but nobody has yet run
-> it on a real server for a real job search. If something is wrong with it, you may be
-> the first to find out. Please say so.
+> **A caveat worth reading.** Each of the image's build steps has been run by hand under
+> production settings, but the image itself has not been run on a real server for a real
+> job search. Continuous integration can build and health-check it, but only where the
+> runner has a Docker daemon, which is not the common case. If something is wrong with
+> it, you may well be the first to find out. Please say so.
 
 ## What you need
 

@@ -86,7 +86,8 @@ first release that works rather than as a mature one.
   file, with an import that reads it back into an empty account.
 - `export_data` and `import_data` management commands.
 - A container image and Compose files for SQLite and PostgreSQL, so installing Postulo
-  is no longer a manual job (M6).
+  is no longer a manual job (M6). The image's build steps are verified; the image itself
+  has not yet been run on a server.
 
 ### Changed
 
