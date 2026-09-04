@@ -387,3 +387,42 @@ def test_a_refusal_says_what_to_do_about_it(status, expected):
     now is genuinely unreachable from their server.
     """
     assert expected in fetching._describe_failure(status)
+
+
+@pytest.mark.parametrize(
+    "address,expected",
+    [
+        # What MathWorks actually publishes: the country in the locality, and again on
+        # its own. Found by capturing a real posting, not by imagining one.
+        (
+            {"addressLocality": "Issy-les-Moulineaux, FR", "addressCountry": "FR"},
+            "Issy-les-Moulineaux, FR",
+        ),
+        # The tidy case.
+        (
+            {"addressLocality": "Paris", "addressCountry": "FR"},
+            "Paris, FR",
+        ),
+        # A country given as an object rather than a string, which is equally valid.
+        (
+            {"addressLocality": "Berlin", "addressCountry": {"name": "DE"}},
+            "Berlin, DE",
+        ),
+        # Region and country that happen to match.
+        (
+            {"addressLocality": "Lisbon", "addressRegion": "PT", "addressCountry": "PT"},
+            "Lisbon, PT",
+        ),
+        # A place that legitimately repeats a word must not lose it.
+        (
+            {"addressLocality": "New York", "addressRegion": "New York", "addressCountry": "US"},
+            "New York, US",
+        ),
+    ],
+)
+def test_a_location_is_not_said_twice(address, expected):
+    posting = {**FULL_POSTING, "jobLocation": {"@type": "Place", "address": address}}
+
+    data = SchemaOrgSource().parse("https://example.org/j/1", page_with_jsonld(posting))
+
+    assert data.location == expected

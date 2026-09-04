@@ -94,16 +94,27 @@ def _location(job_location) -> str:
     parts = [
         address.get("addressLocality"),
         address.get("addressRegion"),
-        address.get("addressCountry"),
+        _text(address["addressCountry"])
+        if isinstance(address.get("addressCountry"), dict)
+        else address.get("addressCountry"),
     ]
-    readable = [
-        str(part).strip() for part in parts if isinstance(part, str | int) and str(part).strip()
-    ]
-    if isinstance(address.get("addressCountry"), dict):
-        country = _text(address["addressCountry"])
-        if country:
-            readable.append(country)
-    return ", ".join(dict.fromkeys(readable))
+
+    # Sites repeat themselves. MathWorks, for one, writes "Issy-les-Moulineaux, FR" as
+    # the locality and "FR" again as the country, which joined naively reads
+    # "Issy-les-Moulineaux, FR, FR". Comparing comma-separated pieces rather than whole
+    # strings drops the repetition without discarding a genuine "York" after "New York".
+    readable: list[str] = []
+    seen: set[str] = set()
+    for part in parts:
+        text = str(part).strip() if isinstance(part, str | int) else ""
+        if not text:
+            continue
+        pieces = {piece.strip().lower() for piece in text.split(",") if piece.strip()}
+        if pieces and pieces <= seen:
+            continue
+        seen |= pieces
+        readable.append(text)
+    return ", ".join(readable)
 
 
 def _salary(base_salary) -> tuple[Decimal | None, Decimal | None, str, str]:
