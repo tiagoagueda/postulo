@@ -1,5 +1,7 @@
 # Postulo
 
+[![CI](https://source.tiagoagueda.com/tiagoagueda/postulo/actions/workflows/ci.yml/badge.svg)](https://source.tiagoagueda.com/tiagoagueda/postulo/actions)
+
 **Self-hosted job application manager, from the applicant's side of the table.**
 
 Every applicant tracking system is built for the company doing the hiring. Postulo is

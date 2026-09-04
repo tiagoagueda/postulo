@@ -4,6 +4,11 @@
 # `runs-on` must name a label the Forgejo runner actually advertises, which is shown
 # under Settings -> Actions -> Runners. A label no runner has does not fail the job: it
 # queues it for ever, which looks exactly like CI passing until somebody checks.
+#
+# Only `actions/checkout` is used, and nothing else from any action marketplace. Forgejo
+# resolves bare action names against its own instance rather than GitHub, so an action
+# published only on GitHub -- setup-uv and setup-node among them -- may not resolve at
+# all. Installing those two tools directly is a few more lines and no guesswork.
 name: CI
 
 on:
@@ -15,7 +20,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/catthehacker/ubuntu:act-24.04
+      # Debian with Node and git already present. uv brings its own Python, so nothing
+      # else needs installing, and the image is a fraction of the size of a full
+      # Actions runner image.
+      image: node:22-bookworm
     strategy:
       fail-fast: false
       matrix:
@@ -25,9 +33,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
-        with:
-          enable-cache: true
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Install dependencies
         run: uv sync --locked --python ${{ matrix.python-version }}
@@ -58,14 +66,10 @@ jobs:
     # That only works if it is kept in step with its source.
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/catthehacker/ubuntu:act-24.04
+      image: node:22-bookworm
 
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
 
       - run: npm ci
 
@@ -74,5 +78,8 @@ jobs:
 
       - name: Fail if the committed stylesheet is out of date
         run: |
+          # A container-backed runner may check out as a different user than the one
+          # running the steps, and git then refuses to read the repository at all.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git diff --exit-code -- src/postulo/static/css/app.css \
             || (echo "::error::app.css is stale. Run 'npm run build:css' and commit the result." && exit 1)
