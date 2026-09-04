@@ -1,6 +1,6 @@
 # Postulo — implementation plan
 
-> **Status:** M0 to M4 complete. This is a living document, revised as milestones
+> **Status:** M0 to M5 complete. This is a living document, revised as milestones
 > land and assumptions meet reality.
 
 ## 1. Mission
@@ -128,6 +128,24 @@ Two items in the original plan did not survive contact with the packages:
 - **django-ninja deprecated returning `(status, body)` tuples** in favour of `Status()`.
   Treating warnings as errors surfaced it immediately rather than at the next upgrade.
 
+### Corrections made during M5
+
+- **Every figure is read from the event log, not from current statuses.** This is the
+  reason M2 stored both. An application that interviewed and was then rejected has a
+  current status of "rejected"; counting statuses would report a search that reached
+  three final rounds as having reached none.
+- **Import merges companies and only companies.** A company is an identity keyed by its
+  name — the rule intake already uses — so a forced import attaches to employers that
+  exist rather than colliding with the per-owner unique name. Everything else is content
+  and gets duplicated, which is what "force" should mean. Found because the first
+  version violated the constraint and the test said so.
+- **Bars are inline SVG rather than styled `div`s.** A width can only be computed at
+  render time, and the Content-Security-Policy forbids inline style attributes. An SVG
+  width is a presentation attribute rather than CSS, so the policy did not need
+  loosening to draw a chart.
+- **The download endpoint's docstring claimed POST-only before the code enforced it.**
+  A test written from the docstring caught the discrepancy.
+
 ## 4. Repository layout
 
 ```
@@ -225,8 +243,8 @@ rather than a rewrite.
 | **M2** | Jobs and applications: companies, contacts, postings, applications, the event timeline, board and table views, reminders, notes, tags | **Complete** |
 | **M3** | Documents: resume content, CV variants with per-variant overrides, cover letters, uploads and versioning, PDF rendering, snapshot on send | **Complete** |
 | **M4** | Capture and plugins: URL fetching, the JSON-LD parser, the plugin registry, the review screen, the capture API and tokens, `docs/PLUGINS.md` | **Complete** |
-| **M5** | Insights and data ownership: funnel and response-rate analytics, time to response, source conversion, search and filters, export and import | Next |
-| **M6** | Ship: Dockerfile, compose files for SQLite and PostgreSQL, health checks, installation documentation, v0.1.0 | |
+| **M5** | Insights and data ownership: funnel and response-rate analytics, time to response, source conversion, search and filters, export and import | **Complete** |
+| **M6** | Ship: Dockerfile, compose files for SQLite and PostgreSQL, health checks, installation documentation, v0.1.0 | Next |
 
 Each milestone ends green: migrations applied, tests passing, and a working interface.
 M2 is the first point at which the application earns its keep, so nothing before it

@@ -79,7 +79,8 @@ record of the same employer, and neither can see the other's opinion of them.
 Paste a posting's address and Postulo will read the page for you — see
 [Capturing postings](Capturing-postings).
 
-## What is not here yet
+## What the record adds up to
 
-Response rates, time-to-reply and source conversion figures are planned for M5. See
-[Roadmap](Roadmap).
+**Insights** turns the timeline into figures: how far applications get, what share are
+answered at all, how long employers take, and which sources actually convert. See
+[Insights](Insights).

@@ -26,8 +26,11 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 - **Capture postings** from a URL — Postulo reads the page and asks you to confirm it
   before recording anything. Extensible through plugins, and reachable through a small
   API for scripts and browser extensions.
-- **See the funnel** — response rates, time to response, and which sources actually
-  convert.
+- **See what is working** — how far applications get, what share are answered, how long
+  employers take, and which sources convert. Read from the timeline, so an interview that
+  ended in a rejection still counts as an interview.
+- **Take everything with you** — one zip holding a readable JSON document of every record
+  and every file, which imports back.
 
 ## Principles
 

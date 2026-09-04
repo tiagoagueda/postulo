@@ -11,6 +11,7 @@
 - [Getting started](Getting-started)
 - [Tracking applications](Tracking-applications)
 - [Capturing postings](Capturing-postings)
+- [Insights](Insights)
 - [Your career record](Your-career-record)
 - [CVs](CVs)
 - [Cover letters](Cover-letters)

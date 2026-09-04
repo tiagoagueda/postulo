@@ -12,11 +12,9 @@ this wiki reads as a promise.
 | **M2** | Companies, contacts, postings, applications, the event timeline, board and table, reminders, tags |
 | **M3** | The career record, CV variants, cover letters, uploads, PDF export, snapshots of what you sent |
 | **M4** | Capturing a posting from its address, the plugin interface, and the capture API |
+| **M5** | Insights read from the timeline, and a complete export you can import back |
 
 ## Still to come
-
-**M5 — insights and data ownership.** Response rates, time to reply, which sources
-actually convert, and a one-click export of everything you have.
 
 **M6 — packaging.** A container image and Compose files, so installing Postulo stops being
 a manual job. See [Installing Postulo](Installing-Postulo) for what that involves today.

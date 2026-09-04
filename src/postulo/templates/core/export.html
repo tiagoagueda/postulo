@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Export everything" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-2xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Export everything" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Data you cannot walk away with is not really yours. This is one zip holding every
+        record in your account and every file in it.
+      {% endblocktranslate %}
+    </p>
+
+    <div class="card mb-6">
+      <h2 class="mb-4 font-medium">{% translate "What is in it" %}</h2>
+      <dl class="grid grid-cols-2 gap-3 text-sm">
+        <div class="flex justify-between"><dt>{% translate "Companies" %}</dt><dd class="tabular-nums">{{ counts.companies|default:0 }}</dd></div>
+        <div class="flex justify-between"><dt>{% translate "Applications" %}</dt><dd class="tabular-nums">{{ counts.applications|default:0 }}</dd></div>
+        <div class="flex justify-between"><dt>{% translate "CVs" %}</dt><dd class="tabular-nums">{{ counts.cvs|default:0 }}</dd></div>
+        <div class="flex justify-between"><dt>{% translate "Cover letters" %}</dt><dd class="tabular-nums">{{ counts.cover_letters|default:0 }}</dd></div>
+        <div class="flex justify-between"><dt>{% translate "Uploaded files" %}</dt><dd class="tabular-nums">{{ counts.uploads|default:0 }}</dd></div>
+        <div class="flex justify-between"><dt>{% translate "Sent documents" %}</dt><dd class="tabular-nums">{{ counts.sent_documents|default:0 }}</dd></div>
+      </dl>
+      <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          Plus your profile, your career record, tags, every timeline entry and every
+          reminder. The archive contains one readable JSON file and a media folder.
+        {% endblocktranslate %}
+      </p>
+    </div>
+
+    <form method="post" action="{% url 'core:export_download' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn-primary">{% translate "Download the archive" %}</button>
+      <span class="ml-3 text-xs text-ink-500 dark:text-ink-400">{{ filename }}</span>
+    </form>
+
+    <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
+      <h2 class="mb-2 font-medium">{% translate "Putting it back" %}</h2>
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          An archive can be imported into an empty account from the command line. It is
+          not offered here because importing creates records rather than merging them,
+          and that is a decision worth making deliberately rather than by clicking.
+        {% endblocktranslate %}
+      </p>
+      <pre class="overflow-x-auto rounded bg-ink-100 p-3 text-xs dark:bg-ink-950"><code>uv run manage.py import_data you@example.org {{ filename }}</code></pre>
+    </div>
+  </div>
+{% endblock %}

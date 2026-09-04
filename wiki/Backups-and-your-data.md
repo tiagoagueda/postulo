@@ -1,10 +1,53 @@
 # Backups and your data
 
-> **There is no export button yet.** A one-click JSON and media export is planned for
-> milestone M5 — see [Roadmap](Roadmap). Until then, backing up means copying files, which
-> is not difficult.
+## Taking everything with you
 
-## What to copy
+**Dashboard → Export everything**, or *Insights → Export everything*.
+
+One zip, holding a readable JSON document of every record in your account and every file
+in it: your profile, career record, companies, postings, applications with their whole
+timeline, reminders, tags, CVs, cover letters, uploads and every document you sent.
+
+From the command line:
+
+```sh
+uv run manage.py export_data you@example.org --output postulo-backup.zip
+```
+
+The JSON is nested the way the records actually relate — companies contain postings,
+postings contain applications, applications contain their timeline — rather than being a
+dump of database tables. The point is that somebody can still do something useful with it
+in ten years, when Postulo is a memory.
+
+## Putting an archive back
+
+```sh
+uv run manage.py import_data you@example.org postulo-backup.zip
+```
+
+Import **creates records; it never merges**. Deciding whether the "Acme" in a file is the
+same Acme already in the database is a judgement Postulo is not in a position to make,
+and getting it wrong quietly would be worse than not trying. So an import into an account
+that already holds a job search is refused unless you pass `--force`.
+
+Two exceptions to "never merges", both deliberate:
+
+- **Companies are matched by name**, the same rule the application form uses, so a forced
+  import attaches to employers you already have rather than creating "Acme" twice.
+- **A CV whose name is taken gets a number appended.** A CV is content rather than an
+  identity, so a clash gets a new name instead of being merged into whatever happened to
+  share its title.
+
+It runs in one transaction: an archive that turns out to be broken half way through
+leaves the account exactly as it was.
+
+There is no import button in the web interface. Importing is a migration, not an everyday
+action, and it is worth doing deliberately on a command line rather than by clicking.
+
+## What to copy for a backup
+
+An export is the portable copy. For a backup you can restore onto the same version, copy
+the files themselves:
 
 Two things, and they must be copied together:
 

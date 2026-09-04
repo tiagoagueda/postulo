@@ -9,12 +9,20 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 from postulo.core.models import Tag
 from postulo.jobs.views import UserFormKwargsMixin
 
+from .analytics import build as build_insights
 from .forms import (
     ApplicationForm,
     ApplicationIntakeForm,
@@ -324,3 +332,25 @@ class TagDeleteView(OwnedObjectMixin, DeleteView):
     model = Tag
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("applications:tag_list")
+
+
+# --------------------------------------------------------------------- insights
+
+
+class InsightsView(OwnedObjectMixin, TemplateView):
+    """What the record says about the search.
+
+    Read from the event log rather than from current statuses, so an application that
+    was interviewing before it was rejected still counts as an interview. Anything else
+    would report that a search which reached three final rounds had reached none.
+    """
+
+    template_name = "applications/insights.html"
+
+    def get_queryset(self):
+        return Application.objects.for_user(self.request.user)
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["insights"] = build_insights(self.request.user)
+        return context

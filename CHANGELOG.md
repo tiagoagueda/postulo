@@ -67,6 +67,12 @@ All notable changes to Postulo are recorded here. The format follows
   and for postings behind a login. Postulo fetches nothing in that case.
 - Fetch failures now explain themselves. A bare status code is true and useless; a 403
   in particular needs to say that the site blocks non-browsers and what to do instead.
+- Insights: a funnel, response rate, time to a reply, and source conversion — every
+  figure read from the event log, so an interview that ended in a rejection still counts
+  as an interview (M5).
+- A complete export: one zip holding a readable JSON document of every record and every
+  file, with an import that reads it back into an empty account.
+- `export_data` and `import_data` management commands.
 
 ### Changed
 

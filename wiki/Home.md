@@ -21,6 +21,7 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 | Use it for the first time | [Getting started](Getting-started) |
 | Keep on top of applications | [Tracking applications](Tracking-applications) |
 | Stop retyping adverts | [Capturing postings](Capturing-postings) |
+| See what the record adds up to | [Insights](Insights) |
 | Write your CV once and tailor it | [Your career record](Your-career-record) and [CVs](CVs) |
 | Reuse a cover letter properly | [Cover letters](Cover-letters) |
 | Know what you sent to whom | [Files and what you sent](Files-and-what-you-sent) |
@@ -38,6 +39,8 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 - **Tailors CVs** per role without forking your history.
 - **Keeps what you actually sent**, frozen as a PDF at the moment of sending.
 - **Stores files you already had**, versioned, and never serves them publicly.
+- **Tells you what is working** — how far applications get, how long employers take,
+  which sources convert — read from the timeline rather than from current statuses.
 - **Reads a posting from its address**, and asks you to confirm it before recording
   anything.
 
