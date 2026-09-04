@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+/* Templates and Python live outside this directory, so point Tailwind at them. */
+@source "../../src/postulo";
+
+/*
+ * Dark mode has three states. An explicit profile preference stamps data-theme on the
+ * root element and wins outright; with nothing stamped, the operating system decides.
+ * Both branches feed the same `dark:` variant, so no rule has to know which applied.
+ */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+@theme {
+  --font-sans:
+    "Inter var", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  /* Ink: a warm near-black rather than pure black, which is easier to read at length. */
+  --color-ink-50: oklch(0.985 0.002 250);
+  --color-ink-100: oklch(0.968 0.003 250);
+  --color-ink-200: oklch(0.922 0.005 250);
+  --color-ink-300: oklch(0.86 0.008 250);
+  --color-ink-400: oklch(0.68 0.012 250);
+  --color-ink-500: oklch(0.55 0.015 250);
+  --color-ink-600: oklch(0.44 0.016 250);
+  --color-ink-700: oklch(0.36 0.016 250);
+  --color-ink-800: oklch(0.26 0.014 250);
+  --color-ink-900: oklch(0.19 0.012 250);
+  --color-ink-950: oklch(0.13 0.01 250);
+
+  /* Brand: a deep indigo. Sober enough for something you use while job hunting. */
+  --color-brand-50: oklch(0.97 0.014 275);
+  --color-brand-100: oklch(0.94 0.03 275);
+  --color-brand-200: oklch(0.88 0.06 275);
+  --color-brand-300: oklch(0.8 0.1 275);
+  --color-brand-400: oklch(0.7 0.15 275);
+  --color-brand-500: oklch(0.62 0.185 275);
+  --color-brand-600: oklch(0.55 0.19 275);
+  --color-brand-700: oklch(0.47 0.17 275);
+  --color-brand-800: oklch(0.39 0.14 275);
+  --color-brand-900: oklch(0.32 0.11 275);
+}
+
+/* --------------------------------------------------------------- base layer */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-900 antialiased dark:bg-ink-950 dark:text-ink-100;
+  }
+
+  input:where(
+      [type="text"], [type="email"], [type="password"], [type="url"], [type="tel"],
+      [type="number"], [type="date"], [type="datetime-local"], [type="search"]
+    ),
+  select,
+  textarea {
+    @apply field-input;
+  }
+
+  label {
+    @apply text-sm font-medium text-ink-700 dark:text-ink-300;
+  }
+
+  /* A visible focus ring is not decoration; it is how keyboard users navigate. */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+}
+
+/* --------------------------------------------------------- component layer */
+
+/*
+ * These three are declared as utilities rather than component classes because other
+ * classes compose them with @apply, which in Tailwind v4 only accepts utilities.
+ */
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2
+    text-sm font-medium transition-colors
+    disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility nav-link {
+  @apply rounded-lg px-3 py-2 text-sm font-medium text-ink-600
+    hover:bg-ink-100 hover:text-ink-900
+    dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-ink-100;
+}
+
+@utility alert {
+  @apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm;
+}
+
+@utility field-input {
+  @apply w-full rounded-lg border border-ink-300 bg-white px-3 py-2 text-sm
+    text-ink-900 placeholder:text-ink-400
+    focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none
+    dark:border-ink-700 dark:bg-ink-950 dark:text-ink-100;
+}
+
+@layer components {
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
+  }
+
+  .btn-secondary {
+    @apply btn border border-ink-300 bg-white text-ink-800 hover:bg-ink-100
+      dark:border-ink-700 dark:bg-ink-900 dark:text-ink-100 dark:hover:bg-ink-800;
+  }
+
+  .btn-ghost {
+    @apply btn text-ink-600 hover:bg-ink-100 hover:text-ink-900
+      dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-ink-100;
+  }
+
+  .card {
+    @apply rounded-xl border border-ink-200 bg-white p-6 shadow-sm
+      dark:border-ink-800 dark:bg-ink-900;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-ink-700 dark:text-ink-300;
+  }
+
+  .field-help {
+    @apply mt-1.5 text-xs text-ink-500 dark:text-ink-400;
+  }
+
+  .field-error {
+    @apply mt-1.5 text-xs font-medium text-red-600 dark:text-red-400;
+  }
+
+  .nav-link-active {
+    @apply nav-link bg-ink-100 text-ink-900 dark:bg-ink-800 dark:text-ink-50;
+  }
+
+  .alert-info {
+    @apply alert border-brand-200 bg-brand-50 text-brand-900
+      dark:border-brand-800 dark:bg-brand-900/30 dark:text-brand-100;
+  }
+
+  .alert-success {
+    @apply alert border-emerald-200 bg-emerald-50 text-emerald-900
+      dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-100;
+  }
+
+  .alert-warning {
+    @apply alert border-amber-200 bg-amber-50 text-amber-900
+      dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-100;
+  }
+
+  .alert-error {
+    @apply alert border-red-200 bg-red-50 text-red-900
+      dark:border-red-800 dark:bg-red-900/30 dark:text-red-100;
+  }
+}
+
+/* ------------------------------------------------------------------- htmx */
+
+/* Show progress only once a request is genuinely in flight. */
+.htmx-indicator {
+  @apply invisible opacity-0 transition-opacity;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  @apply visible opacity-100;
+}

@@ -48,3 +48,27 @@ jobs:
           # Long enough to satisfy security.W009; not a real secret.
           POSTULO_SECRET_KEY: ci-only-placeholder-nS7pQ2xV9wR4tY6uI8oA3sD5fG1hJ0kL2zX4cV6b
           POSTULO_ALLOWED_HOSTS: postulo.example.org
+
+  styles:
+    # The compiled stylesheet is committed so that the application runs without Node.
+    # That only works if it is kept in step with its source.
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:act-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: npm ci
+
+      - name: Rebuild the stylesheet
+        run: npm run build:css
+
+      - name: Fail if the committed stylesheet is out of date
+        run: |
+          git diff --exit-code -- src/postulo/static/css/app.css \
+            || (echo "::error::app.css is stale. Run 'npm run build:css' and commit the result." && exit 1)

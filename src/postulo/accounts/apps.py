@@ -7,3 +7,6 @@ class AccountsConfig(AppConfig):
     name = "postulo.accounts"
     label = "accounts"
     verbose_name = _("Accounts")
+
+    def ready(self) -> None:
+        from . import signals  # noqa: F401  (registers the receivers)

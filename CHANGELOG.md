@@ -15,3 +15,19 @@ All notable changes to Postulo are recorded here. The format follows
 - Continuous integration on Forgejo: linting, migration checks, tests across three
   Python versions, and a production deployment check.
 - Implementation plan covering the architecture, data model, and milestones.
+- Ownership foundations: an `OwnedModel` base with an owner-scoped queryset and view
+  mixins that narrow rather than check, so another account's record returns 404 instead
+  of confirming that it exists (M1).
+- Personal profiles holding the contact block that will be printed on CVs, plus
+  per-account language, time zone, and theme preferences.
+- Invitation-only registration: single-use invitations that expire on their own and may
+  be bound to one email address, which is enforced at signup rather than merely
+  suggested.
+- Private file delivery through an ownership-checked view, with optional hand-off to
+  nginx (`X-Accel-Redirect`) or Apache (`X-Sendfile`), and a guard against stored paths
+  that resolve outside the media root.
+- Interface shell built with Tailwind v4 and htmx, in light and dark themes.
+
+### Changed
+
+- The default time zone is now `Europe/Paris` rather than UTC.

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Your details" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-2xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Your details" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        This is the contact block that will be printed on your CVs, plus how Postulo
+        should present itself to you.
+      {% endblocktranslate %}
+    </p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="card mb-4">
+        <h2 class="mb-4 font-medium">{% translate "Contact block" %}</h2>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.first_name %}
+          {% include "partials/field.html" with field=form.last_name %}
+        </div>
+        {% include "partials/field.html" with field=form.headline %}
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.phone %}
+          {% include "partials/field.html" with field=form.location %}
+        </div>
+        {% include "partials/field.html" with field=form.website %}
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.linkedin_url %}
+          {% include "partials/field.html" with field=form.source_repo_url %}
+        </div>
+      </div>
+
+      <div class="card mb-6">
+        <h2 class="mb-4 font-medium">{% translate "Preferences" %}</h2>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.language %}
+          {% include "partials/field.html" with field=form.time_zone %}
+        </div>
+        {% include "partials/field.html" with field=form.theme %}
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+        <a href="{% url 'core:home' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+
+    <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
+      <h2 class="mb-3 font-medium">{% translate "Account" %}</h2>
+      <div class="flex flex-wrap gap-3">
+        <a href="{% url 'account_change_password' %}" class="btn-secondary">
+          {% translate "Change password" %}
+        </a>
+        <a href="{% url 'account_email' %}" class="btn-secondary">
+          {% translate "Email addresses" %}
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

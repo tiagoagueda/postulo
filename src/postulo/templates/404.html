@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Not found" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-md py-16 text-center">
+    <p class="mb-2 text-5xl font-semibold text-ink-300 dark:text-ink-700">404</p>
+    <h1 class="mb-2 text-xl font-semibold">{% translate "Not found" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "There is nothing here, or it is not yours to see." %}
+    </p>
+    <a href="{% url 'core:home' %}" class="btn-secondary">{% translate "Go back" %}</a>
+  </div>
+{% endblock %}

@@ -14,6 +14,9 @@ PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
 MAILERS = {"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}}
 
+# A throwaway app providing a concrete OwnedModel to test the foundations against.
+INSTALLED_APPS = [*INSTALLED_APPS, "tests.testapp"]
+
 MEDIA_ROOT = tempfile.mkdtemp(prefix="postulo-test-media-")
 
 # WhiteNoise warns about a missing static root; give it a real, empty directory.

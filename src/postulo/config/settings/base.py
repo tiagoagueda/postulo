@@ -59,6 +59,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    # Last, because it needs request.user and overrides LocaleMiddleware.
+    "postulo.core.middleware.UserPreferencesMiddleware",
 ]
 
 TEMPLATES = [
@@ -72,6 +74,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.i18n",
+                "postulo.core.context_processors.ui",
             ],
         },
     },
@@ -110,6 +113,11 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
+# The user model has no username column at all; allauth must be told, or it will
+# look for one while building its forms.
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 
 # An instance is invite-only unless the operator opens registration deliberately.
 POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)
@@ -130,7 +138,7 @@ LANGUAGES = [
 
 LOCALE_PATHS = [REPO_DIR / "locale"]
 
-TIME_ZONE = env("POSTULO_TIME_ZONE", default="UTC")
+TIME_ZONE = env("POSTULO_TIME_ZONE", default="Europe/Paris")
 USE_I18N = True
 USE_TZ = True
 
@@ -144,6 +152,13 @@ STATICFILES_DIRS = [PACKAGE_DIR / "static"]
 # Every file is delivered through an ownership-checked view instead.
 MEDIA_URL = "media/"
 MEDIA_ROOT = env.path("POSTULO_MEDIA_ROOT", default=REPO_DIR / "data" / "media")
+
+# Optional hand-off to the web server once Django has authorised a download. Leave both
+# unset to have Django stream the file itself, which is correct but ties up a worker.
+# nginx: an `internal` location, e.g. "/protected-media/".
+POSTULO_MEDIA_ACCEL_PREFIX = env("POSTULO_MEDIA_ACCEL_PREFIX", default="")
+# Apache with mod_xsendfile.
+POSTULO_MEDIA_SENDFILE = env.bool("POSTULO_MEDIA_SENDFILE", default=False)
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},

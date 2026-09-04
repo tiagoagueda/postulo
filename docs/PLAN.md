@@ -1,7 +1,7 @@
 # Postulo — implementation plan
 
-> **Status:** M0 complete. This is a living document, revised as milestones land and
-> assumptions meet reality.
+> **Status:** M0 and M1 complete. This is a living document, revised as milestones
+> land and assumptions meet reality.
 
 ## 1. Mission
 
@@ -38,7 +38,7 @@ Every version below was verified against PyPI and installed successfully on Pyth
 | Runtime | Python 3.12 to 3.14, managed by `uv` | 3.14 pinned locally via `.python-version`; CI covers all three |
 | Framework | **Django 6.1** | 5.2 does not support Python 3.14. Brings built-in CSP, template partials, the Tasks API and `MAILERS` |
 | Database | SQLite by default, PostgreSQL via `POSTULO_DATABASE_URL` | Self-hosting sanity: one file to back up. PostgreSQL for those who want it |
-| Interface | Django templates, HTMX 2, Alpine.js, Tailwind v4 | Server-rendered. No SPA, and no API-first tax on an application of this scale |
+| Interface | Django templates, htmx 2, Tailwind v4 | Server-rendered. No SPA, and no API-first tax on an application of this scale. Alpine.js was dropped — see below |
 | Authentication | django-allauth, email as identifier | Invite-only by default via `POSTULO_REGISTRATION_OPEN` |
 | API | **django-ninja** | Pydantic schemas serve double duty as the plugin data contract. Verified working on Python 3.14 with Django 6.1 during M0 |
 | PDF | Pluggable: WeasyPrint on Linux and Docker, Playwright Chromium on Windows | WeasyPrint needs GTK, which Windows lacks. `POSTULO_PDF_BACKEND` overrides the auto-detection |
@@ -57,6 +57,21 @@ Two items in the original plan did not survive contact with the packages:
 - **`EMAIL_BACKEND` is deprecated in Django 6.1** in favour of `MAILERS`, and the two may
   not be combined. All settings use `MAILERS`. This was caught by treating warnings as
   errors, which is precisely why that setting is switched on.
+
+### Corrections made during M1
+
+- **Alpine.js was dropped.** Alpine evaluates its expressions with `new Function()`,
+  which requires `script-src 'unsafe-eval'`. Weakening the Content-Security-Policy of an
+  application that stores personal documents, in exchange for sprinkles of client-side
+  state, is a poor trade. htmx needs no `eval`, and the small amount of behaviour left
+  over is plain JavaScript.
+- **The compiled stylesheet is committed.** Tailwind needs Node, and requiring it to run
+  Postulo would be an unpleasant surprise for someone self-hosting a Python application.
+  Node is needed only to *change* the CSS; CI rebuilds it and fails if the committed
+  file has drifted.
+- **allauth needs telling that the user model has no username**, via
+  `ACCOUNT_USER_MODEL_USERNAME_FIELD = None`. Without it, its forms look for a column
+  that does not exist.
 
 ## 4. Repository layout
 
@@ -151,8 +166,8 @@ rather than a rewrite.
 | # | Deliverable | State |
 | --- | --- | --- |
 | **M0** | Repository, toolchain, Django skeleton, split settings, custom user model, i18n wiring, CI, documentation | **Complete** |
-| **M1** | Accounts and foundations: allauth flows, invites, `OwnedModel` with isolation tests, private media delivery, the Tailwind and HTMX layout | Next |
-| **M2** | Jobs and applications: companies, contacts, postings, applications, the event timeline, board and table views, reminders, notes, tags | |
+| **M1** | Accounts and foundations: allauth flows, invitations, `OwnedModel` with isolation tests, private media delivery, the Tailwind and htmx layout | **Complete** |
+| **M2** | Jobs and applications: companies, contacts, postings, applications, the event timeline, board and table views, reminders, notes, tags | Next |
 | **M3** | Documents: resume content, CV variants with per-variant overrides, cover letters, uploads and versioning, PDF rendering, snapshot on send | |
 | **M4** | Capture and plugins: URL fetching, the JSON-LD parser, the plugin registry, the review screen, the capture API and tokens, `docs/PLUGINS.md` | |
 | **M5** | Insights and data ownership: funnel and response-rate analytics, time to response, source conversion, search and filters, export and import | |

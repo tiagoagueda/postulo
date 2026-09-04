@@ -34,9 +34,9 @@ weasyprint = ["weasyprint>=69"]
 chromium = ["playwright>=1.62"]
 
 [project.urls]
-Homepage = "https://git.tiagoagueda.com/tiagoagueda/postulo"
-Source = "https://git.tiagoagueda.com/tiagoagueda/postulo"
-Issues = "https://git.tiagoagueda.com/tiagoagueda/postulo/issues"
+Homepage = "https://source.tiagoagueda.com/tiagoagueda/postulo"
+Source = "https://source.tiagoagueda.com/tiagoagueda/postulo"
+Issues = "https://source.tiagoagueda.com/tiagoagueda/postulo/issues"
 
 [dependency-groups]
 dev = [
@@ -84,6 +84,11 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S105", "S106"]
+# Declarative Meta and admin classes hold dicts and lists by design; RUF012 wants
+# ClassVar on all of them, which adds noise to every Django class in the project.
+"src/postulo/*/forms.py" = ["RUF012"]
+"src/postulo/*/admin.py" = ["RUF012"]
+"src/postulo/*/views.py" = ["RUF012"]
 "src/postulo/config/settings/*" = ["F403", "F405"]
 
 [tool.ruff.lint.isort]

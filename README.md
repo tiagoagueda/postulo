@@ -44,7 +44,16 @@ Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 uv sync                      # install dependencies
 cp .env.example .env         # configure (a dev SECRET_KEY is generated if unset)
 uv run manage.py migrate
+uv run manage.py createsuperuser
 uv run manage.py runserver
+```
+
+Node is **not** required to run Postulo: the compiled stylesheet is committed. It is
+only needed to change the CSS, in which case:
+
+```sh
+npm install
+npm run watch:css            # or `npm run build:css` for a one-off
 ```
 
 Tests and linting:
@@ -62,6 +71,6 @@ users are entitled to its source.
 
 ## Where this lives
 
-Developed on [Forgejo](https://git.tiagoagueda.com/tiagoagueda/postulo) and mirrored to
+Developed on [Forgejo](https://source.tiagoagueda.com/tiagoagueda/postulo) and mirrored to
 GitHub. Issues and pull requests belong on the Forgejo repository; the GitHub copy is a
 read-only mirror.

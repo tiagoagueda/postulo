@@ -1,14 +1,63 @@
-{% load i18n static %}<!doctype html>
-<html lang="{{ LANGUAGE_CODE|default:'en-gb' }}">
+{% load i18n static postulo %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE|default:'en-gb' }}"{% if ui_theme %} data-theme="{{ ui_theme }}"{% endif %}>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Postulo{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <meta name="referrer" content="same-origin">
+    <title>{% block title %}{% translate "Postulo" %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <script src="{% static 'js/vendor/htmx.min.js' %}" defer></script>
   </head>
-  <body>
-    <main>
+
+  <body class="min-h-screen">
+    {% block chrome %}
+      <header class="border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900">
+        <div class="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
+          <a href="{% url 'core:home' %}"
+             class="text-lg font-semibold tracking-tight text-ink-900 dark:text-ink-50">
+            {% translate "Postulo" %}
+          </a>
+
+          {% if user.is_authenticated %}
+            <nav class="flex items-center gap-1" aria-label="{% translate 'Main' %}">
+              <a href="{% url 'core:home' %}" class="{% nav_active 'core:home' %}">
+                {% translate "Dashboard" %}
+              </a>
+              {% if user.is_staff %}
+                <a href="{% url 'accounts:invite_list' %}"
+                   class="{% nav_active 'accounts:invite_list' 'accounts:invite_create' %}">
+                  {% translate "Invitations" %}
+                </a>
+              {% endif %}
+            </nav>
+
+            <div class="ml-auto flex items-center gap-1">
+              <a href="{% url 'accounts:profile' %}" class="{% nav_active 'accounts:profile' %}">
+                {{ user.display_name }}
+              </a>
+              <form method="post" action="{% url 'account_logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-ghost">{% translate "Sign out" %}</button>
+              </form>
+            </div>
+          {% else %}
+            <div class="ml-auto flex items-center gap-2">
+              <a href="{% url 'account_login' %}" class="btn-secondary">{% translate "Sign in" %}</a>
+            </div>
+          {% endif %}
+        </div>
+      </header>
+    {% endblock %}
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      {% include "partials/messages.html" %}
       {% block content %}{% endblock %}
     </main>
+
+    <footer class="mx-auto max-w-6xl px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Postulo — your job search, on your server.
+      {% endblocktranslate %}
+    </footer>
   </body>
 </html>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "New invitation" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-md">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "New invitation" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Naming an address restricts the invitation to that person. Leaving it blank
+        creates a link that anyone holding it may use once.
+      {% endblocktranslate %}
+    </p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        {% include "partials/field.html" with field=form.email %}
+        {% include "partials/field.html" with field=form.note %}
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Create invitation" %}</button>
+        <a href="{% url 'accounts:invite_list' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

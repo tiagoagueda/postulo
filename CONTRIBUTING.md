@@ -1,7 +1,7 @@
 # Contributing to Postulo
 
 Thank you for considering it. Postulo is developed on
-[Forgejo](https://git.tiagoagueda.com/tiagoagueda/postulo); the GitHub repository is a
+[Forgejo](https://source.tiagoagueda.com/tiagoagueda/postulo); the GitHub repository is a
 read-only mirror, so please open issues and pull requests on Forgejo.
 
 ## Getting set up
@@ -24,10 +24,12 @@ uv run ruff format .
 uv run ruff check --fix .
 uv run pytest
 uv run manage.py makemigrations --check --dry-run
+npm run build:css            # only if you touched assets/css/
 ```
 
 Continuous integration runs all of the above across Python 3.12, 3.13, and 3.14, plus
-`manage.py check --deploy` against production settings.
+`manage.py check --deploy` against production settings, and it fails if the committed
+stylesheet has drifted from its source.
 
 ## House style
 
@@ -38,7 +40,11 @@ Continuous integration runs all of the above across Python 3.12, 3.13, and 3.14,
 - **Every user-owned model** inherits the shared owned-model base and is filtered by
   owner in every query. Cross-account data leaks are the one bug class we test for
   explicitly, so new models need a test proving isolation.
-- **Personal documents are private.** Never serve uploaded media directly.
+- **Personal documents are private.** Never serve uploaded media directly; deliver them
+  through `postulo.core.files.serve_private_file` from a view that has already
+  established who is asking.
+- **No `unsafe-eval`.** The Content-Security-Policy is strict on purpose. Client-side
+  behaviour is htmx plus plain JavaScript, which is why Alpine.js is not used.
 - Keep commits focused, and describe *why* in the message rather than *what*.
 
 ## Translations

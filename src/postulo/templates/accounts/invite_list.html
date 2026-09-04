@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Invitations" %}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Invitations" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Each invitation may be used once, and expires on its own." %}
+      </p>
+    </div>
+    <a href="{% url 'accounts:invite_create' %}" class="btn-primary ml-auto">
+      {% translate "New invitation" %}
+    </a>
+  </div>
+
+  {% if invites %}
+    <div class="card overflow-x-auto p-0">
+      <table class="w-full text-left text-sm">
+        <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
+                      dark:border-ink-800 dark:text-ink-400">
+          <tr>
+            <th class="px-4 py-3 font-medium">{% translate "For" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Status" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Expires" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Link" %}</th>
+            <th class="px-4 py-3"><span class="sr-only">{% translate "Actions" %}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for invite in invites %}
+            <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+              <td class="px-4 py-3">{{ invite }}</td>
+              <td class="px-4 py-3">
+                {% if invite.is_accepted %}
+                  <span class="text-emerald-600 dark:text-emerald-400">{% translate "Accepted" %}</span>
+                {% elif invite.is_expired %}
+                  <span class="text-ink-500 dark:text-ink-400">{% translate "Expired" %}</span>
+                {% else %}
+                  <span class="text-brand-600 dark:text-brand-400">{% translate "Pending" %}</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ invite.expires_at|date:"j M Y" }}</td>
+              <td class="px-4 py-3">
+                {% if not invite.is_accepted and not invite.is_expired %}
+                  <code class="block max-w-xs truncate text-xs text-ink-500 dark:text-ink-400">{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:invite_accept' invite.token %}</code>
+                {% else %}
+                  <span class="text-ink-400">—</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-right">
+                {% if not invite.is_accepted %}
+                  <form method="post" action="{% url 'accounts:invite_revoke' invite.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-ghost text-red-600 dark:text-red-400">
+                      {% translate "Revoke" %}
+                    </button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card text-center text-sm text-ink-500 dark:text-ink-400">
+      {% translate "No invitations yet." %}
+    </div>
+  {% endif %}
+{% endblock %}
