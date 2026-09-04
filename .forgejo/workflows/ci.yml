@@ -1,0 +1,50 @@
+# CI runs on Forgejo. The GitHub mirror deliberately has no workflow of its own:
+# GitHub ignores .forgejo/, so the mirror stays a mirror instead of a second CI bill.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:act-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked --python ${{ matrix.python-version }}
+
+      - name: Lint
+        run: |
+          uv run ruff check --output-format=full .
+          uv run ruff format --check .
+
+      - name: Check for missing migrations
+        run: uv run manage.py makemigrations --check --dry-run
+        env:
+          DJANGO_SETTINGS_MODULE: postulo.config.settings.test
+
+      - name: Test
+        run: uv run pytest --cov --cov-report=term-missing
+
+      - name: Production settings deployment check
+        run: uv run manage.py check --deploy --fail-level WARNING
+        env:
+          DJANGO_SETTINGS_MODULE: postulo.config.settings.prod
+          # Long enough to satisfy security.W009; not a real secret.
+          POSTULO_SECRET_KEY: ci-only-placeholder-nS7pQ2xV9wR4tY6uI8oA3sD5fG1hJ0kL2zX4cV6b
+          POSTULO_ALLOWED_HOSTS: postulo.example.org

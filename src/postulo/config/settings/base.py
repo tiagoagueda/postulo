@@ -1,0 +1,189 @@
+"""Settings shared by every environment.
+
+Values that differ between a laptop and a server belong in the environment, not in
+this file. See ``.env.example`` for the full set of recognised variables.
+"""
+
+from pathlib import Path
+
+import environ
+from django.utils.translation import gettext_lazy as _
+
+# src/postulo/config/settings/base.py -> src/postulo
+PACKAGE_DIR = Path(__file__).resolve().parents[2]
+# ... -> the repository root
+REPO_DIR = PACKAGE_DIR.parents[1]
+
+env = environ.Env()
+environ.Env.read_env(REPO_DIR / ".env")
+
+# --------------------------------------------------------------------------- core
+
+SECRET_KEY = env("POSTULO_SECRET_KEY", default=None)
+DEBUG = env.bool("POSTULO_DEBUG", default=False)
+ALLOWED_HOSTS = env.list("POSTULO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+CSRF_TRUSTED_ORIGINS = env.list("POSTULO_CSRF_TRUSTED_ORIGINS", default=[])
+
+ROOT_URLCONF = "postulo.config.urls"
+WSGI_APPLICATION = "postulo.config.wsgi.application"
+ASGI_APPLICATION = "postulo.config.asgi.application"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # third party
+    "allauth",
+    "allauth.account",
+    "django_htmx",
+    "django_tasks_db",
+    # postulo
+    "postulo.core",
+    "postulo.accounts",
+]
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.middleware.csp.ContentSecurityPolicyMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
+]
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [PACKAGE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.i18n",
+            ],
+        },
+    },
+]
+
+# ----------------------------------------------------------------------- database
+
+DATABASES = {
+    "default": env.db_url(
+        "POSTULO_DATABASE_URL",
+        default=f"sqlite:///{REPO_DIR / 'data' / 'postulo.sqlite3'}",
+    ),
+}
+DATABASES["default"].setdefault("ATOMIC_REQUESTS", True)
+
+# --------------------------------------------------------------------------- auth
+
+AUTH_USER_MODEL = "accounts.User"
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_UNIQUE_EMAIL = True
+
+# An instance is invite-only unless the operator opens registration deliberately.
+POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)
+
+# The admin is a small attack surface worth moving off a guessable path.
+POSTULO_ADMIN_URL = env("POSTULO_ADMIN_URL", default="admin/")
+
+# ---------------------------------------------------------- internationalisation
+
+# British English is the source language; every other locale is a translation of it.
+LANGUAGE_CODE = "en-gb"
+
+LANGUAGES = [
+    ("en-gb", _("English (United Kingdom)")),
+    ("fr-fr", _("French (France)")),
+    ("pt-pt", _("Portuguese (Portugal)")),
+]
+
+LOCALE_PATHS = [REPO_DIR / "locale"]
+
+TIME_ZONE = env("POSTULO_TIME_ZONE", default="UTC")
+USE_I18N = True
+USE_TZ = True
+
+# ---------------------------------------------------------------- static & media
+
+STATIC_URL = "static/"
+STATIC_ROOT = env.path("POSTULO_STATIC_ROOT", default=REPO_DIR / "staticfiles")
+STATICFILES_DIRS = [PACKAGE_DIR / "static"]
+
+# Media holds CVs and cover letters: personal documents, never served directly.
+# Every file is delivered through an ownership-checked view instead.
+MEDIA_URL = "media/"
+MEDIA_ROOT = env.path("POSTULO_MEDIA_ROOT", default=REPO_DIR / "data" / "media")
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+
+# ---------------------------------------------------------------------- tasks
+
+TASKS = {
+    "default": {
+        "BACKEND": "django_tasks_db.DatabaseBackend",
+    },
+}
+
+# --------------------------------------------------------------------- security
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+
+# ---------------------------------------------------------------------- email
+
+# Django 6.1 deprecates the EMAIL_* settings in favour of MAILERS; the two may not be
+# mixed, so Postulo uses MAILERS exclusively. Each environment defines its own.
+DEFAULT_FROM_EMAIL = env("POSTULO_DEFAULT_FROM_EMAIL", default="postulo@localhost")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# --------------------------------------------------------------------- logging
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "{asctime} {levelname} {name}: {message}", "style": "{"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
+    },
+    "root": {"handlers": ["console"], "level": env("POSTULO_LOG_LEVEL", default="INFO")},
+}

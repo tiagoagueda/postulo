@@ -1,0 +1,105 @@
+[project]
+name = "postulo"
+version = "0.0.1"
+description = "Self-hosted job application manager, from the applicant's side of the table."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "AGPL-3.0-or-later"
+authors = [{ name = "Tiago Agueda" }]
+keywords = ["django", "self-hosted", "job-search", "job-applications", "cv", "resume"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "django>=6.1,<6.2",
+    "django-allauth>=65.19",
+    "django-environ>=0.14",
+    "django-htmx>=1.29",
+    "django-ninja>=1.7",
+    # Django 6.1 ships the Tasks API but no worker; this adds the ORM-backed
+    # backend and the `db_worker` process that executes queued tasks.
+    "django-tasks-db>=0.13",
+    "whitenoise>=6.12",
+]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.2"]
+weasyprint = ["weasyprint>=69"]
+chromium = ["playwright>=1.62"]
+
+[project.urls]
+Homepage = "https://git.tiagoagueda.com/tiagoagueda/postulo"
+Source = "https://git.tiagoagueda.com/tiagoagueda/postulo"
+Issues = "https://git.tiagoagueda.com/tiagoagueda/postulo/issues"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4",
+    "pytest-django>=4.14",
+    "pytest-cov>=6.0",
+    "factory-boy>=3.3",
+    "ruff>=0.16",
+    "pre-commit>=4.0",
+    "django-stubs[compatible-mypy]>=5.1 ; python_version < '3.14'",
+]
+
+[build-system]
+requires = ["uv_build>=0.9,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "postulo"
+module-root = "src"
+
+# ------------------------------------------------------------------------ tooling
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["*/migrations/*"]
+
+[tool.ruff.lint]
+select = [
+    "F",    # pyflakes
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # bugbear
+    "C4",   # comprehensions
+    "DJ",   # flake8-django
+    "S",    # bandit
+    "T20",  # no stray print()
+    "RUF",
+]
+ignore = [
+    "S101",  # assert is how pytest works
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105", "S106"]
+"src/postulo/config/settings/*" = ["F403", "F405"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["postulo"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "postulo.config.settings.test"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "--strict-markers --strict-config"
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["src/postulo"]
+omit = ["*/migrations/*", "*/config/wsgi.py", "*/config/asgi.py"]
+
+[tool.coverage.report]
+skip_covered = true
+show_missing = true
