@@ -13,12 +13,12 @@ docker compose -f docker/compose.yml exec postulo python manage.py createsuperus
 Then put a reverse proxy in front of port 8000 to terminate TLS. That is the whole
 installation; the rest of this page is detail and the alternative without a container.
 
-> **A caveat worth reading.** Each of the image's build steps has been run by hand under
-> production settings, but the image itself has not been run on a real server for a real
-> job search. Continuous integration does not build it either — that needs a runner with
-> a Docker daemon, which is not the common case — so `scripts/check-image.sh` does the
-> same job wherever you do have Docker. If something is wrong with the image, you may
-> well be the first to find out. Please say so.
+> **What has been tested.** The image has been built and run on a Raspberry Pi
+> (arm64, Debian): it builds, migrates, passes its health check, serves pages, and
+> renders a PDF with WeasyPrint. The Compose file above was followed exactly as written.
+> What has *not* happened is somebody running it for months of a real job search, so
+> treat it as working rather than as proven. `scripts/check-image.sh` repeats that whole
+> check wherever you have Docker.
 
 ## What you need
 

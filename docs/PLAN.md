@@ -256,16 +256,18 @@ Portuguese translations themselves.
 
 ## 9. Open assumptions
 
-1. **Docker is still untested locally**, and this did not change: the development
-   machine has no Docker CLI. The image's individual build steps were each run by hand
-   under production settings, and CI attempts a full build and health check, but nobody
-   has yet run this image in anger on a real server.
+1. **Docker was never available on the development machine**, which held for every
+   milestone. Resolved after the fact by building and running the image on a Raspberry
+   Pi over SSH: arm64, Debian, a host already running a dozen other containers. That one
+   session found three defects nothing local would have — 162 log lines per PDF export,
+   a check script that assumed membership of the docker group, and a Compose project
+   named after its own directory.
 2. **Development runs on SQLite, and on Windows with Chromium**, because WeasyPrint's
    system libraries are impractical there. Servers and CI use WeasyPrint, which is the
    default. CI installs Pango so that the one test rendering a real PDF actually runs
    rather than skipping.
 3. **`django-tasks-db` does not yet declare Django 6.1** in its classifiers, although it
-   sets no upper pin and installs and migrates cleanly. Worth re-checking at M5, when
-   background work starts to matter.
+   sets no upper pin and installs and migrates cleanly. Nothing queues work yet, so no
+   worker runs; worth re-checking whenever something does.
 4. **Translation catalogues depend on contributors.** The application ships fully usable
    in British English; French and Portuguese arrive when someone writes them.
