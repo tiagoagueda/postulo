@@ -231,5 +231,12 @@ LOGGING = {
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "simple"},
     },
+    "loggers": {
+        # WeasyPrint subsets a font on every render and reports each step at INFO.
+        # Exporting one CV produced 162 lines of it, which does not bury a log so much
+        # as replace it. Measured on a real export, not guessed at.
+        "fontTools": {"level": "WARNING"},
+        "weasyprint": {"level": "WARNING"},
+    },
     "root": {"handlers": ["console"], "level": env("POSTULO_LOG_LEVEL", default="INFO")},
 }

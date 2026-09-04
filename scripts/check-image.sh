@@ -5,20 +5,27 @@
 # the runner to have a Docker daemon it is allowed to talk to, which forgejo-runner does
 # not provide by default. Run it wherever you do have Docker — it is exactly what a CI
 # job would do.
+#
+# Plenty of machines have Docker installed but do not put their user in the docker group,
+# which is a defensible choice given that the group is effectively root. Set DOCKER to
+# whatever reaches your daemon:
+#
+#   DOCKER="sudo docker" ./scripts/check-image.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TAG="${1:-postulo:check}"
 NAME="postulo-image-check"
+DOCKER="${DOCKER:-docker}"
 
-cleanup() { docker rm -f "$NAME" >/dev/null 2>&1 || true; }
+cleanup() { $DOCKER rm -f "$NAME" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
 echo "Building $TAG"
-docker build -f "$ROOT/docker/Dockerfile" -t "$TAG" "$ROOT"
+$DOCKER build -f "$ROOT/docker/Dockerfile" -t "$TAG" "$ROOT"
 
 echo "Starting it"
-docker run -d --name "$NAME" -p 8000:8000 \
+$DOCKER run -d --name "$NAME" -p 8000:8000 \
     -e POSTULO_SECRET_KEY="check-only-$(head -c 32 /dev/urandom | base64 | tr -d '=+/')" \
     -e POSTULO_ALLOWED_HOSTS=localhost,127.0.0.1 \
     -e POSTULO_SSL_REDIRECT=false \
@@ -37,5 +44,5 @@ done
 
 echo
 echo "It did not become healthy. Its log:" >&2
-docker logs "$NAME" >&2
+$DOCKER logs "$NAME" >&2
 exit 1

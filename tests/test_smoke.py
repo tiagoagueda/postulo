@@ -71,3 +71,13 @@ def test_a_fresh_install_can_open_its_database(tmp_path, monkeypatch):
     importlib.import_module("postulo.config.settings.base")
 
     assert target.parent.is_dir(), "the directory holding the database must be created"
+
+
+@pytest.mark.parametrize("noisy", ["fontTools", "weasyprint"])
+def test_the_pdf_renderer_does_not_bury_the_log(settings, noisy):
+    """One exported CV produced 162 lines of font-subsetting chatter at INFO.
+
+    Measured on a real export inside the container, which is the only place WeasyPrint
+    has ever run. A log that is 99% font internals is not a log.
+    """
+    assert settings.LOGGING["loggers"][noisy]["level"] == "WARNING"
