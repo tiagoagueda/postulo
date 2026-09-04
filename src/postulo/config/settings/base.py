@@ -94,6 +94,15 @@ DATABASES = {
 }
 DATABASES["default"].setdefault("ATOMIC_REQUESTS", True)
 
+# SQLite creates the database file, but not the directory holding it, so a fresh
+# install fails on its very first command with "unable to open database file". The
+# development settings only avoid this by chance, because writing the development
+# secret key happens to create the same directory first.
+if "sqlite3" in DATABASES["default"]["ENGINE"]:
+    _db_path = Path(DATABASES["default"]["NAME"])
+    if _db_path.name != ":memory:":
+        _db_path.parent.mkdir(parents=True, exist_ok=True)
+
 # --------------------------------------------------------------------------- auth
 
 AUTH_USER_MODEL = "accounts.User"

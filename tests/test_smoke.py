@@ -50,3 +50,24 @@ def test_configured_languages_are_available(code, settings):
 
 def test_british_english_is_the_source_language(settings):
     assert settings.LANGUAGE_CODE == "en-gb"
+
+
+def test_a_fresh_install_can_open_its_database(tmp_path, monkeypatch):
+    """A fresh checkout has no data/ directory, and SQLite will not create one.
+
+    This failed CI, but it would have failed any first-time installation following the
+    documented steps just as reliably: development only escapes it because writing the
+    development secret key happens to create the same directory first.
+    """
+    import importlib
+    import sys
+
+    target = tmp_path / "nested" / "deeper" / "postulo.sqlite3"
+    assert not target.parent.exists()
+
+    monkeypatch.setenv("POSTULO_DATABASE_URL", f"sqlite:///{target}")
+    monkeypatch.setenv("POSTULO_SECRET_KEY", "not-a-real-secret-key-for-this-test")
+    sys.modules.pop("postulo.config.settings.base", None)
+    importlib.import_module("postulo.config.settings.base")
+
+    assert target.parent.is_dir(), "the directory holding the database must be created"
