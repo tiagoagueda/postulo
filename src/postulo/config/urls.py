@@ -13,6 +13,8 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("applications/", include("postulo.applications.urls")),
     path("jobs/", include("postulo.jobs.urls")),
+    path("career/", include("postulo.resume.urls")),
+    path("documents/", include("postulo.documents.urls")),
     path(settings.POSTULO_ADMIN_URL, admin.site.urls),
 ]
 

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Documents" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <div class="mb-6 flex flex-wrap items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">{% translate "Documents" %}</h1>
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {{ application.posting.title }} — {{ application.posting.company.name }}
+        </p>
+      </div>
+      <a href="{% url 'documents:send' application.pk %}" class="btn-primary ml-auto">
+        {% translate "Record what you sent" %}
+      </a>
+    </div>
+
+    <h2 class="mb-3 font-medium">{% translate "Frozen at the moment of sending" %}</h2>
+    {% if rendered %}
+      <div class="card mb-8 p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for document in rendered %}
+            <li class="flex items-center gap-3 px-4 py-3">
+              <div class="min-w-0 flex-1">
+                <p class="font-medium">{{ document.title }}</p>
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {{ document.rendered_at|date:"j M Y, H:i" }} · {{ document.checksum|slice:":12" }}
+                </p>
+              </div>
+              <a href="{% url 'documents:rendered_download' document.pk %}"
+                 class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      <div class="card mb-8 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Nothing recorded for this application yet." %}
+      </div>
+    {% endif %}
+
+    {% if uploads %}
+      <h2 class="mb-3 font-medium">{% translate "Files you already had" %}</h2>
+      <div class="card p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for document in uploads %}
+            <li class="flex items-center gap-3 px-4 py-3">
+              <p class="min-w-0 flex-1 font-medium">{{ document.title }}</p>
+              <a href="{% url 'documents:upload_download' document.pk %}"
+                 class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

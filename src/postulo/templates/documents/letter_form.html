@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Cover letter" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-2xl">
+    <h1 class="mb-6 text-2xl font-semibold tracking-tight">{% translate "Cover letter" %}</h1>
+    <form method="post" novalidate >
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="card mb-6">
+        {% for field in form %}
+          {% include "partials/field.html" with field=field %}
+        {% endfor %}
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+        <a href="{% url 'documents:letter_list' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

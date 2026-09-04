@@ -1,0 +1,299 @@
+"""CVs, cover letters, uploaded files, and the snapshots of what you actually sent.
+
+Three ideas hold this together.
+
+**A CV variant is a selection, not a copy.** ``CV`` picks items out of
+:mod:`postulo.resume` through ``CVItem`` and orders them. Correcting a job title in the
+master copy corrects it in every variant. A variant may override an item's highlights
+for its own purposes without touching the original.
+
+**A cover letter is a template until it is sent.** Placeholders are filled from the
+application it is being sent with, so one well-written letter serves many applications
+without copy-paste drift.
+
+**What you sent is frozen.** ``RenderedDocument`` stores the PDF produced at the moment
+of sending, along with the text it was built from. Months later, when an interviewer
+asks about something on your CV, you need the version they read, not the version you
+have edited eleven times since.
+"""
+
+from __future__ import annotations
+
+import hashlib
+
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.core.validators import FileExtensionValidator
+from django.db import models
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
+from postulo.core.models import OwnedModel
+
+
+def upload_to_documents(instance, filename: str) -> str:
+    """Store files under the owner, so a stray path can only ever reach one person.
+
+    Media is never served directly, but defence in depth is cheap here.
+    """
+    return f"documents/{instance.owner_id}/{timezone.now():%Y/%m}/{filename}"
+
+
+class Theme(models.TextChoices):
+    """Built-in rendering themes.
+
+    Kept as choices rather than user-editable rows: a theme is a Django template plus a
+    stylesheet, and letting people upload those would mean executing their markup during
+    rendering. User themes belong behind a deliberate decision, not in the first version.
+    """
+
+    PLAIN = "plain", _("Plain")
+    CLASSIC = "classic", _("Classic")
+
+
+class CV(OwnedModel):
+    """A named selection of your career, aimed at a particular kind of role."""
+
+    name = models.CharField(
+        _("name"), max_length=120, help_text=_("For you, not for the employer: “Backend, English”.")
+    )
+    headline = models.CharField(_("headline"), max_length=200, blank=True)
+    summary = models.TextField(
+        _("summary"), blank=True, help_text=_("The opening paragraph, if you use one.")
+    )
+    theme = models.CharField(_("theme"), max_length=20, choices=Theme, default=Theme.PLAIN)
+    language = models.CharField(
+        _("language"),
+        max_length=10,
+        blank=True,
+        help_text=_(
+            "Which language this variant is written in. Leave blank to follow your profile."
+        ),
+    )
+    show_contact_details = models.BooleanField(
+        _("include contact details"),
+        default=True,
+        help_text=_("Your name, email and location, taken from your profile."),
+    )
+
+    class Meta:
+        verbose_name = _("CV")
+        verbose_name_plural = _("CVs")
+        ordering = ("name",)
+        constraints = [
+            models.UniqueConstraint(fields=("owner", "name"), name="unique_cv_name_per_owner")
+        ]
+
+    def __str__(self) -> str:
+        return self.name
+
+    def get_absolute_url(self) -> str:
+        return reverse("documents:cv_detail", args=[self.pk])
+
+    def included_items(self):
+        """The items that will actually be rendered, in order."""
+        return self.items.filter(is_included=True).select_related("content_type")
+
+
+class CVItem(OwnedModel):
+    """One entry on one CV variant.
+
+    A generic relation is used because a CV is an ordered list of heterogeneous things.
+    Six nullable foreign keys with a check constraint would say the same thing less
+    clearly, and would need widening every time a new kind of item is added.
+    """
+
+    cv = models.ForeignKey(CV, on_delete=models.CASCADE, related_name="items", verbose_name=_("CV"))
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    item = GenericForeignKey("content_type", "object_id")
+
+    order = models.PositiveIntegerField(_("order"), default=0)
+    is_included = models.BooleanField(
+        _("included"),
+        default=True,
+        help_text=_("Uncheck to keep the entry on this variant but leave it off the page."),
+    )
+    override_highlights = models.TextField(
+        _("highlights for this CV"),
+        blank=True,
+        help_text=_("Replaces the master highlights on this variant only. One per line."),
+    )
+
+    class Meta:
+        verbose_name = _("CV entry")
+        verbose_name_plural = _("CV entries")
+        ordering = ("order", "pk")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("cv", "content_type", "object_id"), name="unique_item_per_cv"
+            )
+        ]
+        indexes = [models.Index(fields=("content_type", "object_id"))]
+
+    def __str__(self) -> str:
+        return str(self.item) if self.item else _("Missing entry")
+
+    @property
+    def highlight_lines(self) -> list[str]:
+        """The highlights to render: this variant's override, or the master copy."""
+        from postulo.resume.models import split_highlights
+
+        if self.override_highlights.strip():
+            return split_highlights(self.override_highlights)
+        return split_highlights(getattr(self.item, "highlights", ""))
+
+
+class CoverLetter(OwnedModel):
+    """A letter, or a template for many letters.
+
+    Placeholders are filled in when the letter is rendered against an application. They
+    are deliberately a small, fixed set: a general-purpose expression language in a
+    document people paste employer-supplied text into is a liability, not a feature.
+    """
+
+    #: Placeholders the renderer understands, and where each comes from.
+    PLACEHOLDERS = {
+        "company": _("The company you are applying to"),
+        "role": _("The job title"),
+        "location": _("Where the role is based"),
+        "name": _("Your own name"),
+        "date": _("Today's date"),
+    }
+
+    name = models.CharField(_("name"), max_length=120)
+    subject = models.CharField(_("subject"), max_length=250, blank=True)
+    body = models.TextField(
+        _("body"), help_text=_("Placeholders such as {{ company }} are filled in when sent.")
+    )
+    is_template = models.BooleanField(
+        _("reusable template"),
+        default=True,
+        help_text=_("Templates appear when you send a letter with an application."),
+    )
+    theme = models.CharField(_("theme"), max_length=20, choices=Theme, default=Theme.PLAIN)
+
+    class Meta:
+        verbose_name = _("cover letter")
+        verbose_name_plural = _("cover letters")
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+    def get_absolute_url(self) -> str:
+        return reverse("documents:letter_detail", args=[self.pk])
+
+
+class DocumentKind(models.TextChoices):
+    CV = "cv", _("CV")
+    COVER_LETTER = "cover_letter", _("Cover letter")
+    CERTIFICATE = "certificate", _("Certificate")
+    PORTFOLIO = "portfolio", _("Portfolio")
+    REFERENCE = "reference", _("Reference")
+    OTHER = "other", _("Other")
+
+
+class UploadedDocument(OwnedModel):
+    """A file you already had: a designed CV, a scanned certificate, a portfolio.
+
+    The hybrid half of the model. Not everything worth sending was written in Postulo,
+    and an application manager that cannot hold the PDF a designer made for you is not
+    much use.
+    """
+
+    title = models.CharField(_("title"), max_length=200)
+    kind = models.CharField(_("kind"), max_length=20, choices=DocumentKind, default=DocumentKind.CV)
+    file = models.FileField(
+        _("file"),
+        upload_to=upload_to_documents,
+        validators=[
+            FileExtensionValidator(
+                ["pdf", "doc", "docx", "odt", "rtf", "txt", "png", "jpg", "jpeg"]
+            )
+        ],
+    )
+    notes = models.TextField(_("notes"), blank=True)
+
+    version = models.PositiveIntegerField(_("version"), default=1)
+    replaces = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="replaced_by",
+        verbose_name=_("replaces"),
+        help_text=_("The earlier version this supersedes. The old file is kept."),
+    )
+
+    class Meta:
+        verbose_name = _("uploaded document")
+        verbose_name_plural = _("uploaded documents")
+        ordering = ("-created_at",)
+
+    def __str__(self) -> str:
+        return f"{self.title} (v{self.version})"
+
+    def get_absolute_url(self) -> str:
+        return reverse("documents:upload_detail", args=[self.pk])
+
+    @property
+    def is_current(self) -> bool:
+        """Whether anything supersedes this version."""
+        return not self.replaced_by.exists()
+
+
+class RenderedDocument(OwnedModel):
+    """A PDF exactly as it was sent, kept unchanged.
+
+    The source text is stored alongside the file. A PDF is awkward to search and
+    impossible to diff; keeping the text means you can still answer "what did I claim?"
+    without opening anything.
+    """
+
+    title = models.CharField(_("title"), max_length=250)
+    kind = models.CharField(_("kind"), max_length=20, choices=DocumentKind, default=DocumentKind.CV)
+    file = models.FileField(_("file"), upload_to=upload_to_documents)
+
+    application = models.ForeignKey(
+        "applications.Application",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="rendered_documents",
+        verbose_name=_("application"),
+    )
+    cv = models.ForeignKey(
+        CV,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="renders",
+        verbose_name=_("from CV"),
+    )
+    cover_letter = models.ForeignKey(
+        CoverLetter,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="renders",
+        verbose_name=_("from cover letter"),
+    )
+
+    source_text = models.TextField(_("text as sent"), blank=True)
+    checksum = models.CharField(_("checksum"), max_length=64, blank=True, editable=False)
+    rendered_at = models.DateTimeField(_("rendered on"), default=timezone.now)
+
+    class Meta:
+        verbose_name = _("sent document")
+        verbose_name_plural = _("sent documents")
+        ordering = ("-rendered_at",)
+
+    def __str__(self) -> str:
+        return self.title
+
+    @staticmethod
+    def checksum_for(content: bytes) -> str:
+        return hashlib.sha256(content).hexdigest()

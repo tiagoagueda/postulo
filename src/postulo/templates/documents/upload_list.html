@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Files" %}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Files" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Documents you already had. Nothing here is served publicly." %}
+      </p>
+    </div>
+    <a href="{% url 'documents:upload_create' %}" class="btn-primary ml-auto">
+      {% translate "Upload a file" %}
+    </a>
+  </div>
+
+  {% if documents %}
+    <div class="card p-0">
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for document in documents %}
+          <li class="flex items-center gap-3 px-4 py-3 {% if not document.is_current %}opacity-60{% endif %}">
+            <div class="min-w-0 flex-1">
+              <p class="font-medium">{{ document.title }}</p>
+              <p class="text-xs text-ink-500 dark:text-ink-400">
+                {{ document.get_kind_display }} · {% translate "version" %} {{ document.version }}
+                · {{ document.created_at|date:"j M Y" }}
+                {% if not document.is_current %} · {% translate "superseded" %}{% endif %}
+              </p>
+            </div>
+            <a href="{% url 'documents:upload_download' document.pk %}"
+               class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
+            <a href="{% url 'documents:upload_update' document.pk %}"
+               class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
+            <a href="{% url 'documents:upload_delete' document.pk %}"
+               class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+              {% translate "Delete" %}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% else %}
+    <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Nothing uploaded yet." %}
+    </div>
+  {% endif %}
+{% endblock %}

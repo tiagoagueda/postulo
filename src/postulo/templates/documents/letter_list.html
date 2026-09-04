@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Cover letters" %}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Cover letters" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Write one well, then let placeholders do the rest." %}
+      </p>
+    </div>
+    <a href="{% url 'documents:letter_create' %}" class="btn-primary ml-auto">
+      {% translate "New letter" %}
+    </a>
+  </div>
+
+  {% if letters %}
+    <div class="card p-0">
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for letter in letters %}
+          <li class="flex items-center gap-3 px-4 py-3">
+            <div class="min-w-0 flex-1">
+              <a href="{{ letter.get_absolute_url }}" class="font-medium hover:underline">
+                {{ letter.name }}
+              </a>
+              {% if letter.subject %}
+                <p class="truncate text-sm text-ink-500 dark:text-ink-400">{{ letter.subject }}</p>
+              {% endif %}
+            </div>
+            {% if letter.is_template %}
+              <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+                {% translate "Template" %}
+              </span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% else %}
+    <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
+      {% translate "No cover letters yet." %}
+    </div>
+  {% endif %}
+{% endblock %}

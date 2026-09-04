@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Record what you sent" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-2xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Record what you sent" %}</h1>
+    <p class="mb-2 text-sm text-ink-500 dark:text-ink-400">
+      {{ application.posting.title }} — {{ application.posting.company.name }}
+    </p>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Anything chosen here is rendered as it stands now and kept unchanged. Months
+        later, when an interviewer asks about a line on your CV, you will have the
+        version they read rather than the version you have edited since.
+      {% endblocktranslate %}
+    </p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="card mb-6">
+        {% for field in form %}
+          {% include "partials/field.html" with field=field %}
+        {% endfor %}
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Freeze and attach" %}</button>
+        <a href="{{ application.get_absolute_url }}" class="btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

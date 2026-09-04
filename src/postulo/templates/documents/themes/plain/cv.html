@@ -1,0 +1,40 @@
+{% extends "documents/themes/base_cv.html" %}
+
+{% block page_styles %}
+      body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 10pt;
+        line-height: 1.45;
+      }
+
+      @page { size: A4; margin: 18mm; }
+      * { box-sizing: border-box; }
+      body { margin: 0; color: #16181d; }
+      h1 { margin: 0 0 2px; font-size: 20pt; letter-spacing: -0.01em; }
+      h2 { margin: 0 0 8px; }
+      p { margin: 0; }
+      ul { margin: 6px 0 0; padding-left: 16px; }
+      li { margin-bottom: 2px; }
+      .headline { color: #4a4f5a; }
+      .details { margin-top: 6px; color: #4a4f5a; font-size: 8.5pt; }
+      .details span:not(:last-child)::after { content: " · "; }
+      .summary { margin: 14px 0; }
+      .block { margin-top: 16px; }
+      /* Never orphan a heading or split a single job across a page break. */
+      .block h2 { break-after: avoid; }
+      .entry { margin-bottom: 12px; break-inside: avoid; }
+      .entry-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+      .role { font-weight: 600; }
+      .org { color: #4a4f5a; }
+      .dates { color: #6b7280; white-space: nowrap; font-variant-numeric: tabular-nums; }
+      .summary-line { margin-top: 4px; }
+      h2 {
+        font-size: 9pt;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+        border-bottom: 1px solid #e3e5e9;
+        padding-bottom: 3px;
+      }
+      .entry-head .role { font-size: 10.5pt; }
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ cv.name }}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{{ cv.name }}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {{ cv.headline|default:"" }}{% if cv.headline %} · {% endif %}{{ cv.get_theme_display }}
+      </p>
+    </div>
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      <a href="{% url 'documents:cv_preview' cv.pk %}" target="_blank" rel="noopener"
+         class="btn-secondary">{% translate "Preview" %}</a>
+      <form method="post" action="{% url 'documents:cv_export' cv.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-primary">{% translate "Export PDF" %}</button>
+      </form>
+      <a href="{% url 'documents:cv_update' cv.pk %}" class="btn-secondary">{% translate "Settings" %}</a>
+      <a href="{% url 'documents:cv_delete' cv.pk %}"
+         class="btn-ghost text-red-600 dark:text-red-400">{% translate "Delete" %}</a>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2">
+      <h2 class="mb-3 font-medium">{% translate "What is on this CV" %}</h2>
+      {% if items %}
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for item in items %}
+              <li class="flex items-start gap-3 px-4 py-3 {% if not item.is_included %}opacity-50{% endif %}">
+                <div class="min-w-0 flex-1">
+                  <p class="font-medium">{{ item }}</p>
+                  <p class="text-xs text-ink-500 dark:text-ink-400">
+                    {{ item.content_type.name|capfirst }}
+                    {% if item.override_highlights %}
+                      · <span class="text-brand-600 dark:text-brand-400">{% translate "tailored for this CV" %}</span>
+                    {% endif %}
+                    {% if not item.is_included %} · {% translate "hidden" %}{% endif %}
+                  </p>
+                </div>
+                <div class="flex shrink-0 items-center gap-1">
+                  <form method="post" action="{% url 'documents:cv_item_move' item.pk 'up' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                            aria-label="{% translate 'Move up' %}">↑</button>
+                  </form>
+                  <form method="post" action="{% url 'documents:cv_item_move' item.pk 'down' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                            aria-label="{% translate 'Move down' %}">↓</button>
+                  </form>
+                  <a href="{% url 'documents:cv_item_update' item.pk %}"
+                     class="btn-ghost px-2 py-1 text-xs">{% translate "Tailor" %}</a>
+                  <a href="{% url 'documents:cv_item_delete' item.pk %}"
+                     class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                    {% translate "Remove" %}
+                  </a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Nothing on this CV yet. Choose some entries below." %}
+        </div>
+      {% endif %}
+
+      {% if renders %}
+        <h2 class="mt-8 mb-3 font-medium">{% translate "Versions you have sent" %}</h2>
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for render in renders %}
+              <li class="flex items-center gap-3 px-4 py-3">
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm">{{ render.rendered_at|date:"j M Y, H:i" }}</p>
+                  {% if render.application %}
+                    <p class="text-xs text-ink-500 dark:text-ink-400">
+                      <a href="{{ render.application.get_absolute_url }}" class="hover:underline">
+                        {{ render.application.posting.title }}
+                      </a>
+                    </p>
+                  {% endif %}
+                </div>
+                <a href="{% url 'documents:rendered_download' render.pk %}"
+                   class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+
+    <aside>
+      <div class="card">
+        <h2 class="mb-1 font-medium">{% translate "Add entries" %}</h2>
+        <p class="mb-4 text-xs text-ink-500 dark:text-ink-400">
+          {% translate "Only entries not already on this CV are listed." %}
+        </p>
+
+        {% if add_form.groups %}
+          <form method="post" action="{% url 'documents:cv_add_items' cv.pk %}">
+            {% csrf_token %}
+            <div class="space-y-4">
+              {% for group in add_form.groups %}
+                <fieldset>
+                  <legend class="mb-1 text-xs font-medium uppercase tracking-wide text-ink-500 dark:text-ink-400">
+                    {{ group.label }}
+                  </legend>
+                  <div class="space-y-1 text-sm">{{ group.field }}</div>
+                </fieldset>
+              {% endfor %}
+            </div>
+            <button type="submit" class="btn-primary mt-4 w-full">{% translate "Add to CV" %}</button>
+          </form>
+        {% else %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% translate "Everything you have written is already on this CV." %}
+            <a href="{% url 'resume:overview' %}" class="text-brand-600 hover:underline dark:text-brand-400">
+              {% translate "Write some more." %}
+            </a>
+          </p>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+{% endblock %}

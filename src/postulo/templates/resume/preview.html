@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Career preview" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <div class="mb-6 flex items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">{% translate "Everything you have written" %}</h1>
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% translate "The master record. A CV variant selects from this; it never copies it." %}
+        </p>
+      </div>
+      <a href="{% url 'resume:overview' %}" class="btn-secondary ml-auto">{% translate "Edit" %}</a>
+    </div>
+
+    {% if experience %}
+      <section class="mb-8">
+        <h2 class="mb-3 font-medium">{% translate "Experience" %}</h2>
+        <div class="space-y-4">
+          {% for item in experience %}
+            <div class="card">
+              <div class="flex flex-wrap items-baseline justify-between gap-2">
+                <p class="font-medium">{{ item.role }} — {{ item.organisation }}</p>
+                <p class="text-xs text-ink-500 tabular-nums dark:text-ink-400">
+                  {{ item.start_date|date:"M Y" }} –
+                  {% if item.end_date %}{{ item.end_date|date:"M Y" }}{% else %}{% translate "present" %}{% endif %}
+                </p>
+              </div>
+              {% if item.summary %}<p class="mt-1 text-sm">{{ item.summary }}</p>{% endif %}
+              {% if item.highlight_lines %}
+                <ul class="mt-2 list-disc pl-5 text-sm text-ink-600 dark:text-ink-300">
+                  {% for line in item.highlight_lines %}<li>{{ line }}</li>{% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    {% if education %}
+      <section class="mb-8">
+        <h2 class="mb-3 font-medium">{% translate "Education" %}</h2>
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for item in education %}
+              <li class="px-4 py-3">
+                <p class="font-medium">{{ item.qualification }}</p>
+                <p class="text-sm text-ink-500 dark:text-ink-400">{{ item.institution }}</p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endif %}
+
+    {% if projects %}
+      <section class="mb-8">
+        <h2 class="mb-3 font-medium">{% translate "Projects" %}</h2>
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for item in projects %}
+              <li class="px-4 py-3">
+                <p class="font-medium">{{ item.name }}</p>
+                {% if item.summary %}
+                  <p class="text-sm text-ink-500 dark:text-ink-400">{{ item.summary }}</p>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endif %}
+
+    {% if skill_groups %}
+      <section class="mb-8">
+        <h2 class="mb-3 font-medium">{% translate "Skills" %}</h2>
+        <div class="card space-y-2 text-sm">
+          {% for group in skill_groups %}
+            <p><strong>{{ group.name }}:</strong> {{ group.skill_names|join:", " }}</p>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    {% if certifications or languages %}
+      <div class="grid gap-6 sm:grid-cols-2">
+        {% if certifications %}
+          <section>
+            <h2 class="mb-3 font-medium">{% translate "Certifications" %}</h2>
+            <div class="card space-y-1 text-sm">
+              {% for item in certifications %}<p>{{ item.name }}</p>{% endfor %}
+            </div>
+          </section>
+        {% endif %}
+        {% if languages %}
+          <section>
+            <h2 class="mb-3 font-medium">{% translate "Languages" %}</h2>
+            <div class="card space-y-1 text-sm">
+              {% for item in languages %}<p>{{ item }}</p>{% endfor %}
+            </div>
+          </section>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

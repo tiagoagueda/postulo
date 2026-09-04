@@ -1,0 +1,28 @@
+{% load i18n %}<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ letter.name }}</title>
+    <style>{% block page_styles %}{% endblock %}</style>
+  </head>
+  <body>
+    <header class="sender">
+      <p class="name">{{ contact.name }}</p>
+      <p class="details">
+        {% if contact.email %}<span>{{ contact.email }}</span>{% endif %}
+        {% if contact.phone %}<span>{{ contact.phone }}</span>{% endif %}
+        {% if contact.location %}<span>{{ contact.location }}</span>{% endif %}
+      </p>
+    </header>
+
+    {% if application %}
+      <p class="recipient">{{ application.posting.company.name }}</p>
+    {% endif %}
+
+    <p class="date">{% now "j F Y" %}</p>
+
+    {% if subject %}<p class="subject">{{ subject }}</p>{% endif %}
+
+    <div class="body">{{ body|linebreaks }}</div>
+  </body>
+</html>

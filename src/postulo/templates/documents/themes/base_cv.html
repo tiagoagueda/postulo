@@ -1,0 +1,105 @@
+{% load i18n %}<!doctype html>
+{% comment %}
+  The structure every CV theme shares. A theme supplies only the stylesheet, which is
+  inlined: the renderer must never fetch anything, so that producing a PDF cannot touch
+  the network or the filesystem.
+{% endcomment %}
+<html lang="{{ cv.language|default:'en-GB' }}">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ cv.name }}</title>
+    <style>{% block page_styles %}{% endblock %}</style>
+  </head>
+  <body>
+
+    {% if contact %}
+      <header class="contact">
+        <h1>{{ contact.name }}</h1>
+        {% if cv.headline or contact.headline %}
+          <p class="headline">{{ cv.headline|default:contact.headline }}</p>
+        {% endif %}
+        <p class="details">
+          {% if contact.email %}<span>{{ contact.email }}</span>{% endif %}
+          {% if contact.phone %}<span>{{ contact.phone }}</span>{% endif %}
+          {% if contact.location %}<span>{{ contact.location }}</span>{% endif %}
+          {% if contact.website %}<span>{{ contact.website }}</span>{% endif %}
+          {% if contact.linkedin_url %}<span>{{ contact.linkedin_url }}</span>{% endif %}
+          {% if contact.source_repo_url %}<span>{{ contact.source_repo_url }}</span>{% endif %}
+        </p>
+      </header>
+    {% elif cv.headline %}
+      <header class="contact"><h1>{{ cv.headline }}</h1></header>
+    {% endif %}
+
+    {% if cv.summary %}
+      <section class="summary"><p>{{ cv.summary|linebreaksbr }}</p></section>
+    {% endif %}
+
+    {% for section in sections %}
+      <section class="block">
+        <h2>{{ section.label }}</h2>
+
+        {% if section.kind == 'skillgroup' %}
+          <ul class="skills">
+            {% for entry in section.items %}
+              <li><strong>{{ entry.item.name }}:</strong> {{ entry.item.skill_names|join:", " }}</li>
+            {% endfor %}
+          </ul>
+
+        {% elif section.kind == 'languageskill' %}
+          <ul class="languages">
+            {% for entry in section.items %}
+              <li>{{ entry.item.name }} — {{ entry.item.get_proficiency_display }}</li>
+            {% endfor %}
+          </ul>
+
+        {% elif section.kind == 'certification' %}
+          <ul class="certifications">
+            {% for entry in section.items %}
+              <li>
+                {{ entry.item.name }}{% if entry.item.issuer %}, {{ entry.item.issuer }}{% endif %}
+                {% if entry.item.issued_on %}<span class="dates">{{ entry.item.issued_on|date:"Y" }}</span>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
+        {% else %}
+          {% for entry in section.items %}
+            <article class="entry">
+              <div class="entry-head">
+                <div>
+                  {% if section.kind == 'experience' %}
+                    <p class="role">{{ entry.item.role }}</p>
+                    <p class="org">{{ entry.item.organisation }}{% if entry.item.location %} · {{ entry.item.location }}{% endif %}</p>
+                  {% elif section.kind == 'education' %}
+                    <p class="role">{{ entry.item.qualification }}</p>
+                    <p class="org">{{ entry.item.institution }}{% if entry.item.location %} · {{ entry.item.location }}{% endif %}</p>
+                  {% else %}
+                    <p class="role">{{ entry.item.name }}</p>
+                    {% if entry.item.role %}<p class="org">{{ entry.item.role }}</p>{% endif %}
+                  {% endif %}
+                </div>
+                <p class="dates">
+                  {% if entry.item.start_date %}{{ entry.item.start_date|date:"M Y" }}{% endif %}
+                  {% if entry.item.start_date and entry.item.end_date %} – {% endif %}
+                  {% if entry.item.end_date %}{{ entry.item.end_date|date:"M Y" }}
+                  {% elif entry.item.start_date %} – {% translate "present" %}{% endif %}
+                </p>
+              </div>
+
+              {% if entry.item.summary %}<p class="summary-line">{{ entry.item.summary }}</p>{% endif %}
+
+              {% with lines=entry.highlight_lines %}
+                {% if lines %}
+                  <ul class="highlights">
+                    {% for line in lines %}<li>{{ line }}</li>{% endfor %}
+                  </ul>
+                {% endif %}
+              {% endwith %}
+            </article>
+          {% endfor %}
+        {% endif %}
+      </section>
+    {% endfor %}
+  </body>
+</html>

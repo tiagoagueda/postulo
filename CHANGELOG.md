@@ -40,6 +40,18 @@ All notable changes to Postulo are recorded here. The format follows
   companies by name case-insensitively.
 - Reminders, tags, and a dashboard that leads with what needs chasing.
 - Salary figures grouped by the reader's locale rather than a hard-coded separator.
+- A career record written once — experience, education, projects, skills, certifications
+  and languages — that every CV variant draws on rather than copying (M3).
+- CV variants that select and order entries from that record, and may rewrite an entry's
+  highlights for one variant without touching the master copy.
+- Cover letters with a small, fixed set of placeholders filled in from the application
+  they are sent with.
+- Uploaded documents, versioned, for files written outside Postulo, delivered only
+  through an ownership-checked view.
+- PDF export through a pluggable renderer: WeasyPrint or headless Chromium, neither a
+  hard dependency. Two themes, Plain and Classic.
+- Snapshots of what was actually sent: the PDF frozen at the moment of sending, with the
+  text it was built from, never regenerated.
 
 ### Changed
 

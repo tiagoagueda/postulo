@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ letter.name }}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{{ letter.name }}</h1>
+      {% if letter.subject %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">{{ letter.subject }}</p>
+      {% endif %}
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="{% url 'documents:letter_preview' letter.pk %}" target="_blank" rel="noopener"
+         class="btn-secondary">{% translate "Preview" %}</a>
+      <a href="{% url 'documents:letter_update' letter.pk %}" class="btn-secondary">
+        {% translate "Edit" %}
+      </a>
+      <a href="{% url 'documents:letter_delete' letter.pk %}"
+         class="btn-ghost text-red-600 dark:text-red-400">{% translate "Delete" %}</a>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2">
+      <div class="card whitespace-pre-line text-sm">{{ letter.body }}</div>
+    </div>
+
+    <aside>
+      <div class="card">
+        <h2 class="mb-1 font-medium">{% translate "Placeholders" %}</h2>
+        <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
+          {% translate "Filled in when the letter is sent with an application." %}
+        </p>
+        <dl class="space-y-2 text-sm">
+          {% for name, description in placeholders.items %}
+            <div>
+              <dt><code class="rounded bg-ink-100 px-1 text-xs dark:bg-ink-800">&#123;&#123; {{ name }} &#125;&#125;</code></dt>
+              <dd class="text-xs text-ink-500 dark:text-ink-400">{{ description }}</dd>
+            </div>
+          {% endfor %}
+        </dl>
+      </div>
+    </aside>
+  </div>
+{% endblock %}

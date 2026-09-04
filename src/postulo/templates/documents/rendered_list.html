@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Sent documents" %}{% endblock %}
+
+{% block content %}
+  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Sent documents" %}</h1>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed %}
+      Every document exactly as it left, frozen at the moment it was sent. These are
+      never regenerated, however much the CV they came from has changed since.
+    {% endblocktranslate %}
+  </p>
+
+  {% if documents %}
+    <div class="card overflow-x-auto p-0">
+      <table class="w-full text-left text-sm">
+        <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
+                      dark:border-ink-800 dark:text-ink-400">
+          <tr>
+            <th class="px-4 py-3 font-medium">{% translate "Document" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Sent with" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "When" %}</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for document in documents %}
+            <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+              <td class="px-4 py-3">{{ document.title }}</td>
+              <td class="px-4 py-3">
+                {% if document.application %}
+                  <a href="{{ document.application.get_absolute_url }}" class="hover:underline">
+                    {{ document.application.posting.title }}
+                  </a>
+                {% else %}
+                  <span class="text-ink-400">{% translate "Exported on its own" %}</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+                {{ document.rendered_at|date:"j M Y, H:i" }}
+              </td>
+              <td class="px-4 py-3 text-right">
+                <a href="{% url 'documents:rendered_download' document.pk %}"
+                   class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Nothing sent yet." %}
+    </div>
+  {% endif %}
+{% endblock %}

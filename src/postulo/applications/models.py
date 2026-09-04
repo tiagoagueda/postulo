@@ -138,6 +138,13 @@ class Application(OwnedModel):
     tags = models.ManyToManyField(
         Tag, blank=True, related_name="applications", verbose_name=_("tags")
     )
+    sent_uploads = models.ManyToManyField(
+        "documents.UploadedDocument",
+        blank=True,
+        related_name="applications",
+        verbose_name=_("files sent"),
+        help_text=_("Files you already had, as opposed to documents Postulo rendered."),
+    )
 
     objects = ApplicationQuerySet.as_manager()
 

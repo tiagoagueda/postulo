@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     "postulo.accounts",
     "postulo.jobs",
     "postulo.applications",
+    "postulo.resume",
+    "postulo.documents",
 ]
 
 MIDDLEWARE = [
@@ -161,6 +163,13 @@ MEDIA_ROOT = env.path("POSTULO_MEDIA_ROOT", default=REPO_DIR / "data" / "media")
 POSTULO_MEDIA_ACCEL_PREFIX = env("POSTULO_MEDIA_ACCEL_PREFIX", default="")
 # Apache with mod_xsendfile.
 POSTULO_MEDIA_SENDFILE = env.bool("POSTULO_MEDIA_SENDFILE", default=False)
+
+# ------------------------------------------------------------------------ pdf
+
+# auto | weasyprint | chromium. Neither backend is a hard dependency: Postulo is
+# usable without PDF export, so a missing one is reported when export is attempted
+# rather than preventing the application from starting.
+POSTULO_PDF_BACKEND = env("POSTULO_PDF_BACKEND", default="auto")
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},

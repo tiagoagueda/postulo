@@ -157,6 +157,42 @@
         </div>
       </div>
 
+      <div class="card mb-6">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="font-medium">{% translate "Documents" %}</h2>
+          <a href="{% url 'documents:send' application.pk %}"
+             class="text-sm text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "Record what you sent" %}
+          </a>
+        </div>
+        {% with sent=application.rendered_documents.all %}
+          {% if sent %}
+            <ul class="space-y-2">
+              {% for document in sent %}
+                <li class="flex items-start gap-2">
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm">{{ document.title }}</p>
+                    <p class="text-xs text-ink-500 dark:text-ink-400">
+                      {{ document.rendered_at|date:"j M Y" }}
+                    </p>
+                  </div>
+                  <a href="{% url 'documents:rendered_download' document.pk %}"
+                     class="btn-ghost px-2 py-1 text-xs">{% translate "Get" %}</a>
+                </li>
+              {% endfor %}
+            </ul>
+            <a href="{% url 'documents:application_documents' application.pk %}"
+               class="mt-3 inline-block text-xs text-brand-600 hover:underline dark:text-brand-400">
+              {% translate "All documents" %}
+            </a>
+          {% else %}
+            <p class="text-sm text-ink-500 dark:text-ink-400">
+              {% translate "Nothing recorded yet." %}
+            </p>
+          {% endif %}
+        {% endwith %}
+      </div>
+
       <div class="card">
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-medium">{% translate "Reminders" %}</h2>

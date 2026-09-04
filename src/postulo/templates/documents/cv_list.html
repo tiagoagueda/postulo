@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "CVs" %}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "CVs" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "One variant per kind of role. Each selects from your career record." %}
+      </p>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="{% url 'resume:overview' %}" class="btn-secondary">{% translate "Your career" %}</a>
+      <a href="{% url 'documents:cv_create' %}" class="btn-primary">{% translate "New CV" %}</a>
+    </div>
+  </div>
+
+  {% if cvs %}
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {% for cv in cvs %}
+        <a href="{{ cv.get_absolute_url }}" class="card hover:border-brand-400">
+          <p class="font-medium">{{ cv.name }}</p>
+          {% if cv.headline %}
+            <p class="text-sm text-ink-500 dark:text-ink-400">{{ cv.headline }}</p>
+          {% endif %}
+          <p class="mt-3 text-xs text-ink-400">
+            {% blocktranslate trimmed count total=cv.items.count %}
+              {{ total }} entry
+            {% plural %}
+              {{ total }} entries
+            {% endblocktranslate %}
+            · {{ cv.get_theme_display }}
+          </p>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card py-12 text-center">
+      <p class="mb-1 font-medium">{% translate "No CVs yet" %}</p>
+      <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Write your career down first, then build variants from it." %}
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <a href="{% url 'resume:overview' %}" class="btn-secondary">{% translate "Your career" %}</a>
+        <a href="{% url 'documents:cv_create' %}" class="btn-primary">{% translate "New CV" %}</a>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

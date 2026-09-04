@@ -1,7 +1,7 @@
 # Postulo — implementation plan
 
-> **Status:** M0, M1 and M2 complete. This is a living document, revised as
-> milestones land and assumptions meet reality.
+> **Status:** M0 to M3 complete. This is a living document, revised as milestones
+> land and assumptions meet reality.
 
 ## 1. Mission
 
@@ -88,6 +88,25 @@ Two items in the original plan did not survive contact with the packages:
 - **Number grouping is left to Django's locale machinery.** Hard-coding a thousands
   separator in a project that ships French and Portuguese would have been wrong in two
   of its three languages.
+
+### Corrections made during M3
+
+- **Highlights are text, one bullet per line, not rows.** Separate rows would have
+  bought per-bullet reordering at the price of a formset on every editing screen, and
+  would have turned a per-variant override into a fiddly set of selections rather than a
+  textarea. The plan called for ordered bullet children; this is simpler and does the
+  same job.
+- **Cover letters are never rendered by Django's template engine.** A letter is text a
+  person wrote, usually with fragments pasted from a job advert. Handing that to the
+  template engine would let `{% ... %}` in the source reach into the application, so
+  substitution is a regular expression over a fixed set of names and can do nothing
+  else. There is a test that proves an expression in a letter is not evaluated.
+- **Themes are choices, not user-editable rows.** A theme is a Django template plus a
+  stylesheet; letting people upload those would mean executing their markup while
+  rendering. User themes belong behind a deliberate decision.
+- **A generic relation carries a real cost.** Two different models can share a primary
+  key, so filtering `CVItem` by `object_id` alone matches rows it should not. Every
+  query pairs it with the content type. A test caught this the hard way.
 
 ## 4. Repository layout
 
@@ -184,8 +203,8 @@ rather than a rewrite.
 | **M0** | Repository, toolchain, Django skeleton, split settings, custom user model, i18n wiring, CI, documentation | **Complete** |
 | **M1** | Accounts and foundations: allauth flows, invitations, `OwnedModel` with isolation tests, private media delivery, the Tailwind and htmx layout | **Complete** |
 | **M2** | Jobs and applications: companies, contacts, postings, applications, the event timeline, board and table views, reminders, notes, tags | **Complete** |
-| **M3** | Documents: resume content, CV variants with per-variant overrides, cover letters, uploads and versioning, PDF rendering, snapshot on send | Next |
-| **M4** | Capture and plugins: URL fetching, the JSON-LD parser, the plugin registry, the review screen, the capture API and tokens, `docs/PLUGINS.md` | |
+| **M3** | Documents: resume content, CV variants with per-variant overrides, cover letters, uploads and versioning, PDF rendering, snapshot on send | **Complete** |
+| **M4** | Capture and plugins: URL fetching, the JSON-LD parser, the plugin registry, the review screen, the capture API and tokens, `docs/PLUGINS.md` | Next |
 | **M5** | Insights and data ownership: funnel and response-rate analytics, time to response, source conversion, search and filters, export and import | |
 | **M6** | Ship: Dockerfile, compose files for SQLite and PostgreSQL, health checks, installation documentation, v0.1.0 | |
 
@@ -203,7 +222,9 @@ Portuguese translations themselves.
    images and compose files will be written to standard practice and validated on the
    target host rather than here.
 2. **Development runs on SQLite with Playwright**, while Docker defaults to PostgreSQL
-   with WeasyPrint. Both paths need CI coverage before v0.1.0.
+   with WeasyPrint. Both paths need CI coverage before v0.1.0. CI currently has no PDF
+   backend at all, so the one test that renders a real PDF skips there; the rest use a
+   stand-in renderer.
 3. **`django-tasks-db` does not yet declare Django 6.1** in its classifiers, although it
    sets no upper pin and installs and migrates cleanly. Worth re-checking at M5, when
    background work starts to matter.

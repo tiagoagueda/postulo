@@ -1,0 +1,23 @@
+{% extends "documents/themes/base_letter.html" %}
+
+{% block page_styles %}
+      body {
+        font-family: "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+        font-size: 11pt;
+        line-height: 1.6;
+      }
+
+      @page { size: A4; margin: 22mm; }
+      body { margin: 0; color: #16181d; }
+      p { margin: 0; }
+      .sender { margin-bottom: 24px; }
+      .name { font-weight: 600; font-size: 13pt; }
+      .details { color: #4a4f5a; font-size: 9pt; margin-top: 3px; }
+      .details span:not(:last-child)::after { content: " · "; }
+      .recipient { margin-bottom: 18px; }
+      .date { margin-bottom: 18px; color: #4a4f5a; }
+      .subject { font-weight: 600; margin-bottom: 16px; }
+      .body p { margin-bottom: 11px; }
+      .sender { border-bottom: 1px solid #c7cad1; padding-bottom: 10px; }
+      .name { font-variant: small-caps; letter-spacing: 0.02em; }
+{% endblock %}

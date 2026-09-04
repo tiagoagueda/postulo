@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Your career" %}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Your career" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          Written once, here. Every CV variant draws on this, so correcting a job title
+          corrects it everywhere.
+        {% endblocktranslate %}
+      </p>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="{% url 'resume:preview' %}" class="btn-secondary">{% translate "Preview" %}</a>
+      <a href="{% url 'documents:cv_list' %}" class="btn-primary">{% translate "Your CVs" %}</a>
+    </div>
+  </div>
+
+  <div class="space-y-8">
+    {% for section in sections %}
+      <section>
+        <div class="mb-3 flex items-center gap-3">
+          <h2 class="font-medium">{{ section.spec.plural }}</h2>
+          <a href="{% url 'resume:item_create' section.spec.slug %}"
+             class="ml-auto text-sm text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "Add" %}
+          </a>
+        </div>
+
+        {% if section.spec.blurb %}
+          <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">{{ section.spec.blurb }}</p>
+        {% endif %}
+
+        {% if section.items %}
+          <div class="card p-0">
+            <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+              {% for item in section.items %}
+                <li class="flex items-start gap-3 px-4 py-3">
+                  <div class="min-w-0 flex-1">
+                    <p class="font-medium">{{ item }}</p>
+                    {% if section.spec.slug == 'skill-group' %}
+                      <p class="text-sm text-ink-500 dark:text-ink-400">
+                        {% if item.skill_names %}
+                          {{ item.skill_names|join:", " }}
+                        {% else %}
+                          {% translate "No skills in this group yet" %}
+                        {% endif %}
+                      </p>
+                    {% elif item.highlight_lines %}
+                      <p class="text-sm text-ink-500 dark:text-ink-400">
+                        {% blocktranslate trimmed count total=item.highlight_lines|length %}
+                          {{ total }} highlight
+                        {% plural %}
+                          {{ total }} highlights
+                        {% endblocktranslate %}
+                      </p>
+                    {% endif %}
+                  </div>
+
+                  <div class="flex shrink-0 items-center gap-1">
+                    <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'up' %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                              aria-label="{% translate 'Move up' %}">↑</button>
+                    </form>
+                    <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'down' %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                              aria-label="{% translate 'Move down' %}">↓</button>
+                    </form>
+                    <a href="{% url 'resume:item_update' section.spec.slug item.pk %}"
+                       class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
+                    <a href="{% url 'resume:item_delete' section.spec.slug item.pk %}"
+                       class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                      {% translate "Delete" %}
+                    </a>
+                  </div>
+                </li>
+
+                {% if section.spec.slug == 'skill-group' %}
+                  <li class="bg-ink-50 px-4 py-2 dark:bg-ink-950">
+                    <div class="flex flex-wrap items-center gap-2">
+                      {% for skill in item.skills.all %}
+                        <a href="{% url 'resume:item_update' 'skill' skill.pk %}"
+                           class="rounded bg-ink-100 px-2 py-0.5 text-xs hover:bg-ink-200
+                                  dark:bg-ink-800 dark:hover:bg-ink-700">{{ skill.name }}</a>
+                      {% endfor %}
+                      <a href="{% url 'resume:item_create' 'skill' %}"
+                         class="text-xs text-brand-600 hover:underline dark:text-brand-400">
+                        {% translate "Add a skill" %}
+                      </a>
+                    </div>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% else %}
+          <div class="card text-sm text-ink-500 dark:text-ink-400">
+            {% translate "Nothing here yet." %}
+            <a href="{% url 'resume:item_create' section.spec.slug %}"
+               class="text-brand-600 hover:underline dark:text-brand-400">
+              {% translate "Add the first one." %}
+            </a>
+          </div>
+        {% endif %}
+      </section>
+    {% endfor %}
+  </div>
+{% endblock %}
