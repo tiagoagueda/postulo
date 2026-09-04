@@ -44,14 +44,42 @@ corrected.
   is a way to go looking at them.
 - **It gives up quickly.** Ten seconds, two megabytes, three redirects.
 
-## When a page will not capture
+## When the site refuses
 
-Some pages cannot be read from the outside at all: postings behind a login, or built
-entirely by JavaScript after the page loads. Postulo fetches HTML; it does not run a
-browser.
+Large employers frequently sit behind bot protection that turns away anything which is
+not a browser. You will see something like:
 
-When that happens, use **Record an application** and paste the text in. It is the same
-form, without the pre-filling.
+> The site refused the request (403). Large sites often sit behind bot protection that
+> turns away anything that is not a browser, even when the page is perfectly visible to
+> you. Paste the page source in below instead.
+
+The advert is on your screen and unreachable from your server at the same time, and that
+is not a contradiction: the block is aimed at automated clients in general, not at you.
+
+Postulo does not pretend to be a browser to get around it. Disguising the request would
+be dishonest, and it would also break `robots.txt` handling, which matches on the name a
+client gives — so the polite thing and the correct thing happen to agree.
+
+**Paste the page source instead.** On the capture page, open *The site refuses Postulo,
+or the posting needs a login*:
+
+1. Open the posting in your browser.
+2. View the page source (Ctrl+U in most browsers) and select all of it.
+3. Paste it into the box, along with the address.
+
+Postulo reads what you paste and fetches nothing. Your browser was already allowed to see
+the page, so there is nothing to refuse.
+
+The same route works for postings behind a login, and for pages built entirely by
+JavaScript — in the second case, use your browser's developer tools to copy the rendered
+HTML rather than the original source, since the source will not contain the advert.
+
+This is exactly what the planned browser extension will automate.
+
+## When nothing can be read at all
+
+If a page carries no structured data and no usable title, use **Record an application**
+and type it in. Same form, without the pre-filling.
 
 ## Captures waiting for you
 

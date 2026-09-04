@@ -27,11 +27,29 @@ from .models import Capture, CaptureStatus
 
 
 class CaptureURLForm(forms.Form):
+    """An address to fetch, or a page you already have.
+
+    The second field exists because plenty of large employers sit behind bot protection
+    that refuses anything not driving a browser. Their advert is perfectly visible to
+    you and completely unreachable from your server, and the answer to that is to hand
+    Postulo the page rather than to dress the request up as a browser. The same field
+    covers postings behind a login, for the same reason.
+    """
+
     url = forms.URLField(
         label=_("Posting address"),
         max_length=500,
         widget=forms.URLInput(attrs={"placeholder": "https://…", "autofocus": "autofocus"}),
         help_text=_("Postulo fetches this one page, and nothing else."),
+    )
+    html = forms.CharField(
+        label=_("Page source"),
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 6, "placeholder": "<!doctype html>…"}),
+        help_text=_(
+            "Optional. If the site refuses Postulo, open the posting in your browser, "
+            "view the page source, and paste it here. Nothing is fetched when you do."
+        ),
     )
 
 
@@ -59,15 +77,23 @@ class CaptureCreateView(OwnedObjectMixin, View):
             return self._render(request, form)
 
         url = form.cleaned_data["url"]
-        try:
-            fetched = fetch_page(url)
-        except CaptureError as exc:
-            # Refusals here are explanations, not failures: the message says what to do
-            # instead, which is nearly always "paste the text in by hand".
-            messages.error(request, str(exc))
-            return self._render(request, form)
+        supplied = form.cleaned_data.get("html", "").strip()
 
-        result = parse_page(fetched.url, fetched.html)
+        if supplied:
+            # Nothing is fetched: the page came from a browser that was already allowed
+            # to see it, which is also how the future extension will work.
+            page_url, page_html = url, supplied
+        else:
+            try:
+                fetched = fetch_page(url)
+            except CaptureError as exc:
+                # Refusals here are explanations, not failures: the message says what to
+                # do instead, and the form keeps what was typed so it can be acted on.
+                messages.error(request, str(exc))
+                return self._render(request, form)
+            page_url, page_html = fetched.url, fetched.html
+
+        result = parse_page(page_url, page_html)
         if result is None:
             messages.error(
                 request,
@@ -78,7 +104,7 @@ class CaptureCreateView(OwnedObjectMixin, View):
         data, source = result
         capture = Capture.objects.create(
             owner=request.user,
-            url=fetched.url[:500],
+            url=page_url[:500],
             source_name=source.name,
             source_version=getattr(source, "version", ""),
             origin="web",

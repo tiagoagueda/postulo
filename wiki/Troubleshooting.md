@@ -67,6 +67,15 @@ The database has a record whose file is missing from `MEDIA_ROOT`. Usually the m
 directory was not restored alongside the database — see [Backups and your
 data](Backups-and-your-data).
 
+## "The site refused the request (403)"
+
+Bot protection, not a mistake on your part. The page is visible to your browser and
+refused to your server.
+
+Paste the page source instead: on the capture page, open *The site refuses Postulo, or
+the posting needs a login*, view the source in your browser, and paste it in. Postulo
+fetches nothing when you do. See [Capturing postings](Capturing-postings#when-the-site-refuses).
+
 ## "Nothing resembling a job posting was found on that page"
 
 The page carries no structured data and no usable title. Postings behind a login, or

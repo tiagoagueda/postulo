@@ -234,3 +234,44 @@ def test_a_token_is_shown_once_and_then_never_again(client, user):
 
     assert first.context["new_token"], "the secret is shown immediately after creation"
     assert second.context["new_token"] is None, "and is not recoverable afterwards"
+
+
+def test_pasting_the_page_source_skips_fetching_entirely(client, user, monkeypatch):
+    """The way round a site that refuses Postulo, and round a login wall.
+
+    Nothing is fetched, so nothing can be refused. This is also exactly what the browser
+    extension will do, since the browser has already been allowed to see the page.
+    """
+    from postulo.plugins import fetching
+
+    def must_not_be_called(url):
+        raise AssertionError("nothing should be fetched when the page is supplied")
+
+    monkeypatch.setattr("postulo.jobs.capture_views.fetch_page", must_not_be_called)
+    client.force_login(user)
+
+    response = client.post(
+        reverse("jobs:capture_create"),
+        {"url": "https://www.example.org/jobs/1", "html": PAGE},
+    )
+
+    assert response.status_code == 302
+    capture = Capture.objects.for_user(user).get()
+    assert capture.data["title"] == "Research Engineer"
+    assert fetching  # imported for clarity about what was bypassed
+
+
+def test_a_refused_fetch_keeps_the_form_and_explains(client, user, monkeypatch):
+    from postulo.plugins.fetching import FetchFailed
+
+    def refuse(url):
+        raise FetchFailed("The site refused the request (403). …bot protection…")
+
+    monkeypatch.setattr("postulo.jobs.capture_views.fetch_page", refuse)
+    client.force_login(user)
+
+    response = client.post(reverse("jobs:capture_create"), {"url": "https://example.org/jobs/1"})
+
+    assert response.status_code == 200
+    assert any("403" in str(m) for m in response.context["messages"])
+    assert not Capture.objects.for_user(user).exists()

@@ -62,6 +62,37 @@ class FetchedPage:
     html: str
 
 
+def _describe_failure(status: int) -> str:
+    """Say what a refusal means and what to do about it.
+
+    A bare status code is true and useless. The 401 and 403 cases are worth spelling
+    out: large employers routinely sit behind bot protection that refuses anything not
+    driving a browser, so the page your browser is showing you right now is genuinely
+    unreachable from the server — and the answer is to hand Postulo the page rather than
+    to try harder at pretending.
+    """
+    if status in (401, 403):
+        return str(
+            _(
+                "The site refused the request (%(status)s). Large sites often sit behind "
+                "bot protection that turns away anything that is not a browser, even "
+                "when the page is perfectly visible to you. Paste the page source in "
+                "below instead."
+            )
+            % {"status": status}
+        )
+    if status == 404:
+        return str(_("There is nothing at that address (404). Check the link."))
+    if status == 429:
+        return str(_("The site asked us to slow down (429). Try again in a few minutes."))
+    if status >= 500:
+        return str(
+            _("The site is having trouble (%(status)s). That is their end, not yours.")
+            % {"status": status}
+        )
+    return str(_("That page returned %(status)s.") % {"status": status})
+
+
 def _addresses_for(host: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Address]:
     try:
         infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
@@ -181,9 +212,7 @@ def fetch_page(url: str) -> FetchedPage:
                 continue
 
             if response.status_code >= 400:
-                raise FetchFailed(
-                    _("That page returned %(status)s.") % {"status": response.status_code}
-                )
+                raise FetchFailed(_describe_failure(response.status_code))
 
             content_type = response.headers.get("content-type", "")
             if "html" not in content_type.lower():

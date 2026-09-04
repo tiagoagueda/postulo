@@ -364,3 +364,26 @@ def test_a_capture_validates_its_stored_data_on_the_way_out(capture):
 
     assert data.title == "Senior Backend Engineer"
     assert data.company_name == "Aperture Science"
+
+
+# ------------------------------------------------- when a site refuses Postulo
+
+
+@pytest.mark.parametrize(
+    "status,expected",
+    [
+        (403, "bot protection"),
+        (401, "bot protection"),
+        (404, "nothing at that address"),
+        (429, "slow down"),
+        (503, "having trouble"),
+    ],
+)
+def test_a_refusal_says_what_to_do_about_it(status, expected):
+    """A bare status code is true and useless.
+
+    403 in particular is the common case: large employers sit behind bot protection that
+    turns away anything not driving a browser, so the page somebody is looking at right
+    now is genuinely unreachable from their server.
+    """
+    assert expected in fetching._describe_failure(status)

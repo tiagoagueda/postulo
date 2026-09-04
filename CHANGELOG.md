@@ -63,6 +63,10 @@ All notable changes to Postulo are recorded here. The format follows
   a source, with no change to Postulo — see `docs/PLUGINS.md`.
 - A capture API with per-device bearer tokens, hashed at rest and revocable, reaching
   captures and nothing else. It is what the future browser extension will use.
+- Capturing by pasting the page source, for sites whose bot protection refuses the server
+  and for postings behind a login. Postulo fetches nothing in that case.
+- Fetch failures now explain themselves. A bare status code is true and useless; a 403
+  in particular needs to say that the site blocks non-browsers and what to do instead.
 
 ### Changed
 
