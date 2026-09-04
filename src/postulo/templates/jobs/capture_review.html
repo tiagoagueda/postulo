@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Review the capture" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Review the capture" %}</h1>
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed with source=capture.source_name %}
+        Read by {{ source }}. Check it before saving — a parser reading somebody else's
+        markup gets things wrong, which is why nothing has been recorded yet.
+      {% endblocktranslate %}
+    </p>
+
+    {% if capture.url %}
+      <p class="mb-6 truncate text-sm">
+        <a href="{{ capture.url }}" rel="noopener noreferrer external" target="_blank"
+           class="text-brand-600 hover:underline dark:text-brand-400">{{ capture.url }}</a>
+      </p>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="card mb-4">
+        <h2 class="mb-4 font-medium">{% translate "The role" %}</h2>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.company_name %}
+          {% include "partials/field.html" with field=form.title %}
+        </div>
+        {% include "partials/field.html" with field=form.url %}
+        <div class="grid gap-x-4 sm:grid-cols-3">
+          {% include "partials/field.html" with field=form.location %}
+          {% include "partials/field.html" with field=form.remote_type %}
+          {% include "partials/field.html" with field=form.employment_type %}
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h2 class="mb-4 font-medium">{% translate "Money and dates" %}</h2>
+        <div class="grid gap-x-4 sm:grid-cols-4">
+          {% include "partials/field.html" with field=form.salary_min %}
+          {% include "partials/field.html" with field=form.salary_max %}
+          {% include "partials/field.html" with field=form.salary_currency %}
+          {% include "partials/field.html" with field=form.salary_period %}
+        </div>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.closes_at %}
+          {% include "partials/field.html" with field=form.deadline %}
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h2 class="mb-4 font-medium">{% translate "Your application" %}</h2>
+        <div class="grid gap-x-4 sm:grid-cols-3">
+          {% include "partials/field.html" with field=form.status %}
+          {% include "partials/field.html" with field=form.channel %}
+          {% include "partials/field.html" with field=form.priority %}
+        </div>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.source %}
+          {% include "partials/field.html" with field=form.tags %}
+        </div>
+      </div>
+
+      <div class="card mb-6">
+        <h2 class="mb-4 font-medium">{% translate "The posting itself" %}</h2>
+        {% include "partials/field.html" with field=form.description %}
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Save as an application" %}</button>
+        <a href="{% url 'jobs:capture_list' %}" class="btn-ghost">{% translate "Later" %}</a>
+      </div>
+    </form>
+
+    <form method="post" action="{% url 'jobs:capture_discard' capture.pk %}" class="mt-6">
+      {% csrf_token %}
+      <button type="submit" class="btn-ghost text-sm text-red-600 dark:text-red-400">
+        {% translate "Discard this capture" %}
+      </button>
+    </form>
+  </div>
+{% endblock %}

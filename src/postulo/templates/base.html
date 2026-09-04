@@ -52,8 +52,11 @@
             </nav>
 
             <div class="ml-auto flex items-center gap-1">
+              <a href="{% url 'jobs:capture_create' %}" class="btn-secondary mr-1">
+                {% translate "Capture" %}
+              </a>
               <a href="{% url 'applications:create' %}" class="btn-primary mr-2">
-                {% translate "Record an application" %}
+                {% translate "Record" %}
               </a>
               <a href="{% url 'accounts:profile' %}" class="{% nav_active 'accounts:profile' %}">
                 {{ user.display_name }}

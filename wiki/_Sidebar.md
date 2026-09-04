@@ -10,10 +10,12 @@
 **Using it**
 - [Getting started](Getting-started)
 - [Tracking applications](Tracking-applications)
+- [Capturing postings](Capturing-postings)
 - [Your career record](Your-career-record)
 - [CVs](CVs)
 - [Cover letters](Cover-letters)
 - [Files and what you sent](Files-and-what-you-sent)
+- [The capture API](The-capture-API)
 
 **Project**
 - [Roadmap](Roadmap)

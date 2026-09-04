@@ -67,6 +67,32 @@ The database has a record whose file is missing from `MEDIA_ROOT`. Usually the m
 directory was not restored alongside the database — see [Backups and your
 data](Backups-and-your-data).
 
+## "Nothing resembling a job posting was found on that page"
+
+The page carries no structured data and no usable title. Postings behind a login, or
+built entirely by JavaScript after the page loads, cannot be read from the outside —
+Postulo fetches HTML, it does not run a browser.
+
+Use **Record an application** and paste the text in. If it is a site you use often, a
+plugin can be written for it: see
+[docs/PLUGINS.md](https://source.tiagoagueda.com/tiagoagueda/postulo/src/branch/main/docs/PLUGINS.md).
+
+## "That address is on a private or local network"
+
+Capture refuses anything resolving to a loopback, private or link-local address, and
+there is no setting to permit it. Paste the posting text in by hand.
+
+## "This site's robots.txt asks automated clients not to fetch that page"
+
+The site has declined. You can set `POSTULO_CAPTURE_IGNORE_ROBOTS=true`, which makes you
+responsible for the requests your instance makes, or copy the text in by hand.
+
+## An API token stopped working
+
+Tokens return `401` when missing, mistyped, revoked, or belonging to a disabled account.
+Check the token list under **Your details → Capture tokens**: it shows which are revoked
+and when each was last used. A lost token cannot be recovered, only replaced.
+
 ## Times are wrong
 
 Set `POSTULO_TIME_ZONE` for the instance, and check the time zone on your own profile,

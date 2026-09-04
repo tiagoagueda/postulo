@@ -207,3 +207,74 @@ class JobPosting(OwnedModel):
             figure = _("up to %(high)s") % {"high": amount(self.salary_max)}
 
         return f"{figure} {self.salary_currency}".strip()
+
+
+class CaptureStatus(models.TextChoices):
+    PENDING = "pending", _("Waiting for review")
+    ACCEPTED = "accepted", _("Turned into an application")
+    DISCARDED = "discarded", _("Discarded")
+
+
+class Capture(OwnedModel):
+    """A posting read off a page, waiting for a person to confirm it.
+
+    A capture is never an application. Parsing somebody else's markup is guesswork often
+    enough that turning the result straight into a record would put invented job titles
+    into the one place they must not be. Everything captured waits here until it has been
+    looked at.
+
+    The parsed fields are kept as JSON rather than as columns because they are not the
+    record — they are a suggestion for a form, and the shape belongs to
+    :class:`~postulo.plugins.base.JobPostingData`, which validates them on the way in and
+    on the way out.
+    """
+
+    url = models.URLField(_("address"), max_length=500, blank=True)
+    source_name = models.CharField(_("read by"), max_length=60, blank=True)
+    source_version = models.CharField(_("source version"), max_length=20, blank=True)
+    origin = models.CharField(
+        _("captured from"),
+        max_length=20,
+        default="web",
+        help_text=_("Which part of Postulo produced this: the web interface, or the API."),
+    )
+    data = models.JSONField(_("parsed posting"), default=dict)
+    status = models.CharField(
+        _("status"), max_length=20, choices=CaptureStatus, default=CaptureStatus.PENDING
+    )
+    application = models.ForeignKey(
+        "applications.Application",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="captures",
+        verbose_name=_("application"),
+    )
+
+    class Meta:
+        verbose_name = _("capture")
+        verbose_name_plural = _("captures")
+        ordering = ("-created_at",)
+        indexes = [models.Index(fields=("owner", "status"))]
+
+    def __str__(self) -> str:
+        return self.data.get("title") or self.url or _("Empty capture")
+
+    def get_absolute_url(self) -> str:
+        return reverse("jobs:capture_review", args=[self.pk])
+
+    @property
+    def posting_data(self):
+        """The parsed posting, validated again on the way out.
+
+        Stored JSON can outlive the schema that wrote it. Validating on read means a
+        capture saved by an older version shows up as a clear error rather than as
+        subtly wrong values in a form somebody is about to accept.
+        """
+        from postulo.plugins.base import JobPostingData
+
+        return JobPostingData(**self.data)
+
+    @property
+    def is_pending(self) -> bool:
+        return self.status == CaptureStatus.PENDING

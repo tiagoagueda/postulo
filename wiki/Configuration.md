@@ -47,6 +47,17 @@ Leave both hand-off settings unset and Django streams downloads itself. That is 
 everywhere, and ties up an application worker for the duration of each download — fine
 for a personal instance.
 
+## Capture
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `POSTULO_CAPTURE_IGNORE_ROBOTS` | `false` | Postulo honours `robots.txt` when fetching a posting. A person capturing a page they are looking at is not a crawler, but Postulo cannot prove that to the site, so the polite default stands. Turning it off makes you responsible for the requests your instance makes. |
+
+Private and local addresses are refused when capturing, and there is deliberately no
+setting to allow them: a self-hosted box that will fetch any address you hand it is a way
+to go looking at the rest of your network. See
+[Capturing postings](Capturing-postings#what-it-will-not-do).
+
 ## Documents
 
 | Variable | Default | What it does |

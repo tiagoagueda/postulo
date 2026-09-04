@@ -23,7 +23,9 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
   six months later you know exactly which version that employer read.
 - **Bring your own files.** Externally authored PDFs and DOCX files are stored and
   versioned alongside generated ones.
-- **Capture postings** manually or from a URL, extensible through plugins.
+- **Capture postings** from a URL — Postulo reads the page and asks you to confirm it
+  before recording anything. Extensible through plugins, and reachable through a small
+  API for scripts and browser extensions.
 - **See the funnel** — response rates, time to response, and which sources actually
   convert.
 
@@ -39,6 +41,7 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 - **[The wiki](https://source.tiagoagueda.com/tiagoagueda/postulo/wiki)** — installing,
   configuring and using Postulo. Authored in [wiki/](wiki/) and published from there.
 - [Implementation plan](docs/PLAN.md) — architecture, data model, and milestones
+- [Writing a capture source](docs/PLUGINS.md) — the plugin contract
 
 ## Development
 

@@ -11,13 +11,9 @@ this wiki reads as a promise.
 | **M1** | Accounts, invitations, ownership separation, private file delivery, the interface |
 | **M2** | Companies, contacts, postings, applications, the event timeline, board and table, reminders, tags |
 | **M3** | The career record, CV variants, cover letters, uploads, PDF export, snapshots of what you sent |
+| **M4** | Capturing a posting from its address, the plugin interface, and the capture API |
 
 ## Still to come
-
-**M4 — capture and plugins.** Paste a posting URL and have the title, company and
-description filled in for you, with a review step before anything is saved. A plugin
-interface so other people can add support for particular sites, and an API that a browser
-extension can use later.
 
 **M5 — insights and data ownership.** Response rates, time to reply, which sources
 actually convert, and a one-click export of everything you have.
@@ -27,7 +23,7 @@ a manual job. See [Installing Postulo](Installing-Postulo) for what that involve
 
 ## After version 1
 
-- A browser extension, built on M4's API.
+- A browser extension, built on [the capture API](The-capture-API), which already exists.
 - Optional assistance from a language model for tailoring, as a plugin, disabled by
   default and never required.
 - Email ingestion and calendar synchronisation.

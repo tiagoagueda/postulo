@@ -5,6 +5,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from postulo.api.api import api
+
 urlpatterns = [
     path("", include("postulo.core.urls")),
     # Postulo's own account pages come first: Django resolves in order, so these
@@ -15,6 +17,9 @@ urlpatterns = [
     path("jobs/", include("postulo.jobs.urls")),
     path("career/", include("postulo.resume.urls")),
     path("documents/", include("postulo.documents.urls")),
+    path("capture-tokens/", include("postulo.api.urls")),
+    # The capture API. Deliberately the only machine-readable surface Postulo has.
+    path("api/v1/", api.urls),
     path(settings.POSTULO_ADMIN_URL, admin.site.urls),
 ]
 

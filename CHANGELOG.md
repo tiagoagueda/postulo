@@ -55,6 +55,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 - A user wiki covering installation, configuration, every part of the interface,
   backups and troubleshooting, authored in `wiki/` and published to Forgejo.
+- Capturing a posting from its address: Postulo fetches the page, reads what it can, and
+  presents the result for review. Nothing is recorded until a person accepts it (M4).
+- Two built-in sources: schema.org `JobPosting` structured data, and a fallback reading
+  the page's own title and text.
+- A plugin interface. Any Python package advertising a `postulo.sources` entry point adds
+  a source, with no change to Postulo — see `docs/PLUGINS.md`.
+- A capture API with per-device bearer tokens, hashed at rest and revocable, reaching
+  captures and nothing else. It is what the future browser extension will use.
 
 ### Changed
 

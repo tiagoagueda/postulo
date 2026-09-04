@@ -1,6 +1,6 @@
 # Postulo — implementation plan
 
-> **Status:** M0 to M3 complete. This is a living document, revised as milestones
+> **Status:** M0 to M4 complete. This is a living document, revised as milestones
 > land and assumptions meet reality.
 
 ## 1. Mission
@@ -112,6 +112,22 @@ Two items in the original plan did not survive contact with the packages:
   is installed, findable, and raises OSError on import. Availability is therefore decided
   by attempting the import, not by asking whether the package exists.
 
+### Corrections made during M4
+
+- **Fetching a user-supplied URL is the security story of this milestone**, not parsing.
+  Postulo runs on the same network as a router, a NAS and a hypervisor, so capture
+  refuses anything resolving off the public internet, revalidates every redirect, and has
+  no setting to permit otherwise. The parsers were the easy half.
+- **BeautifulSoup and lxml were not added.** Reading JSON-LD out of a `<script>` element
+  needs no cleverness, and the text fallback only has to be tidy enough for somebody to
+  edit. The standard library's HTML parser does both, and a C extension is a poor thing
+  to ask of someone installing this on their own server.
+- **A length constraint on a Pydantic field runs before validators.** Declaring
+  `max_length` on the description would have rejected an over-long advert instead of
+  letting the validator truncate it — the opposite of the intent, and caught by a test.
+- **django-ninja deprecated returning `(status, body)` tuples** in favour of `Status()`.
+  Treating warnings as errors surfaced it immediately rather than at the next upgrade.
+
 ## 4. Repository layout
 
 ```
@@ -208,8 +224,8 @@ rather than a rewrite.
 | **M1** | Accounts and foundations: allauth flows, invitations, `OwnedModel` with isolation tests, private media delivery, the Tailwind and htmx layout | **Complete** |
 | **M2** | Jobs and applications: companies, contacts, postings, applications, the event timeline, board and table views, reminders, notes, tags | **Complete** |
 | **M3** | Documents: resume content, CV variants with per-variant overrides, cover letters, uploads and versioning, PDF rendering, snapshot on send | **Complete** |
-| **M4** | Capture and plugins: URL fetching, the JSON-LD parser, the plugin registry, the review screen, the capture API and tokens, `docs/PLUGINS.md` | Next |
-| **M5** | Insights and data ownership: funnel and response-rate analytics, time to response, source conversion, search and filters, export and import | |
+| **M4** | Capture and plugins: URL fetching, the JSON-LD parser, the plugin registry, the review screen, the capture API and tokens, `docs/PLUGINS.md` | **Complete** |
+| **M5** | Insights and data ownership: funnel and response-rate analytics, time to response, source conversion, search and filters, export and import | Next |
 | **M6** | Ship: Dockerfile, compose files for SQLite and PostgreSQL, health checks, installation documentation, v0.1.0 | |
 
 Each milestone ends green: migrations applied, tests passing, and a working interface.

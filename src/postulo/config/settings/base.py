@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "postulo.applications",
     "postulo.resume",
     "postulo.documents",
+    "postulo.api",
 ]
 
 MIDDLEWARE = [
@@ -181,6 +182,14 @@ POSTULO_MEDIA_SENDFILE = env.bool("POSTULO_MEDIA_SENDFILE", default=False)
 # optional, so an unusable renderer is reported when export is attempted rather than
 # preventing the application from starting.
 POSTULO_PDF_BACKEND = env("POSTULO_PDF_BACKEND", default="auto")
+
+# ---------------------------------------------------------------------- capture
+
+# Postulo honours robots.txt when fetching a posting. A person capturing a page they
+# are looking at is not a crawler, but Postulo cannot prove that to the site, so the
+# polite default stands. Turning this off makes the operator responsible for the
+# requests their instance makes.
+POSTULO_CAPTURE_IGNORE_ROBOTS = env.bool("POSTULO_CAPTURE_IGNORE_ROBOTS", default=False)
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},

@@ -20,11 +20,13 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 | Understand a setting | [Configuration](Configuration) |
 | Use it for the first time | [Getting started](Getting-started) |
 | Keep on top of applications | [Tracking applications](Tracking-applications) |
+| Stop retyping adverts | [Capturing postings](Capturing-postings) |
 | Write your CV once and tailor it | [Your career record](Your-career-record) and [CVs](CVs) |
 | Reuse a cover letter properly | [Cover letters](Cover-letters) |
 | Know what you sent to whom | [Files and what you sent](Files-and-what-you-sent) |
 | Share the instance with someone | [Accounts and invitations](Accounts-and-invitations) |
 | Not lose everything | [Backups and your data](Backups-and-your-data) |
+| Capture from a script or extension | [The capture API](The-capture-API) |
 | Fix something | [Troubleshooting](Troubleshooting) |
 
 ## What it does
@@ -36,6 +38,8 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 - **Tailors CVs** per role without forking your history.
 - **Keeps what you actually sent**, frozen as a PDF at the moment of sending.
 - **Stores files you already had**, versioned, and never serves them publicly.
+- **Reads a posting from its address**, and asks you to confirm it before recording
+  anything.
 
 ## What it will not do
 

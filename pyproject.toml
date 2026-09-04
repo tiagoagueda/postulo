@@ -26,6 +26,10 @@ dependencies = [
     # backend and the `db_worker` process that executes queued tasks.
     "django-tasks-db>=0.13",
     "whitenoise>=6.12",
+    # Fetching a posting the user pasted. Chosen over requests for its explicit timeouts
+    # and for letting redirects be followed by hand, which capture needs in order to
+    # revalidate every hop.
+    "httpx>=0.28",
     # The default PDF renderer. A small Python dependency, but it loads Pango through
     # the system linker: see the [chromium] extra for machines where that is awkward.
     "weasyprint>=69",

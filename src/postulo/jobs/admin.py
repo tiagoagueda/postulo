@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Company, Contact, JobPosting
+from .models import Capture, Company, Contact, JobPosting
 
 
 class ContactInline(admin.TabularInline):
@@ -30,3 +30,11 @@ class JobPostingAdmin(admin.ModelAdmin):
     list_filter = ("owner", "remote_type", "employment_type")
     search_fields = ("title", "location", "description")
     autocomplete_fields = ("company",)
+
+
+@admin.register(Capture)
+class CaptureAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "source_name", "status", "origin", "owner", "created_at")
+    list_filter = ("owner", "status", "source_name", "origin")
+    search_fields = ("url",)
+    readonly_fields = ("data", "source_name", "source_version", "origin")

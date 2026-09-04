@@ -74,8 +74,12 @@ from a company page. An application can name one of them as its main contact.
 Companies are private to your account. Two people sharing an instance each keep their own
 record of the same employer, and neither can see the other's opinion of them.
 
+## Not retyping adverts
+
+Paste a posting's address and Postulo will read the page for you — see
+[Capturing postings](Capturing-postings).
+
 ## What is not here yet
 
-Pasting a posting URL and having the details filled in for you is planned for M4. Response
-rates, time-to-reply and source conversion figures are planned for M5. See
+Response rates, time-to-reply and source conversion figures are planned for M5. See
 [Roadmap](Roadmap).

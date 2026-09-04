@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Capture a posting" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-2xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Capture a posting" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Paste the address of a job advert. Postulo fetches that one page, reads what it
+        can, and shows you the result to correct before anything is saved.
+      {% endblocktranslate %}
+    </p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        {% include "partials/field.html" with field=form.url %}
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Read the page" %}</button>
+        <a href="{% url 'applications:create' %}" class="btn-ghost">
+          {% translate "Type it in instead" %}
+        </a>
+      </div>
+    </form>
+
+    <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
+      <h2 class="mb-2 font-medium">{% translate "How this works" %}</h2>
+      <ul class="mb-4 list-disc space-y-1 pl-5 text-sm text-ink-600 dark:text-ink-300">
+        <li>{% translate "One page is fetched — the one you pasted. Postulo never crawls." %}</li>
+        <li>{% translate "The site's robots.txt is honoured." %}</li>
+        <li>{% translate "Private and local addresses are refused." %}</li>
+        <li>{% translate "Nothing is saved until you have reviewed it." %}</li>
+      </ul>
+
+      <h2 class="mb-2 font-medium">{% translate "Sources installed" %}</h2>
+      <ul class="space-y-1 text-sm text-ink-500 dark:text-ink-400">
+        {% for source in sources %}
+          <li><code class="text-xs">{{ source.name }}</code> {{ source.version }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endblock %}

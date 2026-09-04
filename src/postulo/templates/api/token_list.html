@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Capture tokens" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Capture tokens" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        A token lets a tool outside Postulo hand over a posting. It can do nothing else:
+        it cannot read your applications, your CVs, or anything but the captures it
+        creates.
+      {% endblocktranslate %}
+    </p>
+
+    {% if new_token %}
+      <div class="alert-success mb-6 flex-col items-start">
+        <p class="mb-2 font-medium">{% translate "Copy this now" %}</p>
+        <code class="mb-2 block w-full break-all rounded bg-white/60 p-2 text-xs dark:bg-black/30">{{ new_token }}</code>
+        <p class="text-xs">
+          {% translate "Postulo stores only a hash of it and cannot show it again. Lose it and you make another." %}
+        </p>
+      </div>
+    {% endif %}
+
+    <div class="card mb-8">
+      <h2 class="mb-4 font-medium">{% translate "New token" %}</h2>
+      <form method="post" action="{% url 'api:token_create' %}" class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <div class="min-w-64 flex-1">
+          <label class="field-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+          {{ form.name }}
+        </div>
+        <button type="submit" class="btn-primary">{% translate "Create" %}</button>
+      </form>
+    </div>
+
+    {% if tokens %}
+      <div class="card mb-8 p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for token in tokens %}
+            <li class="flex items-center gap-3 px-4 py-3 {% if not token.is_active %}opacity-50{% endif %}">
+              <div class="min-w-0 flex-1">
+                <p class="font-medium">{{ token.name }}</p>
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  <code>{{ token.prefix }}…</code>
+                  · {% translate "created" %} {{ token.created_at|date:"j M Y" }}
+                  {% if token.last_used_at %}
+                    · {% translate "last used" %} {{ token.last_used_at|date:"j M Y, H:i" }}
+                  {% else %}
+                    · {% translate "never used" %}
+                  {% endif %}
+                  {% if not token.is_active %} · {% translate "revoked" %}{% endif %}
+                </p>
+              </div>
+              {% if token.is_active %}
+                <form method="post" action="{% url 'api:token_revoke' token.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                    {% translate "Revoke" %}
+                  </button>
+                </form>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <div class="card">
+      <h2 class="mb-3 font-medium">{% translate "Using a token" %}</h2>
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Send it as a bearer token. To check that one works:" %}
+      </p>
+      <pre class="mb-4 overflow-x-auto rounded bg-ink-100 p-3 text-xs dark:bg-ink-950"><code>curl -H "Authorization: Bearer YOUR_TOKEN" \
+  {{ api_root }}me</code></pre>
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "To hand over a posting:" %}
+      </p>
+      <pre class="overflow-x-auto rounded bg-ink-100 p-3 text-xs dark:bg-ink-950"><code>curl -X POST -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.org/jobs/42"}' \
+  {{ api_root }}captures</code></pre>
+    </div>
+  </div>
+{% endblock %}
