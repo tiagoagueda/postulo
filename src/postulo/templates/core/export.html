@@ -48,5 +48,13 @@
       </p>
       <pre class="overflow-x-auto rounded bg-ink-100 p-3 text-xs dark:bg-ink-950"><code>uv run manage.py import_data you@example.org {{ filename }}</code></pre>
     </div>
+
+    <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
+      <h2 class="mb-2 font-medium">{% translate "Leaving" %}</h2>
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "You can delete your account yourself: every record, every file on the disk, tokens, connections, and the account. The export above is the safety net; take it first." %}
+      </p>
+      <a href="{% url 'accounts:delete' %}" class="btn-ghost text-red-600 dark:text-red-400">{% translate "Delete my account" %}</a>
+    </div>
   </div>
 {% endblock %}

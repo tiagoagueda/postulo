@@ -1,0 +1,34 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="mx-auto max-w-md">
+    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Delete account" %}</h2>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed with name=person.get_full_name|default:person.username username=person.username email=person.email %}
+        {{ name }} (<strong>{{ username }}</strong>, {{ email }}) and everything the account owns:
+        applications, companies, documents and the files behind them, reminders, tokens,
+        connections. The files are removed from the disk. Nothing can bring it back.
+      {% endblocktranslate %}
+    </p>
+    {% if blocked %}
+      <div class="alert-warning mb-6" role="status">{{ blocked }}</div>
+      <a href="{% url 'server:people' %}" class="btn-ghost">{% translate "Back to People" %}</a>
+    {% else %}
+      <form method="post" class="card border-red-300 dark:border-red-900">
+        {% csrf_token %}
+        <label class="field-label" for="id_confirm_username">
+          {% blocktranslate trimmed with username=person.username %}
+            Type the username, {{ username }}, to confirm
+          {% endblocktranslate %}
+        </label>
+        <input type="text" id="id_confirm_username" name="confirm_username" class="field-input mb-2" autocomplete="off">
+        {% if error %}<p class="field-error mb-2">{{ error }}</p>{% endif %}
+        <div class="flex items-center gap-3">
+          <button type="submit" class="btn bg-red-600 text-white hover:bg-red-700">{% translate "Delete the account" %}</button>
+          <a href="{% url 'server:people' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

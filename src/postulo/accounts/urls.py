@@ -9,6 +9,7 @@ urlpatterns = [
     path("theme/", views.ThemeView.as_view(), name="theme"),
     path("avatar/<int:pk>/", views.AvatarView.as_view(), name="avatar"),
     path("avatar/refresh/", views.GravatarRefreshView.as_view(), name="avatar_refresh"),
+    path("delete/", views.DeleteAccountView.as_view(), name="delete"),
     path("invitations/", views.InviteListView.as_view(), name="invite_list"),
     path("invitations/new/", views.InviteCreateView.as_view(), name="invite_create"),
     path("invitations/<int:pk>/revoke/", views.InviteRevokeView.as_view(), name="invite_revoke"),

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from allauth.account.decorators import reauthentication_required
 from django.contrib import messages
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import (
     Http404,
@@ -13,6 +15,7 @@ from django.http import (
 )
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -22,7 +25,7 @@ from postulo.core.context_processors import theme_switch
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import StaffRequiredMixin
 
-from . import avatars
+from . import avatars, deletion
 from .adapter import INVITE_SESSION_KEY
 from .forms import InviteForm, ProfileForm
 from .models import Invite, Profile, Theme
@@ -192,3 +195,51 @@ class ThemeView(LoginRequiredMixin, View):
         ):
             target = reverse("core:home")
         return HttpResponseRedirect(target)
+
+
+class DeleteAccountView(LoginRequiredMixin, View):
+    """Settings > Your data > Delete my account.
+
+    Two proofs, because deletion is the one operation where a half-measure is worse than
+    nothing: allauth's reauthentication (the password again, or the second factor), and
+    the address typed out. No confirmation link by email — the person is signed in and has
+    just proven it. The last administrator is told to appoint another first.
+    """
+
+    template_name = "accounts/delete_account.html"
+
+    @method_decorator(reauthentication_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def render(self, request: HttpRequest, error: str = "") -> HttpResponse:
+        from postulo.core.export import build_document
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "section_title": _("Your data"),
+                "counts": build_document(request.user).get("counts", {}),
+                "last_administrator": deletion.is_last_administrator(request.user),
+                "error": error,
+            },
+        )
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        return self.render(request)
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        typed = request.POST.get("confirm_email", "").strip().casefold()
+        if typed != request.user.email.casefold():
+            return self.render(request, _("That is not the address on this account."))
+        user = request.user
+        if deletion.is_last_administrator(user):
+            return self.render(request)
+        logout(request)
+        try:
+            deletion.delete_account(user)
+        except deletion.LastAdministrator:  # pragma: no cover - checked just above
+            return redirect("account_login")
+        messages.success(request, _("Your account and everything in it have been deleted."))
+        return redirect("account_login")

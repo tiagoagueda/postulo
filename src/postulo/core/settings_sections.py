@@ -97,7 +97,7 @@ BUILTIN: tuple[SettingsSection, ...] = (
         url_name="core:export",
         icon="download",
         order=50,
-        match=("core:export_download",),
+        match=("core:export_download", "accounts:delete"),
     ),
 )
 

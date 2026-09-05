@@ -44,6 +44,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Delete my account.** Under *Settings → Your data*, with the export offered first: the
+  page lists what goes, asks for the password again (or the second factor) and the address
+  typed out, and then deletes everything at once — every record, every file behind a
+  document or a picture on the disk, tokens, connections and their secrets, pending
+  invitations, the account. The same service sits behind *Delete account* on *Server
+  settings → People* and behind `manage.py delete_account`. The last administrator cannot
+  be deleted by anyone, including themselves. (#33)
 - **A password strength meter** under every field where a password is chosen — sign-up,
   invitation, change, set, reset — and never on sign-in. The estimate is zxcvbn's, run in
   the browser (vendored, served from Postulo's own origin), fed with the name and address

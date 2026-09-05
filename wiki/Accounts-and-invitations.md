@@ -109,10 +109,11 @@ the door closes again. `createsuperuser` on the command line still works, and do
 same thing.
 
 *Server settings → People* lists every account and lets an administrator make or unmake
-other administrators, deactivate accounts (nothing deleted, no sign-in) and change a
-person's username on their behalf. The last administrator cannot be removed or
-deactivated — by anyone, including themselves — and nobody can deactivate the account they
-are signed in with. A username is unique across the instance whoever changes it: a name
+other administrators, deactivate accounts (nothing deleted, no sign-in), delete an account
+outright (see *Deleting your account*) and change a person's username on their behalf. The
+last administrator cannot be removed, deactivated or deleted — by anyone, including
+themselves — and nobody can deactivate or delete the account they are signed in with from
+that page. A username is unique across the instance whoever changes it: a name
 already in use, in any capitalisation, is refused before anything is saved.
 
 ## Who can sign up
@@ -146,6 +147,25 @@ record of who was let in.
 
 Only administrators can issue invitations. To make someone an administrator, use *Server
 settings → People*.
+
+## Deleting your account
+
+**Settings → Your data → Delete my account.** The page says exactly what goes —
+applications, listings, companies and contacts, documents *and the files behind them on
+the disk*, reminders, interviews, tokens, connections and their secrets, the invitations
+you issued that nobody accepted, the account itself — and offers the export first,
+prominently. Confirming takes your password again (or your second factor) and your address
+typed out. Then it is done, at once: there is no grace period, because a "pending
+deletion" state is a second thing to get wrong, and the export is the safety net.
+
+The one account that cannot be deleted is the last administrator's, by anyone, including
+themselves: make somebody else an administrator first. An administrator can delete another
+person's account from *Server settings → People* (the same service, the same file cleanup),
+and an operator from the command line:
+
+```sh
+uv run manage.py delete_account alex.morgan     # asks first; --yes to skip the question
+```
 
 ## Separation between accounts
 

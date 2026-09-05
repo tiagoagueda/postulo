@@ -27,6 +27,7 @@ from django.views import View
 from django.views.generic import RedirectView, TemplateView, UpdateView
 
 from postulo import __version__
+from postulo.accounts import deletion
 
 from . import site
 from .mixins import StaffRequiredMixin
@@ -141,9 +142,7 @@ class PeopleView(ServerSectionMixin, TemplateView):
 
 def _last_administrator(user) -> bool:
     """Whether ``user`` is the only active administrator left."""
-    User = get_user_model()
-    others = User.objects.filter(is_staff=True, is_active=True).exclude(pk=user.pk)
-    return user.is_staff and user.is_active and not others.exists()
+    return deletion.is_last_administrator(user)
 
 
 class PersonAdminView(StaffRequiredMixin, View):
@@ -190,6 +189,61 @@ class PersonActiveView(StaffRequiredMixin, View):
             person.is_active = True
             person.save(update_fields=["is_active"])
             messages.success(request, _("%(name)s can sign in again.") % {"name": person})
+        return redirect("server:people")
+
+
+class PersonDeleteView(StaffRequiredMixin, View):
+    """Delete somebody's account, files included, on their behalf or after they left.
+
+    The same service as the person's own *Delete my account*, so nothing is left behind
+    either way. Not oneself (that path is under Settings, with reauthentication), and
+    never the last administrator.
+    """
+
+    template_name = "server/person_delete.html"
+
+    def _blocked(self, request: HttpRequest, person) -> str:
+        if person == request.user:
+            return str(_("Delete your own account from Settings, not from here."))
+        if deletion.is_last_administrator(person):
+            return str(_("That is the last administrator. Appoint another first."))
+        return ""
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        person = get_object_or_404(get_user_model(), pk=pk)
+        return render(
+            request,
+            self.template_name,
+            {
+                "section_title": _("People"),
+                "person": person,
+                "blocked": self._blocked(request, person),
+            },
+        )
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        person = get_object_or_404(get_user_model(), pk=pk)
+        blocked = self._blocked(request, person)
+        if blocked:
+            messages.error(request, blocked)
+            return redirect("server:people")
+        if request.POST.get("confirm_username", "").strip().casefold() != person.username:
+            return render(
+                request,
+                self.template_name,
+                {
+                    "section_title": _("People"),
+                    "person": person,
+                    "blocked": "",
+                    "error": _("That is not the username."),
+                },
+            )
+        report = deletion.delete_account(person)
+        messages.success(
+            request,
+            _("%(name)s is gone: the account, its records and %(files)s files on disk.")
+            % {"name": report.username, "files": report.files_removed},
+        )
         return redirect("server:people")
 
 
