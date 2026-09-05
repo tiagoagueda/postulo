@@ -13,6 +13,14 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 > **Status: 0.1.0.** Usable, and used. Not yet battle-tested: it has recorded real
 > applications, but by one person, for days rather than months.
 
+## Never paywalled
+
+**No feature of Postulo is, or ever will be, behind a paywall.** People looking for work
+are, more often than not, people who cannot afford to pay for the tools to find it.
+Everything this software does is available in full to everyone who runs it: no paid
+tier, no "pro" edition, no licence key, no feature that unlocks later. The licence
+guarantees that for the code; this paragraph guarantees it for the project's intentions.
+
 ## What it does
 
 - **Track applications** end to end — from a posting you spotted to an offer, with an

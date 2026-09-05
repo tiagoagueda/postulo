@@ -12,6 +12,8 @@ All notable changes to Postulo are recorded here. The format follows
   scripted timelines so Insights has something to say. Deterministic for a given seed.
 - `POSTULO_SECURE_COOKIES`, for instances reached only inside a mesh VPN, where the
   browser sees plain HTTP but the wire is already encrypted.
+- The commitment that no feature will ever be paywalled, stated in the README, the wiki,
+  the contributing guide and the plan.
 
 ## [0.1.0] — 2026-09-04
 

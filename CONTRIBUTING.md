@@ -31,6 +31,15 @@ Continuous integration runs all of the above across Python 3.12, 3.13, and 3.14,
 `manage.py check --deploy` against production settings, and it fails if the committed
 stylesheet has drifted from its source.
 
+## What will not be merged
+
+**Anything that puts a feature behind payment.** Postulo will never have a paid tier, a
+"pro" edition, a licence key, or a feature that unlocks later — people looking for work
+usually cannot pay for the tools to find it, and this project exists for them. A pull
+request that introduces any of those will be declined however good the code is. The same
+goes for anything that nudges towards paying: upgrade prompts, feature comparison
+tables, "premium" labels.
+
 ## House style
 
 - **British English** in code, comments, documentation, and interface text: *organise*,

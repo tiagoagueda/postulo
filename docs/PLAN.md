@@ -20,6 +20,7 @@ These were settled before any code was written, because each one is expensive to
 
 | Decision | Choice | Consequence |
 | --- | --- | --- |
+| Paying | **Never.** No paid tier, no licence key, no feature that unlocks later | People looking for work usually cannot pay for the tools to find it. A commitment, not a strategy; it precedes every other decision here. |
 | Tenancy | **Multi-user from day one** | Every user-owned model carries an owner; every query is scoped. No painful retrofit later. |
 | Documents | **Hybrid** | Structured CV content is the source of truth *and* externally authored files can be uploaded and versioned. |
 | AI assistance | **Not in v1** | The application is complete and useful without an API key. A plugin can add it later against the same contracts. |

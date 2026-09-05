@@ -12,6 +12,14 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 > Treat it as a first release that works rather than as a mature one. See
 > [Roadmap](Roadmap).
 
+## Never paywalled
+
+**No feature of Postulo is, or ever will be, behind a paywall.** People looking for work
+are, more often than not, people who cannot afford to pay for the tools to find it.
+Everything this software does is available in full to everyone who runs it — no paid
+tier, no "pro" edition, no licence key, no feature that unlocks later. That is a
+commitment, not a strategy, and it does not change.
+
 ## Start here
 
 | If you want to… | Read |
@@ -49,3 +57,4 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 - Apply to jobs for you.
 - Send anything anywhere on your behalf. Postulo records what you sent; you still send it.
 - Phone home. There is no telemetry, and no outbound request Postulo makes on its own.
+- Charge you for any of it, now or later.
