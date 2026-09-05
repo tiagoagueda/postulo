@@ -8,6 +8,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- A theme switch in the header, cycling light, dark and match-the-system. It applies at
+  once, persists on the profile so it follows the account to every device, and the
+  stylesheet now sets `color-scheme` so the browser's own controls follow the theme too.
+  The select on *Your details* stays as the explicit version. (#9)
 - An icon set. [Lucide](https://lucide.dev) icons (ISC), inlined by a `{% icon %}` template
   tag from files copied into the repository by `npm run sync:icons`, so the application
   needs neither Node nor a network to draw one. Decorative by default; given a `label`

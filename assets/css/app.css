@@ -58,6 +58,24 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /*
+   * Tell the browser which theme is in force, so its own controls — scrollbars, select
+   * menus, the date picker — follow it. Same three states as the `dark` variant above.
+   */
+  :root {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+    }
+  }
+
   body {
     @apply bg-ink-50 text-ink-900 antialiased dark:bg-ink-950 dark:text-ink-100;
   }
@@ -165,6 +183,19 @@
     @apply alert border-red-200 bg-red-50 text-red-900
       dark:border-red-800 dark:bg-red-900/30 dark:text-red-100;
   }
+}
+
+/* ----------------------------------------------------------- theme switch */
+
+/* The switch carries all three icons; data-current says which one is showing. */
+[data-theme-switch] [data-theme-icon] {
+  display: none;
+}
+
+[data-theme-switch][data-current="light"] [data-theme-icon="light"],
+[data-theme-switch][data-current="dark"] [data-theme-icon="dark"],
+[data-theme-switch][data-current="system"] [data-theme-icon="system"] {
+  display: block;
 }
 
 /* ------------------------------------------------------------------- htmx */

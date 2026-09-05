@@ -4,18 +4,26 @@ from __future__ import annotations
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
+from django.http import (
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
+)
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
+from postulo.core.context_processors import theme_switch
 from postulo.core.mixins import StaffRequiredMixin
 
 from .adapter import INVITE_SESSION_KEY
 from .forms import InviteForm, ProfileForm
-from .models import Invite, Profile
+from .models import Invite, Profile, Theme
 
 
 class ProfileView(LoginRequiredMixin, UpdateView):
@@ -99,3 +107,33 @@ class InviteAcceptView(View):
                 % {"email": invite.email},
             )
         return HttpResponseRedirect(reverse("account_signup"))
+
+
+class ThemeView(LoginRequiredMixin, View):
+    """Save the theme from the switch in the header.
+
+    One field, three values, and a reply that fits the way it was asked: an htmx request
+    gets the switch back, re-rendered for its new state; a plain form post goes back to
+    the page it came from. Nothing else about the profile is touched. The select on
+    *Your details* still exists for anyone who prefers the explicit version.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        choice = request.POST.get("theme", "")
+        if choice not in Theme.values:
+            return HttpResponseBadRequest("Not a theme.")
+        profile, _created = Profile.objects.get_or_create(user=request.user)
+        profile.theme = choice
+        profile.save()
+        if getattr(request, "htmx", False):
+            return render(
+                request,
+                "core/partials/theme_switch.html",
+                {"theme_switch": theme_switch(choice), "ui_theme": choice},
+            )
+        target = request.POST.get("next", "")
+        if not url_has_allowed_host_and_scheme(
+            target, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+        ):
+            target = reverse("core:home")
+        return HttpResponseRedirect(target)

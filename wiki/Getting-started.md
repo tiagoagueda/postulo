@@ -19,7 +19,8 @@ The same page holds three preferences:
 
 - **Language** — the interface language.
 - **Time zone** — dates and times are shown in this.
-- **Theme** — light, dark, or match your operating system.
+- **Theme** — light, dark, or match your operating system. The switch at the top right
+  of every page cycles through the same three; this select is the explicit version.
 
 ## 3. Record an application
 

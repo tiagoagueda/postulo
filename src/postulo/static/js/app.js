@@ -17,4 +17,33 @@
       control.form.requestSubmit();
     }
   });
+
+  // The theme switch in the header applies its change the moment it is pressed, before
+  // the server has confirmed it. "system" means removing the attribute so the operating
+  // system preference applies again; the reply then replaces the switch in its new
+  // state, and the stylesheet picks the icon from data-current.
+  var NEXT_THEME = { light: "dark", dark: "system", system: "light" };
+
+  function applyTheme(theme) {
+    var root = document.documentElement;
+    if (theme === "system") {
+      delete root.dataset.theme;
+    } else {
+      root.dataset.theme = theme;
+    }
+  }
+
+  document.addEventListener("submit", function (event) {
+    var form = event.target.closest("[data-theme-switch]");
+    if (!form) {
+      return;
+    }
+    var choice = form.querySelector("input[name=theme]");
+    if (!choice) {
+      return;
+    }
+    applyTheme(choice.value);
+    form.dataset.current = choice.value;
+    choice.value = NEXT_THEME[choice.value] || "system";
+  });
 })();

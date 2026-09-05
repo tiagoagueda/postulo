@@ -6,6 +6,7 @@ app_name = "accounts"
 
 urlpatterns = [
     path("profile/", views.ProfileView.as_view(), name="profile"),
+    path("theme/", views.ThemeView.as_view(), name="theme"),
     path("invitations/", views.InviteListView.as_view(), name="invite_list"),
     path("invitations/new/", views.InviteCreateView.as_view(), name="invite_create"),
     path("invitations/<int:pk>/revoke/", views.InviteRevokeView.as_view(), name="invite_revoke"),
