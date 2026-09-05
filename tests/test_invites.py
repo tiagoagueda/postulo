@@ -128,15 +128,20 @@ def test_signing_up_through_an_invitation_spends_it(client, invite, settings, dj
     response = client.post(
         reverse("account_signup"),
         {
+            "first_name": "New",
+            "last_name": "Comer",
+            "username": "newcomer",
             "email": "newcomer@example.org",
             "password1": "a-fairly-long-password-42",
             "password2": "a-fairly-long-password-42",
         },
     )
 
-    assert response.status_code in (302, 200)
+    assert response.status_code == 302, getattr(response, "context_data", {}).get("form")
     created = django_user_model.objects.filter(email="newcomer@example.org").first()
     assert created is not None, "the invited person should have an account"
+    assert created.username == "newcomer"
+    assert created.get_full_name() == "New Comer"
 
     invite.refresh_from_db()
     assert invite.is_accepted
@@ -152,6 +157,9 @@ def test_an_invitation_for_one_address_cannot_be_used_by_another(client, db, sta
     response = client.post(
         reverse("account_signup"),
         {
+            "first_name": "Gate",
+            "last_name": "Crasher",
+            "username": "gatecrasher",
             "email": "gatecrasher@example.org",
             "password1": "a-fairly-long-password-42",
             "password2": "a-fairly-long-password-42",
@@ -159,6 +167,7 @@ def test_an_invitation_for_one_address_cannot_be_used_by_another(client, db, sta
     )
 
     assert response.status_code == 200, "the form should be redisplayed with an error"
+    assert "only be used with the address it was sent to" in response.content.decode()
     bound.refresh_from_db()
     assert not bound.is_accepted
 

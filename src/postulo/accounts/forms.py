@@ -4,11 +4,37 @@ from __future__ import annotations
 
 import zoneinfo
 
+from allauth.account.adapter import get_adapter
+from allauth.account.forms import SignupForm as AllauthSignupForm
 from django import forms
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from .models import Invite, Profile
+
+
+class SignupForm(AllauthSignupForm):
+    """allauth's signup form, plus the two names.
+
+    allauth builds username, email and password fields from ``ACCOUNT_SIGNUP_FIELDS``;
+    the name is Postulo's requirement, so it is added here and saved onto the user in
+    the same step. Fields are reordered so the form reads as a person would fill it in.
+    """
+
+    first_name = forms.CharField(label=_("First name"), max_length=150)
+    last_name = forms.CharField(label=_("Last name"), max_length=150)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        order = ["first_name", "last_name", "username", "email", "password1", "password2"]
+        self.order_fields([name for name in order if name in self.fields])
+
+    def save(self, request):
+        user = super().save(request)
+        user.first_name = self.cleaned_data["first_name"].strip()
+        user.last_name = self.cleaned_data["last_name"].strip()
+        user.save(update_fields=["first_name", "last_name"])
+        return user
 
 
 def language_choices() -> list[tuple[str, str]]:
@@ -36,8 +62,15 @@ class ProfileForm(forms.ModelForm):
     be printed at the top of a CV, and nobody thinks of it as an account setting.
     """
 
-    first_name = forms.CharField(label=_("First name"), max_length=150, required=False)
-    last_name = forms.CharField(label=_("Last name"), max_length=150, required=False)
+    username = forms.CharField(
+        label=_("Username"),
+        max_length=32,
+        help_text=_(
+            "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
+        ),
+    )
+    first_name = forms.CharField(label=_("First name"), max_length=150)
+    last_name = forms.CharField(label=_("Last name"), max_length=150)
 
     class Meta:
         model = Profile
@@ -62,16 +95,26 @@ class ProfileForm(forms.ModelForm):
             label=_("Time zone"), choices=time_zone_choices, required=False
         )
         if self.instance and self.instance.pk:
+            self.fields["username"].initial = self.instance.user.username
             self.fields["first_name"].initial = self.instance.user.first_name
             self.fields["last_name"].initial = self.instance.user.last_name
+
+    def clean_username(self) -> str:
+        """The same rules as at signup, unless the username is simply unchanged."""
+        username = self.cleaned_data["username"].strip().casefold()
+        current = self.instance.user.username if self.instance and self.instance.pk else ""
+        if username == current:
+            return username
+        return get_adapter().clean_username(username)
 
     def save(self, commit: bool = True) -> Profile:
         profile = super().save(commit=commit)
         user = profile.user
-        user.first_name = self.cleaned_data.get("first_name", "")
-        user.last_name = self.cleaned_data.get("last_name", "")
+        user.username = self.cleaned_data["username"]
+        user.first_name = self.cleaned_data["first_name"].strip()
+        user.last_name = self.cleaned_data["last_name"].strip()
         if commit:
-            user.save(update_fields=["first_name", "last_name"])
+            user.save(update_fields=["username", "first_name", "last_name"])
         return profile
 
 

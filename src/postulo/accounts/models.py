@@ -18,18 +18,48 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from .validators import USERNAME_MAX_LENGTH, slug_from_email, username_validator
+
 INVITE_TOKEN_BYTES = 32
 DEFAULT_INVITE_VALIDITY = timedelta(days=14)
 
 
+def unique_username(candidate: str, taken) -> str:
+    """``candidate``, or ``candidate`` with the smallest numeric suffix not in ``taken``.
+
+    ``taken`` is any callable answering whether a username exists, so the same rule
+    serves the manager, the importer and the migration that gives existing accounts
+    their first username.
+    """
+    if not taken(candidate):
+        return candidate
+    for suffix in range(2, 10_000):
+        stem = candidate[: USERNAME_MAX_LENGTH - len(str(suffix))]
+        attempt = f"{stem}{suffix}"
+        if not taken(attempt):
+            return attempt
+    raise ValueError(f"No free username near {candidate!r}.")
+
+
 class UserManager(DjangoUserManager):
-    """Manager for a user identified by email address rather than a username."""
+    """Manager for a user known by a username, reached by an email address.
+
+    Both are obligatory. Code that creates accounts — tests, the seeder, an import — may
+    leave the username out, in which case it is derived from the address; a person
+    signing up chooses it.
+    """
 
     def _create_user(self, email, password, **extra_fields):  # type: ignore[override]
         if not email:
             raise ValueError("An email address is required.")
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        username = (extra_fields.pop("username", "") or "").strip().casefold()
+        if not username:
+            username = unique_username(
+                slug_from_email(email),
+                lambda name: self.model._default_manager.filter(username=name).exists(),
+            )
+        user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -46,17 +76,42 @@ class UserManager(DjangoUserManager):
             raise ValueError("A superuser must have is_staff=True.")
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("A superuser must have is_superuser=True.")
-        return self._create_user(email, password, **extra_fields)
+        user = self._create_user(email, password, **extra_fields)
+        # The operator typed this address at the console of their own server. That is
+        # all the proof there is going to be, and without it the first account could not
+        # sign in until email delivery worked — which is the thing it would be signing in
+        # to configure.
+        from allauth.account.models import EmailAddress
+
+        EmailAddress.objects.update_or_create(
+            user=user,
+            email__iexact=user.email,
+            defaults={"email": user.email, "verified": True, "primary": True},
+        )
+        return user
 
 
 class User(AbstractUser):
-    """A person applying for jobs."""
+    """A person applying for jobs.
 
-    username = None  # type: ignore[assignment]
+    Known by a username, which is what they sign in with and what others on a shared
+    instance see; reached by an email address, which is unique too and works for signing
+    in as well. Both are obligatory, as is a full name, because a job search is conducted
+    under one's own name and every document starts from it.
+    """
+
+    username = models.CharField(
+        _("username"),
+        max_length=USERNAME_MAX_LENGTH,
+        unique=True,
+        validators=[username_validator],
+        help_text=_("Lowercase letters, digits, dots, underscores and hyphens."),
+        error_messages={"unique": _("Somebody already has that username.")},
+    )
     email = models.EmailField(_("email address"), unique=True)
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS: ClassVar[list[str]] = []
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS: ClassVar[list[str]] = ["email", "first_name", "last_name"]
 
     objects = UserManager()  # type: ignore[misc,assignment]
 
@@ -65,12 +120,17 @@ class User(AbstractUser):
         verbose_name_plural = _("users")
 
     def __str__(self) -> str:
-        return self.email
+        return self.username
+
+    def save(self, *args, **kwargs) -> None:
+        # One spelling per person: "Alex" and "alex" must never be two accounts.
+        self.username = (self.username or "").strip().casefold()
+        super().save(*args, **kwargs)
 
     @property
     def display_name(self) -> str:
-        """A friendly name for the interface, falling back to the email address."""
-        return self.get_full_name() or self.email.split("@")[0]
+        """The full name, or the username while an account has none yet."""
+        return self.get_full_name() or self.username
 
 
 class Theme(models.TextChoices):

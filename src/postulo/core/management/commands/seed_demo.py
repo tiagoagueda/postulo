@@ -20,6 +20,7 @@ import random
 import secrets
 from dataclasses import dataclass
 
+from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
@@ -225,10 +226,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options) -> None:
         User = get_user_model()
-        user, created = User.objects.get_or_create(email=options["email"])
+        user = User.objects.filter(email__iexact=options["email"]).first()
+        created = user is None
         if created:
-            user.set_password(options["password"] or secrets.token_urlsafe(24))
-            user.save()
+            user = User.objects.create_user(
+                email=options["email"],
+                password=options["password"] or secrets.token_urlsafe(24),
+            )
+        # Nobody will click a verification link for a fictional account; the seeder
+        # vouches for the address so the account can sign in straight away.
+        EmailAddress.objects.update_or_create(
+            user=user,
+            email__iexact=user.email,
+            defaults={"email": user.email, "verified": True, "primary": True},
+        )
 
         has_data = any(
             model.objects.for_user(user).exists()

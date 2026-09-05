@@ -9,6 +9,8 @@ from pathlib import Path
 import environ
 from django.utils.translation import gettext_lazy as _
 
+from postulo.accounts.validators import USERNAME_BLACKLIST
+
 # src/postulo/config/settings/base.py -> src/postulo
 PACKAGE_DIR = Path(__file__).resolve().parents[2]
 # ... -> the repository root
@@ -123,15 +125,24 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-ACCOUNT_EMAIL_VERIFICATION = "optional"
-ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
-# The user model has no username column at all; allauth must be told, or it will
-# look for one while building its forms.
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# Identity: a username, chosen at signup, and an email address; either signs in. Both are
+# obligatory and unique, and so is a full name, which the signup form adds.
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+ACCOUNT_SIGNUP_FIELDS = ["username*", "email*", "password1*", "password2*"]
+ACCOUNT_FORMS = {"signup": "postulo.accounts.forms.SignupForm"}
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
+ACCOUNT_PRESERVE_USERNAME_CASING = False
+ACCOUNT_USERNAME_MIN_LENGTH = 3
+ACCOUNT_USERNAME_VALIDATORS = "postulo.accounts.validators.username_validators"
+ACCOUNT_USERNAME_BLACKLIST = USERNAME_BLACKLIST
+# Every address is proven by a link before it is used: to sign in, and to be primary.
+# An invitation sent to an address counts as that proof (see accounts/signals.py).
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_MAX_EMAIL_ADDRESSES = 5
+ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
 
 # An instance is invite-only unless the operator opens registration deliberately.
 POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)

@@ -108,13 +108,19 @@ Set `POSTULO_TIME_ZONE` for the instance, and check the time zone on your own pr
 which overrides it. Times are stored in UTC and displayed in your zone; the stored data is
 not wrong, only its presentation.
 
-## Password reset emails never arrive
+## Verification or password reset emails never arrive
 
 Postulo only sends email through the account system, and only if it is configured. See
-[Configuration](Configuration#email). To change a password without email:
+[Configuration](Configuration#email). Until it is, nobody who signs up can complete the
+verification that sign-in requires — except the account made with `createsuperuser`,
+whose address is trusted, and people who arrived through an invitation bound to their
+address.
+
+To verify an address by hand, open the admin (*Accounts → Email addresses*), find it, and
+tick *Verified*. To change a password without email:
 
 ```sh
-uv run manage.py changepassword you@example.org
+uv run manage.py changepassword alex.morgan     # the username
 ```
 
 ## Checking a deployment

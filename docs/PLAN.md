@@ -73,7 +73,8 @@ Two items in the original plan did not survive contact with the packages:
   file has drifted.
 - **allauth needs telling that the user model has no username**, via
   `ACCOUNT_USER_MODEL_USERNAME_FIELD = None`. Without it, its forms look for a column
-  that does not exist.
+  that does not exist. *(Reversed for 0.2.0: accounts have a username again, chosen at
+  signup and usable to sign in alongside the address — see #1.)*
 
 ### Corrections made during M2
 

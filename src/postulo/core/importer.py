@@ -117,6 +117,14 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         user.first_name = account.get("first_name") or user.first_name
         user.last_name = account.get("last_name") or user.last_name
         user.save(update_fields=["first_name", "last_name"])
+    # The username travels too, but the account importing already has one, and taking
+    # somebody else's on this instance is out of the question: keep it when it is free.
+    wanted = (account.get("username") or "").strip().casefold()
+    if wanted and wanted != user.username:
+        taken = type(user)._default_manager.exclude(pk=user.pk).filter(username=wanted)
+        if not taken.exists():
+            user.username = wanted
+            user.save(update_fields=["username"])
     profile_data = account.get("profile") or {}
     profile = getattr(user, "profile", None)
     if profile and profile_data:

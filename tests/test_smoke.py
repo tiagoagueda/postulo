@@ -17,10 +17,11 @@ def test_healthz_reports_ok(client, db):
     assert response.json() == {"status": "ok", "database": "ok"}
 
 
-def test_user_is_identified_by_email(user):
+def test_user_is_known_by_a_username_and_reached_by_an_email(user):
     assert user.email == "applicant@example.org"
-    assert user.get_username() == "applicant@example.org"
-    assert str(user) == "applicant@example.org"
+    assert user.username == "applicant", "derived from the address when nobody chose one"
+    assert user.get_username() == "applicant"
+    assert str(user) == "applicant"
     assert user.display_name == "applicant"
 
 

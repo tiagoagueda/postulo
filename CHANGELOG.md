@@ -8,6 +8,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Changed
 
+- **Accounts have a username.** Chosen at signup, 3 to 32 lowercase letters, digits,
+  dots, underscores or hyphens; it signs in interchangeably with the email address, and
+  it is what others on a shared instance see. Existing accounts were given one derived
+  from their address on upgrade (`alex.morgan@…` → `alex.morgan`), changeable on *Your
+  details*. `createsuperuser` and `changepassword` now take the username. (#1)
+- **A full name is obligatory.** The signup form asks for it, *Your details* insists on
+  it, and the dashboard asks for it until an account that predates the rule has one. (#2)
+- **Email addresses are verified before they are used.** A link is sent at signup and
+  the account signs in once it has been followed; an invitation bound to an address counts
+  as that proof, and so does `createsuperuser`. An account may hold up to five addresses,
+  one of them primary. Addresses in use before this release were marked verified by the
+  upgrade, so nobody already signed in is locked out. (#3)
 - The header's right side is now the account menu — an initials tile, the name, and a
   disclosure holding *Your details*, *Export everything* and *Sign out* — beside the theme
   switch. *Capture* and *Record* moved to the dashboard, which had relied on the header

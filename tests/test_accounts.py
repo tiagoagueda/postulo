@@ -32,6 +32,7 @@ def test_saving_the_profile_stores_details_and_name(client, user):
     response = client.post(
         reverse("accounts:profile"),
         {
+            "username": "tiago",
             "first_name": "Tiago",
             "last_name": "Agueda",
             "headline": "Backend engineer",
@@ -49,6 +50,7 @@ def test_saving_the_profile_stores_details_and_name(client, user):
     assert response.status_code == 302
     user.refresh_from_db()
     profile = user.profile
+    assert user.username == "tiago"
     assert user.first_name == "Tiago"
     assert profile.headline == "Backend engineer"
     assert profile.location == "Paris, France"
