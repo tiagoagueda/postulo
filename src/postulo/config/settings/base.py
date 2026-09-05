@@ -123,7 +123,12 @@ AUTHENTICATION_BACKENDS = [
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    # Twelve rather than Django's eight: length is the one factor that reliably matters,
+    # and with a strength meter beside the field it costs nothing. New passwords only.
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 12},
+    },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -135,7 +140,13 @@ LOGOUT_REDIRECT_URL = "/"
 # obligatory and unique, and so is a full name, which the signup form adds.
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["username*", "email*", "password1*", "password2*"]
-ACCOUNT_FORMS = {"signup": "postulo.accounts.forms.SignupForm"}
+# Every form where a password is chosen carries the strength meter; sign-in does not.
+ACCOUNT_FORMS = {
+    "signup": "postulo.accounts.forms.SignupForm",
+    "change_password": "postulo.accounts.forms.ChangePasswordForm",
+    "set_password": "postulo.accounts.forms.SetPasswordForm",
+    "reset_password_from_key": "postulo.accounts.forms.ResetPasswordKeyForm",
+}
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 ACCOUNT_PRESERVE_USERNAME_CASING = False

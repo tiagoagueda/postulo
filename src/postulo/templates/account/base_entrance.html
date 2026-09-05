@@ -7,3 +7,7 @@
     </div>
   </div>
 {% endblock %}
+
+{# Sign-up, set, change and reset all choose a password and get the strength meter; the
+   sign-in form has no password1 and gets nothing. #}
+{% block scripts %}{% if form.password1 %}{% include "account/partials/password_meter.html" %}{% endif %}{% endblock %}

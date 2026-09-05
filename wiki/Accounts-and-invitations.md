@@ -175,6 +175,16 @@ This is not a security control on its own; it just keeps the noise down.
 
 ## Passwords
 
+A new password must be at least twelve characters, not all digits, not on the list of
+commonly used passwords, and not too close to your own name or address. Wherever you
+choose one — sign-up, an invitation, *Change password*, *Set password* for an account
+that came in through single sign-on, a reset link — a meter under the field says how
+strong it is as you type: *very weak* to *strong*, with a hint when it is low. The estimate
+is made in your browser (by zxcvbn, which knows about dictionary words, keyboard walks,
+dates and repeats, and about the name and address you typed above) and the password never
+leaves your browser until you submit the form. The rules listed under the field are what
+the server checks; the meter cannot contradict them. Nothing appears on the sign-in form.
+
 Password resets are sent by email, so they need working email settings — see
 [Configuration](Configuration#email). Without them, reset a password from the command
 line:

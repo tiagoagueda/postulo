@@ -44,6 +44,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **A password strength meter** under every field where a password is chosen — sign-up,
+  invitation, change, set, reset — and never on sign-in. The estimate is zxcvbn's, run in
+  the browser (vendored, served from Postulo's own origin), fed with the name and address
+  typed above so a password built from them scores low; a four-segment bar with a word
+  that a screen reader hears change, and a hint when it is low. Django's rules stay listed
+  beneath as the checklist the meter cannot contradict. New passwords must be at least
+  twelve characters; existing ones are untouched. (#26)
 - **A picture beside your name.** Upload one under *Your details* — decoded, squared,
   re-encoded to 256 pixels and stripped of its metadata, then served privately like every
   other personal file — or tick *Use my Gravatar* and Postulo fetches the picture for your

@@ -5,6 +5,9 @@ from __future__ import annotations
 import zoneinfo
 
 from allauth.account.adapter import get_adapter
+from allauth.account.forms import ChangePasswordForm as AllauthChangePasswordForm
+from allauth.account.forms import ResetPasswordKeyForm as AllauthResetPasswordKeyForm
+from allauth.account.forms import SetPasswordForm as AllauthSetPasswordForm
 from allauth.account.forms import SignupForm as AllauthSignupForm
 from allauth.socialaccount.forms import SignupForm as AllauthSocialSignupForm
 from django import forms
@@ -14,6 +17,18 @@ from django.utils.translation import gettext_lazy as _
 
 from . import avatars
 from .models import Invite, Profile
+
+
+def with_strength_meter(form: forms.Form) -> None:
+    """Mark the field where a password is chosen, so the browser draws a meter under it.
+
+    The estimate runs client-side (zxcvbn) and the password never leaves the browser
+    before the form is submitted; with scripts off the field is an ordinary field and
+    Django's rules, listed beneath it, still decide.
+    """
+    field = form.fields.get("password1")
+    if field is not None:
+        field.widget.attrs["data-password-meter"] = "true"
 
 
 class SignupForm(AllauthSignupForm):
@@ -31,6 +46,7 @@ class SignupForm(AllauthSignupForm):
         super().__init__(*args, **kwargs)
         order = ["first_name", "last_name", "username", "email", "password1", "password2"]
         self.order_fields([name for name in order if name in self.fields])
+        with_strength_meter(self)
 
     def save(self, request):
         user = super().save(request)
@@ -38,6 +54,24 @@ class SignupForm(AllauthSignupForm):
         user.last_name = self.cleaned_data["last_name"].strip()
         user.save(update_fields=["first_name", "last_name"])
         return user
+
+
+class ChangePasswordForm(AllauthChangePasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        with_strength_meter(self)
+
+
+class SetPasswordForm(AllauthSetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        with_strength_meter(self)
+
+
+class ResetPasswordKeyForm(AllauthResetPasswordKeyForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        with_strength_meter(self)
 
 
 def language_choices() -> list[tuple[str, str]]:
