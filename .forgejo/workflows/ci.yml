@@ -92,3 +92,45 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git diff --exit-code -- src/postulo/static/css/app.css \
             || (echo "::error::app.css is stale. Run 'npm run build:css' and commit the result." && exit 1)
+
+  browser:
+    # The critical path in a real browser: sign in, capture, review, board, send, export.
+    # One Python version is enough; the matrix above covers the interpreter, this covers
+    # the pages joining up. Traces and screenshots of a failure are kept as artifacts.
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-bookworm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install WeasyPrint's system libraries
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libfontconfig1 fonts-dejavu-core
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install dependencies
+        run: uv sync --locked --python 3.14 --group e2e
+
+      - name: Install Chromium for Playwright
+        run: uv run playwright install --with-deps chromium
+
+      - name: Drive the critical path in a browser
+        run: >
+          uv run pytest -m e2e --browser chromium
+          --tracing retain-on-failure --screenshot only-on-failure --output browser-artifacts
+
+      - name: Keep the trace and screenshots of a failure
+        # v3 works on Forgejo Actions; v4 depends on GitHub's own artifact backend.
+        if: failure()
+        uses: actions/upload-artifact@v3
+        continue-on-error: true
+        with:
+          name: browser-failure
+          path: browser-artifacts

@@ -8,6 +8,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- A browser smoke test of the critical path — sign in, capture by pasting a page, review,
+  move the card on the board, record what was sent, download the export — driven by
+  Playwright against a live server. Opt in with `uv run pytest -m e2e`; CI runs it in its
+  own job on every push and keeps the trace of a failure. (#36)
 - `seed_demo`: fills an account with a fictional but believable job search, with
   scripted timelines so Insights has something to say. Deterministic for a given seed.
 - `POSTULO_SECURE_COOKIES`, for instances reached only inside a mesh VPN, where the

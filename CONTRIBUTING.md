@@ -31,6 +31,19 @@ Continuous integration runs all of the above across Python 3.12, 3.13, and 3.14,
 `manage.py check --deploy` against production settings, and it fails if the committed
 stylesheet has drifted from its source.
 
+There is also a browser test of the critical path (sign in, capture, review, board, record
+what was sent, export), which is left out of the default run because it needs a browser:
+
+```sh
+uv sync --group e2e
+uv run playwright install chromium
+uv run pytest -m e2e
+```
+
+CI runs it on every push. If you change a page on that path — the header, the capture
+review, the board, the export — run it before opening the pull request; it is the test that
+notices when steps stop joining up.
+
 ## What will not be merged
 
 **Anything that puts a feature behind payment.** Postulo will never have a paid tier, a
