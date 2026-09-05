@@ -12,12 +12,12 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
 
 from postulo.core.mixins import OwnedObjectMixin
+from postulo.core.redirects import safe_next
 
 from .models import LISTING_FILTERS, Capture, CaptureStatus, DiscardReason, JobPosting, ListingState
 
@@ -112,12 +112,7 @@ class ListingCreateView(OwnedObjectMixin, View):
 
 
 def _back_to(request: HttpRequest, fallback: str) -> HttpResponse:
-    target = request.POST.get("next", "")
-    if not url_has_allowed_host_and_scheme(
-        target, allowed_hosts={request.get_host()}, require_https=request.is_secure()
-    ):
-        target = fallback
-    return HttpResponseRedirect(target)
+    return HttpResponseRedirect(safe_next(request, fallback))
 
 
 class ListingStateView(OwnedObjectMixin, View):

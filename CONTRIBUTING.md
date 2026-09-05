@@ -123,6 +123,13 @@ Postulo is written in British English and translated from there. French and Port
 catalogues exist and are waiting for contributors — see
 [docs/TRANSLATING.md](docs/TRANSLATING.md).
 
+## Keeping dependencies current
+
+Once a month, or when the `security` job says so: `uv lock --upgrade`, run the suite,
+read the changelogs of anything that moved a major version, and commit the lock file on
+its own. `docs/THREAT-MODEL.md` says who the attackers are and which rules follow; a pull
+request that touches a boundary answers to it.
+
 ## Making a release
 
 1. Move the *Unreleased* entries in `CHANGELOG.md` under a new `## [X.Y.Z] — YYYY-MM-DD`

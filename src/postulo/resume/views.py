@@ -10,12 +10,13 @@ from __future__ import annotations
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
 
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
+from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 
 from .models import (
@@ -138,7 +139,7 @@ class ResumeItemMoveView(OwnedObjectMixin, View):
         item = get_object_or_404(self.get_queryset(), pk=pk)
         item.order = max(0, item.order + (-1 if direction == "up" else 1))
         item.save(update_fields=["order", "updated_at"])
-        return redirect(request.POST.get("next") or "resume:overview")
+        return redirect(safe_next(request, reverse("resume:overview")))
 
 
 class ResumePreviewView(OwnedObjectMixin, View):

@@ -25,6 +25,7 @@ from django.views.generic import (
 from postulo.core import tables
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 from postulo.core.models import Tag
+from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 
 from . import ical, quiet
@@ -287,7 +288,7 @@ class ApplicationStatusView(OwnedObjectMixin, View):
             return render(
                 request, "applications/partials/application_row.html", {"application": application}
             )
-        return redirect(request.POST.get("next") or application.get_absolute_url())
+        return redirect(safe_next(request, application.get_absolute_url()))
 
 
 class EventCreateView(OwnedObjectMixin, View):
@@ -363,7 +364,7 @@ class ReminderCompleteView(OwnedObjectMixin, View):
         reminder = get_object_or_404(self.get_queryset(), pk=pk)
         reminder.complete()
         messages.success(request, _("Marked as done."))
-        return redirect(request.POST.get("next") or reverse("applications:reminder_list"))
+        return redirect(safe_next(request, reverse("applications:reminder_list")))
 
 
 class ApplicationQuietActionView(OwnedObjectMixin, View):
@@ -406,7 +407,7 @@ class ApplicationQuietActionView(OwnedObjectMixin, View):
             messages.success(request, _("Snoozed for two weeks."))
         else:
             messages.error(request, _("That is not something Postulo can do about it."))
-        return redirect(request.POST.get("next") or application.get_absolute_url())
+        return redirect(safe_next(request, application.get_absolute_url()))
 
 
 # ------------------------------------------------------------------ interviews
@@ -525,7 +526,7 @@ class InterviewOutcomeView(OwnedObjectMixin, View):
                     InterviewOutcome.NO_SHOW: _("Recorded: nobody showed up."),
                 }[outcome],
             )
-        return redirect(request.POST.get("next") or interview.application.get_absolute_url())
+        return redirect(safe_next(request, interview.application.get_absolute_url()))
 
 
 class InterviewCalendarView(OwnedObjectMixin, View):

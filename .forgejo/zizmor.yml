@@ -1,0 +1,11 @@
+# zizmor audits the workflows themselves (run by the security job in ci.yml).
+#
+# Forgejo resolves `actions/checkout` and `actions/upload-artifact` against its own
+# instance, not GitHub, so pinning them to a GitHub commit hash would point at a commit
+# the instance may not have. A tag pin is what Forgejo can honour; everything else is
+# held to zizmor's defaults.
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        "actions/*": ref-pin

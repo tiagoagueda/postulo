@@ -20,6 +20,10 @@ on:
     # library is noticed even in a week when nothing was pushed.
     - cron: "17 6 * * 1"
 
+# Every job here only reads the repository.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -35,6 +39,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The token is not needed after the checkout; leaving it in .git/config
+          # would hand it to every later step and any artifact that packs the tree.
+          persist-credentials: false
 
       - name: Install WeasyPrint's system libraries
         # WeasyPrint is the default renderer and loads Pango through the system linker.
@@ -86,6 +94,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The token is not needed after the checkout; leaving it in .git/config
+          # would hand it to every later step and any artifact that packs the tree.
+          persist-credentials: false
 
       - name: Install uv
         run: |
@@ -103,6 +115,11 @@ jobs:
           npm ci
           npm audit --audit-level=high
 
+      - name: Audit the workflows themselves
+        # A workflow is code that runs with the repository's credentials; zizmor checks
+        # for injected expressions, over-broad permissions and unpinned actions.
+        run: uvx zizmor --no-progress --config .forgejo/zizmor.yml --min-severity medium .forgejo/workflows/*.yml
+
   styles:
     # The compiled stylesheet is committed so that the application runs without Node.
     # That only works if it is kept in step with its source.
@@ -112,6 +129,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The token is not needed after the checkout; leaving it in .git/config
+          # would hand it to every later step and any artifact that packs the tree.
+          persist-credentials: false
 
       - run: npm ci
 
@@ -146,6 +167,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The token is not needed after the checkout; leaving it in .git/config
+          # would hand it to every later step and any artifact that packs the tree.
+          persist-credentials: false
 
       - name: Install WeasyPrint's system libraries
         run: |

@@ -33,9 +33,31 @@ were the only thing that mattered.
   remember to look.
 - A vulnerability report is handled before any feature work.
 
+## When a vulnerability is disclosed in a dependency
+
+The process, so that it is the same every time and needs no thinking on a bad day:
+
+1. **Notice.** The `security` job in CI audits every locked dependency on every push and
+   every Monday; the maintainer is also subscribed to the security announcements of the
+   direct dependencies (Django, django-allauth, django-ninja, Pillow, WeasyPrint, httpx,
+   cryptography). A failing audit is a page, not a chore.
+2. **Assess** within a day: does Postulo use the affected code path, and can it be reached
+   from outside? Record the answer in a confidential issue.
+3. **Fix**: upgrade the dependency (`uv lock --upgrade-package NAME`), run the suite, and if
+   Postulo's own code needs a change make it in the same commit.
+4. **Release** a patch version (`vX.Y.Z+1`) through the release workflow, the same day for
+   anything reachable without signing in, within the week otherwise.
+5. **Tell operators**: a `Security` section in that release's changelog entry, and a pinned
+   issue on the repository that says what was affected, what to upgrade to, and whether
+   anything else — rotating a token, say — is needed.
+
+Postulo itself: a report about Postulo's own code follows the same steps from 2 onwards,
+with the reporter kept informed and credited if they wish.
+
 ## Supported versions
 
-Postulo is pre-alpha. Until version 1.0, only the `main` branch receives fixes.
+Until version 1.0, only the latest release and the `main` branch receive fixes. Upgrading
+is a `docker compose pull`; there is no reason to stay behind.
 
 ## Notes for operators
 

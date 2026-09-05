@@ -16,7 +16,6 @@ from django.http import (
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
@@ -24,6 +23,7 @@ from django.views.generic import CreateView, ListView, UpdateView
 from postulo.core.context_processors import theme_switch
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import StaffRequiredMixin
+from postulo.core.redirects import safe_next
 
 from . import avatars, deletion
 from .adapter import INVITE_SESSION_KEY
@@ -189,12 +189,7 @@ class ThemeView(LoginRequiredMixin, View):
                 "core/partials/theme_switch.html",
                 {"theme_switch": theme_switch(choice), "ui_theme": choice},
             )
-        target = request.POST.get("next", "")
-        if not url_has_allowed_host_and_scheme(
-            target, allowed_hosts={request.get_host()}, require_https=request.is_secure()
-        ):
-            target = reverse("core:home")
-        return HttpResponseRedirect(target)
+        return HttpResponseRedirect(safe_next(request, reverse("core:home")))
 
 
 class DeleteAccountView(LoginRequiredMixin, View):

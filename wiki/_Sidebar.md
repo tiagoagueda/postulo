@@ -5,6 +5,7 @@
 - [Configuration](Configuration)
 - [Accounts and invitations](Accounts-and-invitations)
 - [Backups and your data](Backups-and-your-data)
+- [Hardening](Hardening)
 - [Troubleshooting](Troubleshooting)
 
 **Using it**

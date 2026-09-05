@@ -6,6 +6,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Four actions — changing a status from the board, completing a reminder, the *Gone
+  quiet* buttons, an interview's outcome — and the career record's move buttons followed
+  a `next` parameter without checking it stayed on this site, so a hostile page could
+  send a signed-in person elsewhere after a click. Every `next` now goes through one
+  helper that refuses another host or a drop to plain http.
+
 ### Changed
 
 - **A company can be in several industries.** The one free-text *industry* field became a
@@ -44,6 +52,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **A security programme with machinery behind it.** A `tests/security` package of tests
+  each saying what an attacker would try — sending a person elsewhere through `next`,
+  forging a form, calling the API on a session, fixing a session id, guessing passwords,
+  reading a token out of the database, climbing out of the media directory with a crafted
+  archive, fetching a private file by path — and a threat model in `docs/THREAT-MODEL.md`
+  with the rules that follow from it. `SECURITY.md` gains the process for a vulnerability
+  disclosed in a dependency, the wiki a *Hardening* page, and CI audits the workflows
+  themselves. (#40)
 - **A release workflow.** Pushing a `vX.Y.Z` tag refuses to proceed unless `pyproject.toml`,
   `__version__` and `CHANGELOG.md` agree, then builds the sdist and the wheel and creates
   the Forgejo release with that changelog section as its notes and the files attached.

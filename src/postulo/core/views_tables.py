@@ -6,11 +6,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from . import tables
+from .redirects import safe_next
 
 
 @login_required
@@ -29,7 +29,4 @@ def table_settings(request: HttpRequest, name: str) -> HttpResponse:
         if "move" not in request.POST:
             messages.success(request, _("Columns saved."))
 
-    target = request.POST.get("next", "")
-    if not url_has_allowed_host_and_scheme(target, allowed_hosts={request.get_host()}):
-        target = "/"
-    return redirect(target)
+    return redirect(safe_next(request, "/"))

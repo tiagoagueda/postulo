@@ -16,13 +16,20 @@ on:
   push:
     tags: ["v*"]
 
+# Nothing is granted by default; the release job needs to write releases, nothing else.
+permissions: {}
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     container:
       image: node:22-bookworm
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install uv
         run: |
@@ -48,8 +55,13 @@ jobs:
   image:
     if: ${{ vars.BUILD_IMAGE == 'true' }}
     runs-on: docker
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Work out the tags
         id: tags
@@ -64,8 +76,12 @@ jobs:
         run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login "${GITHUB_SERVER_URL#https://}" -u "${{ secrets.REGISTRY_USER }}" --password-stdin
 
       - name: Build for amd64 and arm64 and push
+        # Through the environment rather than expanded into the script: a value that
+        # reaches a shell as text is data, one that is pasted into it is code.
+        env:
+          TAGS: ${{ steps.tags.outputs.tags }}
         run: |
           docker buildx create --use --name postulo-release >/dev/null 2>&1 || docker buildx use postulo-release
           tags=""
-          for tag in $(echo "${{ steps.tags.outputs.tags }}" | tr ',' ' '); do tags="$tags -t $tag"; done
+          for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
           docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
