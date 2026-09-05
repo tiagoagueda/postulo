@@ -70,6 +70,12 @@ in **found via** when you record a posting. Everything without one is grouped as
 recorded*, which is honest but not useful. Two minutes of discipline here is worth more
 than the rest of the page.
 
+## By industry
+
+The same table again, by the industries you gave each company. A company in several
+industries counts under each of them, which is the honest reading; applications at
+companies with no industry sit under *Not recorded*.
+
 ## Small numbers
 
 A job search produces dozens of applications, not thousands. Below five, Postulo says so

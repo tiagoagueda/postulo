@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import cached_property
 
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -13,8 +13,8 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from postulo.core import tables
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 
-from .forms import CompanyForm, ContactForm, JobPostingForm
-from .models import Company, Contact, DiscardReason, JobPosting
+from .forms import CompanyForm, ContactForm, IndustryForm, JobPostingForm
+from .models import Company, Contact, DiscardReason, Industry, JobPosting
 from .tables import CompaniesTable
 
 
@@ -49,15 +49,16 @@ class CompanyListView(OwnedObjectMixin, ListView):
     def get_queryset(self):
         # The table's ordering always ends in the key, so pagination over the aggregated
         # rows never repeats or skips one between pages.
-        queryset = super().get_queryset().with_table_data()
+        queryset = super().get_queryset().with_table_data().prefetch_related("industries")
         search = self.request.GET.get("q", "").strip()
         if search:
             queryset = queryset.filter(
                 Q(name__icontains=search)
                 | Q(location__icontains=search)
-                | Q(industry__icontains=search)
+                | Q(industries__name__icontains=search)
             )
-        return self.table.apply(queryset)
+        # A company in two matching industries is still one row.
+        return self.table.apply(queryset).distinct()
 
     def get_template_names(self) -> list[str]:
         if self.request.htmx and not self.request.htmx.history_restore_request:
@@ -76,6 +77,9 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
     model = Company
     template_name = "jobs/company_detail.html"
     context_object_name = "company"
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("industries")
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
@@ -112,6 +116,46 @@ class CompanyDeleteView(OwnedObjectMixin, DeleteView):
     def form_valid(self, form):
         messages.success(self.request, _("Company deleted, along with its postings."))
         return super().form_valid(form)
+
+
+# ------------------------------------------------------------------- industries
+
+
+class IndustryListView(OwnedObjectMixin, ListView):
+    """The person's vocabulary of industries, with how many companies each holds."""
+
+    model = Industry
+    template_name = "jobs/industry_list.html"
+    context_object_name = "industries"
+
+    def get_queryset(self):
+        return super().get_queryset().annotate(company_count=Count("companies", distinct=True))
+
+
+class IndustryCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):
+    model = Industry
+    form_class = IndustryForm
+    template_name = "jobs/industry_form.html"
+    success_url = reverse_lazy("jobs:industry_list")
+
+
+class IndustryUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+    model = Industry
+    form_class = IndustryForm
+    template_name = "jobs/industry_form.html"
+    success_url = reverse_lazy("jobs:industry_list")
+
+    def form_valid(self, form):
+        merged = form.cleaned_data.get("merge_into") is not None
+        response = super().form_valid(form)
+        messages.success(self.request, _("Merged.") if merged else _("Industry renamed."))
+        return response
+
+
+class IndustryDeleteView(OwnedObjectMixin, DeleteView):
+    model = Industry
+    template_name = "partials/confirm_delete.html"
+    success_url = reverse_lazy("jobs:industry_list")
 
 
 # -------------------------------------------------------------------- contacts

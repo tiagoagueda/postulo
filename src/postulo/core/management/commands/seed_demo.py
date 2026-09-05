@@ -56,6 +56,7 @@ from postulo.jobs.models import (
     Company,
     Contact,
     DiscardReason,
+    Industry,
     JobPosting,
     ListingState,
     RemoteType,
@@ -74,21 +75,36 @@ from postulo.resume.models import (
 # --------------------------------------------------------------------- material
 
 COMPANIES = [
-    # name, industry, location, website
-    ("Aperture Science", "Research", "Paris", "https://aperture.example"),
-    ("Black Mesa", "Research", "Lyon", "https://blackmesa.example"),
-    ("Initech", "Software", "Paris", "https://initech.example"),
-    ("Vandelay Industries", "Import and export", "Lisbon", "https://vandelay.example"),
-    ("Globex Corporation", "Conglomerate", "Berlin", "https://globex.example"),
-    ("Hooli", "Software", "Paris", "https://hooli.example"),
-    ("Pied Piper", "Software", "Remote", "https://piedpiper.example"),
-    ("Wayne Enterprises", "Conglomerate", "London", "https://wayne.example"),
-    ("Stark Industries", "Engineering", "Amsterdam", "https://stark.example"),
-    ("Tyrell Corporation", "Biotech", "Porto", "https://tyrell.example"),
-    ("Cyberdyne Systems", "Robotics", "Paris", "https://cyberdyne.example"),
-    ("Wonka Industries", "Manufacturing", "Lyon", "https://wonka.example"),
-    ("Acme Corporation", "Manufacturing", "Remote", "https://acme.example"),
-    ("Umbrella Corporation", "Pharmaceuticals", "Berlin", "https://umbrella.example"),
+    # name, industries, location, website
+    ("Aperture Science", ("Research", "Software"), "Paris", "https://aperture.example"),
+    ("Black Mesa", ("Research", "Energy"), "Lyon", "https://blackmesa.example"),
+    ("Initech", ("Software",), "Paris", "https://initech.example"),
+    (
+        "Vandelay Industries",
+        ("Transport and logistics", "Retail"),
+        "Lisbon",
+        "https://vandelay.example",
+    ),
+    ("Globex Corporation", ("Energy", "Software", "Finance"), "Berlin", "https://globex.example"),
+    ("Hooli", ("Software", "Advertising and marketing"), "Paris", "https://hooli.example"),
+    ("Pied Piper", ("Software",), "Remote", "https://piedpiper.example"),
+    ("Wayne Enterprises", ("Finance", "Defence", "Research"), "London", "https://wayne.example"),
+    ("Stark Industries", ("Engineering", "Defence"), "Amsterdam", "https://stark.example"),
+    ("Tyrell Corporation", ("Biotechnology",), "Porto", "https://tyrell.example"),
+    ("Cyberdyne Systems", ("Engineering", "Software"), "Paris", "https://cyberdyne.example"),
+    (
+        "Wonka Industries",
+        ("Manufacturing", "Food and agriculture"),
+        "Lyon",
+        "https://wonka.example",
+    ),
+    ("Acme Corporation", ("Manufacturing",), "Remote", "https://acme.example"),
+    (
+        "Umbrella Corporation",
+        ("Pharmaceuticals", "Biotechnology"),
+        "Berlin",
+        "https://umbrella.example",
+    ),
 ]
 
 TITLES = [
@@ -301,6 +317,7 @@ class Command(BaseCommand):
             JobPosting,
             Contact,
             Company,
+            Industry,
             Tag,
             Skill,
             SkillGroup,
@@ -453,11 +470,10 @@ class Command(BaseCommand):
         # ---- companies and people --------------------------------------------
         companies = []
         contacts: dict[int, list[Contact]] = {}
-        for name, industry, location, website in COMPANIES:
+        for name, fields, location, website in COMPANIES:
             company = Company.objects.create(
                 owner=user,
                 name=name,
-                industry=industry,
                 location=location,
                 website=website,
                 careers_url=f"{website}/careers",
@@ -471,6 +487,7 @@ class Command(BaseCommand):
                     ]
                 ),
             )
+            company.industries.set(Industry.named(user, fields))
             companies.append(company)
             report.companies += 1
             if rng.random() < 0.4:

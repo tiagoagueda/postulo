@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Industries" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-2xl">
+    <div class="mb-6 flex items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">{% translate "Industries" %}</h1>
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% translate "The fields your companies operate in, in your own words. A company may be in several." %}
+        </p>
+      </div>
+      <a href="{% url 'jobs:industry_create' %}" class="btn-primary ml-auto">
+        {% translate "New industry" %}
+      </a>
+    </div>
+
+    {% if industries %}
+      <div class="card p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for industry in industries %}
+            <li class="flex items-center gap-3 px-4 py-3">
+              <a href="{% url 'jobs:company_list' %}?industry={{ industry.name|urlencode }}" class="flex-1 hover:underline">
+                {{ industry.name }}
+              </a>
+              <span class="text-xs text-ink-400 tabular-nums">
+                {% blocktranslate count counter=industry.company_count trimmed %}
+                  {{ counter }} company
+                {% plural %}
+                  {{ counter }} companies
+                {% endblocktranslate %}
+              </span>
+              <a href="{% url 'jobs:industry_update' industry.pk %}" class="btn-ghost px-2 py-1 text-xs">
+                {% translate "Edit" %}
+              </a>
+              <a href="{% url 'jobs:industry_delete' industry.pk %}"
+                 class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                {% translate "Delete" %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+        {% translate "Two spellings of the same thing? Edit one and merge it into the other." %}
+      </p>
+    {% else %}
+      <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
+        {% translate "No industries yet. They appear as you describe companies." %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -8,6 +8,7 @@ the same role a year later does not overwrite the first attempt.
 
 from __future__ import annotations
 
+import re
 from datetime import timedelta
 
 from django.db import models
@@ -15,9 +16,67 @@ from django.db.models import Count, Max
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import number_format
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel, OwnedQuerySet
+
+
+class Industry(OwnedModel):
+    """A field a company operates in, in the applicant's own words.
+
+    A vocabulary per person rather than a shared list, for the same reason companies are
+    per person: two people on one instance may describe the same employer differently,
+    and neither should see the other's words. A company may belong to several — a bank
+    that is also an insurer and a software house is all three, and counting it under one
+    would be a lie the figures repeat. Slugs are unique per owner, so "Fintech" and
+    "fintech" are one industry.
+    """
+
+    name = models.CharField(_("name"), max_length=60)
+    slug = models.SlugField(_("slug"), max_length=60)
+
+    class Meta:
+        verbose_name = _("industry")
+        verbose_name_plural = _("industries")
+        ordering = ("name",)
+        constraints = [
+            models.UniqueConstraint(fields=("owner", "slug"), name="unique_industry_slug_per_owner")
+        ]
+
+    def __str__(self) -> str:
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)[:60] or "other"
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def named(cls, owner, names) -> list[Industry]:
+        """The owner's industries with these names, made if missing, in the order given.
+
+        Matching is by slug, so capitals and accents do not breed duplicates; a name
+        already known keeps the spelling it was first entered with.
+        """
+        found: list[Industry] = []
+        seen: set[str] = set()
+        for raw in names:
+            name = str(raw).strip()[:60]
+            slug = slugify(name)[:60]
+            if not name or not slug or slug in seen:
+                continue
+            seen.add(slug)
+            industry, _created = cls.objects.get_or_create(
+                owner=owner, slug=slug, defaults={"name": name}
+            )
+            found.append(industry)
+        return found
+
+    @classmethod
+    def split(cls, text: str) -> list[str]:
+        """Names out of a typed list: commas, semicolons and slashes all separate."""
+        return [part.strip() for part in re.split(r"[;,/]", text or "") if part.strip()]
 
 
 class CompanyQuerySet(OwnedQuerySet):
@@ -45,7 +104,9 @@ class Company(OwnedModel):
         _("careers page"), blank=True, help_text=_("Where this company lists its openings.")
     )
     location = models.CharField(_("location"), max_length=200, blank=True)
-    industry = models.CharField(_("industry"), max_length=120, blank=True)
+    industries = models.ManyToManyField(
+        Industry, blank=True, related_name="companies", verbose_name=_("industries")
+    )
     notes = models.TextField(_("notes"), blank=True)
 
     objects = CompanyQuerySet.as_manager()
@@ -63,6 +124,11 @@ class Company(OwnedModel):
 
     def get_absolute_url(self) -> str:
         return reverse("jobs:company_detail", args=[self.pk])
+
+    @property
+    def industry_names(self) -> str:
+        """The industries as one line, for places that want text rather than labels."""
+        return ", ".join(industry.name for industry in self.industries.all())
 
 
 class Contact(OwnedModel):

@@ -22,7 +22,7 @@ class CompanyOut(Schema):
     website: str = ""
     careers_url: str = ""
     location: str = ""
-    industry: str = ""
+    industries: list[str] = Field(default_factory=list)
     notes: str = ""
     created_at: dt.datetime
 
@@ -48,7 +48,9 @@ class CompanyIn(Schema):
     website: str = Field(default="", max_length=200)
     careers_url: str = Field(default="", max_length=200)
     location: str = Field(default="", max_length=200)
-    industry: str = Field(default="", max_length=120)
+    industries: list[str] = Field(
+        default_factory=list, description="Names; unknown ones join the owner's vocabulary."
+    )
     notes: str = ""
 
 
@@ -57,7 +59,7 @@ class CompanyPatch(Schema):
     website: str | None = Field(default=None, max_length=200)
     careers_url: str | None = Field(default=None, max_length=200)
     location: str | None = Field(default=None, max_length=200)
-    industry: str | None = Field(default=None, max_length=120)
+    industries: list[str] | None = Field(default=None, description="Replaces the whole list")
     notes: str | None = None
 
 
@@ -445,7 +447,7 @@ def company_out(company, *, detail: bool = False) -> dict:
         "website": company.website,
         "careers_url": company.careers_url,
         "location": company.location,
-        "industry": company.industry,
+        "industries": [industry.name for industry in company.industries.all()],
         "notes": company.notes,
         "created_at": company.created_at,
     }

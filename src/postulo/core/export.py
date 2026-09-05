@@ -25,7 +25,8 @@ from postulo import __version__
 
 #: Bumped when the shape changes in a way an importer must notice. 2 added the listing
 #: state and dates on postings and the listing a capture became; 3 added interviews under
-#: each application, the ``actor`` on events and the table layout on the profile. The
+#: each application, the ``actor`` on events, the table layout on the profile, and a list
+#: of ``industries`` on a company where there was one ``industry`` string. The
 #: importer still reads every earlier
 #: format, filling the new fields in.
 FORMAT_VERSION = 3
@@ -55,7 +56,6 @@ COMPANY_FIELDS = (
     "website",
     "careers_url",
     "location",
-    "industry",
     "notes",
     "created_at",
 )
@@ -269,6 +269,7 @@ def build_document(user) -> dict:
 
     # --------------------------------------------------- companies and the rest
     companies = Company.objects.for_user(user).prefetch_related(
+        "industries",
         "contacts",
         "postings__applications__events",
         "postings__applications__reminders",
@@ -278,6 +279,7 @@ def build_document(user) -> dict:
         document["companies"].append(
             {
                 **_fields(company, COMPANY_FIELDS),
+                "industries": [industry.name for industry in company.industries.all()],
                 "contacts": [
                     _fields(
                         contact,

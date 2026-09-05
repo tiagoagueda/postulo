@@ -21,12 +21,12 @@ class CompaniesTable(Table):
             lookups=("location",),
             default=True,
         ),
+        # Several per company, so no single value to sort by; the filter matches any.
         Column(
             "industry",
-            _("Industry"),
-            sort=("industry",),
+            _("Industries"),
             filter="text",
-            lookups=("industry",),
+            lookups=("industries__name",),
             default=True,
         ),
         Column(

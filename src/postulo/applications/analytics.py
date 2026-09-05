@@ -102,6 +102,9 @@ class Insights:
     interviews_ahead: int = 0
     interview_kinds: list[tuple[str, int]] = field(default_factory=list)
     sources: list[SourceRow] = field(default_factory=list)
+    #: The same figures by the company's industries. A company in three fields counts in
+    #: all three, which is the honest reading.
+    industries: list[SourceRow] = field(default_factory=list)
     by_month: list[tuple[str, int]] = field(default_factory=list)
     #: Gone quiet: open, sent, silent past the person's threshold, nothing planned.
     quiet_now: int = 0
@@ -202,7 +205,9 @@ def _first_interview_days(applications) -> dict[int, int]:
 def build(user) -> Insights:
     """Work out what the record says about ``user``'s search."""
     applications = list(
-        Application.objects.for_user(user).select_related("posting", "posting__company")
+        Application.objects.for_user(user)
+        .select_related("posting", "posting__company")
+        .prefetch_related("posting__company__industries")
     )
     insights = Insights(total=len(applications))
 
@@ -301,6 +306,26 @@ def build(user) -> Insights:
         if application.pk in quiet_ids:
             row.quiet += 1
     insights.sources = sorted(rows.values(), key=lambda row: (-row.applied, row.name))
+
+    # ------------------------------------------------------------- industries
+    by_industry: dict[str, SourceRow] = {}
+    for application in ever_applied:
+        names = [i.name for i in application.posting.company.industries.all()] or [
+            str(_("Not recorded"))
+        ]
+        statuses = reached[application.pk]
+        for name in names:
+            row = by_industry.setdefault(name, SourceRow(name=name))
+            row.applied += 1
+            if statuses & RESPONSE_STATUSES:
+                row.responded += 1
+            if statuses & {Status.INTERVIEWING, Status.SCREENING, Status.ASSESSMENT}:
+                row.interviewed += 1
+            if Status.OFFER in statuses:
+                row.offers += 1
+            if application.pk in quiet_ids:
+                row.quiet += 1
+    insights.industries = sorted(by_industry.values(), key=lambda row: (-row.applied, row.name))
 
     # ----------------------------------------------------------- over time
     per_month = (

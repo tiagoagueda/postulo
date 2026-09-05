@@ -150,6 +150,15 @@ posting you have recorded there and every application you have made.
 Contacts are the people: recruiters, hiring managers, a friend on the inside. Add them
 from a company page. An application can name one of them as its main contact.
 
+**Industries** are the fields a company operates in, in your own words, and a company may
+be in several — a bank that is also an insurer and a software house is all three. Tick the
+ones you already use on the company form, or type new ones separated by commas; a starter
+list is suggested but never imposed. The companies table shows them all and filters by any
+of them, the search box matches them, Insights reports applications and outcomes by
+industry (a company in three fields counts in all three), and **Companies → Industries**
+is where you rename one, merge two spellings of the same thing, or delete a word you no
+longer use — deleting a word never deletes a company.
+
 Companies are private to your account. Two people sharing an instance each keep their own
 record of the same employer, and neither can see the other's opinion of them.
 

@@ -8,6 +8,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Changed
 
+- **A company can be in several industries.** The one free-text *industry* field became a
+  vocabulary of your own — tick what you already use, type new ones, a starter list is
+  only suggested — with any number per company. The companies table shows them all and
+  filters by any, search matches them, Insights adds a *By industry* table, the API and
+  the export carry a list of names (the importer still reads the old string), and
+  *Companies → Industries* renames, merges and deletes words. Every existing value was
+  converted on upgrade, splitting "Software, Insurance" into two. (#39)
 - **Listings: the stage before applications.** Every posting arrives in *Listings* first,
   whether captured from a page or typed in, and waits as *new* until it is shortlisted,
   discarded (with a reason, kept) or applied to. *Apply* is what creates the application;

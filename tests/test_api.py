@@ -272,11 +272,13 @@ def test_companies_contacts_reminders_and_letters_write(client, user, search):
     assert response.json()["website"] == "https://aperture.example"
 
     response = patch(
-        client, f"/api/v1/companies/{search['company'].pk}", {"industry": "Research"}, **bearer
+        client,
+        f"/api/v1/companies/{search['company'].pk}",
+        {"industries": ["Research", "Software"]},
+        **bearer,
     )
-    assert (
-        response.json()["industry"] == "Research" and response.json()["name"] == "Aperture Science"
-    )
+    assert response.json()["industries"] == ["Research", "Software"]
+    assert response.json()["name"] == "Aperture Science"
 
     response = post(
         client,

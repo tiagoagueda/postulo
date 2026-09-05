@@ -5,7 +5,7 @@ from ninja import Query, Router, Status
 from ninja.pagination import paginate
 
 from postulo.applications.services import get_or_create_company
-from postulo.jobs.models import Company, Contact
+from postulo.jobs.models import Company, Contact, Industry
 
 from ..auth import scope
 from ..schemas import (
@@ -26,11 +26,11 @@ router = Router(tags=["companies"], auth=scope("read"))
 @router.get("", response=list[CompanyOut], summary="List companies")
 @paginate
 def list_companies(request, q: str | None = Query(None, description="Name, location or industry")):
-    companies = owned(request, Company.objects).order_by("name")
+    companies = owned(request, Company.objects).prefetch_related("industries").order_by("name")
     if q:
         companies = companies.filter(
-            Q(name__icontains=q) | Q(location__icontains=q) | Q(industry__icontains=q)
-        )
+            Q(name__icontains=q) | Q(location__icontains=q) | Q(industries__name__icontains=q)
+        ).distinct()
     return [company_out(c) for c in companies]
 
 
@@ -38,16 +38,20 @@ def list_companies(request, q: str | None = Query(None, description="Name, locat
 def add_company(request, payload: CompanyIn):
     """Matched by name, case-insensitively, as the forms do: no second Acme."""
     company = get_or_create_company(request.auth.owner, payload.name)
-    for field in ("website", "careers_url", "location", "industry", "notes"):
+    for field in ("website", "careers_url", "location", "notes"):
         value = getattr(payload, field)
         if value:
             setattr(company, field, value)
     company.save()
+    if payload.industries:
+        company.industries.add(*Industry.named(request.auth.owner, payload.industries))
     return Status(201, company_out(_detail(request, company.pk), detail=True))
 
 
 def _detail(request, pk: int) -> Company:
-    return owned_or_404(request, Company.objects.prefetch_related("contacts", "postings"), pk)
+    return owned_or_404(
+        request, Company.objects.prefetch_related("contacts", "postings", "industries"), pk
+    )
 
 
 @router.get("/{int:pk}", response=CompanyDetailOut, summary="One company, with its contacts")
@@ -60,10 +64,14 @@ def get_company(request, pk: int):
 )
 def patch_company(request, pk: int, payload: CompanyPatch):
     company = _detail(request, pk)
-    for field, value in payload.dict(exclude_unset=True).items():
+    data = payload.dict(exclude_unset=True)
+    industries = data.pop("industries", None)
+    for field, value in data.items():
         if value is not None:
             setattr(company, field, value)
     company.save()
+    if industries is not None:
+        company.industries.set(Industry.named(request.auth.owner, industries))
     return company_out(_detail(request, pk), detail=True)
 
 

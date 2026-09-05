@@ -98,7 +98,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     from postulo.applications.models import Application, ApplicationEvent, Interview, Reminder
     from postulo.core.models import Tag
     from postulo.documents.models import CV, CoverLetter, CVItem, RenderedDocument, UploadedDocument
-    from postulo.jobs.models import Capture, Company, Contact, JobPosting
+    from postulo.jobs.models import Capture, Company, Contact, Industry, JobPosting
     from postulo.resume import models as resume
 
     document = read_manifest(archive)
@@ -188,6 +188,11 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         posting_entries = company_entry.pop("postings", [])
         company_entry.pop("id", None)
         company_entry.pop("created_at", None)
+        # Format 3 carries a list; earlier formats had one string, possibly a typed list.
+        industry_names = company_entry.pop("industries", None)
+        if industry_names is None:
+            industry_names = Industry.split(company_entry.get("industry", ""))
+        company_entry.pop("industry", None)
 
         # A company is an identity keyed by its name, which is why intake matches on
         # it too. Importing attaches to one that already exists rather than colliding
@@ -198,6 +203,8 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         if company is None:
             company = Company.objects.create(owner=user, name=name, **company_entry)
             report.companies += 1
+        if industry_names:
+            company.industries.add(*Industry.named(user, industry_names))
 
         for contact_entry in contact_entries:
             old_id = contact_entry.pop("id", None)

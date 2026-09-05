@@ -12,9 +12,37 @@
         <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
       {% endif %}
       <div class="card mb-6">
-        {% for field in form %}
-          {% include "partials/field.html" with field=field %}
-        {% endfor %}
+        {% include "partials/field.html" with field=form.name %}
+        {% include "partials/field.html" with field=form.website %}
+        {% include "partials/field.html" with field=form.careers_url %}
+        {% include "partials/field.html" with field=form.location %}
+
+        <fieldset class="mb-4" data-industries>
+          <legend class="field-label">{{ form.industries.label }}</legend>
+          {% if form.industries.field.queryset %}
+            <div class="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              {% for checkbox in form.industries %}
+                <label class="flex items-center gap-1.5">
+                  {{ checkbox.tag }} <span>{{ checkbox.choice_label }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+              {% translate "Your list is empty. Type the first ones below; the suggestions are only a start." %}
+            </p>
+          {% endif %}
+          {% for error in form.industries.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          <label class="field-label" for="{{ form.new_industries.id_for_label }}">{{ form.new_industries.label }}</label>
+          {{ form.new_industries }}
+          <datalist id="industry-suggestions">
+            {% for name in form.suggestions %}<option value="{{ name }}">{% endfor %}
+          </datalist>
+          <p class="field-help">{{ form.new_industries.help_text }}</p>
+          {% for error in form.new_industries.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </fieldset>
+
+        {% include "partials/field.html" with field=form.notes %}
       </div>
       <div class="flex items-center gap-3">
         <button type="submit" class="btn-primary">{% translate "Save" %}</button>
