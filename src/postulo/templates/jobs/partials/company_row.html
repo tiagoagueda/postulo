@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n postulo %}
 <tr id="company-{{ company.pk }}" class="border-b border-ink-100 last:border-0 dark:border-ink-800">
   {% for column in columns %}
     {% if column.key == 'name' %}
@@ -44,6 +44,10 @@
     {% elif column.key == 'created' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
         {{ company.created_at|date:"j M Y" }}
+      </td>
+    {% elif column.key|slice:":3" == 'id_' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {% company_identifier company column.key %}
       </td>
     {% endif %}
   {% endfor %}

@@ -28,6 +28,24 @@
     </div>
   </div>
 
+  {% if company.identifiers.all %}
+    <dl class="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm" data-identifiers>
+      {% for identifier in company.identifiers.all %}
+        <div class="flex items-baseline gap-2">
+          <dt class="text-ink-500 dark:text-ink-400">{{ identifier.scheme_label }}</dt>
+          <dd class="tabular-nums">
+            {% if identifier.url %}
+              <a href="{{ identifier.url }}" rel="noopener noreferrer external" target="_blank"
+                 class="text-brand-600 underline dark:text-brand-400">{{ identifier.value }}</a>
+            {% else %}
+              {{ identifier.value }}
+            {% endif %}
+          </dd>
+        </div>
+      {% endfor %}
+    </dl>
+  {% endif %}
+
   {% if company.website or company.careers_url %}
     <div class="mb-6 flex flex-wrap gap-4 text-sm">
       {% if company.website %}

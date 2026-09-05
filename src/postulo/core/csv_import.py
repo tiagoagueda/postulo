@@ -36,6 +36,7 @@ PREVIEW_ROWS = 10
 FIELDS: tuple[tuple[str, str], ...] = (
     ("ignore", _("Ignore this column")),
     ("company", _("Company")),
+    ("wikidata", _("Company's Wikidata id")),
     ("role", _("Role / job title")),
     ("url", _("Posting URL")),
     ("location", _("Location")),
@@ -70,6 +71,7 @@ SYNONYMS: dict[str, tuple[str, ...]] = {
         "organizacao",
         "empregador",
     ),
+    "wikidata": ("wikidata", "wikidata id", "qid", "wikidata company"),
     "role": (
         "role",
         "title",
@@ -634,6 +636,7 @@ def map_channel(text: str) -> str:
 class ParsedRow:
     number: int
     company: str = ""
+    wikidata: str = ""
     role: str = ""
     url: str = ""
     location: str = ""
@@ -668,6 +671,8 @@ def parse_rows(sheet: Sheet, mapping: list[str], *, day_first: bool = True) -> l
                 continue
             if key == "company":
                 row.company = value[:200]
+            elif key == "wikidata":
+                row.wikidata = value[:200]
             elif key == "role":
                 row.role = value[:250]
             elif key == "url":
@@ -763,8 +768,9 @@ def perform(user, sheet: Sheet, mapping: list[str], *, day_first: bool = True) -
                 continue
             existed = (
                 Company.objects.for_user(user).filter(name__iexact=row.company.strip()).exists()
+                or Company.by_identifier(user, "wikidata", row.wikidata) is not None
             )
-            company = get_or_create_company(user, row.company)
+            company = get_or_create_company(user, row.company, wikidata=row.wikidata)
             if not existed:
                 report.companies_created += 1
             if row.applied_at is not None:

@@ -159,6 +159,21 @@ industry (a company in three fields counts in all three), and **Companies → In
 is where you rename one, merge two spellings of the same thing, or delete a word you no
 longer use — deleting a word never deletes a company.
 
+**Identifiers** tie a company to a public record, so it can be recognised wherever it turns
+up — in a spreadsheet you import, in a posting a browser extension captures, in another
+account's export — without anyone comparing spellings. A company can carry one of each:
+a **Wikidata** item (`Q…`), a **Legal Entity Identifier** (the 20-character LEI, checked
+for its check digits), a **company register number** with its country (`PT 501234567`,
+`FR 552081317`, `DE HRB 12345`), a **LinkedIn**, **Crunchbase** or **OpenCorporates**
+slug, and any number of *Other* ids with a name of your own (a DUNS number, an internal
+supplier code). Paste a whole address if that is what you have; Postulo keeps the id and
+links it back. One id names one company: giving a second company the same Wikidata item
+is refused with the name of the one that has it, because that is exactly the duplicate
+identifiers exist to prevent. The companies table has an optional column per kind, the
+search box matches the values, and the CSV importer, the API and the export all carry
+them — a row or a request that names the employer's Wikidata id finds your company by it
+even if it spells the name differently.
+
 Companies are private to your account. Two people sharing an instance each keep their own
 record of the same employer, and neither can see the other's opinion of them.
 

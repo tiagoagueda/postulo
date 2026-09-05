@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import datetime as dt
 
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
@@ -175,17 +176,35 @@ def create_application(
     return apply_to_listing(posting, application_data, actor=actor)
 
 
-def get_or_create_company(owner, name: str) -> Company:
+def get_or_create_company(owner, name: str, *, wikidata: str = "") -> Company:
     """Find this owner's company by name, case-insensitively, or add it.
 
     Matching loosely on the way in avoids ending up with "Acme", "acme" and "ACME" as
-    three separate employers after a few weeks of typing.
+    three separate employers after a few weeks of typing. A Wikidata id, when the caller
+    has one, is a stronger match than any spelling: the company carrying it is the one,
+    whatever it is called here. A company found or made by name gains the id if it has
+    none yet and nobody else's record holds it.
     """
+    from postulo.jobs import identifiers
+    from postulo.jobs.models import CompanyIdentifier
+
     name = name.strip()
-    existing = Company.objects.for_user(owner).filter(name__iexact=name).first()
-    if existing is not None:
-        return existing
-    return Company.objects.create(owner=owner, name=name)
+    if wikidata:
+        by_id = Company.by_identifier(owner, identifiers.WIKIDATA, wikidata)
+        if by_id is not None:
+            return by_id
+    company = Company.objects.for_user(owner).filter(name__iexact=name).first()
+    if company is None:
+        company = Company.objects.create(owner=owner, name=name)
+    if wikidata and not company.identifiers.filter(scheme=identifiers.WIKIDATA).exists():
+        try:
+            value = identifiers.clean(identifiers.WIKIDATA, wikidata)
+        except ValidationError:
+            return company
+        CompanyIdentifier.objects.get_or_create(
+            owner=owner, scheme=identifiers.WIKIDATA, value=value, defaults={"company": company}
+        )
+    return company
 
 
 # ------------------------------------------------------------------- interviews

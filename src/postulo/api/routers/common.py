@@ -23,6 +23,18 @@ def choice_or_422(value: str, choices, *, field: str, allow_blank: bool = False)
     return value
 
 
+def identifiers_or_422(company, items, *, replace: bool = False) -> None:
+    """Attach identifiers to a company, or explain in one 422 what was wrong with them."""
+    from django.core.exceptions import ValidationError
+
+    from postulo.jobs.services import set_identifiers
+
+    try:
+        set_identifiers(company, [(i.scheme, i.value, i.label) for i in items], replace=replace)
+    except ValidationError as exc:
+        raise HttpError(422, "; ".join(exc.messages)) from exc
+
+
 def priority_or_422(value: int) -> int:
     from postulo.applications.models import Priority
 

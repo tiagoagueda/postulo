@@ -16,6 +16,21 @@ from ninja import Field, Schema
 # ------------------------------------------------------------------ companies
 
 
+class IdentifierOut(Schema):
+    scheme: str = Field(
+        description="wikidata, lei, register, linkedin, crunchbase, opencorporates, other"
+    )
+    value: str
+    label: str = Field(default="", description="What the identifier is, for scheme 'other'")
+    url: str = Field(default="", description="Where the value links, when the scheme has a home")
+
+
+class IdentifierIn(Schema):
+    scheme: str = Field(max_length=20)
+    value: str = Field(max_length=200, description="A pasted address is accepted; the id is kept")
+    label: str = Field(default="", max_length=60)
+
+
 class CompanyOut(Schema):
     id: int
     name: str
@@ -23,6 +38,7 @@ class CompanyOut(Schema):
     careers_url: str = ""
     location: str = ""
     industries: list[str] = Field(default_factory=list)
+    identifiers: list[IdentifierOut] = Field(default_factory=list)
     notes: str = ""
     created_at: dt.datetime
 
@@ -51,6 +67,10 @@ class CompanyIn(Schema):
     industries: list[str] = Field(
         default_factory=list, description="Names; unknown ones join the owner's vocabulary."
     )
+    identifiers: list[IdentifierIn] = Field(
+        default_factory=list,
+        description="Added to the company; a Wikidata id also matches an existing company.",
+    )
     notes: str = ""
 
 
@@ -60,6 +80,9 @@ class CompanyPatch(Schema):
     careers_url: str | None = Field(default=None, max_length=200)
     location: str | None = Field(default=None, max_length=200)
     industries: list[str] | None = Field(default=None, description="Replaces the whole list")
+    identifiers: list[IdentifierIn] | None = Field(
+        default=None, description="Replaces the whole list"
+    )
     notes: str | None = None
 
 
@@ -112,6 +135,11 @@ class ListingIn(Schema):
     """The posting half of intake: company by name, and what the listing says."""
 
     company_name: str = Field(max_length=200)
+    company_wikidata: str = Field(
+        default="",
+        max_length=200,
+        description="The employer's Wikidata id, when known: a stronger match than the name.",
+    )
     title: str = Field(max_length=250)
     url: str = Field(default="", max_length=500)
     location: str = Field(default="", max_length=200)
@@ -128,7 +156,9 @@ class ListingIn(Schema):
     def posting_data(self) -> dict:
         """Only the listing's own fields — the one-step schema below adds more."""
         return {
-            name: getattr(self, name) for name in ListingIn.model_fields if name != "company_name"
+            name: getattr(self, name)
+            for name in ListingIn.model_fields
+            if name not in ("company_name", "company_wikidata")
         }
 
 
@@ -463,6 +493,10 @@ def company_out(company, *, detail: bool = False) -> dict:
         "careers_url": company.careers_url,
         "location": company.location,
         "industries": [industry.name for industry in company.industries.all()],
+        "identifiers": [
+            {"scheme": i.scheme, "value": i.value, "label": i.label, "url": i.url}
+            for i in company.identifiers.all()
+        ],
         "notes": company.notes,
         "created_at": company.created_at,
     }

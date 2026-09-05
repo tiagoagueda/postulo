@@ -8,7 +8,7 @@ from pathlib import Path
 from django import template
 from django.forms import BoundField
 from django.urls import reverse
-from django.utils.html import escape
+from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -90,6 +90,22 @@ def initials_for(user) -> str:
     if words:
         return words[0][:2].upper()
     return "?"
+
+
+@register.simple_tag
+def company_identifier(company, column_key: str) -> str:
+    """The cell of an identifier column: the value, linked where the scheme has a home."""
+    identifier = company.identifier(column_key.removeprefix("id_"))
+    if identifier is None:
+        return "—"
+    if identifier.url:
+        return format_html(
+            '<a href="{}" rel="noopener noreferrer external" target="_blank" '
+            'class="text-brand-600 underline dark:text-brand-400">{}</a>',
+            identifier.url,
+            identifier.value,
+        )
+    return identifier.value
 
 
 @register.simple_tag

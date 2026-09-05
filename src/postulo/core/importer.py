@@ -18,6 +18,7 @@ import json
 import zipfile
 from dataclasses import dataclass, field
 
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils.dateparse import parse_date, parse_datetime
@@ -98,7 +99,9 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     from postulo.applications.models import Application, ApplicationEvent, Interview, Reminder
     from postulo.core.models import Tag
     from postulo.documents.models import CV, CoverLetter, CVItem, RenderedDocument, UploadedDocument
+    from postulo.jobs import identifiers
     from postulo.jobs.models import Capture, Company, Contact, Industry, JobPosting
+    from postulo.jobs.services import set_identifiers
     from postulo.resume import models as resume
 
     document = read_manifest(archive)
@@ -198,18 +201,39 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         if industry_names is None:
             industry_names = Industry.split(company_entry.get("industry", ""))
         company_entry.pop("industry", None)
+        identifier_entries = company_entry.pop("identifiers", None) or []
 
         # A company is an identity keyed by its name, which is why intake matches on
         # it too. Importing attaches to one that already exists rather than colliding
         # with the per-owner unique name — the postings and applications underneath are
-        # what actually get duplicated when an import is forced.
+        # what actually get duplicated when an import is forced. An identifier both
+        # sides carry is a stronger match than the spelling.
         name = company_entry.pop("name", "")
-        company = Company.objects.for_user(user).filter(name__iexact=name).first()
+        company = None
+        for entry in identifier_entries:
+            if entry.get("scheme") != identifiers.OTHER:
+                company = Company.by_identifier(
+                    user, entry.get("scheme", ""), entry.get("value", "")
+                )
+                if company is not None:
+                    break
+        if company is None:
+            company = Company.objects.for_user(user).filter(name__iexact=name).first()
         if company is None:
             company = Company.objects.create(owner=user, name=name, **company_entry)
             report.companies += 1
         if industry_names:
             company.industries.add(*Industry.named(user, industry_names))
+        for entry in identifier_entries:
+            try:
+                set_identifiers(
+                    company,
+                    [(entry.get("scheme", ""), entry.get("value", ""), entry.get("label", ""))],
+                )
+            except ValidationError:
+                # Malformed in the file, or already on another company here: the record
+                # is still worth having, the id is not worth refusing it over.
+                continue
 
         for contact_entry in contact_entries:
             old_id = contact_entry.pop("id", None)

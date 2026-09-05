@@ -67,7 +67,10 @@ that already holds a job search is refused unless you pass `--force`.
 
 Two exceptions to "never merges", both deliberate:
 
-- **Companies are matched by name**, the same rule the application form uses, so a forced
+- **Companies are matched by identifier first, then by name.** A company in the file that
+  carries a Wikidata item (or any other id) your account already has attaches to that
+  company whatever it is called; otherwise the name decides, the same rule the application
+  form uses, so a forced
   import attaches to employers you already have rather than creating "Acme" twice.
 - **A CV whose name is taken gets a number appended.** A CV is content rather than an
   identity, so a clash gets a new name instead of being merged into whatever happened to

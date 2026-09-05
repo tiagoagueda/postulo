@@ -11,8 +11,8 @@ from django import forms
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from . import industries
-from .models import Company, Contact, Industry, JobPosting
+from . import identifiers, industries
+from .models import Company, CompanyIdentifier, Contact, Industry, JobPosting
 
 
 class OwnerScopedModelForm(forms.ModelForm):
@@ -104,6 +104,88 @@ class CompanyForm(OwnerScopedModelForm):
         if clash.exists():
             raise forms.ValidationError(_("You already have a company with that name."))
         return name
+
+
+class CompanyIdentifierForm(forms.ModelForm):
+    """One row of the identifiers block: a scheme, the value, and a name when it is Other."""
+
+    class Meta:
+        model = CompanyIdentifier
+        fields = ("scheme", "value", "label")
+        widgets = {
+            "value": forms.TextInput(attrs={"autocomplete": "off", "spellcheck": "false"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # A blank first choice, so an untouched extra row counts as unchanged and is
+        # dropped rather than complaining that its value is missing.
+        self.fields["scheme"].choices = [("", "—"), *identifiers.CHOICES]
+        self.fields["scheme"].required = False
+        self.fields["value"].required = False
+
+    def clean(self) -> dict:
+        data = super().clean()
+        if not data.get("scheme") and (data.get("value") or data.get("label")):
+            self.add_error("scheme", _("Choose what kind of identifier this is."))
+        if data.get("scheme") and not data.get("value"):
+            self.add_error("value", _("Type the identifier."))
+        return data
+
+
+class BaseCompanyIdentifierFormSet(forms.BaseInlineFormSet):
+    """The rows together: no scheme twice, no value twice, and the owner filled in."""
+
+    def clean(self) -> None:
+        super().clean()
+        seen_schemes: set[str] = set()
+        seen_values: set[tuple[str, str]] = set()
+        for form in self.forms:
+            if not form.is_valid() or not form.has_changed() or form.cleaned_data.get("DELETE"):
+                continue
+            scheme = form.cleaned_data.get("scheme")
+            value = form.instance.value  # normalised by the model's clean()
+            if not scheme or not value:
+                continue
+            if scheme != identifiers.OTHER:
+                if scheme in seen_schemes:
+                    form.add_error("scheme", _("This kind of identifier is already listed."))
+                seen_schemes.add(scheme)
+            if (scheme, value) in seen_values:
+                form.add_error("value", _("This identifier is already listed."))
+            seen_values.add((scheme, value))
+            if scheme != identifiers.OTHER and self.owner is not None:
+                clash = (
+                    CompanyIdentifier.objects.for_user(self.owner)
+                    .filter(scheme=scheme, value=value)
+                    .exclude(company=self.instance if self.instance.pk else None)
+                    .select_related("company")
+                    .first()
+                )
+                if clash is not None:
+                    form.add_error(
+                        "value",
+                        _("%(company)s already carries this identifier.")
+                        % {"company": clash.company.name},
+                    )
+
+    @property
+    def owner(self):
+        return getattr(self.instance, "owner", None) or getattr(self, "user", None)
+
+    def save_new(self, form, commit=True):
+        form.instance.owner = self.instance.owner
+        return super().save_new(form, commit=commit)
+
+
+CompanyIdentifierFormSet = forms.inlineformset_factory(
+    Company,
+    CompanyIdentifier,
+    form=CompanyIdentifierForm,
+    formset=BaseCompanyIdentifierFormSet,
+    extra=1,
+    can_delete=True,
+)
 
 
 class IndustryForm(OwnerScopedModelForm):

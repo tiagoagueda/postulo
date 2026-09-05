@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core.tables import Column, Table, register
 
+from . import identifiers
+
 
 @register
 class CompaniesTable(Table):
@@ -49,6 +51,12 @@ class CompaniesTable(Table):
         Column("website", _("Website"), filter="text", lookups=("website",)),
         Column("careers", _("Careers page")),
         Column("notes", _("Notes"), filter="text", lookups=("notes",)),
+        # One optional column per identifier scheme, hidden until asked for.
+        *(
+            Column(f"id_{key}", scheme.label)
+            for key, scheme in identifiers.SCHEMES.items()
+            if key != identifiers.OTHER
+        ),
         Column(
             "last_activity",
             _("Last activity"),

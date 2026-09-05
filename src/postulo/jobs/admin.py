@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Capture, Company, Contact, Industry, JobPosting
+from .models import Capture, Company, CompanyIdentifier, Contact, Industry, JobPosting
 
 
 class ContactInline(admin.TabularInline):
@@ -9,13 +9,19 @@ class ContactInline(admin.TabularInline):
     fields = ("name", "role", "email", "phone")
 
 
+class IdentifierInline(admin.TabularInline):
+    model = CompanyIdentifier
+    extra = 0
+    fields = ("scheme", "value", "label")
+
+
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ("name", "owner", "location", "industry_names")
     list_filter = ("owner",)
     search_fields = ("name", "location", "industries__name")
     filter_horizontal = ("industries",)
-    inlines = (ContactInline,)
+    inlines = (IdentifierInline, ContactInline)
 
 
 @admin.register(Industry)

@@ -96,7 +96,7 @@ are in the web interface.
 | `GET /applications/{id}` | One application with its timeline, reminders, interviews and sent documents |
 | `GET /listings?state=undecided` | Listings; `state` is `undecided` (default), `new`, `shortlisted`, `discarded`, `applied`, `closed` or `all` |
 | `GET /listings/{id}` | One listing, description included |
-| `GET /companies?q=` · `GET /companies/{id}` | Companies, with their `industries` as a list of names; the detail carries contacts and listing ids |
+| `GET /companies?q=` · `GET /companies/{id}` | Companies, with their `industries` as a list of names and their `identifiers` as `{scheme, value, label, url}`; `q` matches identifier values too; the detail carries contacts and listing ids |
 | `GET /reminders?due=true` · `?outstanding=true` | Reminders |
 | `GET /interviews?state=upcoming` · `GET /interviews/{id}` | Interviews; `state` is `upcoming` (default), `scheduled`, `past` or `all`; each carries a stable `uid` |
 | `GET /interviews/calendar.ics` · `GET /interviews/{id}/calendar.ics` | The diary, or one interview, as iCalendar text |
@@ -122,7 +122,7 @@ stays the single truth.
 | `POST /reminders` · `POST /reminders/{id}/complete` | Reminders |
 | `POST /interviews` | Schedule: `application_id`, `starts_at`, optional `ends_at`, `kind`, `location`, `contact_ids`, `notes`, `remind` |
 | `PATCH /interviews/{id}` · `POST /interviews/{id}/outcome` | Move or change an interview; record `done`, `cancelled` or `no_show` |
-| `POST /companies` · `PATCH /companies/{id}` · `POST /companies/{id}/contacts` | Companies, matched by name as the forms do, and their people; `industries` is a list of names, unknown ones join the vocabulary, and a PATCH replaces the whole list |
+| `POST /companies` · `PATCH /companies/{id}` · `POST /companies/{id}/contacts` | Companies, matched by name as the forms do — or by a Wikidata id in `identifiers`, which wins over the name — and their people; `industries` is a list of names, unknown ones join the vocabulary; `identifiers` is a list of `{scheme, value, label}` (schemes `wikidata`, `lei`, `register`, `linkedin`, `crunchbase`, `opencorporates`, `other`), a malformed or borrowed one is a 422; a PATCH replaces either whole list. `POST /listings` and `POST /applications` take `company_wikidata` beside `company_name` |
 | `POST /letters` | Draft a cover letter |
 
 ## Downloading

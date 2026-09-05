@@ -5,6 +5,7 @@ from __future__ import annotations
 from functools import cached_property
 
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Count, Q
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -13,7 +14,8 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from postulo.core import tables
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 
-from .forms import CompanyForm, ContactForm, IndustryForm, JobPostingForm
+from . import identifiers
+from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
 from .models import Company, Contact, DiscardReason, Industry, JobPosting
 from .tables import CompaniesTable
 
@@ -49,13 +51,16 @@ class CompanyListView(OwnedObjectMixin, ListView):
     def get_queryset(self):
         # The table's ordering always ends in the key, so pagination over the aggregated
         # rows never repeats or skips one between pages.
-        queryset = super().get_queryset().with_table_data().prefetch_related("industries")
+        queryset = (
+            super().get_queryset().with_table_data().prefetch_related("industries", "identifiers")
+        )
         search = self.request.GET.get("q", "").strip()
         if search:
             queryset = queryset.filter(
                 Q(name__icontains=search)
                 | Q(location__icontains=search)
                 | Q(industries__name__icontains=search)
+                | Q(identifiers__value__icontains=search)
             )
         # A company in two matching industries is still one row.
         return self.table.apply(queryset).distinct()
@@ -79,7 +84,7 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
     context_object_name = "company"
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("industries")
+        return super().get_queryset().prefetch_related("industries", "identifiers")
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
@@ -88,7 +93,48 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         return context
 
 
-class CompanyCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):
+class CompanyIdentifiersMixin:
+    """The identifiers block on the company form: an inline formset saved with the company.
+
+    The formset validates against the person's other companies, so it needs the user
+    before the company exists; on create it is bound to the unsaved instance and told
+    the owner explicitly.
+    """
+
+    def get_identifiers(self) -> CompanyIdentifierFormSet:
+        instance = getattr(self, "object", None) or Company(owner=self.request.user)
+        kwargs = {"instance": instance, "prefix": "identifiers"}
+        # A form posted without the block (an older client, a script) means no change to
+        # the identifiers, not an error about a missing management form.
+        if self.request.method == "POST" and "identifiers-TOTAL_FORMS" in self.request.POST:
+            kwargs["data"] = self.request.POST
+        formset = CompanyIdentifierFormSet(**kwargs)
+        formset.user = self.request.user
+        return formset
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context.setdefault("identifiers", self.get_identifiers())
+        context["identifier_schemes"] = identifiers.SCHEMES.values()
+        return context
+
+    def form_valid(self, form):
+        formset = self.get_identifiers()
+        if formset.is_bound and not formset.is_valid():
+            return self.render_to_response(self.get_context_data(form=form, identifiers=formset))
+        with transaction.atomic():
+            response = super().form_valid(form)
+            if formset.is_bound:
+                formset.instance = self.object
+                for row in formset.forms:
+                    row.instance.company = self.object
+                formset.save()
+        return response
+
+
+class CompanyCreateView(
+    OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CompanyIdentifiersMixin, CreateView
+):
     model = Company
     form_class = CompanyForm
     template_name = "jobs/company_form.html"
@@ -98,7 +144,7 @@ class CompanyCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, C
         return super().form_valid(form)
 
 
-class CompanyUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+class CompanyUpdateView(OwnedObjectMixin, UserFormKwargsMixin, CompanyIdentifiersMixin, UpdateView):
     model = Company
     form_class = CompanyForm
     template_name = "jobs/company_form.html"

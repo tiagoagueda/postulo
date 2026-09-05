@@ -65,6 +65,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Companies carry external identifiers, starting with a Wikidata id.** A company can
+  have one Wikidata item, one LEI (check digits verified), one national register number
+  with its country, one LinkedIn, Crunchbase and OpenCorporates slug, and any number of
+  named *Other* ids. Paste an address and the id is kept and linked back. One id names one
+  company per account, and it is a stronger match than the name: the CSV importer's
+  *Wikidata* column, `company_wikidata` on the API's listing and application doors, and
+  a restored export all find your company by it whatever it is called. The companies
+  table gains a column per kind, search matches the values, the export carries them, and
+  the demo seed gives a few companies some. (#42)
 - **An accessibility programme with machinery behind it.** The browser tests now run
   axe-core over every page they visit — thirty-odd, signed in and out — against WCAG 2.2
   at levels A and AA, and a violation fails the build naming the element and the rule.

@@ -59,7 +59,7 @@ def list_listings(
 @router.post("", response={201: ListingDetailOut}, auth=scope("write"), summary="Add a listing")
 def add_listing(request, payload: ListingIn):
     owner = request.auth.owner
-    company = get_or_create_company(owner, payload.company_name)
+    company = get_or_create_company(owner, payload.company_name, wikidata=payload.company_wikidata)
     listing = create_listing(owner, company=company, posting_data=payload.posting_data())
     return Status(
         201,

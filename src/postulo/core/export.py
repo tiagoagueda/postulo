@@ -277,6 +277,7 @@ def build_document(user) -> dict:
     # --------------------------------------------------- companies and the rest
     companies = Company.objects.for_user(user).prefetch_related(
         "industries",
+        "identifiers",
         "contacts",
         "postings__applications__events",
         "postings__applications__reminders",
@@ -287,6 +288,10 @@ def build_document(user) -> dict:
             {
                 **_fields(company, COMPANY_FIELDS),
                 "industries": [industry.name for industry in company.industries.all()],
+                "identifiers": [
+                    {"scheme": i.scheme, "value": i.value, "label": i.label}
+                    for i in company.identifiers.all()
+                ],
                 "contacts": [
                     _fields(
                         contact,

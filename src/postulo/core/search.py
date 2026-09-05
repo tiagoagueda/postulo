@@ -167,7 +167,17 @@ def search_companies(user, query: str) -> Iterable[Hit]:
     rows = (
         Company.objects.for_user(user)
         .prefetch_related("industries")
-        .filter(contains(query, "name", "notes", "location", "industries__name", "website"))
+        .filter(
+            contains(
+                query,
+                "name",
+                "notes",
+                "location",
+                "industries__name",
+                "website",
+                "identifiers__value",
+            )
+        )
         .distinct()
         .order_by("name")
     )

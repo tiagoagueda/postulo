@@ -66,7 +66,7 @@ def record_application(request, payload: ApplicationIn):
     choice_or_422(payload.status, ApplicationStatus, field="status")
     choice_or_422(payload.channel, Channel, field="channel", allow_blank=True)
     priority_or_422(payload.priority)
-    company = get_or_create_company(owner, payload.company_name)
+    company = get_or_create_company(owner, payload.company_name, wikidata=payload.company_wikidata)
     application = create_application(
         owner,
         company=company,

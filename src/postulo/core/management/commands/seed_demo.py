@@ -54,6 +54,7 @@ from postulo.documents.rendering import snapshot_cv, snapshot_letter
 from postulo.jobs.models import (
     Capture,
     Company,
+    CompanyIdentifier,
     Contact,
     DiscardReason,
     Industry,
@@ -73,6 +74,17 @@ from postulo.resume.models import (
 )
 
 # --------------------------------------------------------------------- material
+
+#: Identifiers for a few of the companies, so the block on the company page and the
+#: table's optional columns have something to show. The ids are made up, as the
+#: companies are.
+DEMO_IDENTIFIERS = {
+    "Aperture Science": (("wikidata", "Q4779874"), ("linkedin", "aperture-science")),
+    "Black Mesa": (("wikidata", "Q2313543"),),
+    "Initech": (("lei", "HWUPKR0MPOU8FGXBT394"), ("crunchbase", "initech")),
+    "Globex Corporation": (("wikidata", "Q5570047"), ("register", "DE HRB 12345")),
+    "Wayne Enterprises": (("wikidata", "Q2586409"), ("opencorporates", "us_de/2345678")),
+}
 
 COMPANIES = [
     # name, industries, location, website
@@ -488,6 +500,10 @@ class Command(BaseCommand):
                 ),
             )
             company.industries.set(Industry.named(user, fields))
+            for scheme, value in DEMO_IDENTIFIERS.get(name, ()):
+                CompanyIdentifier.objects.create(
+                    owner=user, company=company, scheme=scheme, value=value
+                )
             companies.append(company)
             report.companies += 1
             if rng.random() < 0.4:

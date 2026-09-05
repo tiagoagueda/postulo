@@ -11,6 +11,7 @@ from __future__ import annotations
 import re
 from datetime import timedelta
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Max
 from django.urls import reverse
@@ -20,6 +21,8 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel, OwnedQuerySet
+
+from . import identifiers
 
 
 class Industry(OwnedModel):
@@ -129,6 +132,95 @@ class Company(OwnedModel):
     def industry_names(self) -> str:
         """The industries as one line, for places that want text rather than labels."""
         return ", ".join(industry.name for industry in self.industries.all())
+
+    def identifier(self, scheme: str) -> CompanyIdentifier | None:
+        """The identifier under ``scheme``, from the prefetched set when there is one."""
+        for identifier in self.identifiers.all():
+            if identifier.scheme == scheme:
+                return identifier
+        return None
+
+    @classmethod
+    def by_identifier(cls, owner, scheme: str, raw: str) -> Company | None:
+        """The owner's company carrying this identifier, or None.
+
+        The value is normalised first, so a pasted URL finds what a typed id recorded.
+        A malformed value simply matches nothing; it is not this method's job to complain.
+        """
+        try:
+            value = identifiers.clean(scheme, raw)
+        except ValidationError:
+            return None
+        found = (
+            CompanyIdentifier.objects.for_user(owner)
+            .filter(scheme=scheme, value=value)
+            .select_related("company")
+            .first()
+        )
+        return found.company if found else None
+
+
+class CompanyIdentifier(OwnedModel):
+    """One external id for a company: a Wikidata item, a LEI, a register number, a slug.
+
+    Unique twice over: a company has one value per scheme (except *other*, which is a
+    labelled free slot), and one account cannot give two companies the same identifier —
+    that would be two records of one employer, which is what identifiers exist to prevent.
+    """
+
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, related_name="identifiers", verbose_name=_("company")
+    )
+    scheme = models.CharField(_("scheme"), max_length=20, choices=identifiers.CHOICES)
+    value = models.CharField(_("identifier"), max_length=100)
+    label = models.CharField(
+        _("name"),
+        max_length=60,
+        blank=True,
+        help_text=_("What the identifier is, when the scheme is Other."),
+    )
+
+    class Meta:
+        verbose_name = _("company identifier")
+        verbose_name_plural = _("company identifiers")
+        ordering = ("scheme", "value")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("company", "scheme"),
+                condition=~models.Q(scheme=identifiers.OTHER),
+                name="one_identifier_per_scheme_per_company",
+            ),
+            models.UniqueConstraint(
+                fields=("owner", "scheme", "value"),
+                condition=~models.Q(scheme=identifiers.OTHER),
+                name="one_company_per_identifier_per_owner",
+            ),
+            models.UniqueConstraint(
+                fields=("company", "scheme", "label", "value"),
+                name="unique_other_identifier_per_company",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.scheme_label}: {self.value}"
+
+    def clean(self) -> None:
+        self.value = identifiers.clean(self.scheme, self.value)
+        self.label = (self.label or "").strip()
+        if self.scheme == identifiers.OTHER and not self.label:
+            raise ValidationError({"label": _("Say what this identifier is.")})
+        if self.scheme != identifiers.OTHER:
+            self.label = ""
+
+    @property
+    def scheme_label(self) -> str:
+        if self.scheme == identifiers.OTHER and self.label:
+            return self.label
+        return str(identifiers.SCHEMES[self.scheme].label)
+
+    @property
+    def url(self) -> str:
+        return identifiers.url_for(self.scheme, self.value)
 
 
 class Contact(OwnedModel):
