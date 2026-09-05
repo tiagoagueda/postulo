@@ -1,0 +1,106 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="max-w-4xl">
+    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Which column is which?" %}</h2>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed with name=sheet.filename rows=sheet.row_count %}
+        <strong>{{ name }}</strong>: {{ rows }} rows. The guesses below come from the header names; correct any of them, then check the preview before importing.
+      {% endblocktranslate %}
+    </p>
+
+    <form method="post" data-csv-map>
+      {% csrf_token %}
+      <div class="card mb-6">
+        <table class="w-full text-left text-sm">
+          <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
+            <tr>
+              <th class="px-3 py-2 font-medium">{% translate "Column in the file" %}</th>
+              <th class="px-3 py-2 font-medium">{% translate "First value" %}</th>
+              <th class="px-3 py-2 font-medium">{% translate "Read as" %}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for index, header, chosen in columns %}
+              <tr>
+                <td class="px-3 py-2 font-medium">{{ header|default:"—" }}</td>
+                <td class="px-3 py-2 text-ink-500 dark:text-ink-400">
+                  {% for row in preview %}{% if forloop.first %}{% for cell in sheet.rows.0 %}{% if forloop.counter0 == index %}{{ cell|truncatechars:40 }}{% endif %}{% endfor %}{% endif %}{% endfor %}
+                </td>
+                <td class="px-3 py-2">
+                  <label class="sr-only" for="column_{{ index }}">{% blocktranslate with name=header %}Read {{ name }} as{% endblocktranslate %}</label>
+                  <select id="column_{{ index }}" name="column_{{ index }}" class="field-input w-56 py-1 text-sm">
+                    {% for key, label in fields %}
+                      <option value="{{ key }}" {% if key == chosen %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <fieldset class="mt-4 flex flex-wrap items-center gap-4 text-sm">
+          <legend class="field-label">{% translate "Dates written as" %}</legend>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="date_order" value="day_first" {% if day_first %}checked{% endif %}> {% translate "day / month / year (31/12/2026)" %}
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="date_order" value="month_first" {% if not day_first %}checked{% endif %}> {% translate "month / day / year (12/31/2026)" %}
+          </label>
+        </fieldset>
+        <div class="mt-4 flex items-center gap-3">
+          <button type="submit" name="action" value="preview" class="btn-secondary">{% translate "Update the preview" %}</button>
+        </div>
+      </div>
+
+      <h3 class="mb-2 font-medium">{% translate "How the first rows will be read" %}</h3>
+      <div class="card mb-4 overflow-x-auto p-0">
+        <table class="w-full text-left text-sm">
+          <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
+            <tr>
+              <th class="px-3 py-2 font-medium">#</th>
+              <th class="px-3 py-2 font-medium">{% translate "Company" %}</th>
+              <th class="px-3 py-2 font-medium">{% translate "Role" %}</th>
+              <th class="px-3 py-2 font-medium">{% translate "Applied" %}</th>
+              <th class="px-3 py-2 font-medium">{% translate "Status" %}</th>
+              <th class="px-3 py-2 font-medium">{% translate "Becomes" %}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-ink-100 dark:divide-ink-800" data-preview>
+            {% for row in preview %}
+              <tr>
+                <td class="px-3 py-2 tabular-nums text-ink-400">{{ row.number }}</td>
+                <td class="px-3 py-2">{{ row.company|default:"—" }}</td>
+                <td class="px-3 py-2">{{ row.role|default:"—" }}</td>
+                <td class="px-3 py-2 tabular-nums">{{ row.applied_at|date:"j M Y"|default:"—" }}</td>
+                <td class="px-3 py-2">
+                  {{ row.status }}{% if not row.status_known %} <span class="text-xs text-amber-700 dark:text-amber-400">({% blocktranslate with text=row.status_text %}was “{{ text }}”{% endblocktranslate %})</span>{% endif %}
+                </td>
+                <td class="px-3 py-2">
+                  {% if row.becomes == "skipped" %}
+                    <span class="text-red-600 dark:text-red-400">{% translate "skipped" %}: {{ row.problems|join:", " }}</span>
+                  {% elif row.becomes == "application" %}
+                    {% translate "application" %}
+                  {% else %}
+                    {% translate "listing" %}
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400" data-summary>
+        {% blocktranslate trimmed with applications=would_import listings=would_list skipped=would_skip %}
+          Across the whole file: {{ applications }} applications, {{ listings }} listings, {{ skipped }} rows skipped for want of a company or a role. Rows already recorded are found and skipped as they are imported.
+        {% endblocktranslate %}
+      </p>
+
+      <div class="flex items-center gap-3">
+        <button type="submit" name="action" value="import" class="btn-primary">{% translate "Import" %}</button>
+        <button type="submit" name="start_over" value="1" class="btn-ghost">{% translate "Choose another file" %}</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

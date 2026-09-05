@@ -1,0 +1,38 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="max-w-2xl">
+    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Imported" %}</h2>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate with name=report.filename %}From {{ name }}.{% endblocktranslate %}
+    </p>
+
+    <div class="card mb-6" data-report>
+      <dl class="grid grid-cols-2 gap-3 text-sm">
+        <div class="flex justify-between"><dt>{% translate "Rows read" %}</dt><dd class="tabular-nums">{{ report.rows }}</dd></div>
+        <div class="flex justify-between"><dt>{% translate "Applications" %}</dt><dd class="tabular-nums">{{ report.applications }}</dd></div>
+        <div class="flex justify-between"><dt>{% translate "Listings" %}</dt><dd class="tabular-nums">{{ report.listings }}</dd></div>
+        <div class="flex justify-between"><dt>{% translate "Companies created" %}</dt><dd class="tabular-nums">{{ report.companies_created }}</dd></div>
+        <div class="flex justify-between"><dt>{% translate "Rows skipped" %}</dt><dd class="tabular-nums">{{ report.skipped|length }}</dd></div>
+      </dl>
+      {% if report.skipped %}
+        <details class="mt-4 text-sm">
+          <summary class="cursor-pointer text-ink-600 dark:text-ink-300">{% translate "Why rows were skipped" %}</summary>
+          <ul class="mt-2 list-disc space-y-1 pl-5 text-ink-600 dark:text-ink-300">
+            {% for line in report.skipped %}<li>{{ line }}</li>{% endfor %}
+          </ul>
+        </details>
+      {% endif %}
+    </div>
+
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Every imported application carries an “Imported from” entry on its timeline, so you can always tell what came from the spreadsheet." %}
+    </p>
+    <div class="flex items-center gap-3">
+      <a href="{% url 'applications:list' %}" class="btn-primary">{% translate "See the applications" %}</a>
+      <a href="{% url 'listings:list' %}" class="btn-secondary">{% translate "See the listings" %}</a>
+      <a href="{% url 'core:import_csv' %}" class="btn-ghost">{% translate "Import another file" %}</a>
+    </div>
+  </div>
+{% endblock %}

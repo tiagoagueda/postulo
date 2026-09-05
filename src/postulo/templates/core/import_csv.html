@@ -1,0 +1,33 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="max-w-2xl">
+    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Import from a spreadsheet" %}</h2>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Most people track a job search in a spreadsheet until it hurts. Bring it here rather than retyping it: one CSV, any columns, any language of headers. You will see how each column is read before anything is saved." %}
+    </p>
+
+    <form method="post" enctype="multipart/form-data" class="card mb-6" data-csv-upload>
+      {% csrf_token %}
+      <label class="field-label" for="id_file">{% translate "A CSV file" %}</label>
+      <input type="file" id="id_file" name="file" accept=".csv,text/csv,text/plain" required class="field-input mb-2">
+      <p class="field-help mb-4">
+        {% translate "From Excel, Numbers or Google Sheets: File → Save as (or Download) → CSV. Commas, semicolons or tabs; up to 2 MB and 5 000 rows." %}
+      </p>
+      <button type="submit" class="btn-primary">{% translate "Upload and map the columns" %}</button>
+    </form>
+
+    <div class="card">
+      <h3 class="mb-2 font-medium">{% translate "Starting clean instead?" %}</h3>
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "A template with Postulo's own columns and one example row. Fill it in and upload it above." %}
+      </p>
+      <a href="{% url 'core:import_csv_template' %}" class="btn-secondary">{% translate "Download the template" %}</a>
+    </div>
+
+    <p class="mt-6 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "Rows with a date applied become applications, dated as the spreadsheet says and marked as imported on their timeline; rows without one become listings. Companies are matched by name. A row that is already recorded — the same address, or the same company, role and date — is reported and left alone." %}
+    </p>
+  </div>
+{% endblock %}

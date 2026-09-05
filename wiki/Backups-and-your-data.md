@@ -19,6 +19,41 @@ postings contain applications, applications contain their timeline — rather th
 dump of database tables. The point is that somebody can still do something useful with it
 in ten years, when Postulo is a memory.
 
+## Bringing a spreadsheet in
+
+Most people track a job search in a spreadsheet until it hurts. **Settings → Your data →
+Import from a spreadsheet** takes that spreadsheet as a CSV (from Excel, Numbers or Google
+Sheets: *Save as* or *Download* → CSV; commas, semicolons or tabs; any encoding Excel
+produces) and brings it in without retyping:
+
+1. **Upload** the file, or download the template with Postulo's own columns first.
+2. **Map the columns.** Postulo guesses which column is which from the header names — in
+   English, French or Portuguese: *Entreprise* and *Empresa* are a company — and every
+   guess can be corrected. Say once whether dates are written day-first or month-first.
+3. **Check the preview** of the first rows as they will be read: dates parsed, statuses
+   mapped from whatever the spreadsheet said (*entretien* is *interviewing*; a word Postulo
+   does not know becomes *applied*, with the original kept in a note), and what each row
+   becomes.
+4. **Import**, in one transaction. Rows with a date applied become applications, dated as
+   the spreadsheet says; rows without one become listings; companies are matched by name
+   or created; tags are created as needed. Every imported application carries an *Imported
+   from file.csv* entry on its timeline, so provenance is never in doubt.
+
+A row already recorded — the same posting address, or the same company, role and date
+applied — is reported and left alone, so importing twice does not double anything. The
+report says how many rows became what and why any were skipped.
+
+From the command line, for a long history:
+
+```sh
+uv run manage.py import_csv alex.morgan history.csv --show          # print the guessed mapping
+uv run manage.py import_csv alex.morgan history.csv --mapping map.json --dry-run
+uv run manage.py import_csv alex.morgan history.csv --mapping map.json
+```
+
+Excel's own format is not read; *Save as CSV* is one click, and it keeps a dependency out
+of a one-time operation.
+
 ## Putting an archive back
 
 ```sh

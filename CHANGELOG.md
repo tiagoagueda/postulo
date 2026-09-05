@@ -44,6 +44,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Import from a spreadsheet.** Under *Settings → Your data*: upload a CSV (any delimiter,
+  any encoding Excel produces, or start from the downloadable template), see which column
+  Postulo took for which field — guessed from headers in English, French or Portuguese, all
+  editable — check a preview of the first rows with dates and statuses as they will be
+  read, and import in one transaction. Rows with a date applied become applications, dated
+  as the spreadsheet says and marked *Imported from file.csv* on their timeline; rows
+  without one become listings; companies are matched by name; duplicates by address or by
+  company, role and date are reported, not created. `manage.py import_csv` does the same
+  from the command line. (#31)
 - **One search box over everything**, in the header, with `/` as its shortcut. It looks
   through listings, applications and their timelines, companies and people, reminders,
   letters, CVs, files, the career record and the text of what was sent — a hit in a sent
