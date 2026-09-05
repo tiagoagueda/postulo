@@ -2,7 +2,7 @@
 
 Rather than retyping an advert, paste its address and let Postulo read the page.
 
-**Capture**, in the top right of every page.
+**Capture a posting**, on the dashboard.
 
 ## What happens
 

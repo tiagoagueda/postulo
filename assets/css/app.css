@@ -164,6 +164,13 @@
     @apply nav-link bg-ink-100 text-ink-900 dark:bg-ink-800 dark:text-ink-50;
   }
 
+  /* An entry in the account menu: link or button, same look. */
+  .menu-item {
+    @apply flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700
+      hover:bg-ink-100 hover:text-ink-900
+      dark:text-ink-200 dark:hover:bg-ink-800 dark:hover:text-ink-50;
+  }
+
   .alert-info {
     @apply alert border-brand-200 bg-brand-50 text-brand-900
       dark:border-brand-800 dark:bg-brand-900/30 dark:text-brand-100;
@@ -183,6 +190,17 @@
     @apply alert border-red-200 bg-red-50 text-red-900
       dark:border-red-800 dark:bg-red-900/30 dark:text-red-100;
   }
+}
+
+/* ------------------------------------------------------------ account menu */
+
+/* The summary is the trigger; the browser's disclosure triangle is not wanted on it. */
+details[data-menu] > summary {
+  list-style: none;
+}
+
+details[data-menu] > summary::-webkit-details-marker {
+  display: none;
 }
 
 /* ----------------------------------------------------------- theme switch */

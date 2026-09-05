@@ -4,14 +4,26 @@
 {% block title %}{% translate "Dashboard" %}{% endblock %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">
-    {% blocktranslate trimmed with name=user.display_name %}
-      Welcome back, {{ name }}
-    {% endblocktranslate %}
-  </h1>
-  <p class="mb-8 text-sm text-ink-500 dark:text-ink-400">
-    {% translate "Where your job search stands today." %}
-  </p>
+  <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="mb-1 text-2xl font-semibold tracking-tight">
+        {% blocktranslate trimmed with name=user.display_name %}
+          Welcome back, {{ name }}
+        {% endblocktranslate %}
+      </h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Where your job search stands today." %}
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="{% url 'jobs:capture_create' %}" class="btn-secondary">
+        {% translate "Capture a posting" %}
+      </a>
+      <a href="{% url 'applications:create' %}" class="btn-primary">
+        {% translate "Record an application" %}
+      </a>
+    </div>
+  </div>
 
   <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <a href="{% url 'applications:list' %}?state=open" class="card hover:border-brand-400">

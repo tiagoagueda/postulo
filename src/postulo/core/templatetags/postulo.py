@@ -2,6 +2,7 @@
 
 import functools
 import re
+import zlib
 from pathlib import Path
 
 from django import template
@@ -58,6 +59,51 @@ def icon(name: str, label: str = "", **attrs: str) -> str:
     for key, value in attrs.items():
         rendered.append(f'{escape(key.replace("_", "-"))}="{escape(value)}"')
     return mark_safe(source.replace("<svg", "<svg " + " ".join(rendered), 1))  # noqa: S308
+
+
+#: Backgrounds for the initials tile, chosen by name so two people look different. They
+#: are spelled out here rather than built at runtime because the stylesheet is compiled
+#: from what appears in the source, and a class assembled from pieces would never be found.
+AVATAR_COLOURS = (
+    "bg-brand-600",
+    "bg-emerald-600",
+    "bg-amber-600",
+    "bg-rose-600",
+    "bg-sky-600",
+    "bg-violet-600",
+    "bg-teal-600",
+    "bg-orange-600",
+)
+
+
+def initials_for(user) -> str:
+    """Two letters for the tile: first and last name, or what the display name offers."""
+    first = (getattr(user, "first_name", "") or "").strip()
+    last = (getattr(user, "last_name", "") or "").strip()
+    if first and last:
+        return (first[0] + last[0]).upper()
+    words = [word for word in (user.display_name or "").replace(".", " ").split() if word]
+    if len(words) >= 2:
+        return (words[0][0] + words[1][0]).upper()
+    if words:
+        return words[0][:2].upper()
+    return "?"
+
+
+@register.simple_tag
+def avatar(user, css_class: str = "size-7 text-xs") -> str:
+    """An initials tile for ``user``, until a picture exists to show instead.
+
+    Decorative: it always stands beside the person's name. The colour is a stable
+    function of the display name, so it is the same on every page and every device.
+    """
+    name = user.display_name or ""
+    colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
+    return mark_safe(  # noqa: S308
+        f'<span class="{escape(css_class)} {colour} inline-flex shrink-0 select-none '
+        'items-center justify-center rounded-full font-semibold text-white" '
+        f'aria-hidden="true">{escape(initials_for(user))}</span>'
+    )
 
 
 @register.filter

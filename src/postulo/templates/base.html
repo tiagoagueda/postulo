@@ -55,19 +55,31 @@
             </nav>
 
             <div class="ml-auto flex items-center gap-1">
-              <a href="{% url 'jobs:capture_create' %}" class="btn-secondary mr-1">
-                {% translate "Capture" %}
-              </a>
-              <a href="{% url 'applications:create' %}" class="btn-primary mr-2">
-                {% translate "Record" %}
-              </a>
-              <a href="{% url 'accounts:profile' %}" class="{% nav_active 'accounts:profile' %}">
-                {{ user.display_name }}
-              </a>
-              <form method="post" action="{% url 'account_logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn-ghost">{% translate "Sign out" %}</button>
-              </form>
+              {# The account menu: a disclosure the browser opens and closes itself, with #}
+              {# the script only adding "close when the pointer goes elsewhere". #}
+              <details class="relative" data-menu>
+                <summary class="{% nav_active 'accounts:profile' %} flex cursor-pointer items-center gap-2"
+                         aria-label="{% blocktranslate trimmed with name=user.display_name %}Account menu, {{ name }}{% endblocktranslate %}">
+                  {% avatar user %}
+                  <span class="hidden sm:inline">{{ user.display_name }}</span>
+                  {% icon "chevron-down" class="size-4 text-ink-400" %}
+                </summary>
+                <div class="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border border-ink-200 bg-white py-1 shadow-lg dark:border-ink-800 dark:bg-ink-900">
+                  <a href="{% url 'accounts:profile' %}" class="menu-item">
+                    {% icon "user" %}{% translate "Your details" %}
+                  </a>
+                  <a href="{% url 'core:export' %}" class="menu-item">
+                    {% icon "download" %}{% translate "Export everything" %}
+                  </a>
+                  <div class="my-1 border-t border-ink-200 dark:border-ink-800" role="separator"></div>
+                  <form method="post" action="{% url 'account_logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="menu-item">
+                      {% icon "log-out" %}{% translate "Sign out" %}
+                    </button>
+                  </form>
+                </div>
+              </details>
               {% include "core/partials/theme_switch.html" %}
             </div>
           {% else %}

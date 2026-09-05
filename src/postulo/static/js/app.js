@@ -46,4 +46,35 @@
     form.dataset.current = choice.value;
     choice.value = NEXT_THEME[choice.value] || "system";
   });
+
+  // The account menu is a <details> element, which opens and closes itself and is
+  // keyboard-operable without help. What it does not do is close when the pointer goes
+  // elsewhere or Escape is pressed, so that part is added here.
+  function closeMenus(except) {
+    document.querySelectorAll("details[data-menu][open]").forEach(function (menu) {
+      if (menu !== except) {
+        menu.removeAttribute("open");
+      }
+    });
+  }
+
+  document.addEventListener("click", function (event) {
+    closeMenus(event.target.closest("details[data-menu]"));
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") {
+      return;
+    }
+    var open = document.querySelector("details[data-menu][open]");
+    if (!open) {
+      return;
+    }
+    var inside = open.contains(document.activeElement);
+    closeMenus(null);
+    var summary = open.querySelector("summary");
+    if (inside && summary) {
+      summary.focus();
+    }
+  });
 })();

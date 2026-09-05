@@ -9,7 +9,8 @@ address; there are no usernames.
 
 ## 2. Fill in your details
 
-**Your name → Your details.**
+**Your name, top right → Your details.** The menu under your name also holds *Export
+everything* and *Sign out*.
 
 This is the contact block that gets printed at the top of your CVs: your name, email,
 phone, location and links. It is worth doing first, because every CV you generate reads
@@ -24,7 +25,7 @@ The same page holds three preferences:
 
 ## 3. Record an application
 
-**Record an application**, in the top right of every page.
+**Record an application**, on the dashboard or on the Applications page.
 
 Only the company and the job title are required. The company is matched by name and
 created for you if it is new, so you never have to set one up first.

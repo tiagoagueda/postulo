@@ -6,6 +6,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The header's right side is now the account menu — an initials tile, the name, and a
+  disclosure holding *Your details*, *Export everything* and *Sign out* — beside the theme
+  switch. *Capture* and *Record* moved to the dashboard, which had relied on the header
+  for both. (#10)
+
 ### Added
 
 - A theme switch in the header, cycling light, dark and match-the-system. It applies at
