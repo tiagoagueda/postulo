@@ -6,6 +6,7 @@
 - [Accounts and invitations](Accounts-and-invitations)
 - [Backups and your data](Backups-and-your-data)
 - [Hardening](Hardening)
+- [Accessibility](Accessibility)
 - [Troubleshooting](Troubleshooting)
 
 **Using it**

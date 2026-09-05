@@ -23,14 +23,14 @@
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
         {% if company.website %}
           <a href="{{ company.website }}" rel="noopener noreferrer external" target="_blank"
-             class="text-brand-600 hover:underline dark:text-brand-400">{{ company.website|cut:"https://"|cut:"http://" }}</a>
+             class="text-brand-600 underline dark:text-brand-400">{{ company.website|cut:"https://"|cut:"http://" }}</a>
         {% else %}—{% endif %}
       </td>
     {% elif column.key == 'careers' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
         {% if company.careers_url %}
           <a href="{{ company.careers_url }}" rel="noopener noreferrer external" target="_blank"
-             class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Openings" %}</a>
+             class="text-brand-600 underline dark:text-brand-400">{% translate "Openings" %}</a>
         {% else %}—{% endif %}
       </td>
     {% elif column.key == 'notes' %}

@@ -32,11 +32,11 @@
     <div class="mb-6 flex flex-wrap gap-4 text-sm">
       {% if company.website %}
         <a href="{{ company.website }}" rel="noopener noreferrer external" target="_blank"
-           class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Website" %}</a>
+           class="text-brand-600 underline dark:text-brand-400">{% translate "Website" %}</a>
       {% endif %}
       {% if company.careers_url %}
         <a href="{{ company.careers_url }}" rel="noopener noreferrer external" target="_blank"
-           class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Careers page" %}</a>
+           class="text-brand-600 underline dark:text-brand-400">{% translate "Careers page" %}</a>
       {% endif %}
     </div>
   {% endif %}
@@ -49,7 +49,7 @@
           <ul class="divide-y divide-ink-100 dark:divide-ink-800">
             {% for posting in postings %}
               <li class="px-4 py-3">
-                <a href="{{ posting.get_absolute_url }}" class="font-medium hover:underline">
+                <a href="{{ posting.get_absolute_url }}" class="inline-block py-1 font-medium hover:underline">
                   {{ posting.title }}
                 </a>
                 <p class="text-sm text-ink-500 dark:text-ink-400">
@@ -81,7 +81,7 @@
       <div class="mb-3 flex items-center justify-between">
         <h2 class="font-medium">{% translate "People" %}</h2>
         <a href="{% url 'jobs:contact_create' %}?company={{ company.pk }}"
-           class="text-sm text-brand-600 hover:underline dark:text-brand-400">{% translate "Add" %}</a>
+           class="text-sm text-brand-600 underline dark:text-brand-400">{% translate "Add" %}</a>
       </div>
       {% if contacts %}
         <div class="card p-0">

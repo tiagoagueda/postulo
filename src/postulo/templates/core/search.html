@@ -5,9 +5,11 @@
 
 {% block content %}
   <div class="mx-auto max-w-3xl">
-    <form method="get" action="{% url 'core:search' %}" role="search" class="mb-6 flex items-end gap-3">
+    <h1 class="mb-4 text-2xl font-semibold tracking-tight">{% translate "Search" %}</h1>
+    <form method="get" action="{% url 'core:search' %}" role="search"
+          aria-labelledby="search-q-label" class="mb-6 flex items-end gap-3">
       <div class="flex-1">
-        <label class="field-label" for="search-q">{% translate "Search everything" %}</label>
+        <label class="field-label" for="search-q" id="search-q-label">{% translate "Search everything" %}</label>
         <input type="search" id="search-q" name="q" value="{{ query }}" class="field-input w-full"
                autofocus placeholder="{% translate 'A company, a role, a phrase from a letter, a name…' %}">
       </div>
@@ -55,7 +57,7 @@
             </ul>
           </div>
           {% if group.has_more %}
-            <a href="{{ group.more_url }}" class="mt-2 inline-block text-sm text-brand-600 hover:underline dark:text-brand-400">
+            <a href="{{ group.more_url }}" class="mt-2 inline-block text-sm text-brand-600 underline dark:text-brand-400">
               {% blocktranslate count counter=group.total with label=group.label trimmed %}
                 All {{ counter }} in {{ label }}
               {% plural %}

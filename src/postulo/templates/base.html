@@ -11,6 +11,8 @@
   </head>
 
   <body class="min-h-screen">
+    {# The first thing Tab reaches: past the header, straight to the page. #}
+    <a href="#main" class="skip-link">{% translate "Skip to content" %}</a>
     {% block chrome %}
       <header class="border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900">
         <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
@@ -54,7 +56,8 @@
 
             <div class="ml-auto flex items-center gap-1">
               {# One box over everything. Small until it has focus; "/" jumps to it. #}
-              <form method="get" action="{% url 'core:search' %}" role="search" class="hidden md:block">
+              <form method="get" action="{% url 'core:search' %}" role="search"
+                    aria-label="{% translate 'Site search' %}" class="hidden md:block">
                 <label for="site-search" class="sr-only">{% translate "Search everything" %}</label>
                 <input type="search" id="site-search" name="q" value="{% if request.resolver_match.view_name == 'core:search' %}{{ request.GET.q }}{% endif %}"
                        placeholder="{% translate 'Search  /' %}" data-search-shortcut
@@ -104,7 +107,7 @@
       </header>
     {% endblock %}
 
-    <main class="mx-auto max-w-7xl px-4 py-8">
+    <main id="main" tabindex="-1" class="mx-auto max-w-7xl px-4 py-8 outline-none">
       {% include "partials/messages.html" %}
       {# `main` exists so that an area such as Settings can wrap `content` in a layout of #}
       {# its own; pages — allauth's included — keep overriding `content` as they always did. #}

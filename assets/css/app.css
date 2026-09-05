@@ -30,8 +30,8 @@
   --color-ink-100: oklch(0.968 0.003 250);
   --color-ink-200: oklch(0.922 0.005 250);
   --color-ink-300: oklch(0.86 0.008 250);
-  --color-ink-400: oklch(0.68 0.012 250);
-  --color-ink-500: oklch(0.55 0.015 250);
+  --color-ink-400: oklch(0.54 0.012 250);
+  --color-ink-500: oklch(0.5 0.015 250);
   --color-ink-600: oklch(0.44 0.016 250);
   --color-ink-700: oklch(0.36 0.016 250);
   --color-ink-800: oklch(0.26 0.014 250);
@@ -54,6 +54,19 @@
 /* --------------------------------------------------------------- base layer */
 
 @layer base {
+  /*
+   * The two muted greys are the only shades that differ per theme. Small text in ink-400
+   * needs 4.5:1 against white (so it is fairly dark in the light theme) and against
+   * near-black (so it is fairly light in the dark one); one value cannot do both, and the
+   * utilities read the variable, so redefining it here is enough.
+   */
+  :root {
+    @variant dark {
+      --color-ink-400: oklch(0.68 0.012 250);
+      --color-ink-500: oklch(0.6 0.015 250);
+    }
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
   }
@@ -226,4 +239,26 @@ details[data-menu] > summary::-webkit-details-marker {
 .htmx-request .htmx-indicator,
 .htmx-request.htmx-indicator {
   @apply visible opacity-100;
+}
+
+/* Accessibility: the skip link is visible only when it has focus, and nothing moves for
+   someone who asked their system for less motion. */
+@layer components {
+  .skip-link {
+    @apply sr-only;
+  }
+  .skip-link:focus {
+    @apply not-sr-only fixed left-4 top-4 z-50 rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

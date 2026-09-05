@@ -66,14 +66,15 @@ def icon(name: str, label: str = "", **attrs: str) -> str:
 #: are spelled out here rather than built at runtime because the stylesheet is compiled
 #: from what appears in the source, and a class assembled from pieces would never be found.
 AVATAR_COLOURS = (
+    # Each gives white text at least 5:1, which the two small letters need.
     "bg-brand-600",
-    "bg-emerald-600",
-    "bg-amber-600",
-    "bg-rose-600",
-    "bg-sky-600",
+    "bg-emerald-700",
+    "bg-amber-700",
+    "bg-rose-700",
+    "bg-sky-700",
     "bg-violet-600",
-    "bg-teal-600",
-    "bg-orange-600",
+    "bg-teal-700",
+    "bg-orange-700",
 )
 
 

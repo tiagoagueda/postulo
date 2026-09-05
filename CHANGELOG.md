@@ -8,6 +8,19 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **Three template notes were printing themselves on the page.** Django's `{# #}` comment
+  is single-line only; spread over several lines it is text, and the notes above the
+  Columns menu, the filters and the table header appeared on every table page with their
+  braces. One of them mentioned `<details>`, which the browser took literally, so the
+  Columns menu sat inside a stray closed disclosure and could not be reached at all from
+  the keyboard. The six offenders are proper comment blocks now, and a test refuses any
+  new multi-line `{# #}`. (#41)
+- **Small grey text was too faint to pass.** The muted grey used for timestamps, counts
+  and hints read at 2.9:1 against white; it now reads at 5:1 in the light theme and keeps
+  its lighter value in the dark one, where it already passed. The initials tiles beside
+  names use darker backgrounds for the same reason, links inside sentences are underlined
+  rather than told apart by colour alone, the search page has a heading and its two search
+  landmarks are named, and a posting title in a company's list is a full-height target. (#41)
 - Four actions — changing a status from the board, completing a reminder, the *Gone
   quiet* buttons, an interview's outcome — and the career record's move buttons followed
   a `next` parameter without checking it stayed on this site, so a hostile page could
@@ -52,6 +65,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **An accessibility programme with machinery behind it.** The browser tests now run
+  axe-core over every page they visit — thirty-odd, signed in and out — against WCAG 2.2
+  at levels A and AA, and a violation fails the build naming the element and the rule.
+  A *Skip to content* link is the first thing Tab reaches, the main region takes focus,
+  and animation respects *prefers-reduced-motion*. The wiki gains an accessibility
+  statement: what to expect, what is checked, what is known not to be, and that a feature
+  somebody cannot use is a bug. (#41)
 - **A security programme with machinery behind it.** A `tests/security` package of tests
   each saying what an attacker would try — sending a person elsewhere through `next`,
   forging a form, calling the API on a session, fixing a session id, guessing passwords,

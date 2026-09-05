@@ -189,6 +189,9 @@ jobs:
       - name: Install Chromium for Playwright
         run: uv run playwright install --with-deps chromium
 
+      - name: Install axe-core for the accessibility checks
+        run: npm ci
+
       - name: Drive the critical path in a browser
         run: >
           uv run pytest -m e2e --browser chromium

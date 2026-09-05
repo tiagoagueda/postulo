@@ -1,8 +1,8 @@
 {% load i18n postulo %}
-{# The header of a configurable table: sort links, and beneath them the filter inputs.
+{% comment %} The header of a configurable table: sort links, and beneath them the filter inputs.
    Every input is associated with the filter form (`form=`) so the plain Apply button
    works without scripts, and carries htmx attributes so typing narrows the table live.
-   Text inputs are preserved across swaps, so a keystroke in flight is never lost. #}
+   Text inputs are preserved across swaps, so a keystroke in flight is never lost. {% endcomment %}
 <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
               dark:border-ink-800 dark:text-ink-400">
   <tr>
@@ -71,6 +71,6 @@
     </tr>
   {% endif %}
 </thead>
-{# The sort in force travels with the filters, so narrowing never resets it. It lives
-   inside the swapped region so it is always the one the server last used. #}
+{% comment %} The sort in force travels with the filters, so narrowing never resets it. It lives
+   inside the swapped region so it is always the one the server last used. {% endcomment %}
 <input type="hidden" name="sort" value="{{ table.sort }}" form="{{ form_id }}">

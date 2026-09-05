@@ -105,7 +105,9 @@ and a pull request that introduces one will be asked to fix it first.
 - **Accessible by construction.** Every input has a `<label>`; icons that stand alone get a
   `label`, the rest are decorative; anything that changes without a page load sits in a
   live region or is announced; `<details>` and real links before scripted widgets; test
-  the page with the keyboard alone before calling it done.
+  the page with the keyboard alone before calling it done. The browser suite runs axe-core
+  over every page it visits (`uv run pytest -m e2e tests/e2e/test_accessibility.py`); add
+  a new page to its list.
 - Keep commits focused, and describe *why* in the message rather than *what*.
 
 ## Documentation

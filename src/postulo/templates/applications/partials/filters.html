@@ -1,6 +1,6 @@
 {% load i18n %}
-{# Shared by the board and the table. Given a `table_id`, the table's version narrows
-   live as you type; the board's stays a plain form. #}
+{% comment %} Shared by the board and the table. Given a `table_id`, the table's version narrows
+   live as you type; the board's stays a plain form. {% endcomment %}
 <form method="get" {% if form_id %}id="{{ form_id }}"{% endif %} class="mb-6 flex flex-wrap items-end gap-3"
       {% if table_id %}hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
       hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}>
