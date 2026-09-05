@@ -22,6 +22,8 @@ from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.jobs.models import JobPosting, ListingState
+
 from .models import Application, ApplicationEvent, Status
 
 #: The stages a funnel counts, in order. Each is "reached this, ever".
@@ -89,6 +91,15 @@ class Insights:
     still_waiting: int = 0
     sources: list[SourceRow] = field(default_factory=list)
     by_month: list[tuple[str, int]] = field(default_factory=list)
+    #: The stage before applications: how many listings were noticed, and what became of them.
+    listings_noted: int = 0
+    listings_applied: int = 0
+    listings_discarded: int = 0
+
+    @property
+    def selectivity(self) -> float | None:
+        """The share of noticed listings that turned into an application."""
+        return 100 * self.listings_applied / self.listings_noted if self.listings_noted else None
 
     @property
     def response_rate(self) -> float | None:
@@ -152,6 +163,12 @@ def build(user) -> Insights:
         Application.objects.for_user(user).select_related("posting", "posting__company")
     )
     insights = Insights(total=len(applications))
+
+    listings = JobPosting.objects.for_user(user)
+    insights.listings_noted = listings.count()
+    insights.listings_applied = listings.in_state("applied").count()
+    insights.listings_discarded = listings.in_state(ListingState.DISCARDED).count()
+
     if not applications:
         return insights
 

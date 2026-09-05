@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% load i18n postulo %}
+
+{% block title %}{% translate "Listings" %}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Listings" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Every posting you have noticed, until you decide: shortlist it, discard it, or apply." %}
+      </p>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="{% url 'jobs:capture_create' %}" class="btn-secondary">{% translate "Capture a posting" %}</a>
+      <a href="{% url 'listings:create' %}" class="btn-primary">{% translate "Add a listing" %}</a>
+    </div>
+  </div>
+
+  {% if pending_captures %}
+    <section class="card mb-6 border-brand-200 dark:border-brand-800" aria-labelledby="captures-heading">
+      <h2 id="captures-heading" class="mb-3 font-medium">
+        {% blocktranslate count counter=pending_captures|length trimmed %}
+          One capture waiting for review
+        {% plural %}
+          {{ counter }} captures waiting for review
+        {% endblocktranslate %}
+      </h2>
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for capture in pending_captures %}
+          <li class="flex items-center gap-3 py-2">
+            <div class="min-w-0 flex-1">
+              <p class="truncate font-medium">{{ capture }}</p>
+              <p class="truncate text-xs text-ink-500 dark:text-ink-400">
+                {{ capture.data.company_name|default:"—" }} · {{ capture.created_at|date:"j M Y, H:i" }}
+              </p>
+            </div>
+            <a href="{% url 'jobs:capture_review' capture.pk %}" class="btn-secondary shrink-0">
+              {% translate "Review" %}
+            </a>
+            <form method="post" action="{% url 'jobs:capture_discard' capture.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                {% translate "Discard" %}
+              </button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <nav class="mb-4 flex flex-wrap gap-1" aria-label="{% translate 'Listing filters' %}">
+    {% for filter in filters %}
+      <a href="?state={{ filter.value }}"
+         class="{% if filter.active %}nav-link-active{% else %}nav-link{% endif %} flex items-center gap-2"
+         {% if filter.active %}aria-current="page"{% endif %}>
+        {{ filter.label }}
+        <span class="text-xs tabular-nums text-ink-400">{{ filter.count }}</span>
+      </a>
+    {% endfor %}
+  </nav>
+
+  {% if listings %}
+    <div class="card overflow-x-auto p-0">
+      <table class="w-full text-left text-sm">
+        <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
+                      dark:border-ink-800 dark:text-ink-400">
+          <tr>
+            <th class="px-4 py-3 font-medium">{% translate "Role" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Company" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Location" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "Closes" %}</th>
+            <th class="px-4 py-3 font-medium">{% translate "State" %}</th>
+            <th class="px-4 py-3 font-medium"><span class="sr-only">{% translate "Actions" %}</span></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for listing in listings %}
+            <tr data-listing-state="{{ listing.derived_state }}">
+              <td class="px-4 py-3">
+                <a href="{{ listing.get_absolute_url }}" class="font-medium hover:underline">{{ listing.title }}</a>
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {% blocktranslate with when=listing.noted_at|date:"j M" trimmed %}noted {{ when }}{% endblocktranslate %}
+                  {% if listing.source %} · {{ listing.source }}{% endif %}
+                </p>
+              </td>
+              <td class="px-4 py-3">
+                <a href="{{ listing.company.get_absolute_url }}" class="hover:underline">{{ listing.company.name }}</a>
+              </td>
+              <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ listing.location|default:"—" }}</td>
+              <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
+                {% if listing.closes_at %}{{ listing.closes_at|date:"j M Y" }}{% else %}—{% endif %}
+              </td>
+              <td class="px-4 py-3">
+                <span class="rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-700 dark:bg-ink-800 dark:text-ink-200">
+                  {{ listing.derived_state_label }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end gap-1">
+                  {% if listing.is_undecided %}
+                    {% if listing.state != "shortlisted" %}
+                      <form method="post" action="{% url 'listings:shortlist' listing.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Shortlist" %}</button>
+                      </form>
+                    {% endif %}
+                    <form method="post" action="{% url 'listings:discard' listing.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                      <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                        {% translate "Discard" %}
+                      </button>
+                    </form>
+                    <a href="{% url 'listings:apply' listing.pk %}" class="btn-primary px-3 py-1 text-xs">
+                      {% translate "Apply" %}
+                    </a>
+                  {% elif listing.derived_state == "discarded" %}
+                    <form method="post" action="{% url 'listings:restore' listing.pk %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                      <button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Restore" %}</button>
+                    </form>
+                  {% elif listing.derived_state == "applied" %}
+                    {% with application=listing.applications.all|first %}
+                      {% if application %}
+                        <a href="{{ application.get_absolute_url }}" class="btn-ghost px-2 py-1 text-xs">
+                          {% translate "Application" %}
+                        </a>
+                      {% endif %}
+                    {% endwith %}
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if is_paginated %}
+      <nav class="mt-4 flex items-center gap-2 text-sm" aria-label="{% translate 'Pagination' %}">
+        {% if page_obj.has_previous %}
+          <a href="?state={{ current_filter }}&page={{ page_obj.previous_page_number }}"
+             class="btn-secondary">{% translate "Previous" %}</a>
+        {% endif %}
+        <span class="text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed with current=page_obj.number total=paginator.num_pages %}
+            Page {{ current }} of {{ total }}
+          {% endblocktranslate %}
+        </span>
+        {% if page_obj.has_next %}
+          <a href="?state={{ current_filter }}&page={{ page_obj.next_page_number }}"
+             class="btn-secondary">{% translate "Next" %}</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="card py-12 text-center">
+      {% if current_filter == "undecided" %}
+        <p class="mb-1 font-medium">{% translate "Nothing to decide" %}</p>
+        <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Capture a posting from its address, or add one by hand, and it waits here for you." %}
+        </p>
+        <a href="{% url 'listings:create' %}" class="btn-primary">{% translate "Add a listing" %}</a>
+      {% else %}
+        <p class="font-medium">{% translate "Nothing here" %}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

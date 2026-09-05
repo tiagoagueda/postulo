@@ -13,12 +13,20 @@ from postulo.jobs.models import Contact, EmploymentType, RemoteType, SalaryPerio
 from .models import Application, ApplicationEvent, Channel, EventKind, Priority, Reminder, Status
 
 
-class ApplicationIntakeForm(forms.Form):
-    """Everything needed to record a new application, on one page.
+class UserAwareForm(forms.Form):
+    """A form that knows whose it is, so owner-scoped choices can be built."""
 
-    An application is almost always entered while looking at a posting, so splitting
-    this into "create a company", then "create a posting", then "create an application"
-    would be three forms for a single thought. The company is matched by name and
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+
+class PostingIntakeForm(UserAwareForm):
+    """The posting half of intake: a company by name, and what the listing says.
+
+    On its own it adds a listing and reviews a capture; :class:`ApplicationIntakeForm`
+    adds the person's side to it. Only the company and the title are required — a
+    listing can be thin, an application cannot. The company is matched by name and
     created if it is new.
     """
 
@@ -58,25 +66,6 @@ class ApplicationIntakeForm(forms.Form):
         label=_("Description"), required=False, widget=forms.Textarea(attrs={"rows": 8})
     )
 
-    status = forms.ChoiceField(label=_("Status"), choices=Status.choices, initial=Status.APPLIED)
-    channel = forms.ChoiceField(
-        label=_("Applied through"), choices=[("", "—"), *Channel.choices], required=False
-    )
-    priority = forms.TypedChoiceField(
-        label=_("Priority"), choices=Priority.choices, coerce=int, initial=Priority.NORMAL
-    )
-    deadline = forms.DateField(
-        label=_("Your deadline"), required=False, widget=forms.DateInput(attrs={"type": "date"})
-    )
-    tags = forms.ModelMultipleChoiceField(
-        label=_("Tags"), queryset=Tag.objects.none(), required=False
-    )
-
-    def __init__(self, *args, user=None, **kwargs):
-        self.user = user
-        super().__init__(*args, **kwargs)
-        self.fields["tags"].queryset = Tag.objects.for_user(user)
-
     def clean(self):
         cleaned = super().clean()
         low, high = cleaned.get("salary_min"), cleaned.get("salary_max")
@@ -106,6 +95,31 @@ class ApplicationIntakeForm(forms.Form):
         data.update({key: self.cleaned_data.get(key) for key in self.POSTING_NULLABLE_FIELDS})
         return data
 
+
+class ApplicationDetailsForm(UserAwareForm):
+    """The person's side of an application: status, channel, priority, deadline, tags.
+
+    On its own it is the *Apply* step for a listing that already exists.
+    """
+
+    status = forms.ChoiceField(label=_("Status"), choices=Status.choices, initial=Status.APPLIED)
+    channel = forms.ChoiceField(
+        label=_("Applied through"), choices=[("", "—"), *Channel.choices], required=False
+    )
+    priority = forms.TypedChoiceField(
+        label=_("Priority"), choices=Priority.choices, coerce=int, initial=Priority.NORMAL
+    )
+    deadline = forms.DateField(
+        label=_("Your deadline"), required=False, widget=forms.DateInput(attrs={"type": "date"})
+    )
+    tags = forms.ModelMultipleChoiceField(
+        label=_("Tags"), queryset=Tag.objects.none(), required=False
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["tags"].queryset = Tag.objects.for_user(self.user)
+
     @property
     def application_data(self) -> dict:
         return {
@@ -114,6 +128,16 @@ class ApplicationIntakeForm(forms.Form):
             "priority": self.cleaned_data.get("priority") or Priority.NORMAL,
             "deadline": self.cleaned_data.get("deadline"),
         }
+
+
+class ApplicationIntakeForm(PostingIntakeForm, ApplicationDetailsForm):
+    """Everything needed to record a new application, on one page.
+
+    An application is almost always entered while looking at a posting, so splitting
+    this into "create a company", then "create a posting", then "create an application"
+    would be three forms for a single thought. Underneath, it is a listing and then an
+    application for it, exactly as if the two steps had been taken apart.
+    """
 
 
 class ApplicationForm(OwnerScopedModelForm):

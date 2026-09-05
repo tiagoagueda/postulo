@@ -11,7 +11,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 
 from .forms import CompanyForm, ContactForm, JobPostingForm
-from .models import Company, Contact, JobPosting
+from .models import Company, Contact, DiscardReason, JobPosting
 
 
 class UserFormKwargsMixin:
@@ -159,7 +159,12 @@ class PostingDetailView(OwnedObjectMixin, DetailView):
     context_object_name = "posting"
 
     def get_queryset(self):
-        return super().get_queryset().select_related("company")
+        return super().get_queryset().select_related("company").with_application_count()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["discard_reasons"] = DiscardReason.choices
+        return context
 
 
 class PostingUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):

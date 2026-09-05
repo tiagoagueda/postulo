@@ -28,12 +28,16 @@ How Postulo behaves for you lives under **Settings**, one section per page:
   posting (see [The capture API](The-capture-API)).
 - **Your data** — the export.
 
-## 3. Record an application
+## 3. Note what you find, then apply
 
-**Record an application**, on the dashboard or on the Applications page.
+Postings you notice go into **Listings** first: capture one from its address, or **Add a
+listing** by hand. Only the company and the job title are required; the company is
+matched by name and created for you if it is new, so you never have to set one up first.
+From there, each listing is shortlisted, discarded, or applied to — and **Apply** is what
+turns it into an application with a timeline. See [Listings](Listings).
 
-Only the company and the job title are required. The company is matched by name and
-created for you if it is new, so you never have to set one up first.
+Already applied somewhere? **Record an application**, on the dashboard or on the
+Applications page, does both steps in one form.
 
 Two fields are worth filling in even when you are in a hurry:
 

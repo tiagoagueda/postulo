@@ -1,5 +1,9 @@
 # Tracking applications
 
+An application begins as a listing — a posting you noticed — and becomes an application
+the moment you apply to it. That first stage has its own page: [Listings](Listings). This
+one is about what happens from the application onwards.
+
 ## Statuses
 
 | Status | What it means |
@@ -77,7 +81,8 @@ record of the same employer, and neither can see the other's opinion of them.
 ## Not retyping adverts
 
 Paste a posting's address and Postulo will read the page for you — see
-[Capturing postings](Capturing-postings).
+[Capturing postings](Capturing-postings). What it reads lands in your
+[Listings](Listings), and applying from there is one short form.
 
 ## What the record adds up to
 

@@ -61,6 +61,16 @@
       </div>
     </div>
 
+    {% if insights.listings_noted %}
+      <p class="mb-8 text-sm text-ink-500 dark:text-ink-400" data-selectivity>
+        {% blocktranslate count counter=insights.listings_noted with applied=insights.listings_applied discarded=insights.listings_discarded share=insights.selectivity|floatformat:0 trimmed %}
+          You have noticed {{ counter }} listing; applied to {{ applied }} ({{ share }}%) and discarded {{ discarded }}.
+        {% plural %}
+          You have noticed {{ counter }} listings; applied to {{ applied }} ({{ share }}%) and discarded {{ discarded }}.
+        {% endblocktranslate %}
+      </p>
+    {% endif %}
+
     <div class="grid gap-6 lg:grid-cols-3">
 
       <section class="lg:col-span-2">

@@ -9,13 +9,15 @@ Rather than retyping an advert, paste its address and let Postulo read the page.
 1. Postulo fetches the one page you pasted.
 2. It reads what it can — usually from the structured data the site publishes about
    itself for search engines.
-3. It shows you the result in the ordinary application form, for you to correct.
-4. Nothing is recorded until you accept it.
+3. It shows you the result in the posting form, for you to correct.
+4. Nothing is recorded until you save it — and what you save is a **listing**, something
+   noticed and not yet decided about. Tick *I have already applied to this one* and it
+   becomes an application straight away.
 
 That fourth step is not a formality. A parser reading markup it has never seen gets
 things wrong, and a job title invented by a computer is exactly the sort of error you
-would not spot six weeks later. Everything captured waits under **Captures** until you
-have looked at it.
+would not spot six weeks later. Everything captured waits at the top of the
+[Listings](Listings) page until you have looked at it.
 
 ## What it can read
 
@@ -78,15 +80,16 @@ This is exactly what the planned browser extension will automate.
 
 ## When nothing can be read at all
 
-If a page carries no structured data and no usable title, use **Record an application**
-and type it in. Same form, without the pre-filling.
+If a page carries no structured data and no usable title, use **Add a listing** on the
+Listings page and type it in — or **Record an application** if you have already applied.
+Same forms, without the pre-filling.
 
 ## Captures waiting for you
 
-**Dashboard → Captures awaiting review**, or the Captures page.
+At the top of the **Listings** page, and counted on the dashboard.
 
-Each capture can be reviewed — which opens the pre-filled form — or discarded. Accepting
-one creates the application and links the two, so the record shows where it came from.
+Each capture can be reviewed — which opens the pre-filled form — or discarded. Saving
+one creates the listing and links the two, so the record shows where it came from.
 
 ## Capturing from elsewhere
 

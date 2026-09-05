@@ -25,7 +25,7 @@ These were settled before any code was written, because each one is expensive to
 | Tenancy | **Multi-user from day one** | Every user-owned model carries an owner; every query is scoped. No painful retrofit later. |
 | Documents | **Hybrid** | Structured CV content is the source of truth *and* externally authored files can be uploaded and versioned. |
 | AI assistance | **Not in v1** | The application is complete and useful without an API key. A plugin can add it later against the same contracts. |
-| Posting capture | **Manual and URL, plugin-extensible** | A plugin interface and a capture API exist from M4, so a browser extension is a later addition rather than a rewrite. |
+| Posting capture | **Manual and URL, plugin-extensible** | A plugin interface and a capture API exist from M4, so a browser extension is a later addition rather than a rewrite. Since 0.2.0 everything captured or typed lands in *Listings* first — the stage before applications, where a posting is shortlisted, discarded or applied to (#25). |
 | Languages | **en-GB source; fr-FR and pt-PT via contributors** | Every user-facing string is translatable from the first commit. |
 | Licence | **AGPL-3.0-or-later** | A modified Postulo run as a service must offer its source. |
 | Hosting | **Forgejo primary, GitHub mirror** | CI lives in `.forgejo/`, which GitHub ignores. Issues and pull requests belong on Forgejo. |
@@ -232,6 +232,8 @@ rather than a rewrite.
 - **Built-in source.** schema.org `JobPosting` JSON-LD extraction, which most large
   boards embed, falling back to readability text extraction and then to a pre-filled
   manual form. Captures always land in a review screen; nothing is saved on a guess.
+  What the review saves is a listing (0.2.0, #25): the person then shortlists, discards
+  or applies, and only *Apply* creates an application.
 - **API surface.** `POST /api/v1/captures`, authenticated with per-device capture tokens
   that are hashed at rest, scoped and revocable.
 - **Good citizenship.** A single page fetch that the user initiated, honouring

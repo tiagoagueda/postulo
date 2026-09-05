@@ -9,6 +9,7 @@
 
 **Using it**
 - [Getting started](Getting-started)
+- [Listings](Listings)
 - [Tracking applications](Tracking-applications)
 - [Capturing postings](Capturing-postings)
 - [Insights](Insights)

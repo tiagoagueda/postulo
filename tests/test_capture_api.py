@@ -179,15 +179,13 @@ def test_the_review_page_arrives_pre_filled(client, user, pending):
     assert initial["company_name"] == "Black Mesa"
 
 
-def test_accepting_a_capture_creates_the_application_and_links_it(client, user, pending):
+def test_accepting_a_capture_makes_a_listing_and_links_it(client, user, pending):
     client.force_login(user)
     response = client.post(
         reverse("jobs:capture_review", args=[pending.pk]),
         {
             "company_name": "Black Mesa",
             "title": "Research Engineer",
-            "status": "applied",
-            "priority": "2",
             "salary_currency": "EUR",
             "salary_period": "year",
         },
@@ -196,8 +194,34 @@ def test_accepting_a_capture_creates_the_application_and_links_it(client, user, 
 
     assert response.status_code == 302
     assert pending.status == CaptureStatus.ACCEPTED
+    assert pending.posting is not None
+    assert pending.posting.title == "Research Engineer"
+    assert pending.posting.derived_state == "new", "a listing to decide about, not an application"
+    assert pending.application is None
+    assert response.url == pending.posting.get_absolute_url()
+    assert not Application.objects.for_user(user).exists()
+
+
+def test_accepting_a_capture_already_applied_to_makes_the_application_too(client, user, pending):
+    client.force_login(user)
+    response = client.post(
+        reverse("jobs:capture_review", args=[pending.pk]),
+        {
+            "company_name": "Black Mesa",
+            "title": "Research Engineer",
+            "salary_currency": "EUR",
+            "salary_period": "year",
+            "already_applied": "on",
+        },
+    )
+    pending.refresh_from_db()
+
+    assert response.status_code == 302
     assert pending.application is not None
-    assert pending.application.posting.title == "Research Engineer"
+    assert pending.application.posting == pending.posting
+    assert pending.application.status == "applied"
+    assert pending.posting.derived_state == "applied"
+    assert response.url == pending.application.get_absolute_url()
 
 
 def test_a_capture_can_be_discarded(client, user, pending):

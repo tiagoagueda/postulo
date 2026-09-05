@@ -179,6 +179,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
 
     # ------------------------------------------------ companies and their work
     contacts: dict[int, Contact] = {}
+    postings: dict[int, JobPosting] = {}
     applications: dict[int, Application] = {}
 
     for company_entry in document.get("companies", []):
@@ -203,13 +204,24 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
 
         for posting_entry in posting_entries:
             application_entries = posting_entry.pop("applications", [])
-            posting_entry.pop("id", None)
-            posting_entry.pop("created_at", None)
+            old_posting_id = posting_entry.pop("id", None)
+            created_at = _dt(posting_entry.pop("created_at", None))
             for name in ("posted_at", "closes_at"):
                 posting_entry[name] = _d(posting_entry.get(name))
             posting_entry["closed_at"] = _dt(posting_entry.get("closed_at"))
+            # Format 1 predates listings: a posting then existed only under an application,
+            # so it was noted and decided when it was created.
+            posting_entry["noted_at"] = _dt(posting_entry.get("noted_at")) or created_at
+            posting_entry["decided_at"] = _dt(posting_entry.get("decided_at")) or (
+                created_at if application_entries else None
+            )
+            if posting_entry.get("noted_at") is None:
+                posting_entry.pop("noted_at")
+            posting_entry.setdefault("state", "new")
+            posting_entry.setdefault("discard_reason", "")
 
             posting = JobPosting.objects.create(owner=user, company=company, **posting_entry)
+            postings[old_posting_id] = posting
             report.postings += 1
 
             for application_entry in application_entries:
@@ -358,7 +370,12 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         capture_entry.pop("id", None)
         capture_entry.pop("created_at", None)
         application = applications.get(capture_entry.pop("application_id", None))
-        Capture.objects.create(owner=user, application=application, **capture_entry)
+        posting = postings.get(capture_entry.pop("posting_id", None))
+        if posting is None and application is not None:
+            posting = application.posting
+        Capture.objects.create(
+            owner=user, application=application, posting=posting, **capture_entry
+        )
 
     return report
 

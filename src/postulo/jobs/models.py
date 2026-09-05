@@ -8,6 +8,8 @@ the same role a year later does not overwrite the first attempt.
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -98,6 +100,37 @@ class SalaryPeriod(models.TextChoices):
     HOUR = "hour", _("Per hour")
 
 
+class ListingState(models.TextChoices):
+    """Where a listing stands before anyone applies to it.
+
+    Two more states exist but are never stored, because they follow from other facts:
+    *applied*, when an application exists, and *closed*, when the opening is gone or its
+    closing date has passed. See :attr:`JobPosting.derived_state`.
+    """
+
+    NEW = "new", _("New")
+    SHORTLISTED = "shortlisted", _("Shortlisted")
+    DISCARDED = "discarded", _("Discarded")
+
+
+class DiscardReason(models.TextChoices):
+    NOT_FOR_ME = "not_for_me", _("Not for me")
+    PAY = "pay", _("The pay")
+    LOCATION = "location", _("The location")
+    CLOSED = "closed", _("Closed or already filled")
+    OTHER = "other", _("Other")
+
+
+#: The stored states a listing can be filtered by, plus the two derived ones.
+LISTING_FILTERS = (
+    ListingState.NEW,
+    ListingState.SHORTLISTED,
+    ListingState.DISCARDED,
+    "applied",
+    "closed",
+)
+
+
 class JobPostingQuerySet(models.QuerySet):
     def for_user(self, user) -> JobPostingQuerySet:
         if user is None or not getattr(user, "is_authenticated", False):
@@ -107,9 +140,51 @@ class JobPostingQuerySet(models.QuerySet):
     def open(self) -> JobPostingQuerySet:
         return self.filter(closed_at__isnull=True)
 
+    def with_application_count(self) -> JobPostingQuerySet:
+        return self.annotate(application_count=models.Count("applications", distinct=True))
+
+    def undecided(self) -> JobPostingQuerySet:
+        """New or shortlisted, not applied to, and still open: what the person must decide."""
+        return (
+            self.with_application_count()
+            .filter(
+                state__in=(ListingState.NEW, ListingState.SHORTLISTED),
+                application_count=0,
+                closed_at__isnull=True,
+            )
+            .exclude(closes_at__lt=timezone.localdate())
+        )
+
+    def closing_soon(self, days: int = 7) -> JobPostingQuerySet:
+        today = timezone.localdate()
+        return self.undecided().filter(
+            closes_at__gte=today, closes_at__lte=today + timedelta(days=days)
+        )
+
+    def in_state(self, state: str) -> JobPostingQuerySet:
+        """Filter by a stored state or one of the two derived ones."""
+        annotated = self.with_application_count()
+        if state == "applied":
+            return annotated.filter(application_count__gt=0)
+        if state == "closed":
+            return annotated.filter(application_count=0).filter(
+                models.Q(closed_at__isnull=False) | models.Q(closes_at__lt=timezone.localdate())
+            )
+        if state in ListingState.values:
+            return annotated.filter(
+                state=state, application_count=0, closed_at__isnull=True
+            ).exclude(closes_at__lt=timezone.localdate())
+        return annotated
+
 
 class JobPosting(OwnedModel):
-    """A specific opening at a company."""
+    """A specific opening at a company — a listing, until the person decides about it.
+
+    Every posting arrives here first, captured or typed, and waits: new, then shortlisted
+    or discarded by the person, and *applied* the moment an application exists. That last
+    state is never stored; it is read from the applications, so it can never disagree
+    with them.
+    """
 
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, related_name="postings", verbose_name=_("company")
@@ -161,12 +236,24 @@ class JobPosting(OwnedModel):
         help_text=_("Set when the opening is no longer available."),
     )
 
+    state = models.CharField(
+        _("state"), max_length=20, choices=ListingState, default=ListingState.NEW
+    )
+    discard_reason = models.CharField(
+        _("why it was discarded"), max_length=20, choices=DiscardReason, blank=True
+    )
+    noted_at = models.DateTimeField(
+        _("noted on"), default=timezone.now, help_text=_("When it entered your listings.")
+    )
+    decided_at = models.DateTimeField(_("decided on"), null=True, blank=True)
+
     objects = JobPostingQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("job posting")
         verbose_name_plural = _("job postings")
-        ordering = ("-created_at",)
+        ordering = ("-noted_at", "-created_at")
+        indexes = [models.Index(fields=("owner", "state"))]
 
     def __str__(self) -> str:
         return f"{self.title} — {self.company.name}"
@@ -177,6 +264,56 @@ class JobPosting(OwnedModel):
     @property
     def is_open(self) -> bool:
         return self.closed_at is None
+
+    @property
+    def is_past_closing(self) -> bool:
+        return self.closes_at is not None and self.closes_at < timezone.localdate()
+
+    @property
+    def has_applications(self) -> bool:
+        count = getattr(self, "application_count", None)
+        if count is None:
+            count = self.applications.count()
+        return count > 0
+
+    @property
+    def derived_state(self) -> str:
+        """What the listing is, all things considered: the stored state, or one it earned."""
+        if self.has_applications:
+            return "applied"
+        if self.state == ListingState.DISCARDED:
+            return ListingState.DISCARDED
+        if not self.is_open or self.is_past_closing:
+            return "closed"
+        return self.state
+
+    @property
+    def derived_state_label(self) -> str:
+        labels = {**dict(ListingState.choices), "applied": _("Applied"), "closed": _("Closed")}
+        return str(labels[self.derived_state])
+
+    @property
+    def is_undecided(self) -> bool:
+        return self.derived_state in (ListingState.NEW, ListingState.SHORTLISTED)
+
+    def shortlist(self) -> None:
+        self.state = ListingState.SHORTLISTED
+        self.discard_reason = ""
+        self.decided_at = timezone.now()
+        self.save(update_fields=["state", "discard_reason", "decided_at", "updated_at"])
+
+    def discard(self, reason: str = "") -> None:
+        self.state = ListingState.DISCARDED
+        self.discard_reason = reason
+        self.decided_at = timezone.now()
+        self.save(update_fields=["state", "discard_reason", "decided_at", "updated_at"])
+
+    def restore(self) -> None:
+        """Back to new, as if the decision had not been made."""
+        self.state = ListingState.NEW
+        self.discard_reason = ""
+        self.decided_at = None
+        self.save(update_fields=["state", "discard_reason", "decided_at", "updated_at"])
 
     def close(self) -> None:
         if self.closed_at is None:
@@ -241,6 +378,15 @@ class Capture(OwnedModel):
     data = models.JSONField(_("parsed posting"), default=dict)
     status = models.CharField(
         _("status"), max_length=20, choices=CaptureStatus, default=CaptureStatus.PENDING
+    )
+    posting = models.ForeignKey(
+        JobPosting,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="captures",
+        verbose_name=_("listing"),
+        help_text=_("The listing this capture became, once reviewed."),
     )
     application = models.ForeignKey(
         "applications.Application",

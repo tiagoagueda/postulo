@@ -8,6 +8,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Changed
 
+- **Listings: the stage before applications.** Every posting arrives in *Listings* first,
+  whether captured from a page or typed in, and waits as *new* until it is shortlisted,
+  discarded (with a reason, kept) or applied to. *Apply* is what creates the application;
+  *applied* and *closed* are read from the facts, never set by hand. Reviewing a capture
+  now saves a listing rather than an application, with an *I have already applied*
+  shortcut for recording after the fact; *Record an application* keeps doing both steps
+  in one form. Captures waiting for review sit at the top of the Listings page, and the
+  old captures page redirects there. The dashboard counts listings to decide on and those
+  closing this week; Insights reports selectivity. The export format is now 2 and the
+  importer still reads 1. Existing postings all had applications and show as applied. (#25)
 - **Accounts have a username.** Chosen at signup, 3 to 32 lowercase letters, digits,
   dots, underscores or hyphens; it signs in interchangeably with the email address, and
   it is what others on a shared instance see. Existing accounts were given one derived

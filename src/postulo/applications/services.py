@@ -103,17 +103,22 @@ def change_status(
 
 
 @transaction.atomic
-def create_application(owner, *, company: Company, posting_data: dict, application_data: dict):
-    """Create a posting and an application for it in one step.
+def create_listing(owner, *, company: Company, posting_data: dict) -> JobPosting:
+    """Add a listing: a posting the person has noticed and not yet decided about."""
+    return JobPosting.objects.create(owner=owner, company=company, **posting_data)
 
-    Applications are almost always entered while looking at a posting, so asking someone
-    to create a company, then a posting, then an application would be three forms for
-    one thought.
+
+@transaction.atomic
+def apply_to_listing(posting: JobPosting, application_data: dict) -> Application:
+    """The decision: an application for a listing.
+
+    The listing's derived state becomes *applied* by the mere existence of the
+    application; only the moment of decision is written down.
     """
-    posting = JobPosting.objects.create(owner=owner, company=company, **posting_data)
+    application_data = dict(application_data)
     status = application_data.pop("status", Status.DRAFT)
     application = Application.objects.create(
-        owner=owner, posting=posting, status=Status.DRAFT, **application_data
+        owner=posting.owner, posting=posting, status=Status.DRAFT, **application_data
     )
 
     record_event(
@@ -125,7 +130,22 @@ def create_application(owner, *, company: Company, posting_data: dict, applicati
     if status != Status.DRAFT:
         change_status(application, status)
 
+    if posting.decided_at is None:
+        posting.decided_at = timezone.now()
+        posting.save(update_fields=["decided_at", "updated_at"])
     return application
+
+
+@transaction.atomic
+def create_application(owner, *, company: Company, posting_data: dict, application_data: dict):
+    """Record a listing and an application for it in one step.
+
+    Applications are almost always entered while looking at a posting, so asking someone
+    to add a listing and then apply to it would be two forms for one thought. Underneath
+    it is exactly those two steps, so the data is the same whichever door was used.
+    """
+    posting = create_listing(owner, company=company, posting_data=posting_data)
+    return apply_to_listing(posting, application_data)
 
 
 def get_or_create_company(owner, name: str) -> Company:

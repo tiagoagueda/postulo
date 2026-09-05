@@ -9,6 +9,8 @@ job titles into the records people rely on.
 
 from __future__ import annotations
 
+import functools
+
 from django import forms
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -131,24 +133,43 @@ class CaptureListView(OwnedObjectMixin, ListView):
         return context
 
 
+@functools.cache
+def review_form_class():
+    """The posting half of intake, plus one question: has the person already applied?
+
+    Built lazily rather than at import: applications already depends on jobs, and
+    importing it back at import time would close the loop.
+    """
+    from postulo.applications.forms import PostingIntakeForm
+
+    class CaptureReviewForm(PostingIntakeForm):
+        already_applied = forms.BooleanField(
+            label=_("I have already applied to this one"),
+            required=False,
+            help_text=_(
+                "Ticked, the listing becomes an application straight away, marked as "
+                "applied today. Otherwise it waits in your listings for you to decide."
+            ),
+        )
+
+    return CaptureReviewForm
+
+
 class CaptureReviewView(OwnedObjectMixin, View):
-    """Show what was read, in the form that will create the application."""
+    """Show what was read, in the form that will make it a listing.
+
+    The correction step is what makes captures safe: a parser reading somebody else's
+    markup gets things wrong. Saving lands the result in the person's listings, not in
+    their applications — unless they say they have already applied, which is the common
+    case of recording after the fact, and then it becomes both.
+    """
 
     template_name = "jobs/capture_review.html"
 
     def get_queryset(self):
         return Capture.objects.for_user(self.request.user)
 
-    def _form_class(self):
-        # Imported here rather than at module scope: applications already depends on
-        # jobs, and importing it back at import time would close the loop.
-        from postulo.applications.forms import ApplicationIntakeForm
-
-        return ApplicationIntakeForm
-
     def _initial(self, capture: Capture) -> dict:
-        from postulo.applications.models import Status
-
         data = capture.posting_data
         return {
             "company_name": data.company_name,
@@ -164,37 +185,49 @@ class CaptureReviewView(OwnedObjectMixin, View):
             "salary_period": data.salary_period or "year",
             "closes_at": data.closes_at,
             "description": data.description,
-            "status": Status.DRAFT,
         }
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         capture = get_object_or_404(self.get_queryset(), pk=pk)
-        form = self._form_class()(initial=self._initial(capture), user=request.user)
+        form = review_form_class()(initial=self._initial(capture), user=request.user)
         return render(request, self.template_name, {"capture": capture, "form": form})
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
-        from postulo.applications.services import create_application, get_or_create_company
+        from postulo.applications.models import Priority, Status
+        from postulo.applications.services import (
+            apply_to_listing,
+            create_listing,
+            get_or_create_company,
+        )
 
         capture = get_object_or_404(self.get_queryset(), pk=pk)
-        form = self._form_class()(request.POST, user=request.user)
+        form = review_form_class()(request.POST, user=request.user)
         if not form.is_valid():
             return render(request, self.template_name, {"capture": capture, "form": form})
 
         company = get_or_create_company(request.user, form.cleaned_data["company_name"])
-        application = create_application(
-            request.user,
-            company=company,
-            posting_data=form.posting_data,
-            application_data=form.application_data,
-        )
-        application.tags.set(form.cleaned_data["tags"])
-
+        listing = create_listing(request.user, company=company, posting_data=form.posting_data)
         capture.status = CaptureStatus.ACCEPTED
-        capture.application = application
-        capture.save(update_fields=["status", "application", "updated_at"])
+        capture.posting = listing
 
-        messages.success(request, _("Application recorded from the capture."))
-        return redirect(application.get_absolute_url())
+        if form.cleaned_data.get("already_applied"):
+            application = apply_to_listing(
+                listing,
+                {
+                    "status": Status.APPLIED,
+                    "channel": "",
+                    "priority": Priority.NORMAL,
+                    "deadline": None,
+                },
+            )
+            capture.application = application
+            capture.save(update_fields=["status", "posting", "application", "updated_at"])
+            messages.success(request, _("Application recorded from the capture."))
+            return redirect(application.get_absolute_url())
+
+        capture.save(update_fields=["status", "posting", "updated_at"])
+        messages.success(request, _("Saved to your listings. Decide about it when you are ready."))
+        return redirect(listing.get_absolute_url())
 
 
 class CaptureDiscardView(OwnedObjectMixin, View):
@@ -206,7 +239,7 @@ class CaptureDiscardView(OwnedObjectMixin, View):
         capture.status = CaptureStatus.DISCARDED
         capture.save(update_fields=["status", "updated_at"])
         messages.success(request, _("Capture discarded."))
-        return redirect("jobs:capture_list")
+        return redirect("listings:list")
 
 
 capture_list_url = reverse_lazy("jobs:capture_list")

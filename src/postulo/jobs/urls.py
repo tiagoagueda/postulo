@@ -1,4 +1,5 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
+from django.views.generic import RedirectView
 
 from . import capture_views, views
 
@@ -13,7 +14,12 @@ urlpatterns = [
     path("contacts/new/", views.ContactCreateView.as_view(), name="contact_create"),
     path("contacts/<int:pk>/edit/", views.ContactUpdateView.as_view(), name="contact_update"),
     path("contacts/<int:pk>/delete/", views.ContactDeleteView.as_view(), name="contact_delete"),
-    path("captures/", capture_views.CaptureListView.as_view(), name="capture_list"),
+    # Captures waiting for review now sit at the top of the listings page.
+    path(
+        "captures/",
+        RedirectView.as_view(url=reverse_lazy("listings:list"), permanent=False),
+        name="capture_list",
+    ),
     path("captures/new/", capture_views.CaptureCreateView.as_view(), name="capture_create"),
     path(
         "captures/<int:pk>/review/",

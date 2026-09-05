@@ -1,24 +1,14 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Review the capture" %}{% endblock %}
+{% block title %}{% translate "Add a listing" %}{% endblock %}
 
 {% block content %}
   <div class="mx-auto max-w-3xl">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Review the capture" %}</h1>
-    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-      {% blocktranslate trimmed with source=capture.source_name %}
-        Read by {{ source }}. Check it before saving — a parser reading somebody else's
-        markup gets things wrong, which is why nothing has been recorded yet.
-      {% endblocktranslate %}
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Add a listing" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "A posting you have noticed. The company and the title are enough to start; the rest can come later." %}
     </p>
-
-    {% if capture.url %}
-      <p class="mb-6 truncate text-sm">
-        <a href="{{ capture.url }}" rel="noopener noreferrer external" target="_blank"
-           class="text-brand-600 hover:underline dark:text-brand-400">{{ capture.url }}</a>
-      </p>
-    {% endif %}
 
     <form method="post" novalidate>
       {% csrf_token %}
@@ -54,32 +44,15 @@
         </div>
       </div>
 
-      <div class="card mb-4">
+      <div class="card mb-6">
         <h2 class="mb-4 font-medium">{% translate "The posting itself" %}</h2>
         {% include "partials/field.html" with field=form.description %}
       </div>
 
-      <div class="card mb-6">
-        <label class="flex items-start gap-3 text-sm">
-          {{ form.already_applied }}
-          <span>
-            <span class="font-medium">{{ form.already_applied.label }}</span>
-            <span class="block text-ink-500 dark:text-ink-400">{{ form.already_applied.help_text }}</span>
-          </span>
-        </label>
-      </div>
-
       <div class="flex items-center gap-3">
-        <button type="submit" class="btn-primary">{% translate "Save to listings" %}</button>
-        <a href="{% url 'listings:list' %}" class="btn-ghost">{% translate "Later" %}</a>
+        <button type="submit" class="btn-primary">{% translate "Add to listings" %}</button>
+        <a href="{% url 'listings:list' %}" class="btn-ghost">{% translate "Cancel" %}</a>
       </div>
-    </form>
-
-    <form method="post" action="{% url 'jobs:capture_discard' capture.pk %}" class="mt-6">
-      {% csrf_token %}
-      <button type="submit" class="btn-ghost text-sm text-red-600 dark:text-red-400">
-        {% translate "Discard this capture" %}
-      </button>
     </form>
   </div>
 {% endblock %}

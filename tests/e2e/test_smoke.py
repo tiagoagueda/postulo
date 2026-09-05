@@ -78,13 +78,23 @@ def test_the_critical_path(live_server, page: Page, applicant) -> None:
     page.locator("textarea[name=html]").fill(POSTING_HTML)
     page.get_by_role("button", name="Read the page").click()
 
-    # The review screen is the intake form, pre-filled from the page.
+    # The review screen is the posting form, pre-filled from the page. Saving makes a
+    # listing: something noticed, not yet decided about.
     expect(page.locator("#id_title")).to_have_value("Senior Django Developer")
     expect(page.locator("#id_company_name")).to_have_value("Aperture Science")
-    page.get_by_role("button", name="Save as an application").click()
+    page.get_by_role("button", name="Save to listings").click()
+
+    expect(page.get_by_role("heading", level=1)).to_contain_text("Senior Django Developer")
+    expect(page.locator("[data-listing-state='new']")).to_be_visible()
+
+    # The decision: apply. That creates the application and starts the timeline.
+    page.get_by_role("link", name="Apply", exact=True).click()
+    expect(page.get_by_role("heading", level=1)).to_contain_text("Apply: Senior Django Developer")
+    page.get_by_role("button", name="Record the application").click()
 
     expect(page.get_by_role("heading", level=1)).to_contain_text("Senior Django Developer")
     expect(page.get_by_role("link", name="Aperture Science")).to_be_visible()
+    expect(page.get_by_text("Application created")).to_be_visible()
     application_url = page.url
 
     # On the board, changing the select moves the card: the change is submitted at once.

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Apply" %} · {{ listing.title }}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-2xl">
+    <p class="text-sm text-ink-500 dark:text-ink-400">
+      <a href="{{ listing.company.get_absolute_url }}" class="hover:underline">{{ listing.company.name }}</a>
+    </p>
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">
+      {% blocktranslate with title=listing.title trimmed %}Apply: {{ title }}{% endblocktranslate %}
+    </h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "This records the application. The listing leaves your to-decide list and the timeline begins." %}
+    </p>
+
+    {% if listing.has_applications %}
+      <div class="alert-info mb-4">
+        {% translate "You have applied to this one before. Recording a second application is fine; both stay on the record." %}
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="card mb-6">
+        <div class="grid gap-x-4 sm:grid-cols-3">
+          {% include "partials/field.html" with field=form.status %}
+          {% include "partials/field.html" with field=form.channel %}
+          {% include "partials/field.html" with field=form.priority %}
+        </div>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.deadline %}
+          {% include "partials/field.html" with field=form.tags %}
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Record the application" %}</button>
+        <a href="{{ listing.get_absolute_url }}" class="btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

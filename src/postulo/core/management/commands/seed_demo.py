@@ -42,7 +42,15 @@ from postulo.documents.models import (
 )
 from postulo.documents.pdf import PDFBackendUnavailable, get_pdf_backend
 from postulo.documents.rendering import snapshot_cv, snapshot_letter
-from postulo.jobs.models import Capture, Company, Contact, JobPosting, RemoteType
+from postulo.jobs.models import (
+    Capture,
+    Company,
+    Contact,
+    DiscardReason,
+    JobPosting,
+    ListingState,
+    RemoteType,
+)
 from postulo.plugins.base import JobPostingData
 from postulo.resume.models import (
     Certification,
@@ -169,6 +177,7 @@ MIX: list[tuple[str, int, int]] = [
 @dataclass
 class Report:
     companies: int = 0
+    listings: int = 0
     applications: int = 0
     events: int = 0
     reminders: int = 0
@@ -699,6 +708,34 @@ class Command(BaseCommand):
                         occurred_at=application.applied_at,
                     )
                     report.events += 1
+
+        # ---- listings not yet decided about ------------------------------------
+        # The stage before applications: noticed, not applied to. A few new, one
+        # shortlisted, one discarded, and closing dates so the dashboard has a nudge.
+        undecided = [
+            (companies[1], "Platform Engineer", ListingState.NEW, 5, ""),
+            (companies[3], "Senior Backend Developer", ListingState.NEW, 12, ""),
+            (companies[5], "Engineering Manager", ListingState.SHORTLISTED, 20, ""),
+            (companies[7], "Data Engineer", ListingState.NEW, None, ""),
+            (companies[2], "Junior Developer", ListingState.DISCARDED, None, DiscardReason.PAY),
+        ]
+        for company, title, state, closes_in, reason in undecided:
+            JobPosting.objects.create(
+                owner=user,
+                company=company,
+                title=title,
+                location=company.location,
+                employment_type="full_time",
+                url=f"{company.website}/careers/{rng.randint(1000, 9999)}",
+                source=rng.choices(SOURCES, weights=SOURCE_WEIGHTS)[0],
+                closes_at=(now.date() + dt.timedelta(days=closes_in)) if closes_in else None,
+                description=f"{company.name} is hiring a {title.lower()}. Noticed, not decided.",
+                state=state,
+                discard_reason=reason,
+                noted_at=now - dt.timedelta(days=rng.randint(1, 10)),
+                decided_at=(now - dt.timedelta(days=1)) if state != ListingState.NEW else None,
+            )
+            report.listings += 1
 
         # ---- captures waiting for review -------------------------------------
         for company, title in [

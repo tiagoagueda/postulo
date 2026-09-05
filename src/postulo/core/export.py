@@ -24,7 +24,9 @@ from django.utils import timezone
 from postulo import __version__
 
 #: Bumped when the shape changes in a way an importer must notice.
-FORMAT_VERSION = 1
+#: Bumped when the shape changes. 2 added the listing state and dates on postings and the
+#: listing a capture became; the importer still reads 1, filling the new fields in.
+FORMAT_VERSION = 2
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -70,6 +72,10 @@ POSTING_FIELDS = (
     "posted_at",
     "closes_at",
     "closed_at",
+    "state",
+    "discard_reason",
+    "noted_at",
+    "decided_at",
     "created_at",
 )
 APPLICATION_FIELDS = (
@@ -114,6 +120,7 @@ CAPTURE_FIELDS = (
     "source_version",
     "origin",
     "status",
+    "posting_id",
     "application_id",
     "created_at",
 )

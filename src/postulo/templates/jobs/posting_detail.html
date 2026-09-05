@@ -13,12 +13,42 @@
       </p>
       <h1 class="text-2xl font-semibold tracking-tight">{{ posting.title }}</h1>
       <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">
+        <span class="rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-700 dark:bg-ink-800 dark:text-ink-200"
+              data-listing-state="{{ posting.derived_state }}">
+          {{ posting.derived_state_label }}{% if posting.discard_reason %}: {{ posting.get_discard_reason_display }}{% endif %}
+        </span>
         {{ posting.location|default:"" }}
         {% if posting.remote_type %} · {{ posting.get_remote_type_display }}{% endif %}
         {% if posting.employment_type %} · {{ posting.get_employment_type_display }}{% endif %}
       </p>
     </div>
-    <div class="ml-auto flex items-center gap-2">
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      {% if posting.is_undecided %}
+        {% if posting.state != "shortlisted" %}
+          <form method="post" action="{% url 'listings:shortlist' posting.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn-secondary">{% translate "Shortlist" %}</button>
+          </form>
+        {% endif %}
+        <form method="post" action="{% url 'listings:discard' posting.pk %}" class="flex items-center gap-1">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{% url 'listings:list' %}">
+          <select name="reason" class="field-input w-44 px-2 py-1 text-xs" aria-label="{% translate 'Why' %}">
+            {% for value, label in discard_reasons %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn-ghost text-red-600 dark:text-red-400">{% translate "Discard" %}</button>
+        </form>
+        <a href="{% url 'listings:apply' posting.pk %}" class="btn-primary">{% translate "Apply" %}</a>
+      {% elif posting.derived_state == "discarded" %}
+        <form method="post" action="{% url 'listings:restore' posting.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn-secondary">{% translate "Restore" %}</button>
+        </form>
+      {% endif %}
       <a href="{% url 'jobs:posting_update' posting.pk %}" class="btn-secondary">{% translate "Edit" %}</a>
       <a href="{% url 'jobs:posting_delete' posting.pk %}"
          class="btn-ghost text-red-600 dark:text-red-400">{% translate "Delete" %}</a>
