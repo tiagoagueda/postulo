@@ -98,6 +98,13 @@ npm install
 npm run watch:css            # or `npm run build:css` for a one-off
 ```
 
+To see it with data rather than an empty screen, fill an account with a fictional
+search — thirty applications over six months, with documents:
+
+```sh
+uv run manage.py seed_demo you@example.org
+```
+
 Tests and linting:
 
 ```sh

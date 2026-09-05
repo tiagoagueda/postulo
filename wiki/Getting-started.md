@@ -68,6 +68,22 @@ months later, when someone asks about a line on a CV you have since rewritten.
 
 See [Files and what you sent](Files-and-what-you-sent).
 
+## Seeing it with data first
+
+An empty Postulo is hard to judge. To fill an account with a fictional but believable
+search — thirty applications over six months, ending every way a search can, with CVs,
+letters and PDFs of what was "sent":
+
+```sh
+uv run manage.py seed_demo you@example.org
+```
+
+Everything it creates is obviously invented (the employers are Aperture Science, Black
+Mesa and their friends), and the timelines are scripted so that Insights has a real story
+to tell. It refuses to add to an account that already holds a search; pass `--reset` to
+replace one, or give it a different address and `--password` to create a throwaway
+account. With Docker: `docker compose exec postulo python manage.py seed_demo …`.
+
 ## Where things live
 
 | Page | What it is for |

@@ -6,7 +6,12 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- `seed_demo`: fills an account with a fictional but believable job search, with
+  scripted timelines so Insights has something to say. Deterministic for a given seed.
+- `POSTULO_SECURE_COOKIES`, for instances reached only inside a mesh VPN, where the
+  browser sees plain HTTP but the wire is already encrypted.
 
 ## [0.1.0] — 2026-09-04
 
