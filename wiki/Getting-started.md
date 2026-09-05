@@ -29,8 +29,8 @@ How Postulo behaves for you lives under **Settings**, one section per page:
 - **Connections** — where the plugins that act for you (notifications, document stores,
   synchronisation) find their services and how they sign in. Empty until the operator
   installs such a plugin.
-- **Capture tokens** — for the browser extension and anything else that hands over a
-  posting (see [The capture API](The-capture-API)).
+- **API tokens** — for the browser extension and anything else that acts for you, each
+  allowed only what you tick (see [The API](The-capture-API)).
 - **Your data** — the export.
 
 ## 3. Note what you find, then apply

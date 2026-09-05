@@ -37,6 +37,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **A general API with scoped tokens.** Capture tokens became API tokens holding any of
+  four scopes — `captures`, `read`, `write`, `documents:read` — with an optional expiry;
+  every existing token kept exactly the `captures` scope, so nothing installed stopped
+  working. `read` covers applications with timelines, listings, companies, reminders, CVs,
+  letters, files and insights; `write` records and changes through the same services as
+  the forms and signs every timeline entry with the token's name; `documents:read` alone
+  downloads files. The OpenAPI description is at `/api/v1/openapi.json`. (#12)
 - **Notifications.** Postulo can now tell you things: a reminder falling due, a posting
   arriving through the capture API. A notifier is a connected plugin; the built-in one is
   **Email**, through the instance's mail settings, and every notifier connection carries

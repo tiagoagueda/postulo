@@ -12,22 +12,22 @@ from django.views.generic import ListView
 
 from postulo.core.mixins import OwnedObjectMixin
 
-from .forms import CaptureTokenForm
-from .models import CaptureToken
+from .forms import ApiTokenForm
+from .models import ApiToken
 
 #: Where the newly created token waits for exactly one page render. A session key,
 #: not a secret: the secret it briefly points at never touches the database.
 NEW_TOKEN_SESSION_KEY = "postulo_new_capture_token"  # noqa: S105
 
 
-class CaptureTokenListView(OwnedObjectMixin, ListView):
-    model = CaptureToken
+class ApiTokenListView(OwnedObjectMixin, ListView):
+    model = ApiToken
     template_name = "api/token_list.html"
     context_object_name = "tokens"
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
-        context["form"] = CaptureTokenForm(user=self.request.user)
+        context["form"] = ApiTokenForm(user=self.request.user)
         # Shown once and then forgotten: Postulo stores only a hash and genuinely
         # cannot produce the token again.
         context["new_token"] = self.request.session.pop(NEW_TOKEN_SESSION_KEY, None)
@@ -35,24 +35,29 @@ class CaptureTokenListView(OwnedObjectMixin, ListView):
         return context
 
 
-class CaptureTokenCreateView(OwnedObjectMixin, View):
+class ApiTokenCreateView(OwnedObjectMixin, View):
     def get_queryset(self):
-        return CaptureToken.objects.for_user(self.request.user)
+        return ApiToken.objects.for_user(self.request.user)
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        form = CaptureTokenForm(request.POST, user=request.user)
+        form = ApiTokenForm(request.POST, user=request.user)
         if form.is_valid():
-            _token, raw = CaptureToken.issue(request.user, form.cleaned_data["name"])
+            _token, raw = ApiToken.issue(
+                request.user,
+                form.cleaned_data["name"],
+                scopes=form.cleaned_data["scopes"],
+                expires_at=form.expires_at(),
+            )
             request.session[NEW_TOKEN_SESSION_KEY] = raw
             messages.success(request, _("Token created. Copy it now; it is not shown again."))
         else:
-            messages.error(request, _("Give the token a name."))
+            messages.error(request, _("Give the token a name and at least one scope."))
         return redirect("api:token_list")
 
 
-class CaptureTokenRevokeView(OwnedObjectMixin, View):
+class ApiTokenRevokeView(OwnedObjectMixin, View):
     def get_queryset(self):
-        return CaptureToken.objects.for_user(self.request.user)
+        return ApiToken.objects.for_user(self.request.user)
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         token = get_object_or_404(self.get_queryset(), pk=pk)

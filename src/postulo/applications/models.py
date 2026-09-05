@@ -221,6 +221,10 @@ class ApplicationEvent(models.Model):
     from_status = models.CharField(_("from status"), max_length=20, choices=Status, blank=True)
     to_status = models.CharField(_("to status"), max_length=20, choices=Status, blank=True)
 
+    #: Who wrote it when it was not the person at the keyboard: "API token laptop-agent".
+    #: Blank means the person themselves, which is nearly always.
+    actor = models.CharField(_("recorded by"), max_length=120, blank=True)
+
     created_at = models.DateTimeField(_("recorded on"), auto_now_add=True)
 
     objects = ApplicationEventQuerySet.as_manager()

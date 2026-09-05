@@ -1,109 +1,114 @@
-# The capture API
+# The API
 
-Postulo has one machine-readable surface, and it does one thing: accept a job posting for
-review.
+Postulo has one machine-readable surface, at `/api/v1/`, and it does exactly what the
+token you hand it allows. It began as the *capture API* — a way for something outside
+Postulo to hand over a posting, and nothing else — and that part is unchanged. Around it
+now sits the rest: reading a search, recording to it, downloading what was sent.
 
-It exists so that something outside Postulo — a script, a keyboard shortcut, the browser
-extension planned for later — can hand over a posting without you copying anything by
-hand.
+## Tokens and scopes
 
-## What it cannot do
+**Settings → API tokens.** Give it a name — the device or tool it is for — tick what it
+may do, choose when it expires, and Postulo shows you the token **once**. Only a hash is
+kept: a copy of the database is not a set of working credentials, and a lost token is
+replaced, not recovered.
 
-Worth stating plainly, because it is the point. A capture token **cannot**:
+| Scope | What it allows |
+| --- | --- |
+| `captures` | Hand over a posting for review, and list the captures awaiting review. Nothing else. |
+| `read` | Read everything the owner has: applications with their timelines, listings, companies and contacts, reminders, CVs, letters, the list of files, insights. |
+| `write` | Record and change, through the same code as the forms: add listings and apply to them, record applications, change status, add timeline entries and reminders, add companies and contacts, draft letters. Nothing is deleted through the API. |
+| `documents:read` | Download the files themselves — uploads and the snapshots of what was sent. Separate, because files are the most sensitive thing here. |
 
-- read your applications, CVs, cover letters, files or contacts;
-- change or delete anything;
-- sign in to the web interface.
+A browser extension needs `captures` and nothing else; a leak costs its holder the
+ability to fill a review queue you will then decline. An agent starts with `read` and is
+given `write` when you trust it. Every timeline entry written through the API is signed
+with the token's name — *via API token laptop-agent* — so you can always see what an
+agent did, and undo it by hand.
 
-It can create captures, and list the ones it created. A token that leaks costs its holder
-the ability to put entries in a review queue that you will then decline.
-
-## Getting a token
-
-**Settings → Capture tokens.**
-
-Give it a name — the device or tool it is for — and Postulo shows you the token **once**.
-Only a hash is stored, so it genuinely cannot be shown again. If you lose it, revoke it
-and make another.
-
-Tokens can be revoked at any time, and the list shows when each was last used, which is
-how you notice one you forgot about.
+A token is not a sign-in. It never reaches the web interface, and two-factor
+authentication does not apply to it. Revoke it from the same page; revoked and expired
+tokens answer `401` like a token that never existed.
 
 ## Using it
 
-Send the token as a bearer token.
-
-**Check that a token works.** Creates nothing, so it is safe to call while you are
-setting something up:
+Send the token as a bearer token. To check one and see its scopes:
 
 ```sh
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  https://postulo.example.org/api/v1/me
+curl -H "Authorization: Bearer YOUR_TOKEN" https://postulo.example.org/api/v1/me
 ```
 
-```json
-{ "name": "Firefox on the laptop", "owner": "you@example.org", "last_used_at": null }
-```
+Everything the API offers is described in OpenAPI at `/api/v1/openapi.json` — load it into
+any client or viewer; there is deliberately no documentation page served by Postulo, since
+its assets would have to come from a CDN the content security policy forbids. Lists are
+paginated with `limit` and `offset` and come back as `{"items": [...], "count": n}`.
 
-**Hand over a posting by address.** Postulo fetches the page itself, under the same rules
-as the web interface:
+## Capturing a posting
+
+Needs `captures`.
 
 ```sh
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" -H "Content-Type: application/json" \
   -d '{"url": "https://example.org/jobs/42"}' \
   https://postulo.example.org/api/v1/captures
 ```
 
-**Hand over a posting with its page.** Supply `html` and Postulo parses what you send
-instead of fetching anything. This is how a browser extension captures a posting that is
-only visible to a signed-in reader — the browser has already loaded it, so there is
-nothing for the server to fetch and no login for it to lack:
+Postulo fetches the one page — public addresses only, `robots.txt` honoured — reads it,
+and stores a **capture** for review. To capture a posting only a signed-in reader can see,
+or one behind bot protection, send the page source yourself and nothing is fetched:
 
 ```sh
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://example.org/jobs/42", "html": "<html>…</html>"}' \
-  https://postulo.example.org/api/v1/captures
+  -d '{"url": "https://example.org/jobs/42", "html": "<!doctype html>..."}'
 ```
 
-Either way the response is the capture, including where to review it:
+The response is `201` with the capture: title, company, location, source, status and a
+`review_url`. `422` means the page yielded nothing usable, or the address was refused, and
+`detail` says which. Nothing is created but the capture: the owner reviews it into a
+listing, and applies from there. `GET /api/v1/captures` lists the captures awaiting review.
 
-```json
-{
-  "id": 12,
-  "url": "https://example.org/jobs/42",
-  "title": "Senior Backend Engineer",
-  "company_name": "Aperture Science",
-  "location": "Paris, FR",
-  "source": "schema.org",
-  "status": "pending",
-  "created_at": "2026-09-04T18:26:40Z",
-  "review_url": "https://postulo.example.org/jobs/captures/12/review/"
-}
-```
+## Reading
 
-**List what is waiting.**
+Needs `read`. Everything is the token owner's; another person's records are `404`, as they
+are in the web interface.
 
-```sh
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  https://postulo.example.org/api/v1/captures
-```
+| Call | What comes back |
+| --- | --- |
+| `GET /applications?status=&company=&since=&open_only=` | Applications, newest first |
+| `GET /applications/{id}` | One application with its timeline, reminders and sent documents |
+| `GET /listings?state=undecided` | Listings; `state` is `undecided` (default), `new`, `shortlisted`, `discarded`, `applied`, `closed` or `all` |
+| `GET /listings/{id}` | One listing, description included |
+| `GET /companies?q=` · `GET /companies/{id}` | Companies; the detail carries contacts and listing ids |
+| `GET /reminders?due=true` · `?outstanding=true` | Reminders |
+| `GET /cvs` · `GET /cvs/{id}` | CVs; the detail lists what each includes |
+| `GET /letters` · `GET /letters/{id}` | Cover letters; the detail carries the text |
+| `GET /documents?source=` | Files — `upload`, `rendered`, or both when unset — with a `download_url` each |
+| `GET /insights` | The figures the Insights page shows |
+
+## Writing
+
+Needs `write`. Every write goes through the same services as the forms, so the event log
+stays the single truth.
+
+| Call | What it does |
+| --- | --- |
+| `POST /listings` | Add a listing: `company_name`, `title`, and any posting fields |
+| `POST /listings/{id}/apply` | Apply: `status`, `channel`, `priority`, `deadline`, `tags` |
+| `POST /listings/{id}/shortlist` · `/discard` (`reason`) · `/restore` | Decide about a listing |
+| `POST /applications` | Record an application in one step: the listing fields and the application fields together |
+| `POST /applications/{id}/status` | `status`, optional `note` — the timeline records the change |
+| `POST /applications/{id}/events` | `kind`, `summary`, `body`, optional `occurred_at` |
+| `POST /reminders` · `POST /reminders/{id}/complete` | Reminders |
+| `POST /companies` · `PATCH /companies/{id}` · `POST /companies/{id}/contacts` | Companies, matched by name as the forms do, and their people |
+| `POST /letters` | Draft a cover letter |
+
+## Downloading
+
+Needs `documents:read`. `GET /documents/{source}/{id}/download`, where `source` is `upload`
+or `rendered`; the `download_url` on each document is exactly this.
 
 ## Responses
 
-| Status | Meaning |
-| --- | --- |
-| `201` | The capture was created and is waiting for review |
-| `401` | The token is missing, wrong, or revoked |
-| `422` | The page could not be fetched or held nothing resembling a posting. The body says which |
-
-A `422` is an explanation, not a failure to retry blindly: it will say that the address is
-private, that `robots.txt` declined, that the page was too large, or that nothing job-like
-was found.
-
-## Nothing is created but a capture
-
-The API never creates an application. Everything it accepts waits for you on the review
-screen, for the same reason the web interface works that way: a parser reading somebody
-else's markup is not a good enough reason to write to your records.
+`401` is a missing, mistyped, revoked or expired token — nothing more is said, because
+confirming a token exists is itself information. `403` is a live token without the scope
+the call needs, and `detail` names the scope. `404` is a record that is not yours, or does
+not exist; the two are deliberately indistinguishable. `422` is a value that will not do,
+with `detail` saying why.

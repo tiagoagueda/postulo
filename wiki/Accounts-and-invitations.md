@@ -45,7 +45,7 @@ a leaked password alone is not enough.
 
   A password alone signs in again; set it up afresh afterwards.
 
-Capture tokens are their own credential and do not go through the second factor: a
+API tokens are their own credential and do not go through the second factor: a
 browser extension has no code to type. See [The capture API](The-capture-API).
 
 ## Single sign-on

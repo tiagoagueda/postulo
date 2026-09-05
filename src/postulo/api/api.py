@@ -1,13 +1,19 @@
-"""The capture API.
+"""The API: one machine-readable surface, scoped by token.
 
-Small on purpose. It exists so that something outside Postulo can hand over a posting,
-and it can do nothing else: there is no way through this API to read an application, a
-CV, or anything else the owner has. A token that leaks costs its holder the ability to
-add captures somebody will then decline on the review screen.
+It began as the capture API — a way for something outside Postulo to hand over a posting,
+and nothing else — and that part is unchanged: a token holding only the ``captures``
+scope still cannot read an application, a CV, or anything else. The rest arrived for the
+tools that need more: an agent acting for a person needs to read their search and,
+if they say so, to write to it; a browser extension wants to know whether a posting is
+already tracked.
 
-The browser extension planned for later is a client of this and nothing more. Building
-the interface first means the extension is an addition rather than a reason to rewrite
-anything.
+Every read is owner-scoped exactly as the views are. Every write goes through the same
+services as the forms, so the event log stays the single truth, and each entry written
+this way names the token that wrote it.
+
+The OpenAPI description is served at ``openapi.json`` under the API root. There is no
+documentation page rendered here: its assets would have to come from a CDN the content
+security policy forbids, and the schema is what a client consumes anyway.
 """
 
 from __future__ import annotations
@@ -18,7 +24,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI, Schema, Status
 from ninja.errors import HttpError
-from ninja.security import HttpBearer
 from pydantic import Field
 
 from postulo.jobs.models import Capture, CaptureStatus
@@ -28,35 +33,22 @@ from postulo.plugins.base import CaptureError
 from postulo.plugins.fetching import fetch_page
 from postulo.plugins.registry import parse_page
 
-from .models import CaptureToken
-
-
-class CaptureTokenAuth(HttpBearer):
-    """Authenticate with a capture token presented as a bearer token."""
-
-    def authenticate(self, request, token: str):
-        if not token:
-            return None
-        record = (
-            CaptureToken.objects.active()
-            .select_related("owner")
-            .filter(token_hash=CaptureToken.hash_token(token))
-            .first()
-        )
-        if record is None or not record.owner.is_active:
-            return None
-        record.record_use()
-        # The rest of the API reads request.auth.owner; nothing here logs the caller in,
-        # so a capture token can never be mistaken for a session.
-        return record
-
+from .auth import TokenAuth, scope
+from .models import ApiToken
+from .routers import applications, companies, documents, insights, listings, reminders
+from .schemas import TokenOut
 
 api = NinjaAPI(
-    title="Postulo capture API",
-    version="1.0",
-    auth=CaptureTokenAuth(),
+    title="Postulo API",
+    version="1",
+    auth=TokenAuth(),
     urls_namespace="postulo-api",
     docs_url=None,
+    description=(
+        "Scoped bearer tokens, made under Settings → API tokens. `captures` hands over a "
+        "posting; `read` reads everything the owner has; `write` records and changes "
+        "through the same services as the forms; `documents:read` downloads files."
+    ),
 )
 
 
@@ -86,12 +78,6 @@ class CaptureOut(Schema):
     review_url: str
 
 
-class TokenOut(Schema):
-    name: str
-    owner: str
-    last_used_at: dt.datetime | None
-
-
 def _as_output(request, capture: Capture) -> dict:
     data = capture.data
     return {
@@ -109,28 +95,36 @@ def _as_output(request, capture: Capture) -> dict:
 
 @api.get("/me", response=TokenOut, summary="Check a token")
 def whoami(request):
-    """Confirm a token works, and say who it belongs to.
+    """Confirm a token works, and say who it belongs to and what it may do.
 
     A client needs some way to tell a mistyped token from a network problem without
     creating anything.
     """
-    token: CaptureToken = request.auth
+    token: ApiToken = request.auth
     return {
         "name": token.name,
         "owner": token.owner.email,
+        "scopes": token.scopes,
+        "expires_at": token.expires_at,
         "last_used_at": token.last_used_at,
     }
 
 
-@api.post("/captures", response={201: CaptureOut}, summary="Capture a posting")
+@api.post(
+    "/captures",
+    response={201: CaptureOut},
+    auth=scope("captures"),
+    tags=["captures"],
+    summary="Capture a posting",
+)
 def create_capture(request, payload: CaptureIn):
     """Read a posting and store it for review.
 
     Nothing is created beyond the capture itself. The owner still has to look at it and
-    accept it before an application exists, because a parser reading somebody else's
-    markup is not a good enough reason to write to their records.
+    save it before a listing exists, because a parser reading somebody else's markup is
+    not a good enough reason to write to their records.
     """
-    token: CaptureToken = request.auth
+    token: ApiToken = request.auth
     owner = token.owner
 
     try:
@@ -170,8 +164,22 @@ def create_capture(request, payload: CaptureIn):
     return Status(201, _as_output(request, capture))
 
 
-@api.get("/captures", response=list[CaptureOut], summary="List captures awaiting review")
+@api.get(
+    "/captures",
+    response=list[CaptureOut],
+    auth=scope("captures"),
+    tags=["captures"],
+    summary="List captures awaiting review",
+)
 def list_captures(request):
-    token: CaptureToken = request.auth
+    token: ApiToken = request.auth
     captures = Capture.objects.for_user(token.owner).filter(status=CaptureStatus.PENDING)[:50]
     return [_as_output(request, capture) for capture in captures]
+
+
+api.add_router("/applications", applications.router)
+api.add_router("/listings", listings.router)
+api.add_router("/companies", companies.router)
+api.add_router("/reminders", reminders.router)
+api.add_router("", documents.router)
+api.add_router("/insights", insights.router)

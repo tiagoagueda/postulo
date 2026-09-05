@@ -76,6 +76,11 @@
               <div class="flex flex-wrap items-baseline gap-2">
                 <p class="font-medium">{{ event.summary|default:event.get_kind_display }}</p>
                 <span class="text-xs text-ink-400">{{ event.occurred_at|date:"j M Y, H:i" }}</span>
+                {% if event.actor %}
+                  <span class="text-xs text-ink-400" data-actor>
+                    {% blocktranslate with actor=event.actor trimmed %}via {{ actor }}{% endblocktranslate %}
+                  </span>
+                {% endif %}
                 {% if event.kind != 'status_change' %}
                   <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
                     {{ event.get_kind_display }}

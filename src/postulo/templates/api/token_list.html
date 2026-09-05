@@ -1,16 +1,17 @@
 {% extends "settings/base.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Capture tokens" %} · {% translate "Settings" %}{% endblock %}
+{% block title %}{% translate "API tokens" %} · {% translate "Settings" %}{% endblock %}
 
 {% block content %}
   <div>
-    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Capture tokens" %}</h2>
+    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "API tokens" %}</h2>
     <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed %}
-        A token lets a tool outside Postulo hand over a posting. It can do nothing else:
-        it cannot read your applications, your CVs, or anything but the captures it
-        creates.
+        A token lets a tool outside Postulo act for you — a browser extension handing over a
+        posting, an agent reading your search — and does only what its scopes allow. It is
+        not a sign-in: it never reaches the web interface, and two-factor authentication does
+        not apply to it.
       {% endblocktranslate %}
     </p>
 
@@ -25,12 +26,27 @@
     {% endif %}
 
     <div class="card mb-8">
-      <h2 class="mb-4 font-medium">{% translate "New token" %}</h2>
-      <form method="post" action="{% url 'api:token_create' %}" class="flex flex-wrap items-end gap-3">
+      <h3 class="mb-4 font-medium">{% translate "New token" %}</h3>
+      <form method="post" action="{% url 'api:token_create' %}" novalidate>
         {% csrf_token %}
-        <div class="min-w-64 flex-1">
-          <label class="field-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
-          {{ form.name }}
+        {% include "partials/field.html" with field=form.name %}
+        <fieldset class="mb-4">
+          <legend class="field-label mb-2">{{ form.scopes.label }}</legend>
+          <div class="space-y-2">
+            {% for choice in form.scopes %}
+              <label class="flex items-start gap-3 text-sm">
+                {{ choice.tag }}
+                <span>{{ choice.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          {% for error in form.scopes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          <p class="field-help">
+            {% translate "A browser extension needs only the first. Give an agent read alone until you trust it with write." %}
+          </p>
+        </fieldset>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.expires %}
         </div>
         <button type="submit" class="btn-primary">{% translate "Create" %}</button>
       </form>
@@ -40,18 +56,22 @@
       <div class="card mb-8 p-0">
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
           {% for token in tokens %}
-            <li class="flex items-center gap-3 px-4 py-3 {% if not token.is_active %}opacity-50{% endif %}">
+            <li class="flex items-center gap-3 px-4 py-3 {% if not token.is_active %}opacity-50{% endif %}" data-token="{{ token.prefix }}">
               <div class="min-w-0 flex-1">
                 <p class="font-medium">{{ token.name }}</p>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   <code>{{ token.prefix }}…</code>
+                  · {{ token.scopes|join:", " }}
                   · {% translate "created" %} {{ token.created_at|date:"j M Y" }}
+                  {% if token.expires_at %}
+                    · {% if token.is_expired %}{% translate "expired" %}{% else %}{% translate "expires" %}{% endif %} {{ token.expires_at|date:"j M Y" }}
+                  {% endif %}
                   {% if token.last_used_at %}
                     · {% translate "last used" %} {{ token.last_used_at|date:"j M Y, H:i" }}
                   {% else %}
                     · {% translate "never used" %}
                   {% endif %}
-                  {% if not token.is_active %} · {% translate "revoked" %}{% endif %}
+                  {% if token.revoked_at %} · {% translate "revoked" %}{% endif %}
                 </p>
               </div>
               {% if token.is_active %}
@@ -69,19 +89,24 @@
     {% endif %}
 
     <div class="card">
-      <h2 class="mb-3 font-medium">{% translate "Using a token" %}</h2>
+      <h3 class="mb-3 font-medium">{% translate "Using a token" %}</h3>
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Send it as a bearer token. To check that one works:" %}
+        {% translate "Send it as a bearer token. To check that one works, and see its scopes:" %}
       </p>
       <pre class="mb-4 overflow-x-auto rounded bg-ink-100 p-3 text-xs dark:bg-ink-950"><code>curl -H "Authorization: Bearer YOUR_TOKEN" \
   {{ api_root }}me</code></pre>
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-        {% translate "To hand over a posting:" %}
+        {% translate "To hand over a posting (needs the captures scope):" %}
       </p>
-      <pre class="overflow-x-auto rounded bg-ink-100 p-3 text-xs dark:bg-ink-950"><code>curl -X POST -H "Authorization: Bearer YOUR_TOKEN" \
+      <pre class="mb-4 overflow-x-auto rounded bg-ink-100 p-3 text-xs dark:bg-ink-950"><code>curl -X POST -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.org/jobs/42"}' \
   {{ api_root }}captures</code></pre>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% blocktranslate with url=api_root|add:"openapi.json" trimmed %}
+          Everything the API offers is described at <code>{{ url }}</code>, in OpenAPI.
+        {% endblocktranslate %}
+      </p>
     </div>
   </div>
 {% endblock %}

@@ -17,7 +17,7 @@
 - [CVs](CVs)
 - [Cover letters](Cover-letters)
 - [Files and what you sent](Files-and-what-you-sent)
-- [The capture API](The-capture-API)
+- [The API](The-capture-API)
 
 **Project**
 - [Roadmap](Roadmap)

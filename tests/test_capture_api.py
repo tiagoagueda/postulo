@@ -9,7 +9,7 @@ import json
 import pytest
 from django.urls import reverse
 
-from postulo.api.models import CaptureToken
+from postulo.api.models import ApiToken
 from postulo.applications.models import Application
 from postulo.jobs.models import Capture, CaptureStatus
 
@@ -27,7 +27,7 @@ PAGE = (
 
 @pytest.fixture
 def token(db, user):
-    _record, raw = CaptureToken.issue(user, "Test device")
+    _record, raw = ApiToken.issue(user, "Test device")
     return raw
 
 
@@ -49,12 +49,12 @@ def post_capture(client, bearer, **payload):
 
 
 def test_the_secret_is_never_stored(db, user):
-    record, raw = CaptureToken.issue(user, "Test device")
+    record, raw = ApiToken.issue(user, "Test device")
 
     assert record.token_hash != raw
     assert raw not in record.token_hash
     assert record.prefix == raw[: len(record.prefix)]
-    assert not CaptureToken.objects.filter(token_hash=raw).exists()
+    assert not ApiToken.objects.filter(token_hash=raw).exists()
 
 
 def test_a_token_identifies_its_owner(client, bearer, user):
@@ -70,7 +70,7 @@ def test_no_token_and_a_wrong_token_are_both_refused(client, db, header):
 
 
 def test_a_revoked_token_stops_working(client, db, user):
-    record, raw = CaptureToken.issue(user, "Old laptop")
+    record, raw = ApiToken.issue(user, "Old laptop")
     bearer = {"HTTP_AUTHORIZATION": f"Bearer {raw}"}
     assert client.get("/api/v1/me", **bearer).status_code == 200
 
@@ -80,7 +80,7 @@ def test_a_revoked_token_stops_working(client, db, user):
 
 
 def test_a_token_belonging_to_a_disabled_account_stops_working(client, db, user):
-    _record, raw = CaptureToken.issue(user, "Device")
+    _record, raw = ApiToken.issue(user, "Device")
     user.is_active = False
     user.save(update_fields=["is_active"])
 
@@ -88,7 +88,7 @@ def test_a_token_belonging_to_a_disabled_account_stops_working(client, db, user)
 
 
 def test_using_a_token_records_that_it_was_used(client, db, user):
-    record, raw = CaptureToken.issue(user, "Device")
+    record, raw = ApiToken.issue(user, "Device")
     assert record.last_used_at is None
 
     client.get("/api/v1/me", **{"HTTP_AUTHORIZATION": f"Bearer {raw}"})
@@ -241,7 +241,7 @@ def test_another_accounts_capture_is_not_found(client, other_user, pending):
 
 
 def test_another_accounts_token_is_not_listed(client, user, other_user):
-    CaptureToken.issue(other_user, "Their device")
+    ApiToken.issue(other_user, "Their device")
     client.force_login(user)
 
     response = client.get(reverse("api:token_list"))
@@ -251,7 +251,7 @@ def test_another_accounts_token_is_not_listed(client, user, other_user):
 
 def test_a_token_is_shown_once_and_then_never_again(client, user):
     client.force_login(user)
-    client.post(reverse("api:token_create"), {"name": "Laptop"})
+    client.post(reverse("api:token_create"), {"name": "Laptop", "scopes": ["captures"]})
 
     first = client.get(reverse("api:token_list"))
     second = client.get(reverse("api:token_list"))

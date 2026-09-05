@@ -85,7 +85,7 @@ BUILTIN: tuple[SettingsSection, ...] = (
     ),
     SettingsSection(
         slug="tokens",
-        label=_("Capture tokens"),
+        label=_("API tokens"),
         url_name="api:token_list",
         icon="shield",
         order=40,

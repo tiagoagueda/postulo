@@ -117,6 +117,9 @@ ignore = [
 "src/postulo/*/views.py" = ["RUF012"]
 "src/postulo/*/models.py" = ["RUF012"]
 "src/postulo/config/settings/*" = ["F403", "F405"]
+# django-ninja declares query parameters as `Query(...)` defaults; that is its documented
+# idiom, not the mutable-default mistake bugbear is looking for.
+"src/postulo/api/routers/*" = ["B008"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["postulo"]

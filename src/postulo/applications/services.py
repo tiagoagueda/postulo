@@ -26,8 +26,13 @@ def record_event(
     occurred_at=None,
     from_status: str = "",
     to_status: str = "",
+    actor: str = "",
 ) -> ApplicationEvent:
-    """Append one entry to an application's timeline."""
+    """Append one entry to an application's timeline.
+
+    ``actor`` names who wrote it when it was not the person themselves — an API token, an
+    import — so the timeline shows what an agent did and the person can undo it by hand.
+    """
     return ApplicationEvent.objects.create(
         application=application,
         kind=kind,
@@ -36,6 +41,7 @@ def record_event(
         occurred_at=occurred_at or timezone.now(),
         from_status=from_status,
         to_status=to_status,
+        actor=actor,
     )
 
 
@@ -46,6 +52,7 @@ def change_status(
     *,
     note: str = "",
     occurred_at=None,
+    actor: str = "",
 ) -> ApplicationEvent | None:
     """Move an application to ``new_status`` and record why.
 
@@ -99,6 +106,7 @@ def change_status(
         occurred_at=occurred_at,
         from_status=previous,
         to_status=new_status,
+        actor=actor,
     )
 
 
@@ -109,7 +117,9 @@ def create_listing(owner, *, company: Company, posting_data: dict) -> JobPosting
 
 
 @transaction.atomic
-def apply_to_listing(posting: JobPosting, application_data: dict) -> Application:
+def apply_to_listing(
+    posting: JobPosting, application_data: dict, *, actor: str = ""
+) -> Application:
     """The decision: an application for a listing.
 
     The listing's derived state becomes *applied* by the mere existence of the
@@ -126,9 +136,10 @@ def apply_to_listing(posting: JobPosting, application_data: dict) -> Application
         kind=EventKind.NOTE,
         summary=str(_("Application created")),
         occurred_at=application.created_at,
+        actor=actor,
     )
     if status != Status.DRAFT:
-        change_status(application, status)
+        change_status(application, status, actor=actor)
 
     if posting.decided_at is None:
         posting.decided_at = timezone.now()
@@ -137,7 +148,9 @@ def apply_to_listing(posting: JobPosting, application_data: dict) -> Application
 
 
 @transaction.atomic
-def create_application(owner, *, company: Company, posting_data: dict, application_data: dict):
+def create_application(
+    owner, *, company: Company, posting_data: dict, application_data: dict, actor: str = ""
+):
     """Record a listing and an application for it in one step.
 
     Applications are almost always entered while looking at a posting, so asking someone
@@ -145,7 +158,7 @@ def create_application(owner, *, company: Company, posting_data: dict, applicati
     it is exactly those two steps, so the data is the same whichever door was used.
     """
     posting = create_listing(owner, company=company, posting_data=posting_data)
-    return apply_to_listing(posting, application_data)
+    return apply_to_listing(posting, application_data, actor=actor)
 
 
 def get_or_create_company(owner, name: str) -> Company:

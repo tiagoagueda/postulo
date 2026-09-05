@@ -9,7 +9,7 @@ from django.core.management import call_command
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.api.models import CaptureToken
+from postulo.api.models import ApiToken
 from postulo.applications.models import Application, Reminder, Status
 from postulo.jobs.models import Company, JobPosting
 from postulo.notifications import base
@@ -150,7 +150,7 @@ def test_the_email_notifier_tests_itself_and_falls_back_to_the_owner(user):
 
 def test_a_capture_through_the_api_is_announced(client, user):
     email_connection(user)
-    _record, raw = CaptureToken.issue(user, "Extension")
+    _record, raw = ApiToken.issue(user, "Extension")
     response = client.post(
         "/api/v1/captures",
         {"url": "https://example.org/jobs/7", "html": PAGE},
