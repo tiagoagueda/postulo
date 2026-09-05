@@ -74,7 +74,7 @@ def test_the_critical_path(live_server, page: Page, applicant) -> None:
     # Capture by pasting the page: nothing is fetched, the parser does the work.
     page.goto(f"{base}/jobs/captures/new/")
     page.locator("input[name=url]").fill(POSTING_URL)
-    page.locator("details > summary").click()
+    page.locator("form details > summary").click()
     page.locator("textarea[name=html]").fill(POSTING_HTML)
     page.get_by_role("button", name="Read the page").click()
 
@@ -130,5 +130,5 @@ def test_the_critical_path(live_server, page: Page, applicant) -> None:
     # Out through the account menu: it opens on the name, and Sign out is inside it.
     page.locator("details[data-menu] > summary").click()
     page.get_by_role("button", name="Sign out").click()
-    expect(page.get_by_role("link", name="Sign in")).to_be_visible()
+    expect(page.get_by_role("banner").get_by_role("link", name="Sign in")).to_be_visible()
     expect(page.locator("details[data-menu]")).to_have_count(0)
