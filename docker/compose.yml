@@ -33,5 +33,24 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
 
+  # Notices reminders falling due and tells their owners through their notifiers. Only
+  # needed once somebody has set up a notification connection; start it with
+  #   docker compose -f docker/compose.yml --profile scheduler up -d
+  # Alternatively run `manage.py send_due_reminders` from the host's cron every few minutes.
+  scheduler:
+    profiles: ["scheduler"]
+    image: postulo:latest
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      POSTULO_DATABASE_URL: sqlite:////app/data/postulo.sqlite3
+      POSTULO_SKIP_MIGRATE: "1"
+    volumes:
+      - postulo-data:/app/data
+    command: ["python", "manage.py", "send_due_reminders", "--loop", "--every", "300"]
+    depends_on:
+      - postulo
+
 volumes:
   postulo-data:

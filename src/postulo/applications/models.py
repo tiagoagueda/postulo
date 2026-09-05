@@ -262,6 +262,8 @@ class Reminder(OwnedModel):
     summary = models.CharField(_("what to do"), max_length=250)
     due_at = models.DateTimeField(_("when"), db_index=True)
     done_at = models.DateTimeField(_("done on"), null=True, blank=True)
+    #: When its falling due was announced through the person's notifiers, if it was.
+    notified_at = models.DateTimeField(_("notified on"), null=True, blank=True)
 
     objects = ReminderQuerySet.as_manager()
 

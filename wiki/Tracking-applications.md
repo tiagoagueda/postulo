@@ -57,9 +57,12 @@ When they disagree, believe the log.
 Reminders are a note plus a date. Overdue ones are highlighted, and anything due appears
 on the dashboard.
 
-> **Reminders do not notify you.** Postulo sends no emails and no push messages; a
-> reminder appears in the application and on your dashboard when its time comes. If you
-> need to be told, put it in your calendar as well.
+A reminder appears in the application and on your dashboard when its time comes. To be
+*told* — by email, or by whatever a notification plugin speaks — add a connection under
+**Settings → Connections** and tick *A reminder falls due*. The built-in **Email** notifier
+needs only an address and the instance's mail settings; the operator must also run the
+scheduler that notices reminders falling due (see
+[Configuration](Configuration#notifications)). Each reminder is announced once.
 
 ## Tags
 

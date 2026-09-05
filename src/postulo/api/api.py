@@ -22,6 +22,8 @@ from ninja.security import HttpBearer
 from pydantic import Field
 
 from postulo.jobs.models import Capture, CaptureStatus
+from postulo.notifications.base import Notification
+from postulo.notifications.service import notify
 from postulo.plugins.base import CaptureError
 from postulo.plugins.fetching import fetch_page
 from postulo.plugins.registry import parse_page
@@ -153,6 +155,17 @@ def create_capture(request, payload: CaptureIn):
         origin="api",
         data=data.model_dump(mode="json"),
         status=CaptureStatus.PENDING,
+    )
+    # The one event a person cannot see coming: something arrived from outside. Their
+    # notifiers, if any, hear about it; the capture is saved whether or not they do.
+    notify(
+        owner,
+        Notification(
+            event="capture_received",
+            title=str(_("Captured: %(title)s") % {"title": data.title}),
+            body=" · ".join(part for part in (data.company_name, data.location) if part),
+            url=request.build_absolute_uri(reverse("jobs:capture_review", args=[capture.pk])),
+        ),
     )
     return Status(201, _as_output(request, capture))
 

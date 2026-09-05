@@ -99,10 +99,11 @@ def test_the_model_encrypts_on_the_way_in_and_merges_on_the_way_out(user):
 
 
 def test_the_registry_knows_kinds_and_finds_plugins_by_name():
-    assert [plugin.name for plugin in registry.plugins("notifier")] == ["echo"]
+    names = [plugin.name for plugin in registry.plugins("notifier")]
+    assert "echo" in names and "email" in names, "the test plugin beside the built-in one"
     assert registry.find_plugin("notifier", "echo").label == "Echo"
     assert registry.find_plugin("notifier", "nope") is None
-    assert [plugin.name for plugin in registry.connected_plugins()] == ["echo"]
+    assert "echo" in [plugin.name for plugin in registry.connected_plugins()]
     assert registry.plugins("store") == []
     with pytest.raises(ValueError, match="Unknown plugin kind"):
         registry.plugins("weather")
@@ -159,6 +160,9 @@ def test_the_form_is_drawn_from_the_plugin_and_secrets_are_never_echoed(client, 
         "url": "https://echo.example.org/hook",
         "quiet": False,
         "tone": "chatty",
+        # A notifier connection carries a switch per event; none were ticked here.
+        "event_reminder_due": False,
+        "event_capture_received": False,
     }
     assert connection.secrets == {"token": "s3cret"}
 

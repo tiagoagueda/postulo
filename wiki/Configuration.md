@@ -98,6 +98,26 @@ synchronisation — keep their configuration under *Settings → Connections*.
 | `POSTULO_CONNECTIONS_ALLOW_PRIVATE` | `false` | Whether a connection may reach a private or local address. Unlike capture, the destination here is what the person typed, and self-hosted services — a Paperless on the LAN, a mail server in the same Compose network — live on private addresses. Turn it on when yours do. Every request a plugin makes is checked, redirects included. |
 | `POSTULO_FIELD_KEY` | empty | The key connection secrets are encrypted under. Unset, a key is derived from `POSTULO_SECRET_KEY` — which means rotating that key makes every stored secret unreadable. Set this once and secrets survive a rotation. Any long random string. |
 
+## Notifications
+
+Postulo sends nothing until a person adds a notification connection under *Settings →
+Connections*. The built-in **Email** notifier uses the mail settings below; plugins add
+other ways. Two things happen without anyone asking: a posting arriving through the capture
+API is announced at once, and a reminder falling due is announced by the **scheduler**,
+which somebody has to run:
+
+```sh
+# in the container, as a service that loops every five minutes
+docker compose -f docker/compose.yml --profile scheduler up -d
+
+# or from the host's cron, every few minutes
+*/5 * * * * docker compose -f /data/stacks/postulo/docker/compose.yml exec -T postulo python manage.py send_due_reminders
+```
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `POSTULO_PUBLIC_URL` | empty | Where the instance is reached from outside, e.g. `https://postulo.example.org`. Used for the links in messages the scheduler sends, where no request is around to build them from. Unset, those links are bare paths. |
+
 ## Documents
 
 | Variable | Default | What it does |
@@ -106,9 +126,9 @@ synchronisation — keep their configuration under *Settings → Connections*.
 
 ## Email
 
-Postulo does not send you notifications. Email is used only by the account system, for
-password resets and address confirmations, so an instance with a single user who never
-forgets their password can ignore this section entirely.
+Email carries the account system's messages — verification links, password resets — and
+the built-in **Email** notifier's, for anyone who sets one up under *Settings →
+Connections*. Prove the settings with *Server settings → Email → Send a test message*.
 
 | Variable | Default |
 | --- | --- |

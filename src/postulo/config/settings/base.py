@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # postulo
     "postulo.core",
     "postulo.plugins",
+    "postulo.notifications",
     "postulo.accounts",
     "postulo.jobs",
     "postulo.applications",
@@ -238,6 +239,11 @@ MEDIA_ROOT = env.path("POSTULO_MEDIA_ROOT", default=REPO_DIR / "data" / "media")
 # Where `manage.py backup` writes when given no target. Beside the data it copies, so a
 # single volume holds both; move it elsewhere if that volume is the thing being backed up.
 POSTULO_BACKUP_DIR = env.path("POSTULO_BACKUP_DIR", default=REPO_DIR / "data" / "backups")
+
+# Where this instance is reached from outside, for the links in messages sent when no
+# request is around — a reminder falling due at three in the morning. Unset, such links
+# are bare paths. Where a request exists, the link is built from it instead.
+POSTULO_PUBLIC_URL = env("POSTULO_PUBLIC_URL", default="").rstrip("/")
 
 # Optional hand-off to the web server once Django has authorised a download. Leave both
 # unset to have Django stream the file itself, which is correct but ties up a worker.

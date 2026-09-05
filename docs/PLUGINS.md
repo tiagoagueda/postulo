@@ -4,10 +4,10 @@ Postulo is modular on purpose: anything that could reasonably vary sits behind a
 interface that a separately installed package can implement, and the built-in
 implementations are plugins that happen to ship in the box.
 
-**Capture sources** are the first kind, and the only kind so far; this document is about
-them. **Notifiers** — how you are told that a reminder is due or a capture has arrived —
-are next, with SMTP built in and an Apprise-based plugin as the first external one. They
-are tracked on the 0.2.0 milestone, and this document will grow a section when they land.
+**Capture sources** were the first kind, and most of this document is about them.
+**Notifiers** — how you are told that a reminder is due or a capture has arrived — are the
+second, with email built in; see *Plugins that connect to another service* below for the
+connection machinery they and the coming **stores** and **syncs** share.
 
 # Writing a capture source
 
@@ -206,8 +206,29 @@ included: private and local addresses are refused unless the operator set
 `POSTULO_CONNECTIONS_ALLOW_PRIVATE=true`, which is where self-hosted services usually live.
 A plugin that opens its own connection bypasses that policy, and a reviewer will say so.
 
-What each kind then *does* — a notifier's `send()`, a store's `put()` — is that kind's own
-interface, documented with it as it lands.
+What each kind then *does* is that kind's own interface. So far:
+
+### Notifiers
+
+A notifier adds one method:
+
+```python
+from postulo.notifications.base import Notification
+
+
+class MyNotifier:
+    ...
+
+    def send(self, notification: Notification, config: dict, user) -> None:
+        """Carry one message. Raise on failure; Postulo records it on the connection."""
+```
+
+`notification` has an `event` (`reminder_due`, `capture_received`), a `title`, an optional
+`body` and an optional `url`. `user` is the person it is for — fall back to their address
+or name if your service needs one. Every notifier connection automatically carries a
+switch per event, so your plugin never has to ask which events to deliver: if `send()` is
+called, the person wanted it. The built-in `postulo.notifications.email.EmailNotifier` is
+forty lines and a fair template.
 
 ## Adding a settings section
 

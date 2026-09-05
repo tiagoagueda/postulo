@@ -37,6 +37,12 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Notifications.** Postulo can now tell you things: a reminder falling due, a posting
+  arriving through the capture API. A notifier is a connected plugin; the built-in one is
+  **Email**, through the instance's mail settings, and every notifier connection carries
+  a switch per event. Reminders are noticed by `manage.py send_due_reminders`, run from
+  cron or as the Compose `scheduler` profile, and each is announced once.
+  `POSTULO_PUBLIC_URL` gives those messages absolute links. (#4)
 - **Connections**: the per-person configuration and secrets for plugins that talk to
   another service — notifiers, document stores, synchronisation. A plugin describes its
   fields; Postulo draws the form under Settings → Connections, stores secrets encrypted

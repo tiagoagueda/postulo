@@ -12,6 +12,15 @@ from .models import Connection
 SECRET_PLACEHOLDER = "••••••••"  # noqa: S105 - a display placeholder, not a credential
 
 
+def kind_specs(kind: str) -> list[FieldSpec]:
+    """Fields every connection of a kind carries, whatever the plugin: a notifier's events."""
+    if kind == "notifier":
+        from postulo.notifications.base import event_specs
+
+        return event_specs()
+    return []
+
+
 def form_field_for(spec: FieldSpec, *, has_value: bool = False) -> forms.Field:
     common = {"label": spec.label, "help_text": spec.help, "required": spec.required}
     if spec.type == "boolean":
@@ -56,7 +65,7 @@ class ConnectionForm(forms.ModelForm):
     def __init__(self, plugin, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.plugin = plugin
-        self.specs: list[FieldSpec] = list(plugin.config_fields())
+        self.specs: list[FieldSpec] = list(plugin.config_fields()) + kind_specs(plugin.kind)
         existing_config = dict(self.instance.config) if self.instance.pk else {}
         existing_secrets = self.instance.secrets if self.instance.pk else {}
         for spec in self.specs:
