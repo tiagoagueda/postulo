@@ -12,6 +12,17 @@ translation of it.
 Note that `pt-PT` is European Portuguese, not Brazilian. If you would like a `pt-BR`
 catalogue, open an issue — adding a locale is a one-line change plus a directory.
 
+## Which languages, and when
+
+The source language is British English. The 0.2.0 release aims to ship a catalogue for
+every official language of the European Union: Bulgarian, Croatian, Czech, Danish, Dutch,
+Estonian, Finnish, French, German, Greek, Hungarian, Irish, Italian, Latvian, Lithuanian,
+Maltese, Polish, Portuguese, Romanian, Slovak, Slovene, Spanish and Swedish. A first draft
+may be machine-assisted and is marked *fuzzy* until a speaker has read it, so a language is
+usable on day one and honest about its state. Later releases extend the set in phases: the
+rest of the European continent, then Africa, then Asia, then the remaining world. If your
+language is not in the current phase, a catalogue for it is still welcome.
+
 ## Adding or updating a translation
 
 Extracting messages requires GNU `gettext` (`sudo apt install gettext`, or the

@@ -44,6 +44,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Two more commitments, stated where the first two are.** Security: the application
+  holds the most personal documents a person has while looking for work, so the code and
+  the data are kept as secure as the project knows how, with security tests in the suite
+  and dependency vulnerability checks in CI on every run and weekly. Inclusion: Postulo is
+  meant to be usable by everyone, at its fullest, including people with disabilities, and a
+  feature somebody cannot use is a bug. Stated in the README, the wiki, the plan, the
+  contributing guide and the security policy.
 - **Gone quiet.** An open application that was sent, has had nothing happen for 21 days
   (adjustable under *Settings → Appearance*) and has nothing planned — no reminder ahead,
   no interview in the diary — is *quiet*. The dashboard lists them, longest silence first,

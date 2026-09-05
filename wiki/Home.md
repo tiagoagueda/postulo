@@ -29,6 +29,31 @@ ship in the box, and a plugin written by somebody else is installed with one com
 no change to Postulo. The person who cares about a particular job board, or a particular
 way of being notified, should never have to wait for this project.
 
+## Secure, because of what it holds
+
+**Postulo holds the most personal documents a person has while looking for work, and it
+is built as if that were the only thing that mattered.** A CV carries a home address, a
+phone number and a full employment history; a timeline says who has and has not replied.
+So the code and the data are kept as secure as the project knows how to make them: every
+record is owned and every query is scoped, files are never served without a permission
+check, the browser is held to a strict content security policy, nothing is fetched from
+the network without a deliberate decision, and the test suite includes security tests —
+ownership sweeps, policy checks, the things an attacker would try — that fail the build.
+Dependencies are checked for known vulnerabilities on every run and on a schedule, so a
+fresh disclosure is noticed without anyone having to remember to look. A security report
+is handled before any feature is; see the [security policy](https://source.tiagoagueda.com/tiagoagueda/postulo/src/branch/main/SECURITY.md).
+
+## Built for everyone
+
+**Postulo is meant to be usable by everyone, at its fullest, including people with
+disabilities.** Looking for work is hard enough without the tool getting in the way. So
+the interface is server-rendered HTML that works with scripts off, every control can be
+reached and operated from the keyboard, images and icons carry names or are marked as
+decorative, colour never carries a meaning on its own, changes on the page are announced
+to screen readers, and the pages are checked against the accessibility guidelines
+(WCAG 2.2, level AA) as part of the browser tests rather than as an afterthought. When a
+feature cannot be made to work for someone, that is a bug, and it is filed as one.
+
 ## Start here
 
 | If you want to… | Read |

@@ -21,6 +21,31 @@ Everything this software does is available in full to everyone who runs it: no p
 tier, no "pro" edition, no licence key, no feature that unlocks later. The licence
 guarantees that for the code; this paragraph guarantees it for the project's intentions.
 
+## Secure, because of what it holds
+
+**Postulo holds the most personal documents a person has while looking for work, and it
+is built as if that were the only thing that mattered.** A CV carries a home address, a
+phone number and a full employment history; a timeline says who has and has not replied.
+So the code and the data are kept as secure as the project knows how to make them: every
+record is owned and every query is scoped, files are never served without a permission
+check, the browser is held to a strict content security policy, nothing is fetched from
+the network without a deliberate decision, and the test suite includes security tests —
+ownership sweeps, policy checks, the things an attacker would try — that fail the build.
+Dependencies are checked for known vulnerabilities on every run and on a schedule, so a
+fresh disclosure is noticed without anyone having to remember to look. A security report
+is handled before any feature is; see [SECURITY.md](SECURITY.md).
+
+## Built for everyone
+
+**Postulo is meant to be usable by everyone, at its fullest, including people with
+disabilities.** Looking for work is hard enough without the tool getting in the way. So
+the interface is server-rendered HTML that works with scripts off, every control can be
+reached and operated from the keyboard, images and icons carry names or are marked as
+decorative, colour never carries a meaning on its own, changes on the page are announced
+to screen readers, and the pages are checked against the accessibility guidelines
+(WCAG 2.2, level AA) as part of the browser tests rather than as an afterthought. When a
+feature cannot be made to work for someone, that is a bug, and it is filed as one.
+
 ## What it does
 
 - **Track applications** end to end — from a posting you spotted to an offer, with an
@@ -46,6 +71,11 @@ guarantees that for the code; this paragraph guarantees it for the project's int
 - **Your data is yours.** Full JSON + media export, always one command away.
 - **No telemetry.** No outbound calls except URL captures you explicitly trigger.
 - **Private by default.** Uploaded documents are never publicly served.
+- **Secure by obligation.** Ownership-scoped queries, permission-checked files, a strict
+  content security policy, security tests in the suite, and dependency vulnerability
+  checks in CI. See [SECURITY.md](SECURITY.md).
+- **Accessible to everyone.** Keyboard-operable, screen-reader-announced, usable with
+  scripts off, and checked against WCAG 2.2 AA in the browser tests.
 - **Boring, durable stack.** Django, SQLite or PostgreSQL, server-rendered HTML.
 - **Modular by design.** Anything that could reasonably vary — where a posting is read
   from, how you are told about things, how a PDF is produced — sits behind an interface

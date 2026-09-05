@@ -15,6 +15,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # The dependency audit below also runs weekly, so a vulnerability disclosed in a
+    # library is noticed even in a week when nothing was pushed.
+    - cron: "17 6 * * 1"
 
 jobs:
   test:
@@ -69,6 +73,35 @@ jobs:
           # Long enough to satisfy security.W009; not a real secret.
           POSTULO_SECRET_KEY: ci-only-placeholder-nS7pQ2xV9wR4tY6uI8oA3sD5fG1hJ0kL2zX4cV6b
           POSTULO_ALLOWED_HOSTS: postulo.example.org
+
+  security:
+    # Postulo holds people's CVs and employment histories, and one of its stated
+    # commitments is to keep them as secure as it knows how. Part of that is noticing a
+    # vulnerability disclosed in a dependency without anyone having to remember to look:
+    # every Python package in the lock file and every Node package used to build the
+    # assets is checked against the advisory databases, on every push and every week.
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-bookworm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Audit the Python dependencies
+        # pip-audit reads the locked environment, so what is checked is exactly what runs.
+        run: |
+          uv sync --locked --python 3.14 --all-groups
+          uv run --with pip-audit pip-audit --strict --progress-spinner off
+
+      - name: Audit the asset build's Node dependencies
+        run: |
+          npm ci
+          npm audit --audit-level=high
 
   styles:
     # The compiled stylesheet is committed so that the application runs without Node.

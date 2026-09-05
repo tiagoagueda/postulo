@@ -68,6 +68,18 @@ request that introduces any of those will be declined however good the code is. 
 goes for anything that nudges towards paying: upgrade prompts, feature comparison
 tables, "premium" labels.
 
+**Anything that weakens a security boundary.** Postulo holds people's CVs and employment
+histories, and keeping them secure is one of its stated missions. A change that serves a
+file without the ownership check, loosens the content security policy, adds an inline
+script, makes an outbound request nobody asked for, or trusts a value from the query
+string will be declined until it does not. New surfaces come with security tests.
+
+**Anything somebody cannot use.** Being usable by everyone, including people with
+disabilities, is the other stated mission. A control that cannot be reached from the
+keyboard, an icon with no name, a meaning carried by colour alone, a change on the page
+that a screen reader is not told about, or a page that breaks with scripts off is a bug,
+and a pull request that introduces one will be asked to fix it first.
+
 ## House style
 
 - **British English** in code, comments, documentation, and interface text: *organise*,
@@ -86,6 +98,14 @@ tables, "premium" labels.
   a second implementation is plausible. Capture sources work this way; notifications
   will. If you find yourself writing `if backend == "x"`, that is usually a plugin
   boundary asking to exist.
+- **Security tests are part of the feature.** A new endpoint gets a test that another
+  account cannot reach it, that a forged request is refused, and that whatever it reads
+  from the request is validated. Run `uv run pytest tests/test_ownership.py` and friends
+  before you open the pull request; CI audits the dependencies too.
+- **Accessible by construction.** Every input has a `<label>`; icons that stand alone get a
+  `label`, the rest are decorative; anything that changes without a page load sits in a
+  live region or is announced; `<details>` and real links before scripted widgets; test
+  the page with the keyboard alone before calling it done.
 - Keep commits focused, and describe *why* in the message rather than *what*.
 
 ## Documentation
