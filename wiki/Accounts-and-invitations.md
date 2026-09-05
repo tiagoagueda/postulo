@@ -89,9 +89,11 @@ the door closes again. `createsuperuser` on the command line still works, and do
 same thing.
 
 *Server settings → People* lists every account and lets an administrator make or unmake
-other administrators and deactivate accounts (nothing deleted, no sign-in). The last
-administrator cannot be removed or deactivated, and nobody can deactivate the account
-they are signed in with.
+other administrators, deactivate accounts (nothing deleted, no sign-in) and change a
+person's username on their behalf. The last administrator cannot be removed or
+deactivated — by anyone, including themselves — and nobody can deactivate the account they
+are signed in with. A username is unique across the instance whoever changes it: a name
+already in use, in any capitalisation, is refused before anything is saved.
 
 ## Who can sign up
 

@@ -193,6 +193,48 @@ class PersonActiveView(StaffRequiredMixin, View):
         return redirect("server:people")
 
 
+class PersonUsernameView(StaffRequiredMixin, UpdateView):
+    """Change somebody's username on their behalf.
+
+    The person can do it themselves under Settings > Account; this is the same form, with
+    the same rules, for the administrator who is asked to. A username is unique across the
+    instance whoever changes it: the model refuses a duplicate, and the form refuses one
+    first, in words, whatever the capitals.
+    """
+
+    template_name = "server/person_username.html"
+    section_title = _("People")
+
+    def get_queryset(self):
+        return get_user_model().objects.all()
+
+    def get_form_class(self):
+        from postulo.accounts.forms import AccountForm
+
+        return AccountForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["section_title"] = self.section_title
+        context["person"] = self.object
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(
+            self.request,
+            _("%(name)s is now @%(username)s.")
+            % {
+                "name": self.object.get_full_name() or self.object.email,
+                "username": self.object.username,
+            },
+        )
+        return response
+
+    def get_success_url(self) -> str:
+        return reverse("server:people")
+
+
 class PolicyView(ServerSectionMixin, UpdateView):
     """One form over the policy row, plus which of its fields the environment pins."""
 

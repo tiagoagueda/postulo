@@ -127,6 +127,36 @@ def test_the_last_administrator_cannot_be_removed_or_deactivated(client, admin):
     assert admin.is_active
 
 
+def test_an_administrator_can_change_a_username_but_never_to_one_in_use(client, admin, user):
+    client.force_login(admin)
+    page = client.get(reverse("server:person_username", args=[user.pk]))
+    assert page.status_code == 200 and "signs in as" in page.content.decode()
+
+    response = client.post(
+        reverse("server:person_username", args=[user.pk]), {"username": "Alex.M"}
+    )
+    assert response.status_code == 302
+    user.refresh_from_db()
+    assert user.username == "alex.m", "stored lowercase, whatever was typed"
+
+    response = client.post(
+        reverse("server:person_username", args=[user.pk]), {"username": "ADMIN-ONE"}
+    )
+    assert response.status_code == 200
+    assert "already" in response.content.decode().lower()
+    user.refresh_from_db()
+    assert user.username == "alex.m", "the administrator's own name is taken, in any case"
+
+    response = client.post(reverse("server:person_username", args=[user.pk]), {"username": "a"})
+    assert response.status_code == 200, "too short"
+
+    # People change their own the same way, under Settings, with the same uniqueness.
+    client.force_login(user)
+    response = client.post(reverse("settings:account"), {"username": "admin-one"})
+    assert response.status_code == 200 and "already" in response.content.decode().lower()
+    assert client.get(reverse("server:person_username", args=[admin.pk])).status_code in (302, 403)
+
+
 def test_deactivating_keeps_the_data_and_blocks_the_sign_in(client, admin, user):
     EmailAddress.objects.create(user=user, email=user.email, verified=True, primary=True)
     client.force_login(admin)

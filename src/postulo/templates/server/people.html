@@ -42,6 +42,9 @@
             </td>
             <td class="px-4 py-3">
               <div class="flex items-center justify-end gap-1">
+                <a href="{% url 'server:person_username' person.pk %}" class="btn-ghost px-2 py-1 text-xs">
+                  {% translate "Change username" %}
+                </a>
                 <form method="post" action="{% url 'server:person_admin' person.pk %}">
                   {% csrf_token %}
                   <button type="submit" class="btn-ghost px-2 py-1 text-xs">
@@ -69,5 +72,8 @@
     {% plural %}
       {{ counter }} administrators. The last one cannot be removed or deactivated.
     {% endblocktranslate %}
+  </p>
+  <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+    {% translate "A username is unique across the instance whoever changes it, and people can change their own under Settings." %}
   </p>
 {% endblock %}

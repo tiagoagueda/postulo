@@ -44,6 +44,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Plugins carry their own translations.** A plugin package ships a `locale/` directory
+  next to its code, laid out as `makemessages` lays it out, and the registry adds it to the
+  catalogues Django reads when the plugin loads. Postulo's own catalogues never carry a
+  plugin's strings, so a plugin author adds a language without a Postulo release.
+- **Administrators can change a username** from *Server settings → People*, with the same
+  form and rules as the person's own *Settings → Account*: lowercase, 3 to 32 characters,
+  and unique across the instance in any capitalisation, refused in words before anything
+  is saved.
 - **Two more commitments, stated where the first two are.** Security: the application
   holds the most personal documents a person has while looking for work, so the code and
   the data are kept as secure as the project knows how, with security tests in the suite

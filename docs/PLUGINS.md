@@ -93,6 +93,38 @@ uv pip install my-postulo-myboard
 That is the whole installation. Restart Postulo and the source appears on the capture
 page. Uninstalling the package removes it.
 
+## Translations: every plugin holds its own
+
+Postulo speaks many languages, and a plugin must speak them itself. Its labels, help
+texts and messages are never added to Postulo's catalogues: a plugin author adds a
+language without waiting for a Postulo release, and a plugin translated into a language
+Postulo does not yet have still shows it. The rule is one directory:
+
+```text
+my_package/
+    __init__.py
+    source.py
+    locale/
+        fr_FR/LC_MESSAGES/django.po
+        fr_FR/LC_MESSAGES/django.mo
+        pt_PT/LC_MESSAGES/django.po
+        pt_PT/LC_MESSAGES/django.mo
+```
+
+Wrap every string a person will read in `gettext` or `gettext_lazy`, exactly as Postulo
+does, then from the package's directory:
+
+```sh
+django-admin makemessages --locale fr_FR --locale pt_PT   # writes locale/*/django.po
+django-admin compilemessages                              # writes the .mo files
+```
+
+Ship the compiled `.mo` files in the package. When the registry loads a plugin it adds the
+package's `locale/` to the directories Django reads catalogues from, so nothing else is
+needed; a plugin without a `locale/` simply shows its English. The languages worth
+covering first are the ones Postulo itself ships (see `docs/TRANSLATING.md`), and a
+catalogue that is only partly translated is better than none.
+
 ## How sources are chosen
 
 Third-party sources are tried first, in the order the entry points resolve, then the
@@ -199,6 +231,9 @@ Register it in the group for its kind — `postulo.notifiers`, `postulo.stores`,
 [project.entry-points."postulo.notifiers"]
 mynotifier = "my_package:MyNotifier"
 ```
+
+Connected plugins hold their own translations too — the `locale/` directory described
+above applies to every kind of plugin.
 
 **Use `postulo.plugins.http.client()` for every request.** It carries Postulo's timeouts and
 user agent, and it enforces the instance's destination policy on every request, redirects

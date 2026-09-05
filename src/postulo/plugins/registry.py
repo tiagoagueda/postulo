@@ -32,6 +32,7 @@ from importlib.metadata import entry_points
 
 from .base import CONNECTED_KINDS, ConnectedPlugin, JobPostingData, SourcePlugin
 from .builtin import BUILTIN_SOURCES
+from .locale import register_plugin_locale
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +84,9 @@ def _load_third_party(kind: str) -> list:
         except Exception:
             logger.exception("Plugin %r (%s) could not be loaded", entry_point.name, kind)
             continue
+
+        # Every plugin holds its own translations: a locale/ next to its package.
+        register_plugin_locale(entry_point.module)
 
         if not isinstance(plugin, protocol):
             logger.error(

@@ -13,7 +13,9 @@ from django.utils.translation import gettext_lazy as _
 
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 32
-USERNAME_PATTERN = re.compile(r"^[a-z0-9](?:[a-z0-9._-]{1,30}[a-z0-9])?$")
+# Three to thirty-two characters, starting and ending with a letter or digit. The middle
+# group is obligatory, so a one- or two-character name is refused as the message promises.
+USERNAME_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._-]{1,30}[a-z0-9]$")
 
 username_validator = RegexValidator(
     regex=USERNAME_PATTERN,
