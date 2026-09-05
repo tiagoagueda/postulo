@@ -24,8 +24,15 @@ SECURE_HSTS_PRELOAD = env.bool("POSTULO_HSTS_PRELOAD", default=False)
 SILENCED_SYSTEM_CHECKS = [] if SECURE_HSTS_PRELOAD else ["security.W021"]
 SECURE_SSL_REDIRECT = env.bool("POSTULO_SSL_REDIRECT", default=True)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+
+# Secure cookies are only ever sent over HTTPS, which is right for anything a browser
+# reaches over the open internet. It is wrong for an instance reached only inside a mesh
+# VPN such as NetBird or Tailscale, where the wire is already encrypted and the browser
+# sees plain HTTP: the cookie is never sent, and nobody can sign in. Turn this off only
+# in that situation, and turn SSL redirection off with it.
+POSTULO_SECURE_COOKIES = env.bool("POSTULO_SECURE_COOKIES", default=True)
+SESSION_COOKIE_SECURE = POSTULO_SECURE_COOKIES
+CSRF_COOKIE_SECURE = POSTULO_SECURE_COOKIES
 
 # Postulo serves no third-party scripts, fonts, or trackers. Say so, and enforce it.
 SECURE_CSP = {

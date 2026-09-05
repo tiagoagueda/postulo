@@ -92,3 +92,4 @@ These apply only under the production settings.
 | `POSTULO_HSTS_SECONDS` | `31536000` | One year. |
 | `POSTULO_HSTS_INCLUDE_SUBDOMAINS` | `true` | |
 | `POSTULO_HSTS_PRELOAD` | `false` | Off deliberately: preloading is close to irreversible and commits every subdomain to HTTPS. Turn it on only if you understand that. |
+| `POSTULO_SECURE_COOKIES` | `true` | Session and CSRF cookies are sent only over HTTPS. Set to `false` **only** for an instance reached solely inside a mesh VPN such as NetBird or Tailscale, where the browser sees plain HTTP but the wire is already encrypted — otherwise nobody can sign in. Turn `POSTULO_SSL_REDIRECT` off with it. |
