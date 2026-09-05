@@ -59,6 +59,12 @@ the kinds of interview held are tallied from the diary itself.
 A table comparing sources: how many you sent, how many were answered, how many reached
 an interview, how many produced an offer.
 
+A *Quiet* column counts the applications from each source that are still live but have
+gone quiet — silent past your threshold, with nothing planned. They are not failures yet,
+but they are not replies either, and a source whose applications mostly go quiet is telling
+you something the response rate has not caught up with. Beneath the table, the companies
+where applications have gone quiet are named.
+
 This is the figure most likely to change what you do, and it depends entirely on filling
 in **found via** when you record a posting. Everything without one is grouped as *Not
 recorded*, which is honest but not useful. Two minutes of discipline here is worth more

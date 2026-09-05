@@ -60,12 +60,23 @@
 
     {# The point of the dashboard: what needs doing, not what has been done. #}
     <section class="lg:col-span-2">
-      <h2 class="mb-3 font-medium">{% translate "Worth chasing" %}</h2>
-      {% if awaiting_reply %}
-        <div class="card p-0">
+      <div class="mb-3 flex items-baseline justify-between">
+        <h2 class="font-medium">{% translate "Gone quiet" %}</h2>
+        {% if quiet_count %}
+          <a href="{% url 'applications:list' %}?quiet=1" class="text-sm text-brand-600 hover:underline dark:text-brand-400">
+            {% blocktranslate count counter=quiet_count trimmed %}
+              {{ counter }} application
+            {% plural %}
+              All {{ counter }}
+            {% endblocktranslate %}
+          </a>
+        {% endif %}
+      </div>
+      {% if quiet_applications %}
+        <div class="card p-0" data-gone-quiet>
           <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-            {% for application in awaiting_reply %}
-              <li class="flex items-center gap-3 px-4 py-3">
+            {% for application in quiet_applications %}
+              <li class="flex flex-wrap items-center gap-3 px-4 py-3">
                 <div class="min-w-0 flex-1">
                   <a href="{{ application.get_absolute_url }}"
                      class="block truncate font-medium hover:underline">
@@ -73,31 +84,54 @@
                   </a>
                   <p class="truncate text-sm text-ink-500 dark:text-ink-400">
                     {{ application.posting.company.name }}
+                    · {{ application.get_status_display }}
+                    ·
+                    {% blocktranslate trimmed count days=application.days_since_activity %}
+                      quiet for {{ days }} day
+                    {% plural %}
+                      quiet for {{ days }} days
+                    {% endblocktranslate %}
                   </p>
                 </div>
-                <p class="shrink-0 text-sm text-ink-500 tabular-nums dark:text-ink-400">
-                  {% blocktranslate trimmed count days=application.days_since_applied %}
-                    {{ days }} day
-                  {% plural %}
-                    {{ days }} days
-                  {% endblocktranslate %}
-                </p>
+                <div class="flex shrink-0 items-center gap-1">
+                  <form method="post" action="{% url 'applications:quiet_action' application.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'core:home' %}">
+                    <button type="submit" name="action" value="follow_up" class="btn-ghost px-2 py-1 text-xs">
+                      {% translate "Followed up" %}
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'applications:quiet_action' application.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'core:home' %}">
+                    <button type="submit" name="action" value="snooze" class="btn-ghost px-2 py-1 text-xs">
+                      {% translate "Snooze" %}
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'applications:status' application.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'core:home' %}">
+                    <input type="hidden" name="status" value="ghosted">
+                    <button type="submit" class="btn-ghost px-2 py-1 text-xs text-ink-500">
+                      {% translate "Ghosted" %}
+                    </button>
+                  </form>
+                </div>
               </li>
             {% endfor %}
           </ul>
         </div>
-        {% if awaiting_reply_count > 10 %}
-          <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
-            {% blocktranslate trimmed with total=awaiting_reply_count %}
-              Showing 10 of {{ total }}.
-            {% endblocktranslate %}
-          </p>
-        {% endif %}
+        <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed with days=quiet_after_days %}
+            Open applications with nothing for {{ days }} days and nothing planned. Snooze sets a
+            reminder two weeks out; Ghosted records that you stopped waiting.
+          {% endblocktranslate %}
+        </p>
       {% else %}
         <div class="card text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate trimmed with days=chase_after_days %}
-            Nothing has been waiting more than {{ days }} days. Either you are on top of
-            it, or it is time to send out a few more.
+          {% blocktranslate trimmed with days=quiet_after_days %}
+            Nothing has gone quiet for {{ days }} days. Either you are on top of it, or it is
+            time to send out a few more.
           {% endblocktranslate %}
         </div>
       {% endif %}

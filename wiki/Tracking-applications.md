@@ -102,6 +102,28 @@ application imports, and **Dashboard → All interviews → Calendar file** down
 still ahead in one file. Each interview keeps a stable identifier, so importing the file
 again updates the meeting rather than duplicating it.
 
+## Gone quiet
+
+An employer that simply stops replying is the most common ending, and *Ghosted* exists to
+record it. Postulo now notices the silence before you name it. An application has **gone
+quiet** when it is still live, was actually sent, nothing has happened to it for **21
+days** — change the number under **Settings → Appearance** — and nothing is planned: no
+reminder ahead of it, no interview in the diary. If you have already planned the next
+step, it is not quiet, it is waiting.
+
+The dashboard lists them, longest silence first, with three things to do about each:
+
+- **Followed up** records the follow-up on the timeline;
+- **Snooze** sets a reminder two weeks out, which makes the application waiting rather
+  than quiet;
+- **Ghosted** moves the status, through the timeline, so the record says when you stopped
+  waiting.
+
+The board card carries a *Quiet for n days* badge, the table has a *Gone quiet* filter,
+Insights counts them per source and per company, and — if you have a notifier connection
+with *Applications go quiet* switched on — the scheduler tells you when applications newly
+fall silent, once per silence. All of these use the same rule, so the numbers agree.
+
 ## Reminders
 
 Reminders are a note plus a date. Overdue ones are highlighted, and anything due appears

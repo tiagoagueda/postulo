@@ -37,6 +37,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Gone quiet.** An open application that was sent, has had nothing happen for 21 days
+  (adjustable under *Settings → Appearance*) and has nothing planned — no reminder ahead,
+  no interview in the diary — is *quiet*. The dashboard lists them, longest silence first,
+  with *Followed up*, *Snooze* (a reminder two weeks out) and *Ghosted*; the board card
+  says how long; the table filters by it; the API takes `?quiet=true`; Insights counts
+  quiet applications per source and names the companies. A notifier with *Applications go
+  quiet* switched on hears about newly quiet applications from the scheduler, once per
+  silence. The dashboard's *Worth chasing* block, which only looked at the date applied,
+  is replaced by this. (#30)
 - **Tables you can sort, narrow and arrange.** Applications and Companies now sort by any
   column from its header, narrow by typing beneath the header — text, dates from and to,
   choices — with the table updating as you type and a plain button for scripts-off, and

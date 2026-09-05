@@ -163,6 +163,7 @@ def test_the_form_is_drawn_from_the_plugin_and_secrets_are_never_echoed(client, 
         # A notifier connection carries a switch per event; none were ticked here.
         "event_reminder_due": False,
         "event_capture_received": False,
+        "event_went_quiet": False,
     }
     assert connection.secrets == {"token": "s3cret"}
 

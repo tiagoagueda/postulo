@@ -17,6 +17,15 @@
     </div>
   {% endif %}
 
+  {% if application.is_quiet and application.days_since_activity is not None %}
+    <p class="mt-2 text-xs text-amber-700 dark:text-amber-400" data-quiet>
+      {% blocktranslate trimmed count days=application.days_since_activity %}
+        Quiet for {{ days }} day
+      {% plural %}
+        Quiet for {{ days }} days
+      {% endblocktranslate %}
+    </p>
+  {% endif %}
   {% if application.next_interview_at %}
     <p class="mt-2 flex items-center gap-1 text-xs text-brand-700 dark:text-brand-400" data-next-interview>
       {% icon "calendar" class="size-3.5" %}

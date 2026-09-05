@@ -331,16 +331,14 @@ def test_a_completed_reminder_is_not_completed_twice(db, user, application):
 # ----------------------------------------------------------------- the dashboard
 
 
-def test_the_dashboard_suggests_chasing_a_stale_application(client, user, application):
-    change_status(application, Status.APPLIED)
-    application.applied_at = timezone.now() - timedelta(days=30)
-    application.save(update_fields=["applied_at"])
+def test_the_dashboard_says_which_applications_have_gone_quiet(client, user, application):
+    change_status(application, Status.APPLIED, occurred_at=timezone.now() - timedelta(days=30))
     client.force_login(user)
 
     response = client.get(reverse("core:home"))
 
     assert response.status_code == 200
-    assert application in list(response.context["awaiting_reply"])
+    assert application in list(response.context["quiet_applications"])
 
 
 def test_the_dashboard_leaves_a_fresh_application_alone(client, user, application):
@@ -349,7 +347,7 @@ def test_the_dashboard_leaves_a_fresh_application_alone(client, user, applicatio
 
     response = client.get(reverse("core:home"))
 
-    assert list(response.context["awaiting_reply"]) == []
+    assert list(response.context["quiet_applications"]) == []
 
 
 def test_an_event_belonging_to_someone_else_is_not_visible(db, user, other_user, application):

@@ -18,8 +18,8 @@ from __future__ import annotations
 import uuid
 
 from django.db import models
-from django.db.models import OuterRef, Subquery
-from django.db.models.functions import Now
+from django.db.models import Exists, F, OuterRef, Subquery
+from django.db.models.functions import Coalesce, Now
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -61,6 +61,9 @@ OPEN_STATUSES = frozenset(
         Status.OFFER,
     }
 )
+
+#: Statuses an application can go quiet in: open, and actually sent.
+QUIET_STATUSES = frozenset(OPEN_STATUSES - {Status.DRAFT})
 
 #: The order columns appear on the board, left to right.
 BOARD_STATUSES = (
@@ -115,18 +118,52 @@ class ApplicationQuerySet(models.QuerySet):
 
         Subqueries rather than joins, for the same reason as the interview: they compose.
         """
-        last_event = (
-            ApplicationEvent.objects.filter(application=OuterRef("pk"))
-            .order_by("-occurred_at")
-            .values("occurred_at")[:1]
-        )
         next_reminder = (
             Reminder.objects.filter(application=OuterRef("pk"), done_at__isnull=True)
             .order_by("due_at")
             .values("due_at")[:1]
         )
-        return self.annotate(
-            last_activity_at=Subquery(last_event), next_reminder_at=Subquery(next_reminder)
+        return self.with_activity().annotate(next_reminder_at=Subquery(next_reminder))
+
+    def with_activity(self, at=None) -> ApplicationQuerySet:
+        """Annotate ``last_activity_at`` and ``has_future_reminder``, once.
+
+        The last activity is the latest timeline entry, falling back to the date applied
+        and then the date recorded, so every application has one. Annotations already
+        present are left alone, so this composes with ``with_display_data``.
+        """
+        queryset = self
+        present = self.query.annotations
+        if "last_activity_at" not in present:
+            last_event = (
+                ApplicationEvent.objects.filter(application=OuterRef("pk"))
+                .order_by("-occurred_at")
+                .values("occurred_at")[:1]
+            )
+            queryset = queryset.annotate(
+                last_activity_at=Coalesce(Subquery(last_event), F("applied_at"), F("created_at"))
+            )
+        if "has_future_reminder" not in present:
+            ahead = Reminder.objects.filter(
+                application=OuterRef("pk"), done_at__isnull=True, due_at__gt=at or Now()
+            )
+            queryset = queryset.annotate(has_future_reminder=Exists(ahead))
+        if "next_interview_at" not in present:
+            queryset = queryset.with_next_interview()
+        return queryset
+
+    def quiet(self, after_days: int, at=None) -> ApplicationQuerySet:
+        """Open, sent, nothing for ``after_days`` days, and nothing planned.
+
+        The one predicate behind every mention of *quiet*: the dashboard block, the board
+        badge, the table filter, the figures and the notifier all call this.
+        """
+        now = at or timezone.now()
+        cutoff = now - timezone.timedelta(days=after_days)
+        return (
+            self.with_activity(at=now)
+            .filter(status__in=list(QUIET_STATUSES), last_activity_at__lt=cutoff)
+            .filter(has_future_reminder=False, next_interview_at__isnull=True)
         )
 
     def with_next_interview(self) -> ApplicationQuerySet:
@@ -189,6 +226,9 @@ class Application(OwnedModel):
         verbose_name=_("files sent"),
         help_text=_("Files you already had, as opposed to documents Postulo rendered."),
     )
+    #: When the silence on this application was last announced to its owner. Compared with
+    #: the last activity, so a silence is announced once and a new one is announced again.
+    quiet_announced_at = models.DateTimeField(_("quiet announced on"), null=True, blank=True)
 
     objects = ApplicationQuerySet.as_manager()
 
@@ -218,6 +258,14 @@ class Application(OwnedModel):
         if self.applied_at is None:
             return None
         return (timezone.now() - self.applied_at).days
+
+    @property
+    def days_since_activity(self) -> int | None:
+        """Days since anything happened, when the queryset annotated the last activity."""
+        last = getattr(self, "last_activity_at", None)
+        if last is None:
+            return None
+        return (timezone.now() - last).days
 
 
 class EventKind(models.TextChoices):

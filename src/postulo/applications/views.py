@@ -27,7 +27,7 @@ from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 from postulo.core.models import Tag
 from postulo.jobs.views import UserFormKwargsMixin
 
-from . import ical
+from . import ical, quiet
 from .analytics import build as build_insights
 from .forms import (
     ApplicationForm,
@@ -42,6 +42,7 @@ from .models import (
     BOARD_STATUSES,
     SETTLED_OUTCOMES,
     Application,
+    EventKind,
     Interview,
     InterviewOutcome,
     Reminder,
@@ -92,6 +93,9 @@ class ApplicationFilterMixin:
         elif state == "closed":
             queryset = queryset.closed()
 
+        if params.get("quiet", "").strip():
+            queryset = queryset.quiet(quiet.threshold_for(self.request.user))
+
         return queryset.distinct()
 
     def filter_context(self) -> dict:
@@ -100,6 +104,7 @@ class ApplicationFilterMixin:
             "selected_status": self.request.GET.get("status", ""),
             "selected_tag": self.request.GET.get("tag", ""),
             "selected_state": self.request.GET.get("state", ""),
+            "selected_quiet": bool(self.request.GET.get("quiet", "").strip()),
             "statuses": Status.choices,
             "tags": Tag.objects.for_user(self.request.user),
         }
@@ -152,11 +157,17 @@ class ApplicationBoardView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
     context_object_name = "applications"
 
     def get_queryset(self):
-        return self.filter_queryset(super().get_queryset().with_display_data())
+        # The cards say how long a quiet application has been quiet, so they need the
+        # last activity too.
+        return self.filter_queryset(super().get_queryset().with_display_data().with_activity())
 
     def get_context_data(self, **kwargs) -> dict:
         context = {**super().get_context_data(**kwargs), **self.filter_context()}
         applications = list(context["applications"])
+        # The same predicate as the dashboard, so the badge and the block agree.
+        quiet_ids = set(quiet.quiet_applications(self.request.user).values_list("pk", flat=True))
+        for application in applications:
+            application.is_quiet = application.pk in quiet_ids
         context["columns"] = [
             {
                 "status": status,
@@ -353,6 +364,49 @@ class ReminderCompleteView(OwnedObjectMixin, View):
         reminder.complete()
         messages.success(request, _("Marked as done."))
         return redirect(request.POST.get("next") or reverse("applications:reminder_list"))
+
+
+class ApplicationQuietActionView(OwnedObjectMixin, View):
+    """What to do about an application that has gone quiet, from the dashboard.
+
+    *Followed up* records the follow-up on the timeline; *Snooze* sets a reminder two
+    weeks out, which by definition makes the application not quiet. *Ghosted* is the
+    ordinary status action, so the timeline says when the person gave up waiting.
+    """
+
+    def get_queryset(self):
+        return Application.objects.for_user(self.request.user).select_related(
+            "posting", "posting__company"
+        )
+
+    def post(self, request, pk: int) -> HttpResponse:
+        application = get_object_or_404(self.get_queryset(), pk=pk)
+        action = request.POST.get("action", "")
+        if action == "follow_up":
+            record_event(
+                application,
+                kind=EventKind.FOLLOW_UP,
+                summary=str(_("Followed up")),
+                body=request.POST.get("note", ""),
+            )
+            messages.success(request, _("Follow-up recorded."))
+        elif action == "snooze":
+            Reminder.objects.create(
+                owner=request.user,
+                application=application,
+                summary=str(
+                    _("Chase %(company)s about %(role)s")
+                    % {
+                        "company": application.posting.company.name,
+                        "role": application.posting.title,
+                    }
+                ),
+                due_at=quiet.snooze_until(),
+            )
+            messages.success(request, _("Snoozed for two weeks."))
+        else:
+            messages.error(request, _("That is not something Postulo can do about it."))
+        return redirect(request.POST.get("next") or application.get_absolute_url())
 
 
 # ------------------------------------------------------------------ interviews

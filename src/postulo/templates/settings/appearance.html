@@ -23,6 +23,18 @@
         {% for error in form.theme.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
       </fieldset>
     </div>
+    <div class="card mb-6">
+      <h3 class="mb-1 font-medium">{% translate "Gone quiet" %}</h3>
+      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks." %}
+      </p>
+      <div class="flex items-end gap-3">
+        <div class="w-32">
+          {% include "partials/field.html" with field=form.quiet_after_days %}
+        </div>
+        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">{% translate "days" %}</p>
+      </div>
+    </div>
     <button type="submit" class="btn-primary">{% translate "Save" %}</button>
   </form>
 {% endblock %}

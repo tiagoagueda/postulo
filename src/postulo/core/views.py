@@ -9,9 +9,6 @@ from django.http import HttpRequest, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-#: How long an application may sit unanswered before the dashboard suggests chasing it.
-CHASE_AFTER_DAYS = 14
-
 #: How far back "recent" reaches on the dashboard.
 RECENT_DAYS = 30
 
@@ -30,16 +27,13 @@ def home(request: HttpRequest):
         Reminder,
         Status,
     )
+    from postulo.applications.quiet import quiet_applications, threshold_for
     from postulo.jobs.models import JobPosting
 
     applications = Application.objects.for_user(request.user)
     listings = JobPosting.objects.for_user(request.user)
     now = timezone.now()
-
-    awaiting = applications.filter(
-        status__in=[Status.APPLIED, Status.ACKNOWLEDGED],
-        applied_at__lte=now - timedelta(days=CHASE_AFTER_DAYS),
-    ).with_display_data()
+    quiet = quiet_applications(request.user, at=now)
 
     context = {
         "open_count": applications.open().count(),
@@ -53,9 +47,9 @@ def home(request: HttpRequest):
         "offer_count": applications.filter(status=Status.OFFER).count(),
         "listings_to_decide": listings.undecided().count(),
         "closing_soon_count": listings.closing_soon().count(),
-        "awaiting_reply": awaiting[:10],
-        "awaiting_reply_count": awaiting.count(),
-        "chase_after_days": CHASE_AFTER_DAYS,
+        "quiet_applications": quiet[:10],
+        "quiet_count": quiet.count(),
+        "quiet_after_days": threshold_for(request.user),
         "upcoming_interviews": (
             Interview.objects.for_user(request.user).upcoming().with_display_data()[:5]
         ),

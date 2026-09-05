@@ -37,12 +37,16 @@
       </select>
     </div>
   {% endif %}
+  <label class="mb-2 flex items-center gap-2 text-sm">
+    <input type="checkbox" name="quiet" value="1" {% if selected_quiet %}checked{% endif %}>
+    {% translate "Gone quiet" %}
+  </label>
   <button type="submit" class="btn-secondary">{% translate "Filter" %}</button>
   {% if table %}
     {% if table.filters_active %}
       <a href="{{ table.clear_url }}" class="btn-ghost">{% translate "Clear" %}</a>
     {% endif %}
-  {% elif search or selected_status or selected_tag or selected_state %}
+  {% elif search or selected_status or selected_tag or selected_state or selected_quiet %}
     <a href="{{ request.path }}" class="btn-ghost">{% translate "Clear" %}</a>
   {% endif %}
 </form>

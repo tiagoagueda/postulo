@@ -112,12 +112,24 @@ class ProfileForm(forms.ModelForm):
 
 
 class AppearanceForm(forms.ModelForm):
-    """Settings → Appearance. The explicit version of the switch in the header."""
+    """Settings → Appearance: the theme, and how the dashboard behaves."""
 
     class Meta:
         model = Profile
-        fields = ("theme",)
+        fields = ("theme", "quiet_after_days")
         widgets = {"theme": forms.RadioSelect}
+        labels = {"quiet_after_days": _("Consider an application quiet after")}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Left blank, the threshold goes back to the default rather than refusing to save.
+        self.fields["quiet_after_days"].required = False
+
+    def clean_quiet_after_days(self) -> int:
+        value = self.cleaned_data.get("quiet_after_days")
+        if value is None:
+            return Profile._meta.get_field("quiet_after_days").default
+        return value
 
 
 class LocaleForm(forms.ModelForm):

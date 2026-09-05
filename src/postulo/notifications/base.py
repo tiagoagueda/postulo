@@ -7,7 +7,7 @@ person chooses, per connection, which events reach it.
 
 Events are few on purpose. Telling somebody what they just did themselves is noise; the
 events here are the things that happen *to* them: a reminder they set falling due, a
-capture arriving from outside.
+capture arriving from outside, an employer falling silent.
 """
 
 from __future__ import annotations
@@ -26,6 +26,7 @@ from postulo.plugins.base import ConnectedPlugin, FieldSpec
 EVENTS = {
     "reminder_due": _("A reminder falls due"),
     "capture_received": _("A posting arrives through the capture API"),
+    "went_quiet": _("Applications go quiet"),
 }
 
 

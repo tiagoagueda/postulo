@@ -1,8 +1,9 @@
-"""Notice the reminders that have fallen due, and tell their owners.
+"""Notice what the clock has changed, and tell the people concerned.
 
 Something has to look at the clock. For a single-instance application one command a
 few minutes apart is the right size: run it from the host's cron, or as the ``scheduler``
-service in the Compose file, which runs it in a loop. Each reminder is announced once;
+service in the Compose file, which runs it in a loop. Each pass announces the reminders
+that have fallen due and the applications that have gone quiet. Each is announced once;
 the stamp survives whether or not the person had a notifier at the time, so adding one
 later does not replay a month of old reminders.
 """
@@ -57,7 +58,10 @@ def announce_due_reminders() -> tuple[int, int]:
 
 
 class Command(BaseCommand):
-    help = "Notify people of reminders that have fallen due. Run it from cron, or with --loop."
+    help = (
+        "Notify people of reminders that have fallen due and applications that have gone "
+        "quiet. Run it from cron, or with --loop."
+    )
 
     def add_arguments(self, parser) -> None:
         parser.add_argument("--loop", action="store_true", help="Keep running, forever.")
@@ -69,15 +73,18 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options) -> None:
+        from postulo.applications.quiet import announce_quiet_applications
+
         while True:
             stamped, delivered = announce_due_reminders()
+            quiet, told = announce_quiet_applications()
+            when = f"{timezone.now():%Y-%m-%d %H:%M}"
             if stamped:
-                self.stdout.write(
-                    f"{timezone.now():%Y-%m-%d %H:%M} {stamped} reminders due, "
-                    f"{delivered} deliveries"
-                )
+                self.stdout.write(f"{when} {stamped} reminders due, {delivered} deliveries")
+            if quiet:
+                self.stdout.write(f"{when} {quiet} applications gone quiet, {told} deliveries")
             if not options["loop"]:
-                if not stamped:
+                if not stamped and not quiet:
                     self.stdout.write("Nothing due.")
                 return
             time.sleep(max(options["every"], 10))

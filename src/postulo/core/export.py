@@ -46,6 +46,7 @@ PROFILE_FIELDS = (
     "time_zone",
     "theme",
     "table_settings",
+    "quiet_after_days",
 )
 TAG_FIELDS = ("id", "name", "slug", "colour")
 COMPANY_FIELDS = (

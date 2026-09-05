@@ -11,7 +11,7 @@ from .models import Channel, Priority, Status
 class ApplicationsTable(Table):
     name = "applications"
     default_sort = "-created"
-    extra_params = ("q", "status", "state", "tag")
+    extra_params = ("q", "status", "state", "tag", "quiet")
     noun = (_("application"), _("applications"))
     columns = (
         Column(

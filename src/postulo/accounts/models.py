@@ -14,6 +14,7 @@ from typing import ClassVar
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager as DjangoUserManager
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -186,6 +187,13 @@ class Profile(models.Model):
     #: How each table is laid out — which columns, in what order, how many rows a page
     #: holds — keyed by the table's name. A preference, so it follows the account.
     table_settings = models.JSONField(_("table settings"), default=dict, blank=True)
+    #: Days without activity after which an open application counts as having gone quiet.
+    quiet_after_days = models.PositiveSmallIntegerField(
+        _("quiet after"),
+        default=21,
+        validators=[MinValueValidator(1), MaxValueValidator(365)],
+        help_text=_("Days without anything happening, and nothing planned, before Postulo asks."),
+    )
 
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)

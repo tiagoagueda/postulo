@@ -14,6 +14,7 @@ urlpatterns = [
     path("<int:pk>/delete/", views.ApplicationDeleteView.as_view(), name="delete"),
     path("<int:pk>/status/", views.ApplicationStatusView.as_view(), name="status"),
     path("<int:pk>/events/new/", views.EventCreateView.as_view(), name="event_create"),
+    path("<int:pk>/quiet/", views.ApplicationQuietActionView.as_view(), name="quiet_action"),
     path("reminders/", views.ReminderListView.as_view(), name="reminder_list"),
     path("reminders/new/", views.ReminderCreateView.as_view(), name="reminder_create"),
     path(

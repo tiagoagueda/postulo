@@ -8,6 +8,7 @@ from ninja.pagination import paginate
 
 from postulo.applications.models import SYSTEM_EVENT_KINDS, Application, Channel, EventKind
 from postulo.applications.models import Status as ApplicationStatus
+from postulo.applications.quiet import threshold_for
 from postulo.applications.services import (
     change_status,
     create_application,
@@ -38,8 +39,13 @@ def list_applications(
     company: int | None = Query(None, description="A company id"),
     since: dt.date | None = Query(None, description="Applied on or after this date"),
     open_only: bool = Query(False, description="Only applications still undecided"),
+    quiet: bool = Query(
+        False, description="Only applications that have gone quiet by the owner's threshold"
+    ),
 ):
     applications = owned(request, Application.objects).with_display_data().order_by("-created_at")
+    if quiet:
+        applications = applications.quiet(threshold_for(request.auth.owner))
     if status:
         applications = applications.filter(status=status)
     if company:

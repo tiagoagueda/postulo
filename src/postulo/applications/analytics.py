@@ -69,10 +69,16 @@ class SourceRow:
     responded: int = 0
     interviewed: int = 0
     offers: int = 0
+    #: Open right now and gone quiet — the ones the response rate has not yet counted.
+    quiet: int = 0
 
     @property
     def response_rate(self) -> float | None:
         return 100 * self.responded / self.applied if self.applied else None
+
+    @property
+    def quiet_rate(self) -> float | None:
+        return 100 * self.quiet / self.applied if self.applied else None
 
 
 @dataclass
@@ -97,6 +103,10 @@ class Insights:
     interview_kinds: list[tuple[str, int]] = field(default_factory=list)
     sources: list[SourceRow] = field(default_factory=list)
     by_month: list[tuple[str, int]] = field(default_factory=list)
+    #: Gone quiet: open, sent, silent past the person's threshold, nothing planned.
+    quiet_now: int = 0
+    quiet_after_days: int = 0
+    quiet_by_company: list[tuple[str, int]] = field(default_factory=list)
     #: The stage before applications: how many listings were noticed, and what became of them.
     listings_noted: int = 0
     listings_applied: int = 0
@@ -262,6 +272,19 @@ def build(user) -> Insights:
     labels = dict(Interview._meta.get_field("kind").choices)
     insights.interview_kinds = [(str(labels.get(kind, kind)), count) for kind, count in kinds]
 
+    # ------------------------------------------------------------------ quiet
+    from .quiet import quiet_applications, threshold_for
+
+    quiet_ids = set(quiet_applications(user).values_list("pk", flat=True))
+    insights.quiet_now = len(quiet_ids)
+    insights.quiet_after_days = threshold_for(user)
+    by_company: dict[str, int] = {}
+    for application in applications:
+        if application.pk in quiet_ids:
+            name = application.posting.company.name
+            by_company[name] = by_company.get(name, 0) + 1
+    insights.quiet_by_company = sorted(by_company.items(), key=lambda item: (-item[1], item[0]))
+
     # --------------------------------------------------------------- sources
     rows: dict[str, SourceRow] = {}
     for application in ever_applied:
@@ -275,6 +298,8 @@ def build(user) -> Insights:
             row.interviewed += 1
         if Status.OFFER in statuses:
             row.offers += 1
+        if application.pk in quiet_ids:
+            row.quiet += 1
     insights.sources = sorted(rows.values(), key=lambda row: (-row.applied, row.name))
 
     # ----------------------------------------------------------- over time

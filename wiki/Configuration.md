@@ -102,9 +102,9 @@ synchronisation — keep their configuration under *Settings → Connections*.
 
 Postulo sends nothing until a person adds a notification connection under *Settings →
 Connections*. The built-in **Email** notifier uses the mail settings below; plugins add
-other ways. Two things happen without anyone asking: a posting arriving through the capture
-API is announced at once, and a reminder falling due is announced by the **scheduler**,
-which somebody has to run:
+other ways. Three things happen without anyone asking: a posting arriving through the
+capture API is announced at once; a reminder falling due, and applications going quiet, are
+announced by the **scheduler**, which somebody has to run:
 
 ```sh
 # in the container, as a service that loops every five minutes

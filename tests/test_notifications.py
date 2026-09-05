@@ -97,6 +97,7 @@ def test_a_notifier_connection_carries_a_switch_per_event(client, user):
         "to": "me@example.org",
         "event_reminder_due": True,
         "event_capture_received": False,
+        "event_went_quiet": False,
     }
 
 
