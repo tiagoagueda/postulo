@@ -263,7 +263,7 @@ def test_the_export_carries_listing_state_and_the_importer_reads_both_formats(
     )
 
     document = build_document(user)
-    assert document["postulo"]["format"] == export_module.FORMAT_VERSION == 2
+    assert document["postulo"]["format"] == export_module.FORMAT_VERSION == 3
     exported = document["companies"][0]["postings"][0]
     assert exported["state"] == "shortlisted" and exported["decided_at"]
     assert document["captures"][0]["posting_id"] == item.pk

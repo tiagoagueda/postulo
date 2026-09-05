@@ -198,6 +198,89 @@
         {% endwith %}
       </div>
 
+      <div class="card mb-6" id="interviews">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="font-medium">{% translate "Interviews" %}</h2>
+          <a href="{% url 'applications:interview_create' application.pk %}"
+             class="text-sm text-brand-600 hover:underline dark:text-brand-400">
+            {% translate "Schedule" %}
+          </a>
+        </div>
+        {% if scheduled_interviews %}
+          <ul class="space-y-3">
+            {% for interview in scheduled_interviews %}
+              <li id="interview-{{ interview.pk }}">
+                <div class="flex items-start gap-3">
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-medium">{{ interview.get_kind_display }}</p>
+                    <p class="text-xs {% if interview.awaits_outcome %}text-amber-700 dark:text-amber-400{% else %}text-ink-500 dark:text-ink-400{% endif %} tabular-nums">
+                      {{ interview.starts_at|date:"D j M Y, H:i" }}–{{ interview.ends_at|date:"H:i" }}
+                    </p>
+                    {% if interview.location %}
+                      <p class="truncate text-xs text-ink-500 dark:text-ink-400">
+                        {% if interview.is_link %}
+                          <a href="{{ interview.location }}" rel="noopener noreferrer external" target="_blank"
+                             class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Join the call" %}</a>
+                        {% else %}
+                          {{ interview.location }}
+                        {% endif %}
+                      </p>
+                    {% endif %}
+                    {% if interview.contacts.all %}
+                      <p class="text-xs text-ink-500 dark:text-ink-400">
+                        {% translate "With" %}
+                        {% for person in interview.contacts.all %}{% if not forloop.first %}, {% endif %}{{ person.name }}{% endfor %}
+                      </p>
+                    {% endif %}
+                    {% if interview.notes %}
+                      <p class="mt-1 whitespace-pre-line text-xs text-ink-600 dark:text-ink-300">{{ interview.notes }}</p>
+                    {% endif %}
+                  </div>
+                  <div class="flex shrink-0 flex-col items-end gap-1">
+                    <a href="{% url 'applications:interview_ics' interview.pk %}" class="btn-ghost px-2 py-1 text-xs">
+                      {% translate "Calendar" %}
+                    </a>
+                    <a href="{% url 'applications:interview_update' interview.pk %}" class="btn-ghost px-2 py-1 text-xs">
+                      {% translate "Edit" %}
+                    </a>
+                  </div>
+                </div>
+                <div class="mt-1">
+                  {% if interview.awaits_outcome %}
+                    <p class="mb-1 text-xs text-amber-700 dark:text-amber-400">{% translate "How did it go?" %}</p>
+                  {% endif %}
+                  {% include "applications/partials/interview_outcome.html" with next=application.get_absolute_url %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Nothing scheduled." %}</p>
+        {% endif %}
+        {% if settled_interviews %}
+          <details class="mt-3 text-sm">
+            <summary class="cursor-pointer text-xs text-ink-500 dark:text-ink-400">
+              {% blocktranslate count counter=settled_interviews|length trimmed %}
+                {{ counter }} earlier
+              {% plural %}
+                {{ counter }} earlier
+              {% endblocktranslate %}
+            </summary>
+            <ul class="mt-2 space-y-2">
+              {% for interview in settled_interviews %}
+                <li id="interview-{{ interview.pk }}" class="flex items-baseline gap-2 text-xs">
+                  <span class="tabular-nums text-ink-500 dark:text-ink-400">{{ interview.starts_at|date:"j M Y" }}</span>
+                  <span>{{ interview.get_kind_display }}</span>
+                  <span class="rounded bg-ink-100 px-1.5 py-0.5 text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+                    {{ interview.get_outcome_display }}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          </details>
+        {% endif %}
+      </div>
+
       <div class="card">
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-medium">{% translate "Reminders" %}</h2>

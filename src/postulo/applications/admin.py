@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Application, ApplicationEvent, Reminder
+from .models import Application, ApplicationEvent, Interview, Reminder
 
 
 class EventInline(admin.TabularInline):
@@ -32,3 +32,13 @@ class ReminderAdmin(admin.ModelAdmin):
     list_display = ("summary", "due_at", "done_at", "application", "owner")
     list_filter = ("owner", "done_at")
     search_fields = ("summary",)
+
+
+@admin.register(Interview)
+class InterviewAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "kind", "starts_at", "outcome", "owner")
+    list_filter = ("owner", "kind", "outcome")
+    search_fields = ("application__posting__title", "application__posting__company__name")
+    autocomplete_fields = ("application",)
+    filter_horizontal = ("contacts",)
+    readonly_fields = ("uid",)

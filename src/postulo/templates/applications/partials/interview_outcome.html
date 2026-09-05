@@ -1,0 +1,16 @@
+{% load i18n %}
+{# The three ways a scheduled interview ends. `next` is where to return to afterwards. #}
+<form method="post" action="{% url 'applications:interview_outcome' interview.pk %}"
+      class="flex flex-wrap items-center gap-1">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <button type="submit" name="outcome" value="done" class="btn-ghost px-2 py-1 text-xs">
+    {% translate "Held" %}
+  </button>
+  <button type="submit" name="outcome" value="cancelled" class="btn-ghost px-2 py-1 text-xs">
+    {% translate "Cancelled" %}
+  </button>
+  <button type="submit" name="outcome" value="no_show" class="btn-ghost px-2 py-1 text-xs">
+    {% translate "No-show" %}
+  </button>
+</form>

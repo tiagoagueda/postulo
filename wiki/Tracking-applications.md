@@ -52,6 +52,34 @@ different from the date you got round to recording it.
 The status field is what the board and filters read. The log is what actually happened.
 When they disagree, believe the log.
 
+## Interviews
+
+A timeline entry says an interview *happened*. An interview in the diary says one *will*:
+it has a start and an end, a place or a link to the call, the people you are meeting, a
+kind — phone screen, video call, on site, panel, assessment — and notes to prepare with.
+
+Schedule one from the **Interviews** card on the application page. Three things follow:
+
+- the timeline records that it was scheduled, and later how it went;
+- a reminder falls due the day before (untick it if you do not want one), so whatever
+  tells you about reminders tells you about interviews too;
+- it appears under **Coming up** on the dashboard, on the board card, and in the table.
+
+Once its time has passed, the diary asks how it went. **Held** writes an *interview* entry
+on the timeline dated when it took place and moves the status forward if it had not kept
+up — a phone screen to *Screening*, an assessment to *Assessment*, anything else to
+*Interviewing* — through the same path as any status change, so the log says so. It never
+moves a settled application: an interview you remember after a rejection reopens nothing.
+**Cancelled** and **No-show** are recorded too; nothing is deleted.
+
+Recording one that already happened uses the same form: an interview whose time is past is
+written straight onto the timeline as held.
+
+Every interview has a **Calendar** link that downloads an `.ics` file any calendar
+application imports, and **Dashboard → All interviews → Calendar file** downloads everything
+still ahead in one file. Each interview keeps a stable identifier, so importing the file
+again updates the meeting rather than duplicating it.
+
 ## Reminders
 
 Reminders are a note plus a date. Overdue ones are highlighted, and anything due appears

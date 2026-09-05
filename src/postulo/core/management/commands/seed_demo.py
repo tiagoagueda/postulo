@@ -28,8 +28,17 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
 
-from postulo.applications.models import Application, Channel, EventKind, Priority, Reminder, Status
-from postulo.applications.services import change_status, record_event
+from postulo.applications.models import (
+    Application,
+    Channel,
+    EventKind,
+    Interview,
+    InterviewKind,
+    Priority,
+    Reminder,
+    Status,
+)
+from postulo.applications.services import change_status, record_event, schedule_interview
 from postulo.core.models import Tag
 from postulo.documents.models import (
     CV,
@@ -181,6 +190,7 @@ class Report:
     applications: int = 0
     events: int = 0
     reminders: int = 0
+    interviews: int = 0
     snapshots: int = 0
     notes: list[str] | None = None
 
@@ -285,6 +295,7 @@ class Command(BaseCommand):
             CVItem,
             CV,
             CoverLetter,
+            Interview,
             Reminder,
             Application,
             JobPosting,
@@ -588,6 +599,35 @@ class Command(BaseCommand):
                 reminder.done_at = now + delta + dt.timedelta(hours=3)
                 reminder.save(update_fields=["done_at"])
             report.reminders += 1
+
+        # ---- interviews: one held, one in the diary ---------------------------
+        talking = [a for a in applications if a.status == Status.INTERVIEWING]
+        for index, application in enumerate(talking[:2]):
+            company = application.posting.company
+            people = contacts.get(company.pk, [])
+            schedule_interview(
+                application,
+                kind=InterviewKind.PHONE,
+                starts_at=now - dt.timedelta(days=6 + index, hours=2),
+                location="",
+                contacts=people,
+            )
+            report.interviews += 1
+            report.events += 2  # held, and the status catching up
+            upcoming = schedule_interview(
+                application,
+                kind=InterviewKind.VIDEO if index else InterviewKind.ONSITE,
+                starts_at=(now + dt.timedelta(days=2 + 3 * index)).replace(
+                    hour=10, minute=0, second=0, microsecond=0
+                ),
+                location=f"{company.website}/meet/{rng.randint(1000, 9999)}"
+                if index
+                else company.location,
+                notes="Ask about the team's on-call rota and how they run retros.",
+                contacts=people,
+            )
+            report.interviews += 1
+            report.reminders += int(upcoming.reminder_id is not None)
 
         # ---- documents -------------------------------------------------------
         cvs = []

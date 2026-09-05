@@ -185,6 +185,49 @@ class ListingRef(Schema):
     company: CompanyRef
 
 
+class InterviewOut(Schema):
+    id: int
+    uid: str = Field(description="Stable across edits; what a calendar keys the meeting by")
+    application_id: int
+    kind: str
+    starts_at: dt.datetime
+    ends_at: dt.datetime
+    location: str = ""
+    contact_ids: list[int]
+    notes: str = ""
+    outcome: str
+    reminder_id: int | None = None
+    web_url: str
+    calendar_url: str
+
+
+class InterviewIn(Schema):
+    application_id: int
+    kind: str = "video"
+    starts_at: dt.datetime
+    ends_at: dt.datetime | None = Field(
+        default=None, description="An hour after the start if unset"
+    )
+    location: str = Field(default="", max_length=500)
+    contact_ids: list[int] = Field(default_factory=list)
+    notes: str = ""
+    remind: bool = Field(default=True, description="Make a reminder for the day before")
+
+
+class InterviewPatch(Schema):
+    kind: str | None = None
+    starts_at: dt.datetime | None = None
+    ends_at: dt.datetime | None = None
+    location: str | None = Field(default=None, max_length=500)
+    contact_ids: list[int] | None = None
+    notes: str | None = None
+
+
+class InterviewOutcomeIn(Schema):
+    outcome: str = Field(description="done, cancelled or no_show")
+    note: str = ""
+
+
 class ApplicationOut(Schema):
     id: int
     listing: ListingRef
@@ -196,6 +239,7 @@ class ApplicationOut(Schema):
     closed_at: dt.datetime | None = None
     contact_id: int | None = None
     tags: list[str]
+    next_interview_at: dt.datetime | None = None
     created_at: dt.datetime
     web_url: str
 
@@ -203,6 +247,7 @@ class ApplicationOut(Schema):
 class ApplicationDetailOut(ApplicationOut):
     events: list[EventOut]
     reminders: list[ReminderOut]
+    interviews: list[InterviewOut]
     sent_document_ids: list[int]
 
 
@@ -338,6 +383,7 @@ def application_out(request, application, *, detail: bool = False) -> dict:
         "closed_at": application.closed_at,
         "contact_id": application.contact_id,
         "tags": [tag.name for tag in application.tags.all()],
+        "next_interview_at": getattr(application, "next_interview_at", None),
         "created_at": application.created_at,
         "web_url": request.build_absolute_uri(application.get_absolute_url()),
     }
@@ -356,8 +402,29 @@ def application_out(request, application, *, detail: bool = False) -> dict:
             for event in application.events.all()
         ]
         data["reminders"] = [reminder_out(r) for r in application.reminders.all()]
+        data["interviews"] = [interview_out(request, i) for i in application.interviews.all()]
         data["sent_document_ids"] = [d.pk for d in application.rendered_documents.all()]
     return data
+
+
+def interview_out(request, interview) -> dict:
+    return {
+        "id": interview.pk,
+        "uid": interview.uid,
+        "application_id": interview.application_id,
+        "kind": interview.kind,
+        "starts_at": interview.starts_at,
+        "ends_at": interview.ends_at,
+        "location": interview.location,
+        "contact_ids": [c.pk for c in interview.contacts.all()],
+        "notes": interview.notes,
+        "outcome": interview.outcome,
+        "reminder_id": interview.reminder_id,
+        "web_url": request.build_absolute_uri(interview.get_absolute_url()),
+        "calendar_url": request.build_absolute_uri(
+            reverse("postulo-api:interview_calendar", kwargs={"pk": interview.pk})
+        ),
+    }
 
 
 def reminder_out(reminder) -> dict:

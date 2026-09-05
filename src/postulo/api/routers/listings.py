@@ -89,9 +89,11 @@ def apply(request, pk: int, payload: ApplicationDetailsIn):
 
     fresh = owned_or_404(
         request,
-        Application.objects.select_related("posting", "posting__company").prefetch_related(
-            "tags", "events", "reminders", "rendered_documents"
-        ),
+        Application.objects.select_related("posting", "posting__company")
+        .prefetch_related(
+            "tags", "events", "reminders", "interviews__contacts", "rendered_documents"
+        )
+        .with_next_interview(),
         application.pk,
     )
     return Status(201, application_out(request, fresh, detail=True))

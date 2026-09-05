@@ -133,6 +133,51 @@
 
     <section>
       <div class="mb-3 flex items-center justify-between">
+        <h2 class="font-medium">{% translate "Coming up" %}</h2>
+        <a href="{% url 'applications:interview_list' %}" class="text-sm text-brand-600 hover:underline dark:text-brand-400">
+          {% translate "All interviews" %}
+        </a>
+      </div>
+      {% if upcoming_interviews %}
+        <div class="card p-0" data-coming-up>
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for interview in upcoming_interviews %}
+              <li class="flex items-start gap-3 px-4 py-3">
+                <div class="w-20 shrink-0 text-sm tabular-nums">
+                  <p class="font-medium">{{ interview.starts_at|date:"D j M" }}</p>
+                  <p class="text-xs text-ink-500 dark:text-ink-400">{{ interview.starts_at|date:"H:i" }}</p>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <a href="{{ interview.application.get_absolute_url }}#interview-{{ interview.pk }}"
+                     class="block truncate text-sm font-medium hover:underline">
+                    {{ interview.application.posting.title }}
+                  </a>
+                  <p class="truncate text-xs text-ink-500 dark:text-ink-400">
+                    {{ interview.get_kind_display }} · {{ interview.application.posting.company.name }}
+                  </p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="card text-sm text-ink-500 dark:text-ink-400">
+          {% translate "No interviews in the diary." %}
+        </div>
+      {% endif %}
+      {% if interviews_awaiting_outcome %}
+        <p class="mt-2 text-xs text-amber-700 dark:text-amber-400" data-awaiting-outcome>
+          <a href="{% url 'applications:interview_list' %}" class="hover:underline">
+            {% blocktranslate count counter=interviews_awaiting_outcome trimmed %}
+              {{ counter }} interview has passed without an outcome. How did it go?
+            {% plural %}
+              {{ counter }} interviews have passed without an outcome. How did they go?
+            {% endblocktranslate %}
+          </a>
+        </p>
+      {% endif %}
+
+      <div class="mt-6 mb-3 flex items-center justify-between">
         <h2 class="font-medium">{% translate "Due now" %}</h2>
         <a href="{% url 'applications:reminder_create' %}" class="text-sm text-brand-600 hover:underline dark:text-brand-400">
           {% translate "Add" %}

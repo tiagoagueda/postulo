@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n postulo %}
 <article class="card p-3">
   <a href="{{ application.get_absolute_url }}" class="block font-medium hover:underline">
     {{ application.posting.title }}
@@ -15,6 +15,13 @@
         </span>
       {% endfor %}
     </div>
+  {% endif %}
+
+  {% if application.next_interview_at %}
+    <p class="mt-2 flex items-center gap-1 text-xs text-brand-700 dark:text-brand-400" data-next-interview>
+      {% icon "calendar" class="size-3.5" %}
+      {{ application.next_interview_at|date:"D j M, H:i" }}
+    </p>
   {% endif %}
 
   <div class="mt-3 flex items-center justify-between gap-2">

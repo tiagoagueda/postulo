@@ -6,7 +6,7 @@
 
 One zip, holding a readable JSON document of every record in your account and every file
 in it: your profile, career record, companies, postings, applications with their whole
-timeline, reminders, tags, CVs, cover letters, uploads and every document you sent.
+timeline, reminders, interviews, tags, CVs, cover letters, uploads and every document you sent.
 
 From the command line:
 

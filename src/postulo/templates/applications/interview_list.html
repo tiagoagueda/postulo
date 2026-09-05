@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load i18n postulo %}
+
+{% block title %}{% translate "Interviews" %}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Interviews" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% if showing_all %}
+          {% translate "Everything, newest first." %}
+        {% else %}
+          {% translate "What is in the diary, soonest first. Schedule one from an application's page." %}
+        {% endif %}
+      </p>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      {% if showing_all %}
+        <a href="{% url 'applications:interview_list' %}" class="btn-secondary">
+          {% translate "Scheduled only" %}
+        </a>
+      {% else %}
+        <a href="?show=all" class="btn-secondary">{% translate "Show past too" %}</a>
+      {% endif %}
+      <a href="{% url 'applications:interview_calendar' %}" class="btn-secondary">
+        {% icon "calendar" %} {% translate "Calendar file" %}
+      </a>
+    </div>
+  </div>
+
+  {% if interviews %}
+    <div class="card p-0">
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for interview in interviews %}
+          <li id="interview-{{ interview.pk }}" class="flex flex-wrap items-start gap-3 px-4 py-3">
+            <div class="w-36 shrink-0 text-sm tabular-nums">
+              <p class="font-medium {% if interview.awaits_outcome %}text-amber-700 dark:text-amber-400{% endif %}">
+                {{ interview.starts_at|date:"D j M" }}
+              </p>
+              <p class="text-xs text-ink-500 dark:text-ink-400">
+                {{ interview.starts_at|date:"H:i" }}–{{ interview.ends_at|date:"H:i" }}
+              </p>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm">
+                <span class="font-medium">{{ interview.get_kind_display }}</span>
+                ·
+                <a href="{{ interview.application.get_absolute_url }}" class="hover:underline">
+                  {{ interview.application.posting.title }}
+                </a>
+                <span class="text-ink-500 dark:text-ink-400">
+                  {{ interview.application.posting.company.name }}
+                </span>
+              </p>
+              <p class="text-xs text-ink-500 dark:text-ink-400">
+                {% if interview.location %}
+                  {% if interview.is_link %}
+                    <a href="{{ interview.location }}" rel="noopener noreferrer external" target="_blank"
+                       class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Join the call" %}</a>
+                  {% else %}
+                    {{ interview.location }}
+                  {% endif %}
+                {% endif %}
+                {% for person in interview.contacts.all %}
+                  {% if forloop.first %}{% if interview.location %} · {% endif %}{% translate "with" %}{% else %},{% endif %}
+                  {{ person.name }}
+                {% endfor %}
+              </p>
+              {% if interview.awaits_outcome %}
+                <p class="mt-1 text-xs text-amber-700 dark:text-amber-400">{% translate "How did it go?" %}</p>
+              {% endif %}
+            </div>
+            <div class="flex shrink-0 items-center gap-1">
+              {% if interview.is_scheduled %}
+                {% include "applications/partials/interview_outcome.html" with next=request.get_full_path %}
+                <a href="{% url 'applications:interview_update' interview.pk %}" class="btn-ghost px-2 py-1 text-xs">
+                  {% translate "Edit" %}
+                </a>
+              {% else %}
+                <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+                  {{ interview.get_outcome_display }}
+                </span>
+              {% endif %}
+              <a href="{% url 'applications:interview_ics' interview.pk %}" class="btn-ghost px-2 py-1 text-xs"
+                 title="{% translate 'Calendar file' %}">
+                {% icon "calendar" _("Calendar file") %}
+              </a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% else %}
+    <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
+      {% if showing_all %}
+        {% translate "No interviews recorded yet." %}
+      {% else %}
+        {% translate "Nothing in the diary. When one is offered, schedule it from the application's page." %}
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n postulo %}
 <tr id="application-{{ application.pk }}" class="border-b border-ink-100 last:border-0 dark:border-ink-800">
   <td class="px-4 py-3">
     <a href="{{ application.get_absolute_url }}" class="font-medium hover:underline">
@@ -22,6 +22,12 @@
   <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ application.posting.location|default:"—" }}</td>
   <td class="px-4 py-3">
     {% include "partials/status_badge.html" with status=application.status label=application.get_status_display %}
+    {% if application.next_interview_at %}
+      <p class="mt-1 flex items-center gap-1 text-xs text-brand-700 dark:text-brand-400" data-next-interview>
+        {% icon "calendar" class="size-3.5" %}
+        {{ application.next_interview_at|date:"j M, H:i" }}
+      </p>
+    {% endif %}
   </td>
   <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
     {{ application.applied_at|date:"j M Y"|default:"—" }}

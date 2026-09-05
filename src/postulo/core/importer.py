@@ -36,6 +36,7 @@ class ImportReport:
     applications: int = 0
     events: int = 0
     reminders: int = 0
+    interviews: int = 0
     resume_items: int = 0
     cvs: int = 0
     cover_letters: int = 0
@@ -94,7 +95,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     Runs in one transaction: a failure half way through leaves the account exactly as it
     was, rather than partly overwritten by a file that turned out to be broken.
     """
-    from postulo.applications.models import Application, ApplicationEvent, Reminder
+    from postulo.applications.models import Application, ApplicationEvent, Interview, Reminder
     from postulo.core.models import Tag
     from postulo.documents.models import CV, CoverLetter, CVItem, RenderedDocument, UploadedDocument
     from postulo.jobs.models import Capture, Company, Contact, JobPosting
@@ -227,6 +228,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             for application_entry in application_entries:
                 event_entries = application_entry.pop("events", [])
                 reminder_entries = application_entry.pop("reminders", [])
+                interview_entries = application_entry.pop("interviews", [])
                 tag_slugs = application_entry.pop("tags", [])
                 old_id = application_entry.pop("id", None)
                 application_entry.pop("created_at", None)
@@ -257,9 +259,10 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                     ApplicationEvent.objects.create(application=application, **event_entry)
                     report.events += 1
 
+                reminders: dict[int, Reminder] = {}
                 for reminder_entry in reminder_entries:
-                    reminder_entry.pop("id", None)
-                    Reminder.objects.create(
+                    old_reminder_id = reminder_entry.pop("id", None)
+                    reminders[old_reminder_id] = Reminder.objects.create(
                         owner=user,
                         application=application,
                         summary=reminder_entry.get("summary", ""),
@@ -267,6 +270,28 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                         done_at=_dt(reminder_entry.get("done_at")),
                     )
                     report.reminders += 1
+
+                for interview_entry in interview_entries:
+                    interview_entry.pop("id", None)
+                    interview_entry.pop("created_at", None)
+                    contact_ids = interview_entry.pop("contact_ids", [])
+                    reminder_id = interview_entry.pop("reminder_id", None)
+                    # The calendar identifier travels, so a calendar that knew the meeting
+                    # still does; a forced duplicate on the same instance gets a fresh one.
+                    uid = interview_entry.pop("uid", None)
+                    if uid and Interview.objects.filter(owner=user, uid=uid).exists():
+                        uid = None
+                    interview = Interview.objects.create(
+                        owner=user,
+                        application=application,
+                        reminder=reminders.get(reminder_id),
+                        starts_at=_dt(interview_entry.pop("starts_at", None)),
+                        ends_at=_dt(interview_entry.pop("ends_at", None)),
+                        **({"uid": uid} if uid else {}),
+                        **interview_entry,
+                    )
+                    interview.contacts.set([contacts[i] for i in contact_ids if i in contacts])
+                    report.interviews += 1
 
     # ---------------------------------------------------------------- documents
     documents = document.get("documents", {})

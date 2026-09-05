@@ -19,6 +19,24 @@ urlpatterns = [
     path(
         "reminders/<int:pk>/done/", views.ReminderCompleteView.as_view(), name="reminder_complete"
     ),
+    path("interviews/", views.InterviewListView.as_view(), name="interview_list"),
+    path(
+        "interviews/calendar.ics",
+        views.InterviewCalendarView.as_view(),
+        name="interview_calendar",
+    ),
+    path("<int:pk>/interviews/new/", views.InterviewCreateView.as_view(), name="interview_create"),
+    path("interviews/<int:pk>/edit/", views.InterviewUpdateView.as_view(), name="interview_update"),
+    path(
+        "interviews/<int:pk>/outcome/",
+        views.InterviewOutcomeView.as_view(),
+        name="interview_outcome",
+    ),
+    path(
+        "interviews/<int:pk>/calendar.ics",
+        views.InterviewCalendarView.as_view(),
+        name="interview_ics",
+    ),
     path("tags/", views.TagListView.as_view(), name="tag_list"),
     path("tags/new/", views.TagCreateView.as_view(), name="tag_create"),
     path("tags/<int:pk>/edit/", views.TagUpdateView.as_view(), name="tag_update"),

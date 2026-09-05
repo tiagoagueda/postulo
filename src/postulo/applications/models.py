@@ -15,7 +15,11 @@ from the failures.
 
 from __future__ import annotations
 
+import uuid
+
 from django.db import models
+from django.db.models import OuterRef, Subquery
+from django.db.models.functions import Now
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -100,7 +104,28 @@ class ApplicationQuerySet(models.QuerySet):
 
     def with_display_data(self) -> ApplicationQuerySet:
         """Load what every list and board template reads, in one round trip."""
-        return self.select_related("posting", "posting__company").prefetch_related("tags")
+        return (
+            self.select_related("posting", "posting__company")
+            .prefetch_related("tags")
+            .with_next_interview()
+        )
+
+    def with_next_interview(self) -> ApplicationQuerySet:
+        """Annotate ``next_interview_at``: the start of the soonest interview still ahead.
+
+        A subquery rather than a join with ``Min``, so it composes with any other
+        annotation without multiplying rows.
+        """
+        upcoming = (
+            Interview.objects.filter(
+                application=OuterRef("pk"),
+                outcome=InterviewOutcome.SCHEDULED,
+                ends_at__gte=Now(),
+            )
+            .order_by("starts_at")
+            .values("starts_at")[:1]
+        )
+        return self.annotate(next_interview_at=Subquery(upcoming))
 
 
 class Application(OwnedModel):
@@ -183,11 +208,20 @@ class EventKind(models.TextChoices):
     EMAIL_RECEIVED = "email_received", _("Email received")
     CALL = "call", _("Call")
     INTERVIEW = "interview", _("Interview")
+    INTERVIEW_SCHEDULED = "interview_scheduled", _("Interview scheduled")
+    INTERVIEW_CANCELLED = "interview_cancelled", _("Interview cancelled")
     ASSESSMENT = "assessment", _("Assessment or test")
     OFFER = "offer", _("Offer received")
     REJECTION = "rejection", _("Rejection received")
     FOLLOW_UP = "follow_up", _("Followed up")
     OTHER = "other", _("Other")
+
+
+#: Kinds the record writes for itself. Offering them to be typed would let the log
+#: contradict the field or the interview they describe.
+SYSTEM_EVENT_KINDS = frozenset(
+    {EventKind.STATUS_CHANGE, EventKind.INTERVIEW_SCHEDULED, EventKind.INTERVIEW_CANCELLED}
+)
 
 
 class ApplicationEventQuerySet(models.QuerySet):
@@ -291,3 +325,147 @@ class Reminder(OwnedModel):
         if self.done_at is None:
             self.done_at = timezone.now()
             self.save(update_fields=["done_at", "updated_at"])
+
+
+class InterviewKind(models.TextChoices):
+    PHONE = "phone", _("Phone screen")
+    VIDEO = "video", _("Video call")
+    ONSITE = "onsite", _("On site")
+    PANEL = "panel", _("Panel")
+    ASSESSMENT = "assessment", _("Assessment or test")
+    OTHER = "other", _("Other")
+
+
+class InterviewOutcome(models.TextChoices):
+    SCHEDULED = "scheduled", _("Scheduled")
+    DONE = "done", _("Held")
+    CANCELLED = "cancelled", _("Cancelled")
+    NO_SHOW = "no_show", _("They did not show up")
+
+
+#: Outcomes under which the meeting is over, one way or another.
+SETTLED_OUTCOMES = frozenset(
+    {InterviewOutcome.DONE, InterviewOutcome.CANCELLED, InterviewOutcome.NO_SHOW}
+)
+
+
+class InterviewQuerySet(models.QuerySet):
+    def for_user(self, user) -> InterviewQuerySet:
+        if user is None or not getattr(user, "is_authenticated", False):
+            return self.none()
+        return self.filter(owner=user)
+
+    def scheduled(self) -> InterviewQuerySet:
+        """Interviews nobody has recorded an outcome for yet."""
+        return self.filter(outcome=InterviewOutcome.SCHEDULED)
+
+    def upcoming(self, at=None) -> InterviewQuerySet:
+        """Scheduled interviews that have not finished yet, soonest first."""
+        return self.scheduled().filter(ends_at__gte=at or timezone.now()).order_by("starts_at")
+
+    def awaiting_outcome(self, at=None) -> InterviewQuerySet:
+        """Scheduled interviews whose time has passed: the person should say how it went."""
+        return self.scheduled().filter(ends_at__lt=at or timezone.now())
+
+    def with_display_data(self) -> InterviewQuerySet:
+        return self.select_related(
+            "application", "application__posting", "application__posting__company"
+        ).prefetch_related("contacts")
+
+
+def _mint_uid() -> str:
+    """A calendar identifier: minted once, never changed, so a sync recognises the meeting."""
+    return f"{uuid.uuid4()}@postulo"
+
+
+class Interview(OwnedModel):
+    """A meeting with the other side: a start, an end, a place, the people, and a kind.
+
+    A timeline entry says an interview *happened*; this says one *will*, which is what a
+    calendar, a reminder and a "coming up" list all need. The log stays the truth about
+    what took place: scheduling one writes an entry, and so does settling it.
+    """
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="interviews",
+        verbose_name=_("application"),
+    )
+    kind = models.CharField(
+        _("kind"), max_length=20, choices=InterviewKind, default=InterviewKind.VIDEO
+    )
+    starts_at = models.DateTimeField(_("starts"), db_index=True)
+    ends_at = models.DateTimeField(_("ends"))
+    location = models.CharField(
+        _("where"),
+        max_length=500,
+        blank=True,
+        help_text=_("An address, or the link to the call."),
+    )
+    contacts = models.ManyToManyField(
+        Contact, blank=True, related_name="interviews", verbose_name=_("who you are meeting")
+    )
+    notes = models.TextField(_("preparation notes"), blank=True)
+    outcome = models.CharField(
+        _("outcome"),
+        max_length=20,
+        choices=InterviewOutcome,
+        default=InterviewOutcome.SCHEDULED,
+        db_index=True,
+    )
+    #: Stable across edits, so a calendar that imported the meeting once can find it again.
+    uid = models.CharField(_("calendar identifier"), max_length=64, default=_mint_uid)
+    #: The nudge made when it was scheduled, if one was. Cancelling the interview settles it.
+    reminder = models.OneToOneField(
+        Reminder,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="interview",
+        verbose_name=_("reminder"),
+    )
+
+    objects = InterviewQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("interview")
+        verbose_name_plural = _("interviews")
+        ordering = ("starts_at", "pk")
+        constraints = [
+            # Unique per calendar, which is per person: two people importing the same
+            # archive each keep the identifier their own calendar already knows.
+            models.UniqueConstraint(fields=("owner", "uid"), name="interview_uid_per_owner"),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.get_kind_display()} — {self.application}"
+
+    def get_absolute_url(self) -> str:
+        return f"{self.application.get_absolute_url()}#interview-{self.pk}"
+
+    @property
+    def is_scheduled(self) -> bool:
+        return self.outcome == InterviewOutcome.SCHEDULED
+
+    @property
+    def is_settled(self) -> bool:
+        return self.outcome in SETTLED_OUTCOMES
+
+    @property
+    def is_over(self) -> bool:
+        """Whether its time has passed, whatever was recorded about it."""
+        return self.ends_at < timezone.now()
+
+    @property
+    def awaits_outcome(self) -> bool:
+        return self.is_scheduled and self.is_over
+
+    @property
+    def is_link(self) -> bool:
+        """Whether the place is somewhere to click rather than somewhere to go."""
+        return self.location.startswith(("http://", "https://"))
+
+    @property
+    def duration(self):
+        return self.ends_at - self.starts_at

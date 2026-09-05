@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import (
@@ -22,17 +25,36 @@ from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 from postulo.core.models import Tag
 from postulo.jobs.views import UserFormKwargsMixin
 
+from . import ical
 from .analytics import build as build_insights
 from .forms import (
     ApplicationForm,
     ApplicationIntakeForm,
     EventForm,
+    InterviewForm,
     ReminderForm,
     StatusChangeForm,
     TagForm,
 )
-from .models import BOARD_STATUSES, Application, Reminder, Status
-from .services import change_status, create_application, get_or_create_company, record_event
+from .models import (
+    BOARD_STATUSES,
+    SETTLED_OUTCOMES,
+    Application,
+    Interview,
+    InterviewOutcome,
+    Reminder,
+    Status,
+)
+from .services import (
+    DEFAULT_INTERVIEW_LENGTH,
+    change_status,
+    create_application,
+    get_or_create_company,
+    record_event,
+    reschedule_interview,
+    schedule_interview,
+    settle_interview,
+)
 
 
 class ApplicationFilterMixin:
@@ -133,6 +155,9 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["events"] = self.object.events.all()
         context["reminders"] = self.object.reminders.filter(done_at__isnull=True)
+        interviews = list(self.object.interviews.prefetch_related("contacts"))
+        context["scheduled_interviews"] = [i for i in interviews if i.is_scheduled]
+        context["settled_interviews"] = [i for i in interviews if i.is_settled][::-1]
         context["event_form"] = EventForm()
         context["status_form"] = StatusChangeForm(initial={"status": self.object.status})
         return context
@@ -303,6 +328,147 @@ class ReminderCompleteView(OwnedObjectMixin, View):
         reminder.complete()
         messages.success(request, _("Marked as done."))
         return redirect(request.POST.get("next") or reverse("applications:reminder_list"))
+
+
+# ------------------------------------------------------------------ interviews
+
+
+class InterviewListView(OwnedObjectMixin, ListView):
+    """Everything in the diary, soonest first; the past too on request."""
+
+    model = Interview
+    template_name = "applications/interview_list.html"
+    context_object_name = "interviews"
+
+    def get_queryset(self):
+        queryset = super().get_queryset().with_display_data()
+        if self.request.GET.get("show") == "all":
+            return queryset.order_by("-starts_at", "-pk")
+        return queryset.scheduled().order_by("starts_at", "pk")
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["showing_all"] = self.request.GET.get("show") == "all"
+        return context
+
+
+class InterviewCreateView(OwnedObjectMixin, View):
+    """Schedule an interview for one application, or record one that already happened."""
+
+    template_name = "applications/interview_form.html"
+
+    def get_queryset(self):
+        return Application.objects.for_user(self.request.user).select_related(
+            "posting", "posting__company"
+        )
+
+    def get(self, request, pk: int) -> HttpResponse:
+        application = get_object_or_404(self.get_queryset(), pk=pk)
+        tomorrow = timezone.localtime() + timedelta(days=1)
+        form = InterviewForm(
+            user=request.user,
+            application=application,
+            initial={"starts_at": tomorrow.replace(hour=10, minute=0, second=0, microsecond=0)},
+        )
+        return render(request, self.template_name, {"form": form, "application": application})
+
+    def post(self, request, pk: int) -> HttpResponse:
+        application = get_object_or_404(self.get_queryset(), pk=pk)
+        form = InterviewForm(request.POST, user=request.user, application=application)
+        if not form.is_valid():
+            return render(request, self.template_name, {"form": form, "application": application})
+        data = form.cleaned_data
+        interview = schedule_interview(
+            application,
+            kind=data["kind"],
+            starts_at=data["starts_at"],
+            ends_at=data["ends_at"],
+            location=data["location"],
+            notes=data["notes"],
+            contacts=data["contacts"],
+            remind=data["remind"],
+        )
+        if interview.is_settled:
+            messages.success(request, _("Interview recorded."))
+        else:
+            messages.success(request, _("Interview scheduled."))
+        return redirect(application.get_absolute_url())
+
+
+class InterviewUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+    model = Interview
+    form_class = InterviewForm
+    template_name = "applications/interview_form.html"
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("application", "application__posting", "application__posting__company")
+        )
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["application"] = self.object.application
+        return context
+
+    def form_valid(self, form):
+        # Everything but the times is saved as edited; the times go through the service,
+        # so a move is written on the timeline and the reminder moves with it.
+        previous = Interview.objects.get(pk=self.object.pk)
+        starts_at = form.cleaned_data["starts_at"]
+        ends_at = form.cleaned_data["ends_at"] or starts_at + DEFAULT_INTERVIEW_LENGTH
+        form.instance.starts_at, form.instance.ends_at = previous.starts_at, previous.ends_at
+        interview = form.save()
+        reschedule_interview(interview, starts_at=starts_at, ends_at=ends_at)
+        messages.success(self.request, _("Interview updated."))
+        return redirect(interview.application.get_absolute_url())
+
+
+class InterviewOutcomeView(OwnedObjectMixin, View):
+    """How it went: held, cancelled, or nobody came."""
+
+    def get_queryset(self):
+        return Interview.objects.for_user(self.request.user).select_related("application")
+
+    def post(self, request, pk: int) -> HttpResponse:
+        interview = get_object_or_404(self.get_queryset(), pk=pk)
+        outcome = request.POST.get("outcome", "")
+        if outcome not in SETTLED_OUTCOMES:
+            messages.error(request, _("That is not an outcome Postulo recognises."))
+        else:
+            settle_interview(interview, outcome, note=request.POST.get("note", ""))
+            messages.success(
+                request,
+                {
+                    InterviewOutcome.DONE: _("Recorded as held."),
+                    InterviewOutcome.CANCELLED: _("Recorded as cancelled."),
+                    InterviewOutcome.NO_SHOW: _("Recorded: nobody showed up."),
+                }[outcome],
+            )
+        return redirect(request.POST.get("next") or interview.application.get_absolute_url())
+
+
+class InterviewCalendarView(OwnedObjectMixin, View):
+    """An .ics file: one interview, or everything still ahead."""
+
+    def get_queryset(self):
+        return Interview.objects.for_user(self.request.user).with_display_data()
+
+    def get(self, request, pk: int | None = None) -> HttpResponse:
+        if pk is not None:
+            interviews = [get_object_or_404(self.get_queryset(), pk=pk)]
+            filename = f"interview-{pk}.ics"
+        else:
+            interviews = list(self.get_queryset().upcoming())
+            filename = "interviews.ics"
+        text = ical.calendar(
+            interviews,
+            url_for=lambda i: request.build_absolute_uri(i.application.get_absolute_url()),
+        )
+        response = HttpResponse(text, content_type="text/calendar; charset=utf-8")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response
 
 
 # ------------------------------------------------------------------------ tags

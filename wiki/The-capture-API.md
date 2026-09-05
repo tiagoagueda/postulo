@@ -15,7 +15,7 @@ replaced, not recovered.
 | Scope | What it allows |
 | --- | --- |
 | `captures` | Hand over a posting for review, and list the captures awaiting review. Nothing else. |
-| `read` | Read everything the owner has: applications with their timelines, listings, companies and contacts, reminders, CVs, letters, the list of files, insights. |
+| `read` | Read everything the owner has: applications with their timelines, listings, companies and contacts, reminders, interviews (as JSON or as `.ics`), CVs, letters, the list of files, insights. |
 | `write` | Record and change, through the same code as the forms: add listings and apply to them, record applications, change status, add timeline entries and reminders, add companies and contacts, draft letters. Nothing is deleted through the API. |
 | `documents:read` | Download the files themselves — uploads and the snapshots of what was sent. Separate, because files are the most sensitive thing here. |
 
@@ -73,11 +73,13 @@ are in the web interface.
 | Call | What comes back |
 | --- | --- |
 | `GET /applications?status=&company=&since=&open_only=` | Applications, newest first |
-| `GET /applications/{id}` | One application with its timeline, reminders and sent documents |
+| `GET /applications/{id}` | One application with its timeline, reminders, interviews and sent documents |
 | `GET /listings?state=undecided` | Listings; `state` is `undecided` (default), `new`, `shortlisted`, `discarded`, `applied`, `closed` or `all` |
 | `GET /listings/{id}` | One listing, description included |
 | `GET /companies?q=` · `GET /companies/{id}` | Companies; the detail carries contacts and listing ids |
 | `GET /reminders?due=true` · `?outstanding=true` | Reminders |
+| `GET /interviews?state=upcoming` · `GET /interviews/{id}` | Interviews; `state` is `upcoming` (default), `scheduled`, `past` or `all`; each carries a stable `uid` |
+| `GET /interviews/calendar.ics` · `GET /interviews/{id}/calendar.ics` | The diary, or one interview, as iCalendar text |
 | `GET /cvs` · `GET /cvs/{id}` | CVs; the detail lists what each includes |
 | `GET /letters` · `GET /letters/{id}` | Cover letters; the detail carries the text |
 | `GET /documents?source=` | Files — `upload`, `rendered`, or both when unset — with a `download_url` each |
@@ -97,6 +99,8 @@ stays the single truth.
 | `POST /applications/{id}/status` | `status`, optional `note` — the timeline records the change |
 | `POST /applications/{id}/events` | `kind`, `summary`, `body`, optional `occurred_at` |
 | `POST /reminders` · `POST /reminders/{id}/complete` | Reminders |
+| `POST /interviews` | Schedule: `application_id`, `starts_at`, optional `ends_at`, `kind`, `location`, `contact_ids`, `notes`, `remind` |
+| `PATCH /interviews/{id}` · `POST /interviews/{id}/outcome` | Move or change an interview; record `done`, `cancelled` or `no_show` |
 | `POST /companies` · `PATCH /companies/{id}` · `POST /companies/{id}/contacts` | Companies, matched by name as the forms do, and their people |
 | `POST /letters` | Draft a cover letter |
 

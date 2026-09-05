@@ -24,7 +24,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.models import JobPosting, ListingState
 
-from .models import Application, ApplicationEvent, Status
+from .models import Application, ApplicationEvent, EventKind, Interview, InterviewOutcome, Status
 
 #: The stages a funnel counts, in order. Each is "reached this, ever".
 FUNNEL_STAGES: tuple[tuple[str, str], ...] = (
@@ -89,6 +89,12 @@ class Insights:
     fastest_reply_days: int | None = None
     slowest_reply_days: int | None = None
     still_waiting: int = 0
+    #: Interviews: how long the first one took to come, and what kinds there were.
+    median_days_to_interview: float | None = None
+    interviewed: int = 0
+    interviews_held: int = 0
+    interviews_ahead: int = 0
+    interview_kinds: list[tuple[str, int]] = field(default_factory=list)
     sources: list[SourceRow] = field(default_factory=list)
     by_month: list[tuple[str, int]] = field(default_factory=list)
     #: The stage before applications: how many listings were noticed, and what became of them.
@@ -157,6 +163,32 @@ def _first_reply_days(applications) -> dict[int, int]:
     return days
 
 
+def _first_interview_days(applications) -> dict[int, int]:
+    """Days from applying to the first interview, per application.
+
+    Read from the log: an interview recorded by hand years ago and one settled through
+    the diary both leave an *interview* entry dated when it happened.
+    """
+    applied_at = {
+        application.pk: application.applied_at
+        for application in applications
+        if application.applied_at is not None
+    }
+    if not applied_at:
+        return {}
+    first_interview = (
+        ApplicationEvent.objects.filter(application_id__in=applied_at, kind=EventKind.INTERVIEW)
+        .values("application_id")
+        .annotate(first=Min("occurred_at"))
+    )
+    days: dict[int, int] = {}
+    for row in first_interview:
+        when, sent = row["first"], applied_at[row["application_id"]]
+        if when >= sent:
+            days[row["application_id"]] = (when - sent).days
+    return days
+
+
 def build(user) -> Insights:
     """Work out what the record says about ``user``'s search."""
     applications = list(
@@ -212,6 +244,23 @@ def build(user) -> Insights:
         and a.status != Status.GHOSTED
         and (now - a.applied_at).days >= 0
     )
+
+    # ------------------------------------------------------------- interviews
+    interview_days = _first_interview_days(ever_applied)
+    insights.interviewed = len(interview_days)
+    if interview_days:
+        insights.median_days_to_interview = statistics.median(sorted(interview_days.values()))
+    diary = Interview.objects.for_user(user)
+    insights.interviews_held = diary.filter(outcome=InterviewOutcome.DONE).count()
+    insights.interviews_ahead = diary.upcoming().count()
+    kinds = (
+        diary.filter(outcome=InterviewOutcome.DONE)
+        .values_list("kind")
+        .annotate(count=Count("id"))
+        .order_by("-count", "kind")
+    )
+    labels = dict(Interview._meta.get_field("kind").choices)
+    insights.interview_kinds = [(str(labels.get(kind, kind)), count) for kind, count in kinds]
 
     # --------------------------------------------------------------- sources
     rows: dict[str, SourceRow] = {}

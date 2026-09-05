@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.pagination import paginate
 
-from postulo.applications.models import Application, Channel, EventKind
+from postulo.applications.models import SYSTEM_EVENT_KINDS, Application, Channel, EventKind
 from postulo.applications.models import Status as ApplicationStatus
 from postulo.applications.services import (
     change_status,
@@ -75,9 +75,11 @@ def record_application(request, payload: ApplicationIn):
 def _detail(request, pk: int) -> Application:
     return owned_or_404(
         request,
-        Application.objects.select_related("posting", "posting__company").prefetch_related(
-            "tags", "events", "reminders", "rendered_documents"
-        ),
+        Application.objects.select_related("posting", "posting__company")
+        .prefetch_related(
+            "tags", "events", "reminders", "interviews__contacts", "rendered_documents"
+        )
+        .with_next_interview(),
         pk,
     )
 
@@ -111,10 +113,12 @@ def set_status(request, pk: int, payload: StatusIn):
 def add_event(request, pk: int, payload: EventIn):
     application = _detail(request, pk)
     kind = choice_or_422(payload.kind, EventKind, field="kind")
-    if kind == EventKind.STATUS_CHANGE:
+    if kind in SYSTEM_EVENT_KINDS:
         from ninja.errors import HttpError
 
-        raise HttpError(422, _("Use the status endpoint to change the status."))
+        raise HttpError(
+            422, _("Use the status or interviews endpoints; the timeline records those itself.")
+        )
     event = record_event(
         application,
         kind=kind,

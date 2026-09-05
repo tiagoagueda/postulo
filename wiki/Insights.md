@@ -47,6 +47,13 @@ expect; the slowest tells you what is possible.
 Applications still waiting are counted separately. They have no reply time yet, and
 treating them as instant or as infinite would both be wrong.
 
+## Interviews
+
+The median number of days between applying and the first interview, how many
+applications reached one, and what is in the diary. Read from the timeline's *interview*
+entries — an interview typed in by hand counts as much as one settled from the diary — and
+the kinds of interview held are tallied from the diary itself.
+
 ## Where they came from
 
 A table comparing sources: how many you sent, how many were answered, how many reached

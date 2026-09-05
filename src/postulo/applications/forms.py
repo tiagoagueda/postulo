@@ -10,7 +10,17 @@ from postulo.core.models import Tag
 from postulo.jobs.forms import OwnerScopedModelForm
 from postulo.jobs.models import Contact, EmploymentType, RemoteType, SalaryPeriod
 
-from .models import Application, ApplicationEvent, Channel, EventKind, Priority, Reminder, Status
+from .models import (
+    SYSTEM_EVENT_KINDS,
+    Application,
+    ApplicationEvent,
+    Channel,
+    EventKind,
+    Interview,
+    Priority,
+    Reminder,
+    Status,
+)
 
 
 class UserAwareForm(forms.Form):
@@ -192,10 +202,11 @@ class EventForm(forms.ModelForm):
             "%Y-%m-%d",
         ]
         self.fields["occurred_at"].initial = timezone.localtime()
-        # A status change is the record of something the application did, not something
-        # to be typed by hand; offering it here would let the log contradict the field.
+        # A status change or a scheduling is the record of something the application did,
+        # not something to be typed by hand; offering them here would let the log
+        # contradict the field or the interview they describe.
         self.fields["kind"].choices = [
-            (value, label) for value, label in EventKind.choices if value != EventKind.STATUS_CHANGE
+            (value, label) for value, label in EventKind.choices if value not in SYSTEM_EVENT_KINDS
         ]
 
 
@@ -212,6 +223,61 @@ class ReminderForm(OwnerScopedModelForm):
             self.user
         ).with_display_data()
         self.fields["due_at"].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"]
+
+
+DATETIME_INPUT_FORMATS = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"]
+
+
+class InterviewForm(OwnerScopedModelForm):
+    """Schedule an interview — or record one that already happened, from the same form."""
+
+    remind = forms.BooleanField(
+        label=_("Remind me the day before"),
+        required=False,
+        initial=True,
+        help_text=_("A reminder falls due a day ahead, when there is a day ahead."),
+    )
+
+    class Meta:
+        model = Interview
+        fields = ("kind", "starts_at", "ends_at", "location", "contacts", "notes")
+        widgets = {
+            "starts_at": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+            ),
+            "ends_at": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+            ),
+            "contacts": forms.CheckboxSelectMultiple,
+            "notes": forms.Textarea(attrs={"rows": 4}),
+        }
+
+    def __init__(self, *args, application=None, **kwargs):
+        instance = kwargs.get("instance")
+        self.application = application or (instance.application if instance is not None else None)
+        super().__init__(*args, **kwargs)
+        self.fields["ends_at"].required = False
+        self.fields["ends_at"].help_text = _("Left blank, it lasts an hour.")
+        for name in ("starts_at", "ends_at"):
+            self.fields[name].input_formats = DATETIME_INPUT_FORMATS
+        if self.instance.pk:
+            # The reminder was made, or not, when it was scheduled; moving the interview
+            # moves it.
+            del self.fields["remind"]
+
+    def scope_querysets(self) -> None:
+        contacts = Contact.objects.for_user(self.user)
+        if self.application is not None:
+            # The people worth offering are the ones at this company.
+            contacts = contacts.filter(company=self.application.posting.company_id)
+        self.fields["contacts"].queryset = contacts
+
+    def clean(self):
+        cleaned = super().clean()
+        starts, ends = cleaned.get("starts_at"), cleaned.get("ends_at")
+        if starts and ends and ends <= starts:
+            self.add_error("ends_at", _("It cannot end before it starts."))
+        return cleaned
 
 
 class TagForm(OwnerScopedModelForm):

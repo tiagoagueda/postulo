@@ -102,6 +102,38 @@
           </p>
         </div>
 
+        <h2 class="mt-8 mb-3 font-medium">{% translate "Interviews" %}</h2>
+        <div class="card" data-interviews>
+          <div class="grid gap-4 sm:grid-cols-3">
+            <div>
+              <p class="text-2xl font-semibold tabular-nums">
+                {% if insights.median_days_to_interview is not None %}{{ insights.median_days_to_interview|floatformat:0 }}{% else %}—{% endif %}
+              </p>
+              <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Median days to a first interview" %}</p>
+            </div>
+            <div>
+              <p class="text-2xl font-semibold tabular-nums">{{ insights.interviewed }}</p>
+              <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Applications that reached one" %}</p>
+            </div>
+            <div>
+              <p class="text-2xl font-semibold tabular-nums">{{ insights.interviews_ahead }}</p>
+              <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "In the diary" %}</p>
+            </div>
+          </div>
+          {% if insights.interview_kinds %}
+            <ul class="mt-4 flex flex-wrap gap-2 text-xs">
+              {% for label, count in insights.interview_kinds %}
+                <li class="rounded bg-ink-100 px-2 py-1 text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+                  {{ label }} <span class="tabular-nums">· {{ count }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+            {% translate "Counted from the timeline, so interviews recorded before the diary existed are in." %}
+          </p>
+        </div>
+
         <h2 class="mt-8 mb-3 font-medium">{% translate "Where they came from" %}</h2>
         {% if insights.sources %}
           <div class="card overflow-x-auto p-0">

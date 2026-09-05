@@ -37,6 +37,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Interviews as meetings in a diary.** An interview has a start and an end, a place or
+  a link, the people at the company you are meeting, a kind — phone screen, video call,
+  on site, panel, assessment — preparation notes, and a stable calendar identifier.
+  Scheduling one writes the timeline and makes a reminder for the day before; *Held*
+  writes the interview entry dated when it happened and moves a lagging status through
+  the usual path; *Cancelled* and *No-show* are recorded too. One that already happened
+  is recorded as held from the same form. The dashboard shows *Coming up* and asks about
+  interviews that passed without an outcome; the board card and the table show the next
+  one. Every interview downloads as an `.ics` file, and so does the whole diary. The API
+  gained `/interviews`, application detail carries them, and Insights reports the median
+  days to a first interview. The export format is now 3 and the importer reads every
+  earlier one. (#14)
 - **A general API with scoped tokens.** Capture tokens became API tokens holding any of
   four scopes — `captures`, `read`, `write`, `documents:read` — with an optional expiry;
   every existing token kept exactly the `captures` scope, so nothing installed stopped

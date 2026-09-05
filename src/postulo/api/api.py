@@ -35,7 +35,15 @@ from postulo.plugins.registry import parse_page
 
 from .auth import TokenAuth, scope
 from .models import ApiToken
-from .routers import applications, companies, documents, insights, listings, reminders
+from .routers import (
+    applications,
+    companies,
+    documents,
+    insights,
+    interviews,
+    listings,
+    reminders,
+)
 from .schemas import TokenOut
 
 api = NinjaAPI(
@@ -181,5 +189,6 @@ api.add_router("/applications", applications.router)
 api.add_router("/listings", listings.router)
 api.add_router("/companies", companies.router)
 api.add_router("/reminders", reminders.router)
+api.add_router("/interviews", interviews.router)
 api.add_router("", documents.router)
 api.add_router("/insights", insights.router)

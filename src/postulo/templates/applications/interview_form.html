@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if form.instance.pk %}{% translate "Edit interview" %}{% else %}{% translate "Schedule an interview" %}{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-lg">
+    <p class="text-sm text-ink-500 dark:text-ink-400">
+      <a href="{{ application.get_absolute_url }}" class="hover:underline">
+        {{ application.posting.title }} · {{ application.posting.company.name }}
+      </a>
+    </p>
+    <h1 class="mb-2 text-2xl font-semibold tracking-tight">
+      {% if form.instance.pk %}{% translate "Edit interview" %}{% else %}{% translate "Schedule an interview" %}{% endif %}
+    </h1>
+    {% if not form.instance.pk %}
+      <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "One that has already happened is recorded straight onto the timeline as held." %}
+      </p>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        {% include "partials/field.html" with field=form.kind %}
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          {% include "partials/field.html" with field=form.starts_at %}
+          {% include "partials/field.html" with field=form.ends_at %}
+        </div>
+        {% include "partials/field.html" with field=form.location %}
+        {% if form.contacts.field.queryset %}
+          <fieldset class="mb-4">
+            <legend class="field-label">{{ form.contacts.label }}</legend>
+            <div class="flex flex-col gap-1 text-sm">
+              {% for checkbox in form.contacts %}
+                <label class="flex items-center gap-2">
+                  {{ checkbox.tag }} <span>{{ checkbox.choice_label }}</span>
+                </label>
+              {% endfor %}
+            </div>
+            {% for error in form.contacts.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </fieldset>
+        {% else %}
+          <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+            {% url 'jobs:company_detail' application.posting.company.pk as company_url %}
+            {% blocktranslate trimmed %}
+              No people recorded at this company yet. Add them from
+              <a href="{{ company_url }}" class="underline">the company page</a> to name who you are meeting.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+        {% include "partials/field.html" with field=form.notes %}
+        {% if form.remind %}
+          <label class="flex items-start gap-2 text-sm">
+            {{ form.remind }}
+            <span>
+              {{ form.remind.label }}
+              <span class="block text-xs text-ink-500 dark:text-ink-400">{{ form.remind.help_text }}</span>
+            </span>
+          </label>
+        {% endif %}
+      </div>
+      {% if form.non_field_errors %}
+        <div class="alert-error mb-6">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary">
+          {% if form.instance.pk %}{% translate "Save" %}{% else %}{% translate "Schedule" %}{% endif %}
+        </button>
+        <a href="{{ application.get_absolute_url }}" class="btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

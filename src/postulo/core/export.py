@@ -23,10 +23,11 @@ from django.utils import timezone
 
 from postulo import __version__
 
-#: Bumped when the shape changes in a way an importer must notice.
-#: Bumped when the shape changes. 2 added the listing state and dates on postings and the
-#: listing a capture became; the importer still reads 1, filling the new fields in.
-FORMAT_VERSION = 2
+#: Bumped when the shape changes in a way an importer must notice. 2 added the listing
+#: state and dates on postings and the listing a capture became; 3 added interviews under
+#: each application and the ``actor`` on events. The importer still reads every earlier
+#: format, filling the new fields in.
+FORMAT_VERSION = 3
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -97,9 +98,22 @@ EVENT_FIELDS = (
     "body",
     "from_status",
     "to_status",
+    "actor",
     "created_at",
 )
 REMINDER_FIELDS = ("id", "summary", "due_at", "done_at")
+INTERVIEW_FIELDS = (
+    "id",
+    "uid",
+    "kind",
+    "starts_at",
+    "ends_at",
+    "location",
+    "notes",
+    "outcome",
+    "reminder_id",
+    "created_at",
+)
 CV_FIELDS = ("id", "name", "headline", "summary", "theme", "language", "show_contact_details")
 LETTER_FIELDS = ("id", "name", "subject", "body", "theme", "is_template")
 UPLOAD_FIELDS = ("id", "title", "kind", "notes", "version", "replaces_id", "created_at")
@@ -252,7 +266,10 @@ def build_document(user) -> dict:
 
     # --------------------------------------------------- companies and the rest
     companies = Company.objects.for_user(user).prefetch_related(
-        "contacts", "postings__applications__events", "postings__applications__reminders"
+        "contacts",
+        "postings__applications__events",
+        "postings__applications__reminders",
+        "postings__applications__interviews__contacts",
     )
     for company in companies:
         document["companies"].append(
@@ -279,6 +296,13 @@ def build_document(user) -> dict:
                                 "reminders": [
                                     _fields(reminder, REMINDER_FIELDS)
                                     for reminder in application.reminders.all()
+                                ],
+                                "interviews": [
+                                    {
+                                        **_fields(interview, INTERVIEW_FIELDS),
+                                        "contact_ids": [c.pk for c in interview.contacts.all()],
+                                    }
+                                    for interview in application.interviews.all()
                                 ],
                             }
                             for application in posting.applications.all()
@@ -344,6 +368,12 @@ def build_document(user) -> dict:
             len(posting["applications"])
             for company in document["companies"]
             for posting in company["postings"]
+        ),
+        "interviews": sum(
+            len(application["interviews"])
+            for company in document["companies"]
+            for posting in company["postings"]
+            for application in posting["applications"]
         ),
         "cvs": len(document["documents"]["cvs"]),
         "cover_letters": len(document["documents"]["cover_letters"]),

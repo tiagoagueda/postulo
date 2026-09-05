@@ -23,7 +23,13 @@ def home(request: HttpRequest):
 
     # Imported here rather than at module scope: core is the foundation these apps are
     # built on, and importing them at the top would make the dependency circular.
-    from postulo.applications.models import Application, ApplicationEvent, Reminder, Status
+    from postulo.applications.models import (
+        Application,
+        ApplicationEvent,
+        Interview,
+        Reminder,
+        Status,
+    )
     from postulo.jobs.models import JobPosting
 
     applications = Application.objects.for_user(request.user)
@@ -50,6 +56,12 @@ def home(request: HttpRequest):
         "awaiting_reply": awaiting[:10],
         "awaiting_reply_count": awaiting.count(),
         "chase_after_days": CHASE_AFTER_DAYS,
+        "upcoming_interviews": (
+            Interview.objects.for_user(request.user).upcoming().with_display_data()[:5]
+        ),
+        "interviews_awaiting_outcome": (
+            Interview.objects.for_user(request.user).awaiting_outcome().count()
+        ),
         "due_reminders": (
             Reminder.objects.for_user(request.user)
             .due()
