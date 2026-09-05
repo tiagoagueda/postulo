@@ -27,6 +27,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Two-factor authentication**, opt-in per person under Settings → Account: a code from
+  an authenticator app after the password, ten single-use recovery codes, and "trust this
+  browser" for thirty days. `manage.py mfa_reset <username>` is the way back for an
+  account that has lost both phone and codes. Capture tokens are their own credential and
+  do not go through it. Through allauth's `mfa` app, which becomes a dependency. (#27)
 - A **Settings** area, reached from the account menu: Appearance, Language and time,
   Account (username, addresses, password), Capture tokens and Your data, each its own
   page in a sidebar. allauth's address and password pages appear inside it. *Your details*

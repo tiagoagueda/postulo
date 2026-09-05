@@ -74,8 +74,12 @@ class AccountView(SettingsSectionMixin, UpdateView):
         return self.request.user
 
     def get_context_data(self, **kwargs):
+        from allauth.mfa.adapter import get_adapter as get_mfa_adapter
+
         context = super().get_context_data(**kwargs)
         context["addresses"] = self.request.user.emailaddress_set.order_by("-primary", "email")
         context["email_url"] = reverse("account_email")
         context["password_url"] = reverse("account_change_password")
+        context["mfa_enabled"] = get_mfa_adapter().is_mfa_enabled(self.request.user)
+        context["mfa_url"] = reverse("mfa_index")
         return context

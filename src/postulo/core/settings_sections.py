@@ -59,6 +59,13 @@ BUILTIN: tuple[SettingsSection, ...] = (
             "account_change_password",
             "account_set_password",
             "account_reauthenticate",
+            "mfa_index",
+            "mfa_activate_totp",
+            "mfa_deactivate_totp",
+            "mfa_view_recovery_codes",
+            "mfa_generate_recovery_codes",
+            "mfa_download_recovery_codes",
+            "mfa_reauthenticate",
         ),
     ),
     SettingsSection(

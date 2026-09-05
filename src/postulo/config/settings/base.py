@@ -4,6 +4,7 @@ Values that differ between a laptop and a server belong in the environment, not 
 this file. See ``.env.example`` for the full set of recognised variables.
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     # third party
     "allauth",
     "allauth.account",
+    "allauth.mfa",
     "django_htmx",
     "django_tasks_db",
     # postulo
@@ -143,6 +145,15 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_MAX_EMAIL_ADDRESSES = 5
 ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
+
+# Two-factor authentication: a code from an authenticator app, and recovery codes for the
+# day the phone is gone. Opt-in per person under Settings → Account. Passkeys are the
+# natural next step; they need a secure origin, which a plain-HTTP mesh instance lacks.
+MFA_SUPPORTED_TYPES = ["totp", "recovery_codes"]
+MFA_TOTP_ISSUER = "Postulo"
+# A personal machine need not be asked for a code every day.
+MFA_TRUST_ENABLED = True
+MFA_TRUST_COOKIE_AGE = timedelta(days=30)
 
 # An instance is invite-only unless the operator opens registration deliberately.
 POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)

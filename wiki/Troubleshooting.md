@@ -123,6 +123,18 @@ tick *Verified*. To change a password without email:
 uv run manage.py changepassword alex.morgan     # the username
 ```
 
+## I cannot get past the code prompt
+
+Two-factor authentication is on for the account and the phone with the app is gone. Use
+one of the recovery codes shown when it was set up. Without those, someone with a shell on
+the server removes the second factor:
+
+```sh
+uv run manage.py mfa_reset alex.morgan
+```
+
+Then sign in with the password alone and set it up again.
+
 ## Checking a deployment
 
 This reports anything unsafe about your production configuration:

@@ -22,6 +22,32 @@ one an export records. An address cannot be made primary until it has been verif
 Accounts that existed before verification was required were marked verified when the
 instance was upgraded: they had been signing in by those addresses all along.
 
+## Two-factor authentication
+
+Optional, per person, under **Settings → Account → Two-factor authentication**. Once it is
+on, signing in asks for a six-digit code from an authenticator app after the password, so
+a leaked password alone is not enough.
+
+- **Setting up**: scan the QR code with any authenticator app (Aegis, 2FAS, Ente Auth,
+  Google Authenticator, the one built into your password manager), or type the key, then
+  confirm with one code. Postulo asks for your password again first.
+- **Recovery codes**: ten single-use codes, shown when you set up and available again from
+  the same page. Keep them somewhere that is not your phone; each signs you in once when
+  the phone is not to hand.
+- **Trust this browser**: after a code, Postulo offers to skip the question on that browser
+  for thirty days. Decline on a shared computer.
+- **Lost the phone and the codes?** Whoever has a shell on the server can remove the second
+  factor from an account:
+
+  ```sh
+  uv run manage.py mfa_reset alex.morgan
+  ```
+
+  A password alone signs in again; set it up afresh afterwards.
+
+Capture tokens are their own credential and do not go through the second factor: a
+browser extension has no code to type. See [The capture API](The-capture-API).
+
 ## Who can sign up
 
 Registration is governed by `POSTULO_REGISTRATION_OPEN`, which defaults to `false`. With

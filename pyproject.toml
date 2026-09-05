@@ -18,7 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "django>=6.1,<6.2",
-    "django-allauth>=65.19",
+    "django-allauth[mfa]>=65.19",
     "django-environ>=0.14",
     "django-htmx>=1.29",
     "django-ninja>=1.7",
@@ -62,6 +62,11 @@ e2e = [
     "playwright>=1.62",
     "pytest-playwright>=0.9",
 ]
+
+# Both groups are installed by default so that `uv add` and `uv sync` never quietly remove
+# the browser test's dependencies; the browser itself is still a `playwright install` away.
+[tool.uv]
+default-groups = ["dev", "e2e"]
 
 [build-system]
 requires = ["uv_build>=0.9,<0.13"]
