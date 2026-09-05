@@ -1,0 +1,20 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Language and time" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "What Postulo speaks to you, and whose clock it shows." %}
+  </p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-6">
+      <div class="grid gap-x-4 sm:grid-cols-2">
+        {% include "partials/field.html" with field=form.language %}
+        {% include "partials/field.html" with field=form.time_zone %}
+      </div>
+    </div>
+    <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+  </form>
+{% endblock %}

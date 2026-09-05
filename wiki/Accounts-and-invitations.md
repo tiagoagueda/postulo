@@ -8,14 +8,14 @@ Every account has three things, all obligatory:
 
 - **A username** — 3 to 32 lowercase letters, digits, dots, underscores or hyphens. It is
   what you sign in with, and what other people on a shared instance see. Chosen at
-  signup; changed on *Your details*.
+  signup; changed under *Settings → Account*.
 - **A full name** — first and last. Every document starts from it, so Postulo asks for
   it up front rather than printing a CV with a blank at the top.
 - **An email address** — unique across the instance, and **verified**: a link is sent to
   it, and the account cannot sign in until the link has been followed. The address works
   for signing in too, interchangeably with the username.
 
-An account may hold up to five addresses (*Your details → Email addresses*), each of
+An account may hold up to five addresses (*Settings → Account → Email addresses*), each of
 them verified by its own link. One is **primary**: it receives Postulo's mail and is the
 one an export records. An address cannot be made primary until it has been verified.
 

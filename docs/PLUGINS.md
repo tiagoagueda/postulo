@@ -149,6 +149,32 @@ board offers, say — think carefully. You would be making requests outside all 
 above, on an instance whose owner did not ask for them. Prefer teaching the API to
 `postulo.plugins.fetching` over reaching for `httpx` yourself.
 
+## Adding a settings section
+
+The Settings area is a sidebar of sections, each its own page. A plugin with per-person
+settings registers a section and it appears beside the built-in ones, in the order it asks
+for. Register it when your app is ready:
+
+```python
+from django.utils.translation import gettext_lazy as _
+
+from postulo.core.settings_sections import SettingsSection, register
+
+register(
+    SettingsSection(
+        slug="myboard",
+        label=_("MyBoard"),
+        url_name="myboard:settings",  # your own view, rendered with settings/base.html
+        icon="link",  # any icon in assets/icons.txt
+        order=60,  # built-in sections use 10 to 50
+    )
+)
+```
+
+Your template extends `settings/base.html` and fills `content`; the sidebar comes with it.
+Give `match` the URL names of any further pages that belong to your section, so it stays
+highlighted while a person is on them.
+
 ## A worked example
 
 ```python

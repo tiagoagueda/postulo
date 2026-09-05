@@ -11,19 +11,22 @@ they have followed it.
 
 ## 2. Fill in your details
 
-**Your name, top right → Your details.** The menu under your name also holds *Export
-everything* and *Sign out*.
+**Your name, top right → Your details.** The menu under your name also holds *Settings*,
+*Export everything* and *Sign out*.
 
-This is the contact block that gets printed at the top of your CVs: your name, email,
-phone, location and links. It is worth doing first, because every CV you generate reads
-from it.
+*Your details* is the contact block that gets printed at the top of your CVs: your name,
+headline, phone, location and links. It is worth doing first, because every CV you
+generate reads from it.
 
-The same page holds three preferences:
+How Postulo behaves for you lives under **Settings**, one section per page:
 
-- **Language** — the interface language.
-- **Time zone** — dates and times are shown in this.
-- **Theme** — light, dark, or match your operating system. The switch at the top right
-  of every page cycles through the same three; this select is the explicit version.
+- **Appearance** — light, dark, or match your operating system. The switch at the top
+  right of every page cycles through the same three; this is the explicit version.
+- **Language and time** — the interface language, and the time zone dates are shown in.
+- **Account** — your username, your email addresses, your password.
+- **Capture tokens** — for the browser extension and anything else that hands over a
+  posting (see [The capture API](The-capture-API)).
+- **Your data** — the export.
 
 ## 3. Record an application
 

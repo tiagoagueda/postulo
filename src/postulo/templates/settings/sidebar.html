@@ -1,0 +1,15 @@
+{% load i18n postulo %}
+<nav aria-label="{% translate 'Settings sections' %}">
+  <ul class="flex gap-1 overflow-x-auto lg:flex-col">
+    {% for entry in sections %}
+      <li class="shrink-0">
+        <a href="{% url entry.section.url_name %}"
+           class="{% if entry.active %}nav-link-active{% else %}nav-link{% endif %} flex items-center gap-2"
+           {% if entry.active %}aria-current="page"{% endif %}>
+          {% icon entry.section.icon class="size-4" %}
+          {{ entry.section.label }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

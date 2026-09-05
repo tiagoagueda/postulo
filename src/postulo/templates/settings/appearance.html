@@ -1,0 +1,28 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Appearance" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "The switch at the top right cycles through the same three; this is the explicit version." %}
+  </p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-6">
+      <fieldset>
+        <legend class="field-label mb-3">{{ form.theme.label }}</legend>
+        <div class="space-y-2">
+          {% for choice in form.theme %}
+            <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+              {{ choice.tag }}
+              <span>{{ choice.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        {% for error in form.theme.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </fieldset>
+    </div>
+    <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+  </form>
+{% endblock %}

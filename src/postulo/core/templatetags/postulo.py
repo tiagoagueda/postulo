@@ -118,6 +118,20 @@ def add_class(field: BoundField, css_classes: str) -> BoundField:
     return field.as_widget(attrs={"class": merged})
 
 
+@register.inclusion_tag("settings/sidebar.html", takes_context=True)
+def settings_sidebar(context) -> dict:
+    """The sections of the Settings area, with the one being looked at marked."""
+    from postulo.core.settings_sections import sections
+
+    request = context.get("request")
+    return {
+        "sections": [
+            {"section": section, "active": request is not None and section.is_active(request)}
+            for section in sections()
+        ]
+    }
+
+
 @register.simple_tag(takes_context=True)
 def nav_active(context, *url_names: str, css_class: str = "nav-link-active") -> str:
     """Return ``css_class`` when the current view matches one of ``url_names``."""

@@ -99,7 +99,7 @@ responsible for the requests your instance makes, or copy the text in by hand.
 ## An API token stopped working
 
 Tokens return `401` when missing, mistyped, revoked, or belonging to a disabled account.
-Check the token list under **Your details → Capture tokens**: it shows which are revoked
+Check the token list under **Settings → Capture tokens**: it shows which are revoked
 and when each was last used. A lost token cannot be recovered, only replaced.
 
 ## Times are wrong

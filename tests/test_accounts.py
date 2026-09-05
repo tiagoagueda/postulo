@@ -32,7 +32,6 @@ def test_saving_the_profile_stores_details_and_name(client, user):
     response = client.post(
         reverse("accounts:profile"),
         {
-            "username": "tiago",
             "first_name": "Tiago",
             "last_name": "Agueda",
             "headline": "Backend engineer",
@@ -41,20 +40,15 @@ def test_saving_the_profile_stores_details_and_name(client, user):
             "website": "",
             "linkedin_url": "",
             "source_repo_url": "",
-            "language": "pt-pt",
-            "time_zone": "Europe/Paris",
-            "theme": Theme.DARK,
         },
     )
 
     assert response.status_code == 302
     user.refresh_from_db()
     profile = user.profile
-    assert user.username == "tiago"
     assert user.first_name == "Tiago"
     assert profile.headline == "Backend engineer"
     assert profile.location == "Paris, France"
-    assert profile.time_zone == "Europe/Paris"
 
 
 def test_the_profile_page_only_ever_edits_your_own(client, user, other_user):

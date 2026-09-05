@@ -68,6 +68,9 @@
                   <a href="{% url 'accounts:profile' %}" class="menu-item">
                     {% icon "user" %}{% translate "Your details" %}
                   </a>
+                  <a href="{% url 'settings:index' %}" class="menu-item">
+                    {% icon "settings" %}{% translate "Settings" %}
+                  </a>
                   <a href="{% url 'core:export' %}" class="menu-item">
                     {% icon "download" %}{% translate "Export everything" %}
                   </a>
@@ -93,7 +96,9 @@
 
     <main class="mx-auto max-w-7xl px-4 py-8">
       {% include "partials/messages.html" %}
-      {% block content %}{% endblock %}
+      {# `main` exists so that an area such as Settings can wrap `content` in a layout of #}
+      {# its own; pages — allauth's included — keep overriding `content` as they always did. #}
+      {% block main %}{% block content %}{% endblock %}{% endblock %}
     </main>
 
     <footer class="mx-auto max-w-7xl px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">

@@ -27,6 +27,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- A **Settings** area, reached from the account menu: Appearance, Language and time,
+  Account (username, addresses, password), Capture tokens and Your data, each its own
+  page in a sidebar. allauth's address and password pages appear inside it. *Your details*
+  keeps what documents print — the name and the contact block — and nothing else. A plugin
+  with per-person settings can register a section (see `docs/PLUGINS.md`). (#22)
 - A theme switch in the header, cycling light, dark and match-the-system. It applies at
   once, persists on the profile so it follows the account to every device, and the
   stylesheet now sets `color-scheme` so the browser's own controls follow the theme too.

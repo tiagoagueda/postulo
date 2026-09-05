@@ -20,7 +20,7 @@ the ability to put entries in a review queue that you will then decline.
 
 ## Getting a token
 
-**Your details → Capture tokens.**
+**Settings → Capture tokens.**
 
 Give it a name — the device or tool it is for — and Postulo shows you the token **once**.
 Only a hash is stored, so it genuinely cannot be shown again. If you lose it, revoke it

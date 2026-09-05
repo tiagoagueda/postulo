@@ -23,6 +23,7 @@ def test_the_right_side_holds_the_account_menu_and_the_theme_switch(client, user
     assert user.display_name in header
     assert "Account menu, applicant" in header
     assert "Your details" in header
+    assert "Settings" in header
     assert "Export everything" in header
     assert "Sign out" in header
     assert "data-theme-switch" in header

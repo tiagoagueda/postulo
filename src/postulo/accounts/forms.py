@@ -8,6 +8,7 @@ from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm as AllauthSignupForm
 from django import forms
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from .models import Invite, Profile
@@ -56,35 +57,51 @@ def time_zone_choices() -> list[tuple[str, str]]:
 
 
 class ProfileForm(forms.ModelForm):
-    """Personal details, contact block, and interface preferences.
+    """Your details: the name and the contact block, which is what documents print.
 
     The name lives on the user model but belongs on this page: it is the name that will
-    be printed at the top of a CV, and nobody thinks of it as an account setting.
+    be printed at the top of a CV, and nobody thinks of it as an account setting. How
+    Postulo behaves for the person — theme, language, username, addresses — is Settings.
     """
 
-    username = forms.CharField(
-        label=_("Username"),
-        max_length=32,
-        help_text=_(
-            "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
-        ),
-    )
     first_name = forms.CharField(label=_("First name"), max_length=150)
     last_name = forms.CharField(label=_("Last name"), max_length=150)
 
     class Meta:
         model = Profile
-        fields = (
-            "headline",
-            "phone",
-            "location",
-            "website",
-            "linkedin_url",
-            "source_repo_url",
-            "language",
-            "time_zone",
-            "theme",
-        )
+        fields = ("headline", "phone", "location", "website", "linkedin_url", "source_repo_url")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields["first_name"].initial = self.instance.user.first_name
+            self.fields["last_name"].initial = self.instance.user.last_name
+
+    def save(self, commit: bool = True) -> Profile:
+        profile = super().save(commit=commit)
+        user = profile.user
+        user.first_name = self.cleaned_data["first_name"].strip()
+        user.last_name = self.cleaned_data["last_name"].strip()
+        if commit:
+            user.save(update_fields=["first_name", "last_name"])
+        return profile
+
+
+class AppearanceForm(forms.ModelForm):
+    """Settings → Appearance. The explicit version of the switch in the header."""
+
+    class Meta:
+        model = Profile
+        fields = ("theme",)
+        widgets = {"theme": forms.RadioSelect}
+
+
+class LocaleForm(forms.ModelForm):
+    """Settings → Language and time."""
+
+    class Meta:
+        model = Profile
+        fields = ("language", "time_zone")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -94,28 +111,27 @@ class ProfileForm(forms.ModelForm):
         self.fields["time_zone"] = forms.ChoiceField(
             label=_("Time zone"), choices=time_zone_choices, required=False
         )
-        if self.instance and self.instance.pk:
-            self.fields["username"].initial = self.instance.user.username
-            self.fields["first_name"].initial = self.instance.user.first_name
-            self.fields["last_name"].initial = self.instance.user.last_name
+
+
+class AccountForm(forms.ModelForm):
+    """Settings → Account: the username. Addresses and the password have allauth's pages."""
+
+    class Meta:
+        model = get_user_model()
+        fields = ("username",)
+        labels = {"username": _("Username")}
+        help_texts = {
+            "username": _(
+                "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
+            )
+        }
 
     def clean_username(self) -> str:
         """The same rules as at signup, unless the username is simply unchanged."""
         username = self.cleaned_data["username"].strip().casefold()
-        current = self.instance.user.username if self.instance and self.instance.pk else ""
-        if username == current:
+        if username == self.instance.username:
             return username
         return get_adapter().clean_username(username)
-
-    def save(self, commit: bool = True) -> Profile:
-        profile = super().save(commit=commit)
-        user = profile.user
-        user.username = self.cleaned_data["username"]
-        user.first_name = self.cleaned_data["first_name"].strip()
-        user.last_name = self.cleaned_data["last_name"].strip()
-        if commit:
-            user.save(update_fields=["username", "first_name", "last_name"])
-        return profile
 
 
 class InviteForm(forms.ModelForm):

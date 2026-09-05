@@ -205,7 +205,6 @@ def test_an_open_invitation_still_needs_the_click(client, settings, staff_user):
 
 def profile_post(**overrides):
     data = {
-        "username": "applicant",
         "first_name": "Alex",
         "last_name": "Morgan",
         "headline": "",
@@ -214,9 +213,6 @@ def profile_post(**overrides):
         "website": "",
         "linkedin_url": "",
         "source_repo_url": "",
-        "language": "",
-        "time_zone": "",
-        "theme": "system",
     }
     data.update(overrides)
     return data
@@ -229,20 +225,24 @@ def test_the_profile_insists_on_a_full_name(client, user):
     assert "last_name" in response.context["form"].errors
 
 
-def test_the_profile_can_change_the_username_to_a_free_one_only(client, user, other_user):
+def test_the_username_can_be_changed_to_a_free_one_only(client, user, other_user):
     client.force_login(user)
-    response = client.post(reverse("accounts:profile"), profile_post(username=other_user.username))
+    account = reverse("settings:account")
+    response = client.post(account, {"username": other_user.username})
     assert response.status_code == 200
     assert "username" in response.context["form"].errors
 
-    response = client.post(reverse("accounts:profile"), profile_post(username="admin"))
+    response = client.post(account, {"username": "admin"})
     assert "username" in response.context["form"].errors
 
-    response = client.post(reverse("accounts:profile"), profile_post(username="Alex.Morgan"))
+    response = client.post(account, {"username": "Alex.Morgan"})
     assert response.status_code == 302
     user.refresh_from_db()
     assert user.username == "alex.morgan"
-    assert user.display_name == "Alex Morgan"
+
+    # Unchanged is always fine, even though it is "taken" — by oneself.
+    response = client.post(account, {"username": "alex.morgan"})
+    assert response.status_code == 302
 
 
 def test_the_dashboard_asks_for_a_name_until_there_is_one(client, user):
