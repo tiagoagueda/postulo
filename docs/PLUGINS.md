@@ -149,6 +149,66 @@ board offers, say — think carefully. You would be making requests outside all 
 above, on an instance whose owner did not ask for them. Prefer teaching the API to
 `postulo.plugins.fetching` over reaching for `httpx` yourself.
 
+## Plugins that connect to another service
+
+Sources are stateless. A **notifier**, a **store** or a **sync** talks to another service on
+a person's behalf, and needs to know where it is and how to sign in. That is a
+*connection*, and it is Postulo's business, not the plugin's: the plugin says what it
+needs, Postulo draws the form under *Settings → Connections*, keeps the answers — secrets
+encrypted, never shown back — and hands them over when it calls the plugin.
+
+A connected plugin provides four names and two methods, no base class:
+
+```python
+from postulo.plugins.base import FieldSpec, TestResult
+from postulo.plugins import http
+
+
+class MyNotifier:
+    name = "mynotifier"  # stable identifier, recorded on every connection
+    version = "1.0"
+    kind = "notifier"  # or "store", or "sync"
+    label = "My notifier"  # what people see
+
+    def config_fields(self):
+        return [
+            FieldSpec("url", "Server address", type="url"),
+            FieldSpec("token", "API token", type="password", secret=True),
+            FieldSpec("quiet", "Quiet hours", type="boolean", required=False),
+        ]
+
+    def test(self, config):
+        """One real request, one sentence back. Runs when a person presses Test."""
+        with http.client() as client:
+            response = client.get(
+                f"{config['url']}/ping", headers={"Authorization": config["token"]}
+            )
+        if response.status_code != 200:
+            return TestResult(False, f"the server answered {response.status_code}")
+        return TestResult(True, "reachable")
+```
+
+Field types: `text`, `url`, `email`, `password`, `integer`, `boolean`, `choice` (give
+`choices`), `textarea`. A field marked `secret` is stored encrypted and is never rendered
+back; `config` as passed to your methods holds configuration and secrets together.
+
+Register it in the group for its kind — `postulo.notifiers`, `postulo.stores`,
+`postulo.syncs`:
+
+```toml
+[project.entry-points."postulo.notifiers"]
+mynotifier = "my_package:MyNotifier"
+```
+
+**Use `postulo.plugins.http.client()` for every request.** It carries Postulo's timeouts and
+user agent, and it enforces the instance's destination policy on every request, redirects
+included: private and local addresses are refused unless the operator set
+`POSTULO_CONNECTIONS_ALLOW_PRIVATE=true`, which is where self-hosted services usually live.
+A plugin that opens its own connection bypasses that policy, and a reviewer will say so.
+
+What each kind then *does* — a notifier's `send()`, a store's `put()` — is that kind's own
+interface, documented with it as it lands.
+
 ## Adding a settings section
 
 The Settings area is a sidebar of sections, each its own page. A plugin with per-person

@@ -37,6 +37,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Connections**: the per-person configuration and secrets for plugins that talk to
+  another service — notifiers, document stores, synchronisation. A plugin describes its
+  fields; Postulo draws the form under Settings → Connections, stores secrets encrypted
+  (under `POSTULO_FIELD_KEY`, or a key derived from the secret key), never shows them
+  back, and offers a Test button that runs the plugin for real. Plugins get one shared
+  HTTP client that enforces the destination policy on every request: private addresses
+  are refused unless `POSTULO_CONNECTIONS_ALLOW_PRIVATE` is set. The plugin registry now
+  knows four kinds — sources, notifiers, stores, syncs. (#11)
 - **Single sign-on through OpenID Connect**, native. Three environment variables name
   the provider and a button appears on the sign-in page; an address the provider has
   verified signs in the account that holds it and links the two, never duplicating. By

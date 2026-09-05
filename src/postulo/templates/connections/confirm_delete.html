@@ -1,0 +1,23 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="card max-w-md">
+    <h2 class="mb-2 text-xl font-semibold">{% translate "Remove this connection?" %}</h2>
+    <p class="mb-2 text-sm text-ink-600 dark:text-ink-300">
+      {% blocktranslate trimmed with name=object.label %}
+        “{{ name }}” will be removed, and the secrets stored for it deleted.
+      {% endblocktranslate %}
+    </p>
+    <p class="mb-6 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "Nothing on the other service is touched. You can connect it again later." %}
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn bg-red-600 text-white hover:bg-red-700">{% translate "Remove" %}</button>
+        <a href="{% url 'connections:list' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

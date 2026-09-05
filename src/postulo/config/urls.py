@@ -13,6 +13,7 @@ urlpatterns = [
     # take precedence over any allauth route sharing a path.
     path("accounts/", include("postulo.accounts.urls")),
     path("accounts/", include("allauth.urls")),
+    path("settings/connections/", include("postulo.plugins.urls")),
     path("settings/", include("postulo.accounts.settings_urls")),
     path("server/", include("postulo.core.server_urls")),
     path("applications/", include("postulo.applications.urls")),

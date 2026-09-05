@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "django_tasks_db",
     # postulo
     "postulo.core",
+    "postulo.plugins",
     "postulo.accounts",
     "postulo.jobs",
     "postulo.applications",
@@ -261,6 +262,15 @@ POSTULO_PDF_BACKEND = env("POSTULO_PDF_BACKEND", default="auto")
 # polite default stands. Turning this off makes the operator responsible for the
 # requests their instance makes.
 POSTULO_CAPTURE_IGNORE_ROBOTS = env.bool("POSTULO_CAPTURE_IGNORE_ROBOTS", default=False)
+
+# Connections: plugins that talk to another service on a person's behalf. Their secrets
+# are encrypted under a key derived from SECRET_KEY unless a dedicated one is given, so
+# that rotating Django's key does not silently lock every connection.
+POSTULO_FIELD_KEY = env("POSTULO_FIELD_KEY", default="")
+# Capture refuses private addresses because the URL came from a stranger's page. A
+# connection's destination is what the person typed, and self-hosted services live on
+# private networks, so the operator decides — once — whether plugins may reach them.
+POSTULO_CONNECTIONS_ALLOW_PRIVATE = env.bool("POSTULO_CONNECTIONS_ALLOW_PRIVATE", default=False)
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},

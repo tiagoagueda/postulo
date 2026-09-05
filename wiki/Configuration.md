@@ -88,6 +88,16 @@ setting to allow them: a self-hosted box that will fetch any address you hand it
 to go looking at the rest of your network. See
 [Capturing postings](Capturing-postings#what-it-will-not-do).
 
+## Connections
+
+Plugins that talk to another service on a person's behalf — notifiers, document stores,
+synchronisation — keep their configuration under *Settings → Connections*.
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `POSTULO_CONNECTIONS_ALLOW_PRIVATE` | `false` | Whether a connection may reach a private or local address. Unlike capture, the destination here is what the person typed, and self-hosted services — a Paperless on the LAN, a mail server in the same Compose network — live on private addresses. Turn it on when yours do. Every request a plugin makes is checked, redirects included. |
+| `POSTULO_FIELD_KEY` | empty | The key connection secrets are encrypted under. Unset, a key is derived from `POSTULO_SECRET_KEY` — which means rotating that key makes every stored secret unreadable. Set this once and secrets survive a rotation. Any long random string. |
+
 ## Documents
 
 | Variable | Default | What it does |

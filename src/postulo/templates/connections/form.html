@@ -1,0 +1,49 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">
+    {% if connection %}{{ connection.label }}{% else %}{% blocktranslate with plugin=plugin.label trimmed %}Connect {{ plugin }}{% endblocktranslate %}{% endif %}
+  </h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {{ kind_label }} · {{ plugin.label }} <code class="text-xs">{{ plugin.version }}</code>
+  </p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="card mb-4">
+      {% include "partials/field.html" with field=form.label %}
+      <label class="flex items-center gap-3 text-sm">
+        {{ form.enabled }}
+        <span>{{ form.enabled.label }}</span>
+      </label>
+    </div>
+
+    <div class="card mb-6">
+      <h3 class="mb-4 font-medium">{% blocktranslate with plugin=plugin.label trimmed %}What {{ plugin }} needs{% endblocktranslate %}</h3>
+      {% for field in form.plugin_fields %}
+        {% if field.field.widget.input_type == "checkbox" %}
+          <div class="mb-4">
+            <label class="flex items-center gap-3 text-sm">
+              {{ field }}
+              <span>{{ field.label }}</span>
+            </label>
+            {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
+            {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+        {% else %}
+          {% include "partials/field.html" with field=field %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+      <a href="{% url 'connections:list' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+    </div>
+  </form>
+{% endblock %}

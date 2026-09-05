@@ -15,6 +15,7 @@ not put a fabricated job title into their records.
 from __future__ import annotations
 
 import datetime as dt
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import Protocol, runtime_checkable
 
@@ -102,3 +103,73 @@ class SourcePlugin(Protocol):
 
 class CaptureError(Exception):
     """Raised when a page cannot be fetched or cannot be understood."""
+
+
+# ----------------------------------------------------------- connected plugins
+
+#: The kinds of plugin that talk to another service on a person's behalf, and the
+#: entry-point group each registers under. Sources are stateless and live apart.
+CONNECTED_KINDS = {
+    "notifier": "postulo.notifiers",
+    "store": "postulo.stores",
+    "sync": "postulo.syncs",
+}
+
+FIELD_TYPES = ("text", "url", "email", "password", "integer", "boolean", "choice", "textarea")
+
+
+@dataclass(frozen=True)
+class FieldSpec:
+    """One thing a plugin needs from a person: an address, a token, a folder name.
+
+    Postulo builds the connection form from these, so a plugin never renders HTML and a
+    person never sees a form Postulo did not draw. A ``secret`` field is stored encrypted
+    and is never shown back; ``choices`` are ``(value, label)`` pairs for ``choice``.
+    """
+
+    name: str
+    label: str
+    type: str = "text"
+    help: str = ""
+    required: bool = True
+    secret: bool = False
+    default: str | int | bool | None = None
+    choices: tuple[tuple[str, str], ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.type not in FIELD_TYPES:
+            raise ValueError(f"Unknown field type {self.type!r}; use one of {FIELD_TYPES}.")
+        if self.type == "choice" and not self.choices:
+            raise ValueError(f"Field {self.name!r} is a choice with no choices.")
+
+
+@dataclass(frozen=True)
+class TestResult:
+    """What ``test()`` came back with: whether it worked, and a sentence for the person."""
+
+    ok: bool
+    message: str = ""
+
+
+@runtime_checkable
+class ConnectedPlugin(Protocol):
+    """What a plugin that connects to another service must provide.
+
+    No base class, as with sources: these names are enough. ``kind`` says which group it
+    belongs to — ``notifier``, ``store`` or ``sync`` — and the kind's own interface adds
+    what that kind does (a notifier sends; a store puts). This is the part they share:
+    what to ask the person for, and how to prove the answers work.
+    """
+
+    name: str
+    version: str
+    kind: str
+    label: str
+
+    def config_fields(self) -> list[FieldSpec]:
+        """What the connection form asks for."""
+        ...
+
+    def test(self, config: dict) -> TestResult:
+        """Try the configuration for real — one request, one message — and report."""
+        ...

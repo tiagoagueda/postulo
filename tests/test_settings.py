@@ -97,7 +97,15 @@ def test_a_plugin_can_add_a_section(client, user):
     settings_sections.register(section)
     try:
         ordered = [s.slug for s in settings_sections.sections()]
-        assert ordered == ["appearance", "locale", "account", "tokens", "weather", "data"]
+        assert ordered == [
+            "appearance",
+            "locale",
+            "account",
+            "connections",
+            "tokens",
+            "weather",
+            "data",
+        ]
         client.force_login(user)
         html = client.get(reverse("settings:appearance")).content.decode()
         assert "Weather" in html

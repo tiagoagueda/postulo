@@ -70,6 +70,20 @@ BUILTIN: tuple[SettingsSection, ...] = (
         ),
     ),
     SettingsSection(
+        slug="connections",
+        label=_("Connections"),
+        url_name="connections:list",
+        icon="link",
+        order=35,
+        match=(
+            "connections:pick",
+            "connections:create",
+            "connections:edit",
+            "connections:test",
+            "connections:delete",
+        ),
+    ),
+    SettingsSection(
         slug="tokens",
         label=_("Capture tokens"),
         url_name="api:token_list",

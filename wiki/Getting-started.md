@@ -24,7 +24,11 @@ How Postulo behaves for you lives under **Settings**, one section per page:
 - **Appearance** — light, dark, or match your operating system. The switch at the top
   right of every page cycles through the same three; this is the explicit version.
 - **Language and time** — the interface language, and the time zone dates are shown in.
-- **Account** — your username, your email addresses, your password.
+- **Account** — your username, your email addresses, your password, two-factor
+  authentication, and any single sign-on connected to the account.
+- **Connections** — where the plugins that act for you (notifications, document stores,
+  synchronisation) find their services and how they sign in. Empty until the operator
+  installs such a plugin.
 - **Capture tokens** — for the browser extension and anything else that hands over a
   posting (see [The capture API](The-capture-API)).
 - **Your data** — the export.
