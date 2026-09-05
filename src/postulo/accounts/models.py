@@ -140,6 +140,11 @@ class Theme(models.TextChoices):
     DARK = "dark", _("Dark")
 
 
+def upload_to_avatars(instance, filename: str) -> str:
+    """Pictures live under the person, like every other private file."""
+    return f"avatars/{instance.user_id}/{filename}"
+
+
 class Profile(models.Model):
     """Personal details and preferences.
 
@@ -187,6 +192,15 @@ class Profile(models.Model):
     #: How each table is laid out — which columns, in what order, how many rows a page
     #: holds — keyed by the table's name. A preference, so it follows the account.
     table_settings = models.JSONField(_("table settings"), default=dict, blank=True)
+    #: A picture the person uploaded, re-encoded to a square; beats the Gravatar.
+    avatar = models.ImageField(_("picture"), upload_to=upload_to_avatars, blank=True)
+    #: Opt-in: fetch the Gravatar for the primary address, once, server-side.
+    use_gravatar = models.BooleanField(_("use my Gravatar"), default=False)
+    #: The copy the server fetched; served by Postulo, never by gravatar.com.
+    gravatar_image = models.ImageField(
+        _("Gravatar copy"), upload_to=upload_to_avatars, blank=True, editable=False
+    )
+    gravatar_checked_at = models.DateTimeField(_("Gravatar checked on"), null=True, blank=True)
     #: Days without activity after which an open application counts as having gone quiet.
     quiet_after_days = models.PositiveSmallIntegerField(
         _("quiet after"),
@@ -204,6 +218,20 @@ class Profile(models.Model):
 
     def __str__(self) -> str:
         return f"Profile for {self.user}"
+
+    @property
+    def picture(self):
+        """The file to show: the upload, else the Gravatar when opted in, else nothing."""
+        if self.avatar:
+            return self.avatar
+        if self.use_gravatar and self.gravatar_image:
+            return self.gravatar_image
+        return None
+
+    @property
+    def picture_version(self) -> int:
+        """Changes whenever the profile does, so a browser cache never shows an old face."""
+        return int(self.updated_at.timestamp()) if self.updated_at else 0
 
 
 class InviteQuerySet(models.QuerySet):

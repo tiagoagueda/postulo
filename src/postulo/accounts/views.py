@@ -19,8 +19,10 @@ from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
 from postulo.core.context_processors import theme_switch
+from postulo.core.files import serve_private_file
 from postulo.core.mixins import StaffRequiredMixin
 
+from . import avatars
 from .adapter import INVITE_SESSION_KEY
 from .forms import InviteForm, ProfileForm
 from .models import Invite, Profile, Theme
@@ -33,14 +35,67 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     form_class = ProfileForm
     template_name = "accounts/profile.html"
     success_url = reverse_lazy("accounts:profile")
+    context_object_name = "profile"
 
     def get_object(self, queryset=None) -> Profile:
         profile, _created = Profile.objects.get_or_create(user=self.request.user)
         return profile
 
     def form_valid(self, form):
+        response = super().form_valid(form)
         messages.success(self.request, _("Your details have been saved."))
-        return super().form_valid(form)
+        outcome = getattr(form, "gravatar_outcome", "")
+        if outcome == "none":
+            messages.info(
+                self.request,
+                _("Gravatar has no picture for your address, so your initials stay."),
+            )
+        elif outcome == "error":
+            messages.warning(
+                self.request, _("Gravatar could not be reached just now. Try again later.")
+            )
+        return response
+
+
+class AvatarView(LoginRequiredMixin, View):
+    """Serve a person's picture: their own, or anyone's to an administrator.
+
+    The file lives under private media like every other personal file and comes out only
+    through here, so the content security policy can keep saying ``img-src 'self'``. A
+    face is not a CV, so the cache may keep it for a day; the address changes with the
+    profile, so a new picture is never hidden by an old cache entry.
+    """
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        if pk != request.user.pk and not request.user.is_staff:
+            raise Http404
+        profile = get_object_or_404(Profile, user_id=pk)
+        picture = profile.picture
+        if not picture:
+            raise Http404
+        response = serve_private_file(request, picture, download_name="picture.png")
+        response["Cache-Control"] = "private, max-age=86400"
+        return response
+
+
+class GravatarRefreshView(LoginRequiredMixin, View):
+    """Ask Gravatar again, on demand, for one's own picture."""
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        profile, _created = Profile.objects.get_or_create(user=request.user)
+        if not profile.use_gravatar:
+            messages.error(request, _("Turn on “Use my Gravatar” first."))
+        else:
+            outcome = avatars.fetch_gravatar(profile)
+            messages.success(
+                request,
+                {
+                    "found": _("Your Gravatar has been fetched again."),
+                    "none": _("Gravatar has no picture for your address, so your initials stay."),
+                    "error": _("Gravatar could not be reached just now. Try again later."),
+                }[outcome],
+            )
+        return redirect("accounts:profile")
 
 
 class InviteListView(StaffRequiredMixin, ListView):

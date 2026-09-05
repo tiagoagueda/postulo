@@ -44,6 +44,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **A picture beside your name.** Upload one under *Your details* — decoded, squared,
+  re-encoded to 256 pixels and stripped of its metadata, then served privately like every
+  other personal file — or tick *Use my Gravatar* and Postulo fetches the picture for your
+  primary address once, server-side, keeps a copy and shows that; nothing is fetched while
+  pages are viewed, and the content security policy is unchanged. The upload wins over the
+  Gravatar; without either, the initials tile stays. Refetched when the primary address
+  changes or on demand; the uploaded picture travels in the export. (#7)
 - **Plugins carry their own translations.** A plugin package ships a `locale/` directory
   next to its code, laid out as `makemessages` lays it out, and the registry adds it to the
   catalogues Django reads when the plugin loads. Postulo's own catalogues never carry a

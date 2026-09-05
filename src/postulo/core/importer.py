@@ -133,6 +133,11 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             if hasattr(profile, name) and value:
                 setattr(profile, name, value)
         profile.save()
+    avatar_file = account.get("avatar_file") or ""
+    if profile and avatar_file:
+        content = _extract(archive, avatar_file)
+        if content is not None:
+            profile.avatar.save(avatar_file.rsplit("/", 1)[-1], ContentFile(content), save=True)
 
     # --------------------------------------------------------------------- tags
     tags_by_slug: dict[str, Tag] = {}

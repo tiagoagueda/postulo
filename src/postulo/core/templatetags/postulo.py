@@ -7,6 +7,7 @@ from pathlib import Path
 
 from django import template
 from django.forms import BoundField
+from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
@@ -97,6 +98,14 @@ def avatar(user, css_class: str = "size-7 text-xs") -> str:
     Decorative: it always stands beside the person's name. The colour is a stable
     function of the display name, so it is the same on every page and every device.
     """
+    profile = getattr(user, "profile", None) if getattr(user, "pk", None) else None
+    picture = getattr(profile, "picture", None) if profile is not None else None
+    if picture:
+        url = reverse("accounts:avatar", args=[user.pk])
+        return mark_safe(  # noqa: S308
+            f'<img src="{url}?v={profile.picture_version}" alt="" '
+            f'class="{escape(css_class)} shrink-0 rounded-full object-cover">'
+        )
     name = user.display_name or ""
     colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
     return mark_safe(  # noqa: S308

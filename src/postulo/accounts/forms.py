@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from . import avatars
 from .models import Invite, Profile
 
 
@@ -90,6 +91,26 @@ class ProfileForm(forms.ModelForm):
 
     first_name = forms.CharField(label=_("First name"), max_length=150)
     last_name = forms.CharField(label=_("Last name"), max_length=150)
+    # A plain FileField, not an ImageField: the size and type are checked before anything
+    # is decoded, and the decoding is done once, by the same code that stores the result.
+    picture = forms.FileField(
+        label=_("Upload a picture"),
+        required=False,
+        help_text=_(
+            "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of "
+            "anything the file knew about where it was taken."
+        ),
+    )
+    remove_picture = forms.BooleanField(label=_("Remove the uploaded picture"), required=False)
+    use_gravatar = forms.BooleanField(
+        label=_("Use my Gravatar"),
+        required=False,
+        help_text=_(
+            "Postulo fetches the picture for your primary address from gravatar.com once, "
+            "keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick "
+            "it and the copy is deleted."
+        ),
+    )
 
     class Meta:
         model = Profile
@@ -100,6 +121,24 @@ class ProfileForm(forms.ModelForm):
         if self.instance and self.instance.pk:
             self.fields["first_name"].initial = self.instance.user.first_name
             self.fields["last_name"].initial = self.instance.user.last_name
+            self.fields["use_gravatar"].initial = self.instance.use_gravatar
+            if not self.instance.avatar:
+                del self.fields["remove_picture"]
+
+    def clean_picture(self):
+        upload = self.cleaned_data.get("picture")
+        if not upload:
+            return upload
+        if upload.size > avatars.MAX_UPLOAD_BYTES:
+            raise forms.ValidationError(_("That picture is over 5 MB. A smaller one, please."))
+        content_type = getattr(upload, "content_type", "") or ""
+        if content_type not in avatars.ALLOWED_CONTENT_TYPES:
+            raise forms.ValidationError(_("Use a PNG, JPEG, WebP or GIF."))
+        try:
+            self._processed_picture = avatars.process(upload.read())
+        except avatars.UnusableImage as exc:
+            raise forms.ValidationError(str(exc)) from exc
+        return upload
 
     def save(self, commit: bool = True) -> Profile:
         profile = super().save(commit=commit)
@@ -108,7 +147,28 @@ class ProfileForm(forms.ModelForm):
         user.last_name = self.cleaned_data["last_name"].strip()
         if commit:
             user.save(update_fields=["first_name", "last_name"])
+            self._save_picture(profile)
         return profile
+
+    #: How the Gravatar fetch went, for the view to word its message: found, none, error, "".
+    gravatar_outcome: str = ""
+
+    def _save_picture(self, profile: Profile) -> None:
+        processed = getattr(self, "_processed_picture", None)
+        if processed is not None:
+            avatars.store(profile, "avatar", processed, "avatar")
+            profile.save(update_fields=["avatar", "updated_at"])
+        elif self.cleaned_data.get("remove_picture"):
+            avatars.remove_upload(profile)
+
+        wanted = bool(self.cleaned_data.get("use_gravatar"))
+        if wanted != profile.use_gravatar:
+            profile.use_gravatar = wanted
+            profile.save(update_fields=["use_gravatar", "updated_at"])
+            if wanted:
+                self.gravatar_outcome = avatars.fetch_gravatar(profile)
+            else:
+                avatars.forget_gravatar(profile)
 
 
 class AppearanceForm(forms.ModelForm):

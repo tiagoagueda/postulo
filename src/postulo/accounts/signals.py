@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from allauth.account.models import EmailAddress
-from allauth.account.signals import user_signed_up
+from allauth.account.signals import email_changed, user_signed_up
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -63,3 +63,16 @@ def consume_invite(request, user, **kwargs) -> None:
         if invite.email and invite.email.casefold() == (user.email or "").casefold():
             EmailAddress.objects.filter(user=user, email__iexact=user.email).update(verified=True)
     request.session.pop(INVITE_SESSION_KEY, None)
+
+
+@receiver(email_changed, dispatch_uid="postulo_gravatar_follows_the_address")
+def gravatar_follows_the_primary_address(
+    request, user, from_email_address, to_email_address, **kwargs
+) -> None:
+    """A new primary address means a new Gravatar, for those who opted in."""
+    from . import avatars
+
+    # Read afresh: the instance cached on the user may predate the person opting in.
+    profile = Profile.objects.filter(user=user).first()
+    if profile is not None and profile.use_gravatar:
+        avatars.fetch_gravatar(profile)

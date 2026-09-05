@@ -48,6 +48,7 @@ PROFILE_FIELDS = (
     "theme",
     "table_settings",
     "quiet_after_days",
+    "use_gravatar",
 )
 TAG_FIELDS = ("id", "name", "slug", "colour")
 COMPANY_FIELDS = (
@@ -207,12 +208,14 @@ def _fields(instance, names: tuple[str, ...]) -> dict:
 
 def build_document(user) -> dict:
     """Assemble everything belonging to ``user`` as one nested document."""
+    from postulo.accounts.models import Profile
     from postulo.core.models import Tag
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
     from postulo.jobs.models import Capture, Company
     from postulo.resume import models as resume
 
-    profile = getattr(user, "profile", None)
+    # Read afresh rather than through the instance cached on the user, which may be stale.
+    profile = Profile.objects.filter(user=user).first()
 
     document: dict[str, Any] = {
         "postulo": {
@@ -231,6 +234,10 @@ def build_document(user) -> dict:
             "first_name": user.first_name,
             "last_name": user.last_name,
             "profile": _fields(profile, PROFILE_FIELDS) if profile else {},
+            # The uploaded picture travels with the files; a Gravatar copy is refetched.
+            "avatar_file": (
+                f"{MEDIA_PREFIX}{profile.avatar.name}" if profile and profile.avatar else ""
+            ),
         },
         "tags": [_fields(tag, TAG_FIELDS) for tag in Tag.objects.for_user(user)],
         "resume": {},
@@ -396,6 +403,9 @@ def _media_paths(document: dict) -> list[str]:
         for entry in document["documents"].get(section, []):
             if entry.get("file"):
                 names.append(entry["file"][len(MEDIA_PREFIX) :])
+    avatar = document.get("account", {}).get("avatar_file")
+    if avatar:
+        names.append(avatar[len(MEDIA_PREFIX) :])
     return names
 
 

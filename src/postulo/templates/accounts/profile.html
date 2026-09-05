@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Your details" %}{% endblock %}
 
@@ -15,11 +15,51 @@
       {% endblocktranslate %}
     </p>
 
-    <form method="post" novalidate>
+    <form method="post" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}
         <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
       {% endif %}
+
+      <div class="card mb-4" data-picture>
+        <h2 class="mb-4 font-medium">{% translate "Your picture" %}</h2>
+        <div class="flex flex-wrap items-start gap-6">
+          <div class="shrink-0">
+            {% avatar user "size-24 text-3xl" %}
+            <p class="mt-2 max-w-24 text-center text-xs text-ink-500 dark:text-ink-400">
+              {% if profile.avatar %}
+                {% translate "Uploaded" %}
+              {% elif profile.use_gravatar and profile.gravatar_image %}
+                {% translate "From Gravatar" %}
+              {% else %}
+                {% translate "Your initials" %}
+              {% endif %}
+            </p>
+          </div>
+          <div class="min-w-64 flex-1">
+            {% include "partials/field.html" with field=form.picture %}
+            {% if form.remove_picture %}
+              <label class="mb-4 flex items-center gap-2 text-sm">
+                {{ form.remove_picture }} {{ form.remove_picture.label }}
+              </label>
+            {% endif %}
+            <label class="flex items-start gap-2 text-sm">
+              {{ form.use_gravatar }}
+              <span>
+                {{ form.use_gravatar.label }}
+                <span class="block text-xs text-ink-500 dark:text-ink-400">{{ form.use_gravatar.help_text }}</span>
+              </span>
+            </label>
+            {% if profile.use_gravatar and profile.gravatar_checked_at and not profile.gravatar_image %}
+              <p class="mt-2 text-xs text-ink-500 dark:text-ink-400" data-no-gravatar>
+                {% blocktranslate trimmed with when=profile.gravatar_checked_at|date:"j M Y, H:i" %}
+                  Gravatar had no picture for your address when last asked, on {{ when }}.
+                {% endblocktranslate %}
+              </p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
 
       <div class="card mb-4">
         <h2 class="mb-4 font-medium">{% translate "Your name" %}</h2>
@@ -48,5 +88,15 @@
         <a href="{% url 'core:home' %}" class="btn-ghost">{% translate "Cancel" %}</a>
       </div>
     </form>
+
+    {% if profile.use_gravatar %}
+      <form method="post" action="{% url 'accounts:avatar_refresh' %}" class="mt-4">
+        {% csrf_token %}
+        <button type="submit" class="btn-ghost text-sm">{% translate "Fetch my Gravatar again" %}</button>
+        <span class="text-xs text-ink-500 dark:text-ink-400">
+          {% translate "Also happens by itself when your primary address changes." %}
+        </span>
+      </form>
+    {% endif %}
   </div>
 {% endblock %}

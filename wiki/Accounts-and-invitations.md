@@ -22,6 +22,26 @@ one an export records. An address cannot be made primary until it has been verif
 Accounts that existed before verification was required were marked verified when the
 instance was upgraded: they had been signing in by those addresses all along.
 
+## Your picture
+
+The header shows your initials on a coloured tile until you give it a picture, under
+**Your details → Your picture**. Two ways, in this order of precedence:
+
+- **Upload one.** PNG, JPEG, WebP or GIF up to 5 MB. Postulo decodes it, straightens it,
+  cuts it to a square and re-encodes it, which also strips everything the file knew about
+  where and when it was taken — a phone photograph carries the place. It is stored under
+  private media and served only to you (and to administrators), never by the web server.
+- **Use my Gravatar.** Tick the box and Postulo fetches the picture for your primary
+  address from gravatar.com **once, from the server**, keeps a copy and shows that. Pages
+  never point your browser at Gravatar: an image loaded from there would tell them your
+  address and a hash of your email on every page view. It is fetched again when your
+  primary address changes, or when you press *Fetch my Gravatar again*. Untick the box and
+  the copy is deleted. If Gravatar has no picture for your address, the initials stay and
+  the page says so.
+
+Nothing here appears on a CV. Whether a photograph belongs on one depends on the country,
+and that will be a per-CV choice, off by default, when it arrives.
+
 ## Two-factor authentication
 
 Optional, per person, under **Settings → Account → Two-factor authentication**. Once it is
