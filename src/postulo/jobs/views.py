@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
+from functools import cached_property
+
 from django.contrib import messages
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from postulo.core import tables
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 
 from .forms import CompanyForm, ContactForm, JobPostingForm
 from .models import Company, Contact, DiscardReason, JobPosting
+from .tables import CompaniesTable
 
 
 class UserFormKwargsMixin:
@@ -27,23 +31,25 @@ class UserFormKwargsMixin:
 
 
 class CompanyListView(OwnedObjectMixin, ListView):
+    """The table of employers: sortable, narrowable, and laid out as the person likes."""
+
     model = Company
     template_name = "jobs/company_list.html"
     context_object_name = "companies"
-    paginate_by = 50
+
+    @cached_property
+    def table(self) -> CompaniesTable:
+        return CompaniesTable(
+            self.request, tables.settings_for(self.request.user, CompaniesTable.name)
+        )
+
+    def get_paginate_by(self, queryset) -> int:
+        return self.table.page_size
 
     def get_queryset(self):
-        # Aggregation drops Meta.ordering, and pagination over an unordered queryset
-        # can repeat or skip rows between pages. Say it explicitly.
-        queryset = (
-            super()
-            .get_queryset()
-            .annotate(
-                posting_count=Count("postings", distinct=True),
-                application_count=Count("postings__applications", distinct=True),
-            )
-            .order_by("name")
-        )
+        # The table's ordering always ends in the key, so pagination over the aggregated
+        # rows never repeats or skips one between pages.
+        queryset = super().get_queryset().with_table_data()
         search = self.request.GET.get("q", "").strip()
         if search:
             queryset = queryset.filter(
@@ -51,11 +57,18 @@ class CompanyListView(OwnedObjectMixin, ListView):
                 | Q(location__icontains=search)
                 | Q(industry__icontains=search)
             )
-        return queryset
+        return self.table.apply(queryset)
+
+    def get_template_names(self) -> list[str]:
+        if self.request.htmx and not self.request.htmx.history_restore_request:
+            return [f"{self.template_name}#htmx"]
+        return [self.template_name]
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         context["search"] = self.request.GET.get("q", "")
+        context["table"] = self.table
+        context["page_sizes"] = tables.PAGE_SIZES
         return context
 
 

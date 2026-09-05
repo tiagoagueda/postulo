@@ -11,12 +11,24 @@ from __future__ import annotations
 from datetime import timedelta
 
 from django.db import models
+from django.db.models import Count, Max
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core.models import OwnedModel
+from postulo.core.models import OwnedModel, OwnedQuerySet
+
+
+class CompanyQuerySet(OwnedQuerySet):
+    def with_table_data(self) -> CompanyQuerySet:
+        """Annotate the counts and dates the companies table can show and sort by."""
+        return self.annotate(
+            posting_count=Count("postings", distinct=True),
+            application_count=Count("postings__applications", distinct=True),
+            contact_count=Count("contacts", distinct=True),
+            last_activity_at=Max("postings__applications__events__occurred_at"),
+        )
 
 
 class Company(OwnedModel):
@@ -35,6 +47,8 @@ class Company(OwnedModel):
     location = models.CharField(_("location"), max_length=200, blank=True)
     industry = models.CharField(_("industry"), max_length=120, blank=True)
     notes = models.TextField(_("notes"), blank=True)
+
+    objects = CompanyQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("company")

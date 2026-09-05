@@ -7,3 +7,7 @@ class JobsConfig(AppConfig):
     name = "postulo.jobs"
     label = "jobs"
     verbose_name = _("Jobs")
+
+    def ready(self) -> None:
+        # Registers the table with the settings view.
+        from . import tables  # noqa: F401

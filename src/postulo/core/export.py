@@ -25,7 +25,8 @@ from postulo import __version__
 
 #: Bumped when the shape changes in a way an importer must notice. 2 added the listing
 #: state and dates on postings and the listing a capture became; 3 added interviews under
-#: each application and the ``actor`` on events. The importer still reads every earlier
+#: each application, the ``actor`` on events and the table layout on the profile. The
+#: importer still reads every earlier
 #: format, filling the new fields in.
 FORMAT_VERSION = 3
 
@@ -44,6 +45,7 @@ PROFILE_FIELDS = (
     "language",
     "time_zone",
     "theme",
+    "table_settings",
 )
 TAG_FIELDS = ("id", "name", "slug", "colour")
 COMPANY_FIELDS = (

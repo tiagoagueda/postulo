@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
+from functools import cached_property
 
 from django.contrib import messages
 from django.db.models import Q
@@ -21,6 +22,7 @@ from django.views.generic import (
     UpdateView,
 )
 
+from postulo.core import tables
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 from postulo.core.models import Tag
 from postulo.jobs.views import UserFormKwargsMixin
@@ -55,6 +57,7 @@ from .services import (
     schedule_interview,
     settle_interview,
 )
+from .tables import ApplicationsTable
 
 
 class ApplicationFilterMixin:
@@ -103,16 +106,38 @@ class ApplicationFilterMixin:
 
 
 class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
+    """The table: sortable, narrowable from its headers, and laid out as the person likes."""
+
     model = Application
     template_name = "applications/application_list.html"
     context_object_name = "applications"
-    paginate_by = 50
+
+    @cached_property
+    def table(self) -> ApplicationsTable:
+        return ApplicationsTable(
+            self.request, tables.settings_for(self.request.user, ApplicationsTable.name)
+        )
+
+    def get_paginate_by(self, queryset) -> int:
+        return self.table.page_size
 
     def get_queryset(self):
-        return self.filter_queryset(super().get_queryset().with_display_data())
+        queryset = super().get_queryset().with_display_data().with_table_data()
+        return self.table.apply(self.filter_queryset(queryset))
+
+    def get_template_names(self) -> list[str]:
+        # An htmx request wants the table alone; the back button's restore wants the page.
+        if self.request.htmx and not self.request.htmx.history_restore_request:
+            return [f"{self.template_name}#htmx"]
+        return [self.template_name]
 
     def get_context_data(self, **kwargs) -> dict:
-        return {**super().get_context_data(**kwargs), **self.filter_context()}
+        return {
+            **super().get_context_data(**kwargs),
+            **self.filter_context(),
+            "table": self.table,
+            "page_sizes": tables.PAGE_SIZES,
+        }
 
 
 class ApplicationBoardView(OwnedObjectMixin, ApplicationFilterMixin, ListView):

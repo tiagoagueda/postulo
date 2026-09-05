@@ -39,6 +39,28 @@ records that make the interesting questions answerable.
 Both share the same filters: text search across job title, company and location; status;
 outcome (live or settled); and tag.
 
+## The table
+
+The table is yours to arrange, and the same is true of the **Companies** table.
+
+- **Sort** by clicking a column header; click again for the other direction. Dates sort
+  newest first on the first click. The arrow shows which column is in charge.
+- **Narrow by typing in the header.** Beneath each header that can filter sits an input:
+  text columns match anything containing what you type, dates take a from and a to, and
+  choices such as priority are a list. The table updates as you type; without scripts, the
+  *Filter* button applies everything at once. Header filters combine with the form above.
+  *Clear filters* takes everything off and keeps the sort.
+- **Choose and order columns** with the *Columns* control. Tick what you want to see, move
+  columns up and down, pick 25, 50 or 100 rows a page, and *Apply*. The applications table
+  offers, beyond the usual five: deadline, priority, applied through, salary, tags, last
+  activity, next reminder, next interview and the date recorded. Companies offer people,
+  website, careers page, notes, last activity and the date added. *Reset* restores the
+  usual layout.
+
+Sort and filters live in the address, so a view you have set up can be bookmarked or sent
+to someone, and the back button works. Which columns show, and how many rows a page holds,
+are a preference: they are saved to your account and follow you to every device.
+
 ## The timeline
 
 Every application has an append-only log of what happened. Status changes are recorded

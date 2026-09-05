@@ -183,6 +183,9 @@ class Profile(models.Model):
     language = models.CharField(_("language"), max_length=10, blank=True)
     time_zone = models.CharField(_("time zone"), max_length=64, blank=True)
     theme = models.CharField(_("theme"), max_length=10, choices=Theme, default=Theme.SYSTEM)
+    #: How each table is laid out — which columns, in what order, how many rows a page
+    #: holds — keyed by the table's name. A preference, so it follows the account.
+    table_settings = models.JSONField(_("table settings"), default=dict, blank=True)
 
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)

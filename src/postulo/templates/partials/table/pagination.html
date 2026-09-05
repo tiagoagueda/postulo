@@ -1,0 +1,22 @@
+{% load i18n %}
+{% if is_paginated %}
+  <nav class="mt-4 flex items-center gap-2 text-sm" aria-label="{% translate 'Pagination' %}">
+    {% if page_obj.has_previous %}
+      <a href="{% querystring page=page_obj.previous_page_number %}"
+         hx-get="{% querystring page=page_obj.previous_page_number %}"
+         hx-target="#{{ table_id }}" hx-swap="outerHTML show:top" hx-push-url="true"
+         class="btn-secondary">{% translate "Previous" %}</a>
+    {% endif %}
+    <span class="text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed with current=page_obj.number total=paginator.num_pages %}
+        Page {{ current }} of {{ total }}
+      {% endblocktranslate %}
+    </span>
+    {% if page_obj.has_next %}
+      <a href="{% querystring page=page_obj.next_page_number %}"
+         hx-get="{% querystring page=page_obj.next_page_number %}"
+         hx-target="#{{ table_id }}" hx-swap="outerHTML show:top" hx-push-url="true"
+         class="btn-secondary">{% translate "Next" %}</a>
+    {% endif %}
+  </nav>
+{% endif %}

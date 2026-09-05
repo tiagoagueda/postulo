@@ -1,0 +1,48 @@
+{% load i18n %}
+<tr id="company-{{ company.pk }}" class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+  {% for column in columns %}
+    {% if column.key == 'name' %}
+      <td class="px-4 py-3">
+        <a href="{{ company.get_absolute_url }}" class="font-medium hover:underline">
+          {{ company.name }}
+        </a>
+      </td>
+    {% elif column.key == 'location' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.location|default:"—" }}</td>
+    {% elif column.key == 'industry' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.industry|default:"—" }}</td>
+    {% elif column.key == 'postings' %}
+      <td class="px-4 py-3 text-right tabular-nums">{{ company.posting_count }}</td>
+    {% elif column.key == 'applications' %}
+      <td class="px-4 py-3 text-right tabular-nums">{{ company.application_count }}</td>
+    {% elif column.key == 'contacts' %}
+      <td class="px-4 py-3 text-right tabular-nums">{{ company.contact_count }}</td>
+    {% elif column.key == 'website' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
+        {% if company.website %}
+          <a href="{{ company.website }}" rel="noopener noreferrer external" target="_blank"
+             class="text-brand-600 hover:underline dark:text-brand-400">{{ company.website|cut:"https://"|cut:"http://" }}</a>
+        {% else %}—{% endif %}
+      </td>
+    {% elif column.key == 'careers' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
+        {% if company.careers_url %}
+          <a href="{{ company.careers_url }}" rel="noopener noreferrer external" target="_blank"
+             class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Openings" %}</a>
+        {% else %}—{% endif %}
+      </td>
+    {% elif column.key == 'notes' %}
+      <td class="max-w-xs truncate px-4 py-3 text-ink-500 dark:text-ink-400" title="{{ company.notes }}">
+        {{ company.notes|truncatechars:80|default:"—" }}
+      </td>
+    {% elif column.key == 'last_activity' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ company.last_activity_at|date:"j M Y"|default:"—" }}
+      </td>
+    {% elif column.key == 'created' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ company.created_at|date:"j M Y" }}
+      </td>
+    {% endif %}
+  {% endfor %}
+</tr>

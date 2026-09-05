@@ -3,73 +3,75 @@
 
 {% block title %}{% translate "Applications" %}{% endblock %}
 
+{% partialdef count %}
+  <p id="applications-count" class="text-sm text-ink-500 dark:text-ink-400"
+     aria-live="polite" aria-atomic="true"{% if oob %} hx-swap-oob="true"{% endif %}>
+    {% blocktranslate trimmed count total=paginator.count %}
+      {{ total }} application
+    {% plural %}
+      {{ total }} applications
+    {% endblocktranslate %}
+    {% if table.filters_active %}
+      · <a href="{{ table.clear_url }}" class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Clear filters" %}</a>
+    {% endif %}
+  </p>
+{% endpartialdef %}
+
+{% partialdef table %}
+  <div id="applications-table">
+    {% if applications %}
+      <div class="card overflow-x-auto p-0">
+        <table class="w-full text-left text-sm">
+          {% include "partials/table/head.html" with table_id="applications-table" form_id="application-filters" %}
+          <tbody>
+            {% for application in applications %}
+              {% include "applications/partials/application_row.html" with columns=table.visible %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% include "partials/table/pagination.html" with table_id="applications-table" %}
+    {% elif table.filters_active %}
+      <div class="card py-12 text-center">
+        <p class="mb-1 font-medium">{% translate "Nothing matches these filters" %}</p>
+        <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Loosen one of them, or start again." %}
+        </p>
+        <a href="{{ table.clear_url }}" class="btn-secondary">{% translate "Clear filters" %}</a>
+      </div>
+    {% else %}
+      <div class="card py-12 text-center">
+        <p class="mb-1 font-medium">{% translate "Nothing here yet" %}</p>
+        <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Record the first application and the rest will follow." %}
+        </p>
+        <a href="{% url 'applications:create' %}" class="btn-primary">
+          {% translate "Record an application" %}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+{% endpartialdef %}
+
+{% partialdef htmx %}
+  {% partial table %}
+  {% with oob=True %}{% partial count %}{% endwith %}
+{% endpartialdef %}
+
 {% block content %}
   <div class="mb-6 flex flex-wrap items-center gap-4">
     <div>
       <h1 class="text-2xl font-semibold tracking-tight">{% translate "Applications" %}</h1>
-      <p class="text-sm text-ink-500 dark:text-ink-400">
-        {% blocktranslate trimmed count total=paginator.count %}
-          {{ total }} application
-        {% plural %}
-          {{ total }} applications
-        {% endblocktranslate %}
-      </p>
+      {% partial count %}
     </div>
     <div class="ml-auto flex items-center gap-2">
+      {% include "partials/table/columns.html" %}
       <a href="{% url 'applications:board' %}" class="btn-secondary">{% translate "Board" %}</a>
       <a href="{% url 'applications:create' %}" class="btn-primary">{% translate "Record an application" %}</a>
     </div>
   </div>
 
-  {% include "applications/partials/filters.html" %}
+  {% include "applications/partials/filters.html" with form_id="application-filters" table_id="applications-table" %}
 
-  {% if applications %}
-    <div class="card overflow-x-auto p-0">
-      <table class="w-full text-left text-sm">
-        <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
-                      dark:border-ink-800 dark:text-ink-400">
-          <tr>
-            <th class="px-4 py-3 font-medium">{% translate "Role" %}</th>
-            <th class="px-4 py-3 font-medium">{% translate "Company" %}</th>
-            <th class="px-4 py-3 font-medium">{% translate "Location" %}</th>
-            <th class="px-4 py-3 font-medium">{% translate "Status" %}</th>
-            <th class="px-4 py-3 font-medium">{% translate "Applied" %}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for application in applications %}
-            {% include "applications/partials/application_row.html" %}
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    {% if is_paginated %}
-      <nav class="mt-4 flex items-center gap-2 text-sm" aria-label="{% translate 'Pagination' %}">
-        {% if page_obj.has_previous %}
-          <a href="?{% if search %}q={{ search }}&{% endif %}page={{ page_obj.previous_page_number }}"
-             class="btn-secondary">{% translate "Previous" %}</a>
-        {% endif %}
-        <span class="text-ink-500 dark:text-ink-400">
-          {% blocktranslate trimmed with current=page_obj.number total=paginator.num_pages %}
-            Page {{ current }} of {{ total }}
-          {% endblocktranslate %}
-        </span>
-        {% if page_obj.has_next %}
-          <a href="?{% if search %}q={{ search }}&{% endif %}page={{ page_obj.next_page_number }}"
-             class="btn-secondary">{% translate "Next" %}</a>
-        {% endif %}
-      </nav>
-    {% endif %}
-  {% else %}
-    <div class="card py-12 text-center">
-      <p class="mb-1 font-medium">{% translate "Nothing here yet" %}</p>
-      <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Record the first application and the rest will follow." %}
-      </p>
-      <a href="{% url 'applications:create' %}" class="btn-primary">
-        {% translate "Record an application" %}
-      </a>
-    </div>
-  {% endif %}
+  {% partial table %}
 {% endblock %}

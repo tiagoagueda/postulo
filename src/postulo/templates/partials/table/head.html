@@ -1,0 +1,76 @@
+{% load i18n postulo %}
+{# The header of a configurable table: sort links, and beneath them the filter inputs.
+   Every input is associated with the filter form (`form=`) so the plain Apply button
+   works without scripts, and carries htmx attributes so typing narrows the table live.
+   Text inputs are preserved across swaps, so a keystroke in flight is never lost. #}
+<thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
+              dark:border-ink-800 dark:text-ink-400">
+  <tr>
+    {% for header in table.headers %}
+      <th scope="col" class="px-4 py-3 font-medium {% if header.column.numeric %}text-right{% endif %} {{ header.column.css }}"
+          {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
+        {% if header.column.sortable %}
+          <a href="{% querystring sort=header.next_sort page=None %}"
+             hx-get="{% querystring sort=header.next_sort page=None %}"
+             hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+             class="inline-flex items-center gap-1 hover:text-ink-900 dark:hover:text-ink-100 {% if header.state %}text-ink-900 dark:text-ink-100{% endif %}">
+            {{ header.label }}
+            {% if header.state == 'asc' %}
+              {% icon "arrow-up" class="size-3.5" %}
+            {% elif header.state == 'desc' %}
+              {% icon "arrow-down" class="size-3.5" %}
+            {% endif %}
+          </a>
+        {% else %}
+          {{ header.label }}
+        {% endif %}
+      </th>
+    {% endfor %}
+  </tr>
+  {% if table.has_filter_row %}
+    <tr class="hidden border-t border-ink-100 md:table-row dark:border-ink-800" data-filter-row>
+      {% for header in table.headers %}
+        <td class="px-2 py-1.5">
+          {% if header.column.filter == 'text' %}
+            <input type="search" id="{{ header.input_id }}" name="{{ header.column.name }}"
+                   value="{{ header.value }}" form="{{ form_id }}" hx-preserve
+                   aria-label="{{ header.filter_label }}" placeholder="{% translate 'Filter' %}"
+                   hx-get="{{ request.path }}" hx-include="#{{ form_id }}"
+                   hx-trigger="input changed delay:300ms, search"
+                   hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+                   class="field-input w-full min-w-24 px-2 py-1 text-xs normal-case tracking-normal">
+          {% elif header.column.filter == 'choice' %}
+            <select id="{{ header.input_id }}" name="{{ header.column.name }}" form="{{ form_id }}"
+                    aria-label="{{ header.filter_label }}"
+                    hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
+                    hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+                    class="field-input w-full min-w-24 px-2 py-1 text-xs normal-case tracking-normal">
+              <option value="">{% translate "Any" %}</option>
+              {% for value, label in header.column.choices %}
+                <option value="{{ value }}" {% if value == header.value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          {% elif header.column.filter == 'date' %}
+            <div class="flex flex-col gap-1">
+              <input type="date" id="{{ header.input_id }}-from" name="{{ header.column.name }}_from"
+                     value="{{ header.value_from }}" form="{{ form_id }}"
+                     aria-label="{{ header.filter_label }}: {% translate 'from' %}"
+                     hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
+                     hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+                     class="field-input w-full px-2 py-1 text-xs normal-case tracking-normal">
+              <input type="date" id="{{ header.input_id }}-to" name="{{ header.column.name }}_to"
+                     value="{{ header.value_to }}" form="{{ form_id }}"
+                     aria-label="{{ header.filter_label }}: {% translate 'to' %}"
+                     hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
+                     hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+                     class="field-input w-full px-2 py-1 text-xs normal-case tracking-normal">
+            </div>
+          {% endif %}
+        </td>
+      {% endfor %}
+    </tr>
+  {% endif %}
+</thead>
+{# The sort in force travels with the filters, so narrowing never resets it. It lives
+   inside the swapped region so it is always the one the server last used. #}
+<input type="hidden" name="sort" value="{{ table.sort }}" form="{{ form_id }}">

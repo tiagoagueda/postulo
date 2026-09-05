@@ -7,3 +7,7 @@ class ApplicationsConfig(AppConfig):
     name = "postulo.applications"
     label = "applications"
     verbose_name = _("Applications")
+
+    def ready(self) -> None:
+        # Registers the table with the settings view.
+        from . import tables  # noqa: F401

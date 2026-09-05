@@ -1,35 +1,84 @@
 {% load i18n postulo %}
 <tr id="application-{{ application.pk }}" class="border-b border-ink-100 last:border-0 dark:border-ink-800">
-  <td class="px-4 py-3">
-    <a href="{{ application.get_absolute_url }}" class="font-medium hover:underline">
-      {{ application.posting.title }}
-    </a>
-    {% if application.tags.all %}
-      <div class="mt-1 flex flex-wrap gap-1">
-        {% for tag in application.tags.all %}
-          <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
-            {{ tag.name }}
-          </span>
-        {% endfor %}
-      </div>
+  {% for column in columns %}
+    {% if column.key == 'role' %}
+      <td class="px-4 py-3">
+        <a href="{{ application.get_absolute_url }}" class="font-medium hover:underline">
+          {{ application.posting.title }}
+        </a>
+        {% if application.tags.all and 'tags' not in table.visible_keys %}
+          <div class="mt-1 flex flex-wrap gap-1">
+            {% for tag in application.tags.all %}
+              <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+                {{ tag.name }}
+              </span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </td>
+    {% elif column.key == 'company' %}
+      <td class="px-4 py-3">
+        <a href="{{ application.posting.company.get_absolute_url }}" class="hover:underline">
+          {{ application.posting.company.name }}
+        </a>
+      </td>
+    {% elif column.key == 'location' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ application.posting.location|default:"—" }}</td>
+    {% elif column.key == 'status' %}
+      <td class="px-4 py-3">
+        {% include "partials/status_badge.html" with status=application.status label=application.get_status_display %}
+        {% if application.next_interview_at and 'next_interview' not in table.visible_keys %}
+          <p class="mt-1 flex items-center gap-1 text-xs text-brand-700 dark:text-brand-400" data-next-interview>
+            {% icon "calendar" class="size-3.5" %}
+            {{ application.next_interview_at|date:"j M, H:i" }}
+          </p>
+        {% endif %}
+      </td>
+    {% elif column.key == 'applied' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ application.applied_at|date:"j M Y"|default:"—" }}
+      </td>
+    {% elif column.key == 'deadline' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ application.deadline|date:"j M Y"|default:"—" }}
+      </td>
+    {% elif column.key == 'priority' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ application.get_priority_display }}</td>
+    {% elif column.key == 'channel' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ application.get_channel_display|default:"—" }}</td>
+    {% elif column.key == 'salary' %}
+      <td class="px-4 py-3 text-right text-ink-500 tabular-nums dark:text-ink-400">
+        {{ application.posting.salary_display|default:"—" }}
+      </td>
+    {% elif column.key == 'tags' %}
+      <td class="px-4 py-3">
+        <div class="flex flex-wrap gap-1">
+          {% for tag in application.tags.all %}
+            <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+              {{ tag.name }}
+            </span>
+          {% empty %}
+            <span class="text-ink-400">—</span>
+          {% endfor %}
+        </div>
+      </td>
+    {% elif column.key == 'last_activity' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ application.last_activity_at|date:"j M Y"|default:"—" }}
+      </td>
+    {% elif column.key == 'next_reminder' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ application.next_reminder_at|date:"j M Y, H:i"|default:"—" }}
+      </td>
+    {% elif column.key == 'next_interview' %}
+      <td class="px-4 py-3 tabular-nums {% if application.next_interview_at %}text-brand-700 dark:text-brand-400{% else %}text-ink-500 dark:text-ink-400{% endif %}"
+          {% if application.next_interview_at %}data-next-interview{% endif %}>
+        {{ application.next_interview_at|date:"D j M, H:i"|default:"—" }}
+      </td>
+    {% elif column.key == 'created' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ application.created_at|date:"j M Y" }}
+      </td>
     {% endif %}
-  </td>
-  <td class="px-4 py-3">
-    <a href="{{ application.posting.company.get_absolute_url }}" class="hover:underline">
-      {{ application.posting.company.name }}
-    </a>
-  </td>
-  <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ application.posting.location|default:"—" }}</td>
-  <td class="px-4 py-3">
-    {% include "partials/status_badge.html" with status=application.status label=application.get_status_display %}
-    {% if application.next_interview_at %}
-      <p class="mt-1 flex items-center gap-1 text-xs text-brand-700 dark:text-brand-400" data-next-interview>
-        {% icon "calendar" class="size-3.5" %}
-        {{ application.next_interview_at|date:"j M, H:i" }}
-      </p>
-    {% endif %}
-  </td>
-  <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
-    {{ application.applied_at|date:"j M Y"|default:"—" }}
-  </td>
+  {% endfor %}
 </tr>

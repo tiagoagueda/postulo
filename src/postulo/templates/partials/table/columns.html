@@ -1,0 +1,51 @@
+{% load i18n postulo %}
+{# The Columns control: which columns show, in what order, and how many rows a page holds.
+   A <details> element, so it opens and closes without scripts; the up and down buttons
+   are submits, so reordering needs none either. #}
+<details class="relative" data-menu>
+  <summary class="btn-secondary cursor-pointer list-none">
+    {% icon "settings" %} {% translate "Columns" %}
+  </summary>
+  <form method="post" action="{% url 'core:table_settings' table.name %}"
+        class="absolute right-0 z-10 mt-2 w-72 rounded-lg border border-ink-200 bg-white p-3 shadow-lg
+               dark:border-ink-700 dark:bg-ink-900">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <ul class="mb-3 space-y-1 text-sm">
+      {% for row in table.chooser %}
+        <li class="flex items-center gap-2">
+          <input type="hidden" name="order" value="{{ row.column.key }}">
+          <input type="checkbox" id="column-{{ table.name }}-{{ row.column.key }}" name="show"
+                 value="{{ row.column.key }}" {% if row.shown %}checked{% endif %}>
+          <label for="column-{{ table.name }}-{{ row.column.key }}" class="flex-1">{{ row.column.label }}</label>
+          <button type="submit" name="move" value="up:{{ row.column.key }}" class="btn-ghost p-1"
+                  {% if row.first %}disabled{% endif %}
+                  aria-label="{% blocktranslate with column=row.column.label %}Move {{ column }} up{% endblocktranslate %}">
+            {% icon "chevron-up" class="size-3.5" %}
+          </button>
+          <button type="submit" name="move" value="down:{{ row.column.key }}" class="btn-ghost p-1"
+                  {% if row.last %}disabled{% endif %}
+                  aria-label="{% blocktranslate with column=row.column.label %}Move {{ column }} down{% endblocktranslate %}">
+            {% icon "chevron-down" class="size-3.5" %}
+          </button>
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="mb-3 flex items-center gap-2 text-sm">
+      <label for="page-size-{{ table.name }}">{% translate "Rows per page" %}</label>
+      <select id="page-size-{{ table.name }}" name="page_size" class="field-input w-20 px-2 py-1 text-xs">
+        {% for size in page_sizes %}
+          <option value="{{ size }}" {% if size == table.page_size %}selected{% endif %}>{{ size }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="btn-primary px-3 py-1 text-xs">{% translate "Apply" %}</button>
+      {% if table.is_customised %}
+        <button type="submit" name="reset" value="1" class="btn-ghost px-3 py-1 text-xs">
+          {% translate "Reset" %}
+        </button>
+      {% endif %}
+    </div>
+  </form>
+</details>

@@ -110,6 +110,25 @@ class ApplicationQuerySet(models.QuerySet):
             .with_next_interview()
         )
 
+    def with_table_data(self) -> ApplicationQuerySet:
+        """Annotate what the optional table columns show: the last activity and the next reminder.
+
+        Subqueries rather than joins, for the same reason as the interview: they compose.
+        """
+        last_event = (
+            ApplicationEvent.objects.filter(application=OuterRef("pk"))
+            .order_by("-occurred_at")
+            .values("occurred_at")[:1]
+        )
+        next_reminder = (
+            Reminder.objects.filter(application=OuterRef("pk"), done_at__isnull=True)
+            .order_by("due_at")
+            .values("due_at")[:1]
+        )
+        return self.annotate(
+            last_activity_at=Subquery(last_event), next_reminder_at=Subquery(next_reminder)
+        )
+
     def with_next_interview(self) -> ApplicationQuerySet:
         """Annotate ``next_interview_at``: the start of the soonest interview still ahead.
 

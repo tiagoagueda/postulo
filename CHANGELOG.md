@@ -37,6 +37,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Tables you can sort, narrow and arrange.** Applications and Companies now sort by any
+  column from its header, narrow by typing beneath the header — text, dates from and to,
+  choices — with the table updating as you type and a plain button for scripts-off, and
+  offer a *Columns* control to choose which columns show, in what order, and how many
+  rows a page holds. Applications gained optional columns for deadline, priority, channel,
+  salary, tags, last activity, next reminder, next interview and date recorded; companies
+  for people, website, careers page, notes, last activity and date added. Sort and filters
+  live in the address; the layout is saved to the account. The defaults reproduce the old
+  tables exactly. (#20)
 - **Interviews as meetings in a diary.** An interview has a start and an end, a place or
   a link, the people at the company you are meeting, a kind — phone screen, video call,
   on site, panel, assessment — preparation notes, and a stable calendar identifier.
