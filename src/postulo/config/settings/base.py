@@ -189,6 +189,10 @@ STATICFILES_DIRS = [PACKAGE_DIR / "static"]
 MEDIA_URL = "media/"
 MEDIA_ROOT = env.path("POSTULO_MEDIA_ROOT", default=REPO_DIR / "data" / "media")
 
+# Where `manage.py backup` writes when given no target. Beside the data it copies, so a
+# single volume holds both; move it elsewhere if that volume is the thing being backed up.
+POSTULO_BACKUP_DIR = env.path("POSTULO_BACKUP_DIR", default=REPO_DIR / "data" / "backups")
+
 # Optional hand-off to the web server once Django has authorised a download. Leave both
 # unset to have Django stream the file itself, which is correct but ties up a worker.
 # nginx: an `internal` location, e.g. "/protected-media/".

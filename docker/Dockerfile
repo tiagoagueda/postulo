@@ -37,6 +37,7 @@ ENV PYTHONUNBUFFERED=1 \
     PATH="/app/.venv/bin:$PATH" \
     DJANGO_SETTINGS_MODULE=postulo.config.settings.prod \
     POSTULO_MEDIA_ROOT=/app/data/media \
+    POSTULO_BACKUP_DIR=/app/data/backups \
     POSTULO_STATIC_ROOT=/app/staticfiles
 
 # libpango and friends are WeasyPrint's; curl is for the health check. Nothing else.
@@ -66,7 +67,7 @@ RUN POSTULO_SECRET_KEY=build-time-only-not-a-secret \
 COPY docker/entrypoint.sh /usr/local/bin/postulo-entrypoint
 RUN chmod +x /usr/local/bin/postulo-entrypoint \
     && useradd --system --create-home --uid 1000 postulo \
-    && mkdir -p /app/data/media \
+    && mkdir -p /app/data/media /app/data/backups \
     && chown -R postulo:postulo /app/data
 
 # Nothing here needs root, and the data directory is the only thing it writes to.

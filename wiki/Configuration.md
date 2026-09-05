@@ -39,6 +39,7 @@ SQLite is a perfectly reasonable choice for a personal instance, and makes
 | Variable | Default | What it does |
 | --- | --- | --- |
 | `POSTULO_MEDIA_ROOT` | `data/media` | Where uploaded and generated documents are kept. **Never serve this directory from your web server.** |
+| `POSTULO_BACKUP_DIR` | `data/backups` | Where `manage.py backup` writes when given no target. `/app/data/backups` in the container. See [Backups and your data](Backups-and-your-data). |
 | `POSTULO_STATIC_ROOT` | `staticfiles` | Where `collectstatic` writes. Served by WhiteNoise. |
 | `POSTULO_MEDIA_ACCEL_PREFIX` | empty | An nginx `internal` location, e.g. `/protected-media/`. Lets nginx send the bytes after Postulo has authorised the download. |
 | `POSTULO_MEDIA_SENDFILE` | `false` | The Apache equivalent, using `mod_xsendfile`. |

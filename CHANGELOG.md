@@ -37,6 +37,12 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Instance backup and restore.** `manage.py backup` writes one archive holding a
+  manifest, the database — through SQLite's backup API or `pg_dump`, consistent while
+  Postulo runs — and the media directory, and verifies it. `manage.py restore` puts one
+  back onto an empty instance (or, with `--force`, over a populated one), refuses the
+  other engine's archive and anything that escapes the media directory, then runs
+  migrations. `POSTULO_BACKUP_DIR` is the default destination. (#32)
 - **Two-factor authentication**, opt-in per person under Settings → Account: a code from
   an authenticator app after the password, ten single-use recovery codes, and "trust this
   browser" for thirty days. `manage.py mfa_reset <username>` is the way back for an
