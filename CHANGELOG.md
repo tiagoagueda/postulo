@@ -44,6 +44,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Browser extensions**, in their own repositories: postulo-chromium (Chrome, Edge, Brave,
+  Vivaldi, Opera, Arc; one Manifest V3 source built for both browsers) and postulo-firefox
+  (Firefox and its forks, Firefox for Android; the package assembled from that source).
+  One button, or `Alt+Shift+P`, sends the page as the browser sees it to the capture API
+  with a `captures`-only token, and shows what was read with a link to the review screen.
+  Only `activeTab`; the instance's origin is requested when it is saved; no analytics, no
+  third-party requests. (#17, #18)
 - **Import from a spreadsheet.** Under *Settings → Your data*: upload a CSV (any delimiter,
   any encoding Excel produces, or start from the downloadable template), see which column
   Postulo took for which field — guessed from headers in English, French or Portuguese, all

@@ -65,6 +65,26 @@ The response is `201` with the capture: title, company, location, source, status
 `detail` says which. Nothing is created but the capture: the owner reviews it into a
 listing, and applies from there. `GET /api/v1/captures` lists the captures awaiting review.
 
+## The browser extensions
+
+The capture API was built for a browser extension, and there is one — for Chromium-based
+browsers (Chrome, Edge, Brave, Vivaldi, Opera, Arc) and for Firefox and its forks,
+including Firefox for Android:
+
+- [postulo-chromium](https://source.tiagoagueda.com/tiagoagueda/postulo-chromium) holds
+  the source, one Manifest V3 codebase built for both browsers.
+- [postulo-firefox](https://source.tiagoagueda.com/tiagoagueda/postulo-firefox) assembles
+  the Firefox package from it and carries what addons.mozilla.org needs.
+
+Set it up once: make a token under **Settings → API tokens** with the `captures` scope and
+nothing more, then paste your Postulo's address and the token into the extension's
+settings. *Test* asks Postulo who the token is; *Save* asks the browser for permission to
+reach your address. From then on, on a job posting, the button (or `Alt+Shift+P`) sends the
+page **as your browser sees it** — so a posting only visible to a signed-in reader, or one
+behind bot protection, is captured too — and shows what Postulo read, with a link to the
+review screen. The page goes to your server and nowhere else: no analytics, no third-party
+requests, no permission to run on any site until you press the button.
+
 ## Reading
 
 Needs `read`. Everything is the token owner's; another person's records are `404`, as they
