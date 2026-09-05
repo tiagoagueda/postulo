@@ -54,6 +54,10 @@ tables, "premium" labels.
   established who is asking.
 - **No `unsafe-eval`.** The Content-Security-Policy is strict on purpose. Client-side
   behaviour is htmx plus plain JavaScript, which is why Alpine.js is not used.
+- **Prefer an interface with a built-in plugin over a hard-coded implementation** whenever
+  a second implementation is plausible. Capture sources work this way; notifications
+  will. If you find yourself writing `if backend == "x"`, that is usually a plugin
+  boundary asking to exist.
 - Keep commits focused, and describe *why* in the message rather than *what*.
 
 ## Documentation

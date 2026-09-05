@@ -1,3 +1,14 @@
+# Writing a plugin
+
+Postulo is modular on purpose: anything that could reasonably vary sits behind an
+interface that a separately installed package can implement, and the built-in
+implementations are plugins that happen to ship in the box.
+
+**Capture sources** are the first kind, and the only kind so far; this document is about
+them. **Notifiers** — how you are told that a reminder is due or a capture has arrived —
+are next, with SMTP built in and an Apprise-based plugin as the first external one. They
+are tracked on the 0.2.0 milestone, and this document will grow a section when they land.
+
 # Writing a capture source
 
 Postulo reads job postings through **sources**. Two are built in, and anyone can add

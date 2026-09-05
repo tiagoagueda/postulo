@@ -20,6 +20,15 @@ Everything this software does is available in full to everyone who runs it — n
 tier, no "pro" edition, no licence key, no feature that unlocks later. That is a
 commitment, not a strategy, and it does not change.
 
+## Modular by design
+
+Anything that could reasonably vary sits behind an interface that a separately installed
+package can implement — where a posting is read from today; how you are notified and how
+documents are rendered next. Postulo's own implementations are plugins that happen to
+ship in the box, and a plugin written by somebody else is installed with one command and
+no change to Postulo. The person who cares about a particular job board, or a particular
+way of being notified, should never have to wait for this project.
+
 ## Start here
 
 | If you want to… | Read |

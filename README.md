@@ -47,6 +47,10 @@ guarantees that for the code; this paragraph guarantees it for the project's int
 - **No telemetry.** No outbound calls except URL captures you explicitly trigger.
 - **Private by default.** Uploaded documents are never publicly served.
 - **Boring, durable stack.** Django, SQLite or PostgreSQL, server-rendered HTML.
+- **Modular by design.** Anything that could reasonably vary — where a posting is read
+  from, how you are told about things, how a PDF is produced — sits behind an interface
+  that a separately installed package can implement. Postulo's own implementations are
+  plugins that happen to ship in the box. See [docs/PLUGINS.md](docs/PLUGINS.md).
 
 ## Documentation
 

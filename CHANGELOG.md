@@ -14,6 +14,8 @@ All notable changes to Postulo are recorded here. The format follows
   browser sees plain HTTP but the wire is already encrypted.
 - The commitment that no feature will ever be paywalled, stated in the README, the wiki,
   the contributing guide and the plan.
+- Modularity stated as a principle in the same places: an interface wherever a choice could
+  reasonably vary, with Postulo's own implementations as plugins that ship in the box.
 
 ## [0.1.0] — 2026-09-04
 
