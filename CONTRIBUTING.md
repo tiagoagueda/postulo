@@ -123,6 +123,21 @@ Postulo is written in British English and translated from there. French and Port
 catalogues exist and are waiting for contributors — see
 [docs/TRANSLATING.md](docs/TRANSLATING.md).
 
+## Making a release
+
+1. Move the *Unreleased* entries in `CHANGELOG.md` under a new `## [X.Y.Z] — YYYY-MM-DD`
+   heading, and leave an empty *Unreleased* above it.
+2. Set the same version in `pyproject.toml` and in `src/postulo/__init__.py`.
+3. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree.
+4. Commit, then tag and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+The `release` workflow does the rest: it refuses a tag that disagrees with the code or the
+changelog, builds the sdist and the wheel, and creates the Forgejo release with the
+changelog section as its notes. The image job runs only on a runner with the `docker`
+label and the repository variable `BUILD_IMAGE` set to `true` (with `REGISTRY_USER` and
+`REGISTRY_TOKEN` as secrets), so that without one nothing queues for ever; until then,
+`scripts/check-image.sh` builds and checks the image wherever there is a Docker daemon.
+
 ## Licence
 
 Contributions are accepted under the [AGPL-3.0-or-later](LICENSE) licence that covers

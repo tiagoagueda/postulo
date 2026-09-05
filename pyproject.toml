@@ -110,6 +110,8 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S105", "S106"]
+# Command-line tools talk to the person through print.
+"scripts/*" = ["T201"]
 # Declarative Meta and admin classes hold dicts and lists by design; RUF012 wants
 # ClassVar on all of them, which adds noise to every Django class in the project.
 "src/postulo/*/forms.py" = ["RUF012"]

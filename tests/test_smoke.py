@@ -14,7 +14,9 @@ def test_home_page_renders(client, db):
 def test_healthz_reports_ok(client, db):
     response = client.get(reverse("core:healthz"))
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "database": "ok"}
+    from postulo import __version__
+
+    assert response.json() == {"status": "ok", "database": "ok", "version": __version__}
 
 
 def test_user_is_known_by_a_username_and_reached_by_an_email(user):

@@ -205,3 +205,25 @@ uv run manage.py migrate
 uv run manage.py collectstatic --noinput
 # restart your server
 ```
+
+## Releases and upgrading
+
+A release is a tag `vX.Y.Z` on the repository. Pushing one makes Forgejo build the sdist and
+the wheel, create a release with that version's changelog section as its notes and the two
+files attached, and — on an instance whose runner can build images — publish the container
+image to Forgejo's registry as `X.Y.Z`, `X.Y` and `latest`.
+
+The Compose files name the published image pinned to a minor, `…/postulo:0.2`, so
+upgrading is:
+
+```sh
+docker compose -f docker/compose.yml pull
+docker compose -f docker/compose.yml up -d
+```
+
+Building from source still works and always will: `docker compose -f docker/compose.yml
+up -d --build` builds the same image name from the checkout. Migrations run when the
+container starts, whichever way it was made.
+
+Which version you are running is in the page footer, in full on *Server settings →
+Overview*, and in `/healthz`, so monitoring can see an upgrade happen.

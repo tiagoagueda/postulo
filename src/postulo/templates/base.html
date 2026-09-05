@@ -111,10 +111,13 @@
       {% block main %}{% block content %}{% endblock %}{% endblock %}
     </main>
 
-    <footer class="mx-auto max-w-7xl px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
-      {% blocktranslate trimmed %}
-        Postulo — your job search, on your server.
-      {% endblocktranslate %}
+    <footer class="mx-auto flex max-w-7xl flex-wrap gap-x-4 px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
+      <span>
+        {% blocktranslate trimmed %}
+          Postulo — your job search, on your server.
+        {% endblocktranslate %}
+      </span>
+      <span data-version>Postulo {{ postulo_version }}</span>
     </footer>
     {# Scripts a page needs and the rest do not; always from Postulo's own origin. #}
     {% block scripts %}{% endblock %}

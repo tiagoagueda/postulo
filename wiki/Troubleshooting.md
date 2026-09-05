@@ -1,5 +1,11 @@
 # Troubleshooting
 
+## Which version am I running?
+
+The page footer says *Postulo X.Y.Z*; *Server settings → Overview* says it in full beside the
+Python and Django versions; and `GET /healthz` returns it as `version`, which is the one to
+quote in a bug report and the one monitoring can watch to see an upgrade happen.
+
 ## "No PDF backend is usable"
 
 WeasyPrint is installed with Postulo, so this almost always means its system libraries

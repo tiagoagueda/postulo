@@ -21,7 +21,10 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: postulo:latest
+    # The published image, pinned to a minor: `docker compose pull` takes the next patch
+    # and never a surprise. `build:` above still works for anyone building from source;
+    # it tags the result with the same name.
+    image: source.tiagoagueda.com/tiagoagueda/postulo:0.2
     restart: unless-stopped
     env_file:
       - ../.env
@@ -39,7 +42,10 @@ services:
   # Alternatively run `manage.py send_due_reminders` from the host's cron every few minutes.
   scheduler:
     profiles: ["scheduler"]
-    image: postulo:latest
+    # The published image, pinned to a minor: `docker compose pull` takes the next patch
+    # and never a surprise. `build:` above still works for anyone building from source;
+    # it tags the result with the same name.
+    image: source.tiagoagueda.com/tiagoagueda/postulo:0.2
     restart: unless-stopped
     env_file:
       - ../.env

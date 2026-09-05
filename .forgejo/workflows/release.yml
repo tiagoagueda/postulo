@@ -1,0 +1,71 @@
+# Runs when a release tag (vX.Y.Z) is pushed. Nothing here creates a tag: a person does
+# that, deliberately, after writing the changelog section and bumping the version.
+#
+# Two jobs. `release` runs on the ordinary runner: it refuses a tag that disagrees with
+# pyproject.toml, __version__ or CHANGELOG.md, builds the sdist and the wheel, and creates
+# the Forgejo release with that changelog section as its notes and the two files attached.
+#
+# `image` needs a runner that can talk to a Docker daemon, which the default one cannot
+# (see scripts/check-image.sh). It runs on the `docker` label and only when the repository
+# variable BUILD_IMAGE is "true", so that without such a runner nothing queues for ever
+# looking like a pass. Registered with a docker-capable runner, it builds the image for
+# amd64 and arm64 and pushes it to Forgejo's registry as X.Y.Z, X.Y and latest.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-bookworm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Refuse a tag that disagrees with the code or the changelog
+        run: uv run --no-project python scripts/release_tools.py check "${GITHUB_REF_NAME}"
+
+      - name: Build the sdist and the wheel
+        run: uv build
+
+      - name: Write the release notes from the changelog
+        run: uv run --no-project python scripts/release_tools.py notes "${GITHUB_REF_NAME#v}" -o release-notes.md
+
+      - name: Create the Forgejo release and attach the files
+        env:
+          FORGEJO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORGEJO_URL: ${{ github.server_url }}
+          FORGEJO_REPOSITORY: ${{ github.repository }}
+        run: uv run --no-project python scripts/release_tools.py publish "${GITHUB_REF_NAME}" dist/* --notes release-notes.md
+
+  image:
+    if: ${{ vars.BUILD_IMAGE == 'true' }}
+    runs-on: docker
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Work out the tags
+        id: tags
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          registry="${GITHUB_SERVER_URL#https://}"
+          image="${registry}/${GITHUB_REPOSITORY}"
+          echo "image=${image}" >> "$GITHUB_OUTPUT"
+          echo "tags=${image}:${version},${image}:${version%.*},${image}:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Sign in to the registry
+        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login "${GITHUB_SERVER_URL#https://}" -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+
+      - name: Build for amd64 and arm64 and push
+        run: |
+          docker buildx create --use --name postulo-release >/dev/null 2>&1 || docker buildx use postulo-release
+          tags=""
+          for tag in $(echo "${{ steps.tags.outputs.tags }}" | tr ',' ' '); do tags="$tags -t $tag"; done
+          docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .

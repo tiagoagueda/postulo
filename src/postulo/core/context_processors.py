@@ -43,4 +43,22 @@ def ui(request: HttpRequest) -> dict:
         "registration_open": site.signup_open_now(),
         "instance_name": site.instance_name(),
         "instance_tagline": site.tagline(),
+        "postulo_version": installed_version(),
     }
+
+
+def installed_version() -> str:
+    """The version of the package that is actually running.
+
+    From the installed distribution's metadata when there is one — which is what a
+    wheel or an image carries — and from the package itself otherwise, so a source
+    checkout says the same thing.
+    """
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version("postulo")
+    except PackageNotFoundError:  # pragma: no cover - a checkout without an install
+        from postulo import __version__
+
+        return __version__

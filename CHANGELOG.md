@@ -44,6 +44,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **A release workflow.** Pushing a `vX.Y.Z` tag refuses to proceed unless `pyproject.toml`,
+  `__version__` and `CHANGELOG.md` agree, then builds the sdist and the wheel and creates
+  the Forgejo release with that changelog section as its notes and the files attached.
+  The image job builds for amd64 and arm64 and pushes to Forgejo's registry, on a
+  Docker-capable runner and only when the repository says so. The version now shows in
+  the page footer and in `/healthz`, and the Compose files name the published image pinned
+  to a minor while `build:` keeps working. (#37)
 - **Browser extensions**, in their own repositories: postulo-chromium (Chrome, Edge, Brave,
   Vivaldi, Opera, Arc; one Manifest V3 source built for both browsers) and postulo-firefox
   (Firefox and its forks, Firefox for Android; the package assembled from that source).
