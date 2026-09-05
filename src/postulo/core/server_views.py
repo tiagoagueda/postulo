@@ -227,9 +227,18 @@ class SignInView(PolicyView):
     pinned_fields = ("registration_open",)
 
     def get_context_data(self, **kwargs):
+        from postulo.accounts import sso
+
         context = super().get_context_data(**kwargs)
         context["effective_registration_open"] = site.registration_open()
         context["is_empty"] = site.is_empty()
+        context["sso"] = {
+            "enabled": sso.enabled(),
+            "name": sso.name(),
+            "server_url": sso.server_url(),
+            "auto_signup": sso.auto_signup(),
+            "callback_url": sso.callback_url(self.request) if sso.enabled() else "",
+        }
         return context
 
 

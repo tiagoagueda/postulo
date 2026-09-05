@@ -59,6 +59,7 @@ BUILTIN: tuple[SettingsSection, ...] = (
             "account_change_password",
             "account_set_password",
             "account_reauthenticate",
+            "socialaccount_connections",
             "mfa_index",
             "mfa_activate_totp",
             "mfa_deactivate_totp",

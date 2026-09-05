@@ -17,6 +17,28 @@
     {% endif %}
   </div>
 
+  <div class="card mb-4 text-sm" data-sso="{{ sso.enabled|yesno:'on,off' }}">
+    <h3 class="mb-2 font-medium">{% translate "Single sign-on" %}</h3>
+    {% if sso.enabled %}
+      <dl class="space-y-1">
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Provider" %}</dt><dd>{{ sso.name }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Server" %}</dt><dd class="truncate"><code class="text-xs">{{ sso.server_url }}</code></dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Callback to register with it" %}</dt><dd class="truncate"><code class="text-xs">{{ sso.callback_url }}</code></dd></div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "May create accounts" %}</dt>
+          <dd>{% if sso.auto_signup %}{% translate "yes — the identity provider is the invitation" %}{% else %}{% translate "no — existing accounts only" %}{% endif %}</dd>
+        </div>
+      </dl>
+      <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+        {% translate "Configured in the environment with the POSTULO_OIDC_* variables; see Configuration in the wiki." %}
+      </p>
+    {% else %}
+      <p class="text-ink-500 dark:text-ink-400">
+        {% translate "Not configured. Set POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID and POSTULO_OIDC_CLIENT_SECRET in the environment to offer a sign-in button for an OpenID Connect provider." %}
+      </p>
+    {% endif %}
+  </div>
+
   {% if pinned.registration_open %}
     <div class="alert-info mb-4 text-sm" data-pinned="registration_open">
       {% blocktranslate with variable=pinned.registration_open trimmed %}

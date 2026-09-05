@@ -6,6 +6,7 @@ import zoneinfo
 
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm as AllauthSignupForm
+from allauth.socialaccount.forms import SignupForm as AllauthSocialSignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -54,6 +55,29 @@ def time_zone_choices() -> list[tuple[str, str]]:
     return [("", _("Use the instance default"))] + [
         (name, name.replace("_", " ")) for name in sorted(zoneinfo.available_timezones())
     ]
+
+
+class SocialSignupForm(AllauthSocialSignupForm):
+    """The form single sign-on falls back to when the provider's claims were not enough.
+
+    Usually the claims carry a name and an address and no form is shown at all; this one
+    appears when something is missing, and asks for the same things a direct signup does.
+    """
+
+    first_name = forms.CharField(label=_("First name"), max_length=150)
+    last_name = forms.CharField(label=_("Last name"), max_length=150)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        order = ["first_name", "last_name", "username", "email"]
+        self.order_fields([name for name in order if name in self.fields])
+
+    def save(self, request):
+        user = super().save(request)
+        user.first_name = self.cleaned_data["first_name"].strip()
+        user.last_name = self.cleaned_data["last_name"].strip()
+        user.save(update_fields=["first_name", "last_name"])
+        return user
 
 
 class ProfileForm(forms.ModelForm):

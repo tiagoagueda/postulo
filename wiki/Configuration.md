@@ -44,6 +44,25 @@ SQLite is a perfectly reasonable choice for a personal instance, and makes
 | --- | --- | --- |
 | `POSTULO_REGISTRATION_OPEN` | `false` | When false, the only way in is an invitation. Also changeable under *Server settings → Sign-in* when this variable is not set. See [Accounts and invitations](Accounts-and-invitations). |
 
+## Single sign-on
+
+Optional. Set the first three and a button appears on the sign-in page; leave them unset
+and nothing changes. See [Accounts and invitations](Accounts-and-invitations#single-sign-on)
+for how accounts are linked and who may be created.
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `POSTULO_OIDC_SERVER_URL` | empty | The provider's issuer URL — where `/.well-known/openid-configuration` lives. For Authentik: `https://auth.example.org/application/o/postulo/`. |
+| `POSTULO_OIDC_CLIENT_ID` | empty | The client (application) id registered with the provider. |
+| `POSTULO_OIDC_CLIENT_SECRET` | empty | Its secret. |
+| `POSTULO_OIDC_NAME` | `Single sign-on` | What the button says. |
+| `POSTULO_OIDC_AUTO_SIGNUP` | `false` | Whether the provider may create accounts. Off: existing accounts only. |
+
+Register the callback the provider must send people back to, shown under *Server
+settings → Sign-in*: `https://your-host/accounts/sso/oidc/login/callback/`. It must match
+what the browser reaches exactly, scheme, host and port included. Behind a reverse proxy,
+`POSTULO_ALLOWED_HOSTS` and `POSTULO_CSRF_TRUSTED_ORIGINS` need the same host.
+
 ## Storage
 
 | Variable | Default | What it does |

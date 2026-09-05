@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.mfa",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.openid_connect",
     "django_htmx",
     "django_tasks_db",
     # postulo
@@ -154,6 +156,49 @@ MFA_TOTP_ISSUER = "Postulo"
 # A personal machine need not be asked for a code every day.
 MFA_TRUST_ENABLED = True
 MFA_TRUST_COOKIE_AGE = timedelta(days=30)
+
+# Single sign-on through OpenID Connect, configured from the environment. Unset means no
+# button and nothing changes for anyone. One generic provider covers Authentik, Keycloak,
+# Pocket ID, Zitadel, Kanidm, Google and anything else that speaks OIDC.
+POSTULO_OIDC_NAME = env("POSTULO_OIDC_NAME", default="Single sign-on")
+POSTULO_OIDC_SERVER_URL = env("POSTULO_OIDC_SERVER_URL", default="")
+POSTULO_OIDC_CLIENT_ID = env("POSTULO_OIDC_CLIENT_ID", default="")
+POSTULO_OIDC_CLIENT_SECRET = env("POSTULO_OIDC_CLIENT_SECRET", default="")
+# By default single sign-on signs in accounts that exist; the identity provider is not an
+# invitation unless the operator says so.
+POSTULO_OIDC_AUTO_SIGNUP = env.bool("POSTULO_OIDC_AUTO_SIGNUP", default=False)
+POSTULO_OIDC_PROVIDER_ID = "oidc"
+
+SOCIALACCOUNT_PROVIDERS = (
+    {
+        "openid_connect": {
+            "APPS": [
+                {
+                    "provider_id": POSTULO_OIDC_PROVIDER_ID,
+                    "name": POSTULO_OIDC_NAME,
+                    "client_id": POSTULO_OIDC_CLIENT_ID,
+                    "secret": POSTULO_OIDC_CLIENT_SECRET,
+                    "settings": {"server_url": POSTULO_OIDC_SERVER_URL},
+                }
+            ]
+        }
+    }
+    if POSTULO_OIDC_SERVER_URL and POSTULO_OIDC_CLIENT_ID
+    else {}
+)
+# The provider round-trip carries its own state; a plain link avoids the production CSP
+# (form-action 'self') silently blocking the redirect a POST form would make.
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "sso"
+# An address the identity provider has verified links to the existing account holding it.
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+# Postulo has no use for the provider's tokens; credentials with no purpose are a liability.
+SOCIALACCOUNT_STORE_TOKENS = False
+SOCIALACCOUNT_ADAPTER = "postulo.accounts.social_adapter.SocialAccountAdapter"
+SOCIALACCOUNT_FORMS = {"signup": "postulo.accounts.forms.SocialSignupForm"}
 
 # An instance is invite-only unless the operator opens registration deliberately.
 POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)

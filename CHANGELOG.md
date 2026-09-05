@@ -37,6 +37,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Single sign-on through OpenID Connect**, native. Three environment variables name
+  the provider and a button appears on the sign-in page; an address the provider has
+  verified signs in the account that holds it and links the two, never duplicating. By
+  default only existing accounts sign in; `POSTULO_OIDC_AUTO_SIGNUP` lets the provider
+  create them. Usernames and names come from the claims, bent to Postulo's rules. The
+  callback to register is shown under Server settings → Sign-in; connections are managed
+  under Settings → Account. Provider tokens are not stored. allauth's `socialaccount`
+  extra becomes a dependency. (#6)
 - **Server settings**, for administrators, from the account menu: an overview of what
   is running and where the data is; People, with the invitations, make-administrator
   and deactivate (never the last administrator); the sign-in policy; a test of the email

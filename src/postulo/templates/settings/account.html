@@ -73,4 +73,21 @@
       </a>
     </div>
   </div>
+
+  {% if sso_enabled %}
+    <div class="card mt-6" data-sso="{{ sso_name }}">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h3 class="font-medium">{% translate "Sign-in methods" %}</h3>
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate with provider=sso_name trimmed %}
+              This instance also signs in through {{ provider }}. Connect it to this account
+              to use it, or disconnect it.
+            {% endblocktranslate %}
+          </p>
+        </div>
+        <a href="{{ connections_url }}" class="btn-secondary shrink-0">{% translate "Manage" %}</a>
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}

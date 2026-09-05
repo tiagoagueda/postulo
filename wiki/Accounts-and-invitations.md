@@ -48,6 +48,33 @@ a leaked password alone is not enough.
 Capture tokens are their own credential and do not go through the second factor: a
 browser extension has no code to type. See [The capture API](The-capture-API).
 
+## Single sign-on
+
+An instance can sign people in through an **OpenID Connect** identity provider —
+Authentik, Keycloak, Pocket ID, Zitadel, Kanidm, Google, or anything else that speaks it.
+It is native: nothing to install, four variables in the environment (see
+[Configuration](Configuration#single-sign-on)), and a button on the sign-in page named
+after the provider.
+
+- **Existing accounts link, they are not duplicated.** An address the provider has
+  verified signs in the account that holds it, and the provider is connected to that
+  account from then on. People can see and disconnect it under *Settings → Account →
+  Sign-in methods*.
+- **By default, existing accounts only.** The identity provider is not an invitation:
+  someone it knows but Postulo does not is turned away, unless they followed an
+  invitation link or registration is open. Set `POSTULO_OIDC_AUTO_SIGNUP=true` to let
+  the provider create accounts — right for a household or a small team where it already
+  gates everything.
+- **The username and name come from the provider's claims** — `preferred_username`,
+  `given_name`, `family_name` — bent to Postulo's rules, with the address's local part
+  as the fallback for the username. An address the provider says it verified needs no
+  further click.
+- **Two-factor still applies** after a single sign-on, if the person has it on.
+- **The callback address** the provider must be told is shown under *Server settings →
+  Sign-in*, exactly as the browser reaches it: scheme, host and port must match.
+
+Sign-in tokens from the provider are not stored; Postulo has no use for them.
+
 ## Administrators
 
 An administrator runs the instance: invites people, sees the list of accounts, and

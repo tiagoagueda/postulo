@@ -135,6 +135,18 @@ uv run manage.py mfa_reset alex.morgan
 
 Then sign in with the password alone and set it up again.
 
+## Single sign-on sends me back with an error
+
+Nine times out of ten the **redirect URI** the identity provider has on file is not the
+one Postulo sent. Compare the callback shown under *Server settings → Sign-in* with the
+provider's application settings character for character: scheme, host, port, trailing
+slash. A test instance reached on plain HTTP inside a mesh needs the provider to accept a
+plain-HTTP redirect for it.
+
+If the provider is reached but Postulo refuses the address as unverified, the provider is
+not sending `email_verified: true` in its claims; most can be told to. Until then the
+person receives a verification link as anyone else would.
+
 ## Checking a deployment
 
 This reports anything unsafe about your production configuration:
