@@ -30,7 +30,8 @@ def test_the_meter_speaks_as_you_type(live_server, page: Page, applicant) -> Non
     expect(status).to_contain_text("Very weak")
 
     field.fill("alex.morgan")
-    expect(status).to_contain_text("weak", ignore_case=True), "built from the person's own name"
+    expect(status).to_contain_text("personal"), "it knows this is the person's own name"
+    expect(status).not_to_contain_text("Strong")
 
     field.fill("correct horse battery staple crossing")
     expect(status).to_contain_text("Strong")

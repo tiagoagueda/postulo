@@ -104,19 +104,28 @@
     // What the person has typed elsewhere on the form: an address, a username, a name.
     // A password built from them scores low, which is what the server will say too.
     var values = [];
-    if (!input.form) {
-      return values;
-    }
-    input.form.querySelectorAll("input[type=text], input[type=email]").forEach(function (field) {
-      if (field.value) {
-        values.push(field.value);
-        field.value.split(/[@._\-\s]+/).forEach(function (part) {
-          if (part.length > 2) {
-            values.push(part);
-          }
-        });
+    function add(text) {
+      if (!text) {
+        return;
       }
-    });
+      values.push(text);
+      text.split(/[@._\-\s]+/).forEach(function (part) {
+        if (part.length > 2) {
+          values.push(part);
+        }
+      });
+    }
+    // On change and set, the form holds no name or address; the page passes the signed-in
+    // person's own instead.
+    var template = document.getElementById("password-meter");
+    if (template) {
+      add(template.getAttribute("data-user-inputs") || "");
+    }
+    if (input.form) {
+      input.form.querySelectorAll("input[type=text], input[type=email]").forEach(function (field) {
+        add(field.value);
+      });
+    }
     return values;
   }
 
