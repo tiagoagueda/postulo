@@ -276,6 +276,7 @@ def test_a_hostname_that_does_not_resolve_is_refused(monkeypatch):
         fetching.validate_public_url("https://nowhere.example.org/")
 
 
+@pytest.mark.django_db
 def test_robots_can_be_honoured_and_can_be_overridden(settings, monkeypatch):
     class Response:
         status_code = 200
@@ -293,6 +294,7 @@ def test_robots_can_be_honoured_and_can_be_overridden(settings, monkeypatch):
     assert fetching.robots_allow("https://example.org/jobs/1", client=Client()) is True
 
 
+@pytest.mark.django_db
 def test_a_site_without_robots_txt_is_treated_as_allowing_everything():
     class Missing:
         status_code = 404
@@ -305,6 +307,7 @@ def test_a_site_without_robots_txt_is_treated_as_allowing_everything():
     assert fetching.robots_allow("https://example.org/jobs/1", client=Client()) is True
 
 
+@pytest.mark.django_db
 def test_an_unreachable_robots_txt_does_not_block_the_capture():
     class Client:
         def get(self, *args, **kwargs):

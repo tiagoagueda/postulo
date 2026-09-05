@@ -15,9 +15,19 @@ to start without it.
 | `POSTULO_DEBUG` | `false` (`true` in development) | Never enable on a reachable instance: it exposes settings and stack traces. |
 | `POSTULO_ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated hostnames this instance answers to. |
 | `POSTULO_CSRF_TRUSTED_ORIGINS` | empty | Comma-separated origins **including the scheme**, e.g. `https://postulo.example.org`. Needed behind a reverse proxy. |
-| `POSTULO_TIME_ZONE` | `Europe/Paris` | The instance default. Each person can override it in their own profile. |
+| `POSTULO_TIME_ZONE` | `Europe/Paris` | The instance default. Each person can override it in their own settings. Also changeable under *Server settings → Defaults* when this variable is not set. |
 | `POSTULO_LOG_LEVEL` | `INFO` | Standard Python levels. |
 | `POSTULO_ADMIN_URL` | `admin/` | Moves Django's admin off a guessable path. Include the trailing slash. |
+
+## Settings changed from the interface
+
+Policy — whether registration is open, whether `robots.txt` is honoured, the default time
+zone, the instance's name and tagline, the language new accounts start with — can be
+changed by an administrator under **Server settings** without touching the environment.
+Three of those have an environment variable as well, marked in the tables above; **when
+the variable is set, it wins**, and the page shows the value read-only and says which
+variable pinned it. Leave policy out of `.env` if you would rather change it from the
+page. Infrastructure — secrets, the database, hosts, TLS — stays in the environment.
 
 ## Database
 
@@ -32,7 +42,7 @@ SQLite is a perfectly reasonable choice for a personal instance, and makes
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `POSTULO_REGISTRATION_OPEN` | `false` | When false, the only way in is an invitation. See [Accounts and invitations](Accounts-and-invitations). |
+| `POSTULO_REGISTRATION_OPEN` | `false` | When false, the only way in is an invitation. Also changeable under *Server settings → Sign-in* when this variable is not set. See [Accounts and invitations](Accounts-and-invitations). |
 
 ## Storage
 
@@ -52,7 +62,7 @@ for a personal instance.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `POSTULO_CAPTURE_IGNORE_ROBOTS` | `false` | Postulo honours `robots.txt` when fetching a posting. A person capturing a page they are looking at is not a crawler, but Postulo cannot prove that to the site, so the polite default stands. Turning it off makes you responsible for the requests your instance makes. |
+| `POSTULO_CAPTURE_IGNORE_ROBOTS` | `false` | Postulo honours `robots.txt` when fetching a posting. A person capturing a page they are looking at is not a crawler, but Postulo cannot prove that to the site, so the polite default stands. Turning it off makes you responsible for the requests your instance makes. Also changeable under *Server settings → Capture* when this variable is not set. |
 
 Private and local addresses are refused when capturing, and there is deliberately no
 setting to allow them: a self-hosted box that will fetch any address you hand it is a way

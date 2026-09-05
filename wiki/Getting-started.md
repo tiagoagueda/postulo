@@ -4,8 +4,9 @@ This walks through the first half hour, in the order that makes the least work.
 
 ## 1. Sign in
 
-Use the account you created with `createsuperuser`: either the username or the email
-address you gave it signs in. The address counts as verified for that first account; for
+On a fresh instance, open the site and create the first account: it becomes the
+administrator. (Or use the one you created with `createsuperuser`.) Either the username
+or the email address signs in. The address counts as verified for that first account; for
 everyone who signs up afterwards, a link is sent to their address and they sign in once
 they have followed it.
 

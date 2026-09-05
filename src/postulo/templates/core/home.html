@@ -1,16 +1,20 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Postulo" %}{% endblock %}
+{% block title %}{{ instance_name }}{% endblock %}
 
 {% block content %}
   <div class="mx-auto max-w-2xl py-10 text-center">
-    <h1 class="mb-3 text-3xl font-semibold tracking-tight">{% translate "Postulo" %}</h1>
+    <h1 class="mb-3 text-3xl font-semibold tracking-tight">{{ instance_name }}</h1>
     <p class="mb-8 text-ink-600 dark:text-ink-300">
-      {% blocktranslate trimmed %}
-        A self-hosted job application manager, written from the applicant's side of the
-        table. Your applications, your CVs, your cover letters, on your server.
-      {% endblocktranslate %}
+      {% if instance_tagline %}
+        {{ instance_tagline }}
+      {% else %}
+        {% blocktranslate trimmed %}
+          A self-hosted job application manager, written from the applicant's side of the
+          table. Your applications, your CVs, your cover letters, on your server.
+        {% endblocktranslate %}
+      {% endif %}
     </p>
     <div class="flex items-center justify-center gap-3">
       <a href="{% url 'account_login' %}" class="btn-primary">{% translate "Sign in" %}</a>

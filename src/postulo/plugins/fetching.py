@@ -30,7 +30,6 @@ from urllib.parse import urlparse, urlunparse
 from urllib.robotparser import RobotFileParser
 
 import httpx
-from django.conf import settings
 from django.utils.translation import gettext as _
 
 from .base import CaptureError
@@ -134,7 +133,11 @@ def robots_allow(url: str, *, client: httpx.Client | None = None) -> bool:
     A missing, unreachable or unparseable robots.txt means yes, which is what the
     standard says and what every other client does.
     """
-    if getattr(settings, "POSTULO_CAPTURE_IGNORE_ROBOTS", False):
+    # Imported here: the plugins package is the foundation that core builds capture on,
+    # and the policy module needs the database models.
+    from postulo.core import site
+
+    if site.capture_ignore_robots():
         return True
 
     parts = urlparse(url)

@@ -10,9 +10,11 @@ docker compose -f docker/compose.yml up -d
 docker compose -f docker/compose.yml exec postulo python manage.py createsuperuser
 ```
 
-`createsuperuser` asks for a username, an email address, your first and last name, and a
-password. That account's address counts as verified, so it can sign in before email
-delivery is configured; everyone invited afterwards receives a verification link.
+The last line is optional: on an empty instance the sign-up form is offered to whoever
+opens the site, and the first account created becomes the administrator. Either way that
+first account's address counts as verified, so it can sign in before email delivery is
+configured; everyone invited afterwards receives a verification link. `createsuperuser`
+asks for a username, an email address, your first and last name, and a password.
 
 Then put a reverse proxy in front of port 8000 to terminate TLS. That is the whole
 installation; the rest of this page is detail and the alternative without a container.

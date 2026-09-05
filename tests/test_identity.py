@@ -125,7 +125,8 @@ def test_signing_up_needs_a_name_a_username_and_an_address(client, settings):
     assert not User.objects.exists()
 
 
-def test_signing_up_creates_the_account_and_asks_for_the_click(client, settings):
+def test_signing_up_creates_the_account_and_asks_for_the_click(client, settings, user):
+    # `user` exists, so this is not the first account, which would be trusted outright.
     settings.POSTULO_REGISTRATION_OPEN = True
     response = client.post(reverse("account_signup"), SIGNUP)
     assert response.status_code == 302

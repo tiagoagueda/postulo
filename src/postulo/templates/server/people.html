@@ -1,0 +1,73 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div>
+      <h2 class="text-2xl font-semibold tracking-tight">{% translate "People" %}</h2>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Every account on this instance. Administrators see accounts, never anyone's applications or documents." %}
+      </p>
+    </div>
+    <a href="{% url 'accounts:invite_list' %}" class="btn-primary ml-auto">{% translate "Invitations" %}</a>
+  </div>
+
+  <div class="card overflow-x-auto p-0">
+    <table class="w-full text-left text-sm">
+      <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
+        <tr>
+          <th class="px-4 py-3 font-medium">{% translate "Username" %}</th>
+          <th class="px-4 py-3 font-medium">{% translate "Name" %}</th>
+          <th class="px-4 py-3 font-medium">{% translate "Email" %}</th>
+          <th class="px-4 py-3 font-medium">{% translate "Last sign-in" %}</th>
+          <th class="px-4 py-3 font-medium">{% translate "Role" %}</th>
+          <th class="px-4 py-3"><span class="sr-only">{% translate "Actions" %}</span></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for person in people %}
+          <tr data-person="{{ person.username }}" {% if not person.is_active %}class="text-ink-400"{% endif %}>
+            <td class="px-4 py-3 font-medium">{{ person.username }}</td>
+            <td class="px-4 py-3">{{ person.get_full_name|default:"—" }}</td>
+            <td class="px-4 py-3">{{ person.email }}</td>
+            <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ person.last_login|date:"j M Y"|default:"—" }}</td>
+            <td class="px-4 py-3">
+              {% if not person.is_active %}
+                {% translate "Deactivated" %}
+              {% elif person.is_staff %}
+                <span class="font-medium">{% translate "Administrator" %}</span>
+              {% else %}
+                {% translate "Member" %}
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center justify-end gap-1">
+                <form method="post" action="{% url 'server:person_admin' person.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-ghost px-2 py-1 text-xs">
+                    {% if person.is_staff %}{% translate "Remove administrator" %}{% else %}{% translate "Make administrator" %}{% endif %}
+                  </button>
+                </form>
+                {% if person != user %}
+                  <form method="post" action="{% url 'server:person_active' person.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-ghost px-2 py-1 text-xs {% if person.is_active %}text-red-600 dark:text-red-400{% endif %}">
+                      {% if person.is_active %}{% translate "Deactivate" %}{% else %}{% translate "Reactivate" %}{% endif %}
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+    {% blocktranslate count counter=administrators trimmed %}
+      {{ counter }} administrator. The last one cannot be removed or deactivated.
+    {% plural %}
+      {{ counter }} administrators. The last one cannot be removed or deactivated.
+    {% endblocktranslate %}
+  </p>
+{% endblock %}

@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 
-def test_home_page_renders(client):
+def test_home_page_renders(client, db):
     response = client.get(reverse("core:home"))
     assert response.status_code == 200
     assert b"Postulo" in response.content

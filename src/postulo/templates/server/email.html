@@ -1,0 +1,32 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Email" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "How this instance sends mail: verification links, password resets. Configured in the environment; proven here." %}
+  </p>
+
+  <div class="card mb-4">
+    <dl class="space-y-2 text-sm">
+      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Backend" %}</dt><dd><code>{{ mailer.backend }}</code></dd></div>
+      {% if mailer.is_smtp %}
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Server" %}</dt><dd>{{ mailer.host|default:"—" }}{% if mailer.port %}:{{ mailer.port }}{% endif %}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Username" %}</dt><dd>{{ mailer.username|default:"—" }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">TLS</dt><dd>{{ mailer.use_tls|yesno }}</dd></div>
+      {% endif %}
+      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "From" %}</dt><dd>{{ mailer.from_address }}</dd></div>
+    </dl>
+    <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "See Configuration in the wiki for the variables. The password is never shown." %}
+    </p>
+  </div>
+
+  <form method="post" action="{% url 'server:email_test' %}" novalidate>
+    {% csrf_token %}
+    <div class="card mb-6">
+      {% include "partials/field.html" with field=form.to %}
+    </div>
+    <button type="submit" class="btn-primary">{% translate "Send a test message" %}</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,348 @@
+"""Server settings: the instance, for administrators, in Postulo's own shell.
+
+Policy an administrator can change — who may sign up, what new accounts start with, how
+capture behaves — lives in the database and is edited here. Infrastructure stays in the
+environment, and where an environment variable pins a policy value the page shows it
+read-only and says so, so that a `.env` written for 0.1.0 goes on meaning what it meant.
+"""
+
+from __future__ import annotations
+
+import platform
+import sys
+from pathlib import Path
+
+import django
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from django.db import connection
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django.views import View
+from django.views.generic import RedirectView, TemplateView, UpdateView
+
+from postulo import __version__
+
+from . import site
+from .mixins import StaffRequiredMixin
+from .models import SiteSettings
+from .server_forms import CaptureForm, DefaultsForm, SignInForm, TestEmailForm
+
+
+class ServerIndexView(StaffRequiredMixin, RedirectView):
+    pattern_name = "server:overview"
+
+
+class ServerSectionMixin(StaffRequiredMixin):
+    section_title: str = ""
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["section_title"] = self.section_title
+        return context
+
+
+def _directory_size(root: Path) -> tuple[int, int]:
+    files = 0
+    size = 0
+    if root.is_dir():
+        for entry in root.rglob("*"):
+            if entry.is_file():
+                files += 1
+                size += entry.stat().st_size
+    return files, size
+
+
+def _newest_backup(root: Path):
+    if not root.is_dir():
+        return None
+    archives = sorted(root.glob("*.tar.gz"), key=lambda p: p.stat().st_mtime, reverse=True)
+    if not archives:
+        return None
+    newest = archives[0]
+    return {
+        "path": newest,
+        "age": timezone.now()
+        - timezone.datetime.fromtimestamp(
+            newest.stat().st_mtime, tz=timezone.get_current_timezone()
+        ),
+    }
+
+
+def _pdf_backend_name() -> str | None:
+    from postulo.documents.pdf import PDFBackendUnavailable, get_pdf_backend
+
+    try:
+        return get_pdf_backend().name
+    except PDFBackendUnavailable:
+        return None
+
+
+def _queued_tasks() -> int | None:
+    try:
+        from django_tasks_db.models import DBTaskResult
+    except Exception:
+        return None
+    try:
+        return DBTaskResult.objects.filter(status="READY").count()
+    except Exception:
+        return None
+
+
+class OverviewView(ServerSectionMixin, TemplateView):
+    template_name = "server/overview.html"
+    section_title = _("Overview")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        media_root = Path(settings.MEDIA_ROOT)
+        media_files, media_bytes = _directory_size(media_root)
+        database = settings.DATABASES["default"]
+        context.update(
+            {
+                "version": __version__,
+                "python_version": platform.python_version(),
+                "django_version": django.get_version(),
+                "database_engine": connection.vendor,
+                "database_name": str(database.get("NAME", "")),
+                "pdf_backend": _pdf_backend_name(),
+                "media_root": media_root,
+                "media_files": media_files,
+                "media_bytes": media_bytes,
+                "backup_dir": Path(settings.POSTULO_BACKUP_DIR),
+                "newest_backup": _newest_backup(Path(settings.POSTULO_BACKUP_DIR)),
+                "queued_tasks": _queued_tasks(),
+                "admin_url": reverse("admin:index"),
+                "health_url": reverse("core:healthz"),
+                "platform": platform.platform(),
+                "executable": sys.executable,
+            }
+        )
+        return context
+
+
+class PeopleView(ServerSectionMixin, TemplateView):
+    template_name = "server/people.html"
+    section_title = _("People")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        User = get_user_model()
+        people = User.objects.order_by("username")
+        context["people"] = people
+        context["administrators"] = people.filter(is_staff=True, is_active=True).count()
+        return context
+
+
+def _last_administrator(user) -> bool:
+    """Whether ``user`` is the only active administrator left."""
+    User = get_user_model()
+    others = User.objects.filter(is_staff=True, is_active=True).exclude(pk=user.pk)
+    return user.is_staff and user.is_active and not others.exists()
+
+
+class PersonAdminView(StaffRequiredMixin, View):
+    """Make somebody an administrator, or stop them being one. Never the last one."""
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        person = get_object_or_404(get_user_model(), pk=pk)
+        if person.is_staff:
+            if _last_administrator(person):
+                messages.error(request, _("That is the last administrator. Appoint another first."))
+            else:
+                person.is_staff = False
+                person.is_superuser = False
+                person.save(update_fields=["is_staff", "is_superuser"])
+                messages.success(
+                    request, _("%(name)s is no longer an administrator.") % {"name": person}
+                )
+        else:
+            person.is_staff = True
+            person.is_superuser = True
+            person.save(update_fields=["is_staff", "is_superuser"])
+            messages.success(request, _("%(name)s is now an administrator.") % {"name": person})
+        return redirect("server:people")
+
+
+class PersonActiveView(StaffRequiredMixin, View):
+    """Deactivate an account — it keeps its data, cannot sign in — or reactivate it."""
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        person = get_object_or_404(get_user_model(), pk=pk)
+        if person == request.user:
+            messages.error(request, _("You cannot deactivate the account you are signed in with."))
+        elif person.is_active:
+            if _last_administrator(person):
+                messages.error(request, _("That is the last administrator. Appoint another first."))
+            else:
+                person.is_active = False
+                person.save(update_fields=["is_active"])
+                messages.success(
+                    request,
+                    _("%(name)s is deactivated: nothing deleted, no sign-in.") % {"name": person},
+                )
+        else:
+            person.is_active = True
+            person.save(update_fields=["is_active"])
+            messages.success(request, _("%(name)s can sign in again.") % {"name": person})
+        return redirect("server:people")
+
+
+class PolicyView(ServerSectionMixin, UpdateView):
+    """One form over the policy row, plus which of its fields the environment pins."""
+
+    model = SiteSettings
+    pinned_fields: tuple[str, ...] = ()
+
+    def get_object(self, queryset=None) -> SiteSettings:
+        return SiteSettings.get()
+
+    def get_success_url(self) -> str:
+        return self.request.path
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        messages.success(self.request, _("Saved."))
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["pinned"] = {
+            field: site.overridden_by(field)
+            for field in self.pinned_fields
+            if site.overridden_by(field)
+        }
+        return context
+
+
+class SignInView(PolicyView):
+    form_class = SignInForm
+    template_name = "server/signin.html"
+    section_title = _("Sign-in")
+    pinned_fields = ("registration_open",)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["effective_registration_open"] = site.registration_open()
+        context["is_empty"] = site.is_empty()
+        return context
+
+
+class CaptureView(PolicyView):
+    form_class = CaptureForm
+    template_name = "server/capture.html"
+    section_title = _("Capture")
+    pinned_fields = ("capture_ignore_robots",)
+
+    def get_context_data(self, **kwargs):
+        from postulo.plugins import fetching
+
+        context = super().get_context_data(**kwargs)
+        context["effective_ignore_robots"] = site.capture_ignore_robots()
+        context["limits"] = {
+            "max_bytes": fetching.MAX_BYTES,
+            "timeout_seconds": fetching.TIMEOUT_SECONDS,
+            "max_redirects": fetching.MAX_REDIRECTS,
+            "user_agent": fetching.USER_AGENT,
+        }
+        return context
+
+
+class DefaultsView(PolicyView):
+    form_class = DefaultsForm
+    template_name = "server/defaults.html"
+    section_title = _("Defaults")
+    pinned_fields = ("default_time_zone",)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["effective_time_zone"] = site.default_time_zone()
+        context["effective_language"] = site.default_language()
+        return context
+
+
+def _mailer_summary() -> dict:
+    mailer = (getattr(settings, "MAILERS", {}) or {}).get("default", {})
+    options = mailer.get("OPTIONS", {}) or {}
+    backend = str(mailer.get("BACKEND", ""))
+    return {
+        "backend": ".".join(backend.split(".")[-2:]) or backend,
+        "is_smtp": backend.endswith("smtp.EmailBackend"),
+        "host": options.get("host", ""),
+        "port": options.get("port", ""),
+        "username": options.get("username", ""),
+        "use_tls": options.get("use_tls"),
+        "from_address": settings.DEFAULT_FROM_EMAIL,
+    }
+
+
+class EmailView(ServerSectionMixin, TemplateView):
+    template_name = "server/email.html"
+    section_title = _("Email")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mailer"] = _mailer_summary()
+        context["form"] = kwargs.get("form") or TestEmailForm(
+            initial={"to": self.request.user.email}
+        )
+        return context
+
+
+class EmailTestView(StaffRequiredMixin, View):
+    """Send one message, so a configuration can be proven before anyone depends on it."""
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        form = TestEmailForm(request.POST)
+        if not form.is_valid():
+            view = EmailView()
+            view.request = request
+            return render(request, EmailView.template_name, view.get_context_data(form=form))
+        to = form.cleaned_data["to"]
+        try:
+            sent = send_mail(
+                subject=str(_("A test message from %(name)s") % {"name": site.instance_name()}),
+                message=str(
+                    _(
+                        "If you are reading this, the email settings of your Postulo "
+                        "instance work. Nothing else to do."
+                    )
+                ),
+                from_email=None,
+                recipient_list=[to],
+                fail_silently=False,
+            )
+        except Exception as error:
+            messages.error(request, _("Sending failed: %(error)s") % {"error": error})
+        else:
+            if sent:
+                messages.success(request, _("Sent to %(to)s.") % {"to": to})
+            else:
+                messages.error(request, _("The mail backend accepted nothing."))
+        return redirect("server:email")
+
+
+class PluginsView(ServerSectionMixin, TemplateView):
+    template_name = "server/plugins.html"
+    section_title = _("Plugins")
+
+    def get_context_data(self, **kwargs):
+        from postulo.plugins.registry import ENTRY_POINT_GROUP, available_sources
+
+        context = super().get_context_data(**kwargs)
+        context["sources"] = [
+            {
+                "name": source.name,
+                "version": getattr(source, "version", ""),
+                "module": type(source).__module__,
+                "builtin": type(source).__module__.startswith("postulo."),
+            }
+            for source in available_sources(refresh=True)
+        ]
+        context["entry_point_group"] = ENTRY_POINT_GROUP
+        return context

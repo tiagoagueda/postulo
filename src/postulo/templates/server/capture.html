@@ -1,0 +1,47 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Capture" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "How this instance fetches a posting somebody pasted." %}
+  </p>
+
+  <div class="card mb-4">
+    <h3 class="mb-3 font-medium">{% translate "Limits" %}</h3>
+    <dl class="space-y-2 text-sm">
+      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Largest page read" %}</dt><dd>{{ limits.max_bytes|filesizeformat }}</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Timeout" %}</dt><dd>{{ limits.timeout_seconds }} s</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Redirects followed" %}</dt><dd>{{ limits.max_redirects }}</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Identifies itself as" %}</dt><dd class="truncate"><code class="text-xs">{{ limits.user_agent }}</code></dd></div>
+    </dl>
+    <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "One page per request, public addresses only, never a crawl. These are fixed." %}
+    </p>
+  </div>
+
+  <div class="card mb-4 text-sm" data-effective="{{ effective_ignore_robots|yesno:'ignored,honoured' }}">
+    {% if effective_ignore_robots %}
+      {% translate "robots.txt is currently ignored." %}
+    {% else %}
+      {% translate "robots.txt is currently honoured." %}
+    {% endif %}
+  </div>
+
+  {% if pinned.capture_ignore_robots %}
+    <div class="alert-info mb-4 text-sm" data-pinned="capture_ignore_robots">
+      {% blocktranslate with variable=pinned.capture_ignore_robots trimmed %}
+        Set by the environment: <code>{{ variable }}</code>. Remove it from the environment to
+        change this here.
+      {% endblocktranslate %}
+    </div>
+  {% else %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        {% include "partials/field.html" with field=form.capture_ignore_robots %}
+      </div>
+      <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+    </form>
+  {% endif %}
+{% endblock %}

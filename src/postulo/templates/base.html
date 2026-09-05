@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="same-origin">
-    <title>{% block title %}{% translate "Postulo" %}{% endblock %}</title>
+    <title>{% block title %}{{ instance_name }}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
     <script src="{% static 'js/vendor/htmx.min.js' %}" defer></script>
     <script src="{% static 'js/app.js' %}" defer></script>
@@ -16,7 +16,7 @@
         <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
           <a href="{% url 'core:home' %}"
              class="text-lg font-semibold tracking-tight text-ink-900 dark:text-ink-50">
-            {% translate "Postulo" %}
+            {{ instance_name }}
           </a>
 
           {% if user.is_authenticated %}
@@ -50,12 +50,6 @@
                  class="{% nav_active 'applications:reminder_list' %}">
                 {% translate "Reminders" %}
               </a>
-              {% if user.is_staff %}
-                <a href="{% url 'accounts:invite_list' %}"
-                   class="{% nav_active 'accounts:invite_list' 'accounts:invite_create' %}">
-                  {% translate "Invitations" %}
-                </a>
-              {% endif %}
             </nav>
 
             <div class="ml-auto flex items-center gap-1">
@@ -75,6 +69,11 @@
                   <a href="{% url 'settings:index' %}" class="menu-item">
                     {% icon "settings" %}{% translate "Settings" %}
                   </a>
+                  {% if user.is_staff %}
+                    <a href="{% url 'server:index' %}" class="menu-item">
+                      {% icon "shield" %}{% translate "Server settings" %}
+                    </a>
+                  {% endif %}
                   <a href="{% url 'core:export' %}" class="menu-item">
                     {% icon "download" %}{% translate "Export everything" %}
                   </a>

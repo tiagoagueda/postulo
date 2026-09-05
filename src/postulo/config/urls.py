@@ -14,6 +14,7 @@ urlpatterns = [
     path("accounts/", include("postulo.accounts.urls")),
     path("accounts/", include("allauth.urls")),
     path("settings/", include("postulo.accounts.settings_urls")),
+    path("server/", include("postulo.core.server_urls")),
     path("applications/", include("postulo.applications.urls")),
     path("listings/", include("postulo.jobs.listing_urls")),
     path("jobs/", include("postulo.jobs.urls")),

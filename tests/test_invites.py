@@ -77,7 +77,9 @@ def test_pending_excludes_accepted_and_expired(db, staff_user, user):
 # ------------------------------------------------------------------ signup gating
 
 
-def test_signup_is_closed_without_an_invitation(client, db, settings):
+def test_signup_is_closed_without_an_invitation(client, user, settings):
+    # `user` exists so the instance is not empty: an empty one offers the form to
+    # whoever will become its first account.
     settings.POSTULO_REGISTRATION_OPEN = False
     response = client.get(reverse("account_signup"))
 

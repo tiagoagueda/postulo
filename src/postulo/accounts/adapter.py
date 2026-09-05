@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from allauth.account.adapter import DefaultAccountAdapter
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
+
+from postulo.core import site
 
 from .models import Invite
 
@@ -30,7 +31,7 @@ class AccountAdapter(DefaultAccountAdapter):
     """
 
     def is_open_for_signup(self, request: HttpRequest) -> bool:
-        if settings.POSTULO_REGISTRATION_OPEN:
+        if site.signup_open_now():
             return True
         return pending_invite(request) is not None
 
@@ -42,7 +43,7 @@ class AccountAdapter(DefaultAccountAdapter):
         """
         email = super().clean_email(email)
         request = getattr(self, "request", None) or getattr(self, "_request", None)
-        if request is None or settings.POSTULO_REGISTRATION_OPEN:
+        if request is None or site.registration_open():
             return email
         invite = pending_invite(request)
         if invite and invite.email and invite.email.casefold() != email.casefold():

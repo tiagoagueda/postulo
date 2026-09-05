@@ -118,18 +118,30 @@ def add_class(field: BoundField, css_classes: str) -> BoundField:
     return field.as_widget(attrs={"class": merged})
 
 
+def _sidebar(context, sections) -> dict:
+    request = context.get("request")
+    return {
+        "sections": [
+            {"section": section, "active": request is not None and section.is_active(request)}
+            for section in sections
+        ]
+    }
+
+
 @register.inclusion_tag("settings/sidebar.html", takes_context=True)
 def settings_sidebar(context) -> dict:
     """The sections of the Settings area, with the one being looked at marked."""
     from postulo.core.settings_sections import sections
 
-    request = context.get("request")
-    return {
-        "sections": [
-            {"section": section, "active": request is not None and section.is_active(request)}
-            for section in sections()
-        ]
-    }
+    return _sidebar(context, sections())
+
+
+@register.inclusion_tag("settings/sidebar.html", takes_context=True)
+def server_sidebar(context) -> dict:
+    """The sections of the Server settings area, for administrators."""
+    from postulo.core.server_sections import SECTIONS
+
+    return _sidebar(context, SECTIONS)
 
 
 @register.simple_tag(takes_context=True)

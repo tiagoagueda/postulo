@@ -1,0 +1,39 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Plugins" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "What this instance can read a posting with. Postulo's own sources ship in the box; others arrive as installed packages." %}
+  </p>
+
+  <div class="card overflow-x-auto p-0">
+    <table class="w-full text-left text-sm">
+      <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
+        <tr>
+          <th class="px-4 py-3 font-medium">{% translate "Source" %}</th>
+          <th class="px-4 py-3 font-medium">{% translate "Version" %}</th>
+          <th class="px-4 py-3 font-medium">{% translate "Origin" %}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for source in sources %}
+          <tr data-source="{{ source.name }}">
+            <td class="px-4 py-3 font-medium">{{ source.name }}</td>
+            <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ source.version|default:"—" }}</td>
+            <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
+              {% if source.builtin %}{% translate "built in" %}{% else %}<code class="text-xs">{{ source.module }}</code>{% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+    {% blocktranslate with group=entry_point_group trimmed %}
+      A package registers a source under the <code>{{ group }}</code> entry-point group and
+      is picked up on the next start. A source that fails to load is logged and left out;
+      the built-in ones keep working.
+    {% endblocktranslate %}
+  </p>
+{% endblock %}

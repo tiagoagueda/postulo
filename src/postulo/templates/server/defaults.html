@@ -1,0 +1,40 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Defaults" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "What this instance calls itself, and what a new account starts with." %}
+  </p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-4">
+      <h3 class="mb-3 font-medium">{% translate "This instance" %}</h3>
+      {% include "partials/field.html" with field=form.instance_name %}
+      {% include "partials/field.html" with field=form.tagline %}
+    </div>
+
+    <div class="card mb-6">
+      <h3 class="mb-3 font-medium">{% translate "New accounts" %}</h3>
+      {% include "partials/field.html" with field=form.default_language %}
+      {% if pinned.default_time_zone %}
+        <div class="alert-info mb-4 text-sm" data-pinned="default_time_zone">
+          {% blocktranslate with variable=pinned.default_time_zone zone=effective_time_zone trimmed %}
+            The time zone is set by the environment: <code>{{ variable }}</code> = {{ zone }}.
+            Remove it from the environment to change it here.
+          {% endblocktranslate %}
+        </div>
+      {% else %}
+        {% include "partials/field.html" with field=form.default_time_zone %}
+      {% endif %}
+      <p class="text-xs text-ink-500 dark:text-ink-400">
+        {% blocktranslate with zone=effective_time_zone language=effective_language trimmed %}
+          In force now: {{ language }}, {{ zone }}.
+        {% endblocktranslate %}
+      </p>
+    </div>
+
+    <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+  </form>
+{% endblock %}

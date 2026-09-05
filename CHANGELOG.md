@@ -37,6 +37,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Server settings**, for administrators, from the account menu: an overview of what
+  is running and where the data is; People, with the invitations, make-administrator
+  and deactivate (never the last administrator); the sign-in policy; a test of the email
+  settings; the installed plugins; capture policy; and the instance's name, tagline and
+  the language and time zone new accounts start with. Policy now lives in the database,
+  and an environment variable, when set, still wins and is shown as such — so an existing
+  `.env` keeps meaning what it meant. **The first account on an empty instance becomes
+  the administrator**, with a trusted address, which makes `createsuperuser` optional.
+  Invitations left the main navigation for Server settings → People. (#24)
 - **Instance backup and restore.** `manage.py backup` writes one archive holding a
   manifest, the database — through SQLite's backup API or `pg_dump`, consistent while
   Postulo runs — and the media directory, and verifies it. `manage.py restore` puts one

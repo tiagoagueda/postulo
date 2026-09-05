@@ -48,18 +48,38 @@ a leaked password alone is not enough.
 Capture tokens are their own credential and do not go through the second factor: a
 browser extension has no code to type. See [The capture API](The-capture-API).
 
+## Administrators
+
+An administrator runs the instance: invites people, sees the list of accounts, and
+changes the instance's policy under **Server settings**, reached from the account menu
+(top right). Administrators see *accounts* — never anyone's applications, documents or
+contacts; those stay private to the person who owns them.
+
+**The first account is the administrator.** On an empty instance the sign-up form is
+offered to whoever reaches it, and the account it creates administers the instance; its
+address is trusted, since nobody else exists yet to send a verification link. After that
+the door closes again. `createsuperuser` on the command line still works, and does the
+same thing.
+
+*Server settings → People* lists every account and lets an administrator make or unmake
+other administrators and deactivate accounts (nothing deleted, no sign-in). The last
+administrator cannot be removed or deactivated, and nobody can deactivate the account
+they are signed in with.
+
 ## Who can sign up
 
-Registration is governed by `POSTULO_REGISTRATION_OPEN`, which defaults to `false`. With
-it off, the signup form is not offered at all: the only way in is an invitation. An
-instance holding somebody's employment history has no reason to accept strangers.
+Registration is closed by default: the sign-up form is not offered, and the only way in
+is an invitation. An instance holding somebody's employment history has no reason to
+accept strangers.
 
-Set it to `true` only if you genuinely want anyone who finds the URL to be able to create
-an account.
+An administrator opens it under *Server settings → Sign-in*. The operator may also pin it
+with `POSTULO_REGISTRATION_OPEN` in the environment, in which case the environment wins
+and the page says so. Open it only if you genuinely want anyone who finds the URL to be
+able to create an account.
 
 ## Invitations
 
-Staff members see **Invitations** in the navigation.
+**Server settings → People → Invitations.**
 
 An invitation is:
 
@@ -75,7 +95,8 @@ Create one, copy the link from the list, and send it however you like. Pending
 invitations can be revoked. Accepted ones cannot be deleted, because they are part of the
 record of who was let in.
 
-Only staff can issue invitations. To make someone staff, use the Django admin.
+Only administrators can issue invitations. To make someone an administrator, use *Server
+settings → People*.
 
 ## Separation between accounts
 
@@ -89,7 +110,13 @@ Asking for a record belonging to someone else returns **not found** rather than
 
 ## The administration interface
 
-Django's admin is available, and by default at `/admin/`. On a public instance, move it:
+Everything an administrator needs day to day is under **Server settings**: an overview
+of what is running and where the data is, the accounts, the sign-in policy, a test of
+the email settings, the installed plugins, capture policy, and the instance's name and
+the defaults new accounts start with.
+
+Django's own admin remains, as the escape hatch, by default at `/admin/`. On a public
+instance, move it:
 
 ```sh
 POSTULO_ADMIN_URL=some-private-path/

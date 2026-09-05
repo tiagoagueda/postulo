@@ -1,0 +1,36 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Sign-in" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "Who may create an account here." %}
+  </p>
+
+  <div class="card mb-4 text-sm" data-effective="{{ effective_registration_open|yesno:'open,closed' }}">
+    {% if is_empty %}
+      <p>{% translate "This instance has no accounts yet, so the sign-up form is offered to whoever reaches it: the first account becomes the administrator." %}</p>
+    {% elif effective_registration_open %}
+      <p>{% translate "Registration is open: anyone who finds the address may create an account." %}</p>
+    {% else %}
+      <p>{% translate "Invitation only: the sign-up form is not offered. Invite people from the People section." %}</p>
+    {% endif %}
+  </div>
+
+  {% if pinned.registration_open %}
+    <div class="alert-info mb-4 text-sm" data-pinned="registration_open">
+      {% blocktranslate with variable=pinned.registration_open trimmed %}
+        Set by the environment: <code>{{ variable }}</code>. Remove it from the environment to
+        change this here.
+      {% endblocktranslate %}
+    </div>
+  {% else %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        {% include "partials/field.html" with field=form.registration_open %}
+      </div>
+      <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+    </form>
+  {% endif %}
+{% endblock %}

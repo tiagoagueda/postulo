@@ -23,17 +23,18 @@ class UserPreferencesMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        from . import site
+
         profile = self._profile(request)
 
-        tz_name = getattr(profile, "time_zone", "") if profile else ""
-        if tz_name:
-            try:
-                timezone.activate(zoneinfo.ZoneInfo(tz_name))
-            except (zoneinfo.ZoneInfoNotFoundError, ValueError):
-                # A profile holding a time zone this machine does not know should not
-                # take the whole request down; fall back to the instance default.
-                timezone.deactivate()
-        else:
+        # The person's own zone, else the instance default an administrator may have set,
+        # else what the environment says (which deactivate() falls back to).
+        tz_name = (getattr(profile, "time_zone", "") if profile else "") or site.default_time_zone()
+        try:
+            timezone.activate(zoneinfo.ZoneInfo(tz_name))
+        except (zoneinfo.ZoneInfoNotFoundError, ValueError):
+            # A profile holding a time zone this machine does not know should not take
+            # the whole request down; fall back to the instance default.
             timezone.deactivate()
 
         language = getattr(profile, "language", "") if profile else ""

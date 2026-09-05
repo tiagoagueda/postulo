@@ -1,0 +1,77 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Overview" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "What this instance is running, and where its data is." %}
+  </p>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div class="card">
+      <h3 class="mb-3 font-medium">{% translate "Software" %}</h3>
+      <dl class="space-y-2 text-sm">
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">Postulo</dt><dd data-version>{{ version }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">Python</dt><dd>{{ python_version }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">Django</dt><dd>{{ django_version }}</dd></div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "PDF renderer" %}</dt>
+          <dd>{% if pdf_backend %}{{ pdf_backend }}{% else %}<span class="text-red-600 dark:text-red-400">{% translate "none usable" %}</span>{% endif %}</dd>
+        </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Queued tasks" %}</dt>
+          <dd>{% if queued_tasks is not None %}{{ queued_tasks }}{% else %}—{% endif %}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h3 class="mb-3 font-medium">{% translate "Data" %}</h3>
+      <dl class="space-y-2 text-sm">
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Database" %}</dt>
+          <dd class="truncate">{{ database_engine }}{% if database_engine == "sqlite" %} · <code class="text-xs">{{ database_name }}</code>{% endif %}</dd>
+        </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Media" %}</dt>
+          <dd class="truncate text-right">
+            {% blocktranslate count counter=media_files with size=media_bytes|filesizeformat trimmed %}
+              {{ counter }} file, {{ size }}
+            {% plural %}
+              {{ counter }} files, {{ size }}
+            {% endblocktranslate %}
+            <span class="block text-xs text-ink-500 dark:text-ink-400"><code>{{ media_root }}</code></span>
+          </dd>
+        </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Newest backup" %}</dt>
+          <dd class="text-right" data-backup-age>
+            {% if newest_backup %}
+              {% blocktranslate with when=newest_backup.age|timesince trimmed %}{{ when }} ago{% endblocktranslate %}
+              {% if newest_backup.age.days >= 7 %}
+                <span class="block text-xs text-amber-700 dark:text-amber-400">{% translate "older than a week" %}</span>
+              {% endif %}
+            {% else %}
+              <span class="text-amber-700 dark:text-amber-400">{% translate "none yet" %}</span>
+            {% endif %}
+            <span class="block text-xs text-ink-500 dark:text-ink-400"><code>{{ backup_dir }}</code></span>
+          </dd>
+        </div>
+      </dl>
+      <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          Back up with <code>manage.py backup</code>; see the wiki page on backups for a
+          schedule and for restoring.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  </div>
+
+  <div class="card mt-4 text-sm">
+    <h3 class="mb-2 font-medium">{% translate "Also" %}</h3>
+    <ul class="space-y-1">
+      <li><a href="{{ health_url }}" class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Health check" %}</a> <span class="text-ink-500 dark:text-ink-400">— {% translate "what a monitor should poll" %}</span></li>
+      <li><a href="{{ admin_url }}" class="text-brand-600 hover:underline dark:text-brand-400">{% translate "Django admin" %}</a> <span class="text-ink-500 dark:text-ink-400">— {% translate "the escape hatch, for anything this area does not cover" %}</span></li>
+    </ul>
+  </div>
+{% endblock %}

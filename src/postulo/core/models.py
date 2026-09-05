@@ -89,3 +89,66 @@ class Tag(OwnedModel):
         if not self.slug:
             self.slug = slugify(self.name)[:60]
         super().save(*args, **kwargs)
+
+
+class SiteSettings(models.Model):
+    """Instance policy an administrator may change from the interface. One row.
+
+    Infrastructure — secrets, the database, hosts, TLS — stays in the environment: it is
+    needed before the application can start, or it is a secret. Policy lives here. An
+    environment variable, when set, still wins (see :mod:`postulo.core.site`), so an
+    existing deployment keeps behaving exactly as it did. A ``None`` means "never set from
+    the interface", and the code's default applies.
+    """
+
+    instance_name = models.CharField(
+        _("instance name"),
+        max_length=60,
+        default="Postulo",
+        help_text=_("Shown in the header and on the sign-in page."),
+    )
+    tagline = models.CharField(
+        _("tagline"),
+        max_length=200,
+        blank=True,
+        help_text=_("A line under the name on the sign-in page. Optional."),
+    )
+    registration_open = models.BooleanField(
+        _("registration open"),
+        null=True,
+        blank=True,
+        help_text=_("Whether anyone who finds the address may create an account."),
+    )
+    capture_ignore_robots = models.BooleanField(
+        _("ignore robots.txt when capturing"),
+        null=True,
+        blank=True,
+    )
+    default_language = models.CharField(_("default language"), max_length=10, blank=True)
+    default_time_zone = models.CharField(_("default time zone"), max_length=64, blank=True)
+
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("updated by"),
+    )
+
+    class Meta:
+        verbose_name = _("site settings")
+        verbose_name_plural = _("site settings")
+
+    def __str__(self) -> str:
+        return self.instance_name
+
+    def save(self, *args, **kwargs) -> None:
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get(cls) -> "SiteSettings":
+        row, _created = cls.objects.get_or_create(pk=1)
+        return row

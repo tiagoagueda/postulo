@@ -14,9 +14,38 @@ from .models import Profile
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL, dispatch_uid="postulo_create_profile")
 def create_profile(sender, instance, created, **kwargs) -> None:
-    """Give every new user a profile, so views never have to wonder whether one exists."""
+    """Give every new user a profile, so views never have to wonder whether one exists.
+
+    A new profile starts from the instance defaults an administrator may have set for
+    language and time zone; the person can change both under Settings.
+    """
     if created:
-        Profile.objects.get_or_create(user=instance)
+        from postulo.core import site
+
+        profile, made = Profile.objects.get_or_create(user=instance)
+        if made:
+            row = site.current()
+            if row.default_language or row.default_time_zone:
+                profile.language = row.default_language
+                profile.time_zone = row.default_time_zone
+                profile.save(update_fields=["language", "time_zone", "updated_at"])
+
+
+@receiver(user_signed_up, dispatch_uid="postulo_first_account")
+def first_account_is_the_administrator(request, user, **kwargs) -> None:
+    """The first account on an empty instance administers it.
+
+    Somebody has to, and the person who just installed Postulo and reached its sign-up
+    form is the only candidate. Their address is trusted for the same reason the
+    console's is: there is nobody else yet to send a verification link on whose behalf.
+    """
+    User = type(user)
+    if User.objects.exclude(pk=user.pk).exists():
+        return
+    user.is_staff = True
+    user.is_superuser = True
+    user.save(update_fields=["is_staff", "is_superuser"])
+    EmailAddress.objects.filter(user=user, email__iexact=user.email).update(verified=True)
 
 
 @receiver(user_signed_up, dispatch_uid="postulo_consume_invite")

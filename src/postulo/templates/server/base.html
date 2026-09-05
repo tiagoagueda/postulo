@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n postulo %}
+
+{% block title %}{% if section_title %}{{ section_title }} · {% endif %}{% translate "Server settings" %}{% endblock %}
+
+{% block main %}
+  <div class="mx-auto max-w-5xl lg:flex lg:items-start lg:gap-10">
+    <aside class="mb-6 lg:mb-0 lg:w-56 lg:shrink-0">
+      <h1 class="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
+        {% translate "Server settings" %}
+      </h1>
+      {% server_sidebar %}
+    </aside>
+    <div class="min-w-0 flex-1">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}

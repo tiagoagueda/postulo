@@ -1,6 +1,5 @@
 """Context available to every template."""
 
-from django.conf import settings
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 
@@ -36,8 +35,12 @@ def ui(request: HttpRequest) -> dict:
         # "system" means stamp nothing and let the operating system preference apply.
         if choice in {"light", "dark"}:
             theme = choice
+    from . import site
+
     return {
         "ui_theme": theme,
         "theme_switch": theme_switch(choice),
-        "registration_open": settings.POSTULO_REGISTRATION_OPEN,
+        "registration_open": site.signup_open_now(),
+        "instance_name": site.instance_name(),
+        "instance_tagline": site.tagline(),
     }
