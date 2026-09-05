@@ -1,13 +1,15 @@
 {
   "name": "postulo-assets",
   "private": true,
-  "description": "Stylesheet build for Postulo. Node is only needed to change the CSS; the compiled result is committed so the application runs without it.",
+  "description": "Stylesheet and icon build for Postulo. Node is only needed to change the CSS or the icon set; the results are committed so the application runs without it.",
   "scripts": {
     "build:css": "tailwindcss --input assets/css/app.css --output src/postulo/static/css/app.css --minify",
-    "watch:css": "tailwindcss --input assets/css/app.css --output src/postulo/static/css/app.css --watch"
+    "watch:css": "tailwindcss --input assets/css/app.css --output src/postulo/static/css/app.css --watch",
+    "sync:icons": "node scripts/sync-icons.mjs"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.0.0",
+    "lucide-static": "1.41.0",
     "tailwindcss": "^4.0.0"
   }
 }

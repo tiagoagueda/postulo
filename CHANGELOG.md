@@ -8,6 +8,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- An icon set. [Lucide](https://lucide.dev) icons (ISC), inlined by a `{% icon %}` template
+  tag from files copied into the repository by `npm run sync:icons`, so the application
+  needs neither Node nor a network to draw one. Decorative by default; given a `label`
+  when an icon stands alone. (#8)
 - A browser smoke test of the critical path — sign in, capture by pasting a page, review,
   move the card on the board, record what was sent, download the export — driven by
   Playwright against a live server. Opt in with `uv run pytest -m e2e`; CI runs it in its

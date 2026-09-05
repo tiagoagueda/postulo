@@ -44,6 +44,21 @@ CI runs it on every push. If you change a page on that path — the header, the 
 review, the board, the export — run it before opening the pull request; it is the test that
 notices when steps stop joining up.
 
+## Icons
+
+The interface uses [Lucide](https://lucide.dev) icons, inlined by the `{% icon %}` tag:
+
+```django
+{% icon "sun" class="size-5" %}                {# decorative, beside a word #}
+{% icon "x" label="Close" class="size-4" %}    {# standing alone, so it needs a name #}
+```
+
+Only the icons listed in `assets/icons.txt` are in the repository. To use a new one, add
+its name to that list, run `npm run sync:icons`, and commit the copied file with your
+change; CI fails if the two disagree. Icons decorate — a button is a word with an icon
+beside it, not an icon alone — except where the header is too narrow for words, and there
+the icon gets a `label`.
+
 ## What will not be merged
 
 **Anything that puts a feature behind payment.** Postulo will never have a paid tier, a

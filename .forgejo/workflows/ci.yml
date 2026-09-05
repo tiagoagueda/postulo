@@ -85,13 +85,18 @@ jobs:
       - name: Rebuild the stylesheet
         run: npm run build:css
 
-      - name: Fail if the committed stylesheet is out of date
+      - name: Re-copy the icons
+        run: npm run sync:icons
+
+      - name: Fail if the committed stylesheet or icons are out of date
         run: |
           # A container-backed runner may check out as a different user than the one
           # running the steps, and git then refuses to read the repository at all.
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git diff --exit-code -- src/postulo/static/css/app.css \
             || (echo "::error::app.css is stale. Run 'npm run build:css' and commit the result." && exit 1)
+          test -z "$(git status --porcelain -- src/postulo/static/icons)" \
+            || (echo "::error::static/icons disagrees with assets/icons.txt. Run 'npm run sync:icons' and commit the result." && git status --porcelain -- src/postulo/static/icons && exit 1)
 
   browser:
     # The critical path in a real browser: sign in, capture, review, board, send, export.

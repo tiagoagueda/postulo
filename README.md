@@ -130,6 +130,8 @@ uv run ruff format .
 [AGPL-3.0-or-later](LICENSE). If you run a modified Postulo as a network service, your
 users are entitled to its source.
 
+The icons are [Lucide](https://lucide.dev), used under the ISC licence.
+
 ## Where this lives
 
 Developed on [Forgejo](https://source.tiagoagueda.com/tiagoagueda/postulo) and mirrored to
