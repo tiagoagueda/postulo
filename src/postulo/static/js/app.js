@@ -178,6 +178,30 @@
     closeMenus(event.target.closest("details[data-menu]"));
   });
 
+  // "/" jumps to the search box, as on most sites with one, unless the person is
+  // already typing somewhere.
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey) {
+      return;
+    }
+    var active = document.activeElement;
+    if (
+      active &&
+      (active.tagName === "INPUT" ||
+        active.tagName === "TEXTAREA" ||
+        active.tagName === "SELECT" ||
+        active.isContentEditable)
+    ) {
+      return;
+    }
+    var box = document.querySelector("[data-search-shortcut]");
+    if (box) {
+      event.preventDefault();
+      box.focus();
+      box.select();
+    }
+  });
+
   document.addEventListener("keydown", function (event) {
     if (event.key !== "Escape") {
       return;

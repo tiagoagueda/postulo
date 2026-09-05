@@ -43,6 +43,7 @@ from .routers import (
     interviews,
     listings,
     reminders,
+    search,
 )
 from .schemas import TokenOut
 
@@ -192,3 +193,4 @@ api.add_router("/reminders", reminders.router)
 api.add_router("/interviews", interviews.router)
 api.add_router("", documents.router)
 api.add_router("/insights", insights.router)
+api.add_router("/search", search.router)

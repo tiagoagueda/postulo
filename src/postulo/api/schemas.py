@@ -324,6 +324,21 @@ class DocumentOut(Schema):
     download_url: str
 
 
+class SearchHitOut(Schema):
+    id: int
+    title: str
+    subtitle: str = ""
+    excerpt: str = ""
+    web_url: str
+
+
+class SearchGroupOut(Schema):
+    kind: str
+    label: str
+    total: int
+    hits: list[SearchHitOut]
+
+
 class TokenOut(Schema):
     name: str
     owner: str

@@ -53,6 +53,13 @@
             </nav>
 
             <div class="ml-auto flex items-center gap-1">
+              {# One box over everything. Small until it has focus; "/" jumps to it. #}
+              <form method="get" action="{% url 'core:search' %}" role="search" class="hidden md:block">
+                <label for="site-search" class="sr-only">{% translate "Search everything" %}</label>
+                <input type="search" id="site-search" name="q" value="{% if request.resolver_match.view_name == 'core:search' %}{{ request.GET.q }}{% endif %}"
+                       placeholder="{% translate 'Search  /' %}" data-search-shortcut
+                       class="field-input w-32 py-1 text-sm transition-[width] focus:w-64">
+              </form>
               {# The account menu: a disclosure the browser opens and closes itself, with #}
               {# the script only adding "close when the pointer goes elsewhere". #}
               <details class="relative" data-menu>

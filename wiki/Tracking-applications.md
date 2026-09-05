@@ -162,6 +162,18 @@ longer use — deleting a word never deletes a company.
 Companies are private to your account. Two people sharing an instance each keep their own
 record of the same employer, and neither can see the other's opinion of them.
 
+## Finding things
+
+The search box in the header — press `/` to jump to it — looks through everything you
+wrote or kept: listings, applications and every line of their timelines, companies and
+people, reminders, cover letters, CVs, your files' titles and notes, your career record,
+and **the text of what you sent**, so "what did I claim in that CV?" is answered without
+opening a PDF: the hit says *in the CV you sent to Black Mesa on 12 May* and links to the
+application. Results come grouped by kind, a few per group with the passage the term was
+found in and a link to all of them; closed applications and discarded listings are
+included, because you are looking for something you remember. Matching is on words as you
+typed them, in any capitalisation.
+
 ## Not retyping adverts
 
 Paste a posting's address and Postulo will read the page for you — see

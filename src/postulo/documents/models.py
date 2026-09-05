@@ -237,7 +237,8 @@ class UploadedDocument(OwnedModel):
         return f"{self.title} (v{self.version})"
 
     def get_absolute_url(self) -> str:
-        return reverse("documents:upload_detail", args=[self.pk])
+        # There is no detail page for a file; the edit page shows everything about it.
+        return reverse("documents:upload_update", args=[self.pk])
 
     @property
     def is_current(self) -> bool:

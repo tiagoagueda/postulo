@@ -162,3 +162,27 @@ def nav_active(context, *url_names: str, css_class: str = "nav-link-active") -> 
         return "nav-link"
     current = f"{match.app_name}:{match.url_name}" if match.app_name else match.url_name
     return css_class if current in url_names else "nav-link"
+
+
+@register.filter
+def highlight(text, query: str) -> str:
+    """Wrap every occurrence of ``query`` in ``text`` in a <mark>, escaping everything else.
+
+    Case-insensitive, so the passage keeps its own capitals; what is marked is what was
+    typed. The result is safe because both halves are escaped before being joined.
+    """
+    text = str(text or "")
+    query = (query or "").strip()
+    if not query:
+        return escape(text)
+    pieces = []
+    lowered, needle, position = text.lower(), query.lower(), 0
+    while True:
+        found = lowered.find(needle, position)
+        if found == -1:
+            pieces.append(escape(text[position:]))
+            break
+        pieces.append(escape(text[position:found]))
+        pieces.append(f"<mark>{escape(text[found : found + len(query)])}</mark>")
+        position = found + len(query)
+    return mark_safe("".join(pieces))  # noqa: S308

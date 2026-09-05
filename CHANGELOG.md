@@ -44,6 +44,12 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **One search box over everything**, in the header, with `/` as its shortcut. It looks
+  through listings, applications and their timelines, companies and people, reminders,
+  letters, CVs, files, the career record and the text of what was sent — a hit in a sent
+  CV says which application it went to and when — and shows results grouped by kind, a few
+  per group with the matching passage marked and a link to the rest. Closed and discarded
+  things are included. `GET /api/v1/search` gives agents the same. (#29)
 - **Delete my account.** Under *Settings → Your data*, with the export offered first: the
   page lists what goes, asks for the password again (or the second factor) and the address
   typed out, and then deletes everything at once — every record, every file behind a

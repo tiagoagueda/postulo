@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n postulo %}
+
+{% block title %}{% if query %}{{ query }} · {% endif %}{% translate "Search" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <form method="get" action="{% url 'core:search' %}" role="search" class="mb-6 flex items-end gap-3">
+      <div class="flex-1">
+        <label class="field-label" for="search-q">{% translate "Search everything" %}</label>
+        <input type="search" id="search-q" name="q" value="{{ query }}" class="field-input w-full"
+               autofocus placeholder="{% translate 'A company, a role, a phrase from a letter, a name…' %}">
+      </div>
+      <button type="submit" class="btn-primary">{% translate "Search" %}</button>
+    </form>
+
+    {% if too_short %}
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Type at least two characters." %}</p>
+    {% elif not query %}
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Listings, applications and their timelines, companies and people, reminders, the text of what you sent, letters, CVs, files and your career record — everything, including what is closed or discarded, because you are looking for something you remember." %}
+      </p>
+    {% elif not groups %}
+      <div class="card py-10 text-center">
+        <p class="mb-1 font-medium">{% blocktranslate with term=query %}Nothing matches “{{ term }}”{% endblocktranslate %}</p>
+        <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Try fewer words, or a different spelling." %}</p>
+      </div>
+    {% else %}
+      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400" role="status" aria-live="polite">
+        {% blocktranslate count counter=total with term=query trimmed %}
+          {{ counter }} result for “{{ term }}”
+        {% plural %}
+          {{ counter }} results for “{{ term }}”
+        {% endblocktranslate %}
+      </p>
+      {% for group in groups %}
+        <section class="mb-6" data-group="{{ group.kind }}">
+          <div class="mb-2 flex items-baseline justify-between">
+            <h2 class="font-medium">{{ group.label }}</h2>
+            <span class="text-xs text-ink-400 tabular-nums">{{ group.total }}</span>
+          </div>
+          <div class="card p-0">
+            <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+              {% for hit in group.hits %}
+                <li class="px-4 py-3">
+                  <a href="{{ hit.url }}" class="font-medium hover:underline">{{ hit.title|highlight:query }}</a>
+                  {% if hit.subtitle %}
+                    <span class="ml-2 text-xs text-ink-500 dark:text-ink-400">{{ hit.subtitle|highlight:query }}</span>
+                  {% endif %}
+                  {% if hit.excerpt %}
+                    <p class="mt-1 text-sm text-ink-600 dark:text-ink-300">{{ hit.excerpt|highlight:query }}</p>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% if group.has_more %}
+            <a href="{{ group.more_url }}" class="mt-2 inline-block text-sm text-brand-600 hover:underline dark:text-brand-400">
+              {% blocktranslate count counter=group.total with label=group.label trimmed %}
+                All {{ counter }} in {{ label }}
+              {% plural %}
+                All {{ counter }} in {{ label }}
+              {% endblocktranslate %}
+            </a>
+          {% endif %}
+        </section>
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endblock %}
