@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 10:09+0000\n"
+"POT-Creation-Date: 2026-09-06 13:08+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -31,7 +31,7 @@ msgstr "%(company)s már rendelkezik ezzel az azonosítóval."
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s már rendelkezik %(scheme)s azonosítóval: %(value)s."
 
-#: src/postulo/plugins/views.py:205
+#: src/postulo/plugins/views.py:206
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -219,12 +219,12 @@ msgstr "%(name)s — önéletrajz"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:132
+#: src/postulo/plugins/forms.py:136
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "A(z) %(plugin)s nem tudta ellenőrizni ezeket a beállításokat: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:43
+#: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s, %(company)s"
@@ -483,7 +483,7 @@ msgid "Add a company"
 msgstr "Cég hozzáadása"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:76
+#: src/postulo/templates/connections/list.html:87
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1150,6 +1150,13 @@ msgid ""
 msgstr ""
 "Az itteni módosítások a(z) „%(name)s” bejegyzésre csak ebben az önéletrajzban vonatkoznak. A törzsrekord érintetlen marad, így a többi változatod nem változik."
 
+#: src/postulo/plugins/syncing.py:48
+#, draft
+msgid ""
+"Changes made here are pushed on the next run; the other side is read then too."
+msgstr ""
+"Az itt végzett változtatások a következő futáskor kerülnek át; a másik oldal is akkor olvasódik be."
+
 #: src/postulo/applications/views.py:399
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
@@ -1346,7 +1353,7 @@ msgstr "A cég webhelye"
 msgid "Company's Wikidata id"
 msgstr "A cég Wikidata-azonosítója"
 
-#: src/postulo/plugins/models.py:43
+#: src/postulo/plugins/models.py:45
 #, draft
 msgid "configuration"
 msgstr "konfiguráció"
@@ -1368,30 +1375,31 @@ msgstr "Kapcsolódás"
 msgid "Connect %(plugin)s"
 msgstr "%(plugin)s kapcsolása"
 
-#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:58
+#: src/postulo/plugins/models.py:123
 #, draft
 msgid "connection"
 msgstr "kapcsolat"
 
-#: src/postulo/plugins/views.py:234
+#: src/postulo/plugins/views.py:253
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Kapcsolat eltávolítva, a titkokkal együtt."
 
-#: src/postulo/plugins/views.py:161
+#: src/postulo/plugins/views.py:162
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Kapcsolat mentve. Teszteld, hogy biztosan működik-e."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
-#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
-#: src/postulo/plugins/views.py:230
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:88
+#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:249
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
 msgstr "Kapcsolatok"
 
-#: src/postulo/plugins/models.py:54
+#: src/postulo/plugins/models.py:59
 #, draft
 msgid "connections"
 msgstr "kapcsolatok"
@@ -1859,7 +1867,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:57
+#: src/postulo/templates/connections/list.html:68
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -1950,7 +1958,7 @@ msgstr "Üres"
 msgid "Empty capture"
 msgstr "Üres rögzítés"
 
-#: src/postulo/plugins/models.py:45
+#: src/postulo/plugins/models.py:47
 #, draft
 msgid "enabled"
 msgstr "engedélyezve"
@@ -1985,6 +1993,11 @@ msgstr "Esemény vagy vásár"
 msgid "events"
 msgstr "események"
 
+#: src/postulo/plugins/syncing.py:30
+#, draft
+msgid "Every 15 minutes"
+msgstr "15 percenként"
+
 #: src/postulo/templates/server/people.html:9
 #, draft
 msgid ""
@@ -2005,6 +2018,16 @@ msgid ""
 "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr ""
 "Minden dokumentum pontosan úgy, ahogy elment, az elküldés pillanatában lefagyasztva. Soha nem készülnek újra, bármennyit változott is azóta az önéletrajz, amelyből származnak."
+
+#: src/postulo/plugins/syncing.py:32
+#, draft
+msgid "Every four hours"
+msgstr "Négyóránként"
+
+#: src/postulo/plugins/syncing.py:31
+#, draft
+msgid "Every hour"
+msgstr "Óránként"
 
 #: src/postulo/templates/core/import_csv_done.html:30
 #, draft
@@ -2132,7 +2155,7 @@ msgstr "Külön exportálva"
 msgid "Failed"
 msgstr "Sikertelen"
 
-#: src/postulo/plugins/models.py:102
+#: src/postulo/plugins/models.py:107
 #, draft
 msgid "Failed without saying why."
 msgstr "Sikertelen, indoklás nélkül."
@@ -2567,7 +2590,7 @@ msgstr "Ide már jelentkeztem"
 msgid "id in the store"
 msgstr "azonosító a tárolóban"
 
-#: src/postulo/jobs/models.py:175
+#: src/postulo/jobs/models.py:175 src/postulo/plugins/models.py:130
 #, draft
 msgid "identifier"
 msgstr "azonosító"
@@ -2874,7 +2897,7 @@ msgstr "kiállítva ekkor"
 msgid "It cannot end before it starts."
 msgstr "Nem érhet véget, mielőtt elkezdődne."
 
-#: src/postulo/plugins/views.py:185
+#: src/postulo/plugins/views.py:186
 #, draft
 msgid "It works."
 msgstr "Működik."
@@ -2912,7 +2935,7 @@ msgstr "Csatlakozás a híváshoz"
 
 #: src/postulo/applications/models.py:317
 #: src/postulo/applications/models.py:463 src/postulo/documents/models.py:208
-#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:35
+#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:37
 #, draft
 msgid "kind"
 msgstr "fajta"
@@ -2922,7 +2945,7 @@ msgstr "fajta"
 msgid "Kind"
 msgstr "Fajta"
 
-#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:41
 #, draft
 msgid "label"
 msgstr "címke"
@@ -2983,7 +3006,7 @@ msgstr "Utolsó tevékenység"
 msgid "last attempt"
 msgstr "utolsó próbálkozás"
 
-#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:50
 #, draft
 msgid "last error"
 msgstr "utolsó hiba"
@@ -2994,17 +3017,42 @@ msgstr "utolsó hiba"
 msgid "Last name"
 msgstr "Vezetéknév"
 
+#: src/postulo/plugins/models.py:132
+#, draft
+msgid "last pushed"
+msgstr "utoljára átküldve"
+
+#: src/postulo/plugins/models.py:52
+#, draft
+msgid "last run"
+msgstr "utolsó futás"
+
+#: src/postulo/templates/connections/list.html:45
+#, python-format, draft
+msgid "Last run %(when)s: %(report)s"
+msgstr "Utolsó futás %(when)s: %(report)s"
+
+#: src/postulo/plugins/models.py:53
+#, draft
+msgid "last run's report"
+msgstr "az utolsó futás jelentése"
+
 #: src/postulo/templates/server/people.html:22
 #, draft
 msgid "Last sign-in"
 msgstr "Utolsó bejelentkezés"
+
+#: src/postulo/plugins/models.py:133
+#, draft
+msgid "last synced"
+msgstr "utoljára szinkronizálva"
 
 #: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:70
 #, draft
 msgid "last used"
 msgstr "utoljára használva"
 
-#: src/postulo/plugins/models.py:47
+#: src/postulo/plugins/models.py:49
 #, draft
 msgid "last worked"
 msgstr "utoljára futott"
@@ -3438,7 +3486,7 @@ msgstr ""
 msgid "no company"
 msgstr "nincs cég"
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:79
 #, draft
 msgid "No connections yet"
 msgstr "Még nincsenek kapcsolatok"
@@ -3469,7 +3517,7 @@ msgstr "Még nincsenek iparágak. A cégek leírása közben jelennek meg."
 msgid "No installed plugin needs a connection."
 msgstr "Egyetlen telepített bővítménynek sincs szüksége kapcsolatra."
 
-#: src/postulo/templates/connections/list.html:80
+#: src/postulo/templates/connections/list.html:91
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3766,7 +3814,7 @@ msgstr "Még semmi sem lett elküldve."
 msgid "Nothing to chase."
 msgstr "Nincs miért érdeklődni."
 
-#: src/postulo/templates/connections/list.html:78
+#: src/postulo/templates/connections/list.html:89
 #, draft
 msgid "Nothing to connect to"
 msgstr "Nincs mihez kapcsolódni"
@@ -3781,7 +3829,7 @@ msgstr "Nincs mit eldönteni"
 msgid "Nothing to measure yet"
 msgstr "Még nincs mit mérni"
 
-#: src/postulo/plugins/views.py:214
+#: src/postulo/plugins/views.py:215
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -3870,6 +3918,11 @@ msgid ""
 msgstr ""
 "Be. A bejelentkezés kódot kér a hitelesítő alkalmazásodból vagy egy helyreállítási kódot."
 
+#: src/postulo/plugins/syncing.py:33
+#, draft
+msgid "Once a day"
+msgstr "Naponta egyszer"
+
 #: src/postulo/resume/models.py:62
 #, draft
 msgid "One achievement per line."
@@ -3882,7 +3935,7 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Egy rögzítés vár ellenőrzésre"
 msgstr[1] "%(counter)s rögzítés vár ellenőrzésre"
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:81
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4175,7 +4228,7 @@ msgstr "A(z) {{ company }} típusú helyőrzők küldéskor töltődnek ki."
 msgid "Plain"
 msgstr "Egyszerű"
 
-#: src/postulo/plugins/models.py:37
+#: src/postulo/plugins/models.py:39
 #, draft
 msgid "plugin"
 msgstr "bővítmény"
@@ -4417,7 +4470,7 @@ msgstr "Visszahelyezés"
 msgid "qualification"
 msgstr "képesítés"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Queue every document you already have for this store."
 msgstr "Sorba teszi minden meglévő dokumentumát ehhez a tárolóhoz."
@@ -4672,8 +4725,13 @@ msgstr "Emlékeztetők"
 msgid "Remote"
 msgstr "Távmunka"
 
+#: src/postulo/plugins/models.py:129
+#, draft
+msgid "remote address"
+msgstr "távoli cím"
+
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:59
+#: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4694,6 +4752,11 @@ msgstr "Feltöltött kép eltávolítása"
 #, draft
 msgid "Remove this connection?"
 msgstr "Eltávolítod ezt a kapcsolatot?"
+
+#: src/postulo/plugins/models.py:134
+#, draft
+msgid "removed on the other side"
+msgstr "a másik oldalon eltávolítva"
 
 #: src/postulo/documents/models.py:288
 #, draft
@@ -4819,6 +4882,11 @@ msgid ""
 "Rows with a date applied become applications, dated as the spreadsheet says and marked as imported on their timeline; rows without one become listings. Companies are matched by name. A row that is already recorded — the same address, or the same company, role and date — is reported and left alone."
 msgstr ""
 "A jelentkezési dátummal rendelkező sorokból jelentkezés lesz, a táblázat szerinti dátummal, az idővonalon importáltként megjelölve; a dátum nélküli sorokból hirdetés. A cégek név szerint kerülnek párosításra. A már rögzített sor — azonos cím, vagy azonos cég, pozíció és dátum — jelentésre kerül, és érintetlen marad."
+
+#: src/postulo/plugins/syncing.py:43
+#, draft
+msgid "Run"
+msgstr "Futtatás"
 
 #: src/postulo/applications/tables.py:79
 #: src/postulo/templates/applications/application_detail.html:121
@@ -4966,7 +5034,7 @@ msgstr "Keresés  /"
 msgid "Search everything"
 msgstr "Keresés mindenben"
 
-#: src/postulo/plugins/models.py:44
+#: src/postulo/plugins/models.py:46
 #, draft
 msgid "secrets"
 msgstr "titkok"
@@ -5003,7 +5071,7 @@ msgstr "Tesztüzenet küldése"
 msgid "Send a test message to"
 msgstr "Tesztüzenet küldése ide"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Send everything"
 msgstr "Minden elküldése"
@@ -5370,7 +5438,7 @@ msgstr "Még él"
 msgid "store"
 msgstr "tároló"
 
-#: src/postulo/plugins/forms.py:47
+#: src/postulo/plugins/forms.py:51
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Tárolva; hagyd üresen a jelenlegi érték megtartásához."
@@ -5400,6 +5468,31 @@ msgstr "felváltva"
 #, draft
 msgid "Supersedes"
 msgstr "Ezt váltja fel"
+
+#: src/postulo/plugins/views.py:236
+#, python-format, draft
+msgid "Sync failed: %(error)s"
+msgstr "A szinkronizálás nem sikerült: %(error)s"
+
+#: src/postulo/plugins/models.py:137
+#, draft
+msgid "sync link"
+msgstr "szinkronizálási kapcsolat"
+
+#: src/postulo/plugins/models.py:138
+#, draft
+msgid "sync links"
+msgstr "szinkronizálási kapcsolatok"
+
+#: src/postulo/templates/connections/list.html:58
+#, draft
+msgid "Sync now"
+msgstr "Szinkronizálás most"
+
+#: src/postulo/plugins/views.py:238
+#, python-format, draft
+msgid "Synced: %(summary)s."
+msgstr "Szinkronizálva: %(summary)s."
 
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -5478,12 +5571,12 @@ msgid "Templates appear when you send a letter with an application."
 msgstr ""
 "A sablonok akkor jelennek meg, amikor jelentkezéssel együtt küldesz levelet."
 
-#: src/postulo/templates/connections/list.html:48
+#: src/postulo/templates/connections/list.html:53
 #, draft
 msgid "Test"
 msgstr "Teszt"
 
-#: src/postulo/plugins/views.py:187
+#: src/postulo/plugins/views.py:188
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "A teszt sikertelen: %(message)s"
@@ -5597,7 +5690,7 @@ msgstr "Ez az oldal ezt adta vissza: %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Ez a kép 5 MB-nál nagyobb. Kisebbet kérünk."
 
-#: src/postulo/plugins/views.py:173
+#: src/postulo/plugins/views.py:174
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ez a bővítmény már nincs telepítve."
@@ -5607,7 +5700,7 @@ msgstr "Ez a bővítmény már nincs telepítve."
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "A(z) %(name)s PDF-motor be van állítva, de nem használható. %(hint)s"
 
-#: src/postulo/documents/archiving.py:106
+#: src/postulo/documents/archiving.py:106 src/postulo/plugins/syncing.py:75
 #, python-format, draft
 msgid "The %(plugin)s plugin is not installed."
 msgstr "A(z) %(plugin)s bővítmény nincs telepítve."
@@ -6218,6 +6311,11 @@ msgstr "verzió"
 msgid "Version"
 msgstr "Verzió"
 
+#: src/postulo/plugins/models.py:131
+#, draft
+msgid "version tag"
+msgstr "verziócímke"
+
 #: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "Versions you have sent"
@@ -6727,7 +6825,7 @@ msgid ""
 msgstr ""
 "A neved és az elérhetőségi blokk, amely az önéletrajzaidra kerül. Hogy a Postulo hogyan viselkedik veled — téma, nyelv, felhasználónév, címek — a <a href=\"%(settings_url)s\" class=\"underline\">Beállítások</a> alatt található."
 
-#: src/postulo/plugins/models.py:41
+#: src/postulo/plugins/models.py:43
 #, draft
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "Az általad adott név: „Telegram”, „Paperless otthon”."

@@ -15,7 +15,7 @@ not put a fabricated job title into their records.
 from __future__ import annotations
 
 import datetime as dt
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Protocol, runtime_checkable
 
@@ -184,3 +184,53 @@ class ConnectedPlugin(Protocol):
     def test(self, config: dict) -> TestResult:
         """Try the configuration for real — one request, one message — and report."""
         ...
+
+
+# ------------------------------------------------------------------------- syncs
+
+
+@dataclass
+class SyncReport:
+    """What one run of a sync did, in numbers and in sentences.
+
+    ``notes`` are things a person should know — a record removed on the other side, an
+    event on the calendar that is not Postulo's — and ``error`` is why the run stopped,
+    if it did. Both are shown on the connection.
+    """
+
+    pushed: int = 0
+    pulled: int = 0
+    removed: int = 0
+    skipped: int = 0
+    notes: list[str] = field(default_factory=list)
+    error: str = ""
+
+    def summary(self) -> str:
+        parts = []
+        if self.pushed:
+            parts.append(f"{self.pushed} pushed")
+        if self.pulled:
+            parts.append(f"{self.pulled} pulled")
+        if self.removed:
+            parts.append(f"{self.removed} removed")
+        if self.skipped:
+            parts.append(f"{self.skipped} skipped")
+        text = ", ".join(parts) if parts else "nothing to do"
+        if self.notes:
+            text += " · " + " · ".join(self.notes)
+        return text
+
+
+@runtime_checkable
+class SyncPlugin(ConnectedPlugin, Protocol):
+    """A connected plugin that keeps records here and records elsewhere the same.
+
+    ``sync`` is given the connection itself — the plugin keeps its
+    :class:`~postulo.plugins.models.SyncLink` rows against it — and the configuration
+    and secrets together. It compares both sides, pushes and pulls what it must, and
+    returns a :class:`SyncReport`. It raises when it cannot run at all; a record it
+    cannot handle is a note, not an exception. The scheduler calls it on the interval
+    the connection carries; *Sync now* calls it at once.
+    """
+
+    def sync(self, connection, config: dict) -> SyncReport: ...

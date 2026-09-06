@@ -102,6 +102,17 @@ application imports, and **Dashboard → All interviews → Calendar file** down
 still ahead in one file. Each interview keeps a stable identifier, so importing the file
 again updates the meeting rather than duplicating it.
 
+A downloaded file is a snapshot. To have the interviews simply *be* on the phone, and to
+have a move made there come back here, the operator installs a **synchronisation plugin**
+and you add a connection under **Settings → Connections**:
+[postulo-dav](https://source.tiagoagueda.com/postulo/postulo-dav) puts the interviews in a
+calendar called *Postulo* and the people you are meeting in an address book of the same
+name, on Nextcloud, Radicale, Baïkal, SOGo, Fastmail or anything else that speaks CalDAV
+and CardDAV. Only those two collections are touched, ever. Each connection has an interval
+— fifteen minutes to once a day — that the scheduler honours, and a *Sync now* button
+beside it. Moving an interview on the phone moves it here and says so on the timeline;
+deleting it there never deletes it here.
+
 ## Gone quiet
 
 An employer that simply stops replying is the most common ending, and *Ghosted* exists to

@@ -109,7 +109,8 @@ hundred more, each named by one URL (see *Plugins in the image* on
 capture API is announced at once; a reminder falling due, and applications going quiet, are
 announced by the **scheduler**, which somebody has to run — the same pass also sends the
 copies of documents waiting for an external store (see *Keeping copies elsewhere* on
-[Files and what you sent](Files-and-what-you-sent)):
+[Files and what you sent](Files-and-what-you-sent)) and runs the synchronisation
+connections whose interval has come round:
 
 ```sh
 # in the container, as a service that loops every five minutes

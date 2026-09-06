@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 10:09+0000\n"
+"POT-Creation-Date: 2026-09-06 13:08+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: čeština\n"
@@ -31,7 +31,7 @@ msgstr "%(company)s už tento identifikátor má."
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s už má identifikátor %(scheme)s: %(value)s."
 
-#: src/postulo/plugins/views.py:205
+#: src/postulo/plugins/views.py:206
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -228,12 +228,12 @@ msgstr "%(name)s — CV"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:132
+#: src/postulo/plugins/forms.py:136
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nemohl tato nastavení zkontrolovat: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:43
+#: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s ve firmě %(company)s"
@@ -494,7 +494,7 @@ msgid "Add a company"
 msgstr "Přidat firmu"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:76
+#: src/postulo/templates/connections/list.html:87
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1162,6 +1162,13 @@ msgid ""
 msgstr ""
 "Změny zde se týkají „%(name)s“ jen v tomto CV. Hlavní záznam zůstává nedotčen, takže ostatní varianty se nemění."
 
+#: src/postulo/plugins/syncing.py:48
+#, draft
+msgid ""
+"Changes made here are pushed on the next run; the other side is read then too."
+msgstr ""
+"Změny provedené zde se odešlou při dalším běhu; tehdy se také přečte druhá strana."
+
 #: src/postulo/applications/views.py:399
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
@@ -1358,7 +1365,7 @@ msgstr "Web firmy"
 msgid "Company's Wikidata id"
 msgstr "Wikidata identifikátor firmy"
 
-#: src/postulo/plugins/models.py:43
+#: src/postulo/plugins/models.py:45
 #, draft
 msgid "configuration"
 msgstr "konfigurace"
@@ -1380,30 +1387,31 @@ msgstr "Připojit"
 msgid "Connect %(plugin)s"
 msgstr "Připojit %(plugin)s"
 
-#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:58
+#: src/postulo/plugins/models.py:123
 #, draft
 msgid "connection"
 msgstr "připojení"
 
-#: src/postulo/plugins/views.py:234
+#: src/postulo/plugins/views.py:253
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Připojení odebráno, včetně tajemství."
 
-#: src/postulo/plugins/views.py:161
+#: src/postulo/plugins/views.py:162
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Připojení uloženo. Otestujte ho, ať víte, že funguje."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
-#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
-#: src/postulo/plugins/views.py:230
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:88
+#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:249
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
 msgstr "Připojení"
 
-#: src/postulo/plugins/models.py:54
+#: src/postulo/plugins/models.py:59
 #, draft
 msgid "connections"
 msgstr "připojení"
@@ -1869,7 +1877,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:57
+#: src/postulo/templates/connections/list.html:68
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -1960,7 +1968,7 @@ msgstr "Prázdné"
 msgid "Empty capture"
 msgstr "Prázdné zachycení"
 
-#: src/postulo/plugins/models.py:45
+#: src/postulo/plugins/models.py:47
 #, draft
 msgid "enabled"
 msgstr "zapnuto"
@@ -1995,6 +2003,11 @@ msgstr "Akce nebo veletrh"
 msgid "events"
 msgstr "události"
 
+#: src/postulo/plugins/syncing.py:30
+#, draft
+msgid "Every 15 minutes"
+msgstr "Každých 15 minut"
+
 #: src/postulo/templates/server/people.html:9
 #, draft
 msgid ""
@@ -2014,6 +2027,16 @@ msgid ""
 "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr ""
 "Každý dokument přesně tak, jak odešel, zmrazený v okamžiku odeslání. Nikdy se negenerují znovu, ať se CV, z něhož vzešly, změnilo sebevíc."
+
+#: src/postulo/plugins/syncing.py:32
+#, draft
+msgid "Every four hours"
+msgstr "Každé čtyři hodiny"
+
+#: src/postulo/plugins/syncing.py:31
+#, draft
+msgid "Every hour"
+msgstr "Každou hodinu"
 
 #: src/postulo/templates/core/import_csv_done.html:30
 #, draft
@@ -2140,7 +2163,7 @@ msgstr "Exportováno samostatně"
 msgid "Failed"
 msgstr "Selhalo"
 
-#: src/postulo/plugins/models.py:102
+#: src/postulo/plugins/models.py:107
 #, draft
 msgid "Failed without saying why."
 msgstr "Selhalo bez udání důvodu."
@@ -2576,7 +2599,7 @@ msgstr "Sem už jsem se hlásil(a)"
 msgid "id in the store"
 msgstr "id v úložišti"
 
-#: src/postulo/jobs/models.py:175
+#: src/postulo/jobs/models.py:175 src/postulo/plugins/models.py:130
 #, draft
 msgid "identifier"
 msgstr "identifikátor"
@@ -2881,7 +2904,7 @@ msgstr "vydáno dne"
 msgid "It cannot end before it starts."
 msgstr "Nemůže skončit dřív, než začne."
 
-#: src/postulo/plugins/views.py:185
+#: src/postulo/plugins/views.py:186
 #, draft
 msgid "It works."
 msgstr "Funguje to."
@@ -2919,7 +2942,7 @@ msgstr "Připojit se k hovoru"
 
 #: src/postulo/applications/models.py:317
 #: src/postulo/applications/models.py:463 src/postulo/documents/models.py:208
-#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:35
+#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:37
 #, draft
 msgid "kind"
 msgstr "druh"
@@ -2929,7 +2952,7 @@ msgstr "druh"
 msgid "Kind"
 msgstr "Druh"
 
-#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:41
 #, draft
 msgid "label"
 msgstr "popisek"
@@ -2990,7 +3013,7 @@ msgstr "Poslední aktivita"
 msgid "last attempt"
 msgstr "poslední pokus"
 
-#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:50
 #, draft
 msgid "last error"
 msgstr "poslední chyba"
@@ -3001,17 +3024,42 @@ msgstr "poslední chyba"
 msgid "Last name"
 msgstr "Příjmení"
 
+#: src/postulo/plugins/models.py:132
+#, draft
+msgid "last pushed"
+msgstr "naposledy odesláno"
+
+#: src/postulo/plugins/models.py:52
+#, draft
+msgid "last run"
+msgstr "poslední běh"
+
+#: src/postulo/templates/connections/list.html:45
+#, python-format, draft
+msgid "Last run %(when)s: %(report)s"
+msgstr "Poslední běh %(when)s: %(report)s"
+
+#: src/postulo/plugins/models.py:53
+#, draft
+msgid "last run's report"
+msgstr "zpráva z posledního běhu"
+
 #: src/postulo/templates/server/people.html:22
 #, draft
 msgid "Last sign-in"
 msgstr "Poslední přihlášení"
+
+#: src/postulo/plugins/models.py:133
+#, draft
+msgid "last synced"
+msgstr "naposledy synchronizováno"
 
 #: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:70
 #, draft
 msgid "last used"
 msgstr "naposledy použito"
 
-#: src/postulo/plugins/models.py:47
+#: src/postulo/plugins/models.py:49
 #, draft
 msgid "last worked"
 msgstr "naposledy fungovalo"
@@ -3444,7 +3492,7 @@ msgstr "Zatím žádné firmy. Vytvoří se vám, když zaznamenáte žádost."
 msgid "no company"
 msgstr "bez firmy"
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:79
 #, draft
 msgid "No connections yet"
 msgstr "Zatím žádná připojení"
@@ -3475,7 +3523,7 @@ msgstr "Zatím žádné obory. Objevují se, jak popisujete firmy."
 msgid "No installed plugin needs a connection."
 msgstr "Žádný nainstalovaný plugin nepotřebuje připojení."
 
-#: src/postulo/templates/connections/list.html:80
+#: src/postulo/templates/connections/list.html:91
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3770,7 +3818,7 @@ msgstr "Zatím nic neodesláno."
 msgid "Nothing to chase."
 msgstr "Není komu se připomínat."
 
-#: src/postulo/templates/connections/list.html:78
+#: src/postulo/templates/connections/list.html:89
 #, draft
 msgid "Nothing to connect to"
 msgstr "Není k čemu se připojit"
@@ -3785,7 +3833,7 @@ msgstr "Není o čem rozhodovat"
 msgid "Nothing to measure yet"
 msgstr "Zatím není co měřit"
 
-#: src/postulo/plugins/views.py:214
+#: src/postulo/plugins/views.py:215
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -3873,6 +3921,11 @@ msgid ""
 "On. Signing in asks for a code from your authenticator app, or a recovery code."
 msgstr "Zapnuto. Přihlášení vyžaduje kód z ověřovací aplikace nebo záložní kód."
 
+#: src/postulo/plugins/syncing.py:33
+#, draft
+msgid "Once a day"
+msgstr "Jednou denně"
+
 #: src/postulo/resume/models.py:62
 #, draft
 msgid "One achievement per line."
@@ -3886,7 +3939,7 @@ msgstr[0] "Jedno zachycení čeká na kontrolu"
 msgstr[1] "%(counter)s zachycení čekají na kontrolu"
 msgstr[2] "%(counter)s zachycení čeká na kontrolu"
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:81
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4178,7 +4231,7 @@ msgstr "Zástupné symboly jako {{ company }} se při odeslání vyplní."
 msgid "Plain"
 msgstr "Prostý"
 
-#: src/postulo/plugins/models.py:37
+#: src/postulo/plugins/models.py:39
 #, draft
 msgid "plugin"
 msgstr "plugin"
@@ -4420,7 +4473,7 @@ msgstr "Vrácení zpět"
 msgid "qualification"
 msgstr "kvalifikace"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Queue every document you already have for this store."
 msgstr "Zařadí do fronty každý dokument, který už máte, pro toto úložiště."
@@ -4675,8 +4728,13 @@ msgstr "Připomínky"
 msgid "Remote"
 msgstr "Na dálku"
 
+#: src/postulo/plugins/models.py:129
+#, draft
+msgid "remote address"
+msgstr "vzdálená adresa"
+
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:59
+#: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4697,6 +4755,11 @@ msgstr "Odebrat nahraný obrázek"
 #, draft
 msgid "Remove this connection?"
 msgstr "Odebrat toto připojení?"
+
+#: src/postulo/plugins/models.py:134
+#, draft
+msgid "removed on the other side"
+msgstr "odstraněno na druhé straně"
 
 #: src/postulo/documents/models.py:288
 #, draft
@@ -4822,6 +4885,11 @@ msgid ""
 "Rows with a date applied become applications, dated as the spreadsheet says and marked as imported on their timeline; rows without one become listings. Companies are matched by name. A row that is already recorded — the same address, or the same company, role and date — is reported and left alone."
 msgstr ""
 "Řádky s datem podání se stanou žádostmi s datem podle tabulky a označením importu na časové ose; řádky bez data se stanou nabídkami. Firmy se párují podle názvu. Už zaznamenaný řádek — stejná adresa, nebo stejná firma, pozice a datum — se nahlásí a ponechá."
+
+#: src/postulo/plugins/syncing.py:43
+#, draft
+msgid "Run"
+msgstr "Spouštět"
 
 #: src/postulo/applications/tables.py:79
 #: src/postulo/templates/applications/application_detail.html:121
@@ -4969,7 +5037,7 @@ msgstr "Hledat  /"
 msgid "Search everything"
 msgstr "Hledat ve všem"
 
-#: src/postulo/plugins/models.py:44
+#: src/postulo/plugins/models.py:46
 #, draft
 msgid "secrets"
 msgstr "tajemství"
@@ -5005,7 +5073,7 @@ msgstr "Poslat zkušební zprávu"
 msgid "Send a test message to"
 msgstr "Poslat zkušební zprávu na"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Send everything"
 msgstr "Odeslat vše"
@@ -5372,7 +5440,7 @@ msgstr "Stále běží"
 msgid "store"
 msgstr "úložiště"
 
-#: src/postulo/plugins/forms.py:47
+#: src/postulo/plugins/forms.py:51
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Uloženo; nechte prázdné, chcete-li zachovat aktuální hodnotu."
@@ -5402,6 +5470,31 @@ msgstr "nahrazeno"
 #, draft
 msgid "Supersedes"
 msgstr "Nahrazuje"
+
+#: src/postulo/plugins/views.py:236
+#, python-format, draft
+msgid "Sync failed: %(error)s"
+msgstr "Synchronizace selhala: %(error)s"
+
+#: src/postulo/plugins/models.py:137
+#, draft
+msgid "sync link"
+msgstr "vazba synchronizace"
+
+#: src/postulo/plugins/models.py:138
+#, draft
+msgid "sync links"
+msgstr "vazby synchronizace"
+
+#: src/postulo/templates/connections/list.html:58
+#, draft
+msgid "Sync now"
+msgstr "Synchronizovat nyní"
+
+#: src/postulo/plugins/views.py:238
+#, python-format, draft
+msgid "Synced: %(summary)s."
+msgstr "Synchronizováno: %(summary)s."
 
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -5479,12 +5572,12 @@ msgstr "Šablona"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Šablony se objeví, když odesíláte dopis se žádostí."
 
-#: src/postulo/templates/connections/list.html:48
+#: src/postulo/templates/connections/list.html:53
 #, draft
 msgid "Test"
 msgstr "Otestovat"
 
-#: src/postulo/plugins/views.py:187
+#: src/postulo/plugins/views.py:188
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Test selhal: %(message)s"
@@ -5598,7 +5691,7 @@ msgstr "Tato stránka vrátila %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tento obrázek má přes 5 MB. Menší, prosím."
 
-#: src/postulo/plugins/views.py:173
+#: src/postulo/plugins/views.py:174
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Tento plugin už není nainstalován."
@@ -5608,7 +5701,7 @@ msgstr "Tento plugin už není nainstalován."
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "PDF backend %(name)s je nastaven, ale nepoužitelný. %(hint)s"
 
-#: src/postulo/documents/archiving.py:106
+#: src/postulo/documents/archiving.py:106 src/postulo/plugins/syncing.py:75
 #, python-format, draft
 msgid "The %(plugin)s plugin is not installed."
 msgstr "Zásuvný modul %(plugin)s není nainstalován."
@@ -6214,6 +6307,11 @@ msgstr "verze"
 msgid "Version"
 msgstr "Verze"
 
+#: src/postulo/plugins/models.py:131
+#, draft
+msgid "version tag"
+msgstr "značka verze"
+
 #: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "Versions you have sent"
@@ -6723,7 +6821,7 @@ msgid ""
 msgstr ""
 "Vaše jméno a kontaktní blok, který se vytiskne na vaše CV. Jak se k vám Postulo chová — motiv, jazyk, uživatelské jméno, adresy — najdete v <a href=\"%(settings_url)s\" class=\"underline\">Nastavení</a>."
 
-#: src/postulo/plugins/models.py:41
+#: src/postulo/plugins/models.py:43
 #, draft
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "Váš název pro něj: „Telegram“, „Paperless doma“."

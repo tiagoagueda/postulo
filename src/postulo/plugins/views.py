@@ -81,6 +81,7 @@ class ConnectionListView(OwnedObjectMixin, ListView):
                     "kind_label": KIND_LABELS.get(connection.kind, connection.kind),
                     "summary": _summary(plugin, connection),
                     "is_store": connection.kind == "store",
+                    "is_sync": connection.kind == "sync",
                 }
             )
         context["rows"] = rows
@@ -217,6 +218,24 @@ class ConnectionBackfillView(OwnedObjectMixin, View):
                 )
                 % {"label": connection.label},
             )
+        return redirect("connections:list")
+
+
+class ConnectionSyncNowView(OwnedObjectMixin, View):
+    """*Sync now*: run a sync connection at once rather than on its interval."""
+
+    def get_queryset(self):
+        return Connection.objects.for_user(self.request.user).of_kind("sync")
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        from .syncing import sync_connection
+
+        connection = get_object_or_404(self.get_queryset(), pk=pk)
+        report = sync_connection(connection)
+        if report.error:
+            messages.error(request, _("Sync failed: %(error)s") % {"error": report.error})
+        else:
+            messages.success(request, _("Synced: %(summary)s.") % {"summary": report.summary()})
         return redirect("connections:list")
 
 

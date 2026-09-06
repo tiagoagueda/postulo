@@ -40,6 +40,11 @@
               {% if row.summary %}
                 <p class="truncate text-xs text-ink-500 dark:text-ink-400">{{ row.summary }}</p>
               {% endif %}
+              {% if row.is_sync and row.connection.last_summary %}
+                <p class="truncate text-xs text-ink-500 dark:text-ink-400">
+                  {% blocktranslate with when=row.connection.synced_at|date:"j M Y, H:i" report=row.connection.last_summary trimmed %}Last run {{ when }}: {{ report }}{% endblocktranslate %}
+                </p>
+              {% endif %}
             </div>
             <div class="flex items-center gap-1">
               {% if row.plugin %}
@@ -47,6 +52,12 @@
                   {% csrf_token %}
                   <button type="submit" class="btn-secondary px-3 py-1 text-xs">{% translate "Test" %}</button>
                 </form>
+                {% if row.is_sync %}
+                  <form method="post" action="{% url 'connections:sync_now' row.connection.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Sync now" %}</button>
+                  </form>
+                {% endif %}
                 {% if row.is_store %}
                   <form method="post" action="{% url 'connections:backfill' row.connection.pk %}">
                     {% csrf_token %}

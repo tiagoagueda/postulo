@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 10:09+0000\n"
+"POT-Creation-Date: 2026-09-06 13:08+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -31,7 +31,7 @@ msgstr "Tá an t-aitheantóir seo ag %(company)s cheana."
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "Tá aitheantóir %(scheme)s ag %(company)s cheana: %(value)s."
 
-#: src/postulo/plugins/views.py:205
+#: src/postulo/plugins/views.py:206
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -257,12 +257,12 @@ msgstr "%(name)s — CV"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:132
+#: src/postulo/plugins/forms.py:136
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "Níorbh fhéidir le %(plugin)s na socruithe seo a sheiceáil: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:43
+#: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s ag %(company)s"
@@ -534,7 +534,7 @@ msgid "Add a company"
 msgstr "Cuir cuideachta leis"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:76
+#: src/postulo/templates/connections/list.html:87
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1205,6 +1205,13 @@ msgid ""
 msgstr ""
 "Baineann athruithe anseo le “%(name)s” ar an CV seo amháin. Fágtar an máistirthaifead mar atá, mar sin ní théann sé i bhfeidhm ar do leaganacha eile."
 
+#: src/postulo/plugins/syncing.py:48
+#, draft
+msgid ""
+"Changes made here are pushed on the next run; the other side is read then too."
+msgstr ""
+"Seoltar athruithe a dhéantar anseo ar an gcéad rith eile; léitear an taobh eile ansin freisin."
+
 #: src/postulo/applications/views.py:399
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
@@ -1401,7 +1408,7 @@ msgstr "Suíomh gréasáin na cuideachta"
 msgid "Company's Wikidata id"
 msgstr "Aitheantóir Wikidata na cuideachta"
 
-#: src/postulo/plugins/models.py:43
+#: src/postulo/plugins/models.py:45
 #, draft
 msgid "configuration"
 msgstr "cumraíocht"
@@ -1423,30 +1430,31 @@ msgstr "Nasc"
 msgid "Connect %(plugin)s"
 msgstr "Nasc %(plugin)s"
 
-#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:58
+#: src/postulo/plugins/models.py:123
 #, draft
 msgid "connection"
 msgstr "nasc"
 
-#: src/postulo/plugins/views.py:234
+#: src/postulo/plugins/views.py:253
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Nasc bainte, rúin san áireamh."
 
-#: src/postulo/plugins/views.py:161
+#: src/postulo/plugins/views.py:162
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Nasc sábháilte. Tástáil é le cinntiú go n-oibríonn sé."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
-#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
-#: src/postulo/plugins/views.py:230
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:88
+#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:249
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
 msgstr "Naisc"
 
-#: src/postulo/plugins/models.py:54
+#: src/postulo/plugins/models.py:59
 #, draft
 msgid "connections"
 msgstr "naisc"
@@ -1914,7 +1922,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:57
+#: src/postulo/templates/connections/list.html:68
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -2005,7 +2013,7 @@ msgstr "Folamh"
 msgid "Empty capture"
 msgstr "Gabháil fholamh"
 
-#: src/postulo/plugins/models.py:45
+#: src/postulo/plugins/models.py:47
 #, draft
 msgid "enabled"
 msgstr "cumasaithe"
@@ -2040,6 +2048,11 @@ msgstr "Imeacht nó aonach"
 msgid "events"
 msgstr "imeachtaí"
 
+#: src/postulo/plugins/syncing.py:30
+#, draft
+msgid "Every 15 minutes"
+msgstr "Gach 15 nóiméad"
+
 #: src/postulo/templates/server/people.html:9
 #, draft
 msgid ""
@@ -2060,6 +2073,16 @@ msgid ""
 "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr ""
 "Gach doiciméad díreach mar a d'imigh sé, reoite ag an nóiméad a seoladh é. Ní athghintear iad riamh, cibé méid atá athraithe ar an CV as ar tháinig siad ó shin."
+
+#: src/postulo/plugins/syncing.py:32
+#, draft
+msgid "Every four hours"
+msgstr "Gach ceithre huaire an chloig"
+
+#: src/postulo/plugins/syncing.py:31
+#, draft
+msgid "Every hour"
+msgstr "Gach uair an chloig"
 
 #: src/postulo/templates/core/import_csv_done.html:30
 #, draft
@@ -2186,7 +2209,7 @@ msgstr "Easpórtáilte ina aonar"
 msgid "Failed"
 msgstr "Theip air"
 
-#: src/postulo/plugins/models.py:102
+#: src/postulo/plugins/models.py:107
 #, draft
 msgid "Failed without saying why."
 msgstr "Theip air gan a rá cén fáth."
@@ -2623,7 +2646,7 @@ msgstr "Chuir mé iarratas chuig an gceann seo cheana"
 msgid "id in the store"
 msgstr "aitheantas sa stór"
 
-#: src/postulo/jobs/models.py:175
+#: src/postulo/jobs/models.py:175 src/postulo/plugins/models.py:130
 #, draft
 msgid "identifier"
 msgstr "aitheantóir"
@@ -2929,7 +2952,7 @@ msgstr "eisithe ar"
 msgid "It cannot end before it starts."
 msgstr "Ní féidir leis críochnú sula dtosaíonn sé."
 
-#: src/postulo/plugins/views.py:185
+#: src/postulo/plugins/views.py:186
 #, draft
 msgid "It works."
 msgstr "Oibríonn sé."
@@ -2967,7 +2990,7 @@ msgstr "Téigh isteach sa ghlao"
 
 #: src/postulo/applications/models.py:317
 #: src/postulo/applications/models.py:463 src/postulo/documents/models.py:208
-#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:35
+#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:37
 #, draft
 msgid "kind"
 msgstr "cineál"
@@ -2977,7 +3000,7 @@ msgstr "cineál"
 msgid "Kind"
 msgstr "Cineál"
 
-#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:41
 #, draft
 msgid "label"
 msgstr "lipéad"
@@ -3038,7 +3061,7 @@ msgstr "Gníomhaíocht dheireanach"
 msgid "last attempt"
 msgstr "an iarracht dheireanach"
 
-#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:50
 #, draft
 msgid "last error"
 msgstr "earráid dheireanach"
@@ -3049,17 +3072,42 @@ msgstr "earráid dheireanach"
 msgid "Last name"
 msgstr "Sloinne"
 
+#: src/postulo/plugins/models.py:132
+#, draft
+msgid "last pushed"
+msgstr "seolta go deireanach"
+
+#: src/postulo/plugins/models.py:52
+#, draft
+msgid "last run"
+msgstr "an rith deireanach"
+
+#: src/postulo/templates/connections/list.html:45
+#, python-format, draft
+msgid "Last run %(when)s: %(report)s"
+msgstr "An rith deireanach %(when)s: %(report)s"
+
+#: src/postulo/plugins/models.py:53
+#, draft
+msgid "last run's report"
+msgstr "tuairisc an rite dheireanaigh"
+
 #: src/postulo/templates/server/people.html:22
 #, draft
 msgid "Last sign-in"
 msgstr "Síniú isteach deireanach"
+
+#: src/postulo/plugins/models.py:133
+#, draft
+msgid "last synced"
+msgstr "sioncronaithe go deireanach"
 
 #: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:70
 #, draft
 msgid "last used"
 msgstr "úsáidte go deireanach"
 
-#: src/postulo/plugins/models.py:47
+#: src/postulo/plugins/models.py:49
 #, draft
 msgid "last worked"
 msgstr "oibrithe go deireanach"
@@ -3493,7 +3541,7 @@ msgstr ""
 msgid "no company"
 msgstr "gan chuideachta"
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:79
 #, draft
 msgid "No connections yet"
 msgstr "Níl aon naisc fós"
@@ -3525,7 +3573,7 @@ msgstr ""
 msgid "No installed plugin needs a connection."
 msgstr "Ní theastaíonn nasc ó aon bhreiseán suiteáilte."
 
-#: src/postulo/templates/connections/list.html:80
+#: src/postulo/templates/connections/list.html:91
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3822,7 +3870,7 @@ msgstr "Níor seoladh aon rud fós."
 msgid "Nothing to chase."
 msgstr "Níl aon rud le tuairisc a chur air."
 
-#: src/postulo/templates/connections/list.html:78
+#: src/postulo/templates/connections/list.html:89
 #, draft
 msgid "Nothing to connect to"
 msgstr "Níl aon rud le nascadh leis"
@@ -3837,7 +3885,7 @@ msgstr "Níl aon rud le cinneadh"
 msgid "Nothing to measure yet"
 msgstr "Níl aon rud le tomhas fós"
 
-#: src/postulo/plugins/views.py:214
+#: src/postulo/plugins/views.py:215
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -3926,6 +3974,11 @@ msgid ""
 msgstr ""
 "Ar siúl. Iarrann síniú isteach cód ó d'aip fhíordheimhnithe, nó cód athshlánaithe."
 
+#: src/postulo/plugins/syncing.py:33
+#, draft
+msgid "Once a day"
+msgstr "Uair sa lá"
+
 #: src/postulo/resume/models.py:62
 #, draft
 msgid "One achievement per line."
@@ -3941,7 +3994,7 @@ msgstr[2] "%(counter)s ghabháil ag fanacht le hathbhreithniú"
 msgstr[3] "%(counter)s ngabháil ag fanacht le hathbhreithniú"
 msgstr[4] "%(counter)s gabháil ag fanacht le hathbhreithniú"
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:81
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4237,7 +4290,7 @@ msgstr "Líontar áitchoinneálaithe ar nós {{ company }} nuair a sheoltar iad.
 msgid "Plain"
 msgstr "Simplí"
 
-#: src/postulo/plugins/models.py:37
+#: src/postulo/plugins/models.py:39
 #, draft
 msgid "plugin"
 msgstr "breiseán"
@@ -4480,7 +4533,7 @@ msgstr "Á chur ar ais"
 msgid "qualification"
 msgstr "cáilíocht"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Queue every document you already have for this store."
 msgstr "Cuir gach doiciméad atá agat cheana sa scuaine don stór seo."
@@ -4739,8 +4792,13 @@ msgstr "Meabhrúcháin"
 msgid "Remote"
 msgstr "Cianda"
 
+#: src/postulo/plugins/models.py:129
+#, draft
+msgid "remote address"
+msgstr "cianseoladh"
+
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:59
+#: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4761,6 +4819,11 @@ msgstr "Bain an pictiúr uaslódáilte"
 #, draft
 msgid "Remove this connection?"
 msgstr "Bain an nasc seo?"
+
+#: src/postulo/plugins/models.py:134
+#, draft
+msgid "removed on the other side"
+msgstr "bainte ar an taobh eile"
 
 #: src/postulo/documents/models.py:288
 #, draft
@@ -4887,6 +4950,11 @@ msgid ""
 "Rows with a date applied become applications, dated as the spreadsheet says and marked as imported on their timeline; rows without one become listings. Companies are matched by name. A row that is already recorded — the same address, or the same company, role and date — is reported and left alone."
 msgstr ""
 "Éiríonn rónna a bhfuil dáta iarratais acu ina n-iarratais, dátaithe mar a deir an scarbhileog agus marcáilte mar iompórtáilte ar a n-amlíne; éiríonn rónna gan dáta ina bhfógraí. Meaitseáiltear cuideachtaí de réir ainm. Tuairiscítear ró atá taifeadta cheana — an seoladh céanna, nó an chuideachta, an ról agus an dáta céanna — agus fágtar é mar atá."
+
+#: src/postulo/plugins/syncing.py:43
+#, draft
+msgid "Run"
+msgstr "Rith"
 
 #: src/postulo/applications/tables.py:79
 #: src/postulo/templates/applications/application_detail.html:121
@@ -5034,7 +5102,7 @@ msgstr "Cuardaigh  /"
 msgid "Search everything"
 msgstr "Cuardaigh gach rud"
 
-#: src/postulo/plugins/models.py:44
+#: src/postulo/plugins/models.py:46
 #, draft
 msgid "secrets"
 msgstr "rúin"
@@ -5071,7 +5139,7 @@ msgstr "Seol teachtaireacht tástála"
 msgid "Send a test message to"
 msgstr "Seol teachtaireacht tástála chuig"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Send everything"
 msgstr "Seol gach rud"
@@ -5439,7 +5507,7 @@ msgstr "Beo fós"
 msgid "store"
 msgstr "stór"
 
-#: src/postulo/plugins/forms.py:47
+#: src/postulo/plugins/forms.py:51
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Stóráilte; fág bán chun an luach reatha a choinneáil."
@@ -5469,6 +5537,31 @@ msgstr "curtha in ionad"
 #, draft
 msgid "Supersedes"
 msgstr "Tagann in ionad"
+
+#: src/postulo/plugins/views.py:236
+#, python-format, draft
+msgid "Sync failed: %(error)s"
+msgstr "Theip ar an sioncrónú: %(error)s"
+
+#: src/postulo/plugins/models.py:137
+#, draft
+msgid "sync link"
+msgstr "nasc sioncrónaithe"
+
+#: src/postulo/plugins/models.py:138
+#, draft
+msgid "sync links"
+msgstr "naisc sioncrónaithe"
+
+#: src/postulo/templates/connections/list.html:58
+#, draft
+msgid "Sync now"
+msgstr "Sioncronaigh anois"
+
+#: src/postulo/plugins/views.py:238
+#, python-format, draft
+msgid "Synced: %(summary)s."
+msgstr "Sioncronaithe: %(summary)s."
 
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -5546,12 +5639,12 @@ msgstr "Teimpléad"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Taispeántar teimpléid nuair a sheolann tú litir le hiarratas."
 
-#: src/postulo/templates/connections/list.html:48
+#: src/postulo/templates/connections/list.html:53
 #, draft
 msgid "Test"
 msgstr "Tástáil"
 
-#: src/postulo/plugins/views.py:187
+#: src/postulo/plugins/views.py:188
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Theip ar an tástáil: %(message)s"
@@ -5665,7 +5758,7 @@ msgstr "Sheol an leathanach sin %(status)s ar ais."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tá an pictiúr sin os cionn 5 MB. Ceann níos lú, le do thoil."
 
-#: src/postulo/plugins/views.py:173
+#: src/postulo/plugins/views.py:174
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Níl an breiseán sin suiteáilte a thuilleadh."
@@ -5675,7 +5768,7 @@ msgstr "Níl an breiseán sin suiteáilte a thuilleadh."
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "Tá an t-inneall PDF %(name)s cumraithe ach níl sé inúsáidte. %(hint)s"
 
-#: src/postulo/documents/archiving.py:106
+#: src/postulo/documents/archiving.py:106 src/postulo/plugins/syncing.py:75
 #, python-format, draft
 msgid "The %(plugin)s plugin is not installed."
 msgstr "Níl an breiseán %(plugin)s suiteáilte."
@@ -6296,6 +6389,11 @@ msgstr "leagan"
 msgid "Version"
 msgstr "Leagan"
 
+#: src/postulo/plugins/models.py:131
+#, draft
+msgid "version tag"
+msgstr "clib leagain"
+
 #: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "Versions you have sent"
@@ -6816,7 +6914,7 @@ msgid ""
 msgstr ""
 "D'ainm agus an bloc teagmhála a phriontálfar ar do CVanna. Tá an chaoi a n-iompraíonn Postulo duitse — téama, teanga, ainm úsáideora, seoltaí — faoi <a href=\"%(settings_url)s\" class=\"underline\">Socruithe</a>."
 
-#: src/postulo/plugins/models.py:41
+#: src/postulo/plugins/models.py:43
 #, draft
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "D'ainm air: “Telegram”, “Paperless sa bhaile”."

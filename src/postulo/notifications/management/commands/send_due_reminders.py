@@ -6,7 +6,8 @@ service in the Compose file, which runs it in a loop. Each pass announces the re
 that have fallen due and the applications that have gone quiet. Each is announced once;
 the stamp survives whether or not the person had a notifier at the time, so adding one
 later does not replay a month of old reminders. The same pass sends the copies of
-documents that are waiting for an external store, and retries the ones that failed.
+documents that are waiting for an external store, retries the ones that failed, and runs
+the sync connections whose interval has come round.
 """
 
 from __future__ import annotations
@@ -76,11 +77,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> None:
         from postulo.applications.quiet import announce_quiet_applications
         from postulo.documents.archiving import send_pending
+        from postulo.plugins.syncing import run_syncs
 
         while True:
             stamped, delivered = announce_due_reminders()
             quiet, told = announce_quiet_applications()
             copies_sent, copies_failed = send_pending()
+            syncs_ran, syncs_failed = run_syncs()
             when = f"{timezone.now():%Y-%m-%d %H:%M}"
             if stamped:
                 self.stdout.write(f"{when} {stamped} reminders due, {delivered} deliveries")
@@ -90,8 +93,10 @@ class Command(BaseCommand):
                 self.stdout.write(
                     f"{when} {copies_sent} document copies sent, {copies_failed} failed"
                 )
+            if syncs_ran:
+                self.stdout.write(f"{when} {syncs_ran} syncs ran, {syncs_failed} failed")
             if not options["loop"]:
-                if not stamped and not quiet and not copies_sent and not copies_failed:
+                if not any((stamped, quiet, copies_sent, copies_failed, syncs_ran)):
                     self.stdout.write("Nothing due.")
                 return
             time.sleep(max(options["every"], 10))

@@ -26,6 +26,10 @@ def kind_specs(kind: str) -> list[FieldSpec]:
         from postulo.documents.stores import kind_specs as document_kind_specs
 
         return document_kind_specs()
+    if kind == "sync":
+        from .syncing import kind_specs as sync_kind_specs
+
+        return sync_kind_specs()
     return []
 
 

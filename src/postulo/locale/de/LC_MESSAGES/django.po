@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 10:09+0000\n"
+"POT-Creation-Date: 2026-09-06 13:08+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Deutsch\n"
@@ -31,7 +31,7 @@ msgstr "%(company)s trägt diese Kennung bereits."
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s hat bereits eine %(scheme)s-Kennung: %(value)s."
 
-#: src/postulo/plugins/views.py:205
+#: src/postulo/plugins/views.py:206
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -220,12 +220,12 @@ msgstr "%(name)s — Lebenslauf"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:132
+#: src/postulo/plugins/forms.py:136
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s konnte diese Einstellungen nicht prüfen: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:43
+#: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s bei %(company)s"
@@ -485,7 +485,7 @@ msgid "Add a company"
 msgstr "Unternehmen hinzufügen"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:76
+#: src/postulo/templates/connections/list.html:87
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1153,6 +1153,13 @@ msgid ""
 msgstr ""
 "Änderungen hier gelten für „%(name)s“ nur in diesem Lebenslauf. Der Stammdatensatz bleibt unberührt, Ihre anderen Varianten also auch."
 
+#: src/postulo/plugins/syncing.py:48
+#, draft
+msgid ""
+"Changes made here are pushed on the next run; the other side is read then too."
+msgstr ""
+"Hier gemachte Änderungen werden beim nächsten Lauf übertragen; die andere Seite wird dann ebenfalls gelesen."
+
 #: src/postulo/applications/views.py:399
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
@@ -1349,7 +1356,7 @@ msgstr "Website des Unternehmens"
 msgid "Company's Wikidata id"
 msgstr "Wikidata-Kennung des Unternehmens"
 
-#: src/postulo/plugins/models.py:43
+#: src/postulo/plugins/models.py:45
 #, draft
 msgid "configuration"
 msgstr "Konfiguration"
@@ -1371,30 +1378,31 @@ msgstr "Verbinden"
 msgid "Connect %(plugin)s"
 msgstr "%(plugin)s verbinden"
 
-#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:58
+#: src/postulo/plugins/models.py:123
 #, draft
 msgid "connection"
 msgstr "Verbindung"
 
-#: src/postulo/plugins/views.py:234
+#: src/postulo/plugins/views.py:253
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Verbindung entfernt, samt Geheimnissen."
 
-#: src/postulo/plugins/views.py:161
+#: src/postulo/plugins/views.py:162
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Verbindung gespeichert. Testen Sie sie, um sicherzugehen."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
-#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
-#: src/postulo/plugins/views.py:230
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:88
+#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:249
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
 msgstr "Verbindungen"
 
-#: src/postulo/plugins/models.py:54
+#: src/postulo/plugins/models.py:59
 #, draft
 msgid "connections"
 msgstr "Verbindungen"
@@ -1861,7 +1869,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:57
+#: src/postulo/templates/connections/list.html:68
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -1952,7 +1960,7 @@ msgstr "Leer"
 msgid "Empty capture"
 msgstr "Leere Erfassung"
 
-#: src/postulo/plugins/models.py:45
+#: src/postulo/plugins/models.py:47
 #, draft
 msgid "enabled"
 msgstr "aktiviert"
@@ -1987,6 +1995,11 @@ msgstr "Veranstaltung oder Messe"
 msgid "events"
 msgstr "Ereignisse"
 
+#: src/postulo/plugins/syncing.py:30
+#, draft
+msgid "Every 15 minutes"
+msgstr "Alle 15 Minuten"
+
 #: src/postulo/templates/server/people.html:9
 #, draft
 msgid ""
@@ -2007,6 +2020,16 @@ msgid ""
 "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr ""
 "Jedes Dokument genau so, wie es abgeschickt wurde, eingefroren im Moment des Sendens. Sie werden nie neu erzeugt, wie sehr sich der zugrunde liegende Lebenslauf seither auch geändert hat."
+
+#: src/postulo/plugins/syncing.py:32
+#, draft
+msgid "Every four hours"
+msgstr "Alle vier Stunden"
+
+#: src/postulo/plugins/syncing.py:31
+#, draft
+msgid "Every hour"
+msgstr "Jede Stunde"
 
 #: src/postulo/templates/core/import_csv_done.html:30
 #, draft
@@ -2134,7 +2157,7 @@ msgstr "Einzeln exportiert"
 msgid "Failed"
 msgstr "Fehlgeschlagen"
 
-#: src/postulo/plugins/models.py:102
+#: src/postulo/plugins/models.py:107
 #, draft
 msgid "Failed without saying why."
 msgstr "Ohne Angabe von Gründen fehlgeschlagen."
@@ -2570,7 +2593,7 @@ msgstr "Hier habe ich mich bereits beworben"
 msgid "id in the store"
 msgstr "ID im Speicher"
 
-#: src/postulo/jobs/models.py:175
+#: src/postulo/jobs/models.py:175 src/postulo/plugins/models.py:130
 #, draft
 msgid "identifier"
 msgstr "Kennung"
@@ -2876,7 +2899,7 @@ msgstr "ausgestellt am"
 msgid "It cannot end before it starts."
 msgstr "Es kann nicht enden, bevor es beginnt."
 
-#: src/postulo/plugins/views.py:185
+#: src/postulo/plugins/views.py:186
 #, draft
 msgid "It works."
 msgstr "Es funktioniert."
@@ -2914,7 +2937,7 @@ msgstr "Am Gespräch teilnehmen"
 
 #: src/postulo/applications/models.py:317
 #: src/postulo/applications/models.py:463 src/postulo/documents/models.py:208
-#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:35
+#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:37
 #, draft
 msgid "kind"
 msgstr "Art"
@@ -2924,7 +2947,7 @@ msgstr "Art"
 msgid "Kind"
 msgstr "Art"
 
-#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:41
 #, draft
 msgid "label"
 msgstr "Bezeichnung"
@@ -2985,7 +3008,7 @@ msgstr "Letzte Aktivität"
 msgid "last attempt"
 msgstr "letzter Versuch"
 
-#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:50
 #, draft
 msgid "last error"
 msgstr "letzter Fehler"
@@ -2996,17 +3019,42 @@ msgstr "letzter Fehler"
 msgid "Last name"
 msgstr "Nachname"
 
+#: src/postulo/plugins/models.py:132
+#, draft
+msgid "last pushed"
+msgstr "zuletzt übertragen"
+
+#: src/postulo/plugins/models.py:52
+#, draft
+msgid "last run"
+msgstr "letzter Lauf"
+
+#: src/postulo/templates/connections/list.html:45
+#, python-format, draft
+msgid "Last run %(when)s: %(report)s"
+msgstr "Letzter Lauf %(when)s: %(report)s"
+
+#: src/postulo/plugins/models.py:53
+#, draft
+msgid "last run's report"
+msgstr "Bericht des letzten Laufs"
+
 #: src/postulo/templates/server/people.html:22
 #, draft
 msgid "Last sign-in"
 msgstr "Letzte Anmeldung"
+
+#: src/postulo/plugins/models.py:133
+#, draft
+msgid "last synced"
+msgstr "zuletzt abgeglichen"
 
 #: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:70
 #, draft
 msgid "last used"
 msgstr "zuletzt verwendet"
 
-#: src/postulo/plugins/models.py:47
+#: src/postulo/plugins/models.py:49
 #, draft
 msgid "last worked"
 msgstr "zuletzt gelaufen"
@@ -3440,7 +3488,7 @@ msgstr ""
 msgid "no company"
 msgstr "kein Unternehmen"
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:79
 #, draft
 msgid "No connections yet"
 msgstr "Noch keine Verbindungen"
@@ -3471,7 +3519,7 @@ msgstr "Noch keine Branchen. Sie entstehen, während Sie Unternehmen beschreiben
 msgid "No installed plugin needs a connection."
 msgstr "Kein installiertes Plugin braucht eine Verbindung."
 
-#: src/postulo/templates/connections/list.html:80
+#: src/postulo/templates/connections/list.html:91
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3768,7 +3816,7 @@ msgstr "Noch nichts gesendet."
 msgid "Nothing to chase."
 msgstr "Nichts nachzufassen."
 
-#: src/postulo/templates/connections/list.html:78
+#: src/postulo/templates/connections/list.html:89
 #, draft
 msgid "Nothing to connect to"
 msgstr "Nichts zu verbinden"
@@ -3783,7 +3831,7 @@ msgstr "Nichts zu entscheiden"
 msgid "Nothing to measure yet"
 msgstr "Noch nichts zu messen"
 
-#: src/postulo/plugins/views.py:214
+#: src/postulo/plugins/views.py:215
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -3872,6 +3920,11 @@ msgid ""
 msgstr ""
 "An. Beim Anmelden wird ein Code aus Ihrer Authenticator-App oder ein Wiederherstellungscode abgefragt."
 
+#: src/postulo/plugins/syncing.py:33
+#, draft
+msgid "Once a day"
+msgstr "Einmal täglich"
+
 #: src/postulo/resume/models.py:62
 #, draft
 msgid "One achievement per line."
@@ -3884,7 +3937,7 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Eine Erfassung wartet auf Prüfung"
 msgstr[1] "%(counter)s Erfassungen warten auf Prüfung"
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:81
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4177,7 +4230,7 @@ msgstr "Platzhalter wie {{ company }} werden beim Senden ausgefüllt."
 msgid "Plain"
 msgstr "Schlicht"
 
-#: src/postulo/plugins/models.py:37
+#: src/postulo/plugins/models.py:39
 #, draft
 msgid "plugin"
 msgstr "Plugin"
@@ -4419,7 +4472,7 @@ msgstr "Zurücklegen"
 msgid "qualification"
 msgstr "Abschluss"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Queue every document you already have for this store."
 msgstr "Reiht jedes Dokument, das Sie bereits haben, für diesen Speicher ein."
@@ -4673,8 +4726,13 @@ msgstr "Erinnerungen"
 msgid "Remote"
 msgstr "Remote"
 
+#: src/postulo/plugins/models.py:129
+#, draft
+msgid "remote address"
+msgstr "entfernte Adresse"
+
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:59
+#: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4695,6 +4753,11 @@ msgstr "Hochgeladenes Bild entfernen"
 #, draft
 msgid "Remove this connection?"
 msgstr "Diese Verbindung entfernen?"
+
+#: src/postulo/plugins/models.py:134
+#, draft
+msgid "removed on the other side"
+msgstr "auf der anderen Seite entfernt"
 
 #: src/postulo/documents/models.py:288
 #, draft
@@ -4820,6 +4883,11 @@ msgid ""
 "Rows with a date applied become applications, dated as the spreadsheet says and marked as imported on their timeline; rows without one become listings. Companies are matched by name. A row that is already recorded — the same address, or the same company, role and date — is reported and left alone."
 msgstr ""
 "Zeilen mit Bewerbungsdatum werden Bewerbungen, datiert wie in der Tabelle und in ihrer Chronik als importiert markiert; Zeilen ohne werden Angebote. Unternehmen werden über den Namen zugeordnet. Eine bereits erfasste Zeile — dieselbe Adresse oder dasselbe Unternehmen, dieselbe Stelle und dasselbe Datum — wird gemeldet und in Ruhe gelassen."
+
+#: src/postulo/plugins/syncing.py:43
+#, draft
+msgid "Run"
+msgstr "Ausführen"
 
 #: src/postulo/applications/tables.py:79
 #: src/postulo/templates/applications/application_detail.html:121
@@ -4967,7 +5035,7 @@ msgstr "Suchen  /"
 msgid "Search everything"
 msgstr "Alles durchsuchen"
 
-#: src/postulo/plugins/models.py:44
+#: src/postulo/plugins/models.py:46
 #, draft
 msgid "secrets"
 msgstr "Geheimnisse"
@@ -5004,7 +5072,7 @@ msgstr "Testnachricht senden"
 msgid "Send a test message to"
 msgstr "Testnachricht senden an"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Send everything"
 msgstr "Alles senden"
@@ -5372,7 +5440,7 @@ msgstr "Noch offen"
 msgid "store"
 msgstr "Speicher"
 
-#: src/postulo/plugins/forms.py:47
+#: src/postulo/plugins/forms.py:51
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Gespeichert; leer lassen, um den aktuellen Wert zu behalten."
@@ -5402,6 +5470,31 @@ msgstr "ersetzt"
 #, draft
 msgid "Supersedes"
 msgstr "Ersetzt"
+
+#: src/postulo/plugins/views.py:236
+#, python-format, draft
+msgid "Sync failed: %(error)s"
+msgstr "Abgleich fehlgeschlagen: %(error)s"
+
+#: src/postulo/plugins/models.py:137
+#, draft
+msgid "sync link"
+msgstr "Abgleich-Verknüpfung"
+
+#: src/postulo/plugins/models.py:138
+#, draft
+msgid "sync links"
+msgstr "Abgleich-Verknüpfungen"
+
+#: src/postulo/templates/connections/list.html:58
+#, draft
+msgid "Sync now"
+msgstr "Jetzt abgleichen"
+
+#: src/postulo/plugins/views.py:238
+#, python-format, draft
+msgid "Synced: %(summary)s."
+msgstr "Abgeglichen: %(summary)s."
 
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -5480,12 +5573,12 @@ msgid "Templates appear when you send a letter with an application."
 msgstr ""
 "Vorlagen erscheinen, wenn Sie ein Anschreiben mit einer Bewerbung senden."
 
-#: src/postulo/templates/connections/list.html:48
+#: src/postulo/templates/connections/list.html:53
 #, draft
 msgid "Test"
 msgstr "Testen"
 
-#: src/postulo/plugins/views.py:187
+#: src/postulo/plugins/views.py:188
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Test fehlgeschlagen: %(message)s"
@@ -5601,7 +5694,7 @@ msgstr "Diese Seite lieferte %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Dieses Bild ist größer als 5 MB. Bitte ein kleineres."
 
-#: src/postulo/plugins/views.py:173
+#: src/postulo/plugins/views.py:174
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Dieses Plugin ist nicht mehr installiert."
@@ -5611,7 +5704,7 @@ msgstr "Dieses Plugin ist nicht mehr installiert."
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "Das PDF-Backend %(name)s ist konfiguriert, aber nicht nutzbar. %(hint)s"
 
-#: src/postulo/documents/archiving.py:106
+#: src/postulo/documents/archiving.py:106 src/postulo/plugins/syncing.py:75
 #, python-format, draft
 msgid "The %(plugin)s plugin is not installed."
 msgstr "Das Plugin %(plugin)s ist nicht installiert."
@@ -6225,6 +6318,11 @@ msgstr "Version"
 msgid "Version"
 msgstr "Version"
 
+#: src/postulo/plugins/models.py:131
+#, draft
+msgid "version tag"
+msgstr "Versionskennung"
+
 #: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "Versions you have sent"
@@ -6738,7 +6836,7 @@ msgid ""
 msgstr ""
 "Ihr Name und der Kontaktblock, der auf Ihre Lebensläufe gedruckt wird. Wie sich Postulo für Sie verhält — Design, Sprache, Benutzername, Adressen — steht unter <a href=\"%(settings_url)s\" class=\"underline\">Einstellungen</a>."
 
-#: src/postulo/plugins/models.py:41
+#: src/postulo/plugins/models.py:43
 #, draft
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "Ihr Name dafür: „Telegram“, „Paperless zu Hause“."

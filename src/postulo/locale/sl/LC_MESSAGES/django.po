@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 10:09+0000\n"
+"POT-Creation-Date: 2026-09-06 13:08+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenščina\n"
@@ -31,7 +31,7 @@ msgstr "%(company)s že ima ta identifikator."
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s že ima identifikator %(scheme)s: %(value)s."
 
-#: src/postulo/plugins/views.py:205
+#: src/postulo/plugins/views.py:206
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -244,12 +244,12 @@ msgstr "%(name)s — življenjepis"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:132
+#: src/postulo/plugins/forms.py:136
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s ni mogel preveriti teh nastavitev: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:43
+#: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s pri %(company)s"
@@ -516,7 +516,7 @@ msgid "Add a company"
 msgstr "Dodaj podjetje"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:76
+#: src/postulo/templates/connections/list.html:87
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1185,6 +1185,13 @@ msgid ""
 msgstr ""
 "Spremembe tukaj veljajo za »%(name)s« samo v tem življenjepisu. Glavni zapis ostane nedotaknjen, zato druge različice niso prizadete."
 
+#: src/postulo/plugins/syncing.py:48
+#, draft
+msgid ""
+"Changes made here are pushed on the next run; the other side is read then too."
+msgstr ""
+"Spremembe, narejene tukaj, se pošljejo ob naslednjem zagonu; takrat se prebere tudi druga stran."
+
 #: src/postulo/applications/views.py:399
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
@@ -1381,7 +1388,7 @@ msgstr "Spletišče podjetja"
 msgid "Company's Wikidata id"
 msgstr "Identifikator Wikidata podjetja"
 
-#: src/postulo/plugins/models.py:43
+#: src/postulo/plugins/models.py:45
 #, draft
 msgid "configuration"
 msgstr "nastavitev"
@@ -1403,30 +1410,31 @@ msgstr "Poveži"
 msgid "Connect %(plugin)s"
 msgstr "Poveži %(plugin)s"
 
-#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:58
+#: src/postulo/plugins/models.py:123
 #, draft
 msgid "connection"
 msgstr "povezava"
 
-#: src/postulo/plugins/views.py:234
+#: src/postulo/plugins/views.py:253
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Povezava odstranjena, vključno s skrivnostmi."
 
-#: src/postulo/plugins/views.py:161
+#: src/postulo/plugins/views.py:162
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Povezava shranjena. Preizkusite jo, da se prepričate, da deluje."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
-#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
-#: src/postulo/plugins/views.py:230
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:88
+#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:249
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
 msgstr "Povezave"
 
-#: src/postulo/plugins/models.py:54
+#: src/postulo/plugins/models.py:59
 #, draft
 msgid "connections"
 msgstr "povezave"
@@ -1892,7 +1900,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:57
+#: src/postulo/templates/connections/list.html:68
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -1983,7 +1991,7 @@ msgstr "Prazno"
 msgid "Empty capture"
 msgstr "Prazen zajem"
 
-#: src/postulo/plugins/models.py:45
+#: src/postulo/plugins/models.py:47
 #, draft
 msgid "enabled"
 msgstr "omogočeno"
@@ -2018,6 +2026,11 @@ msgstr "Dogodek ali sejem"
 msgid "events"
 msgstr "dogodki"
 
+#: src/postulo/plugins/syncing.py:30
+#, draft
+msgid "Every 15 minutes"
+msgstr "Vsakih 15 minut"
+
 #: src/postulo/templates/server/people.html:9
 #, draft
 msgid ""
@@ -2037,6 +2050,16 @@ msgid ""
 "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr ""
 "Vsak dokument točno tak, kot je odšel, zamrznjen v trenutku pošiljanja. Nikoli se ne ustvarijo znova, ne glede na to, kako zelo se je življenjepis, iz katerega izhajajo, medtem spremenil."
+
+#: src/postulo/plugins/syncing.py:32
+#, draft
+msgid "Every four hours"
+msgstr "Vsake štiri ure"
+
+#: src/postulo/plugins/syncing.py:31
+#, draft
+msgid "Every hour"
+msgstr "Vsako uro"
 
 #: src/postulo/templates/core/import_csv_done.html:30
 #, draft
@@ -2163,7 +2186,7 @@ msgstr "Izvoženo posebej"
 msgid "Failed"
 msgstr "Neuspešno"
 
-#: src/postulo/plugins/models.py:102
+#: src/postulo/plugins/models.py:107
 #, draft
 msgid "Failed without saying why."
 msgstr "Ni uspelo, brez pojasnila."
@@ -2597,7 +2620,7 @@ msgstr "Sem sem se že prijavil/-a"
 msgid "id in the store"
 msgstr "id v shrambi"
 
-#: src/postulo/jobs/models.py:175
+#: src/postulo/jobs/models.py:175 src/postulo/plugins/models.py:130
 #, draft
 msgid "identifier"
 msgstr "identifikator"
@@ -2903,7 +2926,7 @@ msgstr "izdano dne"
 msgid "It cannot end before it starts."
 msgstr "Ne more se končati, preden se začne."
 
-#: src/postulo/plugins/views.py:185
+#: src/postulo/plugins/views.py:186
 #, draft
 msgid "It works."
 msgstr "Deluje."
@@ -2941,7 +2964,7 @@ msgstr "Pridruži se klicu"
 
 #: src/postulo/applications/models.py:317
 #: src/postulo/applications/models.py:463 src/postulo/documents/models.py:208
-#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:35
+#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:37
 #, draft
 msgid "kind"
 msgstr "vrsta"
@@ -2951,7 +2974,7 @@ msgstr "vrsta"
 msgid "Kind"
 msgstr "Vrsta"
 
-#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:41
 #, draft
 msgid "label"
 msgstr "oznaka"
@@ -3012,7 +3035,7 @@ msgstr "Zadnja dejavnost"
 msgid "last attempt"
 msgstr "zadnji poskus"
 
-#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:50
 #, draft
 msgid "last error"
 msgstr "zadnja napaka"
@@ -3023,17 +3046,42 @@ msgstr "zadnja napaka"
 msgid "Last name"
 msgstr "Priimek"
 
+#: src/postulo/plugins/models.py:132
+#, draft
+msgid "last pushed"
+msgstr "nazadnje poslano"
+
+#: src/postulo/plugins/models.py:52
+#, draft
+msgid "last run"
+msgstr "zadnji zagon"
+
+#: src/postulo/templates/connections/list.html:45
+#, python-format, draft
+msgid "Last run %(when)s: %(report)s"
+msgstr "Zadnji zagon %(when)s: %(report)s"
+
+#: src/postulo/plugins/models.py:53
+#, draft
+msgid "last run's report"
+msgstr "poročilo zadnjega zagona"
+
 #: src/postulo/templates/server/people.html:22
 #, draft
 msgid "Last sign-in"
 msgstr "Zadnja prijava"
+
+#: src/postulo/plugins/models.py:133
+#, draft
+msgid "last synced"
+msgstr "nazadnje sinhronizirano"
 
 #: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:70
 #, draft
 msgid "last used"
 msgstr "nazadnje uporabljeno"
 
-#: src/postulo/plugins/models.py:47
+#: src/postulo/plugins/models.py:49
 #, draft
 msgid "last worked"
 msgstr "nazadnje delovalo"
@@ -3466,7 +3514,7 @@ msgstr "Podjetij še ni. Ustvarijo se za vas, ko zabeležite prijavo."
 msgid "no company"
 msgstr "brez podjetja"
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:79
 #, draft
 msgid "No connections yet"
 msgstr "Povezav še ni"
@@ -3497,7 +3545,7 @@ msgstr "Panog še ni. Pojavijo se, ko opisujete podjetja."
 msgid "No installed plugin needs a connection."
 msgstr "Noben nameščen vtičnik ne potrebuje povezave."
 
-#: src/postulo/templates/connections/list.html:80
+#: src/postulo/templates/connections/list.html:91
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3792,7 +3840,7 @@ msgstr "Še nič ni poslano."
 msgid "Nothing to chase."
 msgstr "Ni koga opomniti."
 
-#: src/postulo/templates/connections/list.html:78
+#: src/postulo/templates/connections/list.html:89
 #, draft
 msgid "Nothing to connect to"
 msgstr "Ni se s čim povezati"
@@ -3807,7 +3855,7 @@ msgstr "Ni o čem odločati"
 msgid "Nothing to measure yet"
 msgstr "Še ni česa meriti"
 
-#: src/postulo/plugins/views.py:214
+#: src/postulo/plugins/views.py:215
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -3896,6 +3944,11 @@ msgid ""
 msgstr ""
 "Vklopljeno. Prijava zahteva kodo iz aplikacije za preverjanje ali kodo za obnovitev."
 
+#: src/postulo/plugins/syncing.py:33
+#, draft
+msgid "Once a day"
+msgstr "Enkrat na dan"
+
 #: src/postulo/resume/models.py:62
 #, draft
 msgid "One achievement per line."
@@ -3910,7 +3963,7 @@ msgstr[1] "%(counter)s zajema čakata na pregled"
 msgstr[2] "%(counter)s zajemi čakajo na pregled"
 msgstr[3] "%(counter)s zajemov čaka na pregled"
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:81
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4204,7 +4257,7 @@ msgstr "Ograde, kot je {{ company }}, se izpolnijo ob pošiljanju."
 msgid "Plain"
 msgstr "Preprosto"
 
-#: src/postulo/plugins/models.py:37
+#: src/postulo/plugins/models.py:39
 #, draft
 msgid "plugin"
 msgstr "vtičnik"
@@ -4446,7 +4499,7 @@ msgstr "Vračanje nazaj"
 msgid "qualification"
 msgstr "kvalifikacija"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Queue every document you already have for this store."
 msgstr "V vrsto postavi vsak dokument, ki ga že imate, za to shrambo."
@@ -4702,8 +4755,13 @@ msgstr "Opomniki"
 msgid "Remote"
 msgstr "Na daljavo"
 
+#: src/postulo/plugins/models.py:129
+#, draft
+msgid "remote address"
+msgstr "oddaljeni naslov"
+
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:59
+#: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4724,6 +4782,11 @@ msgstr "Odstrani naloženo sliko"
 #, draft
 msgid "Remove this connection?"
 msgstr "Odstranim to povezavo?"
+
+#: src/postulo/plugins/models.py:134
+#, draft
+msgid "removed on the other side"
+msgstr "odstranjeno na drugi strani"
 
 #: src/postulo/documents/models.py:288
 #, draft
@@ -4849,6 +4912,11 @@ msgid ""
 "Rows with a date applied become applications, dated as the spreadsheet says and marked as imported on their timeline; rows without one become listings. Companies are matched by name. A row that is already recorded — the same address, or the same company, role and date — is reported and left alone."
 msgstr ""
 "Vrstice z datumom prijave postanejo prijave, datirane, kot pravi preglednica, in na časovnici označene kot uvožene; vrstice brez njega postanejo oglasi. Podjetja se ujemajo po imenu. Že zabeležena vrstica — isti naslov ali isto podjetje, delovno mesto in datum — se poroča in pusti pri miru."
+
+#: src/postulo/plugins/syncing.py:43
+#, draft
+msgid "Run"
+msgstr "Zaganjaj"
 
 #: src/postulo/applications/tables.py:79
 #: src/postulo/templates/applications/application_detail.html:121
@@ -4996,7 +5064,7 @@ msgstr "Išči  /"
 msgid "Search everything"
 msgstr "Išči po vsem"
 
-#: src/postulo/plugins/models.py:44
+#: src/postulo/plugins/models.py:46
 #, draft
 msgid "secrets"
 msgstr "skrivnosti"
@@ -5032,7 +5100,7 @@ msgstr "Pošlji preizkusno sporočilo"
 msgid "Send a test message to"
 msgstr "Pošlji preizkusno sporočilo na"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Send everything"
 msgstr "Pošlji vse"
@@ -5399,7 +5467,7 @@ msgstr "Še živi"
 msgid "store"
 msgstr "shramba"
 
-#: src/postulo/plugins/forms.py:47
+#: src/postulo/plugins/forms.py:51
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Shranjeno; pustite prazno, da ohranite trenutno vrednost."
@@ -5429,6 +5497,31 @@ msgstr "nadomeščeno"
 #, draft
 msgid "Supersedes"
 msgstr "Nadomešča"
+
+#: src/postulo/plugins/views.py:236
+#, python-format, draft
+msgid "Sync failed: %(error)s"
+msgstr "Sinhronizacija ni uspela: %(error)s"
+
+#: src/postulo/plugins/models.py:137
+#, draft
+msgid "sync link"
+msgstr "povezava sinhronizacije"
+
+#: src/postulo/plugins/models.py:138
+#, draft
+msgid "sync links"
+msgstr "povezave sinhronizacije"
+
+#: src/postulo/templates/connections/list.html:58
+#, draft
+msgid "Sync now"
+msgstr "Sinhroniziraj zdaj"
+
+#: src/postulo/plugins/views.py:238
+#, python-format, draft
+msgid "Synced: %(summary)s."
+msgstr "Sinhronizirano: %(summary)s."
 
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -5506,12 +5599,12 @@ msgstr "Predloga"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Predloge se pojavijo, ko pošljete pismo s prijavo."
 
-#: src/postulo/templates/connections/list.html:48
+#: src/postulo/templates/connections/list.html:53
 #, draft
 msgid "Test"
 msgstr "Preizkusi"
 
-#: src/postulo/plugins/views.py:187
+#: src/postulo/plugins/views.py:188
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Preizkus ni uspel: %(message)s"
@@ -5625,7 +5718,7 @@ msgstr "Ta stran je vrnila %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Ta slika je večja od 5 MB. Manjšo, prosim."
 
-#: src/postulo/plugins/views.py:173
+#: src/postulo/plugins/views.py:174
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ta vtičnik ni več nameščen."
@@ -5635,7 +5728,7 @@ msgstr "Ta vtičnik ni več nameščen."
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "Zaledni sistem za PDF %(name)s je nastavljen, a ni uporaben. %(hint)s"
 
-#: src/postulo/documents/archiving.py:106
+#: src/postulo/documents/archiving.py:106 src/postulo/plugins/syncing.py:75
 #, python-format, draft
 msgid "The %(plugin)s plugin is not installed."
 msgstr "Vtičnik %(plugin)s ni nameščen."
@@ -6247,6 +6340,11 @@ msgstr "različica"
 msgid "Version"
 msgstr "Različica"
 
+#: src/postulo/plugins/models.py:131
+#, draft
+msgid "version tag"
+msgstr "oznaka različice"
+
 #: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "Versions you have sent"
@@ -6759,7 +6857,7 @@ msgid ""
 msgstr ""
 "Vaše ime in blok s stiki, ki bo natisnjen na vaših življenjepisih. Kako se Postulo vede do vas — tema, jezik, uporabniško ime, naslovi — je v <a href=\"%(settings_url)s\" class=\"underline\">Nastavitvah</a>."
 
-#: src/postulo/plugins/models.py:41
+#: src/postulo/plugins/models.py:43
 #, draft
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "Vaše ime zanjo: »Telegram«, »Paperless doma«."

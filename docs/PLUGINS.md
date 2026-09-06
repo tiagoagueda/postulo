@@ -335,6 +335,46 @@ so your plugin never asks which kinds to keep: if `put` is called, the person wa
 built-in `postulo.documents.stores.LocalStore` is the same contract applied to private
 media, and cannot be switched off.
 
+### Syncs
+
+A sync keeps records here and records elsewhere the same, in both directions — contacts
+in an address book, interviews in a calendar. It adds one method:
+
+```python
+from postulo.plugins.base import SyncReport
+from postulo.plugins.models import SyncLink
+
+
+class MySync:
+    ...
+    kind = "sync"
+
+    def sync(self, connection, config) -> SyncReport:
+        """Compare both sides, push and pull what you must, say what you did."""
+        report = SyncReport()
+        for contact in Contact.objects.for_user(connection.owner):
+            link = SyncLink.for_record(connection, contact)
+            ...
+            SyncLink.bind(
+                connection, contact, remote_href=href, uid=uid, etag=etag, local_hash=digest
+            )
+            report.pushed += 1
+        return report
+```
+
+What ties a local record to its remote twin is a `SyncLink` row against the connection —
+the remote address, the identifier the remote uses, the version tag it last gave, a hash
+of what was last pushed — kept beside the record, never on it. `SyncLink.for_record`,
+`of_model` and `bind` are the whole API. When the other side deletes a twin, set
+`remote_gone` on the link rather than deleting the local record: a swipe on a phone must
+not erase an interview. Every sync connection carries an interval — fifteen minutes to
+a day — and the scheduler runs it when that comes round; *Sync now* on the connection
+runs it at once. Return a `SyncReport` with counts and `notes` for anything a person
+should know; raise only when the run cannot happen at all. The report's summary and any
+error are shown on the connection.
+[postulo-dav](https://source.tiagoagueda.com/postulo/postulo-dav) is the reference:
+CardDAV and CalDAV, both directions.
+
 ## Getting a plugin into the container
 
 The image installs a locked environment at build time and runs as a user that cannot

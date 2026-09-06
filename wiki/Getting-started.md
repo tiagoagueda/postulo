@@ -32,7 +32,7 @@ How Postulo behaves for you lives under **Settings**, one section per page:
   authentication, and any single sign-on connected to the account.
 - **Connections** — where the plugins that act for you (notifications, document stores,
   synchronisation) find their services and how they sign in. Empty until the operator
-  installs such a plugin.
+  installs such a plugin; each one you add is tested, run and reported on from here.
 - **API tokens** — for the browser extension and anything else that acts for you, each
   allowed only what you tick (see [The API](The-capture-API)).
 - **Your data** — the export.

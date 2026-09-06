@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 10:09+0000\n"
+"POT-Creation-Date: 2026-09-06 13:08+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -31,7 +31,7 @@ msgstr "%(company)s вече има този идентификатор."
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s вече има идентификатор %(scheme)s: %(value)s."
 
-#: src/postulo/plugins/views.py:205
+#: src/postulo/plugins/views.py:206
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -219,12 +219,12 @@ msgstr "%(name)s — CV"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:132
+#: src/postulo/plugins/forms.py:136
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s не успя да провери тези настройки: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:43
+#: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s в %(company)s"
@@ -483,7 +483,7 @@ msgid "Add a company"
 msgstr "Добавяне на компания"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:76
+#: src/postulo/templates/connections/list.html:87
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1151,6 +1151,13 @@ msgid ""
 msgstr ""
 "Промените тук важат за „%(name)s“ само в това CV. Основният запис остава недокоснат, така че другите ви варианти не се засягат."
 
+#: src/postulo/plugins/syncing.py:48
+#, draft
+msgid ""
+"Changes made here are pushed on the next run; the other side is read then too."
+msgstr ""
+"Направените тук промени се изпращат при следващото изпълнение; тогава се чете и другата страна."
+
 #: src/postulo/applications/views.py:399
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
@@ -1347,7 +1354,7 @@ msgstr "Сайт на компанията"
 msgid "Company's Wikidata id"
 msgstr "Wikidata идентификатор на компанията"
 
-#: src/postulo/plugins/models.py:43
+#: src/postulo/plugins/models.py:45
 #, draft
 msgid "configuration"
 msgstr "конфигурация"
@@ -1369,30 +1376,31 @@ msgstr "Свързване"
 msgid "Connect %(plugin)s"
 msgstr "Свързване на %(plugin)s"
 
-#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:58
+#: src/postulo/plugins/models.py:123
 #, draft
 msgid "connection"
 msgstr "връзка"
 
-#: src/postulo/plugins/views.py:234
+#: src/postulo/plugins/views.py:253
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Връзката е премахната, включително тайните."
 
-#: src/postulo/plugins/views.py:161
+#: src/postulo/plugins/views.py:162
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Връзката е запазена. Тествайте я, за да сте сигурни, че работи."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
-#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
-#: src/postulo/plugins/views.py:230
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:88
+#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:249
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
 msgstr "Връзки"
 
-#: src/postulo/plugins/models.py:54
+#: src/postulo/plugins/models.py:59
 #, draft
 msgid "connections"
 msgstr "връзки"
@@ -1858,7 +1866,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:57
+#: src/postulo/templates/connections/list.html:68
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -1949,7 +1957,7 @@ msgstr "Празно"
 msgid "Empty capture"
 msgstr "Празно прихващане"
 
-#: src/postulo/plugins/models.py:45
+#: src/postulo/plugins/models.py:47
 #, draft
 msgid "enabled"
 msgstr "включено"
@@ -1984,6 +1992,11 @@ msgstr "Събитие или изложение"
 msgid "events"
 msgstr "събития"
 
+#: src/postulo/plugins/syncing.py:30
+#, draft
+msgid "Every 15 minutes"
+msgstr "На всеки 15 минути"
+
 #: src/postulo/templates/server/people.html:9
 #, draft
 msgid ""
@@ -2003,6 +2016,16 @@ msgid ""
 "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr ""
 "Всеки документ точно както е излязъл, замразен в момента на изпращане. Никога не се генерират наново, колкото и да се е променило CV-то, от което са дошли."
+
+#: src/postulo/plugins/syncing.py:32
+#, draft
+msgid "Every four hours"
+msgstr "На всеки четири часа"
+
+#: src/postulo/plugins/syncing.py:31
+#, draft
+msgid "Every hour"
+msgstr "На всеки час"
 
 #: src/postulo/templates/core/import_csv_done.html:30
 #, draft
@@ -2130,7 +2153,7 @@ msgstr "Експортирано отделно"
 msgid "Failed"
 msgstr "Неуспешно"
 
-#: src/postulo/plugins/models.py:102
+#: src/postulo/plugins/models.py:107
 #, draft
 msgid "Failed without saying why."
 msgstr "Провали се, без да каже защо."
@@ -2565,7 +2588,7 @@ msgstr "Вече съм кандидатствал за тази"
 msgid "id in the store"
 msgstr "идентификатор в хранилището"
 
-#: src/postulo/jobs/models.py:175
+#: src/postulo/jobs/models.py:175 src/postulo/plugins/models.py:130
 #, draft
 msgid "identifier"
 msgstr "идентификатор"
@@ -2871,7 +2894,7 @@ msgstr "издадена на"
 msgid "It cannot end before it starts."
 msgstr "Не може да приключи, преди да е започнало."
 
-#: src/postulo/plugins/views.py:185
+#: src/postulo/plugins/views.py:186
 #, draft
 msgid "It works."
 msgstr "Работи."
@@ -2909,7 +2932,7 @@ msgstr "Присъединяване към разговора"
 
 #: src/postulo/applications/models.py:317
 #: src/postulo/applications/models.py:463 src/postulo/documents/models.py:208
-#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:35
+#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:37
 #, draft
 msgid "kind"
 msgstr "вид"
@@ -2919,7 +2942,7 @@ msgstr "вид"
 msgid "Kind"
 msgstr "Вид"
 
-#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:41
 #, draft
 msgid "label"
 msgstr "етикет"
@@ -2980,7 +3003,7 @@ msgstr "Последна активност"
 msgid "last attempt"
 msgstr "последен опит"
 
-#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:50
 #, draft
 msgid "last error"
 msgstr "последна грешка"
@@ -2991,17 +3014,42 @@ msgstr "последна грешка"
 msgid "Last name"
 msgstr "Фамилия"
 
+#: src/postulo/plugins/models.py:132
+#, draft
+msgid "last pushed"
+msgstr "последно изпратено"
+
+#: src/postulo/plugins/models.py:52
+#, draft
+msgid "last run"
+msgstr "последно изпълнение"
+
+#: src/postulo/templates/connections/list.html:45
+#, python-format, draft
+msgid "Last run %(when)s: %(report)s"
+msgstr "Последно изпълнение %(when)s: %(report)s"
+
+#: src/postulo/plugins/models.py:53
+#, draft
+msgid "last run's report"
+msgstr "доклад от последното изпълнение"
+
 #: src/postulo/templates/server/people.html:22
 #, draft
 msgid "Last sign-in"
 msgstr "Последен вход"
+
+#: src/postulo/plugins/models.py:133
+#, draft
+msgid "last synced"
+msgstr "последно синхронизирано"
 
 #: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:70
 #, draft
 msgid "last used"
 msgstr "последно използван"
 
-#: src/postulo/plugins/models.py:47
+#: src/postulo/plugins/models.py:49
 #, draft
 msgid "last worked"
 msgstr "последно работил"
@@ -3434,7 +3482,7 @@ msgstr "Още няма компании. Създават се за вас, к�
 msgid "no company"
 msgstr "без компания"
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:79
 #, draft
 msgid "No connections yet"
 msgstr "Още няма връзки"
@@ -3465,7 +3513,7 @@ msgstr "Още няма отрасли. Появяват се, докато оп
 msgid "No installed plugin needs a connection."
 msgstr "Никоя инсталирана добавка не се нуждае от връзка."
 
-#: src/postulo/templates/connections/list.html:80
+#: src/postulo/templates/connections/list.html:91
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3762,7 +3810,7 @@ msgstr "Още нищо изпратено."
 msgid "Nothing to chase."
 msgstr "Нищо за напомняне."
 
-#: src/postulo/templates/connections/list.html:78
+#: src/postulo/templates/connections/list.html:89
 #, draft
 msgid "Nothing to connect to"
 msgstr "Няма към какво да се свържете"
@@ -3777,7 +3825,7 @@ msgstr "Нищо за решаване"
 msgid "Nothing to measure yet"
 msgstr "Още нищо за измерване"
 
-#: src/postulo/plugins/views.py:214
+#: src/postulo/plugins/views.py:215
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -3866,6 +3914,11 @@ msgid ""
 msgstr ""
 "Вкл. Влизането изисква код от приложението ви за удостоверяване или код за възстановяване."
 
+#: src/postulo/plugins/syncing.py:33
+#, draft
+msgid "Once a day"
+msgstr "Веднъж дневно"
+
 #: src/postulo/resume/models.py:62
 #, draft
 msgid "One achievement per line."
@@ -3878,7 +3931,7 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Едно прихващане чака преглед"
 msgstr[1] "%(counter)s прихващания чакат преглед"
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:81
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4171,7 +4224,7 @@ msgstr "Заместители като {{ company }} се попълват пр
 msgid "Plain"
 msgstr "Обикновен"
 
-#: src/postulo/plugins/models.py:37
+#: src/postulo/plugins/models.py:39
 #, draft
 msgid "plugin"
 msgstr "добавка"
@@ -4413,7 +4466,7 @@ msgstr "Връщане обратно"
 msgid "qualification"
 msgstr "квалификация"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Queue every document you already have for this store."
 msgstr "Поставя на опашка всеки документ, който вече имате, за това хранилище."
@@ -4666,8 +4719,13 @@ msgstr "Напомняния"
 msgid "Remote"
 msgstr "Дистанционно"
 
+#: src/postulo/plugins/models.py:129
+#, draft
+msgid "remote address"
+msgstr "отдалечен адрес"
+
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:59
+#: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4688,6 +4746,11 @@ msgstr "Премахване на качената снимка"
 #, draft
 msgid "Remove this connection?"
 msgstr "Да се премахне ли тази връзка?"
+
+#: src/postulo/plugins/models.py:134
+#, draft
+msgid "removed on the other side"
+msgstr "премахнато от другата страна"
 
 #: src/postulo/documents/models.py:288
 #, draft
@@ -4813,6 +4876,11 @@ msgid ""
 "Rows with a date applied become applications, dated as the spreadsheet says and marked as imported on their timeline; rows without one become listings. Companies are matched by name. A row that is already recorded — the same address, or the same company, role and date — is reported and left alone."
 msgstr ""
 "Редове с дата на кандидатстване стават кандидатури, датирани както казва таблицата и отбелязани като импортирани в хронологията си; редове без такава стават обяви. Компаниите се съпоставят по име. Вече записан ред — същият адрес, или същите компания, позиция и дата — се докладва и се оставя на мира."
+
+#: src/postulo/plugins/syncing.py:43
+#, draft
+msgid "Run"
+msgstr "Изпълнявай"
 
 #: src/postulo/applications/tables.py:79
 #: src/postulo/templates/applications/application_detail.html:121
@@ -4960,7 +5028,7 @@ msgstr "Търсене  /"
 msgid "Search everything"
 msgstr "Търсене навсякъде"
 
-#: src/postulo/plugins/models.py:44
+#: src/postulo/plugins/models.py:46
 #, draft
 msgid "secrets"
 msgstr "тайни"
@@ -4997,7 +5065,7 @@ msgstr "Изпращане на тестово съобщение"
 msgid "Send a test message to"
 msgstr "Изпращане на тестово съобщение до"
 
-#: src/postulo/templates/connections/list.html:54
+#: src/postulo/templates/connections/list.html:65
 #, draft
 msgid "Send everything"
 msgstr "Изпращане на всичко"
@@ -5365,7 +5433,7 @@ msgstr "Още активна"
 msgid "store"
 msgstr "хранилище"
 
-#: src/postulo/plugins/forms.py:47
+#: src/postulo/plugins/forms.py:51
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Съхранено; оставете празно, за да запазите текущата стойност."
@@ -5395,6 +5463,31 @@ msgstr "заменен"
 #, draft
 msgid "Supersedes"
 msgstr "Заменя"
+
+#: src/postulo/plugins/views.py:236
+#, python-format, draft
+msgid "Sync failed: %(error)s"
+msgstr "Синхронизацията не успя: %(error)s"
+
+#: src/postulo/plugins/models.py:137
+#, draft
+msgid "sync link"
+msgstr "връзка за синхронизация"
+
+#: src/postulo/plugins/models.py:138
+#, draft
+msgid "sync links"
+msgstr "връзки за синхронизация"
+
+#: src/postulo/templates/connections/list.html:58
+#, draft
+msgid "Sync now"
+msgstr "Синхронизирай сега"
+
+#: src/postulo/plugins/views.py:238
+#, python-format, draft
+msgid "Synced: %(summary)s."
+msgstr "Синхронизирано: %(summary)s."
 
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -5472,12 +5565,12 @@ msgstr "Шаблон"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Шаблоните се появяват, когато изпращате писмо с кандидатура."
 
-#: src/postulo/templates/connections/list.html:48
+#: src/postulo/templates/connections/list.html:53
 #, draft
 msgid "Test"
 msgstr "Тест"
 
-#: src/postulo/plugins/views.py:187
+#: src/postulo/plugins/views.py:188
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Тестът се провали: %(message)s"
@@ -5591,7 +5684,7 @@ msgstr "Тази страница върна %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Тази снимка е над 5 MB. По-малка, моля."
 
-#: src/postulo/plugins/views.py:173
+#: src/postulo/plugins/views.py:174
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Тази добавка вече не е инсталирана."
@@ -5601,7 +5694,7 @@ msgstr "Тази добавка вече не е инсталирана."
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "PDF модулът %(name)s е конфигуриран, но не е използваем. %(hint)s"
 
-#: src/postulo/documents/archiving.py:106
+#: src/postulo/documents/archiving.py:106 src/postulo/plugins/syncing.py:75
 #, python-format, draft
 msgid "The %(plugin)s plugin is not installed."
 msgstr "Приставката %(plugin)s не е инсталирана."
@@ -6208,6 +6301,11 @@ msgstr "версия"
 msgid "Version"
 msgstr "Версия"
 
+#: src/postulo/plugins/models.py:131
+#, draft
+msgid "version tag"
+msgstr "етикет на версия"
+
 #: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "Versions you have sent"
@@ -6717,7 +6815,7 @@ msgid ""
 msgstr ""
 "Вашето име и блокът с контакти, който ще бъде отпечатан на CV-тата ви. Как Postulo се държи с вас — тема, език, потребителско име, адреси — е в <a href=\"%(settings_url)s\" class=\"underline\">Настройки</a>."
 
-#: src/postulo/plugins/models.py:41
+#: src/postulo/plugins/models.py:43
 #, draft
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "Вашето име за нея: „Telegram“, „Paperless у дома“."

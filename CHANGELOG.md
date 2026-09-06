@@ -18,6 +18,16 @@ All notable changes to Postulo are recorded here. The format follows
   *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
   switch per document kind, *Send to stores now* tries at once, *Send everything* queues
   what existed before the store did, and the references travel in the export. (#13)
+- **Synchronisation plugins, and postulo-dav as the first.** A plugin in the
+  `postulo.syncs` group keeps records here and elsewhere the same, in both directions;
+  the core gives it a connection, a `SyncLink` side table for the remote twin of each
+  record, an interval per connection that the scheduler honours, a *Sync now* button, and
+  a place on the connection for its last report. postulo-dav puts company contacts in a
+  CardDAV address book and interviews in a CalDAV calendar — Nextcloud, Radicale, Baïkal,
+  SOGo, Fastmail and the rest — in a dedicated *Postulo* collection each, so a personal
+  address book is never imported into a job tracker. The later change wins and the losing
+  version is kept as a note; a deletion on the phone never deletes here. Lives at
+  [postulo/postulo-dav](https://source.tiagoagueda.com/postulo/postulo-dav). (#16)
 - **postulo-paperless, the first store plugin.** Connect a Paperless-ngx archive and
   every document Postulo renders or receives is filed there: the company as
   correspondent, the kind as document type, a `postulo` tag, and a custom field that

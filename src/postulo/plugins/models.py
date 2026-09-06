@@ -8,6 +8,8 @@ answers. One person may hold several connections to the same plugin.
 
 from __future__ import annotations
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -46,6 +48,9 @@ class Connection(OwnedModel):
 
     last_ok_at = models.DateTimeField(_("last worked"), null=True, blank=True)
     last_error = models.TextField(_("last error"), blank=True)
+    #: For syncs: when the plugin last ran, whatever the outcome, and what it reported.
+    synced_at = models.DateTimeField(_("last run"), null=True, blank=True)
+    last_summary = models.TextField(_("last run's report"), blank=True)
 
     objects = ConnectionQuerySet.as_manager()
 
@@ -101,3 +106,67 @@ class Connection(OwnedModel):
         else:
             self.last_error = message or str(_("Failed without saying why."))
         self.save(update_fields=["last_ok_at", "last_error", "updated_at"])
+
+
+class SyncLink(OwnedModel):
+    """One local record's twin on the other side of a sync connection.
+
+    The remote address, the identifier the remote knows the record by, the version tag it
+    last gave, and a hash of what was last pushed — kept here, beside the record, never
+    on it. A contact stays a contact; that it also lives in an address book is this
+    connection's business. When the other side deletes the twin, the link is kept with
+    ``remote_gone`` set rather than the local record deleted: a swipe on a phone must not
+    erase an interview.
+    """
+
+    connection = models.ForeignKey(
+        Connection, on_delete=models.CASCADE, related_name="links", verbose_name=_("connection")
+    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveBigIntegerField()
+    target = GenericForeignKey("content_type", "object_id")
+
+    remote_href = models.CharField(_("remote address"), max_length=500, blank=True)
+    uid = models.CharField(_("identifier"), max_length=200, blank=True)
+    etag = models.CharField(_("version tag"), max_length=200, blank=True)
+    local_hash = models.CharField(_("last pushed"), max_length=64, blank=True)
+    last_synced_at = models.DateTimeField(_("last synced"), null=True, blank=True)
+    remote_gone = models.BooleanField(_("removed on the other side"), default=False)
+
+    class Meta:
+        verbose_name = _("sync link")
+        verbose_name_plural = _("sync links")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("connection", "content_type", "object_id"), name="synclink_one_per_record"
+            ),
+        ]
+        indexes = [models.Index(fields=("connection", "remote_href"))]
+
+    def __str__(self) -> str:
+        return f"{self.content_type.model} {self.object_id} ↔ {self.remote_href or self.uid}"
+
+    @classmethod
+    def for_record(cls, connection: Connection, record):
+        """The link of ``record`` on ``connection``, or ``None``."""
+        return cls.objects.filter(
+            connection=connection,
+            content_type=ContentType.objects.get_for_model(record),
+            object_id=record.pk,
+        ).first()
+
+    @classmethod
+    def of_model(cls, connection: Connection, model):
+        return cls.objects.filter(
+            connection=connection, content_type=ContentType.objects.get_for_model(model)
+        )
+
+    @classmethod
+    def bind(cls, connection: Connection, record, **values) -> SyncLink:
+        link, _created = cls.objects.update_or_create(
+            connection=connection,
+            content_type=ContentType.objects.get_for_model(record),
+            object_id=record.pk,
+            defaults={"owner": connection.owner, **values},
+        )
+        return link
