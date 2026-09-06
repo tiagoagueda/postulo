@@ -407,10 +407,74 @@ a second call finds the first suggestion and changes nothing, whether it is wait
 accepted or declined. That is what lets a mailbox be read every five minutes without
 asking the same question twice.
 
-## Getting a plugin into the container
+## Getting a plugin into an instance
+
+**From the interface.** *Server settings → Plugins* installs a wheel an administrator
+uploads, or a plugin named in a configured catalogue. Plugins land in
+`POSTULO_PLUGINS_DIR` — on the data volume, not in the environment — which is added to the
+import path at startup, with a `plugins.json` beside them recording what is installed and
+where it came from. Because the record is on the volume, an upgrade cannot lose them: the
+container's entry point runs `manage.py plugins sync` at boot and reinstalls what the
+record lists and the new environment lacks.
+
+Three things are refused, each with the reason: a wheel that is not `py3-none-any` (the
+image has no compiler), a package with no `postulo.*` entry point (installing it would do
+nothing), and a dependency that would move one of Postulo's own — every install runs with
+the running environment as a constraint.
+
+**From the command line**, which is the same code:
+
+```sh
+manage.py plugins list
+manage.py plugins install ./postulo_apprise-0.1.0-py3-none-any.whl
+manage.py plugins install postulo-apprise      # by name, from a catalogue
+manage.py plugins disable postulo-apprise      # stops it loading; the files stay
+manage.py plugins remove postulo-apprise
+manage.py plugins sync                         # what the entry point runs at boot
+```
+
+## Publishing to a catalogue
+
+A catalogue is one JSON file listing plugins, and beside it a detached Ed25519 signature
+over exactly those bytes. An administrator configures it as
+`POSTULO_PLUGIN_CATALOGUES=name|url|public-key`; without the key there is no catalogue,
+because an unsigned list of URLs to run code from is not something Postulo will offer. The
+index is fetched when somebody presses *Check for updates*, never on its own.
+
+```json
+{
+  "plugins": [
+    {
+      "name": "postulo-apprise",
+      "summary": "Notifications through Apprise",
+      "maintainer": "Tiago Agueda",
+      "licence": "AGPL-3.0-or-later",
+      "repository": "https://source.tiagoagueda.com/postulo/postulo-apprise",
+      "releases": [
+        {
+          "version": "0.1.0",
+          "url": "https://…/postulo_apprise-0.1.0-py3-none-any.whl",
+          "sha256": "…",
+          "requires_postulo": ">=0.2",
+          "provides": ["postulo.notifiers:apprise"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+Newest release first. Every wheel is checked against the SHA-256 the *signed* index
+carries, so a mirror or a hijacked download host cannot ship code. Being listed means the
+people who publish that catalogue looked at the plugin — its contract, its licence, that
+it does nothing with the network or with secrets beyond what it says. That is a review,
+not a guarantee, and the page says so.
+
+## Getting a plugin into the container image
 
 The image installs a locked environment at build time and runs as a user that cannot
-write to it, so `pip install` inside a running container does not last. Two ways do:
+write to it. Installing through the interface handles that by putting plugins on the
+volume; to bake one into the image instead:
 
 ```sh
 # 1. A build argument: any number of packages, in the form pip accepts.

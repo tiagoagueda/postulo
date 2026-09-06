@@ -31,6 +31,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.12 /uv /usr/local/bin/uv
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
+    POSTULO_PLUGINS_DIR=/app/data/plugins \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/app/.venv \
@@ -94,7 +95,7 @@ RUN POSTULO_SECRET_KEY=build-time-only-not-a-secret \
 COPY docker/entrypoint.sh /usr/local/bin/postulo-entrypoint
 RUN chmod +x /usr/local/bin/postulo-entrypoint \
     && useradd --system --create-home --uid 1000 postulo \
-    && mkdir -p /app/data/media /app/data/backups \
+    && mkdir -p /app/data/media /app/data/backups /app/data/plugins \
     && chown -R postulo:postulo /app/data
 
 # Nothing here needs root, and the data directory is the only thing it writes to.

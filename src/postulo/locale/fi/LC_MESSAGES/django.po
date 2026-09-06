@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 13:29+0000\n"
+"POT-Creation-Date: 2026-09-06 13:54+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -160,6 +160,18 @@ msgstr "%(language)s — konekäännös, odottaa tarkistusta"
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s–%(high)s"
 
+#: src/postulo/core/server_views.py:620
+#, python-format, draft
+msgid "%(name)s %(version)s is installed from the catalogue."
+msgstr "%(name)s %(version)s on asennettu luettelosta."
+
+#: src/postulo/core/server_views.py:570
+#, python-format, draft
+msgid ""
+"%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
+msgstr ""
+"%(name)s %(version)s on asennettu. Käynnistä Postulo uudelleen, jos se lisää omia sivujaan; kaikki muu on käytettävissä heti."
+
 #: src/postulo/templates/server/person_delete.html:8
 #, python-format, draft
 msgid ""
@@ -167,35 +179,76 @@ msgid ""
 msgstr ""
 "%(name)s (<strong>%(username)s</strong>, %(email)s) ja kaikki, mitä tili omistaa: hakemukset, yritykset, asiakirjat ja niiden takana olevat tiedostot, muistutukset, tunnisteavaimet, yhteydet. Tiedostot poistetaan levyltä. Mikään ei tuo niitä takaisin."
 
-#: src/postulo/core/server_views.py:191
+#: src/postulo/core/server_views.py:193
 #, python-format, draft
 msgid "%(name)s can sign in again."
 msgstr "%(name)s voi kirjautua taas sisään."
 
-#: src/postulo/core/server_views.py:186
+#: src/postulo/plugins/installing.py:310
+#, python-format, draft
+msgid ""
+"%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
+msgstr ""
+"%(name)s ei ilmoita yhtään Postulon liityntäkohtaa, joten sen asentaminen ei tekisi mitään. Lisäosa rekisteröityy johonkin näistä: %(groups)s."
+
+#: src/postulo/plugins/installing.py:376
+#, python-format, draft
+msgid "%(name)s does not match the checksum it was published with."
+msgstr "%(name)s ei vastaa tarkistussummaa, jolla se julkaistiin."
+
+#: src/postulo/core/server_views.py:188
 #, python-format, draft
 msgid "%(name)s is deactivated: nothing deleted, no sign-in."
 msgstr "%(name)s on passivoitu: mitään ei poistettu, kirjautuminen estetty."
 
-#: src/postulo/core/server_views.py:244
+#: src/postulo/core/server_views.py:246
 #, python-format, draft
 msgid "%(name)s is gone: the account, its records and %(files)s files on disk."
 msgstr "%(name)s on poissa: tili, sen tietueet ja %(files)s tiedostoa levyltä."
 
-#: src/postulo/core/server_views.py:161
+#: src/postulo/core/server_views.py:163
 #, python-format, draft
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s ei ole enää ylläpitäjä."
 
-#: src/postulo/core/server_views.py:280
+#: src/postulo/plugins/installing.py:412 src/postulo/plugins/installing.py:466
+#, python-format, draft
+msgid "%(name)s is not installed."
+msgstr "%(name)s ei ole asennettu."
+
+#: src/postulo/plugins/installing.py:300
+#, python-format, draft
+msgid ""
+"%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
+msgstr ""
+"%(name)s ei ole puhdasta Pythonia. Postulo asentaa vain kaikille alustoille käännettyjä wheel-paketteja (py3-none-any); tässä vedoksessa ei ole kääntäjää."
+
+#: src/postulo/core/server_views.py:282
 #, python-format, draft
 msgid "%(name)s is now @%(username)s."
 msgstr "%(name)s on nyt @%(username)s."
 
-#: src/postulo/core/server_views.py:167
+#: src/postulo/core/server_views.py:169
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s on nyt ylläpitäjä."
+
+#: src/postulo/core/server_views.py:662
+#, python-format, draft
+msgid ""
+"%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
+msgstr ""
+"%(name)s on poistettu. Käynnistä Postulo uudelleen varmistaaksesi, ettei siitä ole mitään ladattuna."
+
+#: src/postulo/core/server_views.py:646
+#, python-format, draft
+msgid "%(name)s is switched off; its files are still here."
+msgstr "%(name)s on kytketty pois; sen tiedostot ovat yhä täällä."
+
+#: src/postulo/core/server_views.py:648
+#, python-format, draft
+msgid "%(name)s is switched on again."
+msgstr "%(name)s on taas kytketty päälle."
 
 #: src/postulo/templates/server/person_username.html:8
 #, python-format, draft
@@ -203,6 +256,11 @@ msgid ""
 "%(name)s signs in as <strong>%(current)s</strong>. The new username must be free on this instance; capitals do not make it different."
 msgstr ""
 "%(name)s kirjautuu nimellä <strong>%(current)s</strong>. Uuden käyttäjänimen on oltava vapaa tässä instanssissa; isot kirjaimet eivät erota sitä."
+
+#: src/postulo/plugins/installing.py:320
+#, python-format, draft
+msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
+msgstr "%(name)s muuttaisi sitä, mistä Postulo itse riippuu. %(problems)s"
 
 #: src/postulo/documents/rendering.py:196
 #, python-format, draft
@@ -218,6 +276,11 @@ msgstr "%(name)s — CV"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/installing.py:286
+#, python-format, draft
+msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
+msgstr "%(package)s: vaatii %(wanted)s, ja Postulolla on %(have)s."
 
 #: src/postulo/plugins/forms.py:136
 #, python-format, draft
@@ -273,6 +336,16 @@ msgid_plural "%(total)s highlights"
 msgstr[0] "%(total)s kohokohta"
 msgstr[1] "%(total)s kohokohtaa"
 
+#: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
+#, python-format, draft
+msgid "%(url)s answered %(code)s."
+msgstr "%(url)s vastasi %(code)s."
+
+#: src/postulo/plugins/catalogue.py:198
+#, python-format, draft
+msgid "%(url)s is far larger than a catalogue should be."
+msgstr "%(url)s on paljon suurempi kuin luettelon pitäisi olla."
+
 #: src/postulo/templates/server/overview.html:50
 #, python-format, draft
 msgid "%(when)s ago"
@@ -322,12 +395,12 @@ msgstr "Vihje käyttöliittymälle, esimerkiksi ”amber” tai ”sky”."
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Rivi nimen alla kirjautumissivulla. Valinnainen."
 
-#: src/postulo/templates/server/plugins.html:33
+#: src/postulo/templates/server/plugins.html:209
 #, python-format, draft
 msgid ""
-"A package registers a source under the <code>%(group)s</code> entry-point group and is picked up on the next start. A source that fails to load is logged and left out; the built-in ones keep working."
+"A package registers a source under the <code>%(group)s</code> entry-point group. A plugin that only registers entry points appears as soon as it is installed; one that adds pages of its own needs a restart. A source that fails to load is logged and left out, and the built-in ones keep working."
 msgstr ""
-"Paketti rekisteröi lähteen entry point -ryhmään <code>%(group)s</code>, ja se otetaan käyttöön seuraavassa käynnistyksessä. Lähde, jonka lataus epäonnistuu, kirjataan lokiin ja jätetään pois; sisäänrakennetut toimivat edelleen."
+"Paketti rekisteröi lähteen liityntäkohtaryhmässä <code>%(group)s</code>. Lisäosa, joka rekisteröi vain liityntäkohtia, ilmestyy heti asennuksen jälkeen; sellainen, joka lisää omia sivujaan, vaatii uudelleenkäynnistyksen. Lähde, joka ei lataudu, kirjataan lokiin ja jätetään pois, ja sisäänrakennetut toimivat edelleen."
 
 #: src/postulo/templates/core/dashboard.html:23
 #, python-format, draft
@@ -363,6 +436,13 @@ msgstr ""
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Profiili GitHubissa, Forgejossa, GitLabissa tai vastaavassa."
+
+#: src/postulo/templates/server/plugins.html:110
+#, draft
+msgid ""
+"A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it says about itself and shows you that before anything is installed."
+msgstr ""
+"Python-wheel (<code>.whl</code>), joka on rakennettu kaikille alustoille. Postulo lukee, mitä se sanoo itsestään, ja näyttää sen sinulle ennen kuin mitään asennetaan."
 
 #: src/postulo/notifications/base.py:27
 #, draft
@@ -404,7 +484,7 @@ msgid ""
 msgstr ""
 "Malli, jossa on Postulon omat sarakkeet ja yksi esimerkkirivi. Täytä se ja lataa yllä."
 
-#: src/postulo/core/server_views.py:414
+#: src/postulo/core/server_views.py:416
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Testiviesti lähettäjältä %(name)s"
@@ -958,7 +1038,7 @@ msgstr "leipäteksti"
 msgid "Bringing a spreadsheet in"
 msgstr "Taulukon tuominen"
 
-#: src/postulo/templates/server/plugins.html:25
+#: src/postulo/templates/server/plugins.html:201
 #, draft
 msgid "built in"
 msgstr "sisäänrakennettu"
@@ -1029,6 +1109,7 @@ msgstr "Paluu-URL rekisteröitäväksi tarjoajalle"
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
+#: src/postulo/templates/server/plugins.html:102
 #, draft
 msgid "Cancel"
 msgstr "Peruuta"
@@ -1039,7 +1120,7 @@ msgstr "Peruuta"
 msgid "Cancelled"
 msgstr "Peruttu"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:344
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:346
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1081,6 +1162,11 @@ msgstr "Kaappaus hylätty."
 #, draft
 msgid "Capture postings"
 msgstr "Kaappaa ilmoituksia"
+
+#: src/postulo/templates/server/plugins.html:185
+#, draft
+msgid "Capture sources this instance has"
+msgstr "Tämän palvelimen poimintalähteet"
 
 #: src/postulo/jobs/models.py:545
 #, draft
@@ -1124,6 +1210,11 @@ msgstr "urasivu"
 #, draft
 msgid "Careers page"
 msgstr "Urasivu"
+
+#: src/postulo/templates/server/plugins.html:123
+#, draft
+msgid "Catalogues"
+msgstr "Luettelot"
 
 #: src/postulo/documents/models.py:193
 #, draft
@@ -1187,10 +1278,25 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Kysy yritykseltä %(company)s tehtävästä %(role)s"
 
+#: src/postulo/templates/server/plugins.html:133
+#, draft
+msgid "Check for updates"
+msgstr "Tarkista päivitykset"
+
 #: src/postulo/documents/models.py:287
 #, draft
 msgid "checksum"
 msgstr "tarkistussumma"
+
+#: src/postulo/templates/server/plugins.html:95
+#, draft
+msgid "Checksum"
+msgstr "Tarkistussumma"
+
+#: src/postulo/core/server_views.py:501
+#, draft
+msgid "Choose a package first."
+msgstr "Valitse ensin paketti."
 
 #: src/postulo/templates/core/import_csv_map.html:102
 #, draft
@@ -1720,7 +1826,7 @@ msgstr "oletuskieli"
 msgid "default time zone"
 msgstr "oletusaikavyöhyke"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:364
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:366
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -1768,10 +1874,15 @@ msgstr "Poista tilini ja kaikki sen sisältö"
 msgid "Delete the account"
 msgstr "Poista tili"
 
-#: src/postulo/core/server_views.py:207
+#: src/postulo/core/server_views.py:209
 #, draft
 msgid "Delete your own account from Settings, not from here."
 msgstr "Poista oma tilisi Asetuksista, ei täältä."
+
+#: src/postulo/templates/server/plugins.html:93
+#, draft
+msgid "Depends on"
+msgstr "Riippuu"
 
 #: src/postulo/applications/forms.py:76 src/postulo/core/csv_import.py:52
 #: src/postulo/templates/jobs/posting_detail.html:60
@@ -1968,7 +2079,7 @@ msgid "education"
 msgstr "koulutus"
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:391
+#: src/postulo/core/server_views.py:393
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:21
 #, draft
@@ -2594,6 +2705,11 @@ msgstr "kohokohdat"
 msgid "highlights for this CV"
 msgstr "kohokohdat tälle CV:lle"
 
+#: src/postulo/templates/server/plugins.html:90
+#, draft
+msgid "Home page"
+msgstr "Kotisivu"
+
 #: src/postulo/jobs/industries.py:35
 #, draft
 msgid "Hospitality and tourism"
@@ -2687,7 +2803,7 @@ msgstr "Tunnisteet"
 msgid "Identifies itself as"
 msgstr "Esittäytyy nimellä"
 
-#: src/postulo/core/server_views.py:416
+#: src/postulo/core/server_views.py:418
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -2833,12 +2949,37 @@ msgstr "Tietotekniikka"
 msgid "Insights"
 msgstr "Tilastot"
 
+#: src/postulo/templates/server/plugins.html:154
+#, draft
+msgid "Install"
+msgstr "Asenna"
+
+#: src/postulo/templates/server/plugins.html:79
+#, draft
+msgid "Install a package"
+msgstr "Asenna paketti"
+
+#: src/postulo/templates/server/plugins.html:101
+#, draft
+msgid "Install it"
+msgstr "Asenna se"
+
 #: src/postulo/documents/pdf.py:41
 #, draft
 msgid ""
 "Install it with: uv sync --extra chromium, then: uv run playwright install chromium"
 msgstr ""
 "Asenna komennolla: uv sync --extra chromium, sitten: uv run playwright install chromium"
+
+#: src/postulo/templates/server/plugins.html:22
+#, draft
+msgid "Installed on this instance"
+msgstr "Asennettu tälle palvelimelle"
+
+#: src/postulo/templates/server/plugins.html:11
+#, draft
+msgid "Installing a plugin runs somebody else's code inside Postulo."
+msgstr "Lisäosan asentaminen ajaa jonkun toisen koodia Postulon sisällä."
 
 #: src/postulo/core/models.py:105
 #, draft
@@ -2967,6 +3108,13 @@ msgstr "myöntäjä"
 #, draft
 msgid "issued on"
 msgstr "myönnetty"
+
+#: src/postulo/templates/server/plugins.html:13
+#, draft
+msgid ""
+"It can read and change everything on this instance, for every person on it. Install only what you have read or have reason to trust. Nothing is ever updated automatically: an update is a code change, and an administrator clicks it."
+msgstr ""
+"Se voi lukea ja muuttaa kaiken tällä palvelimella, jokaisen käyttäjän osalta. Asenna vain sellaista, jonka olet lukenut tai johon sinulla on syytä luottaa. Mitään ei koskaan päivitetä itsestään: päivitys on koodimuutos, ja ylläpitäjä napsauttaa sitä."
 
 #: src/postulo/applications/forms.py:279
 #, draft
@@ -3164,6 +3312,11 @@ msgstr "Lakiala"
 msgid "Legal Entity Identifier (LEI)"
 msgstr "Legal Entity Identifier (LEI)"
 
+#: src/postulo/templates/server/plugins.html:88
+#, draft
+msgid "Licence"
+msgstr "Lisenssi"
+
 #: src/postulo/accounts/models.py:139
 #, draft
 msgid "Light"
@@ -3270,6 +3423,11 @@ msgstr "ensisijainen yhteyshenkilö"
 #, draft
 msgid "Main contact"
 msgstr "Ensisijainen yhteyshenkilö"
+
+#: src/postulo/templates/server/plugins.html:89
+#, draft
+msgid "Maintainer"
+msgstr "Ylläpitäjä"
 
 #: src/postulo/templates/server/people.html:51
 #, draft
@@ -3419,6 +3577,7 @@ msgstr "Siirrä ylös"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
 #: src/postulo/templates/server/people.html:20
+#: src/postulo/templates/server/plugins.html:86
 #, draft
 msgid "Name"
 msgstr "Nimi"
@@ -3551,6 +3710,28 @@ msgstr "Ei"
 #, draft
 msgid "No address to send to."
 msgstr "Ei osoitetta, johon lähettää."
+
+#: src/postulo/plugins/catalogue.py:166
+#, python-format, draft
+msgid "No catalogue called “%(name)s” is configured."
+msgstr "Luetteloa nimeltä ”%(name)s” ei ole määritetty."
+
+#: src/postulo/plugins/catalogue.py:250
+#, draft
+msgid "No catalogue is configured on this instance."
+msgstr "Tälle palvelimelle ei ole määritetty luetteloa."
+
+#: src/postulo/templates/server/plugins.html:169
+#, draft
+msgid ""
+"No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
+msgstr ""
+"Luetteloa ei ole määritetty, joten lisäosat asennetaan lähettämästäsi paketista. Luettelo on allekirjoitettu lista lisäosista, jotka voi asentaa nimellä."
+
+#: src/postulo/plugins/catalogue.py:209
+#, python-format, draft
+msgid "No catalogue lists %(name)s."
+msgstr "Yksikään luettelo ei mainitse pakettia %(name)s."
 
 #: src/postulo/templates/jobs/company_list.html:44
 #, draft
@@ -3727,6 +3908,11 @@ msgstr "Ei minulle"
 msgid "Not found"
 msgstr "Ei löytynyt"
 
+#: src/postulo/templates/server/plugins.html:35
+#, draft
+msgid "not loaded"
+msgstr "ei ladattu"
+
 #: src/postulo/templates/applications/suggestion_list.html:50
 #, draft
 msgid "Not matched to an application."
@@ -3791,6 +3977,11 @@ msgstr "Muistiinpanot"
 msgid "notes"
 msgstr "muistiinpanot"
 
+#: src/postulo/templates/server/plugins.html:94
+#, draft
+msgid "nothing"
+msgstr "ei mitään"
+
 #: src/postulo/templates/core/dashboard.html:259
 #, draft
 msgid "Nothing due."
@@ -3824,6 +4015,13 @@ msgid ""
 "Nothing in the diary. When one is offered, schedule it from the application's page."
 msgstr ""
 "Ei mitään kalenterissa. Kun haastattelua tarjotaan, sovi se hakemuksen sivulta."
+
+#: src/postulo/templates/server/plugins.html:71
+#, python-format, draft
+msgid ""
+"Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
+msgstr ""
+"Täällä ei ole vielä mitään asennettuna. Lisäosat asuvat hakemistossa %(directory)s, datalevyllä, joten ne selviävät päivityksestä."
 
 #: src/postulo/templates/jobs/capture_form.html:49
 #, draft
@@ -3939,6 +4137,11 @@ msgstr "Mikään ei odota"
 msgid "Nothing was added."
 msgstr "Mitään ei lisätty."
 
+#: src/postulo/core/server_views.py:539
+#, draft
+msgid "Nothing was installed."
+msgstr "Mitään ei asennettu."
+
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
 #, draft
 msgid "Notifications"
@@ -3955,6 +4158,7 @@ msgid "notified on"
 msgstr "ilmoitettu"
 
 #: src/postulo/templates/connections/list.html:26
+#: src/postulo/templates/server/plugins.html:32
 #, draft
 msgid "Off"
 msgstr "Pois"
@@ -4114,7 +4318,7 @@ msgstr "järjestys"
 msgid "organisation"
 msgstr "organisaatio"
 
-#: src/postulo/templates/server/plugins.html:16
+#: src/postulo/templates/server/plugins.html:192
 #, draft
 msgid "Origin"
 msgstr "Alkuperä"
@@ -4157,7 +4361,7 @@ msgstr "Tulokset"
 msgid "Outstanding only"
 msgstr "Vain avoimet"
 
-#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:100
+#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:102
 #: src/postulo/templates/server/overview.html:5
 #, draft
 msgid "Overview"
@@ -4167,6 +4371,11 @@ msgstr "Yleiskatsaus"
 #, draft
 msgid "owner"
 msgstr "omistaja"
+
+#: src/postulo/templates/server/plugins.html:115
+#, draft
+msgid "Package"
+msgstr "Paketti"
 
 #: src/postulo/templates/applications/suggestion_list.html:107
 #: src/postulo/templates/jobs/listing_list.html:149
@@ -4240,8 +4449,8 @@ msgid "Pending only"
 msgstr "Vain odottavat"
 
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
-#: src/postulo/core/server_views.py:132 src/postulo/core/server_views.py:218
-#: src/postulo/core/server_views.py:235 src/postulo/core/server_views.py:260
+#: src/postulo/core/server_views.py:134 src/postulo/core/server_views.py:220
+#: src/postulo/core/server_views.py:237 src/postulo/core/server_views.py:262
 #: src/postulo/jobs/tables.py:50
 #: src/postulo/templates/jobs/company_detail.html:100
 #: src/postulo/templates/server/people.html:7
@@ -4329,7 +4538,7 @@ msgstr "liitännäinen"
 msgid "plugin not installed"
 msgstr "liitännäistä ei ole asennettu"
 
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:437
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:452
 #: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
 #, draft
 msgid "Plugins"
@@ -4460,6 +4669,13 @@ msgstr "valmistautumismuistiinpanot"
 msgid "present"
 msgstr "nykyhetki"
 
+#: src/postulo/templates/server/plugins.html:162
+#, draft
+msgid ""
+"Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
+msgstr ""
+"Paina Tarkista päivitykset hakeaksesi, mitä luettelot tarjoavat. Postulo ei hae niitä itsestään."
+
 #: src/postulo/templates/documents/cv_detail.html:16
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:18
@@ -4534,6 +4750,11 @@ msgstr "projektit"
 #, draft
 msgid "Provider"
 msgstr "Tarjoaja"
+
+#: src/postulo/templates/server/plugins.html:91
+#, draft
+msgid "Provides"
+msgstr "Tarjoaa"
 
 #: src/postulo/jobs/identifiers.py:83
 #, draft
@@ -4648,6 +4869,11 @@ msgid ""
 "Read from the timeline, so an interview that ended in a rejection still counts as an interview."
 msgstr ""
 "Luettu aikajanalta, joten hylkäykseen päättynyt haastattelu lasketaan silti haastatteluksi."
+
+#: src/postulo/templates/server/plugins.html:118
+#, draft
+msgid "Read it"
+msgstr "Lue se"
 
 #: src/postulo/templates/jobs/capture_form.html:36
 #, draft
@@ -4776,6 +5002,11 @@ msgstr "rekisteröityminen avoin"
 msgid "Registration open"
 msgstr "Rekisteröityminen avoin"
 
+#: src/postulo/templates/server/plugins.html:154
+#, draft
+msgid "Reinstall"
+msgstr "Asenna uudelleen"
+
 #: src/postulo/applications/models.py:47
 #: src/postulo/templates/applications/insights.html:247
 #, draft
@@ -4826,6 +5057,7 @@ msgstr "etäosoite"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
+#: src/postulo/templates/server/plugins.html:62
 #, draft
 msgid "Remove"
 msgstr "Poista"
@@ -5064,7 +5296,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Tallennettu ilmoituksiisi. Päätä, kun olet valmis."
 
 #: src/postulo/accounts/settings_views.py:32
-#: src/postulo/core/server_views.py:306 src/postulo/resume/views.py:111
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:111
 #, draft
 msgid "Saved."
 msgstr "Tallennettu."
@@ -5189,7 +5421,7 @@ msgstr "Lähetä vastaanottajalle"
 msgid "Send to stores now"
 msgstr "Lähetä säilöihin nyt"
 
-#: src/postulo/core/server_views.py:426
+#: src/postulo/core/server_views.py:428
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Lähetys epäonnistui: %(error)s"
@@ -5223,7 +5455,7 @@ msgstr "Lähetetyt asiakirjat"
 msgid "sent on"
 msgstr "lähetetty"
 
-#: src/postulo/core/server_views.py:429 src/postulo/notifications/email.py:80
+#: src/postulo/core/server_views.py:431 src/postulo/notifications/email.py:80
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Lähetetty: %(to)s."
@@ -5251,6 +5483,13 @@ msgstr "Palvelin"
 #, draft
 msgid "Server settings"
 msgstr "Palvelimen asetukset"
+
+#: src/postulo/templates/server/plugins.html:175
+#, draft
+msgid ""
+"Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code> entries, separated by commas. The index must be signed with that key, and every wheel must match the checksum the signed index carries, or nothing is installed."
+msgstr ""
+"Aseta <code>POSTULO_PLUGIN_CATALOGUES</code> arvoksi pilkuilla erotetut <code>name|url|public-key</code> -merkinnät. Hakemiston on oltava allekirjoitettu tuolla avaimella, ja jokaisen wheelin on vastattava allekirjoitetun hakemiston tarkistussummaa, tai mitään ei asenneta."
 
 #: src/postulo/applications/models.py:206
 #, draft
@@ -5347,7 +5586,7 @@ msgstr "Kirjaudu sisään"
 msgid "Sign out"
 msgstr "Kirjaudu ulos"
 
-#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:322
+#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:324
 #: src/postulo/templates/server/signin.html:5
 #, draft
 msgid "Sign-in"
@@ -5452,7 +5691,7 @@ msgid "Somebody already has that username."
 msgstr "Jollakulla on jo tuo käyttäjänimi."
 
 #: src/postulo/templates/applications/insights.html:144
-#: src/postulo/templates/server/plugins.html:14
+#: src/postulo/templates/server/plugins.html:190
 #, draft
 msgid "Source"
 msgstr "Lähde"
@@ -5594,6 +5833,16 @@ msgstr "korvattu"
 #, draft
 msgid "Supersedes"
 msgstr "Korvaa"
+
+#: src/postulo/templates/server/plugins.html:55
+#, draft
+msgid "Switch off"
+msgstr "Kytke pois"
+
+#: src/postulo/templates/server/plugins.html:55
+#, draft
+msgid "Switch on"
+msgstr "Kytke päälle"
 
 #: src/postulo/plugins/views.py:236
 #, python-format, draft
@@ -5769,6 +6018,11 @@ msgstr "Tuo kutsu on jo hyväksytty, eikä sitä voi perua."
 msgid "That is not a status Postulo recognises."
 msgstr "Tuo ei ole Postulon tuntema tila."
 
+#: src/postulo/plugins/installing.py:185
+#, draft
+msgid "That is not a wheel: Postulo installs .whl files."
+msgstr "Tuo ei ole wheel: Postulo asentaa .whl-tiedostoja."
+
 #: src/postulo/applications/views.py:519
 #, draft
 msgid "That is not an outcome Postulo recognises."
@@ -5779,21 +6033,31 @@ msgstr "Tuo ei ole Postulon tuntema tulos."
 msgid "That is not something Postulo can do about it."
 msgstr "Tuota Postulo ei voi sille tehdä."
 
+#: src/postulo/core/server_views.py:490
+#, draft
+msgid "That is not something this page does."
+msgstr "Tätä tämä sivu ei tee."
+
 #: src/postulo/accounts/views.py:230
 #, draft
 msgid "That is not the address on this account."
 msgstr "Tuo ei ole tämän tilin osoite."
 
-#: src/postulo/core/server_views.py:238
+#: src/postulo/core/server_views.py:240
 #, draft
 msgid "That is not the username."
 msgstr "Tuo ei ole käyttäjänimi."
 
-#: src/postulo/core/server_views.py:155 src/postulo/core/server_views.py:180
-#: src/postulo/core/server_views.py:209
+#: src/postulo/core/server_views.py:157 src/postulo/core/server_views.py:182
+#: src/postulo/core/server_views.py:211
 #, draft
 msgid "That is the last administrator. Appoint another first."
 msgstr "Tuo on viimeinen ylläpitäjä. Nimeä ensin toinen."
+
+#: src/postulo/core/server_views.py:548 src/postulo/core/server_views.py:553
+#, draft
+msgid "That package is no longer waiting; upload it again."
+msgstr "Tuo paketti ei enää odota; lähetä se uudelleen."
 
 #: src/postulo/plugins/fetching.py:205
 #, python-format, draft
@@ -5841,6 +6105,26 @@ msgstr "Lisäosaa %(plugin)s ei ole asennettu."
 msgid "The application deadline, if stated."
 msgstr "Hakuajan päättymispäivä, jos ilmoitettu."
 
+#: src/postulo/plugins/catalogue.py:127
+#, draft
+msgid "The catalogue is not readable JSON."
+msgstr "Luettelo ei ole luettavaa JSONia."
+
+#: src/postulo/plugins/catalogue.py:119
+#, draft
+msgid "The catalogue's signature does not match its contents; it was not used."
+msgstr "Luettelon allekirjoitus ei vastaa sen sisältöä; sitä ei käytetty."
+
+#: src/postulo/plugins/catalogue.py:115
+#, python-format, draft
+msgid "The catalogue's signature or key is not readable: %(error)s"
+msgstr "Luettelon allekirjoitus tai avain ei ole luettavissa: %(error)s"
+
+#: src/postulo/core/server_views.py:605
+#, draft
+msgid "The catalogues answered, and list nothing yet."
+msgstr "Luettelot vastasivat, eivätkä mainitse vielä mitään."
+
 #: src/postulo/templates/applications/application_intake.html:10
 #, draft
 msgid ""
@@ -5869,6 +6153,11 @@ msgid ""
 "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr ""
 "Kojelauta luettelee avoimet hakemukset, joissa ei ole tapahtunut mitään vähään aikaan eikä mitään ole suunnitteilla. Rekrytoijien omat neuvot asettuvat kahden–kolmen viikon tienoille."
+
+#: src/postulo/plugins/catalogue.py:232
+#, draft
+msgid "The download is far larger than a plugin should be."
+msgstr "Lataus on paljon suurempi kuin lisäosan pitäisi olla."
 
 #: src/postulo/documents/models.py:228
 #, draft
@@ -5902,6 +6191,16 @@ msgstr "Tiedosto on tyhjä."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Tiedosto on yli 2 Mt. Työnhaku ei ole niin suuri."
 
+#: src/postulo/plugins/installing.py:354
+#, python-format, draft
+msgid "The installer could not be run: %(error)s"
+msgstr "Asennusohjelmaa ei voitu ajaa: %(error)s"
+
+#: src/postulo/plugins/installing.py:358
+#, python-format, draft
+msgid "The installer refused it: %(error)s"
+msgstr "Asennusohjelma hylkäsi sen: %(error)s"
+
 #: src/postulo/documents/models.py:160
 #, draft
 msgid "The job title"
@@ -5922,7 +6221,7 @@ msgstr "Ilmoitus, joksi tämä kaappaus tarkistuksen jälkeen muuttui."
 msgid "The location"
 msgstr "Sijainti"
 
-#: src/postulo/core/server_views.py:431 src/postulo/notifications/email.py:79
+#: src/postulo/core/server_views.py:433 src/postulo/notifications/email.py:79
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Postipalvelin ei hyväksynyt mitään."
@@ -6012,6 +6311,16 @@ msgstr ""
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "Ylempi luku ei voi olla alempaa pienempi."
+
+#: src/postulo/plugins/catalogue.py:238
+#, draft
+msgid "The wheel does not match the checksum the catalogue published for it."
+msgstr "Wheel ei vastaa tarkistussummaa, jonka luettelo sille julkaisi."
+
+#: src/postulo/plugins/installing.py:190
+#, draft
+msgid "The wheel has no metadata; it may be damaged."
+msgstr "Wheelillä ei ole metatietoja; se voi olla vahingoittunut."
 
 #: src/postulo/accounts/models.py:191 src/postulo/documents/models.py:65
 #: src/postulo/documents/models.py:176
@@ -6106,6 +6415,11 @@ msgid ""
 "This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
 msgstr ""
 "Tämä on Postulo-ilmoitusyhteytesi testiviesti. Muistutukset ja kaappaukset saapuvat samaa reittiä."
+
+#: src/postulo/templates/server/plugins.html:83
+#, draft
+msgid "This is what you are about to install. Nothing has been installed yet."
+msgstr "Tämän olet asentamassa. Mitään ei ole vielä asennettu."
 
 #: src/postulo/jobs/forms.py:152
 #, draft
@@ -6438,7 +6752,7 @@ msgstr "Vahvistettu"
 msgid "version"
 msgstr "versio"
 
-#: src/postulo/templates/server/plugins.html:15
+#: src/postulo/templates/server/plugins.html:191
 #, draft
 msgid "Version"
 msgstr "Versio"
@@ -6572,6 +6886,11 @@ msgstr "Mitä se saa tehdä"
 msgid "what it says"
 msgstr "mitä siinä sanotaan"
 
+#: src/postulo/templates/server/plugins.html:87
+#, draft
+msgid "What it says it is"
+msgstr "Mitä se sanoo olevansa"
+
 #: src/postulo/templates/settings/locale.html:7
 #, draft
 msgid "What Postulo speaks to you, and whose clock it shows."
@@ -6597,9 +6916,9 @@ msgstr "Miksi tämä instanssi kutsuu itseään ja mistä uusi tili aloittaa."
 #: src/postulo/templates/server/plugins.html:7
 #, draft
 msgid ""
-"What this instance can read a posting with. Postulo's own sources ship in the box; others arrive as installed packages."
+"What this instance can read a posting with, be notified through, keep documents in, and synchronise with. Postulo's own implementations ship in the box; others are packages you install here."
 msgstr ""
-"Millä tämä instanssi voi lukea ilmoituksen. Postulon omat lähteet tulevat mukana; muut saapuvat asennettuina paketteina."
+"Millä tämä palvelin osaa lukea ilmoituksen, ilmoittaa sinulle, säilyttää asiakirjoja ja synkronoida. Postulon omat toteutukset ovat mukana; muut ovat paketteja, jotka asennat täällä."
 
 #: src/postulo/templates/server/overview.html:7
 #, draft
@@ -6861,7 +7180,7 @@ msgid ""
 msgstr ""
 "Voit poistaa tilisi itse: jokaisen tietueen, jokaisen tiedoston levyltä, avaimet, yhteydet ja tilin. Yllä oleva vienti on turvaverkko; ota se ensin."
 
-#: src/postulo/core/server_views.py:177
+#: src/postulo/core/server_views.py:179
 #, draft
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Et voi passivoida tiliä, jolla olet kirjautuneena."

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 13:29+0000\n"
+"POT-Creation-Date: 2026-09-06 13:54+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -172,6 +172,18 @@ msgstr "%(language)s — mašininis vertimas, laukia peržiūros"
 msgid "%(low)s to %(high)s"
 msgstr "nuo %(low)s iki %(high)s"
 
+#: src/postulo/core/server_views.py:620
+#, python-format, draft
+msgid "%(name)s %(version)s is installed from the catalogue."
+msgstr "%(name)s %(version)s įdiegtas iš katalogo."
+
+#: src/postulo/core/server_views.py:570
+#, python-format, draft
+msgid ""
+"%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
+msgstr ""
+"%(name)s %(version)s įdiegtas. Paleiskite Postulo iš naujo, jei jis prideda savo puslapių; visa kita veikia jau dabar."
+
 #: src/postulo/templates/server/person_delete.html:8
 #, python-format, draft
 msgid ""
@@ -179,35 +191,76 @@ msgid ""
 msgstr ""
 "%(name)s (<strong>%(username)s</strong>, %(email)s) ir viskas, kas priklauso paskyrai: paraiškos, įmonės, dokumentai ir už jų esantys failai, priminimai, žetonai, ryšiai. Failai ištrinami iš disko. Niekas jų nesugrąžins."
 
-#: src/postulo/core/server_views.py:191
+#: src/postulo/core/server_views.py:193
 #, python-format, draft
 msgid "%(name)s can sign in again."
 msgstr "%(name)s vėl gali prisijungti."
 
-#: src/postulo/core/server_views.py:186
+#: src/postulo/plugins/installing.py:310
+#, python-format, draft
+msgid ""
+"%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
+msgstr ""
+"%(name)s nedeklaruoja jokio Postulo įėjimo taško, tad jo įdiegimas nieko neduotų. Papildinys registruojasi vienoje iš: %(groups)s."
+
+#: src/postulo/plugins/installing.py:376
+#, python-format, draft
+msgid "%(name)s does not match the checksum it was published with."
+msgstr "%(name)s neatitinka kontrolinės sumos, su kuria buvo paskelbtas."
+
+#: src/postulo/core/server_views.py:188
 #, python-format, draft
 msgid "%(name)s is deactivated: nothing deleted, no sign-in."
 msgstr "%(name)s išjungtas: niekas neištrinta, prisijungti negalima."
 
-#: src/postulo/core/server_views.py:244
+#: src/postulo/core/server_views.py:246
 #, python-format, draft
 msgid "%(name)s is gone: the account, its records and %(files)s files on disk."
 msgstr "%(name)s nebėra: paskyra, jos įrašai ir %(files)s failų diske."
 
-#: src/postulo/core/server_views.py:161
+#: src/postulo/core/server_views.py:163
 #, python-format, draft
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s nebėra administratorius."
 
-#: src/postulo/core/server_views.py:280
+#: src/postulo/plugins/installing.py:412 src/postulo/plugins/installing.py:466
+#, python-format, draft
+msgid "%(name)s is not installed."
+msgstr "%(name)s neįdiegtas."
+
+#: src/postulo/plugins/installing.py:300
+#, python-format, draft
+msgid ""
+"%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
+msgstr ""
+"%(name)s nėra grynas Python. Postulo diegia tik bet kuriai platformai skirtus wheel failus (py3-none-any); šiame atvaizde nėra kompiliatoriaus."
+
+#: src/postulo/core/server_views.py:282
 #, python-format, draft
 msgid "%(name)s is now @%(username)s."
 msgstr "%(name)s dabar yra @%(username)s."
 
-#: src/postulo/core/server_views.py:167
+#: src/postulo/core/server_views.py:169
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s dabar yra administratorius."
+
+#: src/postulo/core/server_views.py:662
+#, python-format, draft
+msgid ""
+"%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
+msgstr ""
+"%(name)s pašalintas. Paleiskite Postulo iš naujo, kad būtumėte tikri, jog iš jo nieko neliko įkelta."
+
+#: src/postulo/core/server_views.py:646
+#, python-format, draft
+msgid "%(name)s is switched off; its files are still here."
+msgstr "%(name)s išjungtas; jo failai vis dar čia."
+
+#: src/postulo/core/server_views.py:648
+#, python-format, draft
+msgid "%(name)s is switched on again."
+msgstr "%(name)s vėl įjungtas."
 
 #: src/postulo/templates/server/person_username.html:8
 #, python-format, draft
@@ -215,6 +268,11 @@ msgid ""
 "%(name)s signs in as <strong>%(current)s</strong>. The new username must be free on this instance; capitals do not make it different."
 msgstr ""
 "%(name)s prisijungia kaip <strong>%(current)s</strong>. Naujas naudotojo vardas šioje instancijoje turi būti laisvas; didžiosios raidės jo neskiria."
+
+#: src/postulo/plugins/installing.py:320
+#, python-format, draft
+msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
+msgstr "%(name)s pakeistų tai, nuo ko priklauso pats Postulo. %(problems)s"
 
 #: src/postulo/documents/rendering.py:196
 #, python-format, draft
@@ -230,6 +288,11 @@ msgstr "%(name)s — CV"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/installing.py:286
+#, python-format, draft
+msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
+msgstr "%(package)s: reikia %(wanted)s, o Postulo turi %(have)s."
 
 #: src/postulo/plugins/forms.py:136
 #, python-format, draft
@@ -289,6 +352,16 @@ msgstr[0] "%(total)s pasiekimas"
 msgstr[1] "%(total)s pasiekimai"
 msgstr[2] "%(total)s pasiekimų"
 
+#: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
+#, python-format, draft
+msgid "%(url)s answered %(code)s."
+msgstr "%(url)s atsakė %(code)s."
+
+#: src/postulo/plugins/catalogue.py:198
+#, python-format, draft
+msgid "%(url)s is far larger than a catalogue should be."
+msgstr "%(url)s yra kur kas didesnis, nei turėtų būti katalogas."
+
 #: src/postulo/templates/server/overview.html:50
 #, python-format, draft
 msgid "%(when)s ago"
@@ -338,12 +411,12 @@ msgstr "Užuomina sąsajai, pvz., „amber“ arba „sky“."
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Eilutė po pavadinimu prisijungimo puslapyje. Neprivaloma."
 
-#: src/postulo/templates/server/plugins.html:33
+#: src/postulo/templates/server/plugins.html:209
 #, python-format, draft
 msgid ""
-"A package registers a source under the <code>%(group)s</code> entry-point group and is picked up on the next start. A source that fails to load is logged and left out; the built-in ones keep working."
+"A package registers a source under the <code>%(group)s</code> entry-point group. A plugin that only registers entry points appears as soon as it is installed; one that adds pages of its own needs a restart. A source that fails to load is logged and left out, and the built-in ones keep working."
 msgstr ""
-"Paketas registruoja šaltinį <code>%(group)s</code> įėjimo taškų grupėje ir yra aptinkamas kitą kartą paleidžiant. Neįkeliamas šaltinis registruojamas žurnale ir praleidžiamas; įmontuotieji veikia toliau."
+"Paketas registruoja šaltinį įėjimo taškų grupėje <code>%(group)s</code>. Papildinys, registruojantis tik įėjimo taškus, atsiranda iškart po įdiegimo; tas, kuris prideda savo puslapių, reikalauja perkrovimo. Šaltinis, kuris neįsikelia, užrašomas žurnale ir praleidžiamas, o įtaisytieji toliau veikia."
 
 #: src/postulo/templates/core/dashboard.html:23
 #, python-format, draft
@@ -381,6 +454,13 @@ msgstr ""
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Profilis „GitHub“, „Forgejo“, „GitLab“ ar panašiai."
+
+#: src/postulo/templates/server/plugins.html:110
+#, draft
+msgid ""
+"A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it says about itself and shows you that before anything is installed."
+msgstr ""
+"Python wheel (<code>.whl</code>), sukurtas bet kuriai platformai. Postulo perskaito, ką jis sako apie save, ir parodo tai jums prieš ką nors įdiegdamas."
 
 #: src/postulo/notifications/base.py:27
 #, draft
@@ -422,7 +502,7 @@ msgid ""
 msgstr ""
 "Šablonas su Postulo stulpeliais ir viena pavyzdine eilute. Užpildykite jį ir įkelkite aukščiau."
 
-#: src/postulo/core/server_views.py:414
+#: src/postulo/core/server_views.py:416
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Bandomasis pranešimas nuo %(name)s"
@@ -976,7 +1056,7 @@ msgstr "tekstas"
 msgid "Bringing a spreadsheet in"
 msgstr "Skaičiuoklės įkėlimas"
 
-#: src/postulo/templates/server/plugins.html:25
+#: src/postulo/templates/server/plugins.html:201
 #, draft
 msgid "built in"
 msgstr "įmontuotas"
@@ -1047,6 +1127,7 @@ msgstr "Grąžinimo URL, registruotinas pas teikėją"
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
+#: src/postulo/templates/server/plugins.html:102
 #, draft
 msgid "Cancel"
 msgstr "Atšaukti"
@@ -1057,7 +1138,7 @@ msgstr "Atšaukti"
 msgid "Cancelled"
 msgstr "Atšaukta"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:344
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:346
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1099,6 +1180,11 @@ msgstr "Fiksavimas atmestas."
 #, draft
 msgid "Capture postings"
 msgstr "Fiksuoti skelbimus"
+
+#: src/postulo/templates/server/plugins.html:185
+#, draft
+msgid "Capture sources this instance has"
+msgstr "Šio egzemplioriaus fiksavimo šaltiniai"
 
 #: src/postulo/jobs/models.py:545
 #, draft
@@ -1142,6 +1228,11 @@ msgstr "karjeros puslapis"
 #, draft
 msgid "Careers page"
 msgstr "Karjeros puslapis"
+
+#: src/postulo/templates/server/plugins.html:123
+#, draft
+msgid "Catalogues"
+msgstr "Katalogai"
 
 #: src/postulo/documents/models.py:193
 #, draft
@@ -1205,10 +1296,25 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Priminti %(company)s apie %(role)s"
 
+#: src/postulo/templates/server/plugins.html:133
+#, draft
+msgid "Check for updates"
+msgstr "Tikrinti atnaujinimus"
+
 #: src/postulo/documents/models.py:287
 #, draft
 msgid "checksum"
 msgstr "kontrolinė suma"
+
+#: src/postulo/templates/server/plugins.html:95
+#, draft
+msgid "Checksum"
+msgstr "Kontrolinė suma"
+
+#: src/postulo/core/server_views.py:501
+#, draft
+msgid "Choose a package first."
+msgstr "Pirmiausia pasirinkite paketą."
 
 #: src/postulo/templates/core/import_csv_map.html:102
 #, draft
@@ -1738,7 +1844,7 @@ msgstr "numatytoji kalba"
 msgid "default time zone"
 msgstr "numatytoji laiko juosta"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:364
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:366
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -1786,10 +1892,15 @@ msgstr "Ištrinti mano paskyrą ir viską joje"
 msgid "Delete the account"
 msgstr "Ištrinti paskyrą"
 
-#: src/postulo/core/server_views.py:207
+#: src/postulo/core/server_views.py:209
 #, draft
 msgid "Delete your own account from Settings, not from here."
 msgstr "Savo paskyrą ištrinkite Nustatymuose, ne čia."
+
+#: src/postulo/templates/server/plugins.html:93
+#, draft
+msgid "Depends on"
+msgstr "Priklauso nuo"
 
 #: src/postulo/applications/forms.py:76 src/postulo/core/csv_import.py:52
 #: src/postulo/templates/jobs/posting_detail.html:60
@@ -1987,7 +2098,7 @@ msgid "education"
 msgstr "išsilavinimas"
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:391
+#: src/postulo/core/server_views.py:393
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:21
 #, draft
@@ -2612,6 +2723,11 @@ msgstr "pasiekimai"
 msgid "highlights for this CV"
 msgstr "pasiekimai šiam CV"
 
+#: src/postulo/templates/server/plugins.html:90
+#, draft
+msgid "Home page"
+msgstr "Pradžios puslapis"
+
 #: src/postulo/jobs/industries.py:35
 #, draft
 msgid "Hospitality and tourism"
@@ -2705,7 +2821,7 @@ msgstr "Identifikatoriai"
 msgid "Identifies itself as"
 msgstr "Prisistato kaip"
 
-#: src/postulo/core/server_views.py:416
+#: src/postulo/core/server_views.py:418
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -2851,12 +2967,37 @@ msgstr "Informacinės technologijos"
 msgid "Insights"
 msgstr "Įžvalgos"
 
+#: src/postulo/templates/server/plugins.html:154
+#, draft
+msgid "Install"
+msgstr "Įdiegti"
+
+#: src/postulo/templates/server/plugins.html:79
+#, draft
+msgid "Install a package"
+msgstr "Įdiegti paketą"
+
+#: src/postulo/templates/server/plugins.html:101
+#, draft
+msgid "Install it"
+msgstr "Įdiek jį"
+
 #: src/postulo/documents/pdf.py:41
 #, draft
 msgid ""
 "Install it with: uv sync --extra chromium, then: uv run playwright install chromium"
 msgstr ""
 "Įdiekite su: uv sync --extra chromium, tada: uv run playwright install chromium"
+
+#: src/postulo/templates/server/plugins.html:22
+#, draft
+msgid "Installed on this instance"
+msgstr "Įdiegta šiame egzemplioriuje"
+
+#: src/postulo/templates/server/plugins.html:11
+#, draft
+msgid "Installing a plugin runs somebody else's code inside Postulo."
+msgstr "Papildinio įdiegimas paleidžia svetimą kodą Postulo viduje."
 
 #: src/postulo/core/models.py:105
 #, draft
@@ -2985,6 +3126,13 @@ msgstr "išdavė"
 #, draft
 msgid "issued on"
 msgstr "išduota"
+
+#: src/postulo/templates/server/plugins.html:13
+#, draft
+msgid ""
+"It can read and change everything on this instance, for every person on it. Install only what you have read or have reason to trust. Nothing is ever updated automatically: an update is a code change, and an administrator clicks it."
+msgstr ""
+"Jis gali skaityti ir keisti viską šiame egzemplioriuje, kiekvieno žmogaus duomenis. Diekite tik tai, ką perskaitėte arba kuo turite pagrindo pasitikėti. Niekas niekada neatsinaujina savaime: atnaujinimas yra kodo pakeitimas, ir jį paspaudžia administratorius."
 
 #: src/postulo/applications/forms.py:279
 #, draft
@@ -3182,6 +3330,11 @@ msgstr "Teisė"
 msgid "Legal Entity Identifier (LEI)"
 msgstr "Juridinio asmens identifikatorius (LEI)"
 
+#: src/postulo/templates/server/plugins.html:88
+#, draft
+msgid "Licence"
+msgstr "Licencija"
+
 #: src/postulo/accounts/models.py:139
 #, draft
 msgid "Light"
@@ -3288,6 +3441,11 @@ msgstr "pagrindinis kontaktas"
 #, draft
 msgid "Main contact"
 msgstr "Pagrindinis kontaktas"
+
+#: src/postulo/templates/server/plugins.html:89
+#, draft
+msgid "Maintainer"
+msgstr "Prižiūrėtojas"
 
 #: src/postulo/templates/server/people.html:51
 #, draft
@@ -3437,6 +3595,7 @@ msgstr "Aukštyn"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
 #: src/postulo/templates/server/people.html:20
+#: src/postulo/templates/server/plugins.html:86
 #, draft
 msgid "Name"
 msgstr "Pavadinimas"
@@ -3569,6 +3728,28 @@ msgstr "Ne"
 #, draft
 msgid "No address to send to."
 msgstr "Nėra adreso, kuriuo siųsti."
+
+#: src/postulo/plugins/catalogue.py:166
+#, python-format, draft
+msgid "No catalogue called “%(name)s” is configured."
+msgstr "Nėra sukonfigūruoto katalogo pavadinimu „%(name)s“."
+
+#: src/postulo/plugins/catalogue.py:250
+#, draft
+msgid "No catalogue is configured on this instance."
+msgstr "Šiame egzemplioriuje nėra sukonfigūruoto katalogo."
+
+#: src/postulo/templates/server/plugins.html:169
+#, draft
+msgid ""
+"No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
+msgstr ""
+"Nėra sukonfigūruoto katalogo, tad papildiniai diegiami iš jūsų įkelto paketo. Katalogas – tai pasirašytas papildinių sąrašas, iš kurio galima diegti pagal pavadinimą."
+
+#: src/postulo/plugins/catalogue.py:209
+#, python-format, draft
+msgid "No catalogue lists %(name)s."
+msgstr "Joks katalogas nenurodo %(name)s."
 
 #: src/postulo/templates/jobs/company_list.html:44
 #, draft
@@ -3745,6 +3926,11 @@ msgstr "Ne man"
 msgid "Not found"
 msgstr "Nerasta"
 
+#: src/postulo/templates/server/plugins.html:35
+#, draft
+msgid "not loaded"
+msgstr "neįkelta"
+
 #: src/postulo/templates/applications/suggestion_list.html:50
 #, draft
 msgid "Not matched to an application."
@@ -3809,6 +3995,11 @@ msgstr "Pastabos"
 msgid "notes"
 msgstr "pastabos"
 
+#: src/postulo/templates/server/plugins.html:94
+#, draft
+msgid "nothing"
+msgstr "nieko"
+
 #: src/postulo/templates/core/dashboard.html:259
 #, draft
 msgid "Nothing due."
@@ -3842,6 +4033,13 @@ msgid ""
 "Nothing in the diary. When one is offered, schedule it from the application's page."
 msgstr ""
 "Dienoraštyje nieko nėra. Kai pasiūlys, suplanuokite iš paraiškos puslapio."
+
+#: src/postulo/templates/server/plugins.html:71
+#, python-format, draft
+msgid ""
+"Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
+msgstr ""
+"Čia dar nieko neįdiegta. Papildiniai gyvena aplanke %(directory)s, duomenų tome, tad išgyvena atnaujinimą."
 
 #: src/postulo/templates/jobs/capture_form.html:49
 #, draft
@@ -3956,6 +4154,11 @@ msgstr "Niekas nelaukia"
 msgid "Nothing was added."
 msgstr "Niekas nepridėta."
 
+#: src/postulo/core/server_views.py:539
+#, draft
+msgid "Nothing was installed."
+msgstr "Nieko nebuvo įdiegta."
+
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
 #, draft
 msgid "Notifications"
@@ -3972,6 +4175,7 @@ msgid "notified on"
 msgstr "pranešta"
 
 #: src/postulo/templates/connections/list.html:26
+#: src/postulo/templates/server/plugins.html:32
 #, draft
 msgid "Off"
 msgstr "Išjungta"
@@ -4135,7 +4339,7 @@ msgstr "tvarka"
 msgid "organisation"
 msgstr "organizacija"
 
-#: src/postulo/templates/server/plugins.html:16
+#: src/postulo/templates/server/plugins.html:192
 #, draft
 msgid "Origin"
 msgstr "Kilmė"
@@ -4178,7 +4382,7 @@ msgstr "Rezultatai"
 msgid "Outstanding only"
 msgstr "Tik neatlikti"
 
-#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:100
+#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:102
 #: src/postulo/templates/server/overview.html:5
 #, draft
 msgid "Overview"
@@ -4188,6 +4392,11 @@ msgstr "Apžvalga"
 #, draft
 msgid "owner"
 msgstr "savininkas"
+
+#: src/postulo/templates/server/plugins.html:115
+#, draft
+msgid "Package"
+msgstr "Paketas"
 
 #: src/postulo/templates/applications/suggestion_list.html:107
 #: src/postulo/templates/jobs/listing_list.html:149
@@ -4261,8 +4470,8 @@ msgid "Pending only"
 msgstr "Tik laukiantys"
 
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
-#: src/postulo/core/server_views.py:132 src/postulo/core/server_views.py:218
-#: src/postulo/core/server_views.py:235 src/postulo/core/server_views.py:260
+#: src/postulo/core/server_views.py:134 src/postulo/core/server_views.py:220
+#: src/postulo/core/server_views.py:237 src/postulo/core/server_views.py:262
 #: src/postulo/jobs/tables.py:50
 #: src/postulo/templates/jobs/company_detail.html:100
 #: src/postulo/templates/server/people.html:7
@@ -4350,7 +4559,7 @@ msgstr "papildinys"
 msgid "plugin not installed"
 msgstr "papildinys neįdiegtas"
 
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:437
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:452
 #: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
 #, draft
 msgid "Plugins"
@@ -4481,6 +4690,13 @@ msgstr "pasiruošimo pastabos"
 msgid "present"
 msgstr "iki dabar"
 
+#: src/postulo/templates/server/plugins.html:162
+#, draft
+msgid ""
+"Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
+msgstr ""
+"Paspauskite „Tikrinti atnaujinimus“, kad parsisiųstumėte, ką siūlo katalogai. Postulo pats jų netraukia."
+
 #: src/postulo/templates/documents/cv_detail.html:16
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:18
@@ -4555,6 +4771,11 @@ msgstr "projektai"
 #, draft
 msgid "Provider"
 msgstr "Teikėjas"
+
+#: src/postulo/templates/server/plugins.html:91
+#, draft
+msgid "Provides"
+msgstr "Teikia"
 
 #: src/postulo/jobs/identifiers.py:83
 #, draft
@@ -4670,6 +4891,11 @@ msgid ""
 "Read from the timeline, so an interview that ended in a rejection still counts as an interview."
 msgstr ""
 "Skaitoma iš laiko juostos, todėl atmetimu pasibaigęs pokalbis vis tiek skaičiuojamas kaip pokalbis."
+
+#: src/postulo/templates/server/plugins.html:118
+#, draft
+msgid "Read it"
+msgstr "Perskaityk"
 
 #: src/postulo/templates/jobs/capture_form.html:36
 #, draft
@@ -4796,6 +5022,11 @@ msgstr "registracija atvira"
 msgid "Registration open"
 msgstr "Registracija atvira"
 
+#: src/postulo/templates/server/plugins.html:154
+#, draft
+msgid "Reinstall"
+msgstr "Įdiegti iš naujo"
+
 #: src/postulo/applications/models.py:47
 #: src/postulo/templates/applications/insights.html:247
 #, draft
@@ -4846,6 +5077,7 @@ msgstr "nuotolinis adresas"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
+#: src/postulo/templates/server/plugins.html:62
 #, draft
 msgid "Remove"
 msgstr "Pašalinti"
@@ -5084,7 +5316,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Išsaugota jūsų skelbimuose. Nuspręskite, kai būsite pasiruošę."
 
 #: src/postulo/accounts/settings_views.py:32
-#: src/postulo/core/server_views.py:306 src/postulo/resume/views.py:111
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:111
 #, draft
 msgid "Saved."
 msgstr "Išsaugota."
@@ -5209,7 +5441,7 @@ msgstr "Siųsti į"
 msgid "Send to stores now"
 msgstr "Siųsti į saugyklas dabar"
 
-#: src/postulo/core/server_views.py:426
+#: src/postulo/core/server_views.py:428
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Siuntimas nepavyko: %(error)s"
@@ -5243,7 +5475,7 @@ msgstr "Išsiųsti dokumentai"
 msgid "sent on"
 msgstr "išsiųsta"
 
-#: src/postulo/core/server_views.py:429 src/postulo/notifications/email.py:80
+#: src/postulo/core/server_views.py:431 src/postulo/notifications/email.py:80
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Išsiųsta į %(to)s."
@@ -5271,6 +5503,13 @@ msgstr "Serveris"
 #, draft
 msgid "Server settings"
 msgstr "Serverio nustatymai"
+
+#: src/postulo/templates/server/plugins.html:175
+#, draft
+msgid ""
+"Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code> entries, separated by commas. The index must be signed with that key, and every wheel must match the checksum the signed index carries, or nothing is installed."
+msgstr ""
+"Nustatykite <code>POSTULO_PLUGIN_CATALOGUES</code> į kableliais atskirtus įrašus <code>name|url|public-key</code>. Indeksas turi būti pasirašytas tuo raktu, o kiekvienas wheel turi atitikti pasirašytame indekse esančią kontrolinę sumą, kitaip nieko neįdiegiama."
 
 #: src/postulo/applications/models.py:206
 #, draft
@@ -5366,7 +5605,7 @@ msgstr "Prisijungti"
 msgid "Sign out"
 msgstr "Atsijungti"
 
-#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:322
+#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:324
 #: src/postulo/templates/server/signin.html:5
 #, draft
 msgid "Sign-in"
@@ -5471,7 +5710,7 @@ msgid "Somebody already has that username."
 msgstr "Kažkas jau turi tokį naudotojo vardą."
 
 #: src/postulo/templates/applications/insights.html:144
-#: src/postulo/templates/server/plugins.html:14
+#: src/postulo/templates/server/plugins.html:190
 #, draft
 msgid "Source"
 msgstr "Šaltinis"
@@ -5613,6 +5852,16 @@ msgstr "pakeista"
 #, draft
 msgid "Supersedes"
 msgstr "Pakeičia"
+
+#: src/postulo/templates/server/plugins.html:55
+#, draft
+msgid "Switch off"
+msgstr "Išjungti"
+
+#: src/postulo/templates/server/plugins.html:55
+#, draft
+msgid "Switch on"
+msgstr "Įjungti"
 
 #: src/postulo/plugins/views.py:236
 #, python-format, draft
@@ -5788,6 +6037,11 @@ msgstr "Tas pakvietimas jau priimtas ir negali būti atšauktas."
 msgid "That is not a status Postulo recognises."
 msgstr "Tai ne būsena, kurią Postulo atpažįsta."
 
+#: src/postulo/plugins/installing.py:185
+#, draft
+msgid "That is not a wheel: Postulo installs .whl files."
+msgstr "Tai ne wheel: Postulo diegia .whl failus."
+
 #: src/postulo/applications/views.py:519
 #, draft
 msgid "That is not an outcome Postulo recognises."
@@ -5798,21 +6052,31 @@ msgstr "Tai ne rezultatas, kurį Postulo atpažįsta."
 msgid "That is not something Postulo can do about it."
 msgstr "Postulo negali su ja to padaryti."
 
+#: src/postulo/core/server_views.py:490
+#, draft
+msgid "That is not something this page does."
+msgstr "Šis puslapis to nedaro."
+
 #: src/postulo/accounts/views.py:230
 #, draft
 msgid "That is not the address on this account."
 msgstr "Tai ne šios paskyros adresas."
 
-#: src/postulo/core/server_views.py:238
+#: src/postulo/core/server_views.py:240
 #, draft
 msgid "That is not the username."
 msgstr "Tai ne naudotojo vardas."
 
-#: src/postulo/core/server_views.py:155 src/postulo/core/server_views.py:180
-#: src/postulo/core/server_views.py:209
+#: src/postulo/core/server_views.py:157 src/postulo/core/server_views.py:182
+#: src/postulo/core/server_views.py:211
 #, draft
 msgid "That is the last administrator. Appoint another first."
 msgstr "Tai paskutinis administratorius. Pirmiausia paskirkite kitą."
+
+#: src/postulo/core/server_views.py:548 src/postulo/core/server_views.py:553
+#, draft
+msgid "That package is no longer waiting; upload it again."
+msgstr "Tas paketas nebelaukia; įkelkite jį iš naujo."
 
 #: src/postulo/plugins/fetching.py:205
 #, python-format, draft
@@ -5859,6 +6123,26 @@ msgstr "Papildinys %(plugin)s neįdiegtas."
 msgid "The application deadline, if stated."
 msgstr "Paraiškų teikimo terminas, jei nurodytas."
 
+#: src/postulo/plugins/catalogue.py:127
+#, draft
+msgid "The catalogue is not readable JSON."
+msgstr "Katalogas nėra skaitomas JSON."
+
+#: src/postulo/plugins/catalogue.py:119
+#, draft
+msgid "The catalogue's signature does not match its contents; it was not used."
+msgstr "Katalogo parašas neatitinka jo turinio; jis nebuvo naudojamas."
+
+#: src/postulo/plugins/catalogue.py:115
+#, python-format, draft
+msgid "The catalogue's signature or key is not readable: %(error)s"
+msgstr "Katalogo parašas arba raktas neįskaitomas: %(error)s"
+
+#: src/postulo/core/server_views.py:605
+#, draft
+msgid "The catalogues answered, and list nothing yet."
+msgstr "Katalogai atsakė ir kol kas nieko nenurodo."
+
 #: src/postulo/templates/applications/application_intake.html:10
 #, draft
 msgid ""
@@ -5887,6 +6171,11 @@ msgid ""
 "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr ""
 "Skydelyje rodomos atviros paraiškos, kuriose kurį laiką nieko nevyko ir nieko nesuplanuota. Pačių atrankos specialistų patarimai sukasi apie dvi–tris savaites."
+
+#: src/postulo/plugins/catalogue.py:232
+#, draft
+msgid "The download is far larger than a plugin should be."
+msgstr "Atsiunčiamas failas kur kas didesnis, nei turėtų būti papildinys."
 
 #: src/postulo/documents/models.py:228
 #, draft
@@ -5920,6 +6209,16 @@ msgstr "Failas tuščias."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Failas didesnis nei 2 MB. Darbo paieška ne tokia didelė."
 
+#: src/postulo/plugins/installing.py:354
+#, python-format, draft
+msgid "The installer could not be run: %(error)s"
+msgstr "Nepavyko paleisti diegimo programos: %(error)s"
+
+#: src/postulo/plugins/installing.py:358
+#, python-format, draft
+msgid "The installer refused it: %(error)s"
+msgstr "Diegimo programa jį atmetė: %(error)s"
+
 #: src/postulo/documents/models.py:160
 #, draft
 msgid "The job title"
@@ -5940,7 +6239,7 @@ msgstr "Skelbimas, kuriuo po peržiūros tapo šis fiksavimas."
 msgid "The location"
 msgstr "Vieta"
 
-#: src/postulo/core/server_views.py:431 src/postulo/notifications/email.py:79
+#: src/postulo/core/server_views.py:433 src/postulo/notifications/email.py:79
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Pašto sistema nieko nepriėmė."
@@ -6029,6 +6328,16 @@ msgstr ""
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "Viršutinis skaičius negali būti mažesnis už apatinį."
+
+#: src/postulo/plugins/catalogue.py:238
+#, draft
+msgid "The wheel does not match the checksum the catalogue published for it."
+msgstr "Wheel neatitinka kontrolinės sumos, kurią katalogas jam paskelbė."
+
+#: src/postulo/plugins/installing.py:190
+#, draft
+msgid "The wheel has no metadata; it may be damaged."
+msgstr "Wheel neturi metaduomenų; jis gali būti sugadintas."
 
 #: src/postulo/accounts/models.py:191 src/postulo/documents/models.py:65
 #: src/postulo/documents/models.py:176
@@ -6125,6 +6434,11 @@ msgid ""
 "This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
 msgstr ""
 "Tai bandomasis pranešimas iš jūsų Postulo pranešimų ryšio. Priminimai ir fiksavimai atkeliaus tuo pačiu būdu."
+
+#: src/postulo/templates/server/plugins.html:83
+#, draft
+msgid "This is what you are about to install. Nothing has been installed yet."
+msgstr "Štai ką ketinate įdiegti. Kol kas nieko neįdiegta."
 
 #: src/postulo/jobs/forms.py:152
 #, draft
@@ -6459,7 +6773,7 @@ msgstr "Patvirtinta"
 msgid "version"
 msgstr "versija"
 
-#: src/postulo/templates/server/plugins.html:15
+#: src/postulo/templates/server/plugins.html:191
 #, draft
 msgid "Version"
 msgstr "Versija"
@@ -6594,6 +6908,11 @@ msgstr "Ką jis gali"
 msgid "what it says"
 msgstr "ką sako"
 
+#: src/postulo/templates/server/plugins.html:87
+#, draft
+msgid "What it says it is"
+msgstr "Kuo jis sakosi esąs"
+
 #: src/postulo/templates/settings/locale.html:7
 #, draft
 msgid "What Postulo speaks to you, and whose clock it shows."
@@ -6619,9 +6938,9 @@ msgstr "Kaip ši instancija vadinasi ir nuo ko pradeda nauja paskyra."
 #: src/postulo/templates/server/plugins.html:7
 #, draft
 msgid ""
-"What this instance can read a posting with. Postulo's own sources ship in the box; others arrive as installed packages."
+"What this instance can read a posting with, be notified through, keep documents in, and synchronise with. Postulo's own implementations ship in the box; others are packages you install here."
 msgstr ""
-"Kuo ši instancija gali skaityti skelbimą. Postulo šaltiniai įmontuoti; kiti atkeliauja kaip įdiegti paketai."
+"Kuo šis egzempliorius gali perskaityti skelbimą, jus informuoti, saugoti dokumentus ir sinchronizuotis. Paties Postulo įgyvendinimai yra įtaisyti; kiti – paketai, kuriuos įdiegiate čia."
 
 #: src/postulo/templates/server/overview.html:7
 #, draft
@@ -6883,7 +7202,7 @@ msgid ""
 msgstr ""
 "Paskyrą galite ištrinti patys: kiekvieną įrašą, kiekvieną failą diske, žetonus, ryšius ir paskyrą. Eksportas aukščiau — apsaugos tinklas; pirmiausia pasidarykite jį."
 
-#: src/postulo/core/server_views.py:177
+#: src/postulo/core/server_views.py:179
 #, draft
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Negalite išjungti paskyros, su kuria esate prisijungę."

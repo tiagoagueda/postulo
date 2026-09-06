@@ -88,6 +88,14 @@ setting to allow them: a self-hosted box that will fetch any address you hand it
 to go looking at the rest of your network. See
 [Capturing postings](Capturing-postings#what-it-will-not-do).
 
+## Plugins
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| `POSTULO_PLUGINS_DIR` | `data/plugins` (`/app/data/plugins` in the image) | Where plugins installed through the interface live. On the data volume, so they survive an upgrade; added to the import path at startup. |
+| `POSTULO_PLUGIN_CATALOGUES` | empty | Signed lists of plugins that can be installed by name, as `name\|url\|public-key` entries separated by commas. Without a key there is no catalogue. Fetched only when an administrator asks. |
+| `POSTULO_SKIP_PLUGIN_SYNC` | unset | Set to `1` to stop the container reinstalling recorded plugins at boot. |
+
 ## Connections
 
 Plugins that talk to another service on a person's behalf — notifiers, document stores,

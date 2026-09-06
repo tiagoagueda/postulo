@@ -45,10 +45,20 @@ it somewhere the web server cannot reach, and test a restore once. See
 
 ## Plugins and connections
 
-A plugin runs inside Postulo's process with everything Postulo can do. Install only
-plugins you have read or trust, and keep `POSTULO_CONNECTIONS_ALLOW_PRIVATE` off unless a
-plugin genuinely needs to reach a service on your own network — with it on, a public
-hostname that resolves to a private address is allowed through.
+A plugin runs inside Postulo's process with everything Postulo can do, for every person
+on the instance. Install only plugins you have read or trust. Postulo refuses a package
+that is not pure Python, that declares no Postulo entry point, or whose dependencies would
+move one of its own, and it never updates anything by itself — but none of that is a
+judgement about what the plugin does once it is running. A plugin you are unsure about can
+be switched off without being removed.
+
+A catalogue must be configured with a public key, and its index must be signed with that
+key before a single wheel is fetched; every wheel is then checked against the checksum the
+signed index carries. Add a catalogue only from people whose review you would accept.
+
+Keep `POSTULO_CONNECTIONS_ALLOW_PRIVATE` off unless a plugin genuinely needs to reach a
+service on your own network — with it on, a public hostname that resolves to a private
+address is allowed through.
 
 ## Keeping up
 

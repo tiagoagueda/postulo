@@ -7,3 +7,13 @@ class PluginsConfig(AppConfig):
     name = "postulo.plugins"
     label = "plugins"
     verbose_name = _("Plugins")
+
+    def ready(self) -> None:
+        """Put the data volume's plugins directory on the import path, if there is one.
+
+        Before anything reads entry points, so a plugin installed through the interface
+        is found exactly as one installed with pip would be.
+        """
+        from .installing import activate
+
+        activate()

@@ -247,6 +247,17 @@ STATICFILES_DIRS = [PACKAGE_DIR / "static"]
 MEDIA_URL = "media/"
 MEDIA_ROOT = env.path("POSTULO_MEDIA_ROOT", default=REPO_DIR / "data" / "media")
 
+# Where plugins installed through the interface live. On the data volume, not in the
+# environment: the image is rebuilt on every upgrade and the volume is not, so a plugin
+# put here survives one. The directory is added to the import path at startup.
+POSTULO_PLUGINS_DIR = env.path("POSTULO_PLUGINS_DIR", default=REPO_DIR / "data" / "plugins")
+
+# Catalogues an administrator may install plugins from, as `name|url|public-key` entries
+# separated by commas. Empty by default: an index is a list of code to run, so pointing at
+# one is a decision an operator makes, and every index must be signed with the key given
+# here before anything is fetched from it.
+POSTULO_PLUGIN_CATALOGUES = env("POSTULO_PLUGIN_CATALOGUES", default="")
+
 # Where `manage.py backup` writes when given no target. Beside the data it copies, so a
 # single volume holds both; move it elsewhere if that volume is the thing being backed up.
 POSTULO_BACKUP_DIR = env.path("POSTULO_BACKUP_DIR", default=REPO_DIR / "data" / "backups")

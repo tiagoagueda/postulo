@@ -12,6 +12,13 @@ if [ "${POSTULO_SKIP_MIGRATE:-}" != "1" ]; then
     python manage.py migrate --noinput
 fi
 
+# Plugins live on the data volume, and the environment in this image is brand new after
+# an upgrade. Anything the volume's record lists but the environment lacks is installed
+# again here, before the first request.
+if [ "${POSTULO_SKIP_PLUGIN_SYNC:-}" != "1" ]; then
+    python manage.py plugins sync || echo "Postulo: some plugins could not be restored"
+fi
+
 # A quick sanity check on the configuration, so a misconfigured instance says so on
 # start-up rather than at the first request.
 python manage.py check --deploy --fail-level ERROR

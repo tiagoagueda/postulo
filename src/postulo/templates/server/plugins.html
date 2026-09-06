@@ -4,9 +4,185 @@
 {% block content %}
   <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Plugins" %}</h2>
   <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
-    {% translate "What this instance can read a posting with. Postulo's own sources ship in the box; others arrive as installed packages." %}
+    {% translate "What this instance can read a posting with, be notified through, keep documents in, and synchronise with. Postulo's own implementations ship in the box; others are packages you install here." %}
   </p>
 
+  <div class="alert-warning mb-6" role="note">
+    <p class="font-medium">{% translate "Installing a plugin runs somebody else's code inside Postulo." %}</p>
+    <p class="text-sm">
+      {% blocktranslate trimmed %}
+        It can read and change everything on this instance, for every person on it. Install
+        only what you have read or have reason to trust. Nothing is ever updated
+        automatically: an update is a code change, and an administrator clicks it.
+      {% endblocktranslate %}
+    </p>
+  </div>
+
+  {# ------------------------------------------------------------ installed #}
+  <h3 class="mb-3 font-medium">{% translate "Installed on this instance" %}</h3>
+  {% if installed %}
+    <div class="card mb-8 p-0">
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for plugin in installed %}
+          <li class="flex flex-wrap items-start gap-3 px-4 py-3" data-plugin="{{ plugin.name }}">
+            <div class="min-w-0 flex-1">
+              <p class="font-medium">
+                {{ plugin.name }} <span class="text-ink-500 dark:text-ink-400">{{ plugin.version }}</span>
+                {% if plugin.disabled %}
+                  <span class="ml-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{% translate "Off" %}</span>
+                {% endif %}
+                {% if not plugin.present %}
+                  <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200">{% translate "not loaded" %}</span>
+                {% endif %}
+              </p>
+              <p class="text-xs text-ink-500 dark:text-ink-400">
+                {{ plugin.origin }} · {{ plugin.source|truncatechars:60 }}
+                {% if plugin.installed_at %} · {{ plugin.installed_at }}{% endif %}
+                {% if plugin.installed_by %} · {{ plugin.installed_by }}{% endif %}
+              </p>
+              {% if plugin.entry_points %}
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {% for point in plugin.entry_points %}<code>{{ point }}</code>{% if not forloop.last %} · {% endif %}{% endfor %}
+                </p>
+              {% endif %}
+            </div>
+            <div class="flex items-center gap-1">
+              <form method="post" action="{% url 'server:plugin_action' %}">
+                {% csrf_token %}
+                <input type="hidden" name="name" value="{{ plugin.name }}">
+                <input type="hidden" name="action" value="{% if plugin.disabled %}enable{% else %}disable{% endif %}">
+                <button type="submit" class="btn-secondary px-3 py-1 text-xs">
+                  {% if plugin.disabled %}{% translate "Switch on" %}{% else %}{% translate "Switch off" %}{% endif %}
+                </button>
+              </form>
+              <form method="post" action="{% url 'server:plugin_action' %}">
+                {% csrf_token %}
+                <input type="hidden" name="name" value="{{ plugin.name }}">
+                <input type="hidden" name="action" value="remove">
+                <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">{% translate "Remove" %}</button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% else %}
+    <div class="card mb-8 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate with directory=plugins_dir trimmed %}
+        Nothing is installed here yet. Plugins live in {{ directory }}, on the data volume,
+        so they survive an upgrade.
+      {% endblocktranslate %}
+    </div>
+  {% endif %}
+
+  {# --------------------------------------------------------------- upload #}
+  <h3 class="mb-3 font-medium">{% translate "Install a package" %}</h3>
+  {% if pending %}
+    <div class="card mb-8">
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "This is what you are about to install. Nothing has been installed yet." %}
+      </p>
+      <dl class="mb-4 grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[10rem_1fr]">
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Name" %}</dt><dd class="font-medium">{{ pending.name }} {{ pending.version }}</dd>
+        {% if pending.summary %}<dt class="text-ink-500 dark:text-ink-400">{% translate "What it says it is" %}</dt><dd>{{ pending.summary }}</dd>{% endif %}
+        {% if pending.licence %}<dt class="text-ink-500 dark:text-ink-400">{% translate "Licence" %}</dt><dd>{{ pending.licence }}</dd>{% endif %}
+        {% if pending.author %}<dt class="text-ink-500 dark:text-ink-400">{% translate "Maintainer" %}</dt><dd>{{ pending.author }}</dd>{% endif %}
+        {% if pending.home_page %}<dt class="text-ink-500 dark:text-ink-400">{% translate "Home page" %}</dt><dd>{{ pending.home_page }}</dd>{% endif %}
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Provides" %}</dt>
+        <dd>{% for point in pending.entry_points %}<code class="text-xs">{{ point }}</code>{% if not forloop.last %} · {% endif %}{% empty %}—{% endfor %}</dd>
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Depends on" %}</dt>
+        <dd>{% for requirement in pending.requires %}{{ requirement }}{% if not forloop.last %}, {% endif %}{% empty %}{% translate "nothing" %}{% endfor %}</dd>
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Checksum" %}</dt><dd><code class="text-xs">{{ pending.sha256 }}</code></dd>
+      </dl>
+      <form method="post" action="{% url 'server:plugin_action' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="confirm">
+        <input type="hidden" name="token" value="{{ pending.token }}">
+        <button type="submit" class="btn-primary">{% translate "Install it" %}</button>
+        <button type="submit" name="action" value="cancel" class="btn-ghost">{% translate "Cancel" %}</button>
+      </form>
+    </div>
+  {% else %}
+    <form method="post" action="{% url 'server:plugin_action' %}" enctype="multipart/form-data" class="card mb-8">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="upload">
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it
+          says about itself and shows you that before anything is installed.
+        {% endblocktranslate %}
+      </p>
+      <label class="mb-3 block text-sm font-medium" for="package">{% translate "Package" %}</label>
+      <input type="file" name="package" id="package" accept=".whl" required
+             class="field-input mb-4 block w-full">
+      <button type="submit" class="btn-primary">{% translate "Read it" %}</button>
+    </form>
+  {% endif %}
+
+  {# ------------------------------------------------------------ catalogue #}
+  <h3 class="mb-3 font-medium">{% translate "Catalogues" %}</h3>
+  {% if catalogues_configured %}
+    <div class="card mb-8 p-0">
+      <div class="flex flex-wrap items-center gap-3 border-b border-ink-100 px-4 py-3 dark:border-ink-800">
+        <p class="min-w-0 flex-1 text-sm text-ink-500 dark:text-ink-400">
+          {% for name in catalogues_configured %}<code>{{ name }}</code>{% if not forloop.last %} · {% endif %}{% endfor %}
+        </p>
+        <form method="post" action="{% url 'server:plugin_action' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="refresh">
+          <button type="submit" class="btn-secondary px-3 py-1 text-sm">{% translate "Check for updates" %}</button>
+        </form>
+      </div>
+      {% if listings %}
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for listing in listings %}
+            <li class="flex flex-wrap items-start gap-3 px-4 py-3">
+              <div class="min-w-0 flex-1">
+                <p class="font-medium">{{ listing.name }} {{ listing.version }}</p>
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {{ listing.summary }}
+                  {% if listing.licence %} · {{ listing.licence }}{% endif %}
+                  {% if listing.maintainer %} · {{ listing.maintainer }}{% endif %}
+                  · <code>{{ listing.catalogue }}</code>
+                </p>
+              </div>
+              <form method="post" action="{% url 'server:plugin_action' %}">
+                {% csrf_token %}
+                <input type="hidden" name="name" value="{{ listing.name }}">
+                <input type="hidden" name="action" value="install">
+                <button type="submit" class="btn-secondary px-3 py-1 text-sm">
+                  {% if listing.installed %}{% translate "Reinstall" %}{% else %}{% translate "Install" %}{% endif %}
+                </button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="px-4 py-3 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own." %}
+        </p>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="card mb-8 text-sm text-ink-500 dark:text-ink-400">
+      <p class="mb-2">
+        {% blocktranslate trimmed %}
+          No catalogue is configured, so plugins are installed from a package you upload.
+          A catalogue is a signed list of plugins that can be installed by name.
+        {% endblocktranslate %}
+      </p>
+      <p>
+        {% blocktranslate trimmed %}
+          Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code>
+          entries, separated by commas. The index must be signed with that key, and every
+          wheel must match the checksum the signed index carries, or nothing is installed.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  {% endif %}
+
+  {# -------------------------------------------------------------- sources #}
+  <h3 class="mb-3 font-medium">{% translate "Capture sources this instance has" %}</h3>
   <div class="card overflow-x-auto p-0">
     <table class="w-full text-left text-sm">
       <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
@@ -31,9 +207,10 @@
   </div>
   <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
     {% blocktranslate with group=entry_point_group trimmed %}
-      A package registers a source under the <code>{{ group }}</code> entry-point group and
-      is picked up on the next start. A source that fails to load is logged and left out;
-      the built-in ones keep working.
+      A package registers a source under the <code>{{ group }}</code> entry-point group.
+      A plugin that only registers entry points appears as soon as it is installed; one
+      that adds pages of its own needs a restart. A source that fails to load is logged and
+      left out, and the built-in ones keep working.
     {% endblocktranslate %}
   </p>
 {% endblock %}

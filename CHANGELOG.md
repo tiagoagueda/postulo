@@ -18,6 +18,21 @@ All notable changes to Postulo are recorded here. The format follows
   *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
   switch per document kind, *Send to stores now* tries at once, *Send everything* queues
   what existed before the store did, and the references travel in the export. (#13)
+- **Plugins install from the interface, and survive an upgrade.** *Server settings →
+  Plugins* takes a package an administrator uploads: Postulo reads what it says about
+  itself — name, version, licence, maintainer, entry points, dependencies, checksum — and
+  shows that for confirmation before anything is installed. Plugins live on the data
+  volume with a record beside them, so an upgrade cannot lose them; the container
+  reinstalls what the record lists and the new image lacks, at boot. A wheel that is not
+  pure Python, declares no Postulo entry point, or would move one of Postulo's own
+  dependencies is refused with the reason. Plugins can be switched off without being
+  removed. `manage.py plugins list | install | remove | disable | enable | sync |
+  catalogue` is the same code from the command line. (#38)
+- **Signed catalogues.** A catalogue is a JSON index and a detached Ed25519 signature, and
+  an administrator configures it as a URL *and* a public key: unsigned, it is not used at
+  all. Every wheel is checked against the checksum the signed index carries, so a mirror
+  or a hijacked host cannot ship code. Nothing is fetched until somebody presses *Check
+  for updates*, and no catalogue is configured by default. (#38)
 - **postulo-mcp, a way in for an AI agent — and still no AI inside Postulo.** A small
   server that speaks the Model Context Protocol to whatever agent you already run, and
   Postulo's ordinary API on the other side, with a personal access token whose scopes you

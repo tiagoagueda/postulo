@@ -77,11 +77,20 @@ It builds, starts a container, and waits for the health check to answer.
 through a view that has established who is asking, and serving the directory would
 bypass that entirely.
 
-### Plugins in the image
+### Plugins
 
-A plugin is a Python package installed into Postulo's environment, and the image's
-environment is built once and never written to afterwards. So a plugin is baked in at
-build time, one of two ways.
+A plugin is a Python package that adds a capture source, a way of being notified, a
+document store or a synchronisation. **The usual way to install one is from the
+interface**, under *Server settings → Plugins*: upload the package, read what it says
+about itself, and install it. Plugins live in `/app/data/plugins` — on the data volume,
+not in the image — so an upgrade cannot lose them; the container reinstalls anything the
+volume's record lists and the new image lacks, before the first request.
+
+Installing a plugin runs somebody else's code inside Postulo, with everything Postulo can
+do. Only administrators can do it, nothing is ever updated automatically, and a plugin can
+be switched off without being removed.
+
+If you would rather have an immutable image with its plugins baked in, that works too.
 
 **A build argument**, with any number of packages in the form pip accepts — a name, a
 wheel URL, a `git+https://…` address:
@@ -115,6 +124,12 @@ USER postulo
 Either way the plugin is installed with Postulo's own lock as a constraint, so it cannot
 change the version of anything Postulo pins, and it survives upgrades because it is part
 of the image you build. Restart, and the plugin appears under *Settings → Connections*.
+
+**Catalogues.** A catalogue is a signed list of plugins that can then be installed by
+name. Set `POSTULO_PLUGIN_CATALOGUES` to `name|url|public-key` entries, separated by
+commas; the index must be signed with that key, and every package must match the checksum
+the signed index carries, or nothing is installed. Nothing is fetched until an
+administrator presses *Check for updates*. No catalogue is configured by default.
 The first one worth adding is
 [postulo-apprise](https://source.tiagoagueda.com/postulo/postulo-apprise), which sends
 Postulo's notifications to Telegram, ntfy, Discord, Matrix, Gotify and over a hundred

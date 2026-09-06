@@ -50,6 +50,25 @@ def _protocol_for(kind: str):
     return SourcePlugin if kind == "source" else ConnectedPlugin
 
 
+def _disabled() -> set[str]:
+    """Plugins an administrator has switched off. They stay installed and do not load."""
+    try:
+        from .installing import disabled_names
+
+        return disabled_names()
+    except Exception:  # pragma: no cover - a broken record must not take capture down
+        logger.exception("The plugins record could not be read")
+        return set()
+
+
+def _distribution_of(entry_point) -> str:
+    from .installing import canonicalise
+
+    distribution = getattr(entry_point, "dist", None)
+    name = getattr(distribution, "name", "") if distribution is not None else ""
+    return canonicalise(name)
+
+
 def register_builtin(kind: str, plugin_class: type) -> None:
     """Add a plugin that ships inside this process — Postulo's own, or a test's.
 
@@ -78,7 +97,10 @@ def _load_third_party(kind: str) -> list:
     """
     protocol = _protocol_for(kind)
     plugins: list = []
+    switched_off = _disabled()
     for entry_point in entry_points(group=GROUPS[kind]):
+        if _distribution_of(entry_point) in switched_off:
+            continue
         try:
             plugin = entry_point.load()()
         except Exception:

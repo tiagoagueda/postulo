@@ -9,6 +9,8 @@ read-only and says so, so that a `.env` written for 0.1.0 goes on meaning what i
 from __future__ import annotations
 
 import platform
+import secrets
+import shutil
 import sys
 from pathlib import Path
 
@@ -432,11 +434,25 @@ class EmailTestView(StaffRequiredMixin, View):
         return redirect("server:email")
 
 
+#: Where a wheel waits between "read it" and "install it". Under the plugins directory,
+#: which is on the data volume and writable; cleaned out as soon as it is used.
+PENDING_DIRNAME = ".pending"
+
+
+def _pending_dir() -> Path:
+    from postulo.plugins.installing import plugins_dir
+
+    return plugins_dir() / PENDING_DIRNAME
+
+
 class PluginsView(ServerSectionMixin, TemplateView):
+    """What is installed, what can be, and the plain warning about what installing means."""
+
     template_name = "server/plugins.html"
     section_title = _("Plugins")
 
     def get_context_data(self, **kwargs):
+        from postulo.plugins import catalogue, installing
         from postulo.plugins.registry import ENTRY_POINT_GROUP, available_sources
 
         context = super().get_context_data(**kwargs)
@@ -450,4 +466,200 @@ class PluginsView(ServerSectionMixin, TemplateView):
             for source in available_sources(refresh=True)
         ]
         context["entry_point_group"] = ENTRY_POINT_GROUP
+        context["installed"] = installing.status()
+        context["plugins_dir"] = str(installing.plugins_dir())
+        context["catalogues_configured"] = sorted(catalogue.configured())
+        context["pending"] = self.request.session.get("plugin_pending")
+        context["listings"] = self.request.session.get("plugin_listings", [])
         return context
+
+
+class PluginActionView(StaffRequiredMixin, View):
+    """Upload, confirm, install from a catalogue, switch off, remove.
+
+    Uploading only *reads* the package: what it says about itself is shown for
+    confirmation, and the wheel waits in a scratch directory until an administrator says
+    yes. Nothing about that is decorative — the confirmation is where a person sees the
+    entry points, the licence and the dependencies before somebody else's code runs.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        action = request.POST.get("action", "")
+        handler = getattr(self, f"_{action}", None)
+        if handler is None:
+            messages.error(request, _("That is not something this page does."))
+            return redirect("server:plugins")
+        return handler(request)
+
+    # ------------------------------------------------------------- upload
+
+    def _upload(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins.installing import InstallError, check, read_wheel
+
+        upload = request.FILES.get("package")
+        if upload is None:
+            messages.error(request, _("Choose a package first."))
+            return redirect("server:plugins")
+
+        scratch = _pending_dir()
+        shutil.rmtree(scratch, ignore_errors=True)
+        scratch.mkdir(parents=True, exist_ok=True)
+        token = secrets.token_urlsafe(16)
+        target = scratch / f"{token}.whl"
+        with target.open("wb") as handle:
+            for chunk in upload.chunks():
+                handle.write(chunk)
+
+        try:
+            info = read_wheel(target)
+            check(info)
+        except InstallError as error:
+            target.unlink(missing_ok=True)
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+
+        request.session["plugin_pending"] = {
+            "token": token,
+            "name": info.name,
+            "version": info.version,
+            "summary": info.summary,
+            "licence": info.licence,
+            "author": info.author,
+            "home_page": info.home_page,
+            "requires": info.requires,
+            "entry_points": info.entry_points,
+            "sha256": info.sha256,
+            "filename": upload.name,
+        }
+        return redirect("server:plugins")
+
+    def _cancel(self, request: HttpRequest) -> HttpResponse:
+        request.session.pop("plugin_pending", None)
+        shutil.rmtree(_pending_dir(), ignore_errors=True)
+        messages.info(request, _("Nothing was installed."))
+        return redirect("server:plugins")
+
+    def _confirm(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins.installing import InstallError, install_wheel
+
+        pending = request.session.get("plugin_pending") or {}
+        token = request.POST.get("token", "")
+        if not pending or token != pending.get("token"):
+            messages.error(request, _("That package is no longer waiting; upload it again."))
+            return redirect("server:plugins")
+        wheel = _pending_dir() / f"{token}.whl"
+        if not wheel.is_file():
+            request.session.pop("plugin_pending", None)
+            messages.error(request, _("That package is no longer waiting; upload it again."))
+            return redirect("server:plugins")
+        try:
+            entry = install_wheel(
+                wheel,
+                origin="upload",
+                source=pending.get("filename", ""),
+                by=request.user.get_username(),
+            )
+        except InstallError as error:
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+        finally:
+            request.session.pop("plugin_pending", None)
+            shutil.rmtree(_pending_dir(), ignore_errors=True)
+        messages.success(
+            request,
+            _(
+                "%(name)s %(version)s is installed. Restart Postulo if it adds pages of "
+                "its own; anything else is available now."
+            )
+            % {"name": entry.name, "version": entry.version},
+        )
+        return redirect("server:plugins")
+
+    # ---------------------------------------------------------- catalogue
+
+    def _refresh(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins import catalogue, installing
+
+        catalogues, problems = catalogue.fetch_all()
+        for problem in problems:
+            messages.error(request, problem)
+        listings = []
+        for one in catalogues:
+            for listing in one.listings:
+                release = listing.latest
+                if release is None:
+                    continue
+                listings.append(
+                    {
+                        "name": listing.name,
+                        "version": release.version,
+                        "summary": listing.summary,
+                        "licence": listing.licence,
+                        "maintainer": listing.maintainer,
+                        "catalogue": one.name,
+                        "installed": installing.installed(listing.name) is not None,
+                    }
+                )
+        request.session["plugin_listings"] = listings
+        if catalogues and not listings:
+            messages.info(request, _("The catalogues answered, and list nothing yet."))
+        return redirect("server:plugins")
+
+    def _install(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins import catalogue
+        from postulo.plugins.installing import InstallError
+
+        name = request.POST.get("name", "")
+        try:
+            entry = catalogue.install(name, by=request.user.get_username())
+        except (catalogue.CatalogueError, InstallError) as error:
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+        messages.success(
+            request,
+            _("%(name)s %(version)s is installed from the catalogue.")
+            % {"name": entry.name, "version": entry.version},
+        )
+        return redirect("server:plugins")
+
+    # ------------------------------------------------- switching, removing
+
+    def _disable(self, request: HttpRequest) -> HttpResponse:
+        return self._switch(request, True)
+
+    def _enable(self, request: HttpRequest) -> HttpResponse:
+        return self._switch(request, False)
+
+    def _switch(self, request: HttpRequest, disabled: bool) -> HttpResponse:
+        from postulo.plugins.installing import InstallError, set_disabled
+        from postulo.plugins.registry import plugins as registry_plugins
+
+        try:
+            entry = set_disabled(request.POST.get("name", ""), disabled)
+        except InstallError as error:
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+        for kind in ("source", "notifier", "store", "sync"):
+            registry_plugins(kind, refresh=True)
+        messages.success(
+            request,
+            _("%(name)s is switched off; its files are still here.") % {"name": entry.name}
+            if disabled
+            else _("%(name)s is switched on again.") % {"name": entry.name},
+        )
+        return redirect("server:plugins")
+
+    def _remove(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins.installing import InstallError, remove
+
+        try:
+            entry = remove(request.POST.get("name", ""))
+        except InstallError as error:
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+        messages.success(
+            request,
+            _("%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded.")
+            % {"name": entry.name},
+        )
+        return redirect("server:plugins")

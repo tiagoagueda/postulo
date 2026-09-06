@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 13:29+0000\n"
+"POT-Creation-Date: 2026-09-06 13:54+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: čeština\n"
@@ -169,6 +169,18 @@ msgstr "%(language)s — strojový překlad, čeká na kontrolu"
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s až %(high)s"
 
+#: src/postulo/core/server_views.py:620
+#, python-format, draft
+msgid "%(name)s %(version)s is installed from the catalogue."
+msgstr "%(name)s %(version)s je nainstalován z katalogu."
+
+#: src/postulo/core/server_views.py:570
+#, python-format, draft
+msgid ""
+"%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
+msgstr ""
+"%(name)s %(version)s je nainstalován. Restartujte Postulo, pokud přidává vlastní stránky; vše ostatní je k dispozici hned."
+
 #: src/postulo/templates/server/person_delete.html:8
 #, python-format, draft
 msgid ""
@@ -176,35 +188,76 @@ msgid ""
 msgstr ""
 "%(name)s (<strong>%(username)s</strong>, %(email)s) a vše, co účet vlastní: žádosti, firmy, dokumenty a soubory za nimi, připomínky, tokeny, připojení. Soubory se z disku smažou. Nic je nevrátí zpět."
 
-#: src/postulo/core/server_views.py:191
+#: src/postulo/core/server_views.py:193
 #, python-format, draft
 msgid "%(name)s can sign in again."
 msgstr "%(name)s se může znovu přihlásit."
 
-#: src/postulo/core/server_views.py:186
+#: src/postulo/plugins/installing.py:310
+#, python-format, draft
+msgid ""
+"%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
+msgstr ""
+"%(name)s nedeklaruje žádný vstupní bod Postula, takže by jeho instalace nic neudělala. Zásuvný modul se registruje pod jedním z: %(groups)s."
+
+#: src/postulo/plugins/installing.py:376
+#, python-format, draft
+msgid "%(name)s does not match the checksum it was published with."
+msgstr "%(name)s neodpovídá kontrolnímu součtu, se kterým byl zveřejněn."
+
+#: src/postulo/core/server_views.py:188
 #, python-format, draft
 msgid "%(name)s is deactivated: nothing deleted, no sign-in."
 msgstr "%(name)s je deaktivován: nic nesmazáno, žádné přihlášení."
 
-#: src/postulo/core/server_views.py:244
+#: src/postulo/core/server_views.py:246
 #, python-format, draft
 msgid "%(name)s is gone: the account, its records and %(files)s files on disk."
 msgstr "%(name)s je pryč: účet, jeho záznamy a %(files)s souborů na disku."
 
-#: src/postulo/core/server_views.py:161
+#: src/postulo/core/server_views.py:163
 #, python-format, draft
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s už není správcem."
 
-#: src/postulo/core/server_views.py:280
+#: src/postulo/plugins/installing.py:412 src/postulo/plugins/installing.py:466
+#, python-format, draft
+msgid "%(name)s is not installed."
+msgstr "%(name)s není nainstalován."
+
+#: src/postulo/plugins/installing.py:300
+#, python-format, draft
+msgid ""
+"%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
+msgstr ""
+"%(name)s není v čistém Pythonu. Postulo instaluje jen wheely pro libovolnou platformu (py3-none-any); tento obraz nemá překladač."
+
+#: src/postulo/core/server_views.py:282
 #, python-format, draft
 msgid "%(name)s is now @%(username)s."
 msgstr "%(name)s je nyní @%(username)s."
 
-#: src/postulo/core/server_views.py:167
+#: src/postulo/core/server_views.py:169
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s je nyní správcem."
+
+#: src/postulo/core/server_views.py:662
+#, python-format, draft
+msgid ""
+"%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
+msgstr ""
+"%(name)s je odstraněn. Restartujte Postulo, abyste měli jistotu, že z něj nic nezůstalo načtené."
+
+#: src/postulo/core/server_views.py:646
+#, python-format, draft
+msgid "%(name)s is switched off; its files are still here."
+msgstr "%(name)s je vypnutý; jeho soubory tu stále jsou."
+
+#: src/postulo/core/server_views.py:648
+#, python-format, draft
+msgid "%(name)s is switched on again."
+msgstr "%(name)s je zase zapnutý."
 
 #: src/postulo/templates/server/person_username.html:8
 #, python-format, draft
@@ -212,6 +265,11 @@ msgid ""
 "%(name)s signs in as <strong>%(current)s</strong>. The new username must be free on this instance; capitals do not make it different."
 msgstr ""
 "%(name)s se přihlašuje jako <strong>%(current)s</strong>. Nové uživatelské jméno musí být v této instanci volné; velká písmena ho neodlišují."
+
+#: src/postulo/plugins/installing.py:320
+#, python-format, draft
+msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
+msgstr "%(name)s by změnil to, na čem závisí samo Postulo. %(problems)s"
 
 #: src/postulo/documents/rendering.py:196
 #, python-format, draft
@@ -227,6 +285,11 @@ msgstr "%(name)s — CV"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/installing.py:286
+#, python-format, draft
+msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
+msgstr "%(package)s: potřebuje %(wanted)s a Postulo má %(have)s."
 
 #: src/postulo/plugins/forms.py:136
 #, python-format, draft
@@ -285,6 +348,16 @@ msgstr[0] "%(total)s úspěch"
 msgstr[1] "%(total)s úspěchy"
 msgstr[2] "%(total)s úspěchů"
 
+#: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
+#, python-format, draft
+msgid "%(url)s answered %(code)s."
+msgstr "%(url)s odpovědělo %(code)s."
+
+#: src/postulo/plugins/catalogue.py:198
+#, python-format, draft
+msgid "%(url)s is far larger than a catalogue should be."
+msgstr "%(url)s je mnohem větší, než by katalog měl být."
+
 #: src/postulo/templates/server/overview.html:50
 #, python-format, draft
 msgid "%(when)s ago"
@@ -334,12 +407,12 @@ msgstr "Nápověda pro rozhraní, například „amber“ nebo „sky“."
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Řádek pod názvem na přihlašovací stránce. Nepovinné."
 
-#: src/postulo/templates/server/plugins.html:33
+#: src/postulo/templates/server/plugins.html:209
 #, python-format, draft
 msgid ""
-"A package registers a source under the <code>%(group)s</code> entry-point group and is picked up on the next start. A source that fails to load is logged and left out; the built-in ones keep working."
+"A package registers a source under the <code>%(group)s</code> entry-point group. A plugin that only registers entry points appears as soon as it is installed; one that adds pages of its own needs a restart. A source that fails to load is logged and left out, and the built-in ones keep working."
 msgstr ""
-"Balíček registruje zdroj ve skupině vstupních bodů <code>%(group)s</code> a při dalším startu se načte. Zdroj, který se nenačte, se zaloguje a vynechá; vestavěné fungují dál."
+"Balíček registruje zdroj ve skupině vstupních bodů <code>%(group)s</code>. Zásuvný modul, který registruje jen vstupní body, se objeví hned po instalaci; ten, který přidává vlastní stránky, vyžaduje restart. Zdroj, který se nenačte, se zaznamená a vynechá, a vestavěné dál fungují."
 
 #: src/postulo/templates/core/dashboard.html:23
 #, python-format, draft
@@ -377,6 +450,13 @@ msgstr ""
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Profil na GitHubu, Forgejo, GitLabu nebo podobně."
+
+#: src/postulo/templates/server/plugins.html:110
+#, draft
+msgid ""
+"A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it says about itself and shows you that before anything is installed."
+msgstr ""
+"Python wheel (<code>.whl</code>) sestavený pro libovolnou platformu. Postulo přečte, co o sobě říká, a ukáže vám to dřív, než se cokoli nainstaluje."
 
 #: src/postulo/notifications/base.py:27
 #, draft
@@ -418,7 +498,7 @@ msgid ""
 msgstr ""
 "Šablona s vlastními sloupci Postula a jedním ukázkovým řádkem. Vyplňte ji a nahrajte výše."
 
-#: src/postulo/core/server_views.py:414
+#: src/postulo/core/server_views.py:416
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Zkušební zpráva od %(name)s"
@@ -972,7 +1052,7 @@ msgstr "tělo"
 msgid "Bringing a spreadsheet in"
 msgstr "Načtení tabulky"
 
-#: src/postulo/templates/server/plugins.html:25
+#: src/postulo/templates/server/plugins.html:201
 #, draft
 msgid "built in"
 msgstr "vestavěný"
@@ -1043,6 +1123,7 @@ msgstr "Zpětná adresa k registraci u poskytovatele"
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
+#: src/postulo/templates/server/plugins.html:102
 #, draft
 msgid "Cancel"
 msgstr "Zrušit"
@@ -1053,7 +1134,7 @@ msgstr "Zrušit"
 msgid "Cancelled"
 msgstr "Zrušeno"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:344
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:346
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1095,6 +1176,11 @@ msgstr "Zachycení zahozeno."
 #, draft
 msgid "Capture postings"
 msgstr "Zachytávat inzeráty"
+
+#: src/postulo/templates/server/plugins.html:185
+#, draft
+msgid "Capture sources this instance has"
+msgstr "Zdroje zachytávání této instance"
 
 #: src/postulo/jobs/models.py:545
 #, draft
@@ -1138,6 +1224,11 @@ msgstr "kariérní stránka"
 #, draft
 msgid "Careers page"
 msgstr "Kariérní stránka"
+
+#: src/postulo/templates/server/plugins.html:123
+#, draft
+msgid "Catalogues"
+msgstr "Katalogy"
 
 #: src/postulo/documents/models.py:193
 #, draft
@@ -1201,10 +1292,25 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Připomenout se ve firmě %(company)s ohledně %(role)s"
 
+#: src/postulo/templates/server/plugins.html:133
+#, draft
+msgid "Check for updates"
+msgstr "Zkontrolovat aktualizace"
+
 #: src/postulo/documents/models.py:287
 #, draft
 msgid "checksum"
 msgstr "kontrolní součet"
+
+#: src/postulo/templates/server/plugins.html:95
+#, draft
+msgid "Checksum"
+msgstr "Kontrolní součet"
+
+#: src/postulo/core/server_views.py:501
+#, draft
+msgid "Choose a package first."
+msgstr "Nejprve zvolte balíček."
 
 #: src/postulo/templates/core/import_csv_map.html:102
 #, draft
@@ -1734,7 +1840,7 @@ msgstr "výchozí jazyk"
 msgid "default time zone"
 msgstr "výchozí časové pásmo"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:364
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:366
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -1782,10 +1888,15 @@ msgstr "Smazat můj účet a vše v něm"
 msgid "Delete the account"
 msgstr "Smazat účet"
 
-#: src/postulo/core/server_views.py:207
+#: src/postulo/core/server_views.py:209
 #, draft
 msgid "Delete your own account from Settings, not from here."
 msgstr "Vlastní účet smažte z Nastavení, ne odsud."
+
+#: src/postulo/templates/server/plugins.html:93
+#, draft
+msgid "Depends on"
+msgstr "Závisí na"
 
 #: src/postulo/applications/forms.py:76 src/postulo/core/csv_import.py:52
 #: src/postulo/templates/jobs/posting_detail.html:60
@@ -1982,7 +2093,7 @@ msgid "education"
 msgstr "vzdělání"
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:391
+#: src/postulo/core/server_views.py:393
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:21
 #, draft
@@ -2608,6 +2719,11 @@ msgstr "úspěchy"
 msgid "highlights for this CV"
 msgstr "úspěchy pro toto CV"
 
+#: src/postulo/templates/server/plugins.html:90
+#, draft
+msgid "Home page"
+msgstr "Domovská stránka"
+
 #: src/postulo/jobs/industries.py:35
 #, draft
 msgid "Hospitality and tourism"
@@ -2701,7 +2817,7 @@ msgstr "Identifikátory"
 msgid "Identifies itself as"
 msgstr "Představuje se jako"
 
-#: src/postulo/core/server_views.py:416
+#: src/postulo/core/server_views.py:418
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -2847,12 +2963,37 @@ msgstr "Informační technologie"
 msgid "Insights"
 msgstr "Přehledy"
 
+#: src/postulo/templates/server/plugins.html:154
+#, draft
+msgid "Install"
+msgstr "Nainstalovat"
+
+#: src/postulo/templates/server/plugins.html:79
+#, draft
+msgid "Install a package"
+msgstr "Instalace balíčku"
+
+#: src/postulo/templates/server/plugins.html:101
+#, draft
+msgid "Install it"
+msgstr "Nainstalovat ho"
+
 #: src/postulo/documents/pdf.py:41
 #, draft
 msgid ""
 "Install it with: uv sync --extra chromium, then: uv run playwright install chromium"
 msgstr ""
 "Nainstalujte pomocí: uv sync --extra chromium, pak: uv run playwright install chromium"
+
+#: src/postulo/templates/server/plugins.html:22
+#, draft
+msgid "Installed on this instance"
+msgstr "Nainstalováno na této instanci"
+
+#: src/postulo/templates/server/plugins.html:11
+#, draft
+msgid "Installing a plugin runs somebody else's code inside Postulo."
+msgstr "Instalace zásuvného modulu spustí cizí kód uvnitř Postula."
 
 #: src/postulo/core/models.py:105
 #, draft
@@ -2980,6 +3121,13 @@ msgstr "vydal(a)"
 #, draft
 msgid "issued on"
 msgstr "vydáno dne"
+
+#: src/postulo/templates/server/plugins.html:13
+#, draft
+msgid ""
+"It can read and change everything on this instance, for every person on it. Install only what you have read or have reason to trust. Nothing is ever updated automatically: an update is a code change, and an administrator clicks it."
+msgstr ""
+"Může číst a měnit všechno na této instanci, pro každého, kdo ji používá. Instalujte jen to, co jste přečetli nebo čemu máte důvod věřit. Nic se nikdy neaktualizuje samo: aktualizace je změna kódu a klikne na ni správce."
 
 #: src/postulo/applications/forms.py:279
 #, draft
@@ -3177,6 +3325,11 @@ msgstr "Právo"
 msgid "Legal Entity Identifier (LEI)"
 msgstr "Identifikátor právnické osoby (LEI)"
 
+#: src/postulo/templates/server/plugins.html:88
+#, draft
+msgid "Licence"
+msgstr "Licence"
+
 #: src/postulo/accounts/models.py:139
 #, draft
 msgid "Light"
@@ -3283,6 +3436,11 @@ msgstr "hlavní kontakt"
 #, draft
 msgid "Main contact"
 msgstr "Hlavní kontakt"
+
+#: src/postulo/templates/server/plugins.html:89
+#, draft
+msgid "Maintainer"
+msgstr "Údržba"
 
 #: src/postulo/templates/server/people.html:51
 #, draft
@@ -3432,6 +3590,7 @@ msgstr "Nahoru"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
 #: src/postulo/templates/server/people.html:20
+#: src/postulo/templates/server/plugins.html:86
 #, draft
 msgid "Name"
 msgstr "Název"
@@ -3564,6 +3723,28 @@ msgstr "Ne"
 #, draft
 msgid "No address to send to."
 msgstr "Není kam odeslat."
+
+#: src/postulo/plugins/catalogue.py:166
+#, python-format, draft
+msgid "No catalogue called “%(name)s” is configured."
+msgstr "Není nastaven žádný katalog s názvem „%(name)s“."
+
+#: src/postulo/plugins/catalogue.py:250
+#, draft
+msgid "No catalogue is configured on this instance."
+msgstr "Na této instanci není nastaven žádný katalog."
+
+#: src/postulo/templates/server/plugins.html:169
+#, draft
+msgid ""
+"No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
+msgstr ""
+"Není nastaven žádný katalog, takže se zásuvné moduly instalují z balíčku, který nahrajete. Katalog je podepsaný seznam zásuvných modulů, které lze instalovat podle jména."
+
+#: src/postulo/plugins/catalogue.py:209
+#, python-format, draft
+msgid "No catalogue lists %(name)s."
+msgstr "Žádný katalog neuvádí %(name)s."
 
 #: src/postulo/templates/jobs/company_list.html:44
 #, draft
@@ -3740,6 +3921,11 @@ msgstr "Nic pro mě"
 msgid "Not found"
 msgstr "Nenalezeno"
 
+#: src/postulo/templates/server/plugins.html:35
+#, draft
+msgid "not loaded"
+msgstr "nenačteno"
+
 #: src/postulo/templates/applications/suggestion_list.html:50
 #, draft
 msgid "Not matched to an application."
@@ -3804,6 +3990,11 @@ msgstr "Poznámky"
 msgid "notes"
 msgstr "poznámky"
 
+#: src/postulo/templates/server/plugins.html:94
+#, draft
+msgid "nothing"
+msgstr "nic"
+
 #: src/postulo/templates/core/dashboard.html:259
 #, draft
 msgid "Nothing due."
@@ -3837,6 +4028,13 @@ msgid ""
 "Nothing in the diary. When one is offered, schedule it from the application's page."
 msgstr ""
 "V diáři nic není. Až vám nějaký nabídnou, naplánujte ho ze stránky žádosti."
+
+#: src/postulo/templates/server/plugins.html:71
+#, python-format, draft
+msgid ""
+"Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
+msgstr ""
+"Zatím tu nic nainstalováno není. Zásuvné moduly leží v %(directory)s, na datovém svazku, takže přežijí aktualizaci."
 
 #: src/postulo/templates/jobs/capture_form.html:49
 #, draft
@@ -3950,6 +4148,11 @@ msgstr "Nic nečeká"
 msgid "Nothing was added."
 msgstr "Nic nebylo přidáno."
 
+#: src/postulo/core/server_views.py:539
+#, draft
+msgid "Nothing was installed."
+msgstr "Nic nebylo nainstalováno."
+
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
 #, draft
 msgid "Notifications"
@@ -3966,6 +4169,7 @@ msgid "notified on"
 msgstr "oznámeno dne"
 
 #: src/postulo/templates/connections/list.html:26
+#: src/postulo/templates/server/plugins.html:32
 #, draft
 msgid "Off"
 msgstr "Vypnuto"
@@ -4128,7 +4332,7 @@ msgstr "pořadí"
 msgid "organisation"
 msgstr "organizace"
 
-#: src/postulo/templates/server/plugins.html:16
+#: src/postulo/templates/server/plugins.html:192
 #, draft
 msgid "Origin"
 msgstr "Původ"
@@ -4171,7 +4375,7 @@ msgstr "Výsledky"
 msgid "Outstanding only"
 msgstr "Jen nevyřízené"
 
-#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:100
+#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:102
 #: src/postulo/templates/server/overview.html:5
 #, draft
 msgid "Overview"
@@ -4181,6 +4385,11 @@ msgstr "Přehled"
 #, draft
 msgid "owner"
 msgstr "vlastník"
+
+#: src/postulo/templates/server/plugins.html:115
+#, draft
+msgid "Package"
+msgstr "Balíček"
 
 #: src/postulo/templates/applications/suggestion_list.html:107
 #: src/postulo/templates/jobs/listing_list.html:149
@@ -4254,8 +4463,8 @@ msgid "Pending only"
 msgstr "Jen nevyřízené"
 
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
-#: src/postulo/core/server_views.py:132 src/postulo/core/server_views.py:218
-#: src/postulo/core/server_views.py:235 src/postulo/core/server_views.py:260
+#: src/postulo/core/server_views.py:134 src/postulo/core/server_views.py:220
+#: src/postulo/core/server_views.py:237 src/postulo/core/server_views.py:262
 #: src/postulo/jobs/tables.py:50
 #: src/postulo/templates/jobs/company_detail.html:100
 #: src/postulo/templates/server/people.html:7
@@ -4343,7 +4552,7 @@ msgstr "plugin"
 msgid "plugin not installed"
 msgstr "plugin není nainstalován"
 
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:437
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:452
 #: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
 #, draft
 msgid "Plugins"
@@ -4474,6 +4683,13 @@ msgstr "poznámky k přípravě"
 msgid "present"
 msgstr "dosud"
 
+#: src/postulo/templates/server/plugins.html:162
+#, draft
+msgid ""
+"Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
+msgstr ""
+"Stiskněte „Zkontrolovat aktualizace“ a stáhne se, co katalogy nabízejí. Postulo je samo nestahuje."
+
 #: src/postulo/templates/documents/cv_detail.html:16
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:18
@@ -4548,6 +4764,11 @@ msgstr "projekty"
 #, draft
 msgid "Provider"
 msgstr "Poskytovatel"
+
+#: src/postulo/templates/server/plugins.html:91
+#, draft
+msgid "Provides"
+msgstr "Poskytuje"
 
 #: src/postulo/jobs/identifiers.py:83
 #, draft
@@ -4663,6 +4884,11 @@ msgid ""
 "Read from the timeline, so an interview that ended in a rejection still counts as an interview."
 msgstr ""
 "Čteno z časové osy, takže pohovor, který skončil zamítnutím, se stále počítá jako pohovor."
+
+#: src/postulo/templates/server/plugins.html:118
+#, draft
+msgid "Read it"
+msgstr "Přečíst ho"
 
 #: src/postulo/templates/jobs/capture_form.html:36
 #, draft
@@ -4790,6 +5016,11 @@ msgstr "registrace otevřená"
 msgid "Registration open"
 msgstr "Registrace otevřená"
 
+#: src/postulo/templates/server/plugins.html:154
+#, draft
+msgid "Reinstall"
+msgstr "Přeinstalovat"
+
 #: src/postulo/applications/models.py:47
 #: src/postulo/templates/applications/insights.html:247
 #, draft
@@ -4840,6 +5071,7 @@ msgstr "vzdálená adresa"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
+#: src/postulo/templates/server/plugins.html:62
 #, draft
 msgid "Remove"
 msgstr "Odebrat"
@@ -5078,7 +5310,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Uloženo do vašich nabídek. Rozhodněte se, až budete připraveni."
 
 #: src/postulo/accounts/settings_views.py:32
-#: src/postulo/core/server_views.py:306 src/postulo/resume/views.py:111
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:111
 #, draft
 msgid "Saved."
 msgstr "Uloženo."
@@ -5202,7 +5434,7 @@ msgstr "Poslat na"
 msgid "Send to stores now"
 msgstr "Odeslat do úložišť nyní"
 
-#: src/postulo/core/server_views.py:426
+#: src/postulo/core/server_views.py:428
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Odeslání selhalo: %(error)s"
@@ -5236,7 +5468,7 @@ msgstr "Odeslané dokumenty"
 msgid "sent on"
 msgstr "odesláno"
 
-#: src/postulo/core/server_views.py:429 src/postulo/notifications/email.py:80
+#: src/postulo/core/server_views.py:431 src/postulo/notifications/email.py:80
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Odesláno na %(to)s."
@@ -5264,6 +5496,13 @@ msgstr "Server"
 #, draft
 msgid "Server settings"
 msgstr "Nastavení serveru"
+
+#: src/postulo/templates/server/plugins.html:175
+#, draft
+msgid ""
+"Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code> entries, separated by commas. The index must be signed with that key, and every wheel must match the checksum the signed index carries, or nothing is installed."
+msgstr ""
+"Nastavte <code>POSTULO_PLUGIN_CATALOGUES</code> na položky <code>name|url|public-key</code> oddělené čárkami. Index musí být podepsán tímto klíčem a každý wheel musí odpovídat kontrolnímu součtu z podepsaného indexu, jinak se nic nenainstaluje."
 
 #: src/postulo/applications/models.py:206
 #, draft
@@ -5359,7 +5598,7 @@ msgstr "Přihlásit se"
 msgid "Sign out"
 msgstr "Odhlásit se"
 
-#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:322
+#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:324
 #: src/postulo/templates/server/signin.html:5
 #, draft
 msgid "Sign-in"
@@ -5464,7 +5703,7 @@ msgid "Somebody already has that username."
 msgstr "Toto uživatelské jméno už někdo má."
 
 #: src/postulo/templates/applications/insights.html:144
-#: src/postulo/templates/server/plugins.html:14
+#: src/postulo/templates/server/plugins.html:190
 #, draft
 msgid "Source"
 msgstr "Zdroj"
@@ -5606,6 +5845,16 @@ msgstr "nahrazeno"
 #, draft
 msgid "Supersedes"
 msgstr "Nahrazuje"
+
+#: src/postulo/templates/server/plugins.html:55
+#, draft
+msgid "Switch off"
+msgstr "Vypnout"
+
+#: src/postulo/templates/server/plugins.html:55
+#, draft
+msgid "Switch on"
+msgstr "Zapnout"
 
 #: src/postulo/plugins/views.py:236
 #, python-format, draft
@@ -5781,6 +6030,11 @@ msgstr "Tato pozvánka už byla přijata a nelze ji zneplatnit."
 msgid "That is not a status Postulo recognises."
 msgstr "To není stav, který Postulo zná."
 
+#: src/postulo/plugins/installing.py:185
+#, draft
+msgid "That is not a wheel: Postulo installs .whl files."
+msgstr "To není wheel: Postulo instaluje soubory .whl."
+
 #: src/postulo/applications/views.py:519
 #, draft
 msgid "That is not an outcome Postulo recognises."
@@ -5791,21 +6045,31 @@ msgstr "To není výsledek, který Postulo zná."
 msgid "That is not something Postulo can do about it."
 msgstr "To s tím Postulo udělat nemůže."
 
+#: src/postulo/core/server_views.py:490
+#, draft
+msgid "That is not something this page does."
+msgstr "To tato stránka nedělá."
+
 #: src/postulo/accounts/views.py:230
 #, draft
 msgid "That is not the address on this account."
 msgstr "To není adresa tohoto účtu."
 
-#: src/postulo/core/server_views.py:238
+#: src/postulo/core/server_views.py:240
 #, draft
 msgid "That is not the username."
 msgstr "To není uživatelské jméno."
 
-#: src/postulo/core/server_views.py:155 src/postulo/core/server_views.py:180
-#: src/postulo/core/server_views.py:209
+#: src/postulo/core/server_views.py:157 src/postulo/core/server_views.py:182
+#: src/postulo/core/server_views.py:211
 #, draft
 msgid "That is the last administrator. Appoint another first."
 msgstr "To je poslední správce. Nejdřív jmenujte jiného."
+
+#: src/postulo/core/server_views.py:548 src/postulo/core/server_views.py:553
+#, draft
+msgid "That package is no longer waiting; upload it again."
+msgstr "Ten balíček už nečeká; nahrajte ho znovu."
 
 #: src/postulo/plugins/fetching.py:205
 #, python-format, draft
@@ -5852,6 +6116,26 @@ msgstr "Zásuvný modul %(plugin)s není nainstalován."
 msgid "The application deadline, if stated."
 msgstr "Uzávěrka přihlášek, pokud je uvedena."
 
+#: src/postulo/plugins/catalogue.py:127
+#, draft
+msgid "The catalogue is not readable JSON."
+msgstr "Katalog není čitelný JSON."
+
+#: src/postulo/plugins/catalogue.py:119
+#, draft
+msgid "The catalogue's signature does not match its contents; it was not used."
+msgstr "Podpis katalogu neodpovídá jeho obsahu; katalog nebyl použit."
+
+#: src/postulo/plugins/catalogue.py:115
+#, python-format, draft
+msgid "The catalogue's signature or key is not readable: %(error)s"
+msgstr "Podpis nebo klíč katalogu není čitelný: %(error)s"
+
+#: src/postulo/core/server_views.py:605
+#, draft
+msgid "The catalogues answered, and list nothing yet."
+msgstr "Katalogy odpověděly a zatím nic neuvádějí."
+
 #: src/postulo/templates/applications/application_intake.html:10
 #, draft
 msgid ""
@@ -5880,6 +6164,11 @@ msgid ""
 "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr ""
 "Přehled vypisuje otevřené žádosti, u nichž se už nějakou dobu nic nestalo, bez plánu. Rady samotných náborářů se pohybují kolem dvou až tří týdnů."
+
+#: src/postulo/plugins/catalogue.py:232
+#, draft
+msgid "The download is far larger than a plugin should be."
+msgstr "Stahovaný soubor je mnohem větší, než by zásuvný modul měl být."
 
 #: src/postulo/documents/models.py:228
 #, draft
@@ -5912,6 +6201,16 @@ msgstr "Soubor je prázdný."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Soubor má přes 2 MB. Hledání práce není tak velké."
 
+#: src/postulo/plugins/installing.py:354
+#, python-format, draft
+msgid "The installer could not be run: %(error)s"
+msgstr "Instalátor se nepodařilo spustit: %(error)s"
+
+#: src/postulo/plugins/installing.py:358
+#, python-format, draft
+msgid "The installer refused it: %(error)s"
+msgstr "Instalátor jej odmítl: %(error)s"
+
 #: src/postulo/documents/models.py:160
 #, draft
 msgid "The job title"
@@ -5932,7 +6231,7 @@ msgstr "Nabídka, kterou se toto zachycení po kontrole stalo."
 msgid "The location"
 msgstr "Místo"
 
-#: src/postulo/core/server_views.py:431 src/postulo/notifications/email.py:79
+#: src/postulo/core/server_views.py:433 src/postulo/notifications/email.py:79
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Poštovní backend nic nepřijal."
@@ -6020,6 +6319,16 @@ msgstr ""
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "Horní částka nemůže být nižší než dolní."
+
+#: src/postulo/plugins/catalogue.py:238
+#, draft
+msgid "The wheel does not match the checksum the catalogue published for it."
+msgstr "Wheel neodpovídá kontrolnímu součtu, který pro něj katalog zveřejnil."
+
+#: src/postulo/plugins/installing.py:190
+#, draft
+msgid "The wheel has no metadata; it may be damaged."
+msgstr "Wheel nemá metadata; možná je poškozený."
 
 #: src/postulo/accounts/models.py:191 src/postulo/documents/models.py:65
 #: src/postulo/documents/models.py:176
@@ -6116,6 +6425,11 @@ msgid ""
 "This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
 msgstr ""
 "Toto je zkušební zpráva z vašeho připojení oznámení Postula. Připomínky a zachycení budou chodit stejnou cestou."
+
+#: src/postulo/templates/server/plugins.html:83
+#, draft
+msgid "This is what you are about to install. Nothing has been installed yet."
+msgstr "Tohle se chystáte nainstalovat. Zatím nebylo nainstalováno nic."
 
 #: src/postulo/jobs/forms.py:152
 #, draft
@@ -6448,7 +6762,7 @@ msgstr "Ověřeno"
 msgid "version"
 msgstr "verze"
 
-#: src/postulo/templates/server/plugins.html:15
+#: src/postulo/templates/server/plugins.html:191
 #, draft
 msgid "Version"
 msgstr "Verze"
@@ -6582,6 +6896,11 @@ msgstr "Co smí dělat"
 msgid "what it says"
 msgstr "co říká"
 
+#: src/postulo/templates/server/plugins.html:87
+#, draft
+msgid "What it says it is"
+msgstr "Co o sobě říká"
+
 #: src/postulo/templates/settings/locale.html:7
 #, draft
 msgid "What Postulo speaks to you, and whose clock it shows."
@@ -6607,9 +6926,9 @@ msgstr "Jak se tato instance nazývá a s čím nový účet začíná."
 #: src/postulo/templates/server/plugins.html:7
 #, draft
 msgid ""
-"What this instance can read a posting with. Postulo's own sources ship in the box; others arrive as installed packages."
+"What this instance can read a posting with, be notified through, keep documents in, and synchronise with. Postulo's own implementations ship in the box; others are packages you install here."
 msgstr ""
-"Čím tato instance umí číst inzerát. Vlastní zdroje Postula jsou vestavěné; další přicházejí jako nainstalované balíčky."
+"Čím tato instance umí přečíst inzerát, upozornit vás, uchovat dokumenty a synchronizovat se. Vlastní implementace Postula jsou vestavěné; ostatní jsou balíčky, které nainstalujete zde."
 
 #: src/postulo/templates/server/overview.html:7
 #, draft
@@ -6870,7 +7189,7 @@ msgid ""
 msgstr ""
 "Svůj účet můžete smazat sami: každý záznam, každý soubor na disku, tokeny, připojení i účet. Export výše je záchranná síť; udělejte ho nejdřív."
 
-#: src/postulo/core/server_views.py:177
+#: src/postulo/core/server_views.py:179
 #, draft
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Nemůžete deaktivovat účet, kterým jste přihlášeni."
