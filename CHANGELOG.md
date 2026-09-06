@@ -8,6 +8,27 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Import a career record from a Europass CV.** Anybody who has applied to an EU
+  institution, or through a national employment service, already has one, and typing that
+  record in a second time is exactly the work Postulo exists to remove. *Your career →
+  Import* reads the Europass XML — what the CV editor produced, and what an older export
+  on a disk will be — and matches on tag names rather than the namespace, so all the
+  namespaces the format has been through read alike. It happens in two steps: the file is
+  read, the page says what was found, and nothing reaches the career record until somebody
+  has seen the list and pressed the button. What is held between the steps is the parsed
+  record, not the file. **An import only ever adds**: nothing existing is changed or
+  removed, a blank profile field is filled but one that already says something is not, and
+  a skill heading that already exists is used rather than repeated — duplicates are a
+  minute to delete and something lost is not. Europass keeps five CEFR levels per language
+  and Postulo keeps one, so the lowest is taken and all five are shown before confirming;
+  claiming the best of five is what gets found out in an interview. It is XML from
+  somewhere else, so there is a 5 MB cap and **any document type declaration is refused
+  before parsing** — that is where entity expansion lives, billion-laughs and external
+  entities both need one, and a Europass export has no use for it. `manage.py
+  import_europass` does the same from a shell, with `--dry-run`. The reader produces an
+  intermediate record rather than writing as it goes, so the JSON format that replaced this
+  one (#69) becomes a second front door and not a second mapping. (#54)
+
 - **Document stores: local media built in, an interface for keeping copies elsewhere.**
   A store plugin in the `postulo.stores` group receives a copy of every new document —
   rendered CVs and letters, uploaded files — with enough metadata to file it: kind,

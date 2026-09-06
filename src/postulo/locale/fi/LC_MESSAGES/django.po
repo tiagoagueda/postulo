@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 19:26+0000\n"
+"POT-Creation-Date: 2026-09-06 19:43+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -272,7 +272,7 @@ msgstr "%(name)s — CV"
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — kojelauta"
 
-#: src/postulo/resume/views.py:201
+#: src/postulo/resume/views.py:207
 #, python-format, draft
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d vastasi, %(broken)d ei; ne jotka eivät, kertovat miksi."
@@ -313,12 +313,12 @@ msgstr ""
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d kopiota lähetetty."
 
-#: src/postulo/resume/views.py:188
+#: src/postulo/resume/views.py:194
 #, python-format, draft
 msgid "%(title)s did not answer: %(detail)s"
 msgstr "%(title)s ei vastannut: %(detail)s"
 
-#: src/postulo/resume/views.py:192
+#: src/postulo/resume/views.py:198
 #, python-format, draft
 msgid "%(title)s still answers."
 msgstr "%(title)s vastaa yhä."
@@ -344,7 +344,7 @@ msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s merkintä"
 msgstr[1] "%(total)s merkintää"
 
-#: src/postulo/templates/resume/overview.html:84
+#: src/postulo/templates/resume/overview.html:85
 #, python-format, draft
 msgid "%(total)s highlight"
 msgid_plural "%(total)s highlights"
@@ -444,6 +444,13 @@ msgstr "Yritys, tehtävä, lause kirjeestä, nimi…"
 #, draft
 msgid "A CSV file"
 msgstr "CSV-tiedosto"
+
+#: src/postulo/templates/resume/europass_import.html:20
+#, draft
+msgid ""
+"A Europass XML file — what the CV editor produced, and what an older export on your disk will be. Postulo reads it, shows you what is in it, and writes nothing until you say so."
+msgstr ""
+"Europass-XML-tiedosto — se, jonka CV-editori tuotti, ja se, joka vanhempi vienti levylläsi on. Postulo lukee sen, näyttää sinulle mitä siinä on eikä kirjoita mitään ennen kuin sanot."
 
 #: src/postulo/core/models.py:74
 #, draft
@@ -664,8 +671,8 @@ msgstr "Toiminnot"
 #: src/postulo/templates/applications/application_detail.html:289
 #: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:114
-#: src/postulo/templates/resume/overview.html:36
-#: src/postulo/templates/resume/overview.html:41
+#: src/postulo/templates/resume/overview.html:37
+#: src/postulo/templates/resume/overview.html:42
 #, draft
 msgid "Add"
 msgstr "Lisää"
@@ -690,10 +697,15 @@ msgstr "Lisää yhteys"
 msgid "Add a listing"
 msgstr "Lisää ilmoitus"
 
-#: src/postulo/templates/resume/overview.html:123
+#: src/postulo/templates/resume/overview.html:124
 #, draft
 msgid "Add a skill"
 msgstr "Lisää taito"
+
+#: src/postulo/templates/resume/europass_import.html:126
+#, draft
+msgid "Add all of this"
+msgstr "Lisää kaikki tämä"
 
 #: src/postulo/templates/documents/cv_detail.html:100
 #, draft
@@ -710,7 +722,7 @@ msgstr "Lisää merkintä"
 msgid "Add one"
 msgstr "Lisää yksi"
 
-#: src/postulo/templates/resume/overview.html:136
+#: src/postulo/templates/resume/overview.html:137
 #, draft
 msgid "Add the first one."
 msgstr "Lisää ensimmäinen."
@@ -740,6 +752,13 @@ msgstr "Lisätty"
 msgid "Added %(count)s entries."
 msgstr "%(count)s merkintää lisätty."
 
+#: src/postulo/resume/views.py:287
+#, python-format, draft
+msgid ""
+"Added %(total)s entries. Nothing was overwritten; anything duplicated is yours to delete."
+msgstr ""
+"Lisättiin %(total)s merkintää. Mitään ei korvattu; kaksoiskappaleet saat itse poistaa."
+
 #: src/postulo/applications/views.py:312 src/postulo/applications/views.py:662
 #, draft
 msgid "Added to the timeline."
@@ -750,7 +769,7 @@ msgstr "Lisätty aikajanalle."
 msgid "Added to your listings."
 msgstr "Lisätty ilmoituksiisi."
 
-#: src/postulo/resume/views.py:103
+#: src/postulo/resume/views.py:109
 #, draft
 msgid "Added."
 msgstr "Lisätty."
@@ -787,7 +806,7 @@ msgid_plural "All %(counter)s in %(label)s"
 msgstr[0] "Kaikki %(counter)s ryhmässä %(label)s"
 msgstr[1] "Kaikki %(counter)s ryhmässä %(label)s"
 
-#: src/postulo/resume/views.py:205
+#: src/postulo/resume/views.py:211
 #, python-format, draft
 msgid "All %(ok)d links still answer."
 msgstr "Kaikki %(ok)d linkkiä vastaavat yhä."
@@ -828,6 +847,13 @@ msgid ""
 "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr ""
 "Arkiston voi tuoda tyhjään tiliin komentoriviltä. Sitä ei tarjota tässä, koska tuonti luo tietueita sen sijaan että yhdistäisi niitä, ja se on päätös, joka kannattaa tehdä harkiten eikä napsauttamalla."
+
+#: src/postulo/templates/resume/europass_import.html:35
+#, draft
+msgid ""
+"An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
+msgstr ""
+"Tuonti vain lisää. Mitään ansioluettelossasi jo olevaa ei muuteta eikä poisteta, ja kaksoiskappaleiksi osoittautuvat saat itse poistaa."
 
 #: src/postulo/templates/accounts/profile.html:89
 #, draft
@@ -1418,17 +1444,17 @@ msgstr "Kysy yritykseltä %(company)s tehtävästä %(role)s"
 msgid "Check for updates"
 msgstr "Tarkista päivitykset"
 
-#: src/postulo/templates/resume/overview.html:72
+#: src/postulo/templates/resume/overview.html:73
 #, draft
 msgid "Check it answers"
 msgstr "Tarkista että vastaa"
 
-#: src/postulo/templates/resume/overview.html:32
+#: src/postulo/templates/resume/overview.html:33
 #, draft
 msgid "Check them all"
 msgstr "Tarkista kaikki"
 
-#: src/postulo/templates/resume/overview.html:64
+#: src/postulo/templates/resume/overview.html:65
 #, python-format, draft
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Tarkistettu %(when)s: %(detail)s"
@@ -1442,6 +1468,11 @@ msgstr "tarkistussumma"
 #, draft
 msgid "Checksum"
 msgstr "Tarkistussumma"
+
+#: src/postulo/resume/views.py:247
+#, draft
+msgid "Choose a Europass file first."
+msgstr "Valitse ensin Europass-tiedosto."
 
 #: src/postulo/core/server_views.py:542
 #, draft
@@ -1751,6 +1782,11 @@ msgstr "konteksti"
 #, draft
 msgid "Contract"
 msgstr "Määräaikainen"
+
+#: src/postulo/resume/views.py:319
+#, draft
+msgid "conversation"
+msgstr "keskustelu"
 
 #: src/postulo/templates/api/token_list.html:20
 #, draft
@@ -2072,7 +2108,7 @@ msgstr "Puolustus"
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
-#: src/postulo/templates/resume/overview.html:108
+#: src/postulo/templates/resume/overview.html:109
 #, draft
 msgid "Delete"
 msgstr "Poista"
@@ -2294,7 +2330,7 @@ msgstr ""
 #: src/postulo/templates/jobs/company_detail.html:135
 #: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
-#: src/postulo/templates/resume/overview.html:105
+#: src/postulo/templates/resume/overview.html:106
 #: src/postulo/templates/resume/preview.html:15
 #, draft
 msgid "Edit"
@@ -2314,6 +2350,7 @@ msgstr "Muokkaa haastattelua"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
+#: src/postulo/templates/resume/europass_import.html:62
 #: src/postulo/templates/resume/preview.html:45
 #, draft
 msgid "Education"
@@ -2333,7 +2370,7 @@ msgid "Email"
 msgstr "Sähköposti"
 
 #: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
-#: src/postulo/jobs/models.py:263
+#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:309
 #, draft
 msgid "email address"
 msgstr "sähköpostiosoite"
@@ -2402,6 +2439,13 @@ msgstr "Energia"
 #, draft
 msgid "Engineering"
 msgstr "Insinöörityö"
+
+#: src/postulo/templates/resume/europass_import.html:90
+#, draft
+msgid ""
+"Europass records five levels per language and Postulo keeps one, so the lowest is taken. Change it afterwards if that is not the one you would claim."
+msgstr ""
+"Europass merkitsee viisi tasoa kieltä kohden ja Postulo säilyttää yhden, joten alin otetaan. Muuta sitä jälkeenpäin, jos et ilmoittaisi juuri sitä."
 
 #: src/postulo/applications/models.py:341
 #, draft
@@ -2523,6 +2567,7 @@ msgstr "Kaikki, uusin ensin."
 
 #: src/postulo/documents/rendering.py:23 src/postulo/resume/registry.py:33
 #: src/postulo/resume/registry.py:34
+#: src/postulo/templates/resume/europass_import.html:53
 #: src/postulo/templates/resume/preview.html:20
 #, draft
 msgid "Experience"
@@ -2711,6 +2756,11 @@ msgstr "Etsi tunnus"
 msgid "First name"
 msgstr "Etunimi"
 
+#: src/postulo/resume/views.py:307
+#, draft
+msgid "first name"
+msgstr "etunimi"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -2787,6 +2837,11 @@ msgstr "Löydetty"
 #, draft
 msgid "found via"
 msgstr "löydetty"
+
+#: src/postulo/templates/resume/europass_import.html:116
+#, python-format, draft
+msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
+msgstr "Löytyi: %(names)s. Vain tyhjiksi jättämäsi kentät täytetään."
 
 #: src/postulo/jobs/models.py:287
 #, draft
@@ -2979,6 +3034,7 @@ msgid "happened on"
 msgstr "tapahtui"
 
 #: src/postulo/accounts/models.py:236 src/postulo/documents/models.py:61
+#: src/postulo/resume/views.py:313
 #, draft
 msgid "headline"
 msgstr "ammattinimike"
@@ -3138,6 +3194,13 @@ msgid ""
 msgstr ""
 "Jos luet tätä, Postulo-instanssisi sähköpostiasetukset toimivat. Mitään muuta ei tarvitse tehdä."
 
+#: src/postulo/templates/resume/europass_import.html:10
+#, draft
+msgid ""
+"If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
+msgstr ""
+"Jos olet hakenut töitä EU-toimielimestä tai kansallisen työvoimapalvelun kautta, sinulla on tämä tiedosto jo. Sen sijaan että kirjoittaisit kaiken uudelleen, anna se tänne."
+
 #: src/postulo/core/models.py:123
 #, draft
 msgid "ignore robots.txt when capturing"
@@ -3154,9 +3217,17 @@ msgid "Ignore this column"
 msgstr "Ohita tämä sarake"
 
 #: src/postulo/templates/core/import_csv_map.html:101
+#: src/postulo/templates/resume/overview.html:18
 #, draft
 msgid "Import"
 msgstr "Tuo"
+
+#: src/postulo/resume/views.py:233
+#: src/postulo/templates/resume/europass_import.html:4
+#: src/postulo/templates/resume/europass_import.html:8
+#, draft
+msgid "Import a Europass CV"
+msgstr "Tuo Europass-ansioluettelo"
 
 #: src/postulo/templates/core/import_csv_done.html:35
 #, draft
@@ -3574,6 +3645,8 @@ msgid "Language for new accounts"
 msgstr "Uusien tilien kieli"
 
 #: src/postulo/documents/rendering.py:29 src/postulo/resume/registry.py:78
+#: src/postulo/resume/views.py:301
+#: src/postulo/templates/resume/europass_import.html:71
 #: src/postulo/templates/resume/preview.html:100
 #, draft
 msgid "Languages"
@@ -3787,6 +3860,11 @@ msgstr "lähetetyt linkit"
 #, draft
 msgid "Links you pointed them at"
 msgstr "Linkit, joihin ohjasit heidät"
+
+#: src/postulo/resume/views.py:317
+#, draft
+msgid "listening"
+msgstr "kuullun ymmärtäminen"
 
 #: src/postulo/jobs/models.py:584
 #: src/postulo/templates/core/import_csv_map.html:86
@@ -4043,7 +4121,7 @@ msgid "Move %(column)s up"
 msgstr "Siirrä %(column)s ylös"
 
 #: src/postulo/templates/documents/cv_detail.html:54
-#: src/postulo/templates/resume/overview.html:102
+#: src/postulo/templates/resume/overview.html:103
 #, draft
 msgid "Move down"
 msgstr "Siirrä alas"
@@ -4054,7 +4132,7 @@ msgid "Move it along"
 msgstr "Vie eteenpäin"
 
 #: src/postulo/templates/documents/cv_detail.html:49
-#: src/postulo/templates/resume/overview.html:97
+#: src/postulo/templates/resume/overview.html:98
 #, draft
 msgid "Move up"
 msgstr "Siirrä ylös"
@@ -4314,7 +4392,7 @@ msgstr "Tälle yritykselle ei ole kirjattu ilmoituksia."
 msgid "no role"
 msgstr "ei tehtävää"
 
-#: src/postulo/templates/resume/overview.html:79
+#: src/postulo/templates/resume/overview.html:80
 #, draft
 msgid "No skills in this group yet"
 msgstr "Tässä ryhmässä ei ole vielä taitoja"
@@ -4512,7 +4590,7 @@ msgstr "Ei mitään"
 msgid "Nothing here yet"
 msgstr "Ei vielä mitään"
 
-#: src/postulo/templates/resume/overview.html:133
+#: src/postulo/templates/resume/overview.html:134
 #, draft
 msgid "Nothing here yet."
 msgstr "Ei vielä mitään."
@@ -5051,6 +5129,11 @@ msgstr "Jakso"
 msgid "Permissions"
 msgstr "Oikeudet"
 
+#: src/postulo/templates/resume/europass_import.html:114
+#, draft
+msgid "Personal details"
+msgstr "Henkilötiedot"
+
 #: src/postulo/accounts/admin.py:22
 #, draft
 msgid "Personal info"
@@ -5147,6 +5230,11 @@ msgstr "Portfolio"
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Portfoliot, profiilit ja videot, joihin ohjasit heidät."
+
+#: src/postulo/resume/views.py:299
+#, draft
+msgid "Positions"
+msgstr "Tehtävät"
 
 #: src/postulo/jobs/models.py:421
 #, draft
@@ -5270,7 +5358,7 @@ msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html:16
 #: src/postulo/templates/documents/letter_detail.html:16
-#: src/postulo/templates/resume/overview.html:18
+#: src/postulo/templates/resume/overview.html:19
 #, draft
 msgid "Preview"
 msgstr "Esikatselu"
@@ -5328,6 +5416,7 @@ msgid "Project"
 msgstr "Projekti"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/resume/registry.py:45
+#: src/postulo/templates/resume/europass_import.html:107
 #: src/postulo/templates/resume/preview.html:61
 #, draft
 msgid "Projects"
@@ -5337,6 +5426,11 @@ msgstr "Projektit"
 #, draft
 msgid "projects"
 msgstr "projektit"
+
+#: src/postulo/resume/views.py:303
+#, draft
+msgid "Projects and achievements"
+msgstr "Projektit ja saavutukset"
 
 #: src/postulo/templates/server/logs.html:176
 #, draft
@@ -5393,6 +5487,11 @@ msgstr "Palauttaminen"
 #, draft
 msgid "qualification"
 msgstr "tutkinto"
+
+#: src/postulo/resume/views.py:300
+#, draft
+msgid "Qualifications"
+msgstr "Tutkinnot"
 
 #: src/postulo/templates/connections/list.html:65
 #, draft
@@ -5481,6 +5580,7 @@ msgid ""
 msgstr ""
 "Luettu aikajanalta, joten hylkäykseen päättynyt haastattelu lasketaan silti haastatteluksi."
 
+#: src/postulo/templates/resume/europass_import.html:29
 #: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
@@ -5490,6 +5590,11 @@ msgstr "Lue se"
 #, draft
 msgid "Read the page"
 msgstr "Lue sivu"
+
+#: src/postulo/resume/views.py:318
+#, draft
+msgid "reading"
+msgstr "luetun ymmärtäminen"
 
 #: src/postulo/jobs/industries.py:40
 #, draft
@@ -5927,7 +6032,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Tallennettu ilmoituksiisi. Päätä, kun olet valmis."
 
 #: src/postulo/accounts/settings_views.py:34
-#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:112
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:118
 #, draft
 msgid "Saved."
 msgstr "Tallennettu."
@@ -6301,7 +6406,8 @@ msgid "skill groups"
 msgstr "taitoryhmät"
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:52
-#: src/postulo/resume/registry.py:56
+#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:302
+#: src/postulo/templates/resume/europass_import.html:98
 #: src/postulo/templates/resume/preview.html:79
 #, draft
 msgid "Skills"
@@ -6383,10 +6489,20 @@ msgstr "lähteen versio"
 msgid "Sources installed"
 msgstr "Asennetut lähteet"
 
+#: src/postulo/resume/views.py:320
+#, draft
+msgid "speaking"
+msgstr "puhuminen"
+
 #: src/postulo/documents/models.py:166
 #, draft
 msgid "Speculative letter"
 msgstr "Avoin hakemus"
+
+#: src/postulo/templates/resume/europass_import.html:129
+#, draft
+msgid "Start again"
+msgstr "Aloita alusta"
 
 #: src/postulo/templates/documents/letter_form.html:8
 #, draft
@@ -6524,6 +6640,11 @@ msgstr "korvattu"
 msgid "Supersedes"
 msgstr "Korvaa"
 
+#: src/postulo/resume/views.py:308
+#, draft
+msgid "surname"
+msgstr "sukunimi"
+
 #: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
@@ -6625,6 +6746,11 @@ msgstr "räätälöity tälle CV:lle"
 msgid "Telecommunications"
 msgstr "Televiestintä"
 
+#: src/postulo/resume/views.py:310
+#, draft
+msgid "telephone"
+msgstr "puhelin"
+
 #: src/postulo/templates/documents/letter_list.html:45
 #, draft
 msgid "Template"
@@ -6708,6 +6834,16 @@ msgstr "Tuo tiedosto on suurempi kuin %(limit)s Mt."
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Tämä tiedosto on suurempi kuin tunnuksen pitäisi olla."
+
+#: src/postulo/resume/views.py:252
+#, python-format, draft
+msgid "That file is over %(limit)s MB. A CV is not that big."
+msgstr "Tiedosto on yli %(limit)s Mt. Ei ansioluettelo ole niin suuri."
+
+#: src/postulo/resume/views.py:265
+#, draft
+msgid "That file was read, and there was nothing in it to import."
+msgstr "Tiedosto luettiin, eikä siinä ollut mitään tuotavaa."
 
 #: src/postulo/plugins/fetching.py:102 src/postulo/plugins/fetching.py:127
 #, draft
@@ -6914,6 +7050,11 @@ msgid ""
 msgstr ""
 "Toimialat, joilla yrityksesi toimivat, omin sanoin. Yritys voi olla usealla."
 
+#: src/postulo/templates/resume/europass_import.html:26
+#, draft
+msgid "The file"
+msgstr "Tiedosto"
+
 #: src/postulo/core/csv_import.py:441
 #, draft
 msgid "The file holds no rows."
@@ -7086,7 +7227,7 @@ msgstr "Teema: %(current)s. Vaihda: %(next)s."
 msgid "Then delete"
 msgstr "Sitten poista"
 
-#: src/postulo/resume/views.py:197
+#: src/postulo/resume/views.py:203
 #, draft
 msgid "There are no links to check."
 msgstr "Tarkistettavia linkkejä ei ole."
@@ -7110,6 +7251,11 @@ msgstr "Tuossa osoitteessa ei ole mitään (404). Tarkista linkki."
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Täällä ei ole mitään, tai se ei ole sinun nähtäväsi."
+
+#: src/postulo/resume/views.py:276
+#, draft
+msgid "There is nothing waiting to be imported."
+msgstr "Mitään ei odota tuontia."
 
 #: src/postulo/templates/applications/insights.html:31
 #, python-format, draft
@@ -7619,6 +7765,7 @@ msgstr ""
 "WeasyPrint asennetaan Postulon mukana, mutta se tarvitsee Pangon ja sen järjestelmäkirjastot. Debianissa tai Ubuntussa: apt install libpango-1.0-0 libpangoft2-1.0-0. Windowsissa niitä on hankala saada, joten käytä sen sijaan chromium-moottoria. Katso https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
 #: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:116
+#: src/postulo/resume/views.py:311
 #, draft
 msgid "website"
 msgstr "verkkosivusto"
@@ -7671,6 +7818,11 @@ msgstr "Mitä se sisältää"
 msgid ""
 "What is in the diary, soonest first. Schedule one from an application's page."
 msgstr "Mitä kalenterissa on, lähin ensin. Sovi haastattelu hakemuksen sivulta."
+
+#: src/postulo/templates/resume/europass_import.html:44
+#, draft
+msgid "What is in the file"
+msgstr "Mitä tiedostossa on"
 
 #: src/postulo/templates/documents/cv_detail.html:29
 #, draft
@@ -7815,6 +7967,11 @@ msgstr "Missä tämä yritys julkaisee avoimet paikkansa."
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Mistä löysit sen: työpaikkasivusto, suositus, yrityksen sivusto."
+
+#: src/postulo/resume/views.py:312
+#, draft
+msgid "where you live"
+msgstr "missä asut"
 
 #: src/postulo/templates/core/dashboard.html:42
 #, draft
@@ -7961,6 +8118,11 @@ msgstr "Kirjoita vähän lisää."
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Kirjoita ensin urasi ylös ja rakenna sitten versioita siitä."
+
+#: src/postulo/resume/views.py:321
+#, draft
+msgid "writing"
+msgstr "kirjoittaminen"
 
 #: src/postulo/templates/resume/overview.html:11
 #, draft
@@ -8120,7 +8282,7 @@ msgid "Your career record"
 msgstr "Urahistoriasi"
 
 #: src/postulo/templates/core/dashboard.html:270
-#: src/postulo/templates/resume/overview.html:19
+#: src/postulo/templates/resume/overview.html:20
 #, draft
 msgid "Your CVs"
 msgstr "CV:si"

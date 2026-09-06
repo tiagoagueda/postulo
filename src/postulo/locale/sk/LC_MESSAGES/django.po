@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 19:26+0000\n"
+"POT-Creation-Date: 2026-09-06 19:43+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenčina\n"
@@ -284,7 +284,7 @@ msgstr "%(name)s — CV"
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — prehľad"
 
-#: src/postulo/resume/views.py:201
+#: src/postulo/resume/views.py:207
 #, python-format, draft
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d odpovedalo, %(broken)d nie; tie, ktoré nie, hovoria prečo."
@@ -325,12 +325,12 @@ msgstr ""
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d kópií odoslaných."
 
-#: src/postulo/resume/views.py:188
+#: src/postulo/resume/views.py:194
 #, python-format, draft
 msgid "%(title)s did not answer: %(detail)s"
 msgstr "%(title)s neodpovedal: %(detail)s"
 
-#: src/postulo/resume/views.py:192
+#: src/postulo/resume/views.py:198
 #, python-format, draft
 msgid "%(title)s still answers."
 msgstr "%(title)s stále odpovedá."
@@ -359,7 +359,7 @@ msgstr[0] "%(total)s položka"
 msgstr[1] "%(total)s položky"
 msgstr[2] "%(total)s položiek"
 
-#: src/postulo/templates/resume/overview.html:84
+#: src/postulo/templates/resume/overview.html:85
 #, python-format, draft
 msgid "%(total)s highlight"
 msgid_plural "%(total)s highlights"
@@ -462,6 +462,13 @@ msgstr "Firma, pozícia, veta z listu, meno…"
 #, draft
 msgid "A CSV file"
 msgstr "Súbor CSV"
+
+#: src/postulo/templates/resume/europass_import.html:20
+#, draft
+msgid ""
+"A Europass XML file — what the CV editor produced, and what an older export on your disk will be. Postulo reads it, shows you what is in it, and writes nothing until you say so."
+msgstr ""
+"Súbor XML Europass — ten, ktorý vytvoril editor životopisu, a ten, ktorým bude starší export na vašom disku. Postulo ho prečíta, ukáže vám, čo v ňom je, a nič nezapíše, kým to nepoviete."
 
 #: src/postulo/core/models.py:74
 #, draft
@@ -684,8 +691,8 @@ msgstr "Akcie"
 #: src/postulo/templates/applications/application_detail.html:289
 #: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:114
-#: src/postulo/templates/resume/overview.html:36
-#: src/postulo/templates/resume/overview.html:41
+#: src/postulo/templates/resume/overview.html:37
+#: src/postulo/templates/resume/overview.html:42
 #, draft
 msgid "Add"
 msgstr "Pridať"
@@ -710,10 +717,15 @@ msgstr "Pridať pripojenie"
 msgid "Add a listing"
 msgstr "Pridať ponuku"
 
-#: src/postulo/templates/resume/overview.html:123
+#: src/postulo/templates/resume/overview.html:124
 #, draft
 msgid "Add a skill"
 msgstr "Pridať zručnosť"
+
+#: src/postulo/templates/resume/europass_import.html:126
+#, draft
+msgid "Add all of this"
+msgstr "Pridať toto všetko"
 
 #: src/postulo/templates/documents/cv_detail.html:100
 #, draft
@@ -730,7 +742,7 @@ msgstr "Pridať položku"
 msgid "Add one"
 msgstr "Pridať jeden"
 
-#: src/postulo/templates/resume/overview.html:136
+#: src/postulo/templates/resume/overview.html:137
 #, draft
 msgid "Add the first one."
 msgstr "Pridajte prvú."
@@ -760,6 +772,13 @@ msgstr "Pridané"
 msgid "Added %(count)s entries."
 msgstr "Pridaných %(count)s položiek."
 
+#: src/postulo/resume/views.py:287
+#, python-format, draft
+msgid ""
+"Added %(total)s entries. Nothing was overwritten; anything duplicated is yours to delete."
+msgstr ""
+"Pridaných %(total)s položiek. Nič nebolo prepísané; čo sa ukáže ako duplicita, zmažete sami."
+
 #: src/postulo/applications/views.py:312 src/postulo/applications/views.py:662
 #, draft
 msgid "Added to the timeline."
@@ -770,7 +789,7 @@ msgstr "Pridané na časovú os."
 msgid "Added to your listings."
 msgstr "Pridané do vašich ponúk."
 
-#: src/postulo/resume/views.py:103
+#: src/postulo/resume/views.py:109
 #, draft
 msgid "Added."
 msgstr "Pridané."
@@ -808,7 +827,7 @@ msgstr[0] "Všetkých %(counter)s v %(label)s"
 msgstr[1] "Všetky %(counter)s v %(label)s"
 msgstr[2] "Všetkých %(counter)s v %(label)s"
 
-#: src/postulo/resume/views.py:205
+#: src/postulo/resume/views.py:211
 #, python-format, draft
 msgid "All %(ok)d links still answer."
 msgstr "Všetkých %(ok)d odkazov stále odpovedá."
@@ -849,6 +868,13 @@ msgid ""
 "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr ""
 "Archív možno importovať do prázdneho účtu z príkazového riadka. Tu sa neponúka, pretože import vytvára záznamy namiesto ich zlučovania, a to je rozhodnutie, ktoré stojí za to urobiť vedome, nie kliknutím."
+
+#: src/postulo/templates/resume/europass_import.html:35
+#, draft
+msgid ""
+"An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
+msgstr ""
+"Import iba pridáva. Nič, čo už vo vašom životopise je, sa nemení ani neodstraňuje, a čo sa ukáže ako duplicita, zmažete sami."
 
 #: src/postulo/templates/accounts/profile.html:89
 #, draft
@@ -1438,17 +1464,17 @@ msgstr "Pripomenúť sa vo firme %(company)s ohľadom %(role)s"
 msgid "Check for updates"
 msgstr "Skontrolovať aktualizácie"
 
-#: src/postulo/templates/resume/overview.html:72
+#: src/postulo/templates/resume/overview.html:73
 #, draft
 msgid "Check it answers"
 msgstr "Overiť, že odpovedá"
 
-#: src/postulo/templates/resume/overview.html:32
+#: src/postulo/templates/resume/overview.html:33
 #, draft
 msgid "Check them all"
 msgstr "Overiť všetky"
 
-#: src/postulo/templates/resume/overview.html:64
+#: src/postulo/templates/resume/overview.html:65
 #, python-format, draft
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Overené %(when)s: %(detail)s"
@@ -1462,6 +1488,11 @@ msgstr "kontrolný súčet"
 #, draft
 msgid "Checksum"
 msgstr "Kontrolný súčet"
+
+#: src/postulo/resume/views.py:247
+#, draft
+msgid "Choose a Europass file first."
+msgstr "Najprv vyberte súbor Europass."
 
 #: src/postulo/core/server_views.py:542
 #, draft
@@ -1771,6 +1802,11 @@ msgstr "kontext"
 #, draft
 msgid "Contract"
 msgstr "Na dobu určitú"
+
+#: src/postulo/resume/views.py:319
+#, draft
+msgid "conversation"
+msgstr "konverzácia"
 
 #: src/postulo/templates/api/token_list.html:20
 #, draft
@@ -2092,7 +2128,7 @@ msgstr "Obrana"
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
-#: src/postulo/templates/resume/overview.html:108
+#: src/postulo/templates/resume/overview.html:109
 #, draft
 msgid "Delete"
 msgstr "Vymazať"
@@ -2313,7 +2349,7 @@ msgstr ""
 #: src/postulo/templates/jobs/company_detail.html:135
 #: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
-#: src/postulo/templates/resume/overview.html:105
+#: src/postulo/templates/resume/overview.html:106
 #: src/postulo/templates/resume/preview.html:15
 #, draft
 msgid "Edit"
@@ -2333,6 +2369,7 @@ msgstr "Upraviť pohovor"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
+#: src/postulo/templates/resume/europass_import.html:62
 #: src/postulo/templates/resume/preview.html:45
 #, draft
 msgid "Education"
@@ -2352,7 +2389,7 @@ msgid "Email"
 msgstr "E-mail"
 
 #: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
-#: src/postulo/jobs/models.py:263
+#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:309
 #, draft
 msgid "email address"
 msgstr "e-mailová adresa"
@@ -2421,6 +2458,13 @@ msgstr "Energetika"
 #, draft
 msgid "Engineering"
 msgstr "Inžinierstvo"
+
+#: src/postulo/templates/resume/europass_import.html:90
+#, draft
+msgid ""
+"Europass records five levels per language and Postulo keeps one, so the lowest is taken. Change it afterwards if that is not the one you would claim."
+msgstr ""
+"Europass zaznamenáva pre každý jazyk päť úrovní a Postulo si ponecháva jednu, takže sa berie najnižšia. Zmeňte ju potom, ak to nie je tá, ktorú by ste uviedli."
 
 #: src/postulo/applications/models.py:341
 #, draft
@@ -2541,6 +2585,7 @@ msgstr "Všetko, najnovšie prvé."
 
 #: src/postulo/documents/rendering.py:23 src/postulo/resume/registry.py:33
 #: src/postulo/resume/registry.py:34
+#: src/postulo/templates/resume/europass_import.html:53
 #: src/postulo/templates/resume/preview.html:20
 #, draft
 msgid "Experience"
@@ -2729,6 +2774,11 @@ msgstr "Nájsť logo"
 msgid "First name"
 msgstr "Meno"
 
+#: src/postulo/resume/views.py:307
+#, draft
+msgid "first name"
+msgstr "meno"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -2805,6 +2855,11 @@ msgstr "Nájdené cez"
 #, draft
 msgid "found via"
 msgstr "nájdené cez"
+
+#: src/postulo/templates/resume/europass_import.html:116
+#, python-format, draft
+msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
+msgstr "Nájdené: %(names)s. Vyplnia sa len tie polia, ktoré ste nechali prázdne."
 
 #: src/postulo/jobs/models.py:287
 #, draft
@@ -2998,6 +3053,7 @@ msgid "happened on"
 msgstr "stalo sa dňa"
 
 #: src/postulo/accounts/models.py:236 src/postulo/documents/models.py:61
+#: src/postulo/resume/views.py:313
 #, draft
 msgid "headline"
 msgstr "profesijný titul"
@@ -3157,6 +3213,13 @@ msgid ""
 msgstr ""
 "Ak toto čítate, e-mailové nastavenia vašej inštancie Postula fungujú. Nič ďalšie netreba."
 
+#: src/postulo/templates/resume/europass_import.html:10
+#, draft
+msgid ""
+"If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
+msgstr ""
+"Ak ste sa uchádzali o miesto v inštitúcii EÚ alebo cez úrad práce, tento súbor už máte. Namiesto toho, aby ste všetko písali znova, jednoducho ho odovzdajte."
+
 #: src/postulo/core/models.py:123
 #, draft
 msgid "ignore robots.txt when capturing"
@@ -3173,9 +3236,17 @@ msgid "Ignore this column"
 msgstr "Tento stĺpec ignorovať"
 
 #: src/postulo/templates/core/import_csv_map.html:101
+#: src/postulo/templates/resume/overview.html:18
 #, draft
 msgid "Import"
 msgstr "Importovať"
+
+#: src/postulo/resume/views.py:233
+#: src/postulo/templates/resume/europass_import.html:4
+#: src/postulo/templates/resume/europass_import.html:8
+#, draft
+msgid "Import a Europass CV"
+msgstr "Importovať životopis Europass"
 
 #: src/postulo/templates/core/import_csv_done.html:35
 #, draft
@@ -3592,6 +3663,8 @@ msgid "Language for new accounts"
 msgstr "Jazyk pre nové účty"
 
 #: src/postulo/documents/rendering.py:29 src/postulo/resume/registry.py:78
+#: src/postulo/resume/views.py:301
+#: src/postulo/templates/resume/europass_import.html:71
 #: src/postulo/templates/resume/preview.html:100
 #, draft
 msgid "Languages"
@@ -3805,6 +3878,11 @@ msgstr "odoslané odkazy"
 #, draft
 msgid "Links you pointed them at"
 msgstr "Odkazy, na ktoré ste ich nasmerovali"
+
+#: src/postulo/resume/views.py:317
+#, draft
+msgid "listening"
+msgstr "počúvanie"
 
 #: src/postulo/jobs/models.py:584
 #: src/postulo/templates/core/import_csv_map.html:86
@@ -4061,7 +4139,7 @@ msgid "Move %(column)s up"
 msgstr "Presunúť %(column)s nahor"
 
 #: src/postulo/templates/documents/cv_detail.html:54
-#: src/postulo/templates/resume/overview.html:102
+#: src/postulo/templates/resume/overview.html:103
 #, draft
 msgid "Move down"
 msgstr "Nadol"
@@ -4072,7 +4150,7 @@ msgid "Move it along"
 msgstr "Posunúť ďalej"
 
 #: src/postulo/templates/documents/cv_detail.html:49
-#: src/postulo/templates/resume/overview.html:97
+#: src/postulo/templates/resume/overview.html:98
 #, draft
 msgid "Move up"
 msgstr "Nahor"
@@ -4332,7 +4410,7 @@ msgstr "Pre túto firmu nie sú zaznamenané žiadne inzeráty."
 msgid "no role"
 msgstr "bez pozície"
 
-#: src/postulo/templates/resume/overview.html:79
+#: src/postulo/templates/resume/overview.html:80
 #, draft
 msgid "No skills in this group yet"
 msgstr "V tejto skupine zatiaľ nie sú zručnosti"
@@ -4530,7 +4608,7 @@ msgstr "Nič tu nie je"
 msgid "Nothing here yet"
 msgstr "Zatiaľ tu nič nie je"
 
-#: src/postulo/templates/resume/overview.html:133
+#: src/postulo/templates/resume/overview.html:134
 #, draft
 msgid "Nothing here yet."
 msgstr "Zatiaľ tu nič nie je."
@@ -5072,6 +5150,11 @@ msgstr "Obdobie"
 msgid "Permissions"
 msgstr "Oprávnenia"
 
+#: src/postulo/templates/resume/europass_import.html:114
+#, draft
+msgid "Personal details"
+msgstr "Osobné údaje"
+
 #: src/postulo/accounts/admin.py:22
 #, draft
 msgid "Personal info"
@@ -5168,6 +5251,11 @@ msgstr "Portfólio"
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Portfóliá, profily a videá, na ktoré ste ich nasmerovali."
+
+#: src/postulo/resume/views.py:299
+#, draft
+msgid "Positions"
+msgstr "Pozície"
 
 #: src/postulo/jobs/models.py:421
 #, draft
@@ -5291,7 +5379,7 @@ msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html:16
 #: src/postulo/templates/documents/letter_detail.html:16
-#: src/postulo/templates/resume/overview.html:18
+#: src/postulo/templates/resume/overview.html:19
 #, draft
 msgid "Preview"
 msgstr "Náhľad"
@@ -5349,6 +5437,7 @@ msgid "Project"
 msgstr "Projekt"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/resume/registry.py:45
+#: src/postulo/templates/resume/europass_import.html:107
 #: src/postulo/templates/resume/preview.html:61
 #, draft
 msgid "Projects"
@@ -5358,6 +5447,11 @@ msgstr "Projekty"
 #, draft
 msgid "projects"
 msgstr "projekty"
+
+#: src/postulo/resume/views.py:303
+#, draft
+msgid "Projects and achievements"
+msgstr "Projekty a úspechy"
 
 #: src/postulo/templates/server/logs.html:176
 #, draft
@@ -5414,6 +5508,11 @@ msgstr "Vrátenie späť"
 #, draft
 msgid "qualification"
 msgstr "kvalifikácia"
+
+#: src/postulo/resume/views.py:300
+#, draft
+msgid "Qualifications"
+msgstr "Kvalifikácie"
 
 #: src/postulo/templates/connections/list.html:65
 #, draft
@@ -5503,6 +5602,7 @@ msgid ""
 msgstr ""
 "Čítané z časovej osi, takže pohovor, ktorý skončil zamietnutím, sa stále počíta ako pohovor."
 
+#: src/postulo/templates/resume/europass_import.html:29
 #: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
@@ -5512,6 +5612,11 @@ msgstr "Prečítať ho"
 #, draft
 msgid "Read the page"
 msgstr "Prečítať stránku"
+
+#: src/postulo/resume/views.py:318
+#, draft
+msgid "reading"
+msgstr "čítanie"
 
 #: src/postulo/jobs/industries.py:40
 #, draft
@@ -5948,7 +6053,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Uložené do vašich ponúk. Rozhodnite sa, keď budete pripravení."
 
 #: src/postulo/accounts/settings_views.py:34
-#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:112
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:118
 #, draft
 msgid "Saved."
 msgstr "Uložené."
@@ -6320,7 +6425,8 @@ msgid "skill groups"
 msgstr "skupiny zručností"
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:52
-#: src/postulo/resume/registry.py:56
+#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:302
+#: src/postulo/templates/resume/europass_import.html:98
 #: src/postulo/templates/resume/preview.html:79
 #, draft
 msgid "Skills"
@@ -6402,10 +6508,20 @@ msgstr "verzia zdroja"
 msgid "Sources installed"
 msgstr "Nainštalované zdroje"
 
+#: src/postulo/resume/views.py:320
+#, draft
+msgid "speaking"
+msgstr "hovorenie"
+
 #: src/postulo/documents/models.py:166
 #, draft
 msgid "Speculative letter"
 msgstr "Spontánny list"
+
+#: src/postulo/templates/resume/europass_import.html:129
+#, draft
+msgid "Start again"
+msgstr "Začať odznova"
 
 #: src/postulo/templates/documents/letter_form.html:8
 #, draft
@@ -6543,6 +6659,11 @@ msgstr "nahradené"
 msgid "Supersedes"
 msgstr "Nahrádza"
 
+#: src/postulo/resume/views.py:308
+#, draft
+msgid "surname"
+msgstr "priezvisko"
+
 #: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
@@ -6644,6 +6765,11 @@ msgstr "prispôsobené pre toto CV"
 msgid "Telecommunications"
 msgstr "Telekomunikácie"
 
+#: src/postulo/resume/views.py:310
+#, draft
+msgid "telephone"
+msgstr "telefón"
+
 #: src/postulo/templates/documents/letter_list.html:45
 #, draft
 msgid "Template"
@@ -6727,6 +6853,16 @@ msgstr "Tento súbor je väčší než %(limit)s MB."
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Tento súbor je väčší, než by logo malo byť."
+
+#: src/postulo/resume/views.py:252
+#, python-format, draft
+msgid "That file is over %(limit)s MB. A CV is not that big."
+msgstr "Tento súbor presahuje %(limit)s MB. Taký veľký životopis nie je."
+
+#: src/postulo/resume/views.py:265
+#, draft
+msgid "That file was read, and there was nothing in it to import."
+msgstr "Tento súbor bol prečítaný a nebolo v ňom čo importovať."
 
 #: src/postulo/plugins/fetching.py:102 src/postulo/plugins/fetching.py:127
 #, draft
@@ -6932,6 +7068,11 @@ msgid ""
 msgstr ""
 "Odvetvia, v ktorých vaše firmy pôsobia, vašimi slovami. Firma môže byť vo viacerých."
 
+#: src/postulo/templates/resume/europass_import.html:26
+#, draft
+msgid "The file"
+msgstr "Súbor"
+
 #: src/postulo/core/csv_import.py:441
 #, draft
 msgid "The file holds no rows."
@@ -7102,7 +7243,7 @@ msgstr "Motív: %(current)s. Prepnúť na: %(next)s."
 msgid "Then delete"
 msgstr "Potom vymazať"
 
-#: src/postulo/resume/views.py:197
+#: src/postulo/resume/views.py:203
 #, draft
 msgid "There are no links to check."
 msgstr "Nie sú žiadne odkazy na kontrolu."
@@ -7126,6 +7267,11 @@ msgstr "Na tejto adrese nič nie je (404). Skontrolujte odkaz."
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Nič tu nie je, alebo to nie je vaše na videnie."
+
+#: src/postulo/resume/views.py:276
+#, draft
+msgid "There is nothing waiting to be imported."
+msgstr "Nič nečaká na import."
 
 #: src/postulo/templates/applications/insights.html:31
 #, python-format, draft
@@ -7636,6 +7782,7 @@ msgstr ""
 "WeasyPrint sa inštaluje s Postulom, ale potrebuje Pango a jeho systémové knižnice. Na Debiane alebo Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. Na Windows sa získavajú ťažko, použite teda backend chromium. Pozri https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
 #: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:116
+#: src/postulo/resume/views.py:311
 #, draft
 msgid "website"
 msgstr "web"
@@ -7688,6 +7835,11 @@ msgstr "Čo obsahuje"
 msgid ""
 "What is in the diary, soonest first. Schedule one from an application's page."
 msgstr "Čo je v diári, najbližšie prvé. Naplánujte pohovor zo stránky žiadosti."
+
+#: src/postulo/templates/resume/europass_import.html:44
+#, draft
+msgid "What is in the file"
+msgstr "Čo je v súbore"
 
 #: src/postulo/templates/documents/cv_detail.html:29
 #, draft
@@ -7832,6 +7984,11 @@ msgstr "Kde táto firma zverejňuje voľné miesta."
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Kde ste na to narazili: pracovný portál, odporúčanie, web firmy."
+
+#: src/postulo/resume/views.py:312
+#, draft
+msgid "where you live"
+msgstr "kde bývate"
 
 #: src/postulo/templates/core/dashboard.html:42
 #, draft
@@ -7978,6 +8135,11 @@ msgstr "Napíšte o niečo viac."
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Najprv spíšte svoju kariéru, potom z nej tvorte varianty."
+
+#: src/postulo/resume/views.py:321
+#, draft
+msgid "writing"
+msgstr "písanie"
 
 #: src/postulo/templates/resume/overview.html:11
 #, draft
@@ -8139,7 +8301,7 @@ msgid "Your career record"
 msgstr "Váš kariérny záznam"
 
 #: src/postulo/templates/core/dashboard.html:270
-#: src/postulo/templates/resume/overview.html:19
+#: src/postulo/templates/resume/overview.html:20
 #, draft
 msgid "Your CVs"
 msgstr "Vaše CV"

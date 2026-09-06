@@ -19,6 +19,12 @@ postings contain applications, applications contain their timeline — rather th
 dump of database tables. The point is that somebody can still do something useful with it
 in ten years, when Postulo is a memory.
 
+## Bringing a career record in
+
+A Europass CV — the XML the EU's CV editor produced — can be read straight into your
+career record, in two steps, with nothing written until you have seen what was found.
+[Your career record](Your-career-record#importing-a-europass-cv) has the detail.
+
 ## Bringing a spreadsheet in
 
 Most people track a job search in a spreadsheet until it hurts. **Settings → Your data →

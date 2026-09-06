@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 19:26+0000\n"
+"POT-Creation-Date: 2026-09-06 19:43+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -284,7 +284,7 @@ msgstr "%(name)s — CV"
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — skydelis"
 
-#: src/postulo/resume/views.py:201
+#: src/postulo/resume/views.py:207
 #, python-format, draft
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d atsakė, %(broken)d ne; tos, kurios neatsakė, pasako kodėl."
@@ -325,12 +325,12 @@ msgstr ""
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d kopijos išsiųstos."
 
-#: src/postulo/resume/views.py:188
+#: src/postulo/resume/views.py:194
 #, python-format, draft
 msgid "%(title)s did not answer: %(detail)s"
 msgstr "%(title)s neatsakė: %(detail)s"
 
-#: src/postulo/resume/views.py:192
+#: src/postulo/resume/views.py:198
 #, python-format, draft
 msgid "%(title)s still answers."
 msgstr "%(title)s vis dar atsako."
@@ -359,7 +359,7 @@ msgstr[0] "%(total)s įrašas"
 msgstr[1] "%(total)s įrašai"
 msgstr[2] "%(total)s įrašų"
 
-#: src/postulo/templates/resume/overview.html:84
+#: src/postulo/templates/resume/overview.html:85
 #, python-format, draft
 msgid "%(total)s highlight"
 msgid_plural "%(total)s highlights"
@@ -462,6 +462,13 @@ msgstr "Įmonė, pareigos, frazė iš laiško, vardas…"
 #, draft
 msgid "A CSV file"
 msgstr "CSV failas"
+
+#: src/postulo/templates/resume/europass_import.html:20
+#, draft
+msgid ""
+"A Europass XML file — what the CV editor produced, and what an older export on your disk will be. Postulo reads it, shows you what is in it, and writes nothing until you say so."
+msgstr ""
+"Europass XML failas — tas, kurį sukūrė CV rengyklė, ir tas, kuris jūsų diske bus senesnis eksportas. Postulo jį perskaito, parodo, kas jame yra, ir nieko nerašo, kol nepasakysite."
 
 #: src/postulo/core/models.py:74
 #, draft
@@ -684,8 +691,8 @@ msgstr "Veiksmai"
 #: src/postulo/templates/applications/application_detail.html:289
 #: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:114
-#: src/postulo/templates/resume/overview.html:36
-#: src/postulo/templates/resume/overview.html:41
+#: src/postulo/templates/resume/overview.html:37
+#: src/postulo/templates/resume/overview.html:42
 #, draft
 msgid "Add"
 msgstr "Pridėti"
@@ -710,10 +717,15 @@ msgstr "Pridėti ryšį"
 msgid "Add a listing"
 msgstr "Pridėti skelbimą"
 
-#: src/postulo/templates/resume/overview.html:123
+#: src/postulo/templates/resume/overview.html:124
 #, draft
 msgid "Add a skill"
 msgstr "Pridėti įgūdį"
+
+#: src/postulo/templates/resume/europass_import.html:126
+#, draft
+msgid "Add all of this"
+msgstr "Pridėti visa tai"
 
 #: src/postulo/templates/documents/cv_detail.html:100
 #, draft
@@ -730,7 +742,7 @@ msgstr "Pridėti įrašą"
 msgid "Add one"
 msgstr "Pridėti vieną"
 
-#: src/postulo/templates/resume/overview.html:136
+#: src/postulo/templates/resume/overview.html:137
 #, draft
 msgid "Add the first one."
 msgstr "Pridėkite pirmąjį."
@@ -760,6 +772,13 @@ msgstr "Pridėta"
 msgid "Added %(count)s entries."
 msgstr "Pridėta įrašų: %(count)s."
 
+#: src/postulo/resume/views.py:287
+#, python-format, draft
+msgid ""
+"Added %(total)s entries. Nothing was overwritten; anything duplicated is yours to delete."
+msgstr ""
+"Pridėta %(total)s įrašų. Niekas nebuvo perrašyta; kas pasirodys besidubliuojantis, ištrinsite patys."
+
 #: src/postulo/applications/views.py:312 src/postulo/applications/views.py:662
 #, draft
 msgid "Added to the timeline."
@@ -770,7 +789,7 @@ msgstr "Pridėta į laiko juostą."
 msgid "Added to your listings."
 msgstr "Pridėta į jūsų skelbimus."
 
-#: src/postulo/resume/views.py:103
+#: src/postulo/resume/views.py:109
 #, draft
 msgid "Added."
 msgstr "Pridėta."
@@ -808,7 +827,7 @@ msgstr[0] "Visi %(counter)s grupėje %(label)s"
 msgstr[1] "Visi %(counter)s grupėje %(label)s"
 msgstr[2] "Visi %(counter)s grupėje %(label)s"
 
-#: src/postulo/resume/views.py:205
+#: src/postulo/resume/views.py:211
 #, python-format, draft
 msgid "All %(ok)d links still answer."
 msgstr "Visos %(ok)d nuorodos vis dar atsako."
@@ -849,6 +868,13 @@ msgid ""
 "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr ""
 "Archyvą galima importuoti į tuščią paskyrą iš komandinės eilutės. Čia tai nesiūloma, nes importavimas kuria įrašus, o ne juos sulieja, ir tokį sprendimą verta priimti apgalvotai, o ne spustelėjimu."
+
+#: src/postulo/templates/resume/europass_import.html:35
+#, draft
+msgid ""
+"An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
+msgstr ""
+"Importas tik prideda. Niekas, kas jūsų karjeros apraše jau yra, nekeičiama ir nešalinama, o kas pasirodo besidubliuojantis, ištrinsite patys."
 
 #: src/postulo/templates/accounts/profile.html:89
 #, draft
@@ -1438,17 +1464,17 @@ msgstr "Priminti %(company)s apie %(role)s"
 msgid "Check for updates"
 msgstr "Tikrinti atnaujinimus"
 
-#: src/postulo/templates/resume/overview.html:72
+#: src/postulo/templates/resume/overview.html:73
 #, draft
 msgid "Check it answers"
 msgstr "Patikrinti, ar atsako"
 
-#: src/postulo/templates/resume/overview.html:32
+#: src/postulo/templates/resume/overview.html:33
 #, draft
 msgid "Check them all"
 msgstr "Patikrinti visas"
 
-#: src/postulo/templates/resume/overview.html:64
+#: src/postulo/templates/resume/overview.html:65
 #, python-format, draft
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Patikrinta %(when)s: %(detail)s"
@@ -1462,6 +1488,11 @@ msgstr "kontrolinė suma"
 #, draft
 msgid "Checksum"
 msgstr "Kontrolinė suma"
+
+#: src/postulo/resume/views.py:247
+#, draft
+msgid "Choose a Europass file first."
+msgstr "Pirmiausia pasirinkite Europass failą."
 
 #: src/postulo/core/server_views.py:542
 #, draft
@@ -1771,6 +1802,11 @@ msgstr "kontekstas"
 #, draft
 msgid "Contract"
 msgstr "Terminuota sutartis"
+
+#: src/postulo/resume/views.py:319
+#, draft
+msgid "conversation"
+msgstr "pokalbis"
 
 #: src/postulo/templates/api/token_list.html:20
 #, draft
@@ -2092,7 +2128,7 @@ msgstr "Gynyba"
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
-#: src/postulo/templates/resume/overview.html:108
+#: src/postulo/templates/resume/overview.html:109
 #, draft
 msgid "Delete"
 msgstr "Ištrinti"
@@ -2314,7 +2350,7 @@ msgstr ""
 #: src/postulo/templates/jobs/company_detail.html:135
 #: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
-#: src/postulo/templates/resume/overview.html:105
+#: src/postulo/templates/resume/overview.html:106
 #: src/postulo/templates/resume/preview.html:15
 #, draft
 msgid "Edit"
@@ -2334,6 +2370,7 @@ msgstr "Redaguoti pokalbį"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
+#: src/postulo/templates/resume/europass_import.html:62
 #: src/postulo/templates/resume/preview.html:45
 #, draft
 msgid "Education"
@@ -2353,7 +2390,7 @@ msgid "Email"
 msgstr "El. paštas"
 
 #: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
-#: src/postulo/jobs/models.py:263
+#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:309
 #, draft
 msgid "email address"
 msgstr "el. pašto adresas"
@@ -2422,6 +2459,13 @@ msgstr "Energetika"
 #, draft
 msgid "Engineering"
 msgstr "Inžinerija"
+
+#: src/postulo/templates/resume/europass_import.html:90
+#, draft
+msgid ""
+"Europass records five levels per language and Postulo keeps one, so the lowest is taken. Change it afterwards if that is not the one you would claim."
+msgstr ""
+"Europass nurodo penkis lygius kiekvienai kalbai, o Postulo saugo vieną, todėl imamas žemiausias. Pakeiskite jį vėliau, jei nurodytumėte kitą."
 
 #: src/postulo/applications/models.py:341
 #, draft
@@ -2542,6 +2586,7 @@ msgstr "Viskas, naujausi pirmiau."
 
 #: src/postulo/documents/rendering.py:23 src/postulo/resume/registry.py:33
 #: src/postulo/resume/registry.py:34
+#: src/postulo/templates/resume/europass_import.html:53
 #: src/postulo/templates/resume/preview.html:20
 #, draft
 msgid "Experience"
@@ -2730,6 +2775,11 @@ msgstr "Rasti logotipą"
 msgid "First name"
 msgstr "Vardas"
 
+#: src/postulo/resume/views.py:307
+#, draft
+msgid "first name"
+msgstr "vardas"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -2806,6 +2856,12 @@ msgstr "Rasta per"
 #, draft
 msgid "found via"
 msgstr "rasta per"
+
+#: src/postulo/templates/resume/europass_import.html:116
+#, python-format, draft
+msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
+msgstr ""
+"Rasta: %(names)s. Bus užpildyti tik tie laukai, kuriuos palikote tuščius."
 
 #: src/postulo/jobs/models.py:287
 #, draft
@@ -2998,6 +3054,7 @@ msgid "happened on"
 msgstr "įvyko"
 
 #: src/postulo/accounts/models.py:236 src/postulo/documents/models.py:61
+#: src/postulo/resume/views.py:313
 #, draft
 msgid "headline"
 msgstr "profesinis pavadinimas"
@@ -3157,6 +3214,13 @@ msgid ""
 msgstr ""
 "Jei tai skaitote, jūsų Postulo instancijos el. pašto nustatymai veikia. Daugiau nieko daryti nereikia."
 
+#: src/postulo/templates/resume/europass_import.html:10
+#, draft
+msgid ""
+"If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
+msgstr ""
+"Jei kreipėtės į ES instituciją arba per nacionalinę užimtumo tarnybą, šį failą jau turite. Užuot viską rinkę iš naujo, tiesiog jį pateikite."
+
 #: src/postulo/core/models.py:123
 #, draft
 msgid "ignore robots.txt when capturing"
@@ -3173,9 +3237,17 @@ msgid "Ignore this column"
 msgstr "Nepaisyti šio stulpelio"
 
 #: src/postulo/templates/core/import_csv_map.html:101
+#: src/postulo/templates/resume/overview.html:18
 #, draft
 msgid "Import"
 msgstr "Importuoti"
+
+#: src/postulo/resume/views.py:233
+#: src/postulo/templates/resume/europass_import.html:4
+#: src/postulo/templates/resume/europass_import.html:8
+#, draft
+msgid "Import a Europass CV"
+msgstr "Importuoti Europass CV"
 
 #: src/postulo/templates/core/import_csv_done.html:35
 #, draft
@@ -3592,6 +3664,8 @@ msgid "Language for new accounts"
 msgstr "Naujų paskyrų kalba"
 
 #: src/postulo/documents/rendering.py:29 src/postulo/resume/registry.py:78
+#: src/postulo/resume/views.py:301
+#: src/postulo/templates/resume/europass_import.html:71
 #: src/postulo/templates/resume/preview.html:100
 #, draft
 msgid "Languages"
@@ -3805,6 +3879,11 @@ msgstr "išsiųstos nuorodos"
 #, draft
 msgid "Links you pointed them at"
 msgstr "Nuorodos, į kurias juos nukreipėte"
+
+#: src/postulo/resume/views.py:317
+#, draft
+msgid "listening"
+msgstr "klausymas"
 
 #: src/postulo/jobs/models.py:584
 #: src/postulo/templates/core/import_csv_map.html:86
@@ -4061,7 +4140,7 @@ msgid "Move %(column)s up"
 msgstr "Perkelti %(column)s aukštyn"
 
 #: src/postulo/templates/documents/cv_detail.html:54
-#: src/postulo/templates/resume/overview.html:102
+#: src/postulo/templates/resume/overview.html:103
 #, draft
 msgid "Move down"
 msgstr "Žemyn"
@@ -4072,7 +4151,7 @@ msgid "Move it along"
 msgstr "Stumti pirmyn"
 
 #: src/postulo/templates/documents/cv_detail.html:49
-#: src/postulo/templates/resume/overview.html:97
+#: src/postulo/templates/resume/overview.html:98
 #, draft
 msgid "Move up"
 msgstr "Aukštyn"
@@ -4332,7 +4411,7 @@ msgstr "Šiai įmonei skelbimų neįrašyta."
 msgid "no role"
 msgstr "nėra pareigų"
 
-#: src/postulo/templates/resume/overview.html:79
+#: src/postulo/templates/resume/overview.html:80
 #, draft
 msgid "No skills in this group yet"
 msgstr "Šioje grupėje įgūdžių dar nėra"
@@ -4530,7 +4609,7 @@ msgstr "Čia nieko nėra"
 msgid "Nothing here yet"
 msgstr "Čia dar nieko nėra"
 
-#: src/postulo/templates/resume/overview.html:133
+#: src/postulo/templates/resume/overview.html:134
 #, draft
 msgid "Nothing here yet."
 msgstr "Čia dar nieko nėra."
@@ -5074,6 +5153,11 @@ msgstr "Laikotarpis"
 msgid "Permissions"
 msgstr "Leidimai"
 
+#: src/postulo/templates/resume/europass_import.html:114
+#, draft
+msgid "Personal details"
+msgstr "Asmens duomenys"
+
 #: src/postulo/accounts/admin.py:22
 #, draft
 msgid "Personal info"
@@ -5170,6 +5254,11 @@ msgstr "Portfolio"
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Portfolio, profiliai ir vaizdo įrašai, į kuriuos juos nukreipėte."
+
+#: src/postulo/resume/views.py:299
+#, draft
+msgid "Positions"
+msgstr "Pareigos"
 
 #: src/postulo/jobs/models.py:421
 #, draft
@@ -5293,7 +5382,7 @@ msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html:16
 #: src/postulo/templates/documents/letter_detail.html:16
-#: src/postulo/templates/resume/overview.html:18
+#: src/postulo/templates/resume/overview.html:19
 #, draft
 msgid "Preview"
 msgstr "Peržiūra"
@@ -5351,6 +5440,7 @@ msgid "Project"
 msgstr "Projektas"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/resume/registry.py:45
+#: src/postulo/templates/resume/europass_import.html:107
 #: src/postulo/templates/resume/preview.html:61
 #, draft
 msgid "Projects"
@@ -5360,6 +5450,11 @@ msgstr "Projektai"
 #, draft
 msgid "projects"
 msgstr "projektai"
+
+#: src/postulo/resume/views.py:303
+#, draft
+msgid "Projects and achievements"
+msgstr "Projektai ir pasiekimai"
 
 #: src/postulo/templates/server/logs.html:176
 #, draft
@@ -5416,6 +5511,11 @@ msgstr "Grąžinimas atgal"
 #, draft
 msgid "qualification"
 msgstr "kvalifikacija"
+
+#: src/postulo/resume/views.py:300
+#, draft
+msgid "Qualifications"
+msgstr "Kvalifikacijos"
 
 #: src/postulo/templates/connections/list.html:65
 #, draft
@@ -5505,6 +5605,7 @@ msgid ""
 msgstr ""
 "Skaitoma iš laiko juostos, todėl atmetimu pasibaigęs pokalbis vis tiek skaičiuojamas kaip pokalbis."
 
+#: src/postulo/templates/resume/europass_import.html:29
 #: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
@@ -5514,6 +5615,11 @@ msgstr "Perskaityk"
 #, draft
 msgid "Read the page"
 msgstr "Skaityti puslapį"
+
+#: src/postulo/resume/views.py:318
+#, draft
+msgid "reading"
+msgstr "skaitymas"
 
 #: src/postulo/jobs/industries.py:40
 #, draft
@@ -5949,7 +6055,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Išsaugota jūsų skelbimuose. Nuspręskite, kai būsite pasiruošę."
 
 #: src/postulo/accounts/settings_views.py:34
-#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:112
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:118
 #, draft
 msgid "Saved."
 msgstr "Išsaugota."
@@ -6322,7 +6428,8 @@ msgid "skill groups"
 msgstr "įgūdžių grupės"
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:52
-#: src/postulo/resume/registry.py:56
+#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:302
+#: src/postulo/templates/resume/europass_import.html:98
 #: src/postulo/templates/resume/preview.html:79
 #, draft
 msgid "Skills"
@@ -6404,10 +6511,20 @@ msgstr "šaltinio versija"
 msgid "Sources installed"
 msgstr "Įdiegti šaltiniai"
 
+#: src/postulo/resume/views.py:320
+#, draft
+msgid "speaking"
+msgstr "kalbėjimas"
+
 #: src/postulo/documents/models.py:166
 #, draft
 msgid "Speculative letter"
 msgstr "Savarankiškas laiškas"
+
+#: src/postulo/templates/resume/europass_import.html:129
+#, draft
+msgid "Start again"
+msgstr "Pradėti iš naujo"
 
 #: src/postulo/templates/documents/letter_form.html:8
 #, draft
@@ -6545,6 +6662,11 @@ msgstr "pakeista"
 msgid "Supersedes"
 msgstr "Pakeičia"
 
+#: src/postulo/resume/views.py:308
+#, draft
+msgid "surname"
+msgstr "pavardė"
+
 #: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
@@ -6646,6 +6768,11 @@ msgstr "pritaikyta šiam CV"
 msgid "Telecommunications"
 msgstr "Telekomunikacijos"
 
+#: src/postulo/resume/views.py:310
+#, draft
+msgid "telephone"
+msgstr "telefonas"
+
 #: src/postulo/templates/documents/letter_list.html:45
 #, draft
 msgid "Template"
@@ -6729,6 +6856,16 @@ msgstr "Tas failas didesnis nei %(limit)s MB."
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Šis failas didesnis, nei logotipas turėtų būti."
+
+#: src/postulo/resume/views.py:252
+#, python-format, draft
+msgid "That file is over %(limit)s MB. A CV is not that big."
+msgstr "Šis failas viršija %(limit)s MB. CV nėra toks didelis."
+
+#: src/postulo/resume/views.py:265
+#, draft
+msgid "That file was read, and there was nothing in it to import."
+msgstr "Šis failas buvo perskaitytas ir jame nebuvo ko importuoti."
 
 #: src/postulo/plugins/fetching.py:102 src/postulo/plugins/fetching.py:127
 #, draft
@@ -6934,6 +7071,11 @@ msgid ""
 msgstr ""
 "Sritys, kuriose veikia jūsų įmonės, jūsų žodžiais. Įmonė gali būti keliose."
 
+#: src/postulo/templates/resume/europass_import.html:26
+#, draft
+msgid "The file"
+msgstr "Failas"
+
 #: src/postulo/core/csv_import.py:441
 #, draft
 msgid "The file holds no rows."
@@ -7105,7 +7247,7 @@ msgstr "Tema: %(current)s. Perjungti į: %(next)s."
 msgid "Then delete"
 msgstr "Tada ištrinti"
 
-#: src/postulo/resume/views.py:197
+#: src/postulo/resume/views.py:203
 #, draft
 msgid "There are no links to check."
 msgstr "Nėra nuorodų, kurias reikėtų patikrinti."
@@ -7129,6 +7271,11 @@ msgstr "Tuo adresu nieko nėra (404). Patikrinkite nuorodą."
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Čia nieko nėra arba tai ne jums matyti."
+
+#: src/postulo/resume/views.py:276
+#, draft
+msgid "There is nothing waiting to be imported."
+msgstr "Niekas nelaukia importavimo."
 
 #: src/postulo/templates/applications/insights.html:31
 #, python-format, draft
@@ -7641,6 +7788,7 @@ msgstr ""
 "„WeasyPrint“ įdiegiamas kartu su Postulo, bet jam reikia „Pango“ ir jo sistemos bibliotekų. „Debian“ ar „Ubuntu“: apt install libpango-1.0-0 libpangoft2-1.0-0. „Windows“ jas gauti keblu, todėl vietoj to naudokite chromium variklį. Žr. https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
 #: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:116
+#: src/postulo/resume/views.py:311
 #, draft
 msgid "website"
 msgstr "svetainė"
@@ -7694,6 +7842,11 @@ msgid ""
 "What is in the diary, soonest first. Schedule one from an application's page."
 msgstr ""
 "Kas dienoraštyje, artimiausi pirmiau. Suplanuokite iš paraiškos puslapio."
+
+#: src/postulo/templates/resume/europass_import.html:44
+#, draft
+msgid "What is in the file"
+msgstr "Kas yra faile"
 
 #: src/postulo/templates/documents/cv_detail.html:29
 #, draft
@@ -7838,6 +7991,11 @@ msgstr "Kur ši įmonė skelbia laisvas vietas."
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Kur jį radote: darbo portalas, rekomendacija, įmonės svetainė."
+
+#: src/postulo/resume/views.py:312
+#, draft
+msgid "where you live"
+msgstr "kur gyvenate"
 
 #: src/postulo/templates/core/dashboard.html:42
 #, draft
@@ -7984,6 +8142,11 @@ msgstr "Parašykite šiek tiek daugiau."
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Pirmiausia surašykite karjerą, tada iš jos kurkite variantus."
+
+#: src/postulo/resume/views.py:321
+#, draft
+msgid "writing"
+msgstr "rašymas"
 
 #: src/postulo/templates/resume/overview.html:11
 #, draft
@@ -8145,7 +8308,7 @@ msgid "Your career record"
 msgstr "Jūsų karjeros įrašas"
 
 #: src/postulo/templates/core/dashboard.html:270
-#: src/postulo/templates/resume/overview.html:19
+#: src/postulo/templates/resume/overview.html:20
 #, draft
 msgid "Your CVs"
 msgstr "Jūsų CV"

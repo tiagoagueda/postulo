@@ -32,6 +32,7 @@ from .conftest import EMAIL, PASSWORD
 pytestmark = pytest.mark.e2e
 
 AXE = Path(__file__).resolve().parents[2] / "node_modules" / "axe-core" / "axe.min.js"
+EUROPASS = Path(__file__).resolve().parents[1] / "data" / "europass.xml"
 TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"]
 
 #: Rules deliberately not enforced, with the reason. Keep this list short and honest.
@@ -209,6 +210,7 @@ def test_every_signed_in_page_has_no_violations(
         "/jobs/postings/new/",
         "/career/education/new/",
         "/career/preview/",
+        "/career/import/",
         "/server/logs/",
         "/accounts/invitations/new/",
     ]
@@ -223,6 +225,29 @@ def test_every_signed_in_page_has_no_violations(
         if found:
             failures.append(describe(f"{path} ({scheme})", found))
     assert not failures, "\n\n".join(failures)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_europass_review_page_has_no_violations(
+    live_server, page: Page, axe_source, applicant, scheme
+):
+    """The half of the import page a GET cannot reach.
+
+    The review state only exists after a file has been read, so walking addresses never
+    sees it. It is also the half with the content: counts, five CEFR levels per language,
+    and the two buttons that decide whether any of it is written.
+    """
+    page.emulate_media(color_scheme=scheme)
+    base = live_server.url
+    sign_in(page, base)
+
+    page.goto(f"{base}/career/import/")
+    page.locator("input[type=file]").set_input_files(str(EUROPASS))
+    page.get_by_role("button", name="Read it").click()
+
+    expect(page.get_by_role("heading", name="What is in the file")).to_be_visible()
+    found = violations_on(page, axe_source)
+    assert not found, describe(f"/career/import/ review ({scheme})", found)
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
@@ -343,6 +368,7 @@ VISITED_URL_NAMES: tuple[str, ...] = (
     "resume:item_update",
     "resume:item_delete",
     "resume:preview",
+    "resume:europass_import",
     "accounts:profile",
     "accounts:delete",
     "accounts:invite_list",

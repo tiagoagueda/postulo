@@ -82,6 +82,71 @@ looked up: Postulo asks orcid.org nothing, and the checksum catches what a looku
 Identifiers appear in a CV's contact block beside your website, on the variants where you
 have asked for contact details.
 
+## Importing a Europass CV
+
+**Documents → Your career → Import**
+
+If you have applied to an EU institution, or through a national employment service, you
+already have a Europass CV. Typing that career record in a second time is exactly the work
+Postulo exists to remove, so it will read the file instead.
+
+Postulo reads the **Europass XML** — what the CV editor produced, and what an older export
+sitting on your disk will be. It does not matter which namespace the file carries: Europass
+has been through several over the years, and all of them read.
+
+### It happens in two steps
+
+1. **Choose the file.** Postulo reads it and shows you what it found: how many positions,
+   qualifications, languages, skills and projects, and which personal details are in it.
+2. **Press the button.** Nothing reaches your career record until you have seen the list
+   and confirmed it.
+
+Between the two steps Postulo holds the *parsed record*, not your file. There is no reason
+to keep somebody's CV on a server for longer than it takes to read it.
+
+### What it will and will not do
+
+**An import only ever adds.** Nothing already in your career record is changed or removed.
+If you import the same file twice you will have everything twice, and deleting the copies
+is a minute's work — losing something you had written is not.
+
+Blank fields on *Your details* are filled in: headline, telephone, where you live, your
+website, and your name if you have not given one. **A field that already says something is
+left exactly as it is.** Your own words about yourself beat a form you filled in years ago.
+
+A skill heading you already have — *Digital*, say — is used rather than repeated, so you do
+not end up with the same heading twice.
+
+### Languages lose four levels of five
+
+Europass records listening, reading, conversation, speaking and writing separately, and
+almost nobody is the same at all five. Postulo keeps one level per language, so it takes
+**the lowest**. Claiming the best of five on a CV is the kind of thing that gets found out
+in an interview. The review page shows you all five before you confirm, so you can correct
+it afterwards knowing exactly what was set aside.
+
+### What is refused
+
+The file is XML from somewhere else, so it is read carefully: there is a 5 MB cap, and any
+file carrying a **document type declaration** is refused outright without being parsed.
+That is where entity expansion lives — the "billion laughs" attack and external entity
+fetches both need one — and a genuine Europass export has no use for it. Nothing is
+fetched while reading: no schema is resolved and no network request is made.
+
+A file that is not readable XML, or that has no `LearnerInfo` section, is refused with the
+reason rather than half-imported.
+
+### From the command line
+
+An operator with a shell can do the same thing:
+
+```sh
+python manage.py import_europass cv.xml --user alex@example.org --dry-run
+```
+
+`--dry-run` says what it found and writes nothing. Without it, the import runs and reports
+what it added.
+
 ## Ordering
 
 Each entry has an **order** number; lower numbers come first, and the arrows on the

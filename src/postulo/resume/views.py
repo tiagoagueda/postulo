@@ -7,7 +7,11 @@ only in a noun.
 
 from __future__ import annotations
 
+import datetime as dt
+
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -19,12 +23,14 @@ from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 
+from . import europass
 from .models import (
     Certification,
     Education,
     Experience,
     LanguageSkill,
     Link,
+    Proficiency,
     Project,
     Skill,
     SkillGroup,
@@ -204,3 +210,228 @@ class LinkCheckView(OwnedObjectMixin, View):
         else:
             messages.success(request, _("All %(ok)d links still answer.") % {"ok": ok})
         return redirect(safe_next(request, fallback))
+
+
+class EuropassImportView(LoginRequiredMixin, TemplateView):
+    """Read a Europass file, show what is in it, and write it only when told to.
+
+    Two steps on one address, the same shape as the spreadsheet import: the file is read
+    and held in the session, the page says what was found, and nothing reaches the career
+    record until somebody has seen the list and pressed the button. Capture and suggestions
+    both work this way, and for the same reason -- **nothing is saved on a guess**.
+
+    What is held between the two steps is the parsed record, not the file. There is no
+    reason to keep somebody's CV on the server for longer than it takes to read it.
+    """
+
+    template_name = "resume/europass_import.html"
+    SESSION_KEY = "europass_import"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        held = self.request.session.get(self.SESSION_KEY)
+        context["section_title"] = _("Import a Europass CV")
+        context["found"] = _for_display(held) if held else None
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get("action") == "forget":
+            request.session.pop(self.SESSION_KEY, None)
+            return redirect("resume:europass_import")
+
+        if request.POST.get("action") == "confirm":
+            return self._write(request)
+
+        upload = request.FILES.get("file")
+        if not upload:
+            messages.error(request, _("Choose a Europass file first."))
+            return redirect("resume:europass_import")
+        if upload.size > europass.MAX_BYTES:
+            messages.error(
+                request,
+                _("That file is over %(limit)s MB. A CV is not that big.")
+                % {"limit": europass.MAX_BYTES // (1024 * 1024)},
+            )
+            return redirect("resume:europass_import")
+
+        try:
+            record = europass.read(upload.read())
+        except europass.EuropassError as error:
+            messages.error(request, str(error))
+            return redirect("resume:europass_import")
+
+        if record.is_empty:
+            messages.warning(
+                request, _("That file was read, and there was nothing in it to import.")
+            )
+            return redirect("resume:europass_import")
+
+        request.session[self.SESSION_KEY] = _summarise(record)
+        request.session[f"{self.SESSION_KEY}_data"] = _to_session(record)
+        return redirect("resume:europass_import")
+
+    def _write(self, request):
+        raw = request.session.get(f"{self.SESSION_KEY}_data")
+        if not raw:
+            messages.error(request, _("There is nothing waiting to be imported."))
+            return redirect("resume:europass_import")
+
+        record = _from_session(raw)
+        with transaction.atomic():
+            report = europass.apply(request.user, record)
+
+        request.session.pop(self.SESSION_KEY, None)
+        request.session.pop(f"{self.SESSION_KEY}_data", None)
+        messages.success(
+            request,
+            _(
+                "Added %(total)s entries. Nothing was overwritten; anything duplicated is "
+                "yours to delete."
+            )
+            % {"total": report.total},
+        )
+        return redirect("resume:overview")
+
+
+#: Europass's own words on the left, Postulo's on the right. The session holds the keys,
+#: so a language changed between reading the file and confirming it still reads properly.
+COUNT_LABELS = {
+    "experience": _("Positions"),
+    "education": _("Qualifications"),
+    "languages": _("Languages"),
+    "skills": _("Skills"),
+    "projects": _("Projects and achievements"),
+}
+
+PERSON_LABELS = {
+    "first_name": _("first name"),
+    "last_name": _("surname"),
+    "email": _("email address"),
+    "phone": _("telephone"),
+    "website": _("website"),
+    "location": _("where you live"),
+    "headline": _("headline"),
+}
+
+LEVEL_LABELS = {
+    "Listening": _("listening"),
+    "Reading": _("reading"),
+    "SpokenInteraction": _("conversation"),
+    "SpokenProduction": _("speaking"),
+    "Writing": _("writing"),
+}
+
+
+def _for_display(held: dict) -> dict:
+    """The held summary with its keys turned into words somebody can read."""
+    shown = dict(held)
+    shown["counts"] = [
+        {"label": COUNT_LABELS.get(key, key), "total": total}
+        for key, total in held.get("counts", {}).items()
+        if total
+    ]
+    shown["person"] = [PERSON_LABELS.get(key, key) for key in held.get("person", {})]
+    shown["languages"] = [
+        {
+            "name": row["name"],
+            "proficiency": _proficiency_label(row.get("proficiency")),
+            "levels": [
+                {"part": LEVEL_LABELS.get(part, part), "level": level}
+                for part, level in (row.get("levels") or {}).items()
+            ],
+        }
+        for row in held.get("languages", [])
+    ]
+    return shown
+
+
+def _proficiency_label(value):
+    try:
+        return Proficiency(value).label
+    except ValueError:
+        return value
+
+
+def _summarise(record: europass.Record) -> dict:
+    """What the review page shows: enough to recognise the file, not the whole of it."""
+    return {
+        "counts": record.counts(),
+        "person": record.person,
+        "experience": [
+            {"role": row["role"], "organisation": row["organisation"]} for row in record.experience
+        ],
+        "education": [
+            {"qualification": row["qualification"], "institution": row["institution"]}
+            for row in record.education
+        ],
+        "languages": [
+            {"name": row["name"], "proficiency": row["proficiency"], "levels": row["levels"]}
+            for row in record.languages
+        ],
+        "skill_groups": record.skill_groups,
+        "projects": [{"name": row["name"]} for row in record.projects],
+    }
+
+
+def _to_session(record: europass.Record) -> dict:
+    """The record as something a session can hold: dates become strings."""
+    return {
+        "person": record.person,
+        "experience": [
+            {
+                **row,
+                "start_date": _iso(row["start_date"]),
+                "end_date": _iso(row["end_date"]),
+            }
+            for row in record.experience
+        ],
+        "education": [
+            {
+                **row,
+                "start_date": _iso(row["start_date"]),
+                "end_date": _iso(row["end_date"]),
+            }
+            for row in record.education
+        ],
+        "languages": record.languages,
+        "skill_groups": record.skill_groups,
+        "projects": record.projects,
+    }
+
+
+def _from_session(raw: dict) -> europass.Record:
+    return europass.Record(
+        person=raw.get("person", {}),
+        experience=[
+            {
+                **row,
+                "start_date": _date(row.get("start_date")),
+                "end_date": _date(row.get("end_date")),
+            }
+            for row in raw.get("experience", [])
+        ],
+        education=[
+            {
+                **row,
+                "start_date": _date(row.get("start_date")),
+                "end_date": _date(row.get("end_date")),
+            }
+            for row in raw.get("education", [])
+        ],
+        languages=raw.get("languages", []),
+        skill_groups=raw.get("skill_groups", []),
+        projects=raw.get("projects", []),
+    )
+
+
+def _iso(value):
+    return value.isoformat() if value else None
+
+
+def _date(value):
+    if not value:
+        return None
+    try:
+        return dt.date.fromisoformat(value)
+    except (ValueError, TypeError):
+        return None

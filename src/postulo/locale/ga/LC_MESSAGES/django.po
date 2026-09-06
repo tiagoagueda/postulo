@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 19:26+0000\n"
+"POT-Creation-Date: 2026-09-06 19:43+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -310,7 +310,7 @@ msgstr "%(name)s — CV"
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — deais"
 
-#: src/postulo/resume/views.py:201
+#: src/postulo/resume/views.py:207
 #, python-format, draft
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr ""
@@ -352,12 +352,12 @@ msgstr ""
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d cóip seolta."
 
-#: src/postulo/resume/views.py:188
+#: src/postulo/resume/views.py:194
 #, python-format, draft
 msgid "%(title)s did not answer: %(detail)s"
 msgstr "Níor fhreagair %(title)s: %(detail)s"
 
-#: src/postulo/resume/views.py:192
+#: src/postulo/resume/views.py:198
 #, python-format, draft
 msgid "%(title)s still answers."
 msgstr "Freagraíonn %(title)s fós."
@@ -392,7 +392,7 @@ msgstr[2] "%(total)s iontráil"
 msgstr[3] "%(total)s n-iontráil"
 msgstr[4] "%(total)s iontráil"
 
-#: src/postulo/templates/resume/overview.html:84
+#: src/postulo/templates/resume/overview.html:85
 #, python-format, draft
 msgid "%(total)s highlight"
 msgid_plural "%(total)s highlights"
@@ -501,6 +501,13 @@ msgstr "Cuideachta, ról, frása as litir, ainm…"
 #, draft
 msgid "A CSV file"
 msgstr "Comhad CSV"
+
+#: src/postulo/templates/resume/europass_import.html:20
+#, draft
+msgid ""
+"A Europass XML file — what the CV editor produced, and what an older export on your disk will be. Postulo reads it, shows you what is in it, and writes nothing until you say so."
+msgstr ""
+"Comhad XML Europass — an ceann a rinne eagarthóir an CV, agus an ceann a bheidh in easpórtáil níos sine ar do dhiosca. Léann Postulo é, taispeánann sé duit a bhfuil ann, agus ní scríobhann sé aon rud go dtí go n-abraíonn tú é."
 
 #: src/postulo/core/models.py:74
 #, draft
@@ -729,8 +736,8 @@ msgstr "Gníomhartha"
 #: src/postulo/templates/applications/application_detail.html:289
 #: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:114
-#: src/postulo/templates/resume/overview.html:36
-#: src/postulo/templates/resume/overview.html:41
+#: src/postulo/templates/resume/overview.html:37
+#: src/postulo/templates/resume/overview.html:42
 #, draft
 msgid "Add"
 msgstr "Cuir leis"
@@ -755,10 +762,15 @@ msgstr "Cuir nasc leis"
 msgid "Add a listing"
 msgstr "Cuir fógra leis"
 
-#: src/postulo/templates/resume/overview.html:123
+#: src/postulo/templates/resume/overview.html:124
 #, draft
 msgid "Add a skill"
 msgstr "Cuir scil leis"
+
+#: src/postulo/templates/resume/europass_import.html:126
+#, draft
+msgid "Add all of this"
+msgstr "Cuir seo ar fad leis"
 
 #: src/postulo/templates/documents/cv_detail.html:100
 #, draft
@@ -775,7 +787,7 @@ msgstr "Cuir iontráil leis"
 msgid "Add one"
 msgstr "Cuir ceann leis"
 
-#: src/postulo/templates/resume/overview.html:136
+#: src/postulo/templates/resume/overview.html:137
 #, draft
 msgid "Add the first one."
 msgstr "Cuir an chéad cheann leis."
@@ -805,6 +817,13 @@ msgstr "Curtha leis"
 msgid "Added %(count)s entries."
 msgstr "Cuireadh %(count)s iontráil leis."
 
+#: src/postulo/resume/views.py:287
+#, python-format, draft
+msgid ""
+"Added %(total)s entries. Nothing was overwritten; anything duplicated is yours to delete."
+msgstr ""
+"Cuireadh %(total)s iontráil leis. Níor scríobhadh thar aon rud; is leatsa aon rud atá dúbailte a scriosadh."
+
 #: src/postulo/applications/views.py:312 src/postulo/applications/views.py:662
 #, draft
 msgid "Added to the timeline."
@@ -815,7 +834,7 @@ msgstr "Curtha leis an amlíne."
 msgid "Added to your listings."
 msgstr "Curtha le do chuid fógraí."
 
-#: src/postulo/resume/views.py:103
+#: src/postulo/resume/views.py:109
 #, draft
 msgid "Added."
 msgstr "Curtha leis."
@@ -855,7 +874,7 @@ msgstr[2] "Gach ceann den %(counter)s in %(label)s"
 msgstr[3] "Gach ceann den %(counter)s in %(label)s"
 msgstr[4] "Gach ceann den %(counter)s in %(label)s"
 
-#: src/postulo/resume/views.py:205
+#: src/postulo/resume/views.py:211
 #, python-format, draft
 msgid "All %(ok)d links still answer."
 msgstr "Freagraíonn na %(ok)d nasc go léir fós."
@@ -896,6 +915,13 @@ msgid ""
 "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr ""
 "Is féidir cartlann a iompórtáil isteach i gcuntas folamh ón líne ordaithe. Ní thairgtear anseo é toisc go gcruthaíonn iompórtáil taifid seachas iad a chumasc, agus is fiú an cinneadh sin a dhéanamh d'aon ghnó seachas trí chliceáil."
+
+#: src/postulo/templates/resume/europass_import.html:35
+#, draft
+msgid ""
+"An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
+msgstr ""
+"Ní dhéanann iompórtáil ach cur leis. Ní athraítear ná ní bhaintear aon rud atá i do thaifead gairme cheana, agus is leatsa aon rud a bhíonn dúbailte a scriosadh."
 
 #: src/postulo/templates/accounts/profile.html:89
 #, draft
@@ -1486,17 +1512,17 @@ msgstr "Cuir tuairisc ar %(company)s faoi %(role)s"
 msgid "Check for updates"
 msgstr "Seiceáil le haghaidh nuashonruithe"
 
-#: src/postulo/templates/resume/overview.html:72
+#: src/postulo/templates/resume/overview.html:73
 #, draft
 msgid "Check it answers"
 msgstr "Seiceáil go bhfreagraíonn sé"
 
-#: src/postulo/templates/resume/overview.html:32
+#: src/postulo/templates/resume/overview.html:33
 #, draft
 msgid "Check them all"
 msgstr "Seiceáil iad go léir"
 
-#: src/postulo/templates/resume/overview.html:64
+#: src/postulo/templates/resume/overview.html:65
 #, python-format, draft
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Seiceáilte %(when)s: %(detail)s"
@@ -1510,6 +1536,11 @@ msgstr "suim sheiceála"
 #, draft
 msgid "Checksum"
 msgstr "Suim sheiceála"
+
+#: src/postulo/resume/views.py:247
+#, draft
+msgid "Choose a Europass file first."
+msgstr "Roghnaigh comhad Europass ar dtús."
 
 #: src/postulo/core/server_views.py:542
 #, draft
@@ -1819,6 +1850,11 @@ msgstr "comhthéacs"
 #, draft
 msgid "Contract"
 msgstr "Conradh"
+
+#: src/postulo/resume/views.py:319
+#, draft
+msgid "conversation"
+msgstr "comhrá"
 
 #: src/postulo/templates/api/token_list.html:20
 #, draft
@@ -2141,7 +2177,7 @@ msgstr "Cosaint"
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
-#: src/postulo/templates/resume/overview.html:108
+#: src/postulo/templates/resume/overview.html:109
 #, draft
 msgid "Delete"
 msgstr "Scrios"
@@ -2364,7 +2400,7 @@ msgstr ""
 #: src/postulo/templates/jobs/company_detail.html:135
 #: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
-#: src/postulo/templates/resume/overview.html:105
+#: src/postulo/templates/resume/overview.html:106
 #: src/postulo/templates/resume/preview.html:15
 #, draft
 msgid "Edit"
@@ -2384,6 +2420,7 @@ msgstr "Cuir agallamh in eagar"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
+#: src/postulo/templates/resume/europass_import.html:62
 #: src/postulo/templates/resume/preview.html:45
 #, draft
 msgid "Education"
@@ -2403,7 +2440,7 @@ msgid "Email"
 msgstr "Ríomhphost"
 
 #: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
-#: src/postulo/jobs/models.py:263
+#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:309
 #, draft
 msgid "email address"
 msgstr "seoladh ríomhphoist"
@@ -2473,6 +2510,13 @@ msgstr "Fuinneamh"
 #, draft
 msgid "Engineering"
 msgstr "Innealtóireacht"
+
+#: src/postulo/templates/resume/europass_import.html:90
+#, draft
+msgid ""
+"Europass records five levels per language and Postulo keeps one, so the lowest is taken. Change it afterwards if that is not the one you would claim."
+msgstr ""
+"Coinníonn Europass cúig leibhéal do gach teanga agus ní choinníonn Postulo ach ceann amháin, mar sin tógtar an ceann is ísle. Athraigh ina dhiaidh sin é mura hé sin an ceann a d'éileofá."
 
 #: src/postulo/applications/models.py:341
 #, draft
@@ -2594,6 +2638,7 @@ msgstr "Gach rud, an ceann is nuaí ar dtús."
 
 #: src/postulo/documents/rendering.py:23 src/postulo/resume/registry.py:33
 #: src/postulo/resume/registry.py:34
+#: src/postulo/templates/resume/europass_import.html:53
 #: src/postulo/templates/resume/preview.html:20
 #, draft
 msgid "Experience"
@@ -2781,6 +2826,11 @@ msgstr "Aimsigh lógó"
 msgid "First name"
 msgstr "Céadainm"
 
+#: src/postulo/resume/views.py:307
+#, draft
+msgid "first name"
+msgstr "ainm"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -2858,6 +2908,11 @@ msgstr "Aimsithe trí"
 #, draft
 msgid "found via"
 msgstr "aimsithe trí"
+
+#: src/postulo/templates/resume/europass_import.html:116
+#, python-format, draft
+msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
+msgstr "Aimsíodh: %(names)s. Ní líonfar ach na réimsí a d'fhág tú folamh."
 
 #: src/postulo/jobs/models.py:287
 #, draft
@@ -3052,6 +3107,7 @@ msgid "happened on"
 msgstr "tharla ar"
 
 #: src/postulo/accounts/models.py:236 src/postulo/documents/models.py:61
+#: src/postulo/resume/views.py:313
 #, draft
 msgid "headline"
 msgstr "teideal gairmiúil"
@@ -3212,6 +3268,13 @@ msgid ""
 msgstr ""
 "Má tá tú ag léamh seo, oibríonn socruithe ríomhphoist d'ásc Postulo. Níl a thuilleadh le déanamh."
 
+#: src/postulo/templates/resume/europass_import.html:10
+#, draft
+msgid ""
+"If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
+msgstr ""
+"Má chuir tú isteach ar phost in institiúid de chuid an AE nó trí sheirbhís fostaíochta náisiúnta, tá an comhad seo agat cheana. In ionad an t-iomlán a chlóscríobh arís, tabhair dúinn é."
+
 #: src/postulo/core/models.py:123
 #, draft
 msgid "ignore robots.txt when capturing"
@@ -3228,9 +3291,17 @@ msgid "Ignore this column"
 msgstr "Déan neamhaird den cholún seo"
 
 #: src/postulo/templates/core/import_csv_map.html:101
+#: src/postulo/templates/resume/overview.html:18
 #, draft
 msgid "Import"
 msgstr "Iompórtáil"
+
+#: src/postulo/resume/views.py:233
+#: src/postulo/templates/resume/europass_import.html:4
+#: src/postulo/templates/resume/europass_import.html:8
+#, draft
+msgid "Import a Europass CV"
+msgstr "Iompórtáil CV Europass"
 
 #: src/postulo/templates/core/import_csv_done.html:35
 #, draft
@@ -3649,6 +3720,8 @@ msgid "Language for new accounts"
 msgstr "Teanga do chuntais nua"
 
 #: src/postulo/documents/rendering.py:29 src/postulo/resume/registry.py:78
+#: src/postulo/resume/views.py:301
+#: src/postulo/templates/resume/europass_import.html:71
 #: src/postulo/templates/resume/preview.html:100
 #, draft
 msgid "Languages"
@@ -3862,6 +3935,11 @@ msgstr "naisc seolta"
 #, draft
 msgid "Links you pointed them at"
 msgstr "Naisc ar dhírigh tú orthu iad"
+
+#: src/postulo/resume/views.py:317
+#, draft
+msgid "listening"
+msgstr "éisteacht"
 
 #: src/postulo/jobs/models.py:584
 #: src/postulo/templates/core/import_csv_map.html:86
@@ -4118,7 +4196,7 @@ msgid "Move %(column)s up"
 msgstr "Bog %(column)s suas"
 
 #: src/postulo/templates/documents/cv_detail.html:54
-#: src/postulo/templates/resume/overview.html:102
+#: src/postulo/templates/resume/overview.html:103
 #, draft
 msgid "Move down"
 msgstr "Bog síos"
@@ -4129,7 +4207,7 @@ msgid "Move it along"
 msgstr "Bog ar aghaidh é"
 
 #: src/postulo/templates/documents/cv_detail.html:49
-#: src/postulo/templates/resume/overview.html:97
+#: src/postulo/templates/resume/overview.html:98
 #, draft
 msgid "Move up"
 msgstr "Bog suas"
@@ -4391,7 +4469,7 @@ msgstr "Níl aon fhógraí taifeadta don chuideachta seo."
 msgid "no role"
 msgstr "gan ról"
 
-#: src/postulo/templates/resume/overview.html:79
+#: src/postulo/templates/resume/overview.html:80
 #, draft
 msgid "No skills in this group yet"
 msgstr "Níl aon scileanna sa ghrúpa seo fós"
@@ -4589,7 +4667,7 @@ msgstr "Níl aon rud anseo"
 msgid "Nothing here yet"
 msgstr "Níl aon rud anseo fós"
 
-#: src/postulo/templates/resume/overview.html:133
+#: src/postulo/templates/resume/overview.html:134
 #, draft
 msgid "Nothing here yet."
 msgstr "Níl aon rud anseo fós."
@@ -5144,6 +5222,11 @@ msgstr "Tréimhse"
 msgid "Permissions"
 msgstr "Ceadanna"
 
+#: src/postulo/templates/resume/europass_import.html:114
+#, draft
+msgid "Personal details"
+msgstr "Sonraí pearsanta"
+
 #: src/postulo/accounts/admin.py:22
 #, draft
 msgid "Personal info"
@@ -5240,6 +5323,11 @@ msgstr "Punann"
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Punanna, próifílí agus físeáin ar dhírigh tú orthu iad."
+
+#: src/postulo/resume/views.py:299
+#, draft
+msgid "Positions"
+msgstr "Poist"
 
 #: src/postulo/jobs/models.py:421
 #, draft
@@ -5364,7 +5452,7 @@ msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html:16
 #: src/postulo/templates/documents/letter_detail.html:16
-#: src/postulo/templates/resume/overview.html:18
+#: src/postulo/templates/resume/overview.html:19
 #, draft
 msgid "Preview"
 msgstr "Réamhamharc"
@@ -5422,6 +5510,7 @@ msgid "Project"
 msgstr "Tionscadal"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/resume/registry.py:45
+#: src/postulo/templates/resume/europass_import.html:107
 #: src/postulo/templates/resume/preview.html:61
 #, draft
 msgid "Projects"
@@ -5431,6 +5520,11 @@ msgstr "Tionscadail"
 #, draft
 msgid "projects"
 msgstr "tionscadail"
+
+#: src/postulo/resume/views.py:303
+#, draft
+msgid "Projects and achievements"
+msgstr "Tionscadail agus éachtaí"
 
 #: src/postulo/templates/server/logs.html:176
 #, draft
@@ -5487,6 +5581,11 @@ msgstr "Á chur ar ais"
 #, draft
 msgid "qualification"
 msgstr "cáilíocht"
+
+#: src/postulo/resume/views.py:300
+#, draft
+msgid "Qualifications"
+msgstr "Cáilíochtaí"
 
 #: src/postulo/templates/connections/list.html:65
 #, draft
@@ -5580,6 +5679,7 @@ msgid ""
 msgstr ""
 "Léite ón amlíne, mar sin comhaireann agallamh a chríochnaigh le diúltú mar agallamh fós."
 
+#: src/postulo/templates/resume/europass_import.html:29
 #: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
@@ -5589,6 +5689,11 @@ msgstr "Léigh é"
 #, draft
 msgid "Read the page"
 msgstr "Léigh an leathanach"
+
+#: src/postulo/resume/views.py:318
+#, draft
+msgid "reading"
+msgstr "léitheoireacht"
 
 #: src/postulo/jobs/industries.py:40
 #, draft
@@ -6026,7 +6131,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Sábháilte i do chuid fógraí. Déan cinneadh faoi nuair a bheidh tú réidh."
 
 #: src/postulo/accounts/settings_views.py:34
-#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:112
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:118
 #, draft
 msgid "Saved."
 msgstr "Sábháilte."
@@ -6400,7 +6505,8 @@ msgid "skill groups"
 msgstr "grúpaí scileanna"
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:52
-#: src/postulo/resume/registry.py:56
+#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:302
+#: src/postulo/templates/resume/europass_import.html:98
 #: src/postulo/templates/resume/preview.html:79
 #, draft
 msgid "Skills"
@@ -6482,10 +6588,20 @@ msgstr "leagan foinse"
 msgid "Sources installed"
 msgstr "Foinsí suiteáilte"
 
+#: src/postulo/resume/views.py:320
+#, draft
+msgid "speaking"
+msgstr "labhairt"
+
 #: src/postulo/documents/models.py:166
 #, draft
 msgid "Speculative letter"
 msgstr "Litir gan iarraidh"
+
+#: src/postulo/templates/resume/europass_import.html:129
+#, draft
+msgid "Start again"
+msgstr "Tosaigh arís"
 
 #: src/postulo/templates/documents/letter_form.html:8
 #, draft
@@ -6623,6 +6739,11 @@ msgstr "curtha in ionad"
 msgid "Supersedes"
 msgstr "Tagann in ionad"
 
+#: src/postulo/resume/views.py:308
+#, draft
+msgid "surname"
+msgstr "sloinne"
+
 #: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
@@ -6724,6 +6845,11 @@ msgstr "curtha in oiriúint don CV seo"
 msgid "Telecommunications"
 msgstr "Teileachumarsáid"
 
+#: src/postulo/resume/views.py:310
+#, draft
+msgid "telephone"
+msgstr "teileafón"
+
 #: src/postulo/templates/documents/letter_list.html:45
 #, draft
 msgid "Template"
@@ -6807,6 +6933,16 @@ msgstr "Tá an comhad sin níos mó ná %(limit)s MB."
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Tá an comhad seo níos mó ná mar ba cheart do lógó a bheith."
+
+#: src/postulo/resume/views.py:252
+#, python-format, draft
+msgid "That file is over %(limit)s MB. A CV is not that big."
+msgstr "Tá an comhad sin níos mó ná %(limit)s MB. Níl CV chomh mór sin."
+
+#: src/postulo/resume/views.py:265
+#, draft
+msgid "That file was read, and there was nothing in it to import."
+msgstr "Léadh an comhad sin, agus ní raibh aon rud ann le hiompórtáil."
 
 #: src/postulo/plugins/fetching.py:102 src/postulo/plugins/fetching.py:127
 #, draft
@@ -7013,6 +7149,11 @@ msgid ""
 msgstr ""
 "Na réimsí ina n-oibríonn do chuideachtaí, i d'fhocail féin. Féadfaidh cuideachta a bheith i roinnt acu."
 
+#: src/postulo/templates/resume/europass_import.html:26
+#, draft
+msgid "The file"
+msgstr "An comhad"
+
 #: src/postulo/core/csv_import.py:441
 #, draft
 msgid "The file holds no rows."
@@ -7187,7 +7328,7 @@ msgstr "Téama: %(current)s. Athraigh go: %(next)s."
 msgid "Then delete"
 msgstr "Ansin scrios"
 
-#: src/postulo/resume/views.py:197
+#: src/postulo/resume/views.py:203
 #, draft
 msgid "There are no links to check."
 msgstr "Níl aon nasc le seiceáil."
@@ -7211,6 +7352,11 @@ msgstr "Níl aon rud ag an seoladh sin (404). Seiceáil an nasc."
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Níl aon rud anseo, nó ní leatsa é a fheiceáil."
+
+#: src/postulo/resume/views.py:276
+#, draft
+msgid "There is nothing waiting to be imported."
+msgstr "Níl aon rud ag fanacht lena iompórtáil."
 
 #: src/postulo/templates/applications/insights.html:31
 #, python-format, draft
@@ -7730,6 +7876,7 @@ msgstr ""
 "Suiteáiltear WeasyPrint le Postulo, ach teastaíonn Pango agus a leabharlanna córais uaidh. Ar Debian nó Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. Ar Windows tá siad deacair a fháil, mar sin úsáid an t-inneall chromium ina ionad. Féach https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
 #: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:116
+#: src/postulo/resume/views.py:311
 #, draft
 msgid "website"
 msgstr "suíomh gréasáin"
@@ -7784,6 +7931,11 @@ msgid ""
 "What is in the diary, soonest first. Schedule one from an application's page."
 msgstr ""
 "Cad atá sa dialann, an ceann is luaithe ar dtús. Sceidealaigh ceann ó leathanach iarratais."
+
+#: src/postulo/templates/resume/europass_import.html:44
+#, draft
+msgid "What is in the file"
+msgstr "A bhfuil sa chomhad"
 
 #: src/postulo/templates/documents/cv_detail.html:29
 #, draft
@@ -7929,6 +8081,11 @@ msgstr "Cá liostálann an chuideachta seo a folúntais."
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Cár tháinig tú air: bord post, moladh, suíomh na cuideachta."
+
+#: src/postulo/resume/views.py:312
+#, draft
+msgid "where you live"
+msgstr "cá bhfuil tú i do chónaí"
 
 #: src/postulo/templates/core/dashboard.html:42
 #, draft
@@ -8078,6 +8235,11 @@ msgstr "Scríobh beagán níos mó."
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Scríobh do ghairm síos ar dtús, ansin tóg leaganacha uaidh."
+
+#: src/postulo/resume/views.py:321
+#, draft
+msgid "writing"
+msgstr "scríbhneoireacht"
 
 #: src/postulo/templates/resume/overview.html:11
 #, draft
@@ -8244,7 +8406,7 @@ msgid "Your career record"
 msgstr "Do thaifead gairme"
 
 #: src/postulo/templates/core/dashboard.html:270
-#: src/postulo/templates/resume/overview.html:19
+#: src/postulo/templates/resume/overview.html:20
 #, draft
 msgid "Your CVs"
 msgstr "Do CVanna"

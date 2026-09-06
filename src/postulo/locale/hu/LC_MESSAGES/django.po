@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 19:26+0000\n"
+"POT-Creation-Date: 2026-09-06 19:43+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -274,7 +274,7 @@ msgstr "%(name)s — önéletrajz"
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — áttekintés"
 
-#: src/postulo/resume/views.py:201
+#: src/postulo/resume/views.py:207
 #, python-format, draft
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d válaszolt, %(broken)d nem; amelyek nem, megmondják, miért."
@@ -315,12 +315,12 @@ msgstr ""
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d másolat elküldve."
 
-#: src/postulo/resume/views.py:188
+#: src/postulo/resume/views.py:194
 #, python-format, draft
 msgid "%(title)s did not answer: %(detail)s"
 msgstr "A(z) %(title)s nem válaszolt: %(detail)s"
 
-#: src/postulo/resume/views.py:192
+#: src/postulo/resume/views.py:198
 #, python-format, draft
 msgid "%(title)s still answers."
 msgstr "A(z) %(title)s még válaszol."
@@ -346,7 +346,7 @@ msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s bejegyzés"
 msgstr[1] "%(total)s bejegyzés"
 
-#: src/postulo/templates/resume/overview.html:84
+#: src/postulo/templates/resume/overview.html:85
 #, python-format, draft
 msgid "%(total)s highlight"
 msgid_plural "%(total)s highlights"
@@ -446,6 +446,13 @@ msgstr "Egy cég, egy pozíció, egy mondat egy levélből, egy név…"
 #, draft
 msgid "A CSV file"
 msgstr "CSV-fájl"
+
+#: src/postulo/templates/resume/europass_import.html:20
+#, draft
+msgid ""
+"A Europass XML file — what the CV editor produced, and what an older export on your disk will be. Postulo reads it, shows you what is in it, and writes nothing until you say so."
+msgstr ""
+"Egy Europass XML-fájl — az, amit az önéletrajz-szerkesztő készített, és az, ami egy régebbi export a lemezén. A Postulo elolvassa, megmutatja, mi van benne, és semmit nem ír be, amíg Ön nem szól."
 
 #: src/postulo/core/models.py:74
 #, draft
@@ -667,8 +674,8 @@ msgstr "Műveletek"
 #: src/postulo/templates/applications/application_detail.html:289
 #: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:114
-#: src/postulo/templates/resume/overview.html:36
-#: src/postulo/templates/resume/overview.html:41
+#: src/postulo/templates/resume/overview.html:37
+#: src/postulo/templates/resume/overview.html:42
 #, draft
 msgid "Add"
 msgstr "Hozzáadás"
@@ -693,10 +700,15 @@ msgstr "Kapcsolat hozzáadása"
 msgid "Add a listing"
 msgstr "Hirdetés hozzáadása"
 
-#: src/postulo/templates/resume/overview.html:123
+#: src/postulo/templates/resume/overview.html:124
 #, draft
 msgid "Add a skill"
 msgstr "Készség hozzáadása"
+
+#: src/postulo/templates/resume/europass_import.html:126
+#, draft
+msgid "Add all of this"
+msgstr "Mindezt hozzáadom"
 
 #: src/postulo/templates/documents/cv_detail.html:100
 #, draft
@@ -713,7 +725,7 @@ msgstr "Bejegyzés hozzáadása"
 msgid "Add one"
 msgstr "Vegyen fel egyet"
 
-#: src/postulo/templates/resume/overview.html:136
+#: src/postulo/templates/resume/overview.html:137
 #, draft
 msgid "Add the first one."
 msgstr "Add hozzá az elsőt."
@@ -743,6 +755,13 @@ msgstr "Hozzáadva"
 msgid "Added %(count)s entries."
 msgstr "%(count)s bejegyzés hozzáadva."
 
+#: src/postulo/resume/views.py:287
+#, python-format, draft
+msgid ""
+"Added %(total)s entries. Nothing was overwritten; anything duplicated is yours to delete."
+msgstr ""
+"%(total)s tétel hozzáadva. Semmi nem íródott felül; ami ismétlődik, azt Ön törli."
+
 #: src/postulo/applications/views.py:312 src/postulo/applications/views.py:662
 #, draft
 msgid "Added to the timeline."
@@ -753,7 +772,7 @@ msgstr "Hozzáadva az idővonalhoz."
 msgid "Added to your listings."
 msgstr "Hozzáadva a hirdetéseidhez."
 
-#: src/postulo/resume/views.py:103
+#: src/postulo/resume/views.py:109
 #, draft
 msgid "Added."
 msgstr "Hozzáadva."
@@ -790,7 +809,7 @@ msgid_plural "All %(counter)s in %(label)s"
 msgstr[0] "Mind a %(counter)s itt: %(label)s"
 msgstr[1] "Mind a %(counter)s itt: %(label)s"
 
-#: src/postulo/resume/views.py:205
+#: src/postulo/resume/views.py:211
 #, python-format, draft
 msgid "All %(ok)d links still answer."
 msgstr "Mind a(z) %(ok)d hivatkozás válaszol még."
@@ -831,6 +850,13 @@ msgid ""
 "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr ""
 "Egy archívum parancssorból importálható egy üres fiókba. Itt nincs felkínálva, mert az importálás rekordokat hoz létre ahelyett, hogy összevonná őket, és ezt a döntést érdemes megfontoltan, nem egy kattintással meghozni."
+
+#: src/postulo/templates/resume/europass_import.html:35
+#, draft
+msgid ""
+"An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
+msgstr ""
+"Az importálás csak hozzáad. Semmi, ami már a pályafutásában szerepel, nem változik és nem törlődik, és ami ismétlődésnek bizonyul, azt Ön törli."
 
 #: src/postulo/templates/accounts/profile.html:89
 #, draft
@@ -1420,17 +1446,17 @@ msgstr "Érdeklődés itt: %(company)s, erről: %(role)s"
 msgid "Check for updates"
 msgstr "Frissítések keresése"
 
-#: src/postulo/templates/resume/overview.html:72
+#: src/postulo/templates/resume/overview.html:73
 #, draft
 msgid "Check it answers"
 msgstr "Ellenőrzés, hogy válaszol-e"
 
-#: src/postulo/templates/resume/overview.html:32
+#: src/postulo/templates/resume/overview.html:33
 #, draft
 msgid "Check them all"
 msgstr "Mind ellenőrzése"
 
-#: src/postulo/templates/resume/overview.html:64
+#: src/postulo/templates/resume/overview.html:65
 #, python-format, draft
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Ellenőrizve %(when)s: %(detail)s"
@@ -1444,6 +1470,11 @@ msgstr "ellenőrző összeg"
 #, draft
 msgid "Checksum"
 msgstr "Ellenőrzőösszeg"
+
+#: src/postulo/resume/views.py:247
+#, draft
+msgid "Choose a Europass file first."
+msgstr "Előbb válasszon egy Europass-fájlt."
 
 #: src/postulo/core/server_views.py:542
 #, draft
@@ -1753,6 +1784,11 @@ msgstr "környezet"
 #, draft
 msgid "Contract"
 msgstr "Határozott idejű"
+
+#: src/postulo/resume/views.py:319
+#, draft
+msgid "conversation"
+msgstr "társalgás"
 
 #: src/postulo/templates/api/token_list.html:20
 #, draft
@@ -2075,7 +2111,7 @@ msgstr "Védelem"
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
-#: src/postulo/templates/resume/overview.html:108
+#: src/postulo/templates/resume/overview.html:109
 #, draft
 msgid "Delete"
 msgstr "Törlés"
@@ -2298,7 +2334,7 @@ msgstr ""
 #: src/postulo/templates/jobs/company_detail.html:135
 #: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
-#: src/postulo/templates/resume/overview.html:105
+#: src/postulo/templates/resume/overview.html:106
 #: src/postulo/templates/resume/preview.html:15
 #, draft
 msgid "Edit"
@@ -2318,6 +2354,7 @@ msgstr "Interjú szerkesztése"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
+#: src/postulo/templates/resume/europass_import.html:62
 #: src/postulo/templates/resume/preview.html:45
 #, draft
 msgid "Education"
@@ -2337,7 +2374,7 @@ msgid "Email"
 msgstr "E-mail"
 
 #: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
-#: src/postulo/jobs/models.py:263
+#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:309
 #, draft
 msgid "email address"
 msgstr "e-mail-cím"
@@ -2406,6 +2443,13 @@ msgstr "Energia"
 #, draft
 msgid "Engineering"
 msgstr "Mérnöki tevékenység"
+
+#: src/postulo/templates/resume/europass_import.html:90
+#, draft
+msgid ""
+"Europass records five levels per language and Postulo keeps one, so the lowest is taken. Change it afterwards if that is not the one you would claim."
+msgstr ""
+"Az Europass nyelvenként öt szintet rögzít, a Postulo pedig egyet tart nyilván, ezért a legalacsonyabbat veszi. Utólag módosítsa, ha nem ezt a szintet vallaná magáénak."
 
 #: src/postulo/applications/models.py:341
 #, draft
@@ -2528,6 +2572,7 @@ msgstr "Minden, a legújabbal kezdve."
 
 #: src/postulo/documents/rendering.py:23 src/postulo/resume/registry.py:33
 #: src/postulo/resume/registry.py:34
+#: src/postulo/templates/resume/europass_import.html:53
 #: src/postulo/templates/resume/preview.html:20
 #, draft
 msgid "Experience"
@@ -2716,6 +2761,11 @@ msgstr "Logó keresése"
 msgid "First name"
 msgstr "Keresztnév"
 
+#: src/postulo/resume/views.py:307
+#, draft
+msgid "first name"
+msgstr "keresztnév"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -2792,6 +2842,12 @@ msgstr "Forrás"
 #, draft
 msgid "found via"
 msgstr "forrás"
+
+#: src/postulo/templates/resume/europass_import.html:116
+#, python-format, draft
+msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
+msgstr ""
+"Megtalálva: %(names)s. Csak azok a mezők töltődnek ki, amelyeket üresen hagyott."
 
 #: src/postulo/jobs/models.py:287
 #, draft
@@ -2984,6 +3040,7 @@ msgid "happened on"
 msgstr "történt ekkor"
 
 #: src/postulo/accounts/models.py:236 src/postulo/documents/models.py:61
+#: src/postulo/resume/views.py:313
 #, draft
 msgid "headline"
 msgstr "szakmai cím"
@@ -3143,6 +3200,13 @@ msgid ""
 msgstr ""
 "Ha ezt olvasod, a Postulo példányod e-mail-beállításai működnek. Nincs más teendő."
 
+#: src/postulo/templates/resume/europass_import.html:10
+#, draft
+msgid ""
+"If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
+msgstr ""
+"Ha uniós intézményhez vagy nemzeti munkaügyi szolgálaton keresztül pályázott, ez a fájl már megvan. Ahelyett, hogy mindent újra begépelne, adja át."
+
 #: src/postulo/core/models.py:123
 #, draft
 msgid "ignore robots.txt when capturing"
@@ -3159,9 +3223,17 @@ msgid "Ignore this column"
 msgstr "Oszlop figyelmen kívül hagyása"
 
 #: src/postulo/templates/core/import_csv_map.html:101
+#: src/postulo/templates/resume/overview.html:18
 #, draft
 msgid "Import"
 msgstr "Importálás"
+
+#: src/postulo/resume/views.py:233
+#: src/postulo/templates/resume/europass_import.html:4
+#: src/postulo/templates/resume/europass_import.html:8
+#, draft
+msgid "Import a Europass CV"
+msgstr "Europass-önéletrajz importálása"
 
 #: src/postulo/templates/core/import_csv_done.html:35
 #, draft
@@ -3580,6 +3652,8 @@ msgid "Language for new accounts"
 msgstr "Új fiókok nyelve"
 
 #: src/postulo/documents/rendering.py:29 src/postulo/resume/registry.py:78
+#: src/postulo/resume/views.py:301
+#: src/postulo/templates/resume/europass_import.html:71
 #: src/postulo/templates/resume/preview.html:100
 #, draft
 msgid "Languages"
@@ -3793,6 +3867,11 @@ msgstr "elküldött hivatkozások"
 #, draft
 msgid "Links you pointed them at"
 msgstr "Hivatkozások, amelyekre ráirányította őket"
+
+#: src/postulo/resume/views.py:317
+#, draft
+msgid "listening"
+msgstr "hallás utáni értés"
 
 #: src/postulo/jobs/models.py:584
 #: src/postulo/templates/core/import_csv_map.html:86
@@ -4049,7 +4128,7 @@ msgid "Move %(column)s up"
 msgstr "%(column)s feljebb"
 
 #: src/postulo/templates/documents/cv_detail.html:54
-#: src/postulo/templates/resume/overview.html:102
+#: src/postulo/templates/resume/overview.html:103
 #, draft
 msgid "Move down"
 msgstr "Lejjebb"
@@ -4060,7 +4139,7 @@ msgid "Move it along"
 msgstr "Továbbléptetés"
 
 #: src/postulo/templates/documents/cv_detail.html:49
-#: src/postulo/templates/resume/overview.html:97
+#: src/postulo/templates/resume/overview.html:98
 #, draft
 msgid "Move up"
 msgstr "Feljebb"
@@ -4321,7 +4400,7 @@ msgstr "Ehhez a céghez nincs rögzített hirdetés."
 msgid "no role"
 msgstr "nincs pozíció"
 
-#: src/postulo/templates/resume/overview.html:79
+#: src/postulo/templates/resume/overview.html:80
 #, draft
 msgid "No skills in this group yet"
 msgstr "Ebben a csoportban még nincsenek készségek"
@@ -4519,7 +4598,7 @@ msgstr "Nincs itt semmi"
 msgid "Nothing here yet"
 msgstr "Még nincs itt semmi"
 
-#: src/postulo/templates/resume/overview.html:133
+#: src/postulo/templates/resume/overview.html:134
 #, draft
 msgid "Nothing here yet."
 msgstr "Még nincs itt semmi."
@@ -5062,6 +5141,11 @@ msgstr "Időszak"
 msgid "Permissions"
 msgstr "Jogosultságok"
 
+#: src/postulo/templates/resume/europass_import.html:114
+#, draft
+msgid "Personal details"
+msgstr "Személyes adatok"
+
 #: src/postulo/accounts/admin.py:22
 #, draft
 msgid "Personal info"
@@ -5158,6 +5242,11 @@ msgstr "Portfólió"
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Portfóliók, profilok és videók, amelyekre ráirányította őket."
+
+#: src/postulo/resume/views.py:299
+#, draft
+msgid "Positions"
+msgstr "Beosztások"
 
 #: src/postulo/jobs/models.py:421
 #, draft
@@ -5281,7 +5370,7 @@ msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html:16
 #: src/postulo/templates/documents/letter_detail.html:16
-#: src/postulo/templates/resume/overview.html:18
+#: src/postulo/templates/resume/overview.html:19
 #, draft
 msgid "Preview"
 msgstr "Előnézet"
@@ -5339,6 +5428,7 @@ msgid "Project"
 msgstr "Projekt"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/resume/registry.py:45
+#: src/postulo/templates/resume/europass_import.html:107
 #: src/postulo/templates/resume/preview.html:61
 #, draft
 msgid "Projects"
@@ -5348,6 +5438,11 @@ msgstr "Projektek"
 #, draft
 msgid "projects"
 msgstr "projektek"
+
+#: src/postulo/resume/views.py:303
+#, draft
+msgid "Projects and achievements"
+msgstr "Projektek és eredmények"
 
 #: src/postulo/templates/server/logs.html:176
 #, draft
@@ -5404,6 +5499,11 @@ msgstr "Visszahelyezés"
 #, draft
 msgid "qualification"
 msgstr "képesítés"
+
+#: src/postulo/resume/views.py:300
+#, draft
+msgid "Qualifications"
+msgstr "Végzettségek"
 
 #: src/postulo/templates/connections/list.html:65
 #, draft
@@ -5492,6 +5592,7 @@ msgid ""
 msgstr ""
 "Az idővonalból olvasva, így az elutasítással végződő interjú is interjúnak számít."
 
+#: src/postulo/templates/resume/europass_import.html:29
 #: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
@@ -5501,6 +5602,11 @@ msgstr "Olvasd be"
 #, draft
 msgid "Read the page"
 msgstr "Oldal beolvasása"
+
+#: src/postulo/resume/views.py:318
+#, draft
+msgid "reading"
+msgstr "olvasás"
 
 #: src/postulo/jobs/industries.py:40
 #, draft
@@ -5938,7 +6044,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Elmentve a hirdetéseid közé. Dönts, amikor készen állsz."
 
 #: src/postulo/accounts/settings_views.py:34
-#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:112
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:118
 #, draft
 msgid "Saved."
 msgstr "Mentve."
@@ -6311,7 +6417,8 @@ msgid "skill groups"
 msgstr "készségcsoportok"
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:52
-#: src/postulo/resume/registry.py:56
+#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:302
+#: src/postulo/templates/resume/europass_import.html:98
 #: src/postulo/templates/resume/preview.html:79
 #, draft
 msgid "Skills"
@@ -6393,10 +6500,20 @@ msgstr "forrás verziója"
 msgid "Sources installed"
 msgstr "Telepített források"
 
+#: src/postulo/resume/views.py:320
+#, draft
+msgid "speaking"
+msgstr "beszéd"
+
 #: src/postulo/documents/models.py:166
 #, draft
 msgid "Speculative letter"
 msgstr "Spontán jelentkezés"
+
+#: src/postulo/templates/resume/europass_import.html:129
+#, draft
+msgid "Start again"
+msgstr "Kezdjük elölről"
 
 #: src/postulo/templates/documents/letter_form.html:8
 #, draft
@@ -6534,6 +6651,11 @@ msgstr "felváltva"
 msgid "Supersedes"
 msgstr "Ezt váltja fel"
 
+#: src/postulo/resume/views.py:308
+#, draft
+msgid "surname"
+msgstr "vezetéknév"
+
 #: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
@@ -6635,6 +6757,11 @@ msgstr "ehhez az önéletrajzhoz testreszabva"
 msgid "Telecommunications"
 msgstr "Távközlés"
 
+#: src/postulo/resume/views.py:310
+#, draft
+msgid "telephone"
+msgstr "telefon"
+
 #: src/postulo/templates/documents/letter_list.html:45
 #, draft
 msgid "Template"
@@ -6719,6 +6846,16 @@ msgstr "Ez a fájl nagyobb %(limit)s MB-nál."
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Ez a fájl nagyobb, mint amekkora egy logó lehet."
+
+#: src/postulo/resume/views.py:252
+#, python-format, draft
+msgid "That file is over %(limit)s MB. A CV is not that big."
+msgstr "Ez a fájl nagyobb %(limit)s MB-nál. Egy önéletrajz nem ekkora."
+
+#: src/postulo/resume/views.py:265
+#, draft
+msgid "That file was read, and there was nothing in it to import."
+msgstr "A fájlt beolvastuk, és nem volt benne semmi importálnivaló."
 
 #: src/postulo/plugins/fetching.py:102 src/postulo/plugins/fetching.py:127
 #, draft
@@ -6924,6 +7061,11 @@ msgid ""
 msgstr ""
 "Az iparágak, amelyekben a cégeid tevékenykednek, a saját szavaiddal. Egy cég több iparágban is lehet."
 
+#: src/postulo/templates/resume/europass_import.html:26
+#, draft
+msgid "The file"
+msgstr "A fájl"
+
 #: src/postulo/core/csv_import.py:441
 #, draft
 msgid "The file holds no rows."
@@ -7098,7 +7240,7 @@ msgstr "Téma: %(current)s. Váltás erre: %(next)s."
 msgid "Then delete"
 msgstr "Majd törlés"
 
-#: src/postulo/resume/views.py:197
+#: src/postulo/resume/views.py:203
 #, draft
 msgid "There are no links to check."
 msgstr "Nincs ellenőrizendő hivatkozás."
@@ -7122,6 +7264,11 @@ msgstr "Ezen a címen nincs semmi (404). Ellenőrizd a linket."
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Itt nincs semmi, vagy nem a te szemednek való."
+
+#: src/postulo/resume/views.py:276
+#, draft
+msgid "There is nothing waiting to be imported."
+msgstr "Semmi nem vár importálásra."
 
 #: src/postulo/templates/applications/insights.html:31
 #, python-format, draft
@@ -7633,6 +7780,7 @@ msgstr ""
 "A WeasyPrint a Postulóval együtt települ, de szüksége van a Pangóra és annak rendszerkönyvtáraira. Debianon vagy Ubuntun: apt install libpango-1.0-0 libpangoft2-1.0-0. Windowson ezeket nehéz beszerezni, ezért használd helyette a chromium motort. Lásd: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
 #: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:116
+#: src/postulo/resume/views.py:311
 #, draft
 msgid "website"
 msgstr "webhely"
@@ -7686,6 +7834,11 @@ msgid ""
 "What is in the diary, soonest first. Schedule one from an application's page."
 msgstr ""
 "Ami a naptárban van, a legközelebbivel kezdve. Tűzz ki egyet egy jelentkezés oldaláról."
+
+#: src/postulo/templates/resume/europass_import.html:44
+#, draft
+msgid "What is in the file"
+msgstr "Mi van a fájlban"
 
 #: src/postulo/templates/documents/cv_detail.html:29
 #, draft
@@ -7830,6 +7983,11 @@ msgstr "Hol teszi közzé ez a cég a nyitott pozícióit."
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Hol találkoztál vele: állásportál, ajánlás, a cég webhelye."
+
+#: src/postulo/resume/views.py:312
+#, draft
+msgid "where you live"
+msgstr "hol lakik"
 
 #: src/postulo/templates/core/dashboard.html:42
 #, draft
@@ -7977,6 +8135,11 @@ msgstr "Írj még egy kicsit."
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Először írd le a pályafutásodat, aztán építs belőle változatokat."
+
+#: src/postulo/resume/views.py:321
+#, draft
+msgid "writing"
+msgstr "írás"
 
 #: src/postulo/templates/resume/overview.html:11
 #, draft
@@ -8136,7 +8299,7 @@ msgid "Your career record"
 msgstr "A pályafutásod"
 
 #: src/postulo/templates/core/dashboard.html:270
-#: src/postulo/templates/resume/overview.html:19
+#: src/postulo/templates/resume/overview.html:20
 #, draft
 msgid "Your CVs"
 msgstr "Az önéletrajzaid"

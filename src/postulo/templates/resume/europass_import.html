@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Import a Europass CV" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Import a Europass CV" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        If you have applied to an EU institution or through a national employment service,
+        you already have this file. Rather than type it all again, hand it over.
+      {% endblocktranslate %}
+    </p>
+
+    {% if not found %}
+      <form method="post" enctype="multipart/form-data" class="card mb-6">
+        {% csrf_token %}
+        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed %}
+            A Europass XML file — what the CV editor produced, and what an older export on
+            your disk will be. Postulo reads it, shows you what is in it, and writes
+            nothing until you say so.
+          {% endblocktranslate %}
+        </p>
+        <label class="mb-3 block text-sm font-medium" for="file">{% translate "The file" %}</label>
+        <input type="file" name="file" id="file" accept=".xml,text/xml,application/xml" required
+               class="field-input mb-4 block w-full">
+        <button type="submit" class="btn-primary">{% translate "Read it" %}</button>
+      </form>
+
+      <div class="alert-info text-sm" role="note">
+        <div>
+          <p>
+            {% blocktranslate trimmed %}
+              An import only ever adds. Nothing already in your career record is changed or
+              removed, and anything that turns out to be a duplicate is yours to delete.
+            {% endblocktranslate %}
+          </p>
+        </div>
+      </div>
+    {% else %}
+      <div class="card mb-6" data-europass-found>
+        <h2 class="mb-3 font-medium">{% translate "What is in the file" %}</h2>
+        <dl class="mb-4 grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[10rem_1fr]">
+          {% for row in found.counts %}
+            <dt class="text-ink-500 dark:text-ink-400">{{ row.label }}</dt>
+            <dd class="tabular-nums">{{ row.total }}</dd>
+          {% endfor %}
+        </dl>
+
+        {% if found.experience %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Experience" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.experience %}
+              <li>{{ row.role }}{% if row.organisation %} · {{ row.organisation }}{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.education %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Education" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.education %}
+              <li>{{ row.qualification }}{% if row.institution %} · {{ row.institution }}{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.languages %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Languages" %}</h3>
+          {% comment %} Europass keeps five levels per language and Postulo keeps one, so all
+             five are shown: the one that will be saved is the lowest, and somebody who
+             disagrees can change it afterwards knowing what was thrown away. {% endcomment %}
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.languages %}
+              <li>
+                {{ row.name }}
+                {% if row.proficiency %}<span class="text-ink-500 dark:text-ink-400">· {{ row.proficiency }}</span>{% endif %}
+                {% if row.levels %}
+                  <span class="text-xs text-ink-500 dark:text-ink-400">
+                    ({% for part in row.levels %}{{ part.part }} {{ part.level }}{% if not forloop.last %}, {% endif %}{% endfor %})
+                  </span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              Europass records five levels per language and Postulo keeps one, so the lowest
+              is taken. Change it afterwards if that is not the one you would claim.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+
+        {% if found.skill_groups %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Skills" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for group in found.skill_groups %}
+              <li>{{ group.name }}: {{ group.skills|join:", " }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.projects %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Projects" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.projects %}<li>{{ row.name }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.person %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Personal details" %}</h3>
+          <p class="text-sm text-ink-600 dark:text-ink-300">
+            {% blocktranslate with names=found.person|join:", " trimmed %}
+              Found: {{ names }}. Only the ones you have left blank will be filled in.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+      </div>
+
+      <form method="post" class="flex items-center gap-3">
+        {% csrf_token %}
+        <button type="submit" name="action" value="confirm" class="btn-primary">
+          {% translate "Add all of this" %}
+        </button>
+        <button type="submit" name="action" value="forget" class="btn-ghost">
+          {% translate "Start again" %}
+        </button>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

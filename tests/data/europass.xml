@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  A Europass export, shaped the way the CV editor produced them: nested WorkExperience,
+  dates as attributes, CEFR levels split five ways, and free prose under each skill
+  heading. Committed rather than built in the test, because what this reader has to cope
+  with is a real file's shape and not a tidy one somebody wrote to make a test pass.
+-->
+<SkillsPassport xmlns="http://europass.cedefop.europa.eu/Europass" locale="en">
+  <LearnerInfo>
+    <Identification>
+      <PersonName><FirstName>Alex</FirstName><Surname>Morgan</Surname></PersonName>
+      <ContactInfo>
+        <Address><Contact><Municipality>Lisboa</Municipality><Country><Label>Portugal</Label></Country></Contact></Address>
+        <Email><Contact>alex@example.org</Contact></Email>
+        <Telephone><Contact>+351912345678</Contact></Telephone>
+        <Website><Contact>https://alex.example.org</Contact></Website>
+      </ContactInfo>
+    </Identification>
+    <Headline><Description><Label>Backend engineer</Label></Description></Headline>
+    <WorkExperience>
+      <WorkExperience>
+        <Period><From year="2019" month="03" day="01"/><To year="2023" month="06" day="30"/></Period>
+        <Position><Label>Senior Engineer</Label></Position>
+        <Activities>Built the thing. Kept it running.</Activities>
+        <Employer>
+          <Name>Aperture Science</Name>
+          <ContactInfo><Address><Contact><Municipality>Cambridge</Municipality><Country><Label>United Kingdom</Label></Country></Contact></Address></ContactInfo>
+        </Employer>
+      </WorkExperience>
+      <WorkExperience>
+        <Period><From year="2023" month="07"/><Current>true</Current></Period>
+        <Position><Label>Principal Engineer</Label></Position>
+        <Activities>Still building things.</Activities>
+        <Employer><Name>Black Mesa</Name></Employer>
+      </WorkExperience>
+    </WorkExperience>
+    <Education>
+      <Education>
+        <Period><From year="2014" month="09"/><To year="2018" month="07"/></Period>
+        <Title>MSc Computer Science</Title>
+        <Organisation>
+          <Name>Universidade de Lisboa</Name>
+          <ContactInfo><Address><Contact><Municipality>Lisboa</Municipality><Country><Label>Portugal</Label></Country></Contact></Address></ContactInfo>
+        </Organisation>
+        <Level><Label>EQF 7</Label></Level>
+        <Activities>Distributed systems.</Activities>
+      </Education>
+    </Education>
+    <Skills>
+      <Linguistic>
+        <MotherTongue><Description><Label>português</Label></Description></MotherTongue>
+        <ForeignLanguage>
+          <Description><Label>English</Label></Description>
+          <ProficiencyLevel>
+            <Listening level="C2"/><Reading level="C2"/>
+            <SpokenInteraction level="C1"/><SpokenProduction level="C1"/><Writing level="B2"/>
+          </ProficiencyLevel>
+        </ForeignLanguage>
+      </Linguistic>
+      <Computer><Description><Label>Python; PostgreSQL; Docker</Label></Description></Computer>
+      <Organisational><Description><Label>Mentoring
+Planning</Label></Description></Organisational>
+    </Skills>
+    <Achievement>
+      <Achievement>
+        <Title><Label>Open source</Label></Title>
+        <Description><Label>Maintainer of a thing.</Label></Description>
+      </Achievement>
+    </Achievement>
+  </LearnerInfo>
+</SkillsPassport>

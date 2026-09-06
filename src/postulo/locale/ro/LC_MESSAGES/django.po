@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 19:26+0000\n"
+"POT-Creation-Date: 2026-09-06 19:43+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: română\n"
@@ -286,7 +286,7 @@ msgstr "%(name)s — CV"
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — tablou de bord"
 
-#: src/postulo/resume/views.py:201
+#: src/postulo/resume/views.py:207
 #, python-format, draft
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d au răspuns, %(broken)d nu; cele care nu au răspuns spun de ce."
@@ -326,12 +326,12 @@ msgstr "%(sent)d copii trimise, %(failed)d eșuate; fiecare document spune care.
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d copii trimise."
 
-#: src/postulo/resume/views.py:188
+#: src/postulo/resume/views.py:194
 #, python-format, draft
 msgid "%(title)s did not answer: %(detail)s"
 msgstr "%(title)s nu a răspuns: %(detail)s"
 
-#: src/postulo/resume/views.py:192
+#: src/postulo/resume/views.py:198
 #, python-format, draft
 msgid "%(title)s still answers."
 msgstr "%(title)s încă răspunde."
@@ -360,7 +360,7 @@ msgstr[0] "%(total)s intrare"
 msgstr[1] "%(total)s intrări"
 msgstr[2] "%(total)s de intrări"
 
-#: src/postulo/templates/resume/overview.html:84
+#: src/postulo/templates/resume/overview.html:85
 #, python-format, draft
 msgid "%(total)s highlight"
 msgid_plural "%(total)s highlights"
@@ -463,6 +463,13 @@ msgstr "O companie, un post, o frază dintr-o scrisoare, un nume…"
 #, draft
 msgid "A CSV file"
 msgstr "Un fișier CSV"
+
+#: src/postulo/templates/resume/europass_import.html:20
+#, draft
+msgid ""
+"A Europass XML file — what the CV editor produced, and what an older export on your disk will be. Postulo reads it, shows you what is in it, and writes nothing until you say so."
+msgstr ""
+"Un fișier XML Europass — cel produs de editorul de CV și cel care va fi un export mai vechi de pe discul dumneavoastră. Postulo îl citește, vă arată ce conține și nu scrie nimic până nu spuneți."
 
 #: src/postulo/core/models.py:74
 #, draft
@@ -687,8 +694,8 @@ msgstr "Acțiuni"
 #: src/postulo/templates/applications/application_detail.html:289
 #: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:114
-#: src/postulo/templates/resume/overview.html:36
-#: src/postulo/templates/resume/overview.html:41
+#: src/postulo/templates/resume/overview.html:37
+#: src/postulo/templates/resume/overview.html:42
 #, draft
 msgid "Add"
 msgstr "Adaugă"
@@ -713,10 +720,15 @@ msgstr "Adaugă o conexiune"
 msgid "Add a listing"
 msgstr "Adaugă un anunț"
 
-#: src/postulo/templates/resume/overview.html:123
+#: src/postulo/templates/resume/overview.html:124
 #, draft
 msgid "Add a skill"
 msgstr "Adaugă o competență"
+
+#: src/postulo/templates/resume/europass_import.html:126
+#, draft
+msgid "Add all of this"
+msgstr "Adaugă tot"
 
 #: src/postulo/templates/documents/cv_detail.html:100
 #, draft
@@ -733,7 +745,7 @@ msgstr "Adaugă intrare"
 msgid "Add one"
 msgstr "Adăugați una"
 
-#: src/postulo/templates/resume/overview.html:136
+#: src/postulo/templates/resume/overview.html:137
 #, draft
 msgid "Add the first one."
 msgstr "Adaug-o pe prima."
@@ -763,6 +775,13 @@ msgstr "Adăugată"
 msgid "Added %(count)s entries."
 msgstr "%(count)s intrări adăugate."
 
+#: src/postulo/resume/views.py:287
+#, python-format, draft
+msgid ""
+"Added %(total)s entries. Nothing was overwritten; anything duplicated is yours to delete."
+msgstr ""
+"S-au adăugat %(total)s intrări. Nimic nu a fost suprascris; ce se dovedește dublat rămâne al dumneavoastră de șters."
+
 #: src/postulo/applications/views.py:312 src/postulo/applications/views.py:662
 #, draft
 msgid "Added to the timeline."
@@ -773,7 +792,7 @@ msgstr "Adăugat pe cronologie."
 msgid "Added to your listings."
 msgstr "Adăugat la anunțurile tale."
 
-#: src/postulo/resume/views.py:103
+#: src/postulo/resume/views.py:109
 #, draft
 msgid "Added."
 msgstr "Adăugat."
@@ -811,7 +830,7 @@ msgstr[0] "Toate cele %(counter)s din %(label)s"
 msgstr[1] "Toate cele %(counter)s din %(label)s"
 msgstr[2] "Toate cele %(counter)s din %(label)s"
 
-#: src/postulo/resume/views.py:205
+#: src/postulo/resume/views.py:211
 #, python-format, draft
 msgid "All %(ok)d links still answer."
 msgstr "Toate cele %(ok)d legături încă răspund."
@@ -852,6 +871,13 @@ msgid ""
 "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr ""
 "O arhivă poate fi importată într-un cont gol din linia de comandă. Nu este oferită aici pentru că importul creează înregistrări în loc să le contopească, iar aceasta este o decizie care merită luată deliberat, nu printr-un clic."
+
+#: src/postulo/templates/resume/europass_import.html:35
+#, draft
+msgid ""
+"An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
+msgstr ""
+"Un import doar adaugă. Nimic din ce se află deja în parcursul dumneavoastră nu este modificat sau eliminat, iar ce se dovedește dublat rămâne al dumneavoastră de șters."
 
 #: src/postulo/templates/accounts/profile.html:89
 #, draft
@@ -1443,17 +1469,17 @@ msgstr "Revino la %(company)s despre %(role)s"
 msgid "Check for updates"
 msgstr "Caută actualizări"
 
-#: src/postulo/templates/resume/overview.html:72
+#: src/postulo/templates/resume/overview.html:73
 #, draft
 msgid "Check it answers"
 msgstr "Verifică dacă răspunde"
 
-#: src/postulo/templates/resume/overview.html:32
+#: src/postulo/templates/resume/overview.html:33
 #, draft
 msgid "Check them all"
 msgstr "Verifică-le pe toate"
 
-#: src/postulo/templates/resume/overview.html:64
+#: src/postulo/templates/resume/overview.html:65
 #, python-format, draft
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Verificată la %(when)s: %(detail)s"
@@ -1467,6 +1493,11 @@ msgstr "sumă de control"
 #, draft
 msgid "Checksum"
 msgstr "Sumă de control"
+
+#: src/postulo/resume/views.py:247
+#, draft
+msgid "Choose a Europass file first."
+msgstr "Alegeți mai întâi un fișier Europass."
 
 #: src/postulo/core/server_views.py:542
 #, draft
@@ -1776,6 +1807,11 @@ msgstr "context"
 #, draft
 msgid "Contract"
 msgstr "Determinat"
+
+#: src/postulo/resume/views.py:319
+#, draft
+msgid "conversation"
+msgstr "conversație"
 
 #: src/postulo/templates/api/token_list.html:20
 #, draft
@@ -2098,7 +2134,7 @@ msgstr "Apărare"
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
-#: src/postulo/templates/resume/overview.html:108
+#: src/postulo/templates/resume/overview.html:109
 #, draft
 msgid "Delete"
 msgstr "Șterge"
@@ -2320,7 +2356,7 @@ msgstr ""
 #: src/postulo/templates/jobs/company_detail.html:135
 #: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
-#: src/postulo/templates/resume/overview.html:105
+#: src/postulo/templates/resume/overview.html:106
 #: src/postulo/templates/resume/preview.html:15
 #, draft
 msgid "Edit"
@@ -2340,6 +2376,7 @@ msgstr "Editează interviul"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
+#: src/postulo/templates/resume/europass_import.html:62
 #: src/postulo/templates/resume/preview.html:45
 #, draft
 msgid "Education"
@@ -2359,7 +2396,7 @@ msgid "Email"
 msgstr "E-mail"
 
 #: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
-#: src/postulo/jobs/models.py:263
+#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:309
 #, draft
 msgid "email address"
 msgstr "adresă de e-mail"
@@ -2428,6 +2465,13 @@ msgstr "Energie"
 #, draft
 msgid "Engineering"
 msgstr "Inginerie"
+
+#: src/postulo/templates/resume/europass_import.html:90
+#, draft
+msgid ""
+"Europass records five levels per language and Postulo keeps one, so the lowest is taken. Change it afterwards if that is not the one you would claim."
+msgstr ""
+"Europass consemnează cinci niveluri pentru fiecare limbă, iar Postulo păstrează unul, așa că se ia cel mai scăzut. Schimbați-l după aceea dacă nu este cel pe care l-ați declara."
 
 #: src/postulo/applications/models.py:341
 #, draft
@@ -2549,6 +2593,7 @@ msgstr "Tot, cel mai recent primul."
 
 #: src/postulo/documents/rendering.py:23 src/postulo/resume/registry.py:33
 #: src/postulo/resume/registry.py:34
+#: src/postulo/templates/resume/europass_import.html:53
 #: src/postulo/templates/resume/preview.html:20
 #, draft
 msgid "Experience"
@@ -2737,6 +2782,11 @@ msgstr "Caută siglă"
 msgid "First name"
 msgstr "Prenume"
 
+#: src/postulo/resume/views.py:307
+#, draft
+msgid "first name"
+msgstr "prenume"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -2814,6 +2864,12 @@ msgstr "Găsit prin"
 #, draft
 msgid "found via"
 msgstr "găsit prin"
+
+#: src/postulo/templates/resume/europass_import.html:116
+#, python-format, draft
+msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
+msgstr ""
+"Găsit: %(names)s. Se completează doar câmpurile pe care le-ați lăsat goale."
 
 #: src/postulo/jobs/models.py:287
 #, draft
@@ -3007,6 +3063,7 @@ msgid "happened on"
 msgstr "s-a întâmplat la"
 
 #: src/postulo/accounts/models.py:236 src/postulo/documents/models.py:61
+#: src/postulo/resume/views.py:313
 #, draft
 msgid "headline"
 msgstr "titlu profesional"
@@ -3166,6 +3223,13 @@ msgid ""
 msgstr ""
 "Dacă citești asta, setările de e-mail ale instanței tale Postulo funcționează. Nimic altceva de făcut."
 
+#: src/postulo/templates/resume/europass_import.html:10
+#, draft
+msgid ""
+"If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
+msgstr ""
+"Dacă ați candidat la o instituție a UE sau prin serviciul public de ocupare, aveți deja acest fișier. În loc să tastați totul din nou, predați-l."
+
 #: src/postulo/core/models.py:123
 #, draft
 msgid "ignore robots.txt when capturing"
@@ -3182,9 +3246,17 @@ msgid "Ignore this column"
 msgstr "Ignoră această coloană"
 
 #: src/postulo/templates/core/import_csv_map.html:101
+#: src/postulo/templates/resume/overview.html:18
 #, draft
 msgid "Import"
 msgstr "Importă"
+
+#: src/postulo/resume/views.py:233
+#: src/postulo/templates/resume/europass_import.html:4
+#: src/postulo/templates/resume/europass_import.html:8
+#, draft
+msgid "Import a Europass CV"
+msgstr "Importă un CV Europass"
 
 #: src/postulo/templates/core/import_csv_done.html:35
 #, draft
@@ -3603,6 +3675,8 @@ msgid "Language for new accounts"
 msgstr "Limba pentru conturile noi"
 
 #: src/postulo/documents/rendering.py:29 src/postulo/resume/registry.py:78
+#: src/postulo/resume/views.py:301
+#: src/postulo/templates/resume/europass_import.html:71
 #: src/postulo/templates/resume/preview.html:100
 #, draft
 msgid "Languages"
@@ -3816,6 +3890,11 @@ msgstr "legături trimise"
 #, draft
 msgid "Links you pointed them at"
 msgstr "Legături către care i-ați îndrumat"
+
+#: src/postulo/resume/views.py:317
+#, draft
+msgid "listening"
+msgstr "ascultare"
 
 #: src/postulo/jobs/models.py:584
 #: src/postulo/templates/core/import_csv_map.html:86
@@ -4072,7 +4151,7 @@ msgid "Move %(column)s up"
 msgstr "Mută %(column)s în sus"
 
 #: src/postulo/templates/documents/cv_detail.html:54
-#: src/postulo/templates/resume/overview.html:102
+#: src/postulo/templates/resume/overview.html:103
 #, draft
 msgid "Move down"
 msgstr "Mută în jos"
@@ -4083,7 +4162,7 @@ msgid "Move it along"
 msgstr "Du-o mai departe"
 
 #: src/postulo/templates/documents/cv_detail.html:49
-#: src/postulo/templates/resume/overview.html:97
+#: src/postulo/templates/resume/overview.html:98
 #, draft
 msgid "Move up"
 msgstr "Mută în sus"
@@ -4344,7 +4423,7 @@ msgstr "Niciun anunț înregistrat pentru această companie."
 msgid "no role"
 msgstr "fără post"
 
-#: src/postulo/templates/resume/overview.html:79
+#: src/postulo/templates/resume/overview.html:80
 #, draft
 msgid "No skills in this group yet"
 msgstr "Nicio competență în acest grup încă"
@@ -4542,7 +4621,7 @@ msgstr "Nimic aici"
 msgid "Nothing here yet"
 msgstr "Nimic aici încă"
 
-#: src/postulo/templates/resume/overview.html:133
+#: src/postulo/templates/resume/overview.html:134
 #, draft
 msgid "Nothing here yet."
 msgstr "Nimic aici încă."
@@ -5089,6 +5168,11 @@ msgstr "Perioadă"
 msgid "Permissions"
 msgstr "Permisiuni"
 
+#: src/postulo/templates/resume/europass_import.html:114
+#, draft
+msgid "Personal details"
+msgstr "Date personale"
+
 #: src/postulo/accounts/admin.py:22
 #, draft
 msgid "Personal info"
@@ -5185,6 +5269,11 @@ msgstr "Portofoliu"
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Portofolii, profiluri și videoclipuri către care i-ați îndrumat."
+
+#: src/postulo/resume/views.py:299
+#, draft
+msgid "Positions"
+msgstr "Posturi"
 
 #: src/postulo/jobs/models.py:421
 #, draft
@@ -5308,7 +5397,7 @@ msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html:16
 #: src/postulo/templates/documents/letter_detail.html:16
-#: src/postulo/templates/resume/overview.html:18
+#: src/postulo/templates/resume/overview.html:19
 #, draft
 msgid "Preview"
 msgstr "Previzualizare"
@@ -5366,6 +5455,7 @@ msgid "Project"
 msgstr "Proiect"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/resume/registry.py:45
+#: src/postulo/templates/resume/europass_import.html:107
 #: src/postulo/templates/resume/preview.html:61
 #, draft
 msgid "Projects"
@@ -5375,6 +5465,11 @@ msgstr "Proiecte"
 #, draft
 msgid "projects"
 msgstr "proiecte"
+
+#: src/postulo/resume/views.py:303
+#, draft
+msgid "Projects and achievements"
+msgstr "Proiecte și realizări"
 
 #: src/postulo/templates/server/logs.html:176
 #, draft
@@ -5431,6 +5526,11 @@ msgstr "Repunere la loc"
 #, draft
 msgid "qualification"
 msgstr "calificare"
+
+#: src/postulo/resume/views.py:300
+#, draft
+msgid "Qualifications"
+msgstr "Calificări"
 
 #: src/postulo/templates/connections/list.html:65
 #, draft
@@ -5521,6 +5621,7 @@ msgid ""
 msgstr ""
 "Citit din cronologie, așa că un interviu încheiat cu un refuz se numără tot ca interviu."
 
+#: src/postulo/templates/resume/europass_import.html:29
 #: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
@@ -5530,6 +5631,11 @@ msgstr "Citește-l"
 #, draft
 msgid "Read the page"
 msgstr "Citește pagina"
+
+#: src/postulo/resume/views.py:318
+#, draft
+msgid "reading"
+msgstr "citire"
 
 #: src/postulo/jobs/industries.py:40
 #, draft
@@ -5966,7 +6072,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Salvat în anunțurile tale. Decide când ești pregătit."
 
 #: src/postulo/accounts/settings_views.py:34
-#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:112
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:118
 #, draft
 msgid "Saved."
 msgstr "Salvat."
@@ -6339,7 +6445,8 @@ msgid "skill groups"
 msgstr "grupuri de competențe"
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:52
-#: src/postulo/resume/registry.py:56
+#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:302
+#: src/postulo/templates/resume/europass_import.html:98
 #: src/postulo/templates/resume/preview.html:79
 #, draft
 msgid "Skills"
@@ -6421,10 +6528,20 @@ msgstr "versiunea sursei"
 msgid "Sources installed"
 msgstr "Surse instalate"
 
+#: src/postulo/resume/views.py:320
+#, draft
+msgid "speaking"
+msgstr "vorbire"
+
 #: src/postulo/documents/models.py:166
 #, draft
 msgid "Speculative letter"
 msgstr "Candidatură spontană"
+
+#: src/postulo/templates/resume/europass_import.html:129
+#, draft
+msgid "Start again"
+msgstr "Începe din nou"
 
 #: src/postulo/templates/documents/letter_form.html:8
 #, draft
@@ -6562,6 +6679,11 @@ msgstr "înlocuit"
 msgid "Supersedes"
 msgstr "Înlocuiește"
 
+#: src/postulo/resume/views.py:308
+#, draft
+msgid "surname"
+msgstr "nume de familie"
+
 #: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
@@ -6663,6 +6785,11 @@ msgstr "adaptată pentru acest CV"
 msgid "Telecommunications"
 msgstr "Telecomunicații"
 
+#: src/postulo/resume/views.py:310
+#, draft
+msgid "telephone"
+msgstr "telefon"
+
 #: src/postulo/templates/documents/letter_list.html:45
 #, draft
 msgid "Template"
@@ -6746,6 +6873,16 @@ msgstr "Fișierul acela este mai mare de %(limit)s MB."
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Acest fișier este mai mare decât ar trebui să fie o siglă."
+
+#: src/postulo/resume/views.py:252
+#, python-format, draft
+msgid "That file is over %(limit)s MB. A CV is not that big."
+msgstr "Fișierul depășește %(limit)s MB. Un CV nu este atât de mare."
+
+#: src/postulo/resume/views.py:265
+#, draft
+msgid "That file was read, and there was nothing in it to import."
+msgstr "Fișierul a fost citit și nu era nimic de importat în el."
 
 #: src/postulo/plugins/fetching.py:102 src/postulo/plugins/fetching.py:127
 #, draft
@@ -6953,6 +7090,11 @@ msgid ""
 msgstr ""
 "Domeniile în care activează companiile tale, cu propriile cuvinte. O companie poate fi în mai multe."
 
+#: src/postulo/templates/resume/europass_import.html:26
+#, draft
+msgid "The file"
+msgstr "Fișierul"
+
 #: src/postulo/core/csv_import.py:441
 #, draft
 msgid "The file holds no rows."
@@ -7126,7 +7268,7 @@ msgstr "Temă: %(current)s. Comută la: %(next)s."
 msgid "Then delete"
 msgstr "Apoi șterge"
 
-#: src/postulo/resume/views.py:197
+#: src/postulo/resume/views.py:203
 #, draft
 msgid "There are no links to check."
 msgstr "Nu există legături de verificat."
@@ -7150,6 +7292,11 @@ msgstr "Nu este nimic la adresa aceea (404). Verifică linkul."
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Nu este nimic aici, sau nu îți este dat să vezi."
+
+#: src/postulo/resume/views.py:276
+#, draft
+msgid "There is nothing waiting to be imported."
+msgstr "Nu așteaptă nimic să fie importat."
 
 #: src/postulo/templates/applications/insights.html:31
 #, python-format, draft
@@ -7664,6 +7811,7 @@ msgstr ""
 "WeasyPrint se instalează cu Postulo, dar are nevoie de Pango și de bibliotecile lui de sistem. Pe Debian sau Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. Pe Windows sunt greu de obținut, așa că folosește motorul chromium în schimb. Vezi https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
 #: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:116
+#: src/postulo/resume/views.py:311
 #, draft
 msgid "website"
 msgstr "site web"
@@ -7717,6 +7865,11 @@ msgid ""
 "What is in the diary, soonest first. Schedule one from an application's page."
 msgstr ""
 "Ce este în agendă, cel mai apropiat primul. Programează unul din pagina unei candidaturi."
+
+#: src/postulo/templates/resume/europass_import.html:44
+#, draft
+msgid "What is in the file"
+msgstr "Ce conține fișierul"
 
 #: src/postulo/templates/documents/cv_detail.html:29
 #, draft
@@ -7862,6 +8015,11 @@ msgstr "Unde își publică această companie posturile vacante."
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr ""
 "Unde ai dat de el: un portal de joburi, o recomandare, site-ul companiei."
+
+#: src/postulo/resume/views.py:312
+#, draft
+msgid "where you live"
+msgstr "unde locuiți"
 
 #: src/postulo/templates/core/dashboard.html:42
 #, draft
@@ -8009,6 +8167,11 @@ msgstr "Mai scrie puțin."
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Scrie-ți mai întâi cariera, apoi construiește variante din ea."
+
+#: src/postulo/resume/views.py:321
+#, draft
+msgid "writing"
+msgstr "scriere"
 
 #: src/postulo/templates/resume/overview.html:11
 #, draft
@@ -8170,7 +8333,7 @@ msgid "Your career record"
 msgstr "Istoricul carierei tale"
 
 #: src/postulo/templates/core/dashboard.html:270
-#: src/postulo/templates/resume/overview.html:19
+#: src/postulo/templates/resume/overview.html:20
 #, draft
 msgid "Your CVs"
 msgstr "CV-urile tale"

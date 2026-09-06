@@ -34,7 +34,7 @@ Add at the proxy what an application cannot do for itself:
   `/api/v1/` — Postulo limits sign-in attempts itself, but a proxy limit is cheaper and
   earlier.
 - **A body size limit** a little above the largest upload you expect (uploads are capped
-  at 20 MB, avatars at 5 MB, spreadsheets at 2 MB).
+  at 20 MB, avatars at 5 MB, Europass files at 5 MB, spreadsheets at 2 MB).
 - **Never serve `data/media` yourself.** Uploaded CVs are delivered only through a view
   that has checked who is asking. If you use `X-Accel-Redirect` or `X-Sendfile`, mark the
   location `internal`.
