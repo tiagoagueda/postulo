@@ -11,6 +11,8 @@ from django import forms
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import phone_field, phones
+
 from . import identifiers, industries, logos
 from .models import Company, CompanyIdentifier, Contact, Industry, JobPosting
 
@@ -292,11 +294,33 @@ class IndustryForm(OwnerScopedModelForm):
         return industry
 
 
+def _language_of(user) -> str:
+    """What the owner reads Postulo in, which is the best first guess at their country."""
+    profile = getattr(user, "profile", None) if user is not None else None
+    return getattr(profile, "language", "") or ""
+
+
 class ContactForm(OwnerScopedModelForm):
     class Meta:
         model = Contact
         fields = ("name", "role", "company", "email", "phone", "linkedin_url", "notes")
         widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # A recruiter's number written down as "06 12 34 56 78" cannot be dialled from
+        # anywhere else, and the moment to fix that is the moment somebody types it.
+        self.fields["phone"] = phone_field.PhoneField(
+            label=_("Phone"),
+            required=False,
+            default_country=phones.default_country(_language_of(self.user)),
+            help_text=_(
+                "Kept in the international form, so you can still ring it from another "
+                "country. A number that already starts with + is taken as it is."
+            ),
+        )
+        if self.instance and self.instance.pk:
+            self.fields["phone"].initial = self.instance.phone
 
     def scope_querysets(self) -> None:
         self.fields["company"].queryset = Company.objects.for_user(self.user)

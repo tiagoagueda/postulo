@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Not for anything it renders on its own: adding it puts the built-in widget templates
+    # on the project's template engine, which FORM_RENDERER below then uses. Without it,
+    # widgets are rendered by a separate engine that cannot see src/postulo/templates.
+    "django.forms",
     # third party
     "allauth",
     "allauth.account",
@@ -139,6 +143,12 @@ CACHE_TABLE = "postulo_cache"
 CACHES = {
     "default": env.cache_url("POSTULO_CACHE_URL", default=f"dbcache://{CACHE_TABLE}"),
 }
+
+# Widgets are rendered by the project's own template engine rather than by a private one
+# of Django's, so a widget template can live beside every other template. The phone field
+# needs it: it is two controls in one, and building that markup as a string in Python
+# would be worse than a template in every way that matters.
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 # --------------------------------------------------------------------------- auth
 

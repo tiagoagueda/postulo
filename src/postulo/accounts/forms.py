@@ -17,6 +17,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import phone_field, phones
+
 from . import avatars
 from .models import Invite, Profile
 
@@ -258,7 +260,19 @@ class ProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["phone"] = phone_field.PhoneField(
+            label=_("Phone"),
+            required=False,
+            default_country=phones.default_country(
+                getattr(self.instance, "language", "") or settings.LANGUAGE_CODE
+            ),
+            help_text=_(
+                "Kept in the international form, so it can be dialled from anywhere. A "
+                "number that already starts with + is taken as it is."
+            ),
+        )
         if self.instance and self.instance.pk:
+            self.fields["phone"].initial = self.instance.phone
             self.fields["first_name"].initial = self.instance.user.first_name
             self.fields["last_name"].initial = self.instance.user.last_name
             self.fields["use_gravatar"].initial = self.instance.use_gravatar

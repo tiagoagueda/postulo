@@ -160,6 +160,28 @@ def company_logo(company, css_class: str = "size-6 text-[0.6rem]") -> str:
     )
 
 
+@register.simple_tag
+def phone_link(number: str) -> str:
+    """A stored number, spaced to be read aloud and linked so a phone can dial it.
+
+    Half of these calls happen on a phone, where a number that is only text has to be
+    copied out by hand. The `tel:` form is the digits; the visible form is grouped.
+    """
+    from postulo.core import phones
+
+    number = (number or "").strip()
+    if not number:
+        return ""
+    dialled = phones.as_dialled(number)
+    if not dialled:
+        return escape(number)
+    return format_html(
+        '<a href="tel:{}" class="text-brand-600 underline dark:text-brand-400">{}</a>',
+        dialled,
+        phones.readable(number),
+    )
+
+
 @register.filter
 def get_item(mapping, key):
     """One value out of a dictionary, by a key held in a variable.

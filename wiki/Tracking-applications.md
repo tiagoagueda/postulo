@@ -55,6 +55,23 @@ A company with no logo shows its initials, coloured from the name.
 Postulo never fetches a logo on its own: an address is fetched when you save it, and a
 website is read when you press the button. Nothing happens on a page view.
 
+## Telephone numbers
+
+A number written down the way it is said locally — `06 12 34 56 78` — cannot be dialled from
+anywhere else, and six months later nothing in the record says which country it belonged to.
+So a phone field asks which country the number is for, starting at the one your own language
+suggests, and keeps what you type in the international form: `+33612345678`.
+
+Paste a number that already begins with `+` and it is taken exactly as it is; the chooser
+beside the box is ignored, because you have already said which country it is for. Type
+something Postulo cannot make sense of and it is kept exactly as you typed it, because a
+number nobody can parse is still worth having.
+
+Numbers are shown grouped so they can be read aloud, and linked so a phone can ring them.
+
+Postulo does not tell you whether a number is *valid*. That would need every country's
+numbering plan, and it is not going to dial anything.
+
 ## Two views of the same thing
 
 - **Board** shows only live applications, in columns by status. Move one along with the

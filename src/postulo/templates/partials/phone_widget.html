@@ -1,0 +1,29 @@
+{% load i18n %}{% comment %}
+  The country and the number, side by side. The country chooser has a name of its own
+  because a bare select in a two-part control is announced as nothing at all; the visible
+  label belongs to the field as a whole and cannot serve both.
+{% endcomment %}
+{% comment %} The select must be allowed to shrink below the width of its longest option,
+   or it takes the whole row and leaves the number box a few pixels wide -- which is both
+   unusable and a WCAG 2.2 target-size failure. `min-w-0` is what permits that; the browser
+   then clips the closed select's text, which is why the flag and dialling code come first.
+{% endcomment %}
+<div class="flex gap-2">
+  <div class="w-36 shrink-0">
+    {% with widget=widget.subwidgets.0 %}
+      <select name="{{ widget.name }}" id="{{ widget.attrs.id }}" class="field-input w-full min-w-0"
+              aria-label="{% translate 'Country the number is in' %}">
+        {% for group, options, index in widget.optgroups %}
+          {% for option in options %}<option value="{{ option.value|stringformat:'s' }}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>{% endfor %}
+        {% endfor %}
+      </select>
+    {% endwith %}
+  </div>
+  <div class="min-w-0 flex-1">
+    {% with widget=widget.subwidgets.1 %}
+      <input type="text" name="{{ widget.name }}" id="{{ widget.attrs.id }}"
+             value="{{ widget.value|default_if_none:'' }}"
+             class="field-input w-full" inputmode="tel" autocomplete="tel">
+    {% endwith %}
+  </div>
+</div>

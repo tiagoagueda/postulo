@@ -131,6 +131,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Phone fields ask which country the number is for.** A recruiter's number written down
+  as `06 12 34 56 78` cannot be dialled from anywhere else, and the person writing it down
+  is not thinking about that at the time. The field now offers a country beside the box,
+  starting at the one your own language suggests, and stores the result in the
+  international form so it still works six months and one border later. A number that
+  already starts with `+` is taken exactly as it is. A number nobody can parse is kept
+  exactly as it was typed, because refusing to save it would be the worst outcome
+  available. Numbers are shown grouped so they can be read aloud, and linked so a phone can
+  ring them. Postulo does **not** decide whether a number is real: that needs every
+  country's numbering plan, and Postulo is not going to dial anything. (#53)
 - **The language picker shows each language's flag, and reads as a list.** Twenty-four
   languages is a long list, and the eye finds a flag faster than it reads a name written in
   a script it does not use. The flags are regional indicator characters rather than images:
