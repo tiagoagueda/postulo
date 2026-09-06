@@ -104,7 +104,9 @@ def test_the_registry_knows_kinds_and_finds_plugins_by_name():
     assert registry.find_plugin("notifier", "echo").label == "Echo"
     assert registry.find_plugin("notifier", "nope") is None
     assert "echo" in [plugin.name for plugin in registry.connected_plugins()]
-    assert registry.plugins("store") == []
+    # The local store is built in, in shape only: it needs no connection and is not offered.
+    assert [plugin.name for plugin in registry.plugins("store")] == ["local"]
+    assert "local" not in [plugin.name for plugin in registry.connected_plugins()]
     with pytest.raises(ValueError, match="Unknown plugin kind"):
         registry.plugins("weather")
     # Sources are untouched by the generalisation.

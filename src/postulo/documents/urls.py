@@ -33,7 +33,19 @@ urlpatterns = [
     path("files/<int:pk>/edit/", views.UploadUpdateView.as_view(), name="upload_update"),
     path("files/<int:pk>/delete/", views.UploadDeleteView.as_view(), name="upload_delete"),
     path("files/<int:pk>/download/", views.UploadDownloadView.as_view(), name="upload_download"),
+    path(
+        "files/<int:pk>/archive/",
+        views.SendCopiesNowView.as_view(),
+        {"origin": "upload"},
+        name="upload_archive",
+    ),
     path("sent/", views.RenderedListView.as_view(), name="rendered_list"),
+    path(
+        "sent/<int:pk>/archive/",
+        views.SendCopiesNowView.as_view(),
+        {"origin": "render"},
+        name="rendered_archive",
+    ),
     path("sent/<int:pk>/download/", views.RenderedDownloadView.as_view(), name="rendered_download"),
     path("applications/<int:pk>/send/", views.SendDocumentsView.as_view(), name="send"),
     path(

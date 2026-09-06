@@ -37,6 +37,34 @@ To record a set: open an application and choose **Record what you sent**. Pick a
 cover letter and any files you already had. Postulo renders the first two as they stand,
 attaches everything to the application, and notes it on the timeline.
 
+## Keeping copies elsewhere
+
+Everything above lives in Postulo's own private media, and always will: that is where
+rendering, downloads, the export and the review of what you sent read from, and none of
+it needs a network. A **document store** is somewhere that receives *copies* — a
+Paperless-ngx archive, say, through the
+[postulo-paperless](https://source.tiagoagueda.com/postulo/postulo-paperless) plugin.
+
+Once the operator has installed a store plugin, add it under **Settings → Connections**.
+The form ends with a switch per kind of document — CV, cover letter, certificate,
+portfolio, reference, other — so you can send the paperwork and keep the rest at home.
+From then on every new document is queued for the store and the **scheduler** sends it on
+its next pass, a few minutes later. Each document shows how that went, beside its name:
+
+- **archived** — with a link to it in the store, when the store has one;
+- **waiting to be sent** — the scheduler has not been round yet;
+- **failed: …** — with the reason; Postulo tries again with a growing wait, six times,
+  then leaves it to you;
+- **not accepted** — the store declined that kind of document.
+
+**Send to stores now** under a document tries at once, and gives a copy that gave up its
+attempts back. **Send everything** on the connection queues every document you already
+had before the store existed. Nothing is ever sent twice to the same store, and nothing
+is ever deleted from a store: an archive is for keeping.
+
+The references — where each copy went — travel in your export, so a restored instance
+still knows where its copies are even before you recreate the connection.
+
 ## Privacy
 
 Uploaded documents contain your address, your phone number and your full employment

@@ -8,6 +8,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Document stores: local media built in, an interface for keeping copies elsewhere.**
+  A store plugin in the `postulo.stores` group receives a copy of every new document —
+  rendered CVs and letters, uploaded files — with enough metadata to file it: kind,
+  title, company, role, the application's link, dates, language, tags. Local media stays
+  the source of truth and is the same contract applied to this instance, so nothing
+  about a plugin is a special case. Copies go out through the scheduler, never inside a
+  request, with retries and a growing wait; each document shows *archived* with a link,
+  *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
+  switch per document kind, *Send to stores now* tries at once, *Send everything* queues
+  what existed before the store did, and the references travel in the export. (#13)
 - **postulo-apprise, the first plugin built outside the core.** One package, one
   connection, and Postulo can notify through [Apprise](https://github.com/caronc/apprise):
   Telegram, ntfy, Discord, Matrix, Gotify, Pushover, Signal, email and well over a hundred

@@ -47,6 +47,13 @@
                   {% csrf_token %}
                   <button type="submit" class="btn-secondary px-3 py-1 text-xs">{% translate "Test" %}</button>
                 </form>
+                {% if row.is_store %}
+                  <form method="post" action="{% url 'connections:backfill' row.connection.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                            title="{% translate 'Queue every document you already have for this store.' %}">{% translate "Send everything" %}</button>
+                  </form>
+                {% endif %}
                 <a href="{% url 'connections:edit' row.connection.pk %}" class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
               {% endif %}
               <a href="{% url 'connections:delete' row.connection.pk %}" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">{% translate "Remove" %}</a>

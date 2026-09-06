@@ -14,6 +14,7 @@ from postulo.applications.models import Application
 from postulo.applications.services import record_event
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
+from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 
 from .forms import (
@@ -234,7 +235,21 @@ class CoverLetterPreviewView(OwnedObjectMixin, View):
 # ----------------------------------------------------------------------- uploads
 
 
-class UploadListView(OwnedObjectMixin, ListView):
+class CopiesContextMixin:
+    """Give a list page each document's copies and whether *Send now* makes sense."""
+
+    def get_context_data(self, **kwargs):
+        from .archiving import attach_copies, store_connections
+
+        context = super().get_context_data(**kwargs)
+        documents = list(context.get(self.context_object_name) or [])
+        attach_copies(documents)
+        context[self.context_object_name] = documents
+        context["has_stores"] = store_connections(self.request.user).exists()
+        return context
+
+
+class UploadListView(CopiesContextMixin, OwnedObjectMixin, ListView):
     model = UploadedDocument
     template_name = "documents/upload_list.html"
     context_object_name = "documents"
@@ -295,7 +310,52 @@ class RenderedDownloadView(OwnedObjectMixin, View):
         return serve_private_file(request, document.file, download_name=f"{document.title}.pdf")
 
 
-class RenderedListView(OwnedObjectMixin, ListView):
+class SendCopiesNowView(OwnedObjectMixin, View):
+    """*Send now*: try every store this document is still missing from, at once.
+
+    The one place a store is called inside a request. It is what the person asked for,
+    with the button in front of them, and the outcome is told to them in a sentence.
+    """
+
+    models = {"upload": UploadedDocument, "render": RenderedDocument}
+
+    def get_queryset(self):
+        model = self.models[self.kwargs["origin"]]
+        return model.objects.for_user(self.request.user)
+
+    def post(self, request: HttpRequest, origin: str, pk: int) -> HttpResponse:
+        from .archiving import send_now, store_connections
+
+        document = get_object_or_404(self.get_queryset(), pk=pk)
+        fallback = reverse_lazy(
+            "documents:upload_list" if origin == "upload" else "documents:rendered_list"
+        )
+        if not store_connections(request.user).exists():
+            messages.info(
+                request,
+                _("No document store is connected. Add one under Settings → Connections."),
+            )
+            return redirect(safe_next(request, str(fallback)))
+        sent, failed = send_now(document)
+        if failed and not sent:
+            messages.error(request, _("The copy could not be sent; the document says why."))
+        elif failed:
+            messages.warning(
+                request,
+                _("%(sent)d copies sent, %(failed)d failed; each document says which.")
+                % {"sent": sent, "failed": failed},
+            )
+        elif sent:
+            messages.success(
+                request,
+                _("%(sent)d copies sent.") % {"sent": sent},
+            )
+        else:
+            messages.info(request, _("Every store already has this document."))
+        return redirect(safe_next(request, str(fallback)))
+
+
+class RenderedListView(CopiesContextMixin, OwnedObjectMixin, ListView):
     model = RenderedDocument
     template_name = "documents/rendered_list.html"
     context_object_name = "documents"
@@ -379,7 +439,13 @@ class ApplicationDocumentsView(OwnedObjectMixin, DetailView):
     context_object_name = "application"
 
     def get_context_data(self, **kwargs) -> dict:
+        from .archiving import attach_copies, store_connections
+
         context = super().get_context_data(**kwargs)
-        context["rendered"] = self.object.rendered_documents.all()
-        context["uploads"] = self.object.sent_uploads.all()
+        rendered = list(self.object.rendered_documents.all())
+        uploads = list(self.object.sent_uploads.all())
+        attach_copies([*rendered, *uploads])
+        context["rendered"] = rendered
+        context["uploads"] = uploads
+        context["has_stores"] = store_connections(self.request.user).exists()
         return context

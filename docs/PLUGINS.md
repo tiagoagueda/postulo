@@ -300,6 +300,41 @@ deliver: if `send()` is called, the person wanted it. The built-in
 one built outside the core, with `validate`, `summary`, a secret that is a list, and the
 destination policy applied to the servers its URLs name.
 
+### Stores
+
+A store keeps a *copy* of a document somewhere else — an archive such as Paperless, a
+share, a folder. Local media stays the source of truth: rendering, serving, export and the
+review of what was sent never depend on a store, and a job search does not stop because
+an archive server is down. A store adds one method:
+
+```python
+from postulo.documents.stores import DocumentMetadata, ExternalRef
+
+
+class MyStore:
+    ...
+    kind = "store"
+
+    def put(self, document, file, metadata: DocumentMetadata, config, user) -> ExternalRef | None:
+        """Keep a copy. Return where it went, or None to say "not for me". Raise on failure."""
+```
+
+`file` is open for reading; `metadata` is plain values — `kind` (a `DocumentKind`),
+`kind_label`, `origin` (`render` or `upload`), `title`, `filename`, `content_type`,
+`created_at`, `checksum`, `size`, `company`, `role`, `application_url`, `sent_on`,
+`language`, `tags` — enough to file it sensibly without opening it. Return an
+`ExternalRef(store, id, url)`; Postulo keeps it beside the document, shows the link, and
+carries it in the export. Return `None` to decline a kind you do not keep (an archive for
+paperwork may decline a video); the person sees *not accepted*. Raise on failure: the
+scheduler retries with a growing wait and the document shows the error.
+
+Postulo calls `put` from the scheduler, never inside a request, except when a person
+presses *Send to stores now*. Every store connection carries a switch per document kind,
+so your plugin never asks which kinds to keep: if `put` is called, the person wanted it.
+`browse()` and `delete()` are reserved for a later stage and not called yet. The
+built-in `postulo.documents.stores.LocalStore` is the same contract applied to private
+media, and cannot be switched off.
+
 ## Getting a plugin into the container
 
 The image installs a locked environment at build time and runs as a user that cannot

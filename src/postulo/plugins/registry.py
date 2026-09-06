@@ -130,10 +130,14 @@ def find_plugin(kind: str, name: str):
 
 
 def connected_plugins() -> list:
-    """Every installed plugin that needs a connection, whatever its kind."""
+    """Every installed plugin a person can connect to, whatever its kind.
+
+    A built-in that needs nothing from anyone — the local document store — says so with
+    ``needs_connection = False`` and is left off the list: there is no form to draw.
+    """
     found: list = []
     for kind in CONNECTED_KINDS:
-        found.extend(plugins(kind))
+        found.extend(p for p in plugins(kind) if getattr(p, "needs_connection", True))
     return found
 
 

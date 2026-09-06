@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import CV, CoverLetter, CVItem, RenderedDocument, UploadedDocument
+from .models import CV, CoverLetter, CVItem, DocumentCopy, RenderedDocument, UploadedDocument
 
 
 class CVItemInline(admin.TabularInline):
@@ -37,3 +37,10 @@ class RenderedDocumentAdmin(admin.ModelAdmin):
     list_filter = ("owner", "kind")
     search_fields = ("title",)
     readonly_fields = ("checksum", "source_text")
+
+
+@admin.register(DocumentCopy)
+class DocumentCopyAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "store", "status", "attempts", "owner", "sent_at")
+    list_filter = ("status", "store", "owner")
+    readonly_fields = ("attempts", "last_attempt_at", "sent_at", "last_error")

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:56+0000\n"
+"POT-Creation-Date: 2026-09-06 10:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Ελληνικά\n"
@@ -30,6 +30,13 @@ msgstr "Η %(company)s έχει ήδη αυτό το αναγνωριστικό.
 #, python-format, draft
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "Η %(company)s έχει ήδη αναγνωριστικό %(scheme)s: %(value)s."
+
+#: src/postulo/plugins/views.py:205
+#, python-format, draft
+msgid ""
+"%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
+msgstr ""
+"%(count)d έγγραφα μπήκαν στην ουρά για %(label)s. Ο χρονοπρογραμματιστής θα τα στείλει στο επόμενο πέρασμά του· κάθε έγγραφο δείχνει πώς πήγε."
 
 #: src/postulo/applications/quiet.py:116
 #, python-format, draft
@@ -199,12 +206,12 @@ msgid ""
 msgstr ""
 "Ο/Η %(name)s συνδέεται ως <strong>%(current)s</strong>. Το νέο όνομα χρήστη πρέπει να είναι ελεύθερο σε αυτή την εγκατάσταση· τα κεφαλαία δεν το διαφοροποιούν."
 
-#: src/postulo/documents/rendering.py:180
+#: src/postulo/documents/rendering.py:196
 #, python-format, draft
 msgid "%(name)s — cover letter"
 msgstr "%(name)s — συνοδευτική επιστολή"
 
-#: src/postulo/documents/rendering.py:160
+#: src/postulo/documents/rendering.py:176
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — βιογραφικό"
@@ -214,12 +221,12 @@ msgstr "%(name)s — βιογραφικό"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:128
+#: src/postulo/plugins/forms.py:132
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "Το %(plugin)s δεν μπόρεσε να ελέγξει αυτές τις ρυθμίσεις: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:42
+#: src/postulo/notifications/management/commands/send_due_reminders.py:43
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s στην %(company)s"
@@ -228,6 +235,17 @@ msgstr "%(role)s στην %(company)s"
 #, python-format, draft
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s στην %(company)s — %(days)s ημέρες"
+
+#: src/postulo/documents/views.py:345
+#, python-format, draft
+msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
+msgstr ""
+"%(sent)d αντίγραφα στάλθηκαν, %(failed)d απέτυχαν· κάθε έγγραφο λέει ποια."
+
+#: src/postulo/documents/views.py:351
+#, python-format, draft
+msgid "%(sent)d copies sent."
+msgstr "%(sent)d αντίγραφα στάλθηκαν."
 
 #: src/postulo/templates/applications/application_list.html:9
 #, python-format, draft
@@ -468,7 +486,7 @@ msgid "Add a company"
 msgstr "Προσθήκη εταιρείας"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:69
+#: src/postulo/templates/connections/list.html:76
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -522,7 +540,7 @@ msgstr "Προσθήκη στο χρονολόγιο"
 msgid "Added"
 msgstr "Προστέθηκε"
 
-#: src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:117
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "Προστέθηκαν %(count)s καταχωρίσεις."
@@ -807,6 +825,11 @@ msgstr "Υποβολή αίτησης: %(title)s"
 msgid "Apprenticeship"
 msgstr "Μαθητεία"
 
+#: src/postulo/documents/models.py:305
+#, draft
+msgid "Archived"
+msgstr "Αρχειοθετήθηκε"
+
 #: src/postulo/templates/partials/confirm_delete.html:9
 #, draft
 msgid "Are you sure?"
@@ -823,6 +846,11 @@ msgstr "Αξιολόγηση"
 #, draft
 msgid "Assessment or test"
 msgstr "Αξιολόγηση ή τεστ"
+
+#: src/postulo/documents/models.py:352
+#, draft
+msgid "attempts"
+msgstr "προσπάθειες"
 
 #: src/postulo/jobs/industries.py:30
 #, draft
@@ -1344,24 +1372,24 @@ msgstr "Σύνδεση"
 msgid "Connect %(plugin)s"
 msgstr "Σύνδεση %(plugin)s"
 
-#: src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
 #, draft
 msgid "connection"
 msgstr "σύνδεση"
 
-#: src/postulo/plugins/views.py:201
+#: src/postulo/plugins/views.py:234
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Η σύνδεση αφαιρέθηκε, μαζί με τα μυστικά."
 
-#: src/postulo/plugins/views.py:160
+#: src/postulo/plugins/views.py:161
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Η σύνδεση αποθηκεύτηκε. Δοκιμάστε την για να βεβαιωθείτε ότι λειτουργεί."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
-#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:197
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
+#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
+#: src/postulo/plugins/views.py:230
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1515,7 +1543,7 @@ msgstr "νόμισμα"
 msgid "CV"
 msgstr "Βιογραφικό"
 
-#: src/postulo/documents/views.py:74
+#: src/postulo/documents/views.py:75
 #, draft
 msgid "CV created. Now choose what goes on it."
 msgstr "Το βιογραφικό δημιουργήθηκε. Τώρα επιλέξτε τι θα περιέχει."
@@ -1644,7 +1672,7 @@ msgstr "Άμυνα"
 #: src/postulo/templates/applications/tag_list.html:32
 #: src/postulo/templates/documents/cv_detail.html:23
 #: src/postulo/templates/documents/letter_detail.html:21
-#: src/postulo/templates/documents/upload_list.html:38
+#: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:27
 #: src/postulo/templates/jobs/industry_list.html:40
 #: src/postulo/templates/jobs/posting_detail.html:54
@@ -1732,6 +1760,16 @@ msgstr "Διαχείριση Django"
 msgid "Document"
 msgstr "Έγγραφο"
 
+#: src/postulo/documents/models.py:362
+#, draft
+msgid "document copies"
+msgstr "αντίγραφα εγγράφων"
+
+#: src/postulo/documents/models.py:361
+#, draft
+msgid "document copy"
+msgstr "αντίγραφο εγγράφου"
+
 #: src/postulo/plugins/views.py:32
 #, draft
 msgid "Document stores"
@@ -1746,7 +1784,7 @@ msgstr "Αποθήκες εγγράφων"
 msgid "Documents"
 msgstr "Έγγραφα"
 
-#: src/postulo/documents/views.py:367
+#: src/postulo/documents/views.py:427
 #, draft
 msgid "Documents sent"
 msgstr "Απεσταλμένα έγγραφα"
@@ -1768,11 +1806,11 @@ msgstr "Ολοκληρώθηκε"
 msgid "done on"
 msgstr "ολοκληρώθηκε στις"
 
-#: src/postulo/templates/documents/application_documents.html:33
-#: src/postulo/templates/documents/application_documents.html:52
+#: src/postulo/templates/documents/application_documents.html:35
+#: src/postulo/templates/documents/application_documents.html:58
 #: src/postulo/templates/documents/cv_detail.html:90
-#: src/postulo/templates/documents/rendered_list.html:45
-#: src/postulo/templates/documents/upload_list.html:33
+#: src/postulo/templates/documents/rendered_list.html:49
+#: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "Download"
 msgstr "Λήψη"
@@ -1824,9 +1862,9 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:50
+#: src/postulo/templates/connections/list.html:57
 #: src/postulo/templates/documents/letter_detail.html:18
-#: src/postulo/templates/documents/upload_list.html:35
+#: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
 #: src/postulo/templates/jobs/company_detail.html:120
 #: src/postulo/templates/jobs/industry_list.html:36
@@ -1992,6 +2030,11 @@ msgid ""
 msgstr ""
 "Κάθε ρόλος που είχατε. Γράψτε τα σημεία έμφασης μία φορά· προσαρμόστε τα ανά βιογραφικό αργότερα."
 
+#: src/postulo/documents/views.py:354
+#, draft
+msgid "Every store already has this document."
+msgstr "Κάθε αποθήκη έχει ήδη αυτό το έγγραφο."
+
 #: src/postulo/jobs/listing_views.py:30
 #, draft
 msgid "Everything"
@@ -2081,10 +2124,15 @@ msgstr "Εξαγωγή όλων"
 msgid "Export PDF"
 msgstr "Εξαγωγή PDF"
 
-#: src/postulo/templates/documents/rendered_list.html:37
+#: src/postulo/templates/documents/rendered_list.html:41
 #, draft
 msgid "Exported on its own"
 msgstr "Εξήχθη ξεχωριστά"
+
+#: src/postulo/documents/models.py:306
+#, draft
+msgid "Failed"
+msgstr "Απέτυχε"
 
 #: src/postulo/plugins/models.py:102
 #, draft
@@ -2121,7 +2169,7 @@ msgstr "Τα στοιχεία εμφανίζονται αφού κάνετε α�
 msgid "file"
 msgstr "αρχείο"
 
-#: src/postulo/documents/views.py:253
+#: src/postulo/documents/views.py:268
 #, draft
 msgid "File saved."
 msgstr "Το αρχείο αποθηκεύτηκε."
@@ -2133,12 +2181,17 @@ msgstr "Το αρχείο αποθηκεύτηκε."
 msgid "Files"
 msgstr "Αρχεία"
 
+#: src/postulo/documents/stores.py:106
+#, draft
+msgid "Files are kept under this instance's private media."
+msgstr "Τα αρχεία φυλάσσονται στα ιδιωτικά μέσα αυτής της εγκατάστασης."
+
 #: src/postulo/applications/models.py:226
 #, draft
 msgid "files sent"
 msgstr "απεσταλμένα αρχεία"
 
-#: src/postulo/templates/documents/application_documents.html:45
+#: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Files you already had"
 msgstr "Αρχεία που είχατε ήδη"
@@ -2511,6 +2564,11 @@ msgstr "Υβριδικό"
 msgid "I have already applied to this one"
 msgstr "Έχω ήδη κάνει αίτηση σε αυτή"
 
+#: src/postulo/documents/models.py:350
+#, draft
+msgid "id in the store"
+msgstr "αναγνωριστικό στην αποθήκη"
+
 #: src/postulo/jobs/models.py:175
 #, draft
 msgid "identifier"
@@ -2817,7 +2875,7 @@ msgstr "εκδόθηκε στις"
 msgid "It cannot end before it starts."
 msgstr "Δεν μπορεί να τελειώσει πριν αρχίσει."
 
-#: src/postulo/plugins/views.py:184
+#: src/postulo/plugins/views.py:185
 #, draft
 msgid "It works."
 msgstr "Λειτουργεί."
@@ -2865,7 +2923,7 @@ msgstr "είδος"
 msgid "Kind"
 msgstr "Είδος"
 
-#: src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
 #, draft
 msgid "label"
 msgstr "ετικέτα"
@@ -2921,7 +2979,12 @@ msgstr "Μεγαλύτερη σελίδα που διαβάστηκε"
 msgid "Last activity"
 msgstr "Τελευταία δραστηριότητα"
 
-#: src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:356
+#, draft
+msgid "last attempt"
+msgstr "τελευταία προσπάθεια"
+
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
 #, draft
 msgid "last error"
 msgstr "τελευταίο σφάλμα"
@@ -2996,6 +3059,11 @@ msgstr "σύνδεσμος"
 #, draft
 msgid "Link"
 msgstr "Σύνδεσμος"
+
+#: src/postulo/documents/models.py:351
+#, draft
+msgid "link in the store"
+msgstr "σύνδεσμος στην αποθήκη"
 
 #: src/postulo/accounts/models.py:182 src/postulo/jobs/models.py:241
 #, draft
@@ -3334,6 +3402,11 @@ msgstr "Νεότερο αντίγραφο ασφαλείας"
 msgid "Next"
 msgstr "Επόμενο"
 
+#: src/postulo/documents/models.py:354
+#, draft
+msgid "next attempt"
+msgstr "επόμενη προσπάθεια"
+
 #: src/postulo/applications/tables.py:98
 #, draft
 msgid "Next interview"
@@ -3366,7 +3439,7 @@ msgstr ""
 msgid "no company"
 msgstr "χωρίς εταιρεία"
 
-#: src/postulo/templates/connections/list.html:61
+#: src/postulo/templates/connections/list.html:68
 #, draft
 msgid "No connections yet"
 msgstr "Δεν υπάρχουν συνδέσεις ακόμη"
@@ -3381,6 +3454,12 @@ msgstr "Δεν υπάρχουν συνοδευτικές επιστολές ακ
 msgid "No CVs yet"
 msgstr "Δεν υπάρχουν βιογραφικά ακόμη"
 
+#: src/postulo/documents/views.py:336
+#, draft
+msgid "No document store is connected. Add one under Settings → Connections."
+msgstr ""
+"Δεν έχει συνδεθεί αποθήκη εγγράφων. Προσθέστε μία στις Ρυθμίσεις → Συνδέσεις."
+
 #: src/postulo/templates/jobs/industry_list.html:51
 #, draft
 msgid "No industries yet. They appear as you describe companies."
@@ -3391,7 +3470,7 @@ msgstr "Δεν υπάρχουν κλάδοι ακόμη. Εμφανίζοντα�
 msgid "No installed plugin needs a connection."
 msgstr "Κανένα εγκατεστημένο πρόσθετο δεν χρειάζεται σύνδεση."
 
-#: src/postulo/templates/connections/list.html:73
+#: src/postulo/templates/connections/list.html:80
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3491,6 +3570,11 @@ msgstr "κανένα ακόμη"
 #, draft
 msgid "Normal"
 msgstr "Κανονική"
+
+#: src/postulo/documents/models.py:307
+#, draft
+msgid "Not accepted"
+msgstr "Δεν έγινε δεκτό"
 
 #: src/postulo/templates/403.html:4 src/postulo/templates/403.html:9
 #, draft
@@ -3639,7 +3723,7 @@ msgstr "Τίποτα σε αυτό το βιογραφικό ακόμη. Επι�
 msgid "Nothing recorded against this one yet."
 msgstr "Τίποτα δεν έχει καταγραφεί γι' αυτή ακόμη."
 
-#: src/postulo/templates/documents/application_documents.html:40
+#: src/postulo/templates/documents/application_documents.html:42
 #, draft
 msgid "Nothing recorded for this application yet."
 msgstr "Τίποτα δεν έχει καταγραφεί για αυτή την αίτηση ακόμη."
@@ -3674,7 +3758,7 @@ msgstr ""
 msgid "Nothing scheduled."
 msgstr "Τίποτα προγραμματισμένο."
 
-#: src/postulo/templates/documents/rendered_list.html:54
+#: src/postulo/templates/documents/rendered_list.html:58
 #, draft
 msgid "Nothing sent yet."
 msgstr "Τίποτα δεν έχει σταλεί ακόμη."
@@ -3684,7 +3768,7 @@ msgstr "Τίποτα δεν έχει σταλεί ακόμη."
 msgid "Nothing to chase."
 msgstr "Τίποτα προς επικοινωνία."
 
-#: src/postulo/templates/connections/list.html:71
+#: src/postulo/templates/connections/list.html:78
 #, draft
 msgid "Nothing to connect to"
 msgstr "Τίποτα για σύνδεση"
@@ -3699,7 +3783,14 @@ msgstr "Τίποτα προς απόφαση"
 msgid "Nothing to measure yet"
 msgstr "Τίποτα προς μέτρηση ακόμη"
 
-#: src/postulo/templates/documents/upload_list.html:46
+#: src/postulo/plugins/views.py:214
+#, python-format, draft
+msgid ""
+"Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
+msgstr ""
+"Τίποτα για την ουρά: κάθε έγγραφο των επιλεγμένων ειδών βρίσκεται ήδη στη λίστα για %(label)s."
+
+#: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
 msgstr "Τίποτα δεν έχει ανέβει ακόμη."
@@ -3709,7 +3800,7 @@ msgstr "Τίποτα δεν έχει ανέβει ακόμη."
 msgid "Nothing waiting"
 msgstr "Τίποτα δεν περιμένει"
 
-#: src/postulo/documents/views.py:100 src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:101 src/postulo/documents/views.py:117
 #, draft
 msgid "Nothing was added."
 msgstr "Τίποτα δεν προστέθηκε."
@@ -3793,7 +3884,7 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Μία σύλληψη αναμένει έλεγχο"
 msgstr[1] "%(counter)s συλλήψεις αναμένουν έλεγχο"
 
-#: src/postulo/templates/connections/list.html:63
+#: src/postulo/templates/connections/list.html:70
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -3988,7 +4079,7 @@ msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr ""
 "Επικολλήστε το κείμενο. Οι αγγελίες εξαφανίζονται από τον ιστό· το αντίγραφό σας όχι."
 
-#: src/postulo/documents/views.py:174
+#: src/postulo/documents/views.py:175
 #, draft
 msgid "PDF created."
 msgstr "Το PDF δημιουργήθηκε."
@@ -4332,6 +4423,11 @@ msgstr "Επαναφορά"
 msgid "qualification"
 msgstr "προσόν"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Queue every document you already have for this store."
+msgstr "Βάζει στην ουρά κάθε έγγραφο που ήδη έχετε για αυτή την αποθήκη."
+
 #: src/postulo/templates/server/overview.html:22
 #, draft
 msgid "Queued tasks"
@@ -4493,7 +4589,7 @@ msgstr "καταγράφηκε από"
 msgid "recorded on"
 msgstr "καταγράφηκε στις"
 
-#: src/postulo/documents/views.py:370
+#: src/postulo/documents/views.py:430
 #, draft
 msgid "Recorded what you sent."
 msgstr "Καταγράφηκαν όσα στείλατε."
@@ -4582,7 +4678,7 @@ msgid "Remote"
 msgstr "Εξ αποστάσεως"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:52
+#: src/postulo/templates/connections/list.html:59
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4913,6 +5009,11 @@ msgstr "Αποστολή δοκιμαστικού μηνύματος"
 msgid "Send a test message to"
 msgstr "Αποστολή δοκιμαστικού μηνύματος σε"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Send everything"
+msgstr "Αποστολή όλων"
+
 #: src/postulo/templates/api/token_list.html:94
 #, draft
 msgid "Send it as a bearer token. To check that one works, and see its scopes:"
@@ -4923,6 +5024,11 @@ msgstr ""
 #, draft
 msgid "Send to"
 msgstr "Αποστολή σε"
+
+#: src/postulo/templates/documents/partials/copies.html:20
+#, draft
+msgid "Send to stores now"
+msgstr "Αποστολή στις αποθήκες τώρα"
 
 #: src/postulo/core/server_views.py:426
 #, python-format, draft
@@ -4935,7 +5041,7 @@ msgstr "Η αποστολή απέτυχε: %(error)s"
 msgid "Sent"
 msgstr "Στάλθηκε"
 
-#: src/postulo/documents/models.py:291
+#: src/postulo/documents/models.py:291 src/postulo/documents/models.py:336
 #, draft
 msgid "sent document"
 msgstr "απεσταλμένο έγγραφο"
@@ -4952,6 +5058,11 @@ msgstr "απεσταλμένα έγγραφα"
 #, draft
 msgid "Sent documents"
 msgstr "Απεσταλμένα έγγραφα"
+
+#: src/postulo/documents/models.py:357
+#, draft
+msgid "sent on"
+msgstr "στάλθηκε στις"
 
 #: src/postulo/core/server_views.py:429 src/postulo/notifications/email.py:80
 #, python-format, draft
@@ -5232,7 +5343,8 @@ msgstr "Κατάσταση"
 msgid "Status"
 msgstr "Κατάσταση"
 
-#: src/postulo/applications/models.py:197 src/postulo/jobs/models.py:552
+#: src/postulo/applications/models.py:197 src/postulo/documents/models.py:348
+#: src/postulo/jobs/models.py:552
 #, draft
 msgid "status"
 msgstr "κατάσταση"
@@ -5259,7 +5371,12 @@ msgstr "Η κατάσταση ενημερώθηκε."
 msgid "Still live"
 msgstr "Ακόμη ενεργή"
 
-#: src/postulo/plugins/forms.py:43
+#: src/postulo/documents/models.py:328
+#, draft
+msgid "store"
+msgstr "αποθήκη"
+
+#: src/postulo/plugins/forms.py:47
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Αποθηκευμένο· αφήστε κενό για να διατηρήσετε την τρέχουσα τιμή."
@@ -5371,7 +5488,7 @@ msgstr "Τα πρότυπα εμφανίζονται όταν στέλνετε �
 msgid "Test"
 msgstr "Δοκιμή"
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:187
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Η δοκιμή απέτυχε: %(message)s"
@@ -5486,7 +5603,7 @@ msgstr "Αυτή η σελίδα επέστρεψε %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Αυτή η εικόνα ξεπερνά τα 5 MB. Μια μικρότερη, παρακαλώ."
 
-#: src/postulo/plugins/views.py:172
+#: src/postulo/plugins/views.py:173
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Αυτό το πρόσθετο δεν είναι πλέον εγκατεστημένο."
@@ -5496,6 +5613,11 @@ msgstr "Αυτό το πρόσθετο δεν είναι πλέον εγκατε
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr ""
 "Η μηχανή PDF %(name)s είναι ρυθμισμένη αλλά όχι χρησιμοποιήσιμη. %(hint)s"
+
+#: src/postulo/documents/archiving.py:106
+#, python-format, draft
+msgid "The %(plugin)s plugin is not installed."
+msgstr "Το πρόσθετο %(plugin)s δεν είναι εγκατεστημένο."
 
 #: src/postulo/jobs/models.py:402
 #, draft
@@ -5513,6 +5635,16 @@ msgstr ""
 #, draft
 msgid "The company you are applying to"
 msgstr "Η εταιρεία στην οποία κάνετε αίτηση"
+
+#: src/postulo/documents/archiving.py:102
+#, draft
+msgid "The connection is gone or switched off."
+msgstr "Η σύνδεση χάθηκε ή είναι απενεργοποιημένη."
+
+#: src/postulo/documents/views.py:341
+#, draft
+msgid "The copy could not be sent; the document says why."
+msgstr "Το αντίγραφο δεν μπόρεσε να σταλεί· το έγγραφο λέει γιατί."
 
 #: src/postulo/templates/settings/appearance.html:29
 #, draft
@@ -5682,6 +5814,11 @@ msgstr "Θέμα: %(current)s. Αλλαγή σε: %(next)s."
 msgid "Then delete"
 msgstr "Έπειτα διαγραφή"
 
+#: src/postulo/documents/archiving.py:109
+#, draft
+msgid "There is no file to send."
+msgstr "Δεν υπάρχει αρχείο για αποστολή."
+
 #: src/postulo/plugins/fetching.py:84
 #, draft
 msgid "There is nothing at that address (404). Check the link."
@@ -5713,6 +5850,7 @@ msgstr "Δεν εμφανίστηκαν"
 msgid "This identifier is already listed."
 msgstr "Αυτό το αναγνωριστικό είναι ήδη στη λίστα."
 
+#: src/postulo/documents/stores.py:98
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -5985,7 +6123,7 @@ msgstr "Ανέβασμα και αντιστοίχιση των στηλών"
 msgid "Uploaded"
 msgstr "Ανέβηκε"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:232 src/postulo/documents/models.py:344
 #, draft
 msgid "uploaded document"
 msgstr "ανεβασμένο έγγραφο"
@@ -6117,6 +6255,11 @@ msgstr "Αναμένει έλεγχο"
 #, draft
 msgid "Waiting on a reply"
 msgstr "Αναμένει απάντηση"
+
+#: src/postulo/documents/models.py:304
+#, draft
+msgid "Waiting to be sent"
+msgstr "Αναμονή για αποστολή"
 
 #: src/postulo/templates/core/import_csv_map.html:78
 #, python-format, draft

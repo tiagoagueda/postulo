@@ -107,7 +107,9 @@ alone covers Telegram, ntfy, Discord, Matrix, Gotify, Pushover, Signal and over 
 hundred more, each named by one URL (see *Plugins in the image* on
 [Installing Postulo](Installing-Postulo)). Three things happen without anyone asking: a posting arriving through the
 capture API is announced at once; a reminder falling due, and applications going quiet, are
-announced by the **scheduler**, which somebody has to run:
+announced by the **scheduler**, which somebody has to run — the same pass also sends the
+copies of documents waiting for an external store (see *Keeping copies elsewhere* on
+[Files and what you sent](Files-and-what-you-sent)):
 
 ```sh
 # in the container, as a service that loops every five minutes

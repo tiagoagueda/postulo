@@ -28,6 +28,8 @@
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   {{ document.rendered_at|date:"j M Y, H:i" }} · {{ document.checksum|slice:":12" }}
                 </p>
+                {% url 'documents:rendered_archive' document.pk as send_url %}
+                {% include "documents/partials/copies.html" with document=document send_url=send_url %}
               </div>
               <a href="{% url 'documents:rendered_download' document.pk %}"
                  class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
@@ -47,7 +49,11 @@
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
           {% for document in uploads %}
             <li class="flex items-center gap-3 px-4 py-3">
-              <p class="min-w-0 flex-1 font-medium">{{ document.title }}</p>
+              <div class="min-w-0 flex-1">
+                <p class="font-medium">{{ document.title }}</p>
+                {% url 'documents:upload_archive' document.pk as send_url %}
+                {% include "documents/partials/copies.html" with document=document send_url=send_url %}
+              </div>
               <a href="{% url 'documents:upload_download' document.pk %}"
                  class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
             </li>

@@ -298,3 +298,96 @@ class RenderedDocument(OwnedModel):
     @staticmethod
     def checksum_for(content: bytes) -> str:
         return hashlib.sha256(content).hexdigest()
+
+
+class CopyStatus(models.TextChoices):
+    PENDING = "pending", _("Waiting to be sent")
+    SENT = "sent", _("Archived")
+    FAILED = "failed", _("Failed")
+    DECLINED = "declined", _("Not accepted")
+
+
+class DocumentCopy(OwnedModel):
+    """Where a copy of a document went, or is going, and how that is getting on.
+
+    Local media is the source of truth; a copy is what an external store — a Paperless,
+    a share — was given. One row per document per connection. The reference the store
+    handed back (its id, a link) lives here and travels in the export, so a restored
+    instance still knows where its copies went even before the connection is recreated:
+    ``connection`` may be empty, ``store`` and ``label`` say what it was.
+    """
+
+    connection = models.ForeignKey(
+        "plugins.Connection",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="copies",
+        verbose_name=_("connection"),
+    )
+    store = models.CharField(_("store"), max_length=60)
+    label = models.CharField(_("label"), max_length=100, blank=True)
+    rendered = models.ForeignKey(
+        RenderedDocument,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="copies",
+        verbose_name=_("sent document"),
+    )
+    upload = models.ForeignKey(
+        UploadedDocument,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="copies",
+        verbose_name=_("uploaded document"),
+    )
+
+    status = models.CharField(
+        _("status"), max_length=10, choices=CopyStatus, default=CopyStatus.PENDING
+    )
+    external_id = models.CharField(_("id in the store"), max_length=500, blank=True)
+    external_url = models.CharField(_("link in the store"), max_length=500, blank=True)
+    attempts = models.PositiveSmallIntegerField(_("attempts"), default=0)
+    next_attempt_at = models.DateTimeField(
+        _("next attempt"), default=timezone.now, null=True, blank=True
+    )
+    last_attempt_at = models.DateTimeField(_("last attempt"), null=True, blank=True)
+    sent_at = models.DateTimeField(_("sent on"), null=True, blank=True)
+    last_error = models.TextField(_("last error"), blank=True)
+
+    class Meta:
+        verbose_name = _("document copy")
+        verbose_name_plural = _("document copies")
+        ordering = ("pk",)
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(rendered__isnull=False, upload__isnull=True)
+                    | models.Q(rendered__isnull=True, upload__isnull=False)
+                ),
+                name="documents_copy_of_one_document",
+            ),
+            models.UniqueConstraint(
+                fields=("connection", "rendered"),
+                condition=models.Q(connection__isnull=False, rendered__isnull=False),
+                name="documents_copy_once_per_render",
+            ),
+            models.UniqueConstraint(
+                fields=("connection", "upload"),
+                condition=models.Q(connection__isnull=False, upload__isnull=False),
+                name="documents_copy_once_per_upload",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.label or self.store}: {self.get_status_display()}"
+
+    @property
+    def document(self):
+        return self.rendered if self.rendered_id else self.upload
+
+    @property
+    def is_sent(self) -> bool:
+        return self.status == CopyStatus.SENT

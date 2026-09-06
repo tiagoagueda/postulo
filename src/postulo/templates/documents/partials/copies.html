@@ -1,0 +1,22 @@
+{% load i18n %}
+{% comment %}
+  The state of a document's copies in external stores, one line each, and *Send now*
+  when at least one store is connected. Expects `document` (with `archive_copies`
+  attached), `send_url` and `has_stores`.
+{% endcomment %}
+{% if document.archive_copies %}
+  <ul class="mt-1 space-y-0.5 text-xs">
+    {% for copy in document.archive_copies %}
+      <li class="{% if copy.status == 'failed' %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
+        {% if copy.external_url and copy.is_sent %}<a href="{{ copy.external_url }}" rel="noopener" class="underline">{{ copy.label|default:copy.store }}</a>{% else %}{{ copy.label|default:copy.store }}{% endif %}: {{ copy.get_status_display|lower }}{% if copy.last_error and not copy.is_sent %} — {{ copy.last_error|truncatechars:80 }}{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{% if has_stores and send_url %}
+  <form method="post" action="{{ send_url }}" class="mt-1">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button type="submit" class="text-xs text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Send to stores now" %}</button>
+  </form>
+{% endif %}

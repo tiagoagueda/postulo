@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:56+0000\n"
+"POT-Creation-Date: 2026-09-06 10:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -30,6 +30,13 @@ msgstr "%(company)s jau turi šį identifikatorių."
 #, python-format, draft
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s jau turi %(scheme)s identifikatorių: %(value)s."
+
+#: src/postulo/plugins/views.py:205
+#, python-format, draft
+msgid ""
+"%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
+msgstr ""
+"%(count)d dokumentai įtraukti į eilę saugyklai %(label)s. Planuoklis juos išsiųs kito perėjimo metu; kiekvienas dokumentas rodo, kaip pavyko."
 
 #: src/postulo/applications/quiet.py:116
 #, python-format, draft
@@ -209,12 +216,12 @@ msgid ""
 msgstr ""
 "%(name)s prisijungia kaip <strong>%(current)s</strong>. Naujas naudotojo vardas šioje instancijoje turi būti laisvas; didžiosios raidės jo neskiria."
 
-#: src/postulo/documents/rendering.py:180
+#: src/postulo/documents/rendering.py:196
 #, python-format, draft
 msgid "%(name)s — cover letter"
 msgstr "%(name)s — motyvacinis laiškas"
 
-#: src/postulo/documents/rendering.py:160
+#: src/postulo/documents/rendering.py:176
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
@@ -224,12 +231,12 @@ msgstr "%(name)s — CV"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:128
+#: src/postulo/plugins/forms.py:132
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nepavyko patikrinti šių nustatymų: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:42
+#: src/postulo/notifications/management/commands/send_due_reminders.py:43
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s, %(company)s"
@@ -238,6 +245,17 @@ msgstr "%(role)s, %(company)s"
 #, python-format, draft
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s, %(company)s — %(days)s d."
+
+#: src/postulo/documents/views.py:345
+#, python-format, draft
+msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
+msgstr ""
+"%(sent)d kopijos išsiųstos, %(failed)d nepavyko; kiekvienas dokumentas pasako kurios."
+
+#: src/postulo/documents/views.py:351
+#, python-format, draft
+msgid "%(sent)d copies sent."
+msgstr "%(sent)d kopijos išsiųstos."
 
 #: src/postulo/templates/applications/application_list.html:9
 #, python-format, draft
@@ -480,7 +498,7 @@ msgid "Add a company"
 msgstr "Pridėti įmonę"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:69
+#: src/postulo/templates/connections/list.html:76
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -534,7 +552,7 @@ msgstr "Pridėti į laiko juostą"
 msgid "Added"
 msgstr "Pridėta"
 
-#: src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:117
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "Pridėta įrašų: %(count)s."
@@ -819,6 +837,11 @@ msgstr "Teikti paraišką: %(title)s"
 msgid "Apprenticeship"
 msgstr "Pameistrystė"
 
+#: src/postulo/documents/models.py:305
+#, draft
+msgid "Archived"
+msgstr "Archyvuota"
+
 #: src/postulo/templates/partials/confirm_delete.html:9
 #, draft
 msgid "Are you sure?"
@@ -835,6 +858,11 @@ msgstr "Vertinimas"
 #, draft
 msgid "Assessment or test"
 msgstr "Vertinimas arba testas"
+
+#: src/postulo/documents/models.py:352
+#, draft
+msgid "attempts"
+msgstr "bandymai"
 
 #: src/postulo/jobs/industries.py:30
 #, draft
@@ -1356,24 +1384,24 @@ msgstr "Prijungti"
 msgid "Connect %(plugin)s"
 msgstr "Prijungti %(plugin)s"
 
-#: src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
 #, draft
 msgid "connection"
 msgstr "ryšys"
 
-#: src/postulo/plugins/views.py:201
+#: src/postulo/plugins/views.py:234
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Ryšys pašalintas kartu su paslaptimis."
 
-#: src/postulo/plugins/views.py:160
+#: src/postulo/plugins/views.py:161
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Ryšys išsaugotas. Išbandykite jį, kad įsitikintumėte, jog veikia."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
-#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:197
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
+#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
+#: src/postulo/plugins/views.py:230
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1527,7 +1555,7 @@ msgstr "valiuta"
 msgid "CV"
 msgstr "CV"
 
-#: src/postulo/documents/views.py:74
+#: src/postulo/documents/views.py:75
 #, draft
 msgid "CV created. Now choose what goes on it."
 msgstr "CV sukurtas. Dabar pasirinkite, kas į jį pateks."
@@ -1655,7 +1683,7 @@ msgstr "Gynyba"
 #: src/postulo/templates/applications/tag_list.html:32
 #: src/postulo/templates/documents/cv_detail.html:23
 #: src/postulo/templates/documents/letter_detail.html:21
-#: src/postulo/templates/documents/upload_list.html:38
+#: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:27
 #: src/postulo/templates/jobs/industry_list.html:40
 #: src/postulo/templates/jobs/posting_detail.html:54
@@ -1743,6 +1771,16 @@ msgstr "Django administravimas"
 msgid "Document"
 msgstr "Dokumentas"
 
+#: src/postulo/documents/models.py:362
+#, draft
+msgid "document copies"
+msgstr "dokumentų kopijos"
+
+#: src/postulo/documents/models.py:361
+#, draft
+msgid "document copy"
+msgstr "dokumento kopija"
+
 #: src/postulo/plugins/views.py:32
 #, draft
 msgid "Document stores"
@@ -1757,7 +1795,7 @@ msgstr "Dokumentų saugyklos"
 msgid "Documents"
 msgstr "Dokumentai"
 
-#: src/postulo/documents/views.py:367
+#: src/postulo/documents/views.py:427
 #, draft
 msgid "Documents sent"
 msgstr "Išsiųsti dokumentai"
@@ -1779,11 +1817,11 @@ msgstr "Atlikta"
 msgid "done on"
 msgstr "atlikta"
 
-#: src/postulo/templates/documents/application_documents.html:33
-#: src/postulo/templates/documents/application_documents.html:52
+#: src/postulo/templates/documents/application_documents.html:35
+#: src/postulo/templates/documents/application_documents.html:58
 #: src/postulo/templates/documents/cv_detail.html:90
-#: src/postulo/templates/documents/rendered_list.html:45
-#: src/postulo/templates/documents/upload_list.html:33
+#: src/postulo/templates/documents/rendered_list.html:49
+#: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "Download"
 msgstr "Atsisiųsti"
@@ -1836,9 +1874,9 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:50
+#: src/postulo/templates/connections/list.html:57
 #: src/postulo/templates/documents/letter_detail.html:18
-#: src/postulo/templates/documents/upload_list.html:35
+#: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
 #: src/postulo/templates/jobs/company_detail.html:120
 #: src/postulo/templates/jobs/industry_list.html:36
@@ -2003,6 +2041,11 @@ msgid ""
 msgstr ""
 "Kiekvienos pareigos, kurias ėjote. Pasiekimus surašykite vieną kartą; vėliau pritaikykite kiekvienam CV."
 
+#: src/postulo/documents/views.py:354
+#, draft
+msgid "Every store already has this document."
+msgstr "Kiekviena saugykla jau turi šį dokumentą."
+
 #: src/postulo/jobs/listing_views.py:30
 #, draft
 msgid "Everything"
@@ -2092,10 +2135,15 @@ msgstr "Eksportuoti viską"
 msgid "Export PDF"
 msgstr "Eksportuoti PDF"
 
-#: src/postulo/templates/documents/rendered_list.html:37
+#: src/postulo/templates/documents/rendered_list.html:41
 #, draft
 msgid "Exported on its own"
 msgstr "Eksportuota atskirai"
+
+#: src/postulo/documents/models.py:306
+#, draft
+msgid "Failed"
+msgstr "Nepavyko"
 
 #: src/postulo/plugins/models.py:102
 #, draft
@@ -2132,7 +2180,7 @@ msgstr "Skaičiai atsiras, kai kur nors pateiksite paraišką."
 msgid "file"
 msgstr "failas"
 
-#: src/postulo/documents/views.py:253
+#: src/postulo/documents/views.py:268
 #, draft
 msgid "File saved."
 msgstr "Failas išsaugotas."
@@ -2144,12 +2192,17 @@ msgstr "Failas išsaugotas."
 msgid "Files"
 msgstr "Failai"
 
+#: src/postulo/documents/stores.py:106
+#, draft
+msgid "Files are kept under this instance's private media."
+msgstr "Failai laikomi šio egzemplioriaus privačiuose medijos failuose."
+
 #: src/postulo/applications/models.py:226
 #, draft
 msgid "files sent"
 msgstr "išsiųsti failai"
 
-#: src/postulo/templates/documents/application_documents.html:45
+#: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Files you already had"
 msgstr "Failai, kuriuos jau turėjote"
@@ -2522,6 +2575,11 @@ msgstr "Hibridinis"
 msgid "I have already applied to this one"
 msgstr "Jau teikiau paraišką į šį"
 
+#: src/postulo/documents/models.py:350
+#, draft
+msgid "id in the store"
+msgstr "id saugykloje"
+
 #: src/postulo/jobs/models.py:175
 #, draft
 msgid "identifier"
@@ -2828,7 +2886,7 @@ msgstr "išduota"
 msgid "It cannot end before it starts."
 msgstr "Negali baigtis anksčiau nei prasideda."
 
-#: src/postulo/plugins/views.py:184
+#: src/postulo/plugins/views.py:185
 #, draft
 msgid "It works."
 msgstr "Veikia."
@@ -2876,7 +2934,7 @@ msgstr "rūšis"
 msgid "Kind"
 msgstr "Rūšis"
 
-#: src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
 #, draft
 msgid "label"
 msgstr "žyma"
@@ -2932,7 +2990,12 @@ msgstr "Didžiausias perskaitytas puslapis"
 msgid "Last activity"
 msgstr "Paskutinė veikla"
 
-#: src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:356
+#, draft
+msgid "last attempt"
+msgstr "paskutinis bandymas"
+
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
 #, draft
 msgid "last error"
 msgstr "paskutinė klaida"
@@ -3007,6 +3070,11 @@ msgstr "nuoroda"
 #, draft
 msgid "Link"
 msgstr "Nuoroda"
+
+#: src/postulo/documents/models.py:351
+#, draft
+msgid "link in the store"
+msgstr "nuoroda saugykloje"
 
 #: src/postulo/accounts/models.py:182 src/postulo/jobs/models.py:241
 #, draft
@@ -3345,6 +3413,11 @@ msgstr "Naujausia atsarginė kopija"
 msgid "Next"
 msgstr "Kitas"
 
+#: src/postulo/documents/models.py:354
+#, draft
+msgid "next attempt"
+msgstr "kitas bandymas"
+
 #: src/postulo/applications/tables.py:98
 #, draft
 msgid "Next interview"
@@ -3376,7 +3449,7 @@ msgstr "Įmonių dar nėra. Jos sukuriamos jums įrašant paraišką."
 msgid "no company"
 msgstr "nėra įmonės"
 
-#: src/postulo/templates/connections/list.html:61
+#: src/postulo/templates/connections/list.html:68
 #, draft
 msgid "No connections yet"
 msgstr "Ryšių dar nėra"
@@ -3391,6 +3464,12 @@ msgstr "Motyvacinių laiškų dar nėra."
 msgid "No CVs yet"
 msgstr "CV dar nėra"
 
+#: src/postulo/documents/views.py:336
+#, draft
+msgid "No document store is connected. Add one under Settings → Connections."
+msgstr ""
+"Neprijungta jokia dokumentų saugykla. Pridėkite ją skiltyje Nustatymai → Ryšiai."
+
 #: src/postulo/templates/jobs/industry_list.html:51
 #, draft
 msgid "No industries yet. They appear as you describe companies."
@@ -3401,7 +3480,7 @@ msgstr "Šakų dar nėra. Jos atsiranda aprašant įmones."
 msgid "No installed plugin needs a connection."
 msgstr "Nė vienam įdiegtam papildiniui ryšio nereikia."
 
-#: src/postulo/templates/connections/list.html:73
+#: src/postulo/templates/connections/list.html:80
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3501,6 +3580,11 @@ msgstr "dar nėra"
 #, draft
 msgid "Normal"
 msgstr "Įprastas"
+
+#: src/postulo/documents/models.py:307
+#, draft
+msgid "Not accepted"
+msgstr "Nepriimta"
 
 #: src/postulo/templates/403.html:4 src/postulo/templates/403.html:9
 #, draft
@@ -3648,7 +3732,7 @@ msgstr "Šiame CV dar nieko nėra. Pasirinkite įrašus žemiau."
 msgid "Nothing recorded against this one yet."
 msgstr "Apie tai dar nieko neįrašyta."
 
-#: src/postulo/templates/documents/application_documents.html:40
+#: src/postulo/templates/documents/application_documents.html:42
 #, draft
 msgid "Nothing recorded for this application yet."
 msgstr "Apie šią paraišką dar nieko neįrašyta."
@@ -3682,7 +3766,7 @@ msgstr ""
 msgid "Nothing scheduled."
 msgstr "Nieko nesuplanuota."
 
-#: src/postulo/templates/documents/rendered_list.html:54
+#: src/postulo/templates/documents/rendered_list.html:58
 #, draft
 msgid "Nothing sent yet."
 msgstr "Dar nieko neišsiųsta."
@@ -3692,7 +3776,7 @@ msgstr "Dar nieko neišsiųsta."
 msgid "Nothing to chase."
 msgstr "Nėra kam priminti."
 
-#: src/postulo/templates/connections/list.html:71
+#: src/postulo/templates/connections/list.html:78
 #, draft
 msgid "Nothing to connect to"
 msgstr "Nėra prie ko jungtis"
@@ -3707,7 +3791,14 @@ msgstr "Nėra ką spręsti"
 msgid "Nothing to measure yet"
 msgstr "Dar nėra ką matuoti"
 
-#: src/postulo/templates/documents/upload_list.html:46
+#: src/postulo/plugins/views.py:214
+#, python-format, draft
+msgid ""
+"Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
+msgstr ""
+"Nėra ko įtraukti į eilę: kiekvienas pasirinktų rūšių dokumentas jau yra %(label)s sąraše."
+
+#: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
 msgstr "Dar nieko neįkelta."
@@ -3717,7 +3808,7 @@ msgstr "Dar nieko neįkelta."
 msgid "Nothing waiting"
 msgstr "Niekas nelaukia"
 
-#: src/postulo/documents/views.py:100 src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:101 src/postulo/documents/views.py:117
 #, draft
 msgid "Nothing was added."
 msgstr "Niekas nepridėta."
@@ -3802,7 +3893,7 @@ msgstr[0] "Vienas fiksavimas laukia peržiūros"
 msgstr[1] "%(counter)s fiksavimai laukia peržiūros"
 msgstr[2] "%(counter)s fiksavimų laukia peržiūros"
 
-#: src/postulo/templates/connections/list.html:63
+#: src/postulo/templates/connections/list.html:70
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -3994,7 +4085,7 @@ msgstr ""
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr "Įklijuokite tekstą. Skelbimai dingsta iš interneto; jūsų kopija ne."
 
-#: src/postulo/documents/views.py:174
+#: src/postulo/documents/views.py:175
 #, draft
 msgid "PDF created."
 msgstr "PDF sukurtas."
@@ -4336,6 +4427,11 @@ msgstr "Grąžinimas atgal"
 msgid "qualification"
 msgstr "kvalifikacija"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Queue every document you already have for this store."
+msgstr "Įtraukia į eilę kiekvieną jau turimą dokumentą šiai saugyklai."
+
 #: src/postulo/templates/server/overview.html:22
 #, draft
 msgid "Queued tasks"
@@ -4498,7 +4594,7 @@ msgstr "įrašė"
 msgid "recorded on"
 msgstr "įrašyta"
 
-#: src/postulo/documents/views.py:370
+#: src/postulo/documents/views.py:430
 #, draft
 msgid "Recorded what you sent."
 msgstr "Įrašyta, ką išsiuntėte."
@@ -4586,7 +4682,7 @@ msgid "Remote"
 msgstr "Nuotoliniu būdu"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:52
+#: src/postulo/templates/connections/list.html:59
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4916,6 +5012,11 @@ msgstr "Siųsti bandomąjį pranešimą"
 msgid "Send a test message to"
 msgstr "Siųsti bandomąjį pranešimą į"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Send everything"
+msgstr "Siųsti viską"
+
 #: src/postulo/templates/api/token_list.html:94
 #, draft
 msgid "Send it as a bearer token. To check that one works, and see its scopes:"
@@ -4926,6 +5027,11 @@ msgstr ""
 #, draft
 msgid "Send to"
 msgstr "Siųsti į"
+
+#: src/postulo/templates/documents/partials/copies.html:20
+#, draft
+msgid "Send to stores now"
+msgstr "Siųsti į saugyklas dabar"
 
 #: src/postulo/core/server_views.py:426
 #, python-format, draft
@@ -4938,7 +5044,7 @@ msgstr "Siuntimas nepavyko: %(error)s"
 msgid "Sent"
 msgstr "Išsiųsta"
 
-#: src/postulo/documents/models.py:291
+#: src/postulo/documents/models.py:291 src/postulo/documents/models.py:336
 #, draft
 msgid "sent document"
 msgstr "išsiųstas dokumentas"
@@ -4955,6 +5061,11 @@ msgstr "išsiųsti dokumentai"
 #, draft
 msgid "Sent documents"
 msgstr "Išsiųsti dokumentai"
+
+#: src/postulo/documents/models.py:357
+#, draft
+msgid "sent on"
+msgstr "išsiųsta"
 
 #: src/postulo/core/server_views.py:429 src/postulo/notifications/email.py:80
 #, python-format, draft
@@ -5235,7 +5346,8 @@ msgstr "Būklė"
 msgid "Status"
 msgstr "Būsena"
 
-#: src/postulo/applications/models.py:197 src/postulo/jobs/models.py:552
+#: src/postulo/applications/models.py:197 src/postulo/documents/models.py:348
+#: src/postulo/jobs/models.py:552
 #, draft
 msgid "status"
 msgstr "būsena"
@@ -5262,7 +5374,12 @@ msgstr "Būsena atnaujinta."
 msgid "Still live"
 msgstr "Vis dar gyva"
 
-#: src/postulo/plugins/forms.py:43
+#: src/postulo/documents/models.py:328
+#, draft
+msgid "store"
+msgstr "saugykla"
+
+#: src/postulo/plugins/forms.py:47
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Išsaugota; palikite tuščią, kad išliktų dabartinė reikšmė."
@@ -5374,7 +5491,7 @@ msgstr "Šablonai atsiranda siunčiant laišką su paraiška."
 msgid "Test"
 msgstr "Išbandyti"
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:187
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Bandymas nepavyko: %(message)s"
@@ -5488,7 +5605,7 @@ msgstr "Tas puslapis grąžino %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tas paveikslėlis didesnis nei 5 MB. Prašome mažesnio."
 
-#: src/postulo/plugins/views.py:172
+#: src/postulo/plugins/views.py:173
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Tas papildinys nebeįdiegtas."
@@ -5497,6 +5614,11 @@ msgstr "Tas papildinys nebeįdiegtas."
 #, python-format, draft
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "PDF variklis %(name)s sukonfigūruotas, bet nenaudotinas. %(hint)s"
+
+#: src/postulo/documents/archiving.py:106
+#, python-format, draft
+msgid "The %(plugin)s plugin is not installed."
+msgstr "Papildinys %(plugin)s neįdiegtas."
 
 #: src/postulo/jobs/models.py:402
 #, draft
@@ -5514,6 +5636,16 @@ msgstr ""
 #, draft
 msgid "The company you are applying to"
 msgstr "Įmonė, į kurią teikiate paraišką"
+
+#: src/postulo/documents/archiving.py:102
+#, draft
+msgid "The connection is gone or switched off."
+msgstr "Ryšys dingo arba išjungtas."
+
+#: src/postulo/documents/views.py:341
+#, draft
+msgid "The copy could not be sent; the document says why."
+msgstr "Kopijos nepavyko išsiųsti; dokumentas pasako kodėl."
 
 #: src/postulo/templates/settings/appearance.html:29
 #, draft
@@ -5680,6 +5812,11 @@ msgstr "Tema: %(current)s. Perjungti į: %(next)s."
 msgid "Then delete"
 msgstr "Tada ištrinti"
 
+#: src/postulo/documents/archiving.py:109
+#, draft
+msgid "There is no file to send."
+msgstr "Nėra failo, kurį būtų galima siųsti."
+
 #: src/postulo/plugins/fetching.py:84
 #, draft
 msgid "There is nothing at that address (404). Check the link."
@@ -5713,6 +5850,7 @@ msgstr "Neatvyko"
 msgid "This identifier is already listed."
 msgstr "Šis identifikatorius jau sąraše."
 
+#: src/postulo/documents/stores.py:98
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -5984,7 +6122,7 @@ msgstr "Įkelti ir priskirti stulpelius"
 msgid "Uploaded"
 msgstr "Įkelta"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:232 src/postulo/documents/models.py:344
 #, draft
 msgid "uploaded document"
 msgstr "įkeltas dokumentas"
@@ -6116,6 +6254,11 @@ msgstr "Laukia peržiūros"
 #, draft
 msgid "Waiting on a reply"
 msgstr "Laukia atsakymo"
+
+#: src/postulo/documents/models.py:304
+#, draft
+msgid "Waiting to be sent"
+msgstr "Laukia siuntimo"
 
 #: src/postulo/templates/core/import_csv_map.html:78
 #, python-format, draft

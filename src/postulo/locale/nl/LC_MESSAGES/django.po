@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:56+0000\n"
+"POT-Creation-Date: 2026-09-06 10:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Nederlands\n"
@@ -30,6 +30,13 @@ msgstr "%(company)s heeft deze identificatie al."
 #, python-format, draft
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s heeft al een %(scheme)s-identificatie: %(value)s."
+
+#: src/postulo/plugins/views.py:205
+#, python-format, draft
+msgid ""
+"%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
+msgstr ""
+"%(count)d documenten staan in de wachtrij voor %(label)s. De planner verstuurt ze bij de volgende ronde; elk document laat zien hoe dat ging."
 
 #: src/postulo/applications/quiet.py:116
 #, python-format, draft
@@ -198,12 +205,12 @@ msgid ""
 msgstr ""
 "%(name)s logt in als <strong>%(current)s</strong>. De nieuwe gebruikersnaam moet vrij zijn op deze instantie; hoofdletters maken geen verschil."
 
-#: src/postulo/documents/rendering.py:180
+#: src/postulo/documents/rendering.py:196
 #, python-format, draft
 msgid "%(name)s — cover letter"
 msgstr "%(name)s — sollicitatiebrief"
 
-#: src/postulo/documents/rendering.py:160
+#: src/postulo/documents/rendering.py:176
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — cv"
@@ -213,12 +220,12 @@ msgstr "%(name)s — cv"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:128
+#: src/postulo/plugins/forms.py:132
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s kon deze instellingen niet controleren: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:42
+#: src/postulo/notifications/management/commands/send_due_reminders.py:43
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s bij %(company)s"
@@ -227,6 +234,16 @@ msgstr "%(role)s bij %(company)s"
 #, python-format, draft
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s bij %(company)s — %(days)s dagen"
+
+#: src/postulo/documents/views.py:345
+#, python-format, draft
+msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
+msgstr "%(sent)d kopieën verzonden, %(failed)d mislukt; elk document zegt welke."
+
+#: src/postulo/documents/views.py:351
+#, python-format, draft
+msgid "%(sent)d copies sent."
+msgstr "%(sent)d kopieën verzonden."
 
 #: src/postulo/templates/applications/application_list.html:9
 #, python-format, draft
@@ -466,7 +483,7 @@ msgid "Add a company"
 msgstr "Bedrijf toevoegen"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:69
+#: src/postulo/templates/connections/list.html:76
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -520,7 +537,7 @@ msgstr "Aan tijdlijn toevoegen"
 msgid "Added"
 msgstr "Toegevoegd"
 
-#: src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:117
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "%(count)s vermeldingen toegevoegd."
@@ -804,6 +821,11 @@ msgstr "Solliciteren: %(title)s"
 msgid "Apprenticeship"
 msgstr "Leertraject"
 
+#: src/postulo/documents/models.py:305
+#, draft
+msgid "Archived"
+msgstr "Gearchiveerd"
+
 #: src/postulo/templates/partials/confirm_delete.html:9
 #, draft
 msgid "Are you sure?"
@@ -820,6 +842,11 @@ msgstr "Assessment"
 #, draft
 msgid "Assessment or test"
 msgstr "Assessment of test"
+
+#: src/postulo/documents/models.py:352
+#, draft
+msgid "attempts"
+msgstr "pogingen"
 
 #: src/postulo/jobs/industries.py:30
 #, draft
@@ -1341,24 +1368,24 @@ msgstr "Koppelen"
 msgid "Connect %(plugin)s"
 msgstr "%(plugin)s koppelen"
 
-#: src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
 #, draft
 msgid "connection"
 msgstr "koppeling"
 
-#: src/postulo/plugins/views.py:201
+#: src/postulo/plugins/views.py:234
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Koppeling verwijderd, geheimen inbegrepen."
 
-#: src/postulo/plugins/views.py:160
+#: src/postulo/plugins/views.py:161
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Koppeling opgeslagen. Test haar om te zien of ze werkt."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
-#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:197
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
+#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
+#: src/postulo/plugins/views.py:230
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1512,7 +1539,7 @@ msgstr "valuta"
 msgid "CV"
 msgstr "Cv"
 
-#: src/postulo/documents/views.py:74
+#: src/postulo/documents/views.py:75
 #, draft
 msgid "CV created. Now choose what goes on it."
 msgstr "Cv aangemaakt. Kies nu wat erop komt."
@@ -1641,7 +1668,7 @@ msgstr "Defensie"
 #: src/postulo/templates/applications/tag_list.html:32
 #: src/postulo/templates/documents/cv_detail.html:23
 #: src/postulo/templates/documents/letter_detail.html:21
-#: src/postulo/templates/documents/upload_list.html:38
+#: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:27
 #: src/postulo/templates/jobs/industry_list.html:40
 #: src/postulo/templates/jobs/posting_detail.html:54
@@ -1729,6 +1756,16 @@ msgstr "Django-beheer"
 msgid "Document"
 msgstr "Document"
 
+#: src/postulo/documents/models.py:362
+#, draft
+msgid "document copies"
+msgstr "documentkopieën"
+
+#: src/postulo/documents/models.py:361
+#, draft
+msgid "document copy"
+msgstr "documentkopie"
+
 #: src/postulo/plugins/views.py:32
 #, draft
 msgid "Document stores"
@@ -1743,7 +1780,7 @@ msgstr "Documentopslag"
 msgid "Documents"
 msgstr "Documenten"
 
-#: src/postulo/documents/views.py:367
+#: src/postulo/documents/views.py:427
 #, draft
 msgid "Documents sent"
 msgstr "Verstuurde documenten"
@@ -1765,11 +1802,11 @@ msgstr "Gedaan"
 msgid "done on"
 msgstr "gedaan op"
 
-#: src/postulo/templates/documents/application_documents.html:33
-#: src/postulo/templates/documents/application_documents.html:52
+#: src/postulo/templates/documents/application_documents.html:35
+#: src/postulo/templates/documents/application_documents.html:58
 #: src/postulo/templates/documents/cv_detail.html:90
-#: src/postulo/templates/documents/rendered_list.html:45
-#: src/postulo/templates/documents/upload_list.html:33
+#: src/postulo/templates/documents/rendered_list.html:49
+#: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "Download"
 msgstr "Downloaden"
@@ -1821,9 +1858,9 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:50
+#: src/postulo/templates/connections/list.html:57
 #: src/postulo/templates/documents/letter_detail.html:18
-#: src/postulo/templates/documents/upload_list.html:35
+#: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
 #: src/postulo/templates/jobs/company_detail.html:120
 #: src/postulo/templates/jobs/industry_list.html:36
@@ -1989,6 +2026,11 @@ msgid ""
 msgstr ""
 "Elke functie die u hebt vervuld. Schrijf de hoogtepunten één keer op; stem ze later per cv af."
 
+#: src/postulo/documents/views.py:354
+#, draft
+msgid "Every store already has this document."
+msgstr "Elke opslag heeft dit document al."
+
 #: src/postulo/jobs/listing_views.py:30
 #, draft
 msgid "Everything"
@@ -2079,10 +2121,15 @@ msgstr "Alles exporteren"
 msgid "Export PDF"
 msgstr "PDF exporteren"
 
-#: src/postulo/templates/documents/rendered_list.html:37
+#: src/postulo/templates/documents/rendered_list.html:41
 #, draft
 msgid "Exported on its own"
 msgstr "Apart geëxporteerd"
+
+#: src/postulo/documents/models.py:306
+#, draft
+msgid "Failed"
+msgstr "Mislukt"
 
 #: src/postulo/plugins/models.py:102
 #, draft
@@ -2119,7 +2166,7 @@ msgstr "Cijfers verschijnen zodra u ergens hebt gesolliciteerd."
 msgid "file"
 msgstr "bestand"
 
-#: src/postulo/documents/views.py:253
+#: src/postulo/documents/views.py:268
 #, draft
 msgid "File saved."
 msgstr "Bestand opgeslagen."
@@ -2131,12 +2178,17 @@ msgstr "Bestand opgeslagen."
 msgid "Files"
 msgstr "Bestanden"
 
+#: src/postulo/documents/stores.py:106
+#, draft
+msgid "Files are kept under this instance's private media."
+msgstr "Bestanden staan in de privémedia van deze instantie."
+
 #: src/postulo/applications/models.py:226
 #, draft
 msgid "files sent"
 msgstr "verstuurde bestanden"
 
-#: src/postulo/templates/documents/application_documents.html:45
+#: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Files you already had"
 msgstr "Bestanden die u al had"
@@ -2510,6 +2562,11 @@ msgstr "Hybride"
 msgid "I have already applied to this one"
 msgstr "Ik heb hier al gesolliciteerd"
 
+#: src/postulo/documents/models.py:350
+#, draft
+msgid "id in the store"
+msgstr "id in de opslag"
+
 #: src/postulo/jobs/models.py:175
 #, draft
 msgid "identifier"
@@ -2816,7 +2873,7 @@ msgstr "uitgegeven op"
 msgid "It cannot end before it starts."
 msgstr "Het kan niet eindigen voordat het begint."
 
-#: src/postulo/plugins/views.py:184
+#: src/postulo/plugins/views.py:185
 #, draft
 msgid "It works."
 msgstr "Het werkt."
@@ -2864,7 +2921,7 @@ msgstr "soort"
 msgid "Kind"
 msgstr "Soort"
 
-#: src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
 #, draft
 msgid "label"
 msgstr "label"
@@ -2920,7 +2977,12 @@ msgstr "Grootste gelezen pagina"
 msgid "Last activity"
 msgstr "Laatste activiteit"
 
-#: src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:356
+#, draft
+msgid "last attempt"
+msgstr "laatste poging"
+
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
 #, draft
 msgid "last error"
 msgstr "laatste fout"
@@ -2995,6 +3057,11 @@ msgstr "link"
 #, draft
 msgid "Link"
 msgstr "Link"
+
+#: src/postulo/documents/models.py:351
+#, draft
+msgid "link in the store"
+msgstr "link in de opslag"
 
 #: src/postulo/accounts/models.py:182 src/postulo/jobs/models.py:241
 #, draft
@@ -3333,6 +3400,11 @@ msgstr "Nieuwste back-up"
 msgid "Next"
 msgstr "Volgende"
 
+#: src/postulo/documents/models.py:354
+#, draft
+msgid "next attempt"
+msgstr "volgende poging"
+
 #: src/postulo/applications/tables.py:98
 #, draft
 msgid "Next interview"
@@ -3365,7 +3437,7 @@ msgstr ""
 msgid "no company"
 msgstr "geen bedrijf"
 
-#: src/postulo/templates/connections/list.html:61
+#: src/postulo/templates/connections/list.html:68
 #, draft
 msgid "No connections yet"
 msgstr "Nog geen koppelingen"
@@ -3380,6 +3452,12 @@ msgstr "Nog geen sollicitatiebrieven."
 msgid "No CVs yet"
 msgstr "Nog geen cv's"
 
+#: src/postulo/documents/views.py:336
+#, draft
+msgid "No document store is connected. Add one under Settings → Connections."
+msgstr ""
+"Er is geen documentopslag verbonden. Voeg er een toe onder Instellingen → Verbindingen."
+
 #: src/postulo/templates/jobs/industry_list.html:51
 #, draft
 msgid "No industries yet. They appear as you describe companies."
@@ -3390,7 +3468,7 @@ msgstr "Nog geen sectoren. Ze verschijnen terwijl u bedrijven beschrijft."
 msgid "No installed plugin needs a connection."
 msgstr "Geen geïnstalleerde plugin heeft een koppeling nodig."
 
-#: src/postulo/templates/connections/list.html:73
+#: src/postulo/templates/connections/list.html:80
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3490,6 +3568,11 @@ msgstr "nog geen"
 #, draft
 msgid "Normal"
 msgstr "Normaal"
+
+#: src/postulo/documents/models.py:307
+#, draft
+msgid "Not accepted"
+msgstr "Niet aanvaard"
 
 #: src/postulo/templates/403.html:4 src/postulo/templates/403.html:9
 #, draft
@@ -3638,7 +3721,7 @@ msgstr "Nog niets op dit cv. Kies hieronder enkele vermeldingen."
 msgid "Nothing recorded against this one yet."
 msgstr "Hierover is nog niets vastgelegd."
 
-#: src/postulo/templates/documents/application_documents.html:40
+#: src/postulo/templates/documents/application_documents.html:42
 #, draft
 msgid "Nothing recorded for this application yet."
 msgstr "Voor deze sollicitatie is nog niets vastgelegd."
@@ -3672,7 +3755,7 @@ msgstr ""
 msgid "Nothing scheduled."
 msgstr "Niets gepland."
 
-#: src/postulo/templates/documents/rendered_list.html:54
+#: src/postulo/templates/documents/rendered_list.html:58
 #, draft
 msgid "Nothing sent yet."
 msgstr "Nog niets verstuurd."
@@ -3682,7 +3765,7 @@ msgstr "Nog niets verstuurd."
 msgid "Nothing to chase."
 msgstr "Niets om na te bellen."
 
-#: src/postulo/templates/connections/list.html:71
+#: src/postulo/templates/connections/list.html:78
 #, draft
 msgid "Nothing to connect to"
 msgstr "Niets om mee te koppelen"
@@ -3697,7 +3780,14 @@ msgstr "Niets om over te beslissen"
 msgid "Nothing to measure yet"
 msgstr "Nog niets te meten"
 
-#: src/postulo/templates/documents/upload_list.html:46
+#: src/postulo/plugins/views.py:214
+#, python-format, draft
+msgid ""
+"Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
+msgstr ""
+"Niets in de wachtrij te zetten: elk document van de gekozen soorten staat al op de lijst voor %(label)s."
+
+#: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
 msgstr "Nog niets geüpload."
@@ -3707,7 +3797,7 @@ msgstr "Nog niets geüpload."
 msgid "Nothing waiting"
 msgstr "Niets wacht"
 
-#: src/postulo/documents/views.py:100 src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:101 src/postulo/documents/views.py:117
 #, draft
 msgid "Nothing was added."
 msgstr "Er is niets toegevoegd."
@@ -3791,7 +3881,7 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Eén vastlegging wacht op controle"
 msgstr[1] "%(counter)s vastleggingen wachten op controle"
 
-#: src/postulo/templates/connections/list.html:63
+#: src/postulo/templates/connections/list.html:70
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -3982,7 +4072,7 @@ msgstr ""
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr "Plak de tekst. Vacatures verdwijnen van het web; uw kopie niet."
 
-#: src/postulo/documents/views.py:174
+#: src/postulo/documents/views.py:175
 #, draft
 msgid "PDF created."
 msgstr "PDF aangemaakt."
@@ -4324,6 +4414,11 @@ msgstr "Terugzetten"
 msgid "qualification"
 msgstr "kwalificatie"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Queue every document you already have for this store."
+msgstr "Zet elk document dat u al hebt in de wachtrij voor deze opslag."
+
 #: src/postulo/templates/server/overview.html:22
 #, draft
 msgid "Queued tasks"
@@ -4485,7 +4580,7 @@ msgstr "vastgelegd door"
 msgid "recorded on"
 msgstr "vastgelegd op"
 
-#: src/postulo/documents/views.py:370
+#: src/postulo/documents/views.py:430
 #, draft
 msgid "Recorded what you sent."
 msgstr "Vastgelegd wat u verstuurde."
@@ -4574,7 +4669,7 @@ msgid "Remote"
 msgstr "Op afstand"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:52
+#: src/postulo/templates/connections/list.html:59
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4904,6 +4999,11 @@ msgstr "Een testbericht sturen"
 msgid "Send a test message to"
 msgstr "Een testbericht sturen naar"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Send everything"
+msgstr "Alles versturen"
+
 #: src/postulo/templates/api/token_list.html:94
 #, draft
 msgid "Send it as a bearer token. To check that one works, and see its scopes:"
@@ -4914,6 +5014,11 @@ msgstr ""
 #, draft
 msgid "Send to"
 msgstr "Sturen naar"
+
+#: src/postulo/templates/documents/partials/copies.html:20
+#, draft
+msgid "Send to stores now"
+msgstr "Nu naar de opslagen versturen"
 
 #: src/postulo/core/server_views.py:426
 #, python-format, draft
@@ -4926,7 +5031,7 @@ msgstr "Versturen mislukt: %(error)s"
 msgid "Sent"
 msgstr "Verstuurd"
 
-#: src/postulo/documents/models.py:291
+#: src/postulo/documents/models.py:291 src/postulo/documents/models.py:336
 #, draft
 msgid "sent document"
 msgstr "verstuurd document"
@@ -4943,6 +5048,11 @@ msgstr "verstuurde documenten"
 #, draft
 msgid "Sent documents"
 msgstr "Verstuurde documenten"
+
+#: src/postulo/documents/models.py:357
+#, draft
+msgid "sent on"
+msgstr "verzonden op"
 
 #: src/postulo/core/server_views.py:429 src/postulo/notifications/email.py:80
 #, python-format, draft
@@ -5224,7 +5334,8 @@ msgstr "Toestand"
 msgid "Status"
 msgstr "Status"
 
-#: src/postulo/applications/models.py:197 src/postulo/jobs/models.py:552
+#: src/postulo/applications/models.py:197 src/postulo/documents/models.py:348
+#: src/postulo/jobs/models.py:552
 #, draft
 msgid "status"
 msgstr "status"
@@ -5251,7 +5362,12 @@ msgstr "Status bijgewerkt."
 msgid "Still live"
 msgstr "Nog lopend"
 
-#: src/postulo/plugins/forms.py:43
+#: src/postulo/documents/models.py:328
+#, draft
+msgid "store"
+msgstr "opslag"
+
+#: src/postulo/plugins/forms.py:47
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Opgeslagen; laat leeg om de huidige waarde te behouden."
@@ -5364,7 +5480,7 @@ msgstr ""
 msgid "Test"
 msgstr "Testen"
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:187
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Test mislukt: %(message)s"
@@ -5479,7 +5595,7 @@ msgstr "Die pagina gaf %(status)s terug."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Die afbeelding is groter dan 5 MB. Een kleinere, graag."
 
-#: src/postulo/plugins/views.py:172
+#: src/postulo/plugins/views.py:173
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Die plugin is niet meer geïnstalleerd."
@@ -5488,6 +5604,11 @@ msgstr "Die plugin is niet meer geïnstalleerd."
 #, python-format, draft
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "De PDF-backend %(name)s is geconfigureerd maar niet bruikbaar. %(hint)s"
+
+#: src/postulo/documents/archiving.py:106
+#, python-format, draft
+msgid "The %(plugin)s plugin is not installed."
+msgstr "De plug-in %(plugin)s is niet geïnstalleerd."
 
 #: src/postulo/jobs/models.py:402
 #, draft
@@ -5505,6 +5626,16 @@ msgstr ""
 #, draft
 msgid "The company you are applying to"
 msgstr "Het bedrijf waar u solliciteert"
+
+#: src/postulo/documents/archiving.py:102
+#, draft
+msgid "The connection is gone or switched off."
+msgstr "De verbinding is weg of uitgeschakeld."
+
+#: src/postulo/documents/views.py:341
+#, draft
+msgid "The copy could not be sent; the document says why."
+msgstr "De kopie kon niet worden verzonden; het document zegt waarom."
 
 #: src/postulo/templates/settings/appearance.html:29
 #, draft
@@ -5673,6 +5804,11 @@ msgstr "Thema: %(current)s. Wisselen naar: %(next)s."
 msgid "Then delete"
 msgstr "Daarna wissen"
 
+#: src/postulo/documents/archiving.py:109
+#, draft
+msgid "There is no file to send."
+msgstr "Er is geen bestand om te versturen."
+
 #: src/postulo/plugins/fetching.py:84
 #, draft
 msgid "There is nothing at that address (404). Check the link."
@@ -5704,6 +5840,7 @@ msgstr "Ze kwamen niet opdagen"
 msgid "This identifier is already listed."
 msgstr "Deze identificatie staat al in de lijst."
 
+#: src/postulo/documents/stores.py:98
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -5976,7 +6113,7 @@ msgstr "Uploaden en de kolommen toewijzen"
 msgid "Uploaded"
 msgstr "Geüpload"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:232 src/postulo/documents/models.py:344
 #, draft
 msgid "uploaded document"
 msgstr "geüpload document"
@@ -6107,6 +6244,11 @@ msgstr "Wacht op controle"
 #, draft
 msgid "Waiting on a reply"
 msgstr "Wacht op antwoord"
+
+#: src/postulo/documents/models.py:304
+#, draft
+msgid "Waiting to be sent"
+msgstr "Wacht op verzending"
 
 #: src/postulo/templates/core/import_csv_map.html:78
 #, python-format, draft

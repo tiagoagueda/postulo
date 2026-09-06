@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:56+0000\n"
+"POT-Creation-Date: 2026-09-06 10:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenščina\n"
@@ -30,6 +30,13 @@ msgstr "%(company)s že ima ta identifikator."
 #, python-format, draft
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s že ima identifikator %(scheme)s: %(value)s."
+
+#: src/postulo/plugins/views.py:205
+#, python-format, draft
+msgid ""
+"%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
+msgstr ""
+"%(count)d dokumentov je v vrsti za %(label)s. Razporejevalnik jih pošlje ob naslednjem prehodu; vsak dokument pokaže, kako je šlo."
 
 #: src/postulo/applications/quiet.py:116
 #, python-format, draft
@@ -222,12 +229,12 @@ msgid ""
 msgstr ""
 "%(name)s se prijavlja kot <strong>%(current)s</strong>. Novo uporabniško ime mora biti na tej instanci prosto; velike črke ga ne razlikujejo."
 
-#: src/postulo/documents/rendering.py:180
+#: src/postulo/documents/rendering.py:196
 #, python-format, draft
 msgid "%(name)s — cover letter"
 msgstr "%(name)s — motivacijsko pismo"
 
-#: src/postulo/documents/rendering.py:160
+#: src/postulo/documents/rendering.py:176
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — življenjepis"
@@ -237,12 +244,12 @@ msgstr "%(name)s — življenjepis"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:128
+#: src/postulo/plugins/forms.py:132
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s ni mogel preveriti teh nastavitev: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:42
+#: src/postulo/notifications/management/commands/send_due_reminders.py:43
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s pri %(company)s"
@@ -251,6 +258,17 @@ msgstr "%(role)s pri %(company)s"
 #, python-format, draft
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s pri %(company)s — %(days)s dni"
+
+#: src/postulo/documents/views.py:345
+#, python-format, draft
+msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
+msgstr ""
+"%(sent)d kopij poslanih, %(failed)d neuspešnih; vsak dokument pove katere."
+
+#: src/postulo/documents/views.py:351
+#, python-format, draft
+msgid "%(sent)d copies sent."
+msgstr "%(sent)d kopij poslanih."
 
 #: src/postulo/templates/applications/application_list.html:9
 #, python-format, draft
@@ -498,7 +516,7 @@ msgid "Add a company"
 msgstr "Dodaj podjetje"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:69
+#: src/postulo/templates/connections/list.html:76
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -552,7 +570,7 @@ msgstr "Dodaj na časovnico"
 msgid "Added"
 msgstr "Dodano"
 
-#: src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:117
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "Dodanih %(count)s vnosov."
@@ -838,6 +856,11 @@ msgstr "Prijavi se: %(title)s"
 msgid "Apprenticeship"
 msgstr "Vajeništvo"
 
+#: src/postulo/documents/models.py:305
+#, draft
+msgid "Archived"
+msgstr "Arhivirano"
+
 #: src/postulo/templates/partials/confirm_delete.html:9
 #, draft
 msgid "Are you sure?"
@@ -854,6 +877,11 @@ msgstr "Ocenjevanje"
 #, draft
 msgid "Assessment or test"
 msgstr "Ocenjevanje ali preizkus"
+
+#: src/postulo/documents/models.py:352
+#, draft
+msgid "attempts"
+msgstr "poskusi"
 
 #: src/postulo/jobs/industries.py:30
 #, draft
@@ -1375,24 +1403,24 @@ msgstr "Poveži"
 msgid "Connect %(plugin)s"
 msgstr "Poveži %(plugin)s"
 
-#: src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
 #, draft
 msgid "connection"
 msgstr "povezava"
 
-#: src/postulo/plugins/views.py:201
+#: src/postulo/plugins/views.py:234
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Povezava odstranjena, vključno s skrivnostmi."
 
-#: src/postulo/plugins/views.py:160
+#: src/postulo/plugins/views.py:161
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Povezava shranjena. Preizkusite jo, da se prepričate, da deluje."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
-#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:197
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
+#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
+#: src/postulo/plugins/views.py:230
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1546,7 +1574,7 @@ msgstr "valuta"
 msgid "CV"
 msgstr "Življenjepis"
 
-#: src/postulo/documents/views.py:74
+#: src/postulo/documents/views.py:75
 #, draft
 msgid "CV created. Now choose what goes on it."
 msgstr "Življenjepis ustvarjen. Zdaj izberite, kaj gre vanj."
@@ -1674,7 +1702,7 @@ msgstr "Obramba"
 #: src/postulo/templates/applications/tag_list.html:32
 #: src/postulo/templates/documents/cv_detail.html:23
 #: src/postulo/templates/documents/letter_detail.html:21
-#: src/postulo/templates/documents/upload_list.html:38
+#: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:27
 #: src/postulo/templates/jobs/industry_list.html:40
 #: src/postulo/templates/jobs/posting_detail.html:54
@@ -1762,6 +1790,16 @@ msgstr "Skrbništvo Django"
 msgid "Document"
 msgstr "Dokument"
 
+#: src/postulo/documents/models.py:362
+#, draft
+msgid "document copies"
+msgstr "kopije dokumentov"
+
+#: src/postulo/documents/models.py:361
+#, draft
+msgid "document copy"
+msgstr "kopija dokumenta"
+
 #: src/postulo/plugins/views.py:32
 #, draft
 msgid "Document stores"
@@ -1776,7 +1814,7 @@ msgstr "Shrambe dokumentov"
 msgid "Documents"
 msgstr "Dokumenti"
 
-#: src/postulo/documents/views.py:367
+#: src/postulo/documents/views.py:427
 #, draft
 msgid "Documents sent"
 msgstr "Poslani dokumenti"
@@ -1798,11 +1836,11 @@ msgstr "Opravljeno"
 msgid "done on"
 msgstr "opravljeno dne"
 
-#: src/postulo/templates/documents/application_documents.html:33
-#: src/postulo/templates/documents/application_documents.html:52
+#: src/postulo/templates/documents/application_documents.html:35
+#: src/postulo/templates/documents/application_documents.html:58
 #: src/postulo/templates/documents/cv_detail.html:90
-#: src/postulo/templates/documents/rendered_list.html:45
-#: src/postulo/templates/documents/upload_list.html:33
+#: src/postulo/templates/documents/rendered_list.html:49
+#: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "Download"
 msgstr "Prenesi"
@@ -1854,9 +1892,9 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:50
+#: src/postulo/templates/connections/list.html:57
 #: src/postulo/templates/documents/letter_detail.html:18
-#: src/postulo/templates/documents/upload_list.html:35
+#: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
 #: src/postulo/templates/jobs/company_detail.html:120
 #: src/postulo/templates/jobs/industry_list.html:36
@@ -2021,6 +2059,11 @@ msgid ""
 msgstr ""
 "Vsako delovno mesto, ki ste ga imeli. Poudarke zapišite enkrat; prilagodite jih po življenjepisu pozneje."
 
+#: src/postulo/documents/views.py:354
+#, draft
+msgid "Every store already has this document."
+msgstr "Vsaka shramba že ima ta dokument."
+
 #: src/postulo/jobs/listing_views.py:30
 #, draft
 msgid "Everything"
@@ -2110,10 +2153,15 @@ msgstr "Izvozi vse"
 msgid "Export PDF"
 msgstr "Izvozi PDF"
 
-#: src/postulo/templates/documents/rendered_list.html:37
+#: src/postulo/templates/documents/rendered_list.html:41
 #, draft
 msgid "Exported on its own"
 msgstr "Izvoženo posebej"
+
+#: src/postulo/documents/models.py:306
+#, draft
+msgid "Failed"
+msgstr "Neuspešno"
 
 #: src/postulo/plugins/models.py:102
 #, draft
@@ -2150,7 +2198,7 @@ msgstr "Številke se pojavijo, ko se nekam prijavite."
 msgid "file"
 msgstr "datoteka"
 
-#: src/postulo/documents/views.py:253
+#: src/postulo/documents/views.py:268
 #, draft
 msgid "File saved."
 msgstr "Datoteka shranjena."
@@ -2162,12 +2210,17 @@ msgstr "Datoteka shranjena."
 msgid "Files"
 msgstr "Datoteke"
 
+#: src/postulo/documents/stores.py:106
+#, draft
+msgid "Files are kept under this instance's private media."
+msgstr "Datoteke so shranjene v zasebnih medijih te instance."
+
 #: src/postulo/applications/models.py:226
 #, draft
 msgid "files sent"
 msgstr "poslane datoteke"
 
-#: src/postulo/templates/documents/application_documents.html:45
+#: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Files you already had"
 msgstr "Datoteke, ki ste jih že imeli"
@@ -2539,6 +2592,11 @@ msgstr "Hibridno"
 msgid "I have already applied to this one"
 msgstr "Sem sem se že prijavil/-a"
 
+#: src/postulo/documents/models.py:350
+#, draft
+msgid "id in the store"
+msgstr "id v shrambi"
+
 #: src/postulo/jobs/models.py:175
 #, draft
 msgid "identifier"
@@ -2845,7 +2903,7 @@ msgstr "izdano dne"
 msgid "It cannot end before it starts."
 msgstr "Ne more se končati, preden se začne."
 
-#: src/postulo/plugins/views.py:184
+#: src/postulo/plugins/views.py:185
 #, draft
 msgid "It works."
 msgstr "Deluje."
@@ -2893,7 +2951,7 @@ msgstr "vrsta"
 msgid "Kind"
 msgstr "Vrsta"
 
-#: src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
 #, draft
 msgid "label"
 msgstr "oznaka"
@@ -2949,7 +3007,12 @@ msgstr "Največja prebrana stran"
 msgid "Last activity"
 msgstr "Zadnja dejavnost"
 
-#: src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:356
+#, draft
+msgid "last attempt"
+msgstr "zadnji poskus"
+
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
 #, draft
 msgid "last error"
 msgstr "zadnja napaka"
@@ -3024,6 +3087,11 @@ msgstr "povezava"
 #, draft
 msgid "Link"
 msgstr "Povezava"
+
+#: src/postulo/documents/models.py:351
+#, draft
+msgid "link in the store"
+msgstr "povezava v shrambi"
 
 #: src/postulo/accounts/models.py:182 src/postulo/jobs/models.py:241
 #, draft
@@ -3362,6 +3430,11 @@ msgstr "Najnovejša varnostna kopija"
 msgid "Next"
 msgstr "Naprej"
 
+#: src/postulo/documents/models.py:354
+#, draft
+msgid "next attempt"
+msgstr "naslednji poskus"
+
 #: src/postulo/applications/tables.py:98
 #, draft
 msgid "Next interview"
@@ -3393,7 +3466,7 @@ msgstr "Podjetij še ni. Ustvarijo se za vas, ko zabeležite prijavo."
 msgid "no company"
 msgstr "brez podjetja"
 
-#: src/postulo/templates/connections/list.html:61
+#: src/postulo/templates/connections/list.html:68
 #, draft
 msgid "No connections yet"
 msgstr "Povezav še ni"
@@ -3408,6 +3481,12 @@ msgstr "Motivacijskih pisem še ni."
 msgid "No CVs yet"
 msgstr "Življenjepisov še ni"
 
+#: src/postulo/documents/views.py:336
+#, draft
+msgid "No document store is connected. Add one under Settings → Connections."
+msgstr ""
+"Nobena shramba dokumentov ni povezana. Dodajte jo pod Nastavitve → Povezave."
+
 #: src/postulo/templates/jobs/industry_list.html:51
 #, draft
 msgid "No industries yet. They appear as you describe companies."
@@ -3418,7 +3497,7 @@ msgstr "Panog še ni. Pojavijo se, ko opisujete podjetja."
 msgid "No installed plugin needs a connection."
 msgstr "Noben nameščen vtičnik ne potrebuje povezave."
 
-#: src/postulo/templates/connections/list.html:73
+#: src/postulo/templates/connections/list.html:80
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3518,6 +3597,11 @@ msgstr "še nobenega"
 #, draft
 msgid "Normal"
 msgstr "Običajna"
+
+#: src/postulo/documents/models.py:307
+#, draft
+msgid "Not accepted"
+msgstr "Ni sprejeto"
 
 #: src/postulo/templates/403.html:4 src/postulo/templates/403.html:9
 #, draft
@@ -3664,7 +3748,7 @@ msgstr "V tem življenjepisu še ni ničesar. Spodaj izberite vnose."
 msgid "Nothing recorded against this one yet."
 msgstr "Za to še ni nič zabeleženo."
 
-#: src/postulo/templates/documents/application_documents.html:40
+#: src/postulo/templates/documents/application_documents.html:42
 #, draft
 msgid "Nothing recorded for this application yet."
 msgstr "Za to prijavo še ni nič zabeleženo."
@@ -3698,7 +3782,7 @@ msgstr ""
 msgid "Nothing scheduled."
 msgstr "Nič ni načrtovano."
 
-#: src/postulo/templates/documents/rendered_list.html:54
+#: src/postulo/templates/documents/rendered_list.html:58
 #, draft
 msgid "Nothing sent yet."
 msgstr "Še nič ni poslano."
@@ -3708,7 +3792,7 @@ msgstr "Še nič ni poslano."
 msgid "Nothing to chase."
 msgstr "Ni koga opomniti."
 
-#: src/postulo/templates/connections/list.html:71
+#: src/postulo/templates/connections/list.html:78
 #, draft
 msgid "Nothing to connect to"
 msgstr "Ni se s čim povezati"
@@ -3723,7 +3807,14 @@ msgstr "Ni o čem odločati"
 msgid "Nothing to measure yet"
 msgstr "Še ni česa meriti"
 
-#: src/postulo/templates/documents/upload_list.html:46
+#: src/postulo/plugins/views.py:214
+#, python-format, draft
+msgid ""
+"Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
+msgstr ""
+"Ničesar ni za v vrsto: vsak dokument izbranih vrst je že na seznamu za %(label)s."
+
+#: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
 msgstr "Še nič ni naloženo."
@@ -3733,7 +3824,7 @@ msgstr "Še nič ni naloženo."
 msgid "Nothing waiting"
 msgstr "Nič ne čaka"
 
-#: src/postulo/documents/views.py:100 src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:101 src/postulo/documents/views.py:117
 #, draft
 msgid "Nothing was added."
 msgstr "Nič ni bilo dodano."
@@ -3819,7 +3910,7 @@ msgstr[1] "%(counter)s zajema čakata na pregled"
 msgstr[2] "%(counter)s zajemi čakajo na pregled"
 msgstr[3] "%(counter)s zajemov čaka na pregled"
 
-#: src/postulo/templates/connections/list.html:63
+#: src/postulo/templates/connections/list.html:70
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4013,7 +4104,7 @@ msgstr ""
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr "Prilepite besedilo. Oglasi izginejo s spleta; vaša kopija ne bo."
 
-#: src/postulo/documents/views.py:174
+#: src/postulo/documents/views.py:175
 #, draft
 msgid "PDF created."
 msgstr "PDF ustvarjen."
@@ -4355,6 +4446,11 @@ msgstr "Vračanje nazaj"
 msgid "qualification"
 msgstr "kvalifikacija"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Queue every document you already have for this store."
+msgstr "V vrsto postavi vsak dokument, ki ga že imate, za to shrambo."
+
 #: src/postulo/templates/server/overview.html:22
 #, draft
 msgid "Queued tasks"
@@ -4519,7 +4615,7 @@ msgstr "zabeležil/-a"
 msgid "recorded on"
 msgstr "zabeleženo dne"
 
-#: src/postulo/documents/views.py:370
+#: src/postulo/documents/views.py:430
 #, draft
 msgid "Recorded what you sent."
 msgstr "Zabeleženo, kaj ste poslali."
@@ -4607,7 +4703,7 @@ msgid "Remote"
 msgstr "Na daljavo"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:52
+#: src/postulo/templates/connections/list.html:59
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4936,6 +5032,11 @@ msgstr "Pošlji preizkusno sporočilo"
 msgid "Send a test message to"
 msgstr "Pošlji preizkusno sporočilo na"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Send everything"
+msgstr "Pošlji vse"
+
 #: src/postulo/templates/api/token_list.html:94
 #, draft
 msgid "Send it as a bearer token. To check that one works, and see its scopes:"
@@ -4946,6 +5047,11 @@ msgstr ""
 #, draft
 msgid "Send to"
 msgstr "Pošlji na"
+
+#: src/postulo/templates/documents/partials/copies.html:20
+#, draft
+msgid "Send to stores now"
+msgstr "Pošlji v shrambe zdaj"
 
 #: src/postulo/core/server_views.py:426
 #, python-format, draft
@@ -4958,7 +5064,7 @@ msgstr "Pošiljanje ni uspelo: %(error)s"
 msgid "Sent"
 msgstr "Poslano"
 
-#: src/postulo/documents/models.py:291
+#: src/postulo/documents/models.py:291 src/postulo/documents/models.py:336
 #, draft
 msgid "sent document"
 msgstr "poslan dokument"
@@ -4975,6 +5081,11 @@ msgstr "poslani dokumenti"
 #, draft
 msgid "Sent documents"
 msgstr "Poslani dokumenti"
+
+#: src/postulo/documents/models.py:357
+#, draft
+msgid "sent on"
+msgstr "poslano"
 
 #: src/postulo/core/server_views.py:429 src/postulo/notifications/email.py:80
 #, python-format, draft
@@ -5255,7 +5366,8 @@ msgstr "Stanje"
 msgid "Status"
 msgstr "Stanje"
 
-#: src/postulo/applications/models.py:197 src/postulo/jobs/models.py:552
+#: src/postulo/applications/models.py:197 src/postulo/documents/models.py:348
+#: src/postulo/jobs/models.py:552
 #, draft
 msgid "status"
 msgstr "stanje"
@@ -5282,7 +5394,12 @@ msgstr "Stanje posodobljeno."
 msgid "Still live"
 msgstr "Še živi"
 
-#: src/postulo/plugins/forms.py:43
+#: src/postulo/documents/models.py:328
+#, draft
+msgid "store"
+msgstr "shramba"
+
+#: src/postulo/plugins/forms.py:47
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Shranjeno; pustite prazno, da ohranite trenutno vrednost."
@@ -5394,7 +5511,7 @@ msgstr "Predloge se pojavijo, ko pošljete pismo s prijavo."
 msgid "Test"
 msgstr "Preizkusi"
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:187
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Preizkus ni uspel: %(message)s"
@@ -5508,7 +5625,7 @@ msgstr "Ta stran je vrnila %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Ta slika je večja od 5 MB. Manjšo, prosim."
 
-#: src/postulo/plugins/views.py:172
+#: src/postulo/plugins/views.py:173
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ta vtičnik ni več nameščen."
@@ -5517,6 +5634,11 @@ msgstr "Ta vtičnik ni več nameščen."
 #, python-format, draft
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "Zaledni sistem za PDF %(name)s je nastavljen, a ni uporaben. %(hint)s"
+
+#: src/postulo/documents/archiving.py:106
+#, python-format, draft
+msgid "The %(plugin)s plugin is not installed."
+msgstr "Vtičnik %(plugin)s ni nameščen."
 
 #: src/postulo/jobs/models.py:402
 #, draft
@@ -5534,6 +5656,16 @@ msgstr ""
 #, draft
 msgid "The company you are applying to"
 msgstr "Podjetje, kamor se prijavljate"
+
+#: src/postulo/documents/archiving.py:102
+#, draft
+msgid "The connection is gone or switched off."
+msgstr "Povezava je izginila ali je izklopljena."
+
+#: src/postulo/documents/views.py:341
+#, draft
+msgid "The copy could not be sent; the document says why."
+msgstr "Kopije ni bilo mogoče poslati; dokument pove, zakaj."
 
 #: src/postulo/templates/settings/appearance.html:29
 #, draft
@@ -5701,6 +5833,11 @@ msgstr "Tema: %(current)s. Preklopi na: %(next)s."
 msgid "Then delete"
 msgstr "Nato izbriši"
 
+#: src/postulo/documents/archiving.py:109
+#, draft
+msgid "There is no file to send."
+msgstr "Ni datoteke za pošiljanje."
+
 #: src/postulo/plugins/fetching.py:84
 #, draft
 msgid "There is nothing at that address (404). Check the link."
@@ -5736,6 +5873,7 @@ msgstr "Niso prišli"
 msgid "This identifier is already listed."
 msgstr "Ta identifikator je že na seznamu."
 
+#: src/postulo/documents/stores.py:98
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -6007,7 +6145,7 @@ msgstr "Naloži in dodeli stolpce"
 msgid "Uploaded"
 msgstr "Naloženo"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:232 src/postulo/documents/models.py:344
 #, draft
 msgid "uploaded document"
 msgstr "naložen dokument"
@@ -6138,6 +6276,11 @@ msgstr "Čaka na pregled"
 #, draft
 msgid "Waiting on a reply"
 msgstr "Čaka na odgovor"
+
+#: src/postulo/documents/models.py:304
+#, draft
+msgid "Waiting to be sent"
+msgstr "Čaka na pošiljanje"
 
 #: src/postulo/templates/core/import_csv_map.html:78
 #, python-format, draft

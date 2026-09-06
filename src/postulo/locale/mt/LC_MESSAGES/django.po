@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:56+0000\n"
+"POT-Creation-Date: 2026-09-06 10:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Malti\n"
@@ -30,6 +30,13 @@ msgstr "%(company)s diġà għandha dan l-identifikatur."
 #, python-format, draft
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s diġà għandha identifikatur %(scheme)s: %(value)s."
+
+#: src/postulo/plugins/views.py:205
+#, python-format, draft
+msgid ""
+"%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
+msgstr ""
+"%(count)d dokumenti tqiegħdu fil-kju għal %(label)s. L-iskedatur jibgħathom fil-mogħdija li jmiss tiegħu; kull dokument juri kif mar."
 
 #: src/postulo/applications/quiet.py:116
 #, python-format, draft
@@ -222,12 +229,12 @@ msgid ""
 msgstr ""
 "%(name)s jidħol bħala <strong>%(current)s</strong>. L-isem tal-utent il-ġdid irid ikun ħieles f'din l-istanza; l-ittri kbar ma jagħmluhx differenti."
 
-#: src/postulo/documents/rendering.py:180
+#: src/postulo/documents/rendering.py:196
 #, python-format, draft
 msgid "%(name)s — cover letter"
 msgstr "%(name)s — ittra ta' motivazzjoni"
 
-#: src/postulo/documents/rendering.py:160
+#: src/postulo/documents/rendering.py:176
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
@@ -237,12 +244,12 @@ msgstr "%(name)s — CV"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:128
+#: src/postulo/plugins/forms.py:132
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s ma setax jiċċekkja dawn is-settings: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:42
+#: src/postulo/notifications/management/commands/send_due_reminders.py:43
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s ma' %(company)s"
@@ -251,6 +258,16 @@ msgstr "%(role)s ma' %(company)s"
 #, python-format, draft
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s ma' %(company)s — %(days)s jum"
+
+#: src/postulo/documents/views.py:345
+#, python-format, draft
+msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
+msgstr "%(sent)d kopji mibgħuta, %(failed)d fallew; kull dokument jgħid liema."
+
+#: src/postulo/documents/views.py:351
+#, python-format, draft
+msgid "%(sent)d copies sent."
+msgstr "%(sent)d kopji mibgħuta."
 
 #: src/postulo/templates/applications/application_list.html:9
 #, python-format, draft
@@ -498,7 +515,7 @@ msgid "Add a company"
 msgstr "Żid kumpanija"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:69
+#: src/postulo/templates/connections/list.html:76
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -552,7 +569,7 @@ msgstr "Żid mal-kronoloġija"
 msgid "Added"
 msgstr "Miżjuda"
 
-#: src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:117
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "%(count)s entrati miżjuda."
@@ -839,6 +856,11 @@ msgstr "Applika: %(title)s"
 msgid "Apprenticeship"
 msgstr "Apprendistat"
 
+#: src/postulo/documents/models.py:305
+#, draft
+msgid "Archived"
+msgstr "Arkivjat"
+
 #: src/postulo/templates/partials/confirm_delete.html:9
 #, draft
 msgid "Are you sure?"
@@ -855,6 +877,11 @@ msgstr "Assessjar"
 #, draft
 msgid "Assessment or test"
 msgstr "Assessjar jew test"
+
+#: src/postulo/documents/models.py:352
+#, draft
+msgid "attempts"
+msgstr "tentattivi"
 
 #: src/postulo/jobs/industries.py:30
 #, draft
@@ -1376,24 +1403,24 @@ msgstr "Ikkonnettja"
 msgid "Connect %(plugin)s"
 msgstr "Ikkonnettja %(plugin)s"
 
-#: src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
 #, draft
 msgid "connection"
 msgstr "konnessjoni"
 
-#: src/postulo/plugins/views.py:201
+#: src/postulo/plugins/views.py:234
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Konnessjoni mneħħija, sigrieti inklużi."
 
-#: src/postulo/plugins/views.py:160
+#: src/postulo/plugins/views.py:161
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Konnessjoni ssejvjata. Ittestjaha biex tkun ċert li taħdem."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
-#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:197
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
+#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
+#: src/postulo/plugins/views.py:230
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1547,7 +1574,7 @@ msgstr "munita"
 msgid "CV"
 msgstr "CV"
 
-#: src/postulo/documents/views.py:74
+#: src/postulo/documents/views.py:75
 #, draft
 msgid "CV created. Now choose what goes on it."
 msgstr "CV maħluq. Issa agħżel x'jidħol fih."
@@ -1676,7 +1703,7 @@ msgstr "Difiża"
 #: src/postulo/templates/applications/tag_list.html:32
 #: src/postulo/templates/documents/cv_detail.html:23
 #: src/postulo/templates/documents/letter_detail.html:21
-#: src/postulo/templates/documents/upload_list.html:38
+#: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:27
 #: src/postulo/templates/jobs/industry_list.html:40
 #: src/postulo/templates/jobs/posting_detail.html:54
@@ -1764,6 +1791,16 @@ msgstr "Amministrazzjoni Django"
 msgid "Document"
 msgstr "Dokument"
 
+#: src/postulo/documents/models.py:362
+#, draft
+msgid "document copies"
+msgstr "kopji ta' dokumenti"
+
+#: src/postulo/documents/models.py:361
+#, draft
+msgid "document copy"
+msgstr "kopja ta' dokument"
+
 #: src/postulo/plugins/views.py:32
 #, draft
 msgid "Document stores"
@@ -1778,7 +1815,7 @@ msgstr "Ħażniet tad-dokumenti"
 msgid "Documents"
 msgstr "Dokumenti"
 
-#: src/postulo/documents/views.py:367
+#: src/postulo/documents/views.py:427
 #, draft
 msgid "Documents sent"
 msgstr "Dokumenti mibgħuta"
@@ -1800,11 +1837,11 @@ msgstr "Lest"
 msgid "done on"
 msgstr "lest fi"
 
-#: src/postulo/templates/documents/application_documents.html:33
-#: src/postulo/templates/documents/application_documents.html:52
+#: src/postulo/templates/documents/application_documents.html:35
+#: src/postulo/templates/documents/application_documents.html:58
 #: src/postulo/templates/documents/cv_detail.html:90
-#: src/postulo/templates/documents/rendered_list.html:45
-#: src/postulo/templates/documents/upload_list.html:33
+#: src/postulo/templates/documents/rendered_list.html:49
+#: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "Download"
 msgstr "Niżżel"
@@ -1856,9 +1893,9 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:50
+#: src/postulo/templates/connections/list.html:57
 #: src/postulo/templates/documents/letter_detail.html:18
-#: src/postulo/templates/documents/upload_list.html:35
+#: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
 #: src/postulo/templates/jobs/company_detail.html:120
 #: src/postulo/templates/jobs/industry_list.html:36
@@ -2024,6 +2061,11 @@ msgid ""
 msgstr ""
 "Kull rwol li kellek. Ikteb il-punti ewlenin darba; addattahom għal kull CV wara."
 
+#: src/postulo/documents/views.py:354
+#, draft
+msgid "Every store already has this document."
+msgstr "Kull maħżen diġà għandu dan id-dokument."
+
 #: src/postulo/jobs/listing_views.py:30
 #, draft
 msgid "Everything"
@@ -2113,10 +2155,15 @@ msgstr "Esporta kollox"
 msgid "Export PDF"
 msgstr "Esporta PDF"
 
-#: src/postulo/templates/documents/rendered_list.html:37
+#: src/postulo/templates/documents/rendered_list.html:41
 #, draft
 msgid "Exported on its own"
 msgstr "Esportat waħdu"
+
+#: src/postulo/documents/models.py:306
+#, draft
+msgid "Failed"
+msgstr "Falla"
 
 #: src/postulo/plugins/models.py:102
 #, draft
@@ -2153,7 +2200,7 @@ msgstr "Il-figuri jidhru ladarba tkun applikajt għal xi ħaġa."
 msgid "file"
 msgstr "fajl"
 
-#: src/postulo/documents/views.py:253
+#: src/postulo/documents/views.py:268
 #, draft
 msgid "File saved."
 msgstr "Fajl issejvjat."
@@ -2165,12 +2212,17 @@ msgstr "Fajl issejvjat."
 msgid "Files"
 msgstr "Fajls"
 
+#: src/postulo/documents/stores.py:106
+#, draft
+msgid "Files are kept under this instance's private media."
+msgstr "Il-fajls jinżammu fil-midja privata ta' din l-istanza."
+
 #: src/postulo/applications/models.py:226
 #, draft
 msgid "files sent"
 msgstr "fajls mibgħuta"
 
-#: src/postulo/templates/documents/application_documents.html:45
+#: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Files you already had"
 msgstr "Fajls li diġà kellek"
@@ -2544,6 +2596,11 @@ msgstr "Ibridu"
 msgid "I have already applied to this one"
 msgstr "Diġà applikajt għal dan"
 
+#: src/postulo/documents/models.py:350
+#, draft
+msgid "id in the store"
+msgstr "id fil-maħżen"
+
 #: src/postulo/jobs/models.py:175
 #, draft
 msgid "identifier"
@@ -2850,7 +2907,7 @@ msgstr "maħruġa fi"
 msgid "It cannot end before it starts."
 msgstr "Ma tistax tispiċċa qabel ma tibda."
 
-#: src/postulo/plugins/views.py:184
+#: src/postulo/plugins/views.py:185
 #, draft
 msgid "It works."
 msgstr "Jaħdem."
@@ -2898,7 +2955,7 @@ msgstr "tip"
 msgid "Kind"
 msgstr "Tip"
 
-#: src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
 #, draft
 msgid "label"
 msgstr "tikketta"
@@ -2954,7 +3011,12 @@ msgstr "L-akbar paġna moqrija"
 msgid "Last activity"
 msgstr "L-aħħar attività"
 
-#: src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:356
+#, draft
+msgid "last attempt"
+msgstr "l-aħħar tentattiv"
+
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
 #, draft
 msgid "last error"
 msgstr "l-aħħar żball"
@@ -3029,6 +3091,11 @@ msgstr "link"
 #, draft
 msgid "Link"
 msgstr "Link"
+
+#: src/postulo/documents/models.py:351
+#, draft
+msgid "link in the store"
+msgstr "link fil-maħżen"
 
 #: src/postulo/accounts/models.py:182 src/postulo/jobs/models.py:241
 #, draft
@@ -3367,6 +3434,11 @@ msgstr "L-aktar backup riċenti"
 msgid "Next"
 msgstr "Li jmiss"
 
+#: src/postulo/documents/models.py:354
+#, draft
+msgid "next attempt"
+msgstr "it-tentattiv li jmiss"
+
 #: src/postulo/applications/tables.py:98
 #, draft
 msgid "Next interview"
@@ -3399,7 +3471,7 @@ msgstr ""
 msgid "no company"
 msgstr "l-ebda kumpanija"
 
-#: src/postulo/templates/connections/list.html:61
+#: src/postulo/templates/connections/list.html:68
 #, draft
 msgid "No connections yet"
 msgstr "L-ebda konnessjoni għalissa"
@@ -3414,6 +3486,12 @@ msgstr "L-ebda ittra ta' motivazzjoni għalissa."
 msgid "No CVs yet"
 msgstr "L-ebda CV għalissa"
 
+#: src/postulo/documents/views.py:336
+#, draft
+msgid "No document store is connected. Add one under Settings → Connections."
+msgstr ""
+"L-ebda maħżen ta' dokumenti mhu konness. Żid wieħed taħt Settings → Konnessjonijiet."
+
 #: src/postulo/templates/jobs/industry_list.html:51
 #, draft
 msgid "No industries yet. They appear as you describe companies."
@@ -3424,7 +3502,7 @@ msgstr "L-ebda industrija għalissa. Jidhru hekk kif tiddeskrivi l-kumpaniji."
 msgid "No installed plugin needs a connection."
 msgstr "L-ebda plugin installat ma għandu bżonn konnessjoni."
 
-#: src/postulo/templates/connections/list.html:73
+#: src/postulo/templates/connections/list.html:80
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3524,6 +3602,11 @@ msgstr "l-ebda wieħed għalissa"
 #, draft
 msgid "Normal"
 msgstr "Normali"
+
+#: src/postulo/documents/models.py:307
+#, draft
+msgid "Not accepted"
+msgstr "Mhux aċċettat"
 
 #: src/postulo/templates/403.html:4 src/postulo/templates/403.html:9
 #, draft
@@ -3672,7 +3755,7 @@ msgstr "Xejn fuq dan is-CV għalissa. Agħżel xi entrati hawn taħt."
 msgid "Nothing recorded against this one yet."
 msgstr "Xejn irreġistrat kontra din għalissa."
 
-#: src/postulo/templates/documents/application_documents.html:40
+#: src/postulo/templates/documents/application_documents.html:42
 #, draft
 msgid "Nothing recorded for this application yet."
 msgstr "Xejn irreġistrat għal din l-applikazzjoni għalissa."
@@ -3706,7 +3789,7 @@ msgstr ""
 msgid "Nothing scheduled."
 msgstr "Xejn skedat."
 
-#: src/postulo/templates/documents/rendered_list.html:54
+#: src/postulo/templates/documents/rendered_list.html:58
 #, draft
 msgid "Nothing sent yet."
 msgstr "Xejn mibgħut għalissa."
@@ -3716,7 +3799,7 @@ msgstr "Xejn mibgħut għalissa."
 msgid "Nothing to chase."
 msgstr "Xejn x'issegwi."
 
-#: src/postulo/templates/connections/list.html:71
+#: src/postulo/templates/connections/list.html:78
 #, draft
 msgid "Nothing to connect to"
 msgstr "Xejn ma' xiex tikkonnettja"
@@ -3731,7 +3814,14 @@ msgstr "Xejn x'tiddeċiedi"
 msgid "Nothing to measure yet"
 msgstr "Xejn x'tkejjel għalissa"
 
-#: src/postulo/templates/documents/upload_list.html:46
+#: src/postulo/plugins/views.py:214
+#, python-format, draft
+msgid ""
+"Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
+msgstr ""
+"Xejn x'jitqiegħed fil-kju: kull dokument tat-tipi magħżula diġà jinsab fil-lista għal %(label)s."
+
+#: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
 msgstr "Xejn imtella' għalissa."
@@ -3741,7 +3831,7 @@ msgstr "Xejn imtella' għalissa."
 msgid "Nothing waiting"
 msgstr "Xejn jistenna"
 
-#: src/postulo/documents/views.py:100 src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:101 src/postulo/documents/views.py:117
 #, draft
 msgid "Nothing was added."
 msgstr "Xejn ma ġie miżjud."
@@ -3827,7 +3917,7 @@ msgstr[1] "%(counter)s qbidiet jistennew reviżjoni"
 msgstr[2] "%(counter)s qbid jistennew reviżjoni"
 msgstr[3] "%(counter)s qbid jistennew reviżjoni"
 
-#: src/postulo/templates/connections/list.html:63
+#: src/postulo/templates/connections/list.html:70
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4020,7 +4110,7 @@ msgstr ""
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr "Waħħal it-test. L-avviżi jisparixxu mill-web; il-kopja tiegħek le."
 
-#: src/postulo/documents/views.py:174
+#: src/postulo/documents/views.py:175
 #, draft
 msgid "PDF created."
 msgstr "PDF maħluq."
@@ -4362,6 +4452,11 @@ msgstr "Reġġa' lura"
 msgid "qualification"
 msgstr "kwalifika"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Queue every document you already have for this store."
+msgstr "Iqiegħed fil-kju kull dokument li diġà għandek għal dan il-maħżen."
+
 #: src/postulo/templates/server/overview.html:22
 #, draft
 msgid "Queued tasks"
@@ -4526,7 +4621,7 @@ msgstr "irreġistrat minn"
 msgid "recorded on"
 msgstr "irreġistrat fi"
 
-#: src/postulo/documents/views.py:370
+#: src/postulo/documents/views.py:430
 #, draft
 msgid "Recorded what you sent."
 msgstr "Irreġistrat dak li bgħatt."
@@ -4615,7 +4710,7 @@ msgid "Remote"
 msgstr "Remot"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:52
+#: src/postulo/templates/connections/list.html:59
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4946,6 +5041,11 @@ msgstr "Ibgħat messaġġ ta' prova"
 msgid "Send a test message to"
 msgstr "Ibgħat messaġġ ta' prova lil"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Send everything"
+msgstr "Ibgħat kollox"
+
 #: src/postulo/templates/api/token_list.html:94
 #, draft
 msgid "Send it as a bearer token. To check that one works, and see its scopes:"
@@ -4956,6 +5056,11 @@ msgstr ""
 #, draft
 msgid "Send to"
 msgstr "Ibgħat lil"
+
+#: src/postulo/templates/documents/partials/copies.html:20
+#, draft
+msgid "Send to stores now"
+msgstr "Ibgħat lill-imħażen issa"
 
 #: src/postulo/core/server_views.py:426
 #, python-format, draft
@@ -4968,7 +5073,7 @@ msgstr "Il-bgħit falla: %(error)s"
 msgid "Sent"
 msgstr "Mibgħut"
 
-#: src/postulo/documents/models.py:291
+#: src/postulo/documents/models.py:291 src/postulo/documents/models.py:336
 #, draft
 msgid "sent document"
 msgstr "dokument mibgħut"
@@ -4985,6 +5090,11 @@ msgstr "dokumenti mibgħuta"
 #, draft
 msgid "Sent documents"
 msgstr "Dokumenti mibgħuta"
+
+#: src/postulo/documents/models.py:357
+#, draft
+msgid "sent on"
+msgstr "mibgħut fi"
 
 #: src/postulo/core/server_views.py:429 src/postulo/notifications/email.py:80
 #, python-format, draft
@@ -5265,7 +5375,8 @@ msgstr "Stat"
 msgid "Status"
 msgstr "Status"
 
-#: src/postulo/applications/models.py:197 src/postulo/jobs/models.py:552
+#: src/postulo/applications/models.py:197 src/postulo/documents/models.py:348
+#: src/postulo/jobs/models.py:552
 #, draft
 msgid "status"
 msgstr "status"
@@ -5292,7 +5403,12 @@ msgstr "Status aġġornat."
 msgid "Still live"
 msgstr "Għadha ħajja"
 
-#: src/postulo/plugins/forms.py:43
+#: src/postulo/documents/models.py:328
+#, draft
+msgid "store"
+msgstr "maħżen"
+
+#: src/postulo/plugins/forms.py:47
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Maħżun; ħalli vojt biex iżżomm il-valur attwali."
@@ -5404,7 +5520,7 @@ msgstr "Il-mudelli jidhru meta tibgħat ittra ma' applikazzjoni."
 msgid "Test"
 msgstr "Ittestja"
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:187
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "It-test falla: %(message)s"
@@ -5518,7 +5634,7 @@ msgstr "Dik il-paġna rritornat %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Dik l-istampa hija aktar minn 5 MB. Waħda iżgħar, jekk jogħġbok."
 
-#: src/postulo/plugins/views.py:172
+#: src/postulo/plugins/views.py:173
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Dak il-plugin m'għadux installat."
@@ -5528,6 +5644,11 @@ msgstr "Dak il-plugin m'għadux installat."
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr ""
 "Il-backend tal-PDF %(name)s huwa kkonfigurat iżda ma jistax jintuża. %(hint)s"
+
+#: src/postulo/documents/archiving.py:106
+#, python-format, draft
+msgid "The %(plugin)s plugin is not installed."
+msgstr "Il-plugin %(plugin)s mhux installat."
 
 #: src/postulo/jobs/models.py:402
 #, draft
@@ -5545,6 +5666,16 @@ msgstr ""
 #, draft
 msgid "The company you are applying to"
 msgstr "Il-kumpanija li qed tapplika magħha"
+
+#: src/postulo/documents/archiving.py:102
+#, draft
+msgid "The connection is gone or switched off."
+msgstr "Il-konnessjoni marret jew hi mitfija."
+
+#: src/postulo/documents/views.py:341
+#, draft
+msgid "The copy could not be sent; the document says why."
+msgstr "Il-kopja ma setgħetx tintbagħat; id-dokument jgħid għaliex."
 
 #: src/postulo/templates/settings/appearance.html:29
 #, draft
@@ -5712,6 +5843,11 @@ msgstr "Tema: %(current)s. Aqleb għal: %(next)s."
 msgid "Then delete"
 msgstr "Imbagħad ħassar"
 
+#: src/postulo/documents/archiving.py:109
+#, draft
+msgid "There is no file to send."
+msgstr "M'hemm l-ebda fajl x'jintbagħat."
+
 #: src/postulo/plugins/fetching.py:84
 #, draft
 msgid "There is nothing at that address (404). Check the link."
@@ -5747,6 +5883,7 @@ msgstr "Ma dehrux"
 msgid "This identifier is already listed."
 msgstr "Dan l-identifikatur diġà elenkat."
 
+#: src/postulo/documents/stores.py:98
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -6019,7 +6156,7 @@ msgstr "Tella' u mmappja l-kolonni"
 msgid "Uploaded"
 msgstr "Imtella'"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:232 src/postulo/documents/models.py:344
 #, draft
 msgid "uploaded document"
 msgstr "dokument imtella'"
@@ -6151,6 +6288,11 @@ msgstr "Tistenna reviżjoni"
 #, draft
 msgid "Waiting on a reply"
 msgstr "Tistenna tweġiba"
+
+#: src/postulo/documents/models.py:304
+#, draft
+msgid "Waiting to be sent"
+msgstr "Qed jistenna li jintbagħat"
 
 #: src/postulo/templates/core/import_csv_map.html:78
 #, python-format, draft

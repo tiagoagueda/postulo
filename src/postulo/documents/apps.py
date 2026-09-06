@@ -7,3 +7,11 @@ class DocumentsConfig(AppConfig):
     name = "postulo.documents"
     label = "documents"
     verbose_name = _("Documents")
+
+    def ready(self) -> None:
+        from postulo.plugins import registry
+
+        from . import signals  # noqa: F401 - connects the receivers
+        from .stores import LocalStore
+
+        registry.register_builtin("store", LocalStore)

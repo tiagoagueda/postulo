@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:56+0000\n"
+"POT-Creation-Date: 2026-09-06 10:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -30,6 +30,13 @@ msgstr "%(company)s вече има този идентификатор."
 #, python-format, draft
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s вече има идентификатор %(scheme)s: %(value)s."
+
+#: src/postulo/plugins/views.py:205
+#, python-format, draft
+msgid ""
+"%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
+msgstr ""
+"%(count)d документа са поставени на опашка за %(label)s. Планировчикът ще ги изпрати при следващото си преминаване; всеки документ показва как е минало."
 
 #: src/postulo/applications/quiet.py:116
 #, python-format, draft
@@ -197,12 +204,12 @@ msgid ""
 msgstr ""
 "%(name)s влиза като <strong>%(current)s</strong>. Новото потребителско име трябва да е свободно в тази инстанция; главните букви не го различават."
 
-#: src/postulo/documents/rendering.py:180
+#: src/postulo/documents/rendering.py:196
 #, python-format, draft
 msgid "%(name)s — cover letter"
 msgstr "%(name)s — мотивационно писмо"
 
-#: src/postulo/documents/rendering.py:160
+#: src/postulo/documents/rendering.py:176
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
@@ -212,12 +219,12 @@ msgstr "%(name)s — CV"
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/forms.py:128
+#: src/postulo/plugins/forms.py:132
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s не успя да провери тези настройки: %(error)s"
 
-#: src/postulo/notifications/management/commands/send_due_reminders.py:42
+#: src/postulo/notifications/management/commands/send_due_reminders.py:43
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s в %(company)s"
@@ -226,6 +233,17 @@ msgstr "%(role)s в %(company)s"
 #, python-format, draft
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s в %(company)s — %(days)s дни"
+
+#: src/postulo/documents/views.py:345
+#, python-format, draft
+msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
+msgstr ""
+"%(sent)d копия са изпратени, %(failed)d неуспешни; всеки документ показва кое."
+
+#: src/postulo/documents/views.py:351
+#, python-format, draft
+msgid "%(sent)d copies sent."
+msgstr "%(sent)d копия са изпратени."
 
 #: src/postulo/templates/applications/application_list.html:9
 #, python-format, draft
@@ -465,7 +483,7 @@ msgid "Add a company"
 msgstr "Добавяне на компания"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:69
+#: src/postulo/templates/connections/list.html:76
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -519,7 +537,7 @@ msgstr "Добавяне към хронологията"
 msgid "Added"
 msgstr "Добавена"
 
-#: src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:117
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "Добавени %(count)s записа."
@@ -804,6 +822,11 @@ msgstr "Кандидатстване: %(title)s"
 msgid "Apprenticeship"
 msgstr "Стаж за квалификация"
 
+#: src/postulo/documents/models.py:305
+#, draft
+msgid "Archived"
+msgstr "Архивиран"
+
 #: src/postulo/templates/partials/confirm_delete.html:9
 #, draft
 msgid "Are you sure?"
@@ -820,6 +843,11 @@ msgstr "Оценяване"
 #, draft
 msgid "Assessment or test"
 msgstr "Оценяване или тест"
+
+#: src/postulo/documents/models.py:352
+#, draft
+msgid "attempts"
+msgstr "опити"
 
 #: src/postulo/jobs/industries.py:30
 #, draft
@@ -1341,24 +1369,24 @@ msgstr "Свързване"
 msgid "Connect %(plugin)s"
 msgstr "Свързване на %(plugin)s"
 
-#: src/postulo/plugins/models.py:53
+#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:53
 #, draft
 msgid "connection"
 msgstr "връзка"
 
-#: src/postulo/plugins/views.py:201
+#: src/postulo/plugins/views.py:234
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Връзката е премахната, включително тайните."
 
-#: src/postulo/plugins/views.py:160
+#: src/postulo/plugins/views.py:161
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Връзката е запазена. Тествайте я, за да сте сигурни, че работи."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
-#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:197
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:87
+#: src/postulo/plugins/views.py:105 src/postulo/plugins/views.py:135
+#: src/postulo/plugins/views.py:230
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1512,7 +1540,7 @@ msgstr "валута"
 msgid "CV"
 msgstr "CV"
 
-#: src/postulo/documents/views.py:74
+#: src/postulo/documents/views.py:75
 #, draft
 msgid "CV created. Now choose what goes on it."
 msgstr "CV-то е създадено. Сега изберете какво влиза в него."
@@ -1640,7 +1668,7 @@ msgstr "Отбрана"
 #: src/postulo/templates/applications/tag_list.html:32
 #: src/postulo/templates/documents/cv_detail.html:23
 #: src/postulo/templates/documents/letter_detail.html:21
-#: src/postulo/templates/documents/upload_list.html:38
+#: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:27
 #: src/postulo/templates/jobs/industry_list.html:40
 #: src/postulo/templates/jobs/posting_detail.html:54
@@ -1728,6 +1756,16 @@ msgstr "Django администрация"
 msgid "Document"
 msgstr "Документ"
 
+#: src/postulo/documents/models.py:362
+#, draft
+msgid "document copies"
+msgstr "копия на документи"
+
+#: src/postulo/documents/models.py:361
+#, draft
+msgid "document copy"
+msgstr "копие на документ"
+
 #: src/postulo/plugins/views.py:32
 #, draft
 msgid "Document stores"
@@ -1742,7 +1780,7 @@ msgstr "Хранилища за документи"
 msgid "Documents"
 msgstr "Документи"
 
-#: src/postulo/documents/views.py:367
+#: src/postulo/documents/views.py:427
 #, draft
 msgid "Documents sent"
 msgstr "Изпратени документи"
@@ -1764,11 +1802,11 @@ msgstr "Готово"
 msgid "done on"
 msgstr "готово на"
 
-#: src/postulo/templates/documents/application_documents.html:33
-#: src/postulo/templates/documents/application_documents.html:52
+#: src/postulo/templates/documents/application_documents.html:35
+#: src/postulo/templates/documents/application_documents.html:58
 #: src/postulo/templates/documents/cv_detail.html:90
-#: src/postulo/templates/documents/rendered_list.html:45
-#: src/postulo/templates/documents/upload_list.html:33
+#: src/postulo/templates/documents/rendered_list.html:49
+#: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "Download"
 msgstr "Изтегляне"
@@ -1820,9 +1858,9 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:50
+#: src/postulo/templates/connections/list.html:57
 #: src/postulo/templates/documents/letter_detail.html:18
-#: src/postulo/templates/documents/upload_list.html:35
+#: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:25
 #: src/postulo/templates/jobs/company_detail.html:120
 #: src/postulo/templates/jobs/industry_list.html:36
@@ -1987,6 +2025,11 @@ msgid ""
 msgstr ""
 "Всяка позиция, която сте заемали. Напишете акцентите веднъж; нагодете ги за всяко CV по-късно."
 
+#: src/postulo/documents/views.py:354
+#, draft
+msgid "Every store already has this document."
+msgstr "Всяко хранилище вече има този документ."
+
 #: src/postulo/jobs/listing_views.py:30
 #, draft
 msgid "Everything"
@@ -2077,10 +2120,15 @@ msgstr "Експорт на всичко"
 msgid "Export PDF"
 msgstr "Експорт в PDF"
 
-#: src/postulo/templates/documents/rendered_list.html:37
+#: src/postulo/templates/documents/rendered_list.html:41
 #, draft
 msgid "Exported on its own"
 msgstr "Експортирано отделно"
+
+#: src/postulo/documents/models.py:306
+#, draft
+msgid "Failed"
+msgstr "Неуспешно"
 
 #: src/postulo/plugins/models.py:102
 #, draft
@@ -2117,7 +2165,7 @@ msgstr "Цифрите се появяват, след като сте канд�
 msgid "file"
 msgstr "файл"
 
-#: src/postulo/documents/views.py:253
+#: src/postulo/documents/views.py:268
 #, draft
 msgid "File saved."
 msgstr "Файлът е запазен."
@@ -2129,12 +2177,17 @@ msgstr "Файлът е запазен."
 msgid "Files"
 msgstr "Файлове"
 
+#: src/postulo/documents/stores.py:106
+#, draft
+msgid "Files are kept under this instance's private media."
+msgstr "Файловете се пазят в частните медийни файлове на този екземпляр."
+
 #: src/postulo/applications/models.py:226
 #, draft
 msgid "files sent"
 msgstr "изпратени файлове"
 
-#: src/postulo/templates/documents/application_documents.html:45
+#: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Files you already had"
 msgstr "Файлове, които вече сте имали"
@@ -2507,6 +2560,11 @@ msgstr "Хибридна"
 msgid "I have already applied to this one"
 msgstr "Вече съм кандидатствал за тази"
 
+#: src/postulo/documents/models.py:350
+#, draft
+msgid "id in the store"
+msgstr "идентификатор в хранилището"
+
 #: src/postulo/jobs/models.py:175
 #, draft
 msgid "identifier"
@@ -2813,7 +2871,7 @@ msgstr "издадена на"
 msgid "It cannot end before it starts."
 msgstr "Не може да приключи, преди да е започнало."
 
-#: src/postulo/plugins/views.py:184
+#: src/postulo/plugins/views.py:185
 #, draft
 msgid "It works."
 msgstr "Работи."
@@ -2861,7 +2919,7 @@ msgstr "вид"
 msgid "Kind"
 msgstr "Вид"
 
-#: src/postulo/plugins/models.py:39
+#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:39
 #, draft
 msgid "label"
 msgstr "етикет"
@@ -2917,7 +2975,12 @@ msgstr "Най-голяма прочетена страница"
 msgid "Last activity"
 msgstr "Последна активност"
 
-#: src/postulo/plugins/models.py:48
+#: src/postulo/documents/models.py:356
+#, draft
+msgid "last attempt"
+msgstr "последен опит"
+
+#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:48
 #, draft
 msgid "last error"
 msgstr "последна грешка"
@@ -2992,6 +3055,11 @@ msgstr "връзка"
 #, draft
 msgid "Link"
 msgstr "Връзка"
+
+#: src/postulo/documents/models.py:351
+#, draft
+msgid "link in the store"
+msgstr "връзка в хранилището"
 
 #: src/postulo/accounts/models.py:182 src/postulo/jobs/models.py:241
 #, draft
@@ -3330,6 +3398,11 @@ msgstr "Най-ново резервно копие"
 msgid "Next"
 msgstr "Напред"
 
+#: src/postulo/documents/models.py:354
+#, draft
+msgid "next attempt"
+msgstr "следващ опит"
+
 #: src/postulo/applications/tables.py:98
 #, draft
 msgid "Next interview"
@@ -3361,7 +3434,7 @@ msgstr "Още няма компании. Създават се за вас, к�
 msgid "no company"
 msgstr "без компания"
 
-#: src/postulo/templates/connections/list.html:61
+#: src/postulo/templates/connections/list.html:68
 #, draft
 msgid "No connections yet"
 msgstr "Още няма връзки"
@@ -3376,6 +3449,12 @@ msgstr "Още няма мотивационни писма."
 msgid "No CVs yet"
 msgstr "Още няма CV-та"
 
+#: src/postulo/documents/views.py:336
+#, draft
+msgid "No document store is connected. Add one under Settings → Connections."
+msgstr ""
+"Не е свързано хранилище за документи. Добавете такова в Настройки → Връзки."
+
 #: src/postulo/templates/jobs/industry_list.html:51
 #, draft
 msgid "No industries yet. They appear as you describe companies."
@@ -3386,7 +3465,7 @@ msgstr "Още няма отрасли. Появяват се, докато оп
 msgid "No installed plugin needs a connection."
 msgstr "Никоя инсталирана добавка не се нуждае от връзка."
 
-#: src/postulo/templates/connections/list.html:73
+#: src/postulo/templates/connections/list.html:80
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3486,6 +3565,11 @@ msgstr "още няма"
 #, draft
 msgid "Normal"
 msgstr "Нормален"
+
+#: src/postulo/documents/models.py:307
+#, draft
+msgid "Not accepted"
+msgstr "Не е прието"
 
 #: src/postulo/templates/403.html:4 src/postulo/templates/403.html:9
 #, draft
@@ -3634,7 +3718,7 @@ msgstr "Още нищо в това CV. Изберете записи по-до�
 msgid "Nothing recorded against this one yet."
 msgstr "Още нищо записано за тази."
 
-#: src/postulo/templates/documents/application_documents.html:40
+#: src/postulo/templates/documents/application_documents.html:42
 #, draft
 msgid "Nothing recorded for this application yet."
 msgstr "Още нищо записано за тази кандидатура."
@@ -3668,7 +3752,7 @@ msgstr ""
 msgid "Nothing scheduled."
 msgstr "Нищо насрочено."
 
-#: src/postulo/templates/documents/rendered_list.html:54
+#: src/postulo/templates/documents/rendered_list.html:58
 #, draft
 msgid "Nothing sent yet."
 msgstr "Още нищо изпратено."
@@ -3678,7 +3762,7 @@ msgstr "Още нищо изпратено."
 msgid "Nothing to chase."
 msgstr "Нищо за напомняне."
 
-#: src/postulo/templates/connections/list.html:71
+#: src/postulo/templates/connections/list.html:78
 #, draft
 msgid "Nothing to connect to"
 msgstr "Няма към какво да се свържете"
@@ -3693,7 +3777,14 @@ msgstr "Нищо за решаване"
 msgid "Nothing to measure yet"
 msgstr "Още нищо за измерване"
 
-#: src/postulo/templates/documents/upload_list.html:46
+#: src/postulo/plugins/views.py:214
+#, python-format, draft
+msgid ""
+"Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
+msgstr ""
+"Няма какво да се постави на опашка: всеки документ от избраните видове вече е в списъка за %(label)s."
+
+#: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
 msgstr "Още нищо качено."
@@ -3703,7 +3794,7 @@ msgstr "Още нищо качено."
 msgid "Nothing waiting"
 msgstr "Нищо не чака"
 
-#: src/postulo/documents/views.py:100 src/postulo/documents/views.py:116
+#: src/postulo/documents/views.py:101 src/postulo/documents/views.py:117
 #, draft
 msgid "Nothing was added."
 msgstr "Нищо не беше добавено."
@@ -3787,7 +3878,7 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Едно прихващане чака преглед"
 msgstr[1] "%(counter)s прихващания чакат преглед"
 
-#: src/postulo/templates/connections/list.html:63
+#: src/postulo/templates/connections/list.html:70
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -3980,7 +4071,7 @@ msgstr ""
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr "Поставете текста. Обявите изчезват от мрежата; вашето копие — не."
 
-#: src/postulo/documents/views.py:174
+#: src/postulo/documents/views.py:175
 #, draft
 msgid "PDF created."
 msgstr "PDF е създаден."
@@ -4322,6 +4413,11 @@ msgstr "Връщане обратно"
 msgid "qualification"
 msgstr "квалификация"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Queue every document you already have for this store."
+msgstr "Поставя на опашка всеки документ, който вече имате, за това хранилище."
+
 #: src/postulo/templates/server/overview.html:22
 #, draft
 msgid "Queued tasks"
@@ -4482,7 +4578,7 @@ msgstr "записано от"
 msgid "recorded on"
 msgstr "записано на"
 
-#: src/postulo/documents/views.py:370
+#: src/postulo/documents/views.py:430
 #, draft
 msgid "Recorded what you sent."
 msgstr "Изпратеното е записано."
@@ -4571,7 +4667,7 @@ msgid "Remote"
 msgstr "Дистанционно"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:52
+#: src/postulo/templates/connections/list.html:59
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -4901,6 +4997,11 @@ msgstr "Изпращане на тестово съобщение"
 msgid "Send a test message to"
 msgstr "Изпращане на тестово съобщение до"
 
+#: src/postulo/templates/connections/list.html:54
+#, draft
+msgid "Send everything"
+msgstr "Изпращане на всичко"
+
 #: src/postulo/templates/api/token_list.html:94
 #, draft
 msgid "Send it as a bearer token. To check that one works, and see its scopes:"
@@ -4911,6 +5012,11 @@ msgstr ""
 #, draft
 msgid "Send to"
 msgstr "Изпращане до"
+
+#: src/postulo/templates/documents/partials/copies.html:20
+#, draft
+msgid "Send to stores now"
+msgstr "Изпращане към хранилищата сега"
 
 #: src/postulo/core/server_views.py:426
 #, python-format, draft
@@ -4923,7 +5029,7 @@ msgstr "Изпращането се провали: %(error)s"
 msgid "Sent"
 msgstr "Изпратено"
 
-#: src/postulo/documents/models.py:291
+#: src/postulo/documents/models.py:291 src/postulo/documents/models.py:336
 #, draft
 msgid "sent document"
 msgstr "изпратен документ"
@@ -4940,6 +5046,11 @@ msgstr "изпратени документи"
 #, draft
 msgid "Sent documents"
 msgstr "Изпратени документи"
+
+#: src/postulo/documents/models.py:357
+#, draft
+msgid "sent on"
+msgstr "изпратено на"
 
 #: src/postulo/core/server_views.py:429 src/postulo/notifications/email.py:80
 #, python-format, draft
@@ -5221,7 +5332,8 @@ msgstr "Състояние"
 msgid "Status"
 msgstr "Статус"
 
-#: src/postulo/applications/models.py:197 src/postulo/jobs/models.py:552
+#: src/postulo/applications/models.py:197 src/postulo/documents/models.py:348
+#: src/postulo/jobs/models.py:552
 #, draft
 msgid "status"
 msgstr "статус"
@@ -5248,7 +5360,12 @@ msgstr "Статусът е обновен."
 msgid "Still live"
 msgstr "Още активна"
 
-#: src/postulo/plugins/forms.py:43
+#: src/postulo/documents/models.py:328
+#, draft
+msgid "store"
+msgstr "хранилище"
+
+#: src/postulo/plugins/forms.py:47
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Съхранено; оставете празно, за да запазите текущата стойност."
@@ -5360,7 +5477,7 @@ msgstr "Шаблоните се появяват, когато изпращат�
 msgid "Test"
 msgstr "Тест"
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:187
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Тестът се провали: %(message)s"
@@ -5474,7 +5591,7 @@ msgstr "Тази страница върна %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Тази снимка е над 5 MB. По-малка, моля."
 
-#: src/postulo/plugins/views.py:172
+#: src/postulo/plugins/views.py:173
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Тази добавка вече не е инсталирана."
@@ -5483,6 +5600,11 @@ msgstr "Тази добавка вече не е инсталирана."
 #, python-format, draft
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "PDF модулът %(name)s е конфигуриран, но не е използваем. %(hint)s"
+
+#: src/postulo/documents/archiving.py:106
+#, python-format, draft
+msgid "The %(plugin)s plugin is not installed."
+msgstr "Приставката %(plugin)s не е инсталирана."
 
 #: src/postulo/jobs/models.py:402
 #, draft
@@ -5500,6 +5622,16 @@ msgstr ""
 #, draft
 msgid "The company you are applying to"
 msgstr "Компанията, в която кандидатствате"
+
+#: src/postulo/documents/archiving.py:102
+#, draft
+msgid "The connection is gone or switched off."
+msgstr "Връзката липсва или е изключена."
+
+#: src/postulo/documents/views.py:341
+#, draft
+msgid "The copy could not be sent; the document says why."
+msgstr "Копието не можа да бъде изпратено; документът показва защо."
 
 #: src/postulo/templates/settings/appearance.html:29
 #, draft
@@ -5666,6 +5798,11 @@ msgstr "Тема: %(current)s. Превключване към: %(next)s."
 msgid "Then delete"
 msgstr "После изтриване"
 
+#: src/postulo/documents/archiving.py:109
+#, draft
+msgid "There is no file to send."
+msgstr "Няма файл за изпращане."
+
 #: src/postulo/plugins/fetching.py:84
 #, draft
 msgid "There is nothing at that address (404). Check the link."
@@ -5697,6 +5834,7 @@ msgstr "Не се явиха"
 msgid "This identifier is already listed."
 msgstr "Този идентификатор вече е в списъка."
 
+#: src/postulo/documents/stores.py:98
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -5967,7 +6105,7 @@ msgstr "Качване и съпоставяне на колоните"
 msgid "Uploaded"
 msgstr "Качено"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:232 src/postulo/documents/models.py:344
 #, draft
 msgid "uploaded document"
 msgstr "качен документ"
@@ -6099,6 +6237,11 @@ msgstr "Чака преглед"
 #, draft
 msgid "Waiting on a reply"
 msgstr "Чака отговор"
+
+#: src/postulo/documents/models.py:304
+#, draft
+msgid "Waiting to be sent"
+msgstr "Чака изпращане"
 
 #: src/postulo/templates/core/import_csv_map.html:78
 #, python-format, draft

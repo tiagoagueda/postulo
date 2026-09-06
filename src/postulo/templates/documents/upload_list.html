@@ -28,6 +28,8 @@
                 · {{ document.created_at|date:"j M Y" }}
                 {% if not document.is_current %} · {% translate "superseded" %}{% endif %}
               </p>
+              {% url 'documents:upload_archive' document.pk as send_url %}
+              {% include "documents/partials/copies.html" with document=document send_url=send_url %}
             </div>
             <a href="{% url 'documents:upload_download' document.pk %}"
                class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>

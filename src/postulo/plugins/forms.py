@@ -22,6 +22,10 @@ def kind_specs(kind: str) -> list[FieldSpec]:
         from postulo.notifications.base import event_specs
 
         return event_specs()
+    if kind == "store":
+        from postulo.documents.stores import kind_specs as document_kind_specs
+
+        return document_kind_specs()
     return []
 
 

@@ -5,7 +5,8 @@ few minutes apart is the right size: run it from the host's cron, or as the ``sc
 service in the Compose file, which runs it in a loop. Each pass announces the reminders
 that have fallen due and the applications that have gone quiet. Each is announced once;
 the stamp survives whether or not the person had a notifier at the time, so adding one
-later does not replay a month of old reminders.
+later does not replay a month of old reminders. The same pass sends the copies of
+documents that are waiting for an external store, and retries the ones that failed.
 """
 
 from __future__ import annotations
@@ -74,17 +75,23 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options) -> None:
         from postulo.applications.quiet import announce_quiet_applications
+        from postulo.documents.archiving import send_pending
 
         while True:
             stamped, delivered = announce_due_reminders()
             quiet, told = announce_quiet_applications()
+            copies_sent, copies_failed = send_pending()
             when = f"{timezone.now():%Y-%m-%d %H:%M}"
             if stamped:
                 self.stdout.write(f"{when} {stamped} reminders due, {delivered} deliveries")
             if quiet:
                 self.stdout.write(f"{when} {quiet} applications gone quiet, {told} deliveries")
+            if copies_sent or copies_failed:
+                self.stdout.write(
+                    f"{when} {copies_sent} document copies sent, {copies_failed} failed"
+                )
             if not options["loop"]:
-                if not stamped and not quiet:
+                if not stamped and not quiet and not copies_sent and not copies_failed:
                     self.stdout.write("Nothing due.")
                 return
             time.sleep(max(options["every"], 10))

@@ -149,6 +149,22 @@ def letter_text(letter: CoverLetter, application=None) -> str:
     return f"{subject}\n\n{body}".strip()
 
 
+def _keep(document: RenderedDocument, filename: str, content: bytes) -> None:
+    """Write the PDF to the local store — the one every document is in, always.
+
+    External stores get their copies once the document is saved, through the scheduler.
+    """
+    from .stores import LocalStore, metadata_for
+
+    LocalStore().put(
+        document,
+        ContentFile(content),
+        metadata_for(document, filename=filename),
+        {},
+        document.owner,
+    )
+
+
 def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
     """Freeze a CV as a PDF, exactly as it stands now.
 
@@ -168,7 +184,7 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
         source_text=html,
         checksum=RenderedDocument.checksum_for(content),
     )
-    document.file.save(f"{slugify(cv.name) or 'cv'}.pdf", ContentFile(content), save=False)
+    _keep(document, f"{slugify(cv.name) or 'cv'}.pdf", content)
     document.save()
     return document
 
@@ -188,8 +204,6 @@ def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> R
         source_text=letter_text(letter, application),
         checksum=RenderedDocument.checksum_for(content),
     )
-    document.file.save(
-        f"{slugify(letter.name) or 'cover-letter'}.pdf", ContentFile(content), save=False
-    )
+    _keep(document, f"{slugify(letter.name) or 'cover-letter'}.pdf", content)
     document.save()
     return document

@@ -27,7 +27,11 @@
         <tbody>
           {% for document in documents %}
             <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
-              <td class="px-4 py-3">{{ document.title }}</td>
+              <td class="px-4 py-3">
+                {{ document.title }}
+                {% url 'documents:rendered_archive' document.pk as send_url %}
+                {% include "documents/partials/copies.html" with document=document send_url=send_url %}
+              </td>
               <td class="px-4 py-3">
                 {% if document.application %}
                   <a href="{{ document.application.get_absolute_url }}" class="hover:underline">

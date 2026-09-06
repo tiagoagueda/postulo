@@ -54,6 +54,31 @@ class ImportReport:
         ]
 
 
+def _restore_copies(user, entries: list, **document) -> None:
+    """Keep the references to copies in external stores, with no connection behind them.
+
+    The archive says where a document went; the connection that took it there is a
+    secret-bearing thing the person recreates by hand. The reference survives on its own.
+    """
+    from postulo.documents.models import DocumentCopy
+
+    for entry in entries or []:
+        if not isinstance(entry, dict) or not entry.get("store"):
+            continue
+        DocumentCopy.objects.create(
+            owner=user,
+            connection=None,
+            store=str(entry.get("store", ""))[:60],
+            label=str(entry.get("label", ""))[:100],
+            status="sent",
+            external_id=str(entry.get("external_id", ""))[:500],
+            external_url=str(entry.get("external_url", ""))[:500],
+            sent_at=_dt(entry.get("sent_at")),
+            next_attempt_at=None,
+            **document,
+        )
+
+
 def _dt(value):
     return parse_datetime(value) if value else None
 
@@ -382,6 +407,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         replaces_id = upload_entry.pop("replaces_id", None)
         stored_name = upload_entry.pop("file", "")
         upload_entry.pop("created_at", None)
+        copies = upload_entry.pop("copies", [])
 
         upload = UploadedDocument(owner=user, **upload_entry)
         content = _extract(archive, stored_name)
@@ -390,6 +416,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         else:
             upload.file.save(stored_name.rsplit("/", 1)[-1], ContentFile(content), save=False)
         upload.save()
+        _restore_copies(user, copies, upload=upload)
         uploads[old_id] = upload
         report.uploads += 1
         if replaces_id:
@@ -408,6 +435,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         cv = cvs.get(sent_entry.pop("cv_id", None))
         letter = letters.get(sent_entry.pop("cover_letter_id", None))
         rendered_at = _dt(sent_entry.pop("rendered_at", None))
+        copies = sent_entry.pop("copies", [])
 
         sent = RenderedDocument(
             owner=user,
@@ -424,6 +452,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         else:
             sent.file.save(stored_name.rsplit("/", 1)[-1], ContentFile(content), save=False)
         sent.save()
+        _restore_copies(user, copies, rendered=sent)
         report.sent_documents += 1
 
     # ----------------------------------------------------------------- captures

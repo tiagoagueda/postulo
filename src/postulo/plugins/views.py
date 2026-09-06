@@ -80,6 +80,7 @@ class ConnectionListView(OwnedObjectMixin, ListView):
                     "plugin": plugin,
                     "kind_label": KIND_LABELS.get(connection.kind, connection.kind),
                     "summary": _summary(plugin, connection),
+                    "is_store": connection.kind == "store",
                 }
             )
         context["rows"] = rows
@@ -184,6 +185,38 @@ class ConnectionTestView(OwnedObjectMixin, View):
             messages.success(request, message or _("It works."))
         else:
             messages.error(request, _("Test failed: %(message)s") % {"message": message})
+        return redirect("connections:list")
+
+
+class ConnectionBackfillView(OwnedObjectMixin, View):
+    """*Send everything*: offer every existing document to a store connected later."""
+
+    def get_queryset(self):
+        return Connection.objects.for_user(self.request.user).of_kind("store")
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        from postulo.documents.archiving import backfill
+
+        connection = get_object_or_404(self.get_queryset(), pk=pk)
+        count = backfill(connection)
+        if count:
+            messages.success(
+                request,
+                _(
+                    "%(count)d documents are queued for %(label)s. The scheduler sends "
+                    "them on its next pass; each document shows how that went."
+                )
+                % {"count": count, "label": connection.label},
+            )
+        else:
+            messages.info(
+                request,
+                _(
+                    "Nothing to queue: every document of the chosen kinds is already listed for "
+                    "%(label)s."
+                )
+                % {"label": connection.label},
+            )
         return redirect("connections:list")
 
 

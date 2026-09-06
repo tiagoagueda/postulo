@@ -355,20 +355,20 @@ def build_document(user) -> dict:
     ]
     document["documents"]["uploads"] = [
         {
-            **_fields(
-                upload, ("id", "title", "kind", "notes", "version", "replaces_id", "created_at")
-            ),
+            **_fields(upload, UPLOAD_FIELDS),
             "file": f"{MEDIA_PREFIX}{upload.file.name}" if upload.file else "",
+            "copies": _copies(upload),
         }
-        for upload in UploadedDocument.objects.for_user(user)
+        for upload in UploadedDocument.objects.for_user(user).prefetch_related("copies")
     ]
     document["documents"]["sent"] = [
         {
             **_fields(sent, SENT_FIELDS),
             "file": f"{MEDIA_PREFIX}{sent.file.name}" if sent.file else "",
             "source_text": sent.source_text,
+            "copies": _copies(sent),
         }
-        for sent in RenderedDocument.objects.for_user(user)
+        for sent in RenderedDocument.objects.for_user(user).prefetch_related("copies")
     ]
 
     document["captures"] = [
@@ -399,6 +399,25 @@ def build_document(user) -> dict:
         "captures": len(document["captures"]),
     }
     return document
+
+
+def _copies(document) -> list[dict]:
+    """Where copies of this document went: the references external stores handed back.
+
+    Only copies that arrived are worth carrying; a pending or failed one is a state of
+    this instance, not a fact about the archive.
+    """
+    return [
+        {
+            "store": copy.store,
+            "label": copy.label,
+            "external_id": copy.external_id,
+            "external_url": copy.external_url,
+            "sent_at": copy.sent_at.isoformat() if copy.sent_at else None,
+        }
+        for copy in document.copies.all()
+        if copy.status == "sent"
+    ]
 
 
 def _media_paths(document: dict) -> list[str]:
