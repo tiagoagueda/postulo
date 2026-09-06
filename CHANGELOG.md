@@ -6,6 +6,30 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **The dashboard and Insights are one page, built from widgets you arrange.** They
+  answered the same question — *how is this going?* — at two distances, and you had to
+  remember which page held which number. Neither could be adjusted: the dashboard showed
+  everybody the same six counters, and Insights showed a response funnel to somebody with
+  three applications. Everything both pages held is now a **widget**: seventeen of them,
+  each knowing what it computes and which template draws it, registered from
+  ``AppConfig.ready`` the way settings sections and capture sources already are. What you
+  see and in what order is stored on your profile, and *Settings → Dashboard* arranges it
+  with buttons rather than dragging — arranging is done once and then not again, and a form
+  that posts works from a keyboard, with a screen reader and with scripts off. **Nothing
+  changes for anybody who never opens it**: the standard arrangement is exactly what the
+  dashboard showed before, in the same order, and a widget added in a later release joins
+  it by itself. Once you have arranged the page it is yours, and new widgets stay off until
+  you ask. What is stored is what you *chose*, which is the opposite way round from the
+  navigation and is what makes both of those true; never-arranged and arranged-to-nothing
+  are different values, so clearing the page stays cleared instead of handing the defaults
+  back. Several widgets read the same expensive pass over the event log, and it happens
+  once per page however many of them are on it. ``/applications/insights/`` redirects to
+  the dashboard, so a bookmark still lands. The browser suite checks a dashboard carrying
+  every widget at once, in both themes — markup that a walk of addresses can no longer
+  reach. (#44)
+
 ### Added
 
 - **The Europass import reads the current JSON format as well as the legacy XML.** The XML

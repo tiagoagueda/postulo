@@ -1,0 +1,16 @@
+{% load i18n %}
+<h2 class="mb-3 font-medium">{{ widget.label }}</h2>
+{% if insights.by_month %}
+  <div class="card">
+    <ul class="space-y-2 text-sm">
+      {% for month, count in insights.by_month %}
+        <li class="flex items-center justify-between gap-3">
+          <span class="tabular-nums text-ink-500 dark:text-ink-400">{{ month }}</span>
+          <span class="tabular-nums">{{ count }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% else %}
+  {% include "widgets/_nothing_yet.html" %}
+{% endif %}

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 20:07+0000\n"
+"POT-Creation-Date: 2026-09-06 20:31+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: polski\n"
@@ -59,7 +59,7 @@ msgstr[1] ""
 msgstr[2] ""
 "%(counter)s administratorów. Ostatniego nie można usunąć, dezaktywować ani skasować."
 
-#: src/postulo/templates/core/dashboard.html:82
+#: src/postulo/templates/widgets/gone_quiet.html:6
 #, python-format, draft
 msgid "%(counter)s application"
 msgid_plural "All %(counter)s"
@@ -91,7 +91,7 @@ msgstr[0] "%(counter)s plik, %(size)s"
 msgstr[1] "%(counter)s pliki, %(size)s"
 msgstr[2] "%(counter)s plików, %(size)s"
 
-#: src/postulo/templates/core/dashboard.html:220
+#: src/postulo/templates/widgets/upcoming_interviews.html:38
 #, python-format, draft
 msgid "%(counter)s interview has passed without an outcome. How did it go?"
 msgid_plural "%(counter)s interviews have passed without an outcome. How did they go?"
@@ -99,7 +99,7 @@ msgstr[0] "%(counter)s rozmowa minęła bez wyniku. Jak poszło?"
 msgstr[1] "%(counter)s rozmowy minęły bez wyniku. Jak poszło?"
 msgstr[2] "%(counter)s rozmów minęło bez wyniku. Jak poszło?"
 
-#: src/postulo/templates/core/dashboard.html:282
+#: src/postulo/templates/widgets/listings.html:10
 #, python-format, draft
 msgid "%(counter)s listing to decide on"
 msgid_plural "%(counter)s listings to decide on"
@@ -115,8 +115,8 @@ msgstr[0] "%(counter)s wynik dla „%(term)s”"
 msgstr[1] "%(counter)s wyniki dla „%(term)s”"
 msgstr[2] "%(counter)s wyników dla „%(term)s”"
 
-#: src/postulo/templates/applications/insights.html:269
-#: src/postulo/templates/applications/insights.html:283
+#: src/postulo/templates/widgets/durations.html:9
+#: src/postulo/templates/widgets/durations.html:23
 #, python-format, draft
 msgid "%(days)s day"
 msgid_plural "%(days)s days"
@@ -458,7 +458,7 @@ msgstr ""
 msgid "A company carries one identifier per scheme."
 msgstr "Firma ma jeden identyfikator na schemat."
 
-#: src/postulo/templates/applications/insights.html:223
+#: src/postulo/templates/widgets/industries.html:37
 #, draft
 msgid "A company in several industries counts in each of them."
 msgstr "Firma w kilku branżach liczy się w każdej z nich."
@@ -483,6 +483,11 @@ msgstr "Wskazówka dla interfejsu, na przykład „amber” lub „sky”."
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Linia pod nazwą na stronie logowania. Opcjonalna."
 
+#: src/postulo/applications/widgets.py:109
+#, draft
+msgid "A line when a plugin thinks something happened and is waiting for you."
+msgstr "Linijka, gdy wtyczka sądzi, że coś się wydarzyło, i czeka na Ciebie."
+
 #: src/postulo/templates/server/plugins.html:244
 #, python-format, draft
 msgid ""
@@ -497,7 +502,7 @@ msgid ""
 msgstr ""
 "Klucz dostępu jest związany z adresem, pod którym go utworzono, tutaj %(host)s. Dotarcie do tej instancji pod inną nazwą lub jej przeniesienie nie przeniesie kluczy dostępu."
 
-#: src/postulo/templates/core/dashboard.html:23
+#: src/postulo/templates/widgets/suggestions.html:6
 #, python-format, draft
 msgid ""
 "A plugin has suggested one thing that may have happened: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">look at it</a>."
@@ -570,7 +575,7 @@ msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr ""
 "Przypomnienie staje się wymagalne dzień wcześniej, jeśli jest dzień wcześniej."
 
-#: src/postulo/accounts/models.py:339
+#: src/postulo/accounts/models.py:351
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Podpowiedź, dla kogo to jest."
@@ -645,18 +650,18 @@ msgstr "Przyjmij"
 msgid "Accepted"
 msgstr "Zaakceptowana"
 
-#: src/postulo/accounts/models.py:353
+#: src/postulo/accounts/models.py:365
 #, draft
 msgid "accepted at"
 msgstr "zaakceptowano dnia"
 
-#: src/postulo/accounts/models.py:360
+#: src/postulo/accounts/models.py:372
 #, draft
 msgid "accepted by"
 msgstr "zaakceptowano przez"
 
-#: src/postulo/accounts/settings_views.py:72
-#: src/postulo/core/settings_sections.py:53
+#: src/postulo/accounts/settings_views.py:73
+#: src/postulo/core/settings_sections.py:60
 #: src/postulo/templates/settings/account.html:5
 #, draft
 msgid "Account"
@@ -698,13 +703,18 @@ msgid "Actions"
 msgstr "Działania"
 
 #: src/postulo/templates/applications/application_detail.html:289
-#: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:114
 #: src/postulo/templates/resume/overview.html:37
 #: src/postulo/templates/resume/overview.html:42
+#: src/postulo/templates/widgets/due_reminders.html:5
 #, draft
 msgid "Add"
 msgstr "Dodaj"
+
+#: src/postulo/templates/settings/dashboard.html:92
+#, python-format, draft
+msgid "Add %(name)s"
+msgstr "Dodaj %(name)s"
 
 #: src/postulo/templates/jobs/company_list.html:65
 #, draft
@@ -788,7 +798,7 @@ msgid ""
 msgstr ""
 "Dodano %(total)s pozycji. Nic nie zostało nadpisane; co okaże się powtórzeniem, usuniesz sam."
 
-#: src/postulo/applications/views.py:312 src/postulo/applications/views.py:662
+#: src/postulo/applications/views.py:312 src/postulo/applications/views.py:656
 #, draft
 msgid "Added to the timeline."
 msgstr "Dodano do osi czasu."
@@ -846,10 +856,15 @@ msgstr "Wszystkie %(ok)d odnośników wciąż odpowiada."
 msgid "All documents"
 msgstr "Wszystkie dokumenty"
 
-#: src/postulo/templates/core/dashboard.html:187
+#: src/postulo/templates/widgets/upcoming_interviews.html:5
 #, draft
 msgid "All interviews"
 msgstr "Wszystkie rozmowy"
+
+#: src/postulo/templates/widgets/listings.html:5
+#, draft
+msgid "All listings"
+msgstr "Wszystkie ogłoszenia"
 
 #: src/postulo/templates/server/overview.html:71
 #, draft
@@ -957,14 +972,14 @@ msgstr "API"
 msgid "API token"
 msgstr "Token API"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:88
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
 msgid "API tokens"
 msgstr "Tokeny API"
 
-#: src/postulo/accounts/settings_views.py:60
+#: src/postulo/accounts/settings_views.py:61
 #: src/postulo/core/settings_sections.py:39
 #: src/postulo/templates/settings/appearance.html:5
 #, draft
@@ -1030,7 +1045,7 @@ msgstr "Aplikacje"
 msgid "applications"
 msgstr "aplikacje"
 
-#: src/postulo/templates/applications/insights.html:298
+#: src/postulo/applications/widgets.py:270
 #, draft
 msgid "Applications by month"
 msgstr "Aplikacje według miesiąca"
@@ -1040,15 +1055,26 @@ msgstr "Aplikacje według miesiąca"
 msgid "Applications go quiet"
 msgstr "Aplikacje cichną"
 
-#: src/postulo/templates/applications/insights.html:44
+#: src/postulo/templates/widgets/insight_counters.html:17
 #, draft
 msgid "Applications sent"
 msgstr "Wysłane aplikacje"
 
-#: src/postulo/templates/applications/insights.html:115
+#: src/postulo/applications/widgets.py:187
+#, draft
+msgid ""
+"Applications sent, how many got any reply, how long a reply takes, offers."
+msgstr "Wysłane zgłoszenia, ile dostało odpowiedź, ile trwa odpowiedź, oferty."
+
+#: src/postulo/templates/widgets/interviews_summary.html:13
 #, draft
 msgid "Applications that reached one"
 msgstr "Aplikacje, które do tego doszły"
+
+#: src/postulo/applications/widgets.py:247
+#, draft
+msgid "Applications, replies and offers per company, with the ones gone quiet."
+msgstr "Zgłoszenia, odpowiedzi i oferty według firm, wraz z tymi, które ucichły."
 
 #: src/postulo/templates/accounts/delete_account.html:21
 #, draft
@@ -1063,7 +1089,7 @@ msgstr "Aplikacje z ich osiami czasu"
 msgid "Applied"
 msgstr "Wysłana"
 
-#: src/postulo/templates/core/dashboard.html:70
+#: src/postulo/templates/widgets/counters.html:17
 #, draft
 msgid "Applied in the last 30 days"
 msgstr "Wysłane w ostatnich 30 dniach"
@@ -1119,6 +1145,16 @@ msgstr "Zarchiwizowano"
 msgid "Are you sure?"
 msgstr "Na pewno?"
 
+#: src/postulo/templates/core/dashboard.html:31
+#, draft
+msgid "Arrange"
+msgstr "Uporządkuj"
+
+#: src/postulo/templates/core/dashboard.html:61
+#, draft
+msgid "Arrange it"
+msgstr "Uporządkuj go"
+
 #: src/postulo/applications/analytics.py:35
 #: src/postulo/applications/models.py:44
 #, draft
@@ -1170,6 +1206,11 @@ msgstr "Znów w twoich ofertach."
 #, draft
 msgid "Back to People"
 msgstr "Wróć do Osób"
+
+#: src/postulo/templates/settings/dashboard.html:110
+#, draft
+msgid "Back to the standard arrangement"
+msgstr "Powrót do układu standardowego"
 
 #: src/postulo/core/views_tables.py:25
 #, draft
@@ -1226,7 +1267,7 @@ msgstr "Wczytanie arkusza kalkulacyjnego"
 msgid "built in"
 msgstr "wbudowane"
 
-#: src/postulo/templates/applications/insights.html:189
+#: src/postulo/applications/widgets.py:258
 #, draft
 msgid "By industry"
 msgstr "Według branży"
@@ -1314,7 +1355,7 @@ msgstr "Przechwyć"
 msgid "capture"
 msgstr "przechwycenie"
 
-#: src/postulo/templates/core/dashboard.html:47
+#: src/postulo/templates/core/dashboard.html:33
 #: src/postulo/templates/jobs/capture_form.html:4
 #: src/postulo/templates/jobs/capture_form.html:8
 #: src/postulo/templates/jobs/capture_list.html:20
@@ -1523,7 +1564,7 @@ msgstr "Wybierz przynajmniej jeden dokument do zapisania."
 msgid "Choose what kind of identifier this is."
 msgstr "Wybierz, jakiego rodzaju to identyfikator."
 
-#: src/postulo/applications/views.py:658
+#: src/postulo/applications/views.py:652
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Najpierw wybierz, której aplikacji to dotyczy."
@@ -1585,6 +1626,11 @@ msgstr "Termin zamknięcia"
 msgid "closing date"
 msgstr "termin zamknięcia"
 
+#: src/postulo/templates/widgets/listings.html:22
+#, python-format, draft
+msgid "Closing this week: %(total)s"
+msgstr "Kończą się w tym tygodniu: %(total)s"
+
 #: src/postulo/resume/models.py:203
 #, draft
 msgid "Code (GitHub, GitLab…)"
@@ -1615,12 +1661,12 @@ msgstr "Kolumny"
 msgid "Columns saved."
 msgstr "Zapisano kolumny."
 
-#: src/postulo/templates/core/dashboard.html:185
+#: src/postulo/applications/widgets.py:147
 #, draft
 msgid "Coming up"
 msgstr "Nadchodzące"
 
-#: src/postulo/core/navigation.py:76 src/postulo/core/search.py:386
+#: src/postulo/core/navigation.py:75 src/postulo/core/search.py:386
 #: src/postulo/templates/core/export.html:19
 #: src/postulo/templates/jobs/company_list.html:4
 #: src/postulo/templates/jobs/company_list.html:58
@@ -1643,7 +1689,7 @@ msgstr "Firmy i kontakty"
 msgid "Companies created"
 msgstr "Utworzone firmy"
 
-#: src/postulo/templates/core/dashboard.html:276
+#: src/postulo/templates/widgets/shortcuts.html:15
 #, draft
 msgid "Companies you have applied to"
 msgstr "Firmy, do których aplikowałeś"
@@ -1743,7 +1789,7 @@ msgstr "Usunięto połączenie razem z sekretami."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Zapisano połączenie. Przetestuj je, żeby upewnić się, że działa."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:88
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
 #: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
 #: src/postulo/plugins/views.py:249
 #: src/postulo/templates/connections/list.html:7
@@ -1837,7 +1883,7 @@ msgstr "Nie udało się pobrać: %(error)s"
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Nie udało się odczytać %(site)s: %(error)s"
 
-#: src/postulo/templates/applications/insights.html:132
+#: src/postulo/templates/widgets/interviews_summary.html:30
 #, draft
 msgid ""
 "Counted from the timeline, so interviews recorded before the diary existed are in."
@@ -1881,13 +1927,13 @@ msgstr "Utwórz zaproszenie"
 msgid "created"
 msgstr "utworzono"
 
-#: src/postulo/accounts/models.py:283 src/postulo/accounts/models.py:350
+#: src/postulo/accounts/models.py:295 src/postulo/accounts/models.py:362
 #: src/postulo/core/models.py:18
 #, draft
 msgid "created at"
 msgstr "utworzono dnia"
 
-#: src/postulo/accounts/models.py:348
+#: src/postulo/accounts/models.py:360
 #, draft
 msgid "created by"
 msgstr "utworzono przez"
@@ -1944,11 +1990,18 @@ msgstr "CV"
 msgid "Dark"
 msgstr "Ciemny"
 
-#: src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:113 src/postulo/core/navigation.py:42
+#: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
+#: src/postulo/templates/settings/dashboard.html:5
 #, draft
 msgid "Dashboard"
 msgstr "Pulpit"
+
+#: src/postulo/accounts/models.py:276
+#, draft
+msgid "dashboard widgets"
+msgstr "widżety pulpitu"
 
 #: src/postulo/templates/server/overview.html:29
 #, draft
@@ -1997,7 +2050,14 @@ msgstr "dzień / miesiąc / rok (31/12/2026)"
 msgid "days"
 msgstr "dni"
 
-#: src/postulo/accounts/models.py:280
+#: src/postulo/applications/widgets.py:223
+#, draft
+msgid ""
+"Days to a first reply and to a first interview: fastest, median, slowest."
+msgstr ""
+"Dni do pierwszej odpowiedzi i do pierwszej rozmowy: najszybciej, mediana, najwolniej."
+
+#: src/postulo/accounts/models.py:292
 #, draft
 msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
@@ -2101,7 +2161,7 @@ msgstr "Odrzuć"
 msgid "Declined"
 msgstr "Odrzucone"
 
-#: src/postulo/applications/views.py:650
+#: src/postulo/applications/views.py:644
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Odrzucone. Nie będzie sugerowane ponownie."
@@ -2259,7 +2319,7 @@ msgstr "kopia dokumentu"
 msgid "Document stores"
 msgstr "Magazyny dokumentów"
 
-#: src/postulo/core/navigation.py:66 src/postulo/documents/apps.py:9
+#: src/postulo/core/navigation.py:65 src/postulo/documents/apps.py:9
 #: src/postulo/templates/applications/application_detail.html:167
 #: src/postulo/templates/documents/application_documents.html:4
 #: src/postulo/templates/documents/application_documents.html:10
@@ -2280,7 +2340,7 @@ msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:305
 #: src/postulo/templates/applications/reminder_list.html:45
-#: src/postulo/templates/core/dashboard.html:250
+#: src/postulo/templates/widgets/due_reminders.html:23
 #, draft
 msgid "Done"
 msgstr "Zrobione"
@@ -2320,7 +2380,7 @@ msgstr "Pobierz szablon"
 msgid "Draft"
 msgstr "Szkic"
 
-#: src/postulo/templates/core/dashboard.html:230
+#: src/postulo/applications/widgets.py:160
 #, draft
 msgid "Due now"
 msgstr "Do zrobienia teraz"
@@ -2341,7 +2401,7 @@ msgid ""
 "Each is written in itself, so you can find yours without reading this one."
 msgstr "Każdy zapisany jest w sobie samym, byś znalazł swój bez czytania tego."
 
-#: src/postulo/templates/applications/insights.html:100
+#: src/postulo/templates/widgets/funnel.html:26
 #, draft
 msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
@@ -2406,7 +2466,7 @@ msgstr ""
 msgid "Email"
 msgstr "E-mail"
 
-#: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
+#: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:346
 #: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:311
 #, draft
 msgid "email address"
@@ -2635,7 +2695,7 @@ msgstr "Wygasa"
 msgid "expires"
 msgstr "wygasa"
 
-#: src/postulo/accounts/models.py:351
+#: src/postulo/accounts/models.py:363
 #, draft
 msgid "expires at"
 msgstr "wygasa o"
@@ -2652,10 +2712,8 @@ msgid ""
 msgstr ""
 "Wyjaśnienie, co poszło nie tak, często oznacza wskazanie, którego połączenia, której firmy lub którego dokumentu dotyczyło. Nie ma tu treści żadnego dokumentu, ale traktuj tę stronę jak resztę instancji, zanim cokolwiek z niej udostępnisz."
 
-#: src/postulo/templates/applications/insights.html:14
-#: src/postulo/templates/base.html:91
-#: src/postulo/templates/core/dashboard.html:298
-#: src/postulo/templates/core/export.html:8
+#: src/postulo/templates/base.html:91 src/postulo/templates/core/export.html:8
+#: src/postulo/templates/widgets/shortcuts.html:21
 #, draft
 msgid "Export everything"
 msgstr "Eksportuj wszystko"
@@ -2685,7 +2743,7 @@ msgstr "Nie powiodło się bez podania przyczyny."
 msgid "Fair"
 msgstr "Targi"
 
-#: src/postulo/templates/applications/insights.html:267
+#: src/postulo/templates/widgets/durations.html:7
 #, draft
 msgid "Fastest"
 msgstr "Najszybciej"
@@ -2712,7 +2770,7 @@ msgstr ""
 msgid "field of study"
 msgstr "kierunek studiów"
 
-#: src/postulo/templates/applications/insights.html:21
+#: src/postulo/templates/widgets/_nothing_yet.html:3
 #, draft
 msgid "Figures appear once you have applied for something."
 msgstr "Liczby pojawią się, gdy gdzieś zaaplikujesz."
@@ -2823,7 +2881,7 @@ msgid "Follow-up recorded."
 msgstr "Zapisano ponaglenie."
 
 #: src/postulo/applications/models.py:290 src/postulo/applications/views.py:391
-#: src/postulo/templates/core/dashboard.html:116
+#: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
 msgstr "Ponaglono"
@@ -2972,13 +3030,13 @@ msgid "Get"
 msgstr "Pobierz"
 
 #: src/postulo/applications/models.py:49
-#: src/postulo/templates/applications/insights.html:250
-#: src/postulo/templates/core/dashboard.html:131
+#: src/postulo/templates/widgets/gone_quiet.html:55
+#: src/postulo/templates/widgets/outcomes.html:18
 #, draft
 msgid "Ghosted"
 msgstr "Bez odpowiedzi"
 
-#: src/postulo/templates/applications/insights.html:255
+#: src/postulo/templates/widgets/outcomes.html:23
 #, draft
 msgid ""
 "Ghosted is counted separately from rejected on purpose. An employer who stopped replying did not turn you down; they never said."
@@ -2995,14 +3053,14 @@ msgstr "Nadaj tokenowi nazwę i przynajmniej jeden zakres."
 msgid "Go back"
 msgstr "Wróć"
 
+#: src/postulo/applications/widgets.py:134
 #: src/postulo/templates/applications/partials/filters.html:43
-#: src/postulo/templates/core/dashboard.html:79
 #: src/postulo/templates/settings/appearance.html:42
 #, draft
 msgid "Gone quiet"
 msgstr "Ucichła"
 
-#: src/postulo/templates/applications/insights.html:184
+#: src/postulo/templates/widgets/sources.html:50
 #, draft
 msgid "Gone quiet at:"
 msgstr "Cicho od:"
@@ -3012,7 +3070,7 @@ msgstr "Cicho od:"
 msgid "Good"
 msgstr "Dobre"
 
-#: src/postulo/templates/applications/insights.html:50
+#: src/postulo/templates/widgets/insight_counters.html:23
 #, draft
 msgid "Got any reply"
 msgstr "Dostała jakąkolwiek odpowiedź"
@@ -3022,12 +3080,12 @@ msgstr "Dostała jakąkolwiek odpowiedź"
 msgid "grade"
 msgstr "ocena"
 
-#: src/postulo/accounts/models.py:274
+#: src/postulo/accounts/models.py:286
 #, draft
 msgid "Gravatar checked on"
 msgstr "Gravatar sprawdzono dnia"
 
-#: src/postulo/accounts/models.py:272
+#: src/postulo/accounts/models.py:284
 #, draft
 msgid "Gravatar copy"
 msgstr "Kopia z Gravatara"
@@ -3128,21 +3186,42 @@ msgstr "Strona domowa"
 msgid "Hospitality and tourism"
 msgstr "Hotelarstwo i turystyka"
 
+#: src/postulo/jobs/widgets.py:44
+#, draft
+msgid "How choosy you have been"
+msgstr "Jak bardzo byłeś wybredny"
+
 #: src/postulo/templates/applications/application_detail.html:250
 #: src/postulo/templates/applications/interview_list.html:71
 #, draft
 msgid "How did it go?"
 msgstr "Jak poszło?"
 
-#: src/postulo/templates/applications/insights.html:77
+#: src/postulo/applications/widgets.py:198
 #, draft
 msgid "How far things got"
 msgstr "Jak daleko zaszło"
 
-#: src/postulo/templates/applications/insights.html:263
+#: src/postulo/applications/widgets.py:222
 #, draft
 msgid "How long they take"
 msgstr "Jak długo to trwa"
+
+#: src/postulo/applications/widgets.py:199
+#, draft
+msgid "How many applications ever reached each stage, read from the timeline."
+msgstr ""
+"Ile zgłoszeń kiedykolwiek dotarło do każdego etapu, odczytane z osi czasu."
+
+#: src/postulo/applications/widgets.py:235
+#, draft
+msgid "How many applications reached one, how many were held, and of what kind."
+msgstr "Ile zgłoszeń doszło do rozmowy, ile się odbyło i jakiego rodzaju."
+
+#: src/postulo/applications/widgets.py:271
+#, draft
+msgid "How much you sent, month by month, so a quiet stretch is visible."
+msgstr "Ile wysyłałeś miesiąc po miesiącu, żeby cichy okres było widać."
 
 #: src/postulo/templates/core/import_csv_map.html:57
 #, draft
@@ -3307,7 +3386,7 @@ msgstr "Za 90 dni"
 msgid "In a year"
 msgstr "Za rok"
 
-#: src/postulo/templates/core/dashboard.html:62
+#: src/postulo/templates/widgets/counters.html:9
 #, draft
 msgid "In conversation"
 msgstr "W rozmowach"
@@ -3327,7 +3406,7 @@ msgstr "w %(kind)s wygenerowanym %(when)s"
 msgid "in the %(kind)s you sent to %(company)s on %(when)s"
 msgstr "w %(kind)s wysłanym do %(company)s dnia %(when)s"
 
-#: src/postulo/templates/applications/insights.html:119
+#: src/postulo/templates/widgets/interviews_summary.html:17
 #, draft
 msgid "In the diary"
 msgstr "W terminarzu"
@@ -3360,9 +3439,9 @@ msgstr "branże"
 msgid "industry"
 msgstr "branża"
 
-#: src/postulo/templates/applications/insights.html:195
 #: src/postulo/templates/jobs/industry_form.html:4
 #: src/postulo/templates/jobs/industry_form.html:8
+#: src/postulo/templates/widgets/industries.html:9
 #, draft
 msgid "Industry"
 msgstr "Branża"
@@ -3376,14 +3455,6 @@ msgstr "Zmieniono nazwę branży."
 #, draft
 msgid "Information technology"
 msgstr "Technologie informacyjne"
-
-#: src/postulo/core/navigation.py:63
-#: src/postulo/templates/applications/insights.html:4
-#: src/postulo/templates/applications/insights.html:9
-#: src/postulo/templates/core/dashboard.html:279
-#, draft
-msgid "Insights"
-msgstr "Statystyki"
 
 #: src/postulo/templates/server/plugins.html:189
 #, draft
@@ -3488,18 +3559,18 @@ msgstr "Na etapie rozmów"
 msgid "interviews"
 msgstr "rozmowy"
 
+#: src/postulo/applications/widgets.py:234
 #: src/postulo/templates/accounts/delete_account.html:22
 #: src/postulo/templates/applications/application_detail.html:203
-#: src/postulo/templates/applications/insights.html:104
-#: src/postulo/templates/applications/insights.html:146
-#: src/postulo/templates/applications/insights.html:198
 #: src/postulo/templates/applications/interview_list.html:4
 #: src/postulo/templates/applications/interview_list.html:9
+#: src/postulo/templates/widgets/industries.html:12
+#: src/postulo/templates/widgets/sources.html:12
 #, draft
 msgid "Interviews"
 msgstr "Rozmowy"
 
-#: src/postulo/accounts/models.py:366
+#: src/postulo/accounts/models.py:378
 #, draft
 msgid "invitation"
 msgstr "zaproszenie"
@@ -3523,7 +3594,7 @@ msgstr ""
 msgid "Invitation revoked."
 msgstr "Unieważniono zaproszenie."
 
-#: src/postulo/accounts/models.py:367
+#: src/postulo/accounts/models.py:379
 #, draft
 msgid "invitations"
 msgstr "zaproszenia"
@@ -3669,8 +3740,8 @@ msgstr "Język"
 msgid "language"
 msgstr "język"
 
-#: src/postulo/accounts/settings_views.py:66
-#: src/postulo/core/settings_sections.py:46
+#: src/postulo/accounts/settings_views.py:67
+#: src/postulo/core/settings_sections.py:53
 #: src/postulo/templates/settings/locale.html:5
 #, draft
 msgid "Language and time"
@@ -3892,6 +3963,13 @@ msgstr "odnośniki"
 msgid "links sent"
 msgstr "wysłane odnośniki"
 
+#: src/postulo/core/widgets_builtin.py:18
+#, draft
+msgid ""
+"Links to the places a job search goes back to: the board, CVs, companies."
+msgstr ""
+"Odnośniki do miejsc, do których wraca się w poszukiwaniach: tablica, CV, firmy."
+
 #: src/postulo/documents/forms.py:205
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
@@ -3918,9 +3996,15 @@ msgstr "Filtry ofert"
 #: src/postulo/templates/core/import_csv_done.html:15
 #: src/postulo/templates/jobs/listing_list.html:4
 #: src/postulo/templates/jobs/listing_list.html:9
+#: src/postulo/templates/widgets/shortcuts.html:18
 #, draft
 msgid "Listings"
 msgstr "Oferty"
+
+#: src/postulo/jobs/widgets.py:32
+#, draft
+msgid "Listings to decide on"
+msgstr "Ogłoszenia do rozstrzygnięcia"
 
 #: src/postulo/templates/core/search.html:23
 #, draft
@@ -4030,7 +4114,7 @@ msgstr "Mianuj administratorem"
 msgid "Manage"
 msgstr "Zarządzaj"
 
-#: src/postulo/templates/core/dashboard.html:301
+#: src/postulo/templates/widgets/shortcuts.html:24
 #, draft
 msgid "Manage tags"
 msgstr "Zarządzaj tagami"
@@ -4066,22 +4150,22 @@ msgstr "Może tworzyć konta"
 msgid "Media"
 msgstr "Media"
 
-#: src/postulo/templates/applications/insights.html:277
+#: src/postulo/templates/widgets/durations.html:17
 #, draft
 msgid "Median"
 msgstr "Mediana"
 
-#: src/postulo/templates/applications/insights.html:111
+#: src/postulo/templates/widgets/interviews_summary.html:9
 #, draft
 msgid "Median days to a first interview"
 msgstr "Mediana dni do pierwszej rozmowy"
 
-#: src/postulo/templates/applications/insights.html:56
+#: src/postulo/templates/widgets/insight_counters.html:29
 #, draft
 msgid "Median days to a reply"
 msgstr "Mediana dni do odpowiedzi"
 
-#: src/postulo/templates/applications/insights.html:292
+#: src/postulo/templates/widgets/durations.html:32
 #, draft
 msgid ""
 "Median rather than average: one employer taking four months should not move the number everyone else sets."
@@ -4156,6 +4240,16 @@ msgstr "Przenieś %(column)s w dół"
 #, python-format, draft
 msgid "Move %(column)s up"
 msgstr "Przenieś %(column)s w górę"
+
+#: src/postulo/templates/settings/dashboard.html:46
+#, python-format, draft
+msgid "Move %(name)s down"
+msgstr "Przesuń %(name)s w dół"
+
+#: src/postulo/templates/settings/dashboard.html:33
+#, python-format, draft
+msgid "Move %(name)s up"
+msgstr "Przesuń %(name)s w górę"
 
 #: src/postulo/templates/documents/cv_detail.html:54
 #: src/postulo/templates/resume/overview.html:103
@@ -4361,6 +4455,11 @@ msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
 "Nie podłączono żadnego magazynu dokumentów. Dodaj go w Ustawienia → Połączenia."
 
+#: src/postulo/templates/widgets/industries.html:41
+#, draft
+msgid "No industries recorded against the companies you have applied to."
+msgstr "Przy firmach, do których aplikowałeś, nie zapisano branż."
+
 #: src/postulo/templates/jobs/industry_list.html:51
 #, draft
 msgid "No industries yet. They appear as you describe companies."
@@ -4378,7 +4477,7 @@ msgid ""
 msgstr ""
 "Żadna zainstalowana wtyczka nie potrzebuje połączenia. Powiadamiacze, magazyny dokumentów i wtyczki synchronizacji pojawiają się tutaj, gdy operator którąś zainstaluje."
 
-#: src/postulo/templates/core/dashboard.html:214
+#: src/postulo/templates/widgets/upcoming_interviews.html:32
 #, draft
 msgid "No interviews in the diary."
 msgstr "Brak rozmów w terminarzu."
@@ -4458,6 +4557,11 @@ msgstr "nie — tylko istniejące konta"
 #, draft
 msgid "No-show"
 msgstr "Nieobecność"
+
+#: src/postulo/templates/widgets/durations.html:37
+#, draft
+msgid "Nobody has replied yet, so there is nothing to time."
+msgstr "Nikt jeszcze nie odpowiedział, więc nie ma czego mierzyć."
 
 #: src/postulo/templates/jobs/company_detail.html:143
 #, draft
@@ -4552,12 +4656,17 @@ msgstr "Jeszcze nie wysłano"
 msgid "Not set here — the environment or the default applies"
 msgstr "Nie ustawiono tutaj — obowiązuje środowisko lub wartość domyślna"
 
+#: src/postulo/templates/settings/dashboard.html:77
+#, python-format, draft
+msgid "Not shown · %(name)s"
+msgstr "Nie pokazywane · %(name)s"
+
 #: src/postulo/templates/connections/list.html:37
 #, draft
 msgid "not tested yet"
 msgstr "jeszcze nie testowano"
 
-#: src/postulo/accounts/models.py:339
+#: src/postulo/accounts/models.py:351
 #, draft
 msgid "note"
 msgstr "notatka"
@@ -4600,7 +4709,7 @@ msgstr "notatki"
 msgid "nothing"
 msgstr "nic"
 
-#: src/postulo/templates/core/dashboard.html:259
+#: src/postulo/templates/widgets/due_reminders.html:32
 #, draft
 msgid "Nothing due."
 msgstr "Nic nie jest wymagalne."
@@ -4610,7 +4719,7 @@ msgstr "Nic nie jest wymagalne."
 msgid "Nothing has been recorded yet"
 msgstr "Nic jeszcze nie zostało zapisane"
 
-#: src/postulo/templates/core/dashboard.html:147
+#: src/postulo/templates/widgets/gone_quiet.html:71
 #, python-format, draft
 msgid ""
 "Nothing has gone quiet for %(days)s days. Either you are on top of it, or it is time to send out a few more."
@@ -4699,8 +4808,8 @@ msgid "Nothing recorded for this application yet."
 msgstr "Dla tej aplikacji jeszcze nic nie zapisano."
 
 #: src/postulo/templates/applications/application_detail.html:195
-#: src/postulo/templates/applications/insights.html:228
-#: src/postulo/templates/core/dashboard.html:178
+#: src/postulo/templates/widgets/recent_activity.html:26
+#: src/postulo/templates/widgets/sources.html:56
 #, draft
 msgid "Nothing recorded yet."
 msgstr "Jeszcze nic nie zapisano."
@@ -4747,11 +4856,6 @@ msgstr "Nie ma z czym się połączyć"
 msgid "Nothing to decide"
 msgstr "Nic do rozstrzygnięcia"
 
-#: src/postulo/templates/applications/insights.html:19
-#, draft
-msgid "Nothing to measure yet"
-msgstr "Jeszcze nic do zmierzenia"
-
 #: src/postulo/plugins/views.py:215
 #, python-format, draft
 msgid ""
@@ -4780,6 +4884,11 @@ msgstr "Nic nie dodano."
 msgid "Nothing was installed."
 msgstr "Nic nie zostało zainstalowane."
 
+#: src/postulo/templates/settings/dashboard.html:68
+#, draft
+msgid "Nothing. The dashboard will offer to bring something back."
+msgstr "Nic. Pulpit zaproponuje, żeby coś przywrócić."
+
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
 #, draft
 msgid "Notifications"
@@ -4794,6 +4903,12 @@ msgstr "Powiadomienia są skonfigurowane"
 #, draft
 msgid "notified on"
 msgstr "powiadomiono dnia"
+
+#: src/postulo/jobs/widgets.py:45
+#, draft
+msgid ""
+"Of the listings you noticed, how many you applied to and how many you let go."
+msgstr "Z ogłoszeń, które zauważyłeś: do ilu aplikowałeś, a ile odpuściłeś."
 
 #: src/postulo/templates/connections/list.html:26
 #: src/postulo/templates/server/plugins.html:41
@@ -4819,14 +4934,14 @@ msgstr "Oferta pracy"
 msgid "Offer received"
 msgstr "Otrzymano ofertę"
 
-#: src/postulo/templates/applications/insights.html:60
-#: src/postulo/templates/applications/insights.html:147
-#: src/postulo/templates/applications/insights.html:199
+#: src/postulo/templates/widgets/industries.html:13
+#: src/postulo/templates/widgets/insight_counters.html:33
+#: src/postulo/templates/widgets/sources.html:13
 #, draft
 msgid "Offers"
 msgstr "Oferty pracy"
 
-#: src/postulo/templates/core/dashboard.html:66
+#: src/postulo/templates/widgets/counters.html:13
 #, draft
 msgid "Offers on the table"
 msgstr "Oferty na stole"
@@ -4845,6 +4960,11 @@ msgstr "Na miejscu"
 #, draft
 msgid "On the timeline"
 msgstr "Na osi czasu"
+
+#: src/postulo/templates/settings/dashboard.html:15
+#, draft
+msgid "On your dashboard"
+msgstr "Na Twoim pulpicie"
 
 #: src/postulo/accounts/forms.py:78
 #, draft
@@ -4951,19 +5071,25 @@ msgstr "Przechwytywać można tylko adresy http i https."
 msgid "Only what is still live. Settled applications live in the table."
 msgstr "Tylko to, co wciąż trwa. Rozstrzygnięte aplikacje są w tabeli."
 
-#: src/postulo/templates/core/dashboard.html:140
+#: src/postulo/templates/widgets/gone_quiet.html:64
 #, python-format, draft
 msgid ""
 "Open applications with nothing for %(days)s days and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
 msgstr ""
 "Otwarte aplikacje bez niczego od %(days)s dni i bez planów. Odłóż ustawia przypomnienie za dwa tygodnie; Bez odpowiedzi zapisuje, że przestałeś czekać."
 
+#: src/postulo/applications/widgets.py:135
+#, draft
+msgid ""
+"Open applications with nothing heard, and the three things to do about it."
+msgstr "Otwarte zgłoszenia bez odzewu i trzy rzeczy, które można z tym zrobić."
+
 #: src/postulo/templates/jobs/partials/company_row.html:36
 #, draft
 msgid "Openings"
 msgstr "Wakaty"
 
-#: src/postulo/accounts/models.py:336
+#: src/postulo/accounts/models.py:348
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Opcjonalnie. Jeśli ustawione, tylko ten adres może użyć zaproszenia."
@@ -5030,7 +5156,7 @@ msgstr "wynik"
 msgid "Outcome"
 msgstr "Wynik"
 
-#: src/postulo/templates/applications/insights.html:234
+#: src/postulo/applications/widgets.py:210
 #, draft
 msgid "Outcomes"
 msgstr "Wyniki"
@@ -5212,7 +5338,7 @@ msgstr "telefon"
 msgid "Phone screen"
 msgstr "Rozmowa telefoniczna wstępna"
 
-#: src/postulo/accounts/models.py:267
+#: src/postulo/accounts/models.py:279
 #, draft
 msgid "picture"
 msgstr "obrazek"
@@ -5443,12 +5569,12 @@ msgstr "Adresy prywatne i lokalne są odrzucane."
 msgid "proficiency"
 msgstr "poziom"
 
-#: src/postulo/accounts/models.py:166 src/postulo/accounts/models.py:287
+#: src/postulo/accounts/models.py:166 src/postulo/accounts/models.py:299
 #, draft
 msgid "profile"
 msgstr "profil"
 
-#: src/postulo/accounts/models.py:288
+#: src/postulo/accounts/models.py:300
 #, draft
 msgid "profiles"
 msgstr "profile"
@@ -5551,13 +5677,13 @@ msgstr "Dodaje do kolejki każdy dokument, który już masz, dla tego magazynu."
 msgid "Queued tasks"
 msgstr "Zadania w kolejce"
 
-#: src/postulo/templates/applications/insights.html:148
-#: src/postulo/templates/applications/insights.html:200
+#: src/postulo/templates/widgets/industries.html:14
+#: src/postulo/templates/widgets/sources.html:14
 #, draft
 msgid "Quiet"
 msgstr "Ucichła"
 
-#: src/postulo/accounts/models.py:277
+#: src/postulo/accounts/models.py:289
 #, draft
 msgid "quiet after"
 msgstr "cicho po"
@@ -5567,7 +5693,7 @@ msgstr "cicho po"
 msgid "quiet announced on"
 msgstr "ciszę ogłoszono dnia"
 
-#: src/postulo/templates/applications/insights.html:177
+#: src/postulo/templates/widgets/sources.html:43
 #, python-format, draft
 msgid ""
 "Quiet counts open applications silent for %(days)s days with nothing planned; they are not yet failures, but they are not replies either."
@@ -5582,7 +5708,7 @@ msgstr[0] "Cicho od %(days)s dnia"
 msgstr[1] "Cicho od %(days)s dni"
 msgstr[2] "Cicho od %(days)s dni"
 
-#: src/postulo/templates/core/dashboard.html:104
+#: src/postulo/templates/widgets/gone_quiet.html:28
 #, python-format, draft
 msgid "quiet for %(days)s day"
 msgid_plural "quiet for %(days)s days"
@@ -5633,13 +5759,6 @@ msgstr ""
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr "Odczyt wszystkiego: aplikacje, oferty, firmy, dokumenty, statystyki"
 
-#: src/postulo/templates/applications/insights.html:11
-#, draft
-msgid ""
-"Read from the timeline, so an interview that ended in a rejection still counts as an interview."
-msgstr ""
-"Odczytane z osi czasu, więc rozmowa zakończona odrzuceniem nadal liczy się jako rozmowa."
-
 #: src/postulo/templates/resume/europass_import.html:31
 #: src/postulo/templates/server/plugins.html:153
 #, draft
@@ -5661,7 +5780,7 @@ msgstr "czytanie"
 msgid "Real estate"
 msgstr "Nieruchomości"
 
-#: src/postulo/templates/core/dashboard.html:154
+#: src/postulo/applications/widgets.py:173
 #, draft
 msgid "Recent activity"
 msgstr "Ostatnia aktywność"
@@ -5676,8 +5795,7 @@ msgstr "Zapisz"
 #: src/postulo/templates/applications/application_intake.html:8
 #: src/postulo/templates/applications/application_list.html:49
 #: src/postulo/templates/applications/application_list.html:70
-#: src/postulo/templates/applications/insights.html:24
-#: src/postulo/templates/core/dashboard.html:50
+#: src/postulo/templates/core/dashboard.html:36
 #, draft
 msgid "Record an application"
 msgstr "Zapisz aplikację"
@@ -5788,7 +5906,7 @@ msgid "Reinstall"
 msgstr "Zainstaluj ponownie"
 
 #: src/postulo/applications/models.py:47
-#: src/postulo/templates/applications/insights.html:246
+#: src/postulo/templates/widgets/outcomes.html:14
 #, draft
 msgid "Rejected"
 msgstr "Odrzucona"
@@ -5814,13 +5932,18 @@ msgstr "przypomnienie"
 msgid "reminders"
 msgstr "przypomnienia"
 
-#: src/postulo/core/navigation.py:77 src/postulo/core/search.py:388
+#: src/postulo/core/navigation.py:76 src/postulo/core/search.py:388
 #: src/postulo/templates/applications/application_detail.html:286
 #: src/postulo/templates/applications/reminder_list.html:4
 #: src/postulo/templates/applications/reminder_list.html:8
 #, draft
 msgid "Reminders"
 msgstr "Przypomnienia"
+
+#: src/postulo/applications/widgets.py:161
+#, draft
+msgid "Reminders that have come due, each with a button to mark it done."
+msgstr "Przypomnienia, którym minął termin, każde z przyciskiem odhaczenia."
 
 #: src/postulo/jobs/models.py:280
 #, draft
@@ -5882,11 +6005,18 @@ msgstr "zastępuje"
 msgid "Replaces the master highlights on this variant only. One per line."
 msgstr "Zastępuje główne osiągnięcia tylko w tym wariancie. Jedno w wierszu."
 
-#: src/postulo/templates/applications/insights.html:145
-#: src/postulo/templates/applications/insights.html:197
+#: src/postulo/templates/widgets/industries.html:11
+#: src/postulo/templates/widgets/sources.html:11
 #, draft
 msgid "Replied"
 msgstr "Odpowiedzieli"
+
+#: src/postulo/applications/widgets.py:211
+#, draft
+msgid ""
+"Replied, rejected, went silent, still waiting — what became of what you sent."
+msgstr ""
+"Odpowiedziano, odrzucono, cisza, wciąż czeka — co się stało z tym, co wysłałeś."
 
 #: src/postulo/jobs/industries.py:22
 #, draft
@@ -6090,7 +6220,7 @@ msgstr "Zapisz w ofertach"
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Zapisano w twoich ofertach. Zdecyduj, kiedy będziesz gotowy."
 
-#: src/postulo/accounts/settings_views.py:34
+#: src/postulo/accounts/settings_views.py:35
 #: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:118
 #, draft
 msgid "Saved."
@@ -6174,10 +6304,15 @@ msgstr "Zmienne opisuje Konfiguracja w wiki. Hasło nigdy nie jest pokazywane."
 msgid "See the applications"
 msgstr "Zobacz aplikacje"
 
-#: src/postulo/templates/core/dashboard.html:267
+#: src/postulo/templates/widgets/shortcuts.html:6
 #, draft
 msgid "See the board"
 msgstr "Zobacz tablicę"
+
+#: src/postulo/templates/settings/dashboard.html:105
+#, draft
+msgid "See the dashboard"
+msgstr "Zobacz pulpit"
 
 #: src/postulo/templates/core/import_csv_done.html:34
 #, draft
@@ -6220,8 +6355,8 @@ msgstr "Wyślij do magazynów teraz"
 msgid "Sending failed: %(error)s"
 msgstr "Wysyłanie nie powiodło się: %(error)s"
 
-#: src/postulo/templates/applications/insights.html:144
-#: src/postulo/templates/applications/insights.html:196
+#: src/postulo/templates/widgets/industries.html:10
+#: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Wysłano"
@@ -6328,7 +6463,7 @@ msgstr "Sekcje ustawień"
 msgid "Settled"
 msgstr "Rozstrzygnięta"
 
-#: src/postulo/templates/core/dashboard.html:264
+#: src/postulo/core/widgets_builtin.py:17
 #, draft
 msgid "Shortcuts"
 msgstr "Skróty"
@@ -6486,7 +6621,7 @@ msgstr "Przejdź do treści"
 msgid "skipped"
 msgstr "pominięte"
 
-#: src/postulo/templates/applications/insights.html:281
+#: src/postulo/templates/widgets/durations.html:21
 #, draft
 msgid "Slowest"
 msgstr "Najwolniej"
@@ -6496,7 +6631,7 @@ msgstr "Najwolniej"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/templates/core/dashboard.html:123
+#: src/postulo/templates/widgets/gone_quiet.html:47
 #, draft
 msgid "Snooze"
 msgstr "Odłóż"
@@ -6524,13 +6659,13 @@ msgid ""
 msgstr ""
 "Kto przychodzi przez tego dostawcę, zostaje zalogowany na konto, do którego należy podany adres, o ile dostawca twierdzi, że adres jest zweryfikowany. Warto zatem odpowiedzieć na jedno pytanie: czy ten dostawca uznaje adres za zweryfikowany tylko wtedy, gdy osoba udowodniła, że jest jej? Jeśli sam go prowadzisz, niemal na pewno. Jeśli jest cudzy, sprawdź to, zanim na nim polegniesz. Ustaw POSTULO_OIDC_LINK_BY_EMAIL na false, aby każdy musiał zalogować się tutaj raz i połączyć dostawcę ze swojej strony konta."
 
-#: src/postulo/templates/applications/insights.html:143
 #: src/postulo/templates/server/plugins.html:225
+#: src/postulo/templates/widgets/sources.html:9
 #, draft
 msgid "Source"
 msgstr "Źródło"
 
-#: src/postulo/templates/applications/insights.html:176
+#: src/postulo/templates/widgets/sources.html:42
 #, draft
 msgid ""
 "Source is the “found via” field on a posting. Fill it in and this table starts earning its place."
@@ -6629,12 +6764,18 @@ msgstr "Zaktualizowano status."
 msgid "Stay signed in on this device"
 msgstr "Pozostań zalogowany na tym urządzeniu"
 
-#: src/postulo/templates/applications/insights.html:238
 #: src/postulo/templates/applications/partials/filters.html:26
-#: src/postulo/templates/core/dashboard.html:58
+#: src/postulo/templates/widgets/counters.html:5
+#: src/postulo/templates/widgets/outcomes.html:6
 #, draft
 msgid "Still live"
 msgstr "Wciąż w toku"
+
+#: src/postulo/applications/widgets.py:122
+#, draft
+msgid ""
+"Still live, in conversation, offers, and what you sent in the last month."
+msgstr "Wciąż żywe, w rozmowach, oferty i to, co wysłałeś w ostatnim miesiącu."
 
 #: src/postulo/documents/models.py:412
 #, draft
@@ -6798,6 +6939,11 @@ msgstr "Dostosuj ten wpis"
 #, draft
 msgid "tailored for this CV"
 msgstr "dostosowane do tego CV"
+
+#: src/postulo/templates/settings/dashboard.html:57
+#, python-format, draft
+msgid "Take %(name)s off"
+msgstr "Zdejmij %(name)s"
 
 #: src/postulo/jobs/industries.py:13
 #, draft
@@ -6984,6 +7130,11 @@ msgstr "To nie jest status, który Postulo rozpoznaje."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "To nie jest pakiet wheel: Postulo instaluje pliki .whl."
 
+#: src/postulo/accounts/settings_views.py:140
+#, draft
+msgid "That is not a widget Postulo knows about."
+msgstr "To nie jest widżet, który Postulo zna."
+
 #: src/postulo/applications/views.py:519
 #, draft
 msgid "That is not an outcome Postulo recognises."
@@ -7052,7 +7203,7 @@ msgstr "Ten obrazek ma ponad 5 MB. Poproszę o mniejszy."
 msgid "That plugin is no longer installed."
 msgstr "Ta wtyczka nie jest już zainstalowana."
 
-#: src/postulo/applications/views.py:645
+#: src/postulo/applications/views.py:639
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Na tę sugestię już odpowiedziano."
@@ -7193,6 +7344,13 @@ msgstr "Instalator go odrzucił: %(error)s"
 msgid "The job title"
 msgstr "Nazwa stanowiska"
 
+#: src/postulo/applications/widgets.py:174
+#, draft
+msgid ""
+"The last ten things the timeline recorded, whichever application they were on."
+msgstr ""
+"Dziesięć ostatnich rzeczy zapisanych na osi czasu, przy dowolnym zgłoszeniu."
+
 #: src/postulo/jobs/identifiers.py:151
 #, draft
 msgid "The LEI's check digits do not match."
@@ -7227,6 +7385,12 @@ msgstr "Backend poczty nic nie przyjął."
 #, draft
 msgid "The master record. A CV variant selects from this; it never copies it."
 msgstr "Zapis główny. Wariant CV wybiera z niego; nigdy go nie kopiuje."
+
+#: src/postulo/applications/widgets.py:148
+#, draft
+msgid ""
+"The next interviews in the diary, and any that passed without an outcome."
+msgstr "Najbliższe rozmowy w kalendarzu i te, które minęły bez wyniku."
 
 #: src/postulo/documents/models.py:63
 #, draft
@@ -7263,6 +7427,18 @@ msgstr ""
 #, draft
 msgid "The role"
 msgstr "Stanowisko"
+
+#: src/postulo/applications/widgets.py:259
+#, draft
+msgid ""
+"The same figures by field. A company in three fields counts in all three."
+msgstr ""
+"Te same liczby według branży. Firma w trzech branżach liczy się w każdej z nich."
+
+#: src/postulo/applications/widgets.py:186
+#, draft
+msgid "The search in four numbers"
+msgstr "Poszukiwania w czterech liczbach"
 
 #: src/postulo/plugins/fetching.py:89
 #, draft
@@ -7373,7 +7549,7 @@ msgstr "Nic tu nie ma albo nie tobie wolno to zobaczyć."
 msgid "There is nothing waiting to be imported."
 msgstr "Nic nie czeka na zaimportowanie."
 
-#: src/postulo/templates/applications/insights.html:31
+#: src/postulo/templates/widgets/insight_counters.html:5
 #, python-format, draft
 msgid ""
 "These figures come from %(total)s application. Read them as a record of what happened, not as a rate that predicts anything."
@@ -7447,6 +7623,13 @@ msgstr "To zaproszenie jest dla %(email)s. Zarejestruj się tym adresem."
 #, draft
 msgid "This invitation may only be used with the address it was sent to."
 msgstr "Tego zaproszenia można użyć tylko z adresem, na który zostało wysłane."
+
+#: src/postulo/templates/settings/dashboard.html:117
+#, draft
+msgid ""
+"This is the standard arrangement. Until you change something, a widget added in a later release will appear here on its own; once you have arranged the page, new ones stay off it until you ask."
+msgstr ""
+"To jest układ standardowy. Dopóki niczego nie zmienisz, widżet dodany w późniejszym wydaniu pojawi się tu sam; gdy raz uporządkujesz stronę, nowe trzymają się z dala, dopóki o nie nie poprosisz."
 
 #: src/postulo/notifications/email.py:68
 #, draft
@@ -7558,7 +7741,7 @@ msgstr "na status"
 msgid "Today's date"
 msgstr "Dzisiejsza data"
 
-#: src/postulo/accounts/models.py:331
+#: src/postulo/accounts/models.py:343
 #, draft
 msgid "token"
 msgstr "token"
@@ -7675,7 +7858,7 @@ msgstr "do %(high)s"
 msgid "Update the preview"
 msgstr "Odśwież podgląd"
 
-#: src/postulo/accounts/models.py:284 src/postulo/core/models.py:19
+#: src/postulo/accounts/models.py:296 src/postulo/core/models.py:19
 #: src/postulo/core/models.py:139
 #, draft
 msgid "updated at"
@@ -7741,7 +7924,7 @@ msgstr "Użyj PNG, JPEG, WebP lub GIF."
 msgid "Use my Gravatar"
 msgstr "Używaj mojego Gravatara"
 
-#: src/postulo/accounts/models.py:269
+#: src/postulo/accounts/models.py:281
 #, draft
 msgid "use my Gravatar"
 msgstr "używaj mojego Gravatara"
@@ -7849,7 +8032,7 @@ msgstr "Rozmowa wideo"
 msgid "Waiting for review"
 msgstr "Czeka na sprawdzenie"
 
-#: src/postulo/templates/applications/insights.html:242
+#: src/postulo/templates/widgets/outcomes.html:10
 #, draft
 msgid "Waiting on a reply"
 msgstr "Czeka na odpowiedź"
@@ -7893,7 +8076,7 @@ msgstr "strona internetowa"
 msgid "Website"
 msgstr "Strona internetowa"
 
-#: src/postulo/templates/core/dashboard.html:37
+#: src/postulo/templates/core/dashboard.html:22
 #, python-format, draft
 msgid "Welcome back, %(name)s"
 msgstr "Witaj ponownie, %(name)s"
@@ -7967,6 +8150,12 @@ msgstr "co mówi"
 msgid "What it says it is"
 msgstr "Czym się przedstawia"
 
+#: src/postulo/applications/widgets.py:25
+#: src/postulo/core/widgets_builtin.py:22
+#, draft
+msgid "What needs doing"
+msgstr "Co jest do zrobienia"
+
 #: src/postulo/templates/settings/locale.html:7
 #, draft
 msgid "What Postulo speaks to you, and whose clock it shows."
@@ -7976,6 +8165,13 @@ msgstr "W jakim języku Postulo do ciebie mówi i czyj zegar pokazuje."
 #, draft
 msgid "what the check found"
 msgstr "co wykazało sprawdzenie"
+
+#: src/postulo/templates/settings/dashboard.html:7
+#, draft
+msgid ""
+"What the dashboard shows, and in what order. Everything that used to be on Insights is here as a widget; take off what you never read and put the rest where you want it."
+msgstr ""
+"Co pokazuje pulpit i w jakiej kolejności. Wszystko, co było w Insights, jest tu jako widżet; zdejmij to, czego nigdy nie czytasz, a resztę ustaw tam, gdzie chcesz."
 
 #: src/postulo/accounts/models.py:174 src/postulo/jobs/models.py:204
 #, draft
@@ -7988,6 +8184,11 @@ msgid ""
 "What the plugins that read for you think happened. Nothing here is in your record until you say so."
 msgstr ""
 "Co wtyczki czytające za ciebie uważają, że się wydarzyło. Nic z tego nie trafia do twoich zapisów, dopóki tego nie powiesz."
+
+#: src/postulo/applications/widgets.py:26
+#, draft
+msgid "What the record says"
+msgstr "Co mówią zapisy"
 
 #: src/postulo/templates/server/defaults.html:7
 #, draft
@@ -8025,6 +8226,12 @@ msgstr "co zrobić"
 #, draft
 msgid "What will be deleted"
 msgstr "Co zostanie usunięte"
+
+#: src/postulo/jobs/widgets.py:33
+#, draft
+msgid "What you have noticed and not yet acted on, and what closes this week."
+msgstr ""
+"Co zauważyłeś, a jeszcze nie rozstrzygnąłeś, i co kończy się w tym tygodniu."
 
 #: src/postulo/accounts/forms.py:520
 #, draft
@@ -8075,10 +8282,15 @@ msgstr ""
 msgid "Where the role is based"
 msgstr "Gdzie jest stanowisko"
 
-#: src/postulo/templates/applications/insights.html:136
+#: src/postulo/applications/widgets.py:246
 #, draft
 msgid "Where they came from"
 msgstr "Skąd przyszły"
+
+#: src/postulo/applications/widgets.py:121
+#, draft
+msgid "Where things stand"
+msgstr "Jak stoją sprawy"
 
 #: src/postulo/jobs/models.py:118
 #, draft
@@ -8095,7 +8307,7 @@ msgstr "Gdzie na to trafiłeś: portal z ofertami, polecenie, strona firmy."
 msgid "where you live"
 msgstr "gdzie mieszkasz"
 
-#: src/postulo/templates/core/dashboard.html:42
+#: src/postulo/templates/core/dashboard.html:27
 #, draft
 msgid "Where your job search stands today."
 msgstr "Na jakim etapie jest dziś twoje poszukiwanie pracy."
@@ -8351,7 +8563,14 @@ msgstr ""
 msgid "You have not applied to this one."
 msgstr "Nie aplikowałeś tutaj."
 
-#: src/postulo/templates/applications/insights.html:66
+#: src/postulo/templates/widgets/selectivity.html:14
+#, draft
+msgid ""
+"You have not noted any listings yet, so there is nothing to be choosy about."
+msgstr ""
+"Nie odnotowałeś jeszcze żadnych ogłoszeń, więc nie ma wobec czego być wybrednym."
+
+#: src/postulo/templates/widgets/selectivity.html:6
 #, python-format, draft
 msgid ""
 "You have noticed %(counter)s listing; applied to %(applied)s (%(share)s%%) and discarded %(discarded)s."
@@ -8363,6 +8582,11 @@ msgstr[1] ""
 "Zauważyłeś %(counter)s oferty; zaaplikowałeś na %(applied)s (%(share)s%%) i odrzuciłeś %(discarded)s."
 msgstr[2] ""
 "Zauważyłeś %(counter)s ofert; zaaplikowałeś na %(applied)s (%(share)s%%) i odrzuciłeś %(discarded)s."
+
+#: src/postulo/templates/core/dashboard.html:59
+#, draft
+msgid "You have taken everything off it. Put something back whenever you like."
+msgstr "Zdjąłeś z niego wszystko. Przywróć coś, kiedy zechcesz."
 
 #: src/postulo/templates/settings/account.html:52
 #, draft
@@ -8406,18 +8630,23 @@ msgstr ""
 msgid "Your career"
 msgstr "Twoja kariera"
 
-#: src/postulo/templates/core/dashboard.html:273
+#: src/postulo/templates/widgets/shortcuts.html:12
 #, draft
 msgid "Your career record"
 msgstr "Twoja historia kariery"
 
-#: src/postulo/templates/core/dashboard.html:270
 #: src/postulo/templates/resume/overview.html:20
+#: src/postulo/templates/widgets/shortcuts.html:9
 #, draft
 msgid "Your CVs"
 msgstr "Twoje CV"
 
-#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:96
+#: src/postulo/templates/core/dashboard.html:57
+#, draft
+msgid "Your dashboard is empty"
+msgstr "Twój pulpit jest pusty"
+
+#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:103
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -8432,7 +8661,7 @@ msgstr "Twój termin"
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
 #: src/postulo/templates/base.html:80
-#: src/postulo/templates/core/dashboard.html:304
+#: src/postulo/templates/widgets/shortcuts.html:27
 #, draft
 msgid "Your details"
 msgstr "Twoje dane"
@@ -8452,7 +8681,7 @@ msgstr "Twój Gravatar został pobrany ponownie."
 msgid "Your initials"
 msgstr "Twoje inicjały"
 
-#: src/postulo/core/views.py:104
+#: src/postulo/core/views.py:55
 #, draft
 msgid "Your job search, on your server."
 msgstr "Twoje poszukiwanie pracy, na twoim serwerze."
@@ -8501,18 +8730,10 @@ msgstr "Twój obrazek"
 msgid "your role"
 msgstr "twoje stanowisko"
 
-#: src/postulo/accounts/settings_views.py:73
+#: src/postulo/accounts/settings_views.py:74
 #, draft
 msgid "Your username has been changed."
 msgstr "Zmieniono twoją nazwę użytkownika."
-
-#: src/postulo/templates/core/dashboard.html:289
-#, python-format, draft
-msgid "· %(counter)s closing this week"
-msgid_plural "· %(counter)s closing this week"
-msgstr[0] "· %(counter)s zamyka się w tym tygodniu"
-msgstr[1] "· %(counter)s zamykają się w tym tygodniu"
-msgstr[2] "· %(counter)s zamyka się w tym tygodniu"
 
 #: src/postulo/templates/partials/confirm_delete.html:11
 #, python-format, draft

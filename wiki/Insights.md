@@ -1,9 +1,18 @@
 # Insights
 
-**Insights**, in the navigation.
+**The dashboard**, arranged under *Settings → Dashboard*.
 
 What the record adds up to: how far applications get, how many are answered at all, how
 long employers take, and which sources actually produce something.
+
+> **Insights is not a separate page any more.** It answered the same question the dashboard
+> did — *how is this going?* — at a different distance, and you had to remember which page
+> held which number. Everything described below is now a **widget** you can put on the
+> dashboard, in the order you want. Nothing is gone; the old address still leads there.
+>
+> These widgets are **off by default**, because a response funnel means nothing to somebody
+> with three applications. Turn on the ones you want under *Settings → Dashboard*, or press
+> *Arrange* on the dashboard itself.
 
 ## Read from the timeline, not from statuses
 
@@ -85,6 +94,21 @@ attached.
 Even above five, treat these as a record of what happened rather than as a rate that
 predicts anything. Nine applications and one interview is not an eleven per cent
 interview rate; it is one interview.
+
+## Choosing which of these to see
+
+**Settings → Dashboard** lists every widget with a sentence saying what it is for. The ones
+described on this page sit under *What the record says*; the ones about today — gone quiet,
+interviews coming up, reminders due — sit under *What needs doing*.
+
+Add, remove and reorder with buttons rather than by dragging. Arranging is done once and
+then not again, and a form that posts works with a keyboard, with a screen reader and with
+scripts switched off, which dragging does not.
+
+**Until you change something, the arrangement is the standard one**, and a widget added in a
+later release appears on it by itself. **Once you have arranged the page it is yours**, and
+new widgets stay off it until you ask for them. *Back to the standard arrangement* undoes
+the whole thing.
 
 ## Exporting
 

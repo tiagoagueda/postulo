@@ -10,4 +10,8 @@ class JobsConfig(AppConfig):
 
     def ready(self) -> None:
         # Registers the table with the settings view.
-        from . import tables  # noqa: F401
+        # Registers this app's dashboard widgets.
+        from . import (
+            tables,  # noqa: F401
+            widgets,  # noqa: F401
+        )

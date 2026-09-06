@@ -42,6 +42,13 @@ BUILTIN: tuple[SettingsSection, ...] = (
         order=10,
     ),
     SettingsSection(
+        slug="dashboard",
+        label=_("Dashboard"),
+        url_name="settings:dashboard",
+        icon="layout-dashboard",
+        order=15,
+    ),
+    SettingsSection(
         slug="locale",
         label=_("Language and time"),
         url_name="settings:locale",

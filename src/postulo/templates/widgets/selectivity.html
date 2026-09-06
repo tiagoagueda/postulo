@@ -1,0 +1,17 @@
+{% load i18n %}
+<h2 class="mb-3 font-medium">{{ widget.label }}</h2>
+<div class="card text-sm" data-selectivity>
+  {% if insights.listings_noted %}
+    <p>
+      {% blocktranslate count counter=insights.listings_noted with applied=insights.listings_applied discarded=insights.listings_discarded share=insights.selectivity|floatformat:0 trimmed %}
+        You have noticed {{ counter }} listing; applied to {{ applied }} ({{ share }}%) and discarded {{ discarded }}.
+      {% plural %}
+        You have noticed {{ counter }} listings; applied to {{ applied }} ({{ share }}%) and discarded {{ discarded }}.
+      {% endblocktranslate %}
+    </p>
+  {% else %}
+    <p class="text-ink-500 dark:text-ink-400">
+      {% translate "You have not noted any listings yet, so there is nothing to be choosy about." %}
+    </p>
+  {% endif %}
+</div>

@@ -103,7 +103,7 @@ def furnished(applicant):
     applicant.is_staff = True
     applicant.is_superuser = True
     applicant.save()
-    return {"application": application, "company": company}
+    return {"application": application, "company": company, "applicant": applicant}
 
 
 def sign_in(page: Page, base: str) -> None:
@@ -149,7 +149,6 @@ def test_every_signed_in_page_has_no_violations(
         "/applications/interviews/",
         "/applications/reminders/",
         "/applications/reminders/new/",
-        "/applications/insights/",
         "/applications/new/",
         "/applications/tags/",
         "/jobs/companies/",
@@ -175,6 +174,7 @@ def test_every_signed_in_page_has_no_violations(
         "/accounts/2fa/",
         "/settings/",
         "/settings/appearance/",
+        "/settings/dashboard/",
         "/settings/language/",
         "/settings/account/",
         "/settings/connections/",
@@ -251,6 +251,51 @@ def test_the_europass_review_page_has_no_violations(
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_a_dashboard_with_every_widget_on_it_has_no_violations(
+    live_server, page: Page, axe_source, furnished, scheme
+):
+    """Every widget at once, which no walk of addresses can reach.
+
+    The default dashboard shows seven of them. The rest — the funnel bars, the two tables,
+    the figures — used to be on the Insights page and were checked there; when that page
+    became widgets, nothing was looking at them any more. This looks at all of them, in
+    both themes, on one page.
+    """
+    from postulo.core import widgets
+
+    profile = furnished["applicant"].profile
+    profile.dashboard_widgets = [w.key for w in widgets.all_widgets()]
+    profile.save(update_fields=["dashboard_widgets"])
+
+    page.emulate_media(color_scheme=scheme)
+    base = live_server.url
+    sign_in(page, base)
+    page.goto(f"{base}/")
+
+    for widget in widgets.all_widgets():
+        expect(page.locator(f'[data-widget="{widget.key}"]')).to_have_count(1)
+    found = violations_on(page, axe_source)
+    assert not found, describe(f"/ with every widget ({scheme})", found)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_dashboard_can_be_arranged_from_the_keyboard(
+    live_server, page: Page, axe_source, furnished, scheme
+):
+    """Arranging is a form, on purpose: it works with the keyboard and with scripts off."""
+    page.emulate_media(color_scheme=scheme)
+    base = live_server.url
+    sign_in(page, base)
+    page.goto(f"{base}/settings/dashboard/")
+
+    page.get_by_role("button", name="Take Gone quiet off").click()
+    expect(page.get_by_role("button", name="Add Gone quiet")).to_be_visible()
+
+    page.goto(f"{base}/")
+    expect(page.locator('[data-widget="gone_quiet"]')).to_have_count(0)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
 def test_the_error_pages_have_no_violations(live_server, page: Page, db, axe_source, scheme):
     """The pages somebody is on when they are already lost, and the last to be looked at.
 
@@ -310,7 +355,6 @@ VISITED_URL_NAMES: tuple[str, ...] = (
     "applications:create",
     "applications:update",
     "applications:delete",
-    "applications:insights",
     "applications:interview_list",
     "applications:interview_create",
     "applications:interview_update",
@@ -374,6 +418,7 @@ VISITED_URL_NAMES: tuple[str, ...] = (
     "accounts:invite_list",
     "accounts:invite_create",
     "settings:appearance",
+    "settings:dashboard",
     "settings:locale",
     "settings:account",
     "connections:list",

@@ -229,22 +229,28 @@ def test_listings_are_private_to_their_owner(client, user, other_user, company):
 def test_the_navigation_and_the_dashboard_point_at_listings(client, user, company):
     listing(user, company, closes_at=timezone.localdate() + dt.timedelta(days=2))
     listing(user, company, title="Another")
+    profile = user.profile
+    profile.dashboard_widgets = ["listings"]
+    profile.save(update_fields=["dashboard_widgets"])
     client.force_login(user)
     html = client.get(reverse("core:home")).content.decode()
     header = html[: html.index("</header>")]
     assert reverse("listings:list") in header and "Listings" in header
     assert "2 listings to decide on" in html
-    assert "1 closing this week" in html
+    assert "Closing this week: 1" in html
 
 
-def test_insights_report_selectivity(client, user, company):
+def test_the_selectivity_widget_reports_what_was_let_go(client, user, company):
     listing(user, company, title="A")
     binned = listing(user, company, title="B")
     binned.discard()
     applied = listing(user, company, title="C")
     Application.objects.create(owner=user, posting=applied, status=Status.APPLIED)
+    profile = user.profile
+    profile.dashboard_widgets = ["selectivity"]
+    profile.save(update_fields=["dashboard_widgets"])
     client.force_login(user)
-    html = client.get(reverse("applications:insights")).content.decode()
+    html = client.get(reverse("core:home")).content.decode()
     assert "noticed 3 listings" in html
     assert "applied to 1 (33%)" in html
     assert "discarded 1" in html

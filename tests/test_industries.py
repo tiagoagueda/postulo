@@ -298,11 +298,14 @@ def test_insights_count_an_application_under_each_of_its_companys_industries(use
     assert rows["Not recorded"].applied == 1
 
 
-def test_the_insights_page_has_the_industry_table(client, user):
+def test_the_industry_table_is_a_dashboard_widget(client, user):
     aperture = company_with(user, "Aperture Science", "Software")
     posting = JobPosting.objects.create(owner=user, company=aperture, title="Role")
     application = Application.objects.create(owner=user, posting=posting, status=Status.DRAFT)
     change_status(application, Status.APPLIED)
+    profile = user.profile
+    profile.dashboard_widgets = ["industries"]
+    profile.save(update_fields=["dashboard_widgets"])
     client.force_login(user)
-    body = client.get(reverse("applications:insights")).content.decode()
+    body = client.get(reverse("core:home")).content.decode()
     assert "data-by-industry" in body and "By industry" in body

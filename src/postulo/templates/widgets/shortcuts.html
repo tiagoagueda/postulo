@@ -1,0 +1,30 @@
+{% load i18n %}
+<div class="card">
+  <h2 class="mb-3 font-medium">{{ widget.label }}</h2>
+  <div class="flex flex-col gap-2 text-sm">
+    <a href="{% url 'applications:board' %}" class="text-brand-600 underline dark:text-brand-400">
+      {% translate "See the board" %}
+    </a>
+    <a href="{% url 'documents:cv_list' %}" class="text-brand-600 underline dark:text-brand-400">
+      {% translate "Your CVs" %}
+    </a>
+    <a href="{% url 'resume:overview' %}" class="text-brand-600 underline dark:text-brand-400">
+      {% translate "Your career record" %}
+    </a>
+    <a href="{% url 'jobs:company_list' %}" class="text-brand-600 underline dark:text-brand-400">
+      {% translate "Companies you have applied to" %}
+    </a>
+    <a href="{% url 'listings:list' %}" class="text-brand-600 underline dark:text-brand-400">
+      {% translate "Listings" %}
+    </a>
+    <a href="{% url 'core:export' %}" class="text-brand-600 underline dark:text-brand-400">
+      {% translate "Export everything" %}
+    </a>
+    <a href="{% url 'applications:tag_list' %}" class="text-brand-600 underline dark:text-brand-400">
+      {% translate "Manage tags" %}
+    </a>
+    <a href="{% url 'accounts:profile' %}" class="text-brand-600 underline dark:text-brand-400">
+      {% translate "Your details" %}
+    </a>
+  </div>
+</div>

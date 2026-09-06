@@ -1,0 +1,28 @@
+{% load i18n %}
+<h2 class="mb-3 font-medium">{{ widget.label }}</h2>
+<div class="card">
+  <dl class="space-y-3 text-sm">
+    <div class="flex justify-between">
+      <dt>{% translate "Still live" %}</dt>
+      <dd class="tabular-nums">{{ insights.open_now }}</dd>
+    </div>
+    <div class="flex justify-between">
+      <dt>{% translate "Waiting on a reply" %}</dt>
+      <dd class="tabular-nums">{{ insights.still_waiting }}</dd>
+    </div>
+    <div class="flex justify-between">
+      <dt>{% translate "Rejected" %}</dt>
+      <dd class="tabular-nums">{{ insights.rejected }}</dd>
+    </div>
+    <div class="flex justify-between">
+      <dt>{% translate "Ghosted" %}</dt>
+      <dd class="tabular-nums">{{ insights.ghosted }}</dd>
+    </div>
+  </dl>
+  <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed %}
+      Ghosted is counted separately from rejected on purpose. An employer who
+      stopped replying did not turn you down; they never said.
+    {% endblocktranslate %}
+  </p>
+</div>

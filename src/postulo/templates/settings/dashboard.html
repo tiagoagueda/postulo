@@ -1,0 +1,124 @@
+{% extends "settings/base.html" %}
+{% load i18n postulo %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Dashboard" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed %}
+      What the dashboard shows, and in what order. Everything that used to be on Insights is
+      here as a widget; take off what you never read and put the rest where you want it.
+    {% endblocktranslate %}
+  </p>
+
+  <div class="card mb-6 p-0">
+    <h3 class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
+      {% translate "On your dashboard" %}
+    </h3>
+    {% if chosen %}
+      <ol class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for widget in chosen %}
+          <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+            <div class="min-w-0 flex-1">
+              <p class="font-medium">{{ widget.label|default:widget.key }}</p>
+              <p class="text-sm text-ink-500 dark:text-ink-400">{{ widget.blurb }}</p>
+            </div>
+            <div class="flex shrink-0 items-center gap-1">
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value="{{ widget.key }}">
+                <button type="submit" name="action" value="up" class="btn-ghost px-2 py-1 text-xs"
+                        {% if forloop.first %}disabled{% endif %}>
+                  {% icon "arrow-up" class="h-4 w-4" %}
+                  <span class="sr-only">
+                    {% blocktranslate with name=widget.label trimmed %}
+                      Move {{ name }} up
+                    {% endblocktranslate %}
+                  </span>
+                </button>
+              </form>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value="{{ widget.key }}">
+                <button type="submit" name="action" value="down" class="btn-ghost px-2 py-1 text-xs"
+                        {% if forloop.last %}disabled{% endif %}>
+                  {% icon "arrow-down" class="h-4 w-4" %}
+                  <span class="sr-only">
+                    {% blocktranslate with name=widget.label trimmed %}
+                      Move {{ name }} down
+                    {% endblocktranslate %}
+                  </span>
+                </button>
+              </form>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value="{{ widget.key }}">
+                <button type="submit" name="action" value="remove"
+                        class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                  {% blocktranslate with name=widget.label trimmed %}
+                    Take {{ name }} off
+                  {% endblocktranslate %}
+                </button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="px-4 py-6 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Nothing. The dashboard will offer to bring something back." %}
+      </p>
+    {% endif %}
+  </div>
+
+  {% for group, items in available %}
+    {% if items %}
+      <div class="card mb-6 p-0">
+        <h3 class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
+          {% blocktranslate with name=group trimmed %}
+            Not shown · {{ name }}
+          {% endblocktranslate %}
+        </h3>
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for widget in items %}
+            <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+              <div class="min-w-0 flex-1">
+                <p class="font-medium">{{ widget.label|default:widget.key }}</p>
+                <p class="text-sm text-ink-500 dark:text-ink-400">{{ widget.blurb }}</p>
+              </div>
+              <form method="post" class="shrink-0">
+                {% csrf_token %}
+                <input type="hidden" name="key" value="{{ widget.key }}">
+                <button type="submit" name="action" value="add" class="btn-secondary px-3 py-1 text-sm">
+                  {% blocktranslate with name=widget.label trimmed %}
+                    Add {{ name }}
+                  {% endblocktranslate %}
+                </button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endfor %}
+
+  <div class="flex flex-wrap items-center gap-3">
+    <a href="{% url 'core:home' %}" class="btn-primary">{% translate "See the dashboard" %}</a>
+    {% if not is_default %}
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="action" value="reset" class="btn-ghost">
+          {% translate "Back to the standard arrangement" %}
+        </button>
+      </form>
+    {% endif %}
+  </div>
+  {% if is_default %}
+    <p class="mt-3 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        This is the standard arrangement. Until you change something, a widget added in a
+        later release will appear here on its own; once you have arranged the page, new
+        ones stay off it until you ask.
+      {% endblocktranslate %}
+    </p>
+  {% endif %}
+{% endblock %}

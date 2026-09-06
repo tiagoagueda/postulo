@@ -1,0 +1,76 @@
+{% load i18n %}
+<div class="mb-3 flex items-baseline justify-between">
+  <h2 class="font-medium">{{ widget.label }}</h2>
+  {% if quiet_count %}
+    <a href="{% url 'applications:list' %}?quiet=1" class="text-sm text-brand-600 underline dark:text-brand-400">
+      {% blocktranslate count counter=quiet_count trimmed %}
+        {{ counter }} application
+      {% plural %}
+        All {{ counter }}
+      {% endblocktranslate %}
+    </a>
+  {% endif %}
+</div>
+{% if quiet_applications %}
+  <div class="card p-0" data-gone-quiet>
+    <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+      {% for application in quiet_applications %}
+        <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+          <div class="min-w-0 flex-1">
+            <a href="{{ application.get_absolute_url }}"
+               class="block truncate font-medium hover:underline">
+              {{ application.posting.title }}
+            </a>
+            <p class="truncate text-sm text-ink-500 dark:text-ink-400">
+              {{ application.posting.company.name }}
+              · {{ application.get_status_display }}
+              ·
+              {% blocktranslate trimmed count days=application.days_since_activity %}
+                quiet for {{ days }} day
+              {% plural %}
+                quiet for {{ days }} days
+              {% endblocktranslate %}
+            </p>
+          </div>
+          <div class="flex shrink-0 items-center gap-1">
+            <form method="post" action="{% url 'applications:quiet_action' application.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{% url 'core:home' %}">
+              <button type="submit" name="action" value="follow_up" class="btn-ghost px-2 py-1 text-xs">
+                {% translate "Followed up" %}
+              </button>
+            </form>
+            <form method="post" action="{% url 'applications:quiet_action' application.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{% url 'core:home' %}">
+              <button type="submit" name="action" value="snooze" class="btn-ghost px-2 py-1 text-xs">
+                {% translate "Snooze" %}
+              </button>
+            </form>
+            <form method="post" action="{% url 'applications:status' application.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{% url 'core:home' %}">
+              <input type="hidden" name="status" value="ghosted">
+              <button type="submit" class="btn-ghost px-2 py-1 text-xs text-ink-500">
+                {% translate "Ghosted" %}
+              </button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed with days=quiet_after_days %}
+      Open applications with nothing for {{ days }} days and nothing planned. Snooze sets a
+      reminder two weeks out; Ghosted records that you stopped waiting.
+    {% endblocktranslate %}
+  </p>
+{% else %}
+  <div class="card text-sm text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed with days=quiet_after_days %}
+      Nothing has gone quiet for {{ days }} days. Either you are on top of it, or it is
+      time to send out a few more.
+    {% endblocktranslate %}
+  </div>
+{% endif %}

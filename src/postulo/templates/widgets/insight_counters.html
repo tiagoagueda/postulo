@@ -1,0 +1,38 @@
+{% load i18n %}
+{% if insights.applied %}
+  {% if insights.sample_is_small %}
+    <div class="alert-info mb-4">
+      {% blocktranslate trimmed count total=insights.applied %}
+        These figures come from {{ total }} application. Read them as a record of what
+        happened, not as a rate that predicts anything.
+      {% plural %}
+        These figures come from {{ total }} applications — too few to draw conclusions
+        from. Read them as a record of what happened, not as rates that predict anything.
+      {% endblocktranslate %}
+    </div>
+  {% endif %}
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="card">
+      <p class="text-3xl font-semibold tabular-nums">{{ insights.applied }}</p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Applications sent" %}</p>
+    </div>
+    <div class="card">
+      <p class="text-3xl font-semibold tabular-nums">
+        {% if insights.response_rate is not None %}{{ insights.response_rate|floatformat:0 }}%{% else %}—{% endif %}
+      </p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Got any reply" %}</p>
+    </div>
+    <div class="card">
+      <p class="text-3xl font-semibold tabular-nums">
+        {% if insights.median_days_to_reply is not None %}{{ insights.median_days_to_reply|floatformat:0 }}{% else %}—{% endif %}
+      </p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Median days to a reply" %}</p>
+    </div>
+    <div class="card">
+      <p class="text-3xl font-semibold tabular-nums">{{ insights.offers }}</p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Offers" %}</p>
+    </div>
+  </div>
+{% else %}
+  {% include "widgets/_nothing_yet.html" %}
+{% endif %}

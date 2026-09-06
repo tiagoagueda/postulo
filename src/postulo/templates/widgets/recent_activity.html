@@ -1,0 +1,28 @@
+{% load i18n %}
+<h2 class="mb-3 font-medium">{{ widget.label }}</h2>
+{% if recent_events %}
+  <div class="card p-0">
+    <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+      {% for event in recent_events %}
+        <li class="px-4 py-3">
+          <div class="flex items-baseline gap-2">
+            <a href="{{ event.application.get_absolute_url }}"
+               class="truncate font-medium hover:underline">
+              {{ event.application.posting.title }}
+            </a>
+            <span class="shrink-0 text-xs text-ink-400">
+              {{ event.occurred_at|date:"j M, H:i" }}
+            </span>
+          </div>
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {{ event.summary|default:event.get_kind_display }}
+          </p>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% else %}
+  <div class="card text-sm text-ink-500 dark:text-ink-400">
+    {% translate "Nothing recorded yet." %}
+  </div>
+{% endif %}

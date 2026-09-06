@@ -35,6 +35,10 @@ EXCUSED: dict[str, str] = {
     "documents:cv_export": "a rendered PDF arriving as a download",
     "documents:upload_download": "an uploaded file arriving as a download",
     "documents:rendered_download": "a rendered document arriving as a download",
+    "applications:insights": (
+        "a redirect to the dashboard, which the suite visits; the figures it used to "
+        "render are widgets there and are checked with the rest"
+    ),
     "applications:interview_ics": "a calendar file for one interview",
     "applications:interview_calendar": "a calendar feed of every interview",
     "accounts:avatar": "an image, served through a permission check",

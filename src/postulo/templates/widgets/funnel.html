@@ -1,0 +1,30 @@
+{% load i18n %}
+<h2 class="mb-3 font-medium">{{ widget.label }}</h2>
+{% if insights.funnel %}
+  <div class="card">
+    <ul class="space-y-3">
+      {% for stage in insights.funnel %}
+        <li>
+          <div class="mb-1 flex items-baseline justify-between text-sm">
+            <span>{{ stage.label }}</span>
+            <span class="tabular-nums text-ink-500 dark:text-ink-400">
+              {{ stage.count }}
+              {% if not forloop.first %}· {{ stage.share|floatformat:0 }}%{% endif %}
+            </span>
+          </div>
+          {% comment %} A real progress element, for two reasons. Its value is an
+             attribute rather than a style, which the content security policy needs --
+             that is why this was an SVG. And it is announced with its value by a
+             screen reader without an aria-label having to repeat the count. {% endcomment %}
+          <progress class="funnel-bar" value="{{ stage.share|floatformat:0 }}" max="100"
+                    aria-label="{{ stage.label }}">{{ stage.share|floatformat:0 }}%</progress>
+        </li>
+      {% endfor %}
+    </ul>
+    <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "Each stage counts applications that ever reached it, whatever happened afterwards." %}
+    </p>
+  </div>
+{% else %}
+  {% include "widgets/_nothing_yet.html" %}
+{% endif %}

@@ -192,23 +192,64 @@ def test_an_unrecorded_source_is_named_rather_than_dropped(user, company):
 # --------------------------------------------------------------------- the page
 
 
-def test_the_page_renders_with_no_data_at_all(client, user):
+def show_figures(user):
+    """Put the figure widgets on this person's dashboard, which is where they live now."""
+    profile = user.profile
+    profile.dashboard_widgets = ["insight_counters", "funnel", "outcomes", "durations"]
+    profile.save(update_fields=["dashboard_widgets"])
+
+
+def figures_on(response):
+    """The insights object, whichever widget on the page computed it."""
+    for item in response.context["page"]:
+        if "insights" in item.context:
+            return item.context["insights"]
+    raise AssertionError("no widget on the page carries the figures")
+
+
+def test_the_old_address_leads_to_the_dashboard(client, user):
+    """Insights is not a destination any more, but a bookmark should still land."""
     client.force_login(user)
+
     response = client.get(reverse("applications:insights"))
 
+    assert response.status_code == 302
+    assert response["Location"] == reverse("core:home")
+
+
+def test_the_page_renders_with_no_data_at_all(client, user):
+    show_figures(user)
+    client.force_login(user)
+
+    response = client.get(reverse("core:home"))
+
     assert response.status_code == 200
-    assert response.context["insights"].applied == 0
+    assert figures_on(response).applied == 0
 
 
 def test_the_page_renders_with_data(client, user, company):
     application = make_application(user, company, applied_days_ago=20)
     change_status(application, Status.INTERVIEWING)
+    show_figures(user)
     client.force_login(user)
 
-    response = client.get(reverse("applications:insights"))
+    response = client.get(reverse("core:home"))
 
     assert response.status_code == 200
-    assert response.context["insights"].applied == 1
+    assert figures_on(response).applied == 1
+
+
+def test_the_figures_are_computed_once_however_many_widgets_want_them(client, user, company):
+    """Four widgets read the same pass over the event log; it should happen once."""
+    make_application(user, company, applied_days_ago=20)
+    show_figures(user)
+    client.force_login(user)
+
+    response = client.get(reverse("core:home"))
+
+    carriers = [item for item in response.context["page"] if "insights" in item.context]
+    assert len(carriers) == 4
+    assert len({id(item.context["insights"]) for item in carriers}) == 1
 
 
 def test_insights_never_include_another_account(user, other_user, company):
@@ -230,8 +271,9 @@ def test_a_funnel_bar_is_a_progress_element_with_its_share_as_the_value(client, 
     having to repeat it.
     """
     make_application(user, company, applied_days_ago=20)
+    show_figures(user)
     client.force_login(user)
-    html = client.get(reverse("applications:insights")).content.decode()
+    html = client.get(reverse("core:home")).content.decode()
 
     assert 'class="funnel-bar"' in html
     assert re.search(r'<progress class="funnel-bar" value="\d+" max="100"', html)
@@ -259,8 +301,9 @@ def test_the_bar_is_not_stretched_out_of_shape_any_more():
 def test_the_bar_carries_a_name_and_the_stage_count_is_beside_it(client, user, company):
     """The count is already text in the row, so the bar names the stage and nothing else."""
     make_application(user, company, applied_days_ago=20)
+    show_figures(user)
     client.force_login(user)
-    html = client.get(reverse("applications:insights")).content.decode()
+    html = client.get(reverse("core:home")).content.decode()
     assert 'aria-label="Applied"' in html
 
 

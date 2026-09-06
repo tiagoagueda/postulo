@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <a href="{% url 'applications:list' %}?state=open" class="card hover:border-brand-400">
+    <p class="text-3xl font-semibold tabular-nums">{{ open_count }}</p>
+    <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Still live" %}</p>
+  </a>
+  <div class="card">
+    <p class="text-3xl font-semibold tabular-nums">{{ interviewing_count }}</p>
+    <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "In conversation" %}</p>
+  </div>
+  <div class="card">
+    <p class="text-3xl font-semibold tabular-nums">{{ offer_count }}</p>
+    <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Offers on the table" %}</p>
+  </div>
+  <div class="card">
+    <p class="text-3xl font-semibold tabular-nums">{{ applied_recently }}</p>
+    <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Applied in the last 30 days" %}</p>
+  </div>
+</div>

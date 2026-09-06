@@ -10,11 +10,12 @@ from __future__ import annotations
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import RedirectView, UpdateView
+from django.views.generic import RedirectView, TemplateView, UpdateView
 
-from postulo.core import site
+from postulo.core import site, widgets
 
 from . import passkeys, sso
 from .forms import AccountForm, AppearanceForm, LocaleForm
@@ -94,3 +95,70 @@ class AccountView(SettingsSectionMixin, UpdateView):
         context["sso_name"] = sso.name()
         context["connections_url"] = reverse("socialaccount_connections")
         return context
+
+
+class DashboardView(SettingsSectionMixin, TemplateView):
+    """Arranging the dashboard: which widgets, in what order.
+
+    A list with buttons rather than dragging. The board can drag since #35, but that took
+    real work to make reachable without a mouse, and arranging is done once and then not
+    again — a form that posts is keyboard-workable, screen-reader-workable and
+    script-free for nothing.
+
+    Every action is a POST to this address, which is what makes it survive a reload and
+    behave under the back button.
+    """
+
+    template_name = "settings/dashboard.html"
+    section_title = _("Dashboard")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile = self._profile()
+        chosen = widgets.keys_for(profile)
+        context["chosen"] = [widgets.get(key) for key in chosen]
+        context["available"] = [
+            (group, [w for w in items if w.key not in chosen]) for group, items in widgets.groups()
+        ]
+        context["is_default"] = not widgets.has_arranged(profile)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        profile = self._profile()
+        keys = widgets.keys_for(profile)
+        action = request.POST.get("action", "")
+        key = request.POST.get("key", "")
+
+        if action == "reset":
+            # None, not []: back to "never arranged", which is what reset means.
+            profile.dashboard_widgets = None
+            profile.save(update_fields=["dashboard_widgets"])
+            return redirect("settings:dashboard")
+        elif key in widgets.REGISTRY:
+            keys = self._rearrange(keys, action, key)
+        else:
+            messages.error(request, _("That is not a widget Postulo knows about."))
+            return redirect("settings:dashboard")
+
+        profile.dashboard_widgets = keys
+        profile.save(update_fields=["dashboard_widgets"])
+        return redirect("settings:dashboard")
+
+    def _profile(self) -> Profile:
+        profile, _created = Profile.objects.get_or_create(user=self.request.user)
+        return profile
+
+    @staticmethod
+    def _rearrange(keys: list[str], action: str, key: str) -> list[str]:
+        keys = list(keys)
+        if action == "add":
+            if key not in keys:
+                keys.append(key)
+        elif action == "remove":
+            keys = [k for k in keys if k != key]
+        elif action in {"up", "down"} and key in keys:
+            index = keys.index(key)
+            target = index - 1 if action == "up" else index + 1
+            if 0 <= target < len(keys):
+                keys[index], keys[target] = keys[target], keys[index]
+        return keys

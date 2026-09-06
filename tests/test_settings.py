@@ -99,6 +99,7 @@ def test_a_plugin_can_add_a_section(client, user):
         ordered = [s.slug for s in settings_sections.sections()]
         assert ordered == [
             "appearance",
+            "dashboard",
             "locale",
             "account",
             "connections",

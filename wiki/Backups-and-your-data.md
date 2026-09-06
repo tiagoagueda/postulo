@@ -2,7 +2,7 @@
 
 ## Taking everything with you
 
-**Dashboard → Export everything**, or *Insights → Export everything*.
+**Dashboard → Export everything**, on the *Shortcuts* widget.
 
 One zip, holding a readable JSON document of every record in your account and every file
 in it: your profile, career record, companies, postings, applications with their whole

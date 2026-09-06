@@ -7,3 +7,7 @@ class CoreConfig(AppConfig):
     name = "postulo.core"
     label = "core"
     verbose_name = _("Core")
+
+    def ready(self) -> None:
+        # Registers the dashboard widgets core owns.
+        from . import widgets_builtin  # noqa: F401

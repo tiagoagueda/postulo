@@ -272,3 +272,20 @@ def highlight(text, query: str) -> str:
         pieces.append(f"<mark>{escape(text[found : found + len(query)])}</mark>")
         position = found + len(query)
     return mark_safe("".join(pieces))  # noqa: S308
+
+
+@register.simple_tag(takes_context=True)
+def render_widget(context, rendered):
+    """Draw one dashboard widget with the context it computed for itself.
+
+    ``{% include %}`` would hand the widget the whole page's context, which is how one
+    widget ends up quietly reading a variable another one set. Each is rendered against
+    its own dict and the request, so a widget can only see what it asked for.
+    """
+    from django.template.loader import render_to_string
+
+    return render_to_string(
+        rendered.spec.template,
+        {**rendered.context, "widget": rendered.spec},
+        request=context.get("request"),
+    )

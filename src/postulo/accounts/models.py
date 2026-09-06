@@ -263,6 +263,18 @@ class Profile(models.Model):
     #: How each table is laid out — which columns, in what order, how many rows a page
     #: holds — keyed by the table's name. A preference, so it follows the account.
     table_settings = models.JSONField(_("table settings"), default=dict, blank=True)
+    #: Which dashboard widgets this person has chosen, in the order they appear.
+    #:
+    #: ``None`` means "never arranged", which is the default set; an empty list means
+    #: "arranged, to nothing", which is a page somebody deliberately cleared. They have to
+    #: be different values, or clearing the page would hand the defaults straight back.
+    #:
+    #: What is stored is what was *chosen*, the opposite way round from
+    #: ``hidden_nav_items`` and on purpose: a widget added in a later release should appear
+    #: for somebody who never arranged anything, and stay off the page of somebody who did.
+    dashboard_widgets = models.JSONField(
+        _("dashboard widgets"), null=True, blank=True, default=None
+    )
     #: A picture the person uploaded, re-encoded to a square; beats the Gravatar.
     avatar = models.ImageField(_("picture"), upload_to=upload_to_avatars, blank=True)
     #: Opt-in: fetch the Gravatar for the primary address, once, server-side.

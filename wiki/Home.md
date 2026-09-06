@@ -65,7 +65,7 @@ feature cannot be made to work for someone, that is a bug, and it is filed as on
 | Use it for the first time | [Getting started](Getting-started) |
 | Keep on top of applications | [Tracking applications](Tracking-applications) |
 | Stop retyping adverts | [Capturing postings](Capturing-postings) |
-| See what the record adds up to | [Insights](Insights) |
+| See what the record adds up to | [Insights and the dashboard](Insights) |
 | Write your CV once and tailor it | [Your career record](Your-career-record) and [CVs](CVs) |
 | Reuse a letter properly, of any of the four kinds | [Letters](Cover-letters) |
 | Know what you sent to whom | [Files and what you sent](Files-and-what-you-sent) |

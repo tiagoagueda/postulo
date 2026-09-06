@@ -60,7 +60,6 @@ ITEMS: tuple[NavItem, ...] = (
         ("applications:detail", "applications:create"),
     ),
     NavItem("board", _("Board"), "applications:board"),
-    NavItem("insights", _("Insights"), "applications:insights"),
     NavItem(
         "documents",
         _("Documents"),

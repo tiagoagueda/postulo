@@ -272,10 +272,13 @@ def test_insights_count_the_quiet_ones_per_source_and_company(user, company):
     assert insights.quiet_by_company == [("Aperture Science", 2), ("Black Mesa", 1)]
 
 
-def test_the_insights_page_shows_the_quiet_column(client, user, company):
+def test_the_sources_widget_shows_the_quiet_column(client, user, company):
     sent(user, company, days_ago=30, source="LinkedIn")
+    profile = user.profile
+    profile.dashboard_widgets = ["sources"]
+    profile.save(update_fields=["dashboard_widgets"])
     client.force_login(user)
-    body = client.get(reverse("applications:insights")).content.decode()
+    body = client.get(reverse("core:home")).content.decode()
     assert "Quiet" in body and "data-quiet-by-company" in body
 
 

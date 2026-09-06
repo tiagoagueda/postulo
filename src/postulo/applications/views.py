@@ -6,6 +6,7 @@ from datetime import timedelta
 from functools import cached_property
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -18,7 +19,7 @@ from django.views.generic import (
     DeleteView,
     DetailView,
     ListView,
-    TemplateView,
+    RedirectView,
     UpdateView,
 )
 
@@ -29,7 +30,6 @@ from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 
 from . import ical, quiet, suggestions
-from .analytics import build as build_insights
 from .forms import (
     ApplicationForm,
     ApplicationIntakeForm,
@@ -584,23 +584,17 @@ class TagDeleteView(OwnedObjectMixin, DeleteView):
 # --------------------------------------------------------------------- insights
 
 
-class InsightsView(OwnedObjectMixin, TemplateView):
-    """What the record says about the search.
+class InsightsView(LoginRequiredMixin, RedirectView):
+    """Insights is the dashboard now (#44).
 
-    Read from the event log rather than from current statuses, so an application that
-    was interviewing before it was rejected still counts as an interview. Anything else
-    would report that a search which reached three final rounds had reached none.
+    It answered the same question the dashboard did — *how is this going?* — at a
+    different distance, and a person had to remember which page held which number. Its
+    figures are widgets on the one page. This stays so that a bookmark, a link in an old
+    note or a browser's history lands somewhere useful instead of on a 404.
     """
 
-    template_name = "applications/insights.html"
-
-    def get_queryset(self):
-        return Application.objects.for_user(self.request.user)
-
-    def get_context_data(self, **kwargs) -> dict:
-        context = super().get_context_data(**kwargs)
-        context["insights"] = build_insights(self.request.user)
-        return context
+    pattern_name = "core:home"
+    permanent = False
 
 
 # --------------------------------------------------------------- suggestions

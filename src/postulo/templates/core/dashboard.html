@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Dashboard" %}{% endblock %}
 
@@ -16,21 +16,6 @@
     </div>
   {% endif %}
 
-  {% if suggestion_count %}
-    <div class="alert-warning mb-6" role="status">
-      <p>
-        {% url 'applications:suggestion_list' as suggestions_url %}
-        {% blocktranslate count counter=suggestion_count trimmed %}
-          A plugin has suggested one thing that may have happened:
-          <a href="{{ suggestions_url }}" class="font-medium underline">look at it</a>.
-        {% plural %}
-          Plugins have suggested {{ counter }} things that may have happened:
-          <a href="{{ suggestions_url }}" class="font-medium underline">look at them</a>.
-        {% endblocktranslate %}
-      </p>
-    </div>
-  {% endif %}
-
   <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
     <div>
       <h1 class="mb-1 text-2xl font-semibold tracking-tight">
@@ -42,7 +27,8 @@
         {% translate "Where your job search stands today." %}
       </p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
+      <a href="{% url 'settings:dashboard' %}" class="btn-ghost">{% translate "Arrange" %}</a>
       <a href="{% url 'jobs:capture_create' %}" class="btn-secondary">
         {% translate "Capture a posting" %}
       </a>
@@ -52,259 +38,26 @@
     </div>
   </div>
 
-  <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-    <a href="{% url 'applications:list' %}?state=open" class="card hover:border-brand-400">
-      <p class="text-3xl font-semibold tabular-nums">{{ open_count }}</p>
-      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Still live" %}</p>
-    </a>
-    <div class="card">
-      <p class="text-3xl font-semibold tabular-nums">{{ interviewing_count }}</p>
-      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "In conversation" %}</p>
+  {% if page %}
+    {% comment %} Twelve columns, so a quarter, a half and a whole row all divide into it.
+       The widths are written out as literal classes rather than built from the widget's
+       own string: Tailwind reads the templates, and a class it never sees is a class it
+       never compiles. {% endcomment %}
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      {% for item in page %}
+        <section class="{% if item.spec.width == 'quarter' %}lg:col-span-3{% elif item.spec.width == 'half' %}lg:col-span-6{% else %}lg:col-span-12{% endif %}"
+                 data-widget="{{ item.spec.key }}">
+          {% render_widget item %}
+        </section>
+      {% endfor %}
     </div>
-    <div class="card">
-      <p class="text-3xl font-semibold tabular-nums">{{ offer_count }}</p>
-      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Offers on the table" %}</p>
+  {% else %}
+    <div class="card py-12 text-center">
+      <p class="mb-1 font-medium">{% translate "Your dashboard is empty" %}</p>
+      <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "You have taken everything off it. Put something back whenever you like." %}
+      </p>
+      <a href="{% url 'settings:dashboard' %}" class="btn-primary">{% translate "Arrange it" %}</a>
     </div>
-    <div class="card">
-      <p class="text-3xl font-semibold tabular-nums">{{ applied_recently }}</p>
-      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Applied in the last 30 days" %}</p>
-    </div>
-  </div>
-
-  <div class="grid gap-6 lg:grid-cols-3">
-
-    {# The point of the dashboard: what needs doing, not what has been done. #}
-    <section class="lg:col-span-2">
-      <div class="mb-3 flex items-baseline justify-between">
-        <h2 class="font-medium">{% translate "Gone quiet" %}</h2>
-        {% if quiet_count %}
-          <a href="{% url 'applications:list' %}?quiet=1" class="text-sm text-brand-600 underline dark:text-brand-400">
-            {% blocktranslate count counter=quiet_count trimmed %}
-              {{ counter }} application
-            {% plural %}
-              All {{ counter }}
-            {% endblocktranslate %}
-          </a>
-        {% endif %}
-      </div>
-      {% if quiet_applications %}
-        <div class="card p-0" data-gone-quiet>
-          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-            {% for application in quiet_applications %}
-              <li class="flex flex-wrap items-center gap-3 px-4 py-3">
-                <div class="min-w-0 flex-1">
-                  <a href="{{ application.get_absolute_url }}"
-                     class="block truncate font-medium hover:underline">
-                    {{ application.posting.title }}
-                  </a>
-                  <p class="truncate text-sm text-ink-500 dark:text-ink-400">
-                    {{ application.posting.company.name }}
-                    · {{ application.get_status_display }}
-                    ·
-                    {% blocktranslate trimmed count days=application.days_since_activity %}
-                      quiet for {{ days }} day
-                    {% plural %}
-                      quiet for {{ days }} days
-                    {% endblocktranslate %}
-                  </p>
-                </div>
-                <div class="flex shrink-0 items-center gap-1">
-                  <form method="post" action="{% url 'applications:quiet_action' application.pk %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{% url 'core:home' %}">
-                    <button type="submit" name="action" value="follow_up" class="btn-ghost px-2 py-1 text-xs">
-                      {% translate "Followed up" %}
-                    </button>
-                  </form>
-                  <form method="post" action="{% url 'applications:quiet_action' application.pk %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{% url 'core:home' %}">
-                    <button type="submit" name="action" value="snooze" class="btn-ghost px-2 py-1 text-xs">
-                      {% translate "Snooze" %}
-                    </button>
-                  </form>
-                  <form method="post" action="{% url 'applications:status' application.pk %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{% url 'core:home' %}">
-                    <input type="hidden" name="status" value="ghosted">
-                    <button type="submit" class="btn-ghost px-2 py-1 text-xs text-ink-500">
-                      {% translate "Ghosted" %}
-                    </button>
-                  </form>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-        <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
-          {% blocktranslate trimmed with days=quiet_after_days %}
-            Open applications with nothing for {{ days }} days and nothing planned. Snooze sets a
-            reminder two weeks out; Ghosted records that you stopped waiting.
-          {% endblocktranslate %}
-        </p>
-      {% else %}
-        <div class="card text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate trimmed with days=quiet_after_days %}
-            Nothing has gone quiet for {{ days }} days. Either you are on top of it, or it is
-            time to send out a few more.
-          {% endblocktranslate %}
-        </div>
-      {% endif %}
-
-      <h2 class="mt-8 mb-3 font-medium">{% translate "Recent activity" %}</h2>
-      {% if recent_events %}
-        <div class="card p-0">
-          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-            {% for event in recent_events %}
-              <li class="px-4 py-3">
-                <div class="flex items-baseline gap-2">
-                  <a href="{{ event.application.get_absolute_url }}"
-                     class="truncate font-medium hover:underline">
-                    {{ event.application.posting.title }}
-                  </a>
-                  <span class="shrink-0 text-xs text-ink-400">
-                    {{ event.occurred_at|date:"j M, H:i" }}
-                  </span>
-                </div>
-                <p class="text-sm text-ink-500 dark:text-ink-400">
-                  {{ event.summary|default:event.get_kind_display }}
-                </p>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-      {% else %}
-        <div class="card text-sm text-ink-500 dark:text-ink-400">
-          {% translate "Nothing recorded yet." %}
-        </div>
-      {% endif %}
-    </section>
-
-    <section>
-      <div class="mb-3 flex items-center justify-between">
-        <h2 class="font-medium">{% translate "Coming up" %}</h2>
-        <a href="{% url 'applications:interview_list' %}" class="text-sm text-brand-600 underline dark:text-brand-400">
-          {% translate "All interviews" %}
-        </a>
-      </div>
-      {% if upcoming_interviews %}
-        <div class="card p-0" data-coming-up>
-          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-            {% for interview in upcoming_interviews %}
-              <li class="flex items-start gap-3 px-4 py-3">
-                <div class="w-20 shrink-0 text-sm tabular-nums">
-                  <p class="font-medium">{{ interview.starts_at|date:"D j M" }}</p>
-                  <p class="text-xs text-ink-500 dark:text-ink-400">{{ interview.starts_at|date:"H:i" }}</p>
-                </div>
-                <div class="min-w-0 flex-1">
-                  <a href="{{ interview.application.get_absolute_url }}#interview-{{ interview.pk }}"
-                     class="block truncate text-sm font-medium hover:underline">
-                    {{ interview.application.posting.title }}
-                  </a>
-                  <p class="truncate text-xs text-ink-500 dark:text-ink-400">
-                    {{ interview.get_kind_display }} · {{ interview.application.posting.company.name }}
-                  </p>
-                </div>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-      {% else %}
-        <div class="card text-sm text-ink-500 dark:text-ink-400">
-          {% translate "No interviews in the diary." %}
-        </div>
-      {% endif %}
-      {% if interviews_awaiting_outcome %}
-        <p class="mt-2 text-xs text-amber-700 dark:text-amber-400" data-awaiting-outcome>
-          <a href="{% url 'applications:interview_list' %}" class="hover:underline">
-            {% blocktranslate count counter=interviews_awaiting_outcome trimmed %}
-              {{ counter }} interview has passed without an outcome. How did it go?
-            {% plural %}
-              {{ counter }} interviews have passed without an outcome. How did they go?
-            {% endblocktranslate %}
-          </a>
-        </p>
-      {% endif %}
-
-      <div class="mt-6 mb-3 flex items-center justify-between">
-        <h2 class="font-medium">{% translate "Due now" %}</h2>
-        <a href="{% url 'applications:reminder_create' %}" class="text-sm text-brand-600 underline dark:text-brand-400">
-          {% translate "Add" %}
-        </a>
-      </div>
-      {% if due_reminders %}
-        <div class="card p-0">
-          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-            {% for reminder in due_reminders %}
-              <li class="flex items-start gap-3 px-4 py-3">
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-medium">{{ reminder.summary }}</p>
-                  <p class="text-xs text-ink-500 dark:text-ink-400">
-                    {{ reminder.due_at|date:"j M, H:i" }}
-                  </p>
-                </div>
-                <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}">
-                  {% csrf_token %}
-                  <input type="hidden" name="next" value="{% url 'core:home' %}">
-                  <button type="submit" class="btn-ghost px-2 py-1 text-xs">
-                    {% translate "Done" %}
-                  </button>
-                </form>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-      {% else %}
-        <div class="card text-sm text-ink-500 dark:text-ink-400">
-          {% translate "Nothing due." %}
-        </div>
-      {% endif %}
-
-      <div class="card mt-6">
-        <h2 class="mb-3 font-medium">{% translate "Shortcuts" %}</h2>
-        <div class="flex flex-col gap-2 text-sm">
-          <a href="{% url 'applications:board' %}" class="text-brand-600 underline dark:text-brand-400">
-            {% translate "See the board" %}
-          </a>
-          <a href="{% url 'documents:cv_list' %}" class="text-brand-600 underline dark:text-brand-400">
-            {% translate "Your CVs" %}
-          </a>
-          <a href="{% url 'resume:overview' %}" class="text-brand-600 underline dark:text-brand-400">
-            {% translate "Your career record" %}
-          </a>
-          <a href="{% url 'jobs:company_list' %}" class="text-brand-600 underline dark:text-brand-400">
-            {% translate "Companies you have applied to" %}
-          </a>
-          <a href="{% url 'applications:insights' %}" class="text-brand-600 underline dark:text-brand-400">
-            {% translate "Insights" %}
-          </a>
-          <a href="{% url 'listings:list' %}" class="text-brand-600 underline dark:text-brand-400">
-            {% blocktranslate count counter=listings_to_decide trimmed %}
-              {{ counter }} listing to decide on
-            {% plural %}
-              {{ counter }} listings to decide on
-            {% endblocktranslate %}
-            {% if closing_soon_count %}
-              <span class="text-amber-700 dark:text-amber-400">
-                {% blocktranslate count counter=closing_soon_count trimmed %}
-                  · {{ counter }} closing this week
-                {% plural %}
-                  · {{ counter }} closing this week
-                {% endblocktranslate %}
-              </span>
-            {% endif %}
-          </a>
-          <a href="{% url 'core:export' %}" class="text-brand-600 underline dark:text-brand-400">
-            {% translate "Export everything" %}
-          </a>
-          <a href="{% url 'applications:tag_list' %}" class="text-brand-600 underline dark:text-brand-400">
-            {% translate "Manage tags" %}
-          </a>
-          <a href="{% url 'accounts:profile' %}" class="text-brand-600 underline dark:text-brand-400">
-            {% translate "Your details" %}
-          </a>
-        </div>
-      </div>
-    </section>
-  </div>
+  {% endif %}
 {% endblock %}

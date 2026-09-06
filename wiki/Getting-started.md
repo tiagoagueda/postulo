@@ -104,7 +104,7 @@ uv run manage.py seed_demo you@example.org
 ```
 
 Everything it creates is obviously invented (the employers are Aperture Science, Black
-Mesa and their friends), and the timelines are scripted so that Insights has a real story
+Mesa and their friends), and the timelines are scripted so that the figure widgets have a real story
 to tell. It refuses to add to an account that already holds a search; pass `--reset` to
 replace one, or give it a different address and `--password` to create a throwaway
 account. With Docker: `docker compose exec postulo python manage.py seed_demo …`.
@@ -113,7 +113,7 @@ account. With Docker: `docker compose exec postulo python manage.py seed_demo �
 
 | Page | What it is for |
 | --- | --- |
-| **Dashboard** | What needs doing: applications worth chasing, reminders due, recent activity. |
+| **Dashboard** | What needs doing: applications worth chasing, reminders due, recent activity. Made of widgets you arrange — press *Arrange*, or *Settings → Dashboard*, to add the figures that used to be on Insights. |
 | **Applications** | Everything, as a filterable table. |
 | **Board** | Only what is still live, arranged by status. |
 | **Documents** | CVs, cover letters, uploaded files, and your career record. |

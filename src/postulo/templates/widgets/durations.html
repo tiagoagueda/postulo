@@ -1,0 +1,39 @@
+{% load i18n %}
+<h2 class="mb-3 font-medium">{{ widget.label }}</h2>
+{% if insights.median_days_to_reply is not None %}
+  <div class="card">
+    <dl class="space-y-3 text-sm">
+      <div class="flex justify-between">
+        <dt>{% translate "Fastest" %}</dt>
+        <dd class="tabular-nums">
+          {% blocktranslate trimmed count days=insights.fastest_reply_days %}
+            {{ days }} day
+          {% plural %}
+            {{ days }} days
+          {% endblocktranslate %}
+        </dd>
+      </div>
+      <div class="flex justify-between">
+        <dt>{% translate "Median" %}</dt>
+        <dd class="tabular-nums">{{ insights.median_days_to_reply|floatformat:0 }}</dd>
+      </div>
+      <div class="flex justify-between">
+        <dt>{% translate "Slowest" %}</dt>
+        <dd class="tabular-nums">
+          {% blocktranslate trimmed count days=insights.slowest_reply_days %}
+            {{ days }} day
+          {% plural %}
+            {{ days }} days
+          {% endblocktranslate %}
+        </dd>
+      </div>
+    </dl>
+    <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "Median rather than average: one employer taking four months should not move the number everyone else sets." %}
+    </p>
+  </div>
+{% else %}
+  <div class="card text-sm text-ink-500 dark:text-ink-400">
+    {% translate "Nobody has replied yet, so there is nothing to time." %}
+  </div>
+{% endif %}

@@ -1,0 +1,43 @@
+{% load i18n %}
+<h2 class="mb-3 font-medium">{{ widget.label }}</h2>
+{% if insights.industries %}
+  <div class="card overflow-x-auto p-0" data-by-industry>
+    <table class="w-full text-left text-sm">
+      <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
+                    dark:border-ink-800 dark:text-ink-400">
+        <tr>
+          <th scope="col" class="px-4 py-3 font-medium">{% translate "Industry" %}</th>
+          <th scope="col" class="px-4 py-3 font-medium">{% translate "Sent" %}</th>
+          <th scope="col" class="px-4 py-3 font-medium">{% translate "Replied" %}</th>
+          <th scope="col" class="px-4 py-3 font-medium">{% translate "Interviews" %}</th>
+          <th scope="col" class="px-4 py-3 font-medium">{% translate "Offers" %}</th>
+          <th scope="col" class="px-4 py-3 font-medium">{% translate "Quiet" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in insights.industries %}
+          <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+            <td class="px-4 py-3">{{ row.name }}</td>
+            <td class="px-4 py-3 tabular-nums">{{ row.applied }}</td>
+            <td class="px-4 py-3 tabular-nums">
+              {{ row.responded }}
+              {% if row.response_rate is not None %}
+                <span class="text-xs text-ink-400">({{ row.response_rate|floatformat:0 }}%)</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 tabular-nums">{{ row.interviewed }}</td>
+            <td class="px-4 py-3 tabular-nums">{{ row.offers }}</td>
+            <td class="px-4 py-3 tabular-nums">{{ row.quiet }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+    {% translate "A company in several industries counts in each of them." %}
+  </p>
+{% else %}
+  <div class="card text-sm text-ink-500 dark:text-ink-400">
+    {% translate "No industries recorded against the companies you have applied to." %}
+  </div>
+{% endif %}
