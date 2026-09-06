@@ -102,6 +102,49 @@ def answering(monkeypatch):
     return state
 
 
+def without_dns(url: str) -> str:
+    """``validate_public_url`` with the name lookup replaced, and nothing else.
+
+    The real one resolves a hostname and refuses unless every address it answers with is
+    publicly routable. A test cannot resolve ``portfolio.example.org``, so the lookup is
+    the one part stood in for: a literal private or loopback address is refused exactly
+    as the real function would refuse it, and a name is taken to be public. What is being
+    tested is *which requests are checked*, not the check itself, which has its own tests.
+    """
+    import ipaddress
+    from urllib.parse import urlparse
+
+    from postulo.plugins.fetching import UnsafeURL
+
+    host = urlparse(url).hostname or ""
+    try:
+        address = ipaddress.ip_address(host)
+    except ValueError:
+        return url
+    if not address.is_global:
+        raise UnsafeURL("That address is on a private or local network.")
+    return url
+
+
+def with_transport(monkeypatch, transport):
+    """Make every client the link checker builds speak to ``transport``.
+
+    The guard being tested is an event hook on the real client, so the client itself has
+    to be the real one; only the wire underneath it, and the name lookup, are replaced.
+    """
+    import httpx
+
+    from postulo.plugins import http as plugin_http
+
+    real = httpx.Client
+
+    def build(*args, **kwargs):
+        return real(*args, **{**kwargs, "transport": transport})
+
+    monkeypatch.setattr(plugin_http.httpx, "Client", build)
+    monkeypatch.setattr(plugin_http, "validate_public_url", without_dns)
+
+
 # ------------------------------------------------------------------ letters
 
 
@@ -277,6 +320,90 @@ def test_a_private_address_is_never_visited(user, monkeypatch):
     link_checks.check(link)
     link.refresh_from_db()
     assert link.is_broken and "not public" in link.check_detail
+
+
+def test_a_redirect_towards_a_private_address_is_not_followed(user, monkeypatch):
+    """The address a person saved is public; where it sends us afterwards may not be.
+
+    This is the whole reason link checking does not use a bare ``httpx.Client``. A client
+    told to follow redirects makes each hop itself, so a public host answering
+    ``302 Location: http://127.0.0.1:9000/`` would be fetched and its answer written onto
+    the link — a scan of whatever network the instance sits on, with the results shown.
+    """
+    import httpx
+
+    reached: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        reached.append(str(request.url))
+        if request.url.host == "portfolio.example.org":
+            return httpx.Response(302, headers={"Location": "http://127.0.0.1:9000/admin/"})
+        return httpx.Response(200)
+
+    monkeypatch.setattr(link_checks, "validate_public_url", without_dns)
+    with_transport(monkeypatch, httpx.MockTransport(handler))
+
+    link = a_link(user, url="https://portfolio.example.org/")
+    link_checks.check(link)
+    link.refresh_from_db()
+
+    assert reached == ["https://portfolio.example.org/"], "the second hop was never made"
+    assert link.is_broken
+    assert "private or local address" in link.check_detail
+
+
+def test_a_redirect_to_another_public_address_is_followed(user, monkeypatch):
+    """The guard refuses a destination, not redirection itself."""
+    import httpx
+
+    reached: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        reached.append(str(request.url))
+        if request.url.host == "old.example.org":
+            return httpx.Response(301, headers={"Location": "https://new.example.org/cv"})
+        return httpx.Response(200)
+
+    monkeypatch.setattr(link_checks, "validate_public_url", without_dns)
+    with_transport(monkeypatch, httpx.MockTransport(handler))
+
+    link = a_link(user, url="https://old.example.org/cv")
+    link_checks.check(link)
+    link.refresh_from_db()
+
+    assert len(reached) == 2, "a public redirect is followed as it always was"
+    assert not link.is_broken
+
+
+def test_the_check_is_public_only_even_where_connections_may_be_private(
+    user, monkeypatch, settings
+):
+    """POSTULO_CONNECTIONS_ALLOW_PRIVATE is about connections, not about a portfolio.
+
+    An operator running Paperless on the same network has said so about *connections*. A
+    portfolio address is a public thing by definition — a recruiter clicks it from the
+    open internet — so a private one is broken whatever that setting says.
+    """
+    import httpx
+
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = True
+    reached: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        reached.append(str(request.url))
+        if request.url.host == "portfolio.example.org":
+            return httpx.Response(302, headers={"Location": "http://192.168.1.20/"})
+        return httpx.Response(200)
+
+    monkeypatch.setattr(link_checks, "validate_public_url", without_dns)
+    with_transport(monkeypatch, httpx.MockTransport(handler))
+
+    link = a_link(user, url="https://portfolio.example.org/")
+    link_checks.check(link)
+    link.refresh_from_db()
+
+    assert reached == ["https://portfolio.example.org/"]
+    assert link.is_broken
 
 
 def test_checking_happens_only_when_a_person_asks(client, user, answering):

@@ -48,15 +48,44 @@ def _guard(request: httpx.Request) -> None:
     check_destination(str(request.url))
 
 
+def _public_only(request: httpx.Request) -> None:
+    """Refuse anything that is not publicly routable, whatever the operator allowed.
+
+    ``check_destination`` exists for connections, where a private address is the whole
+    point. Some things Postulo fetches are public by definition — a portfolio address a
+    recruiter will click — and for those the operator's connection policy is not the
+    question being asked.
+    """
+    try:
+        validate_public_url(str(request.url))
+    except UnsafeURL as exc:
+        raise DestinationRefused(str(exc)) from exc
+
+
+def _build(guard, timeout: float, kwargs: dict) -> httpx.Client:
+    headers = {"User-Agent": USER_AGENT, **kwargs.pop("headers", {})}
+    hooks = kwargs.pop("event_hooks", {})
+    hooks = {**hooks, "request": [guard, *hooks.get("request", [])]}
+    kwargs.setdefault("follow_redirects", True)
+    kwargs.setdefault("max_redirects", MAX_REDIRECTS)
+    return httpx.Client(timeout=timeout, headers=headers, event_hooks=hooks, **kwargs)
+
+
 def client(*, timeout: float = DEFAULT_TIMEOUT, **kwargs) -> httpx.Client:
     """An ``httpx.Client`` with Postulo's defaults and the destination policy attached.
 
     Use it as a context manager. Extra keyword arguments go to ``httpx.Client``; a
     plugin needing basic auth, for instance, passes ``auth=``.
     """
-    headers = {"User-Agent": USER_AGENT, **kwargs.pop("headers", {})}
-    hooks = kwargs.pop("event_hooks", {})
-    hooks = {**hooks, "request": [_guard, *hooks.get("request", [])]}
-    kwargs.setdefault("follow_redirects", True)
-    kwargs.setdefault("max_redirects", MAX_REDIRECTS)
-    return httpx.Client(timeout=timeout, headers=headers, event_hooks=hooks, **kwargs)
+    return _build(_guard, timeout, kwargs)
+
+
+def public_only_client(*, timeout: float = DEFAULT_TIMEOUT, **kwargs) -> httpx.Client:
+    """Like :func:`client`, but private addresses are refused however the instance is set.
+
+    The hook runs on every request the client makes rather than once on the address it
+    was handed, which is the part that matters: a public host is perfectly free to answer
+    ``302 Location: http://127.0.0.1:9000/``, and a client following that redirect on its
+    own would make the request before anything had a chance to object.
+    """
+    return _build(_public_only, timeout, kwargs)

@@ -131,6 +131,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **Checking a portfolio link could be redirected onto your own network.** *Check it
+  answers* validated the address you saved and then let the HTTP client follow redirects
+  by itself, so a site answering `302 Location: http://127.0.0.1:9000/` had that request
+  made and the status written onto the link. On a self-hosted instance sitting beside a
+  router, a NAS and a hypervisor, that turned the button into a scan of that network with
+  the answers on display. Every request the check makes is now examined, redirects
+  included, and a redirect towards a private or local address is refused and reported as
+  such. A redirect between public addresses is followed exactly as before, and this holds
+  whatever `POSTULO_CONNECTIONS_ALLOW_PRIVATE` is set to: that setting is about
+  connections to services you run, and a portfolio address is public by definition. (#57)
 - **The container image would not build.** `collectstatic` with the manifest storage
   the image uses follows references inside JavaScript, and the vendored password-meter
   bundles ended with a pointer to a source map that was never shipped, so the build

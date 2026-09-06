@@ -60,6 +60,13 @@ from the inside because it never visits your links. So there is a button: *Check
 answers* on one link, *Check them all* on the section. One request each, when you press it,
 and the result is kept beside the link. Nothing is ever checked on a schedule.
 
+The check only ever visits public addresses. A link pointing at something on your own
+network — `192.168.…`, `localhost`, a name that resolves to either — is reported as broken
+without a request being made, and so is a public address that redirects to one. That is
+true even on an instance where `POSTULO_CONNECTIONS_ALLOW_PRIVATE` is on for plugins: a
+portfolio address is something a recruiter clicks from the open internet, so an answer from
+inside your house would not tell you anything you wanted to know.
+
 ## Ordering
 
 Each entry has an **order** number; lower numbers come first, and the arrows on the

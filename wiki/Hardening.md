@@ -58,7 +58,10 @@ signed index carries. Add a catalogue only from people whose review you would ac
 
 Keep `POSTULO_CONNECTIONS_ALLOW_PRIVATE` off unless a plugin genuinely needs to reach a
 service on your own network — with it on, a public hostname that resolves to a private
-address is allowed through.
+address is allowed through. It applies to plugin connections and to company logos, and not
+to the two things that are public by definition: capturing a posting from a URL, and
+checking that a portfolio link answers. Both refuse a private address however that setting
+is left, on the first request and on anything they are redirected to.
 
 ## Keeping up
 
