@@ -3,10 +3,20 @@
 Plain data, importable without Django: the settings module reads it, and so does the
 ``scripts/messages.py`` tool that keeps the catalogues current.
 
-Phase 1 is every official language of the European Union. The names are the languages'
-own — someone looking for their language in a list finds "Deutsch", not the English word
-for it — and the plural rules are the standard gettext ones, which Python's ``gettext``
-evaluates at runtime.
+The names are the languages' own — somebody looking for their language in a list finds
+"Deutsch", not the English word for it — and the plural rules are the standard gettext
+ones, which Python's ``gettext`` evaluates at runtime.
+
+**Which languages, and in what order.** #43 set the phases and each now has a milestone:
+
+* **0.2.0** — the 24 official languages of the European Union.
+* **0.3.0** — Africa (#70). "Every language of Africa" is some two thousand of them, so the
+  rule drawn here is: **a language with official or national status in at least one African
+  state, plus the cross-border lingua francas that outrank most of those in speakers.**
+  Twenty-nine of them, and a documented rule rather than a list assembled by feel. French,
+  Portuguese, English and Spanish already carry a great deal of the continent, so the gap
+  was smaller than the map suggests.
+* **0.4.0** — Asia and South America (#71). **0.5.0** — the rest of the world (#72).
 """
 
 from __future__ import annotations
@@ -21,10 +31,12 @@ from __future__ import annotations
 #:
 #: Written out deliberately rather than derived from the code, because a language is not a
 #: country: ``el`` is Greek and ``cs`` is Czech, and neither code says so. For the European
-#: Union set every language has one uncontested home, which is what makes this tractable
-#: now. It will not survive #43 moving past Europe — Spanish is not only Spain, Arabic is
-#: not one flag — and the rule there is that a language with no uncontested home gets no
-#: flag at all. No flag beats a wrong flag.
+#: Union set every language had one uncontested home. Africa (#70) is where that stopped
+#: being true, and the rule held: **a language with no uncontested home gets no flag at
+#: all.** Arabic is twenty-two countries, Swahili is four, Hausa is two, and Sesotho is
+#: Lesotho's as much as South Africa's. Those are blank on purpose, and the picker copes.
+#: No flag beats a wrong flag, and a wrong flag about somebody's language is not a small
+#: wrong.
 FLAGS: dict[str, str] = {
     "en-gb": "\U0001f1ec\U0001f1e7",
     "bg": "\U0001f1e7\U0001f1ec",
@@ -50,6 +62,25 @@ FLAGS: dict[str, str] = {
     "sk": "\U0001f1f8\U0001f1f0",
     "sl": "\U0001f1f8\U0001f1ee",
     "sv": "\U0001f1f8\U0001f1ea",
+    # Africa (#70). A flag only where one country is uncontestedly the language's
+    # home. Absent for the cross-border ones by the rule above rather than by
+    # oversight: ar, ee, ff, ha, ig, ln, om, ss, st, sw, ti, tn, yo.
+    "af": "\U0001f1ff\U0001f1e6",
+    "ak": "\U0001f1ec\U0001f1ed",
+    "am": "\U0001f1ea\U0001f1f9",
+    "bm": "\U0001f1f2\U0001f1f1",
+    "kab": "\U0001f1e9\U0001f1ff",
+    "mg": "\U0001f1f2\U0001f1ec",
+    "nr": "\U0001f1ff\U0001f1e6",
+    "ny": "\U0001f1f2\U0001f1fc",
+    "rw": "\U0001f1f7\U0001f1fc",
+    "sn": "\U0001f1ff\U0001f1fc",
+    "so": "\U0001f1f8\U0001f1f4",
+    "ts": "\U0001f1ff\U0001f1e6",
+    "ve": "\U0001f1ff\U0001f1e6",
+    "wo": "\U0001f1f8\U0001f1f3",
+    "xh": "\U0001f1ff\U0001f1e6",
+    "zu": "\U0001f1ff\U0001f1e6",
 }
 
 
@@ -90,6 +121,36 @@ NATIVE_NAMES: dict[str, str] = {
     "sk": "slovenčina",
     "sl": "slovenščina",
     "sv": "svenska",
+    # Africa (#70), alphabetical by code like the rest.
+    "af": "Afrikaans",
+    "ak": "Akan",
+    "am": "አማርኛ",
+    "ar": "العربية",
+    "bm": "Bamanankan",
+    "ee": "Eʋegbe",
+    "ff": "Pulaar",
+    "ha": "Hausa",
+    "ig": "Igbo",
+    "kab": "Taqbaylit",
+    "ln": "Lingála",
+    "mg": "Malagasy",
+    "nr": "isiNdebele",
+    "ny": "Chichewa",
+    "om": "Afaan Oromoo",
+    "rw": "Ikinyarwanda",
+    "sn": "chiShona",
+    "so": "Soomaali",
+    "ss": "siSwati",
+    "st": "Sesotho",
+    "sw": "Kiswahili",
+    "ti": "ትግርኛ",
+    "tn": "Setswana",
+    "ts": "Xitsonga",
+    "ve": "Tshivenḓa",
+    "wo": "Wolof",
+    "xh": "isiXhosa",
+    "yo": "Yorùbá",
+    "zu": "isiZulu",
 }
 
 #: What ``settings.LANGUAGES`` is built from.
@@ -136,6 +197,40 @@ PLURAL_FORMS: dict[str, str] = {
     "sk": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
     "sl": "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);",
     "sv": _TWO,
+    "af": _TWO,
+    "ak": "nplurals=2; plural=(n > 1);",
+    "am": "nplurals=2; plural=(n > 1);",
+    # Arabic distinguishes zero, one, two, a few, many and everything else: six forms,
+    # more than any other language Postulo carries.
+    "ar": (
+        "nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : "
+        "n%100>=11 ? 4 : 5);"
+    ),
+    "bm": "nplurals=1; plural=0;",
+    "ee": _TWO,
+    "ff": _TWO,
+    "ha": _TWO,
+    "ig": "nplurals=1; plural=0;",
+    "kab": "nplurals=2; plural=(n > 1);",
+    "ln": "nplurals=2; plural=(n > 1);",
+    "mg": "nplurals=2; plural=(n > 1);",
+    "nr": _TWO,
+    "ny": _TWO,
+    "om": _TWO,
+    "rw": _TWO,
+    "sn": "nplurals=1; plural=0;",
+    "so": _TWO,
+    "ss": _TWO,
+    "st": _TWO,
+    "sw": _TWO,
+    "ti": "nplurals=2; plural=(n > 1);",
+    "tn": _TWO,
+    "ts": _TWO,
+    "ve": _TWO,
+    "wo": "nplurals=1; plural=0;",
+    "xh": _TWO,
+    "yo": "nplurals=2; plural=(n > 1);",
+    "zu": "nplurals=2; plural=(n > 1);",
 }
 
 
@@ -219,3 +314,24 @@ def direction(code: str) -> str:
     in every engine, and a document that declines to say is a document that gets guessed at.
     """
     return "rtl" if is_rtl(code) else "ltr"
+
+
+#: Language subtag → the script it is written in, where that is not the Latin alphabet.
+#:
+#: Only the exceptions are listed: everything absent from this map is Latin, which is the
+#: overwhelming majority and would be noise here. What it exists for is fonts. A script the
+#: rendering machine cannot draw comes out as a row of empty boxes, and a box on somebody's
+#: CV is worse than English — so ``tests/test_fonts.py`` reads this and insists the
+#: container image installs a font package that covers every script Postulo offers.
+SCRIPTS: dict[str, str] = {
+    "am": "Ethiopic",
+    "ar": "Arabic",
+    "bg": "Cyrillic",
+    "el": "Greek",
+    "ti": "Ethiopic",
+}
+
+
+def scripts_offered() -> set[str]:
+    """Every non-Latin script among the languages Postulo currently offers."""
+    return {SCRIPTS[code] for code, _name in LANGUAGES if code in SCRIPTS}

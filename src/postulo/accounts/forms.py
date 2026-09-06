@@ -149,6 +149,13 @@ def language_choices() -> list[tuple[str, str]]:
     partial: list[tuple[str, str]] = []
     for code, name in settings.LANGUAGES:
         row = status.get(code)
+        if row is not None and row.get("total", 0) and not row.get("translated", 0):
+            # A language whose catalogue nobody has started is not offered. Postulo adds
+            # the languages of a phase before their translations exist (#70), and offering
+            # somebody their own language only to hand them an English interface is a
+            # promise with nothing behind it. The catalogue sits there waiting for a
+            # translator, and the language appears the day one starts.
+            continue
         if row is None or row.get("total", 0) == 0:
             reviewed.append((code, name))
         elif row.get("percent", 0) < 95:

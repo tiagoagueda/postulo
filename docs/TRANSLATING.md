@@ -6,12 +6,32 @@ and compiled to the `.mo` Django reads at build time.
 
 ## Which languages, and when
 
-Postulo speaks every official language of the European Union: Bulgarian, Croatian, Czech,
-Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Irish,
-Italian, Latvian, Lithuanian, Maltese, Polish, Portuguese, Romanian, Slovak, Slovene,
-Spanish and Swedish. Later releases extend the set in phases: the rest of the European
-continent, then Africa, then Asia, then the remaining world. If your language is not in
-the current phase, a catalogue for it is still welcome — adding one is described below.
+The set grows in phases, one per release (#43):
+
+| Release | Languages | State |
+| --- | --- | --- |
+| 0.2.0 | The 24 official languages of the European Union | Complete, machine-drafted |
+| 0.3.0 | Africa (#70) — 29 languages | Catalogues created, awaiting translation |
+| 0.4.0 | Asia and South America (#71) | Not started |
+| 0.5.0 | The rest of the world (#72) | Not started |
+
+"Every language of Africa" is some two thousand of them, so the rule drawn for 0.3.0 is
+**a language with official or national status in at least one African state, plus the
+cross-border lingua francas that outrank most of those in speakers**: Afrikaans, Akan,
+Amharic, Arabic, Bamanankan, Chichewa, Eʋegbe, Hausa, Igbo, isiNdebele, isiXhosa, isiZulu,
+Ikinyarwanda, Lingála, Malagasy, Afaan Oromoo, Pulaar, Sesotho, Setswana, chiShona,
+siSwati, Soomaali, Kiswahili, Taqbaylit, ትግርኛ, Tshivenḓa, Wolof, Xitsonga and Yorùbá.
+French, Portuguese, English and Spanish already carry a great deal of the continent, so
+the gap was smaller than the map suggests.
+
+**A language is offered once somebody has begun its catalogue, and not before.** All 29
+African catalogues exist and are empty; the language picker does not list them yet,
+because offering somebody their own language and handing them an English interface is a
+promise with nothing behind it. Translate one string and the language appears, with its
+completion percentage beside its name.
+
+If your language is not in the current phase, a catalogue for it is still welcome —
+adding one is described below.
 
 Note that `pt-PT` is European Portuguese and `fr-FR` is the French of France. A `pt-BR`
 or `fr-CA` catalogue is a directory and a line, if someone wants to keep it.

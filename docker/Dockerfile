@@ -41,10 +41,18 @@ ENV PYTHONUNBUFFERED=1 \
     POSTULO_BACKUP_DIR=/app/data/backups \
     POSTULO_STATIC_ROOT=/app/staticfiles
 
-# libpango and friends are WeasyPrint's; curl is for the health check. Nothing else.
+# libpango and friends are WeasyPrint's; curl is for the health check.
+#
+# fonts-noto-core is for the scripts. DejaVu draws Latin, Greek and Cyrillic and stops
+# there, so an Amharic or Tigrinya CV rendered in this image came out a page of empty
+# boxes, and a box on somebody's CV is worse than English. Noto's core set covers
+# Arabic and Ethiopic (#70), and the Indic scripts and Hebrew that #71 will want; CJK
+# is a separate package and a separate decision when that phase arrives.
+# tests/test_fonts.py holds this list to the languages Postulo actually offers.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libfontconfig1 fonts-dejavu-core \
+        libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libfontconfig1 \
+        fonts-dejavu-core fonts-noto-core \
         curl \
     && rm -rf /var/lib/apt/lists/*
 

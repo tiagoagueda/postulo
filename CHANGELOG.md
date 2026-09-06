@@ -8,6 +8,29 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **The languages of Africa, and everything a language needs before its words arrive.**
+  "Every language of Africa" is some two thousand of them, so the rule drawn is *official
+  or national status in at least one African state, plus the cross-border lingua francas
+  that outrank most of those in speakers*: twenty-nine languages, and a documented rule
+  rather than a list assembled by feel. Each arrives with the things that have to be right
+  **before** anybody translates against them and are expensive to correct afterwards — its
+  own name for itself, its gettext plural rule (Arabic has six forms; Wolof, Igbo, Shona
+  and Bamanankan have one), and its script. Arabic is the first right-to-left language
+  Postulo carries, and the layout for it landed first (#67). **The flag rule held where it
+  was designed to**: a language with no uncontested home gets none, so Arabic, Swahili,
+  Hausa, Sesotho and nine others are deliberately blank — a wrong flag against somebody's
+  language is not a small wrong. **The image can now draw them**: it installed
+  `fonts-dejavu-core`, which covers Latin, Greek and Cyrillic and stops there, so an
+  Amharic or Tigrinya CV would have rendered as a page of empty boxes; `fonts-noto-core`
+  is added and a test holds the image's fonts to the languages actually offered. **A
+  language is offered once somebody has begun its catalogue, and not before** — all
+  twenty-nine exist and are empty, and listing them would be offering somebody their own
+  language and handing them an English interface. Translate one string and it appears,
+  with its completion beside its name. The suite's rule changed to match: the European
+  Union set must stay complete, every language must have a correct plural rule and a page
+  that renders, and completeness is a promise about a finished phase rather than about a
+  language added yesterday. The 45,037 translations themselves are the rest of #70. (#70)
+
 - **The interface is laid out right to left when the language is.** The `dir` attribute
   has been emitted since the first release and has been `ltr` on every page ever rendered,
   because every language Postulo speaks is read left to right — so what happened under
