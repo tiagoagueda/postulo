@@ -6,6 +6,17 @@ normalised or, failing that, derived from the address. A full name is filled fro
 claims. And whether a *new* account may be created at all is a policy question: by
 default single sign-on signs in accounts that exist, and the identity provider only
 becomes the invitation when the operator says so.
+
+**Finding an account that already exists** is the other half, and it is worth being
+explicit about what it trusts. With ``POSTULO_OIDC_LINK_BY_EMAIL`` on, which is the
+default, somebody arriving through the provider is signed in as the local account holding
+the address the provider asserts. allauth only ever matches an address the provider
+marked verified, so an unverified claim links to nothing — but "verified" is the
+provider's word, and the security of the whole arrangement is the operator's answer to
+one question: does *their* provider only mark an address verified when the person proved
+they hold it? For a Keycloak, Authentik or Pocket ID they run, yes. For an endpoint that
+merely speaks OpenID Connect, not necessarily. Turning the setting off makes a person
+sign in locally once and connect the provider from their own account page instead.
 """
 
 from __future__ import annotations
@@ -47,6 +58,24 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         if site.signup_open_now():
             return True
         return pending_invite(request) is not None
+
+    def can_authenticate_by_email(self, sociallogin, email: str) -> bool:
+        """Whether a verified address from the provider signs somebody into that account.
+
+        allauth reads its own setting for this, which is derived from
+        ``POSTULO_OIDC_LINK_BY_EMAIL`` at start-up. Deciding it here as well means the
+        variable is authoritative wherever it is read, rather than there being two
+        settings that could drift apart — and it puts Postulo's policy in the one file
+        that already holds the rest of it.
+
+        allauth has already narrowed what reaches this to addresses the provider marked
+        verified; the question left is whether this instance takes the provider's word.
+        """
+        from . import sso
+
+        if not sso.link_by_email():
+            return False
+        return super().can_authenticate_by_email(sociallogin, email)
 
     def populate_user(self, request: HttpRequest, sociallogin, data):
         user = super().populate_user(request, sociallogin, data)

@@ -232,9 +232,24 @@ SOCIALACCOUNT_PROVIDERS = (
 # (form-action 'self') silently blocking the redirect a POST form would make.
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "sso"
-# An address the identity provider has verified links to the existing account holding it.
-SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
-SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# Somebody arriving through the provider is signed in as the existing local account
+# holding the address the provider asserts, and the two are connected from then on.
+# allauth only matches an address the provider marked *verified*, so an unverified claim
+# links to nothing — which means the whole arrangement rests on one property of the
+# operator's chosen provider: that "verified" there means the person proved they hold the
+# address. That is true of a well-run Keycloak, Authentik or Pocket ID. It is not
+# automatically true of every endpoint that speaks OpenID Connect, and a provider that
+# lets somebody set their own address and calls it verified turns "sign in with SSO" into
+# "sign in as anyone whose address you know".
+#
+# POSTULO_OIDC_AUTO_SIGNUP already stops a stranger creating an account. Linking to an
+# account that exists is a different door, and this is the one that closes it: off, a
+# person signs in locally first and connects the provider deliberately from their own
+# account page. On by default, because that is how the instances already running behave.
+POSTULO_OIDC_LINK_BY_EMAIL = env.bool("POSTULO_OIDC_LINK_BY_EMAIL", default=True)
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = POSTULO_OIDC_LINK_BY_EMAIL
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = POSTULO_OIDC_LINK_BY_EMAIL
 SOCIALACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 # Postulo has no use for the provider's tokens; credentials with no purpose are a liability.

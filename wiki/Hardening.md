@@ -78,6 +78,46 @@ What you should not do is point it at a per-process cache — `locmemcache://` �
 `dummycache://`. Both make Postulo *look* like it is enforcing a limit while enforcing it
 once per worker, or not at all.
 
+## Single sign-on, and what it asks you to trust
+
+With an OpenID Connect provider configured, somebody arriving through it is signed in as
+the Postulo account holding the address the provider gives, and the two are connected from
+then on. That is the convenience worth having, and it is worth knowing exactly what it
+rests on.
+
+**Postulo only ever matches an address the provider marked verified.** An unverified claim
+links to nothing at all. So the security of the arrangement comes down to one question
+about your provider, not about Postulo:
+
+> Does this provider only call an address verified when the person actually proved they
+> hold it?
+
+For a Keycloak, Authentik, Pocket ID, Zitadel or Kanidm you run yourself, the answer is
+almost certainly yes, and there is nothing to do. For an endpoint you do not control, check
+before you rely on it: a provider that lets somebody type any address into their profile and
+calls it verified turns "sign in with single sign-on" into "sign in as anyone whose address
+you know".
+
+If you cannot answer it, close the door:
+
+```sh
+POSTULO_OIDC_LINK_BY_EMAIL=false
+```
+
+Then single sign-on signs in only accounts that have already connected the provider
+deliberately, from *Settings → Connections*. A person signs in with a password once and
+links it themselves.
+
+Two related things, so the picture is complete:
+
+- `POSTULO_OIDC_AUTO_SIGNUP` is a **different** door, and it is shut by default: it governs
+  whether the provider may *create* an account. Linking to one that already exists is what
+  the setting above governs.
+- If a local account's own address was never verified, signing into it through the provider
+  wipes that account's password. That is deliberate and it protects you: somebody who
+  registered with your address before you did, and knows the password they chose, is locked
+  out at the moment you first sign in. A verified local address is left alone.
+
 ## Accounts
 
 - Leave registration closed unless you mean to run a shared instance; invite people.

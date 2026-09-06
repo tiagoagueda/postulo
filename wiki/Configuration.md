@@ -79,6 +79,11 @@ for how accounts are linked and who may be created.
 | `POSTULO_OIDC_CLIENT_SECRET` | empty | Its secret. |
 | `POSTULO_OIDC_NAME` | `Single sign-on` | What the button says. |
 | `POSTULO_OIDC_AUTO_SIGNUP` | `false` | Whether the provider may create accounts. Off: existing accounts only. |
+| `POSTULO_OIDC_LINK_BY_EMAIL` | `true` | Whether an address the provider says it has verified signs somebody in to the account holding it. Off: each person connects the provider from their own account page. |
+
+Leaving `POSTULO_OIDC_LINK_BY_EMAIL` on means this instance takes the provider's word that
+somebody proved they hold an address. That is safe for a provider you run and worth checking
+for one you do not; [Hardening](Hardening) has the question to ask.
 
 Register the callback the provider must send people back to, shown under *Server
 settings → Sign-in*: `https://your-host/accounts/sso/oidc/login/callback/`. It must match

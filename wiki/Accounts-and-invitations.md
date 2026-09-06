@@ -79,7 +79,11 @@ after the provider.
 - **Existing accounts link, they are not duplicated.** An address the provider has
   verified signs in the account that holds it, and the provider is connected to that
   account from then on. People can see and disconnect it under *Settings → Account →
-  Sign-in methods*.
+  Sign-in methods*. Only a **verified** address ever matches; an unverified claim links to
+  nothing. That does mean the instance takes your provider's word for what verified means,
+  so if you do not run the provider, read the note on [Hardening](Hardening#single-sign-on-and-what-it-asks-you-to-trust)
+  and consider `POSTULO_OIDC_LINK_BY_EMAIL=false`, which makes each person connect the
+  provider from their own account page instead.
 - **By default, existing accounts only.** The identity provider is not an invitation:
   someone it knows but Postulo does not is turned away, unless they followed an
   invitation link or registration is open. Set `POSTULO_OIDC_AUTO_SIGNUP=true` to let

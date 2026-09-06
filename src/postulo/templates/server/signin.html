@@ -28,7 +28,28 @@
           <dt class="text-ink-500 dark:text-ink-400">{% translate "May create accounts" %}</dt>
           <dd>{% if sso.auto_signup %}{% translate "yes — the identity provider is the invitation" %}{% else %}{% translate "no — existing accounts only" %}{% endif %}</dd>
         </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Signs in to an existing account by e-mail" %}</dt>
+          <dd>{% if sso.link_by_email %}{% translate "yes — a verified address matches" %}{% else %}{% translate "no — each person connects it themselves" %}{% endif %}</dd>
+        </div>
       </dl>
+      {% comment %} An operator deciding whether to turn single sign-on on is standing here.
+         What it trusts belongs here too, not only in the wiki. {% endcomment %}
+      {% if sso.link_by_email %}
+        <div class="alert-info mt-3 text-xs" data-sso-trust role="note">
+          <div>
+            {% blocktranslate trimmed %}
+              Somebody arriving through this provider is signed in as the account holding the
+              address it gives, so long as the provider says that address is verified. That
+              makes one question worth answering: does this provider only call an address
+              verified when the person proved they hold it? If you run it, almost certainly.
+              If it is somebody else's, check before you rely on it. Set
+              POSTULO_OIDC_LINK_BY_EMAIL to false to require each person to sign in here once
+              and connect the provider from their own account page.
+            {% endblocktranslate %}
+          </div>
+        </div>
+      {% endif %}
       <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
         {% translate "Configured in the environment with the POSTULO_OIDC_* variables; see Configuration in the wiki." %}
       </p>

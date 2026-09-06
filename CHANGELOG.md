@@ -129,6 +129,20 @@ All notable changes to Postulo are recorded here. The format follows
   `FROM` Dockerfile does the same for anyone who prefers it; both are on *Installing
   Postulo*. (#5)
 
+### Added
+
+- **A way to refuse the identity provider's word about an address.** With single sign-on
+  configured, somebody arriving through the provider is signed in as the account holding
+  the address it gives — provided the provider marked that address verified, which Postulo
+  has always required. That makes the whole arrangement rest on one property of *your*
+  provider: that "verified" there means the person proved they hold the address. True of a
+  Keycloak or Authentik you run; not automatically true of every endpoint that speaks
+  OpenID Connect. `POSTULO_OIDC_LINK_BY_EMAIL=false` requires each person to sign in here
+  once and connect the provider from their own account page instead. It stays on by
+  default, so nothing changes for an instance already running. *Server settings → Sign-in*
+  now says which of the two is in force and what it trusts, and *Hardening* has the
+  question to ask about your provider. (#62)
+
 ### Fixed
 
 - **The progress bars on Insights had stretched, flattened ends.** Each funnel bar was an

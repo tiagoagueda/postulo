@@ -335,6 +335,7 @@ class SignInView(PolicyView):
             "name": sso.name(),
             "server_url": sso.server_url(),
             "auto_signup": sso.auto_signup(),
+            "link_by_email": sso.link_by_email(),
             "callback_url": sso.callback_url(self.request) if sso.enabled() else "",
         }
         return context

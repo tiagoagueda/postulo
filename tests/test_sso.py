@@ -190,6 +190,73 @@ def test_a_verified_address_links_the_existing_account_and_signs_it_in(rf, confi
     assert User.objects.count() == 1, "linked, not duplicated"
 
 
+def test_an_address_the_provider_has_not_verified_links_to_nothing(rf, configured):
+    """The gate the whole arrangement rests on, asserted rather than assumed.
+
+    Without it, a provider that lets somebody type any address into their profile would
+    let them sign in as whoever holds it here.
+    """
+    existing = User.objects.create_user(
+        email="alex@example.org", password=PASSWORD, username="alex"
+    )
+    EmailAddress.objects.create(user=existing, email=existing.email, verified=True, primary=True)
+    request = a_request(rf)
+
+    with context.request_context(request):
+        complete_social_login(request, social_login("alex@example.org", verified=False))
+
+    assert not SocialAccount.objects.filter(user=existing).exists()
+    assert request.user != existing
+
+
+def test_an_operator_can_refuse_to_take_the_providers_word(rf, configured):
+    """POSTULO_OIDC_LINK_BY_EMAIL off: sign in here once, then connect it yourself.
+
+    On, the instance is trusting that "verified" at the provider means the person proved
+    they hold the address. That is true of a Keycloak or an Authentik somebody runs, and
+    not automatically true of every endpoint that speaks OpenID Connect. An operator who
+    cannot answer that question about their own provider should be able to close the door.
+    """
+    configured.POSTULO_OIDC_LINK_BY_EMAIL = False
+    existing = User.objects.create_user(
+        email="alex@example.org", password=PASSWORD, username="alex"
+    )
+    EmailAddress.objects.create(user=existing, email=existing.email, verified=True, primary=True)
+    request = a_request(rf)
+
+    with context.request_context(request):
+        complete_social_login(request, social_login("alex@example.org"))
+
+    assert request.user != existing, "the address matched and was deliberately not used"
+    assert not SocialAccount.objects.filter(user=existing).exists()
+    assert User.objects.count() == 1, "and no second account was made either"
+
+
+def test_the_default_is_to_link_so_nothing_changes_for_instances_already_running(settings):
+    from postulo.accounts import sso
+
+    assert sso.link_by_email() is True
+
+
+def test_the_sign_in_settings_page_says_what_it_trusts(client, configured, admin_user):
+    """An operator deciding whether to turn single sign-on on is standing on this page."""
+    client.force_login(admin_user)
+    html = client.get(reverse("server:signin")).content.decode()
+
+    assert "data-sso-trust" in html
+    assert "verified" in html
+    assert "POSTULO_OIDC_LINK_BY_EMAIL" in html, "and how to close the door"
+
+
+def test_the_page_says_so_when_the_door_is_closed(client, configured, admin_user):
+    configured.POSTULO_OIDC_LINK_BY_EMAIL = False
+    client.force_login(admin_user)
+    html = client.get(reverse("server:signin")).content.decode()
+
+    assert "connects it themselves" in html
+    assert "data-sso-trust" not in html, "nothing to warn about once it is off"
+
+
 def test_an_unknown_person_is_turned_away_unless_the_provider_may_create_accounts(
     rf, configured, user
 ):
