@@ -80,6 +80,18 @@ keyboard, an icon with no name, a meaning carried by colour alone, a change on t
 that a screen reader is not told about, or a page that breaks with scripts off is a bug,
 and a pull request that introduces one will be asked to fix it first.
 
+## Code written with AI
+
+Code written with the help of an AI assistant is welcome on the same terms as any other
+code: a person proposes it, has read it, can explain it, and answers for it. The
+assistant is a tool the contributor used, not a contributor; a pull request is a
+conversation between people, and the person opening it is the one who will be asked
+what a line does and why. Say that a model helped, the way you would credit a library.
+Review what it wrote with the care you would give a stranger's patch, especially around
+ownership scoping, file handling and anything the security tests cover, because a
+plausible-looking mistake is the kind that gets through. `CLAUDE.md` in the repository
+root tells an assistant how this project works; keep it current when the rules change.
+
 ## House style
 
 - **British English** in code, comments, documentation, and interface text: *organise*,

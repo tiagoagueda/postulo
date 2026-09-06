@@ -21,6 +21,10 @@ Everything this software does is available in full to everyone who runs it: no p
 tier, no "pro" edition, no licence key, no feature that unlocks later. The licence
 guarantees that for the code; this paragraph guarantees it for the project's intentions.
 
+The project's only source of income is voluntary support at
+[buymeacoffee.com/tiagoagueda](https://buymeacoffee.com/tiagoagueda). Nothing is owed,
+nothing is unlocked by it, and nothing in Postulo will ever ask for it.
+
 ## Secure, because of what it holds
 
 **Postulo holds the most personal documents a person has while looking for work, and it
@@ -81,6 +85,13 @@ feature cannot be made to work for someone, that is a bug, and it is filed as on
   from, how you are told about things, how a PDF is produced — sits behind an interface
   that a separately installed package can implement. Postulo's own implementations are
   plugins that happen to ship in the box. See [docs/PLUGINS.md](docs/PLUGINS.md).
+
+## Written with AI, answered for by people
+
+Much of Postulo is written with an AI assistant, and contributions made the same way are
+welcome. The rule is simple: a person proposes the change, has read it, can explain it,
+and answers for it. The assistant is a tool; the contributor is accountable. See
+[CONTRIBUTING.md](CONTRIBUTING.md) and [CLAUDE.md](CLAUDE.md).
 
 ## In your language
 
