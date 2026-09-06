@@ -243,6 +243,103 @@ def test_connections_are_private_to_their_owner(client, user, other_user):
     assert "My echo" not in client.get(reverse("connections:list")).content.decode()
 
 
+class PickyNotifier(EchoNotifier):
+    """A plugin that checks its configuration as a whole and describes it, masked."""
+
+    name = "picky"
+    label = "Picky"
+
+    def config_fields(self):
+        return [
+            FieldSpec("urls", "Addresses", type="textarea", secret=True),
+            FieldSpec("room", "Room", type="text", required=False),
+        ]
+
+    def validate(self, config):
+        problems = {}
+        bad = [line for line in config.get("urls", "").splitlines() if "://" not in line]
+        if bad:
+            problems["urls"] = [f"{len(bad)} line(s) are not addresses"]
+        if config.get("room") == "forbidden":
+            problems[""] = "not that room"
+        return problems
+
+    def summary(self, config):
+        return " · ".join(
+            line.split("://", 1)[0] + "://…" for line in config.get("urls", "").splitlines()
+        )
+
+
+def test_a_plugin_may_check_the_whole_configuration_at_the_form(client, user):
+    registry.register_builtin("notifier", PickyNotifier)
+    try:
+        client.force_login(user)
+        url = reverse("connections:create", args=["notifier", "picky"])
+        html = client.get(url).content.decode()
+        assert "<textarea" in html and 'name="plugin_urls"' in html, "a secret may be several lines"
+
+        response = client.post(
+            url, {"label": "x", "plugin_urls": "tgram://a/b\nnot an address", "plugin_room": "r"}
+        )
+        assert response.status_code == 200
+        assert response.context["form"].errors["plugin_urls"] == ["1 line(s) are not addresses"]
+
+        response = client.post(
+            url, {"label": "x", "plugin_urls": "tgram://a/b", "plugin_room": "forbidden"}
+        )
+        assert response.context["form"].non_field_errors() == ["not that room"]
+
+        response = client.post(
+            url, {"label": "x", "plugin_urls": "tgram://a/b\nntfy://c", "plugin_room": "r"}
+        )
+        assert response.status_code == 302
+        connection = Connection.objects.get(owner=user, plugin="picky")
+        assert connection.secrets == {"urls": "tgram://a/b\nntfy://c"}
+
+        # The list shows the plugin's masked description, never the secret itself.
+        html = client.get(reverse("connections:list")).content.decode()
+        assert "tgram://… · ntfy://…" in html and "tgram://a/b" not in html
+
+        # Editing with the secret left blank validates against the stored value.
+        edit = reverse("connections:edit", args=[connection.pk])
+        html = client.get(edit).content.decode()
+        assert "tgram://a/b" not in html and "leave blank to keep" in html
+        response = client.post(edit, {"label": "y", "plugin_room": "forbidden"})
+        assert response.context["form"].non_field_errors() == ["not that room"]
+        response = client.post(edit, {"label": "y", "plugin_room": "z"})
+        assert response.status_code == 302
+        connection.refresh_from_db()
+        assert connection.secrets == {"urls": "tgram://a/b\nntfy://c"} and connection.label == "y"
+    finally:
+        registry.unregister_builtin("notifier", PickyNotifier)
+
+
+def test_a_plugin_that_cannot_check_or_describe_does_not_take_the_page_down(client, user):
+    class Broken(PickyNotifier):
+        name = "broken"
+
+        def validate(self, config):
+            raise RuntimeError("no idea")
+
+        def summary(self, config):
+            raise RuntimeError("no idea")
+
+    registry.register_builtin("notifier", Broken)
+    try:
+        client.force_login(user)
+        url = reverse("connections:create", args=["notifier", "broken"])
+        response = client.post(url, {"label": "x", "plugin_urls": "tgram://a/b"})
+        assert response.status_code == 200
+        assert "RuntimeError: no idea" in response.context["form"].non_field_errors()[0]
+        connection = Connection(owner=user, kind="notifier", plugin="broken", label="b")
+        connection.secrets = {"urls": "tgram://a/b"}
+        connection.save()
+        html = client.get(reverse("connections:list")).content.decode()
+        assert response.status_code == 200 and f'data-connection="{connection.pk}"' in html
+    finally:
+        registry.unregister_builtin("notifier", Broken)
+
+
 def test_connections_have_a_settings_section(client, user):
     client.force_login(user)
     html = client.get(reverse("connections:list")).content.decode()

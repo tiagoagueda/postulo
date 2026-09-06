@@ -102,7 +102,10 @@ synchronisation — keep their configuration under *Settings → Connections*.
 
 Postulo sends nothing until a person adds a notification connection under *Settings →
 Connections*. The built-in **Email** notifier uses the mail settings below; plugins add
-other ways. Three things happen without anyone asking: a posting arriving through the
+other ways — [postulo-apprise](https://source.tiagoagueda.com/postulo/postulo-apprise)
+alone covers Telegram, ntfy, Discord, Matrix, Gotify, Pushover, Signal and over a
+hundred more, each named by one URL (see *Plugins in the image* on
+[Installing Postulo](Installing-Postulo)). Three things happen without anyone asking: a posting arriving through the
 capture API is announced at once; a reminder falling due, and applications going quiet, are
 announced by the **scheduler**, which somebody has to run:
 

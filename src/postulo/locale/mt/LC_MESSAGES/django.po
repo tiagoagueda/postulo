@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:17+0000\n"
+"POT-Creation-Date: 2026-09-06 09:56+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Malti\n"
@@ -236,6 +236,11 @@ msgstr "%(name)s — CV"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/forms.py:128
+#, python-format, draft
+msgid "%(plugin)s could not check these settings: %(error)s"
+msgstr "%(plugin)s ma setax jiċċekkja dawn is-settings: %(error)s"
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:42
 #, python-format, draft
@@ -493,7 +498,7 @@ msgid "Add a company"
 msgstr "Żid kumpanija"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:66
+#: src/postulo/templates/connections/list.html:69
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1376,19 +1381,19 @@ msgstr "Ikkonnettja %(plugin)s"
 msgid "connection"
 msgstr "konnessjoni"
 
-#: src/postulo/plugins/views.py:181
+#: src/postulo/plugins/views.py:201
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Konnessjoni mneħħija, sigrieti inklużi."
 
-#: src/postulo/plugins/views.py:140
+#: src/postulo/plugins/views.py:160
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Konnessjoni ssejvjata. Ittestjaha biex tkun ċert li taħdem."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:66
-#: src/postulo/plugins/views.py:84 src/postulo/plugins/views.py:114
-#: src/postulo/plugins/views.py:177
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
+#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
+#: src/postulo/plugins/views.py:197
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1851,7 +1856,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:47
+#: src/postulo/templates/connections/list.html:50
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:35
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -2845,7 +2850,7 @@ msgstr "maħruġa fi"
 msgid "It cannot end before it starts."
 msgstr "Ma tistax tispiċċa qabel ma tibda."
 
-#: src/postulo/plugins/views.py:164
+#: src/postulo/plugins/views.py:184
 #, draft
 msgid "It works."
 msgstr "Jaħdem."
@@ -3394,7 +3399,7 @@ msgstr ""
 msgid "no company"
 msgstr "l-ebda kumpanija"
 
-#: src/postulo/templates/connections/list.html:58
+#: src/postulo/templates/connections/list.html:61
 #, draft
 msgid "No connections yet"
 msgstr "L-ebda konnessjoni għalissa"
@@ -3419,7 +3424,7 @@ msgstr "L-ebda industrija għalissa. Jidhru hekk kif tiddeskrivi l-kumpaniji."
 msgid "No installed plugin needs a connection."
 msgstr "L-ebda plugin installat ma għandu bżonn konnessjoni."
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:73
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3711,7 +3716,7 @@ msgstr "Xejn mibgħut għalissa."
 msgid "Nothing to chase."
 msgstr "Xejn x'issegwi."
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:71
 #, draft
 msgid "Nothing to connect to"
 msgstr "Xejn ma' xiex tikkonnettja"
@@ -3822,7 +3827,7 @@ msgstr[1] "%(counter)s qbidiet jistennew reviżjoni"
 msgstr[2] "%(counter)s qbid jistennew reviżjoni"
 msgstr[3] "%(counter)s qbid jistennew reviżjoni"
 
-#: src/postulo/templates/connections/list.html:60
+#: src/postulo/templates/connections/list.html:63
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4610,7 +4615,7 @@ msgid "Remote"
 msgstr "Remot"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:49
+#: src/postulo/templates/connections/list.html:52
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -5287,7 +5292,7 @@ msgstr "Status aġġornat."
 msgid "Still live"
 msgstr "Għadha ħajja"
 
-#: src/postulo/plugins/forms.py:51
+#: src/postulo/plugins/forms.py:43
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Maħżun; ħalli vojt biex iżżomm il-valur attwali."
@@ -5394,12 +5399,12 @@ msgstr "Mudell"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Il-mudelli jidhru meta tibgħat ittra ma' applikazzjoni."
 
-#: src/postulo/templates/connections/list.html:45
+#: src/postulo/templates/connections/list.html:48
 #, draft
 msgid "Test"
 msgstr "Ittestja"
 
-#: src/postulo/plugins/views.py:166
+#: src/postulo/plugins/views.py:186
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "It-test falla: %(message)s"
@@ -5513,7 +5518,7 @@ msgstr "Dik il-paġna rritornat %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Dik l-istampa hija aktar minn 5 MB. Waħda iżgħar, jekk jogħġbok."
 
-#: src/postulo/plugins/views.py:152
+#: src/postulo/plugins/views.py:172
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Dak il-plugin m'għadux installat."

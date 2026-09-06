@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:17+0000\n"
+"POT-Creation-Date: 2026-09-06 09:56+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: español\n"
@@ -212,6 +212,11 @@ msgstr "%(name)s — CV"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/forms.py:128
+#, python-format, draft
+msgid "%(plugin)s could not check these settings: %(error)s"
+msgstr "%(plugin)s no pudo comprobar esta configuración: %(error)s"
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:42
 #, python-format, draft
@@ -462,7 +467,7 @@ msgid "Add a company"
 msgstr "Añadir una empresa"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:66
+#: src/postulo/templates/connections/list.html:69
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1343,19 +1348,19 @@ msgstr "Conectar %(plugin)s"
 msgid "connection"
 msgstr "conexión"
 
-#: src/postulo/plugins/views.py:181
+#: src/postulo/plugins/views.py:201
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Conexión eliminada, secretos incluidos."
 
-#: src/postulo/plugins/views.py:140
+#: src/postulo/plugins/views.py:160
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Conexión guardada. Pruébala para asegurarte de que funciona."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:66
-#: src/postulo/plugins/views.py:84 src/postulo/plugins/views.py:114
-#: src/postulo/plugins/views.py:177
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
+#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
+#: src/postulo/plugins/views.py:197
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1818,7 +1823,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:47
+#: src/postulo/templates/connections/list.html:50
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:35
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -2813,7 +2818,7 @@ msgstr "emitida el"
 msgid "It cannot end before it starts."
 msgstr "No puede terminar antes de empezar."
 
-#: src/postulo/plugins/views.py:164
+#: src/postulo/plugins/views.py:184
 #, draft
 msgid "It works."
 msgstr "Funciona."
@@ -3361,7 +3366,7 @@ msgstr "Aún no hay empresas. Se crean para ti cuando registras una candidatura.
 msgid "no company"
 msgstr "sin empresa"
 
-#: src/postulo/templates/connections/list.html:58
+#: src/postulo/templates/connections/list.html:61
 #, draft
 msgid "No connections yet"
 msgstr "Aún no hay conexiones"
@@ -3386,7 +3391,7 @@ msgstr "Aún no hay sectores. Aparecen a medida que describes empresas."
 msgid "No installed plugin needs a connection."
 msgstr "Ningún plugin instalado necesita una conexión."
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:73
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3677,7 +3682,7 @@ msgstr "Aún no se ha enviado nada."
 msgid "Nothing to chase."
 msgstr "Nada que reclamar."
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:71
 #, draft
 msgid "Nothing to connect to"
 msgstr "Nada a lo que conectarse"
@@ -3786,7 +3791,7 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Una captura esperando revisión"
 msgstr[1] "%(counter)s capturas esperando revisión"
 
-#: src/postulo/templates/connections/list.html:60
+#: src/postulo/templates/connections/list.html:63
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4568,7 +4573,7 @@ msgid "Remote"
 msgstr "Remoto"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:49
+#: src/postulo/templates/connections/list.html:52
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -5245,7 +5250,7 @@ msgstr "Estado actualizado."
 msgid "Still live"
 msgstr "Aún viva"
 
-#: src/postulo/plugins/forms.py:51
+#: src/postulo/plugins/forms.py:43
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Guardado; deja en blanco para conservar el valor actual."
@@ -5352,12 +5357,12 @@ msgstr "Plantilla"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Las plantillas aparecen cuando envías una carta con una candidatura."
 
-#: src/postulo/templates/connections/list.html:45
+#: src/postulo/templates/connections/list.html:48
 #, draft
 msgid "Test"
 msgstr "Probar"
 
-#: src/postulo/plugins/views.py:166
+#: src/postulo/plugins/views.py:186
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "La prueba falló: %(message)s"
@@ -5471,7 +5476,7 @@ msgstr "Esa página devolvió %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Esa imagen supera los 5 MB. Una más pequeña, por favor."
 
-#: src/postulo/plugins/views.py:152
+#: src/postulo/plugins/views.py:172
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ese plugin ya no está instalado."

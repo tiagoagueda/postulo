@@ -60,6 +60,25 @@ RUN python scripts/messages.py compile
 
 RUN uv sync --locked --no-dev --extra server
 
+# Plugins baked into the image. A plugin is an ordinary Python package installed into
+# Postulo's environment; this argument takes any number of them, in whatever form pip
+# accepts — a name from an index, a wheel URL, git+https://… — and installs them at
+# build time so the image is complete and immutable. Git is needed only for the git
+# form, and only for the length of this step; it is removed again so the runtime image
+# stays as small as it was. The core's lock is a constraint, so a plugin can never
+# change the version of a package Postulo itself pins.
+ARG POSTULO_EXTRA_PACKAGES=""
+RUN if [ -n "$POSTULO_EXTRA_PACKAGES" ]; then \
+        apt-get update \
+        && apt-get install -y --no-install-recommends git \
+        && uv export --locked --no-dev --extra server --no-hashes --no-emit-project \
+            --output-file /tmp/constraints.txt \
+        && uv pip install --no-cache --constraint /tmp/constraints.txt $POSTULO_EXTRA_PACKAGES \
+        && rm -f /tmp/constraints.txt \
+        && apt-get purge -y git && apt-get autoremove -y \
+        && rm -rf /var/lib/apt/lists/*; \
+    fi
+
 COPY manage.py ./
 COPY --from=styles /build/src/postulo/static/css/app.css ./src/postulo/static/css/app.css
 

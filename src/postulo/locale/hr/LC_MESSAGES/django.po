@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:17+0000\n"
+"POT-Creation-Date: 2026-09-06 09:56+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: hrvatski\n"
@@ -223,6 +223,11 @@ msgstr "%(name)s — životopis"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/forms.py:128
+#, python-format, draft
+msgid "%(plugin)s could not check these settings: %(error)s"
+msgstr "%(plugin)s nije mogao provjeriti ove postavke: %(error)s"
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:42
 #, python-format, draft
@@ -476,7 +481,7 @@ msgid "Add a company"
 msgstr "Dodaj tvrtku"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:66
+#: src/postulo/templates/connections/list.html:69
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1357,19 +1362,19 @@ msgstr "Poveži %(plugin)s"
 msgid "connection"
 msgstr "veza"
 
-#: src/postulo/plugins/views.py:181
+#: src/postulo/plugins/views.py:201
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Veza uklonjena, uključujući tajne."
 
-#: src/postulo/plugins/views.py:140
+#: src/postulo/plugins/views.py:160
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Veza spremljena. Testirajte je da se uvjerite da radi."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:66
-#: src/postulo/plugins/views.py:84 src/postulo/plugins/views.py:114
-#: src/postulo/plugins/views.py:177
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
+#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
+#: src/postulo/plugins/views.py:197
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1832,7 +1837,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:47
+#: src/postulo/templates/connections/list.html:50
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:35
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -2823,7 +2828,7 @@ msgstr "izdano dana"
 msgid "It cannot end before it starts."
 msgstr "Ne može završiti prije nego što počne."
 
-#: src/postulo/plugins/views.py:164
+#: src/postulo/plugins/views.py:184
 #, draft
 msgid "It works."
 msgstr "Radi."
@@ -3371,7 +3376,7 @@ msgstr "Još nema tvrtki. Stvaraju se za vas kad zabilježite prijavu."
 msgid "no company"
 msgstr "nema tvrtke"
 
-#: src/postulo/templates/connections/list.html:58
+#: src/postulo/templates/connections/list.html:61
 #, draft
 msgid "No connections yet"
 msgstr "Još nema veza"
@@ -3396,7 +3401,7 @@ msgstr "Još nema djelatnosti. Pojavljuju se kako opisujete tvrtke."
 msgid "No installed plugin needs a connection."
 msgstr "Nijedan instalirani dodatak ne treba vezu."
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:73
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3686,7 +3691,7 @@ msgstr "Još ništa nije poslano."
 msgid "Nothing to chase."
 msgstr "Nema koga podsjećati."
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:71
 #, draft
 msgid "Nothing to connect to"
 msgstr "Nema se na što povezati"
@@ -3796,7 +3801,7 @@ msgstr[0] "Jedno hvatanje čeka pregled"
 msgstr[1] "%(counter)s hvatanja čekaju pregled"
 msgstr[2] "%(counter)s hvatanja čeka pregled"
 
-#: src/postulo/templates/connections/list.html:60
+#: src/postulo/templates/connections/list.html:63
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4581,7 +4586,7 @@ msgid "Remote"
 msgstr "Na daljinu"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:49
+#: src/postulo/templates/connections/list.html:52
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -5257,7 +5262,7 @@ msgstr "Status ažuriran."
 msgid "Still live"
 msgstr "Još aktivno"
 
-#: src/postulo/plugins/forms.py:51
+#: src/postulo/plugins/forms.py:43
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Pohranjeno; ostavite prazno da zadržite trenutnu vrijednost."
@@ -5364,12 +5369,12 @@ msgstr "Predložak"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Predlošci se pojavljuju kad šaljete pismo s prijavom."
 
-#: src/postulo/templates/connections/list.html:45
+#: src/postulo/templates/connections/list.html:48
 #, draft
 msgid "Test"
 msgstr "Testiraj"
 
-#: src/postulo/plugins/views.py:166
+#: src/postulo/plugins/views.py:186
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Test nije uspio: %(message)s"
@@ -5483,7 +5488,7 @@ msgstr "Ta stranica je vratila %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Ta slika ima više od 5 MB. Manju, molim."
 
-#: src/postulo/plugins/views.py:152
+#: src/postulo/plugins/views.py:172
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Taj dodatak više nije instaliran."

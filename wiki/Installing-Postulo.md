@@ -77,6 +77,49 @@ It builds, starts a container, and waits for the health check to answer.
 through a view that has established who is asking, and serving the directory would
 bypass that entirely.
 
+### Plugins in the image
+
+A plugin is a Python package installed into Postulo's environment, and the image's
+environment is built once and never written to afterwards. So a plugin is baked in at
+build time, one of two ways.
+
+**A build argument**, with any number of packages in the form pip accepts — a name, a
+wheel URL, a `git+https://…` address:
+
+```sh
+docker compose -f docker/compose.yml build \
+  --build-arg POSTULO_EXTRA_PACKAGES="git+https://source.tiagoagueda.com/postulo/postulo-apprise.git"
+docker compose -f docker/compose.yml up -d
+```
+
+Or, to keep it in the Compose file rather than on the command line:
+
+```yaml
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        POSTULO_EXTRA_PACKAGES: git+https://source.tiagoagueda.com/postulo/postulo-apprise.git
+```
+
+**Your own image on top of Postulo's**, for anyone who would rather not build from
+source:
+
+```dockerfile
+FROM source.tiagoagueda.com/postulo/postulo:0.2
+USER root
+RUN uv pip install --no-cache git+https://source.tiagoagueda.com/postulo/postulo-apprise.git
+USER postulo
+```
+
+Either way the plugin is installed with Postulo's own lock as a constraint, so it cannot
+change the version of anything Postulo pins, and it survives upgrades because it is part
+of the image you build. Restart, and the plugin appears under *Settings → Connections*.
+The first one worth adding is
+[postulo-apprise](https://source.tiagoagueda.com/postulo/postulo-apprise), which sends
+Postulo's notifications to Telegram, ntfy, Discord, Matrix, Gotify and over a hundred
+other services.
+
 ## Trying it on your own machine
 
 ```sh

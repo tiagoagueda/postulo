@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:17+0000\n"
+"POT-Creation-Date: 2026-09-06 09:56+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -249,6 +249,11 @@ msgstr "%(name)s — CV"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/forms.py:128
+#, python-format, draft
+msgid "%(plugin)s could not check these settings: %(error)s"
+msgstr "Níorbh fhéidir le %(plugin)s na socruithe seo a sheiceáil: %(error)s"
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:42
 #, python-format, draft
@@ -511,7 +516,7 @@ msgid "Add a company"
 msgstr "Cuir cuideachta leis"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:66
+#: src/postulo/templates/connections/list.html:69
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1395,19 +1400,19 @@ msgstr "Nasc %(plugin)s"
 msgid "connection"
 msgstr "nasc"
 
-#: src/postulo/plugins/views.py:181
+#: src/postulo/plugins/views.py:201
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Nasc bainte, rúin san áireamh."
 
-#: src/postulo/plugins/views.py:140
+#: src/postulo/plugins/views.py:160
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Nasc sábháilte. Tástáil é le cinntiú go n-oibríonn sé."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:66
-#: src/postulo/plugins/views.py:84 src/postulo/plugins/views.py:114
-#: src/postulo/plugins/views.py:177
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
+#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
+#: src/postulo/plugins/views.py:197
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1871,7 +1876,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:47
+#: src/postulo/templates/connections/list.html:50
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:35
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -2866,7 +2871,7 @@ msgstr "eisithe ar"
 msgid "It cannot end before it starts."
 msgstr "Ní féidir leis críochnú sula dtosaíonn sé."
 
-#: src/postulo/plugins/views.py:164
+#: src/postulo/plugins/views.py:184
 #, draft
 msgid "It works."
 msgstr "Oibríonn sé."
@@ -3415,7 +3420,7 @@ msgstr ""
 msgid "no company"
 msgstr "gan chuideachta"
 
-#: src/postulo/templates/connections/list.html:58
+#: src/postulo/templates/connections/list.html:61
 #, draft
 msgid "No connections yet"
 msgstr "Níl aon naisc fós"
@@ -3441,7 +3446,7 @@ msgstr ""
 msgid "No installed plugin needs a connection."
 msgstr "Ní theastaíonn nasc ó aon bhreiseán suiteáilte."
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:73
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3733,7 +3738,7 @@ msgstr "Níor seoladh aon rud fós."
 msgid "Nothing to chase."
 msgstr "Níl aon rud le tuairisc a chur air."
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:71
 #, draft
 msgid "Nothing to connect to"
 msgstr "Níl aon rud le nascadh leis"
@@ -3845,7 +3850,7 @@ msgstr[2] "%(counter)s ghabháil ag fanacht le hathbhreithniú"
 msgstr[3] "%(counter)s ngabháil ag fanacht le hathbhreithniú"
 msgstr[4] "%(counter)s gabháil ag fanacht le hathbhreithniú"
 
-#: src/postulo/templates/connections/list.html:60
+#: src/postulo/templates/connections/list.html:63
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4639,7 +4644,7 @@ msgid "Remote"
 msgstr "Cianda"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:49
+#: src/postulo/templates/connections/list.html:52
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -5317,7 +5322,7 @@ msgstr "Stádas nuashonraithe."
 msgid "Still live"
 msgstr "Beo fós"
 
-#: src/postulo/plugins/forms.py:51
+#: src/postulo/plugins/forms.py:43
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Stóráilte; fág bán chun an luach reatha a choinneáil."
@@ -5424,12 +5429,12 @@ msgstr "Teimpléad"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Taispeántar teimpléid nuair a sheolann tú litir le hiarratas."
 
-#: src/postulo/templates/connections/list.html:45
+#: src/postulo/templates/connections/list.html:48
 #, draft
 msgid "Test"
 msgstr "Tástáil"
 
-#: src/postulo/plugins/views.py:166
+#: src/postulo/plugins/views.py:186
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Theip ar an tástáil: %(message)s"
@@ -5543,7 +5548,7 @@ msgstr "Sheol an leathanach sin %(status)s ar ais."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tá an pictiúr sin os cionn 5 MB. Ceann níos lú, le do thoil."
 
-#: src/postulo/plugins/views.py:152
+#: src/postulo/plugins/views.py:172
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Níl an breiseán sin suiteáilte a thuilleadh."

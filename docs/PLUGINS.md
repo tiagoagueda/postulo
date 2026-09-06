@@ -241,6 +241,38 @@ included: private and local addresses are refused unless the operator set
 `POSTULO_CONNECTIONS_ALLOW_PRIVATE=true`, which is where self-hosted services usually live.
 A plugin that opens its own connection bypasses that policy, and a reviewer will say so.
 
+Two more methods are optional, and Postulo looks for them by name:
+
+```python
+def validate(self, config) -> dict[str, list[str]]:
+    """Runs when the form is submitted, with configuration and secrets together.
+
+    Return problems keyed by field name; an empty key is a problem with the form
+    as a whole. An empty dict means the configuration is fine.
+    """
+    if "://" not in config["url"]:
+        return {"url": ["That is not an address."]}
+    return {}
+
+
+def summary(self, config) -> str:
+    """One line for the connections list. Mask every secret part."""
+    return f"{config['url']} as {config['token'][:2]}…"
+```
+
+`validate` is where a plugin that can tell a typo from a token says so — at the form,
+rather than at three in the morning when a reminder falls due. `summary` exists because
+secrets are never shown back: it is how a person tells two connections to the same plugin
+apart. A secret may be a `textarea` when it is naturally several lines (Apprise takes a
+list of URLs with the credentials inside); it is stored, masked and kept-when-blank like
+any other secret.
+
+**Dependencies.** A plugin declares its own — `apprise`, `imapclient`, whatever it
+speaks — in its `pyproject.toml`, and nothing else: Postulo is not on PyPI, so naming it
+there sends pip looking for something it cannot find. In the container image a plugin is
+installed under the core's lock as a constraint, so a plugin cannot change the version of
+a package Postulo itself pins; declare the loosest bound that works.
+
 What each kind then *does* is that kind's own interface. So far:
 
 ### Notifiers
@@ -258,12 +290,38 @@ class MyNotifier:
         """Carry one message. Raise on failure; Postulo records it on the connection."""
 ```
 
-`notification` has an `event` (`reminder_due`, `capture_received`), a `title`, an optional
-`body` and an optional `url`. `user` is the person it is for — fall back to their address
-or name if your service needs one. Every notifier connection automatically carries a
-switch per event, so your plugin never has to ask which events to deliver: if `send()` is
-called, the person wanted it. The built-in `postulo.notifications.email.EmailNotifier` is
-forty lines and a fair template.
+`notification` has an `event` (`reminder_due`, `capture_received`, `went_quiet`), a
+`title`, an optional `body` and an optional `url`. `user` is the person it is for — fall
+back to their address or name if your service needs one. Every notifier connection
+automatically carries a switch per event, so your plugin never has to ask which events to
+deliver: if `send()` is called, the person wanted it. The built-in
+`postulo.notifications.email.EmailNotifier` is forty lines and a fair template;
+[postulo-apprise](https://source.tiagoagueda.com/postulo/postulo-apprise) is a complete
+one built outside the core, with `validate`, `summary`, a secret that is a list, and the
+destination policy applied to the servers its URLs name.
+
+## Getting a plugin into the container
+
+The image installs a locked environment at build time and runs as a user that cannot
+write to it, so `pip install` inside a running container does not last. Two ways do:
+
+```sh
+# 1. A build argument: any number of packages, in the form pip accepts.
+docker compose -f docker/compose.yml build \
+  --build-arg POSTULO_EXTRA_PACKAGES="git+https://source.tiagoagueda.com/postulo/postulo-apprise.git"
+```
+
+```dockerfile
+# 2. Your own image on top of Postulo's.
+FROM source.tiagoagueda.com/postulo/postulo:0.2
+USER root
+RUN uv pip install --no-cache postulo-apprise
+USER postulo
+```
+
+Both install into Postulo's environment with the core's lock as a constraint, so a plugin
+cannot change the version of a package Postulo pins. Installing from the interface — an
+uploaded package, a catalogue — is a later step on the roadmap.
 
 ## Adding a settings section
 

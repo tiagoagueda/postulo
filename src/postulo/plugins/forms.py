@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import logging
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from .base import FieldSpec
 from .models import Connection
+
+logger = logging.getLogger(__name__)
 
 #: Shown in place of a stored secret. Submitting it back means "leave it as it is".
 SECRET_PLACEHOLDER = "••••••••"  # noqa: S105 - a display placeholder, not a credential
@@ -23,6 +27,27 @@ def kind_specs(kind: str) -> list[FieldSpec]:
 
 def form_field_for(spec: FieldSpec, *, has_value: bool = False) -> forms.Field:
     common = {"label": spec.label, "help_text": spec.help, "required": spec.required}
+    if spec.type == "password" or spec.secret:
+        # A stored secret is never shown back. The field is optional while one exists,
+        # because leaving it blank means keeping it. A secret may be several lines —
+        # Apprise takes a list of URLs with the credentials inside — in which case it is
+        # a text area that is just as blank on the way back.
+        attrs = {
+            "placeholder": SECRET_PLACEHOLDER if has_value else "",
+            "autocomplete": "off",
+        }
+        if spec.type == "textarea":
+            widget = forms.Textarea(attrs={"rows": 4, **attrs})
+        else:
+            widget = forms.PasswordInput(render_value=False, attrs=attrs)
+        hint = str(_("Stored; leave blank to keep the current value.")) if has_value else ""
+        return forms.CharField(
+            widget=widget,
+            label=spec.label,
+            help_text=" ".join(part for part in (spec.help, hint) if part),
+            required=spec.required and not has_value,
+            max_length=20_000 if spec.type == "textarea" else 2000,
+        )
     if spec.type == "boolean":
         return forms.BooleanField(label=spec.label, help_text=spec.help, required=False)
     if spec.type == "integer":
@@ -35,23 +60,6 @@ def form_field_for(spec: FieldSpec, *, has_value: bool = False) -> forms.Field:
         return forms.EmailField(**common)
     if spec.type == "textarea":
         return forms.CharField(widget=forms.Textarea(attrs={"rows": 4}), **common)
-    if spec.type == "password" or spec.secret:
-        # A stored secret is never shown back. The field is optional while one exists,
-        # because leaving it blank means keeping it.
-        return forms.CharField(
-            widget=forms.PasswordInput(
-                render_value=False,
-                attrs={
-                    "placeholder": SECRET_PLACEHOLDER if has_value else "",
-                    "autocomplete": "off",
-                },
-            ),
-            label=spec.label,
-            help_text=spec.help
-            or (str(_("Stored; leave blank to keep the current value.")) if has_value else ""),
-            required=spec.required and not has_value,
-            max_length=2000,
-        )
     return forms.CharField(max_length=500, **common)
 
 
@@ -85,10 +93,9 @@ class ConnectionForm(forms.ModelForm):
         """The bound fields the plugin asked for, in the order it asked."""
         return [self[f"plugin_{spec.name}"] for spec in self.specs]
 
-    def save(self, commit: bool = True) -> Connection:
-        connection = super().save(commit=False)
-        connection.kind = self.plugin.kind
-        connection.plugin = self.plugin.name
+    def _merged(self) -> tuple[dict, dict]:
+        """Configuration and secrets as they will be stored: what was typed over what is kept."""
+        connection = self.instance
         config = dict(connection.config) if connection.pk else {}
         secrets = connection.secrets if connection.pk else {}
         for spec in self.specs:
@@ -99,8 +106,39 @@ class ConnectionForm(forms.ModelForm):
                 # blank: keep what is stored
             else:
                 config[spec.name] = value if value is not None else ""
-        connection.config = config
-        connection.secrets = secrets
+        return config, secrets
+
+    def clean(self) -> dict:
+        """Let the plugin look at the whole configuration once every field is in order.
+
+        A plugin that can tell a malformed address from a good one says so here, on the
+        form, against the field concerned. It sees configuration and secrets together,
+        the stored secret standing in for a blank field, so it checks what will run.
+        """
+        cleaned = super().clean()
+        validate = getattr(self.plugin, "validate", None)
+        if validate is None or self.errors:
+            return cleaned
+        config, secrets = self._merged()
+        try:
+            problems = validate({**config, **secrets}) or {}
+        except Exception as error:
+            logger.exception("Plugin %r failed to validate a connection", self.plugin.name)
+            raise forms.ValidationError(
+                _("%(plugin)s could not check these settings: %(error)s")
+                % {"plugin": self.plugin.label, "error": f"{type(error).__name__}: {error}"}
+            ) from error
+        for name, messages in problems.items():
+            field = f"plugin_{name}" if name and f"plugin_{name}" in self.fields else None
+            for message in [messages] if isinstance(messages, str) else messages:
+                self.add_error(field, message)
+        return cleaned
+
+    def save(self, commit: bool = True) -> Connection:
+        connection = super().save(commit=False)
+        connection.kind = self.plugin.kind
+        connection.plugin = self.plugin.name
+        connection.config, connection.secrets = self._merged()
         if commit:
             connection.save()
         return connection

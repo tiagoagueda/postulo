@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:17+0000\n"
+"POT-Creation-Date: 2026-09-06 09:56+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -214,6 +214,11 @@ msgstr "%(name)s — CV"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/forms.py:128
+#, python-format, draft
+msgid "%(plugin)s could not check these settings: %(error)s"
+msgstr "%(plugin)s n'a pas pu vérifier ces réglages : %(error)s"
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:42
 #, python-format, draft
@@ -464,7 +469,7 @@ msgid "Add a company"
 msgstr "Ajouter une entreprise"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:66
+#: src/postulo/templates/connections/list.html:69
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1345,19 +1350,19 @@ msgstr "Connecter %(plugin)s"
 msgid "connection"
 msgstr "connexion"
 
-#: src/postulo/plugins/views.py:181
+#: src/postulo/plugins/views.py:201
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Connexion supprimée, secrets compris."
 
-#: src/postulo/plugins/views.py:140
+#: src/postulo/plugins/views.py:160
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Connexion enregistrée. Testez-la pour vérifier qu'elle fonctionne."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:66
-#: src/postulo/plugins/views.py:84 src/postulo/plugins/views.py:114
-#: src/postulo/plugins/views.py:177
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
+#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
+#: src/postulo/plugins/views.py:197
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1820,7 +1825,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:47
+#: src/postulo/templates/connections/list.html:50
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:35
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -2816,7 +2821,7 @@ msgstr "délivrée le"
 msgid "It cannot end before it starts."
 msgstr "Il ne peut pas se terminer avant d'avoir commencé."
 
-#: src/postulo/plugins/views.py:164
+#: src/postulo/plugins/views.py:184
 #, draft
 msgid "It works."
 msgstr "Ça fonctionne."
@@ -3365,7 +3370,7 @@ msgstr ""
 msgid "no company"
 msgstr "pas d'entreprise"
 
-#: src/postulo/templates/connections/list.html:58
+#: src/postulo/templates/connections/list.html:61
 #, draft
 msgid "No connections yet"
 msgstr "Pas encore de connexion"
@@ -3391,7 +3396,7 @@ msgstr ""
 msgid "No installed plugin needs a connection."
 msgstr "Aucun plugin installé n'a besoin d'une connexion."
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:73
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3683,7 +3688,7 @@ msgstr "Rien d'envoyé pour l'instant."
 msgid "Nothing to chase."
 msgstr "Rien à relancer."
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:71
 #, draft
 msgid "Nothing to connect to"
 msgstr "Rien à connecter"
@@ -3792,7 +3797,7 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Une capture en attente de vérification"
 msgstr[1] "%(counter)s captures en attente de vérification"
 
-#: src/postulo/templates/connections/list.html:60
+#: src/postulo/templates/connections/list.html:63
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4577,7 +4582,7 @@ msgid "Remote"
 msgstr "À distance"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:49
+#: src/postulo/templates/connections/list.html:52
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -5256,7 +5261,7 @@ msgstr "Statut mis à jour."
 msgid "Still live"
 msgstr "Encore en cours"
 
-#: src/postulo/plugins/forms.py:51
+#: src/postulo/plugins/forms.py:43
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Enregistré ; laissez vide pour conserver la valeur actuelle."
@@ -5364,12 +5369,12 @@ msgid "Templates appear when you send a letter with an application."
 msgstr ""
 "Les modèles apparaissent quand vous envoyez une lettre avec une candidature."
 
-#: src/postulo/templates/connections/list.html:45
+#: src/postulo/templates/connections/list.html:48
 #, draft
 msgid "Test"
 msgstr "Tester"
 
-#: src/postulo/plugins/views.py:166
+#: src/postulo/plugins/views.py:186
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Échec du test : %(message)s"
@@ -5484,7 +5489,7 @@ msgstr "Cette page a renvoyé %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Cette image dépasse 5 Mo. Une plus petite, s'il vous plaît."
 
-#: src/postulo/plugins/views.py:152
+#: src/postulo/plugins/views.py:172
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ce plugin n'est plus installé."

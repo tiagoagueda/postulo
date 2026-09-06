@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:17+0000\n"
+"POT-Creation-Date: 2026-09-06 09:56+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -211,6 +211,11 @@ msgstr "%(name)s — CV"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/forms.py:128
+#, python-format, draft
+msgid "%(plugin)s could not check these settings: %(error)s"
+msgstr "%(plugin)s не успя да провери тези настройки: %(error)s"
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:42
 #, python-format, draft
@@ -460,7 +465,7 @@ msgid "Add a company"
 msgstr "Добавяне на компания"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:66
+#: src/postulo/templates/connections/list.html:69
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1341,19 +1346,19 @@ msgstr "Свързване на %(plugin)s"
 msgid "connection"
 msgstr "връзка"
 
-#: src/postulo/plugins/views.py:181
+#: src/postulo/plugins/views.py:201
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Връзката е премахната, включително тайните."
 
-#: src/postulo/plugins/views.py:140
+#: src/postulo/plugins/views.py:160
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Връзката е запазена. Тествайте я, за да сте сигурни, че работи."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:66
-#: src/postulo/plugins/views.py:84 src/postulo/plugins/views.py:114
-#: src/postulo/plugins/views.py:177
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
+#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
+#: src/postulo/plugins/views.py:197
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1815,7 +1820,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:47
+#: src/postulo/templates/connections/list.html:50
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:35
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -2808,7 +2813,7 @@ msgstr "издадена на"
 msgid "It cannot end before it starts."
 msgstr "Не може да приключи, преди да е започнало."
 
-#: src/postulo/plugins/views.py:164
+#: src/postulo/plugins/views.py:184
 #, draft
 msgid "It works."
 msgstr "Работи."
@@ -3356,7 +3361,7 @@ msgstr "Още няма компании. Създават се за вас, к�
 msgid "no company"
 msgstr "без компания"
 
-#: src/postulo/templates/connections/list.html:58
+#: src/postulo/templates/connections/list.html:61
 #, draft
 msgid "No connections yet"
 msgstr "Още няма връзки"
@@ -3381,7 +3386,7 @@ msgstr "Още няма отрасли. Появяват се, докато оп
 msgid "No installed plugin needs a connection."
 msgstr "Никоя инсталирана добавка не се нуждае от връзка."
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:73
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3673,7 +3678,7 @@ msgstr "Още нищо изпратено."
 msgid "Nothing to chase."
 msgstr "Нищо за напомняне."
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:71
 #, draft
 msgid "Nothing to connect to"
 msgstr "Няма към какво да се свържете"
@@ -3782,7 +3787,7 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Едно прихващане чака преглед"
 msgstr[1] "%(counter)s прихващания чакат преглед"
 
-#: src/postulo/templates/connections/list.html:60
+#: src/postulo/templates/connections/list.html:63
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4566,7 +4571,7 @@ msgid "Remote"
 msgstr "Дистанционно"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:49
+#: src/postulo/templates/connections/list.html:52
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -5243,7 +5248,7 @@ msgstr "Статусът е обновен."
 msgid "Still live"
 msgstr "Още активна"
 
-#: src/postulo/plugins/forms.py:51
+#: src/postulo/plugins/forms.py:43
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Съхранено; оставете празно, за да запазите текущата стойност."
@@ -5350,12 +5355,12 @@ msgstr "Шаблон"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Шаблоните се появяват, когато изпращате писмо с кандидатура."
 
-#: src/postulo/templates/connections/list.html:45
+#: src/postulo/templates/connections/list.html:48
 #, draft
 msgid "Test"
 msgstr "Тест"
 
-#: src/postulo/plugins/views.py:166
+#: src/postulo/plugins/views.py:186
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Тестът се провали: %(message)s"
@@ -5469,7 +5474,7 @@ msgstr "Тази страница върна %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Тази снимка е над 5 MB. По-малка, моля."
 
-#: src/postulo/plugins/views.py:152
+#: src/postulo/plugins/views.py:172
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Тази добавка вече не е инсталирана."

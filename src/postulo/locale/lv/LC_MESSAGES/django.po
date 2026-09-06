@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 09:17+0000\n"
+"POT-Creation-Date: 2026-09-06 09:56+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: latviešu\n"
@@ -220,6 +220,11 @@ msgstr "%(name)s — CV"
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
+
+#: src/postulo/plugins/forms.py:128
+#, python-format, draft
+msgid "%(plugin)s could not check these settings: %(error)s"
+msgstr "%(plugin)s nevarēja pārbaudīt šos iestatījumus: %(error)s"
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:42
 #, python-format, draft
@@ -472,7 +477,7 @@ msgid "Add a company"
 msgstr "Pievienot uzņēmumu"
 
 #: src/postulo/templates/connections/list.html:13
-#: src/postulo/templates/connections/list.html:66
+#: src/postulo/templates/connections/list.html:69
 #: src/postulo/templates/connections/pick.html:5
 #, draft
 msgid "Add a connection"
@@ -1353,20 +1358,20 @@ msgstr "Savienot %(plugin)s"
 msgid "connection"
 msgstr "savienojums"
 
-#: src/postulo/plugins/views.py:181
+#: src/postulo/plugins/views.py:201
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Savienojums noņemts kopā ar noslēpumiem."
 
-#: src/postulo/plugins/views.py:140
+#: src/postulo/plugins/views.py:160
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr ""
 "Savienojums saglabāts. Pārbaudiet to, lai pārliecinātos, ka tas darbojas."
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:66
-#: src/postulo/plugins/views.py:84 src/postulo/plugins/views.py:114
-#: src/postulo/plugins/views.py:177
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:86
+#: src/postulo/plugins/views.py:104 src/postulo/plugins/views.py:134
+#: src/postulo/plugins/views.py:197
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -1828,7 +1833,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_detail.html:244
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
-#: src/postulo/templates/connections/list.html:47
+#: src/postulo/templates/connections/list.html:50
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:35
 #: src/postulo/templates/jobs/company_detail.html:25
@@ -2818,7 +2823,7 @@ msgstr "izdots"
 msgid "It cannot end before it starts."
 msgstr "Nevar beigties, pirms sākas."
 
-#: src/postulo/plugins/views.py:164
+#: src/postulo/plugins/views.py:184
 #, draft
 msgid "It works."
 msgstr "Darbojas."
@@ -3366,7 +3371,7 @@ msgstr "Uzņēmumu vēl nav. Tie tiek izveidoti jums, kad ierakstāt pieteikumu.
 msgid "no company"
 msgstr "nav uzņēmuma"
 
-#: src/postulo/templates/connections/list.html:58
+#: src/postulo/templates/connections/list.html:61
 #, draft
 msgid "No connections yet"
 msgstr "Savienojumu vēl nav"
@@ -3391,7 +3396,7 @@ msgstr "Nozaru vēl nav. Tās parādās, kad aprakstāt uzņēmumus."
 msgid "No installed plugin needs a connection."
 msgstr "Nevienam instalētajam spraudnim savienojums nav vajadzīgs."
 
-#: src/postulo/templates/connections/list.html:70
+#: src/postulo/templates/connections/list.html:73
 #, draft
 msgid ""
 "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
@@ -3682,7 +3687,7 @@ msgstr "Vēl nekas nav nosūtīts."
 msgid "Nothing to chase."
 msgstr "Nav kam atgādināt."
 
-#: src/postulo/templates/connections/list.html:68
+#: src/postulo/templates/connections/list.html:71
 #, draft
 msgid "Nothing to connect to"
 msgstr "Nav, ar ko savienoties"
@@ -3792,7 +3797,7 @@ msgstr[0] "Viens tvērums gaida pārskatīšanu"
 msgstr[1] "%(counter)s tvērumi gaida pārskatīšanu"
 msgstr[2] "%(counter)s tvērumu gaida pārskatīšanu"
 
-#: src/postulo/templates/connections/list.html:60
+#: src/postulo/templates/connections/list.html:63
 #, python-format, draft
 msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
@@ -4576,7 +4581,7 @@ msgid "Remote"
 msgstr "Attālināti"
 
 #: src/postulo/templates/connections/confirm_delete.html:18
-#: src/postulo/templates/connections/list.html:49
+#: src/postulo/templates/connections/list.html:52
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
 #, draft
@@ -5251,7 +5256,7 @@ msgstr "Statuss atjaunināts."
 msgid "Still live"
 msgstr "Joprojām aktīvs"
 
-#: src/postulo/plugins/forms.py:51
+#: src/postulo/plugins/forms.py:43
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Saglabāts; atstājiet tukšu, lai paturētu pašreizējo vērtību."
@@ -5358,12 +5363,12 @@ msgstr "Veidne"
 msgid "Templates appear when you send a letter with an application."
 msgstr "Veidnes parādās, kad sūtāt vēstuli kopā ar pieteikumu."
 
-#: src/postulo/templates/connections/list.html:45
+#: src/postulo/templates/connections/list.html:48
 #, draft
 msgid "Test"
 msgstr "Pārbaudīt"
 
-#: src/postulo/plugins/views.py:166
+#: src/postulo/plugins/views.py:186
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Pārbaude neizdevās: %(message)s"
@@ -5477,7 +5482,7 @@ msgstr "Šī lapa atgrieza %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Šis attēls pārsniedz 5 MB. Lūdzu, mazāku."
 
-#: src/postulo/plugins/views.py:152
+#: src/postulo/plugins/views.py:172
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Šis spraudnis vairs nav instalēts."

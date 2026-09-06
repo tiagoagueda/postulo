@@ -159,6 +159,17 @@ class ConnectedPlugin(Protocol):
     belongs to — ``notifier``, ``store`` or ``sync`` — and the kind's own interface adds
     what that kind does (a notifier sends; a store puts). This is the part they share:
     what to ask the person for, and how to prove the answers work.
+
+    Two more methods are optional, and Postulo looks for them by name:
+
+    - ``validate(config) -> dict[str, list[str]]`` runs when the connection form is
+      submitted, with configuration and secrets together, and returns problems keyed by
+      field name (an empty key for the form as a whole). A plugin that can tell a typo
+      from a token should say so here, at the form, rather than at three in the morning
+      when a reminder falls due.
+    - ``summary(config) -> str`` is one line for the connections list: which services a
+      connection reaches, with every secret part masked. Secrets are never shown back,
+      so this is how a person tells two connections to the same plugin apart.
     """
 
     name: str

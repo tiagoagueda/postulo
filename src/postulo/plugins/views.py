@@ -43,6 +43,24 @@ def _plugin_or_404(kind: str, name: str):
     return plugin
 
 
+def _summary(plugin, connection: Connection) -> str:
+    """The plugin's one-line description of a connection, or nothing if it has none.
+
+    A plugin failing to describe itself must not take the list down: the connection is
+    still there to be edited or removed.
+    """
+    summary = getattr(plugin, "summary", None)
+    if summary is None:
+        return ""
+    try:
+        return str(summary(connection.full_config) or "")
+    except SecretsUnreadable:
+        return ""
+    except Exception:
+        logger.exception("Plugin %r could not summarise connection %s", plugin.name, connection.pk)
+        return ""
+
+
 class ConnectionListView(OwnedObjectMixin, ListView):
     model = Connection
     template_name = "connections/list.html"
@@ -55,11 +73,13 @@ class ConnectionListView(OwnedObjectMixin, ListView):
         context["kind_labels"] = KIND_LABELS
         rows = []
         for connection in context["connections"]:
+            plugin = connection.plugin_instance
             rows.append(
                 {
                     "connection": connection,
-                    "plugin": connection.plugin_instance,
+                    "plugin": plugin,
                     "kind_label": KIND_LABELS.get(connection.kind, connection.kind),
+                    "summary": _summary(plugin, connection),
                 }
             )
         context["rows"] = rows

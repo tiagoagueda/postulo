@@ -6,6 +6,27 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **postulo-apprise, the first plugin built outside the core.** One package, one
+  connection, and Postulo can notify through [Apprise](https://github.com/caronc/apprise):
+  Telegram, ntfy, Discord, Matrix, Gotify, Pushover, Signal, email and well over a hundred
+  other services, each named by one URL. The URLs carry their credentials, so the whole
+  field is a secret — encrypted at rest, never shown back — and the connections list
+  shows each service with the secret parts masked. A malformed URL is refused on the
+  form, not discovered when a reminder falls due, and the instance's destination policy
+  applies to every self-hosted service an Apprise URL names. The built-in Email notifier
+  stays as it is: the core works with no plugin installed. (#5)
+- **Plugins can check a connection and describe it.** A connected plugin may provide
+  `validate(config)`, run when the form is submitted with configuration and secrets
+  together, and `summary(config)`, one masked line for the connections list. A secret
+  may now be a text area, for plugins whose secret is a list. (#5)
+- **Plugins in the image.** The Dockerfile takes `POSTULO_EXTRA_PACKAGES`, any number
+  of packages in the form pip accepts, and installs them at build time under the core's
+  own lock as a constraint, so a plugin cannot change what Postulo pins. A two-line
+  `FROM` Dockerfile does the same for anyone who prefers it; both are on *Installing
+  Postulo*. (#5)
+
 ### Fixed
 
 - **The container image would not build.** `collectstatic` with the manifest storage
