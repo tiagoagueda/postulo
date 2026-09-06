@@ -6,7 +6,7 @@ Postulo stores personal documents — CVs, cover letters, and employment history
 security reports are taken seriously.
 
 Please report vulnerabilities privately rather than opening a public issue. Open a
-confidential issue on the [Forgejo repository](https://source.tiagoagueda.com/tiagoagueda/postulo),
+confidential issue on the [Forgejo repository](https://source.tiagoagueda.com/postulo/postulo),
 or email the maintainer if you have no account there.
 
 Please include the affected version or commit, what an attacker could achieve, and the

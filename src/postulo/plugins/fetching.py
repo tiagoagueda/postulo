@@ -34,7 +34,7 @@ from django.utils.translation import gettext as _
 
 from .base import CaptureError
 
-USER_AGENT = "Postulo (+https://source.tiagoagueda.com/tiagoagueda/postulo)"
+USER_AGENT = "Postulo (+https://source.tiagoagueda.com/postulo/postulo)"
 
 #: Generous for an advert, mean for anything that is not one.
 MAX_BYTES = 2_000_000

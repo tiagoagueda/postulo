@@ -100,6 +100,6 @@ browser extension planned for later. See [The capture API](The-capture-API).
 
 If a board you use often is read badly, a plugin can be written for it and installed
 without changing Postulo or waiting for anyone. See
-[docs/PLUGINS.md](https://source.tiagoagueda.com/tiagoagueda/postulo/src/branch/main/docs/PLUGINS.md).
+[docs/PLUGINS.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/PLUGINS.md).
 
 The capture page lists which sources are installed.

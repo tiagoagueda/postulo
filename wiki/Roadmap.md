@@ -29,7 +29,7 @@ answers in advance.
 - Email ingestion and calendar synchronisation.
 - French and Portuguese translations. The application is written in British English and
   the catalogues are ready; they need people to write them. See
-  [Translating](https://source.tiagoagueda.com/tiagoagueda/postulo/src/branch/main/docs/TRANSLATING.md).
+  [Translating](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/TRANSLATING.md).
 
 ## Things that are not planned
 

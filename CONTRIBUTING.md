@@ -1,7 +1,7 @@
 # Contributing to Postulo
 
 Thank you for considering it. Postulo is developed on
-[Forgejo](https://source.tiagoagueda.com/tiagoagueda/postulo); the GitHub repository is a
+[Forgejo](https://source.tiagoagueda.com/postulo/postulo); the GitHub repository is a
 read-only mirror, so please open issues and pull requests on Forgejo.
 
 ## Getting set up

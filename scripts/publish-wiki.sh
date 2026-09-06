@@ -9,7 +9,7 @@
 # Settings -> Repository -> Wiki, then create any page in the web interface once.
 set -euo pipefail
 
-REMOTE="${POSTULO_WIKI_REMOTE:-https://source.tiagoagueda.com/tiagoagueda/postulo.wiki.git}"
+REMOTE="${POSTULO_WIKI_REMOTE:-https://source.tiagoagueda.com/postulo/postulo.wiki.git}"
 SOURCE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/wiki"
 WORKDIR="$(mktemp -d)"
 trap 'rm -rf "$WORKDIR"' EXIT

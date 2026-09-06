@@ -3,7 +3,7 @@
 ## The short version
 
 ```sh
-git clone https://source.tiagoagueda.com/tiagoagueda/postulo.git
+git clone https://source.tiagoagueda.com/postulo/postulo.git
 cd postulo
 cp .env.example .env          # set POSTULO_SECRET_KEY and POSTULO_ALLOWED_HOSTS
 docker compose -f docker/compose.yml up -d
@@ -80,7 +80,7 @@ bypass that entirely.
 ## Trying it on your own machine
 
 ```sh
-git clone https://source.tiagoagueda.com/tiagoagueda/postulo.git
+git clone https://source.tiagoagueda.com/postulo/postulo.git
 cd postulo
 uv sync
 cp .env.example .env

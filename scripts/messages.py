@@ -394,7 +394,7 @@ def header_for(code: str, existing: dict[str, str]) -> dict[str, str]:
     now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M%z")
     header = {
         "Project-Id-Version": "Postulo",
-        "Report-Msgid-Bugs-To": "https://source.tiagoagueda.com/tiagoagueda/postulo/issues",
+        "Report-Msgid-Bugs-To": "https://source.tiagoagueda.com/postulo/postulo/issues",
         "POT-Creation-Date": now,
         "PO-Revision-Date": existing.get("PO-Revision-Date", now),
         "Last-Translator": existing.get("Last-Translator", "Postulo contributors"),

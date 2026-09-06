@@ -41,7 +41,7 @@ the network without a deliberate decision, and the test suite includes security 
 ownership sweeps, policy checks, the things an attacker would try — that fail the build.
 Dependencies are checked for known vulnerabilities on every run and on a schedule, so a
 fresh disclosure is noticed without anyone having to remember to look. A security report
-is handled before any feature is; see the [security policy](https://source.tiagoagueda.com/tiagoagueda/postulo/src/branch/main/SECURITY.md).
+is handled before any feature is; see the [security policy](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/SECURITY.md).
 
 ## Built for everyone
 

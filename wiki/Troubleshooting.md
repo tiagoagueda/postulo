@@ -90,7 +90,7 @@ Postulo fetches HTML, it does not run a browser.
 
 Use **Record an application** and paste the text in. If it is a site you use often, a
 plugin can be written for it: see
-[docs/PLUGINS.md](https://source.tiagoagueda.com/tiagoagueda/postulo/src/branch/main/docs/PLUGINS.md).
+[docs/PLUGINS.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/PLUGINS.md).
 
 ## "That address is on a private or local network"
 
@@ -167,6 +167,6 @@ DJANGO_SETTINGS_MODULE=postulo.config.settings.prod uv run manage.py check --dep
 
 ## Something else
 
-Open an issue on [the repository](https://source.tiagoagueda.com/tiagoagueda/postulo/issues),
+Open an issue on [the repository](https://source.tiagoagueda.com/postulo/postulo/issues),
 with the version (`git rev-parse --short HEAD`), what you did, and what happened. Please
 do not paste your `.env`.

@@ -1,6 +1,6 @@
 # Wiki sources
 
-These are the pages of the [Postulo wiki](https://source.tiagoagueda.com/tiagoagueda/postulo/wiki).
+These are the pages of the [Postulo wiki](https://source.tiagoagueda.com/postulo/postulo/wiki).
 
 They are kept here, rather than edited in the wiki interface, so that documentation
 changes are reviewed alongside the code that made them necessary.

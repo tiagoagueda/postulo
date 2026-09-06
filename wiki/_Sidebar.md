@@ -23,5 +23,5 @@
 
 **Project**
 - [Roadmap](Roadmap)
-- [Contributing](https://source.tiagoagueda.com/tiagoagueda/postulo/src/branch/main/CONTRIBUTING.md)
-- [Translating](https://source.tiagoagueda.com/tiagoagueda/postulo/src/branch/main/docs/TRANSLATING.md)
+- [Contributing](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CONTRIBUTING.md)
+- [Translating](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/TRANSLATING.md)

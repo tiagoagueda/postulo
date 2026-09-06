@@ -1,6 +1,6 @@
 # Postulo
 
-[![CI](https://source.tiagoagueda.com/tiagoagueda/postulo/actions/workflows/ci.yml/badge.svg)](https://source.tiagoagueda.com/tiagoagueda/postulo/actions)
+[![CI](https://source.tiagoagueda.com/postulo/postulo/actions/workflows/ci.yml/badge.svg)](https://source.tiagoagueda.com/postulo/postulo/actions)
 
 **Self-hosted job application manager, from the applicant's side of the table.**
 
@@ -125,7 +125,7 @@ Postulo is in each language so nobody has to guess.
 
 ## Documentation
 
-- **[The wiki](https://source.tiagoagueda.com/tiagoagueda/postulo/wiki)** — installing,
+- **[The wiki](https://source.tiagoagueda.com/postulo/postulo/wiki)** — installing,
   configuring and using Postulo. Authored in [wiki/](wiki/) and published from there.
 - [Implementation plan](docs/PLAN.md) — architecture, data model, and milestones
 - [Writing a capture source](docs/PLUGINS.md) — the plugin contract
@@ -133,7 +133,7 @@ Postulo is in each language so nobody has to guess.
 ## Running it
 
 ```sh
-git clone https://source.tiagoagueda.com/tiagoagueda/postulo.git
+git clone https://source.tiagoagueda.com/postulo/postulo.git
 cd postulo
 cp .env.example .env          # set POSTULO_SECRET_KEY and POSTULO_ALLOWED_HOSTS
 docker compose -f docker/compose.yml up -d
@@ -141,7 +141,7 @@ docker compose -f docker/compose.yml exec postulo python manage.py createsuperus
 ```
 
 Then put a reverse proxy in front of it for TLS. See
-[Installing Postulo](https://source.tiagoagueda.com/tiagoagueda/postulo/wiki/Installing-Postulo)
+[Installing Postulo](https://source.tiagoagueda.com/postulo/postulo/wiki/Installing-Postulo)
 for the full instructions, including installing without a container.
 
 ## Development
@@ -205,6 +205,6 @@ The icons are [Lucide](https://lucide.dev), used under the ISC licence.
 
 ## Where this lives
 
-Developed on [Forgejo](https://source.tiagoagueda.com/tiagoagueda/postulo) and mirrored to
+Developed on [Forgejo](https://source.tiagoagueda.com/postulo/postulo) and mirrored to
 GitHub. Issues and pull requests belong on the Forgejo repository; the GitHub copy is a
 read-only mirror.

@@ -71,9 +71,9 @@ The capture API was built for a browser extension, and there is one — for Chro
 browsers (Chrome, Edge, Brave, Vivaldi, Opera, Arc) and for Firefox and its forks,
 including Firefox for Android:
 
-- [postulo-chromium](https://source.tiagoagueda.com/tiagoagueda/postulo-chromium) holds
+- [postulo-chromium](https://source.tiagoagueda.com/postulo/postulo-chromium) holds
   the source, one Manifest V3 codebase built for both browsers.
-- [postulo-firefox](https://source.tiagoagueda.com/tiagoagueda/postulo-firefox) assembles
+- [postulo-firefox](https://source.tiagoagueda.com/postulo/postulo-firefox) assembles
   the Firefox package from it and carries what addons.mozilla.org needs.
 
 Set it up once: make a token under **Settings → API tokens** with the `captures` scope and

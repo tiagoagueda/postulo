@@ -294,7 +294,7 @@ highlighted while a person is on them.
 ## A worked example
 
 The complete, installable version of everything on this page is
-[postulo-helloworld](https://source.tiagoagueda.com/tiagoagueda/postulo-helloworld): a
+[postulo-helloworld](https://source.tiagoagueda.com/postulo/postulo-helloworld): a
 capture source and a notifier, translations of its own, tests that run both through
 Postulo's registry, and a CI workflow — under the MIT licence so you can copy it into your
 own plugin without a second thought. Start there. The fragment below is its source, cut

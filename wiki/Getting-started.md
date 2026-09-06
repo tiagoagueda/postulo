@@ -26,7 +26,7 @@ How Postulo behaves for you lives under **Settings**, one section per page:
 - **Language and time** — the interface language, and the time zone dates are shown in.
   Postulo speaks every official language of the European Union; a language whose
   translation is a machine-assisted draft says so in the list until a speaker has
-  reviewed it, and [translating](https://source.tiagoagueda.com/tiagoagueda/postulo/src/branch/main/docs/TRANSLATING.md)
+  reviewed it, and [translating](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/TRANSLATING.md)
   is the easiest way to help.
 - **Account** — your username, your email addresses, your password, two-factor
   authentication, and any single sign-on connected to the account.
