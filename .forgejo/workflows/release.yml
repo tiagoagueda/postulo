@@ -39,6 +39,9 @@ jobs:
       - name: Refuse a tag that disagrees with the code or the changelog
         run: uv run --no-project python scripts/release_tools.py check "${GITHUB_REF_NAME}"
 
+      - name: Compile the translations into the package
+        run: uv run --no-project python scripts/messages.py compile
+
       - name: Build the sdist and the wheel
         run: uv build
 

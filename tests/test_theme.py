@@ -41,7 +41,7 @@ def test_posting_a_theme_saves_it_and_goes_back(client, user):
     assert theme_of(user) == "dark"
 
     response = client.get(reverse("core:home"))
-    assert b'<html lang="en-gb" data-theme="dark">' in response.content
+    assert b'<html lang="en-gb" dir="ltr" data-theme="dark">' in response.content
     assert b'data-theme-switch data-current="dark"' in response.content
     assert b'name="theme" value="system"' in response.content
 

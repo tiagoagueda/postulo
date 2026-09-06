@@ -71,6 +71,16 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
 
+      - name: Check the translation catalogues are current and consistent
+        # Every string in the source has a slot in every catalogue, every translation
+        # keeps the placeholders of its original, and the plural rules match the table.
+        run: |
+          uv run python scripts/messages.py extract --check
+          uv run python scripts/messages.py check
+
+      - name: Compile the translations
+        run: uv run python scripts/messages.py compile
+
       - name: Test
         run: uv run pytest --cov --cov-report=term-missing
 
@@ -191,6 +201,9 @@ jobs:
 
       - name: Install axe-core for the accessibility checks
         run: npm ci
+
+      - name: Compile the translations
+        run: uv run python scripts/messages.py compile
 
       - name: Drive the critical path in a browser
         run: >

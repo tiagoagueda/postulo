@@ -8,9 +8,9 @@ from datetime import timedelta
 from pathlib import Path
 
 import environ
-from django.utils.translation import gettext_lazy as _
 
 from postulo.accounts.validators import USERNAME_BLACKLIST
+from postulo.core import languages
 
 # src/postulo/config/settings/base.py -> src/postulo
 PACKAGE_DIR = Path(__file__).resolve().parents[2]
@@ -224,13 +224,13 @@ POSTULO_ADMIN_URL = env("POSTULO_ADMIN_URL", default="admin/")
 # British English is the source language; every other locale is a translation of it.
 LANGUAGE_CODE = "en-gb"
 
-LANGUAGES = [
-    ("en-gb", _("English (United Kingdom)")),
-    ("fr-fr", _("French (France)")),
-    ("pt-pt", _("Portuguese (Portugal)")),
-]
+# Every official language of the European Union, each under its own name; the list and
+# the plural rules live in postulo.core.languages so the catalogue tooling can read them
+# without loading Django.
+LANGUAGES = languages.LANGUAGES
 
-LOCALE_PATHS = [REPO_DIR / "locale"]
+# Inside the package, so an installed wheel and a container carry the catalogues too.
+LOCALE_PATHS = [PACKAGE_DIR / "locale"]
 
 TIME_ZONE = env("POSTULO_TIME_ZONE", default="Europe/Paris")
 USE_I18N = True

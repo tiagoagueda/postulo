@@ -75,10 +75,38 @@ class ResetPasswordKeyForm(AllauthResetPasswordKeyForm):
 
 
 def language_choices() -> list[tuple[str, str]]:
-    """Languages this instance offers, plus an option to follow the browser."""
-    return [("", _("Use the instance default"))] + [
-        (code, name) for code, name in settings.LANGUAGES
-    ]
+    """Languages this instance offers, plus an option to follow the browser.
+
+    A language that is only partly translated says so beside its name, and one whose
+    translation is a machine-assisted draft nobody has reviewed says that, so nobody is
+    surprised by English in the gaps or by an odd turn of phrase.
+    """
+    from postulo.core.languages import translation_status
+
+    status = translation_status()
+    choices = [("", _("Use the instance default"))]
+    for code, name in settings.LANGUAGES:
+        row = status.get(code)
+        if row is None or row.get("total", 0) == 0:
+            choices.append((code, name))
+        elif row.get("percent", 0) < 95:
+            choices.append(
+                (
+                    code,
+                    _("%(language)s — %(percent)s%% translated")
+                    % {"language": name, "percent": row["percent"]},
+                )
+            )
+        elif row.get("drafts", 0):
+            choices.append(
+                (
+                    code,
+                    _("%(language)s — machine translation, awaiting review") % {"language": name},
+                )
+            )
+        else:
+            choices.append((code, name))
+    return choices
 
 
 def time_zone_choices() -> list[tuple[str, str]]:

@@ -159,10 +159,10 @@ postulo/
 ├── pyproject.toml            # uv-managed; extras: postgres, weasyprint, chromium
 ├── docker/                   # Dockerfile, compose files, entrypoint            (M6)
 ├── docs/                     # PLAN.md, TRANSLATING.md, INSTALL.md, PLUGINS.md
-├── locale/                   # fr_FR and pt_PT catalogues
 ├── src/postulo/
 │   ├── config/               # settings/{base,dev,prod,test}.py, urls, wsgi, asgi
 │   ├── core/                 # OwnedModel, scoped querysets, Tag, layout
+│   ├── locale/               # one catalogue per language (scripts/messages.py)
 │   ├── accounts/             # User, Profile, invites                           (M1)
 │   ├── resume/               # structured career content                        (M3)
 │   ├── documents/            # CV variants, cover letters, uploads, rendering   (M3)

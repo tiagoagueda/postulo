@@ -52,6 +52,12 @@ WORKDIR /app
 # Dependencies first, so a change to the application does not re-resolve them.
 COPY pyproject.toml uv.lock README.md ./
 COPY src ./src
+COPY scripts/messages.py ./scripts/messages.py
+
+# The translation catalogues are committed as .po text; Django reads the compiled .mo,
+# which this writes in plain Python — no gettext in the image.
+RUN python scripts/messages.py compile
+
 RUN uv sync --locked --no-dev --extra server
 
 COPY manage.py ./

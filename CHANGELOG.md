@@ -65,6 +65,17 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Postulo speaks every official language of the European Union.** Twenty-three
+  catalogues beside the British English source — Bulgarian, Croatian, Czech, Danish,
+  Dutch, Estonian, Finnish, French, German, Greek, Hungarian, Irish, Italian, Latvian,
+  Lithuanian, Maltese, Polish, Portuguese, Romanian, Slovak, Slovene, Spanish and Swedish
+  — each complete as a machine-assisted draft flagged `draft` until a speaker has read
+  it, and each saying so in the language picker until then. The catalogues live inside
+  the package, so an installed wheel or a container carries them; `scripts/messages.py`
+  extracts, checks, compiles and reports on them in plain Python, with no GNU gettext
+  needed on the machine, and the build refuses a catalogue that is out of date or a
+  translation that lost a placeholder. Pages declare their text direction, so a
+  right-to-left language later is a catalogue and not a redesign. (#43)
 - **Companies carry external identifiers, starting with a Wikidata id.** A company can
   have one Wikidata item, one LEI (check digits verified), one national register number
   with its country, one LinkedIn, Crunchbase and OpenCorporates slug, and any number of
