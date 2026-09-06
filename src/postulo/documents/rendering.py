@@ -88,6 +88,8 @@ def contact_details(owner) -> dict:
         "website": getattr(profile, "website", ""),
         "linkedin_url": getattr(profile, "linkedin_url", ""),
         "source_repo_url": getattr(profile, "source_repo_url", ""),
+        # Beside the website and the LinkedIn address, which is where a reader looks.
+        "identifiers": list(profile.identifiers.all()) if profile is not None else [],
     }
 
 

@@ -19,8 +19,8 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core import phone_field, phones
 
-from . import avatars
-from .models import Invite, Profile
+from . import avatars, identifiers
+from .models import Invite, PersonIdentifier, Profile
 
 
 def with_strength_meter(form: forms.Form) -> None:
@@ -378,6 +378,66 @@ class AppearanceForm(forms.ModelForm):
         if value is None:
             return Profile._meta.get_field("quiet_after_days").default
         return value
+
+
+class PersonIdentifierForm(forms.ModelForm):
+    """One row: a scheme, the value, and a name for it when the scheme is Other."""
+
+    class Meta:
+        model = PersonIdentifier
+        fields = ("scheme", "value", "label")
+        widgets = {
+            "value": forms.TextInput(attrs={"autocomplete": "off", "spellcheck": "false"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # A blank first choice, so an untouched extra row counts as unchanged and is
+        # dropped rather than complaining that its value is missing.
+        self.fields["scheme"].choices = [("", "—"), *identifiers.CHOICES]
+        self.fields["scheme"].required = False
+        self.fields["value"].required = False
+
+    def clean(self) -> dict:
+        data = super().clean()
+        if not data.get("scheme") and (data.get("value") or data.get("label")):
+            self.add_error("scheme", _("Choose what kind of identifier this is."))
+        if data.get("scheme") and not data.get("value"):
+            self.add_error("value", _("Type the identifier."))
+        return data
+
+
+class BasePersonIdentifierFormSet(forms.BaseInlineFormSet):
+    """The rows together: one of each kind, and nothing listed twice."""
+
+    def clean(self) -> None:
+        super().clean()
+        seen_schemes: set[str] = set()
+        seen_values: set[tuple[str, str]] = set()
+        for form in self.forms:
+            if not form.is_valid() or not form.has_changed() or form.cleaned_data.get("DELETE"):
+                continue
+            scheme = form.cleaned_data.get("scheme")
+            value = form.instance.value  # normalised by the model's clean()
+            if not scheme or not value:
+                continue
+            if scheme != identifiers.OTHER:
+                if scheme in seen_schemes:
+                    form.add_error("scheme", _("This kind of identifier is already listed."))
+                seen_schemes.add(scheme)
+            if (scheme, value) in seen_values:
+                form.add_error("value", _("This identifier is already listed."))
+            seen_values.add((scheme, value))
+
+
+PersonIdentifierFormSet = forms.inlineformset_factory(
+    Profile,
+    PersonIdentifier,
+    form=PersonIdentifierForm,
+    formset=BasePersonIdentifierFormSet,
+    extra=1,
+    can_delete=True,
+)
 
 
 class LocaleForm(forms.ModelForm):

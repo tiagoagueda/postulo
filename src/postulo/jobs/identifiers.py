@@ -14,11 +14,11 @@ identifier knows what they typed, and looking it up is a deliberate action for l
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
-from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+
+from postulo.core.identifiers import Scheme, value_from_url
 
 # Registered in the order the form offers them: the ones people actually have to hand
 # come first.
@@ -29,27 +29,6 @@ LINKEDIN = "linkedin"
 CRUNCHBASE = "crunchbase"
 OPENCORPORATES = "opencorporates"
 OTHER = "other"
-
-
-@dataclass(frozen=True)
-class Scheme:
-    key: str
-    label: str
-    #: What a well-formed value looks like, applied after normalisation.
-    pattern: re.Pattern[str]
-    #: Where the value links, with ``{value}`` standing for it; empty when there is nowhere.
-    link: str = ""
-    #: Shown beside the input.
-    example: str = ""
-    #: Path prefixes that identify a pasted URL of this scheme, so the slug can be lifted.
-    url_paths: tuple[str, ...] = ()
-    #: The hosts those URLs live on; an address elsewhere is not an identifier of this kind.
-    hosts: tuple[str, ...] = ()
-    #: Whether letters are folded to upper case.
-    upper: bool = False
-
-    def url_for(self, value: str) -> str:
-        return self.link.format(value=value) if self.link else ""
 
 
 SCHEMES: dict[str, Scheme] = {
@@ -134,17 +113,10 @@ def normalise(scheme_key: str, raw: str) -> str:
     """
     scheme = SCHEMES[scheme_key]
     value = (raw or "").strip()
-    if "://" in value and scheme.url_paths and _hosted_by(value, scheme):
-        parts = urlsplit(value)
-        # GLEIF keeps the record in the fragment; everyone else in the path.
-        haystack = parts.path + ("#" + parts.fragment if parts.fragment else "")
-        for prefix in scheme.url_paths:
-            if prefix in haystack:
-                tail = haystack.split(prefix, 1)[1].strip("/")
-                # An OpenCorporates company keeps its slash: /companies/gb/01234567
-                keep = 2 if scheme_key == OPENCORPORATES else 1
-                value = "/".join(tail.split("/")[:keep])
-                break
+    # An OpenCorporates company keeps its slash: /companies/gb/01234567
+    lifted = value_from_url(value, scheme, segments=2 if scheme_key == OPENCORPORATES else 1)
+    if lifted is not None:
+        value = lifted
     if scheme_key in (LINKEDIN, CRUNCHBASE, OPENCORPORATES):
         value = value.lower()
     if scheme.upper:
@@ -156,11 +128,6 @@ def normalise(scheme_key: str, raw: str) -> str:
         if len(value) > 2 and value[:2].isalpha() and value[2] != " ":
             value = value[:2] + " " + value[2:].lstrip(" -:")
     return value
-
-
-def _hosted_by(url: str, scheme: Scheme) -> bool:
-    host = (urlsplit(url).hostname or "").lower()
-    return any(host == h or host.endswith("." + h) for h in scheme.hosts)
 
 
 def _lei_checks_out(value: str) -> bool:

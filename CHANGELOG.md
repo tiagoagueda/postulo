@@ -131,6 +131,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **You can record an ORCID, and other identifiers that say which researcher you are.**
+  A name is not an identity: two researchers share one, one researcher publishes under
+  three, and a marriage or a transliteration turns one into another. In the places Postulo
+  is aimed at first — academic posts, research institutes, EU bodies — the identifier
+  somebody actually has is an ORCID, and it is what an application form asks for by name.
+  *Your details* now takes one, along with a ResearcherID, a Scopus Author ID, an ISNI or
+  anything else under *Other*. Paste the whole address if that is what you have. An ORCID
+  is checked against its own checksum, so a typo is caught without Postulo ever asking
+  orcid.org anything. They appear in a CV's contact block beside the website, and travel in
+  the export. (#46)
 - **Every page is now either checked for accessibility or excused in writing.** The browser
   suite ran axe-core over a list of addresses somebody maintained by hand, which meant a
   page added later was simply not on it and nothing said so. About thirty were missing,

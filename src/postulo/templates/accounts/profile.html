@@ -83,6 +83,64 @@
         </div>
       </div>
 
+      <fieldset class="card mb-6" data-identifiers>
+        <legend class="field-label px-1">{% translate "Identifiers" %}</legend>
+        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed %}
+            An ORCID, or another public id that says which researcher you are. A name is
+            not an identity — two people share one, one person publishes under three — and
+            an application form for an academic post asks for this by name. Paste a whole
+            address if that is what you have; Postulo keeps the id.
+          {% endblocktranslate %}
+        </p>
+        {{ identifiers.management_form }}
+        {% if identifiers.non_form_errors %}
+          <div class="alert-error mb-3">{{ identifiers.non_form_errors }}</div>
+        {% endif %}
+        <ol class="space-y-3">
+          {% for row in identifiers %}
+            <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
+              {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
+              <div class="grid gap-3 sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,10rem)_auto] sm:items-end">
+                <div>
+                  <label class="field-label" for="{{ row.scheme.id_for_label }}">{% translate "Kind" %}</label>
+                  {{ row.scheme|add_class:"field-input" }}
+                </div>
+                <div>
+                  <label class="field-label" for="{{ row.value.id_for_label }}">{% translate "Identifier" %}</label>
+                  {{ row.value|add_class:"field-input" }}
+                </div>
+                <div>
+                  <label class="field-label" for="{{ row.label.id_for_label }}">{% translate "Name, if Other" %}</label>
+                  {{ row.label|add_class:"field-input" }}
+                </div>
+                {% if row.instance.pk %}
+                  <label class="flex items-center gap-1.5 pb-2 text-sm">
+                    {{ row.DELETE }} <span>{% translate "Remove" %}</span>
+                  </label>
+                {% else %}
+                  <span></span>
+                {% endif %}
+              </div>
+              {% for field in row.visible_fields %}
+                {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+              {% endfor %}
+              {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </li>
+          {% endfor %}
+        </ol>
+        <details class="mt-3 text-sm">
+          <summary class="cursor-pointer text-ink-600 dark:text-ink-400">{% translate "What goes where" %}</summary>
+          <dl class="mt-2 grid gap-1 sm:grid-cols-[minmax(0,14rem)_1fr]">
+            {% for scheme in identifier_schemes %}
+              <dt class="text-ink-500 dark:text-ink-400">{{ scheme.label }}</dt>
+              <dd class="font-mono text-xs">{{ scheme.example }}</dd>
+            {% endfor %}
+          </dl>
+        </details>
+        <p class="field-help">{% translate "Save to add another identifier." %}</p>
+      </fieldset>
+
       <div class="flex items-center gap-3">
         <button type="submit" class="btn-primary">{% translate "Save" %}</button>
         <a href="{% url 'core:home' %}" class="btn-ghost">{% translate "Cancel" %}</a>

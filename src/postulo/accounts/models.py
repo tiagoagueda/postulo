@@ -19,6 +19,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from . import identifiers
 from .validators import USERNAME_MAX_LENGTH, slug_from_email, username_validator
 
 INVITE_TOKEN_BYTES = 32
@@ -143,6 +144,72 @@ class Theme(models.TextChoices):
 def upload_to_avatars(instance, filename: str) -> str:
     """Pictures live under the person, like every other private file."""
     return f"avatars/{instance.user_id}/{filename}"
+
+
+class PersonIdentifier(models.Model):
+    """One external identifier for the person whose account this is.
+
+    A name is not an identity. Two researchers share one, one researcher publishes under
+    three, and a marriage or a transliteration turns one into another — which is the whole
+    reason ORCID exists, and the reason an application form for an academic post asks for
+    it by name.
+
+    Attached to the profile rather than to a CV, because it is a fact about the person and
+    not about one variant of their career record. Which CVs show it is a separate choice,
+    made the same way the rest of the contact block is.
+    """
+
+    profile = models.ForeignKey(
+        "accounts.Profile",
+        on_delete=models.CASCADE,
+        related_name="identifiers",
+        verbose_name=_("profile"),
+    )
+    scheme = models.CharField(_("scheme"), max_length=20, choices=identifiers.CHOICES)
+    value = models.CharField(_("identifier"), max_length=100)
+    label = models.CharField(
+        _("name"),
+        max_length=60,
+        blank=True,
+        help_text=_("What the identifier is, when the scheme is Other."),
+    )
+
+    class Meta:
+        verbose_name = _("identifier")
+        verbose_name_plural = _("identifiers")
+        ordering = ("scheme", "value")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("profile", "scheme"),
+                condition=~models.Q(scheme=identifiers.OTHER),
+                name="one_identifier_per_scheme_per_person",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.get_scheme_display()}: {self.value}"
+
+    def clean(self) -> None:
+        """Tidy and check the value here, so nothing stores a half-typed identifier.
+
+        On the model rather than only on the form, because an import or a plugin writing
+        one should get the same answer as somebody typing it into a page.
+        """
+        super().clean()
+        if self.scheme and self.value:
+            self.value = identifiers.clean(self.scheme, self.value)
+
+    @property
+    def url(self) -> str:
+        return identifiers.url_for(self.scheme, self.value)
+
+    @property
+    def display_label(self) -> str:
+        return (
+            self.label
+            if self.scheme == identifiers.OTHER and self.label
+            else str(self.get_scheme_display())
+        )
 
 
 class Profile(models.Model):

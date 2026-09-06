@@ -27,7 +27,7 @@ from postulo.core.redirects import safe_next
 
 from . import avatars, deletion
 from .adapter import INVITE_SESSION_KEY
-from .forms import InviteForm, ProfileForm
+from .forms import InviteForm, PersonIdentifierFormSet, ProfileForm
 from .models import Invite, Profile, Theme
 
 
@@ -44,8 +44,37 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         profile, _created = Profile.objects.get_or_create(user=self.request.user)
         return profile
 
+    def get_identifiers(self):
+        """The identifiers block: an inline formset saved with the profile."""
+        kwargs = {"instance": self.object, "prefix": "identifiers"}
+        # A form posted without the block -- an older client, a script -- means no change
+        # to the identifiers, not an error about a missing management form.
+        if self.request.method == "POST" and "identifiers-TOTAL_FORMS" in self.request.POST:
+            kwargs["data"] = self.request.POST
+        return PersonIdentifierFormSet(**kwargs)
+
+    def get_context_data(self, **kwargs) -> dict:
+        from . import identifiers as person_identifiers
+
+        context = super().get_context_data(**kwargs)
+        context.setdefault("identifiers", self.get_identifiers())
+        context["identifier_schemes"] = person_identifiers.SCHEMES.values()
+        return context
+
     def form_valid(self, form):
-        response = super().form_valid(form)
+        from django.db import transaction
+
+        formset = self.get_identifiers()
+        if formset.is_bound and not formset.is_valid():
+            return self.render_to_response(self.get_context_data(form=form, identifiers=formset))
+        with transaction.atomic():
+            response = super().form_valid(form)
+            if formset.is_bound:
+                formset.instance = self.object
+                formset.save()
+        return self._after_saving(form, response)
+
+    def _after_saving(self, form, response):
         messages.success(self.request, _("Your details have been saved."))
         outcome = getattr(form, "gravatar_outcome", "")
         if outcome == "none":

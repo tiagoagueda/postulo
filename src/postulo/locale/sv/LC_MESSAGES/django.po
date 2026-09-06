@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 19:08+0000\n"
+"POT-Creation-Date: 2026-09-06 19:17+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: svenska\n"
@@ -257,12 +257,12 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s skulle ändra det som Postulo självt beror på. %(problems)s"
 
-#: src/postulo/documents/rendering.py:220
+#: src/postulo/documents/rendering.py:222
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/documents/rendering.py:200
+#: src/postulo/documents/rendering.py:202
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
@@ -514,7 +514,7 @@ msgid ""
 msgstr ""
 "En annons du har lagt märke till. Företaget och titeln räcker för att börja; resten kan komma senare."
 
-#: src/postulo/accounts/models.py:186
+#: src/postulo/accounts/models.py:253
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "En profil på GitHub, Forgejo, GitLab eller liknande."
@@ -541,7 +541,7 @@ msgstr "En påminnelse förfaller"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "En påminnelse förfaller en dag i förväg, när det finns en dag i förväg."
 
-#: src/postulo/accounts/models.py:272
+#: src/postulo/accounts/models.py:339
 #, draft
 msgid "A reminder of who this is for."
 msgstr "En minnesanteckning om vem detta är till."
@@ -553,10 +553,15 @@ msgid ""
 msgstr ""
 "En självhostad hanterare för jobbansökningar, skriven från den sökandes sida av bordet. Dina ansökningar, dina CV:n, dina personliga brev, på din server."
 
-#: src/postulo/accounts/models.py:172
+#: src/postulo/accounts/models.py:239
 #, draft
 msgid "A short professional title, such as “Backend engineer”."
 msgstr "En kort yrkestitel, till exempel ”Backendutvecklare”."
+
+#: src/postulo/accounts/identifiers.py:75
+#, draft
+msgid "a staff number, a national registration"
+msgstr "ett personalnummer, en nationell registrering"
 
 #: src/postulo/templates/applications/application_form.html:27
 #, draft
@@ -612,12 +617,12 @@ msgstr "Godta"
 msgid "Accepted"
 msgstr "Accepterad"
 
-#: src/postulo/accounts/models.py:286
+#: src/postulo/accounts/models.py:353
 #, draft
 msgid "accepted at"
 msgstr "accepterad den"
 
-#: src/postulo/accounts/models.py:293
+#: src/postulo/accounts/models.py:360
 #, draft
 msgid "accepted by"
 msgstr "accepterad av"
@@ -805,7 +810,7 @@ msgstr "Alla intervjuer"
 msgid "Also"
 msgstr "Dessutom"
 
-#: src/postulo/templates/accounts/profile.html:97
+#: src/postulo/templates/accounts/profile.html:155
 #, draft
 msgid "Also happens by itself when your primary address changes."
 msgstr "Sker också av sig självt när din primära adress ändras."
@@ -826,6 +831,13 @@ msgid ""
 "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr ""
 "Ett arkiv kan importeras till ett tomt konto från kommandoraden. Det erbjuds inte här eftersom import skapar poster i stället för att slå ihop dem, och det är ett beslut värt att fatta medvetet snarare än med ett klick."
+
+#: src/postulo/templates/accounts/profile.html:89
+#, draft
+msgid ""
+"An ORCID, or another public id that says which researcher you are. A name is not an identity — two people share one, one person publishes under three — and an application form for an academic post asks for this by name. Paste a whole address if that is what you have; Postulo keeps the id."
+msgstr ""
+"Ett ORCID eller ett annat offentligt id som säger vilken forskare du är. Ett namn är ingen identitet — två personer delar ett, en person publicerar under tre — och ett ansökningsformulär till en akademisk tjänst frågar om precis detta. Klistra in hela adressen om det är den du har; Postulo behåller id:t."
 
 #: src/postulo/plugins/fetching.py:242
 #, draft
@@ -855,7 +867,7 @@ msgstr "Svarade %(code)s."
 msgid "Any"
 msgstr "Alla"
 
-#: src/postulo/jobs/identifiers.py:118
+#: src/postulo/jobs/identifiers.py:97
 #, draft
 msgid "Any identifier, with a name for it"
 msgstr "Vilken identifierare som helst, med ett namn på den"
@@ -1204,7 +1216,7 @@ msgid "Callback to register with it"
 msgstr "Återanrops-URL att registrera hos leverantören"
 
 #: src/postulo/templates/accounts/invite_form.html:24
-#: src/postulo/templates/accounts/profile.html:88
+#: src/postulo/templates/accounts/profile.html:146
 #: src/postulo/templates/applications/application_form.html:22
 #: src/postulo/templates/applications/application_intake.html:73
 #: src/postulo/templates/applications/interview_form.html:70
@@ -1448,7 +1460,7 @@ msgstr "Välj en annan fil"
 msgid "Choose at least one document to record."
 msgstr "Välj minst ett dokument att registrera."
 
-#: src/postulo/jobs/forms.py:187
+#: src/postulo/accounts/forms.py:404 src/postulo/jobs/forms.py:187
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Välj vilken sorts identifierare detta är."
@@ -1458,7 +1470,7 @@ msgstr "Välj vilken sorts identifierare detta är."
 msgid "Choose which application this is about first."
 msgstr "Välj först vilken ansökan det gäller."
 
-#: src/postulo/accounts/models.py:179
+#: src/postulo/accounts/models.py:246
 #, draft
 msgid "City and country, as it should appear on a CV."
 msgstr "Stad och land, som det ska stå i ett CV."
@@ -1520,7 +1532,7 @@ msgstr "sista ansökningsdag"
 msgid "Code (GitHub, GitLab…)"
 msgstr "Kod (GitHub, GitLab…)"
 
-#: src/postulo/accounts/models.py:184
+#: src/postulo/accounts/models.py:251
 #, draft
 msgid "code repository"
 msgstr "kodförråd"
@@ -1615,7 +1627,7 @@ msgstr "företagsidentifierare"
 msgid "company identifiers"
 msgstr "företagsidentifierare"
 
-#: src/postulo/jobs/identifiers.py:80
+#: src/postulo/jobs/identifiers.py:59
 #, draft
 msgid "Company register number"
 msgstr "Organisationsnummer"
@@ -1806,13 +1818,13 @@ msgstr "Skapa inbjudan"
 msgid "created"
 msgstr "skapad"
 
-#: src/postulo/accounts/models.py:216 src/postulo/accounts/models.py:283
+#: src/postulo/accounts/models.py:283 src/postulo/accounts/models.py:350
 #: src/postulo/core/models.py:18
 #, draft
 msgid "created at"
 msgstr "skapad den"
 
-#: src/postulo/accounts/models.py:281
+#: src/postulo/accounts/models.py:348
 #, draft
 msgid "created by"
 msgstr "skapad av"
@@ -1864,7 +1876,7 @@ msgstr "CV-post"
 msgid "CVs"
 msgstr "CV:n"
 
-#: src/postulo/accounts/models.py:140
+#: src/postulo/accounts/models.py:141
 #, draft
 msgid "Dark"
 msgstr "Mörkt"
@@ -1922,7 +1934,7 @@ msgstr "dag / månad / år (31/12/2026)"
 msgid "days"
 msgstr "dagar"
 
-#: src/postulo/accounts/models.py:213
+#: src/postulo/accounts/models.py:280
 #, draft
 msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
@@ -2322,13 +2334,13 @@ msgstr "utbildning"
 msgid "Email"
 msgstr "E-post"
 
-#: src/postulo/accounts/models.py:112 src/postulo/accounts/models.py:267
+#: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
 #: src/postulo/jobs/models.py:263
 #, draft
 msgid "email address"
 msgstr "e-postadress"
 
-#: src/postulo/accounts/forms.py:480
+#: src/postulo/accounts/forms.py:540
 #, draft
 msgid "Email address (optional)"
 msgstr "E-postadress (valfri)"
@@ -2544,7 +2556,7 @@ msgstr "Går ut"
 msgid "expires"
 msgstr "går ut"
 
-#: src/postulo/accounts/models.py:284
+#: src/postulo/accounts/models.py:351
 #, draft
 msgid "expires at"
 msgstr "går ut kl."
@@ -2599,7 +2611,7 @@ msgstr "Mässa"
 msgid "Fastest"
 msgstr "Snabbast"
 
-#: src/postulo/templates/accounts/profile.html:95
+#: src/postulo/templates/accounts/profile.html:153
 #, draft
 msgid "Fetch my Gravatar again"
 msgstr "Hämta min Gravatar igen"
@@ -2919,17 +2931,17 @@ msgstr "Fick något svar"
 msgid "grade"
 msgstr "betyg"
 
-#: src/postulo/accounts/models.py:207
+#: src/postulo/accounts/models.py:274
 #, draft
 msgid "Gravatar checked on"
 msgstr "Gravatar kontrollerad den"
 
-#: src/postulo/accounts/models.py:205
+#: src/postulo/accounts/models.py:272
 #, draft
 msgid "Gravatar copy"
 msgstr "Gravatar-kopia"
 
-#: src/postulo/accounts/views.py:58 src/postulo/accounts/views.py:98
+#: src/postulo/accounts/views.py:87 src/postulo/accounts/views.py:127
 #, draft
 msgid "Gravatar could not be reached just now. Try again later."
 msgstr "Gravatar kunde inte nås just nu. Försök igen senare."
@@ -2940,7 +2952,7 @@ msgid "Gravatar had no picture for your address when last asked, on %(when)s."
 msgstr ""
 "Gravatar hade ingen bild för din adress när det senast frågades, den %(when)s."
 
-#: src/postulo/accounts/views.py:54 src/postulo/accounts/views.py:97
+#: src/postulo/accounts/views.py:83 src/postulo/accounts/views.py:126
 #, draft
 msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr "Gravatar har ingen bild för din adress, så dina initialer stannar kvar."
@@ -2967,7 +2979,7 @@ msgstr "hände"
 msgid "happened on"
 msgstr "hände den"
 
-#: src/postulo/accounts/models.py:169 src/postulo/documents/models.py:61
+#: src/postulo/accounts/models.py:236 src/postulo/documents/models.py:61
 #, draft
 msgid "headline"
 msgstr "yrkestitel"
@@ -2993,7 +3005,7 @@ msgstr "Genomförd"
 msgid "hidden"
 msgstr "dold"
 
-#: src/postulo/accounts/models.py:195
+#: src/postulo/accounts/models.py:262
 #, draft
 msgid "hidden navigation items"
 msgstr "dolda navigeringsposter"
@@ -3087,11 +3099,13 @@ msgstr "Jag har redan sökt den här"
 msgid "id in the store"
 msgstr "id i lagringen"
 
+#: src/postulo/accounts/models.py:169 src/postulo/accounts/models.py:178
 #: src/postulo/jobs/models.py:199 src/postulo/plugins/models.py:130
 #, draft
 msgid "identifier"
 msgstr "identifierare"
 
+#: src/postulo/templates/accounts/profile.html:110
 #: src/postulo/templates/jobs/company_form.html:67
 #, draft
 msgid "Identifier"
@@ -3102,6 +3116,12 @@ msgstr "Identifierare"
 msgid "identifier at the source"
 msgstr "id hos källan"
 
+#: src/postulo/accounts/models.py:179
+#, draft
+msgid "identifiers"
+msgstr "identifierare"
+
+#: src/postulo/templates/accounts/profile.html:87
 #: src/postulo/templates/jobs/company_form.html:49
 #, draft
 msgid "Identifiers"
@@ -3372,12 +3392,12 @@ msgstr "intervjuer"
 msgid "Interviews"
 msgstr "Intervjuer"
 
-#: src/postulo/accounts/models.py:299
+#: src/postulo/accounts/models.py:366
 #, draft
 msgid "invitation"
 msgstr "inbjudan"
 
-#: src/postulo/accounts/views.py:124
+#: src/postulo/accounts/views.py:153
 #, draft
 msgid ""
 "Invitation created. Send the person the link shown below; it can be used once."
@@ -3391,12 +3411,12 @@ msgid ""
 msgstr ""
 "Endast inbjudan: registreringsformuläret erbjuds inte. Bjud in personer från avsnittet Personer."
 
-#: src/postulo/accounts/views.py:140
+#: src/postulo/accounts/views.py:169
 #, draft
 msgid "Invitation revoked."
 msgstr "Inbjudan återkallad."
 
-#: src/postulo/accounts/models.py:300
+#: src/postulo/accounts/models.py:367
 #, draft
 msgid "invitations"
 msgstr "inbjudningar"
@@ -3514,6 +3534,7 @@ msgstr ""
 msgid "kind"
 msgstr "typ"
 
+#: src/postulo/templates/accounts/profile.html:106
 #: src/postulo/templates/jobs/company_form.html:63
 #, draft
 msgid "Kind"
@@ -3529,12 +3550,12 @@ msgstr "Sorters brev"
 msgid "label"
 msgstr "etikett"
 
-#: src/postulo/accounts/forms.py:442 src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:502 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Språk"
 
-#: src/postulo/accounts/models.py:189 src/postulo/documents/models.py:67
+#: src/postulo/accounts/models.py:256 src/postulo/documents/models.py:67
 #: src/postulo/documents/models.py:246 src/postulo/resume/models.py:185
 #: src/postulo/resume/models.py:191
 #, draft
@@ -3672,7 +3693,7 @@ msgstr "Lämnas det tomt varar den en timme."
 msgid "Legal"
 msgstr "Juridik"
 
-#: src/postulo/jobs/identifiers.py:70
+#: src/postulo/jobs/identifiers.py:49
 #, draft
 msgid "Legal Entity Identifier (LEI)"
 msgstr "Legal Entity Identifier (LEI)"
@@ -3716,7 +3737,7 @@ msgstr "Nivå"
 msgid "Licence"
 msgstr "Licens"
 
-#: src/postulo/accounts/models.py:139
+#: src/postulo/accounts/models.py:140
 #, draft
 msgid "Light"
 msgstr "Ljust"
@@ -3742,7 +3763,7 @@ msgstr "Länk"
 msgid "link in the store"
 msgstr "länk i lagringen"
 
-#: src/postulo/accounts/models.py:182 src/postulo/jobs/models.py:265
+#: src/postulo/accounts/models.py:249 src/postulo/jobs/models.py:265
 #, draft
 msgid "LinkedIn"
 msgstr "LinkedIn"
@@ -3794,7 +3815,7 @@ msgid ""
 msgstr ""
 "Annonser, ansökningar och deras tidslinjer, företag och personer, påminnelser, texten i det du skickade, brev, CV:n, filer och din karriärhistorik — allt, inklusive det som är stängt eller kasserat, för du letar efter något du minns."
 
-#: src/postulo/accounts/models.py:176 src/postulo/jobs/models.py:120
+#: src/postulo/accounts/models.py:243 src/postulo/jobs/models.py:120
 #: src/postulo/jobs/models.py:389 src/postulo/resume/models.py:55
 #: src/postulo/resume/models.py:86
 #, draft
@@ -3852,7 +3873,7 @@ msgstr "Låg"
 msgid "Lower numbers appear first."
 msgstr "Lägre nummer visas först."
 
-#: src/postulo/accounts/models.py:109
+#: src/postulo/accounts/models.py:110
 #, draft
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Små bokstäver, siffror, punkter, understreck och bindestreck."
@@ -3915,7 +3936,7 @@ msgstr "Koppla först en kolumn till Företag och en till Roll."
 msgid "Marked as done."
 msgstr "Markerad som klar."
 
-#: src/postulo/accounts/models.py:138
+#: src/postulo/accounts/models.py:139
 #, draft
 msgid "Match the operating system"
 msgstr "Följ operativsystemet"
@@ -4039,6 +4060,17 @@ msgstr "För den vidare"
 msgid "Move up"
 msgstr "Flytta upp"
 
+#: src/postulo/accounts/models.py:171 src/postulo/api/models.py:61
+#: src/postulo/core/models.py:68 src/postulo/documents/models.py:59
+#: src/postulo/documents/models.py:228 src/postulo/jobs/models.py:39
+#: src/postulo/jobs/models.py:115 src/postulo/jobs/models.py:201
+#: src/postulo/jobs/models.py:261 src/postulo/resume/models.py:104
+#: src/postulo/resume/models.py:119 src/postulo/resume/models.py:138
+#: src/postulo/resume/models.py:155
+#, draft
+msgid "name"
+msgstr "namn"
+
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
 #: src/postulo/templates/server/people.html:20
 #: src/postulo/templates/server/plugins.html:114
@@ -4046,16 +4078,7 @@ msgstr "Flytta upp"
 msgid "Name"
 msgstr "Namn"
 
-#: src/postulo/api/models.py:61 src/postulo/core/models.py:68
-#: src/postulo/documents/models.py:59 src/postulo/documents/models.py:228
-#: src/postulo/jobs/models.py:39 src/postulo/jobs/models.py:115
-#: src/postulo/jobs/models.py:201 src/postulo/jobs/models.py:261
-#: src/postulo/resume/models.py:104 src/postulo/resume/models.py:119
-#: src/postulo/resume/models.py:138 src/postulo/resume/models.py:155
-#, draft
-msgid "name"
-msgstr "namn"
-
+#: src/postulo/templates/accounts/profile.html:114
 #: src/postulo/templates/jobs/company_form.html:71
 #, draft
 msgid "Name, if Other"
@@ -4420,7 +4443,7 @@ msgstr "Inte angivet här — miljön eller standardvärdet gäller"
 msgid "not tested yet"
 msgstr "inte testad ännu"
 
-#: src/postulo/accounts/models.py:272
+#: src/postulo/accounts/models.py:339
 #, draft
 msgid "note"
 msgstr "anteckning"
@@ -4430,7 +4453,7 @@ msgstr "anteckning"
 msgid "Note"
 msgstr "Anteckning"
 
-#: src/postulo/accounts/forms.py:481
+#: src/postulo/accounts/forms.py:541
 #: src/postulo/templates/applications/application_detail.html:48
 #, draft
 msgid "Note (optional)"
@@ -4818,7 +4841,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Lediga tjänster"
 
-#: src/postulo/accounts/models.py:269
+#: src/postulo/accounts/models.py:336
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Valfritt. Om det anges får bara den här adressen använda inbjudan."
@@ -4856,9 +4879,10 @@ msgstr "Ursprung"
 msgid "Original posting"
 msgstr "Ursprunglig annons"
 
-#: src/postulo/applications/models.py:87 src/postulo/applications/models.py:291
+#: src/postulo/accounts/identifiers.py:73 src/postulo/applications/models.py:87
+#: src/postulo/applications/models.py:291
 #: src/postulo/applications/models.py:410 src/postulo/documents/models.py:280
-#: src/postulo/jobs/identifiers.py:116 src/postulo/jobs/models.py:317
+#: src/postulo/jobs/identifiers.py:95 src/postulo/jobs/models.py:317
 #: src/postulo/resume/models.py:207
 #, draft
 msgid "Other"
@@ -5047,7 +5071,7 @@ msgstr "Läkemedel"
 msgid "Phone"
 msgstr "Telefon"
 
-#: src/postulo/accounts/models.py:174 src/postulo/jobs/models.py:264
+#: src/postulo/accounts/models.py:241 src/postulo/jobs/models.py:264
 #, draft
 msgid "phone"
 msgstr "telefon"
@@ -5057,7 +5081,7 @@ msgstr "telefon"
 msgid "Phone screen"
 msgstr "Telefonintervju"
 
-#: src/postulo/accounts/models.py:200
+#: src/postulo/accounts/models.py:267
 #, draft
 msgid "picture"
 msgstr "bild"
@@ -5231,7 +5255,7 @@ msgstr "prefix"
 msgid "preparation notes"
 msgstr "förberedelseanteckningar"
 
-#: src/postulo/templates/documents/themes/base_cv.html:95
+#: src/postulo/templates/documents/themes/base_cv.html:98
 #: src/postulo/templates/resume/preview.html:28
 #, draft
 msgid "present"
@@ -5283,12 +5307,12 @@ msgstr "Privata och lokala adresser avvisas."
 msgid "proficiency"
 msgstr "nivå"
 
-#: src/postulo/accounts/models.py:220
+#: src/postulo/accounts/models.py:166 src/postulo/accounts/models.py:287
 #, draft
 msgid "profile"
 msgstr "profil"
 
-#: src/postulo/accounts/models.py:221
+#: src/postulo/accounts/models.py:288
 #, draft
 msgid "profiles"
 msgstr "profiler"
@@ -5324,7 +5348,7 @@ msgstr "Leverantör"
 msgid "Provides"
 msgstr "Ger"
 
-#: src/postulo/jobs/identifiers.py:83
+#: src/postulo/jobs/identifiers.py:62
 #, draft
 msgid "PT 501234567, FR 552081317, DE HRB 12345"
 msgstr "PT 501234567, FR 552081317, DE HRB 12345"
@@ -5372,7 +5396,7 @@ msgstr "Köade uppgifter"
 msgid "Quiet"
 msgstr "Tyst"
 
-#: src/postulo/accounts/models.py:210
+#: src/postulo/accounts/models.py:277
 #, draft
 msgid "quiet after"
 msgstr "tyst efter"
@@ -5629,6 +5653,7 @@ msgstr "På distans"
 msgid "remote address"
 msgstr "fjärradress"
 
+#: src/postulo/templates/accounts/profile.html:119
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
@@ -5840,7 +5865,7 @@ msgstr "Lön till"
 msgid "salary to"
 msgstr "lön till"
 
-#: src/postulo/templates/accounts/profile.html:87
+#: src/postulo/templates/accounts/profile.html:145
 #: src/postulo/templates/applications/application_form.html:21
 #: src/postulo/templates/applications/application_intake.html:72
 #: src/postulo/templates/applications/interview_form.html:68
@@ -5870,6 +5895,11 @@ msgstr "Spara"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Spara företaget för att lägga till ytterligare en identifierare."
+
+#: src/postulo/templates/accounts/profile.html:141
+#, draft
+msgid "Save to add another identifier."
+msgstr "Spara för att lägga till ytterligare en identifierare."
 
 #: src/postulo/templates/jobs/capture_review.html:73
 #, draft
@@ -5914,7 +5944,7 @@ msgstr "Inbokad"
 msgid "Scheduled only"
 msgstr "Endast inbokade"
 
-#: src/postulo/jobs/models.py:198
+#: src/postulo/accounts/models.py:168 src/postulo/jobs/models.py:198
 #, draft
 msgid "scheme"
 msgstr "schema"
@@ -6301,7 +6331,7 @@ msgstr "Uppskjuten två veckor."
 msgid "Software"
 msgstr "Programvara"
 
-#: src/postulo/accounts/models.py:110
+#: src/postulo/accounts/models.py:111
 #, draft
 msgid "Somebody already has that username."
 msgstr "Någon har redan det användarnamnet."
@@ -6522,7 +6552,7 @@ msgstr "Synkronisering"
 msgid "Table"
 msgstr "Tabell"
 
-#: src/postulo/accounts/models.py:198
+#: src/postulo/accounts/models.py:265
 #, draft
 msgid "table settings"
 msgstr "tabellinställningar"
@@ -6630,7 +6660,7 @@ msgstr "Den adressen omdirigerade för många gånger."
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Den adressen returnerade %(kind)s i stället för en webbsida."
 
-#: src/postulo/jobs/identifiers.py:179
+#: src/postulo/accounts/identifiers.py:135 src/postulo/jobs/identifiers.py:146
 #, python-format, draft
 msgid ""
 "That does not look like a %(scheme)s identifier (for example %(example)s)."
@@ -6673,7 +6703,7 @@ msgstr "Det värdnamnet kunde inte slås upp."
 msgid "That image is far larger than a logo needs to be."
 msgstr "Den här bilden är långt större än vad en logotyp behöver."
 
-#: src/postulo/accounts/views.py:136
+#: src/postulo/accounts/views.py:165
 #, draft
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Den inbjudan har redan accepterats och kan inte återkallas."
@@ -6709,7 +6739,7 @@ msgstr "Det är inte något Postulo kan göra med den."
 msgid "That is not something this page does."
 msgstr "Det gör inte den här sidan."
 
-#: src/postulo/accounts/views.py:230
+#: src/postulo/accounts/views.py:259
 #, draft
 msgid "That is not the address on this account."
 msgstr "Det är inte adressen på det här kontot."
@@ -6724,6 +6754,13 @@ msgstr "Det är inte användarnamnet."
 #, draft
 msgid "That is the last administrator. Appoint another first."
 msgstr "Det är den sista administratören. Utse en annan först."
+
+#: src/postulo/accounts/identifiers.py:141
+#, draft
+msgid ""
+"That ORCID's last digit does not match the rest, so one of them is a typo."
+msgstr ""
+"Sista siffran i det här ORCID:t stämmer inte med resten, så en av dem är ett skrivfel."
 
 #: src/postulo/core/server_views.py:587 src/postulo/core/server_views.py:592
 #, draft
@@ -6891,7 +6928,7 @@ msgstr "Installationsprogrammet avvisade det: %(error)s"
 msgid "The job title"
 msgstr "Jobbtiteln"
 
-#: src/postulo/jobs/identifiers.py:184
+#: src/postulo/jobs/identifiers.py:151
 #, draft
 msgid "The LEI's check digits do not match."
 msgstr "LEI:ns kontrollsiffror stämmer inte."
@@ -7017,7 +7054,7 @@ msgstr ""
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Wheel-filen har inga metadata; den kan vara skadad."
 
-#: src/postulo/accounts/models.py:191 src/postulo/documents/models.py:65
+#: src/postulo/accounts/models.py:258 src/postulo/documents/models.py:65
 #: src/postulo/documents/models.py:241
 #, draft
 msgid "theme"
@@ -7091,7 +7128,7 @@ msgstr "De dök inte upp"
 msgid "This company has no website recorded."
 msgstr "Det här företaget har ingen webbplats registrerad."
 
-#: src/postulo/jobs/forms.py:212
+#: src/postulo/accounts/forms.py:429 src/postulo/jobs/forms.py:212
 #, draft
 msgid "This identifier is already listed."
 msgstr "Den här identifieraren finns redan i listan."
@@ -7121,7 +7158,7 @@ msgstr ""
 msgid "This instance is invite-only."
 msgstr "Den här instansen är endast för inbjudna."
 
-#: src/postulo/accounts/views.py:164
+#: src/postulo/accounts/views.py:193
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
 msgstr "Den här inbjudan är till %(email)s. Registrera dig med den adressen."
@@ -7144,7 +7181,7 @@ msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr ""
 "Det här är vad du står i begrepp att installera. Ingenting är installerat ännu."
 
-#: src/postulo/jobs/forms.py:209
+#: src/postulo/accounts/forms.py:426 src/postulo/jobs/forms.py:209
 #, draft
 msgid "This kind of identifier is already listed."
 msgstr "Den här sortens identifierare finns redan i listan."
@@ -7182,12 +7219,12 @@ msgid ""
 msgstr ""
 "Ikryssad blir annonsen genast en ansökan, markerad som skickad i dag. Annars väntar den bland dina annonser tills du bestämmer dig."
 
-#: src/postulo/accounts/forms.py:448
+#: src/postulo/accounts/forms.py:508
 #, draft
 msgid "Time zone"
 msgstr "Tidszon"
 
-#: src/postulo/accounts/models.py:190
+#: src/postulo/accounts/models.py:257
 #, draft
 msgid "time zone"
 msgstr "tidszon"
@@ -7243,7 +7280,7 @@ msgstr "till status"
 msgid "Today's date"
 msgstr "Dagens datum"
 
-#: src/postulo/accounts/models.py:264
+#: src/postulo/accounts/models.py:331
 #, draft
 msgid "token"
 msgstr "token"
@@ -7280,7 +7317,7 @@ msgstr "Transport och logistik"
 msgid "Try fewer words, or a different spelling."
 msgstr "Prova färre ord, eller en annan stavning."
 
-#: src/postulo/accounts/views.py:90
+#: src/postulo/accounts/views.py:119
 #, draft
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Slå först på ”Använd min Gravatar”."
@@ -7311,7 +7348,7 @@ msgstr "Skriv minst två tecken."
 msgid "Type it in instead"
 msgstr "Skriv in det i stället"
 
-#: src/postulo/jobs/forms.py:189
+#: src/postulo/accounts/forms.py:406 src/postulo/jobs/forms.py:189
 #, draft
 msgid "Type the identifier."
 msgstr "Skriv in identifieraren."
@@ -7332,7 +7369,9 @@ msgid "Uncheck to keep the entry on this variant but leave it off the page."
 msgstr ""
 "Avmarkera för att behålla posten i den här varianten men lämna den utanför sidan."
 
-#: src/postulo/jobs/identifiers.py:176 src/postulo/jobs/identifiers.py:190
+#: src/postulo/accounts/identifiers.py:132
+#: src/postulo/accounts/identifiers.py:149 src/postulo/jobs/identifiers.py:143
+#: src/postulo/jobs/identifiers.py:157
 #, draft
 msgid "Unknown identifier scheme."
 msgstr "Okänt identifierarschema."
@@ -7358,7 +7397,7 @@ msgstr "upp till %(high)s"
 msgid "Update the preview"
 msgstr "Uppdatera förhandsgranskningen"
 
-#: src/postulo/accounts/models.py:217 src/postulo/core/models.py:19
+#: src/postulo/accounts/models.py:284 src/postulo/core/models.py:19
 #: src/postulo/core/models.py:139
 #, draft
 msgid "updated at"
@@ -7424,7 +7463,7 @@ msgstr "Använd en PNG, JPEG, WebP eller GIF."
 msgid "Use my Gravatar"
 msgstr "Använd min Gravatar"
 
-#: src/postulo/accounts/models.py:202
+#: src/postulo/accounts/models.py:269
 #, draft
 msgid "use my Gravatar"
 msgstr "använd min Gravatar"
@@ -7441,18 +7480,18 @@ msgid ""
 msgstr ""
 "Använd status- eller intervju-ändpunkterna; tidslinjen registrerar dem själv."
 
-#: src/postulo/accounts/models.py:120 src/postulo/accounts/models.py:165
+#: src/postulo/accounts/models.py:121 src/postulo/accounts/models.py:232
 #, draft
 msgid "user"
 msgstr "användare"
 
-#: src/postulo/accounts/forms.py:458 src/postulo/templates/server/email.html:15
+#: src/postulo/accounts/forms.py:518 src/postulo/templates/server/email.html:15
 #: src/postulo/templates/server/people.html:19
 #, draft
 msgid "Username"
 msgstr "Användarnamn"
 
-#: src/postulo/accounts/models.py:105
+#: src/postulo/accounts/models.py:106
 #, draft
 msgid "username"
 msgstr "användarnamn"
@@ -7462,7 +7501,7 @@ msgstr "användarnamn"
 msgid "Username or email"
 msgstr "Användarnamn eller e-post"
 
-#: src/postulo/accounts/models.py:121
+#: src/postulo/accounts/models.py:122
 #, draft
 msgid "users"
 msgstr "användare"
@@ -7565,7 +7604,7 @@ msgid ""
 msgstr ""
 "WeasyPrint installeras med Postulo, men det behöver Pango och dess systembibliotek. På Debian eller Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. På Windows är de besvärliga att få tag på, så använd chromium-motorn i stället. Se https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
-#: src/postulo/accounts/models.py:181 src/postulo/jobs/models.py:116
+#: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:116
 #, draft
 msgid "website"
 msgstr "webbplats"
@@ -7596,6 +7635,7 @@ msgstr "vad en övervakare bör fråga"
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "Vad ett nytt konto börjar med. Var och en kan ändra sitt."
 
+#: src/postulo/templates/accounts/profile.html:133
 #: src/postulo/templates/jobs/company_form.html:90
 #, draft
 msgid "What goes where"
@@ -7648,7 +7688,7 @@ msgstr "Vilket språk Postulo talar med dig, och vems klocka den visar."
 msgid "what the check found"
 msgstr "vad kontrollen fann"
 
-#: src/postulo/jobs/models.py:204
+#: src/postulo/accounts/models.py:174 src/postulo/jobs/models.py:204
 #, draft
 msgid "What the identifier is, when the scheme is Other."
 msgstr "Vad identifieraren är, när schemat är Annan."
@@ -7697,7 +7737,7 @@ msgstr "vad som ska göras"
 msgid "What will be deleted"
 msgstr "Vad som raderas"
 
-#: src/postulo/accounts/forms.py:460
+#: src/postulo/accounts/forms.py:520
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -7965,7 +8005,7 @@ msgstr "Du har redan en tagg med det namnet."
 msgid "You already have that industry."
 msgstr "Du har redan den branschen."
 
-#: src/postulo/accounts/views.py:157
+#: src/postulo/accounts/views.py:186
 #, draft
 msgid "You are already signed in."
 msgstr "Du är redan inloggad."
@@ -8024,7 +8064,7 @@ msgstr[1] ""
 msgid "You will be asked for the current one first."
 msgstr "Du kommer först att bli ombedd att ange det nuvarande."
 
-#: src/postulo/accounts/views.py:239
+#: src/postulo/accounts/views.py:268
 #, draft
 msgid "Your account and everything in it have been deleted."
 msgstr "Ditt konto och allt i det har raderats."
@@ -8072,7 +8112,7 @@ msgstr "Din karriärhistorik"
 msgid "Your CVs"
 msgstr "Dina CV:n"
 
-#: src/postulo/accounts/views.py:217 src/postulo/core/settings_sections.py:96
+#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:96
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -8092,12 +8132,12 @@ msgstr "Din sista dag"
 msgid "Your details"
 msgstr "Dina uppgifter"
 
-#: src/postulo/accounts/views.py:49
+#: src/postulo/accounts/views.py:78
 #, draft
 msgid "Your details have been saved."
 msgstr "Dina uppgifter har sparats."
 
-#: src/postulo/accounts/views.py:96
+#: src/postulo/accounts/views.py:125
 #, draft
 msgid "Your Gravatar has been fetched again."
 msgstr "Din Gravatar har hämtats igen."

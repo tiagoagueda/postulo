@@ -237,6 +237,16 @@ def build_document(user) -> dict:
             "first_name": user.first_name,
             "last_name": user.last_name,
             "profile": _fields(profile, PROFILE_FIELDS) if profile else {},
+            # An ORCID is one of the few things in here that means the same to somebody
+            # else's software, so it travels with the rest.
+            "identifiers": (
+                [
+                    {"scheme": row.scheme, "value": row.value, "label": row.label}
+                    for row in profile.identifiers.all()
+                ]
+                if profile
+                else []
+            ),
             # The uploaded picture travels with the files; a Gravatar copy is refetched.
             "avatar_file": (
                 f"{MEDIA_PREFIX}{profile.avatar.name}" if profile and profile.avatar else ""

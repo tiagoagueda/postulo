@@ -67,6 +67,21 @@ true even on an instance where `POSTULO_CONNECTIONS_ALLOW_PRIVATE` is on for plu
 portfolio address is something a recruiter clicks from the open internet, so an answer from
 inside your house would not tell you anything you wanted to know.
 
+## Identifiers
+
+A name is not an identity. Two researchers share one, one researcher publishes under three,
+and a marriage or a transliteration turns one into another. An **ORCID** says which
+researcher you are regardless, and in academia it is what an application form asks for by
+name — so *Your details* takes one, along with a ResearcherID, a Scopus Author ID, an ISNI,
+or anything else under *Other* with a name you give it.
+
+Paste the whole address if that is what you have; Postulo keeps the identifier. An ORCID's
+last character is a checksum, so a mistyped one is refused with the reason. Nothing is ever
+looked up: Postulo asks orcid.org nothing, and the checksum catches what a lookup would.
+
+Identifiers appear in a CV's contact block beside your website, on the variants where you
+have asked for contact details.
+
 ## Ordering
 
 Each entry has an **order** number; lower numbers come first, and the arrows on the

@@ -21,6 +21,9 @@
         <p class="details">
           {% if contact.email %}<span>{{ contact.email }}</span>{% endif %}
           {% if contact.phone %}<span>{{ contact.phone }}</span>{% endif %}
+          {% for identifier in contact.identifiers %}
+            <span>{{ identifier.display_label }} {{ identifier.value }}</span>
+          {% endfor %}
           {% if contact.location %}<span>{{ contact.location }}</span>{% endif %}
           {% if contact.website %}<span>{{ contact.website }}</span>{% endif %}
           {% if contact.linkedin_url %}<span>{{ contact.linkedin_url }}</span>{% endif %}

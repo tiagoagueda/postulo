@@ -121,6 +121,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     Runs in one transaction: a failure half way through leaves the account exactly as it
     was, rather than partly overwritten by a file that turned out to be broken.
     """
+    from postulo.accounts.models import PersonIdentifier
     from postulo.applications.models import Application, ApplicationEvent, Interview, Reminder
     from postulo.core.models import Tag
     from postulo.documents.models import CV, CoverLetter, CVItem, RenderedDocument, UploadedDocument
@@ -161,6 +162,20 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             if hasattr(profile, name) and value:
                 setattr(profile, name, value)
         profile.save()
+    for row in account.get("identifiers") or []:
+        scheme = (row.get("scheme") or "").strip()
+        value = (row.get("value") or "").strip()
+        if not profile or not scheme or not value:
+            continue
+        # get_or_create rather than create: importing an archive twice should not raise
+        # on the one-per-scheme constraint.
+        PersonIdentifier.objects.get_or_create(
+            profile=profile,
+            scheme=scheme,
+            value=value,
+            defaults={"label": row.get("label") or ""},
+        )
+
     avatar_file = account.get("avatar_file") or ""
     if profile and avatar_file:
         content = _extract(archive, avatar_file)
