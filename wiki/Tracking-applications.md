@@ -30,6 +30,31 @@ it deserves its own name.
 Nothing is ever deleted by changing a status. Rejections and withdrawals are exactly the
 records that make the interesting questions answerable.
 
+## Company logos
+
+A company can have a logo, and it makes a long list of applications much faster to read.
+There are three ways to give it one, all on the company's page or its form:
+
+- **paste an address.** Postulo fetches the image **once**, from the server, and keeps a
+  copy. It does not put the address in the page: that would ask the company's own server
+  for the picture on every view, telling them which companies you are looking at and when.
+- **Find logo**, which reads the company's own website — the one public place every
+  company maintains — for the icon it declares: an apple-touch-icon, a declared icon, the
+  logo in its schema.org details, and last the conventional `/favicon.ico`. One press, one
+  page, a handful of images.
+- **upload one** yourself.
+
+PNG, JPEG, GIF and WebP. SVG is refused for now: it can carry scripts and references to
+other files, and accepting it means a sanitiser first. Whatever arrives is decoded and
+re-encoded to a 256-pixel square, which drops anything else the file was carrying, and is
+served from your instance like every other file. The most recent action wins, so there is
+no precedence to remember, and *Remove* takes it away.
+
+A company with no logo shows its initials, coloured from the name.
+
+Postulo never fetches a logo on its own: an address is fetched when you save it, and a
+website is read when you press the button. Nothing happens on a page view.
+
 ## Two views of the same thing
 
 - **Board** shows only live applications, in columns by status. Move one along with the

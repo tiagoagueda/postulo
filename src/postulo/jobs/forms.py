@@ -11,7 +11,7 @@ from django import forms
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from . import identifiers, industries
+from . import identifiers, industries, logos
 from .models import Company, CompanyIdentifier, Contact, Industry, JobPosting
 
 
@@ -44,6 +44,22 @@ class CompanyForm(OwnerScopedModelForm):
         widget=forms.TextInput(attrs={"list": "industry-suggestions", "autocomplete": "off"}),
     )
 
+    logo_url = forms.URLField(
+        label=_("Logo address"),
+        required=False,
+        max_length=500,
+        help_text=_(
+            "Postulo fetches it once and keeps a copy; the address is never shown to a "
+            "browser. PNG, JPEG, GIF or WebP."
+        ),
+    )
+    logo_upload = forms.ImageField(
+        label=_("Or upload one"),
+        required=False,
+        help_text=_("Kept at 256 pixels square, re-encoded, with nothing else of the file."),
+    )
+    remove_logo = forms.BooleanField(label=_("Remove the logo"), required=False)
+
     field_order = (
         "name",
         "website",
@@ -51,6 +67,9 @@ class CompanyForm(OwnerScopedModelForm):
         "location",
         "industries",
         "new_industries",
+        "logo_url",
+        "logo_upload",
+        "remove_logo",
         "notes",
     )
 
@@ -61,6 +80,17 @@ class CompanyForm(OwnerScopedModelForm):
 
     def scope_querysets(self) -> None:
         self.fields["industries"].queryset = Industry.objects.for_user(self.user)
+        if self.instance.pk and self.instance.logo_source_url:
+            self.fields["logo_url"].initial = self.instance.logo_source_url
+        if not (self.instance.pk and self.instance.logo):
+            del self.fields["remove_logo"]
+
+    def clean_logo_upload(self):
+        """Refuse an oversized file before anything tries to decode it."""
+        upload = self.cleaned_data.get("logo_upload")
+        if upload and upload.size > logos.MAX_BYTES:
+            raise forms.ValidationError(_("That file is larger than a logo should be."))
+        return upload
 
     @property
     def suggestions(self) -> list[str]:
@@ -68,6 +98,31 @@ class CompanyForm(OwnerScopedModelForm):
         return industries.suggestions(
             exclude=self.fields["industries"].queryset.values_list("name", flat=True)
         )
+
+    def apply_logo(self, company: Company) -> str:
+        """Do what the logo fields asked for. Returns a problem to show, or "".
+
+        A logo that cannot be fetched never stops a company being saved: the person was
+        recording an employer, and an icon that would not come is not a reason to lose
+        the rest of what they typed.
+        """
+        if self.cleaned_data.get("remove_logo"):
+            logos.clear(company)
+            return ""
+        upload = self.cleaned_data.get("logo_upload")
+        if upload:
+            try:
+                logos.from_upload(company, upload.read())
+            except logos.UnusableLogo as error:
+                return str(error)
+            return ""
+        url = (self.cleaned_data.get("logo_url") or "").strip()
+        if url and url != company.logo_source_url:
+            try:
+                logos.from_url(company, url)
+            except logos.UnusableLogo as error:
+                return str(error)
+        return ""
 
     def save(self, commit: bool = True) -> Company:
         company = super().save(commit=commit)

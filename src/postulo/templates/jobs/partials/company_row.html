@@ -3,9 +3,12 @@
   {% for column in columns %}
     {% if column.key == 'name' %}
       <td class="px-4 py-3">
-        <a href="{{ company.get_absolute_url }}" class="font-medium hover:underline">
-          {{ company.name }}
-        </a>
+        <span class="flex items-center gap-2">
+          {% company_logo company %}
+          <a href="{{ company.get_absolute_url }}" class="font-medium hover:underline">
+            {{ company.name }}
+          </a>
+        </span>
       </td>
     {% elif column.key == 'location' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.location|default:"—" }}</td>

@@ -58,6 +58,9 @@ COMPANY_FIELDS = (
     "careers_url",
     "location",
     "notes",
+    "logo_source",
+    "logo_source_url",
+    "logo_fetched_at",
     "created_at",
 )
 CONTACT_FIELDS = ("id", "name", "role", "email", "phone", "linkedin_url", "notes")
@@ -293,6 +296,7 @@ def build_document(user) -> dict:
         document["companies"].append(
             {
                 **_fields(company, COMPANY_FIELDS),
+                "logo_file": f"{MEDIA_PREFIX}{company.logo.name}" if company.logo else "",
                 "industries": [industry.name for industry in company.industries.all()],
                 "identifiers": [
                     {"scheme": i.scheme, "value": i.value, "label": i.label}
@@ -437,6 +441,9 @@ def _media_paths(document: dict) -> list[str]:
     avatar = document.get("account", {}).get("avatar_file")
     if avatar:
         names.append(avatar[len(MEDIA_PREFIX) :])
+    for company in document.get("companies", []):
+        if company.get("logo_file"):
+            names.append(company["logo_file"][len(MEDIA_PREFIX) :])
     return names
 
 

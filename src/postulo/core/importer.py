@@ -234,6 +234,8 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             industry_names = Industry.split(company_entry.get("industry", ""))
         company_entry.pop("industry", None)
         identifier_entries = company_entry.pop("identifiers", None) or []
+        logo_name = company_entry.pop("logo_file", "")
+        company_entry["logo_fetched_at"] = _dt(company_entry.get("logo_fetched_at"))
 
         # A company is an identity keyed by its name, which is why intake matches on
         # it too. Importing attaches to one that already exists rather than colliding
@@ -254,6 +256,9 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         if company is None:
             company = Company.objects.create(owner=user, name=name, **company_entry)
             report.companies += 1
+            logo = _extract(archive, logo_name) if logo_name else None
+            if logo is not None:
+                company.logo.save(logo_name.rsplit("/", 1)[-1], ContentFile(logo), save=True)
         if industry_names:
             company.industries.add(*Industry.named(user, industry_names))
         for entry in identifier_entries:

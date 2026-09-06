@@ -18,6 +18,15 @@ All notable changes to Postulo are recorded here. The format follows
   *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
   switch per document kind, *Send to stores now* tries at once, *Send everything* queues
   what existed before the store did, and the references travel in the export. (#13)
+- **Companies can have a logo**, from an address you paste, from the company's own
+  website, or uploaded. Postulo fetches it once, from the server, and keeps a copy: an
+  `<img>` pointing at the company's server would tell them which companies you are looking
+  at and when, on every page view, and the content security policy that forbids that stays
+  exactly as it is. Everything is decoded and re-encoded to a 256-pixel square, so nothing
+  else the file carried survives; SVG is refused until there is a sanitiser for it. Logos
+  show beside the name in the companies table, the applications table, the board and the
+  company page — and nowhere on a CV or a letter. A company without one shows its
+  initials. (#21)
 - **Letters come in four kinds.** A cover letter is one page about one posting; a
   motivation letter is longer and sectioned, which is the norm for academic posts, EU
   institutions and much of the continent; a speculative letter has no posting behind it;

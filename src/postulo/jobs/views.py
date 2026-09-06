@@ -7,14 +7,19 @@ from functools import cached_property
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Count, Q
+from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from postulo.core import tables
+from postulo.core.files import serve_private_file
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
+from postulo.core.redirects import safe_next
 
-from . import identifiers
+from . import identifiers, logos
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
 from .models import Company, Contact, DiscardReason, Industry, JobPosting
 from .tables import CompaniesTable
@@ -132,8 +137,31 @@ class CompanyIdentifiersMixin:
         return response
 
 
+class LogoFormMixin:
+    """Whatever the logo fields asked for, done after the company is saved.
+
+    After, because a logo needs the company's primary key to be filed under; and never
+    fatally, because a picture that would not come is no reason to lose everything else
+    the person typed. The problem is shown and the company is saved.
+    """
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        problem = form.apply_logo(self.object)
+        if problem:
+            messages.warning(
+                self.request, _("The logo was not changed: %(problem)s") % {"problem": problem}
+            )
+        return response
+
+
 class CompanyCreateView(
-    OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CompanyIdentifiersMixin, CreateView
+    LogoFormMixin,
+    OwnedObjectMixin,
+    UserFormKwargsMixin,
+    OwnerFormMixin,
+    CompanyIdentifiersMixin,
+    CreateView,
 ):
     model = Company
     form_class = CompanyForm
@@ -144,7 +172,9 @@ class CompanyCreateView(
         return super().form_valid(form)
 
 
-class CompanyUpdateView(OwnedObjectMixin, UserFormKwargsMixin, CompanyIdentifiersMixin, UpdateView):
+class CompanyUpdateView(
+    LogoFormMixin, OwnedObjectMixin, UserFormKwargsMixin, CompanyIdentifiersMixin, UpdateView
+):
     model = Company
     form_class = CompanyForm
     template_name = "jobs/company_form.html"
@@ -152,6 +182,55 @@ class CompanyUpdateView(OwnedObjectMixin, UserFormKwargsMixin, CompanyIdentifier
     def form_valid(self, form):
         messages.success(self.request, _("Company updated."))
         return super().form_valid(form)
+
+
+class CompanyLogoView(OwnedObjectMixin, View):
+    """Serve a company's logo — from this instance, never from anybody else's server.
+
+    It lives under private media like every other file and comes out only through here,
+    which is what lets the content security policy keep saying ``img-src 'self'``. The
+    address carries the moment it was fetched, so a new logo is never hidden behind an
+    old cache entry.
+    """
+
+    def get_queryset(self):
+        return Company.objects.for_user(self.request.user)
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        company = get_object_or_404(self.get_queryset(), pk=pk)
+        if not company.logo:
+            raise Http404
+        response = serve_private_file(request, company.logo, download_name="logo.png")
+        response["Cache-Control"] = "private, max-age=86400"
+        return response
+
+
+class CompanyLogoActionView(OwnedObjectMixin, View):
+    """*Find logo* and *Refresh*: one request each, when a person presses the button."""
+
+    def get_queryset(self):
+        return Company.objects.for_user(self.request.user)
+
+    def post(self, request: HttpRequest, pk: int, action: str) -> HttpResponse:
+        company = get_object_or_404(self.get_queryset(), pk=pk)
+        try:
+            if action == "website":
+                found = logos.find_on_website(company)
+                messages.success(request, _("Found a logo at %(url)s.") % {"url": found})
+            elif action == "refresh":
+                if not company.logo_source_url:
+                    messages.info(request, _("There is no address to fetch it from again."))
+                else:
+                    logos.from_url(company, company.logo_source_url)
+                    messages.success(request, _("Fetched again."))
+            elif action == "remove":
+                logos.clear(company)
+                messages.success(request, _("The logo is gone."))
+            else:
+                raise Http404
+        except logos.UnusableLogo as error:
+            messages.error(request, str(error))
+        return redirect(safe_next(request, company.get_absolute_url()))
 
 
 class CompanyDeleteView(OwnedObjectMixin, DeleteView):

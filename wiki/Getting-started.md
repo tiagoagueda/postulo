@@ -112,5 +112,5 @@ account. With Docker: `docker compose exec postulo python manage.py seed_demo â€
 | **Applications** | Everything, as a filterable table. |
 | **Board** | Only what is still live, arranged by status. |
 | **Documents** | CVs, cover letters, uploaded files, and your career record. |
-| **Companies** | Employers, their people, and the postings you recorded. |
+| **Companies** | Employers, their people, the postings you recorded, and a logo if you gave one. |
 | **Reminders** | Things to chase, with dates. |

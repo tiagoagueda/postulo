@@ -132,6 +132,34 @@ def avatar(user, css_class: str = "size-7 text-xs") -> str:
     )
 
 
+@register.simple_tag
+def company_logo(company, css_class: str = "size-6 text-[0.6rem]") -> str:
+    """A company's logo, or an initials tile until there is one.
+
+    Decorative: it always stands beside the company's name, so it carries no alternative
+    text of its own. The image comes from this instance — never from the company's own
+    server — which is what keeps every page free of a request that would tell somebody
+    else who is looking at them.
+    """
+    if company is None:
+        return ""
+    if getattr(company, "logo", None):
+        url = reverse("jobs:company_logo", args=[company.pk])
+        stamp = int(company.logo_fetched_at.timestamp()) if company.logo_fetched_at else 0
+        return mark_safe(  # noqa: S308
+            f'<img src="{url}?v={stamp}" alt="" '
+            f'class="{escape(css_class)} shrink-0 rounded object-contain">'
+        )
+    name = (company.name or "").strip()
+    colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
+    letters = "".join(word[0] for word in name.replace(".", " ").split()[:2]).upper() or "?"
+    return mark_safe(  # noqa: S308
+        f'<span class="{escape(css_class)} {colour} inline-flex shrink-0 select-none '
+        'items-center justify-center rounded font-semibold text-white" '
+        f'aria-hidden="true">{escape(letters)}</span>'
+    )
+
+
 @register.filter
 def add_class(field: BoundField, css_classes: str) -> BoundField:
     """Append CSS classes to a form widget.

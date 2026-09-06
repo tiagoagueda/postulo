@@ -93,6 +93,17 @@ class CompanyQuerySet(OwnedQuerySet):
         )
 
 
+class LogoSource(models.TextChoices):
+    URL = "url", _("From an address")
+    WEBSITE = "website", _("Found on their website")
+    UPLOAD = "upload", _("Uploaded")
+
+
+def logo_upload_to(instance, filename: str) -> str:
+    """Under the owner, like every other file: a stray path reaches only one person."""
+    return f"logos/{instance.owner_id}/{filename}"
+
+
 class Company(OwnedModel):
     """An employer, as recorded by one applicant.
 
@@ -111,6 +122,19 @@ class Company(OwnedModel):
         Industry, blank=True, related_name="companies", verbose_name=_("industries")
     )
     notes = models.TextField(_("notes"), blank=True)
+
+    #: The logo, always a file of Postulo's own: fetched from an address, found on the
+    #: company's site, or uploaded. Never a URL rendered into a page — that would tell
+    #: somebody else's server which companies this person is looking at.
+    #: A plain file field, not an ImageField: the bytes were decoded, checked and
+    #: re-encoded on the way in, so there is nothing left for Django to verify, and
+    #: ImageField would open the file again on every load to measure it.
+    logo = models.FileField(_("logo"), upload_to=logo_upload_to, blank=True, max_length=255)
+    logo_source = models.CharField(
+        _("where the logo came from"), max_length=10, choices=LogoSource, blank=True
+    )
+    logo_source_url = models.CharField(_("logo address"), max_length=500, blank=True)
+    logo_fetched_at = models.DateTimeField(_("logo fetched"), null=True, blank=True)
 
     objects = CompanyQuerySet.as_manager()
 
