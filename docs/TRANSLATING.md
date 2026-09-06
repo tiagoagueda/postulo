@@ -29,8 +29,13 @@ msgid "Applications"
 msgstr "Bewerbungen"
 ```
 
-The language picker says *machine translation, awaiting review* beside a language while
-any of its entries is a draft, and *N % translated* while any is missing. **Reviewing a
+The language picker is a list rather than a dropdown, grouped by how far along each
+language is: *reviewed by a speaker*, *machine translation, awaiting review*, or *partly
+translated* with the percentage beside the name. It is a list because a dropdown cannot do
+what it needs — an `<option>` takes `lang` and nothing inside it, so the name could not be
+marked as being in its own language and the flag could not be hidden from a screen reader.
+The state of a translation is a group heading rather than part of a name, so that an option
+marked as German is not made to contain an English phrase. **Reviewing a
 draft means reading it and deleting the flag**: if the translation is right, remove
 `draft`; if it is wrong, fix it and remove `draft`. That is the whole job, and it can be
 done a few strings at a time. A translation that needs a second opinion can carry
@@ -111,8 +116,12 @@ help rather than fight that.
 
 1. Add the code and the language's own name for itself to `NATIVE_NAMES` in
    `src/postulo/core/languages.py`, and its gettext plural rule to `PLURAL_FORMS`.
-2. `uv run python scripts/messages.py extract` creates the catalogue.
-3. Translate, `check`, `stats --write`, and open a pull request.
+2. Add a flag to `FLAGS` in the same file — two regional indicator characters, chosen
+   deliberately rather than derived from the code, because a language is not a country.
+   **Leave it out where there is no uncontested answer.** Spanish is not only Spain and
+   Arabic is not one flag; no flag beats a wrong flag, and the picker copes with a blank.
+3. `uv run python scripts/messages.py extract` creates the catalogue.
+4. Translate, `check`, `stats --write`, and open a pull request.
 
 ## Plugins
 

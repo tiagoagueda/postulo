@@ -9,11 +9,50 @@
 
   <form method="post" novalidate>
     {% csrf_token %}
+    {% comment %} Rows rather than a dropdown, for two reasons a dropdown cannot serve. An
+       <option> takes `lang` and nothing inside it, so a flag put in the option text is read
+       out along with the name, and the name still has to be marked as being in its own
+       language or a screen reader pronounces it with the wrong rules. Here the flag is
+       hidden — the name beside it already says what it is — and the name carries its own
+       `lang`. Twenty-four rows also read better than a dropdown of twenty-four.
+    {% endcomment %}
+    <fieldset class="card mb-6">
+      <legend class="field-label mb-1">{{ form.language.label }}</legend>
+      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Each is written in itself, so you can find yours without reading this one." %}
+      </p>
+      {% for group in form.language_groups %}
+        {% if group.label %}
+          <p class="mt-4 mb-2 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
+            {{ group.label }}
+          </p>
+        {% endif %}
+        <div class="grid gap-1 sm:grid-cols-2">
+          {% for option in group.options %}
+            <label class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm
+                          hover:bg-ink-100 dark:hover:bg-ink-800">
+              <input type="radio" name="language" value="{{ option.code }}"
+                     {% if option.selected %}checked{% endif %}>
+              {% if option.flag %}
+                {% comment %} Decorative. On Windows this renders as two letters rather
+                   than a flag, which is a legible fallback and not a broken image.
+                {% endcomment %}
+                <span aria-hidden="true" class="text-base leading-none">{{ option.flag }}</span>
+              {% endif %}
+              {% if option.code %}
+                <span lang="{{ option.code }}">{{ option.name }}</span>
+              {% else %}
+                <span>{{ option.name }}</span>
+              {% endif %}
+            </label>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      {% for error in form.language.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </fieldset>
+
     <div class="card mb-6">
-      <div class="grid gap-x-4 sm:grid-cols-2">
-        {% include "partials/field.html" with field=form.language %}
-        {% include "partials/field.html" with field=form.time_zone %}
-      </div>
+      {% include "partials/field.html" with field=form.time_zone %}
     </div>
     <button type="submit" class="btn-primary">{% translate "Save" %}</button>
   </form>

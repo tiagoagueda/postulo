@@ -131,6 +131,17 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **The language picker shows each language's flag, and reads as a list.** Twenty-four
+  languages is a long list, and the eye finds a flag faster than it reads a name written in
+  a script it does not use. The flags are regional indicator characters rather than images:
+  two code points, no request, and nothing for the content security policy to block. On
+  Windows they render as the two letters instead, which is a legible fallback rather than a
+  broken image. The picker is now a list of rows rather than a dropdown, because a dropdown
+  could not carry both — an `<option>` takes `lang` and nothing inside it, so the flag would
+  have been read out along with the name it decorates. Each language is written in itself,
+  marked as being in itself, and the flag is hidden from screen readers. Every flag is
+  chosen deliberately rather than derived from the code, since a language is not a country:
+  Greek is Greece, Irish is Ireland, and neither code says so. (#52)
 - **Postulo has a mark.** A layered paper-cut *P*, in the browser tab, beside the instance's
   name in the header, on a phone's home screen, and at the top of the README and the wiki.
   It is still a work in progress. It lives once at `assets/brand/postulo.png` and everything

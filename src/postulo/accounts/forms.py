@@ -373,13 +373,62 @@ class LocaleForm(forms.ModelForm):
         model = Profile
         fields = ("language", "time_zone")
 
+    def language_groups(self) -> list[dict]:
+        """The language list, ready to render as rows rather than as a dropdown.
+
+        A dropdown cannot do what this list needs. An ``<option>`` may carry ``lang`` and
+        nothing inside it, so a flag placed in the option text is read out by a screen
+        reader along with the name — "Greek flag, Ελληνικά" — and the name has to be
+        marked as being in its own language or it is pronounced with the wrong rules
+        entirely (#64). Rows solve both: the flag is hidden from the accessibility tree
+        because the name beside it already says what it is, and the name carries its own
+        ``lang``.
+
+        Twenty-four rows also read better than a dropdown of twenty-four: somebody
+        looking for their language sees all of them at once.
+        """
+        from postulo.core import languages
+
+        current = self["language"].value() or ""
+        groups = []
+        for label, entries in language_choices()[1:]:
+            groups.append(
+                {
+                    "label": label,
+                    "options": [
+                        {
+                            "code": code,
+                            "name": name,
+                            "flag": languages.flag(code),
+                            "selected": code == current,
+                        }
+                        for code, name in entries
+                    ],
+                }
+            )
+        default = language_choices()[0]
+        return [
+            {
+                "label": "",
+                "options": [
+                    {
+                        "code": "",
+                        "name": default[1],
+                        "flag": "",
+                        "selected": not current,
+                    }
+                ],
+            },
+            *groups,
+        ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["language"] = forms.ChoiceField(
             label=_("Language"),
             choices=language_choices,
             required=False,
-            widget=LanguageSelect,
+            widget=forms.RadioSelect,
         )
         self.fields["time_zone"] = forms.ChoiceField(
             label=_("Time zone"), choices=time_zone_choices, required=False

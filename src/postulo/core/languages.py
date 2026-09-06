@@ -11,6 +11,58 @@ evaluates at runtime.
 
 from __future__ import annotations
 
+#: Language code → the flag of the country the language is most plainly at home in.
+#:
+#: Two regional indicator characters, not an image: ``\U0001F1EB\U0001F1F7`` is two code
+#: points, costs no request at all, and cannot be blocked by ``img-src 'self'``. It renders
+#: as a flag on macOS, iOS, Android and most Linux desktops. **Windows shows the two
+#: letters instead** — ``FR`` rather than a French flag — which is a legible fallback and
+#: not a broken image, and is worth knowing before it is reported as a bug.
+#:
+#: Written out deliberately rather than derived from the code, because a language is not a
+#: country: ``el`` is Greek and ``cs`` is Czech, and neither code says so. For the European
+#: Union set every language has one uncontested home, which is what makes this tractable
+#: now. It will not survive #43 moving past Europe — Spanish is not only Spain, Arabic is
+#: not one flag — and the rule there is that a language with no uncontested home gets no
+#: flag at all. No flag beats a wrong flag.
+FLAGS: dict[str, str] = {
+    "en-gb": "\U0001f1ec\U0001f1e7",
+    "bg": "\U0001f1e7\U0001f1ec",
+    "cs": "\U0001f1e8\U0001f1ff",
+    "da": "\U0001f1e9\U0001f1f0",
+    "de": "\U0001f1e9\U0001f1ea",
+    "el": "\U0001f1ec\U0001f1f7",
+    "es": "\U0001f1ea\U0001f1f8",
+    "et": "\U0001f1ea\U0001f1ea",
+    "fi": "\U0001f1eb\U0001f1ee",
+    "fr-fr": "\U0001f1eb\U0001f1f7",
+    "ga": "\U0001f1ee\U0001f1ea",
+    "hr": "\U0001f1ed\U0001f1f7",
+    "hu": "\U0001f1ed\U0001f1fa",
+    "it": "\U0001f1ee\U0001f1f9",
+    "lt": "\U0001f1f1\U0001f1f9",
+    "lv": "\U0001f1f1\U0001f1fb",
+    "mt": "\U0001f1f2\U0001f1f9",
+    "nl": "\U0001f1f3\U0001f1f1",
+    "pl": "\U0001f1f5\U0001f1f1",
+    "pt-pt": "\U0001f1f5\U0001f1f9",
+    "ro": "\U0001f1f7\U0001f1f4",
+    "sk": "\U0001f1f8\U0001f1f0",
+    "sl": "\U0001f1f8\U0001f1ee",
+    "sv": "\U0001f1f8\U0001f1ea",
+}
+
+
+def flag(code: str) -> str:
+    """The flag for a language, or nothing where none is right.
+
+    Nothing is a perfectly good answer and the interface must cope with it: the phase of
+    #43 beyond Europe brings languages with no single home, and they will be left blank
+    rather than given somebody's best guess.
+    """
+    return FLAGS.get(code, "")
+
+
 #: Language code as Django writes it → the language's own name for itself.
 #: The order is the order of the picker: alphabetical by code, source language first.
 NATIVE_NAMES: dict[str, str] = {

@@ -158,10 +158,10 @@ def test_the_picker_groups_languages_by_how_well_translated_they_are(client, use
     assert groups["Partly translated"]["pl"] == "polski (40%)"
 
 
-def test_every_language_option_says_which_language_it_is_in(client, user):
+def test_every_language_says_which_language_it_is_in(client, user):
     """WCAG 2.2 3.1.2, Language of Parts, at level AA.
 
-    Every option is written in its own language, and without `lang` a screen reader reads
+    Every entry is written in its own language, and without `lang` a screen reader reads
     all of them with the rules of whatever the interface is set to. This is the one list
     in Postulo where that matters most: it is where somebody who cannot read the current
     language has come to get out of it.
@@ -170,23 +170,40 @@ def test_every_language_option_says_which_language_it_is_in(client, user):
 
     client.force_login(user)
     html = client.get(reverse("settings:locale")).content.decode()
-    field = html[
-        html.index('name="language"') : html.index("</select>", html.index('name="language"'))
-    ]
 
-    options = re.findall(r"<option[^>]*>", field)
-    assert len(options) > 20, "the whole list is there"
+    rows = re.findall(r'<input type="radio" name="language" value="([^"]*)"', html)
+    assert len(rows) > 20, "the whole list is there"
 
-    with_value = [o for o in options if re.search(r'value="[^"]+"', o)]
-    assert with_value, "something other than the blank entry"
-    for option in with_value:
-        code = re.search(r'value="([^"]+)"', option).group(1)
-        assert f'lang="{code}"' in option, f"{code} does not say what language it is in"
+    for code in rows:
+        if not code:
+            continue
+        assert f'lang="{code}"' in html, f"{code} does not say what language it is in"
 
-    blank = [o for o in options if 'value=""' in o]
-    assert blank and "lang=" not in blank[0], (
-        "the default entry is in the interface language, not in any of the listed ones"
-    )
+    # The "use the instance default" row is in the interface language, not in any listed
+    # one, so it must not claim to be.
+    assert "<span >" not in html
+    assert 'lang=""' not in html
+
+
+def test_each_language_shows_its_flag_without_reading_it_out(client, user):
+    """A flag beside a name the person can already read is decoration, and is marked so.
+
+    Two regional indicator characters rather than an image: no request, nothing for
+    `img-src 'self'` to block, and on Windows it degrades to two letters rather than to a
+    broken image.
+    """
+    import re
+
+    from postulo.core import languages
+
+    client.force_login(user)
+    html = client.get(reverse("settings:locale")).content.decode()
+
+    flags = re.findall(r'<span aria-hidden="true"[^>]*>([^<]+)</span>', html)
+    assert languages.flag("el") in flags, "Greek is Greece, which its code does not say"
+    assert languages.flag("cs") in flags
+    assert languages.flag("ga") in flags, "Irish is Ireland, likewise"
+    assert len([f for f in flags if f.strip()]) >= len(languages.FLAGS)
 
 
 def test_a_documents_language_menu_says_the_same(client, user):
