@@ -19,19 +19,28 @@
 
   {% include "applications/partials/filters.html" %}
 
+  <p class="sr-only" id="board-drag-help">
+    {% blocktranslate trimmed %}
+      Cards can be dragged between columns with a mouse. Every card also carries a status
+      menu, which does the same thing from the keyboard.
+    {% endblocktranslate %}
+  </p>
+
   <div class="flex gap-4 overflow-x-auto pb-4">
     {% for column in columns %}
       <section class="w-72 shrink-0">
         <div class="mb-2 flex items-baseline justify-between px-1">
           <h2 class="text-sm font-medium">{{ column.label }}</h2>
-          <span class="text-xs text-ink-400 tabular-nums">{{ column.applications|length }}</span>
+          <span class="text-xs text-ink-400 tabular-nums" data-column-count>{{ column.applications|length }}</span>
         </div>
-        <div class="flex flex-col gap-2">
+        <div class="flex min-h-24 flex-col gap-2 rounded-lg transition-colors"
+             data-board-column="{{ column.status }}"
+             data-column-label="{{ column.label }}">
           {% for application in column.applications %}
             {% include "applications/partials/application_card.html" %}
           {% empty %}
             <p class="rounded-lg border border-dashed border-ink-200 px-3 py-6 text-center text-xs
-                      text-ink-400 dark:border-ink-800">
+                      text-ink-400 dark:border-ink-800" data-empty>
               {% translate "Empty" %}
             </p>
           {% endfor %}

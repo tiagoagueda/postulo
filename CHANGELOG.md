@@ -18,6 +18,12 @@ All notable changes to Postulo are recorded here. The format follows
   *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
   switch per document kind, *Send to stores now* tries at once, *Send everything* queues
   what existed before the store did, and the references travel in the export. (#13)
+- **A card can be dragged between board columns.** About sixty lines of delegated
+  JavaScript, no library, no new endpoint: a drop sets the card's own status menu and
+  submits the form that was already there, so the server path, the event log and the
+  timeline entry are the ones the menu produced. The card moves at once and the counts
+  follow. The menu stays, because dragging fires on neither a touch screen nor a keyboard,
+  and the cards say so to a screen reader. (#35)
 - **Companies can have a logo**, from an address you paste, from the company's own
   website, or uploaded. Postulo fetches it once, from the server, and keeps a copy: an
   `<img>` pointing at the company's server would tell them which companies you are looking

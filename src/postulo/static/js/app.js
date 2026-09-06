@@ -18,6 +18,114 @@
     }
   });
 
+  // Dragging a card between board columns. No library and no new endpoint: on drop the
+  // card's own status menu is set and its form submitted, so the server path is exactly
+  // the one the menu already uses and the timeline entry is written the same way.
+  //
+  // The menu stays. Drag and drop does not fire on touch screens and is not reachable
+  // from a keyboard, so it is an addition to the control that works everywhere, never a
+  // replacement for it.
+  var dragging = null;
+
+  function columnOf(node) {
+    return node && node.closest ? node.closest("[data-board-column]") : null;
+  }
+
+  function highlight(column, on) {
+    if (!column) {
+      return;
+    }
+    column.classList.toggle("bg-ink-100", on);
+    column.classList.toggle("dark:bg-ink-800", on);
+  }
+
+  function recount(column) {
+    if (!column) {
+      return;
+    }
+    var section = column.closest("section");
+    var counter = section && section.querySelector("[data-column-count]");
+    if (counter) {
+      counter.textContent = String(column.querySelectorAll("[data-card]").length);
+    }
+    var empty = column.querySelector("[data-empty]");
+    if (empty) {
+      empty.hidden = column.querySelectorAll("[data-card]").length > 0;
+    }
+  }
+
+  document.addEventListener("dragstart", function (event) {
+    var card = event.target.closest && event.target.closest("[data-card]");
+    if (!card) {
+      return;
+    }
+    dragging = { card: card, from: columnOf(card) };
+    card.classList.add("opacity-50");
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      // Firefox will not start a drag without something on the transfer.
+      event.dataTransfer.setData("text/plain", card.dataset.card || "");
+    }
+  });
+
+  document.addEventListener("dragend", function () {
+    if (dragging) {
+      dragging.card.classList.remove("opacity-50");
+    }
+    document.querySelectorAll("[data-board-column]").forEach(function (column) {
+      highlight(column, false);
+    });
+    dragging = null;
+  });
+
+  document.addEventListener("dragover", function (event) {
+    var column = columnOf(event.target);
+    if (!dragging || !column) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+    highlight(column, column !== dragging.from);
+  });
+
+  document.addEventListener("dragleave", function (event) {
+    var column = columnOf(event.target);
+    if (column && !column.contains(event.relatedTarget)) {
+      highlight(column, false);
+    }
+  });
+
+  document.addEventListener("drop", function (event) {
+    var column = columnOf(event.target);
+    if (!dragging || !column) {
+      return;
+    }
+    event.preventDefault();
+    highlight(column, false);
+    var card = dragging.card;
+    var from = dragging.from;
+    var status = column.dataset.boardColumn;
+    if (!status || column === from) {
+      return;
+    }
+    var select = card.querySelector("select[name='status']");
+    if (!select) {
+      return;
+    }
+    // Optimistic: the card moves now, and the form that was already there does the
+    // saving. If the server refuses, the page it sends back is the truth.
+    column.appendChild(card);
+    card.dataset.status = status;
+    recount(from);
+    recount(column);
+    select.value = status;
+    if (select.form) {
+      select.form.requestSubmit();
+    }
+  });
+
   // The theme switch in the header applies its change the moment it is pressed, before
   // the server has confirmed it. "system" means removing the attribute so the operating
   // system preference applies again; the reply then replaces the switch in its new

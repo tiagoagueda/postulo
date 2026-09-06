@@ -1,5 +1,6 @@
 {% load i18n postulo %}
-<article class="card p-3">
+<article class="card p-3" draggable="true" data-card="{{ application.pk }}"
+         data-status="{{ application.status }}" aria-describedby="board-drag-help">
   <a href="{{ application.get_absolute_url }}" class="block font-medium hover:underline">
     {{ application.posting.title }}
   </a>

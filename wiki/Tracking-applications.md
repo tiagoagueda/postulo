@@ -64,6 +64,16 @@ website is read when you press the button. Nothing happens on a page view.
 Both share the same filters: text search across job title, company and location; status;
 outcome (live or settled); and tag.
 
+## Moving a card on the board
+
+Drag a card to another column and it moves, and the timeline records the change exactly as
+it would have if you had used the menu — there is no separate path for dragging. The card
+moves at once and the counts follow; if the server refuses, the page it sends back is the
+truth.
+
+**The menu on each card stays.** Dragging fires on neither a touch screen nor a keyboard,
+so the menu is the way that works everywhere, and dragging is an addition to it.
+
 ## The table
 
 The table is yours to arrange, and the same is true of the **Companies** table.
