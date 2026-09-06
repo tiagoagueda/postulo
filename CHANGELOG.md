@@ -131,6 +131,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **`X-Forwarded-Proto` was believed from whoever sent it.** Postulo told Django to treat
+  any request carrying `X-Forwarded-Proto: https` as secure, which is right behind a
+  reverse proxy and wrong the moment an instance is reachable directly — and the Compose
+  file publishes a port, so that is a normal way to run one. Anybody who could reach such
+  an instance could send the header themselves and skip the redirect to HTTPS. The
+  forwarding headers are now believed only from an address a proxy could be at — loopback,
+  a Docker network, a LAN, or whatever `POSTULO_TRUSTED_PROXIES` names — and stripped from
+  every other request before anything reads them. Nothing changes for the usual
+  arrangement, where the proxy is a container beside Postulo or a service on the same host.
+  As a consequence, `X-Forwarded-For` from a trusted proxy is now honoured too, so the
+  sign-in rate limits count each visitor separately instead of counting the whole instance
+  as one. (#60)
 - **Sign-in rate limits were counted once per worker and forgotten on every restart.**
   Postulo turns somebody away after ten failed sign-ins a minute from one address, or five
   in five minutes against one account. Those counts live in Django's cache, no cache was

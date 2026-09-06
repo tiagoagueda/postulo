@@ -23,6 +23,13 @@ SECURE_HSTS_PRELOAD = env.bool("POSTULO_HSTS_PRELOAD", default=False)
 # is deliberate, so the check that nags about it is silenced while it stays off.
 SILENCED_SYSTEM_CHECKS = [] if SECURE_HSTS_PRELOAD else ["security.W021"]
 SECURE_SSL_REDIRECT = env.bool("POSTULO_SSL_REDIRECT", default=True)
+
+# Django's own documentation warns about this one, and rightly: it makes any request
+# carrying X-Forwarded-Proto: https count as secure, and that is an ordinary header
+# anybody can send. It is safe here only because TrustedProxyMiddleware has already
+# removed the header from every request that did not come from POSTULO_TRUSTED_PROXIES,
+# so by the time SecurityMiddleware reads it, a proxy is the only thing that could have
+# set it. Changing one of those two without the other undoes both.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Secure cookies are only ever sent over HTTPS, which is right for anything a browser

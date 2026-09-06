@@ -6,8 +6,29 @@ adds around it. None of it is required to run, all of it is worth an hour.
 ## The reverse proxy
 
 Terminate TLS in front of Postulo and forward `X-Forwarded-Proto`; Postulo redirects to
-HTTPS, sets HSTS for a year, and marks its cookies `Secure`. Add at the proxy what an
-application cannot do for itself:
+HTTPS, sets HSTS for a year, and marks its cookies `Secure`.
+
+`X-Forwarded-Proto` is an ordinary request header, so anything that can reach Postulo
+directly can send it and claim a connection it does not have. Postulo therefore believes it
+**only from an address a proxy could be at**: loopback, a Docker network, a LAN. A request
+arriving straight from the internet has that header — and `X-Forwarded-For`,
+`X-Forwarded-Host` and the rest — removed before anything reads it.
+
+That default fits the usual arrangement, where the proxy is a container beside Postulo or a
+service on the same host, and there is nothing to set. Two cases need a word:
+
+- **Your proxy is somewhere else**, on its own public host. Name it:
+  `POSTULO_TRUSTED_PROXIES=203.0.113.7/32`. Give it the narrowest range that works.
+- **There is no proxy at all.** `POSTULO_TRUSTED_PROXIES=` trusts nothing, which is right,
+  and you should also turn `POSTULO_SSL_REDIRECT` off and read the note beside
+  `POSTULO_SECURE_COOKIES` — an instance on plain HTTP has other decisions to make.
+
+Believing `X-Forwarded-For` from a proxy has a second effect worth knowing about: without
+it, every request appears to come from the proxy, so the sign-in rate limits count the
+whole instance as one visitor and a persistent stranger could use up everybody's allowance.
+With it, they count each person separately, as intended.
+
+Add at the proxy what an application cannot do for itself:
 
 - **Rate limits** on `/accounts/login/`, `/accounts/signup/`, `/accounts/password/` and
   `/api/v1/` — Postulo limits sign-in attempts itself, but a proxy limit is cheaper and

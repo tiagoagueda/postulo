@@ -38,6 +38,15 @@ page. Infrastructure — secrets, the database, hosts, TLS — stays in the envi
 SQLite is a perfectly reasonable choice for a personal instance, and makes
 [backups](Backups-and-your-data) a single file copy.
 
+## Behind a proxy
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `POSTULO_TRUSTED_PROXIES` | Loopback, Docker and LAN ranges | Which addresses may set `X-Forwarded-Proto` and `X-Forwarded-For`. Comma-separated CIDRs. Empty trusts nothing. |
+
+The default is where a self-hosted reverse proxy lives, so most instances need not set it.
+Everything about why is on [Hardening](Hardening).
+
 ## Cache
 
 | Variable | Default | What it does |

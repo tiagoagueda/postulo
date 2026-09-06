@@ -10,7 +10,7 @@ from pathlib import Path
 import environ
 
 from postulo.accounts.validators import USERNAME_BLACKLIST
-from postulo.core import languages
+from postulo.core import languages, proxy
 
 # src/postulo/config/settings/base.py -> src/postulo
 PACKAGE_DIR = Path(__file__).resolve().parents[2]
@@ -59,7 +59,17 @@ INSTALLED_APPS = [
     "postulo.api",
 ]
 
+#: Where a reverse proxy may be, for the headers it sets to be believed. See
+#: postulo.core.proxy: anything outside these ranges has its forwarding headers dropped,
+#: so an instance published straight onto a port cannot be told it is behind HTTPS.
+POSTULO_TRUSTED_PROXIES = env.list(
+    "POSTULO_TRUSTED_PROXIES", default=list(proxy.DEFAULT_TRUSTED_PROXIES)
+)
+
 MIDDLEWARE = [
+    # First, so nothing downstream sees a forwarding header from somewhere untrusted --
+    # SecurityMiddleware reads X-Forwarded-Proto through SECURE_PROXY_SSL_HEADER.
+    "postulo.core.proxy.TrustedProxyMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
