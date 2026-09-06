@@ -4,7 +4,7 @@
 // security policy allows scripts from Postulo's own origin only, so nothing is ever loaded
 // from a CDN.
 
-import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 const DESTINATION = "src/postulo/static/js/vendor";
@@ -28,7 +28,11 @@ for (const [source, name] of FILES) {
   }
   const to = join(DESTINATION, name);
   mkdirSync(dirname(to), { recursive: true });
-  copyFileSync(from, to);
+  // The bundles end with a pointer to a source map that is not shipped. Django's
+  // manifest storage follows such references at collectstatic time and refuses a
+  // file that points at nothing, so the pointer goes; the code is unchanged.
+  const text = readFileSync(from, "utf8").replace(/^\/\/# sourceMappingURL=.*\n?$/m, "");
+  writeFileSync(to, text);
   console.log(`${name} <- ${source}`);
 }
 process.exit(failed ? 1 : 0);

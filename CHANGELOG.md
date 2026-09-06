@@ -8,6 +8,12 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **The container image would not build.** `collectstatic` with the manifest storage
+  the image uses follows references inside JavaScript, and the vendored password-meter
+  bundles ended with a pointer to a source map that was never shipped, so the build
+  stopped there. The vendoring script now drops that pointer, the build no longer pulls
+  the development dependencies back into the image, and both the test suite and the CI
+  run `collectstatic` the way the image does.
 - **Three template notes were printing themselves on the page.** Django's `{# #}` comment
   is single-line only; spread over several lines it is text, and the notes above the
   Columns menu, the filters and the table header appeared on every table page with their

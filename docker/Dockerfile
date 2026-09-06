@@ -66,9 +66,11 @@ COPY --from=styles /build/src/postulo/static/css/app.css ./src/postulo/static/cs
 # Collected once, at build time: the running container should not need to write to its
 # own image, and a read-only filesystem is a reasonable thing for an operator to want.
 # The key here exists only for the length of this command and never reaches the image.
+# --no-sync: the environment above is the one to use; a plain `uv run` would otherwise
+# resolve the development groups back into the image.
 RUN POSTULO_SECRET_KEY=build-time-only-not-a-secret \
     POSTULO_ALLOWED_HOSTS=localhost \
-    uv run manage.py collectstatic --noinput --clear
+    uv run --no-sync manage.py collectstatic --noinput --clear
 
 COPY docker/entrypoint.sh /usr/local/bin/postulo-entrypoint
 RUN chmod +x /usr/local/bin/postulo-entrypoint \

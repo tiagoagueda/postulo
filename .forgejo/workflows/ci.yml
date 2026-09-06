@@ -85,12 +85,18 @@ jobs:
         run: uv run pytest --cov --cov-report=term-missing
 
       - name: Production settings deployment check
-        run: uv run manage.py check --deploy --fail-level WARNING
+        # check --deploy, and collectstatic with the manifest storage the image uses,
+        # which follows references inside CSS and JS and refuses one that points at
+        # nothing — the failure that once broke the image build and not the tests.
+        run: |
+          uv run manage.py check --deploy --fail-level WARNING
+          uv run manage.py collectstatic --noinput --clear
         env:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.prod
           # Long enough to satisfy security.W009; not a real secret.
           POSTULO_SECRET_KEY: ci-only-placeholder-nS7pQ2xV9wR4tY6uI8oA3sD5fG1hJ0kL2zX4cV6b
           POSTULO_ALLOWED_HOSTS: postulo.example.org
+          POSTULO_STATIC_ROOT: /tmp/postulo-static
 
   security:
     # Postulo holds people's CVs and employment histories, and one of its stated
