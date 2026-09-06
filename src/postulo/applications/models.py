@@ -536,3 +536,105 @@ class Interview(OwnedModel):
     @property
     def duration(self):
         return self.ends_at - self.starts_at
+
+
+class SuggestionStatus(models.TextChoices):
+    PENDING = "pending", _("Waiting for review")
+    ACCEPTED = "accepted", _("Accepted")
+    DECLINED = "declined", _("Declined")
+
+
+class SuggestionQuerySet(models.QuerySet):
+    def for_user(self, user) -> SuggestionQuerySet:
+        if user is None or not getattr(user, "is_authenticated", False):
+            return self.none()
+        return self.filter(owner=user)
+
+    def pending(self) -> SuggestionQuerySet:
+        return self.filter(status=SuggestionStatus.PENDING)
+
+    def matched(self) -> SuggestionQuerySet:
+        return self.filter(application__isnull=False)
+
+    def unmatched(self) -> SuggestionQuerySet:
+        return self.filter(application__isnull=True)
+
+
+class Suggestion(OwnedModel):
+    """Something a plugin thinks happened, waiting for a person to say whether it did.
+
+    Nothing a plugin infers from outside — a mailbox, a calendar — is written into the
+    record on a guess. It waits here, and accepting it writes it through the same
+    services a person's own typing goes through, with the plugin named as the actor.
+
+    ``external_id`` is what the source calls the thing it read. It makes filing
+    idempotent per person and source, which is how a mailbox read every five minutes
+    stops suggesting the same message for ever, whether it was accepted or declined.
+    """
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="suggestions",
+        verbose_name=_("application"),
+        help_text=_("Empty when the source could not tell which application it is about."),
+    )
+    source = models.CharField(_("suggested by"), max_length=60)
+    external_id = models.CharField(_("identifier at the source"), max_length=250, blank=True)
+
+    kind = models.CharField(_("kind"), max_length=20, choices=EventKind, default=EventKind.NOTE)
+    summary = models.CharField(_("what it says"), max_length=250)
+    body = models.TextField(_("detail"), blank=True)
+    occurred_at = models.DateTimeField(_("happened"), default=timezone.now)
+    suggested_status = models.CharField(
+        _("suggested status"),
+        max_length=20,
+        choices=Status,
+        blank=True,
+        help_text=_("When accepting should also move the application."),
+    )
+    #: Dates an invitation offered, as text, for whoever schedules the interview.
+    proposed_dates = models.JSONField(_("dates offered"), default=list, blank=True)
+    #: Whatever the source wants to show the person: a sender, a subject, a folder.
+    context = models.JSONField(_("context"), default=dict, blank=True)
+
+    status = models.CharField(
+        _("status"), max_length=20, choices=SuggestionStatus, default=SuggestionStatus.PENDING
+    )
+    event = models.ForeignKey(
+        "applications.ApplicationEvent",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="from_suggestions",
+        verbose_name=_("timeline entry"),
+    )
+    reviewed_at = models.DateTimeField(_("reviewed on"), null=True, blank=True)
+
+    objects = SuggestionQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("suggestion")
+        verbose_name_plural = _("suggestions")
+        ordering = ("-occurred_at", "-pk")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("owner", "source", "external_id"),
+                condition=~models.Q(external_id=""),
+                name="suggestion_once_per_source_id",
+            ),
+        ]
+        indexes = [models.Index(fields=("owner", "status"))]
+
+    def __str__(self) -> str:
+        return self.summary
+
+    @property
+    def is_pending(self) -> bool:
+        return self.status == SuggestionStatus.PENDING
+
+    @property
+    def is_matched(self) -> bool:
+        return self.application_id is not None

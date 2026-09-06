@@ -18,6 +18,21 @@ All notable changes to Postulo are recorded here. The format follows
   *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
   switch per document kind, *Send to stores now* tries at once, *Send everything* queues
   what existed before the store did, and the references travel in the export. (#13)
+- **Suggestions: what a plugin thinks happened, waiting for you to agree.** A plugin
+  reading something outside Postulo is guessing, so nothing it infers is written into the
+  record. It files a suggestion — what it says, which application it seems to be about,
+  what it would move the application to — and *Applications → Suggestions* is where you
+  accept or decline it. Accepting writes it through the same services your own typing
+  goes through, with the plugin named on the timeline entry; declining writes nothing. A
+  source that names what it read is never asked about the same thing twice. (#34)
+- **postulo-imap, reading the job-hunt mailbox.** One folder that you chose — never the
+  inbox — read over IMAP, matched to an application by thread, contact, sender domain or
+  the words in the message, and classified by phrase lists in English, French and
+  Portuguese that anyone can read and extend. Acknowledgements, rejections, interview
+  invitations with the dates they name, assessments and offers become suggestions.
+  Messages are flagged with an invisible keyword once read, or moved, or left alone
+  entirely. Lives at
+  [postulo/postulo-imap](https://source.tiagoagueda.com/postulo/postulo-imap). (#34)
 - **Synchronisation plugins, and postulo-dav as the first.** A plugin in the
   `postulo.syncs` group keeps records here and elsewhere the same, in both directions;
   the core gives it a connection, a `SyncLink` side table for the remote twin of each

@@ -113,6 +113,24 @@ and CardDAV. Only those two collections are touched, ever. Each connection has a
 beside it. Moving an interview on the phone moves it here and says so on the timeline;
 deleting it there never deletes it here.
 
+## Suggestions
+
+A plugin that reads for you — a mailbox, through
+[postulo-imap](https://source.tiagoagueda.com/postulo/postulo-imap) — never writes
+anything into your record. What it works out lands under **Applications → Suggestions**:
+what the message says, which application it seems to be about, who it came from, and the
+phrase that was recognised.
+
+Each one waits there until you **accept** it, which writes it onto the timeline exactly as
+your own typing would (and moves the application, when the suggestion says so — a
+rejection to *Rejected*, an invitation to *Interviewing*), or **decline** it, which writes
+nothing. Every entry an accepted suggestion produces says which plugin it came from, so
+you can always see what was decided for you and undo it.
+
+Neither answer is asked for twice: a message you declined is never suggested again. One
+that could not be matched to an application says so, and you pick the application yourself
+before accepting it. The dashboard tells you when something is waiting.
+
 ## Gone quiet
 
 An employer that simply stops replying is the most common ending, and *Ghosted* exists to

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Suggestions" %}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Suggestions" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          What the plugins that read for you think happened. Nothing here is in your record
+          until you say so.
+        {% endblocktranslate %}
+      </p>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      {% if showing_all %}
+        <a href="{% url 'applications:suggestion_list' %}" class="btn-secondary">{% translate "Waiting only" %}</a>
+      {% else %}
+        <a href="?show=all" class="btn-secondary">{% translate "Show all" %}</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if suggestions %}
+    <div class="card p-0">
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for suggestion in suggestions %}
+          <li class="px-4 py-4" data-suggestion="{{ suggestion.pk }}">
+            <div class="flex flex-wrap items-start gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="font-medium">{{ suggestion.summary }}</p>
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {{ suggestion.get_kind_display }}
+                  {% if suggestion.suggested_status %}
+                    · {% blocktranslate with status=suggestion.get_suggested_status_display trimmed %}would move it to {{ status }}{% endblocktranslate %}
+                  {% endif %}
+                  · {{ suggestion.occurred_at|date:"j M Y, H:i" }}
+                  · <code>{{ suggestion.source }}</code>
+                </p>
+                {% if suggestion.application %}
+                  <p class="mt-1 text-sm">
+                    <a href="{{ suggestion.application.get_absolute_url }}" class="text-brand-600 underline dark:text-brand-400">
+                      {{ suggestion.application.posting.title }} — {{ suggestion.application.posting.company.name }}
+                    </a>
+                  </p>
+                {% else %}
+                  <p class="mt-1 text-sm text-amber-700 dark:text-amber-500">
+                    {% translate "Not matched to an application." %}
+                  </p>
+                {% endif %}
+                {% for key, value in suggestion.context.items %}
+                  <p class="truncate text-xs text-ink-500 dark:text-ink-400">{{ key }}: {{ value }}</p>
+                {% endfor %}
+                {% if suggestion.body %}
+                  <p class="mt-1 whitespace-pre-line text-sm text-ink-600 dark:text-ink-300">{{ suggestion.body|truncatechars:400 }}</p>
+                {% endif %}
+                {% if suggestion.proposed_dates %}
+                  <p class="mt-1 text-xs text-ink-600 dark:text-ink-300">
+                    {% translate "Dates offered:" %}
+                    {% for date in suggestion.proposed_dates %}{{ date }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                  </p>
+                {% endif %}
+              </div>
+
+              <div class="shrink-0">
+                {% if suggestion.is_pending %}
+                  <form method="post" action="{% url 'applications:suggestion_action' suggestion.pk 'accept' %}"
+                        class="flex flex-wrap items-center justify-end gap-2">
+                    {% csrf_token %}
+                    {% if not suggestion.application %}
+                      <label class="sr-only" for="application-{{ suggestion.pk }}">{% translate "Application" %}</label>
+                      <select name="application" id="application-{{ suggestion.pk }}" class="field-input py-1 text-sm" required>
+                        <option value="">{% translate "Which application?" %}</option>
+                        {% for application in open_applications %}
+                          <option value="{{ application.pk }}">{{ application.posting.title }} — {{ application.posting.company.name }}</option>
+                        {% endfor %}
+                      </select>
+                    {% endif %}
+                    <button type="submit" class="btn-primary px-3 py-1 text-sm">{% translate "Accept" %}</button>
+                  </form>
+                  <form method="post" action="{% url 'applications:suggestion_action' suggestion.pk 'decline' %}" class="mt-1 text-right">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">{% translate "Decline" %}</button>
+                  </form>
+                {% elif suggestion.event %}
+                  <a href="{{ suggestion.application.get_absolute_url }}" class="text-sm text-brand-600 underline dark:text-brand-400">
+                    {% translate "On the timeline" %}
+                  </a>
+                {% else %}
+                  <span class="text-xs text-ink-400">{{ suggestion.get_status_display }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    {% if is_paginated %}
+      <nav class="mt-4 flex items-center gap-2 text-sm" aria-label="{% translate 'Pagination' %}">
+        {% if page_obj.has_previous %}
+          <a href="?{% if showing_all %}show=all&amp;{% endif %}page={{ page_obj.previous_page_number }}" class="btn-secondary">{% translate "Previous" %}</a>
+        {% endif %}
+        <span class="text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed with current=page_obj.number total=paginator.num_pages %}
+            Page {{ current }} of {{ total }}
+          {% endblocktranslate %}
+        </span>
+        {% if page_obj.has_next %}
+          <a href="?{% if showing_all %}show=all&amp;{% endif %}page={{ page_obj.next_page_number }}" class="btn-secondary">{% translate "Next" %}</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="card py-12 text-center">
+      <p class="mb-1 font-medium">
+        {% if showing_all %}{% translate "No suggestions yet" %}{% else %}{% translate "Nothing waiting" %}{% endif %}
+      </p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          A plugin that reads a mailbox or a calendar for you files what it finds here, and
+          it stays here until you accept or decline it.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  {% endif %}
+{% endblock %}

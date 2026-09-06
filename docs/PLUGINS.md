@@ -375,6 +375,38 @@ error are shown on the connection.
 [postulo-dav](https://source.tiagoagueda.com/postulo/postulo-dav) is the reference:
 CardDAV and CalDAV, both directions.
 
+### Suggesting, instead of writing
+
+A plugin that reads something outside Postulo — a mailbox, a calendar, a board — is
+guessing, and a wrong guess in the record is worse than no guess at all. So nothing a
+plugin infers is written straight into an application. It becomes a **suggestion**:
+
+```python
+from postulo.applications.suggestions import suggest
+
+suggest(
+    connection.owner,
+    source="imap",  # your plugin's name
+    external_id=message_id,  # what you call it; makes this idempotent
+    application=found,  # or None when you cannot tell
+    kind="rejection",  # a postulo.applications.models.EventKind
+    summary="We are moving forward with other candidates",
+    body=excerpt,
+    occurred_at=when,
+    suggested_status="rejected",  # optional: a Status to move it to
+    proposed_dates=["12/09/2026 14:00"],  # optional: dates a message offered, as written
+    context={"From": sender},  # anything the person should see
+)
+```
+
+It lands under **Applications → Suggestions**, and the person accepts or declines it.
+Accepting writes it through `record_event` or `change_status` with your plugin's name as
+the actor, so the timeline shows what an automatism did and the person can undo it by
+hand. **Given an `external_id`, `suggest` is idempotent for that source and person** —
+a second call finds the first suggestion and changes nothing, whether it is waiting,
+accepted or declined. That is what lets a mailbox be read every five minutes without
+asking the same question twice.
+
 ## Getting a plugin into the container
 
 The image installs a locked environment at build time and runs as a user that cannot

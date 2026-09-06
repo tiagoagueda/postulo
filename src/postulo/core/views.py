@@ -26,6 +26,7 @@ def home(request: HttpRequest):
         Interview,
         Reminder,
         Status,
+        Suggestion,
     )
     from postulo.applications.quiet import quiet_applications, threshold_for
     from postulo.jobs.models import JobPosting
@@ -61,6 +62,7 @@ def home(request: HttpRequest):
             .due()
             .select_related("application", "application__posting")[:10]
         ),
+        "suggestion_count": Suggestion.objects.for_user(request.user).pending().count(),
         "recent_events": (
             ApplicationEvent.objects.for_user(request.user).select_related(
                 "application", "application__posting", "application__posting__company"

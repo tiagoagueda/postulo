@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 13:08+0000\n"
+"POT-Creation-Date: 2026-09-06 13:29+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: português (Portugal)\n"
@@ -56,7 +56,7 @@ msgstr[0] ""
 msgstr[1] ""
 "%(counter)s administradores. O último não pode ser removido, desativado nem eliminado."
 
-#: src/postulo/templates/core/dashboard.html:67
+#: src/postulo/templates/core/dashboard.html:82
 #, python-format, draft
 msgid "%(counter)s application"
 msgid_plural "All %(counter)s"
@@ -84,14 +84,14 @@ msgid_plural "%(counter)s files, %(size)s"
 msgstr[0] "%(counter)s ficheiro, %(size)s"
 msgstr[1] "%(counter)s ficheiros, %(size)s"
 
-#: src/postulo/templates/core/dashboard.html:205
+#: src/postulo/templates/core/dashboard.html:220
 #, python-format, draft
 msgid "%(counter)s interview has passed without an outcome. How did it go?"
 msgid_plural "%(counter)s interviews have passed without an outcome. How did they go?"
 msgstr[0] "%(counter)s entrevista já passou sem resultado. Como correu?"
 msgstr[1] "%(counter)s entrevistas já passaram sem resultado. Como correram?"
 
-#: src/postulo/templates/core/dashboard.html:267
+#: src/postulo/templates/core/dashboard.html:282
 #, python-format, draft
 msgid "%(counter)s listing to decide on"
 msgid_plural "%(counter)s listings to decide on"
@@ -329,6 +329,24 @@ msgid ""
 msgstr ""
 "Um pacote regista uma fonte no grupo de pontos de entrada <code>%(group)s</code> e é apanhado no próximo arranque. Uma fonte que não carrega é registada e deixada de fora; as incorporadas continuam a funcionar."
 
+#: src/postulo/templates/core/dashboard.html:23
+#, python-format, draft
+msgid ""
+"A plugin has suggested one thing that may have happened: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">look at it</a>."
+msgid_plural ""
+"Plugins have suggested %(counter)s things that may have happened: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">look at them</a>."
+msgstr[0] ""
+"Um plugin sugeriu uma coisa que pode ter acontecido: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">veja-a</a>."
+msgstr[1] ""
+"Os plugins sugeriram %(counter)s coisas que podem ter acontecido: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">veja-as</a>."
+
+#: src/postulo/templates/applications/suggestion_list.html:122
+#, draft
+msgid ""
+"A plugin that reads a mailbox or a calendar for you files what it finds here, and it stays here until you accept or decline it."
+msgstr ""
+"Um plugin que lê por si uma caixa de correio ou um calendário deixa aqui o que encontra, e fica aqui até o aceitar ou recusar."
+
 #: src/postulo/notifications/base.py:28
 #, draft
 msgid "A posting arrives through the capture API"
@@ -417,7 +435,12 @@ msgstr "A1 — iniciante"
 msgid "A2 — elementary"
 msgstr "A2 — elementar"
 
-#: src/postulo/applications/models.py:46
+#: src/postulo/templates/applications/suggestion_list.html:81
+#, draft
+msgid "Accept"
+msgstr "Aceitar"
+
+#: src/postulo/applications/models.py:46 src/postulo/applications/models.py:543
 #: src/postulo/templates/accounts/invite_list.html:38
 #, draft
 msgid "Accepted"
@@ -471,7 +494,7 @@ msgid "Actions"
 msgstr "Ações"
 
 #: src/postulo/templates/applications/application_detail.html:289
-#: src/postulo/templates/core/dashboard.html:217
+#: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:102
 #: src/postulo/templates/resume/overview.html:30
 #, draft
@@ -543,7 +566,7 @@ msgstr "Adicionada"
 msgid "Added %(count)s entries."
 msgstr "%(count)s entradas adicionadas."
 
-#: src/postulo/applications/views.py:311
+#: src/postulo/applications/views.py:312 src/postulo/applications/views.py:662
 #, draft
 msgid "Added to the timeline."
 msgstr "Adicionado à cronologia."
@@ -590,7 +613,7 @@ msgstr[1] "Todos os %(counter)s em %(label)s"
 msgid "All documents"
 msgstr "Todos os documentos"
 
-#: src/postulo/templates/core/dashboard.html:172
+#: src/postulo/templates/core/dashboard.html:187
 #, draft
 msgid "All interviews"
 msgstr "Todas as entrevistas"
@@ -690,13 +713,15 @@ msgstr "Aspeto"
 #: src/postulo/applications/models.py:236
 #: src/postulo/applications/models.py:315
 #: src/postulo/applications/models.py:365
-#: src/postulo/applications/models.py:460 src/postulo/applications/tables.py:15
+#: src/postulo/applications/models.py:460
+#: src/postulo/applications/models.py:581 src/postulo/applications/tables.py:15
 #: src/postulo/documents/models.py:267 src/postulo/jobs/models.py:569
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
 msgstr "candidatura"
 
+#: src/postulo/templates/applications/suggestion_list.html:73
 #: src/postulo/templates/jobs/capture_list.html:51
 #: src/postulo/templates/jobs/listing_list.html:130
 #, draft
@@ -708,7 +733,7 @@ msgstr "Candidatura"
 msgid "Application created"
 msgstr "Candidatura criada"
 
-#: src/postulo/applications/views.py:264
+#: src/postulo/applications/views.py:265
 #, draft
 msgid "Application deleted."
 msgstr "Candidatura eliminada."
@@ -718,12 +743,12 @@ msgstr "Candidatura eliminada."
 msgid "Application recorded from the capture."
 msgstr "Candidatura registada a partir da captura."
 
-#: src/postulo/applications/views.py:230 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:231 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Candidatura registada."
 
-#: src/postulo/applications/views.py:254
+#: src/postulo/applications/views.py:255
 #, draft
 msgid "Application updated."
 msgstr "Candidatura atualizada."
@@ -777,7 +802,7 @@ msgstr "Candidaturas, com as suas cronologias"
 msgid "Applied"
 msgstr "Enviada"
 
-#: src/postulo/templates/core/dashboard.html:55
+#: src/postulo/templates/core/dashboard.html:70
 #, draft
 msgid "Applied in the last 30 days"
 msgstr "Enviadas nos últimos 30 dias"
@@ -1027,7 +1052,7 @@ msgstr "Captura"
 msgid "capture"
 msgstr "captura"
 
-#: src/postulo/templates/core/dashboard.html:32
+#: src/postulo/templates/core/dashboard.html:47
 #: src/postulo/templates/jobs/capture_form.html:4
 #: src/postulo/templates/jobs/capture_form.html:8
 #: src/postulo/templates/jobs/capture_list.html:20
@@ -1159,7 +1184,7 @@ msgid ""
 msgstr ""
 "As alterações feitas aqui são enviadas na próxima execução; o outro lado é lido nessa altura também."
 
-#: src/postulo/applications/views.py:399
+#: src/postulo/applications/views.py:400
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Insistir com %(company)s sobre %(role)s"
@@ -1183,6 +1208,11 @@ msgstr "Escolha pelo menos um documento a registar."
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Escolha que tipo de identificador é este."
+
+#: src/postulo/applications/views.py:658
+#, draft
+msgid "Choose which application this is about first."
+msgstr "Escolha primeiro a que candidatura diz respeito."
 
 #: src/postulo/accounts/models.py:179
 #, draft
@@ -1265,7 +1295,7 @@ msgstr "Colunas"
 msgid "Columns saved."
 msgstr "Colunas guardadas."
 
-#: src/postulo/templates/core/dashboard.html:170
+#: src/postulo/templates/core/dashboard.html:185
 #, draft
 msgid "Coming up"
 msgstr "A seguir"
@@ -1293,7 +1323,7 @@ msgstr "Empresas e contactos"
 msgid "Companies created"
 msgstr "Empresas criadas"
 
-#: src/postulo/templates/core/dashboard.html:261
+#: src/postulo/templates/core/dashboard.html:276
 #, draft
 msgid "Companies you have applied to"
 msgstr "Empresas a que se candidatou"
@@ -1446,6 +1476,11 @@ msgstr "Bloco de contactos"
 #, draft
 msgid "contacts"
 msgstr "contactos"
+
+#: src/postulo/applications/models.py:601
+#, draft
+msgid "context"
+msgstr "contexto"
 
 #: src/postulo/jobs/models.py:262
 #, draft
@@ -1606,6 +1641,16 @@ msgstr "Base de dados"
 msgid "Date applied"
 msgstr "Data da candidatura"
 
+#: src/postulo/applications/models.py:599
+#, draft
+msgid "dates offered"
+msgstr "datas propostas"
+
+#: src/postulo/templates/applications/suggestion_list.html:61
+#, draft
+msgid "Dates offered:"
+msgstr "Datas propostas:"
+
 #: src/postulo/templates/core/import_csv_map.html:44
 #, draft
 msgid "Dates written as"
@@ -1651,6 +1696,21 @@ msgstr "Prazo"
 #, draft
 msgid "decided on"
 msgstr "decidida em"
+
+#: src/postulo/templates/applications/suggestion_list.html:85
+#, draft
+msgid "Decline"
+msgstr "Recusar"
+
+#: src/postulo/applications/models.py:544
+#, draft
+msgid "Declined"
+msgstr "Recusada"
+
+#: src/postulo/applications/views.py:650
+#, draft
+msgid "Declined. It will not be suggested again."
+msgstr "Recusada. Não voltará a ser sugerida."
 
 #: src/postulo/core/models.py:127
 #, draft
@@ -1725,6 +1785,11 @@ msgstr "Descrição"
 #, draft
 msgid "description"
 msgstr "descrição"
+
+#: src/postulo/applications/models.py:589
+#, draft
+msgid "detail"
+msgstr "detalhe"
 
 #: src/postulo/applications/models.py:320
 #, draft
@@ -1801,7 +1866,7 @@ msgstr "Documentos que já tinha. Nada aqui é servido publicamente."
 
 #: src/postulo/templates/applications/application_detail.html:305
 #: src/postulo/templates/applications/reminder_list.html:45
-#: src/postulo/templates/core/dashboard.html:235
+#: src/postulo/templates/core/dashboard.html:250
 #, draft
 msgid "Done"
 msgstr "Concluído"
@@ -1841,7 +1906,7 @@ msgstr "Descarregar o modelo"
 msgid "Draft"
 msgstr "Rascunho"
 
-#: src/postulo/templates/core/dashboard.html:215
+#: src/postulo/templates/core/dashboard.html:230
 #, draft
 msgid "Due now"
 msgstr "A vencer agora"
@@ -1957,6 +2022,11 @@ msgstr "Vazio"
 #, draft
 msgid "Empty capture"
 msgstr "Captura vazia"
+
+#: src/postulo/applications/models.py:582
+#, draft
+msgid "Empty when the source could not tell which application it is about."
+msgstr "Vazio quando a fonte não conseguiu dizer a que candidatura diz respeito."
 
 #: src/postulo/plugins/models.py:47
 #, draft
@@ -2134,7 +2204,7 @@ msgstr "expira em"
 
 #: src/postulo/templates/applications/insights.html:14
 #: src/postulo/templates/base.html:88
-#: src/postulo/templates/core/dashboard.html:283
+#: src/postulo/templates/core/dashboard.html:298
 #: src/postulo/templates/core/export.html:8
 #, draft
 msgid "Export everything"
@@ -2264,13 +2334,13 @@ msgstr "Primeiro valor"
 msgid "First, take everything with you"
 msgstr "Primeiro, leve tudo consigo"
 
-#: src/postulo/applications/views.py:393
+#: src/postulo/applications/views.py:394
 #, draft
 msgid "Follow-up recorded."
 msgstr "Insistência registada."
 
-#: src/postulo/applications/models.py:283 src/postulo/applications/views.py:390
-#: src/postulo/templates/core/dashboard.html:101
+#: src/postulo/applications/models.py:283 src/postulo/applications/views.py:391
+#: src/postulo/templates/core/dashboard.html:116
 #, draft
 msgid "Followed up"
 msgstr "Insistiu"
@@ -2387,7 +2457,7 @@ msgstr "Obter"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/applications/insights.html:251
-#: src/postulo/templates/core/dashboard.html:116
+#: src/postulo/templates/core/dashboard.html:131
 #, draft
 msgid "Ghosted"
 msgstr "Sem resposta"
@@ -2410,7 +2480,7 @@ msgid "Go back"
 msgstr "Voltar"
 
 #: src/postulo/templates/applications/partials/filters.html:43
-#: src/postulo/templates/core/dashboard.html:64
+#: src/postulo/templates/core/dashboard.html:79
 #: src/postulo/templates/settings/appearance.html:27
 #, draft
 msgid "Gone quiet"
@@ -2474,6 +2544,11 @@ msgid ""
 "Group related skills under a heading, such as “Languages” or “Infrastructure”."
 msgstr ""
 "Agrupe competências relacionadas sob um título, como «Idiomas» ou «Infraestrutura»."
+
+#: src/postulo/applications/models.py:590
+#, draft
+msgid "happened"
+msgstr "aconteceu"
 
 #: src/postulo/applications/models.py:318
 #, draft
@@ -2601,6 +2676,11 @@ msgstr "identificador"
 msgid "Identifier"
 msgstr "Identificador"
 
+#: src/postulo/applications/models.py:585
+#, draft
+msgid "identifier at the source"
+msgstr "identificador na fonte"
+
 #: src/postulo/templates/jobs/company_form.html:49
 #, draft
 msgid "Identifiers"
@@ -2679,7 +2759,7 @@ msgstr "Em 90 dias"
 msgid "In a year"
 msgstr "Num ano"
 
-#: src/postulo/templates/core/dashboard.html:47
+#: src/postulo/templates/core/dashboard.html:62
 #, draft
 msgid "In conversation"
 msgstr "Em conversa"
@@ -2752,7 +2832,7 @@ msgstr "Tecnologias de informação"
 #: src/postulo/templates/applications/insights.html:4
 #: src/postulo/templates/applications/insights.html:9
 #: src/postulo/templates/base.html:41
-#: src/postulo/templates/core/dashboard.html:264
+#: src/postulo/templates/core/dashboard.html:279
 #, draft
 msgid "Insights"
 msgstr "Análises"
@@ -2799,7 +2879,7 @@ msgstr "entrevista"
 msgid "Interview cancelled"
 msgstr "Entrevista cancelada"
 
-#: src/postulo/applications/views.py:472
+#: src/postulo/applications/views.py:473
 #, draft
 msgid "Interview recorded."
 msgstr "Entrevista registada."
@@ -2809,7 +2889,7 @@ msgstr "Entrevista registada."
 msgid "Interview scheduled"
 msgstr "Entrevista marcada"
 
-#: src/postulo/applications/views.py:474
+#: src/postulo/applications/views.py:475
 #, draft
 msgid "Interview scheduled."
 msgstr "Entrevista marcada."
@@ -2819,7 +2899,7 @@ msgstr "Entrevista marcada."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Entrevista amanhã: %(kind)s na %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:504
+#: src/postulo/applications/views.py:505
 #, draft
 msgid "Interview updated."
 msgstr "Entrevista atualizada."
@@ -2933,7 +3013,8 @@ msgid "Join the call"
 msgstr "Entrar na chamada"
 
 #: src/postulo/applications/models.py:317
-#: src/postulo/applications/models.py:463 src/postulo/documents/models.py:208
+#: src/postulo/applications/models.py:463
+#: src/postulo/applications/models.py:587 src/postulo/documents/models.py:208
 #: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:37
 #, draft
 msgid "kind"
@@ -3205,7 +3286,7 @@ msgstr "Tornar administrador"
 msgid "Manage"
 msgstr "Gerir"
 
-#: src/postulo/templates/core/dashboard.html:286
+#: src/postulo/templates/core/dashboard.html:301
 #, draft
 msgid "Manage tags"
 msgstr "Gerir etiquetas"
@@ -3220,7 +3301,7 @@ msgstr "Indústria"
 msgid "Map a column to Company and one to Role first."
 msgstr "Associe primeiro uma coluna a Empresa e outra a Função."
 
-#: src/postulo/applications/views.py:366
+#: src/postulo/applications/views.py:367
 #, draft
 msgid "Marked as done."
 msgstr "Marcado como concluído."
@@ -3442,6 +3523,7 @@ msgstr "Novo token"
 msgid "Newest backup"
 msgstr "Cópia de segurança mais recente"
 
+#: src/postulo/templates/applications/suggestion_list.html:112
 #: src/postulo/templates/jobs/listing_list.html:155
 #: src/postulo/templates/partials/table/pagination.html:19
 #, draft
@@ -3523,7 +3605,7 @@ msgid ""
 msgstr ""
 "Nenhum plugin instalado precisa de uma ligação. Os notificadores, arquivos de documentos e plugins de sincronização aparecem aqui quando o operador instalar um."
 
-#: src/postulo/templates/core/dashboard.html:199
+#: src/postulo/templates/core/dashboard.html:214
 #, draft
 msgid "No interviews in the diary."
 msgstr "Nenhuma entrevista na agenda."
@@ -3566,6 +3648,11 @@ msgstr "sem função"
 #, draft
 msgid "No skills in this group yet"
 msgstr "Ainda não há competências neste grupo"
+
+#: src/postulo/templates/applications/suggestion_list.html:119
+#, draft
+msgid "No suggestions yet"
+msgstr "Ainda não há sugestões"
 
 #: src/postulo/templates/applications/tag_list.html:40
 #, draft
@@ -3644,6 +3731,11 @@ msgstr "Não é para mim"
 msgid "Not found"
 msgstr "Não encontrado"
 
+#: src/postulo/templates/applications/suggestion_list.html:50
+#, draft
+msgid "Not matched to an application."
+msgstr "Sem candidatura associada."
+
 #: src/postulo/applications/analytics.py:296
 #: src/postulo/applications/analytics.py:314
 #, draft
@@ -3703,12 +3795,12 @@ msgstr "Notas"
 msgid "notes"
 msgstr "notas"
 
-#: src/postulo/templates/core/dashboard.html:244
+#: src/postulo/templates/core/dashboard.html:259
 #, draft
 msgid "Nothing due."
 msgstr "Nada a vencer."
 
-#: src/postulo/templates/core/dashboard.html:132
+#: src/postulo/templates/core/dashboard.html:147
 #, python-format, draft
 msgid ""
 "Nothing has gone quiet for %(days)s days. Either you are on top of it, or it is time to send out a few more."
@@ -3775,7 +3867,7 @@ msgstr "Ainda nada registado para esta candidatura."
 
 #: src/postulo/templates/applications/application_detail.html:195
 #: src/postulo/templates/applications/insights.html:229
-#: src/postulo/templates/core/dashboard.html:163
+#: src/postulo/templates/core/dashboard.html:178
 #, draft
 msgid "Nothing recorded yet."
 msgstr "Ainda nada registado."
@@ -3840,6 +3932,7 @@ msgstr ""
 msgid "Nothing uploaded yet."
 msgstr "Ainda nada carregado."
 
+#: src/postulo/templates/applications/suggestion_list.html:119
 #: src/postulo/templates/jobs/capture_list.html:62
 #, draft
 msgid "Nothing waiting"
@@ -3895,7 +3988,7 @@ msgstr "Oferta recebida"
 msgid "Offers"
 msgstr "Ofertas"
 
-#: src/postulo/templates/core/dashboard.html:51
+#: src/postulo/templates/core/dashboard.html:66
 #, draft
 msgid "Offers on the table"
 msgstr "Ofertas em cima da mesa"
@@ -3909,6 +4002,11 @@ msgstr "com mais de uma semana"
 #, draft
 msgid "On site"
 msgstr "Presencial"
+
+#: src/postulo/templates/applications/suggestion_list.html:89
+#, draft
+msgid "On the timeline"
+msgstr "Na cronologia"
 
 #: src/postulo/templates/settings/account.html:65
 #, draft
@@ -3989,7 +4087,7 @@ msgid "Only what is still live. Settled applications live in the table."
 msgstr ""
 "Apenas o que ainda está ativo. As candidaturas resolvidas estão na tabela."
 
-#: src/postulo/templates/core/dashboard.html:125
+#: src/postulo/templates/core/dashboard.html:140
 #, python-format, draft
 msgid ""
 "Open applications with nothing for %(days)s days and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
@@ -4077,6 +4175,7 @@ msgstr "Visão geral"
 msgid "owner"
 msgstr "proprietário"
 
+#: src/postulo/templates/applications/suggestion_list.html:107
 #: src/postulo/templates/jobs/listing_list.html:149
 #: src/postulo/templates/partials/table/pagination.html:11
 #, python-format, draft
@@ -4088,6 +4187,7 @@ msgstr "Página %(current)s de %(total)s"
 msgid "Page source"
 msgstr "Código-fonte da página"
 
+#: src/postulo/templates/applications/suggestion_list.html:102
 #: src/postulo/templates/jobs/listing_list.html:143
 #: src/postulo/templates/partials/table/pagination.html:3
 #, draft
@@ -4374,6 +4474,7 @@ msgstr "atual"
 msgid "Preview"
 msgstr "Pré-visualizar"
 
+#: src/postulo/templates/applications/suggestion_list.html:104
 #: src/postulo/templates/jobs/listing_list.html:146
 #: src/postulo/templates/partials/table/pagination.html:8
 #, draft
@@ -4508,7 +4609,7 @@ msgid_plural "Quiet for %(days)s days"
 msgstr[0] "Em silêncio há %(days)s dia"
 msgstr[1] "Em silêncio há %(days)s dias"
 
-#: src/postulo/templates/core/dashboard.html:89
+#: src/postulo/templates/core/dashboard.html:104
 #, python-format, draft
 msgid "quiet for %(days)s day"
 msgid_plural "quiet for %(days)s days"
@@ -4564,7 +4665,7 @@ msgstr "Ler a página"
 msgid "Real estate"
 msgstr "Imobiliário"
 
-#: src/postulo/templates/core/dashboard.html:139
+#: src/postulo/templates/core/dashboard.html:154
 #, draft
 msgid "Recent activity"
 msgstr "Atividade recente"
@@ -4580,7 +4681,7 @@ msgstr "Registar"
 #: src/postulo/templates/applications/application_list.html:49
 #: src/postulo/templates/applications/application_list.html:70
 #: src/postulo/templates/applications/insights.html:24
-#: src/postulo/templates/core/dashboard.html:35
+#: src/postulo/templates/core/dashboard.html:50
 #, draft
 msgid "Record an application"
 msgstr "Registar uma candidatura"
@@ -4613,12 +4714,12 @@ msgstr "Registar o que enviou"
 msgid "Recorded"
 msgstr "Registado"
 
-#: src/postulo/applications/views.py:525
+#: src/postulo/applications/views.py:526
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Registada como cancelada."
 
-#: src/postulo/applications/views.py:524
+#: src/postulo/applications/views.py:525
 #, draft
 msgid "Recorded as held."
 msgstr "Registada como realizada."
@@ -4638,7 +4739,7 @@ msgstr "registado em"
 msgid "Recorded what you sent."
 msgstr "Registado o que enviou."
 
-#: src/postulo/applications/views.py:526
+#: src/postulo/applications/views.py:527
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Registado: ninguém compareceu."
@@ -4816,6 +4917,11 @@ msgstr "Rever"
 #, draft
 msgid "Review the capture"
 msgstr "Rever a captura"
+
+#: src/postulo/applications/models.py:614
+#, draft
+msgid "reviewed on"
+msgstr "revista em"
 
 #: src/postulo/templates/accounts/invite_list.html:58
 #: src/postulo/templates/api/token_list.html:81
@@ -5046,7 +5152,7 @@ msgstr ""
 msgid "See the applications"
 msgstr "Ver as candidaturas"
 
-#: src/postulo/templates/core/dashboard.html:252
+#: src/postulo/templates/core/dashboard.html:267
 #, draft
 msgid "See the board"
 msgstr "Ver o quadro"
@@ -5192,7 +5298,7 @@ msgstr "Secções das definições"
 msgid "Settled"
 msgstr "Resolvida"
 
-#: src/postulo/templates/core/dashboard.html:249
+#: src/postulo/templates/core/dashboard.html:264
 #, draft
 msgid "Shortcuts"
 msgstr "Atalhos"
@@ -5213,6 +5319,7 @@ msgstr "Pré-selecionada"
 msgid "Shortlisted."
 msgstr "Pré-selecionada."
 
+#: src/postulo/templates/applications/suggestion_list.html:21
 #: src/postulo/templates/jobs/capture_list.html:18
 #, draft
 msgid "Show all"
@@ -5326,12 +5433,12 @@ msgstr "Mais lento"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/templates/core/dashboard.html:108
+#: src/postulo/templates/core/dashboard.html:123
 #, draft
 msgid "Snooze"
 msgstr "Adiar"
 
-#: src/postulo/applications/views.py:407
+#: src/postulo/applications/views.py:408
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Adiada por duas semanas."
@@ -5400,7 +5507,8 @@ msgstr "Estado"
 msgid "Status"
 msgstr "Estado"
 
-#: src/postulo/applications/models.py:197 src/postulo/documents/models.py:348
+#: src/postulo/applications/models.py:197
+#: src/postulo/applications/models.py:604 src/postulo/documents/models.py:348
 #: src/postulo/jobs/models.py:552
 #, draft
 msgid "status"
@@ -5416,14 +5524,14 @@ msgstr "Mudança de estado"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Estado na folha de cálculo: %(text)s"
 
-#: src/postulo/applications/views.py:282
+#: src/postulo/applications/views.py:283
 #, draft
 msgid "Status updated."
 msgstr "Estado atualizado."
 
 #: src/postulo/templates/applications/insights.html:239
 #: src/postulo/templates/applications/partials/filters.html:26
-#: src/postulo/templates/core/dashboard.html:43
+#: src/postulo/templates/core/dashboard.html:58
 #, draft
 msgid "Still live"
 msgstr "Ainda ativa"
@@ -5447,6 +5555,32 @@ msgstr "Forte"
 #, draft
 msgid "subject"
 msgstr "assunto"
+
+#: src/postulo/applications/models.py:584
+#, draft
+msgid "suggested by"
+msgstr "sugerida por"
+
+#: src/postulo/applications/models.py:592
+#, draft
+msgid "suggested status"
+msgstr "estado sugerido"
+
+#: src/postulo/applications/models.py:619
+#, draft
+msgid "suggestion"
+msgstr "sugestão"
+
+#: src/postulo/applications/models.py:620
+#, draft
+msgid "suggestions"
+msgstr "sugestões"
+
+#: src/postulo/templates/applications/suggestion_list.html:4
+#: src/postulo/templates/applications/suggestion_list.html:9
+#, draft
+msgid "Suggestions"
+msgstr "Sugestões"
 
 #: src/postulo/applications/models.py:319 src/postulo/documents/models.py:63
 #: src/postulo/resume/models.py:60 src/postulo/resume/models.py:143
@@ -5613,7 +5747,7 @@ msgstr "Isso não parece um identificador %(scheme)s (por exemplo %(example)s)."
 msgid "That does not look like a complete web address."
 msgstr "Isso não parece um endereço web completo."
 
-#: src/postulo/applications/views.py:313
+#: src/postulo/applications/views.py:314
 #, draft
 msgid "That entry could not be saved."
 msgstr "Não foi possível guardar essa entrada."
@@ -5633,17 +5767,17 @@ msgstr "Não foi possível resolver esse nome de anfitrião."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Esse convite já foi aceite e não pode ser revogado."
 
-#: src/postulo/applications/views.py:284
+#: src/postulo/applications/views.py:285
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Isso não é um estado que o Postulo reconheça."
 
-#: src/postulo/applications/views.py:518
+#: src/postulo/applications/views.py:519
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Isso não é um resultado que o Postulo reconheça."
 
-#: src/postulo/applications/views.py:409
+#: src/postulo/applications/views.py:410
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Isso não é algo que o Postulo possa fazer com ela."
@@ -5688,6 +5822,11 @@ msgstr "Essa imagem tem mais de 5 MB. Uma mais pequena, por favor."
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Esse plugin já não está instalado."
+
+#: src/postulo/applications/views.py:645
+#, draft
+msgid "That suggestion has already been answered."
+msgstr "Essa sugestão já foi respondida."
 
 #: src/postulo/documents/pdf.py:148
 #, python-format, draft
@@ -6012,6 +6151,11 @@ msgstr "fuso horário"
 msgid "Time zone for new accounts"
 msgstr "Fuso horário para novas contas"
 
+#: src/postulo/applications/models.py:612
+#, draft
+msgid "timeline entry"
+msgstr "entrada da cronologia"
+
 #: src/postulo/templates/server/capture.html:14
 #, draft
 msgid "Timeout"
@@ -6329,7 +6473,7 @@ msgstr "via %(actor)s"
 msgid "Video call"
 msgstr "Videochamada"
 
-#: src/postulo/jobs/models.py:522
+#: src/postulo/applications/models.py:542 src/postulo/jobs/models.py:522
 #, draft
 msgid "Waiting for review"
 msgstr "À espera de revisão"
@@ -6338,6 +6482,11 @@ msgstr "À espera de revisão"
 #, draft
 msgid "Waiting on a reply"
 msgstr "À espera de resposta"
+
+#: src/postulo/templates/applications/suggestion_list.html:19
+#, draft
+msgid "Waiting only"
+msgstr "Só as que esperam"
 
 #: src/postulo/documents/models.py:304
 #, draft
@@ -6372,7 +6521,7 @@ msgstr "sítio web"
 msgid "Website"
 msgstr "Sítio web"
 
-#: src/postulo/templates/core/dashboard.html:22
+#: src/postulo/templates/core/dashboard.html:37
 #, python-format, draft
 msgid "Welcome back, %(name)s"
 msgstr "Bem-vindo de volta, %(name)s"
@@ -6424,6 +6573,11 @@ msgstr "O que está neste CV"
 msgid "What it may do"
 msgstr "O que pode fazer"
 
+#: src/postulo/applications/models.py:588
+#, draft
+msgid "what it says"
+msgstr "o que diz"
+
 #: src/postulo/templates/settings/locale.html:7
 #, draft
 msgid "What Postulo speaks to you, and whose clock it shows."
@@ -6433,6 +6587,13 @@ msgstr "O idioma em que o Postulo lhe fala, e o relógio que mostra."
 #, draft
 msgid "What the identifier is, when the scheme is Other."
 msgstr "O que é o identificador, quando o esquema é Outro."
+
+#: src/postulo/templates/applications/suggestion_list.html:11
+#, draft
+msgid ""
+"What the plugins that read for you think happened. Nothing here is in your record until you say so."
+msgstr ""
+"O que os plugins que leem por si acham que aconteceu. Nada disto entra no seu registo enquanto não o disser."
 
 #: src/postulo/templates/server/defaults.html:7
 #, draft
@@ -6478,6 +6639,11 @@ msgstr "quando"
 msgid "When"
 msgstr "Quando"
 
+#: src/postulo/applications/models.py:596
+#, draft
+msgid "When accepting should also move the application."
+msgstr "Quando aceitar também deve mover a candidatura."
+
 #: src/postulo/jobs/models.py:418
 #, draft
 msgid "When it entered your listings."
@@ -6516,7 +6682,7 @@ msgid "Where you came across it: a job board, a referral, the company site."
 msgstr ""
 "Onde a encontrou: um portal de emprego, uma recomendação, o sítio da empresa."
 
-#: src/postulo/templates/core/dashboard.html:27
+#: src/postulo/templates/core/dashboard.html:42
 #, draft
 msgid "Where your job search stands today."
 msgstr "Em que ponto está hoje a sua procura de emprego."
@@ -6525,6 +6691,11 @@ msgstr "Em que ponto está hoje a sua procura de emprego."
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Se quem encontrar o endereço pode criar uma conta."
+
+#: src/postulo/templates/applications/suggestion_list.html:75
+#, draft
+msgid "Which application?"
+msgstr "Que candidatura?"
 
 #: src/postulo/templates/core/import_csv_map.html:6
 #, draft
@@ -6613,6 +6784,11 @@ msgstr "Regime de trabalho"
 #, draft
 msgid "working arrangement"
 msgstr "regime de trabalho"
+
+#: src/postulo/templates/applications/suggestion_list.html:37
+#, python-format, draft
+msgid "would move it to %(status)s"
+msgstr "mudá-la-ia para %(status)s"
 
 #: src/postulo/templates/documents/letter_list.html:11
 #, draft
@@ -6756,12 +6932,12 @@ msgstr "A sua candidatura"
 msgid "Your career"
 msgstr "A sua carreira"
 
-#: src/postulo/templates/core/dashboard.html:258
+#: src/postulo/templates/core/dashboard.html:273
 #, draft
 msgid "Your career record"
 msgstr "O seu percurso profissional"
 
-#: src/postulo/templates/core/dashboard.html:255
+#: src/postulo/templates/core/dashboard.html:270
 #: src/postulo/templates/resume/overview.html:19
 #, draft
 msgid "Your CVs"
@@ -6782,7 +6958,7 @@ msgstr "O seu prazo"
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
 #: src/postulo/templates/base.html:77
-#: src/postulo/templates/core/dashboard.html:289
+#: src/postulo/templates/core/dashboard.html:304
 #, draft
 msgid "Your details"
 msgstr "Os seus dados"
@@ -6851,7 +7027,7 @@ msgstr "a sua função"
 msgid "Your username has been changed."
 msgstr "O seu nome de utilizador foi alterado."
 
-#: src/postulo/templates/core/dashboard.html:274
+#: src/postulo/templates/core/dashboard.html:289
 #, python-format, draft
 msgid "· %(counter)s closing this week"
 msgid_plural "· %(counter)s closing this week"

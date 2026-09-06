@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 13:08+0000\n"
+"POT-Creation-Date: 2026-09-06 13:29+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -59,7 +59,7 @@ msgstr[1] ""
 msgstr[2] ""
 "%(counter)s administratorių. Paskutinio negalima pašalinti, išjungti ar ištrinti."
 
-#: src/postulo/templates/core/dashboard.html:67
+#: src/postulo/templates/core/dashboard.html:82
 #, python-format, draft
 msgid "%(counter)s application"
 msgid_plural "All %(counter)s"
@@ -91,7 +91,7 @@ msgstr[0] "%(counter)s failas, %(size)s"
 msgstr[1] "%(counter)s failai, %(size)s"
 msgstr[2] "%(counter)s failų, %(size)s"
 
-#: src/postulo/templates/core/dashboard.html:205
+#: src/postulo/templates/core/dashboard.html:220
 #, python-format, draft
 msgid "%(counter)s interview has passed without an outcome. How did it go?"
 msgid_plural "%(counter)s interviews have passed without an outcome. How did they go?"
@@ -99,7 +99,7 @@ msgstr[0] "%(counter)s pokalbis praėjo be rezultato. Kaip sekėsi?"
 msgstr[1] "%(counter)s pokalbiai praėjo be rezultato. Kaip sekėsi?"
 msgstr[2] "%(counter)s pokalbių praėjo be rezultato. Kaip sekėsi?"
 
-#: src/postulo/templates/core/dashboard.html:267
+#: src/postulo/templates/core/dashboard.html:282
 #, python-format, draft
 msgid "%(counter)s listing to decide on"
 msgid_plural "%(counter)s listings to decide on"
@@ -345,6 +345,26 @@ msgid ""
 msgstr ""
 "Paketas registruoja šaltinį <code>%(group)s</code> įėjimo taškų grupėje ir yra aptinkamas kitą kartą paleidžiant. Neįkeliamas šaltinis registruojamas žurnale ir praleidžiamas; įmontuotieji veikia toliau."
 
+#: src/postulo/templates/core/dashboard.html:23
+#, python-format, draft
+msgid ""
+"A plugin has suggested one thing that may have happened: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">look at it</a>."
+msgid_plural ""
+"Plugins have suggested %(counter)s things that may have happened: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">look at them</a>."
+msgstr[0] ""
+"Papildinys pasiūlė vieną dalyką, kuris galbūt įvyko: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">peržiūrėkite jį</a>."
+msgstr[1] ""
+"Papildiniai pasiūlė %(counter)s dalykus, kurie galbūt įvyko: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">peržiūrėkite juos</a>."
+msgstr[2] ""
+"Papildiniai pasiūlė %(counter)s dalykus, kurie galbūt įvyko: <a href=\"%(suggestions_url)s\" class=\"font-medium underline\">peržiūrėkite juos</a>."
+
+#: src/postulo/templates/applications/suggestion_list.html:122
+#, draft
+msgid ""
+"A plugin that reads a mailbox or a calendar for you files what it finds here, and it stays here until you accept or decline it."
+msgstr ""
+"Papildinys, kuris už jus skaito pašto dėžutę ar kalendorių, čia palieka tai, ką randa, ir tai lieka čia, kol priimsite arba atmesite."
+
 #: src/postulo/notifications/base.py:28
 #, draft
 msgid "A posting arrives through the capture API"
@@ -431,7 +451,12 @@ msgstr "A1 — pradedantysis"
 msgid "A2 — elementary"
 msgstr "A2 — elementarus"
 
-#: src/postulo/applications/models.py:46
+#: src/postulo/templates/applications/suggestion_list.html:81
+#, draft
+msgid "Accept"
+msgstr "Priimti"
+
+#: src/postulo/applications/models.py:46 src/postulo/applications/models.py:543
 #: src/postulo/templates/accounts/invite_list.html:38
 #, draft
 msgid "Accepted"
@@ -485,7 +510,7 @@ msgid "Actions"
 msgstr "Veiksmai"
 
 #: src/postulo/templates/applications/application_detail.html:289
-#: src/postulo/templates/core/dashboard.html:217
+#: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:102
 #: src/postulo/templates/resume/overview.html:30
 #, draft
@@ -557,7 +582,7 @@ msgstr "Pridėta"
 msgid "Added %(count)s entries."
 msgstr "Pridėta įrašų: %(count)s."
 
-#: src/postulo/applications/views.py:311
+#: src/postulo/applications/views.py:312 src/postulo/applications/views.py:662
 #, draft
 msgid "Added to the timeline."
 msgstr "Pridėta į laiko juostą."
@@ -605,7 +630,7 @@ msgstr[2] "Visi %(counter)s grupėje %(label)s"
 msgid "All documents"
 msgstr "Visi dokumentai"
 
-#: src/postulo/templates/core/dashboard.html:172
+#: src/postulo/templates/core/dashboard.html:187
 #, draft
 msgid "All interviews"
 msgstr "Visi pokalbiai"
@@ -704,13 +729,15 @@ msgstr "Išvaizda"
 #: src/postulo/applications/models.py:236
 #: src/postulo/applications/models.py:315
 #: src/postulo/applications/models.py:365
-#: src/postulo/applications/models.py:460 src/postulo/applications/tables.py:15
+#: src/postulo/applications/models.py:460
+#: src/postulo/applications/models.py:581 src/postulo/applications/tables.py:15
 #: src/postulo/documents/models.py:267 src/postulo/jobs/models.py:569
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
 msgstr "paraiška"
 
+#: src/postulo/templates/applications/suggestion_list.html:73
 #: src/postulo/templates/jobs/capture_list.html:51
 #: src/postulo/templates/jobs/listing_list.html:130
 #, draft
@@ -722,7 +749,7 @@ msgstr "Paraiška"
 msgid "Application created"
 msgstr "Paraiška sukurta"
 
-#: src/postulo/applications/views.py:264
+#: src/postulo/applications/views.py:265
 #, draft
 msgid "Application deleted."
 msgstr "Paraiška ištrinta."
@@ -732,12 +759,12 @@ msgstr "Paraiška ištrinta."
 msgid "Application recorded from the capture."
 msgstr "Paraiška įrašyta iš fiksavimo."
 
-#: src/postulo/applications/views.py:230 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:231 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Paraiška įrašyta."
 
-#: src/postulo/applications/views.py:254
+#: src/postulo/applications/views.py:255
 #, draft
 msgid "Application updated."
 msgstr "Paraiška atnaujinta."
@@ -791,7 +818,7 @@ msgstr "Paraiškos su laiko juostomis"
 msgid "Applied"
 msgstr "Pateikta"
 
-#: src/postulo/templates/core/dashboard.html:55
+#: src/postulo/templates/core/dashboard.html:70
 #, draft
 msgid "Applied in the last 30 days"
 msgstr "Pateikta per pastarąsias 30 dienų"
@@ -1041,7 +1068,7 @@ msgstr "Fiksuoti"
 msgid "capture"
 msgstr "fiksavimas"
 
-#: src/postulo/templates/core/dashboard.html:32
+#: src/postulo/templates/core/dashboard.html:47
 #: src/postulo/templates/jobs/capture_form.html:4
 #: src/postulo/templates/jobs/capture_form.html:8
 #: src/postulo/templates/jobs/capture_list.html:20
@@ -1173,7 +1200,7 @@ msgid ""
 msgstr ""
 "Čia padaryti pakeitimai išsiunčiami per kitą vykdymą; tada perskaitoma ir kita pusė."
 
-#: src/postulo/applications/views.py:399
+#: src/postulo/applications/views.py:400
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Priminti %(company)s apie %(role)s"
@@ -1197,6 +1224,11 @@ msgstr "Pasirinkite bent vieną dokumentą įrašymui."
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Pasirinkite, kokios rūšies tai identifikatorius."
+
+#: src/postulo/applications/views.py:658
+#, draft
+msgid "Choose which application this is about first."
+msgstr "Pirmiausia pasirinkite, su kuria paraiška tai susiję."
 
 #: src/postulo/accounts/models.py:179
 #, draft
@@ -1279,7 +1311,7 @@ msgstr "Stulpeliai"
 msgid "Columns saved."
 msgstr "Stulpeliai išsaugoti."
 
-#: src/postulo/templates/core/dashboard.html:170
+#: src/postulo/templates/core/dashboard.html:185
 #, draft
 msgid "Coming up"
 msgstr "Artėja"
@@ -1307,7 +1339,7 @@ msgstr "Įmonės ir kontaktai"
 msgid "Companies created"
 msgstr "Sukurtos įmonės"
 
-#: src/postulo/templates/core/dashboard.html:261
+#: src/postulo/templates/core/dashboard.html:276
 #, draft
 msgid "Companies you have applied to"
 msgstr "Įmonės, į kurias teikėte paraiškas"
@@ -1460,6 +1492,11 @@ msgstr "Kontaktų blokas"
 #, draft
 msgid "contacts"
 msgstr "kontaktai"
+
+#: src/postulo/applications/models.py:601
+#, draft
+msgid "context"
+msgstr "kontekstas"
 
 #: src/postulo/jobs/models.py:262
 #, draft
@@ -1620,6 +1657,16 @@ msgstr "Duomenų bazė"
 msgid "Date applied"
 msgstr "Paraiškos data"
 
+#: src/postulo/applications/models.py:599
+#, draft
+msgid "dates offered"
+msgstr "pasiūlytos datos"
+
+#: src/postulo/templates/applications/suggestion_list.html:61
+#, draft
+msgid "Dates offered:"
+msgstr "Pasiūlytos datos:"
+
 #: src/postulo/templates/core/import_csv_map.html:44
 #, draft
 msgid "Dates written as"
@@ -1665,6 +1712,21 @@ msgstr "Terminas"
 #, draft
 msgid "decided on"
 msgstr "nuspręsta"
+
+#: src/postulo/templates/applications/suggestion_list.html:85
+#, draft
+msgid "Decline"
+msgstr "Atmesti"
+
+#: src/postulo/applications/models.py:544
+#, draft
+msgid "Declined"
+msgstr "Atmesta"
+
+#: src/postulo/applications/views.py:650
+#, draft
+msgid "Declined. It will not be suggested again."
+msgstr "Atmesta. Daugiau nebus siūloma."
 
 #: src/postulo/core/models.py:127
 #, draft
@@ -1739,6 +1801,11 @@ msgstr "Aprašymas"
 #, draft
 msgid "description"
 msgstr "aprašymas"
+
+#: src/postulo/applications/models.py:589
+#, draft
+msgid "detail"
+msgstr "detalė"
 
 #: src/postulo/applications/models.py:320
 #, draft
@@ -1815,7 +1882,7 @@ msgstr "Dokumentai, kuriuos jau turėjote. Niekas čia nėra viešai pateikiama.
 
 #: src/postulo/templates/applications/application_detail.html:305
 #: src/postulo/templates/applications/reminder_list.html:45
-#: src/postulo/templates/core/dashboard.html:235
+#: src/postulo/templates/core/dashboard.html:250
 #, draft
 msgid "Done"
 msgstr "Atlikta"
@@ -1855,7 +1922,7 @@ msgstr "Atsisiųsti šabloną"
 msgid "Draft"
 msgstr "Juodraštis"
 
-#: src/postulo/templates/core/dashboard.html:215
+#: src/postulo/templates/core/dashboard.html:230
 #, draft
 msgid "Due now"
 msgstr "Sueina dabar"
@@ -1972,6 +2039,11 @@ msgstr "Tuščia"
 #, draft
 msgid "Empty capture"
 msgstr "Tuščias fiksavimas"
+
+#: src/postulo/applications/models.py:582
+#, draft
+msgid "Empty when the source could not tell which application it is about."
+msgstr "Tuščia, kai šaltinis negalėjo nustatyti, su kuria paraiška tai susiję."
 
 #: src/postulo/plugins/models.py:47
 #, draft
@@ -2147,7 +2219,7 @@ msgstr "baigia galioti"
 
 #: src/postulo/templates/applications/insights.html:14
 #: src/postulo/templates/base.html:88
-#: src/postulo/templates/core/dashboard.html:283
+#: src/postulo/templates/core/dashboard.html:298
 #: src/postulo/templates/core/export.html:8
 #, draft
 msgid "Export everything"
@@ -2278,13 +2350,13 @@ msgstr "Pirma reikšmė"
 msgid "First, take everything with you"
 msgstr "Pirmiausia pasiimkite viską su savimi"
 
-#: src/postulo/applications/views.py:393
+#: src/postulo/applications/views.py:394
 #, draft
 msgid "Follow-up recorded."
 msgstr "Priminimas įrašytas."
 
-#: src/postulo/applications/models.py:283 src/postulo/applications/views.py:390
-#: src/postulo/templates/core/dashboard.html:101
+#: src/postulo/applications/models.py:283 src/postulo/applications/views.py:391
+#: src/postulo/templates/core/dashboard.html:116
 #, draft
 msgid "Followed up"
 msgstr "Priminta"
@@ -2401,7 +2473,7 @@ msgstr "Gauti"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/applications/insights.html:251
-#: src/postulo/templates/core/dashboard.html:116
+#: src/postulo/templates/core/dashboard.html:131
 #, draft
 msgid "Ghosted"
 msgstr "Be atsakymo"
@@ -2424,7 +2496,7 @@ msgid "Go back"
 msgstr "Grįžti"
 
 #: src/postulo/templates/applications/partials/filters.html:43
-#: src/postulo/templates/core/dashboard.html:64
+#: src/postulo/templates/core/dashboard.html:79
 #: src/postulo/templates/settings/appearance.html:27
 #, draft
 msgid "Gone quiet"
@@ -2487,6 +2559,11 @@ msgid ""
 "Group related skills under a heading, such as “Languages” or “Infrastructure”."
 msgstr ""
 "Susijusius įgūdžius grupuokite po antrašte, pvz., „Kalbos“ arba „Infrastruktūra“."
+
+#: src/postulo/applications/models.py:590
+#, draft
+msgid "happened"
+msgstr "įvyko"
 
 #: src/postulo/applications/models.py:318
 #, draft
@@ -2613,6 +2690,11 @@ msgstr "identifikatorius"
 msgid "Identifier"
 msgstr "Identifikatorius"
 
+#: src/postulo/applications/models.py:585
+#, draft
+msgid "identifier at the source"
+msgstr "identifikatorius šaltinyje"
+
 #: src/postulo/templates/jobs/company_form.html:49
 #, draft
 msgid "Identifiers"
@@ -2691,7 +2773,7 @@ msgstr "Po 90 dienų"
 msgid "In a year"
 msgstr "Po metų"
 
-#: src/postulo/templates/core/dashboard.html:47
+#: src/postulo/templates/core/dashboard.html:62
 #, draft
 msgid "In conversation"
 msgstr "Bendraujama"
@@ -2764,7 +2846,7 @@ msgstr "Informacinės technologijos"
 #: src/postulo/templates/applications/insights.html:4
 #: src/postulo/templates/applications/insights.html:9
 #: src/postulo/templates/base.html:41
-#: src/postulo/templates/core/dashboard.html:264
+#: src/postulo/templates/core/dashboard.html:279
 #, draft
 msgid "Insights"
 msgstr "Įžvalgos"
@@ -2811,7 +2893,7 @@ msgstr "pokalbis"
 msgid "Interview cancelled"
 msgstr "Pokalbis atšauktas"
 
-#: src/postulo/applications/views.py:472
+#: src/postulo/applications/views.py:473
 #, draft
 msgid "Interview recorded."
 msgstr "Pokalbis įrašytas."
@@ -2821,7 +2903,7 @@ msgstr "Pokalbis įrašytas."
 msgid "Interview scheduled"
 msgstr "Pokalbis suplanuotas"
 
-#: src/postulo/applications/views.py:474
+#: src/postulo/applications/views.py:475
 #, draft
 msgid "Interview scheduled."
 msgstr "Pokalbis suplanuotas."
@@ -2831,7 +2913,7 @@ msgstr "Pokalbis suplanuotas."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Pokalbis rytoj: %(kind)s, %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:504
+#: src/postulo/applications/views.py:505
 #, draft
 msgid "Interview updated."
 msgstr "Pokalbis atnaujintas."
@@ -2946,7 +3028,8 @@ msgid "Join the call"
 msgstr "Prisijungti prie skambučio"
 
 #: src/postulo/applications/models.py:317
-#: src/postulo/applications/models.py:463 src/postulo/documents/models.py:208
+#: src/postulo/applications/models.py:463
+#: src/postulo/applications/models.py:587 src/postulo/documents/models.py:208
 #: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:37
 #, draft
 msgid "kind"
@@ -3218,7 +3301,7 @@ msgstr "Padaryti administratoriumi"
 msgid "Manage"
 msgstr "Tvarkyti"
 
-#: src/postulo/templates/core/dashboard.html:286
+#: src/postulo/templates/core/dashboard.html:301
 #, draft
 msgid "Manage tags"
 msgstr "Tvarkyti žymas"
@@ -3233,7 +3316,7 @@ msgstr "Gamyba"
 msgid "Map a column to Company and one to Role first."
 msgstr "Pirmiausia priskirkite vieną stulpelį Įmonei, o kitą Pareigoms."
 
-#: src/postulo/applications/views.py:366
+#: src/postulo/applications/views.py:367
 #, draft
 msgid "Marked as done."
 msgstr "Pažymėta kaip atlikta."
@@ -3455,6 +3538,7 @@ msgstr "Naujas žetonas"
 msgid "Newest backup"
 msgstr "Naujausia atsarginė kopija"
 
+#: src/postulo/templates/applications/suggestion_list.html:112
 #: src/postulo/templates/jobs/listing_list.html:155
 #: src/postulo/templates/partials/table/pagination.html:19
 #, draft
@@ -3535,7 +3619,7 @@ msgid ""
 msgstr ""
 "Nė vienam įdiegtam papildiniui ryšio nereikia. Pranešėjai, dokumentų saugyklos ir sinchronizavimo papildiniai atsiras čia, kai operatorius juos įdiegs."
 
-#: src/postulo/templates/core/dashboard.html:199
+#: src/postulo/templates/core/dashboard.html:214
 #, draft
 msgid "No interviews in the diary."
 msgstr "Dienoraštyje pokalbių nėra."
@@ -3578,6 +3662,11 @@ msgstr "nėra pareigų"
 #, draft
 msgid "No skills in this group yet"
 msgstr "Šioje grupėje įgūdžių dar nėra"
+
+#: src/postulo/templates/applications/suggestion_list.html:119
+#, draft
+msgid "No suggestions yet"
+msgstr "Pasiūlymų dar nėra"
 
 #: src/postulo/templates/applications/tag_list.html:40
 #, draft
@@ -3656,6 +3745,11 @@ msgstr "Ne man"
 msgid "Not found"
 msgstr "Nerasta"
 
+#: src/postulo/templates/applications/suggestion_list.html:50
+#, draft
+msgid "Not matched to an application."
+msgstr "Nesusieta su paraiška."
+
 #: src/postulo/applications/analytics.py:296
 #: src/postulo/applications/analytics.py:314
 #, draft
@@ -3715,12 +3809,12 @@ msgstr "Pastabos"
 msgid "notes"
 msgstr "pastabos"
 
-#: src/postulo/templates/core/dashboard.html:244
+#: src/postulo/templates/core/dashboard.html:259
 #, draft
 msgid "Nothing due."
 msgstr "Niekas nesueina."
 
-#: src/postulo/templates/core/dashboard.html:132
+#: src/postulo/templates/core/dashboard.html:147
 #, python-format, draft
 msgid ""
 "Nothing has gone quiet for %(days)s days. Either you are on top of it, or it is time to send out a few more."
@@ -3787,7 +3881,7 @@ msgstr "Apie šią paraišką dar nieko neįrašyta."
 
 #: src/postulo/templates/applications/application_detail.html:195
 #: src/postulo/templates/applications/insights.html:229
-#: src/postulo/templates/core/dashboard.html:163
+#: src/postulo/templates/core/dashboard.html:178
 #, draft
 msgid "Nothing recorded yet."
 msgstr "Dar nieko neįrašyta."
@@ -3851,6 +3945,7 @@ msgstr ""
 msgid "Nothing uploaded yet."
 msgstr "Dar nieko neįkelta."
 
+#: src/postulo/templates/applications/suggestion_list.html:119
 #: src/postulo/templates/jobs/capture_list.html:62
 #, draft
 msgid "Nothing waiting"
@@ -3906,7 +4001,7 @@ msgstr "Gautas pasiūlymas"
 msgid "Offers"
 msgstr "Pasiūlymai"
 
-#: src/postulo/templates/core/dashboard.html:51
+#: src/postulo/templates/core/dashboard.html:66
 #, draft
 msgid "Offers on the table"
 msgstr "Pasiūlymai ant stalo"
@@ -3920,6 +4015,11 @@ msgstr "senesni nei savaitės"
 #, draft
 msgid "On site"
 msgstr "Vietoje"
+
+#: src/postulo/templates/applications/suggestion_list.html:89
+#, draft
+msgid "On the timeline"
+msgstr "Laiko juostoje"
 
 #: src/postulo/templates/settings/account.html:65
 #, draft
@@ -4001,7 +4101,7 @@ msgstr "Fiksuoti galima tik http ir https adresus."
 msgid "Only what is still live. Settled applications live in the table."
 msgstr "Tik tai, kas dar gyva. Išspręstos paraiškos yra lentelėje."
 
-#: src/postulo/templates/core/dashboard.html:125
+#: src/postulo/templates/core/dashboard.html:140
 #, python-format, draft
 msgid ""
 "Open applications with nothing for %(days)s days and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
@@ -4089,6 +4189,7 @@ msgstr "Apžvalga"
 msgid "owner"
 msgstr "savininkas"
 
+#: src/postulo/templates/applications/suggestion_list.html:107
 #: src/postulo/templates/jobs/listing_list.html:149
 #: src/postulo/templates/partials/table/pagination.html:11
 #, python-format, draft
@@ -4100,6 +4201,7 @@ msgstr "Puslapis %(current)s iš %(total)s"
 msgid "Page source"
 msgstr "Puslapio šaltinis"
 
+#: src/postulo/templates/applications/suggestion_list.html:102
 #: src/postulo/templates/jobs/listing_list.html:143
 #: src/postulo/templates/partials/table/pagination.html:3
 #, draft
@@ -4386,6 +4488,7 @@ msgstr "iki dabar"
 msgid "Preview"
 msgstr "Peržiūra"
 
+#: src/postulo/templates/applications/suggestion_list.html:104
 #: src/postulo/templates/jobs/listing_list.html:146
 #: src/postulo/templates/partials/table/pagination.html:8
 #, draft
@@ -4521,7 +4624,7 @@ msgstr[0] "Tylu %(days)s dieną"
 msgstr[1] "Tylu %(days)s dienas"
 msgstr[2] "Tylu %(days)s dienų"
 
-#: src/postulo/templates/core/dashboard.html:89
+#: src/postulo/templates/core/dashboard.html:104
 #, python-format, draft
 msgid "quiet for %(days)s day"
 msgid_plural "quiet for %(days)s days"
@@ -4578,7 +4681,7 @@ msgstr "Skaityti puslapį"
 msgid "Real estate"
 msgstr "Nekilnojamasis turtas"
 
-#: src/postulo/templates/core/dashboard.html:139
+#: src/postulo/templates/core/dashboard.html:154
 #, draft
 msgid "Recent activity"
 msgstr "Naujausia veikla"
@@ -4594,7 +4697,7 @@ msgstr "Įrašyti"
 #: src/postulo/templates/applications/application_list.html:49
 #: src/postulo/templates/applications/application_list.html:70
 #: src/postulo/templates/applications/insights.html:24
-#: src/postulo/templates/core/dashboard.html:35
+#: src/postulo/templates/core/dashboard.html:50
 #, draft
 msgid "Record an application"
 msgstr "Įrašyti paraišką"
@@ -4627,12 +4730,12 @@ msgstr "Įrašyti, ką išsiuntėte"
 msgid "Recorded"
 msgstr "Įrašyta"
 
-#: src/postulo/applications/views.py:525
+#: src/postulo/applications/views.py:526
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Įrašyta kaip atšaukta."
 
-#: src/postulo/applications/views.py:524
+#: src/postulo/applications/views.py:525
 #, draft
 msgid "Recorded as held."
 msgstr "Įrašyta kaip įvykusi."
@@ -4652,7 +4755,7 @@ msgstr "įrašyta"
 msgid "Recorded what you sent."
 msgstr "Įrašyta, ką išsiuntėte."
 
-#: src/postulo/applications/views.py:526
+#: src/postulo/applications/views.py:527
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Įrašyta: niekas neatvyko."
@@ -4830,6 +4933,11 @@ msgstr "Peržiūrėti"
 #, draft
 msgid "Review the capture"
 msgstr "Peržiūrėti fiksavimą"
+
+#: src/postulo/applications/models.py:614
+#, draft
+msgid "reviewed on"
+msgstr "peržiūrėta"
 
 #: src/postulo/templates/accounts/invite_list.html:58
 #: src/postulo/templates/api/token_list.html:81
@@ -5060,7 +5168,7 @@ msgstr ""
 msgid "See the applications"
 msgstr "Žiūrėti paraiškas"
 
-#: src/postulo/templates/core/dashboard.html:252
+#: src/postulo/templates/core/dashboard.html:267
 #, draft
 msgid "See the board"
 msgstr "Žiūrėti lentą"
@@ -5206,7 +5314,7 @@ msgstr "Nustatymų skiltys"
 msgid "Settled"
 msgstr "Išspręsta"
 
-#: src/postulo/templates/core/dashboard.html:249
+#: src/postulo/templates/core/dashboard.html:264
 #, draft
 msgid "Shortcuts"
 msgstr "Spartieji klavišai"
@@ -5227,6 +5335,7 @@ msgstr "Trumpajame sąraše"
 msgid "Shortlisted."
 msgstr "Įtraukta į trumpąjį sąrašą."
 
+#: src/postulo/templates/applications/suggestion_list.html:21
 #: src/postulo/templates/jobs/capture_list.html:18
 #, draft
 msgid "Show all"
@@ -5340,12 +5449,12 @@ msgstr "Lėčiausias"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/templates/core/dashboard.html:108
+#: src/postulo/templates/core/dashboard.html:123
 #, draft
 msgid "Snooze"
 msgstr "Atidėti"
 
-#: src/postulo/applications/views.py:407
+#: src/postulo/applications/views.py:408
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Atidėta dviem savaitėms."
@@ -5414,7 +5523,8 @@ msgstr "Būklė"
 msgid "Status"
 msgstr "Būsena"
 
-#: src/postulo/applications/models.py:197 src/postulo/documents/models.py:348
+#: src/postulo/applications/models.py:197
+#: src/postulo/applications/models.py:604 src/postulo/documents/models.py:348
 #: src/postulo/jobs/models.py:552
 #, draft
 msgid "status"
@@ -5430,14 +5540,14 @@ msgstr "Būsenos pokytis"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Būsena skaičiuoklėje: %(text)s"
 
-#: src/postulo/applications/views.py:282
+#: src/postulo/applications/views.py:283
 #, draft
 msgid "Status updated."
 msgstr "Būsena atnaujinta."
 
 #: src/postulo/templates/applications/insights.html:239
 #: src/postulo/templates/applications/partials/filters.html:26
-#: src/postulo/templates/core/dashboard.html:43
+#: src/postulo/templates/core/dashboard.html:58
 #, draft
 msgid "Still live"
 msgstr "Vis dar gyva"
@@ -5461,6 +5571,32 @@ msgstr "Stiprus"
 #, draft
 msgid "subject"
 msgstr "tema"
+
+#: src/postulo/applications/models.py:584
+#, draft
+msgid "suggested by"
+msgstr "pasiūlė"
+
+#: src/postulo/applications/models.py:592
+#, draft
+msgid "suggested status"
+msgstr "siūloma būsena"
+
+#: src/postulo/applications/models.py:619
+#, draft
+msgid "suggestion"
+msgstr "pasiūlymas"
+
+#: src/postulo/applications/models.py:620
+#, draft
+msgid "suggestions"
+msgstr "pasiūlymai"
+
+#: src/postulo/templates/applications/suggestion_list.html:4
+#: src/postulo/templates/applications/suggestion_list.html:9
+#, draft
+msgid "Suggestions"
+msgstr "Pasiūlymai"
 
 #: src/postulo/applications/models.py:319 src/postulo/documents/models.py:63
 #: src/postulo/resume/models.py:60 src/postulo/resume/models.py:143
@@ -5627,7 +5763,7 @@ msgstr "Tai nepanašu į %(scheme)s identifikatorių (pavyzdžiui, %(example)s).
 msgid "That does not look like a complete web address."
 msgstr "Tai nepanašu į pilną žiniatinklio adresą."
 
-#: src/postulo/applications/views.py:313
+#: src/postulo/applications/views.py:314
 #, draft
 msgid "That entry could not be saved."
 msgstr "Šio įrašo nepavyko išsaugoti."
@@ -5647,17 +5783,17 @@ msgstr "Nepavyko išspręsti to serverio vardo."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Tas pakvietimas jau priimtas ir negali būti atšauktas."
 
-#: src/postulo/applications/views.py:284
+#: src/postulo/applications/views.py:285
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Tai ne būsena, kurią Postulo atpažįsta."
 
-#: src/postulo/applications/views.py:518
+#: src/postulo/applications/views.py:519
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Tai ne rezultatas, kurį Postulo atpažįsta."
 
-#: src/postulo/applications/views.py:409
+#: src/postulo/applications/views.py:410
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Postulo negali su ja to padaryti."
@@ -5702,6 +5838,11 @@ msgstr "Tas paveikslėlis didesnis nei 5 MB. Prašome mažesnio."
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Tas papildinys nebeįdiegtas."
+
+#: src/postulo/applications/views.py:645
+#, draft
+msgid "That suggestion has already been answered."
+msgstr "Į tą pasiūlymą jau atsakyta."
 
 #: src/postulo/documents/pdf.py:148
 #, python-format, draft
@@ -6026,6 +6167,11 @@ msgstr "laiko juosta"
 msgid "Time zone for new accounts"
 msgstr "Naujų paskyrų laiko juosta"
 
+#: src/postulo/applications/models.py:612
+#, draft
+msgid "timeline entry"
+msgstr "laiko juostos įrašas"
+
 #: src/postulo/templates/server/capture.html:14
 #, draft
 msgid "Timeout"
@@ -6343,7 +6489,7 @@ msgstr "per %(actor)s"
 msgid "Video call"
 msgstr "Vaizdo skambutis"
 
-#: src/postulo/jobs/models.py:522
+#: src/postulo/applications/models.py:542 src/postulo/jobs/models.py:522
 #, draft
 msgid "Waiting for review"
 msgstr "Laukia peržiūros"
@@ -6352,6 +6498,11 @@ msgstr "Laukia peržiūros"
 #, draft
 msgid "Waiting on a reply"
 msgstr "Laukia atsakymo"
+
+#: src/postulo/templates/applications/suggestion_list.html:19
+#, draft
+msgid "Waiting only"
+msgstr "Tik laukiantys"
 
 #: src/postulo/documents/models.py:304
 #, draft
@@ -6386,7 +6537,7 @@ msgstr "svetainė"
 msgid "Website"
 msgstr "Svetainė"
 
-#: src/postulo/templates/core/dashboard.html:22
+#: src/postulo/templates/core/dashboard.html:37
 #, python-format, draft
 msgid "Welcome back, %(name)s"
 msgstr "Sveiki sugrįžę, %(name)s"
@@ -6438,6 +6589,11 @@ msgstr "Kas šiame CV"
 msgid "What it may do"
 msgstr "Ką jis gali"
 
+#: src/postulo/applications/models.py:588
+#, draft
+msgid "what it says"
+msgstr "ką sako"
+
 #: src/postulo/templates/settings/locale.html:7
 #, draft
 msgid "What Postulo speaks to you, and whose clock it shows."
@@ -6447,6 +6603,13 @@ msgstr "Kokia kalba Postulo su jumis kalba ir kieno laikrodį rodo."
 #, draft
 msgid "What the identifier is, when the scheme is Other."
 msgstr "Kas tai per identifikatorius, kai schema yra „Kita“."
+
+#: src/postulo/templates/applications/suggestion_list.html:11
+#, draft
+msgid ""
+"What the plugins that read for you think happened. Nothing here is in your record until you say so."
+msgstr ""
+"Ką už jus skaitantys papildiniai mano, kad įvyko. Nieko iš to jūsų įraše nebus, kol nepasakysite."
 
 #: src/postulo/templates/server/defaults.html:7
 #, draft
@@ -6492,6 +6655,11 @@ msgstr "kada"
 msgid "When"
 msgstr "Kada"
 
+#: src/postulo/applications/models.py:596
+#, draft
+msgid "When accepting should also move the application."
+msgstr "Kai priėmimas turi ir pastumti paraišką."
+
 #: src/postulo/jobs/models.py:418
 #, draft
 msgid "When it entered your listings."
@@ -6529,7 +6697,7 @@ msgstr "Kur ši įmonė skelbia laisvas vietas."
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Kur jį radote: darbo portalas, rekomendacija, įmonės svetainė."
 
-#: src/postulo/templates/core/dashboard.html:27
+#: src/postulo/templates/core/dashboard.html:42
 #, draft
 msgid "Where your job search stands today."
 msgstr "Kur šiandien jūsų darbo paieška."
@@ -6538,6 +6706,11 @@ msgstr "Kur šiandien jūsų darbo paieška."
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Ar kiekvienas, radęs adresą, gali susikurti paskyrą."
+
+#: src/postulo/templates/applications/suggestion_list.html:75
+#, draft
+msgid "Which application?"
+msgstr "Kuri paraiška?"
 
 #: src/postulo/templates/core/import_csv_map.html:6
 #, draft
@@ -6626,6 +6799,11 @@ msgstr "Darbo forma"
 #, draft
 msgid "working arrangement"
 msgstr "darbo forma"
+
+#: src/postulo/templates/applications/suggestion_list.html:37
+#, python-format, draft
+msgid "would move it to %(status)s"
+msgstr "perkeltų ją į %(status)s"
 
 #: src/postulo/templates/documents/letter_list.html:11
 #, draft
@@ -6770,12 +6948,12 @@ msgstr "Jūsų paraiška"
 msgid "Your career"
 msgstr "Jūsų karjera"
 
-#: src/postulo/templates/core/dashboard.html:258
+#: src/postulo/templates/core/dashboard.html:273
 #, draft
 msgid "Your career record"
 msgstr "Jūsų karjeros įrašas"
 
-#: src/postulo/templates/core/dashboard.html:255
+#: src/postulo/templates/core/dashboard.html:270
 #: src/postulo/templates/resume/overview.html:19
 #, draft
 msgid "Your CVs"
@@ -6796,7 +6974,7 @@ msgstr "Jūsų terminas"
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
 #: src/postulo/templates/base.html:77
-#: src/postulo/templates/core/dashboard.html:289
+#: src/postulo/templates/core/dashboard.html:304
 #, draft
 msgid "Your details"
 msgstr "Jūsų duomenys"
@@ -6865,7 +7043,7 @@ msgstr "jūsų pareigos"
 msgid "Your username has been changed."
 msgstr "Jūsų naudotojo vardas pakeistas."
 
-#: src/postulo/templates/core/dashboard.html:274
+#: src/postulo/templates/core/dashboard.html:289
 #, python-format, draft
 msgid "· %(counter)s closing this week"
 msgid_plural "· %(counter)s closing this week"

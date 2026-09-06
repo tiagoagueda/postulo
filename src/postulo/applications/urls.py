@@ -20,6 +20,12 @@ urlpatterns = [
     path(
         "reminders/<int:pk>/done/", views.ReminderCompleteView.as_view(), name="reminder_complete"
     ),
+    path("suggestions/", views.SuggestionListView.as_view(), name="suggestion_list"),
+    path(
+        "suggestions/<int:pk>/<str:action>/",
+        views.SuggestionActionView.as_view(),
+        name="suggestion_action",
+    ),
     path("interviews/", views.InterviewListView.as_view(), name="interview_list"),
     path(
         "interviews/calendar.ics",

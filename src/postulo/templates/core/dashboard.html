@@ -16,6 +16,21 @@
     </div>
   {% endif %}
 
+  {% if suggestion_count %}
+    <div class="alert-warning mb-6" role="status">
+      <p>
+        {% url 'applications:suggestion_list' as suggestions_url %}
+        {% blocktranslate count counter=suggestion_count trimmed %}
+          A plugin has suggested one thing that may have happened:
+          <a href="{{ suggestions_url }}" class="font-medium underline">look at it</a>.
+        {% plural %}
+          Plugins have suggested {{ counter }} things that may have happened:
+          <a href="{{ suggestions_url }}" class="font-medium underline">look at them</a>.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  {% endif %}
+
   <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
     <div>
       <h1 class="mb-1 text-2xl font-semibold tracking-tight">

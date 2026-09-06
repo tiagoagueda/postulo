@@ -28,7 +28,7 @@ from postulo.core.models import Tag
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 
-from . import ical, quiet
+from . import ical, quiet, suggestions
 from .analytics import build as build_insights
 from .forms import (
     ApplicationForm,
@@ -48,6 +48,7 @@ from .models import (
     InterviewOutcome,
     Reminder,
     Status,
+    Suggestion,
 )
 from .services import (
     DEFAULT_INTERVIEW_LENGTH,
@@ -600,3 +601,63 @@ class InsightsView(OwnedObjectMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["insights"] = build_insights(self.request.user)
         return context
+
+
+# --------------------------------------------------------------- suggestions
+
+
+class SuggestionListView(OwnedObjectMixin, ListView):
+    """What the plugins think happened, waiting for a person to agree or not."""
+
+    model = Suggestion
+    template_name = "applications/suggestion_list.html"
+    context_object_name = "suggestions"
+    paginate_by = 50
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related("application__posting__company", "event")
+        if self.request.GET.get("show") != "all":
+            queryset = queryset.pending()
+        return queryset
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["showing_all"] = self.request.GET.get("show") == "all"
+        context["pending_count"] = suggestions.pending_count(self.request.user)
+        context["open_applications"] = (
+            Application.objects.for_user(self.request.user)
+            .open()
+            .select_related("posting__company")[:200]
+        )
+        return context
+
+
+class SuggestionActionView(OwnedObjectMixin, View):
+    """Accept a suggestion into the record, or decline it for good."""
+
+    def get_queryset(self):
+        return Suggestion.objects.for_user(self.request.user)
+
+    def post(self, request: HttpResponse, pk: int, action: str):
+        suggestion = get_object_or_404(self.get_queryset(), pk=pk)
+        fallback = reverse("applications:suggestion_list")
+        if not suggestion.is_pending:
+            messages.info(request, _("That suggestion has already been answered."))
+            return redirect(safe_next(request, fallback))
+
+        if action == "decline":
+            suggestions.decline(suggestion)
+            messages.success(request, _("Declined. It will not be suggested again."))
+            return redirect(safe_next(request, fallback))
+
+        application = suggestion.application
+        chosen = request.POST.get("application")
+        if chosen:
+            application = get_object_or_404(Application.objects.for_user(request.user), pk=chosen)
+        if application is None:
+            messages.error(request, _("Choose which application this is about first."))
+            return redirect(safe_next(request, fallback))
+
+        suggestions.accept(suggestion, application=application)
+        messages.success(request, _("Added to the timeline."))
+        return redirect(safe_next(request, fallback))
