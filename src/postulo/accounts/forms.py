@@ -97,33 +97,61 @@ def language_choices() -> list[tuple[str, str]]:
     A language that is only partly translated says so beside its name, and one whose
     translation is a machine-assisted draft nobody has reviewed says that, so nobody is
     surprised by English in the gaps or by an odd turn of phrase.
+    Each language is named in itself, which is the only way somebody who cannot read the
+    current one will recognise theirs. That is also what makes the ``lang`` attribute
+    matter here more than anywhere else in Postulo: without it a screen reader pronounces
+    every entry with the rules of the interface language, and "Ελληνικά" read as English
+    is not a word — it is a string of letters, or nothing at all. So how well translated a
+    language is has been moved out of the option text and into the group it sits in: the
+    option holds the name and nothing else, and can therefore be marked as being in that
+    language, while the words about it stay in the language they are actually written in.
     """
     from postulo.core.languages import translation_status
 
     status = translation_status()
-    choices = [("", _("Use the instance default"))]
+    reviewed: list[tuple[str, str]] = []
+    drafted: list[tuple[str, str]] = []
+    partial: list[tuple[str, str]] = []
     for code, name in settings.LANGUAGES:
         row = status.get(code)
         if row is None or row.get("total", 0) == 0:
-            choices.append((code, name))
+            reviewed.append((code, name))
         elif row.get("percent", 0) < 95:
-            choices.append(
-                (
-                    code,
-                    _("%(language)s — %(percent)s%% translated")
-                    % {"language": name, "percent": row["percent"]},
-                )
-            )
+            # A bare percentage carries no language of its own, so it can stay beside the
+            # name without putting English inside an option marked as something else.
+            partial.append((code, f"{name} ({row['percent']}%)"))
         elif row.get("drafts", 0):
-            choices.append(
-                (
-                    code,
-                    _("%(language)s — machine translation, awaiting review") % {"language": name},
-                )
-            )
+            drafted.append((code, name))
         else:
-            choices.append((code, name))
+            reviewed.append((code, name))
+
+    choices: list = [("", _("Use the instance default"))]
+    if reviewed:
+        choices.append((_("Reviewed by a speaker"), reviewed))
+    if drafted:
+        choices.append((_("Machine translation, awaiting review"), drafted))
+    if partial:
+        choices.append((_("Partly translated"), partial))
     return choices
+
+
+class LanguageSelect(forms.Select):
+    """A language menu whose options say which language each of them is in.
+
+    WCAG 2.2 calls this Language of Parts (3.1.2, level AA). A ``<select>`` allows ``lang``
+    on an ``<option>`` and nothing inside one, which is why the state of a translation had
+    to move to the group label: the option text has to be wholly in the language it claims.
+
+    Right-to-left languages will want ``dir`` alongside this; that belongs with the rest of
+    the layout work rather than here.
+    """
+
+    def create_option(self, name, value, *args, **kwargs):
+        option = super().create_option(name, value, *args, **kwargs)
+        code = str(value or "")
+        if code:
+            option["attrs"]["lang"] = code
+        return option
 
 
 def time_zone_choices() -> list[tuple[str, str]]:
@@ -315,7 +343,10 @@ class LocaleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["language"] = forms.ChoiceField(
-            label=_("Language"), choices=language_choices, required=False
+            label=_("Language"),
+            choices=language_choices,
+            required=False,
+            widget=LanguageSelect,
         )
         self.fields["time_zone"] = forms.ChoiceField(
             label=_("Time zone"), choices=time_zone_choices, required=False

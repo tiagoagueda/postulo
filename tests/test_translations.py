@@ -128,7 +128,14 @@ def test_the_interface_renders_in_every_language(client, user, code, compiled):
     assert heading in body
 
 
-def test_the_picker_says_when_a_language_is_a_draft(client, user, monkeypatch):
+def test_the_picker_groups_languages_by_how_well_translated_they_are(client, user, monkeypatch):
+    """The state of a translation is a group heading, not part of a language's name.
+
+    It used to be appended to the option text — "Deutsch — machine translation, awaiting
+    review" — which put an English phrase inside the one option that has to be wholly in
+    German, because that option carries `lang="de"` and a screen reader will pronounce
+    every word of it accordingly.
+    """
     from postulo.accounts import forms
     from postulo.core import languages as languages_module
 
@@ -142,11 +149,58 @@ def test_the_picker_says_when_a_language_is_a_draft(client, user, monkeypatch):
         },
     )
     with translation.override("en-gb"):
-        labels = dict(forms.language_choices())
-    assert labels["de"] == "Deutsch — machine translation, awaiting review"
-    assert labels["fr-fr"] == "français (France)"
-    assert labels["pl"] == "polski — 40% translated"
-    assert labels["sv"] == "svenska", "no status known: the name alone"
+        groups = {str(label): dict(entries) for label, entries in forms.language_choices()[1:]}
+
+    assert groups["Machine translation, awaiting review"]["de"] == "Deutsch"
+    assert groups["Reviewed by a speaker"]["fr-fr"] == "français (France)"
+    assert groups["Reviewed by a speaker"]["sv"] == "svenska", "no status known: the name alone"
+    # A bare percentage carries no language of its own, so it may stay beside the name.
+    assert groups["Partly translated"]["pl"] == "polski (40%)"
+
+
+def test_every_language_option_says_which_language_it_is_in(client, user):
+    """WCAG 2.2 3.1.2, Language of Parts, at level AA.
+
+    Every option is written in its own language, and without `lang` a screen reader reads
+    all of them with the rules of whatever the interface is set to. This is the one list
+    in Postulo where that matters most: it is where somebody who cannot read the current
+    language has come to get out of it.
+    """
+    import re
+
+    client.force_login(user)
+    html = client.get(reverse("settings:locale")).content.decode()
+    field = html[
+        html.index('name="language"') : html.index("</select>", html.index('name="language"'))
+    ]
+
+    options = re.findall(r"<option[^>]*>", field)
+    assert len(options) > 20, "the whole list is there"
+
+    with_value = [o for o in options if re.search(r'value="[^"]+"', o)]
+    assert with_value, "something other than the blank entry"
+    for option in with_value:
+        code = re.search(r'value="([^"]+)"', option).group(1)
+        assert f'lang="{code}"' in option, f"{code} does not say what language it is in"
+
+    blank = [o for o in options if 'value=""' in o]
+    assert blank and "lang=" not in blank[0], (
+        "the default entry is in the interface language, not in any of the listed ones"
+    )
+
+
+def test_a_documents_language_menu_says_the_same(client, user):
+    """A CV's and a letter's language field list the same names, so they need the same."""
+    import re
+
+    client.force_login(user)
+    html = client.get(reverse("documents:letter_create")).content.decode()
+    field = html[
+        html.index('name="language"') : html.index("</select>", html.index('name="language"'))
+    ]
+    assert 'lang="pt-pt"' in field or 'lang="de"' in field
+    for option in re.findall(r'<option value="([^"]+)"[^>]*>', field):
+        assert f'lang="{option}"' in field
 
 
 def test_a_right_to_left_language_flips_the_page(client, user, settings):

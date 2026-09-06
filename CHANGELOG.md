@@ -131,6 +131,17 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **The language menu did not say which language each of its entries was in.** Every option
+  is written in its own language — *български*, *Ελληνικά*, *čeština* — and none of them
+  carried a `lang` attribute, so a screen reader pronounced all of them with the rules of
+  whatever the interface was set to. Greek read as English is not a word; it is a string of
+  letters, or silence. That is WCAG 2.2 success criterion 3.1.2 at level AA, and it fails
+  hardest in the one list somebody who cannot read the current language has come to. Each
+  option now says what it is. How well translated a language is has moved out of the option
+  text and into the group it sits in — *Reviewed by a speaker*, *Machine translation,
+  awaiting review*, *Partly translated* — because an English phrase inside an option marked
+  as German would be read out in German. The same applies to a CV's and a letter's language
+  field. (#64)
 - **A cover letter was sent out declaring English, whatever it was written in.** The letter
   theme had `lang="en-GB"` written into it, and there was no field that could have said
   otherwise — the CV had one, the letter did not. A letter written in Portuguese and

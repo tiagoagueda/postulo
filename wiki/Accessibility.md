@@ -15,6 +15,10 @@ us about a barrier.
   convenience — the table narrowing as you type, the password meter, the theme applying
   before the server confirms it — and every one of them has a plain button that does the
   same thing.
+- **Each language names itself, and says so.** The language menu lists every language
+  under its own name, and each entry is marked with the language it is in, so a screen
+  reader pronounces it properly rather than reading Greek with English rules. How well
+  translated each one is appears as a heading over the group rather than inside the entry.
 - **Screen readers are told what changes.** Counts that update, the password meter's word,
   a search result summary and the messages after an action are live regions. Icons that
   stand alone have names; icons beside words are marked decorative. Tables have headers,

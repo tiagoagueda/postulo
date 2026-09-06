@@ -38,6 +38,13 @@ def language_choices() -> list[tuple[str, str]]:
     return [("", _("Follow your profile")), *languages.LANGUAGES]
 
 
+def language_widget() -> forms.Select:
+    """The same menu the profile uses, so an option says which language it is in."""
+    from postulo.accounts.forms import LanguageSelect
+
+    return LanguageSelect(choices=language_choices())
+
+
 class LanguageChoiceMixin:
     """Turn the model's free-text ``language`` field into a picker."""
 
@@ -45,7 +52,7 @@ class LanguageChoiceMixin:
         super().__init__(*args, **kwargs)
         field = self.fields.get("language")
         if field is not None:
-            field.widget = forms.Select(choices=language_choices())
+            field.widget = language_widget()
             field.required = False
 
 
