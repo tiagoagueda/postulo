@@ -8,6 +8,26 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **The Europass import reads the current JSON format as well as the legacy XML.** The XML
+  is what the old CV editor produced and what an old file on a disk still is; the JSON is
+  what europass.europa.eu exports today, so it is the one somebody is most likely to
+  arrive with. There is still one file box and one page: a person has *a Europass file* and
+  should not have to know which format it is, so the first character decides and the review
+  page says which was found. Both readers produce the same intermediate record — a test
+  reads two fixtures describing the same career and insists the records match, which is
+  what keeps the mapping in one place rather than two. Read defensively, as JSON from
+  somewhere else has to be: the same 5 MB cap, a nesting cap measured without recursing,
+  no key assumed present and no value assumed to have the type it should. **A file that is
+  half right imports the half that is right** and lists what it could not read before
+  anything is written, and what was read but not written — a job with no start date — is
+  named afterwards rather than dropped quietly. An **ORCID** among the websites in either
+  format is lifted out and kept as an identifier (#46), checksum first: a wrong one is
+  discarded rather than saved, an existing one is left alone, and orcid.org is asked
+  nothing. A date whose month is absent still becomes January; a month that is present and
+  unreadable now produces no date at all, because inventing one could misdate a job by
+  eleven months. The reader's messages are translated, which the first version's were
+  not. (#69)
+
 - **Import a career record from a Europass CV.** Anybody who has applied to an EU
   institution, or through a national employment service, already has one, and typing that
   record in a second time is exactly the work Postulo exists to remove. *Your career →

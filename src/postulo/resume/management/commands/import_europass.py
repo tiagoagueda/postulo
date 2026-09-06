@@ -1,7 +1,8 @@
 """Import a Europass career record from the command line.
 
-The same reader the page uses, for an operator with a shell and a file. It says what it
-found before it writes anything, and ``--dry-run`` stops there.
+The same reader the page uses, for an operator with a shell and a file. Either format —
+the XML or the JSON — and the file itself decides which. It says what it found before it
+writes anything, and ``--dry-run`` stops there.
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ class Command(BaseCommand):
     help = "Import a career record from a Europass XML file."
 
     def add_arguments(self, parser):
-        parser.add_argument("path", help="the Europass file to read")
+        parser.add_argument("path", help="the Europass file to read, XML or JSON")
         parser.add_argument(
             "--user",
             required=True,
@@ -51,11 +52,13 @@ class Command(BaseCommand):
             raise CommandError(str(error)) from error
 
         counts = record.counts()
-        self.stdout.write(f"Read {path.name}:")
+        self.stdout.write(f"Read {path.name} as Europass {record.source.upper()}:")
         for kind, total in counts.items():
             self.stdout.write(f"  {kind}: {total}")
         if record.person:
             self.stdout.write(f"  personal details: {', '.join(sorted(record.person))}")
+        for note in record.skipped:
+            self.stdout.write(self.style.WARNING(f"  {note}"))
 
         if record.is_empty:
             self.stdout.write(self.style.WARNING("Nothing to import."))
@@ -73,4 +76,6 @@ class Command(BaseCommand):
             self.stdout.write(f"  {kind}: {total}")
         if report.profile_filled:
             self.stdout.write(f"  filled blank profile fields: {', '.join(report.profile_filled)}")
+        for note in report.skipped:
+            self.stdout.write(self.style.WARNING(f"  {note}"))
         self.stdout.write("Nothing was overwritten. Anything duplicated is yours to delete.")

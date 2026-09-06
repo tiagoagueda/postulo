@@ -21,8 +21,9 @@ in ten years, when Postulo is a memory.
 
 ## Bringing a career record in
 
-A Europass CV — the XML the EU's CV editor produced — can be read straight into your
-career record, in two steps, with nothing written until you have seen what was found.
+A Europass CV — either the JSON europass.europa.eu exports today or the XML the old CV
+editor produced — can be read straight into your career record, in two steps, with nothing
+written until you have seen what was found.
 [Your career record](Your-career-record#importing-a-europass-cv) has the detail.
 
 ## Bringing a spreadsheet in

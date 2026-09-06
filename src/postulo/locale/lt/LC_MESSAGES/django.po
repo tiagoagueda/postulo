@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 19:43+0000\n"
+"POT-Creation-Date: 2026-09-06 20:07+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -314,6 +314,11 @@ msgstr "%(role)s, %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s, %(company)s — %(days)s d."
 
+#: src/postulo/resume/europass.py:793
+#, python-format, draft
+msgid "%(role)s: no start date, so it was not added."
+msgstr "%(role)s: nėra pradžios datos, todėl nepridėta."
+
 #: src/postulo/documents/views.py:373
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
@@ -393,6 +398,11 @@ msgstr "%(url)s atsakė %(code)s."
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr "%(url)s yra kur kas didesnis, nei turėtų būti katalogas."
 
+#: src/postulo/resume/europass.py:612
+#, python-format, draft
+msgid "%(what)s was in the file but could not be read."
+msgstr "%(what)s buvo faile, bet jo nepavyko perskaityti."
+
 #: src/postulo/templates/server/overview.html:50
 #, python-format, draft
 msgid "%(when)s ago"
@@ -462,13 +472,6 @@ msgstr "Įmonė, pareigos, frazė iš laiško, vardas…"
 #, draft
 msgid "A CSV file"
 msgstr "CSV failas"
-
-#: src/postulo/templates/resume/europass_import.html:20
-#, draft
-msgid ""
-"A Europass XML file — what the CV editor produced, and what an older export on your disk will be. Postulo reads it, shows you what is in it, and writes nothing until you say so."
-msgstr ""
-"Europass XML failas — tas, kurį sukūrė CV rengyklė, ir tas, kuris jūsų diske bus senesnis eksportas. Postulo jį perskaito, parodo, kas jame yra, ir nieko nerašo, kol nepasakysite."
 
 #: src/postulo/core/models.py:74
 #, draft
@@ -668,6 +671,11 @@ msgstr "Paskyros meniu, %(name)s"
 msgid "Accounts"
 msgstr "Paskyros"
 
+#: src/postulo/resume/europass.py:722
+#, draft
+msgid "Achievements"
+msgstr "Pasiekimai"
+
 #: src/postulo/applications/analytics.py:32
 #: src/postulo/applications/models.py:41
 #, draft
@@ -722,7 +730,7 @@ msgstr "Pridėti skelbimą"
 msgid "Add a skill"
 msgstr "Pridėti įgūdį"
 
-#: src/postulo/templates/resume/europass_import.html:126
+#: src/postulo/templates/resume/europass_import.html:143
 #, draft
 msgid "Add all of this"
 msgstr "Pridėti visa tai"
@@ -869,7 +877,7 @@ msgid ""
 msgstr ""
 "Archyvą galima importuoti į tuščią paskyrą iš komandinės eilutės. Čia tai nesiūloma, nes importavimas kuria įrašus, o ne juos sulieja, ir tokį sprendimą verta priimti apgalvotai, o ne spustelėjimu."
 
-#: src/postulo/templates/resume/europass_import.html:35
+#: src/postulo/templates/resume/europass_import.html:37
 #, draft
 msgid ""
 "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
@@ -1803,7 +1811,7 @@ msgstr "kontekstas"
 msgid "Contract"
 msgstr "Terminuota sutartis"
 
-#: src/postulo/resume/views.py:319
+#: src/postulo/resume/views.py:327
 #, draft
 msgid "conversation"
 msgstr "pokalbis"
@@ -2369,8 +2377,9 @@ msgid "Edit interview"
 msgstr "Redaguoti pokalbį"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
-#: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
-#: src/postulo/templates/resume/europass_import.html:62
+#: src/postulo/resume/europass.py:667 src/postulo/resume/registry.py:41
+#: src/postulo/resume/registry.py:42
+#: src/postulo/templates/resume/europass_import.html:67
 #: src/postulo/templates/resume/preview.html:45
 #, draft
 msgid "Education"
@@ -2381,6 +2390,13 @@ msgstr "Išsilavinimas"
 msgid "education"
 msgstr "išsilavinimas"
 
+#: src/postulo/templates/resume/europass_import.html:20
+#, draft
+msgid ""
+"Either Europass format: the JSON europass.europa.eu exports today, or the XML the old CV editor produced and an older export on your disk still is. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
+"Bet kuris iš dviejų Europass formatų: JSON, kurį europass.europa.eu eksportuoja šiandien, arba XML, kurį sukūrė sena CV rengyklė ir kuriuo tebėra senesnis eksportas jūsų diske. Postulo pats nustato, kuris tai yra, parodo, kas jame yra, ir nieko nerašo, kol nepasakysite."
+
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
 #: src/postulo/core/server_views.py:434
 #: src/postulo/templates/server/email.html:5
@@ -2390,7 +2406,7 @@ msgid "Email"
 msgstr "El. paštas"
 
 #: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
-#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:309
+#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:311
 #, draft
 msgid "email address"
 msgstr "el. pašto adresas"
@@ -2460,7 +2476,7 @@ msgstr "Energetika"
 msgid "Engineering"
 msgstr "Inžinerija"
 
-#: src/postulo/templates/resume/europass_import.html:90
+#: src/postulo/templates/resume/europass_import.html:95
 #, draft
 msgid ""
 "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Change it afterwards if that is not the one you would claim."
@@ -2586,7 +2602,7 @@ msgstr "Viskas, naujausi pirmiau."
 
 #: src/postulo/documents/rendering.py:23 src/postulo/resume/registry.py:33
 #: src/postulo/resume/registry.py:34
-#: src/postulo/templates/resume/europass_import.html:53
+#: src/postulo/templates/resume/europass_import.html:58
 #: src/postulo/templates/resume/preview.html:20
 #, draft
 msgid "Experience"
@@ -2775,7 +2791,7 @@ msgstr "Rasti logotipą"
 msgid "First name"
 msgstr "Vardas"
 
-#: src/postulo/resume/views.py:307
+#: src/postulo/resume/views.py:309
 #, draft
 msgid "first name"
 msgstr "vardas"
@@ -2857,7 +2873,7 @@ msgstr "Rasta per"
 msgid "found via"
 msgstr "rasta per"
 
-#: src/postulo/templates/resume/europass_import.html:116
+#: src/postulo/templates/resume/europass_import.html:121
 #, python-format, draft
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr ""
@@ -3054,7 +3070,7 @@ msgid "happened on"
 msgstr "įvyko"
 
 #: src/postulo/accounts/models.py:236 src/postulo/documents/models.py:61
-#: src/postulo/resume/views.py:313
+#: src/postulo/resume/views.py:315
 #, draft
 msgid "headline"
 msgstr "profesinis pavadinimas"
@@ -3664,8 +3680,8 @@ msgid "Language for new accounts"
 msgstr "Naujų paskyrų kalba"
 
 #: src/postulo/documents/rendering.py:29 src/postulo/resume/registry.py:78
-#: src/postulo/resume/views.py:301
-#: src/postulo/templates/resume/europass_import.html:71
+#: src/postulo/resume/views.py:303
+#: src/postulo/templates/resume/europass_import.html:76
 #: src/postulo/templates/resume/preview.html:100
 #, draft
 msgid "Languages"
@@ -3880,7 +3896,7 @@ msgstr "išsiųstos nuorodos"
 msgid "Links you pointed them at"
 msgstr "Nuorodos, į kurias juos nukreipėte"
 
-#: src/postulo/resume/views.py:317
+#: src/postulo/resume/views.py:325
 #, draft
 msgid "listening"
 msgstr "klausymas"
@@ -4961,6 +4977,11 @@ msgstr ""
 msgid "Or upload one"
 msgstr "Arba įkelkite savo"
 
+#: src/postulo/resume/views.py:316
+#, draft
+msgid "ORCID"
+msgstr "ORCID"
+
 #: src/postulo/documents/models.py:113 src/postulo/resume/models.py:31
 #, draft
 msgid "order"
@@ -5153,7 +5174,7 @@ msgstr "Laikotarpis"
 msgid "Permissions"
 msgstr "Leidimai"
 
-#: src/postulo/templates/resume/europass_import.html:114
+#: src/postulo/templates/resume/europass_import.html:119
 #, draft
 msgid "Personal details"
 msgstr "Asmens duomenys"
@@ -5255,7 +5276,7 @@ msgstr "Portfolio"
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Portfolio, profiliai ir vaizdo įrašai, į kuriuos juos nukreipėte."
 
-#: src/postulo/resume/views.py:299
+#: src/postulo/resume/views.py:301
 #, draft
 msgid "Positions"
 msgstr "Pareigos"
@@ -5440,7 +5461,7 @@ msgid "Project"
 msgstr "Projektas"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/resume/registry.py:45
-#: src/postulo/templates/resume/europass_import.html:107
+#: src/postulo/templates/resume/europass_import.html:112
 #: src/postulo/templates/resume/preview.html:61
 #, draft
 msgid "Projects"
@@ -5451,7 +5472,7 @@ msgstr "Projektai"
 msgid "projects"
 msgstr "projektai"
 
-#: src/postulo/resume/views.py:303
+#: src/postulo/resume/views.py:305
 #, draft
 msgid "Projects and achievements"
 msgstr "Projektai ir pasiekimai"
@@ -5512,7 +5533,7 @@ msgstr "Grąžinimas atgal"
 msgid "qualification"
 msgstr "kvalifikacija"
 
-#: src/postulo/resume/views.py:300
+#: src/postulo/resume/views.py:302
 #, draft
 msgid "Qualifications"
 msgstr "Kvalifikacijos"
@@ -5581,6 +5602,17 @@ msgstr "Skaityti %(name)s kaip"
 msgid "Read as"
 msgstr "Skaityti kaip"
 
+#: src/postulo/resume/views.py:321
+#, draft
+msgid "Read as Europass JSON, the format europass.europa.eu exports."
+msgstr ""
+"Perskaityta kaip Europass JSON — formatas, kurį eksportuoja europass.europa.eu."
+
+#: src/postulo/resume/views.py:320
+#, draft
+msgid "Read as Europass XML, the format the CV editor produced."
+msgstr "Perskaityta kaip Europass XML — formatas, kurį kūrė CV rengyklė."
+
 #: src/postulo/jobs/models.py:566
 #, draft
 msgid "read by"
@@ -5605,7 +5637,7 @@ msgid ""
 msgstr ""
 "Skaitoma iš laiko juostos, todėl atmetimu pasibaigęs pokalbis vis tiek skaičiuojamas kaip pokalbis."
 
-#: src/postulo/templates/resume/europass_import.html:29
+#: src/postulo/templates/resume/europass_import.html:31
 #: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
@@ -5616,7 +5648,7 @@ msgstr "Perskaityk"
 msgid "Read the page"
 msgstr "Skaityti puslapį"
 
-#: src/postulo/resume/views.py:318
+#: src/postulo/resume/views.py:326
 #, draft
 msgid "reading"
 msgstr "skaitymas"
@@ -6428,8 +6460,8 @@ msgid "skill groups"
 msgstr "įgūdžių grupės"
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:52
-#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:302
-#: src/postulo/templates/resume/europass_import.html:98
+#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:304
+#: src/postulo/templates/resume/europass_import.html:103
 #: src/postulo/templates/resume/preview.html:79
 #, draft
 msgid "Skills"
@@ -6511,7 +6543,7 @@ msgstr "šaltinio versija"
 msgid "Sources installed"
 msgstr "Įdiegti šaltiniai"
 
-#: src/postulo/resume/views.py:320
+#: src/postulo/resume/views.py:328
 #, draft
 msgid "speaking"
 msgstr "kalbėjimas"
@@ -6521,7 +6553,7 @@ msgstr "kalbėjimas"
 msgid "Speculative letter"
 msgstr "Savarankiškas laiškas"
 
-#: src/postulo/templates/resume/europass_import.html:129
+#: src/postulo/templates/resume/europass_import.html:146
 #, draft
 msgid "Start again"
 msgstr "Pradėti iš naujo"
@@ -6662,7 +6694,7 @@ msgstr "pakeista"
 msgid "Supersedes"
 msgstr "Pakeičia"
 
-#: src/postulo/resume/views.py:308
+#: src/postulo/resume/views.py:310
 #, draft
 msgid "surname"
 msgstr "pavardė"
@@ -6768,7 +6800,7 @@ msgstr "pritaikyta šiam CV"
 msgid "Telecommunications"
 msgstr "Telekomunikacijos"
 
-#: src/postulo/resume/views.py:310
+#: src/postulo/resume/views.py:312
 #, draft
 msgid "telephone"
 msgstr "telefonas"
@@ -6836,15 +6868,37 @@ msgstr "Tai nepanašu į %(scheme)s identifikatorių (pavyzdžiui, %(example)s).
 msgid "That does not look like a complete web address."
 msgstr "Tai nepanašu į pilną žiniatinklio adresą."
 
+#: src/postulo/resume/europass.py:318 src/postulo/resume/europass.py:591
+#, draft
+msgid "That does not look like a Europass file: it has no LearnerInfo section."
+msgstr "Tai nepanašu į Europass failą: jame nėra LearnerInfo skilties."
+
 #: src/postulo/applications/views.py:314
 #, draft
 msgid "That entry could not be saved."
 msgstr "Šio įrašo nepavyko išsaugoti."
 
+#: src/postulo/resume/europass.py:300
+#, draft
+msgid ""
+"That file carries a document type declaration, which Postulo will not read. A Europass export does not have one."
+msgstr ""
+"Faile yra dokumento tipo deklaracija, kurios Postulo neskaito. Europass eksporte tokios nėra."
+
 #: src/postulo/jobs/logos.py:92
 #, draft
 msgid "That file could not be read as an image."
 msgstr "Šio failo nepavyko perskaityti kaip paveikslėlio."
+
+#: src/postulo/resume/europass.py:210
+#, draft
+msgid "That file is empty."
+msgstr "Failas tuščias."
+
+#: src/postulo/resume/europass.py:213
+#, python-format, draft
+msgid "That file is larger than %(limit)s MB, so it was not read."
+msgstr "Failas didesnis nei %(limit)s MB, todėl nebuvo perskaitytas."
 
 #: src/postulo/documents/forms.py:175
 #, python-format, draft
@@ -6857,10 +6911,30 @@ msgstr "Tas failas didesnis nei %(limit)s MB."
 msgid "That file is larger than a logo should be."
 msgstr "Šis failas didesnis, nei logotipas turėtų būti."
 
+#: src/postulo/resume/europass.py:575
+#, python-format, draft
+msgid "That file is not readable JSON: %(reason)s"
+msgstr "Failas nėra skaitomas JSON: %(reason)s"
+
+#: src/postulo/resume/europass.py:310
+#, python-format, draft
+msgid "That file is not readable XML: %(reason)s"
+msgstr "Failas nėra skaitomas XML: %(reason)s"
+
+#: src/postulo/resume/europass.py:572
+#, draft
+msgid "That file is not UTF-8, so it is not a Europass export."
+msgstr "Failas nėra UTF-8, todėl tai nėra Europass eksportas."
+
 #: src/postulo/resume/views.py:252
 #, python-format, draft
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Šis failas viršija %(limit)s MB. CV nėra toks didelis."
+
+#: src/postulo/resume/europass.py:580
+#, python-format, draft
+msgid "That file nests more than %(limit)s levels deep, so it was not read."
+msgstr "Failas įdėtas giliau nei %(limit)s lygių, todėl nebuvo perskaitytas."
 
 #: src/postulo/resume/views.py:265
 #, draft
@@ -6886,6 +6960,13 @@ msgstr "Tas pakvietimas jau priimtas ir negali būti atšauktas."
 #, draft
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Tai SVG, kurio Postulo dar nelaiko. Tinka PNG arba JPEG."
+
+#: src/postulo/resume/europass.py:223
+#, draft
+msgid ""
+"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
+msgstr ""
+"Tai ne Europass failas. Postulo skaito XML, kurį kūrė CV rengyklė, ir JSON, kurį eksportuoja europass.europa.eu; šis nėra nei vienas, nei kitas."
 
 #: src/postulo/applications/views.py:285
 #, draft
@@ -7071,7 +7152,7 @@ msgid ""
 msgstr ""
 "Sritys, kuriose veikia jūsų įmonės, jūsų žodžiais. Įmonė gali būti keliose."
 
-#: src/postulo/templates/resume/europass_import.html:26
+#: src/postulo/templates/resume/europass_import.html:27
 #, draft
 msgid "The file"
 msgstr "Failas"
@@ -7162,6 +7243,13 @@ msgstr "Skelbimas"
 #, draft
 msgid "The posting itself"
 msgstr "Pats skelbimas"
+
+#: src/postulo/templates/resume/europass_import.html:132
+#, draft
+msgid ""
+"The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
+msgstr ""
+"Likusią failo dalį vis tiek verta importuoti. To, kas išvardyta čia, ne, ir vėliau galėsite tai pridėti ranka."
 
 #: src/postulo/templates/applications/application_intake.html:23
 #: src/postulo/templates/jobs/capture_review.html:30
@@ -7788,7 +7876,7 @@ msgstr ""
 "„WeasyPrint“ įdiegiamas kartu su Postulo, bet jam reikia „Pango“ ir jo sistemos bibliotekų. „Debian“ ar „Ubuntu“: apt install libpango-1.0-0 libpangoft2-1.0-0. „Windows“ jas gauti keblu, todėl vietoj to naudokite chromium variklį. Žr. https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
 #: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:116
-#: src/postulo/resume/views.py:311
+#: src/postulo/resume/views.py:313
 #, draft
 msgid "website"
 msgstr "svetainė"
@@ -7819,6 +7907,11 @@ msgstr "ką turėtų tikrinti stebėsena"
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "Nuo ko pradeda nauja paskyra. Kiekvienas gali pasikeisti savo."
 
+#: src/postulo/templates/resume/europass_import.html:127
+#, draft
+msgid "What could not be read"
+msgstr "Ko nepavyko perskaityti"
+
 #: src/postulo/templates/accounts/profile.html:133
 #: src/postulo/templates/jobs/company_form.html:90
 #, draft
@@ -7843,7 +7936,7 @@ msgid ""
 msgstr ""
 "Kas dienoraštyje, artimiausi pirmiau. Suplanuokite iš paraiškos puslapio."
 
-#: src/postulo/templates/resume/europass_import.html:44
+#: src/postulo/templates/resume/europass_import.html:46
 #, draft
 msgid "What is in the file"
 msgstr "Kas yra faile"
@@ -7992,7 +8085,7 @@ msgstr "Kur ši įmonė skelbia laisvas vietas."
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Kur jį radote: darbo portalas, rekomendacija, įmonės svetainė."
 
-#: src/postulo/resume/views.py:312
+#: src/postulo/resume/views.py:314
 #, draft
 msgid "where you live"
 msgstr "kur gyvenate"
@@ -8107,6 +8200,11 @@ msgstr "Su: %(people)s"
 msgid "Withdrawn"
 msgstr "Atsiimta"
 
+#: src/postulo/resume/europass.py:644
+#, draft
+msgid "Work experience"
+msgstr "Darbo patirtis"
+
 #: src/postulo/templates/connections/list.html:35
 #, python-format, draft
 msgid "worked %(when)s"
@@ -8143,7 +8241,7 @@ msgstr "Parašykite šiek tiek daugiau."
 msgid "Write your career down first, then build variants from it."
 msgstr "Pirmiausia surašykite karjerą, tada iš jos kurkite variantus."
 
-#: src/postulo/resume/views.py:321
+#: src/postulo/resume/views.py:329
 #, draft
 msgid "writing"
 msgstr "rašymas"

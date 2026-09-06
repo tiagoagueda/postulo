@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 19:43+0000\n"
+"POT-Creation-Date: 2026-09-06 20:07+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: dansk\n"
@@ -303,6 +303,11 @@ msgstr "%(role)s hos %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s hos %(company)s — %(days)s dage"
 
+#: src/postulo/resume/europass.py:793
+#, python-format, draft
+msgid "%(role)s: no start date, so it was not added."
+msgstr "%(role)s: ingen startdato, så den blev ikke tilføjet."
+
 #: src/postulo/documents/views.py:373
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
@@ -376,6 +381,11 @@ msgstr "%(url)s svarede %(code)s."
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr "%(url)s er langt større, end et katalog bør være."
 
+#: src/postulo/resume/europass.py:612
+#, python-format, draft
+msgid "%(what)s was in the file but could not be read."
+msgstr "%(what)s stod i filen, men kunne ikke læses."
+
 #: src/postulo/templates/server/overview.html:50
 #, python-format, draft
 msgid "%(when)s ago"
@@ -445,13 +455,6 @@ msgstr "En virksomhed, en stilling, en sætning fra et brev, et navn…"
 #, draft
 msgid "A CSV file"
 msgstr "En CSV-fil"
-
-#: src/postulo/templates/resume/europass_import.html:20
-#, draft
-msgid ""
-"A Europass XML file — what the CV editor produced, and what an older export on your disk will be. Postulo reads it, shows you what is in it, and writes nothing until you say so."
-msgstr ""
-"En Europass-XML-fil — den, cv-editoren lavede, og den, en ældre eksport på din disk vil være. Postulo læser den, viser dig hvad der står i den, og skriver ikke noget, før du siger til."
 
 #: src/postulo/core/models.py:74
 #, draft
@@ -650,6 +653,11 @@ msgstr "Kontomenu, %(name)s"
 msgid "Accounts"
 msgstr "Konti"
 
+#: src/postulo/resume/europass.py:722
+#, draft
+msgid "Achievements"
+msgstr "Resultater"
+
 #: src/postulo/applications/analytics.py:32
 #: src/postulo/applications/models.py:41
 #, draft
@@ -704,7 +712,7 @@ msgstr "Tilføj et opslag"
 msgid "Add a skill"
 msgstr "Tilføj en færdighed"
 
-#: src/postulo/templates/resume/europass_import.html:126
+#: src/postulo/templates/resume/europass_import.html:143
 #, draft
 msgid "Add all of this"
 msgstr "Tilføj det hele"
@@ -850,7 +858,7 @@ msgid ""
 msgstr ""
 "Et arkiv kan importeres til en tom konto fra kommandolinjen. Det tilbydes ikke her, fordi import opretter poster i stedet for at flette dem, og det er en beslutning, der fortjener at blive taget bevidst og ikke med et klik."
 
-#: src/postulo/templates/resume/europass_import.html:35
+#: src/postulo/templates/resume/europass_import.html:37
 #, draft
 msgid ""
 "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
@@ -1784,7 +1792,7 @@ msgstr "kontekst"
 msgid "Contract"
 msgstr "Tidsbegrænset"
 
-#: src/postulo/resume/views.py:319
+#: src/postulo/resume/views.py:327
 #, draft
 msgid "conversation"
 msgstr "samtale"
@@ -2349,8 +2357,9 @@ msgid "Edit interview"
 msgstr "Rediger samtale"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
-#: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
-#: src/postulo/templates/resume/europass_import.html:62
+#: src/postulo/resume/europass.py:667 src/postulo/resume/registry.py:41
+#: src/postulo/resume/registry.py:42
+#: src/postulo/templates/resume/europass_import.html:67
 #: src/postulo/templates/resume/preview.html:45
 #, draft
 msgid "Education"
@@ -2361,6 +2370,13 @@ msgstr "Uddannelse"
 msgid "education"
 msgstr "uddannelse"
 
+#: src/postulo/templates/resume/europass_import.html:20
+#, draft
+msgid ""
+"Either Europass format: the JSON europass.europa.eu exports today, or the XML the old CV editor produced and an older export on your disk still is. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
+"Begge Europass-formater: den JSON, europass.europa.eu eksporterer i dag, eller den XML, den gamle cv-editor lavede, og som en ældre eksport på din disk stadig er. Postulo finder selv ud af hvilken det er, viser dig hvad der står i den, og skriver ikke noget, før du siger til."
+
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
 #: src/postulo/core/server_views.py:434
 #: src/postulo/templates/server/email.html:5
@@ -2370,7 +2386,7 @@ msgid "Email"
 msgstr "E-mail"
 
 #: src/postulo/accounts/models.py:113 src/postulo/accounts/models.py:334
-#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:309
+#: src/postulo/jobs/models.py:263 src/postulo/resume/views.py:311
 #, draft
 msgid "email address"
 msgstr "e-mailadresse"
@@ -2440,7 +2456,7 @@ msgstr "Energi"
 msgid "Engineering"
 msgstr "Ingeniørarbejde"
 
-#: src/postulo/templates/resume/europass_import.html:90
+#: src/postulo/templates/resume/europass_import.html:95
 #, draft
 msgid ""
 "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Change it afterwards if that is not the one you would claim."
@@ -2568,7 +2584,7 @@ msgstr "Alt, nyeste først."
 
 #: src/postulo/documents/rendering.py:23 src/postulo/resume/registry.py:33
 #: src/postulo/resume/registry.py:34
-#: src/postulo/templates/resume/europass_import.html:53
+#: src/postulo/templates/resume/europass_import.html:58
 #: src/postulo/templates/resume/preview.html:20
 #, draft
 msgid "Experience"
@@ -2757,7 +2773,7 @@ msgstr "Find logo"
 msgid "First name"
 msgstr "Fornavn"
 
-#: src/postulo/resume/views.py:307
+#: src/postulo/resume/views.py:309
 #, draft
 msgid "first name"
 msgstr "fornavn"
@@ -2840,7 +2856,7 @@ msgstr "Fundet via"
 msgid "found via"
 msgstr "fundet via"
 
-#: src/postulo/templates/resume/europass_import.html:116
+#: src/postulo/templates/resume/europass_import.html:121
 #, python-format, draft
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr ""
@@ -3037,7 +3053,7 @@ msgid "happened on"
 msgstr "skete den"
 
 #: src/postulo/accounts/models.py:236 src/postulo/documents/models.py:61
-#: src/postulo/resume/views.py:313
+#: src/postulo/resume/views.py:315
 #, draft
 msgid "headline"
 msgstr "jobtitel"
@@ -3649,8 +3665,8 @@ msgid "Language for new accounts"
 msgstr "Sprog for nye konti"
 
 #: src/postulo/documents/rendering.py:29 src/postulo/resume/registry.py:78
-#: src/postulo/resume/views.py:301
-#: src/postulo/templates/resume/europass_import.html:71
+#: src/postulo/resume/views.py:303
+#: src/postulo/templates/resume/europass_import.html:76
 #: src/postulo/templates/resume/preview.html:100
 #, draft
 msgid "Languages"
@@ -3865,7 +3881,7 @@ msgstr "sendte links"
 msgid "Links you pointed them at"
 msgstr "Links du pegede dem på"
 
-#: src/postulo/resume/views.py:317
+#: src/postulo/resume/views.py:325
 #, draft
 msgid "listening"
 msgstr "lytning"
@@ -4943,6 +4959,11 @@ msgstr ""
 msgid "Or upload one"
 msgstr "Eller send et"
 
+#: src/postulo/resume/views.py:316
+#, draft
+msgid "ORCID"
+msgstr "ORCID"
+
 #: src/postulo/documents/models.py:113 src/postulo/resume/models.py:31
 #, draft
 msgid "order"
@@ -5135,7 +5156,7 @@ msgstr "Periode"
 msgid "Permissions"
 msgstr "Rettigheder"
 
-#: src/postulo/templates/resume/europass_import.html:114
+#: src/postulo/templates/resume/europass_import.html:119
 #, draft
 msgid "Personal details"
 msgstr "Personlige oplysninger"
@@ -5237,7 +5258,7 @@ msgstr "Portefølje"
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Porteføljer, profiler og videoer, du pegede dem på."
 
-#: src/postulo/resume/views.py:299
+#: src/postulo/resume/views.py:301
 #, draft
 msgid "Positions"
 msgstr "Stillinger"
@@ -5422,7 +5443,7 @@ msgid "Project"
 msgstr "Projekt"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/resume/registry.py:45
-#: src/postulo/templates/resume/europass_import.html:107
+#: src/postulo/templates/resume/europass_import.html:112
 #: src/postulo/templates/resume/preview.html:61
 #, draft
 msgid "Projects"
@@ -5433,7 +5454,7 @@ msgstr "Projekter"
 msgid "projects"
 msgstr "projekter"
 
-#: src/postulo/resume/views.py:303
+#: src/postulo/resume/views.py:305
 #, draft
 msgid "Projects and achievements"
 msgstr "Projekter og resultater"
@@ -5494,7 +5515,7 @@ msgstr "Læg den tilbage"
 msgid "qualification"
 msgstr "kvalifikation"
 
-#: src/postulo/resume/views.py:300
+#: src/postulo/resume/views.py:302
 #, draft
 msgid "Qualifications"
 msgstr "Uddannelser"
@@ -5561,6 +5582,16 @@ msgstr "Læs %(name)s som"
 msgid "Read as"
 msgstr "Læs som"
 
+#: src/postulo/resume/views.py:321
+#, draft
+msgid "Read as Europass JSON, the format europass.europa.eu exports."
+msgstr "Læst som Europass JSON, det format europass.europa.eu eksporterer."
+
+#: src/postulo/resume/views.py:320
+#, draft
+msgid "Read as Europass XML, the format the CV editor produced."
+msgstr "Læst som Europass XML, det format cv-editoren lavede."
+
 #: src/postulo/jobs/models.py:566
 #, draft
 msgid "read by"
@@ -5585,7 +5616,7 @@ msgid ""
 msgstr ""
 "Læst fra tidslinjen, så en samtale, der endte i et afslag, tæller stadig som en samtale."
 
-#: src/postulo/templates/resume/europass_import.html:29
+#: src/postulo/templates/resume/europass_import.html:31
 #: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
@@ -5596,7 +5627,7 @@ msgstr "Læs den"
 msgid "Read the page"
 msgstr "Læs siden"
 
-#: src/postulo/resume/views.py:318
+#: src/postulo/resume/views.py:326
 #, draft
 msgid "reading"
 msgstr "læsning"
@@ -6407,8 +6438,8 @@ msgid "skill groups"
 msgstr "færdighedsgrupper"
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:52
-#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:302
-#: src/postulo/templates/resume/europass_import.html:98
+#: src/postulo/resume/registry.py:56 src/postulo/resume/views.py:304
+#: src/postulo/templates/resume/europass_import.html:103
 #: src/postulo/templates/resume/preview.html:79
 #, draft
 msgid "Skills"
@@ -6490,7 +6521,7 @@ msgstr "kildeversion"
 msgid "Sources installed"
 msgstr "Installerede kilder"
 
-#: src/postulo/resume/views.py:320
+#: src/postulo/resume/views.py:328
 #, draft
 msgid "speaking"
 msgstr "tale"
@@ -6500,7 +6531,7 @@ msgstr "tale"
 msgid "Speculative letter"
 msgstr "Uopfordret brev"
 
-#: src/postulo/templates/resume/europass_import.html:129
+#: src/postulo/templates/resume/europass_import.html:146
 #, draft
 msgid "Start again"
 msgstr "Start forfra"
@@ -6641,7 +6672,7 @@ msgstr "erstattet"
 msgid "Supersedes"
 msgstr "Erstatter"
 
-#: src/postulo/resume/views.py:308
+#: src/postulo/resume/views.py:310
 #, draft
 msgid "surname"
 msgstr "efternavn"
@@ -6747,7 +6778,7 @@ msgstr "tilpasset til dette CV"
 msgid "Telecommunications"
 msgstr "Telekommunikation"
 
-#: src/postulo/resume/views.py:310
+#: src/postulo/resume/views.py:312
 #, draft
 msgid "telephone"
 msgstr "telefon"
@@ -6815,15 +6846,37 @@ msgstr "Det ligner ikke en %(scheme)s-identifikator (f.eks. %(example)s)."
 msgid "That does not look like a complete web address."
 msgstr "Det ligner ikke en fuldstændig webadresse."
 
+#: src/postulo/resume/europass.py:318 src/postulo/resume/europass.py:591
+#, draft
+msgid "That does not look like a Europass file: it has no LearnerInfo section."
+msgstr "Det ligner ikke en Europass-fil: den har ingen LearnerInfo-sektion."
+
 #: src/postulo/applications/views.py:314
 #, draft
 msgid "That entry could not be saved."
 msgstr "Den post kunne ikke gemmes."
 
+#: src/postulo/resume/europass.py:300
+#, draft
+msgid ""
+"That file carries a document type declaration, which Postulo will not read. A Europass export does not have one."
+msgstr ""
+"Filen indeholder en dokumenttypeerklæring, som Postulo ikke læser. En Europass-eksport har ingen."
+
 #: src/postulo/jobs/logos.py:92
 #, draft
 msgid "That file could not be read as an image."
 msgstr "Denne fil kunne ikke læses som et billede."
+
+#: src/postulo/resume/europass.py:210
+#, draft
+msgid "That file is empty."
+msgstr "Filen er tom."
+
+#: src/postulo/resume/europass.py:213
+#, python-format, draft
+msgid "That file is larger than %(limit)s MB, so it was not read."
+msgstr "Filen er større end %(limit)s MB, så den blev ikke læst."
 
 #: src/postulo/documents/forms.py:175
 #, python-format, draft
@@ -6836,10 +6889,30 @@ msgstr "Den fil er større end %(limit)s MB."
 msgid "That file is larger than a logo should be."
 msgstr "Denne fil er større, end et logo bør være."
 
+#: src/postulo/resume/europass.py:575
+#, python-format, draft
+msgid "That file is not readable JSON: %(reason)s"
+msgstr "Filen er ikke læsbar JSON: %(reason)s"
+
+#: src/postulo/resume/europass.py:310
+#, python-format, draft
+msgid "That file is not readable XML: %(reason)s"
+msgstr "Filen er ikke læsbar XML: %(reason)s"
+
+#: src/postulo/resume/europass.py:572
+#, draft
+msgid "That file is not UTF-8, so it is not a Europass export."
+msgstr "Filen er ikke UTF-8, så det er ikke en Europass-eksport."
+
 #: src/postulo/resume/views.py:252
 #, python-format, draft
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Filen er større end %(limit)s MB. Så stort er et cv ikke."
+
+#: src/postulo/resume/europass.py:580
+#, python-format, draft
+msgid "That file nests more than %(limit)s levels deep, so it was not read."
+msgstr "Filen er indlejret i mere end %(limit)s niveauer, så den blev ikke læst."
 
 #: src/postulo/resume/views.py:265
 #, draft
@@ -6865,6 +6938,13 @@ msgstr "Den invitation er allerede accepteret og kan ikke tilbagekaldes."
 #, draft
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Det er en SVG, som Postulo endnu ikke gemmer. En PNG eller JPEG virker."
+
+#: src/postulo/resume/europass.py:223
+#, draft
+msgid ""
+"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
+msgstr ""
+"Det er ikke en Europass-fil. Postulo læser den XML, cv-editoren lavede, og den JSON, europass.europa.eu eksporterer; det her er ingen af delene."
 
 #: src/postulo/applications/views.py:285
 #, draft
@@ -7051,7 +7131,7 @@ msgid ""
 msgstr ""
 "De felter, dine virksomheder arbejder inden for, med dine egne ord. En virksomhed kan være i flere."
 
-#: src/postulo/templates/resume/europass_import.html:26
+#: src/postulo/templates/resume/europass_import.html:27
 #, draft
 msgid "The file"
 msgstr "Filen"
@@ -7142,6 +7222,13 @@ msgstr "Opslaget"
 #, draft
 msgid "The posting itself"
 msgstr "Selve opslaget"
+
+#: src/postulo/templates/resume/europass_import.html:132
+#, draft
+msgid ""
+"The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
+msgstr ""
+"Resten af filen er stadig værd at importere. Det, der står her, er ikke, og du kan tilføje det i hånden bagefter."
 
 #: src/postulo/templates/applications/application_intake.html:23
 #: src/postulo/templates/jobs/capture_review.html:30
@@ -7765,7 +7852,7 @@ msgstr ""
 "WeasyPrint installeres med Postulo, men den har brug for Pango og dets systembiblioteker. På Debian eller Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. På Windows er de besværlige at få fat i, så brug chromium-motoren i stedet. Se https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
 #: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:116
-#: src/postulo/resume/views.py:311
+#: src/postulo/resume/views.py:313
 #, draft
 msgid "website"
 msgstr "websted"
@@ -7796,6 +7883,11 @@ msgstr "hvad en overvåger bør forespørge"
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "Hvad en ny konto begynder med. Hver person kan ændre sit."
 
+#: src/postulo/templates/resume/europass_import.html:127
+#, draft
+msgid "What could not be read"
+msgstr "Hvad der ikke kunne læses"
+
 #: src/postulo/templates/accounts/profile.html:133
 #: src/postulo/templates/jobs/company_form.html:90
 #, draft
@@ -7820,7 +7912,7 @@ msgid ""
 msgstr ""
 "Hvad der er i kalenderen, snarest først. Planlæg en fra en ansøgnings side."
 
-#: src/postulo/templates/resume/europass_import.html:44
+#: src/postulo/templates/resume/europass_import.html:46
 #, draft
 msgid "What is in the file"
 msgstr "Hvad der står i filen"
@@ -7970,7 +8062,7 @@ msgid "Where you came across it: a job board, a referral, the company site."
 msgstr ""
 "Hvor du stødte på det: en jobportal, en henvisning, virksomhedens websted."
 
-#: src/postulo/resume/views.py:312
+#: src/postulo/resume/views.py:314
 #, draft
 msgid "where you live"
 msgstr "hvor du bor"
@@ -8085,6 +8177,11 @@ msgstr "Med: %(people)s"
 msgid "Withdrawn"
 msgstr "Trukket tilbage"
 
+#: src/postulo/resume/europass.py:644
+#, draft
+msgid "Work experience"
+msgstr "Erhvervserfaring"
+
 #: src/postulo/templates/connections/list.html:35
 #, python-format, draft
 msgid "worked %(when)s"
@@ -8121,7 +8218,7 @@ msgstr "Skriv lidt mere."
 msgid "Write your career down first, then build variants from it."
 msgstr "Skriv din karriere ned først, og byg så varianter ud fra den."
 
-#: src/postulo/resume/views.py:321
+#: src/postulo/resume/views.py:329
 #, draft
 msgid "writing"
 msgstr "skrivning"

@@ -290,6 +290,8 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
             )
             % {"total": report.total},
         )
+        for note in report.skipped:
+            messages.warning(request, note)
         return redirect("resume:overview")
 
 
@@ -311,6 +313,12 @@ PERSON_LABELS = {
     "website": _("website"),
     "location": _("where you live"),
     "headline": _("headline"),
+    "orcid": _("ORCID"),
+}
+
+SOURCE_LABELS = {
+    "xml": _("Read as Europass XML, the format the CV editor produced."),
+    "json": _("Read as Europass JSON, the format europass.europa.eu exports."),
 }
 
 LEVEL_LABELS = {
@@ -330,6 +338,7 @@ def _for_display(held: dict) -> dict:
         for key, total in held.get("counts", {}).items()
         if total
     ]
+    shown["source"] = SOURCE_LABELS.get(held.get("source"), "")
     shown["person"] = [PERSON_LABELS.get(key, key) for key in held.get("person", {})]
     shown["languages"] = [
         {
@@ -356,6 +365,8 @@ def _summarise(record: europass.Record) -> dict:
     """What the review page shows: enough to recognise the file, not the whole of it."""
     return {
         "counts": record.counts(),
+        "source": record.source,
+        "skipped": record.skipped,
         "person": record.person,
         "experience": [
             {"role": row["role"], "organisation": row["organisation"]} for row in record.experience

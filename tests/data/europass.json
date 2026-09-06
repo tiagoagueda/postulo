@@ -1,0 +1,116 @@
+{
+  "_comment": [
+    "The same career as tests/data/europass.xml, in the shape europass.europa.eu exports:",
+    "a SkillsPassport wrapper, telephone and website as arrays, dates as objects of Year,",
+    "Month and Day, CEFR split five ways, and free prose under each skill heading. The two",
+    "fixtures describe the same person on purpose, so a test can insist that both readers",
+    "produce the same record and the mapping stays in one place."
+  ],
+  "SkillsPassport": {
+    "Locale": "en",
+    "DocumentInfo": {"DocumentType": "ECV", "CreationDate": "2026-08-01T09:00:00Z"},
+    "LearnerInfo": {
+      "Identification": {
+        "PersonName": {"FirstName": "Alex", "Surname": "Morgan"},
+        "ContactInfo": {
+          "Address": {
+            "Contact": {
+              "AddressLine": "Rua do Exemplo 1",
+              "Municipality": "Lisboa",
+              "PostalCode": "1000-001",
+              "Country": {"Code": "PT", "Label": "Portugal"}
+            }
+          },
+          "Email": {"Contact": "alex@example.org"},
+          "Telephone": [
+            {"Contact": "+351912345678", "Use": {"Code": "mobile", "Label": "Mobile"}}
+          ],
+          "Website": [
+            {"Contact": "https://alex.example.org"},
+            {"Contact": "https://orcid.org/0000-0002-1825-0097"}
+          ]
+        }
+      },
+      "Headline": {
+        "Type": {"Code": "position_applied_for", "Label": "Position applied for"},
+        "Description": {"Label": "Backend engineer"}
+      },
+      "WorkExperience": [
+        {
+          "Period": {
+            "From": {"Year": 2019, "Month": 3, "Day": 1},
+            "To": {"Year": 2023, "Month": 6, "Day": 30},
+            "Current": false
+          },
+          "Position": {"Code": "2512", "Label": "Senior Engineer"},
+          "Activities": "Built the thing. Kept it running.",
+          "Employer": {
+            "Name": "Aperture Science",
+            "ContactInfo": {
+              "Address": {
+                "Contact": {
+                  "Municipality": "Cambridge",
+                  "Country": {"Code": "UK", "Label": "United Kingdom"}
+                }
+              }
+            }
+          }
+        },
+        {
+          "Period": {"From": {"Year": 2023, "Month": 7}, "Current": true},
+          "Position": {"Label": "Principal Engineer"},
+          "Activities": "Still building things.",
+          "Employer": {"Name": "Black Mesa"}
+        }
+      ],
+      "Education": [
+        {
+          "Period": {
+            "From": {"Year": 2014, "Month": 9},
+            "To": {"Year": 2018, "Month": 7},
+            "Current": false
+          },
+          "Title": "MSc Computer Science",
+          "Organisation": {
+            "Name": "Universidade de Lisboa",
+            "ContactInfo": {
+              "Address": {
+                "Contact": {
+                  "Municipality": "Lisboa",
+                  "Country": {"Code": "PT", "Label": "Portugal"}
+                }
+              }
+            }
+          },
+          "Level": {"Code": "eqf7", "Label": "EQF 7"},
+          "Activities": "Distributed systems."
+        }
+      ],
+      "Skills": {
+        "Linguistic": {
+          "MotherTongue": [{"Description": {"Code": "pt", "Label": "português"}}],
+          "ForeignLanguage": [
+            {
+              "Description": {"Code": "en", "Label": "English"},
+              "ProficiencyLevel": {
+                "Listening": "C2",
+                "Reading": "C2",
+                "SpokenInteraction": "C1",
+                "SpokenProduction": "C1",
+                "Writing": "B2"
+              }
+            }
+          ]
+        },
+        "Computer": {"Description": {"Label": "Python; PostgreSQL; Docker"}},
+        "Organisational": {"Description": {"Label": "Mentoring\nPlanning"}}
+      },
+      "Achievement": [
+        {
+          "Title": {"Label": "Open source"},
+          "Description": {"Label": "Maintainer of a thing."}
+        }
+      ]
+    }
+  }
+}

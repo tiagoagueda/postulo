@@ -1,8 +1,10 @@
 """Reading a Europass CV: what the file says, what gets written, and what is refused.
 
-The fixture at ``tests/data/europass.xml`` is a real file's shape — nested
-``WorkExperience``, dates as attributes, CEFR split five ways, prose under each skill
-heading — because that is what this reader has to survive.
+Two fixtures, one career. ``tests/data/europass.xml`` is the legacy format's real shape —
+nested ``WorkExperience``, dates as attributes, CEFR split five ways, prose under each
+skill heading — and ``tests/data/europass.json`` is the same person as the current platform
+exports them. They describe the same career on purpose: a test insists the two readers
+produce the same record, which is what keeps the mapping in one place instead of two.
 """
 
 import datetime as dt
@@ -13,6 +15,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.urls import reverse
 
+from postulo.accounts import identifiers
+from postulo.accounts.models import PersonIdentifier
 from postulo.resume import europass
 from postulo.resume.models import (
     Education,
@@ -26,6 +30,7 @@ from postulo.resume.models import (
 pytestmark = pytest.mark.django_db
 
 FIXTURE = Path(__file__).parent / "data" / "europass.xml"
+JSON_FIXTURE = Path(__file__).parent / "data" / "europass.json"
 
 MINIMAL = b"""<?xml version="1.0"?>
 <SkillsPassport xmlns="http://europass.cedefop.europa.eu/Europass">
@@ -156,9 +161,9 @@ def test_an_external_entity_cannot_reach_the_disk():
         europass.read(xxe)
 
 
-def test_something_that_is_not_xml_says_so():
+def test_xml_that_does_not_parse_says_so():
     with pytest.raises(europass.EuropassError, match="not readable XML"):
-        europass.read(b"this is a PDF, honestly")
+        europass.read(b"<SkillsPassport><LearnerInfo>")
 
 
 def test_xml_that_is_not_europass_says_so():
@@ -296,7 +301,7 @@ def test_a_file_that_cannot_be_read_says_why_and_keeps_the_page(client, user):
     client.force_login(user)
     url = reverse("resume:europass_import")
 
-    response = client.post(url, {"file": upload(data=b"not xml at all")}, follow=True)
+    response = client.post(url, {"file": upload(data=b"<SkillsPassport><Learner")}, follow=True)
 
     assert b"not readable XML" in response.content
     assert response.context["found"] is None
@@ -361,3 +366,205 @@ def test_the_command_imports_for_the_account_it_is_given(user, other_user, capsy
     assert Experience.objects.filter(owner=user).count() == 2
     assert not Experience.objects.filter(owner=other_user).exists()
     assert "Nothing was overwritten" in capsys.readouterr().out
+
+
+# ------------------------------------------------------------- the JSON format
+
+
+MINIMAL_JSON = b"""{
+  "SkillsPassport": {"LearnerInfo": {"WorkExperience": {
+    "Period": {"From": {"Year": 2020}},
+    "Position": {"Label": "Engineer"},
+    "Employer": {"Name": "Initech"}
+  }}}
+}"""
+
+
+def test_both_formats_read_the_same_career():
+    """The point of the split: two front doors, one mapping.
+
+    If this ever fails, the JSON reader has grown its own copy of the mapping and the two
+    are free to drift apart, which is exactly what the intermediate record is for.
+    """
+    from_xml = europass.read(FIXTURE.read_bytes())
+    from_json = europass.read(JSON_FIXTURE.read_bytes())
+
+    assert from_xml.source == "xml"
+    assert from_json.source == "json"
+    assert from_json.person == from_xml.person
+    assert from_json.experience == from_xml.experience
+    assert from_json.education == from_xml.education
+    assert from_json.languages == from_xml.languages
+    assert from_json.skill_groups == from_xml.skill_groups
+    assert from_json.projects == from_xml.projects
+
+
+def test_the_format_is_sniffed_so_nobody_has_to_know_which_they_have():
+    assert europass.read(FIXTURE.read_bytes()).source == "xml"
+    assert europass.read(JSON_FIXTURE.read_bytes()).source == "json"
+    # A byte order mark and leading whitespace do not change the answer.
+    assert europass.read(b"\xef\xbb\xbf\n  " + JSON_FIXTURE.read_bytes()).source == "json"
+
+
+def test_something_that_is_neither_format_says_so():
+    with pytest.raises(europass.EuropassError, match="not a Europass file"):
+        europass.read(b"Name,Role\nAlex,Engineer\n")
+
+
+def test_one_entry_written_as_an_object_reads_like_a_list_of_one():
+    """Exports differ on whether a single entry is wrapped in an array."""
+    record = europass.read(MINIMAL_JSON)
+
+    assert len(record.experience) == 1
+    assert record.experience[0]["role"] == "Engineer"
+    assert record.experience[0]["start_date"] == dt.date(2020, 1, 1)
+
+
+def test_a_block_of_the_wrong_type_is_skipped_and_said_out_loud():
+    """Half a file is worth importing; a silently empty career is not."""
+    data = b"""{"LearnerInfo": {
+      "WorkExperience": "see attached",
+      "Education": [{"Title": "MSc", "Period": {"From": {"Year": 2014}}}]
+    }}"""
+
+    record = europass.read(data)
+
+    assert record.experience == []
+    assert len(record.education) == 1
+    assert any("Work experience" in note for note in record.skipped)
+
+
+def test_values_of_the_wrong_type_do_not_stop_the_read():
+    data = b"""{"LearnerInfo": {
+      "Identification": {"PersonName": {"FirstName": ["Alex"], "Surname": "Morgan"}},
+      "WorkExperience": [
+        {"Position": {"Label": "Engineer"}, "Employer": {"Name": 12345},
+         "Period": {"From": {"Year": "2020", "Month": "not a month"}}}
+      ]
+    }}"""
+
+    record = europass.read(data)
+
+    assert record.person == {"last_name": "Morgan"}
+    assert record.experience[0]["organisation"] == "12345"
+    # A month that is missing becomes January; a month that is nonsense is not guessed at,
+    # because inventing one could misdate the job by eleven months.
+    assert record.experience[0]["start_date"] is None
+
+
+def test_json_that_is_not_europass_says_so():
+    with pytest.raises(europass.EuropassError, match="LearnerInfo"):
+        europass.read(b'{"hello": "world"}')
+
+
+def test_json_that_does_not_parse_says_so():
+    with pytest.raises(europass.EuropassError, match="not readable JSON"):
+        europass.read(b'{"LearnerInfo": ')
+
+
+def test_a_document_that_nests_too_deep_is_refused():
+    """A career record is not forty levels deep, so anything that is, is not one."""
+    data = ('{"LearnerInfo":' * 60) + "null" + ("}" * 60)
+
+    with pytest.raises(europass.EuropassError, match="nests more than"):
+        europass.read(data.encode())
+
+
+def test_a_json_file_over_the_cap_is_not_parsed():
+    with pytest.raises(europass.EuropassError, match="larger than"):
+        europass.read(b"{" + b" " * europass.MAX_BYTES)
+
+
+def test_the_json_reads_through_the_page_as_well(client, user):
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+
+    client.post(url, {"file": upload("cv.json", JSON_FIXTURE.read_bytes())})
+    client.post(url, {"action": "confirm"})
+
+    assert Experience.objects.filter(owner=user).count() == 2
+    assert Education.objects.filter(owner=user).count() == 1
+
+
+# ------------------------------------------------------------------- an ORCID
+
+
+def test_an_orcid_among_the_websites_becomes_an_identifier(user):
+    """Neither format has a field for it, and everybody who has one lists it as a site."""
+    record = europass.read(FIXTURE.read_bytes())
+
+    assert record.person["orcid"] == "0000-0002-1825-0097"
+    # The first website is still the website; the ORCID does not take its place.
+    assert record.person["website"] == "https://alex.example.org"
+
+    europass.apply(user, record)
+
+    identifier = PersonIdentifier.objects.get(profile=user.profile)
+    assert identifier.scheme == identifiers.ORCID
+    assert identifier.value == "0000-0002-1825-0097"
+
+
+def test_an_orcid_that_fails_its_checksum_is_dropped_rather_than_saved(user):
+    data = FIXTURE.read_bytes().replace(b"0000-0002-1825-0097", b"0000-0002-1825-0098")
+
+    record = europass.read(data)
+
+    assert "orcid" not in record.person
+    europass.apply(user, record)
+    assert not PersonIdentifier.objects.filter(profile=user.profile).exists()
+
+
+def test_an_orcid_somebody_already_has_is_left_alone(user):
+    PersonIdentifier.objects.create(
+        profile=user.profile, scheme=identifiers.ORCID, value="0000-0001-5109-3700"
+    )
+
+    europass.apply(user, europass.read(FIXTURE.read_bytes()))
+
+    identifiers_held = PersonIdentifier.objects.filter(profile=user.profile)
+    assert identifiers_held.count() == 1
+    assert identifiers_held.get().value == "0000-0001-5109-3700"
+
+
+# ------------------------------------------------ saying what was not written
+
+
+def test_experience_without_a_start_is_named_rather_than_dropped_quietly(user):
+    data = MINIMAL.replace(b'<Period><From year="2020"/></Period>', b"")
+
+    report = europass.apply(user, europass.read(data))
+
+    assert not Experience.objects.filter(owner=user).exists()
+    assert report.skipped == ["Engineer: no start date, so it was not added."]
+
+
+def test_the_review_page_says_which_format_it_read(client, user):
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+
+    client.post(url, {"file": upload("cv.json", JSON_FIXTURE.read_bytes())})
+
+    assert b"Read as Europass JSON" in client.get(url).content
+
+
+def test_the_review_page_lists_what_it_could_not_read(client, user):
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+    half = b'{"LearnerInfo": {"WorkExperience": "see attached", "Education": [{"Title": "MSc"}]}}'
+
+    client.post(url, {"file": upload("cv.json", half)})
+
+    page = client.get(url)
+    assert b"What could not be read" in page.content
+    assert b"Work experience was in the file but could not be read." in page.content
+
+
+def test_what_could_not_be_written_is_said_after_the_import(client, user):
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+    undated = MINIMAL.replace(b'<Period><From year="2020"/></Period>', b"")
+    client.post(url, {"file": upload(data=undated)})
+
+    response = client.post(url, {"action": "confirm"}, follow=True)
+
+    assert b"no start date, so it was not added" in response.content

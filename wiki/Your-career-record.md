@@ -90,9 +90,15 @@ If you have applied to an EU institution, or through a national employment servi
 already have a Europass CV. Typing that career record in a second time is exactly the work
 Postulo exists to remove, so it will read the file instead.
 
-Postulo reads the **Europass XML** — what the CV editor produced, and what an older export
-sitting on your disk will be. It does not matter which namespace the file carries: Europass
-has been through several over the years, and all of them read.
+Postulo reads **both** Europass formats:
+
+- the **JSON**, which is what europass.europa.eu exports today;
+- the **XML**, which is what the old CV editor produced and what an older export sitting on
+  your disk still is. It does not matter which namespace the file carries — Europass has
+  been through several over the years, and all of them read.
+
+You do not have to know which one you have. There is one file box; Postulo works out which
+format it was handed and tells you on the review page.
 
 ### It happens in two steps
 
@@ -117,6 +123,24 @@ left exactly as it is.** Your own words about yourself beat a form you filled in
 A skill heading you already have — *Digital*, say — is used rather than repeated, so you do
 not end up with the same heading twice.
 
+If one of the websites in the file is an **ORCID** address, it is lifted out and kept as an
+identifier rather than as another link — that is what an academic application form asks for
+by name. Its checksum decides: a mistyped one is dropped rather than saved, and orcid.org
+is asked nothing. An ORCID you already have is left as it is.
+
+### A file that is only half right
+
+An export can be missing pieces, or carry a section in a shape Postulo does not recognise.
+That is not a reason to refuse the lot. The half that reads is imported, and the review page
+lists **what could not be read** before you confirm, so nothing goes missing quietly. After
+the import, anything that was read but not written — a job with no start date, which there
+is nothing to order — is named in a message rather than dropped.
+
+A date is treated the same way. A month or a day that is simply **absent** becomes the first
+of the period, because people write "2019" and mean it. A month that is **present and
+unreadable** produces no date at all: turning nonsense into January could misdate a job by
+eleven months, and being told is better than being wrong.
+
 ### Languages lose four levels of five
 
 Europass records listening, reading, conversation, speaking and writing separately, and
@@ -127,22 +151,25 @@ it afterwards knowing exactly what was set aside.
 
 ### What is refused
 
-The file is XML from somewhere else, so it is read carefully: there is a 5 MB cap, and any
-file carrying a **document type declaration** is refused outright without being parsed.
-That is where entity expansion lives — the "billion laughs" attack and external entity
-fetches both need one — and a genuine Europass export has no use for it. Nothing is
-fetched while reading: no schema is resolved and no network request is made.
+The file came from somewhere else, so it is read carefully. There is a 5 MB cap for both
+formats. Any XML carrying a **document type declaration** is refused outright without being
+parsed: that is where entity expansion lives — the "billion laughs" attack and external
+entity fetches both need one — and a genuine Europass export has no use for it. JSON that
+nests more than forty levels deep is refused too, because a career record is not that deep.
+Nothing is fetched while reading: no schema is resolved and no network request is made.
 
-A file that is not readable XML, or that has no `LearnerInfo` section, is refused with the
-reason rather than half-imported.
+A file that is neither format, that does not parse, or that has no `LearnerInfo` section is
+refused with the reason rather than half-imported.
 
 ### From the command line
 
 An operator with a shell can do the same thing:
 
 ```sh
-python manage.py import_europass cv.xml --user alex@example.org --dry-run
+python manage.py import_europass cv.json --user alex@example.org --dry-run
 ```
+
+Either format, and the file decides which: the command says which one it read.
 
 `--dry-run` says what it found and writes nothing. Without it, the import runs and reports
 what it added.

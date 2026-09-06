@@ -18,13 +18,15 @@
         {% csrf_token %}
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
           {% blocktranslate trimmed %}
-            A Europass XML file — what the CV editor produced, and what an older export on
-            your disk will be. Postulo reads it, shows you what is in it, and writes
-            nothing until you say so.
+            Either Europass format: the JSON europass.europa.eu exports today, or the XML
+            the old CV editor produced and an older export on your disk still is. Postulo
+            works out which it is, shows you what is in it, and writes nothing until you
+            say so.
           {% endblocktranslate %}
         </p>
         <label class="mb-3 block text-sm font-medium" for="file">{% translate "The file" %}</label>
-        <input type="file" name="file" id="file" accept=".xml,text/xml,application/xml" required
+        <input type="file" name="file" id="file" required
+               accept=".xml,.json,text/xml,application/xml,application/json"
                class="field-input mb-4 block w-full">
         <button type="submit" class="btn-primary">{% translate "Read it" %}</button>
       </form>
@@ -41,7 +43,10 @@
       </div>
     {% else %}
       <div class="card mb-6" data-europass-found>
-        <h2 class="mb-3 font-medium">{% translate "What is in the file" %}</h2>
+        <h2 class="mb-1 font-medium">{% translate "What is in the file" %}</h2>
+        {% if found.source %}
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{{ found.source }}</p>
+        {% endif %}
         <dl class="mb-4 grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[10rem_1fr]">
           {% for row in found.counts %}
             <dt class="text-ink-500 dark:text-ink-400">{{ row.label }}</dt>
@@ -114,6 +119,18 @@
           <p class="text-sm text-ink-600 dark:text-ink-300">
             {% blocktranslate with names=found.person|join:", " trimmed %}
               Found: {{ names }}. Only the ones you have left blank will be filled in.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+        {% if found.skipped %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "What could not be read" %}</h3>
+          <ul class="space-y-1 text-sm text-amber-700 dark:text-amber-400">
+            {% for note in found.skipped %}<li>{{ note }}</li>{% endfor %}
+          </ul>
+          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              The rest of the file is still worth importing. What is listed here is not,
+              and you can add it by hand afterwards.
             {% endblocktranslate %}
           </p>
         {% endif %}
