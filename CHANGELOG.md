@@ -156,6 +156,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **Every page breached the content security policy.** htmx injects a `<style>` element as
+  it starts, carrying its own rules for the request indicator, and production allows no
+  inline styles — so the browser refused it and logged a violation on the dashboard, the
+  sign-in page and everywhere else. The rules were redundant: Postulo's own stylesheet
+  already defines them, precisely because inline styles are not available here. htmx is now
+  told not to add them, through a meta tag the policy permits. A browser test serves the
+  pages under the production policy and fails on any violation the browser reports, which
+  is the part that keeps it true — a policy in a settings file is not evidence that the
+  pages obey it. (#68)
 - **The progress bars on Insights had stretched, flattened ends.** Each funnel bar was an
   SVG with `preserveAspectRatio="none"`, which scales a hundred-unit-wide drawing across
   the whole column: one horizontal unit became several pixels while one vertical unit

@@ -41,7 +41,10 @@ Add at the proxy what an application cannot do for itself:
 - The security headers Postulo sends (a strict content security policy, `nosniff`,
   `same-origin` referrer, `DENY` framing) can stay as they are; do not loosen the policy
   to add analytics — there is no place for a third-party script in a page that shows
-  somebody's employment history.
+  somebody's employment history. The pages are served under that policy in a real browser
+  by the test suite, which fails if any of them provokes a single violation, so it should
+  stay quiet in yours too. If you point a reporting endpoint at it and see something, it is
+  worth telling us about.
 
 ## Secrets
 

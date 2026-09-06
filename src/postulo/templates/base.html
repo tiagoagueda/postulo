@@ -3,6 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% comment %} htmx injects a <style> element as it starts, carrying its own rules for the
+       request indicator. The production policy sets style-src 'self' with no unsafe-inline,
+       so the browser refuses it and logs a violation on every page. Postulo's own stylesheet
+       already defines .htmx-indicator and the .htmx-request pair, precisely because inline
+       styles are not available here, so what htmx adds is redundant as well as blocked.
+       Configured by attribute, which the policy does allow. {% endcomment %}
+    <meta name="htmx-config" content='{"includeIndicatorStyles":false}'>
     <meta name="referrer" content="same-origin">
     <title>{% block title %}{{ instance_name }}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
