@@ -18,6 +18,12 @@ All notable changes to Postulo are recorded here. The format follows
   *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
   switch per document kind, *Send to stores now* tries at once, *Send everything* queues
   what existed before the store did, and the references travel in the export. (#13)
+- **postulo-paperless, the first store plugin.** Connect a Paperless-ngx archive and
+  every document Postulo renders or receives is filed there: the company as
+  correspondent, the kind as document type, a `postulo` tag, and a custom field that
+  leads back to the application. Consumption is asynchronous and retries are safe,
+  because Paperless names the document it already holds; nothing is ever archived twice
+  or deleted. Lives at [postulo/postulo-paperless](https://source.tiagoagueda.com/postulo/postulo-paperless). (#15)
 - **postulo-apprise, the first plugin built outside the core.** One package, one
   connection, and Postulo can notify through [Apprise](https://github.com/caronc/apprise):
   Telegram, ntfy, Discord, Matrix, Gotify, Pushover, Signal, email and well over a hundred
