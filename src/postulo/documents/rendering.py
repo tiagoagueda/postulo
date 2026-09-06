@@ -51,6 +51,18 @@ def document_language(document) -> str:
     return site.default_language() or "en-GB"
 
 
+def document_direction(document) -> str:
+    """``"rtl"`` or ``"ltr"`` for a rendered document, from the language it declares.
+
+    Not from whoever is looking at it. A person reading Postulo in Arabic may write a CV in
+    English, and the PDF that goes out has to be laid out for the language it is written in
+    — WeasyPrint hyphenates, justifies and orders the lines by this and by nothing else.
+    """
+    from postulo.core import languages
+
+    return languages.direction(document_language(document))
+
+
 @dataclass
 class Section:
     """A run of CV entries sharing a heading."""
@@ -102,6 +114,7 @@ def render_cv_html(cv: CV) -> str:
             "sections": build_sections(cv),
             "contact": contact_details(cv.owner) if cv.show_contact_details else None,
             "document_language": document_language(cv),
+            "document_direction": document_direction(cv),
         },
     )
 
@@ -163,6 +176,7 @@ def render_letter_html(letter: CoverLetter, application=None) -> str:
             "contact": contact_details(letter.owner),
             "application": application,
             "document_language": document_language(letter),
+            "document_direction": document_direction(letter),
         },
     )
 

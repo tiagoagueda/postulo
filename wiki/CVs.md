@@ -63,3 +63,8 @@ a CV in French, write French into a French variant.
 
 Left blank, it follows the language you read Postulo in rather than defaulting to English.
 Cover letters have the same field and behave the same way.
+
+It also sets the document's **direction**. A CV written in Arabic or Hebrew is laid out
+right to left; one written in English is laid out left to right, whichever language you
+happen to read Postulo in. The PDF goes to somebody else, so it is laid out for what is
+written on it rather than for who made it.

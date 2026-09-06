@@ -22,7 +22,7 @@
         {% if posting.employment_type %} · {{ posting.get_employment_type_display }}{% endif %}
       </p>
     </div>
-    <div class="ml-auto flex flex-wrap items-center gap-2">
+    <div class="ms-auto flex flex-wrap items-center gap-2">
       {% if posting.is_undecided %}
         {% if posting.state != "shortlisted" %}
           <form method="post" action="{% url 'listings:shortlist' posting.pk %}">

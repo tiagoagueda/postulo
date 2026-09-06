@@ -120,8 +120,13 @@ help rather than fight that.
    deliberately rather than derived from the code, because a language is not a country.
    **Leave it out where there is no uncontested answer.** Spanish is not only Spain and
    Arabic is not one flag; no flag beats a wrong flag, and the picker copes with a blank.
-3. `uv run python scripts/messages.py extract` creates the catalogue.
-4. Translate, `check`, `stats --write`, and open a pull request.
+3. **If the language is read right to left**, add its subtag to `RTL` in the same file.
+   That one list is what both the interface and a rendered document read, so a language
+   added there is laid out correctly everywhere at once. The interface layout itself needs
+   no work — that was done in #67 and is held by a lint and a browser suite that visits the
+   application in a right-to-left language.
+4. `uv run python scripts/messages.py extract` creates the catalogue.
+5. Translate, `check`, `stats --write`, and open a pull request.
 
 ## Plugins
 

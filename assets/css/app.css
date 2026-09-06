@@ -72,6 +72,54 @@
   }
 
   /*
+   * Machine text is never in the reader's script. A package name, a version, a checksum,
+   * an entry point: all Latin, and all liable to sit inside an Arabic or Hebrew line where
+   * the bidirectional algorithm resolves the punctuation around them against the
+   * paragraph and throws it to the wrong end. Isolating every <code> here is one rule
+   * instead of a <bdi> at each of the forty places one appears.
+   */
+  code,
+  kbd,
+  samp {
+    unicode-bidi: isolate;
+  }
+
+  /*
+   * The same for anything a person typed, wherever a template has said so with <bdi>.
+   * The element carries `unicode-bidi: isolate` by default; this only stops a reset or a
+   * future utility taking it away, and says out loud that it is load-bearing.
+   */
+  bdi {
+    unicode-bidi: isolate;
+  }
+
+  /*
+   * An icon that points sideways points the wrong way when the page is read the other
+   * way: a "next" chevron aiming at the left margin in Arabic is worse than no chevron.
+   * Vertical ones -- the sort arrows, move up and move down -- mean the same in both.
+   *
+   * Keyed on the name the {% icon %} tag stamps rather than on a class somebody has to
+   * remember to add, so a horizontal icon flips the day it is used and nobody has to
+   * think about it. tests/test_template_lint.py holds the list to the icon set.
+   */
+  [dir="rtl"] [data-icon="chevron-left"],
+  [dir="rtl"] [data-icon="chevron-right"],
+  [dir="rtl"] [data-icon="chevrons-left"],
+  [dir="rtl"] [data-icon="chevrons-right"],
+  [dir="rtl"] [data-icon="arrow-left"],
+  [dir="rtl"] [data-icon="arrow-right"],
+  [dir="rtl"] [data-icon="arrow-big-left"],
+  [dir="rtl"] [data-icon="arrow-big-right"],
+  [dir="rtl"] [data-icon="corner-down-left"],
+  [dir="rtl"] [data-icon="corner-down-right"],
+  [dir="rtl"] [data-icon="move-left"],
+  [dir="rtl"] [data-icon="move-right"],
+  [dir="rtl"] [data-icon="undo"],
+  [dir="rtl"] [data-icon="redo"] {
+    transform: scaleX(-1);
+  }
+
+  /*
    * Tell the browser which theme is in force, so its own controls — scrollbars, select
    * menus, the date picker — follow it. Same three states as the `dark` variant above.
    */
@@ -179,7 +227,7 @@
 
   /* An entry in the account menu: link or button, same look. */
   .menu-item {
-    @apply flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700
+    @apply flex w-full items-center gap-2 px-3 py-2 text-start text-sm text-ink-700
       hover:bg-ink-100 hover:text-ink-900
       dark:text-ink-200 dark:hover:bg-ink-800 dark:hover:text-ink-50;
   }
@@ -311,7 +359,7 @@ details[data-menu] > summary::-webkit-details-marker {
     @apply sr-only;
   }
   .skip-link:focus {
-    @apply not-sr-only fixed left-4 top-4 z-50 rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white;
+    @apply not-sr-only fixed start-4 top-4 z-50 rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white;
   }
 }
 

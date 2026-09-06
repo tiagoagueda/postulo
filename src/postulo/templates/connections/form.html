@@ -6,7 +6,7 @@
     {% if connection %}{{ connection.label }}{% else %}{% blocktranslate with plugin=plugin.label trimmed %}Connect {{ plugin }}{% endblocktranslate %}{% endif %}
   </h2>
   <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
-    {{ kind_label }} · {{ plugin.label }} <code class="text-xs">{{ plugin.version }}</code>
+    {{ kind_label }} · <bdi>{{ plugin.label }}</bdi> <code class="text-xs">{{ plugin.version }}</code>
   </p>
 
   <form method="post" novalidate>

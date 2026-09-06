@@ -123,6 +123,12 @@ root tells an assistant how this project works; keep it current when the rules c
   *colour*, *licence* (noun), *behaviour*.
 - **Wrap every user-facing string** in `gettext` / `gettext_lazy`, or `{% translate %}`
   in templates. Untranslatable strings are treated as bugs.
+- **Never name a side of the page.** Use the logical utilities — `ms`/`me`, `ps`/`pe`,
+  `start`/`end`, `text-start`/`text-end`, `border-s`/`border-e` — not `ml`, `pl`,
+  `text-left` or `left-0`. They mean the same thing under `ltr` and the right thing under
+  `rtl`; `tests/test_template_lint.py` fails on a physical one. Wrap text a person typed
+  in `<bdi>` where it sits inline beside other text, so a Latin name inside an Arabic line
+  does not throw the punctuation to the wrong end.
 - **Every user-owned model** inherits the shared owned-model base and is filtered by
   owner in every query. Cross-account data leaks are the one bug class we test for
   explicitly, so new models need a test proving isolation.

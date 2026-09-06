@@ -6,6 +6,32 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **The interface is laid out right to left when the language is.** The `dir` attribute
+  has been emitted since the first release and has been `ltr` on every page ever rendered,
+  because every language Postulo speaks is read left to right — so what happened under
+  `rtl` was unknown rather than known-good. It is known now, and the layout work is done
+  before the first such language arrives (#70) rather than after somebody reports it.
+  Sixty-five classes across forty-two templates and the stylesheet stopped naming a side
+  and started naming a **reading edge** — `ms`/`me`, `ps`/`pe`, `start`/`end`,
+  `text-start`/`text-end`, `border-s` — which mean exactly what they meant under `ltr`. The
+  action buttons at the end of a heading row, the timeline rule beside the event log, the
+  menus that hang from a corner, the skip link and the board's columns all move to the
+  other edge; icons that point sideways are mirrored by name, and vertical ones are left
+  alone because they mean the same either way. **Text that is not in the reader's script
+  is isolated**: company names, job titles, addresses and letter subjects in `<bdi>`, and
+  every `<code>` span by one stylesheet rule, so a Latin name inside an Arabic line does
+  not throw the separator to the wrong end. **A rendered document has its own direction**,
+  from the language it is written in and not from the language of whoever made it — an
+  English CV written by somebody using Postulo in Arabic is an English, left-to-right PDF.
+  One list of right-to-left subtags serves the interface and the documents alike, and it is
+  Postulo's own rather than Django's, because #43 goes well past the languages Django ships
+  with. Held by two things that will still be there next year: a **lint** that fails on any
+  template or stylesheet class naming a left or a right, and a **browser suite** that reads
+  the application in a right-to-left language — in both themes, through axe — and measures
+  that the buttons, the board and the skip link actually moved. (#67)
+
 ### Changed
 
 - **The dashboard and Insights are one page, built from widgets you arrange.** They

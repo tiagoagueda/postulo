@@ -11,14 +11,14 @@
         {% translate "Each invitation may be used once, and expires on its own." %}
       </p>
     </div>
-    <a href="{% url 'accounts:invite_create' %}" class="btn-primary ml-auto">
+    <a href="{% url 'accounts:invite_create' %}" class="btn-primary ms-auto">
       {% translate "New invitation" %}
     </a>
   </div>
 
   {% if invites %}
     <div class="card overflow-x-auto p-0">
-      <table class="w-full text-left text-sm">
+      <table class="w-full text-start text-sm">
         <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
                       dark:border-ink-800 dark:text-ink-400">
           <tr>
@@ -50,7 +50,7 @@
                   <span class="text-ink-400">—</span>
                 {% endif %}
               </td>
-              <td class="px-4 py-3 text-right">
+              <td class="px-4 py-3 text-end">
                 {% if not invite.is_accepted %}
                   <form method="post" action="{% url 'accounts:invite_revoke' invite.pk %}">
                     {% csrf_token %}

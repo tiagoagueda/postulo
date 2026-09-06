@@ -38,16 +38,16 @@
               <p class="font-medium">
                 {{ plugin.name }} <span class="text-ink-500 dark:text-ink-400">{{ plugin.version }}</span>
                 {% if plugin.disabled %}
-                  <span class="ml-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{% translate "Off" %}</span>
+                  <span class="ms-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{% translate "Off" %}</span>
                 {% endif %}
                 {% if not plugin.present %}
-                  <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200">{% translate "not loaded" %}</span>
+                  <span class="ms-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200">{% translate "not loaded" %}</span>
                 {% endif %}
               </p>
               <p class="text-xs text-ink-500 dark:text-ink-400">
-                {{ plugin.origin }} · {{ plugin.source|truncatechars:60 }}
+                {{ plugin.origin }} · <bdi>{{ plugin.source|truncatechars:60 }}</bdi>
                 {% if plugin.installed_at %} · {{ plugin.installed_at }}{% endif %}
-                {% if plugin.installed_by %} · {{ plugin.installed_by }}{% endif %}
+                {% if plugin.installed_by %} · <bdi>{{ plugin.installed_by }}</bdi>{% endif %}
               </p>
               {% if plugin.entry_points %}
                 <p class="text-xs text-ink-500 dark:text-ink-400">
@@ -176,7 +176,7 @@
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   {{ listing.summary }}
                   {% if listing.licence %} · {{ listing.licence }}{% endif %}
-                  {% if listing.maintainer %} · {{ listing.maintainer }}{% endif %}
+                  {% if listing.maintainer %} · <bdi>{{ listing.maintainer }}</bdi>{% endif %}
                   · <code>{{ listing.catalogue }}</code>
                 </p>
               </div>
@@ -218,7 +218,7 @@
   {# -------------------------------------------------------------- sources #}
   <h3 class="mb-3 font-medium">{% translate "Capture sources this instance has" %}</h3>
   <div class="card overflow-x-auto p-0">
-    <table class="w-full text-left text-sm">
+    <table class="w-full text-start text-sm">
       <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
         <tr>
           <th class="px-4 py-3 font-medium">{% translate "Source" %}</th>

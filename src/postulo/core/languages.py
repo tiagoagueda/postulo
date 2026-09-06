@@ -172,3 +172,50 @@ def translation_status() -> dict[str, dict[str, int]]:
 
 
 _STATUS: dict[str, dict[str, int]] | None = None
+
+
+#: Language subtags written right to left.
+#:
+#: Postulo's own list rather than Django's ``LANGUAGES_BIDI``, and the reason is #43: Django
+#: knows the languages Django ships with, and Postulo is going past them. The African set
+#: (#70) brings Arabic; the Asian set (#71) brings Hebrew, Persian and Urdu. One list that
+#: both the interface and a rendered document read is one place to add a language to, and
+#: one answer when they are asked the same question.
+#:
+#: Matched on the primary subtag, so ``ar-eg`` is as right to left as ``ar``. Direction is a
+#: property of the script rather than of the region, and no region of Arabic is written the
+#: other way.
+RTL: frozenset[str] = frozenset(
+    {
+        "ar",  # Arabic
+        "arc",  # Aramaic
+        "ckb",  # Central Kurdish (Sorani)
+        "dv",  # Divehi
+        "fa",  # Persian
+        "he",  # Hebrew
+        "ks",  # Kashmiri
+        "ku",  # Kurdish, where written in the Arabic script
+        "nqo",  # N'Ko
+        "prs",  # Dari
+        "ps",  # Pashto
+        "sd",  # Sindhi
+        "syr",  # Syriac
+        "ug",  # Uyghur
+        "ur",  # Urdu
+        "yi",  # Yiddish
+    }
+)
+
+
+def is_rtl(code: str) -> bool:
+    """Whether a language tag names a language written right to left."""
+    return (code or "").strip().lower().replace("_", "-").split("-", 1)[0] in RTL
+
+
+def direction(code: str) -> str:
+    """``"rtl"`` or ``"ltr"``, for the ``dir`` attribute of a page or a document.
+
+    Always one of the two, never empty: ``dir=""`` is not the same as an absent attribute
+    in every engine, and a document that declines to say is a document that gets guessed at.
+    """
+    return "rtl" if is_rtl(code) else "ltr"

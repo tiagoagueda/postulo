@@ -7,7 +7,7 @@
               dark:border-ink-800 dark:text-ink-400">
   <tr>
     {% for header in table.headers %}
-      <th scope="col" class="px-4 py-3 font-medium {% if header.column.numeric %}text-right{% endif %} {{ header.column.css }}"
+      <th scope="col" class="px-4 py-3 font-medium {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
           {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
         {% if header.column.sortable %}
           <a href="{% querystring sort=header.next_sort page=None %}"

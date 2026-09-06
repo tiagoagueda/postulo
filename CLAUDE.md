@@ -30,6 +30,9 @@ Four commitments are stated in the README and are not negotiable in code:
   CSS is committed). All JavaScript lives in `static/js/app.js` and vendored files —
   the CSP forbids inline scripts. Django `{# #}` comments are single-line only.
 - Every `next` redirect goes through `safe_next()`.
+- Never name a side of the page: logical utilities (`ms`/`me`, `ps`/`pe`, `start`/`end`,
+  `text-start`/`text-end`) only, and `<bdi>` around typed text that sits inline beside
+  other text. `tests/test_template_lint.py` fails on a physical one.
 - Every user-facing string is wrapped for translation. After adding or changing one, run
   `uv run python scripts/messages.py extract` so every catalogue gets its slot; a new
   translation carries the `draft` flag until a speaker reviews it (`docs/TRANSLATING.md`).

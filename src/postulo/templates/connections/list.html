@@ -10,7 +10,7 @@
       </p>
     </div>
     {% if plugins_available %}
-      <a href="{% url 'connections:pick' %}" class="btn-primary ml-auto">{% translate "Add a connection" %}</a>
+      <a href="{% url 'connections:pick' %}" class="btn-primary ms-auto">{% translate "Add a connection" %}</a>
     {% endif %}
   </div>
 
@@ -23,14 +23,14 @@
               <p class="font-medium">
                 {{ row.connection.label }}
                 {% if not row.connection.enabled %}
-                  <span class="ml-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{% translate "Off" %}</span>
+                  <span class="ms-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{% translate "Off" %}</span>
                 {% endif %}
               </p>
               <p class="text-xs text-ink-500 dark:text-ink-400">
                 {{ row.kind_label }} ·
                 {% if row.plugin %}{{ row.plugin.label }}{% else %}<span class="text-red-600 dark:text-red-400">{% translate "plugin not installed" %}</span>{% endif %}
                 {% if row.connection.last_error %}
-                  · <span class="text-red-600 dark:text-red-400">{{ row.connection.last_error|truncatechars:80 }}</span>
+                  · <span class="text-red-600 dark:text-red-400"><bdi>{{ row.connection.last_error|truncatechars:80 }}</bdi></span>
                 {% elif row.connection.last_ok_at %}
                   · {% blocktranslate with when=row.connection.last_ok_at|date:"j M Y, H:i" trimmed %}worked {{ when }}{% endblocktranslate %}
                 {% else %}

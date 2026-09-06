@@ -14,7 +14,7 @@
 
   {% if documents %}
     <div class="card overflow-x-auto p-0">
-      <table class="w-full text-left text-sm">
+      <table class="w-full text-start text-sm">
         <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
                       dark:border-ink-800 dark:text-ink-400">
           <tr>
@@ -44,7 +44,7 @@
               <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
                 {{ document.rendered_at|date:"j M Y, H:i" }}
               </td>
-              <td class="px-4 py-3 text-right">
+              <td class="px-4 py-3 text-end">
                 <a href="{% url 'documents:rendered_download' document.pk %}"
                    class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
               </td>

@@ -1,5 +1,5 @@
 {% load i18n static postulo %}<!doctype html>
-<html lang="{{ LANGUAGE_CODE|default:'en-gb' }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr' }}"{% if ui_theme %} data-theme="{{ ui_theme }}"{% endif %}>
+<html lang="{{ LANGUAGE_CODE|default:'en-gb' }}" dir="{{ text_direction|default:'ltr' }}"{% if ui_theme %} data-theme="{{ ui_theme }}"{% endif %}>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -53,7 +53,7 @@
               {% endfor %}
             </nav>
 
-            <div class="ml-auto flex items-center gap-1">
+            <div class="ms-auto flex items-center gap-1">
               {# One box over everything. Small until it has focus; "/" jumps to it. #}
               <form method="get" action="{% url 'core:search' %}" role="search"
                     aria-label="{% translate 'Site search' %}" class="hidden md:block">
@@ -71,7 +71,7 @@
                   <span class="hidden sm:inline">{{ user.display_name }}</span>
                   {% icon "chevron-down" class="size-4 text-ink-400" %}
                 </summary>
-                <div class="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border border-ink-200 bg-white py-1 shadow-lg dark:border-ink-800 dark:bg-ink-900">
+                <div class="absolute end-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border border-ink-200 bg-white py-1 shadow-lg dark:border-ink-800 dark:bg-ink-900">
                   <a href="{% url 'accounts:profile' %}" class="menu-item">
                     {% icon "user" %}{% translate "Your details" %}
                   </a>
@@ -98,7 +98,7 @@
               {% include "core/partials/theme_switch.html" %}
             </div>
           {% else %}
-            <div class="ml-auto flex items-center gap-2">
+            <div class="ms-auto flex items-center gap-2">
               <a href="{% url 'account_login' %}" class="btn-secondary">{% translate "Sign in" %}</a>
             </div>
           {% endif %}

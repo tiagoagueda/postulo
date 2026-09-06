@@ -14,7 +14,7 @@
         {% endblocktranslate %}
       </p>
     </div>
-    <div class="ml-auto flex items-center gap-2">
+    <div class="ms-auto flex items-center gap-2">
       <a href="{% url 'resume:europass_import' %}" class="btn-ghost">{% translate "Import" %}</a>
       <a href="{% url 'resume:preview' %}" class="btn-secondary">{% translate "Preview" %}</a>
       <a href="{% url 'documents:cv_list' %}" class="btn-primary">{% translate "Your CVs" %}</a>
@@ -27,7 +27,7 @@
         <div class="mb-3 flex items-center gap-3">
           <h2 class="font-medium">{{ section.spec.plural }}</h2>
           {% if section.spec.slug == 'link' and section.items %}
-            <form method="post" action="{% url 'resume:link_check_all' %}" class="ml-auto">
+            <form method="post" action="{% url 'resume:link_check_all' %}" class="ms-auto">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ request.get_full_path }}">
               <button type="submit" class="text-sm text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Check them all" %}</button>
@@ -38,7 +38,7 @@
             </a>
           {% else %}
             <a href="{% url 'resume:item_create' section.spec.slug %}"
-               class="ml-auto text-sm text-brand-600 underline dark:text-brand-400">
+               class="ms-auto text-sm text-brand-600 underline dark:text-brand-400">
               {% translate "Add" %}
             </a>
           {% endif %}

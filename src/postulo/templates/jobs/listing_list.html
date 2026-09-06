@@ -11,7 +11,7 @@
         {% translate "Every posting you have noticed, until you decide: shortlist it, discard it, or apply." %}
       </p>
     </div>
-    <div class="ml-auto flex items-center gap-2">
+    <div class="ms-auto flex items-center gap-2">
       <a href="{% url 'jobs:capture_create' %}" class="btn-secondary">{% translate "Capture a posting" %}</a>
       <a href="{% url 'listings:create' %}" class="btn-primary">{% translate "Add a listing" %}</a>
     </div>
@@ -32,7 +32,7 @@
             <div class="min-w-0 flex-1">
               <p class="truncate font-medium">{{ capture }}</p>
               <p class="truncate text-xs text-ink-500 dark:text-ink-400">
-                {{ capture.data.company_name|default:"—" }} · {{ capture.created_at|date:"j M Y, H:i" }}
+                <bdi>{{ capture.data.company_name|default:"—" }}</bdi> · {{ capture.created_at|date:"j M Y, H:i" }}
               </p>
             </div>
             <a href="{% url 'jobs:capture_review' capture.pk %}" class="btn-secondary shrink-0">
@@ -63,7 +63,7 @@
 
   {% if listings %}
     <div class="card overflow-x-auto p-0">
-      <table class="w-full text-left text-sm">
+      <table class="w-full text-start text-sm">
         <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
                       dark:border-ink-800 dark:text-ink-400">
           <tr>
@@ -82,7 +82,7 @@
                 <a href="{{ listing.get_absolute_url }}" class="font-medium hover:underline">{{ listing.title }}</a>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   {% blocktranslate with when=listing.noted_at|date:"j M" trimmed %}noted {{ when }}{% endblocktranslate %}
-                  {% if listing.source %} · {{ listing.source }}{% endif %}
+                  {% if listing.source %} · <bdi>{{ listing.source }}</bdi>{% endif %}
                 </p>
               </td>
               <td class="px-4 py-3">

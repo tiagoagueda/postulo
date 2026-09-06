@@ -21,7 +21,7 @@
         {% endfor %}
       </div>
     </div>
-    <div class="ml-auto flex items-center gap-2">
+    <div class="ms-auto flex items-center gap-2">
       <a href="{% url 'applications:update' application.pk %}" class="btn-secondary">
         {% translate "Edit" %}
       </a>
@@ -68,10 +68,10 @@
 
       <h2 class="mb-3 font-medium">{% translate "What happened" %}</h2>
       {% if events %}
-        <ol class="relative border-l border-ink-200 pl-6 dark:border-ink-800">
+        <ol class="relative border-s border-ink-200 ps-6 dark:border-ink-800">
           {% for event in events %}
             <li class="mb-6 last:mb-0">
-              <span class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full
+              <span class="absolute -start-1.5 mt-1.5 h-3 w-3 rounded-full
                            {% if event.kind == 'status_change' %}bg-brand-500{% else %}bg-ink-300 dark:bg-ink-600{% endif %}"></span>
               <div class="flex flex-wrap items-baseline gap-2">
                 <p class="font-medium">{{ event.summary|default:event.get_kind_display }}</p>

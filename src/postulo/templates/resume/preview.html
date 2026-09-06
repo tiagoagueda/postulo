@@ -12,7 +12,7 @@
           {% translate "The master record. A CV variant selects from this; it never copies it." %}
         </p>
       </div>
-      <a href="{% url 'resume:overview' %}" class="btn-secondary ml-auto">{% translate "Edit" %}</a>
+      <a href="{% url 'resume:overview' %}" class="btn-secondary ms-auto">{% translate "Edit" %}</a>
     </div>
 
     {% if experience %}
@@ -30,7 +30,7 @@
               </div>
               {% if item.summary %}<p class="mt-1 text-sm">{{ item.summary }}</p>{% endif %}
               {% if item.highlight_lines %}
-                <ul class="mt-2 list-disc pl-5 text-sm text-ink-600 dark:text-ink-300">
+                <ul class="mt-2 list-disc ps-5 text-sm text-ink-600 dark:text-ink-300">
                   {% for line in item.highlight_lines %}<li>{{ line }}</li>{% endfor %}
                 </ul>
               {% endif %}

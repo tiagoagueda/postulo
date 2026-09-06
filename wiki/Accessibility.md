@@ -25,6 +25,9 @@ us about a barrier.
   sortable ones say which way they are sorted.
 - **Colour never carries a meaning on its own.** A status has its label; the strength
   meter has its word; a quiet application says so in text.
+- **The page follows the direction of the language it is in.** In a right-to-left
+  language the whole interface flips — headings, action buttons, the board's columns, the
+  timeline's rule, the menus, the skip link. See *Right to left* below.
 - **Text and contrast.** Both themes are checked for contrast at the AA level. Text
   resizes with the browser; nothing is locked to a pixel size.
 - **Motion.** The little animation there is respects *prefers-reduced-motion*.
@@ -50,6 +53,38 @@ the button was a button. What it did not have was any visual signal that a faile
 was an error, any weight on its headings, or anything to make a control look like one. A
 machine cannot see that, so a separate test now checks that Postulo's own stylesheet
 reaches those pages at all, and looking at them remains the other half of the job.
+
+## Right to left
+
+Arabic, Hebrew, Persian and Urdu are read right to left, and a page in one of them has to
+be laid out that way — not merely have its text reversed inside a left-to-right shell.
+
+**What flips.** Everything that names an edge: the action buttons at the end of a heading
+row, the timeline rule beside the event log, the menus that hang from a corner, the skip
+link, table alignment, and the board's columns, so the earliest status is the one nearest
+where you start reading. Icons that point sideways are mirrored; ones that point up or
+down are not, because they mean the same thing either way.
+
+**What does not flip.** Text that is not in your language. A company called *Aperture
+Science* stays Latin and stays left-to-right inside an Arabic line, and so do email
+addresses, web addresses, version numbers, package names and checksums. They are isolated
+so the punctuation around them stays where it belongs — without that, a separator jumps to
+the wrong end of the line and the row reads as nonsense.
+
+**A document has its own direction.** A CV or a cover letter is laid out for the language
+*it* is written in, not for the language you read Postulo in. Somebody using Postulo in
+Arabic who writes an English CV gets an English, left-to-right PDF; the reverse holds too.
+That is what the *language* field on a CV and a letter decides, along with hyphenation and
+how a screen reader pronounces it.
+
+**How it is checked.** The browser suite visits the application in a right-to-left
+language, in both themes, and runs axe over it; it also measures that the action buttons,
+the board and the skip link actually moved rather than merely being labelled as though
+they had. A separate lint refuses any stylesheet class that names a left or a right, which
+is what stops this drifting back one heading row at a time.
+
+**No right-to-left language is offered yet.** The layout work is done and tested first, so
+that the language can be added as a catalogue and nothing else.
 
 ## Known gaps
 

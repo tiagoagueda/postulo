@@ -12,7 +12,7 @@
           {{ application.posting.title }} — {{ application.posting.company.name }}
         </p>
       </div>
-      <a href="{% url 'documents:send' application.pk %}" class="btn-primary ml-auto">
+      <a href="{% url 'documents:send' application.pk %}" class="btn-primary ms-auto">
         {% translate "Record what you sent" %}
       </a>
     </div>
@@ -51,7 +51,7 @@
             <li class="px-4 py-3">
               <p class="font-medium">{{ link.title }}</p>
               <p class="truncate text-xs text-ink-500 dark:text-ink-400">
-                {{ link.get_kind_display }} · <a href="{{ link.url }}" rel="noopener" class="underline">{{ link.url }}</a>
+                {{ link.get_kind_display }} · <a href="{{ link.url }}" rel="noopener" class="underline"><bdi>{{ link.url }}</bdi></a>
                 {% if link.is_broken %} · <span class="text-red-600 dark:text-red-400">{% translate "did not answer when last checked" %}</span>{% endif %}
               </p>
             </li>

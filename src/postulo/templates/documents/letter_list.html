@@ -11,7 +11,7 @@
         {% translate "Write one well, then let placeholders do the rest." %}
       </p>
     </div>
-    <a href="{% url 'documents:letter_create' %}" class="btn-primary ml-auto">
+    <a href="{% url 'documents:letter_create' %}" class="btn-primary ms-auto">
       {% translate "New letter" %}
     </a>
   </div>
@@ -37,7 +37,7 @@
                 {{ letter.name }}
               </a>
               <p class="truncate text-sm text-ink-500 dark:text-ink-400">
-                {{ letter.get_kind_display }}{% if letter.subject %} · {{ letter.subject }}{% endif %}
+                {{ letter.get_kind_display }}{% if letter.subject %} · <bdi>{{ letter.subject }}</bdi>{% endif %}
               </p>
             </div>
             {% if letter.is_template %}

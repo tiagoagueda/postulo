@@ -34,7 +34,7 @@
         </div>
         <div class="flex justify-between gap-4">
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Media" %}</dt>
-          <dd class="truncate text-right">
+          <dd class="truncate text-end">
             {% blocktranslate count counter=media_files with size=media_bytes|filesizeformat trimmed %}
               {{ counter }} file, {{ size }}
             {% plural %}
@@ -45,7 +45,7 @@
         </div>
         <div class="flex justify-between gap-4">
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Newest backup" %}</dt>
-          <dd class="text-right" data-backup-age>
+          <dd class="text-end" data-backup-age>
             {% if newest_backup %}
               {% blocktranslate with when=newest_backup.age|timesince trimmed %}{{ when }} ago{% endblocktranslate %}
               {% if newest_backup.age.days >= 7 %}
