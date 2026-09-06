@@ -1,0 +1,7 @@
+{% load allauth %}
+{% comment %} The name comes in as an attribute rather than in the slot, which is why the
+   default template prints {{ attrs.name }} and not a slot. Keep both: a caller that fills
+   the slot gets what it put there. {% endcomment %}
+<a class="btn-secondary w-full" title="{{ attrs.name }}" href="{{ attrs.href }}">
+  {% slot %}{{ attrs.name }}{% endslot %}
+</a>

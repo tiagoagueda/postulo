@@ -1,7 +1,9 @@
 {% extends "settings/base.html" %}
 
-{% block content %}
+{% comment %} `settings/base.html` puts the sidebar in `main` and a `panel` around `content`,
+   so the card goes in `panel` and allauth's page still lands inside both. {% endcomment %}
+{% block panel %}
   <div class="card max-w-2xl">
-    {% block content_body %}{% endblock %}
+    {% block content %}{% endblock %}
   </div>
 {% endblock %}

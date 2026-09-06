@@ -1,0 +1,31 @@
+{% load allauth %}
+{% comment %} allauth's own version of this is `{{ form.as_p }}`, which is where `Login:`
+   and an unstyled `errorlist` came from. Each field goes through Postulo's own partial
+   instead, so an allauth form is laid out, labelled and coloured like every other form
+   here -- and Django's own aria-describedby and aria-invalid come with it.
+
+   Errors that belong to no field are the ones a sign-in produces, so they get an alert
+   with role="alert": after a failed attempt the page is re-rendered, and the message has
+   to be the thing a person notices rather than another line of prose. {% endcomment %}
+{% if attrs.form.non_field_errors %}
+  <div class="alert-error mb-4" role="alert">
+    <div>
+      {% for error in attrs.form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    </div>
+  </div>
+{% endif %}
+{% for field in attrs.form.hidden_fields %}{{ field }}{% endfor %}
+{% for field in attrs.form.visible_fields %}
+  {% if field.field.widget.input_type == "checkbox" %}
+    <div class="mb-4">
+      <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+        {{ field }}
+        <span>{{ field.label }}</span>
+      </label>
+      {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
+      {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    </div>
+  {% else %}
+    {% include "partials/field.html" with field=field %}
+  {% endif %}
+{% endfor %}

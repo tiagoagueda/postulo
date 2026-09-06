@@ -179,6 +179,13 @@ def test_every_signed_in_page_has_no_violations(
         "/server/capture/",
         "/server/defaults/",
         "/accounts/password/change/",
+        # The pages allauth renders, which now sit inside Postulo's own layout. They
+        # passed here throughout while being entirely unstyled, which is the limit of
+        # what a machine can tell you; tests/test_allauth_layout.py checks the rest.
+        "/accounts/email/",
+        "/accounts/2fa/totp/activate/",
+        "/accounts/social/connections/",
+        "/accounts/logout/",
     ]
     failures = []
     for path in paths:

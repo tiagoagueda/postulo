@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% comment %} As with the entrance pages: the card wraps `content` from `main`, so that a
+   page which knows only how to fill `content` lands inside it. {% endcomment %}
+{% block main %}
   <div class="mx-auto max-w-2xl">
     <div class="card">
-      {% block content_body %}{% endblock %}
+      {% block content %}{% endblock %}
     </div>
   </div>
 {% endblock %}

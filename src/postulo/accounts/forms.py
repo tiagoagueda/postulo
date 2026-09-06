@@ -6,6 +6,7 @@ import zoneinfo
 
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import ChangePasswordForm as AllauthChangePasswordForm
+from allauth.account.forms import LoginForm as AllauthLoginForm
 from allauth.account.forms import ResetPasswordKeyForm as AllauthResetPasswordKeyForm
 from allauth.account.forms import SetPasswordForm as AllauthSetPasswordForm
 from allauth.account.forms import SignupForm as AllauthSignupForm
@@ -29,6 +30,22 @@ def with_strength_meter(form: forms.Form) -> None:
     field = form.fields.get("password1")
     if field is not None:
         field.widget.attrs["data-password-meter"] = "true"
+
+
+class LoginForm(AllauthLoginForm):
+    """The sign-in form, in Postulo's words.
+
+    Either a username or an email address signs in here, and allauth names that field
+    "Login" because it cannot know which. It also labels the checkbox "Remember Me",
+    which is title case in a project that writes sentence case everywhere else. Both are
+    a sentence a person reads at the door, so both are worth saying properly.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["login"].label = _("Username or email")
+        if "remember" in self.fields:
+            self.fields["remember"].label = _("Stay signed in on this device")
 
 
 class SignupForm(AllauthSignupForm):

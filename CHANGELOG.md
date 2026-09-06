@@ -131,6 +131,21 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **Every sign-in and account page was rendered without any of Postulo's styling.** The
+  four templates allauth's own pages inherit put their card inside a block called
+  `content_body`, and allauth's pages fill `content` — so a page replaced the wrapper
+  rather than landing inside it, and thirty-one templates had never once been seen with a
+  card, a heading size, a styled control or a coloured error. Signing in, signing up,
+  resetting or changing a password, managing email addresses, two-factor authentication
+  and the third-party connections page all showed full-width unstyled markup: fields
+  labelled `Login:` and `Remember Me:`, a submit control that read as a line of text, and
+  a wrong-password message in the same black as everything around it. They now sit inside
+  the layout, and allauth's building blocks — headings, paragraphs, buttons, form fields,
+  tables, alerts — use the same design as the rest of Postulo, so a form there behaves
+  like a form anywhere else, error text included. The sign-in field is labelled *Username
+  or email* rather than *Login*. The browser accessibility suite reported nothing
+  throughout, because everything it can measure was already correct; a test now checks
+  that Postulo's own stylesheet actually reaches these pages. (#63)
 - **An address was checked and then looked up a second time to connect to.** Capturing a
   posting, checking a portfolio link and fetching a company logo all resolved a hostname,
   refused it if any address it answered with was private, and then handed the name to the

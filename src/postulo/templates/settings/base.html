@@ -14,7 +14,9 @@
       {% settings_sidebar %}
     </aside>
     <div class="min-w-0 flex-1">
-      {% block content %}{% endblock %}
+      {# `panel` sits between the sidebar and the page, so a base that wants to put a card #}
+      {# round allauth's content has somewhere to do it without taking the sidebar away. #}
+      {% block panel %}{% block content %}{% endblock %}{% endblock %}
     </div>
   </div>
 {% endblock %}

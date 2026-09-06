@@ -1,0 +1,7 @@
+{% load allauth %}
+{% comment %} Given a level by its tags where there is one; "danger" and "error" both appear.
+   role="alert" so a message that arrives after the page does is announced. {% endcomment %}
+<div class="mb-4 {% if 'danger' in attrs.tags or 'error' in attrs.tags %}alert-error{% elif 'warning' in attrs.tags %}alert-warning{% elif 'success' in attrs.tags %}alert-success{% else %}alert-info{% endif %}"
+     role="alert">
+  {% slot message %}{% endslot %}
+</div>

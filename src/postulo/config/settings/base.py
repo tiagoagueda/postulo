@@ -170,6 +170,7 @@ ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["username*", "email*", "password1*", "password2*"]
 # Every form where a password is chosen carries the strength meter; sign-in does not.
 ACCOUNT_FORMS = {
+    "login": "postulo.accounts.forms.LoginForm",
     "signup": "postulo.accounts.forms.SignupForm",
     "change_password": "postulo.accounts.forms.ChangePasswordForm",
     "set_password": "postulo.accounts.forms.SetPasswordForm",

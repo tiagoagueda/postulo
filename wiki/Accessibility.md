@@ -33,6 +33,14 @@ rule. That covers what a machine can check. Using the pages with a keyboard alon
 with NVDA and VoiceOver, is done by hand and is the part most likely to find what axe
 cannot; findings become bugs with the `accessibility` label.
 
+It is worth being plain about the limit of the automated half. The sign-in page passed
+every one of those checks, in both themes, while being rendered with no styling at all:
+the markup was correct, the labels were associated, black on white has ample contrast, and
+the button was a button. What it did not have was any visual signal that a failed sign-in
+was an error, any weight on its headings, or anything to make a control look like one. A
+machine cannot see that, so a separate test now checks that Postulo's own stylesheet
+reaches those pages at all, and looking at them remains the other half of the job.
+
 ## Known gaps
 
 - The PDFs Postulo renders are not yet tagged PDFs, so a CV a blind person makes here is

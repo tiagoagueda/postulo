@@ -1,13 +1,16 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% comment %} The card lives in `main`, around `content`, because allauth's own pages fill
+   `content` and nothing else. Putting it inside `content` would mean allauth replaced it.
+{% endcomment %}
+{% block main %}
   <div class="mx-auto max-w-md">
     <div class="card">
-      {% block content_body %}{% endblock %}
+      {% block content %}{% endblock %}
     </div>
   </div>
 {% endblock %}
 
-{% comment %} Sign-up, set, change and reset all choose a password and get the strength meter; the
-   sign-in form has no password1 and gets nothing. {% endcomment %}
+{% comment %} Sign-up, set, change and reset all choose a password and get the strength meter;
+   the sign-in form has no password1 and gets nothing. {% endcomment %}
 {% block scripts %}{% if form.password1 %}{% include "account/partials/password_meter.html" %}{% endif %}{% endblock %}
