@@ -43,6 +43,23 @@
       </div>
     {% endif %}
 
+    {% if links %}
+      <h2 class="mb-3 font-medium">{% translate "Links you pointed them at" %}</h2>
+      <div class="card mb-8 p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for link in links %}
+            <li class="px-4 py-3">
+              <p class="font-medium">{{ link.title }}</p>
+              <p class="truncate text-xs text-ink-500 dark:text-ink-400">
+                {{ link.get_kind_display }} · <a href="{{ link.url }}" rel="noopener" class="underline">{{ link.url }}</a>
+                {% if link.is_broken %} · <span class="text-red-600 dark:text-red-400">{% translate "did not answer when last checked" %}</span>{% endif %}
+              </p>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
     {% if uploads %}
       <h2 class="mb-3 font-medium">{% translate "Files you already had" %}</h2>
       <div class="card p-0">

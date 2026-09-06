@@ -45,6 +45,7 @@ from postulo.documents.models import (
     CoverLetter,
     CVItem,
     DocumentKind,
+    LetterKind,
     RenderedDocument,
     Theme,
     UploadedDocument,
@@ -68,6 +69,8 @@ from postulo.resume.models import (
     Education,
     Experience,
     LanguageSkill,
+    Link,
+    LinkKind,
     Project,
     Skill,
     SkillGroup,
@@ -338,6 +341,7 @@ class Command(BaseCommand):
             Project,
             Certification,
             LanguageSkill,
+            Link,
         ):
             model.objects.for_user(user).delete()
 
@@ -465,6 +469,33 @@ class Command(BaseCommand):
             ),
             LanguageSkill.objects.create(owner=user, name="English", proficiency="c2", order=1),
             LanguageSkill.objects.create(owner=user, name="French", proficiency="b2", order=2),
+        ]
+
+        links = [
+            Link.objects.create(
+                owner=user,
+                title="Portfolio",
+                url="https://alexmorgan.example/work",
+                kind=LinkKind.PORTFOLIO,
+                description="Six projects, with what each one was actually for.",
+                order=0,
+            ),
+            Link.objects.create(
+                owner=user,
+                title="Source repositories",
+                url="https://source.example/alexmorgan",
+                kind=LinkKind.CODE,
+                description="Everything public, including the failures.",
+                order=1,
+            ),
+            Link.objects.create(
+                owner=user,
+                title="Two minutes about me",
+                url="https://video.example/w/alexmorgan-intro",
+                kind=LinkKind.VIDEO,
+                description="Unlisted; the short version of this CV, spoken.",
+                order=2,
+            ),
         ]
 
         # ---- tags ------------------------------------------------------------
@@ -735,6 +766,41 @@ class Command(BaseCommand):
                 is_template=True,
                 theme=Theme.CLASSIC,
             ),
+            CoverLetter.objects.create(
+                owner=user,
+                name="Why this work",
+                kind=LetterKind.MOTIVATION,
+                subject="{{ role }} — {{ company }}",
+                body=(
+                    "I am applying for the {{ role }} role at {{ company }}.\n\n"
+                    "Why this work\n"
+                    "I started with systems nobody else wanted to touch, and found that I "
+                    "liked making them legible again.\n\n"
+                    "Why {{ company }}\n"
+                    "You publish your incident write-ups. That tells me more about how you "
+                    "work than any job advert could.\n\n"
+                    "What I bring\n"
+                    "Ten years of backend work, four of them on systems other teams "
+                    "depended on, and the habit of writing things down.\n\n"
+                    "{{ name }}\n{{ date }}"
+                ),
+                is_template=True,
+                theme=Theme.CLASSIC,
+            ),
+            CoverLetter.objects.create(
+                owner=user,
+                name="After the interview",
+                kind=LetterKind.FOLLOW_UP,
+                subject="Thank you — {{ role }}",
+                body=(
+                    "Dear [name],\n\n"
+                    "Thank you for your time today.\n\n"
+                    "One thing I did not say well: the migration I described took four "
+                    "months, and the reason it worked was the rollback we never needed.\n\n"
+                    "Yours sincerely,\n{{ name }}"
+                ),
+                is_template=True,
+            ),
         ]
 
         upload = UploadedDocument(
@@ -774,6 +840,7 @@ class Command(BaseCommand):
                         letter.save(update_fields=["rendered_at"])
                         report.snapshots += 1
                     application.sent_uploads.add(upload)
+                    application.sent_links.add(links[0], links[2])
                     record_event(
                         application,
                         summary="Documents sent",

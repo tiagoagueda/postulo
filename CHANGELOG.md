@@ -18,6 +18,21 @@ All notable changes to Postulo are recorded here. The format follows
   *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
   switch per document kind, *Send to stores now* tries at once, *Send everything* queues
   what existed before the store did, and the references travel in the export. (#13)
+- **Letters come in four kinds.** A cover letter is one page about one posting; a
+  motivation letter is longer and sectioned, which is the norm for academic posts, EU
+  institutions and much of the continent; a speculative letter has no posting behind it;
+  a follow-up note comes after an interview. Each starts from its own shape and theme
+  rather than an empty box, the letters page filters by kind, and a rendered motivation
+  letter is filed as one. Existing letters are cover letters. Translators get a note about
+  *lettre de motivation*, which means the other thing. (#28)
+- **Links: portfolios, profiles and video CVs.** Work of yours that already lives
+  somewhere is an address, not a file, so it is kept as one: a link with a title, a kind
+  and a line of description, on your career record. Links go on a CV as their own section
+  and can be sent with an application, where the timeline records them. A video CV is a
+  link of the video kind — an unlisted upload somewhere — which is what almost everyone
+  does; Postulo does not host video. *Check it answers* asks, once and only when you press
+  it, whether an address still responds, because a portfolio that 404s on the day the
+  recruiter clicks is the worst outcome there is. (#28)
 - **Plugins install from the interface, and survive an upgrade.** *Server settings →
   Plugins* takes a package an administrator uploads: Postulo reads what it says about
   itself — name, version, licence, maintainer, entry points, dependencies, checksum — and

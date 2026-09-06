@@ -76,6 +76,22 @@ beside the translation and knows the plural forms. Either way:
 3. Open a pull request. A reviewer who speaks the language is ideal; one who can read a
    diff and run the checks is enough.
 
+## One distinction worth care: kinds of letter
+
+Postulo has four kinds of letter, and two of them are a trap for translators. In French
+and Portuguese, *lettre de motivation* and *carta de motivação* are the everyday words for
+what English calls a **cover letter** — one page, addressed, about one posting. Postulo's
+**motivation letter** is a different document: longer, sectioned, about the person and
+their reasons, usually with no addressee block, and the norm for academic posts, EU
+institutions and NGOs.
+
+Translating both with the same phrase makes the two kinds indistinguishable in the
+interface. Where your language has one everyday word, give the cover letter that word and
+find a longer, plainer phrase for the motivation letter — or the other way round if that
+reads better. The interface tells them apart by their shape, and the starter text for each
+kind shows it, so a reader who sees both will not be confused for long; the names should
+help rather than fight that.
+
 ## Guidance for translators
 
 - Translate meaning, not words. *Ghosted* describes an employer that stopped replying;

@@ -187,16 +187,23 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         "skill_groups": resume.SkillGroup,
         "certifications": resume.Certification,
         "languages": resume.LanguageSkill,
+        "links": resume.Link,
     }
     date_fields = {"start_date", "end_date", "issued_on", "expires_on"}
+    moment_fields = {"checked_at"}
 
     for key, model in section_models.items():
         resume_map[key] = {}
         for entry in document.get("resume", {}).get(key, []):
             old_id = entry.pop("id", None)
-            values = {
-                name: (_d(value) if name in date_fields else value) for name, value in entry.items()
-            }
+            values = {}
+            for name, value in entry.items():
+                if name in date_fields:
+                    values[name] = _d(value)
+                elif name in moment_fields:
+                    values[name] = _dt(value)
+                else:
+                    values[name] = value
             created = model.objects.create(owner=user, **values)
             resume_map[key][old_id] = created
             report.resume_items += 1
@@ -291,6 +298,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                 reminder_entries = application_entry.pop("reminders", [])
                 interview_entries = application_entry.pop("interviews", [])
                 tag_slugs = application_entry.pop("tags", [])
+                sent_link_ids = application_entry.pop("sent_link_ids", [])
                 old_id = application_entry.pop("id", None)
                 application_entry.pop("created_at", None)
                 contact_id = application_entry.pop("contact_id", None)
@@ -311,6 +319,14 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                 if tag_slugs:
                     application.tags.set(
                         [tags_by_slug[slug] for slug in tag_slugs if slug in tags_by_slug]
+                    )
+                if sent_link_ids:
+                    application.sent_links.set(
+                        [
+                            resume_map["links"][link_id]
+                            for link_id in sent_link_ids
+                            if link_id in resume_map.get("links", {})
+                        ]
                     )
 
                 for event_entry in event_entries:

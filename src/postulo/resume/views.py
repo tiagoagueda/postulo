@@ -24,6 +24,7 @@ from .models import (
     Education,
     Experience,
     LanguageSkill,
+    Link,
     Project,
     Skill,
     SkillGroup,
@@ -162,3 +163,44 @@ class ResumePreviewView(OwnedObjectMixin, View):
                 "languages": LanguageSkill.objects.for_user(user),
             },
         )
+
+
+class LinkCheckView(OwnedObjectMixin, View):
+    """*Check*: ask once whether a link still answers, because a person asked.
+
+    One link with a primary key, or all of them without. Postulo checks nothing on a
+    schedule and nothing on its own.
+    """
+
+    def get_queryset(self):
+        return Link.objects.for_user(self.request.user)
+
+    def post(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
+        from . import links as link_checks
+
+        fallback = reverse("resume:overview")
+        if pk is not None:
+            link = get_object_or_404(self.get_queryset(), pk=pk)
+            link_checks.check(link)
+            if link.is_broken:
+                messages.error(
+                    request,
+                    _("%(title)s did not answer: %(detail)s")
+                    % {"title": link.title, "detail": link.check_detail},
+                )
+            else:
+                messages.success(request, _("%(title)s still answers.") % {"title": link.title})
+            return redirect(safe_next(request, fallback))
+
+        ok, broken = link_checks.check_all(request.user)
+        if not ok and not broken:
+            messages.info(request, _("There are no links to check."))
+        elif broken:
+            messages.warning(
+                request,
+                _("%(ok)d answered, %(broken)d did not; the ones that did not say why.")
+                % {"ok": ok, "broken": broken},
+            )
+        else:
+            messages.success(request, _("All %(ok)d links still answer.") % {"ok": ok})
+        return redirect(safe_next(request, fallback))

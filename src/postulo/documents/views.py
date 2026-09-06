@@ -25,7 +25,7 @@ from .forms import (
     SendDocumentsForm,
     UploadedDocumentForm,
 )
-from .models import CV, CoverLetter, CVItem, RenderedDocument, UploadedDocument
+from .models import CV, CoverLetter, CVItem, LetterKind, RenderedDocument, UploadedDocument
 from .pdf import PDFBackendUnavailable
 from .rendering import render_cv_html, render_letter_html, snapshot_cv, snapshot_letter
 
@@ -180,9 +180,24 @@ class CVExportView(OwnedObjectMixin, PDFErrorMixin, View):
 
 
 class CoverLetterListView(OwnedObjectMixin, ListView):
+    """Every letter, of every kind, with a filter for when there are several kinds."""
+
     model = CoverLetter
     template_name = "documents/letter_list.html"
     context_object_name = "letters"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        kind = self.request.GET.get("kind", "")
+        if kind in LetterKind.values:
+            queryset = queryset.filter(kind=kind)
+        return queryset
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["kinds"] = LetterKind.choices
+        context["current_kind"] = self.request.GET.get("kind", "")
+        return context
 
 
 class CoverLetterDetailView(OwnedObjectMixin, DetailView):
@@ -201,6 +216,19 @@ class CoverLetterCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixi
     model = CoverLetter
     form_class = CoverLetterForm
     template_name = "documents/letter_form.html"
+
+    def get_initial(self) -> dict:
+        """A kind chosen on the way in decides the starter text and the theme."""
+        initial = super().get_initial()
+        kind = self.request.GET.get("kind", "")
+        if kind in LetterKind.values:
+            initial["kind"] = kind
+        return initial
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["kinds"] = LetterKind.choices
+        return context
 
 
 class CoverLetterUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
@@ -421,6 +449,11 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
             application.sent_uploads.add(*uploads)
             created.extend(str(upload) for upload in uploads)
 
+        links = form.cleaned_data["links"]
+        if links:
+            application.sent_links.add(*links)
+            created.extend(f"{link.title} — {link.url}" for link in links)
+
         if created:
             record_event(
                 application,
@@ -447,5 +480,6 @@ class ApplicationDocumentsView(OwnedObjectMixin, DetailView):
         attach_copies([*rendered, *uploads])
         context["rendered"] = rendered
         context["uploads"] = uploads
+        context["links"] = list(self.object.sent_links.all())
         context["has_stores"] = store_connections(self.request.user).exists()
         return context

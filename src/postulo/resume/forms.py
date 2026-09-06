@@ -11,6 +11,7 @@ from .models import (
     Education,
     Experience,
     LanguageSkill,
+    Link,
     Project,
     Skill,
     SkillGroup,
@@ -106,3 +107,9 @@ class LanguageSkillForm(OwnerScopedModelForm):
     class Meta:
         model = LanguageSkill
         fields = ("name", "proficiency", "order")
+
+
+class LinkForm(OwnerScopedModelForm):
+    class Meta:
+        model = Link
+        fields = ("title", "url", "kind", "description", "order")

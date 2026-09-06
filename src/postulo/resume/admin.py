@@ -5,6 +5,7 @@ from .models import (
     Education,
     Experience,
     LanguageSkill,
+    Link,
     Project,
     Skill,
     SkillGroup,
@@ -60,3 +61,10 @@ class CertificationAdmin(OwnedAdmin):
 @admin.register(LanguageSkill)
 class LanguageSkillAdmin(OwnedAdmin):
     list_display = ("name", "proficiency", "owner")
+
+
+@admin.register(Link)
+class LinkAdmin(OwnedAdmin):
+    list_display = ("title", "kind", "url", "check_status", "checked_at", "owner")
+    list_filter = ("owner", "kind", "check_status")
+    search_fields = ("title", "url")

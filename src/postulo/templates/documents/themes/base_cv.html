@@ -53,6 +53,15 @@
             {% endfor %}
           </ul>
 
+        {% elif section.kind == 'link' %}
+          <ul>
+            {% for entry in section.items %}
+              <li>
+                {{ entry.item.title }}{% if entry.item.description %} — {{ entry.item.description }}{% endif %}
+                <span class="org">{{ entry.item.url }}</span>
+              </li>
+            {% endfor %}
+          </ul>
         {% elif section.kind == 'certification' %}
           <ul class="certifications">
             {% for entry in section.items %}

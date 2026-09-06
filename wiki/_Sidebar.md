@@ -17,7 +17,7 @@
 - [Insights](Insights)
 - [Your career record](Your-career-record)
 - [CVs](CVs)
-- [Cover letters](Cover-letters)
+- [Letters](Cover-letters)
 - [Files and what you sent](Files-and-what-you-sent)
 - [The API](The-capture-API)
 

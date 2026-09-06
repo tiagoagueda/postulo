@@ -37,6 +37,14 @@ To record a set: open an application and choose **Record what you sent**. Pick a
 cover letter and any files you already had. Postulo renders the first two as they stand,
 attaches everything to the application, and notes it on the timeline.
 
+## Links you pointed them at
+
+Not everything you send is a file. A portfolio, a profile or a video CV is an address, and
+those live on [your career record](Your-career-record) as **links**. *Record what you
+sent* offers them beside your CV, your letter and your files, and the ones you tick are
+attached to the application and named on the timeline. A link that did not answer when it
+was last checked says so wherever it appears.
+
 ## Keeping copies elsewhere
 
 Everything above lives in Postulo's own private media, and always will: that is where

@@ -1,6 +1,21 @@
-# Cover letters
+# Letters
 
-**Documents → Cover letters**
+Four kinds, told apart by their shape rather than their name.
+
+| Kind | What it is |
+| --- | --- |
+| **Cover letter** | One page, addressed, about one posting. |
+| **Motivation letter** | Longer and sectioned: your story and your reasons, usually with no addressee block. The norm for academic posts, EU institutions, NGOs and apprenticeships, and across much of Europe. |
+| **Speculative letter** | Unsolicited, with no posting behind it. Pairs with a thin listing. |
+| **Follow-up note** | Short, after an interview, and worth keeping because you will want the wording again. |
+
+Choose the kind when you make the letter and it starts from that kind's shape — a
+motivation letter opens with its sections in place, a follow-up note with two lines and a
+sign-off — and from the theme that suits it. Change either afterwards; nothing is locked.
+The letters page filters by kind, and a rendered motivation letter is filed as a
+motivation letter rather than a cover letter, so *Sent documents* says what it was.
+
+**Documents → Letters**
 
 Write one good letter and let placeholders do the repetitive part.
 

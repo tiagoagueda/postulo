@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Cover letters" %}{% endblock %}
+{% block title %}{% translate "Letters" %}{% endblock %}
 
 {% block content %}
   <div class="mb-6 flex flex-wrap items-center gap-4">
     <div>
-      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Cover letters" %}</h1>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Letters" %}</h1>
       <p class="text-sm text-ink-500 dark:text-ink-400">
         {% translate "Write one well, then let placeholders do the rest." %}
       </p>
@@ -15,6 +15,17 @@
       {% translate "New letter" %}
     </a>
   </div>
+
+  <nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="{% translate 'Kinds of letter' %}">
+    <a href="{% url 'documents:letter_list' %}"
+       class="{% if not current_kind %}btn-secondary{% else %}btn-ghost{% endif %} px-3 py-1"
+       {% if not current_kind %}aria-current="page"{% endif %}>{% translate "All" %}</a>
+    {% for value, label in kinds %}
+      <a href="?kind={{ value }}"
+         class="{% if current_kind == value %}btn-secondary{% else %}btn-ghost{% endif %} px-3 py-1"
+         {% if current_kind == value %}aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
 
   {% if letters %}
     <div class="card p-0">
@@ -25,9 +36,9 @@
               <a href="{{ letter.get_absolute_url }}" class="font-medium hover:underline">
                 {{ letter.name }}
               </a>
-              {% if letter.subject %}
-                <p class="truncate text-sm text-ink-500 dark:text-ink-400">{{ letter.subject }}</p>
-              {% endif %}
+              <p class="truncate text-sm text-ink-500 dark:text-ink-400">
+                {{ letter.get_kind_display }}{% if letter.subject %} · {{ letter.subject }}{% endif %}
+              </p>
             </div>
             {% if letter.is_template %}
               <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
@@ -40,7 +51,11 @@
     </div>
   {% else %}
     <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
-      {% translate "No cover letters yet." %}
+      {% if current_kind %}
+        {% translate "No letters of this kind yet." %}
+      {% else %}
+        {% translate "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview." %}
+      {% endif %}
     </div>
   {% endif %}
 {% endblock %}

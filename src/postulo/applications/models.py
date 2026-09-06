@@ -219,6 +219,13 @@ class Application(OwnedModel):
     tags = models.ManyToManyField(
         Tag, blank=True, related_name="applications", verbose_name=_("tags")
     )
+    sent_links = models.ManyToManyField(
+        "resume.Link",
+        blank=True,
+        related_name="sent_with",
+        verbose_name=_("links sent"),
+        help_text=_("Portfolios, profiles and videos you pointed them at."),
+    )
     sent_uploads = models.ManyToManyField(
         "documents.UploadedDocument",
         blank=True,

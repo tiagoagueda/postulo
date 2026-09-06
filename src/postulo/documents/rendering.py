@@ -23,6 +23,7 @@ SECTION_LABELS = {
     "experience": _("Experience"),
     "education": _("Education"),
     "project": _("Projects"),
+    "link": _("Links"),
     "skillgroup": _("Skills"),
     "certification": _("Certifications"),
     "languageskill": _("Languages"),
@@ -193,12 +194,15 @@ def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> R
     """Freeze a cover letter as a PDF, with its placeholders already resolved."""
     html = render_letter_html(letter, application)
     content = html_to_pdf(html, backend=backend)
-    title = gettext("%(name)s — cover letter") % {"name": letter.name}
+    title = gettext("%(name)s — %(kind)s") % {
+        "name": letter.name,
+        "kind": str(letter.get_kind_display()).lower(),
+    }
 
     document = RenderedDocument(
         owner=letter.owner,
         title=title,
-        kind=DocumentKind.COVER_LETTER,
+        kind=letter.document_kind,
         cover_letter=letter,
         application=application,
         source_text=letter_text(letter, application),

@@ -193,3 +193,68 @@ class LanguageSkill(ResumeItem):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.get_proficiency_display()})"
+
+
+class LinkKind(models.TextChoices):
+    """What a link points at, which is enough for a reader to know whether to click."""
+
+    PORTFOLIO = "portfolio", _("Portfolio")
+    SITE = "site", _("Personal site")
+    CODE = "code", _("Code (GitHub, GitLab…)")
+    DESIGN = "design", _("Design (Behance, Dribbble…)")
+    PUBLICATION = "publication", _("Publication")
+    VIDEO = "video", _("Video")
+    OTHER = "other", _("Other")
+
+
+class LinkStatus(models.TextChoices):
+    UNCHECKED = "", _("Not checked")
+    OK = "ok", _("Answered")
+    BROKEN = "broken", _("Did not answer")
+
+
+class Link(ResumeItem):
+    """Somewhere your work already lives: a portfolio, a profile, a video.
+
+    A portfolio is mostly an address, and a video CV almost always is one — an unlisted
+    upload somewhere, not a file to hand over. Both belong on the CV as a *Links* section
+    and both can be sent with an application, which is what this is.
+
+    Postulo never fetches a link on its own. *Check* asks, once, whether the address still
+    answers, and records what it found: a portfolio that 404s on the day the recruiter
+    clicks is the worst possible outcome, and the only thing worse is a job tracker
+    quietly making requests nobody asked for.
+    """
+
+    title = models.CharField(_("title"), max_length=200)
+    url = models.URLField(_("address"), max_length=500)
+    kind = models.CharField(_("kind"), max_length=20, choices=LinkKind, default=LinkKind.PORTFOLIO)
+    description = models.CharField(
+        _("description"),
+        max_length=250,
+        blank=True,
+        help_text=_("One line, for whoever is reading the CV."),
+    )
+
+    checked_at = models.DateTimeField(_("last checked"), null=True, blank=True)
+    check_status = models.CharField(
+        _("last check"), max_length=10, choices=LinkStatus, blank=True, default=""
+    )
+    check_detail = models.CharField(_("what the check found"), max_length=250, blank=True)
+
+    class Meta(ResumeItem.Meta):
+        verbose_name = _("link")
+        verbose_name_plural = _("links")
+
+    def __str__(self) -> str:
+        return self.title
+
+    @property
+    def host(self) -> str:
+        from urllib.parse import urlsplit
+
+        return (urlsplit(self.url).hostname or "").removeprefix("www.")
+
+    @property
+    def is_broken(self) -> bool:
+        return self.check_status == LinkStatus.BROKEN

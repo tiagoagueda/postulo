@@ -119,7 +119,7 @@ INTERVIEW_FIELDS = (
     "created_at",
 )
 CV_FIELDS = ("id", "name", "headline", "summary", "theme", "language", "show_contact_details")
-LETTER_FIELDS = ("id", "name", "subject", "body", "theme", "is_template")
+LETTER_FIELDS = ("id", "name", "kind", "subject", "body", "theme", "is_template")
 UPLOAD_FIELDS = ("id", "title", "kind", "notes", "version", "replaces_id", "created_at")
 SENT_FIELDS = (
     "id",
@@ -270,6 +270,11 @@ def build_document(user) -> dict:
             ("id", "name", "issuer", "issued_on", "expires_on", "credential_url", "order"),
         ),
         "languages": (resume.LanguageSkill, ("id", "name", "proficiency", "order")),
+        "links": (
+            resume.Link,
+            ("id", "title", "url", "kind", "description", "order", "check_status",
+             "check_detail", "checked_at"),
+        ),
     }  # fmt: skip
     for key, (model, names) in resume_sections.items():
         document["resume"][key] = [_fields(item, names) for item in model.objects.for_user(user)]
@@ -282,6 +287,7 @@ def build_document(user) -> dict:
         "postings__applications__events",
         "postings__applications__reminders",
         "postings__applications__interviews__contacts",
+        "postings__applications__sent_links",
     )
     for company in companies:
         document["companies"].append(
@@ -306,6 +312,7 @@ def build_document(user) -> dict:
                             {
                                 **_fields(application, APPLICATION_FIELDS),
                                 "tags": [tag.slug for tag in application.tags.all()],
+                                "sent_link_ids": [link.pk for link in application.sent_links.all()],
                                 "events": [
                                     _fields(event, EVENT_FIELDS)
                                     for event in application.events.all()

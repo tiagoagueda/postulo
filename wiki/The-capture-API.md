@@ -101,7 +101,7 @@ are in the web interface.
 | `GET /interviews?state=upcoming` · `GET /interviews/{id}` | Interviews; `state` is `upcoming` (default), `scheduled`, `past` or `all`; each carries a stable `uid` |
 | `GET /interviews/calendar.ics` · `GET /interviews/{id}/calendar.ics` | The diary, or one interview, as iCalendar text |
 | `GET /cvs` · `GET /cvs/{id}` | CVs; the detail lists what each includes |
-| `GET /letters` · `GET /letters/{id}` | Cover letters; the detail carries the text |
+| `GET /letters` · `GET /letters/{id}` | Letters of every kind; the detail carries the text |
 | `GET /documents?source=` | Files — `upload`, `rendered`, or both when unset — with a `download_url` each |
 | `GET /insights` | The figures the Insights page shows |
 | `GET /search?q=&limit=` | Everything matching, grouped by kind as the search page shows it, each hit with its passage and `web_url` |

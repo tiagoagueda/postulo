@@ -25,10 +25,22 @@
       <section>
         <div class="mb-3 flex items-center gap-3">
           <h2 class="font-medium">{{ section.spec.plural }}</h2>
-          <a href="{% url 'resume:item_create' section.spec.slug %}"
-             class="ml-auto text-sm text-brand-600 underline dark:text-brand-400">
-            {% translate "Add" %}
-          </a>
+          {% if section.spec.slug == 'link' and section.items %}
+            <form method="post" action="{% url 'resume:link_check_all' %}" class="ml-auto">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="text-sm text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Check them all" %}</button>
+            </form>
+            <a href="{% url 'resume:item_create' section.spec.slug %}"
+               class="text-sm text-brand-600 underline dark:text-brand-400">
+              {% translate "Add" %}
+            </a>
+          {% else %}
+            <a href="{% url 'resume:item_create' section.spec.slug %}"
+               class="ml-auto text-sm text-brand-600 underline dark:text-brand-400">
+              {% translate "Add" %}
+            </a>
+          {% endif %}
         </div>
 
         {% if section.spec.blurb %}
@@ -42,7 +54,24 @@
                 <li class="flex items-start gap-3 px-4 py-3">
                   <div class="min-w-0 flex-1">
                     <p class="font-medium">{{ item }}</p>
-                    {% if section.spec.slug == 'skill-group' %}
+                    {% if section.spec.slug == 'link' %}
+                      <p class="truncate text-sm text-ink-500 dark:text-ink-400">
+                        {{ item.get_kind_display }} ·
+                        <a href="{{ item.url }}" rel="noopener" class="underline">{{ item.url }}</a>
+                      </p>
+                      {% if item.checked_at %}
+                        <p class="text-xs {% if item.is_broken %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
+                          {% blocktranslate with when=item.checked_at|date:"j M Y" detail=item.check_detail trimmed %}
+                            Checked {{ when }}: {{ detail }}
+                          {% endblocktranslate %}
+                        </p>
+                      {% endif %}
+                      <form method="post" action="{% url 'resume:link_check' item.pk %}" class="mt-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <button type="submit" class="text-xs text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Check it answers" %}</button>
+                      </form>
+                    {% elif section.spec.slug == 'skill-group' %}
                       <p class="text-sm text-ink-500 dark:text-ink-400">
                         {% if item.skill_names %}
                           {{ item.skill_names|join:", " }}

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 13:54+0000\n"
+"POT-Creation-Date: 2026-09-06 14:27+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -266,15 +266,21 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s changerait ce dont Postulo lui-même dépend. %(problems)s"
 
-#: src/postulo/documents/rendering.py:196
+#: src/postulo/documents/rendering.py:197
 #, python-format, draft
-msgid "%(name)s — cover letter"
-msgstr "%(name)s — lettre de motivation"
+msgid "%(name)s — %(kind)s"
+msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/documents/rendering.py:176
+#: src/postulo/documents/rendering.py:177
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
+
+#: src/postulo/resume/views.py:201
+#, python-format, draft
+msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
+msgstr ""
+"%(ok)d ont répondu, %(broken)d non ; celles qui n'ont pas répondu disent pourquoi."
 
 #: src/postulo/applications/services.py:114
 #, python-format, draft
@@ -301,16 +307,26 @@ msgstr "%(role)s chez %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s chez %(company)s — %(days)s jours"
 
-#: src/postulo/documents/views.py:345
+#: src/postulo/documents/views.py:373
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d copies envoyées, %(failed)d en échec ; chaque document dit lesquelles."
 
-#: src/postulo/documents/views.py:351
+#: src/postulo/documents/views.py:379
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d copies envoyées."
+
+#: src/postulo/resume/views.py:188
+#, python-format, draft
+msgid "%(title)s did not answer: %(detail)s"
+msgstr "%(title)s n'a pas répondu : %(detail)s"
+
+#: src/postulo/resume/views.py:192
+#, python-format, draft
+msgid "%(title)s still answers."
+msgstr "%(title)s répond toujours."
 
 #: src/postulo/templates/applications/application_list.html:9
 #, python-format, draft
@@ -333,7 +349,7 @@ msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s entrée"
 msgstr[1] "%(total)s entrées"
 
-#: src/postulo/templates/resume/overview.html:55
+#: src/postulo/templates/resume/overview.html:84
 #, python-format, draft
 msgid "%(total)s highlight"
 msgid_plural "%(total)s highlights"
@@ -361,6 +377,37 @@ msgid ""
 "<strong>%(name)s</strong>: %(rows)s rows. The guesses below come from the header names; correct any of them, then check the preview before importing."
 msgstr ""
 "<strong>%(name)s</strong> : %(rows)s lignes. Les propositions ci-dessous viennent des noms des colonnes ; corrigez-les au besoin, puis vérifiez l'aperçu avant d'importer."
+
+#: src/postulo/documents/models.py:179
+#, draft
+msgid ""
+"[What you are applying for, and the one thing that makes you the person for it.]\n"
+"\n"
+"Why this work\n"
+"[What draws you to it.]\n"
+"\n"
+"Why {{ company }}\n"
+"[What you know about them.]\n"
+"\n"
+"What I bring\n"
+"[Your route here, and what it taught you.]\n"
+"\n"
+"{{ name }}\n"
+"{{ date }}"
+msgstr ""
+"[Ce à quoi vous candidatez, et la seule chose qui fait de vous la bonne personne.]\n"
+"\n"
+"Pourquoi ce métier\n"
+"[Ce qui vous y attire.]\n"
+"\n"
+"Pourquoi {{ company }}\n"
+"[Ce que vous savez d'eux.]\n"
+"\n"
+"Ce que j'apporte\n"
+"[Votre parcours jusqu'ici, et ce qu'il vous a appris.]\n"
+"\n"
+"{{ name }}\n"
+"{{ date }}"
 
 #: src/postulo/templates/api/token_list.html:45
 #, draft
@@ -424,6 +471,13 @@ msgid ""
 "A plugin that reads a mailbox or a calendar for you files what it finds here, and it stays here until you accept or decline it."
 msgstr ""
 "Un plugin qui lit pour vous une boîte aux lettres ou un agenda dépose ici ce qu'il trouve, et cela y reste jusqu'à ce que vous l'acceptiez ou le refusiez."
+
+#: src/postulo/resume/registry.py:71
+#, draft
+msgid ""
+"A portfolio, a profile, a video: work of yours that already lives somewhere."
+msgstr ""
+"Un portfolio, un profil, une vidéo : votre travail, là où il se trouve déjà."
 
 #: src/postulo/notifications/base.py:28
 #, draft
@@ -524,7 +578,7 @@ msgstr "A2 — élémentaire"
 msgid "Accept"
 msgstr "Accepter"
 
-#: src/postulo/applications/models.py:46 src/postulo/applications/models.py:543
+#: src/postulo/applications/models.py:46 src/postulo/applications/models.py:550
 #: src/postulo/templates/accounts/invite_list.html:38
 #, draft
 msgid "Accepted"
@@ -580,7 +634,8 @@ msgstr "Actions"
 #: src/postulo/templates/applications/application_detail.html:289
 #: src/postulo/templates/core/dashboard.html:232
 #: src/postulo/templates/jobs/company_detail.html:102
-#: src/postulo/templates/resume/overview.html:30
+#: src/postulo/templates/resume/overview.html:36
+#: src/postulo/templates/resume/overview.html:41
 #, draft
 msgid "Add"
 msgstr "Ajouter"
@@ -605,7 +660,7 @@ msgstr "Ajouter une connexion"
 msgid "Add a listing"
 msgstr "Ajouter une offre"
 
-#: src/postulo/templates/resume/overview.html:94
+#: src/postulo/templates/resume/overview.html:123
 #, draft
 msgid "Add a skill"
 msgstr "Ajouter une compétence"
@@ -620,7 +675,7 @@ msgstr "Ajouter des entrées"
 msgid "Add entry"
 msgstr "Ajouter une entrée"
 
-#: src/postulo/templates/resume/overview.html:107
+#: src/postulo/templates/resume/overview.html:136
 #, draft
 msgid "Add the first one."
 msgstr "Ajoutez la première."
@@ -660,12 +715,12 @@ msgstr "Ajouté à la chronologie."
 msgid "Added to your listings."
 msgstr "Ajoutée à vos offres."
 
-#: src/postulo/resume/views.py:102
+#: src/postulo/resume/views.py:103
 #, draft
 msgid "Added."
 msgstr "Ajouté."
 
-#: src/postulo/jobs/models.py:541
+#: src/postulo/jobs/models.py:541 src/postulo/resume/models.py:230
 #, draft
 msgid "address"
 msgstr "adresse"
@@ -685,12 +740,22 @@ msgstr "Publicité et marketing"
 msgid "Aerospace"
 msgstr "Aérospatiale"
 
+#: src/postulo/templates/documents/letter_list.html:22
+#, draft
+msgid "All"
+msgstr "Tous"
+
 #: src/postulo/templates/core/search.html:61
 #, python-format, draft
 msgid "All %(counter)s in %(label)s"
 msgid_plural "All %(counter)s in %(label)s"
 msgstr[0] "Les %(counter)s dans %(label)s"
 msgstr[1] "Les %(counter)s dans %(label)s"
+
+#: src/postulo/resume/views.py:205
+#, python-format, draft
+msgid "All %(ok)d links still answer."
+msgstr "Les %(ok)d liens répondent toujours."
 
 #: src/postulo/templates/applications/application_detail.html:191
 #, draft
@@ -717,7 +782,7 @@ msgstr "Se fait aussi tout seul quand votre adresse principale change."
 msgid "An 'other' identifier needs a name."
 msgstr "Un identifiant « autre » a besoin d'un nom."
 
-#: src/postulo/applications/models.py:471
+#: src/postulo/applications/models.py:478
 #, draft
 msgid "An address, or the link to the call."
 msgstr "Une adresse, ou le lien de la visioconférence."
@@ -738,6 +803,16 @@ msgstr "un type de fichier inconnu"
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "et %(more)s de plus"
+
+#: src/postulo/resume/models.py:212
+#, draft
+msgid "Answered"
+msgstr "A répondu"
+
+#: src/postulo/resume/links.py:70
+#, python-format, draft
+msgid "Answered %(code)s."
+msgstr "A répondu %(code)s."
 
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
@@ -794,12 +869,12 @@ msgstr "Jetons d'API"
 msgid "Appearance"
 msgstr "Apparence"
 
-#: src/postulo/applications/models.py:236
-#: src/postulo/applications/models.py:315
-#: src/postulo/applications/models.py:365
-#: src/postulo/applications/models.py:460
-#: src/postulo/applications/models.py:581 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:267 src/postulo/jobs/models.py:569
+#: src/postulo/applications/models.py:243
+#: src/postulo/applications/models.py:322
+#: src/postulo/applications/models.py:372
+#: src/postulo/applications/models.py:467
+#: src/postulo/applications/models.py:588 src/postulo/applications/tables.py:15
+#: src/postulo/documents/models.py:340 src/postulo/jobs/models.py:569
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -848,7 +923,7 @@ msgstr "Candidature mise à jour."
 msgid "Applications"
 msgstr "Candidatures"
 
-#: src/postulo/applications/models.py:237 src/postulo/applications/tables.py:15
+#: src/postulo/applications/models.py:244 src/postulo/applications/tables.py:15
 #, draft
 msgid "applications"
 msgstr "candidatures"
@@ -932,7 +1007,7 @@ msgstr "Postuler : %(title)s"
 msgid "Apprenticeship"
 msgstr "Apprentissage"
 
-#: src/postulo/documents/models.py:305
+#: src/postulo/documents/models.py:378
 #, draft
 msgid "Archived"
 msgstr "Archivé"
@@ -948,13 +1023,13 @@ msgstr "Vous confirmez ?"
 msgid "Assessment"
 msgstr "Évaluation"
 
-#: src/postulo/applications/models.py:280
-#: src/postulo/applications/models.py:402
+#: src/postulo/applications/models.py:287
+#: src/postulo/applications/models.py:409
 #, draft
 msgid "Assessment or test"
 msgstr "Évaluation ou test"
 
-#: src/postulo/documents/models.py:352
+#: src/postulo/documents/models.py:425
 #, draft
 msgid "attempts"
 msgstr "tentatives"
@@ -1034,7 +1109,7 @@ msgstr "Biotechnologie"
 msgid "Board"
 msgstr "Tableau"
 
-#: src/postulo/documents/models.py:169
+#: src/postulo/documents/models.py:234
 #, draft
 msgid "body"
 msgstr "corps"
@@ -1076,12 +1151,12 @@ msgstr "Calendrier"
 msgid "Calendar file"
 msgstr "Fichier de calendrier"
 
-#: src/postulo/applications/models.py:485
+#: src/postulo/applications/models.py:492
 #, draft
 msgid "calendar identifier"
 msgstr "identifiant de calendrier"
 
-#: src/postulo/applications/models.py:276
+#: src/postulo/applications/models.py:283
 #, draft
 msgid "Call"
 msgstr "Appel"
@@ -1102,7 +1177,7 @@ msgstr "URL de rappel à déclarer auprès du fournisseur"
 #: src/postulo/templates/connections/form.html:46
 #: src/postulo/templates/documents/cv_form.html:21
 #: src/postulo/templates/documents/cv_item_form.html:25
-#: src/postulo/templates/documents/letter_form.html:21
+#: src/postulo/templates/documents/letter_form.html:29
 #: src/postulo/templates/documents/send.html:32
 #: src/postulo/templates/documents/upload_form.html:21
 #: src/postulo/templates/jobs/company_form.html:102
@@ -1120,7 +1195,7 @@ msgstr "URL de rappel à déclarer auprès du fournisseur"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/postulo/applications/models.py:409
+#: src/postulo/applications/models.py:416
 #: src/postulo/templates/applications/partials/interview_outcome.html:11
 #, draft
 msgid "Cancelled"
@@ -1222,7 +1297,7 @@ msgstr "Page carrières"
 msgid "Catalogues"
 msgstr "Catalogues"
 
-#: src/postulo/documents/models.py:193
+#: src/postulo/documents/models.py:266
 #, draft
 msgid "Certificate"
 msgstr "Certificat"
@@ -1237,7 +1312,7 @@ msgstr "certification"
 msgid "Certification"
 msgstr "Certification"
 
-#: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:63
+#: src/postulo/documents/rendering.py:28 src/postulo/resume/registry.py:63
 #: src/postulo/templates/resume/preview.html:92
 #, draft
 msgid "Certifications"
@@ -1289,7 +1364,22 @@ msgstr "Relancer %(company)s au sujet de %(role)s"
 msgid "Check for updates"
 msgstr "Vérifier les mises à jour"
 
-#: src/postulo/documents/models.py:287
+#: src/postulo/templates/resume/overview.html:72
+#, draft
+msgid "Check it answers"
+msgstr "Vérifier qu'il répond"
+
+#: src/postulo/templates/resume/overview.html:32
+#, draft
+msgid "Check them all"
+msgstr "Tous les vérifier"
+
+#: src/postulo/templates/resume/overview.html:64
+#, python-format, draft
+msgid "Checked %(when)s: %(detail)s"
+msgstr "Vérifié le %(when)s : %(detail)s"
+
+#: src/postulo/documents/models.py:360
 #, draft
 msgid "checksum"
 msgstr "somme de contrôle"
@@ -1309,7 +1399,7 @@ msgstr "Choisissez d'abord un paquet."
 msgid "Choose another file"
 msgstr "Choisir un autre fichier"
 
-#: src/postulo/documents/forms.py:158
+#: src/postulo/documents/forms.py:197
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Choisissez au moins un document à enregistrer."
@@ -1379,6 +1469,11 @@ msgstr "Date de clôture"
 #, draft
 msgid "closing date"
 msgstr "date de clôture"
+
+#: src/postulo/resume/models.py:203
+#, draft
+msgid "Code (GitHub, GitLab…)"
+msgstr "Code (GitHub, GitLab…)"
 
 #: src/postulo/accounts/models.py:184
 #, draft
@@ -1517,7 +1612,7 @@ msgstr "Connecter"
 msgid "Connect %(plugin)s"
 msgstr "Connecter %(plugin)s"
 
-#: src/postulo/documents/models.py:326 src/postulo/plugins/models.py:58
+#: src/postulo/documents/models.py:399 src/postulo/plugins/models.py:58
 #: src/postulo/plugins/models.py:123
 #, draft
 msgid "connection"
@@ -1587,7 +1682,7 @@ msgstr "Bloc de coordonnées"
 msgid "contacts"
 msgstr "contacts"
 
-#: src/postulo/applications/models.py:601
+#: src/postulo/applications/models.py:608
 #, draft
 msgid "context"
 msgstr "contexte"
@@ -1614,31 +1709,12 @@ msgid ""
 msgstr ""
 "Compté à partir de la chronologie, donc les entretiens enregistrés avant l'existence de l'agenda sont inclus."
 
-#: src/postulo/documents/forms.py:139 src/postulo/documents/models.py:192
+#: src/postulo/documents/models.py:164 src/postulo/documents/models.py:264
 #: src/postulo/templates/documents/letter_form.html:4
-#: src/postulo/templates/documents/letter_form.html:8
+#: src/postulo/templates/documents/letter_form.html:16
 #, draft
 msgid "Cover letter"
 msgstr "Lettre de motivation"
-
-#: src/postulo/documents/models.py:179
-#, draft
-msgid "cover letter"
-msgstr "lettre de motivation"
-
-#: src/postulo/core/search.py:390
-#: src/postulo/templates/accounts/delete_account.html:24
-#: src/postulo/templates/core/export.html:22
-#: src/postulo/templates/documents/letter_list.html:4
-#: src/postulo/templates/documents/letter_list.html:9
-#, draft
-msgid "Cover letters"
-msgstr "Lettres de motivation"
-
-#: src/postulo/documents/models.py:180
-#, draft
-msgid "cover letters"
-msgstr "lettres de motivation"
 
 #: src/postulo/templates/api/token_list.html:51
 #, draft
@@ -1686,8 +1762,8 @@ msgstr "Devise"
 msgid "currency"
 msgstr "devise"
 
-#: src/postulo/documents/forms.py:137 src/postulo/documents/models.py:81
-#: src/postulo/documents/models.py:107 src/postulo/documents/models.py:191
+#: src/postulo/documents/forms.py:163 src/postulo/documents/models.py:81
+#: src/postulo/documents/models.py:107 src/postulo/documents/models.py:263
 #: src/postulo/templates/documents/cv_form.html:4
 #: src/postulo/templates/documents/cv_form.html:8
 #, draft
@@ -1751,7 +1827,7 @@ msgstr "Base de données"
 msgid "Date applied"
 msgstr "Date de candidature"
 
-#: src/postulo/applications/models.py:599
+#: src/postulo/applications/models.py:606
 #, draft
 msgid "dates offered"
 msgstr "dates proposées"
@@ -1803,6 +1879,69 @@ msgstr "date limite"
 msgid "Deadline"
 msgstr "Date limite"
 
+#: src/postulo/documents/models.py:193
+#, draft
+msgid ""
+"Dear [name],\n"
+"\n"
+"Thank you for your time on [date].\n"
+"\n"
+"[The one thing you would like them to remember.]\n"
+"\n"
+"Yours sincerely,\n"
+"{{ name }}"
+msgstr ""
+"Bonjour [nom],\n"
+"\n"
+"merci pour le temps que vous m'avez accordé le [date].\n"
+"\n"
+"[La seule chose dont vous voulez qu'ils se souviennent.]\n"
+"\n"
+"Cordialement,\n"
+"{{ name }}"
+
+#: src/postulo/documents/models.py:173
+#, draft
+msgid ""
+"Dear {{ company }},\n"
+"\n"
+"[Why this role, in a sentence.]\n"
+"\n"
+"[What you have done that bears on it.]\n"
+"\n"
+"Yours sincerely,\n"
+"{{ name }}"
+msgstr ""
+"Madame, Monsieur,\n"
+"\n"
+"[Pourquoi ce poste, en une phrase.]\n"
+"\n"
+"[Ce que vous avez fait qui compte pour lui.]\n"
+"\n"
+"Cordialement,\n"
+"{{ name }}"
+
+#: src/postulo/documents/models.py:187
+#, draft
+msgid ""
+"Dear {{ company }},\n"
+"\n"
+"You are not advertising, and I am writing anyway.\n"
+"\n"
+"[What you would bring, and to which part of the work.]\n"
+"\n"
+"Yours sincerely,\n"
+"{{ name }}"
+msgstr ""
+"Madame, Monsieur,\n"
+"\n"
+"vous ne recrutez pas, et je vous écris quand même.\n"
+"\n"
+"[Ce que vous apporteriez, et à quelle partie du travail.]\n"
+"\n"
+"Cordialement,\n"
+"{{ name }}"
+
 #: src/postulo/jobs/models.py:420
 #, draft
 msgid "decided on"
@@ -1813,7 +1952,7 @@ msgstr "décidée le"
 msgid "Decline"
 msgstr "Refuser"
 
-#: src/postulo/applications/models.py:544
+#: src/postulo/applications/models.py:551
 #, draft
 msgid "Declined"
 msgstr "Refusée"
@@ -1854,7 +1993,7 @@ msgstr "Défense"
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
-#: src/postulo/templates/resume/overview.html:79
+#: src/postulo/templates/resume/overview.html:108
 #, draft
 msgid "Delete"
 msgstr "Supprimer"
@@ -1897,20 +2036,35 @@ msgstr "Dépend de"
 msgid "Description"
 msgstr "Description"
 
-#: src/postulo/jobs/models.py:380
+#: src/postulo/jobs/models.py:380 src/postulo/resume/models.py:233
 #, draft
 msgid "description"
 msgstr "description"
 
-#: src/postulo/applications/models.py:589
+#: src/postulo/resume/models.py:204
+#, draft
+msgid "Design (Behance, Dribbble…)"
+msgstr "Design (Behance, Dribbble…)"
+
+#: src/postulo/applications/models.py:596
 #, draft
 msgid "detail"
 msgstr "détail"
 
-#: src/postulo/applications/models.py:320
+#: src/postulo/applications/models.py:327
 #, draft
 msgid "details"
 msgstr "détails"
+
+#: src/postulo/resume/models.py:213
+#, draft
+msgid "Did not answer"
+msgstr "N'a pas répondu"
+
+#: src/postulo/templates/documents/application_documents.html:55
+#, draft
+msgid "did not answer when last checked"
+msgstr "n'a pas répondu à la dernière vérification"
 
 #: src/postulo/templates/jobs/capture_list.html:45
 #: src/postulo/templates/jobs/listing_list.html:44
@@ -1946,12 +2100,12 @@ msgstr "Administration Django"
 msgid "Document"
 msgstr "Document"
 
-#: src/postulo/documents/models.py:362
+#: src/postulo/documents/models.py:435
 #, draft
 msgid "document copies"
 msgstr "copies de documents"
 
-#: src/postulo/documents/models.py:361
+#: src/postulo/documents/models.py:434
 #, draft
 msgid "document copy"
 msgstr "copie de document"
@@ -1970,7 +2124,7 @@ msgstr "Dépôts de documents"
 msgid "Documents"
 msgstr "Documents"
 
-#: src/postulo/documents/views.py:427
+#: src/postulo/documents/views.py:460
 #, draft
 msgid "Documents sent"
 msgstr "Documents envoyés"
@@ -1987,13 +2141,13 @@ msgstr "Documents que vous aviez déjà. Rien ici n'est servi publiquement."
 msgid "Done"
 msgstr "Terminé"
 
-#: src/postulo/applications/models.py:369
+#: src/postulo/applications/models.py:376
 #, draft
 msgid "done on"
 msgstr "terminé le"
 
 #: src/postulo/templates/documents/application_documents.html:35
-#: src/postulo/templates/documents/application_documents.html:58
+#: src/postulo/templates/documents/application_documents.html:75
 #: src/postulo/templates/documents/cv_detail.html:90
 #: src/postulo/templates/documents/rendered_list.html:49
 #: src/postulo/templates/documents/upload_list.html:35
@@ -2055,7 +2209,7 @@ msgstr ""
 #: src/postulo/templates/jobs/company_detail.html:120
 #: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
-#: src/postulo/templates/resume/overview.html:76
+#: src/postulo/templates/resume/overview.html:105
 #: src/postulo/templates/resume/preview.html:15
 #, draft
 msgid "Edit"
@@ -2109,12 +2263,12 @@ msgstr "Adresse e-mail (facultatif)"
 msgid "Email addresses"
 msgstr "Adresses e-mail"
 
-#: src/postulo/applications/models.py:275
+#: src/postulo/applications/models.py:282
 #, draft
 msgid "Email received"
 msgstr "E-mail reçu"
 
-#: src/postulo/applications/models.py:274
+#: src/postulo/applications/models.py:281
 #, draft
 msgid "Email sent"
 msgstr "E-mail envoyé"
@@ -2139,7 +2293,7 @@ msgstr "Vide"
 msgid "Empty capture"
 msgstr "Capture vide"
 
-#: src/postulo/applications/models.py:582
+#: src/postulo/applications/models.py:589
 #, draft
 msgid "Empty when the source could not tell which application it is about."
 msgstr "Vide lorsque la source n'a pas pu dire de quelle candidature il s'agit."
@@ -2149,7 +2303,7 @@ msgstr "Vide lorsque la source n'a pas pu dire de quelle candidature il s'agit."
 msgid "enabled"
 msgstr "activé"
 
-#: src/postulo/applications/models.py:466
+#: src/postulo/applications/models.py:473
 #, draft
 msgid "ends"
 msgstr "fin"
@@ -2164,7 +2318,7 @@ msgstr "Énergie"
 msgid "Engineering"
 msgstr "Ingénierie"
 
-#: src/postulo/applications/models.py:334
+#: src/postulo/applications/models.py:341
 #, draft
 msgid "event"
 msgstr "événement"
@@ -2174,7 +2328,7 @@ msgstr "événement"
 msgid "Event or fair"
 msgstr "Événement ou salon"
 
-#: src/postulo/applications/models.py:335
+#: src/postulo/applications/models.py:342
 #, draft
 msgid "events"
 msgstr "événements"
@@ -2236,7 +2390,7 @@ msgid ""
 msgstr ""
 "Chaque poste que vous avez occupé. Écrivez les points forts une fois ; adaptez-les par CV plus tard."
 
-#: src/postulo/documents/views.py:354
+#: src/postulo/documents/views.py:382
 #, draft
 msgid "Every store already has this document."
 msgstr "Chaque dépôt a déjà ce document."
@@ -2336,7 +2490,7 @@ msgstr "Exporter en PDF"
 msgid "Exported on its own"
 msgstr "Exporté séparément"
 
-#: src/postulo/documents/models.py:306
+#: src/postulo/documents/models.py:379
 #, draft
 msgid "Failed"
 msgstr "Échec"
@@ -2371,12 +2525,12 @@ msgstr "domaine d'études"
 msgid "Figures appear once you have applied for something."
 msgstr "Les chiffres apparaîtront une fois que vous aurez postulé quelque part."
 
-#: src/postulo/documents/models.py:210 src/postulo/documents/models.py:259
+#: src/postulo/documents/models.py:283 src/postulo/documents/models.py:332
 #, draft
 msgid "file"
 msgstr "fichier"
 
-#: src/postulo/documents/views.py:268
+#: src/postulo/documents/views.py:296
 #, draft
 msgid "File saved."
 msgstr "Fichier enregistré."
@@ -2393,23 +2547,23 @@ msgstr "Fichiers"
 msgid "Files are kept under this instance's private media."
 msgstr "Les fichiers sont conservés dans les médias privés de cette instance."
 
-#: src/postulo/applications/models.py:226
+#: src/postulo/applications/models.py:233
 #, draft
 msgid "files sent"
 msgstr "fichiers envoyés"
 
-#: src/postulo/templates/documents/application_documents.html:47
+#: src/postulo/templates/documents/application_documents.html:64
 #, draft
 msgid "Files you already had"
 msgstr "Fichiers que vous aviez déjà"
 
-#: src/postulo/applications/models.py:227
+#: src/postulo/applications/models.py:234
 #, draft
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
 "Fichiers que vous aviez déjà, par opposition aux documents produits par Postulo."
 
-#: src/postulo/documents/forms.py:142
+#: src/postulo/documents/forms.py:168
 #, draft
 msgid "Files you have already"
 msgstr "Fichiers que vous avez déjà"
@@ -2451,12 +2605,17 @@ msgstr "Première valeur"
 msgid "First, take everything with you"
 msgstr "D'abord, emportez tout avec vous"
 
+#: src/postulo/documents/models.py:167
+#, draft
+msgid "Follow-up note"
+msgstr "Note après entretien"
+
 #: src/postulo/applications/views.py:394
 #, draft
 msgid "Follow-up recorded."
 msgstr "Relance enregistrée."
 
-#: src/postulo/applications/models.py:283 src/postulo/applications/views.py:391
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:391
 #: src/postulo/templates/core/dashboard.html:116
 #, draft
 msgid "Followed up"
@@ -2525,12 +2684,12 @@ msgstr "à partir de %(low)s"
 msgid "From %(name)s."
 msgstr "De %(name)s."
 
-#: src/postulo/documents/models.py:283
+#: src/postulo/documents/models.py:356
 #, draft
 msgid "from cover letter"
 msgstr "de la lettre de motivation"
 
-#: src/postulo/documents/models.py:275
+#: src/postulo/documents/models.py:348
 #, draft
 msgid "from CV"
 msgstr "du CV"
@@ -2547,7 +2706,7 @@ msgstr ""
 msgid "From Gravatar"
 msgstr "Depuis Gravatar"
 
-#: src/postulo/applications/models.py:322
+#: src/postulo/applications/models.py:329
 #, draft
 msgid "from status"
 msgstr "de l'état"
@@ -2662,12 +2821,12 @@ msgid ""
 msgstr ""
 "Regroupez les compétences liées sous un titre, comme « Langues » ou « Infrastructure »."
 
-#: src/postulo/applications/models.py:590
+#: src/postulo/applications/models.py:597
 #, draft
 msgid "happened"
 msgstr "survenu le"
 
-#: src/postulo/applications/models.py:318
+#: src/postulo/applications/models.py:325
 #, draft
 msgid "happened on"
 msgstr "a eu lieu le"
@@ -2687,7 +2846,7 @@ msgstr "Santé"
 msgid "Health check"
 msgstr "Contrôle de santé"
 
-#: src/postulo/applications/models.py:408
+#: src/postulo/applications/models.py:415
 #: src/postulo/templates/applications/partials/interview_outcome.html:8
 #, draft
 msgid "Held"
@@ -2783,7 +2942,7 @@ msgstr "Hybride"
 msgid "I have already applied to this one"
 msgstr "J'ai déjà postulé à celle-ci"
 
-#: src/postulo/documents/models.py:350
+#: src/postulo/documents/models.py:423
 #, draft
 msgid "id in the store"
 msgstr "identifiant dans le dépôt"
@@ -2798,7 +2957,7 @@ msgstr "identifiant"
 msgid "Identifier"
 msgstr "Identifiant"
 
-#: src/postulo/applications/models.py:585
+#: src/postulo/applications/models.py:592
 #, draft
 msgid "identifier at the source"
 msgstr "identifiant à la source"
@@ -3012,17 +3171,17 @@ msgstr "Assurance"
 msgid "Internship"
 msgstr "Stage"
 
-#: src/postulo/applications/models.py:277
+#: src/postulo/applications/models.py:284
 #, draft
 msgid "Interview"
 msgstr "Entretien"
 
-#: src/postulo/applications/models.py:499
+#: src/postulo/applications/models.py:506
 #, draft
 msgid "interview"
 msgstr "entretien"
 
-#: src/postulo/applications/models.py:279
+#: src/postulo/applications/models.py:286
 #, draft
 msgid "Interview cancelled"
 msgstr "Entretien annulé"
@@ -3032,7 +3191,7 @@ msgstr "Entretien annulé"
 msgid "Interview recorded."
 msgstr "Entretien enregistré."
 
-#: src/postulo/applications/models.py:278
+#: src/postulo/applications/models.py:285
 #, draft
 msgid "Interview scheduled"
 msgstr "Entretien planifié"
@@ -3058,7 +3217,7 @@ msgstr "Entretien mis à jour."
 msgid "Interviewing"
 msgstr "En entretien"
 
-#: src/postulo/applications/models.py:500
+#: src/postulo/applications/models.py:507
 #, draft
 msgid "interviews"
 msgstr "entretiens"
@@ -3168,10 +3327,11 @@ msgstr "Emplois"
 msgid "Join the call"
 msgstr "Rejoindre la visioconférence"
 
-#: src/postulo/applications/models.py:317
-#: src/postulo/applications/models.py:463
-#: src/postulo/applications/models.py:587 src/postulo/documents/models.py:208
-#: src/postulo/documents/models.py:258 src/postulo/plugins/models.py:37
+#: src/postulo/applications/models.py:324
+#: src/postulo/applications/models.py:470
+#: src/postulo/applications/models.py:594 src/postulo/documents/models.py:230
+#: src/postulo/documents/models.py:281 src/postulo/documents/models.py:331
+#: src/postulo/plugins/models.py:37 src/postulo/resume/models.py:231
 #, draft
 msgid "kind"
 msgstr "type"
@@ -3181,12 +3341,17 @@ msgstr "type"
 msgid "Kind"
 msgstr "Type"
 
-#: src/postulo/documents/models.py:329 src/postulo/plugins/models.py:41
+#: src/postulo/templates/documents/letter_list.html:19
+#, draft
+msgid "Kinds of letter"
+msgstr "Types de lettres"
+
+#: src/postulo/documents/models.py:402 src/postulo/plugins/models.py:41
 #, draft
 msgid "label"
 msgstr "libellé"
 
-#: src/postulo/accounts/forms.py:267 src/postulo/resume/registry.py:69
+#: src/postulo/accounts/forms.py:267 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Langue"
@@ -3209,7 +3374,7 @@ msgstr "Langue et heure"
 msgid "Language for new accounts"
 msgstr "Langue des nouveaux comptes"
 
-#: src/postulo/documents/rendering.py:28 src/postulo/resume/registry.py:70
+#: src/postulo/documents/rendering.py:29 src/postulo/resume/registry.py:78
 #: src/postulo/templates/resume/preview.html:100
 #, draft
 msgid "Languages"
@@ -3237,12 +3402,22 @@ msgstr "Taille maximale d'une page lue"
 msgid "Last activity"
 msgstr "Dernière activité"
 
-#: src/postulo/documents/models.py:356
+#: src/postulo/documents/models.py:429
 #, draft
 msgid "last attempt"
 msgstr "dernière tentative"
 
-#: src/postulo/documents/models.py:358 src/postulo/plugins/models.py:50
+#: src/postulo/resume/models.py:241
+#, draft
+msgid "last check"
+msgstr "dernière vérification"
+
+#: src/postulo/resume/models.py:239
+#, draft
+msgid "last checked"
+msgstr "vérifié le"
+
+#: src/postulo/documents/models.py:431 src/postulo/plugins/models.py:50
 #, draft
 msgid "last error"
 msgstr "dernière erreur"
@@ -3323,6 +3498,30 @@ msgstr "Juridique"
 msgid "Legal Entity Identifier (LEI)"
 msgstr "Identifiant d'entité juridique (LEI)"
 
+#: src/postulo/documents/forms.py:165
+#, draft
+msgid "Letter"
+msgstr "Lettre"
+
+#: src/postulo/documents/models.py:244
+#, draft
+msgid "letter"
+msgstr "lettre"
+
+#: src/postulo/core/search.py:390
+#: src/postulo/templates/accounts/delete_account.html:24
+#: src/postulo/templates/core/export.html:22
+#: src/postulo/templates/documents/letter_list.html:4
+#: src/postulo/templates/documents/letter_list.html:9
+#, draft
+msgid "Letters"
+msgstr "Lettres"
+
+#: src/postulo/documents/models.py:245
+#, draft
+msgid "letters"
+msgstr "lettres"
+
 #: src/postulo/templates/server/plugins.html:88
 #, draft
 msgid "Licence"
@@ -3338,17 +3537,18 @@ msgstr "Clair"
 msgid "Limits"
 msgstr "Limites"
 
-#: src/postulo/resume/models.py:140
+#: src/postulo/resume/models.py:140 src/postulo/resume/models.py:246
 #, draft
 msgid "link"
 msgstr "lien"
 
+#: src/postulo/resume/registry.py:69
 #: src/postulo/templates/accounts/invite_list.html:28
 #, draft
 msgid "Link"
 msgstr "Lien"
 
-#: src/postulo/documents/models.py:351
+#: src/postulo/documents/models.py:424
 #, draft
 msgid "link in the store"
 msgstr "lien dans le dépôt"
@@ -3357,6 +3557,27 @@ msgstr "lien dans le dépôt"
 #, draft
 msgid "LinkedIn"
 msgstr "LinkedIn"
+
+#: src/postulo/documents/rendering.py:26 src/postulo/resume/registry.py:70
+#, draft
+msgid "Links"
+msgstr "Liens"
+
+#: src/postulo/resume/models.py:247
+#, draft
+msgid "links"
+msgstr "liens"
+
+#: src/postulo/applications/models.py:226
+#, draft
+msgid "links sent"
+msgstr "liens envoyés"
+
+#: src/postulo/documents/forms.py:174
+#: src/postulo/templates/documents/application_documents.html:47
+#, draft
+msgid "Links you pointed them at"
+msgstr "Liens que vous leur avez indiqués"
 
 #: src/postulo/jobs/models.py:560
 #: src/postulo/templates/core/import_csv_map.html:86
@@ -3554,6 +3775,11 @@ msgid ""
 msgstr ""
 "La plupart des gens suivent leur recherche d'emploi dans une feuille de calcul jusqu'à ce que ça devienne pénible. Apportez-la ici plutôt que de tout retaper : un CSV, n'importe quelles colonnes, des en-têtes dans n'importe quelle langue. Vous verrez comment chaque colonne est lue avant que rien ne soit enregistré."
 
+#: src/postulo/documents/models.py:165 src/postulo/documents/models.py:265
+#, draft
+msgid "Motivation letter"
+msgstr "Lettre de motivation longue"
+
 #: src/postulo/templates/applications/partials/application_card.html:59
 #, draft
 msgid "Move"
@@ -3570,7 +3796,7 @@ msgid "Move %(column)s up"
 msgstr "Monter %(column)s"
 
 #: src/postulo/templates/documents/cv_detail.html:54
-#: src/postulo/templates/resume/overview.html:73
+#: src/postulo/templates/resume/overview.html:102
 #, draft
 msgid "Move down"
 msgstr "Descendre"
@@ -3581,7 +3807,7 @@ msgid "Move it along"
 msgstr "Faire avancer"
 
 #: src/postulo/templates/documents/cv_detail.html:49
-#: src/postulo/templates/resume/overview.html:68
+#: src/postulo/templates/resume/overview.html:97
 #, draft
 msgid "Move up"
 msgstr "Monter"
@@ -3594,7 +3820,7 @@ msgid "Name"
 msgstr "Nom"
 
 #: src/postulo/api/models.py:61 src/postulo/core/models.py:68
-#: src/postulo/documents/models.py:59 src/postulo/documents/models.py:166
+#: src/postulo/documents/models.py:59 src/postulo/documents/models.py:228
 #: src/postulo/jobs/models.py:39 src/postulo/jobs/models.py:104
 #: src/postulo/jobs/models.py:177 src/postulo/jobs/models.py:237
 #: src/postulo/resume/models.py:104 src/postulo/resume/models.py:119
@@ -3697,7 +3923,7 @@ msgstr "Sauvegarde la plus récente"
 msgid "Next"
 msgstr "Suivant"
 
-#: src/postulo/documents/models.py:354
+#: src/postulo/documents/models.py:427
 #, draft
 msgid "next attempt"
 msgstr "prochaine tentative"
@@ -3761,17 +3987,12 @@ msgstr "pas d'entreprise"
 msgid "No connections yet"
 msgstr "Pas encore de connexion"
 
-#: src/postulo/templates/documents/letter_list.html:43
-#, draft
-msgid "No cover letters yet."
-msgstr "Pas encore de lettre de motivation."
-
 #: src/postulo/templates/documents/cv_list.html:41
 #, draft
 msgid "No CVs yet"
 msgstr "Pas encore de CV"
 
-#: src/postulo/documents/views.py:336
+#: src/postulo/documents/views.py:364
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -3810,6 +4031,18 @@ msgstr "Aucun entretien enregistré pour l'instant."
 msgid "No invitations yet."
 msgstr "Pas encore d'invitation."
 
+#: src/postulo/templates/documents/letter_list.html:55
+#, draft
+msgid "No letters of this kind yet."
+msgstr "Aucune lettre de ce type pour l'instant."
+
+#: src/postulo/templates/documents/letter_list.html:57
+#, draft
+msgid ""
+"No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
+msgstr ""
+"Aucune lettre pour l'instant. Une lettre d'accompagnement vise une annonce ; une lettre de motivation longue raconte votre parcours ; une candidature spontanée va là où rien n'est publié ; une note après entretien vient ensuite."
+
 #: src/postulo/documents/pdf.py:167
 #, python-format, draft
 msgid ""
@@ -3834,7 +4067,7 @@ msgstr "Aucune annonce enregistrée pour cette entreprise."
 msgid "no role"
 msgstr "pas de poste"
 
-#: src/postulo/templates/resume/overview.html:50
+#: src/postulo/templates/resume/overview.html:79
 #, draft
 msgid "No skills in this group yet"
 msgstr "Pas encore de compétence dans ce groupe"
@@ -3894,7 +4127,7 @@ msgstr "aucun pour l'instant"
 msgid "Normal"
 msgstr "Normale"
 
-#: src/postulo/documents/models.py:307
+#: src/postulo/documents/models.py:380
 #, draft
 msgid "Not accepted"
 msgstr "Refusé"
@@ -3903,6 +4136,11 @@ msgstr "Refusé"
 #, draft
 msgid "Not allowed"
 msgstr "Non autorisé"
+
+#: src/postulo/resume/models.py:211
+#, draft
+msgid "Not checked"
+msgstr "Non vérifié"
 
 #: src/postulo/templates/server/signin.html:37
 #, draft
@@ -3957,7 +4195,7 @@ msgstr "pas encore testé"
 msgid "note"
 msgstr "note"
 
-#: src/postulo/applications/forms.py:180 src/postulo/applications/models.py:273
+#: src/postulo/applications/forms.py:180 src/postulo/applications/models.py:280
 #, draft
 msgid "Note"
 msgstr "Note"
@@ -3984,7 +4222,7 @@ msgstr "repérée le"
 msgid "Notes"
 msgstr "Notes"
 
-#: src/postulo/documents/models.py:218 src/postulo/jobs/models.py:113
+#: src/postulo/documents/models.py:291 src/postulo/jobs/models.py:113
 #: src/postulo/jobs/models.py:242
 #, draft
 msgid "notes"
@@ -4017,7 +4255,7 @@ msgstr "Rien ici"
 msgid "Nothing here yet"
 msgstr "Rien ici pour l'instant"
 
-#: src/postulo/templates/resume/overview.html:104
+#: src/postulo/templates/resume/overview.html:133
 #, draft
 msgid "Nothing here yet."
 msgstr "Rien ici pour l'instant."
@@ -4165,7 +4403,7 @@ msgstr "Notifications"
 msgid "Notifications are set up"
 msgstr "Les notifications sont configurées"
 
-#: src/postulo/applications/models.py:371
+#: src/postulo/applications/models.py:378
 #, draft
 msgid "notified on"
 msgstr "notifié le"
@@ -4189,7 +4427,7 @@ msgstr ""
 msgid "Offer"
 msgstr "Offre"
 
-#: src/postulo/applications/models.py:281
+#: src/postulo/applications/models.py:288
 #, draft
 msgid "Offer received"
 msgstr "Offre reçue"
@@ -4211,7 +4449,7 @@ msgstr "Offres sur la table"
 msgid "older than a week"
 msgstr "de plus d'une semaine"
 
-#: src/postulo/applications/models.py:400 src/postulo/jobs/models.py:254
+#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:254
 #, draft
 msgid "On site"
 msgstr "Sur site"
@@ -4251,6 +4489,11 @@ msgid "One installed plugin can be connected."
 msgid_plural "%(counter)s installed plugins can be connected."
 msgstr[0] "Un plugin installé peut être connecté."
 msgstr[1] "%(counter)s plugins installés peuvent être connectés."
+
+#: src/postulo/resume/models.py:236
+#, draft
+msgid "One line, for whoever is reading the CV."
+msgstr "Une ligne, pour la personne qui lit le CV."
 
 #: src/postulo/templates/jobs/capture_form.html:46
 #, draft
@@ -4346,9 +4589,10 @@ msgstr "Origine"
 msgid "Original posting"
 msgstr "Annonce d'origine"
 
-#: src/postulo/applications/models.py:87 src/postulo/applications/models.py:284
-#: src/postulo/applications/models.py:403 src/postulo/documents/models.py:196
+#: src/postulo/applications/models.py:87 src/postulo/applications/models.py:291
+#: src/postulo/applications/models.py:410 src/postulo/documents/models.py:269
 #: src/postulo/jobs/identifiers.py:116 src/postulo/jobs/models.py:293
+#: src/postulo/resume/models.py:207
 #, draft
 msgid "Other"
 msgstr "Autre"
@@ -4358,7 +4602,7 @@ msgstr "Autre"
 msgid "Other industries"
 msgstr "Autres secteurs"
 
-#: src/postulo/applications/models.py:478
+#: src/postulo/applications/models.py:485
 #, draft
 msgid "outcome"
 msgstr "résultat"
@@ -4413,7 +4657,7 @@ msgstr "Code source de la page"
 msgid "Pagination"
 msgstr "Pagination"
 
-#: src/postulo/applications/models.py:401
+#: src/postulo/applications/models.py:408
 #, draft
 msgid "Panel"
 msgstr "Jury"
@@ -4510,6 +4754,11 @@ msgstr "Autorisations"
 msgid "Personal info"
 msgstr "Informations personnelles"
 
+#: src/postulo/resume/models.py:202
+#, draft
+msgid "Personal site"
+msgstr "Site personnel"
+
 #: src/postulo/jobs/industries.py:19
 #, draft
 msgid "Pharmaceuticals"
@@ -4520,7 +4769,7 @@ msgstr "Pharmacie"
 msgid "phone"
 msgstr "téléphone"
 
-#: src/postulo/applications/models.py:398
+#: src/postulo/applications/models.py:405
 #, draft
 msgid "Phone screen"
 msgstr "Entretien téléphonique"
@@ -4535,7 +4784,7 @@ msgstr "image"
 msgid "Placeholders"
 msgstr "Champs de substitution"
 
-#: src/postulo/documents/models.py:169
+#: src/postulo/documents/models.py:234
 #, draft
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr ""
@@ -4583,10 +4832,15 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP ou GIF jusqu'à 5 Mo. L'image est recadrée au carré et débarrassée de tout ce que le fichier savait sur le lieu de la prise de vue."
 
-#: src/postulo/documents/models.py:194
+#: src/postulo/documents/models.py:267 src/postulo/resume/models.py:201
 #, draft
 msgid "Portfolio"
 msgstr "Portfolio"
+
+#: src/postulo/applications/models.py:227
+#, draft
+msgid "Portfolios, profiles and videos you pointed them at."
+msgstr "Portfolios, profils et vidéos que vous leur avez indiqués."
 
 #: src/postulo/jobs/models.py:397
 #, draft
@@ -4676,12 +4930,12 @@ msgstr "Postulo — votre recherche d'emploi, sur votre serveur."
 msgid "prefix"
 msgstr "préfixe"
 
-#: src/postulo/applications/models.py:476
+#: src/postulo/applications/models.py:483
 #, draft
 msgid "preparation notes"
 msgstr "notes de préparation"
 
-#: src/postulo/templates/documents/themes/base_cv.html:86
+#: src/postulo/templates/documents/themes/base_cv.html:95
 #: src/postulo/templates/resume/preview.html:28
 #, draft
 msgid "present"
@@ -4791,6 +5045,11 @@ msgstr ""
 msgid "Public sector"
 msgstr "Secteur public"
 
+#: src/postulo/resume/models.py:205
+#, draft
+msgid "Publication"
+msgstr "Publication"
+
 #: src/postulo/templates/core/export.html:49
 #, draft
 msgid "Putting it back"
@@ -4822,7 +5081,7 @@ msgstr "Silencieuse"
 msgid "quiet after"
 msgstr "silencieuse après"
 
-#: src/postulo/applications/models.py:231
+#: src/postulo/applications/models.py:238
 #, draft
 msgid "quiet announced on"
 msgstr "silence signalé le"
@@ -4961,17 +5220,17 @@ msgstr "Enregistré comme annulé."
 msgid "Recorded as held."
 msgstr "Enregistré comme tenu."
 
-#: src/postulo/applications/models.py:327
+#: src/postulo/applications/models.py:334
 #, draft
 msgid "recorded by"
 msgstr "enregistré par"
 
-#: src/postulo/applications/models.py:329
+#: src/postulo/applications/models.py:336
 #, draft
 msgid "recorded on"
 msgstr "enregistré le"
 
-#: src/postulo/documents/views.py:430
+#: src/postulo/documents/views.py:463
 #, draft
 msgid "Recorded what you sent."
 msgstr "Ce que vous avez envoyé a été enregistré."
@@ -4991,7 +5250,7 @@ msgstr "Recruteur"
 msgid "Redirects followed"
 msgstr "Redirections suivies"
 
-#: src/postulo/documents/models.py:195
+#: src/postulo/documents/models.py:268
 #, draft
 msgid "Reference"
 msgstr "Référence"
@@ -5029,7 +5288,7 @@ msgstr "Réinstaller"
 msgid "Rejected"
 msgstr "Refusée"
 
-#: src/postulo/applications/models.py:282
+#: src/postulo/applications/models.py:289
 #, draft
 msgid "Rejection received"
 msgstr "Refus reçu"
@@ -5039,13 +5298,13 @@ msgstr "Refus reçu"
 msgid "Remind me the day before"
 msgstr "Me le rappeler la veille"
 
-#: src/postulo/applications/models.py:376
-#: src/postulo/applications/models.py:493
+#: src/postulo/applications/models.py:383
+#: src/postulo/applications/models.py:500
 #, draft
 msgid "reminder"
 msgstr "rappel"
 
-#: src/postulo/applications/models.py:377
+#: src/postulo/applications/models.py:384
 #, draft
 msgid "reminders"
 msgstr "rappels"
@@ -5098,12 +5357,12 @@ msgstr "Supprimer cette connexion ?"
 msgid "removed on the other side"
 msgstr "supprimé de l'autre côté"
 
-#: src/postulo/documents/models.py:288
+#: src/postulo/documents/models.py:361
 #, draft
 msgid "rendered on"
 msgstr "produit le"
 
-#: src/postulo/documents/models.py:227
+#: src/postulo/documents/models.py:300
 #, draft
 msgid "replaces"
 msgstr "remplace"
@@ -5146,7 +5405,7 @@ msgstr "CV"
 msgid "Retail"
 msgstr "Commerce de détail"
 
-#: src/postulo/documents/models.py:172
+#: src/postulo/documents/models.py:237
 #, draft
 msgid "reusable template"
 msgstr "modèle réutilisable"
@@ -5163,7 +5422,7 @@ msgstr "Vérifier"
 msgid "Review the capture"
 msgstr "Vérifier la capture"
 
-#: src/postulo/applications/models.py:614
+#: src/postulo/applications/models.py:621
 #, draft
 msgid "reviewed on"
 msgstr "examinée le"
@@ -5280,7 +5539,7 @@ msgstr "salaire jusqu'à"
 #: src/postulo/templates/connections/form.html:45
 #: src/postulo/templates/documents/cv_form.html:20
 #: src/postulo/templates/documents/cv_item_form.html:24
-#: src/postulo/templates/documents/letter_form.html:20
+#: src/postulo/templates/documents/letter_form.html:28
 #: src/postulo/templates/documents/upload_form.html:20
 #: src/postulo/templates/jobs/company_form.html:101
 #: src/postulo/templates/jobs/contact_form.html:20
@@ -5313,7 +5572,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Enregistrée dans vos offres. Décidez quand vous serez prêt."
 
 #: src/postulo/accounts/settings_views.py:32
-#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:111
+#: src/postulo/core/server_views.py:308 src/postulo/resume/views.py:112
 #, draft
 msgid "Saved."
 msgstr "Enregistré."
@@ -5335,7 +5594,7 @@ msgstr "Planifier"
 msgid "Schedule an interview"
 msgstr "Planifier un entretien"
 
-#: src/postulo/applications/models.py:407
+#: src/postulo/applications/models.py:414
 #, draft
 msgid "Scheduled"
 msgstr "Planifié"
@@ -5449,12 +5708,12 @@ msgstr "Échec de l'envoi : %(error)s"
 msgid "Sent"
 msgstr "Envoyé"
 
-#: src/postulo/documents/models.py:291 src/postulo/documents/models.py:336
+#: src/postulo/documents/models.py:364 src/postulo/documents/models.py:409
 #, draft
 msgid "sent document"
 msgstr "document envoyé"
 
-#: src/postulo/documents/models.py:292
+#: src/postulo/documents/models.py:365
 #, draft
 msgid "sent documents"
 msgstr "documents envoyés"
@@ -5467,7 +5726,7 @@ msgstr "documents envoyés"
 msgid "Sent documents"
 msgstr "Documents envoyés"
 
-#: src/postulo/documents/models.py:357
+#: src/postulo/documents/models.py:430
 #, draft
 msgid "sent on"
 msgstr "envoyé le"
@@ -5655,7 +5914,7 @@ msgstr "Groupe de compétences"
 msgid "skill groups"
 msgstr "groupes de compétences"
 
-#: src/postulo/documents/rendering.py:26 src/postulo/resume/registry.py:52
+#: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:52
 #: src/postulo/resume/registry.py:56
 #: src/postulo/templates/resume/preview.html:79
 #, draft
@@ -5731,12 +5990,27 @@ msgstr "version de la source"
 msgid "Sources installed"
 msgstr "Sources installées"
 
+#: src/postulo/documents/models.py:166
+#, draft
+msgid "Speculative letter"
+msgstr "Candidature spontanée"
+
+#: src/postulo/templates/documents/letter_form.html:8
+#, draft
+msgid "Start from a kind"
+msgstr "Partir d'un type"
+
+#: src/postulo/templates/documents/letter_form.html:9
+#, draft
+msgid "Start from:"
+msgstr "Partir de :"
+
 #: src/postulo/templates/core/import_csv.html:22
 #, draft
 msgid "Starting clean instead?"
 msgstr "Repartir de zéro ?"
 
-#: src/postulo/applications/models.py:465
+#: src/postulo/applications/models.py:472
 #, draft
 msgid "starts"
 msgstr "début"
@@ -5762,13 +6036,13 @@ msgid "Status"
 msgstr "Statut"
 
 #: src/postulo/applications/models.py:197
-#: src/postulo/applications/models.py:604 src/postulo/documents/models.py:348
+#: src/postulo/applications/models.py:611 src/postulo/documents/models.py:421
 #: src/postulo/jobs/models.py:552
 #, draft
 msgid "status"
 msgstr "statut"
 
-#: src/postulo/applications/models.py:272
+#: src/postulo/applications/models.py:279
 #, draft
 msgid "Status change"
 msgstr "Changement de statut"
@@ -5790,7 +6064,7 @@ msgstr "Statut mis à jour."
 msgid "Still live"
 msgstr "Encore en cours"
 
-#: src/postulo/documents/models.py:328
+#: src/postulo/documents/models.py:401
 #, draft
 msgid "store"
 msgstr "dépôt"
@@ -5805,27 +6079,27 @@ msgstr "Enregistré ; laissez vide pour conserver la valeur actuelle."
 msgid "Strong"
 msgstr "Fort"
 
-#: src/postulo/documents/models.py:167
+#: src/postulo/documents/models.py:232
 #, draft
 msgid "subject"
 msgstr "objet"
 
-#: src/postulo/applications/models.py:584
+#: src/postulo/applications/models.py:591
 #, draft
 msgid "suggested by"
 msgstr "proposée par"
 
-#: src/postulo/applications/models.py:592
+#: src/postulo/applications/models.py:599
 #, draft
 msgid "suggested status"
 msgstr "statut proposé"
 
-#: src/postulo/applications/models.py:619
+#: src/postulo/applications/models.py:626
 #, draft
 msgid "suggestion"
 msgstr "proposition"
 
-#: src/postulo/applications/models.py:620
+#: src/postulo/applications/models.py:627
 #, draft
 msgid "suggestions"
 msgstr "propositions"
@@ -5836,7 +6110,7 @@ msgstr "propositions"
 msgid "Suggestions"
 msgstr "Propositions"
 
-#: src/postulo/applications/models.py:319 src/postulo/documents/models.py:63
+#: src/postulo/applications/models.py:326 src/postulo/documents/models.py:63
 #: src/postulo/resume/models.py:60 src/postulo/resume/models.py:143
 #, draft
 msgid "summary"
@@ -5847,7 +6121,7 @@ msgstr "résumé"
 msgid "superseded"
 msgstr "remplacé"
 
-#: src/postulo/documents/forms.py:112
+#: src/postulo/documents/forms.py:138
 #, draft
 msgid "Supersedes"
 msgstr "Remplace"
@@ -5953,12 +6227,12 @@ msgstr "adaptée pour ce CV"
 msgid "Telecommunications"
 msgstr "Télécommunications"
 
-#: src/postulo/templates/documents/letter_list.html:34
+#: src/postulo/templates/documents/letter_list.html:45
 #, draft
 msgid "Template"
 msgstr "Modèle"
 
-#: src/postulo/documents/models.py:174
+#: src/postulo/documents/models.py:239
 #, draft
 msgid "Templates appear when you send a letter with an application."
 msgstr ""
@@ -5974,7 +6248,7 @@ msgstr "Tester"
 msgid "Test failed: %(message)s"
 msgstr "Échec du test : %(message)s"
 
-#: src/postulo/documents/models.py:286
+#: src/postulo/documents/models.py:359
 #, draft
 msgid "text as sent"
 msgstr "texte tel qu'envoyé"
@@ -6018,7 +6292,7 @@ msgstr "Cela ne ressemble pas à une adresse web complète."
 msgid "That entry could not be saved."
 msgstr "Cette entrée n'a pas pu être enregistrée."
 
-#: src/postulo/documents/forms.py:118
+#: src/postulo/documents/forms.py:144
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Ce fichier dépasse %(limit)s Mo."
@@ -6119,6 +6393,11 @@ msgstr "Le moteur PDF %(name)s est configuré mais inutilisable. %(hint)s"
 msgid "The %(plugin)s plugin is not installed."
 msgstr "Le plugin %(plugin)s n'est pas installé."
 
+#: src/postulo/resume/links.py:68
+#, python-format, draft
+msgid "The address answered %(code)s."
+msgstr "L'adresse a répondu %(code)s."
+
 #: src/postulo/jobs/models.py:402
 #, draft
 msgid "The application deadline, if stated."
@@ -6152,7 +6431,7 @@ msgid ""
 msgstr ""
 "L'entreprise est rapprochée par son nom et créée si elle est nouvelle. Seuls l'entreprise et l'intitulé du poste sont obligatoires ; tout le reste peut être renseigné plus tard."
 
-#: src/postulo/documents/models.py:159
+#: src/postulo/documents/models.py:221
 #, draft
 msgid "The company you are applying to"
 msgstr "L'entreprise où vous postulez"
@@ -6162,7 +6441,7 @@ msgstr "L'entreprise où vous postulez"
 msgid "The connection is gone or switched off."
 msgstr "La connexion a disparu ou est désactivée."
 
-#: src/postulo/documents/views.py:341
+#: src/postulo/documents/views.py:369
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "La copie n'a pas pu être envoyée ; le document dit pourquoi."
@@ -6179,7 +6458,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "Le téléchargement est bien plus gros qu'un plugin ne devrait l'être."
 
-#: src/postulo/documents/models.py:228
+#: src/postulo/documents/models.py:301
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr ""
@@ -6222,7 +6501,7 @@ msgstr "L'installateur n'a pas pu être lancé : %(error)s"
 msgid "The installer refused it: %(error)s"
 msgstr "L'installateur l'a refusé : %(error)s"
 
-#: src/postulo/documents/models.py:160
+#: src/postulo/documents/models.py:222
 #, draft
 msgid "The job title"
 msgstr "L'intitulé du poste"
@@ -6347,7 +6626,7 @@ msgid "The wheel has no metadata; it may be damaged."
 msgstr "Le wheel n'a pas de métadonnées ; il est peut-être endommagé."
 
 #: src/postulo/accounts/models.py:191 src/postulo/documents/models.py:65
-#: src/postulo/documents/models.py:176
+#: src/postulo/documents/models.py:241
 #, draft
 msgid "theme"
 msgstr "thème"
@@ -6361,6 +6640,11 @@ msgstr "Thème : %(current)s. Passer à : %(next)s."
 #, draft
 msgid "Then delete"
 msgstr "Puis supprimer"
+
+#: src/postulo/resume/views.py:197
+#, draft
+msgid "There are no links to check."
+msgstr "Il n'y a aucun lien à vérifier."
 
 #: src/postulo/documents/archiving.py:109
 #, draft
@@ -6388,7 +6672,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Ces chiffres proviennent de %(total)s candidatures — trop peu pour en tirer des conclusions. Lisez-les comme un compte rendu de ce qui s'est passé, pas comme des taux qui prédisent quoi que ce soit."
 
-#: src/postulo/applications/models.py:410
+#: src/postulo/applications/models.py:417
 #, draft
 msgid "They did not show up"
 msgstr "Ils ne se sont pas présentés"
@@ -6488,7 +6772,7 @@ msgstr "fuseau horaire"
 msgid "Time zone for new accounts"
 msgstr "Fuseau horaire des nouveaux comptes"
 
-#: src/postulo/applications/models.py:612
+#: src/postulo/applications/models.py:619
 #, draft
 msgid "timeline entry"
 msgstr "entrée du journal"
@@ -6498,8 +6782,8 @@ msgstr "entrée du journal"
 msgid "Timeout"
 msgstr "Délai d'attente"
 
-#: src/postulo/documents/models.py:207 src/postulo/documents/models.py:257
-#: src/postulo/jobs/models.py:364
+#: src/postulo/documents/models.py:280 src/postulo/documents/models.py:330
+#: src/postulo/jobs/models.py:364 src/postulo/resume/models.py:229
 #, draft
 msgid "title"
 msgstr "intitulé"
@@ -6524,12 +6808,12 @@ msgstr "À trancher"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Pour transmettre une annonce (nécessite la portée captures) :"
 
-#: src/postulo/applications/models.py:323
+#: src/postulo/applications/models.py:330
 #, draft
 msgid "to status"
 msgstr "vers le statut"
 
-#: src/postulo/documents/models.py:163
+#: src/postulo/documents/models.py:225
 #, draft
 msgid "Today's date"
 msgstr "Date du jour"
@@ -6683,12 +6967,12 @@ msgstr "Envoyer le fichier et associer les colonnes"
 msgid "Uploaded"
 msgstr "Envoyé"
 
-#: src/postulo/documents/models.py:232 src/postulo/documents/models.py:344
+#: src/postulo/documents/models.py:305 src/postulo/documents/models.py:417
 #, draft
 msgid "uploaded document"
 msgstr "document envoyé"
 
-#: src/postulo/documents/models.py:233
+#: src/postulo/documents/models.py:306
 #, draft
 msgid "uploaded documents"
 msgstr "documents envoyés"
@@ -6775,7 +7059,7 @@ msgstr "Services aux collectivités"
 msgid "Verified"
 msgstr "Vérifiée"
 
-#: src/postulo/documents/models.py:220
+#: src/postulo/documents/models.py:293
 #: src/postulo/templates/documents/upload_list.html:27
 #, draft
 msgid "version"
@@ -6806,12 +7090,17 @@ msgstr "Très faible"
 msgid "via %(actor)s"
 msgstr "via %(actor)s"
 
-#: src/postulo/applications/models.py:399
+#: src/postulo/resume/models.py:206
+#, draft
+msgid "Video"
+msgstr "Vidéo"
+
+#: src/postulo/applications/models.py:406
 #, draft
 msgid "Video call"
 msgstr "Visioconférence"
 
-#: src/postulo/applications/models.py:542 src/postulo/jobs/models.py:522
+#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:522
 #, draft
 msgid "Waiting for review"
 msgstr "En attente de vérification"
@@ -6826,7 +7115,7 @@ msgstr "En attente d'une réponse"
 msgid "Waiting only"
 msgstr "En attente seulement"
 
-#: src/postulo/documents/models.py:304
+#: src/postulo/documents/models.py:377
 #, draft
 msgid "Waiting to be sent"
 msgstr "En attente d'envoi"
@@ -6912,7 +7201,7 @@ msgstr "Ce qui figure sur ce CV"
 msgid "What it may do"
 msgstr "Ce qu'il peut faire"
 
-#: src/postulo/applications/models.py:588
+#: src/postulo/applications/models.py:595
 #, draft
 msgid "what it says"
 msgstr "ce qu'elle dit"
@@ -6926,6 +7215,11 @@ msgstr "Ce qu'il dit être"
 #, draft
 msgid "What Postulo speaks to you, and whose clock it shows."
 msgstr "La langue dans laquelle Postulo vous parle, et l'horloge qu'il affiche."
+
+#: src/postulo/resume/models.py:243
+#, draft
+msgid "what the check found"
+msgstr "ce qu'a trouvé la vérification"
 
 #: src/postulo/jobs/models.py:180
 #, draft
@@ -6956,7 +7250,7 @@ msgstr ""
 msgid "What this instance is running, and where its data is."
 msgstr "Ce que cette instance exécute, et où sont ses données."
 
-#: src/postulo/applications/models.py:367
+#: src/postulo/applications/models.py:374
 #, draft
 msgid "what to do"
 msgstr "que faire"
@@ -6973,7 +7267,7 @@ msgid ""
 msgstr ""
 "Ce avec quoi vous vous connectez. Lettres minuscules, chiffres, points, tirets bas, tirets."
 
-#: src/postulo/applications/models.py:368
+#: src/postulo/applications/models.py:375
 #, draft
 msgid "when"
 msgstr "quand"
@@ -6983,7 +7277,7 @@ msgstr "quand"
 msgid "When"
 msgstr "Quand"
 
-#: src/postulo/applications/models.py:596
+#: src/postulo/applications/models.py:603
 #, draft
 msgid "When accepting should also move the application."
 msgstr "Lorsque l'acceptation doit aussi faire avancer la candidature."
@@ -6993,7 +7287,7 @@ msgstr "Lorsque l'acceptation doit aussi faire avancer la candidature."
 msgid "When it entered your listings."
 msgstr "Quand elle est entrée dans vos offres."
 
-#: src/postulo/applications/models.py:468
+#: src/postulo/applications/models.py:475
 #, draft
 msgid "where"
 msgstr "où"
@@ -7005,7 +7299,7 @@ msgid ""
 msgstr ""
 "Où les plugins qui agissent pour vous trouvent leurs services, et comment ils s'y connectent. Les secrets sont stockés chiffrés et jamais réaffichés."
 
-#: src/postulo/documents/models.py:161
+#: src/postulo/documents/models.py:223
 #, draft
 msgid "Where the role is based"
 msgstr "Où le poste est basé"
@@ -7073,7 +7367,7 @@ msgstr "Pour quel plugin cette connexion est-elle destinée ?"
 msgid "Who may create an account here."
 msgstr "Qui peut créer un compte ici."
 
-#: src/postulo/applications/models.py:474
+#: src/postulo/applications/models.py:481
 #, draft
 msgid "who you are meeting"
 msgstr "qui vous rencontrez"
@@ -7180,7 +7474,7 @@ msgstr ""
 msgid "You already have a company with that name."
 msgstr "Vous avez déjà une entreprise de ce nom."
 
-#: src/postulo/documents/forms.py:32
+#: src/postulo/documents/forms.py:42
 #, draft
 msgid "You already have a CV with that name."
 msgstr "Vous avez déjà un CV de ce nom."
@@ -7352,7 +7646,7 @@ msgstr "Le nom que vous lui donnez : « Telegram », « Paperless à la maison �
 msgid "Your name, email and location, taken from your profile."
 msgstr "Votre nom, e-mail et lieu, tirés de votre profil."
 
-#: src/postulo/documents/models.py:162
+#: src/postulo/documents/models.py:224
 #, draft
 msgid "Your own name"
 msgstr "Votre propre nom"

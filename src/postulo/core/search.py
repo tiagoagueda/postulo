@@ -387,7 +387,7 @@ GROUPS: tuple[tuple[str, str, Callable, str, bool], ...] = (
     ("contacts", _("People"), search_contacts, "jobs:company_list", False),
     ("reminders", _("Reminders"), search_reminders, "applications:reminder_list", False),
     ("sent", _("Text you sent"), search_sent, "documents:rendered_list", False),
-    ("letters", _("Cover letters"), search_letters, "documents:letter_list", False),
+    ("letters", _("Letters"), search_letters, "documents:letter_list", False),
     ("cvs", _("CVs"), search_cvs, "documents:cv_list", False),
     ("uploads", _("Files"), search_uploads, "documents:upload_list", False),
     ("career", _("Career record"), search_career, "resume:overview", False),

@@ -8,7 +8,7 @@ from postulo.applications import analytics
 from postulo.applications.models import Application, Status
 from postulo.documents.models import CV, CoverLetter, UploadedDocument
 from postulo.jobs.models import Capture, Company
-from postulo.resume.models import Experience
+from postulo.resume.models import Experience, Link
 
 
 @pytest.fixture
@@ -22,7 +22,11 @@ def test_it_fills_every_part_of_the_application(seeded):
     assert Application.objects.for_user(seeded).count() >= 25
     assert Experience.objects.for_user(seeded).count() == 3
     assert CV.objects.for_user(seeded).count() == 2
-    assert CoverLetter.objects.for_user(seeded).count() == 2
+    letters = CoverLetter.objects.for_user(seeded)
+    assert letters.count() == 4
+    assert {letter.kind for letter in letters} == {"cover", "motivation", "follow_up"}
+    links = Link.objects.for_user(seeded)
+    assert {link.kind for link in links} == {"portfolio", "code", "video"}
     assert UploadedDocument.objects.for_user(seeded).count() == 1
     assert Capture.objects.for_user(seeded).count() == 2
 

@@ -62,6 +62,14 @@ SECTIONS: dict[str, SectionSpec] = {
         _("Certification"),
         _("Certifications"),
     ),
+    "link": SectionSpec(
+        "link",
+        resume_models.Link,
+        resume_forms.LinkForm,
+        _("Link"),
+        _("Links"),
+        _("A portfolio, a profile, a video: work of yours that already lives somewhere."),
+    ),
     "language": SectionSpec(
         "language",
         resume_models.LanguageSkill,
@@ -72,4 +80,12 @@ SECTIONS: dict[str, SectionSpec] = {
 }
 
 #: The sections shown on the overview page, in the order a CV usually reads.
-OVERVIEW_ORDER = ("experience", "education", "project", "skill-group", "certification", "language")
+OVERVIEW_ORDER = (
+    "experience",
+    "education",
+    "project",
+    "link",
+    "skill-group",
+    "certification",
+    "language",
+)

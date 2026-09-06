@@ -7,9 +7,19 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.forms import OwnerScopedModelForm
+from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
-from .models import CV, CoverLetter, CVItem, UploadedDocument
+from .models import (
+    CV,
+    LETTER_STARTERS,
+    LETTER_THEMES,
+    CoverLetter,
+    CVItem,
+    LetterKind,
+    Theme,
+    UploadedDocument,
+)
 
 #: Maximum size for an upload, in bytes. Generous for a CV, mean for a video.
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
@@ -92,10 +102,26 @@ class AddCVItemsForm(forms.Form):
 
 
 class CoverLetterForm(OwnerScopedModelForm):
+    """A letter of any of the four kinds.
+
+    A new letter starts from the kind's own text rather than an empty box: what a
+    motivation letter is supposed to look like is not obvious, and a shape on the page
+    says it better than help text underneath.
+    """
+
     class Meta:
         model = CoverLetter
-        fields = ("name", "subject", "body", "theme", "is_template")
+        fields = ("name", "kind", "subject", "body", "theme", "is_template")
         widgets = {"body": forms.Textarea(attrs={"rows": 18})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            return
+        kind = self.initial.get("kind") or LetterKind.COVER
+        self.initial.setdefault("kind", kind)
+        self.initial.setdefault("body", str(LETTER_STARTERS.get(kind, "")))
+        self.initial.setdefault("theme", LETTER_THEMES.get(kind, Theme.PLAIN))
 
 
 class UploadedDocumentForm(OwnerScopedModelForm):
@@ -136,11 +162,17 @@ class SendDocumentsForm(forms.Form):
 
     cv = forms.ModelChoiceField(label=_("CV"), queryset=CV.objects.none(), required=False)
     cover_letter = forms.ModelChoiceField(
-        label=_("Cover letter"), queryset=CoverLetter.objects.none(), required=False
+        label=_("Letter"), queryset=CoverLetter.objects.none(), required=False
     )
     uploads = forms.ModelMultipleChoiceField(
         label=_("Files you have already"),
         queryset=UploadedDocument.objects.none(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    links = forms.ModelMultipleChoiceField(
+        label=_("Links you pointed them at"),
+        queryset=Link.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple,
     )
@@ -151,9 +183,16 @@ class SendDocumentsForm(forms.Form):
         self.fields["cv"].queryset = CV.objects.for_user(user)
         self.fields["cover_letter"].queryset = CoverLetter.objects.for_user(user)
         self.fields["uploads"].queryset = UploadedDocument.objects.for_user(user)
+        self.fields["links"].queryset = Link.objects.for_user(user)
 
     def clean(self):
         cleaned = super().clean()
-        if not any((cleaned.get("cv"), cleaned.get("cover_letter"), cleaned.get("uploads"))):
+        chosen = (
+            cleaned.get("cv"),
+            cleaned.get("cover_letter"),
+            cleaned.get("uploads"),
+            cleaned.get("links"),
+        )
+        if not any(chosen):
             raise forms.ValidationError(_("Choose at least one document to record."))
         return cleaned

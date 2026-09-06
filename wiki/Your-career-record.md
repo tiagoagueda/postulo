@@ -36,6 +36,30 @@ They render as a bulleted list. Keeping them as plain lines means reordering is 
 text, and a CV variant can replace the whole set with a textarea rather than a fiddly set
 of checkboxes.
 
+## Links: portfolios, profiles, videos
+
+**Documents → Your career record → Links**
+
+Some of your work already lives somewhere: a portfolio, a personal site, the code you have
+published, a paper, or a video of you talking for two minutes. That is an address, not a
+file, so Postulo keeps it as one. A link has a title, the address, a kind — portfolio,
+personal site, code, design, publication, video, other — and one line of description for
+whoever is reading.
+
+Links go on a CV like any other entry, as a **Links** section, and can be sent with an
+application alongside your CV and letters; the timeline records which ones you pointed
+them at.
+
+**Video CVs** belong here too, as a link of the *video* kind: an unlisted upload on
+YouTube, Vimeo, a PeerTube instance or your own share. That is what almost everyone
+actually does, and it costs you nothing here. Postulo does not host video itself.
+
+**Check it answers.** A portfolio address that returns "not found" on the day a recruiter
+clicks it is the worst outcome this record exists to prevent, and Postulo cannot see it
+from the inside because it never visits your links. So there is a button: *Check it
+answers* on one link, *Check them all* on the section. One request each, when you press it,
+and the result is kept beside the link. Nothing is ever checked on a schedule.
+
 ## Ordering
 
 Each entry has an **order** number; lower numbers come first, and the arrows on the

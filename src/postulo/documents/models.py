@@ -146,6 +146,68 @@ class CVItem(OwnedModel):
         return split_highlights(getattr(self.item, "highlights", ""))
 
 
+class LetterKind(models.TextChoices):
+    """What sort of letter this is, which decides its shape rather than its wording.
+
+    A **cover letter** is one page, addressed, about one posting. A **motivation letter**
+    is longer and sectioned, about the person and their reasons, usually with no addressee
+    block — the norm for academic posts, EU institutions, NGOs and much of the continent.
+    A **speculative letter** has no posting behind it. A **follow-up note** comes after an
+    interview and is short.
+
+    The names are a translation hazard worth knowing about: in French and Portuguese
+    *lettre de motivation* and *carta de motivação* are the everyday words for what
+    English calls a cover letter. The two kinds here are told apart by their shape — the
+    length, the sections, the addressee — and never by the name alone.
+    """
+
+    COVER = "cover", _("Cover letter")
+    MOTIVATION = "motivation", _("Motivation letter")
+    SPECULATIVE = "speculative", _("Speculative letter")
+    FOLLOW_UP = "follow_up", _("Follow-up note")
+
+
+#: What a new letter of each kind starts as. Not a template to be filled in mechanically:
+#: something on the page beats an empty box, and shows the shape the kind expects.
+LETTER_STARTERS = {
+    LetterKind.COVER: _(
+        "Dear {{ company }},\n\n"
+        "[Why this role, in a sentence.]\n\n"
+        "[What you have done that bears on it.]\n\n"
+        "Yours sincerely,\n{{ name }}"
+    ),
+    LetterKind.MOTIVATION: _(
+        "[What you are applying for, and the one thing that makes you the person for "
+        "it.]\n\n"
+        "Why this work\n[What draws you to it.]\n\n"
+        "Why {{ company }}\n[What you know about them.]\n\n"
+        "What I bring\n[Your route here, and what it taught you.]\n\n"
+        "{{ name }}\n{{ date }}"
+    ),
+    LetterKind.SPECULATIVE: _(
+        "Dear {{ company }},\n\n"
+        "You are not advertising, and I am writing anyway.\n\n"
+        "[What you would bring, and to which part of the work.]\n\n"
+        "Yours sincerely,\n{{ name }}"
+    ),
+    LetterKind.FOLLOW_UP: _(
+        "Dear [name],\n\n"
+        "Thank you for your time on [date].\n\n"
+        "[The one thing you would like them to remember.]\n\n"
+        "Yours sincerely,\n{{ name }}"
+    ),
+}
+
+#: The theme each kind starts with. A motivation letter is a piece of prose and reads
+#: better set; a follow-up note is an email in all but name.
+LETTER_THEMES = {
+    LetterKind.COVER: "plain",
+    LetterKind.MOTIVATION: "classic",
+    LetterKind.SPECULATIVE: "plain",
+    LetterKind.FOLLOW_UP: "plain",
+}
+
+
 class CoverLetter(OwnedModel):
     """A letter, or a template for many letters.
 
@@ -164,6 +226,9 @@ class CoverLetter(OwnedModel):
     }
 
     name = models.CharField(_("name"), max_length=120)
+    kind = models.CharField(
+        _("kind"), max_length=20, choices=LetterKind, default=LetterKind.COVER, db_index=True
+    )
     subject = models.CharField(_("subject"), max_length=250, blank=True)
     body = models.TextField(
         _("body"), help_text=_("Placeholders such as {{ company }} are filled in when sent.")
@@ -176,8 +241,8 @@ class CoverLetter(OwnedModel):
     theme = models.CharField(_("theme"), max_length=20, choices=Theme, default=Theme.PLAIN)
 
     class Meta:
-        verbose_name = _("cover letter")
-        verbose_name_plural = _("cover letters")
+        verbose_name = _("letter")
+        verbose_name_plural = _("letters")
         ordering = ("name",)
 
     def __str__(self) -> str:
@@ -186,10 +251,18 @@ class CoverLetter(OwnedModel):
     def get_absolute_url(self) -> str:
         return reverse("documents:letter_detail", args=[self.pk])
 
+    @property
+    def document_kind(self) -> str:
+        """Which kind of document a render of this letter is filed as."""
+        if self.kind == LetterKind.MOTIVATION:
+            return DocumentKind.MOTIVATION_LETTER
+        return DocumentKind.COVER_LETTER
+
 
 class DocumentKind(models.TextChoices):
     CV = "cv", _("CV")
     COVER_LETTER = "cover_letter", _("Cover letter")
+    MOTIVATION_LETTER = "motivation_letter", _("Motivation letter")
     CERTIFICATE = "certificate", _("Certificate")
     PORTFOLIO = "portfolio", _("Portfolio")
     REFERENCE = "reference", _("Reference")
