@@ -131,6 +131,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **The progress bars on Insights had stretched, flattened ends.** Each funnel bar was an
+  SVG with `preserveAspectRatio="none"`, which scales a hundred-unit-wide drawing across
+  the whole column: one horizontal unit became several pixels while one vertical unit
+  stayed one, and the corner radius was stretched with everything else, so a semicircle
+  rendered as a wide shallow ellipse. It was an SVG because the content security policy
+  forbids an inline `style`, so the width had to be an attribute. A `<progress>` element
+  is an attribute too, rounds properly at any width because the radius is applied to the
+  real box, and is announced by a screen reader with its value rather than needing a label
+  that repeats the count. (#45)
 - **The language menu did not say which language each of its entries was in.** Every option
   is written in its own language — *български*, *Ελληνικά*, *čeština* — and none of them
   carried a `lang` attribute, so a screen reader pronounced all of them with the rules of

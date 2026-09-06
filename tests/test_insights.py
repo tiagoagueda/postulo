@@ -1,6 +1,8 @@
 """Insights, computed from the timeline rather than from current statuses."""
 
 import datetime as dt
+import re
+from pathlib import Path
 
 import pytest
 from django.urls import reverse
@@ -213,3 +215,62 @@ def test_insights_never_include_another_account(user, other_user, company):
     make_application(user, company, applied_days_ago=10)
 
     assert analytics.build(other_user).total == 0
+
+
+# ------------------------------------------------------------- the funnel bars
+
+
+def test_a_funnel_bar_is_a_progress_element_with_its_share_as_the_value(client, user, company):
+    """It was an SVG, and the reason is worth keeping in mind before changing it back.
+
+    Production sets `style-src 'self'` with no `unsafe-inline`, so `style="width: 42%"` is
+    refused by the browser and the width has to come from somewhere the policy allows. An
+    SVG attribute was one answer. `<progress>` is a better one: its value is an attribute
+    too, and it is announced with that value by a screen reader without an `aria-label`
+    having to repeat it.
+    """
+    make_application(user, company, applied_days_ago=20)
+    client.force_login(user)
+    html = client.get(reverse("applications:insights")).content.decode()
+
+    assert 'class="funnel-bar"' in html
+    assert re.search(r'<progress class="funnel-bar" value="\d+" max="100"', html)
+    assert "<svg" not in html.split("How far things got")[1].split("</div>")[0]
+
+
+def test_the_bar_is_not_stretched_out_of_shape_any_more():
+    """The bug, stated as the thing that caused it.
+
+    `preserveAspectRatio="none"` scales a 100-unit-wide viewBox across the whole column,
+    so one horizontal unit becomes several pixels while one vertical unit stays one. The
+    corner radius is scaled with everything else, and `rx="3"` renders as a wide shallow
+    ellipse rather than a semicircle — which reads as a flattened, slightly pointed end,
+    and the narrower the bar the more obvious it is.
+    """
+    templates = (Path(__file__).resolve().parents[1] / "src" / "postulo" / "templates").rglob(
+        "*.html"
+    )
+    offenders = [
+        p.name for p in templates if 'preserveAspectRatio="none"' in p.read_text(encoding="utf-8")
+    ]
+    assert not offenders, f"a stretched viewBox is back in {offenders}"
+
+
+def test_the_bar_carries_a_name_and_the_stage_count_is_beside_it(client, user, company):
+    """The count is already text in the row, so the bar names the stage and nothing else."""
+    make_application(user, company, applied_days_ago=20)
+    client.force_login(user)
+    html = client.get(reverse("applications:insights")).content.decode()
+    assert 'aria-label="Applied"' in html
+
+
+def test_the_rounded_ends_are_in_the_compiled_stylesheet():
+    """The compiled CSS is committed, so a change to the source without `npm run build:css`
+    would leave the bars square in production and nowhere else."""
+    css = (
+        Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "css" / "app.css"
+    ).read_text(encoding="utf-8")
+    assert "funnel-bar" in css
+    # Firefox paints the filled part here, everything else on ::-webkit-progress-value.
+    assert "::-moz-progress-bar" in css
+    assert "::-webkit-progress-value" in css

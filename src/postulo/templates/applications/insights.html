@@ -86,14 +86,12 @@
                     {% if not forloop.first %}· {{ stage.share|floatformat:0 }}%{% endif %}
                   </span>
                 </div>
-                <svg viewBox="0 0 100 6" preserveAspectRatio="none" class="h-1.5 w-full"
-                     role="img"
-                     aria-label="{{ stage.label }}: {{ stage.count }}">
-                  <rect x="0" y="0" width="100" height="6" rx="3"
-                        class="fill-ink-200 dark:fill-ink-800"></rect>
-                  <rect x="0" y="0" width="{{ stage.share|floatformat:0 }}" height="6" rx="3"
-                        class="fill-brand-500"></rect>
-                </svg>
+                {% comment %} A real progress element, for two reasons. Its value is an
+                   attribute rather than a style, which the content security policy needs --
+                   that is why this was an SVG. And it is announced with its value by a
+                   screen reader without an aria-label having to repeat the count. {% endcomment %}
+                <progress class="funnel-bar" value="{{ stage.share|floatformat:0 }}" max="100"
+                          aria-label="{{ stage.label }}">{{ stage.share|floatformat:0 }}%</progress>
               </li>
             {% endfor %}
           </ul>
