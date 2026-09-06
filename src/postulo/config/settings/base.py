@@ -275,6 +275,12 @@ SOCIALACCOUNT_STORE_TOKENS = False
 SOCIALACCOUNT_ADAPTER = "postulo.accounts.social_adapter.SocialAccountAdapter"
 SOCIALACCOUNT_FORMS = {"signup": "postulo.accounts.forms.SocialSignupForm"}
 
+# Whether arriving through the identity provider counts as the second factor, so
+# somebody with a TOTP app is not asked for a code as well. Off: Postulo cannot see how
+# the provider authenticated anybody, so this is the operator's judgement about their own
+# provider. Also settable from Server settings → Sign-in.
+POSTULO_OIDC_IS_SECOND_FACTOR = env.bool("POSTULO_OIDC_IS_SECOND_FACTOR", default=False)
+
 # An instance is invite-only unless the operator opens registration deliberately.
 POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)
 

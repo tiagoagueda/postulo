@@ -121,6 +121,38 @@ Two related things, so the picture is complete:
   registered with your address before you did, and knows the password they chose, is locked
   out at the moment you first sign in. A verified local address is left alone.
 
+## When a second factor is asked for
+
+Postulo asks for a code from an authenticator app whenever the account has one set up. Two
+sign-ins are treated differently, and it is worth knowing which and why.
+
+**A passkey never gets the prompt**, and there is no setting for that. It is already two
+factors — the device somebody has, released by a fingerprint, a face or a PIN — so asking
+for a code afterwards is a second lock on a door that already has one. That friction is
+what makes people turn two-factor authentication off altogether, which leaves them worse
+off than before.
+
+**Single sign-on gets the prompt unless you say otherwise.** Your identity provider has
+just done the checking Postulo is about to repeat, and on a company or university provider
+it very often did it with something stronger than six digits. But Postulo cannot see that:
+how the provider authenticated somebody is not in what it sends back. So it is your call,
+because you are the only one who knows what your provider actually enforces:
+
+```sh
+POSTULO_OIDC_IS_SECOND_FACTOR=true
+```
+
+or the switch under *Server settings → Sign-in*. Turn it on when you run the provider and
+know it requires a second factor of its own. Leave it off otherwise: with it on, anybody
+who gets through your provider is through Postulo, and the code that would have caught them
+is not asked for.
+
+Two things it never does. It does not apply to a **password** sign-in: somebody with an
+authenticator app who signs in with a password is asked for the code, always. And it
+removes nobody's authenticator app — it changes when a code is asked for, not whether the
+account has one. Each person can see which of their own ways in are complete under
+*Settings → Account*.
+
 ## Accounts
 
 - Leave registration closed unless you mean to run a shared instance; invite people.

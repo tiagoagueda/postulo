@@ -1,5 +1,5 @@
 {% extends "server/base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block content %}
   <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Sign-in" %}</h2>
@@ -60,20 +60,29 @@
     {% endif %}
   </div>
 
-  {% if pinned.registration_open %}
-    <div class="alert-info mb-4 text-sm" data-pinned="registration_open">
-      {% blocktranslate with variable=pinned.registration_open trimmed %}
-        Set by the environment: <code>{{ variable }}</code>. Remove it from the environment to
-        change this here.
-      {% endblocktranslate %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-6">
+      {% for field in form %}
+        {% with variable=pinned|get_item:field.name %}
+          {% if variable %}
+            <div class="mb-4" data-pinned="{{ field.name }}">
+              <p class="field-label">{{ field.label }}</p>
+              <p class="alert-info text-sm">
+                <span>
+                  {% blocktranslate trimmed %}
+                    Set by the environment: <code>{{ variable }}</code>. Remove it from the
+                    environment to change this here.
+                  {% endblocktranslate %}
+                </span>
+              </p>
+            </div>
+          {% else %}
+            {% include "partials/field.html" with field=field %}
+          {% endif %}
+        {% endwith %}
+      {% endfor %}
     </div>
-  {% else %}
-    <form method="post" novalidate>
-      {% csrf_token %}
-      <div class="card mb-6">
-        {% include "partials/field.html" with field=form.registration_open %}
-      </div>
-      <button type="submit" class="btn-primary">{% translate "Save" %}</button>
-    </form>
-  {% endif %}
+    <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+  </form>
 {% endblock %}

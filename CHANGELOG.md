@@ -131,6 +131,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **An operator can say that arriving through the identity provider is enough.** Somebody
+  with an authenticator app was asked for a code even when the provider had just checked
+  them more carefully than Postulo ever would. *Server settings → Sign-in* now has a switch
+  for it, off by default, because Postulo cannot see how a provider authenticated anybody —
+  that is a judgement only the person running it can make. It never applies to a password
+  sign-in, and it removes nobody's authenticator app. There is deliberately **no** switch
+  for passkeys: a passkey is already two factors, so no code is asked for after one, and a
+  setting to put that prompt back would only restore the friction that makes people turn
+  two-factor authentication off. *Settings → Account* now lists which of your own ways in
+  ask for a code and which do not. (#48)
 - **Passkeys.** Sign in with a fingerprint, your face or a device PIN, and there is no
   password in it anywhere: nothing to leak in a breach, nothing to reuse elsewhere, and no
   code anybody can talk you into reading out. A passkey is already two factors and the

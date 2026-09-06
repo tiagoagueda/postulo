@@ -30,6 +30,21 @@ class AccountAdapter(DefaultAccountAdapter):
     strangers by default, so the answer is no unless something says otherwise.
     """
 
+    def get_login_stages(self) -> list[str]:
+        """allauth's steps after a sign-in, with Postulo's own second-factor rule.
+
+        The stage is swapped rather than the setting changed, because what it decides
+        depends on how somebody signed in — which is a question about this request, not
+        about the instance.
+        """
+        stages = super().get_login_stages()
+        return [
+            "postulo.accounts.stages.SecondFactorStage"
+            if stage == "allauth.mfa.stages.AuthenticateStage"
+            else stage
+            for stage in stages
+        ]
+
     def is_open_for_signup(self, request: HttpRequest) -> bool:
         if site.signup_open_now():
             return True

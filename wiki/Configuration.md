@@ -91,6 +91,7 @@ for how accounts are linked and who may be created.
 | `POSTULO_OIDC_NAME` | `Single sign-on` | What the button says. |
 | `POSTULO_OIDC_AUTO_SIGNUP` | `false` | Whether the provider may create accounts. Off: existing accounts only. |
 | `POSTULO_OIDC_LINK_BY_EMAIL` | `true` | Whether an address the provider says it has verified signs somebody in to the account holding it. Off: each person connects the provider from their own account page. |
+| `POSTULO_OIDC_IS_SECOND_FACTOR` | `false` | Whether arriving through the provider counts as the second factor, so no code is asked for as well. Also under *Server settings → Sign-in*. |
 
 Leaving `POSTULO_OIDC_LINK_BY_EMAIL` on means this instance takes the provider's word that
 somebody proved they hold an address. That is safe for a provider you run and worth checking

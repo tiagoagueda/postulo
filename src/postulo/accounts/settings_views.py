@@ -14,6 +14,8 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import RedirectView, UpdateView
 
+from postulo.core import site
+
 from . import passkeys, sso
 from .forms import AccountForm, AppearanceForm, LocaleForm
 from .models import Profile
@@ -84,6 +86,7 @@ class AccountView(SettingsSectionMixin, UpdateView):
         context["mfa_enabled"] = get_mfa_adapter().is_mfa_enabled(self.request.user)
         context["mfa_url"] = reverse("mfa_index")
         context["passkeys"] = passkeys.summary(self.request.user, self.request)
+        context["sso_is_second_factor"] = site.sso_is_second_factor()
         context["passkeys_url"] = reverse("mfa_list_webauthn")
         context["add_passkey_url"] = reverse("mfa_add_webauthn")
         context["recovery_codes_url"] = reverse("mfa_view_recovery_codes")

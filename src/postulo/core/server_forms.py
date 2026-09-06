@@ -45,9 +45,20 @@ class SignInForm(forms.ModelForm):
         ),
     )
 
+    sso_is_second_factor = PolicyField(
+        label=_("Single sign-on counts as the second factor"),
+        help_text=_(
+            "Yes: somebody who arrives through the identity provider is signed straight in, "
+            "without being asked for a code as well. Say yes only if you know that provider "
+            "checks identity at least as carefully as Postulo would. It never applies to a "
+            "password sign-in, and it removes nobody's authenticator app. A passkey already "
+            "counts on its own and needs no setting."
+        ),
+    )
+
     class Meta:
         model = SiteSettings
-        fields = ("registration_open",)
+        fields = ("registration_open", "sso_is_second_factor")
 
 
 class CaptureForm(forms.ModelForm):

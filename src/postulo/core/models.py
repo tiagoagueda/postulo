@@ -124,6 +124,15 @@ class SiteSettings(models.Model):
         null=True,
         blank=True,
     )
+    sso_is_second_factor = models.BooleanField(
+        _("single sign-on counts as the second factor"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Whether somebody who arrived through the identity provider is asked for a "
+            "code as well."
+        ),
+    )
     default_language = models.CharField(_("default language"), max_length=10, blank=True)
     default_time_zone = models.CharField(_("default time zone"), max_length=64, blank=True)
 

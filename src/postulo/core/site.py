@@ -22,6 +22,7 @@ from .models import SiteSettings
 ENV_OVERRIDES = {
     "registration_open": "POSTULO_REGISTRATION_OPEN",
     "capture_ignore_robots": "POSTULO_CAPTURE_IGNORE_ROBOTS",
+    "sso_is_second_factor": "POSTULO_OIDC_IS_SECOND_FACTOR",
     "default_time_zone": "POSTULO_TIME_ZONE",
 }
 
@@ -51,6 +52,20 @@ def capture_ignore_robots() -> bool:
         return bool(settings.POSTULO_CAPTURE_IGNORE_ROBOTS)
     stored = current().capture_ignore_robots
     return bool(settings.POSTULO_CAPTURE_IGNORE_ROBOTS) if stored is None else stored
+
+
+def sso_is_second_factor() -> bool:
+    """Whether arriving through the identity provider is enough on its own.
+
+    Off unless an operator says otherwise, because Postulo cannot see how the provider
+    authenticated anybody. Turning it on is trusting the provider's own checking in place
+    of a code, which is a reasonable thing to do about a provider you run and a poor thing
+    to do about one you do not.
+    """
+    if overridden_by("sso_is_second_factor"):
+        return bool(settings.POSTULO_OIDC_IS_SECOND_FACTOR)
+    stored = current().sso_is_second_factor
+    return bool(settings.POSTULO_OIDC_IS_SECOND_FACTOR) if stored is None else stored
 
 
 def default_time_zone() -> str:

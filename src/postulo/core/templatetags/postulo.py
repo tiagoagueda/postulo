@@ -161,6 +161,19 @@ def company_logo(company, css_class: str = "size-6 text-[0.6rem]") -> str:
 
 
 @register.filter
+def get_item(mapping, key):
+    """One value out of a dictionary, by a key held in a variable.
+
+    Django's template language can look up a constant key and not a variable one, and the
+    alternative is building the same dictionary again in the view with the field names
+    already resolved. One filter is less code and stays true when a field is added.
+    """
+    if hasattr(mapping, "get"):
+        return mapping.get(key)
+    return None
+
+
+@register.filter
 def add_class(field: BoundField, css_classes: str) -> BoundField:
     """Append CSS classes to a form widget.
 

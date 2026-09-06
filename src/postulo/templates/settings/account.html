@@ -133,6 +133,30 @@
         {% if mfa_enabled %}{% translate "Manage" %}{% else %}{% translate "Set up" %}{% endif %}
       </a>
     </div>
+
+    {% comment %} Which ways in are already complete, so nobody has to work out why they were
+       asked for a code once and not the next time. {% endcomment %}
+    {% if mfa_enabled %}
+      <ul class="mt-3 space-y-1 text-sm text-ink-500 dark:text-ink-400" data-second-factor>
+        <li>{% translate "With a password: you are asked for a code. Always." %}</li>
+        {% if passkeys.count %}
+          <li>{% translate "With a passkey: no code. The passkey is both factors already." %}</li>
+        {% endif %}
+        {% if sso_enabled %}
+          <li>
+            {% if sso_is_second_factor %}
+              {% blocktranslate with provider=sso_name trimmed %}
+                Through {{ provider }}: no code. This instance is set to treat that as enough.
+              {% endblocktranslate %}
+            {% else %}
+              {% blocktranslate with provider=sso_name trimmed %}
+                Through {{ provider }}: you are asked for a code as well.
+              {% endblocktranslate %}
+            {% endif %}
+          </li>
+        {% endif %}
+      </ul>
+    {% endif %}
   </div>
 
   {% if sso_enabled %}

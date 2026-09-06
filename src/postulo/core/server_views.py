@@ -322,7 +322,7 @@ class SignInView(PolicyView):
     form_class = SignInForm
     template_name = "server/signin.html"
     section_title = _("Sign-in")
-    pinned_fields = ("registration_open",)
+    pinned_fields = ("registration_open", "sso_is_second_factor")
 
     def get_context_data(self, **kwargs):
         from postulo.accounts import sso
