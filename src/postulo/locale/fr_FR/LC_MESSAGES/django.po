@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 14:54+0000\n"
+"POT-Creation-Date: 2026-09-06 15:00+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -276,6 +276,11 @@ msgstr "%(name)s — %(kind)s"
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
 
+#: src/postulo/templates/base.html:23
+#, python-format, draft
+msgid "%(name)s — dashboard"
+msgstr "%(name)s — tableau de bord"
+
 #: src/postulo/resume/views.py:201
 #, python-format, draft
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
@@ -513,7 +518,7 @@ msgstr "Un rappel arrive à échéance"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Un rappel arrive à échéance la veille, quand il y a une veille."
 
-#: src/postulo/accounts/models.py:268
+#: src/postulo/accounts/models.py:272
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Un pense-bête pour savoir à qui elle s'adresse."
@@ -584,12 +589,12 @@ msgstr "Accepter"
 msgid "Accepted"
 msgstr "Acceptée"
 
-#: src/postulo/accounts/models.py:282
+#: src/postulo/accounts/models.py:286
 #, draft
 msgid "accepted at"
 msgstr "acceptée le"
 
-#: src/postulo/accounts/models.py:289
+#: src/postulo/accounts/models.py:293
 #, draft
 msgid "accepted by"
 msgstr "acceptée par"
@@ -601,7 +606,7 @@ msgstr "acceptée par"
 msgid "Account"
 msgstr "Compte"
 
-#: src/postulo/templates/base.html:70
+#: src/postulo/templates/base.html:48
 #, python-format, draft
 msgid "Account menu, %(name)s"
 msgstr "Menu du compte, %(name)s"
@@ -912,11 +917,11 @@ msgstr "Candidature enregistrée."
 msgid "Application updated."
 msgstr "Candidature mise à jour."
 
-#: src/postulo/applications/apps.py:9 src/postulo/core/search.py:384
-#: src/postulo/jobs/tables.py:44
+#: src/postulo/applications/apps.py:9 src/postulo/core/navigation.py:58
+#: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:44
 #: src/postulo/templates/applications/application_list.html:4
 #: src/postulo/templates/applications/application_list.html:64
-#: src/postulo/templates/base.html:35 src/postulo/templates/core/export.html:20
+#: src/postulo/templates/core/export.html:20
 #: src/postulo/templates/core/import_csv_done.html:14
 #: src/postulo/templates/jobs/posting_detail.html:100
 #, draft
@@ -1101,10 +1106,10 @@ msgstr "Devient"
 msgid "Biotechnology"
 msgstr "Biotechnologie"
 
+#: src/postulo/core/navigation.py:62
 #: src/postulo/templates/applications/application_board.html:4
 #: src/postulo/templates/applications/application_board.html:9
 #: src/postulo/templates/applications/application_list.html:69
-#: src/postulo/templates/base.html:38
 #, draft
 msgid "Board"
 msgstr "Tableau"
@@ -1512,7 +1517,7 @@ msgstr "Colonnes enregistrées."
 msgid "Coming up"
 msgstr "À venir"
 
-#: src/postulo/core/search.py:386 src/postulo/templates/base.html:49
+#: src/postulo/core/navigation.py:76 src/postulo/core/search.py:386
 #: src/postulo/templates/core/export.html:19
 #: src/postulo/templates/jobs/company_list.html:4
 #: src/postulo/templates/jobs/company_list.html:58
@@ -1648,7 +1653,7 @@ msgstr "Connexions"
 msgid "connections"
 msgstr "connexions"
 
-#: src/postulo/accounts/forms.py:243
+#: src/postulo/accounts/forms.py:253
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Considérer une candidature comme silencieuse après"
@@ -1753,13 +1758,13 @@ msgstr "Créer une invitation"
 msgid "created"
 msgstr "créée"
 
-#: src/postulo/accounts/models.py:212 src/postulo/accounts/models.py:279
+#: src/postulo/accounts/models.py:216 src/postulo/accounts/models.py:283
 #: src/postulo/core/models.py:18
 #, draft
 msgid "created at"
 msgstr "créé le"
 
-#: src/postulo/accounts/models.py:277
+#: src/postulo/accounts/models.py:281
 #, draft
 msgid "created by"
 msgstr "créé par"
@@ -1816,7 +1821,7 @@ msgstr "CV"
 msgid "Dark"
 msgstr "Sombre"
 
-#: src/postulo/templates/base.html:27
+#: src/postulo/core/navigation.py:42
 #: src/postulo/templates/core/dashboard.html:4
 #, draft
 msgid "Dashboard"
@@ -1864,12 +1869,12 @@ msgstr "Dates écrites au format"
 msgid "day / month / year (31/12/2026)"
 msgstr "jour / mois / année (31/12/2026)"
 
-#: src/postulo/templates/settings/appearance.html:35
+#: src/postulo/templates/settings/appearance.html:50
 #, draft
 msgid "days"
 msgstr "jours"
 
-#: src/postulo/accounts/models.py:209
+#: src/postulo/accounts/models.py:213
 #, draft
 msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
@@ -2132,9 +2137,8 @@ msgstr "copie de document"
 msgid "Document stores"
 msgstr "Dépôts de documents"
 
-#: src/postulo/documents/apps.py:9
+#: src/postulo/core/navigation.py:66 src/postulo/documents/apps.py:9
 #: src/postulo/templates/applications/application_detail.html:167
-#: src/postulo/templates/base.html:45
 #: src/postulo/templates/documents/application_documents.html:4
 #: src/postulo/templates/documents/application_documents.html:10
 #, draft
@@ -2264,13 +2268,13 @@ msgstr "formation"
 msgid "Email"
 msgstr "E-mail"
 
-#: src/postulo/accounts/models.py:112 src/postulo/accounts/models.py:263
+#: src/postulo/accounts/models.py:112 src/postulo/accounts/models.py:267
 #: src/postulo/jobs/models.py:263
 #, draft
 msgid "email address"
 msgstr "adresse e-mail"
 
-#: src/postulo/accounts/forms.py:302
+#: src/postulo/accounts/forms.py:336
 #, draft
 msgid "Email address (optional)"
 msgstr "Adresse e-mail (facultatif)"
@@ -2424,6 +2428,13 @@ msgid ""
 msgstr ""
 "Tout disparaît, d'un coup, et personne ne pourra le restaurer. Faites d'abord votre export."
 
+#: src/postulo/accounts/forms.py:243
+#, draft
+msgid ""
+"Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
+msgstr ""
+"Tout ici est accessible autrement : en retirer un ne vous enlève rien. Le mot Postulo mène toujours au tableau de bord."
+
 #: src/postulo/templates/api/token_list.html:106
 #, python-format, draft
 msgid ""
@@ -2479,7 +2490,7 @@ msgstr "Expire"
 msgid "expires"
 msgstr "expire"
 
-#: src/postulo/accounts/models.py:280
+#: src/postulo/accounts/models.py:284
 #, draft
 msgid "expires at"
 msgstr "expire à"
@@ -2490,7 +2501,7 @@ msgid "expires on"
 msgstr "expire le"
 
 #: src/postulo/templates/applications/insights.html:14
-#: src/postulo/templates/base.html:88
+#: src/postulo/templates/base.html:66
 #: src/postulo/templates/core/dashboard.html:298
 #: src/postulo/templates/core/export.html:8
 #, draft
@@ -2799,7 +2810,7 @@ msgstr "Retour"
 
 #: src/postulo/templates/applications/partials/filters.html:43
 #: src/postulo/templates/core/dashboard.html:79
-#: src/postulo/templates/settings/appearance.html:27
+#: src/postulo/templates/settings/appearance.html:42
 #, draft
 msgid "Gone quiet"
 msgstr "Silencieuse"
@@ -2824,12 +2835,12 @@ msgstr "A reçu une réponse"
 msgid "grade"
 msgstr "mention"
 
-#: src/postulo/accounts/models.py:203
+#: src/postulo/accounts/models.py:207
 #, draft
 msgid "Gravatar checked on"
 msgstr "Gravatar vérifié le"
 
-#: src/postulo/accounts/models.py:201
+#: src/postulo/accounts/models.py:205
 #, draft
 msgid "Gravatar copy"
 msgstr "Copie du Gravatar"
@@ -2898,6 +2909,11 @@ msgstr "Tenu"
 #, draft
 msgid "hidden"
 msgstr "masqué"
+
+#: src/postulo/accounts/models.py:195
+#, draft
+msgid "hidden navigation items"
+msgstr "éléments de navigation masqués"
 
 #: src/postulo/applications/models.py:93
 #, draft
@@ -3152,9 +3168,9 @@ msgstr "Secteur renommé."
 msgid "Information technology"
 msgstr "Informatique"
 
+#: src/postulo/core/navigation.py:63
 #: src/postulo/templates/applications/insights.html:4
 #: src/postulo/templates/applications/insights.html:9
-#: src/postulo/templates/base.html:41
 #: src/postulo/templates/core/dashboard.html:279
 #, draft
 msgid "Insights"
@@ -3275,7 +3291,7 @@ msgstr "entretiens"
 msgid "Interviews"
 msgstr "Entretiens"
 
-#: src/postulo/accounts/models.py:295
+#: src/postulo/accounts/models.py:299
 #, draft
 msgid "invitation"
 msgstr "invitation"
@@ -3299,7 +3315,7 @@ msgstr ""
 msgid "Invitation revoked."
 msgstr "Invitation révoquée."
 
-#: src/postulo/accounts/models.py:296
+#: src/postulo/accounts/models.py:300
 #, draft
 msgid "invitations"
 msgstr "invitations"
@@ -3398,7 +3414,7 @@ msgstr "Types de lettres"
 msgid "label"
 msgstr "libellé"
 
-#: src/postulo/accounts/forms.py:267 src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:301 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Langue"
@@ -3637,7 +3653,7 @@ msgstr "offre"
 msgid "Listing filters"
 msgstr "Filtres des offres"
 
-#: src/postulo/core/search.py:385 src/postulo/templates/base.html:31
+#: src/postulo/core/navigation.py:45 src/postulo/core/search.py:385
 #: src/postulo/templates/core/import_csv_done.html:15
 #: src/postulo/templates/jobs/listing_list.html:4
 #: src/postulo/templates/jobs/listing_list.html:9
@@ -3708,7 +3724,7 @@ msgstr "Les nombres les plus petits apparaissent en premier."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Lettres minuscules, chiffres, points, tirets bas et tirets."
 
-#: src/postulo/templates/base.html:25
+#: src/postulo/templates/base.html:28
 #, draft
 msgid "Main"
 msgstr "Principal"
@@ -4257,7 +4273,7 @@ msgstr "Non défini ici — l'environnement ou la valeur par défaut s'applique"
 msgid "not tested yet"
 msgstr "pas encore testé"
 
-#: src/postulo/accounts/models.py:268
+#: src/postulo/accounts/models.py:272
 #, draft
 msgid "note"
 msgstr "note"
@@ -4267,7 +4283,7 @@ msgstr "note"
 msgid "Note"
 msgstr "Note"
 
-#: src/postulo/accounts/forms.py:303
+#: src/postulo/accounts/forms.py:337
 #: src/postulo/templates/applications/application_detail.html:48
 #, draft
 msgid "Note (optional)"
@@ -4627,7 +4643,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Postes à pourvoir"
 
-#: src/postulo/accounts/models.py:265
+#: src/postulo/accounts/models.py:269
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
@@ -4851,7 +4867,7 @@ msgstr "téléphone"
 msgid "Phone screen"
 msgstr "Entretien téléphonique"
 
-#: src/postulo/accounts/models.py:196
+#: src/postulo/accounts/models.py:200
 #, draft
 msgid "picture"
 msgstr "image"
@@ -5004,7 +5020,7 @@ msgid ""
 msgstr ""
 "Postulo n'en conserve qu'un condensé et ne peut pas le réafficher. Si vous le perdez, créez-en un autre."
 
-#: src/postulo/templates/base.html:119
+#: src/postulo/templates/base.html:97
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — votre recherche d'emploi, sur votre serveur."
@@ -5071,12 +5087,12 @@ msgstr "Les adresses privées et locales sont refusées."
 msgid "proficiency"
 msgstr "niveau"
 
-#: src/postulo/accounts/models.py:216
+#: src/postulo/accounts/models.py:220
 #, draft
 msgid "profile"
 msgstr "profil"
 
-#: src/postulo/accounts/models.py:217
+#: src/postulo/accounts/models.py:221
 #, draft
 msgid "profiles"
 msgstr "profils"
@@ -5160,7 +5176,7 @@ msgstr "Tâches en attente"
 msgid "Quiet"
 msgstr "Silencieuse"
 
-#: src/postulo/accounts/models.py:206
+#: src/postulo/accounts/models.py:210
 #, draft
 msgid "quiet after"
 msgstr "silencieuse après"
@@ -5398,11 +5414,10 @@ msgstr "rappel"
 msgid "reminders"
 msgstr "rappels"
 
-#: src/postulo/core/search.py:388
+#: src/postulo/core/navigation.py:77 src/postulo/core/search.py:388
 #: src/postulo/templates/applications/application_detail.html:286
 #: src/postulo/templates/applications/reminder_list.html:4
 #: src/postulo/templates/applications/reminder_list.html:8
-#: src/postulo/templates/base.html:53
 #, draft
 msgid "Reminders"
 msgstr "Rappels"
@@ -5644,7 +5659,7 @@ msgstr "salaire jusqu'à"
 #: src/postulo/templates/server/defaults.html:38
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/signin.html:55
-#: src/postulo/templates/settings/appearance.html:38
+#: src/postulo/templates/settings/appearance.html:53
 #: src/postulo/templates/settings/locale.html:18
 #, draft
 msgid "Save"
@@ -5723,12 +5738,12 @@ msgstr "Présélection"
 msgid "Search"
 msgstr "Rechercher"
 
-#: src/postulo/templates/base.html:63
+#: src/postulo/templates/base.html:41
 #, draft
 msgid "Search  /"
 msgstr "Rechercher  /"
 
-#: src/postulo/templates/base.html:61 src/postulo/templates/core/search.html:12
+#: src/postulo/templates/base.html:39 src/postulo/templates/core/search.html:12
 #, draft
 msgid "Search everything"
 msgstr "Tout rechercher"
@@ -5849,7 +5864,7 @@ msgstr "Serveur"
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:84 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:62 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:10
 #, draft
 msgid "Server settings"
@@ -5887,7 +5902,7 @@ msgid "Set when the opening is no longer available."
 msgstr "À renseigner quand le poste n'est plus disponible."
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:80 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:58 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:21
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -5937,6 +5952,11 @@ msgstr "Tout afficher"
 msgid "Show done too"
 msgstr "Afficher aussi les terminés"
 
+#: src/postulo/accounts/forms.py:240
+#, draft
+msgid "Show in the navigation"
+msgstr "Afficher dans la navigation"
+
 #: src/postulo/templates/applications/interview_list.html:24
 #, draft
 msgid "Show past too"
@@ -5947,12 +5967,12 @@ msgstr "Afficher aussi les passés"
 msgid "Shown in the header and on the sign-in page."
 msgstr "Affiché dans l'en-tête et sur la page de connexion."
 
-#: src/postulo/templates/base.html:103 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:81 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
 msgstr "Se connecter"
 
-#: src/postulo/templates/base.html:94
+#: src/postulo/templates/base.html:72
 #, draft
 msgid "Sign out"
 msgstr "Se déconnecter"
@@ -5973,7 +5993,7 @@ msgstr "Méthodes de connexion"
 msgid "Single sign-on"
 msgstr "Authentification unique"
 
-#: src/postulo/templates/base.html:60
+#: src/postulo/templates/base.html:38
 #, draft
 msgid "Site search"
 msgstr "Recherche sur le site"
@@ -6265,7 +6285,7 @@ msgstr "Synchronisation"
 msgid "Table"
 msgstr "Tableau"
 
-#: src/postulo/accounts/models.py:194
+#: src/postulo/accounts/models.py:198
 #, draft
 msgid "table settings"
 msgstr "réglages du tableau"
@@ -6572,7 +6592,7 @@ msgstr "La connexion a disparu ou est désactivée."
 msgid "The copy could not be sent; the document says why."
 msgstr "La copie n'a pas pu être envoyée ; le document dit pourquoi."
 
-#: src/postulo/templates/settings/appearance.html:29
+#: src/postulo/templates/settings/appearance.html:44
 #, draft
 msgid ""
 "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
@@ -6903,7 +6923,7 @@ msgid ""
 msgstr ""
 "Coché, l'offre devient immédiatement une candidature, marquée comme envoyée aujourd'hui. Sinon, elle attend votre décision dans vos offres."
 
-#: src/postulo/accounts/forms.py:270
+#: src/postulo/accounts/forms.py:304
 #, draft
 msgid "Time zone"
 msgstr "Fuseau horaire"
@@ -6964,7 +6984,7 @@ msgstr "vers le statut"
 msgid "Today's date"
 msgstr "Date du jour"
 
-#: src/postulo/accounts/models.py:260
+#: src/postulo/accounts/models.py:264
 #, draft
 msgid "token"
 msgstr "jeton"
@@ -7080,7 +7100,7 @@ msgstr "jusqu'à %(high)s"
 msgid "Update the preview"
 msgstr "Actualiser l'aperçu"
 
-#: src/postulo/accounts/models.py:213 src/postulo/core/models.py:19
+#: src/postulo/accounts/models.py:217 src/postulo/core/models.py:19
 #: src/postulo/core/models.py:130
 #, draft
 msgid "updated at"
@@ -7146,7 +7166,7 @@ msgstr "Utilisez un PNG, JPEG, WebP ou GIF."
 msgid "Use my Gravatar"
 msgstr "Utiliser mon Gravatar"
 
-#: src/postulo/accounts/models.py:198
+#: src/postulo/accounts/models.py:202
 #, draft
 msgid "use my Gravatar"
 msgstr "utiliser mon Gravatar"
@@ -7168,7 +7188,7 @@ msgstr ""
 msgid "user"
 msgstr "utilisateur"
 
-#: src/postulo/accounts/forms.py:280 src/postulo/templates/server/email.html:15
+#: src/postulo/accounts/forms.py:314 src/postulo/templates/server/email.html:15
 #: src/postulo/templates/server/people.html:19
 #, draft
 msgid "Username"
@@ -7406,7 +7426,7 @@ msgstr "que faire"
 msgid "What will be deleted"
 msgstr "Ce qui sera supprimé"
 
-#: src/postulo/accounts/forms.py:282
+#: src/postulo/accounts/forms.py:316
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -7747,7 +7767,7 @@ msgstr "Votre date limite"
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
-#: src/postulo/templates/base.html:77
+#: src/postulo/templates/base.html:55
 #: src/postulo/templates/core/dashboard.html:304
 #, draft
 msgid "Your details"

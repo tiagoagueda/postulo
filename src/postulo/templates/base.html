@@ -16,42 +16,22 @@
     {% block chrome %}
       <header class="border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900">
         <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+          {% comment %}
+            When the Dashboard link is hidden the wordmark takes the job over properly:
+            the active style on the dashboard, and a name that says where it goes.
+          {% endcomment %}
           <a href="{% url 'core:home' %}"
-             class="text-lg font-semibold tracking-tight text-ink-900 dark:text-ink-50">
+             class="text-lg font-semibold tracking-tight {% if dashboard_hidden %}{% nav_active 'core:home' %} !text-lg !font-semibold{% else %}text-ink-900 dark:text-ink-50{% endif %}"
+             {% if dashboard_hidden %}aria-label="{% blocktranslate with name=instance_name trimmed %}{{ name }} — dashboard{% endblocktranslate %}"{% endif %}>
             {{ instance_name }}
           </a>
 
           {% if user.is_authenticated %}
             <nav class="flex items-center gap-1" aria-label="{% translate 'Main' %}">
-              <a href="{% url 'core:home' %}" class="{% nav_active 'core:home' %}">
-                {% translate "Dashboard" %}
-              </a>
-              <a href="{% url 'listings:list' %}"
-                 class="{% nav_active 'listings:list' 'listings:create' 'listings:apply' 'jobs:posting_detail' 'jobs:posting_update' 'jobs:capture_create' 'jobs:capture_review' %}">
-                {% translate "Listings" %}
-              </a>
-              <a href="{% url 'applications:list' %}"
-                 class="{% nav_active 'applications:list' 'applications:detail' 'applications:create' %}">
-                {% translate "Applications" %}
-              </a>
-              <a href="{% url 'applications:board' %}" class="{% nav_active 'applications:board' %}">
-                {% translate "Board" %}
-              </a>
-              <a href="{% url 'applications:insights' %}" class="{% nav_active 'applications:insights' %}">
-                {% translate "Insights" %}
-              </a>
-              <a href="{% url 'documents:cv_list' %}"
-                 class="{% nav_active 'documents:cv_list' 'documents:cv_detail' 'documents:letter_list' 'documents:letter_detail' 'documents:upload_list' 'resume:overview' %}">
-                {% translate "Documents" %}
-              </a>
-              <a href="{% url 'jobs:company_list' %}"
-                 class="{% nav_active 'jobs:company_list' 'jobs:company_detail' %}">
-                {% translate "Companies" %}
-              </a>
-              <a href="{% url 'applications:reminder_list' %}"
-                 class="{% nav_active 'applications:reminder_list' %}">
-                {% translate "Reminders" %}
-              </a>
+              {% for item in nav_items %}
+                <a href="{% url item.url_name %}" class="{% nav_active_names item.active_names %}"
+                   data-nav="{{ item.key }}">{{ item.label }}</a>
+              {% endfor %}
             </nav>
 
             <div class="ml-auto flex items-center gap-1">

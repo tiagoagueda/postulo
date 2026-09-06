@@ -18,6 +18,14 @@ All notable changes to Postulo are recorded here. The format follows
   *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
   switch per document kind, *Send to stores now* tries at once, *Send everything* queues
   what existed before the store did, and the references travel in the export. (#13)
+- **Choose what the navigation shows.** Clicking the Postulo wordmark already goes to
+  the dashboard, so the *Dashboard* link beside it was a second control for one
+  destination. *Settings → Appearance* now lists every item in the row and you tick the
+  ones you want; everything there is reachable another way, and the row is what runs out
+  of room first on a narrow screen. All of them stay on by default, because a first-time
+  visitor has no way of knowing the wordmark is a link. When *Dashboard* is off the
+  wordmark takes the job over properly: the active style on the dashboard, and an
+  accessible name that says where it goes rather than just naming the instance. (#23)
 - **A card can be dragged between board columns.** About sixty lines of delegated
   JavaScript, no library, no new endpoint: a drop sets the card's own status menu and
   submits the form that was already there, so the server path, the event log and the

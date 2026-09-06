@@ -234,7 +234,17 @@ class ProfileForm(forms.ModelForm):
 
 
 class AppearanceForm(forms.ModelForm):
-    """Settings → Appearance: the theme, and how the dashboard behaves."""
+    """Settings → Appearance: the theme, the navigation, and how the dashboard behaves."""
+
+    navigation = forms.MultipleChoiceField(
+        label=_("Show in the navigation"),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text=_(
+            "Everything here is reachable another way, so leaving one out takes nothing "
+            "away. The Postulo wordmark always goes to the dashboard."
+        ),
+    )
 
     class Meta:
         model = Profile
@@ -246,6 +256,30 @@ class AppearanceForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Left blank, the threshold goes back to the default rather than refusing to save.
         self.fields["quiet_after_days"].required = False
+
+        from postulo.core import navigation
+
+        self.fields["navigation"].choices = navigation.choices()
+        hidden = set(self.instance.hidden_nav_items or []) if self.instance.pk else set()
+        self.initial.setdefault(
+            "navigation", [key for key in navigation.HIDEABLE if key not in hidden]
+        )
+
+    def save(self, commit: bool = True) -> Profile:
+        """The form asks what to show; the profile records what to hide.
+
+        Storing the hidden ones rather than the shown ones is what makes a new item
+        appear for everybody who has not decided about it, which is the behaviour a
+        person expects of an upgrade.
+        """
+        from postulo.core import navigation
+
+        profile = super().save(commit=False)
+        shown = set(self.cleaned_data.get("navigation") or [])
+        profile.hidden_nav_items = [key for key in navigation.HIDEABLE if key not in shown]
+        if commit:
+            profile.save()
+        return profile
 
     def clean_quiet_after_days(self) -> int:
         value = self.cleaned_data.get("quiet_after_days")

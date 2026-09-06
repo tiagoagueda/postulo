@@ -209,6 +209,12 @@ def nav_active(context, *url_names: str, css_class: str = "nav-link-active") -> 
     return css_class if current in url_names else "nav-link"
 
 
+@register.simple_tag(takes_context=True)
+def nav_active_names(context, url_names, css_class: str = "nav-link-active") -> str:
+    """``nav_active`` for a navigation item, which carries its names as a sequence."""
+    return nav_active(context, *url_names, css_class=css_class)
+
+
 @register.filter
 def highlight(text, query: str) -> str:
     """Wrap every occurrence of ``query`` in ``text`` in a <mark>, escaping everything else.

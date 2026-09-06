@@ -24,9 +24,12 @@ def theme_switch(choice: str) -> dict:
 
 
 def ui(request: HttpRequest) -> dict:
-    """Interface-wide values: the resolved theme and the instance's registration policy."""
+    """Interface-wide values: the resolved theme, the navigation, the instance's policy."""
+    from . import navigation
+
     theme = ""
     choice = "system"
+    profile = None
     user = getattr(request, "user", None)
     if user is not None and user.is_authenticated:
         profile = getattr(user, "profile", None)
@@ -40,6 +43,8 @@ def ui(request: HttpRequest) -> dict:
     return {
         "ui_theme": theme,
         "theme_switch": theme_switch(choice),
+        "nav_items": navigation.visible_items(profile),
+        "dashboard_hidden": navigation.dashboard_hidden(profile),
         "registration_open": site.signup_open_now(),
         "instance_name": site.instance_name(),
         "instance_tagline": site.tagline(),

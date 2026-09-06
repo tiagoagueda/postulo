@@ -22,7 +22,12 @@ generate reads from it.
 How Postulo behaves for you lives under **Settings**, one section per page:
 
 - **Appearance** — light, dark, or match your operating system. The switch at the top
-  right of every page cycles through the same three; this is the explicit version.
+  right of every page cycles through the same three; this is the explicit version. The
+  same page lists the items in the navigation across the top, and you tick the ones you
+  want to see. Everything is reachable another way, so leaving one out takes nothing
+  away — the row is what runs out of room first on a narrow screen. *Dashboard* is the
+  one most people drop: the Postulo wordmark already goes there, and once the link is
+  gone the wordmark says so to a screen reader and lights up on the dashboard itself.
 - **Language and time** — the interface language, and the time zone dates are shown in.
   Postulo speaks every official language of the European Union; a language whose
   translation is a machine-assisted draft says so in the list until a speaker has
