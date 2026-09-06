@@ -131,6 +131,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Every page is now either checked for accessibility or excused in writing.** The browser
+  suite ran axe-core over a list of addresses somebody maintained by hand, which meant a
+  page added later was simply not on it and nothing said so. About thirty were missing,
+  among them the whole suggestions queue, every cover letter page, the contact and industry
+  forms, and both error pages. A test now walks the URL resolver and fails unless every
+  pattern is either visited by the browser suite or named with a reason — "a file
+  download", "a POST from a page that is visited". Adding a page without deciding about it
+  is a failing test rather than an omission nobody notices, and it runs in milliseconds
+  without a browser, so it fails on a laptop long before CI reaches the slow part. (#66)
 - **Phone fields ask which country the number is for.** A recruiter's number written down
   as `06 12 34 56 78` cannot be dialled from anywhere else, and the person writing it down
   is not thinking about that at the time. The field now offers a country beside the box,
@@ -225,6 +234,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **The error pages were the least accessible pages in Postulo.** The large faint numeral
+  on 404, 403 and 500 sat at 1.5:1 against its background, which is unreadable for anybody
+  with low vision looking straight at it. It is now legible, and marked decorative so a
+  screen reader does not read the status out twice — the heading beneath says what
+  happened. The 500 page had no landmark at all, and stated only half its colours, so a
+  browser in dark mode gave it a dark link on a light ground. Being the page that renders
+  when everything else is broken, it now depends on nothing and states all of them. Nobody
+  had looked at these: they were not on the accessibility suite's list. (#66)
 - **Every page breached the content security policy.** htmx injects a `<style>` element as
   it starts, carrying its own rules for the request indicator, and production allows no
   inline styles — so the browser refused it and logged a violation on the dashboard, the

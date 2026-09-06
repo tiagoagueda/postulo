@@ -37,6 +37,12 @@ rule. That covers what a machine can check. Using the pages with a keyboard alon
 with NVDA and VoiceOver, is done by hand and is the part most likely to find what axe
 cannot; findings become bugs with the `accessibility` label.
 
+Every page a person can reach is on that list, and that is now enforced rather than
+remembered: a separate test walks the application's own URL table and fails unless each one
+is either visited by the browser suite or named with a reason it is not a page — a file
+download, a form submission, a redirect. Adding a page without deciding about it breaks the
+build.
+
 It is worth being plain about the limit of the automated half. The sign-in page passed
 every one of those checks, in both themes, while being rendered with no styling at all:
 the markup was correct, the labels were associated, black on white has ample contrast, and

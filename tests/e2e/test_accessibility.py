@@ -8,6 +8,17 @@ markup and the help page, so the fix is a minute away rather than a search.
 axe covers what a machine can check — names, roles, contrast, structure, focus order
 markers. It does not replace using the pages with a keyboard and a screen reader, which
 the accessibility programme (#41) schedules by hand.
+
+**What this suite is, and is not.** It is a regression net for the things a machine can
+measure. It is not evidence that a page is good: it reported nothing at all, in both
+themes, on a sign-in page that turned out to be rendered with no styling whatsoever —
+correct markup, associated labels, ample contrast, and nothing a person could use. Looking
+at the pages remains the other half of the job.
+
+The list below was written by hand, which meant a page added later was simply not on it and
+nothing said so. `tests/test_page_coverage.py` now walks the URL resolver and fails unless
+every pattern is either named here or excused in writing, so the list can no longer drift
+behind the application.
 """
 
 import datetime as dt
@@ -186,6 +197,20 @@ def test_every_signed_in_page_has_no_violations(
         "/accounts/2fa/totp/activate/",
         "/accounts/social/connections/",
         "/accounts/logout/",
+        # Everything below was reachable and unchecked until the coverage test asked.
+        "/applications/suggestions/",
+        f"/applications/{a.pk}/delete/",
+        "/applications/tags/new/",
+        "/documents/letters/new/",
+        "/documents/cvs/new/",
+        "/jobs/contacts/new/",
+        "/jobs/industries/new/",
+        "/jobs/captures/new/",
+        "/jobs/postings/new/",
+        "/career/education/new/",
+        "/career/preview/",
+        "/server/logs/",
+        "/accounts/invitations/new/",
     ]
     failures = []
     for path in paths:
@@ -197,6 +222,32 @@ def test_every_signed_in_page_has_no_violations(
         found = violations_on(page, axe_source)
         if found:
             failures.append(describe(f"{path} ({scheme})", found))
+    assert not failures, "\n\n".join(failures)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_error_pages_have_no_violations(live_server, page: Page, db, axe_source, scheme):
+    """The pages somebody is on when they are already lost, and the last to be looked at.
+
+    404 is reached by asking for something that is not there. 500 is rendered directly:
+    provoking a real one would need a view that raises, and what is being checked is the
+    template rather than the machinery that reaches it.
+    """
+    page.emulate_media(color_scheme=scheme)
+    failures = []
+
+    page.goto(f"{live_server.url}/no-such-page-exists-here/")
+    found = violations_on(page, axe_source)
+    if found:
+        failures.append(describe(f"404 ({scheme})", found))
+
+    from django.template.loader import render_to_string
+
+    page.set_content(render_to_string("500.html"))
+    found = violations_on(page, axe_source)
+    if found:
+        failures.append(describe(f"500 ({scheme})", found))
+
     assert not failures, "\n\n".join(failures)
 
 
@@ -215,3 +266,104 @@ def test_the_skip_link_and_keyboard_reach_the_main_content(live_server, page: Pa
     expect(page.locator("details[data-menu][open]")).to_have_count(1)
     page.keyboard.press("Escape")
     expect(page.locator("details[data-menu][open]")).to_have_count(0)
+
+
+#: Which URL patterns the lists above reach, so `tests/test_page_coverage.py` can tell
+#: what is covered from what nobody has decided about. Names rather than addresses,
+#: because an address changes and a name is what the rest of the code refers to.
+VISITED_URL_NAMES: tuple[str, ...] = (
+    "core:home",
+    "core:search",
+    "core:export",
+    "core:import_csv",
+    "listings:list",
+    "listings:create",
+    "listings:apply",
+    "applications:list",
+    "applications:board",
+    "applications:detail",
+    "applications:create",
+    "applications:update",
+    "applications:delete",
+    "applications:insights",
+    "applications:interview_list",
+    "applications:interview_create",
+    "applications:interview_update",
+    "applications:interview_outcome",
+    "applications:reminder_list",
+    "applications:reminder_create",
+    "applications:suggestion_list",
+    "applications:tag_list",
+    "applications:tag_create",
+    "applications:tag_update",
+    "applications:tag_delete",
+    "jobs:company_list",
+    "jobs:company_create",
+    "jobs:company_detail",
+    "jobs:company_update",
+    "jobs:company_delete",
+    "jobs:contact_create",
+    "jobs:contact_update",
+    "jobs:contact_delete",
+    "jobs:industry_list",
+    "jobs:industry_create",
+    "jobs:industry_update",
+    "jobs:industry_delete",
+    "jobs:capture_list",
+    "jobs:capture_create",
+    "jobs:capture_review",
+    "jobs:posting_create",
+    "jobs:posting_detail",
+    "jobs:posting_update",
+    "jobs:posting_delete",
+    "documents:cv_list",
+    "documents:cv_create",
+    "documents:cv_detail",
+    "documents:cv_update",
+    "documents:cv_delete",
+    "documents:cv_preview",
+    "documents:cv_add_items",
+    "documents:cv_item_update",
+    "documents:cv_item_delete",
+    "documents:letter_list",
+    "documents:letter_create",
+    "documents:letter_detail",
+    "documents:letter_update",
+    "documents:letter_delete",
+    "documents:letter_preview",
+    "documents:upload_list",
+    "documents:upload_create",
+    "documents:upload_update",
+    "documents:upload_delete",
+    "documents:rendered_list",
+    "documents:application_documents",
+    "documents:send",
+    "resume:overview",
+    "resume:item_create",
+    "resume:item_update",
+    "resume:item_delete",
+    "resume:preview",
+    "accounts:profile",
+    "accounts:delete",
+    "accounts:invite_list",
+    "accounts:invite_create",
+    "settings:appearance",
+    "settings:locale",
+    "settings:account",
+    "connections:list",
+    "connections:pick",
+    "connections:create",
+    "connections:edit",
+    "connections:delete",
+    "api:token_list",
+    "server:overview",
+    "server:people",
+    "server:person_username",
+    "server:person_delete",
+    "server:signin",
+    "server:email",
+    "server:plugins",
+    "server:capture",
+    "server:defaults",
+    "server:logs",
+)
