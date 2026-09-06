@@ -239,6 +239,17 @@ class CoverLetter(OwnedModel):
         help_text=_("Templates appear when you send a letter with an application."),
     )
     theme = models.CharField(_("theme"), max_length=20, choices=Theme, default=Theme.PLAIN)
+    #: What the body is written in. A letter to a Portuguese employer is written in
+    #: Portuguese, and the PDF has to say so: a screen reader reading it out is often the
+    #: recruiter's, and hyphenation and justification follow the declaration too.
+    language = models.CharField(
+        _("language"),
+        max_length=10,
+        blank=True,
+        help_text=_(
+            "Which language this letter is written in. Leave blank to follow your profile."
+        ),
+    )
 
     class Meta:
         verbose_name = _("letter")

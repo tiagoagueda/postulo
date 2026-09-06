@@ -182,6 +182,76 @@ def recording_handler(reached, redirects=None):
     return httpx.MockTransport(handler)
 
 
+# ------------------------------------------------------- the language declared
+
+
+def test_a_letter_declares_the_language_it_is_written_in(user):
+    """The PDF that goes out is the one a recruiter's screen reader may read aloud.
+
+    It used to say ``lang="en-GB"`` whatever the letter was written in, hard-coded in the
+    theme, and there was no field that could have said otherwise. A letter written in
+    Portuguese and declared English is read with English letter-to-sound rules, and
+    hyphenated with them by the renderer as well.
+    """
+    from postulo.documents.models import CoverLetter
+    from postulo.documents.rendering import render_letter_html
+
+    letter = CoverLetter.objects.create(
+        owner=user, name="Para o instituto", body="Boa tarde,", language="pt-pt"
+    )
+    assert 'lang="pt-pt"' in render_letter_html(letter)
+
+
+def test_a_document_with_no_language_of_its_own_follows_the_profile(user):
+    """Leaving it blank is the common case, and English is the wrong assumption there."""
+    from postulo.documents.models import CV, CoverLetter
+    from postulo.documents.rendering import render_cv_html, render_letter_html
+
+    user.profile.language = "fr-fr"
+    user.profile.save(update_fields=["language"])
+
+    letter = CoverLetter.objects.create(owner=user, name="Lettre", body="Bonjour,")
+    assert 'lang="fr-fr"' in render_letter_html(letter)
+
+    cv = CV.objects.create(owner=user, name="Ingénieur")
+    assert 'lang="fr-fr"' in render_cv_html(cv)
+
+
+def test_what_the_document_says_beats_what_the_profile_says(user):
+    """Somebody reading Postulo in one language writes to employers in others."""
+    from postulo.documents.models import CoverLetter
+    from postulo.documents.rendering import render_letter_html
+
+    user.profile.language = "pt-pt"
+    user.profile.save(update_fields=["language"])
+
+    letter = CoverLetter.objects.create(
+        owner=user, name="To the lab", body="Dear Professor,", language="en-gb"
+    )
+    assert 'lang="en-gb"' in render_letter_html(letter)
+
+
+def test_the_language_is_chosen_from_the_list_rather_than_typed(client, user):
+    """A mistyped tag is worse than none: nothing downstream can make sense of it."""
+    client.force_login(user)
+    html = client.get(reverse("documents:letter_create")).content.decode()
+    assert 'name="language"' in html
+    assert "<select" in html
+    assert "Follow your profile" in html
+
+
+def test_a_letters_language_travels_in_the_export(user):
+    from postulo.core import export
+    from postulo.documents.models import CoverLetter
+
+    CoverLetter.objects.create(
+        owner=user, name="Para o instituto", body="Boa tarde,", language="pt-pt"
+    )
+    document = export.build_document(user)
+    letters = document["documents"]["cover_letters"]
+    assert letters and letters[0]["language"] == "pt-pt"
+
+
 # ------------------------------------------------------------------ letters
 
 

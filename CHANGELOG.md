@@ -131,6 +131,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **A cover letter was sent out declaring English, whatever it was written in.** The letter
+  theme had `lang="en-GB"` written into it, and there was no field that could have said
+  otherwise — the CV had one, the letter did not. A letter written in Portuguese and
+  declared English is read aloud with English letter-to-sound rules by whatever the
+  recipient uses to read it, which may well be the screen reader of the person deciding on
+  the application, and the renderer hyphenates and justifies by the same declaration. A
+  letter now carries its own language, and both letters and CVs fall back to the language
+  you read Postulo in rather than to English. Both are chosen from the list of the
+  instance's languages instead of typed, because a mistyped tag is worse than none. (#65)
 - **Every sign-in and account page was rendered without any of Postulo's styling.** The
   four templates allauth's own pages inherit put their card inside a block called
   `content_body`, and allauth's pages fill `content` — so a page replaced the wrapper

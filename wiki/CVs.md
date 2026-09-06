@@ -56,6 +56,10 @@ working. See [Installing Postulo](Installing-Postulo#pdf-rendering).
 
 ## A note on languages
 
-A CV variant has a **language** field. It sets the language attribute of the rendered
-document, which matters for hyphenation and for screen readers. It does **not** translate
-anything: if you want a CV in French, write French into a French variant.
+A CV variant has a **language** field, chosen from the languages this instance offers. It
+sets the language attribute of the rendered document, which matters for hyphenation and for
+screen readers — including the recruiter's. It does **not** translate anything: if you want
+a CV in French, write French into a French variant.
+
+Left blank, it follows the language you read Postulo in rather than defaulting to English.
+Cover letters have the same field and behave the same way.

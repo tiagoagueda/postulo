@@ -122,7 +122,7 @@ INTERVIEW_FIELDS = (
     "created_at",
 )
 CV_FIELDS = ("id", "name", "headline", "summary", "theme", "language", "show_contact_details")
-LETTER_FIELDS = ("id", "name", "kind", "subject", "body", "theme", "is_template")
+LETTER_FIELDS = ("id", "name", "kind", "subject", "body", "theme", "is_template", "language")
 UPLOAD_FIELDS = ("id", "title", "kind", "notes", "version", "replaces_id", "created_at")
 SENT_FIELDS = (
     "id",

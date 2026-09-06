@@ -25,7 +25,31 @@ from .models import (
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
 
-class CVForm(OwnerScopedModelForm):
+def language_choices() -> list[tuple[str, str]]:
+    """The languages a document may declare, with blank meaning "whatever I read in".
+
+    A list rather than a text box because the value ends up in the ``lang`` of a PDF that
+    gets sent to somebody, and a mistyped tag is worse than none: a screen reader will
+    happily read Portuguese with the rules of whatever ``pt_PT`` or ``portuguese`` failed
+    to parse as. The choices are the instance's own languages, each under its own name.
+    """
+    from postulo.core import languages
+
+    return [("", _("Follow your profile")), *languages.LANGUAGES]
+
+
+class LanguageChoiceMixin:
+    """Turn the model's free-text ``language`` field into a picker."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        field = self.fields.get("language")
+        if field is not None:
+            field.widget = forms.Select(choices=language_choices())
+            field.required = False
+
+
+class CVForm(LanguageChoiceMixin, OwnerScopedModelForm):
     class Meta:
         model = CV
         fields = ("name", "headline", "summary", "theme", "language", "show_contact_details")
@@ -101,7 +125,7 @@ class AddCVItemsForm(forms.Form):
         return chosen
 
 
-class CoverLetterForm(OwnerScopedModelForm):
+class CoverLetterForm(LanguageChoiceMixin, OwnerScopedModelForm):
     """A letter of any of the four kinds.
 
     A new letter starts from the kind's own text rather than an empty box: what a
@@ -111,7 +135,7 @@ class CoverLetterForm(OwnerScopedModelForm):
 
     class Meta:
         model = CoverLetter
-        fields = ("name", "kind", "subject", "body", "theme", "is_template")
+        fields = ("name", "kind", "subject", "body", "theme", "is_template", "language")
         widgets = {"body": forms.Textarea(attrs={"rows": 18})}
 
     def __init__(self, *args, **kwargs):

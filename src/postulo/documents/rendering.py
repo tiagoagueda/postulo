@@ -30,6 +30,27 @@ SECTION_LABELS = {
 }
 
 
+def document_language(document) -> str:
+    """The language tag a rendered document declares, best answer first.
+
+    What the document itself says, then what its owner reads Postulo in, then the
+    instance default. British English is the last resort rather than the assumption: the
+    letter that goes out is the one a recruiter's screen reader may read aloud, and
+    declaring the wrong language there makes it unintelligible rather than merely
+    untidy — hyphenation and justification follow the same declaration.
+    """
+    from postulo.core import site
+
+    own = (getattr(document, "language", "") or "").strip()
+    if own:
+        return own
+    profile = getattr(getattr(document, "owner", None), "profile", None)
+    from_profile = (getattr(profile, "language", "") or "").strip()
+    if from_profile:
+        return from_profile
+    return site.default_language() or "en-GB"
+
+
 @dataclass
 class Section:
     """A run of CV entries sharing a heading."""
@@ -78,6 +99,7 @@ def render_cv_html(cv: CV) -> str:
             "cv": cv,
             "sections": build_sections(cv),
             "contact": contact_details(cv.owner) if cv.show_contact_details else None,
+            "document_language": document_language(cv),
         },
     )
 
@@ -138,6 +160,7 @@ def render_letter_html(letter: CoverLetter, application=None) -> str:
             "body": fill_placeholders(letter.body, values),
             "contact": contact_details(letter.owner),
             "application": application,
+            "document_language": document_language(letter),
         },
     )
 

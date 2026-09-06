@@ -58,6 +58,17 @@ pasted.
 Letters marked **reusable template** are offered when you record what you sent with an
 application. Untick it for a one-off letter written for a single employer.
 
+## Language
+
+A letter has a **language**, and the PDF says so. It matters more than it sounds: the file
+you send is one a recruiter may open with a screen reader, and a Portuguese letter declaring
+itself English is read aloud with English letter-to-sound rules. The renderer hyphenates and
+justifies by the same declaration.
+
+Leave it blank and the letter follows the language you read Postulo in, which is the right
+guess far more often than English is. Set it when you write to an employer in a language
+that is not your own. CVs have the same field, and behave the same way.
+
 ## Themes
 
 The same two as CVs — Plain and Classic — laid out as a letter: your contact block, the
