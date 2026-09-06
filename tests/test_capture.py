@@ -245,6 +245,58 @@ def test_a_public_address_is_accepted(resolves_to):
     assert fetching.validate_public_url("https://example.org/jobs/1")
 
 
+def test_the_addresses_that_passed_come_back_for_the_caller_to_use(resolves_to):
+    """Checking a name and connecting to it must be one act, not two lookups.
+
+    A record that lives one second can answer with a public address while it is being
+    checked and a private one a moment later, when the connection is made — so the check
+    would have passed on an address nobody ever contacted. ``public_addresses_for`` hands
+    back what it approved so the connection can go there instead of asking again.
+    """
+    resolves_to("93.184.216.34")
+
+    addresses = fetching.public_addresses_for("https://example.org/jobs/1")
+
+    assert [str(a) for a in addresses] == ["93.184.216.34"]
+
+
+def test_a_fetch_connects_to_the_approved_address_and_still_names_the_site(
+    resolves_to, monkeypatch, db
+):
+    """The page is fetched from the address that passed, asking for the site by name."""
+    import httpx
+
+    from postulo.plugins import http as plugin_http
+
+    resolves_to("93.184.216.34")
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/robots.txt":
+            return httpx.Response(404)
+        seen["sent_to"] = request.url.host
+        seen["asked_for"] = request.headers.get("Host", "").split(":")[0]
+        seen["tls_name"] = request.extensions.get("sni_hostname")
+        return httpx.Response(
+            200,
+            headers={"content-type": "text/html"},
+            content=b"<html><head><title>A job</title></head><body>Work here</body></html>",
+        )
+
+    real = httpx.Client
+    monkeypatch.setattr(
+        plugin_http.httpx,
+        "Client",
+        lambda *a, **kw: real(*a, **{**kw, "transport": httpx.MockTransport(handler)}),
+    )
+
+    fetching.fetch_page("https://example.org/jobs/1")
+
+    assert seen["sent_to"] == "93.184.216.34", "connected to the address that was approved"
+    assert seen["asked_for"] == "example.org", "and asked the site for its own page"
+    assert seen["tls_name"] == "example.org", "so the certificate is checked against the name"
+
+
 @pytest.mark.parametrize("url", ["file:///etc/passwd", "ftp://example.org/x", "gopher://x/1"])
 def test_only_http_and_https_are_fetched(url):
     with pytest.raises(fetching.UnsafeURL, match="http and https"):

@@ -102,14 +102,28 @@ def answering(monkeypatch):
     return state
 
 
-def without_dns(url: str) -> str:
-    """``validate_public_url`` with the name lookup replaced, and nothing else.
+#: Names the link tests use, and the public address each one resolves to. Standing in for
+#: the lookup is the only part of the address check a test can usefully replace: what is
+#: under test is which requests get checked and where they are then sent, not the check
+#: itself, which has tests of its own in tests/test_capture.py.
+PUBLIC_NAMES = {
+    "portfolio.example.org": "203.0.113.10",
+    "old.example.org": "203.0.113.11",
+    "new.example.org": "203.0.113.12",
+}
 
-    The real one resolves a hostname and refuses unless every address it answers with is
-    publicly routable. A test cannot resolve ``portfolio.example.org``, so the lookup is
-    the one part stood in for: a literal private or loopback address is refused exactly
-    as the real function would refuse it, and a name is taken to be public. What is being
-    tested is *which requests are checked*, not the check itself, which has its own tests.
+
+def without_dns(url: str) -> str:
+    """``validate_public_url`` with the lookup replaced. Returns the URL, as it does."""
+    resolving_to_public_addresses(url)
+    return url
+
+
+def resolving_to_public_addresses(url: str):
+    """``public_addresses_for`` with the lookup replaced.
+
+    A known name answers with its public address; a literal address answers with itself
+    and is refused if it is private, exactly as the real one would refuse it.
     """
     import ipaddress
     from urllib.parse import urlparse
@@ -117,13 +131,15 @@ def without_dns(url: str) -> str:
     from postulo.plugins.fetching import UnsafeURL
 
     host = urlparse(url).hostname or ""
+    if host in PUBLIC_NAMES:
+        return [ipaddress.ip_address(PUBLIC_NAMES[host])]
     try:
         address = ipaddress.ip_address(host)
-    except ValueError:
-        return url
+    except ValueError as error:
+        raise UnsafeURL("That hostname could not be resolved.") from error
     if not address.is_global:
         raise UnsafeURL("That address is on a private or local network.")
-    return url
+    return [address]
 
 
 def with_transport(monkeypatch, transport):
@@ -142,7 +158,28 @@ def with_transport(monkeypatch, transport):
         return real(*args, **{**kwargs, "transport": transport})
 
     monkeypatch.setattr(plugin_http.httpx, "Client", build)
-    monkeypatch.setattr(plugin_http, "validate_public_url", without_dns)
+    monkeypatch.setattr(plugin_http, "public_addresses_for", resolving_to_public_addresses)
+
+
+def recording_handler(reached, redirects=None):
+    """A transport that notes where each request was addressed, and who it asked for.
+
+    Both halves matter: the request goes to an address that passed the check, and the
+    ``Host`` header still names the site, so the site sees what it expects and a
+    certificate is checked against the name rather than against a number.
+    """
+    import httpx
+
+    redirects = redirects or {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        asked_for = request.headers.get("Host", "").split(":")[0]
+        reached.append((asked_for, request.url.host))
+        if asked_for in redirects:
+            return httpx.Response(302, headers={"Location": redirects[asked_for]})
+        return httpx.Response(200)
+
+    return httpx.MockTransport(handler)
 
 
 # ------------------------------------------------------------------ letters
@@ -330,48 +367,38 @@ def test_a_redirect_towards_a_private_address_is_not_followed(user, monkeypatch)
     ``302 Location: http://127.0.0.1:9000/`` would be fetched and its answer written onto
     the link — a scan of whatever network the instance sits on, with the results shown.
     """
-    import httpx
-
-    reached: list[str] = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        reached.append(str(request.url))
-        if request.url.host == "portfolio.example.org":
-            return httpx.Response(302, headers={"Location": "http://127.0.0.1:9000/admin/"})
-        return httpx.Response(200)
-
+    reached: list[tuple[str, str]] = []
     monkeypatch.setattr(link_checks, "validate_public_url", without_dns)
-    with_transport(monkeypatch, httpx.MockTransport(handler))
+    with_transport(
+        monkeypatch,
+        recording_handler(reached, {"portfolio.example.org": "http://127.0.0.1:9000/admin/"}),
+    )
 
     link = a_link(user, url="https://portfolio.example.org/")
     link_checks.check(link)
     link.refresh_from_db()
 
-    assert reached == ["https://portfolio.example.org/"], "the second hop was never made"
+    assert [asked for asked, _sent in reached] == ["portfolio.example.org"], (
+        "the second hop was never made"
+    )
     assert link.is_broken
     assert "private or local address" in link.check_detail
 
 
 def test_a_redirect_to_another_public_address_is_followed(user, monkeypatch):
     """The guard refuses a destination, not redirection itself."""
-    import httpx
-
-    reached: list[str] = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        reached.append(str(request.url))
-        if request.url.host == "old.example.org":
-            return httpx.Response(301, headers={"Location": "https://new.example.org/cv"})
-        return httpx.Response(200)
-
+    reached: list[tuple[str, str]] = []
     monkeypatch.setattr(link_checks, "validate_public_url", without_dns)
-    with_transport(monkeypatch, httpx.MockTransport(handler))
+    with_transport(
+        monkeypatch,
+        recording_handler(reached, {"old.example.org": "https://new.example.org/cv"}),
+    )
 
     link = a_link(user, url="https://old.example.org/cv")
     link_checks.check(link)
     link.refresh_from_db()
 
-    assert len(reached) == 2, "a public redirect is followed as it always was"
+    assert [asked for asked, _sent in reached] == ["old.example.org", "new.example.org"]
     assert not link.is_broken
 
 
@@ -384,26 +411,58 @@ def test_the_check_is_public_only_even_where_connections_may_be_private(
     portfolio address is a public thing by definition — a recruiter clicks it from the
     open internet — so a private one is broken whatever that setting says.
     """
-    import httpx
-
     settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = True
-    reached: list[str] = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        reached.append(str(request.url))
-        if request.url.host == "portfolio.example.org":
-            return httpx.Response(302, headers={"Location": "http://192.168.1.20/"})
-        return httpx.Response(200)
-
+    reached: list[tuple[str, str]] = []
     monkeypatch.setattr(link_checks, "validate_public_url", without_dns)
-    with_transport(monkeypatch, httpx.MockTransport(handler))
+    with_transport(
+        monkeypatch,
+        recording_handler(reached, {"portfolio.example.org": "http://192.168.1.20/"}),
+    )
 
     link = a_link(user, url="https://portfolio.example.org/")
     link_checks.check(link)
     link.refresh_from_db()
 
-    assert reached == ["https://portfolio.example.org/"]
+    assert [asked for asked, _sent in reached] == ["portfolio.example.org"]
     assert link.is_broken
+
+
+def test_the_request_goes_to_the_address_that_was_approved(user, monkeypatch):
+    """Checking a name and then connecting to it are two lookups with a gap between them.
+
+    A record that lives one second is free to answer with a public address while it is
+    being checked and a private one a moment later, when the connection is actually made
+    — so the check would have passed on an address nobody ever contacted. The approved
+    address is used for the connection instead, and the name travels in the ``Host``
+    header so the site still sees the request it expects.
+    """
+    reached: list[tuple[str, str]] = []
+    monkeypatch.setattr(link_checks, "validate_public_url", without_dns)
+    with_transport(monkeypatch, recording_handler(reached))
+
+    link = a_link(user, url="https://portfolio.example.org/cv")
+    link_checks.check(link)
+
+    assert reached == [("portfolio.example.org", "203.0.113.10")], (
+        "asked for the site by name, sent to the address that passed"
+    )
+
+
+def test_the_certificate_is_still_checked_against_the_name(user, monkeypatch):
+    """Pinning must not turn TLS verification into a check against a number."""
+    import httpx
+
+    names: list[str | None] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        names.append(request.extensions.get("sni_hostname"))
+        return httpx.Response(200)
+
+    monkeypatch.setattr(link_checks, "validate_public_url", without_dns)
+    with_transport(monkeypatch, httpx.MockTransport(handler))
+
+    link_checks.check(a_link(user, url="https://portfolio.example.org/cv"))
+    assert names == ["portfolio.example.org"]
 
 
 def test_checking_happens_only_when_a_person_asks(client, user, answering):

@@ -11,6 +11,9 @@ the constraints below are not theoretical:
 * only ``http`` and ``https``;
 * every address the hostname resolves to must be publicly routable — loopback, private,
   link-local, shared and reserved ranges are all refused;
+* the connection is then made to one of the addresses that was checked, rather than to
+  whatever the name resolves to a moment later, so a record with a one-second lifetime
+  cannot answer with a public address for the check and a private one for the connection;
 * redirects are followed by hand, at most three, revalidating the destination each time,
   because a public hostname is free to redirect to ``127.0.0.1``;
 * a response must be HTML, must arrive within the timeout, and is abandoned once it
@@ -100,11 +103,17 @@ def _addresses_for(host: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Addr
     return [ipaddress.ip_address(info[4][0]) for info in infos]
 
 
-def validate_public_url(url: str) -> str:
-    """Check a URL is one Postulo is willing to fetch, and return it normalised.
+def public_addresses_for(url: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Address]:
+    """Every address ``url``'s host answers with, once they have all been approved.
 
     Every resolved address is checked, not just the first: a hostname answering with one
     public and one private address would otherwise be a way through.
+
+    The list comes back rather than being thrown away because the caller has to *connect*
+    to one of these. Resolving again at connection time is the gap this closes: a name
+    with a one-second lifetime is free to answer with a public address for the check and
+    a private one a moment later, and the check would have passed on an address nobody
+    ever contacted.
     """
     parts = urlparse(url.strip())
 
@@ -123,8 +132,13 @@ def validate_public_url(url: str) -> str:
                 "fetch it. Paste the posting text in by hand instead."
             )
         )
+    return addresses
 
-    return urlunparse(parts)
+
+def validate_public_url(url: str) -> str:
+    """Check a URL is one Postulo is willing to fetch, and return it normalised."""
+    public_addresses_for(url)
+    return urlunparse(urlparse(url.strip()))
 
 
 def robots_allow(url: str, *, client: httpx.Client | None = None) -> bool:
@@ -178,13 +192,17 @@ def _read_capped(response: httpx.Response) -> str:
 
 def fetch_page(url: str) -> FetchedPage:
     """Fetch one page, following redirects by hand so each hop can be checked."""
+    # Imported here: http builds on this module, so importing it at the top would be a
+    # cycle. What it provides is the client that pins each request to an address that
+    # passed the check, rather than resolving the name a second time to connect.
+    from . import http
+
     current = validate_public_url(url)
 
-    with httpx.Client(
+    with http.public_only_client(
         timeout=TIMEOUT_SECONDS,
         follow_redirects=False,
         headers={
-            "User-Agent": USER_AGENT,
             "Accept": "text/html,application/xhtml+xml",
             "Accept-Language": "en,*;q=0.5",
         },

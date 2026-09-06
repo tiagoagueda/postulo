@@ -105,6 +105,11 @@ to the two things that are public by definition: capturing a posting from a URL,
 checking that a portfolio link answers. Both refuse a private address however that setting
 is left, on the first request and on anything they are redirected to.
 
+Where the check does apply, Postulo connects to an address it has already approved rather
+than looking the name up again, so a record that answers differently a second later cannot
+send the request somewhere the check never saw. The site is still asked for by name, and
+its certificate is still checked against that name.
+
 ## Keeping up
 
 Subscribe to the repository's releases. A vulnerability disclosed in a dependency is

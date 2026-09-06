@@ -131,6 +131,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **An address was checked and then looked up a second time to connect to.** Capturing a
+  posting, checking a portfolio link and fetching a company logo all resolved a hostname,
+  refused it if any address it answered with was private, and then handed the name to the
+  HTTP client — which looked it up again. A DNS record that lives one second is free to
+  answer with a public address for the check and a private one for the connection, which
+  is the standard way a check like this is got around. The addresses that passed are now
+  the ones connected to. The site is still asked for by name and its certificate still
+  checked against that name, so nothing about the request it receives changes. (#58)
 - **`X-Forwarded-Proto` was believed from whoever sent it.** Postulo told Django to treat
   any request carrying `X-Forwarded-Proto: https` as secure, which is right behind a
   reverse proxy and wrong the moment an instance is reachable directly — and the Compose
