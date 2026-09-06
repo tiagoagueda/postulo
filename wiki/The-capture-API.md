@@ -130,6 +130,38 @@ stays the single truth.
 Needs `documents:read`. `GET /documents/{source}/{id}/download`, where `source` is `upload`
 or `rendered`; the `download_url` on each document is exactly this.
 
+## Giving an AI agent a way in
+
+Postulo has no AI in it and never asks you for an API key. If you want an agent to know
+about your job search anyway, run
+[postulo-mcp](https://source.tiagoagueda.com/postulo/postulo-mcp) beside the agent you
+already use. It speaks the Model Context Protocol on one side and this API on the other,
+so the agent gets no privileged path: it can do exactly what your token allows, and
+nothing else.
+
+Make a token with **Read everything**, and point the agent at it:
+
+```json
+{
+  "mcpServers": {
+    "postulo": {
+      "command": "postulo-mcp",
+      "env": {
+        "POSTULO_URL": "https://postulo.example.org",
+        "POSTULO_TOKEN": "the token you just made"
+      }
+    }
+  }
+}
+```
+
+Two things worth deciding deliberately. **A `read` token shows the model your whole job
+search** — applications and their timelines, companies and people, CVs and letters as
+text, reminders, interviews and figures. And **writing is off unless you turn it on**,
+with `postulo-mcp --write` *and* a token carrying `write`; every write an agent makes then
+appears on the timeline with the token's name against it, so you can see it and undo it.
+There is no delete tool of any kind.
+
 ## Responses
 
 `401` is a missing, mistyped, revoked or expired token — nothing more is said, because

@@ -18,6 +18,14 @@ All notable changes to Postulo are recorded here. The format follows
   *waiting*, *failed* with the reason, or *not accepted*. A store connection carries a
   switch per document kind, *Send to stores now* tries at once, *Send everything* queues
   what existed before the store did, and the references travel in the export. (#13)
+- **postulo-mcp, a way in for an AI agent — and still no AI inside Postulo.** A small
+  server that speaks the Model Context Protocol to whatever agent you already run, and
+  Postulo's ordinary API on the other side, with a personal access token whose scopes you
+  chose. It can read applications and their timelines, companies, contacts, CVs, letters,
+  reminders, interviews and the figures; writing notes, statuses, reminders and letter
+  drafts needs both `--write` and a `write` token, and every write lands on the timeline
+  with the token's name against it. There is no delete tool of any kind. Lives at
+  [postulo/postulo-mcp](https://source.tiagoagueda.com/postulo/postulo-mcp). (#19)
 - **Suggestions: what a plugin thinks happened, waiting for you to agree.** A plugin
   reading something outside Postulo is guessing, so nothing it infers is written into the
   record. It files a suggestion — what it says, which application it seems to be about,
