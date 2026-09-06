@@ -131,6 +131,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **The log can be served at `/logs` for a collector.** One JSON object per line, oldest
+  first, with `since` and `limit` so a scraper asks only for what it has not seen — enough
+  for Grafana Alloy, Vector or Promtail running elsewhere on your network to read a Postulo
+  instance without arranging log shipping off the host. It is **off**, and while off that
+  address is a 404 rather than a 403, so nothing confirms the endpoint exists. On, it needs
+  a bearer token, and with the endpoint enabled and no token set it refuses to serve and
+  records why rather than publishing to whoever finds it. A session is not a substitute: the
+  reader is a collector, not a person. Unlike metrics, a log entry names connections,
+  companies and applications, so *Hardening* says plainly that this is personal data leaving
+  the instance, and the log page itself says whether the endpoint is open. (#51)
 - **Read the log from the administration area.** When a notifier will not send or a store
   refuses a document, the answer is in the log, and getting to it meant `docker logs` and a
   shell — on an instance whose administrator is usually the person using it, often from a

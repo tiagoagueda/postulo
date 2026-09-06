@@ -22,6 +22,10 @@ pasting any of it into a bug report. And the file is rotated by size — about f
 in total by default — so it cannot fill a disk, which also means a problem from last month
 may have scrolled off.
 
+If you keep logs centrally, the same records can be served at `/logs` for a collector to
+scrape. It is off by default and needs a token; see [Hardening](Hardening#the-log-endpoint)
+before turning it on.
+
 ## "No PDF backend is usable"
 
 WeasyPrint is installed with Postulo, so this almost always means its system libraries

@@ -46,6 +46,8 @@ SQLite is a perfectly reasonable choice for a personal instance, and makes
 | `POSTULO_LOG_MAX_BYTES` | `5242880` | How large the file grows before it rotates. |
 | `POSTULO_LOG_BACKUPS` | `3` | How many rotations are kept. Five megabytes across four files by default. |
 | `POSTULO_LOG_LEVEL` | `INFO` | How much is written, to the file and to the console alike. |
+| `POSTULO_LOGS_ENDPOINT_ENABLED` | `false` | Serve the log at `/logs` for a collector. Off, that address is a 404. |
+| `POSTULO_LOGS_TOKEN` | empty | The bearer token a collector must present. With the endpoint on and this empty, it refuses to serve. |
 
 Records go to the console exactly as before, so `docker logs` is unchanged. The file is the
 same records as one JSON object per line, which is what makes the page able to filter them

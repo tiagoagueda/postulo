@@ -275,6 +275,12 @@ SOCIALACCOUNT_STORE_TOKENS = False
 SOCIALACCOUNT_ADAPTER = "postulo.accounts.social_adapter.SocialAccountAdapter"
 SOCIALACCOUNT_FORMS = {"signup": "postulo.accounts.forms.SocialSignupForm"}
 
+# The log, served at /logs for a collector to scrape. Off, and a 404 rather than a 403
+# when off, so nothing confirms that an endpoint is there at all. On without a token it
+# refuses to serve: an unauthenticated log endpoint is a data leak with a URL.
+POSTULO_LOGS_ENDPOINT_ENABLED = env.bool("POSTULO_LOGS_ENDPOINT_ENABLED", default=False)
+POSTULO_LOGS_TOKEN = env("POSTULO_LOGS_TOKEN", default="")
+
 # Whether arriving through the identity provider counts as the second factor, so
 # somebody with a TOTP app is not asked for a code as well. Off: Postulo cannot see how
 # the provider authenticated anybody, so this is the operator's judgement about their own

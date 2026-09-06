@@ -154,5 +154,34 @@
         also goes to the console, where <code>docker logs</code> reads it.
       {% endblocktranslate %}
     </p>
+
+    {% comment %} Whether these records are also reachable over HTTP is the single most
+       consequential thing about this page, so it is stated here rather than only in the
+       wiki. {% endcomment %}
+    {% if endpoint_enabled %}
+      <div class="{% if endpoint_has_token %}alert-info{% else %}alert-error{% endif %} mt-4 text-sm"
+           role="note" data-logs-endpoint="{% if endpoint_has_token %}on{% else %}open{% endif %}">
+        <div>
+          {% if endpoint_has_token %}
+            <p>
+              {% blocktranslate trimmed %}
+                These records are also served at <code>/logs</code> for a log collector,
+                behind the token in POSTULO_LOGS_TOKEN. Anything holding that token can read
+                everything on this page.
+              {% endblocktranslate %}
+            </p>
+          {% else %}
+            <p class="font-medium">{% translate "The /logs endpoint is on and has no token." %}</p>
+            <p>
+              {% blocktranslate trimmed %}
+                It refuses to serve anything rather than publishing these records to whoever
+                finds it. Set POSTULO_LOGS_TOKEN, or turn
+                POSTULO_LOGS_ENDPOINT_ENABLED off.
+              {% endblocktranslate %}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
   {% endif %}
 {% endblock %}

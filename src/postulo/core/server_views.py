@@ -353,7 +353,7 @@ class LogsView(ServerSectionMixin, TemplateView):
     section_title = _("Logs")
 
     def get_context_data(self, **kwargs):
-        from . import logs
+        from . import logs, views_logs
 
         context = super().get_context_data(**kwargs)
         level = self.request.GET.get("level", "")
@@ -372,6 +372,8 @@ class LogsView(ServerSectionMixin, TemplateView):
                 "size": logs.size_on_disk(),
                 "path": logs.log_path(),
                 "filtering": bool(level or logger or search),
+                "endpoint_enabled": views_logs.enabled(),
+                "endpoint_has_token": bool(views_logs.token()),
             }
         )
         return context

@@ -60,6 +60,30 @@ A backup holds everything. Encrypt it at rest (`age`, `gpg`, or an encrypted vol
 it somewhere the web server cannot reach, and test a restore once. See
 [Backups and your data](Backups-and-your-data).
 
+## The log endpoint
+
+`/logs` serves the same records as *Server settings → Logs*, one JSON object per line, for a
+collector such as Grafana Alloy or Vector running elsewhere on your network. **It is off**,
+and while it is off that address is a 404 rather than a 403, so nothing tells a stranger the
+endpoint exists.
+
+If you turn it on, set a token:
+
+```sh
+POSTULO_LOGS_ENDPOINT_ENABLED=true
+POSTULO_LOGS_TOKEN=$(python -c 'import secrets; print(secrets.token_urlsafe(32))')
+```
+
+With the endpoint on and no token, Postulo refuses to serve anything and records why. That
+is deliberate: an unauthenticated log endpoint is a data leak with a URL, and a forgotten
+variable should fail loudly rather than publish quietly.
+
+Be clear about what this is. Metrics can be made to carry nothing about anybody. A log entry
+cannot: explaining that a delivery failed means naming the connection, and often the company
+and the application it was for. Turning this on is personal data leaving the instance over
+HTTP, to be treated the way you would treat a backup. If you can already read the
+container's stdout, do that instead — it is the same records and nothing new is exposed.
+
 ## The cache, and why it is not optional
 
 Postulo counts failed sign-ins, password resets and a few other things in its cache, and
