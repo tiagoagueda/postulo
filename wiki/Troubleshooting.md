@@ -26,6 +26,10 @@ If you keep logs centrally, the same records can be served at `/logs` for a coll
 scrape. It is off by default and needs a token; see [Hardening](Hardening#the-log-endpoint)
 before turning it on.
 
+If you keep graphs, `/metrics` serves Prometheus metrics — what exists, what is waiting,
+what has failed, and whether the database and migrations are healthy. Also off by default,
+and it carries nothing about anybody.
+
 ## "No PDF backend is usable"
 
 WeasyPrint is installed with Postulo, so this almost always means its system libraries

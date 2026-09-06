@@ -29,6 +29,7 @@ EXCUSED: dict[str, str] = {
     "core:healthz": "a JSON status document for monitoring to poll",
     "core:manifest": "the JSON manifest a browser reads when installing the app",
     "core:logs_endpoint": "one JSON object per line, for a log collector to scrape",
+    "core:metrics": "the Prometheus text format, for a scraper rather than a person",
     "core:export_download": "a zip archive arriving as a download",
     "core:import_csv_template": "a spreadsheet arriving as a download",
     "documents:cv_export": "a rendered PDF arriving as a download",

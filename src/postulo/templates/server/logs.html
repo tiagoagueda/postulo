@@ -158,6 +158,32 @@
     {% comment %} Whether these records are also reachable over HTTP is the single most
        consequential thing about this page, so it is stated here rather than only in the
        wiki. {% endcomment %}
+    {% if metrics_enabled %}
+      <div class="alert-info mt-4 text-sm" role="note" data-metrics-endpoint="on">
+        <div>
+          {% if metrics_has_token %}
+            <p>
+              {% blocktranslate trimmed %}
+                Prometheus metrics are served at <code>/metrics</code>, behind the token in
+                POSTULO_METRICS_TOKEN. They carry counts only — how many applications exist,
+                not whose — and nothing that names a person, a company or an application.
+              {% endblocktranslate %}
+            </p>
+          {% else %}
+            <p>
+              {% blocktranslate trimmed %}
+                Prometheus metrics are served at <code>/metrics</code> with no token, so
+                anybody who can reach this instance can read them. They carry counts only —
+                how many applications exist, not whose — and nothing that names a person, a
+                company or an application, which is why this is a reasonable thing to leave
+                open on a private network. Set POSTULO_METRICS_TOKEN if it is not.
+              {% endblocktranslate %}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
     {% if endpoint_enabled %}
       <div class="{% if endpoint_has_token %}alert-info{% else %}alert-error{% endif %} mt-4 text-sm"
            role="note" data-logs-endpoint="{% if endpoint_has_token %}on{% else %}open{% endif %}">

@@ -131,6 +131,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Prometheus metrics at `/metrics`, off unless you turn them on.** What exists, what is
+  waiting, what has failed, and whether the database answers and the migrations are
+  applied — enough to graph a Postulo instance and to be told when a store starts refusing
+  everything. Off by default, and while off that address is a 404 rather than a 403, so
+  nothing confirms an endpoint is there. `POSTULO_METRICS_TOKEN` gates it when you want it
+  gated. **Nothing in it names anybody**: counts only, with no label carrying a person, a
+  company, an application or a URL, and a test asserting exactly that. There are
+  deliberately no request-rate or latency metrics — three workers means a counter in one of
+  them sees a third of the traffic, and your reverse proxy already has those numbers and
+  sees all of it. (#50)
 - **You can record an ORCID, and other identifiers that say which researcher you are.**
   A name is not an identity: two researchers share one, one researcher publishes under
   three, and a marriage or a transliteration turns one into another. In the places Postulo

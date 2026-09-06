@@ -285,6 +285,14 @@ SOCIALACCOUNT_STORE_TOKENS = False
 SOCIALACCOUNT_ADAPTER = "postulo.accounts.social_adapter.SocialAccountAdapter"
 SOCIALACCOUNT_FORMS = {"signup": "postulo.accounts.forms.SocialSignupForm"}
 
+# Prometheus metrics at /metrics. Off, and a 404 rather than a 403 when off, so nothing
+# confirms an endpoint is there. Unlike the log below, these carry nothing about anybody:
+# counts of records, work waiting, and what has failed. With no token set they are
+# readable by whoever can reach the instance, and the page says exactly that rather than
+# implying they are protected.
+POSTULO_METRICS_ENABLED = env.bool("POSTULO_METRICS_ENABLED", default=False)
+POSTULO_METRICS_TOKEN = env("POSTULO_METRICS_TOKEN", default="")
+
 # The log, served at /logs for a collector to scrape. Off, and a 404 rather than a 403
 # when off, so nothing confirms that an endpoint is there at all. On without a token it
 # refuses to serve: an unauthenticated log endpoint is a data leak with a URL.

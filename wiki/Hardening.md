@@ -60,6 +60,34 @@ A backup holds everything. Encrypt it at rest (`age`, `gpg`, or an encrypted vol
 it somewhere the web server cannot reach, and test a restore once. See
 [Backups and your data](Backups-and-your-data).
 
+## Monitoring
+
+`/metrics` serves Prometheus metrics: how many applications, listings and companies exist,
+how many document copies are waiting or have failed, whether the database answers and
+whether the migrations are applied. **It is off**, and while it is off that address is a
+404 rather than a 403, so nothing tells a stranger the endpoint exists.
+
+```sh
+POSTULO_METRICS_ENABLED=true
+POSTULO_METRICS_TOKEN=        # optional; see below
+```
+
+**Nothing in it names anybody.** Counts only: how many applications exist, never whose;
+how many copies are waiting, never for what. No label carries a person, a company, an
+application or a URL, and a test asserts it — a metric with somebody's identifier in a
+label is a record of what they are doing, exported somewhere else, and calling it
+monitoring does not change that.
+
+That is why the token is optional here and mandatory for the log endpoint. Left empty,
+`/metrics` is readable by whoever can reach the instance, which is a sensible thing on a
+private network and a decision you should make deliberately; *Server settings → Logs* says
+which of the two is in force.
+
+**There are no request-rate or latency metrics, on purpose.** The image runs three workers,
+and a counter living in one of them sees a third of the traffic — a graph quietly showing a
+third of the traffic is worse than no graph. Your reverse proxy already has those numbers,
+sees every request, and is the right place for them.
+
 ## The log endpoint
 
 `/logs` serves the same records as *Server settings → Logs*, one JSON object per line, for a

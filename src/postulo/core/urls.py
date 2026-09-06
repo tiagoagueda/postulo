@@ -1,6 +1,14 @@
 from django.urls import path
 
-from . import views, views_export, views_import, views_logs, views_search, views_tables
+from . import (
+    views,
+    views_export,
+    views_import,
+    views_logs,
+    views_metrics,
+    views_search,
+    views_tables,
+)
 
 app_name = "core"
 
@@ -10,6 +18,7 @@ urlpatterns = [
     path("manifest.webmanifest", views.manifest, name="manifest"),
     # Off unless an operator turns it on, and a 404 rather than a 403 when it is off.
     path("logs", views_logs.collect, name="logs_endpoint"),
+    path("metrics", views_metrics.scrape, name="metrics"),
     path("search/", views_search.search_page, name="search"),
     path("export/", views_export.export_overview, name="export"),
     path("export/download/", views_export.export_download, name="export_download"),
