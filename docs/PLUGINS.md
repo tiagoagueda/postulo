@@ -422,6 +422,26 @@ image has no compiler), a package with no `postulo.*` entry point (installing it
 nothing), and a dependency that would move one of Postulo's own — every install runs with
 the running environment as a constraint.
 
+**What is verified, and where that stops.** A catalogue's index carries an Ed25519
+signature checked against the configured key, and each release names a SHA-256 that the
+downloaded wheel must match. That covers the plugin's own file. It does not cover its
+**requirements**: those are resolved from PyPI when the plugin is installed, and are
+whatever is served that day, along with whatever they need in turn. Trusting a plugin
+therefore means trusting its dependency list, and it is worth reading before you install.
+
+Two things narrow it:
+
+- **Only built wheels are installed** (`--only-binary :all:`). A source distribution runs
+  its own build code during installation, as the container's user, before anybody has seen
+  it. A plugin that genuinely needs a source build is one to install by hand, deliberately.
+- **Everything that arrived is recorded** in `plugins.json` and listed under the plugin on
+  *Server settings → Plugins*, so an administrator can see what is actually in the instance
+  without a shell — including packages no wheel's metadata mentions, because a requirement
+  of a requirement never appears there.
+
+A catalogue carrying the whole resolved set with hashes, installed with `--require-hashes`,
+is the real answer and a change to the catalogue format; it is not built yet.
+
 **From the command line**, which is the same code:
 
 ```sh

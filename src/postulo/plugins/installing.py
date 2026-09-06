@@ -21,6 +21,15 @@ Three refusals matter, and each of them says why:
   running environment as a constraint, so a plugin can never change the version of
   something Postulo itself depends on. The refusal names the package.
 
+**What is verified, and where that stops.** A catalogue's index is signed and each
+wheel is checked against the checksum the signed index carries -- but that covers the
+plugin's own file and nothing else. Its requirements are resolved from PyPI when it is
+installed, and are whatever was served that day. So the installer takes only wheels
+(``--only-binary :all:``), because a source distribution runs its own build code during
+installation; and the record keeps every package that actually arrived, so an
+administrator can see what is in their instance without a shell. Trusting a plugin means
+trusting its dependency list, and the page says as much before anything is fetched.
+
 Installing a plugin is running somebody else's code inside Postulo, with everything
 Postulo can do. Nothing here pretends otherwise; the page that calls it says so plainly,
 only administrators reach it, and a plugin can be switched off without being removed.
@@ -97,6 +106,12 @@ class Installed:
     installed_by: str = ""
     entry_points: list[str] = field(default_factory=list)
     disabled: bool = False
+    #: Everything that arrived alongside the wheel, as ``name==version``. The signature
+    #: and the checksum cover the plugin's own file and nothing else: its requirements are
+    #: resolved from PyPI at install time and are whatever was served that day. Recording
+    #: them is what lets an administrator see what is actually in their instance without a
+    #: shell, and notice when an update quietly brings something new.
+    dependencies: list[str] = field(default_factory=list)
 
     @property
     def is_from_catalogue(self) -> bool:
@@ -330,6 +345,23 @@ def installer() -> list[str]:
     return [sys.executable, "-m", "pip", "install", "--disable-pip-version-check"]
 
 
+def distributions_in(directory: Path) -> dict[str, str]:
+    """``{name: version}`` for every package sitting in ``directory``.
+
+    Read from the ``.dist-info`` directory names rather than by importing anything, so it
+    works before and after an install without a metadata cache getting in the way.
+    """
+    found: dict[str, str] = {}
+    if not directory.is_dir():
+        return found
+    for dist_info in directory.glob("*.dist-info"):
+        stem = dist_info.name[: -len(".dist-info")]
+        name, _sep, version = stem.rpartition("-")
+        if name:
+            found[canonicalise(name)] = version
+    return found
+
+
 def run_install(target: Path, wheel: Path, constraint_file: Path) -> str:
     """Install one wheel into ``target``. Returns whatever the installer said."""
     command = [
@@ -338,6 +370,14 @@ def run_install(target: Path, wheel: Path, constraint_file: Path) -> str:
         str(target),
         "--constraint",
         str(constraint_file),
+        # Wheels only. A source distribution runs its own build code during installation,
+        # as the container's user, and installing a plugin already means installing
+        # whatever its requirements resolve to on PyPI that day -- so the one thing worth
+        # refusing outright is a dependency that gets to execute before anybody has seen
+        # what it is. A plugin genuinely needing a source build is one an operator should
+        # install by hand, deliberately.
+        "--only-binary",
+        ":all:",
         "--upgrade",
         str(wheel),
     ]
@@ -380,12 +420,22 @@ def install_wheel(
 
     target = plugins_dir()
     target.mkdir(parents=True, exist_ok=True)
+    before = distributions_in(target)
     constraint_file = target / ".constraints.txt"
     constraint_file.write_text("\n".join(constraints()) + "\n", encoding="utf-8")
     try:
         run_install(target, wheel, constraint_file)
     finally:
         constraint_file.unlink(missing_ok=True)
+
+    # What the installer actually brought, as opposed to what the wheel asked for. The
+    # two differ: a requirement of a requirement never appears in the wheel's metadata.
+    after = distributions_in(target)
+    arrived = sorted(
+        f"{name}=={version}"
+        for name, version in after.items()
+        if canonicalise(name) != canonicalise(info.name) and before.get(name) != version
+    )
 
     entry = Installed(
         name=info.name,
@@ -397,6 +447,7 @@ def install_wheel(
         installed_by=by,
         entry_points=info.entry_points,
         disabled=False,
+        dependencies=arrived,
     )
     record = [item for item in read_record() if canonicalise(item.name) != canonicalise(info.name)]
     write_record([*record, entry])

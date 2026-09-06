@@ -138,6 +138,14 @@ A catalogue must be configured with a public key, and its index must be signed w
 key before a single wheel is fetched; every wheel is then checked against the checksum the
 signed index carries. Add a catalogue only from people whose review you would accept.
 
+That signature covers the plugin's own file and stops there. A plugin's **requirements**
+are fetched from PyPI when it is installed, and are whatever is served that day, together
+with whatever they need in turn — so trusting a plugin means trusting its dependency list,
+and the confirmation page shows you that list before anything is fetched. Postulo installs
+only built wheels, so nothing runs a build script on the way in, and records every package
+that arrived: open a plugin's entry under *Server settings → Plugins* to see what is
+actually in your instance.
+
 Keep `POSTULO_CONNECTIONS_ALLOW_PRIVATE` off unless a plugin genuinely needs to reach a
 service on your own network — with it on, a public hostname that resolves to a private
 address is allowed through. It applies to plugin connections and to company logos, and not

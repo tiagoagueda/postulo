@@ -131,6 +131,17 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Plugins install only built wheels, and say what came with them.** A catalogue's
+  signature and the checksum beside it cover a plugin's own file. Its requirements are
+  resolved from PyPI when it is installed and are whatever is served that day, which the
+  interface did not say anywhere — an administrator reading "signature verified" could
+  reasonably conclude that everything installed had been. The plugins page now says where
+  that verification stops, both on the page itself and on the confirmation shown before
+  anything is fetched. Only built wheels are installed, so a dependency arriving as a
+  source package can no longer run its own build script during installation. And every
+  package that actually arrived is recorded and listed under the plugin, including the
+  ones no wheel's metadata mentions, because a requirement of a requirement never appears
+  there. (#61)
 - **A way to refuse the identity provider's word about an address.** With single sign-on
   configured, somebody arriving through the provider is signed in as the account holding
   the address it gives — provided the provider marked that address verified, which Postulo

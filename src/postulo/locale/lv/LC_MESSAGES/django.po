@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:13+0000\n"
+"POT-Creation-Date: 2026-09-06 17:22+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: latviešu\n"
@@ -183,14 +183,14 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s atkal var pieteikties."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s nedeklarē nevienu Postulo ieejas punktu, tāpēc tā instalēšana neko nedotu. Spraudnis reģistrējas vienā no: %(groups)s."
 
-#: src/postulo/plugins/installing.py:376
+#: src/postulo/plugins/installing.py:416
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s neatbilst kontrolsummai, ar kuru tas tika publicēts."
@@ -210,12 +210,12 @@ msgstr "%(name)s vairs nav: konts, tā ieraksti un %(files)s faili diskā."
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s vairs nav administrators."
 
-#: src/postulo/plugins/installing.py:412 src/postulo/plugins/installing.py:466
+#: src/postulo/plugins/installing.py:463 src/postulo/plugins/installing.py:517
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s nav instalēts."
 
-#: src/postulo/plugins/installing.py:300
+#: src/postulo/plugins/installing.py:315
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -256,7 +256,7 @@ msgid ""
 msgstr ""
 "%(name)s piesakās kā <strong>%(current)s</strong>. Jaunajam lietotājvārdam šajā instancē jābūt brīvam; lielie burti to neatšķir."
 
-#: src/postulo/plugins/installing.py:320
+#: src/postulo/plugins/installing.py:335
 #, python-format, draft
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s mainītu to, no kā ir atkarīgs pats Postulo. %(problems)s"
@@ -286,7 +286,7 @@ msgstr "%(ok)d atbildēja, %(broken)d ne; tās, kas neatbildēja, pasaka kāpēc
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:286
+#: src/postulo/plugins/installing.py:301
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: tam vajag %(wanted)s, un Postulo ir %(have)s."
@@ -358,6 +358,14 @@ msgid_plural "%(total)s highlights"
 msgstr[0] "%(total)s sasniegums"
 msgstr[1] "%(total)s sasniegumi"
 msgstr[2] "%(total)s sasniegumu"
+
+#: src/postulo/templates/server/plugins.html:65
+#, python-format, draft
+msgid "%(total)s package came with it"
+msgid_plural "%(total)s packages came with it"
+msgstr[0] "Kopā ar to atnāca %(total)s pakotne"
+msgstr[1] "Kopā ar to atnāca %(total)s pakotnes"
+msgstr[2] "Kopā ar to atnāca %(total)s pakotņu"
 
 #: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
 #, python-format, draft
@@ -449,7 +457,7 @@ msgstr "Norāde saskarnei, piemēram, “amber” vai “sky”."
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Rinda zem nosaukuma pieteikšanās lapā. Neobligāti."
 
-#: src/postulo/templates/server/plugins.html:209
+#: src/postulo/templates/server/plugins.html:244
 #, python-format, draft
 msgid ""
 "A package registers a source under the <code>%(group)s</code> entry-point group. A plugin that only registers entry points appears as soon as it is installed; one that adds pages of its own needs a restart. A source that fails to load is logged and left out, and the built-in ones keep working."
@@ -476,6 +484,13 @@ msgid ""
 msgstr ""
 "Spraudnis, kas jūsu vietā lasa pastkasti vai kalendāru, atstāj šeit atrasto, un tas paliek šeit, līdz jūs to pieņemat vai noraidāt."
 
+#: src/postulo/templates/server/plugins.html:20
+#, draft
+msgid ""
+"A plugin's own file is checked against the checksum its catalogue signed. Its requirements are not: those are fetched from PyPI when it is installed, and are whatever is served that day. Trusting a plugin means trusting its list of requirements too. Postulo installs only built wheels, never a source package that would run its own code while installing, and records everything that arrived."
+msgstr ""
+"Paša spraudņa fails tiek pārbaudīts pret kontrolsummu, ko parakstījis tā katalogs. Tā atkarības – nē: tās tiek lejupielādētas no PyPI instalēšanas brīdī un ir tas, kas tajā dienā tiek piedāvāts. Uzticēties spraudnim nozīmē uzticēties arī tā atkarību sarakstam. Postulo instalē tikai gatavas pakotnes (wheels), nekad pirmkoda pakotni, kas instalēšanas laikā izpildītu savu kodu, un pieraksta visu, kas atnāca."
+
 #: src/postulo/resume/registry.py:71
 #, draft
 msgid ""
@@ -499,7 +514,7 @@ msgstr ""
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Profils GitHub, Forgejo, GitLab vai līdzīgā vietnē."
 
-#: src/postulo/templates/server/plugins.html:110
+#: src/postulo/templates/server/plugins.html:145
 #, draft
 msgid ""
 "A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it says about itself and shows you that before anything is installed."
@@ -1121,7 +1136,7 @@ msgstr "teksts"
 msgid "Bringing a spreadsheet in"
 msgstr "Izklājlapas ienešana"
 
-#: src/postulo/templates/server/plugins.html:201
+#: src/postulo/templates/server/plugins.html:236
 #, draft
 msgid "built in"
 msgstr "iebūvēts"
@@ -1192,7 +1207,7 @@ msgstr "Atgriezeniskais URL, ko reģistrēt pie pakalpojuma sniedzēja"
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
-#: src/postulo/templates/server/plugins.html:102
+#: src/postulo/templates/server/plugins.html:137
 #, draft
 msgid "Cancel"
 msgstr "Atcelt"
@@ -1246,7 +1261,7 @@ msgstr "Tvērums noraidīts."
 msgid "Capture postings"
 msgstr "Tvert sludinājumus"
 
-#: src/postulo/templates/server/plugins.html:185
+#: src/postulo/templates/server/plugins.html:220
 #, draft
 msgid "Capture sources this instance has"
 msgstr "Šīs instances tveršanas avoti"
@@ -1301,7 +1316,7 @@ msgstr "karjeras lapa"
 msgid "Careers page"
 msgstr "Karjeras lapa"
 
-#: src/postulo/templates/server/plugins.html:123
+#: src/postulo/templates/server/plugins.html:158
 #, draft
 msgid "Catalogues"
 msgstr "Katalogi"
@@ -1368,7 +1383,7 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Atgādināt %(company)s par %(role)s"
 
-#: src/postulo/templates/server/plugins.html:133
+#: src/postulo/templates/server/plugins.html:168
 #, draft
 msgid "Check for updates"
 msgstr "Meklēt atjauninājumus"
@@ -1393,7 +1408,7 @@ msgstr "Pārbaudīts %(when)s: %(detail)s"
 msgid "checksum"
 msgstr "kontrolsumma"
 
-#: src/postulo/templates/server/plugins.html:95
+#: src/postulo/templates/server/plugins.html:130
 #, draft
 msgid "Checksum"
 msgstr "Kontrolsumma"
@@ -2044,7 +2059,7 @@ msgstr "Dzēst kontu"
 msgid "Delete your own account from Settings, not from here."
 msgstr "Savu kontu dzēsiet Iestatījumos, nevis šeit."
 
-#: src/postulo/templates/server/plugins.html:93
+#: src/postulo/templates/server/plugins.html:121
 #, draft
 msgid "Depends on"
 msgstr "Atkarīgs no"
@@ -2543,6 +2558,13 @@ msgstr "Iegūt manu Gravatar vēlreiz"
 msgid "Fetched again."
 msgstr "Lejupielādēts vēlreiz."
 
+#: src/postulo/templates/server/plugins.html:126
+#, draft
+msgid ""
+"Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only."
+msgstr ""
+"Tiek lejupielādētas no PyPI, kad šis tiek instalēts, kopā ar visu, kas tām pašām nepieciešams. Iepriekš minētā kontrolsumma attiecas tikai uz šo pakotni."
+
 #: src/postulo/resume/models.py:85
 #, draft
 msgid "field of study"
@@ -2928,7 +2950,7 @@ msgstr "sasniegumi"
 msgid "highlights for this CV"
 msgstr "sasniegumi šim CV"
 
-#: src/postulo/templates/server/plugins.html:90
+#: src/postulo/templates/server/plugins.html:118
 #, draft
 msgid "Home page"
 msgstr "Mājaslapa"
@@ -3172,17 +3194,17 @@ msgstr "Informācijas tehnoloģijas"
 msgid "Insights"
 msgstr "Ieskati"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Install"
 msgstr "Instalēt"
 
-#: src/postulo/templates/server/plugins.html:79
+#: src/postulo/templates/server/plugins.html:107
 #, draft
 msgid "Install a package"
 msgstr "Instalēt pakotni"
 
-#: src/postulo/templates/server/plugins.html:101
+#: src/postulo/templates/server/plugins.html:136
 #, draft
 msgid "Install it"
 msgstr "Instalēt to"
@@ -3194,7 +3216,7 @@ msgid ""
 msgstr ""
 "Instalējiet ar: uv sync --extra chromium, pēc tam: uv run playwright install chromium"
 
-#: src/postulo/templates/server/plugins.html:22
+#: src/postulo/templates/server/plugins.html:31
 #, draft
 msgid "Installed on this instance"
 msgstr "Instalēts šajā instancē"
@@ -3586,7 +3608,7 @@ msgstr "Vēstules"
 msgid "letters"
 msgstr "vēstules"
 
-#: src/postulo/templates/server/plugins.html:88
+#: src/postulo/templates/server/plugins.html:116
 #, draft
 msgid "Licence"
 msgstr "Licence"
@@ -3745,7 +3767,7 @@ msgstr "galvenais kontakts"
 msgid "Main contact"
 msgstr "Galvenais kontakts"
 
-#: src/postulo/templates/server/plugins.html:89
+#: src/postulo/templates/server/plugins.html:117
 #, draft
 msgid "Maintainer"
 msgstr "Uzturētājs"
@@ -3903,7 +3925,7 @@ msgstr "Uz augšu"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
 #: src/postulo/templates/server/people.html:20
-#: src/postulo/templates/server/plugins.html:86
+#: src/postulo/templates/server/plugins.html:114
 #, draft
 msgid "Name"
 msgstr "Nosaukums"
@@ -4047,7 +4069,7 @@ msgstr "Nav konfigurēts neviens katalogs ar nosaukumu “%(name)s”."
 msgid "No catalogue is configured on this instance."
 msgstr "Šajā instancē nav konfigurēts neviens katalogs."
 
-#: src/postulo/templates/server/plugins.html:169
+#: src/postulo/templates/server/plugins.html:204
 #, draft
 msgid ""
 "No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
@@ -4251,7 +4273,7 @@ msgstr "Nav man"
 msgid "Not found"
 msgstr "Nav atrasts"
 
-#: src/postulo/templates/server/plugins.html:35
+#: src/postulo/templates/server/plugins.html:44
 #, draft
 msgid "not loaded"
 msgstr "nav ielādēts"
@@ -4320,7 +4342,7 @@ msgstr "Piezīmes"
 msgid "notes"
 msgstr "piezīmes"
 
-#: src/postulo/templates/server/plugins.html:94
+#: src/postulo/templates/server/plugins.html:123
 #, draft
 msgid "nothing"
 msgstr "nekas"
@@ -4359,7 +4381,7 @@ msgid ""
 msgstr ""
 "Dienasgrāmatā nekā nav. Kad kādu piedāvā, ieplānojiet to no pieteikuma lapas."
 
-#: src/postulo/templates/server/plugins.html:71
+#: src/postulo/templates/server/plugins.html:99
 #, python-format, draft
 msgid ""
 "Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
@@ -4505,7 +4527,7 @@ msgid "notified on"
 msgstr "paziņots"
 
 #: src/postulo/templates/connections/list.html:26
-#: src/postulo/templates/server/plugins.html:32
+#: src/postulo/templates/server/plugins.html:41
 #, draft
 msgid "Off"
 msgstr "Izslēgts"
@@ -4678,7 +4700,7 @@ msgstr "kārtība"
 msgid "organisation"
 msgstr "organizācija"
 
-#: src/postulo/templates/server/plugins.html:192
+#: src/postulo/templates/server/plugins.html:227
 #, draft
 msgid "Origin"
 msgstr "Izcelsme"
@@ -4733,7 +4755,7 @@ msgstr "Pārskats"
 msgid "owner"
 msgstr "īpašnieks"
 
-#: src/postulo/templates/server/plugins.html:115
+#: src/postulo/templates/server/plugins.html:150
 #, draft
 msgid "Package"
 msgstr "Pakotne"
@@ -5052,7 +5074,7 @@ msgstr "sagatavošanās piezīmes"
 msgid "present"
 msgstr "tagad"
 
-#: src/postulo/templates/server/plugins.html:162
+#: src/postulo/templates/server/plugins.html:197
 #, draft
 msgid ""
 "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
@@ -5134,7 +5156,7 @@ msgstr "projekti"
 msgid "Provider"
 msgstr "Pakalpojuma sniedzējs"
 
-#: src/postulo/templates/server/plugins.html:91
+#: src/postulo/templates/server/plugins.html:119
 #, draft
 msgid "Provides"
 msgstr "Nodrošina"
@@ -5259,7 +5281,7 @@ msgid ""
 msgstr ""
 "Nolasīts no laika skalas, tāpēc intervija, kas beidzās ar noraidījumu, joprojām skaitās kā intervija."
 
-#: src/postulo/templates/server/plugins.html:118
+#: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
 msgstr "Izlasīt to"
@@ -5395,7 +5417,7 @@ msgstr "reģistrācija atvērta"
 msgid "Registration open"
 msgstr "Reģistrācija atvērta"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Reinstall"
 msgstr "Instalēt no jauna"
@@ -5449,7 +5471,7 @@ msgstr "attālā adrese"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
-#: src/postulo/templates/server/plugins.html:62
+#: src/postulo/templates/server/plugins.html:90
 #, draft
 msgid "Remove"
 msgstr "Noņemt"
@@ -5885,7 +5907,7 @@ msgstr "Serveris"
 msgid "Server settings"
 msgstr "Servera iestatījumi"
 
-#: src/postulo/templates/server/plugins.html:175
+#: src/postulo/templates/server/plugins.html:210
 #, draft
 msgid ""
 "Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code> entries, separated by commas. The index must be signed with that key, and every wheel must match the checksum the signed index carries, or nothing is installed."
@@ -6108,7 +6130,7 @@ msgstr ""
 "Tas, kurš ienāk caur šo pakalpojumu sniedzēju, tiek pieteikts kontā, kuram pieder norādītā adrese, ja vien sniedzējs apgalvo, ka adrese ir apstiprināta. Tāpēc ir vērts atbildēt uz vienu jautājumu: vai šis sniedzējs sauc adresi par apstiprinātu tikai tad, kad cilvēks ir pierādījis, ka tā ir viņa? Ja to uzturat jūs paši, gandrīz noteikti. Ja tas ir kāda cita, pārbaudiet, pirms uz to paļaujaties. Iestatiet POSTULO_OIDC_LINK_BY_EMAIL uz false, lai katram vienreiz būtu jāpiesakās šeit un jāpievieno sniedzējs no savas konta lapas."
 
 #: src/postulo/templates/applications/insights.html:143
-#: src/postulo/templates/server/plugins.html:190
+#: src/postulo/templates/server/plugins.html:225
 #, draft
 msgid "Source"
 msgstr "Avots"
@@ -6271,12 +6293,12 @@ msgstr "aizstāts"
 msgid "Supersedes"
 msgstr "Aizstāj"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
 msgstr "Izslēgt"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch on"
 msgstr "Ieslēgt"
@@ -6481,7 +6503,7 @@ msgstr "Tas ir SVG, ko Postulo vēl neglabā. Der PNG vai JPEG."
 msgid "That is not a status Postulo recognises."
 msgstr "Tas nav statuss, ko Postulo atpazīst."
 
-#: src/postulo/plugins/installing.py:185
+#: src/postulo/plugins/installing.py:200
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Tas nav wheel: Postulo instalē .whl failus."
@@ -6663,12 +6685,12 @@ msgstr "Fails ir tukšs."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Fails pārsniedz 2 MB. Darba meklējumi nav tik lieli."
 
-#: src/postulo/plugins/installing.py:354
+#: src/postulo/plugins/installing.py:394
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "Instalētāju nevarēja palaist: %(error)s"
 
-#: src/postulo/plugins/installing.py:358
+#: src/postulo/plugins/installing.py:398
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "Instalētājs to noraidīja: %(error)s"
@@ -6798,7 +6820,7 @@ msgstr "Augšējais skaitlis nevar būt zemāks par apakšējo."
 msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr "Wheel neatbilst kontrolsummai, ko katalogs tam publicējis."
 
-#: src/postulo/plugins/installing.py:190
+#: src/postulo/plugins/installing.py:205
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Wheel nav metadatu; tas var būt bojāts."
@@ -6914,7 +6936,7 @@ msgid ""
 msgstr ""
 "Šī ir testa ziņa no jūsu Postulo paziņojumu savienojuma. Atgādinājumi un tvērumi pienāks tāpat."
 
-#: src/postulo/templates/server/plugins.html:83
+#: src/postulo/templates/server/plugins.html:111
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Lūk, ko jūs gatavojaties instalēt. Vēl nekas nav instalēts."
@@ -7257,7 +7279,7 @@ msgstr "Pārbaudīts"
 msgid "version"
 msgstr "versija"
 
-#: src/postulo/templates/server/plugins.html:191
+#: src/postulo/templates/server/plugins.html:226
 #, draft
 msgid "Version"
 msgstr "Versija"
@@ -7397,7 +7419,7 @@ msgstr "Ko tas drīkst"
 msgid "what it says"
 msgstr "ko tas saka"
 
-#: src/postulo/templates/server/plugins.html:87
+#: src/postulo/templates/server/plugins.html:115
 #, draft
 msgid "What it says it is"
 msgstr "Kas tas, pēc paša teiktā, ir"

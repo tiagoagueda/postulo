@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:13+0000\n"
+"POT-Creation-Date: 2026-09-06 17:22+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: dansk\n"
@@ -174,14 +174,14 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s kan logge ind igen."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s angiver intet Postulo-indgangspunkt, så det ville ikke gøre noget at installere det. Et tilføjelsesprogram registrerer sig under en af: %(groups)s."
 
-#: src/postulo/plugins/installing.py:376
+#: src/postulo/plugins/installing.py:416
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s svarer ikke til den kontrolsum, det blev udgivet med."
@@ -201,12 +201,12 @@ msgstr "%(name)s er væk: kontoen, dens poster og %(files)s filer på disken."
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s er ikke længere administrator."
 
-#: src/postulo/plugins/installing.py:412 src/postulo/plugins/installing.py:466
+#: src/postulo/plugins/installing.py:463 src/postulo/plugins/installing.py:517
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s er ikke installeret."
 
-#: src/postulo/plugins/installing.py:300
+#: src/postulo/plugins/installing.py:315
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -247,7 +247,7 @@ msgid ""
 msgstr ""
 "%(name)s logger ind som <strong>%(current)s</strong>. Det nye brugernavn skal være ledigt på denne instans; store bogstaver gør ingen forskel."
 
-#: src/postulo/plugins/installing.py:320
+#: src/postulo/plugins/installing.py:335
 #, python-format, draft
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s ville ændre det, Postulo selv afhænger af. %(problems)s"
@@ -278,7 +278,7 @@ msgstr ""
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:286
+#: src/postulo/plugins/installing.py:301
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: kræver %(wanted)s, og Postulo har %(have)s."
@@ -346,6 +346,13 @@ msgid "%(total)s highlight"
 msgid_plural "%(total)s highlights"
 msgstr[0] "%(total)s højdepunkt"
 msgstr[1] "%(total)s højdepunkter"
+
+#: src/postulo/templates/server/plugins.html:65
+#, python-format, draft
+msgid "%(total)s package came with it"
+msgid_plural "%(total)s packages came with it"
+msgstr[0] "%(total)s pakke fulgte med"
+msgstr[1] "%(total)s pakker fulgte med"
 
 #: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
 #, python-format, draft
@@ -437,7 +444,7 @@ msgstr "Et hint til brugerfladen, f.eks. “amber” eller “sky”."
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "En linje under navnet på login-siden. Valgfri."
 
-#: src/postulo/templates/server/plugins.html:209
+#: src/postulo/templates/server/plugins.html:244
 #, python-format, draft
 msgid ""
 "A package registers a source under the <code>%(group)s</code> entry-point group. A plugin that only registers entry points appears as soon as it is installed; one that adds pages of its own needs a restart. A source that fails to load is logged and left out, and the built-in ones keep working."
@@ -461,6 +468,13 @@ msgid ""
 "A plugin that reads a mailbox or a calendar for you files what it finds here, and it stays here until you accept or decline it."
 msgstr ""
 "En udvidelse, der læser en postkasse eller en kalender for dig, lægger her, hvad den finder, og det bliver her, indtil du accepterer eller afviser det."
+
+#: src/postulo/templates/server/plugins.html:20
+#, draft
+msgid ""
+"A plugin's own file is checked against the checksum its catalogue signed. Its requirements are not: those are fetched from PyPI when it is installed, and are whatever is served that day. Trusting a plugin means trusting its list of requirements too. Postulo installs only built wheels, never a source package that would run its own code while installing, and records everything that arrived."
+msgstr ""
+"Selve plugin-filen kontrolleres mod den kontrolsum, dens katalog har signeret. Dens afhængigheder gør ikke: de hentes fra PyPI, når den installeres, og er hvad der end serveres den dag. At stole på et plugin betyder også at stole på dets liste af afhængigheder. Postulo installerer kun byggede pakker (wheels), aldrig en kildepakke, der ville køre sin egen kode under installation, og registrerer alt, hvad der ankom."
 
 #: src/postulo/resume/registry.py:71
 #, draft
@@ -486,7 +500,7 @@ msgstr ""
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "En profil på GitHub, Forgejo, GitLab eller lignende."
 
-#: src/postulo/templates/server/plugins.html:110
+#: src/postulo/templates/server/plugins.html:145
 #, draft
 msgid ""
 "A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it says about itself and shows you that before anything is installed."
@@ -1107,7 +1121,7 @@ msgstr "brødtekst"
 msgid "Bringing a spreadsheet in"
 msgstr "Hent et regneark ind"
 
-#: src/postulo/templates/server/plugins.html:201
+#: src/postulo/templates/server/plugins.html:236
 #, draft
 msgid "built in"
 msgstr "indbygget"
@@ -1178,7 +1192,7 @@ msgstr "Callback-URL, der skal registreres hos udbyderen"
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
-#: src/postulo/templates/server/plugins.html:102
+#: src/postulo/templates/server/plugins.html:137
 #, draft
 msgid "Cancel"
 msgstr "Annuller"
@@ -1232,7 +1246,7 @@ msgstr "Indfangning kasseret."
 msgid "Capture postings"
 msgstr "Indfang opslag"
 
-#: src/postulo/templates/server/plugins.html:185
+#: src/postulo/templates/server/plugins.html:220
 #, draft
 msgid "Capture sources this instance has"
 msgstr "Denne instans' opsamlingskilder"
@@ -1287,7 +1301,7 @@ msgstr "karriereside"
 msgid "Careers page"
 msgstr "Karriereside"
 
-#: src/postulo/templates/server/plugins.html:123
+#: src/postulo/templates/server/plugins.html:158
 #, draft
 msgid "Catalogues"
 msgstr "Kataloger"
@@ -1354,7 +1368,7 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Følg op hos %(company)s om %(role)s"
 
-#: src/postulo/templates/server/plugins.html:133
+#: src/postulo/templates/server/plugins.html:168
 #, draft
 msgid "Check for updates"
 msgstr "Søg efter opdateringer"
@@ -1379,7 +1393,7 @@ msgstr "Tjekket %(when)s: %(detail)s"
 msgid "checksum"
 msgstr "kontrolsum"
 
-#: src/postulo/templates/server/plugins.html:95
+#: src/postulo/templates/server/plugins.html:130
 #, draft
 msgid "Checksum"
 msgstr "Kontrolsum"
@@ -2029,7 +2043,7 @@ msgstr "Slet kontoen"
 msgid "Delete your own account from Settings, not from here."
 msgstr "Slet din egen konto fra Indstillinger, ikke herfra."
 
-#: src/postulo/templates/server/plugins.html:93
+#: src/postulo/templates/server/plugins.html:121
 #, draft
 msgid "Depends on"
 msgstr "Afhænger af"
@@ -2530,6 +2544,13 @@ msgstr "Hent min Gravatar igen"
 msgid "Fetched again."
 msgstr "Hentet igen."
 
+#: src/postulo/templates/server/plugins.html:126
+#, draft
+msgid ""
+"Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only."
+msgstr ""
+"Hentes fra PyPI, når dette installeres, sammen med hvad de selv har brug for. Kontrolsummen ovenfor dækker kun denne pakke."
+
 #: src/postulo/resume/models.py:85
 #, draft
 msgid "field of study"
@@ -2917,7 +2938,7 @@ msgstr "højdepunkter"
 msgid "highlights for this CV"
 msgstr "højdepunkter til dette CV"
 
-#: src/postulo/templates/server/plugins.html:90
+#: src/postulo/templates/server/plugins.html:118
 #, draft
 msgid "Home page"
 msgstr "Hjemmeside"
@@ -3161,17 +3182,17 @@ msgstr "Informationsteknologi"
 msgid "Insights"
 msgstr "Indsigt"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Install"
 msgstr "Installer"
 
-#: src/postulo/templates/server/plugins.html:79
+#: src/postulo/templates/server/plugins.html:107
 #, draft
 msgid "Install a package"
 msgstr "Installer en pakke"
 
-#: src/postulo/templates/server/plugins.html:101
+#: src/postulo/templates/server/plugins.html:136
 #, draft
 msgid "Install it"
 msgstr "Installer den"
@@ -3183,7 +3204,7 @@ msgid ""
 msgstr ""
 "Installér med: uv sync --extra chromium, derefter: uv run playwright install chromium"
 
-#: src/postulo/templates/server/plugins.html:22
+#: src/postulo/templates/server/plugins.html:31
 #, draft
 msgid "Installed on this instance"
 msgstr "Installeret på denne instans"
@@ -3577,7 +3598,7 @@ msgstr "Breve"
 msgid "letters"
 msgstr "breve"
 
-#: src/postulo/templates/server/plugins.html:88
+#: src/postulo/templates/server/plugins.html:116
 #, draft
 msgid "Licence"
 msgstr "Licens"
@@ -3736,7 +3757,7 @@ msgstr "primær kontakt"
 msgid "Main contact"
 msgstr "Primær kontakt"
 
-#: src/postulo/templates/server/plugins.html:89
+#: src/postulo/templates/server/plugins.html:117
 #, draft
 msgid "Maintainer"
 msgstr "Vedligeholder"
@@ -3894,7 +3915,7 @@ msgstr "Flyt op"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
 #: src/postulo/templates/server/people.html:20
-#: src/postulo/templates/server/plugins.html:86
+#: src/postulo/templates/server/plugins.html:114
 #, draft
 msgid "Name"
 msgstr "Navn"
@@ -4038,7 +4059,7 @@ msgstr "Der er ikke opsat noget katalog ved navn “%(name)s”."
 msgid "No catalogue is configured on this instance."
 msgstr "Der er ikke opsat noget katalog på denne instans."
 
-#: src/postulo/templates/server/plugins.html:169
+#: src/postulo/templates/server/plugins.html:204
 #, draft
 msgid ""
 "No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
@@ -4244,7 +4265,7 @@ msgstr "Ikke noget for mig"
 msgid "Not found"
 msgstr "Ikke fundet"
 
-#: src/postulo/templates/server/plugins.html:35
+#: src/postulo/templates/server/plugins.html:44
 #, draft
 msgid "not loaded"
 msgstr "ikke indlæst"
@@ -4313,7 +4334,7 @@ msgstr "Noter"
 msgid "notes"
 msgstr "noter"
 
-#: src/postulo/templates/server/plugins.html:94
+#: src/postulo/templates/server/plugins.html:123
 #, draft
 msgid "nothing"
 msgstr "ingenting"
@@ -4352,7 +4373,7 @@ msgid ""
 msgstr ""
 "Intet i kalenderen. Når en tilbydes, så planlæg den fra ansøgningens side."
 
-#: src/postulo/templates/server/plugins.html:71
+#: src/postulo/templates/server/plugins.html:99
 #, python-format, draft
 msgid ""
 "Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
@@ -4498,7 +4519,7 @@ msgid "notified on"
 msgstr "underrettet den"
 
 #: src/postulo/templates/connections/list.html:26
-#: src/postulo/templates/server/plugins.html:32
+#: src/postulo/templates/server/plugins.html:41
 #, draft
 msgid "Off"
 msgstr "Fra"
@@ -4669,7 +4690,7 @@ msgstr "rækkefølge"
 msgid "organisation"
 msgstr "organisation"
 
-#: src/postulo/templates/server/plugins.html:192
+#: src/postulo/templates/server/plugins.html:227
 #, draft
 msgid "Origin"
 msgstr "Oprindelse"
@@ -4724,7 +4745,7 @@ msgstr "Overblik"
 msgid "owner"
 msgstr "ejer"
 
-#: src/postulo/templates/server/plugins.html:115
+#: src/postulo/templates/server/plugins.html:150
 #, draft
 msgid "Package"
 msgstr "Pakke"
@@ -5043,7 +5064,7 @@ msgstr "forberedelsesnoter"
 msgid "present"
 msgstr "nu"
 
-#: src/postulo/templates/server/plugins.html:162
+#: src/postulo/templates/server/plugins.html:197
 #, draft
 msgid ""
 "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
@@ -5125,7 +5146,7 @@ msgstr "projekter"
 msgid "Provider"
 msgstr "Udbyder"
 
-#: src/postulo/templates/server/plugins.html:91
+#: src/postulo/templates/server/plugins.html:119
 #, draft
 msgid "Provides"
 msgstr "Tilbyder"
@@ -5248,7 +5269,7 @@ msgid ""
 msgstr ""
 "Læst fra tidslinjen, så en samtale, der endte i et afslag, tæller stadig som en samtale."
 
-#: src/postulo/templates/server/plugins.html:118
+#: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
 msgstr "Læs den"
@@ -5383,7 +5404,7 @@ msgstr "registrering åben"
 msgid "Registration open"
 msgstr "Registrering åben"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Reinstall"
 msgstr "Geninstaller"
@@ -5437,7 +5458,7 @@ msgstr "fjernadresse"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
-#: src/postulo/templates/server/plugins.html:62
+#: src/postulo/templates/server/plugins.html:90
 #, draft
 msgid "Remove"
 msgstr "Fjern"
@@ -5873,7 +5894,7 @@ msgstr "Server"
 msgid "Server settings"
 msgstr "Serverindstillinger"
 
-#: src/postulo/templates/server/plugins.html:175
+#: src/postulo/templates/server/plugins.html:210
 #, draft
 msgid ""
 "Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code> entries, separated by commas. The index must be signed with that key, and every wheel must match the checksum the signed index carries, or nothing is installed."
@@ -6096,7 +6117,7 @@ msgstr ""
 "Den, der kommer via denne udbyder, logges ind på den konto, som ejer den angivne adresse, forudsat at udbyderen siger, at adressen er bekræftet. Derfor er ét spørgsmål værd at besvare: kalder denne udbyder kun en adresse bekræftet, når personen har bevist, at den er deres? Hvis du selv driver den, næsten helt sikkert. Er den andres, så tjek det, før du stoler på den. Sæt POSTULO_OIDC_LINK_BY_EMAIL til false for at kræve, at hver enkelt logger ind her én gang og forbinder udbyderen fra sin egen kontoside."
 
 #: src/postulo/templates/applications/insights.html:143
-#: src/postulo/templates/server/plugins.html:190
+#: src/postulo/templates/server/plugins.html:225
 #, draft
 msgid "Source"
 msgstr "Kilde"
@@ -6259,12 +6280,12 @@ msgstr "erstattet"
 msgid "Supersedes"
 msgstr "Erstatter"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
 msgstr "Slå fra"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch on"
 msgstr "Slå til"
@@ -6469,7 +6490,7 @@ msgstr "Det er en SVG, som Postulo endnu ikke gemmer. En PNG eller JPEG virker."
 msgid "That is not a status Postulo recognises."
 msgstr "Det er ikke en status, Postulo kender."
 
-#: src/postulo/plugins/installing.py:185
+#: src/postulo/plugins/installing.py:200
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Det er ikke en wheel: Postulo installerer .whl-filer."
@@ -6652,12 +6673,12 @@ msgstr "Filen er tom."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Filen er over 2 MB. En jobsøgning er ikke så stor."
 
-#: src/postulo/plugins/installing.py:354
+#: src/postulo/plugins/installing.py:394
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "Installationsprogrammet kunne ikke køres: %(error)s"
 
-#: src/postulo/plugins/installing.py:358
+#: src/postulo/plugins/installing.py:398
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "Installationsprogrammet afviste den: %(error)s"
@@ -6787,7 +6808,7 @@ msgstr "Det øverste tal kan ikke være lavere end det nederste."
 msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr "Wheel'en svarer ikke til den kontrolsum, kataloget udgav for den."
 
-#: src/postulo/plugins/installing.py:190
+#: src/postulo/plugins/installing.py:205
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Wheel'en har ingen metadata; den er måske beskadiget."
@@ -6901,7 +6922,7 @@ msgid ""
 msgstr ""
 "Dette er testbeskeden fra din Postulo-notifikationsforbindelse. Påmindelser og indfangninger kommer på samme måde."
 
-#: src/postulo/templates/server/plugins.html:83
+#: src/postulo/templates/server/plugins.html:111
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Det er dette, du er ved at installere. Intet er installeret endnu."
@@ -7243,7 +7264,7 @@ msgstr "Bekræftet"
 msgid "version"
 msgstr "version"
 
-#: src/postulo/templates/server/plugins.html:191
+#: src/postulo/templates/server/plugins.html:226
 #, draft
 msgid "Version"
 msgstr "Version"
@@ -7383,7 +7404,7 @@ msgstr "Hvad det må gøre"
 msgid "what it says"
 msgstr "hvad det siger"
 
-#: src/postulo/templates/server/plugins.html:87
+#: src/postulo/templates/server/plugins.html:115
 #, draft
 msgid "What it says it is"
 msgstr "Hvad den siger, den er"

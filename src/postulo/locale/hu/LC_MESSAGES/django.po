@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:13+0000\n"
+"POT-Creation-Date: 2026-09-06 17:22+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -174,14 +174,14 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s újra bejelentkezhet."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "A(z) %(name)s nem jelent be Postulo-belépési pontot, így a telepítése nem tenne semmit. Egy bővítmény az alábbiak egyike alá regisztrál: %(groups)s."
 
-#: src/postulo/plugins/installing.py:376
+#: src/postulo/plugins/installing.py:416
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr ""
@@ -202,12 +202,12 @@ msgstr "%(name)s eltűnt: a fiók, a rekordjai és %(files)s fájl a lemezről."
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s már nem adminisztrátor."
 
-#: src/postulo/plugins/installing.py:412 src/postulo/plugins/installing.py:466
+#: src/postulo/plugins/installing.py:463 src/postulo/plugins/installing.py:517
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "A(z) %(name)s nincs telepítve."
 
-#: src/postulo/plugins/installing.py:300
+#: src/postulo/plugins/installing.py:315
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -248,7 +248,7 @@ msgid ""
 msgstr ""
 "%(name)s <strong>%(current)s</strong> néven jelentkezik be. Az új felhasználónévnek szabadnak kell lennie ezen a példányon; a nagybetűk nem tesznek különbséget."
 
-#: src/postulo/plugins/installing.py:320
+#: src/postulo/plugins/installing.py:335
 #, python-format, draft
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr ""
@@ -279,7 +279,7 @@ msgstr "%(ok)d válaszolt, %(broken)d nem; amelyek nem, megmondják, miért."
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:286
+#: src/postulo/plugins/installing.py:301
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: %(wanted)s kell neki, a Postulónak pedig %(have)s van."
@@ -347,6 +347,13 @@ msgid "%(total)s highlight"
 msgid_plural "%(total)s highlights"
 msgstr[0] "%(total)s kiemelés"
 msgstr[1] "%(total)s kiemelés"
+
+#: src/postulo/templates/server/plugins.html:65
+#, python-format, draft
+msgid "%(total)s package came with it"
+msgid_plural "%(total)s packages came with it"
+msgstr[0] "%(total)s csomag érkezett vele"
+msgstr[1] "%(total)s csomag érkezett vele"
 
 #: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
 #, python-format, draft
@@ -438,7 +445,7 @@ msgstr "Tipp a felületnek, például „amber” vagy „sky”."
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Egy sor a név alatt a bejelentkezési oldalon. Nem kötelező."
 
-#: src/postulo/templates/server/plugins.html:209
+#: src/postulo/templates/server/plugins.html:244
 #, python-format, draft
 msgid ""
 "A package registers a source under the <code>%(group)s</code> entry-point group. A plugin that only registers entry points appears as soon as it is installed; one that adds pages of its own needs a restart. A source that fails to load is logged and left out, and the built-in ones keep working."
@@ -463,6 +470,13 @@ msgid ""
 msgstr ""
 "Az a bővítmény, amely postafiókot vagy naptárat olvas ön helyett, ide teszi, amit talál, és itt is marad, amíg el nem fogadja vagy el nem utasítja."
 
+#: src/postulo/templates/server/plugins.html:20
+#, draft
+msgid ""
+"A plugin's own file is checked against the checksum its catalogue signed. Its requirements are not: those are fetched from PyPI when it is installed, and are whatever is served that day. Trusting a plugin means trusting its list of requirements too. Postulo installs only built wheels, never a source package that would run its own code while installing, and records everything that arrived."
+msgstr ""
+"A bővítmény saját fájlját a katalógusa által aláírt ellenőrzőösszeg alapján ellenőrizzük. A függőségeit nem: azokat a telepítéskor a PyPI-ról töltjük le, és azok, amit aznap kiszolgálnak. Egy bővítményben megbízni annyit tesz, hogy a függőséglistájában is megbízunk. A Postulo csak megépített csomagokat (wheels) telepít, soha nem forráscsomagot, amely telepítés közben saját kódot futtatna, és feljegyzi mindazt, ami megérkezett."
+
 #: src/postulo/resume/registry.py:71
 #, draft
 msgid ""
@@ -486,7 +500,7 @@ msgstr ""
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Profil a GitHubon, Forgejón, GitLabon vagy hasonlón."
 
-#: src/postulo/templates/server/plugins.html:110
+#: src/postulo/templates/server/plugins.html:145
 #, draft
 msgid ""
 "A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it says about itself and shows you that before anything is installed."
@@ -1108,7 +1122,7 @@ msgstr "törzsszöveg"
 msgid "Bringing a spreadsheet in"
 msgstr "Táblázat behozatala"
 
-#: src/postulo/templates/server/plugins.html:201
+#: src/postulo/templates/server/plugins.html:236
 #, draft
 msgid "built in"
 msgstr "beépített"
@@ -1179,7 +1193,7 @@ msgstr "A szolgáltatónál regisztrálandó visszahívási URL"
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
-#: src/postulo/templates/server/plugins.html:102
+#: src/postulo/templates/server/plugins.html:137
 #, draft
 msgid "Cancel"
 msgstr "Mégse"
@@ -1233,7 +1247,7 @@ msgstr "Rögzítés elvetve."
 msgid "Capture postings"
 msgstr "Hirdetések rögzítése"
 
-#: src/postulo/templates/server/plugins.html:185
+#: src/postulo/templates/server/plugins.html:220
 #, draft
 msgid "Capture sources this instance has"
 msgstr "Ennek a példánynak a rögzítési forrásai"
@@ -1288,7 +1302,7 @@ msgstr "karrieroldal"
 msgid "Careers page"
 msgstr "Karrieroldal"
 
-#: src/postulo/templates/server/plugins.html:123
+#: src/postulo/templates/server/plugins.html:158
 #, draft
 msgid "Catalogues"
 msgstr "Katalógusok"
@@ -1355,7 +1369,7 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Érdeklődés itt: %(company)s, erről: %(role)s"
 
-#: src/postulo/templates/server/plugins.html:133
+#: src/postulo/templates/server/plugins.html:168
 #, draft
 msgid "Check for updates"
 msgstr "Frissítések keresése"
@@ -1380,7 +1394,7 @@ msgstr "Ellenőrizve %(when)s: %(detail)s"
 msgid "checksum"
 msgstr "ellenőrző összeg"
 
-#: src/postulo/templates/server/plugins.html:95
+#: src/postulo/templates/server/plugins.html:130
 #, draft
 msgid "Checksum"
 msgstr "Ellenőrzőösszeg"
@@ -2031,7 +2045,7 @@ msgstr "A fiók törlése"
 msgid "Delete your own account from Settings, not from here."
 msgstr "A saját fiókodat a Beállításokból töröld, ne innen."
 
-#: src/postulo/templates/server/plugins.html:93
+#: src/postulo/templates/server/plugins.html:121
 #, draft
 msgid "Depends on"
 msgstr "Ettől függ"
@@ -2533,6 +2547,13 @@ msgstr "Gravatarom újbóli lekérése"
 msgid "Fetched again."
 msgstr "Újra letöltve."
 
+#: src/postulo/templates/server/plugins.html:126
+#, draft
+msgid ""
+"Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only."
+msgstr ""
+"A telepítéskor a PyPI-ról töltődnek le, mindazzal együtt, amire ők maguk rászorulnak. A fenti ellenőrzőösszeg csak erre a csomagra vonatkozik."
+
 #: src/postulo/resume/models.py:85
 #, draft
 msgid "field of study"
@@ -2920,7 +2941,7 @@ msgstr "kiemelések"
 msgid "highlights for this CV"
 msgstr "kiemelések ehhez az önéletrajzhoz"
 
-#: src/postulo/templates/server/plugins.html:90
+#: src/postulo/templates/server/plugins.html:118
 #, draft
 msgid "Home page"
 msgstr "Honlap"
@@ -3165,17 +3186,17 @@ msgstr "Informatika"
 msgid "Insights"
 msgstr "Elemzések"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Install"
 msgstr "Telepítés"
 
-#: src/postulo/templates/server/plugins.html:79
+#: src/postulo/templates/server/plugins.html:107
 #, draft
 msgid "Install a package"
 msgstr "Csomag telepítése"
 
-#: src/postulo/templates/server/plugins.html:101
+#: src/postulo/templates/server/plugins.html:136
 #, draft
 msgid "Install it"
 msgstr "Telepítsd"
@@ -3187,7 +3208,7 @@ msgid ""
 msgstr ""
 "Telepítés: uv sync --extra chromium, majd: uv run playwright install chromium"
 
-#: src/postulo/templates/server/plugins.html:22
+#: src/postulo/templates/server/plugins.html:31
 #, draft
 msgid "Installed on this instance"
 msgstr "Ezen a példányon telepítve"
@@ -3580,7 +3601,7 @@ msgstr "Levelek"
 msgid "letters"
 msgstr "levelek"
 
-#: src/postulo/templates/server/plugins.html:88
+#: src/postulo/templates/server/plugins.html:116
 #, draft
 msgid "Licence"
 msgstr "Licenc"
@@ -3739,7 +3760,7 @@ msgstr "fő kapcsolattartó"
 msgid "Main contact"
 msgstr "Fő kapcsolattartó"
 
-#: src/postulo/templates/server/plugins.html:89
+#: src/postulo/templates/server/plugins.html:117
 #, draft
 msgid "Maintainer"
 msgstr "Karbantartó"
@@ -3897,7 +3918,7 @@ msgstr "Feljebb"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
 #: src/postulo/templates/server/people.html:20
-#: src/postulo/templates/server/plugins.html:86
+#: src/postulo/templates/server/plugins.html:114
 #, draft
 msgid "Name"
 msgstr "Név"
@@ -4041,7 +4062,7 @@ msgstr "Nincs beállítva „%(name)s” nevű katalógus."
 msgid "No catalogue is configured on this instance."
 msgstr "Ezen a példányon nincs beállítva katalógus."
 
-#: src/postulo/templates/server/plugins.html:169
+#: src/postulo/templates/server/plugins.html:204
 #, draft
 msgid ""
 "No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
@@ -4246,7 +4267,7 @@ msgstr "Nem nekem való"
 msgid "Not found"
 msgstr "Nem található"
 
-#: src/postulo/templates/server/plugins.html:35
+#: src/postulo/templates/server/plugins.html:44
 #, draft
 msgid "not loaded"
 msgstr "nincs betöltve"
@@ -4315,7 +4336,7 @@ msgstr "Jegyzetek"
 msgid "notes"
 msgstr "jegyzetek"
 
-#: src/postulo/templates/server/plugins.html:94
+#: src/postulo/templates/server/plugins.html:123
 #, draft
 msgid "nothing"
 msgstr "semmi"
@@ -4354,7 +4375,7 @@ msgid ""
 msgstr ""
 "Semmi sincs a naptárban. Amikor felajánlanak egyet, tűzd ki a jelentkezés oldaláról."
 
-#: src/postulo/templates/server/plugins.html:71
+#: src/postulo/templates/server/plugins.html:99
 #, python-format, draft
 msgid ""
 "Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
@@ -4501,7 +4522,7 @@ msgid "notified on"
 msgstr "értesítve ekkor"
 
 #: src/postulo/templates/connections/list.html:26
-#: src/postulo/templates/server/plugins.html:32
+#: src/postulo/templates/server/plugins.html:41
 #, draft
 msgid "Off"
 msgstr "Ki"
@@ -4674,7 +4695,7 @@ msgstr "sorrend"
 msgid "organisation"
 msgstr "szervezet"
 
-#: src/postulo/templates/server/plugins.html:192
+#: src/postulo/templates/server/plugins.html:227
 #, draft
 msgid "Origin"
 msgstr "Eredet"
@@ -4729,7 +4750,7 @@ msgstr "Áttekintés"
 msgid "owner"
 msgstr "tulajdonos"
 
-#: src/postulo/templates/server/plugins.html:115
+#: src/postulo/templates/server/plugins.html:150
 #, draft
 msgid "Package"
 msgstr "Csomag"
@@ -5049,7 +5070,7 @@ msgstr "felkészülési jegyzetek"
 msgid "present"
 msgstr "jelenleg"
 
-#: src/postulo/templates/server/plugins.html:162
+#: src/postulo/templates/server/plugins.html:197
 #, draft
 msgid ""
 "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
@@ -5131,7 +5152,7 @@ msgstr "projektek"
 msgid "Provider"
 msgstr "Szolgáltató"
 
-#: src/postulo/templates/server/plugins.html:91
+#: src/postulo/templates/server/plugins.html:119
 #, draft
 msgid "Provides"
 msgstr "Nyújtja"
@@ -5255,7 +5276,7 @@ msgid ""
 msgstr ""
 "Az idővonalból olvasva, így az elutasítással végződő interjú is interjúnak számít."
 
-#: src/postulo/templates/server/plugins.html:118
+#: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
 msgstr "Olvasd be"
@@ -5392,7 +5413,7 @@ msgstr "regisztráció nyitva"
 msgid "Registration open"
 msgstr "Regisztráció nyitva"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Reinstall"
 msgstr "Újratelepítés"
@@ -5446,7 +5467,7 @@ msgstr "távoli cím"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
-#: src/postulo/templates/server/plugins.html:62
+#: src/postulo/templates/server/plugins.html:90
 #, draft
 msgid "Remove"
 msgstr "Eltávolítás"
@@ -5883,7 +5904,7 @@ msgstr "Szerver"
 msgid "Server settings"
 msgstr "Szerverbeállítások"
 
-#: src/postulo/templates/server/plugins.html:175
+#: src/postulo/templates/server/plugins.html:210
 #, draft
 msgid ""
 "Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code> entries, separated by commas. The index must be signed with that key, and every wheel must match the checksum the signed index carries, or nothing is installed."
@@ -6106,7 +6127,7 @@ msgstr ""
 "Aki ezen a szolgáltatón keresztül érkezik, abba a fiókba jelentkezik be, amelyhez a megadott cím tartozik, feltéve hogy a szolgáltató szerint a cím megerősített. Egy kérdést tehát érdemes megválaszolni: ez a szolgáltató csak akkor nevez egy címet megerősítettnek, ha a személy bizonyította, hogy az övé? Ha Ön üzemelteti, szinte biztosan. Ha másé, ellenőrizze, mielőtt rá hagyatkozik. Állítsa a POSTULO_OIDC_LINK_BY_EMAIL értékét false-ra, hogy mindenkinek egyszer be kelljen jelentkeznie itt, és a saját fiókoldaláról kelljen összekapcsolnia a szolgáltatót."
 
 #: src/postulo/templates/applications/insights.html:143
-#: src/postulo/templates/server/plugins.html:190
+#: src/postulo/templates/server/plugins.html:225
 #, draft
 msgid "Source"
 msgstr "Forrás"
@@ -6269,12 +6290,12 @@ msgstr "felváltva"
 msgid "Supersedes"
 msgstr "Ezt váltja fel"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
 msgstr "Kikapcsolás"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch on"
 msgstr "Bekapcsolás"
@@ -6480,7 +6501,7 @@ msgstr "Ez SVG, amit a Postulo még nem őriz meg. PNG vagy JPEG megfelel."
 msgid "That is not a status Postulo recognises."
 msgstr "Ez nem olyan állapot, amelyet a Postulo ismer."
 
-#: src/postulo/plugins/installing.py:185
+#: src/postulo/plugins/installing.py:200
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Ez nem wheel: a Postulo .whl fájlokat telepít."
@@ -6662,12 +6683,12 @@ msgstr "A fájl üres."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "A fájl nagyobb 2 MB-nál. Egy álláskeresés nem ekkora."
 
-#: src/postulo/plugins/installing.py:354
+#: src/postulo/plugins/installing.py:394
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "A telepítőt nem sikerült futtatni: %(error)s"
 
-#: src/postulo/plugins/installing.py:358
+#: src/postulo/plugins/installing.py:398
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "A telepítő elutasította: %(error)s"
@@ -6800,7 +6821,7 @@ msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr ""
 "A wheel nem egyezik azzal az ellenőrzőösszeggel, amelyet a katalógus közzétett hozzá."
 
-#: src/postulo/plugins/installing.py:190
+#: src/postulo/plugins/installing.py:205
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "A wheelnek nincsenek metaadatai; lehet, hogy sérült."
@@ -6915,7 +6936,7 @@ msgid ""
 msgstr ""
 "Ez a Postulo értesítési kapcsolatod tesztüzenete. Az emlékeztetők és a rögzítések ugyanígy fognak érkezni."
 
-#: src/postulo/templates/server/plugins.html:83
+#: src/postulo/templates/server/plugins.html:111
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Ezt készül telepíteni. Még semmi sem lett telepítve."
@@ -7258,7 +7279,7 @@ msgstr "Ellenőrizve"
 msgid "version"
 msgstr "verzió"
 
-#: src/postulo/templates/server/plugins.html:191
+#: src/postulo/templates/server/plugins.html:226
 #, draft
 msgid "Version"
 msgstr "Verzió"
@@ -7398,7 +7419,7 @@ msgstr "Mit tehet"
 msgid "what it says"
 msgstr "mit mond"
 
-#: src/postulo/templates/server/plugins.html:87
+#: src/postulo/templates/server/plugins.html:115
 #, draft
 msgid "What it says it is"
 msgstr "Aminek mondja magát"

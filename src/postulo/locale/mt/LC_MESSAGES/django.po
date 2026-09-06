@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:13+0000\n"
+"POT-Creation-Date: 2026-09-06 17:22+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Malti\n"
@@ -198,14 +198,14 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s jista' jerġa' jidħol."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s ma jiddikjara l-ebda punt ta' dħul ta' Postulo, allura li tinstallah ma jagħmel xejn. Plugin jirreġistra taħt wieħed minn: %(groups)s."
 
-#: src/postulo/plugins/installing.py:376
+#: src/postulo/plugins/installing.py:416
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s ma jaqbilx mas-somma ta' kontroll li biha ġie ppubblikat."
@@ -226,12 +226,12 @@ msgstr ""
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s m'għadux amministratur."
 
-#: src/postulo/plugins/installing.py:412 src/postulo/plugins/installing.py:466
+#: src/postulo/plugins/installing.py:463 src/postulo/plugins/installing.py:517
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s mhux installat."
 
-#: src/postulo/plugins/installing.py:300
+#: src/postulo/plugins/installing.py:315
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -272,7 +272,7 @@ msgid ""
 msgstr ""
 "%(name)s jidħol bħala <strong>%(current)s</strong>. L-isem tal-utent il-ġdid irid ikun ħieles f'din l-istanza; l-ittri kbar ma jagħmluhx differenti."
 
-#: src/postulo/plugins/installing.py:320
+#: src/postulo/plugins/installing.py:335
 #, python-format, draft
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s ibiddel dak li Postulo nnifsu jiddependi minnu. %(problems)s"
@@ -302,7 +302,7 @@ msgstr "%(ok)d wieġbu, %(broken)d le; dawk li ma wieġbux jgħidu għaliex."
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:286
+#: src/postulo/plugins/installing.py:301
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: jeħtieġ %(wanted)s, u Postulo għandu %(have)s."
@@ -377,6 +377,15 @@ msgstr[0] "%(total)s punt ewlieni"
 msgstr[1] "%(total)s punti ewlenin"
 msgstr[2] "%(total)s punt ewlieni"
 msgstr[3] "%(total)s punt ewlieni"
+
+#: src/postulo/templates/server/plugins.html:65
+#, python-format, draft
+msgid "%(total)s package came with it"
+msgid_plural "%(total)s packages came with it"
+msgstr[0] "Ġie miegħu %(total)s pakkett"
+msgstr[1] "Ġew miegħu %(total)s pakketti"
+msgstr[2] "Ġew miegħu %(total)s pakketti"
+msgstr[3] "Ġew miegħu %(total)s pakkett"
 
 #: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
 #, python-format, draft
@@ -468,7 +477,7 @@ msgstr "Ħjiel għall-interfaċċa, bħal “amber” jew “sky”."
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Linja taħt l-isem fil-paġna tal-login. Fakultattiv."
 
-#: src/postulo/templates/server/plugins.html:209
+#: src/postulo/templates/server/plugins.html:244
 #, python-format, draft
 msgid ""
 "A package registers a source under the <code>%(group)s</code> entry-point group. A plugin that only registers entry points appears as soon as it is installed; one that adds pages of its own needs a restart. A source that fails to load is logged and left out, and the built-in ones keep working."
@@ -497,6 +506,13 @@ msgid ""
 msgstr ""
 "Plugin li jaqra kaxxa postali jew kalendarju għalik iħalli hawn dak li jsib, u jibqa' hawn sakemm taċċettah jew tirrifjutah."
 
+#: src/postulo/templates/server/plugins.html:20
+#, draft
+msgid ""
+"A plugin's own file is checked against the checksum its catalogue signed. Its requirements are not: those are fetched from PyPI when it is installed, and are whatever is served that day. Trusting a plugin means trusting its list of requirements too. Postulo installs only built wheels, never a source package that would run its own code while installing, and records everything that arrived."
+msgstr ""
+"Il-fajl tal-plugin innifsu jiġi vverifikat kontra l-checksum iffirmat mill-katalgu tiegħu. Ir-rekwiżiti tiegħu le: dawk jinġiebu minn PyPI meta jiġi installat, u huma dak li jiġi servut dakinhar. Li tafda plugin ifisser li tafda wkoll il-lista tar-rekwiżiti tiegħu. Postulo jinstalla biss pakketti mibnija (wheels), qatt pakkett tas-sors li jħaddem il-kodiċi tiegħu waqt l-installazzjoni, u jżomm rekord ta’ dak kollu li wasal."
+
 #: src/postulo/resume/registry.py:71
 #, draft
 msgid ""
@@ -520,7 +536,7 @@ msgstr ""
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Profil fuq GitHub, Forgejo, GitLab jew simili."
 
-#: src/postulo/templates/server/plugins.html:110
+#: src/postulo/templates/server/plugins.html:145
 #, draft
 msgid ""
 "A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it says about itself and shows you that before anything is installed."
@@ -1145,7 +1161,7 @@ msgstr "korp"
 msgid "Bringing a spreadsheet in"
 msgstr "Iddaħħal spreadsheet"
 
-#: src/postulo/templates/server/plugins.html:201
+#: src/postulo/templates/server/plugins.html:236
 #, draft
 msgid "built in"
 msgstr "inkorporat"
@@ -1216,7 +1232,7 @@ msgstr "URL ta' callback biex tirreġistra mal-fornitur"
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
-#: src/postulo/templates/server/plugins.html:102
+#: src/postulo/templates/server/plugins.html:137
 #, draft
 msgid "Cancel"
 msgstr "Ikkanċella"
@@ -1270,7 +1286,7 @@ msgstr "Qbid skartat."
 msgid "Capture postings"
 msgstr "Aqbad avviżi"
 
-#: src/postulo/templates/server/plugins.html:185
+#: src/postulo/templates/server/plugins.html:220
 #, draft
 msgid "Capture sources this instance has"
 msgstr "Sorsi ta' qbid ta' din l-istanza"
@@ -1325,7 +1341,7 @@ msgstr "paġna tal-karrieri"
 msgid "Careers page"
 msgstr "Paġna tal-karrieri"
 
-#: src/postulo/templates/server/plugins.html:123
+#: src/postulo/templates/server/plugins.html:158
 #, draft
 msgid "Catalogues"
 msgstr "Katalgi"
@@ -1392,7 +1408,7 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Segwi ma' %(company)s dwar %(role)s"
 
-#: src/postulo/templates/server/plugins.html:133
+#: src/postulo/templates/server/plugins.html:168
 #, draft
 msgid "Check for updates"
 msgstr "Iċċekkja għal aġġornamenti"
@@ -1417,7 +1433,7 @@ msgstr "Iċċekkjat %(when)s: %(detail)s"
 msgid "checksum"
 msgstr "checksum"
 
-#: src/postulo/templates/server/plugins.html:95
+#: src/postulo/templates/server/plugins.html:130
 #, draft
 msgid "Checksum"
 msgstr "Somma ta' kontroll"
@@ -2068,7 +2084,7 @@ msgstr "Ħassar il-kont"
 msgid "Delete your own account from Settings, not from here."
 msgstr "Ħassar il-kont tiegħek stess minn Settings, mhux minn hawn."
 
-#: src/postulo/templates/server/plugins.html:93
+#: src/postulo/templates/server/plugins.html:121
 #, draft
 msgid "Depends on"
 msgstr "Jiddependi minn"
@@ -2569,6 +2585,13 @@ msgstr "Erġa' ġib il-Gravatar tiegħi"
 msgid "Fetched again."
 msgstr "Miksub mill-ġdid."
 
+#: src/postulo/templates/server/plugins.html:126
+#, draft
+msgid ""
+"Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only."
+msgstr ""
+"Jinġiebu minn PyPI meta dan jiġi installat, flimkien ma’ dak kollu li jeħtieġu huma stess. Il-checksum ta’ hawn fuq ikopri dan il-pakkett biss."
+
 #: src/postulo/resume/models.py:85
 #, draft
 msgid "field of study"
@@ -2956,7 +2979,7 @@ msgstr "punti ewlenin"
 msgid "highlights for this CV"
 msgstr "punti ewlenin għal dan is-CV"
 
-#: src/postulo/templates/server/plugins.html:90
+#: src/postulo/templates/server/plugins.html:118
 #, draft
 msgid "Home page"
 msgstr "Paġna ewlenija"
@@ -3201,17 +3224,17 @@ msgstr "Teknoloġija tal-informazzjoni"
 msgid "Insights"
 msgstr "Analiżi"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Install"
 msgstr "Installa"
 
-#: src/postulo/templates/server/plugins.html:79
+#: src/postulo/templates/server/plugins.html:107
 #, draft
 msgid "Install a package"
 msgstr "Installa pakkett"
 
-#: src/postulo/templates/server/plugins.html:101
+#: src/postulo/templates/server/plugins.html:136
 #, draft
 msgid "Install it"
 msgstr "Installah"
@@ -3223,7 +3246,7 @@ msgid ""
 msgstr ""
 "Installah b': uv sync --extra chromium, imbagħad: uv run playwright install chromium"
 
-#: src/postulo/templates/server/plugins.html:22
+#: src/postulo/templates/server/plugins.html:31
 #, draft
 msgid "Installed on this instance"
 msgstr "Installat fuq din l-istanza"
@@ -3616,7 +3639,7 @@ msgstr "Ittri"
 msgid "letters"
 msgstr "ittri"
 
-#: src/postulo/templates/server/plugins.html:88
+#: src/postulo/templates/server/plugins.html:116
 #, draft
 msgid "Licence"
 msgstr "Liċenzja"
@@ -3775,7 +3798,7 @@ msgstr "kuntatt ewlieni"
 msgid "Main contact"
 msgstr "Kuntatt ewlieni"
 
-#: src/postulo/templates/server/plugins.html:89
+#: src/postulo/templates/server/plugins.html:117
 #, draft
 msgid "Maintainer"
 msgstr "Manutenzjoni"
@@ -3933,7 +3956,7 @@ msgstr "Ċaqlaq 'il fuq"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
 #: src/postulo/templates/server/people.html:20
-#: src/postulo/templates/server/plugins.html:86
+#: src/postulo/templates/server/plugins.html:114
 #, draft
 msgid "Name"
 msgstr "Isem"
@@ -4077,7 +4100,7 @@ msgstr "M'hemm l-ebda katalgu bl-isem “%(name)s” konfigurat."
 msgid "No catalogue is configured on this instance."
 msgstr "Fuq din l-istanza m'hemm l-ebda katalgu konfigurat."
 
-#: src/postulo/templates/server/plugins.html:169
+#: src/postulo/templates/server/plugins.html:204
 #, draft
 msgid ""
 "No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
@@ -4282,7 +4305,7 @@ msgstr "Mhux għalija"
 msgid "Not found"
 msgstr "Ma nstabx"
 
-#: src/postulo/templates/server/plugins.html:35
+#: src/postulo/templates/server/plugins.html:44
 #, draft
 msgid "not loaded"
 msgstr "mhux mgħobbi"
@@ -4351,7 +4374,7 @@ msgstr "Noti"
 msgid "notes"
 msgstr "noti"
 
-#: src/postulo/templates/server/plugins.html:94
+#: src/postulo/templates/server/plugins.html:123
 #, draft
 msgid "nothing"
 msgstr "xejn"
@@ -4390,7 +4413,7 @@ msgid ""
 msgstr ""
 "Xejn fid-djarju. Meta tiġi offruta waħda, skedaha mill-paġna tal-applikazzjoni."
 
-#: src/postulo/templates/server/plugins.html:71
+#: src/postulo/templates/server/plugins.html:99
 #, python-format, draft
 msgid ""
 "Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
@@ -4537,7 +4560,7 @@ msgid "notified on"
 msgstr "notifikat fi"
 
 #: src/postulo/templates/connections/list.html:26
-#: src/postulo/templates/server/plugins.html:32
+#: src/postulo/templates/server/plugins.html:41
 #, draft
 msgid "Off"
 msgstr "Mitfi"
@@ -4713,7 +4736,7 @@ msgstr "ordni"
 msgid "organisation"
 msgstr "organizzazzjoni"
 
-#: src/postulo/templates/server/plugins.html:192
+#: src/postulo/templates/server/plugins.html:227
 #, draft
 msgid "Origin"
 msgstr "Oriġini"
@@ -4768,7 +4791,7 @@ msgstr "Ħarsa ġenerali"
 msgid "owner"
 msgstr "sid"
 
-#: src/postulo/templates/server/plugins.html:115
+#: src/postulo/templates/server/plugins.html:150
 #, draft
 msgid "Package"
 msgstr "Pakkett"
@@ -5087,7 +5110,7 @@ msgstr "noti ta' preparazzjoni"
 msgid "present"
 msgstr "preżent"
 
-#: src/postulo/templates/server/plugins.html:162
+#: src/postulo/templates/server/plugins.html:197
 #, draft
 msgid ""
 "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
@@ -5169,7 +5192,7 @@ msgstr "proġetti"
 msgid "Provider"
 msgstr "Fornitur"
 
-#: src/postulo/templates/server/plugins.html:91
+#: src/postulo/templates/server/plugins.html:119
 #, draft
 msgid "Provides"
 msgstr "Jipprovdi"
@@ -5296,7 +5319,7 @@ msgid ""
 msgstr ""
 "Moqri mill-kronoloġija, għalhekk intervista li spiċċat f'rifjut xorta tgħodd bħala intervista."
 
-#: src/postulo/templates/server/plugins.html:118
+#: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
 msgstr "Aqrah"
@@ -5432,7 +5455,7 @@ msgstr "reġistrazzjoni miftuħa"
 msgid "Registration open"
 msgstr "Reġistrazzjoni miftuħa"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Reinstall"
 msgstr "Installa mill-ġdid"
@@ -5486,7 +5509,7 @@ msgstr "indirizz remot"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
-#: src/postulo/templates/server/plugins.html:62
+#: src/postulo/templates/server/plugins.html:90
 #, draft
 msgid "Remove"
 msgstr "Neħħi"
@@ -5924,7 +5947,7 @@ msgstr "Server"
 msgid "Server settings"
 msgstr "Settings tas-server"
 
-#: src/postulo/templates/server/plugins.html:175
+#: src/postulo/templates/server/plugins.html:210
 #, draft
 msgid ""
 "Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code> entries, separated by commas. The index must be signed with that key, and every wheel must match the checksum the signed index carries, or nothing is installed."
@@ -6147,7 +6170,7 @@ msgstr ""
 "Min jasal permezz ta’ dan il-fornitur jidħol fil-kont li għandu l-indirizz mogħti, sakemm il-fornitur jgħid li l-indirizz huwa vverifikat. Għalhekk mistoqsija waħda tistħoqq tweġiba: dan il-fornitur isejjaħ indirizz ivverifikat biss meta l-persuna tkun ipprovat li huwa tagħha? Jekk tħaddmu int, kważi żgur. Jekk huwa ta’ ħaddieħor, iċċekkja qabel toqgħod fuqu. Issettja POSTULO_OIDC_LINK_BY_EMAIL għal false biex kulħadd ikollu jidħol hawn darba u jgħaqqad il-fornitur mill-paġna tal-kont tiegħu."
 
 #: src/postulo/templates/applications/insights.html:143
-#: src/postulo/templates/server/plugins.html:190
+#: src/postulo/templates/server/plugins.html:225
 #, draft
 msgid "Source"
 msgstr "Sors"
@@ -6310,12 +6333,12 @@ msgstr "sostitwit"
 msgid "Supersedes"
 msgstr "Jissostitwixxi"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
 msgstr "Itfi"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch on"
 msgstr "Ixgħel"
@@ -6520,7 +6543,7 @@ msgstr "Dak huwa SVG, li Postulo għadu ma jżommx. PNG jew JPEG jaħdem."
 msgid "That is not a status Postulo recognises."
 msgstr "Dak mhuwiex status li Postulo jagħraf."
 
-#: src/postulo/plugins/installing.py:185
+#: src/postulo/plugins/installing.py:200
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Dak mhuwiex wheel: Postulo jinstalla fajls .whl."
@@ -6704,12 +6727,12 @@ msgid "The file is over 2 MB. A job search is not that big."
 msgstr ""
 "Il-fajl huwa aktar minn 2 MB. Tfittxija għax-xogħol mhijiex daqshekk kbira."
 
-#: src/postulo/plugins/installing.py:354
+#: src/postulo/plugins/installing.py:394
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "L-installatur ma setax jitħaddem: %(error)s"
 
-#: src/postulo/plugins/installing.py:358
+#: src/postulo/plugins/installing.py:398
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "L-installatur irrifjutah: %(error)s"
@@ -6840,7 +6863,7 @@ msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr ""
 "Il-wheel ma jaqbilx mas-somma ta' kontroll li ppubblika għalih il-katalgu."
 
-#: src/postulo/plugins/installing.py:190
+#: src/postulo/plugins/installing.py:205
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Il-wheel m'għandux metadata; jista' jkun bil-ħsara."
@@ -6959,7 +6982,7 @@ msgid ""
 msgstr ""
 "Dan huwa l-messaġġ ta' prova mill-konnessjoni tan-notifiki ta' Postulo tiegħek. Tfakkiriet u qbidiet jaslu bl-istess mod."
 
-#: src/postulo/templates/server/plugins.html:83
+#: src/postulo/templates/server/plugins.html:111
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Dan hu li se tinstalla. Għadu ma ġie installat xejn."
@@ -7302,7 +7325,7 @@ msgstr "Verifikat"
 msgid "version"
 msgstr "verżjoni"
 
-#: src/postulo/templates/server/plugins.html:191
+#: src/postulo/templates/server/plugins.html:226
 #, draft
 msgid "Version"
 msgstr "Verżjoni"
@@ -7442,7 +7465,7 @@ msgstr "X'jista' jagħmel"
 msgid "what it says"
 msgstr "x'tgħid"
 
-#: src/postulo/templates/server/plugins.html:87
+#: src/postulo/templates/server/plugins.html:115
 #, draft
 msgid "What it says it is"
 msgstr "X'jgħid li hu"

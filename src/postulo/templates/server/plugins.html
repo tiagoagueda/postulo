@@ -16,6 +16,15 @@
         automatically: an update is a code change, and an administrator clicks it.
       {% endblocktranslate %}
     </p>
+    <p class="mt-2 text-sm">
+      {% blocktranslate trimmed %}
+        A plugin's own file is checked against the checksum its catalogue signed. Its
+        requirements are not: those are fetched from PyPI when it is installed, and are
+        whatever is served that day. Trusting a plugin means trusting its list of
+        requirements too. Postulo installs only built wheels, never a source package that
+        would run its own code while installing, and records everything that arrived.
+      {% endblocktranslate %}
+    </p>
   </div>
 
   {# ------------------------------------------------------------ installed #}
@@ -44,6 +53,24 @@
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   {% for point in plugin.entry_points %}<code>{{ point }}</code>{% if not forloop.last %} · {% endif %}{% endfor %}
                 </p>
+              {% endif %}
+              {% comment %} What came with it, rather than what it said it needed: a
+                 requirement of a requirement never appears in a wheel's metadata, and this
+                 is the only place an administrator can see the difference without a shell.
+              {% endcomment %}
+              {% if plugin.dependencies %}
+                <details class="mt-1" data-dependencies="{{ plugin.name }}">
+                  <summary class="cursor-pointer text-xs text-ink-500 dark:text-ink-400">
+                    {% blocktranslate count total=plugin.dependencies|length trimmed %}
+                      {{ total }} package came with it
+                    {% plural %}
+                      {{ total }} packages came with it
+                    {% endblocktranslate %}
+                  </summary>
+                  <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+                    {% for requirement in plugin.dependencies %}<code>{{ requirement }}</code>{% if not forloop.last %} · {% endif %}{% endfor %}
+                  </p>
+                </details>
               {% endif %}
             </div>
             <div class="flex items-center gap-1">
@@ -91,7 +118,14 @@
         <dt class="text-ink-500 dark:text-ink-400">{% translate "Provides" %}</dt>
         <dd>{% for point in pending.entry_points %}<code class="text-xs">{{ point }}</code>{% if not forloop.last %} · {% endif %}{% empty %}—{% endfor %}</dd>
         <dt class="text-ink-500 dark:text-ink-400">{% translate "Depends on" %}</dt>
-        <dd>{% for requirement in pending.requires %}{{ requirement }}{% if not forloop.last %}, {% endif %}{% empty %}{% translate "nothing" %}{% endfor %}</dd>
+        <dd>
+          {% for requirement in pending.requires %}{{ requirement }}{% if not forloop.last %}, {% endif %}{% empty %}{% translate "nothing" %}{% endfor %}
+          {% if pending.requires %}
+            <span class="block text-xs text-ink-500 dark:text-ink-400">
+              {% translate "Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only." %}
+            </span>
+          {% endif %}
+        </dd>
         <dt class="text-ink-500 dark:text-ink-400">{% translate "Checksum" %}</dt><dd><code class="text-xs">{{ pending.sha256 }}</code></dd>
       </dl>
       <form method="post" action="{% url 'server:plugin_action' %}">

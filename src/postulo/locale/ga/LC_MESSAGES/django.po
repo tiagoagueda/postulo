@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:13+0000\n"
+"POT-Creation-Date: 2026-09-06 17:22+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -210,14 +210,14 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "Is féidir le %(name)s síniú isteach arís."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "Ní dhearbhaíonn %(name)s aon phointe iontrála Postulo, mar sin ní dhéanfadh a shuiteáil aon rud. Cláraíonn breiseán faoi cheann de: %(groups)s."
 
-#: src/postulo/plugins/installing.py:376
+#: src/postulo/plugins/installing.py:416
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "Ní ionann %(name)s agus an tsuim sheiceála lena bhfoilsíodh é."
@@ -239,12 +239,12 @@ msgstr ""
 msgid "%(name)s is no longer an administrator."
 msgstr "Ní riarthóir é/í %(name)s a thuilleadh."
 
-#: src/postulo/plugins/installing.py:412 src/postulo/plugins/installing.py:466
+#: src/postulo/plugins/installing.py:463 src/postulo/plugins/installing.py:517
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "Níl %(name)s suiteáilte."
 
-#: src/postulo/plugins/installing.py:300
+#: src/postulo/plugins/installing.py:315
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -285,7 +285,7 @@ msgid ""
 msgstr ""
 "Síníonn %(name)s isteach mar <strong>%(current)s</strong>. Caithfidh an t-ainm úsáideora nua a bheith saor ar an ásc seo; ní dhéanann ceannlitreacha difear."
 
-#: src/postulo/plugins/installing.py:320
+#: src/postulo/plugins/installing.py:335
 #, python-format, draft
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "D'athródh %(name)s an méid a bhraitheann Postulo féin air. %(problems)s"
@@ -316,7 +316,7 @@ msgstr ""
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:286
+#: src/postulo/plugins/installing.py:301
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: teastaíonn %(wanted)s uaidh, agus tá %(have)s ag Postulo."
@@ -396,6 +396,16 @@ msgstr[1] "%(total)s bhuaicphointe"
 msgstr[2] "%(total)s bhuaicphointe"
 msgstr[3] "%(total)s mbuaicphointe"
 msgstr[4] "%(total)s buaicphointe"
+
+#: src/postulo/templates/server/plugins.html:65
+#, python-format, draft
+msgid "%(total)s package came with it"
+msgid_plural "%(total)s packages came with it"
+msgstr[0] "Tháinig %(total)s pacáiste leis"
+msgstr[1] "Tháinig %(total)s phacáiste leis"
+msgstr[2] "Tháinig %(total)s pacáiste leis"
+msgstr[3] "Tháinig %(total)s bpacáiste leis"
+msgstr[4] "Tháinig %(total)s pacáiste leis"
 
 #: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
 #, python-format, draft
@@ -487,7 +497,7 @@ msgstr "Leid don chomhéadan, mar “amber” nó “sky”."
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Líne faoin ainm ar an leathanach sínithe isteach. Roghnach."
 
-#: src/postulo/templates/server/plugins.html:209
+#: src/postulo/templates/server/plugins.html:244
 #, python-format, draft
 msgid ""
 "A package registers a source under the <code>%(group)s</code> entry-point group. A plugin that only registers entry points appears as soon as it is installed; one that adds pages of its own needs a restart. A source that fails to load is logged and left out, and the built-in ones keep working."
@@ -518,6 +528,13 @@ msgid ""
 msgstr ""
 "Fágann breiseán a léann bosca poist nó féilire duit an méid a aimsíonn sé anseo, agus fanann sé anseo go dtí go nglacann tú leis nó go ndiúltaíonn tú dó."
 
+#: src/postulo/templates/server/plugins.html:20
+#, draft
+msgid ""
+"A plugin's own file is checked against the checksum its catalogue signed. Its requirements are not: those are fetched from PyPI when it is installed, and are whatever is served that day. Trusting a plugin means trusting its list of requirements too. Postulo installs only built wheels, never a source package that would run its own code while installing, and records everything that arrived."
+msgstr ""
+"Seiceáiltear comhad an bhreiseáin féin i gcoinne na suime seiceála a shínigh a chatalóg. Ní sheiceáiltear a chuid riachtanas: faightear iad sin ó PyPI nuair a shuiteáiltear é, agus is iad an rud a fhreastalaítear an lá sin. Ciallaíonn muinín a chur i mbreiseán muinín a chur ina liosta riachtanas freisin. Ní shuiteálann Postulo ach pacáistí tógtha (wheels), riamh pacáiste foinseach a rithfeadh a chód féin le linn suiteála, agus coinníonn sé taifead ar gach ar tháinig."
+
 #: src/postulo/resume/registry.py:71
 #, draft
 msgid ""
@@ -541,7 +558,7 @@ msgstr ""
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Próifíl ar GitHub, Forgejo, GitLab nó a leithéid."
 
-#: src/postulo/templates/server/plugins.html:110
+#: src/postulo/templates/server/plugins.html:145
 #, draft
 msgid ""
 "A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it says about itself and shows you that before anything is installed."
@@ -1168,7 +1185,7 @@ msgstr "corp"
 msgid "Bringing a spreadsheet in"
 msgstr "Scarbhileog a thabhairt isteach"
 
-#: src/postulo/templates/server/plugins.html:201
+#: src/postulo/templates/server/plugins.html:236
 #, draft
 msgid "built in"
 msgstr "ionsuite"
@@ -1239,7 +1256,7 @@ msgstr "URL aisghlaoch le clárú leis"
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
-#: src/postulo/templates/server/plugins.html:102
+#: src/postulo/templates/server/plugins.html:137
 #, draft
 msgid "Cancel"
 msgstr "Cealaigh"
@@ -1293,7 +1310,7 @@ msgstr "Gabháil caite i leataobh."
 msgid "Capture postings"
 msgstr "Gabh fógraí"
 
-#: src/postulo/templates/server/plugins.html:185
+#: src/postulo/templates/server/plugins.html:220
 #, draft
 msgid "Capture sources this instance has"
 msgstr "Foinsí gabhála an ásc seo"
@@ -1348,7 +1365,7 @@ msgstr "leathanach gairmeacha"
 msgid "Careers page"
 msgstr "Leathanach gairmeacha"
 
-#: src/postulo/templates/server/plugins.html:123
+#: src/postulo/templates/server/plugins.html:158
 #, draft
 msgid "Catalogues"
 msgstr "Catalóga"
@@ -1415,7 +1432,7 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Cuir tuairisc ar %(company)s faoi %(role)s"
 
-#: src/postulo/templates/server/plugins.html:133
+#: src/postulo/templates/server/plugins.html:168
 #, draft
 msgid "Check for updates"
 msgstr "Seiceáil le haghaidh nuashonruithe"
@@ -1440,7 +1457,7 @@ msgstr "Seiceáilte %(when)s: %(detail)s"
 msgid "checksum"
 msgstr "suim sheiceála"
 
-#: src/postulo/templates/server/plugins.html:95
+#: src/postulo/templates/server/plugins.html:130
 #, draft
 msgid "Checksum"
 msgstr "Suim sheiceála"
@@ -2091,7 +2108,7 @@ msgstr "Scrios an cuntas"
 msgid "Delete your own account from Settings, not from here."
 msgstr "Scrios do chuntas féin ó Shocruithe, ní ó anseo."
 
-#: src/postulo/templates/server/plugins.html:93
+#: src/postulo/templates/server/plugins.html:121
 #, draft
 msgid "Depends on"
 msgstr "Ag brath ar"
@@ -2593,6 +2610,13 @@ msgstr "Faigh mo Gravatar arís"
 msgid "Fetched again."
 msgstr "Faighte arís."
 
+#: src/postulo/templates/server/plugins.html:126
+#, draft
+msgid ""
+"Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only."
+msgstr ""
+"Faightear ó PyPI nuair a shuiteáiltear é seo, mar aon le cibé rud a theastaíonn uathu féin. Ní chlúdaíonn an tsuim seiceála thuas ach an pacáiste seo."
+
 #: src/postulo/resume/models.py:85
 #, draft
 msgid "field of study"
@@ -2981,7 +3005,7 @@ msgstr "buaicphointí"
 msgid "highlights for this CV"
 msgstr "buaicphointí don CV seo"
 
-#: src/postulo/templates/server/plugins.html:90
+#: src/postulo/templates/server/plugins.html:118
 #, draft
 msgid "Home page"
 msgstr "Leathanach baile"
@@ -3226,17 +3250,17 @@ msgstr "Teicneolaíocht faisnéise"
 msgid "Insights"
 msgstr "Léargais"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Install"
 msgstr "Suiteáil"
 
-#: src/postulo/templates/server/plugins.html:79
+#: src/postulo/templates/server/plugins.html:107
 #, draft
 msgid "Install a package"
 msgstr "Suiteáil pacáiste"
 
-#: src/postulo/templates/server/plugins.html:101
+#: src/postulo/templates/server/plugins.html:136
 #, draft
 msgid "Install it"
 msgstr "Suiteáil é"
@@ -3248,7 +3272,7 @@ msgid ""
 msgstr ""
 "Suiteáil é le: uv sync --extra chromium, ansin: uv run playwright install chromium"
 
-#: src/postulo/templates/server/plugins.html:22
+#: src/postulo/templates/server/plugins.html:31
 #, draft
 msgid "Installed on this instance"
 msgstr "Suiteáilte ar an ásc seo"
@@ -3642,7 +3666,7 @@ msgstr "Litreacha"
 msgid "letters"
 msgstr "litreacha"
 
-#: src/postulo/templates/server/plugins.html:88
+#: src/postulo/templates/server/plugins.html:116
 #, draft
 msgid "Licence"
 msgstr "Ceadúnas"
@@ -3801,7 +3825,7 @@ msgstr "príomhtheagmhálaí"
 msgid "Main contact"
 msgstr "Príomhtheagmhálaí"
 
-#: src/postulo/templates/server/plugins.html:89
+#: src/postulo/templates/server/plugins.html:117
 #, draft
 msgid "Maintainer"
 msgstr "Cothaitheoir"
@@ -3959,7 +3983,7 @@ msgstr "Bog suas"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
 #: src/postulo/templates/server/people.html:20
-#: src/postulo/templates/server/plugins.html:86
+#: src/postulo/templates/server/plugins.html:114
 #, draft
 msgid "Name"
 msgstr "Ainm"
@@ -4103,7 +4127,7 @@ msgstr "Níl aon chatalóg darb ainm “%(name)s” cumraithe."
 msgid "No catalogue is configured on this instance."
 msgstr "Níl aon chatalóg cumraithe ar an ásc seo."
 
-#: src/postulo/templates/server/plugins.html:169
+#: src/postulo/templates/server/plugins.html:204
 #, draft
 msgid ""
 "No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
@@ -4309,7 +4333,7 @@ msgstr "Ní domsa é"
 msgid "Not found"
 msgstr "Níor aimsíodh"
 
-#: src/postulo/templates/server/plugins.html:35
+#: src/postulo/templates/server/plugins.html:44
 #, draft
 msgid "not loaded"
 msgstr "gan luchtú"
@@ -4378,7 +4402,7 @@ msgstr "Nótaí"
 msgid "notes"
 msgstr "nótaí"
 
-#: src/postulo/templates/server/plugins.html:94
+#: src/postulo/templates/server/plugins.html:123
 #, draft
 msgid "nothing"
 msgstr "faic"
@@ -4417,7 +4441,7 @@ msgid ""
 msgstr ""
 "Níl aon rud sa dialann. Nuair a thairgtear ceann, sceidealaigh é ó leathanach an iarratais."
 
-#: src/postulo/templates/server/plugins.html:71
+#: src/postulo/templates/server/plugins.html:99
 #, python-format, draft
 msgid ""
 "Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
@@ -4564,7 +4588,7 @@ msgid "notified on"
 msgstr "fógartha ar"
 
 #: src/postulo/templates/connections/list.html:26
-#: src/postulo/templates/server/plugins.html:32
+#: src/postulo/templates/server/plugins.html:41
 #, draft
 msgid "Off"
 msgstr "As"
@@ -4744,7 +4768,7 @@ msgstr "ord"
 msgid "organisation"
 msgstr "eagraíocht"
 
-#: src/postulo/templates/server/plugins.html:192
+#: src/postulo/templates/server/plugins.html:227
 #, draft
 msgid "Origin"
 msgstr "Bunús"
@@ -4799,7 +4823,7 @@ msgstr "Forbhreathnú"
 msgid "owner"
 msgstr "úinéir"
 
-#: src/postulo/templates/server/plugins.html:115
+#: src/postulo/templates/server/plugins.html:150
 #, draft
 msgid "Package"
 msgstr "Pacáiste"
@@ -5119,7 +5143,7 @@ msgstr "nótaí ullmhúcháin"
 msgid "present"
 msgstr "faoi láthair"
 
-#: src/postulo/templates/server/plugins.html:162
+#: src/postulo/templates/server/plugins.html:197
 #, draft
 msgid ""
 "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
@@ -5201,7 +5225,7 @@ msgstr "tionscadail"
 msgid "Provider"
 msgstr "Soláthraí"
 
-#: src/postulo/templates/server/plugins.html:91
+#: src/postulo/templates/server/plugins.html:119
 #, draft
 msgid "Provides"
 msgstr "Soláthraíonn"
@@ -5330,7 +5354,7 @@ msgid ""
 msgstr ""
 "Léite ón amlíne, mar sin comhaireann agallamh a chríochnaigh le diúltú mar agallamh fós."
 
-#: src/postulo/templates/server/plugins.html:118
+#: src/postulo/templates/server/plugins.html:153
 #, draft
 msgid "Read it"
 msgstr "Léigh é"
@@ -5466,7 +5490,7 @@ msgstr "clárú oscailte"
 msgid "Registration open"
 msgstr "Clárú oscailte"
 
-#: src/postulo/templates/server/plugins.html:154
+#: src/postulo/templates/server/plugins.html:189
 #, draft
 msgid "Reinstall"
 msgstr "Athshuiteáil"
@@ -5520,7 +5544,7 @@ msgstr "cianseoladh"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:76
-#: src/postulo/templates/server/plugins.html:62
+#: src/postulo/templates/server/plugins.html:90
 #, draft
 msgid "Remove"
 msgstr "Bain"
@@ -5958,7 +5982,7 @@ msgstr "Freastalaí"
 msgid "Server settings"
 msgstr "Socruithe freastalaí"
 
-#: src/postulo/templates/server/plugins.html:175
+#: src/postulo/templates/server/plugins.html:210
 #, draft
 msgid ""
 "Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code> entries, separated by commas. The index must be signed with that key, and every wheel must match the checksum the signed index carries, or nothing is installed."
@@ -6182,7 +6206,7 @@ msgstr ""
 "Duine a thagann tríd an soláthraí seo, sínítear isteach é sa chuntas ar leis an seoladh a thugtar, chomh fada is a deir an soláthraí go bhfuil an seoladh fíoraithe. Is fiú ceist amháin a fhreagairt mar sin: an nglaonn an soláthraí seo seoladh fíoraithe air ach amháin nuair a chruthaigh an duine gur leis é? Má ritheann tú féin é, is dócha go láidir. Más le duine eile é, seiceáil sula mbraitheann tú air. Socraigh POSTULO_OIDC_LINK_BY_EMAIL go false chun a éileamh go sínigh gach duine isteach anseo uair amháin agus go gceanglóidh siad an soláthraí óna leathanach cuntais féin."
 
 #: src/postulo/templates/applications/insights.html:143
-#: src/postulo/templates/server/plugins.html:190
+#: src/postulo/templates/server/plugins.html:225
 #, draft
 msgid "Source"
 msgstr "Foinse"
@@ -6345,12 +6369,12 @@ msgstr "curtha in ionad"
 msgid "Supersedes"
 msgstr "Tagann in ionad"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch off"
 msgstr "Múch é"
 
-#: src/postulo/templates/server/plugins.html:55
+#: src/postulo/templates/server/plugins.html:83
 #, draft
 msgid "Switch on"
 msgstr "Las é"
@@ -6555,7 +6579,7 @@ msgstr "Is SVG é sin, rud nach gcoinníonn Postulo fós. Oibríonn PNG nó JPEG
 msgid "That is not a status Postulo recognises."
 msgstr "Ní stádas é sin a aithníonn Postulo."
 
-#: src/postulo/plugins/installing.py:185
+#: src/postulo/plugins/installing.py:200
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Ní roth é sin: suiteálann Postulo comhaid .whl."
@@ -6738,12 +6762,12 @@ msgstr "Tá an comhad folamh."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Tá an comhad os cionn 2 MB. Níl cuardach poist chomh mór sin."
 
-#: src/postulo/plugins/installing.py:354
+#: src/postulo/plugins/installing.py:394
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "Níorbh fhéidir an suiteálaí a rith: %(error)s"
 
-#: src/postulo/plugins/installing.py:358
+#: src/postulo/plugins/installing.py:398
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "Dhiúltaigh an suiteálaí dó: %(error)s"
@@ -6876,7 +6900,7 @@ msgstr ""
 msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr "Ní ionann an roth agus an tsuim sheiceála a d'fhoilsigh an chatalóg dó."
 
-#: src/postulo/plugins/installing.py:190
+#: src/postulo/plugins/installing.py:205
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Níl meiteashonraí ag an roth; b'fhéidir go bhfuil sé damáistithe."
@@ -6998,7 +7022,7 @@ msgid ""
 msgstr ""
 "Seo an teachtaireacht tástála ó do nasc fógraí Postulo. Tiocfaidh meabhrúcháin agus gabhálacha ar an mbealach céanna."
 
-#: src/postulo/templates/server/plugins.html:83
+#: src/postulo/templates/server/plugins.html:111
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Seo a bhfuil tú ar tí a shuiteáil. Níl aon rud suiteáilte fós."
@@ -7342,7 +7366,7 @@ msgstr "Fíoraithe"
 msgid "version"
 msgstr "leagan"
 
-#: src/postulo/templates/server/plugins.html:191
+#: src/postulo/templates/server/plugins.html:226
 #, draft
 msgid "Version"
 msgstr "Leagan"
@@ -7483,7 +7507,7 @@ msgstr "Cad a fhéadann sé a dhéanamh"
 msgid "what it says"
 msgstr "a deir sé"
 
-#: src/postulo/templates/server/plugins.html:87
+#: src/postulo/templates/server/plugins.html:115
 #, draft
 msgid "What it says it is"
 msgstr "A ndeir sé atá ann"

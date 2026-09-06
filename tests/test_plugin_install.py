@@ -593,3 +593,99 @@ def test_the_command_syncs_and_reports_the_catalogue(tmp_path, plugins_dir, inst
     out = StringIO()
     call_command("plugins", "catalogue", stdout=out)
     assert "No catalogue is configured" in out.getvalue()
+
+
+# ------------------------------------------- what came with it, and what cannot
+
+
+def test_only_built_wheels_are_installed_never_a_source_package(monkeypatch, plugins_dir):
+    """A source distribution runs its own code while installing, before anybody sees it.
+
+    The signature over a catalogue and the checksum in it cover the plugin's own file.
+    Its requirements are resolved from PyPI at install time, so a dependency arriving as
+    an sdist would execute a setup script as the container's user with nobody having read
+    a line of it. Wheels only.
+    """
+    command: list[str] = []
+
+    class Finished:
+        returncode = 0
+        stdout = "installed"
+        stderr = ""
+
+    def fake_run(argv, **kwargs):
+        command.extend(argv)
+        return Finished()
+
+    monkeypatch.setattr(installing.subprocess, "run", fake_run)
+    installing.run_install(plugins_dir, Path("example.whl"), Path("constraints.txt"))
+
+    assert "--only-binary" in command
+    assert command[command.index("--only-binary") + 1] == ":all:"
+
+
+def test_the_record_keeps_what_actually_arrived_not_what_was_asked_for(
+    tmp_path, plugins_dir, monkeypatch
+):
+    """A requirement of a requirement never appears in a wheel's own metadata.
+
+    So the wheel saying it needs one package tells an administrator very little about what
+    is now sitting in their instance. The record holds what the installer actually left.
+    """
+    wheel = a_wheel(tmp_path, requires=("something-useful>=2",))
+
+    def fake(target: Path, wheel_path: Path, constraint_file: Path) -> str:
+        with zipfile.ZipFile(wheel_path) as archive:
+            archive.extractall(target)
+        for dist_info in Path(target).glob("*.dist-info"):
+            (dist_info / "RECORD").write_text("", encoding="utf-8")
+        # pip would also have brought the requirement, and the one it needs in turn.
+        for name, version in (("something_useful", "2.4"), ("a_transitive_thing", "0.9")):
+            made = Path(target) / f"{name}-{version}.dist-info"
+            made.mkdir(parents=True, exist_ok=True)
+            (made / "RECORD").write_text("", encoding="utf-8")
+        return "installed"
+
+    monkeypatch.setattr(installing, "run_install", fake)
+    entry = installing.install_wheel(wheel)
+
+    assert entry.dependencies == ["a-transitive-thing==0.9", "something-useful==2.4"]
+    assert "postulo-example" not in " ".join(entry.dependencies), "the plugin is not its own"
+    assert installing.read_record()[0].dependencies == entry.dependencies, "and it is kept"
+
+
+def test_a_plugin_that_brought_nothing_records_nothing(tmp_path, plugins_dir, installer):
+    entry = installing.install_wheel(a_wheel(tmp_path))
+    assert entry.dependencies == []
+
+
+def test_the_page_says_the_checksum_does_not_cover_the_requirements(
+    client, admin, tmp_path, plugins_dir, installer
+):
+    """An administrator deciding whether to install is standing on this page."""
+    client.force_login(admin)
+    html = client.get(reverse("server:plugins")).content.decode()
+    assert "requirements are not" in html
+    assert "PyPI" in html
+
+
+def test_what_came_with_a_plugin_is_shown_beside_it(
+    client, admin, tmp_path, plugins_dir, monkeypatch
+):
+    def fake(target: Path, wheel_path: Path, constraint_file: Path) -> str:
+        with zipfile.ZipFile(wheel_path) as archive:
+            archive.extractall(target)
+        for dist_info in Path(target).glob("*.dist-info"):
+            (dist_info / "RECORD").write_text("", encoding="utf-8")
+        made = Path(target) / "something_useful-2.4.dist-info"
+        made.mkdir(parents=True, exist_ok=True)
+        (made / "RECORD").write_text("", encoding="utf-8")
+        return "installed"
+
+    monkeypatch.setattr(installing, "run_install", fake)
+    installing.install_wheel(a_wheel(tmp_path))
+
+    client.force_login(admin)
+    html = client.get(reverse("server:plugins")).content.decode()
+    assert "data-dependencies" in html
+    assert "something-useful==2.4" in html
