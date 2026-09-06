@@ -1,6 +1,7 @@
 """Test settings: fast, isolated, and independent of the developer's .env."""
 
 import tempfile
+from pathlib import Path
 
 from .base import *
 
@@ -22,6 +23,9 @@ INSTALLED_APPS = [*INSTALLED_APPS, "tests.testapp"]
 MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = True
 
 MEDIA_ROOT = tempfile.mkdtemp(prefix="postulo-test-media-")
+
+POSTULO_LOG_DIR = tempfile.mkdtemp(prefix="postulo-test-logs-")
+LOGGING["handlers"]["file"]["filename"] = str(Path(POSTULO_LOG_DIR) / "postulo.log")
 
 # WhiteNoise warns about a missing static root; give it a real, empty directory.
 STATIC_ROOT = tempfile.mkdtemp(prefix="postulo-test-static-")

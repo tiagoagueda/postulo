@@ -38,6 +38,19 @@ page. Infrastructure — secrets, the database, hosts, TLS — stays in the envi
 SQLite is a perfectly reasonable choice for a personal instance, and makes
 [backups](Backups-and-your-data) a single file copy.
 
+## Logs
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `POSTULO_LOG_DIR` | `data/logs` | Where the log file is kept, so *Server settings → Logs* can show it. Empty keeps no file. |
+| `POSTULO_LOG_MAX_BYTES` | `5242880` | How large the file grows before it rotates. |
+| `POSTULO_LOG_BACKUPS` | `3` | How many rotations are kept. Five megabytes across four files by default. |
+| `POSTULO_LOG_LEVEL` | `INFO` | How much is written, to the file and to the console alike. |
+
+Records go to the console exactly as before, so `docker logs` is unchanged. The file is the
+same records as one JSON object per line, which is what makes the page able to filter them
+and what a log collector can read without guessing.
+
 ## Behind a proxy
 
 | Variable | Default | What it does |

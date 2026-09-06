@@ -131,6 +131,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Read the log from the administration area.** When a notifier will not send or a store
+  refuses a document, the answer is in the log, and getting to it meant `docker logs` and a
+  shell — on an instance whose administrator is usually the person using it, often from a
+  phone. *Server settings → Logs* now shows what the instance has been saying, newest first,
+  filtered by level, by which part of Postulo said it, or by a word in the message. Records
+  are kept as one JSON object per line in a file under the data volume, rotated by size so
+  it cannot fill a disk, and the console still receives everything exactly as before. The
+  page says plainly, before showing anything, that these records can name people and their
+  applications. `POSTULO_LOG_DIR` set to nothing keeps no file at all. (#49)
 - **An operator can say that arriving through the identity provider is enough.** Somebody
   with an authenticator app was asked for a code even when the provider had just checked
   them more carefully than Postulo ever would. *Server settings → Sign-in* now has a switch

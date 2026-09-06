@@ -6,6 +6,22 @@ The page footer says *Postulo X.Y.Z*; *Server settings → Overview* says it in 
 Python and Django versions; and `GET /healthz` returns it as `version`, which is the one to
 quote in a bug report and the one monitoring can watch to see an upgrade happen.
 
+## Reading the log
+
+*Server settings → Logs* shows what the instance has been saying, newest first, filtered by
+level, by which part of Postulo said it, or by a word in the message. It is usually the
+quickest answer to "the notification did not arrive" or "the document was not filed": the
+failure is recorded with the connection it happened to and the reason the other end gave.
+
+Everything on that page is also on the console, so `docker logs postulo` gives you the same
+records if you have a terminal to hand.
+
+Two things worth knowing. Records name people, companies and applications in the course of
+explaining what failed, so treat the page as you would the rest of the instance before
+pasting any of it into a bug report. And the file is rotated by size — about five megabytes
+in total by default — so it cannot fill a disk, which also means a problem from last month
+may have scrolled off.
+
 ## "No PDF backend is usable"
 
 WeasyPrint is installed with Postulo, so this almost always means its system libraries

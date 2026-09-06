@@ -399,14 +399,47 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # --------------------------------------------------------------------- logging
 
+# Where records are kept so an administrator can read them without a shell. Empty turns
+# it off entirely and only the console is written to. See postulo.core.logs.
+POSTULO_LOG_DIR = env("POSTULO_LOG_DIR", default=str(REPO_DIR / "data" / "logs"))
+POSTULO_LOG_MAX_BYTES = env.int("POSTULO_LOG_MAX_BYTES", default=5 * 1024 * 1024)
+POSTULO_LOG_BACKUPS = env.int("POSTULO_LOG_BACKUPS", default=3)
+
+# The directory has to exist before logging is configured, and a failure here must not be
+# what stops an instance from starting.
+if POSTULO_LOG_DIR:
+    from postulo.core import logs as _logs
+
+    _logs.ensure_directory_at(POSTULO_LOG_DIR)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "simple": {"format": "{asctime} {levelname} {name}: {message}", "style": "{"},
+        # One JSON object per line: a page can filter it, the extras a record carried
+        # survive, and a collector can be handed it as it is.
+        "json": {"()": "postulo.core.logs.JSONFormatter"},
     },
     "handlers": {
+        # Untouched. `docker logs` is how an operator with a terminal reads these, and
+        # taking that away in order to add a page would be a poor trade.
         "console": {"class": "logging.StreamHandler", "formatter": "simple"},
+        **(
+            {
+                "file": {
+                    "class": "logging.handlers.RotatingFileHandler",
+                    "filename": str(Path(POSTULO_LOG_DIR) / "postulo.log"),
+                    "maxBytes": POSTULO_LOG_MAX_BYTES,
+                    "backupCount": POSTULO_LOG_BACKUPS,
+                    "encoding": "utf-8",
+                    "formatter": "json",
+                    "delay": True,
+                }
+            }
+            if POSTULO_LOG_DIR
+            else {}
+        ),
     },
     "loggers": {
         # WeasyPrint subsets a font on every render and reports each step at INFO.
@@ -415,5 +448,8 @@ LOGGING = {
         "fontTools": {"level": "WARNING"},
         "weasyprint": {"level": "WARNING"},
     },
-    "root": {"handlers": ["console"], "level": env("POSTULO_LOG_LEVEL", default="INFO")},
+    "root": {
+        "handlers": ["console", "file"] if POSTULO_LOG_DIR else ["console"],
+        "level": env("POSTULO_LOG_LEVEL", default="INFO"),
+    },
 }

@@ -1,0 +1,158 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Logs" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "What this instance has been saying about itself, newest first." %}
+  </p>
+
+  {% comment %} Said before anything is shown, not after. A log names people, companies and
+     applications in the course of explaining what failed, and an administrator opening this
+     page should know that before they read it out to somebody or paste it into a bug report.
+  {% endcomment %}
+  <div class="alert-warning mb-6" role="note">
+    <div>
+      <p class="font-medium">{% translate "These records can name people and their applications." %}</p>
+      <p class="text-sm">
+        {% blocktranslate trimmed %}
+          Explaining what went wrong often means saying which connection, which company or
+          which document it happened to. Nothing here contains a document's contents, but
+          treat this page as you would the rest of the instance before you share any of it.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  </div>
+
+  {% if not available %}
+    <div class="card text-sm" data-logs="off">
+      <p class="mb-2 font-medium">{% translate "Nothing is being kept." %}</p>
+      <p class="text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          POSTULO_LOG_DIR is empty, so records go to the console and nowhere else. Set it to
+          a directory on the data volume to read them here; see Configuration in the wiki.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  {% else %}
+    <form method="get" class="card mb-6" id="log-filters">
+      <div class="grid gap-4 sm:grid-cols-3">
+        <div>
+          <label class="field-label" for="level">{% translate "From level" %}</label>
+          <select name="level" id="level" class="field-input">
+            <option value="">{% translate "Everything" %}</option>
+            {% for name in levels %}
+              <option value="{{ name }}" {% if name == level %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="logger">{% translate "From" %}</label>
+          <select name="logger" id="logger" class="field-input">
+            <option value="">{% translate "Anywhere" %}</option>
+            {% for name in loggers %}
+              <option value="{{ name }}" {% if name == logger %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="q">{% translate "Containing" %}</label>
+          <input type="search" name="q" id="q" value="{{ search }}" class="field-input">
+        </div>
+      </div>
+      <div class="mt-4 flex items-center gap-3">
+        <button type="submit" class="btn-primary">{% translate "Show" %}</button>
+        {% if filtering %}
+          <a href="{% url 'server:logs' %}" class="btn-ghost">{% translate "Clear" %}</a>
+        {% endif %}
+      </div>
+    </form>
+
+    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" aria-live="polite" data-log-count>
+      {% blocktranslate count total=records|length trimmed %}
+        {{ total }} record
+      {% plural %}
+        {{ total }} records
+      {% endblocktranslate %}
+      · {% blocktranslate with kilobytes=size|filesizeformat trimmed %}{{ kilobytes }} on disk{% endblocktranslate %}
+    </p>
+
+    {% if records %}
+      <div class="card overflow-x-auto p-0">
+        <table class="w-full text-left text-sm">
+          <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
+                        dark:border-ink-800 dark:text-ink-400">
+            <tr>
+              <th scope="col" class="px-4 py-3 font-medium">{% translate "When" %}</th>
+              <th scope="col" class="px-4 py-3 font-medium">{% translate "Level" %}</th>
+              <th scope="col" class="px-4 py-3 font-medium">{% translate "From" %}</th>
+              <th scope="col" class="px-4 py-3 font-medium">{% translate "What happened" %}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for record in records %}
+              <tr data-level="{{ record.level }}">
+                <td class="px-4 py-3 align-top whitespace-nowrap text-xs tabular-nums text-ink-500 dark:text-ink-400">
+                  {% if record.when %}{{ record.when }}{% else %}—{% endif %}
+                </td>
+                <td class="px-4 py-3 align-top">
+                  <span class="rounded px-1.5 py-0.5 text-xs font-medium
+                    {% if record.level == 'ERROR' or record.level == 'CRITICAL' %}
+                      bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200
+                    {% elif record.level == 'WARNING' %}
+                      bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200
+                    {% else %}
+                      bg-ink-100 text-ink-700 dark:bg-ink-800 dark:text-ink-200
+                    {% endif %}">{{ record.level|default:"—" }}</span>
+                </td>
+                <td class="px-4 py-3 align-top text-xs text-ink-500 dark:text-ink-400">
+                  <code>{{ record.logger|default:"—" }}</code>
+                </td>
+                <td class="px-4 py-3 align-top">
+                  <span class="break-words">{{ record.message }}</span>
+                  {% if record.extras %}
+                    <details class="mt-1">
+                      <summary class="cursor-pointer text-xs text-ink-500 dark:text-ink-400">
+                        {% translate "More" %}
+                      </summary>
+                      <dl class="mt-1 grid gap-x-3 text-xs sm:grid-cols-[8rem_1fr]">
+                        {% for key, value in record.extras.items %}
+                          <dt class="text-ink-500 dark:text-ink-400">{{ key }}</dt>
+                          <dd class="break-all"><code>{{ value }}</code></dd>
+                        {% endfor %}
+                      </dl>
+                    </details>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="card py-12 text-center">
+        <p class="mb-1 font-medium">
+          {% if filtering %}
+            {% translate "Nothing matches those filters" %}
+          {% else %}
+            {% translate "Nothing has been recorded yet" %}
+          {% endif %}
+        </p>
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% if filtering %}
+            {% translate "Loosen one of them, or start again." %}
+          {% else %}
+            {% translate "A quiet log is the one you want." %}
+          {% endif %}
+        </p>
+      </div>
+    {% endif %}
+
+    <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+      {% blocktranslate with file=path trimmed %}
+        Kept in {{ file }} and rotated by size, so this cannot fill the disk. Everything here
+        also goes to the console, where <code>docker logs</code> reads it.
+      {% endblocktranslate %}
+    </p>
+  {% endif %}
+{% endblock %}

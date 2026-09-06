@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:54+0000\n"
+"POT-Creation-Date: 2026-09-06 18:04+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenščina\n"
@@ -144,6 +144,11 @@ msgstr[1] "pred %(days)s dnevoma"
 msgstr[2] "pred %(days)s dnevi"
 msgstr[3] "pred %(days)s dnevi"
 
+#: src/postulo/templates/server/logs.html:78
+#, python-format, draft
+msgid "%(kilobytes)s on disk"
+msgstr "%(kilobytes)s na disku"
+
 #: src/postulo/applications/services.py:356
 #, python-format, draft
 msgid "%(kind)s held"
@@ -174,12 +179,12 @@ msgstr "%(kind)s: %(title)s pri %(company)s"
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s do %(high)s"
 
-#: src/postulo/core/server_views.py:621
+#: src/postulo/core/server_views.py:657
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s je nameščen iz kataloga."
 
-#: src/postulo/core/server_views.py:571
+#: src/postulo/core/server_views.py:607
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -248,19 +253,19 @@ msgstr "%(name)s je zdaj @%(username)s."
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s je zdaj skrbnik."
 
-#: src/postulo/core/server_views.py:663
+#: src/postulo/core/server_views.py:699
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s je odstranjen. Znova zaženite Postulo, da boste prepričani, da od njega ni ostalo nič naloženega."
 
-#: src/postulo/core/server_views.py:647
+#: src/postulo/core/server_views.py:683
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s je izklopljen; njegove datoteke so še tukaj."
 
-#: src/postulo/core/server_views.py:649
+#: src/postulo/core/server_views.py:685
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s je spet vklopljen."
@@ -387,6 +392,15 @@ msgstr[0] "Z njim je prišel %(total)s paket"
 msgstr[1] "Z njim sta prišla %(total)s paketa"
 msgstr[2] "Z njim so prišli %(total)s paketi"
 msgstr[3] "Z njim je prišlo %(total)s paketov"
+
+#: src/postulo/templates/server/logs.html:73
+#, python-format, draft
+msgid "%(total)s record"
+msgid_plural "%(total)s records"
+msgstr[0] "%(total)s zapis"
+msgstr[1] "%(total)s zapisa"
+msgstr[2] "%(total)s zapisi"
+msgstr[3] "%(total)s zapisov"
 
 #: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
 #, python-format, draft
@@ -551,6 +565,11 @@ msgid ""
 msgstr ""
 "Pythonovo kolo (<code>.whl</code>), zgrajeno za katero koli platformo. Postulo prebere, kaj pove o sebi, in vam to pokaže, preden se karkoli namesti."
 
+#: src/postulo/templates/server/logs.html:146
+#, draft
+msgid "A quiet log is the one you want."
+msgstr "Tih dnevnik je tisti, ki ga želite."
+
 #: src/postulo/notifications/base.py:27
 #, draft
 msgid "A reminder falls due"
@@ -592,7 +611,7 @@ msgid ""
 msgstr ""
 "Predloga s stolpci Postula in eno vzorčno vrstico. Izpolnite jo in naložite zgoraj."
 
-#: src/postulo/core/server_views.py:417
+#: src/postulo/core/server_views.py:453
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Preizkusno sporočilo od %(name)s"
@@ -898,6 +917,11 @@ msgid ""
 "Anything chosen here is rendered as it stands now and kept unchanged. Months later, when an interviewer asks about a line on your CV, you will have the version they read rather than the version you have edited since."
 msgstr ""
 "Vse, kar izberete tukaj, se izriše takšno, kot je zdaj, in ohrani nespremenjeno. Mesece pozneje, ko vas bo izpraševalec vprašal o vrstici v življenjepisu, boste imeli različico, ki jo je prebral, in ne tiste, ki ste jo medtem urejali."
+
+#: src/postulo/templates/server/logs.html:53
+#, draft
+msgid "Anywhere"
+msgstr "Od koderkoli"
 
 #: src/postulo/api/apps.py:9
 #, draft
@@ -1255,7 +1279,7 @@ msgstr "Prekliči"
 msgid "Cancelled"
 msgstr "Odpovedano"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:347
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:383
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1450,7 +1474,7 @@ msgstr "kontrolna vsota"
 msgid "Checksum"
 msgstr "Kontrolna vsota"
 
-#: src/postulo/core/server_views.py:502
+#: src/postulo/core/server_views.py:538
 #, draft
 msgid "Choose a package first."
 msgstr "Najprej izberite paket."
@@ -1488,6 +1512,7 @@ msgstr "Klasično"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:80
+#: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
 msgstr "Počisti"
@@ -1742,6 +1767,11 @@ msgstr "Blok s stiki"
 #, draft
 msgid "contacts"
 msgstr "stiki"
+
+#: src/postulo/templates/server/logs.html:60
+#, draft
+msgid "Containing"
+msgstr "Vsebuje"
 
 #: src/postulo/applications/models.py:608
 #, draft
@@ -2042,7 +2072,7 @@ msgstr "privzeti jezik"
 msgid "default time zone"
 msgstr "privzeti časovni pas"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:367
+#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:403
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -2309,7 +2339,7 @@ msgid "education"
 msgstr "izobrazba"
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:394
+#: src/postulo/core/server_views.py:430
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:21
 #, draft
@@ -2464,6 +2494,7 @@ msgid "Every store already has this document."
 msgstr "Vsaka shramba že ima ta dokument."
 
 #: src/postulo/jobs/listing_views.py:30
+#: src/postulo/templates/server/logs.html:44
 #, draft
 msgid "Everything"
 msgstr "Vse"
@@ -2545,6 +2576,13 @@ msgstr "poteče ob"
 #, draft
 msgid "expires on"
 msgstr "poteče dne"
+
+#: src/postulo/templates/server/logs.html:19
+#, draft
+msgid ""
+"Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
+msgstr ""
+"Pojasniti, kaj je šlo narobe, pogosto pomeni povedati, katere povezave, katerega podjetja ali katerega dokumenta se je tikalo. Tu ni vsebine nobenega dokumenta, a s to stranjo ravnajte kot z ostalo instanco, preden karkoli od nje delite."
 
 #: src/postulo/templates/applications/insights.html:14
 #: src/postulo/templates/base.html:77
@@ -2781,6 +2819,8 @@ msgid "from"
 msgstr "od"
 
 #: src/postulo/templates/server/email.html:18
+#: src/postulo/templates/server/logs.html:51
+#: src/postulo/templates/server/logs.html:89
 #, draft
 msgid "From"
 msgstr "Od"
@@ -2821,6 +2861,11 @@ msgstr ""
 #, draft
 msgid "From Gravatar"
 msgstr "Iz Gravatarja"
+
+#: src/postulo/templates/server/logs.html:42
+#, draft
+msgid "From level"
+msgstr "Od ravni"
 
 #: src/postulo/applications/models.py:329
 #, draft
@@ -3090,7 +3135,7 @@ msgstr "Identifikatorji"
 msgid "Identifies itself as"
 msgstr "Predstavlja se kot"
 
-#: src/postulo/core/server_views.py:419
+#: src/postulo/core/server_views.py:455
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3455,6 +3500,13 @@ msgid "Kept at 256 pixels square, re-encoded, with nothing else of the file."
 msgstr ""
 "Hranjen kot kvadrat 256 slikovnih pik, prekodiran, brez česar koli drugega iz datoteke."
 
+#: src/postulo/templates/server/logs.html:153
+#, python-format, draft
+msgid ""
+"Kept in %(file)s and rotated by size, so this cannot fill the disk. Everything here also goes to the console, where <code>docker logs</code> reads it."
+msgstr ""
+"Hrani se v %(file)s in se menja po velikosti, zato ne more napolniti diska. Vse tu gre tudi na konzolo, kjer to bere <code>docker logs</code>."
+
 #: src/postulo/applications/models.py:324
 #: src/postulo/applications/models.py:470
 #: src/postulo/applications/models.py:594 src/postulo/documents/models.py:230
@@ -3656,6 +3708,11 @@ msgstr "Pisma"
 msgid "letters"
 msgstr "pisma"
 
+#: src/postulo/templates/server/logs.html:88
+#, draft
+msgid "Level"
+msgstr "Raven"
+
 #: src/postulo/templates/server/plugins.html:116
 #, draft
 msgid "Licence"
@@ -3774,8 +3831,15 @@ msgstr "naslov logotipa"
 msgid "logo fetched"
 msgstr "logotip pridobljen"
 
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:353
+#: src/postulo/templates/server/logs.html:5
+#, draft
+msgid "Logs"
+msgstr "Dnevniki"
+
 #: src/postulo/templates/applications/application_list.html:38
 #: src/postulo/templates/jobs/company_list.html:38
+#: src/postulo/templates/server/logs.html:144
 #, draft
 msgid "Loosen one of them, or start again."
 msgstr "Enega od njih sprostite ali začnite znova."
@@ -3922,6 +3986,11 @@ msgstr "Denar in datumi"
 #, draft
 msgid "month / day / year (12/31/2026)"
 msgstr "mesec / dan / leto (12/31/2026)"
+
+#: src/postulo/templates/server/logs.html:117
+#, draft
+msgid "More"
+msgstr "Več"
 
 #: src/postulo/core/csv_import.py:445
 #, python-format, draft
@@ -4401,6 +4470,11 @@ msgstr "nič"
 msgid "Nothing due."
 msgstr "Nič ne zapade."
 
+#: src/postulo/templates/server/logs.html:139
+#, draft
+msgid "Nothing has been recorded yet"
+msgstr "Zaenkrat ni zabeleženo nič"
+
 #: src/postulo/templates/core/dashboard.html:147
 #, python-format, draft
 msgid ""
@@ -4429,6 +4503,11 @@ msgid ""
 "Nothing in the diary. When one is offered, schedule it from the application's page."
 msgstr "Nič v dnevniku. Ko ga ponudijo, ga načrtujte s strani prijave."
 
+#: src/postulo/templates/server/logs.html:30
+#, draft
+msgid "Nothing is being kept."
+msgstr "Nič se ne hrani."
+
 #: src/postulo/templates/server/plugins.html:99
 #, python-format, draft
 msgid ""
@@ -4446,6 +4525,11 @@ msgstr "Nič se ne shrani, dokler tega ne pregledate."
 #, draft
 msgid "Nothing matches these filters"
 msgstr "Nič ne ustreza tem filtrom"
+
+#: src/postulo/templates/server/logs.html:137
+#, draft
+msgid "Nothing matches those filters"
+msgstr "Tem filtrom ne ustreza nič"
 
 #: src/postulo/templates/core/search.html:27
 #, python-format, draft
@@ -4554,7 +4638,7 @@ msgstr "Nič ne čaka"
 msgid "Nothing was added."
 msgstr "Nič ni bilo dodano."
 
-#: src/postulo/core/server_views.py:540
+#: src/postulo/core/server_views.py:576
 #, draft
 msgid "Nothing was installed."
 msgstr "Nič ni bilo nameščeno."
@@ -5010,7 +5094,7 @@ msgstr "vtičnik"
 msgid "plugin not installed"
 msgstr "vtičnik ni nameščen"
 
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:453
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:489
 #: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
 #, draft
 msgid "Plugins"
@@ -5136,6 +5220,13 @@ msgstr ""
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — vaše iskanje zaposlitve, na vašem strežniku."
+
+#: src/postulo/templates/server/logs.html:32
+#, draft
+msgid ""
+"POSTULO_LOG_DIR is empty, so records go to the console and nowhere else. Set it to a directory on the data volume to read them here; see Configuration in the wiki."
+msgstr ""
+"POSTULO_LOG_DIR je prazen, zato gredo zapisi le na konzolo. Nastavite ga na imenik na podatkovnem nosilcu, da jih berete tukaj; glejte Konfiguracijo na wikiju."
 
 #: src/postulo/api/models.py:63
 #, draft
@@ -5924,7 +6015,7 @@ msgstr "Pošlji na"
 msgid "Send to stores now"
 msgstr "Pošlji v shrambe zdaj"
 
-#: src/postulo/core/server_views.py:429
+#: src/postulo/core/server_views.py:465
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Pošiljanje ni uspelo: %(error)s"
@@ -5958,7 +6049,7 @@ msgstr "Poslani dokumenti"
 msgid "sent on"
 msgstr "poslano"
 
-#: src/postulo/core/server_views.py:432 src/postulo/notifications/email.py:80
+#: src/postulo/core/server_views.py:468 src/postulo/notifications/email.py:80
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Poslano na %(to)s."
@@ -6056,6 +6147,11 @@ msgstr "V ožjem izboru"
 #, draft
 msgid "Shortlisted."
 msgstr "Uvrščeno v ožji izbor."
+
+#: src/postulo/templates/server/logs.html:65
+#, draft
+msgid "Show"
+msgstr "Prikaži"
 
 #: src/postulo/templates/applications/suggestion_list.html:21
 #: src/postulo/templates/jobs/capture_list.html:18
@@ -6615,7 +6711,7 @@ msgstr "To ni izid, ki ga Postulo pozna."
 msgid "That is not something Postulo can do about it."
 msgstr "Tega Postulo s tem ne more storiti."
 
-#: src/postulo/core/server_views.py:491
+#: src/postulo/core/server_views.py:527
 #, draft
 msgid "That is not something this page does."
 msgstr "Tega ta stran ne počne."
@@ -6636,7 +6732,7 @@ msgstr "To ni uporabniško ime."
 msgid "That is the last administrator. Appoint another first."
 msgstr "To je zadnji skrbnik. Najprej imenujte drugega."
 
-#: src/postulo/core/server_views.py:549 src/postulo/core/server_views.py:554
+#: src/postulo/core/server_views.py:585 src/postulo/core/server_views.py:590
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Ta paket ne čaka več; naložite ga znova."
@@ -6712,7 +6808,7 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Podpis ali ključ kataloga ni berljiv: %(error)s"
 
-#: src/postulo/core/server_views.py:606
+#: src/postulo/core/server_views.py:642
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Katalogi so odgovorili in še ničesar ne navajajo."
@@ -6823,7 +6919,7 @@ msgstr "Logotipa ni več."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logotip ni bil spremenjen: %(problem)s"
 
-#: src/postulo/core/server_views.py:434 src/postulo/notifications/email.py:79
+#: src/postulo/core/server_views.py:470 src/postulo/notifications/email.py:79
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Zaledni sistem za pošto ni sprejel ničesar."
@@ -6979,6 +7075,11 @@ msgstr[2] ""
 "Te številke izhajajo iz %(total)s prijav — premalo za sklepe. Berite jih kot zapis tega, kar se je zgodilo, ne kot stopnje, ki karkoli napovedujejo."
 msgstr[3] ""
 "Te številke izhajajo iz %(total)s prijav — premalo za sklepe. Berite jih kot zapis tega, kar se je zgodilo, ne kot stopnje, ki karkoli napovedujejo."
+
+#: src/postulo/templates/server/logs.html:17
+#, draft
+msgid "These records can name people and their applications."
+msgstr "Ti zapisi lahko poimenujejo ljudi in njihove prijave."
 
 #: src/postulo/applications/models.py:417
 #, draft
@@ -7499,6 +7600,7 @@ msgid "What goes where"
 msgstr "Kaj gre kam"
 
 #: src/postulo/templates/applications/application_detail.html:69
+#: src/postulo/templates/server/logs.html:90
 #, draft
 msgid "What happened"
 msgstr "Kaj se je zgodilo"
@@ -7568,6 +7670,11 @@ msgid ""
 msgstr ""
 "S čim zna ta instanca prebrati oglas, vas obvestiti, hraniti dokumente in se sinhronizirati. Postulove lastne izvedbe so vgrajene; druge so paketi, ki jih namestite tukaj."
 
+#: src/postulo/templates/server/logs.html:7
+#, draft
+msgid "What this instance has been saying about itself, newest first."
+msgstr "Kaj je ta instanca povedala o sebi, najnovejše najprej."
+
 #: src/postulo/templates/server/overview.html:7
 #, draft
 msgid "What this instance is running, and where its data is."
@@ -7600,6 +7707,7 @@ msgid "when"
 msgstr "kdaj"
 
 #: src/postulo/templates/documents/rendered_list.html:23
+#: src/postulo/templates/server/logs.html:87
 #, draft
 msgid "When"
 msgstr "Kdaj"

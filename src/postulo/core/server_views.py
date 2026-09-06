@@ -341,6 +341,42 @@ class SignInView(PolicyView):
         return context
 
 
+class LogsView(ServerSectionMixin, TemplateView):
+    """What the instance has been saying, newest first.
+
+    Reading the log used to mean `docker logs` and a shell. The person administering a
+    Postulo instance is usually the person using it, and is quite often on a phone when
+    something stops working.
+    """
+
+    template_name = "server/logs.html"
+    section_title = _("Logs")
+
+    def get_context_data(self, **kwargs):
+        from . import logs
+
+        context = super().get_context_data(**kwargs)
+        level = self.request.GET.get("level", "")
+        logger = self.request.GET.get("logger", "")
+        search = self.request.GET.get("q", "")
+
+        context.update(
+            {
+                "available": logs.available(),
+                "records": logs.read(limit=200, level=level, logger=logger, search=search),
+                "levels": logs.LEVELS,
+                "loggers": logs.loggers(),
+                "level": level,
+                "logger": logger,
+                "search": search,
+                "size": logs.size_on_disk(),
+                "path": logs.log_path(),
+                "filtering": bool(level or logger or search),
+            }
+        )
+        return context
+
+
 class CaptureView(PolicyView):
     form_class = CaptureForm
     template_name = "server/capture.html"

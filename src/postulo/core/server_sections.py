@@ -42,6 +42,9 @@ SECTIONS: tuple[SettingsSection, ...] = (
         slug="capture", label=_("Capture"), url_name="server:capture", icon="search", order=60
     ),
     SettingsSection(
+        slug="logs", label=_("Logs"), url_name="server:logs", icon="file-text", order=65
+    ),
+    SettingsSection(
         slug="defaults", label=_("Defaults"), url_name="server:defaults", icon="settings", order=70
     ),
 )

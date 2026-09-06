@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:54+0000\n"
+"POT-Creation-Date: 2026-09-06 18:04+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Deutsch\n"
@@ -120,6 +120,11 @@ msgid_plural "%(days)s days ago"
 msgstr[0] "vor %(days)s Tag"
 msgstr[1] "vor %(days)s Tagen"
 
+#: src/postulo/templates/server/logs.html:78
+#, python-format, draft
+msgid "%(kilobytes)s on disk"
+msgstr "%(kilobytes)s auf der Festplatte"
+
 #: src/postulo/applications/services.py:356
 #, python-format, draft
 msgid "%(kind)s held"
@@ -150,12 +155,12 @@ msgstr "%(kind)s: %(title)s bei %(company)s"
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s bis %(high)s"
 
-#: src/postulo/core/server_views.py:621
+#: src/postulo/core/server_views.py:657
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s ist aus dem Katalog installiert."
 
-#: src/postulo/core/server_views.py:571
+#: src/postulo/core/server_views.py:607
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -225,19 +230,19 @@ msgstr "%(name)s heißt jetzt @%(username)s."
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s ist jetzt Administrator."
 
-#: src/postulo/core/server_views.py:663
+#: src/postulo/core/server_views.py:699
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s ist entfernt. Starten Sie Postulo neu, damit sicher nichts davon geladen bleibt."
 
-#: src/postulo/core/server_views.py:647
+#: src/postulo/core/server_views.py:683
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s ist abgeschaltet; die Dateien sind noch da."
 
-#: src/postulo/core/server_views.py:649
+#: src/postulo/core/server_views.py:685
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s ist wieder eingeschaltet."
@@ -354,6 +359,13 @@ msgid "%(total)s package came with it"
 msgid_plural "%(total)s packages came with it"
 msgstr[0] "%(total)s Paket kam mit"
 msgstr[1] "%(total)s Pakete kamen mit"
+
+#: src/postulo/templates/server/logs.html:73
+#, python-format, draft
+msgid "%(total)s record"
+msgid_plural "%(total)s records"
+msgstr[0] "%(total)s Eintrag"
+msgstr[1] "%(total)s Einträge"
 
 #: src/postulo/plugins/catalogue.py:193 src/postulo/plugins/catalogue.py:221
 #, python-format, draft
@@ -515,6 +527,11 @@ msgid ""
 msgstr ""
 "Ein Python-Wheel (<code>.whl</code>) für beliebige Plattformen. Postulo liest, was es über sich selbst sagt, und zeigt es Ihnen, bevor irgendetwas installiert wird."
 
+#: src/postulo/templates/server/logs.html:146
+#, draft
+msgid "A quiet log is the one you want."
+msgstr "Ein ruhiges Protokoll ist das, was Sie wollen."
+
 #: src/postulo/notifications/base.py:27
 #, draft
 msgid "A reminder falls due"
@@ -557,7 +574,7 @@ msgid ""
 msgstr ""
 "Eine Vorlage mit Postulos eigenen Spalten und einer Beispielzeile. Füllen Sie sie aus und laden Sie sie oben hoch."
 
-#: src/postulo/core/server_views.py:417
+#: src/postulo/core/server_views.py:453
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Eine Testnachricht von %(name)s"
@@ -862,6 +879,11 @@ msgid ""
 "Anything chosen here is rendered as it stands now and kept unchanged. Months later, when an interviewer asks about a line on your CV, you will have the version they read rather than the version you have edited since."
 msgstr ""
 "Was hier gewählt wird, wird im jetzigen Stand gerendert und unverändert aufbewahrt. Wenn Monate später jemand im Gespräch nach einer Zeile Ihres Lebenslaufs fragt, haben Sie die Fassung, die gelesen wurde, statt der seither bearbeiteten."
+
+#: src/postulo/templates/server/logs.html:53
+#, draft
+msgid "Anywhere"
+msgstr "Überall"
 
 #: src/postulo/api/apps.py:9
 #, draft
@@ -1219,7 +1241,7 @@ msgstr "Abbrechen"
 msgid "Cancelled"
 msgstr "Abgesagt"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:347
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:383
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1414,7 +1436,7 @@ msgstr "Prüfsumme"
 msgid "Checksum"
 msgstr "Prüfsumme"
 
-#: src/postulo/core/server_views.py:502
+#: src/postulo/core/server_views.py:538
 #, draft
 msgid "Choose a package first."
 msgstr "Wählen Sie zuerst ein Paket."
@@ -1452,6 +1474,7 @@ msgstr "Klassisch"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:80
+#: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
 msgstr "Leeren"
@@ -1706,6 +1729,11 @@ msgstr "Kontaktblock"
 #, draft
 msgid "contacts"
 msgstr "Kontakte"
+
+#: src/postulo/templates/server/logs.html:60
+#, draft
+msgid "Containing"
+msgstr "Enthält"
 
 #: src/postulo/applications/models.py:608
 #, draft
@@ -2006,7 +2034,7 @@ msgstr "Standardsprache"
 msgid "default time zone"
 msgstr "Standardzeitzone"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:367
+#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:403
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -2274,7 +2302,7 @@ msgid "education"
 msgstr "Ausbildung"
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:394
+#: src/postulo/core/server_views.py:430
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:21
 #, draft
@@ -2431,6 +2459,7 @@ msgid "Every store already has this document."
 msgstr "Jeder Speicher hat dieses Dokument bereits."
 
 #: src/postulo/jobs/listing_views.py:30
+#: src/postulo/templates/server/logs.html:44
 #, draft
 msgid "Everything"
 msgstr "Alles"
@@ -2513,6 +2542,13 @@ msgstr "läuft ab um"
 #, draft
 msgid "expires on"
 msgstr "läuft ab am"
+
+#: src/postulo/templates/server/logs.html:19
+#, draft
+msgid ""
+"Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
+msgstr ""
+"Zu erklären, was schiefging, heißt oft zu sagen, welche Verbindung, welches Unternehmen oder welches Dokument betroffen war. Hier steht nichts vom Inhalt eines Dokuments, aber behandeln Sie diese Seite wie den Rest der Instanz, bevor Sie etwas davon weitergeben."
 
 #: src/postulo/templates/applications/insights.html:14
 #: src/postulo/templates/base.html:77
@@ -2750,6 +2786,8 @@ msgid "from"
 msgstr "von"
 
 #: src/postulo/templates/server/email.html:18
+#: src/postulo/templates/server/logs.html:51
+#: src/postulo/templates/server/logs.html:89
 #, draft
 msgid "From"
 msgstr "Von"
@@ -2790,6 +2828,11 @@ msgstr ""
 #, draft
 msgid "From Gravatar"
 msgstr "Von Gravatar"
+
+#: src/postulo/templates/server/logs.html:42
+#, draft
+msgid "From level"
+msgstr "Ab Stufe"
 
 #: src/postulo/applications/models.py:329
 #, draft
@@ -3061,7 +3104,7 @@ msgstr "Kennungen"
 msgid "Identifies itself as"
 msgstr "Gibt sich aus als"
 
-#: src/postulo/core/server_views.py:419
+#: src/postulo/core/server_views.py:455
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3427,6 +3470,13 @@ msgid "Kept at 256 pixels square, re-encoded, with nothing else of the file."
 msgstr ""
 "Als Quadrat mit 256 Pixeln gespeichert, neu kodiert, ohne alles Übrige der Datei."
 
+#: src/postulo/templates/server/logs.html:153
+#, python-format, draft
+msgid ""
+"Kept in %(file)s and rotated by size, so this cannot fill the disk. Everything here also goes to the console, where <code>docker logs</code> reads it."
+msgstr ""
+"Liegt in %(file)s und wird nach Größe rotiert, kann die Festplatte also nicht füllen. Alles hier geht auch an die Konsole, wo <code>docker logs</code> es liest."
+
 #: src/postulo/applications/models.py:324
 #: src/postulo/applications/models.py:470
 #: src/postulo/applications/models.py:594 src/postulo/documents/models.py:230
@@ -3628,6 +3678,11 @@ msgstr "Briefe"
 msgid "letters"
 msgstr "Briefe"
 
+#: src/postulo/templates/server/logs.html:88
+#, draft
+msgid "Level"
+msgstr "Stufe"
+
 #: src/postulo/templates/server/plugins.html:116
 #, draft
 msgid "Licence"
@@ -3746,8 +3801,15 @@ msgstr "Logo-Adresse"
 msgid "logo fetched"
 msgstr "Logo geholt"
 
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:353
+#: src/postulo/templates/server/logs.html:5
+#, draft
+msgid "Logs"
+msgstr "Protokolle"
+
 #: src/postulo/templates/applications/application_list.html:38
 #: src/postulo/templates/jobs/company_list.html:38
+#: src/postulo/templates/server/logs.html:144
 #, draft
 msgid "Loosen one of them, or start again."
 msgstr "Lockern Sie einen davon oder beginnen Sie neu."
@@ -3894,6 +3956,11 @@ msgstr "Geld und Daten"
 #, draft
 msgid "month / day / year (12/31/2026)"
 msgstr "Monat / Tag / Jahr (12/31/2026)"
+
+#: src/postulo/templates/server/logs.html:117
+#, draft
+msgid "More"
+msgstr "Mehr"
 
 #: src/postulo/core/csv_import.py:445
 #, python-format, draft
@@ -4374,6 +4441,11 @@ msgstr "nichts"
 msgid "Nothing due."
 msgstr "Nichts fällig."
 
+#: src/postulo/templates/server/logs.html:139
+#, draft
+msgid "Nothing has been recorded yet"
+msgstr "Es wurde noch nichts aufgezeichnet"
+
 #: src/postulo/templates/core/dashboard.html:147
 #, python-format, draft
 msgid ""
@@ -4403,6 +4475,11 @@ msgid ""
 msgstr ""
 "Nichts im Terminkalender. Wenn eines angeboten wird, planen Sie es auf der Seite der Bewerbung."
 
+#: src/postulo/templates/server/logs.html:30
+#, draft
+msgid "Nothing is being kept."
+msgstr "Es wird nichts aufbewahrt."
+
 #: src/postulo/templates/server/plugins.html:99
 #, python-format, draft
 msgid ""
@@ -4419,6 +4496,11 @@ msgstr "Nichts wird gespeichert, bevor Sie es geprüft haben."
 #: src/postulo/templates/jobs/company_list.html:36
 #, draft
 msgid "Nothing matches these filters"
+msgstr "Nichts passt zu diesen Filtern"
+
+#: src/postulo/templates/server/logs.html:137
+#, draft
+msgid "Nothing matches those filters"
 msgstr "Nichts passt zu diesen Filtern"
 
 #: src/postulo/templates/core/search.html:27
@@ -4529,7 +4611,7 @@ msgstr "Nichts wartet"
 msgid "Nothing was added."
 msgstr "Nichts wurde hinzugefügt."
 
-#: src/postulo/core/server_views.py:540
+#: src/postulo/core/server_views.py:576
 #, draft
 msgid "Nothing was installed."
 msgstr "Es wurde nichts installiert."
@@ -4978,7 +5060,7 @@ msgstr "Plugin"
 msgid "plugin not installed"
 msgstr "Plugin nicht installiert"
 
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:453
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:489
 #: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
 #, draft
 msgid "Plugins"
@@ -5104,6 +5186,13 @@ msgstr ""
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — Ihre Jobsuche, auf Ihrem Server."
+
+#: src/postulo/templates/server/logs.html:32
+#, draft
+msgid ""
+"POSTULO_LOG_DIR is empty, so records go to the console and nowhere else. Set it to a directory on the data volume to read them here; see Configuration in the wiki."
+msgstr ""
+"POSTULO_LOG_DIR ist leer, Einträge gehen also nur an die Konsole. Setzen Sie es auf ein Verzeichnis im Datenvolume, um sie hier zu lesen; siehe Konfiguration im Wiki."
 
 #: src/postulo/api/models.py:63
 #, draft
@@ -5891,7 +5980,7 @@ msgstr "Senden an"
 msgid "Send to stores now"
 msgstr "Jetzt an die Speicher senden"
 
-#: src/postulo/core/server_views.py:429
+#: src/postulo/core/server_views.py:465
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Senden fehlgeschlagen: %(error)s"
@@ -5925,7 +6014,7 @@ msgstr "Gesendete Dokumente"
 msgid "sent on"
 msgstr "gesendet am"
 
-#: src/postulo/core/server_views.py:432 src/postulo/notifications/email.py:80
+#: src/postulo/core/server_views.py:468 src/postulo/notifications/email.py:80
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Gesendet an %(to)s."
@@ -6024,6 +6113,11 @@ msgstr "Vorgemerkt"
 #, draft
 msgid "Shortlisted."
 msgstr "Vorgemerkt."
+
+#: src/postulo/templates/server/logs.html:65
+#, draft
+msgid "Show"
+msgstr "Anzeigen"
 
 #: src/postulo/templates/applications/suggestion_list.html:21
 #: src/postulo/templates/jobs/capture_list.html:18
@@ -6586,7 +6680,7 @@ msgstr "Das ist kein Ergebnis, das Postulo kennt."
 msgid "That is not something Postulo can do about it."
 msgstr "Das kann Postulo damit nicht tun."
 
-#: src/postulo/core/server_views.py:491
+#: src/postulo/core/server_views.py:527
 #, draft
 msgid "That is not something this page does."
 msgstr "Das tut diese Seite nicht."
@@ -6607,7 +6701,7 @@ msgstr "Das ist nicht der Benutzername."
 msgid "That is the last administrator. Appoint another first."
 msgstr "Das ist der letzte Administrator. Ernennen Sie zuerst einen anderen."
 
-#: src/postulo/core/server_views.py:549 src/postulo/core/server_views.py:554
+#: src/postulo/core/server_views.py:585 src/postulo/core/server_views.py:590
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Dieses Paket wartet nicht mehr; laden Sie es erneut hoch."
@@ -6683,7 +6777,7 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Die Signatur oder der Schlüssel des Katalogs ist nicht lesbar: %(error)s"
 
-#: src/postulo/core/server_views.py:606
+#: src/postulo/core/server_views.py:642
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Die Kataloge haben geantwortet und führen noch nichts."
@@ -6794,7 +6888,7 @@ msgstr "Das Logo ist weg."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Das Logo wurde nicht geändert: %(problem)s"
 
-#: src/postulo/core/server_views.py:434 src/postulo/notifications/email.py:79
+#: src/postulo/core/server_views.py:470 src/postulo/notifications/email.py:79
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Das Mail-Backend hat nichts angenommen."
@@ -6948,6 +7042,11 @@ msgstr[0] ""
 "Diese Zahlen stammen aus %(total)s Bewerbung. Lesen Sie sie als Protokoll dessen, was geschah, nicht als Quote, die etwas vorhersagt."
 msgstr[1] ""
 "Diese Zahlen stammen aus %(total)s Bewerbungen — zu wenige, um Schlüsse zu ziehen. Lesen Sie sie als Protokoll dessen, was geschah, nicht als Quoten, die etwas vorhersagen."
+
+#: src/postulo/templates/server/logs.html:17
+#, draft
+msgid "These records can name people and their applications."
+msgstr "Diese Einträge können Personen und ihre Bewerbungen nennen."
 
 #: src/postulo/applications/models.py:417
 #, draft
@@ -7474,6 +7573,7 @@ msgid "What goes where"
 msgstr "Was wohin gehört"
 
 #: src/postulo/templates/applications/application_detail.html:69
+#: src/postulo/templates/server/logs.html:90
 #, draft
 msgid "What happened"
 msgstr "Was geschah"
@@ -7544,6 +7644,11 @@ msgid ""
 msgstr ""
 "Womit diese Instanz eine Anzeige lesen, benachrichtigen, Dokumente aufbewahren und abgleichen kann. Postulos eigene Umsetzungen sind eingebaut; andere sind Pakete, die Sie hier installieren."
 
+#: src/postulo/templates/server/logs.html:7
+#, draft
+msgid "What this instance has been saying about itself, newest first."
+msgstr "Was diese Instanz über sich selbst gesagt hat, neueste zuerst."
+
 #: src/postulo/templates/server/overview.html:7
 #, draft
 msgid "What this instance is running, and where its data is."
@@ -7577,6 +7682,7 @@ msgid "when"
 msgstr "wann"
 
 #: src/postulo/templates/documents/rendered_list.html:23
+#: src/postulo/templates/server/logs.html:87
 #, draft
 msgid "When"
 msgstr "Wann"
