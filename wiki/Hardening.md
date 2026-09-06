@@ -36,6 +36,27 @@ A backup holds everything. Encrypt it at rest (`age`, `gpg`, or an encrypted vol
 it somewhere the web server cannot reach, and test a restore once. See
 [Backups and your data](Backups-and-your-data).
 
+## The cache, and why it is not optional
+
+Postulo counts failed sign-ins, password resets and a few other things in its cache, and
+turns somebody away once a count is too high. The default cache is a table in Postulo's own
+database, which matters for one reason: every worker reads and writes the same table, so
+"ten failed attempts a minute" is ten across the instance rather than ten per worker, and
+the count is still there after a restart.
+
+The table is made by a migration; there is nothing to run.
+
+If you have Redis or Memcached, `POSTULO_CACHE_URL` points at it and everything above still
+holds:
+
+```sh
+POSTULO_CACHE_URL=redis://localhost:6379/1
+```
+
+What you should not do is point it at a per-process cache — `locmemcache://` — or at
+`dummycache://`. Both make Postulo *look* like it is enforcing a limit while enforcing it
+once per worker, or not at all.
+
 ## Accounts
 
 - Leave registration closed unless you mean to run a shared instance; invite people.

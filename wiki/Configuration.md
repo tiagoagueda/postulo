@@ -38,6 +38,19 @@ page. Infrastructure — secrets, the database, hosts, TLS — stays in the envi
 SQLite is a perfectly reasonable choice for a personal instance, and makes
 [backups](Backups-and-your-data) a single file copy.
 
+## Cache
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `POSTULO_CACHE_URL` | A table in Postulo's own database | Where the cache lives. `redis://localhost:6379/1`, `rediss://…` and `memcache://localhost:11211` all work. |
+
+Postulo keeps the counts behind its rate limits here — how often a password has been got
+wrong, how often a reset has been asked for — so the cache has to be one that every worker
+shares and that survives a restart. The default does both, and its table is made by a
+migration, so there is nothing to set up. Redis or Memcached is faster and behaves the same
+way. Pointing this at a per-process cache is the one thing to avoid; see
+[Hardening](Hardening).
+
 ## Accounts
 
 | Variable | Default | What it does |

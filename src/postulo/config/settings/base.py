@@ -112,6 +112,24 @@ if "sqlite3" in DATABASES["default"]["ENGINE"]:
     if _db_path.name != ":memory:":
         _db_path.parent.mkdir(parents=True, exist_ok=True)
 
+# -------------------------------------------------------------------------- cache
+
+#: The table a database-backed cache lives in. Created by a migration, so a fresh
+#: install has one without anybody running a command.
+CACHE_TABLE = "postulo_cache"
+
+# Django's default cache is per process, and the image runs several workers. That is
+# fine for a memoised template, and wrong for anything that counts: allauth's rate
+# limits live in the cache, so a limit of ten failed sign-ins a minute becomes ten per
+# worker, and every restart forgets them. A database-backed cache is shared by every
+# worker, survives a restart, and needs nothing an instance does not already have.
+#
+# An operator with Redis or Memcached points POSTULO_CACHE_URL at it and gets a faster
+# one. Anything django-environ understands works: redis://, rediss://, memcache://.
+CACHES = {
+    "default": env.cache_url("POSTULO_CACHE_URL", default=f"dbcache://{CACHE_TABLE}"),
+}
+
 # --------------------------------------------------------------------------- auth
 
 AUTH_USER_MODEL = "accounts.User"

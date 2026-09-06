@@ -131,6 +131,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **Sign-in rate limits were counted once per worker and forgotten on every restart.**
+  Postulo turns somebody away after ten failed sign-ins a minute from one address, or five
+  in five minutes against one account. Those counts live in Django's cache, no cache was
+  configured, and Django's default one is a dictionary inside a single process — while the
+  container image runs three workers. So the real limit was roughly three times the one
+  written down, depending on which worker a request landed on, and every restart or deploy
+  wiped it. The default cache is now a table in Postulo's own database: shared by every
+  worker, kept across a restart, and created by a migration so there is nothing to run.
+  `POSTULO_CACHE_URL` points at Redis or Memcached instead. (#59)
 - **Checking a portfolio link could be redirected onto your own network.** *Check it
   answers* validated the address you saved and then let the HTTP client follow redirects
   by itself, so a site answering `302 Location: http://127.0.0.1:9000/` had that request
