@@ -111,5 +111,10 @@
     </footer>
     {# Scripts a page needs and the rest do not; always from Postulo's own origin. #}
     {% block scripts %}{% endblock %}
+    {% comment %} allauth's pages put theirs in `extra_body` rather than in `scripts`, and a
+       block with no home is discarded in silence -- which is how the passkey button came to
+       be rendered with nothing wired to it. It sits outside `scripts` so that a base
+       overriding that one cannot swallow it. {% endcomment %}
+    {% block extra_body %}{% endblock %}
   </body>
 </html>

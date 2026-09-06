@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:22+0000\n"
+"POT-Creation-Date: 2026-09-06 17:40+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -300,7 +300,7 @@ msgstr "%(name)s — %(kind)s"
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
 
-#: src/postulo/templates/base.html:26
+#: src/postulo/templates/base.html:34
 #, python-format, draft
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — deais"
@@ -504,6 +504,13 @@ msgid ""
 msgstr ""
 "Cláraíonn pacáiste foinse sa ghrúpa pointí iontrála <code>%(group)s</code>. Breiseán nach gcláraíonn ach pointí iontrála, feictear é chomh luath is atá sé suiteáilte; ceann a chuireann leathanaigh dá chuid féin leis, teastaíonn atosú uaidh. Foinse nach luchtaítear, logáiltear í agus fágtar ar lár í, agus leanann na cinn ionsuite ag obair."
 
+#: src/postulo/templates/settings/account.html:101
+#, python-format, draft
+msgid ""
+"A passkey is tied to the address you made it at, which here is %(host)s. Reaching this instance by another name, or moving it, will not carry your passkeys over."
+msgstr ""
+"Tá eochair rochtana ceangailte leis an seoladh ar ar chruthaigh tú í, anseo %(host)s. Ní thabharfaidh teacht ar an ásc seo faoi ainm eile, ná é a bhogadh, do chuid eochracha rochtana leo."
+
 #: src/postulo/templates/core/dashboard.html:23
 #, python-format, draft
 msgid ""
@@ -664,7 +671,7 @@ msgstr "glactha ag"
 msgid "Account"
 msgstr "Cuntas"
 
-#: src/postulo/templates/base.html:51
+#: src/postulo/templates/base.html:59
 #, python-format, draft
 msgid "Account menu, %(name)s"
 msgstr "Roghchlár cuntais, %(name)s"
@@ -737,6 +744,11 @@ msgstr "Cuir iontrálacha leis"
 #, draft
 msgid "Add entry"
 msgstr "Cuir iontráil leis"
+
+#: src/postulo/templates/settings/account.html:84
+#, draft
+msgid "Add one"
+msgstr "Cuir ceann leis"
 
 #: src/postulo/templates/resume/overview.html:136
 #, draft
@@ -1714,7 +1726,7 @@ msgstr "Naisc"
 msgid "connections"
 msgstr "naisc"
 
-#: src/postulo/accounts/forms.py:298
+#: src/postulo/accounts/forms.py:331
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Meas iarratas a bheith ina thost tar éis"
@@ -2336,7 +2348,7 @@ msgstr "Ríomhphost"
 msgid "email address"
 msgstr "seoladh ríomhphoist"
 
-#: src/postulo/accounts/forms.py:384
+#: src/postulo/accounts/forms.py:417
 #, draft
 msgid "Email address (optional)"
 msgstr "Seoladh ríomhphoist (roghnach)"
@@ -2491,7 +2503,7 @@ msgid ""
 msgstr ""
 "Imíonn gach rud, ag an am céanna, agus ní féidir le haon duine é a fháil ar ais. Tóg d'easpórtáil ar dtús."
 
-#: src/postulo/accounts/forms.py:288
+#: src/postulo/accounts/forms.py:321
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
@@ -2563,7 +2575,7 @@ msgid "expires on"
 msgstr "téann in éag ar"
 
 #: src/postulo/templates/applications/insights.html:14
-#: src/postulo/templates/base.html:69
+#: src/postulo/templates/base.html:77
 #: src/postulo/templates/core/dashboard.html:298
 #: src/postulo/templates/core/export.html:8
 #, draft
@@ -2695,8 +2707,8 @@ msgstr "Airgeadas"
 msgid "Find logo"
 msgstr "Aimsigh lógó"
 
-#: src/postulo/accounts/forms.py:59 src/postulo/accounts/forms.py:175
-#: src/postulo/accounts/forms.py:199
+#: src/postulo/accounts/forms.py:92 src/postulo/accounts/forms.py:208
+#: src/postulo/accounts/forms.py:232
 #, draft
 msgid "First name"
 msgstr "Céadainm"
@@ -2751,6 +2763,12 @@ msgstr "Mar shampla, “BSc Ríomheolaíocht”."
 #, draft
 msgid "For you, not for the employer: “Backend, English”."
 msgstr "Duitse, ní don fhostóir: “Cúlchríoch, Béarla”."
+
+#: src/postulo/accounts/forms.py:70
+#, draft
+msgid "For you, so you can tell one from another later: “work laptop”, “phone”."
+msgstr ""
+"Duitse, chun iad a aithint óna chéile níos déanaí: “ríomhaire oibre”, “fón”."
 
 #: src/postulo/jobs/views.py:219
 #, python-format, draft
@@ -3494,7 +3512,7 @@ msgstr "Cineálacha litreach"
 msgid "label"
 msgstr "lipéad"
 
-#: src/postulo/accounts/forms.py:346 src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:379 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Teanga"
@@ -3566,8 +3584,8 @@ msgstr "seiceáilte go deireanach"
 msgid "last error"
 msgstr "earráid dheireanach"
 
-#: src/postulo/accounts/forms.py:60 src/postulo/accounts/forms.py:176
-#: src/postulo/accounts/forms.py:200
+#: src/postulo/accounts/forms.py:93 src/postulo/accounts/forms.py:209
+#: src/postulo/accounts/forms.py:233
 #, draft
 msgid "Last name"
 msgstr "Sloinne"
@@ -3641,6 +3659,11 @@ msgstr "Dlí"
 #, draft
 msgid "Legal Entity Identifier (LEI)"
 msgstr "Aitheantóir Eintitis Dhlítheanaigh (LEI)"
+
+#: src/postulo/accounts/forms.py:75
+#, draft
+msgid "Let this passkey sign me in on its own"
+msgstr "Lig don eochair rochtana seo mé a shíniú isteach léi féin"
 
 #: src/postulo/documents/forms.py:196
 #, draft
@@ -3805,12 +3828,12 @@ msgstr "Taispeántar uimhreacha níos ísle ar dtús."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Litreacha beaga, digití, poncanna, fostríoca agus fleiscíní."
 
-#: src/postulo/accounts/forms.py:132
+#: src/postulo/accounts/forms.py:165
 #, draft
 msgid "Machine translation, awaiting review"
 msgstr "Meaisínaistriúchán, ag fanacht le hathbhreithniú"
 
-#: src/postulo/templates/base.html:31
+#: src/postulo/templates/base.html:39
 #, draft
 msgid "Main"
 msgstr "Príomh"
@@ -3836,8 +3859,9 @@ msgid "Make administrator"
 msgstr "Déan ina riarthóir"
 
 #: src/postulo/templates/settings/account.html:26
-#: src/postulo/templates/settings/account.html:72
-#: src/postulo/templates/settings/account.html:89
+#: src/postulo/templates/settings/account.html:84
+#: src/postulo/templates/settings/account.html:134
+#: src/postulo/templates/settings/account.html:151
 #, draft
 msgid "Manage"
 msgstr "Bainistigh"
@@ -4374,7 +4398,7 @@ msgstr "nóta"
 msgid "Note"
 msgstr "Nóta"
 
-#: src/postulo/accounts/forms.py:385
+#: src/postulo/accounts/forms.py:418
 #: src/postulo/templates/applications/application_detail.html:48
 #, draft
 msgid "Note (optional)"
@@ -4593,7 +4617,7 @@ msgstr "fógartha ar"
 msgid "Off"
 msgstr "As"
 
-#: src/postulo/templates/settings/account.html:67
+#: src/postulo/templates/settings/account.html:129
 #, draft
 msgid ""
 "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
@@ -4638,7 +4662,14 @@ msgstr "Ar an láthair"
 msgid "On the timeline"
 msgstr "Ar an amlíne"
 
-#: src/postulo/templates/settings/account.html:65
+#: src/postulo/accounts/forms.py:76
+#, draft
+msgid ""
+"On, it replaces the password entirely and your device asks for a fingerprint, your face or a PIN instead. Off, it is only a second step after the password, and it will not appear on the sign-in page."
+msgstr ""
+"Ar siúl, cuireann sí in ionad an fhocail faire go hiomlán agus iarrann do ghléas méarlorg, d’aghaidh nó UAP. As, níl inti ach an dara céim tar éis an fhocail faire agus ní thaispeánfar ar an leathanach sínithe isteach í."
+
+#: src/postulo/templates/settings/account.html:127
 #, draft
 msgid ""
 "On. Signing in asks for a code from your authenticator app, or a recovery code."
@@ -4692,6 +4723,23 @@ msgid ""
 "One page per request, public addresses only, never a crawl. These are fixed."
 msgstr ""
 "Leathanach amháin in aghaidh an iarratais, seoltaí poiblí amháin, ní craobhscaoileadh riamh. Tá siad seo socraithe."
+
+#: src/postulo/templates/settings/account.html:69
+#, python-format, draft
+msgid ""
+"One passkey on this account. It signs you in with a fingerprint, your face or a PIN, and there is no password to leak."
+msgid_plural ""
+"%(total)s passkeys on this account. They sign you in with a fingerprint, your face or a PIN, and there is no password to leak."
+msgstr[0] ""
+"Eochair rochtana amháin ar an gcuntas seo. Síníonn sí isteach thú le méarlorg, le d’aghaidh nó le UAP, agus níl aon fhocal faire ann a d’fhéadfadh sceitheadh."
+msgstr[1] ""
+"%(total)s eochair rochtana ar an gcuntas seo. Síníonn siad isteach thú le méarlorg, le d’aghaidh nó le UAP, agus níl aon fhocal faire ann a d’fhéadfadh sceitheadh."
+msgstr[2] ""
+"%(total)s eochracha rochtana ar an gcuntas seo. Síníonn siad isteach thú le méarlorg, le d’aghaidh nó le UAP, agus níl aon fhocal faire ann a d’fhéadfadh sceitheadh."
+msgstr[3] ""
+"%(total)s n-eochracha rochtana ar an gcuntas seo. Síníonn siad isteach thú le méarlorg, le d’aghaidh nó le UAP, agus níl aon fhocal faire ann a d’fhéadfadh sceitheadh."
+msgstr[4] ""
+"%(total)s eochair rochtana ar an gcuntas seo. Síníonn siad isteach thú le méarlorg, le d’aghaidh nó le UAP, agus níl aon fhocal faire ann a d’fhéadfadh sceitheadh."
 
 #: src/postulo/templates/applications/interview_form.html:18
 #, draft
@@ -4862,10 +4910,15 @@ msgstr "fógra parsáilte"
 msgid "Part time"
 msgstr "Páirtaimseartha"
 
-#: src/postulo/accounts/forms.py:134
+#: src/postulo/accounts/forms.py:167
 #, draft
 msgid "Partly translated"
 msgstr "Aistrithe go páirteach"
+
+#: src/postulo/templates/settings/account.html:66
+#, draft
+msgid "Passkeys"
+msgstr "Eochracha rochtana"
 
 #: src/postulo/templates/settings/account.html:50
 #, draft
@@ -5019,7 +5072,7 @@ msgid ""
 msgstr ""
 "Chomh maith le do phróifíl, do thaifead gairme, clibeanna, gach iontráil amlíne agus gach meabhrúchán. Tá comhad JSON inléite amháin agus fillteán meán sa chartlann."
 
-#: src/postulo/accounts/forms.py:206
+#: src/postulo/accounts/forms.py:239
 #, draft
 msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
@@ -5102,7 +5155,7 @@ msgid ""
 msgstr ""
 "Faigheann Postulo leathanach amháin a d'iarr duine, agus urramaíonn sé robots.txt an tsuímh de réir réamhshocraithe. Ná habair tá ach amháin má tá cinneadh déanta agat nach mbaineann an cúirtéis sin anseo."
 
-#: src/postulo/accounts/forms.py:215
+#: src/postulo/accounts/forms.py:248
 #, draft
 msgid ""
 "Postulo fetches the picture for your primary address from gravatar.com once, keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick it and the copy is deleted."
@@ -5122,7 +5175,7 @@ msgid ""
 msgstr ""
 "Ní stórálann Postulo ach haiseáil de agus ní féidir leis é a thaispeáint arís. Má chailleann tú é, déanann tú ceann eile."
 
-#: src/postulo/templates/base.html:100
+#: src/postulo/templates/base.html:108
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — do chuardach poist, ar do fhreastalaí féin."
@@ -5559,7 +5612,7 @@ msgstr "Bain riarthóir"
 msgid "Remove the logo"
 msgstr "Bain an lógó"
 
-#: src/postulo/accounts/forms.py:211
+#: src/postulo/accounts/forms.py:244
 #, draft
 msgid "Remove the uploaded picture"
 msgstr "Bain an pictiúr uaslódáilte"
@@ -5639,7 +5692,7 @@ msgstr "Athbhreithnigh"
 msgid "Review the capture"
 msgstr "Athbhreithnigh an ghabháil"
 
-#: src/postulo/accounts/forms.py:130
+#: src/postulo/accounts/forms.py:163
 #, draft
 msgid "Reviewed by a speaker"
 msgstr "Athbhreithnithe ag cainteoir"
@@ -5851,12 +5904,12 @@ msgstr "Scagadh"
 msgid "Search"
 msgstr "Cuardaigh"
 
-#: src/postulo/templates/base.html:44
+#: src/postulo/templates/base.html:52
 #, draft
 msgid "Search  /"
 msgstr "Cuardaigh  /"
 
-#: src/postulo/templates/base.html:42 src/postulo/templates/core/search.html:12
+#: src/postulo/templates/base.html:50 src/postulo/templates/core/search.html:12
 #, draft
 msgid "Search everything"
 msgstr "Cuardaigh gach rud"
@@ -5976,7 +6029,7 @@ msgstr "Freastalaí"
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:65 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:73 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:10
 #, draft
 msgid "Server settings"
@@ -6003,7 +6056,7 @@ msgid ""
 msgstr ""
 "Socraithe ag an timpeallacht: <code>%(variable)s</code>. Bain den timpeallacht é chun é seo a athrú anseo."
 
-#: src/postulo/templates/settings/account.html:72
+#: src/postulo/templates/settings/account.html:134
 #, draft
 msgid "Set up"
 msgstr "Socraigh"
@@ -6014,7 +6067,7 @@ msgid "Set when the opening is no longer available."
 msgstr "Socraigh nuair nach bhfuil an folúntas ar fáil a thuilleadh."
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:61 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:69 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:21
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -6064,7 +6117,7 @@ msgstr "Taispeáin gach rud"
 msgid "Show done too"
 msgstr "Taispeáin cinn déanta freisin"
 
-#: src/postulo/accounts/forms.py:285
+#: src/postulo/accounts/forms.py:318
 #, draft
 msgid "Show in the navigation"
 msgstr "Taispeáin sa nascleanúint"
@@ -6079,12 +6132,19 @@ msgstr "Taispeáin cinn caite freisin"
 msgid "Shown in the header and on the sign-in page."
 msgstr "Taispeántar sa cheanntásc agus ar an leathanach sínithe isteach."
 
-#: src/postulo/templates/base.html:84 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:92 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
 msgstr "Sínigh isteach"
 
-#: src/postulo/templates/base.html:75
+#: src/postulo/templates/settings/account.html:77
+#, draft
+msgid ""
+"Sign in with a fingerprint, your face or a device PIN. Nothing to type, nothing written down, and nothing an email can talk you out of."
+msgstr ""
+"Sínigh isteach le méarlorg, le d’aghaidh nó le UAP an ghléis. Faic le clóscríobh, faic scríofa síos, agus faic ar féidir le ríomhphost tú a chur ina choinne."
+
+#: src/postulo/templates/base.html:83
 #, draft
 msgid "Sign out"
 msgstr "Sínigh amach"
@@ -6095,7 +6155,7 @@ msgstr "Sínigh amach"
 msgid "Sign-in"
 msgstr "Síniú isteach"
 
-#: src/postulo/templates/settings/account.html:81
+#: src/postulo/templates/settings/account.html:143
 #, draft
 msgid "Sign-in methods"
 msgstr "Modhanna sínithe isteach"
@@ -6110,7 +6170,7 @@ msgstr "Sínigh isteach i gcuntas atá ann trí ríomhphost"
 msgid "Single sign-on"
 msgstr "Síniú isteach aonair"
 
-#: src/postulo/templates/base.html:41
+#: src/postulo/templates/base.html:49
 #, draft
 msgid "Site search"
 msgstr "Cuardach suímh"
@@ -6157,7 +6217,7 @@ msgstr "Scileanna"
 msgid "skills"
 msgstr "scileanna"
 
-#: src/postulo/templates/base.html:15
+#: src/postulo/templates/base.html:23
 #, draft
 msgid "Skip to content"
 msgstr "Léim go dtí an t-ábhar"
@@ -6295,7 +6355,7 @@ msgstr "Stádas sa scarbhileog: %(text)s"
 msgid "Status updated."
 msgstr "Stádas nuashonraithe."
 
-#: src/postulo/accounts/forms.py:48
+#: src/postulo/accounts/forms.py:49
 #, draft
 msgid "Stay signed in on this device"
 msgstr "Fan sínithe isteach ar an ngléas seo"
@@ -6635,7 +6695,7 @@ msgstr "Tá an leathanach sin níos mó ná %(limit)s MB, mar sin níor léadh �
 msgid "That page returned %(status)s."
 msgstr "Sheol an leathanach sin %(status)s ar ais."
 
-#: src/postulo/accounts/forms.py:240
+#: src/postulo/accounts/forms.py:273
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tá an pictiúr sin os cionn 5 MB. Ceann níos lú, le do thoil."
@@ -6984,7 +7044,7 @@ msgstr "Tá an t-aitheantóir seo liostaithe cheana."
 msgid "This instance"
 msgstr "An t-ásc seo"
 
-#: src/postulo/templates/settings/account.html:83
+#: src/postulo/templates/settings/account.html:145
 #, python-format, draft
 msgid ""
 "This instance also signs in through %(provider)s. Connect it to this account to use it, or disconnect it."
@@ -7053,7 +7113,7 @@ msgid ""
 msgstr ""
 "Ticeáilte, éiríonn an fógra ina iarratas láithreach, marcáilte mar a cuireadh isteach inniu. Seachas sin fanann sé i do chuid fógraí go gcinneann tú."
 
-#: src/postulo/accounts/forms.py:352
+#: src/postulo/accounts/forms.py:385
 #, draft
 msgid "Time zone"
 msgstr "Crios ama"
@@ -7167,7 +7227,7 @@ msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr ""
 "Dhá litriú ar an rud céanna? Cuir ceann amháin in eagar agus cumaisc isteach sa cheann eile é."
 
-#: src/postulo/templates/settings/account.html:62
+#: src/postulo/templates/settings/account.html:124
 #, draft
 msgid "Two-factor authentication"
 msgstr "Fíordheimhniú dhá fhachtóir"
@@ -7248,7 +7308,7 @@ msgstr "nuashonraithe ag"
 msgid "Upload a file"
 msgstr "Uaslódáil comhad"
 
-#: src/postulo/accounts/forms.py:204
+#: src/postulo/accounts/forms.py:237
 #, draft
 msgid "Upload a picture"
 msgstr "Uaslódáil pictiúr"
@@ -7286,12 +7346,12 @@ msgid ""
 msgstr ""
 "Úsáid 3 go 32 litir bheaga, digit, ponc, fostríoc nó fleiscín, ag tosú agus ag críochnú le litir nó digit."
 
-#: src/postulo/accounts/forms.py:243
+#: src/postulo/accounts/forms.py:276
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Úsáid PNG, JPEG, WebP nó GIF."
 
-#: src/postulo/accounts/forms.py:213
+#: src/postulo/accounts/forms.py:246
 #, draft
 msgid "Use my Gravatar"
 msgstr "Úsáid mo Gravatar"
@@ -7301,7 +7361,7 @@ msgstr "Úsáid mo Gravatar"
 msgid "use my Gravatar"
 msgstr "úsáid mo Gravatar"
 
-#: src/postulo/accounts/forms.py:128 src/postulo/accounts/forms.py:163
+#: src/postulo/accounts/forms.py:161 src/postulo/accounts/forms.py:196
 #, draft
 msgid "Use the instance default"
 msgstr "Úsáid réamhshocrú an áisc"
@@ -7318,7 +7378,7 @@ msgstr ""
 msgid "user"
 msgstr "úsáideoir"
 
-#: src/postulo/accounts/forms.py:362 src/postulo/templates/server/email.html:15
+#: src/postulo/accounts/forms.py:395 src/postulo/templates/server/email.html:15
 #: src/postulo/templates/server/people.html:19
 #, draft
 msgid "Username"
@@ -7329,7 +7389,7 @@ msgstr "Ainm úsáideora"
 msgid "username"
 msgstr "ainm úsáideora"
 
-#: src/postulo/accounts/forms.py:46
+#: src/postulo/accounts/forms.py:47
 #, draft
 msgid "Username or email"
 msgstr "Ainm úsáideora nó ríomhphost"
@@ -7552,6 +7612,11 @@ msgstr ""
 msgid "What this instance is running, and where its data is."
 msgstr "Cad atá á rith ag an ásc seo, agus cá bhfuil a shonraí."
 
+#: src/postulo/accounts/forms.py:69
+#, draft
+msgid "What to call it"
+msgstr "Cad a thabharfar uirthi"
+
 #: src/postulo/applications/models.py:374
 #, draft
 msgid "what to do"
@@ -7562,7 +7627,7 @@ msgstr "cad atá le déanamh"
 msgid "What will be deleted"
 msgstr "Cad a scriosfar"
 
-#: src/postulo/accounts/forms.py:364
+#: src/postulo/accounts/forms.py:397
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -7838,6 +7903,13 @@ msgid ""
 msgstr ""
 "Chuir tú iarratas chuig an gceann seo roimhe seo. Tá sé ceart go leor dara hiarratas a thaifeadadh; fanann an dá cheann ar an taifead."
 
+#: src/postulo/templates/settings/account.html:111
+#, python-format, draft
+msgid ""
+"You have no recovery codes. Lose the device holding your passkey and there is nothing else to try. <a class=\"underline\" href=\"%(url)s\">Generate some</a> and keep them somewhere that is not the device."
+msgstr ""
+"Níl aon chóid athshlánaithe agat. Má chailleann tú an gléas a bhfuil d’eochair rochtana air, níl aon rud eile fágtha. <a class=\"underline\" href=\"%(url)s\">Cruthaigh cuid acu</a> agus coinnigh áit éigin seachas ar an ngléas iad."
+
 #: src/postulo/templates/jobs/posting_detail.html:118
 #, draft
 msgid "You have not applied to this one."
@@ -7887,6 +7959,13 @@ msgstr ""
 msgid "Your application"
 msgstr "D'iarratas"
 
+#: src/postulo/templates/settings/account.html:92
+#, draft
+msgid ""
+"Your browser will only make a passkey on a page served over HTTPS. This instance is being reached over plain HTTP, so passkeys cannot be offered here. That is the browser's rule, not a setting on this server."
+msgstr ""
+"Ní chruthóidh do bhrabhsálaí eochair rochtana ach ar leathanach a fhreastalaítear thar HTTPS. Baintear amach an t-ásc seo thar ghnáth-HTTP, mar sin ní féidir eochracha rochtana a thairiscint anseo. Riail an bhrabhsálaí atá ann, ní socrú ar an bhfreastalaí seo."
+
 #: src/postulo/templates/documents/cv_list.html:15
 #: src/postulo/templates/documents/cv_list.html:46
 #: src/postulo/templates/resume/overview.html:4
@@ -7920,7 +7999,7 @@ msgstr "Do spriocdháta"
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
-#: src/postulo/templates/base.html:58
+#: src/postulo/templates/base.html:66
 #: src/postulo/templates/core/dashboard.html:304
 #, draft
 msgid "Your details"

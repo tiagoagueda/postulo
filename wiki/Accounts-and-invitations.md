@@ -68,6 +68,40 @@ a leaked password alone is not enough.
 API tokens are their own credential and do not go through the second factor: a
 browser extension has no code to type. See [The capture API](The-capture-API).
 
+## Passkeys
+
+A **passkey** is held by your device or your password manager and released by a
+fingerprint, your face or a device PIN. It is the best way in Postulo has:
+
+- **There is no shared secret.** Nothing to leak in a breach, nothing to reuse on another
+  site, and no code to read out to somebody who has phoned you pretending to be support.
+- **It is already two factors** — the device you have, unlocked by something you are or
+  know — so it stands on its own rather than being a step after a password.
+- **It cannot be used on the wrong site.** The browser will only offer a passkey to the
+  address it was made at, which is what makes it proof against a convincing copy of your
+  sign-in page.
+
+Add one under *Settings → Account → Passkeys*. Give it a name you will recognise later, and
+leave *Let this passkey sign me in on its own* ticked unless you want it only as a second
+step after your password. Then *Sign in with a passkey* on the sign-in page is all it takes.
+
+Two things are worth knowing before you rely on one.
+
+**It is tied to the address you made it at.** A passkey made at `postulo.example.org` will
+not work at `jobs.example.org`, and moving your instance to a new name makes every existing
+passkey unusable there. That is the standard, not a limitation of Postulo, and there is no
+migrating them: add new ones at the new address and remove the old. The account page names
+the address you are currently on, so you can see what you are committing to.
+
+**Your browser needs HTTPS.** Over plain HTTP browsers refuse the whole mechanism, with
+`localhost` the only exception. An instance reached at a bare address over a mesh VPN cannot
+offer passkeys at all, and no server setting changes that; the account page says so instead
+of showing a button that would fail.
+
+**Make recovery codes.** Once a passkey is your only way in, losing the device means losing
+the account. Recovery codes are the answer, they live under *Two-factor authentication*, and
+the account page nags you until you have some. Keep them somewhere that is not the device.
+
 ## Single sign-on
 
 An instance can sign people in through an **OpenID Connect** identity provider —

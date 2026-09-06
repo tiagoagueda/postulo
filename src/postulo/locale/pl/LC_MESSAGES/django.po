@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:22+0000\n"
+"POT-Creation-Date: 2026-09-06 17:40+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: polski\n"
@@ -274,7 +274,7 @@ msgstr "%(name)s — %(kind)s"
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
 
-#: src/postulo/templates/base.html:26
+#: src/postulo/templates/base.html:34
 #, python-format, draft
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — pulpit"
@@ -467,6 +467,13 @@ msgid ""
 msgstr ""
 "Pakiet rejestruje źródło w grupie punktów wejścia <code>%(group)s</code>. Wtyczka, która rejestruje tylko punkty wejścia, pojawia się zaraz po instalacji; taka, która dodaje własne strony, wymaga ponownego uruchomienia. Źródło, które się nie wczyta, trafia do dziennika i zostaje pominięte, a wbudowane działają dalej."
 
+#: src/postulo/templates/settings/account.html:101
+#, python-format, draft
+msgid ""
+"A passkey is tied to the address you made it at, which here is %(host)s. Reaching this instance by another name, or moving it, will not carry your passkeys over."
+msgstr ""
+"Klucz dostępu jest związany z adresem, pod którym go utworzono, tutaj %(host)s. Dotarcie do tej instancji pod inną nazwą lub jej przeniesienie nie przeniesie kluczy dostępu."
+
 #: src/postulo/templates/core/dashboard.html:23
 #, python-format, draft
 msgid ""
@@ -622,7 +629,7 @@ msgstr "zaakceptowano przez"
 msgid "Account"
 msgstr "Konto"
 
-#: src/postulo/templates/base.html:51
+#: src/postulo/templates/base.html:59
 #, python-format, draft
 msgid "Account menu, %(name)s"
 msgstr "Menu konta, %(name)s"
@@ -695,6 +702,11 @@ msgstr "Dodaj wpisy"
 #, draft
 msgid "Add entry"
 msgstr "Dodaj wpis"
+
+#: src/postulo/templates/settings/account.html:84
+#, draft
+msgid "Add one"
+msgstr "Dodaj jeden"
 
 #: src/postulo/templates/resume/overview.html:136
 #, draft
@@ -1669,7 +1681,7 @@ msgstr "Połączenia"
 msgid "connections"
 msgstr "połączenia"
 
-#: src/postulo/accounts/forms.py:298
+#: src/postulo/accounts/forms.py:331
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Uznaj aplikację za cichą po"
@@ -2290,7 +2302,7 @@ msgstr "E-mail"
 msgid "email address"
 msgstr "adres e-mail"
 
-#: src/postulo/accounts/forms.py:384
+#: src/postulo/accounts/forms.py:417
 #, draft
 msgid "Email address (optional)"
 msgstr "Adres e-mail (opcjonalnie)"
@@ -2443,7 +2455,7 @@ msgid ""
 msgstr ""
 "Wszystko znika, od razu, i nikt tego nie przywróci. Najpierw zrób eksport."
 
-#: src/postulo/accounts/forms.py:288
+#: src/postulo/accounts/forms.py:321
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
@@ -2515,7 +2527,7 @@ msgid "expires on"
 msgstr "wygasa dnia"
 
 #: src/postulo/templates/applications/insights.html:14
-#: src/postulo/templates/base.html:69
+#: src/postulo/templates/base.html:77
 #: src/postulo/templates/core/dashboard.html:298
 #: src/postulo/templates/core/export.html:8
 #, draft
@@ -2648,8 +2660,8 @@ msgstr "Finanse"
 msgid "Find logo"
 msgstr "Znajdź logo"
 
-#: src/postulo/accounts/forms.py:59 src/postulo/accounts/forms.py:175
-#: src/postulo/accounts/forms.py:199
+#: src/postulo/accounts/forms.py:92 src/postulo/accounts/forms.py:208
+#: src/postulo/accounts/forms.py:232
 #, draft
 msgid "First name"
 msgstr "Imię"
@@ -2704,6 +2716,11 @@ msgstr "Na przykład „Licencjat z informatyki”."
 #, draft
 msgid "For you, not for the employer: “Backend, English”."
 msgstr "Dla ciebie, nie dla pracodawcy: „Backend, angielski”."
+
+#: src/postulo/accounts/forms.py:70
+#, draft
+msgid "For you, so you can tell one from another later: “work laptop”, “phone”."
+msgstr "Dla Ciebie, żeby później je rozróżnić: „laptop służbowy”, „telefon”."
 
 #: src/postulo/jobs/views.py:219
 #, python-format, draft
@@ -3443,7 +3460,7 @@ msgstr "Rodzaje listów"
 msgid "label"
 msgstr "etykieta"
 
-#: src/postulo/accounts/forms.py:346 src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:379 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Język"
@@ -3515,8 +3532,8 @@ msgstr "ostatnio sprawdzono"
 msgid "last error"
 msgstr "ostatni błąd"
 
-#: src/postulo/accounts/forms.py:60 src/postulo/accounts/forms.py:176
-#: src/postulo/accounts/forms.py:200
+#: src/postulo/accounts/forms.py:93 src/postulo/accounts/forms.py:209
+#: src/postulo/accounts/forms.py:233
 #, draft
 msgid "Last name"
 msgstr "Nazwisko"
@@ -3590,6 +3607,11 @@ msgstr "Prawo"
 #, draft
 msgid "Legal Entity Identifier (LEI)"
 msgstr "Identyfikator podmiotu prawnego (LEI)"
+
+#: src/postulo/accounts/forms.py:75
+#, draft
+msgid "Let this passkey sign me in on its own"
+msgstr "Pozwól temu kluczowi logować mnie samodzielnie"
 
 #: src/postulo/documents/forms.py:196
 #, draft
@@ -3754,12 +3776,12 @@ msgstr "Niższe liczby pojawiają się pierwsze."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Małe litery, cyfry, kropki, podkreślenia i łączniki."
 
-#: src/postulo/accounts/forms.py:132
+#: src/postulo/accounts/forms.py:165
 #, draft
 msgid "Machine translation, awaiting review"
 msgstr "Tłumaczenie maszynowe, oczekuje na weryfikację"
 
-#: src/postulo/templates/base.html:31
+#: src/postulo/templates/base.html:39
 #, draft
 msgid "Main"
 msgstr "Główny"
@@ -3785,8 +3807,9 @@ msgid "Make administrator"
 msgstr "Mianuj administratorem"
 
 #: src/postulo/templates/settings/account.html:26
-#: src/postulo/templates/settings/account.html:72
-#: src/postulo/templates/settings/account.html:89
+#: src/postulo/templates/settings/account.html:84
+#: src/postulo/templates/settings/account.html:134
+#: src/postulo/templates/settings/account.html:151
 #, draft
 msgid "Manage"
 msgstr "Zarządzaj"
@@ -4321,7 +4344,7 @@ msgstr "notatka"
 msgid "Note"
 msgstr "Notatka"
 
-#: src/postulo/accounts/forms.py:385
+#: src/postulo/accounts/forms.py:418
 #: src/postulo/templates/applications/application_detail.html:48
 #, draft
 msgid "Note (optional)"
@@ -4540,7 +4563,7 @@ msgstr "powiadomiono dnia"
 msgid "Off"
 msgstr "Wyłączone"
 
-#: src/postulo/templates/settings/account.html:67
+#: src/postulo/templates/settings/account.html:129
 #, draft
 msgid ""
 "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
@@ -4585,7 +4608,14 @@ msgstr "Na miejscu"
 msgid "On the timeline"
 msgstr "Na osi czasu"
 
-#: src/postulo/templates/settings/account.html:65
+#: src/postulo/accounts/forms.py:76
+#, draft
+msgid ""
+"On, it replaces the password entirely and your device asks for a fingerprint, your face or a PIN instead. Off, it is only a second step after the password, and it will not appear on the sign-in page."
+msgstr ""
+"Włączone: zastępuje hasło całkowicie, a urządzenie prosi o odcisk palca, twarz lub PIN. Wyłączone: jest tylko drugim krokiem po haśle i nie pojawi się na stronie logowania."
+
+#: src/postulo/templates/settings/account.html:127
 #, draft
 msgid ""
 "On. Signing in asks for a code from your authenticator app, or a recovery code."
@@ -4635,6 +4665,19 @@ msgid ""
 "One page per request, public addresses only, never a crawl. These are fixed."
 msgstr ""
 "Jedna strona na żądanie, tylko publiczne adresy, nigdy przeszukiwanie. To jest stałe."
+
+#: src/postulo/templates/settings/account.html:69
+#, python-format, draft
+msgid ""
+"One passkey on this account. It signs you in with a fingerprint, your face or a PIN, and there is no password to leak."
+msgid_plural ""
+"%(total)s passkeys on this account. They sign you in with a fingerprint, your face or a PIN, and there is no password to leak."
+msgstr[0] ""
+"Jeden klucz dostępu na tym koncie. Loguje Cię odciskiem palca, twarzą lub PIN-em, i nie ma hasła, które mogłoby wyciec."
+msgstr[1] ""
+"%(total)s klucze dostępu na tym koncie. Logują Cię odciskiem palca, twarzą lub PIN-em, i nie ma hasła, które mogłoby wyciec."
+msgstr[2] ""
+"%(total)s kluczy dostępu na tym koncie. Logują Cię odciskiem palca, twarzą lub PIN-em, i nie ma hasła, które mogłoby wyciec."
 
 #: src/postulo/templates/applications/interview_form.html:18
 #, draft
@@ -4803,10 +4846,15 @@ msgstr "sparsowane ogłoszenie"
 msgid "Part time"
 msgstr "Niepełny etat"
 
-#: src/postulo/accounts/forms.py:134
+#: src/postulo/accounts/forms.py:167
 #, draft
 msgid "Partly translated"
 msgstr "Częściowo przetłumaczone"
+
+#: src/postulo/templates/settings/account.html:66
+#, draft
+msgid "Passkeys"
+msgstr "Klucze dostępu"
 
 #: src/postulo/templates/settings/account.html:50
 #, draft
@@ -4960,7 +5008,7 @@ msgid ""
 msgstr ""
 "Plus twój profil, historia kariery, tagi, każdy wpis osi czasu i każde przypomnienie. Archiwum zawiera jeden czytelny plik JSON i folder media."
 
-#: src/postulo/accounts/forms.py:206
+#: src/postulo/accounts/forms.py:239
 #, draft
 msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
@@ -5043,7 +5091,7 @@ msgid ""
 msgstr ""
 "Postulo pobiera jedną stronę, o którą ktoś poprosił, i domyślnie respektuje robots.txt witryny. Powiedz tak tylko, jeśli uznałeś, że ta uprzejmość tutaj nie obowiązuje."
 
-#: src/postulo/accounts/forms.py:215
+#: src/postulo/accounts/forms.py:248
 #, draft
 msgid ""
 "Postulo fetches the picture for your primary address from gravatar.com once, keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick it and the copy is deleted."
@@ -5062,7 +5110,7 @@ msgid ""
 msgstr ""
 "Postulo przechowuje tylko jego hasz i nie może go pokazać ponownie. Jeśli go zgubisz, utwórz kolejny."
 
-#: src/postulo/templates/base.html:100
+#: src/postulo/templates/base.html:108
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — twoje poszukiwanie pracy, na twoim serwerze."
@@ -5495,7 +5543,7 @@ msgstr "Odbierz uprawnienia administratora"
 msgid "Remove the logo"
 msgstr "Usuń logo"
 
-#: src/postulo/accounts/forms.py:211
+#: src/postulo/accounts/forms.py:244
 #, draft
 msgid "Remove the uploaded picture"
 msgstr "Usuń wgrany obrazek"
@@ -5574,7 +5622,7 @@ msgstr "Sprawdź"
 msgid "Review the capture"
 msgstr "Sprawdź przechwycenie"
 
-#: src/postulo/accounts/forms.py:130
+#: src/postulo/accounts/forms.py:163
 #, draft
 msgid "Reviewed by a speaker"
 msgstr "Sprawdzone przez osobę mówiącą"
@@ -5786,12 +5834,12 @@ msgstr "Wstępna selekcja"
 msgid "Search"
 msgstr "Szukaj"
 
-#: src/postulo/templates/base.html:44
+#: src/postulo/templates/base.html:52
 #, draft
 msgid "Search  /"
 msgstr "Szukaj  /"
 
-#: src/postulo/templates/base.html:42 src/postulo/templates/core/search.html:12
+#: src/postulo/templates/base.html:50 src/postulo/templates/core/search.html:12
 #, draft
 msgid "Search everything"
 msgstr "Szukaj wszędzie"
@@ -5910,7 +5958,7 @@ msgstr "Serwer"
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:65 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:73 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:10
 #, draft
 msgid "Server settings"
@@ -5937,7 +5985,7 @@ msgid ""
 msgstr ""
 "Ustawione przez środowisko: <code>%(variable)s</code>. Usuń to ze środowiska, żeby zmienić tutaj."
 
-#: src/postulo/templates/settings/account.html:72
+#: src/postulo/templates/settings/account.html:134
 #, draft
 msgid "Set up"
 msgstr "Skonfiguruj"
@@ -5948,7 +5996,7 @@ msgid "Set when the opening is no longer available."
 msgstr "Ustaw, gdy oferta nie jest już dostępna."
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:61 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:69 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:21
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -5998,7 +6046,7 @@ msgstr "Pokaż wszystko"
 msgid "Show done too"
 msgstr "Pokaż też zrobione"
 
-#: src/postulo/accounts/forms.py:285
+#: src/postulo/accounts/forms.py:318
 #, draft
 msgid "Show in the navigation"
 msgstr "Pokazuj w nawigacji"
@@ -6013,12 +6061,19 @@ msgstr "Pokaż też minione"
 msgid "Shown in the header and on the sign-in page."
 msgstr "Widoczne w nagłówku i na stronie logowania."
 
-#: src/postulo/templates/base.html:84 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:92 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
 msgstr "Zaloguj się"
 
-#: src/postulo/templates/base.html:75
+#: src/postulo/templates/settings/account.html:77
+#, draft
+msgid ""
+"Sign in with a fingerprint, your face or a device PIN. Nothing to type, nothing written down, and nothing an email can talk you out of."
+msgstr ""
+"Zaloguj się odciskiem palca, twarzą lub PIN-em urządzenia. Nic do wpisywania, nic zapisanego i nic, do czego mógłby Cię namówić e-mail."
+
+#: src/postulo/templates/base.html:83
 #, draft
 msgid "Sign out"
 msgstr "Wyloguj się"
@@ -6029,7 +6084,7 @@ msgstr "Wyloguj się"
 msgid "Sign-in"
 msgstr "Logowanie"
 
-#: src/postulo/templates/settings/account.html:81
+#: src/postulo/templates/settings/account.html:143
 #, draft
 msgid "Sign-in methods"
 msgstr "Metody logowania"
@@ -6044,7 +6099,7 @@ msgstr "Loguje do istniejącego konta przez e-mail"
 msgid "Single sign-on"
 msgstr "Jednokrotne logowanie"
 
-#: src/postulo/templates/base.html:41
+#: src/postulo/templates/base.html:49
 #, draft
 msgid "Site search"
 msgstr "Wyszukiwanie w witrynie"
@@ -6091,7 +6146,7 @@ msgstr "Umiejętności"
 msgid "skills"
 msgstr "umiejętności"
 
-#: src/postulo/templates/base.html:15
+#: src/postulo/templates/base.html:23
 #, draft
 msgid "Skip to content"
 msgstr "Przejdź do treści"
@@ -6229,7 +6284,7 @@ msgstr "Status w arkuszu: %(text)s"
 msgid "Status updated."
 msgstr "Zaktualizowano status."
 
-#: src/postulo/accounts/forms.py:48
+#: src/postulo/accounts/forms.py:49
 #, draft
 msgid "Stay signed in on this device"
 msgstr "Pozostań zalogowany na tym urządzeniu"
@@ -6570,7 +6625,7 @@ msgstr "Ta strona jest większa niż %(limit)s MB, więc nie została odczytana.
 msgid "That page returned %(status)s."
 msgstr "Ta strona zwróciła %(status)s."
 
-#: src/postulo/accounts/forms.py:240
+#: src/postulo/accounts/forms.py:273
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Ten obrazek ma ponad 5 MB. Poproszę o mniejszy."
@@ -6913,7 +6968,7 @@ msgstr "Ten identyfikator już jest na liście."
 msgid "This instance"
 msgstr "Ta instancja"
 
-#: src/postulo/templates/settings/account.html:83
+#: src/postulo/templates/settings/account.html:145
 #, python-format, draft
 msgid ""
 "This instance also signs in through %(provider)s. Connect it to this account to use it, or disconnect it."
@@ -6980,7 +7035,7 @@ msgid ""
 msgstr ""
 "Zaznaczone: oferta od razu staje się aplikacją, oznaczoną jako wysłana dzisiaj. W przeciwnym razie czeka w twoich ofertach na decyzję."
 
-#: src/postulo/accounts/forms.py:352
+#: src/postulo/accounts/forms.py:385
 #, draft
 msgid "Time zone"
 msgstr "Strefa czasowa"
@@ -7093,7 +7148,7 @@ msgstr "Zamieniona w aplikację"
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "Dwie pisownie tego samego? Edytuj jedną i połącz ją z drugą."
 
-#: src/postulo/templates/settings/account.html:62
+#: src/postulo/templates/settings/account.html:124
 #, draft
 msgid "Two-factor authentication"
 msgstr "Uwierzytelnianie dwuskładnikowe"
@@ -7174,7 +7229,7 @@ msgstr "zaktualizowano przez"
 msgid "Upload a file"
 msgstr "Wgraj plik"
 
-#: src/postulo/accounts/forms.py:204
+#: src/postulo/accounts/forms.py:237
 #, draft
 msgid "Upload a picture"
 msgstr "Wgraj obrazek"
@@ -7212,12 +7267,12 @@ msgid ""
 msgstr ""
 "Użyj od 3 do 32 małych liter, cyfr, kropek, podkreśleń lub łączników, zaczynając i kończąc literą lub cyfrą."
 
-#: src/postulo/accounts/forms.py:243
+#: src/postulo/accounts/forms.py:276
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Użyj PNG, JPEG, WebP lub GIF."
 
-#: src/postulo/accounts/forms.py:213
+#: src/postulo/accounts/forms.py:246
 #, draft
 msgid "Use my Gravatar"
 msgstr "Używaj mojego Gravatara"
@@ -7227,7 +7282,7 @@ msgstr "Używaj mojego Gravatara"
 msgid "use my Gravatar"
 msgstr "używaj mojego Gravatara"
 
-#: src/postulo/accounts/forms.py:128 src/postulo/accounts/forms.py:163
+#: src/postulo/accounts/forms.py:161 src/postulo/accounts/forms.py:196
 #, draft
 msgid "Use the instance default"
 msgstr "Użyj wartości domyślnej instancji"
@@ -7243,7 +7298,7 @@ msgstr "Użyj punktów końcowych statusu lub rozmów; oś czasu sama je zapisuj
 msgid "user"
 msgstr "użytkownik"
 
-#: src/postulo/accounts/forms.py:362 src/postulo/templates/server/email.html:15
+#: src/postulo/accounts/forms.py:395 src/postulo/templates/server/email.html:15
 #: src/postulo/templates/server/people.html:19
 #, draft
 msgid "Username"
@@ -7254,7 +7309,7 @@ msgstr "Nazwa użytkownika"
 msgid "username"
 msgstr "nazwa użytkownika"
 
-#: src/postulo/accounts/forms.py:46
+#: src/postulo/accounts/forms.py:47
 #, draft
 msgid "Username or email"
 msgstr "Nazwa użytkownika lub e-mail"
@@ -7474,6 +7529,11 @@ msgstr ""
 msgid "What this instance is running, and where its data is."
 msgstr "Co ta instancja uruchamia i gdzie są jej dane."
 
+#: src/postulo/accounts/forms.py:69
+#, draft
+msgid "What to call it"
+msgstr "Jak go nazwać"
+
 #: src/postulo/applications/models.py:374
 #, draft
 msgid "what to do"
@@ -7484,7 +7544,7 @@ msgstr "co zrobić"
 msgid "What will be deleted"
 msgstr "Co zostanie usunięte"
 
-#: src/postulo/accounts/forms.py:364
+#: src/postulo/accounts/forms.py:397
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -7757,6 +7817,13 @@ msgid ""
 msgstr ""
 "Już tu aplikowałeś. Zapisanie drugiej aplikacji jest w porządku; obie zostają w historii."
 
+#: src/postulo/templates/settings/account.html:111
+#, python-format, draft
+msgid ""
+"You have no recovery codes. Lose the device holding your passkey and there is nothing else to try. <a class=\"underline\" href=\"%(url)s\">Generate some</a> and keep them somewhere that is not the device."
+msgstr ""
+"Nie masz kodów odzyskiwania. Jeśli zgubisz urządzenie z kluczem dostępu, nie zostanie nic innego. <a class=\"underline\" href=\"%(url)s\">Wygeneruj kilka</a> i trzymaj je gdzie indziej niż na tym urządzeniu."
+
 #: src/postulo/templates/jobs/posting_detail.html:118
 #, draft
 msgid "You have not applied to this one."
@@ -7802,6 +7869,13 @@ msgstr ""
 msgid "Your application"
 msgstr "Twoja aplikacja"
 
+#: src/postulo/templates/settings/account.html:92
+#, draft
+msgid ""
+"Your browser will only make a passkey on a page served over HTTPS. This instance is being reached over plain HTTP, so passkeys cannot be offered here. That is the browser's rule, not a setting on this server."
+msgstr ""
+"Twoja przeglądarka utworzy klucz dostępu tylko na stronie serwowanej przez HTTPS. Ta instancja jest osiągana przez zwykły HTTP, więc klucze dostępu nie mogą być tu oferowane. To reguła przeglądarki, nie ustawienie tego serwera."
+
 #: src/postulo/templates/documents/cv_list.html:15
 #: src/postulo/templates/documents/cv_list.html:46
 #: src/postulo/templates/resume/overview.html:4
@@ -7835,7 +7909,7 @@ msgstr "Twój termin"
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
-#: src/postulo/templates/base.html:58
+#: src/postulo/templates/base.html:66
 #: src/postulo/templates/core/dashboard.html:304
 #, draft
 msgid "Your details"

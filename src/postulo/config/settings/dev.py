@@ -19,6 +19,11 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "testserver"]
 
 MAILERS = {"default": {"BACKEND": "django.core.mail.backends.console.EmailBackend"}}
 
+# The browser treats localhost as a secure origin, so a passkey can be registered while
+# developing; the library that checks the origin wants https:// unless told otherwise.
+# Never set this on a server: it is what makes the check mean something.
+MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = True
+
 # Manifest hashing needs collectstatic to have run; unhelpful while developing.
 STORAGES["staticfiles"] = {
     "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",

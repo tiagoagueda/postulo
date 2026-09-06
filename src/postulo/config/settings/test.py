@@ -17,6 +17,10 @@ MAILERS = {"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend
 # A throwaway app providing a concrete OwnedModel to test the foundations against.
 INSTALLED_APPS = [*INSTALLED_APPS, "tests.testapp"]
 
+# The test client is not a browser and never speaks https; without this every WebAuthn
+# test would be testing the origin check rather than the thing it means to test.
+MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = True
+
 MEDIA_ROOT = tempfile.mkdtemp(prefix="postulo-test-media-")
 
 # WhiteNoise warns about a missing static root; give it a real, empty directory.

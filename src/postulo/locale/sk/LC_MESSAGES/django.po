@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:22+0000\n"
+"POT-Creation-Date: 2026-09-06 17:40+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenčina\n"
@@ -274,7 +274,7 @@ msgstr "%(name)s — %(kind)s"
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
 
-#: src/postulo/templates/base.html:26
+#: src/postulo/templates/base.html:34
 #, python-format, draft
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — prehľad"
@@ -467,6 +467,13 @@ msgid ""
 msgstr ""
 "Balík registruje zdroj v skupine vstupných bodov <code>%(group)s</code>. Zásuvný modul, ktorý registruje len vstupné body, sa objaví hneď po inštalácii; ten, ktorý pridáva vlastné stránky, vyžaduje reštart. Zdroj, ktorý sa nenačíta, sa zaznamená a vynechá, a vstavané fungujú ďalej."
 
+#: src/postulo/templates/settings/account.html:101
+#, python-format, draft
+msgid ""
+"A passkey is tied to the address you made it at, which here is %(host)s. Reaching this instance by another name, or moving it, will not carry your passkeys over."
+msgstr ""
+"Prístupový kľúč je viazaný na adresu, na ktorej ste ho vytvorili, tu %(host)s. Dostať sa k tejto inštancii pod iným názvom alebo ju presunúť vaše prístupové kľúče so sebou nevezme."
+
 #: src/postulo/templates/core/dashboard.html:23
 #, python-format, draft
 msgid ""
@@ -621,7 +628,7 @@ msgstr "prijal(a)"
 msgid "Account"
 msgstr "Účet"
 
-#: src/postulo/templates/base.html:51
+#: src/postulo/templates/base.html:59
 #, python-format, draft
 msgid "Account menu, %(name)s"
 msgstr "Ponuka účtu, %(name)s"
@@ -694,6 +701,11 @@ msgstr "Pridať položky"
 #, draft
 msgid "Add entry"
 msgstr "Pridať položku"
+
+#: src/postulo/templates/settings/account.html:84
+#, draft
+msgid "Add one"
+msgstr "Pridať jeden"
 
 #: src/postulo/templates/resume/overview.html:136
 #, draft
@@ -1668,7 +1680,7 @@ msgstr "Pripojenia"
 msgid "connections"
 msgstr "pripojenia"
 
-#: src/postulo/accounts/forms.py:298
+#: src/postulo/accounts/forms.py:331
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Považovať žiadosť za stíchnutú po"
@@ -2288,7 +2300,7 @@ msgstr "E-mail"
 msgid "email address"
 msgstr "e-mailová adresa"
 
-#: src/postulo/accounts/forms.py:384
+#: src/postulo/accounts/forms.py:417
 #, draft
 msgid "Email address (optional)"
 msgstr "E-mailová adresa (nepovinné)"
@@ -2440,7 +2452,7 @@ msgid ""
 "Everything goes, at once, and nobody can bring it back. Take your export first."
 msgstr "Všetko zmizne, naraz, a nikto to nevráti. Najprv si urobte export."
 
-#: src/postulo/accounts/forms.py:288
+#: src/postulo/accounts/forms.py:321
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
@@ -2513,7 +2525,7 @@ msgid "expires on"
 msgstr "vyprší dňa"
 
 #: src/postulo/templates/applications/insights.html:14
-#: src/postulo/templates/base.html:69
+#: src/postulo/templates/base.html:77
 #: src/postulo/templates/core/dashboard.html:298
 #: src/postulo/templates/core/export.html:8
 #, draft
@@ -2646,8 +2658,8 @@ msgstr "Financie"
 msgid "Find logo"
 msgstr "Nájsť logo"
 
-#: src/postulo/accounts/forms.py:59 src/postulo/accounts/forms.py:175
-#: src/postulo/accounts/forms.py:199
+#: src/postulo/accounts/forms.py:92 src/postulo/accounts/forms.py:208
+#: src/postulo/accounts/forms.py:232
 #, draft
 msgid "First name"
 msgstr "Meno"
@@ -2702,6 +2714,11 @@ msgstr "Napríklad „Bc. informatika“."
 #, draft
 msgid "For you, not for the employer: “Backend, English”."
 msgstr "Pre vás, nie pre zamestnávateľa: „Backend, angličtina“."
+
+#: src/postulo/accounts/forms.py:70
+#, draft
+msgid "For you, so you can tell one from another later: “work laptop”, “phone”."
+msgstr "Pre vás, aby ste ich neskôr rozoznali: „pracovný notebook“, „telefón“."
 
 #: src/postulo/jobs/views.py:219
 #, python-format, draft
@@ -3441,7 +3458,7 @@ msgstr "Druhy listov"
 msgid "label"
 msgstr "označenie"
 
-#: src/postulo/accounts/forms.py:346 src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:379 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Jazyk"
@@ -3513,8 +3530,8 @@ msgstr "naposledy skontrolované"
 msgid "last error"
 msgstr "posledná chyba"
 
-#: src/postulo/accounts/forms.py:60 src/postulo/accounts/forms.py:176
-#: src/postulo/accounts/forms.py:200
+#: src/postulo/accounts/forms.py:93 src/postulo/accounts/forms.py:209
+#: src/postulo/accounts/forms.py:233
 #, draft
 msgid "Last name"
 msgstr "Priezvisko"
@@ -3588,6 +3605,11 @@ msgstr "Právo"
 #, draft
 msgid "Legal Entity Identifier (LEI)"
 msgstr "Identifikátor právnickej osoby (LEI)"
+
+#: src/postulo/accounts/forms.py:75
+#, draft
+msgid "Let this passkey sign me in on its own"
+msgstr "Nechať tento prístupový kľúč prihlásiť ma samostatne"
 
 #: src/postulo/documents/forms.py:196
 #, draft
@@ -3752,12 +3774,12 @@ msgstr "Nižšie čísla sa zobrazujú prvé."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Malé písmená, číslice, bodky, podčiarkovníky a pomlčky."
 
-#: src/postulo/accounts/forms.py:132
+#: src/postulo/accounts/forms.py:165
 #, draft
 msgid "Machine translation, awaiting review"
 msgstr "Strojový preklad, čaká na kontrolu"
 
-#: src/postulo/templates/base.html:31
+#: src/postulo/templates/base.html:39
 #, draft
 msgid "Main"
 msgstr "Hlavný"
@@ -3783,8 +3805,9 @@ msgid "Make administrator"
 msgstr "Vymenovať za správcu"
 
 #: src/postulo/templates/settings/account.html:26
-#: src/postulo/templates/settings/account.html:72
-#: src/postulo/templates/settings/account.html:89
+#: src/postulo/templates/settings/account.html:84
+#: src/postulo/templates/settings/account.html:134
+#: src/postulo/templates/settings/account.html:151
 #, draft
 msgid "Manage"
 msgstr "Spravovať"
@@ -4319,7 +4342,7 @@ msgstr "poznámka"
 msgid "Note"
 msgstr "Poznámka"
 
-#: src/postulo/accounts/forms.py:385
+#: src/postulo/accounts/forms.py:418
 #: src/postulo/templates/applications/application_detail.html:48
 #, draft
 msgid "Note (optional)"
@@ -4536,7 +4559,7 @@ msgstr "oznámené dňa"
 msgid "Off"
 msgstr "Vypnuté"
 
-#: src/postulo/templates/settings/account.html:67
+#: src/postulo/templates/settings/account.html:129
 #, draft
 msgid ""
 "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
@@ -4581,7 +4604,14 @@ msgstr "Na mieste"
 msgid "On the timeline"
 msgstr "Na časovej osi"
 
-#: src/postulo/templates/settings/account.html:65
+#: src/postulo/accounts/forms.py:76
+#, draft
+msgid ""
+"On, it replaces the password entirely and your device asks for a fingerprint, your face or a PIN instead. Off, it is only a second step after the password, and it will not appear on the sign-in page."
+msgstr ""
+"Zapnuté nahrádza heslo úplne a vaše zariadenie sa spýta na odtlačok prsta, tvár alebo PIN. Vypnuté je len druhým krokom po hesle a na prihlasovacej stránke sa neobjaví."
+
+#: src/postulo/templates/settings/account.html:127
 #, draft
 msgid ""
 "On. Signing in asks for a code from your authenticator app, or a recovery code."
@@ -4631,6 +4661,19 @@ msgid ""
 "One page per request, public addresses only, never a crawl. These are fixed."
 msgstr ""
 "Jedna stránka na požiadavku, len verejné adresy, nikdy prechádzanie. To je pevné."
+
+#: src/postulo/templates/settings/account.html:69
+#, python-format, draft
+msgid ""
+"One passkey on this account. It signs you in with a fingerprint, your face or a PIN, and there is no password to leak."
+msgid_plural ""
+"%(total)s passkeys on this account. They sign you in with a fingerprint, your face or a PIN, and there is no password to leak."
+msgstr[0] ""
+"Jeden prístupový kľúč na tomto účte. Prihlási vás odtlačkom prsta, tvárou alebo PINom a nie je tu žiadne heslo, ktoré by mohlo uniknúť."
+msgstr[1] ""
+"%(total)s prístupové kľúče na tomto účte. Prihlásia vás odtlačkom prsta, tvárou alebo PINom a nie je tu žiadne heslo, ktoré by mohlo uniknúť."
+msgstr[2] ""
+"%(total)s prístupových kľúčov na tomto účte. Prihlásia vás odtlačkom prsta, tvárou alebo PINom a nie je tu žiadne heslo, ktoré by mohlo uniknúť."
 
 #: src/postulo/templates/applications/interview_form.html:18
 #, draft
@@ -4798,10 +4841,15 @@ msgstr "spracovaný inzerát"
 msgid "Part time"
 msgstr "Čiastočný úväzok"
 
-#: src/postulo/accounts/forms.py:134
+#: src/postulo/accounts/forms.py:167
 #, draft
 msgid "Partly translated"
 msgstr "Čiastočne preložené"
+
+#: src/postulo/templates/settings/account.html:66
+#, draft
+msgid "Passkeys"
+msgstr "Prístupové kľúče"
 
 #: src/postulo/templates/settings/account.html:50
 #, draft
@@ -4955,7 +5003,7 @@ msgid ""
 msgstr ""
 "Plus váš profil, váš kariérny záznam, štítky, každá položka časovej osi a každá pripomienka. Archív obsahuje jeden čitateľný súbor JSON a priečinok media."
 
-#: src/postulo/accounts/forms.py:206
+#: src/postulo/accounts/forms.py:239
 #, draft
 msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
@@ -5038,7 +5086,7 @@ msgid ""
 msgstr ""
 "Postulo načíta jednu stránku, o ktorú niekto požiadal, a predvolene rešpektuje robots.txt webu. Povedzte áno, len ak ste rozhodli, že táto zdvorilosť tu neplatí."
 
-#: src/postulo/accounts/forms.py:215
+#: src/postulo/accounts/forms.py:248
 #, draft
 msgid ""
 "Postulo fetches the picture for your primary address from gravatar.com once, keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick it and the copy is deleted."
@@ -5057,7 +5105,7 @@ msgid ""
 msgstr ""
 "Postulo ukladá len jeho hash a nemôže ho znova zobraziť. Ak ho stratíte, vytvorte ďalší."
 
-#: src/postulo/templates/base.html:100
+#: src/postulo/templates/base.html:108
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — vaše hľadanie práce, na vašom serveri."
@@ -5490,7 +5538,7 @@ msgstr "Odobrať správcu"
 msgid "Remove the logo"
 msgstr "Odstrániť logo"
 
-#: src/postulo/accounts/forms.py:211
+#: src/postulo/accounts/forms.py:244
 #, draft
 msgid "Remove the uploaded picture"
 msgstr "Odobrať nahraný obrázok"
@@ -5569,7 +5617,7 @@ msgstr "Skontrolovať"
 msgid "Review the capture"
 msgstr "Skontrolovať zachytenie"
 
-#: src/postulo/accounts/forms.py:130
+#: src/postulo/accounts/forms.py:163
 #, draft
 msgid "Reviewed by a speaker"
 msgstr "Skontrolované rodeným hovorcom"
@@ -5781,12 +5829,12 @@ msgstr "Predvýber"
 msgid "Search"
 msgstr "Hľadať"
 
-#: src/postulo/templates/base.html:44
+#: src/postulo/templates/base.html:52
 #, draft
 msgid "Search  /"
 msgstr "Hľadať  /"
 
-#: src/postulo/templates/base.html:42 src/postulo/templates/core/search.html:12
+#: src/postulo/templates/base.html:50 src/postulo/templates/core/search.html:12
 #, draft
 msgid "Search everything"
 msgstr "Hľadať vo všetkom"
@@ -5905,7 +5953,7 @@ msgstr "Server"
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:65 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:73 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:10
 #, draft
 msgid "Server settings"
@@ -5931,7 +5979,7 @@ msgid ""
 msgstr ""
 "Nastavené prostredím: <code>%(variable)s</code>. Odoberte to z prostredia, aby ste to mohli zmeniť tu."
 
-#: src/postulo/templates/settings/account.html:72
+#: src/postulo/templates/settings/account.html:134
 #, draft
 msgid "Set up"
 msgstr "Nastaviť"
@@ -5942,7 +5990,7 @@ msgid "Set when the opening is no longer available."
 msgstr "Nastavte, keď už miesto nie je k dispozícii."
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:61 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:69 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:21
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -5992,7 +6040,7 @@ msgstr "Zobraziť všetko"
 msgid "Show done too"
 msgstr "Zobraziť aj hotové"
 
-#: src/postulo/accounts/forms.py:285
+#: src/postulo/accounts/forms.py:318
 #, draft
 msgid "Show in the navigation"
 msgstr "Zobrazovať v navigácii"
@@ -6007,12 +6055,19 @@ msgstr "Zobraziť aj minulé"
 msgid "Shown in the header and on the sign-in page."
 msgstr "Zobrazené v hlavičke a na prihlasovacej stránke."
 
-#: src/postulo/templates/base.html:84 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:92 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
 msgstr "Prihlásiť sa"
 
-#: src/postulo/templates/base.html:75
+#: src/postulo/templates/settings/account.html:77
+#, draft
+msgid ""
+"Sign in with a fingerprint, your face or a device PIN. Nothing to type, nothing written down, and nothing an email can talk you out of."
+msgstr ""
+"Prihláste sa odtlačkom prsta, tvárou alebo PINom zariadenia. Nič na písanie, nič zapísané a nič, od čoho by vás e-mail mohol odhovoriť."
+
+#: src/postulo/templates/base.html:83
 #, draft
 msgid "Sign out"
 msgstr "Odhlásiť sa"
@@ -6023,7 +6078,7 @@ msgstr "Odhlásiť sa"
 msgid "Sign-in"
 msgstr "Prihlásenie"
 
-#: src/postulo/templates/settings/account.html:81
+#: src/postulo/templates/settings/account.html:143
 #, draft
 msgid "Sign-in methods"
 msgstr "Spôsoby prihlásenia"
@@ -6038,7 +6093,7 @@ msgstr "Prihlási sa do existujúceho účtu e-mailom"
 msgid "Single sign-on"
 msgstr "Jednotné prihlásenie"
 
-#: src/postulo/templates/base.html:41
+#: src/postulo/templates/base.html:49
 #, draft
 msgid "Site search"
 msgstr "Hľadanie na webe"
@@ -6085,7 +6140,7 @@ msgstr "Zručnosti"
 msgid "skills"
 msgstr "zručnosti"
 
-#: src/postulo/templates/base.html:15
+#: src/postulo/templates/base.html:23
 #, draft
 msgid "Skip to content"
 msgstr "Prejsť na obsah"
@@ -6223,7 +6278,7 @@ msgstr "Stav v tabuľke: %(text)s"
 msgid "Status updated."
 msgstr "Stav aktualizovaný."
 
-#: src/postulo/accounts/forms.py:48
+#: src/postulo/accounts/forms.py:49
 #, draft
 msgid "Stay signed in on this device"
 msgstr "Zostať prihlásený na tomto zariadení"
@@ -6563,7 +6618,7 @@ msgstr "Táto stránka je väčšia než %(limit)s MB, takže nebola prečítan�
 msgid "That page returned %(status)s."
 msgstr "Táto stránka vrátila %(status)s."
 
-#: src/postulo/accounts/forms.py:240
+#: src/postulo/accounts/forms.py:273
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tento obrázok má vyše 5 MB. Menší, prosím."
@@ -6903,7 +6958,7 @@ msgstr "Tento identifikátor už je v zozname."
 msgid "This instance"
 msgstr "Táto inštancia"
 
-#: src/postulo/templates/settings/account.html:83
+#: src/postulo/templates/settings/account.html:145
 #, python-format, draft
 msgid ""
 "This instance also signs in through %(provider)s. Connect it to this account to use it, or disconnect it."
@@ -6970,7 +7025,7 @@ msgid ""
 msgstr ""
 "Zaškrtnuté: ponuka sa ihneď stane žiadosťou označenou ako dnes odoslanou. Inak čaká vo vašich ponukách na rozhodnutie."
 
-#: src/postulo/accounts/forms.py:352
+#: src/postulo/accounts/forms.py:385
 #, draft
 msgid "Time zone"
 msgstr "Časové pásmo"
@@ -7083,7 +7138,7 @@ msgstr "Premenené na žiadosť"
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "Dva zápisy toho istého? Upravte jeden a zlúčte ho do druhého."
 
-#: src/postulo/templates/settings/account.html:62
+#: src/postulo/templates/settings/account.html:124
 #, draft
 msgid "Two-factor authentication"
 msgstr "Dvojfaktorové overenie"
@@ -7163,7 +7218,7 @@ msgstr "aktualizoval(a)"
 msgid "Upload a file"
 msgstr "Nahrať súbor"
 
-#: src/postulo/accounts/forms.py:204
+#: src/postulo/accounts/forms.py:237
 #, draft
 msgid "Upload a picture"
 msgstr "Nahrať obrázok"
@@ -7201,12 +7256,12 @@ msgid ""
 msgstr ""
 "Použite 3 až 32 malých písmen, číslic, bodiek, podčiarkovníkov alebo pomlčiek, na začiatku a na konci písmeno alebo číslicu."
 
-#: src/postulo/accounts/forms.py:243
+#: src/postulo/accounts/forms.py:276
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Použite PNG, JPEG, WebP alebo GIF."
 
-#: src/postulo/accounts/forms.py:213
+#: src/postulo/accounts/forms.py:246
 #, draft
 msgid "Use my Gravatar"
 msgstr "Používať môj Gravatar"
@@ -7216,7 +7271,7 @@ msgstr "Používať môj Gravatar"
 msgid "use my Gravatar"
 msgstr "používať môj Gravatar"
 
-#: src/postulo/accounts/forms.py:128 src/postulo/accounts/forms.py:163
+#: src/postulo/accounts/forms.py:161 src/postulo/accounts/forms.py:196
 #, draft
 msgid "Use the instance default"
 msgstr "Použiť predvolenú hodnotu inštancie"
@@ -7233,7 +7288,7 @@ msgstr ""
 msgid "user"
 msgstr "používateľ"
 
-#: src/postulo/accounts/forms.py:362 src/postulo/templates/server/email.html:15
+#: src/postulo/accounts/forms.py:395 src/postulo/templates/server/email.html:15
 #: src/postulo/templates/server/people.html:19
 #, draft
 msgid "Username"
@@ -7244,7 +7299,7 @@ msgstr "Používateľské meno"
 msgid "username"
 msgstr "používateľské meno"
 
-#: src/postulo/accounts/forms.py:46
+#: src/postulo/accounts/forms.py:47
 #, draft
 msgid "Username or email"
 msgstr "Používateľské meno alebo e-mail"
@@ -7463,6 +7518,11 @@ msgstr ""
 msgid "What this instance is running, and where its data is."
 msgstr "Čo táto inštancia prevádzkuje a kde má údaje."
 
+#: src/postulo/accounts/forms.py:69
+#, draft
+msgid "What to call it"
+msgstr "Ako sa má volať"
+
 #: src/postulo/applications/models.py:374
 #, draft
 msgid "what to do"
@@ -7473,7 +7533,7 @@ msgstr "čo robiť"
 msgid "What will be deleted"
 msgstr "Čo bude vymazané"
 
-#: src/postulo/accounts/forms.py:364
+#: src/postulo/accounts/forms.py:397
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -7747,6 +7807,13 @@ msgid ""
 msgstr ""
 "Sem ste sa už predtým hlásili. Zaznamenať druhú žiadosť je v poriadku; obe zostanú v zázname."
 
+#: src/postulo/templates/settings/account.html:111
+#, python-format, draft
+msgid ""
+"You have no recovery codes. Lose the device holding your passkey and there is nothing else to try. <a class=\"underline\" href=\"%(url)s\">Generate some</a> and keep them somewhere that is not the device."
+msgstr ""
+"Nemáte žiadne záložné kódy. Ak stratíte zariadenie s prístupovým kľúčom, nezostane nič iné. <a class=\"underline\" href=\"%(url)s\">Vygenerujte si nejaké</a> a uložte ich inam než do zariadenia."
+
 #: src/postulo/templates/jobs/posting_detail.html:118
 #, draft
 msgid "You have not applied to this one."
@@ -7792,6 +7859,13 @@ msgstr ""
 msgid "Your application"
 msgstr "Vaša žiadosť"
 
+#: src/postulo/templates/settings/account.html:92
+#, draft
+msgid ""
+"Your browser will only make a passkey on a page served over HTTPS. This instance is being reached over plain HTTP, so passkeys cannot be offered here. That is the browser's rule, not a setting on this server."
+msgstr ""
+"Váš prehliadač vytvorí prístupový kľúč iba na stránke doručenej cez HTTPS. K tejto inštancii sa pristupuje cez obyčajné HTTP, takže tu prístupové kľúče nemožno ponúknuť. To je pravidlo prehliadača, nie nastavenie tohto servera."
+
 #: src/postulo/templates/documents/cv_list.html:15
 #: src/postulo/templates/documents/cv_list.html:46
 #: src/postulo/templates/resume/overview.html:4
@@ -7825,7 +7899,7 @@ msgstr "Vaša uzávierka"
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
-#: src/postulo/templates/base.html:58
+#: src/postulo/templates/base.html:66
 #: src/postulo/templates/core/dashboard.html:304
 #, draft
 msgid "Your details"

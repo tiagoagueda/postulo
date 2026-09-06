@@ -131,6 +131,17 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Passkeys.** Sign in with a fingerprint, your face or a device PIN, and there is no
+  password in it anywhere: nothing to leak in a breach, nothing to reuse elsewhere, and no
+  code anybody can talk you into reading out. A passkey is already two factors and the
+  browser will only offer it to the address it was made at, so it is proof against a
+  convincing copy of the sign-in page as well. Add one under *Settings → Account →
+  Passkeys*, then *Sign in with a passkey* on the sign-in page. Signing **up** with one
+  stays off: who may register here is the operator's decision and a passkey does not change
+  it. The account page says the two things that are easy to find out too late — that a
+  passkey is tied to the address you made it at and will not follow the instance to a new
+  name, and that browsers refuse the whole mechanism over plain HTTP — and it asks you to
+  make recovery codes once a passkey could be your only way in. (#47)
 - **Plugins install only built wheels, and say what came with them.** A catalogue's
   signature and the checksum beside it cover a plugin's own file. Its requirements are
   resolved from PyPI when it is installed and are whatever is served that day, which the

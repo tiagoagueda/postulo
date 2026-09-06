@@ -190,10 +190,28 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_MAX_EMAIL_ADDRESSES = 5
 ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
 
-# Two-factor authentication: a code from an authenticator app, and recovery codes for the
-# day the phone is gone. Opt-in per person under Settings → Account. Passkeys are the
-# natural next step; they need a secure origin, which a plain-HTTP mesh instance lacks.
-MFA_SUPPORTED_TYPES = ["totp", "recovery_codes"]
+# Ways of proving who you are beyond a password, all opt-in per person under
+# Settings → Account:
+#
+# * a **passkey** — held by the device or a password manager, unlocked by a fingerprint,
+#   a face or a PIN. It is two factors on its own, and there is no shared secret for
+#   anybody to leak, phish or reuse. It can be the whole sign-in, not only the second half;
+# * a **code from an authenticator app**, for anyone whose devices cannot hold a passkey;
+# * **recovery codes**, for the day the phone or the key is gone. They matter more once a
+#   passkey can be the only way in, so the passkey pages point at them.
+#
+# Passkeys need a secure origin. Browsers refuse the WebAuthn API over plain HTTP, with
+# localhost the one exception, so an instance reached over a mesh VPN at a bare address
+# cannot offer them however this is configured — nothing here can change that, and the
+# page says so rather than failing silently.
+MFA_SUPPORTED_TYPES = ["webauthn", "totp", "recovery_codes"]
+# A passkey is a way *in*, not only a second step after a password.
+MFA_PASSKEY_LOGIN_ENABLED = True
+# Signing up with one is a different question. Who may register here is the operator's
+# decision, and a passkey at the door does not change that decision.
+MFA_PASSKEY_SIGNUP_ENABLED = False
+MFA_ADAPTER = "postulo.accounts.mfa_adapter.MFAAdapter"
+MFA_FORMS = {"add_webauthn": "postulo.accounts.forms.AddPasskeyForm"}
 MFA_TOTP_ISSUER = "Postulo"
 # A personal machine need not be asked for a code every day.
 MFA_TRUST_ENABLED = True

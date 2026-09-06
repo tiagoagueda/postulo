@@ -56,6 +56,67 @@
     </div>
   </div>
 
+  {% comment %} Passkeys come before the authenticator app, because they are the better
+     answer and the one most people should reach for: nothing to type, nothing to leak, and
+     two factors in a single gesture. {% endcomment %}
+  <div class="card mb-6" data-passkeys="{{ passkeys.count }}">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h3 class="font-medium">{% translate "Passkeys" %}</h3>
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% if passkeys.count %}
+            {% blocktranslate count total=passkeys.count trimmed %}
+              One passkey on this account. It signs you in with a fingerprint, your face or
+              a PIN, and there is no password to leak.
+            {% plural %}
+              {{ total }} passkeys on this account. They sign you in with a fingerprint,
+              your face or a PIN, and there is no password to leak.
+            {% endblocktranslate %}
+          {% else %}
+            {% translate "Sign in with a fingerprint, your face or a device PIN. Nothing to type, nothing written down, and nothing an email can talk you out of." %}
+          {% endif %}
+        </p>
+      </div>
+      {% if passkeys.usable %}
+        <a href="{% if passkeys.count %}{{ passkeys_url }}{% else %}{{ add_passkey_url }}{% endif %}"
+           class="btn-secondary shrink-0">
+          {% if passkeys.count %}{% translate "Manage" %}{% else %}{% translate "Add one" %}{% endif %}
+        </a>
+      {% endif %}
+    </div>
+
+    {% if not passkeys.usable %}
+      <p class="alert-warning mt-3 text-sm" role="note" data-passkeys-insecure>
+        <span>
+          {% blocktranslate trimmed %}
+            Your browser will only make a passkey on a page served over HTTPS. This instance
+            is being reached over plain HTTP, so passkeys cannot be offered here. That is the
+            browser's rule, not a setting on this server.
+          {% endblocktranslate %}
+        </span>
+      </p>
+    {% else %}
+      <p class="mt-3 text-xs text-ink-500 dark:text-ink-400" data-passkeys-host>
+        {% blocktranslate with host=passkeys.bound_to trimmed %}
+          A passkey is tied to the address you made it at, which here is {{ host }}. Reaching
+          this instance by another name, or moving it, will not carry your passkeys over.
+        {% endblocktranslate %}
+      </p>
+    {% endif %}
+
+    {% if passkeys.count and not passkeys.has_recovery_codes %}
+      <p class="alert-warning mt-3 text-sm" role="note" data-no-recovery-codes>
+        <span>
+          {% blocktranslate with url=recovery_codes_url trimmed %}
+            You have no recovery codes. Lose the device holding your passkey and there is
+            nothing else to try. <a class="underline" href="{{ url }}">Generate some</a> and
+            keep them somewhere that is not the device.
+          {% endblocktranslate %}
+        </span>
+      </p>
+    {% endif %}
+  </div>
+
   <div class="card" data-mfa-status="{% if mfa_enabled %}on{% else %}off{% endif %}">
     <div class="flex items-start justify-between gap-4">
       <div>

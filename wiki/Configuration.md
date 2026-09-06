@@ -66,6 +66,17 @@ way. Pointing this at a per-process cache is the one thing to avoid; see
 | --- | --- | --- |
 | `POSTULO_REGISTRATION_OPEN` | `false` | When false, the only way in is an invitation. Also changeable under *Server settings → Sign-in* when this variable is not set. See [Accounts and invitations](Accounts-and-invitations). |
 
+## Passkeys
+
+There is nothing to configure. Passkeys are offered wherever the browser allows them, which
+means an instance served over HTTPS, or `localhost` while you are developing. Over plain
+HTTP the browser refuses them and the account page says so.
+
+A passkey is registered against the hostname the browser is on and against the instance
+name from *Server settings → Defaults*, which is what a password manager shows in its list.
+Changing the instance name is safe and only affects passkeys made afterwards; changing the
+**hostname** makes every existing passkey unusable at the new one.
+
 ## Single sign-on
 
 Optional. Set the first three and a button appears on the sign-in page; leave them unset

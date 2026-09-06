@@ -10,6 +10,7 @@ from allauth.account.forms import LoginForm as AllauthLoginForm
 from allauth.account.forms import ResetPasswordKeyForm as AllauthResetPasswordKeyForm
 from allauth.account.forms import SetPasswordForm as AllauthSetPasswordForm
 from allauth.account.forms import SignupForm as AllauthSignupForm
+from allauth.mfa.webauthn.forms import AddWebAuthnForm as AllauthAddWebAuthnForm
 from allauth.socialaccount.forms import SignupForm as AllauthSocialSignupForm
 from django import forms
 from django.conf import settings
@@ -46,6 +47,38 @@ class LoginForm(AllauthLoginForm):
         self.fields["login"].label = _("Username or email")
         if "remember" in self.fields:
             self.fields["remember"].label = _("Stay signed in on this device")
+
+
+class AddPasskeyForm(AllauthAddWebAuthnForm):
+    """Naming a passkey, and choosing whether it can sign you in on its own.
+
+    allauth labels that choice *Passwordless*, with a sentence about biometrics and PIN
+    protection. It is the most consequential switch on the page and the label says nothing
+    about what turning it off would mean — which is that the key becomes a second step
+    after a password rather than a way in, and that it will not appear on the sign-in page
+    at all.
+
+    So it is named for what it does, described in terms of what happens either way, and it
+    starts on. Somebody adding a passkey is almost always trying to stop typing a password.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        name = self.fields.get("name")
+        if name is not None:
+            name.label = _("What to call it")
+            name.help_text = _(
+                "For you, so you can tell one from another later: “work laptop”, “phone”."
+            )
+        field = self.fields.get("passwordless")
+        if field is not None:
+            field.label = _("Let this passkey sign me in on its own")
+            field.help_text = _(
+                "On, it replaces the password entirely and your device asks for a "
+                "fingerprint, your face or a PIN instead. Off, it is only a second step "
+                "after the password, and it will not appear on the sign-in page."
+            )
+            field.initial = True
 
 
 class SignupForm(AllauthSignupForm):

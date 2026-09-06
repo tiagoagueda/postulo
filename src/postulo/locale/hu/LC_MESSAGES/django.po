@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-06 17:22+0000\n"
+"POT-Creation-Date: 2026-09-06 17:40+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -264,7 +264,7 @@ msgstr "%(name)s — %(kind)s"
 msgid "%(name)s — CV"
 msgstr "%(name)s — önéletrajz"
 
-#: src/postulo/templates/base.html:26
+#: src/postulo/templates/base.html:34
 #, python-format, draft
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — áttekintés"
@@ -452,6 +452,13 @@ msgid ""
 msgstr ""
 "Egy csomag a(z) <code>%(group)s</code> belépésipont-csoportban jegyez be forrást. Az a bővítmény, amely csak belépési pontokat jegyez be, a telepítés után azonnal megjelenik; amelyik saját oldalakat ad, újraindítást kér. Az a forrás, amely nem tölthető be, naplózásra kerül és kimarad, a beépítettek pedig tovább működnek."
 
+#: src/postulo/templates/settings/account.html:101
+#, python-format, draft
+msgid ""
+"A passkey is tied to the address you made it at, which here is %(host)s. Reaching this instance by another name, or moving it, will not carry your passkeys over."
+msgstr ""
+"A hozzáférési kulcs ahhoz a címhez kötődik, ahol létrehozta, itt %(host)s. Ha ezt a példányt más néven éri el, vagy áthelyezi, a hozzáférési kulcsok nem jönnek vele."
+
 #: src/postulo/templates/core/dashboard.html:23
 #, python-format, draft
 msgid ""
@@ -605,7 +612,7 @@ msgstr "elfogadta"
 msgid "Account"
 msgstr "Fiók"
 
-#: src/postulo/templates/base.html:51
+#: src/postulo/templates/base.html:59
 #, python-format, draft
 msgid "Account menu, %(name)s"
 msgstr "Fiókmenü, %(name)s"
@@ -678,6 +685,11 @@ msgstr "Bejegyzések hozzáadása"
 #, draft
 msgid "Add entry"
 msgstr "Bejegyzés hozzáadása"
+
+#: src/postulo/templates/settings/account.html:84
+#, draft
+msgid "Add one"
+msgstr "Vegyen fel egyet"
 
 #: src/postulo/templates/resume/overview.html:136
 #, draft
@@ -1651,7 +1663,7 @@ msgstr "Kapcsolatok"
 msgid "connections"
 msgstr "kapcsolatok"
 
-#: src/postulo/accounts/forms.py:298
+#: src/postulo/accounts/forms.py:331
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Jelentkezés elcsendesedettnek tekintése ennyi után"
@@ -2273,7 +2285,7 @@ msgstr "E-mail"
 msgid "email address"
 msgstr "e-mail-cím"
 
-#: src/postulo/accounts/forms.py:384
+#: src/postulo/accounts/forms.py:417
 #, draft
 msgid "Email address (optional)"
 msgstr "E-mail-cím (nem kötelező)"
@@ -2427,7 +2439,7 @@ msgid ""
 msgstr ""
 "Minden megszűnik, egyszerre, és senki sem hozhatja vissza. Előbb készítsd el az exportodat."
 
-#: src/postulo/accounts/forms.py:288
+#: src/postulo/accounts/forms.py:321
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
@@ -2500,7 +2512,7 @@ msgid "expires on"
 msgstr "lejár ezen a napon"
 
 #: src/postulo/templates/applications/insights.html:14
-#: src/postulo/templates/base.html:69
+#: src/postulo/templates/base.html:77
 #: src/postulo/templates/core/dashboard.html:298
 #: src/postulo/templates/core/export.html:8
 #, draft
@@ -2633,8 +2645,8 @@ msgstr "Pénzügy"
 msgid "Find logo"
 msgstr "Logó keresése"
 
-#: src/postulo/accounts/forms.py:59 src/postulo/accounts/forms.py:175
-#: src/postulo/accounts/forms.py:199
+#: src/postulo/accounts/forms.py:92 src/postulo/accounts/forms.py:208
+#: src/postulo/accounts/forms.py:232
 #, draft
 msgid "First name"
 msgstr "Keresztnév"
@@ -2689,6 +2701,11 @@ msgstr "Például „BSc informatika”."
 #, draft
 msgid "For you, not for the employer: “Backend, English”."
 msgstr "Neked szól, nem a munkaadónak: „Backend, angol”."
+
+#: src/postulo/accounts/forms.py:70
+#, draft
+msgid "For you, so you can tell one from another later: “work laptop”, “phone”."
+msgstr "Önnek, hogy később megkülönböztesse őket: „munkalaptop”, „telefon”."
 
 #: src/postulo/jobs/views.py:219
 #, python-format, draft
@@ -3429,7 +3446,7 @@ msgstr "Levéltípusok"
 msgid "label"
 msgstr "címke"
 
-#: src/postulo/accounts/forms.py:346 src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:379 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Nyelv"
@@ -3501,8 +3518,8 @@ msgstr "legutóbb ellenőrizve"
 msgid "last error"
 msgstr "utolsó hiba"
 
-#: src/postulo/accounts/forms.py:60 src/postulo/accounts/forms.py:176
-#: src/postulo/accounts/forms.py:200
+#: src/postulo/accounts/forms.py:93 src/postulo/accounts/forms.py:209
+#: src/postulo/accounts/forms.py:233
 #, draft
 msgid "Last name"
 msgstr "Vezetéknév"
@@ -3576,6 +3593,11 @@ msgstr "Jog"
 #, draft
 msgid "Legal Entity Identifier (LEI)"
 msgstr "Jogalany-azonosító (LEI)"
+
+#: src/postulo/accounts/forms.py:75
+#, draft
+msgid "Let this passkey sign me in on its own"
+msgstr "Ez a hozzáférési kulcs magában is jelentkeztessen be"
 
 #: src/postulo/documents/forms.py:196
 #, draft
@@ -3740,12 +3762,12 @@ msgstr "A kisebb számok kerülnek előre."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Kisbetűk, számjegyek, pontok, aláhúzások és kötőjelek."
 
-#: src/postulo/accounts/forms.py:132
+#: src/postulo/accounts/forms.py:165
 #, draft
 msgid "Machine translation, awaiting review"
 msgstr "Gépi fordítás, ellenőrzésre vár"
 
-#: src/postulo/templates/base.html:31
+#: src/postulo/templates/base.html:39
 #, draft
 msgid "Main"
 msgstr "Fő"
@@ -3771,8 +3793,9 @@ msgid "Make administrator"
 msgstr "Adminisztrátorrá tétel"
 
 #: src/postulo/templates/settings/account.html:26
-#: src/postulo/templates/settings/account.html:72
-#: src/postulo/templates/settings/account.html:89
+#: src/postulo/templates/settings/account.html:84
+#: src/postulo/templates/settings/account.html:134
+#: src/postulo/templates/settings/account.html:151
 #, draft
 msgid "Manage"
 msgstr "Kezelés"
@@ -4308,7 +4331,7 @@ msgstr "jegyzet"
 msgid "Note"
 msgstr "Jegyzet"
 
-#: src/postulo/accounts/forms.py:385
+#: src/postulo/accounts/forms.py:418
 #: src/postulo/templates/applications/application_detail.html:48
 #, draft
 msgid "Note (optional)"
@@ -4527,7 +4550,7 @@ msgstr "értesítve ekkor"
 msgid "Off"
 msgstr "Ki"
 
-#: src/postulo/templates/settings/account.html:67
+#: src/postulo/templates/settings/account.html:129
 #, draft
 msgid ""
 "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
@@ -4572,7 +4595,14 @@ msgstr "Helyben"
 msgid "On the timeline"
 msgstr "Az idővonalon"
 
-#: src/postulo/templates/settings/account.html:65
+#: src/postulo/accounts/forms.py:76
+#, draft
+msgid ""
+"On, it replaces the password entirely and your device asks for a fingerprint, your face or a PIN instead. Off, it is only a second step after the password, and it will not appear on the sign-in page."
+msgstr ""
+"Bekapcsolva teljesen kiváltja a jelszót, és az eszköz ujjlenyomatot, arcot vagy PIN-kódot kér helyette. Kikapcsolva csak második lépés a jelszó után, és nem jelenik meg a bejelentkezési oldalon."
+
+#: src/postulo/templates/settings/account.html:127
 #, draft
 msgid ""
 "On. Signing in asks for a code from your authenticator app, or a recovery code."
@@ -4620,6 +4650,17 @@ msgid ""
 "One page per request, public addresses only, never a crawl. These are fixed."
 msgstr ""
 "Kérésenként egy oldal, csak nyilvános címek, soha nem tallózás. Ezek rögzítettek."
+
+#: src/postulo/templates/settings/account.html:69
+#, python-format, draft
+msgid ""
+"One passkey on this account. It signs you in with a fingerprint, your face or a PIN, and there is no password to leak."
+msgid_plural ""
+"%(total)s passkeys on this account. They sign you in with a fingerprint, your face or a PIN, and there is no password to leak."
+msgstr[0] ""
+"Egy hozzáférési kulcs ezen a fiókon. Ujjlenyomattal, arccal vagy PIN-kóddal jelentkezteti be, és nincs jelszó, ami kiszivároghatna."
+msgstr[1] ""
+"%(total)s hozzáférési kulcs ezen a fiókon. Ujjlenyomattal, arccal vagy PIN-kóddal jelentkeztetik be, és nincs jelszó, ami kiszivároghatna."
 
 #: src/postulo/templates/applications/interview_form.html:18
 #, draft
@@ -4789,10 +4830,15 @@ msgstr "feldolgozott hirdetés"
 msgid "Part time"
 msgstr "Részmunkaidő"
 
-#: src/postulo/accounts/forms.py:134
+#: src/postulo/accounts/forms.py:167
 #, draft
 msgid "Partly translated"
 msgstr "Részben lefordítva"
+
+#: src/postulo/templates/settings/account.html:66
+#, draft
+msgid "Passkeys"
+msgstr "Hozzáférési kulcsok"
 
 #: src/postulo/templates/settings/account.html:50
 #, draft
@@ -4947,7 +4993,7 @@ msgid ""
 msgstr ""
 "Ezenkívül a profilod, a pályafutásod, címkék, minden idővonal-bejegyzés és minden emlékeztető. Az archívum egy olvasható JSON-fájlt és egy media mappát tartalmaz."
 
-#: src/postulo/accounts/forms.py:206
+#: src/postulo/accounts/forms.py:239
 #, draft
 msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
@@ -5030,7 +5076,7 @@ msgid ""
 msgstr ""
 "A Postulo egy oldalt kér le, amelyet valaki kért, és alapértelmezés szerint tiszteletben tartja a webhely robots.txt fájlját. Csak akkor mondj igent, ha úgy döntöttél, hogy ez az udvariasság itt nem érvényes."
 
-#: src/postulo/accounts/forms.py:215
+#: src/postulo/accounts/forms.py:248
 #, draft
 msgid ""
 "Postulo fetches the picture for your primary address from gravatar.com once, keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick it and the copy is deleted."
@@ -5049,7 +5095,7 @@ msgid ""
 msgstr ""
 "A Postulo csak egy hash-t tárol belőle, és nem tudja újra megmutatni. Ha elveszíted, készíts másikat."
 
-#: src/postulo/templates/base.html:100
+#: src/postulo/templates/base.html:108
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — az álláskeresésed, a saját szervereden."
@@ -5482,7 +5528,7 @@ msgstr "Adminisztrátori jog elvétele"
 msgid "Remove the logo"
 msgstr "Logó eltávolítása"
 
-#: src/postulo/accounts/forms.py:211
+#: src/postulo/accounts/forms.py:244
 #, draft
 msgid "Remove the uploaded picture"
 msgstr "Feltöltött kép eltávolítása"
@@ -5561,7 +5607,7 @@ msgstr "Ellenőrzés"
 msgid "Review the capture"
 msgstr "A rögzítés ellenőrzése"
 
-#: src/postulo/accounts/forms.py:130
+#: src/postulo/accounts/forms.py:163
 #, draft
 msgid "Reviewed by a speaker"
 msgstr "Anyanyelvi beszélő ellenőrizte"
@@ -5773,12 +5819,12 @@ msgstr "Szűrés"
 msgid "Search"
 msgstr "Keresés"
 
-#: src/postulo/templates/base.html:44
+#: src/postulo/templates/base.html:52
 #, draft
 msgid "Search  /"
 msgstr "Keresés  /"
 
-#: src/postulo/templates/base.html:42 src/postulo/templates/core/search.html:12
+#: src/postulo/templates/base.html:50 src/postulo/templates/core/search.html:12
 #, draft
 msgid "Search everything"
 msgstr "Keresés mindenben"
@@ -5898,7 +5944,7 @@ msgstr "Szerver"
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:65 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:73 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:10
 #, draft
 msgid "Server settings"
@@ -5924,7 +5970,7 @@ msgid ""
 msgstr ""
 "A környezet állítja be: <code>%(variable)s</code>. Távolítsd el a környezetből, hogy itt módosíthasd."
 
-#: src/postulo/templates/settings/account.html:72
+#: src/postulo/templates/settings/account.html:134
 #, draft
 msgid "Set up"
 msgstr "Beállítás"
@@ -5935,7 +5981,7 @@ msgid "Set when the opening is no longer available."
 msgstr "Állítsd be, amikor a pozíció már nem elérhető."
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:61 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:69 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:21
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -5985,7 +6031,7 @@ msgstr "Összes mutatása"
 msgid "Show done too"
 msgstr "A készek is"
 
-#: src/postulo/accounts/forms.py:285
+#: src/postulo/accounts/forms.py:318
 #, draft
 msgid "Show in the navigation"
 msgstr "Megjelenítés a navigációban"
@@ -6000,12 +6046,19 @@ msgstr "A múltbeliek is"
 msgid "Shown in the header and on the sign-in page."
 msgstr "A fejlécben és a bejelentkezési oldalon jelenik meg."
 
-#: src/postulo/templates/base.html:84 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:92 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
 msgstr "Bejelentkezés"
 
-#: src/postulo/templates/base.html:75
+#: src/postulo/templates/settings/account.html:77
+#, draft
+msgid ""
+"Sign in with a fingerprint, your face or a device PIN. Nothing to type, nothing written down, and nothing an email can talk you out of."
+msgstr ""
+"Jelentkezzen be ujjlenyomattal, arccal vagy az eszköz PIN-kódjával. Semmit sem kell begépelni, semmit sem kell feljegyezni, és nincs semmi, amiről egy e-mail lebeszélhetné."
+
+#: src/postulo/templates/base.html:83
 #, draft
 msgid "Sign out"
 msgstr "Kijelentkezés"
@@ -6016,7 +6069,7 @@ msgstr "Kijelentkezés"
 msgid "Sign-in"
 msgstr "Bejelentkezés"
 
-#: src/postulo/templates/settings/account.html:81
+#: src/postulo/templates/settings/account.html:143
 #, draft
 msgid "Sign-in methods"
 msgstr "Bejelentkezési módok"
@@ -6031,7 +6084,7 @@ msgstr "Bejelentkezés meglévő fiókba e-maillel"
 msgid "Single sign-on"
 msgstr "Egyszeri bejelentkezés"
 
-#: src/postulo/templates/base.html:41
+#: src/postulo/templates/base.html:49
 #, draft
 msgid "Site search"
 msgstr "Keresés a webhelyen"
@@ -6078,7 +6131,7 @@ msgstr "Készségek"
 msgid "skills"
 msgstr "készségek"
 
-#: src/postulo/templates/base.html:15
+#: src/postulo/templates/base.html:23
 #, draft
 msgid "Skip to content"
 msgstr "Ugrás a tartalomra"
@@ -6216,7 +6269,7 @@ msgstr "Állapot a táblázatban: %(text)s"
 msgid "Status updated."
 msgstr "Állapot frissítve."
 
-#: src/postulo/accounts/forms.py:48
+#: src/postulo/accounts/forms.py:49
 #, draft
 msgid "Stay signed in on this device"
 msgstr "Maradjak bejelentkezve ezen az eszközön"
@@ -6557,7 +6610,7 @@ msgstr "Ez az oldal nagyobb %(limit)s MB-nál, ezért nem lett beolvasva."
 msgid "That page returned %(status)s."
 msgstr "Ez az oldal ezt adta vissza: %(status)s."
 
-#: src/postulo/accounts/forms.py:240
+#: src/postulo/accounts/forms.py:273
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Ez a kép 5 MB-nál nagyobb. Kisebbet kérünk."
@@ -6899,7 +6952,7 @@ msgstr "Ez az azonosító már szerepel a listán."
 msgid "This instance"
 msgstr "Ez a példány"
 
-#: src/postulo/templates/settings/account.html:83
+#: src/postulo/templates/settings/account.html:145
 #, python-format, draft
 msgid ""
 "This instance also signs in through %(provider)s. Connect it to this account to use it, or disconnect it."
@@ -6967,7 +7020,7 @@ msgid ""
 msgstr ""
 "Bejelölve a hirdetés azonnal jelentkezéssé válik, ma elküldöttként megjelölve. Egyébként a hirdetéseid között várja a döntésedet."
 
-#: src/postulo/accounts/forms.py:352
+#: src/postulo/accounts/forms.py:385
 #, draft
 msgid "Time zone"
 msgstr "Időzóna"
@@ -7081,7 +7134,7 @@ msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr ""
 "Ugyanannak két írásmódja? Szerkeszd az egyiket, és vond össze a másikkal."
 
-#: src/postulo/templates/settings/account.html:62
+#: src/postulo/templates/settings/account.html:124
 #, draft
 msgid "Two-factor authentication"
 msgstr "Kétlépcsős hitelesítés"
@@ -7162,7 +7215,7 @@ msgstr "frissítette"
 msgid "Upload a file"
 msgstr "Fájl feltöltése"
 
-#: src/postulo/accounts/forms.py:204
+#: src/postulo/accounts/forms.py:237
 #, draft
 msgid "Upload a picture"
 msgstr "Kép feltöltése"
@@ -7200,12 +7253,12 @@ msgid ""
 msgstr ""
 "Használj 3–32 kisbetűt, számjegyet, pontot, aláhúzást vagy kötőjelet, betűvel vagy számjeggyel kezdve és végződve."
 
-#: src/postulo/accounts/forms.py:243
+#: src/postulo/accounts/forms.py:276
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Használj PNG, JPEG, WebP vagy GIF fájlt."
 
-#: src/postulo/accounts/forms.py:213
+#: src/postulo/accounts/forms.py:246
 #, draft
 msgid "Use my Gravatar"
 msgstr "Gravatarom használata"
@@ -7215,7 +7268,7 @@ msgstr "Gravatarom használata"
 msgid "use my Gravatar"
 msgstr "Gravatarom használata"
 
-#: src/postulo/accounts/forms.py:128 src/postulo/accounts/forms.py:163
+#: src/postulo/accounts/forms.py:161 src/postulo/accounts/forms.py:196
 #, draft
 msgid "Use the instance default"
 msgstr "A példány alapértelmezésének használata"
@@ -7232,7 +7285,7 @@ msgstr ""
 msgid "user"
 msgstr "felhasználó"
 
-#: src/postulo/accounts/forms.py:362 src/postulo/templates/server/email.html:15
+#: src/postulo/accounts/forms.py:395 src/postulo/templates/server/email.html:15
 #: src/postulo/templates/server/people.html:19
 #, draft
 msgid "Username"
@@ -7243,7 +7296,7 @@ msgstr "Felhasználónév"
 msgid "username"
 msgstr "felhasználónév"
 
-#: src/postulo/accounts/forms.py:46
+#: src/postulo/accounts/forms.py:47
 #, draft
 msgid "Username or email"
 msgstr "Felhasználónév vagy e-mail"
@@ -7463,6 +7516,11 @@ msgstr ""
 msgid "What this instance is running, and where its data is."
 msgstr "Mit futtat ez a példány, és hol vannak az adatai."
 
+#: src/postulo/accounts/forms.py:69
+#, draft
+msgid "What to call it"
+msgstr "Hogy hívják"
+
 #: src/postulo/applications/models.py:374
 #, draft
 msgid "what to do"
@@ -7473,7 +7531,7 @@ msgstr "mi a teendő"
 msgid "What will be deleted"
 msgstr "Mi törlődik"
 
-#: src/postulo/accounts/forms.py:364
+#: src/postulo/accounts/forms.py:397
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -7747,6 +7805,13 @@ msgid ""
 msgstr ""
 "Ide már jelentkeztél korábban. Egy második jelentkezés rögzítése rendben van; mindkettő megmarad."
 
+#: src/postulo/templates/settings/account.html:111
+#, python-format, draft
+msgid ""
+"You have no recovery codes. Lose the device holding your passkey and there is nothing else to try. <a class=\"underline\" href=\"%(url)s\">Generate some</a> and keep them somewhere that is not the device."
+msgstr ""
+"Nincsenek helyreállítási kódjai. Ha elveszíti a hozzáférési kulcsot tartó eszközt, nem marad más. <a class=\"underline\" href=\"%(url)s\">Készítsen néhányat</a>, és tartsa őket az eszközön kívül."
+
 #: src/postulo/templates/jobs/posting_detail.html:118
 #, draft
 msgid "You have not applied to this one."
@@ -7790,6 +7855,13 @@ msgstr ""
 msgid "Your application"
 msgstr "A jelentkezésed"
 
+#: src/postulo/templates/settings/account.html:92
+#, draft
+msgid ""
+"Your browser will only make a passkey on a page served over HTTPS. This instance is being reached over plain HTTP, so passkeys cannot be offered here. That is the browser's rule, not a setting on this server."
+msgstr ""
+"A böngészője csak HTTPS-en kiszolgált oldalon hoz létre hozzáférési kulcsot. Ezt a példányt sima HTTP-n éri el, ezért itt nem kínálhatók hozzáférési kulcsok. Ez a böngésző szabálya, nem e kiszolgáló beállítása."
+
 #: src/postulo/templates/documents/cv_list.html:15
 #: src/postulo/templates/documents/cv_list.html:46
 #: src/postulo/templates/resume/overview.html:4
@@ -7823,7 +7895,7 @@ msgstr "A határidőd"
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
-#: src/postulo/templates/base.html:58
+#: src/postulo/templates/base.html:66
 #: src/postulo/templates/core/dashboard.html:304
 #, draft
 msgid "Your details"

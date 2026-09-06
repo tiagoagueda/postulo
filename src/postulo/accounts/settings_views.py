@@ -14,7 +14,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import RedirectView, UpdateView
 
-from . import sso
+from . import passkeys, sso
 from .forms import AccountForm, AppearanceForm, LocaleForm
 from .models import Profile
 
@@ -83,6 +83,10 @@ class AccountView(SettingsSectionMixin, UpdateView):
         context["password_url"] = reverse("account_change_password")
         context["mfa_enabled"] = get_mfa_adapter().is_mfa_enabled(self.request.user)
         context["mfa_url"] = reverse("mfa_index")
+        context["passkeys"] = passkeys.summary(self.request.user, self.request)
+        context["passkeys_url"] = reverse("mfa_list_webauthn")
+        context["add_passkey_url"] = reverse("mfa_add_webauthn")
+        context["recovery_codes_url"] = reverse("mfa_view_recovery_codes")
         context["sso_enabled"] = sso.enabled()
         context["sso_name"] = sso.name()
         context["connections_url"] = reverse("socialaccount_connections")
