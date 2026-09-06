@@ -44,6 +44,31 @@ CI runs it on every push. If you change a page on that path — the header, the 
 review, the board, the export — run it before opening the pull request; it is the test that
 notices when steps stop joining up.
 
+## The mark
+
+Postulo's mark is a layered paper-cut **P**. It lives once, at `assets/brand/postulo.png`,
+and everything served is derived from it:
+
+```sh
+uv run python scripts/brand.py          # write the derived images
+uv run python scripts/brand.py --check  # CI runs this
+```
+
+That produces the favicons, the Apple touch icon, the two manifest icons and the header
+logo into `src/postulo/static/brand/`, all committed — the same arrangement as the compiled
+stylesheet and the icon set, so an instance runs without needing the tooling that made them.
+Change the source, run the script, commit both; CI fails if they disagree.
+
+The mark is **decorative everywhere it appears**. It always sits beside the instance's name,
+so it carries an empty `alt` and a screen reader is not made to say "Postulo logo, Postulo".
+
+The file in this repository is 1024 pixels square, which is twice the largest thing derived
+from it. The full-resolution artwork lives wherever it is being designed; a source tree is
+not an asset library.
+
+It is a work in progress and will change. Nothing should hard-code its colours: the
+stylesheet's `brand` palette is the source of truth for those.
+
 ## Icons
 
 The interface uses [Lucide](https://lucide.dev) icons, inlined by the `{% icon %}` tag:

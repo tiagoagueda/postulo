@@ -12,6 +12,14 @@
     <meta name="htmx-config" content='{"includeIndicatorStyles":false}'>
     <meta name="referrer" content="same-origin">
     <title>{% block title %}{{ instance_name }}{% endblock %}</title>
+    {% comment %} Three sizes rather than one: a browser picks the nearest and scaling a
+       32-pixel mark up to a 180-pixel home screen looks exactly as bad as it sounds. The
+       .ico is for anything that still asks for /favicon.ico without being told to.
+    {% endcomment %}
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'brand/favicon-32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'brand/favicon-16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'brand/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'core:manifest' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
     <script src="{% static 'js/vendor/htmx.min.js' %}" defer></script>
     <script src="{% static 'js/app.js' %}" defer></script>
@@ -28,8 +36,12 @@
             the active style on the dashboard, and a name that says where it goes.
           {% endcomment %}
           <a href="{% url 'core:home' %}"
-             class="text-lg font-semibold tracking-tight {% if dashboard_hidden %}{% nav_active 'core:home' %} !text-lg !font-semibold{% else %}text-ink-900 dark:text-ink-50{% endif %}"
+             class="flex items-center gap-2 text-lg font-semibold tracking-tight {% if dashboard_hidden %}{% nav_active 'core:home' %} !text-lg !font-semibold{% else %}text-ink-900 dark:text-ink-50{% endif %}"
              {% if dashboard_hidden %}aria-label="{% blocktranslate with name=instance_name trimmed %}{{ name }} — dashboard{% endblocktranslate %}"{% endif %}>
+            {% comment %} Decorative: the name is right beside it, and a screen reader
+               repeating "Postulo logo, Postulo" helps nobody. {% endcomment %}
+            <img src="{% static 'brand/logo-64.png' %}" alt="" width="28" height="28"
+                 class="h-7 w-auto shrink-0">
             {{ instance_name }}
           </a>
 

@@ -7,6 +7,7 @@ app_name = "core"
 urlpatterns = [
     path("", views.home, name="home"),
     path("healthz", views.healthz, name="healthz"),
+    path("manifest.webmanifest", views.manifest, name="manifest"),
     # Off unless an operator turns it on, and a 404 rather than a 403 when it is off.
     path("logs", views_logs.collect, name="logs_endpoint"),
     path("search/", views_search.search_page, name="search"),

@@ -131,6 +131,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Added
 
+- **Postulo has a mark.** A layered paper-cut *P*, in the browser tab, beside the instance's
+  name in the header, on a phone's home screen, and at the top of the README and the wiki.
+  It is still a work in progress. It lives once at `assets/brand/postulo.png` and everything
+  served is derived from it by `scripts/brand.py` and committed, the same way the compiled
+  stylesheet is, so an instance runs without needing the tooling and CI fails if the two
+  disagree. A web app manifest comes with it, carrying the instance's own name rather than
+  always saying Postulo, so an instance installed to a home screen is named the way its
+  operator named it.
 - **The log can be served at `/logs` for a collector.** One JSON object per line, oldest
   first, with `since` and `limit` so a scraper asks only for what it has not seen — enough
   for Grafana Alloy, Vector or Promtail running elsewhere on your network to read a Postulo

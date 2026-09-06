@@ -1,3 +1,5 @@
+<img src="src/postulo/static/brand/logo-256.png" alt="" width="96" align="left" hspace="16">
+
 # Postulo
 
 [![CI](https://source.tiagoagueda.com/postulo/postulo/actions/workflows/ci.yml/badge.svg)](https://source.tiagoagueda.com/postulo/postulo/actions)

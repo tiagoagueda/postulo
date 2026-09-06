@@ -1,3 +1,5 @@
+<img src="images/postulo.png" alt="" width="96" align="left" hspace="16">
+
 # Postulo
 
 **A self-hosted job application manager, written from the applicant's side of the table.**

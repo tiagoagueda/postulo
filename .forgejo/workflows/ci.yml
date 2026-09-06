@@ -172,6 +172,8 @@ jobs:
             || (echo "::error::static/icons disagrees with assets/icons.txt. Run 'npm run sync:icons' and commit the result." && git status --porcelain -- src/postulo/static/icons && exit 1)
           test -z "$(git status --porcelain -- src/postulo/static/js/vendor)" \
             || (echo "::error::static/js/vendor disagrees with node_modules. Run 'npm run sync:vendor' and commit the result." && git status --porcelain -- src/postulo/static/js/vendor && exit 1)
+          test -z "$(git status --porcelain -- src/postulo/static/brand)" \
+            || (echo "::error::static/brand disagrees with assets/brand/postulo.png. Run 'uv run python scripts/brand.py' and commit the result." && git status --porcelain -- src/postulo/static/brand && exit 1)
 
   browser:
     # The critical path in a real browser: sign in, capture, review, board, send, export.
