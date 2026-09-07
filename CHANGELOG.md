@@ -6,6 +6,22 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🐛 Fixed
+
+- **Five icons were drawing without their geometry.** The icon tag strips Lucide's fixed
+  24-pixel size so that one file can serve a 16-pixel glyph and a 48-pixel illustration —
+  but it did so across the whole file rather than the root element, and on a `<rect>` the
+  width and height are not a size, they are the shape. The envelope on *Email* lost its box
+  and became a lone flap: a "V". *Language and time* lost the month and kept two rings,
+  *Dashboard* lost every panel and drew nothing at all, *Overview* lost the screen and kept
+  the stand, and the briefcase in the navigation lost the case and kept the handle. Three of
+  the five sit side by side in the settings sidebar, which is how they were noticed
+  together. The root is stripped now and nothing else. **Nothing could have caught it**: the
+  icon tests all asked about the root element, so an icon that rendered as a valid,
+  well-labelled, correctly sized, empty box passed every one of them — and the icons are
+  `aria-hidden` by design, so axe had nothing to look at either. Three tests come with the
+  fix, one of them the reported symptom stated as itself. (#85)
+
 ## [0.2.1] — 2026-09-07
 
 ### 🐛 Fixed

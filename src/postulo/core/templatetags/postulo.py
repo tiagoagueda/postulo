@@ -19,6 +19,18 @@ ICON_DIR = Path(__file__).resolve().parents[2] / "static" / "icons"
 _ICON_NAME = re.compile(r"[a-z0-9-]+")
 
 
+#: The opening ``<svg ...>`` tag, whatever it is spread over. A negated class matches
+#: newlines, which is what makes this work on Lucide's multi-line files.
+_ROOT_SVG = re.compile(r"<svg\b[^>]*>")
+
+#: What the root carries and the tag replaces.
+_SIZE_OR_CLASS = re.compile(r'\s+(?:width|height|class)="[^"]*"')
+
+
+def _without_size_and_class(match: re.Match) -> str:
+    return _SIZE_OR_CLASS.sub("", match.group(0))
+
+
 @functools.cache
 def _icon_source(name: str) -> str:
     """The icon's SVG, trimmed to what the tag will dress up.
@@ -28,6 +40,12 @@ def _icon_source(name: str) -> str:
     caller's, and the size has to come from CSS so that one file serves a 16 pixel
     inline glyph and a 48 pixel empty-state illustration alike. The viewBox stays, and
     with it the geometry.
+
+    **Only the root element is stripped.** Doing it to the whole file also took the width
+    and height off any child that had them, and on a `<rect>` those are not a size but the
+    shape itself: an envelope became a lone flap, a screen became a bare stand. Five icons
+    were drawing wrongly — briefcase, calendar, layout-dashboard, mail and monitor — three
+    of them in the settings sidebar, and had been since this was written.
     """
     path = ICON_DIR / f"{name}.svg"
     if not _ICON_NAME.fullmatch(name) or not path.is_file():
@@ -36,7 +54,7 @@ def _icon_source(name: str) -> str:
         )
     source = path.read_text(encoding="utf-8")
     source = re.sub(r"<!--.*?-->", "", source, flags=re.S)
-    source = re.sub(r'\s+(?:width|height|class)="[^"]*"', "", source)
+    source = re.sub(_ROOT_SVG, _without_size_and_class, source, count=1)
     source = re.sub(r"\s+", " ", source).replace(" >", ">").replace("> <", "><").strip()
     return source
 
