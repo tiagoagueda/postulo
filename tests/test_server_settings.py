@@ -311,3 +311,55 @@ def test_an_empty_instance_offers_sign_up_and_the_first_account_administers(clie
     response = client.get(reverse("account_signup"))
     assert response.status_code == 200
     assert b'name="password1"' not in response.content, "the form is not offered"
+
+
+# --------------------------------------------------------- the newest backup
+
+
+def test_the_overview_says_how_old_the_newest_backup_is(client, admin, settings, tmp_path):
+    """The page had never been rendered with a backup actually on disk.
+
+    Every test and every browser run visited it with an empty backup directory, which
+    takes the "none yet" branch and never touches the age at all. The first real archive
+    to appear anywhere was the one taken before an upgrade — and the page answered with a
+    500. A page nobody has seen in its ordinary state is a page nobody has tested.
+    """
+    import tarfile
+
+    archive = tmp_path / "postulo-20260907-120000.tar.gz"
+    with tarfile.open(archive, "w:gz") as handle:
+        handle.add(__file__, arcname="manifest.json")
+    settings.POSTULO_BACKUP_DIR = str(tmp_path)
+    client.force_login(admin)
+
+    response = client.get(reverse("server:overview"))
+
+    assert response.status_code == 200
+    body = response.content.decode()
+    assert "data-backup-age" in body
+    assert "none yet" not in body
+
+
+def test_a_backup_older_than_a_week_says_so(client, admin, settings, tmp_path):
+    import os
+    import tarfile
+    import time
+
+    archive = tmp_path / "postulo-old.tar.gz"
+    with tarfile.open(archive, "w:gz") as handle:
+        handle.add(__file__, arcname="manifest.json")
+    old = time.time() - 8 * 24 * 3600
+    os.utime(archive, (old, old))
+    settings.POSTULO_BACKUP_DIR = str(tmp_path)
+    client.force_login(admin)
+
+    body = client.get(reverse("server:overview")).content.decode()
+
+    assert "older than a week" in body
+
+
+def test_an_empty_backup_directory_still_says_none_yet(client, admin, settings, tmp_path):
+    settings.POSTULO_BACKUP_DIR = str(tmp_path)
+    client.force_login(admin)
+
+    assert "none yet" in client.get(reverse("server:overview")).content.decode()
