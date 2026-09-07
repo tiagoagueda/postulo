@@ -66,6 +66,10 @@ EXCUSED: dict[str, str] = {
     "resume:link_check": "a POST that asks whether one link still answers",
     "resume:link_check_all": "a POST that asks the same of every link",
     "server:plugin_action": "a POST that installs, removes or disables a plugin",
+    "server:plugin_repository": (
+        "a POST that adds, edits, switches or removes a plugin repository; every "
+        "form that reaches it is on the plugins page, which the suite visits"
+    ),
     "server:email_test": "a POST that sends one test message",
     "server:person_admin": "a POST that grants or removes administrator rights",
     "server:person_active": "a POST that suspends or restores an account",

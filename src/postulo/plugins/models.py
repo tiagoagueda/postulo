@@ -19,6 +19,72 @@ from . import secrets
 from .base import CONNECTED_KINDS
 
 
+class PluginRepository(models.Model):
+    """A catalogue an administrator may install plugins from, as a row rather than a string.
+
+    Catalogues already worked: a signed index, an Ed25519 key, a checksum per wheel, and
+    several of them supported. What did not exist was any way to manage one. They came from
+    ``POSTULO_PLUGIN_CATALOGUES`` — ``name|url|key``, comma-separated — so adding a
+    catalogue meant editing a file and restarting the container.
+
+    The environment still wins, and this is not an instance-wide policy row like
+    ``SiteSettings``: there may be several, and each is switchable on its own.
+
+    **There is no row for the internal tier.** The plugins that ship inside Postulo are not
+    fetched from anywhere; they arrived the way the rest of the application did. The page
+    shows them as a repository so the list reads as one thing, and it is synthesised at
+    render time rather than stored — a row would be a fact about a place, and there is no
+    place.
+    """
+
+    class Tier(models.TextChoices):
+        #: Exactly one, shipped disabled and empty until this project publishes a catalogue
+        #: and takes on the signing key that implies.
+        OFFICIAL = "official", _("Official")
+        CUSTOM = "custom", _("Custom")
+
+    #: The key an installed plugin's ``origin`` records as ``catalogue:<name>``, so it must
+    #: be stable: renaming one orphans the provenance of everything installed from it.
+    name = models.SlugField(_("name"), max_length=50, unique=True)
+    tier = models.CharField(_("tier"), max_length=10, choices=Tier, default=Tier.CUSTOM)
+    url = models.URLField(_("index address"), max_length=500, blank=True)
+    public_key = models.CharField(
+        _("public key"),
+        max_length=200,
+        blank=True,
+        help_text=_(
+            "Ed25519, base64. Without it there is no catalogue: an unsigned list of "
+            "addresses to run code from is not something Postulo will offer."
+        ),
+    )
+    enabled = models.BooleanField(_("enabled"), default=True)
+    added_at = models.DateTimeField(_("added"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("plugin repository")
+        verbose_name_plural = _("plugin repositories")
+        ordering = ("tier", "name")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("tier",),
+                condition=models.Q(tier="official"),
+                name="one_official_plugin_repository",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return self.name
+
+    @property
+    def is_official(self) -> bool:
+        return self.tier == self.Tier.OFFICIAL
+
+    @property
+    def usable(self) -> bool:
+        """Enabled, and actually pointing somewhere it can prove."""
+        return bool(self.enabled and self.url and self.public_key)
+
+
 class ConnectionQuerySet(models.QuerySet):
     def for_user(self, user) -> ConnectionQuerySet:
         if user is None or not getattr(user, "is_authenticated", False):

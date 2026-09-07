@@ -81,11 +81,12 @@ class Catalogue:
     listings: list[Listing] = field(default_factory=list)
 
 
-def configured() -> dict[str, dict[str, str]]:
-    """The catalogues this instance knows: name → {url, key}.
+def from_environment() -> dict[str, dict[str, str]]:
+    """What ``POSTULO_PLUGIN_CATALOGUES`` pins: ``name|url|key``, comma-separated.
 
-    Empty by default. Postulo publishes no catalogue yet, and pointing at one is a
-    decision an operator makes, not something an upgrade does for them.
+    Still supported, and still wins. An operator who put a catalogue in their environment
+    did so to have it not change from a web page, and #93 giving the interface a say does
+    not take that back.
     """
     raw = getattr(settings, "POSTULO_PLUGIN_CATALOGUES", "") or ""
     found: dict[str, dict[str, str]] = {}
@@ -102,13 +103,69 @@ def configured() -> dict[str, dict[str, str]]:
     return found
 
 
-def verify(payload: bytes, signature: str, public_key: str) -> None:
-    """Ed25519 over the index's exact bytes. Anything that does not check out is refused."""
-    from cryptography.exceptions import InvalidSignature
+def configured() -> dict[str, dict[str, str]]:
+    """The catalogues this instance can install from: name → {url, key}.
+
+    Rows first, the environment over the top. Only rows that are switched on *and* have
+    both an address and a key appear: a catalogue without a key is not a catalogue Postulo
+    will offer, and a half-filled row is a draft rather than a source of code.
+
+    Empty by default in every direction. Postulo publishes no catalogue yet, and pointing
+    at one stays a decision an operator makes rather than something an upgrade does for
+    them.
+
+    **A disabled repository disappears from here and nowhere else.** Plugins already
+    installed from it go on working — their code is on the volume and the registry never
+    consults a catalogue — and what stops is installing or updating from it. That is the
+    behaviour the page has to describe, or "off" reads as "gone".
+    """
+    from .models import PluginRepository
+
+    found: dict[str, dict[str, str]] = {}
+    try:
+        rows = list(PluginRepository.objects.all())
+    except Exception:  # pragma: no cover - before migrate, and never at runtime
+        rows = []
+    for row in rows:
+        if row.usable:
+            found[row.name] = {"url": row.url, "key": row.public_key}
+    found.update(from_environment())
+    return found
+
+
+def pinned_names() -> set[str]:
+    """Catalogue names the environment fixes, so the interface can show them unwritable.
+
+    The same shape as `site.overridden_by` for the settings that already work this way: a
+    value the environment holds is shown, greyed out, rather than hidden or silently
+    ignored when somebody edits it.
+    """
+    return set(from_environment())
+
+
+def decode_public_key(public_key: str):
+    """The key as ``cryptography`` understands it, or a :class:`CatalogueError` saying why not.
+
+    Separate from :func:`verify` so that a key can be checked at the moment somebody types
+    it. A mistyped key is not a visible error: it is a catalogue that quietly never works,
+    and the first sign of it is a fetch failing weeks later.
+    """
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
     try:
-        key = Ed25519PublicKey.from_public_bytes(base64.b64decode(public_key, validate=True))
+        return Ed25519PublicKey.from_public_bytes(base64.b64decode(public_key, validate=True))
+    except (ValueError, binascii.Error, TypeError) as error:
+        raise CatalogueError(
+            str(_("That is not an Ed25519 public key: %(error)s")) % {"error": error}
+        ) from error
+
+
+def verify(payload: bytes, signature: str, public_key: str) -> None:
+    """Ed25519 over the index's exact bytes. Anything that does not check out is refused."""
+    from cryptography.exceptions import InvalidSignature
+
+    try:
+        key = decode_public_key(public_key)
         key.verify(base64.b64decode(signature, validate=True), payload)
     except (ValueError, binascii.Error, TypeError) as error:
         raise CatalogueError(

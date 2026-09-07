@@ -8,6 +8,7 @@ read-only and says so, so that a `.env` written for 0.1.0 goes on meaning what i
 
 from __future__ import annotations
 
+import logging
 import platform
 import secrets
 import shutil
@@ -30,11 +31,14 @@ from django.views.generic import RedirectView, TemplateView, UpdateView
 
 from postulo import __version__
 from postulo.accounts import deletion
+from postulo.plugins.forms import PluginRepositoryForm
 
 from . import site
 from .mixins import StaffRequiredMixin
 from .models import SiteSettings
 from .server_forms import CaptureForm, DefaultsForm, SignInForm, TestEmailForm
+
+logger = logging.getLogger(__name__)
 
 
 class ServerIndexView(StaffRequiredMixin, RedirectView):
@@ -510,9 +514,155 @@ class PluginsView(ServerSectionMixin, TemplateView):
         context["installed"] = installing.status()
         context["plugins_dir"] = str(installing.plugins_dir())
         context["catalogues_configured"] = sorted(catalogue.configured())
+        context["repositories"] = _repositories()
+        context["repository_form"] = kwargs.get("repository_form") or PluginRepositoryForm()
         context["pending"] = self.request.session.get("plugin_pending")
         context["listings"] = self.request.session.get("plugin_listings", [])
         return context
+
+
+def _repositories() -> list[dict]:
+    """Every repository the page shows, internal first, with what may be done to each.
+
+    The internal one is synthesised. The plugins that ship inside Postulo are not fetched
+    from anywhere and there is no address to store, so a row would be a fact about a place
+    that does not exist. It appears here so the list reads as one thing rather than two.
+    """
+    from postulo.plugins import catalogue
+    from postulo.plugins.models import PluginRepository
+
+    pinned = catalogue.pinned_names()
+    rows = [
+        {
+            "name": "internal",
+            "tier": "internal",
+            "label": _("Internal"),
+            "note": _("The plugins that ship inside Postulo. Nothing is fetched."),
+            "url": "",
+            "enabled": True,
+            "usable": True,
+            "pinned": "",
+            "editable": False,
+            "removable": False,
+            "switchable": False,
+        }
+    ]
+    for row in PluginRepository.objects.all():
+        variable = "POSTULO_PLUGIN_CATALOGUES" if row.name in pinned else ""
+        rows.append(
+            {
+                "name": row.name,
+                "tier": row.tier,
+                "label": row.get_tier_display(),
+                "note": "",
+                "url": row.url,
+                "enabled": row.enabled,
+                "usable": row.usable,
+                "pinned": variable,
+                "editable": not variable,
+                # The official tier is a fixture of the interface: emptied and switched
+                # off, never deleted, so the heading does not vanish along with it.
+                "removable": not variable and not row.is_official,
+                "switchable": not variable,
+            }
+        )
+    return rows
+
+
+class PluginRepositoryView(StaffRequiredMixin, View):
+    """Add, edit, switch and remove the catalogues an instance may install from.
+
+    Every one of these is an administrator changing where code may come from, which is why
+    each writes a line to the log. There is no audit trail in *Server settings* yet — no
+    action on that page records anything — and building one is #95's problem rather than
+    this view's, but a key change that left no trace at all would be the wrong place to
+    wait for it.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins import catalogue
+        from postulo.plugins.models import PluginRepository
+
+        action = request.POST.get("action", "")
+        name = (request.POST.get("name") or "").strip()
+        row = PluginRepository.objects.filter(name=name).first()
+
+        if action == "add":
+            return self._save(request, PluginRepositoryForm(request.POST))
+
+        if row is None:
+            messages.error(request, _("There is no repository by that name."))
+            return redirect("server:plugins")
+        if row.name in catalogue.pinned_names():
+            messages.error(
+                request,
+                _("The environment sets “%(name)s”, so it cannot be changed here.")
+                % {"name": row.name},
+            )
+            return redirect("server:plugins")
+
+        if action == "save":
+            return self._save(request, PluginRepositoryForm(request.POST, instance=row))
+        if action in {"enable", "disable"}:
+            row.enabled = action == "enable"
+            row.save(update_fields=["enabled"])
+            logger.warning(
+                "Plugin repository %r switched %s by %s",
+                row.name,
+                "on" if row.enabled else "off",
+                request.user.username,
+            )
+            messages.success(
+                request,
+                _("“%(name)s” is on. Plugins may be installed and updated from it.")
+                % {"name": row.name}
+                if row.enabled
+                else _(
+                    "“%(name)s” is off. Nothing new is installed or updated from it; what "
+                    "was already installed goes on working."
+                )
+                % {"name": row.name},
+            )
+            return redirect("server:plugins")
+        if action == "remove":
+            if row.is_official:
+                messages.error(request, _("The official repository is emptied, not removed."))
+                return redirect("server:plugins")
+            logger.warning("Plugin repository %r removed by %s", row.name, request.user.username)
+            row.delete()
+            messages.success(
+                request,
+                _("“%(name)s” is gone. Anything installed from it stays installed.")
+                % {"name": row.name},
+            )
+            return redirect("server:plugins")
+
+        messages.error(request, _("That is not something this page does."))
+        return redirect("server:plugins")
+
+    def _save(self, request: HttpRequest, form) -> HttpResponse:
+        if not form.is_valid():
+            return PluginsView.as_view()(request, repository_form=form)
+        changed_key = form.key_changed
+        row = form.save()
+        if changed_key:
+            logger.warning(
+                "Plugin repository %r had its public key replaced by %s",
+                row.name,
+                request.user.username,
+            )
+            messages.warning(
+                request,
+                _(
+                    "The key for “%(name)s” was replaced. That key is the only thing "
+                    "standing between its index and code running here, so make sure it "
+                    "came from somewhere you trust."
+                )
+                % {"name": row.name},
+            )
+        else:
+            messages.success(request, _("Saved."))
+        return redirect("server:plugins")
 
 
 class PluginActionView(StaffRequiredMixin, View):

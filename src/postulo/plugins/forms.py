@@ -8,9 +8,73 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from .base import FieldSpec
-from .models import Connection
+from .models import Connection, PluginRepository
 
 logger = logging.getLogger(__name__)
+
+
+class PluginRepositoryForm(forms.ModelForm):
+    """A catalogue an administrator adds or edits.
+
+    The key is the whole of the trust. `catalogue.py` is blunt about it -- *"Without the key
+    there is no catalogue: an unsigned list of URLs to run code from is not something
+    Postulo will offer"* -- so a row without one is saved, and simply never offered.
+
+    Changing a key is not an edit like changing a label. It replaces the only thing standing
+    between an index and arbitrary code running inside Postulo, and a form beside a URL box
+    makes it look like a preference. So a change is called out, and written to the log with
+    who did it.
+    """
+
+    class Meta:
+        model = PluginRepository
+        fields = ("name", "url", "public_key", "enabled")
+        labels = {"url": _("Index address")}
+        help_texts = {
+            "name": _(
+                "Recorded against everything installed from here, so it cannot change "
+                "later without orphaning what it installed."
+            ),
+            "url": _("Where the signed index is published. Its signature sits beside it."),
+        }
+
+    def __init__(self, *args, pinned: bool = False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pinned = pinned
+        if self.instance.pk:
+            # The name is what an installed plugin's `origin` remembers.
+            self.fields["name"].disabled = True
+        if pinned:
+            for field in self.fields.values():
+                field.disabled = True
+
+    def clean(self):
+        cleaned = super().clean()
+        if self.pinned:
+            raise forms.ValidationError(
+                _("The environment sets “%(name)s”, so it cannot be changed here.")
+                % {"name": self.instance.name}
+            )
+        return cleaned
+
+    def clean_public_key(self) -> str:
+        key = (self.cleaned_data.get("public_key") or "").strip()
+        if not key:
+            return key
+        from .catalogue import decode_public_key
+
+        try:
+            decode_public_key(key)
+        except Exception as error:
+            # `decode_public_key` already says this in words. Repeating it here would be
+            # the same sentence translated twice into twenty-three languages.
+            raise forms.ValidationError(str(error)) from error
+        return key
+
+    @property
+    def key_changed(self) -> bool:
+        return "public_key" in self.changed_data and bool(self.initial.get("public_key"))
+
 
 #: Shown in place of a stored secret. Submitting it back means "leave it as it is".
 SECRET_PLACEHOLDER = "••••••••"  # noqa: S105 - a display placeholder, not a credential

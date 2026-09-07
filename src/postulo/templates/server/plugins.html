@@ -28,6 +28,89 @@
   </div>
 
   {# ------------------------------------------------------------ installed #}
+  {# ---------------------------------------------------------- repositories #}
+
+  <h3 class="mb-3 font-medium">{% translate "Where plugins may come from" %}</h3>
+  <div class="card mb-8 p-0">
+    <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+      {% for repository in repositories %}
+        <li class="flex flex-wrap items-start gap-3 px-4 py-3" data-repository="{{ repository.name }}">
+          <div class="min-w-0 flex-1">
+            <p class="font-medium">
+              {{ repository.name }}
+              <span class="ml-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{{ repository.label }}</span>
+              {% if not repository.enabled %}
+                <span class="ml-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{% translate "Off" %}</span>
+              {% endif %}
+              {% if repository.pinned %}
+                <span class="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200">{% translate "set in the environment" %}</span>
+              {% endif %}
+            </p>
+            <p class="text-xs text-ink-500 dark:text-ink-400">
+              {% if repository.note %}
+                {{ repository.note }}
+              {% elif repository.url %}
+                {{ repository.url|truncatechars:70 }}
+              {% elif repository.tier == 'official' %}
+                {% translate "Postulo publishes no catalogue yet. Nothing is fetched from here." %}
+              {% else %}
+                {% translate "No address and no key, so nothing is offered from it." %}
+              {% endif %}
+              {% if repository.pinned %} · <code>{{ repository.pinned }}</code>{% endif %}
+            </p>
+          </div>
+          {% if repository.switchable or repository.removable %}
+            <div class="flex items-center gap-1">
+              {% if repository.switchable %}
+                <form method="post" action="{% url 'server:plugin_repository' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="name" value="{{ repository.name }}">
+                  <input type="hidden" name="action" value="{% if repository.enabled %}disable{% else %}enable{% endif %}">
+                  <button type="submit" class="btn-secondary px-3 py-1 text-xs">
+                    {% if repository.enabled %}{% translate "Switch off" %}{% else %}{% translate "Switch on" %}{% endif %}
+                  </button>
+                </form>
+              {% endif %}
+              {% if repository.removable %}
+                <form method="post" action="{% url 'server:plugin_repository' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="name" value="{{ repository.name }}">
+                  <input type="hidden" name="action" value="remove">
+                  <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">{% translate "Remove" %}</button>
+                </form>
+              {% endif %}
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% comment %} Switching a repository off stops installing and updating from it. It does
+     not disable what it already installed -- that code is on the volume and the registry
+     never consults a catalogue -- and saying so here is the difference between "off" and
+     what an administrator would otherwise assume it meant.
+  {% endcomment %}
+  <details class="card mb-8">
+    <summary class="cursor-pointer font-medium">{% translate "Add a repository" %}</summary>
+    <p class="mt-2 mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        An index is a list of code to run here, so it must be signed and you must hold the
+        key. Switching a repository off later stops new installs and updates from it;
+        anything already installed keeps working.
+      {% endblocktranslate %}
+    </p>
+    <form method="post" action="{% url 'server:plugin_repository' %}" class="grid gap-4">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add">
+      {% include "partials/field.html" with field=repository_form.name %}
+      {% include "partials/field.html" with field=repository_form.url %}
+      {% include "partials/field.html" with field=repository_form.public_key %}
+      {% include "partials/field.html" with field=repository_form.enabled %}
+      <div><button type="submit" class="btn-primary">{% translate "Add" %}</button></div>
+    </form>
+  </details>
+
   <h3 class="mb-3 font-medium">{% translate "Installed on this instance" %}</h3>
   {% if installed %}
     <div class="card mb-8 p-0">

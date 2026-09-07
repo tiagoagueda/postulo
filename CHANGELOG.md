@@ -6,6 +6,28 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### ✨ Added
+
+- **Plugin repositories are rows an administrator manages, not one environment variable.**
+  Catalogues already worked — a signed index, an Ed25519 key, a checksum for every wheel, and
+  several of them supported at once. What did not exist was any way to manage one: they came
+  from `POSTULO_PLUGIN_CATALOGUES` as `name|url|key`, so adding a catalogue meant editing a
+  file and restarting the container. *Server settings → Plugins* now lists them in three
+  tiers. **Internal** is the plugins that ship inside Postulo, shown as a repository so the
+  list reads as one thing and synthesised rather than stored — a row would be a fact about a
+  place, and there is no place. **Official** is one row, and it ships **switched off and
+  pointing nowhere**, because Postulo publishes no catalogue: doing so means a signing key
+  kept safe for the life of the project and an answer for rotating it if it leaks, which is
+  taken deliberately or not at all. **Custom** is however many an operator wants. The
+  environment still wins and is shown doing so, the way four settings already work. A key
+  is checked when it is typed rather than only when a fetch fails weeks later, and replacing
+  one says so plainly and is written to the log — it is not an edit like changing a label, it
+  replaces the only thing standing between an index and code running here. Switching a
+  repository off stops installing and updating from it and **does not touch what it already
+  installed**; that code is on the volume and the registry never consults a catalogue. There
+  is a test for each of those, and a migration that turns whatever an instance already had in
+  its environment into rows, so nobody loses a catalogue. (#93)
+
 ### 🔧 Changed
 
 - **Reading a Europass CV is a plugin now.** The reader was already shaped like one — it
