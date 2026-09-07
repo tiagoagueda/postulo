@@ -227,6 +227,12 @@ flags are [flag-icons](https://github.com/lipis/flag-icons), used under the MIT 
 Both are copied into the repository, so nothing is fetched from anybody else's server at
 runtime; the flags carry their notice beside them in `src/postulo/static/flags/`.
 
+The **name and the logo** are not covered by that licence. [TRADEMARKS.md](TRADEMARKS.md)
+says what you may do without asking — which is nearly everything, including naming a plugin
+`postulo-something` and calling your instance whatever you like — and the one case where a
+fork should use another name. It also names the marks belonging to other people that appear
+here, and none of their owners is involved with this project.
+
 ## Where this lives
 
 Developed on [Forgejo](https://source.tiagoagueda.com/postulo/postulo) and mirrored to

@@ -8,6 +8,27 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **`TRADEMARKS.md` says what the licence cannot.** The code is AGPL; the name and the logo
+  are not, and until now nothing said so — a reader had no way to know what a fork may call
+  itself. That matters here more than in most projects, because the README makes four
+  promises and a licence cannot enforce a promise: somebody could fork this, put a feature
+  behind payment, keep the name, and everybody who had heard *never paywalled* would have
+  been told something untrue. Reserving the name is the only instrument that speaks to that,
+  and it is AGPL-3.0 §7(e)'s own provision rather than a restriction bolted onto a free
+  licence. The document leads with what needs no permission, because that is nearly
+  everything: run it, fork it, redistribute it unmodified under its name, say truthfully
+  that your thing works with it, **name a plugin `postulo-something`** — eight repositories
+  already do, and a note that put them in the wrong would cause exactly the harm it was
+  written to prevent — and call your instance whatever you like. Another name is asked for
+  in one case: a materially modified fork that somebody could install thinking it was this.
+  It also closes a real gap rather than a hypothetical one. **`assets/support/buy-me-a-coffee.png`
+  has been in the tree since the support banner landed, with nothing beside it saying whose
+  mark it is**; it now carries a notice, as the flags already do. Lucide and flag-icons were
+  fine — those are copyright licences and were satisfied. A mark is not licensed at all,
+  which is why it needed a different kind of note. Nine tests hold the document to the
+  artwork actually in the tree, so vendoring something new without a line for it fails.
+  (#107)
+
 - **`FUNDING.md` says what the funding link means.** `.github/FUNDING.yml` held one URL,
   and a URL cannot say what is being asked for, what it changes, or — the part that matters
   — what it does not. So the companion says it: that nothing is ever paywalled and no
