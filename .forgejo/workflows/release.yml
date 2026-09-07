@@ -56,8 +56,16 @@ jobs:
         run: uv run --no-project python scripts/release_tools.py publish "${GITHUB_REF_NAME}" dist/* --notes release-notes.md
 
   image:
+    # `if` decides whether this runs; `runs-on` decides where it queues, and Forgejo
+    # queues before it evaluates the condition. With `runs-on: docker` and no runner
+    # advertising that label, the job sat waiting for ever and the whole run never
+    # finished -- which is how v0.2.0's release looked unfinished long after it had been
+    # published. The comment at the top of ci.yml warned about exactly this.
+    #
+    # So the destination follows the switch: with image building off, the job lands on a
+    # runner that exists and is skipped immediately, and the run completes.
     if: ${{ vars.BUILD_IMAGE == 'true' }}
-    runs-on: docker
+    runs-on: ${{ vars.BUILD_IMAGE == 'true' && 'docker' || 'ubuntu-latest' }}
     permissions:
       contents: read
       packages: write

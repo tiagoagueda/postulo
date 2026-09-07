@@ -1,6 +1,6 @@
 # Roadmap
 
-**The current release is 0.2.0.** Releasing is a deliberate act here rather than something
+**The current release is 0.2.1.** Releasing is a deliberate act here rather than something
 that happens on a schedule, so `main` is sometimes ahead of the last tag; the
 [changelog](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CHANGELOG.md)
 says by how much.

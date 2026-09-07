@@ -10,7 +10,7 @@ letters, and the record of what actually happened, on hardware you control.
 
 From the Latin *postulō* — "I apply for". First person, deliberately.
 
-> **Status: 0.2.0.** Usable and used, but by one person, for weeks rather than years:
+> **Status: 0.2.1.** Usable and used, but by one person, for weeks rather than years:
 > treat it as something that works rather than something that is mature. Releasing is a
 > deliberate act here, so `main` may be ahead of the last tag.
 > [Roadmap](Roadmap) says exactly what is in and what is not.

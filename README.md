@@ -12,7 +12,7 @@ data, on your server.
 
 From the Latin *postulō* — "I apply for". First person, deliberately.
 
-> **Status: 0.2.0.** Usable and used, but not battle-tested: it has recorded real
+> **Status: 0.2.1.** Usable and used, but not battle-tested: it has recorded real
 > applications, by one person, for weeks rather than years. Releasing here is a deliberate
 > act rather than something that happens on a schedule, so `main` may be ahead of the last
 > tag — the [changelog](CHANGELOG.md) says by how much.

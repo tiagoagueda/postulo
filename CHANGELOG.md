@@ -6,7 +6,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-09-07
+
 ### 🐛 Fixed
+
+- **The release run never finished.** `release.yml`'s image job says `runs-on: docker` and
+  is guarded by `if: vars.BUILD_IMAGE == 'true'` — but Forgejo queues a job before it
+  evaluates the condition, so with no runner advertising that label the job waited for ever
+  and the run never completed. v0.2.0 was published, attached and correct, and its run still
+  looked unfinished hours later. The comment at the top of `ci.yml` had warned about this
+  exact behaviour, about a different file. The destination follows the switch now: with
+  image building off the job lands on a runner that exists and is skipped at once, and the
+  run completes. (#81)
 
 - **Server settings → Overview returned 500 as soon as a backup existed.** The view worked
   out the newest backup's age as a *span* and the template handed that span to `timesince`,
