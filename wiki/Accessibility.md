@@ -31,6 +31,9 @@ us about a barrier.
 - **Things you click are big enough to hit.** Every button, link and switch is at least
   24 by 24 pixels, or else has that much clear space around it. This matters most on a
   phone, with a tremor, or with any pointer that is not a mouse on a desk.
+- **Nothing scrolls sideways.** At 320 pixels — the width a normal window has at 400%
+  zoom — every page reads in one column, top to bottom. Only a data table scrolls across,
+  in its own box, because a table needs its two dimensions to mean anything.
 
 ## What is checked, and how
 
@@ -55,6 +58,14 @@ box and holds it to 24 by 24, allowing the criterion's own exceptions: a small t
 a link inside a sentence, whose height belongs to the prose it sits in. What it cannot
 judge is whether some other control does the same job at full size; that needs a person,
 and anything relying on it has to be written down.
+
+Width is measured too, and by the same method: at 320 CSS pixels a third browser test
+asks each page to scroll sideways and fails if it moves. That is the criterion's own
+question — *Reflow*, level AA — and it is not one axe can answer, because it is about
+layout at a width rather than about a document. Nothing had ever looked at these pages
+narrow, and every one of them scrolled, by an identical 331 pixels: a single row of
+navigation links that did not care how wide the window was. The failure names the element
+rather than the page, because that is the difference between a fix and a search.
 
 It is worth being plain about the limit of the automated half. The sign-in page passed
 every one of those checks, in both themes, while being rendered with no styling at all:

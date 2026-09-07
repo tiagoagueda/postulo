@@ -49,7 +49,10 @@
             </p>
             {% if row.description %}<p class="text-xs text-ink-500 dark:text-ink-400">{{ row.description }}</p>{% endif %}
           </div>
-          <div class="w-72 shrink-0">
+          {% comment %} Full width until there is room for the fixed column: 288 pixels
+             inside a card inside a 320-pixel page does not fit, and `shrink-0` means it
+             will not give way (#113). {% endcomment %}
+          <div class="w-full shrink-0 sm:w-72">
             <label class="sr-only" for="default-{{ row.name }}">
               {% blocktranslate with plugin=row.label %}What {{ plugin }} does by default{% endblocktranslate %}
             </label>
@@ -357,7 +360,7 @@
 
   {# -------------------------------------------------------------- sources #}
   <h3 class="mb-3 font-medium">{% translate "Capture sources this instance has" %}</h3>
-  <div class="card overflow-x-auto p-0">
+  <div class="card scroll-x p-0">
     <table class="w-full text-left text-sm">
       <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
         <tr>

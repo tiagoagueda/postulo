@@ -137,8 +137,10 @@ def test_the_critical_path(live_server, page: Page, applicant) -> None:
     if pdf_backend_available():
         assert any(name.startswith("media/") and name.endswith(".pdf") for name in names)
 
-    # Out through the account menu: it opens on the name, and Sign out is inside it.
-    page.locator("details[data-menu] > summary").click()
+    # Out through the account menu: it opens on the name, and Sign out is inside it. Named
+    # rather than selected by shape -- the header has a second disclosure now, the
+    # navigation's, which is the one a narrow screen gets (#113).
+    page.get_by_label("Account menu", exact=False).click()
     page.get_by_role("button", name="Sign out").click()
     expect(page.get_by_role("banner").get_by_role("link", name="Sign in")).to_be_visible()
     expect(page.locator("details[data-menu]")).to_have_count(0)

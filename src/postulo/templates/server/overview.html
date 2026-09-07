@@ -7,7 +7,17 @@
     {% translate "What this instance is running, and where its data is." %}
   </p>
 
-  <div class="grid gap-4 sm:grid-cols-2">
+  {% comment %} `[&>*]:min-w-0` on the cards, and `min-w-0` on the two values below that
+     truncate. `truncate` sets `white-space: nowrap`, which makes a value's smallest
+     possible width its whole width -- a database path, say -- and a flex item will not go
+     under that, so the row widened the card, the card widened the track, and the page
+     scrolled 223 pixels sideways at 320. `min-w-0` lets it shrink.
+
+     The two values dropped `truncate` with it. A clipped path is one an administrator
+     cannot read, and it was only these two -- the newest-backup path beneath them has
+     always wrapped. They wrap now as well, because `code` breaks anywhere (#113).
+  {% endcomment %}
+  <div class="grid gap-4 sm:grid-cols-2 [&>*]:min-w-0">
     <div class="card">
       <h3 class="mb-3 font-medium">{% translate "Software" %}</h3>
       <dl class="space-y-2 text-sm">
@@ -30,11 +40,11 @@
       <dl class="space-y-2 text-sm">
         <div class="flex justify-between gap-4">
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Database" %}</dt>
-          <dd class="truncate">{{ database_engine }}{% if database_engine == "sqlite" %} · <code class="text-xs">{{ database_name }}</code>{% endif %}</dd>
+          <dd class="min-w-0">{{ database_engine }}{% if database_engine == "sqlite" %} · <code class="text-xs">{{ database_name }}</code>{% endif %}</dd>
         </div>
         <div class="flex justify-between gap-4">
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Media" %}</dt>
-          <dd class="truncate text-right">
+          <dd class="min-w-0 text-right">
             {% blocktranslate count counter=media_files with size=media_bytes|filesizeformat trimmed %}
               {{ counter }} file, {{ size }}
             {% plural %}

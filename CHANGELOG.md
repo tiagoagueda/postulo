@@ -148,6 +148,32 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Every page in Postulo scrolled sideways on a phone, and one row of links was most of
+  the reason.** At 320 CSS pixels — the width a normal window has at 400% zoom, which is how
+  somebody with low vision reads — all thirteen pages measured overflowed by an identical 331
+  pixels. Identical is the tell: six navigation links come to 635 pixels, a flex row does not
+  care how wide the window is, and that one element was doing it on every page at once.
+  **Reflow is level AA**, and the README promises AA without qualification. Below 768 pixels
+  the row is now a disclosure, the same `<details>` the account menu beside it has always
+  been: it opens with no script, closes with Escape, and the links are written once and
+  rendered twice so only one copy is ever in the layout. Wrapping the row instead would have
+  been one class and three lines of navigation above every page on a phone.
+  **Five more went with it**, none of which anybody had seen, because the navigation was
+  hiding all of them: a fixed 288-pixel column in the plugin tables; an action bar of three
+  buttons that would not wrap; a grid whose items refused to shrink; the API page's
+  `openapi.json` address, which has no word boundary in it for a browser to break; and the
+  server overview, 223 pixels over, where `truncate` — which sets `white-space: nowrap` —
+  made a database path's smallest possible width its whole width and pushed the card, the
+  grid track and then the page. Those two paths now wrap and can be read, which the third
+  path in the same card always could. **And one that is worth knowing about**: a
+  screen-reader-only "Actions" label, one pixel wide and invisible to everyone, made every
+  listing page scroll 144 pixels. It is `position: absolute`, and an absolutely positioned
+  box is confined by its containing block rather than by an ancestor's overflow — so it
+  stepped straight out of the table's scroll box and took the document with it. Every box in
+  Postulo that is allowed to scroll sideways now establishes a containing block, which is
+  what the new `.scroll-x` is for. Checked by a third browser test that asks each page to
+  scroll and fails if it moves. (#113)
+
 - **Sixty-two buttons were two pixels too small to hit, and the suite said the pages were
   fine.** The column chooser's *move up* and *move down* buttons were 22 by 22 — a 14-pixel
   chevron with 4 pixels of padding — against the 24 that WCAG 2.2 asks for at AA, repeated

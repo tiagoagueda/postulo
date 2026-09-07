@@ -1,0 +1,11 @@
+{% load postulo %}
+{% comment %} The main navigation's links, written once and rendered twice: as a row in the
+   header on a wide screen, and stacked inside a disclosure on a narrow one. Only one of the
+   two is ever in the layout, so the duplicate never reaches the accessibility tree.
+
+   `extra` is whatever the caller needs on top of the link's own style -- `block` for the
+   stacked copy, so a link fills the panel rather than sitting at its text width. {% endcomment %}
+{% for item in nav_items %}
+  <a href="{% url item.url_name %}" class="{% nav_active_names item.active_names %} {{ extra }}"
+     data-nav="{{ item.key }}">{{ item.label }}</a>
+{% endfor %}

@@ -8,6 +8,8 @@ wordmark is a link — and when it is taken the wordmark has to do the job prope
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from django.urls import reverse
 
@@ -93,10 +95,14 @@ def test_the_wordmark_says_where_it_goes_once_dashboard_is_hidden(client, user):
     assert 'aria-label="Postulo — dashboard"' in html
     assert "nav-link-active" in html, "and it carries the active style on the dashboard"
 
-    # Somewhere else, it is a link like any other.
+    # Somewhere else, it is a link like any other. The navigation is written twice into the
+    # page -- a row for wide screens, a menu for narrow, only ever one of them in the layout
+    # (#113) -- so counting the marker across the document counts renderings rather than
+    # items. What has to hold is that one item is marked, whatever it is rendered into.
     html = client.get(reverse("applications:list")).content.decode()
     assert 'aria-label="Postulo — dashboard"' in html
-    assert html.count("nav-link-active") == 1, "only the page you are on is marked"
+    marked = set(re.findall(r'nav-link-active[^>]*data-nav="([^"]+)"', html))
+    assert marked == {"applications"}, f"only the page you are on is marked, got {marked}"
 
 
 def test_a_visitor_who_is_not_signed_in_sees_the_plain_wordmark(client):

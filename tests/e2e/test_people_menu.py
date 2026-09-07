@@ -51,7 +51,7 @@ def sign_in(page: Page, base: str) -> None:
 def overflow(page: Page) -> int:
     """How far the table sticks out of the card that holds it."""
     return page.evaluate("""() => {
-        const card = document.querySelector('.card.overflow-x-auto');
+        const card = document.querySelector('.card.scroll-x');
         return Math.round(card.scrollWidth - card.clientWidth);
     }""")
 

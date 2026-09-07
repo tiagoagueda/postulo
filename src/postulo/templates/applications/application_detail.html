@@ -31,7 +31,10 @@
     </div>
   </div>
 
-  <div class="grid gap-6 lg:grid-cols-3">
+  {% comment %} `[&>*]:min-w-0` on the tracks: a grid item refuses to shrink below its
+     content by default, so one wide child widens the column and then the page (#113).
+  {% endcomment %}
+  <div class="grid gap-6 lg:grid-cols-3 [&>*]:min-w-0">
 
     <div class="lg:col-span-2">
 

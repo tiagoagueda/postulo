@@ -62,7 +62,10 @@
               </p>
             {% endif %}
           </div>
-          <div class="w-72 shrink-0">
+          {% comment %} Full width until there is room for the fixed column: 288 pixels
+             inside a card inside a 320-pixel page does not fit, and `shrink-0` means it
+             will not give way (#113). {% endcomment %}
+          <div class="w-full shrink-0 sm:w-72">
             <label class="sr-only" for="state-{{ row.name }}">
               {% blocktranslate with plugin=row.label %}What {{ plugin }} does for this account{% endblocktranslate %}
             </label>

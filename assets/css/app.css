@@ -72,6 +72,20 @@
   }
 
   /*
+   * Inline code is where unbreakable strings come from: a URL, a filesystem path, a
+   * database name. Nothing in them is a word boundary, so a browser will not break them
+   * and one of them widens the page instead -- 44 pixels of sideways scroll on the API
+   * page from a single openapi.json address at 320 (#113). `anywhere` rather than
+   * `break-word` so it counts towards min-content and a flex or grid parent can shrink.
+   *
+   * Not <pre>: that box scrolls on purpose, and `white-space: pre` means this does not
+   * apply inside it anyway.
+   */
+  code {
+    overflow-wrap: anywhere;
+  }
+
+  /*
    * Tell the browser which theme is in force, so its own controls — scrollbars, select
    * menus, the date picker — follow it. Same three states as the `dark` variant above.
    */
@@ -159,6 +173,22 @@
   .card {
     @apply rounded-xl border border-ink-200 bg-white p-6 shadow-sm
       dark:border-ink-800 dark:bg-ink-900;
+  }
+
+  /*
+   * A box whose content is allowed to be wider than the page: a data table, the board's
+   * columns. WCAG's Reflow criterion exempts content that needs two dimensions to mean
+   * anything, provided it is the box that scrolls and not the page.
+   *
+   * `relative` is the part that is easy to leave out and expensive to leave out. An
+   * absolutely positioned descendant is confined by its containing block, not by an
+   * ancestor's overflow, so without a position here it escapes the scroll box and drags
+   * the whole document sideways with it. One 1-pixel `.sr-only` label reading "Actions",
+   * sitting in the last header cell of a 645-pixel table, scrolled every listing page
+   * 144 pixels sideways at 320 -- invisible, unreachable, and the width of a table (#113).
+   */
+  .scroll-x {
+    @apply relative overflow-x-auto;
   }
 
   .field-label {

@@ -30,7 +30,9 @@
     <a href="#main" class="skip-link">{% translate "Skip to content" %}</a>
     {% block chrome %}
       <header class="border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900">
-        <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+        {% comment %} `relative` so the narrow-screen navigation panel below can pin itself to
+           this row's two edges rather than to wherever the Menu button lands in it. {% endcomment %}
+        <div class="relative mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
           {% comment %}
             When the Dashboard link is hidden the wordmark takes the job over properly:
             the active style on the dashboard, and a name that says where it goes.
@@ -46,11 +48,31 @@
           </a>
 
           {% if user.is_authenticated %}
-            <nav class="flex items-center gap-1" aria-label="{% translate 'Main' %}">
-              {% for item in nav_items %}
-                <a href="{% url item.url_name %}" class="{% nav_active_names item.active_names %}"
-                   data-nav="{{ item.key }}">{{ item.label }}</a>
-              {% endfor %}
+            {% comment %} The navigation is a row of links at 768 pixels and up, and a
+               disclosure below that. Six links come to 635 pixels and a flex row does not
+               care about the viewport, so this one element made every page in Postulo
+               scroll sideways at 320 -- an AA failure under Reflow, on all of them, while
+               the accessibility suite passed because reflow is a question about a width
+               and axe is asked about a document (#113).
+
+               A <details>, like the account menu beside it: it opens and closes with no
+               script, and the script only adds "close when the pointer goes elsewhere".
+               Wrapping the row instead would have been one class, and would have put three
+               lines of navigation above every page on a phone. {% endcomment %}
+            <details class="md:hidden" data-menu>
+              {% comment %} No aria-label: the word beside the icon is the name, which is
+                 what a person saying "Menu" to a voice assistant expects to match. {% endcomment %}
+              <summary class="nav-link flex cursor-pointer list-none items-center gap-2">
+                {% icon "menu" class="size-4" %}{% translate "Menu" %}
+              </summary>
+              <nav class="absolute inset-x-4 top-full z-20 mt-2 rounded-xl border border-ink-200
+                          bg-white p-1 shadow-lg dark:border-ink-800 dark:bg-ink-900"
+                   aria-label="{% translate 'Main' %}">
+                {% include "partials/nav_links.html" with extra="block" %}
+              </nav>
+            </details>
+            <nav class="hidden items-center gap-1 md:flex" aria-label="{% translate 'Main' %}">
+              {% include "partials/nav_links.html" %}
             </nav>
 
             <div class="ml-auto flex items-center gap-1">
