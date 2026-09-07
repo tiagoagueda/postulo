@@ -172,3 +172,44 @@ def test_the_reset_command_is_the_way_back_without_the_phone(client, person, cap
     client.logout()
     response = sign_in(client)
     assert response.url == "/", "a password alone signs in again"
+
+
+# ----------------------------------------------- the QR code in the dark theme
+
+
+def test_the_authenticator_qr_is_marked_so_the_dark_theme_can_invert_it(client, person):
+    """`qrcode` draws the modules black and gives the image no background at all.
+
+    Not even a white quiet zone — the SVG is one path filled `#000000` on transparency. On
+    a light page that reads perfectly; on a dark one it is black on near-black, which is not
+    low contrast but invisible, and no camera will find it.
+    """
+    sign_in(client)
+
+    html = client.get(reverse("mfa_activate_totp")).content.decode()
+
+    assert "qr-code" in html, "the QR image carries no class for the theme to act on"
+    assert "data:image/svg+xml" in html, "the QR is still an inline data URI"
+
+
+def test_only_the_qr_is_marked_and_not_every_image(client, person):
+    """The class hangs off the element's own `qr` tag, so an avatar is untouched."""
+    sign_in(client)
+
+    assert "qr-code" not in client.get(reverse("accounts:profile")).content.decode()
+
+
+def test_the_stylesheet_inverts_the_qr_in_the_dark_theme_only():
+    """Compiled CSS, because that is the file an instance actually serves."""
+    from pathlib import Path
+
+    css = (
+        Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "css" / "app.css"
+    ).read_text(encoding="utf-8")
+
+    rules = [line for line in css.split("}") if ".qr-code" in line]
+    assert rules, "the compiled stylesheet has no rule for the QR"
+    assert all("invert" in rule for rule in rules), "the rule does not invert"
+    assert all("data-theme" in rule for rule in rules), (
+        "the QR must only be inverted in the dark theme; on a light page it is already right"
+    )

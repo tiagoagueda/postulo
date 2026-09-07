@@ -177,6 +177,23 @@
     @apply nav-link bg-ink-100 text-ink-900 dark:bg-ink-800 dark:text-ink-50;
   }
 
+  /*
+   * The QR code allauth renders for authenticator setup. `qrcode`'s SVG factory draws the
+   * modules as one path filled #000000 and gives it no background whatsoever -- not even a
+   * white quiet zone. On a light page that reads perfectly. On a dark one it is black on
+   * near-black: not merely low contrast, invisible, and no camera will find it.
+   *
+   * Inverting flips the modules to white and leaves the transparency alone, since a filter
+   * works on the colour channels and not on alpha. The quiet zone therefore stays the page's
+   * own dark, which is what a scanner needs -- an unbroken margin around the code, of a
+   * single colour that contrasts with the modules.
+   */
+  .qr-code {
+    @variant dark {
+      filter: invert(1);
+    }
+  }
+
   /* An entry in the account menu: link or button, same look. */
   .menu-item {
     @apply flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700
