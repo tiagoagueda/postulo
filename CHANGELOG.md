@@ -6,7 +6,20 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
-### Changed
+### 🔧 Changed
+
+- **The changelog says what kind of change each section holds, at a glance.** The entries
+  here are long on purpose — each says *why* rather than what, because the diff already
+  says what — and the cost of that is a file whose headings all looked alike. Every
+  section now carries a mark: ✨ Added, 🔧 Changed, 🐛 Fixed, 🔒 Security, ⚠️ Deprecated,
+  🗑️ Removed. **The word stays beside the mark**, because the word is what reads in a
+  terminal, to a screen reader, and in a font that has no glyph for it; the mark is only
+  what makes the kind findable while scanning. Applied to every section in the file rather
+  than the new ones, since a convention half-applied reads as a mistake. `CONTRIBUTING.md`
+  says which to use and `tests/test_changelog.py` refuses a heading that is not one of the
+  six or carries the wrong mark — the same way the project already refuses a template that
+  names a side of the page. The marks sit inside the sections the release tooling slices
+  out, so they travel into a release's notes, which is checked too. (#80)
 
 - **The one thing that pays for this is visible now.** Voluntary support was a sentence
   buried in the README and absent from the wiki entirely. It is the project's *only*
@@ -23,7 +36,7 @@ All notable changes to Postulo are recorded here. The format follows
   a bug report, a translation reviewed by somebody who actually speaks the language, or
   telling one person who needs this that it exists. (#79)
 
-### Fixed
+### 🐛 Fixed
 
 - **The roadmap contradicted the issue tracker, and the security policy asked for an email
   it never gave.** *Roadmap* said "nothing is planned before somebody has run this for a
@@ -90,7 +103,7 @@ All notable changes to Postulo are recorded here. The format follows
   `main` and the work had moved to per-release branches — so it now runs on those too.
   (#75)
 
-### Changed
+### 🔧 Changed
 
 - **The dashboard and Insights are one page, built from widgets you arrange.** They
   answered the same question — *how is this going?* — at two distances, and you had to
@@ -114,7 +127,7 @@ All notable changes to Postulo are recorded here. The format follows
   every widget at once, in both themes — markup that a walk of addresses can no longer
   reach. (#44)
 
-### Added
+### ✨ Added
 
 - **The Europass import reads the current JSON format as well as the legacy XML.** The XML
   is what the old CV editor produced and what an old file on a disk still is; the JSON is
@@ -278,7 +291,7 @@ All notable changes to Postulo are recorded here. The format follows
   `FROM` Dockerfile does the same for anyone who prefers it; both are on *Installing
   Postulo*. (#5)
 
-### Added
+### ✨ Added
 
 - **Prometheus metrics at `/metrics`, off unless you turn them on.** What exists, what is
   waiting, what has failed, and whether the database answers and the migrations are
@@ -401,7 +414,7 @@ All notable changes to Postulo are recorded here. The format follows
   now says which of the two is in force and what it trusts, and *Hardening* has the
   question to ask about your provider. (#62)
 
-### Fixed
+### 🐛 Fixed
 
 - **The error pages were the least accessible pages in Postulo.** The large faint numeral
   on 404, 403 and 500 sat at 1.5:1 against its background, which is unreadable for anybody
@@ -528,7 +541,7 @@ All notable changes to Postulo are recorded here. The format follows
   send a signed-in person elsewhere after a click. Every `next` now goes through one
   helper that refuses another host or a drop to plain http.
 
-### Changed
+### 🔧 Changed
 
 - **A company can be in several industries.** The one free-text *industry* field became a
   vocabulary of your own — tick what you already use, type new ones, a starter list is
@@ -564,7 +577,7 @@ All notable changes to Postulo are recorded here. The format follows
   switch. *Capture* and *Record* moved to the dashboard, which had relied on the header
   for both. (#10)
 
-### Added
+### ✨ Added
 
 - **Postulo speaks every official language of the European Union.** Twenty-three
   catalogues beside the British English source — Bulgarian, Croatian, Czech, Danish,
@@ -781,7 +794,7 @@ capture, insights and packaging. What it is not is battle-tested: it has been us
 record real applications, but by one person, for days rather than months. Treat it as a
 first release that works rather than as a mature one.
 
-### Added
+### ✨ Added
 
 - Project skeleton: Django 6.1 on Python 3.12–3.14, split settings, and a custom
   email-identified user model (M0).
@@ -852,7 +865,7 @@ first release that works rather than as a mature one.
   is no longer a manual job (M6). Built and run on a Raspberry Pi: it migrates, answers
   its health check, serves pages and renders a PDF with WeasyPrint on arm64.
 
-### Changed
+### 🔧 Changed
 
 - The default time zone is now `Europe/Paris` rather than UTC.
 - WeasyPrint is now the default PDF renderer and is installed with Postulo, rather than

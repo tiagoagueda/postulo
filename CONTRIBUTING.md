@@ -169,6 +169,26 @@ read the changelogs of anything that moved a major version, and commit the lock 
 its own. `docs/THREAT-MODEL.md` says who the attackers are and which rules follow; a pull
 request that touches a boundary answers to it.
 
+## Writing a changelog entry
+
+An entry says **why**, not what. The diff already says what. Each goes under *Unreleased*,
+in one of six sections, each marked so the file can be scanned rather than read:
+
+| | For |
+| --- | --- |
+| `### ✨ Added` | a capability that was not there |
+| `### 🔧 Changed` | behaviour that existed and is now different |
+| `### 🐛 Fixed` | a defect |
+| `### 🔒 Security` | anything with a security consequence |
+| `### ⚠️ Deprecated` | on its way out |
+| `### 🗑️ Removed` | gone |
+
+The word stays beside the mark: the word is what reads in a terminal, to a screen reader,
+and in a font that has no glyph for the mark. `tests/test_changelog.py` refuses a heading
+that is not one of these, or one carrying the wrong mark.
+
+End the entry with the issue it closes, in brackets: `(#42)`.
+
 ## Making a release
 
 1. Move the *Unreleased* entries in `CHANGELOG.md` under a new `## [X.Y.Z] — YYYY-MM-DD`

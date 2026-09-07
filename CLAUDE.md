@@ -44,7 +44,9 @@ uv run python scripts/messages.py extract --check && uv run python scripts/messa
 ```
 
 A feature ships with its tests, its wiki page (authored in `wiki/`) and a CHANGELOG
-entry under *Unreleased*. Commit messages explain why, not what. Never create a release
+entry under *Unreleased*, in one of six marked sections — `### ✨ Added`, `### 🔧 Changed`,
+`### 🐛 Fixed`, `### 🔒 Security`, `### ⚠️ Deprecated`, `### 🗑️ Removed` — ending with the
+issue it closes. An entry says why, not what. Commit messages explain why, not what. Never create a release
 tag; releases are a deliberate, separate act.
 
 ## Working with AI
