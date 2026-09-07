@@ -24,6 +24,33 @@ SECURE_HSTS_PRELOAD = env.bool("POSTULO_HSTS_PRELOAD", default=False)
 SILENCED_SYSTEM_CHECKS = [] if SECURE_HSTS_PRELOAD else ["security.W021"]
 SECURE_SSL_REDIRECT = env.bool("POSTULO_SSL_REDIRECT", default=True)
 
+# That redirect answers before any view does, which is right for a browser and wrong for
+# the endpoints a machine talks to over plain HTTP *inside* the deployment.
+#
+# The liveness probe is the case that mattered. `docker/Dockerfile` runs
+# `curl -fsS http://127.0.0.1:8000/healthz`, and 127.0.0.1 has no TLS to be redirected to.
+# Without this exemption that request was answered with a 301 -- and `curl -f` fails only
+# on 4xx and 5xx, so it exited 0 with an empty body and Docker marked the container
+# healthy. It would have done so with the database gone, the migrations unapplied and
+# every view raising: the 503 the `healthz` view returns was unreachable, and so was the
+# restart a failing check would have caused. A probe that always passes looks exactly like
+# a healthy service, which is why it survived a release (#82).
+#
+# `/metrics` is exempt for the same reason and one more: a scraper reaching the container
+# directly is on that same plain-HTTP hop, and what it collects is counts of records that
+# carry nothing about anybody. A scrape arriving through the proxy is already secure and
+# never reaches this test at all.
+#
+# `/logs` is deliberately **not** exempt. Its entries name connections, companies and
+# applications, and a scrape that visibly breaks is better than personal data crossing a
+# network in clear. An operator who wants it scrapes through the proxy over HTTPS, or
+# turns the redirect off as a decision.
+#
+# Anchored at both ends. `SecurityMiddleware` matches with `re.search` against the path
+# with its leading slash stripped, so an unanchored pattern would exempt every path that
+# merely contains the word -- which would be a worse bug than the one being fixed.
+SECURE_REDIRECT_EXEMPT = [r"^healthz$", r"^metrics$"]
+
 # Django's own documentation warns about this one, and rightly: it makes any request
 # carrying X-Forwarded-Proto: https count as secure, and that is an ordinary header
 # anybody can send. It is safe here only because TrustedProxyMiddleware has already

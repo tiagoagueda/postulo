@@ -187,7 +187,21 @@ DJANGO_SETTINGS_MODULE=postulo.config.settings.prod uv run manage.py check --dep
 
 ## Is it running?
 
-`/healthz` returns JSON and checks the database connection. Useful for uptime monitoring.
+`/healthz` returns JSON and checks the database connection. Useful for uptime monitoring,
+and it is what the container's own health check asks — so a container marked *unhealthy*
+means that endpoint answered 503 or did not answer at all.
+
+It is exempt from the HTTPS redirect, and has to be: the check is `curl` inside the
+container talking to `127.0.0.1`, where there is no TLS to be redirected to. Before v0.3.0
+it was not exempt, so the probe received a `301` — and `curl -f` treats a redirect as
+success. **Every container running 0.2.x reports healthy whatever is wrong with it**,
+including a database that has gone away. If you are on 0.2.x and want a working probe
+before upgrading, set `POSTULO_SSL_REDIRECT=false` and let your reverse proxy do the
+redirecting, which is what most of them do anyway.
+
+`/metrics` is exempt for the same reason. `/logs` is not: it carries entries naming
+connections, companies and applications, so a collector must reach it over HTTPS through
+the proxy rather than over plain HTTP inside the network.
 
 ## Something else
 

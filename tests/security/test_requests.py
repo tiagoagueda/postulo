@@ -156,6 +156,7 @@ print(json.dumps({
     "SESSION_COOKIE_SECURE": prod.SESSION_COOKIE_SECURE,
     "CSRF_COOKIE_SECURE": prod.CSRF_COOKIE_SECURE,
     "SECURE_SSL_REDIRECT": prod.SECURE_SSL_REDIRECT,
+    "SECURE_REDIRECT_EXEMPT": list(prod.SECURE_REDIRECT_EXEMPT),
     "SECURE_CSP": {k: [str(v) for v in vs] for k, vs in prod.SECURE_CSP.items()},
 }))
 """
@@ -190,6 +191,11 @@ def test_the_production_settings_are_what_the_policy_says():
     assert prod["SECURE_HSTS_SECONDS"] >= 31536000
     assert prod["SESSION_COOKIE_SECURE"] and prod["CSRF_COOKIE_SECURE"]
     assert prod["SECURE_SSL_REDIRECT"]
+    # Exactly two, both anchored. `SecurityMiddleware` matches with `re.search`, so an
+    # unanchored pattern would exempt every path containing the word -- a worse bug than
+    # the one this list exists to fix (#82). `logs` is not here on purpose: its entries
+    # name people's connections, companies and applications.
+    assert prod["SECURE_REDIRECT_EXEMPT"] == ["^healthz$", "^metrics$"]
     csp = prod["SECURE_CSP"]
     assert csp["default-src"] == ["'none'"] and csp["script-src"] == ["'self'"]
     assert csp["frame-ancestors"] == ["'none'"] and csp["form-action"] == ["'self'"]

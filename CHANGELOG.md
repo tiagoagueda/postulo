@@ -33,6 +33,23 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The container's health check could not fail.** With `POSTULO_SSL_REDIRECT` on — the
+  production default — `SecurityMiddleware` answered `/healthz` with a 301 to
+  `https://127.0.0.1:8000/healthz`, before any view ran and before anything touched the
+  database. The probe is `curl -fsS`, and `curl -f` fails only on 4xx and 5xx, so it took
+  that redirect as success and exited 0. **Every deployment of the shipped image had a
+  liveness probe that reported healthy whatever was wrong** — database gone, migrations
+  unapplied, every view raising. The 503 the health view returns was unreachable in
+  production, and so was the restart that a failing check plus `restart: unless-stopped`
+  would have produced. It survived a release for the obvious reason: a check that always
+  passes looks exactly like a healthy service. `/healthz` and `/metrics` are exempt from
+  the redirect now, both anchored at each end — `SecurityMiddleware` matches with
+  `re.search`, so a loose pattern would have exempted every path containing the word, which
+  is a worse bug than the one being fixed. **`/logs` is deliberately not exempt**: its
+  entries name connections, companies and applications, and a scrape that visibly breaks
+  beats personal data crossing a network in clear. Six tests come with it, and each of them
+  fails without the fix. (#82)
+
 - **Server settings → People scrolled sideways at every width, including on a desktop.**
   The table needed 967 pixels and the card it sits in gives about 730 whatever the window
   does, so a wider monitor never helped — measured at 1440, 1280, 1024 and 768, and it

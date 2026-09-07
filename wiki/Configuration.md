@@ -218,7 +218,7 @@ These apply only under the production settings.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `POSTULO_SSL_REDIRECT` | `true` | Redirects HTTP to HTTPS. |
+| `POSTULO_SSL_REDIRECT` | `true` | Redirects HTTP to HTTPS. `/healthz` and `/metrics` are exempt: those are reached over plain HTTP from inside the deployment, where there is no TLS to redirect to. `/logs` is not exempt, because its entries name people's connections and applications. |
 | `POSTULO_HSTS_SECONDS` | `31536000` | One year. |
 | `POSTULO_HSTS_INCLUDE_SUBDOMAINS` | `true` | |
 | `POSTULO_HSTS_PRELOAD` | `false` | Off deliberately: preloading is close to irreversible and commits every subdomain to HTTPS. Turn it on only if you understand that. |
