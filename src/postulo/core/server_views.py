@@ -68,13 +68,13 @@ def _newest_backup(root: Path):
     if not archives:
         return None
     newest = archives[0]
-    return {
-        "path": newest,
-        "age": timezone.now()
-        - timezone.datetime.fromtimestamp(
-            newest.stat().st_mtime, tz=timezone.get_current_timezone()
-        ),
-    }
+    # Both, because the page needs both and they are not interchangeable: `timesince`
+    # takes the moment and works out the words, while "older than a week" is a question
+    # about the span. Handing the span to `timesince` is what broke this page.
+    made_at = timezone.datetime.fromtimestamp(
+        newest.stat().st_mtime, tz=timezone.get_current_timezone()
+    )
+    return {"path": newest, "made_at": made_at, "age": timezone.now() - made_at}
 
 
 def _pdf_backend_name() -> str | None:

@@ -47,7 +47,7 @@
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Newest backup" %}</dt>
           <dd class="text-end" data-backup-age>
             {% if newest_backup %}
-              {% blocktranslate with when=newest_backup.age|timesince trimmed %}{{ when }} ago{% endblocktranslate %}
+              {% blocktranslate with when=newest_backup.made_at|timesince trimmed %}{{ when }} ago{% endblocktranslate %}
               {% if newest_backup.age.days >= 7 %}
                 <span class="block text-xs text-amber-700 dark:text-amber-400">{% translate "older than a week" %}</span>
               {% endif %}

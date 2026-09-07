@@ -6,6 +6,22 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🐛 Fixed
+
+- **Server settings → Overview returned 500 as soon as a backup existed.** The view worked
+  out the newest backup's age as a *span* and the template handed that span to `timesince`,
+  which wants a *moment* and reads `.year` off it straight away. The line below it asks
+  `age.days >= 7`, which is the right question about a span — both readings sat in the same
+  six lines of template and only one matched what the view returned. It returns `made_at`
+  and `age` now, and each is used for the thing it answers. **Nothing caught it because no
+  test had ever rendered that page with a backup on disk**: with an empty directory the
+  template takes the "none yet" branch and never touches the filter, so the unit tests, the
+  page-coverage check and the accessibility suite were all looking at the empty state. It
+  had been broken for as long as the feature existed, and reachable by anybody who had run
+  `manage.py backup` once. Three tests come with the fix — a backup present, one older than
+  a week, and an empty directory — so the branch that used to be the only one tested stays
+  tested. (#83)
+
 ## [0.2.0] — 2026-09-07
 
 ### 🔧 Changed
