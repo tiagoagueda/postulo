@@ -6,6 +6,24 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- **Continuous integration had never passed, and the dependency audit had never run.**
+  Every one of the thirty-eight runs since the project moved into its organisation was
+  red, for a reason that had nothing to do with the code: `uv sync` installs Postulo as an
+  editable package, `pip-audit --strict` fails on anything it cannot look up, and Postulo
+  is not on PyPI. **The audit stopped at the project and never reported on the
+  dependencies at all** — so the README's promise that a fresh disclosure is noticed
+  without anyone having to remember to look was not being kept, and a real one would have
+  arrived as one more red run among thirty-eight. The lock file is audited now instead of
+  the installed environment: `--no-emit-project` leaves Postulo out by construction, which
+  keeps `--strict` doing its job, and what is checked is exactly what will be installed
+  rather than an environment that also contains the project. Nothing was actually
+  vulnerable; both the Python and the Node dependencies were clean when this was found.
+  Separately, **nothing on a release branch was being checked at all** — the trigger named
+  `main` and the work had moved to per-release branches — so it now runs on those too.
+  (#75)
+
 ### Changed
 
 - **The dashboard and Insights are one page, built from widgets you arrange.** They

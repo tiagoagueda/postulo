@@ -13,7 +13,11 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # `main` and every release branch. Work moved onto per-release branches after 0.2.0
+    # closed, and for a while nothing pushed there was checked at all: the filter said
+    # `main` and the commits were going somewhere else. A branch whose name starts with a
+    # digit is a release branch here -- 0.3.0, 0.4.0, and whatever follows them.
+    branches: [main, "[0-9]*"]
   pull_request:
   schedule:
     # The dependency audit below also runs weekly, so a vulnerability disclosed in a
@@ -121,10 +125,18 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Audit the Python dependencies
-        # pip-audit reads the locked environment, so what is checked is exactly what runs.
+        # The lock file rather than the installed environment, and the difference is why
+        # this job failed on every run for a fortnight: `uv sync` installs Postulo itself
+        # as an editable package, `--strict` fails on anything it cannot look up, and
+        # Postulo is not on PyPI. The audit never reported on the dependencies at all --
+        # it stopped at the project. Exporting the lock without the project audits exactly
+        # what will be installed and keeps `--strict`, so a dependency that becomes
+        # unauditable still fails the build, which is the whole point of it.
         run: |
-          uv sync --locked --python 3.14 --all-groups
-          uv run --with pip-audit pip-audit --strict --progress-spinner off
+          uv export --no-emit-project --all-groups --format requirements-txt --no-hashes \
+            > /tmp/locked-requirements.txt
+          uv run --with pip-audit pip-audit --strict --progress-spinner off \
+            -r /tmp/locked-requirements.txt
 
       - name: Audit the asset build's Node dependencies
         run: |
