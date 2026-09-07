@@ -320,8 +320,10 @@ def test_a_test_message_proves_the_mail_settings(client, admin):
     assert "Sent to prove@example.org" in response.content.decode()
     assert len(mail.outbox) == 1 and mail.outbox[0].to == ["prove@example.org"]
 
+    # `test_form`, not `form`: the page carries two now -- the settings, and the address to
+    # send a proof to -- and a failure in one must not look like a failure in the other.
     response = client.post(reverse("server:email_test"), {"to": "not-an-address"})
-    assert response.status_code == 200 and "to" in response.context["form"].errors
+    assert response.status_code == 200 and "to" in response.context["test_form"].errors
 
 
 # -------------------------------------------------------------------- plugins

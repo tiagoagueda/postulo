@@ -75,6 +75,10 @@ EXCUSED: dict[str, str] = {
         "form that reaches it is on the plugins page, which the suite visits"
     ),
     "server:email_test": "a POST that sends one test message",
+    "server:email_connection_test": (
+        "a POST that opens an SMTP connection with whatever is on the Email page and "
+        "hangs up; the form that reaches it is on that page, which the suite visits"
+    ),
     "server:person_admin": "a POST that grants or removes administrator rights",
     "server:person_active": "a POST that suspends or restores an account",
     "connections:test": "a POST that tries a connection and reports back",

@@ -7,6 +7,7 @@ inherits an owner and a queryset that knows how to scope itself.
 """
 
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -136,6 +137,31 @@ class SiteSettings(models.Model):
     default_language = models.CharField(_("default language"), max_length=10, blank=True)
     default_time_zone = models.CharField(_("default time zone"), max_length=64, blank=True)
 
+    # --- how this instance sends mail --------------------------------------------------
+    #
+    # Infrastructure that used to be environment-only, and is here because an operator
+    # should not have to edit a file and restart a container to change an SMTP host. The
+    # environment still wins where it speaks; see `postulo.core.site`. Blank and NULL both
+    # mean "not set from the interface", so an instance that has never opened this page
+    # behaves exactly as it did.
+    email_host = models.CharField(_("SMTP server"), max_length=255, blank=True)
+    email_port = models.PositiveIntegerField(
+        _("port"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(65535)],
+    )
+    email_username = models.CharField(_("username"), max_length=255, blank=True)
+    #: Fernet, under the same key as a plugin connection's secrets. Never a plain column:
+    #: a readable password in the policy row would be a new kind of secret in a codebase
+    #: that has deliberately avoided having one. Read through `email_password`.
+    email_password_encrypted = models.TextField(_("password"), blank=True)
+    email_use_tls = models.BooleanField(_("STARTTLS"), null=True, blank=True)
+    email_timeout = models.PositiveIntegerField(
+        _("timeout in seconds"), null=True, blank=True, validators=[MaxValueValidator(300)]
+    )
+    email_from = models.EmailField(_("from address"), blank=True)
+
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -161,3 +187,22 @@ class SiteSettings(models.Model):
     def get(cls) -> "SiteSettings":
         row, _created = cls.objects.get_or_create(pk=1)
         return row
+
+    @property
+    def email_password(self) -> str:
+        """The stored SMTP password, or empty. Raises if the key has changed under it."""
+        from postulo.plugins import secrets
+
+        return secrets.decrypt(self.email_password_encrypted).get("password", "")
+
+    @email_password.setter
+    def email_password(self, raw: str) -> None:
+        from postulo.plugins import secrets
+
+        self.email_password_encrypted = secrets.encrypt({"password": raw} if raw else {})
+
+    @property
+    def has_email_password(self) -> bool:
+        """Whether one is stored. The page may say this much and nothing more: a masked
+        field of the right length gives away the length."""
+        return bool(self.email_password_encrypted)

@@ -23,13 +23,11 @@ class UserPreferencesMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        from . import site
-
         profile = self._profile(request)
 
         # The person's own zone, else the instance default an administrator may have set,
         # else what the environment says (which deactivate() falls back to).
-        tz_name = (getattr(profile, "time_zone", "") if profile else "") or site.default_time_zone()
+        tz_name = (getattr(profile, "time_zone", "") if profile else "") or self._instance_zone()
         try:
             timezone.activate(zoneinfo.ZoneInfo(tz_name))
         except (zoneinfo.ZoneInfoNotFoundError, ValueError):
@@ -43,6 +41,24 @@ class UserPreferencesMiddleware:
             request.LANGUAGE_CODE = translation.get_language()
 
         return self.get_response(request)
+
+    @staticmethod
+    def _instance_zone() -> str:
+        """The instance default, or the environment's if the database cannot be asked.
+
+        Reading it is a query, and this middleware runs in front of `/healthz` -- whose
+        answer only matters on the day the database is the thing that is broken. Letting the
+        query take the request down turns the 503 that probe exists to return into a 500,
+        which reports "the application is down" where it should report "the database is".
+        """
+        from django.conf import settings
+
+        from . import site
+
+        try:
+            return site.default_time_zone()
+        except Exception:
+            return settings.TIME_ZONE
 
     @staticmethod
     def _profile(request):

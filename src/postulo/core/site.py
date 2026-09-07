@@ -24,6 +24,26 @@ ENV_OVERRIDES = {
     "capture_ignore_robots": "POSTULO_CAPTURE_IGNORE_ROBOTS",
     "sso_is_second_factor": "POSTULO_OIDC_IS_SECOND_FACTOR",
     "default_time_zone": "POSTULO_TIME_ZONE",
+    "email_host": "POSTULO_EMAIL_HOST",
+    "email_port": "POSTULO_EMAIL_PORT",
+    "email_username": "POSTULO_EMAIL_HOST_USER",
+    "email_password": "POSTULO_EMAIL_HOST_PASSWORD",
+    "email_use_tls": "POSTULO_EMAIL_USE_TLS",
+    "email_timeout": "POSTULO_EMAIL_TIMEOUT",
+    "email_from": "POSTULO_DEFAULT_FROM_EMAIL",
+}
+
+#: Email field on the policy row → the key the SMTP backend wants. One mapping, so the
+#: form, the resolution and the shadowing check cannot drift apart, and in the order the
+#: page shows them.
+EMAIL_FIELDS = {
+    "email_host": "host",
+    "email_port": "port",
+    "email_username": "username",
+    "email_password": "password",
+    "email_use_tls": "use_tls",
+    "email_timeout": "timeout",
+    "email_from": "from_address",
 }
 
 
@@ -99,3 +119,71 @@ def signup_open_now() -> bool:
     Postulo is the only one who can reach it.
     """
     return registration_open() or is_empty()
+
+
+# ------------------------------------------------------------------------------- email
+
+
+def _stored_email(row: SiteSettings, field: str):
+    """What the policy row holds for one email field, or ``None`` for "nothing"."""
+    if field == "email_password":
+        return row.email_password or None
+    value = getattr(row, field)
+    return None if value in ("", None) else value
+
+
+def email_settings() -> dict:
+    """The SMTP settings actually in force, whatever they came from.
+
+    Read for every message rather than at import, because an administrator changing the
+    server on the Email page has to take effect without a restart. Falls back to the
+    environment if the row cannot be read at all: mail is the channel you need most when
+    something else has broken, and an error notification that fails because the database
+    is down is the one you most wanted.
+    """
+    fallback = {
+        "host": settings.POSTULO_EMAIL_HOST,
+        "port": settings.POSTULO_EMAIL_PORT,
+        "username": settings.POSTULO_EMAIL_HOST_USER,
+        "password": settings.POSTULO_EMAIL_HOST_PASSWORD,
+        "use_tls": settings.POSTULO_EMAIL_USE_TLS,
+        "timeout": settings.POSTULO_EMAIL_TIMEOUT,
+        "from_address": settings.DEFAULT_FROM_EMAIL,
+    }
+    try:
+        row = current()
+    except Exception:
+        return fallback
+
+    resolved = {}
+    for field, key in EMAIL_FIELDS.items():
+        stored = None if overridden_by(field) else _stored_email_quietly(row, field)
+        resolved[key] = fallback[key] if stored is None else stored
+    return resolved
+
+
+def email_shadowed() -> tuple[str, ...]:
+    """Email fields where a value is stored *and* the environment is pinning it.
+
+    Worth saying out loud on the page: remove the variable and the stored value takes over
+    silently, which means mail starts going somewhere else without anybody editing
+    anything.
+    """
+    row = current()
+    return tuple(
+        field
+        for field in EMAIL_FIELDS
+        if overridden_by(field) and _stored_email_quietly(row, field) is not None
+    )
+
+
+def _stored_email_quietly(row: SiteSettings, field: str):
+    """`_stored_email`, treating a password nobody can decrypt as one nobody stored.
+
+    That happens when ``SECRET_KEY`` was rotated without ``POSTULO_FIELD_KEY``. Falling
+    back to the environment beats refusing to send anything at all.
+    """
+    try:
+        return _stored_email(row, field)
+    except Exception:
+        return None

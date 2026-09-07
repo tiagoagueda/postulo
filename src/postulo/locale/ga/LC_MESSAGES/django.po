@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 20:33+0000\n"
+"POT-Creation-Date: 2026-09-07 21:07+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -191,12 +191,12 @@ msgstr "%(kind)s: %(title)s ag %(company)s"
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s go %(high)s"
 
-#: src/postulo/core/server_views.py:938
+#: src/postulo/core/server_views.py:1015
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "Tá %(name)s %(version)s suiteáilte ón gcatalóg."
 
-#: src/postulo/core/server_views.py:888
+#: src/postulo/core/server_views.py:965
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -266,19 +266,19 @@ msgstr "Is @%(username)s é/í %(name)s anois."
 msgid "%(name)s is now an administrator."
 msgstr "Is riarthóir é/í %(name)s anois."
 
-#: src/postulo/core/server_views.py:980
+#: src/postulo/core/server_views.py:1057
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "Tá %(name)s bainte. Atosaigh Postulo le bheith cinnte nach bhfuil aon chuid de fágtha luchtaithe."
 
-#: src/postulo/core/server_views.py:964
+#: src/postulo/core/server_views.py:1041
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "Tá %(name)s múchta; tá a chomhaid fós anseo."
 
-#: src/postulo/core/server_views.py:966
+#: src/postulo/core/server_views.py:1043
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "Tá %(name)s lasta arís."
@@ -512,12 +512,12 @@ msgstr "Cuideachta, ról, frása as litir, ainm…"
 msgid "A CSV file"
 msgstr "Comhad CSV"
 
-#: src/postulo/core/models.py:74
+#: src/postulo/core/models.py:75
 #, draft
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Leid don chomhéadan, mar “amber” nó “sky”."
 
-#: src/postulo/core/models.py:114
+#: src/postulo/core/models.py:115
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Líne faoin ainm ar an leathanach sínithe isteach. Roghnach."
@@ -541,6 +541,11 @@ msgid ""
 "A passkey is tied to the address you made it at, which here is %(host)s. Reaching this instance by another name, or moving it, will not carry your passkeys over."
 msgstr ""
 "Tá eochair rochtana ceangailte leis an seoladh ar ar chruthaigh tú í, anseo %(host)s. Ní thabharfaidh teacht ar an ásc seo faoi ainm eile, ná é a bhogadh, do chuid eochracha rochtana leo."
+
+#: src/postulo/templates/server/email.html:83
+#, draft
+msgid "A password is stored. It is never shown, not even its length."
+msgstr "Tá pasfhocal stóráilte. Ní thaispeántar riamh é, ná fiú a fhad."
 
 #: src/postulo/templates/widgets/suggestions.html:6
 #, python-format, draft
@@ -655,7 +660,7 @@ msgid ""
 msgstr ""
 "Teimpléad le colúin Postulo féin agus ró samplach amháin. Líon isteach é agus uaslódáil thuas é."
 
-#: src/postulo/core/server_views.py:461
+#: src/postulo/core/server_views.py:538
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Teachtaireacht tástála ó %(name)s"
@@ -1322,7 +1327,7 @@ msgid ""
 msgstr ""
 "Déan cúltaca le <code>manage.py backup</code>; féach leathanach na vicí ar chúltacaí le haghaidh sceidil agus athchóirithe."
 
-#: src/postulo/templates/server/email.html:12
+#: src/postulo/templates/server/email.html:17
 #, draft
 msgid "Backend"
 msgstr "Cúlchríoch"
@@ -1642,7 +1647,7 @@ msgstr "Suim sheiceála"
 msgid "Choose a Europass file first."
 msgstr "Roghnaigh comhad Europass ar dtús."
 
-#: src/postulo/core/server_views.py:819
+#: src/postulo/core/server_views.py:896
 #, draft
 msgid "Choose a package first."
 msgstr "Roghnaigh pacáiste ar dtús."
@@ -1739,7 +1744,7 @@ msgstr "Cód (GitHub, GitLab…)"
 msgid "code repository"
 msgstr "stór cóid"
 
-#: src/postulo/core/models.py:71
+#: src/postulo/core/models.py:72
 #, draft
 msgid "colour"
 msgstr "dath"
@@ -1870,6 +1875,17 @@ msgstr "Nasc"
 #, python-format, draft
 msgid "Connect %(plugin)s"
 msgstr "Nasc %(plugin)s"
+
+#: src/postulo/core/mail.py:116
+#, python-format, draft
+msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
+msgstr "Ceangailte le %(host)s:%(port)s agus sínithe isteach mar %(user)s."
+
+#: src/postulo/core/mail.py:121
+#, python-format, draft
+msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
+msgstr ""
+"Ceangailte le %(host)s:%(port)s. Gan ainm úsáideora, mar sin níor síníodh aon rud isteach."
 
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
@@ -2026,7 +2042,7 @@ msgid "created"
 msgstr "cruthaithe"
 
 #: src/postulo/accounts/models.py:302 src/postulo/accounts/models.py:369
-#: src/postulo/core/models.py:18
+#: src/postulo/core/models.py:19
 #, draft
 msgid "created at"
 msgstr "cruthaithe ar"
@@ -2290,12 +2306,12 @@ msgstr "Diúltaithe"
 msgid "Declined. It will not be suggested again."
 msgstr "Diúltaithe. Ní mholfar arís é."
 
-#: src/postulo/core/models.py:136
+#: src/postulo/core/models.py:137
 #, draft
 msgid "default language"
 msgstr "teanga réamhshocraithe"
 
-#: src/postulo/core/models.py:137
+#: src/postulo/core/models.py:138
 #, draft
 msgid "default time zone"
 msgstr "crios ama réamhshocraithe"
@@ -2591,7 +2607,7 @@ msgstr ""
 "Ceachtar den dá fhormáid Europass: an JSON a easpórtálann europass.europa.eu inniu, nó an XML a rinne an sean-eagarthóir CV agus atá fós in easpórtáil níos sine ar do dhiosca. Oibríonn Postulo amach cé acu é, taispeánann sé duit a bhfuil ann, agus ní scríobhann sé aon rud go dtí go n-abraíonn tú é."
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:438
+#: src/postulo/core/server_views.py:447
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
 #: src/postulo/templates/server/people.html:46
@@ -3065,6 +3081,11 @@ msgid ""
 msgstr ""
 "Ní chuireann iachall air rith é: teastaíonn dintiúir ó fhógróir, ó stór nó ó shioncronú nach féidir ach leis an duine seo a thabhairt. Ciallaíonn sé gur féidir leo é a úsáid agus nach féidir leo é a mhúchadh."
 
+#: src/postulo/core/server_forms.py:142
+#, draft
+msgid "Forget the stored password"
+msgstr "Déan dearmad ar an bpasfhocal stóráilte"
+
 #: src/postulo/jobs/views.py:219
 #, python-format, draft
 msgid "Found a logo at %(url)s."
@@ -3108,7 +3129,7 @@ msgstr "Reoigh agus ceangail"
 msgid "from"
 msgstr "ó"
 
-#: src/postulo/templates/server/email.html:18
+#: src/postulo/templates/server/email.html:27
 #: src/postulo/templates/server/logs.html:51
 #: src/postulo/templates/server/logs.html:89
 #, draft
@@ -3124,6 +3145,11 @@ msgstr "ó %(low)s"
 #, python-format, draft
 msgid "From %(name)s."
 msgstr "Ó %(name)s."
+
+#: src/postulo/core/models.py:163
+#, draft
+msgid "from address"
+msgstr "seoladh an tseoltóra"
 
 #: src/postulo/jobs/models.py:97
 #, draft
@@ -3386,9 +3412,9 @@ msgstr "Conas a fhaigheann an t-ásc seo fógra a ghreamaigh duine éigin."
 #: src/postulo/templates/server/email.html:7
 #, draft
 msgid ""
-"How this instance sends mail: verification links, password resets. Configured in the environment; proven here."
+"How this instance sends mail: verification links, password resets, reminders. Set it here, or in the environment, and prove it either way."
 msgstr ""
-"Conas a sheolann an t-ásc seo ríomhphost: naisc fhíoraithe, athshocruithe pasfhocail. Cumraithe sa timpeallacht; cruthaithe anseo."
+"Conas a sheolann an t-ásc seo post: naisc fhíoraithe, athshocruithe pasfhocail, meabhrúcháin. Socraigh anseo é, nó sa timpeallacht, agus cruthaigh é ar aon nós."
 
 #: src/postulo/templates/jobs/capture_form.html:44
 #, draft
@@ -3454,7 +3480,7 @@ msgstr "Aitheantóirí"
 msgid "Identifies itself as"
 msgstr "Aithníonn é féin mar"
 
-#: src/postulo/core/server_views.py:463
+#: src/postulo/core/server_views.py:540
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3468,12 +3494,12 @@ msgid ""
 msgstr ""
 "Má chuir tú isteach ar phost in institiúid de chuid an AE nó trí sheirbhís fostaíochta náisiúnta, tá an comhad seo agat cheana. In ionad an t-iomlán a chlóscríobh arís, tabhair dúinn é."
 
-#: src/postulo/core/models.py:123
+#: src/postulo/core/models.py:124
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "déan neamhaird de robots.txt agus tú ag gabháil"
 
-#: src/postulo/core/server_forms.py:66
+#: src/postulo/core/server_forms.py:67
 #, draft
 msgid "Ignore robots.txt when capturing"
 msgstr "Déan neamhaird de robots.txt agus tú ag gabháil"
@@ -3541,6 +3567,11 @@ msgstr "I gceann bliana"
 #, draft
 msgid "In conversation"
 msgstr "I gcomhrá"
+
+#: src/postulo/templates/server/email.html:15
+#, draft
+msgid "In force now"
+msgstr "I bhfeidhm anois"
 
 #: src/postulo/templates/server/defaults.html:32
 #, python-format, draft
@@ -3650,7 +3681,7 @@ msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr ""
 "Nuair a shuiteálann tú breiseán, ritheann cód duine eile taobh istigh de Postulo."
 
-#: src/postulo/core/models.py:105
+#: src/postulo/core/models.py:106
 #, draft
 msgid "instance name"
 msgstr "ainm an áisc"
@@ -3665,7 +3696,7 @@ msgstr "institiúid"
 msgid "Insurance"
 msgstr "Árachas"
 
-#: src/postulo/core/server_views.py:543
+#: src/postulo/core/server_views.py:620
 #, draft
 msgid "Internal"
 msgstr "Inmheánach"
@@ -3914,7 +3945,7 @@ msgstr "teanga"
 msgid "Language and time"
 msgstr "Teanga agus am"
 
-#: src/postulo/core/server_forms.py:88
+#: src/postulo/core/server_forms.py:89
 #, draft
 msgid "Language for new accounts"
 msgstr "Teanga do chuntais nua"
@@ -4020,6 +4051,11 @@ msgstr "oibrithe go deireanach"
 #, draft
 msgid "Later"
 msgstr "Níos déanaí"
+
+#: src/postulo/core/server_forms.py:139
+#, draft
+msgid "Leave blank to keep the one already stored."
+msgstr "Fág folamh chun an ceann atá stóráilte cheana a choinneáil."
 
 #: src/postulo/resume/models.py:58
 #, draft
@@ -4437,7 +4473,7 @@ msgid "Move up"
 msgstr "Bog suas"
 
 #: src/postulo/accounts/models.py:171 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:68 src/postulo/documents/models.py:59
+#: src/postulo/core/models.py:69 src/postulo/documents/models.py:59
 #: src/postulo/documents/models.py:228 src/postulo/jobs/models.py:39
 #: src/postulo/jobs/models.py:115 src/postulo/jobs/models.py:201
 #: src/postulo/jobs/models.py:261 src/postulo/plugins/models.py:48
@@ -4565,7 +4601,7 @@ msgstr "An chéad agallamh eile"
 msgid "Next reminder"
 msgstr "An chéad mheabhrúchán eile"
 
-#: src/postulo/core/server_forms.py:14
+#: src/postulo/core/server_forms.py:15
 #, draft
 msgid "No"
 msgstr "Níl"
@@ -4614,6 +4650,11 @@ msgstr ""
 #, draft
 msgid "no company"
 msgstr "gan chuideachta"
+
+#: src/postulo/core/server_views.py:518
+#, python-format, draft
+msgid "No connection: %(why)s"
+msgstr "Gan ceangal: %(why)s"
 
 #: src/postulo/templates/connections/list.html:79
 #, draft
@@ -4704,6 +4745,11 @@ msgstr "Níl aon fhógraí taifeadta don chuideachta seo."
 #, draft
 msgid "no role"
 msgstr "gan ról"
+
+#: src/postulo/core/mail.py:93
+#, draft
+msgid "No server to connect to."
+msgstr "Gan freastalaí le ceangal leis."
 
 #: src/postulo/templates/resume/overview.html:80
 #, draft
@@ -4828,7 +4874,12 @@ msgstr "Níor taifeadadh"
 msgid "Not sent yet"
 msgstr "Níor seoladh fós"
 
-#: src/postulo/core/server_forms.py:12
+#: src/postulo/templates/server/email.html:24
+#, draft
+msgid "not set"
+msgstr "gan socrú"
+
+#: src/postulo/core/server_forms.py:13
 #, draft
 msgid "Not set here — the environment or the default applies"
 msgstr "Níor socraíodh anseo — baineann an timpeallacht nó an réamhshocrú"
@@ -4960,6 +5011,12 @@ msgstr "Níl aon rud suiteáilte ar féidir le duine tuairim a bheith aige faoi.
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Ní shábháiltear aon rud go dtí go mbeidh sé athbhreithnithe agat."
 
+#: src/postulo/core/server_forms.py:144
+#, draft
+msgid "Nothing is sent to the server as a password until a new one is entered."
+msgstr ""
+"Ní sheoltar aon phasfhocal chuig an bhfreastalaí go dtí go gcuirtear ceann nua isteach."
+
 #: src/postulo/templates/applications/application_list.html:36
 #: src/postulo/templates/jobs/company_list.html:36
 #, draft
@@ -5075,12 +5132,12 @@ msgid "Nothing was added."
 msgstr "Níor cuireadh aon rud leis."
 
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:661 src/postulo/core/server_views.py:695
+#: src/postulo/core/server_views.py:738 src/postulo/core/server_views.py:772
 #, draft
 msgid "Nothing was different."
 msgstr "Ní raibh aon rud difriúil."
 
-#: src/postulo/core/server_views.py:857
+#: src/postulo/core/server_views.py:934
 #, draft
 msgid "Nothing was installed."
 msgstr "Níor suiteáladh aon rud."
@@ -5263,6 +5320,23 @@ msgstr[3] ""
 msgstr[4] ""
 "%(total)s eochair rochtana ar an gcuntas seo. Síníonn siad isteach thú le méarlorg, le d’aghaidh nó le UAP, agus níl aon fhocal faire ann a d’fhéadfadh sceitheadh."
 
+#: src/postulo/templates/server/email.html:44
+#, python-format, draft
+msgid ""
+"One setting below is stored here and overridden by the environment. Remove that variable and the stored value takes over, without anybody editing anything."
+msgid_plural ""
+"%(counter)s of the settings below are stored here and overridden by the environment. Remove those variables and the stored values take over, without anybody editing anything."
+msgstr[0] ""
+"Tá ceann de na socruithe thíos stóráilte anseo agus sáraíonn an timpeallacht é. Bain an athróg sin agus glacann an luach stóráilte an ceann is fearr, gan aon duine ag cur aon rud in eagar."
+msgstr[1] ""
+"Tá %(counter)s de na socruithe thíos stóráilte anseo agus sáraíonn an timpeallacht iad. Bain na hathróga sin agus glacann na luachanna stóráilte an ceann is fearr, gan aon duine ag cur aon rud in eagar."
+msgstr[2] ""
+"Tá %(counter)s de na socruithe thíos stóráilte anseo agus sáraíonn an timpeallacht iad. Bain na hathróga sin agus glacann na luachanna stóráilte an ceann is fearr, gan aon duine ag cur aon rud in eagar."
+msgstr[3] ""
+"Tá %(counter)s de na socruithe thíos stóráilte anseo agus sáraíonn an timpeallacht iad. Bain na hathróga sin agus glacann na luachanna stóráilte an ceann is fearr, gan aon duine ag cur aon rud in eagar."
+msgstr[4] ""
+"Tá %(counter)s de na socruithe thíos stóráilte anseo agus sáraíonn an timpeallacht iad. Bain na hathróga sin agus glacann na luachanna stóráilte an ceann is fearr, gan aon duine ag cur aon rud in eagar."
+
 #: src/postulo/templates/applications/interview_form.html:18
 #, draft
 msgid ""
@@ -5401,7 +5475,7 @@ msgstr "Gan íoc amháin"
 msgid "Overview"
 msgstr "Forbhreathnú"
 
-#: src/postulo/core/models.py:51
+#: src/postulo/core/models.py:52
 #, draft
 msgid "owner"
 msgstr "úinéir"
@@ -5455,6 +5529,13 @@ msgstr "Aistrithe go páirteach"
 msgid "Passkeys"
 msgstr "Eochracha rochtana"
 
+#: src/postulo/core/models.py:158
+#, draft
+msgid "password"
+msgstr "pasfhocal"
+
+#: src/postulo/core/server_forms.py:136
+#: src/postulo/templates/server/email.html:24
 #: src/postulo/templates/settings/account.html:50
 #, draft
 msgid "Password"
@@ -5623,7 +5704,7 @@ msgid "plugin repository"
 msgstr "stór breiseán"
 
 #: src/postulo/accounts/settings_views.py:119
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:497
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:574
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -5631,7 +5712,7 @@ msgstr "stór breiseán"
 msgid "Plugins"
 msgstr "Breiseáin"
 
-#: src/postulo/core/server_views.py:690
+#: src/postulo/core/server_views.py:767
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -5667,6 +5748,11 @@ msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
 msgstr ""
 "PNG, JPEG, WebP nó GIF suas le 5 MB. Gearrtar go cearnóg é agus baintear de aon rud a bhí ar eolas ag an gcomhad faoin áit ar tógadh é."
+
+#: src/postulo/core/models.py:149
+#, draft
+msgid "port"
+msgstr "port"
 
 #: src/postulo/documents/models.py:278 src/postulo/resume/models.py:201
 #, draft
@@ -5742,7 +5828,7 @@ msgid ""
 msgstr ""
 "Faigheann Postulo uair amháin é agus coinníonn sé cóip; ní thaispeántar an seoladh do bhrabhsálaí riamh. PNG, JPEG, GIF nó WebP."
 
-#: src/postulo/core/server_forms.py:67
+#: src/postulo/core/server_forms.py:68
 #, draft
 msgid ""
 "Postulo fetches one page a person asked for, and honours a site's robots.txt by default. Say yes only if you have decided that courtesy does not apply here."
@@ -6184,12 +6270,12 @@ msgid ""
 msgstr ""
 "Tá clárú oscailte: is féidir le haon duine a aimsíonn an seoladh cuntas a chruthú."
 
-#: src/postulo/core/models.py:117
+#: src/postulo/core/models.py:118
 #, draft
 msgid "registration open"
 msgstr "clárú oscailte"
 
-#: src/postulo/core/server_forms.py:40
+#: src/postulo/core/server_forms.py:41
 #, draft
 msgid "Registration open"
 msgstr "Clárú oscailte"
@@ -6489,6 +6575,7 @@ msgstr "tuarastal go"
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
+#: src/postulo/templates/server/email.html:89
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:75
@@ -6522,8 +6609,8 @@ msgstr "Sábháilte i do chuid fógraí. Déan cinneadh faoi nuair a bheidh tú 
 
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:661
-#: src/postulo/core/server_views.py:695 src/postulo/core/server_views.py:791
+#: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:738
+#: src/postulo/core/server_views.py:772 src/postulo/core/server_views.py:868
 #: src/postulo/resume/views.py:119
 #, draft
 msgid "Saved."
@@ -6596,13 +6683,6 @@ msgstr "Cuardaigh gach rud"
 msgid "secrets"
 msgstr "rúin"
 
-#: src/postulo/templates/server/email.html:21
-#, draft
-msgid ""
-"See Configuration in the wiki for the variables. The password is never shown."
-msgstr ""
-"Féach Cumraíocht sa vicí le haghaidh na n-athróg. Ní thaispeántar an pasfhocal riamh."
-
 #: src/postulo/templates/core/import_csv_done.html:33
 #, draft
 msgid "See the applications"
@@ -6623,12 +6703,17 @@ msgstr "Féach ar an bpainéal"
 msgid "See the listings"
 msgstr "Féach na fógraí"
 
-#: src/postulo/templates/server/email.html:30
+#: src/postulo/templates/server/email.html:103
+#, draft
+msgid "Send a real message"
+msgstr "Seol fíortheachtaireacht"
+
+#: src/postulo/templates/server/email.html:109
 #, draft
 msgid "Send a test message"
 msgstr "Seol teachtaireacht tástála"
 
-#: src/postulo/core/server_forms.py:101
+#: src/postulo/core/server_forms.py:102
 #, draft
 msgid "Send a test message to"
 msgstr "Seol teachtaireacht tástála chuig"
@@ -6654,7 +6739,7 @@ msgstr "Seol chuig"
 msgid "Send to stores now"
 msgstr "Seol chuig na stórtha anois"
 
-#: src/postulo/core/server_views.py:473
+#: src/postulo/core/server_views.py:550
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Theip ar an seoladh: %(error)s"
@@ -6688,7 +6773,7 @@ msgstr "Doiciméid seolta"
 msgid "sent on"
 msgstr "seolta ar"
 
-#: src/postulo/core/server_views.py:476 src/postulo/notifications/email.py:80
+#: src/postulo/core/server_views.py:553 src/postulo/notifications/email.py:80
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Seolta chuig %(to)s."
@@ -6703,7 +6788,7 @@ msgstr "Seolta le"
 msgid "Separate several with commas. Anything new joins your list."
 msgstr "Scar roinnt le camóga. Téann aon rud nua isteach i do liosta."
 
-#: src/postulo/templates/server/email.html:14
+#: src/postulo/templates/server/email.html:19
 #: src/postulo/templates/server/signin.html:25
 #, draft
 msgid "Server"
@@ -6717,6 +6802,11 @@ msgstr "Freastalaí"
 msgid "Server settings"
 msgstr "Socruithe freastalaí"
 
+#: src/postulo/templates/server/email.html:24
+#, draft
+msgid "set"
+msgstr "socraithe"
+
 #: src/postulo/templates/server/plugins.html:356
 #, draft
 msgid ""
@@ -6729,6 +6819,12 @@ msgstr ""
 msgid "Set automatically the first time the status becomes “Applied”."
 msgstr ""
 "Socraítear go huathoibríoch é an chéad uair a éiríonn an stádas “Curtha isteach”."
+
+#: src/postulo/templates/partials/field_pinned.html:12
+#, python-format, draft
+msgid "Set by <code>%(variable)s</code> in the environment; change it there."
+msgstr ""
+"Socraithe ag <code>%(variable)s</code> sa timpeallacht; athraigh ansin é."
 
 #: src/postulo/templates/server/capture.html:33
 #: src/postulo/templates/server/signin.html:74
@@ -6756,6 +6852,7 @@ msgstr "Socraigh nuair nach bhfuil an folúntas ar fáil a thuilleadh."
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:108 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:21
+#: src/postulo/templates/server/email.html:59
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
 #, draft
@@ -6819,7 +6916,7 @@ msgstr "Taispeáin sa nascleanúint"
 msgid "Show past too"
 msgstr "Taispeáin cinn caite freisin"
 
-#: src/postulo/core/models.py:108
+#: src/postulo/core/models.py:109
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Taispeántar sa cheanntásc agus ar an leathanach sínithe isteach."
@@ -6862,12 +6959,12 @@ msgstr "Sínigh isteach i gcuntas atá ann trí ríomhphost"
 msgid "Single sign-on"
 msgstr "Síniú isteach aonair"
 
-#: src/postulo/core/models.py:128
+#: src/postulo/core/models.py:129
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "áirítear síniú isteach aonair mar an dara fachtóir"
 
-#: src/postulo/core/server_forms.py:49
+#: src/postulo/core/server_forms.py:50
 #, draft
 msgid "Single sign-on counts as the second factor"
 msgstr "Áirítear síniú isteach aonair mar an dara fachtóir"
@@ -6877,7 +6974,7 @@ msgstr "Áirítear síniú isteach aonair mar an dara fachtóir"
 msgid "Site search"
 msgstr "Cuardach suímh"
 
-#: src/postulo/core/models.py:150 src/postulo/core/models.py:151
+#: src/postulo/core/models.py:176 src/postulo/core/models.py:177
 #, draft
 msgid "site settings"
 msgstr "socruithe suímh"
@@ -6935,10 +7032,15 @@ msgstr "scipeáilte"
 msgid "Slowest"
 msgstr "Is moille"
 
-#: src/postulo/core/models.py:69 src/postulo/jobs/models.py:40
+#: src/postulo/core/models.py:70 src/postulo/jobs/models.py:40
 #, draft
 msgid "slug"
 msgstr "slug"
+
+#: src/postulo/core/models.py:147
+#, draft
+msgid "SMTP server"
+msgstr "Freastalaí SMTP"
 
 #: src/postulo/templates/widgets/gone_quiet.html:47
 #, draft
@@ -7027,6 +7129,11 @@ msgstr "Ag tosú glan ina ionad?"
 #, draft
 msgid "starts"
 msgstr "tosaíonn"
+
+#: src/postulo/core/models.py:159 src/postulo/core/server_forms.py:129
+#, draft
+msgid "STARTTLS"
+msgstr "STARTTLS"
 
 #: src/postulo/jobs/models.py:436 src/postulo/plugins/models.py:123
 #, draft
@@ -7226,7 +7333,7 @@ msgstr "Tábla"
 msgid "table settings"
 msgstr "socruithe tábla"
 
-#: src/postulo/core/models.py:78
+#: src/postulo/core/models.py:79
 #, draft
 msgid "tag"
 msgstr "clib"
@@ -7238,7 +7345,7 @@ msgstr "clib"
 msgid "Tag"
 msgstr "Clib"
 
-#: src/postulo/core/models.py:111
+#: src/postulo/core/models.py:112
 #, draft
 msgid "tagline"
 msgstr "mana"
@@ -7251,7 +7358,7 @@ msgstr "mana"
 msgid "Tags"
 msgstr "Clibeanna"
 
-#: src/postulo/applications/models.py:220 src/postulo/core/models.py:79
+#: src/postulo/applications/models.py:220 src/postulo/core/models.py:80
 #, draft
 msgid "tags"
 msgstr "clibeanna"
@@ -7306,6 +7413,11 @@ msgstr "Tástáil"
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Theip ar an tástáil: %(message)s"
+
+#: src/postulo/templates/server/email.html:95
+#, draft
+msgid "Test the connection"
+msgstr "Tástáil an ceangal"
 
 #: src/postulo/documents/models.py:370
 #, draft
@@ -7481,7 +7593,7 @@ msgstr "Ní toradh é sin a aithníonn Postulo."
 msgid "That is not something Postulo can do about it."
 msgstr "Ní rud é sin is féidir le Postulo a dhéanamh faoi."
 
-#: src/postulo/core/server_views.py:767 src/postulo/core/server_views.py:808
+#: src/postulo/core/server_views.py:844 src/postulo/core/server_views.py:885
 #, draft
 msgid "That is not something this page does."
 msgstr "Ní dhéanann an leathanach seo é sin."
@@ -7509,7 +7621,7 @@ msgid ""
 msgstr ""
 "Ní réitíonn digit dheireanach an ORCID seo leis an gcuid eile, mar sin is botún clóscríofa ceann acu."
 
-#: src/postulo/core/server_views.py:866 src/postulo/core/server_views.py:871
+#: src/postulo/core/server_views.py:943 src/postulo/core/server_views.py:948
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Níl an pacáiste sin ag fanacht a thuilleadh; uaslódáil arís é."
@@ -7589,7 +7701,7 @@ msgstr "Ní ionann síniú na catalóige agus a bhfuil inti; níor úsáideadh �
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Níl síniú ná eochair na catalóige inléite: %(error)s"
 
-#: src/postulo/core/server_views.py:923
+#: src/postulo/core/server_views.py:1000
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "D'fhreagair na catalóga, agus níl aon rud liostaithe acu fós."
@@ -7641,7 +7753,7 @@ msgid "The earlier version this supersedes. The old file is kept."
 msgstr ""
 "An leagan roimhe seo a dtagann sé seo ina ionad. Coinnítear an seanchomhad."
 
-#: src/postulo/core/server_views.py:726 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:803 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Socraíonn an timpeallacht “%(name)s”, mar sin ní féidir é a athrú anseo."
@@ -7700,7 +7812,7 @@ msgstr "Dhiúltaigh an suiteálaí dó: %(error)s"
 msgid "The job title"
 msgstr "Teideal an phoist"
 
-#: src/postulo/core/server_views.py:783
+#: src/postulo/core/server_views.py:860
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -7739,7 +7851,7 @@ msgstr "Tá an lógó imithe."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Níor athraíodh an lógó: %(problem)s"
 
-#: src/postulo/core/server_views.py:478 src/postulo/notifications/email.py:79
+#: src/postulo/core/server_views.py:555 src/postulo/notifications/email.py:79
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Níor ghlac cúlchríoch an ríomhphoist le haon rud."
@@ -7757,7 +7869,7 @@ msgid ""
 msgstr ""
 "Na chéad agallaimh eile sa dialann, agus na cinn a chuaigh thart gan toradh."
 
-#: src/postulo/core/server_views.py:756
+#: src/postulo/core/server_views.py:833
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Folmhaítear an stór oifigiúil; ní bhaintear é."
@@ -7767,12 +7879,19 @@ msgstr "Folmhaítear an stór oifigiúil; ní bhaintear é."
 msgid "The opening paragraph, if you use one."
 msgstr "An t-alt tosaigh, má úsáideann tú ceann."
 
+#: src/postulo/templates/server/email.html:76
+#, python-format, draft
+msgid ""
+"The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
+msgstr ""
+"Socraítear an pasfhocal le <code>%(variable)s</code> sa timpeallacht; athraigh ansin é. Ní thaispeántar riamh anseo é."
+
 #: src/postulo/jobs/models.py:314
 #, draft
 msgid "The pay"
 msgstr "An pá"
 
-#: src/postulo/core/server_views.py:544
+#: src/postulo/core/server_views.py:621
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Na breiseáin a thagann taobh istigh de Postulo. Ní thógtar aon rud."
@@ -7814,6 +7933,17 @@ msgstr ""
 #, draft
 msgid "The search in four numbers"
 msgstr "An cuardach i gceithre fhigiúr"
+
+#: src/postulo/core/mail.py:66
+#, draft
+msgid ""
+"The server does not offer STARTTLS. Turn it off, or use a port that does."
+msgstr "Ní thairgeann an freastalaí STARTTLS. Múch é, nó úsáid port a dhéanann."
+
+#: src/postulo/core/mail.py:109
+#, python-format, draft
+msgid "The server refused those credentials: %(detail)s"
+msgstr "Dhiúltaigh an freastalaí do na dintiúir sin: %(detail)s"
 
 #: src/postulo/plugins/fetching.py:89
 #, draft
@@ -7909,7 +8039,7 @@ msgstr "Níl aon seoladh ann le é a fháil arís."
 msgid "There is no file to send."
 msgstr "Níl aon chomhad le seoladh."
 
-#: src/postulo/core/server_views.py:721
+#: src/postulo/core/server_views.py:798
 #, draft
 msgid "There is no repository by that name."
 msgstr "Níl aon stór den ainm sin ann."
@@ -7998,6 +8128,13 @@ msgstr ""
 msgid "This instance is invite-only."
 msgstr "Le cuireadh amháin atá an t-ásc seo."
 
+#: src/postulo/templates/server/email.html:31
+#, draft
+msgid ""
+"This instance is not sending over SMTP, so the settings below are recorded and not used. That is normal in development, where mail is printed to the console."
+msgstr ""
+"Ní sheolann an t-ásc seo thar SMTP, mar sin taifeadtar na socruithe thíos gan iad a úsáid. Tá sin gnách le linn forbartha, áit a gclóitear post chuig an consól."
+
 #: src/postulo/accounts/views.py:193
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
@@ -8081,7 +8218,7 @@ msgstr "Crios ama"
 msgid "time zone"
 msgstr "crios ama"
 
-#: src/postulo/core/server_forms.py:94
+#: src/postulo/core/server_forms.py:95
 #, draft
 msgid "Time zone for new accounts"
 msgstr "Crios ama do chuntais nua"
@@ -8095,6 +8232,11 @@ msgstr "iontráil amlíne"
 #, draft
 msgid "Timeout"
 msgstr "Teorainn ama"
+
+#: src/postulo/core/models.py:161
+#, draft
+msgid "timeout in seconds"
+msgstr "teorainn ama i soicindí"
 
 #: src/postulo/documents/models.py:291 src/postulo/documents/models.py:341
 #: src/postulo/jobs/models.py:388 src/postulo/resume/models.py:229
@@ -8255,13 +8397,13 @@ msgstr "suas le %(high)s"
 msgid "Update the preview"
 msgstr "Nuashonraigh an réamhamharc"
 
-#: src/postulo/accounts/models.py:303 src/postulo/core/models.py:19
-#: src/postulo/core/models.py:139
+#: src/postulo/accounts/models.py:303 src/postulo/core/models.py:20
+#: src/postulo/core/models.py:165
 #, draft
 msgid "updated at"
 msgstr "nuashonraithe ar"
 
-#: src/postulo/core/models.py:146
+#: src/postulo/core/models.py:172
 #, draft
 msgid "updated by"
 msgstr "nuashonraithe ag"
@@ -8343,13 +8485,13 @@ msgstr ""
 msgid "user"
 msgstr "úsáideoir"
 
-#: src/postulo/accounts/forms.py:527 src/postulo/templates/server/email.html:15
+#: src/postulo/accounts/forms.py:527 src/postulo/templates/server/email.html:20
 #: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
 msgstr "Ainm úsáideora"
 
-#: src/postulo/accounts/models.py:106
+#: src/postulo/accounts/models.py:106 src/postulo/core/models.py:154
 #, draft
 msgid "username"
 msgstr "ainm úsáideora"
@@ -8363,6 +8505,13 @@ msgstr "Ainm úsáideora nó ríomhphost"
 #, draft
 msgid "users"
 msgstr "úsáideoirí"
+
+#: src/postulo/templates/server/email.html:105
+#, draft
+msgid ""
+"Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
+msgstr ""
+"Úsáideann sé na socruithe sábháilte agus seolann sé chuig fíorbhosca isteach. Tástáil an ceangal ar dtús má d'athraigh tú rud éigin díreach anois."
 
 #: src/postulo/templates/api/token_list.html:92
 #, draft
@@ -8500,7 +8649,7 @@ msgstr "A dteastaíonn ó %(plugin)s"
 msgid "what a monitor should poll"
 msgstr "an rud ba chóir do mhonatóir a phobalbhreith"
 
-#: src/postulo/core/server_forms.py:91
+#: src/postulo/core/server_forms.py:92
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr ""
@@ -8747,12 +8896,12 @@ msgstr "cá bhfuil tú i do chónaí"
 msgid "Where your job search stands today."
 msgstr "Cá seasann do chuardach poist inniu."
 
-#: src/postulo/core/models.py:120
+#: src/postulo/core/models.py:121
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Cibé an féidir le haon duine a aimsíonn an seoladh cuntas a chruthú."
 
-#: src/postulo/core/models.py:131
+#: src/postulo/core/models.py:132
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -8908,10 +9057,17 @@ msgid ""
 msgstr ""
 "Scríofa uair amháin, anseo. Tarraingíonn gach leagan CV air seo, mar sin ceartaíonn ceartú teidil poist é i ngach áit."
 
-#: src/postulo/core/server_forms.py:13
+#: src/postulo/core/server_forms.py:14
 #, draft
 msgid "Yes"
 msgstr "Tá"
+
+#: src/postulo/core/server_forms.py:130
+#, draft
+msgid ""
+"Yes for a server on port 587 that upgrades the connection after connecting. Postulo does not yet speak implicit TLS on port 465."
+msgstr ""
+"Tá, i gcás freastalaí ar phort 587 a chriptíonn an ceangal tar éis ceangal a dhéanamh. Ní labhraíonn Postulo TLS intuigthe ar phort 465 fós."
 
 #: src/postulo/templates/server/signin.html:33
 #, draft
@@ -8923,14 +9079,14 @@ msgstr "tá — meaitseálann seoladh fíoraithe"
 msgid "yes — the identity provider is the invitation"
 msgstr "tá — is é an soláthraí céannachta an cuireadh"
 
-#: src/postulo/core/server_forms.py:41
+#: src/postulo/core/server_forms.py:42
 #, draft
 msgid ""
 "Yes: anyone who finds the address may create an account. No: invitation only. An empty instance always offers the sign-up form, so somebody can become the first account."
 msgstr ""
 "Tá: is féidir le haon duine a aimsíonn an seoladh cuntas a chruthú. Níl: le cuireadh amháin. Tairgeann ásc folamh an fhoirm chlárúcháin i gcónaí, ionas gur féidir le duine éigin a bheith ina chéad chuntas."
 
-#: src/postulo/core/server_forms.py:50
+#: src/postulo/core/server_forms.py:51
 #, draft
 msgid ""
 "Yes: somebody who arrives through the identity provider is signed straight in, without being asked for a code as well. Say yes only if you know that provider checks identity at least as carefully as Postulo would. It never applies to a password sign-in, and it removes nobody's authenticator app. A passkey already counts on its own and needs no setting."
@@ -9182,19 +9338,19 @@ msgstr "do ról"
 msgid "Your username has been changed."
 msgstr "Athraíodh d'ainm úsáideora."
 
-#: src/postulo/core/server_views.py:762
+#: src/postulo/core/server_views.py:839
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr "Tá “%(name)s” imithe. Fanann gach rud a suiteáladh uaidh suiteáilte."
 
-#: src/postulo/core/server_views.py:747
+#: src/postulo/core/server_views.py:824
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "Tá “%(name)s” múchta. Ní shuiteáiltear ná ní nuashonraítear aon rud nua uaidh; leanann an rud a bhí suiteáilte ag obair."
 
-#: src/postulo/core/server_views.py:744
+#: src/postulo/core/server_views.py:821
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""

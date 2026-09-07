@@ -81,16 +81,7 @@ SECURE_CSP = {
     "base-uri": [CSP.SELF],
 }
 
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-        "OPTIONS": {
-            "host": env("POSTULO_EMAIL_HOST", default="localhost"),
-            "port": env.int("POSTULO_EMAIL_PORT", default=25),
-            "username": env("POSTULO_EMAIL_HOST_USER", default=""),
-            "password": env("POSTULO_EMAIL_HOST_PASSWORD", default=""),
-            "use_tls": env.bool("POSTULO_EMAIL_USE_TLS", default=True),
-            "timeout": env.int("POSTULO_EMAIL_TIMEOUT", default=10),
-        },
-    },
-}
+# No OPTIONS: they would be frozen at import, and an administrator changing the SMTP
+# server on the Email page has to take effect without restarting the container. Django
+# builds a fresh backend for every send, so this one reads the resolved settings then.
+MAILERS = {"default": {"BACKEND": "postulo.core.mail.SiteSMTPBackend"}}

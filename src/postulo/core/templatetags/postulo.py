@@ -6,7 +6,7 @@ import zlib
 from pathlib import Path
 
 from django import template
-from django.forms import BoundField
+from django.forms import BoundField, Select, TextInput
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import escape, format_html
@@ -290,6 +290,37 @@ def add_class(field: BoundField, css_classes: str) -> BoundField:
     existing = field.field.widget.attrs.get("class", "")
     merged = f"{existing} {css_classes}".strip()
     return field.as_widget(attrs={"class": merged})
+
+
+@register.inclusion_tag("partials/field_pinned.html")
+def pinned_field(field: BoundField, variable: str) -> dict:
+    """A field the environment sets: shown, readable, copyable, and not editable.
+
+    ``readonly`` rather than ``disabled``. A disabled input leaves the tab order and is
+    announced inconsistently by screen readers, so a value an administrator may well need
+    to read and copy -- the SMTP host they are about to check against their relay's
+    configuration -- would become one some of them cannot reach at all.
+
+    A ``<select>`` has no readonly attribute. Marking one readonly does nothing: the
+    browser lets you change it and the server then refuses, silently, which is the worst of
+    both. So a pinned choice is rendered as a readonly text box holding the label it
+    resolves to -- still a labelled control in the tab order, simply one whose value is
+    settled somewhere else.
+
+    None of this is the boundary. The form drops pinned fields whatever arrives for them;
+    this is what an honest page looks like, not what stops a hand-written POST.
+    """
+    described_by = f"pinned-{field.name}"
+    attrs = {"class": "field-input", "readonly": True, "aria-describedby": described_by}
+    if isinstance(field.field.widget, Select):
+        value = field.value()
+        shown = dict(field.field.widget.choices).get(value, value)
+        control = TextInput().render(
+            field.html_name, str(shown), attrs={**attrs, "id": field.auto_id}
+        )
+    else:
+        control = field.as_widget(attrs=attrs)
+    return {"field": field, "variable": variable, "control": control, "described_by": described_by}
 
 
 def _sidebar(context, sections) -> dict:

@@ -1,0 +1,15 @@
+{% load i18n %}
+{% comment %} A field the environment pins. The value is shown rather than hidden, because
+   an administrator is entitled to see what their instance is actually using, and it is
+   readonly rather than disabled so that it stays in the tab order and a screen reader
+   announces it consistently. `aria-describedby` ties it to the line naming the variable,
+   so the reason is read with the field rather than found afterwards. {% endcomment %}
+<div class="mb-4" data-pinned="{{ field.name }}">
+  <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ control }}
+  <p class="field-help" id="{{ described_by }}">
+    {% blocktranslate trimmed %}
+      Set by <code>{{ variable }}</code> in the environment; change it there.
+    {% endblocktranslate %}
+  </p>
+</div>

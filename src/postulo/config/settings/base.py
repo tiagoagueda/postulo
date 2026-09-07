@@ -421,6 +421,18 @@ CSRF_COOKIE_SAMESITE = "Lax"
 DEFAULT_FROM_EMAIL = env("POSTULO_DEFAULT_FROM_EMAIL", default="postulo@localhost")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+# Read here rather than straight into MAILERS so that `postulo.core.site` can resolve them
+# the way it resolves the rest of the policy: the environment wins where it speaks, the
+# Server settings page fills the rest. MAILERS is built once at import and email has to be
+# configurable without a restart, so the values reach the backend at send time instead.
+# See postulo.core.mail.
+POSTULO_EMAIL_HOST = env("POSTULO_EMAIL_HOST", default="localhost")
+POSTULO_EMAIL_PORT = env.int("POSTULO_EMAIL_PORT", default=25)
+POSTULO_EMAIL_HOST_USER = env("POSTULO_EMAIL_HOST_USER", default="")
+POSTULO_EMAIL_HOST_PASSWORD = env("POSTULO_EMAIL_HOST_PASSWORD", default="")
+POSTULO_EMAIL_USE_TLS = env.bool("POSTULO_EMAIL_USE_TLS", default=True)
+POSTULO_EMAIL_TIMEOUT = env.int("POSTULO_EMAIL_TIMEOUT", default=10)
+
 # --------------------------------------------------------------------- logging
 
 # Where records are kept so an administrator can read them without a shell. Empty turns

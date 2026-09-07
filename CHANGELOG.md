@@ -8,6 +8,45 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Email can be configured from the interface, and the environment still wins.** *Server
+  settings → Email* was a read-only summary and a *Send a test message* button, so changing
+  where an instance sends mail meant editing a file and restarting a container — on an
+  application whose whole premise is that you run it yourself, often on a machine you reach
+  through a browser and nothing else. The server, port, username, password, STARTTLS,
+  timeout and from-address are now all on that page, and a `.env` written for 0.1.0 goes on
+  meaning exactly what it meant: where a variable is set it wins, and the field shows the
+  value **read-only, with the variable that pins it named beside it**, rather than an empty
+  box and a shrug. Readonly rather than disabled, deliberately: a disabled input leaves the
+  tab order and is announced inconsistently, and a value an administrator wants to copy
+  across to their relay's own configuration must not be one some of them cannot reach.
+  Pinned fields are also **dropped on the server**, whatever a request contains, because a
+  readonly attribute is presentation and a form can be posted without a browser.
+
+  The engineering is not the form. **`MAILERS` is built once, when settings are imported**,
+  so a page that wrote to it would have saved, said so, and changed nothing until a restart
+  — worse than no page. Django builds a fresh backend for every message and caches none, so
+  Postulo's own backend resolves the settings then; the from-address is stamped there too,
+  because `DEFAULT_FROM_EMAIL` is read at send time by Django's code and allauth's and
+  neither offers a hook. **The password is encrypted at rest** under the same key as a
+  plugin connection's secrets, and is never rendered again — not the value, not its length;
+  the page says only whether one is set, and forgetting one is a separate, deliberate
+  checkbox rather than an empty field.
+
+  Beside *Send a test message* there is now ***Test the connection***: it opens the socket,
+  negotiates STARTTLS, signs in, asks the server to do nothing and hangs up, proving the
+  credentials without sending anybody an email they then have to ignore. It takes **what is
+  on the screen**, not what is stored, so a new relay can be tried without first overwriting
+  the one that works; and a failure does not block saving, because an administrator may be
+  configuring a relay that is not up yet. The SMTP host is deliberately **not** subject to
+  the private-address rule that governs capture — that rule exists because a capture URL
+  comes off a stranger's page, and a relay on `10.0.0.0/8` is the ordinary case here.
+
+  One state gets said out loud rather than left to be discovered: when a setting is **both**
+  stored here and pinned by a variable, the page says so, because removing that variable
+  hands over to the stored value and mail starts going somewhere else without anybody having
+  edited anything. Only STARTTLS is supported; implicit TLS on port 465 is not offered yet,
+  here or in the environment, and the field says so. (#84)
+
 - **Postulo speaks Brazilian Portuguese.** Not a copy of the European catalogue under
   another code, and not a second translation from English either: **seeded from `pt-pt` and
   adapted**, because every string had already been translated once by somebody thinking about

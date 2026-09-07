@@ -36,7 +36,7 @@ from postulo.plugins.forms import PluginRepositoryForm
 from . import site
 from .mixins import StaffRequiredMixin
 from .models import SiteSettings
-from .server_forms import CaptureForm, DefaultsForm, SignInForm, TestEmailForm
+from .server_forms import CaptureForm, DefaultsForm, EmailForm, SignInForm, TestEmailForm
 
 logger = logging.getLogger(__name__)
 
@@ -419,31 +419,106 @@ class DefaultsView(PolicyView):
 
 
 def _mailer_summary() -> dict:
-    mailer = (getattr(settings, "MAILERS", {}) or {}).get("default", {})
-    options = mailer.get("OPTIONS", {}) or {}
-    backend = str(mailer.get("BACKEND", ""))
+    """What is in force, resolved rather than read out of MAILERS.
+
+    MAILERS no longer carries the values -- they are looked up per send, which is what lets
+    the page below change them -- so a summary built from it would describe the shape of
+    the configuration and none of its content.
+    """
+    backend = str(((getattr(settings, "MAILERS", {}) or {}).get("default", {})).get("BACKEND", ""))
+    resolved = site.email_settings()
     return {
         "backend": ".".join(backend.split(".")[-2:]) or backend,
-        "is_smtp": backend.endswith("smtp.EmailBackend"),
-        "host": options.get("host", ""),
-        "port": options.get("port", ""),
-        "username": options.get("username", ""),
-        "use_tls": options.get("use_tls"),
-        "from_address": settings.DEFAULT_FROM_EMAIL,
+        "is_smtp": backend.endswith("SiteSMTPBackend") or backend.endswith("smtp.EmailBackend"),
+        "host": resolved["host"],
+        "port": resolved["port"],
+        "username": resolved["username"],
+        "use_tls": resolved["use_tls"],
+        "has_password": bool(resolved["password"]),
+        "from_address": resolved["from_address"],
     }
 
 
-class EmailView(ServerSectionMixin, TemplateView):
+class EmailView(PolicyView):
+    """The email settings, and the two ways of proving them."""
+
+    form_class = EmailForm
     template_name = "server/email.html"
     section_title = _("Email")
+    pinned_fields = tuple(site.EMAIL_FIELDS)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mailer"] = _mailer_summary()
-        context["form"] = kwargs.get("form") or TestEmailForm(
+        context["test_form"] = kwargs.get("test_form") or TestEmailForm(
             initial={"to": self.request.user.email}
         )
+        context["shadowed"] = site.email_shadowed()
+        context["has_password"] = SiteSettings.get().has_email_password
         return context
+
+
+class EmailConnectionTestView(StaffRequiredMixin, View):
+    """Open a connection with what is on screen, and hang up without sending anything.
+
+    On screen, not in the database, so a configuration can be tried before it replaces one
+    that works. The password is the exception it has to be: it is never rendered, so a blank
+    one means the stored one, exactly as saving does.
+
+    A failure does not stop anybody saving. An administrator may be configuring a relay that
+    is not up yet, and refusing to record what somebody typed because a machine elsewhere is
+    down is rarely the right answer.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        from . import mail
+
+        row = SiteSettings.get()
+        resolved = site.email_settings()
+        pinned = {f: v for f in site.EMAIL_FIELDS if (v := site.overridden_by(f))}
+
+        def value(field: str, cast=str):
+            key = site.EMAIL_FIELDS[field]
+            if field in pinned:
+                return resolved[key]
+            raw = request.POST.get(field, "").strip()
+            if raw == "":
+                return resolved[key]
+            try:
+                return cast(raw)
+            except (TypeError, ValueError):
+                return resolved[key]
+
+        typed = request.POST.get("email_password", "")
+        if "email_password" in pinned:
+            password = resolved["password"]
+        elif typed:
+            password = typed
+        elif request.POST.get("forget_email_password"):
+            password = ""
+        else:
+            password = row.email_password if row.has_email_password else resolved["password"]
+
+        use_tls = request.POST.get("email_use_tls", "")
+        if "email_use_tls" in pinned or use_tls == "":
+            tls = bool(resolved["use_tls"])
+        else:
+            tls = use_tls == "true"
+
+        try:
+            report = mail.check_connection(
+                host=str(value("email_host")),
+                port=int(value("email_port", int)),
+                username=str(value("email_username")),
+                password=password,
+                use_tls=tls,
+                timeout=int(value("email_timeout", int)),
+            )
+        except mail.ConnectionFailed as error:
+            messages.error(request, _("No connection: %(why)s") % {"why": error})
+        else:
+            messages.success(request, report)
+        return redirect("server:email")
 
 
 class EmailTestView(StaffRequiredMixin, View):
@@ -454,7 +529,9 @@ class EmailTestView(StaffRequiredMixin, View):
         if not form.is_valid():
             view = EmailView()
             view.request = request
-            return render(request, EmailView.template_name, view.get_context_data(form=form))
+            view.object = SiteSettings.get()
+            context = view.get_context_data(form=EmailForm(instance=view.object), test_form=form)
+            return render(request, EmailView.template_name, context)
         to = form.cleaned_data["to"]
         try:
             sent = send_mail(

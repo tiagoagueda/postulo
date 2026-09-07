@@ -198,7 +198,20 @@ docker compose -f docker/compose.yml --profile scheduler up -d
 
 Email carries the account system's messages — verification links, password resets — and
 the built-in **Email** notifier's, for anyone who sets one up under *Settings →
-Connections*. Prove the settings with *Server settings → Email → Send a test message*.
+Connections*.
+
+**You do not have to set any of this in the environment.** *Server settings → Email* holds
+the same settings, takes effect on the next message without a restart, and has two buttons:
+*Test the connection*, which opens a socket, negotiates TLS, signs in and hangs up without
+sending anything to anybody, and *Send a test message*, which sends a real one. The
+connection test uses what is on the screen rather than what is stored, so a new relay can be
+tried before it replaces one that works.
+
+The password entered there is **encrypted at rest**, under the same key as a plugin
+connection's secrets — `POSTULO_FIELD_KEY` if you set one, otherwise `SECRET_KEY`. It is
+never displayed again, not even its length; the page says only whether one is set. If you
+rotate `SECRET_KEY` without having set `POSTULO_FIELD_KEY`, the stored password becomes
+unreadable and Postulo falls back to the environment rather than refusing to send.
 
 | Variable | Default |
 | --- | --- |
@@ -210,7 +223,20 @@ Connections*. Prove the settings with *Server settings → Email → Send a test
 | `POSTULO_EMAIL_USE_TLS` | `true` |
 | `POSTULO_EMAIL_TIMEOUT` | `10` |
 
-In development, email is printed to the console instead of being sent.
+**Where both speak, the environment wins**, as it does for every other setting on these
+pages: an instance configured through a `.env` since 0.1.0 keeps behaving exactly as it did,
+and the page shows such a value read-only with the variable that pins it named beside it.
+
+One thing worth knowing before you delete a variable: if a value is also stored in the
+interface, removing the variable hands over to the stored one — **mail starts going
+somewhere else without anybody editing anything**. The page says so, in as many words,
+whenever both exist.
+
+Only STARTTLS is supported, which is a server on port 587 that upgrades the connection after
+opening it. Implicit TLS on port 465 is not offered yet, in the environment or on the page.
+
+In development, email is printed to the console instead of being sent, so the settings are
+recorded and not used. The page says that too.
 
 ## HTTPS
 

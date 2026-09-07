@@ -149,10 +149,19 @@
 }
 
 @utility field-input {
+  /*
+   * `read-only:` is the "greyed out" a field gets when the environment decides its value
+   * and the page is only reporting it. A muted ground and a hand that says "no" is the
+   * whole of it: the text stays at full contrast, the field stays in the tab order, and a
+   * screen reader still reads the value and the line explaining where it came from. The
+   * `disabled` attribute would have given the same look and taken all three away.
+   */
   @apply w-full rounded-lg border border-ink-300 bg-white px-3 py-2 text-sm
     text-ink-900 placeholder:text-ink-400
+    read-only:cursor-not-allowed read-only:bg-ink-50
     focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none
-    dark:border-ink-700 dark:bg-ink-950 dark:text-ink-100;
+    dark:border-ink-700 dark:bg-ink-950 dark:text-ink-100
+    dark:read-only:bg-ink-900;
 }
 
 @layer components {
