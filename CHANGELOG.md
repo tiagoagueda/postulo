@@ -8,6 +8,19 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **The workflow audit asked GitHub about a repository Forgejo never fetches from GitHub.**
+  The last thing keeping continuous integration red: zizmor takes a GitHub token from
+  `GH_TOKEN` or `GITHUB_TOKEN`, Forgejo Actions sets the latter, and zizmor then asked
+  github.com about `actions/checkout` while holding a Forgejo token — which github.com
+  answered with `401 Unauthorized`, failing the job before any audit had run. The token was
+  the visible half; the wrong question was the other. Forgejo resolves a bare action name
+  against its own instance, so what GitHub believes `actions/checkout@v4` points at is not
+  what runs here, and the online audits would have answered confidently about the wrong
+  host. It runs `--offline` now, which is the mode that was always correct for this
+  instance. It had passed on a laptop because with no token in the environment zizmor
+  defaults to offline — the same shape of fault as #76: green only where it was written.
+  (#77)
+
 - **Two tests passed only on the machine they were written on.** With the dependency audit
   corrected (#75), continuous integration still failed, and for a reason worth stating: the
   suite was green on Windows and red on Linux. The production-policy test set
