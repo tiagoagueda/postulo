@@ -24,12 +24,14 @@ def test_the_right_side_holds_the_account_menu_and_the_theme_switch(client, user
     assert "Account menu, applicant" in header
     assert "Your details" in header
     assert "Settings" in header
-    assert "Export everything" in header
     assert "Sign out" in header
     assert "data-theme-switch" in header
     # Capture and Record have left the header.
     assert reverse("jobs:capture_create") not in header
     assert reverse("applications:create") not in header
+    # So has Export: it is a settings section of its own, beside deleting the account,
+    # and a menu with two ways to the same page teaches people to read neither.
+    assert reverse("core:export") not in header
 
 
 def test_sign_out_stays_a_post(client, user):

@@ -2,7 +2,9 @@
 
 ## Taking everything with you
 
-**Dashboard → Export everything**, on the *Shortcuts* widget.
+**Settings → Your data.** It is also on the dashboard's *Shortcuts* widget if you have
+that one turned on, and on the page that deletes your account — leaving without your data
+should never be the easy path.
 
 One zip, holding a readable JSON document of every record in your account and every file
 in it: your profile, career record, companies, postings, applications with their whole

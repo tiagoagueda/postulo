@@ -12,8 +12,9 @@ they have followed it.
 
 ## 2. Fill in your details
 
-**Your name, top right → Your details.** The menu under your name also holds *Settings*,
-*Export everything* and *Sign out*.
+**Your name, top right → Your details.** The menu under your name also holds *Settings*
+and *Sign out*; everything else about your account, exporting it included, lives under
+*Settings*.
 
 *Your details* is the contact block that gets printed at the top of your CVs: your name,
 headline, phone, location and links. It is worth doing first, because every CV you

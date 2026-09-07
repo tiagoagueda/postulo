@@ -6,6 +6,19 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🔧 Changed
+
+- **Export has left the account menu.** It is a settings section of its own — *Settings →
+  Your data*, beside deleting the account — so the header was a second permanent route to
+  the same page, in a menu of five items where every other entry went somewhere different.
+  A menu with two ways to one place is a menu people learn to stop reading. Nothing is
+  harder to reach: the settings section is the home, the **delete-account page still offers
+  the archive** (leaving without your data should never be the easy path, and that is the
+  moment it matters), and the dashboard's *Shortcuts* widget keeps its link for anybody who
+  put it there — which is not the same as the application putting it in everybody's header.
+  Taking data out remains one of the four commitments; what upholds it is that the export is
+  complete, documented and one button, not the number of links pointing at it. (#86)
+
 ### 🐛 Fixed
 
 - **Five icons were drawing without their geometry.** The icon tag strips Lucide's fixed
