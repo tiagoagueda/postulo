@@ -215,7 +215,57 @@
     }
   }
 
-  /* An entry in the account menu: link or button, same look. */
+  /*
+   * A table that stops being one when there is no room for columns, and becomes a card
+   * per row instead. Opt in with `table-cards` and give every cell a `data-label`.
+   *
+   * `display: block` on table elements is the usual way to do this and it has a usual
+   * cost: it strips the table semantics a screen reader navigates by, so "Administrator"
+   * stops being the Role of a row and becomes a loose word. That is why the markup carries
+   * every ARIA role explicitly. On a wide screen those roles are exactly what the elements
+   * already are and change nothing at all; on a narrow one they are the only thing holding
+   * the meaning together.
+   *
+   * The header row is what goes away, so each cell says its own column through
+   * `data-label` -- with one exception per table, the cell that needs no introduction.
+   *
+   * The breakpoint is `md`, measured rather than guessed: the settings area gives a card
+   * about 730 pixels whatever the window does, and People needs 676 of them once its
+   * actions are a menu. Below that the columns have nowhere to go.
+   */
+  @media (width < 48rem) {
+    .table-cards,
+    .table-cards tbody,
+    .table-cards tr,
+    .table-cards td {
+      display: block;
+    }
+
+    .table-cards thead {
+      display: none;
+    }
+
+    .table-cards tr {
+      @apply relative px-4 py-3;
+    }
+
+    .table-cards td {
+      @apply px-0 py-0.5;
+    }
+
+    /* The column's name, since the header is gone. */
+    .table-cards td[data-label]::before {
+      content: attr(data-label) ": ";
+      @apply text-ink-500 dark:text-ink-400;
+    }
+
+    /* Row actions belong in the corner, out of the reading order of the details. */
+    .table-cards td[data-actions] {
+      @apply absolute end-2 top-2 py-0;
+    }
+  }
+
+  /* An entry in a menu: link or button, same look. */
   .menu-item {
     @apply flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700
       hover:bg-ink-100 hover:text-ink-900

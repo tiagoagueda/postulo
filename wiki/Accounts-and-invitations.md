@@ -154,6 +154,11 @@ themselves — and nobody can deactivate or delete the account they are signed i
 that page. A username is unique across the instance whoever changes it: a name
 already in use, in any capitalisation, is refused before anything is saved.
 
+Each row's actions live behind the **⋮** button at its end. They used to sit across the row
+with their names spelled out, which made that one column a third of the table and pushed the
+whole thing off the side of the page at every window size. On a phone the rows stop being
+rows at all and become a card each, with every value labelled by the column it came from.
+
 ## Who can sign up
 
 Registration is closed by default: the sign-up form is not offered, and the only way in

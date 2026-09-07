@@ -33,6 +33,22 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Server settings → People scrolled sideways at every width, including on a desktop.**
+  The table needed 967 pixels and the card it sits in gives about 730 whatever the window
+  does, so a wider monitor never helped — measured at 1440, 1280, 1024 and 768, and it
+  overflowed by roughly 200 pixels at every one. **A third of the table was four buttons**:
+  *Change username*, *Make administrator*, *Deactivate* and *Delete account*, spelled out end
+  to end, making that column 335 pixels — wider than the email column, and holding no
+  information at all. They are a menu now, the same disclosure the account menu in the header
+  uses, which takes the table to 676 and leaves room to spare. Every action is still there
+  and still a word. **On a phone the rows stop being rows**: a new `table-cards` component
+  gives each person a card with its values stacked and labelled. That technique works by
+  turning table elements into blocks, which takes the table semantics with it — so every
+  element now states its ARIA role, or a screen reader on a narrow screen would hear
+  "Administrator" as a loose word rather than as the Role of a row. Eight other tables are
+  wrapped the same way and may well overflow too; none of them was measured or touched here.
+  (#91)
+
 - **Flags were emoji, and Windows draws those as two letters.** A flag emoji is not a
   character: it is two *regional indicator* code points, and a font is invited — never
   required — to draw the pair as a flag. Segoe UI Emoji never has and Microsoft has said it

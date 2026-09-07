@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 14:28+0000\n"
+"POT-Creation-Date: 2026-09-07 14:47+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -45,7 +45,7 @@ msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "%(count)s кандидатура е замлъкнала"
 msgstr[1] "%(count)s кандидатури са замлъкнали"
 
-#: src/postulo/templates/server/people.html:75
+#: src/postulo/templates/server/people.html:100
 #, python-format, draft
 msgid ""
 "%(counter)s administrator. The last one cannot be removed, deactivated or deleted."
@@ -602,7 +602,7 @@ msgid ""
 msgstr ""
 "Токенът позволява на инструмент извън Postulo да действа от ваше име — разширение за браузър, което предава обява, агент, който чете търсенето ви — и прави само това, което обхватите му позволяват. Не е вход: никога не достига уеб интерфейса и двуфакторното удостоверяване не важи за него."
 
-#: src/postulo/templates/server/people.html:82
+#: src/postulo/templates/server/people.html:107
 #, draft
 msgid ""
 "A username is unique across the instance whoever changes it, and people can change their own under Settings."
@@ -677,10 +677,15 @@ msgstr ""
 
 #: src/postulo/templates/accounts/invite_list.html:29
 #: src/postulo/templates/jobs/listing_list.html:75
-#: src/postulo/templates/server/people.html:24
+#: src/postulo/templates/server/people.html:36
 #, draft
 msgid "Actions"
 msgstr "Действия"
+
+#: src/postulo/templates/server/people.html:63
+#, python-format, draft
+msgid "Actions for %(name)s"
+msgstr "Действия за %(name)s"
 
 #: src/postulo/templates/applications/application_detail.html:289
 #: src/postulo/templates/jobs/company_detail.html:114
@@ -798,7 +803,7 @@ msgstr "Добавено."
 msgid "address"
 msgstr "адрес"
 
-#: src/postulo/templates/server/people.html:38
+#: src/postulo/templates/server/people.html:54
 #, draft
 msgid "Administrator"
 msgstr "Администратор"
@@ -1464,7 +1469,7 @@ msgstr "Смяна на паролата"
 msgid "Change status"
 msgstr "Смяна на статуса"
 
-#: src/postulo/templates/server/people.html:46
+#: src/postulo/templates/server/people.html:68
 #: src/postulo/templates/server/person_username.html:6
 #: src/postulo/templates/settings/account.html:14
 #, draft
@@ -2043,12 +2048,12 @@ msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
 msgstr "Дни без нищо да се случва, и нищо планирано, преди Postulo да попита."
 
-#: src/postulo/templates/server/people.html:58
+#: src/postulo/templates/server/people.html:83
 #, draft
 msgid "Deactivate"
 msgstr "Деактивиране"
 
-#: src/postulo/templates/server/people.html:36
+#: src/postulo/templates/server/people.html:52
 #, draft
 msgid "Deactivated"
 msgstr "Деактивиран"
@@ -2182,7 +2187,7 @@ msgstr "Отбрана"
 msgid "Delete"
 msgstr "Изтриване"
 
-#: src/postulo/templates/server/people.html:64
+#: src/postulo/templates/server/people.html:87
 #: src/postulo/templates/server/person_delete.html:6
 #, draft
 msgid "Delete account"
@@ -2441,7 +2446,8 @@ msgstr ""
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
 #: src/postulo/core/server_views.py:434
 #: src/postulo/templates/server/email.html:5
-#: src/postulo/templates/server/people.html:21
+#: src/postulo/templates/server/people.html:33
+#: src/postulo/templates/server/people.html:46
 #, draft
 msgid "Email"
 msgstr "Имейл"
@@ -3810,7 +3816,8 @@ msgstr "Последно изпълнение %(when)s: %(report)s"
 msgid "last run's report"
 msgstr "доклад от последното изпълнение"
 
-#: src/postulo/templates/server/people.html:22
+#: src/postulo/templates/server/people.html:34
+#: src/postulo/templates/server/people.html:47
 #, draft
 msgid "Last sign-in"
 msgstr "Последен вход"
@@ -4083,7 +4090,7 @@ msgstr "Основен контакт"
 msgid "Maintainer"
 msgstr "Поддръжка"
 
-#: src/postulo/templates/server/people.html:51
+#: src/postulo/templates/server/people.html:74
 #, draft
 msgid "Make administrator"
 msgstr "Направи администратор"
@@ -4154,7 +4161,7 @@ msgid ""
 msgstr ""
 "Медиана вместо средна стойност: един работодател, който отнема четири месеца, не бива да мести числото, което всички останали задават."
 
-#: src/postulo/templates/server/people.html:40
+#: src/postulo/templates/server/people.html:56
 #, draft
 msgid "Member"
 msgstr "Член"
@@ -4262,7 +4269,8 @@ msgid "name"
 msgstr "име"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:17
-#: src/postulo/templates/server/people.html:20
+#: src/postulo/templates/server/people.html:32
+#: src/postulo/templates/server/people.html:45
 #: src/postulo/templates/server/plugins.html:114
 #, draft
 msgid "Name"
@@ -5695,7 +5703,7 @@ msgid_plural "quiet for %(days)s days"
 msgstr[0] "замлъкнала от %(days)s ден"
 msgstr[1] "замлъкнала от %(days)s дни"
 
-#: src/postulo/templates/server/people.html:58
+#: src/postulo/templates/server/people.html:83
 #, draft
 msgid "Reactivate"
 msgstr "Активиране отново"
@@ -5945,7 +5953,7 @@ msgstr "отдалечен адрес"
 msgid "Remove"
 msgstr "Премахване"
 
-#: src/postulo/templates/server/people.html:51
+#: src/postulo/templates/server/people.html:74
 #, draft
 msgid "Remove administrator"
 msgstr "Премахване на администратор"
@@ -6075,7 +6083,8 @@ msgstr "robots.txt в момента се пренебрегва."
 #: src/postulo/applications/tables.py:19
 #: src/postulo/templates/core/import_csv_map.html:64
 #: src/postulo/templates/jobs/listing_list.html:70
-#: src/postulo/templates/server/people.html:23
+#: src/postulo/templates/server/people.html:35
+#: src/postulo/templates/server/people.html:50
 #, draft
 msgid "Role"
 msgstr "Позиция"
@@ -7922,7 +7931,7 @@ msgid "user"
 msgstr "потребител"
 
 #: src/postulo/accounts/forms.py:522 src/postulo/templates/server/email.html:15
-#: src/postulo/templates/server/people.html:19
+#: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
 msgstr "Потребителско име"

@@ -1,5 +1,5 @@
 {% extends "server/base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block content %}
   <div class="mb-6 flex flex-wrap items-start gap-4">
@@ -12,26 +12,40 @@
     <a href="{% url 'accounts:invite_list' %}" class="btn-primary ml-auto">{% translate "Invitations" %}</a>
   </div>
 
+  {% comment %} `table-cards` makes each row a card below the md breakpoint, where five
+     columns have nowhere to go. Every element carries its ARIA role because that layout
+     works by turning table elements into blocks, which otherwise takes the table semantics
+     with it -- on a wide screen the roles are what these elements already are (#91).
+
+     The row's actions were four buttons spelled out in words, 335 pixels of a table that
+     had 728 to live in and needed 967. They are a menu now: the same disclosure the
+     account menu in the header uses, so it opens on a keyboard without help and the script
+     only adds "close when the pointer goes elsewhere".
+  {% endcomment %}
   <div class="card overflow-x-auto p-0">
-    <table class="w-full text-left text-sm">
-      <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
-        <tr>
-          <th class="px-4 py-3 font-medium">{% translate "Username" %}</th>
-          <th class="px-4 py-3 font-medium">{% translate "Name" %}</th>
-          <th class="px-4 py-3 font-medium">{% translate "Email" %}</th>
-          <th class="px-4 py-3 font-medium">{% translate "Last sign-in" %}</th>
-          <th class="px-4 py-3 font-medium">{% translate "Role" %}</th>
-          <th class="px-4 py-3"><span class="sr-only">{% translate "Actions" %}</span></th>
+    <table class="table-cards w-full text-left text-sm" role="table">
+      <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400"
+             role="rowgroup">
+        <tr role="row">
+          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Username" %}</th>
+          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Name" %}</th>
+          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Email" %}</th>
+          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Last sign-in" %}</th>
+          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Role" %}</th>
+          <th class="px-4 py-3" role="columnheader"><span class="sr-only">{% translate "Actions" %}</span></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+      <tbody class="divide-y divide-ink-100 dark:divide-ink-800" role="rowgroup">
         {% for person in people %}
-          <tr data-person="{{ person.username }}" {% if not person.is_active %}class="text-ink-400"{% endif %}>
-            <td class="px-4 py-3 font-medium">{{ person.username }}</td>
-            <td class="px-4 py-3">{{ person.get_full_name|default:"—" }}</td>
-            <td class="px-4 py-3">{{ person.email }}</td>
-            <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ person.last_login|date:"j M Y"|default:"—" }}</td>
-            <td class="px-4 py-3">
+          <tr data-person="{{ person.username }}" role="row" {% if not person.is_active %}class="text-ink-400"{% endif %}>
+            {% comment %} The username needs no label: it is the card's heading. {% endcomment %}
+            <td class="px-4 py-3 font-medium" role="cell">{{ person.username }}</td>
+            <td class="px-4 py-3" role="cell" data-label="{% translate 'Name' %}">{{ person.get_full_name|default:"—" }}</td>
+            <td class="px-4 py-3 break-all" role="cell" data-label="{% translate 'Email' %}">{{ person.email }}</td>
+            <td class="px-4 py-3 text-ink-500 dark:text-ink-400" role="cell" data-label="{% translate 'Last sign-in' %}">
+              {{ person.last_login|date:"j M Y"|default:"—" }}
+            </td>
+            <td class="px-4 py-3" role="cell" data-label="{% translate 'Role' %}">
               {% if not person.is_active %}
                 {% translate "Deactivated" %}
               {% elif person.is_staff %}
@@ -40,30 +54,39 @@
                 {% translate "Member" %}
               {% endif %}
             </td>
-            <td class="px-4 py-3">
-              <div class="flex items-center justify-end gap-1">
-                <a href="{% url 'server:person_username' person.pk %}" class="btn-ghost px-2 py-1 text-xs">
-                  {% translate "Change username" %}
-                </a>
-                <form method="post" action="{% url 'server:person_admin' person.pk %}">
-                  {% csrf_token %}
-                  <button type="submit" class="btn-ghost px-2 py-1 text-xs">
-                    {% if person.is_staff %}{% translate "Remove administrator" %}{% else %}{% translate "Make administrator" %}{% endif %}
-                  </button>
-                </form>
-                {% if person != user %}
-                  <form method="post" action="{% url 'server:person_active' person.pk %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-ghost px-2 py-1 text-xs {% if person.is_active %}text-red-600 dark:text-red-400{% endif %}">
-                      {% if person.is_active %}{% translate "Deactivate" %}{% else %}{% translate "Reactivate" %}{% endif %}
-                    </button>
-                  </form>
-                {% endif %}
-                {% if person != user %}
-                  <a href="{% url 'server:person_delete' person.pk %}" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
-                    {% translate "Delete account" %}
-                  </a>
-                {% endif %}
+            <td class="px-4 py-3" role="cell" data-actions>
+              <div class="flex justify-end">
+                <details class="relative" data-menu>
+                  <summary class="btn-ghost cursor-pointer px-2 py-1"
+                           aria-label="{% blocktranslate trimmed with name=person.username %}Actions for {{ name }}{% endblocktranslate %}">
+                    {% icon "ellipsis-vertical" %}
+                  </summary>
+                  <div class="absolute end-0 z-20 mt-1 w-56 overflow-hidden rounded-xl border border-ink-200 bg-white py-1 text-left shadow-lg dark:border-ink-800 dark:bg-ink-900">
+                    <a href="{% url 'server:person_username' person.pk %}" class="menu-item">
+                      {% icon "pencil" %}{% translate "Change username" %}
+                    </a>
+                    <form method="post" action="{% url 'server:person_admin' person.pk %}">
+                      {% csrf_token %}
+                      <button type="submit" class="menu-item">
+                        {% icon "shield" %}
+                        {% if person.is_staff %}{% translate "Remove administrator" %}{% else %}{% translate "Make administrator" %}{% endif %}
+                      </button>
+                    </form>
+                    {% if person != user %}
+                      <div class="my-1 border-t border-ink-200 dark:border-ink-800" role="separator"></div>
+                      <form method="post" action="{% url 'server:person_active' person.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="menu-item {% if person.is_active %}text-red-600 dark:text-red-400{% endif %}">
+                          {% icon "circle-x" %}
+                          {% if person.is_active %}{% translate "Deactivate" %}{% else %}{% translate "Reactivate" %}{% endif %}
+                        </button>
+                      </form>
+                      <a href="{% url 'server:person_delete' person.pk %}" class="menu-item text-red-600 dark:text-red-400">
+                        {% icon "trash-2" %}{% translate "Delete account" %}
+                      </a>
+                    {% endif %}
+                  </div>
+                </details>
               </div>
             </td>
           </tr>

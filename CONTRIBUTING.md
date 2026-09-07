@@ -114,6 +114,30 @@ show flags in its list. Where one is needed, put it beside the closed select and
 option carry its own flag's URL in a `data-` attribute; see `partials/phone_widget.html`.
 Do not replace a native select with a custom listbox to make room for pictures.
 
+## Tables
+
+A table wider than the card it sits in scrolls sideways, and the settings area gives its
+card about 730 pixels however wide the window is — so a table that does not fit scrolls on
+a desktop, not only on a phone. Measure before assuming otherwise:
+`card.scrollWidth - card.clientWidth` in the browser, at 1440 as well as at 390.
+
+Two things keep one honest:
+
+- **Row actions are a menu**, not a row of buttons. Four buttons with their labels spelled
+  out made one column of *Server settings → People* 335 pixels wide — larger than the email
+  column, and holding no information at all. Use the `<details data-menu>` disclosure the
+  account menu uses; the existing script already closes it when the pointer goes elsewhere.
+- **`table-cards`** turns each row into a card below the `md` breakpoint, where columns have
+  nowhere to go. Give every cell a `data-label` naming its column, except the one that is
+  the card's heading.
+
+`table-cards` works by making table elements blocks, and **that strips the table semantics a
+screen reader navigates by** — "Administrator" stops being the Role of a row and becomes a
+loose word. So a table using it must carry `role="table"`, `role="rowgroup"`, `role="row"`,
+`role="columnheader"` and `role="cell"` explicitly. On a wide screen those roles are what
+the elements already are and change nothing; on a narrow one they are the only thing holding
+the meaning together. `server/people.html` is the worked example.
+
 ## What will not be merged
 
 **Anything that puts a feature behind payment.** Postulo will never have a paid tier, a

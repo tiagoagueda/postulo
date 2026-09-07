@@ -114,6 +114,61 @@ def test_people_lists_accounts_and_makes_or_unmakes_administrators(client, admin
     assert not user.is_staff and not user.is_superuser
 
 
+def test_the_row_actions_are_one_menu_rather_than_four_buttons(client, admin, user):
+    """Four buttons spelled out in words made the actions column 335 pixels of a table
+    that had 728 to live in and needed 967, so it scrolled sideways at every width -- on a
+    1440-pixel desktop as much as on a phone, because the settings card never gets wider
+    than about 730 whatever the window does (#91).
+
+    They are a menu now. Every action is still there and still a word; what changed is that
+    the words are inside a disclosure rather than laid end to end across the row.
+    """
+    client.force_login(admin)
+    html = client.get(reverse("server:people")).content.decode()
+
+    assert html.count("<details") >= 2, "one menu per person"
+    assert f"Actions for {user.username}" in html, "the menu has to say whose it is"
+
+    for action in (
+        "Change username",
+        "Make administrator",
+        "Deactivate",
+        "Delete account",
+    ):
+        assert action in html, action
+
+
+def test_a_person_still_cannot_act_on_their_own_account_from_the_list(client, admin):
+    """Deactivate and Delete are left out of an administrator's own menu, as before."""
+    client.force_login(admin)
+    html = client.get(reverse("server:people")).content.decode()
+
+    assert reverse("server:person_delete", args=[admin.pk]) not in html
+    assert reverse("server:person_active", args=[admin.pk]) not in html
+
+
+def test_every_cell_keeps_its_meaning_when_the_table_becomes_cards(client, admin, user):
+    """Below the md breakpoint the rows are cards, which works by making table elements
+    blocks -- and that takes the table semantics with it unless they are stated. So they
+    are stated, and each cell names its own column for when the header row is gone.
+
+    Without this a screen reader on a narrow screen hears "Administrator" as a loose word
+    rather than as the Role of a row.
+    """
+    client.force_login(admin)
+    html = client.get(reverse("server:people")).content.decode()
+
+    assert 'class="table-cards' in html
+    for role in ('role="table"', 'role="rowgroup"', 'role="row"', 'role="columnheader"'):
+        assert role in html, role
+    assert html.count('role="cell"') >= 12, "two people, six columns each"
+
+    for label in ("Name", "Email", "Last sign-in", "Role"):
+        assert f'data-label="{label}"' in html, label
+    # The username is the card's heading and introduces itself.
+    assert 'data-label="Username"' not in html
+
+
 def test_the_last_administrator_cannot_be_removed_or_deactivated(client, admin):
     client.force_login(admin)
     response = client.post(reverse("server:person_admin", args=[admin.pk]), follow=True)
