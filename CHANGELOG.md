@@ -6,6 +6,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-09-07
+
 ### 🔧 Changed
 
 - **The changelog says what kind of change each section holds, at a glance.** The entries
