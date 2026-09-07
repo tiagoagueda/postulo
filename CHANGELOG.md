@@ -6,6 +6,81 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- **The workflow audit asked GitHub about a repository Forgejo never fetches from GitHub.**
+  The last thing keeping continuous integration red: zizmor takes a GitHub token from
+  `GH_TOKEN` or `GITHUB_TOKEN`, Forgejo Actions sets the latter, and zizmor then asked
+  github.com about `actions/checkout` while holding a Forgejo token — which github.com
+  answered with `401 Unauthorized`, failing the job before any audit had run. The token was
+  the visible half; the wrong question was the other. Forgejo resolves a bare action name
+  against its own instance, so what GitHub believes `actions/checkout@v4` points at is not
+  what runs here, and the online audits would have answered confidently about the wrong
+  host. It runs `--offline` now, which is the mode that was always correct for this
+  instance. It had passed on a laptop because with no token in the environment zizmor
+  defaults to offline — the same shape of fault as #76: green only where it was written.
+  (#77)
+
+- **Two tests passed only on the machine they were written on.** With the dependency audit
+  corrected (#75), continuous integration still failed, and for a reason worth stating: the
+  suite was green on Windows and red on Linux. The production-policy test set
+  `POSTULO_SECRET_KEY` and then imported the production settings — but the base settings
+  module is already imported by the time any test runs, so the key was resolved before the
+  variable existed, and the guard fired. It passed locally only because the base settings
+  read a `.env` from the repository root, and that file is **gitignored**: what the test
+  asserted depended on whether the person running it happened to have a file that is not in
+  the repository. It now imports the production settings in a subprocess with an explicit,
+  scrubbed environment, which no import order and no developer's `.env` can influence, and a
+  second test asserts the guard itself — an instance with no key refuses to start rather
+  than inventing one. Separately, the brand check rebuilt every derived image and compared
+  the bytes, which two machines do not agree on: Pillow's platform wheels round LANCZOS
+  differently, and the three small icons matched while everything from 64 pixels upward did
+  not. It compares recorded digests now — of the source, of each derived file, and of the
+  size-and-padding table they were built from — and rebuilds nothing, so it answers whether
+  these images were built from this source rather than whether this machine rounds like the
+  last one. It still fails on a changed mark, an edited or missing derivative, and a changed
+  recipe. (#76)
+
+- **Continuous integration had never passed, and the dependency audit had never run.**
+  Every one of the thirty-eight runs since the project moved into its organisation was
+  red, for a reason that had nothing to do with the code: `uv sync` installs Postulo as an
+  editable package, `pip-audit --strict` fails on anything it cannot look up, and Postulo
+  is not on PyPI. **The audit stopped at the project and never reported on the
+  dependencies at all** — so the README's promise that a fresh disclosure is noticed
+  without anyone having to remember to look was not being kept, and a real one would have
+  arrived as one more red run among thirty-eight. The lock file is audited now instead of
+  the installed environment: `--no-emit-project` leaves Postulo out by construction, which
+  keeps `--strict` doing its job, and what is checked is exactly what will be installed
+  rather than an environment that also contains the project. Nothing was actually
+  vulnerable; both the Python and the Node dependencies were clean when this was found.
+  Separately, **nothing on a release branch was being checked at all** — the trigger named
+  `main` and the work had moved to per-release branches — so it now runs on those too.
+  (#75)
+
+### Changed
+
+- **The dashboard and Insights are one page, built from widgets you arrange.** They
+  answered the same question — *how is this going?* — at two distances, and you had to
+  remember which page held which number. Neither could be adjusted: the dashboard showed
+  everybody the same six counters, and Insights showed a response funnel to somebody with
+  three applications. Everything both pages held is now a **widget**: seventeen of them,
+  each knowing what it computes and which template draws it, registered from
+  ``AppConfig.ready`` the way settings sections and capture sources already are. What you
+  see and in what order is stored on your profile, and *Settings → Dashboard* arranges it
+  with buttons rather than dragging — arranging is done once and then not again, and a form
+  that posts works from a keyboard, with a screen reader and with scripts off. **Nothing
+  changes for anybody who never opens it**: the standard arrangement is exactly what the
+  dashboard showed before, in the same order, and a widget added in a later release joins
+  it by itself. Once you have arranged the page it is yours, and new widgets stay off until
+  you ask. What is stored is what you *chose*, which is the opposite way round from the
+  navigation and is what makes both of those true; never-arranged and arranged-to-nothing
+  are different values, so clearing the page stays cleared instead of handing the defaults
+  back. Several widgets read the same expensive pass over the event log, and it happens
+  once per page however many of them are on it. ``/applications/insights/`` redirects to
+  the dashboard, so a bookmark still lands. The browser suite checks a dashboard carrying
+  every widget at once, in both themes — markup that a walk of addresses can no longer
+  reach. (#44)
+
 ### Added
 
 - **The languages of Africa, and everything a language needs before its words arrive.**
@@ -54,32 +129,6 @@ All notable changes to Postulo are recorded here. The format follows
   template or stylesheet class naming a left or a right, and a **browser suite** that reads
   the application in a right-to-left language — in both themes, through axe — and measures
   that the buttons, the board and the skip link actually moved. (#67)
-
-### Changed
-
-- **The dashboard and Insights are one page, built from widgets you arrange.** They
-  answered the same question — *how is this going?* — at two distances, and you had to
-  remember which page held which number. Neither could be adjusted: the dashboard showed
-  everybody the same six counters, and Insights showed a response funnel to somebody with
-  three applications. Everything both pages held is now a **widget**: seventeen of them,
-  each knowing what it computes and which template draws it, registered from
-  ``AppConfig.ready`` the way settings sections and capture sources already are. What you
-  see and in what order is stored on your profile, and *Settings → Dashboard* arranges it
-  with buttons rather than dragging — arranging is done once and then not again, and a form
-  that posts works from a keyboard, with a screen reader and with scripts off. **Nothing
-  changes for anybody who never opens it**: the standard arrangement is exactly what the
-  dashboard showed before, in the same order, and a widget added in a later release joins
-  it by itself. Once you have arranged the page it is yours, and new widgets stay off until
-  you ask. What is stored is what you *chose*, which is the opposite way round from the
-  navigation and is what makes both of those true; never-arranged and arranged-to-nothing
-  are different values, so clearing the page stays cleared instead of handing the defaults
-  back. Several widgets read the same expensive pass over the event log, and it happens
-  once per page however many of them are on it. ``/applications/insights/`` redirects to
-  the dashboard, so a bookmark still lands. The browser suite checks a dashboard carrying
-  every widget at once, in both themes — markup that a walk of addresses can no longer
-  reach. (#44)
-
-### Added
 
 - **The Europass import reads the current JSON format as well as the legacy XML.** The XML
   is what the old CV editor produced and what an old file on a disk still is; the JSON is

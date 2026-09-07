@@ -13,7 +13,11 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # `main` and every release branch. Work moved onto per-release branches after 0.2.0
+    # closed, and for a while nothing pushed there was checked at all: the filter said
+    # `main` and the commits were going somewhere else. A branch whose name starts with a
+    # digit is a release branch here -- 0.3.0, 0.4.0, and whatever follows them.
+    branches: [main, "[0-9]*"]
   pull_request:
   schedule:
     # The dependency audit below also runs weekly, so a vulnerability disclosed in a
@@ -121,10 +125,18 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Audit the Python dependencies
-        # pip-audit reads the locked environment, so what is checked is exactly what runs.
+        # The lock file rather than the installed environment, and the difference is why
+        # this job failed on every run for a fortnight: `uv sync` installs Postulo itself
+        # as an editable package, `--strict` fails on anything it cannot look up, and
+        # Postulo is not on PyPI. The audit never reported on the dependencies at all --
+        # it stopped at the project. Exporting the lock without the project audits exactly
+        # what will be installed and keeps `--strict`, so a dependency that becomes
+        # unauditable still fails the build, which is the whole point of it.
         run: |
-          uv sync --locked --python 3.14 --all-groups
-          uv run --with pip-audit pip-audit --strict --progress-spinner off
+          uv export --no-emit-project --all-groups --format requirements-txt --no-hashes \
+            > /tmp/locked-requirements.txt
+          uv run --with pip-audit pip-audit --strict --progress-spinner off \
+            -r /tmp/locked-requirements.txt
 
       - name: Audit the asset build's Node dependencies
         run: |
@@ -134,7 +146,21 @@ jobs:
       - name: Audit the workflows themselves
         # A workflow is code that runs with the repository's credentials; zizmor checks
         # for injected expressions, over-broad permissions and unpinned actions.
-        run: uvx zizmor --no-progress --config .forgejo/zizmor.yml --min-severity medium .forgejo/workflows/*.yml
+        #
+        # `--offline` is not a concession, it is the correct mode here. zizmor takes a
+        # GitHub token from GH_TOKEN or GITHUB_TOKEN, Forgejo Actions sets the latter, and
+        # zizmor then asked github.com about `actions/checkout` using a Forgejo token --
+        # which github.com answered with 401, failing the whole job. But the deeper problem
+        # is that the question was wrong: Forgejo resolves a bare action name against its
+        # own instance, as the note at the top of this file says, so what GitHub thinks
+        # `actions/checkout@v4` refers to is not what runs here. The online audits would
+        # give a confident answer about the wrong host.
+        #
+        # This is also why it passed on a laptop: with no token in the environment zizmor
+        # defaults to offline, so the failure only ever appeared in CI.
+        run: >
+          uvx zizmor --offline --no-progress --config .forgejo/zizmor.yml
+          --min-severity medium .forgejo/workflows/*.yml
 
   styles:
     # The compiled stylesheet is committed so that the application runs without Node.

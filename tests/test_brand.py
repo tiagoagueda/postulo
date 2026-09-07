@@ -43,8 +43,15 @@ def test_every_derived_image_is_committed(name):
     assert path.stat().st_size > 0
 
 
-def test_the_derived_images_match_the_source():
-    """CI runs the same check, so a changed logo cannot land without its derivatives."""
+def test_the_derived_images_were_built_from_the_committed_source():
+    """CI runs the same check, so a changed logo cannot land without its derivatives.
+
+    It compares recorded digests rather than rebuilding and comparing bytes. Rebuilding
+    does not give the same bytes on two machines — Pillow's platform wheels round LANCZOS
+    differently, and the three small icons matched while everything from 64 pixels up did
+    not — so the old check reported the mark as stale on every run that was not the
+    author's. A check whose answer depends on which machine asked is not a check.
+    """
     import subprocess
     import sys
 
@@ -56,6 +63,19 @@ def test_the_derived_images_match_the_source():
         cwd=root,
     )
     assert finished.returncode == 0, finished.stderr
+
+
+def test_the_record_covers_every_derived_image_and_the_recipe():
+    """What `--check` reads. A file absent from it is a file nothing is checking."""
+    import json
+
+    root = Path(__file__).resolve().parents[1]
+    recorded = json.loads((root / "assets" / "brand" / "brand.json").read_text(encoding="utf-8"))
+
+    assert recorded["source"], "the source digest is what says the mark has not changed"
+    on_disk = {path.name for path in BRAND.glob("*.png")} | {"favicon.ico"}
+    assert set(recorded["derived"]) == on_disk, "the record and static/brand disagree"
+    assert set(recorded["spec"]), "the sizes and paddings are part of what was built"
 
 
 def test_the_favicon_is_square_and_the_size_it_claims():
