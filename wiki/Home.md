@@ -10,9 +10,10 @@ letters, and the record of what actually happened, on hardware you control.
 
 From the Latin *postulō* — "I apply for". First person, deliberately.
 
-> **Status: 0.1.0.** Usable, and used — but by one person, for days rather than months.
-> Treat it as a first release that works rather than as a mature one. See
-> [Roadmap](Roadmap).
+> **Status.** The last tagged release is **0.1.0**, and a great deal has landed since
+> without being released — releasing is a deliberate act here. Usable and used, but by one
+> person, for weeks rather than years: treat it as something that works rather than
+> something that is mature. [Roadmap](Roadmap) says exactly what is in and what is not.
 
 ## Never paywalled
 

@@ -8,6 +8,22 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **The roadmap contradicted the issue tracker, and the security policy asked for an email
+  it never gave.** *Roadmap* said "nothing is planned before somebody has run this for a
+  while" while seven issues stood open across four milestones, and listed as *after version
+  1* four things that already exist — the browser extension is two extensions, email
+  ingestion is `postulo-imap`, calendar synchronisation is `postulo-dav`, and French and
+  Portuguese are two of the twenty-four languages that shipped. A page whose stated purpose
+  is that "nothing on this wiki reads as a promise" was doing the opposite. It now
+  separates what is released from what has landed since, names the milestones in progress,
+  points at the tracker as the authority, and lists the eight separate repositories that
+  were once future work. `SECURITY.md` said "email the maintainer" and gave no address, on
+  the one page whose entire purpose is to be reachable; it gives one now. `docs/PLAN.md`
+  stopped at v0.1.0 and still assumed the translations were waiting on contributors, which
+  the twenty-four completed catalogues had settled. And the status lines said **0.1.0**
+  without saying whether that meant "current" or "the last thing anybody tagged" — it is
+  the second, and they say so. (#78)
+
 - **The workflow audit asked GitHub about a repository Forgejo never fetches from GitHub.**
   The last thing keeping continuous integration red: zizmor takes a GitHub token from
   `GH_TOKEN` or `GITHUB_TOKEN`, Forgejo Actions sets the latter, and zizmor then asked

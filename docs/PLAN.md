@@ -1,7 +1,11 @@
 # Postulo — implementation plan
 
-> **Status:** every milestone complete; v0.1.0 released. This is a living document,
-> revised as milestones land and assumptions meet reality.
+> **Status:** M0-M6 complete and released as v0.1.0; the 0.2.0 milestone complete and
+> unreleased; 0.3.0 onward in progress. This is a living document, revised as milestones
+> land and assumptions meet reality. The [issue tracker][issues] is the authority on what
+> is open — this document says why things are the shape they are.
+
+[issues]: https://source.tiagoagueda.com/postulo/postulo/issues
 
 ## 1. Mission
 
@@ -257,9 +261,25 @@ Each milestone ends green: migrations applied, tests passing, and a working inte
 M2 is the first point at which the application earns its keep, so nothing before it
 should be gold-plated.
 
-**Deliberately after v1:** the browser extension (M4's API is its foundation), LLM
-assistance for tailoring, email ingestion, calendar synchronisation, and the French and
-Portuguese translations themselves.
+### After v0.1.0
+
+The lettered milestones gave way to numbered ones, tracked as Forgejo milestones rather
+than here:
+
+| Milestone | Deliverable | State |
+| --- | --- | --- |
+| **0.2.0** | Every official language of the European Union; passkeys and SSO as a second factor; the security findings of a full audit; dashboard and Insights unified as arrangeable widgets; Europass import; ORCID; a readable log and Prometheus metrics | **Complete, unreleased** |
+| **0.3.0** | Right-to-left layout; the languages of Africa; parent and child companies; reports on the regularity of a search | In progress |
+| **0.4.0** | The languages of Asia and South America, and the fonts to draw them | Open |
+| **0.5.0** | The rest of the world's languages, and the tooling to add one without a developer | Open |
+| **0.6.0** | Readable and usable on a phone rather than merely rendered on one | Open |
+
+**What was "deliberately after v1" and is now built.** The browser extension (two of them,
+Chromium and Firefox, on M4's API as intended), email ingestion (`postulo-imap`) and
+calendar synchronisation (`postulo-dav`) all exist as separate repositories, and the French
+and Portuguese translations are two of the twenty-four that shipped in 0.2.0. What remains
+from that list is **LLM assistance for tailoring**, still wanted, still a plugin, still
+disabled by default and never required.
 
 ## 9. Open assumptions
 
@@ -276,5 +296,12 @@ Portuguese translations themselves.
 3. **`django-tasks-db` does not yet declare Django 6.1** in its classifiers, although it
    sets no upper pin and installs and migrates cleanly. Nothing queues work yet, so no
    worker runs; worth re-checking whenever something does.
-4. **Translation catalogues depend on contributors.** The application ships fully usable
-   in British English; French and Portuguese arrive when someone writes them.
+4. **Translation catalogues depend on contributors** — which turned out to be the wrong
+   assumption, and the right one is subtler. Twenty-four languages shipped in 0.2.0
+   without waiting for anybody, machine-drafted and each entry flagged `draft` until a
+   speaker reads it, because a translation somebody can correct beats an English gap
+   nobody notices. What still depends on contributors is **review**: every one of those
+   catalogues is complete and none has been read by a native speaker. The twenty-nine
+   African catalogues (0.3.0) exist and are empty, and a language is not offered until
+   somebody has begun its catalogue — offering a language and handing back English is a
+   promise with nothing behind it.
