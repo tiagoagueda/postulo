@@ -44,6 +44,18 @@
                   <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200">{% translate "not loaded" %}</span>
                 {% endif %}
               </p>
+              {% comment %} Read from the wheel at install time and, until #97, dropped
+                 the moment this page had shown it once. An administrator could see who
+                 wrote a plugin exactly on the day they installed it and never again.
+              {% endcomment %}
+              {% if plugin.summary %}<p class="text-sm">{{ plugin.summary }}</p>{% endif %}
+              {% if plugin.author or plugin.licence or plugin.source_url %}
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {% if plugin.author %}{{ plugin.author }}{% endif %}
+                  {% if plugin.licence %}{% if plugin.author %} · {% endif %}{{ plugin.licence }}{% endif %}
+                  {% if plugin.source_url %}{% if plugin.author or plugin.licence %} · {% endif %}<a href="{{ plugin.source_url }}" rel="noopener noreferrer external" target="_blank" class="text-brand-600 underline dark:text-brand-400">{% translate "Source" %}</a>{% endif %}
+                </p>
+              {% endif %}
               <p class="text-xs text-ink-500 dark:text-ink-400">
                 {{ plugin.origin }} · {{ plugin.source|truncatechars:60 }}
                 {% if plugin.installed_at %} · {{ plugin.installed_at }}{% endif %}
@@ -114,7 +126,7 @@
         {% if pending.summary %}<dt class="text-ink-500 dark:text-ink-400">{% translate "What it says it is" %}</dt><dd>{{ pending.summary }}</dd>{% endif %}
         {% if pending.licence %}<dt class="text-ink-500 dark:text-ink-400">{% translate "Licence" %}</dt><dd>{{ pending.licence }}</dd>{% endif %}
         {% if pending.author %}<dt class="text-ink-500 dark:text-ink-400">{% translate "Maintainer" %}</dt><dd>{{ pending.author }}</dd>{% endif %}
-        {% if pending.home_page %}<dt class="text-ink-500 dark:text-ink-400">{% translate "Home page" %}</dt><dd>{{ pending.home_page }}</dd>{% endif %}
+        {% if pending.source_url %}<dt class="text-ink-500 dark:text-ink-400">{% translate "Source" %}</dt><dd>{{ pending.source_url }}</dd>{% endif %}
         <dt class="text-ink-500 dark:text-ink-400">{% translate "Provides" %}</dt>
         <dd>{% for point in pending.entry_points %}<code class="text-xs">{{ point }}</code>{% if not forloop.last %} · {% endif %}{% empty %}—{% endfor %}</dd>
         <dt class="text-ink-500 dark:text-ink-400">{% translate "Depends on" %}</dt>

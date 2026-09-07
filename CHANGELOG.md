@@ -70,6 +70,23 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **A plugin's own description, licence, author and source link were read and then thrown
+  away.** All four came out of every wheel, the confirmation screen showed them once, and the
+  record kept none — so an administrator could see who wrote a plugin on the day they
+  installed it and never again. They are kept now, and shown on *Server settings → Plugins*.
+  **Two of the four were being read from headers modern packaging does not write**: `Home-page`
+  is setuptools' old `url=`, and anything using `[project.urls]` emits `Project-URL` instead.
+  That was not theoretical — Postulo's own reference plugin is built with hatchling and
+  declares its homepage that way, so the project showed no source link for the plugin it
+  publishes as the example to copy. `Author` was tried before `Author-email`, which meant
+  preferring a bare name over the `First Last <address>` the other field carries. An instance
+  that already has plugins fills in the blanks from the `.dist-info` still on its volume
+  rather than showing them empty for ever. A plugin may now also declare a `label` and a
+  `description` of its own — **optional, and read through helpers rather than added to the
+  protocols**, because `runtime_checkable` checks data members and requiring them would have
+  silently unloaded every plugin written before they existed. Twenty tests, one of them
+  standing guard over exactly that. (#97)
+
 - **The container's health check could not fail.** With `POSTULO_SSL_REDIRECT` on — the
   production default — `SecurityMiddleware` answered `/healthz` with a 301 to
   `https://127.0.0.1:8000/healthz`, before any view ran and before anything touched the

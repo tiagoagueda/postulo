@@ -566,7 +566,7 @@ class PluginActionView(StaffRequiredMixin, View):
             "summary": info.summary,
             "licence": info.licence,
             "author": info.author,
-            "home_page": info.home_page,
+            "source_url": info.source_url,
             "requires": info.requires,
             "entry_points": info.entry_points,
             "sha256": info.sha256,

@@ -80,7 +80,7 @@ class PackageInfo:
     summary: str = ""
     licence: str = ""
     author: str = ""
-    home_page: str = ""
+    source_url: str = ""
     requires_python: str = ""
     requires: list[str] = field(default_factory=list)
     entry_points: list[str] = field(default_factory=list)
@@ -106,6 +106,13 @@ class Installed:
     installed_by: str = ""
     entry_points: list[str] = field(default_factory=list)
     disabled: bool = False
+    #: What the wheel said about itself. Read at install time and, until #97, thrown away
+    #: the moment the confirmation screen had shown it -- so an administrator could see who
+    #: wrote a plugin exactly once, and never again.
+    summary: str = ""
+    licence: str = ""
+    author: str = ""
+    source_url: str = ""
     #: Everything that arrived alongside the wheel, as ``name==version``. The signature
     #: and the checksum cover the plugin's own file and nothing else: its requirements are
     #: resolved from PyPI at install time and are whatever was served that day. Recording
@@ -194,6 +201,45 @@ def canonicalise(name: str) -> str:
 # -------------------------------------------------------------- reading a wheel
 
 
+#: `Project-URL` labels that name where the code lives, best first. Projects label these
+#: however they like, so the list is a preference and the fallback is "whatever there is".
+SOURCE_URL_LABELS = ("source", "source code", "repository", "code", "homepage", "home")
+
+
+def _source_url(headers) -> str:
+    """Where a plugin's code lives, from whichever field its build backend used.
+
+    `Home-page` is setuptools' old `url=`, and asking only for that found nothing on any
+    modern wheel: `[project.urls]` in `pyproject.toml` becomes `Project-URL` instead. This
+    was not theoretical — Postulo's own reference plugin declares
+
+        [project.urls]
+        Homepage = "https://source.tiagoagueda.com/postulo/postulo-helloworld"
+
+    is built with hatchling, and so shipped no source link at all.
+    """
+    offered: dict[str, str] = {}
+    for entry in headers.get_all("Project-URL") or []:
+        label, _, url = entry.partition(",")
+        if url.strip():
+            offered.setdefault(label.strip().lower(), url.strip())
+    for label in SOURCE_URL_LABELS:
+        if label in offered:
+            return offered[label]
+    # Nothing recognised, so the first URL the project offered beats no URL at all.
+    return next(iter(offered.values()), "") or headers.get("Home-page", "") or ""
+
+
+def _author(headers) -> str:
+    """Who wrote it, preferring the field that carries a name *and* an address.
+
+    `Author-email` holds ``First Last <address>``; `Author` holds a bare name. Trying
+    `Author` first — which this did — picked the less informative of the two whenever a
+    package set both.
+    """
+    return headers.get("Author-email", "") or headers.get("Author", "") or ""
+
+
 def read_wheel(path: Path) -> PackageInfo:
     """What the wheel says about itself. Nothing is installed and no code is run."""
     if not zipfile.is_zipfile(path):
@@ -221,8 +267,8 @@ def read_wheel(path: Path) -> PackageInfo:
         version=headers.get("Version", ""),
         summary=headers.get("Summary", "") or "",
         licence=headers.get("License-Expression") or headers.get("License", "") or "",
-        author=headers.get("Author", "") or headers.get("Author-email", "") or "",
-        home_page=headers.get("Home-page", "") or "",
+        author=_author(headers),
+        source_url=_source_url(headers),
         requires_python=headers.get("Requires-Python", "") or "",
         requires=[
             value for value in (headers.get_all("Requires-Dist") or []) if "extra ==" not in value
@@ -448,6 +494,10 @@ def install_wheel(
         entry_points=info.entry_points,
         disabled=False,
         dependencies=arrived,
+        summary=info.summary,
+        licence=info.licence,
+        author=info.author,
+        source_url=info.source_url,
     )
     record = [item for item in read_record() if canonicalise(item.name) != canonicalise(info.name)]
     write_record([*record, entry])
@@ -517,6 +567,48 @@ def set_disabled(name: str, disabled: bool) -> Installed:
     raise InstallError(str(_("%(name)s is not installed.")) % {"name": name})
 
 
+def backfill_metadata() -> list[str]:
+    """Fill in what the record never kept, from the metadata still sitting on the volume.
+
+    Every plugin installed before #97 has a line in ``plugins.json`` with no summary, no
+    licence, no author and no source link — they were read from the wheel, shown once on
+    the confirmation screen, and dropped. The wheel itself is gone, but the ``.dist-info``
+    the installer wrote is right there in the plugins directory, and it carries the same
+    headers.
+
+    So an existing instance fills in rather than showing blanks for ever. Returns the names
+    it managed to complete. Anything it cannot find is left exactly as it was: a missing
+    author is a smaller problem than a wrong one.
+    """
+    directory = plugins_dir()
+    if not directory.is_dir():
+        return []
+
+    entries = read_record()
+    completed: list[str] = []
+    for entry in entries:
+        if entry.summary or entry.author or entry.source_url or entry.licence:
+            continue
+        canonical = canonicalise(entry.name)
+        for dist_info in directory.glob("*.dist-info"):
+            if canonicalise(dist_info.name.split("-")[0]) != canonical:
+                continue
+            metadata = dist_info / "METADATA"
+            if not metadata.is_file():
+                continue
+            headers = Parser().parsestr(metadata.read_text(encoding="utf-8", errors="replace"))
+            entry.summary = headers.get("Summary", "") or ""
+            entry.licence = headers.get("License-Expression") or headers.get("License", "") or ""
+            entry.author = _author(headers)
+            entry.source_url = _source_url(headers)
+            completed.append(entry.name)
+            break
+
+    if completed:
+        write_record(entries)
+    return completed
+
+
 def sync(*, fetch=None) -> tuple[list[str], list[str]]:
     """Reinstall anything the record lists that the directory no longer has.
 
@@ -525,6 +617,9 @@ def sync(*, fetch=None) -> tuple[list[str], list[str]]:
     is fetched again; without it, only what can be found locally is restored.
     """
     activate()
+    # An upgrade is exactly when a record written by an older Postulo is read by a newer
+    # one, so it is the right moment to complete it.
+    backfill_metadata()
     restored: list[str] = []
     lost: list[str] = []
     for entry in read_record():

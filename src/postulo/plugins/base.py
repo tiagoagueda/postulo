@@ -107,6 +107,32 @@ class CaptureError(Exception):
     """Raised when a page cannot be fetched or cannot be understood."""
 
 
+# ------------------------------------------------------- saying what a plugin is
+
+# A plugin may carry a `label` — its name in words — and a `description` saying what it
+# does. Neither is in the protocols above, and that is deliberate rather than an omission.
+#
+# `runtime_checkable` protocols check data members as well as methods, and `registry.py`
+# runs `isinstance` over every third-party plugin and drops the ones that fail. Adding
+# `label` and `description` to `SourcePlugin` would therefore not be a request: it would
+# silently unload every source anybody has already written, including the ones in this
+# project's own plugin repositories.
+#
+# So they are optional, read through these, and documented in `docs/PLUGINS.md` as worth
+# declaring. A plugin that says nothing gets its identifier back, which is what the
+# interface showed before any of this existed.
+
+
+def label_of(plugin) -> str:
+    """A plugin's name in words, falling back to the identifier it registered under."""
+    return str(getattr(plugin, "label", "") or getattr(plugin, "name", "") or "")
+
+
+def description_of(plugin) -> str:
+    """What a plugin says it does, or nothing. Nothing is a perfectly good answer."""
+    return str(getattr(plugin, "description", "") or "")
+
+
 # ------------------------------------------------------------------- importers
 
 #: Where an importer registers itself. Nothing publishes here yet — Europass is built in —

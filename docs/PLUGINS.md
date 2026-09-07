@@ -407,6 +407,33 @@ a second call finds the first suggestion and changes nothing, whether it is wait
 accepted or declined. That is what lets a mailbox be read every five minutes without
 asking the same question twice.
 
+## Saying who you are
+
+Postulo reads your wheel's metadata and keeps it, so an administrator can see what a plugin
+is and who wrote it without a shell. Declare these in `pyproject.toml` and they appear on
+*Server settings → Plugins*:
+
+```toml
+[project]
+description = "One sentence about what this does."
+license = "AGPL-3.0-or-later"
+authors = [{ name = "First Last", email = "first.last@example.org" }]
+
+[project.urls]
+Source = "https://example.org/your-plugin"
+```
+
+Both halves matter. `authors` **with an email** becomes `Author-email: First Last <address>`;
+without one it is just a name. And the URL is read from `Project-URL` — `Source` first, then
+`Repository`, then `Homepage` — because `Home-page` is setuptools' old field and modern
+backends do not write it.
+
+A plugin object may also carry a `label` (its name in words) and a `description`. Both are
+**optional**, read through `base.label_of` and `base.description_of`, and a plugin that
+declares neither gets its own identifier shown instead. They are deliberately not in the
+protocols: `runtime_checkable` checks data members, so requiring them would silently unload
+every plugin written before they existed.
+
 ## Importers
 
 An **importer** reads a person's career out of a file they upload — the mirror of a source,
