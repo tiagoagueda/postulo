@@ -8,20 +8,20 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Changed
 
-- **The one thing that pays for this is visible now.** Voluntary support was a sentence in
-  the middle of the README and absent from the wiki entirely. It is the project's *only*
-  income — not its main one — so it now carries Buy Me a Coffee's own button, under the
-  title in the README, in the wiki's opening page and in the sidebar of every wiki page,
-  with a `FUNDING.yml` so the GitHub mirror shows a Sponsor button too. The button is
-  **served from this repository rather than hotlinked**: the approved asset, a copy of it,
-  and no third-party request made of anybody who merely looks at the page — which is the
-  same rule the application itself follows. What has not changed, and is stated beside the
-  button each time, is that **nothing inside Postulo will ever ask for money**: no banner
-  in the interface, no prompt, no reminder on the dashboard. Asking is confined to the
-  places somebody has to come looking. It also says what to give instead, since for a lot
-  of people looking for work money is the wrong thing: a bug report, a translation reviewed
-  by somebody who speaks the language, or telling one person who needs this that it exists.
-  (#79)
+- **The one thing that pays for this is visible now.** Voluntary support was a sentence
+  buried in the README and absent from the wiki entirely. It is the project's *only*
+  income — not its main one — so it now carries Buy Me a Coffee's own button: once in the
+  README's support section, once on the wiki's opening page, and a link in the sidebar
+  every wiki page shows, with a `FUNDING.yml` so the GitHub mirror offers its Sponsor
+  button too. The button is **served from this repository rather than hotlinked** — the
+  approved asset, a copy of it — so that looking at the page makes no third-party request
+  of anybody, which is the rule the application itself follows. What has not changed, and
+  is restated beside the button each time, is that **nothing inside Postulo will ever ask
+  for money**: no banner in the interface, no prompt, no reminder on the dashboard. Asking
+  stays where somebody has to come looking for it. It also says what to give instead,
+  since for a great many people looking for work money is the wrong thing to be asked for:
+  a bug report, a translation reviewed by somebody who actually speaks the language, or
+  telling one person who needs this that it exists. (#79)
 
 ### Fixed
 

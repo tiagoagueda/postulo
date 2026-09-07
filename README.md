@@ -6,9 +6,6 @@
 
 **Self-hosted job application manager, from the applicant's side of the table.**
 
-<a href="https://buymeacoffee.com/tiagoagueda"><img src="assets/support/buy-me-a-coffee.png" alt="Buy me a coffee" height="40"></a>
-&nbsp;&nbsp;<sub>Voluntary support is this project's only income. Nothing in Postulo asks for it.</sub>
-
 Every applicant tracking system is built for the company doing the hiring. Postulo is
 built for the person applying: your applications, your CVs, your cover letters, your
 data, on your server.
