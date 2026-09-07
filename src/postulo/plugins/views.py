@@ -68,7 +68,7 @@ class ConnectionListView(OwnedObjectMixin, ListView):
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
-        installed = connected_plugins()
+        installed = connected_plugins(self.request.user)
         context["plugins_available"] = installed
         context["kind_labels"] = KIND_LABELS
         rows = []
@@ -100,7 +100,7 @@ class ConnectionPickView(OwnedObjectMixin, View):
     def get(self, request: HttpRequest) -> HttpResponse:
         plugins = [
             {"plugin": plugin, "kind_label": KIND_LABELS.get(plugin.kind, plugin.kind)}
-            for plugin in connected_plugins()
+            for plugin in connected_plugins(request.user)
         ]
         return render(
             request, self.template_name, {"plugins": plugins, "section_title": _("Connections")}

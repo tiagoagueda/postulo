@@ -23,7 +23,8 @@ from django.views.generic import ListView
 from postulo.core.mixins import OwnedObjectMixin
 from postulo.plugins.base import CaptureError
 from postulo.plugins.fetching import fetch_page
-from postulo.plugins.registry import available_sources, parse_page
+from postulo.plugins.policy import plugins_for
+from postulo.plugins.registry import parse_page
 
 from .models import Capture, CaptureStatus
 
@@ -67,7 +68,7 @@ class CaptureCreateView(OwnedObjectMixin, View):
         return render(
             request,
             self.template_name,
-            {"form": form, "sources": available_sources()},
+            {"form": form, "sources": plugins_for(request.user, "source")},
         )
 
     def get(self, request: HttpRequest) -> HttpResponse:

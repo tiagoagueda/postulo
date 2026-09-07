@@ -28,6 +28,51 @@
   </div>
 
   {# ------------------------------------------------------------ installed #}
+  {# --------------------------------------------------------- what is on #}
+
+  <h3 class="mb-3 font-medium">{% translate "What each plugin does, for everybody" %}</h3>
+  <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed %}
+      The default for every account. One person's exceptions are on their row under People.
+      Switching a plugin off stops it being used and deletes nothing.
+    {% endblocktranslate %}
+  </p>
+  <form method="post" action="{% url 'server:plugin_policy' %}" class="card mb-8 p-0">
+    {% csrf_token %}
+    <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+      {% for row in policy_rows %}
+        <li class="flex flex-wrap items-start gap-4 px-4 py-3" data-policy="{{ row.name }}">
+          <div class="min-w-0 flex-1">
+            <p class="font-medium">
+              {{ row.label }}
+              <span class="ml-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{{ row.kind }}</span>
+            </p>
+            {% if row.description %}<p class="text-xs text-ink-500 dark:text-ink-400">{{ row.description }}</p>{% endif %}
+          </div>
+          <div class="w-72 shrink-0">
+            <label class="sr-only" for="default-{{ row.name }}">
+              {% blocktranslate with plugin=row.label %}What {{ plugin }} does by default{% endblocktranslate %}
+            </label>
+            <select name="state:{{ row.name }}" id="default-{{ row.name }}" class="field-input w-full">
+              {% for value, label in policy_states %}
+                <option value="{{ value }}" {% if value == row.state %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </li>
+      {% empty %}
+        <li class="px-4 py-6 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Nothing is installed that a person can hold an opinion about." %}
+        </li>
+      {% endfor %}
+    </ul>
+    {% if policy_rows %}
+      <div class="border-t border-ink-100 px-4 py-3 dark:border-ink-800">
+        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+      </div>
+    {% endif %}
+  </form>
+
   {# ---------------------------------------------------------- repositories #}
 
   <h3 class="mb-3 font-medium">{% translate "Where plugins may come from" %}</h3>

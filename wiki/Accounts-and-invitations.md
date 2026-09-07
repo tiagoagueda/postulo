@@ -154,6 +154,13 @@ themselves — and nobody can deactivate or delete the account they are signed i
 that page. A username is unique across the instance whoever changes it: a name
 already in use, in any capitalisation, is refused before anything is saved.
 
+Each row's menu also holds **Plugins for this account** — the exceptions to what the
+instance decides for everybody. An administrator may make a plugin available, unavailable,
+always on or always off for one person, and whatever they decide is shown to that person on
+their own settings page with the administrator's name against it. Switching a plugin off
+stops it being used and deletes nothing: connections and their settings stay exactly as they
+are, and turning it back on brings them back unchanged.
+
 Each row's actions live behind the **⋮** button at its end. They used to sit across the row
 with their names spelled out, which made that one column a third of the table and pushed the
 whole thing off the side of the page at every window size. On a phone the rows stop being

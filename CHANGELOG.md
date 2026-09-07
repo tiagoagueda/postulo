@@ -8,6 +8,27 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **An administrator can decide a plugin for a person, and cannot decide it quietly.** Four
+  states — available, unavailable, always on, always off — set for the whole instance under
+  *Server settings → Plugins*, or for one account from its row under *People*. Three of the
+  plugin kinds exist to move somebody's data elsewhere, so this is a real power over another
+  person's account, and what makes it acceptable is that it is visible: whatever is decided is
+  shown to that person with the name of who decided it. **Unavailable and always-off are
+  deliberately different** — the first means *not part of your Postulo*, the second means *you
+  can see this exists and somebody switched it off for you*, and the second is the more honest
+  of the two. **Nothing is ever deleted.** Switching a plugin off stops it being used;
+  connections and their configuration stay exactly where they were, and reversing the decision
+  brings them back unchanged — a policy that destroyed data on the way would be a delete button
+  with a confusing name. A person's own choice survives being overruled and returns when the
+  overrule is lifted, and there is a test for that. **Forcing a plugin on does not make it
+  run**: a notifier, store or sync needs credentials only its owner can supply, so *on* means
+  "available to you and you may not switch it off" — the page says so rather than leaving it to
+  be discovered. Mail transports are exempt from all of it, because delivery is instance
+  infrastructure and *always off* for one would be an account nobody could recover. Who decided
+  and when live on the row, and every change is logged: *Server settings* has no audit trail of
+  any kind, and a decision about what somebody's account may run was the wrong place to wait
+  for one. (#95)
+
 - **Plugin repositories are rows an administrator manages, not one environment variable.**
   Catalogues already worked — a signed index, an Ed25519 key, a checksum for every wheel, and
   several of them supported at once. What did not exist was any way to manage one: they came

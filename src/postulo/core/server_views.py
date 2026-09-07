@@ -516,6 +516,10 @@ class PluginsView(ServerSectionMixin, TemplateView):
         context["catalogues_configured"] = sorted(catalogue.configured())
         context["repositories"] = _repositories()
         context["repository_form"] = kwargs.get("repository_form") or PluginRepositoryForm()
+        context["policy_rows"] = _policy_rows()
+        from postulo.plugins.models import PluginPolicy
+
+        context["policy_states"] = PluginPolicy.State.choices
         context["pending"] = self.request.session.get("plugin_pending")
         context["listings"] = self.request.session.get("plugin_listings", [])
         return context
@@ -567,6 +571,129 @@ def _repositories() -> list[dict]:
             }
         )
     return rows
+
+
+def _governed_plugins() -> list:
+    """Every plugin a person may hold an opinion about, in one list across the kinds."""
+    from postulo.plugins import policy
+    from postulo.plugins.registry import plugins
+
+    found = []
+    for kind in policy.GOVERNED_KINDS:
+        found.extend(plugins(kind))
+    return sorted(found, key=lambda item: (getattr(item, "kind", "source"), item.name))
+
+
+def _policy_rows(person=None) -> list[dict]:
+    """What is decided for each plugin, and by whom."""
+    from postulo.plugins import base
+    from postulo.plugins.models import PluginPolicy
+
+    stored = {row.plugin: row for row in PluginPolicy.objects.filter(person=person)}
+    rows = []
+    for plugin in _governed_plugins():
+        row = stored.get(plugin.name)
+        rows.append(
+            {
+                "name": plugin.name,
+                "label": base.label_of(plugin),
+                "description": base.description_of(plugin),
+                "kind": getattr(plugin, "kind", "source"),
+                "state": row.state if row else PluginPolicy.State.AVAILABLE,
+                "decided_by": row.decided_by if row else None,
+                "decided_at": row.decided_at if row else None,
+            }
+        )
+    return rows
+
+
+def _save_policies(request: HttpRequest, person=None) -> int:
+    """Write what was submitted, keeping only the decisions that are not the default.
+
+    A row per plugin per person would be a table that grows with the product of two things
+    that both grow. Absence means available, so the common answer is stored nowhere.
+    """
+    from postulo.plugins.models import PluginPolicy
+
+    states = {value for value, _label in PluginPolicy.State.choices}
+    changed = 0
+    for plugin in _governed_plugins():
+        wanted = request.POST.get(f"state:{plugin.name}", "")
+        if wanted not in states:
+            continue
+        existing = PluginPolicy.objects.filter(plugin=plugin.name, person=person).first()
+        if wanted == PluginPolicy.State.AVAILABLE:
+            if existing:
+                existing.delete()
+                changed += 1
+            continue
+        if existing and existing.state == wanted:
+            continue
+        PluginPolicy.objects.update_or_create(
+            plugin=plugin.name,
+            person=person,
+            defaults={"state": wanted, "decided_by": request.user},
+        )
+        changed += 1
+        logger.warning(
+            "Plugin %r set to %r for %s by %s",
+            plugin.name,
+            wanted,
+            person.username if person else "every account",
+            request.user.username,
+        )
+    return changed
+
+
+class PluginPolicyView(StaffRequiredMixin, View):
+    """The instance default for every plugin: available, unavailable, on, off.
+
+    Nothing here deletes anybody's connections. Switching a plugin off for an account stops
+    it being used; the credentials and the configuration stay exactly where they were, and
+    reversing the decision brings them back unchanged. A policy that destroyed data on the
+    way would be a delete button with a confusing name.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        changed = _save_policies(request)
+        messages.success(
+            request,
+            _("Saved.") if changed else _("Nothing was different."),
+        )
+        return redirect("server:plugins")
+
+
+class PersonPluginsView(StaffRequiredMixin, TemplateView):
+    """One account's exceptions to the instance default.
+
+    An administrator may compel as well as forbid, and this is where. The person is always
+    told what was decided for them and by whom — a locked control on their own settings
+    page rather than one that has quietly vanished (#96). That visibility is the whole
+    reason this is acceptable at all: the concern was never that an administrator holds the
+    power, it was that it could be held invisibly.
+    """
+
+    template_name = "server/person_plugins.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.person = get_object_or_404(get_user_model(), pk=kwargs["pk"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs) -> dict:
+        from postulo.plugins.models import PluginPolicy
+
+        context = super().get_context_data(**kwargs)
+        context["person"] = self.person
+        context["rows"] = _policy_rows(self.person)
+        context["defaults"] = {row["name"]: row["state"] for row in _policy_rows()}
+        context["states"] = PluginPolicy.State.choices
+        context["section_title"] = _("Plugins for %(name)s") % {"name": self.person.username}
+        return context
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        changed = _save_policies(request, self.person)
+        messages.success(request, _("Saved.") if changed else _("Nothing was different."))
+        return redirect("server:person_plugins", pk=self.person.pk)
 
 
 class PluginRepositoryView(StaffRequiredMixin, View):

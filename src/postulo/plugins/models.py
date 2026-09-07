@@ -85,6 +85,72 @@ class PluginRepository(models.Model):
         return bool(self.enabled and self.url and self.public_key)
 
 
+class PluginPolicy(models.Model):
+    """What an administrator has decided about a plugin — for everybody, or for one person.
+
+    Four states, and the difference between two of them is worth keeping.
+    *Unavailable* means the plugin is not part of your Postulo and you do not see it.
+    *Forced off* means you can see that it exists and that somebody switched it off for
+    you. The second is more honest and the first is quieter, and which is right depends on
+    why.
+
+    A row with no ``person`` is the instance default. A row with one is an exception for
+    that account. **No row at all means available**, which is why absence is the common
+    case and nothing has to be written when the default changes.
+
+    ``decided_by`` and ``decided_at`` are here because #95 asks that this be written down
+    and *Server settings* has no audit trail of any kind — no action on any of those pages
+    records anything today. Keeping who and when on the row itself is not a general trail;
+    it is the smallest honest version of one for the decision that most needs it.
+    """
+
+    class State(models.TextChoices):
+        AVAILABLE = "available", _("Available — the person chooses")
+        UNAVAILABLE = "unavailable", _("Unavailable — not offered at all")
+        FORCED_ON = "on", _("On — and they may not switch it off")
+        FORCED_OFF = "off", _("Off — and they may not switch it on")
+
+    plugin = models.CharField(_("plugin"), max_length=60)
+    person = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="plugin_policies",
+        verbose_name=_("person"),
+        help_text=_("Empty for the instance default; an account for an exception to it."),
+    )
+    state = models.CharField(_("state"), max_length=12, choices=State, default=State.AVAILABLE)
+    decided_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("decided by"),
+    )
+    decided_at = models.DateTimeField(_("decided"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("plugin policy")
+        verbose_name_plural = _("plugin policies")
+        ordering = ("plugin", "person_id")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("plugin", "person"),
+                name="one_plugin_policy_per_person",
+            ),
+            models.UniqueConstraint(
+                fields=("plugin",),
+                condition=models.Q(person__isnull=True),
+                name="one_default_policy_per_plugin",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.plugin}: {self.state}"
+
+
 class ConnectionQuerySet(models.QuerySet):
     def for_user(self, user) -> ConnectionQuerySet:
         if user is None or not getattr(user, "is_authenticated", False):

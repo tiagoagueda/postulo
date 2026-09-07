@@ -17,6 +17,12 @@ urlpatterns = [
     path("email/test/", views.EmailTestView.as_view(), name="email_test"),
     path("plugins/", views.PluginsView.as_view(), name="plugins"),
     path("plugins/action/", views.PluginActionView.as_view(), name="plugin_action"),
+    path("plugins/policy/", views.PluginPolicyView.as_view(), name="plugin_policy"),
+    path(
+        "people/<int:pk>/plugins/",
+        views.PersonPluginsView.as_view(),
+        name="person_plugins",
+    ),
     path(
         "plugins/repositories/",
         views.PluginRepositoryView.as_view(),

@@ -1,0 +1,89 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">
+    {% blocktranslate with name=person.username %}Plugins for {{ name }}{% endblocktranslate %}
+  </h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed %}
+      Exceptions to what this instance decides for everybody. Whatever you set here is shown
+      to this person on their own settings page, with your name against it.
+    {% endblocktranslate %}
+  </p>
+
+  {% comment %} Two things worth saying on the page rather than only in a commit message.
+
+     Forcing a connected plugin on does not make it run: a notifier, store or sync needs
+     credentials only this person can supply, so "on" means they may use it and may not
+     switch it off. A source is stateless and genuinely does turn on.
+
+     And nothing here deletes anything. Switching a plugin off stops it being used; the
+     connections and their configuration stay exactly where they are, and reversing the
+     decision brings them back unchanged.
+  {% endcomment %}
+  <div class="alert-info mb-6">
+    <div>
+      <p>
+        {% blocktranslate trimmed %}
+          Switching a plugin off stops it being used. It deletes nothing — connections and
+          their settings stay exactly as they are, and turning it back on brings them back
+          unchanged.
+        {% endblocktranslate %}
+      </p>
+      <p class="mt-2">
+        {% blocktranslate trimmed %}
+          Forcing one on does not make it run: a notifier, a store or a synchronisation
+          needs credentials only this person can give it. It means they may use it and may
+          not switch it off.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  </div>
+
+  <form method="post" class="card p-0">
+    {% csrf_token %}
+    <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+      {% for row in rows %}
+        <li class="flex flex-wrap items-start gap-4 px-4 py-3" data-policy="{{ row.name }}">
+          <div class="min-w-0 flex-1">
+            <p class="font-medium">
+              {{ row.label }}
+              <span class="ml-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{{ row.kind }}</span>
+            </p>
+            {% if row.description %}
+              <p class="text-xs text-ink-500 dark:text-ink-400">{{ row.description }}</p>
+            {% endif %}
+            {% if row.decided_by %}
+              <p class="text-xs text-ink-500 dark:text-ink-400">
+                {% blocktranslate trimmed with who=row.decided_by.username when=row.decided_at|date:"j M Y" %}
+                  Decided by {{ who }} on {{ when }}
+                {% endblocktranslate %}
+              </p>
+            {% endif %}
+          </div>
+          <div class="w-72 shrink-0">
+            <label class="sr-only" for="state-{{ row.name }}">
+              {% blocktranslate with plugin=row.label %}What {{ plugin }} does for this account{% endblocktranslate %}
+            </label>
+            <select name="state:{{ row.name }}" id="state-{{ row.name }}" class="field-input w-full">
+              {% for value, label in states %}
+                <option value="{{ value }}" {% if value == row.state %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </li>
+      {% empty %}
+        <li class="px-4 py-6 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Nothing is installed that a person can hold an opinion about." %}
+        </li>
+      {% endfor %}
+    </ul>
+    {% if rows %}
+      <div class="flex items-center gap-3 border-t border-ink-100 px-4 py-3 dark:border-ink-800">
+        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+        <a href="{% url 'server:people' %}" class="btn-ghost">{% translate "Back to people" %}</a>
+      </div>
+    {% endif %}
+  </form>
+{% endblock %}

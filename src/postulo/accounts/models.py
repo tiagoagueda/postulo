@@ -260,6 +260,13 @@ class Profile(models.Model):
     #: main navigation. Everything there is reachable another way, so hiding one takes
     #: nothing away; the row across the top is what runs out of room first.
     hidden_nav_items = models.JSONField(_("hidden navigation items"), default=list, blank=True)
+    #: Plugins this person has switched off for themselves. Stored as what was turned
+    #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
+    #: later release should be available without anybody having to opt into it.
+    #:
+    #: Only consulted where the choice is theirs to make. An administrator may take it
+    #: away, and `plugins.policy` decides that before this is looked at (#95).
+    plugins_off = models.JSONField(_("plugins switched off"), default=list, blank=True)
     #: How each table is laid out — which columns, in what order, how many rows a page
     #: holds — keyed by the table's name. A preference, so it follows the account.
     table_settings = models.JSONField(_("table settings"), default=dict, blank=True)

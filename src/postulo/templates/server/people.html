@@ -65,6 +65,9 @@
                     <a href="{% url 'server:person_username' person.pk %}" class="menu-item">
                       {% icon "pencil" %}{% translate "Change username" %}
                     </a>
+                    <a href="{% url 'server:person_plugins' person.pk %}" class="menu-item">
+                      {% icon "settings" %}{% translate "Plugins for this account" %}
+                    </a>
                     <form method="post" action="{% url 'server:person_admin' person.pk %}">
                       {% csrf_token %}
                       <button type="submit" class="menu-item">

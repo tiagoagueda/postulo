@@ -136,6 +136,7 @@ def test_every_signed_in_page_has_no_violations(
     sign_in(page, base)
     a = furnished["application"]
     c = furnished["company"]
+    me = furnished["applicant"]
     paths = [
         "/",
         "/listings/",
@@ -185,6 +186,7 @@ def test_every_signed_in_page_has_no_violations(
         "/accounts/delete/",
         "/server/overview/",
         "/server/people/",
+        f"/server/people/{me.pk}/plugins/",
         "/server/sign-in/",
         "/server/email/",
         "/server/plugins/",
@@ -429,6 +431,7 @@ VISITED_URL_NAMES: tuple[str, ...] = (
     "api:token_list",
     "server:overview",
     "server:people",
+    "server:person_plugins",
     "server:person_username",
     "server:person_delete",
     "server:signin",

@@ -159,15 +159,21 @@ def find_plugin(kind: str, name: str):
     return None
 
 
-def connected_plugins() -> list:
+def connected_plugins(person=None) -> list:
     """Every installed plugin a person can connect to, whatever its kind.
 
     A built-in that needs nothing from anyone — the local document store — says so with
     ``needs_connection = False`` and is left off the list: there is no form to draw.
+
+    Given a person, what an administrator has decided for them applies (#95). Without one
+    this is every installed plugin, which is what an administration page wants.
     """
+    from .policy import plugins_for
+
     found: list = []
     for kind in CONNECTED_KINDS:
-        found.extend(p for p in plugins(kind) if getattr(p, "needs_connection", True))
+        of_kind = plugins_for(person, kind) if person is not None else plugins(kind)
+        found.extend(p for p in of_kind if getattr(p, "needs_connection", True))
     return found
 
 
