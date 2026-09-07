@@ -8,6 +8,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **`FUNDING.md` says what the funding link means.** `.github/FUNDING.yml` held one URL,
+  and a URL cannot say what is being asked for, what it changes, or — the part that matters
+  — what it does not. So the companion says it: that nothing is ever paywalled and no
+  feature will be held back and sold separately; that **money buys no influence**, moves no
+  issue up the list and does not outweigh a good bug report from somebody who has given
+  nothing, because a project that sells priority has quietly become a product with
+  customers; what support actually pays for, in categories rather than amounts, since
+  publishing a figure implies a threshold and a threshold implies something happens when it
+  is missed; and what is worth as much from somebody with no money — which, for a great many
+  people looking for work, is the honest position. It ends by telling anyone who would
+  rather give to a person in worse need to do exactly that. (#89)
+
 - **Export has left the account menu.** It is a settings section of its own — *Settings →
   Your data*, beside deleting the account — so the header was a second permanent route to
   the same page, in a menu of five items where every other entry went somewhere different.

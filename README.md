@@ -43,6 +43,9 @@ If money is the wrong thing to give — and for a lot of people looking for work
 then a bug report, a translation reviewed by somebody who actually speaks the language, or
 telling one person who needs this that it exists are all worth as much.
 
+[FUNDING.md](FUNDING.md) is the long version: what support pays for, what it will never
+buy, and why money does not move an issue up the list.
+
 ## Secure, because of what it holds
 
 **Postulo holds the most personal documents a person has while looking for work, and it
