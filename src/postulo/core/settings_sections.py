@@ -91,6 +91,13 @@ BUILTIN: tuple[SettingsSection, ...] = (
         ),
     ),
     SettingsSection(
+        slug="plugins",
+        label=_("Plugins"),
+        url_name="settings:plugins",
+        icon="plus",
+        order=36,
+    ),
+    SettingsSection(
         slug="tokens",
         label=_("API tokens"),
         url_name="api:token_list",

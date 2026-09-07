@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 17:50+0000\n"
+"POT-Creation-Date: 2026-09-07 18:07+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: polski\n"
@@ -902,7 +902,7 @@ msgstr "Identyfikator „inny” potrzebuje nazwy."
 msgid "An address, or the link to the call."
 msgstr "Adres lub link do rozmowy."
 
-#: src/postulo/plugins/policy.py:59
+#: src/postulo/plugins/policy.py:62
 #, draft
 msgid "An administrator decided this for your account."
 msgstr "Administrator zdecydował o tym dla Twojego konta."
@@ -1000,7 +1000,7 @@ msgstr "API"
 msgid "API token"
 msgstr "Token API"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1210,7 +1210,7 @@ msgstr "Motoryzacja"
 msgid "Available — the person chooses"
 msgstr "Dostępne — decyduje osoba"
 
-#: src/postulo/plugins/policy.py:61
+#: src/postulo/plugins/policy.py:64
 #, draft
 msgid "Available; you have not changed it."
 msgstr "Dostępne; nic nie zmieniłeś."
@@ -2038,7 +2038,7 @@ msgstr "CV"
 msgid "Dark"
 msgstr "Ciemny"
 
-#: src/postulo/accounts/settings_views.py:113 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:158 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -2208,6 +2208,11 @@ msgstr "zdecydował"
 #, python-format, draft
 msgid "Decided by %(who)s on %(when)s"
 msgstr "Zdecydował(a) %(who)s dnia %(when)s"
+
+#: src/postulo/templates/settings/plugins.html:45
+#, python-format, draft
+msgid "Decided by %(who)s."
+msgstr "Zdecydował(a) %(who)s."
 
 #: src/postulo/jobs/models.py:444
 #, draft
@@ -4867,6 +4872,11 @@ msgstr ""
 msgid "Nothing is being kept."
 msgstr "Nic nie jest przechowywane."
 
+#: src/postulo/templates/settings/plugins.html:60
+#, draft
+msgid "Nothing is installed here that you can turn on or off."
+msgstr "Nie zainstalowano tu niczego, co mógłbyś włączyć lub wyłączyć."
+
 #: src/postulo/templates/server/plugins.html:241
 #, python-format, draft
 msgid ""
@@ -4999,6 +5009,7 @@ msgstr "Nic nie czeka"
 msgid "Nothing was added."
 msgstr "Nic nie dodano."
 
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:661 src/postulo/core/server_views.py:695
 #, draft
 msgid "Nothing was different."
@@ -5534,8 +5545,11 @@ msgstr "repozytoria wtyczek"
 msgid "plugin repository"
 msgstr "repozytorium wtyczek"
 
+#: src/postulo/accounts/settings_views.py:119
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:497
-#: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
+#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/templates/server/plugins.html:5
+#: src/postulo/templates/settings/plugins.html:5
 #, draft
 msgid "Plugins"
 msgstr "Wtyczki"
@@ -6400,6 +6414,7 @@ msgstr "wynagrodzenie do"
 #: src/postulo/templates/server/signin.html:87
 #: src/postulo/templates/settings/appearance.html:53
 #: src/postulo/templates/settings/locale.html:60
+#: src/postulo/templates/settings/plugins.html:55
 #, draft
 msgid "Save"
 msgstr "Zapisz"
@@ -6425,6 +6440,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Zapisano w twoich ofertach. Zdecyduj, kiedy będziesz gotowy."
 
 #: src/postulo/accounts/settings_views.py:35
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:661
 #: src/postulo/core/server_views.py:695 src/postulo/core/server_views.py:791
 #: src/postulo/resume/views.py:119
@@ -7069,7 +7085,7 @@ msgstr "Wyłącz"
 msgid "Switch on"
 msgstr "Włącz"
 
-#: src/postulo/plugins/policy.py:58
+#: src/postulo/plugins/policy.py:61
 #, draft
 msgid "Switched off for this whole instance."
 msgstr "Wyłączone dla całej tej instancji."
@@ -7080,6 +7096,13 @@ msgid ""
 "Switching a plugin off stops it being used. It deletes nothing — connections and their settings stay exactly as they are, and turning it back on brings them back unchanged."
 msgstr ""
 "Wyłączenie wtyczki wstrzymuje jej używanie. Niczego nie usuwa — połączenia i ich ustawienia pozostają dokładnie takie, jakie są, a ponowne włączenie przywraca je bez zmian."
+
+#: src/postulo/templates/settings/plugins.html:65
+#, draft
+msgid ""
+"Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
+msgstr ""
+"Wyłączenie wstrzymuje używanie i niczego nie usuwa: utworzone przez Ciebie połączenia pozostają dokładnie takie, jakie są, a ponowne włączenie przywraca je bez zmian."
 
 #: src/postulo/plugins/views.py:236
 #, python-format, draft
@@ -7357,7 +7380,7 @@ msgstr "To nie jest status, który Postulo rozpoznaje."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "To nie jest pakiet wheel: Postulo instaluje pliki .whl."
 
-#: src/postulo/accounts/settings_views.py:140
+#: src/postulo/accounts/settings_views.py:185
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "To nie jest widżet, który Postulo zna."
@@ -8433,6 +8456,13 @@ msgstr "Co jest w pliku"
 msgid "What is on this CV"
 msgstr "Co jest w tym CV"
 
+#: src/postulo/templates/settings/plugins.html:7
+#, draft
+msgid ""
+"What is running for your account, and who decided it. This is per account, not per browser: signing in somewhere else does not change it."
+msgstr ""
+"Co działa dla Twojego konta i kto o tym zdecydował. Dotyczy konta, a nie przeglądarki: zalogowanie się gdzie indziej tego nie zmienia."
+
 #: src/postulo/api/forms.py:27
 #, draft
 msgid "What it may do"
@@ -8852,7 +8882,7 @@ msgstr ""
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Nie możesz dezaktywować konta, na które jesteś zalogowany."
 
-#: src/postulo/plugins/policy.py:60
+#: src/postulo/plugins/policy.py:63
 #, draft
 msgid "You chose this."
 msgstr "Ty to wybrałeś."
@@ -8959,7 +8989,7 @@ msgstr "Twoje CV"
 msgid "Your dashboard is empty"
 msgstr "Twój pulpit jest pusty"
 
-#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:103
+#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"

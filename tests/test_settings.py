@@ -103,6 +103,7 @@ def test_a_plugin_can_add_a_section(client, user):
             "locale",
             "account",
             "connections",
+            "plugins",
             "tokens",
             "weather",
             "data",

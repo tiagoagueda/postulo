@@ -10,4 +10,5 @@ urlpatterns = [
     path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
     path("language/", views.LocaleView.as_view(), name="locale"),
     path("account/", views.AccountView.as_view(), name="account"),
+    path("plugins/", views.PluginsView.as_view(), name="plugins"),
 ]

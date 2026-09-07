@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 17:50+0000\n"
+"POT-Creation-Date: 2026-09-07 18:07+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -949,7 +949,7 @@ msgstr "Teastaíonn ainm ó aitheantóir “eile”."
 msgid "An address, or the link to the call."
 msgstr "Seoladh, nó an nasc chuig an nglao."
 
-#: src/postulo/plugins/policy.py:59
+#: src/postulo/plugins/policy.py:62
 #, draft
 msgid "An administrator decided this for your account."
 msgstr "Shocraigh riarthóir é seo ar son do chuntais."
@@ -1048,7 +1048,7 @@ msgstr "API"
 msgid "API token"
 msgstr "Comhartha API"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1260,7 +1260,7 @@ msgstr "Gluaisteáin"
 msgid "Available — the person chooses"
 msgstr "Ar fáil — roghnaíonn an duine"
 
-#: src/postulo/plugins/policy.py:61
+#: src/postulo/plugins/policy.py:64
 #, draft
 msgid "Available; you have not changed it."
 msgstr "Ar fáil; níor athraigh tú aon rud."
@@ -2088,7 +2088,7 @@ msgstr "CVanna"
 msgid "Dark"
 msgstr "Dorcha"
 
-#: src/postulo/accounts/settings_views.py:113 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:158 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -2259,6 +2259,11 @@ msgstr "socraithe ag"
 #, python-format, draft
 msgid "Decided by %(who)s on %(when)s"
 msgstr "Shocraigh %(who)s é ar %(when)s"
+
+#: src/postulo/templates/settings/plugins.html:45
+#, python-format, draft
+msgid "Decided by %(who)s."
+msgstr "Shocraigh %(who)s é."
 
 #: src/postulo/jobs/models.py:444
 #, draft
@@ -4927,6 +4932,11 @@ msgstr ""
 msgid "Nothing is being kept."
 msgstr "Níl aon rud á choinneáil."
 
+#: src/postulo/templates/settings/plugins.html:60
+#, draft
+msgid "Nothing is installed here that you can turn on or off."
+msgstr "Níl aon rud suiteáilte anseo ar féidir leat é a lasadh nó a mhúchadh."
+
 #: src/postulo/templates/server/plugins.html:241
 #, python-format, draft
 msgid ""
@@ -5059,6 +5069,7 @@ msgstr "Níl aon rud ag fanacht"
 msgid "Nothing was added."
 msgstr "Níor cuireadh aon rud leis."
 
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:661 src/postulo/core/server_views.py:695
 #, draft
 msgid "Nothing was different."
@@ -5606,8 +5617,11 @@ msgstr "stórais breiseán"
 msgid "plugin repository"
 msgstr "stór breiseán"
 
+#: src/postulo/accounts/settings_views.py:119
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:497
-#: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
+#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/templates/server/plugins.html:5
+#: src/postulo/templates/settings/plugins.html:5
 #, draft
 msgid "Plugins"
 msgstr "Breiseáin"
@@ -6476,6 +6490,7 @@ msgstr "tuarastal go"
 #: src/postulo/templates/server/signin.html:87
 #: src/postulo/templates/settings/appearance.html:53
 #: src/postulo/templates/settings/locale.html:60
+#: src/postulo/templates/settings/plugins.html:55
 #, draft
 msgid "Save"
 msgstr "Sábháil"
@@ -6501,6 +6516,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Sábháilte i do chuid fógraí. Déan cinneadh faoi nuair a bheidh tú réidh."
 
 #: src/postulo/accounts/settings_views.py:35
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:661
 #: src/postulo/core/server_views.py:695 src/postulo/core/server_views.py:791
 #: src/postulo/resume/views.py:119
@@ -7146,7 +7162,7 @@ msgstr "Múch é"
 msgid "Switch on"
 msgstr "Las é"
 
-#: src/postulo/plugins/policy.py:58
+#: src/postulo/plugins/policy.py:61
 #, draft
 msgid "Switched off for this whole instance."
 msgstr "Múchta don ásc iomlán seo."
@@ -7157,6 +7173,13 @@ msgid ""
 "Switching a plugin off stops it being used. It deletes nothing — connections and their settings stay exactly as they are, and turning it back on brings them back unchanged."
 msgstr ""
 "Stopann múchadh breiseáin a úsáid. Ní scriosann sé aon rud — fanann naisc agus a gcuid socruithe díreach mar atá siad, agus tugann é a lasadh arís ar ais gan athrú iad."
+
+#: src/postulo/templates/settings/plugins.html:65
+#, draft
+msgid ""
+"Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
+msgstr ""
+"Stopann ceann a mhúchadh a úsáid agus ní scriosann sé aon rud: fanann na naisc a rinne tú díreach mar atá siad, agus tugann é a lasadh arís ar ais gan athrú iad."
 
 #: src/postulo/plugins/views.py:236
 #, python-format, draft
@@ -7433,7 +7456,7 @@ msgstr "Ní stádas é sin a aithníonn Postulo."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Ní roth é sin: suiteálann Postulo comhaid .whl."
 
-#: src/postulo/accounts/settings_views.py:140
+#: src/postulo/accounts/settings_views.py:185
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Ní giuirléid í sin a aithníonn Postulo."
@@ -8522,6 +8545,13 @@ msgstr "A bhfuil sa chomhad"
 msgid "What is on this CV"
 msgstr "Cad atá ar an CV seo"
 
+#: src/postulo/templates/settings/plugins.html:7
+#, draft
+msgid ""
+"What is running for your account, and who decided it. This is per account, not per browser: signing in somewhere else does not change it."
+msgstr ""
+"Cad atá ag rith do do chuntas, agus cé a shocraigh é. Baineann sé leis an gcuntas, ní leis an mbrabhsálaí: ní athraíonn logáil isteach in áit eile é."
+
 #: src/postulo/api/forms.py:27
 #, draft
 msgid "What it may do"
@@ -8947,7 +8977,7 @@ msgid "You cannot deactivate the account you are signed in with."
 msgstr ""
 "Ní féidir leat an cuntas a bhfuil tú sínithe isteach leis a dhíghníomhachtú."
 
-#: src/postulo/plugins/policy.py:60
+#: src/postulo/plugins/policy.py:63
 #, draft
 msgid "You chose this."
 msgstr "Roghnaigh tú é seo."
@@ -9058,7 +9088,7 @@ msgstr "Do CVanna"
 msgid "Your dashboard is empty"
 msgstr "Tá do phainéal folamh"
 
-#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:103
+#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"

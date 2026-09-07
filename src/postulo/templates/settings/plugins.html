@@ -1,0 +1,69 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Plugins" %}</h2>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed %}
+      What is running for your account, and who decided it. This is per account, not per
+      browser: signing in somewhere else does not change it.
+    {% endblocktranslate %}
+  </p>
+
+  {% comment %} A form and a Save button, so this works with no JavaScript at all.
+
+     A row that is not yours to change is shown disabled with the reason beside it rather
+     than hidden. Hiding it would be the quiet version of the very thing this page exists
+     to prevent: an administrator may decide a plugin for your account, and you are
+     entitled to see that they did and who they were.
+
+     A disabled checkbox submits nothing, which is why the view only acts on rows it has
+     already established are yours.
+  {% endcomment %}
+  {% if rows %}
+    <form method="post" class="card p-0">
+      {% csrf_token %}
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for row in rows %}
+          <li class="flex items-start gap-3 px-4 py-3" data-plugin="{{ row.name }}">
+            <input type="checkbox" name="on" value="{{ row.name }}" id="plugin-{{ row.name }}"
+                   class="mt-1"
+                   {% if row.on %}checked{% endif %}
+                   {% if not row.theirs %}disabled aria-describedby="why-{{ row.name }}"{% endif %}>
+            <div class="min-w-0 flex-1">
+              <label for="plugin-{{ row.name }}" class="font-medium {% if not row.theirs %}text-ink-500 dark:text-ink-400{% endif %}">
+                {{ row.label }}
+              </label>
+              <span class="ml-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{{ row.kind }}</span>
+              {% if row.description %}
+                <p class="text-xs text-ink-500 dark:text-ink-400">{{ row.description }}</p>
+              {% endif %}
+              <p class="text-xs text-ink-500 dark:text-ink-400" id="why-{{ row.name }}">
+                {{ row.why }}
+                {% if row.who %}
+                  {% blocktranslate trimmed with who=row.who.username %}
+                    Decided by {{ who }}.
+                  {% endblocktranslate %}
+                {% endif %}
+              </p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="border-t border-ink-100 px-4 py-3 dark:border-ink-800">
+        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+      </div>
+    </form>
+  {% else %}
+    <div class="card text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Nothing is installed here that you can turn on or off." %}
+    </div>
+  {% endif %}
+
+  <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed %}
+      Switching one off stops it being used and deletes nothing: any connections you have
+      made stay exactly as they are, and turning it back on brings them back unchanged.
+    {% endblocktranslate %}
+  </p>
+{% endblock %}

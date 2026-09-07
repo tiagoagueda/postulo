@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 17:50+0000\n"
+"POT-Creation-Date: 2026-09-07 18:07+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: eesti\n"
@@ -882,7 +882,7 @@ msgstr "„Muu“ tunnus vajab nime."
 msgid "An address, or the link to the call."
 msgstr "Aadress või kõne link."
 
-#: src/postulo/plugins/policy.py:59
+#: src/postulo/plugins/policy.py:62
 #, draft
 msgid "An administrator decided this for your account."
 msgstr "Administraator otsustas selle teie konto eest."
@@ -980,7 +980,7 @@ msgstr "API"
 msgid "API token"
 msgstr "API tõend"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1192,7 +1192,7 @@ msgstr "Autotööstus"
 msgid "Available — the person chooses"
 msgstr "Saadaval — inimene otsustab"
 
-#: src/postulo/plugins/policy.py:61
+#: src/postulo/plugins/policy.py:64
 #, draft
 msgid "Available; you have not changed it."
 msgstr "Saadaval; te pole midagi muutnud."
@@ -2020,7 +2020,7 @@ msgstr "CV-d"
 msgid "Dark"
 msgstr "Tume"
 
-#: src/postulo/accounts/settings_views.py:113 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:158 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -2190,6 +2190,11 @@ msgstr "otsustas"
 #, python-format, draft
 msgid "Decided by %(who)s on %(when)s"
 msgstr "Otsustas %(who)s kuupäeval %(when)s"
+
+#: src/postulo/templates/settings/plugins.html:45
+#, python-format, draft
+msgid "Decided by %(who)s."
+msgstr "Otsustas %(who)s."
 
 #: src/postulo/jobs/models.py:444
 #, draft
@@ -4849,6 +4854,11 @@ msgstr ""
 msgid "Nothing is being kept."
 msgstr "Midagi ei hoita."
 
+#: src/postulo/templates/settings/plugins.html:60
+#, draft
+msgid "Nothing is installed here that you can turn on or off."
+msgstr "Siia pole paigaldatud midagi, mida saaksite sisse või välja lülitada."
+
 #: src/postulo/templates/server/plugins.html:241
 #, python-format, draft
 msgid ""
@@ -4980,6 +4990,7 @@ msgstr "Miski ei oota"
 msgid "Nothing was added."
 msgstr "Midagi ei lisatud."
 
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:661 src/postulo/core/server_views.py:695
 #, draft
 msgid "Nothing was different."
@@ -5510,8 +5521,11 @@ msgstr "pistikprogrammide hoidlad"
 msgid "plugin repository"
 msgstr "pistikprogrammide hoidla"
 
+#: src/postulo/accounts/settings_views.py:119
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:497
-#: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
+#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/templates/server/plugins.html:5
+#: src/postulo/templates/settings/plugins.html:5
 #, draft
 msgid "Plugins"
 msgstr "Pistikprogrammid"
@@ -6373,6 +6387,7 @@ msgstr "palk kuni"
 #: src/postulo/templates/server/signin.html:87
 #: src/postulo/templates/settings/appearance.html:53
 #: src/postulo/templates/settings/locale.html:60
+#: src/postulo/templates/settings/plugins.html:55
 #, draft
 msgid "Save"
 msgstr "Salvesta"
@@ -6398,6 +6413,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Salvestatud teie kuulutuste hulka. Otsustage, kui olete valmis."
 
 #: src/postulo/accounts/settings_views.py:35
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:661
 #: src/postulo/core/server_views.py:695 src/postulo/core/server_views.py:791
 #: src/postulo/resume/views.py:119
@@ -7041,7 +7057,7 @@ msgstr "Lülita välja"
 msgid "Switch on"
 msgstr "Lülita sisse"
 
-#: src/postulo/plugins/policy.py:58
+#: src/postulo/plugins/policy.py:61
 #, draft
 msgid "Switched off for this whole instance."
 msgstr "Välja lülitatud kogu selles serveris."
@@ -7052,6 +7068,13 @@ msgid ""
 "Switching a plugin off stops it being used. It deletes nothing — connections and their settings stay exactly as they are, and turning it back on brings them back unchanged."
 msgstr ""
 "Pistikprogrammi väljalülitamine peatab selle kasutamise. See ei kustuta midagi — ühendused ja nende seaded jäävad täpselt samaks ning uuesti sisselülitamine toob need muutumatuna tagasi."
+
+#: src/postulo/templates/settings/plugins.html:65
+#, draft
+msgid ""
+"Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
+msgstr ""
+"Väljalülitamine peatab kasutamise ega kustuta midagi: teie loodud ühendused jäävad täpselt samaks ja uuesti sisselülitamine toob need muutumatuna tagasi."
 
 #: src/postulo/plugins/views.py:236
 #, python-format, draft
@@ -7328,7 +7351,7 @@ msgstr "See ei ole olek, mida Postulo tunneb."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "See pole wheel: Postulo paigaldab .whl-faile."
 
-#: src/postulo/accounts/settings_views.py:140
+#: src/postulo/accounts/settings_views.py:185
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "See pole vidin, mida Postulo tunneb."
@@ -8398,6 +8421,13 @@ msgstr "Mis failis on"
 msgid "What is on this CV"
 msgstr "Mis on selles CV-s"
 
+#: src/postulo/templates/settings/plugins.html:7
+#, draft
+msgid ""
+"What is running for your account, and who decided it. This is per account, not per browser: signing in somewhere else does not change it."
+msgstr ""
+"Mis teie konto jaoks töötab ja kes selle otsustas. See käib konto, mitte brauseri kohta: mujal sisse logimine seda ei muuda."
+
 #: src/postulo/api/forms.py:27
 #, draft
 msgid "What it may do"
@@ -8817,7 +8847,7 @@ msgstr ""
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Te ei saa deaktiveerida kontot, millega olete sisse logitud."
 
-#: src/postulo/plugins/policy.py:60
+#: src/postulo/plugins/policy.py:63
 #, draft
 msgid "You chose this."
 msgstr "Te valisite selle."
@@ -8922,7 +8952,7 @@ msgstr "Teie CV-d"
 msgid "Your dashboard is empty"
 msgstr "Sinu töölaud on tühi"
 
-#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:103
+#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"

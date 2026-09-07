@@ -48,6 +48,9 @@ class Decision:
     theirs: bool
     #: ``instance``, ``administrator``, ``person`` or ``default`` — for #96 to show.
     decided_by: str
+    #: The administrator who decided, where one did and is still an account. A person is
+    #: entitled to know *who*, not merely that somebody did.
+    who: object = None
 
     @property
     def imposed(self) -> bool:
@@ -88,11 +91,17 @@ def decide(plugin_name: str, person) -> Decision:
     state = row.state if row else PluginPolicy.State.AVAILABLE
 
     if state == PluginPolicy.State.UNAVAILABLE:
-        return Decision(on=False, offered=False, theirs=False, decided_by="administrator")
+        return Decision(
+            on=False, offered=False, theirs=False, decided_by="administrator", who=row.decided_by
+        )
     if state == PluginPolicy.State.FORCED_ON:
-        return Decision(on=True, offered=True, theirs=False, decided_by="administrator")
+        return Decision(
+            on=True, offered=True, theirs=False, decided_by="administrator", who=row.decided_by
+        )
     if state == PluginPolicy.State.FORCED_OFF:
-        return Decision(on=False, offered=True, theirs=False, decided_by="administrator")
+        return Decision(
+            on=False, offered=True, theirs=False, decided_by="administrator", who=row.decided_by
+        )
 
     chosen_off = plugin_name in _their_choices(person)
     return Decision(
@@ -133,6 +142,41 @@ def set_choice(person, plugin_name: str, *, on: bool) -> bool:
     profile.plugins_off = sorted(chosen)
     profile.save(update_fields=["plugins_off"])
     return True
+
+
+def overview(person) -> list[dict]:
+    """Every plugin this person can see, what it is doing, and who said so.
+
+    The page this feeds (#96) exists for one row of it: the one an administrator decided.
+    A permission somebody holds over your account should be visible from your own settings
+    without your having to ask anybody, or the arrangement is one worth avoiding.
+
+    Plugins that are *unavailable* are left out — that is what unavailable means. A plugin
+    forced off is included, because being told it was switched off for you is the whole
+    difference between the two states.
+    """
+    from . import base
+    from .registry import plugins
+
+    rows = []
+    for kind in GOVERNED_KINDS:
+        for plugin in plugins(kind):
+            decision = decide(plugin.name, person)
+            if not decision.offered:
+                continue
+            rows.append(
+                {
+                    "name": plugin.name,
+                    "label": base.label_of(plugin),
+                    "description": base.description_of(plugin),
+                    "kind": kind,
+                    "on": decision.on,
+                    "theirs": decision.theirs,
+                    "why": decision.explain(),
+                    "who": decision.who,
+                }
+            )
+    return rows
 
 
 def plugins_for(person, kind: str) -> list:

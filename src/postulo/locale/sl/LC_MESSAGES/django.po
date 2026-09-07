@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 17:50+0000\n"
+"POT-Creation-Date: 2026-09-07 18:07+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenščina\n"
@@ -924,7 +924,7 @@ msgstr "Identifikator »drugo« potrebuje ime."
 msgid "An address, or the link to the call."
 msgstr "Naslov ali povezava do klica."
 
-#: src/postulo/plugins/policy.py:59
+#: src/postulo/plugins/policy.py:62
 #, draft
 msgid "An administrator decided this for your account."
 msgstr "Skrbnik je to odločil za vaš račun."
@@ -1022,7 +1022,7 @@ msgstr "API"
 msgid "API token"
 msgstr "Žeton API"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1234,7 +1234,7 @@ msgstr "Avtomobilska industrija"
 msgid "Available — the person chooses"
 msgstr "Na voljo — odloči oseba"
 
-#: src/postulo/plugins/policy.py:61
+#: src/postulo/plugins/policy.py:64
 #, draft
 msgid "Available; you have not changed it."
 msgstr "Na voljo; ničesar niste spremenili."
@@ -2062,7 +2062,7 @@ msgstr "Življenjepisi"
 msgid "Dark"
 msgstr "Temno"
 
-#: src/postulo/accounts/settings_views.py:113 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:158 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -2232,6 +2232,11 @@ msgstr "odločil"
 #, python-format, draft
 msgid "Decided by %(who)s on %(when)s"
 msgstr "Odločil(a) %(who)s dne %(when)s"
+
+#: src/postulo/templates/settings/plugins.html:45
+#, python-format, draft
+msgid "Decided by %(who)s."
+msgstr "Odločil(a) %(who)s."
 
 #: src/postulo/jobs/models.py:444
 #, draft
@@ -4887,6 +4892,11 @@ msgstr ""
 msgid "Nothing is being kept."
 msgstr "Nič se ne hrani."
 
+#: src/postulo/templates/settings/plugins.html:60
+#, draft
+msgid "Nothing is installed here that you can turn on or off."
+msgstr "Tukaj ni nameščeno nič, kar bi lahko vklopili ali izklopili."
+
 #: src/postulo/templates/server/plugins.html:241
 #, python-format, draft
 msgid ""
@@ -5018,6 +5028,7 @@ msgstr "Nič ne čaka"
 msgid "Nothing was added."
 msgstr "Nič ni bilo dodano."
 
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:661 src/postulo/core/server_views.py:695
 #, draft
 msgid "Nothing was different."
@@ -5560,8 +5571,11 @@ msgstr "repozitoriji vtičnikov"
 msgid "plugin repository"
 msgstr "repozitorij vtičnikov"
 
+#: src/postulo/accounts/settings_views.py:119
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:497
-#: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
+#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/templates/server/plugins.html:5
+#: src/postulo/templates/settings/plugins.html:5
 #, draft
 msgid "Plugins"
 msgstr "Vtičniki"
@@ -6426,6 +6440,7 @@ msgstr "plača do"
 #: src/postulo/templates/server/signin.html:87
 #: src/postulo/templates/settings/appearance.html:53
 #: src/postulo/templates/settings/locale.html:60
+#: src/postulo/templates/settings/plugins.html:55
 #, draft
 msgid "Save"
 msgstr "Shrani"
@@ -6451,6 +6466,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Shranjeno med vaše oglase. Odločite se, ko boste pripravljeni."
 
 #: src/postulo/accounts/settings_views.py:35
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:661
 #: src/postulo/core/server_views.py:695 src/postulo/core/server_views.py:791
 #: src/postulo/resume/views.py:119
@@ -7094,7 +7110,7 @@ msgstr "Izklopi"
 msgid "Switch on"
 msgstr "Vklopi"
 
-#: src/postulo/plugins/policy.py:58
+#: src/postulo/plugins/policy.py:61
 #, draft
 msgid "Switched off for this whole instance."
 msgstr "Izklopljeno za celoten ta strežnik."
@@ -7105,6 +7121,13 @@ msgid ""
 "Switching a plugin off stops it being used. It deletes nothing — connections and their settings stay exactly as they are, and turning it back on brings them back unchanged."
 msgstr ""
 "Izklop vtičnika ustavi njegovo uporabo. Ničesar ne izbriše — povezave in njihove nastavitve ostanejo natanko take, kot so, in ponovni vklop jih vrne nespremenjene."
+
+#: src/postulo/templates/settings/plugins.html:65
+#, draft
+msgid ""
+"Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
+msgstr ""
+"Izklop ustavi uporabo in ničesar ne izbriše: povezave, ki ste jih ustvarili, ostanejo natanko take, kot so, in ponovni vklop jih vrne nespremenjene."
 
 #: src/postulo/plugins/views.py:236
 #, python-format, draft
@@ -7381,7 +7404,7 @@ msgstr "To ni stanje, ki ga Postulo pozna."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "To ni kolo: Postulo namešča datoteke .whl."
 
-#: src/postulo/accounts/settings_views.py:140
+#: src/postulo/accounts/settings_views.py:185
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "To ni gradnik, ki bi ga Postulo poznal."
@@ -8458,6 +8481,13 @@ msgstr "Kaj je v datoteki"
 msgid "What is on this CV"
 msgstr "Kaj je v tem življenjepisu"
 
+#: src/postulo/templates/settings/plugins.html:7
+#, draft
+msgid ""
+"What is running for your account, and who decided it. This is per account, not per browser: signing in somewhere else does not change it."
+msgstr ""
+"Kaj teče za vaš račun in kdo je to odločil. To velja za račun, ne za brskalnik: prijava drugje tega ne spremeni."
+
 #: src/postulo/api/forms.py:27
 #, draft
 msgid "What it may do"
@@ -8877,7 +8907,7 @@ msgstr ""
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Računa, s katerim ste prijavljeni, ne morete deaktivirati."
 
-#: src/postulo/plugins/policy.py:60
+#: src/postulo/plugins/policy.py:63
 #, draft
 msgid "You chose this."
 msgstr "To ste izbrali vi."
@@ -8985,7 +9015,7 @@ msgstr "Vaši življenjepisi"
 msgid "Your dashboard is empty"
 msgstr "Vaša nadzorna plošča je prazna"
 
-#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:103
+#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"

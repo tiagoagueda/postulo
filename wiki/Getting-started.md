@@ -37,6 +37,10 @@ How Postulo behaves for you lives under **Settings**, one section per page:
   translation is a machine-assisted draft says so in the list until a speaker has
   reviewed it, and [translating](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/TRANSLATING.md)
   is the easiest way to help.
+- **Plugins** — what is running for your account, and who decided it. Anything you may
+  change, you change here; anything an administrator decided for you is shown switched the
+  way they set it, locked, with their name against it. Switching one off stops it being
+  used and deletes nothing.
 - **Account** — your username, your email addresses, your password, two-factor
   authentication, and any single sign-on connected to the account.
 - **Connections** — where the plugins that act for you (notifications, document stores,

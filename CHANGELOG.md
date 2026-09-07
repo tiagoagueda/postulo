@@ -8,6 +8,21 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A person can see which plugins are running for their account, and who decided.**
+  *Settings → Plugins*, a new section. *Connections* answers "what have I set up"; it says
+  nothing about the parsers that read a posting off a page — they need no connection, so they
+  appeared nowhere at all — and nothing about **why** a plugin is available. This page exists
+  mainly for one of its rows: the one an administrator decided. A control that is not yours to
+  change is shown **disabled with the reason beside it and their name**, rather than hidden,
+  because hiding it would be the quiet version of exactly what the page is against. A plugin
+  made *unavailable* does not appear, which is what unavailable means; one forced *off* does,
+  because being told it was switched off for you is the whole difference between the two. A
+  form and a Save button, so it works with no JavaScript at all. The page says **per account,
+  not per browser** — the request had asked for "in their session", and plugin state survives
+  signing out and does not change when you sign in elsewhere; a page saying *session* while
+  meaning *account* would teach people something untrue about where their settings live.
+  (#96)
+
 - **An administrator can decide a plugin for a person, and cannot decide it quietly.** Four
   states — available, unavailable, always on, always off — set for the whole instance under
   *Server settings → Plugins*, or for one account from its row under *People*. Three of the

@@ -97,6 +97,51 @@ class AccountView(SettingsSectionMixin, UpdateView):
         return context
 
 
+class PluginsView(SettingsSectionMixin, TemplateView):
+    """What is running for this account, and who decided it.
+
+    *Settings → Connections* answers "what have I set up". It says nothing about the
+    parsers that read a posting off a page, which need no connection and so appear nowhere,
+    and nothing about **why** a plugin is available at all.
+
+    This page exists mainly for one of its rows: the one an administrator decided. #95 lets
+    them make a plugin available, unavailable, always on or always off for a named account,
+    and the whole reason that is acceptable is that it cannot be held quietly. A permission
+    somebody holds over your account should be visible from your own settings without your
+    having to ask anybody.
+
+    A form and a Save button, so it works with no JavaScript at all — and a control that is
+    not yours to change is shown disabled with the reason beside it, rather than hidden.
+    Hiding it would be the quiet version of exactly what this page is against.
+    """
+
+    template_name = "settings/plugins.html"
+    section_title = _("Plugins")
+
+    def get_context_data(self, **kwargs):
+        from postulo.plugins import policy
+
+        context = super().get_context_data(**kwargs)
+        context["rows"] = policy.overview(self.request.user)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        from postulo.plugins import policy
+
+        wanted = set(request.POST.getlist("on"))
+        changed = 0
+        for row in policy.overview(request.user):
+            # Only what is theirs. `set_choice` refuses the rest anyway, which matters:
+            # a disabled checkbox submits nothing, so without that refusal a locked-on
+            # plugin would read as "switch me off" on every save.
+            if row["theirs"] and policy.set_choice(
+                request.user, row["name"], on=row["name"] in wanted
+            ):
+                changed += 1
+        messages.success(request, _("Saved.") if changed else _("Nothing was different."))
+        return redirect("settings:plugins")
+
+
 class DashboardView(SettingsSectionMixin, TemplateView):
     """Arranging the dashboard: which widgets, in what order.
 

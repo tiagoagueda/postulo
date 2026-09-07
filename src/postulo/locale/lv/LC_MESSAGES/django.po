@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 17:50+0000\n"
+"POT-Creation-Date: 2026-09-07 18:07+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: latviešu\n"
@@ -898,7 +898,7 @@ msgstr "Identifikatoram “cits” vajag nosaukumu."
 msgid "An address, or the link to the call."
 msgstr "Adrese vai saite uz zvanu."
 
-#: src/postulo/plugins/policy.py:59
+#: src/postulo/plugins/policy.py:62
 #, draft
 msgid "An administrator decided this for your account."
 msgstr "Administrators to izlēma jūsu konta vietā."
@@ -996,7 +996,7 @@ msgstr "API"
 msgid "API token"
 msgstr "API žetons"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1207,7 +1207,7 @@ msgstr "Autobūve"
 msgid "Available — the person chooses"
 msgstr "Pieejams — izvēlas persona"
 
-#: src/postulo/plugins/policy.py:61
+#: src/postulo/plugins/policy.py:64
 #, draft
 msgid "Available; you have not changed it."
 msgstr "Pieejams; jūs neko neesat mainījis."
@@ -2036,7 +2036,7 @@ msgstr "CV"
 msgid "Dark"
 msgstr "Tumšs"
 
-#: src/postulo/accounts/settings_views.py:113 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:158 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -2206,6 +2206,11 @@ msgstr "izlēma"
 #, python-format, draft
 msgid "Decided by %(who)s on %(when)s"
 msgstr "Izlēma %(who)s %(when)s"
+
+#: src/postulo/templates/settings/plugins.html:45
+#, python-format, draft
+msgid "Decided by %(who)s."
+msgstr "Izlēma %(who)s."
 
 #: src/postulo/jobs/models.py:444
 #, draft
@@ -4860,6 +4865,11 @@ msgstr ""
 msgid "Nothing is being kept."
 msgstr "Nekas netiek glabāts."
 
+#: src/postulo/templates/settings/plugins.html:60
+#, draft
+msgid "Nothing is installed here that you can turn on or off."
+msgstr "Šeit nav uzstādīts nekas, ko jūs varētu ieslēgt vai izslēgt."
+
 #: src/postulo/templates/server/plugins.html:241
 #, python-format, draft
 msgid ""
@@ -4991,6 +5001,7 @@ msgstr "Nekas negaida"
 msgid "Nothing was added."
 msgstr "Nekas netika pievienots."
 
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:661 src/postulo/core/server_views.py:695
 #, draft
 msgid "Nothing was different."
@@ -5525,8 +5536,11 @@ msgstr "spraudņu repozitoriji"
 msgid "plugin repository"
 msgstr "spraudņu repozitorijs"
 
+#: src/postulo/accounts/settings_views.py:119
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:497
-#: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
+#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/templates/server/plugins.html:5
+#: src/postulo/templates/settings/plugins.html:5
 #, draft
 msgid "Plugins"
 msgstr "Spraudņi"
@@ -6390,6 +6404,7 @@ msgstr "alga līdz"
 #: src/postulo/templates/server/signin.html:87
 #: src/postulo/templates/settings/appearance.html:53
 #: src/postulo/templates/settings/locale.html:60
+#: src/postulo/templates/settings/plugins.html:55
 #, draft
 msgid "Save"
 msgstr "Saglabāt"
@@ -6415,6 +6430,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Saglabāts jūsu sludinājumos. Izlemiet, kad esat gatavs."
 
 #: src/postulo/accounts/settings_views.py:35
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:661
 #: src/postulo/core/server_views.py:695 src/postulo/core/server_views.py:791
 #: src/postulo/resume/views.py:119
@@ -7058,7 +7074,7 @@ msgstr "Izslēgt"
 msgid "Switch on"
 msgstr "Ieslēgt"
 
-#: src/postulo/plugins/policy.py:58
+#: src/postulo/plugins/policy.py:61
 #, draft
 msgid "Switched off for this whole instance."
 msgstr "Izslēgts visā šajā serverī."
@@ -7069,6 +7085,13 @@ msgid ""
 "Switching a plugin off stops it being used. It deletes nothing — connections and their settings stay exactly as they are, and turning it back on brings them back unchanged."
 msgstr ""
 "Spraudņa izslēgšana pārtrauc tā lietošanu. Tas neko nedzēš — savienojumi un to iestatījumi paliek tieši tādi, kādi ir, un ieslēgšana atpakaļ atgriež tos nemainītus."
+
+#: src/postulo/templates/settings/plugins.html:65
+#, draft
+msgid ""
+"Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
+msgstr ""
+"Viena izslēgšana pārtrauc tā lietošanu un neko nedzēš: jūsu izveidotie savienojumi paliek tieši tādi, kādi ir, un ieslēgšana atpakaļ atgriež tos nemainītus."
 
 #: src/postulo/plugins/views.py:236
 #, python-format, draft
@@ -7344,7 +7367,7 @@ msgstr "Tas nav statuss, ko Postulo atpazīst."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Tas nav wheel: Postulo instalē .whl failus."
 
-#: src/postulo/accounts/settings_views.py:140
+#: src/postulo/accounts/settings_views.py:185
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Tas nav logrīks, ko Postulo pazīst."
@@ -8419,6 +8442,13 @@ msgstr "Kas ir failā"
 msgid "What is on this CV"
 msgstr "Kas ir šajā CV"
 
+#: src/postulo/templates/settings/plugins.html:7
+#, draft
+msgid ""
+"What is running for your account, and who decided it. This is per account, not per browser: signing in somewhere else does not change it."
+msgstr ""
+"Kas darbojas jūsu kontā un kas to izlēma. Tas attiecas uz kontu, nevis uz pārlūku: pieteikšanās citur to nemaina."
+
 #: src/postulo/api/forms.py:27
 #, draft
 msgid "What it may do"
@@ -8836,7 +8866,7 @@ msgstr ""
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Nevarat deaktivizēt kontu, ar kuru esat pieteicies."
 
-#: src/postulo/plugins/policy.py:60
+#: src/postulo/plugins/policy.py:63
 #, draft
 msgid "You chose this."
 msgstr "Jūs to izvēlējāties."
@@ -8943,7 +8973,7 @@ msgstr "Jūsu CV"
 msgid "Your dashboard is empty"
 msgstr "Jūsu panelis ir tukšs"
 
-#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:103
+#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"

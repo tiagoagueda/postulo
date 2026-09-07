@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 17:50+0000\n"
+"POT-Creation-Date: 2026-09-07 18:07+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -883,7 +883,7 @@ msgstr "Az „egyéb” azonosítónak névre van szüksége."
 msgid "An address, or the link to the call."
 msgstr "Egy cím, vagy a hívás linkje."
 
-#: src/postulo/plugins/policy.py:59
+#: src/postulo/plugins/policy.py:62
 #, draft
 msgid "An administrator decided this for your account."
 msgstr "Egy rendszergazda döntött erről a fiókod helyett."
@@ -981,7 +981,7 @@ msgstr "API"
 msgid "API token"
 msgstr "API-token"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1193,7 +1193,7 @@ msgstr "Autóipar"
 msgid "Available — the person chooses"
 msgstr "Elérhető — a személy dönt"
 
-#: src/postulo/plugins/policy.py:61
+#: src/postulo/plugins/policy.py:64
 #, draft
 msgid "Available; you have not changed it."
 msgstr "Elérhető; nem változtattál semmin."
@@ -2021,7 +2021,7 @@ msgstr "Önéletrajzok"
 msgid "Dark"
 msgstr "Sötét"
 
-#: src/postulo/accounts/settings_views.py:113 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:158 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -2192,6 +2192,11 @@ msgstr "eldöntötte"
 #, python-format, draft
 msgid "Decided by %(who)s on %(when)s"
 msgstr "Eldöntötte: %(who)s, ekkor: %(when)s"
+
+#: src/postulo/templates/settings/plugins.html:45
+#, python-format, draft
+msgid "Decided by %(who)s."
+msgstr "Eldöntötte: %(who)s."
 
 #: src/postulo/jobs/models.py:444
 #, draft
@@ -4856,6 +4861,11 @@ msgstr ""
 msgid "Nothing is being kept."
 msgstr "Semmi sem kerül megőrzésre."
 
+#: src/postulo/templates/settings/plugins.html:60
+#, draft
+msgid "Nothing is installed here that you can turn on or off."
+msgstr "Nincs itt telepítve semmi, amit be- vagy kikapcsolhatnál."
+
 #: src/postulo/templates/server/plugins.html:241
 #, python-format, draft
 msgid ""
@@ -4988,6 +4998,7 @@ msgstr "Semmi sem vár"
 msgid "Nothing was added."
 msgstr "Semmi sem került hozzáadásra."
 
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:661 src/postulo/core/server_views.py:695
 #, draft
 msgid "Nothing was different."
@@ -5522,8 +5533,11 @@ msgstr "bővítménytárolók"
 msgid "plugin repository"
 msgstr "bővítménytároló"
 
+#: src/postulo/accounts/settings_views.py:119
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:497
-#: src/postulo/plugins/apps.py:9 src/postulo/templates/server/plugins.html:5
+#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/templates/server/plugins.html:5
+#: src/postulo/templates/settings/plugins.html:5
 #, draft
 msgid "Plugins"
 msgstr "Bővítmények"
@@ -6388,6 +6402,7 @@ msgstr "fizetés eddig"
 #: src/postulo/templates/server/signin.html:87
 #: src/postulo/templates/settings/appearance.html:53
 #: src/postulo/templates/settings/locale.html:60
+#: src/postulo/templates/settings/plugins.html:55
 #, draft
 msgid "Save"
 msgstr "Mentés"
@@ -6413,6 +6428,7 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Elmentve a hirdetéseid közé. Dönts, amikor készen állsz."
 
 #: src/postulo/accounts/settings_views.py:35
+#: src/postulo/accounts/settings_views.py:141
 #: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:661
 #: src/postulo/core/server_views.py:695 src/postulo/core/server_views.py:791
 #: src/postulo/resume/views.py:119
@@ -7057,7 +7073,7 @@ msgstr "Kikapcsolás"
 msgid "Switch on"
 msgstr "Bekapcsolás"
 
-#: src/postulo/plugins/policy.py:58
+#: src/postulo/plugins/policy.py:61
 #, draft
 msgid "Switched off for this whole instance."
 msgstr "Az egész példányon kikapcsolva."
@@ -7068,6 +7084,13 @@ msgid ""
 "Switching a plugin off stops it being used. It deletes nothing — connections and their settings stay exactly as they are, and turning it back on brings them back unchanged."
 msgstr ""
 "Egy bővítmény kikapcsolása megállítja a használatát. Semmit sem töröl — a kapcsolatok és beállításaik pontosan úgy maradnak, ahogy vannak, és a visszakapcsolás változatlanul hozza vissza őket."
+
+#: src/postulo/templates/settings/plugins.html:65
+#, draft
+msgid ""
+"Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
+msgstr ""
+"Egy kikapcsolása megállítja a használatát és semmit sem töröl: az általad létrehozott kapcsolatok pontosan úgy maradnak, ahogy vannak, és a visszakapcsolás változatlanul hozza vissza őket."
 
 #: src/postulo/plugins/views.py:236
 #, python-format, draft
@@ -7346,7 +7369,7 @@ msgstr "Ez nem olyan állapot, amelyet a Postulo ismer."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Ez nem wheel: a Postulo .whl fájlokat telepít."
 
-#: src/postulo/accounts/settings_views.py:140
+#: src/postulo/accounts/settings_views.py:185
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Ez nem olyan elem, amelyet a Postulo ismerne."
@@ -8424,6 +8447,13 @@ msgstr "Mi van a fájlban"
 msgid "What is on this CV"
 msgstr "Mi van ezen az önéletrajzon"
 
+#: src/postulo/templates/settings/plugins.html:7
+#, draft
+msgid ""
+"What is running for your account, and who decided it. This is per account, not per browser: signing in somewhere else does not change it."
+msgstr ""
+"Mi fut a fiókodnál, és ki döntött róla. Ez a fiókra vonatkozik, nem a böngészőre: máshol bejelentkezve sem változik."
+
 #: src/postulo/api/forms.py:27
 #, draft
 msgid "What it may do"
@@ -8843,7 +8873,7 @@ msgstr ""
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Nem tilthatod le azt a fiókot, amellyel be vagy jelentkezve."
 
-#: src/postulo/plugins/policy.py:60
+#: src/postulo/plugins/policy.py:63
 #, draft
 msgid "You chose this."
 msgstr "Ezt te választottad."
@@ -8947,7 +8977,7 @@ msgstr "Az önéletrajzaid"
 msgid "Your dashboard is empty"
 msgstr "Az irányítópultja üres"
 
-#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:103
+#: src/postulo/accounts/views.py:246 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
