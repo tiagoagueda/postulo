@@ -23,6 +23,22 @@ Everything this software does is available in full to everyone who runs it — n
 tier, no "pro" edition, no licence key, no feature that unlocks later. That is a
 commitment, not a strategy, and it does not change.
 
+### If it is worth something to you
+
+**Voluntary support is this project's only income** — not its main one, its only one.
+There is no company behind Postulo and no paid tier waiting to appear once enough people
+depend on it. One person writes it.
+
+<a href="https://buymeacoffee.com/tiagoagueda"><img src="images/buy-me-a-coffee.png" alt="Buy me a coffee" height="44"></a>
+
+Nothing is owed and nothing is unlocked by it. And **nothing inside Postulo will ever ask
+you for money**: no banner in the interface, no prompt, no reminder on the dashboard. This
+page is where the question is put, and nowhere else.
+
+If money is the wrong thing to give — and for a lot of people looking for work, it is —
+a bug report, a translation reviewed by somebody who actually speaks the language, or
+telling one person who needs this that it exists are worth as much.
+
 ## Modular by design
 
 Anything that could reasonably vary sits behind an interface that a separately installed

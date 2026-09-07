@@ -6,6 +6,9 @@
 
 **Self-hosted job application manager, from the applicant's side of the table.**
 
+<a href="https://buymeacoffee.com/tiagoagueda"><img src="assets/support/buy-me-a-coffee.png" alt="Buy me a coffee" height="40"></a>
+&nbsp;&nbsp;<sub>Voluntary support is this project's only income. Nothing in Postulo asks for it.</sub>
+
 Every applicant tracking system is built for the company doing the hiring. Postulo is
 built for the person applying: your applications, your CVs, your cover letters, your
 data, on your server.
@@ -27,9 +30,23 @@ Everything this software does is available in full to everyone who runs it: no p
 tier, no "pro" edition, no licence key, no feature that unlocks later. The licence
 guarantees that for the code; this paragraph guarantees it for the project's intentions.
 
-The project's only source of income is voluntary support at
-[buymeacoffee.com/tiagoagueda](https://buymeacoffee.com/tiagoagueda). Nothing is owed,
-nothing is unlocked by it, and nothing in Postulo will ever ask for it.
+### If it is worth something to you
+
+**Voluntary support is this project's only income.** Not its main one — its only one.
+There is no company behind Postulo, no funding round, no paid tier waiting to appear once
+enough people depend on it. One person writes it, and what it costs to keep going comes
+from people who decided it was worth something.
+
+<a href="https://buymeacoffee.com/tiagoagueda"><img src="assets/support/buy-me-a-coffee.png" alt="Buy me a coffee" height="44"></a>
+
+Nothing is owed. Nothing is unlocked by it, now or later — that is what the paragraph above
+promises and it is not negotiable. And **nothing inside Postulo will ever ask you for
+money**: no banner in the interface, no prompt, no reminder on the dashboard. This is the
+only place the question is put, which is why it is put plainly here.
+
+If money is the wrong thing to give — and for a lot of people looking for work, it is —
+then a bug report, a translation reviewed by somebody who actually speaks the language, or
+telling one person who needs this that it exists are all worth as much.
 
 ## Secure, because of what it holds
 
