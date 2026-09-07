@@ -114,30 +114,13 @@ def sign_in(page: Page, base: str) -> None:
     expect(page).to_have_url(f"{base}/")
 
 
-@pytest.mark.parametrize("scheme", ["light", "dark"])
-def test_the_entrance_pages_have_no_violations(live_server, page: Page, axe_source, db, scheme):
-    page.emulate_media(color_scheme=scheme)
-    base = live_server.url
-    failures = []
-    for path in ("/accounts/login/", "/accounts/password/reset/", "/"):
-        page.goto(f"{base}{path}")
-        found = violations_on(page, axe_source)
-        if found:
-            failures.append(describe(f"{path} ({scheme})", found))
-    assert not failures, "\n\n".join(failures)
+def signed_in_paths(a, c, me) -> list[str]:
+    """Every address the signed-in walk visits, given an application, a company and an account.
 
-
-@pytest.mark.parametrize("scheme", ["light", "dark"])
-def test_every_signed_in_page_has_no_violations(
-    live_server, page: Page, axe_source, furnished, scheme
-):
-    page.emulate_media(color_scheme=scheme)
-    base = live_server.url
-    sign_in(page, base)
-    a = furnished["application"]
-    c = furnished["company"]
-    me = furnished["applicant"]
-    paths = [
+    Hoisted out of the test that grew it so other suites can walk the same list rather than
+    keep a second one that drifts. `tests/test_page_coverage.py` holds it to the resolver.
+    """
+    return [
         "/",
         "/listings/",
         "/listings/new/",
@@ -217,6 +200,32 @@ def test_every_signed_in_page_has_no_violations(
         "/server/logs/",
         "/accounts/invitations/new/",
     ]
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_entrance_pages_have_no_violations(live_server, page: Page, axe_source, db, scheme):
+    page.emulate_media(color_scheme=scheme)
+    base = live_server.url
+    failures = []
+    for path in ("/accounts/login/", "/accounts/password/reset/", "/"):
+        page.goto(f"{base}{path}")
+        found = violations_on(page, axe_source)
+        if found:
+            failures.append(describe(f"{path} ({scheme})", found))
+    assert not failures, "\n\n".join(failures)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_every_signed_in_page_has_no_violations(
+    live_server, page: Page, axe_source, furnished, scheme
+):
+    page.emulate_media(color_scheme=scheme)
+    base = live_server.url
+    sign_in(page, base)
+    a = furnished["application"]
+    c = furnished["company"]
+    me = furnished["applicant"]
+    paths = signed_in_paths(a, c, me)
     failures = []
     for path in paths:
         page.goto(f"{base}{path}")

@@ -17,13 +17,17 @@
           <input type="hidden" name="order" value="{{ row.column.key }}">
           <input type="checkbox" id="column-{{ table.name }}-{{ row.column.key }}" name="show"
                  value="{{ row.column.key }}" {% if row.shown %}checked{% endif %}>
-          <label for="column-{{ table.name }}-{{ row.column.key }}" class="flex-1">{{ row.column.label }}</label>
-          <button type="submit" name="move" value="up:{{ row.column.key }}" class="btn-ghost p-1"
+          {% comment %} The label is the target that has to reach 24 pixels: the checkbox beside
+             it is 13×13 whatever anybody does, and a label that activates it counts
+             as the same target (#115). {% endcomment %}
+          <label for="column-{{ table.name }}-{{ row.column.key }}"
+                 class="tap-target w-full flex-1">{{ row.column.label }}</label>
+          <button type="submit" name="move" value="up:{{ row.column.key }}" class="btn-ghost tap-target justify-center p-1"
                   {% if row.first %}disabled{% endif %}
                   aria-label="{% blocktranslate with column=row.column.label %}Move {{ column }} up{% endblocktranslate %}">
             {% icon "chevron-up" class="size-3.5" %}
           </button>
-          <button type="submit" name="move" value="down:{{ row.column.key }}" class="btn-ghost p-1"
+          <button type="submit" name="move" value="down:{{ row.column.key }}" class="btn-ghost tap-target justify-center p-1"
                   {% if row.last %}disabled{% endif %}
                   aria-label="{% blocktranslate with column=row.column.label %}Move {{ column }} down{% endblocktranslate %}">
             {% icon "chevron-down" class="size-3.5" %}

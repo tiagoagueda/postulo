@@ -265,6 +265,28 @@
     }
   }
 
+  /*
+   * Anything a finger has to find. WCAG 2.2 SC 2.5.8 asks for 24 CSS pixels each way, and
+   * a control can be under that only where something else does the same job at full size,
+   * or where nothing else sits within 24 pixels of it.
+   *
+   * Neither excuse covered the three places this is used, which is why it exists rather
+   * than three separate paddings. The column chooser's move buttons were 22×22 -- a
+   * 14-pixel chevron with 4 pixels of padding, two pixels short in both directions and
+   * sixty-two of them across the tables. The dashboard's shortcut links were 20 high with
+   * 8 pixels between them, so the spacing exception did not apply either. And a checkbox
+   * is 13×13 whatever anybody does, so its *label* has to be the target that qualifies --
+   * which it was not, at 19 pixels high.
+   *
+   * `min-height` and `min-width` rather than padding, because the box is what the criterion
+   * measures and padding is only one way to get there. `inline-flex` and centring so the
+   * label's own text stays where it was: this must not move anything, only enlarge what a
+   * pointer can land on.
+   */
+  .tap-target {
+    @apply inline-flex min-h-6 min-w-6 items-center;
+  }
+
   /* An entry in a menu: link or button, same look. */
   .menu-item {
     @apply flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700

@@ -31,7 +31,13 @@
                    {% if row.on %}checked{% endif %}
                    {% if not row.theirs %}disabled aria-describedby="why-{{ row.name }}"{% endif %}>
             <div class="min-w-0 flex-1">
-              <label for="plugin-{{ row.name }}" class="font-medium {% if not row.theirs %}text-ink-500 dark:text-ink-400{% endif %}">
+              {% comment %} The checkbox is 13×13 and the browser decides that, so the label
+                 that switches it is the target. At 19 pixels high it passed SC 2.5.8 only on the
+                 spacing exception -- these rows are tall and nothing else is near. That is a thin
+                 thing to rest on: one more control in the row and it stops being true. `tap-target`
+                 makes it pass on its size instead (#115). {% endcomment %}
+              <label for="plugin-{{ row.name }}"
+                     class="tap-target font-medium {% if not row.theirs %}text-ink-500 dark:text-ink-400{% endif %}">
                 {{ row.label }}
               </label>
               <span class="ml-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{{ row.kind }}</span>

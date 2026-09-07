@@ -10,10 +10,13 @@
       <th scope="col" class="px-4 py-3 font-medium {% if header.column.numeric %}text-right{% endif %} {{ header.column.css }}"
           {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
         {% if header.column.sortable %}
+          {% comment %} `tap-target` rather than the bare `inline-flex` this used to have:
+             the label is 12-pixel type on a 16-pixel line, and the filter control below it
+             is close enough that the spacing exception does not save it (#115). {% endcomment %}
           <a href="{% querystring sort=header.next_sort page=None %}"
              hx-get="{% querystring sort=header.next_sort page=None %}"
              hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-             class="inline-flex items-center gap-1 hover:text-ink-900 dark:hover:text-ink-100 {% if header.state %}text-ink-900 dark:text-ink-100{% endif %}">
+             class="tap-target gap-1 hover:text-ink-900 dark:hover:text-ink-100 {% if header.state %}text-ink-900 dark:text-ink-100{% endif %}">
             {{ header.label }}
             {% if header.state == 'asc' %}
               {% icon "arrow-up" class="size-3.5" %}

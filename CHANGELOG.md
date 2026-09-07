@@ -148,6 +148,28 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Sixty-two buttons were two pixels too small to hit, and the suite said the pages were
+  fine.** The column chooser's *move up* and *move down* buttons were 22 by 22 — a 14-pixel
+  chevron with 4 pixels of padding — against the 24 that WCAG 2.2 asks for at AA, repeated
+  across every table in the application. They went unnoticed because **axe-core does not
+  enforce Target Size (Minimum)**: it reports the rule as needing review rather than as a
+  violation, so the accessibility suite returned a clean result on every page carrying them.
+  Reading the markup would not have found them either; `p-1` around a `size-3.5` icon is a
+  sum nobody does while writing a template. So the fix comes with **the measurement, as a
+  test**: every clickable thing on every page the browser suite already visits is asked for
+  its box in a real browser and held to 24 by 24, allowing the criterion's own exceptions —
+  clear space around a small target, a checkbox measured by the label that switches it, a
+  link inside a sentence whose height belongs to the prose around it. Three more failures
+  fell out of running it: the dashboard's shortcut links, 20 pixels high in a column with 8
+  between them, which is too small *and* too close; the column chooser's own labels at 20;
+  and every sortable table header, 12-pixel type on a 16-pixel line with a filter control
+  directly beneath. All now carry a `tap-target` class that sets a minimum box without moving
+  anything — the criterion measures the box, and padding is only one way to reach it. One
+  correction to the report: the checkboxes on *Settings → Plugins* were listed as a probable
+  false positive, and they were passing, but on the spacing exception rather than on their
+  size — those rows are tall and nothing sits near them. That is a thin thing to rest on, so
+  they now pass on size too. (#115)
+
 - **A plugin's own description, licence, author and source link were read and then thrown
   away.** All four came out of every wheel, the confirmation screen showed them once, and the
   record kept none — so an administrator could see who wrote a plugin on the day they

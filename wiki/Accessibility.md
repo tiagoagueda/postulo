@@ -28,6 +28,9 @@ us about a barrier.
 - **Text and contrast.** Both themes are checked for contrast at the AA level. Text
   resizes with the browser; nothing is locked to a pixel size.
 - **Motion.** The little animation there is respects *prefers-reduced-motion*.
+- **Things you click are big enough to hit.** Every button, link and switch is at least
+  24 by 24 pixels, or else has that much clear space around it. This matters most on a
+  phone, with a tremor, or with any pointer that is not a mouse on a desk.
 
 ## What is checked, and how
 
@@ -42,6 +45,16 @@ remembered: a separate test walks the application's own URL table and fails unle
 is either visited by the browser suite or named with a reason it is not a page — a file
 download, a form submission, a redirect. Adding a page without deciding about it breaks the
 build.
+
+Size is measured rather than read. axe-core does not enforce *Target Size (Minimum)* —
+it reports the rule as needing review rather than as a violation — so the suite above was
+returning a clean result on pages carrying sixty-two buttons that were 22 pixels square.
+A second browser test now asks every clickable thing on every one of those pages for its
+box and holds it to 24 by 24, allowing the criterion's own exceptions: a small target with
+24 pixels of clear space around it, a checkbox measured by the label that switches it, and
+a link inside a sentence, whose height belongs to the prose it sits in. What it cannot
+judge is whether some other control does the same job at full size; that needs a person,
+and anything relying on it has to be written down.
 
 It is worth being plain about the limit of the automated half. The sign-in page passed
 every one of those checks, in both themes, while being rendered with no styling at all:
