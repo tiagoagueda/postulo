@@ -97,6 +97,11 @@ Postulo reads **both** Europass formats:
   your disk still is. It does not matter which namespace the file carries — Europass has
   been through several over the years, and all of them read.
 
+Reading a file is a **plugin**, and Europass is the one that ships in the box — so the page
+offers whatever this instance can read rather than Europass by name. Nothing else reads
+career files yet; the point is that the next format need not wait for a new release of
+Postulo.
+
 You do not have to know which one you have. There is one file box; Postulo works out which
 format it was handed and tells you on the review page.
 

@@ -15,10 +15,12 @@ not put a fabricated job title into their records.
 from __future__ import annotations
 
 import datetime as dt
+import re
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Protocol, runtime_checkable
 
+from django.utils.translation import gettext as _
 from pydantic import BaseModel, Field, field_validator
 
 #: Nothing longer than this is kept from a page. Job adverts are not novels, and an
@@ -103,6 +105,86 @@ class SourcePlugin(Protocol):
 
 class CaptureError(Exception):
     """Raised when a page cannot be fetched or cannot be understood."""
+
+
+# ------------------------------------------------------------------- importers
+
+#: Where an importer registers itself. Nothing publishes here yet — Europass is built in —
+#: and the contract a third party would write against is #105's subject.
+IMPORTER_GROUP = "postulo.importers"
+
+#: The most a career file may be. A CV is not a novel, and an unbounded upload handed to a
+#: parser is the parser's problem right up until it is everyone's.
+MAX_IMPORT_BYTES = 5 * 1024 * 1024
+
+
+class ImportRefused(Exception):
+    """The file will not be read, and the message says why, to the person who chose it."""
+
+
+def refuse_unreadable(data: bytes) -> None:
+    """What Postulo refuses before any importer sees a byte.
+
+    An importer is handed **a file somebody uploaded**, which is not the threat a source
+    faces: a source is given a URL and the HTML that Postulo fetched from it. So these
+    refusals belong to the kind rather than to each plugin, because "every plugin author
+    remembers" is not a control, and the one they would forget is the third.
+
+    The DOCTYPE check applies to anything that looks like XML. That is where entity
+    expansion lives, and the point is to refuse it rather than to hand it to a parser and
+    hope. It is not applied to everything: ``<!DOCTYPE`` inside an early string value of a
+    perfectly ordinary JSON file is not an attack, and refusing it would be a bug.
+    """
+    if not data:
+        raise ImportRefused(_("That file is empty."))
+    if len(data) > MAX_IMPORT_BYTES:
+        raise ImportRefused(
+            _("That file is larger than %(limit)s MB, so it was not read.")
+            % {"limit": MAX_IMPORT_BYTES // (1024 * 1024)}
+        )
+    head = data[:4096].lstrip(b"\xef\xbb\xbf").lstrip()
+    if head.startswith(b"<") and re.search(rb"<!DOCTYPE", data[:4096], re.I):
+        raise ImportRefused(
+            _(
+                "That file carries a document type declaration, which Postulo will not "
+                "read. A Europass export does not have one."
+            )
+        )
+
+
+@runtime_checkable
+class ImporterPlugin(Protocol):
+    """What something that reads a career out of a file must provide.
+
+    The mirror of :class:`SourcePlugin`, for a different input and a different output: a
+    source reads a *job posting* off a *page*, an importer reads a *person's career* out of
+    a *file*. No base class, as everywhere else here.
+
+    ``read`` returns whatever the importing app understands — today a
+    ``postulo.resume.europass.Record``. This protocol does not name that type, because the
+    plugin machinery has no business depending on the resume app, and because the built-in
+    is the only implementation until #105 writes the contract for anybody else's.
+
+    **An importer does not write anything.** It turns bytes into a record and stops. What
+    reaches the database is decided on the review screen, by the person, for the reason
+    stated at the top of this module: a parser that guesses wrong should waste a few
+    seconds of somebody's attention, not put a fabricated job title into their records —
+    and an import writes a career, which is a great deal more than a title.
+    """
+
+    name: str
+    version: str
+    kind: str
+    label: str
+    description: str
+
+    def can_handle(self, data: bytes, filename: str = "") -> bool:
+        """Whether this importer recognises the file."""
+        ...
+
+    def read(self, data: bytes):
+        """Turn the file into a record, or raise :class:`ImportRefused` saying why not."""
+        ...
 
 
 # ----------------------------------------------------------- connected plugins

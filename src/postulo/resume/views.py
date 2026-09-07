@@ -22,6 +22,7 @@ from django.views.generic import CreateView, DeleteView, TemplateView, UpdateVie
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
+from postulo.plugins import base, registry
 
 from . import europass
 from .models import (
@@ -246,17 +247,38 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
         if not upload:
             messages.error(request, _("Choose a Europass file first."))
             return redirect("resume:europass_import")
-        if upload.size > europass.MAX_BYTES:
+        if upload.size > base.MAX_IMPORT_BYTES:
             messages.error(
                 request,
                 _("That file is over %(limit)s MB. A CV is not that big.")
-                % {"limit": europass.MAX_BYTES // (1024 * 1024)},
+                % {"limit": base.MAX_IMPORT_BYTES // (1024 * 1024)},
             )
             return redirect("resume:europass_import")
 
+        # Refuse first, then ask what is installed rather than naming Europass. The
+        # refusals belong to the kind and apply whoever would have read the file. One
+        # importer ships in the box and is the only one that answers today; the point is
+        # that the second one need not be a change to this view.
+        data = upload.read()
         try:
-            record = europass.read(upload.read())
-        except europass.EuropassError as error:
+            base.refuse_unreadable(data)
+            importer = next(
+                (
+                    plugin
+                    for plugin in registry.plugins("importer")
+                    if plugin.can_handle(data, upload.name or "")
+                ),
+                None,
+            )
+            if importer is None:
+                raise base.ImportRefused(
+                    _(
+                        "Nothing installed here reads that file. Postulo reads the XML the "
+                        "Europass CV editor produced and the JSON europass.europa.eu exports."
+                    )
+                )
+            record = importer.read(data)
+        except base.ImportRefused as error:
             messages.error(request, str(error))
             return redirect("resume:europass_import")
 

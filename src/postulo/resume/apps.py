@@ -7,3 +7,10 @@ class ResumeConfig(AppConfig):
     name = "postulo.resume"
     label = "resume"
     verbose_name = _("Resume")
+
+    def ready(self) -> None:
+        from postulo.plugins import registry
+
+        from .importers import EuropassImporter
+
+        registry.register_builtin("importer", EuropassImporter)

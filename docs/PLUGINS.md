@@ -407,6 +407,43 @@ a second call finds the first suggestion and changes nothing, whether it is wait
 accepted or declined. That is what lets a mailbox be read every five minutes without
 asking the same question twice.
 
+## Importers
+
+An **importer** reads a person's career out of a file they upload — the mirror of a source,
+for a different input and a different output. Europass ships as one; nothing else does yet,
+and the contract for third-party importers is deliberately not written (#105), so treat this
+section as a description of what exists rather than an invitation.
+
+```python
+class MyImporter:
+    name = "json-resume"
+    version = "1.0"
+    kind = "importer"
+    label = "JSON Resume"
+    description = _("The jsonresume.org format.")
+
+    def can_handle(self, data: bytes, filename: str = "") -> bool: ...
+    def read(self, data: bytes): ...
+```
+
+Two rules matter more here than anywhere else in this document.
+
+**Postulo refuses the file before you see it.** `plugins.base.refuse_unreadable` rejects an
+empty upload, anything over `MAX_IMPORT_BYTES`, and a `DOCTYPE` in anything that looks like
+XML — which is where entity expansion lives. That belongs to the kind rather than to each
+importer, because an importer is handed a file a stranger's browser uploaded, and "every
+plugin author remembers" is not a control. Raise `ImportRefused` for anything else you will
+not read; the message goes to the person who chose the file.
+
+**An importer writes nothing.** It turns bytes into a record and stops. What reaches the
+database is decided on the review screen, by the person, which is the same rule a source
+obeys and matters more here: a source that guesses wrong costs somebody a few seconds, and
+an import writes a career.
+
+`can_handle` answers *what is this*, not *is it any good*. A truncated Europass export is
+still a Europass export, and saying "not readable XML" helps far more than "nothing here
+reads that".
+
 ## Getting a plugin into an instance
 
 **From the interface.** *Server settings → Plugins* installs a wheel an administrator

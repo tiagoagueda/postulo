@@ -17,6 +17,7 @@ from django.urls import reverse
 
 from postulo.accounts import identifiers
 from postulo.accounts.models import PersonIdentifier
+from postulo.plugins import base
 from postulo.resume import europass
 from postulo.resume.models import (
     Education,
@@ -146,7 +147,7 @@ def test_a_doctype_is_refused_before_anything_is_parsed():
         b"<SkillsPassport><LearnerInfo><Headline>&lol2;</Headline></LearnerInfo></SkillsPassport>"
     )
 
-    with pytest.raises(europass.EuropassError, match="document type declaration"):
+    with pytest.raises(base.ImportRefused, match="document type declaration"):
         europass.read(bomb)
 
 
@@ -157,7 +158,7 @@ def test_an_external_entity_cannot_reach_the_disk():
         b"<SkillsPassport><LearnerInfo><Headline>&x;</Headline></LearnerInfo></SkillsPassport>"
     )
 
-    with pytest.raises(europass.EuropassError, match="document type declaration"):
+    with pytest.raises(base.ImportRefused, match="document type declaration"):
         europass.read(xxe)
 
 
@@ -172,12 +173,12 @@ def test_xml_that_is_not_europass_says_so():
 
 
 def test_an_empty_file_says_so():
-    with pytest.raises(europass.EuropassError, match="empty"):
+    with pytest.raises(base.ImportRefused, match="empty"):
         europass.read(b"")
 
 
 def test_a_file_over_the_cap_is_not_parsed():
-    with pytest.raises(europass.EuropassError, match="larger than"):
+    with pytest.raises(base.ImportRefused, match="larger than"):
         europass.read(b"<a/>" + b" " * europass.MAX_BYTES)
 
 
@@ -471,7 +472,7 @@ def test_a_document_that_nests_too_deep_is_refused():
 
 
 def test_a_json_file_over_the_cap_is_not_parsed():
-    with pytest.raises(europass.EuropassError, match="larger than"):
+    with pytest.raises(base.ImportRefused, match="larger than"):
         europass.read(b"{" + b" " * europass.MAX_BYTES)
 
 

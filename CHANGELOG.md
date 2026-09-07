@@ -8,6 +8,22 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Reading a Europass CV is a plugin now.** The reader was already shaped like one — it
+  decides which of the two formats it has and dispatches, which is the same split sources
+  have used since the beginning — so this mostly says so out loud: a new `importer` kind, and
+  Europass registered into it the way the built-in notifier and document store already are.
+  The import page asks the registry what this instance can read instead of naming Europass,
+  which is the whole point: the next format somebody wants is a plugin rather than a patch to
+  a view. **One importer, two formats**, because that is what the code is — both readers
+  produce the same record and `apply()` is shared, so two plugins would be one thing
+  described twice. On the way, the refusals that keep a hostile file away from a parser moved
+  from Europass to the kind: an empty file, anything over the cap, and **a `DOCTYPE` in
+  anything that looks like XML**, which is where entity expansion lives. Those are a threat
+  every importer faces rather than one Europass happened to think about, and "every plugin
+  author remembers" is not a control. `apply()` stays in core — an importer turns bytes into
+  a record and never touches the database, which is what keeps one from needing ownership
+  scoping of its own. (#99)
+
 - **`TRADEMARKS.md` says what the licence cannot.** The code is AGPL; the name and the logo
   are not, and until now nothing said so — a reader had no way to know what a fork may call
   itself. That matters here more than in most projects, because the README makes four

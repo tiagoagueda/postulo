@@ -56,9 +56,11 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from postulo.accounts import identifiers
+from postulo.plugins.base import MAX_IMPORT_BYTES, ImportRefused, refuse_unreadable
 
-#: Generous for a CV, mean for anything that is not one.
-MAX_BYTES = 5 * 1024 * 1024
+#: Kept as a name because the interface and the tests use it, but the number belongs to
+#: the importer kind now: every importer gets the same cap, not just this one.
+MAX_BYTES = MAX_IMPORT_BYTES
 
 #: A career record is not this deep. Anything that is, is not one.
 MAX_DEPTH = 40
@@ -81,7 +83,7 @@ SKILL_HEADINGS = (
 _ORDER = list(CEFR.values())
 
 
-class EuropassError(Exception):
+class EuropassError(ImportRefused):
     """The file could not be read, and the message says why in plain words."""
 
 
@@ -206,13 +208,10 @@ def read(data: bytes) -> Record:
     A person has *a Europass file*; they should not have to know which one it is, so the
     first character decides and the record says which was found.
     """
-    if not data:
-        raise EuropassError(_("That file is empty."))
-    if len(data) > MAX_BYTES:
-        raise EuropassError(
-            _("That file is larger than %(limit)s MB, so it was not read.")
-            % {"limit": MAX_BYTES // (1024 * 1024)}
-        )
+    # Empty, oversized and DOCTYPE are the importer kind's refusals now rather than this
+    # module's. An importer is handed a file somebody uploaded, and that is a threat every
+    # importer faces rather than one Europass happened to think about.
+    refuse_unreadable(data)
 
     head = data.lstrip(b"\xef\xbb\xbf").lstrip()
     if head.startswith(b"<"):
@@ -291,18 +290,12 @@ def _levels(level) -> dict[str, str]:
 
 
 def read_xml(data: bytes) -> Record:
-    """Read the Europass XML. Raises :class:`EuropassError` with the reason."""
-    # Before parsing, not after: a DOCTYPE is where entity expansion lives, and the point
-    # is to refuse it rather than to hand it to a parser and hope.
-    head = data[:4096].lstrip()
-    if re.search(rb"<!DOCTYPE", head, re.I):
-        raise EuropassError(
-            _(
-                "That file carries a document type declaration, which Postulo will not "
-                "read. A Europass export does not have one."
-            )
-        )
+    """Read the Europass XML. Raises :class:`EuropassError` with the reason.
 
+    A DOCTYPE has already been refused by ``refuse_unreadable``, which is what makes
+    ``fromstring`` below safe to call. The reasoning lives with the refusal, in
+    ``plugins/base.py``.
+    """
     try:
         root = ElementTree.fromstring(data)  # noqa: S314 - no DOCTYPE, and nothing is fetched
     except ElementTree.ParseError as error:

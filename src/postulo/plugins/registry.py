@@ -30,7 +30,14 @@ from __future__ import annotations
 import logging
 from importlib.metadata import entry_points
 
-from .base import CONNECTED_KINDS, ConnectedPlugin, JobPostingData, SourcePlugin
+from .base import (
+    CONNECTED_KINDS,
+    IMPORTER_GROUP,
+    ConnectedPlugin,
+    ImporterPlugin,
+    JobPostingData,
+    SourcePlugin,
+)
 from .builtin import BUILTIN_SOURCES
 from .locale import register_plugin_locale
 
@@ -39,15 +46,16 @@ logger = logging.getLogger(__name__)
 #: The entry point group third-party sources register themselves under.
 ENTRY_POINT_GROUP = "postulo.sources"
 
-#: Every group, by the kind of plugin it holds.
-GROUPS = {"source": ENTRY_POINT_GROUP, **CONNECTED_KINDS}
+#: Every group, by the kind of plugin it holds. Sources and importers are stateless and
+#: need nothing from anybody; the connected kinds each need a `Connection`.
+GROUPS = {"source": ENTRY_POINT_GROUP, "importer": IMPORTER_GROUP, **CONNECTED_KINDS}
 
 _cache: dict[str, list] = {}
 _builtin: dict[str, list[type]] = {"source": list(BUILTIN_SOURCES)}
 
 
 def _protocol_for(kind: str):
-    return SourcePlugin if kind == "source" else ConnectedPlugin
+    return {"source": SourcePlugin, "importer": ImporterPlugin}.get(kind, ConnectedPlugin)
 
 
 def _disabled() -> set[str]:
