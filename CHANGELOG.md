@@ -8,6 +8,26 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### Fixed
 
+- **Two tests passed only on the machine they were written on.** With the dependency audit
+  corrected (#75), continuous integration still failed, and for a reason worth stating: the
+  suite was green on Windows and red on Linux. The production-policy test set
+  `POSTULO_SECRET_KEY` and then imported the production settings — but the base settings
+  module is already imported by the time any test runs, so the key was resolved before the
+  variable existed, and the guard fired. It passed locally only because the base settings
+  read a `.env` from the repository root, and that file is **gitignored**: what the test
+  asserted depended on whether the person running it happened to have a file that is not in
+  the repository. It now imports the production settings in a subprocess with an explicit,
+  scrubbed environment, which no import order and no developer's `.env` can influence, and a
+  second test asserts the guard itself — an instance with no key refuses to start rather
+  than inventing one. Separately, the brand check rebuilt every derived image and compared
+  the bytes, which two machines do not agree on: Pillow's platform wheels round LANCZOS
+  differently, and the three small icons matched while everything from 64 pixels upward did
+  not. It compares recorded digests now — of the source, of each derived file, and of the
+  size-and-padding table they were built from — and rebuilds nothing, so it answers whether
+  these images were built from this source rather than whether this machine rounds like the
+  last one. It still fails on a changed mark, an edited or missing derivative, and a changed
+  recipe. (#76)
+
 - **Continuous integration had never passed, and the dependency audit had never run.**
   Every one of the thirty-eight runs since the project moved into its organisation was
   red, for a reason that had nothing to do with the code: `uv sync` installs Postulo as an

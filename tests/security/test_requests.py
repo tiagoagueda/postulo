@@ -1,5 +1,7 @@
 """Forged requests, guessed passwords, borrowed sessions, and the headers that say no."""
 
+from pathlib import Path
+
 import pytest
 from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
@@ -129,21 +131,91 @@ def test_every_response_carries_the_defensive_headers(client, person):
     assert response["X-Frame-Options"] == "DENY"
 
 
+#: Imported in a subprocess, with the settings printed as JSON. Two reasons, and both were
+#: found the hard way: `postulo.config.settings.base` is already imported by the time any
+#: test runs, so setting an environment variable here and importing `prod` reads a
+#: `SECRET_KEY` that was resolved before the variable existed; and `base` reads a `.env`
+#: from the repository root, which is gitignored, so what this asserted depended on whether
+#: the person running it happened to have one. It passed on the author's machine and failed
+#: on every other, which is the least useful way for a test to behave.
+PROD_PROBE = """
+import json
+
+import environ
+
+# The repository's .env belongs to whoever is developing here. What is under test is what
+# the module itself says, so the file is taken out of the picture rather than trusted to
+# be absent.
+environ.Env.read_env = lambda *args, **kwargs: None
+
+from postulo.config.settings import prod
+
+print(json.dumps({
+    "DEBUG": prod.DEBUG,
+    "SECURE_HSTS_SECONDS": prod.SECURE_HSTS_SECONDS,
+    "SESSION_COOKIE_SECURE": prod.SESSION_COOKIE_SECURE,
+    "CSRF_COOKIE_SECURE": prod.CSRF_COOKIE_SECURE,
+    "SECURE_SSL_REDIRECT": prod.SECURE_SSL_REDIRECT,
+    "SECURE_CSP": {k: [str(v) for v in vs] for k, vs in prod.SECURE_CSP.items()},
+}))
+"""
+
+
+def production_settings() -> dict:
+    """Import the production settings the way a server would, and report what they say."""
+    import json
+    import os
+    import subprocess
+    import sys
+
+    environment = {k: v for k, v in os.environ.items() if not k.startswith("POSTULO_")}
+    environment["POSTULO_SECRET_KEY"] = "x" * 64
+    environment["POSTULO_ALLOWED_HOSTS"] = "postulo.example.org"
+    finished = subprocess.run(  # noqa: S603 - this interpreter, and a script written here
+        [sys.executable, "-c", PROD_PROBE],
+        capture_output=True,
+        text=True,
+        env=environment,
+        cwd=Path(__file__).resolve().parents[2],
+    )
+    assert finished.returncode == 0, finished.stderr
+    return json.loads(finished.stdout)
+
+
 def test_the_production_settings_are_what_the_policy_says():
     """The prod settings module, imported as a document rather than run as a server."""
-    import importlib
-    import os
+    prod = production_settings()
 
-    os.environ.setdefault("POSTULO_SECRET_KEY", "x" * 64)
-    os.environ.setdefault("POSTULO_ALLOWED_HOSTS", "postulo.example.org")
-    prod = importlib.import_module("postulo.config.settings.prod")
-
-    assert prod.DEBUG is False
-    assert prod.SECURE_HSTS_SECONDS >= 31536000
-    assert prod.SESSION_COOKIE_SECURE and prod.CSRF_COOKIE_SECURE
-    assert prod.SECURE_SSL_REDIRECT
-    csp = prod.SECURE_CSP
+    assert prod["DEBUG"] is False
+    assert prod["SECURE_HSTS_SECONDS"] >= 31536000
+    assert prod["SESSION_COOKIE_SECURE"] and prod["CSRF_COOKIE_SECURE"]
+    assert prod["SECURE_SSL_REDIRECT"]
+    csp = prod["SECURE_CSP"]
     assert csp["default-src"] == ["'none'"] and csp["script-src"] == ["'self'"]
     assert csp["frame-ancestors"] == ["'none'"] and csp["form-action"] == ["'self'"]
     assert "'unsafe-inline'" not in str(csp) and "'unsafe-eval'" not in str(csp)
     assert not any("http" in str(v) for v in csp.values()), "no third-party origin, ever"
+
+
+def test_production_refuses_to_start_without_a_secret_key():
+    """The guard that made the test above pass locally and fail everywhere else.
+
+    Worth asserting in its own right: an instance started with no key must stop rather
+    than invent one, because a generated key would silently invalidate every session and
+    every signed value the next time it restarted.
+    """
+    import os
+    import subprocess
+    import sys
+
+    environment = {k: v for k, v in os.environ.items() if not k.startswith("POSTULO_")}
+    finished = subprocess.run(  # noqa: S603 - this interpreter, and a script written here
+        [sys.executable, "-c", PROD_PROBE],
+        capture_output=True,
+        text=True,
+        env=environment,
+        cwd=Path(__file__).resolve().parents[2],
+    )
+
+    assert finished.returncode != 0
+    assert "POSTULO_SECRET_KEY must be set" in finished.stderr
