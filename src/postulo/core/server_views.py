@@ -425,11 +425,29 @@ def _mailer_summary() -> dict:
     the page below change them -- so a summary built from it would describe the shape of
     the configuration and none of its content.
     """
+    from postulo.notifications import transport as transports
+
     backend = str(((getattr(settings, "MAILERS", {}) or {}).get("default", {})).get("BACKEND", ""))
+    chosen = transports.selected()
+    pluggable = backend.endswith("PluggableBackend")
     resolved = site.email_settings()
     return {
-        "backend": ".".join(backend.split(".")[-2:]) or backend,
-        "is_smtp": backend.endswith("SiteSMTPBackend") or backend.endswith("smtp.EmailBackend"),
+        # With a pluggable backend the class is always the same and says nothing, so the
+        # line names the transport that is actually carrying the mail.
+        "backend": (
+            getattr(chosen, "label", chosen.name)
+            if pluggable and chosen
+            else ".".join(backend.split(".")[-2:]) or backend
+        ),
+        "is_smtp": (
+            (chosen is not None and chosen.name == transports.DEFAULT_TRANSPORT)
+            if pluggable
+            else backend.endswith("smtp.EmailBackend")
+        ),
+        # Whether a transport is carrying anything at all. In development it is not: the
+        # console backend is named directly, and saying "carried by SMTP" beside a line
+        # reading `locmem.EmailBackend` would be two contradictory sentences.
+        "pluggable": pluggable,
         "host": resolved["host"],
         "port": resolved["port"],
         "username": resolved["username"],
@@ -448,6 +466,8 @@ class EmailView(PolicyView):
     pinned_fields = tuple(site.EMAIL_FIELDS)
 
     def get_context_data(self, **kwargs):
+        from postulo.notifications import transport
+
         context = super().get_context_data(**kwargs)
         context["mailer"] = _mailer_summary()
         context["test_form"] = kwargs.get("test_form") or TestEmailForm(
@@ -455,6 +475,20 @@ class EmailView(PolicyView):
         )
         context["shadowed"] = site.email_shadowed()
         context["has_password"] = SiteSettings.get().has_email_password
+
+        chosen = transport.selected()
+        context["transports"] = transport.available()
+        context["transport"] = chosen
+        context["transport_is_smtp"] = (
+            chosen is not None and chosen.name == transport.DEFAULT_TRANSPORT
+        )
+        # Said on the page rather than discovered at the moment somebody tries: this is why
+        # the plugins page will refuse to switch the package off (#104).
+        context["locked"] = (
+            transport.refuse_switching_off(chosen.name)
+            if chosen is not None and context["mailer"]["pluggable"]
+            else ""
+        )
         return context
 
 
@@ -1026,15 +1060,22 @@ class PluginActionView(StaffRequiredMixin, View):
         return self._switch(request, False)
 
     def _switch(self, request: HttpRequest, disabled: bool) -> HttpResponse:
+        from postulo.notifications import transport
         from postulo.plugins.installing import InstallError, set_disabled
+        from postulo.plugins.registry import GROUPS
         from postulo.plugins.registry import plugins as registry_plugins
 
+        name = request.POST.get("name", "")
+        # Switching off a package that carries the mail is switching off the mail (#104).
+        if disabled and (refusal := transport.refuse_removing_distribution(name)):
+            messages.error(request, refusal)
+            return redirect("server:plugins")
         try:
-            entry = set_disabled(request.POST.get("name", ""), disabled)
+            entry = set_disabled(name, disabled)
         except InstallError as error:
             messages.error(request, str(error))
             return redirect("server:plugins")
-        for kind in ("source", "notifier", "store", "sync"):
+        for kind in GROUPS:
             registry_plugins(kind, refresh=True)
         messages.success(
             request,
@@ -1045,10 +1086,15 @@ class PluginActionView(StaffRequiredMixin, View):
         return redirect("server:plugins")
 
     def _remove(self, request: HttpRequest) -> HttpResponse:
+        from postulo.notifications import transport
         from postulo.plugins.installing import InstallError, remove
 
+        name = request.POST.get("name", "")
+        if refusal := transport.refuse_removing_distribution(name):
+            messages.error(request, refusal)
+            return redirect("server:plugins")
         try:
-            entry = remove(request.POST.get("name", ""))
+            entry = remove(name)
         except InstallError as error:
             messages.error(request, str(error))
             return redirect("server:plugins")

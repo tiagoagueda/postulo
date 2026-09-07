@@ -1,18 +1,9 @@
-"""Sending mail with the settings that are in force now, not the ones that were at boot.
+"""Proving a set of SMTP settings without sending anybody a message.
 
-``MAILERS`` is built once, when the settings module is imported. That is fine for a value
-that only ever comes from the environment and fatal for one an administrator can change
-from a page: the form would save, the page would say so, and every message would keep going
-to the old server until somebody restarted the container. A page that appears to work and
-does not is worse than no page.
-
-Django builds a fresh backend for every send — ``MailersHandler.create_connection`` caches
-nothing — so a backend that resolves its own settings in ``__init__`` picks the new ones up
-on the next message, with no restart and no signal to wire up. That is what this is.
-
-The from-address is here for the same reason. ``DEFAULT_FROM_EMAIL`` is read at send time
-by everything that sends anything, Django's and allauth's code included, and there is no
-hook in any of it. The backend is the one place every message passes through.
+The backend that *uses* them lives in `postulo.notifications.transport`, because which
+transport carries the mail is a plugin question now (#104) and this is not. What is left
+here is the thing the Email page needs and the SMTP transport's `test()` calls: open a
+socket, negotiate, sign in, hang up.
 """
 
 from __future__ import annotations
@@ -20,47 +11,7 @@ from __future__ import annotations
 import smtplib
 import ssl
 
-from django.conf import settings
-from django.core.mail.backends.smtp import EmailBackend
 from django.utils.translation import gettext_lazy as _
-
-from . import site
-
-
-class SiteSMTPBackend(EmailBackend):
-    """SMTP, configured from the environment and the Server settings page together.
-
-    Takes no ``OPTIONS``: they would be the frozen values this exists to avoid, and
-    accepting them would leave two places to look when the wrong server is being used.
-    """
-
-    def __init__(self, **kwargs):
-        for name in ("host", "port", "username", "password", "use_tls", "timeout"):
-            kwargs.pop(name, None)
-        resolved = site.email_settings()
-        self.from_address = resolved["from_address"]
-        super().__init__(
-            host=resolved["host"],
-            port=resolved["port"],
-            username=resolved["username"],
-            password=resolved["password"],
-            use_tls=resolved["use_tls"],
-            timeout=resolved["timeout"],
-            **kwargs,
-        )
-
-    def send_messages(self, email_messages):
-        """Stamp the resolved from-address on anything that did not choose one.
-
-        "Did not choose one" means the address Django fills in from ``DEFAULT_FROM_EMAIL``
-        when a caller passes none. A message that names its own sender keeps it: this is
-        for the ninety-nine that do not, not a rule about who Postulo may send as.
-        """
-        for message in email_messages:
-            if message.from_email == settings.DEFAULT_FROM_EMAIL:
-                message.from_email = self.from_address
-        return super().send_messages(email_messages)
-
 
 #: Split out only because it does not fit on a line inside the branch that raises it.
 NO_STARTTLS = _("The server does not offer STARTTLS. Turn it off, or use a port that does.")

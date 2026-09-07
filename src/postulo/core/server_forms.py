@@ -155,8 +155,13 @@ class EmailForm(forms.ModelForm):
             "email_from",
         )
 
+    #: Prefix for the fields a non-SMTP transport declares, so its `host` cannot collide
+    #: with the column of the same name that belongs to SMTP.
+    TRANSPORT_PREFIX = "transport__"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._add_transport_fields()
         self.pinned = {
             field: variable
             for field in site.EMAIL_FIELDS
@@ -186,6 +191,76 @@ class EmailForm(forms.ModelForm):
             self.errors.pop(field, None)
         return cleaned
 
+    def _add_transport_fields(self) -> None:
+        """A chooser when there is a choice, and the chosen transport's own settings.
+
+        SMTP is the exception: its settings are the named columns above, because they came
+        first, because each is overridden individually by its own environment variable, and
+        because a fresh instance has to be able to send before there is a row to read.
+        Anything else declares fields and gets them drawn here, which is what makes the kind
+        worth having for somebody whose host blocks outbound SMTP (#104).
+        """
+        from postulo.notifications import transport as transports
+        from postulo.plugins import base
+        from postulo.plugins.forms import form_field_for
+
+        installed = transports.available()
+        chosen = transports.selected()
+        if len(installed) > 1:
+            self.fields["email_transport"] = forms.ChoiceField(
+                label=_("Mail transport"),
+                choices=[(item.name, base.label_of(item)) for item in installed],
+                required=False,
+                help_text=_("What carries the mail off this machine."),
+            )
+            self.initial.setdefault(
+                "email_transport", getattr(chosen, "name", transports.DEFAULT_TRANSPORT)
+            )
+        if chosen is None or chosen.name == transports.DEFAULT_TRANSPORT:
+            return
+
+        # Not SMTP: its columns mean nothing here, so they are not offered.
+        for name in (
+            "email_host",
+            "email_port",
+            "email_username",
+            "email_use_tls",
+            "email_timeout",
+        ):
+            self.fields.pop(name, None)
+        self.fields.pop("email_password", None)
+        self.fields.pop("forget_email_password", None)
+
+        row = self.instance
+        stored = dict(row.transport_config or {})
+        held = set(row.transport_secrets)
+        for spec in chosen.config_fields():
+            key = f"{self.TRANSPORT_PREFIX}{spec.name}"
+            self.fields[key] = form_field_for(spec, has_value=spec.name in held)
+            if not (spec.type == "password" or spec.secret):
+                self.initial.setdefault(key, stored.get(spec.name, spec.default))
+
+    def _transport_answers(self) -> tuple[dict, dict]:
+        """What was typed for the transport's own fields, split into plain and secret."""
+        from postulo.notifications import transport as transports
+
+        chosen = transports.selected()
+        if chosen is None or chosen.name == transports.DEFAULT_TRANSPORT:
+            return {}, {}
+        plain, secret = {}, {}
+        for spec in chosen.config_fields():
+            key = f"{self.TRANSPORT_PREFIX}{spec.name}"
+            if key not in self.cleaned_data:
+                continue
+            value = self.cleaned_data[key]
+            if spec.type == "password" or spec.secret:
+                # Blank means "keep what is stored", exactly as it does for the SMTP one.
+                if value:
+                    secret[spec.name] = value
+            else:
+                plain[spec.name] = value
+        return plain, secret
+
     def save(self, commit=True):
         row = super().save(commit=False)
         if "email_password" not in self.pinned:
@@ -193,6 +268,13 @@ class EmailForm(forms.ModelForm):
                 row.email_password = ""
             elif self.cleaned_data.get("email_password"):
                 row.email_password = self.cleaned_data["email_password"]
+        if "email_transport" in self.fields:
+            row.email_transport = self.cleaned_data.get("email_transport", "") or ""
+        plain, secret = self._transport_answers()
+        if plain:
+            row.transport_config = {**(row.transport_config or {}), **plain}
+        if secret:
+            row.transport_secrets = {**row.transport_secrets, **secret}
         if commit:
             row.save()
         return row

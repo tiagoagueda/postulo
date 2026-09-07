@@ -33,10 +33,12 @@ from importlib.metadata import entry_points
 from .base import (
     CONNECTED_KINDS,
     IMPORTER_GROUP,
+    TRANSPORT_GROUP,
     ConnectedPlugin,
     ImporterPlugin,
     JobPostingData,
     SourcePlugin,
+    TransportPlugin,
 )
 from .builtin import BUILTIN_SOURCES
 from .locale import register_plugin_locale
@@ -47,15 +49,25 @@ logger = logging.getLogger(__name__)
 ENTRY_POINT_GROUP = "postulo.sources"
 
 #: Every group, by the kind of plugin it holds. Sources and importers are stateless and
-#: need nothing from anybody; the connected kinds each need a `Connection`.
-GROUPS = {"source": ENTRY_POINT_GROUP, "importer": IMPORTER_GROUP, **CONNECTED_KINDS}
+#: need nothing from anybody; the connected kinds each need a `Connection`; a transport is
+#: instance plumbing and belongs to nobody in particular.
+GROUPS = {
+    "source": ENTRY_POINT_GROUP,
+    "importer": IMPORTER_GROUP,
+    "transport": TRANSPORT_GROUP,
+    **CONNECTED_KINDS,
+}
 
 _cache: dict[str, list] = {}
 _builtin: dict[str, list[type]] = {"source": list(BUILTIN_SOURCES)}
 
 
 def _protocol_for(kind: str):
-    return {"source": SourcePlugin, "importer": ImporterPlugin}.get(kind, ConnectedPlugin)
+    return {
+        "source": SourcePlugin,
+        "importer": ImporterPlugin,
+        "transport": TransportPlugin,
+    }.get(kind, ConnectedPlugin)
 
 
 def _disabled() -> set[str]:

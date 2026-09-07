@@ -81,7 +81,10 @@ SECURE_CSP = {
     "base-uri": [CSP.SELF],
 }
 
-# No OPTIONS: they would be frozen at import, and an administrator changing the SMTP
-# server on the Email page has to take effect without restarting the container. Django
-# builds a fresh backend for every send, so this one reads the resolved settings then.
-MAILERS = {"default": {"BACKEND": "postulo.core.mail.SiteSMTPBackend"}}
+# No OPTIONS: they would be frozen at import, and an administrator changing the mail
+# settings has to take effect without restarting the container. Django builds a fresh
+# backend for every send, so this one asks which transport is selected and how it is
+# configured at that point. A plugin cannot supply MAILERS -- entry points are not loaded
+# until the app registry is ready, which is long after settings are read -- so core names
+# one backend and that backend does the asking. See postulo.notifications.transport.
+MAILERS = {"default": {"BACKEND": "postulo.notifications.transport.PluggableBackend"}}

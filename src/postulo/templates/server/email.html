@@ -24,12 +24,32 @@
       {% endif %}
       <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "From" %}</dt><dd class="min-w-0 text-right">{{ mailer.from_address }}</dd></div>
     </dl>
-    {% if not mailer.is_smtp %}
+    {% if not mailer.is_smtp and not mailer.pluggable %}
       <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
         {% translate "This instance is not sending over SMTP, so the settings below are recorded and not used. That is normal in development, where mail is printed to the console." %}
       </p>
     {% endif %}
+    {% comment %} The transport is a plugin, so it says who it is like any other (#97):
+       what it is called, what it does, and the version carrying the mail today. {% endcomment %}
+    {% if transport and mailer.pluggable %}
+      <p class="mt-3 text-xs text-ink-500 dark:text-ink-400" data-transport="{{ transport.name }}">
+        {% blocktranslate trimmed with label=transport.label version=transport.version %}
+          Carried by the {{ label }} transport, version {{ version }}.
+        {% endblocktranslate %}
+        {{ transport.description }}
+      </p>
+    {% endif %}
   </div>
+
+  {% if locked %}
+    {% comment %} Said here rather than only at the moment somebody tries to switch the
+       package off, so an administrator planning a change finds out before they plan it.
+       The rule is evaluated, not hardcoded: it opens by itself once another way back into
+       an account exists (#103). {% endcomment %}
+    <div class="alert-info mb-4 text-sm" role="note" data-locked>
+      <div>{{ locked }}</div>
+    </div>
+  {% endif %}
 
   {% if shadowed %}
     {% comment %} Both a stored value and a variable pinning it. Nothing is wrong today and

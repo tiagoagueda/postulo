@@ -162,6 +162,18 @@ class SiteSettings(models.Model):
     )
     email_from = models.EmailField(_("from address"), blank=True)
 
+    #: Which transport plugin carries the mail. Blank means the built-in SMTP one, so an
+    #: instance that has never heard of transports keeps behaving exactly as it did.
+    email_transport = models.CharField(_("mail transport"), max_length=60, blank=True)
+    #: A non-SMTP transport's own settings, drawn from the fields it declares. SMTP keeps
+    #: the named columns above, because those existed first and the environment overrides
+    #: them one by one; a transport nobody has written yet gets the generic pair, the same
+    #: shape a `Connection` uses.
+    transport_config = models.JSONField(_("transport configuration"), default=dict, blank=True)
+    transport_secrets_encrypted = models.TextField(
+        _("transport secrets"), blank=True, editable=False
+    )
+
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -200,6 +212,19 @@ class SiteSettings(models.Model):
         from postulo.plugins import secrets
 
         self.email_password_encrypted = secrets.encrypt({"password": raw} if raw else {})
+
+    @property
+    def transport_secrets(self) -> dict:
+        """The selected transport's secret settings, decrypted."""
+        from postulo.plugins import secrets
+
+        return secrets.decrypt(self.transport_secrets_encrypted)
+
+    @transport_secrets.setter
+    def transport_secrets(self, values: dict) -> None:
+        from postulo.plugins import secrets
+
+        self.transport_secrets_encrypted = secrets.encrypt(values or {})
 
     @property
     def has_email_password(self) -> bool:

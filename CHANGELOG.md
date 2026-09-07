@@ -8,6 +8,52 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Delivering mail is a plugin now, and SMTP is the one that ships.** A new kind,
+  `transport`, under `postulo.transports`. It exists for a specific person: the self-hoster
+  whose provider blocks outbound 25, 465 and 587 — most residential connections and several
+  hosts — who today has no route except finding a relay that speaks SMTP. They can install
+  one that speaks an HTTP API instead. Postulo ships exactly one transport and names no
+  vendor, which is the plugin system doing what it says it is for.
+
+  **A plugin cannot supply `MAILERS`**, and that shapes the whole thing. Django reads that
+  setting when the settings module is imported; entry points are not loaded until the app
+  registry is ready, which is later. So "SMTP is a plugin" cannot mean "the plugin defines
+  the mail settings". What it does mean: core names one backend, and that backend asks which
+  transport is selected and how it is configured **at send time** — the same mechanism the
+  Email page needed anyway, so the two are one piece of work rather than two.
+
+  **Installing a transport does not silently redirect the mail.** The registry prefers
+  third-party plugins for sources, because a plugin written for one job board knows more
+  about it than a general parser does; that argument does not transfer to where an
+  instance's mail goes. An administrator chooses, and until they do the built-in one carries
+  it. A choice naming something no longer installed falls back rather than failing.
+
+  **The lock.** A transport may not be switched off — nor its package removed — while it is
+  the last way anybody could get back into their account. That is written as a rule that is
+  *evaluated*, never as `if plugin == "smtp": refuse`. A hardcoded exception is one nobody
+  deletes, so the day another recovery route lands the lock would stay shut out of inertia,
+  and an instance running a second transport should be able to switch this one off.
+  `recovery_routes()` lists the ways in that exist: email, and a passkey, which signs
+  somebody in without the password they have forgotten. A two-factor recovery code is
+  deliberately not on that list — it is a *second* factor, so it helps somebody who still
+  knows their password and does nothing for somebody who does not. The refusal counts the
+  accounts it is protecting and names them, the way *People* refuses to remove the last
+  administrator, and it opens by itself the moment the list has something else in it.
+
+  **A transport is nobody's to decide.** The per-person policy has four states and none of
+  them means anything about mail delivery; *forced off* would be an account nobody can
+  recover. All four are refused for a transport rather than merely left off the page,
+  because the page is not the boundary.
+
+  **Three things this did not disturb.** The environment is still a complete route, so a
+  fresh instance with an empty database can send the verification email that has to come
+  before the first account exists. SMTP keeps its own named columns rather than the generic
+  configuration blob, because each is overridden individually by its own variable and
+  because of that first boot. And the email *notifier* is still a different plugin: it
+  decides something is worth telling somebody and writes the words, the transport gets those
+  words off the machine, and merging them would make notification settings and delivery
+  settings the same form. (#104)
+
 - **Email can be configured from the interface, and the environment still wins.** *Server
   settings → Email* was a read-only summary and a *Send a test message* button, so changing
   where an instance sends mail meant editing a file and restarting a container — on an

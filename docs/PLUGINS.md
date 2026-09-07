@@ -471,6 +471,67 @@ an import writes a career.
 still a Europass export, and saying "not readable XML" helps far more than "nothing here
 reads that".
 
+## Transports
+
+A **transport** carries a message off this machine. Postulo ships one, SMTP, and names no
+vendor.
+
+The reason the kind exists: a self-hoster whose provider blocks outbound 25, 465 and 587 —
+which is most residential connections and several hosts — has no route today except finding a
+relay that speaks SMTP. A transport lets them install one that speaks an HTTP API instead.
+
+```toml
+[project.entry-points."postulo.transports"]
+carrier = "postulo_carrier:CarrierTransport"
+```
+
+```python
+class CarrierTransport:
+    name = "carrier"
+    version = "1.0"
+    kind = "transport"
+    label = "Carrier"
+    description = _("Delivers over Carrier's HTTP API.")
+
+    def config_fields(self) -> list[FieldSpec]: ...
+    def test(self, config: dict) -> TestResult: ...
+    def deliver(self, messages: list, config: dict) -> int: ...
+```
+
+`deliver` takes Django `EmailMessage` objects and returns how many went, which is the
+contract an email backend already has — so a transport can be a thin wrapper around one where
+that is the honest implementation. Raising is a failure, and the caller reports it.
+
+**A transport is not a notifier**, and the difference is worth keeping. A notifier decides
+that something is worth telling somebody and writes the words; a transport gets those words
+to them. One sits on the other. Merging them would make "when should Postulo tell me things"
+and "how does this instance reach the outside world" the same form, and they are not: the
+first is a person's preference, the second is the operator's plumbing.
+
+**Three things follow from that.**
+
+*Installing yours does not redirect the mail.* The registry prefers third-party plugins for
+sources — a plugin written for one job board knows more about it than a general parser does —
+and that argument does not transfer to where an instance's mail goes. An administrator
+chooses, on *Server settings → Email*, and until they do the built-in one carries it.
+
+*Your settings are drawn from `config_fields()`*, on that page, exactly as a connection's
+are, with `secret=True` fields encrypted at rest and never shown back. SMTP is the one
+exception: its settings are named columns that predate the kind, each overridden individually
+by its own environment variable, and a fresh instance has to be able to send a verification
+email before there is a row in the database to read.
+
+*The per-person plugin policy does not apply.* None of *available*, *unavailable*, *forced
+on* or *forced off* means anything about mail delivery, and *forced off* would be an account
+nobody can recover. Postulo refuses all four for a transport rather than merely leaving them
+off the page.
+
+**The lock.** A transport may not be switched off — nor its package removed — while it is the
+last way anybody could get back into their account. That is evaluated, not hardcoded to a
+name: `recovery_routes()` lists the ways in that exist, and while removing yours would empty
+that list, the refusal stands and says whose accounts it is protecting. Add another route and
+the lock opens by itself.
+
 ## Getting a plugin into an instance
 
 **From the interface.** *Server settings → Plugins* installs a wheel an administrator

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 21:07+0000\n"
+"POT-Creation-Date: 2026-09-07 21:41+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Nederlands\n"
@@ -150,17 +150,24 @@ msgstr "%(kind)s gepland op %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s bij %(company)s"
 
+#: src/postulo/notifications/transport.py:200
+#, python-format, draft
+msgid ""
+"%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
+msgstr ""
+"%(label)s is hoe deze instantie e-mail verstuurt, en e-mail is hier de enige weg terug naar een account — %(count)d ervan zouden er niet meer in komen. Stel eerst een ander transport in."
+
 #: src/postulo/jobs/models.py:533
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s tot %(high)s"
 
-#: src/postulo/core/server_views.py:1015
+#: src/postulo/core/server_views.py:1049
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s is geïnstalleerd uit de catalogus."
 
-#: src/postulo/core/server_views.py:965
+#: src/postulo/core/server_views.py:999
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -230,19 +237,19 @@ msgstr "%(name)s heet nu @%(username)s."
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s is nu beheerder."
 
-#: src/postulo/core/server_views.py:1057
+#: src/postulo/core/server_views.py:1103
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s is verwijderd. Start Postulo opnieuw om zeker te weten dat er niets van geladen is gebleven."
 
-#: src/postulo/core/server_views.py:1041
+#: src/postulo/core/server_views.py:1082
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s staat uit; de bestanden staan er nog."
 
-#: src/postulo/core/server_views.py:1043
+#: src/postulo/core/server_views.py:1084
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s staat weer aan."
@@ -485,7 +492,7 @@ msgid ""
 msgstr ""
 "Een passkey is gebonden aan het adres waar je hem hebt gemaakt, hier %(host)s. Deze instantie onder een andere naam bereiken, of hem verplaatsen, neemt je passkeys niet mee."
 
-#: src/postulo/templates/server/email.html:83
+#: src/postulo/templates/server/email.html:105
 #, draft
 msgid "A password is stored. It is never shown, not even its length."
 msgstr ""
@@ -598,7 +605,7 @@ msgid ""
 msgstr ""
 "Een sjabloon met Postulo's eigen kolommen en één voorbeeldrij. Vul het in en upload het hierboven."
 
-#: src/postulo/core/server_views.py:538
+#: src/postulo/core/server_views.py:572
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Een testbericht van %(name)s"
@@ -889,7 +896,7 @@ msgstr "Een identificatie “overig” heeft een naam nodig."
 msgid "An address, or the link to the call."
 msgstr "Een adres, of de link naar het gesprek."
 
-#: src/postulo/plugins/policy.py:62
+#: src/postulo/plugins/policy.py:66
 #, draft
 msgid "An administrator decided this for your account."
 msgstr "Een beheerder heeft dit voor uw account besloten."
@@ -1199,7 +1206,7 @@ msgstr "Automotive"
 msgid "Available — the person chooses"
 msgstr "Beschikbaar — de persoon kiest"
 
-#: src/postulo/plugins/policy.py:64
+#: src/postulo/plugins/policy.py:68
 #, draft
 msgid "Available; you have not changed it."
 msgstr "Beschikbaar; u hebt niets gewijzigd."
@@ -1479,6 +1486,11 @@ msgstr "vacaturepagina"
 msgid "Careers page"
 msgstr "Vacaturepagina"
 
+#: src/postulo/templates/server/email.html:39
+#, python-format, draft
+msgid "Carried by the %(label)s transport, version %(version)s."
+msgstr "Bezorgd door het transport %(label)s, versie %(version)s."
+
 #: src/postulo/templates/server/plugins.html:304
 #, draft
 msgid "Catalogues"
@@ -1581,7 +1593,7 @@ msgstr "Controlesom"
 msgid "Choose a Europass file first."
 msgstr "Kies eerst een Europass-bestand."
 
-#: src/postulo/core/server_views.py:896
+#: src/postulo/core/server_views.py:930
 #, draft
 msgid "Choose a package first."
 msgstr "Kies eerst een pakket."
@@ -1810,12 +1822,12 @@ msgstr "Koppelen"
 msgid "Connect %(plugin)s"
 msgstr "%(plugin)s koppelen"
 
-#: src/postulo/core/mail.py:116
+#: src/postulo/core/mail.py:67
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Verbonden met %(host)s:%(port)s en aangemeld als %(user)s."
 
-#: src/postulo/core/mail.py:121
+#: src/postulo/core/mail.py:72
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
@@ -2540,7 +2552,7 @@ msgstr ""
 "Beide Europass-formaten: de JSON die europass.europa.eu vandaag exporteert, of de XML van de oude cv-editor, wat een oudere export op uw schijf nog steeds is. Postulo zoekt zelf uit welke het is, laat u zien wat erin staat en schrijft niets tot u het zegt."
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:447
+#: src/postulo/core/server_views.py:465
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
 #: src/postulo/templates/server/people.html:46
@@ -3352,6 +3364,11 @@ msgid ""
 msgstr ""
 "Hoe deze instantie e-mail verstuurt: verificatielinks, wachtwoordherstel, herinneringen. Stel het hier in, of in de omgeving, en bewijs het hoe dan ook."
 
+#: src/postulo/plugins/policy.py:69
+#, draft
+msgid "How this instance works, rather than a choice anybody holds."
+msgstr "Hoe deze instantie werkt, en niet een keuze die iemand toekomt."
+
 #: src/postulo/templates/jobs/capture_form.html:44
 #, draft
 msgid "How this works"
@@ -3415,7 +3432,7 @@ msgstr "Identificaties"
 msgid "Identifies itself as"
 msgstr "Meldt zich als"
 
-#: src/postulo/core/server_views.py:540
+#: src/postulo/core/server_views.py:574
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3630,7 +3647,7 @@ msgstr "instelling"
 msgid "Insurance"
 msgstr "Verzekeringen"
 
-#: src/postulo/core/server_views.py:620
+#: src/postulo/core/server_views.py:654
 #, draft
 msgid "Internal"
 msgstr "Intern"
@@ -4214,6 +4231,16 @@ msgstr "Lagere nummers komen eerst."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Kleine letters, cijfers, punten, underscores en koppeltekens."
 
+#: src/postulo/core/models.py:167
+#, draft
+msgid "mail transport"
+msgstr "e-mailtransport"
+
+#: src/postulo/core/server_forms.py:211
+#, draft
+msgid "Mail transport"
+msgstr "E-mailtransport"
+
 #: src/postulo/templates/base.html:77 src/postulo/templates/base.html:81
 #, draft
 msgid "Main"
@@ -4584,7 +4611,7 @@ msgstr ""
 msgid "no company"
 msgstr "geen bedrijf"
 
-#: src/postulo/core/server_views.py:518
+#: src/postulo/core/server_views.py:552
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Geen verbinding: %(why)s"
@@ -4678,7 +4705,12 @@ msgstr "Geen vacatures vastgelegd voor dit bedrijf."
 msgid "no role"
 msgstr "geen functie"
 
-#: src/postulo/core/mail.py:93
+#: src/postulo/notifications/smtp.py:81
+#, draft
+msgid "No server set."
+msgstr "Geen server ingesteld."
+
+#: src/postulo/core/mail.py:44
 #, draft
 msgid "No server to connect to."
 msgstr "Geen server om verbinding mee te maken."
@@ -5064,12 +5096,12 @@ msgid "Nothing was added."
 msgstr "Er is niets toegevoegd."
 
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:738 src/postulo/core/server_views.py:772
+#: src/postulo/core/server_views.py:772 src/postulo/core/server_views.py:806
 #, draft
 msgid "Nothing was different."
 msgstr "Er was niets anders."
 
-#: src/postulo/core/server_views.py:934
+#: src/postulo/core/server_views.py:968
 #, draft
 msgid "Nothing was installed."
 msgstr "Er is niets geïnstalleerd."
@@ -5239,7 +5271,7 @@ msgstr[0] ""
 msgstr[1] ""
 "%(total)s passkeys op dit account. Ze melden je aan met een vingerafdruk, je gezicht of een pincode, en er is geen wachtwoord dat kan uitlekken."
 
-#: src/postulo/templates/server/email.html:44
+#: src/postulo/templates/server/email.html:66
 #, python-format, draft
 msgid ""
 "One setting below is stored here and overridden by the environment. Remove that variable and the stored value takes over, without anybody editing anything."
@@ -5616,7 +5648,7 @@ msgid "plugin repository"
 msgstr "plugin-repository"
 
 #: src/postulo/accounts/settings_views.py:119
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:574
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:608
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -5624,7 +5656,7 @@ msgstr "plugin-repository"
 msgid "Plugins"
 msgstr "Plugins"
 
-#: src/postulo/core/server_views.py:767
+#: src/postulo/core/server_views.py:801
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -6481,7 +6513,7 @@ msgstr "salaris tot"
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
-#: src/postulo/templates/server/email.html:89
+#: src/postulo/templates/server/email.html:111
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:75
@@ -6515,8 +6547,8 @@ msgstr "Opgeslagen in uw vacatures. Beslis wanneer u er klaar voor bent."
 
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:738
-#: src/postulo/core/server_views.py:772 src/postulo/core/server_views.py:868
+#: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:772
+#: src/postulo/core/server_views.py:806 src/postulo/core/server_views.py:902
 #: src/postulo/resume/views.py:119
 #, draft
 msgid "Saved."
@@ -6609,12 +6641,12 @@ msgstr "Naar het dashboard"
 msgid "See the listings"
 msgstr "De vacatures bekijken"
 
-#: src/postulo/templates/server/email.html:103
+#: src/postulo/templates/server/email.html:125
 #, draft
 msgid "Send a real message"
 msgstr "Een echt bericht sturen"
 
-#: src/postulo/templates/server/email.html:109
+#: src/postulo/templates/server/email.html:131
 #, draft
 msgid "Send a test message"
 msgstr "Een testbericht sturen"
@@ -6645,7 +6677,7 @@ msgstr "Sturen naar"
 msgid "Send to stores now"
 msgstr "Nu naar de opslagen versturen"
 
-#: src/postulo/core/server_views.py:550
+#: src/postulo/core/server_views.py:584
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Versturen mislukt: %(error)s"
@@ -6679,7 +6711,7 @@ msgstr "Verstuurde documenten"
 msgid "sent on"
 msgstr "verzonden op"
 
-#: src/postulo/core/server_views.py:553 src/postulo/notifications/email.py:80
+#: src/postulo/core/server_views.py:587 src/postulo/notifications/email.py:80
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Verstuurd naar %(to)s."
@@ -6758,7 +6790,7 @@ msgstr "Instellen wanneer de vacature niet meer beschikbaar is."
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:108 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:21
-#: src/postulo/templates/server/email.html:59
+#: src/postulo/templates/server/email.html:81
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
 #, draft
@@ -6880,7 +6912,7 @@ msgstr "Eenmalige aanmelding telt als tweede factor"
 msgid "Site search"
 msgstr "Zoeken op de site"
 
-#: src/postulo/core/models.py:176 src/postulo/core/models.py:177
+#: src/postulo/core/models.py:188 src/postulo/core/models.py:189
 #, draft
 msgid "site settings"
 msgstr "site-instellingen"
@@ -7181,7 +7213,7 @@ msgstr "Uitzetten"
 msgid "Switch on"
 msgstr "Aanzetten"
 
-#: src/postulo/plugins/policy.py:61
+#: src/postulo/plugins/policy.py:65
 #, draft
 msgid "Switched off for this whole instance."
 msgstr "Uitgezet voor deze hele installatie."
@@ -7322,7 +7354,7 @@ msgstr "Testen"
 msgid "Test failed: %(message)s"
 msgstr "Test mislukt: %(message)s"
 
-#: src/postulo/templates/server/email.html:95
+#: src/postulo/templates/server/email.html:117
 #, draft
 msgid "Test the connection"
 msgstr "Test de verbinding"
@@ -7502,7 +7534,7 @@ msgstr "Dat is geen uitkomst die Postulo kent."
 msgid "That is not something Postulo can do about it."
 msgstr "Dat is niet iets wat Postulo ermee kan doen."
 
-#: src/postulo/core/server_views.py:844 src/postulo/core/server_views.py:885
+#: src/postulo/core/server_views.py:878 src/postulo/core/server_views.py:919
 #, draft
 msgid "That is not something this page does."
 msgstr "Dat doet deze pagina niet."
@@ -7530,7 +7562,7 @@ msgid ""
 msgstr ""
 "Het laatste cijfer van deze ORCID past niet bij de rest, dus een ervan is een typefout."
 
-#: src/postulo/core/server_views.py:943 src/postulo/core/server_views.py:948
+#: src/postulo/core/server_views.py:977 src/postulo/core/server_views.py:982
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Dat pakket wacht niet meer; upload het opnieuw."
@@ -7611,7 +7643,7 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "De handtekening of sleutel van de catalogus is niet leesbaar: %(error)s"
 
-#: src/postulo/core/server_views.py:1000
+#: src/postulo/core/server_views.py:1034
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "De catalogi hebben geantwoord en vermelden nog niets."
@@ -7662,7 +7694,7 @@ msgstr "De download is veel groter dan een plug-in hoort te zijn."
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "De eerdere versie die deze vervangt. Het oude bestand blijft bewaard."
 
-#: src/postulo/core/server_views.py:803 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:837 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "De omgeving stelt “%(name)s” in, dus dit kan hier niet worden gewijzigd."
@@ -7722,7 +7754,7 @@ msgstr "Het installatieprogramma weigerde het: %(error)s"
 msgid "The job title"
 msgstr "De functietitel"
 
-#: src/postulo/core/server_views.py:860
+#: src/postulo/core/server_views.py:894
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -7761,7 +7793,7 @@ msgstr "Het logo is weg."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Het logo is niet gewijzigd: %(problem)s"
 
-#: src/postulo/core/server_views.py:555 src/postulo/notifications/email.py:79
+#: src/postulo/core/server_views.py:589 src/postulo/notifications/email.py:79
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "De mailbackend accepteerde niets."
@@ -7778,7 +7810,7 @@ msgid ""
 msgstr ""
 "De eerstvolgende gesprekken in de agenda, en die zonder genoteerde uitkomst."
 
-#: src/postulo/core/server_views.py:833
+#: src/postulo/core/server_views.py:867
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "De officiële repository wordt geleegd, niet verwijderd."
@@ -7788,7 +7820,7 @@ msgstr "De officiële repository wordt geleegd, niet verwijderd."
 msgid "The opening paragraph, if you use one."
 msgstr "De openingsalinea, als u er een gebruikt."
 
-#: src/postulo/templates/server/email.html:76
+#: src/postulo/templates/server/email.html:98
 #, python-format, draft
 msgid ""
 "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -7800,7 +7832,7 @@ msgstr ""
 msgid "The pay"
 msgstr "De beloning"
 
-#: src/postulo/core/server_views.py:621
+#: src/postulo/core/server_views.py:655
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "De plugins die in Postulo meegeleverd worden. Er wordt niets opgehaald."
@@ -7843,14 +7875,14 @@ msgstr ""
 msgid "The search in four numbers"
 msgstr "De zoektocht in vier cijfers"
 
-#: src/postulo/core/mail.py:66
+#: src/postulo/core/mail.py:17
 #, draft
 msgid ""
 "The server does not offer STARTTLS. Turn it off, or use a port that does."
 msgstr ""
 "De server biedt geen STARTTLS aan. Schakel het uit, of gebruik een poort die het wel biedt."
 
-#: src/postulo/core/mail.py:109
+#: src/postulo/core/mail.py:60
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "De server heeft die gegevens geweigerd: %(detail)s"
@@ -7949,7 +7981,7 @@ msgstr "Er is geen adres om het opnieuw op te halen."
 msgid "There is no file to send."
 msgstr "Er is geen bestand om te versturen."
 
-#: src/postulo/core/server_views.py:798
+#: src/postulo/core/server_views.py:832
 #, draft
 msgid "There is no repository by that name."
 msgstr "Er is geen repository met die naam."
@@ -8209,6 +8241,16 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Transport en logistiek"
 
+#: src/postulo/core/models.py:172
+#, draft
+msgid "transport configuration"
+msgstr "transportconfiguratie"
+
+#: src/postulo/core/models.py:174
+#, draft
+msgid "transport secrets"
+msgstr "transportgeheimen"
+
 #: src/postulo/templates/core/search.html:28
 #, draft
 msgid "Try fewer words, or a different spelling."
@@ -8300,12 +8342,12 @@ msgid "Update the preview"
 msgstr "Voorbeeld bijwerken"
 
 #: src/postulo/accounts/models.py:303 src/postulo/core/models.py:20
-#: src/postulo/core/models.py:165
+#: src/postulo/core/models.py:177
 #, draft
 msgid "updated at"
 msgstr "bijgewerkt op"
 
-#: src/postulo/core/models.py:172
+#: src/postulo/core/models.py:184
 #, draft
 msgid "updated by"
 msgstr "bijgewerkt door"
@@ -8408,7 +8450,7 @@ msgstr "Gebruikersnaam of e-mail"
 msgid "users"
 msgstr "gebruikers"
 
-#: src/postulo/templates/server/email.html:105
+#: src/postulo/templates/server/email.html:127
 #, draft
 msgid ""
 "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
@@ -8555,6 +8597,11 @@ msgstr "wat een monitor moet bevragen"
 msgid "What a new account starts with. Each person can change theirs."
 msgstr ""
 "Waarmee een nieuw account begint. Iedereen kan het eigen account aanpassen."
+
+#: src/postulo/core/server_forms.py:214
+#, draft
+msgid "What carries the mail off this machine."
+msgstr "Wat de e-mail van deze machine af draagt."
 
 #: src/postulo/templates/resume/europass_import.html:127
 #, draft
@@ -9034,7 +9081,7 @@ msgstr ""
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "U kunt het account waarmee u bent ingelogd niet deactiveren."
 
-#: src/postulo/plugins/policy.py:63
+#: src/postulo/plugins/policy.py:67
 #, draft
 msgid "You chose this."
 msgstr "U hebt dit gekozen."
@@ -9228,20 +9275,20 @@ msgstr "uw functie"
 msgid "Your username has been changed."
 msgstr "Uw gebruikersnaam is gewijzigd."
 
-#: src/postulo/core/server_views.py:839
+#: src/postulo/core/server_views.py:873
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr ""
 "“%(name)s” is weg. Alles wat eruit is geïnstalleerd blijft geïnstalleerd."
 
-#: src/postulo/core/server_views.py:824
+#: src/postulo/core/server_views.py:858
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "“%(name)s” staat uit. Er wordt niets nieuws uit geïnstalleerd of bijgewerkt; wat al geïnstalleerd was blijft werken."
 
-#: src/postulo/core/server_views.py:821
+#: src/postulo/core/server_views.py:855
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""

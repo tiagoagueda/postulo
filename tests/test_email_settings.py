@@ -19,6 +19,8 @@ exist.
 
 from __future__ import annotations
 
+import contextlib
+
 import pytest
 from django.core import mail as django_mail
 from django.urls import reverse
@@ -26,7 +28,24 @@ from django.urls import reverse
 from postulo.core import mail as postulo_mail
 from postulo.core import site
 from postulo.core.models import SiteSettings
-from postulo.plugins import secrets
+from postulo.notifications import transport
+from postulo.notifications.transport import PluggableBackend as postulo_mail_backend
+from postulo.plugins import registry, secrets
+
+
+@contextlib.contextmanager
+def _only_transport(plugin_class):
+    """Run with one transport registered and SMTP out of the way, then put it back."""
+    from postulo.notifications.smtp import SMTPTransport
+
+    registry.unregister_builtin("transport", SMTPTransport)
+    registry.register_builtin("transport", plugin_class)
+    try:
+        yield
+    finally:
+        registry.unregister_builtin("transport", plugin_class)
+        registry.register_builtin("transport", SMTPTransport)
+
 
 pytestmark = pytest.mark.django_db
 
@@ -211,39 +230,44 @@ def test_a_password_encrypted_under_a_lost_key_does_not_stop_mail(client, admin,
 # ------------------------------------------------------- read at send time, not at import
 
 
-def test_the_backend_takes_the_settings_in_force_when_it_is_built(admin, settings):
+def test_the_settings_are_read_when_a_message_is_sent_not_at_import(admin):
     """The reason the page can exist: MAILERS is frozen at import and this is not."""
+    smtp = registry.find_plugin("transport", "smtp")
     row = SiteSettings.get()
     row.email_host, row.email_port, row.email_username = "smtp.first.example", 2525, "one"
     row.email_use_tls, row.email_timeout = False, 7
     row.email_password = "first-password"
     row.save()
 
-    backend = postulo_mail.SiteSMTPBackend(alias="default")
-    assert (backend.host, backend.port, backend.username) == ("smtp.first.example", 2525, "one")
-    assert backend.password == "first-password" and backend.timeout == 7
+    config = transport.configuration(smtp)
+    assert (config["host"], config["port"], config["username"]) == (
+        "smtp.first.example",
+        2525,
+        "one",
+    )
+    assert config["password"] == "first-password" and config["timeout"] == 7
 
     row.email_host = "smtp.second.example"
     row.save()
 
-    assert postulo_mail.SiteSMTPBackend(alias="default").host == "smtp.second.example"
+    assert transport.configuration(smtp)["host"] == "smtp.second.example"
 
 
-def test_the_backend_ignores_options_that_would_freeze_it(admin):
-    """Passing OPTIONS would put the stale values back; they are dropped rather than obeyed."""
-    row = SiteSettings.get()
-    row.email_host = "smtp.stored.example"
-    row.save()
+def test_the_backend_refuses_options_that_would_freeze_it(admin):
+    """It carries nothing, and says so rather than quietly ignoring what it is handed.
 
-    backend = postulo_mail.SiteSMTPBackend(alias="default", host="smtp.frozen.example", port=99)
+    OPTIONS in MAILERS are exactly the values frozen at import that this design exists to
+    avoid, so an instance that put them there would be one whose Email page silently did
+    nothing. Django's base backend raises on any option a backend does not declare, which
+    turns that mistake into a refusal at the first send instead of a mystery.
+    """
+    from django.core.mail.exceptions import InvalidMailer
 
-    assert backend.host == "smtp.stored.example"
-    assert backend.port != 99
+    with pytest.raises(InvalidMailer):
+        postulo_mail_backend(alias="default", host="smtp.frozen.example", port=99)
 
 
-def test_the_from_address_is_stamped_on_anything_that_did_not_choose_one(
-    admin, settings, monkeypatch
-):
+def test_the_from_address_is_stamped_on_anything_that_did_not_choose_one(admin, settings):
     """The backend is the only place every message passes through.
 
     `DEFAULT_FROM_EMAIL` is read at send time by Django's code and allauth's, and neither
@@ -253,21 +277,30 @@ def test_the_from_address_is_stamped_on_anything_that_did_not_choose_one(
     row = SiteSettings.get()
     row.email_host, row.email_from = "smtp.stored.example", "chosen@example.org"
     row.save()
-
     sent = []
-    monkeypatch.setattr(
-        "django.core.mail.backends.smtp.EmailBackend.send_messages",
-        lambda self, messages: sent.extend(messages) or len(messages),
-    )
 
-    postulo_mail.SiteSMTPBackend(alias="default").send_messages(
-        [
-            django_mail.EmailMessage(subject="s", body="b", to=["someone@example.org"]),
-            django_mail.EmailMessage(
-                subject="s", body="b", from_email="a-plugin@example.org", to=["x@example.org"]
-            ),
-        ]
-    )
+    class Recording:
+        name, version, kind, label, description = "recording", "1", "transport", "R", ""
+
+        def config_fields(self):
+            return []
+
+        def test(self, config):
+            return None
+
+        def deliver(self, messages, config):
+            sent.extend(messages)
+            return len(messages)
+
+    with _only_transport(Recording):
+        postulo_mail_backend(alias="default").send_messages(
+            [
+                django_mail.EmailMessage(subject="s", body="b", to=["someone@example.org"]),
+                django_mail.EmailMessage(
+                    subject="s", body="b", from_email="a-plugin@example.org", to=["x@example.org"]
+                ),
+            ]
+        )
 
     assert [message.from_email for message in sent] == [
         "chosen@example.org",

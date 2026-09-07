@@ -213,6 +213,12 @@ class ImporterPlugin(Protocol):
         ...
 
 
+# ------------------------------------------------------------------ transports
+
+#: Where something that *delivers* mail registers itself.
+TRANSPORT_GROUP = "postulo.transports"
+
+
 # ----------------------------------------------------------- connected plugins
 
 #: The kinds of plugin that talk to another service on a person's behalf, and the
@@ -257,6 +263,49 @@ class TestResult:
 
     ok: bool
     message: str = ""
+
+
+@runtime_checkable
+class TransportPlugin(Protocol):
+    """What something that carries a message off this machine must provide.
+
+    A transport is not a notifier and the difference is worth keeping. A *notifier* decides
+    that something is worth telling somebody and writes the words; a *transport* gets those
+    words to them. One sits on the other. Merging them would make "when should Postulo tell
+    me things" and "how does this instance reach the outside world" the same form, and they
+    are not: the first is a person's preference, the second is the operator's plumbing.
+
+    That is also why a transport is **not** governed by the per-person plugin policy (#95).
+    None of *available*, *unavailable*, *forced on* or *forced off* means anything about
+    mail delivery, and *forced off* would mean an account nobody can recover.
+
+    Why the kind exists at all: a self-hoster whose provider blocks outbound 25, 465 and
+    587 -- which is most residential connections and several hosts -- has no route today
+    except finding a relay that speaks SMTP. A transport lets them install one that speaks
+    an HTTP API instead. Postulo ships exactly one, SMTP, and names no vendor.
+
+    ``deliver`` takes Django ``EmailMessage`` objects and returns how many it sent, which
+    is the contract an email backend already has, so a transport can be a thin wrapper
+    around one where that is the honest implementation.
+    """
+
+    name: str
+    version: str
+    kind: str
+    label: str
+    description: str
+
+    def config_fields(self) -> list[FieldSpec]:
+        """What this transport needs to know. Drawn by Postulo, as a connection's are."""
+        ...
+
+    def test(self, config: dict) -> TestResult:
+        """Prove the configuration without sending anybody a message."""
+        ...
+
+    def deliver(self, messages: list, config: dict) -> int:
+        """Send them, and say how many went. Raising is a failure the caller reports."""
+        ...
 
 
 @runtime_checkable

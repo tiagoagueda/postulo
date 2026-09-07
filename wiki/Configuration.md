@@ -235,6 +235,19 @@ whenever both exist.
 Only STARTTLS is supported, which is a server on port 587 that upgrades the connection after
 opening it. Implicit TLS on port 465 is not offered yet, in the environment or on the page.
 
+**If your host blocks outbound SMTP**, which most residential connections and several VPS
+providers do, delivery is a plugin: install a package that speaks an HTTP API instead and
+pick it under *Mail transport* on the same page. Postulo ships the SMTP one and names no
+vendor; `docs/PLUGINS.md` has the contract. Until you install a second one there is nothing
+to choose and the chooser is not shown.
+
+One refusal worth knowing about before you meet it: **the transport carrying your mail cannot
+be switched off, and its package cannot be removed, while mail is the only way anybody could
+get back into their account.** Postulo counts the accounts that have nothing else — a passkey
+signs somebody in without the password they have forgotten; a two-factor recovery code does
+not, because it is a second factor and they still need the password. Set up another transport,
+or give everyone a passkey, and the refusal lifts on its own.
+
 In development, email is printed to the console instead of being sent, so the settings are
 recorded and not used. The page says that too.
 

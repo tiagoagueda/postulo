@@ -35,6 +35,10 @@ from django.utils.translation import gettext_lazy as _
 #: Kinds a person may hold an opinion about. A transport is deliberately not one of them.
 GOVERNED_KINDS = ("source", "notifier", "store", "sync", "importer")
 
+#: The rest. Named rather than implied, because the guard below has to look a plugin up by
+#: name and "every kind that is not governed" is the honest way to write that.
+UNGOVERNED_KINDS = ("transport",)
+
 
 @dataclass(frozen=True)
 class Decision:
@@ -62,6 +66,7 @@ class Decision:
             "administrator": _("An administrator decided this for your account."),
             "person": _("You chose this."),
             "default": _("Available; you have not changed it."),
+            "infrastructure": _("How this instance works, rather than a choice anybody holds."),
         }[self.decided_by]
 
 
@@ -74,9 +79,30 @@ def _switched_off_for_the_instance(name: str) -> bool:
         return False
 
 
+def is_ungoverned(plugin_name: str) -> bool:
+    """Whether this plugin is instance plumbing rather than anybody's to decide.
+
+    A transport is. None of *available*, *unavailable*, *forced on* or *forced off* means
+    anything about where an instance's mail goes, and *forced off* would mean an account
+    nobody can recover (#104).
+    """
+    from .registry import plugins
+
+    return any(
+        getattr(item, "name", None) == plugin_name
+        for kind in UNGOVERNED_KINDS
+        for item in plugins(kind)
+    )
+
+
 def decide(plugin_name: str, person) -> Decision:
     """The one answer, for one plugin and one person."""
     from .models import PluginPolicy
+
+    # Before anything else, because this is what stops a hand-written POST reaching
+    # `set_choice` with a transport's name and switching the mail off for somebody.
+    if is_ungoverned(plugin_name):
+        return Decision(on=True, offered=False, theirs=False, decided_by="infrastructure")
 
     if _switched_off_for_the_instance(plugin_name):
         return Decision(on=False, offered=False, theirs=False, decided_by="instance")
