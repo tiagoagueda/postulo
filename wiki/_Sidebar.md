@@ -22,6 +22,7 @@
 - [The API](The-capture-API)
 
 **Project**
+- [Support Postulo](https://buymeacoffee.com/tiagoagueda) ☕
 - [Roadmap](Roadmap)
 - [Contributing](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CONTRIBUTING.md)
 - [Translating](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/TRANSLATING.md)

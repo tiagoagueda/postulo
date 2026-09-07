@@ -5,9 +5,14 @@
 Postulo stores personal documents — CVs, cover letters, and employment history — so
 security reports are taken seriously.
 
-Please report vulnerabilities privately rather than opening a public issue. Open a
-confidential issue on the [Forgejo repository](https://source.tiagoagueda.com/postulo/postulo),
-or email the maintainer if you have no account there.
+Please report vulnerabilities privately rather than opening a public issue. Either:
+
+- open a confidential issue on the
+  [Forgejo repository](https://source.tiagoagueda.com/postulo/postulo); or
+- **email the maintainer at <tiago.agueda@tiagoagueda.com>**, which needs no account
+  anywhere and is the right route if you would rather not register to report a problem.
+
+Both reach the same person.
 
 Please include the affected version or commit, what an attacker could achieve, and the
 steps to reproduce it. You can expect an acknowledgement within a week.
@@ -53,6 +58,12 @@ The process, so that it is the same every time and needs no thinking on a bad da
 
 Postulo itself: a report about Postulo's own code follows the same steps from 2 onwards,
 with the reporter kept informed and credited if they wish.
+
+## Who to reach
+
+The maintainer is Tiago Águeda, <tiago.agueda@tiagoagueda.com>. There is one of him, so an
+acknowledgement within a week is a promise he can keep rather than an aspiration; if a
+report is urgent, say so in the subject.
 
 ## Supported versions
 

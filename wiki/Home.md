@@ -10,9 +10,10 @@ letters, and the record of what actually happened, on hardware you control.
 
 From the Latin *postulō* — "I apply for". First person, deliberately.
 
-> **Status: 0.1.0.** Usable, and used — but by one person, for days rather than months.
-> Treat it as a first release that works rather than as a mature one. See
-> [Roadmap](Roadmap).
+> **Status.** The last tagged release is **0.1.0**, and a great deal has landed since
+> without being released — releasing is a deliberate act here. Usable and used, but by one
+> person, for weeks rather than years: treat it as something that works rather than
+> something that is mature. [Roadmap](Roadmap) says exactly what is in and what is not.
 
 ## Never paywalled
 
@@ -21,6 +22,22 @@ are, more often than not, people who cannot afford to pay for the tools to find 
 Everything this software does is available in full to everyone who runs it — no paid
 tier, no "pro" edition, no licence key, no feature that unlocks later. That is a
 commitment, not a strategy, and it does not change.
+
+### If it is worth something to you
+
+**Voluntary support is this project's only income** — not its main one, its only one.
+There is no company behind Postulo and no paid tier waiting to appear once enough people
+depend on it. One person writes it.
+
+<a href="https://buymeacoffee.com/tiagoagueda"><img src="images/buy-me-a-coffee.png" alt="Buy me a coffee" height="44"></a>
+
+Nothing is owed and nothing is unlocked by it. And **nothing inside Postulo will ever ask
+you for money**: no banner in the interface, no prompt, no reminder on the dashboard. This
+page is where the question is put, and nowhere else.
+
+If money is the wrong thing to give — and for a lot of people looking for work, it is —
+a bug report, a translation reviewed by somebody who actually speaks the language, or
+telling one person who needs this that it exists are worth as much.
 
 ## Modular by design
 
