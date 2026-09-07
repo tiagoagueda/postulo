@@ -1,4 +1,4 @@
-{% load i18n %}{% comment %}
+{% load i18n postulo %}{% comment %}
   The country and the number, side by side. The country chooser has a name of its own
   because a bare select in a two-part control is announced as nothing at all; the visible
   label belongs to the field as a whole and cannot serve both.
@@ -6,15 +6,28 @@
 {% comment %} The select must be allowed to shrink below the width of its longest option,
    or it takes the whole row and leaves the number box a few pixels wide -- which is both
    unusable and a WCAG 2.2 target-size failure. `min-w-0` is what permits that; the browser
-   then clips the closed select's text, which is why the flag and dialling code come first.
+   then clips the closed select's text, which is why the dialling code comes first.
+{% endcomment %}
+{% comment %} The flag sits over the select rather than inside it: an <option> holds text
+   and nothing else, in every browser, so no image can go in the list itself (#88). Out
+   here it is arguably more use than it was in there -- visible without opening anything.
+   The space is reserved whether or not a flag is showing, so choosing a country moves
+   nothing on the page.
+
+   Each option carries its own flag's URL. That is around 11 KB of repeated attribute per
+   field, which gzip takes to about two, and it is the only correct way: static files are
+   served under a content hash, so there is no pattern a script could build a URL from.
 {% endcomment %}
 <div class="flex gap-2">
-  <div class="w-36 shrink-0">
+  <div class="relative w-40 shrink-0">
+    <span class="pointer-events-none absolute inset-y-0 start-2.5 flex items-center"
+          data-phone-flag>{% flag widget.country %}</span>
     {% with widget=widget.subwidgets.0 %}
-      <select name="{{ widget.name }}" id="{{ widget.attrs.id }}" class="field-input w-full min-w-0"
-              aria-label="{% translate 'Country the number is in' %}">
+      <select name="{{ widget.name }}" id="{{ widget.attrs.id }}"
+              class="field-input w-full min-w-0 ps-9"
+              aria-label="{% translate 'Country the number is in' %}" data-phone-country>
         {% for group, options, index in widget.optgroups %}
-          {% for option in options %}<option value="{{ option.value|stringformat:'s' }}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>{% endfor %}
+          {% for option in options %}<option value="{{ option.value|stringformat:'s' }}" data-flag="{% flag_url option.value %}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>{% endfor %}
         {% endfor %}
       </select>
     {% endwith %}

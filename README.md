@@ -219,7 +219,10 @@ uv run ruff format .
 [AGPL-3.0-or-later](LICENSE). If you run a modified Postulo as a network service, your
 users are entitled to its source.
 
-The icons are [Lucide](https://lucide.dev), used under the ISC licence.
+The icons are [Lucide](https://lucide.dev), used under the ISC licence, and the country
+flags are [flag-icons](https://github.com/lipis/flag-icons), used under the MIT licence.
+Both are copied into the repository, so nothing is fetched from anybody else's server at
+runtime; the flags carry their notice beside them in `src/postulo/static/flags/`.
 
 ## Where this lives
 

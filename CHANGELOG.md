@@ -21,6 +21,27 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Flags were emoji, and Windows draws those as two letters.** A flag emoji is not a
+  character: it is two *regional indicator* code points, and a font is invited — never
+  required — to draw the pair as a flag. Segoe UI Emoji never has and Microsoft has said it
+  will not, so every Windows machine showed `PT` where everyone else saw a flag. Both places
+  this was used carried a comment predicting exactly that and calling it "a legible fallback
+  and not a broken image". It is not a fallback; it looks broken, and it looked broken to
+  the maintainer on his own desktop. Flags are now SVG images from
+  [flag-icons](https://github.com/lipis/flag-icons) (MIT), copied into the repository like
+  the icons already were — nothing is fetched from anybody else's server, and the policy
+  still says `img-src 'self'`. **The telephone field changed shape**: an `<option>` can hold
+  text and nothing else in any browser, so no image could ever have gone in that list. The
+  flag moved out beside the closed chooser, where it is arguably more use — visible without
+  opening anything — and the list now reads `+351 Portugal`. The chooser is still a native
+  `<select>`, because replacing it with something that could hold pictures would trade a
+  control that works on every phone and with every screen reader for one that has to be
+  re-proved against all of them. With JavaScript off the flag still shows the country the
+  page loaded with. On the way, `languages.FLAGS` held the emoji and `phones.FROM_LANGUAGE`
+  held the ISO code for the same 24 languages — one fact written down twice, in the codebase
+  whose own telephone field refuses to store a country column for precisely that reason. It
+  is one map now, and a test fails if the two ever disagree. (#88)
+
 - **The authenticator QR code could not be seen, let alone scanned, in the dark theme.**
   `qrcode` draws the modules as one path filled `#000000` and gives the image no background
   at all — not even a white quiet zone; black is the only colour in the file. On a light

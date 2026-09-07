@@ -18,6 +18,45 @@
     }
   });
 
+  // The flag beside a telephone field's country chooser. An <option> holds text and
+  // nothing else in every browser, so the flag cannot live in the list; it sits over the
+  // closed select instead, and this keeps it pointing at whatever is chosen (#88).
+  //
+  // The server has already drawn the right flag for the country the field loaded with, so
+  // with this script blocked or still loading the field is correct -- it simply stops
+  // following the select until the form is saved. Each option carries its own URL because
+  // static files are served under a content hash, so there is no pattern to build one
+  // from.
+  document.addEventListener("change", function (event) {
+    var select = event.target.closest("[data-phone-country]");
+    if (!select) {
+      return;
+    }
+    var holder = select.parentNode.querySelector("[data-phone-flag]");
+    if (!holder) {
+      return;
+    }
+    var option = select.options[select.selectedIndex];
+    var url = option ? option.getAttribute("data-flag") : "";
+    if (!url) {
+      holder.textContent = "";
+      return;
+    }
+    var image = holder.querySelector("img");
+    if (!image) {
+      image = document.createElement("img");
+      // Matches what the template renders, so the two cannot drift apart in appearance.
+      image.className = "flag";
+      image.width = 20;
+      image.height = 15;
+      image.alt = "";
+      image.setAttribute("aria-hidden", "true");
+      holder.appendChild(image);
+    }
+    image.setAttribute("data-flag", (select.value || "").toLowerCase());
+    image.src = url;
+  });
+
   // Dragging a card between board columns. No library and no new endpoint: on drop the
   // card's own status menu is set and its form submitted, so the server path is exactly
   // the one the menu already uses and the timeline entry is written the same way.

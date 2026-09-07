@@ -30,7 +30,10 @@ How Postulo behaves for you lives under **Settings**, one section per page:
   one most people drop: the Postulo wordmark already goes there, and once the link is
   gone the wordmark says so to a screen reader and lights up on the dashboard itself.
 - **Language and time** — the interface language, and the time zone dates are shown in.
-  Postulo speaks every official language of the European Union; a language whose
+  Each language is written in itself, so you can find yours without reading English, and
+  the flag beside it is a picture rather than an emoji — Windows does not draw flag emoji,
+  and used to show two letters here instead. Postulo speaks every official language of the
+  European Union; a language whose
   translation is a machine-assisted draft says so in the list until a speaker has
   reviewed it, and [translating](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/TRANSLATING.md)
   is the easiest way to help.

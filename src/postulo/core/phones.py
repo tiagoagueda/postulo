@@ -16,10 +16,12 @@ constant stream of updates, and Postulo has no use for the answer: it is not goi
 anything. A number nobody can parse is still worth keeping — refusing to save it would be
 the worst possible outcome — so an unparseable number is stored exactly as it was typed.
 
-The flags are derived from the country code rather than listed, because unlike a language
-a country **is** a country: ``PT`` becomes the two regional indicators for P and T. The
-same Windows caveat as the language picker applies, and the same answer: two letters is a
-legible fallback.
+This module has no opinion about flags any more. It used to build one from the country
+code -- ``PT`` into the two regional indicators for P and T -- and note that Windows drew
+the letters instead, calling that a legible fallback. It is not one (#88). The flag is an
+SVG now, drawn by the ``{% flag %}`` tag from the country code this module already
+supplies, and the builder was deleted rather than left lying about: a function whose only
+purpose is to produce the broken thing is an invitation to produce it again.
 """
 
 from __future__ import annotations
@@ -316,27 +318,11 @@ FROM_LANGUAGE: dict[str, str] = {
 _DIGITS = re.compile(r"\D+")
 
 
-def flag(country: str) -> str:
-    """The flag for an ISO country code, built from the code itself.
-
-    Unlike a language, a country is a country, so nothing has to be decided by hand: the
-    two letters map straight onto the two regional indicator characters.
-    """
-    country = (country or "").strip().upper()
-    if len(country) != 2 or not country.isalpha():
-        return ""
-    return "".join(chr(0x1F1E6 + ord(letter) - ord("A")) for letter in country)
-
-
 @dataclass(frozen=True)
 class Country:
     code: str
     dialling: str
     name: str
-
-    @property
-    def flag(self) -> str:
-        return flag(self.code)
 
     @property
     def label(self) -> str:

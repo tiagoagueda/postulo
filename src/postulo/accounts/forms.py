@@ -458,6 +458,10 @@ class LocaleForm(forms.ModelForm):
         because the name beside it already says what it is, and the name carries its own
         ``lang``.
 
+        What each option carries is the *country* whose flag stands for the language, not
+        the flag itself; ``{% flag %}`` turns it into an image. It used to be the emoji,
+        which Windows draws as two letters (#88).
+
         Twenty-four rows also read better than a dropdown of twenty-four: somebody
         looking for their language sees all of them at once.
         """
@@ -473,7 +477,7 @@ class LocaleForm(forms.ModelForm):
                         {
                             "code": code,
                             "name": name,
-                            "flag": languages.flag(code),
+                            "country": languages.flag_country(code),
                             "selected": code == current,
                         }
                         for code, name in entries
@@ -488,7 +492,7 @@ class LocaleForm(forms.ModelForm):
                     {
                         "code": "",
                         "name": default[1],
-                        "flag": "",
+                        "country": "",
                         "selected": not current,
                     }
                 ],

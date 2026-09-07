@@ -7,6 +7,8 @@ is unreachable and nothing in the record says which country it belonged to.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from django.urls import reverse
 
@@ -30,12 +32,16 @@ def test_every_dialling_code_is_digits():
         assert dialling.isdigit(), f"{code} ({name}) has {dialling!r}"
 
 
-def test_a_flag_is_built_from_the_country_code():
-    """Unlike a language, a country is a country: nothing has to be decided by hand."""
-    assert phones.flag("PT") == "\U0001f1f5\U0001f1f9"
-    assert phones.flag("gb") == "\U0001f1ec\U0001f1e7"
-    assert phones.flag("") == ""
-    assert phones.flag("nonsense") == ""
+def test_the_emoji_flag_builder_is_gone():
+    """It produced two regional indicators, which Windows draws as two letters (#88).
+
+    Flags are SVGs now, drawn by the `{% flag %}` tag from the country code this module
+    already supplies. This asserts the old builder is not quietly still here for somebody
+    to reach for: a function whose only purpose is to produce the broken thing is an
+    invitation to produce it again.
+    """
+    assert not hasattr(phones, "flag")
+    assert not hasattr(phones.countries()[0], "flag")
 
 
 # ----------------------------------------------------------- combining the two
@@ -134,7 +140,7 @@ def test_the_form_shows_a_stored_number_split_back_into_its_parts(client, user):
 
     html = client.get(reverse("jobs:contact_update", args=[contact.pk])).content.decode()
 
-    assert '<option value="FR" selected>' in html
+    assert re.search(r'<option value="FR"[^>]* selected>', html)
     assert 'value="612345678"' in html
 
 
@@ -144,7 +150,7 @@ def test_the_country_starts_at_the_one_the_person_reads_postulo_in(client, user)
     client.force_login(user)
 
     html = client.get(reverse("jobs:contact_create")).content.decode()
-    assert '<option value="PT" selected>' in html
+    assert re.search(r'<option value="PT"[^>]* selected>', html)
 
 
 # ----------------------------------------------------------------- displaying

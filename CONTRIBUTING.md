@@ -84,6 +84,36 @@ change; CI fails if the two disagree. Icons decorate — a button is a word with
 beside it, not an icon alone — except where the header is too narrow for words, and there
 the icon gets a `label`.
 
+## Flags
+
+Country flags are [flag-icons](https://github.com/lipis/flag-icons) (MIT), drawn by the
+`{% flag %}` tag from an ISO 3166-1 alpha-2 code:
+
+```django
+{% flag "pt" %}                        {# decorative, beside a name #}
+{% flag country label="Portugal" %}    {# standing alone, so it needs a name #}
+```
+
+An **image**, not the flag emoji. A flag emoji is not a character: it is two *regional
+indicator* code points — U+1F1F5 U+1F1F9 for Portugal — and a font is invited rather than
+required to draw the pair as a flag. Segoe UI Emoji never has, so every Windows machine
+drew `PT` (#88). This paragraph deliberately does not print the emoji to make its point,
+for the same reason. Treat any emoji whose meaning depends on a font having agreed to it
+the same way.
+
+The tag renders **nothing** for a code it does not have a flag for, and every caller has to
+cope with that: a language with no uncontested home is left blank rather than given
+somebody's best guess. No flag beats a wrong flag.
+
+`assets/flags.txt` lists what is in the repository, `npm run sync:flags` copies exactly
+those, and `tests/test_flags.py` fails if the list and `core/phones.py` disagree — so a
+country added to the telephone field is a missing flag until the script is run.
+
+An `<option>` element can hold text and nothing else, so a `<select>` of countries cannot
+show flags in its list. Where one is needed, put it beside the closed select and let each
+option carry its own flag's URL in a `data-` attribute; see `partials/phone_widget.html`.
+Do not replace a native select with a custom listbox to make room for pictures.
+
 ## What will not be merged
 
 **Anything that puts a feature behind payment.** Postulo will never have a paid tier, a

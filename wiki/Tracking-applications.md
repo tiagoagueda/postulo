@@ -62,6 +62,12 @@ anywhere else, and six months later nothing in the record says which country it 
 So a phone field asks which country the number is for, starting at the one your own language
 suggests, and keeps what you type in the international form: `+33612345678`.
 
+The country's flag sits at the front of the chooser, so you can see which country a number
+belongs to without opening the list. The list itself gives the dialling code and the name —
+`+351 Portugal` — and no flag, because a dropdown entry can hold text and nothing else in
+any browser. With JavaScript turned off the flag still shows the country the page loaded
+with; it simply stops following the chooser until you save.
+
 Paste a number that already begins with `+` and it is taken exactly as it is; the chooser
 beside the box is ignored, because you have already said which country it is for. Type
 something Postulo cannot make sense of and it is kept exactly as you typed it, because a

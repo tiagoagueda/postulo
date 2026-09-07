@@ -188,9 +188,9 @@ def test_every_language_says_which_language_it_is_in(client, user):
 def test_each_language_shows_its_flag_without_reading_it_out(client, user):
     """A flag beside a name the person can already read is decoration, and is marked so.
 
-    Two regional indicator characters rather than an image: no request, nothing for
-    `img-src 'self'` to block, and on Windows it degrades to two letters rather than to a
-    broken image.
+    An image rather than the two regional indicator characters this used to assert. Those
+    cost no request and drew a flag nearly everywhere, and on Windows they drew the two
+    letters, which is not a fallback but a thing that looks broken (#88).
     """
     import re
 
@@ -199,11 +199,17 @@ def test_each_language_shows_its_flag_without_reading_it_out(client, user):
     client.force_login(user)
     html = client.get(reverse("settings:locale")).content.decode()
 
-    flags = re.findall(r'<span aria-hidden="true"[^>]*>([^<]+)</span>', html)
-    assert languages.flag("el") in flags, "Greek is Greece, which its code does not say"
-    assert languages.flag("cs") in flags
-    assert languages.flag("ga") in flags, "Irish is Ireland, likewise"
-    assert len([f for f in flags if f.strip()]) >= len(languages.FLAGS)
+    images = re.findall(r"<img [^>]*class=\"flag\"[^>]*>", html)
+    countries = {re.search(r'data-flag="([a-z]{2})"', tag).group(1) for tag in images}
+    assert "gr" in countries, "Greek is Greece, which its code does not say"
+    assert "cz" in countries
+    assert "ie" in countries, "Irish is Ireland, likewise"
+    assert len(countries) >= len(set(languages.FLAG_COUNTRIES.values()))
+
+    # Decoration, and marked as such: the name beside it already says which language this
+    # is, and "Greek flag, Ελληνικά" is worse for a screen reader than silence.
+    for tag in images:
+        assert 'alt=""' in tag and 'aria-hidden="true"' in tag, tag
 
 
 def test_a_documents_language_menu_says_the_same(client, user):

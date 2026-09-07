@@ -24,12 +24,18 @@ class PhoneWidget(forms.MultiWidget):
 
     def __init__(self, attrs=None, default_country: str = ""):
         self.default_country = default_country
-        # Flag and dialling code first, name last. A closed select is clipped to its own
-        # width, and what somebody needs to see once they have chosen is which country and
-        # which code -- not the tail of a long name.
+        # Dialling code first, name last. A closed select is clipped to its own width, and
+        # what somebody needs to see once they have chosen is which code -- not the tail of
+        # a long name.
+        #
+        # No flag in the label. An <option> may contain text and nothing else, in every
+        # browser, so the flag emoji that used to sit here could never have become an
+        # image; on Windows it was drawing as two letters anyway (#88). The flag moved out
+        # beside the closed select, where it is visible without opening anything, and each
+        # option carries its country in a data attribute so the script can find the right
+        # one. An attribute is not content, which is why that much is allowed.
         choices = [("", _("Country"))] + [
-            (country.code, f"{country.flag} +{country.dialling} {country.name}")
-            for country in phones.countries()
+            (country.code, f"+{country.dialling} {country.name}") for country in phones.countries()
         ]
         super().__init__(
             widgets=[
@@ -44,6 +50,19 @@ class PhoneWidget(forms.MultiWidget):
                 ),
             ]
         )
+
+    def get_context(self, name, value, attrs):
+        """Hand the template the chosen country, so the flag beside the select is drawn
+        on the server.
+
+        The script keeps it in step afterwards, but it must be right before any script
+        runs and right when none does: with JavaScript off the field still shows the flag
+        of the country it loaded with, which is the true answer until the form is saved.
+        """
+        context = super().get_context(name, value, attrs)
+        parts = value if isinstance(value, list) else self.decompress(value)
+        context["widget"]["country"] = (parts[0] if parts else "") or ""
+        return context
 
     def id_for_label(self, id_):
         """Point the visible label at the number box.

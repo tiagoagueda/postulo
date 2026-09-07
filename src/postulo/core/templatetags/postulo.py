@@ -7,6 +7,7 @@ from pathlib import Path
 
 from django import template
 from django.forms import BoundField
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
@@ -16,7 +17,12 @@ register = template.Library()
 #: Where `npm run sync:icons` puts the Lucide icons listed in assets/icons.txt.
 ICON_DIR = Path(__file__).resolve().parents[2] / "static" / "icons"
 
+#: Where `npm run sync:flags` puts the flag-icons flags listed in assets/flags.txt.
+FLAG_DIR = Path(__file__).resolve().parents[2] / "static" / "flags"
+
 _ICON_NAME = re.compile(r"[a-z0-9-]+")
+
+_COUNTRY = re.compile(r"[A-Za-z]{2}")
 
 
 #: The opening ``<svg ...>`` tag, whatever it is spread over. A negated class matches
@@ -78,6 +84,67 @@ def icon(name: str, label: str = "", **attrs: str) -> str:
     for key, value in attrs.items():
         rendered.append(f'{escape(key.replace("_", "-"))}="{escape(value)}"')
     return mark_safe(source.replace("<svg", "<svg " + " ".join(rendered), 1))  # noqa: S308
+
+
+@functools.cache
+def _have_flag(country: str) -> bool:
+    """Whether ``static/flags/`` holds this country. Cached: the telephone field asks 241
+    times a page and the answer changes only when somebody runs ``npm run sync:flags``.
+
+    The name is checked against the pattern first, so nothing a form field carries can be
+    turned into a path.
+    """
+    return bool(_COUNTRY.fullmatch(country)) and (FLAG_DIR / f"{country}.svg").is_file()
+
+
+@register.simple_tag
+def flag_url(country: str) -> str:
+    """The static URL of a country's flag, or ``""`` where there is no such flag.
+
+    Empty is a real answer and every caller must handle it: a language with no uncontested
+    home gets no flag at all, and a telephone field with nothing chosen yet shows none.
+
+    The file is checked for before ``static()`` is asked for a name, because under the
+    manifest storage production uses, asking for a file that was never collected raises
+    rather than returning a dead link — right of it, and not something an unrecognised
+    country code arriving in a form should be able to trigger.
+    """
+    country = (country or "").strip().lower()
+    return static(f"flags/{country}.svg") if _have_flag(country) else ""
+
+
+@register.simple_tag
+def flag(country: str, css_class: str = "flag", **attrs: str) -> str:
+    """A country's flag: ``{% flag "pt" %}``.
+
+    An image rather than the two regional indicator characters that used to be here.
+    Those cost no request and drew a flag on macOS, iOS, Android and most of Linux, and
+    on Windows they drew ``PT``, because Segoe UI Emoji has never contained the pairs and
+    Microsoft does not intend to add them (#88).
+
+    Decorative by default, like ``{% icon %}`` and for the same reason: a flag next to
+    "português (Portugal)" tells a screen reader nothing the words beside it do not
+    already say, and "Portugal flag, português (Portugal)" is worse than silence. Pass a
+    ``label`` where the flag stands alone and must speak for itself.
+    """
+    url = flag_url(country)
+    if not url:
+        return ""
+    label = attrs.pop("label", "")
+    rendered = [
+        f'src="{escape(url)}"',
+        f'class="{escape(css_class)}"',
+        f'data-flag="{escape(country.strip().lower())}"',
+        # 4:3, stated so the row does not reflow when the image arrives.
+        'width="20"',
+        'height="15"',
+        'loading="lazy"',
+        'decoding="async"',
+        f'alt="{escape(label)}"' if label else 'alt="" aria-hidden="true"',
+    ]
+    for key, value in attrs.items():
+        rendered.append(f'{escape(key.replace("_", "-"))}="{escape(value)}"')
+    return mark_safe(f"<img {' '.join(rendered)}>")  # noqa: S308
 
 
 #: Backgrounds for the initials tile, chosen by name so two people look different. They

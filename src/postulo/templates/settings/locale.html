@@ -1,5 +1,5 @@
 {% extends "settings/base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block content %}
   <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Language and time" %}</h2>
@@ -33,12 +33,13 @@
                           hover:bg-ink-100 dark:hover:bg-ink-800">
               <input type="radio" name="language" value="{{ option.code }}"
                      {% if option.selected %}checked{% endif %}>
-              {% if option.flag %}
-                {% comment %} Decorative. On Windows this renders as two letters rather
-                   than a flag, which is a legible fallback and not a broken image.
-                {% endcomment %}
-                <span aria-hidden="true" class="text-base leading-none">{{ option.flag }}</span>
-              {% endif %}
+              {% comment %} Decorative: the name beside it already says which language
+                 this is, and "Greek flag, Ελληνικά" is worse than silence. An image
+                 rather than the flag emoji that used to be here, which Windows drew as
+                 two letters (#88). Renders as nothing for a language with no
+                 uncontested home, and the row simply closes up.
+              {% endcomment %}
+              {% flag option.country %}
               {% if option.code %}
                 <span lang="{{ option.code }}">{{ option.name }}</span>
               {% else %}

@@ -178,6 +178,27 @@
   }
 
   /*
+   * A country flag, drawn from static/flags/ by the `{% flag %}` tag. flag-icons draws
+   * 4:3, so a 20-pixel width gives 15 of height and nothing is squashed.
+   *
+   * The hairline is not decoration. Plenty of flags reach their own edge in white --
+   * Poland, Japan, Finland, half of Austria -- and against a white card that edge simply
+   * stops existing, leaving a flag that appears to be the wrong shape. `outline` with a
+   * negative offset rather than `box-shadow: inset`, because on a replaced element the
+   * image paints over an inset shadow and under nothing at all; an outline paints on top.
+   * It follows the corner radius in every browser that matters.
+   */
+  .flag {
+    @apply inline-block w-5 shrink-0 rounded-xs;
+    outline: 1px solid --alpha(var(--color-ink-950) / 15%);
+    outline-offset: -1px;
+
+    @variant dark {
+      outline-color: --alpha(var(--color-ink-50) / 20%);
+    }
+  }
+
+  /*
    * The QR code allauth renders for authenticator setup. `qrcode`'s SVG factory draws the
    * modules as one path filled #000000 and gives it no background whatsoever -- not even a
    * white quiet zone. On a light page that reads perfectly. On a dark one it is black on
