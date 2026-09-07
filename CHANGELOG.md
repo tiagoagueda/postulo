@@ -6,19 +6,6 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
-### 🐛 Fixed
-
-- **The authenticator QR code could not be seen, let alone scanned, in the dark theme.**
-  `qrcode` draws the modules as one path filled `#000000` and gives the image no background
-  at all — not even a white quiet zone; black is the only colour in the file. On a light
-  page that reads perfectly, which is why it shipped. On a dark one it is black on
-  near-black: not low contrast, invisible. It is inverted in the dark theme now, which
-  flips the modules to white and leaves the transparency alone, so the quiet zone becomes
-  the page's own dark — an unbroken margin of one colour, which is what a scanner wants.
-  The class hangs off the `qr` tag allauth already puts on that image, so no other image is
-  touched. Setting up two-factor authentication is a page nobody visits twice, which is
-  exactly how a screen goes years without being looked at in both themes. (#87)
-
 ### 🔧 Changed
 
 - **Export has left the account menu.** It is a settings section of its own — *Settings →
@@ -33,6 +20,17 @@ All notable changes to Postulo are recorded here. The format follows
   complete, documented and one button, not the number of links pointing at it. (#86)
 
 ### 🐛 Fixed
+
+- **The authenticator QR code could not be seen, let alone scanned, in the dark theme.**
+  `qrcode` draws the modules as one path filled `#000000` and gives the image no background
+  at all — not even a white quiet zone; black is the only colour in the file. On a light
+  page that reads perfectly, which is why it shipped. On a dark one it is black on
+  near-black: not low contrast, invisible. It is inverted in the dark theme now, which
+  flips the modules to white and leaves the transparency alone, so the quiet zone becomes
+  the page's own dark — an unbroken margin of one colour, which is what a scanner wants.
+  The class hangs off the `qr` tag allauth already puts on that image, so no other image is
+  touched. Setting up two-factor authentication is a page nobody visits twice, which is
+  exactly how a screen goes years without being looked at in both themes. (#87)
 
 - **Five icons were drawing without their geometry.** The icon tag strips Lucide's fixed
   24-pixel size so that one file can serve a 16-pixel glyph and a 48-pixel illustration —
