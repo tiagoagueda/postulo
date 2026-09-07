@@ -12,12 +12,10 @@ data, on your server.
 
 From the Latin *postulō* — "I apply for". First person, deliberately.
 
-> **Status.** The last tagged release is **0.1.0**; a great deal has landed since and is
-> not yet released, because releasing here is a deliberate act rather than something that
-> happens on a schedule. Running from a tag gets you 0.1.0; running from `main` gets you
-> everything in the [changelog](CHANGELOG.md) under *Unreleased*. Either way it is usable
-> and used, but not battle-tested: it has recorded real applications, by one person, for
-> weeks rather than years.
+> **Status: 0.2.0.** Usable and used, but not battle-tested: it has recorded real
+> applications, by one person, for weeks rather than years. Releasing here is a deliberate
+> act rather than something that happens on a schedule, so `main` may be ahead of the last
+> tag — the [changelog](CHANGELOG.md) says by how much.
 
 ## Never paywalled
 

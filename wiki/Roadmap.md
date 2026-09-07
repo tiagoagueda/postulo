@@ -1,9 +1,9 @@
 # Roadmap
 
-**The last tagged release is 0.1.0. A great deal has landed since and is not yet released.**
-Releasing is a deliberate act here rather than something that happens on a schedule, so the
-version number lags the code on purpose. If you are running from a tag you have 0.1.0; if
-you are running from `main` you have everything below.
+**The current release is 0.2.0.** Releasing is a deliberate act here rather than something
+that happens on a schedule, so `main` is sometimes ahead of the last tag; the
+[changelog](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CHANGELOG.md)
+says by how much.
 
 This page says plainly what exists and what does not, so nothing on this wiki reads as a
 promise.
@@ -20,9 +20,11 @@ promise.
 | **M5** | Insights read from the timeline, and a complete export you can import back |
 | **M6** | A container image and Compose files, and the 0.1.0 release |
 
-## Landed since, and unreleased
+The lettered milestones gave way to numbered releases after that.
 
-Milestone **0.2.0** is complete — forty-four issues — and is what `main` carries:
+## 0.2.0
+
+Forty-four issues, released on 7 September 2026:
 
 - **The twenty-four official languages of the European Union**, each under its own name,
   with the interface saying how far along each catalogue is. See [Translating][translating].
