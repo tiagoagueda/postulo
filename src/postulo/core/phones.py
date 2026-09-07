@@ -309,6 +309,7 @@ FROM_LANGUAGE: dict[str, str] = {
     "nl": "NL",
     "pl": "PL",
     "pt-pt": "PT",
+    "pt-br": "BR",
     "ro": "RO",
     "sk": "SK",
     "sl": "SI",

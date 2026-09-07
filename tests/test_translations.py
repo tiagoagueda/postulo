@@ -58,11 +58,15 @@ def compiled(tool, catalogues, tmp_path_factory):
 
 def test_the_settings_offer_every_eu_language():
     codes = dict(settings.LANGUAGES)
-    assert len(codes) == 24
+    # Twenty-four official European Union languages, and Brazilian Portuguese beside the
+    # European: the first case of two regions of one language both being offered (#110).
+    assert len(codes) == 25
     for code in ("bg", "cs", "da", "de", "el", "es", "et", "fi", "fr-fr", "ga", "hr", "hu"):
         assert code in codes
     for code in ("it", "lt", "lv", "mt", "nl", "pl", "pt-pt", "ro", "sk", "sl", "sv"):
         assert code in codes
+    assert codes["pt-br"] == "português (Brasil)"
+    assert codes["pt-pt"] == "português (Portugal)", "each variant named by its own country"
     assert all(name == languages.NATIVE_NAMES[code] for code, name in settings.LANGUAGES), (
         "each language under its own name"
     )
@@ -151,7 +155,10 @@ def test_the_picker_groups_languages_by_how_well_translated_they_are(client, use
     with translation.override("en-gb"):
         groups = {str(label): dict(entries) for label, entries in forms.language_choices()[1:]}
 
-    assert groups["Machine translation, awaiting review"]["de"] == "Deutsch"
+    # Not "machine translation": pt-BR is seeded from pt-PT and adapted, which is a
+    # different provenance and the same warning. What every language here has in common
+    # is that nobody has read it yet.
+    assert groups["Awaiting review by a speaker"]["de"] == "Deutsch"
     assert groups["Reviewed by a speaker"]["fr-fr"] == "français (France)"
     assert groups["Reviewed by a speaker"]["sv"] == "svenska", "no status known: the name alone"
     # A bare percentage carries no language of its own, so it may stay beside the name.

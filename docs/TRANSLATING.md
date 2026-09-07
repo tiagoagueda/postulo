@@ -9,9 +9,37 @@ and compiled to the `.mo` Django reads at build time.
 Postulo speaks every official language of the European Union: Bulgarian, Croatian, Czech,
 Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Irish,
 Italian, Latvian, Lithuanian, Maltese, Polish, Portuguese, Romanian, Slovak, Slovene,
-Spanish and Swedish. Later releases extend the set in phases: the rest of the European
-continent, then Africa, then Asia, then the remaining world. If your language is not in
-the current phase, a catalogue for it is still welcome — adding one is described below.
+Spanish and Swedish, plus **Brazilian Portuguese** beside the European. Later releases
+extend the set in phases: the rest of the European continent, then Africa, then Asia, then
+the remaining world. If your language is not in the current phase, a catalogue for it is
+still welcome — adding one is described below.
+
+## A variant of a language already spoken
+
+`pt-br` is the first case of two regions of one language both being offered, and it was
+added a particular way that the next one should copy.
+
+**Seed from the sibling, do not translate again.** Every string in `pt-pt` had already been
+translated once by somebody thinking about this application; what a variant wants is that
+work adapted, not a second independent pass from English. Each seeded entry carries the
+`draft` flag, and there it means something precise: *this came from the other catalogue and
+nobody who speaks this one has read it*.
+
+**Then adapt only what is unambiguous.** A mechanical pass changed the terms where the two
+are simply different words — *ficheiro* to *arquivo*, *palavra-passe* to *senha*, *definições*
+to *configurações* — word-boundary anchored and case-preserving. Two near-misses are worth
+knowing about, because the next variant will meet their equivalents: `rato` is Brazilian
+*mouse* and also the tail of *contrato*, and `carregar` appears only inside *descarregar*.
+Where the Portuguese was ambiguous the **English msgid** settled it: *Guardar* is sometimes
+"keeps" and sometimes "Save", and only the msgid knows which.
+
+**And leave the rest.** `ligação` means both a *Connection* and a *link* here; the gerund,
+clitic placement and the choice of register are grammar rather than glossary. Those are a
+speaker's to fix, which is what the `draft` flag is for.
+
+**Check the plural rule rather than copying it.** Brazilian Portuguese treats zero as plural
+— *0 candidaturas* — where European Portuguese says *0 candidatura*. That is one line, and
+getting it wrong makes every count on every page ungrammatical.
 
 Note that `pt-PT` is European Portuguese and `fr-FR` is the French of France. A `pt-BR`
 or `fr-CA` catalogue is a directory and a line, if someone wants to keep it.

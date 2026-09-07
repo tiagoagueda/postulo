@@ -129,9 +129,10 @@ class ResetPasswordKeyForm(AllauthResetPasswordKeyForm):
 def language_choices() -> list[tuple[str, str]]:
     """Languages this instance offers, plus an option to follow the browser.
 
-    A language that is only partly translated says so beside its name, and one whose
-    translation is a machine-assisted draft nobody has reviewed says that, so nobody is
-    surprised by English in the gaps or by an odd turn of phrase.
+    A language that is only partly translated says so beside its name, and one nobody has
+    reviewed says that, so nobody is surprised by English in the gaps or by an odd turn of
+    phrase. Unreviewed does not mean machine-made: `pt-br` was seeded from `pt-pt` and
+    adapted, which is a different provenance and the same warning.
     Each language is named in itself, which is the only way somebody who cannot read the
     current one will recognise theirs. That is also what makes the ``lang`` attribute
     matter here more than anywhere else in Postulo: without it a screen reader pronounces
@@ -164,7 +165,11 @@ def language_choices() -> list[tuple[str, str]]:
     if reviewed:
         choices.append((_("Reviewed by a speaker"), reviewed))
     if drafted:
-        choices.append((_("Machine translation, awaiting review"), drafted))
+        # Not "machine translation": a variant seeded from a sibling catalogue is not
+        # machine-translated, and pt-BR is exactly that. What every language in this
+        # group has in common is that no speaker has read it yet, which is the thing
+        # worth saying and the only thing that is true of all of them.
+        choices.append((_("Awaiting review by a speaker"), drafted))
     if partial:
         choices.append((_("Partly translated"), partial))
     return choices

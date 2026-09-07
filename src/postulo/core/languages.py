@@ -3,7 +3,10 @@
 Plain data, importable without Django: the settings module reads it, and so does the
 ``scripts/messages.py`` tool that keeps the catalogues current.
 
-Phase 1 is every official language of the European Union. The names are the languages'
+Phase 1 is every official language of the European Union, plus Brazilian Portuguese beside
+the European — the first case of two regions of one language both being offered.
+
+The names are the languages'
 own — someone looking for their language in a list finds "Deutsch", not the English word
 for it — and the plural rules are the standard gettext ones, which Python's ``gettext``
 evaluates at runtime.
@@ -22,6 +25,9 @@ from __future__ import annotations
 #: and it looked broken on the maintainer's own desktop (#88). Segoe UI Emoji has never
 #: contained the flag pairs and Microsoft has said it does not intend to add them, so this
 #: was never going to age out.
+#:
+#: A regional variant carries its own country: `pt-br` is Brazil and not Portugal, which is
+#: the first case in Postulo of two regions of one language both being offered.
 #:
 #: Written out deliberately rather than derived from the code, because a language is not a
 #: country: ``el`` is Greek and ``cs`` is Czech, and neither code says so. For the European
@@ -50,6 +56,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "nl": "NL",
     "pl": "PL",
     "pt-pt": "PT",
+    "pt-br": "BR",
     "ro": "RO",
     "sk": "SK",
     "sl": "SI",
@@ -90,6 +97,7 @@ NATIVE_NAMES: dict[str, str] = {
     "nl": "Nederlands",
     "pl": "polski",
     "pt-pt": "português (Portugal)",
+    "pt-br": "português (Brasil)",
     "ro": "română",
     "sk": "slovenčina",
     "sl": "slovenščina",
@@ -136,6 +144,11 @@ PLURAL_FORMS: dict[str, str] = {
         "nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
     ),
     "pt-pt": _TWO,
+    #: Not `_TWO`. Brazilian Portuguese treats zero as plural — *0 candidaturas*,
+    #: where European Portuguese says *0 candidatura* — so the rule is `n > 1` and not
+    #: `n != 1`. Copying the European line without looking would make every count on
+    #: every page ungrammatical for the language's largest population.
+    "pt-br": "nplurals=2; plural=(n > 1);",
     "ro": "nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);",
     "sk": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
     "sl": "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);",

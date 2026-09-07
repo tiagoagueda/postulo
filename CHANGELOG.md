@@ -8,6 +8,26 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Postulo speaks Brazilian Portuguese.** Not a copy of the European catalogue under
+  another code, and not a second translation from English either: **seeded from `pt-pt` and
+  adapted**, because every string had already been translated once by somebody thinking about
+  this application and what a variant wants is that work carried across. Each of the 1,615
+  entries carries the `draft` flag, where it means something precise — *this came from the
+  other catalogue and nobody who speaks this one has read it*. A mechanical pass then changed
+  the terms that are simply different words — *ficheiro* to *arquivo*, *palavra-passe* to
+  *senha*, *definições* to *configurações* — word-boundary anchored, because `rato` is
+  Brazilian *mouse* and also the tail of *contrato*, and an unanchored substitution produced
+  "Cont**mouse** a termo" before the boundary went in. Where the Portuguese was ambiguous the
+  English settled it: *Guardar* is sometimes "keeps" and sometimes "Save", and only the msgid
+  knows which. `ligação` — which means both a *Connection* and a *link* here — and every
+  question of gerund, clitic and register were **left alone on purpose**, because they are a
+  speaker's to answer. The plural rule is `n > 1` and not the European `n != 1`: Brazilian
+  treats zero as plural, and copying that one line without looking would have made every
+  count on every page ungrammatical for the language's largest population. The picker's
+  heading changed with it, from *Machine translation, awaiting review* to **Awaiting review by
+  a speaker** — a catalogue seeded from its sibling is not machine-made, and what every
+  language in that group actually has in common is that nobody has read it yet. (#110)
+
 - **A person can see which plugins are running for their account, and who decided.**
   *Settings → Plugins*, a new section. *Connections* answers "what have I set up"; it says
   nothing about the parsers that read a posting off a page — they need no connection, so they
