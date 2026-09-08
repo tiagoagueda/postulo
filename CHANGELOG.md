@@ -302,6 +302,22 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **CI had tested nothing for a fortnight, and looked merely red rather than empty.** A test
+  imported `config/settings/prod.py` at module scope to read the redirect exemption list from
+  what actually ships rather than a retyped copy — a good instinct. But that module refuses to
+  import without `POSTULO_SECRET_KEY`, and the only thing supplying one was the **`.env` in
+  the developer's own working copy**, which is gitignored and which CI does not have. So the
+  import raised there, and because it happened during *collection* it aborted the whole run:
+  not one failing test, no tests at all, on three Python versions and in the browser job, on
+  every push for fourteen commits. The two jobs that kept passing were the two that never run
+  pytest. Nothing distinguished "the suite failed" from "the suite never started", which is
+  how it hid behind a red mark people had stopped reading. The file beside it had already
+  solved this properly and said why — *the repository's `.env` belongs to whoever is
+  developing here* — by reading production in a subprocess with the environment stripped;
+  there is now one such reader in `tests/security/conftest.py` and both files use it.
+  Reproduced by moving `.env` aside, which is how this should have been checked in the first
+  place. (#117)
+
 - **Every page in Postulo scrolled sideways on a phone, and one row of links was most of
   the reason.** At 320 CSS pixels — the width a normal window has at 400% zoom, which is how
   somebody with low vision reads — all thirteen pages measured overflowed by an identical 331

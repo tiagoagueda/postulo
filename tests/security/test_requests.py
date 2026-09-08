@@ -138,54 +138,14 @@ def test_every_response_carries_the_defensive_headers(client, person):
 #: from the repository root, which is gitignored, so what this asserted depended on whether
 #: the person running it happened to have one. It passed on the author's machine and failed
 #: on every other, which is the least useful way for a test to behave.
-PROD_PROBE = """
-import json
-
-import environ
-
-# The repository's .env belongs to whoever is developing here. What is under test is what
-# the module itself says, so the file is taken out of the picture rather than trusted to
-# be absent.
-environ.Env.read_env = lambda *args, **kwargs: None
-
-from postulo.config.settings import prod
-
-print(json.dumps({
-    "DEBUG": prod.DEBUG,
-    "SECURE_HSTS_SECONDS": prod.SECURE_HSTS_SECONDS,
-    "SESSION_COOKIE_SECURE": prod.SESSION_COOKIE_SECURE,
-    "CSRF_COOKIE_SECURE": prod.CSRF_COOKIE_SECURE,
-    "SECURE_SSL_REDIRECT": prod.SECURE_SSL_REDIRECT,
-    "SECURE_REDIRECT_EXEMPT": list(prod.SECURE_REDIRECT_EXEMPT),
-    "SECURE_CSP": {k: [str(v) for v in vs] for k, vs in prod.SECURE_CSP.items()},
-}))
-"""
+#: `production_settings` is a fixture in `conftest.py` beside this: a subprocess with
+#: the environment scrubbed, shared so that the file that needs the same thing cannot
+#: do it a second, subtly different way.
 
 
-def production_settings() -> dict:
-    """Import the production settings the way a server would, and report what they say."""
-    import json
-    import os
-    import subprocess
-    import sys
-
-    environment = {k: v for k, v in os.environ.items() if not k.startswith("POSTULO_")}
-    environment["POSTULO_SECRET_KEY"] = "x" * 64
-    environment["POSTULO_ALLOWED_HOSTS"] = "postulo.example.org"
-    finished = subprocess.run(  # noqa: S603 - this interpreter, and a script written here
-        [sys.executable, "-c", PROD_PROBE],
-        capture_output=True,
-        text=True,
-        env=environment,
-        cwd=Path(__file__).resolve().parents[2],
-    )
-    assert finished.returncode == 0, finished.stderr
-    return json.loads(finished.stdout)
-
-
-def test_the_production_settings_are_what_the_policy_says():
+def test_the_production_settings_are_what_the_policy_says(production_settings):
     """The prod settings module, imported as a document rather than run as a server."""
-    prod = production_settings()
+    prod = production_settings
 
     assert prod["DEBUG"] is False
     assert prod["SECURE_HSTS_SECONDS"] >= 31536000
@@ -213,6 +173,8 @@ def test_production_refuses_to_start_without_a_secret_key():
     import os
     import subprocess
     import sys
+
+    from .conftest import PROD_PROBE
 
     environment = {k: v for k, v in os.environ.items() if not k.startswith("POSTULO_")}
     finished = subprocess.run(  # noqa: S603 - this interpreter, and a script written here

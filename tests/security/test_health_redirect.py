@@ -30,28 +30,35 @@ import pytest
 from django.test import override_settings
 from django.urls import reverse
 
-#: What production says. Imported rather than retyped, so this cannot pass against a list
-#: that no longer matches the one shipped.
-from postulo.config.settings.prod import SECURE_REDIRECT_EXEMPT
-
 pytestmark = pytest.mark.django_db
 
-#: Production, as far as the redirect is concerned.
-AS_DEPLOYED = override_settings(
-    SECURE_SSL_REDIRECT=True, SECURE_REDIRECT_EXEMPT=SECURE_REDIRECT_EXEMPT
-)
+
+@pytest.fixture
+def as_deployed(production_settings):
+    """Production, as far as the redirect is concerned.
+
+    The exemption list is read from the production settings rather than retyped, so this
+    cannot pass against a list that no longer matches the one shipped. It arrives through a
+    fixture because importing `prod.py` needs a secret key it will not invent -- and this
+    file used to import it at module scope, which worked on a machine with a `.env` and
+    aborted collection everywhere else. See `conftest.py` beside this.
+    """
+    return override_settings(
+        SECURE_SSL_REDIRECT=True,
+        SECURE_REDIRECT_EXEMPT=production_settings["SECURE_REDIRECT_EXEMPT"],
+    )
 
 
-def test_the_health_check_reaches_the_view(client):
+def test_the_health_check_reaches_the_view(client, as_deployed):
     """The whole point: a probe that can report something other than success."""
-    with AS_DEPLOYED:
+    with as_deployed:
         response = client.get(reverse("core:healthz"))
 
     assert response.status_code == 200
     assert response.json()["database"] == "ok"
 
 
-def test_the_health_check_can_now_report_a_broken_database(client, monkeypatch):
+def test_the_health_check_can_now_report_a_broken_database(client, monkeypatch, as_deployed):
     """The 503 that was unreachable in production.
 
     Without this the exemption would only prove that a 200 gets through, which a redirect
@@ -64,7 +71,7 @@ def test_the_health_check_can_now_report_a_broken_database(client, monkeypatch):
 
     monkeypatch.setattr(connection, "ensure_connection", refuse)
 
-    with AS_DEPLOYED:
+    with as_deployed:
         response = client.get(reverse("core:healthz"))
 
     assert response.status_code == 503
@@ -72,10 +79,10 @@ def test_the_health_check_can_now_report_a_broken_database(client, monkeypatch):
 
 
 @override_settings(POSTULO_METRICS_ENABLED=True, POSTULO_METRICS_TOKEN="")
-def test_a_scraper_inside_the_deployment_reaches_the_metrics(client):
+def test_a_scraper_inside_the_deployment_reaches_the_metrics(client, as_deployed):
     """A scraper reaching the container directly is on the same plain-HTTP hop as the
     health check, and the numbers it collects carry nothing about anybody."""
-    with AS_DEPLOYED:
+    with as_deployed:
         response = client.get(reverse("core:metrics"))
 
     assert response.status_code == 200
@@ -83,14 +90,14 @@ def test_a_scraper_inside_the_deployment_reaches_the_metrics(client):
 
 
 @override_settings(POSTULO_LOGS_ENDPOINT_ENABLED=True, POSTULO_LOGS_TOKEN="a-token")
-def test_the_log_endpoint_is_still_redirected(client):
+def test_the_log_endpoint_is_still_redirected(client, as_deployed):
     """Deliberately not exempt, and the one asymmetry worth a test of its own.
 
     A log entry names a connection, a company, an application. A scrape that visibly breaks
     is better than that crossing a network in clear; an operator who wants it scrapes
     through the proxy over HTTPS, or turns the redirect off as a decision.
     """
-    with AS_DEPLOYED:
+    with as_deployed:
         response = client.get(reverse("core:logs_endpoint"))
 
     assert response.status_code == 301
@@ -113,23 +120,25 @@ def test_the_log_endpoint_is_still_redirected(client):
         "/settings/healthz",
     ],
 )
-def test_everything_else_is_still_sent_to_https(client, path):
-    with AS_DEPLOYED:
+def test_everything_else_is_still_sent_to_https(client, path, as_deployed):
+    with as_deployed:
         response = client.get(path)
 
     assert response.status_code == 301, f"{path} was let through in the clear"
     assert response["Location"].startswith("https://")
 
 
-def test_the_exemption_is_only_the_two_endpoints_that_need_it():
+def test_the_exemption_is_only_the_two_endpoints_that_need_it(production_settings):
     """Stated as a list rather than inferred from behaviour, so adding a third is a
     deliberate edit to a test rather than something that slips in."""
-    assert SECURE_REDIRECT_EXEMPT == [r"^healthz$", r"^metrics$"]
-    for pattern in SECURE_REDIRECT_EXEMPT:
+    exempt = production_settings["SECURE_REDIRECT_EXEMPT"]
+
+    assert exempt == [r"^healthz$", r"^metrics$"]
+    for pattern in exempt:
         assert pattern.startswith("^") and pattern.endswith("$"), pattern
 
 
-def test_the_dockerfile_still_probes_the_path_that_is_exempt():
+def test_the_dockerfile_still_probes_the_path_that_is_exempt(production_settings):
     """The exemption and the health check name the same path, or neither is worth much.
 
     A rename on either side breaks the pair silently: the probe would go on exiting 0
@@ -145,7 +154,7 @@ def test_the_dockerfile_still_probes_the_path_that_is_exempt():
 
     command = probe.group(1)
     assert "/healthz" in command, command
-    exempt = [p.strip("^$") for p in SECURE_REDIRECT_EXEMPT]
+    exempt = [p.strip("^$") for p in production_settings["SECURE_REDIRECT_EXEMPT"]]
     assert any(f"/{name}" in command for name in exempt), (
         f"the health check probes something no longer exempt: {command}"
     )
