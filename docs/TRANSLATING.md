@@ -12,10 +12,34 @@ Italian, Latvian, Lithuanian, Maltese, Polish, Portuguese, Romanian, Slovak, Slo
 Spanish and Swedish, plus **Brazilian Portuguese** beside the European. It also speaks the
 continent beyond the Union: Albanian, Armenian, Basque, Bosnian, Catalan, Galician,
 Georgian, Icelandic, Luxembourgish, Macedonian, Norwegian Bokmål, Serbian, Turkish,
-Ukrainian and Welsh. Africa, Asia and the remaining world follow in later releases. The
-language picker in Settings is the authority on what is offered today. If your language is
-not in the current phase, a catalogue for it is still welcome — adding one is described
-below.
+Ukrainian and Welsh. The language picker in Settings is the authority on what is offered
+today. If your language is not in the current phase, a catalogue for it is still welcome —
+adding one is described below.
+
+The set grows in phases, one per release (#43):
+
+| Release | Languages | State |
+| --- | --- | --- |
+| 0.2.0 | The 24 official languages of the European Union | Complete, machine-drafted |
+| 0.3.0 | The rest of Europe (#118) — 15 languages | Complete, machine-drafted |
+| 0.3.0 | Africa (#70) — 29 languages | Catalogues created, awaiting translation |
+| 0.4.0 | Asia and South America (#71) | Not started |
+| 0.5.0 | The rest of the world (#72) | Not started |
+
+"Every language of Africa" is some two thousand of them, so the rule drawn for 0.3.0 is
+**a language with official or national status in at least one African state, plus the
+cross-border lingua francas that outrank most of those in speakers**: Afrikaans, Akan,
+Amharic, Arabic, Bamanankan, Chichewa, Eʋegbe, Hausa, Igbo, isiNdebele, isiXhosa, isiZulu,
+Ikinyarwanda, Lingála, Malagasy, Afaan Oromoo, Pulaar, Sesotho, Setswana, chiShona,
+siSwati, Soomaali, Kiswahili, Taqbaylit, ትግርኛ, Tshivenḓa, Wolof, Xitsonga and Yorùbá.
+French, Portuguese, English and Spanish already carry a great deal of the continent, so
+the gap was smaller than the map suggests.
+
+**A language is offered once somebody has begun its catalogue, and not before.** All 29
+African catalogues exist and are empty; the language picker does not list them yet,
+because offering somebody their own language and handing them an English interface is a
+promise with nothing behind it. Translate one string and the language appears, with its
+completion percentage beside its name.
 
 Beyond the Union, two things stop being tidy, and both are handled rather than
 special-cased. A language may be at home somewhere that is not a state — Catalan's flag is
@@ -161,8 +185,13 @@ help rather than fight that.
    language is not a country: Spanish is not only Spain and Arabic is not one flag. **Leave
    it out where there is no honest answer**; the picker copes with a blank. Then add the
    code to `assets/flags.txt` and run `npm run sync:flags`.
-3. `uv run python scripts/messages.py extract` creates the catalogue.
-4. Translate, `check`, `stats --write`, and open a pull request.
+3. **If the language is read right to left**, add its subtag to `RTL` in the same file.
+   That one list is what both the interface and a rendered document read, so a language
+   added there is laid out correctly everywhere at once. The interface layout itself needs
+   no work — that was done in #67 and is held by a lint and a browser suite that visits the
+   application in a right-to-left language.
+4. `uv run python scripts/messages.py extract` creates the catalogue.
+5. Translate, `check`, `stats --write`, and open a pull request.
 
 ## Plugins
 

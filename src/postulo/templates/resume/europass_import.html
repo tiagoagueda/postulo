@@ -58,7 +58,7 @@
           <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Experience" %}</h3>
           <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
             {% for row in found.experience %}
-              <li>{{ row.role }}{% if row.organisation %} · {{ row.organisation }}{% endif %}</li>
+              <li><bdi>{{ row.role }}</bdi>{% if row.organisation %} · <bdi>{{ row.organisation }}</bdi>{% endif %}</li>
             {% endfor %}
           </ul>
         {% endif %}
@@ -67,7 +67,7 @@
           <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Education" %}</h3>
           <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
             {% for row in found.education %}
-              <li>{{ row.qualification }}{% if row.institution %} · {{ row.institution }}{% endif %}</li>
+              <li><bdi>{{ row.qualification }}</bdi>{% if row.institution %} · <bdi>{{ row.institution }}</bdi>{% endif %}</li>
             {% endfor %}
           </ul>
         {% endif %}

@@ -3,18 +3,26 @@
 Plain data, importable without Django: the settings module reads it, and so does the
 ``scripts/messages.py`` tool that keeps the catalogues current.
 
-Europe first: the twenty-four official languages of the European Union, Brazilian
-Portuguese beside the European — the first case of two regions of one language both being
-offered — and then the rest of the continent, which is where the neat rules stop. A
-language on this list may be at home somewhere that is not a state (Basque, Catalan,
-Galician, Welsh), and may be written in a script the rest of the list never uses (Greek,
-Cyrillic, Georgian, Armenian). Both are handled here rather than special-cased at each call
-site.
+The names are the languages' own — somebody looking for their language in a list finds
+"Deutsch", not the English word for it — and the plural rules are the standard gettext
+ones, which Python's ``gettext`` evaluates at runtime.
 
-The names are the languages'
-own — someone looking for their language in a list finds "Deutsch", not the English word
-for it — and the plural rules are the standard gettext ones, which Python's ``gettext``
-evaluates at runtime.
+**Which languages, and in what order.** #43 set the phases and each now has a milestone:
+
+* **0.2.0** — the 24 official languages of the European Union, and Brazilian Portuguese
+  beside the European: the first case of two regions of one language both being offered.
+* **0.3.0** — the rest of the European continent (#118), then Africa (#70). Europe beyond
+  the Union is where the neat rules stop: a language here may be at home somewhere that is
+  not a state (Basque, Catalan, Galician, Welsh), and may be written in a script the rest
+  of the list never uses (Greek, Cyrillic, Georgian, Armenian). Africa is bigger than a
+  list: "every language of Africa" is some two thousand of them, so the rule drawn there is
+  **official or national status in at least one African state, plus the cross-border lingua
+  francas that outrank most of those in speakers** — twenty-nine, and a documented rule
+  rather than a list assembled by feel. French, Portuguese, English and Spanish already
+  carry a great deal of that continent, so the gap was smaller than the map suggests.
+* **0.4.0** — Asia and South America (#71). **0.5.0** — the rest of the world (#72).
+
+Every irregularity above is handled here rather than special-cased at each call site.
 """
 
 from __future__ import annotations
@@ -46,11 +54,19 @@ from __future__ import annotations
 #: artwork for them.
 #:
 #: And a language may still have no answer at all, in which case ``flag_country`` returns
-#: nothing and the picker closes the row up. No flag beats a wrong flag, and every caller
-#: already copes with the empty answer.
+#: nothing and the picker closes the row up. Africa (#70) is where that stops being the
+#: rare case: Arabic is twenty-two countries, Swahili is four, Hausa is two, and Sesotho is
+#: Lesotho's as much as South Africa's. Thirteen of the twenty-nine are blank on purpose
+#: rather than by oversight — ``ar``, ``ee``, ``ff``, ``ha``, ``ig``, ``ln``, ``om``,
+#: ``ss``, ``st``, ``sw``, ``ti``, ``tn``, ``yo``. No flag beats a wrong flag, a wrong flag
+#: about somebody's language is not a small wrong, and every caller copes with nothing.
 FLAG_COUNTRIES: dict[str, str] = {
     "en-gb": "GB",
+    "af": "ZA",
+    "ak": "GH",
+    "am": "ET",
     "bg": "BG",
+    "bm": "ML",
     "bs": "BA",
     "ca": "ES-CT",
     "cs": "CZ",
@@ -71,24 +87,36 @@ FLAG_COUNTRIES: dict[str, str] = {
     "is": "IS",
     "it": "IT",
     "ka": "GE",
+    "kab": "DZ",
     "lb": "LU",
     "lt": "LT",
     "lv": "LV",
+    "mg": "MG",
     "mk": "MK",
     "mt": "MT",
     "nb": "NO",
     "nl": "NL",
+    "nr": "ZA",
+    "ny": "MW",
     "pl": "PL",
     "pt-pt": "PT",
     "pt-br": "BR",
     "ro": "RO",
+    "rw": "RW",
     "sk": "SK",
     "sl": "SI",
+    "sn": "ZW",
+    "so": "SO",
     "sq": "AL",
     "sr": "RS",
     "sv": "SE",
     "tr": "TR",
+    "ts": "ZA",
     "uk": "UA",
+    "ve": "ZA",
+    "wo": "SN",
+    "xh": "ZA",
+    "zu": "ZA",
 }
 
 
@@ -106,45 +134,74 @@ def flag_country(code: str) -> str:
 #: The order is the order of the picker: alphabetical by code, source language first.
 NATIVE_NAMES: dict[str, str] = {
     "en-gb": "English (United Kingdom)",
+    "af": "Afrikaans",
+    "ak": "Akan",
+    "am": "አማርኛ",
+    "ar": "العربية",
     "bg": "български",
+    "bm": "Bamanankan",
     "bs": "bosanski",
     "ca": "català",
     "cs": "čeština",
     "cy": "Cymraeg",
     "da": "dansk",
     "de": "Deutsch",
+    "ee": "Eʋegbe",
     "el": "Ελληνικά",
     "es": "español",
     "et": "eesti",
     "eu": "euskara",
+    "ff": "Pulaar",
     "fi": "suomi",
     "fr-fr": "français (France)",
     "ga": "Gaeilge",
     "gl": "galego",
+    "ha": "Hausa",
     "hr": "hrvatski",
     "hu": "magyar",
     "hy": "հայերեն",
+    "ig": "Igbo",
     "is": "íslenska",
     "it": "italiano",
     "ka": "ქართული",
+    "kab": "Taqbaylit",
     "lb": "Lëtzebuergesch",
+    "ln": "Lingála",
     "lt": "lietuvių",
     "lv": "latviešu",
+    "mg": "Malagasy",
     "mk": "македонски",
     "mt": "Malti",
     "nb": "norsk bokmål",
     "nl": "Nederlands",
+    "nr": "isiNdebele",
+    "ny": "Chichewa",
+    "om": "Afaan Oromoo",
     "pl": "polski",
     "pt-pt": "português (Portugal)",
     "pt-br": "português (Brasil)",
     "ro": "română",
+    "rw": "Ikinyarwanda",
     "sk": "slovenčina",
     "sl": "slovenščina",
+    "sn": "chiShona",
+    "so": "Soomaali",
     "sq": "shqip",
     "sr": "српски",
+    "ss": "siSwati",
+    "st": "Sesotho",
     "sv": "svenska",
+    "sw": "Kiswahili",
+    "ti": "ትግርኛ",
+    "tn": "Setswana",
     "tr": "Türkçe",
+    "ts": "Xitsonga",
     "uk": "українська",
+    "ve": "Tshivenḓa",
+    "wo": "Wolof",
+    "xh": "isiXhosa",
+    "yo": "Yorùbá",
+    "zu": "isiZulu",
 }
 
 #: What ``settings.LANGUAGES`` is built from.
@@ -157,7 +214,21 @@ _TWO = "nplurals=2; plural=(n != 1);"
 
 #: gettext ``Plural-Forms`` per language, written into each catalogue's header.
 PLURAL_FORMS: dict[str, str] = {
+    "af": _TWO,
+    "ak": "nplurals=2; plural=(n > 1);",
+    "am": "nplurals=2; plural=(n > 1);",
+    #: Six: zero, one, two, a few, many and everything else — more forms than any
+    #: other language Postulo carries, and the reason a form count is read from the
+    #: rule rather than assumed.
+    "ar": (
+        "nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : "
+        "n%100>=11 ? 4 : 5);"
+    ),
     "bg": _TWO,
+    #: One. Bamanankan, Igbo, chiShona and Wolof do not distinguish number on the
+    #: noun at all, so their catalogues carry a single form and a second would be
+    #: filled with a guess.
+    "bm": "nplurals=1; plural=0;",
     #: The same three-form rule as Croatian and Serbian, written out rather than
     #: shared: these are separate languages, and a shared constant would invite the
     #: next one to inherit a rule nobody checked.
@@ -173,14 +244,17 @@ PLURAL_FORMS: dict[str, str] = {
     "cy": "nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;",
     "da": _TWO,
     "de": _TWO,
+    "ee": _TWO,
     "el": _TWO,
     "es": _TWO,
     "et": _TWO,
     "eu": _TWO,
+    "ff": _TWO,
     "fi": _TWO,
     "fr-fr": "nplurals=2; plural=(n > 1);",
     "ga": ("nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4);"),
     "gl": _TWO,
+    "ha": _TWO,
     "hr": (
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
         "(n%100<10 || n%100>=20) ? 1 : 2);"
@@ -190,18 +264,22 @@ PLURAL_FORMS: dict[str, str] = {
     #: French does — so the rule is `n > 1`. The noun after a numeral does not
     #: inflect either way, which is exactly what makes the wrong rule easy to miss.
     "hy": "nplurals=2; plural=(n > 1);",
+    "ig": "nplurals=1; plural=0;",
     #: Not `_TWO`: two forms, but the last digit decides rather than the value. 21 and
     #: 31 take the singular like 1 — *tuttugu og ein umsókn* — while 11 takes the plural
     #: like 12, *ellefu umsóknir*.
     "is": "nplurals=2; plural=(n%10!=1 || n%100==11);",
     "it": _TWO,
     "ka": _TWO,
+    "kab": "nplurals=2; plural=(n > 1);",
     "lb": _TWO,
+    "ln": "nplurals=2; plural=(n > 1);",
     "lt": (
         "nplurals=3; plural=(n%10==1 && (n%100<11 || n%100>19) ? 0 : n%10>=2 && n%10<=9 && "
         "(n%100<11 || n%100>19) ? 1 : 2);"
     ),
     "lv": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);",
+    "mg": "nplurals=2; plural=(n > 1);",
     #: Two forms, but the digit decides and not the value, the way Icelandic does
     #: it: 21 and 101 take the singular with 1, while 11 takes the plural.
     "mk": "nplurals=2; plural=(n%10==1 && n%100!=11) ? 0 : 1;",
@@ -211,6 +289,9 @@ PLURAL_FORMS: dict[str, str] = {
     ),
     "nb": _TWO,
     "nl": _TWO,
+    "nr": _TWO,
+    "ny": _TWO,
+    "om": _TWO,
     "pl": (
         "nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
     ),
@@ -221,24 +302,38 @@ PLURAL_FORMS: dict[str, str] = {
     #: every page ungrammatical for the language's largest population.
     "pt-br": "nplurals=2; plural=(n > 1);",
     "ro": "nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);",
+    "rw": _TWO,
     "sk": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
     "sl": "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);",
+    "sn": "nplurals=1; plural=0;",
+    "so": _TWO,
     "sq": _TWO,
     "sr": (
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
         "(n%100<10 || n%100>=20) ? 1 : 2);"
     ),
+    "ss": _TWO,
+    "st": _TWO,
     "sv": _TWO,
+    "sw": _TWO,
+    "ti": "nplurals=2; plural=(n > 1);",
+    "tn": _TWO,
     #: Not `_TWO`. Turkish counts nothing after a numeral — *bir başvuru*, *iki
     #: başvuru* — so both forms carry the same noun, and the split matters only for
     #: the rest of the sentence around it.
     "tr": "nplurals=2; plural=(n > 1);",
+    "ts": _TWO,
     #: Three, and the rule is about the last digit rather than the value: 1, 21 and 101
     #: take the first form, 2-4 the second, and 11-14 the third despite ending in 1-4.
     "uk": (
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : "
         "n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
     ),
+    "ve": _TWO,
+    "wo": "nplurals=1; plural=0;",
+    "xh": _TWO,
+    "yo": "nplurals=2; plural=(n > 1);",
+    "zu": "nplurals=2; plural=(n > 1);",
 }
 
 
@@ -275,3 +370,71 @@ def translation_status() -> dict[str, dict[str, int]]:
 
 
 _STATUS: dict[str, dict[str, int]] | None = None
+
+
+#: Language subtags written right to left.
+#:
+#: Postulo's own list rather than Django's ``LANGUAGES_BIDI``, and the reason is #43: Django
+#: knows the languages Django ships with, and Postulo is going past them. The African set
+#: (#70) brings Arabic; the Asian set (#71) brings Hebrew, Persian and Urdu. One list that
+#: both the interface and a rendered document read is one place to add a language to, and
+#: one answer when they are asked the same question.
+#:
+#: Matched on the primary subtag, so ``ar-eg`` is as right to left as ``ar``. Direction is a
+#: property of the script rather than of the region, and no region of Arabic is written the
+#: other way.
+RTL: frozenset[str] = frozenset(
+    {
+        "ar",  # Arabic
+        "arc",  # Aramaic
+        "ckb",  # Central Kurdish (Sorani)
+        "dv",  # Divehi
+        "fa",  # Persian
+        "he",  # Hebrew
+        "ks",  # Kashmiri
+        "ku",  # Kurdish, where written in the Arabic script
+        "nqo",  # N'Ko
+        "prs",  # Dari
+        "ps",  # Pashto
+        "sd",  # Sindhi
+        "syr",  # Syriac
+        "ug",  # Uyghur
+        "ur",  # Urdu
+        "yi",  # Yiddish
+    }
+)
+
+
+def is_rtl(code: str) -> bool:
+    """Whether a language tag names a language written right to left."""
+    return (code or "").strip().lower().replace("_", "-").split("-", 1)[0] in RTL
+
+
+def direction(code: str) -> str:
+    """``"rtl"`` or ``"ltr"``, for the ``dir`` attribute of a page or a document.
+
+    Always one of the two, never empty: ``dir=""`` is not the same as an absent attribute
+    in every engine, and a document that declines to say is a document that gets guessed at.
+    """
+    return "rtl" if is_rtl(code) else "ltr"
+
+
+#: Language subtag → the script it is written in, where that is not the Latin alphabet.
+#:
+#: Only the exceptions are listed: everything absent from this map is Latin, which is the
+#: overwhelming majority and would be noise here. What it exists for is fonts. A script the
+#: rendering machine cannot draw comes out as a row of empty boxes, and a box on somebody's
+#: CV is worse than English — so ``tests/test_fonts.py`` reads this and insists the
+#: container image installs a font package that covers every script Postulo offers.
+SCRIPTS: dict[str, str] = {
+    "am": "Ethiopic",
+    "ar": "Arabic",
+    "bg": "Cyrillic",
+    "el": "Greek",
+    "ti": "Ethiopic",
+}
+
+
+def scripts_offered() -> set[str]:
+    """Every non-Latin script among the languages Postulo currently offers."""
+    return {SCRIPTS[code] for code, _name in LANGUAGES if code in SCRIPTS}

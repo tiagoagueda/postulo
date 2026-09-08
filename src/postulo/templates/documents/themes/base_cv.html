@@ -4,7 +4,7 @@
   inlined: the renderer must never fetch anything, so that producing a PDF cannot touch
   the network or the filesystem.
 {% endcomment %}
-<html lang="{{ document_language }}">
+<html lang="{{ document_language }}" dir="{{ document_direction|default:'ltr' }}">
   <head>
     <meta charset="utf-8">
     <title>{{ cv.name }}</title>
@@ -82,10 +82,10 @@
                 <div>
                   {% if section.kind == 'experience' %}
                     <p class="role">{{ entry.item.role }}</p>
-                    <p class="org">{{ entry.item.organisation }}{% if entry.item.location %} · {{ entry.item.location }}{% endif %}</p>
+                    <p class="org"><bdi>{{ entry.item.organisation }}</bdi>{% if entry.item.location %} · <bdi>{{ entry.item.location }}</bdi>{% endif %}</p>
                   {% elif section.kind == 'education' %}
                     <p class="role">{{ entry.item.qualification }}</p>
-                    <p class="org">{{ entry.item.institution }}{% if entry.item.location %} · {{ entry.item.location }}{% endif %}</p>
+                    <p class="org"><bdi>{{ entry.item.institution }}</bdi>{% if entry.item.location %} · <bdi>{{ entry.item.location }}</bdi>{% endif %}</p>
                   {% else %}
                     <p class="role">{{ entry.item.name }}</p>
                     {% if entry.item.role %}<p class="org">{{ entry.item.role }}</p>{% endif %}

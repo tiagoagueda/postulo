@@ -8,10 +8,10 @@
     <div>
       <h1 class="text-2xl font-semibold tracking-tight">{{ cv.name }}</h1>
       <p class="text-sm text-ink-500 dark:text-ink-400">
-        {{ cv.headline|default:"" }}{% if cv.headline %} · {% endif %}{{ cv.get_theme_display }}
+        <bdi>{{ cv.headline|default:"" }}</bdi>{% if cv.headline %} · {% endif %}{{ cv.get_theme_display }}
       </p>
     </div>
-    <div class="ml-auto flex flex-wrap items-center gap-2">
+    <div class="ms-auto flex flex-wrap items-center gap-2">
       <a href="{% url 'documents:cv_preview' cv.pk %}" target="_blank" rel="noopener"
          class="btn-secondary">{% translate "Preview" %}</a>
       <form method="post" action="{% url 'documents:cv_export' cv.pk %}">

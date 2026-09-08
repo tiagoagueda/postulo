@@ -13,16 +13,16 @@
   <div class="card mb-4">
     <h3 class="mb-3 font-medium">{% translate "In force now" %}</h3>
     <dl class="space-y-2 text-sm">
-      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Backend" %}</dt><dd class="min-w-0 text-right"><code>{{ mailer.backend }}</code></dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Backend" %}</dt><dd class="min-w-0 text-end"><code>{{ mailer.backend }}</code></dd></div>
       {% if mailer.is_smtp %}
-        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Server" %}</dt><dd class="min-w-0 text-right">{{ mailer.host|default:"—" }}{% if mailer.port %}:{{ mailer.port }}{% endif %}</dd></div>
-        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Username" %}</dt><dd class="min-w-0 text-right">{{ mailer.username|default:"—" }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Server" %}</dt><dd class="min-w-0 text-end">{{ mailer.host|default:"—" }}{% if mailer.port %}:{{ mailer.port }}{% endif %}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Username" %}</dt><dd class="min-w-0 text-end">{{ mailer.username|default:"—" }}</dd></div>
         {% comment %} Whether one is set, and nothing else. A masked field of the right
            length gives away the length. {% endcomment %}
-        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Password" %}</dt><dd class="min-w-0 text-right">{% if mailer.has_password %}{% translate "set" %}{% else %}{% translate "not set" %}{% endif %}</dd></div>
-        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">STARTTLS</dt><dd class="min-w-0 text-right">{{ mailer.use_tls|yesno }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Password" %}</dt><dd class="min-w-0 text-end">{% if mailer.has_password %}{% translate "set" %}{% else %}{% translate "not set" %}{% endif %}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">STARTTLS</dt><dd class="min-w-0 text-end">{{ mailer.use_tls|yesno }}</dd></div>
       {% endif %}
-      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "From" %}</dt><dd class="min-w-0 text-right">{{ mailer.from_address }}</dd></div>
+      <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "From" %}</dt><dd class="min-w-0 text-end">{{ mailer.from_address }}</dd></div>
     </dl>
     {% if not mailer.is_smtp and not mailer.pluggable %}
       <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">

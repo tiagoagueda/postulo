@@ -17,11 +17,11 @@
         {% for industry in company.industries.all %}{% if not forloop.first %}, {% endif %}{{ industry.name }}{% empty %}—{% endfor %}
       </td>
     {% elif column.key == 'postings' %}
-      <td class="px-4 py-3 text-right tabular-nums">{{ company.posting_count }}</td>
+      <td class="px-4 py-3 text-end tabular-nums">{{ company.posting_count }}</td>
     {% elif column.key == 'applications' %}
-      <td class="px-4 py-3 text-right tabular-nums">{{ company.application_count }}</td>
+      <td class="px-4 py-3 text-end tabular-nums">{{ company.application_count }}</td>
     {% elif column.key == 'contacts' %}
-      <td class="px-4 py-3 text-right tabular-nums">{{ company.contact_count }}</td>
+      <td class="px-4 py-3 text-end tabular-nums">{{ company.contact_count }}</td>
     {% elif column.key == 'website' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
         {% if company.website %}

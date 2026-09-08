@@ -21,7 +21,7 @@
   <div id="companies-table">
     {% if companies %}
       <div class="card scroll-x p-0">
-        <table class="w-full text-left text-sm">
+        <table class="w-full text-start text-sm">
           {% include "partials/table/head.html" with table_id="companies-table" form_id="company-filters" %}
           <tbody>
             {% for company in companies %}
@@ -60,7 +60,7 @@
     </div>
     {% comment %} `flex-wrap`: at 320 pixels these three do not fit on a line, and a row
        that will not wrap makes the page scroll sideways instead (#113). {% endcomment %}
-    <div class="ml-auto flex flex-wrap items-center gap-2">
+    <div class="ms-auto flex flex-wrap items-center gap-2">
       {% include "partials/table/columns.html" %}
       <a href="{% url 'jobs:industry_list' %}" class="btn-secondary">{% translate "Industries" %}</a>
       <a href="{% url 'jobs:company_create' %}" class="btn-primary">

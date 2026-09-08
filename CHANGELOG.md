@@ -188,6 +188,55 @@ All notable changes to Postulo are recorded here. The format follows
   this issue would have had to visit it; what has to be true is that `settings.LANGUAGES`
   offers exactly what the table holds, and that is what it now asserts. (#118)
 
+- **The languages of Africa, and everything a language needs before its words arrive.**
+  "Every language of Africa" is some two thousand of them, so the rule drawn is *official
+  or national status in at least one African state, plus the cross-border lingua francas
+  that outrank most of those in speakers*: twenty-nine languages, and a documented rule
+  rather than a list assembled by feel. Each arrives with the things that have to be right
+  **before** anybody translates against them and are expensive to correct afterwards — its
+  own name for itself, its gettext plural rule (Arabic has six forms; Wolof, Igbo, Shona
+  and Bamanankan have one), and its script. Arabic is the first right-to-left language
+  Postulo carries, and the layout for it landed first (#67). **Thirteen carry no flag, and
+  that is the answer rather than a gap**: Europe's stateless languages got the flag of the
+  place they are actually at home in — Catalonia's, the ikurriña — and these are the ones
+  where not even that would be honest. Arabic is twenty-two countries, Swahili four, Hausa
+  two, Sesotho is Lesotho's as much as South Africa's; a wrong flag against somebody's
+  language is not a small wrong. **The image can now draw them**: it installed
+  `fonts-dejavu-core`, which covers Latin, Greek and Cyrillic and stops there, so an
+  Amharic or Tigrinya CV would have rendered as a page of empty boxes; `fonts-noto-core`
+  is added and a test holds the image's fonts to the languages actually offered. **A
+  language is offered once somebody has begun its catalogue, and not before** — all
+  twenty-nine exist and are empty, and listing them would be offering somebody their own
+  language and handing them an English interface. Translate one string and it appears,
+  with its completion beside its name. The suite's rule changed to match: the European
+  Union set must stay complete, every language must have a correct plural rule and a page
+  that renders, and completeness is a promise about a finished phase rather than about a
+  language added yesterday. The 45,037 translations themselves are the rest of #70. (#70)
+
+- **The interface is laid out right to left when the language is.** The `dir` attribute
+  has been emitted since the first release and has been `ltr` on every page ever rendered,
+  because every language Postulo speaks is read left to right — so what happened under
+  `rtl` was unknown rather than known-good. It is known now, and the layout work is done
+  before the first such language arrives (#70) rather than after somebody reports it.
+  Sixty-five classes across forty-two templates and the stylesheet stopped naming a side
+  and started naming a **reading edge** — `ms`/`me`, `ps`/`pe`, `start`/`end`,
+  `text-start`/`text-end`, `border-s` — which mean exactly what they meant under `ltr`. The
+  action buttons at the end of a heading row, the timeline rule beside the event log, the
+  menus that hang from a corner, the skip link and the board's columns all move to the
+  other edge; icons that point sideways are mirrored by name, and vertical ones are left
+  alone because they mean the same either way. **Text that is not in the reader's script
+  is isolated**: company names, job titles, addresses and letter subjects in `<bdi>`, and
+  every `<code>` span by one stylesheet rule, so a Latin name inside an Arabic line does
+  not throw the separator to the wrong end. **A rendered document has its own direction**,
+  from the language it is written in and not from the language of whoever made it — an
+  English CV written by somebody using Postulo in Arabic is an English, left-to-right PDF.
+  One list of right-to-left subtags serves the interface and the documents alike, and it is
+  Postulo's own rather than Django's, because #43 goes well past the languages Django ships
+  with. Held by two things that will still be there next year: a **lint** that fails on any
+  template or stylesheet class naming a left or a right, and a **browser suite** that reads
+  the application in a right-to-left language — in both themes, through axe — and measures
+  that the buttons, the board and the skip link actually moved. (#67)
+
 - **Every plugin carries a manifest, and the six Postulo ships fill it in.** #97 settled
   what a plugin declares — a short name, a full name, an author, a version, a description, a
   source link — and then Postulo's own declared almost none of it. `SchemaOrgSource` was two

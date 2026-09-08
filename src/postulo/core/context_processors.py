@@ -24,8 +24,10 @@ def theme_switch(choice: str) -> dict:
 
 
 def ui(request: HttpRequest) -> dict:
-    """Interface-wide values: the resolved theme, the navigation, the instance's policy."""
-    from . import navigation
+    """Interface-wide values: the resolved theme, the direction, the navigation, the policy."""
+    from django.utils.translation import get_language
+
+    from . import languages, navigation
 
     theme = ""
     choice = "system"
@@ -42,6 +44,10 @@ def ui(request: HttpRequest) -> dict:
 
     return {
         "ui_theme": theme,
+        # Postulo's own answer rather than Django's LANGUAGE_BIDI, so that the interface
+        # and a rendered document agree and a language Django has never heard of still
+        # gets a direction (#43 goes well past the set Django ships with).
+        "text_direction": languages.direction(get_language() or ""),
         "theme_switch": theme_switch(choice),
         "nav_items": navigation.visible_items(profile),
         "dashboard_hidden": navigation.dashboard_hidden(profile),

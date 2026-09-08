@@ -9,7 +9,7 @@
         {% translate "Every account on this instance. Administrators see accounts, never anyone's applications or documents." %}
       </p>
     </div>
-    <a href="{% url 'accounts:invite_list' %}" class="btn-primary ml-auto">{% translate "Invitations" %}</a>
+    <a href="{% url 'accounts:invite_list' %}" class="btn-primary ms-auto">{% translate "Invitations" %}</a>
   </div>
 
   {% comment %} `table-cards` makes each row a card below the md breakpoint, where five
@@ -23,7 +23,7 @@
      only adds "close when the pointer goes elsewhere".
   {% endcomment %}
   <div class="card scroll-x p-0">
-    <table class="table-cards w-full text-left text-sm" role="table">
+    <table class="table-cards w-full text-start text-sm" role="table">
       <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400"
              role="rowgroup">
         <tr role="row">
@@ -61,7 +61,7 @@
                            aria-label="{% blocktranslate trimmed with name=person.username %}Actions for {{ name }}{% endblocktranslate %}">
                     {% icon "ellipsis-vertical" %}
                   </summary>
-                  <div class="absolute end-0 z-20 mt-1 w-56 overflow-hidden rounded-xl border border-ink-200 bg-white py-1 text-left shadow-lg dark:border-ink-800 dark:bg-ink-900">
+                  <div class="absolute end-0 z-20 mt-1 w-56 overflow-hidden rounded-xl border border-ink-200 bg-white py-1 text-start shadow-lg dark:border-ink-800 dark:bg-ink-900">
                     <a href="{% url 'server:person_username' person.pk %}" class="menu-item">
                       {% icon "pencil" %}{% translate "Change username" %}
                     </a>
