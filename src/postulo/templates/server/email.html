@@ -33,10 +33,18 @@
        what it is called, what it does, and the version carrying the mail today. {% endcomment %}
     {% if transport and mailer.pluggable %}
       <p class="mt-3 text-xs text-ink-500 dark:text-ink-400" data-transport="{{ transport.name }}">
-        {% blocktranslate trimmed with label=transport.label version=transport.version %}
+        {% blocktranslate trimmed with label=manifest.label version=manifest.version %}
           Carried by the {{ label }} transport, version {{ version }}.
         {% endblocktranslate %}
-        {{ transport.description }}
+        {{ manifest.description }}
+        {% comment %} Its author, licence and source, the same line the Plugins page shows
+           for every other plugin. A transport is not listed there -- it is not governed per
+           person -- so this is the only place its provenance can appear (#98). {% endcomment %}
+        {% if manifest.author %}<br>{{ manifest.author }}{% endif %}
+        {% if manifest.licence %} · {{ manifest.licence }}{% endif %}
+        {% if manifest.source_url %}
+          · <a href="{{ manifest.source_url }}" rel="noopener noreferrer external" target="_blank" class="text-brand-600 underline dark:text-brand-400">{% translate "Source" %}</a>
+        {% endif %}
       </p>
     {% endif %}
   </div>

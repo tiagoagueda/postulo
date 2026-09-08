@@ -19,19 +19,19 @@ from django.core.mail.backends.smtp import EmailBackend
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
 
-from postulo import __version__
-from postulo.plugins.base import FieldSpec, TestResult
+from postulo.plugins.base import FieldSpec, TestResult, declares, shipped
 
 
+@declares(
+    shipped(
+        name="smtp",
+        label="SMTP",
+        kind="transport",
+        description=_lazy("Sends mail over SMTP, the way a mail server expects to be spoken to."),
+    )
+)
 class SMTPTransport:
     """Delivery over SMTP, configured from the environment and the Email page together."""
-
-    name = "smtp"
-    version = __version__
-    kind = "transport"
-    label = "SMTP"
-    author = "Postulo <postulo@tiagoagueda.com>"
-    description = _lazy("Sends mail over SMTP, the way a mail server expects to be spoken to.")
 
     #: This transport's settings are the named columns on the policy row rather than the
     #: generic blob, so the Email page draws them itself and this stays empty. The method

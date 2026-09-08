@@ -39,6 +39,44 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Every plugin carries a manifest, and the six Postulo ships fill it in.** #97 settled
+  what a plugin declares — a short name, a full name, an author, a version, a description, a
+  source link — and then Postulo's own declared almost none of it. `SchemaOrgSource` was two
+  lines, `name` and `version = "1.0"`, under a module that says a source's version exists *so
+  a capture can be traced to the code that made it*. It could not be traced to anything:
+  `"1.0"` meant 1.0 the day it was written and would have gone on meaning it through every
+  change to the parser underneath. A rule this project asks of other people and not of itself
+  is not a rule.
+
+  **The shape changed with it.** The facts now live in one `Manifest` rather than one
+  optional attribute each, with `@declares` attaching it and setting the protocol members
+  *from* it, so the identifier the registry keys on and the one in the manifest cannot
+  disagree. That is not tidiness. A loose attribute per fact can never be required —
+  `runtime_checkable` protocols check data members, and the registry drops anything failing
+  `isinstance`, so adding `label` to `SourcePlugin` would have silently unloaded every source
+  anybody had already written. One optional attribute carrying any number of facts has
+  neither problem, and a field added later costs a plugin that has not heard of it nothing.
+
+  `manifest_of()` is now the single place anything asks who a plugin is, and it looks in
+  three: the manifest, the loose attributes plugins used before there was one, and **the
+  wheel the plugin was installed from**. That last one is what makes "one place to look" true
+  rather than aspirational — a third-party plugin that never heard of manifests still has an
+  author and a licence in its packaging, and Postulo already reads them.
+
+  So *Server settings → Plugins* now shows the version, the author, the licence and a link to
+  the source **for every plugin**, built-in or installed, on the same line in the same place.
+  #97's complaint was that an administrator could see who wrote a plugin on the day they
+  installed it and never again; the built-ins could not be seen even then. The mail transport
+  is the one plugin that page does not list — it is not governed per person — so the same
+  line appears on *Email*, beside the transport carrying the mail.
+
+  Their version is Postulo's own, which is the truth: these ship with the application and
+  change when it does. **Their identifiers did not move.** `schema.org` and `page-metadata`
+  are written into the `source` field of every capture anybody has made, and renaming one
+  orphans that history; there is a test pinning them. There is also a test that walks the
+  built-ins rather than naming them and fails on a missing field — which is the part that
+  matters, because the issue asking for this counted four and there are six. (#98)
+
 - **Delivering mail is a plugin now, and SMTP is the one that ships.** A new kind,
   `transport`, under `postulo.transports`. It exists for a specific person: the self-hoster
   whose provider blocks outbound 25, 465 and 587 — most residential connections and several

@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import datetime as dt
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from typing import Protocol, runtime_checkable
 
@@ -108,29 +108,180 @@ class CaptureError(Exception):
 
 
 # ------------------------------------------------------- saying what a plugin is
+#
+# Everything a plugin says about itself lives in one object, and `@declares` puts it there.
+# The alternative — a loose attribute per fact — was what came first, and it has two
+# problems. Each new fact is a new optional attribute for every plugin author to know
+# about, and none of them can ever be *required*: `runtime_checkable` protocols check data
+# members as well as methods, and `registry.py` runs `isinstance` over every third-party
+# plugin and drops the ones that fail. Adding `label` to `SourcePlugin` would not have been
+# a request. It would have silently unloaded every source anybody had already written.
+#
+# A manifest sidesteps both. One optional attribute carries any number of facts, and adding
+# a field later changes nothing for a plugin that has not heard of it.
+#
+# A plugin that declares nothing still works, and gets its identifier back where a name
+# should be — which is what the interface showed before any of this existed.
 
-# A plugin may carry a `label` — its name in words — and a `description` saying what it
-# does. Neither is in the protocols above, and that is deliberate rather than an omission.
-#
-# `runtime_checkable` protocols check data members as well as methods, and `registry.py`
-# runs `isinstance` over every third-party plugin and drops the ones that fail. Adding
-# `label` and `description` to `SourcePlugin` would therefore not be a request: it would
-# silently unload every source anybody has already written, including the ones in this
-# project's own plugin repositories.
-#
-# So they are optional, read through these, and documented in `docs/PLUGINS.md` as worth
-# declaring. A plugin that says nothing gets its identifier back, which is what the
-# interface showed before any of this existed.
+
+@dataclass(frozen=True)
+class Manifest:
+    """Who a plugin is: everything it says about itself, in one place.
+
+    ``name`` is the identifier the registry keys on and, for a source, the value written
+    into every capture's ``source`` field. Changing it orphans that history, so it is the
+    one field here that is not free to edit.
+
+    ``author`` is a person or a project and an address — ``First Last <first@example.org>``
+    — because "who wrote this" is a question an administrator installing somebody else's
+    code is entitled to an answer to. ``licence`` is an SPDX identifier. ``source_url`` is
+    where the code actually lives, which is the only claim in here anybody can go and check.
+
+    ``logo`` names an image this plugin would like shown beside its name. Nothing renders it
+    yet; the field exists so that shipping one (#106) is a matter of pointing at an image
+    rather than of inventing somewhere to put it.
+    """
+
+    name: str
+    label: str = ""
+    version: str = ""
+    kind: str = ""
+    description: str = ""
+    author: str = ""
+    licence: str = ""
+    source_url: str = ""
+    logo: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.name:
+            raise ValueError("A manifest needs a name: it is what the registry keys on.")
+        # A plugin that gave no name in words gets its identifier, rather than a blank
+        # where a heading should be.
+        if not self.label:
+            object.__setattr__(self, "label", self.name)
+
+
+def declares(manifest: Manifest):
+    """Class decorator: attach a manifest, and satisfy the protocol from it.
+
+    ``name``, ``version``, ``kind`` and ``label`` are protocol members that the registry,
+    the stored records and half the interface read directly. Writing them out beside a
+    manifest that repeats them would be two sources of truth for one fact, and the day they
+    disagree is the day a capture is filed against a plugin that does not exist. So they are
+    set from the manifest, and there is one place to change them.
+    """
+
+    def attach(plugin_class):
+        plugin_class.manifest = manifest
+        for field_name in ("name", "version", "kind", "label", "description"):
+            value = getattr(manifest, field_name)
+            if value:
+                setattr(plugin_class, field_name, value)
+        return plugin_class
+
+    return attach
+
+
+def manifest_of(plugin) -> Manifest:
+    """Everything this plugin says about itself, wherever it happens to say it.
+
+    Three places, and the earlier one wins: its own manifest, the loose attributes plugins
+    declared before there was one, and the record of the wheel it was installed from. That
+    last one matters — a third-party plugin that never heard of manifests still has an
+    author and a licence in its packaging, and Postulo already reads them at install time.
+    Falling back to it is the difference between "one place to look" being true and being a
+    thing this project asks of other people and not of itself.
+    """
+    declared = getattr(plugin, "manifest", None)
+    if isinstance(declared, Manifest):
+        known = declared
+    else:
+        known = Manifest(
+            name=str(getattr(plugin, "name", "") or "?"),
+            label=str(getattr(plugin, "label", "") or ""),
+            version=str(getattr(plugin, "version", "") or ""),
+            kind=str(getattr(plugin, "kind", "") or ""),
+            description=str(getattr(plugin, "description", "") or ""),
+        )
+    filled = {
+        field_name: value
+        for field_name, value in _from_the_wheel(plugin).items()
+        if value and not getattr(known, field_name)
+    }
+    return replace(known, **filled) if filled else known
+
+
+def _from_the_wheel(plugin) -> dict:
+    """What the package a plugin came from said about itself, or nothing.
+
+    Nothing for a built-in, which came from no package. Defensive because a record that
+    cannot be read must not take down a page that only wanted to print an author's name.
+    """
+    try:
+        from importlib.metadata import packages_distributions
+
+        from .installing import canonicalise, read_record
+
+        top_level = type(plugin).__module__.split(".")[0]
+        distributions = {canonicalise(d) for d in packages_distributions().get(top_level, [])}
+        if not distributions:
+            return {}
+        for entry in read_record():
+            if canonicalise(entry.name) in distributions:
+                return {
+                    "description": entry.summary,
+                    "author": entry.author,
+                    "licence": entry.licence,
+                    "source_url": entry.source_url,
+                }
+    except Exception:  # pragma: no cover - a broken record explains nobody's name
+        return {}
+    return {}
 
 
 def label_of(plugin) -> str:
     """A plugin's name in words, falling back to the identifier it registered under."""
-    return str(getattr(plugin, "label", "") or getattr(plugin, "name", "") or "")
+    return str(manifest_of(plugin).label)
 
 
 def description_of(plugin) -> str:
     """What a plugin says it does, or nothing. Nothing is a perfectly good answer."""
-    return str(getattr(plugin, "description", "") or "")
+    return str(manifest_of(plugin).description)
+
+
+# ------------------------------------------- the plugins Postulo itself ships
+
+#: The same for every plugin in this repository, and saying them once is the point: a
+#: built-in claiming an independent author, licence or version is inventing a fact.
+SHIPPED_AUTHOR = "Postulo <postulo@tiagoagueda.com>"
+SHIPPED_LICENCE = "AGPL-3.0-or-later"
+SHIPPED_SOURCE_URL = "https://source.tiagoagueda.com/postulo/postulo"
+
+
+def shipped(*, name: str, label: str, kind: str, description, logo: str = "") -> Manifest:
+    """A manifest for a plugin that ships inside Postulo.
+
+    The version is Postulo's own, because that is the truth: these ship with the application
+    and change when it does. A built-in with a literal version number identifies nothing --
+    ``version = "1.0"`` meant 1.0 the day it was written and would have gone on meaning it
+    through every change to the parser underneath.
+
+    Not part of the contract a third party writes against. It is a convenience for this
+    repository, so that six built-ins cannot drift into claiming six different licences.
+    """
+    from postulo import __version__
+
+    return Manifest(
+        name=name,
+        label=label,
+        version=__version__,
+        kind=kind,
+        description=str(description),
+        author=SHIPPED_AUTHOR,
+        licence=SHIPPED_LICENCE,
+        source_url=SHIPPED_SOURCE_URL,
+        logo=logo,
+    )
 
 
 # ------------------------------------------------------------------- importers

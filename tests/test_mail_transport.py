@@ -113,12 +113,16 @@ def give_a_passkey(person):
 
 
 def test_smtp_ships_as_a_transport_and_says_who_it_is(db):
+    """Through its manifest, which is where a plugin's facts live now (#98)."""
+    from postulo.plugins.base import manifest_of
+
     smtp = registry.find_plugin("transport", "smtp")
 
     assert smtp is not None
     assert smtp.kind == "transport"
-    assert smtp.label and smtp.version and str(smtp.description)
-    assert smtp.author
+    manifest = manifest_of(smtp)
+    assert manifest.label and manifest.version and manifest.description
+    assert manifest.author and manifest.licence and manifest.source_url
 
 
 def test_a_transport_is_recognised_by_the_registry(db):

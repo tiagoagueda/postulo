@@ -48,6 +48,17 @@
               <span class="ml-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{{ row.kind }}</span>
             </p>
             {% if row.description %}<p class="text-xs text-ink-500 dark:text-ink-400">{{ row.description }}</p>{% endif %}
+            {% comment %} Who wrote it, under what licence, and where the code is. Every
+               plugin carries a manifest now, built-ins included, so this line is the same
+               line whether the code shipped in the box or arrived in a wheel. {% endcomment %}
+            <p class="text-xs text-ink-500 dark:text-ink-400" data-provenance="{{ row.name }}">
+              {{ row.manifest.version }}
+              {% if row.manifest.author %} · {{ row.manifest.author }}{% endif %}
+              {% if row.manifest.licence %} · {{ row.manifest.licence }}{% endif %}
+              {% if row.manifest.source_url %}
+                · <a href="{{ row.manifest.source_url }}" rel="noopener noreferrer external" target="_blank" class="text-brand-600 underline dark:text-brand-400">{% translate "Source" %}</a>
+              {% endif %}
+            </p>
           </div>
           {% comment %} Full width until there is room for the fixed column: 288 pixels
              inside a card inside a 320-pixel page does not fit, and `shrink-0` means it

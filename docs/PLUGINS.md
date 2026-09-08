@@ -409,9 +409,52 @@ asking the same question twice.
 
 ## Saying who you are
 
-Postulo reads your wheel's metadata and keeps it, so an administrator can see what a plugin
-is and who wrote it without a shell. Declare these in `pyproject.toml` and they appear on
-*Server settings → Plugins*:
+Everything a plugin says about itself goes in one place: a **manifest**.
+
+```python
+from postulo.plugins.base import Manifest, declares
+
+
+@declares(
+    Manifest(
+        name="acme-board",
+        label="ACME Board",
+        version="1.4.0",
+        kind="source",
+        description="Reads postings from ACME's board.",
+        author="First Last <first.last@example.org>",
+        licence="AGPL-3.0-or-later",
+        source_url="https://example.org/your-plugin",
+        logo="https://example.org/your-plugin/logo.png",
+    )
+)
+class AcmeBoardSource:
+    def can_handle(self, url): ...
+    def parse(self, url, html): ...
+```
+
+`@declares` attaches the manifest **and** sets `name`, `version`, `kind`, `label` and
+`description` on the class from it, so the protocol members the registry reads and the
+manifest cannot disagree. You may write them by hand instead; the manifest is optional and
+so is the decorator.
+
+`name` is the one field that is not free to change later. It is what the registry keys on
+and, for a source, the value written into every capture's `source` field — renaming it
+orphans the history of every capture anybody made with your plugin.
+
+`logo` names an image to show beside your plugin's name. Nothing renders it yet.
+
+**A manifest is optional, and so is every field but `name`.** A plugin that declares nothing
+still loads, and shows its identifier where a name would be. That is not politeness: the
+protocols are `runtime_checkable`, which means they check data members as well as methods,
+and `registry.py` drops anything that fails `isinstance` — so making any of this required
+would silently unload every plugin written before it existed. One optional attribute
+carrying any number of facts is what makes the set extensible at all.
+
+**Your packaging is the fallback.** Postulo reads your wheel's metadata at install time and
+keeps it, and `base.manifest_of` fills in anything your manifest left out from there. So a
+plugin that declares nothing but packages itself properly still shows an author and a
+licence on *Server settings → Plugins*:
 
 ```toml
 [project]
@@ -423,16 +466,20 @@ authors = [{ name = "First Last", email = "first.last@example.org" }]
 Source = "https://example.org/your-plugin"
 ```
 
-Both halves matter. `authors` **with an email** becomes `Author-email: First Last <address>`;
-without one it is just a name. And the URL is read from `Project-URL` — `Source` first, then
-`Repository`, then `Homepage` — because `Home-page` is setuptools' old field and modern
-backends do not write it.
+Both halves of `authors` matter: **with an email** it becomes `Author-email: First Last
+<address>`, without one it is just a name. The URL is read from `Project-URL` — `Source`
+first, then `Repository`, then `Homepage` — because `Home-page` is setuptools' old field and
+modern backends do not write it.
 
-A plugin object may also carry a `label` (its name in words) and a `description`. Both are
-**optional**, read through `base.label_of` and `base.description_of`, and a plugin that
-declares neither gets its own identifier shown instead. They are deliberately not in the
-protocols: `runtime_checkable` checks data members, so requiring them would silently unload
-every plugin written before they existed.
+Read it all back with `base.manifest_of(plugin)`, which is the one place anything in Postulo
+asks who a plugin is. `base.label_of` and `base.description_of` are shorthands over it.
+
+**The plugins Postulo ships use the same machinery**, through a `shipped()` helper that fills
+in the author, the licence, the source URL and Postulo's own version — because a built-in
+claiming an independent version number is inventing a fact, and one that ships with the
+application changes when the application does. There are six of them, and a test walks every
+one and fails on a missing field, so this is not a rule the project asks of you and not of
+itself.
 
 ## Importers
 

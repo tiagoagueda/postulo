@@ -484,6 +484,7 @@ class EmailView(PolicyView):
 
     def get_context_data(self, **kwargs):
         from postulo.notifications import transport
+        from postulo.plugins import base as plugin_base
 
         context = super().get_context_data(**kwargs)
         context["mailer"] = _mailer_summary()
@@ -496,6 +497,7 @@ class EmailView(PolicyView):
         chosen = transport.selected()
         context["transports"] = transport.available()
         context["transport"] = chosen
+        context["manifest"] = plugin_base.manifest_of(chosen) if chosen else None
         context["transport_is_smtp"] = (
             chosen is not None and chosen.name == transport.DEFAULT_TRANSPORT
         )
@@ -721,12 +723,17 @@ def _policy_rows(person=None) -> list[dict]:
     rows = []
     for plugin in _governed_plugins():
         row = stored.get(plugin.name)
+        # The whole manifest, not three fields off it: this is the page an administrator
+        # is on when the question is "whose code is running here", and #97 exists because
+        # the answer used to be visible on the day of installation and never again.
+        manifest = base.manifest_of(plugin)
         rows.append(
             {
                 "name": plugin.name,
-                "label": base.label_of(plugin),
-                "description": base.description_of(plugin),
-                "kind": getattr(plugin, "kind", "source"),
+                "label": manifest.label,
+                "description": manifest.description,
+                "kind": manifest.kind or "source",
+                "manifest": manifest,
                 "state": row.state if row else PluginPolicy.State.AVAILABLE,
                 "decided_by": row.decided_by if row else None,
                 "decided_at": row.decided_at if row else None,

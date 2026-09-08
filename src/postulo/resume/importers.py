@@ -19,24 +19,24 @@ from __future__ import annotations
 
 from django.utils.translation import gettext_lazy as _
 
-from postulo import __version__
+from postulo.plugins.base import declares, shipped
 
 from . import europass
 
 
+@declares(
+    shipped(
+        name="europass",
+        label="Europass",
+        kind="importer",
+        description=_(
+            "The European CV format: the XML the Europass editor produces and the JSON "
+            "europass.europa.eu exports."
+        ),
+    )
+)
 class EuropassImporter:
     """Reads the XML the Europass CV editor produces and the JSON europass.europa.eu exports."""
-
-    name = "europass"
-    #: Postulo's own, because that is the truth: this ships with the application and changes
-    #: when it does. The two built-in connected plugins already do the same.
-    version = __version__
-    kind = "importer"
-    label = "Europass"
-    description = _(
-        "The European CV format: the XML the Europass editor produces and the JSON "
-        "europass.europa.eu exports."
-    )
 
     def can_handle(self, data: bytes, filename: str = "") -> bool:
         """Whether this looks like one of the two Europass formats.

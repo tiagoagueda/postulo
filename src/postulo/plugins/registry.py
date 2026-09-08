@@ -102,6 +102,17 @@ def register_builtin(kind: str, plugin_class: type) -> None:
     _cache.pop(kind, None)
 
 
+def builtins() -> dict[str, list[type]]:
+    """Every plugin class that ships inside this process, by kind.
+
+    Public so that a test can walk them and fail on one that says nothing about itself. The
+    built-ins are registered from three different app configs and a module-level list, which
+    makes "all of them" easy to miscount by hand -- and a built-in added later would be
+    exactly the one nobody remembered to check (#98).
+    """
+    return {kind: list(registered) for kind, registered in _builtin.items() if registered}
+
+
 def unregister_builtin(kind: str, plugin_class: type) -> None:
     registered = _builtin.get(kind, [])
     if plugin_class in registered:

@@ -24,8 +24,7 @@ from typing import Protocol, runtime_checkable
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from postulo import __version__
-from postulo.plugins.base import ConnectedPlugin, FieldSpec, TestResult
+from postulo.plugins.base import ConnectedPlugin, FieldSpec, TestResult, declares, shipped
 
 from .models import DocumentKind, RenderedDocument, UploadedDocument
 
@@ -84,6 +83,17 @@ class StorePlugin(ConnectedPlugin, Protocol):
 # ---------------------------------------------------------------- the local store
 
 
+@declares(
+    shipped(
+        name="local",
+        label=_("This instance"),
+        kind="store",
+        description=_(
+            "The private media directory on this server, where every document is kept "
+            "whatever else it is also copied to."
+        ),
+    )
+)
 class LocalStore:
     """Private media on this instance: the store every document is in, always.
 
@@ -92,10 +102,6 @@ class LocalStore:
     elsewhere speak the same contract.
     """
 
-    name = "local"
-    version = __version__
-    kind = "store"
-    label = _("This instance")
     #: Not offered under Settings → Connections: it needs nothing from anyone.
     needs_connection = False
 

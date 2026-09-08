@@ -10,9 +10,9 @@ from __future__ import annotations
 
 from django.core.mail import send_mail
 from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _lazy
 
-from postulo import __version__
-from postulo.plugins.base import FieldSpec, TestResult
+from postulo.plugins.base import FieldSpec, TestResult, declares, shipped
 
 from .base import Notification
 
@@ -32,12 +32,17 @@ def _body(notification: Notification) -> str:
     return "\n\n".join(parts) + "\n"
 
 
+@declares(
+    shipped(
+        name="email",
+        label="Email",
+        kind="notifier",
+        description=_lazy(
+            "Sends a notification as plain email, through whatever this instance uses to send mail."
+        ),
+    )
+)
 class EmailNotifier:
-    name = "email"
-    version = __version__
-    kind = "notifier"
-    label = "Email"
-
     def config_fields(self) -> list[FieldSpec]:
         return [
             FieldSpec(

@@ -23,7 +23,9 @@ import datetime as dt
 from decimal import Decimal, InvalidOperation
 from urllib.parse import urlparse
 
-from .base import JobPostingData
+from django.utils.translation import gettext_lazy as _
+
+from .base import JobPostingData, declares, shipped
 from .htmlutil import extract_jsonld, extract_meta, html_to_text, strip_tags
 
 #: schema.org employmentType values mapped onto Postulo's own.
@@ -137,11 +139,20 @@ def _salary(base_salary) -> tuple[Decimal | None, Decimal | None, str, str]:
     return low, high, currency.upper(), period
 
 
+@declares(
+    shipped(
+        name="schema.org",
+        label="schema.org",
+        kind="source",
+        description=_(
+            "Reads the JobPosting most large boards already publish about themselves, "
+            "for search engines. A published standard the sites maintain, so it breaks "
+            "far less often than guessing at their markup would."
+        ),
+    )
+)
 class SchemaOrgSource:
     """Read the schema.org JobPosting that a site publishes about itself."""
-
-    name = "schema.org"
-    version = "1.0"
 
     def can_handle(self, url: str) -> bool:
         return urlparse(url).scheme in {"http", "https"}
@@ -188,11 +199,20 @@ class SchemaOrgSource:
         return None
 
 
+@declares(
+    shipped(
+        name="page-metadata",
+        label=_("Page metadata"),
+        kind="source",
+        description=_(
+            "The fallback, for a page with no structured data: the title it declares and "
+            "its readable text. Deliberately unambitious — it saves typing and never "
+            "pretends to know more than it does."
+        ),
+    )
+)
 class PageMetadataSource:
     """The fallback: a title, whatever the page says about itself, and its text."""
-
-    name = "page-metadata"
-    version = "1.0"
 
     def can_handle(self, url: str) -> bool:
         return urlparse(url).scheme in {"http", "https"}
