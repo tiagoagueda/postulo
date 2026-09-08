@@ -126,7 +126,14 @@ All notable changes to Postulo are recorded here. The format follows
   and is wrong: the *last digit* decides, not the value. 21 and 31 take the singular like 1 —
   *tuttugu og ein umsókn* — while 11 takes the plural like 12. A two-form language whose rule
   is not `n != 1` is exactly the case a form count cannot catch, which is why the rule is
-  written out per language instead of inferred. (#118)
+  written out per language instead of inferred.
+
+  **Bosnian and Serbian brought the second script**, and a temptation worth naming. Both
+  take the same three-form rule Croatian already carries, and the tidy move is one shared
+  constant for all three — which is exactly how a language ends up inheriting a rule nobody
+  checked for it. They are written out separately. Serbian is offered in Cyrillic, its own
+  name in the picker reading *српски*, so the list now carries three scripts and every one
+  of them still says which language it is in. (#118)
 
 - **Every plugin carries a manifest, and the six Postulo ships fill it in.** #97 settled
   what a plugin declares — a short name, a full name, an author, a version, a description, a

@@ -122,6 +122,7 @@ setting per person; the documentation is in English, and this paragraph says wha
 Postulo is in each language so nobody has to guess.
 
 - **български** — Postulo е самостоятелно хостван мениджър на кандидатури за работа: вашите кандидатури, CV-та и мотивационни писма, на вашия сървър, без платени функции.
+- **bosanski** — Postulo je samostalno hostovani upravitelj prijava za posao: vaše prijave, CV-jevi i motivaciona pisma na vašem serveru, bez plaćenih funkcija.
 - **čeština** — Postulo je samostatně hostovaný správce žádostí o práci: vaše žádosti, CV a motivační dopisy na vašem serveru, bez placených funkcí.
 - **dansk** — Postulo er en selvhostet håndtering af jobansøgninger: dine ansøgninger, CV'er og ansøgningsbreve på din egen server, uden betalte funktioner.
 - **Deutsch** — Postulo ist ein selbst gehosteter Bewerbungsmanager: Ihre Bewerbungen, Lebensläufe und Anschreiben auf Ihrem eigenen Server, ohne kostenpflichtige Funktionen.
@@ -145,6 +146,7 @@ Postulo is in each language so nobody has to guess.
 - **română** — Postulo este un manager de candidaturi găzduit pe propriul server: candidaturile, CV-urile și scrisorile tale de intenție pe serverul tău, fără funcții plătite.
 - **slovenčina** — Postulo je samostatne hostovaný správca žiadostí o prácu: vaše žiadosti, CV a motivačné listy na vašom serveri, bez platených funkcií.
 - **slovenščina** — Postulo je samostojno gostovan upravljalnik prijav za zaposlitev: vaše prijave, življenjepisi in motivacijska pisma na vašem strežniku, brez plačljivih funkcij.
+- **српски** — Postulo је самостално хостован управљач пријава за посао: ваше пријаве, CV-јеви и мотивациона писма на вашем серверу, без плаћених функција.
 - **svenska** — Postulo är en självhostad hanterare för jobbansökningar: dina ansökningar, CV:n och personliga brev på din egen server, utan betalfunktioner.
 - **Türkçe** — Postulo, kendi sunucunuzda barındırılan bir iş başvurusu yöneticisidir: başvurularınız, CV'leriniz ve ön yazılarınız kendi sunucunuzda, ücretli özellikler olmadan.
 - **українська** — Postulo — це самостійно розміщений менеджер заявок на роботу: ваші заявки, резюме та супровідні листи на вашому сервері, без платних функцій.

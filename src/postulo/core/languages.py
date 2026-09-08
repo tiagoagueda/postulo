@@ -43,6 +43,7 @@ from __future__ import annotations
 FLAG_COUNTRIES: dict[str, str] = {
     "en-gb": "GB",
     "bg": "BG",
+    "bs": "BA",
     "cs": "CZ",
     "da": "DK",
     "de": "DE",
@@ -67,6 +68,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "ro": "RO",
     "sk": "SK",
     "sl": "SI",
+    "sr": "RS",
     "sv": "SE",
     "tr": "TR",
     "uk": "UA",
@@ -88,6 +90,7 @@ def flag_country(code: str) -> str:
 NATIVE_NAMES: dict[str, str] = {
     "en-gb": "English (United Kingdom)",
     "bg": "български",
+    "bs": "bosanski",
     "cs": "čeština",
     "da": "dansk",
     "de": "Deutsch",
@@ -112,6 +115,7 @@ NATIVE_NAMES: dict[str, str] = {
     "ro": "română",
     "sk": "slovenčina",
     "sl": "slovenščina",
+    "sr": "српски",
     "sv": "svenska",
     "tr": "Türkçe",
     "uk": "українська",
@@ -128,6 +132,13 @@ _TWO = "nplurals=2; plural=(n != 1);"
 #: gettext ``Plural-Forms`` per language, written into each catalogue's header.
 PLURAL_FORMS: dict[str, str] = {
     "bg": _TWO,
+    #: The same three-form rule as Croatian and Serbian, written out rather than
+    #: shared: these are separate languages, and a shared constant would invite the
+    #: next one to inherit a rule nobody checked.
+    "bs": (
+        "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
+        "(n%100<10 || n%100>=20) ? 1 : 2);"
+    ),
     "cs": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
     "da": _TWO,
     "de": _TWO,
@@ -170,6 +181,10 @@ PLURAL_FORMS: dict[str, str] = {
     "ro": "nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);",
     "sk": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
     "sl": "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);",
+    "sr": (
+        "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
+        "(n%100<10 || n%100>=20) ? 1 : 2);"
+    ),
     "sv": _TWO,
     #: Not `_TWO`. Turkish counts nothing after a numeral — *bir başvuru*, *iki
     #: başvuru* — so both forms carry the same noun, and the split matters only for
