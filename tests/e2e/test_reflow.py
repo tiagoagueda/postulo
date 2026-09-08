@@ -71,35 +71,41 @@ SCROLLS_SIDEWAYS = r"""() => {
     };
   };
 
-  // What is actually out there, asked of the browser rather than worked out from boxes.
-  // Every element's border box can sit inside the viewport and the page still scroll --
-  // a margin, a transform and an outline all add scrollable overflow that
-  // `getBoundingClientRect` does not show. So scroll to the far right and ask what is
-  // under the last column of pixels.
-  const outThere = () => {
-    const found = new Map();
-    const was = window.scrollX;
-    window.scrollTo(10000, 0);
-    const x = document.documentElement.clientWidth - 2;
-    for (let y = 4; y < window.innerHeight; y += 12) {
-      for (const el of document.elementsFromPoint(x, y)) {
-        if (el === document.body || el === document.documentElement) continue;
-        const key = el.tagName + (el.className || '');
-        if (!found.has(key)) {
-          const r = el.getBoundingClientRect();
-          const style = getComputedStyle(el);
-          found.set(key, {
-            what: el.outerHTML.replace(/\s+/g, ' ').slice(0, 110),
-            right: Math.round(r.right),
-            marginRight: style.marginRight,
-            transform: style.transform === 'none' ? '' : style.transform,
-            position: style.position,
-          });
+  // Which element is responsible, established by removing things rather than by reasoning
+  // about boxes. Every rectangle can sit inside the viewport and the page still scroll: a
+  // margin, a transform and an outline all add scrollable overflow that
+  // `getBoundingClientRect` never shows, and two attempts to deduce the culprit from
+  // rectangles both reported the settings sidebar -- which is on every settings page,
+  // while only one of them scrolls.
+  //
+  // So: hide a child, ask whether the page still overflows, put it back. If hiding it
+  // fixed the page, the cause is inside it, and the same question is asked of its
+  // children. This ends at the smallest element that is actually to blame and cannot be
+  // fooled by anything, because it never looks at a box at all.
+  const blame = () => {
+    const wide = () => document.documentElement.scrollWidth > limit;
+    if (!wide()) return [];
+    const trail = [];
+    let culprit = document.body;
+    for (let depth = 0; depth < 40; depth++) {
+      let descended = false;
+      for (const child of [...culprit.children]) {
+        const was = child.style.display;
+        child.style.display = 'none';
+        const fixed = !wide();
+        child.style.display = was;
+        if (fixed) {
+          culprit = child;
+          trail.push(describe(child));
+          descended = true;
+          break;
         }
       }
+      if (!descended) break;
     }
-    window.scrollTo(was, 0);
-    return [...found.values()].slice(0, 8);
+    // The last entry is the smallest element whose removal fixes the page; the ones before
+    // it are the path down to it, which is what says where to look.
+    return trail.slice(-4);
   };
 
   const out = [];
@@ -125,7 +131,7 @@ SCROLLS_SIDEWAYS = r"""() => {
     reached,
     culprits: out,
     everything: everything.slice(0, 12),
-    outThere: out.length ? [] : outThere(),
+    blame: out.length ? [] : blame(),
     metrics: {
       clientWidth: limit,
       innerWidth: window.innerWidth,
@@ -158,18 +164,17 @@ def test_no_page_scrolls_sideways_at_320_pixels(live_server, page: Page, furnish
             failures.setdefault(key, path)
         if not result["culprits"]:
             # The filters found nothing to blame and the page scrolls regardless, so show
-            # the working: the page's own measurements, what is actually sitting in the
-            # overflowed column, and everything over the edge with the reason it was ruled
-            # out. A border box inside the viewport can still scroll the page -- a margin,
-            # a transform and an outline all add scrollable overflow that a rectangle does
-            # not show -- so the middle one is the question the others cannot answer.
+            # the working: the page's own measurements, the element whose removal actually
+            # fixes it, and everything over the edge with the reason it was ruled out. The
+            # middle one is the answer; the other two are for reading it against, because
+            # a rectangle inside the viewport can still scroll the page and twice now the
+            # rectangles have pointed at something that was not to blame.
             detail = (
                 f"      metrics: {result['metrics']}\n"
                 + "".join(
-                    f"      at the far edge: right={row['right']} "
-                    f"margin-right={row['marginRight']} position={row['position']} "
-                    f"transform={row['transform'] or 'none'}\n        {row['what']}\n"
-                    for row in result["outThere"]
+                    f"      hiding this fixes the page: {row['width']}px wide, "
+                    f"{row['over']}px over\n        {row['what']}\n"
+                    for row in result["blame"]
                 )
                 + "\n".join(
                     f"      {row['width']}x, {row['over']}px over, {row['position']}, "
