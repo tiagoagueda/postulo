@@ -60,11 +60,13 @@ def test_the_settings_offer_every_eu_language():
     codes = dict(settings.LANGUAGES)
     # Twenty-four official European Union languages, and Brazilian Portuguese beside the
     # European: the first case of two regions of one language both being offered (#110).
-    assert len(codes) == 25
+    # Not a count any more — Europe beyond the Union is arriving language by language
+    # (#118), and a total pinned here would have to be edited by every one of them.
     for code in ("bg", "cs", "da", "de", "el", "es", "et", "fi", "fr-fr", "ga", "hr", "hu"):
         assert code in codes
     for code in ("it", "lt", "lv", "mt", "nl", "pl", "pt-pt", "ro", "sk", "sl", "sv"):
         assert code in codes
+    assert codes == languages.NATIVE_NAMES, "the settings offer exactly what the table holds"
     assert codes["pt-br"] == "português (Brasil)"
     assert codes["pt-pt"] == "português (Portugal)", "each variant named by its own country"
     assert all(name == languages.NATIVE_NAMES[code] for code, name in settings.LANGUAGES), (

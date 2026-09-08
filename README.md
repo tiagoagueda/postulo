@@ -116,9 +116,10 @@ and answers for it. The assistant is a tool; the contributor is accountable. See
 
 ## In your language
 
-Postulo speaks every official language of the European Union, and Brazilian Portuguese
-beside the European. The interface is a setting per person; the documentation is in
-English, and this paragraph says what Postulo is in each language so nobody has to guess.
+Postulo speaks every official language of the European Union, Brazilian Portuguese
+beside the European, and the languages of Europe beyond the Union. The interface is a
+setting per person; the documentation is in English, and this paragraph says what
+Postulo is in each language so nobody has to guess.
 
 - **български** — Postulo е самостоятелно хостван мениджър на кандидатури за работа: вашите кандидатури, CV-та и мотивационни писма, на вашия сървър, без платени функции.
 - **čeština** — Postulo je samostatně hostovaný správce žádostí o práci: vaše žádosti, CV a motivační dopisy na vašem serveru, bez placených funkcí.
@@ -143,6 +144,8 @@ English, and this paragraph says what Postulo is in each language so nobody has 
 - **slovenčina** — Postulo je samostatne hostovaný správca žiadostí o prácu: vaše žiadosti, CV a motivačné listy na vašom serveri, bez platených funkcií.
 - **slovenščina** — Postulo je samostojno gostovan upravljalnik prijav za zaposlitev: vaše prijave, življenjepisi in motivacijska pisma na vašem strežniku, brez plačljivih funkcij.
 - **svenska** — Postulo är en självhostad hanterare för jobbansökningar: dina ansökningar, CV:n och personliga brev på din egen server, utan betalfunktioner.
+- **Türkçe** — Postulo, kendi sunucunuzda barındırılan bir iş başvurusu yöneticisidir: başvurularınız, CV'leriniz ve ön yazılarınız kendi sunucunuzda, ücretli özellikler olmadan.
+- **українська** — Postulo — це самостійно розміщений менеджер заявок на роботу: ваші заявки, резюме та супровідні листи на вашому сервері, без платних функцій.
 
 ## Documentation
 

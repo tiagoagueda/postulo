@@ -9,10 +9,17 @@ and compiled to the `.mo` Django reads at build time.
 Postulo speaks every official language of the European Union: Bulgarian, Croatian, Czech,
 Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Irish,
 Italian, Latvian, Lithuanian, Maltese, Polish, Portuguese, Romanian, Slovak, Slovene,
-Spanish and Swedish, plus **Brazilian Portuguese** beside the European. Later releases
-extend the set in phases: the rest of the European continent, then Africa, then Asia, then
-the remaining world. If your language is not in the current phase, a catalogue for it is
-still welcome — adding one is described below.
+Spanish and Swedish, plus **Brazilian Portuguese** beside the European. The rest of the
+European continent is arriving language by language; Africa, Asia and the remaining world
+follow in later releases. The language picker in Settings is the authority on what is
+offered today. If your language is not in the current phase, a catalogue for it is still
+welcome — adding one is described below.
+
+Beyond the Union, two things stop being tidy, and both are handled rather than
+special-cased. A language may have no country of its own — Basque, Catalan, Galician and
+Welsh get no flag, because the flag of the state they sit in already stands for another
+language on the same list, and no flag beats a wrong flag. And a language may bring its own
+script: Greek and Cyrillic are already here, Georgian and Armenian arrive with the rest.
 
 ## A variant of a language already spoken
 

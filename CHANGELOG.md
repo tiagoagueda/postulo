@@ -98,6 +98,29 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Postulo now speaks Ukrainian and Turkish.** The catalogue set stopped at the borders of
+  the European Union, which is a political boundary rather than a linguistic one: it left out
+  the language with the most speakers of any in Europe that the Union does not administer, and
+  it left out Turkish, which sits inside several member states without being official in any
+  of them. Neither omission was ever a decision — Europe was simply taken to mean the Union
+  because that was the list that came to hand.
+
+  **Ukrainian brought back the plural rule that has to be got right.** Three forms, chosen by
+  the last digit rather than the value: 1, 21 and 101 take the first, 2–4 the second, and
+  11–14 the third *despite ending in 1 to 4*. Copy the two-form rule and every count on
+  every page is wrong for four numbers in ten. Turkish went the other way and is worth saying
+  out loud, because the tidy answer is also the wrong one: the noun after a numeral does not
+  inflect at all — *bir başvuru*, *iki başvuru* — so both forms carry the same word, and the
+  split earns its keep only in the rest of the sentence around it.
+
+  **What comes next is what stops being tidy**, so the ground was laid here rather than at the
+  language that first needs it. `FLAG_COUNTRIES` used to be able to claim that every language
+  had one uncontested home, which was true of the Union and is not true of the continent:
+  Basque, Catalan, Galician and Welsh are coming, and each sits in a state whose flag already
+  stands for a different language on the same list. They will carry no flag, `flag_country()`
+  answers with nothing, and the picker closes the row up — the behaviour was already there,
+  written for a phase beyond Europe that turned out to begin inside it. (#118)
+
 - **Every plugin carries a manifest, and the six Postulo ships fill it in.** #97 settled
   what a plugin declares — a short name, a full name, an author, a version, a description, a
   source link — and then Postulo's own declared almost none of it. `SchemaOrgSource` was two

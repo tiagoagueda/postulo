@@ -3,8 +3,12 @@
 Plain data, importable without Django: the settings module reads it, and so does the
 ``scripts/messages.py`` tool that keeps the catalogues current.
 
-Phase 1 is every official language of the European Union, plus Brazilian Portuguese beside
-the European — the first case of two regions of one language both being offered.
+Europe first: the twenty-four official languages of the European Union, Brazilian
+Portuguese beside the European — the first case of two regions of one language both being
+offered — and then the rest of the continent, which is where the neat rules stop. A
+language on this list may have no country of its own (Basque, Catalan, Galician, Welsh),
+and may be written in a script the rest of the list never uses (Greek, Cyrillic, Georgian,
+Armenian). Both are handled here rather than special-cased at each call site.
 
 The names are the languages'
 own — someone looking for their language in a list finds "Deutsch", not the English word
@@ -30,11 +34,12 @@ from __future__ import annotations
 #: the first case in Postulo of two regions of one language both being offered.
 #:
 #: Written out deliberately rather than derived from the code, because a language is not a
-#: country: ``el`` is Greek and ``cs`` is Czech, and neither code says so. For the European
-#: Union set every language has one uncontested home, which is what makes this tractable
-#: now. It will not survive #43 moving past Europe — Spanish is not only Spain, Arabic is
-#: not one flag — and the rule there is that a language with no uncontested home gets no
-#: flag at all. No flag beats a wrong flag.
+#: country: ``el`` is Greek and ``cs`` is Czech, and neither code says so. Every language
+#: of the European Union happened to have one uncontested home, which is what made the
+#: first pass tractable. The rest of Europe ends that: Basque, Catalan, Galician and Welsh
+#: are spoken across borders or inside one state that already flies its flag for another
+#: language, so they are absent from this table and ``flag_country`` answers with nothing.
+#: No flag beats a wrong flag, and every caller already copes with the empty answer.
 FLAG_COUNTRIES: dict[str, str] = {
     "en-gb": "GB",
     "bg": "BG",
@@ -61,15 +66,17 @@ FLAG_COUNTRIES: dict[str, str] = {
     "sk": "SK",
     "sl": "SI",
     "sv": "SE",
+    "tr": "TR",
+    "uk": "UA",
 }
 
 
 def flag_country(code: str) -> str:
     """The country whose flag stands for a language, or nothing where none is right.
 
-    Nothing is a perfectly good answer and the interface must cope with it: the phase of
-    #43 beyond Europe brings languages with no single home, and they will be left blank
-    rather than given somebody's best guess.
+    Nothing is a perfectly good answer and the interface must cope with it: Europe beyond
+    the Union already brings languages with no single home, and they are left blank rather
+    than given somebody's best guess.
     """
     return FLAG_COUNTRIES.get(code, "")
 
@@ -102,6 +109,8 @@ NATIVE_NAMES: dict[str, str] = {
     "sk": "slovenčina",
     "sl": "slovenščina",
     "sv": "svenska",
+    "tr": "Türkçe",
+    "uk": "українська",
 }
 
 #: What ``settings.LANGUAGES`` is built from.
@@ -153,6 +162,16 @@ PLURAL_FORMS: dict[str, str] = {
     "sk": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
     "sl": "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);",
     "sv": _TWO,
+    #: Not `_TWO`. Turkish counts nothing after a numeral — *bir başvuru*, *iki
+    #: başvuru* — so both forms carry the same noun, and the split matters only for
+    #: the rest of the sentence around it.
+    "tr": "nplurals=2; plural=(n > 1);",
+    #: Three, and the rule is about the last digit rather than the value: 1, 21 and 101
+    #: take the first form, 2-4 the second, and 11-14 the third despite ending in 1-4.
+    "uk": (
+        "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : "
+        "n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
+    ),
 }
 
 

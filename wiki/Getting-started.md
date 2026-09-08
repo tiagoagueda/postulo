@@ -33,7 +33,9 @@ How Postulo behaves for you lives under **Settings**, one section per page:
   Each language is written in itself, so you can find yours without reading English, and
   the flag beside it is a picture rather than an emoji — Windows does not draw flag emoji,
   and used to show two letters here instead. Postulo speaks every official language of the
-  European Union; a language whose
+  European Union and, language by language, the rest of the European continent; a few of
+  them have no flag beside the name, because the state they are spoken in already flies its
+  flag for another language on the same list. A language whose
   translation is a machine-assisted draft says so in the list until a speaker has
   reviewed it, and [translating](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/TRANSLATING.md)
   is the easiest way to help.
