@@ -6,9 +6,10 @@ Plain data, importable without Django: the settings module reads it, and so does
 Europe first: the twenty-four official languages of the European Union, Brazilian
 Portuguese beside the European — the first case of two regions of one language both being
 offered — and then the rest of the continent, which is where the neat rules stop. A
-language on this list may have no country of its own (Basque, Catalan, Galician, Welsh),
-and may be written in a script the rest of the list never uses (Greek, Cyrillic, Georgian,
-Armenian). Both are handled here rather than special-cased at each call site.
+language on this list may be at home somewhere that is not a state (Basque, Catalan,
+Galician, Welsh), and may be written in a script the rest of the list never uses (Greek,
+Cyrillic, Georgian, Armenian). Both are handled here rather than special-cased at each call
+site.
 
 The names are the languages'
 own — someone looking for their language in a list finds "Deutsch", not the English word
@@ -53,6 +54,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "bs": "BA",
     "ca": "ES-CT",
     "cs": "CZ",
+    "cy": "GB-WLS",
     "da": "DK",
     "de": "DE",
     "el": "GR",
@@ -62,12 +64,14 @@ FLAG_COUNTRIES: dict[str, str] = {
     "fi": "FI",
     "fr-fr": "FR",
     "ga": "IE",
+    "gl": "ES-GA",
     "hr": "HR",
     "hu": "HU",
     "hy": "AM",
     "is": "IS",
     "it": "IT",
     "ka": "GE",
+    "lb": "LU",
     "lt": "LT",
     "lv": "LV",
     "mk": "MK",
@@ -106,6 +110,7 @@ NATIVE_NAMES: dict[str, str] = {
     "bs": "bosanski",
     "ca": "català",
     "cs": "čeština",
+    "cy": "Cymraeg",
     "da": "dansk",
     "de": "Deutsch",
     "el": "Ελληνικά",
@@ -115,12 +120,14 @@ NATIVE_NAMES: dict[str, str] = {
     "fi": "suomi",
     "fr-fr": "français (France)",
     "ga": "Gaeilge",
+    "gl": "galego",
     "hr": "hrvatski",
     "hu": "magyar",
     "hy": "հայերեն",
     "is": "íslenska",
     "it": "italiano",
     "ka": "ქართული",
+    "lb": "Lëtzebuergesch",
     "lt": "lietuvių",
     "lv": "latviešu",
     "mk": "македонски",
@@ -160,6 +167,10 @@ PLURAL_FORMS: dict[str, str] = {
     ),
     "ca": _TWO,
     "cs": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
+    #: Four, and the one language here whose rule singles out particular numbers:
+    #: 1 and 2 take their own forms, 8 and 11 share a fourth, and everything else
+    #: falls to the third. Nothing about `nplurals=4` predicts that shape.
+    "cy": "nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;",
     "da": _TWO,
     "de": _TWO,
     "el": _TWO,
@@ -169,6 +180,7 @@ PLURAL_FORMS: dict[str, str] = {
     "fi": _TWO,
     "fr-fr": "nplurals=2; plural=(n > 1);",
     "ga": ("nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4);"),
+    "gl": _TWO,
     "hr": (
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
         "(n%100<10 || n%100>=20) ? 1 : 2);"
@@ -184,6 +196,7 @@ PLURAL_FORMS: dict[str, str] = {
     "is": "nplurals=2; plural=(n%10!=1 || n%100==11);",
     "it": _TWO,
     "ka": _TWO,
+    "lb": _TWO,
     "lt": (
         "nplurals=3; plural=(n%10==1 && (n%100<11 || n%100>19) ? 0 : n%10>=2 && n%10<=9 && "
         "(n%100<11 || n%100>19) ? 1 : 2);"

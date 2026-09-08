@@ -9,17 +9,21 @@ and compiled to the `.mo` Django reads at build time.
 Postulo speaks every official language of the European Union: Bulgarian, Croatian, Czech,
 Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Irish,
 Italian, Latvian, Lithuanian, Maltese, Polish, Portuguese, Romanian, Slovak, Slovene,
-Spanish and Swedish, plus **Brazilian Portuguese** beside the European. The rest of the
-European continent is arriving language by language; Africa, Asia and the remaining world
-follow in later releases. The language picker in Settings is the authority on what is
-offered today. If your language is not in the current phase, a catalogue for it is still
-welcome — adding one is described below.
+Spanish and Swedish, plus **Brazilian Portuguese** beside the European. It also speaks the
+continent beyond the Union: Albanian, Armenian, Basque, Bosnian, Catalan, Galician,
+Georgian, Icelandic, Luxembourgish, Macedonian, Norwegian Bokmål, Serbian, Turkish,
+Ukrainian and Welsh. Africa, Asia and the remaining world follow in later releases. The
+language picker in Settings is the authority on what is offered today. If your language is
+not in the current phase, a catalogue for it is still welcome — adding one is described
+below.
 
 Beyond the Union, two things stop being tidy, and both are handled rather than
-special-cased. A language may have no country of its own — Basque, Catalan, Galician and
-Welsh get no flag, because the flag of the state they sit in already stands for another
-language on the same list, and no flag beats a wrong flag. And a language may bring its own
-script: Greek and Cyrillic are already here, Georgian and Armenian arrive with the rest.
+special-cased. A language may be at home somewhere that is not a state — Catalan's flag is
+not Spain's, which already stands for Spanish on the same list; it is `ES-CT`, Catalonia's
+own, and Basque's is `ES-PV`, Galician's `ES-GA`, Welsh's `GB-WLS`. So the table holds ISO
+3166-2 subdivisions as well as countries. And a language may bring its own script: Greek,
+Cyrillic, Georgian and Armenian are all here, and every option in the picker carries `lang`
+so a screen reader says each name in its own language.
 
 ## A variant of a language already spoken
 
@@ -151,10 +155,12 @@ help rather than fight that.
 
 1. Add the code and the language's own name for itself to `NATIVE_NAMES` in
    `src/postulo/core/languages.py`, and its gettext plural rule to `PLURAL_FORMS`.
-2. Add a flag to `FLAGS` in the same file — two regional indicator characters, chosen
-   deliberately rather than derived from the code, because a language is not a country.
-   **Leave it out where there is no uncontested answer.** Spanish is not only Spain and
-   Arabic is not one flag; no flag beats a wrong flag, and the picker copes with a blank.
+2. Add the place whose flag belongs beside it to `FLAG_COUNTRIES` in the same file — an
+   ISO 3166-1 country, or a 3166-2 subdivision where the language is at home somewhere that
+   is not a state. Choose it deliberately rather than deriving it from the code, because a
+   language is not a country: Spanish is not only Spain and Arabic is not one flag. **Leave
+   it out where there is no honest answer**; the picker copes with a blank. Then add the
+   code to `assets/flags.txt` and run `npm run sync:flags`.
 3. `uv run python scripts/messages.py extract` creates the catalogue.
 4. Translate, `check`, `stats --write`, and open a pull request.
 

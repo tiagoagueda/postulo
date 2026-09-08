@@ -125,9 +125,11 @@ All notable changes to Postulo are recorded here. The format follows
   language that first needs it. `FLAG_COUNTRIES` used to be able to claim that every language
   had one uncontested home, which was true of the Union and is not true of the continent:
   Basque, Catalan, Galician and Welsh are coming, and each sits in a state whose flag already
-  stands for a different language on the same list. They will carry no flag, `flag_country()`
-  answers with nothing, and the picker closes the row up — the behaviour was already there,
-  written for a phase beyond Europe that turned out to begin inside it.
+  stands for a different language on the same list. The rule written down at this point was
+  that such a language carries none: `flag_country()` answers with nothing and the picker
+  closes the row up — behaviour already there, written for a phase beyond Europe that turned
+  out to begin inside it. It did not survive contact with Catalan; four paragraphs down is
+  what replaced it.
 
   **Norwegian Bokmål and Icelandic followed**, and the second is the one that repays reading
   the rule rather than the form count. Icelandic has two plural forms, so `_TWO` looks right
@@ -165,7 +167,26 @@ All notable changes to Postulo are recorded here. The format follows
   `ES-PV`, the ikurriña. So the flag table, `assets/flags.txt`, the tag's validation and the
   sync script all take ISO 3166-2 subdivisions now, Galician and Welsh will use theirs when
   they arrive, and the telephone field is untouched — a dialling code is a state's, and
-  Catalan's is still Spain's. (#118)
+  Catalan's is still Spain's.
+
+  **Galician and Welsh arrived to find their flags waiting**, `ES-GA` and `GB-WLS`, which is
+  why the table was widened a commit early rather than at the language that finally forced
+  it. Welsh brought the plural rule nothing about a form count predicts: four forms, and the
+  only rule on this list that singles out particular numbers. 1 and 2 take their own, 8 and
+  11 share the fourth, and every other number falls to the third. There is no reasoning from
+  `nplurals=4` to that shape — it is copied from the language or it is wrong.
+
+  **Luxembourgish finishes the fifteen**, and it makes the point the whole issue rests on
+  better than any of the others: it is a national language of a member state that is not a
+  language of the Union, because Luxembourg files its Union business in French and German.
+  The Union's list and Europe's list were never the same list. Thirty-nine catalogues now,
+  every one of them complete, across three alphabets, with four subdivision flags beside the
+  thirty-five countries.
+
+  The test that pinned how many languages there are was **deleted rather than edited fifteen
+  times**. A number in a test is a fact restated in a second place, and every language in
+  this issue would have had to visit it; what has to be true is that `settings.LANGUAGES`
+  offers exactly what the table holds, and that is what it now asserts. (#118)
 
 - **Every plugin carries a manifest, and the six Postulo ships fill it in.** #97 settled
   what a plugin declares — a short name, a full name, an author, a version, a description, a
