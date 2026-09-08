@@ -71,6 +71,37 @@ SCROLLS_SIDEWAYS = r"""() => {
     };
   };
 
+  // What is actually out there, asked of the browser rather than worked out from boxes.
+  // Every element's border box can sit inside the viewport and the page still scroll --
+  // a margin, a transform and an outline all add scrollable overflow that
+  // `getBoundingClientRect` does not show. So scroll to the far right and ask what is
+  // under the last column of pixels.
+  const outThere = () => {
+    const found = new Map();
+    const was = window.scrollX;
+    window.scrollTo(10000, 0);
+    const x = document.documentElement.clientWidth - 2;
+    for (let y = 4; y < window.innerHeight; y += 12) {
+      for (const el of document.elementsFromPoint(x, y)) {
+        if (el === document.body || el === document.documentElement) continue;
+        const key = el.tagName + (el.className || '');
+        if (!found.has(key)) {
+          const r = el.getBoundingClientRect();
+          const style = getComputedStyle(el);
+          found.set(key, {
+            what: el.outerHTML.replace(/\s+/g, ' ').slice(0, 110),
+            right: Math.round(r.right),
+            marginRight: style.marginRight,
+            transform: style.transform === 'none' ? '' : style.transform,
+            position: style.position,
+          });
+        }
+      }
+    }
+    window.scrollTo(was, 0);
+    return [...found.values()].slice(0, 8);
+  };
+
   const out = [];
   // Everything over the edge, whatever the filters below decide about it. When the filters
   // agree that nothing is to blame and the page scrolls anyway, this is what gets reported
@@ -90,7 +121,18 @@ SCROLLS_SIDEWAYS = r"""() => {
     if (el.parentElement && over(el.parentElement) && !contained(el.parentElement)) continue;
     out.push(describe(el));
   }
-  return {reached, culprits: out, everything: everything.slice(0, 12)};
+  return {
+    reached,
+    culprits: out,
+    everything: everything.slice(0, 12),
+    outThere: out.length ? [] : outThere(),
+    metrics: {
+      clientWidth: limit,
+      innerWidth: window.innerWidth,
+      docScrollWidth: document.documentElement.scrollWidth,
+      bodyScrollWidth: document.body.scrollWidth,
+    },
+  };
 }"""
 
 
@@ -116,12 +158,25 @@ def test_no_page_scrolls_sideways_at_320_pixels(live_server, page: Page, furnish
             failures.setdefault(key, path)
         if not result["culprits"]:
             # The filters found nothing to blame and the page scrolls regardless, so show
-            # the working: everything over the edge and why each was ruled out.
-            detail = "\n".join(
-                f"      {row['width']}x, {row['over']}px over, {row['position']}, "
-                f"contained={row['contained']} parentOver={row['parentOver']}\n"
-                f"        {row['what']}"
-                for row in result["everything"]
+            # the working: the page's own measurements, what is actually sitting in the
+            # overflowed column, and everything over the edge with the reason it was ruled
+            # out. A border box inside the viewport can still scroll the page -- a margin,
+            # a transform and an outline all add scrollable overflow that a rectangle does
+            # not show -- so the middle one is the question the others cannot answer.
+            detail = (
+                f"      metrics: {result['metrics']}\n"
+                + "".join(
+                    f"      at the far edge: right={row['right']} "
+                    f"margin-right={row['marginRight']} position={row['position']} "
+                    f"transform={row['transform'] or 'none'}\n        {row['what']}\n"
+                    for row in result["outThere"]
+                )
+                + "\n".join(
+                    f"      {row['width']}x, {row['over']}px over, {row['position']}, "
+                    f"contained={row['contained']} parentOver={row['parentOver']}\n"
+                    f"        {row['what']}"
+                    for row in result["everything"]
+                )
             )
             failures.setdefault(
                 f"scrolls {result['reached']}px sideways; nothing passed the filters. "
