@@ -134,8 +134,10 @@ Postulo is in each language so nobody has to guess.
 - **Gaeilge** — Bainisteoir iarratas poist féinóstáilte is ea Postulo: d'iarratais, do CVanna agus do litreacha cumhdaigh ar do fhreastalaí féin, gan aon ghné íoctha.
 - **hrvatski** — Postulo je samostalno hostani upravitelj prijava za posao: vaše prijave, životopisi i motivacijska pisma na vašem poslužitelju, bez plaćenih značajki.
 - **magyar** — A Postulo saját szerveren futtatható álláspályázat-kezelő: a jelentkezéseid, önéletrajzaid és motivációs leveleid a saját szervereden, fizetős funkciók nélkül.
+- **հայերեն** — Postulo-ն ինքնահյուրընկալվող աշխատանքի դիմումների կառավարիչ է՝ ձեր դիմումները, CV-ները և մոտիվացիոն նամակները ձեր սերվերի վրա, առանց վճարովի հնարավորությունների։
 - **íslenska** — Postulo er sjálfhýstur umsóknastjóri: umsóknirnar þínar, ferilskrárnar þínar og kynningarbréfin þín á þínum eigin þjóni, án greiddra eiginleika.
 - **italiano** — Postulo è un gestore di candidature self-hosted: le tue candidature, i tuoi CV e le tue lettere di presentazione sul tuo server, senza funzioni a pagamento.
+- **ქართული** — Postulo არის თვითჰოსტირებული განაცხადების მმართველი: თქვენი განაცხადები, CV-ები და სამოტივაციო წერილები თქვენს სერვერზე, ფასიანი ფუნქციების გარეშე.
 - **lietuvių** — Postulo — savarankiškai talpinama darbo paraiškų tvarkyklė: jūsų paraiškos, CV ir motyvaciniai laiškai jūsų serveryje, be mokamų funkcijų.
 - **latviešu** — Postulo ir pašhostēts darba pieteikumu pārvaldnieks: jūsu pieteikumi, CV un motivācijas vēstules jūsu serverī, bez maksas funkcijām.
 - **македонски** — Postulo е самостојно хостиран управувач на пријави за работа: вашите пријави, CV-а и мотивациски писма на вашиот сервер, без платени функции.

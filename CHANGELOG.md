@@ -138,7 +138,15 @@ All notable changes to Postulo are recorded here. The format follows
   **Albanian and Macedonian** finish the Balkans. Macedonian is the third language here whose
   rule is two forms decided by the last digit rather than the value — Icelandic's shape, in a
   different family — which is now enough of a pattern to say out loud: `nplurals=2` says
-  nothing about *which* two. (#118)
+  nothing about *which* two.
+
+  **Georgian and Armenian each bring an alphabet of their own**, used by no other language on
+  the list and by almost none anywhere else. That costs nothing at render time — the interface
+  has carried `lang` on every language option since #43's first pass, for WCAG 3.1.2 — and it
+  is worth naming because the list is now a place where somebody who cannot read the current
+  language has to find their own, and *ქართული* and *հայերեն* are unmistakable to the person
+  looking for them in a way an English label never is. Armenian also does not take `_TWO`:
+  it counts zero with the singular, the way French does. (#118)
 
 - **Every plugin carries a manifest, and the six Postulo ships fill it in.** #97 settled
   what a plugin declares — a short name, a full name, an author, a version, a description, a
