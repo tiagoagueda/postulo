@@ -6,7 +6,7 @@ from .models import Capture, Company, CompanyIdentifier, Contact, Industry, JobP
 class ContactInline(admin.TabularInline):
     model = Contact
     extra = 0
-    fields = ("name", "role", "email", "phone")
+    fields = ("name", "role", "email")
 
 
 class IdentifierInline(admin.TabularInline):

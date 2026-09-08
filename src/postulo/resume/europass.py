@@ -56,6 +56,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from postulo.accounts import identifiers
+from postulo.core import phone_numbers
 from postulo.plugins.base import MAX_IMPORT_BYTES, ImportRefused, refuse_unreadable
 
 #: Kept as a name because the interface and the tests use it, but the number belongs to
@@ -753,15 +754,30 @@ def apply(owner, record: Record) -> Report:
     profile = getattr(owner, "profile", None)
     if profile is not None and record.person:
         changed = []
-        for field_name in ("headline", "phone", "location", "website"):
+        for field_name in ("headline", "location", "website"):
             value = record.person.get(field_name)
             if value and not getattr(profile, field_name, ""):
                 setattr(profile, field_name, value[:200])
                 changed.append(field_name)
+        # The telephone number is a row of its own now, and the same rule applies to it:
+        # filled in only where there is nothing there, so an import never overwrites what
+        # somebody typed. A number this instance already holds is left alone rather than
+        # failing the whole import over one field of a CV.
+        number = (record.person.get("phone") or "").strip()[:40]
+        wrote_number = False
+        if (
+            number
+            and phone_numbers.primary_for(profile) is None
+            and not phone_numbers.taken_elsewhere(number)
+        ):
+            # Saved on a row of its own, so deliberately not in `changed`: that list names
+            # columns for `update_fields`, and there is no phone column any more.
+            phone_numbers.save_only_number(profile, owner, number)
+            wrote_number = True
         if changed:
             fields = [*changed, "updated_at"] if hasattr(profile, "updated_at") else changed
             profile.save(update_fields=fields)
-            report.profile_filled = changed
+        report.profile_filled = [*changed, *(["phone"] if wrote_number else [])]
 
         # An ORCID somebody already has is theirs; a second one is not an improvement.
         orcid = record.person.get("orcid")

@@ -11,7 +11,7 @@ from django import forms
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import phone_field, phones
+from postulo.core import phone_field, phone_numbers, phones
 
 from . import identifiers, industries, logos
 from .models import Company, CompanyIdentifier, Contact, Industry, JobPosting
@@ -303,24 +303,46 @@ def _language_of(user) -> str:
 class ContactForm(OwnerScopedModelForm):
     class Meta:
         model = Contact
-        fields = ("name", "role", "company", "email", "phone", "linkedin_url", "notes")
+        fields = ("name", "role", "company", "email", "linkedin_url", "notes")
         widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # A recruiter's number written down as "06 12 34 56 78" cannot be dialled from
         # anywhere else, and the moment to fix that is the moment somebody types it.
-        self.fields["phone"] = phone_field.PhoneField(
-            label=_("Phone"),
-            required=False,
-            default_country=phones.default_country(_language_of(self.user)),
-            help_text=_(
-                "Kept in the international form, so you can still ring it from another "
-                "country. A number that already starts with + is taken as it is."
-            ),
-        )
-        if self.instance and self.instance.pk:
-            self.fields["phone"].initial = self.instance.phone
+        #
+        # One box while *Several telephone numbers* is switched off; the rows are their own
+        # formset while it is on, and two controls writing one primary row would be two
+        # answers to the same question.
+        self.several_numbers = phone_numbers.several_allowed(self.user)
+        if not self.several_numbers:
+            self.fields["phone"] = phone_field.PhoneField(
+                label=_("Phone"),
+                required=False,
+                default_country=phones.default_country(_language_of(self.user)),
+                help_text=_(
+                    "Kept in the international form, so you can still ring it from another "
+                    "country. A number that already starts with + is taken as it is."
+                ),
+            )
+            if self.instance and self.instance.pk:
+                primary = phone_numbers.primary_for(self.instance)
+                self.fields["phone"].initial = primary.number if primary else ""
+
+    def clean_phone(self) -> str:
+        typed = (self.cleaned_data.get("phone") or "").strip()
+        primary = phone_numbers.primary_for(self.instance) if self.instance.pk else None
+        if typed and phone_numbers.taken_elsewhere(
+            typed, exclude_pk=primary.pk if primary else None
+        ):
+            raise forms.ValidationError(phone_numbers.ALREADY_IN_USE)
+        return typed
+
+    def save(self, commit: bool = True):
+        contact = super().save(commit=commit)
+        if commit and not self.several_numbers:
+            phone_numbers.save_only_number(contact, self.user, self.cleaned_data.get("phone", ""))
+        return contact
 
     def scope_querysets(self) -> None:
         self.fields["company"].queryset = Company.objects.for_user(self.user)

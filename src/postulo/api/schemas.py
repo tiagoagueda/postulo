@@ -43,13 +43,23 @@ class CompanyOut(Schema):
     created_at: dt.datetime
 
 
+class PhoneNumberOut(Schema):
+    kind: str = ""
+    label: str = ""
+    number: str
+    is_primary: bool = False
+
+
 class ContactOut(Schema):
     id: int
     company_id: int
     name: str
     role: str = ""
     email: str = ""
+    #: The primary number, where the single number has always been, so a client written
+    #: against the earlier shape keeps working. `phone_numbers` is the whole list.
     phone: str = ""
+    phone_numbers: list[PhoneNumberOut] = Field(default_factory=list)
     linkedin_url: str = ""
     notes: str = ""
 
@@ -506,6 +516,11 @@ def company_out(company, *, detail: bool = False) -> dict:
     return data
 
 
+def _primary_number(holder) -> str:
+    row = next((n for n in holder.phone_numbers.all() if n.is_primary), None)
+    return row.number if row else ""
+
+
 def contact_out(contact) -> dict:
     return {
         "id": contact.pk,
@@ -513,7 +528,18 @@ def contact_out(contact) -> dict:
         "name": contact.name,
         "role": contact.role,
         "email": contact.email,
-        "phone": contact.phone,
+        # The primary stays where the single number always was, so a client written
+        # against the old shape keeps working, and the whole list sits beside it.
+        "phone": _primary_number(contact),
+        "phone_numbers": [
+            {
+                "kind": row.kind,
+                "label": row.label,
+                "number": row.number,
+                "is_primary": row.is_primary,
+            }
+            for row in contact.phone_numbers.all()
+        ],
         "linkedin_url": contact.linkedin_url,
         "notes": contact.notes,
     }

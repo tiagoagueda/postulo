@@ -17,6 +17,40 @@ from postulo.core import phones
 pytestmark = pytest.mark.django_db
 
 
+@pytest.fixture
+def single(user):
+    """A person who has switched *Several telephone numbers* off for themselves."""
+    from postulo.core.features import PHONE_NUMBERS
+
+    user.profile.plugins_off = [PHONE_NUMBERS]
+    user.profile.save(update_fields=["plugins_off"])
+    return user
+
+
+def number(holder, owner, value, *, kind="", primary=True):
+    """One stored number, the way the application writes them."""
+    from postulo.core.models import PhoneNumber
+
+    return PhoneNumber.objects.create(
+        owner=owner, holder=holder, number=value, kind=kind, is_primary=primary
+    )
+
+
+def rows(*entries, primary="phone_numbers-0", prefix="phone_numbers"):
+    """The POST a page of telephone rows sends, management form and all."""
+    data = {
+        f"{prefix}-TOTAL_FORMS": str(len(entries)),
+        f"{prefix}-INITIAL_FORMS": "0",
+        f"{prefix}-MIN_NUM_FORMS": "0",
+        f"{prefix}-MAX_NUM_FORMS": "1000",
+        f"{prefix}-primary": primary,
+    }
+    for index, entry in enumerate(entries):
+        for name, value in entry.items():
+            data[f"{prefix}-{index}-{name}"] = value
+    return data
+
+
 # ------------------------------------------------------------------ the table
 
 
@@ -100,9 +134,19 @@ def test_the_contact_form_asks_which_country(client, user):
     client.force_login(user)
     html = client.get(reverse("jobs:contact_create")).content.decode()
 
+    assert 'name="phone_numbers-0-number_0"' in html, "the country"
+    assert 'name="phone_numbers-0-number_1"' in html, "the number"
+    assert "Country the number is in" in html, "and the chooser has a name of its own"
+
+
+def test_the_one_box_asks_the_same_thing_when_several_are_switched_off(client, user, single):
+    """Off is not a lesser version of the field: it is the field, exactly as it was."""
+    client.force_login(user)
+    html = client.get(reverse("jobs:contact_create")).content.decode()
+
     assert 'name="phone_0"' in html, "the country"
     assert 'name="phone_1"' in html, "the number"
-    assert "Country the number is in" in html, "and the chooser has a name of its own"
+    assert "phone_numbers-0-number_0" not in html, "and not both controls at once"
 
 
 def test_saving_a_national_number_stores_it_so_it_can_be_dialled(client, user):
@@ -118,24 +162,22 @@ def test_saving_a_national_number_stores_it_so_it_can_be_dialled(client, user):
             "role": "",
             "company": company.pk,
             "email": "",
-            "phone_0": "FR",
-            "phone_1": "06 12 34 56 78",
             "linkedin_url": "",
             "notes": "",
+            **rows({"number_0": "FR", "number_1": "06 12 34 56 78"}, primary="phone_numbers-0"),
         },
     )
 
     contact = Contact.objects.get(owner=user, name="Cave Johnson")
-    assert contact.phone == "+33612345678"
+    assert contact.phone_numbers.get().number == "+33612345678"
 
 
 def test_the_form_shows_a_stored_number_split_back_into_its_parts(client, user):
     from postulo.jobs.models import Company, Contact
 
     company = Company.objects.create(owner=user, name="Aperture")
-    contact = Contact.objects.create(
-        owner=user, company=company, name="Cave Johnson", phone="+33612345678"
-    )
+    contact = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
+    number(contact, user, "+33612345678")
     client.force_login(user)
 
     html = client.get(reverse("jobs:contact_update", args=[contact.pk])).content.decode()
@@ -161,7 +203,8 @@ def test_a_number_is_shown_as_something_a_phone_can_ring(client, user):
     from postulo.jobs.models import Company, Contact
 
     company = Company.objects.create(owner=user, name="Aperture")
-    Contact.objects.create(owner=user, company=company, name="Cave Johnson", phone="+33612345678")
+    contact = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
+    number(contact, user, "+33612345678")
     client.force_login(user)
 
     html = client.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
@@ -179,4 +222,6 @@ def test_the_visible_label_points_at_the_number(client, user):
 
     labels = re.findall(r'<label[^>]*for="([^"]*)"[^>]*>\s*Phone', html)
     assert labels, "the field has no label at all"
-    assert labels[0] == "id_phone_1", "pointed at nothing, which is worse than no label"
+    assert labels[0] == "id_phone_numbers-0-number_1", (
+        "pointed at nothing, which is worse than no label"
+    )

@@ -14,6 +14,7 @@ from typing import ClassVar
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager as DjangoUserManager
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -238,7 +239,11 @@ class Profile(models.Model):
         blank=True,
         help_text=_("A short professional title, such as “Backend engineer”."),
     )
-    phone = models.CharField(_("phone"), max_length=40, blank=True)
+    #: Deleting the holder deletes its numbers. A ``GenericRelation`` is what gives the
+    #: ORM that cascade — a generic foreign key alone has no referential integrity, so
+    #: without this a deleted profile would leave its telephone numbers behind, still
+    #: holding their claim on the instance-wide uniqueness rule.
+    phone_numbers = GenericRelation("core.PhoneNumber", verbose_name=_("telephone numbers"))
     location = models.CharField(
         _("location"),
         max_length=120,

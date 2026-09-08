@@ -124,9 +124,16 @@
                     {% if contact.role %}
                       <p class="text-xs text-ink-500 dark:text-ink-400">{{ contact.role }}</p>
                     {% endif %}
-                    {% if contact.phone %}
-                      <p class="text-xs text-ink-500 dark:text-ink-400">{% phone_link contact.phone %}</p>
-                    {% endif %}
+                    {% for number in contact.phone_numbers.all %}
+                      {% if several_numbers or number.is_primary %}
+                        <p class="text-xs text-ink-500 dark:text-ink-400">
+                          {% phone_link number.number %}
+                          {% if number.kind_label %}
+                            <span class="text-ink-400 dark:text-ink-500">{{ number.kind_label }}</span>
+                          {% endif %}
+                        </p>
+                      {% endif %}
+                    {% endfor %}
                     {% if contact.email %}
                       <p class="truncate text-xs text-ink-500 dark:text-ink-400">{{ contact.email }}</p>
                     {% endif %}

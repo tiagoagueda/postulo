@@ -89,13 +89,22 @@ def build_sections(cv: CV) -> list[Section]:
 
 
 def contact_details(owner) -> dict:
-    """The contact block, taken from the profile rather than retyped per CV."""
+    """The contact block, taken from the profile rather than retyped per CV.
+
+    One number is printed, and it is the primary one: a CV header has room for the number
+    somebody should ring, not for a list. Whether *Several telephone numbers* is on for
+    this person makes no difference here — the document has always shown one, and the
+    primary is what "one" means now.
+    """
+    from postulo.core import phone_numbers
+
     profile = getattr(owner, "profile", None)
+    primary = phone_numbers.primary_for(profile) if profile is not None else None
     return {
         "name": owner.get_full_name() or owner.display_name,
         "email": owner.email,
         "headline": getattr(profile, "headline", ""),
-        "phone": getattr(profile, "phone", ""),
+        "phone": primary.number if primary else "",
         "location": getattr(profile, "location", ""),
         "website": getattr(profile, "website", ""),
         "linkedin_url": getattr(profile, "linkedin_url", ""),

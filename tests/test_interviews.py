@@ -484,7 +484,7 @@ def test_interviews_travel_in_the_export_and_come_back(user, other_user, applica
         contacts=[recruiter],
     )
     document = export_module.build_document(user)
-    assert document["postulo"]["format"] == 3
+    assert document["postulo"]["format"] == export_module.FORMAT_VERSION
     exported = document["companies"][0]["postings"][0]["applications"][0]["interviews"][0]
     assert exported["uid"] == interview.uid
     assert exported["contact_ids"] == [recruiter.pk]

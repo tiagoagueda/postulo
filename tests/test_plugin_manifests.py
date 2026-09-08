@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_six_of_them_across_five_kinds():
+def test_there_are_seven_of_them_across_six_kinds():
     """A count, so that losing one to a bad import is a failure rather than a quiet absence."""
     found = {
         manifest_of(plugin_class()).name
@@ -144,7 +144,15 @@ def test_there_are_six_of_them_across_five_kinds():
         for plugin_class in classes
     }
 
-    assert found == {"schema.org", "page-metadata", "email", "local", "europass", "smtp"}
+    assert found == {
+        "schema.org",
+        "page-metadata",
+        "email",
+        "local",
+        "europass",
+        "smtp",
+        "phone-numbers",
+    }
 
 
 def test_the_identifiers_that_are_in_peoples_data_have_not_moved():

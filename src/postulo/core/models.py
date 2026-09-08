@@ -7,10 +7,15 @@ inherits an owner and a queryset that knows how to scope itself.
 """
 
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Q
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+
+from . import phones
 
 
 class TimeStampedModel(models.Model):
@@ -90,6 +95,97 @@ class Tag(OwnedModel):
         if not self.slug:
             self.slug = slugify(self.name)[:60]
         super().save(*args, **kwargs)
+
+
+class PhoneNumber(OwnedModel):
+    """One telephone number belonging to a person or to a contact.
+
+    A generic relation, for the reason ``CVItem`` gives: the holder is heterogeneous — the
+    account holder today, a contact at a company today, whatever #92 decides tomorrow —
+    and two nullable foreign keys with a check constraint would say the same thing less
+    clearly while needing a migration every time a third kind of holder appears.
+
+    **The primary is a property of the holder, not of the account.** One number per holder
+    carries ``is_primary``, enforced by a partial unique index rather than by whichever
+    form last saved. That is what makes "switched off shows the primary" a question with
+    exactly one answer, in the database, at every point in the code that asks it.
+
+    **Uniqueness reaches across the whole instance**, which is a deliberate choice by the
+    maintainer and a disclosure worth naming: refusing a number because somebody already
+    holds it tells whoever typed it that *some other account on this server has it*. There
+    is no way to enforce the rule without saying so, which is why the message says it in
+    those words instead of pretending the collision was something else.
+
+    Only a number that reached international form takes part. A number nobody could parse
+    is kept exactly as typed — ``phones.py`` means that — and has no comparable form, so
+    it sits outside the constraint rather than colliding with the first number that shares
+    its digits.
+    """
+
+    class Kind(models.TextChoices):
+        MOBILE = "mobile", _("Mobile")
+        WORK = "work", _("Work")
+        HOME = "home", _("Home")
+        SWITCHBOARD = "switchboard", _("Switchboard")
+        FAX = "fax", _("Fax")
+        OTHER = "other", _("Other")
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveBigIntegerField()
+    holder = GenericForeignKey("content_type", "object_id")
+
+    kind = models.CharField(_("kind"), max_length=20, choices=Kind.choices, blank=True)
+    label = models.CharField(
+        _("name, if Other"),
+        max_length=60,
+        blank=True,
+        help_text=_("Your name for it, when none of the kinds above fits."),
+    )
+    number = models.CharField(_("phone"), max_length=40)
+    #: The comparable form, or empty where there is none. Written by ``save``, never by a
+    #: form: a value the constraint depends on cannot be somebody's to type.
+    normalised = models.CharField(max_length=40, blank=True, db_index=True)
+    is_primary = models.BooleanField(_("primary"), default=False)
+
+    class Meta:
+        verbose_name = _("telephone number")
+        verbose_name_plural = _("telephone numbers")
+        ordering = ("-is_primary", "created_at", "pk")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("content_type", "object_id"),
+                condition=Q(is_primary=True),
+                name="one_primary_phone_number_per_holder",
+            ),
+            models.UniqueConstraint(
+                fields=("normalised",),
+                condition=~Q(normalised=""),
+                name="phone_number_unique_across_the_instance",
+            ),
+        ]
+        indexes = [models.Index(fields=("content_type", "object_id"))]
+
+    def __str__(self) -> str:
+        return self.number
+
+    def save(self, *args, **kwargs):
+        self.number = (self.number or "").strip()
+        self.normalised = phones.normalise(self.number)
+        if self.kind != self.Kind.OTHER:
+            self.label = ""
+        return super().save(*args, **kwargs)
+
+    @property
+    def kind_label(self) -> str:
+        """What to call this number, in words, without inventing a fact.
+
+        A number carried over from the single field nobody was ever asked about has no
+        kind, and gets none: an empty string, so the interface shows the number alone
+        rather than labelling it a mobile because that is the commonest answer.
+        """
+        if self.kind == self.Kind.OTHER:
+            return self.label
+        return str(self.Kind(self.kind).label) if self.kind else ""
 
 
 class SiteSettings(models.Model):

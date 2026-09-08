@@ -78,6 +78,40 @@ Numbers are shown grouped so they can be read aloud, and linked so a phone can r
 Postulo does not tell you whether a number is *valid*. That would need every country's
 numbering plan, and it is not going to dial anything.
 
+### More than one number
+
+*Several telephone numbers* is a plugin, and it ships switched on. With it on, you and each
+of your contacts can have as many numbers as are worth keeping — a mobile, a desk line, a
+switchboard — with one of them marked **primary**. The primary is the number a CV and a
+cover letter print, so nothing downstream has to know there are several.
+
+The kind is yours to leave blank. A number carried over from before this existed has none,
+because nobody was ever asked, and Postulo would rather show the number alone than call it a
+mobile because that is the commonest answer.
+
+**Switching it off does not delete anything.** Postulo shows and uses the primary number
+only — exactly what it did before the plugin existed — and the page tells you how many
+others are being kept back. Switch it on again and they are all there, in the order you left
+them. An export carries every number either way, because an export is what you leave with
+and a switch is not a decision about your records.
+
+### One number, one instance
+
+A telephone number is kept once across the whole instance. Type one that is already recorded
+and Postulo says so rather than taking it from whoever has it.
+
+That message tells you something about somebody else: that an account on this server holds
+that number. There is no way to enforce the rule without saying so, and a vaguer message
+would disclose exactly as much while leaving you guessing, so it says it plainly. **Nothing
+else is disclosed** — not whose, not where, not when.
+
+Two things sit outside the rule. A number Postulo could not parse has no comparable form, so
+it is kept as you typed it and collides with nothing. And a number that was already recorded
+twice before the rule arrived is left alone; the first time you edit one, Postulo tells you.
+
+Numbers are unique but **unverified**: Postulo cannot send an SMS and is not going to start.
+The first account to type a number holds it.
+
 ## Two views of the same thing
 
 - **Board** shows only live applications, in columns by status. Move one along with the

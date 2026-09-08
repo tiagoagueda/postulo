@@ -26,10 +26,11 @@ from postulo import __version__
 #: Bumped when the shape changes in a way an importer must notice. 2 added the listing
 #: state and dates on postings and the listing a capture became; 3 added interviews under
 #: each application, the ``actor`` on events, the table layout on the profile, and a list
-#: of ``industries`` on a company where there was one ``industry`` string. The
+#: of ``industries`` on a company where there was one ``industry`` string; 4 replaced the
+#: single ``phone`` string on a profile and on a contact with a ``phone_numbers`` list. The
 #: importer still reads every earlier
 #: format, filling the new fields in.
-FORMAT_VERSION = 3
+FORMAT_VERSION = 4
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -38,7 +39,6 @@ MEDIA_PREFIX = "media/"
 # the shape of the document rather than as a wall of field names.
 PROFILE_FIELDS = (
     "headline",
-    "phone",
     "location",
     "website",
     "linkedin_url",
@@ -63,7 +63,10 @@ COMPANY_FIELDS = (
     "logo_fetched_at",
     "created_at",
 )
-CONTACT_FIELDS = ("id", "name", "role", "email", "phone", "linkedin_url", "notes")
+CONTACT_FIELDS = ("id", "name", "role", "email", "linkedin_url", "notes")
+#: What one telephone number is, in the file. Every number a holder has, in order, with
+#: the primary marked -- not the primary alone.
+PHONE_NUMBER_FIELDS = ("kind", "label", "number", "is_primary")
 POSTING_FIELDS = (
     "id",
     "title",
@@ -209,6 +212,17 @@ def _fields(instance, names: tuple[str, ...]) -> dict:
     return {name: _value(getattr(instance, name)) for name in names}
 
 
+def _phone_numbers(holder) -> list[dict]:
+    """Every number this holder has, whether or not it is currently being offered.
+
+    An export is what somebody leaves with, so it carries what is *recorded* and not what
+    the interface happens to be showing. A number kept back because *Several telephone
+    numbers* is switched off is still theirs, and an export that quietly dropped it would
+    turn a plugin toggle into data loss by the back door.
+    """
+    return [_fields(row, PHONE_NUMBER_FIELDS) for row in holder.phone_numbers.all()]
+
+
 def build_document(user) -> dict:
     """Assemble everything belonging to ``user`` as one nested document."""
     from postulo.accounts.models import Profile
@@ -236,7 +250,11 @@ def build_document(user) -> dict:
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "profile": _fields(profile, PROFILE_FIELDS) if profile else {},
+            "profile": (
+                {**_fields(profile, PROFILE_FIELDS), "phone_numbers": _phone_numbers(profile)}
+                if profile
+                else {}
+            ),
             # An ORCID is one of the few things in here that means the same to somebody
             # else's software, so it travels with the rest.
             "identifiers": (
@@ -313,10 +331,10 @@ def build_document(user) -> dict:
                     for i in company.identifiers.all()
                 ],
                 "contacts": [
-                    _fields(
-                        contact,
-                        ("id", "name", "role", "email", "phone", "linkedin_url", "notes"),
-                    )
+                    {
+                        **_fields(contact, CONTACT_FIELDS),
+                        "phone_numbers": _phone_numbers(contact),
+                    }
                     for contact in company.contacts.all()
                 ],
                 "postings": [

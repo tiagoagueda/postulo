@@ -579,6 +579,42 @@ name: `recovery_routes()` lists the ways in that exist, and while removing yours
 that list, the refusal stands and says whose accounts it is protecting. Add another route and
 the lock opens by itself.
 
+## Features
+
+A **feature** is a capability of Postulo itself, switched on and off through the same page,
+the same policy and the same explanation as everything else here. It is the only kind that
+does not talk to anything outside the application.
+
+Postulo ships one, `phone-numbers`, which governs whether a person and their contacts may
+hold more than one telephone number.
+
+```toml
+[project.entry-points."postulo.features"]
+my-feature = "my_package:MyFeature"
+```
+
+```python
+from postulo.plugins.base import Manifest, declares
+
+
+@declares(Manifest(name="my-feature", label="My feature", kind="feature", version="1.0"))
+class MyFeature:
+    """A declaration. There is nothing to implement."""
+```
+
+**A feature has no methods**, and that is deliberate. It answers one question — *is this on
+for this person* — and the application asks `policy.decide(name, person).on` before offering
+the part of itself the feature covers. The moment a feature could *act*, "off" would mean two
+different things depending on which plugin you asked.
+
+**Off never deletes anything.** This is the promise the whole plugin system makes, stated on
+two pages of the interface in every language Postulo speaks, and the kind whose subject is
+Postulo's own tables is not the exception to it. What a feature governs is what Postulo
+*offers* and *uses*. The rows stay where they are, the person is told how many are being kept
+back, an export carries all of them regardless, and switching it on again finds them
+unchanged. A feature that deletes on the way out is not a feature, it is a migration with a
+checkbox in front of it.
+
 ## Getting a plugin into an instance
 
 **From the interface.** *Server settings → Plugins* installs a wheel an administrator

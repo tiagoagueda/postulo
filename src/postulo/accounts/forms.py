@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import phone_field, phones
+from postulo.core import phone_field, phone_numbers, phones
 
 from . import avatars, identifiers
 from .models import Invite, PersonIdentifier, Profile
@@ -268,23 +268,30 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ("headline", "phone", "location", "website", "linkedin_url", "source_repo_url")
+        fields = ("headline", "location", "website", "linkedin_url", "source_repo_url")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["phone"] = phone_field.PhoneField(
-            label=_("Phone"),
-            required=False,
-            default_country=phones.default_country(
-                getattr(self.instance, "language", "") or settings.LANGUAGE_CODE
-            ),
-            help_text=_(
-                "Kept in the international form, so it can be dialled from anywhere. A "
-                "number that already starts with + is taken as it is."
-            ),
-        )
+        # One box while *Several telephone numbers* is switched off, and none at all
+        # while it is on: the rows are a formset of their own, and two controls writing
+        # the same primary row would be two answers to one question.
+        self.several_numbers = phone_numbers.several_allowed(getattr(self.instance, "user", None))
+        if not self.several_numbers:
+            self.fields["phone"] = phone_field.PhoneField(
+                label=_("Phone"),
+                required=False,
+                default_country=phones.default_country(
+                    getattr(self.instance, "language", "") or settings.LANGUAGE_CODE
+                ),
+                help_text=_(
+                    "Kept in the international form, so it can be dialled from anywhere. A "
+                    "number that already starts with + is taken as it is."
+                ),
+            )
         if self.instance and self.instance.pk:
-            self.fields["phone"].initial = self.instance.phone
+            if not self.several_numbers:
+                primary = phone_numbers.primary_for(self.instance)
+                self.fields["phone"].initial = primary.number if primary else ""
             self.fields["first_name"].initial = self.instance.user.first_name
             self.fields["last_name"].initial = self.instance.user.last_name
             self.fields["use_gravatar"].initial = self.instance.use_gravatar
@@ -306,6 +313,15 @@ class ProfileForm(forms.ModelForm):
             raise forms.ValidationError(str(exc)) from exc
         return upload
 
+    def clean_phone(self) -> str:
+        typed = (self.cleaned_data.get("phone") or "").strip()
+        primary = phone_numbers.primary_for(self.instance) if self.instance.pk else None
+        if typed and phone_numbers.taken_elsewhere(
+            typed, exclude_pk=primary.pk if primary else None
+        ):
+            raise forms.ValidationError(phone_numbers.ALREADY_IN_USE)
+        return typed
+
     def save(self, commit: bool = True) -> Profile:
         profile = super().save(commit=commit)
         user = profile.user
@@ -314,6 +330,8 @@ class ProfileForm(forms.ModelForm):
         if commit:
             user.save(update_fields=["first_name", "last_name"])
             self._save_picture(profile)
+            if not self.several_numbers:
+                phone_numbers.save_only_number(profile, user, self.cleaned_data.get("phone", ""))
         return profile
 
     #: How the Gravatar fetch went, for the view to word its message: found, none, error, "".

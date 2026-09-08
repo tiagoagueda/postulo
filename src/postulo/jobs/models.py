@@ -11,6 +11,7 @@ from __future__ import annotations
 import re
 from datetime import timedelta
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Max
@@ -261,7 +262,11 @@ class Contact(OwnedModel):
     name = models.CharField(_("name"), max_length=200)
     role = models.CharField(_("role"), max_length=200, blank=True)
     email = models.EmailField(_("email address"), blank=True)
-    phone = models.CharField(_("phone"), max_length=40, blank=True)
+    #: Deleting the holder deletes its numbers. A ``GenericRelation`` is what gives the
+    #: ORM that cascade — a generic foreign key alone has no referential integrity, so
+    #: without this a deleted contact would leave its telephone numbers behind, still
+    #: holding their claim on the instance-wide uniqueness rule.
+    phone_numbers = GenericRelation("core.PhoneNumber", verbose_name=_("telephone numbers"))
     linkedin_url = models.URLField(_("LinkedIn"), blank=True)
     notes = models.TextField(_("notes"), blank=True)
 

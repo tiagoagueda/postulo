@@ -385,6 +385,27 @@ def country_of(number: str) -> Country | None:
     return None
 
 
+def normalise(number: str) -> str:
+    """The form two numbers are compared by, or nothing when they cannot be compared.
+
+    ``+351 912 345 678``, ``+351912345678`` and ``00351912345678`` are one number written
+    three ways, and only the international digits make that visible. A number that never
+    reached that form has no such answer — it is a national number for a country nobody
+    recorded — and this returns nothing for it, which keeps it out of every comparison
+    rather than letting it collide with the first number that happens to share its digits.
+    """
+    number = (number or "").strip()
+    # `00` is the international prefix most of the world dials, and a number written that
+    # way is the same number: comparing only the `+` form would let one account hold
+    # +351912345678 while another held 00351912345678, which is the rule failing quietly.
+    if number.startswith("00"):
+        number = "+" + _DIGITS.sub("", number)[2:]
+    if not number.startswith("+") or country_of(number) is None:
+        return ""
+    digits = _DIGITS.sub("", number)
+    return f"+{digits}" if digits else ""
+
+
 def as_dialled(number: str) -> str:
     """The ``tel:`` form, which is the number with everything but digits and ``+`` gone."""
     number = (number or "").strip()

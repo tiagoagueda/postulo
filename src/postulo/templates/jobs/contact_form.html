@@ -15,7 +15,19 @@
         {% for field in form %}
           {% include "partials/field.html" with field=field %}
         {% endfor %}
+        {% if numbers_kept_back %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed count counter=numbers_kept_back %}
+              One more number is kept for this contact and not shown, because <em>Several
+              telephone numbers</em> is switched off.
+            {% plural %}
+              {{ counter }} more numbers are kept for this contact and not shown, because
+              <em>Several telephone numbers</em> is switched off.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
       </div>
+      {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
       <div class="flex items-center gap-3">
         <button type="submit" class="btn-primary">{% translate "Save" %}</button>
         <a href="{% url 'jobs:company_list' %}" class="btn-ghost">{% translate "Cancel" %}</a>

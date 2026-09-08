@@ -370,6 +370,38 @@ class ImporterPlugin(Protocol):
 TRANSPORT_GROUP = "postulo.transports"
 
 
+# --------------------------------------------------------------------- features
+
+#: Where something that *changes what Postulo keeps* registers itself.
+FEATURE_GROUP = "postulo.features"
+
+
+@runtime_checkable
+class FeaturePlugin(Protocol):
+    """A capability of the application itself, switched on and off like any other plugin.
+
+    Every other kind here talks to something outside: a source reads a page, a notifier
+    sends, a store keeps files, a sync exchanges, a transport mails, an importer reads a
+    file. A feature does none of that. It answers one question — *is this on for this
+    person* — and the application asks it before offering the part of itself the feature
+    covers.
+
+    So a feature has no methods. It is a declaration, and `policy.decide` does the work,
+    which is deliberate: the moment a feature could *act*, "off" would mean two different
+    things depending on which plugin you asked.
+
+    **Off never deletes anything.** That is the promise the whole plugin system makes, in
+    the interface, in every language it speaks, and a feature is not the exception. What a
+    feature governs is what Postulo *offers* and *uses*; the rows already in the database
+    stay exactly where they are and come back unchanged when it is switched on again.
+    """
+
+    #: The identifier the registry and every policy row key on.
+    name: str
+    #: What kind of plugin this is; always ``"feature"``.
+    kind: str
+
+
 # ----------------------------------------------------------- connected plugins
 
 #: The kinds of plugin that talk to another service on a person's behalf, and the

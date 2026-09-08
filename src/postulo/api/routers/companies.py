@@ -2,6 +2,7 @@
 
 from django.db.models import Q
 from ninja import Query, Router, Status
+from ninja.errors import HttpError
 from ninja.pagination import paginate
 
 from postulo.applications.services import get_or_create_company
@@ -98,6 +99,17 @@ def patch_company(request, pk: int, payload: CompanyPatch):
     summary="Add a contact at a company",
 )
 def add_contact(request, pk: int, payload: ContactIn):
+    from postulo.core import phone_numbers
+
     company = _detail(request, pk)
-    contact = Contact.objects.create(owner=request.auth.owner, company=company, **payload.dict())
+    fields = payload.dict()
+    # One number in the payload, as there has always been, written to the row that holds
+    # it. A client sending a number somebody here already has is told so rather than
+    # silently given a contact without one.
+    number = (fields.pop("phone", "") or "").strip()
+    if number and phone_numbers.taken_elsewhere(number):
+        raise HttpError(422, str(phone_numbers.ALREADY_IN_USE))
+    contact = Contact.objects.create(owner=request.auth.owner, company=company, **fields)
+    if number:
+        phone_numbers.save_only_number(contact, request.auth.owner, number)
     return Status(201, contact_out(contact))

@@ -98,6 +98,53 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Several telephone numbers per person and per contact, behind a plugin that can be
+  switched off.** `Profile.phone` and `Contact.phone` were one `CharField` each: one number,
+  no primary, no uniqueness. Email addresses have worked the way this asks since allauth
+  arrived — several per account, exactly one primary, unique across the instance — so there
+  was a shape to copy and its edges were already known.
+
+  **It is a plugin, and that is a new kind.** Every plugin kind until now talks to something
+  outside: a source reads a page, a notifier sends, a store keeps files, a sync exchanges, a
+  transport mails, an importer reads a file. A **feature** talks to nothing. It answers one
+  question — *is this on for this person* — and the application asks before offering the part
+  of itself the feature covers. It exists as a plugin rather than as a settings checkbox
+  because Postulo already has one place where a capability is switched on for a person,
+  overridden by an administrator, and explained on their settings page with a record of who
+  decided; a second mechanism for the same question would be a second set of edge cases and a
+  second thing to remember at every call site.
+
+  **Switching it off deletes nothing, and that was the point worth arguing about.** The
+  interface promises exactly that, on two pages, in every language Postulo speaks, and the
+  first kind whose subject is Postulo's own tables is not where that promise gets an
+  exception. Off shows and uses the primary number only — precisely what the single field did
+  — the page says how many others are being kept back so nobody concludes a checkbox ate
+  them, an export carries all of them either way, and switching it on again finds them in the
+  order they were left. Saving the one box while it is off touches the primary row and
+  nothing else: rows a person cannot see are not theirs to lose by saving a form that never
+  showed them.
+
+  **A number is kept once across the whole instance**, which is the maintainer's decision and
+  a disclosure worth naming rather than dressing up. Refusing a number because somebody
+  already holds it tells whoever typed it that *an account on this server has it*. There is
+  no way to enforce the rule without saying so, and a vaguer message would disclose exactly as
+  much while leaving the person guessing, so the message says it in those words. Nothing else
+  is disclosed — not whose, not where, not when. Two things sit outside the rule by design: a
+  number that never reached international form has nothing comparable and collides with
+  nothing, and pairs that were already recorded before the rule arrived are grandfathered, the
+  migration keeping both and the form telling you the first time one is edited. Unique but
+  **unverified**, because Postulo cannot send an SMS and should not start; the first account
+  to type a number holds it.
+
+  The rows are a generic relation for the reason `CVItem` gives — the holder is heterogeneous
+  and two nullable foreign keys would need a migration every time a third kind of holder
+  appears — with a `GenericRelation` on each holder so deleting one takes its numbers with it.
+  The primary is a partial unique index rather than a rule a form remembers, and the radio
+  that chooses it names a form prefix rather than a key, because somebody adding their first
+  two numbers is choosing between rows that have no keys yet. The export format is 4: a
+  `phone_numbers` list where a `phone` string used to be, and the importer still reads an
+  archive made yesterday. (#90)
+
 - **Postulo now speaks Ukrainian and Turkish.** The catalogue set stopped at the borders of
   the European Union, which is a political boundary rather than a linguistic one: it left out
   the language with the most speakers of any in Europe that the Union does not administer, and

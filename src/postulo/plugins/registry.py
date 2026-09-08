@@ -32,9 +32,11 @@ from importlib.metadata import entry_points
 
 from .base import (
     CONNECTED_KINDS,
+    FEATURE_GROUP,
     IMPORTER_GROUP,
     TRANSPORT_GROUP,
     ConnectedPlugin,
+    FeaturePlugin,
     ImporterPlugin,
     JobPostingData,
     SourcePlugin,
@@ -50,11 +52,13 @@ ENTRY_POINT_GROUP = "postulo.sources"
 
 #: Every group, by the kind of plugin it holds. Sources and importers are stateless and
 #: need nothing from anybody; the connected kinds each need a `Connection`; a transport is
-#: instance plumbing and belongs to nobody in particular.
+#: instance plumbing and belongs to nobody in particular; a feature is a part of Postulo
+#: itself rather than anything outside it.
 GROUPS = {
     "source": ENTRY_POINT_GROUP,
     "importer": IMPORTER_GROUP,
     "transport": TRANSPORT_GROUP,
+    "feature": FEATURE_GROUP,
     **CONNECTED_KINDS,
 }
 
@@ -67,6 +71,7 @@ def _protocol_for(kind: str):
         "source": SourcePlugin,
         "importer": ImporterPlugin,
         "transport": TransportPlugin,
+        "feature": FeaturePlugin,
     }.get(kind, ConnectedPlugin)
 
 

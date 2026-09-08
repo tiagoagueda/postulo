@@ -53,11 +53,34 @@ class ProfileView(LoginRequiredMixin, UpdateView):
             kwargs["data"] = self.request.POST
         return PersonIdentifierFormSet(**kwargs)
 
+    def get_numbers(self):
+        """The telephone rows, when this person is offered more than one number.
+
+        ``None`` while the feature is off, which is what the template checks: the single
+        box on the contact block is the whole control then, and rendering both would be
+        two things writing one primary row.
+        """
+        from postulo.core import phone_numbers, phones
+
+        if not phone_numbers.several_allowed(self.request.user):
+            return None
+        kwargs = {
+            "holder": self.object,
+            "default_country": phones.default_country(getattr(self.object, "language", "")),
+        }
+        if self.request.method == "POST" and "phone_numbers-TOTAL_FORMS" in self.request.POST:
+            kwargs["data"] = self.request.POST
+        return phone_numbers.formset_for(**kwargs)
+
     def get_context_data(self, **kwargs) -> dict:
+        from postulo.core import phone_numbers
+
         from . import identifiers as person_identifiers
 
         context = super().get_context_data(**kwargs)
         context.setdefault("identifiers", self.get_identifiers())
+        context.setdefault("numbers", self.get_numbers())
+        context["numbers_kept_back"] = phone_numbers.kept_back(self.object, self.request.user)
         context["identifier_schemes"] = person_identifiers.SCHEMES.values()
         return context
 
@@ -65,13 +88,22 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         from django.db import transaction
 
         formset = self.get_identifiers()
-        if formset.is_bound and not formset.is_valid():
-            return self.render_to_response(self.get_context_data(form=form, identifiers=formset))
+        numbers = self.get_numbers()
+        invalid = (formset.is_bound and not formset.is_valid()) or (
+            numbers is not None and numbers.is_bound and not numbers.is_valid()
+        )
+        if invalid:
+            return self.render_to_response(
+                self.get_context_data(form=form, identifiers=formset, numbers=numbers)
+            )
         with transaction.atomic():
             response = super().form_valid(form)
             if formset.is_bound:
                 formset.instance = self.object
                 formset.save()
+            if numbers is not None and numbers.is_bound:
+                numbers.instance = self.object
+                numbers.save()
         return self._after_saving(form, response)
 
     def _after_saving(self, form, response):

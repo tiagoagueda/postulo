@@ -114,6 +114,49 @@ def account_is_empty(user) -> bool:
     )
 
 
+def _phone_rows(entry: dict) -> list[dict]:
+    """Take the telephone numbers out of a record, in whichever shape the file has them.
+
+    Format 4 writes a ``phone_numbers`` list. Everything before it wrote one ``phone``
+    string, and an archive made last month is still an archive: that string becomes the
+    single primary number it always was. Both keys are removed from ``entry``, because
+    what remains is passed straight to a model that no longer has a ``phone`` field.
+    """
+    rows = entry.pop("phone_numbers", None) or []
+    legacy = (entry.pop("phone", "") or "").strip()
+    if not rows and legacy:
+        rows = [{"number": legacy, "is_primary": True}]
+    return [row for row in rows if (row.get("number") or "").strip()]
+
+
+def _restore_phone_numbers(holder, owner, rows: list[dict]) -> None:
+    """Recreate a holder's numbers, skipping any this instance already has.
+
+    Numbers are unique across the instance, so an archive carrying one somebody here
+    already holds cannot be imported as it stands. Skipping that row is the only answer
+    that neither fails the whole import nor takes a number away from whoever already had
+    it, and the rest of the archive lands intact.
+    """
+    from postulo.core.models import PhoneNumber
+    from postulo.core.phone_numbers import taken_elsewhere
+
+    primary_taken = False
+    for row in rows:
+        number = (row.get("number") or "").strip()
+        if taken_elsewhere(number):
+            continue
+        wants_primary = bool(row.get("is_primary")) and not primary_taken
+        PhoneNumber.objects.create(
+            owner=owner,
+            holder=holder,
+            number=number,
+            kind=(row.get("kind") or ""),
+            label=(row.get("label") or ""),
+            is_primary=wants_primary,
+        )
+        primary_taken = primary_taken or wants_primary
+
+
 @transaction.atomic
 def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport:
     """Create everything in ``archive`` under ``user``.
@@ -155,13 +198,16 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         if not taken.exists():
             user.username = wanted
             user.save(update_fields=["username"])
-    profile_data = account.get("profile") or {}
+    profile_data = dict(account.get("profile") or {})
+    numbers = _phone_rows(profile_data)
     profile = getattr(user, "profile", None)
     if profile and profile_data:
         for name, value in profile_data.items():
             if hasattr(profile, name) and value:
                 setattr(profile, name, value)
         profile.save()
+    if profile:
+        _restore_phone_numbers(profile, user, numbers)
     for row in account.get("identifiers") or []:
         scheme = (row.get("scheme") or "").strip()
         value = (row.get("value") or "").strip()
@@ -289,7 +335,10 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
 
         for contact_entry in contact_entries:
             old_id = contact_entry.pop("id", None)
-            contacts[old_id] = Contact.objects.create(owner=user, company=company, **contact_entry)
+            numbers = _phone_rows(contact_entry)
+            contact = Contact.objects.create(owner=user, company=company, **contact_entry)
+            _restore_phone_numbers(contact, user, numbers)
+            contacts[old_id] = contact
 
         for posting_entry in posting_entries:
             application_entries = posting_entry.pop("applications", [])

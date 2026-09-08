@@ -16,7 +16,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from postulo.core import tables
 from postulo.core.files import serve_private_file
-from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
+from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin, PhoneNumbersMixin
 from postulo.core.redirects import safe_next
 
 from . import identifiers, logos
@@ -92,9 +92,14 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         return super().get_queryset().prefetch_related("industries", "identifiers")
 
     def get_context_data(self, **kwargs) -> dict:
+        from postulo.core import phone_numbers
+
         context = super().get_context_data(**kwargs)
-        context["contacts"] = self.object.contacts.all()
+        context["contacts"] = self.object.contacts.prefetch_related("phone_numbers")
         context["postings"] = self.object.postings.prefetch_related("applications")
+        # Decided once for the page rather than per contact: it is one answer about one
+        # person, and asking it per row would be a query per row for the same answer.
+        context["several_numbers"] = phone_numbers.several_allowed(self.request.user)
         return context
 
 
@@ -286,7 +291,9 @@ class IndustryDeleteView(OwnedObjectMixin, DeleteView):
 # -------------------------------------------------------------------- contacts
 
 
-class ContactCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):
+class ContactCreateView(
+    OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, PhoneNumbersMixin, CreateView
+):
     model = Contact
     form_class = ContactForm
     template_name = "jobs/contact_form.html"
@@ -307,11 +314,17 @@ class ContactCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, C
         return reverse("jobs:company_list")
 
     def form_valid(self, form):
+        numbers = self.get_phone_numbers()
+        if self.phone_numbers_invalid(numbers):
+            return self.render_to_response(self.get_context_data(form=form, numbers=numbers))
+        with transaction.atomic():
+            response = super().form_valid(form)
+            self.save_phone_numbers(numbers, self.object)
         messages.success(self.request, _("Contact added."))
-        return super().form_valid(form)
+        return response
 
 
-class ContactUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+class ContactUpdateView(OwnedObjectMixin, UserFormKwargsMixin, PhoneNumbersMixin, UpdateView):
     model = Contact
     form_class = ContactForm
     template_name = "jobs/contact_form.html"
@@ -320,6 +333,15 @@ class ContactUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         if self.object.company_id:
             return reverse("jobs:company_detail", args=[self.object.company_id])
         return reverse("jobs:company_list")
+
+    def form_valid(self, form):
+        numbers = self.get_phone_numbers()
+        if self.phone_numbers_invalid(numbers):
+            return self.render_to_response(self.get_context_data(form=form, numbers=numbers))
+        with transaction.atomic():
+            response = super().form_valid(form)
+            self.save_phone_numbers(numbers, self.object)
+        return response
 
 
 class ContactDeleteView(OwnedObjectMixin, DeleteView):

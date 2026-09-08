@@ -17,9 +17,14 @@ for.
 **Forcing a plugin on does not make it run.** A notifier, store or sync needs a
 ``Connection`` holding credentials only the person can supply, so *on* means "this is
 available to you and you may not switch it off" rather than "this is now sending your
-documents somewhere". Sources are the exception: they are stateless and need nothing, so
-forcing one on genuinely turns it on. The interface has to say which of those it means, and
-:func:`decide` returns enough for it to.
+documents somewhere". Sources and features are the exception: they need nothing from
+anybody, so forcing one on genuinely turns it on. The interface has to say which of those
+it means, and :func:`decide` returns enough for it to.
+
+**Switching a feature off does not delete what it governs.** It stops Postulo offering and
+using that part of itself; the rows stay, and switching it back on finds them unchanged.
+That is the same promise every other kind here makes, and it is not weaker for the kind
+whose subject happens to be Postulo's own tables.
 
 **Transports are exempt.** Mail delivery is instance infrastructure rather than a capability
 a person holds, and *forced off* for a transport would be an account nobody can recover
@@ -33,7 +38,7 @@ from dataclasses import dataclass
 from django.utils.translation import gettext_lazy as _
 
 #: Kinds a person may hold an opinion about. A transport is deliberately not one of them.
-GOVERNED_KINDS = ("source", "notifier", "store", "sync", "importer")
+GOVERNED_KINDS = ("source", "notifier", "store", "sync", "importer", "feature")
 
 #: The rest. Named rather than implied, because the guard below has to look a plugin up by
 #: name and "every kind that is not governed" is the honest way to write that.

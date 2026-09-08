@@ -256,6 +256,14 @@ def placeholder_pdf(title: str) -> bytes:
     return bytes(out)
 
 
+def _seed_phone(holder, owner, number: str) -> None:
+    """Give a seeded holder its primary number, skipping one already on this instance."""
+    from postulo.core.phone_numbers import save_only_number, taken_elsewhere
+
+    if not taken_elsewhere(number):
+        save_only_number(holder, owner, number)
+
+
 class Command(BaseCommand):
     help = "Fill an account with a fictional but believable job search."
 
@@ -357,7 +365,7 @@ class Command(BaseCommand):
             user.save(update_fields=["first_name", "last_name"])
         profile = user.profile
         profile.headline = "Backend engineer"
-        profile.phone = "+33 6 00 00 00 00"
+        _seed_phone(profile, user, "+33 6 00 00 00 00")
         profile.location = "Paris, France"
         profile.website = "https://alexmorgan.example"
         profile.linkedin_url = "https://www.linkedin.com/in/alex-morgan-example"
