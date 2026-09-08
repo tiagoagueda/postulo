@@ -54,10 +54,12 @@ FLAG_COUNTRIES: dict[str, str] = {
     "ga": "IE",
     "hr": "HR",
     "hu": "HU",
+    "is": "IS",
     "it": "IT",
     "lt": "LT",
     "lv": "LV",
     "mt": "MT",
+    "nb": "NO",
     "nl": "NL",
     "pl": "PL",
     "pt-pt": "PT",
@@ -97,10 +99,12 @@ NATIVE_NAMES: dict[str, str] = {
     "ga": "Gaeilge",
     "hr": "hrvatski",
     "hu": "magyar",
+    "is": "íslenska",
     "it": "italiano",
     "lt": "lietuvių",
     "lv": "latviešu",
     "mt": "Malti",
+    "nb": "norsk bokmål",
     "nl": "Nederlands",
     "pl": "polski",
     "pt-pt": "português (Portugal)",
@@ -138,6 +142,10 @@ PLURAL_FORMS: dict[str, str] = {
         "(n%100<10 || n%100>=20) ? 1 : 2);"
     ),
     "hu": _TWO,
+    #: Not `_TWO`: two forms, but the last digit decides rather than the value. 21 and
+    #: 31 take the singular like 1 — *tuttugu og ein umsókn* — while 11 takes the plural
+    #: like 12, *ellefu umsóknir*.
+    "is": "nplurals=2; plural=(n%10!=1 || n%100==11);",
     "it": _TWO,
     "lt": (
         "nplurals=3; plural=(n%10==1 && (n%100<11 || n%100>19) ? 0 : n%10>=2 && n%10<=9 && "
@@ -148,6 +156,7 @@ PLURAL_FORMS: dict[str, str] = {
         "nplurals=4; plural=(n==1 ? 0 : n==0 || ( n%100>1 && n%100<11) ? 1 : "
         "(n%100>10 && n%100<20 ) ? 2 : 3);"
     ),
+    "nb": _TWO,
     "nl": _TWO,
     "pl": (
         "nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"

@@ -133,10 +133,12 @@ Postulo is in each language so nobody has to guess.
 - **Gaeilge** — Bainisteoir iarratas poist féinóstáilte is ea Postulo: d'iarratais, do CVanna agus do litreacha cumhdaigh ar do fhreastalaí féin, gan aon ghné íoctha.
 - **hrvatski** — Postulo je samostalno hostani upravitelj prijava za posao: vaše prijave, životopisi i motivacijska pisma na vašem poslužitelju, bez plaćenih značajki.
 - **magyar** — A Postulo saját szerveren futtatható álláspályázat-kezelő: a jelentkezéseid, önéletrajzaid és motivációs leveleid a saját szervereden, fizetős funkciók nélkül.
+- **íslenska** — Postulo er sjálfhýstur umsóknastjóri: umsóknirnar þínar, ferilskrárnar þínar og kynningarbréfin þín á þínum eigin þjóni, án greiddra eiginleika.
 - **italiano** — Postulo è un gestore di candidature self-hosted: le tue candidature, i tuoi CV e le tue lettere di presentazione sul tuo server, senza funzioni a pagamento.
 - **lietuvių** — Postulo — savarankiškai talpinama darbo paraiškų tvarkyklė: jūsų paraiškos, CV ir motyvaciniai laiškai jūsų serveryje, be mokamų funkcijų.
 - **latviešu** — Postulo ir pašhostēts darba pieteikumu pārvaldnieks: jūsu pieteikumi, CV un motivācijas vēstules jūsu serverī, bez maksas funkcijām.
 - **Malti** — Postulo huwa maniġer ta' applikazzjonijiet għax-xogħol self-hosted: l-applikazzjonijiet, is-CVs u l-ittri ta' motivazzjoni tiegħek fuq is-server tiegħek, mingħajr funzjonijiet bi ħlas.
+- **norsk bokmål** — Postulo er en selvhostet søknadsbehandler: søknadene dine, CV-ene dine og søknadsbrevene dine på din egen server, uten betalte funksjoner.
 - **Nederlands** — Postulo is een zelfgehoste sollicitatiemanager: uw sollicitaties, cv's en brieven op uw eigen server, zonder betaalde functies.
 - **polski** — Postulo to samodzielnie hostowany menedżer aplikacji o pracę: twoje aplikacje, CV i listy motywacyjne na twoim serwerze, bez płatnych funkcji.
 - **português** — O Postulo é um gestor de candidaturas auto-hospedado: as suas candidaturas, CV e cartas de apresentação no seu próprio servidor, sem funcionalidades pagas.

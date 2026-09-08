@@ -119,7 +119,14 @@ All notable changes to Postulo are recorded here. The format follows
   Basque, Catalan, Galician and Welsh are coming, and each sits in a state whose flag already
   stands for a different language on the same list. They will carry no flag, `flag_country()`
   answers with nothing, and the picker closes the row up — the behaviour was already there,
-  written for a phase beyond Europe that turned out to begin inside it. (#118)
+  written for a phase beyond Europe that turned out to begin inside it.
+
+  **Norwegian Bokmål and Icelandic followed**, and the second is the one that repays reading
+  the rule rather than the form count. Icelandic has two plural forms, so `_TWO` looks right
+  and is wrong: the *last digit* decides, not the value. 21 and 31 take the singular like 1 —
+  *tuttugu og ein umsókn* — while 11 takes the plural like 12. A two-form language whose rule
+  is not `n != 1` is exactly the case a form count cannot catch, which is why the rule is
+  written out per language instead of inferred. (#118)
 
 - **Every plugin carries a manifest, and the six Postulo ships fill it in.** #97 settled
   what a plugin declares — a short name, a full name, an author, a version, a description, a
