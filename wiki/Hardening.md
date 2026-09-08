@@ -55,10 +55,16 @@ Add at the proxy what an application cannot do for itself:
 
 ## Secrets
 
-- `POSTULO_SECRET_KEY`: long, random, and never reused from another instance.
+- `POSTULO_SECRET_KEY`: long, random, and never reused from another instance. Postulo
+  refuses to start on one that is short, repetitive or an obvious placeholder — Django's own
+  `security.W009` thresholds, moved from a warning to a refusal, because this key does more
+  here than sign sessions.
 - `POSTULO_FIELD_KEY`: the key that encrypts connection secrets (tokens for notifiers and
   stores). Keep it **outside** the database backup — a backup with both is a backup with
-  the secrets in clear.
+  the secrets in clear. **Set it even if you never rotate anything**: without it those
+  secrets are encrypted under `POSTULO_SECRET_KEY`, which means you cannot ever change your
+  signing key without losing them. Setting it now is what makes that possible later, and it
+  is checked for strength the same way.
 - API tokens are shown once and stored hashed; a lost one is replaced, not recovered.
 
 ## Backups

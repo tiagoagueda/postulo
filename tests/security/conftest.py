@@ -57,7 +57,12 @@ print(json.dumps({
 def read_production_settings() -> dict:
     """Import the production settings the way a server would, and report what they say."""
     environment = {k: v for k, v in os.environ.items() if not k.startswith("POSTULO_")}
-    environment["POSTULO_SECRET_KEY"] = "x" * 64
+    # A key the settings will accept: 64 characters was never the whole test, and since #111
+    # `"x" * 64` is refused for having one distinct character -- correctly, and this fixture
+    # was the first thing it caught.
+    environment["POSTULO_SECRET_KEY"] = (
+        "kQ7vN2xR9wT4yU6iO8pA3sD5fG1hJ0kL2zX4cV6bN8mQ7wE9rT5yU3iO1pA6sD4f"
+    )
     environment["POSTULO_ALLOWED_HOSTS"] = "postulo.example.org"
     finished = subprocess.run(  # noqa: S603 - this interpreter, and a script written here
         [sys.executable, "-c", PROD_PROBE],

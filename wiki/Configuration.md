@@ -251,6 +251,35 @@ or give everyone a passkey, and the refusal lifts on its own.
 In development, email is printed to the console instead of being sent, so the settings are
 recorded and not used. The page says that too.
 
+### The secret key, and why it is not only a secret key
+
+`POSTULO_SECRET_KEY` signs sessions and password-reset links — and it also **derives the key
+that encrypts every stored connection credential**, unless you set `POSTULO_FIELD_KEY`. A
+guessable secret key is therefore a guessable encryption key for the passwords people have
+given Postulo for their own Nextcloud, Paperless or Telegram.
+
+So Postulo refuses to start on one that is not a secret: shorter than 50 characters, fewer
+than 5 distinct characters, or an obvious placeholder (`changeme`, `secret`, anything
+beginning `django-insecure-`). Those are Django's own thresholds for `security.W009`, moved
+from a warning nobody reads to a refusal you cannot miss.
+
+```sh
+python -c 'import secrets; print(secrets.token_urlsafe(64))'
+```
+
+**If an upgrade stops your instance starting**, read this before generating a new key.
+Replacing `POSTULO_SECRET_KEY` on an instance that has been running signs everybody out
+*and* makes every stored connection credential unreadable, because the key that encrypted
+them is gone. The order that keeps them:
+
+1. Set `POSTULO_FIELD_KEY` to your **current** secret key and restart. Nothing changes; the
+   credentials are now pinned to a key of their own.
+2. Then set `POSTULO_SECRET_KEY` to a new, strong one. Sessions end, credentials survive.
+
+`POSTULO_ALLOW_WEAK_SECRET_KEY=true` starts a short key anyway, for the case where this
+catches you at an hour when you cannot plan a rotation. It buys an afternoon; it is not an
+answer, and it does not apply to a placeholder.
+
 ## Rate limits
 
 Everything these cover needs an account or a token, so none of it is reachable by a stranger.

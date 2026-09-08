@@ -1,16 +1,21 @@
 """Production settings for a self-hosted instance behind HTTPS."""
 
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.csp import CSP
 
 from .base import *
 from .base import env
+from .keys import refuse_a_weak_key
 
-if not SECRET_KEY:
-    raise ImproperlyConfigured(
-        "POSTULO_SECRET_KEY must be set. Generate one with: "
-        "python -c 'import secrets; print(secrets.token_urlsafe(64))'"
-    )
+# Before anything else, because this key does not only sign sessions: it derives the key
+# that encrypts every stored connection credential. A refusal here costs an operator a
+# restart; the warning it replaces cost them nothing and told them nothing (#111).
+_allow_weak = env.bool("POSTULO_ALLOW_WEAK_SECRET_KEY", default=False)
+refuse_a_weak_key(SECRET_KEY, name="POSTULO_SECRET_KEY", allow_weak=_allow_weak)
+
+# And the same of the field key when there is one, because whenever it is set *it* is the
+# key protecting those credentials, and a weak one there is the identical hole.
+if POSTULO_FIELD_KEY:
+    refuse_a_weak_key(POSTULO_FIELD_KEY, name="POSTULO_FIELD_KEY", allow_weak=_allow_weak)
 
 DEBUG = False
 

@@ -8,6 +8,37 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **`POSTULO_SECRET_KEY=changeme` started an instance perfectly well.** The production
+  settings refused to start with *no* key and said nothing about a bad one. Django notices —
+  `security.W009` is exactly this check — but the container runs `check --deploy --fail-level
+  ERROR` and W009 is a **warning**, so it printed one line into a start-up log nobody reads
+  while the instance served traffic. Not a deliberate exemption: the fail level was sitting
+  one step above where the check was.
+
+  It matters more here than in most Django applications, and that is the whole of why this is
+  tier 1. That key does not only sign sessions and password-reset links: `plugins/secrets.py`
+  derives the Fernet key protecting **every stored connection credential** from it — somebody's
+  Telegram bot token, their Paperless password, their Nextcloud login — through a single
+  unsalted SHA-256. A guessable secret key is a guessable encryption key for other people's
+  passwords to other people's services, and guessing is cheap.
+
+  So a key that is not one now stops the instance before the first request: shorter than 50
+  characters, fewer than 5 distinct characters, or an obvious placeholder — `changeme`,
+  `secret`, anything beginning `django-insecure-`. The two numbers are read out of Django
+  rather than retyped, so the day it revises them this disagrees loudly instead of quietly
+  enforcing the old ones. **`POSTULO_FIELD_KEY` is checked the same way**, which the issue did
+  not ask for and is the same hole by a shorter path: whenever it is set, *it* is the key
+  protecting those credentials.
+
+  **Every refusal says the thing that stops it causing a worse problem.** The obvious
+  response — generate a new key — signs everybody out *and* makes every stored credential
+  unreadable, because the key that encrypted them is gone. The message says so, and says the
+  order that keeps them: set `POSTULO_FIELD_KEY` to the current key first, then change the
+  signing key underneath it. `POSTULO_ALLOW_WEAK_SECRET_KEY=true` starts a short key anyway,
+  for the instance this catches at an hour when nobody wants to plan a rotation — it buys an
+  afternoon, it is not an answer, and it does not open for a placeholder, because somebody who
+  typed `changeme` has not chosen anything there is time to be bought for. (#111)
+
 - **Nothing bounded how often an account could make the server fetch a URL, call the API, or
   scrape the log.** None of it was reachable by a stranger — every surface needs an account or
   a token, and an audit confirmed the boundaries hold: capture refuses private addresses and
