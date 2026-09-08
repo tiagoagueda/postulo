@@ -48,7 +48,14 @@ def test_the_flag_appears_and_follows_the_country(page: Page, live_server, appli
 
     # It really loaded. A blocked request or a name the manifest never learned would leave
     # naturalWidth at 0, and neither is visible in the markup alone.
-    assert flag.evaluate("image => image.complete && image.naturalWidth > 0")
+    #
+    # Waited for rather than asserted outright: setting the attribute is synchronous and
+    # fetching the image is not, so reading `complete` the instant the attribute changes is
+    # a race. It was won on the machine this was written on and lost in CI (#117).
+    page.wait_for_function(
+        "() => { const i = document.querySelector('[data-phone-flag] img');"
+        "        return i && i.complete && i.naturalWidth > 0; }"
+    )
 
     # The placeholder is a real choice, and the reserved space stays so nothing shifts.
     select.select_option("")

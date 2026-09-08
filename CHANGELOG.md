@@ -316,7 +316,19 @@ All notable changes to Postulo are recorded here. The format follows
   developing here* — by reading production in a subprocess with the environment stripped;
   there is now one such reader in `tests/security/conftest.py` and both files use it.
   Reproduced by moving `.env` aside, which is how this should have been checked in the first
-  place. (#117)
+  place.
+
+  With the suite running again it immediately caught three things a green local run never
+  would. Two were **layout on a machine with different fonts**: the action bar beside a page
+  heading did not wrap, so on Linux the buttons were wide enough to push *Applications*
+  sideways at 320 pixels — fixed on all thirteen pages that share the pattern rather than the
+  one that happened to overflow, because which one does is a question about typefaces. And
+  the warning above *Server settings → Plugins* rendered its three paragraphs as three
+  94-pixel columns: `.alert` is a flex row so an icon can sit beside the words, every other
+  alert passes it a single element, and that one passed three. The third was a **race in a
+  test**: setting an image's `src` is synchronous and fetching it is not, so checking that
+  the flag had loaded the instant its attribute changed was a race won on the machine it was
+  written on and lost on a slower one. (#117)
 
 - **Every page in Postulo scrolled sideways on a phone, and one row of links was most of
   the reason.** At 320 CSS pixels — the width a normal window has at 400% zoom, which is how
