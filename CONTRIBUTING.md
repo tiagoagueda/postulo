@@ -270,6 +270,41 @@ finishes, which is how v0.2.0's release came to look unfinished long after it wa
 (#81). A workflow nobody starts cannot queue. Without a docker runner,
 `scripts/check-image.sh` builds and checks the image wherever there is a Docker daemon.
 
+### Giving a runner the `docker` label
+
+A `forgejo-runner` that runs jobs in containers already has a daemon — it needs one to
+start those containers. What it does not do by default is let a *job* reach it. The label
+that does is declared in the runner's `config.yml`, with `host` where the others name an
+image:
+
+```yaml
+runner:
+  labels:
+    - "ubuntu-latest:docker://node:22-bookworm"
+    - "ubuntu-24.04:docker://node:22-bookworm"
+    - "ubuntu-22.04:docker://node:22-bookworm"
+    - "docker:host"
+```
+
+`host` means the job runs on the machine rather than inside a container, which is how it
+reaches the daemon. Restart the runner and it declares the new label on connect; *Site
+administration → Actions → Runners* shows what it is advertising.
+
+Three things the host then needs, each of which fails in its own confusing way if missing:
+**node**, because `actions/checkout` is a JavaScript action and host mode runs it with the
+host's node; the runner's user in the **`docker` group**, or some other route to the socket;
+and **QEMU binfmt** registered — `docker run --privileged --rm tonistiigi/binfmt --install
+all` — or the `linux/arm64` half of the multi-arch build has no emulator and fails.
+
+**What that label costs, stated plainly.** A job on it runs as the runner's user with
+Docker, and Docker is root on that machine. The mitigation is that nothing schedules onto
+this label by itself: `image.yml` is `workflow_dispatch` only, so the only way to reach it
+is somebody pressing the button. Do not put the label on a runner that also serves
+`pull_request` from people who are not you.
+
+To check it works before a release depends on it, run *Actions → Image* against an existing
+tag rather than a new one.
+
 ## Licence
 
 Contributions are accepted under the [AGPL-3.0-or-later](LICENSE) licence that covers
