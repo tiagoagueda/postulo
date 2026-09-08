@@ -547,6 +547,28 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The image could not be built, and had not been buildable since #111 landed.** That
+  issue taught the production settings to refuse a secret key shorter than fifty
+  characters, which is right, and `docker/Dockerfile` passed `collectstatic` a literal
+  twenty-eight characters long. Every `docker build` failed at that step. It was found by
+  deploying, which is the expensive way to find it.
+
+  **The reason it landed green is the interesting half.** CI runs the same `collectstatic`
+  under the same production settings and passes, because the workflow's key is long enough
+  and was written that way for `security.W009` years before this rule existed. What CI does
+  not do is build the image: that needs a runner advertising the `docker` label and none is
+  registered (#81), so `image.yml` has never run once. The check that would have caught this
+  is the check nobody has ever seen execute.
+
+  The build now generates its key and throws it away with the shell that made it. A longer
+  literal would have passed the rule while remaining a published constant somebody could
+  paste into a `.env`; a random one passes it for the reason the rule exists. `collectstatic`
+  needs a key at all only because the settings module insists on one before it will import —
+  nothing it writes is signed, and no session, cookie or stored credential exists at build
+  time. A test now reads the Dockerfile and every workflow and puts each literal key through
+  `refuse_a_weak_key`, so the two cannot drift apart again while the real build stays
+  unexercised. (#121)
+
 - **Every form said "I am invalid, and these two elements explain why" — and neither element
   existed.** Django renders a refused field with `aria-invalid="true"` and
   `aria-describedby="<id>_helptext <id>_error"`, which is exactly right, and Postulo's own

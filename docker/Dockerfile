@@ -93,10 +93,17 @@ COPY --from=styles /build/src/postulo/static/css/app.css ./src/postulo/static/cs
 
 # Collected once, at build time: the running container should not need to write to its
 # own image, and a read-only filesystem is a reasonable thing for an operator to want.
-# The key here exists only for the length of this command and never reaches the image.
 # --no-sync: the environment above is the one to use; a plain `uv run` would otherwise
 # resolve the development groups back into the image.
-RUN POSTULO_SECRET_KEY=build-time-only-not-a-secret \
+#
+# The key is generated here and goes away with the shell that made it. collectstatic needs
+# one only because the settings module insists on one before it will import: nothing it
+# writes is signed, and no session, cookie or stored credential exists at build time. It
+# was a literal -- an honest name, and 28 characters -- until #111 taught the production
+# settings to refuse anything under 50, and the image stopped building (#121). A longer
+# literal would have satisfied the rule while still being a published constant somebody
+# could paste into a .env. A random one satisfies it for the reason the rule exists.
+RUN POSTULO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(64))')" \
     POSTULO_ALLOWED_HOSTS=localhost \
     uv run --no-sync manage.py collectstatic --noinput --clear
 
