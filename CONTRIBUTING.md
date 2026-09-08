@@ -261,10 +261,9 @@ The `release` workflow does the rest, and it is one job: it refuses a tag that d
 with the code or the changelog, builds the sdist and the wheel, and creates the Forgejo
 release with the changelog section as its notes.
 
-**The container image is a separate, deliberate act.** `image.yml` is started by hand —
-*Actions → Image → Run workflow*, with the tag to build — and needs a runner advertising
-the `docker` label, plus `REGISTRY_USER` and `REGISTRY_TOKEN` as secrets. It is not on the
-tag trigger, because Forgejo schedules a job before it evaluates the condition that would
+**The container image is a separate, deliberate act.** `image.yml` is started by hand, and
+it needs a runner advertising the `docker` label plus `REGISTRY_USER` and `REGISTRY_TOKEN`
+as secrets. It is not on the tag trigger, because Forgejo schedules a job before it evaluates the condition that would
 skip it: a job asking for a label no runner advertises queues for ever and its run never
 finishes, which is how v0.2.0's release came to look unfinished long after it was published
 (#81). A workflow nobody starts cannot queue. Without a docker runner,
@@ -302,8 +301,33 @@ this label by itself: `image.yml` is `workflow_dispatch` only, so the only way t
 is somebody pressing the button. Do not put the label on a runner that also serves
 `pull_request` from people who are not you.
 
-To check it works before a release depends on it, run *Actions → Image* against an existing
-tag rather than a new one.
+### Starting the image workflow
+
+Two refs are involved and they are not the same one, which is worth saying because getting
+it wrong produces an error that explains nothing:
+
+```
+GetWorkflowFromCommit, workflow not found
+```
+
+Forgejo reads a dispatched workflow **from the ref you dispatch it from**, and `image.yml`
+has only existed since after v0.2.1. Choosing a tag in the branch selector therefore looks
+for the file in that tag's tree, does not find it, and says the above. So:
+
+- **dispatch from a branch that has the file** — the branch selector;
+- **name the tag to build in the `tag` input** — the box on the form.
+
+The workflow's own checkout uses `ref: ${{ inputs.tag }}`, so the workflow comes from the
+branch while the code built comes from the tag.
+
+Two secrets have to exist first, on the repository or its organisation: `REGISTRY_USER` and
+`REGISTRY_TOKEN`, the latter a token with `write:package`. Without them the sign-in step
+fails on an empty password, which the log reports as a login failure rather than as a
+missing secret.
+
+To check a runner works before a release depends on it, dispatch from a branch and give it
+the current release's tag. That builds something real, publishes tags that are true, and
+does not need a new tag cut for the purpose.
 
 ## Licence
 
