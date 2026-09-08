@@ -253,7 +253,12 @@
       </ul>
     </div>
   {% else %}
-    <div class="card mb-8 text-sm text-ink-500 dark:text-ink-400">
+    {% comment %} `wrap-anywhere` because the sentence carries a filesystem path, and a path
+       has no word boundaries for a browser to break at. The card is 288 pixels at 320 and
+       the path was 8 wider than that on Linux and not on Windows -- which is the whole of
+       why only CI ever saw it. On the class rather than in the string, so the message stays
+       the message and no catalogue has to be touched (#117). {% endcomment %}
+    <div class="card mb-8 wrap-anywhere text-sm text-ink-500 dark:text-ink-400">
       {% blocktranslate with directory=plugins_dir trimmed %}
         Nothing is installed here yet. Plugins live in {{ directory }}, on the data volume,
         so they survive an upgrade.

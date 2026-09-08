@@ -328,7 +328,17 @@ All notable changes to Postulo are recorded here. The format follows
   alert passes it a single element, and that one passed three. The third was a **race in a
   test**: setting an image's `src` is synchronous and fetching it is not, so checking that
   the flag had loaded the instant its attribute changed was a race won on the machine it was
-  written on and lost on a slower one. (#117)
+  written on and lost on a slower one.
+
+  The last of them took four rounds to find because the test kept answering confidently and
+  wrongly. *Server settings → Plugins* scrolled 8 pixels, and every element over the edge was
+  inside the settings sidebar's scroll box — which is on every settings page, while only that
+  one scrolled. The cause was a **filesystem path in a sentence**: paths have no word
+  boundaries, so a browser will not break one, and on Linux the font made it 8 pixels wider
+  than the card. A walk over rectangles could never have found it, because a margin, a
+  transform and an unbreakable string all add scrollable overflow that
+  `getBoundingClientRect` does not show. The test now finds the culprit by hiding elements
+  until the page stops scrolling, which looks at no boxes at all and cannot be fooled. (#117)
 
 - **Every page in Postulo scrolled sideways on a phone, and one row of links was most of
   the reason.** At 320 CSS pixels — the width a normal window has at 400% zoom, which is how
