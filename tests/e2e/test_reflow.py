@@ -62,19 +62,35 @@ SCROLLS_SIDEWAYS = r"""() => {
   };
   const over = (el) => el.getBoundingClientRect().right > limit + 1;
 
-  const out = [];
-  for (const el of document.querySelectorAll('body *')) {
+  const describe = (el) => {
     const r = el.getBoundingClientRect();
-    if (r.width === 0 || !over(el) || contained(el)) continue;
-    // Report the one that starts it, not everything it carries along.
-    if (el.parentElement && over(el.parentElement) && !contained(el.parentElement)) continue;
-    out.push({
+    return {
       width: Math.round(r.width),
       over: Math.round(r.right - limit),
       what: el.outerHTML.replace(/\s+/g, ' ').slice(0, 120),
+    };
+  };
+
+  const out = [];
+  // Everything over the edge, whatever the filters below decide about it. When the filters
+  // agree that nothing is to blame and the page scrolls anyway, this is what gets reported
+  // instead -- because "something overflows and I cannot say what" is not a bug report.
+  const everything = [];
+  for (const el of document.querySelectorAll('body *')) {
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 || !over(el)) continue;
+    everything.push({
+      ...describe(el),
+      position: getComputedStyle(el).position,
+      contained: contained(el),
+      parentOver: !!(el.parentElement && over(el.parentElement)),
     });
+    if (contained(el)) continue;
+    // Report the one that starts it, not everything it carries along.
+    if (el.parentElement && over(el.parentElement) && !contained(el.parentElement)) continue;
+    out.push(describe(el));
   }
-  return {reached, culprits: out};
+  return {reached, culprits: out, everything: everything.slice(0, 12)};
 }"""
 
 
@@ -99,7 +115,19 @@ def test_no_page_scrolls_sideways_at_320_pixels(live_server, page: Page, furnish
             key = f"{culprit['width']}px wide, {culprit['over']}px over  {culprit['what']}"
             failures.setdefault(key, path)
         if not result["culprits"]:
-            failures.setdefault(f"scrolls {result['reached']}px sideways, cause not located", path)
+            # The filters found nothing to blame and the page scrolls regardless, so show
+            # the working: everything over the edge and why each was ruled out.
+            detail = "\n".join(
+                f"      {row['width']}x, {row['over']}px over, {row['position']}, "
+                f"contained={row['contained']} parentOver={row['parentOver']}\n"
+                f"        {row['what']}"
+                for row in result["everything"]
+            )
+            failures.setdefault(
+                f"scrolls {result['reached']}px sideways; nothing passed the filters. "
+                f"Over the edge:\n{detail}",
+                path,
+            )
 
     report = "\n".join(f"  {where}\n    {what}" for what, where in sorted(failures.items()))
     assert not failures, (
