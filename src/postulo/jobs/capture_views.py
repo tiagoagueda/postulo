@@ -20,6 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
 
+from postulo.core import throttle
 from postulo.core.mixins import OwnedObjectMixin
 from postulo.plugins.base import CaptureError
 from postulo.plugins.fetching import fetch_page
@@ -77,6 +78,16 @@ class CaptureCreateView(OwnedObjectMixin, View):
     def post(self, request: HttpRequest) -> HttpResponse:
         form = CaptureURLForm(request.POST)
         if not form.is_valid():
+            return self._render(request, form)
+
+        # Before anything is fetched or parsed. Capture is the one surface that makes this
+        # server talk to somebody else's, and nothing bounded how fast an account could ask
+        # it to (#112). Counted even when the page came with the request rather than being
+        # fetched: no outbound call then, but the parse is still work somebody asked for.
+        try:
+            throttle.capture(request.user)
+        except throttle.TooOften as too_often:
+            messages.error(request, str(too_often))
             return self._render(request, form)
 
         url = form.cleaned_data["url"]

@@ -121,8 +121,8 @@ container's stdout, do that instead — it is the same records and nothing new i
 
 ## The cache, and why it is not optional
 
-Postulo counts failed sign-ins, password resets and a few other things in its cache, and
-turns somebody away once a count is too high. The default cache is a table in Postulo's own
+Postulo counts failed sign-ins, password resets, captures, API calls and scrapes of `/logs`
+and `/metrics` in its cache, and turns somebody away once a count is too high. The default cache is a table in Postulo's own
 database, which matters for one reason: every worker reads and writes the same table, so
 "ten failed attempts a minute" is ten across the instance rather than ten per worker, and
 the count is still there after a restart.
@@ -139,6 +139,15 @@ POSTULO_CACHE_URL=redis://localhost:6379/1
 What you should not do is point it at a per-process cache — `locmemcache://` — or at
 `dummycache://`. Both make Postulo *look* like it is enforcing a limit while enforcing it
 once per worker, or not at all.
+
+**What the counts cover.** allauth's, on sign-in, sign-up and password reset, which have
+always been there. And Postulo's own, on the three things an account could otherwise do
+without limit: capture, the API, and the two token-guarded endpoints. Capture is the one that
+matters, because it is the only thing here that makes *your* server issue an outbound request
+to an address somebody else supplied — `POSTULO_CAPTURE_RATE`, and see *Configuration* for
+the numbers and how to raise them. Nothing in that group is reachable without an account, so
+none of it was ever a stranger's to abuse; it was a ceiling on the people you have already
+let in.
 
 ## Single sign-on, and what it asks you to trust
 

@@ -16,7 +16,7 @@ import hmac
 
 from django.http import Http404, HttpRequest, HttpResponse
 
-from . import metrics
+from . import metrics, throttle
 
 #: What Prometheus expects to be handed.
 CONTENT_TYPE = "text/plain; version=0.0.4; charset=utf-8"
@@ -44,6 +44,16 @@ def scrape(request: HttpRequest) -> HttpResponse:
         )
         response["WWW-Authenticate"] = 'Bearer realm="postulo-metrics"'
         return response
+
+    # Token-guarded and, until now, unbounded. Keyed on the caller's address rather
+    # than an account, because a shared token is what authorises this and there is no
+    # account to key on (#112).
+    try:
+        throttle.endpoint("metrics", request)
+    except throttle.TooOften as too_often:
+        refusal = HttpResponse(f"{too_often}\n", status=429, content_type="text/plain")
+        refusal["Retry-After"] = str(too_often.retry_after)
+        return refusal
 
     response = HttpResponse(metrics.render(), content_type=CONTENT_TYPE)
     response["Cache-Control"] = "no-store"

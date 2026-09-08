@@ -11,7 +11,22 @@ from __future__ import annotations
 from ninja.errors import HttpError
 from ninja.security import HttpBearer
 
+from postulo.core import throttle
+
 from .models import ApiToken
+
+
+def _within_its_allowance(record: ApiToken) -> None:
+    """Count this call against the token, or refuse it with a 429.
+
+    Per token rather than per account, so a token handed to something that misbehaves can be
+    revoked without touching the person's own allowance. Nothing at any layer bounded this
+    before: `lookup` found a token and returned it, and that was the whole of the check (#112).
+    """
+    try:
+        throttle.api(record)
+    except throttle.TooOften as too_often:
+        raise HttpError(429, str(too_often)) from None
 
 
 def lookup(raw: str) -> ApiToken | None:
@@ -35,6 +50,7 @@ class TokenAuth(HttpBearer):
         record = lookup(token)
         if record is None:
             return None
+        _within_its_allowance(record)
         record.record_use()
         # Nothing here logs the caller in: a token can never be mistaken for a session.
         return record
@@ -53,6 +69,7 @@ class ScopedAuth(HttpBearer):
             return None
         if not record.has_scope(self.scope):
             raise HttpError(403, f"This token does not have the '{self.scope}' scope.")
+        _within_its_allowance(record)
         record.record_use()
         return record
 

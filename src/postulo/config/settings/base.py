@@ -329,6 +329,24 @@ if POSTULO_ADMIN_URL and not POSTULO_ADMIN_URL.endswith("/"):
 # two that can drift.
 ACCOUNT_RATE_LIMITS = {"admin_login": "10/m/ip,5/300s/key"}
 
+# ------------------------------------------------------------------ rate limits
+
+# How often one account may make the server do something expensive. Everything these cover
+# needs an account or a token, so none of it is reachable by a stranger -- what was missing
+# is a bound on somebody who has one (#112). `N/s`, `N/m`, `N/h` or `N/d`; empty switches a
+# limit off. See postulo.core.throttle.
+#
+# Capture is the tightest because it is the only one that makes this server issue an
+# outbound request to an address the caller chose. Thirty an hour is far more than a person
+# recording their own applications will use and far less than a scanner wants; an instance
+# doing bulk work should raise it deliberately rather than discover it has no ceiling.
+POSTULO_CAPTURE_RATE = env("POSTULO_CAPTURE_RATE", default="30/h")
+# Per token rather than per account, so revoking one revokes its allowance with it.
+POSTULO_API_RATE = env("POSTULO_API_RATE", default="600/h")
+# /logs and /metrics, which a shared token guards rather than an account, so this is keyed
+# on the caller's address. A collector polls on a schedule; this bounds one that does not.
+POSTULO_ENDPOINT_RATE = env("POSTULO_ENDPOINT_RATE", default="120/h")
+
 # ---------------------------------------------------------- internationalisation
 
 # British English is the source language; every other locale is a translation of it.

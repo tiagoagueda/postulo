@@ -8,6 +8,34 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **Nothing bounded how often an account could make the server fetch a URL, call the API, or
+  scrape the log.** None of it was reachable by a stranger — every surface needs an account or
+  a token, and an audit confirmed the boundaries hold: capture refuses private addresses and
+  revalidates on redirect, the API looks a token up by hash, `/logs` and `/metrics` compare
+  their token with `hmac.compare_digest`. What was missing was a ceiling on somebody who had
+  got past all that legitimately. **Capture is the one that mattered**: it is the only thing
+  in Postulo that makes *your* server issue an outbound request to an address somebody else
+  chose, and one account could ask for that as fast as the machine would go — which turns a
+  self-hosted box into a modest scanner, or exhausts its own outbound connections.
+
+  Three limits now, keyed on the account rather than the address, because an account is the
+  thing being limited and sharing an office network should not mean sharing an allowance:
+  `POSTULO_CAPTURE_RATE` (30/h, the tightest), `POSTULO_API_RATE` (600/h, **per token**, so
+  one handed to something that misbehaves can be revoked without touching your own), and
+  `POSTULO_ENDPOINT_RATE` (120/h, per address, since a shared token guards those and there is
+  no account to count against). All raisable — three people and three hundred want different
+  numbers — and any of them can be set empty to switch off. Anything unreadable also means no
+  limit, deliberately: a mistyped rate should leave an operator with a working instance rather
+  than a locked one.
+
+  Written against the cache that already backs allauth's limits rather than by adding a
+  dependency: it is thirty lines, and a rate limiter is not where a self-hosted application
+  should acquire a supply chain. A refusal is a 429 carrying `Retry-After`, so a well-behaved
+  client waits instead of hammering. The window is fixed rather than sliding and the count is
+  not strictly atomic on the database cache — both stated in the module, and both erring
+  towards letting somebody through, which is the right way round for a limit whose job is to
+  stop a machine being ridden rather than to meter billing. (#112)
+
 - **Django's admin is off unless you ask for it, and rate-limited when you do.** ⚠️ **This
   removes `/admin/` from instances that have one.** `POSTULO_ADMIN_URL` used to default to
   `admin/`, directly under a comment reading *"the admin is a small attack surface worth

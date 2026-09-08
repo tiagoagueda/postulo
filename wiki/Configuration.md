@@ -251,6 +251,35 @@ or give everyone a passkey, and the refusal lifts on its own.
 In development, email is printed to the console instead of being sent, so the settings are
 recorded and not used. The page says that too.
 
+## Rate limits
+
+Everything these cover needs an account or a token, so none of it is reachable by a stranger.
+They bound what somebody who *has* one can make the server do.
+
+| Variable | Default | What it bounds |
+| --- | --- | --- |
+| `POSTULO_CAPTURE_RATE` | `30/h` | Captures, per account. The tightest of the three, because capture is the only thing that makes your server issue an outbound request to an address somebody else chose. |
+| `POSTULO_API_RATE` | `600/h` | API calls, **per token** rather than per account — so a token handed to something that misbehaves can be revoked without touching your own allowance. |
+| `POSTULO_ENDPOINT_RATE` | `120/h` | `/logs` and `/metrics`, per calling address. A shared token guards those, so there is no account to count against. |
+
+Written as `N/s`, `N/m`, `N/h` or `N/d`. **Set one to empty to switch it off.** Anything
+unreadable also means no limit, deliberately: a mistyped rate should leave you with a working
+instance rather than a locked one.
+
+Raise them if they get in your way — an instance with three people has different needs from
+one with three hundred, and a bulk import through the API is a normal thing to want. A
+refusal is a **429** with a `Retry-After` header, so a well-behaved client waits rather than
+hammers.
+
+Two things worth knowing about how they count. The window is fixed rather than sliding, so
+the allowance refills at the boundary and a burst can straddle one. And the count is not
+strictly atomic on the database cache, so heavy concurrency undercounts slightly. Both err
+towards letting somebody through, which is the right way round for a limit whose job is to
+stop a machine being ridden rather than to meter billing.
+
+Sign-in, sign-up and password resets are limited separately, by allauth, and are on by
+default; see *Hardening*.
+
 ## HTTPS
 
 These apply only under the production settings.

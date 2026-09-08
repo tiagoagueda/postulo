@@ -29,7 +29,7 @@ import logging
 from django.conf import settings
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 
-from . import logs
+from . import logs, throttle
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +83,16 @@ def collect(request: HttpRequest) -> HttpResponse:
         response = JsonResponse({"detail": "A bearer token is required."}, status=401)
         response["WWW-Authenticate"] = 'Bearer realm="postulo-logs"'
         return response
+
+    # Token-guarded and, until now, unbounded. Keyed on the caller's address rather
+    # than an account, because a shared token is what authorises this and there is no
+    # account to key on (#112).
+    try:
+        throttle.endpoint("logs", request)
+    except throttle.TooOften as too_often:
+        refusal = JsonResponse({"detail": str(too_often)}, status=429)
+        refusal["Retry-After"] = str(too_often.retry_after)
+        return refusal
 
     try:
         limit = min(int(request.GET.get("limit", DEFAULT_LIMIT)), MAX_LIMIT)
