@@ -5,6 +5,5 @@
     {% if field.field.required %}<span aria-hidden="true" class="text-red-600">*</span>{% endif %}
   </label>
   {{ field|add_class:"field-input" }}
-  {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
-  {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  {% include "partials/field_feedback.html" with field=field %}
 </div>

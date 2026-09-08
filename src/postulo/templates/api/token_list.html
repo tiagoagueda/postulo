@@ -30,7 +30,11 @@
       <form method="post" action="{% url 'api:token_create' %}" novalidate>
         {% csrf_token %}
         {% include "partials/field.html" with field=form.name %}
-        <fieldset class="mb-4">
+        {% comment %} The fieldset carries the description, not the inputs inside it: Django leaves
+     `aria-describedby` off a widget it expects to be drawn as a fieldset, because the group is
+     what the help and the errors are about. `aria_describedby` is Django's own computation of
+     the value, so it cannot drift from the ids `field_feedback.html` renders (#114). {% endcomment %}
+        <fieldset class="mb-4" {% if form.scopes.aria_describedby %}aria-describedby="{{ form.scopes.aria_describedby }}"{% endif %}>
           <legend class="field-label mb-2">{{ form.scopes.label }}</legend>
           <div class="space-y-2">
             {% for choice in form.scopes %}
@@ -40,7 +44,7 @@
               </label>
             {% endfor %}
           </div>
-          {% for error in form.scopes.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          {% include "partials/field_feedback.html" with field=form.scopes %}
           <p class="field-help">
             {% translate "A browser extension needs only the first. Give an agent read alone until you trust it with write." %}
           </p>

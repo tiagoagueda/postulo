@@ -47,7 +47,7 @@
               {{ form.use_gravatar }}
               <span>
                 {{ form.use_gravatar.label }}
-                <span class="block text-xs text-ink-500 dark:text-ink-400">{{ form.use_gravatar.help_text }}</span>
+                <span class="block text-xs text-ink-500 dark:text-ink-400" id="{{ form.use_gravatar.auto_id }}_helptext">{{ form.use_gravatar.help_text }}</span>
               </span>
             </label>
             {% if profile.use_gravatar and profile.gravatar_checked_at and not profile.gravatar_image %}
@@ -123,7 +123,7 @@
                 {% endif %}
               </div>
               {% for field in row.visible_fields %}
-                {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+                {% include "partials/field_feedback.html" with field=field %}
               {% endfor %}
               {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
             </li>

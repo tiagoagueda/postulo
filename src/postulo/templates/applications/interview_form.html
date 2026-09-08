@@ -29,7 +29,7 @@
         </div>
         {% include "partials/field.html" with field=form.location %}
         {% if form.contacts.field.queryset %}
-          <fieldset class="mb-4">
+          <fieldset class="mb-4" {% if form.contacts.aria_describedby %}aria-describedby="{{ form.contacts.aria_describedby }}"{% endif %}>
             <legend class="field-label">{{ form.contacts.label }}</legend>
             <div class="flex flex-col gap-1 text-sm">
               {% for checkbox in form.contacts %}
@@ -38,7 +38,7 @@
                 </label>
               {% endfor %}
             </div>
-            {% for error in form.contacts.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            {% include "partials/field_feedback.html" with field=form.contacts %}
           </fieldset>
         {% else %}
           <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
@@ -55,7 +55,7 @@
             {{ form.remind }}
             <span>
               {{ form.remind.label }}
-              <span class="block text-xs text-ink-500 dark:text-ink-400">{{ form.remind.help_text }}</span>
+              <span class="block text-xs text-ink-500 dark:text-ink-400" id="{{ form.remind.auto_id }}_helptext">{{ form.remind.help_text }}</span>
             </span>
           </label>
         {% endif %}

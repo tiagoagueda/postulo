@@ -22,8 +22,7 @@
         {{ field }}
         <span>{{ field.label }}</span>
       </label>
-      {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
-      {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      {% include "partials/field_feedback.html" with field=field %}
     </div>
   {% else %}
     {% include "partials/field.html" with field=field %}

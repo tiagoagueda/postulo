@@ -16,7 +16,7 @@
        hidden — the name beside it already says what it is — and the name carries its own
        `lang`. Twenty-four rows also read better than a dropdown of twenty-four.
     {% endcomment %}
-    <fieldset class="card mb-6">
+    <fieldset class="card mb-6" {% if form.language.aria_describedby %}aria-describedby="{{ form.language.aria_describedby }}"{% endif %}>
       <legend class="field-label mb-1">{{ form.language.label }}</legend>
       <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
         {% translate "Each is written in itself, so you can find yours without reading this one." %}
@@ -49,7 +49,7 @@
           {% endfor %}
         </div>
       {% endfor %}
-      {% for error in form.language.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      {% include "partials/field_feedback.html" with field=form.language %}
     </fieldset>
 
     <div class="card mb-6">

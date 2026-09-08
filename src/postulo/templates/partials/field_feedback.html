@@ -1,0 +1,28 @@
+{% comment %} A field's help text and its errors, carrying the ids the input already claims.
+
+   Django renders every widget with `aria-describedby="<auto_id>_helptext <auto_id>_error"`
+   and `aria-invalid="true"`, and it is right to. Postulo then drew those two paragraphs
+   without the ids, so every input on every form Postulo draws itself announced *I am
+   invalid, and I am described by two elements* -- and neither element existed. The error
+   was on the page, in red, two lines down, and unreachable to anything but eyes. Four
+   references, four dangling, on a company form with one empty field (#114).
+
+   The id goes on the block rather than on each error, because a field with two errors would
+   otherwise emit the id twice, and Django's own `aria-describedby` names it once. That is
+   also what Django's errorlist template does.
+
+   `role="alert"` earns its place through htmx rather than through page loads: most screen
+   readers do not announce an alert that was already in the document when it arrived, but
+   these forms come back through a swap, and an error inserted into a live page is exactly
+   what the role is for.
+{% endcomment %}
+{% comment %} `errors_only` for a caller that has already drawn the help itself, above the
+   controls rather than under them, and has put the id on it. {% endcomment %}
+{% if field.help_text and not errors_only %}
+  <p class="field-help"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text }}</p>
+{% endif %}
+{% if field.errors %}
+  <div{% if field.auto_id %} id="{{ field.auto_id }}_error"{% endif %} role="alert">
+    {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+  </div>
+{% endif %}

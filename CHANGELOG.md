@@ -302,6 +302,41 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Every form said "I am invalid, and these two elements explain why" — and neither element
+  existed.** Django renders a refused field with `aria-invalid="true"` and
+  `aria-describedby="<id>_helptext <id>_error"`, which is exactly right, and Postulo's own
+  field partial then drew the help and the error **without those ids**. So a screen reader
+  announced the invalid state and then had nothing to read, while the message sat on the page
+  in red two lines below, reachable to eyes and to nothing else. On a company form with one
+  empty name: four references, four of them dangling. It is SC 1.3.1 and SC 3.3.1, both level
+  **A**, under the AA the README commits to — and the application already knew how, because
+  the pages allauth renders were correct throughout. Half of it honoured the promise and half
+  did not, which is worse than a consistent omission: anybody testing the sign-in flow with a
+  screen reader would have concluded it was fine.
+
+  The two paragraphs now carry the ids the input already claims, from one partial the whole
+  application shares. The id goes on the error *block* rather than on each message, because a
+  field with two errors would otherwise emit it twice and `aria-describedby` names it once —
+  and a duplicate id resolves to whichever came first, which is the same bug wearing a
+  disguise. `role="alert"` earns its place through htmx rather than page loads: most screen
+  readers ignore an alert that was already in the document when it arrived, but these forms
+  come back through a swap, and an error inserted into a live page is what the role is for.
+
+  **Groups got the same treatment, one layer up.** A set of radios or checkboxes drawn as a
+  `<fieldset>` — theme, navigation, industries, token scopes, interview contacts, language —
+  had no association at all rather than a broken one: Django deliberately leaves
+  `aria-describedby` off a widget it expects to be drawn as a fieldset, because the group is
+  what the help and the errors are about, and nothing was putting it on the fieldset. They
+  now carry `field.aria_describedby`, which is Django's own computation of the value, so it
+  cannot drift from the ids the partial renders.
+
+  Checked by resolving every `aria-describedby` on every page against the document, and by
+  submitting five forms empty first — a page that has never been refused has no errors to
+  point at, so the half of this that mattered was unreachable by walking pages. axe reports
+  none of it: it cannot know that a `<p>` below an input was meant to describe it, and it does
+  not report a dangling reference at all. Two more turned up that way, both checkboxes whose
+  help was drawn by hand in a `<span>`. (#114)
+
 - **A release run finishes again, and building the image is something you start rather than
   something that hangs.** v0.2.0 was published — wheel, sdist, notes, all of it — with its
   workflow run sitting in `waiting` for ever, because the second job in that file asked for a

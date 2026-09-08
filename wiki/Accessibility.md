@@ -34,6 +34,9 @@ us about a barrier.
 - **Nothing scrolls sideways.** At 320 pixels — the width a normal window has at 400%
   zoom — every page reads in one column, top to bottom. Only a data table scrolls across,
   in its own box, because a table needs its two dimensions to mean anything.
+- **A rejected form says why, to a screen reader too.** When a field is refused, the
+  control is marked invalid *and* points at the message explaining it, so the reason is read
+  out with the field rather than sitting in red where only eyes can find it.
 
 ## What is checked, and how
 
@@ -58,6 +61,15 @@ box and holds it to 24 by 24, allowing the criterion's own exceptions: a small t
 a link inside a sentence, whose height belongs to the prose it sits in. What it cannot
 judge is whether some other control does the same job at full size; that needs a person,
 and anything relying on it has to be written down.
+
+References are resolved, which is a third thing a machine can check and axe does not. Every
+`aria-describedby` on every page is looked up against the document, and any that names an
+element which is not there fails the build. That was the state of every form Postulo drew
+itself: Django marks a refused field `aria-invalid` and points it at its error, correctly,
+and the template drew that error without the id the field was pointing at. The control
+announced that it was invalid and that two elements described it, and neither existed. The
+forms are also submitted empty on purpose, because a page that has never been refused has no
+errors to point at and the half of the bug that matters would never be reached.
 
 Width is measured too, and by the same method: at 320 CSS pixels a third browser test
 asks each page to scroll sideways and fails if it moves. That is the criterion's own
