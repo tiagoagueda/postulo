@@ -36,8 +36,8 @@ mkdirSync(DESTINATION, { recursive: true });
 
 let failed = false;
 for (const code of wanted) {
-  if (!/^[a-z]{2}$/.test(code)) {
-    console.error(`"${code}" is not an ISO 3166-1 alpha-2 code in lower case.`);
+  if (!/^[a-z]{2}(-[a-z]{2,3})?$/.test(code)) {
+    console.error(`"${code}" is not an ISO 3166-1 code in lower case.`);
     failed = true;
     continue;
   }

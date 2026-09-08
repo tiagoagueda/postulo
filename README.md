@@ -123,12 +123,14 @@ Postulo is in each language so nobody has to guess.
 
 - **български** — Postulo е самостоятелно хостван мениджър на кандидатури за работа: вашите кандидатури, CV-та и мотивационни писма, на вашия сървър, без платени функции.
 - **bosanski** — Postulo je samostalno hostovani upravitelj prijava za posao: vaše prijave, CV-jevi i motivaciona pisma na vašem serveru, bez plaćenih funkcija.
+- **català** — Postulo és un gestor de candidatures autoallotjat: les vostres candidatures, CV i cartes de presentació al vostre servidor, sense funcions de pagament.
 - **čeština** — Postulo je samostatně hostovaný správce žádostí o práci: vaše žádosti, CV a motivační dopisy na vašem serveru, bez placených funkcí.
 - **dansk** — Postulo er en selvhostet håndtering af jobansøgninger: dine ansøgninger, CV'er og ansøgningsbreve på din egen server, uden betalte funktioner.
 - **Deutsch** — Postulo ist ein selbst gehosteter Bewerbungsmanager: Ihre Bewerbungen, Lebensläufe und Anschreiben auf Ihrem eigenen Server, ohne kostenpflichtige Funktionen.
 - **Ελληνικά** — Το Postulo είναι ένας αυτοφιλοξενούμενος διαχειριστής αιτήσεων εργασίας: οι αιτήσεις, τα βιογραφικά και οι συνοδευτικές επιστολές σας, στον διακομιστή σας, χωρίς επί πληρωμή λειτουργίες.
 - **español** — Postulo es un gestor de candidaturas de empleo autoalojado: tus candidaturas, CV y cartas de presentación en tu propio servidor, sin funciones de pago.
 - **eesti** — Postulo on ise majutatav töökandideerimiste haldur: teie kandideerimised, CV-d ja motivatsioonikirjad teie enda serveris, ilma tasuliste funktsioonideta.
+- **euskara** — Postulo norberak ostatatutako lan-eskaeren kudeatzailea da: zure eskaerak, CVak eta aurkezpen-gutunak zure zerbitzarian, ordainpeko funtziorik gabe.
 - **suomi** — Postulo on itse ylläpidettävä työhakemusten hallinta: hakemuksesi, CV:si ja saatekirjeesi omalla palvelimellasi, ilman maksullisia ominaisuuksia.
 - **français** — Postulo est un gestionnaire de candidatures auto-hébergé : vos candidatures, vos CV et vos lettres de motivation sur votre propre serveur, sans fonctionnalité payante.
 - **Gaeilge** — Bainisteoir iarratas poist féinóstáilte is ea Postulo: d'iarratais, do CVanna agus do litreacha cumhdaigh ar do fhreastalaí féin, gan aon ghné íoctha.

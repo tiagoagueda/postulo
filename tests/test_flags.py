@@ -49,8 +49,18 @@ def test_the_list_holds_every_country_the_telephone_field_offers():
     A country added to `phones.COUNTRIES` without running `npm run sync:flags` would be a
     country whose flag silently does not appear, which is the sort of thing nobody notices
     until it is somebody's own.
+
+    The list may hold more than the telephone field offers: a subdivision like `es-ct` is
+    there for a language, never for a dialling code.
     """
-    assert set(listed()) == {code.lower() for code, _, _ in phones.COUNTRIES}
+    assert {code.lower() for code, _, _ in phones.COUNTRIES} <= set(listed())
+
+
+def test_nothing_extra_is_listed_that_no_language_asked_for():
+    """The subdivisions earn their place one at a time, each because a language needs it."""
+    countries = {code.lower() for code, _, _ in phones.COUNTRIES}
+    wanted = {country.lower() for country in languages.FLAG_COUNTRIES.values()}
+    assert set(listed()) - countries <= wanted
 
 
 def test_every_listed_flag_is_actually_there():
@@ -90,7 +100,11 @@ def test_the_two_maps_never_contradict_each_other():
     """
     for code, country in languages.FLAG_COUNTRIES.items():
         other = phones.FROM_LANGUAGE.get(code)
-        assert other in (None, country), f"{code}: flag says {country}, telephone says {other}"
+        # A subdivision agrees with the country it is part of: Catalan's flag is Catalonia
+        # and its dialling code is Spain's, and both of those are right.
+        assert other in (None, country, country.split("-")[0]), (
+            f"{code}: flag says {country}, telephone says {other}"
+        )
 
 
 # ------------------------------------------------------------------- the tag
@@ -107,6 +121,13 @@ def test_the_tag_draws_a_flag():
 
 def test_the_tag_takes_a_country_however_it_is_written():
     assert render('{% flag "PT" %}') == render('{% flag " pt " %}') == render('{% flag "pt" %}')
+
+
+def test_the_tag_draws_a_subdivision_too():
+    """Catalan is at home in Catalonia, whose flag is `es-ct` and not Spain's."""
+    html = render('{% flag "ES-CT" %}')
+    assert 'data-flag="es-ct"' in html
+    assert "/flags/es-ct" in html
 
 
 def test_a_flag_is_decoration_unless_it_is_given_words():

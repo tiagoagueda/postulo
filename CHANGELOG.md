@@ -105,6 +105,14 @@ All notable changes to Postulo are recorded here. The format follows
   of them. Neither omission was ever a decision — Europe was simply taken to mean the Union
   because that was the list that came to hand.
 
+  **Why the continent comes first is a decision, and this is it.** The maintainer chose to
+  give the languages of continental Europe precedence over the rest of the world, in the
+  service of European digital sovereignty: Postulo exists as an alternative to hosted
+  services that answer to somebody else's jurisdiction, and an alternative that only speaks
+  the languages those services already speak has not moved anybody very far. Africa (#70)
+  and the rest of the world follow in later releases; the order is deliberate, not
+  alphabetical.
+
   **Ukrainian brought back the plural rule that has to be got right.** Three forms, chosen by
   the last digit rather than the value: 1, 21 and 101 take the first, 2–4 the second, and
   11–14 the third *despite ending in 1 to 4*. Copy the two-form rule and every count on
@@ -146,7 +154,18 @@ All notable changes to Postulo are recorded here. The format follows
   is worth naming because the list is now a place where somebody who cannot read the current
   language has to find their own, and *ქართული* and *հայերեն* are unmistakable to the person
   looking for them in a way an English label never is. Armenian also does not take `_TWO`:
-  it counts zero with the singular, the way French does. (#118)
+  it counts zero with the singular, the way French does.
+
+  **Catalan and Basque made the flags admit that a language can be at home somewhere that is
+  not a state.** The table beside the picker had always mapped a language to an ISO 3166-1
+  country, and for the Union that worked because every language there had one. Catalan's
+  honest answer is not Spain — that flag already stands for Spanish, two rows up — and the
+  rule written down for this case said the language would simply get no flag. That was the
+  wrong call, and the maintainer said so: it is `ES-CT`, Catalonia's own, and Basque's is
+  `ES-PV`, the ikurriña. So the flag table, `assets/flags.txt`, the tag's validation and the
+  sync script all take ISO 3166-2 subdivisions now, Galician and Welsh will use theirs when
+  they arrive, and the telephone field is untouched — a dialling code is a state's, and
+  Catalan's is still Spain's. (#118)
 
 - **Every plugin carries a manifest, and the six Postulo ships fill it in.** #97 settled
   what a plugin declares — a short name, a full name, an author, a version, a description, a

@@ -22,7 +22,11 @@ FLAG_DIR = Path(__file__).resolve().parents[2] / "static" / "flags"
 
 _ICON_NAME = re.compile(r"[a-z0-9-]+")
 
-_COUNTRY = re.compile(r"[A-Za-z]{2}")
+#: An ISO 3166-1 country, or a 3166-2 subdivision of one: `pt`, or `es-ct` for
+#: Catalonia. The second form exists because a language can be at home in a place
+#: that is not a state, and Postulo would rather draw that place's own flag than
+#: the flag of the state it sits in, which already stands for another language.
+_COUNTRY = re.compile(r"[A-Za-z]{2}(?:-[A-Za-z]{2,3})?")
 
 
 #: The opening ``<svg ...>`` tag, whatever it is spread over. A negated class matches

@@ -36,20 +36,29 @@ from __future__ import annotations
 #: Written out deliberately rather than derived from the code, because a language is not a
 #: country: ``el`` is Greek and ``cs`` is Czech, and neither code says so. Every language
 #: of the European Union happened to have one uncontested home, which is what made the
-#: first pass tractable. The rest of Europe ends that: Basque, Catalan, Galician and Welsh
-#: are spoken across borders or inside one state that already flies its flag for another
-#: language, so they are absent from this table and ``flag_country`` answers with nothing.
-#: No flag beats a wrong flag, and every caller already copes with the empty answer.
+#: first pass tractable. The rest of Europe ends that, and in two different ways.
+#:
+#: A language may be at home somewhere that is not a state. Catalan's answer is not Spain —
+#: that flag already stands for Spanish on this same list — and it is not nothing either:
+#: it is ``ES-CT``, Catalonia's own; Basque's is ``ES-PV``, the ikurriña. So this table
+#: holds ISO 3166-2 subdivisions as well as countries, and ``assets/flags.txt`` carries the
+#: artwork for them.
+#:
+#: And a language may still have no answer at all, in which case ``flag_country`` returns
+#: nothing and the picker closes the row up. No flag beats a wrong flag, and every caller
+#: already copes with the empty answer.
 FLAG_COUNTRIES: dict[str, str] = {
     "en-gb": "GB",
     "bg": "BG",
     "bs": "BA",
+    "ca": "ES-CT",
     "cs": "CZ",
     "da": "DK",
     "de": "DE",
     "el": "GR",
     "es": "ES",
     "et": "EE",
+    "eu": "ES-PV",
     "fi": "FI",
     "fr-fr": "FR",
     "ga": "IE",
@@ -95,12 +104,14 @@ NATIVE_NAMES: dict[str, str] = {
     "en-gb": "English (United Kingdom)",
     "bg": "български",
     "bs": "bosanski",
+    "ca": "català",
     "cs": "čeština",
     "da": "dansk",
     "de": "Deutsch",
     "el": "Ελληνικά",
     "es": "español",
     "et": "eesti",
+    "eu": "euskara",
     "fi": "suomi",
     "fr-fr": "français (France)",
     "ga": "Gaeilge",
@@ -147,12 +158,14 @@ PLURAL_FORMS: dict[str, str] = {
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
         "(n%100<10 || n%100>=20) ? 1 : 2);"
     ),
+    "ca": _TWO,
     "cs": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
     "da": _TWO,
     "de": _TWO,
     "el": _TWO,
     "es": _TWO,
     "et": _TWO,
+    "eu": _TWO,
     "fi": _TWO,
     "fr-fr": "nplurals=2; plural=(n > 1);",
     "ga": ("nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4);"),

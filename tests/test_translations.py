@@ -209,10 +209,11 @@ def test_each_language_shows_its_flag_without_reading_it_out(client, user):
     html = client.get(reverse("settings:locale")).content.decode()
 
     images = re.findall(r"<img [^>]*class=\"flag\"[^>]*>", html)
-    countries = {re.search(r'data-flag="([a-z]{2})"', tag).group(1) for tag in images}
+    countries = {re.search(r'data-flag="([a-z-]+)"', tag).group(1) for tag in images}
     assert "gr" in countries, "Greek is Greece, which its code does not say"
     assert "cz" in countries
     assert "ie" in countries, "Irish is Ireland, likewise"
+    assert "es-ct" in countries, "Catalan is Catalonia, which is not a country at all"
     assert len(countries) >= len(set(languages.FLAG_COUNTRIES.values()))
 
     # Decoration, and marked as such: the name beside it already says which language this
