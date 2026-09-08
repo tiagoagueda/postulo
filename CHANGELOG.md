@@ -302,6 +302,23 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **A release run finishes again, and building the image is something you start rather than
+  something that hangs.** v0.2.0 was published — wheel, sdist, notes, all of it — with its
+  workflow run sitting in `waiting` for ever, because the second job in that file asked for a
+  runner advertising the `docker` label and no runner advertises it. Forgejo schedules a job
+  **before** it evaluates the `if` that would skip it, so the job was neither skipped nor
+  failed: it queued, and the run never finished. The comment at the top of `ci.yml` had
+  warned about exactly this — *a label no runner has does not fail the job: it queues it for
+  ever, which looks exactly like CI passing until somebody checks* — and it came true one file
+  over. Giving `runs-on` an expression moved the symptom without removing it: the job then
+  failed in **zero seconds having run no steps**, which is what an unschedulable job looks
+  like when it is not left hanging. So the image build now lives in `image.yml` and is started
+  by hand, with the tag to build as its input. A workflow nobody starts cannot queue, the
+  release workflow has one job, and it always completes. The repository variable that gated
+  the old automatic trigger went with it — a switch on something that only happens when you
+  press the button is a second way of saying no. Nothing is lost that worked: that job had run
+  three times and failed three times, and had never once built an image. (#81)
+
 - **CI had tested nothing for a fortnight, and looked merely red rather than empty.** A test
   imported `config/settings/prod.py` at module scope to read the redirect exemption list from
   what actually ships rather than a retyped copy — a good instinct. But that module refuses to

@@ -1,0 +1,69 @@
+# Builds the container image for a release tag and pushes it to Forgejo's registry.
+#
+# Started by hand, and that is the whole point. This job needs a runner advertising the
+# `docker` label, because it talks to a Docker daemon and the default runner cannot (see
+# scripts/check-image.sh). Forgejo schedules a job before it evaluates the condition that
+# would skip it, so a job asking for a label no runner advertises does not get skipped and
+# does not fail: it queues, for ever, and the run it belongs to never finishes. That is
+# what happened to v0.2.0's release, which was published and complete while its workflow
+# run sat in `waiting` looking unfinished (#81).
+#
+# A workflow nobody starts cannot queue. So this is `workflow_dispatch`: somebody who has
+# registered a docker runner asks for the tag they want built, and the release workflow
+# next door has one job and always completes. The repository variable that used to gate it
+# is gone with the automatic trigger it gated -- a switch on a thing that only happens when
+# you press the button is a second way of saying no.
+name: Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The release tag to build, for example v0.3.0"
+        required: true
+
+# Nothing is granted by default; this needs to read the code and write to the registry.
+permissions: {}
+
+jobs:
+  image:
+    runs-on: docker
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The tag asked for, rather than whatever the default branch is now. A release
+          # image built from a moving branch is an image nobody can reproduce.
+          ref: ${{ inputs.tag }}
+          persist-credentials: false
+
+      - name: Work out the tags
+        id: tags
+        env:
+          # Through the environment rather than expanded into the script: a value that
+          # reaches a shell as text is data, one that is pasted into it is code.
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          registry="${GITHUB_SERVER_URL#https://}"
+          image="${registry}/${GITHUB_REPOSITORY}"
+          echo "tags=${image}:${version},${image}:${version%.*},${image}:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Sign in to the registry
+        env:
+          REGISTRY_USER: ${{ secrets.REGISTRY_USER }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          echo "$REGISTRY_TOKEN" | docker login "${GITHUB_SERVER_URL#https://}" \
+            -u "$REGISTRY_USER" --password-stdin
+
+      - name: Build for amd64 and arm64 and push
+        env:
+          TAGS: ${{ steps.tags.outputs.tags }}
+        run: |
+          docker buildx create --use --name postulo-release >/dev/null 2>&1 || docker buildx use postulo-release
+          tags=""
+          for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
+          docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .

@@ -1,15 +1,22 @@
 # Runs when a release tag (vX.Y.Z) is pushed. Nothing here creates a tag: a person does
 # that, deliberately, after writing the changelog section and bumping the version.
 #
-# Two jobs. `release` runs on the ordinary runner: it refuses a tag that disagrees with
-# pyproject.toml, __version__ or CHANGELOG.md, builds the sdist and the wheel, and creates
-# the Forgejo release with that changelog section as its notes and the two files attached.
+# One job, on purpose. It refuses a tag that disagrees with pyproject.toml, __version__ or
+# CHANGELOG.md, builds the sdist and the wheel, and creates the Forgejo release with that
+# changelog section as its notes and the two files attached.
 #
-# `image` needs a runner that can talk to a Docker daemon, which the default one cannot
-# (see scripts/check-image.sh). It runs on the `docker` label and only when the repository
-# variable BUILD_IMAGE is "true", so that without such a runner nothing queues for ever
-# looking like a pass. Registered with a docker-capable runner, it builds the image for
-# amd64 and arm64 and pushes it to Forgejo's registry as X.Y.Z, X.Y and latest.
+# There used to be a second job here that built the container image, and it is the reason
+# this file says "one job, on purpose". It asked for a runner advertising the `docker`
+# label, because building an image needs a Docker daemon and the default runner has none.
+# Forgejo schedules a job before it evaluates the `if` that would skip it, so the job was
+# neither skipped nor failed: it queued, for ever, and the run never finished. v0.2.0 was
+# published, complete, with its release run sitting in `waiting` (#81). Giving `runs-on` an
+# expression moved the symptom rather than removing it -- the job then failed in zero
+# seconds, having run no steps, which is what an unschedulable job looks like when it is not
+# left hanging.
+#
+# So the image build lives in image.yml and is started by hand. A workflow nobody starts
+# cannot queue, and this run always finishes.
 name: Release
 
 on:
@@ -54,45 +61,3 @@ jobs:
           FORGEJO_URL: ${{ github.server_url }}
           FORGEJO_REPOSITORY: ${{ github.repository }}
         run: uv run --no-project python scripts/release_tools.py publish "${GITHUB_REF_NAME}" dist/* --notes release-notes.md
-
-  image:
-    # `if` decides whether this runs; `runs-on` decides where it queues, and Forgejo
-    # queues before it evaluates the condition. With `runs-on: docker` and no runner
-    # advertising that label, the job sat waiting for ever and the whole run never
-    # finished -- which is how v0.2.0's release looked unfinished long after it had been
-    # published. The comment at the top of ci.yml warned about exactly this.
-    #
-    # So the destination follows the switch: with image building off, the job lands on a
-    # runner that exists and is skipped immediately, and the run completes.
-    if: ${{ vars.BUILD_IMAGE == 'true' }}
-    runs-on: ${{ vars.BUILD_IMAGE == 'true' && 'docker' || 'ubuntu-latest' }}
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: Work out the tags
-        id: tags
-        run: |
-          version="${GITHUB_REF_NAME#v}"
-          registry="${GITHUB_SERVER_URL#https://}"
-          image="${registry}/${GITHUB_REPOSITORY}"
-          echo "image=${image}" >> "$GITHUB_OUTPUT"
-          echo "tags=${image}:${version},${image}:${version%.*},${image}:latest" >> "$GITHUB_OUTPUT"
-
-      - name: Sign in to the registry
-        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login "${GITHUB_SERVER_URL#https://}" -u "${{ secrets.REGISTRY_USER }}" --password-stdin
-
-      - name: Build for amd64 and arm64 and push
-        # Through the environment rather than expanded into the script: a value that
-        # reaches a shell as text is data, one that is pasted into it is code.
-        env:
-          TAGS: ${{ steps.tags.outputs.tags }}
-        run: |
-          docker buildx create --use --name postulo-release >/dev/null 2>&1 || docker buildx use postulo-release
-          tags=""
-          for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
-          docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .

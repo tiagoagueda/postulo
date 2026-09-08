@@ -251,11 +251,17 @@ End the entry with the issue it closes, in brackets: `(#42)`.
 3. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree.
 4. Commit, then tag and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
 
-The `release` workflow does the rest: it refuses a tag that disagrees with the code or the
-changelog, builds the sdist and the wheel, and creates the Forgejo release with the
-changelog section as its notes. The image job runs only on a runner with the `docker`
-label and the repository variable `BUILD_IMAGE` set to `true` (with `REGISTRY_USER` and
-`REGISTRY_TOKEN` as secrets), so that without one nothing queues for ever; until then,
+The `release` workflow does the rest, and it is one job: it refuses a tag that disagrees
+with the code or the changelog, builds the sdist and the wheel, and creates the Forgejo
+release with the changelog section as its notes.
+
+**The container image is a separate, deliberate act.** `image.yml` is started by hand —
+*Actions → Image → Run workflow*, with the tag to build — and needs a runner advertising
+the `docker` label, plus `REGISTRY_USER` and `REGISTRY_TOKEN` as secrets. It is not on the
+tag trigger, because Forgejo schedules a job before it evaluates the condition that would
+skip it: a job asking for a label no runner advertises queues for ever and its run never
+finishes, which is how v0.2.0's release came to look unfinished long after it was published
+(#81). A workflow nobody starts cannot queue. Without a docker runner,
 `scripts/check-image.sh` builds and checks the image wherever there is a Docker daemon.
 
 ## Licence
