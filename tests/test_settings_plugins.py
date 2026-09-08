@@ -101,6 +101,21 @@ def test_a_row_that_is_theirs_offers_a_control(client, user):
     assert "disabled" not in row_for(html, PLUGIN)
 
 
+def test_the_checkbox_carries_the_class_that_colours_it(client, user):
+    """Green around a ticked box and red around an unticked one, down the whole list.
+
+    The colour is redundant by design: the checkbox already says which way it is set, to a
+    screen reader and to a keyboard, and `state-glow` only makes a dozen rows readable at a
+    glance. This asserts the class reaches the markup, because the stylesheet is where the
+    two colours live and a class that quietly stops being emitted takes them with it.
+    """
+    client.force_login(user)
+
+    row = row_for(client.get(reverse(URL)).content.decode(), PLUGIN)
+
+    assert "state-glow" in row
+
+
 # ------------------------------------------- what an administrator decided
 
 

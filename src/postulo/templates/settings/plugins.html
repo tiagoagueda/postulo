@@ -26,8 +26,12 @@
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         {% for row in rows %}
           <li class="flex items-start gap-3 px-4 py-3" data-plugin="{{ row.name }}">
+            {% comment %} `state-glow`: green around a box that is ticked, red around one
+               that is not, so a dozen rows can be read down at a glance rather than one at a
+               time. It says nothing the checkbox does not already say to a screen reader.
+            {% endcomment %}
             <input type="checkbox" name="on" value="{{ row.name }}" id="plugin-{{ row.name }}"
-                   class="mt-1"
+                   class="state-glow mt-1"
                    {% if row.on %}checked{% endif %}
                    {% if not row.theirs %}disabled aria-describedby="why-{{ row.name }}"{% endif %}>
             <div class="min-w-0 flex-1">

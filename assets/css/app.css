@@ -286,6 +286,62 @@
   }
 
   /*
+   * On or off, said twice. The checkbox itself is what a screen reader announces and what
+   * a keyboard toggles; the glow is what the eye reads down a list of a dozen rows without
+   * checking each box in turn. Redundant on purpose -- colour is never the only thing
+   * carrying this state (WCAG 1.4.1), it is the thing that makes the list scannable.
+   *
+   * `box-shadow` rather than `outline`, because `:focus-visible` already owns the outline
+   * and the two would fight: a keyboard user tabbing through would lose the focus ring on
+   * every row. Shadows and outlines paint separately, so both are visible at once.
+   *
+   * A row an administrator has decided is not this person's to change, and a full-strength
+   * red ring on a locked control reads as a fault they are being blamed for. Those keep the
+   * colour and lose the halo, so the row still says which way it is set without shouting
+   * about a state nobody on this page can do anything about.
+   */
+  .state-glow {
+    border-radius: 0.25rem;
+    box-shadow:
+      0 0 0 2px --alpha(var(--color-red-500) / 50%),
+      0 0 6px 2px --alpha(var(--color-red-500) / 30%);
+
+    @variant dark {
+      box-shadow:
+        0 0 0 2px --alpha(var(--color-red-400) / 60%),
+        0 0 7px 2px --alpha(var(--color-red-400) / 40%);
+    }
+  }
+
+  .state-glow:checked {
+    box-shadow:
+      0 0 0 2px --alpha(var(--color-emerald-500) / 50%),
+      0 0 6px 2px --alpha(var(--color-emerald-500) / 30%);
+
+    @variant dark {
+      box-shadow:
+        0 0 0 2px --alpha(var(--color-emerald-400) / 60%),
+        0 0 7px 2px --alpha(var(--color-emerald-400) / 40%);
+    }
+  }
+
+  .state-glow:disabled {
+    box-shadow: 0 0 0 2px --alpha(var(--color-red-500) / 25%);
+
+    @variant dark {
+      box-shadow: 0 0 0 2px --alpha(var(--color-red-400) / 30%);
+    }
+  }
+
+  .state-glow:disabled:checked {
+    box-shadow: 0 0 0 2px --alpha(var(--color-emerald-500) / 25%);
+
+    @variant dark {
+      box-shadow: 0 0 0 2px --alpha(var(--color-emerald-400) / 30%);
+    }
+  }
+
+  /*
    * The QR code allauth renders for authenticator setup. `qrcode`'s SVG factory draws the
    * modules as one path filled #000000 and gives it no background whatsoever -- not even a
    * white quiet zone. On a light page that reads perfectly. On a dark one it is black on

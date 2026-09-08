@@ -485,6 +485,24 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **A plugin's state is drawn around its checkbox, not only inside it.** *Settings →
+  Plugins* is a column of rows, and reading which of a dozen are on meant looking at each
+  13-pixel tick in turn. A ring of colour — green around a ticked box, red around one that
+  is not — makes the column readable in one pass.
+
+  It says nothing the checkbox was not already saying. The tick is what a screen reader
+  announces and what a keyboard toggles, so the colour is redundant by design and WCAG
+  1.4.1 never comes into it; this would be a different change if the tick had been replaced
+  by a colour. `box-shadow` rather than `outline`, because `:focus-visible` owns the outline
+  throughout this stylesheet and the two would otherwise fight — a keyboard user tabbing
+  down the list would lose the focus ring on every row. Shadows and outlines paint
+  separately, so both show at once.
+
+  **A row an administrator decided keeps the colour and loses the halo.** A full-strength
+  red ring around a control that is not yours to change reads as a fault you are being
+  blamed for, which is the opposite of what that row is there to say. Both themes are
+  defined rather than left to whichever ground the glow lands on. (#122)
+
 - **Reading a Europass CV is a plugin now.** The reader was already shaped like one — it
   decides which of the two formats it has and dispatches, which is the same split sources
   have used since the beginning — so this mostly says so out loud: a new `importer` kind, and
