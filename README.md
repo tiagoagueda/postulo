@@ -138,6 +138,7 @@ Postulo is in each language so nobody has to guess.
 - **italiano** — Postulo è un gestore di candidature self-hosted: le tue candidature, i tuoi CV e le tue lettere di presentazione sul tuo server, senza funzioni a pagamento.
 - **lietuvių** — Postulo — savarankiškai talpinama darbo paraiškų tvarkyklė: jūsų paraiškos, CV ir motyvaciniai laiškai jūsų serveryje, be mokamų funkcijų.
 - **latviešu** — Postulo ir pašhostēts darba pieteikumu pārvaldnieks: jūsu pieteikumi, CV un motivācijas vēstules jūsu serverī, bez maksas funkcijām.
+- **македонски** — Postulo е самостојно хостиран управувач на пријави за работа: вашите пријави, CV-а и мотивациски писма на вашиот сервер, без платени функции.
 - **Malti** — Postulo huwa maniġer ta' applikazzjonijiet għax-xogħol self-hosted: l-applikazzjonijiet, is-CVs u l-ittri ta' motivazzjoni tiegħek fuq is-server tiegħek, mingħajr funzjonijiet bi ħlas.
 - **norsk bokmål** — Postulo er en selvhostet søknadsbehandler: søknadene dine, CV-ene dine og søknadsbrevene dine på din egen server, uten betalte funksjoner.
 - **Nederlands** — Postulo is een zelfgehoste sollicitatiemanager: uw sollicitaties, cv's en brieven op uw eigen server, zonder betaalde functies.
@@ -146,6 +147,7 @@ Postulo is in each language so nobody has to guess.
 - **română** — Postulo este un manager de candidaturi găzduit pe propriul server: candidaturile, CV-urile și scrisorile tale de intenție pe serverul tău, fără funcții plătite.
 - **slovenčina** — Postulo je samostatne hostovaný správca žiadostí o prácu: vaše žiadosti, CV a motivačné listy na vašom serveri, bez platených funkcií.
 - **slovenščina** — Postulo je samostojno gostovan upravljalnik prijav za zaposlitev: vaše prijave, življenjepisi in motivacijska pisma na vašem strežniku, brez plačljivih funkcij.
+- **shqip** — Postulo është një menaxher aplikimesh pune i vetëstrehuar: aplikimet, CV-të dhe letrat tuaja motivuese në serverin tuaj, pa veçori me pagesë.
 - **српски** — Postulo је самостално хостован управљач пријава за посао: ваше пријаве, CV-јеви и мотивациона писма на вашем серверу, без плаћених функција.
 - **svenska** — Postulo är en självhostad hanterare för jobbansökningar: dina ansökningar, CV:n och personliga brev på din egen server, utan betalfunktioner.
 - **Türkçe** — Postulo, kendi sunucunuzda barındırılan bir iş başvurusu yöneticisidir: başvurularınız, CV'leriniz ve ön yazılarınız kendi sunucunuzda, ücretli özellikler olmadan.

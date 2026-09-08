@@ -59,6 +59,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "it": "IT",
     "lt": "LT",
     "lv": "LV",
+    "mk": "MK",
     "mt": "MT",
     "nb": "NO",
     "nl": "NL",
@@ -68,6 +69,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "ro": "RO",
     "sk": "SK",
     "sl": "SI",
+    "sq": "AL",
     "sr": "RS",
     "sv": "SE",
     "tr": "TR",
@@ -106,6 +108,7 @@ NATIVE_NAMES: dict[str, str] = {
     "it": "italiano",
     "lt": "lietuvių",
     "lv": "latviešu",
+    "mk": "македонски",
     "mt": "Malti",
     "nb": "norsk bokmål",
     "nl": "Nederlands",
@@ -115,6 +118,7 @@ NATIVE_NAMES: dict[str, str] = {
     "ro": "română",
     "sk": "slovenčina",
     "sl": "slovenščina",
+    "sq": "shqip",
     "sr": "српски",
     "sv": "svenska",
     "tr": "Türkçe",
@@ -163,6 +167,9 @@ PLURAL_FORMS: dict[str, str] = {
         "(n%100<11 || n%100>19) ? 1 : 2);"
     ),
     "lv": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);",
+    #: Two forms, but the digit decides and not the value, the way Icelandic does
+    #: it: 21 and 101 take the singular with 1, while 11 takes the plural.
+    "mk": "nplurals=2; plural=(n%10==1 && n%100!=11) ? 0 : 1;",
     "mt": (
         "nplurals=4; plural=(n==1 ? 0 : n==0 || ( n%100>1 && n%100<11) ? 1 : "
         "(n%100>10 && n%100<20 ) ? 2 : 3);"
@@ -181,6 +188,7 @@ PLURAL_FORMS: dict[str, str] = {
     "ro": "nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);",
     "sk": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
     "sl": "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);",
+    "sq": _TWO,
     "sr": (
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
         "(n%100<10 || n%100>=20) ? 1 : 2);"

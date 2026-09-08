@@ -133,7 +133,12 @@ All notable changes to Postulo are recorded here. The format follows
   constant for all three — which is exactly how a language ends up inheriting a rule nobody
   checked for it. They are written out separately. Serbian is offered in Cyrillic, its own
   name in the picker reading *српски*, so the list now carries three scripts and every one
-  of them still says which language it is in. (#118)
+  of them still says which language it is in.
+
+  **Albanian and Macedonian** finish the Balkans. Macedonian is the third language here whose
+  rule is two forms decided by the last digit rather than the value — Icelandic's shape, in a
+  different family — which is now enough of a pattern to say out loud: `nplurals=2` says
+  nothing about *which* two. (#118)
 
 - **Every plugin carries a manifest, and the six Postulo ships fill it in.** #97 settled
   what a plugin declares — a short name, a full name, an author, a version, a description, a
