@@ -39,7 +39,14 @@ Add at the proxy what an application cannot do for itself:
   that has checked who is asking. If you use `X-Accel-Redirect` or `X-Sendfile`, mark the
   location `internal`.
 - The security headers Postulo sends (a strict content security policy, `nosniff`,
-  `same-origin` referrer, `DENY` framing) can stay as they are; do not loosen the policy
+  `same-origin` referrer, `DENY` framing) can stay as they are — and **check that your proxy
+  passes them through unchanged**, because some replace them. Traefik, on the maintainer's
+  own test instance, rewrites `X-Frame-Options: DENY` to `SAMEORIGIN` and pins HSTS to a
+  year whatever the application asks for. The framing case is not a hole, since
+  `frame-ancestors 'none'` in the policy covers every browser that matters, but a header the
+  application sets and nobody receives is worth knowing about, and no test of the source can
+  find it. `curl -sSI https://your-instance/` and compare with what the container sends.
+  Do not loosen the policy
   to add analytics — there is no place for a third-party script in a page that shows
   somebody's employment history. The pages are served under that policy in a real browser
   by the test suite, which fails if any of them provokes a single violation, so it should
@@ -204,6 +211,30 @@ authenticator app who signs in with a password is asked for the code, always. An
 removes nobody's authenticator app — it changes when a code is asked for, not whether the
 account has one. Each person can see which of their own ways in are complete under
 *Settings → Account*.
+
+## Django's admin
+
+**It is off.** `POSTULO_ADMIN_URL` is empty by default and nothing is mounted, so there is no
+`/admin/` on a Postulo instance unless you put one there. That is deliberate: *Server
+settings* covers people, sign-in policy, plugins, email, logs and defaults, which leaves the
+admin as a developer's convenience — and on a self-hosted box, mostly a second and less
+careful way into the same data, at the first path anybody would try.
+
+It was not always off. Before 0.3.0 it defaulted to `admin/`, which published Django's own
+username-and-password form on every instance whose operator had not read one line of the
+settings file.
+
+If you want it, set a path of your own:
+
+```dotenv
+POSTULO_ADMIN_URL=back-office-7f3a/
+```
+
+Two things to know when you do. The login is **rate-limited** to the same `10/m/ip,
+5/300s/key` as a failed sign-in here, through the same limiter and the same cache — Django's
+admin has a login view of its own, and allauth's limits do not reach it. And a path is not a
+secret: treat it as one fewer thing being guessed at, not as protection. Put the admin behind
+your VPN or an authentication layer at the proxy if you keep it.
 
 ## Accounts
 

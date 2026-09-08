@@ -69,7 +69,11 @@ address it was issued for, or ask for an unbound invitation.
 
 ## The admin returns 404
 
-`POSTULO_ADMIN_URL` has moved it. Check your `.env`; it defaults to `admin/`.
+Most likely it is not running: `POSTULO_ADMIN_URL` is **empty by default** since 0.3.0, and
+an empty value mounts no admin at all. Set it to a path of your choosing to turn it on, and
+restart. If it is set, that path is where the admin is — `/admin/` will 404 unless that is
+what you chose. *Server settings* covers people, sign-in policy, plugins, email, logs and
+defaults without it.
 
 ## CSRF verification failed
 

@@ -234,14 +234,15 @@ of what is running and where the data is, the accounts, the sign-in policy, a te
 the email settings, the installed plugins, capture policy, and the instance's name and
 the defaults new accounts start with.
 
-Django's own admin remains, as the escape hatch, by default at `/admin/`. On a public
-instance, move it:
+Django's own admin is the escape hatch for anything *Server settings* does not cover, and
+it is **off unless you ask for it**. Give it a path and it appears there:
 
 ```sh
 POSTULO_ADMIN_URL=some-private-path/
 ```
 
-This is not a security control on its own; it just keeps the noise down.
+The path is not a security control on its own; it keeps the noise down, and the login is
+rate-limited either way. See *Hardening* for why it is off by default.
 
 ## Passwords
 

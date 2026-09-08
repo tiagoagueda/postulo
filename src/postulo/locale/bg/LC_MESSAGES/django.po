@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-07 21:41+0000\n"
+"POT-Creation-Date: 2026-09-08 06:41+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -162,12 +162,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "от %(low)s до %(high)s"
 
-#: src/postulo/core/server_views.py:1049
+#: src/postulo/core/server_views.py:1066
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s е инсталиран от каталога."
 
-#: src/postulo/core/server_views.py:999
+#: src/postulo/core/server_views.py:1016
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -235,19 +235,19 @@ msgstr "%(name)s вече е @%(username)s."
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s вече е администратор."
 
-#: src/postulo/core/server_views.py:1103
+#: src/postulo/core/server_views.py:1120
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s е премахнат. Рестартирайте Postulo, за да сте сигурни, че нищо от него не е останало заредено."
 
-#: src/postulo/core/server_views.py:1082
+#: src/postulo/core/server_views.py:1099
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s е изключен; файловете му са още тук."
 
-#: src/postulo/core/server_views.py:1084
+#: src/postulo/core/server_views.py:1101
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s е включен отново."
@@ -602,7 +602,7 @@ msgid ""
 msgstr ""
 "Шаблон със собствените колони на Postulo и един примерен ред. Попълнете го и го качете по-горе."
 
-#: src/postulo/core/server_views.py:572
+#: src/postulo/core/server_views.py:589
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Тестово съобщение от %(name)s"
@@ -1590,7 +1590,7 @@ msgstr "Контролна сума"
 msgid "Choose a Europass file first."
 msgstr "Първо изберете файл на Europass."
 
-#: src/postulo/core/server_views.py:930
+#: src/postulo/core/server_views.py:947
 #, draft
 msgid "Choose a package first."
 msgstr "Първо изберете пакет."
@@ -2375,10 +2375,17 @@ msgstr "Отхвърлена"
 msgid "Discarded. It stays in your history and can be restored."
 msgstr "Отхвърлена. Остава в историята ви и може да бъде възстановена."
 
-#: src/postulo/templates/server/overview.html:85
+#: src/postulo/templates/server/overview.html:89
 #, draft
 msgid "Django admin"
 msgstr "Django администрация"
+
+#: src/postulo/templates/server/overview.html:92
+#, draft
+msgid ""
+"Django's admin is not running. It is off unless you ask for it: set <code>POSTULO_ADMIN_URL</code> to a path of your choosing to turn it on."
+msgstr ""
+"Административният панел на Django не работи. Той е изключен, освен ако не го поискате: задайте <code>POSTULO_ADMIN_URL</code> на път по ваш избор, за да го включите."
 
 #: src/postulo/templates/documents/rendered_list.html:21
 #, draft
@@ -2547,7 +2554,7 @@ msgstr ""
 "И двата формата на Europass: JSON, който europass.europa.eu експортира днес, или XML, който правеше старият редактор на автобиографии и какъвто по-старият експорт на диска ви още е. Postulo сам разбира кой е, показва ви какво има в него и не записва нищо, докато не кажете."
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:465
+#: src/postulo/core/server_views.py:482
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
 #: src/postulo/templates/server/people.html:46
@@ -3425,7 +3432,7 @@ msgstr "Идентификатори"
 msgid "Identifies itself as"
 msgstr "Представя се като"
 
-#: src/postulo/core/server_views.py:574
+#: src/postulo/core/server_views.py:591
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3640,7 +3647,7 @@ msgstr "институция"
 msgid "Insurance"
 msgstr "Застраховане"
 
-#: src/postulo/core/server_views.py:654
+#: src/postulo/core/server_views.py:671
 #, draft
 msgid "Internal"
 msgstr "Вътрешно"
@@ -4602,7 +4609,7 @@ msgstr "Още няма компании. Създават се за вас, к�
 msgid "no company"
 msgstr "без компания"
 
-#: src/postulo/core/server_views.py:552
+#: src/postulo/core/server_views.py:569
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Няма връзка: %(why)s"
@@ -5086,12 +5093,12 @@ msgid "Nothing was added."
 msgstr "Нищо не беше добавено."
 
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:772 src/postulo/core/server_views.py:806
+#: src/postulo/core/server_views.py:789 src/postulo/core/server_views.py:823
 #, draft
 msgid "Nothing was different."
 msgstr "Нищо не беше различно."
 
-#: src/postulo/core/server_views.py:968
+#: src/postulo/core/server_views.py:985
 #, draft
 msgid "Nothing was installed."
 msgstr "Нищо не беше инсталирано."
@@ -5639,7 +5646,7 @@ msgid "plugin repository"
 msgstr "хранилище за приставки"
 
 #: src/postulo/accounts/settings_views.py:119
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:608
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:625
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -5647,7 +5654,7 @@ msgstr "хранилище за приставки"
 msgid "Plugins"
 msgstr "Добавки"
 
-#: src/postulo/core/server_views.py:801
+#: src/postulo/core/server_views.py:818
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -6538,8 +6545,8 @@ msgstr "Запазено във вашите обяви. Решете, кога�
 
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:772
-#: src/postulo/core/server_views.py:806 src/postulo/core/server_views.py:902
+#: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:789
+#: src/postulo/core/server_views.py:823 src/postulo/core/server_views.py:919
 #: src/postulo/resume/views.py:119
 #, draft
 msgid "Saved."
@@ -6668,7 +6675,7 @@ msgstr "Изпращане до"
 msgid "Send to stores now"
 msgstr "Изпращане към хранилищата сега"
 
-#: src/postulo/core/server_views.py:584
+#: src/postulo/core/server_views.py:601
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Изпращането се провали: %(error)s"
@@ -6702,7 +6709,7 @@ msgstr "Изпратени документи"
 msgid "sent on"
 msgstr "изпратено на"
 
-#: src/postulo/core/server_views.py:587 src/postulo/notifications/email.py:80
+#: src/postulo/core/server_views.py:604 src/postulo/notifications/email.py:80
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Изпратено до %(to)s."
@@ -7521,7 +7528,7 @@ msgstr "Това не е резултат, който Postulo разпознав
 msgid "That is not something Postulo can do about it."
 msgstr "Това не е нещо, което Postulo може да направи с нея."
 
-#: src/postulo/core/server_views.py:878 src/postulo/core/server_views.py:919
+#: src/postulo/core/server_views.py:895 src/postulo/core/server_views.py:936
 #, draft
 msgid "That is not something this page does."
 msgstr "Това не е нещо, което тази страница прави."
@@ -7549,7 +7556,7 @@ msgid ""
 msgstr ""
 "Последната цифра на този ORCID не съответства на останалите, значи някоя от тях е грешка."
 
-#: src/postulo/core/server_views.py:977 src/postulo/core/server_views.py:982
+#: src/postulo/core/server_views.py:994 src/postulo/core/server_views.py:999
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Този пакет вече не чака; качете го отново."
@@ -7630,7 +7637,7 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Подписът или ключът на каталога не е четим: %(error)s"
 
-#: src/postulo/core/server_views.py:1034
+#: src/postulo/core/server_views.py:1051
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Каталозите отговориха и още нищо не съдържат."
@@ -7681,12 +7688,12 @@ msgstr "Изтеглянето е много по-голямо, отколкот
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "По-ранната версия, която тази заменя. Старият файл се пази."
 
-#: src/postulo/core/server_views.py:837 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:854 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Средата задава „%(name)s“, затова не може да се променя тук."
 
-#: src/postulo/templates/server/overview.html:85
+#: src/postulo/templates/server/overview.html:89
 #, draft
 msgid "the escape hatch, for anything this area does not cover"
 msgstr "аварийният изход за всичко, което тази област не покрива"
@@ -7740,7 +7747,7 @@ msgstr "Инсталаторът го отхвърли: %(error)s"
 msgid "The job title"
 msgstr "Длъжността"
 
-#: src/postulo/core/server_views.py:894
+#: src/postulo/core/server_views.py:911
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -7779,7 +7786,7 @@ msgstr "Логото го няма."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Логото не беше променено: %(problem)s"
 
-#: src/postulo/core/server_views.py:589 src/postulo/notifications/email.py:79
+#: src/postulo/core/server_views.py:606 src/postulo/notifications/email.py:79
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Пощенският модул не прие нищо."
@@ -7795,7 +7802,7 @@ msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Следващите интервюта в календара и тези, които минаха без резултат."
 
-#: src/postulo/core/server_views.py:867
+#: src/postulo/core/server_views.py:884
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Официалното хранилище се изпразва, а не се премахва."
@@ -7817,7 +7824,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Заплащането"
 
-#: src/postulo/core/server_views.py:655
+#: src/postulo/core/server_views.py:672
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Приставките, които идват в Postulo. Не се изтегля нищо."
@@ -7963,7 +7970,7 @@ msgstr "Няма адрес, от който да се изтегли отнов
 msgid "There is no file to send."
 msgstr "Няма файл за изпращане."
 
-#: src/postulo/core/server_views.py:832
+#: src/postulo/core/server_views.py:849
 #, draft
 msgid "There is no repository by that name."
 msgstr "Няма хранилище с това име."
@@ -9252,19 +9259,19 @@ msgstr "вашата позиция"
 msgid "Your username has been changed."
 msgstr "Потребителското ви име беше променено."
 
-#: src/postulo/core/server_views.py:873
+#: src/postulo/core/server_views.py:890
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr "„%(name)s“ го няма. Всичко инсталирано от него остава инсталирано."
 
-#: src/postulo/core/server_views.py:858
+#: src/postulo/core/server_views.py:875
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "„%(name)s“ е изключено. От него не се инсталира и обновява нищо ново; вече инсталираното продължава да работи."
 
-#: src/postulo/core/server_views.py:855
+#: src/postulo/core/server_views.py:872
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""

@@ -24,8 +24,12 @@ urlpatterns = [
     path("capture-tokens/", include("postulo.api.urls")),
     # The capture API. Deliberately the only machine-readable surface Postulo has.
     path("api/v1/", api.urls),
-    path(settings.POSTULO_ADMIN_URL, admin.site.urls),
 ]
+
+# Only when an operator asked for it. Empty is the default, and an admin that is not mounted
+# is the one thing nobody can brute-force (#116).
+if settings.POSTULO_ADMIN_URL:
+    urlpatterns.append(path(settings.POSTULO_ADMIN_URL, admin.site.urls))
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

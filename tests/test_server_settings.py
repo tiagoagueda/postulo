@@ -92,8 +92,10 @@ def test_the_overview_says_what_is_running(client, admin):
     html = client.get(reverse("server:overview")).content.decode()
     assert f"<dd data-version>{__version__}</dd>" in html
     assert "sqlite" in html
-    assert reverse("admin:index") in html and reverse("core:healthz") in html
+    assert reverse("core:healthz") in html
     assert "none yet" in html, "no backup has been taken"
+    # No admin link, because there is no admin: it is off unless an operator asks (#116).
+    assert "POSTULO_ADMIN_URL" in html and "is not running" in html
 
 
 # --------------------------------------------------------------------- people

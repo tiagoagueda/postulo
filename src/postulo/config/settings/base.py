@@ -33,7 +33,9 @@ ASGI_APPLICATION = "postulo.config.asgi.application"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    # Not `django.contrib.admin`: this installs the same app with a site whose login is
+    # rate-limited. See postulo.core.admin_site.
+    "postulo.core.admin_site.PostuloAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -308,8 +310,24 @@ POSTULO_OIDC_IS_SECOND_FACTOR = env.bool("POSTULO_OIDC_IS_SECOND_FACTOR", defaul
 # An instance is invite-only unless the operator opens registration deliberately.
 POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)
 
-# The admin is a small attack surface worth moving off a guessable path.
-POSTULO_ADMIN_URL = env("POSTULO_ADMIN_URL", default="admin/")
+# Where Django's admin lives, and whether it exists at all. **Empty by default**, which
+# means it is not mounted: Postulo's own Server settings cover people, sign-in policy,
+# plugins, email, logs and defaults, so the admin is a developer's convenience and on a
+# self-hosted instance mostly a second, less careful way into the same data. It used to
+# default to `admin/`, which published a username-and-password form at the first path
+# anybody would try on every instance whose operator had not read this line (#116).
+#
+# Set it to a path of your own to turn it on. The trailing slash is added if you leave it
+# off, because forgetting it produced a URL nobody could reach and no error saying why.
+POSTULO_ADMIN_URL = env("POSTULO_ADMIN_URL", default="").strip().lstrip("/")
+if POSTULO_ADMIN_URL and not POSTULO_ADMIN_URL.endswith("/"):
+    POSTULO_ADMIN_URL += "/"
+
+# allauth's limits are good ones and Postulo inherits them, but they cover allauth's views.
+# The admin has a login of its own, which had nothing limiting it. Same numbers as a failed
+# sign-in, through the same limiter and the same cache, so there is one scheme rather than
+# two that can drift.
+ACCOUNT_RATE_LIMITS = {"admin_login": "10/m/ip,5/300s/key"}
 
 # ---------------------------------------------------------- internationalisation
 

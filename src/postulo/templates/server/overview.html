@@ -81,7 +81,18 @@
     <h3 class="mb-2 font-medium">{% translate "Also" %}</h3>
     <ul class="space-y-1">
       <li><a href="{{ health_url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "Health check" %}</a> <span class="text-ink-500 dark:text-ink-400">— {% translate "what a monitor should poll" %}</span></li>
-      <li><a href="{{ admin_url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "Django admin" %}</a> <span class="text-ink-500 dark:text-ink-400">— {% translate "the escape hatch, for anything this area does not cover" %}</span></li>
+      {% comment %} Only when one is mounted. It is off unless an operator set
+         POSTULO_ADMIN_URL, and a link to a 404 is worse than no link (#116). {% endcomment %}
+      {% if admin_url %}
+        <li><a href="{{ admin_url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "Django admin" %}</a> <span class="text-ink-500 dark:text-ink-400">— {% translate "the escape hatch, for anything this area does not cover" %}</span></li>
+      {% else %}
+        <li class="text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed %}
+            Django's admin is not running. It is off unless you ask for it: set
+            <code>POSTULO_ADMIN_URL</code> to a path of your choosing to turn it on.
+          {% endblocktranslate %}
+        </li>
+      {% endif %}
     </ul>
   </div>
 {% endblock %}

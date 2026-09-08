@@ -6,6 +6,37 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🔒 Security
+
+- **Django's admin is off unless you ask for it, and rate-limited when you do.** ⚠️ **This
+  removes `/admin/` from instances that have one.** `POSTULO_ADMIN_URL` used to default to
+  `admin/`, directly under a comment reading *"the admin is a small attack surface worth
+  moving off a guessable path"* — so every instance whose operator had not read that line
+  published Django's own username-and-password form at the first address anybody would try.
+  It was found on the public test instance rather than read out of the source, which is the
+  only way that kind of thing is ever found. The default is now empty and nothing is mounted:
+  choosing to run the admin and choosing where it lives became one decision, made once, on
+  purpose. **To keep yours, set `POSTULO_ADMIN_URL` to a path of your own and restart.**
+
+  Off by default rather than merely moved, because Postulo's own *Server settings* already
+  covers people, sign-in policy, plugins, email, logs and defaults. What is left is a
+  developer's convenience, and on a self-hosted box mostly a second and less careful way into
+  the same data.
+
+  **And throttled when it is mounted.** allauth's rate limits are good ones and Postulo
+  inherits them, but they apply to allauth's views; `django.contrib.admin` has a login view
+  of its own and nothing was counting attempts against it. So the one credential form on the
+  instance with no attempt limiting was the one that reaches every table directly. It now
+  uses allauth's own limiter, cache and numbers — `10/m/ip, 5/300s/key`, the same as a failed
+  sign-in — configured as one more key in `ACCOUNT_RATE_LIMITS` rather than a second scheme
+  that can drift from the first. A `GET` still costs nothing: reading the form is not an
+  attempt, guessing is.
+
+  Two smaller things went with it. A path written without its trailing slash used to produce
+  a URL nobody could reach and no error saying why; it is tidied now. And *Server settings →
+  Overview*, which linked to the admin as "the escape hatch", says plainly that there is not
+  one and which variable turns it on, rather than linking to a 404. (#116)
+
 ### ✨ Added
 
 - **Delivering mail is a plugin now, and SMTP is the one that ships.** A new kind,

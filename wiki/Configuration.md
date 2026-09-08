@@ -17,7 +17,7 @@ to start without it.
 | `POSTULO_CSRF_TRUSTED_ORIGINS` | empty | Comma-separated origins **including the scheme**, e.g. `https://postulo.example.org`. Needed behind a reverse proxy. |
 | `POSTULO_TIME_ZONE` | `Europe/Paris` | The instance default. Each person can override it in their own settings. Also changeable under *Server settings → Defaults* when this variable is not set. |
 | `POSTULO_LOG_LEVEL` | `INFO` | Standard Python levels. |
-| `POSTULO_ADMIN_URL` | `admin/` | Moves Django's admin off a guessable path. Include the trailing slash. |
+| `POSTULO_ADMIN_URL` | empty | **Where Django's admin lives, and whether it exists at all.** Empty means it is not mounted, which is the default: Postulo's own *Server settings* covers what an operator needs, and an admin nobody mounted is an admin nobody can guess at. Set a path of your own to turn it on — its login is rate-limited when you do. A missing trailing slash is added for you. See *Hardening*. |
 
 ## Settings changed from the interface
 
