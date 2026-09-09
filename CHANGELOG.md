@@ -565,6 +565,30 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The runtime image carried 430 MB it never runs, including a Node.js runtime.** Trivy and
+  Grype, run against the image on the test instance, found Playwright, pytest,
+  pytest-playwright and pytest-base-url installed in the application's own virtual
+  environment — 136 MB of browser test tooling, bundling its own Node binary, in a container
+  that launches no browser — and 296 MB of uv's download cache left behind beside it. Out of
+  906 MB.
+
+  **The Dockerfile read correctly, which is why nobody saw it.** `uv sync --locked --no-dev`
+  omits the dependency group called `dev` and nothing else, and `pyproject.toml` declares two
+  — `dev` and `e2e` — with both named in `default-groups` so that `uv sync` never quietly
+  removes the browser test's dependencies. That is a good reason, and it collided with the
+  image build. Checked in the image rather than reasoned about: none of the `dev` group was
+  present, all four of `e2e` were. `--no-default-groups` asks for the project and the named
+  extra and nothing else, and stays right when a third group is added.
+
+  The cache is the same shape of mistake in a different place. `uv` unpacks every wheel into
+  `~/.cache/uv` and keeps it; in a single-stage build that is shipped, and deleting it in a
+  later layer would free nothing because the bytes are already below. `--no-cache` was
+  already on the plugin install a few lines down, for exactly this reason.
+
+  Three tests read the Dockerfile and the project file rather than the image, because nothing
+  here builds an image (#81) and this is the second mistake in that file to reach a
+  deployment. (#154)
+
 - **The image could not be built, and had not been buildable since #111 landed.** That
   issue taught the production settings to refuse a secret key shorter than fifty
   characters, which is right, and `docker/Dockerfile` passed `collectstatic` a literal

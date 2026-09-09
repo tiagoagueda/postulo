@@ -67,7 +67,20 @@ COPY scripts/messages.py ./scripts/messages.py
 # which this writes in plain Python — no gettext in the image.
 RUN python scripts/messages.py compile
 
-RUN uv sync --locked --no-dev --extra server
+# `--no-default-groups`, not `--no-dev`. `--no-dev` omits the group called `dev` and
+# nothing else, and `pyproject.toml` declares two — `dev` and `e2e` — with both in
+# `default-groups` so that `uv sync` never quietly removes the browser test's
+# dependencies. The line therefore read correctly and installed Playwright anyway: 136 MB
+# of test tool, bundling its own Node.js runtime, in an image that runs neither (#154).
+# Naming the groups to exclude would need editing every time one is added; excluding all
+# of them and asking for the extra by name stays right on its own.
+#
+# `--no-cache`: uv unpacks every wheel into ~/.cache/uv and keeps it. In a single-stage
+# build that cache is 296 MB of the shipped image, including wheels for packages that were
+# never installed — and deleting it in a later layer would free nothing, because the bytes
+# are already below. The plugin install a few lines down has said `--no-cache` since it was
+# written; this is the same reasoning applied to the step that installs everything else.
+RUN uv sync --locked --no-default-groups --extra server --no-cache
 
 # Plugins baked into the image. A plugin is an ordinary Python package installed into
 # Postulo's environment; this argument takes any number of them, in whatever form pip

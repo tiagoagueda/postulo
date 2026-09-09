@@ -56,3 +56,57 @@ def test_the_reader_finds_what_it_is_looking_for():
     assert literals_in('POSTULO_SECRET_KEY="$(python -c ...)"') == [], (
         "a substitution, not a literal"
     )
+
+
+# ------------------------------------------------- what the image installs, and keeps
+
+#: The line that builds the runtime environment. Read rather than run, because nothing here
+#: builds an image (#81) and the last two mistakes in this file both looked correct.
+SYNC = re.compile(r"^RUN uv sync .*$", re.M)
+
+
+def sync_line() -> str:
+    found = SYNC.findall(DOCKERFILE.read_text(encoding="utf-8"))
+    assert len(found) == 1, f"expected one `uv sync` line, found {len(found)}"
+    return found[0]
+
+
+def test_the_sync_excludes_every_dependency_group():
+    """#154: `--no-dev` omits the group called `dev` and nothing else.
+
+    `pyproject.toml` declares `dev` and `e2e` and puts both in `default-groups`, so a line
+    saying `--no-dev` reads correctly and installs Playwright anyway — 136 MB of browser test
+    tool, bundling a Node.js runtime, in an image that runs neither. Naming groups to exclude
+    goes stale the moment a third is added; excluding all of them does not.
+    """
+    line = sync_line()
+
+    assert "--no-default-groups" in line, line
+    assert "--no-dev" not in line, "names one group and misses the others"
+
+
+def test_the_sync_keeps_no_download_cache():
+    """uv unpacks every wheel into its cache and keeps it: 296 MB of a single-stage image.
+
+    Deleting it in a later layer frees nothing — the bytes are already below — so it has to
+    not be written in the first place.
+    """
+    assert "--no-cache" in sync_line(), sync_line()
+
+
+def test_every_group_in_the_project_is_covered_by_that_flag():
+    """The reason `--no-default-groups` is the right flag, asserted rather than assumed.
+
+    If somebody adds a third group tomorrow, this test keeps passing — which is the whole
+    point. It fails only if `default-groups` stops naming what the Dockerfile relies on.
+    """
+    import tomllib
+
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    groups = set(project.get("dependency-groups", {}))
+    defaults = set(project.get("tool", {}).get("uv", {}).get("default-groups", []))
+
+    assert defaults <= groups, (
+        f"default-groups names a group that does not exist: {defaults - groups}"
+    )
+    assert len(groups) > 1, "with one group `--no-dev` would have been enough; this guards the rest"
