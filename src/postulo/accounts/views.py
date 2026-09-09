@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from allauth.account.decorators import reauthentication_required
+from allauth.account.views import LoginView as AllauthLoginView
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -377,3 +378,44 @@ class RecoverySetPasswordView(View):
         request.session.pop(RECOVERY_SESSION_KEY, None)
         messages.success(request, _("Your password is set. Sign in with it."))
         return redirect("account_login")
+
+
+# ------------------------------------------- signing in with a code sent by email
+
+
+class SignInView(AllauthLoginView):
+    """allauth's sign-in page, with one fact in its context corrected.
+
+    allauth decides whether to offer "send me a code" from a Django setting read at import,
+    because that is also when it builds its URLs. Postulo's answer is an administrator's,
+    read from the database and from whether mail is actually delivering (#152, #153) — so the
+    door is always built and this says whether it is open.
+
+    A subclass rather than a copy of the template: the page is allauth's and should go on
+    being allauth's, or every release of theirs becomes a merge here.
+    """
+
+    def get_context_data(self, **kwargs) -> dict:
+        from postulo.core import site
+
+        context = super().get_context_data(**kwargs)
+        context["LOGIN_BY_CODE_ENABLED"] = site.email_sign_in()
+        return context
+
+
+class RequestLoginCodeView(View):
+    """The door allauth built, opened only where this instance offers it.
+
+    Refuses with 404 rather than a redirect, because the honest statement is that this
+    instance has no such page — a statement about policy, not about any account. Nothing
+    here consults an address, so there is nothing to learn by asking.
+    """
+
+    def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        from allauth.account.views import request_login_code
+
+        from postulo.core import site
+
+        if not site.email_sign_in():
+            raise Http404("Signing in by email is not offered here.")
+        return request_login_code(request, *args, **kwargs)

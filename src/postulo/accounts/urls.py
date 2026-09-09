@@ -5,6 +5,11 @@ from . import views
 app_name = "accounts"
 
 urlpatterns = [
+    # Postulo's own sign-in page and its by-code door, both shadowing allauth's paths so
+    # that whether the instance offers a code is a decision read at request time rather than
+    # one frozen into the URL table at import (#153). allauth's names still reverse here.
+    path("login/", views.SignInView.as_view(), name="login"),
+    path("login/code/", views.RequestLoginCodeView.as_view(), name="login_code"),
     path("profile/", views.ProfileView.as_view(), name="profile"),
     path("theme/", views.ThemeView.as_view(), name="theme"),
     path("avatar/<int:pk>/", views.AvatarView.as_view(), name="avatar"),

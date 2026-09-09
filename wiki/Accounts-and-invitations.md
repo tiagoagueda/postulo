@@ -303,3 +303,40 @@ mail transport go. **That covers getting existing people back in, and nothing el
 account still has to verify an address before it exists, so an instance with mail switched
 off can recover the people it has and cannot admit new ones. The Email page says so where you
 would act on it, rather than leaving you to find out when the first sign-up fails.
+
+## Signing in with a code sent by email
+
+*Server settings → Sign-in* can offer a fourth way in: somebody who has forgotten their
+password asks for a code at their primary address and types it back.
+
+**A code, not a link**, and the reason is practical rather than theoretical. A link is a
+bearer credential that works from anywhere, and corporate mail scanners *follow links* —
+Defender, Proofpoint and their kind fetch every URL in a message, which spends a single-use
+link before the recipient has read the mail. Postulo's people correspond with recruiters, so
+some of them have exactly that kind of mail. A code typed back into the browser that asked for
+it cannot be burned by a scanner, cannot be usefully forwarded, and cannot be used from a
+device that is not the one signing in.
+
+**It is never a second factor.** Somebody with an authenticator app is still asked for it
+after the code. There is no setting to change that, and that is where this deliberately
+parts company with *single sign-on counts as the second factor*: that setting exists because
+an identity provider may itself have checked identity carefully and Postulo cannot see how. A
+code out of an inbox has no provider behind it to trust, so there is nothing for an operator
+to decide and no switch to leave in the wrong position.
+
+**It is only offered while mail actually works.** Not while it is *configured* — while it is
+delivering. Offering sign-in by email on an instance whose relay is broken is a page promising
+something it cannot do, to somebody who may have no other way in.
+
+**It goes to the primary address**, so changing which address is primary moves it. *Settings →
+Account* says so beside the addresses rather than leaving you to find out.
+
+The code lasts three minutes, three wrong guesses end the attempt, and three resends are the
+most one request will send — each resend is an email somebody may not have asked for.
+`POSTULO_EMAIL_CODE_TIMEOUT`, `POSTULO_EMAIL_CODE_ATTEMPTS` and `POSTULO_EMAIL_CODE_RESENDS`
+change those. The browser is never remembered: a one-off code must not become a standing
+credential on a machine that may not be yours next week.
+
+**It makes the mailbox more load-bearing, and that is worth saying plainly.** Anybody who
+holds the mailbox holds the account, without needing to complete a password reset. That was
+nearly true already — a reset goes to the same place — but with this it is one step shorter.

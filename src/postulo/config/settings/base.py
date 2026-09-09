@@ -202,6 +202,32 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_MAX_EMAIL_ADDRESSES = 5
 ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
 
+# Signing in with a code sent to the primary address (#153). This is on so that allauth
+# registers the route -- it reads this at import to build its URLs -- and *whether the
+# instance offers it* is an administrator's decision read at request time, from the database
+# and from whether mail is actually delivering. `postulo.core.site.email_sign_in` is the
+# answer that matters; this constant only decides that the door exists.
+#
+# A code and not a link, deliberately, and the reason is not theoretical. A link is a bearer
+# credential that works from anywhere, and corporate mail scanners *follow links* -- Defender,
+# Proofpoint and their kind fetch every URL in a message, which spends a single-use link
+# before the recipient has read the mail. Postulo's people correspond with recruiters, so
+# some of them have exactly that mail. A code typed back into the browser that asked for it
+# cannot be burned by a scanner, cannot be usefully forwarded, and cannot be used from a
+# device that is not the one signing in.
+ACCOUNT_LOGIN_BY_CODE_ENABLED = True
+# Three minutes is allauth's default and it is right: long enough for mail to arrive, short
+# enough that a code left in an inbox stops being a key.
+ACCOUNT_LOGIN_BY_CODE_TIMEOUT = env.int("POSTULO_EMAIL_CODE_TIMEOUT", default=180)
+ACCOUNT_LOGIN_BY_CODE_MAX_ATTEMPTS = env.int("POSTULO_EMAIL_CODE_ATTEMPTS", default=3)
+# Resends bounded because each one is an email somebody may not have asked for: a person who
+# mistypes an address they do not own can otherwise send a stranger a stream of them.
+ACCOUNT_LOGIN_BY_CODE_MAX_RESEND_COUNT = env.int("POSTULO_EMAIL_CODE_RESENDS", default=3)
+# Never. Remembering the browser turns a one-off code into a standing credential on a machine
+# that may not be theirs next week, and this is a route for somebody who has lost their
+# password rather than a way to stop typing it.
+ACCOUNT_LOGIN_BY_CODE_TRUST_ENABLED = False
+
 # Ways of proving who you are beyond a password, all opt-in per person under
 # Settings → Account:
 #

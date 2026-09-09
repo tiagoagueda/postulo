@@ -21,6 +21,18 @@
         <h3 class="font-medium">{% translate "Email addresses" %}</h3>
         <p class="text-sm text-ink-500 dark:text-ink-400">
           {% translate "Any of them signs you in. The primary one receives Postulo's mail." %}
+          {% comment %} Said here rather than left to be discovered: on an instance that
+             offers it, the primary address is also a way into the account, so changing
+             which one is primary moves that with it (#153). {% endcomment %}
+          {% if email_sign_in %}
+            <span data-email-sign-in>
+              {% blocktranslate trimmed %}
+                It also gets you back in: ask for a sign-in code and it arrives there. Making
+                a different address primary moves that with it. You are still asked for your
+                authenticator app if you have one.
+              {% endblocktranslate %}
+            </span>
+          {% endif %}
         </p>
       </div>
       <a href="{{ email_url }}" class="btn-secondary shrink-0">{% translate "Manage" %}</a>

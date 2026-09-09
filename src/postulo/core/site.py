@@ -114,6 +114,21 @@ def sso_is_second_factor() -> bool:
     return bool(settings.POSTULO_OIDC_IS_SECOND_FACTOR) if stored is None else stored
 
 
+def email_sign_in() -> bool:
+    """Whether this instance offers signing in with a code sent by email.
+
+    Two conditions, and the second is the one #152 exists for: an administrator has said yes,
+    **and** mail is actually getting through. Offering it on an instance whose relay is broken
+    is a sign-in page promising something it cannot do, to somebody who may have no other way
+    in — which is the worst moment to be optimistic.
+    """
+    if not current().email_sign_in:
+        return False
+    from postulo.notifications import transport
+
+    return transport.selected() is not None and mail_delivers()
+
+
 def default_time_zone() -> str:
     if overridden_by("default_time_zone"):
         return settings.TIME_ZONE

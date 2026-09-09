@@ -382,6 +382,24 @@ class SiteSettings(models.Model):
             "code as well."
         ),
     )
+    #: Whether somebody may sign in with a code sent to their primary address (#153).
+    #:
+    #: Nullable and off unless an administrator says otherwise, because turning it on makes
+    #: the mailbox load-bearing in a new way: today email resets a password, and with this it
+    #: signs somebody in. That was already nearly true — anybody holding the mailbox could
+    #: complete a reset — but it is worth an operator deciding rather than inheriting.
+    #:
+    #: It is **not** a second factor and there is no setting to make it one, which is where
+    #: this deliberately parts company with `sso_is_second_factor`. That setting exists
+    #: because an identity provider may itself have checked identity carefully, and Postulo
+    #: cannot see how; a code out of an inbox has no such provider behind it. Somebody with an
+    #: authenticator is still asked for it.
+    email_sign_in = models.BooleanField(
+        _("sign in with a code sent by email"),
+        null=True,
+        blank=True,
+        help_text=_("Offered only while this instance's mail is actually getting through."),
+    )
     default_language = models.CharField(_("default language"), max_length=10, blank=True)
     #: Which languages this instance offers, as a list of codes. **Empty means all of
     #: them**, and that is not the same as a list naming every one: an instance whose

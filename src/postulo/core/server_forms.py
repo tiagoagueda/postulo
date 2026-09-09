@@ -57,9 +57,20 @@ class SignInForm(forms.ModelForm):
         ),
     )
 
+    email_sign_in = PolicyField(
+        label=_("Sign in with a code sent by email"),
+        help_text=_(
+            "Yes: somebody who has forgotten their password can ask for a code at their "
+            "primary address and type it back. A code rather than a link, because mail "
+            "scanners follow links and would spend one before the person read it. It is "
+            "never a second factor: an authenticator app is still asked for. Offered only "
+            "while this instance's mail is actually getting through."
+        ),
+    )
+
     class Meta:
         model = SiteSettings
-        fields = ("registration_open", "sso_is_second_factor")
+        fields = ("registration_open", "sso_is_second_factor", "email_sign_in")
 
 
 class CaptureForm(forms.ModelForm):

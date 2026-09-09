@@ -208,6 +208,14 @@ def signed_in_paths(a, c, me) -> list[str]:
     ]
 
 
+def _offer_signing_in_by_code() -> None:
+    from postulo.core.models import SiteSettings
+
+    SiteSettings.objects.update_or_create(
+        pk=1, defaults={"email_sign_in": True, "mail_failures": 0}
+    )
+
+
 def _a_recovery_link_for(person) -> str:
     """A live token, so the form the link leads to can be looked at like any other page."""
     from postulo.accounts import recovery
@@ -220,8 +228,12 @@ def _a_recovery_link_for(person) -> str:
 def test_the_entrance_pages_have_no_violations(live_server, page: Page, axe_source, db, scheme):
     page.emulate_media(color_scheme=scheme)
     base = live_server.url
+    # Signing in by code is an administrator's decision and is off by default (#153), so the
+    # page only exists once somebody has said yes. Switched on here so the walk can look at
+    # it like any other entrance page.
+    _offer_signing_in_by_code()
     failures = []
-    for path in ("/accounts/login/", "/accounts/password/reset/", "/"):
+    for path in ("/accounts/login/", "/accounts/password/reset/", "/accounts/login/code/", "/"):
         page.goto(f"{base}{path}")
         found = violations_on(page, axe_source)
         if found:
@@ -460,6 +472,8 @@ VISITED_URL_NAMES: tuple[str, ...] = (
     "server:person_username",
     "server:person_delete",
     "server:person_recovery",
+    "accounts:login",
+    "accounts:login_code",
     "accounts:recovery_open",
     "accounts:recovery_set",
     "server:signin",

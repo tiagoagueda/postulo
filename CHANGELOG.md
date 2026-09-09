@@ -201,6 +201,37 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **An instance can offer signing in with a code sent to the primary address.** allauth has
+  carried the feature all along and it was switched off; what was missing was the decisions.
+  *Server settings → Sign-in* now has the switch, off until an administrator says otherwise.
+
+  **A code and not a link, which is where this parts company with the request.** A link is a
+  bearer credential that works from anywhere, and corporate mail scanners *follow links* —
+  Defender, Proofpoint and their kind fetch every URL in a message, which spends a single-use
+  link before the recipient has read the mail. Postulo's people correspond with recruiters, so
+  some of them have exactly that mail. A code typed back into the browser that asked for it
+  cannot be burned by a scanner, cannot be usefully forwarded, and cannot be used from a device
+  that is not the one signing in.
+
+  **It is never a second factor, and there is no setting to make it one.** Somebody with an
+  authenticator is still asked for it — asserted in `tests/security/` rather than assumed,
+  with its companion proving the flow works at all so the assertion is about the factor and
+  not about a broken path. This is a deliberate departure from `sso_is_second_factor`: that
+  setting exists because an identity provider may itself have checked identity carefully and
+  Postulo cannot see how, while a code out of an inbox has no provider behind it to trust. So
+  there is nothing for an operator to decide and no switch to leave in the wrong position.
+
+  **Offered only where mail is actually delivering**, not merely configured — which is what
+  the mail-health work was for. A sign-in page promising something it cannot do, to somebody
+  who may have no other way in, is the worst place to be optimistic. The switch and the page
+  both read the same answer, and both close again if mail starts failing.
+
+  Three minutes, three guesses, three resends, and the browser is never remembered — a one-off
+  code must not become a standing credential on a machine that may not be theirs next week.
+  The code goes to the primary address, so *Settings → Account* now says that changing which
+  address is primary moves it. And the whole thing makes the mailbox more load-bearing, which
+  the settings page says in as many words rather than leaving to be discovered. (#153)
+
 - **A confirmed telephone number can be the way back into an account**, joining email and a
   passkey — and on this release no number is one anywhere, because nothing can confirm a
   number until an operator installs a text gateway. The route exists and refuses to pretend,

@@ -85,6 +85,8 @@ class AccountView(SettingsSectionMixin, UpdateView):
         context["email_url"] = reverse("account_email")
         context["password_url"] = reverse("account_change_password")
         context["mfa_enabled"] = get_mfa_adapter().is_mfa_enabled(self.request.user)
+        # A fourth way in, on a page that already explains three (#153).
+        context["email_sign_in"] = site.email_sign_in()
         context["mfa_url"] = reverse("mfa_index")
         context["passkeys"] = passkeys.summary(self.request.user, self.request)
         context["sso_is_second_factor"] = site.sso_is_second_factor()
