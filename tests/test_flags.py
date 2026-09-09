@@ -213,9 +213,31 @@ def test_the_stylesheet_keeps_a_white_edged_flag_from_disappearing():
     card behind them takes that edge away. An outline rather than an inset shadow, because a
     replaced element paints its image over an inset shadow and under nothing at all."""
     css = (REPO / "src" / "postulo" / "static" / "css" / "app.css").read_text(encoding="utf-8")
-    rule = re.search(r"\.flag\{[^}]*\}", css)
+    rule = _block(css, ".flag {")
     assert rule, "no .flag rule in the compiled stylesheet"
-    assert "outline" in rule.group(0)
-    assert re.search(r"\.flag:where\(\[data-theme=dark\][^)]*\)\{[^}]*outline-color", css), (
+    assert "outline" in rule
+    assert re.search(r'\[data-theme="dark"\][^}]*\{[^}]*outline-color', rule, re.S), (
         "the outline does not change in the dark theme"
     )
+
+
+def _block(css: str, opener: str) -> str:
+    """One rule and everything nested inside it, found by counting braces.
+
+    Since #159 the committed stylesheet is written out rather than minified, and Tailwind
+    writes the dark-theme branch *nested* inside the rule rather than flattened into a
+    second selector. Both facts asserted above are unchanged; where to read them is not,
+    and an expression that stops at the first `}` now stops in the middle of the rule.
+    """
+    start = css.find(opener)
+    if start < 0:
+        return ""
+    depth = 0
+    for index in range(start, len(css)):
+        if css[index] == "{":
+            depth += 1
+        elif css[index] == "}":
+            depth -= 1
+            if depth == 0:
+                return css[start : index + 1]
+    return ""
