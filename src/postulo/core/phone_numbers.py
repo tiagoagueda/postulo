@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from django import forms
 from django.contrib.contenttypes import forms as generic_forms
-from django.db import transaction
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from . import phone_field, phones
@@ -67,6 +67,42 @@ def kept_back(holder, person) -> int:
     return holder.phone_numbers.exclude(is_primary=True).count()
 
 
+def mine(person) -> models.QuerySet[PhoneNumber]:
+    """The numbers belonging to this person's own profile, and nothing else.
+
+    `PhoneNumber` has a generic holder, so one row belongs to a profile and the next to a
+    contact at a company — both owned by the same account. "My numbers" is therefore a query
+    and not a field, and anything touching recovery has to ask it that way: a recruiter's
+    switchboard is a number this account *owns* and never a number this account *is*.
+    """
+    from django.contrib.contenttypes.models import ContentType
+
+    profile = getattr(person, "profile", None)
+    if profile is None or profile.pk is None:
+        return PhoneNumber.objects.none()
+    return PhoneNumber.objects.filter(
+        content_type=ContentType.objects.get_for_model(type(profile)),
+        object_id=profile.pk,
+    )
+
+
+def recovery_candidates(person) -> list[PhoneNumber]:
+    """This person's numbers that could get them back into their account.
+
+    Three conditions, and all three are load-bearing. The number is one of *theirs*, not one
+    they merely recorded. It was proved, which today means none of them are: nothing can send
+    to a number yet (#143), so this list is empty on every instance and that is the correct
+    answer rather than a placeholder. And the proof is still fresh, because carriers reissue
+    numbers and a stale proof describes somebody who may no longer answer there.
+    """
+    return [row for row in mine(person) if row.is_verified]
+
+
+def can_get_back_in(person) -> bool:
+    """Whether a telephone number is a way back in for this person, today."""
+    return bool(recovery_candidates(person))
+
+
 def taken_elsewhere(number: str, *, exclude_pk: int | None = None) -> bool:
     """Whether some other row on this instance already holds this number.
 
@@ -81,6 +117,54 @@ def taken_elsewhere(number: str, *, exclude_pk: int | None = None) -> bool:
     if exclude_pk is not None:
         rows = rows.exclude(pk=exclude_pk)
     return rows.exists()
+
+
+#: What somebody is told once they have been given that answer too many times in an hour.
+#: Honest about what happened rather than vague about it: a message that pretended the save
+#: failed for some other reason would be a lie, and would still refuse the save, so it would
+#: disclose the same thing while sounding evasive.
+ASKED_TOO_OFTEN = _(
+    "You have been told about a lot of numbers already recorded here. That answer is "
+    "available again in %(minutes)d minutes."
+)
+
+
+def collision_message(person) -> str:
+    """The sentence for a number that is already here, while this account may still have it.
+
+    The disclosure itself was decided in #90 and cannot be avoided: instance-wide uniqueness
+    cannot be enforced without telling whoever typed a number that somebody else may hold it.
+    What changes once a number identifies an account is the *rate* — the same honest sentence,
+    asked five hundred times, is a list of which numbers have accounts here, which is the
+    shape of email enumeration and wants the same care (#142).
+
+    So the answer is bounded rather than blurred. Somebody editing their own numbers never
+    meets the limit; somebody sweeping a numbering range meets it within a minute.
+    """
+    from . import throttle
+
+    try:
+        collision_noticed(person)
+    except throttle.TooOften as too_often:
+        return str(ASKED_TOO_OFTEN % {"minutes": max(1, round(too_often.retry_after / 60))})
+    return str(ALREADY_IN_USE)
+
+
+def collision_noticed(person) -> None:
+    """Spend one of this account's chances to learn that a number is already here.
+
+    The uniqueness rule cannot be enforced without telling whoever typed a number that
+    somebody else may hold it — that disclosure was decided in #90 and written down. What
+    changes once a number identifies an account is the *rate*: the same answer, asked five
+    hundred times, is a list of which numbers have accounts here, which is the shape of email
+    enumeration and wants the same care (#142).
+
+    Only the informative answer is charged for. Somebody editing their own numbers never
+    meets this; somebody sweeping a range meets it on every question worth asking.
+    """
+    from . import throttle
+
+    throttle.consume("number-collision", person, throttle.rate_for("POSTULO_NUMBER_RATE"))
 
 
 @transaction.atomic
@@ -164,6 +248,11 @@ class PhoneNumberForm(forms.ModelForm):
 class BasePhoneNumberFormSet(generic_forms.BaseGenericInlineFormSet):
     """The rows together: nothing listed twice, here or anywhere else on the instance."""
 
+    #: Who is answering, for the collision limit. Set by `formset_for`; `None` where a
+    #: formset is built directly, in which case the limit has nobody to charge and the
+    #: honest sentence is given.
+    asked_by = None
+
     def clean(self) -> None:
         super().clean()
         seen: set[str] = set()
@@ -181,7 +270,7 @@ class BasePhoneNumberFormSet(generic_forms.BaseGenericInlineFormSet):
                 form.add_error("number", _("This number is already listed."))
             seen.add(normalised)
             if taken_elsewhere(typed, exclude_pk=form.instance.pk):
-                form.add_error("number", ALREADY_IN_USE)
+                form.add_error("number", collision_message(self.asked_by))
 
     def save(self, commit: bool = True):
         """Save the rows, then settle which of them is the primary.
@@ -210,8 +299,20 @@ class BasePhoneNumberFormSet(generic_forms.BaseGenericInlineFormSet):
         return saved
 
 
-def formset_for(holder, *, default_country: str = "", data=None, prefix: str = "phone_numbers"):
-    """The rows for one holder, ready to render or to save."""
+def formset_for(
+    holder,
+    *,
+    default_country: str = "",
+    data=None,
+    prefix: str = "phone_numbers",
+    asked_by=None,
+):
+    """The rows for one holder, ready to render or to save.
+
+    `asked_by` is who is answering the form, which the collision limit is keyed on. It is the
+    account rather than the holder because a holder may be a contact at a company, and the
+    thing being bounded is how many numbers *one person* can ask about.
+    """
     factory = generic_forms.generic_inlineformset_factory(
         PhoneNumber,
         form=PhoneNumberForm,
@@ -219,9 +320,11 @@ def formset_for(holder, *, default_country: str = "", data=None, prefix: str = "
         extra=1,
         can_delete=True,
     )
-    return factory(
+    formset = factory(
         data=data,
         instance=holder,
         prefix=prefix,
         form_kwargs={"default_country": default_country},
     )
+    formset.asked_by = asked_by
+    return formset

@@ -8,6 +8,44 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **A telephone number now has a verified state, and on this release nothing is verified.**
+  That is the point rather than a shortfall. Numbers have been storable since they arrived,
+  unique across the instance and first-come-first-served, with no way to prove one — which was
+  fine while nothing depended on them. It stops being fine the moment a number can get somebody
+  back into their account: every number typed before that day is a claim nobody checked, and
+  whoever typed a stranger's number a month ago would be pre-positioned.
+
+  **So the migration adds a column and nothing else.** No existing row is promoted. A test
+  asserts the migration contains a single `AddField`, because granting verification
+  retroactively is the kind of thing that looks like a convenience and is a way into somebody's
+  account.
+
+  **Proving a number means sending a code to it**, which needs a channel that can reach one, and
+  Postulo has none. That is a strict order rather than a preference: no channel, no
+  verification; no verification, no way back in. `record_verified()` exists and nothing calls it.
+
+  Three rules are settled now so they are not settled under pressure later. A proof **lapses
+  after a year**, because people give up numbers and carriers reissue them — an address is
+  forever in a way a number is not, and a stale proof describes somebody who may no longer
+  answer there. **Editing the digits forgets the proof**, dropped in `save()` rather than in a
+  form, so a row written by the API or a shell cannot keep a verification that was never about
+  the number now stored. And only numbers on the account's **own profile** are candidates: a
+  recruiter's switchboard is a number this account owns and never one it is, which is a query
+  and not a field because the holder is generic.
+
+  **An archive cannot carry a claim of verification in.** The export writes the date, because it
+  is the person's own record; the import reads it and throws it away, with a comment saying so,
+  because a claim made by another instance is one this one never checked. `FORMAT_VERSION` is 6.
+
+  **Being told a number is already here is now rate-limited.** The disclosure is unavoidable —
+  instance-wide uniqueness cannot be enforced without it — and that was decided and written down
+  when numbers arrived. What changes once a number identifies an account is the rate: the same
+  honest sentence, asked five hundred times, is a list of which numbers have accounts here,
+  which is the shape of email enumeration. Twenty an hour, and then Postulo says when the answer
+  is available again rather than pretending the save failed for some other reason. Only the
+  informative answer is charged for, so recording your own numbers never meets it.
+  `POSTULO_NUMBER_RATE` sets it; empty switches it off. (#142)
+
 - **A mail server is a host the server dials, and nothing checked where.** Postulo already
   guards a URL somebody typed with three careful rules, and none of them were on the path a
   mail backend takes: Django opens a socket to a host and a port and asks nothing at all.

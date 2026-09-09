@@ -326,7 +326,7 @@ class ProfileForm(forms.ModelForm):
         if typed and phone_numbers.taken_elsewhere(
             typed, exclude_pk=primary.pk if primary else None
         ):
-            raise forms.ValidationError(phone_numbers.ALREADY_IN_USE)
+            raise forms.ValidationError(phone_numbers.collision_message(self.instance.user))
         return typed
 
     def save(self, commit: bool = True) -> Profile:

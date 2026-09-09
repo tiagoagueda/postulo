@@ -146,6 +146,11 @@ def _restore_phone_numbers(holder, owner, rows: list[dict]) -> None:
         if taken_elsewhere(number):
             continue
         wants_primary = bool(row.get("is_primary")) and not primary_taken
+        # `verified_at` is read from the file and thrown away, deliberately and visibly.
+        # An archive is a claim, and a claim of verification made by another instance is a
+        # claim this one never checked; landing it verified would import a way back into an
+        # account from a file (#142). Nothing here sets it, and this comment is why.
+        row.pop("verified_at", None)
         PhoneNumber.objects.create(
             owner=owner,
             holder=holder,

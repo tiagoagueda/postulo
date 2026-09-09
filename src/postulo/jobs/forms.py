@@ -365,7 +365,7 @@ class ContactForm(OwnerScopedModelForm):
         if typed and phone_numbers.taken_elsewhere(
             typed, exclude_pk=primary.pk if primary else None
         ):
-            raise forms.ValidationError(phone_numbers.ALREADY_IN_USE)
+            raise forms.ValidationError(phone_numbers.collision_message(self.user))
         return typed
 
     def scope_querysets(self) -> None:

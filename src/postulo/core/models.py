@@ -148,6 +148,19 @@ class PhoneNumber(OwnedModel):
     #: form: a value the constraint depends on cannot be somebody's to type.
     normalised = models.CharField(max_length=40, blank=True, db_index=True)
     is_primary = models.BooleanField(_("primary"), default=False)
+    #: When somebody proved they hold this number, or NULL for never. NULL is the only
+    #: state any existing row may have: numbers have been storable and first-come-first-
+    #: served since #90, so every one recorded before this existed is a claim nobody
+    #: checked. A migration granting them verification would pre-position whoever typed a
+    #: stranger's number a month ago, which is why this starts empty and is earned (#142).
+    verified_at = models.DateTimeField(_("verified"), null=True, blank=True)
+
+    #: How long a proof lasts before it is worth asking again. An address is forever in a
+    #: way a number is not: people give up numbers and carriers reissue them, so a proof
+    #: from three years ago describes somebody who may no longer be reachable there. A
+    #: year is long enough not to nag and short enough that a reissued number stops being
+    #: a way into an account within one.
+    VERIFICATION_LASTS = timedelta(days=365)
 
     class Meta:
         verbose_name = _("telephone number")
@@ -171,10 +184,19 @@ class PhoneNumber(OwnedModel):
         return self.number
 
     def save(self, *args, **kwargs):
+        previous = self.normalised
         self.number = (self.number or "").strip()
         self.normalised = phones.normalise(self.number)
         if self.kind != self.Kind.OTHER:
             self.label = ""
+        # Editing the digits makes this a different number, and a proof of the old one says
+        # nothing about the new. Dropped here rather than in a form, because a row saved by
+        # the API, a management command or a shell would otherwise keep a verification that
+        # was never about the number now stored (#142).
+        if self.pk and previous and previous != self.normalised:
+            self.verified_at = None
+            if "update_fields" in kwargs and kwargs["update_fields"] is not None:
+                kwargs["update_fields"] = {*kwargs["update_fields"], "verified_at"}
         return super().save(*args, **kwargs)
 
     @property
@@ -188,6 +210,46 @@ class PhoneNumber(OwnedModel):
         if self.kind == self.Kind.OTHER:
             return self.label
         return str(self.Kind(self.kind).label) if self.kind else ""
+
+    # ------------------------------------------------------- whether it was proved
+
+    @property
+    def is_verified(self) -> bool:
+        """Proved, and recently enough to still mean something.
+
+        The freshness half is not decoration. A number a carrier has reissued is somebody
+        else's handset answering to a proof this instance recorded, and that is the failure
+        mode an email address does not have.
+        """
+        from django.utils import timezone
+
+        if self.verified_at is None:
+            return False
+        return timezone.now() - self.verified_at <= self.VERIFICATION_LASTS
+
+    @property
+    def verification_has_lapsed(self) -> bool:
+        """Proved once, too long ago. A different state from never, and worth saying so."""
+        return self.verified_at is not None and not self.is_verified
+
+    def record_verified(self) -> None:
+        """Somebody answered on this number, and this is the only thing that may say so.
+
+        Nothing calls it yet, and that is the order the work has rather than an omission:
+        proving a number means sending a code to it, which needs a channel that can reach
+        one (#143). No channel, no verification; no verification, no way back in.
+        """
+        from django.utils import timezone
+
+        self.verified_at = timezone.now()
+        self.save(update_fields=["verified_at", "updated_at"])
+
+    def forget_verification(self) -> None:
+        """Unprove it, because the number itself changed and that is a new claim."""
+        if self.verified_at is None:
+            return
+        self.verified_at = None
+        self.save(update_fields=["verified_at", "updated_at"])
 
 
 class MailSecurity(models.TextChoices):

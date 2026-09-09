@@ -352,6 +352,12 @@ POSTULO_ENDPOINT_RATE = env("POSTULO_ENDPOINT_RATE", default="120/h")
 # setting anybody would remember to configure. Five an hour is more than somebody who did
 # not receive the first one needs, and few enough to be useless as a way to bother anybody.
 POSTULO_CONFIRMATION_RATE = env("POSTULO_CONFIRMATION_RATE", default="5/h")
+# How often one account may be told that a telephone number is already recorded here. The
+# disclosure itself is deliberate and documented (#90); what this bounds is asking it five
+# hundred times, which turns one honest sentence into a list of the numbers with accounts
+# here. Charged only when the answer is the informative one, so somebody editing their own
+# numbers never meets it (#142).
+POSTULO_NUMBER_RATE = env("POSTULO_NUMBER_RATE", default="20/h")
 
 # ---------------------------------------------------------- internationalisation
 

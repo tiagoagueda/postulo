@@ -108,7 +108,9 @@ def add_contact(request, pk: int, payload: ContactIn):
     # silently given a contact without one.
     number = (fields.pop("phone", "") or "").strip()
     if number and phone_numbers.taken_elsewhere(number):
-        raise HttpError(422, str(phone_numbers.ALREADY_IN_USE))
+        # The API is the surface a sweep would actually use, so it is bounded exactly as
+        # the form is -- one limit, keyed on the account rather than on the token (#142).
+        raise HttpError(422, phone_numbers.collision_message(request.auth.owner))
     contact = Contact.objects.create(owner=request.auth.owner, company=company, **fields)
     if number:
         phone_numbers.save_only_number(contact, request.auth.owner, number)

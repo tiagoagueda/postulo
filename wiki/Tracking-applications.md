@@ -109,8 +109,27 @@ Two things sit outside the rule. A number Postulo could not parse has no compara
 it is kept as you typed it and collides with nothing. And a number that was already recorded
 twice before the rule arrived is left alone; the first time you edit one, Postulo tells you.
 
-Numbers are unique but **unverified**: Postulo cannot send an SMS and is not going to start.
-The first account to type a number holds it.
+A number carries a **verified** state, and on this release nothing is ever verified. Proving a
+number means sending a code to it, and Postulo cannot yet send to a number at all — so every
+number here is a claim nobody checked, and the first account to type one holds it.
+
+That is written down rather than left implied, because the state exists for what comes next: a
+number that could get you back into your account has to be one you proved you hold. When that
+lands, **no number recorded before it will be promoted.** Numbers have been first-come
+first-served since they arrived; granting them verification retroactively would hand a way into
+an account to whoever typed a stranger's number a month ago. Verification will start empty and
+be earned, whatever churn that causes.
+
+Two more things about that state, decided now so they are not decided under pressure later. A
+proof will **lapse after a year** — people give up numbers and carriers reissue them, which is
+a failure mode an email address does not have. And only numbers on **your own profile** will
+ever count: a recruiter's switchboard is a number you recorded, never a number you are.
+
+Being told a number is already recorded here is now **rate-limited**. The disclosure itself is
+unavoidable and deliberate; the same honest sentence asked five hundred times is a list of
+which numbers have accounts here, so after a score of them in an hour Postulo says when the
+answer will be available again instead. You will not meet this while recording your own
+numbers: only the informative answer is counted.
 
 ## Two views of the same thing
 
