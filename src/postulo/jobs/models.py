@@ -24,7 +24,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core.identifiers import COMPANY, require, scheme_field
 from postulo.core.models import OwnedModel, OwnedQuerySet
 
-from . import identifiers
+from . import identifiers, industries
 
 
 class Industry(OwnedModel):
@@ -38,8 +38,13 @@ class Industry(OwnedModel):
     "fintech" are one industry.
     """
 
-    name = models.CharField(_("name"), max_length=60)
-    slug = models.SlugField(_("slug"), max_length=60)
+    name = models.CharField(_("name"), max_length=160)
+    slug = models.SlugField(_("slug"), max_length=160)
+    #: The NACE division this name is, where it is one of them. Empty for a word somebody
+    #: made up, which is the ordinary case and not a lesser kind of industry -- the code is
+    #: what makes a report legible to an employment office that thinks in NACE, and nothing
+    #: else depends on it (#140).
+    code = models.CharField(_("NACE division"), max_length=4, blank=True)
 
     class Meta:
         verbose_name = _("industry")
@@ -54,7 +59,11 @@ class Industry(OwnedModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)[:60] or "other"
+            self.slug = slugify(self.name)[:160] or "other"
+        # The code follows the name rather than being set beside it. Renaming an industry
+        # to a division's name gives it that division; renaming it away takes it back. One
+        # invariant, and no way for the two to disagree (#140).
+        self.code = industries.code_for(self.name)
         super().save(*args, **kwargs)
 
     @classmethod
@@ -67,8 +76,8 @@ class Industry(OwnedModel):
         found: list[Industry] = []
         seen: set[str] = set()
         for raw in names:
-            name = str(raw).strip()[:60]
-            slug = slugify(name)[:60]
+            name = str(raw).strip()[:160]
+            slug = slugify(name)[:160]
             if not name or not slug or slug in seen:
                 continue
             seen.add(slug)

@@ -365,12 +365,28 @@ internal number, so a restored archive keeps its groups.
 
 **Industries** are the fields a company operates in, in your own words, and a company may
 be in several — a bank that is also an insurer and a software house is all three. Tick the
-ones you already use on the company form, or type new ones separated by commas; a starter
-list is suggested but never imposed. The companies table shows them all and filters by any
-of them, the search box matches them, Insights reports applications and outcomes by
-industry (a company in three fields counts in all three), and **Companies → Industries**
-is where you rename one, merge two spellings of the same thing, or delete a word you no
-longer use — deleting a word never deletes a company.
+ones you already use on the company form, or type new ones separated by commas. The
+companies table shows them all and filters by any of them, the search box matches them,
+Insights reports applications and outcomes by industry (a company in three fields counts in
+all three), and **Companies → Industries** is where you rename one, merge two spellings of
+the same thing, or delete a word you no longer use — deleting a word never deletes a
+company.
+
+**What the suggestions are.** Two vocabularies, in one list. First a short set of familiar
+words — *Software*, *Banking*, *Gaming* — because those are what people actually type. Then
+the 87 divisions of **NACE Rev. 2.1**, the European Union's classification of economic
+activities: everything from *Mining of metal ores* to *Water collection, treatment and
+supply*, which the short list had no word for. Eurostat publishes those names in all 24
+official EU languages, so they arrive already translated; in a language the EU does not
+publish, you see the English name and type your own word instead.
+
+**They are suggested and never imposed.** NACE classifies the *business*, not the job:
+applying to a bank's software team is applying to *Financial and insurance activities*,
+which is true of the employer and not much use to you. So *Fintech* remains a perfectly
+good industry, and always will. If the word you pick happens to be a NACE division, Postulo
+quietly records its code beside it — which is what makes a report legible to an employment
+office that thinks in those terms. Nothing you already had was renamed, merged or given a
+code retroactively.
 
 **Identifiers** tie a company to a public record, so it can be recognised wherever it turns
 up — in a spreadsheet you import, in a posting a browser extension captures, in another

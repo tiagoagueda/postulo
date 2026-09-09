@@ -1221,6 +1221,45 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **The list of areas of activity is a classification now, not thirty-two names somebody
+  wrote down.** The old list had *Gaming* and *E-commerce* and no *Mining*, no *Water
+  supply*, no *Arts*, and nothing at all for a third of the economy. The fix is not more
+  names: a hand-made list of two hundred would be two hundred names in thirty-nine
+  languages, carried by this project for ever.
+
+  So the suggestions are seeded from **NACE Rev. 2.1**, the European Union's statistical
+  classification of economic activities, at **division** level — 87 two-digit codes under
+  22 sections. That depth is a choice between three, not the file that was easiest to parse:
+  its 21 sections are coarser than the hand-made list ever was (*Information and
+  communication* was one word for software, telecoms, publishing and film), and its 615
+  classes are a form nobody fills in.
+
+  **The translations are the argument more than the taxonomy is.** Eurostat publishes NACE
+  in all 24 official EU languages, so 87 × 24 names arrive already written by the body that
+  maintains them, and not one of them is a string this project translates — they are
+  reference data in the same sense that a language's own name is. Where the EU publishes no
+  name, the English one stands: inventing NACE names for Catalan or Ukrainian would be
+  Postulo asserting a classification it does not maintain.
+
+  **It is a seed and never a closed list, because NACE classifies the business rather than
+  the job.** Somebody applying to a bank's software team is applying to *Financial and
+  insurance activities*, which is true of the employer and useless to the applicant. So the
+  vocabulary stays one set per person in their own words, *Fintech* remains a perfectly good
+  industry, and the short familiar names Postulo always offered stay at the top of the list
+  — those are what people type. A name that happens to be a division quietly carries its
+  code, which is what makes a report legible to an employment office that thinks in NACE.
+
+  **The licence was checked rather than assumed.** Reuse of Commission documents is
+  authorised under Decision 2011/833/EU, and the default licence for Commission-owned
+  content is CC BY 4.0 — attribution required, changes to be indicated. Both travel with the
+  data in `jobs/data/LICENCE.md`, which also says what was changed and how to replace the
+  file when Rev. 3 arrives. The revision is recorded inside the data rather than in a
+  variable name, because a list copied into a Python module gets copied again.
+
+  Nothing anybody already had was renamed, merged or given a code retroactively: the
+  migration adds a column, widens a name that was capped at sixty characters, and fills in
+  nothing. (#140)
+
 - **One registry of external identifiers, with a matrix saying which each one identifies.**
   The separation asked for already existed and was the least interesting part: a company's
   scheme could not appear on a person because of which module a form imported its choices

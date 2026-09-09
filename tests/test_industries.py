@@ -60,7 +60,10 @@ def test_a_typed_list_splits_on_the_usual_separators():
 def test_the_starter_list_is_a_suggestion_minus_what_you_have():
     names = starter.suggestions(exclude=["software", "Finance"])
     assert "Software" not in names and "Finance" not in names and "Insurance" in names
-    assert len(names) == len(starter.STARTER_INDUSTRIES) - 2
+    assert len({name.casefold() for name in names}) == len(names), "a name offered twice"
+    # Both vocabularies, and Postulo's own first: a datalist shows its options in order.
+    assert names[0] == "Information technology"
+    assert "Mining of metal ores" in names
 
 
 # ------------------------------------------------------------------------ forms

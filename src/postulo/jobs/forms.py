@@ -114,7 +114,11 @@ class CompanyForm(OwnerScopedModelForm):
 
     @property
     def suggestions(self) -> list[str]:
-        """Starter industries the person has not already got, for the input's datalist."""
+        """What the datalist offers: Postulo's short names, then the NACE divisions.
+
+        Minus anything this person already has, because a suggestion for something already
+        on their list is a line of noise (#140).
+        """
         return industries.suggestions(
             exclude=self.fields["industries"].queryset.values_list("name", flat=True)
         )
