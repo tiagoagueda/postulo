@@ -485,39 +485,36 @@ class LocaleForm(forms.ModelForm):
         fields = ("language", "time_zone")
 
     def language_groups(self) -> list[dict]:
-        """The language list, ready to render as rows rather than as a dropdown.
+        """The language list, ready to render as rows inside a disclosure.
 
-        A dropdown cannot do what this list needs. An ``<option>`` may carry ``lang`` and
-        nothing inside it, so a flag placed in the option text is read out by a screen
-        reader along with the name — "Greek flag, Ελληνικά" — and the name has to be
-        marked as being in its own language or it is pronounced with the wrong rules
-        entirely (#64). Rows solve both: the flag is hidden from the accessibility tree
-        because the name beside it already says what it is, and the name carries its own
-        ``lang``.
+        A dropdown cannot do what this list needs, and #119 asked for one. An ``<option>``
+        may carry ``lang`` and nothing inside it, so a flag placed in the option text is
+        read out by a screen reader along with the name — "Greek flag, Ελληνικά" — the name
+        has to be marked as being in its own language or it is pronounced with the wrong
+        rules entirely (#64), and a symbol saying how the translation was made would sit
+        *inside* an element claiming to be Greek while being neither Greek nor a word. Rows
+        solve all three, and the ``<details>`` around them answers the part of #119 that was
+        really about shape: one line closed, like the time zone beside it.
 
         What each option carries is the *country* whose flag stands for the language, not
         the flag itself; ``{% flag %}`` turns it into an image. It used to be the emoji,
         which Windows draws as two letters (#88).
 
-        Twenty-four rows also read better than a dropdown of twenty-four: somebody
-        looking for their language sees all of them at once.
+        ``state`` is how the translation was made, and the percentage comes out of the name
+        rather than staying appended to it: outside the ``lang`` span there is somewhere to
+        put it, which is exactly what a dropdown did not have.
         """
         from postulo.core import languages
 
         current = self["language"].value() or ""
+        status = languages.translation_status()
         groups = []
         for label, entries in language_choices()[1:]:
             groups.append(
                 {
                     "label": label,
                     "options": [
-                        {
-                            "code": code,
-                            "name": name,
-                            "country": languages.flag_country(code),
-                            "selected": code == current,
-                        }
-                        for code, name in entries
+                        self._language_option(code, name, current, status) for code, name in entries
                     ],
                 }
             )
@@ -531,11 +528,52 @@ class LocaleForm(forms.ModelForm):
                         "name": default[1],
                         "country": "",
                         "selected": not current,
+                        "state": "",
+                        "percent": None,
                     }
                 ],
             },
             *groups,
         ]
+
+    @staticmethod
+    def _language_option(code: str, name, current: str, status: dict) -> dict:
+        """One row: what it is called, whose flag stands for it, and how it was made."""
+        from postulo.core import languages
+
+        row = status.get(code) or {}
+        percent = row.get("percent") if row.get("total") else None
+        if percent is not None and percent < 95:
+            state = "partial"
+        elif row.get("drafts"):
+            state = "draft"
+        else:
+            state = "reviewed"
+            percent = None
+        return {
+            "code": code,
+            # `language_choices` appends the percentage to the name so that a dropdown has
+            # somewhere to show it. Here it does not have to: the name goes inside the span
+            # marked as being in that language, and the figure sits outside it in the
+            # interface language, where it belongs (#119).
+            "name": str(name).partition(" (")[0] if state == "partial" else name,
+            "country": languages.flag_country(code),
+            "selected": code == current,
+            "state": state,
+            "percent": percent,
+        }
+
+    def language_now(self) -> dict:
+        """The row the closed disclosure shows: what is in use right now.
+
+        Closed, this control has to go on answering "what am I using?" — a setting that only
+        says so after a click has stopped being a setting page (#119).
+        """
+        for group in self.language_groups():
+            for option in group["options"]:
+                if option["selected"]:
+                    return option
+        return {"code": "", "name": "", "country": "", "state": "", "percent": None}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

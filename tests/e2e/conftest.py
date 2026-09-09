@@ -26,6 +26,25 @@ EMAIL = "alex.morgan@example.org"
 PASSWORD = "correct-horse-battery-staple"  # a test account's password, not a secret
 
 
+@pytest.fixture(autouse=True)
+def _a_fresh_limiter():
+    """Every browser test starts with the sign-in limiter empty.
+
+    Each of these signs in, all of them from one address, and the limit that stops a
+    stranger guessing passwords cannot tell a suite from an attacker -- correctly. So the
+    suite got a `429` somewhere in the middle once it grew past the allowance, and *which*
+    test got it depended on how many ran before it, which is the worst shape a failure can
+    have.
+
+    Cleared per test rather than switched off, so the limiter is the real one and
+    `tests/security/test_rate_limits.py` goes on holding it to its numbers.
+    """
+    from django.core.cache import cache
+
+    cache.clear()
+    yield
+
+
 @pytest.fixture
 def applicant(db):
     """A person with a verified address and one CV, ready to sign in and send things."""

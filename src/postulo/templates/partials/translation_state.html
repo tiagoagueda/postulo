@@ -1,0 +1,26 @@
+{% load i18n postulo %}
+{% comment %} How a translation was made, beside the language it belongs to (#119).
+
+   Two things, always together. The symbol is `aria-hidden`, because a glyph alone is a
+   guess for anybody who has not learnt it and silence for anybody who cannot see it; the
+   words beside it are read out and are in the *interface* language, which is why this sits
+   outside the `<span lang="…">` holding the language's own name. Putting either inside
+   that span would be a WCAG 3.1.2 failure written on purpose.
+
+   Not "machine translation". A variant seeded from a sibling catalogue and adapted by hand
+   is not machine-made, and pt-BR is exactly that. What is true of every language in that
+   group is that no speaker has read it yet.
+{% endcomment %}
+{% if state == "reviewed" %}
+  <span aria-hidden="true" class="shrink-0 text-emerald-600 dark:text-emerald-400">{% icon "circle-check" %}</span>
+  <span class="sr-only">{% translate "read by a speaker" %}</span>
+{% elif state == "draft" %}
+  <span aria-hidden="true" class="shrink-0 text-amber-600 dark:text-amber-400">{% icon "pencil" %}</span>
+  <span class="sr-only">{% translate "written, not yet read by a speaker" %}</span>
+{% elif state == "partial" %}
+  <span aria-hidden="true" class="shrink-0">{% icon "circle-dashed" %}</span>
+  <span class="sr-only">{% translate "still being translated" %}</span>
+  {% if percent %}
+    <span class="text-xs text-ink-500 dark:text-ink-400">{{ percent }}%</span>
+  {% endif %}
+{% endif %}

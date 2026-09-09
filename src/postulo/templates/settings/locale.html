@@ -9,46 +9,91 @@
 
   <form method="post" novalidate>
     {% csrf_token %}
-    {% comment %} Rows rather than a dropdown, for two reasons a dropdown cannot serve. An
-       <option> takes `lang` and nothing inside it, so a flag put in the option text is read
-       out along with the name, and the name still has to be marked as being in its own
-       language or a screen reader pronounces it with the wrong rules. Here the flag is
-       hidden — the name beside it already says what it is — and the name carries its own
-       `lang`. Twenty-four rows also read better than a dropdown of twenty-four.
+    {% comment %} A disclosure rather than a `<select>`, and rows rather than options —
+       which is #119 answered in the shape it asked for without the element that cannot
+       carry it. An `<option>` takes `lang` and nothing inside it, so a flag put in the
+       option text is read out along with the name, a symbol saying how the translation was
+       made would sit inside an element claiming to be Greek while being neither Greek nor
+       a word, and there is nowhere at all for the percentage. Here the flag is hidden — the
+       name beside it already says what it is — the name carries its own `lang`, and
+       everything about the *state* of the translation sits outside that span in the
+       interface language.
+
+       Closed it is one line like the time zone below it, showing what is in use. It opens
+       and closes itself with no script at all, and the radios inside submit either way.
     {% endcomment %}
     <fieldset class="card mb-6" {% if form.language.aria_describedby %}aria-describedby="{{ form.language.aria_describedby }}"{% endif %}>
       <legend class="field-label mb-1">{{ form.language.label }}</legend>
-      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
         {% translate "Each is written in itself, so you can find yours without reading this one." %}
       </p>
-      {% for group in form.language_groups %}
-        {% if group.label %}
-          <p class="mt-4 mb-2 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
-            {{ group.label }}
-          </p>
-        {% endif %}
-        <div class="grid gap-1 sm:grid-cols-2">
-          {% for option in group.options %}
-            <label class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm
-                          hover:bg-ink-100 dark:hover:bg-ink-800">
-              <input type="radio" name="language" value="{{ option.code }}"
-                     {% if option.selected %}checked{% endif %}>
-              {% comment %} Decorative: the name beside it already says which language
-                 this is, and "Greek flag, Ελληνικά" is worse than silence. An image
-                 rather than the flag emoji that used to be here, which Windows drew as
-                 two letters (#88). Renders as nothing for a language with no
-                 uncontested home, and the row simply closes up.
-              {% endcomment %}
-              {% flag option.country %}
-              {% if option.code %}
-                <span lang="{{ option.code }}">{{ option.name }}</span>
-              {% else %}
-                <span>{{ option.name }}</span>
+
+      {% with now=form.language_now %}
+        <details class="relative" data-menu data-language-picker>
+          <summary class="btn-secondary flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-start">
+            {% flag now.country %}
+            {% if now.code %}
+              <span lang="{{ now.code }}">{{ now.name }}</span>
+            {% else %}
+              <span>{{ now.name }}</span>
+            {% endif %}
+            {% include "partials/translation_state.html" with state=now.state percent=now.percent %}
+            <span class="ms-auto text-xs text-ink-500 dark:text-ink-400">{% translate "Change" %}</span>
+          </summary>
+
+          <div class="mt-2 max-h-96 overflow-y-auto rounded-xl border border-ink-200 p-2 dark:border-ink-800"
+               data-language-list>
+            {% for group in form.language_groups %}
+              {% if group.label %}
+                <p class="mt-3 mb-2 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
+                  {{ group.label }}
+                </p>
               {% endif %}
-            </label>
-          {% endfor %}
-        </div>
-      {% endfor %}
+              <div class="grid gap-1 sm:grid-cols-2">
+                {% for option in group.options %}
+                  <label class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm
+                                hover:bg-ink-100 dark:hover:bg-ink-800">
+                    <input type="radio" name="language" value="{{ option.code }}"
+                           {% if option.selected %}checked{% endif %}>
+                    {% comment %} Decorative: the name beside it already says which language
+                       this is, and "Greek flag, Ελληνικά" is worse than silence. An image
+                       rather than the flag emoji that used to be here, which Windows drew as
+                       two letters (#88). Renders as nothing for a language with no
+                       uncontested home, and the row simply closes up.
+                    {% endcomment %}
+                    {% flag option.country %}
+                    {% if option.code %}
+                      <span lang="{{ option.code }}">{{ option.name }}</span>
+                    {% else %}
+                      <span>{{ option.name }}</span>
+                    {% endif %}
+                    {% include "partials/translation_state.html" with state=option.state percent=option.percent %}
+                  </label>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        </details>
+      {% endwith %}
+
+      {% comment %} The symbols, in words, on the page rather than only in a tooltip: a
+         glyph on its own is a guess for anybody who has not learnt it and nothing at all
+         for anybody who cannot see it (#119). {% endcomment %}
+      <p class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-500 dark:text-ink-400">
+        <span class="inline-flex items-center gap-1">
+          <span aria-hidden="true" class="text-emerald-600 dark:text-emerald-400">{% icon "circle-check" %}</span>
+          {% translate "read by a speaker" %}
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <span aria-hidden="true" class="text-amber-600 dark:text-amber-400">{% icon "pencil" %}</span>
+          {% translate "written, not yet read by a speaker" %}
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <span aria-hidden="true">{% icon "circle-dashed" %}</span>
+          {% translate "still being translated" %}
+        </span>
+      </p>
+
       {% include "partials/field_feedback.html" with field=form.language %}
     </fieldset>
 

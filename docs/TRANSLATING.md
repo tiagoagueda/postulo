@@ -92,13 +92,22 @@ msgid "Applications"
 msgstr "Bewerbungen"
 ```
 
-The language picker is a list rather than a dropdown, grouped by how far along each
-language is: *reviewed by a speaker*, *machine translation, awaiting review*, or *partly
-translated* with the percentage beside the name. It is a list because a dropdown cannot do
-what it needs — an `<option>` takes `lang` and nothing inside it, so the name could not be
-marked as being in its own language and the flag could not be hidden from a screen reader.
-The state of a translation is a group heading rather than part of a name, so that an option
-marked as German is not made to contain an English phrase. **Reviewing a
+The language picker is a **disclosure** holding a list, not a dropdown: closed it is one
+line showing the language in use, and open it is every language grouped by how far along it
+is — *read by a speaker*, *written, not yet read by a speaker*, or *still being translated*
+with the percentage beside the name.
+
+It is not a `<select>` because one cannot do what this needs. An `<option>` takes `lang` and
+nothing inside it, so the name could not be marked as being in its own language, the flag
+could not be hidden from a screen reader, the symbol for how a translation was made would be
+announced as part of a string claiming to be German, and the percentage would have nowhere to
+go but inside that name. Here every one of those sits outside the `lang`-marked span, in the
+interface language, with words read out beside each symbol and the legend on the page (#119).
+
+The wording is *written, not yet read by a speaker* rather than anything about machines. A
+variant seeded from a sibling catalogue and adapted by hand is not machine-translated, and
+`pt-BR` is exactly that; what is true of every language in that group is that no speaker has
+read it yet. **Reviewing a
 draft means reading it and deleting the flag**: if the translation is right, remove
 `draft`; if it is wrong, fix it and remove `draft`. That is the whole job, and it can be
 done a few strings at a time. A translation that needs a second opinion can carry

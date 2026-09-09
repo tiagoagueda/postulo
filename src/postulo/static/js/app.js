@@ -455,4 +455,81 @@
       summary.focus();
     }
   });
+
+  // The language picker, which is a disclosure rather than a <select> because an <option>
+  // cannot hold a flag, a language-marked name and a symbol at once (#119).
+  //
+  // Choosing between them costs the keyboard behaviour a native dropdown gives away, so
+  // this hands back the part the platform does not. Radios already do the rest: arrow keys
+  // move between them, and they submit with no script at all, which is why none of what
+  // follows is required for the control to work.
+  var picker = document.querySelector("[data-language-picker]");
+
+  function languageRadios() {
+    return picker ? Array.prototype.slice.call(picker.querySelectorAll('input[type="radio"]')) : [];
+  }
+
+  function chooseLanguage(radio) {
+    if (!radio) {
+      return;
+    }
+    radio.checked = true;
+    radio.focus();
+    // The list scrolls inside itself, so moving to something below the fold has to bring
+    // it into view or the focus ring is somewhere nobody can see.
+    if (radio.scrollIntoView) {
+      radio.scrollIntoView({ block: "nearest" });
+    }
+  }
+
+  // Opening it puts the keyboard where the choosing happens, rather than leaving somebody
+  // to tab past the whole list to reach the first row.
+  if (picker) {
+    picker.addEventListener("toggle", function () {
+      if (!picker.open) {
+        return;
+      }
+      var radios = languageRadios();
+      var current = radios.filter(function (radio) {
+        return radio.checked;
+      })[0];
+      chooseLanguage(current || radios[0]);
+    });
+  }
+
+  var typed = "";
+  var typedAt = 0;
+
+  document.addEventListener("keydown", function (event) {
+    if (!picker || !picker.open || !picker.contains(document.activeElement)) {
+      return;
+    }
+    var radios = languageRadios();
+    if (!radios.length) {
+      return;
+    }
+    if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      chooseLanguage(event.key === "Home" ? radios[0] : radios[radios.length - 1]);
+      return;
+    }
+    // Type-ahead, on the name as it is written in its own language: somebody looking for
+    // Ελληνικά types Ε, and somebody looking for Deutsch types D. A second key within a
+    // second extends the search rather than starting a new one, as a <select> does.
+    if (event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey) {
+      return;
+    }
+    var now = Date.now();
+    typed = now - typedAt > 1000 ? event.key : typed + event.key;
+    typedAt = now;
+    var wanted = typed.toLowerCase();
+    var found = radios.filter(function (radio) {
+      var label = radio.closest("label");
+      return label && label.textContent.trim().toLowerCase().indexOf(wanted) === 0;
+    })[0];
+    if (found) {
+      event.preventDefault();
+      chooseLanguage(found);
+    }
+  });
 })();

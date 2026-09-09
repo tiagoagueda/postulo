@@ -1098,6 +1098,37 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Choosing a language is one control now, and it says how each translation was made.**
+  Thirty-nine radio rows sat beside a time zone field that is a single line, and the list
+  will only get longer. It is a disclosure: closed it shows the language in use — flag, name
+  and state — and open it is the same rows as before.
+
+  **Not a `<select>`, and that is not a shortcut taken.** An `<option>` holds text and
+  nothing else. It takes `lang` on itself, so a dropdown can say *this option is Greek* and
+  no more: a flag inside the option text is read out beside a name that already says what it
+  is, a symbol saying how the translation was made would be announced as part of a string
+  claiming to be Greek while being neither Greek nor a word, and there is nowhere at all for
+  the percentage a partly-translated language shows. The request asked for a flag, a name and
+  a symbol in one control — which is exactly the combination an `<option>` cannot hold.
+
+  So the *shape* is what changed. Each language keeps its own `lang`, the flag stays hidden
+  from screen readers, and everything about the state of a translation now sits outside that
+  span in the interface language — including the percentage, which used to be appended to the
+  language's own name for want of anywhere else to put it.
+
+  **Every symbol is accompanied by words.** A glyph alone means nothing to somebody who
+  cannot see it and is a guess for anybody who has not learnt it, so each has a phrase read
+  out beside it and the legend is on the page rather than in a tooltip a keyboard cannot
+  reach. And the words are *written, not yet read by a speaker* rather than anything about
+  machines: `pt-BR` was seeded from `pt-PT` and adapted by hand, and what is true of every
+  language in that group is that no speaker has read it.
+
+  **The keyboard is the cost of not using a dropdown, and it is paid.** Arrow keys come from
+  the radios themselves; Home, End, type-ahead on each language's own name, Escape and
+  returning the focus are given back in a few lines. None of it is needed for the control to
+  work — the disclosure opens and the radios submit with scripts off entirely. The browser
+  suite walks it with a keyboard. (#119)
+
 - **The image now contains what it runs, rather than everything used to build it.** The
   Python side of the build was a single stage, so every intermediate was already sealed into
   a layer by the time anything could remove it — a later `RUN rm` frees nothing, because the
@@ -1230,6 +1261,14 @@ All notable changes to Postulo are recorded here. The format follows
   complete, documented and one button, not the number of links pointing at it. (#86)
 
 ### 🐛 Fixed
+
+- **The browser suite no longer fails whichever test happens to run after the fortieth
+  sign-in.** Every one of them signs in, all from one address, and the limit that stops a
+  stranger guessing passwords cannot tell a test suite from an attacker — correctly. So the
+  suite got a `429` somewhere in the middle once it grew past the allowance, and *which* test
+  got it depended on how many had run before, which is the worst shape a failure can have.
+  The limiter is now emptied before each browser test rather than switched off, so it is
+  still the real one and the security tests still hold it to its numbers. (#119)
 
 - **Rebuilding the stylesheet no longer produces a diff nothing can read.** `app.css` is a
   build artefact that is committed on purpose — Postulo runs without Node — and Tailwind was
