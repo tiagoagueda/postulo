@@ -70,6 +70,8 @@ def check_connection(
     typing their own infrastructure, and a relay on 10.0.0.0/8 is the ordinary case for a
     self-hosted instance. Do not "fix" this by reusing the capture check.
     """
+    from . import destinations
+
     if not host:
         raise ConnectionFailed(str(_("No server to connect to.")))
     try:
@@ -85,6 +87,11 @@ def check_connection(
             server.noop()
     except ConnectionFailed:
         raise
+    except (destinations.Refused, destinations.Unresolvable) as error:
+        # Decided before anything was dialled, so this says the same thing whether or not
+        # something is listening there. That is what stops the test button being a port
+        # scanner with a form around it (#148).
+        raise ConnectionFailed(str(error)) from error
     except smtplib.SMTPAuthenticationError as error:
         raise ConnectionFailed(
             str(_("The server refused those credentials: %(detail)s"))
@@ -109,18 +116,46 @@ def check_connection(
     }
 
 
-def _open(host: str, port: int, security: str, timeout: int):
-    """The socket, opened the way this kind of connection is opened.
+def host_policy() -> bool:
+    """Whether this instance may dial a private address for mail.
 
-    Implicit TLS is a different constructor rather than a flag, because the handshake
-    happens before any SMTP is spoken; there is no point in the conversation at which a
-    plain `SMTP` object could be persuaded into it.
+    The environment is exempt, and that is the project's ordinary rule rather than a hole in
+    this one: `POSTULO_EMAIL_HOST` is a line in a file only the operator can edit, and the
+    default it carries is `localhost`. Checking the operator's own file would refuse the
+    default configuration of every instance that has never opened the Email page.
+
+    A host stored from the page is checked, because that page is about to be reachable by
+    somebody who is not the operator (#149) and the guard has to exist before the field does.
     """
+    from . import destinations, site
+
+    return destinations.private_allowed() or site.overridden_by("email_host") is not None
+
+
+def _open(host: str, port: int, security: str, timeout: int):
+    """The socket, opened the way this kind of connection is opened, to an approved address.
+
+    Implicit TLS is a different constructor rather than a flag, because the handshake happens
+    before any SMTP is spoken; there is no point in the conversation at which a plain `SMTP`
+    object could be persuaded into it.
+
+    Both dial the *address* that was approved and prove the certificate against the *name*
+    that was typed. Resolving again here would reopen the window the approval closed (#148).
+    """
+    from . import destinations
+
+    address = destinations.approve(host, allow_private=host_policy())
     if security == "ssl":
-        return smtplib.SMTP_SSL(
-            host=host, port=port, timeout=timeout, context=ssl.create_default_context()
+        return destinations.PinnedSMTP_SSL(
+            host=str(address),
+            port=port,
+            timeout=timeout,
+            context=ssl.create_default_context(),
+            certificate_name=host,
         )
-    return smtplib.SMTP(host=host, port=port, timeout=timeout)
+    return destinations.PinnedSMTP(
+        host=str(address), port=port, timeout=timeout, certificate_name=host
+    )
 
 
 def _describe(error) -> str:

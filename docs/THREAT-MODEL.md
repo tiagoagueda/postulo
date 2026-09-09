@@ -34,6 +34,12 @@ attack it and what is worth defending.
 2. A new view narrows its queryset with `for_user()` before any lookup.
 3. A new file is delivered through `serve_private_file`, never by the web server.
 4. A new `next` goes through `postulo.core.redirects.safe_next`.
-5. A new outbound request goes through `postulo.plugins.http.client()`.
+5. A new outbound request goes through `postulo.plugins.http.client()`, and one that is
+   not HTTP goes through `postulo.core.destinations.approve()` — same three rules,
+   different protocol: refuse private addresses unless the operator allowed them, check
+   every address the name answers with, and connect to the one that was checked.
 6. A new secret is stored hashed if it only needs checking, encrypted if it needs using.
+   The encrypted set now includes a mail password typed into *Server settings*, under the
+   same key as every plugin connection's credentials — which is why #111 made a weak
+   `POSTULO_SECRET_KEY` a start-up refusal rather than a warning.
 7. A new endpoint gets a test in `tests/security/` saying what an attacker would try.

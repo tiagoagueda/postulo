@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 13:58+0000\n"
+"POT-Creation-Date: 2026-09-09 14:19+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -126,6 +126,18 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "Duela egun %(days)s"
 msgstr[1] "Duela %(days)s egun"
+
+#: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
+#, python-format, draft
+msgid "%(host)s could not be looked up."
+msgstr "Ezin izan da %(host)s bilatu."
+
+#: src/postulo/core/destinations.py:77
+#, python-format, draft
+msgid ""
+"%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
+msgstr ""
+"%(host)s sare pribatu edo lokal batean dago. Postulo horrelako batera konektatzen da operadoreak POSTULO_CONNECTIONS_ALLOW_PRIVATE=true ezartzen duenean bakarrik."
 
 #: src/postulo/templates/server/logs.html:78
 #, python-format, draft
@@ -1878,12 +1890,12 @@ msgstr "Konektatu"
 msgid "Connect %(plugin)s"
 msgstr "Konektatu %(plugin)s"
 
-#: src/postulo/core/mail.py:101
+#: src/postulo/core/mail.py:108
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "%(host)s:%(port)s(e)ra konektatuta eta %(user)s gisa sartuta."
 
-#: src/postulo/core/mail.py:106
+#: src/postulo/core/mail.py:113
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
@@ -4900,12 +4912,12 @@ msgstr "Ez dago iragarkirik jasota enpresa honetarako."
 msgid "no role"
 msgstr "lanposturik ez"
 
-#: src/postulo/notifications/smtp.py:83
+#: src/postulo/notifications/smtp.py:119
 #, draft
 msgid "No server set."
 msgstr "Ez da zerbitzaririk ezarri."
 
-#: src/postulo/core/mail.py:74
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
 msgid "No server to connect to."
 msgstr "Ez dago zerbitzaririk konektatzeko."
@@ -8284,7 +8296,7 @@ msgid ""
 msgstr ""
 "Zerbitzariak ez du STARTTLS eskaintzen. Itzali, edo erabili eskaintzen duen ataka bat."
 
-#: src/postulo/core/mail.py:90
+#: src/postulo/core/mail.py:97
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "Zerbitzariak kredentzial horiek baztertu ditu: %(detail)s"

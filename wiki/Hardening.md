@@ -322,3 +322,45 @@ will report dozens of HIGH and several CRITICAL entries that Debian has triaged 
 warranting an update. They are not ignorable by choice; there is nothing to install. Scan
 with `--ignore-unfixed` (Trivy) or `--only-fixed` (Grype) to see the findings you can
 actually act on, which is usually none or one.
+
+## Where the server is allowed to dial
+
+Postulo makes outbound connections on your behalf, and every one of them goes somewhere
+*somebody typed*. Two rules cover all of it.
+
+**A capture URL is refused if it is private or local, always.** That address came off a
+stranger's page, and a self-hosted instance sits on a network with a router, a NAS and
+whatever else at addresses a stranger would love the server to fetch for them.
+
+**Everything else — a plugin connection, a mail server — is refused if it is private,
+unless you have said otherwise.** A Paperless on your own LAN is the entire point of a
+connection, and a mail relay in the same Compose network is the same case, so one switch
+governs both:
+
+```
+POSTULO_CONNECTIONS_ALLOW_PRIVATE=true
+```
+
+One decision, made once, by the person who owns the machine. The refusal names this variable
+when it happens, so nobody has to go looking for it.
+
+**`POSTULO_EMAIL_HOST` is exempt.** A host set in the environment is a line in a file only
+you can edit — and the default it carries is `localhost` — so checking it would refuse the
+default configuration of every instance that has never opened the Email page. A host stored
+from *Server settings → Email* is checked.
+
+Three things happen on every one of these connections, and the third is the one that is
+usually missing:
+
+1. **Private and loopback addresses are refused** under the policy above.
+2. **Every address the name answers with is checked**, not just the first. A name that
+   resolves to one public address and one private one would otherwise be a way straight
+   through.
+3. **The connection goes to the address that was checked.** A name with a one-second
+   lifetime can answer publicly for the check and privately a moment later; resolving twice
+   leaves exactly that window. The certificate is still proved against the name you typed,
+   not against the number.
+
+**The refusal happens before anything is dialled.** Every private address gets the same
+answer whether something is listening on it or not, because nothing ever finds out — which
+is what stops the *Test* button being a port scanner with a form around it.

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 13:58+0000\n"
+"POT-Creation-Date: 2026-09-09 14:19+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: српски\n"
@@ -138,6 +138,18 @@ msgid_plural "%(days)s days ago"
 msgstr[0] "пре %(days)s дан"
 msgstr[1] "пре %(days)s дана"
 msgstr[2] "пре %(days)s дана"
+
+#: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
+#, python-format, draft
+msgid "%(host)s could not be looked up."
+msgstr "%(host)s није могуће пронаћи."
+
+#: src/postulo/core/destinations.py:77
+#, python-format, draft
+msgid ""
+"%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
+msgstr ""
+"%(host)s је на приватној или локалној мрежи. Postulo се повезује с таквом само када оператер постави POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
 
 #: src/postulo/templates/server/logs.html:78
 #, python-format, draft
@@ -1891,12 +1903,12 @@ msgstr "Повежи"
 msgid "Connect %(plugin)s"
 msgstr "Повежи %(plugin)s"
 
-#: src/postulo/core/mail.py:101
+#: src/postulo/core/mail.py:108
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Повезано на %(host)s:%(port)s и пријављено као %(user)s."
 
-#: src/postulo/core/mail.py:106
+#: src/postulo/core/mail.py:113
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
@@ -4907,12 +4919,12 @@ msgstr "Нема забележених огласа за ову компани�
 msgid "no role"
 msgstr "нема радног места"
 
-#: src/postulo/notifications/smtp.py:83
+#: src/postulo/notifications/smtp.py:119
 #, draft
 msgid "No server set."
 msgstr "Сервер није постављен."
 
-#: src/postulo/core/mail.py:74
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
 msgid "No server to connect to."
 msgstr "Нема сервера на који би се повезало."
@@ -8295,7 +8307,7 @@ msgid ""
 "The server does not offer STARTTLS. Turn it off, or use a port that does."
 msgstr "Сервер не нуди STARTTLS. Искључите га или користите порт који га нуди."
 
-#: src/postulo/core/mail.py:90
+#: src/postulo/core/mail.py:97
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "Сервер је одбио те приступне податке: %(detail)s"

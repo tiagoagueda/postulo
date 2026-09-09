@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 13:58+0000\n"
+"POT-Creation-Date: 2026-09-09 14:19+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: norsk bokmål\n"
@@ -126,6 +126,18 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "%(days)s dag siden"
 msgstr[1] "%(days)s dager siden"
+
+#: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
+#, python-format, draft
+msgid "%(host)s could not be looked up."
+msgstr "%(host)s kunne ikke slås opp."
+
+#: src/postulo/core/destinations.py:77
+#, python-format, draft
+msgid ""
+"%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
+msgstr ""
+"%(host)s er på et privat eller lokalt nettverk. Postulo kobler til et slikt bare når operatøren setter POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
 
 #: src/postulo/templates/server/logs.html:78
 #, python-format, draft
@@ -1869,12 +1881,12 @@ msgstr "Koble til"
 msgid "Connect %(plugin)s"
 msgstr "Koble til %(plugin)s"
 
-#: src/postulo/core/mail.py:101
+#: src/postulo/core/mail.py:108
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Koblet til %(host)s:%(port)s og logget inn som %(user)s."
 
-#: src/postulo/core/mail.py:106
+#: src/postulo/core/mail.py:113
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
@@ -4888,12 +4900,12 @@ msgstr "Ingen annonser ført opp for dette selskapet."
 msgid "no role"
 msgstr "ingen stilling"
 
-#: src/postulo/notifications/smtp.py:83
+#: src/postulo/notifications/smtp.py:119
 #, draft
 msgid "No server set."
 msgstr "Ingen server satt."
 
-#: src/postulo/core/mail.py:74
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
 msgid "No server to connect to."
 msgstr "Ingen server å koble til."
@@ -8259,7 +8271,7 @@ msgid ""
 msgstr ""
 "Serveren tilbyr ikke STARTTLS. Slå den av, eller bruk en port som gjør det."
 
-#: src/postulo/core/mail.py:90
+#: src/postulo/core/mail.py:97
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "Serveren avviste den legitimasjonen: %(detail)s"

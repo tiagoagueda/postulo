@@ -8,6 +8,37 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **A mail server is a host the server dials, and nothing checked where.** Postulo already
+  guards a URL somebody typed with three careful rules, and none of them were on the path a
+  mail backend takes: Django opens a socket to a host and a port and asks nothing at all.
+  That was fine while the host could only be the operator's own. It stops being fine the
+  moment a person can type one, and the guard has to exist before the field does.
+
+  All three rules now apply to SMTP. **Private and loopback addresses are refused** unless
+  the operator has set `POSTULO_CONNECTIONS_ALLOW_PRIVATE` — the switch that already lets a
+  connection reach a Paperless on the LAN, because a mail relay on the same LAN is the same
+  case and one decision made once beats two. **Every address the name answers with is
+  checked**, not the first, since a name resolving to one public and one private address is
+  otherwise a way straight through. And **the connection goes to the address that was
+  checked** — the rule people leave out, and the one that matters: a name with a one-second
+  lifetime can answer publicly for the check and privately a moment later, so resolving again
+  at connection time would pass on an address nobody ever contacted. The certificate is still
+  proved against the name that was typed rather than against a number.
+
+  **`POSTULO_EMAIL_HOST` is exempt**, and that is the project's ordinary environment-wins rule
+  rather than a hole in this one: it is a line in a file only the operator can edit, and the
+  default it carries is `localhost`. Checking it would refuse the default configuration of
+  every instance that has never opened the Email page.
+
+  **The refusal is decided before anything is dialled.** That is what keeps the *Test* button
+  from being a port scanner with a form around it: connect and read the banner and you learn
+  whether something is listening, so every private address gets an identical answer, because
+  nothing ever finds out. A test asserts that four different private addresses produce one
+  sentence between them — a different sentence for any of them would be a map of the network.
+
+  `docs/THREAT-MODEL.md` gains the rule, and records that the encrypted-secret set now
+  includes a mail password typed into the interface. (#148)
+
 - **The image never took Debian's security updates, so a fixable High sat in it.**
   `libpcre2-8-0` had an update in bookworm that the image did not have. It arrives with
   Python rather than with anything Postulo installs, so no line in the Dockerfile would ever

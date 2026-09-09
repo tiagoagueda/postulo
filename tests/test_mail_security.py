@@ -24,18 +24,36 @@ one.
 
 from __future__ import annotations
 
-import smtplib
 import ssl
 from unittest import mock
 
 import pytest
 from django.urls import reverse
 
-from postulo.core import mail, site
+from postulo.core import destinations, mail, site
 from postulo.core.models import DEFAULT_MAIL_PORTS, MailSecurity, SiteSettings
 from postulo.core.server_forms import EmailForm
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def _resolves_publicly(monkeypatch):
+    """Every host in this module answers with one public address.
+
+    93.184.216.34 rather than a documentation range: 203.0.113.0/24 and 198.51.100.0/24 are
+    reserved for examples, which `ipaddress` correctly reports as not globally routable — so
+    a fixture built from one would have every test failing the guard it was meant to bypass.
+
+    The destination guard (#148) resolves before it dials, and a test about *which socket
+    gets opened* should not also be a test about DNS. `tests/test_mail_destinations.py` is
+    where resolution is the subject.
+    """
+    import ipaddress
+
+    monkeypatch.setattr(
+        destinations, "addresses_for", lambda host: [ipaddress.ip_address("93.184.216.34")]
+    )
 
 
 @pytest.fixture
@@ -54,7 +72,10 @@ def admin(django_user_model):
 
 def test_implicit_tls_opens_a_tls_socket_from_the_start():
     """The whole of the bug: there was no code path that could do this."""
-    with mock.patch.object(smtplib, "SMTP_SSL") as secure, mock.patch.object(smtplib, "SMTP"):
+    with (
+        mock.patch.object(destinations, "PinnedSMTP_SSL") as secure,
+        mock.patch.object(destinations, "PinnedSMTP"),
+    ):
         mail.check_connection(
             host="mail.example.org", port=465, username="", password="", security="ssl", timeout=5
         )
@@ -64,7 +85,10 @@ def test_implicit_tls_opens_a_tls_socket_from_the_start():
 
 
 def test_starttls_opens_a_plain_socket_and_upgrades_it():
-    with mock.patch.object(smtplib, "SMTP") as plain, mock.patch.object(smtplib, "SMTP_SSL"):
+    with (
+        mock.patch.object(destinations, "PinnedSMTP") as plain,
+        mock.patch.object(destinations, "PinnedSMTP_SSL"),
+    ):
         server = plain.return_value.__enter__.return_value
         server.has_extn.return_value = True
         mail.check_connection(
@@ -81,7 +105,10 @@ def test_starttls_opens_a_plain_socket_and_upgrades_it():
 
 
 def test_no_security_never_upgrades():
-    with mock.patch.object(smtplib, "SMTP") as plain, mock.patch.object(smtplib, "SMTP_SSL") as s:
+    with (
+        mock.patch.object(destinations, "PinnedSMTP") as plain,
+        mock.patch.object(destinations, "PinnedSMTP_SSL") as s,
+    ):
         server = plain.return_value.__enter__.return_value
         mail.check_connection(
             host="mail.example.org", port=25, username="", password="", security="none", timeout=5
@@ -92,7 +119,7 @@ def test_no_security_never_upgrades():
 
 
 def test_a_server_without_starttls_is_told_so_rather_than_connected_to_in_the_clear():
-    with mock.patch.object(smtplib, "SMTP") as plain:
+    with mock.patch.object(destinations, "PinnedSMTP") as plain:
         plain.return_value.__enter__.return_value.has_extn.return_value = False
         with pytest.raises(mail.ConnectionFailed) as raised:
             mail.check_connection(
@@ -112,7 +139,7 @@ def test_a_server_without_starttls_is_told_so_rather_than_connected_to_in_the_cl
 
 def test_plain_settings_against_465_say_what_is_wrong():
     """Ten seconds of `timed out` is the worst version of this."""
-    with mock.patch.object(smtplib, "SMTP", side_effect=TimeoutError("timed out")):
+    with mock.patch.object(destinations, "PinnedSMTP", side_effect=TimeoutError("timed out")):
         with pytest.raises(mail.ConnectionFailed) as raised:
             mail.check_connection(
                 host="ssl0.example.net",
@@ -129,7 +156,7 @@ def test_plain_settings_against_465_say_what_is_wrong():
 
 
 def test_implicit_tls_against_587_says_the_other_thing():
-    with mock.patch.object(smtplib, "SMTP_SSL", side_effect=TimeoutError("timed out")):
+    with mock.patch.object(destinations, "PinnedSMTP_SSL", side_effect=TimeoutError("timed out")):
         with pytest.raises(mail.ConnectionFailed) as raised:
             mail.check_connection(
                 host="mail.example.org",
@@ -145,7 +172,7 @@ def test_implicit_tls_against_587_says_the_other_thing():
 
 def test_an_unconventional_port_is_not_second_guessed():
     """A relay on a port of its own is ordinary for a self-hosted instance."""
-    with mock.patch.object(smtplib, "SMTP", side_effect=TimeoutError("timed out")):
+    with mock.patch.object(destinations, "PinnedSMTP", side_effect=TimeoutError("timed out")):
         with pytest.raises(mail.ConnectionFailed) as raised:
             mail.check_connection(
                 host="mail.example.org",
@@ -165,7 +192,7 @@ def test_an_unconventional_port_is_not_second_guessed():
 def test_the_send_path_sets_use_ssl_and_never_both():
     from postulo.notifications.smtp import SMTPTransport
 
-    with mock.patch("postulo.notifications.smtp.EmailBackend") as backend:
+    with mock.patch("postulo.notifications.smtp.GuardedBackend") as backend:
         SMTPTransport().deliver([], {"host": "h", "port": 465, "security": "ssl"})
 
     kwargs = backend.call_args.kwargs
@@ -175,7 +202,7 @@ def test_the_send_path_sets_use_ssl_and_never_both():
 def test_the_send_path_sets_use_tls_for_starttls():
     from postulo.notifications.smtp import SMTPTransport
 
-    with mock.patch("postulo.notifications.smtp.EmailBackend") as backend:
+    with mock.patch("postulo.notifications.smtp.GuardedBackend") as backend:
         SMTPTransport().deliver([], {"host": "h", "port": 587, "security": "starttls"})
 
     kwargs = backend.call_args.kwargs
@@ -185,7 +212,7 @@ def test_the_send_path_sets_use_tls_for_starttls():
 def test_neither_flag_is_set_without_a_choice():
     from postulo.notifications.smtp import SMTPTransport
 
-    with mock.patch("postulo.notifications.smtp.EmailBackend") as backend:
+    with mock.patch("postulo.notifications.smtp.GuardedBackend") as backend:
         SMTPTransport().deliver([], {"host": "h", "port": 25, "security": "none"})
 
     kwargs = backend.call_args.kwargs

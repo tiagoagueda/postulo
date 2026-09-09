@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 13:58+0000\n"
+"POT-Creation-Date: 2026-09-09 14:19+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: galego\n"
@@ -126,6 +126,18 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "hai %(days)s día"
 msgstr[1] "hai %(days)s días"
+
+#: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
+#, python-format, draft
+msgid "%(host)s could not be looked up."
+msgstr "Non se puido resolver %(host)s."
+
+#: src/postulo/core/destinations.py:77
+#, python-format, draft
+msgid ""
+"%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
+msgstr ""
+"%(host)s está nunha rede privada ou local. Postulo só se conecta a unha cando o operador establece POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
 
 #: src/postulo/templates/server/logs.html:78
 #, python-format, draft
@@ -1872,12 +1884,12 @@ msgstr "Conectar"
 msgid "Connect %(plugin)s"
 msgstr "Conectar %(plugin)s"
 
-#: src/postulo/core/mail.py:101
+#: src/postulo/core/mail.py:108
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Conectado a %(host)s:%(port)s e identificado como %(user)s."
 
-#: src/postulo/core/mail.py:106
+#: src/postulo/core/mail.py:113
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
@@ -4891,12 +4903,12 @@ msgstr "Non hai ofertas rexistradas para esta empresa."
 msgid "no role"
 msgstr "sen posto"
 
-#: src/postulo/notifications/smtp.py:83
+#: src/postulo/notifications/smtp.py:119
 #, draft
 msgid "No server set."
 msgstr "Non se indicou ningún servidor."
 
-#: src/postulo/core/mail.py:74
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
 msgid "No server to connect to."
 msgstr "Non hai ningún servidor ao que conectarse."
@@ -8264,7 +8276,7 @@ msgid ""
 "The server does not offer STARTTLS. Turn it off, or use a port that does."
 msgstr "O servidor non ofrece STARTTLS. Apágao, ou usa un porto que si o ofreza."
 
-#: src/postulo/core/mail.py:90
+#: src/postulo/core/mail.py:97
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "O servidor rexeitou esas credenciais: %(detail)s"

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 13:58+0000\n"
+"POT-Creation-Date: 2026-09-09 14:19+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Cymraeg\n"
@@ -149,6 +149,18 @@ msgstr[0] "%(days)s diwrnod yn ôl"
 msgstr[1] "%(days)s ddiwrnod yn ôl"
 msgstr[2] "%(days)s diwrnod yn ôl"
 msgstr[3] "%(days)s diwrnod yn ôl"
+
+#: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
+#, python-format, draft
+msgid "%(host)s could not be looked up."
+msgstr "Ni ellid chwilio am %(host)s."
+
+#: src/postulo/core/destinations.py:77
+#, python-format, draft
+msgid ""
+"%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
+msgstr ""
+"Mae %(host)s ar rwydwaith preifat neu leol. Nid yw Postulo yn cysylltu ag un ond pan fydd y gweithredwr yn gosod POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
 
 #: src/postulo/templates/server/logs.html:78
 #, python-format, draft
@@ -1917,12 +1929,12 @@ msgstr "Cysylltu"
 msgid "Connect %(plugin)s"
 msgstr "Cysylltu %(plugin)s"
 
-#: src/postulo/core/mail.py:101
+#: src/postulo/core/mail.py:108
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Cysylltwyd â %(host)s:%(port)s a mewngofnodwyd fel %(user)s."
 
-#: src/postulo/core/mail.py:106
+#: src/postulo/core/mail.py:113
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
@@ -4944,12 +4956,12 @@ msgstr "Dim hysbysebion wedi'u cofnodi ar gyfer y cwmni hwn."
 msgid "no role"
 msgstr "dim swydd"
 
-#: src/postulo/notifications/smtp.py:83
+#: src/postulo/notifications/smtp.py:119
 #, draft
 msgid "No server set."
 msgstr "Dim gweinydd wedi'i osod."
 
-#: src/postulo/core/mail.py:74
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
 msgid "No server to connect to."
 msgstr "Dim gweinydd i gysylltu ag ef."
@@ -8358,7 +8370,7 @@ msgid ""
 msgstr ""
 "Nid yw'r gweinydd yn cynnig STARTTLS. Diffoddwch ef, neu defnyddiwch borth sy'n ei gynnig."
 
-#: src/postulo/core/mail.py:90
+#: src/postulo/core/mail.py:97
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "Gwrthododd y gweinydd y tystlythyrau hynny: %(detail)s"

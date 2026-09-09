@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 13:58+0000\n"
+"POT-Creation-Date: 2026-09-09 14:19+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Nederlands\n"
@@ -126,6 +126,18 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "%(days)s dag geleden"
 msgstr[1] "%(days)s dagen geleden"
+
+#: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
+#, python-format, draft
+msgid "%(host)s could not be looked up."
+msgstr "%(host)s kon niet worden opgezocht."
+
+#: src/postulo/core/destinations.py:77
+#, python-format, draft
+msgid ""
+"%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
+msgstr ""
+"%(host)s bevindt zich op een privé- of lokaal netwerk. Postulo maakt daar alleen verbinding mee als de beheerder POSTULO_CONNECTIONS_ALLOW_PRIVATE=true instelt."
 
 #: src/postulo/templates/server/logs.html:78
 #, python-format, draft
@@ -1874,12 +1886,12 @@ msgstr "Koppelen"
 msgid "Connect %(plugin)s"
 msgstr "%(plugin)s koppelen"
 
-#: src/postulo/core/mail.py:101
+#: src/postulo/core/mail.py:108
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Verbonden met %(host)s:%(port)s en aangemeld als %(user)s."
 
-#: src/postulo/core/mail.py:106
+#: src/postulo/core/mail.py:113
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
@@ -4898,12 +4910,12 @@ msgstr "Geen vacatures vastgelegd voor dit bedrijf."
 msgid "no role"
 msgstr "geen functie"
 
-#: src/postulo/notifications/smtp.py:83
+#: src/postulo/notifications/smtp.py:119
 #, draft
 msgid "No server set."
 msgstr "Geen server ingesteld."
 
-#: src/postulo/core/mail.py:74
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
 msgid "No server to connect to."
 msgstr "Geen server om verbinding mee te maken."
@@ -8283,7 +8295,7 @@ msgid ""
 msgstr ""
 "De server biedt geen STARTTLS aan. Schakel het uit, of gebruik een poort die het wel biedt."
 
-#: src/postulo/core/mail.py:90
+#: src/postulo/core/mail.py:97
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "De server heeft die gegevens geweigerd: %(detail)s"
