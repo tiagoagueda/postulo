@@ -523,6 +523,13 @@ class EmailView(PolicyView):
         )
         context["shadowed"] = site.email_shadowed()
         context["has_password"] = SiteSettings.get().has_email_password
+        context["mail_health"] = site.mail_health()
+        # Mail failing matters at all times; it matters *urgently* when mail is the only
+        # way back into an account, because then nobody who forgets a password can get in
+        # until it is fixed. Counted here so the page can say how many people that is.
+        context["stranded_by_broken_mail"] = (
+            transport.accounts_needing_email() if not context["mail_health"]["delivers"] else 0
+        )
 
         chosen = transport.selected()
         context["transports"] = transport.available()

@@ -49,6 +49,45 @@
     {% endif %}
   </div>
 
+  {% comment %} Recorded from what the last send actually did, never probed: this page
+     would otherwise open an SMTP connection every time somebody looked at it (#152). {% endcomment %}
+  {% if not mail_health.delivers %}
+    <div class="alert-warning mb-4 text-sm" role="note" data-mail-failing>
+      <div>
+        {% blocktranslate trimmed with when=mail_health.last_error_at count counter=mail_health.failures %}
+          The last message this instance tried to send failed, at {{ when }}.
+        {% plural %}
+          The last {{ counter }} messages this instance tried to send failed. The most
+          recent was at {{ when }}.
+        {% endblocktranslate %}
+        {% if mail_health.last_error %}
+          <br><code class="text-xs">{{ mail_health.last_error }}</code>
+        {% endif %}
+        {% if stranded_by_broken_mail %}
+          <br>
+          {% blocktranslate trimmed count counter=stranded_by_broken_mail %}
+            Mail is the only way back into an account here, so until this works again the
+            one person on this instance cannot get back in if they forget their password.
+          {% plural %}
+            Mail is the only way back into an account here, so until this works again none
+            of the {{ counter }} people on this instance can get back in if they forget
+            their password.
+          {% endblocktranslate %}
+          {% blocktranslate trimmed %}
+            Mail no longer holds the transport in place either, because a route that
+            delivers nothing is not protecting anybody.
+          {% endblocktranslate %}
+        {% endif %}
+      </div>
+    </div>
+  {% elif mail_health.last_ok_at %}
+    <p class="mb-4 text-xs text-ink-500 dark:text-ink-400" data-mail-ok>
+      {% blocktranslate trimmed with when=mail_health.last_ok_at %}
+        Mail last went out at {{ when }}.
+      {% endblocktranslate %}
+    </p>
+  {% endif %}
+
   {% if locked %}
     {% comment %} Said here rather than only at the moment somebody tries to switch the
        package off, so an administrator planning a change finds out before they plan it.

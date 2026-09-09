@@ -21,6 +21,7 @@ too.
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
@@ -102,6 +103,17 @@ class PluggableBackend(BaseEmailBackend):
     possible without a restart.
     """
 
+    def __init__(self, fail_silently: bool = False, **kwargs) -> None:
+        """Own ``fail_silently`` rather than inherit it.
+
+        Django 7.0 removes it from ``BaseEmailBackend``, and reading the inherited attribute
+        already raises a deprecation warning — which this backend does on exactly the path
+        that matters, the one where a send has failed. A backend that honours the flag has
+        to keep it itself, which is what the deprecation says to do.
+        """
+        super().__init__(**kwargs)
+        self.fail_silently = fail_silently
+
     def send_messages(self, email_messages) -> int:
         if not email_messages:
             return 0
@@ -116,13 +128,25 @@ class PluggableBackend(BaseEmailBackend):
 
         config = configuration(transport)
         self._stamp_sender(email_messages)
+        # The one place every message passes through, which is why the outcome is recorded
+        # here and nowhere else: the test button on the Email page sends through this too,
+        # so proving the configuration and using it are the same evidence (#152).
         try:
-            return transport.deliver(list(email_messages), config) or 0
-        except Exception:
+            sent = transport.deliver(list(email_messages), config) or 0
+        except Exception as error:
             logger.exception("Mail transport %r failed to deliver", transport.name)
+            self._record(False, f"{type(error).__name__}: {error}")
             if not self.fail_silently:
                 raise
             return 0
+        self._record(bool(sent), "" if sent else "The transport accepted nothing.")
+        return sent
+
+    @staticmethod
+    def _record(ok: bool, message: str) -> None:
+        from postulo.core import site
+
+        site.record_mail(ok, message)
 
     @staticmethod
     def _stamp_sender(email_messages) -> None:
@@ -146,8 +170,31 @@ class PluggableBackend(BaseEmailBackend):
 # ------------------------------------------------------- the interlock (#100, #104)
 
 
-def recovery_routes(*, without: str = "") -> list[str]:
-    """Ways somebody locked out of their own account could get back into it.
+@dataclass(frozen=True)
+class Route:
+    """One way back into an account, and whether it currently works.
+
+    Two questions, kept apart on purpose. *Exists* is about configuration — a transport is
+    installed, a person holds a passkey. *Delivers* is about evidence, and every route has
+    to answer it in its own way: mail from what the last send did, SMS from whether the
+    number was ever confirmed, an administrator-issued link from whether an administrator
+    is still there to issue one. Writing the pair down now is cheaper than discovering three
+    times over that `recovery_routes()` was counting configuration (#152).
+    """
+
+    name: str
+    exists: bool
+    delivers: bool = True
+    #: Why it does not deliver, for the page rather than for the decision.
+    trouble: str = ""
+
+    @property
+    def counts(self) -> bool:
+        return self.exists and self.delivers
+
+
+def all_routes(*, without: str = "") -> list[Route]:
+    """Every way back into an account this instance has, working or not.
 
     Today there is one that this instance operates — email — and one that belongs to the
     person: a passkey, which signs them in without the password they have forgotten. A TOTP
@@ -157,16 +204,27 @@ def recovery_routes(*, without: str = "") -> list[str]:
     When another route lands (#103 — SMS, Apprise, an administrator-issued link) it is added
     here and the lock below opens by itself. That is the point of writing it as a list.
     """
-    routes = []
+    from postulo.core import site
+
     transport = selected()
-    if transport is not None and transport.name != without:
-        routes.append("email")
-    if not _accounts_needing_email():
-        routes.append("passkey")
-    return routes
+    delivers = site.mail_delivers()
+    return [
+        Route(
+            name="email",
+            exists=transport is not None and transport.name != without,
+            delivers=delivers,
+            trouble="" if delivers else str(_("Mail has been failing.")),
+        ),
+        Route(name="passkey", exists=not accounts_needing_email()),
+    ]
 
 
-def _accounts_needing_email() -> int:
+def recovery_routes(*, without: str = "") -> list[str]:
+    """The names of the routes that actually count. See :func:`all_routes`."""
+    return [route.name for route in all_routes(without=without) if route.counts]
+
+
+def accounts_needing_email() -> int:
     """Active accounts with nothing but email to get back in with.
 
     Counted rather than assumed. On a typical instance this is every account and the lock is
@@ -191,9 +249,18 @@ def refuse_switching_off(name: str) -> str:
     transport = selected()
     if transport is None or transport.name != name:
         return ""
+    from postulo.core import site
+
     if recovery_routes(without=name):
         return ""
-    stranded = _accounts_needing_email()
+    if not site.mail_delivers():
+        # Mail is the last route and it is not delivering, so the lock is protecting a way
+        # in that does not let anybody in. Opening it changes nothing for those accounts:
+        # they are stranded now, and keeping an administrator from installing something
+        # else does not unstrand them. The Email page says so in as many words, because
+        # that fact is the useful one and a quietly-opened lock would not carry it (#152).
+        return ""
+    stranded = accounts_needing_email()
     # "%(count)d of them would" rather than "have", so one account and four read equally
     # well and the sentence needs no plural form.
     return str(

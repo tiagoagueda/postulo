@@ -11,12 +11,15 @@ Everything here is a small function so that the rest of the code asks a question
 
 from __future__ import annotations
 
+import logging
 import os
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from .models import SiteSettings
+
+logger = logging.getLogger(__name__)
 
 #: Model field → the environment variable that, when set, overrides it.
 ENV_OVERRIDES = {
@@ -114,6 +117,44 @@ def offers(code: str) -> bool:
     """Whether this instance offers a language. Nothing stored means it offers them all."""
     chosen = offered_languages()
     return not chosen or code in chosen
+
+
+def mail_delivers() -> bool:
+    """Whether mail has been getting through lately.
+
+    Read on every page that shows the recovery interlock, so it answers from what was
+    recorded rather than by opening a connection. Anything unexpected answers `True`: a
+    broken settings row must not be able to unlock the thing protecting people's accounts.
+    """
+    try:
+        return current().mail_is_delivering
+    except Exception:  # pragma: no cover - fails towards the lock staying shut
+        return True
+
+
+def mail_health() -> dict:
+    """What the Email page shows about the last send: when, and what went wrong."""
+    row = current()
+    return {
+        "delivers": row.mail_is_delivering,
+        "last_ok_at": row.mail_last_ok_at,
+        "last_error_at": row.mail_last_error_at,
+        "last_error": row.mail_last_error,
+        "failures": row.mail_failures or 0,
+        "ever_tried": bool(row.mail_last_ok_at or row.mail_last_error_at),
+    }
+
+
+def record_mail(ok: bool, message: str = "") -> None:
+    """Remember how a send went, from wherever mail is actually sent.
+
+    Swallows everything. This is bookkeeping on the way past; a database that will not take
+    the note must not turn a delivered message into a failed one.
+    """
+    try:
+        SiteSettings.get().record_mail(ok, message)
+    except Exception:  # pragma: no cover - bookkeeping, never the point of the call
+        logger.exception("Could not record how the last send went")
 
 
 def instance_name() -> str:

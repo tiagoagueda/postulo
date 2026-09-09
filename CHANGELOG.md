@@ -642,6 +642,38 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The lock protecting people's accounts rested on a route that might deliver nothing.**
+  Mail may not be switched off while it is the last way anybody could get back into their
+  account. What that rule actually checked was whether a mail transport was *selected* — a
+  statement about configuration, not about delivery. An instance whose relay had been
+  switched off, whose password had been changed, or whose host no longer resolved still
+  counted email as the last way in, and refused every attempt to switch the transport off on
+  the strength of a route that delivered nothing. The refusal told an administrator it was
+  protecting accounts it was not, in fact, protecting.
+
+  Now a route counts because it delivers. The Email page says when mail last went out, or
+  that the last few messages failed and what the transport said about it — recorded from
+  what sends actually did, never probed, because the lock is evaluated while rendering a page
+  and an answer that opened a connection would make reading a page send traffic. The **Send a
+  test message** button goes through the same code a real message does, so nothing extra had
+  to be wired up for it to count as evidence.
+
+  **It takes three failures in a row, not one.** A relay that refuses a single address has
+  told us about that address rather than about itself, and an instance that has never sent
+  anything counts as working. Both fail in the same direction on purpose: this makes the lock
+  honest, never eager to open, because a lock that opens on a shrug is worse than one that
+  stays shut on an optimistic guess.
+
+  **When it does open, the page says the thing that matters.** Mail failing while it is the
+  only route means nobody who forgets a password can get back in — and that is true whether
+  the lock is shut or not, because those accounts are stranded by the relay, not by the
+  setting. So the page names how many people that is, and the lock opens rather than standing
+  between an administrator and the transport that would fix it.
+
+  `recovery_routes()` now returns routes that know the difference between existing and
+  delivering, because SMS, an administrator-issued link and a passkey will each have to
+  answer "does this one actually work" in its own way. (#152)
+
 - **The runtime image carried 430 MB it never runs, including a Node.js runtime.** Trivy and
   Grype, run against the image on the test instance, found Playwright, pytest,
   pytest-playwright and pytest-base-url installed in the application's own virtual

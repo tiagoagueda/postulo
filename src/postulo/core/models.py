@@ -6,6 +6,8 @@ search. Rather than trusting each view to remember a filter, every user-owned mo
 inherits an owner and a queryset that knows how to scope itself.
 """
 
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -280,6 +282,16 @@ class SiteSettings(models.Model):
         _("transport secrets"), blank=True, editable=False
     )
 
+    #: What the mail transport last actually did. Recorded rather than probed, because the
+    #: question "can this instance still send mail?" is asked while rendering a page and an
+    #: answer that opens a connection would make reading a page send traffic (#152).
+    mail_last_ok_at = models.DateTimeField(_("mail last worked"), null=True, blank=True)
+    mail_last_error_at = models.DateTimeField(_("mail last failed"), null=True, blank=True)
+    mail_last_error = models.TextField(_("mail's last error"), blank=True)
+    #: Failures since the last success. One refused address is not a broken relay, so the
+    #: route stops counting only after several in a row with nothing succeeding between.
+    mail_failures = models.PositiveIntegerField(_("mail failures in a row"), default=0)
+
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -305,6 +317,46 @@ class SiteSettings(models.Model):
     def get(cls) -> "SiteSettings":
         row, _created = cls.objects.get_or_create(pk=1)
         return row
+
+    #: Failures in a row before mail stops counting as a way back into an account. Three
+    #: rather than one: a relay that refuses one address at RCPT TO has told us about that
+    #: address, not about itself, and a lock that opens on a typo is worse than one that
+    #: stays shut an evening longer.
+    MAIL_FAILURES_BEFORE_BROKEN = 3
+
+    #: How stale a success may be before it is written again. A send is common; a row
+    #: update per send is not worth it, and the timestamp is read to the hour anyway.
+    MAIL_OK_INTERVAL = timedelta(hours=1)
+
+    def record_mail(self, ok: bool, message: str = "") -> None:
+        """Remember how the last send went. Never raises; a send must not fail over this."""
+        from django.utils import timezone
+
+        now = timezone.now()
+        if not ok:
+            self.mail_last_error_at = now
+            self.mail_last_error = (message or str(_("Failed without saying why.")))[:500]
+            self.mail_failures = (self.mail_failures or 0) + 1
+            fields = ["mail_last_error_at", "mail_last_error", "mail_failures"]
+        else:
+            fresh = self.mail_last_ok_at and now - self.mail_last_ok_at < self.MAIL_OK_INTERVAL
+            if fresh and not self.mail_failures:
+                return
+            self.mail_last_ok_at = now
+            self.mail_last_error = ""
+            self.mail_failures = 0
+            fields = ["mail_last_ok_at", "mail_last_error", "mail_failures"]
+        self.save(update_fields=[*fields, "updated_at"])
+
+    @property
+    def mail_is_delivering(self) -> bool:
+        """Whether mail counts as a way back into an account.
+
+        Unknown counts as working, and so does a run of failures shorter than
+        `MAIL_FAILURES_BEFORE_BROKEN`. Both fail in the direction that keeps the interlock
+        shut: this is a check that makes the lock honest, never one that is eager to open it.
+        """
+        return (self.mail_failures or 0) < self.MAIL_FAILURES_BEFORE_BROKEN
 
     @property
     def email_password(self) -> str:

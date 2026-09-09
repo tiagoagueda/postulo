@@ -311,6 +311,34 @@ them is gone. The order that keeps them:
 catches you at an hour when you cannot plan a rotation. It buys an afternoon; it is not an
 answer, and it does not apply to a placeholder.
 
+### Whether mail is actually getting through
+
+*Server settings → Email* says when mail last went out, and, when the last few messages
+failed, says so with what the transport reported. Nothing is probed to answer that: opening
+a connection every time somebody looked at the page would mean reading a page sends traffic.
+The answer comes from what the last send recorded — the **Send a test message** button goes
+through exactly the same path a real message does, so pressing it is what proves a
+configuration.
+
+This matters beyond the display, because mail is normally the only way somebody who has
+forgotten their password gets back into their account. Postulo will not let you switch the
+mail transport off while that is true (see *Plugins*), and that lock used to rest on whether
+a transport was *configured*. A relay whose password had been changed, whose host no longer
+resolved, or whose credentials had been revoked still counted — so the refusal claimed to be
+protecting accounts it was not protecting.
+
+Now the lock rests on delivery. Three consecutive failures with nothing succeeding in between
+and mail stops counting as a way back in. Three rather than one, deliberately: a relay that
+refuses a single address has told you about that address, not about itself, and a lock that
+opens on a typo is worse than one that stays shut an evening longer. An instance that has
+never sent anything counts as working, for the same reason.
+
+When mail stops counting, the Email page says how many people that leaves with no way back
+into their accounts. **That is the useful fact, and it is true whether or not the lock is
+shut** — those accounts are stranded by the broken relay, not by the setting. The lock opens
+because keeping it closed does not unstrand anybody; it only stops you installing something
+that would.
+
 ## Rate limits
 
 Everything these cover needs an account or a token, so none of it is reachable by a stranger.
