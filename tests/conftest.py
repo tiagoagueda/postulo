@@ -33,5 +33,5 @@ def _no_inherited_environment(monkeypatch):
     Cleared for every test; a test that wants a pinned variable sets it itself, which also
     makes the pinning visible in the test rather than in somebody's untracked file.
     """
-    for variable in site.ENV_OVERRIDES.values():
+    for variable in site.env_variables():
         monkeypatch.delenv(variable, raising=False)

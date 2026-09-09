@@ -251,6 +251,7 @@ unreadable and Postulo falls back to the environment rather than refusing to sen
 | `POSTULO_EMAIL_PORT` | `25` |
 | `POSTULO_EMAIL_HOST_USER` | empty |
 | `POSTULO_EMAIL_HOST_PASSWORD` | empty |
+| `POSTULO_EMAIL_SECURITY` | from `POSTULO_EMAIL_USE_TLS` |
 | `POSTULO_EMAIL_USE_TLS` | `true` |
 | `POSTULO_EMAIL_TIMEOUT` | `10` |
 
@@ -310,6 +311,36 @@ them is gone. The order that keeps them:
 `POSTULO_ALLOW_WEAK_SECRET_KEY=true` starts a short key anyway, for the case where this
 catches you at an hour when you cannot plan a rotation. It buys an afternoon; it is not an
 answer, and it does not apply to a placeholder.
+
+### STARTTLS or implicit TLS, and why the port decides
+
+There are two ways of putting TLS on an SMTP session and they are not interchangeable.
+
+**STARTTLS** connects in the clear, says hello, and asks the server to upgrade the socket.
+That is what ports **587** and 25 expect.
+
+**Implicit TLS**, sometimes written SMTPS, hands over a certificate before a single byte of
+SMTP is spoken. That is what port **465** expects, and it is what Gmail, Microsoft 365,
+Fastmail, OVH and most shared hosting document first.
+
+*Server settings → Email* has one **Connection security** control with three states rather
+than a checkbox each, because the two are alternatives and never layers: Django's SMTP
+backend refuses to be given both, and a pair of checkboxes would offer a combination that
+cannot be saved.
+
+**Point one at the other's port and nothing happens until the timeout**, because each side is
+waiting for the other to speak first. That failure looks exactly like a server being down, so
+Postulo names it: a connection test that fails on 465 without implicit TLS, or on 587 with it,
+says which of the two is wrong before it repeats the timeout. A port that is neither is left
+alone — a relay on a port of its own is ordinary for a self-hosted instance, and a settings
+page that argues with what you typed is a settings page nobody trusts.
+
+Leave the port empty and it fills in the one that choice normally uses: 587 for STARTTLS, 465
+for implicit TLS, 25 for neither. A port you type is never changed.
+
+`POSTULO_EMAIL_SECURITY` is `none`, `starttls` or `ssl`. The older `POSTULO_EMAIL_USE_TLS` is
+still honoured for the two states it can express — `true` means STARTTLS — so a `.env` that
+has worked since 0.1.0 goes on meaning what it meant. Where both are set, the newer one wins.
 
 ### Whether mail is actually getting through
 

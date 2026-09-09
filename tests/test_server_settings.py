@@ -32,7 +32,7 @@ def admin(db):
 
 @pytest.fixture(autouse=True)
 def _no_policy_in_the_environment(monkeypatch):
-    for variable in site.ENV_OVERRIDES.values():
+    for variable in site.env_variables():
         monkeypatch.delenv(variable, raising=False)
 
 

@@ -53,7 +53,7 @@ STORED = {
     "email_host": "smtp.stored.example",
     "email_port": "2525",
     "email_username": "stored-user",
-    "email_use_tls": "true",
+    "email_security": "starttls",
     "email_timeout": "20",
     "email_from": "stored@example.org",
 }
@@ -83,7 +83,7 @@ def test_settings_saved_here_are_the_ones_used(client, admin):
     assert resolved["port"] == 2525
     assert resolved["username"] == "stored-user"
     assert resolved["password"] == "hunter2-and-then-some"
-    assert resolved["use_tls"] is True
+    assert resolved["security"] == "starttls"
     assert resolved["timeout"] == 20
     assert resolved["from_address"] == "stored@example.org"
 
@@ -235,7 +235,7 @@ def test_the_settings_are_read_when_a_message_is_sent_not_at_import(admin):
     smtp = registry.find_plugin("transport", "smtp")
     row = SiteSettings.get()
     row.email_host, row.email_port, row.email_username = "smtp.first.example", 2525, "one"
-    row.email_use_tls, row.email_timeout = False, 7
+    row.email_security, row.email_timeout = "none", 7
     row.email_password = "first-password"
     row.save()
 
@@ -332,7 +332,7 @@ def test_the_connection_test_uses_what_is_on_screen_not_what_is_stored(client, a
 
     assert seen["host"] == "smtp.typed.example"
     assert seen["password"] == "typed-password"
-    assert seen["port"] == 2525 and seen["use_tls"] is True
+    assert seen["port"] == 2525 and seen["security"] == "starttls"
 
 
 def test_the_connection_test_falls_back_to_the_stored_password(client, admin, monkeypatch):
@@ -367,7 +367,7 @@ def test_the_connection_test_says_no_when_there_is_no_server(settings):
     settings.POSTULO_EMAIL_HOST = ""
     with pytest.raises(postulo_mail.ConnectionFailed):
         postulo_mail.check_connection(
-            host="", port=25, username="", password="", use_tls=False, timeout=1
+            host="", port=25, username="", password="", security="none", timeout=1
         )
 
 

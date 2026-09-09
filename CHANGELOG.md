@@ -676,6 +676,37 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Port 465 could not be configured at all, so half the mail providers there are could
+  not be used.** There are two ways of putting TLS on an SMTP session. STARTTLS connects in
+  the clear and asks the server to upgrade the socket, which is ports 587 and 25; implicit
+  TLS hands over a certificate before a byte of SMTP is spoken, which is port 465. Postulo
+  did only the first — no `SMTP_SSL`, no `use_ssl`, nowhere — so an administrator entering
+  their provider's documented settings got a socket waiting for a greeting the server would
+  never send, and, ten seconds later, the word `timed out`. Ticking the STARTTLS box changed
+  nothing, because the failure happened before STARTTLS would have been reached.
+
+  Found configuring a real provider on a real instance, which is the only way this was ever
+  going to be found: every test in the suite that touches mail either mocks the socket or
+  sends to a local memory backend.
+
+  **One control with three states, not a second checkbox.** Django's SMTP backend raises when
+  `use_tls` and `use_ssl` are both set, and rightly — they are alternatives, not layers — so
+  a checkbox each would have offered a pair that cannot be saved. *Connection security* is one
+  field and cannot express the invalid combination. A migration carries the old boolean into
+  it in the order add-carry-remove, because the schema change on its own would have dropped
+  the column first and quietly reset every instance to "nothing chosen"; and
+  `POSTULO_EMAIL_USE_TLS` goes on meaning what it means for every `.env` that sets it, with
+  the new `POSTULO_EMAIL_SECURITY` winning where both are given.
+
+  **The timeout now says which mistake it is.** Pointing one kind at the other's port is the
+  ordinary error rather than an exotic one — the two ports are documented interchangeably by
+  half the providers there are — and both directions fail identically. So a failure on 465
+  without implicit TLS, or on 587 with it, names that before repeating the original message. A
+  port that is neither is left alone: a relay on a port of its own is ordinary for a
+  self-hosted instance, and the surest way to make a settings page hated is to argue with what
+  was typed into it. For the same reason the default port is filled in only when the box was
+  left empty. (#158)
+
 - **The lock protecting people's accounts rested on a route that might deliver nothing.**
   Mail may not be switched off while it is the last way anybody could get back into their
   account. What that rule actually checked was whether a mail transport was *selected* — a

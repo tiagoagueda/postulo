@@ -31,7 +31,9 @@ ENV_OVERRIDES = {
     "email_port": "POSTULO_EMAIL_PORT",
     "email_username": "POSTULO_EMAIL_HOST_USER",
     "email_password": "POSTULO_EMAIL_HOST_PASSWORD",
-    "email_use_tls": "POSTULO_EMAIL_USE_TLS",
+    # Two variables for one field: the new one, and the boolean it replaces, which every
+    # existing `.env` sets and which is still honoured (#158). The first one present wins.
+    "email_security": ("POSTULO_EMAIL_SECURITY", "POSTULO_EMAIL_USE_TLS"),
     "email_timeout": "POSTULO_EMAIL_TIMEOUT",
     "email_from": "POSTULO_DEFAULT_FROM_EMAIL",
 }
@@ -44,17 +46,38 @@ EMAIL_FIELDS = {
     "email_port": "port",
     "email_username": "username",
     "email_password": "password",
-    "email_use_tls": "use_tls",
+    "email_security": "security",
     "email_timeout": "timeout",
     "email_from": "from_address",
 }
 
 
+def env_variables() -> tuple[str, ...]:
+    """Every variable that can pin a setting, flattened.
+
+    A field may name more than one, so anything that wants the whole set — a test clearing
+    the developer's `.env`, a page listing what the environment controls — asks for it here
+    rather than iterating the mapping and meeting a tuple where it expected a name.
+    """
+    flat: list[str] = []
+    for names in ENV_OVERRIDES.values():
+        flat.extend((names,) if isinstance(names, str) else names)
+    return tuple(flat)
+
+
 def overridden_by(field: str) -> str | None:
-    """The environment variable pinning ``field``, if one is set."""
-    variable = ENV_OVERRIDES.get(field)
-    if variable and variable in os.environ:
-        return variable
+    """The environment variable pinning ``field``, if one is set.
+
+    A field may name more than one, because a variable that could not express a new state
+    is kept working rather than retired under the instances that set it. The first one
+    present answers, so the newer name wins where both are given.
+    """
+    names = ENV_OVERRIDES.get(field) or ()
+    if isinstance(names, str):
+        names = (names,)
+    for variable in names:
+        if variable in os.environ:
+            return variable
     return None
 
 
@@ -205,7 +228,7 @@ def email_settings() -> dict:
         "port": settings.POSTULO_EMAIL_PORT,
         "username": settings.POSTULO_EMAIL_HOST_USER,
         "password": settings.POSTULO_EMAIL_HOST_PASSWORD,
-        "use_tls": settings.POSTULO_EMAIL_USE_TLS,
+        "security": settings.POSTULO_EMAIL_SECURITY,
         "timeout": settings.POSTULO_EMAIL_TIMEOUT,
         "from_address": settings.DEFAULT_FROM_EMAIL,
     }

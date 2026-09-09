@@ -465,6 +465,15 @@ def _admin_url() -> str:
         return ""
 
 
+def _security_label(value: str) -> str:
+    from .models import MailSecurity
+
+    try:
+        return str(MailSecurity(value).label)
+    except ValueError:
+        return value or str(_("Not set"))
+
+
 def _mailer_summary() -> dict:
     """What is in force, resolved rather than read out of MAILERS.
 
@@ -498,7 +507,10 @@ def _mailer_summary() -> dict:
         "host": resolved["host"],
         "port": resolved["port"],
         "username": resolved["username"],
-        "use_tls": resolved["use_tls"],
+        "security": resolved["security"],
+        # Named rather than shown as a code, because "ssl" on a settings page is a word
+        # somebody has to look up and "TLS from the first byte" is the answer they wanted.
+        "security_label": _security_label(str(resolved["security"])),
         "has_password": bool(resolved["password"]),
         "from_address": resolved["from_address"],
     }
@@ -589,11 +601,11 @@ class EmailConnectionTestView(StaffRequiredMixin, View):
         else:
             password = row.email_password if row.has_email_password else resolved["password"]
 
-        use_tls = request.POST.get("email_use_tls", "")
-        if "email_use_tls" in pinned or use_tls == "":
-            tls = bool(resolved["use_tls"])
+        typed_security = request.POST.get("email_security", "")
+        if "email_security" in pinned or typed_security == "":
+            security = str(resolved["security"])
         else:
-            tls = use_tls == "true"
+            security = typed_security
 
         try:
             report = mail.check_connection(
@@ -601,7 +613,7 @@ class EmailConnectionTestView(StaffRequiredMixin, View):
                 port=int(value("email_port", int)),
                 username=str(value("email_username")),
                 password=password,
-                use_tls=tls,
+                security=security,
                 timeout=int(value("email_timeout", int)),
             )
         except mail.ConnectionFailed as error:

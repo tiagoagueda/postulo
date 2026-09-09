@@ -190,6 +190,29 @@ class PhoneNumber(OwnedModel):
         return str(self.Kind(self.kind).label) if self.kind else ""
 
 
+class MailSecurity(models.TextChoices):
+    """How TLS gets onto an SMTP session. Two ways, and they are not interchangeable.
+
+    STARTTLS connects in the clear and asks the server to upgrade the socket; implicit TLS
+    hands over a certificate before a byte of SMTP is spoken. Point one at the other's port
+    and nothing happens until the timeout, because each is waiting for the other to speak.
+    """
+
+    NONE = "none", _("None")
+    STARTTLS = "starttls", _("STARTTLS, after connecting")
+    SSL = "ssl", _("TLS from the first byte")
+
+
+#: The port each kind of connection is normally offered on. A suggestion, filled in when
+#: nobody typed one -- never a correction of a port somebody did type, because a relay on a
+#: port of its own is an ordinary thing for a self-hosted instance to have.
+DEFAULT_MAIL_PORTS = {
+    MailSecurity.NONE: 25,
+    MailSecurity.STARTTLS: 587,
+    MailSecurity.SSL: 465,
+}
+
+
 class SiteSettings(models.Model):
     """Instance policy an administrator may change from the interface. One row.
 
@@ -264,7 +287,17 @@ class SiteSettings(models.Model):
     #: a readable password in the policy row would be a new kind of secret in a codebase
     #: that has deliberately avoided having one. Read through `email_password`.
     email_password_encrypted = models.TextField(_("password"), blank=True)
-    email_use_tls = models.BooleanField(_("STARTTLS"), null=True, blank=True)
+    #: How the connection is encrypted, as one choice rather than two booleans. Django's
+    #: SMTP backend raises on `use_tls` and `use_ssl` together, and rightly -- they are
+    #: alternatives, not layers -- so a checkbox each would offer a pair that cannot be
+    #: saved. Blank keeps its meaning from every other column here: not set from the
+    #: interface, so the environment answers (#158).
+    email_security = models.CharField(
+        _("connection security"),
+        max_length=10,
+        blank=True,
+        choices=MailSecurity,
+    )
     email_timeout = models.PositiveIntegerField(
         _("timeout in seconds"), null=True, blank=True, validators=[MaxValueValidator(300)]
     )

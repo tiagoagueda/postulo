@@ -467,6 +467,17 @@ POSTULO_EMAIL_PORT = env.int("POSTULO_EMAIL_PORT", default=25)
 POSTULO_EMAIL_HOST_USER = env("POSTULO_EMAIL_HOST_USER", default="")
 POSTULO_EMAIL_HOST_PASSWORD = env("POSTULO_EMAIL_HOST_PASSWORD", default="")
 POSTULO_EMAIL_USE_TLS = env.bool("POSTULO_EMAIL_USE_TLS", default=True)
+# How the connection is encrypted: "none", "starttls" or "ssl" (#158). Falls back to the
+# older POSTULO_EMAIL_USE_TLS, which every existing .env sets and which cannot express the
+# third state, so an instance that has been setting it goes on meaning what it meant.
+POSTULO_EMAIL_SECURITY = (
+    env.str(
+        "POSTULO_EMAIL_SECURITY",
+        default="starttls" if POSTULO_EMAIL_USE_TLS else "none",
+    )
+    .strip()
+    .lower()
+)
 POSTULO_EMAIL_TIMEOUT = env.int("POSTULO_EMAIL_TIMEOUT", default=10)
 
 # --------------------------------------------------------------------- logging

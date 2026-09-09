@@ -16,13 +16,43 @@ from django.utils.translation import gettext_lazy as _
 #: Split out only because it does not fit on a line inside the branch that raises it.
 NO_STARTTLS = _("The server does not offer STARTTLS. Turn it off, or use a port that does.")
 
+#: The port each kind of connection is conventionally offered on. Used only to explain a
+#: failure -- never to refuse one, because a relay on a port of its own is ordinary.
+CONVENTIONAL_PORTS = {"none": (25,), "starttls": (587, 25), "ssl": (465,)}
+
 
 class ConnectionFailed(Exception):
     """The SMTP server could not be reached, negotiated with, or logged in to."""
 
 
+def _mismatch(security: str, port: int) -> str:
+    """A sentence about why a connection to this port, done this way, hangs.
+
+    Both kinds of failure look identical from here -- a wait, then a disconnection -- and
+    the wait is the worst part of it. Pointing one at the other's port is not an exotic
+    mistake: the two ports are documented interchangeably by half the providers there are.
+    """
+    if security != "ssl" and port == 465:
+        return str(
+            _(
+                "Port 465 expects TLS from the first byte, so it is waiting for a "
+                "certificate while Postulo waits for a greeting. Choose “TLS from the "
+                "first byte”, or use port 587 with STARTTLS."
+            )
+        )
+    if security == "ssl" and port in (587, 25):
+        return str(
+            _(
+                "Port %(port)s expects a connection in the clear that is upgraded "
+                "afterwards. Choose “STARTTLS, after connecting”, or use port 465."
+            )
+            % {"port": port}
+        )
+    return ""
+
+
 def check_connection(
-    *, host: str, port: int, username: str, password: str, use_tls: bool, timeout: int
+    *, host: str, port: int, username: str, password: str, security: str, timeout: int
 ) -> str:
     """Prove a set of SMTP settings without sending a message to anybody.
 
@@ -43,9 +73,9 @@ def check_connection(
     if not host:
         raise ConnectionFailed(str(_("No server to connect to.")))
     try:
-        with smtplib.SMTP(host=host, port=port, timeout=timeout) as server:
+        with _open(host, port, security, timeout) as server:
             server.ehlo()
-            if use_tls:
+            if security == "starttls":
                 if not server.has_extn("starttls"):
                     raise ConnectionFailed(str(NO_STARTTLS))
                 server.starttls(context=ssl.create_default_context())
@@ -61,7 +91,11 @@ def check_connection(
             % {"detail": _describe(error)}
         ) from error
     except (OSError, smtplib.SMTPException, ssl.SSLError) as error:
-        raise ConnectionFailed(f"{type(error).__name__}: {error}") from error
+        # The hint goes first: `timed out` is true and useless, and somebody who has just
+        # waited ten seconds for it deserves the sentence that names the actual problem.
+        hint = _mismatch(security, port)
+        detail = f"{type(error).__name__}: {error}"
+        raise ConnectionFailed(f"{hint} ({detail})" if hint else detail) from error
 
     if username:
         return str(_("Connected to %(host)s:%(port)s and signed in as %(user)s.")) % {
@@ -73,6 +107,20 @@ def check_connection(
         "host": host,
         "port": port,
     }
+
+
+def _open(host: str, port: int, security: str, timeout: int):
+    """The socket, opened the way this kind of connection is opened.
+
+    Implicit TLS is a different constructor rather than a flag, because the handshake
+    happens before any SMTP is spoken; there is no point in the conversation at which a
+    plain `SMTP` object could be persuaded into it.
+    """
+    if security == "ssl":
+        return smtplib.SMTP_SSL(
+            host=host, port=port, timeout=timeout, context=ssl.create_default_context()
+        )
+    return smtplib.SMTP(host=host, port=port, timeout=timeout)
 
 
 def _describe(error) -> str:

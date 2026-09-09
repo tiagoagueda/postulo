@@ -20,7 +20,7 @@
         {% comment %} Whether one is set, and nothing else. A masked field of the right
            length gives away the length. {% endcomment %}
         <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Password" %}</dt><dd class="min-w-0 text-end">{% if mailer.has_password %}{% translate "set" %}{% else %}{% translate "not set" %}{% endif %}</dd></div>
-        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">STARTTLS</dt><dd class="min-w-0 text-end">{{ mailer.use_tls|yesno }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Security" %}</dt><dd class="min-w-0 text-end">{{ mailer.security_label }}</dd></div>
       {% endif %}
       <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "From" %}</dt><dd class="min-w-0 text-end">{{ mailer.from_address }}</dd></div>
     </dl>

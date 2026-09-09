@@ -50,7 +50,7 @@ class SMTPTransport:
                 port=int(config.get("port") or 25),
                 username=str(config.get("username") or ""),
                 password=str(config.get("password") or ""),
-                use_tls=bool(config.get("use_tls")),
+                security=str(config.get("security") or ""),
                 timeout=int(config.get("timeout") or 10),
             )
         except mail.ConnectionFailed as error:
@@ -70,7 +70,9 @@ class SMTPTransport:
             port=int(config.get("port") or 25),
             username=str(config.get("username") or ""),
             password=str(config.get("password") or ""),
-            use_tls=bool(config.get("use_tls")),
+            # Never both: Django refuses the pair, and one field cannot produce it (#158).
+            use_tls=config.get("security") == "starttls",
+            use_ssl=config.get("security") == "ssl",
             timeout=config.get("timeout"),
         )
         return backend.send_messages(messages) or 0

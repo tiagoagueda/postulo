@@ -188,11 +188,13 @@ class EmailForm(forms.ModelForm):
     administrator can read and copy must not become one some of them cannot reach.
     """
 
-    email_use_tls = PolicyField(
-        label=_("STARTTLS"),
+    email_security = forms.ChoiceField(
+        label=_("Connection security"),
+        required=False,
         help_text=_(
-            "Yes for a server on port 587 that upgrades the connection after connecting. "
-            "Postulo does not yet speak implicit TLS on port 465."
+            "STARTTLS connects and then upgrades, which is what port 587 expects. TLS from "
+            "the first byte is what port 465 expects. They are not interchangeable: point "
+            "one at the other's port and each waits for the other to speak."
         ),
     )
     email_password = forms.CharField(
@@ -213,7 +215,7 @@ class EmailForm(forms.ModelForm):
             "email_host",
             "email_port",
             "email_username",
-            "email_use_tls",
+            "email_security",
             "email_timeout",
             "email_from",
         )
@@ -223,7 +225,16 @@ class EmailForm(forms.ModelForm):
     TRANSPORT_PREFIX = "transport__"
 
     def __init__(self, *args, **kwargs):
+        from postulo.core.models import MailSecurity
+
         super().__init__(*args, **kwargs)
+        if "email_security" in self.fields:
+            # An empty first choice, because blank means "not set here" for every column on
+            # this page and the environment answers for it.
+            self.fields["email_security"].choices = [
+                ("", _("Not set — the environment decides")),
+                *MailSecurity.choices,
+            ]
         self._add_transport_fields()
         self.pinned = {
             field: variable
@@ -252,7 +263,24 @@ class EmailForm(forms.ModelForm):
         for field in self.pinned:
             cleaned.pop(field, None)
             self.errors.pop(field, None)
+        self._suggest_the_port(cleaned)
         return cleaned
+
+    @staticmethod
+    def _suggest_the_port(cleaned: dict) -> None:
+        """Fill in the port each kind of connection is normally offered on.
+
+        Only when the box was left empty. A port somebody typed is never corrected: a relay
+        on a port of its own is an ordinary thing for a self-hosted instance to have, and
+        the surest way to make a setting page hated is to argue with what was typed into it.
+        """
+        from postulo.core.models import DEFAULT_MAIL_PORTS
+
+        if "email_port" not in cleaned or "email_security" not in cleaned:
+            return
+        if cleaned.get("email_port"):
+            return
+        cleaned["email_port"] = DEFAULT_MAIL_PORTS.get(cleaned.get("email_security"))
 
     def _add_transport_fields(self) -> None:
         """A chooser when there is a choice, and the chosen transport's own settings.
@@ -287,7 +315,7 @@ class EmailForm(forms.ModelForm):
             "email_host",
             "email_port",
             "email_username",
-            "email_use_tls",
+            "email_security",
             "email_timeout",
         ):
             self.fields.pop(name, None)
