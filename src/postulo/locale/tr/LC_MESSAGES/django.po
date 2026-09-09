@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 14:38+0000\n"
+"POT-Creation-Date: 2026-09-09 14:55+0000\n"
 "PO-Revision-Date: 2026-09-08 12:24+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Türkçe\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s %(when)s için planlandı"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(company)s şirketinde %(title)s"
 
-#: src/postulo/notifications/transport.py:267
+#: src/postulo/notifications/transport.py:298
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -2952,7 +2952,7 @@ msgstr "Ayrı olarak dışa aktarıldı"
 msgid "Failed"
 msgstr "Başarısız"
 
-#: src/postulo/core/models.py:433 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Nedenini söylemeden başarısız oldu."
@@ -3962,7 +3962,7 @@ msgid ""
 msgstr ""
 "%(file)s içinde tutulur ve boyuta göre döndürülür, böylece diski dolduramaz. Buradaki her şey ayrıca konsola da gider; <code>docker logs</code> onu oradan okur."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:233
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4368,12 +4368,12 @@ msgstr "Küçük sayılar önce görünür."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Küçük harfler, rakamlar, noktalar, alt çizgiler ve tireler."
 
-#: src/postulo/core/models.py:388
+#: src/postulo/core/models.py:397
 #, draft
 msgid "mail failures in a row"
 msgstr "arka arkaya posta hatası"
 
-#: src/postulo/notifications/transport.py:216
+#: src/postulo/notifications/transport.py:230
 #, draft
 msgid "Mail has been failing."
 msgstr "Posta başarısız oluyor."
@@ -4389,7 +4389,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Burada posta bir hesaba geri dönmenin tek yolu, bu yüzden bu yeniden çalışana kadar bu örnekteki %(counter)s kişiden hiçbiri parolasını unutursa geri giremez."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:393
 #, draft
 msgid "mail last failed"
 msgstr "posta en son başarısız oldu"
@@ -4399,7 +4399,7 @@ msgstr "posta en son başarısız oldu"
 msgid "Mail last went out at %(when)s."
 msgstr "Posta en son %(when)s tarihinde çıktı."
 
-#: src/postulo/core/models.py:383
+#: src/postulo/core/models.py:392
 #, draft
 msgid "mail last worked"
 msgstr "posta en son çalıştı"
@@ -4421,7 +4421,7 @@ msgstr "posta taşıyıcısı"
 msgid "Mail transport"
 msgstr "Posta taşıyıcısı"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:394
 #, draft
 msgid "mail's last error"
 msgstr "postanın son hatası"
@@ -5840,7 +5840,7 @@ msgstr "Kişisel site"
 msgid "Pharmaceuticals"
 msgstr "İlaç"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:230
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6849,7 +6849,7 @@ msgstr "Kaydedildi."
 msgid "Say what this identifier is."
 msgstr "Bu tanımlayıcının ne olduğunu belirtin."
 
-#: src/postulo/core/phone_numbers.py:244
+#: src/postulo/core/phone_numbers.py:266
 #, draft
 msgid "Say what this number is."
 msgstr "Bu numaranın ne olduğunu söyleyin."
@@ -7215,7 +7215,7 @@ msgstr "Tek oturum açma ikinci etken sayılır"
 msgid "Site search"
 msgstr "Site araması"
 
-#: src/postulo/core/models.py:401 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
 #, draft
 msgid "site settings"
 msgstr "site ayarları"
@@ -7700,6 +7700,21 @@ msgstr "Bağlantıyı sına"
 #, draft
 msgid "text as sent"
 msgstr "gönderildiği hâliyle metin"
+
+#: src/postulo/core/models.py:386
+#, draft
+msgid "text configuration"
+msgstr "mesaj yapılandırması"
+
+#: src/postulo/core/models.py:387
+#, draft
+msgid "text secrets"
+msgstr "mesaj sırları"
+
+#: src/postulo/core/models.py:385
+#, draft
+msgid "text transport"
+msgstr "mesaj taşıyıcısı"
 
 #: src/postulo/core/search.py:389
 #, draft
@@ -8458,6 +8473,11 @@ msgid ""
 msgstr ""
 "Bu kurulumda henüz hesap yok, bu yüzden kayıt formu ona ulaşan herkese sunuluyor: ilk hesap yönetici olur."
 
+#: src/postulo/notifications/text.py:84
+#, draft
+msgid "This instance has no way to send a text message."
+msgstr "Bu örneğin kısa mesaj gönderecek bir yolu yok."
+
 #: src/postulo/templates/core/home.html:29
 #, draft
 msgid "This instance is invite-only."
@@ -8504,7 +8524,7 @@ msgstr "Kuracağınız şey bu. Henüz hiçbir şey kurulmadı."
 msgid "This kind of identifier is already listed."
 msgstr "Bu türden bir tanımlayıcı zaten listede."
 
-#: src/postulo/core/phone_numbers.py:270
+#: src/postulo/core/phone_numbers.py:292
 #, draft
 msgid "This number is already listed."
 msgstr "Bu numara zaten listede."
@@ -8637,6 +8657,11 @@ msgstr "jeton özeti"
 msgid "Token revoked."
 msgstr "Jeton geri alındı."
 
+#: src/postulo/notifications/text.py:57
+#, draft
+msgid "Too many messages. Try again shortly."
+msgstr "Çok fazla mesaj. Birazdan tekrar deneyin."
+
 #: src/postulo/core/throttle.py:74
 #, python-format, draft
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
@@ -8756,12 +8781,12 @@ msgid "Update the preview"
 msgstr "Önizlemeyi güncelle"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:390
+#: src/postulo/core/models.py:399
 #, draft
 msgid "updated at"
 msgstr "güncellenme zamanı"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:406
 #, draft
 msgid "updated by"
 msgstr "güncelleyen"
@@ -9509,7 +9534,7 @@ msgid ""
 msgstr ""
 "Buna daha önce başvurdunuz. İkinci bir başvuru kaydetmenin sakıncası yok; ikisi de kayıtta kalır."
 
-#: src/postulo/core/phone_numbers.py:126
+#: src/postulo/core/phone_numbers.py:148
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

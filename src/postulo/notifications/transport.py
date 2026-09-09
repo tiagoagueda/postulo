@@ -27,6 +27,8 @@ from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.utils.translation import gettext as _
 
+from postulo.plugins import base
+
 logger = logging.getLogger(__name__)
 
 #: What is used when nobody has chosen, and what an instance that has never heard of
@@ -34,26 +36,31 @@ logger = logging.getLogger(__name__)
 DEFAULT_TRANSPORT = "smtp"
 
 
-def available() -> list:
-    """Every transport this instance could use."""
+def available(medium: str = base.MAIL) -> list:
+    """Every transport this instance could use to carry ``medium``."""
     from postulo.plugins.registry import plugins
 
-    return plugins("transport")
+    return [item for item in plugins("transport") if base.medium_of(item) == medium]
 
 
-def selected():
-    """The transport that carries the mail, or ``None`` if there is not one.
+def selected(medium: str = base.MAIL):
+    """The transport that carries ``medium``, or ``None`` if there is not one.
 
-    An administrator's choice, else the built-in SMTP one, else whatever single transport
-    is installed. Never "the first third-party one wins": the registry prefers third-party
-    plugins for sources because a plugin written for one job board knows more about it than
-    a general parser does, and that argument does not transfer to *where this instance's
-    mail goes*. Installing a package must not silently redirect the mail.
+    An administrator's choice, else the built-in one for that medium if there is one, else
+    whatever single transport carries it. Never "the first third-party one wins": the
+    registry prefers third-party plugins for sources because a plugin written for one job
+    board knows more about it than a general parser does, and that argument does not
+    transfer to *where this instance's messages go*. Installing a package must not silently
+    redirect them.
+
+    Postulo ships a mail transport and no text one, so an instance with nothing installed
+    answers ``None`` here for text — which is the honest answer and the reason a telephone
+    number cannot yet be confirmed (#143, #146).
     """
-    installed = available()
+    installed = available(medium)
     if not installed:
         return None
-    chosen = _chosen_name()
+    chosen = _chosen_name(medium)
     for transport in installed:
         if transport.name == chosen:
             return transport
@@ -63,13 +70,16 @@ def selected():
     return installed[0] if len(installed) == 1 else None
 
 
-def _chosen_name() -> str:
+def _chosen_name(medium: str = base.MAIL) -> str:
     from postulo.core import site
 
     try:
-        return site.current().email_transport or DEFAULT_TRANSPORT
+        row = site.current()
     except Exception:
-        return DEFAULT_TRANSPORT
+        return DEFAULT_TRANSPORT if medium == base.MAIL else ""
+    if medium == base.MAIL:
+        return row.email_transport or DEFAULT_TRANSPORT
+    return row.text_transport or ""
 
 
 def configuration(transport) -> dict:
@@ -92,6 +102,10 @@ def configuration(transport) -> dict:
         row = site.current()
     except Exception:
         return {}
+    # One blob per medium rather than one shared blob, because two transports are selected
+    # at once now and a single column could only hold one of their configurations (#143).
+    if base.medium_of(transport) == base.TEXT:
+        return {**(row.text_config or {}), **row.text_secrets}
     return {**(row.transport_config or {}), **row.transport_secrets}
 
 
@@ -216,7 +230,24 @@ def all_routes(*, without: str = "") -> list[Route]:
             trouble="" if delivers else str(_("Mail has been failing.")),
         ),
         Route(name="passkey", exists=not accounts_needing_email()),
+        Route(name="text", exists=_text_reaches_everybody(without)),
     ]
+
+
+def _text_reaches_everybody(without: str = "") -> bool:
+    """Whether a text message is a way back in for *every* account, not merely for some.
+
+    The same bar the passkey route is held to, and for the same reason: this list decides
+    whether mail may be switched off, so a route that covers nine accounts out of ten would
+    strand the tenth. A gateway plus a confirmed number on every active account is what it
+    takes, which is a high bar and the correct one.
+    """
+    carrier = selected(base.TEXT)
+    if carrier is None or carrier.name == without:
+        return False
+    from postulo.core import phone_numbers
+
+    return not phone_numbers.accounts_without_a_verified_number()
 
 
 def recovery_routes(*, without: str = "") -> list[str]:

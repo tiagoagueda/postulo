@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 14:38+0000\n"
+"POT-Creation-Date: 2026-09-09 14:55+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s %(when)s egunerako antolatu da"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s %(company)s enpresan"
 
-#: src/postulo/notifications/transport.py:267
+#: src/postulo/notifications/transport.py:298
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -2960,7 +2960,7 @@ msgstr "Aparte esportatuta"
 msgid "Failed"
 msgstr "Huts egin du"
 
-#: src/postulo/core/models.py:433 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Huts egin du zergatik esan gabe."
@@ -3972,7 +3972,7 @@ msgid ""
 msgstr ""
 "%(file)s fitxategian gordetzen da eta tamainaren arabera biratzen, beraz honek ezin du diskoa bete. Hemengo guztia kontsolara ere joaten da, non <code>docker logs</code>(e)k irakurtzen duen."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:233
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4378,12 +4378,12 @@ msgstr "Zenbaki txikiagoak lehenago agertzen dira."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Minuskulak, zifrak, puntuak, azpimarrak eta marratxoak."
 
-#: src/postulo/core/models.py:388
+#: src/postulo/core/models.py:397
 #, draft
 msgid "mail failures in a row"
 msgstr "posta-hutsegite jarraian"
 
-#: src/postulo/notifications/transport.py:216
+#: src/postulo/notifications/transport.py:230
 #, draft
 msgid "Mail has been failing."
 msgstr "Posta huts egiten ari da."
@@ -4399,7 +4399,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Hemen posta da kontu batera itzultzeko bide bakarra, beraz, berriro funtzionatu arte instantzia honetako %(counter)s pertsonetako inork ezingo du sartu pasahitza ahazten badu."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:393
 #, draft
 msgid "mail last failed"
 msgstr "postaren azken hutsegitea"
@@ -4409,7 +4409,7 @@ msgstr "postaren azken hutsegitea"
 msgid "Mail last went out at %(when)s."
 msgstr "Posta azkenekoz %(when)s atera zen."
 
-#: src/postulo/core/models.py:383
+#: src/postulo/core/models.py:392
 #, draft
 msgid "mail last worked"
 msgstr "posta azkenekoz ondo ibili zen"
@@ -4431,7 +4431,7 @@ msgstr "posta-garraioa"
 msgid "Mail transport"
 msgstr "Posta-garraioa"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:394
 #, draft
 msgid "mail's last error"
 msgstr "postaren azken errorea"
@@ -5850,7 +5850,7 @@ msgstr "Gune pertsonala"
 msgid "Pharmaceuticals"
 msgstr "Farmazia"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:230
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6859,7 +6859,7 @@ msgstr "Gorde da."
 msgid "Say what this identifier is."
 msgstr "Esan zer den identifikatzaile hau."
 
-#: src/postulo/core/phone_numbers.py:244
+#: src/postulo/core/phone_numbers.py:266
 #, draft
 msgid "Say what this number is."
 msgstr "Esan zer zenbaki den hau."
@@ -7225,7 +7225,7 @@ msgstr "Saio-hasiera bakarra bigarren faktoretzat hartzen da"
 msgid "Site search"
 msgstr "Bilaketa gunean"
 
-#: src/postulo/core/models.py:401 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
 #, draft
 msgid "site settings"
 msgstr "gunearen ezarpenak"
@@ -7710,6 +7710,21 @@ msgstr "Probatu konexioa"
 #, draft
 msgid "text as sent"
 msgstr "testua bidali zen bezala"
+
+#: src/postulo/core/models.py:386
+#, draft
+msgid "text configuration"
+msgstr "mezuen konfigurazioa"
+
+#: src/postulo/core/models.py:387
+#, draft
+msgid "text secrets"
+msgstr "mezuen sekretuak"
+
+#: src/postulo/core/models.py:385
+#, draft
+msgid "text transport"
+msgstr "mezuen garraioa"
 
 #: src/postulo/core/search.py:389
 #, draft
@@ -8479,6 +8494,11 @@ msgid ""
 msgstr ""
 "Instalazio honek ez du oraindik konturik, beraz erregistro-orria bertara iristen den edonori eskaintzen zaio: lehen kontua administratzaile bihurtzen da."
 
+#: src/postulo/notifications/text.py:84
+#, draft
+msgid "This instance has no way to send a text message."
+msgstr "Instantzia honek ez du testu-mezurik bidaltzeko modurik."
+
 #: src/postulo/templates/core/home.html:29
 #, draft
 msgid "This instance is invite-only."
@@ -8525,7 +8545,7 @@ msgstr "Hau da instalatzera zoazena. Oraindik ez da ezer instalatu."
 msgid "This kind of identifier is already listed."
 msgstr "Mota honetako identifikatzailea jada zerrendan dago."
 
-#: src/postulo/core/phone_numbers.py:270
+#: src/postulo/core/phone_numbers.py:292
 #, draft
 msgid "This number is already listed."
 msgstr "Zenbaki hau jada zerrendatuta dago."
@@ -8659,6 +8679,11 @@ msgstr "tokenaren hash-a"
 msgid "Token revoked."
 msgstr "Tokena baliogabetu da."
 
+#: src/postulo/notifications/text.py:57
+#, draft
+msgid "Too many messages. Try again shortly."
+msgstr "Mezu gehiegi. Saiatu berriro laster."
+
 #: src/postulo/core/throttle.py:74
 #, python-format, draft
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
@@ -8776,12 +8801,12 @@ msgid "Update the preview"
 msgstr "Eguneratu aurrebista"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:390
+#: src/postulo/core/models.py:399
 #, draft
 msgid "updated at"
 msgstr "eguneratze-data"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:406
 #, draft
 msgid "updated by"
 msgstr "nork eguneratua"
@@ -9532,7 +9557,7 @@ msgid ""
 msgstr ""
 "Honi lehenago ere egin diozu eskaera. Bigarren eskaera bat jasotzea ondo dago; biak geratzen dira erregistroan."
 
-#: src/postulo/core/phone_numbers.py:126
+#: src/postulo/core/phone_numbers.py:148
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

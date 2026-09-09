@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 14:38+0000\n"
+"POT-Creation-Date: 2026-09-09 14:55+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: svenska\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s planerad till %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s hos %(company)s"
 
-#: src/postulo/notifications/transport.py:267
+#: src/postulo/notifications/transport.py:298
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -2951,7 +2951,7 @@ msgstr "Exporterad för sig"
 msgid "Failed"
 msgstr "Misslyckades"
 
-#: src/postulo/core/models.py:433 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Misslyckades utan att säga varför."
@@ -3959,7 +3959,7 @@ msgid ""
 msgstr ""
 "Sparas i %(file)s och roteras efter storlek, så det kan inte fylla disken. Allt här går även till konsolen, där <code>docker logs</code> läser det."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:233
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4365,12 +4365,12 @@ msgstr "Lägre nummer visas först."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Små bokstäver, siffror, punkter, understreck och bindestreck."
 
-#: src/postulo/core/models.py:388
+#: src/postulo/core/models.py:397
 #, draft
 msgid "mail failures in a row"
 msgstr "postfel i rad"
 
-#: src/postulo/notifications/transport.py:216
+#: src/postulo/notifications/transport.py:230
 #, draft
 msgid "Mail has been failing."
 msgstr "Posten har misslyckats."
@@ -4386,7 +4386,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Post är den enda vägen tillbaka in i ett konto här, så tills detta fungerar igen kommer ingen av de %(counter)s personerna på den här instansen in igen om de glömmer sitt lösenord."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:393
 #, draft
 msgid "mail last failed"
 msgstr "posten misslyckades senast"
@@ -4396,7 +4396,7 @@ msgstr "posten misslyckades senast"
 msgid "Mail last went out at %(when)s."
 msgstr "Posten gick senast ut %(when)s."
 
-#: src/postulo/core/models.py:383
+#: src/postulo/core/models.py:392
 #, draft
 msgid "mail last worked"
 msgstr "posten fungerade senast"
@@ -4418,7 +4418,7 @@ msgstr "e-posttransport"
 msgid "Mail transport"
 msgstr "E-posttransport"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:394
 #, draft
 msgid "mail's last error"
 msgstr "postens senaste fel"
@@ -5832,7 +5832,7 @@ msgstr "Egen webbplats"
 msgid "Pharmaceuticals"
 msgstr "Läkemedel"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:230
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6839,7 +6839,7 @@ msgstr "Sparat."
 msgid "Say what this identifier is."
 msgstr "Ange vad den här identifieraren är."
 
-#: src/postulo/core/phone_numbers.py:244
+#: src/postulo/core/phone_numbers.py:266
 #, draft
 msgid "Say what this number is."
 msgstr "Säg vad det här numret är."
@@ -7205,7 +7205,7 @@ msgstr "Enkel inloggning räknas som andra faktor"
 msgid "Site search"
 msgstr "Sök på webbplatsen"
 
-#: src/postulo/core/models.py:401 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
 #, draft
 msgid "site settings"
 msgstr "webbplatsinställningar"
@@ -7690,6 +7690,21 @@ msgstr "Testa anslutningen"
 #, draft
 msgid "text as sent"
 msgstr "text som skickad"
+
+#: src/postulo/core/models.py:386
+#, draft
+msgid "text configuration"
+msgstr "meddelandeinställningar"
+
+#: src/postulo/core/models.py:387
+#, draft
+msgid "text secrets"
+msgstr "meddelandehemligheter"
+
+#: src/postulo/core/models.py:385
+#, draft
+msgid "text transport"
+msgstr "meddelandetransport"
 
 #: src/postulo/core/search.py:389
 #, draft
@@ -8455,6 +8470,11 @@ msgid ""
 msgstr ""
 "Den här instansen har inga konton ännu, så registreringsformuläret erbjuds den som kommer hit: det första kontot blir administratör."
 
+#: src/postulo/notifications/text.py:84
+#, draft
+msgid "This instance has no way to send a text message."
+msgstr "Den här instansen har inget sätt att skicka ett sms."
+
 #: src/postulo/templates/core/home.html:29
 #, draft
 msgid "This instance is invite-only."
@@ -8502,7 +8522,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Den här sortens identifierare finns redan i listan."
 
-#: src/postulo/core/phone_numbers.py:270
+#: src/postulo/core/phone_numbers.py:292
 #, draft
 msgid "This number is already listed."
 msgstr "Det här numret finns redan i listan."
@@ -8636,6 +8656,11 @@ msgstr "token-hash"
 msgid "Token revoked."
 msgstr "Token återkallad."
 
+#: src/postulo/notifications/text.py:57
+#, draft
+msgid "Too many messages. Try again shortly."
+msgstr "För många meddelanden. Försök igen om en stund."
+
 #: src/postulo/core/throttle.py:74
 #, python-format, draft
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
@@ -8754,12 +8779,12 @@ msgid "Update the preview"
 msgstr "Uppdatera förhandsgranskningen"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:390
+#: src/postulo/core/models.py:399
 #, draft
 msgid "updated at"
 msgstr "uppdaterad den"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:406
 #, draft
 msgid "updated by"
 msgstr "uppdaterad av"
@@ -9507,7 +9532,7 @@ msgid ""
 msgstr ""
 "Du har sökt den här förut. Att registrera en andra ansökan är helt i sin ordning; båda stannar kvar i registret."
 
-#: src/postulo/core/phone_numbers.py:126
+#: src/postulo/core/phone_numbers.py:148
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

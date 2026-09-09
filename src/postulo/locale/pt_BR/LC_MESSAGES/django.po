@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 14:38+0000\n"
+"POT-Creation-Date: 2026-09-09 14:55+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: português (Portugal)\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s marcada para %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s na %(company)s"
 
-#: src/postulo/notifications/transport.py:267
+#: src/postulo/notifications/transport.py:298
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -2956,7 +2956,7 @@ msgstr "Exportado à parte"
 msgid "Failed"
 msgstr "Falhou"
 
-#: src/postulo/core/models.py:433 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Falhou sem dizer porquê."
@@ -3968,7 +3968,7 @@ msgid ""
 msgstr ""
 "Guardado em %(file)s e rodado por tamanho, por isso não pode encher o disco. Tudo o que está aqui vai também para a consola, onde o <code>docker logs</code> o lê."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:233
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4373,12 +4373,12 @@ msgstr "Os números mais baixos aparecem primeiro."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Letras minúsculas, algarismos, pontos, sublinhados e hífenes."
 
-#: src/postulo/core/models.py:388
+#: src/postulo/core/models.py:397
 #, draft
 msgid "mail failures in a row"
 msgstr "falhas de e-mail seguidas"
 
-#: src/postulo/notifications/transport.py:216
+#: src/postulo/notifications/transport.py:230
 #, draft
 msgid "Mail has been failing."
 msgstr "O e-mail está falhando."
@@ -4394,7 +4394,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Aqui o e-mail é a única maneira de voltar a entrar numa conta, então, até isso voltar a funcionar, nenhuma das %(counter)s pessoas desta instância vai conseguir entrar se esquecer a senha."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:393
 #, draft
 msgid "mail last failed"
 msgstr "última falha do e-mail"
@@ -4404,7 +4404,7 @@ msgstr "última falha do e-mail"
 msgid "Mail last went out at %(when)s."
 msgstr "O e-mail saiu pela última vez às %(when)s."
 
-#: src/postulo/core/models.py:383
+#: src/postulo/core/models.py:392
 #, draft
 msgid "mail last worked"
 msgstr "última vez que o e-mail funcionou"
@@ -4426,7 +4426,7 @@ msgstr "transporte de e-mail"
 msgid "Mail transport"
 msgstr "Transporte de e-mail"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:394
 #, draft
 msgid "mail's last error"
 msgstr "último erro do e-mail"
@@ -5846,7 +5846,7 @@ msgstr "Sítio pessoal"
 msgid "Pharmaceuticals"
 msgstr "Farmacêutica"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:230
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6851,7 +6851,7 @@ msgstr "Salvo."
 msgid "Say what this identifier is."
 msgstr "Diga o que é este identificador."
 
-#: src/postulo/core/phone_numbers.py:244
+#: src/postulo/core/phone_numbers.py:266
 #, draft
 msgid "Say what this number is."
 msgstr "Diga o que é este número."
@@ -7217,7 +7217,7 @@ msgstr "O início de sessão único conta como segundo fator"
 msgid "Site search"
 msgstr "Pesquisa no sítio"
 
-#: src/postulo/core/models.py:401 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
 #, draft
 msgid "site settings"
 msgstr "configurações do sítio"
@@ -7701,6 +7701,21 @@ msgstr "Testar a conexão"
 #, draft
 msgid "text as sent"
 msgstr "texto tal como enviado"
+
+#: src/postulo/core/models.py:386
+#, draft
+msgid "text configuration"
+msgstr "configuração das mensagens"
+
+#: src/postulo/core/models.py:387
+#, draft
+msgid "text secrets"
+msgstr "segredos das mensagens"
+
+#: src/postulo/core/models.py:385
+#, draft
+msgid "text transport"
+msgstr "transporte das mensagens"
 
 #: src/postulo/core/search.py:389
 #, draft
@@ -8464,6 +8479,11 @@ msgid ""
 msgstr ""
 "Esta instância ainda não tem contas, por isso o formulário de registo é oferecido a quem chegar: a primeira conta torna-se administrador."
 
+#: src/postulo/notifications/text.py:84
+#, draft
+msgid "This instance has no way to send a text message."
+msgstr "Esta instância não tem como enviar uma mensagem de texto."
+
 #: src/postulo/templates/core/home.html:29
 #, draft
 msgid "This instance is invite-only."
@@ -8510,7 +8530,7 @@ msgstr "É isto que está prestes a instalar. Ainda não foi instalado nada."
 msgid "This kind of identifier is already listed."
 msgstr "Este tipo de identificador já está listado."
 
-#: src/postulo/core/phone_numbers.py:270
+#: src/postulo/core/phone_numbers.py:292
 #, draft
 msgid "This number is already listed."
 msgstr "Este número já está na lista."
@@ -8644,6 +8664,11 @@ msgstr "síntese do token"
 msgid "Token revoked."
 msgstr "Token revogado."
 
+#: src/postulo/notifications/text.py:57
+#, draft
+msgid "Too many messages. Try again shortly."
+msgstr "Mensagens demais. Tente de novo daqui a pouco."
+
 #: src/postulo/core/throttle.py:74
 #, python-format, draft
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
@@ -8763,12 +8788,12 @@ msgid "Update the preview"
 msgstr "Atualizar a pré-visualização"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:390
+#: src/postulo/core/models.py:399
 #, draft
 msgid "updated at"
 msgstr "atualizado em"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:406
 #, draft
 msgid "updated by"
 msgstr "atualizado por"
@@ -9519,7 +9544,7 @@ msgid ""
 msgstr ""
 "Já se candidatou a esta antes. Registar uma segunda candidatura é possível; ambas ficam no registo."
 
-#: src/postulo/core/phone_numbers.py:126
+#: src/postulo/core/phone_numbers.py:148
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

@@ -103,6 +103,28 @@ def can_get_back_in(person) -> bool:
     return bool(recovery_candidates(person))
 
 
+def accounts_without_a_verified_number() -> int:
+    """Active accounts that a text message could not get back into.
+
+    Counted rather than assumed, exactly as the passkey count is: on every instance today
+    this is every account, because nothing can confirm a number yet, and the day that stops
+    being true it stops being true here without anything else changing.
+    """
+    from django.contrib.auth import get_user_model
+    from django.contrib.contenttypes.models import ContentType
+    from django.utils import timezone
+
+    from postulo.accounts.models import Profile
+    from postulo.core.models import PhoneNumber
+
+    fresh_enough = timezone.now() - PhoneNumber.VERIFICATION_LASTS
+    with_one = PhoneNumber.objects.filter(
+        content_type=ContentType.objects.get_for_model(Profile),
+        verified_at__gte=fresh_enough,
+    ).values_list("owner_id", flat=True)
+    return get_user_model().objects.filter(is_active=True).exclude(pk__in=with_one).count()
+
+
 def taken_elsewhere(number: str, *, exclude_pk: int | None = None) -> bool:
     """Whether some other row on this instance already holds this number.
 

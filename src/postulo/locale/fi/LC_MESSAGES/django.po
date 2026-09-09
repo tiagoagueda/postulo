@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 14:38+0000\n"
+"POT-Creation-Date: 2026-09-09 14:55+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s sovittu: %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s, %(company)s"
 
-#: src/postulo/notifications/transport.py:267
+#: src/postulo/notifications/transport.py:298
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -2949,7 +2949,7 @@ msgstr "Viety erikseen"
 msgid "Failed"
 msgstr "Epäonnistui"
 
-#: src/postulo/core/models.py:433 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Epäonnistui syytä kertomatta."
@@ -3959,7 +3959,7 @@ msgid ""
 msgstr ""
 "Säilytetään tiedostossa %(file)s ja kierrätetään koon mukaan, joten se ei voi täyttää levyä. Kaikki tämä menee myös konsoliin, josta <code>docker logs</code> lukee sen."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:233
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4365,12 +4365,12 @@ msgstr "Pienemmät numerot näytetään ensin."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Pieniä kirjaimia, numeroita, pisteitä, alaviivoja ja yhdysmerkkejä."
 
-#: src/postulo/core/models.py:388
+#: src/postulo/core/models.py:397
 #, draft
 msgid "mail failures in a row"
 msgstr "postivirhettä peräkkäin"
 
-#: src/postulo/notifications/transport.py:216
+#: src/postulo/notifications/transport.py:230
 #, draft
 msgid "Mail has been failing."
 msgstr "Posti on epäonnistunut."
@@ -4386,7 +4386,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Posti on täällä ainoa tie takaisin tilille, joten kunnes tämä taas toimii, kukaan tämän instanssin %(counter)s ihmisestä ei pääse takaisin, jos unohtaa salasanansa."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:393
 #, draft
 msgid "mail last failed"
 msgstr "posti epäonnistui viimeksi"
@@ -4396,7 +4396,7 @@ msgstr "posti epäonnistui viimeksi"
 msgid "Mail last went out at %(when)s."
 msgstr "Posti lähti viimeksi %(when)s."
 
-#: src/postulo/core/models.py:383
+#: src/postulo/core/models.py:392
 #, draft
 msgid "mail last worked"
 msgstr "posti toimi viimeksi"
@@ -4418,7 +4418,7 @@ msgstr "postin kuljetustapa"
 msgid "Mail transport"
 msgstr "Postin kuljetustapa"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:394
 #, draft
 msgid "mail's last error"
 msgstr "postin viimeisin virhe"
@@ -5835,7 +5835,7 @@ msgstr "Oma sivusto"
 msgid "Pharmaceuticals"
 msgstr "Lääketeollisuus"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:230
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6842,7 +6842,7 @@ msgstr "Tallennettu."
 msgid "Say what this identifier is."
 msgstr "Kerro, mikä tämä tunniste on."
 
-#: src/postulo/core/phone_numbers.py:244
+#: src/postulo/core/phone_numbers.py:266
 #, draft
 msgid "Say what this number is."
 msgstr "Kerro, mikä numero tämä on."
@@ -7209,7 +7209,7 @@ msgstr "Kertakirjautuminen käy toisesta tekijästä"
 msgid "Site search"
 msgstr "Sivustohaku"
 
-#: src/postulo/core/models.py:401 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
 #, draft
 msgid "site settings"
 msgstr "sivuston asetukset"
@@ -7693,6 +7693,21 @@ msgstr "Testaa yhteys"
 #, draft
 msgid "text as sent"
 msgstr "teksti lähetetyssä muodossa"
+
+#: src/postulo/core/models.py:386
+#, draft
+msgid "text configuration"
+msgstr "viestiasetukset"
+
+#: src/postulo/core/models.py:387
+#, draft
+msgid "text secrets"
+msgstr "viestisalaisuudet"
+
+#: src/postulo/core/models.py:385
+#, draft
+msgid "text transport"
+msgstr "viestien kuljetus"
 
 #: src/postulo/core/search.py:389
 #, draft
@@ -8456,6 +8471,11 @@ msgid ""
 msgstr ""
 "Tällä instanssilla ei ole vielä tilejä, joten rekisteröitymislomake tarjotaan sille, joka tänne saapuu: ensimmäisestä tilistä tulee ylläpitäjä."
 
+#: src/postulo/notifications/text.py:84
+#, draft
+msgid "This instance has no way to send a text message."
+msgstr "Tällä instanssilla ei ole tapaa lähettää tekstiviestiä."
+
 #: src/postulo/templates/core/home.html:29
 #, draft
 msgid "This instance is invite-only."
@@ -8502,7 +8522,7 @@ msgstr "Tämän olet asentamassa. Mitään ei ole vielä asennettu."
 msgid "This kind of identifier is already listed."
 msgstr "Tämäntyyppinen tunniste on jo luettelossa."
 
-#: src/postulo/core/phone_numbers.py:270
+#: src/postulo/core/phone_numbers.py:292
 #, draft
 msgid "This number is already listed."
 msgstr "Tämä numero on jo luettelossa."
@@ -8636,6 +8656,11 @@ msgstr "avaimen tiiviste"
 msgid "Token revoked."
 msgstr "Avain peruttu."
 
+#: src/postulo/notifications/text.py:57
+#, draft
+msgid "Too many messages. Try again shortly."
+msgstr "Liikaa viestejä. Yritä pian uudelleen."
+
 #: src/postulo/core/throttle.py:74
 #, python-format, draft
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
@@ -8754,12 +8779,12 @@ msgid "Update the preview"
 msgstr "Päivitä esikatselu"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:390
+#: src/postulo/core/models.py:399
 #, draft
 msgid "updated at"
 msgstr "päivitetty"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:406
 #, draft
 msgid "updated by"
 msgstr "päivittäjä"
@@ -9506,7 +9531,7 @@ msgid ""
 msgstr ""
 "Olet hakenut tätä aiemmin. Toisen hakemuksen kirjaaminen on aivan sallittua; molemmat säilyvät."
 
-#: src/postulo/core/phone_numbers.py:126
+#: src/postulo/core/phone_numbers.py:148
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

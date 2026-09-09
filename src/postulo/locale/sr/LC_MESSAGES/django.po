@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 14:38+0000\n"
+"POT-Creation-Date: 2026-09-09 14:55+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: српски\n"
@@ -181,7 +181,7 @@ msgstr "%(kind)s заказан за %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s у %(company)s"
 
-#: src/postulo/notifications/transport.py:267
+#: src/postulo/notifications/transport.py:298
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -2970,7 +2970,7 @@ msgstr "Извезено засебно"
 msgid "Failed"
 msgstr "Није успело"
 
-#: src/postulo/core/models.py:433 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Није успело, без објашњења зашто."
@@ -3978,7 +3978,7 @@ msgid ""
 msgstr ""
 "Чува се у %(file)s и ротира по величини, па ово не може да напуни диск. Све овде иде и у конзолу, одакле то чита <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:233
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4384,12 +4384,12 @@ msgstr "Мањи бројеви појављују се први."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Мала слова, цифре, тачке, доње црте и цртице."
 
-#: src/postulo/core/models.py:388
+#: src/postulo/core/models.py:397
 #, draft
 msgid "mail failures in a row"
 msgstr "неуспелих слања заредом"
 
-#: src/postulo/notifications/transport.py:216
+#: src/postulo/notifications/transport.py:230
 #, draft
 msgid "Mail has been failing."
 msgstr "Пошта не ради."
@@ -4407,7 +4407,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Овде је пошта једини пут назад у налог, па док ово поново не проради, ниједна од %(counter)s особе на овој инстанци не може да се врати ако заборави лозинку."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:393
 #, draft
 msgid "mail last failed"
 msgstr "пошта последњи пут није успела"
@@ -4417,7 +4417,7 @@ msgstr "пошта последњи пут није успела"
 msgid "Mail last went out at %(when)s."
 msgstr "Пошта је последњи пут послата у %(when)s."
 
-#: src/postulo/core/models.py:383
+#: src/postulo/core/models.py:392
 #, draft
 msgid "mail last worked"
 msgstr "пошта је последњи пут радила"
@@ -4439,7 +4439,7 @@ msgstr "пренос поште"
 msgid "Mail transport"
 msgstr "Пренос поште"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:394
 #, draft
 msgid "mail's last error"
 msgstr "последња грешка поште"
@@ -5867,7 +5867,7 @@ msgstr "Лична страница"
 msgid "Pharmaceuticals"
 msgstr "Фармација"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:230
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6875,7 +6875,7 @@ msgstr "Сачувано."
 msgid "Say what this identifier is."
 msgstr "Реците шта је овај идентификатор."
 
-#: src/postulo/core/phone_numbers.py:244
+#: src/postulo/core/phone_numbers.py:266
 #, draft
 msgid "Say what this number is."
 msgstr "Реците шта је овај број."
@@ -7241,7 +7241,7 @@ msgstr "Јединствена пријава броји се као други 
 msgid "Site search"
 msgstr "Претрага странице"
 
-#: src/postulo/core/models.py:401 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
 #, draft
 msgid "site settings"
 msgstr "подешавања странице"
@@ -7726,6 +7726,21 @@ msgstr "Тестирај везу"
 #, draft
 msgid "text as sent"
 msgstr "текст какав је послат"
+
+#: src/postulo/core/models.py:386
+#, draft
+msgid "text configuration"
+msgstr "конфигурација порука"
+
+#: src/postulo/core/models.py:387
+#, draft
+msgid "text secrets"
+msgstr "тајне порука"
+
+#: src/postulo/core/models.py:385
+#, draft
+msgid "text transport"
+msgstr "транспорт порука"
 
 #: src/postulo/core/search.py:389
 #, draft
@@ -8491,6 +8506,11 @@ msgid ""
 msgstr ""
 "Ова инсталација још нема налога, па се образац за регистрацију нуди свакоме ко до њега допре: први налог постаје администратор."
 
+#: src/postulo/notifications/text.py:84
+#, draft
+msgid "This instance has no way to send a text message."
+msgstr "Ова инстанца нема начина да пошаље текстуалну поруку."
+
 #: src/postulo/templates/core/home.html:29
 #, draft
 msgid "This instance is invite-only."
@@ -8537,7 +8557,7 @@ msgstr "Ово је оно што ћете инсталирати. Још ниш
 msgid "This kind of identifier is already listed."
 msgstr "Ова врста идентификатора већ је на списку."
 
-#: src/postulo/core/phone_numbers.py:270
+#: src/postulo/core/phone_numbers.py:292
 #, draft
 msgid "This number is already listed."
 msgstr "Овај број је већ на списку."
@@ -8671,6 +8691,11 @@ msgstr "хеш токена"
 msgid "Token revoked."
 msgstr "Токен повучен."
 
+#: src/postulo/notifications/text.py:57
+#, draft
+msgid "Too many messages. Try again shortly."
+msgstr "Превише порука. Покушајте поново ускоро."
+
 #: src/postulo/core/throttle.py:74
 #, python-format, draft
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
@@ -8789,12 +8814,12 @@ msgid "Update the preview"
 msgstr "Ажурирај преглед"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:390
+#: src/postulo/core/models.py:399
 #, draft
 msgid "updated at"
 msgstr "ажурирано"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:406
 #, draft
 msgid "updated by"
 msgstr "ажурирао"
@@ -9540,7 +9565,7 @@ msgid ""
 msgstr ""
 "Већ сте се пријавили на овај. Бележење друге пријаве је у реду; обе остају у запису."
 
-#: src/postulo/core/phone_numbers.py:126
+#: src/postulo/core/phone_numbers.py:148
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

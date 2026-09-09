@@ -201,6 +201,44 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Postulo can carry a text message, and ships nothing that sends one.** Both halves are
+  the feature. There was no SMS anywhere — one comment naming it as a route that had not
+  landed — and a telephone number cannot be confirmed until something can reach one.
+
+  **It is a transport, not a notifier, and that was most of the decision.** A notifier's
+  credentials belong to the person: their Twilio account, their Apprise endpoint. Somebody
+  locked out of their account is exactly the one whose own gateway may be unreachable, and
+  "the account holder configured the channel that proves they are the account holder" is
+  circular. A channel carrying a way back in has to be operated by the instance — which is
+  what a transport already is.
+
+  **One kind with two mediums, not a second kind.** Selection, configuration, the interlock
+  that stops the last way in being switched off, the exemption from per-person policy and the
+  page that lists them are identical for both; what differs is the payload. That is what a
+  field describes and what a kind would have duplicated. A transport that does not say what it
+  carries carries mail, so nothing written before this has to be edited.
+
+  **No gateway ships, and that is the answer rather than a gap.** Every one of them is
+  somebody else's jurisdiction: a number, a message and a timestamp reaching Twilio, Vonage or
+  a national aggregator on every send, from an application whose argument is that a
+  self-hoster's data answers to them. Some operators will refuse that and they are right to.
+  The kind exists; the package is somebody else's, exactly as it is for mail over an HTTP API.
+
+  **And SMS is deliberately not the first way back into an account.** It needs a third party,
+  costs money per message, and is defeated by a SIM swap. An administrator issuing a recovery
+  link needs nobody else and answers the same question for the self-hosted instance with one
+  administrator. So a text message becomes a recovery route only when there is a gateway *and*
+  every active account has a confirmed number — the same bar the passkey route is held to, and
+  for the same reason: this list decides whether mail may be switched off, so a route covering
+  nine accounts in ten would strand the tenth.
+
+  Two rate limits rather than one, because two different mistakes want bounding: per account
+  is somebody driving a resend button, per number is a stranger whose number was mistyped into
+  a form and who has no way to make it stop. Mail that fails costs nothing; this costs money
+  and annoys somebody who never asked to be involved. A gateway failure is logged **without
+  the number or the message body**, because that line ends up in an operator's log and the
+  body is a code that gets somebody into an account. (#143)
+
 - **One contract for every kind of contact detail, so they stop each having their own.**
   Postulo holds three and they were at three different stages: an address that allauth
   validates and confirms over SMTP, a telephone number checked less than syntactically on

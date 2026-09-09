@@ -448,6 +448,36 @@ class TestResult:
     message: str = ""
 
 
+#: What a transport carries. Two mediums, one kind, and that is a decision rather than an
+#: accident (#143).
+#:
+#: A recovery channel cannot be a notifier. A notifier's credentials belong to the person --
+#: their Twilio account, their Apprise endpoint -- and somebody locked out of their account is
+#: exactly the person whose own gateway may be unreachable; worse, "the account holder
+#: configured the channel that proves they are the account holder" is circular. So a channel
+#: that carries a way back in has to be operated by the *instance*, which is precisely what a
+#: transport already is.
+#:
+#: A second kind was the obvious alternative and would have duplicated every part of one:
+#: selection, configuration, the interlock that stops the last way in being switched off
+#: (#104), the exemption from per-person policy, and the page that shows them. What differs
+#: between carrying an email and carrying a text message is the payload and nothing else,
+#: which is what a field describes and a kind does not.
+MAIL = "mail"
+TEXT = "text"
+MEDIUMS = (MAIL, TEXT)
+
+#: What a transport that does not say is taken to carry. Every transport written before this
+#: existed carries mail, and none of them should have to be edited to go on saying so.
+DEFAULT_MEDIUM = MAIL
+
+
+def medium_of(transport) -> str:
+    """What this transport carries, defaulting to mail for one that predates the question."""
+    value = getattr(transport, "medium", "") or DEFAULT_MEDIUM
+    return value if value in MEDIUMS else DEFAULT_MEDIUM
+
+
 @runtime_checkable
 class TransportPlugin(Protocol):
     """What something that carries a message off this machine must provide.
@@ -477,6 +507,8 @@ class TransportPlugin(Protocol):
     kind: str
     label: str
     description: str
+    #: ``MAIL`` or ``TEXT``. Absent means mail, so nothing written before this breaks.
+    medium: str
 
     def config_fields(self) -> list[FieldSpec]:
         """What this transport needs to know. Drawn by Postulo, as a connection's are."""
@@ -487,8 +519,28 @@ class TransportPlugin(Protocol):
         ...
 
     def deliver(self, messages: list, config: dict) -> int:
-        """Send them, and say how many went. Raising is a failure the caller reports."""
+        """Send them, and say how many went. Raising is a failure the caller reports.
+
+        For ``MAIL`` these are Django ``EmailMessage`` objects. For ``TEXT`` they are
+        :class:`TextMessage` — a number and one line, because that is the whole of what a
+        text message is and pretending otherwise would make every gateway implement a
+        subject line nobody sends.
+        """
         ...
+
+
+@dataclass(frozen=True)
+class TextMessage:
+    """One text message: where it goes and what it says.
+
+    No subject, no parts, no attachments, no reply address. A gateway that wants more can
+    ask for it in its own configuration; a contract that offered more would have every
+    implementation ignoring most of it.
+    """
+
+    #: In international form, because a gateway in another country cannot dial anything else.
+    to: str
+    body: str
 
 
 @runtime_checkable

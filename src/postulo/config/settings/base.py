@@ -358,6 +358,13 @@ POSTULO_CONFIRMATION_RATE = env("POSTULO_CONFIRMATION_RATE", default="5/h")
 # here. Charged only when the answer is the informative one, so somebody editing their own
 # numbers never meets it (#142).
 POSTULO_NUMBER_RATE = env("POSTULO_NUMBER_RATE", default="20/h")
+# Text messages, bounded twice because two different mistakes are being bounded (#143). Per
+# account is somebody driving the resend button. Per number is a stranger whose number was
+# mistyped into a form and who has no way to make it stop -- which is the one that matters,
+# because they never asked to be involved and cannot switch anything off. Mail that fails
+# costs nothing; this costs money per message.
+POSTULO_TEXT_RATE = env("POSTULO_TEXT_RATE", default="5/h")
+POSTULO_TEXT_PER_NUMBER_RATE = env("POSTULO_TEXT_PER_NUMBER_RATE", default="3/h")
 
 # ---------------------------------------------------------- internationalisation
 

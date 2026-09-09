@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 14:38+0000\n"
+"POT-Creation-Date: 2026-09-09 14:55+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: català\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s programada per al %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s a %(company)s"
 
-#: src/postulo/notifications/transport.py:267
+#: src/postulo/notifications/transport.py:298
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -2955,7 +2955,7 @@ msgstr "Exportat a part"
 msgid "Failed"
 msgstr "Ha fallat"
 
-#: src/postulo/core/models.py:433 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Ha fallat sense dir per què."
@@ -3969,7 +3969,7 @@ msgid ""
 msgstr ""
 "Es guarda a %(file)s i rota per mida, així que això no pot omplir el disc. Tot això també va a la consola, on ho llegeix <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:233
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4375,12 +4375,12 @@ msgstr "Els números més petits surten primer."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Minúscules, xifres, punts, guions baixos i guions."
 
-#: src/postulo/core/models.py:388
+#: src/postulo/core/models.py:397
 #, draft
 msgid "mail failures in a row"
 msgstr "errors de correu seguits"
 
-#: src/postulo/notifications/transport.py:216
+#: src/postulo/notifications/transport.py:230
 #, draft
 msgid "Mail has been failing."
 msgstr "El correu està fallant."
@@ -4396,7 +4396,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Aquí el correu és l'única manera de tornar a entrar en un compte, així que fins que no torni a funcionar cap de les %(counter)s persones d'aquesta instància no podrà entrar si oblida la contrasenya."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:393
 #, draft
 msgid "mail last failed"
 msgstr "darrer error del correu"
@@ -4406,7 +4406,7 @@ msgstr "darrer error del correu"
 msgid "Mail last went out at %(when)s."
 msgstr "El correu va sortir per darrera vegada a les %(when)s."
 
-#: src/postulo/core/models.py:383
+#: src/postulo/core/models.py:392
 #, draft
 msgid "mail last worked"
 msgstr "darrera vegada que el correu va funcionar"
@@ -4428,7 +4428,7 @@ msgstr "transport de correu"
 msgid "Mail transport"
 msgstr "Transport de correu"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:394
 #, draft
 msgid "mail's last error"
 msgstr "darrer error del correu"
@@ -5847,7 +5847,7 @@ msgstr "Lloc personal"
 msgid "Pharmaceuticals"
 msgstr "Farmacèutica"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:230
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6854,7 +6854,7 @@ msgstr "Desat."
 msgid "Say what this identifier is."
 msgstr "Digueu què és aquest identificador."
 
-#: src/postulo/core/phone_numbers.py:244
+#: src/postulo/core/phone_numbers.py:266
 #, draft
 msgid "Say what this number is."
 msgstr "Digueu què és aquest número."
@@ -7221,7 +7221,7 @@ msgstr "L'inici de sessió únic compta com a segon factor"
 msgid "Site search"
 msgstr "Cerca al lloc"
 
-#: src/postulo/core/models.py:401 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
 #, draft
 msgid "site settings"
 msgstr "configuració del lloc"
@@ -7705,6 +7705,21 @@ msgstr "Prova la connexió"
 #, draft
 msgid "text as sent"
 msgstr "text tal com es va enviar"
+
+#: src/postulo/core/models.py:386
+#, draft
+msgid "text configuration"
+msgstr "configuració dels missatges"
+
+#: src/postulo/core/models.py:387
+#, draft
+msgid "text secrets"
+msgstr "secrets dels missatges"
+
+#: src/postulo/core/models.py:385
+#, draft
+msgid "text transport"
+msgstr "transport dels missatges"
 
 #: src/postulo/core/search.py:389
 #, draft
@@ -8472,6 +8487,11 @@ msgid ""
 msgstr ""
 "Aquesta instal·lació encara no té cap compte, així que el formulari de registre s'ofereix a qui hi arribi: el primer compte esdevé administrador."
 
+#: src/postulo/notifications/text.py:84
+#, draft
+msgid "This instance has no way to send a text message."
+msgstr "Aquesta instància no té cap manera d'enviar un missatge de text."
+
 #: src/postulo/templates/core/home.html:29
 #, draft
 msgid "This instance is invite-only."
@@ -8518,7 +8538,7 @@ msgstr "Això és el que instal·lareu. Encara no s'ha instal·lat res."
 msgid "This kind of identifier is already listed."
 msgstr "Aquesta mena d'identificador ja és a la llista."
 
-#: src/postulo/core/phone_numbers.py:270
+#: src/postulo/core/phone_numbers.py:292
 #, draft
 msgid "This number is already listed."
 msgstr "Aquest número ja és a la llista."
@@ -8652,6 +8672,11 @@ msgstr "resum del testimoni"
 msgid "Token revoked."
 msgstr "Testimoni revocat."
 
+#: src/postulo/notifications/text.py:57
+#, draft
+msgid "Too many messages. Try again shortly."
+msgstr "Massa missatges. Torneu-ho a provar d'aquí a poc."
+
 #: src/postulo/core/throttle.py:74
 #, python-format, draft
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
@@ -8771,12 +8796,12 @@ msgid "Update the preview"
 msgstr "Actualitza la previsualització"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:390
+#: src/postulo/core/models.py:399
 #, draft
 msgid "updated at"
 msgstr "actualitzada el"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:406
 #, draft
 msgid "updated by"
 msgstr "actualitzada per"
@@ -9526,7 +9551,7 @@ msgid ""
 msgstr ""
 "Ja us hi havíeu presentat. Registrar una segona candidatura no té res de dolent; totes dues queden al registre."
 
-#: src/postulo/core/phone_numbers.py:126
+#: src/postulo/core/phone_numbers.py:148
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

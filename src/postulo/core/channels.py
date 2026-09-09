@@ -281,14 +281,18 @@ class TelephoneChannel:
         return Checked(True, SYNTACTIC)
 
     def carrier(self) -> str:
-        """Nothing yet, and that is a fact about this instance rather than about numbers.
+        """Whatever this instance can reach a telephone with, and usually nothing.
 
-        A number is confirmable — by a code, typed back. What is missing is anything that
-        can carry a message to one, which is #143. Until that lands this answers nothing,
-        `confirmable()` says no, and #144 refuses to treat a number as a way back in for a
-        reason it can state.
+        A number is confirmable — by a code, typed back. What is usually missing is anything
+        that can carry a message to one: Postulo ships no text gateway and names no vendor,
+        because every one of them is somebody else's jurisdiction (#143). An operator who
+        installs one turns this into a name, and `confirmable()` says yes from that moment
+        without anything here changing.
         """
-        return ""
+        from postulo.notifications import text
+
+        carrier = text.gateway()
+        return getattr(carrier, "name", "") if carrier is not None else ""
 
 
 def register_the_ones_that_exist() -> None:

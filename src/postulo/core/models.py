@@ -377,6 +377,15 @@ class SiteSettings(models.Model):
         _("transport secrets"), blank=True, editable=False
     )
 
+    #: The transport that carries text messages, and its own settings. A separate trio from
+    #: the mail one rather than a shared blob, because both are selected at once and a single
+    #: column could hold only one of their configurations (#143). Blank means none, which is
+    #: what every instance has: Postulo ships a mail transport and no text gateway, and names
+    #: no vendor for either.
+    text_transport = models.CharField(_("text transport"), max_length=60, blank=True)
+    text_config = models.JSONField(_("text configuration"), default=dict, blank=True)
+    text_secrets_encrypted = models.TextField(_("text secrets"), blank=True, editable=False)
+
     #: What the mail transport last actually did. Recorded rather than probed, because the
     #: question "can this instance still send mail?" is asked while rendering a page and an
     #: answer that opens a connection would make reading a page send traffic (#152).
@@ -465,6 +474,19 @@ class SiteSettings(models.Model):
         from postulo.plugins import secrets
 
         self.email_password_encrypted = secrets.encrypt({"password": raw} if raw else {})
+
+    @property
+    def text_secrets(self) -> dict:
+        """The text transport's secret settings, decrypted."""
+        from postulo.plugins import secrets
+
+        return secrets.decrypt(self.text_secrets_encrypted)
+
+    @text_secrets.setter
+    def text_secrets(self, values: dict) -> None:
+        from postulo.plugins import secrets
+
+        self.text_secrets_encrypted = secrets.encrypt(values or {})
 
     @property
     def transport_secrets(self) -> dict:

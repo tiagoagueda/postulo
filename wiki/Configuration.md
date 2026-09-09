@@ -399,6 +399,42 @@ stop a machine being ridden rather than to meter billing.
 Sign-in, sign-up and password resets are limited separately, by allauth, and are on by
 default; see *Hardening*.
 
+## Reaching somebody on a telephone
+
+Postulo can carry a text message, and **ships nothing that sends one**. The capability is a
+plugin; the gateway is somebody else's package. That is a decision, not an unfinished edge.
+
+**Every gateway is somebody else's jurisdiction.** An SMS route means a telephone number, a
+message and a timestamp reaching Twilio, Vonage or a national aggregator on every send — from
+an application whose whole argument is that a self-hoster's data answers to them. Some
+operators will refuse that outright and they are right to; it is not Postulo's to impose by
+shipping a default, and everything works without one.
+
+**It is a transport, not a notifier**, and the distinction matters. A notifier's credentials
+belong to *you* — your Twilio account, your Apprise endpoint. Somebody locked out of their
+account is exactly the person whose own gateway may be unreachable, and "the account holder
+configured the channel that proves they are the account holder" is circular. So a channel that
+carries a way back in is operated by the **instance**, which is what a transport already is.
+Mail and text are two mediums of one kind rather than two kinds, because what differs between
+them is the payload and nothing else.
+
+**SMS is deliberately not the first way back into an account.** It needs a third party, costs
+money per message, and is defeated by a SIM swap — which is not exotic. An administrator
+issuing a recovery link needs no third party at all and answers the same question for a
+self-hosted instance with one administrator, which is most of them. A text gateway exists so
+that a *number can be confirmed at all*; being a recovery route is something it may earn
+afterwards, and only once every account has a confirmed number.
+
+Two limits, because two different mistakes want bounding:
+
+| Variable | Default | What it bounds |
+| --- | --- | --- |
+| `POSTULO_TEXT_RATE` | `5/h` | one account driving the resend button |
+| `POSTULO_TEXT_PER_NUMBER_RATE` | `3/h` | one number being made to buzz all afternoon |
+
+The second is the one that matters. A stranger whose number somebody mistyped into a form
+never asked to be involved and has no way to switch anything off.
+
 ## Contact details, and what proving one means
 
 Postulo holds three kinds of contact detail, and they are not equally provable. One contract
