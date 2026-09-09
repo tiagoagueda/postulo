@@ -98,6 +98,24 @@ def default_language() -> str:
     return current().default_language or settings.LANGUAGE_CODE
 
 
+def offered_languages() -> list[str]:
+    """The codes this instance offers, or an empty list meaning every one it speaks.
+
+    A stored code that Postulo no longer has a catalogue for is passed over rather than
+    breaking the picker, the same way a widget key that no longer exists is.
+    """
+    from . import languages
+
+    stored = current().offered_languages or []
+    return [code for code in stored if code in languages.NATIVE_NAMES]
+
+
+def offers(code: str) -> bool:
+    """Whether this instance offers a language. Nothing stored means it offers them all."""
+    chosen = offered_languages()
+    return not chosen or code in chosen
+
+
 def instance_name() -> str:
     return current().instance_name or "Postulo"
 

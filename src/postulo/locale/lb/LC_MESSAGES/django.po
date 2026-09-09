@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 12:18+0000\n"
+"POT-Creation-Date: 2026-09-09 12:30+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Lëtzebuergesch\n"
@@ -162,12 +162,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s bis %(high)s"
 
-#: src/postulo/core/server_views.py:1073
+#: src/postulo/core/server_views.py:1103
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s ass aus dem Katalog installéiert."
 
-#: src/postulo/core/server_views.py:1023
+#: src/postulo/core/server_views.py:1053
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -181,7 +181,7 @@ msgid ""
 msgstr ""
 "%(name)s (<strong>%(username)s</strong>, %(email)s) an alles, wat de Kont besëtzt: Kandidaturen, Firmen, Dokumenter an d'Fichieren dohannert, Erënnerungen, Tokens, Verbindungen. D'Fichiere gi vun der Disk ewechgeholl. Näischt kann dat zréckbréngen."
 
-#: src/postulo/core/server_views.py:197
+#: src/postulo/core/server_views.py:204
 #, python-format, draft
 msgid "%(name)s can sign in again."
 msgstr "%(name)s kann sech erëm umellen."
@@ -199,18 +199,18 @@ msgid "%(name)s does not match the checksum it was published with."
 msgstr ""
 "%(name)s stëmmt net mat der Prüfsumm iwwereneen, mat där en publizéiert gouf."
 
-#: src/postulo/core/server_views.py:192
+#: src/postulo/core/server_views.py:199
 #, python-format, draft
 msgid "%(name)s is deactivated: nothing deleted, no sign-in."
 msgstr "%(name)s ass deaktivéiert: näischt geläscht, keng Umeldung."
 
-#: src/postulo/core/server_views.py:250
+#: src/postulo/core/server_views.py:257
 #, python-format, draft
 msgid "%(name)s is gone: the account, its records and %(files)s files on disk."
 msgstr ""
 "%(name)s ass fort: de Kont, seng Anträg an %(files)s Fichieren op der Disk."
 
-#: src/postulo/core/server_views.py:167
+#: src/postulo/core/server_views.py:174
 #, python-format, draft
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s ass kee Administrateur méi."
@@ -227,32 +227,39 @@ msgid ""
 msgstr ""
 "%(name)s ass kee reine Python. Postulo installéiert nëmme Rieder, déi fir all Plattform gebaut sinn (py3-none-any); dëst Bild huet kee Compiler."
 
-#: src/postulo/core/server_views.py:286
+#: src/postulo/core/server_views.py:293
 #, python-format, draft
 msgid "%(name)s is now @%(username)s."
 msgstr "%(name)s ass elo @%(username)s."
 
-#: src/postulo/core/server_views.py:173
+#: src/postulo/core/server_views.py:180
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s ass elo Administrateur."
 
-#: src/postulo/core/server_views.py:1127
+#: src/postulo/core/server_views.py:1157
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s ass ewechgeholl. Start Postulo nei, fir sécher ze sinn, datt näischt dovu gelueden bleift."
 
-#: src/postulo/core/server_views.py:1106
+#: src/postulo/core/server_views.py:1136
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s ass ausgeschalt; seng Fichiere sinn nach ëmmer hei."
 
-#: src/postulo/core/server_views.py:1108
+#: src/postulo/core/server_views.py:1138
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s ass erëm ugeschalt."
+
+#: src/postulo/core/server_forms.py:125
+#, python-format, draft
+msgid ""
+"%(name)s is what a new account starts in, so it cannot stop being offered. Change the default first."
+msgstr ""
+"%(name)s ass dat, wat en neie Kont matkritt, also kann et net ophalen ugebuede ze ginn. Ännert fir d'éischt d'Standardsprooch."
 
 #: src/postulo/templates/server/person_username.html:8
 #, python-format, draft
@@ -626,7 +633,7 @@ msgid ""
 msgstr ""
 "Eng Virlag mat de Kolonne vu Postulo selwer an enger Beispillzeil. Fëllt se aus a lued se uewen erop."
 
-#: src/postulo/core/server_views.py:591
+#: src/postulo/core/server_views.py:621
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Eng Testnoriicht vu %(name)s"
@@ -896,6 +903,12 @@ msgstr "All Entretiene"
 #, draft
 msgid "All listings"
 msgstr "All Annoncen"
+
+#: src/postulo/templates/server/defaults.html:58
+#, draft
+msgid ""
+"All of them are offered, and a language added in a later release will be too."
+msgstr "All ginn ugebueden, an eng Sprooch aus enger spéiderer Versioun och."
 
 #: src/postulo/templates/server/overview.html:82
 #, draft
@@ -1213,6 +1226,11 @@ msgstr "Bewäertung"
 msgid "Assessment or test"
 msgstr "Bewäertung oder Test"
 
+#: src/postulo/core/server_forms.py:119
+#, draft
+msgid "At least one language has to be offered, or nobody can read anything."
+msgstr "Op mannst eng Sprooch muss ugebuede ginn, soss kann keen eppes liesen."
+
 #: src/postulo/documents/models.py:436
 #, draft
 msgid "attempts"
@@ -1233,7 +1251,7 @@ msgstr "Verfügbar — d'Persoun wielt"
 msgid "Available; you have not changed it."
 msgstr "Verfügbar; Dir hutt et net geännert."
 
-#: src/postulo/accounts/forms.py:179
+#: src/postulo/accounts/forms.py:186
 #, draft
 msgid "Awaiting review by a speaker"
 msgstr "Waart op d'Iwwerpréiwung duerch e Spriecher"
@@ -1410,7 +1428,7 @@ msgstr "Ofbriechen"
 msgid "Cancelled"
 msgstr "Annuléiert"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:391
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:398
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1615,7 +1633,7 @@ msgstr "Prüfsumm"
 msgid "Choose a Europass file first."
 msgstr "Wielt fir d'éischt en Europass-Fichier."
 
-#: src/postulo/core/server_views.py:954
+#: src/postulo/core/server_views.py:984
 #, draft
 msgid "Choose a package first."
 msgstr "Wielt fir d'éischt e Package."
@@ -1630,7 +1648,7 @@ msgstr "En anere Fichier wielen"
 msgid "Choose at least one document to record."
 msgstr "Wielt op mannst een Dokument fir ze notéieren."
 
-#: src/postulo/accounts/forms.py:434 src/postulo/jobs/forms.py:205
+#: src/postulo/accounts/forms.py:441 src/postulo/jobs/forms.py:205
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Wielt, wat fir eng Zort Identifikateur dat ass."
@@ -1885,7 +1903,7 @@ msgstr "Verbindungen"
 msgid "connections"
 msgstr "Verbindungen"
 
-#: src/postulo/accounts/forms.py:375
+#: src/postulo/accounts/forms.py:382
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Eng Kandidatur als roueg zielen no"
@@ -2280,12 +2298,12 @@ msgstr "Ofgeleent. Et gëtt net méi proposéiert."
 msgid "default language"
 msgstr "Standardsprooch"
 
-#: src/postulo/core/models.py:234
+#: src/postulo/core/models.py:244
 #, draft
 msgid "default time zone"
 msgstr "Standard-Zäitzon"
 
-#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:411
+#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:418
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -2333,7 +2351,7 @@ msgstr "Mäi Kont an alles dran läschen"
 msgid "Delete the account"
 msgstr "De Kont läschen"
 
-#: src/postulo/core/server_views.py:213
+#: src/postulo/core/server_views.py:220
 #, draft
 msgid "Delete your own account from Settings, not from here."
 msgstr "Äre eegene Kont läscht Dir an den Astellungen, net vun hei aus."
@@ -2598,7 +2616,7 @@ msgstr ""
 "All Europass-Format: de JSON, deen europass.europa.eu haut exportéiert, oder de XML, deen deen alen CV-Editor produzéiert huet an deen en eelere Export op Ärer Disk nach ëmmer ass. Postulo fënnt selwer eraus, wat et ass, weist Iech, wat dran ass, a schreift näischt, bis Dir et seet."
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:482
+#: src/postulo/core/server_views.py:512
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
 #: src/postulo/templates/server/people.html:46
@@ -2612,7 +2630,7 @@ msgstr "E-Mail"
 msgid "email address"
 msgstr "E-Mail-Adress"
 
-#: src/postulo/accounts/forms.py:574
+#: src/postulo/accounts/forms.py:581
 #, draft
 msgid "Email address (optional)"
 msgstr "E-Mail-Adress (fakultativ)"
@@ -2780,12 +2798,26 @@ msgid ""
 msgstr ""
 "Alles verschwënnt, op eemol, a keen kann et zréckbréngen. Maacht virdrun Ären Export."
 
-#: src/postulo/accounts/forms.py:365
+#: src/postulo/accounts/forms.py:372
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
 msgstr ""
 "Alles hei ass och op engem anere Wee ze erreechen, also hëlt et näischt ewech, wann ee feelt. De Postulo-Schrëftzuch geet ëmmer op den Iwwerbléck."
+
+#: src/postulo/templates/server/defaults.html:50
+#, draft
+msgid ""
+"Everything is offered until you narrow it. Nobody's own choice is rewritten by this: a language you stop offering leaves a person reading the instance default, and their setting comes back if you offer it again."
+msgstr ""
+"Alles gëtt ugebueden, bis Dir et anzänkt. Keng eege Wiel gëtt doduerch iwwerschriwwen: bei enger Sprooch, déi Dir net méi ubitt, liest d'Persoun de Standard vun der Installatioun, an hir Astellung kënnt zréck, wann Dir se erëm ubitt."
+
+#: src/postulo/core/server_forms.py:96
+#, draft
+msgid ""
+"Everything is offered until you narrow it. Tick them all and it stays that way, so a language added in a later release appears by itself."
+msgstr ""
+"Alles gëtt ugebueden, bis Dir et anzänkt. Kräizt se all un an et bleift esou, sou datt eng Sprooch aus enger spéiderer Versioun vun eleng erschéngt."
 
 #: src/postulo/templates/api/token_list.html:111
 #, python-format, draft
@@ -3005,8 +3037,8 @@ msgstr "Finanzen"
 msgid "Find logo"
 msgstr "Logo sichen"
 
-#: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:222
-#: src/postulo/accounts/forms.py:246
+#: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
+#: src/postulo/accounts/forms.py:253
 #, draft
 msgid "First name"
 msgstr "Virnumm"
@@ -3079,7 +3111,7 @@ msgid ""
 msgstr ""
 "Et unzeschalten heescht net, datt et leeft: e Benoriichtegungsdéngscht, e Späicher oder eng Synchronisatioun brauch Zougangsdaten, déi nëmmen dës Persoun ka ginn. Et heescht, si dierf et benotzen an dierf et net ausschalten."
 
-#: src/postulo/core/server_forms.py:142
+#: src/postulo/core/server_forms.py:205
 #, draft
 msgid "Forget the stored password"
 msgstr "Dat gespäichert Passwuert vergiessen"
@@ -3145,7 +3177,7 @@ msgstr "vun %(low)s"
 msgid "From %(name)s."
 msgstr "Vun %(name)s."
 
-#: src/postulo/core/models.py:259
+#: src/postulo/core/models.py:269
 #, draft
 msgid "from address"
 msgstr "Ofsenderadress"
@@ -3488,7 +3520,7 @@ msgstr "Identifikateuren"
 msgid "Identifies itself as"
 msgstr "Stellt sech vir als"
 
-#: src/postulo/core/server_views.py:593
+#: src/postulo/core/server_views.py:623
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3704,7 +3736,7 @@ msgstr "Institutioun"
 msgid "Insurance"
 msgstr "Versécherung"
 
-#: src/postulo/core/server_views.py:673
+#: src/postulo/core/server_views.py:703
 #, draft
 msgid "Internal"
 msgstr "Intern"
@@ -3902,7 +3934,7 @@ msgid ""
 msgstr ""
 "Gëtt an %(file)s behalen a no Gréisst rotéiert, sou datt dat d'Disk net fëlle kann. Alles hei geet och op d'Konsol, wou <code>docker logs</code> et liest."
 
-#: src/postulo/accounts/forms.py:286 src/postulo/core/phone_numbers.py:149
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:149
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -3943,7 +3975,7 @@ msgstr "Zorte vu Bréiwer"
 msgid "label"
 msgstr "Uweisungsnumm"
 
-#: src/postulo/accounts/forms.py:536 src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:543 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Sprooch"
@@ -3962,7 +3994,7 @@ msgstr "Sprooch"
 msgid "Language and time"
 msgstr "Sprooch an Zäit"
 
-#: src/postulo/core/server_forms.py:89
+#: src/postulo/core/server_forms.py:152
 #, draft
 msgid "Language for new accounts"
 msgstr "Sprooch fir nei Konten"
@@ -3979,6 +4011,17 @@ msgstr "Sproochen"
 #, draft
 msgid "languages"
 msgstr "Sproochen"
+
+#: src/postulo/core/models.py:243
+#, draft
+msgid "languages offered"
+msgstr "ugebuede sproochen"
+
+#: src/postulo/core/server_forms.py:93
+#: src/postulo/templates/server/defaults.html:48
+#, draft
+msgid "Languages this instance offers"
+msgstr "Sproochen, déi dës Installatioun ubitt"
 
 #: src/postulo/templates/jobs/capture_form.html:27
 #, draft
@@ -4017,8 +4060,8 @@ msgstr "fir d'lescht kontrolléiert"
 msgid "last error"
 msgstr "leschte Feeler"
 
-#: src/postulo/accounts/forms.py:95 src/postulo/accounts/forms.py:223
-#: src/postulo/accounts/forms.py:247
+#: src/postulo/accounts/forms.py:95 src/postulo/accounts/forms.py:230
+#: src/postulo/accounts/forms.py:254
 #, draft
 msgid "Last name"
 msgstr "Familljennumm"
@@ -4069,7 +4112,7 @@ msgstr "huet fir d'lescht funktionéiert"
 msgid "Later"
 msgstr "Méi spéit"
 
-#: src/postulo/core/server_forms.py:139
+#: src/postulo/core/server_forms.py:202
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "Loosst eidel, fir dat ze behalen, wat scho gespäichert ass."
@@ -4269,7 +4312,7 @@ msgstr "Logo-Adress"
 msgid "logo fetched"
 msgstr "Logo gehol"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:357
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:364
 #: src/postulo/templates/server/logs.html:5
 #, draft
 msgid "Logs"
@@ -4297,12 +4340,12 @@ msgstr "Kleng Zuelen erschéngen als éischt."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Klengbuchstawen, Zifferen, Punkten, Ënnersträich a Bindestrécher."
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:273
 #, draft
 msgid "mail transport"
 msgstr "Posttransport"
 
-#: src/postulo/core/server_forms.py:211
+#: src/postulo/core/server_forms.py:274
 #, draft
 msgid "Mail transport"
 msgstr "Posttransport"
@@ -4689,7 +4732,7 @@ msgstr ""
 msgid "no company"
 msgstr "keng Firma"
 
-#: src/postulo/core/server_views.py:571
+#: src/postulo/core/server_views.py:601
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Keng Verbindung: %(why)s"
@@ -4951,7 +4994,7 @@ msgstr "Notiz"
 msgid "Note"
 msgstr "Notiz"
 
-#: src/postulo/accounts/forms.py:575
+#: src/postulo/accounts/forms.py:582
 #: src/postulo/templates/applications/application_detail.html:52
 #, draft
 msgid "Note (optional)"
@@ -5058,7 +5101,7 @@ msgstr "Näischt ass installéiert, wourüber eng Persoun eng Meenung hätt."
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Näischt gëtt gespäichert, ier Dir et duerchgekuckt hutt."
 
-#: src/postulo/core/server_forms.py:144
+#: src/postulo/core/server_forms.py:207
 #, draft
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Näischt gëtt als Passwuert un de Server geschéckt, bis en neit agi gëtt."
@@ -5178,12 +5221,12 @@ msgid "Nothing was added."
 msgstr "Näischt gouf dobäigesat."
 
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:796 src/postulo/core/server_views.py:830
+#: src/postulo/core/server_views.py:826 src/postulo/core/server_views.py:860
 #, draft
 msgid "Nothing was different."
 msgstr "Näischt war anescht."
 
-#: src/postulo/core/server_views.py:992
+#: src/postulo/core/server_views.py:1022
 #, draft
 msgid "Nothing was installed."
 msgstr "Näischt gouf installéiert."
@@ -5519,7 +5562,7 @@ msgstr "Resultater"
 msgid "Outstanding only"
 msgstr "Nëmmen déi oppen"
 
-#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:106
+#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:113
 #: src/postulo/templates/server/overview.html:5
 #, draft
 msgid "Overview"
@@ -5589,7 +5632,7 @@ msgstr "Deel vun dëser Firma"
 msgid "Part time"
 msgstr "Deelzäit"
 
-#: src/postulo/accounts/forms.py:181
+#: src/postulo/accounts/forms.py:188
 #, draft
 msgid "Partly translated"
 msgstr "Deelweis iwwersat"
@@ -5599,12 +5642,12 @@ msgstr "Deelweis iwwersat"
 msgid "Passkeys"
 msgstr "Zougangsschlësselen"
 
-#: src/postulo/core/models.py:254
+#: src/postulo/core/models.py:264
 #, draft
 msgid "password"
 msgstr "Passwuert"
 
-#: src/postulo/core/server_forms.py:136
+#: src/postulo/core/server_forms.py:199
 #: src/postulo/templates/server/email.html:24
 #: src/postulo/templates/settings/account.html:50
 #, draft
@@ -5644,8 +5687,8 @@ msgid "Pending only"
 msgstr "Nëmmen ausstoend"
 
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
-#: src/postulo/core/server_views.py:138 src/postulo/core/server_views.py:224
-#: src/postulo/core/server_views.py:241 src/postulo/core/server_views.py:266
+#: src/postulo/core/server_views.py:145 src/postulo/core/server_views.py:231
+#: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:273
 #: src/postulo/jobs/tables.py:50
 #: src/postulo/templates/jobs/company_detail.html:141
 #: src/postulo/templates/server/people.html:7
@@ -5708,7 +5751,7 @@ msgstr "Perséinlech Säit"
 msgid "Pharmaceuticals"
 msgstr "Pharmazeutik"
 
-#: src/postulo/accounts/forms.py:281 src/postulo/core/phone_numbers.py:146
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:146
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -5776,7 +5819,7 @@ msgid "plugin repository"
 msgstr "Plugin-Repository"
 
 #: src/postulo/accounts/settings_views.py:119
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:627
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:657
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -5784,7 +5827,7 @@ msgstr "Plugin-Repository"
 msgid "Plugins"
 msgstr "Plugins"
 
-#: src/postulo/core/server_views.py:825
+#: src/postulo/core/server_views.py:855
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -5814,14 +5857,14 @@ msgid ""
 msgstr ""
 "Dobäi och Äre Profil, Äre Karriäredossier, Etiketten, all Zäitlinnendrag an all Erënnerung. D'Archiv enthält ee liesbare JSON-Fichier an en Dossier mat Medien."
 
-#: src/postulo/accounts/forms.py:253
+#: src/postulo/accounts/forms.py:260
 #, draft
 msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
 msgstr ""
 "PNG, JPEG, WebP oder GIF bis 5 MB. Et gëtt op e Quadrat zougeschnidden an alles gëtt ewechgeholl, wat de Fichier iwwer de Openamerts wousst."
 
-#: src/postulo/core/models.py:245
+#: src/postulo/core/models.py:255
 #, draft
 msgid "port"
 msgstr "Port"
@@ -5908,7 +5951,7 @@ msgid ""
 msgstr ""
 "Postulo hëlt eng Säit, no där eng Persoun gefrot huet, a respektéiert standardméisseg d'robots.txt vun der Säit. Sot nëmmen dann jo, wann Dir entscheet hutt, datt déi Héiflechkeet hei net gëllt."
 
-#: src/postulo/accounts/forms.py:262
+#: src/postulo/accounts/forms.py:269
 #, draft
 msgid ""
 "Postulo fetches the picture for your primary address from gravatar.com once, keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick it and the copy is deleted."
@@ -6438,7 +6481,7 @@ msgstr "Administrateur ewechhuelen"
 msgid "Remove the logo"
 msgstr "De Logo ewechhuelen"
 
-#: src/postulo/accounts/forms.py:258
+#: src/postulo/accounts/forms.py:265
 #, draft
 msgid "Remove the uploaded picture"
 msgstr "Dat eropgelueden Bild ewechhuelen"
@@ -6524,7 +6567,7 @@ msgstr "Duerchkucken"
 msgid "Review the capture"
 msgstr "D'Erfaassung duerchkucken"
 
-#: src/postulo/accounts/forms.py:173
+#: src/postulo/accounts/forms.py:180
 #, draft
 msgid "Reviewed by a speaker"
 msgstr "Vun engem Spriecher duerchgekuckt"
@@ -6656,6 +6699,7 @@ msgstr "salaire bis"
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
+#: src/postulo/templates/server/defaults.html:72
 #: src/postulo/templates/server/email.html:120
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
@@ -6690,9 +6734,9 @@ msgstr "Bei Är Annoncen gespäichert. Entscheet doriwwer, wann Dir sou wäit si
 
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:796
-#: src/postulo/core/server_views.py:830 src/postulo/core/server_views.py:926
-#: src/postulo/resume/views.py:119
+#: src/postulo/core/server_views.py:319 src/postulo/core/server_views.py:447
+#: src/postulo/core/server_views.py:826 src/postulo/core/server_views.py:860
+#: src/postulo/core/server_views.py:956 src/postulo/resume/views.py:119
 #, draft
 msgid "Saved."
 msgstr "Gespäichert."
@@ -6799,7 +6843,7 @@ msgstr "Eng richteg Noriicht schécken"
 msgid "Send a test message"
 msgstr "Eng Testnoriicht schécken"
 
-#: src/postulo/core/server_forms.py:102
+#: src/postulo/core/server_forms.py:165
 #, draft
 msgid "Send a test message to"
 msgstr "Eng Testnoriicht schécken un"
@@ -6825,7 +6869,7 @@ msgstr "Schécken un"
 msgid "Send to stores now"
 msgstr "Elo un d'Späichere schécken"
 
-#: src/postulo/core/server_views.py:603
+#: src/postulo/core/server_views.py:633
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "D'Schécke feelgeschloen: %(error)s"
@@ -6859,7 +6903,7 @@ msgstr "Geschéckt Dokumenter"
 msgid "sent on"
 msgstr "geschéckt den"
 
-#: src/postulo/core/server_views.py:606 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:636 src/postulo/notifications/email.py:85
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Un %(to)s geschéckt."
@@ -6995,7 +7039,7 @@ msgstr "Alles weisen"
 msgid "Show done too"
 msgstr "Och dat weisen, wat gemaach ass"
 
-#: src/postulo/accounts/forms.py:362
+#: src/postulo/accounts/forms.py:369
 #, draft
 msgid "Show in the navigation"
 msgstr "An der Navigatioun weisen"
@@ -7027,7 +7071,7 @@ msgstr ""
 msgid "Sign out"
 msgstr "Ofmellen"
 
-#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:328
+#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:335
 #: src/postulo/templates/server/signin.html:5
 #, draft
 msgid "Sign-in"
@@ -7063,7 +7107,7 @@ msgstr "Single Sign-on zielt als zweete Faktor"
 msgid "Site search"
 msgstr "Sich op der Säit"
 
-#: src/postulo/core/models.py:284 src/postulo/core/models.py:285
+#: src/postulo/core/models.py:294 src/postulo/core/models.py:295
 #, draft
 msgid "site settings"
 msgstr "astellunge vun der säit"
@@ -7126,7 +7170,7 @@ msgstr "Luesst"
 msgid "slug"
 msgstr "Kuerznumm"
 
-#: src/postulo/core/models.py:243
+#: src/postulo/core/models.py:253
 #, draft
 msgid "SMTP server"
 msgstr "SMTP-Server"
@@ -7221,7 +7265,7 @@ msgstr "Léiwer vu vir ufänken?"
 msgid "starts"
 msgstr "fänkt un"
 
-#: src/postulo/core/models.py:255 src/postulo/core/server_forms.py:129
+#: src/postulo/core/models.py:265 src/postulo/core/server_forms.py:192
 #, draft
 msgid "STARTTLS"
 msgstr "STARTTLS"
@@ -7721,7 +7765,7 @@ msgstr "Dat ass kee Resultat, dat Postulo kennt."
 msgid "That is not something Postulo can do about it."
 msgstr "Dat ass näischt, wat Postulo dogéint maache kann."
 
-#: src/postulo/core/server_views.py:902 src/postulo/core/server_views.py:943
+#: src/postulo/core/server_views.py:932 src/postulo/core/server_views.py:973
 #, draft
 msgid "That is not something this page does."
 msgstr "Dat ass näischt, wat dës Säit mécht."
@@ -7731,13 +7775,13 @@ msgstr "Dat ass näischt, wat dës Säit mécht."
 msgid "That is not the address on this account."
 msgstr "Dat ass net d'Adress vun dësem Kont."
 
-#: src/postulo/core/server_views.py:244
+#: src/postulo/core/server_views.py:251
 #, draft
 msgid "That is not the username."
 msgstr "Dat ass net de Benotzernumm."
 
-#: src/postulo/core/server_views.py:161 src/postulo/core/server_views.py:186
-#: src/postulo/core/server_views.py:215
+#: src/postulo/core/server_views.py:168 src/postulo/core/server_views.py:193
+#: src/postulo/core/server_views.py:222
 #, draft
 msgid "That is the last administrator. Appoint another first."
 msgstr "Dat ass dee leschten Administrateur. Ernennt fir d'éischt en aneren."
@@ -7756,7 +7800,7 @@ msgid ""
 msgstr ""
 "Déi lescht Ziffer vun deem ORCID passt net op de Rescht, also ass eng dovun en Tippfeeler."
 
-#: src/postulo/core/server_views.py:1001 src/postulo/core/server_views.py:1006
+#: src/postulo/core/server_views.py:1031 src/postulo/core/server_views.py:1036
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Dee Package waart net méi; lued en nach eemol erop."
@@ -7776,7 +7820,7 @@ msgstr "Déi Säit ass méi grouss wéi %(limit)s MB, also gouf se net gelies."
 msgid "That page returned %(status)s."
 msgstr "Déi Säit huet %(status)s zréckginn."
 
-#: src/postulo/accounts/forms.py:306
+#: src/postulo/accounts/forms.py:313
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Dat Bild ass iwwer 5 MB. E méi klengt, wann ech gelift."
@@ -7842,7 +7886,7 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "D'Ënnerschrëft oder de Schlëssel vum Katalog ass net liesbar: %(error)s"
 
-#: src/postulo/core/server_views.py:1058
+#: src/postulo/core/server_views.py:1088
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "D'Katalogen hunn geäntwert a lëschten nach näischt op."
@@ -7899,7 +7943,7 @@ msgid "The earlier version this supersedes. The old file is kept."
 msgstr ""
 "Déi fréier Versioun, déi dës hei ersetzt. Deen ale Fichier bleift behalen."
 
-#: src/postulo/core/server_views.py:861 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:891 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "D'Ëmfeld setzt „%(name)s“, also kann et hei net geännert ginn."
@@ -7965,7 +8009,7 @@ msgstr "Den Installateur huet et ofgewisen: %(error)s"
 msgid "The job title"
 msgstr "D'Stellenbezeechnung"
 
-#: src/postulo/core/server_views.py:918
+#: src/postulo/core/server_views.py:948
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -8005,7 +8049,7 @@ msgstr "De Logo ass fort."
 msgid "The logo was not changed: %(problem)s"
 msgstr "De Logo gouf net geännert: %(problem)s"
 
-#: src/postulo/core/server_views.py:608 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:638 src/postulo/notifications/email.py:84
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "De Mail-Motor huet näischt ugeholl."
@@ -8022,7 +8066,7 @@ msgid ""
 msgstr ""
 "Déi nächst Entretiener am Agenda, an all déi, déi laanscht sinn, ouni datt eppes erauskomm ass."
 
-#: src/postulo/core/server_views.py:891
+#: src/postulo/core/server_views.py:921
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Dat offiziellt Repository gëtt eidel gemaach an net ewechgeholl."
@@ -8044,7 +8088,7 @@ msgstr ""
 msgid "The pay"
 msgstr "De Salaire"
 
-#: src/postulo/core/server_views.py:674
+#: src/postulo/core/server_views.py:704
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "D'Pluginne, déi am Postulo dra sinn. Et gëtt näischt geholl."
@@ -8207,7 +8251,7 @@ msgstr "Et gëtt keng Adress, vun där een et nach eemol huele kéint."
 msgid "There is no file to send."
 msgstr "Et gëtt kee Fichier fir ze schécken."
 
-#: src/postulo/core/server_views.py:856
+#: src/postulo/core/server_views.py:886
 #, draft
 msgid "There is no repository by that name."
 msgstr "Et gëtt kee Repository mat deem Numm."
@@ -8260,7 +8304,7 @@ msgstr "Si sinn net opgetaucht"
 msgid "This company has no website recorded."
 msgstr "Fir dës Firma ass keng Websäit notéiert."
 
-#: src/postulo/accounts/forms.py:459 src/postulo/jobs/forms.py:230
+#: src/postulo/accounts/forms.py:466 src/postulo/jobs/forms.py:230
 #, draft
 msgid "This identifier is already listed."
 msgstr "Dësen Identifikateur steet schonn op der Lëscht."
@@ -8328,7 +8372,7 @@ msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr ""
 "Dat hei ass, wat Dir installéiere wëllt. Et ass nach näischt installéiert."
 
-#: src/postulo/accounts/forms.py:456 src/postulo/jobs/forms.py:227
+#: src/postulo/accounts/forms.py:463 src/postulo/jobs/forms.py:227
 #, draft
 msgid "This kind of identifier is already listed."
 msgstr "Dës Zort Identifikateur steet schonn op der Lëscht."
@@ -8376,7 +8420,7 @@ msgstr ""
 msgid "tier"
 msgstr "stuf"
 
-#: src/postulo/accounts/forms.py:542
+#: src/postulo/accounts/forms.py:549
 #, draft
 msgid "Time zone"
 msgstr "Zäitzon"
@@ -8386,7 +8430,7 @@ msgstr "Zäitzon"
 msgid "time zone"
 msgstr "zäitzon"
 
-#: src/postulo/core/server_forms.py:95
+#: src/postulo/core/server_forms.py:158
 #, draft
 msgid "Time zone for new accounts"
 msgstr "Zäitzon fir nei Konten"
@@ -8401,7 +8445,7 @@ msgstr "zäitlinnendrag"
 msgid "Timeout"
 msgstr "Zäitlimit"
 
-#: src/postulo/core/models.py:257
+#: src/postulo/core/models.py:267
 #, draft
 msgid "timeout in seconds"
 msgstr "zäitlimit a sekonnen"
@@ -8479,12 +8523,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Transport a Logistik"
 
-#: src/postulo/core/models.py:268
+#: src/postulo/core/models.py:278
 #, draft
 msgid "transport configuration"
 msgstr "konfiguratioun vum transport"
 
-#: src/postulo/core/models.py:270
+#: src/postulo/core/models.py:280
 #, draft
 msgid "transport secrets"
 msgstr "geheimnisser vum transport"
@@ -8525,7 +8569,7 @@ msgstr "Tippt op mannst zwee Zeechen."
 msgid "Type it in instead"
 msgstr "Tippt et amplaz eran"
 
-#: src/postulo/accounts/forms.py:436 src/postulo/jobs/forms.py:207
+#: src/postulo/accounts/forms.py:443 src/postulo/jobs/forms.py:207
 #, draft
 msgid "Type the identifier."
 msgstr "Tippt den Identifikateur."
@@ -8580,12 +8624,12 @@ msgid "Update the preview"
 msgstr "D'Virschau aktualiséieren"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:25
-#: src/postulo/core/models.py:273
+#: src/postulo/core/models.py:283
 #, draft
 msgid "updated at"
 msgstr "aktualiséiert den"
 
-#: src/postulo/core/models.py:280
+#: src/postulo/core/models.py:290
 #, draft
 msgid "updated by"
 msgstr "aktualiséiert vun"
@@ -8597,7 +8641,7 @@ msgstr "aktualiséiert vun"
 msgid "Upload a file"
 msgstr "E Fichier eroplueden"
 
-#: src/postulo/accounts/forms.py:251
+#: src/postulo/accounts/forms.py:258
 #, draft
 msgid "Upload a picture"
 msgstr "E Bild eroplueden"
@@ -8636,12 +8680,12 @@ msgid ""
 msgstr ""
 "Huelt 3 bis 32 Klengbuchstawen, Zifferen, Punkten, Ënnersträich oder Bindestrécher, mat engem Buschtaf oder enger Ziffer um Ufank an um Enn."
 
-#: src/postulo/accounts/forms.py:309
+#: src/postulo/accounts/forms.py:316
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Huelt e PNG, JPEG, WebP oder GIF."
 
-#: src/postulo/accounts/forms.py:260
+#: src/postulo/accounts/forms.py:267
 #, draft
 msgid "Use my Gravatar"
 msgstr "Mäi Gravatar benotzen"
@@ -8651,7 +8695,7 @@ msgstr "Mäi Gravatar benotzen"
 msgid "use my Gravatar"
 msgstr "mäi gravatar benotzen"
 
-#: src/postulo/accounts/forms.py:171 src/postulo/accounts/forms.py:210
+#: src/postulo/accounts/forms.py:178 src/postulo/accounts/forms.py:217
 #, draft
 msgid "Use the instance default"
 msgstr "De Standard vun der Installatioun huelen"
@@ -8668,13 +8712,13 @@ msgstr ""
 msgid "user"
 msgstr "benotzer"
 
-#: src/postulo/accounts/forms.py:552 src/postulo/templates/server/email.html:20
+#: src/postulo/accounts/forms.py:559 src/postulo/templates/server/email.html:20
 #: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
 msgstr "Benotzernumm"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:250
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:260
 #, draft
 msgid "username"
 msgstr "benotzernumm"
@@ -8832,12 +8876,12 @@ msgstr "Wat %(plugin)s brauch"
 msgid "what a monitor should poll"
 msgstr "wat eng Iwwerwaachung ofrufe soll"
 
-#: src/postulo/core/server_forms.py:92
+#: src/postulo/core/server_forms.py:155
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "Wat en neie Kont matkritt. All Persoun kann dat hiert änneren."
 
-#: src/postulo/core/server_forms.py:214
+#: src/postulo/core/server_forms.py:277
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "Wat d'Post vun dëser Maschinn ewechdréit."
@@ -8992,7 +9036,7 @@ msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr ""
 "Wat Dir bemierkt hutt an nach net ugepaakt hutt, a wat dës Woch zoumécht."
 
-#: src/postulo/accounts/forms.py:554
+#: src/postulo/accounts/forms.py:561
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -9254,7 +9298,7 @@ msgstr ""
 msgid "Yes"
 msgstr "Jo"
 
-#: src/postulo/core/server_forms.py:130
+#: src/postulo/core/server_forms.py:193
 #, draft
 msgid ""
 "Yes for a server on port 587 that upgrades the connection after connecting. Postulo does not yet speak implicit TLS on port 465."
@@ -9324,7 +9368,7 @@ msgid ""
 msgstr ""
 "Dir kënnt Äre Kont selwer läschen: all Antrag, all Fichier op der Disk, Tokens, Verbindungen an de Kont selwer. Den Export hei uewen ass d'Sécherheetsnetz; maacht deen fir d'éischt."
 
-#: src/postulo/core/server_views.py:183
+#: src/postulo/core/server_views.py:190
 #, draft
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "De Kont, mat deem Dir ugemellt sidd, kënnt Dir net deaktivéieren."
@@ -9528,20 +9572,20 @@ msgstr "äre posten"
 msgid "Your username has been changed."
 msgstr "Äre Benotzernumm gouf geännert."
 
-#: src/postulo/core/server_views.py:897
+#: src/postulo/core/server_views.py:927
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr ""
 "„%(name)s“ ass fort. Alles, wat dovun installéiert gouf, bleift installéiert."
 
-#: src/postulo/core/server_views.py:882
+#: src/postulo/core/server_views.py:912
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "„%(name)s“ ass aus. Et gëtt näischt Neies dovun installéiert oder aktualiséiert; wat scho installéiert war, leeft weider."
 
-#: src/postulo/core/server_views.py:879
+#: src/postulo/core/server_views.py:909
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""

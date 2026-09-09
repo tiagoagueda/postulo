@@ -231,6 +231,16 @@ class SiteSettings(models.Model):
         ),
     )
     default_language = models.CharField(_("default language"), max_length=10, blank=True)
+    #: Which languages this instance offers, as a list of codes. **Empty means all of
+    #: them**, and that is not the same as a list naming every one: an instance whose
+    #: operator has never opened this setting keeps offering everything, including a
+    #: language added in a later release, while a list frozen on the day somebody first
+    #: saved the form would silently exclude it for ever.
+    #:
+    #: This is a curation, never an entitlement. Nothing here is checked per account, and
+    #: an administrator is not exempt from it — what the instance offers is what the
+    #: instance offers, and two rules where one will do is how the two drift apart.
+    offered_languages = models.JSONField(_("languages offered"), default=list, blank=True)
     default_time_zone = models.CharField(_("default time zone"), max_length=64, blank=True)
 
     # --- how this instance sends mail --------------------------------------------------

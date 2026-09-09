@@ -29,6 +29,37 @@ the variable is set, it wins**, and the page shows the value read-only and says 
 variable pinned it. Leave policy out of `.env` if you would rather change it from the
 page. Infrastructure — secrets, the database, hosts, TLS — stays in the environment.
 
+## Which languages this instance offers
+
+Postulo ships a lot of languages, and an instance does not have to offer all of them. Under
+**Server settings → Defaults**, *Languages this instance offers* is a list of tick boxes;
+untick one and it stops appearing in everybody's language picker.
+
+**Everything is offered until you narrow it**, and leaving it that way is the setting rather
+than the absence of one. An instance that offers all of them keeps offering all of them,
+including a language a later release of Postulo adds — which a list naming every language
+today could not do, because it would have been frozen on the day somebody first saved the
+form. Tick them all and it goes back to that state.
+
+**Narrowing never rewrites anybody's choice.** Somebody whose profile says French, on an
+instance that stops offering French, reads it in the instance's default language from their
+next page onwards — but the stored setting is left exactly where it is, and offering French
+again puts them back in French without their having to notice either event. This matters more
+than it sounds: an operator narrowing a list of thirty-nine to four would otherwise rewrite
+every account that had chosen one of the other thirty-five, and there is no undo for that.
+
+Two saves are refused, and both say why:
+
+- **Offering nothing**, which leaves nobody able to read anything.
+- **Withdrawing the language new accounts start in.** The message names that language and
+  says to change the default first, rather than only saying no.
+
+An administrator is not exempt from the narrowing: what the instance offers is what the
+instance offers. Two rules where one will do is how the two drift apart.
+
+A language that a later release of Postulo *removes* is passed over rather than breaking the
+picker — the same way a dashboard widget whose key no longer exists is.
+
 ## Database
 
 | Variable | Default | What it does |

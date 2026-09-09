@@ -36,7 +36,14 @@ from postulo.plugins.forms import PluginRepositoryForm
 from . import site
 from .mixins import StaffRequiredMixin
 from .models import SiteSettings
-from .server_forms import CaptureForm, DefaultsForm, EmailForm, SignInForm, TestEmailForm
+from .server_forms import (
+    CaptureForm,
+    DefaultsForm,
+    EmailForm,
+    OfferedLanguagesForm,
+    SignInForm,
+    TestEmailForm,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -415,7 +422,30 @@ class DefaultsView(PolicyView):
         context = super().get_context_data(**kwargs)
         context["effective_time_zone"] = site.default_time_zone()
         context["effective_language"] = site.default_language()
+        context.setdefault("languages_form", self.languages_form())
+        context["offers_everything"] = not site.offered_languages()
         return context
+
+    def languages_form(self, data=None) -> OfferedLanguagesForm:
+        return OfferedLanguagesForm(data=data, instance=site.current())
+
+    def post(self, request, *args, **kwargs):
+        """Two forms, one page, saved separately.
+
+        Together they would mean an administrator changing the instance name had to satisfy
+        the language rules to do it — and the language list is thirty-nine checkboxes that
+        would be re-posted on every unrelated save.
+        """
+        if "offered_languages_submit" not in request.POST:
+            return super().post(request, *args, **kwargs)
+
+        form = self.languages_form(data=request.POST)
+        if not form.is_valid():
+            self.object = None
+            return self.render_to_response(self.get_context_data(languages_form=form))
+        form.save()
+        messages.success(request, _("Saved."))
+        return redirect("server:defaults")
 
 
 def _admin_url() -> str:

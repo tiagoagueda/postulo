@@ -37,4 +37,38 @@
 
     <button type="submit" class="btn-primary">{% translate "Save" %}</button>
   </form>
+
+  {% comment %} Its own card, beside the default rather than inside it: thirty-nine
+     checkboxes on the same form as the instance name would bury the four settings above,
+     and an administrator changing a name should not have to satisfy the language rules to
+     do it (#120). {% endcomment %}
+  <form method="post" class="card mt-8">
+    {% csrf_token %}
+    <h2 class="mb-1 font-medium">{% translate "Languages this instance offers" %}</h2>
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Everything is offered until you narrow it. Nobody's own choice is rewritten by
+        this: a language you stop offering leaves a person reading the instance default,
+        and their setting comes back if you offer it again.
+      {% endblocktranslate %}
+    </p>
+    {% if offers_everything %}
+      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "All of them are offered, and a language added in a later release will be too." %}
+      </p>
+    {% endif %}
+    {% include "partials/field_feedback.html" with field=languages_form.offered_languages %}
+    <div class="grid gap-1 sm:grid-cols-2">
+      {% for option in languages_form.offered_languages %}
+        <label class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm
+                      hover:bg-ink-100 dark:hover:bg-ink-800">
+          {{ option.tag }}
+          <span lang="{{ option.data.value }}">{{ option.choice_label }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    <button type="submit" name="offered_languages_submit" value="1" class="btn-primary mt-4">
+      {% translate "Save" %}
+    </button>
+  </form>
 {% endblock %}

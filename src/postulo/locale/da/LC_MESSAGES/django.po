@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 12:18+0000\n"
+"POT-Creation-Date: 2026-09-09 12:30+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: dansk\n"
@@ -162,12 +162,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s til %(high)s"
 
-#: src/postulo/core/server_views.py:1073
+#: src/postulo/core/server_views.py:1103
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s er installeret fra kataloget."
 
-#: src/postulo/core/server_views.py:1023
+#: src/postulo/core/server_views.py:1053
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -181,7 +181,7 @@ msgid ""
 msgstr ""
 "%(name)s (<strong>%(username)s</strong>, %(email)s) og alt, hvad kontoen ejer: ansøgninger, virksomheder, dokumenter og filerne bag dem, påmindelser, tokens, forbindelser. Filerne fjernes fra disken. Intet kan hente det tilbage."
 
-#: src/postulo/core/server_views.py:197
+#: src/postulo/core/server_views.py:204
 #, python-format, draft
 msgid "%(name)s can sign in again."
 msgstr "%(name)s kan logge ind igen."
@@ -198,17 +198,17 @@ msgstr ""
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s svarer ikke til den kontrolsum, det blev udgivet med."
 
-#: src/postulo/core/server_views.py:192
+#: src/postulo/core/server_views.py:199
 #, python-format, draft
 msgid "%(name)s is deactivated: nothing deleted, no sign-in."
 msgstr "%(name)s er deaktiveret: intet slettet, ingen login."
 
-#: src/postulo/core/server_views.py:250
+#: src/postulo/core/server_views.py:257
 #, python-format, draft
 msgid "%(name)s is gone: the account, its records and %(files)s files on disk."
 msgstr "%(name)s er væk: kontoen, dens poster og %(files)s filer på disken."
 
-#: src/postulo/core/server_views.py:167
+#: src/postulo/core/server_views.py:174
 #, python-format, draft
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s er ikke længere administrator."
@@ -225,32 +225,39 @@ msgid ""
 msgstr ""
 "%(name)s er ikke ren Python. Postulo installerer kun wheels bygget til enhver platform (py3-none-any); dette image har ingen oversætter."
 
-#: src/postulo/core/server_views.py:286
+#: src/postulo/core/server_views.py:293
 #, python-format, draft
 msgid "%(name)s is now @%(username)s."
 msgstr "%(name)s hedder nu @%(username)s."
 
-#: src/postulo/core/server_views.py:173
+#: src/postulo/core/server_views.py:180
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s er nu administrator."
 
-#: src/postulo/core/server_views.py:1127
+#: src/postulo/core/server_views.py:1157
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s er fjernet. Genstart Postulo for at være sikker på, at intet af det stadig er indlæst."
 
-#: src/postulo/core/server_views.py:1106
+#: src/postulo/core/server_views.py:1136
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s er slået fra; filerne er her stadig."
 
-#: src/postulo/core/server_views.py:1108
+#: src/postulo/core/server_views.py:1138
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s er slået til igen."
+
+#: src/postulo/core/server_forms.py:125
+#, python-format, draft
+msgid ""
+"%(name)s is what a new account starts in, so it cannot stop being offered. Change the default first."
+msgstr ""
+"%(name)s er det, en ny konto starter i, så den kan ikke fravælges. Skift standardsproget først."
 
 #: src/postulo/templates/server/person_username.html:8
 #, python-format, draft
@@ -622,7 +629,7 @@ msgid ""
 msgstr ""
 "En skabelon med Postulos egne kolonner og én eksempelrække. Udfyld den, og upload den ovenfor."
 
-#: src/postulo/core/server_views.py:591
+#: src/postulo/core/server_views.py:621
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "En testbesked fra %(name)s"
@@ -892,6 +899,12 @@ msgstr "Alle samtaler"
 #, draft
 msgid "All listings"
 msgstr "Alle opslag"
+
+#: src/postulo/templates/server/defaults.html:58
+#, draft
+msgid ""
+"All of them are offered, and a language added in a later release will be too."
+msgstr "Alle tilbydes, og et sprog fra en senere udgivelse gør det også."
 
 #: src/postulo/templates/server/overview.html:82
 #, draft
@@ -1208,6 +1221,11 @@ msgstr "Vurdering"
 msgid "Assessment or test"
 msgstr "Vurdering eller test"
 
+#: src/postulo/core/server_forms.py:119
+#, draft
+msgid "At least one language has to be offered, or nobody can read anything."
+msgstr "Mindst ét sprog skal tilbydes, ellers kan ingen læse noget."
+
 #: src/postulo/documents/models.py:436
 #, draft
 msgid "attempts"
@@ -1228,7 +1246,7 @@ msgstr "Tilgængelig — personen vælger"
 msgid "Available; you have not changed it."
 msgstr "Tilgængelig; du har ikke ændret noget."
 
-#: src/postulo/accounts/forms.py:179
+#: src/postulo/accounts/forms.py:186
 #, draft
 msgid "Awaiting review by a speaker"
 msgstr "Afventer gennemsyn af en, der taler sproget"
@@ -1405,7 +1423,7 @@ msgstr "Annuller"
 msgid "Cancelled"
 msgstr "Aflyst"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:391
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:398
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1610,7 +1628,7 @@ msgstr "Kontrolsum"
 msgid "Choose a Europass file first."
 msgstr "Vælg først en Europass-fil."
 
-#: src/postulo/core/server_views.py:954
+#: src/postulo/core/server_views.py:984
 #, draft
 msgid "Choose a package first."
 msgstr "Vælg en pakke først."
@@ -1625,7 +1643,7 @@ msgstr "Vælg en anden fil"
 msgid "Choose at least one document to record."
 msgstr "Vælg mindst ét dokument at registrere."
 
-#: src/postulo/accounts/forms.py:434 src/postulo/jobs/forms.py:205
+#: src/postulo/accounts/forms.py:441 src/postulo/jobs/forms.py:205
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Vælg, hvilken slags identifikator dette er."
@@ -1879,7 +1897,7 @@ msgstr "Forbindelser"
 msgid "connections"
 msgstr "forbindelser"
 
-#: src/postulo/accounts/forms.py:375
+#: src/postulo/accounts/forms.py:382
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Betragt en ansøgning som stille efter"
@@ -2272,12 +2290,12 @@ msgstr "Afvist. Det bliver ikke foreslået igen."
 msgid "default language"
 msgstr "standardsprog"
 
-#: src/postulo/core/models.py:234
+#: src/postulo/core/models.py:244
 #, draft
 msgid "default time zone"
 msgstr "standardtidszone"
 
-#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:411
+#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:418
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -2325,7 +2343,7 @@ msgstr "Slet min konto og alt i den"
 msgid "Delete the account"
 msgstr "Slet kontoen"
 
-#: src/postulo/core/server_views.py:213
+#: src/postulo/core/server_views.py:220
 #, draft
 msgid "Delete your own account from Settings, not from here."
 msgstr "Slet din egen konto fra Indstillinger, ikke herfra."
@@ -2588,7 +2606,7 @@ msgstr ""
 "Begge Europass-formater: den JSON, europass.europa.eu eksporterer i dag, eller den XML, den gamle cv-editor lavede, og som en ældre eksport på din disk stadig er. Postulo finder selv ud af hvilken det er, viser dig hvad der står i den, og skriver ikke noget, før du siger til."
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:482
+#: src/postulo/core/server_views.py:512
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
 #: src/postulo/templates/server/people.html:46
@@ -2602,7 +2620,7 @@ msgstr "E-mail"
 msgid "email address"
 msgstr "e-mailadresse"
 
-#: src/postulo/accounts/forms.py:574
+#: src/postulo/accounts/forms.py:581
 #, draft
 msgid "Email address (optional)"
 msgstr "E-mailadresse (valgfri)"
@@ -2769,12 +2787,26 @@ msgid ""
 msgstr ""
 "Alt forsvinder på én gang, og ingen kan hente det tilbage. Tag din eksport først."
 
-#: src/postulo/accounts/forms.py:365
+#: src/postulo/accounts/forms.py:372
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
 msgstr ""
 "Alt her kan nås på en anden måde, så at udelade noget tager intet fra dig. Postulo-navnet fører altid til oversigten."
+
+#: src/postulo/templates/server/defaults.html:50
+#, draft
+msgid ""
+"Everything is offered until you narrow it. Nobody's own choice is rewritten by this: a language you stop offering leaves a person reading the instance default, and their setting comes back if you offer it again."
+msgstr ""
+"Alt tilbydes, indtil du indsnævrer det. Ingens eget valg overskrives af dette: ved et sprog, du holder op med at tilbyde, læser personen installationens standardsprog, og deres indstilling kommer tilbage, hvis du tilbyder det igen."
+
+#: src/postulo/core/server_forms.py:96
+#, draft
+msgid ""
+"Everything is offered until you narrow it. Tick them all and it stays that way, so a language added in a later release appears by itself."
+msgstr ""
+"Alt tilbydes, indtil du indsnævrer det. Sæt flueben ved dem alle, og sådan bliver det, så et sprog fra en senere udgivelse dukker op af sig selv."
 
 #: src/postulo/templates/api/token_list.html:111
 #, python-format, draft
@@ -2993,8 +3025,8 @@ msgstr "Finans"
 msgid "Find logo"
 msgstr "Find logo"
 
-#: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:222
-#: src/postulo/accounts/forms.py:246
+#: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
+#: src/postulo/accounts/forms.py:253
 #, draft
 msgid "First name"
 msgstr "Fornavn"
@@ -3068,7 +3100,7 @@ msgid ""
 msgstr ""
 "At tvinge en til at være slået til får den ikke til at køre: en underretter, et arkiv eller en synkronisering kræver oplysninger, kun denne person kan give. Det betyder, at de må bruge den og ikke må slå den fra."
 
-#: src/postulo/core/server_forms.py:142
+#: src/postulo/core/server_forms.py:205
 #, draft
 msgid "Forget the stored password"
 msgstr "Glem den gemte adgangskode"
@@ -3134,7 +3166,7 @@ msgstr "fra %(low)s"
 msgid "From %(name)s."
 msgstr "Fra %(name)s."
 
-#: src/postulo/core/models.py:259
+#: src/postulo/core/models.py:269
 #, draft
 msgid "from address"
 msgstr "afsenderadresse"
@@ -3476,7 +3508,7 @@ msgstr "Identifikatorer"
 msgid "Identifies itself as"
 msgstr "Identificerer sig som"
 
-#: src/postulo/core/server_views.py:593
+#: src/postulo/core/server_views.py:623
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3691,7 +3723,7 @@ msgstr "institution"
 msgid "Insurance"
 msgstr "Forsikring"
 
-#: src/postulo/core/server_views.py:673
+#: src/postulo/core/server_views.py:703
 #, draft
 msgid "Internal"
 msgstr "Intern"
@@ -3890,7 +3922,7 @@ msgid ""
 msgstr ""
 "Gemmes i %(file)s og roteres efter størrelse, så det kan ikke fylde disken. Alt her går også til konsollen, hvor <code>docker logs</code> læser det."
 
-#: src/postulo/accounts/forms.py:286 src/postulo/core/phone_numbers.py:149
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:149
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -3931,7 +3963,7 @@ msgstr "Slags breve"
 msgid "label"
 msgstr "etiket"
 
-#: src/postulo/accounts/forms.py:536 src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:543 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Sprog"
@@ -3950,7 +3982,7 @@ msgstr "sprog"
 msgid "Language and time"
 msgstr "Sprog og tid"
 
-#: src/postulo/core/server_forms.py:89
+#: src/postulo/core/server_forms.py:152
 #, draft
 msgid "Language for new accounts"
 msgstr "Sprog for nye konti"
@@ -3967,6 +3999,17 @@ msgstr "Sprog"
 #, draft
 msgid "languages"
 msgstr "sprog"
+
+#: src/postulo/core/models.py:243
+#, draft
+msgid "languages offered"
+msgstr "tilbudte sprog"
+
+#: src/postulo/core/server_forms.py:93
+#: src/postulo/templates/server/defaults.html:48
+#, draft
+msgid "Languages this instance offers"
+msgstr "Sprog denne installation tilbyder"
 
 #: src/postulo/templates/jobs/capture_form.html:27
 #, draft
@@ -4005,8 +4048,8 @@ msgstr "senest tjekket"
 msgid "last error"
 msgstr "seneste fejl"
 
-#: src/postulo/accounts/forms.py:95 src/postulo/accounts/forms.py:223
-#: src/postulo/accounts/forms.py:247
+#: src/postulo/accounts/forms.py:95 src/postulo/accounts/forms.py:230
+#: src/postulo/accounts/forms.py:254
 #, draft
 msgid "Last name"
 msgstr "Efternavn"
@@ -4057,7 +4100,7 @@ msgstr "kørte sidst"
 msgid "Later"
 msgstr "Senere"
 
-#: src/postulo/core/server_forms.py:139
+#: src/postulo/core/server_forms.py:202
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "Lad stå tomt for at beholde den, der allerede er gemt."
@@ -4257,7 +4300,7 @@ msgstr "logoadresse"
 msgid "logo fetched"
 msgstr "logo hentet"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:357
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:364
 #: src/postulo/templates/server/logs.html:5
 #, draft
 msgid "Logs"
@@ -4285,12 +4328,12 @@ msgstr "Lavere tal vises først."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Små bogstaver, tal, punktummer, understreger og bindestreger."
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:273
 #, draft
 msgid "mail transport"
 msgstr "posttransport"
 
-#: src/postulo/core/server_forms.py:211
+#: src/postulo/core/server_forms.py:274
 #, draft
 msgid "Mail transport"
 msgstr "Posttransport"
@@ -4677,7 +4720,7 @@ msgstr ""
 msgid "no company"
 msgstr "ingen virksomhed"
 
-#: src/postulo/core/server_views.py:571
+#: src/postulo/core/server_views.py:601
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Ingen forbindelse: %(why)s"
@@ -4940,7 +4983,7 @@ msgstr "note"
 msgid "Note"
 msgstr "Note"
 
-#: src/postulo/accounts/forms.py:575
+#: src/postulo/accounts/forms.py:582
 #: src/postulo/templates/applications/application_detail.html:52
 #, draft
 msgid "Note (optional)"
@@ -5047,7 +5090,7 @@ msgstr "Der er intet installeret, som en person kan have en mening om."
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Intet gemmes, før du har gennemset det."
 
-#: src/postulo/core/server_forms.py:144
+#: src/postulo/core/server_forms.py:207
 #, draft
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Der sendes ingen adgangskode til serveren, før en ny indtastes."
@@ -5166,12 +5209,12 @@ msgid "Nothing was added."
 msgstr "Intet blev tilføjet."
 
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:796 src/postulo/core/server_views.py:830
+#: src/postulo/core/server_views.py:826 src/postulo/core/server_views.py:860
 #, draft
 msgid "Nothing was different."
 msgstr "Intet var anderledes."
 
-#: src/postulo/core/server_views.py:992
+#: src/postulo/core/server_views.py:1022
 #, draft
 msgid "Nothing was installed."
 msgstr "Intet blev installeret."
@@ -5503,7 +5546,7 @@ msgstr "Udfald"
 msgid "Outstanding only"
 msgstr "Kun udestående"
 
-#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:106
+#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:113
 #: src/postulo/templates/server/overview.html:5
 #, draft
 msgid "Overview"
@@ -5573,7 +5616,7 @@ msgstr "En del af denne virksomhed"
 msgid "Part time"
 msgstr "Deltid"
 
-#: src/postulo/accounts/forms.py:181
+#: src/postulo/accounts/forms.py:188
 #, draft
 msgid "Partly translated"
 msgstr "Delvist oversat"
@@ -5583,12 +5626,12 @@ msgstr "Delvist oversat"
 msgid "Passkeys"
 msgstr "Adgangsnøgler"
 
-#: src/postulo/core/models.py:254
+#: src/postulo/core/models.py:264
 #, draft
 msgid "password"
 msgstr "adgangskode"
 
-#: src/postulo/core/server_forms.py:136
+#: src/postulo/core/server_forms.py:199
 #: src/postulo/templates/server/email.html:24
 #: src/postulo/templates/settings/account.html:50
 #, draft
@@ -5628,8 +5671,8 @@ msgid "Pending only"
 msgstr "Kun afventende"
 
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
-#: src/postulo/core/server_views.py:138 src/postulo/core/server_views.py:224
-#: src/postulo/core/server_views.py:241 src/postulo/core/server_views.py:266
+#: src/postulo/core/server_views.py:145 src/postulo/core/server_views.py:231
+#: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:273
 #: src/postulo/jobs/tables.py:50
 #: src/postulo/templates/jobs/company_detail.html:141
 #: src/postulo/templates/server/people.html:7
@@ -5692,7 +5735,7 @@ msgstr "Personlig side"
 msgid "Pharmaceuticals"
 msgstr "Lægemidler"
 
-#: src/postulo/accounts/forms.py:281 src/postulo/core/phone_numbers.py:146
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:146
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -5760,7 +5803,7 @@ msgid "plugin repository"
 msgstr "plugin-arkiv"
 
 #: src/postulo/accounts/settings_views.py:119
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:627
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:657
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -5768,7 +5811,7 @@ msgstr "plugin-arkiv"
 msgid "Plugins"
 msgstr "Plugins"
 
-#: src/postulo/core/server_views.py:825
+#: src/postulo/core/server_views.py:855
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -5798,14 +5841,14 @@ msgid ""
 msgstr ""
 "Plus din profil, din karrierehistorik, tags, hver tidslinjepost og hver påmindelse. Arkivet indeholder én læsbar JSON-fil og en media-mappe."
 
-#: src/postulo/accounts/forms.py:253
+#: src/postulo/accounts/forms.py:260
 #, draft
 msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
 msgstr ""
 "PNG, JPEG, WebP eller GIF op til 5 MB. Det beskæres til en firkant og renses for alt, filen vidste om, hvor det blev taget."
 
-#: src/postulo/core/models.py:245
+#: src/postulo/core/models.py:255
 #, draft
 msgid "port"
 msgstr "port"
@@ -5891,7 +5934,7 @@ msgid ""
 msgstr ""
 "Postulo henter én side, som en person har bedt om, og respekterer som standard et websteds robots.txt. Sig kun ja, hvis du har besluttet, at den høflighed ikke gælder her."
 
-#: src/postulo/accounts/forms.py:262
+#: src/postulo/accounts/forms.py:269
 #, draft
 msgid ""
 "Postulo fetches the picture for your primary address from gravatar.com once, keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick it and the copy is deleted."
@@ -6419,7 +6462,7 @@ msgstr "Fjern administrator"
 msgid "Remove the logo"
 msgstr "Fjern logoet"
 
-#: src/postulo/accounts/forms.py:258
+#: src/postulo/accounts/forms.py:265
 #, draft
 msgid "Remove the uploaded picture"
 msgstr "Fjern det uploadede billede"
@@ -6505,7 +6548,7 @@ msgstr "Gennemse"
 msgid "Review the capture"
 msgstr "Gennemse indfangningen"
 
-#: src/postulo/accounts/forms.py:173
+#: src/postulo/accounts/forms.py:180
 #, draft
 msgid "Reviewed by a speaker"
 msgstr "Gennemgået af en taler"
@@ -6637,6 +6680,7 @@ msgstr "løn til"
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
+#: src/postulo/templates/server/defaults.html:72
 #: src/postulo/templates/server/email.html:120
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
@@ -6671,9 +6715,9 @@ msgstr "Gemt i dine opslag. Beslut dig, når du er klar."
 
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:796
-#: src/postulo/core/server_views.py:830 src/postulo/core/server_views.py:926
-#: src/postulo/resume/views.py:119
+#: src/postulo/core/server_views.py:319 src/postulo/core/server_views.py:447
+#: src/postulo/core/server_views.py:826 src/postulo/core/server_views.py:860
+#: src/postulo/core/server_views.py:956 src/postulo/resume/views.py:119
 #, draft
 msgid "Saved."
 msgstr "Gemt."
@@ -6780,7 +6824,7 @@ msgstr "Send en rigtig besked"
 msgid "Send a test message"
 msgstr "Send en testbesked"
 
-#: src/postulo/core/server_forms.py:102
+#: src/postulo/core/server_forms.py:165
 #, draft
 msgid "Send a test message to"
 msgstr "Send en testbesked til"
@@ -6806,7 +6850,7 @@ msgstr "Send til"
 msgid "Send to stores now"
 msgstr "Send til lagre nu"
 
-#: src/postulo/core/server_views.py:603
+#: src/postulo/core/server_views.py:633
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Afsendelse mislykkedes: %(error)s"
@@ -6840,7 +6884,7 @@ msgstr "Sendte dokumenter"
 msgid "sent on"
 msgstr "sendt den"
 
-#: src/postulo/core/server_views.py:606 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:636 src/postulo/notifications/email.py:85
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Sendt til %(to)s."
@@ -6976,7 +7020,7 @@ msgstr "Vis alle"
 msgid "Show done too"
 msgstr "Vis også udførte"
 
-#: src/postulo/accounts/forms.py:362
+#: src/postulo/accounts/forms.py:369
 #, draft
 msgid "Show in the navigation"
 msgstr "Vis i navigationen"
@@ -7008,7 +7052,7 @@ msgstr ""
 msgid "Sign out"
 msgstr "Log ud"
 
-#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:328
+#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:335
 #: src/postulo/templates/server/signin.html:5
 #, draft
 msgid "Sign-in"
@@ -7044,7 +7088,7 @@ msgstr "Enkeltlogin tæller som anden faktor"
 msgid "Site search"
 msgstr "Søg på webstedet"
 
-#: src/postulo/core/models.py:284 src/postulo/core/models.py:285
+#: src/postulo/core/models.py:294 src/postulo/core/models.py:295
 #, draft
 msgid "site settings"
 msgstr "webstedsindstillinger"
@@ -7107,7 +7151,7 @@ msgstr "Langsomst"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:243
+#: src/postulo/core/models.py:253
 #, draft
 msgid "SMTP server"
 msgstr "SMTP-server"
@@ -7202,7 +7246,7 @@ msgstr "Vil du hellere starte forfra?"
 msgid "starts"
 msgstr "begynder"
 
-#: src/postulo/core/models.py:255 src/postulo/core/server_forms.py:129
+#: src/postulo/core/models.py:265 src/postulo/core/server_forms.py:192
 #, draft
 msgid "STARTTLS"
 msgstr "STARTTLS"
@@ -7697,7 +7741,7 @@ msgstr "Det er ikke et udfald, Postulo kender."
 msgid "That is not something Postulo can do about it."
 msgstr "Det er ikke noget, Postulo kan gøre ved den."
 
-#: src/postulo/core/server_views.py:902 src/postulo/core/server_views.py:943
+#: src/postulo/core/server_views.py:932 src/postulo/core/server_views.py:973
 #, draft
 msgid "That is not something this page does."
 msgstr "Det gør denne side ikke."
@@ -7707,13 +7751,13 @@ msgstr "Det gør denne side ikke."
 msgid "That is not the address on this account."
 msgstr "Det er ikke adressen på denne konto."
 
-#: src/postulo/core/server_views.py:244
+#: src/postulo/core/server_views.py:251
 #, draft
 msgid "That is not the username."
 msgstr "Det er ikke brugernavnet."
 
-#: src/postulo/core/server_views.py:161 src/postulo/core/server_views.py:186
-#: src/postulo/core/server_views.py:215
+#: src/postulo/core/server_views.py:168 src/postulo/core/server_views.py:193
+#: src/postulo/core/server_views.py:222
 #, draft
 msgid "That is the last administrator. Appoint another first."
 msgstr "Det er den sidste administrator. Udpeg en anden først."
@@ -7732,7 +7776,7 @@ msgid ""
 msgstr ""
 "Sidste ciffer i dette ORCID passer ikke til resten, så et af dem er en tastefejl."
 
-#: src/postulo/core/server_views.py:1001 src/postulo/core/server_views.py:1006
+#: src/postulo/core/server_views.py:1031 src/postulo/core/server_views.py:1036
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Den pakke venter ikke længere; send den igen."
@@ -7752,7 +7796,7 @@ msgstr "Den side er større end %(limit)s MB, så den blev ikke læst."
 msgid "That page returned %(status)s."
 msgstr "Den side returnerede %(status)s."
 
-#: src/postulo/accounts/forms.py:306
+#: src/postulo/accounts/forms.py:313
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Det billede er over 5 MB. Et mindre, tak."
@@ -7818,7 +7862,7 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Katalogets underskrift eller nøgle kan ikke læses: %(error)s"
 
-#: src/postulo/core/server_views.py:1058
+#: src/postulo/core/server_views.py:1088
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Katalogerne svarede og nævner endnu ingenting."
@@ -7874,7 +7918,7 @@ msgstr "Overførslen er langt større, end et tilføjelsesprogram bør være."
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Den tidligere version, som denne erstatter. Den gamle fil beholdes."
 
-#: src/postulo/core/server_views.py:861 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:891 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Miljøet fastsætter “%(name)s”, så det kan ikke ændres her."
@@ -7940,7 +7984,7 @@ msgstr "Installationsprogrammet afviste den: %(error)s"
 msgid "The job title"
 msgstr "Jobtitlen"
 
-#: src/postulo/core/server_views.py:918
+#: src/postulo/core/server_views.py:948
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -7979,7 +8023,7 @@ msgstr "Logoet er væk."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logoet blev ikke ændret: %(problem)s"
 
-#: src/postulo/core/server_views.py:608 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:638 src/postulo/notifications/email.py:84
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Mail-backend'en tog ikke imod noget."
@@ -7995,7 +8039,7 @@ msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "De næste samtaler i kalenderen, og dem der er gået uden et resultat."
 
-#: src/postulo/core/server_views.py:891
+#: src/postulo/core/server_views.py:921
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Det officielle arkiv tømmes, det fjernes ikke."
@@ -8017,7 +8061,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Lønnen"
 
-#: src/postulo/core/server_views.py:674
+#: src/postulo/core/server_views.py:704
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "De plugins, der følger med Postulo. Der hentes intet."
@@ -8178,7 +8222,7 @@ msgstr "Der er ingen adresse at hente det fra igen."
 msgid "There is no file to send."
 msgstr "Der er ingen fil at sende."
 
-#: src/postulo/core/server_views.py:856
+#: src/postulo/core/server_views.py:886
 #, draft
 msgid "There is no repository by that name."
 msgstr "Der findes intet arkiv med det navn."
@@ -8231,7 +8275,7 @@ msgstr "De mødte ikke op"
 msgid "This company has no website recorded."
 msgstr "Denne virksomhed har intet websted registreret."
 
-#: src/postulo/accounts/forms.py:459 src/postulo/jobs/forms.py:230
+#: src/postulo/accounts/forms.py:466 src/postulo/jobs/forms.py:230
 #, draft
 msgid "This identifier is already listed."
 msgstr "Denne identifikator er allerede på listen."
@@ -8297,7 +8341,7 @@ msgstr ""
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Det er dette, du er ved at installere. Intet er installeret endnu."
 
-#: src/postulo/accounts/forms.py:456 src/postulo/jobs/forms.py:227
+#: src/postulo/accounts/forms.py:463 src/postulo/jobs/forms.py:227
 #, draft
 msgid "This kind of identifier is already listed."
 msgstr "Denne slags identifikator er allerede på listen."
@@ -8344,7 +8388,7 @@ msgstr ""
 msgid "tier"
 msgstr "niveau"
 
-#: src/postulo/accounts/forms.py:542
+#: src/postulo/accounts/forms.py:549
 #, draft
 msgid "Time zone"
 msgstr "Tidszone"
@@ -8354,7 +8398,7 @@ msgstr "Tidszone"
 msgid "time zone"
 msgstr "tidszone"
 
-#: src/postulo/core/server_forms.py:95
+#: src/postulo/core/server_forms.py:158
 #, draft
 msgid "Time zone for new accounts"
 msgstr "Tidszone for nye konti"
@@ -8369,7 +8413,7 @@ msgstr "punkt på tidslinjen"
 msgid "Timeout"
 msgstr "Tidsgrænse"
 
-#: src/postulo/core/models.py:257
+#: src/postulo/core/models.py:267
 #, draft
 msgid "timeout in seconds"
 msgstr "tidsgrænse i sekunder"
@@ -8447,12 +8491,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Transport og logistik"
 
-#: src/postulo/core/models.py:268
+#: src/postulo/core/models.py:278
 #, draft
 msgid "transport configuration"
 msgstr "transportkonfiguration"
 
-#: src/postulo/core/models.py:270
+#: src/postulo/core/models.py:280
 #, draft
 msgid "transport secrets"
 msgstr "transporthemmeligheder"
@@ -8493,7 +8537,7 @@ msgstr "Skriv mindst to tegn."
 msgid "Type it in instead"
 msgstr "Skriv det ind i stedet"
 
-#: src/postulo/accounts/forms.py:436 src/postulo/jobs/forms.py:207
+#: src/postulo/accounts/forms.py:443 src/postulo/jobs/forms.py:207
 #, draft
 msgid "Type the identifier."
 msgstr "Skriv identifikatoren."
@@ -8548,12 +8592,12 @@ msgid "Update the preview"
 msgstr "Opdatér forhåndsvisningen"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:25
-#: src/postulo/core/models.py:273
+#: src/postulo/core/models.py:283
 #, draft
 msgid "updated at"
 msgstr "opdateret den"
 
-#: src/postulo/core/models.py:280
+#: src/postulo/core/models.py:290
 #, draft
 msgid "updated by"
 msgstr "opdateret af"
@@ -8565,7 +8609,7 @@ msgstr "opdateret af"
 msgid "Upload a file"
 msgstr "Upload en fil"
 
-#: src/postulo/accounts/forms.py:251
+#: src/postulo/accounts/forms.py:258
 #, draft
 msgid "Upload a picture"
 msgstr "Upload et billede"
@@ -8604,12 +8648,12 @@ msgid ""
 msgstr ""
 "Brug 3 til 32 små bogstaver, tal, punktummer, understreger eller bindestreger, der begynder og slutter med et bogstav eller tal."
 
-#: src/postulo/accounts/forms.py:309
+#: src/postulo/accounts/forms.py:316
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Brug en PNG, JPEG, WebP eller GIF."
 
-#: src/postulo/accounts/forms.py:260
+#: src/postulo/accounts/forms.py:267
 #, draft
 msgid "Use my Gravatar"
 msgstr "Brug min Gravatar"
@@ -8619,7 +8663,7 @@ msgstr "Brug min Gravatar"
 msgid "use my Gravatar"
 msgstr "brug min Gravatar"
 
-#: src/postulo/accounts/forms.py:171 src/postulo/accounts/forms.py:210
+#: src/postulo/accounts/forms.py:178 src/postulo/accounts/forms.py:217
 #, draft
 msgid "Use the instance default"
 msgstr "Brug instansens standard"
@@ -8636,13 +8680,13 @@ msgstr ""
 msgid "user"
 msgstr "bruger"
 
-#: src/postulo/accounts/forms.py:552 src/postulo/templates/server/email.html:20
+#: src/postulo/accounts/forms.py:559 src/postulo/templates/server/email.html:20
 #: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
 msgstr "Brugernavn"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:250
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:260
 #, draft
 msgid "username"
 msgstr "brugernavn"
@@ -8799,12 +8843,12 @@ msgstr "Hvad %(plugin)s har brug for"
 msgid "what a monitor should poll"
 msgstr "hvad en overvåger bør forespørge"
 
-#: src/postulo/core/server_forms.py:92
+#: src/postulo/core/server_forms.py:155
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "Hvad en ny konto begynder med. Hver person kan ændre sit."
 
-#: src/postulo/core/server_forms.py:214
+#: src/postulo/core/server_forms.py:277
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "Det, der bærer posten væk fra denne maskine."
@@ -8958,7 +9002,7 @@ msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr ""
 "Hvad du har lagt mærke til og endnu ikke taget stilling til, og hvad der lukker i denne uge."
 
-#: src/postulo/accounts/forms.py:554
+#: src/postulo/accounts/forms.py:561
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -9217,7 +9261,7 @@ msgstr ""
 msgid "Yes"
 msgstr "Ja"
 
-#: src/postulo/core/server_forms.py:130
+#: src/postulo/core/server_forms.py:193
 #, draft
 msgid ""
 "Yes for a server on port 587 that upgrades the connection after connecting. Postulo does not yet speak implicit TLS on port 465."
@@ -9287,7 +9331,7 @@ msgid ""
 msgstr ""
 "Du kan selv slette din konto: hver post, hver fil på disken, tokens, forbindelser og kontoen. Eksporten ovenfor er sikkerhedsnettet; tag den først."
 
-#: src/postulo/core/server_views.py:183
+#: src/postulo/core/server_views.py:190
 #, draft
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Du kan ikke deaktivere den konto, du er logget ind med."
@@ -9491,19 +9535,19 @@ msgstr "din stilling"
 msgid "Your username has been changed."
 msgstr "Dit brugernavn er ændret."
 
-#: src/postulo/core/server_views.py:897
+#: src/postulo/core/server_views.py:927
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr "“%(name)s” er væk. Alt installeret derfra forbliver installeret."
 
-#: src/postulo/core/server_views.py:882
+#: src/postulo/core/server_views.py:912
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "“%(name)s” er slået fra. Der installeres og opdateres intet nyt derfra; det, der allerede var installeret, virker fortsat."
 
-#: src/postulo/core/server_views.py:879
+#: src/postulo/core/server_views.py:909
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr "“%(name)s” er slået til. Plugins kan installeres og opdateres derfra."

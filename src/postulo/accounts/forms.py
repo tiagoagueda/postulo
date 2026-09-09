@@ -148,7 +148,14 @@ def language_choices() -> list[tuple[str, str]]:
     reviewed: list[tuple[str, str]] = []
     drafted: list[tuple[str, str]] = []
     partial: list[tuple[str, str]] = []
+    from postulo.core import site
+
     for code, name in settings.LANGUAGES:
+        if not site.offers(code):
+            # An administrator has narrowed what this instance offers (#120). Nothing is
+            # deleted and nobody's stored choice is rewritten; the language is simply not
+            # on the list until it is offered again.
+            continue
         row = status.get(code)
         if row is not None and row.get("total", 0) and not row.get("translated", 0):
             # A language whose catalogue nobody has started is not offered. Postulo adds

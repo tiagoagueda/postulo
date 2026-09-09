@@ -98,6 +98,30 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **An instance can offer fewer languages than Postulo speaks.** Thirty-nine of them in one
+  picker is a long list for an instance whose people all read two, and until now there was no
+  way to say so short of deleting catalogues from the image. *Server settings → Defaults*
+  now carries the list; untick a language and it leaves everybody's picker.
+
+  **Empty means all of them, and that is the design rather than a shortcut.** Storing the list
+  of every language ticked today would have frozen the set on the day somebody first opened
+  the form: the instance would go on offering exactly those thirty-nine while a later release
+  added a fortieth that nobody would ever see. Ticking them all stores nothing, so an instance
+  nobody has narrowed keeps gaining languages as Postulo does.
+
+  **Narrowing never rewrites what somebody chose.** A person whose profile says French reads
+  the instance default from the next page onwards once French stops being offered — and their
+  setting stays exactly where it is, so offering French again brings them back without their
+  noticing either event. Blanking the profile instead would have been one line shorter and
+  irreversible: an operator narrowing thirty-nine to four would silently overwrite every
+  account that had chosen one of the other thirty-five, and there is nothing to put back.
+
+  Two saves are refused rather than accepted quietly — offering nothing, which leaves nobody
+  able to read anything, and withdrawing the language new accounts start in, where the message
+  names that language and says to change the default first. An administrator is not exempt
+  from the narrowing either: what the instance offers is what the instance offers, and two
+  rules where one will do is how the two drift apart. (#120)
+
 - **A contact can be in a department.** Which team somebody is in was going into `role`
   — "Engineering — hiring manager" — or into the notes, or nowhere, because there was
   nowhere else. Now there is: type the name on the contact form and it joins that company's

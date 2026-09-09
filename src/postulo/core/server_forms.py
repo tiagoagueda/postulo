@@ -76,6 +76,69 @@ class CaptureForm(forms.ModelForm):
         fields = ("capture_ignore_robots",)
 
 
+class OfferedLanguagesForm(forms.ModelForm):
+    """Which languages this instance offers at all.
+
+    Stored as an empty list when everything is ticked, and that is the point rather than an
+    optimisation: an instance that offers all of them keeps offering all of them, including
+    a language added in a later release. A list naming every language today would freeze
+    the set on the day somebody first saved this form.
+    """
+
+    class Meta:
+        model = SiteSettings
+        fields = ("offered_languages",)
+
+    offered_languages = forms.MultipleChoiceField(
+        label=_("Languages this instance offers"),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text=_(
+            "Everything is offered until you narrow it. Tick them all and it stays that "
+            "way, so a language added in a later release appears by itself."
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        from postulo.core import languages
+
+        super().__init__(*args, **kwargs)
+        self.every = [
+            (code, name)
+            for code, name in languages.NATIVE_NAMES.items()
+            if code != languages.SOURCE
+        ]
+        self.fields["offered_languages"].choices = self.every
+        stored = list(self.instance.offered_languages or [])
+        self.fields["offered_languages"].initial = stored or [code for code, _n in self.every]
+
+    def clean_offered_languages(self) -> list[str]:
+        chosen = list(self.cleaned_data.get("offered_languages") or [])
+        if not chosen:
+            raise forms.ValidationError(
+                _("At least one language has to be offered, or nobody can read anything.")
+            )
+
+        default = (self.instance.default_language or "").strip()
+        if default and default not in chosen:
+            raise forms.ValidationError(
+                _(
+                    "%(name)s is what a new account starts in, so it cannot stop being "
+                    "offered. Change the default first."
+                )
+                % {"name": self._name_of(default)}
+            )
+
+        # Everything ticked is stored as nothing, so a language added later is offered too.
+        return [] if len(chosen) == len(self.every) else chosen
+
+    @staticmethod
+    def _name_of(code: str) -> str:
+        from postulo.core import languages
+
+        return languages.NATIVE_NAMES.get(code, code)
+
+
 class DefaultsForm(forms.ModelForm):
     class Meta:
         model = SiteSettings

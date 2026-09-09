@@ -35,12 +35,26 @@ class UserPreferencesMiddleware:
             # the whole request down; fall back to the instance default.
             timezone.deactivate()
 
+        # A language an administrator has stopped offering is not applied, and the stored
+        # value is left exactly where it is: withdrawing a language must not silently
+        # rewrite a hundred people's settings, because it may be offered again tomorrow.
         language = getattr(profile, "language", "") if profile else ""
+        if language and not self._offered(language):
+            language = ""
         if language:
             translation.activate(language)
             request.LANGUAGE_CODE = translation.get_language()
 
         return self.get_response(request)
+
+    @staticmethod
+    def _offered(code: str) -> bool:
+        from . import site
+
+        try:
+            return site.offers(code)
+        except Exception:  # pragma: no cover - a broken settings row must not blank a page
+            return True
 
     @staticmethod
     def _instance_zone() -> str:

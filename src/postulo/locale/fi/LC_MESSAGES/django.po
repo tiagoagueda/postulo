@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 12:18+0000\n"
+"POT-Creation-Date: 2026-09-09 12:30+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -162,12 +162,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s–%(high)s"
 
-#: src/postulo/core/server_views.py:1073
+#: src/postulo/core/server_views.py:1103
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s on asennettu luettelosta."
 
-#: src/postulo/core/server_views.py:1023
+#: src/postulo/core/server_views.py:1053
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -181,7 +181,7 @@ msgid ""
 msgstr ""
 "%(name)s (<strong>%(username)s</strong>, %(email)s) ja kaikki, mitä tili omistaa: hakemukset, yritykset, asiakirjat ja niiden takana olevat tiedostot, muistutukset, tunnisteavaimet, yhteydet. Tiedostot poistetaan levyltä. Mikään ei tuo niitä takaisin."
 
-#: src/postulo/core/server_views.py:197
+#: src/postulo/core/server_views.py:204
 #, python-format, draft
 msgid "%(name)s can sign in again."
 msgstr "%(name)s voi kirjautua taas sisään."
@@ -198,17 +198,17 @@ msgstr ""
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s ei vastaa tarkistussummaa, jolla se julkaistiin."
 
-#: src/postulo/core/server_views.py:192
+#: src/postulo/core/server_views.py:199
 #, python-format, draft
 msgid "%(name)s is deactivated: nothing deleted, no sign-in."
 msgstr "%(name)s on passivoitu: mitään ei poistettu, kirjautuminen estetty."
 
-#: src/postulo/core/server_views.py:250
+#: src/postulo/core/server_views.py:257
 #, python-format, draft
 msgid "%(name)s is gone: the account, its records and %(files)s files on disk."
 msgstr "%(name)s on poissa: tili, sen tietueet ja %(files)s tiedostoa levyltä."
 
-#: src/postulo/core/server_views.py:167
+#: src/postulo/core/server_views.py:174
 #, python-format, draft
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s ei ole enää ylläpitäjä."
@@ -225,32 +225,39 @@ msgid ""
 msgstr ""
 "%(name)s ei ole puhdasta Pythonia. Postulo asentaa vain kaikille alustoille käännettyjä wheel-paketteja (py3-none-any); tässä vedoksessa ei ole kääntäjää."
 
-#: src/postulo/core/server_views.py:286
+#: src/postulo/core/server_views.py:293
 #, python-format, draft
 msgid "%(name)s is now @%(username)s."
 msgstr "%(name)s on nyt @%(username)s."
 
-#: src/postulo/core/server_views.py:173
+#: src/postulo/core/server_views.py:180
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s on nyt ylläpitäjä."
 
-#: src/postulo/core/server_views.py:1127
+#: src/postulo/core/server_views.py:1157
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s on poistettu. Käynnistä Postulo uudelleen varmistaaksesi, ettei siitä ole mitään ladattuna."
 
-#: src/postulo/core/server_views.py:1106
+#: src/postulo/core/server_views.py:1136
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s on kytketty pois; sen tiedostot ovat yhä täällä."
 
-#: src/postulo/core/server_views.py:1108
+#: src/postulo/core/server_views.py:1138
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s on taas kytketty päälle."
+
+#: src/postulo/core/server_forms.py:125
+#, python-format, draft
+msgid ""
+"%(name)s is what a new account starts in, so it cannot stop being offered. Change the default first."
+msgstr ""
+"%(name)s on kieli, jolla uusi tili alkaa, joten sen tarjoamista ei voi lopettaa. Vaihda ensin oletuskieli."
 
 #: src/postulo/templates/server/person_username.html:8
 #, python-format, draft
@@ -620,7 +627,7 @@ msgid ""
 msgstr ""
 "Malli, jossa on Postulon omat sarakkeet ja yksi esimerkkirivi. Täytä se ja lataa yllä."
 
-#: src/postulo/core/server_views.py:591
+#: src/postulo/core/server_views.py:621
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Testiviesti lähettäjältä %(name)s"
@@ -890,6 +897,12 @@ msgstr "Kaikki haastattelut"
 #, draft
 msgid "All listings"
 msgstr "Kaikki ilmoitukset"
+
+#: src/postulo/templates/server/defaults.html:58
+#, draft
+msgid ""
+"All of them are offered, and a language added in a later release will be too."
+msgstr "Kaikkia tarjotaan, ja myös myöhemmässä julkaisussa lisättyä kieltä."
 
 #: src/postulo/templates/server/overview.html:82
 #, draft
@@ -1206,6 +1219,11 @@ msgstr "Arviointi"
 msgid "Assessment or test"
 msgstr "Arviointi tai testi"
 
+#: src/postulo/core/server_forms.py:119
+#, draft
+msgid "At least one language has to be offered, or nobody can read anything."
+msgstr "Ainakin yhtä kieltä on tarjottava, tai kukaan ei voi lukea mitään."
+
 #: src/postulo/documents/models.py:436
 #, draft
 msgid "attempts"
@@ -1226,7 +1244,7 @@ msgstr "Käytettävissä — henkilö valitsee"
 msgid "Available; you have not changed it."
 msgstr "Käytettävissä; et ole muuttanut mitään."
 
-#: src/postulo/accounts/forms.py:179
+#: src/postulo/accounts/forms.py:186
 #, draft
 msgid "Awaiting review by a speaker"
 msgstr "Odottaa kielen puhujan tarkistusta"
@@ -1403,7 +1421,7 @@ msgstr "Peruuta"
 msgid "Cancelled"
 msgstr "Peruttu"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:391
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:398
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1608,7 +1626,7 @@ msgstr "Tarkistussumma"
 msgid "Choose a Europass file first."
 msgstr "Valitse ensin Europass-tiedosto."
 
-#: src/postulo/core/server_views.py:954
+#: src/postulo/core/server_views.py:984
 #, draft
 msgid "Choose a package first."
 msgstr "Valitse ensin paketti."
@@ -1623,7 +1641,7 @@ msgstr "Valitse toinen tiedosto"
 msgid "Choose at least one document to record."
 msgstr "Valitse vähintään yksi kirjattava asiakirja."
 
-#: src/postulo/accounts/forms.py:434 src/postulo/jobs/forms.py:205
+#: src/postulo/accounts/forms.py:441 src/postulo/jobs/forms.py:205
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Valitse, millainen tunniste tämä on."
@@ -1878,7 +1896,7 @@ msgstr "Yhteydet"
 msgid "connections"
 msgstr "yhteydet"
 
-#: src/postulo/accounts/forms.py:375
+#: src/postulo/accounts/forms.py:382
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Pidä hakemusta hiljentyneenä, kun on kulunut"
@@ -2272,12 +2290,12 @@ msgstr "Hylätty. Sitä ei ehdoteta uudelleen."
 msgid "default language"
 msgstr "oletuskieli"
 
-#: src/postulo/core/models.py:234
+#: src/postulo/core/models.py:244
 #, draft
 msgid "default time zone"
 msgstr "oletusaikavyöhyke"
 
-#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:411
+#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:418
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -2325,7 +2343,7 @@ msgstr "Poista tilini ja kaikki sen sisältö"
 msgid "Delete the account"
 msgstr "Poista tili"
 
-#: src/postulo/core/server_views.py:213
+#: src/postulo/core/server_views.py:220
 #, draft
 msgid "Delete your own account from Settings, not from here."
 msgstr "Poista oma tilisi Asetuksista, ei täältä."
@@ -2589,7 +2607,7 @@ msgstr ""
 "Kumpi tahansa Europass-muoto: JSON, jonka europass.europa.eu nykyään vie, tai XML, jonka vanha CV-editori tuotti ja joka levylläsi oleva vanhempi vienti yhä on. Postulo päättelee itse kumpi se on, näyttää sinulle mitä siinä on eikä kirjoita mitään ennen kuin sanot."
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:482
+#: src/postulo/core/server_views.py:512
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
 #: src/postulo/templates/server/people.html:46
@@ -2603,7 +2621,7 @@ msgstr "Sähköposti"
 msgid "email address"
 msgstr "sähköpostiosoite"
 
-#: src/postulo/accounts/forms.py:574
+#: src/postulo/accounts/forms.py:581
 #, draft
 msgid "Email address (optional)"
 msgstr "Sähköpostiosoite (valinnainen)"
@@ -2769,12 +2787,26 @@ msgid ""
 msgstr ""
 "Kaikki katoaa kerralla, eikä kukaan voi tuoda sitä takaisin. Ota ensin vientisi talteen."
 
-#: src/postulo/accounts/forms.py:365
+#: src/postulo/accounts/forms.py:372
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
 msgstr ""
 "Kaikkeen tässä pääsee muutakin kautta, joten jonkin jättäminen pois ei vie mitään. Postulo-nimi vie aina kojelaudalle."
+
+#: src/postulo/templates/server/defaults.html:50
+#, draft
+msgid ""
+"Everything is offered until you narrow it. Nobody's own choice is rewritten by this: a language you stop offering leaves a person reading the instance default, and their setting comes back if you offer it again."
+msgstr ""
+"Kaikkea tarjotaan, kunnes rajaat sitä. Tämä ei kirjoita kenenkään omaa valintaa yli: kielellä, jonka tarjoamisen lopetat, henkilö lukee asennuksen oletuskieltä, ja hänen asetuksensa palaa, jos tarjoat sen uudelleen."
+
+#: src/postulo/core/server_forms.py:96
+#, draft
+msgid ""
+"Everything is offered until you narrow it. Tick them all and it stays that way, so a language added in a later release appears by itself."
+msgstr ""
+"Kaikkea tarjotaan, kunnes rajaat sitä. Rastita kaikki ja niin se pysyy, jolloin myöhemmin lisätty kieli ilmestyy itsestään."
 
 #: src/postulo/templates/api/token_list.html:111
 #, python-format, draft
@@ -2993,8 +3025,8 @@ msgstr "Rahoitus"
 msgid "Find logo"
 msgstr "Etsi tunnus"
 
-#: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:222
-#: src/postulo/accounts/forms.py:246
+#: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
+#: src/postulo/accounts/forms.py:253
 #, draft
 msgid "First name"
 msgstr "Etunimi"
@@ -3067,7 +3099,7 @@ msgid ""
 msgstr ""
 "Pakottaminen päälle ei saa sitä toimimaan: ilmoittaja, tallennus tai synkronointi tarvitsee tunnukset, jotka vain tämä henkilö voi antaa. Se tarkoittaa, että hän saa käyttää sitä eikä saa sammuttaa sitä."
 
-#: src/postulo/core/server_forms.py:142
+#: src/postulo/core/server_forms.py:205
 #, draft
 msgid "Forget the stored password"
 msgstr "Unohda tallennettu salasana"
@@ -3132,7 +3164,7 @@ msgstr "alkaen %(low)s"
 msgid "From %(name)s."
 msgstr "Lähettäjä %(name)s."
 
-#: src/postulo/core/models.py:259
+#: src/postulo/core/models.py:269
 #, draft
 msgid "from address"
 msgstr "lähettäjän osoite"
@@ -3474,7 +3506,7 @@ msgstr "Tunnisteet"
 msgid "Identifies itself as"
 msgstr "Esittäytyy nimellä"
 
-#: src/postulo/core/server_views.py:593
+#: src/postulo/core/server_views.py:623
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3689,7 +3721,7 @@ msgstr "oppilaitos"
 msgid "Insurance"
 msgstr "Vakuutus"
 
-#: src/postulo/core/server_views.py:673
+#: src/postulo/core/server_views.py:703
 #, draft
 msgid "Internal"
 msgstr "Sisäinen"
@@ -3887,7 +3919,7 @@ msgid ""
 msgstr ""
 "Säilytetään tiedostossa %(file)s ja kierrätetään koon mukaan, joten se ei voi täyttää levyä. Kaikki tämä menee myös konsoliin, josta <code>docker logs</code> lukee sen."
 
-#: src/postulo/accounts/forms.py:286 src/postulo/core/phone_numbers.py:149
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:149
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -3928,7 +3960,7 @@ msgstr "Kirjeiden lajit"
 msgid "label"
 msgstr "nimi"
 
-#: src/postulo/accounts/forms.py:536 src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:543 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Kieli"
@@ -3947,7 +3979,7 @@ msgstr "kieli"
 msgid "Language and time"
 msgstr "Kieli ja aika"
 
-#: src/postulo/core/server_forms.py:89
+#: src/postulo/core/server_forms.py:152
 #, draft
 msgid "Language for new accounts"
 msgstr "Uusien tilien kieli"
@@ -3964,6 +3996,17 @@ msgstr "Kielet"
 #, draft
 msgid "languages"
 msgstr "kielet"
+
+#: src/postulo/core/models.py:243
+#, draft
+msgid "languages offered"
+msgstr "tarjotut kielet"
+
+#: src/postulo/core/server_forms.py:93
+#: src/postulo/templates/server/defaults.html:48
+#, draft
+msgid "Languages this instance offers"
+msgstr "Kielet, joita tämä asennus tarjoaa"
 
 #: src/postulo/templates/jobs/capture_form.html:27
 #, draft
@@ -4002,8 +4045,8 @@ msgstr "viimeksi tarkistettu"
 msgid "last error"
 msgstr "viimeisin virhe"
 
-#: src/postulo/accounts/forms.py:95 src/postulo/accounts/forms.py:223
-#: src/postulo/accounts/forms.py:247
+#: src/postulo/accounts/forms.py:95 src/postulo/accounts/forms.py:230
+#: src/postulo/accounts/forms.py:254
 #, draft
 msgid "Last name"
 msgstr "Sukunimi"
@@ -4054,7 +4097,7 @@ msgstr "viimeksi toiminut"
 msgid "Later"
 msgstr "Myöhemmin"
 
-#: src/postulo/core/server_forms.py:139
+#: src/postulo/core/server_forms.py:202
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "Jätä tyhjäksi, jos haluat säilyttää jo tallennetun."
@@ -4254,7 +4297,7 @@ msgstr "tunnuksen osoite"
 msgid "logo fetched"
 msgstr "tunnus haettu"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:357
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:364
 #: src/postulo/templates/server/logs.html:5
 #, draft
 msgid "Logs"
@@ -4282,12 +4325,12 @@ msgstr "Pienemmät numerot näytetään ensin."
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Pieniä kirjaimia, numeroita, pisteitä, alaviivoja ja yhdysmerkkejä."
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:273
 #, draft
 msgid "mail transport"
 msgstr "postin kuljetustapa"
 
-#: src/postulo/core/server_forms.py:211
+#: src/postulo/core/server_forms.py:274
 #, draft
 msgid "Mail transport"
 msgstr "Postin kuljetustapa"
@@ -4673,7 +4716,7 @@ msgstr "Ei vielä yrityksiä. Ne luodaan puolestasi, kun kirjaat hakemuksen."
 msgid "no company"
 msgstr "ei yritystä"
 
-#: src/postulo/core/server_views.py:571
+#: src/postulo/core/server_views.py:601
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Ei yhteyttä: %(why)s"
@@ -4935,7 +4978,7 @@ msgstr "muistiinpano"
 msgid "Note"
 msgstr "Muistiinpano"
 
-#: src/postulo/accounts/forms.py:575
+#: src/postulo/accounts/forms.py:582
 #: src/postulo/templates/applications/application_detail.html:52
 #, draft
 msgid "Note (optional)"
@@ -5043,7 +5086,7 @@ msgstr ""
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Mitään ei tallenneta ennen kuin olet tarkistanut sen."
 
-#: src/postulo/core/server_forms.py:144
+#: src/postulo/core/server_forms.py:207
 #, draft
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Palvelimelle ei lähetetä salasanaa ennen kuin uusi on syötetty."
@@ -5163,12 +5206,12 @@ msgid "Nothing was added."
 msgstr "Mitään ei lisätty."
 
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:796 src/postulo/core/server_views.py:830
+#: src/postulo/core/server_views.py:826 src/postulo/core/server_views.py:860
 #, draft
 msgid "Nothing was different."
 msgstr "Mikään ei ollut toisin."
 
-#: src/postulo/core/server_views.py:992
+#: src/postulo/core/server_views.py:1022
 #, draft
 msgid "Nothing was installed."
 msgstr "Mitään ei asennettu."
@@ -5500,7 +5543,7 @@ msgstr "Tulokset"
 msgid "Outstanding only"
 msgstr "Vain avoimet"
 
-#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:106
+#: src/postulo/core/server_sections.py:11 src/postulo/core/server_views.py:113
 #: src/postulo/templates/server/overview.html:5
 #, draft
 msgid "Overview"
@@ -5570,7 +5613,7 @@ msgstr "Osa tätä yritystä"
 msgid "Part time"
 msgstr "Osa-aikainen"
 
-#: src/postulo/accounts/forms.py:181
+#: src/postulo/accounts/forms.py:188
 #, draft
 msgid "Partly translated"
 msgstr "Osittain käännetty"
@@ -5580,12 +5623,12 @@ msgstr "Osittain käännetty"
 msgid "Passkeys"
 msgstr "Avaimet"
 
-#: src/postulo/core/models.py:254
+#: src/postulo/core/models.py:264
 #, draft
 msgid "password"
 msgstr "salasana"
 
-#: src/postulo/core/server_forms.py:136
+#: src/postulo/core/server_forms.py:199
 #: src/postulo/templates/server/email.html:24
 #: src/postulo/templates/settings/account.html:50
 #, draft
@@ -5625,8 +5668,8 @@ msgid "Pending only"
 msgstr "Vain odottavat"
 
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
-#: src/postulo/core/server_views.py:138 src/postulo/core/server_views.py:224
-#: src/postulo/core/server_views.py:241 src/postulo/core/server_views.py:266
+#: src/postulo/core/server_views.py:145 src/postulo/core/server_views.py:231
+#: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:273
 #: src/postulo/jobs/tables.py:50
 #: src/postulo/templates/jobs/company_detail.html:141
 #: src/postulo/templates/server/people.html:7
@@ -5689,7 +5732,7 @@ msgstr "Oma sivusto"
 msgid "Pharmaceuticals"
 msgstr "Lääketeollisuus"
 
-#: src/postulo/accounts/forms.py:281 src/postulo/core/phone_numbers.py:146
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:146
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -5757,7 +5800,7 @@ msgid "plugin repository"
 msgstr "liitännäisten tietolähde"
 
 #: src/postulo/accounts/settings_views.py:119
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:627
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:657
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -5765,7 +5808,7 @@ msgstr "liitännäisten tietolähde"
 msgid "Plugins"
 msgstr "Liitännäiset"
 
-#: src/postulo/core/server_views.py:825
+#: src/postulo/core/server_views.py:855
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -5795,14 +5838,14 @@ msgid ""
 msgstr ""
 "Lisäksi profiilisi, urahistoriasi, tunnisteet, jokainen aikajanan merkintä ja jokainen muistutus. Arkisto sisältää yhden luettavan JSON-tiedoston ja media-kansion."
 
-#: src/postulo/accounts/forms.py:253
+#: src/postulo/accounts/forms.py:260
 #, draft
 msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
 msgstr ""
 "PNG, JPEG, WebP tai GIF, enintään 5 Mt. Kuva rajataan neliöksi ja siitä poistetaan kaikki, mitä tiedosto tiesi kuvauspaikasta."
 
-#: src/postulo/core/models.py:245
+#: src/postulo/core/models.py:255
 #, draft
 msgid "port"
 msgstr "portti"
@@ -5888,7 +5931,7 @@ msgid ""
 msgstr ""
 "Postulo hakee yhden sivun, jota henkilö pyysi, ja noudattaa oletuksena sivuston robots.txt-tiedostoa. Vastaa kyllä vain, jos olet päättänyt, ettei tuo kohteliaisuus päde tässä."
 
-#: src/postulo/accounts/forms.py:262
+#: src/postulo/accounts/forms.py:269
 #, draft
 msgid ""
 "Postulo fetches the picture for your primary address from gravatar.com once, keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick it and the copy is deleted."
@@ -6418,7 +6461,7 @@ msgstr "Poista ylläpitäjyys"
 msgid "Remove the logo"
 msgstr "Poista tunnus"
 
-#: src/postulo/accounts/forms.py:258
+#: src/postulo/accounts/forms.py:265
 #, draft
 msgid "Remove the uploaded picture"
 msgstr "Poista ladattu kuva"
@@ -6503,7 +6546,7 @@ msgstr "Tarkista"
 msgid "Review the capture"
 msgstr "Tarkista kaappaus"
 
-#: src/postulo/accounts/forms.py:173
+#: src/postulo/accounts/forms.py:180
 #, draft
 msgid "Reviewed by a speaker"
 msgstr "Puhujan tarkistama"
@@ -6635,6 +6678,7 @@ msgstr "palkka enintään"
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
+#: src/postulo/templates/server/defaults.html:72
 #: src/postulo/templates/server/email.html:120
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
@@ -6669,9 +6713,9 @@ msgstr "Tallennettu ilmoituksiisi. Päätä, kun olet valmis."
 
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:312 src/postulo/core/server_views.py:796
-#: src/postulo/core/server_views.py:830 src/postulo/core/server_views.py:926
-#: src/postulo/resume/views.py:119
+#: src/postulo/core/server_views.py:319 src/postulo/core/server_views.py:447
+#: src/postulo/core/server_views.py:826 src/postulo/core/server_views.py:860
+#: src/postulo/core/server_views.py:956 src/postulo/resume/views.py:119
 #, draft
 msgid "Saved."
 msgstr "Tallennettu."
@@ -6778,7 +6822,7 @@ msgstr "Lähetä oikea viesti"
 msgid "Send a test message"
 msgstr "Lähetä testiviesti"
 
-#: src/postulo/core/server_forms.py:102
+#: src/postulo/core/server_forms.py:165
 #, draft
 msgid "Send a test message to"
 msgstr "Lähetä testiviesti vastaanottajalle"
@@ -6804,7 +6848,7 @@ msgstr "Lähetä vastaanottajalle"
 msgid "Send to stores now"
 msgstr "Lähetä säilöihin nyt"
 
-#: src/postulo/core/server_views.py:603
+#: src/postulo/core/server_views.py:633
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Lähetys epäonnistui: %(error)s"
@@ -6838,7 +6882,7 @@ msgstr "Lähetetyt asiakirjat"
 msgid "sent on"
 msgstr "lähetetty"
 
-#: src/postulo/core/server_views.py:606 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:636 src/postulo/notifications/email.py:85
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Lähetetty: %(to)s."
@@ -6975,7 +7019,7 @@ msgstr "Näytä kaikki"
 msgid "Show done too"
 msgstr "Näytä myös tehdyt"
 
-#: src/postulo/accounts/forms.py:362
+#: src/postulo/accounts/forms.py:369
 #, draft
 msgid "Show in the navigation"
 msgstr "Näytä valikossa"
@@ -7007,7 +7051,7 @@ msgstr ""
 msgid "Sign out"
 msgstr "Kirjaudu ulos"
 
-#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:328
+#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:335
 #: src/postulo/templates/server/signin.html:5
 #, draft
 msgid "Sign-in"
@@ -7043,7 +7087,7 @@ msgstr "Kertakirjautuminen käy toisesta tekijästä"
 msgid "Site search"
 msgstr "Sivustohaku"
 
-#: src/postulo/core/models.py:284 src/postulo/core/models.py:285
+#: src/postulo/core/models.py:294 src/postulo/core/models.py:295
 #, draft
 msgid "site settings"
 msgstr "sivuston asetukset"
@@ -7106,7 +7150,7 @@ msgstr "Hitain"
 msgid "slug"
 msgstr "tunnus"
 
-#: src/postulo/core/models.py:243
+#: src/postulo/core/models.py:253
 #, draft
 msgid "SMTP server"
 msgstr "SMTP-palvelin"
@@ -7201,7 +7245,7 @@ msgstr "Aloitetaanko sittenkin puhtaalta pöydältä?"
 msgid "starts"
 msgstr "alkaa"
 
-#: src/postulo/core/models.py:255 src/postulo/core/server_forms.py:129
+#: src/postulo/core/models.py:265 src/postulo/core/server_forms.py:192
 #, draft
 msgid "STARTTLS"
 msgstr "STARTTLS"
@@ -7697,7 +7741,7 @@ msgstr "Tuo ei ole Postulon tuntema tulos."
 msgid "That is not something Postulo can do about it."
 msgstr "Tuota Postulo ei voi sille tehdä."
 
-#: src/postulo/core/server_views.py:902 src/postulo/core/server_views.py:943
+#: src/postulo/core/server_views.py:932 src/postulo/core/server_views.py:973
 #, draft
 msgid "That is not something this page does."
 msgstr "Tätä tämä sivu ei tee."
@@ -7707,13 +7751,13 @@ msgstr "Tätä tämä sivu ei tee."
 msgid "That is not the address on this account."
 msgstr "Tuo ei ole tämän tilin osoite."
 
-#: src/postulo/core/server_views.py:244
+#: src/postulo/core/server_views.py:251
 #, draft
 msgid "That is not the username."
 msgstr "Tuo ei ole käyttäjänimi."
 
-#: src/postulo/core/server_views.py:161 src/postulo/core/server_views.py:186
-#: src/postulo/core/server_views.py:215
+#: src/postulo/core/server_views.py:168 src/postulo/core/server_views.py:193
+#: src/postulo/core/server_views.py:222
 #, draft
 msgid "That is the last administrator. Appoint another first."
 msgstr "Tuo on viimeinen ylläpitäjä. Nimeä ensin toinen."
@@ -7732,7 +7776,7 @@ msgid ""
 msgstr ""
 "Tämän ORCIDin viimeinen numero ei täsmää muiden kanssa, joten jokin niistä on kirjoitusvirhe."
 
-#: src/postulo/core/server_views.py:1001 src/postulo/core/server_views.py:1006
+#: src/postulo/core/server_views.py:1031 src/postulo/core/server_views.py:1036
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Tuo paketti ei enää odota; lähetä se uudelleen."
@@ -7752,7 +7796,7 @@ msgstr "Tuo sivu on suurempi kuin %(limit)s Mt, joten sitä ei luettu."
 msgid "That page returned %(status)s."
 msgstr "Tuo sivu palautti %(status)s."
 
-#: src/postulo/accounts/forms.py:306
+#: src/postulo/accounts/forms.py:313
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tuo kuva on yli 5 Mt. Pienempi, kiitos."
@@ -7818,7 +7862,7 @@ msgstr "Luettelon allekirjoitus ei vastaa sen sisältöä; sitä ei käytetty."
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Luettelon allekirjoitus tai avain ei ole luettavissa: %(error)s"
 
-#: src/postulo/core/server_views.py:1058
+#: src/postulo/core/server_views.py:1088
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Luettelot vastasivat, eivätkä mainitse vielä mitään."
@@ -7874,7 +7918,7 @@ msgstr "Lataus on paljon suurempi kuin lisäosan pitäisi olla."
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Aiempi versio, jonka tämä korvaa. Vanha tiedosto säilytetään."
 
-#: src/postulo/core/server_views.py:861 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:891 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Ympäristö asettaa arvon ”%(name)s”, joten sitä ei voi muuttaa täällä."
@@ -7940,7 +7984,7 @@ msgstr "Asennusohjelma hylkäsi sen: %(error)s"
 msgid "The job title"
 msgstr "Tehtävänimike"
 
-#: src/postulo/core/server_views.py:918
+#: src/postulo/core/server_views.py:948
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -7978,7 +8022,7 @@ msgstr "Tunnus on poissa."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Tunnusta ei muutettu: %(problem)s"
 
-#: src/postulo/core/server_views.py:608 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:638 src/postulo/notifications/email.py:84
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Postipalvelin ei hyväksynyt mitään."
@@ -7994,7 +8038,7 @@ msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Seuraavat haastattelut kalenterissa ja ne, jotka menivät ilman tulosta."
 
-#: src/postulo/core/server_views.py:891
+#: src/postulo/core/server_views.py:921
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Virallinen tietolähde tyhjennetään, ei poisteta."
@@ -8016,7 +8060,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Palkkaus"
 
-#: src/postulo/core/server_views.py:674
+#: src/postulo/core/server_views.py:704
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Postulon mukana tulevat liitännäiset. Mitään ei haeta."
@@ -8178,7 +8222,7 @@ msgstr "Ei ole osoitetta, josta hakea se uudelleen."
 msgid "There is no file to send."
 msgstr "Ei tiedostoa lähetettäväksi."
 
-#: src/postulo/core/server_views.py:856
+#: src/postulo/core/server_views.py:886
 #, draft
 msgid "There is no repository by that name."
 msgstr "Sen nimistä tietolähdettä ei ole."
@@ -8231,7 +8275,7 @@ msgstr "He eivät saapuneet"
 msgid "This company has no website recorded."
 msgstr "Tällä yrityksellä ei ole sivustoa tiedossa."
 
-#: src/postulo/accounts/forms.py:459 src/postulo/jobs/forms.py:230
+#: src/postulo/accounts/forms.py:466 src/postulo/jobs/forms.py:230
 #, draft
 msgid "This identifier is already listed."
 msgstr "Tämä tunniste on jo luettelossa."
@@ -8297,7 +8341,7 @@ msgstr ""
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Tämän olet asentamassa. Mitään ei ole vielä asennettu."
 
-#: src/postulo/accounts/forms.py:456 src/postulo/jobs/forms.py:227
+#: src/postulo/accounts/forms.py:463 src/postulo/jobs/forms.py:227
 #, draft
 msgid "This kind of identifier is already listed."
 msgstr "Tämäntyyppinen tunniste on jo luettelossa."
@@ -8345,7 +8389,7 @@ msgstr ""
 msgid "tier"
 msgstr "taso"
 
-#: src/postulo/accounts/forms.py:542
+#: src/postulo/accounts/forms.py:549
 #, draft
 msgid "Time zone"
 msgstr "Aikavyöhyke"
@@ -8355,7 +8399,7 @@ msgstr "Aikavyöhyke"
 msgid "time zone"
 msgstr "aikavyöhyke"
 
-#: src/postulo/core/server_forms.py:95
+#: src/postulo/core/server_forms.py:158
 #, draft
 msgid "Time zone for new accounts"
 msgstr "Uusien tilien aikavyöhyke"
@@ -8370,7 +8414,7 @@ msgstr "aikajanan merkintä"
 msgid "Timeout"
 msgstr "Aikakatkaisu"
 
-#: src/postulo/core/models.py:257
+#: src/postulo/core/models.py:267
 #, draft
 msgid "timeout in seconds"
 msgstr "aikakatkaisu sekunteina"
@@ -8448,12 +8492,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Kuljetus ja logistiikka"
 
-#: src/postulo/core/models.py:268
+#: src/postulo/core/models.py:278
 #, draft
 msgid "transport configuration"
 msgstr "kuljetuksen asetukset"
 
-#: src/postulo/core/models.py:270
+#: src/postulo/core/models.py:280
 #, draft
 msgid "transport secrets"
 msgstr "kuljetuksen salaisuudet"
@@ -8494,7 +8538,7 @@ msgstr "Kirjoita vähintään kaksi merkkiä."
 msgid "Type it in instead"
 msgstr "Kirjoita se sen sijaan"
 
-#: src/postulo/accounts/forms.py:436 src/postulo/jobs/forms.py:207
+#: src/postulo/accounts/forms.py:443 src/postulo/jobs/forms.py:207
 #, draft
 msgid "Type the identifier."
 msgstr "Kirjoita tunniste."
@@ -8549,12 +8593,12 @@ msgid "Update the preview"
 msgstr "Päivitä esikatselu"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:25
-#: src/postulo/core/models.py:273
+#: src/postulo/core/models.py:283
 #, draft
 msgid "updated at"
 msgstr "päivitetty"
 
-#: src/postulo/core/models.py:280
+#: src/postulo/core/models.py:290
 #, draft
 msgid "updated by"
 msgstr "päivittäjä"
@@ -8566,7 +8610,7 @@ msgstr "päivittäjä"
 msgid "Upload a file"
 msgstr "Lataa tiedosto"
 
-#: src/postulo/accounts/forms.py:251
+#: src/postulo/accounts/forms.py:258
 #, draft
 msgid "Upload a picture"
 msgstr "Lataa kuva"
@@ -8605,12 +8649,12 @@ msgid ""
 msgstr ""
 "Käytä 3–32 pientä kirjainta, numeroa, pistettä, alaviivaa tai yhdysmerkkiä; alussa ja lopussa kirjain tai numero."
 
-#: src/postulo/accounts/forms.py:309
+#: src/postulo/accounts/forms.py:316
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Käytä PNG-, JPEG-, WebP- tai GIF-kuvaa."
 
-#: src/postulo/accounts/forms.py:260
+#: src/postulo/accounts/forms.py:267
 #, draft
 msgid "Use my Gravatar"
 msgstr "Käytä Gravataria"
@@ -8620,7 +8664,7 @@ msgstr "Käytä Gravataria"
 msgid "use my Gravatar"
 msgstr "käytä Gravataria"
 
-#: src/postulo/accounts/forms.py:171 src/postulo/accounts/forms.py:210
+#: src/postulo/accounts/forms.py:178 src/postulo/accounts/forms.py:217
 #, draft
 msgid "Use the instance default"
 msgstr "Käytä instanssin oletusta"
@@ -8636,13 +8680,13 @@ msgstr "Käytä tila- tai haastattelupäätepisteitä; aikajana kirjaa ne itse."
 msgid "user"
 msgstr "käyttäjä"
 
-#: src/postulo/accounts/forms.py:552 src/postulo/templates/server/email.html:20
+#: src/postulo/accounts/forms.py:559 src/postulo/templates/server/email.html:20
 #: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
 msgstr "Käyttäjänimi"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:250
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:260
 #, draft
 msgid "username"
 msgstr "käyttäjänimi"
@@ -8799,12 +8843,12 @@ msgstr "Mitä %(plugin)s tarvitsee"
 msgid "what a monitor should poll"
 msgstr "mitä valvonnan tulisi kysellä"
 
-#: src/postulo/core/server_forms.py:92
+#: src/postulo/core/server_forms.py:155
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "Mistä uusi tili aloittaa. Jokainen voi muuttaa omansa."
 
-#: src/postulo/core/server_forms.py:214
+#: src/postulo/core/server_forms.py:277
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "Mikä vie postin pois tältä koneelta."
@@ -8957,7 +9001,7 @@ msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr ""
 "Mitä olet huomannut muttet vielä ratkaissut, ja mikä sulkeutuu tällä viikolla."
 
-#: src/postulo/accounts/forms.py:554
+#: src/postulo/accounts/forms.py:561
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -9216,7 +9260,7 @@ msgstr ""
 msgid "Yes"
 msgstr "Kyllä"
 
-#: src/postulo/core/server_forms.py:130
+#: src/postulo/core/server_forms.py:193
 #, draft
 msgid ""
 "Yes for a server on port 587 that upgrades the connection after connecting. Postulo does not yet speak implicit TLS on port 465."
@@ -9286,7 +9330,7 @@ msgid ""
 msgstr ""
 "Voit poistaa tilisi itse: jokaisen tietueen, jokaisen tiedoston levyltä, avaimet, yhteydet ja tilin. Yllä oleva vienti on turvaverkko; ota se ensin."
 
-#: src/postulo/core/server_views.py:183
+#: src/postulo/core/server_views.py:190
 #, draft
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Et voi passivoida tiliä, jolla olet kirjautuneena."
@@ -9489,19 +9533,19 @@ msgstr "tehtäväsi"
 msgid "Your username has been changed."
 msgstr "Käyttäjänimesi on vaihdettu."
 
-#: src/postulo/core/server_views.py:897
+#: src/postulo/core/server_views.py:927
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr "”%(name)s” on poissa. Kaikki siitä asennettu pysyy asennettuna."
 
-#: src/postulo/core/server_views.py:882
+#: src/postulo/core/server_views.py:912
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "”%(name)s” on pois päältä. Siitä ei asenneta eikä päivitetä mitään uutta; jo asennettu toimii edelleen."
 
-#: src/postulo/core/server_views.py:879
+#: src/postulo/core/server_views.py:909
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr "”%(name)s” on päällä. Siitä voi asentaa ja päivittää liitännäisiä."
