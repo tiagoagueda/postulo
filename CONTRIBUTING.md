@@ -329,6 +329,40 @@ To check a runner works before a release depends on it, dispatch from a branch a
 the current release's tag. That builds something real, publishes tags that are true, and
 does not need a new tag cut for the purpose.
 
+### Scanning the image
+
+Nothing scans the image yet — that needs a runner that can build one, and is #156. Until
+then it is a step somebody does, and this is the step:
+
+```sh
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+    aquasec/trivy image --ignore-unfixed postulo:latest
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+    anchore/grype postulo:latest --only-fixed
+```
+
+**`--ignore-unfixed` / `--only-fixed` is the point, not a convenience.** A Debian stable
+base image carries dozens of HIGH and several CRITICAL findings with no fix available —
+that is the normal state of Debian stable, where the security team triages a great many as
+no-DSA. A gate on severity is therefore red every day for reasons nobody can act on, and is
+switched off within a fortnight. A gate on *fixable* findings is one somebody can clear, and
+on the image that produced #155 it was a single line.
+
+**Run both.** They disagreed usefully: Grype found the only actionable Debian update, which
+Trivy did not mark fixable at all; Trivy found the Python packages and a leftover uv cache,
+which Grype's scan did not see. They also disagree about severity, because Trivy prefers the
+distribution's rating of how a CVE affects *its* build and Grype leans on the NVD's. Neither
+number is the number, and anything written into a pipeline has to say which tool it means.
+
+**Write down the clean half too.** The scan that produced #154 and #155 also reported zero
+secrets and zero misconfigurations, and that is the result that gets forgotten when only the
+bad news is recorded.
+
+A fixable finding in a Debian package usually means the image needs rebuilding without a
+cache rather than a code change: `apt-get upgrade` runs at build time (see `docker/Dockerfile`
+and *Configuration → The image and Debian's updates*), so a fresh build takes whatever Debian
+has published since.
+
 ## Licence
 
 Contributions are accepted under the [AGPL-3.0-or-later](LICENSE) licence that covers

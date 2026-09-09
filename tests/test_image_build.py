@@ -110,3 +110,86 @@ def test_every_group_in_the_project_is_covered_by_that_flag():
         f"default-groups names a group that does not exist: {defaults - groups}"
     )
     assert len(groups) > 1, "with one group `--no-dev` would have been enough; this guards the rest"
+
+
+# ------------------------------------------- what the image does about Debian's updates
+
+
+def apt_commands(text: str | None = None) -> list[str]:
+    """Every apt layer, one string each, with the line continuations folded away.
+
+    Read rather than run, for the same reason as everything else in this file (#81).
+    """
+    source = DOCKERFILE.read_text(encoding="utf-8") if text is None else text
+    folded = source.replace("\\\n", " ")
+    return [line for line in folded.splitlines() if "apt-get update" in line]
+
+
+def test_the_apt_reader_finds_what_it_is_looking_for():
+    """A test that reads a file has to be shown failing, or it passes on an empty match."""
+    assert len(apt_commands()) == 2, "the runtime layer and the plugin one"
+    assert apt_commands("RUN apt-get update \\\n && apt-get install -y curl") == [
+        "RUN apt-get update   && apt-get install -y curl"
+    ]
+    assert apt_commands("RUN echo hello") == []
+
+
+def test_every_apt_layer_takes_debians_updates():
+    """#155: `libpcre2-8-0` carried a fixable High because nothing ever upgraded it.
+
+    It arrives with Python rather than with anything Postulo asked for, so no `install`
+    line would have touched it, and the base image keeps whatever it was built with. The
+    only thing that reaches a package like that is `upgrade`.
+
+    Asserted for every apt layer, not only the first: an image built with
+    `POSTULO_EXTRA_PACKAGES` refreshes the index a second time, and an image with plugins
+    must not be quietly less patched than one without them.
+    """
+    for layer in apt_commands():
+        assert "apt-get upgrade" in layer, f"takes no security updates: {layer}"
+
+
+def test_the_upgrade_sits_between_the_refresh_and_the_install():
+    """Order is the whole of whether it does anything.
+
+    Before `update` it runs against whatever index the base image shipped, which is the
+    stale one that caused this. After `install`, the packages just installed came from the
+    old index. And in a `RUN` of its own it is a separate layer, served from cache on a
+    build whose `update` layer was also cached — so it would be skipped exactly when the
+    index it needed had changed.
+    """
+    for layer in apt_commands():
+        refresh = layer.index("apt-get update")
+        upgrade = layer.index("apt-get upgrade")
+        assert refresh < upgrade, f"upgrades against a stale index: {layer}"
+        if "apt-get install" in layer:
+            assert upgrade < layer.index("apt-get install"), (
+                f"installs from the index it has not refreshed against: {layer}"
+            )
+
+
+def test_it_is_upgrade_and_not_dist_upgrade():
+    """Within a stable release, nothing should add or remove packages behind the build."""
+    for layer in apt_commands():
+        assert "dist-upgrade" not in layer, layer
+
+
+def test_the_base_image_is_not_pinned_by_digest():
+    """The decision, written down where changing it has to be deliberate.
+
+    A digest buys reproducibility and makes Debian's updates arrive only when somebody
+    remembers to bump it. A manual step nobody performs is how the finding got here, so
+    the image drifts towards being patched instead. If this ever becomes a pin, the
+    upgrade above stops being optional — it becomes the only thing patching anything.
+    """
+    from_lines = [
+        line
+        for line in DOCKERFILE.read_text(encoding="utf-8").splitlines()
+        if line.startswith("FROM ")
+    ]
+
+    assert from_lines, "no FROM line found"
+    for line in from_lines:
+        assert "@sha256:" not in line, (
+            "pinned by digest: see #155 before deciding this, and keep the upgrade"
+        )

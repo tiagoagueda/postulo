@@ -296,3 +296,29 @@ its certificate is still checked against that name.
 Subscribe to the repository's releases. A vulnerability disclosed in a dependency is
 handled as `SECURITY.md` describes: a patch release and a pinned issue. Upgrading is a
 `docker compose pull && up -d` (see [Installing Postulo](Installing-Postulo)).
+
+## The image and Debian's updates
+
+Postulo's image is built on `python:3.14-slim-bookworm` and runs `apt-get upgrade` at build
+time, so a fresh build takes whatever security updates Debian has published. That is worth
+knowing for two reasons.
+
+**Rebuilding is how you get patched.** A running container never updates itself; nothing in
+it reaches out for packages, by design. When Debian publishes a security update for something
+in the image — including packages Postulo never asked for, which arrive with Python and with
+Pango — the way to get it is to pull a newly built image, or to rebuild without a cache.
+Pulling the same tag you already have does nothing if the tag has not been rebuilt since.
+
+**The base image is not pinned to a digest, deliberately.** Pinning would make two builds of
+the same commit produce the same image, which is a real thing to want. It would also mean
+Debian's updates arrive only when somebody remembers to bump the digest — and a manual step
+nobody performs is exactly how a fixable High-severity finding sat in the image unnoticed.
+Between an image that drifts towards being patched and one that reliably stays unpatched,
+Postulo takes the first. Each release is published by digest, so the artefact you actually
+run is still identified exactly.
+
+**Most findings in a Debian base image have no fix, and that is normal.** Scanning the image
+will report dozens of HIGH and several CRITICAL entries that Debian has triaged as not
+warranting an update. They are not ignorable by choice; there is nothing to install. Scan
+with `--ignore-unfixed` (Trivy) or `--only-fixed` (Grype) to see the findings you can
+actually act on, which is usually none or one.

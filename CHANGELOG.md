@@ -8,6 +8,40 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **The image never took Debian's security updates, so a fixable High sat in it.**
+  `libpcre2-8-0` had an update in bookworm that the image did not have. It arrives with
+  Python rather than with anything Postulo installs, so no line in the Dockerfile would ever
+  have touched it: the build installed what it needed and kept whatever the base image was
+  built with, for as long as the base image went unrebuilt. It was the only genuinely
+  actionable operating-system finding across two scanners, and it had been there since the
+  image was first built.
+
+  `apt-get upgrade` now runs at build time, in both apt layers — the second one matters,
+  because an image built with `POSTULO_EXTRA_PACKAGES` refreshes the index again and must not
+  end up quietly less patched than one built without plugins.
+
+  **This costs reproducibility and the trade is deliberate.** Two builds of the same commit a
+  week apart are no longer the same image. The alternative — pinning the base image by digest
+  — buys that back, and makes Debian's updates arrive only when somebody remembers to bump
+  the digest. A manual step nobody performs is precisely how this finding got here. Between an
+  image that drifts towards being patched and one that reliably stays unpatched, Postulo takes
+  the first; each release is published by digest, so the artefact anybody runs is still named
+  exactly.
+
+  Four tests read the Dockerfile and hold the ordering, because order is the whole of whether
+  the upgrade does anything: before `update` it runs against the stale index that caused this,
+  after `install` the packages just installed came from the old one, and in a `RUN` of its own
+  it becomes a layer that is served from cache exactly when the index it needed had changed.
+  One of them fails if the base image is ever pinned by digest without that decision being
+  revisited.
+
+  **Most of what a scanner reports here has no fix and that is the normal state of Debian
+  stable.** So the documented gate is *fixable* findings rather than severity: a pipeline that
+  fails on CRITICAL fails every day for reasons nobody can act on and is switched off within a
+  fortnight. `CONTRIBUTING.md` records the two scanner invocations, why both are run, and why
+  they disagree about severity; the pipeline that runs them is #156, which waits on a runner
+  that can build an image at all. (#155)
+
 - **`POSTULO_SECRET_KEY=changeme` started an instance perfectly well.** The production
   settings refused to start with *no* key and said nothing about a bad one. Django notices —
   `security.W009` is exactly this check — but the container runs `check --deploy --fail-level

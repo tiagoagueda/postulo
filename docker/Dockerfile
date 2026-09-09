@@ -49,7 +49,27 @@ ENV PYTHONUNBUFFERED=1 \
 # Arabic and Ethiopic (#70), and the Indic scripts and Hebrew that #71 will want; CJK
 # is a separate package and a separate decision when that phase arrives.
 # tests/test_fonts.py holds this list to the languages Postulo actually offers.
+#
+# `apt-get upgrade` before the install, and it is a decision rather than hygiene (#155).
+# Debian publishes a security update; the base image keeps what it was built with until
+# it is rebuilt; and a package Postulo never asked for -- libpcre2, arriving with Python
+# -- then carries a fixable High for as long as nobody looks. That is what happened.
+#
+# It costs reproducibility: two builds of this commit a week apart are not the same
+# image. The alternative is pinning the base by digest, which buys that back and makes
+# Debian's updates arrive only when somebody remembers to bump the digest -- and a manual
+# step nobody performs is precisely how the finding got here. Between an image that
+# drifts towards being patched and one that reliably stays unpatched, this takes the
+# first. A release is published by digest, so the artefact anybody runs is still named
+# exactly.
+#
+# `upgrade`, not `dist-upgrade`: within a stable release the security updates are there,
+# and nothing should be installing new packages or removing existing ones behind the
+# build. It belongs in this RUN, after `update` and before `install`: a layer of its own
+# would either run against a stale index or be served from cache while the install was
+# not. tests/test_image_build.py holds it in that order.
 RUN apt-get update \
+    && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libfontconfig1 \
         fonts-dejavu-core fonts-noto-core \
@@ -92,6 +112,7 @@ RUN uv sync --locked --no-default-groups --extra server --no-cache
 ARG POSTULO_EXTRA_PACKAGES=""
 RUN if [ -n "$POSTULO_EXTRA_PACKAGES" ]; then \
         apt-get update \
+        && apt-get upgrade -y \
         && apt-get install -y --no-install-recommends git \
         && uv export --locked --no-dev --extra server --no-hashes --no-emit-project \
             --output-file /tmp/constraints.txt \
