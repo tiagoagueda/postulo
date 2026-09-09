@@ -20,6 +20,7 @@ from django.views.generic import DeleteView, ListView
 
 from postulo.core.mixins import OwnedObjectMixin
 
+from . import logos, registry
 from .base import CONNECTED_KINDS
 from .forms import ConnectionForm
 from .models import Connection
@@ -60,6 +61,49 @@ def _summary(plugin, connection: Connection) -> str:
     except Exception:
         logger.exception("Plugin %r could not summarise connection %s", plugin.name, connection.pk)
         return ""
+
+
+class PluginLogoView(LoginRequiredMixin, View):
+    """A plugin's logo, served by this instance, as a PNG (#106).
+
+    Not a static file, because plugins are installed at run time and the manifest
+    `collectstatic` wrote at build time has never heard of them; not a URL at the vendor,
+    because `img-src 'self'` is the point rather than the obstacle -- an `<img>` at
+    somebody else's server would tell them which instances run their plugin and when.
+
+    **Who may see one.** Anybody signed in can see the logo of a plugin that is available
+    to them; a plugin an administrator has switched off for this person is theirs to see
+    only if they administer the instance. That is not because a logo is sensitive -- it is
+    that the set of plugins an instance has installed is a fact about the instance, and the
+    page it belongs on is the administrator's.
+
+    Never 500s on a bad file: a plugin whose logo will not decode is a 404 and a line in
+    the log, because a broken image beside a name is a worse answer than no image.
+    """
+
+    def get(self, request: HttpRequest, name: str) -> HttpResponse:
+        # Through the module rather than a bound name: which plugins exist is decided
+        # at run time, and a name captured at import is a different question.
+        plugin = registry.find_any(name)
+        if plugin is None:
+            raise Http404
+
+        if not request.user.is_staff:
+            from .policy import decide
+
+            if not decide(name, request.user).on:
+                raise Http404
+
+        png = logos.png_for(plugin)
+        if png is None:
+            raise Http404
+
+        response = HttpResponse(png, content_type="image/png")
+        # The file cannot change without the plugin being reinstalled, and reinstalling
+        # restarts the process. A day is long enough to be worth having and short enough
+        # that an upgrade is visible the same afternoon.
+        response["Cache-Control"] = "private, max-age=86400"
+        return response
 
 
 class ConnectionListView(OwnedObjectMixin, ListView):

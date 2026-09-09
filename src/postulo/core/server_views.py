@@ -858,6 +858,9 @@ def _policy_rows(person=None) -> list[dict]:
                 "description": manifest.description,
                 "kind": manifest.kind or "source",
                 "manifest": manifest,
+                # The instance itself, so the template can ask for a logo rather than
+                # being handed one it has no way to fall back from (#106).
+                "plugin": plugin,
                 "state": row.state if row else PluginPolicy.State.AVAILABLE,
                 "decided_by": row.decided_by if row else None,
                 "decided_at": row.decided_at if row else None,

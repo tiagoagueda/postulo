@@ -250,6 +250,37 @@ def company_logo(company, css_class: str = "size-6 text-[0.6rem]") -> str:
 
 
 @register.simple_tag
+def plugin_logo(plugin, css_class: str = "size-6 text-[0.6rem]") -> str:
+    """A plugin's logo, or an initials tile until it ships one (#106).
+
+    Decorative: it always stands beside the plugin's name, so it carries no alternative
+    text of its own. The image comes from this instance, never from whoever wrote the
+    plugin -- an `<img>` at their server would tell them which instances run their code.
+
+    A plugin with no logo is the normal case rather than a failure, so this asks whether
+    there is one to show instead of assuming there is and rendering a broken image.
+    """
+    if plugin is None:
+        return ""
+    name = getattr(plugin, "name", "") or ""
+    label = str(getattr(plugin, "label", "") or name)
+    from postulo.plugins import logos
+
+    if logos.png_for(plugin) is not None:
+        url = reverse("connections:logo", args=[name])
+        return mark_safe(  # noqa: S308
+            f'<img src="{url}" alt="" class="{escape(css_class)} shrink-0 rounded object-contain">'
+        )
+    colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
+    letters = "".join(word[0] for word in label.replace(".", " ").split()[:2]).upper() or "?"
+    return mark_safe(  # noqa: S308
+        f'<span class="{escape(css_class)} {colour} inline-flex shrink-0 select-none '
+        'items-center justify-center rounded font-semibold text-white" '
+        f'aria-hidden="true">{escape(letters)}</span>'
+    )
+
+
+@register.simple_tag
 def phone_link(number: str) -> str:
     """A stored number, spaced to be read aloud and linked so a phone can dial it.
 

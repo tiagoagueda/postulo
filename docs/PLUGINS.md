@@ -511,6 +511,64 @@ just above: third-party plugins are tried first, and built-ins last, so yours ca
 precedence over Postulo's. Entry points resolve in one list with no way to say *after
 everything else*.
 
+## A logo, if you have one
+
+Name a file inside your package and Postulo serves it:
+
+```python
+@declares(
+    Manifest(
+        name="paperless",
+        label="Paperless",
+        ...
+        logo="paperless.png",
+    )
+)
+class PaperlessStore:
+    ...
+```
+
+A **name**, never a path: a separator or a leading dot is refused rather than normalised,
+and the file is read out of the package with `importlib.resources`, so nothing you declare
+can name a file outside it.
+
+**Raster only** — PNG, JPEG, GIF, WebP. SVG is the format logos usually arrive in and the
+one that needs care, because it can carry scripts and references to other files and a direct
+visit to the file is not the `<img>` context where a browser refuses to run them. Postulo
+decodes what you shipped and writes it out again as a 256-pixel PNG, so what is served is an
+image Postulo produced rather than your file passed through. Under 2 MB.
+
+**Postulo serves it; you do not.** There is no way to give a URL, and that is the point
+rather than an omission: an `<img>` at your server would tell you which instances run your
+plugin, how many people use it, and when. The production policy is `img-src 'self'` for
+exactly that reason.
+
+**Having no logo is the normal case.** The interface falls back to the initials tile it
+already uses for a person with no picture and a company with no logo, so nothing is ever a
+broken image — and a declared file that is missing, too large, or not an image falls back the
+same way, with a line in the log rather than a broken page.
+
+### If the logo is somebody else's mark
+
+**Do not put it in Postulo, and Postulo does not put one in itself.** Displaying a mark to
+say "this reads Europass files" is nominative use and is what every integration directory
+does. *Shipping the file* is a different statement: Postulo is AGPL-3.0, and that licence
+grants rights to the code — it cannot sublicense a mark the project does not own, so every
+fork would be redistributing somebody's trademark under a licence with nothing to say about
+it. The Commission's own reuse decision, which makes its documents freely reusable,
+**excludes logos and trademarks from its scope**, so "it is an EU document" is not an answer
+either.
+
+So none of the plugins Postulo ships carries a logo. The Europass importer says "Europass",
+and its name does the identifying. A plugin distributed by whoever owns the mark is a
+different situation and theirs to decide — this rule is about what *this repository*
+redistributes.
+
+The rule has to be the same for every mark, which is why it is written here rather than
+decided per logo: a rule that only works for the logos a project happens to like is not a
+rule. Where a mark's owner permits redistribution, the shape to copy is
+`src/postulo/static/flags/LICENSE.txt` — the notice travels with the files.
+
 ## Saying who you are
 
 Everything a plugin says about itself goes in one place: a **manifest**.

@@ -227,6 +227,32 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A plugin can carry a logo, and Postulo serves it.** The manifest has had a `logo` field
+  since #97 with nothing rendering it. Now a plugin names a file inside its own package and
+  it appears beside the plugin's name.
+
+  Three constraints shaped it and all three had been settled once already. It cannot be a
+  static file: plugins are installed at run time, `collectstatic` ran when the image was
+  built, and the manifest storage raises on a file it never learned rather than returning a
+  dead link. It cannot be a URL: the production policy is `img-src 'self'`, and an image at
+  the plugin author's server would tell them which instances run their code, how many people
+  use it, and when. And it is raster only, because SVG can carry scripts and a direct visit
+  to the file is not the `<img>` context where a browser refuses to run them — what is
+  served is a PNG Postulo produced from what the plugin shipped, not the plugin's file passed
+  through.
+
+  **Having no logo is the normal case, not a failure.** The interface falls back to the
+  initials tile it already uses for a person with no picture and a company with no logo, and
+  a declared file that is missing, oversized or unreadable falls back the same way with a
+  line in the log. Nothing is ever a broken image.
+
+  **Postulo ships no logo for any plugin of its own, and that is the decision rather than
+  the backlog.** Displaying somebody's mark to say "this reads Europass files" is nominative
+  use; *redistributing the file* under AGPL-3.0 would be sublicensing a mark the project does
+  not own, and the Commission's reuse decision explicitly excludes logos from its scope. The
+  rule is written in `docs/PLUGINS.md` rather than decided logo by logo, because one that
+  only works for the marks a project happens to like is not a rule. (#106)
+
 - **A plugin Postulo ships can hold its own translations now, and holding them costs it
   none of the coverage that keeps them translated.** `docs/PLUGINS.md` has always said a
   plugin's strings are never added to Postulo's catalogues. That was true of every

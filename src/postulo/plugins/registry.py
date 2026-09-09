@@ -205,6 +205,20 @@ def find_plugin(kind: str, name: str):
     return None
 
 
+def find_any(name: str):
+    """The plugin called ``name``, whatever kind it is, or ``None``.
+
+    A name is unique across the instance -- it is what the policy rows key on -- so
+    something addressed by name alone, like a logo, does not need to be told the kind as
+    well (#106).
+    """
+    for kind in GROUPS:
+        found = find_plugin(kind, name)
+        if found is not None:
+            return found
+    return None
+
+
 def connected_plugins(person=None) -> list:
     """Every installed plugin a person can connect to, whatever its kind.
 

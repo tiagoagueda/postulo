@@ -1,5 +1,5 @@
 {% extends "server/base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block content %}
   <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Plugins" %}</h2>
@@ -47,6 +47,10 @@
     <ul class="divide-y divide-ink-100 dark:divide-ink-800">
       {% for row in policy_rows %}
         <li class="flex flex-wrap items-start gap-4 px-4 py-3" data-policy="{{ row.name }}">
+          {% comment %} Served by this instance, never by whoever wrote the plugin: an
+             image at their server would tell them which instances run their code, how
+             many people use it and when (#106). {% endcomment %}
+          {% plugin_logo row.plugin "size-8 text-xs" %}
           <div class="min-w-0 flex-1">
             <p class="font-medium">
               {{ row.label }}

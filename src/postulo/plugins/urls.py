@@ -6,6 +6,9 @@ app_name = "connections"
 
 urlpatterns = [
     path("", views.ConnectionListView.as_view(), name="list"),
+    # Addressed by the plugin's name rather than by a number: a logo belongs to the plugin
+    # rather than to any row, and the name is what every other page already has (#106).
+    path("logo/<str:name>/", views.PluginLogoView.as_view(), name="logo"),
     path("add/", views.ConnectionPickView.as_view(), name="pick"),
     path("add/<str:kind>/<str:name>/", views.ConnectionFormView.as_view(), name="create"),
     path("<int:pk>/", views.ConnectionFormView.as_view(), name="edit"),

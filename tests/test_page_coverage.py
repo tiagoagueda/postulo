@@ -43,6 +43,10 @@ EXCUSED: dict[str, str] = {
     "applications:interview_calendar": "a calendar feed of every interview",
     "accounts:avatar": "an image, served through a permission check",
     "jobs:company_logo": "a company's logo image, served from this instance",
+    "connections:logo": (
+        "a plugin's logo image, served from this instance rather than from whoever wrote "
+        "the plugin; the pages it appears on are visited, and it is decorative there"
+    ),
     "jobs:company_logo_action": "a POST that sets or clears a company's logo",
     "applications:event_create": "a POST from the application page, which is visited",
     "api:token_create": "a POST that mints a token and shows it once",
