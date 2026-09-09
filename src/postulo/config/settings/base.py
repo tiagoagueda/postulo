@@ -346,6 +346,12 @@ POSTULO_API_RATE = env("POSTULO_API_RATE", default="600/h")
 # /logs and /metrics, which a shared token guards rather than an account, so this is keyed
 # on the caller's address. A collector polls on a schedule; this bounds one that does not.
 POSTULO_ENDPOINT_RATE = env("POSTULO_ENDPOINT_RATE", default="120/h")
+# Asking for a confirmation to be sent again, across every kind of contact detail (#146).
+# One limit rather than one per channel: a resend button is a way to make somebody's phone
+# buzz forty times, and the channel that costs money per send is not the one whose own
+# setting anybody would remember to configure. Five an hour is more than somebody who did
+# not receive the first one needs, and few enough to be useless as a way to bother anybody.
+POSTULO_CONFIRMATION_RATE = env("POSTULO_CONFIRMATION_RATE", default="5/h")
 
 # ---------------------------------------------------------- internationalisation
 

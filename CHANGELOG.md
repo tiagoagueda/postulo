@@ -132,6 +132,49 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **One contract for every kind of contact detail, so they stop each having their own.**
+  Postulo holds three and they were at three different stages: an address that allauth
+  validates and confirms over SMTP, a telephone number checked less than syntactically on
+  purpose and confirmed by nothing, and a postal address that is neither. Nothing could ask
+  them the same question — and the question is about to matter, because a number that becomes
+  somebody's way back into their account has to be one they proved they hold.
+
+  **Checking now has named depths, and the middle one is refused on purpose.** *Shape* —
+  does this parse. *Plausible* — is this dialling range assigned, does this domain publish an
+  MX record. *Real* — did somebody answer. `phones.py` refused the middle depth because it
+  needs the numbering plan of every country and Postulo was never going to dial anything.
+  Half that argument expires the moment a number is a channel Postulo sends a code to; the
+  other half does not. The cost is unchanged, and the thing that settles the question is
+  confirmation, which is free and conclusive. So the refusal is made again, deliberately,
+  rather than inherited.
+
+  What did change is that telephone checking is now *syntactic* rather than less: a number
+  carries a country and between four and fifteen digits, which is what E.164 allows. **A
+  number that fails is still saved** — the number a recruiter dictated over a bad line is
+  still the only one anybody has, and refusing to record it would be the worst outcome
+  available. The check reports; the one caller that will refuse is the one asking whether a
+  number may be a way back in.
+
+  **Validated-but-never-provable is a legitimate answer.** A postal address can only be
+  proved by posting something to it, which this project is not going to build, and a contract
+  treating that as a gap would keep the postal channel looking permanently unfinished. It is
+  kept apart from a second kind of empty answer — a channel that *is* provable and has nothing
+  to prove it with yet, which is where telephone numbers sit until something can reach one.
+  Two different facts, and the code that has to explain itself to somebody locked out of their
+  account needs to tell them apart.
+
+  **allauth is described, not rewritten.** The email channel satisfies the contract by
+  delegation: allauth keeps the token, the expiry, the resend, the link and the verified flag,
+  and this says so. A contract an existing working implementation cannot be described by is a
+  contract nobody adopts.
+
+  A channel names *what would carry* its confirmation rather than reaching for something, so
+  the interlock protecting the mail transport has the same answer to read. `POSTULO_CONFIRMATION_RATE`
+  bounds resends across every kind at once, because the kind that costs money per send is not
+  the one whose own setting anybody would remember to configure. And the one line a code
+  arrives on names the instance and says nobody will ask for it — a stranger's message
+  containing six digits is the shape of every scam there is. (#146)
+
 - **An instance can offer fewer languages than Postulo speaks.** Thirty-nine of them in one
   picker is a long list for an instance whose people all read two, and until now there was no
   way to say so short of deleting catalogues from the image. *Server settings → Defaults*

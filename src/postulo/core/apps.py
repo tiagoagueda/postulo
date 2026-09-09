@@ -16,3 +16,8 @@ class CoreConfig(AppConfig):
         from .features import PhoneNumbersFeature
 
         registry.register_builtin("feature", PhoneNumbersFeature)
+
+        # The contact channels Postulo already has, described by one contract (#146).
+        from . import channels
+
+        channels.register_the_ones_that_exist()

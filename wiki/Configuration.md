@@ -399,6 +399,48 @@ stop a machine being ridden rather than to meter billing.
 Sign-in, sign-up and password resets are limited separately, by allauth, and are on by
 default; see *Hardening*.
 
+## Contact details, and what proving one means
+
+Postulo holds three kinds of contact detail, and they are not equally provable. One contract
+describes all of them, so the rest of the application can ask the same question of each
+instead of knowing which is which.
+
+**Two things are being asked, and they are different.** *Is this the right shape* — does this
+parse as an email address, does this number carry a country and a plausible count of digits.
+And *did somebody prove they hold it* — did they follow the link, did they type the code back.
+
+**Checking stops at the shape, deliberately.** Between "the right shape" and "somebody
+answered" there is a middle depth: is this dialling range actually assigned, does this domain
+publish an MX record. Postulo does not do that. It needs the numbering plan of every country
+— a multi-megabyte library on a constant update treadmill — and the thing that settles the
+question is confirmation, which costs nothing and is more conclusive. Refusing the middle is a
+decision, not an oversight.
+
+**A number that fails the check is still saved.** This matters more than it sounds. The
+number a recruiter dictated over a bad line is still the only number anybody has, and
+refusing to record it would be the worst available outcome. What a failed check does is stop
+that number counting as something Postulo could reach you on.
+
+| | Checked | Proved | By what |
+| --- | --- | --- | --- |
+| Email address | shape | yes, by a link | whatever transport carries the mail |
+| Telephone number | shape | not yet | nothing on this instance can reach a number |
+| Postal address | shape | **never** | — |
+
+**"Never" is a finished answer, not a missing feature.** A postal address can only be proved
+by posting something to it. Some services do that; this one is not going to, and the contract
+says so rather than leaving the postal channel looking permanently half-built.
+
+**"Not yet" is a different answer from "never".** A telephone number *is* provable — by a
+short code typed back, never by a link, because a link in a text message is a phishing lesson
+nobody should be teaching. What is missing is anything on this instance that can send to a
+number at all. Until that exists, a number cannot be a way back into an account, and Postulo
+can say which of the two reasons applies.
+
+`POSTULO_CONFIRMATION_RATE` (default `5/h`) bounds how often one account may ask for a
+confirmation to be sent again — one limit across every kind, because a resend button is a way
+to make somebody's phone buzz forty times.
+
 ## HTTPS
 
 These apply only under the production settings.
