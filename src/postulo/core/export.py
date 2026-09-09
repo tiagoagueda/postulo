@@ -65,6 +65,8 @@ COMPANY_FIELDS = (
     "created_at",
 )
 CONTACT_FIELDS = ("id", "name", "role", "email", "linkedin_url", "notes")
+#: A contact's team, written as a name beside them rather than as a table of its own: a
+#: department belongs to one company, so the company's block is where it can be resolved.
 #: What one telephone number is, in the file. Every number a holder has, in order, with
 #: the primary marked -- not the primary alone.
 PHONE_NUMBER_FIELDS = ("kind", "label", "number", "is_primary")
@@ -338,6 +340,7 @@ def build_document(user) -> dict:
                 "contacts": [
                     {
                         **_fields(contact, CONTACT_FIELDS),
+                        "department": contact.department.name if contact.department_id else "",
                         "phone_numbers": _phone_numbers(contact),
                     }
                     for contact in company.contacts.all()

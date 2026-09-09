@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core import phone_field, phone_numbers, phones
 
 from . import identifiers, industries, logos
-from .models import Company, CompanyIdentifier, Contact, Industry, JobPosting
+from .models import Company, CompanyIdentifier, Contact, Department, Industry, JobPosting
 
 
 class OwnerScopedModelForm(forms.ModelForm):
@@ -319,6 +319,18 @@ def _language_of(user) -> str:
 
 
 class ContactForm(OwnerScopedModelForm):
+    #: Typed rather than chosen, because a team is usually known before it is a record and
+    #: making somebody create one first is a form standing in front of a form. The name is
+    #: matched against the company's existing departments and only made when it is new,
+    #: which is how `Industry.named` already works.
+    new_department = forms.CharField(
+        label=_("Department"),
+        required=False,
+        max_length=120,
+        help_text=_("The team they are in, if you know it. A new name joins the company's list."),
+        widget=forms.TextInput(attrs={"list": "department-suggestions", "autocomplete": "off"}),
+    )
+
     class Meta:
         model = Contact
         fields = ("name", "role", "company", "email", "linkedin_url", "notes")
@@ -356,14 +368,49 @@ class ContactForm(OwnerScopedModelForm):
             raise forms.ValidationError(phone_numbers.ALREADY_IN_USE)
         return typed
 
+    def scope_querysets(self) -> None:
+        self.fields["company"].queryset = Company.objects.for_user(self.user)
+        if self.instance and self.instance.pk and self.instance.department_id:
+            self.fields["new_department"].initial = self.instance.department.name
+
+    @property
+    def department_suggestions(self) -> list[str]:
+        """The departments already recorded at this contact's company, for the datalist."""
+        company_id = self.instance.company_id if self.instance else None
+        if not company_id:
+            return []
+        return list(
+            Department.objects.for_user(self.user)
+            .filter(company_id=company_id)
+            .values_list("name", flat=True)
+        )
+
     def save(self, commit: bool = True):
         contact = super().save(commit=commit)
         if commit and not self.several_numbers:
             phone_numbers.save_only_number(contact, self.user, self.cleaned_data.get("phone", ""))
+        if commit:
+            self._save_department(contact)
         return contact
 
-    def scope_querysets(self) -> None:
-        self.fields["company"].queryset = Company.objects.for_user(self.user)
+    def _save_department(self, contact) -> None:
+        """Attach the named department, making it if the company has not got one.
+
+        Clearing the box detaches the contact and leaves the department alone: a team does
+        not stop existing because one person moved out of it.
+        """
+        name = (self.cleaned_data.get("new_department") or "").strip()[:120]
+        if not name or not contact.company_id:
+            if contact.department_id:
+                contact.department = None
+                contact.save(update_fields=["department", "updated_at"])
+            return
+        department, _created = Department.objects.get_or_create(
+            owner=self.user, company_id=contact.company_id, name=name
+        )
+        if contact.department_id != department.pk:
+            contact.department = department
+            contact.save(update_fields=["department", "updated_at"])
 
 
 class JobPostingForm(OwnerScopedModelForm):

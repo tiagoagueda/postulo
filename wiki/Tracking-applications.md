@@ -271,6 +271,18 @@ posting you have recorded there and every application you have made.
 Contacts are the people: recruiters, hiring managers, a friend on the inside. Add them
 from a company page. An application can name one of them as its main contact.
 
+### Departments
+
+A contact can be recorded as being in a team: engineering, legal, the Lisbon office. Type
+the name on the contact form and it joins that company's list; type one already there and
+it is reused. Clearing the box takes the person out of the team and leaves the team alone,
+because a department does not stop existing when one person moves out of it.
+
+A department is **not** a small company. It has no website, no logo, no identifiers and no
+postings of its own; it belongs to exactly one company and travels in your export inside
+that company's block. Deleting a department leaves its people where they work — they are
+still at the company — and deleting the company takes its departments with it.
+
 ### One company inside another
 
 A company can be recorded as part of another. Applying to Google, to DeepMind and to

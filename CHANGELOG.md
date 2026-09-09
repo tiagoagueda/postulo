@@ -98,6 +98,29 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A contact can be in a department.** Which team somebody is in was going into `role`
+  — "Engineering — hiring manager" — or into the notes, or nowhere, because there was
+  nowhere else. Now there is: type the name on the contact form and it joins that company's
+  list, type one already there and it is reused, clear the box and the person leaves the
+  team while the team stays.
+
+  **A department is deliberately not a company with a parent**, though it would have fitted
+  the relation added beside it. It has no website, no logo, no identifiers, no industries and
+  no postings of its own that are not the company's; modelling it as a company would fill the
+  companies list with things nobody applied to and teach every count to exclude them. More
+  code, fewer lies.
+
+  Both ends are optional, which is the normal case — most contacts have no department, and a
+  department with nobody in it is a team somebody applied to before knowing anybody there.
+  Going away takes the right things in each direction: a department deleted leaves its people
+  where they work, because they are still at the company, and a company deleted takes its
+  departments with it. A contact cannot borrow another company's department, and saying so is
+  a sentence rather than a silent correction.
+
+  Typed rather than chosen, because making somebody create a team before they can name one is
+  a form standing in front of a form — the same reasoning `Industry.named` already follows.
+  (#137)
+
 - **A company can be part of another one.** Applying to Google, to DeepMind and to Waymo is
   applying to three companies the person already knows are one group; Postulo counted three
   unrelated employers, and searching for the group's name found none of them. One nullable

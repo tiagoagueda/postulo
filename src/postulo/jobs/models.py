@@ -334,6 +334,42 @@ class CompanyIdentifier(OwnedModel):
         return identifiers.url_for(self.scheme, self.value)
 
 
+class Department(OwnedModel):
+    """A team inside a company: engineering, legal, the Lisbon office.
+
+    Deliberately not a `Company` with a parent, though it would fit the shape. A department
+    has no website, no logo, no identifiers, no industries and no postings of its own that
+    are not also the company's; modelling it as a company would fill the companies list with
+    things nobody applied to and teach every count to exclude them. More code, fewer lies.
+
+    Both ends are optional and that is the normal case. Most contacts will never have a
+    department, and a department with nobody in it is perfectly ordinary — it is a team you
+    applied to before you knew anybody there.
+    """
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name="departments",
+        verbose_name=_("company"),
+    )
+    name = models.CharField(_("name"), max_length=120)
+
+    class Meta:
+        verbose_name = _("department")
+        verbose_name_plural = _("departments")
+        ordering = ("name",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=("owner", "company", "name"),
+                name="unique_department_name_per_company",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Contact(OwnedModel):
     """Someone at a company: a recruiter, a hiring manager, a friend on the inside."""
 
@@ -344,6 +380,16 @@ class Contact(OwnedModel):
         null=True,
         blank=True,
         verbose_name=_("company"),
+    )
+    #: The team they are in, when it is known. `SET_NULL`, not `CASCADE`: a department
+    #: going away must not take the people with it — they still work at the company.
+    department = models.ForeignKey(
+        "Department",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="contacts",
+        verbose_name=_("department"),
     )
     name = models.CharField(_("name"), max_length=200)
     role = models.CharField(_("role"), max_length=200, blank=True)
@@ -363,6 +409,14 @@ class Contact(OwnedModel):
 
     def __str__(self) -> str:
         return self.name
+
+    def clean(self) -> None:
+        """A department belongs to a company, so a contact cannot borrow another's."""
+        super().clean()
+        if self.department_id and self.department.company_id != self.company_id:
+            raise ValidationError(
+                {"department": _("That department belongs to a different company.")}
+            )
 
 
 class RemoteType(models.TextChoices):

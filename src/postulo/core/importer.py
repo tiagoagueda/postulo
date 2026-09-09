@@ -169,7 +169,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     from postulo.core.models import Tag
     from postulo.documents.models import CV, CoverLetter, CVItem, RenderedDocument, UploadedDocument
     from postulo.jobs import identifiers
-    from postulo.jobs.models import Capture, Company, Contact, Industry, JobPosting
+    from postulo.jobs.models import Capture, Company, Contact, Department, Industry, JobPosting
     from postulo.jobs.services import set_identifiers
     from postulo.resume import models as resume
 
@@ -346,7 +346,14 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         for contact_entry in contact_entries:
             old_id = contact_entry.pop("id", None)
             numbers = _phone_rows(contact_entry)
+            department_name = (contact_entry.pop("department", "") or "").strip()[:120]
             contact = Contact.objects.create(owner=user, company=company, **contact_entry)
+            if department_name:
+                department, _made = Department.objects.get_or_create(
+                    owner=user, company=company, name=department_name
+                )
+                contact.department = department
+                contact.save(update_fields=["department"])
             _restore_phone_numbers(contact, user, numbers)
             contacts[old_id] = contact
 

@@ -149,8 +149,11 @@
                 <div class="flex items-start gap-2">
                   <div class="min-w-0 flex-1">
                     <p class="font-medium">{{ contact.name }}</p>
-                    {% if contact.role %}
-                      <p class="text-xs text-ink-500 dark:text-ink-400">{{ contact.role }}</p>
+                    {% if contact.role or contact.department %}
+                      <p class="text-xs text-ink-500 dark:text-ink-400">
+                        {{ contact.role }}{% if contact.role and contact.department %} · {% endif %}
+                        {% if contact.department %}<bdi>{{ contact.department.name }}</bdi>{% endif %}
+                      </p>
                     {% endif %}
                     {% for number in contact.phone_numbers.all %}
                       {% if several_numbers or number.is_primary %}

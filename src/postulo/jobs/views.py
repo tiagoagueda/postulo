@@ -102,7 +102,9 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         from postulo.core import phone_numbers
 
         context = super().get_context_data(**kwargs)
-        context["contacts"] = self.object.contacts.prefetch_related("phone_numbers")
+        context["contacts"] = self.object.contacts.select_related("department").prefetch_related(
+            "phone_numbers"
+        )
         context["children"] = self.object.children.all()
         context["postings"] = self.object.postings.prefetch_related("applications")
         # Decided once for the page rather than per contact: it is one answer about one

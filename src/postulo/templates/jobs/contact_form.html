@@ -27,6 +27,11 @@
           </p>
         {% endif %}
       </div>
+      {% if form.department_suggestions %}
+        <datalist id="department-suggestions">
+          {% for name in form.department_suggestions %}<option value="{{ name }}"></option>{% endfor %}
+        </datalist>
+      {% endif %}
       {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
       <div class="flex items-center gap-3">
         <button type="submit" class="btn-primary">{% translate "Save" %}</button>
