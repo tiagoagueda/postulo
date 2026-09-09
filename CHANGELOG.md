@@ -1206,6 +1206,19 @@ All notable changes to Postulo are recorded here. The format follows
   is a test for each of those, and a migration that turns whatever an instance already had in
   its environment into rows, so nobody loses a catalogue. (#93)
 
+### 🐛 Fixed
+
+- **The CV page and the letter page open again.** Making a rendered document point at
+  whatever produced it took `related_name="renders"` with the two columns it replaced, and
+  both detail pages ask for exactly that — so anyone opening one got a server error instead
+  of their CV. Nothing caught it, because the suite tested what the new link *stores* and
+  never opened the page that reads it back.
+
+  The reverse is a query rather than a `GenericRelation`, and that is not a detail. A
+  relation would give the name back and a cascade with it, and the cascade is the one thing
+  that must not happen here: deleting a CV has to leave the PDF an employer received exactly
+  where it is, which was the whole reason `RenderedDocument` exists. (#130)
+
 ### 🔧 Changed
 
 - **A theme says which kinds of document it sets, and nothing offers a pairing it cannot

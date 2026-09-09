@@ -209,6 +209,30 @@ def test_nothing_asks_isinstance_to_find_a_copy():
     assert "ContentType" in code
 
 
+def test_a_draft_still_lists_the_pdfs_made_from_it(user, client):
+    """The reverse of the link, which the generic one took away without anybody noticing.
+
+    ``related_name="renders"`` went with the two columns, and both detail pages ask for it —
+    so the CV page and the letter page raised `AttributeError` for anyone who opened them.
+    A `GenericRelation` would give the name back and a cascade with it, and the cascade is
+    the one thing that must not happen here: deleting a CV must leave the PDF an employer
+    received where it is. So the reverse is a query, and this is the test that says the pages
+    open (#130).
+    """
+    from django.urls import reverse
+
+    cv = CV.objects.create(owner=user, name="Backend")
+    letter = CoverLetter.objects.create(owner=user, name="To Aperture", body="Dear …")
+    render = a_render(user, cv)
+
+    assert list(cv.renders.all()) == [render]
+    assert list(letter.renders.all()) == []
+
+    client.force_login(user)
+    assert client.get(reverse("documents:cv_detail", args=[cv.pk])).status_code == 200
+    assert client.get(reverse("documents:letter_detail", args=[letter.pk])).status_code == 200
+
+
 # ------------------------------------------------------------------ and the archive
 
 

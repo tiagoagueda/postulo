@@ -60,6 +60,22 @@ def theme_field(kind: str) -> models.CharField:
     )
 
 
+def renders_of(draft):
+    """Every PDF produced from this draft, newest first.
+
+    What ``related_name="renders"`` gave before the link became generic (#130). A
+    `GenericRelation` would give it back and would also give a cascade, and the cascade is
+    precisely what must not happen: deleting a CV must leave the PDF an employer received
+    exactly where it is. So this is a query rather than a relation — the reverse half of the
+    link, without the deletion behaviour that comes attached to the real thing.
+
+    `RenderedDocument` is defined further down this module and resolved when this runs.
+    """
+    return RenderedDocument.objects.filter(
+        source_type=ContentType.objects.get_for_model(draft.__class__), source_id=draft.pk
+    ).order_by("-rendered_at", "pk")
+
+
 class CV(OwnedModel):
     """A named selection of your career, aimed at a particular kind of role."""
 
@@ -108,6 +124,11 @@ class CV(OwnedModel):
         compiled into the model, so a theme from a plugin would have shown as a bare slug.
         """
         return themes.label_for(self.theme)
+
+    @property
+    def renders(self):
+        """The PDFs made from this CV. See `renders_of`."""
+        return renders_of(self)
 
     def included_items(self):
         """The items that will actually be rendered, in order."""
@@ -284,6 +305,11 @@ class CoverLetter(OwnedModel):
     def theme_label(self) -> str:
         """The theme's name in words. See `CV.theme_label`."""
         return themes.label_for(self.theme)
+
+    @property
+    def renders(self):
+        """The PDFs made from this letter. See `renders_of`."""
+        return renders_of(self)
 
     @property
     def document_kind(self) -> str:
