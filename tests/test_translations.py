@@ -3,6 +3,14 @@
 The catalogues are text in the repository; what Django reads is the compiled .mo. The
 test suite compiles into a temporary directory of its own, so it needs neither GNU gettext
 nor a build step to have run first, and asks Django to render in each language.
+
+**There is more than one set of them (#127).** A plugin Postulo ships carries its own
+catalogues, and every guarantee below is made about each set rather than about the core
+one -- because the risk in giving a plugin its own catalogue was never that nobody would
+translate it, it was that its strings would leave the sight of the test that says the
+twenty-four European Union languages stay complete. Sets are discovered from the
+filesystem, so a plugin that moves its strings out of core is covered here the moment it
+does, with no list to remember to add it to.
 """
 
 import gettext
@@ -18,8 +26,27 @@ from django.utils import translation
 from postulo.core import languages
 
 REPO = Path(__file__).resolve().parents[1]
-LOCALE = REPO / "src" / "postulo" / "locale"
 CODES = [code for code, _name in languages.LANGUAGES if code != languages.SOURCE]
+
+
+def _load_tool():
+    """`scripts/messages.py`, which is a script rather than a package."""
+    spec = importlib.util.spec_from_file_location("messages_tool", REPO / "scripts" / "messages.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["messages_tool"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+TOOL = _load_tool()
+
+#: Every set of catalogues in the repository: Postulo's own, then each plugin carrying its
+#: own. Read at import time because it decides what the tests below are parametrised over.
+SETS = TOOL.catalogue_sets()
+NAMES = [subject.name for subject in SETS]
+
+#: Every (catalogue set, language) pair, which is what "a catalogue" means from here on.
+EVERY = [(subject.name, code) for subject in SETS for code in CODES]
 
 #: The 24 official languages of the European Union: phase one (#43), finished in 0.2.0 and
 #: not allowed to regress. Every later phase adds languages whose catalogues arrive over
@@ -54,38 +81,53 @@ EUROPEAN_UNION = (
 
 #: Languages with at least one translated string, which are the ones a person is offered.
 def started(catalogues) -> list[str]:
-    return [code for code in CODES if any(m.translated for m in catalogues[code].messages.values())]
+    return [
+        code
+        for code in CODES
+        if any(m.translated for m in catalogues["postulo", code].messages.values())
+    ]
 
 
 @pytest.fixture(scope="module")
 def tool():
-    spec = importlib.util.spec_from_file_location("messages_tool", REPO / "scripts" / "messages.py")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["messages_tool"] = module
-    spec.loader.exec_module(module)
-    return module
+    return TOOL
 
 
 @pytest.fixture(scope="module")
 def catalogues(tool):
-    return {code: tool.parse(tool.po_path(code).read_text(encoding="utf-8")) for code in CODES}
+    """Every catalogue in the repository, by (set, language)."""
+    return {
+        (subject.name, code): tool.parse(tool.po_path(code, subject).read_text(encoding="utf-8"))
+        for subject in SETS
+        for code in CODES
+    }
 
 
 @pytest.fixture(scope="module")
 def compiled(tool, catalogues, tmp_path_factory):
-    """Compiled .mo files in a temporary locale tree, registered with Django."""
+    """Every set compiled into a temporary locale tree of its own, registered with Django.
+
+    In the order the running instance uses: Postulo's own first, then the plugins'. Django
+    merges `reversed(LOCALE_PATHS)` with each merge overriding the last, so first means
+    *wins*, and a plugin cannot change a word of Postulo's interface by translating the
+    same English string differently.
+    """
     root = tmp_path_factory.mktemp("locale")
-    for code, catalogue in catalogues.items():
-        path = root / languages.locale_dir_name(code) / "LC_MESSAGES" / "django.mo"
-        path.parent.mkdir(parents=True)
-        path.write_bytes(tool.compile_catalogue(catalogue))
+    trees = {}
+    for subject in SETS:
+        tree = root / subject.name.replace("/", "_")
+        trees[subject.name] = tree
+        for code in CODES:
+            path = tree / languages.locale_dir_name(code) / "LC_MESSAGES" / "django.mo"
+            path.parent.mkdir(parents=True)
+            path.write_bytes(tool.compile_catalogue(catalogues[subject.name, code]))
     from django.utils.translation import trans_real
 
     previous = settings.LOCALE_PATHS
-    settings.LOCALE_PATHS = [root]
+    settings.LOCALE_PATHS = [trees[name] for name in NAMES]
     trans_real._translations = {}
     trans_real._default = None
-    yield root
+    yield trees
     settings.LOCALE_PATHS = previous
     trans_real._translations = {}
     trans_real._default = None
@@ -113,44 +155,78 @@ def test_the_settings_offer_the_african_languages_too():
         assert code in codes, f"{code} is missing from the languages Postulo offers"
 
 
-@pytest.mark.parametrize("code", [c for c in CODES if c in EUROPEAN_UNION])
-def test_every_european_union_language_stays_complete(code, catalogues):
-    """Finished in 0.2.0. A later phase must not quietly leave a gap in one of these."""
-    catalogue = catalogues[code]
+@pytest.mark.parametrize(
+    ("name", "code"), [pair for pair in EVERY if pair[1] in EUROPEAN_UNION], ids=str
+)
+def test_every_european_union_language_stays_complete(name, code, catalogues):
+    """Finished in 0.2.0. A later phase must not quietly leave a gap in one of these.
+
+    Every set, which is the whole reason #127 was allowed to give a plugin its own
+    catalogue: for a plugin Postulo ships, Postulo is the author, and a string that leaves
+    this test's sight is not translated by somebody else -- it is quietly untranslated.
+    """
+    catalogue = catalogues[name, code]
     missing = [m.msgid for m in catalogue.messages.values() if not m.translated]
-    assert catalogue.messages, f"{code}: empty catalogue"
-    assert not missing, f"{code}: {len(missing)} untranslated, e.g. {missing[:3]}"
+    assert catalogue.messages, f"{name} {code}: empty catalogue"
+    assert not missing, f"{name} {code}: {len(missing)} untranslated, e.g. {missing[:3]}"
 
 
-@pytest.mark.parametrize("code", CODES)
-def test_every_language_has_a_catalogue_with_the_right_plural_rule(code, catalogues):
+@pytest.mark.parametrize(("name", "code"), EVERY, ids=str)
+def test_every_language_has_a_catalogue_with_the_right_plural_rule(name, code, catalogues):
     """True of every language the day it is added, translated or not.
 
     A catalogue with the wrong number of plural slots cannot be filled correctly later, so
     this is the thing to get right before anybody starts translating rather than after.
     """
-    catalogue = catalogues[code]
-    assert catalogue.messages, f"{code}: empty catalogue"
+    catalogue = catalogues[name, code]
+    assert catalogue.messages, f"{name} {code}: empty catalogue"
     assert catalogue.header["Plural-Forms"] == languages.PLURAL_FORMS[code]
 
 
-@pytest.mark.parametrize("code", CODES)
-def test_every_translation_keeps_its_placeholders_and_plural_forms(code, catalogues, tool):
-    problems = tool.problems_in(catalogues[code], code)
+@pytest.mark.parametrize(("name", "code"), EVERY, ids=str)
+def test_every_translation_keeps_its_placeholders_and_plural_forms(name, code, catalogues, tool):
+    problems = tool.problems_in(catalogues[name, code], code)
     assert not problems, "\n".join(problems[:10])
 
 
-def test_the_catalogues_are_current(tool):
+@pytest.mark.parametrize("name", NAMES)
+def test_the_catalogues_are_current(name, tool):
     """What the source says, the catalogues carry: no string added without a slot."""
-    extracted = tool.extract_all()
+    subject = next(s for s in SETS if s.name == name)
+    extracted = tool.extract_all(subject)
     for code in CODES:
-        catalogue = tool.parse(tool.po_path(code).read_text(encoding="utf-8"))
+        catalogue = tool.parse(tool.po_path(code, subject).read_text(encoding="utf-8"))
         missing = set(extracted) - set(catalogue.messages)
         extra = set(catalogue.messages) - set(extracted)
         assert not missing, (
-            f"{code}: run scripts/messages.py extract; missing {sorted(missing)[:3]}"
+            f"{name} {code}: run scripts/messages.py extract; missing {sorted(missing)[:3]}"
         )
-        assert not extra, f"{code}: run scripts/messages.py extract; stale {sorted(extra)[:3]}"
+        assert not extra, (
+            f"{name} {code}: run scripts/messages.py extract; stale {sorted(extra)[:3]}"
+        )
+
+
+def test_a_string_belongs_to_exactly_one_set(tool):
+    """Two sets claiming the same source file would translate it twice, differently."""
+    seen: dict[str, str] = {}
+    for subject in SETS:
+        for path in tool.sources(subject):
+            reference = path.relative_to(REPO).as_posix()
+            assert reference not in seen, f"{reference} is claimed by {seen[reference]} too"
+            seen[reference] = subject.name
+
+
+def test_postulos_own_catalogue_comes_first(compiled):
+    """Which is what decides a msgid two catalogues both define.
+
+    Django merges `reversed(LOCALE_PATHS)`, each merge overriding the last, so the first
+    path wins. Postulo's own being first means a plugin cannot change a word of Postulo's
+    interface by translating the same English string its own way (#127). That the second
+    path never wins is asserted directly in `tests/test_plugin_locale.py`.
+    """
+    assert SETS[0].is_core
+    assert NAMES[0] == "postulo", "the order the sets are discovered in is the order they load"
+    assert settings.LOCALE_PATHS[0] == compiled["postulo"]
 
 
 @pytest.mark.parametrize("code", CODES)
@@ -160,7 +236,7 @@ def test_the_compiled_catalogue_loads_and_pluralises(code, compiled):
     Arabic has six forms and Wolof has one; a catalogue whose header says otherwise gets
     filled wrongly and nobody finds out until a count is printed in the wrong shape.
     """
-    path = compiled / languages.locale_dir_name(code) / "LC_MESSAGES" / "django.mo"
+    path = compiled["postulo"] / languages.locale_dir_name(code) / "LC_MESSAGES" / "django.mo"
     with path.open("rb") as handle:
         catalogue = gettext.GNUTranslations(handle)
     forms = {catalogue.plural(n) for n in range(0, 200)}
@@ -174,11 +250,34 @@ def test_the_compiled_catalogue_loads_and_pluralises(code, compiled):
 def test_a_started_catalogue_actually_translates(code, compiled, catalogues):
     if code not in started(catalogues):
         pytest.skip(f"{code}: nobody has begun this catalogue yet")
-    path = compiled / languages.locale_dir_name(code) / "LC_MESSAGES" / "django.mo"
+    path = compiled["postulo"] / languages.locale_dir_name(code) / "LC_MESSAGES" / "django.mo"
     with path.open("rb") as handle:
         catalogue = gettext.GNUTranslations(handle)
     one = catalogue.ngettext("%(counter)s company", "%(counter)s companies", 1)
     assert one != "%(counter)s company", f"{code}: compiled but translating nothing"
+
+
+@pytest.mark.parametrize("name", [n for n in NAMES if n != "postulo"])
+def test_a_plugins_own_strings_reach_the_reader(name, compiled, catalogues):
+    """The point of the whole exercise: a plugin's catalogue is one Django actually reads.
+
+    A plugin with no catalogue shows English, which is right for a third party and would be
+    a regression for a built-in somebody reads in Portuguese today. The compiled tree the
+    other tests use is the running instance's LOCALE_PATHS in the running instance's
+    order, so this asks the question the way a reader asks it.
+    """
+    catalogue = catalogues[name, "pt-pt"]
+    english, message = next(iter(catalogue.messages.items()))[1].msgid, None
+    for candidate in catalogue.messages.values():
+        if candidate.translated and candidate.plural is None:
+            english, message = candidate.msgid, candidate
+            break
+    assert message is not None, f"{name}: nothing translated to ask about"
+
+    with translation.override("pt-pt"):
+        assert translation.gettext(english) == message.msgstr[0]
+    with translation.override("en-gb"):
+        assert translation.gettext(english) == english
 
 
 @pytest.mark.parametrize("code", CODES)
@@ -208,6 +307,7 @@ def test_the_interface_renders_in_every_language(client, user, code, compiled, c
     assert heading in body
 
 
+@pytest.mark.django_db
 def test_a_language_nobody_has_translated_is_not_offered(catalogues):
     """Offering somebody their language and handing them English is a promise with
     nothing behind it. The catalogue waits for a translator; the option appears with them."""

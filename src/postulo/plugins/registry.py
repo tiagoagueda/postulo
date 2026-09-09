@@ -104,6 +104,10 @@ def register_builtin(kind: str, plugin_class: type) -> None:
     registered = _builtin.setdefault(kind, [])
     if plugin_class not in registered:
         registered.append(plugin_class)
+    # A built-in holds its own translations too, or the rule in docs/PLUGINS.md is one
+    # every plugin Postulo ships breaks (#127). One that has not moved its strings yet
+    # finds Postulo's own catalogue, which is already registered, and nothing happens.
+    register_plugin_locale(plugin_class.__module__)
     _cache.pop(kind, None)
 
 
@@ -116,6 +120,20 @@ def builtins() -> dict[str, list[type]]:
     exactly the one nobody remembered to check (#98).
     """
     return {kind: list(registered) for kind, registered in _builtin.items() if registered}
+
+
+def register_builtin_locales() -> None:
+    """Register the catalogues of every built-in, including those registered at import.
+
+    ``register_builtin`` covers the ones an app config registers, but the two built-in
+    sources are seeded into ``_builtin`` when this module is imported, which can be before
+    the settings are usable. Sweeping at ``AppConfig.ready`` catches those, costs nothing
+    for the ones already registered, and puts every catalogue in place before the first
+    request rather than during one.
+    """
+    for classes in builtins().values():
+        for plugin_class in classes:
+            register_plugin_locale(plugin_class.__module__)
 
 
 def unregister_builtin(kind: str, plugin_class: type) -> None:

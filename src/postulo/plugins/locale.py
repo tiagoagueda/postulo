@@ -22,18 +22,42 @@ logger = logging.getLogger(__name__)
 _registered: list[str] = []
 
 
-def locale_dir_of(module_name: str) -> Path | None:
-    """The ``locale/`` directory of the top-level package ``module_name`` belongs to."""
-    top = module_name.partition(".")[0]
+def _directory_of(module_name: str) -> Path | None:
+    """Where a module lives: its own directory if it is a package, else its package's."""
     try:
-        module = import_module(top)
+        module = import_module(module_name)
     except Exception:  # pragma: no cover - the entry point itself failed to import
         return None
     file = getattr(module, "__file__", None)
-    if not file:
+    return Path(file).resolve().parent if file else None
+
+
+def locale_dir_of(module_name: str) -> Path | None:
+    """The nearest ``locale/`` at or above the package ``module_name`` lives in.
+
+    Nearest, rather than the top-level package's, because a plugin Postulo ships lives
+    *inside* ``postulo`` — and ``postulo/locale`` is Postulo's own catalogue, so a rule
+    that looked only at the top level could never find a built-in's own (#127). Looking
+    outward from the plugin finds ``plugins/builtin/locale`` for one that has moved its
+    strings, and ``postulo/locale`` for one that has not, which is the correct answer in
+    both cases and lets #129 move them one at a time.
+
+    For a third-party plugin the two rules agree: a package with its catalogues beside it
+    is found at the first step, and one that keeps them at the distribution root is found
+    on the way up.
+    """
+    inner = _directory_of(module_name)
+    outer = _directory_of(module_name.partition(".")[0])
+    if inner is None or outer is None:
         return None
-    candidate = Path(file).resolve().parent / "locale"
-    return candidate if candidate.is_dir() else None
+    candidate = inner
+    while True:
+        locale = candidate / "locale"
+        if locale.is_dir():
+            return locale
+        if candidate == outer or candidate.parent == candidate:
+            return None
+        candidate = candidate.parent
 
 
 def register_locale_dir(path: Path | str) -> bool:
@@ -41,7 +65,15 @@ def register_locale_dir(path: Path | str) -> bool:
 
     Django caches the merged catalogue per language the first time it is asked for it, so
     adding a path afterwards means throwing those caches away; the next ``gettext`` call
-    rebuilds them with the new directory included.
+    rebuilds them with the new directory included. Every caller is a plugin being
+    registered, and every plugin is registered while the apps are loading, so the throwing
+    away happens at start-up and never during a request.
+
+    Appended, never prepended, and that decides who wins: Django merges
+    ``reversed(LOCALE_PATHS)`` with each merge overriding the last, so the *first* path
+    wins a msgid that two catalogues both define. Postulo's own is first, so a plugin
+    cannot change a word in Postulo's interface by translating the same English string
+    differently (#127).
     """
     path = str(Path(path).resolve())
     current = [str(Path(p).resolve()) for p in settings.LOCALE_PATHS]

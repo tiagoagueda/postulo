@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[1] / "src" / "postulo"
 
 #: Every module holding a plugin Postulo ships, and the plugins in it.
 SHIPPED = {
-    "plugins/builtin.py": "the two built-in sources",
+    "plugins/builtin/__init__.py": "the two built-in sources",
     "notifications/email.py": "the email notifier",
     "notifications/smtp.py": "the SMTP transport",
     "documents/stores.py": "the local store",
@@ -45,6 +45,7 @@ SURFACE = "postulo.plugins.api"
 REACHING_PAST: dict[str, dict[str, str]] = {
     "notifications/email.py": {
         "postulo.core": "`site`: the instance's name and from-address, for the message it sends",
+        "postulo.notifications.base": "`Notification`, which is what a notifier is handed",
     },
     "notifications/smtp.py": {
         "postulo.core": (
@@ -53,31 +54,74 @@ REACHING_PAST: dict[str, dict[str, str]] = {
         ),
     },
     "documents/stores.py": {
+        "postulo.documents.models": (
+            "`DocumentKind`, `RenderedDocument`, `UploadedDocument`: the rows whose files it "
+            "is storing. The data question #129 names, and the reason the store cannot move "
+            "before it is answered"
+        ),
         "postulo.notifications.base": "an absolute URL for a document it has stored",
     },
     "resume/europass.py": {
         "postulo.accounts": "`identifiers`: the schemes a Europass file carries",
         "postulo.accounts.models": "`PersonIdentifier`, to write those onto a profile",
         "postulo.core": "`phone_numbers`, to write the numbers it read",
+        "postulo.resume.models": (
+            "`Education`, `Experience`, `LanguageSkill`, `Project`, `Skill`, `SkillGroup`: "
+            "the rows a read Europass file becomes"
+        ),
     },
     "core/features.py": {},
-    "plugins/builtin.py": {},
+    "plugins/builtin/__init__.py": {},
 }
 
 
+def _package_of(path: Path) -> list[str]:
+    """The dotted package a file lives in, e.g. `postulo.plugins.builtin` for its `__init__`."""
+    return ["postulo", *path.relative_to(ROOT).parts[:-1]]
+
+
+def _own_package(path: Path) -> str | None:
+    """What counts as *inside* this plugin, for a plugin that is a package.
+
+    A plugin that has become a package has an inside, and reaching into it is not reaching
+    past the surface -- `plugins/builtin` carrying the HTML helper it is the only user of is
+    the point of #129, not a violation. A plugin still living as a single module in a core
+    app has no inside, and an import from the app around it is exactly the dependency the
+    rule is about.
+    """
+    return ".".join(_package_of(path)) if path.name == "__init__.py" else None
+
+
 def postulo_imports(path: Path) -> set[str]:
-    """Every `postulo.*` module this file imports, at any depth, read rather than run."""
+    """Every `postulo.*` module this file imports, at any depth, read rather than run.
+
+    Relative imports are resolved to the module they name. `from .base import shipped`
+    inside `plugins/builtin/` is a dependency on `postulo.plugins.base` exactly as much as
+    spelling it out would be, and counting only the absolute form let one hide here until
+    #127 moved the file and turned it into `..base` (#126).
+    """
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    package = _package_of(path)
+    mine = _own_package(path)
     found: set[str] = set()
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
-            if node.module.startswith("postulo"):
-                found.add(node.module)
+        if isinstance(node, ast.ImportFrom):
+            if node.level:
+                base = package[: len(package) - node.level + 1]
+                module = ".".join([*base, node.module] if node.module else base)
+            else:
+                module = node.module or ""
+            if module.startswith("postulo") and not _is_mine(module, mine):
+                found.add(module)
         elif isinstance(node, ast.Import):
             for alias in node.names:
-                if alias.name.startswith("postulo"):
+                if alias.name.startswith("postulo") and not _is_mine(alias.name, mine):
                     found.add(alias.name)
     return found
+
+
+def _is_mine(module: str, mine: str | None) -> bool:
+    return mine is not None and (module == mine or module.startswith(f"{mine}."))
 
 
 @pytest.mark.parametrize("path", sorted(SHIPPED), ids=lambda p: p)
@@ -108,14 +152,18 @@ def test_nothing_recorded_has_quietly_been_fixed(path: str):
     )
 
 
-def test_the_stateless_plugins_need_nothing_at_all():
+def test_the_stateless_plugins_need_only_the_surface():
     """The check that the surface is not so wide as to be meaningless.
 
-    The two built-in sources import nothing from Postulo whatever, which is what the shape of
-    a source makes possible: a URL and some HTML in, a `JobPostingData` out.
+    The two built-in sources need the surface and nothing else, which is what the shape of a
+    source makes possible: a URL and some HTML in, a `JobPostingData` out.
+
+    They used to appear to need *nothing*, and that was an artefact rather than a fact: they
+    reached for `postulo.plugins.base` through a relative import, which the checker did not
+    resolve. #127 moved the file, the relative import changed depth, and the pretence ended.
     """
-    assert postulo_imports(ROOT / "plugins/builtin.py") == set()
-    assert REACHING_PAST["plugins/builtin.py"] == {}
+    assert postulo_imports(ROOT / "plugins/builtin/__init__.py") == {SURFACE}
+    assert REACHING_PAST["plugins/builtin/__init__.py"] == {}
 
 
 def test_a_feature_needs_only_the_surface():

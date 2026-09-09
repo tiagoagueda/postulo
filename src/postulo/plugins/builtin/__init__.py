@@ -25,7 +25,8 @@ from urllib.parse import urlparse
 
 from django.utils.translation import gettext_lazy as _
 
-from .base import JobPostingData, declares, shipped
+from postulo.plugins.api import JobPostingData, declares, shipped
+
 from .htmlutil import extract_jsonld, extract_meta, html_to_text, strip_tags
 
 #: schema.org employmentType values mapped onto Postulo's own.

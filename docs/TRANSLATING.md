@@ -133,6 +133,14 @@ it, or a translation that would raise at render time, does not get in.
 Compiled `.mo` files are build artefacts and are not committed; the container image, the
 release wheel and the test suite each compile their own.
 
+Every command walks **every set of catalogues**, not only Postulo's own: a plugin Postulo
+ships carries its own, beside its package. `extract` writes each string to the set that
+owns the file it was found in, `check` and `stats` read all of them, and `compile` writes
+every `.mo` in one pass — so the image still builds its catalogues in one step, with no
+per-plugin build to add or forget. `stats` and `status.json` report the sum, because
+"português is complete" has to mean the interface somebody will see rather than the part
+of it that happens to live in core.
+
 ## Editing a catalogue
 
 Any text editor works; [Poedit](https://poedit.net/) or a similar tool shows the source
@@ -197,3 +205,12 @@ help rather than fight that.
 
 A plugin's strings are the plugin's to translate: its `locale/` directory sits beside the
 package and Postulo reads it when the plugin loads. See `docs/PLUGINS.md`.
+
+That is true of the plugins Postulo ships as well. Their catalogues live beside their
+packages — `src/postulo/plugins/builtin/locale/` for the two built-in capture sources —
+and are edited, checked and reviewed exactly like the ones in `src/postulo/locale/`. The
+completeness rule for the European Union languages applies to each set separately, so a
+built-in cannot quietly fall behind.
+
+Postulo's own catalogue is read before any plugin's, so where both translate the same
+English string, Postulo's rendering is the one shown.

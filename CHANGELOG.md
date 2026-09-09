@@ -201,6 +201,35 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A plugin Postulo ships can hold its own translations now, and holding them costs it
+  none of the coverage that keeps them translated.** `docs/PLUGINS.md` has always said a
+  plugin's strings are never added to Postulo's catalogues. That was true of every
+  third-party plugin and false of every plugin Postulo ships, because there was one
+  catalogue in the repository and everything was in it.
+
+  **The guarantee was the whole difficulty.** One test says the twenty-four European Union
+  languages stay complete, and it walked one directory. Move a built-in's strings out and
+  they leave its sight — and for a plugin Postulo ships, Postulo is the author, so the
+  outcome is not "translated by somebody else", it is "quietly untranslated". So the
+  tooling learned about several sets of catalogues instead: `extract` writes each string to
+  the set that owns the file it came from, `check`, `stats` and `compile` walk all of them,
+  and every promise the tests made about the catalogues is now made about each set. Sets
+  are found on the filesystem rather than listed anywhere, so a plugin that moves its
+  strings is covered from the moment the directory exists.
+
+  **Which catalogue wins is now a decision rather than an accident.** Two catalogues can
+  translate the same English word, and Django resolves that by the order of the locale
+  paths — first one wins, and a plugin's is appended. So Postulo's own rendering is always
+  the one shown: a plugin can add a word to the interface and cannot change one. Asserted,
+  because it was previously true by luck.
+
+  The two built-in capture sources moved first, with their thirty-nine translations
+  unchanged and the HTML helper they were the only user of. They were also the plugins the
+  surface test called wholly independent — which turned out to be an artefact of the test
+  reading only absolute imports; resolving the relative ones as well found three more real
+  dependencies that had been hiding behind a dot, each now written down as work #129 has
+  left to do. (#127)
+
 - **A written, enforced answer to "a plugin should not depend on the core": depend on
   `postulo.plugins.api`, and nothing else.** The imperative could not be checked — or even
   argued about — while there was no answer to *depend on what, then*. Now there is one module

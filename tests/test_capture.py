@@ -13,7 +13,7 @@ from postulo.jobs.models import Capture, CaptureStatus
 from postulo.plugins import fetching
 from postulo.plugins.base import JobPostingData
 from postulo.plugins.builtin import PageMetadataSource, SchemaOrgSource
-from postulo.plugins.htmlutil import extract_jsonld, extract_meta, html_to_text
+from postulo.plugins.builtin.htmlutil import extract_jsonld, extract_meta, html_to_text
 from postulo.plugins.registry import parse_page
 
 

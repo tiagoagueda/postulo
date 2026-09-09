@@ -125,6 +125,23 @@ needed; a plugin without a `locale/` simply shows its English. The languages wor
 covering first are the ones Postulo itself ships (see `docs/TRANSLATING.md`), and a
 catalogue that is only partly translated is better than none.
 
+**Postulo's own catalogue is read first, and that decides a tie.** Django merges the
+locale directories in reverse order with each merge overriding the last, so the first
+wins, and a plugin's is always appended. If your plugin translates a string Postulo also
+uses — `Name`, `Send`, `Draft` — the reader sees Postulo's rendering of it, not yours. A
+plugin can add a word to the interface; it cannot change one.
+
+**A plugin Postulo ships follows the same rule** since #127, which it did not before: its
+catalogues sit beside its package and every check Postulo runs over its own catalogues
+runs over the plugin's too. `scripts/messages.py` finds them from the filesystem — a
+directory under `src/postulo` with a `locale/` in it is a set of catalogues — so moving a
+built-in's strings out of core is a matter of creating the directory and re-running
+`extract`, with nothing to add to a list. The twenty-four European Union languages have to
+stay complete in *every* set, which is the guarantee that would otherwise have been traded
+for a tidier layout: for a plugin Postulo ships, Postulo is the author, and a string that
+leaves the completeness test's sight is not translated by somebody else — it is quietly
+untranslated.
+
 ## How sources are chosen
 
 Third-party sources are tried first, in the order the entry points resolve, then the

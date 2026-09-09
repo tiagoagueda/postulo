@@ -60,6 +60,74 @@ CALLS: dict[str, tuple[int, int | None, int | None]] = {
 }
 
 SKIP_DIRS = {"migrations", "static", "locale", "__pycache__"}
+
+
+@dataclass(frozen=True)
+class CatalogueSet:
+    """A directory of source, and the catalogues that hold the strings written in it.
+
+    Postulo used to have exactly one, and `docs/PLUGINS.md` has always said a plugin's
+    strings are never added to Postulo's catalogues -- a rule that was true of every
+    third-party plugin and false of every plugin Postulo ships (#127). A plugin that
+    carries its own catalogues is a second set, and everything below walks all of them so
+    that moving strings out of core does not move them out of the coverage that keeps them
+    translated.
+    """
+
+    #: What to call it in output: ``postulo`` for the core catalogues, otherwise the
+    #: package's path inside the distribution, e.g. ``plugins/builtin``.
+    name: str
+    #: The directory whose source files this set claims.
+    root: Path
+    #: The ``locale/`` directory holding its ``.po`` files.
+    locale: Path
+
+    @property
+    def is_core(self) -> bool:
+        return self.root == PACKAGE
+
+
+def _within(path: Path, directory: Path) -> bool:
+    return path == directory or directory in path.parents
+
+
+def catalogue_sets() -> list[CatalogueSet]:
+    """Postulo's own catalogues first, then every package carrying its own.
+
+    Discovery is by the filesystem: a directory under the package with a ``locale/`` in it
+    is a catalogue set. Nothing is listed here by name, so a plugin that moves its strings
+    out of core needs no edit to this file -- which is the point, because #129 moves the
+    built-ins out one at a time and each move should be one commit in one place.
+
+    **Core is first, and the order is load-bearing.** It becomes the order of
+    ``LOCALE_PATHS``, and Django merges those in ``reversed()`` order with each merge
+    overriding the last -- so the first path wins a msgid two catalogues both define. Core
+    winning is the safe direction: a plugin cannot quietly change a word in Postulo's own
+    interface by translating the same English string differently.
+    """
+    sets = [CatalogueSet("postulo", PACKAGE, LOCALE)]
+    for locale in sorted(PACKAGE.rglob("locale")):
+        if locale == LOCALE or not locale.is_dir():
+            continue
+        if SKIP_DIRS & set(locale.relative_to(PACKAGE).parts[:-1]):
+            continue
+        root = locale.parent
+        sets.append(CatalogueSet(root.relative_to(PACKAGE).as_posix(), root, locale))
+    return sets
+
+
+def core_set() -> CatalogueSet:
+    return catalogue_sets()[0]
+
+
+def owner_of(path: Path) -> CatalogueSet:
+    """Which set claims a source file: the innermost whose root contains it."""
+    return max(
+        (s for s in catalogue_sets() if _within(path, s.root)),
+        key=lambda s: len(s.root.parts),
+    )
+
+
 PLACEHOLDER = re.compile(r"%\((\w+)\)[sdifr]|%[sdifr%]|\{(\w*)\}")
 
 
@@ -192,19 +260,28 @@ def extract_template(source: str, origin: str) -> list[Message]:
     return extract_python(flattened, origin)
 
 
-def sources() -> list[Path]:
+def sources(subject: CatalogueSet | None = None) -> list[Path]:
+    """Every file whose strings belong to ``subject``, defaulting to Postulo's own.
+
+    A file inside a nested set belongs to that one, not to this: core claims the whole
+    package *except* the packages that carry their own catalogues.
+    """
+    subject = subject or core_set()
+    nested = [s.root for s in catalogue_sets() if s.root != subject.root]
     files = []
-    for path in sorted(PACKAGE.rglob("*")):
+    for path in sorted(subject.root.rglob("*")):
         if not path.is_file() or path.suffix not in (".py", ".html", ".txt"):
             continue
-        if SKIP_DIRS & set(path.relative_to(PACKAGE).parts[:-1]):
+        if SKIP_DIRS & set(path.relative_to(subject.root).parts[:-1]):
+            continue
+        if any(_within(path, other) for other in nested if _within(other, subject.root)):
             continue
         files.append(path)
     return files
 
 
-def extract_all() -> dict[tuple[str | None, str], Message]:
-    """Every message in the source tree, merged by (context, msgid)."""
+def extract_all(subject: CatalogueSet | None = None) -> dict[tuple[str | None, str], Message]:
+    """Every message in one set's source, merged by (context, msgid)."""
     import django
     from django.conf import settings
 
@@ -213,7 +290,7 @@ def extract_all() -> dict[tuple[str | None, str], Message]:
         django.setup()
 
     merged: dict[tuple[str | None, str], Message] = {}
-    for path in sources():
+    for path in sources(subject):
         origin = path.relative_to(REPO).as_posix()
         text = path.read_text(encoding="utf-8")
         found = (
@@ -262,9 +339,11 @@ def _write_field(out: list[str], name: str, value: str) -> None:
         out.append(f"{name} {_quote(value)}")
 
 
-def dump(catalogue: Catalogue, code: str) -> str:
+def dump(catalogue: Catalogue, code: str, subject: CatalogueSet | None = None) -> str:
+    subject = subject or core_set()
+    what = "Postulo" if subject.is_core else f"Postulo's {subject.name} plugin"
     out: list[str] = [
-        f"# {NATIVE_NAMES.get(code, code)} translation of Postulo.",
+        f"# {NATIVE_NAMES.get(code, code)} translation of {what}.",
         "# This file is distributed under the same license as Postulo (AGPL-3.0-or-later).",
         "#",
         'msgid ""',
@@ -380,10 +459,11 @@ def _unquote(chunk: str) -> str:
     return chunk.replace("\\n", "\n").replace("\\t", "\t").replace('\\"', '"').replace("\\\\", "\\")
 
 
-def po_path(code: str) -> Path:
+def po_path(code: str, subject: CatalogueSet | None = None) -> Path:
     from django.utils.translation import to_locale
 
-    return LOCALE / to_locale(code) / "LC_MESSAGES" / "django.po"
+    subject = subject or core_set()
+    return subject.locale / to_locale(code) / "LC_MESSAGES" / "django.po"
 
 
 def translated_languages() -> list[str]:
@@ -447,27 +527,38 @@ def merge(extracted: dict, existing: Catalogue | None, code: str) -> Catalogue:
 
 
 def cmd_extract(check: bool) -> int:
-    extracted = extract_all()
+    """Refresh every set, and say which set each count belongs to.
+
+    Every set gets a catalogue for every language Postulo offers, whether or not the set
+    has anything to say in it yet -- the same rule core follows. A set with no catalogue
+    for a language would show English there, which is the documented behaviour for a third
+    party and a regression for a plugin Postulo ships (#127).
+    """
     stale: list[str] = []
-    for code in translated_languages():
-        path = po_path(code)
-        existing = parse(path.read_text(encoding="utf-8")) if path.exists() else None
-        catalogue = merge(extracted, existing, code)
-        text = dump(catalogue, code)
-        if check:
-            current = path.read_text(encoding="utf-8") if path.exists() else ""
-            if _without_dates(current) != _without_dates(text):
-                stale.append(str(path.relative_to(REPO)))
-            continue
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8", newline="\n")
+    written: list[str] = []
+    for subject in catalogue_sets():
+        extracted = extract_all(subject)
+        for code in translated_languages():
+            path = po_path(code, subject)
+            existing = parse(path.read_text(encoding="utf-8")) if path.exists() else None
+            catalogue = merge(extracted, existing, code)
+            text = dump(catalogue, code, subject)
+            if check:
+                current = path.read_text(encoding="utf-8") if path.exists() else ""
+                if _without_dates(current) != _without_dates(text):
+                    stale.append(str(path.relative_to(REPO)))
+                continue
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text, encoding="utf-8", newline="\n")
+        written.append(f"{subject.name}: {len(extracted)} messages")
+    count = len(translated_languages())
     if check:
         if stale:
             print("Catalogues out of date; run scripts/messages.py extract:", *stale, sep="\n  ")
             return 1
-        print(f"{len(translated_languages())} catalogues current; {len(extracted)} messages.")
+        print(f"{count} catalogues current in each set; " + ", ".join(written))
         return 0
-    print(f"{len(extracted)} messages written to {len(translated_languages())} catalogues.")
+    print(f"{count} catalogues per set; " + ", ".join(written))
     return 0
 
 
@@ -517,11 +608,18 @@ def compile_catalogue(catalogue: Catalogue) -> bytes:
 
 
 def cmd_compile() -> int:
+    """Every set, in one pass.
+
+    A plugin that ships inside the image is compiled here rather than by a build step of
+    its own: `docs/PLUGINS.md` tells a third party to ship its `.mo` files, and a built-in
+    has no separate release to ship them in (#127).
+    """
     written = 0
-    for path in sorted(LOCALE.glob("*/LC_MESSAGES/django.po")):
-        catalogue = parse(path.read_text(encoding="utf-8"))
-        path.with_suffix(".mo").write_bytes(compile_catalogue(catalogue))
-        written += 1
+    for subject in catalogue_sets():
+        for path in sorted(subject.locale.glob("*/LC_MESSAGES/django.po")):
+            catalogue = parse(path.read_text(encoding="utf-8"))
+            path.with_suffix(".mo").write_bytes(compile_catalogue(catalogue))
+            written += 1
     print(f"{written} catalogues compiled.")
     return 0
 
@@ -557,20 +655,22 @@ def problems_in(catalogue: Catalogue, code: str) -> list[str]:
 
 def cmd_check() -> int:
     failures = 0
-    for code in translated_languages():
-        path = po_path(code)
-        if not path.exists():
-            print(f"{code}: no catalogue at {path.relative_to(REPO)}")
-            failures += 1
-            continue
-        catalogue = parse(path.read_text(encoding="utf-8"))
-        plural_forms = catalogue.header.get("Plural-Forms", "")
-        if plural_forms != PLURAL_FORMS.get(code):
-            print(f"{code}: Plural-Forms header differs from postulo.core.languages")
-            failures += 1
-        for problem in problems_in(catalogue, code):
-            print(f"{code}: {problem}")
-            failures += 1
+    for subject in catalogue_sets():
+        where = "" if subject.is_core else f"{subject.name} "
+        for code in translated_languages():
+            path = po_path(code, subject)
+            if not path.exists():
+                print(f"{where}{code}: no catalogue at {path.relative_to(REPO)}")
+                failures += 1
+                continue
+            catalogue = parse(path.read_text(encoding="utf-8"))
+            plural_forms = catalogue.header.get("Plural-Forms", "")
+            if plural_forms != PLURAL_FORMS.get(code):
+                print(f"{where}{code}: Plural-Forms header differs from postulo.core.languages")
+                failures += 1
+            for problem in problems_in(catalogue, code):
+                print(f"{where}{code}: {problem}")
+                failures += 1
     print("no problems" if not failures else f"{failures} problem(s)")
     return 1 if failures else 0
 
@@ -593,13 +693,36 @@ def stats_for(catalogue: Catalogue) -> dict[str, int]:
     }
 
 
+def _combined(rows: list[dict[str, int]]) -> dict[str, int]:
+    total = sum(row["total"] for row in rows)
+    translated = sum(row["translated"] for row in rows)
+    return {
+        "total": total,
+        "translated": translated,
+        "drafts": sum(row["drafts"] for row in rows),
+        "fuzzy": sum(row["fuzzy"] for row in rows),
+        "reviewed": sum(row["reviewed"] for row in rows),
+        "percent": round(100 * translated / total) if total else 0,
+    }
+
+
 def cmd_stats(write: bool) -> int:
+    """How far along each language is, counting every set.
+
+    Summed rather than reported per set, because the figure is shown to somebody choosing
+    a language and "português is complete" has to mean the interface they will see, not
+    the part of it that happens to live in core (#127).
+    """
     report: dict[str, dict[str, int]] = {}
     for code in translated_languages():
-        path = po_path(code)
-        if not path.exists():
+        rows = [
+            stats_for(parse(po_path(code, subject).read_text(encoding="utf-8")))
+            for subject in catalogue_sets()
+            if po_path(code, subject).exists()
+        ]
+        if not rows:
             continue
-        report[code] = stats_for(parse(path.read_text(encoding="utf-8")))
+        report[code] = _combined(rows)
     width = max((len(NATIVE_NAMES[c]) for c in report), default=10)
     for code, row in report.items():
         state = f"{row['percent']:3d} %"

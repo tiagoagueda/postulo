@@ -166,13 +166,15 @@ postulo/
 ├── src/postulo/
 │   ├── config/               # settings/{base,dev,prod,test}.py, urls, wsgi, asgi
 │   ├── core/                 # OwnedModel, scoped querysets, Tag, layout
-│   ├── locale/               # one catalogue per language (scripts/messages.py)
+│   ├── locale/               # Postulo's own catalogues, one per language
 │   ├── accounts/             # User, Profile, invites                           (M1)
 │   ├── resume/               # structured career content                        (M3)
 │   ├── documents/            # CV variants, cover letters, uploads, rendering   (M3)
 │   ├── jobs/                 # Company, Contact, JobPosting, capture         (M2/M4)
 │   ├── applications/         # Application, events, reminders, analytics    (M2/M5)
-│   ├── plugins/              # registry, base classes, built-in sources         (M4)
+│   ├── plugins/              # registry, api surface, built-in sources          (M4)
+│   │   └── builtin/locale/   # a shipped plugin's own catalogues (scripts/messages.py
+│   │                         # walks every set, not just core's)
 │   └── api/                  # ninja routers, capture tokens                    (M4)
 └── tests/
 ```
