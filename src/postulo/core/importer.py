@@ -284,6 +284,11 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     postings: dict[int, JobPosting] = {}
     applications: dict[int, Application] = {}
 
+    #: Company primary key -> the name of the company it should belong to. Filled while
+    #: reading and applied afterwards, because a parent may appear later in the file than
+    #: its child does.
+    wants_parent: dict[int, str] = {}
+
     for company_entry in document.get("companies", []):
         contact_entries = company_entry.pop("contacts", [])
         posting_entries = company_entry.pop("postings", [])
@@ -296,6 +301,9 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         company_entry.pop("industry", None)
         identifier_entries = company_entry.pop("identifiers", None) or []
         logo_name = company_entry.pop("logo_file", "")
+        # Resolved after every company in the file exists: a parent may be named before it
+        # has been read, and an archive written before format 5 names none at all.
+        parent_name = (company_entry.pop("parent", "") or "").strip()
         company_entry["logo_fetched_at"] = _dt(company_entry.get("logo_fetched_at"))
 
         # A company is an identity keyed by its name, which is why intake matches on
@@ -320,6 +328,8 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             logo = _extract(archive, logo_name) if logo_name else None
             if logo is not None:
                 company.logo.save(logo_name.rsplit("/", 1)[-1], ContentFile(logo), save=True)
+        if parent_name:
+            wants_parent[company.pk] = parent_name
         if industry_names:
             company.industries.add(*Industry.named(user, industry_names))
         for entry in identifier_entries:
@@ -438,6 +448,21 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                     )
                     interview.contacts.set([contacts[i] for i in contact_ids if i in contacts])
                     report.interviews += 1
+
+    # The ownership tree, once every company in the file has been made or matched. A name
+    # that matches nothing is left alone rather than guessed at, and a company is never made
+    # its own parent — an archive can say anything, and `Company.clean` is not run here.
+    if wants_parent:
+        by_name = {
+            company.name.casefold(): company
+            for company in Company.objects.for_user(user).filter(
+                name__in=set(wants_parent.values())
+            )
+        }
+        for child_pk, name in wants_parent.items():
+            parent = by_name.get(name.casefold())
+            if parent is not None and parent.pk != child_pk:
+                Company.objects.filter(pk=child_pk).update(parent=parent)
 
     # ---------------------------------------------------------------- documents
     documents = document.get("documents", {})

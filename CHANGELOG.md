@@ -98,6 +98,36 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A company can be part of another one.** Applying to Google, to DeepMind and to Waymo is
+  applying to three companies the person already knows are one group; Postulo counted three
+  unrelated employers, and searching for the group's name found none of them. One nullable
+  `parent` on `Company` fixes that: a tree rather than a graph, because at most one owner is
+  what an ownership structure *is* and it keeps every question answerable by walking rather
+  than searching.
+
+  **Nothing is inherited**, which was the open question in the issue and is answered *no*. A
+  subsidiary keeps its own industries, logo and notes. Inheritance is a rule people then have
+  to hold in their heads; naming the parent on the page is what the reader wanted.
+
+  **Three refusals, each with the reason.** A company cannot be part of itself. A chain
+  cannot close into a loop — and the message names the company whose link would close it,
+  because "not allowed" leaves somebody looking down a list of subsidiaries guessing which
+  one. And a chain cannot exceed ten, which is far past any real group and stops a mistake
+  becoming a page that walks for ever. The form goes further and does not *offer* what would
+  be refused: a company's own subtree is not in its parent list, since refusing something the
+  form suggested is worse than never suggesting it.
+
+  The walk protects itself as well as the form does. `clean()` cannot run on a
+  `QuerySet.update`, so a loop written straight into the database — by an import, by a
+  migration, by hand — would otherwise hang every page that asked which group a company
+  belongs to. `group` and `descendants()` both stop rather than spin, and a test writes that
+  loop deliberately to prove it.
+
+  The export is format 5: a company names its parent **by name**, because identifiers in an
+  archive are local to the file, and the importer resolves them in a second pass once every
+  company in it exists — a child may be read long before its parent is. An archive written
+  before this names no parent and still imports. (#55)
+
 - **Several telephone numbers per person and per contact, behind a plugin that can be
   switched off.** `Profile.phone` and `Contact.phone` were one `CharField` each: one number,
   no primary, no uniqueness. Email addresses have worked the way this asks since allauth

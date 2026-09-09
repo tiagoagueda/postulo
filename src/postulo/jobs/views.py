@@ -89,13 +89,21 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
     context_object_name = "company"
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("industries", "identifiers")
+        # `parent` is named in the header, so it is fetched with the company rather than
+        # by a second query while rendering.
+        return (
+            super()
+            .get_queryset()
+            .select_related("parent")
+            .prefetch_related("industries", "identifiers")
+        )
 
     def get_context_data(self, **kwargs) -> dict:
         from postulo.core import phone_numbers
 
         context = super().get_context_data(**kwargs)
         context["contacts"] = self.object.contacts.prefetch_related("phone_numbers")
+        context["children"] = self.object.children.all()
         context["postings"] = self.object.postings.prefetch_related("applications")
         # Decided once for the page rather than per contact: it is one answer about one
         # person, and asking it per row would be a query per row for the same answer.

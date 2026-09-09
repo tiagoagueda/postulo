@@ -271,6 +271,25 @@ posting you have recorded there and every application you have made.
 Contacts are the people: recruiters, hiring managers, a friend on the inside. Add them
 from a company page. An application can name one of them as its main contact.
 
+### One company inside another
+
+A company can be recorded as part of another. Applying to Google, to DeepMind and to
+Waymo is applying to three companies you already know are one group; saying so on the
+company form means the page names the owner and lists what belongs to it.
+
+**Nothing is inherited.** A subsidiary keeps its own industries, its own logo, its own
+notes. An inheritance rule would be one more thing to hold in your head, and naming the
+parent on the page is what you actually wanted to know.
+
+Three things are refused, each saying why: a company cannot be part of itself, a chain
+cannot close into a loop — and the message names the company whose link would close it,
+because "not allowed" leaves you looking down a list of subsidiaries guessing — and a
+chain cannot go more than ten deep, which is far past any real ownership structure and
+stops a mistake becoming a page that walks for ever.
+
+The relation travels in your export, written as the parent's **name** rather than as an
+internal number, so a restored archive keeps its groups.
+
 **Industries** are the fields a company operates in, in your own words, and a company may
 be in several — a bank that is also an insurer and a software house is all three. Tick the
 ones you already use on the company form, or type new ones separated by commas; a starter

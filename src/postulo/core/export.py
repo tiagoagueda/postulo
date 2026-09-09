@@ -27,10 +27,11 @@ from postulo import __version__
 #: state and dates on postings and the listing a capture became; 3 added interviews under
 #: each application, the ``actor`` on events, the table layout on the profile, and a list
 #: of ``industries`` on a company where there was one ``industry`` string; 4 replaced the
-#: single ``phone`` string on a profile and on a contact with a ``phone_numbers`` list. The
+#: single ``phone`` string on a profile and on a contact with a ``phone_numbers`` list;
+#: 5 added ``parent`` on a company, naming the company it belongs to. The
 #: importer still reads every earlier
 #: format, filling the new fields in.
-FORMAT_VERSION = 4
+FORMAT_VERSION = 5
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -325,6 +326,10 @@ def build_document(user) -> dict:
             {
                 **_fields(company, COMPANY_FIELDS),
                 "logo_file": f"{MEDIA_PREFIX}{company.logo.name}" if company.logo else "",
+                # By name, not by id: identifiers in this file are local to it, and a name
+                # is what the importer can resolve against companies it has just made or
+                # matched. An empty string is a company that belongs to nobody.
+                "parent": company.parent.name if company.parent_id else "",
                 "industries": [industry.name for industry in company.industries.all()],
                 "identifiers": [
                     {"scheme": i.scheme, "value": i.value, "label": i.label}

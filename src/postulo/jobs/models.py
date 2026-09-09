@@ -114,6 +114,21 @@ class Company(OwnedModel):
     """
 
     name = models.CharField(_("name"), max_length=200)
+    #: The company this one belongs to, if any. A tree rather than a graph — at most one
+    #: parent — because that is what an ownership structure is and it keeps every question
+    #: answerable in a walk rather than a search. Nothing is inherited: a subsidiary does
+    #: not take its parent's industries, logo or notes, because an inheritance rule is a
+    #: thing people then have to hold in their heads, and naming the parent on the page
+    #: says everything the person needed to know.
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="children",
+        verbose_name=_("part of"),
+        help_text=_("The company this one belongs to, if it belongs to one."),
+    )
     website = models.URLField(_("website"), blank=True)
     careers_url = models.URLField(
         _("careers page"), blank=True, help_text=_("Where this company lists its openings.")
@@ -152,6 +167,77 @@ class Company(OwnedModel):
 
     def get_absolute_url(self) -> str:
         return reverse("jobs:company_detail", args=[self.pk])
+
+    #: How deep an ownership chain may go. Real ones are two or three; the cap exists so a
+    #: mistake cannot produce a thousand-deep chain that every page then walks.
+    MAX_DEPTH = 10
+
+    def clean(self) -> None:
+        """Refuse the three ways a parent can be wrong, each with the reason.
+
+        A cycle is the one worth being careful about: the message names the company whose
+        link would close the loop, because "this is not allowed" leaves somebody looking at
+        a list of subsidiaries trying to work out which one.
+        """
+        super().clean()
+        if self.parent_id is None:
+            return
+        if self.pk and self.parent_id == self.pk:
+            raise ValidationError({"parent": _("A company cannot be part of itself.")})
+
+        seen, node, depth = set(), self.parent, 1
+        while node is not None:
+            if node.pk == self.pk:
+                raise ValidationError(
+                    {
+                        "parent": _("That would make a loop: %(name)s is already part of this one.")
+                        % {"name": self.parent.name}
+                    }
+                )
+            if node.pk in seen:
+                break
+            seen.add(node.pk)
+            depth += 1
+            if depth > self.MAX_DEPTH:
+                raise ValidationError(
+                    {
+                        "parent": _(
+                            "That chain is more than %(limit)s companies deep, which is "
+                            "deeper than any group Postulo can usefully draw."
+                        )
+                        % {"limit": self.MAX_DEPTH}
+                    }
+                )
+            node = node.parent
+
+    @property
+    def group(self) -> Company:
+        """The company at the top of this one's ownership chain, or itself.
+
+        Walks up rather than querying, so a prefetched chain costs nothing, and stops at
+        `MAX_DEPTH` so a cycle written directly into the database cannot hang a page.
+        """
+        node, seen = self, {self.pk}
+        for _step in range(self.MAX_DEPTH):
+            if node.parent is None or node.parent.pk in seen:
+                break
+            node = node.parent
+            seen.add(node.pk)
+        return node
+
+    def descendants(self) -> list[Company]:
+        """Every company under this one, breadth first, without repeating a visit."""
+        found: list[Company] = []
+        seen = {self.pk}
+        queue = list(self.children.all())
+        while queue:
+            node = queue.pop(0)
+            if node.pk in seen:
+                continue
+            seen.add(node.pk)
+            found.append(node)
+            queue.extend(node.children.all())
+        return found
 
     @property
     def industry_names(self) -> str:

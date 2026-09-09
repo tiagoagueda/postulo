@@ -8,6 +8,17 @@
     {% company_logo company "size-14 text-lg" %}
     <div>
       <h1 class="text-2xl font-semibold tracking-tight">{{ company.name }}</h1>
+      {% comment %} The parent is named rather than its details inherited: a subsidiary keeps
+         its own industries, logo and notes, and knowing who owns it is what the reader
+         wanted (#55). {% endcomment %}
+      {% if company.parent %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% url 'jobs:company_detail' company.parent.pk as parent_url %}
+          {% blocktranslate trimmed with name=company.parent.name %}
+            Part of <a href="{{ parent_url }}" class="underline">{{ name }}</a>
+          {% endblocktranslate %}
+        </p>
+      {% endif %}
       {% if company.location %}
         <p class="text-sm text-ink-500 dark:text-ink-400">{{ company.location }}</p>
       {% endif %}
@@ -98,6 +109,23 @@
       {% else %}
         <div class="card text-sm text-ink-500 dark:text-ink-400">
           {% translate "No postings recorded for this company." %}
+        </div>
+      {% endif %}
+
+      {% if children %}
+        <h2 class="mt-8 mb-3 font-medium">{% translate "Part of this company" %}</h2>
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for child in children %}
+              <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+                <a href="{% url 'jobs:company_detail' child.pk %}"
+                   class="min-w-0 flex-1 font-medium underline">{{ child.name }}</a>
+                {% if child.location %}
+                  <span class="text-xs text-ink-500 dark:text-ink-400">{{ child.location }}</span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
         </div>
       {% endif %}
 

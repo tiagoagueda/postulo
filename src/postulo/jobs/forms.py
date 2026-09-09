@@ -77,10 +77,28 @@ class CompanyForm(OwnerScopedModelForm):
 
     class Meta:
         model = Company
-        fields = ("name", "website", "careers_url", "location", "industries", "notes")
+        fields = (
+            "name",
+            "parent",
+            "website",
+            "careers_url",
+            "location",
+            "industries",
+            "notes",
+        )
         widgets = {"notes": forms.Textarea(attrs={"rows": 4})}
 
     def scope_querysets(self) -> None:
+        # The parent is offered as this person's other companies, minus this one and
+        # everything already under it. `Company.clean` refuses a loop anyway; refusing
+        # something the form offered is worse than not offering it.
+        companies = Company.objects.for_user(self.user)
+        if self.instance and self.instance.pk:
+            excluded = {self.instance.pk, *(c.pk for c in self.instance.descendants())}
+            companies = companies.exclude(pk__in=excluded)
+        self.fields["parent"].queryset = companies
+        self.fields["parent"].empty_label = _("Not part of another company")
+
         self.fields["industries"].queryset = Industry.objects.for_user(self.user)
         if self.instance.pk and self.instance.logo_source_url:
             self.fields["logo_url"].initial = self.instance.logo_source_url
