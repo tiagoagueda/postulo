@@ -6,6 +6,16 @@
 <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
               dark:border-ink-800 dark:text-ink-400">
   <tr>
+    {% comment %} The selection column, present only where a bulk form exists. The header
+       holds no checkbox: one would be inert without script, and an inert control is worse
+       than a missing one. `app.js` adds a "Select all on this page" button to the bar
+       instead, so the script *adds* a control rather than animating a dead one (#134).
+    {% endcomment %}
+    {% if bulk_form_id %}
+      <th scope="col" class="w-10 px-4 py-3 font-medium">
+        <span class="sr-only">{% translate "Selected" %}</span>
+      </th>
+    {% endif %}
     {% for header in table.headers %}
       <th scope="col" class="px-4 py-3 font-medium {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
           {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
@@ -32,6 +42,7 @@
   </tr>
   {% if table.has_filter_row %}
     <tr class="hidden border-t border-ink-100 md:table-row dark:border-ink-800" data-filter-row>
+      {% if bulk_form_id %}<td class="px-2 py-1.5"></td>{% endif %}
       {% for header in table.headers %}
         <td class="px-2 py-1.5">
           {% if header.column.filter == 'text' %}

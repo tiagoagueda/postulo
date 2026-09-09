@@ -6,6 +6,7 @@ app_name = "applications"
 
 urlpatterns = [
     path("", views.ApplicationListView.as_view(), name="list"),
+    path("bulk/", views.ApplicationBulkView.as_view(), name="bulk"),
     path("board/", views.ApplicationBoardView.as_view(), name="board"),
     path("insights/", views.InsightsView.as_view(), name="insights"),
     path("new/", views.ApplicationCreateView.as_view(), name="create"),

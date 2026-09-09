@@ -349,6 +349,97 @@
     }
   });
 
+  /*
+   * Bulk selection (#134). Two additions to a form that already works without any of this:
+   * a live count of what is ticked, and a button that ticks everything on the page.
+   *
+   * The button is *added* here rather than revealed. A select-all checkbox rendered by the
+   * template would be an inert control for anybody without script, and an inert control is
+   * worse than a missing one; a button that does not exist until something can make it work
+   * is honest in both directions.
+   */
+  function bulkBoxes(form) {
+    return Array.prototype.slice.call(
+      document.querySelectorAll('[data-bulk-row][form="' + form.id + '"]')
+    );
+  }
+
+  function tellTheCount(form) {
+    var label = form.querySelector("[data-bulk-count]");
+    if (!label) {
+      return;
+    }
+    var boxes = bulkBoxes(form);
+    var ticked = boxes.filter(function (box) {
+      return box.checked;
+    }).length;
+    if (!ticked) {
+      label.textContent = label.dataset.bulkNone || label.textContent;
+      return;
+    }
+    var template = ticked === 1 ? label.dataset.bulkOne : label.dataset.bulkMany;
+    label.textContent = (template || "{count} selected").replace("{count}", ticked);
+  }
+
+  function addSelectAll(form) {
+    if (form.querySelector("[data-bulk-all]")) {
+      return;
+    }
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn-ghost text-sm";
+    button.dataset.bulkAll = "";
+    button.textContent = form.dataset.bulkAllLabel || "Select all on this page";
+    button.addEventListener("click", function () {
+      var boxes = bulkBoxes(form);
+      var everyOne = boxes.every(function (box) {
+        return box.checked;
+      });
+      boxes.forEach(function (box) {
+        box.checked = !everyOne;
+      });
+      tellTheCount(form);
+    });
+    var count = form.querySelector("[data-bulk-count]");
+    if (count && count.parentNode) {
+      count.parentNode.insertBefore(button, count.nextSibling);
+    } else {
+      form.appendChild(button);
+    }
+  }
+
+  function readyBulkForms() {
+    var forms = document.querySelectorAll("[data-bulk-form]");
+    Array.prototype.forEach.call(forms, function (form) {
+      if (!form.id) {
+        return;
+      }
+      var label = form.querySelector("[data-bulk-count]");
+      if (label && !label.dataset.bulkNone) {
+        label.dataset.bulkNone = label.textContent.trim();
+      }
+      addSelectAll(form);
+      tellTheCount(form);
+    });
+  }
+
+  document.addEventListener("change", function (event) {
+    var box = event.target.closest ? event.target.closest("[data-bulk-row]") : null;
+    if (!box) {
+      return;
+    }
+    var form = document.getElementById(box.getAttribute("form"));
+    if (form) {
+      tellTheCount(form);
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", readyBulkForms);
+  // The table is swapped by htmx when a filter changes, which also replaces the bar and
+  // brings fresh, unticked boxes with it -- which is exactly the rule: a changed query
+  // clears the selection.
+  document.body.addEventListener("htmx:afterSwap", readyBulkForms);
+
   document.addEventListener("keydown", function (event) {
     if (event.key !== "Escape") {
       return;

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:28+0000\n"
+"POT-Creation-Date: 2026-09-09 16:50+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -38,6 +38,11 @@ msgstr "%(company)s már rendelkezik ezzel az azonosítóval."
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s már rendelkezik %(scheme)s azonosítóval: %(value)s."
 
+#: src/postulo/core/bulk.py:114
+#, python-format, draft
+msgid "%(count)d %(noun)s changed."
+msgstr "%(count)d %(noun)s megváltozott."
+
 #: src/postulo/plugins/views.py:206
 #, python-format, draft
 msgid ""
@@ -51,6 +56,11 @@ msgid "%(count)s application has gone quiet"
 msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "%(count)s jelentkezés elcsendesedett"
 msgstr[1] "%(count)s jelentkezés elcsendesedett"
+
+#: src/postulo/templates/partials/table/bulk.html:26
+#, python-format, draft
+msgid "%(count)s rows ticked."
+msgstr "%(count)s sor kipipálva."
 
 #: src/postulo/templates/server/people.html:106
 #, python-format, draft
@@ -790,7 +800,7 @@ msgstr "Hozzáadás"
 msgid "Add %(name)s"
 msgstr "%(name)s hozzáadása"
 
-#: src/postulo/templates/jobs/company_list.html:68
+#: src/postulo/templates/jobs/company_list.html:72
 #, draft
 msgid "Add a company"
 msgstr "Cég hozzáadása"
@@ -801,6 +811,11 @@ msgstr "Cég hozzáadása"
 #, draft
 msgid "Add a connection"
 msgstr "Kapcsolat hozzáadása"
+
+#: src/postulo/templates/jobs/partials/bulk_fields.html:9
+#, draft
+msgid "Add a field of activity"
+msgstr "Tevékenységi terület hozzáadása"
 
 #: src/postulo/templates/jobs/listing_form.html:4
 #: src/postulo/templates/jobs/listing_form.html:8
@@ -819,6 +834,11 @@ msgstr "Tároló hozzáadása"
 #, draft
 msgid "Add a skill"
 msgstr "Készség hozzáadása"
+
+#: src/postulo/templates/applications/partials/bulk_fields.html:9
+#, draft
+msgid "Add a tag"
+msgstr "Címke hozzáadása"
 
 #: src/postulo/templates/resume/europass_import.html:143
 #, draft
@@ -882,7 +902,7 @@ msgid ""
 msgstr ""
 "%(total)s tétel hozzáadva. Semmi nem íródott felül; ami ismétlődik, azt Ön törli."
 
-#: src/postulo/applications/views.py:312 src/postulo/applications/views.py:656
+#: src/postulo/applications/views.py:392 src/postulo/applications/views.py:736
 #, draft
 msgid "Added to the timeline."
 msgstr "Hozzáadva az idővonalhoz."
@@ -1038,7 +1058,7 @@ msgstr "Válasz: %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/partials/table/head.html:53
+#: src/postulo/templates/partials/table/head.html:65
 #, draft
 msgid "Any"
 msgstr "Bármelyik"
@@ -1117,7 +1137,7 @@ msgstr "Jelentkezés"
 msgid "Application created"
 msgstr "Jelentkezés létrehozva"
 
-#: src/postulo/applications/views.py:265
+#: src/postulo/applications/views.py:345
 #, draft
 msgid "Application deleted."
 msgstr "Jelentkezés törölve."
@@ -1127,12 +1147,12 @@ msgstr "Jelentkezés törölve."
 msgid "Application recorded from the capture."
 msgstr "Jelentkezés rögzítve a rögzítésből."
 
-#: src/postulo/applications/views.py:231 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:311 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Jelentkezés rögzítve."
 
-#: src/postulo/applications/views.py:255
+#: src/postulo/applications/views.py:335
 #, draft
 msgid "Application updated."
 msgstr "Jelentkezés frissítve."
@@ -1140,7 +1160,7 @@ msgstr "Jelentkezés frissítve."
 #: src/postulo/applications/apps.py:9 src/postulo/core/navigation.py:58
 #: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:44
 #: src/postulo/templates/applications/application_list.html:4
-#: src/postulo/templates/applications/application_list.html:64
+#: src/postulo/templates/applications/application_list.html:68
 #: src/postulo/templates/core/export.html:20
 #: src/postulo/templates/core/import_csv_done.html:14
 #: src/postulo/templates/jobs/posting_detail.html:100
@@ -1226,7 +1246,7 @@ msgstr "Elküldve ezen keresztül"
 msgid "applied through"
 msgstr "elküldve ezen keresztül"
 
-#: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/company_list.html:85
 #: src/postulo/templates/jobs/listing_apply.html:4
 #: src/postulo/templates/jobs/listing_list.html:118
 #: src/postulo/templates/jobs/posting_detail.html:44
@@ -1234,6 +1254,11 @@ msgstr "elküldve ezen keresztül"
 #, draft
 msgid "Apply"
 msgstr "Jelentkezés"
+
+#: src/postulo/templates/partials/table/bulk.html:30
+#, draft
+msgid "Apply to the ticked rows"
+msgstr "Alkalmazás a kipipált sorokra"
 
 #: src/postulo/templates/jobs/listing_apply.html:12
 #, python-format, draft
@@ -1384,7 +1409,7 @@ msgstr "Biotechnológia"
 #: src/postulo/core/navigation.py:62
 #: src/postulo/templates/applications/application_board.html:4
 #: src/postulo/templates/applications/application_board.html:9
-#: src/postulo/templates/applications/application_list.html:69
+#: src/postulo/templates/applications/application_list.html:73
 #, draft
 msgid "Board"
 msgstr "Tábla"
@@ -1651,7 +1676,7 @@ msgid ""
 msgstr ""
 "Az itt végzett változtatások a következő futáskor kerülnek át; a másik oldal is akkor olvasódik be."
 
-#: src/postulo/applications/views.py:400
+#: src/postulo/applications/views.py:480
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Érdeklődés itt: %(company)s, erről: %(role)s"
@@ -1716,7 +1741,7 @@ msgstr "Válassz legalább egy rögzítendő dokumentumot."
 msgid "Choose what kind of identifier this is."
 msgstr "Válaszd ki, milyen fajta azonosító ez."
 
-#: src/postulo/applications/views.py:652
+#: src/postulo/applications/views.py:732
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Először válassza ki, melyik jelentkezésről van szó."
@@ -1733,16 +1758,16 @@ msgstr "Klasszikus"
 
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
-#: src/postulo/templates/jobs/company_list.html:83
+#: src/postulo/templates/jobs/company_list.html:87
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
 msgstr "Törlés"
 
 #: src/postulo/templates/applications/application_list.html:15
-#: src/postulo/templates/applications/application_list.html:40
+#: src/postulo/templates/applications/application_list.html:44
 #: src/postulo/templates/jobs/company_list.html:15
-#: src/postulo/templates/jobs/company_list.html:40
+#: src/postulo/templates/jobs/company_list.html:44
 #, draft
 msgid "Clear filters"
 msgstr "Szűrők törlése"
@@ -1821,7 +1846,7 @@ msgstr "Hamarosan"
 #: src/postulo/core/navigation.py:75 src/postulo/core/search.py:386
 #: src/postulo/templates/core/export.html:19
 #: src/postulo/templates/jobs/company_list.html:4
-#: src/postulo/templates/jobs/company_list.html:58
+#: src/postulo/templates/jobs/company_list.html:62
 #, draft
 msgid "Companies"
 msgstr "Cégek"
@@ -1863,12 +1888,12 @@ msgstr "Cég"
 msgid "company"
 msgstr "cég"
 
-#: src/postulo/jobs/views.py:186
+#: src/postulo/jobs/views.py:239
 #, draft
 msgid "Company added."
 msgstr "Cég hozzáadva."
 
-#: src/postulo/jobs/views.py:257
+#: src/postulo/jobs/views.py:310
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Cég törölve a hirdetéseivel együtt."
@@ -1888,7 +1913,7 @@ msgstr "cégazonosítók"
 msgid "Company register number"
 msgstr "Cégjegyzékszám"
 
-#: src/postulo/jobs/views.py:198
+#: src/postulo/jobs/views.py:251
 #, draft
 msgid "Company updated."
 msgstr "Cég frissítve."
@@ -2001,7 +2026,7 @@ msgstr "kapcsolattartó"
 msgid "Contact"
 msgstr "Kapcsolattartó"
 
-#: src/postulo/jobs/views.py:333
+#: src/postulo/jobs/views.py:386
 #, draft
 msgid "Contact added."
 msgstr "Kapcsolattartó hozzáadva."
@@ -2365,7 +2390,7 @@ msgstr "Elutasítás"
 msgid "Declined"
 msgstr "Elutasítva"
 
-#: src/postulo/applications/views.py:644
+#: src/postulo/applications/views.py:724
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Elutasítva. Többé nem lesz javasolva."
@@ -2524,6 +2549,12 @@ msgid ""
 "Django's admin is not running. It is off unless you ask for it: set <code>POSTULO_ADMIN_URL</code> to a path of your choosing to turn it on."
 msgstr ""
 "A Django adminisztrációs felülete nem fut. Ki van kapcsolva, hacsak nem kéri: állítsa a(z) <code>POSTULO_ADMIN_URL</code> értékét egy tetszőleges útvonalra a bekapcsolásához."
+
+#: src/postulo/templates/applications/partials/bulk_fields.html:7
+#: src/postulo/templates/jobs/partials/bulk_fields.html:7
+#, draft
+msgid "Do this"
+msgstr "Ezt tedd"
 
 #: src/postulo/templates/documents/rendered_list.html:21
 #, draft
@@ -3027,7 +3058,7 @@ msgstr "Fax"
 msgid "Fetch my Gravatar again"
 msgstr "Gravatarom újbóli lekérése"
 
-#: src/postulo/jobs/views.py:240
+#: src/postulo/jobs/views.py:293
 #, draft
 msgid "Fetched again."
 msgstr "Újra letöltve."
@@ -3038,6 +3069,11 @@ msgid ""
 "Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only."
 msgstr ""
 "A telepítéskor a PyPI-ról töltődnek le, mindazzal együtt, amire ők maguk rászorulnak. A fenti ellenőrzőösszeg csak erre a csomagra vonatkozik."
+
+#: src/postulo/templates/jobs/partials/bulk_fields.html:13
+#, draft
+msgid "Field of activity"
+msgstr "Tevékenységi terület"
 
 #: src/postulo/resume/models.py:85
 #, draft
@@ -3098,7 +3134,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Akkor töltődik ki, amikor a levelet egy jelentkezéssel együtt elküldik."
 
 #: src/postulo/templates/applications/partials/filters.html:45
-#: src/postulo/templates/partials/table/head.html:42
+#: src/postulo/templates/partials/table/head.html:54
 #, draft
 msgid "Filter"
 msgstr "Szűrés"
@@ -3149,12 +3185,12 @@ msgstr "A profilod szerint"
 msgid "Follow-up note"
 msgstr "Interjú utáni jegyzet"
 
-#: src/postulo/applications/views.py:394
+#: src/postulo/applications/views.py:474
 #, draft
 msgid "Follow-up recorded."
 msgstr "Érdeklődés rögzítve."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:391
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:471
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3197,7 +3233,7 @@ msgstr ""
 msgid "Forget the stored password"
 msgstr "A tárolt jelszó elfelejtése"
 
-#: src/postulo/jobs/views.py:234
+#: src/postulo/jobs/views.py:287
 #, python-format, draft
 msgid "Found a logo at %(url)s."
 msgstr "Találtam logót itt: %(url)s."
@@ -3236,7 +3272,7 @@ msgstr "Lefagyasztás és csatolás"
 
 #: src/postulo/resume/models.py:56 src/postulo/resume/models.py:87
 #: src/postulo/resume/models.py:141
-#: src/postulo/templates/partials/table/head.html:62
+#: src/postulo/templates/partials/table/head.html:74
 #, draft
 msgid "from"
 msgstr "ettől"
@@ -3751,7 +3787,7 @@ msgid "index address"
 msgstr "az index címe"
 
 #: src/postulo/jobs/forms.py:36 src/postulo/jobs/tables.py:29
-#: src/postulo/templates/jobs/company_list.html:66
+#: src/postulo/templates/jobs/company_list.html:70
 #: src/postulo/templates/jobs/industry_list.html:4
 #: src/postulo/templates/jobs/industry_list.html:10
 #, draft
@@ -3775,7 +3811,7 @@ msgstr "iparág"
 msgid "Industry"
 msgstr "Iparág"
 
-#: src/postulo/jobs/views.py:291
+#: src/postulo/jobs/views.py:344
 #, draft
 msgid "Industry renamed."
 msgstr "Iparág átnevezve."
@@ -3857,7 +3893,7 @@ msgstr "interjú"
 msgid "Interview cancelled"
 msgstr "Interjú lemondva"
 
-#: src/postulo/applications/views.py:473
+#: src/postulo/applications/views.py:553
 #, draft
 msgid "Interview recorded."
 msgstr "Interjú rögzítve."
@@ -3867,7 +3903,7 @@ msgstr "Interjú rögzítve."
 msgid "Interview scheduled"
 msgstr "Interjú kitűzve"
 
-#: src/postulo/applications/views.py:475
+#: src/postulo/applications/views.py:555
 #, draft
 msgid "Interview scheduled."
 msgstr "Interjú kitűzve."
@@ -3877,7 +3913,7 @@ msgstr "Interjú kitűzve."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Interjú holnap: %(kind)s, %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:505
+#: src/postulo/applications/views.py:585
 #, draft
 msgid "Interview updated."
 msgstr "Interjú frissítve."
@@ -4439,8 +4475,8 @@ msgstr "logó letöltve"
 msgid "Logs"
 msgstr "Naplók"
 
-#: src/postulo/templates/applications/application_list.html:38
-#: src/postulo/templates/jobs/company_list.html:38
+#: src/postulo/templates/applications/application_list.html:42
+#: src/postulo/templates/jobs/company_list.html:42
 #: src/postulo/templates/server/logs.html:144
 #, draft
 msgid "Loosen one of them, or start again."
@@ -4584,7 +4620,7 @@ msgstr "Gyártás"
 msgid "Map a column to Company and one to Role first."
 msgstr "Először rendelj egy oszlopot a Céghez és egyet a Pozícióhoz."
 
-#: src/postulo/applications/views.py:367
+#: src/postulo/applications/views.py:447
 #, draft
 msgid "Marked as done."
 msgstr "Késznek jelölve."
@@ -4642,7 +4678,7 @@ msgstr "Menü"
 msgid "Merge into"
 msgstr "Összevonás ebbe"
 
-#: src/postulo/jobs/views.py:291
+#: src/postulo/jobs/views.py:344
 #, draft
 msgid "Merged."
 msgstr "Összevonva."
@@ -4727,6 +4763,11 @@ msgstr "Lejjebb"
 msgid "Move it along"
 msgstr "Továbbléptetés"
 
+#: src/postulo/templates/applications/partials/bulk_fields.html:10
+#, draft
+msgid "Move to status"
+msgstr "Áthelyezés állapotba"
+
 #: src/postulo/templates/documents/cv_detail.html:49
 #: src/postulo/templates/resume/overview.html:98
 #, draft
@@ -4765,7 +4806,7 @@ msgstr "név, ha Egyéb"
 msgid "Name, if Other"
 msgstr "Név, ha Egyéb"
 
-#: src/postulo/templates/jobs/company_list.html:79
+#: src/postulo/templates/jobs/company_list.html:83
 #, draft
 msgid "Name, location or industry"
 msgstr "Név, helyszín vagy iparág"
@@ -4906,7 +4947,7 @@ msgstr ""
 msgid "No catalogue lists %(name)s."
 msgstr "Egyetlen katalógus sem sorolja fel a(z) %(name)s bővítményt."
 
-#: src/postulo/templates/jobs/company_list.html:44
+#: src/postulo/templates/jobs/company_list.html:48
 #, draft
 msgid ""
 "No companies yet. They are created for you when you record an application."
@@ -5255,7 +5296,7 @@ msgstr ""
 msgid "Nothing here"
 msgstr "Nincs itt semmi"
 
-#: src/postulo/templates/applications/application_list.html:44
+#: src/postulo/templates/applications/application_list.html:48
 #, draft
 msgid "Nothing here yet"
 msgstr "Még nincs itt semmi"
@@ -5312,8 +5353,8 @@ msgstr "Semmi sem kerül mentésre, amíg át nem nézted."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "A kiszolgálónak nem küldünk jelszót, amíg újat nem ad meg."
 
-#: src/postulo/templates/applications/application_list.html:36
-#: src/postulo/templates/jobs/company_list.html:36
+#: src/postulo/templates/applications/application_list.html:40
+#: src/postulo/templates/jobs/company_list.html:40
 #, draft
 msgid "Nothing matches these filters"
 msgstr "Semmi sem felel meg ezeknek a szűrőknek"
@@ -5436,6 +5477,11 @@ msgstr "Semmi sem volt más."
 #, draft
 msgid "Nothing was installed."
 msgstr "Semmi sem lett telepítve."
+
+#: src/postulo/core/bulk.py:99
+#, draft
+msgid "Nothing was selected, so nothing changed."
+msgstr "Semmi nem volt kijelölve, így semmi nem változott."
 
 #: src/postulo/templates/settings/dashboard.html:68
 #, draft
@@ -5630,6 +5676,11 @@ msgstr[0] ""
 msgstr[1] ""
 "%(total)s hozzáférési kulcs ezen a fiókon. Ujjlenyomattal, arccal vagy PIN-kóddal jelentkeztetik be, és nincs jelszó, ami kiszivároghatna."
 
+#: src/postulo/templates/partials/table/bulk.html:25
+#, draft
+msgid "One row ticked."
+msgstr "Egy sor kipipálva."
+
 #: src/postulo/templates/server/email.html:130
 #, python-format, draft
 msgid ""
@@ -5697,7 +5748,7 @@ msgid ""
 msgstr ""
 "Nyitott pályázatok, amelyekről nincs hír, és a három dolog, amit tehet velük."
 
-#: src/postulo/templates/jobs/partials/company_row.html:36
+#: src/postulo/templates/jobs/partials/company_row.html:48
 #, draft
 msgid "Openings"
 msgstr "Nyitott pozíciók"
@@ -6142,7 +6193,7 @@ msgstr "A hirdetés címe"
 msgid "Posting details"
 msgstr "A hirdetés részletei"
 
-#: src/postulo/jobs/views.py:390
+#: src/postulo/jobs/views.py:443
 #, draft
 msgid "Posting updated."
 msgstr "Hirdetés frissítve."
@@ -6522,8 +6573,8 @@ msgstr "Rögzítés"
 #: src/postulo/templates/applications/application_board.html:16
 #: src/postulo/templates/applications/application_intake.html:4
 #: src/postulo/templates/applications/application_intake.html:8
-#: src/postulo/templates/applications/application_list.html:49
-#: src/postulo/templates/applications/application_list.html:70
+#: src/postulo/templates/applications/application_list.html:53
+#: src/postulo/templates/applications/application_list.html:74
 #: src/postulo/templates/core/dashboard.html:36
 #, draft
 msgid "Record an application"
@@ -6540,7 +6591,7 @@ msgstr ""
 msgid "Record the application"
 msgstr "A jelentkezés rögzítése"
 
-#: src/postulo/templates/applications/application_list.html:46
+#: src/postulo/templates/applications/application_list.html:50
 #, draft
 msgid "Record the first application and the rest will follow."
 msgstr "Rögzítsd az első jelentkezést, a többi követni fogja."
@@ -6565,12 +6616,12 @@ msgid ""
 msgstr ""
 "Feljegyzésre kerül mindenre, amit innen telepítettek, ezért később nem változtatható meg anélkül, hogy leválasztaná, amit telepített."
 
-#: src/postulo/applications/views.py:526
+#: src/postulo/applications/views.py:606
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Lemondottként rögzítve."
 
-#: src/postulo/applications/views.py:525
+#: src/postulo/applications/views.py:605
 #, draft
 msgid "Recorded as held."
 msgstr "Megtartottként rögzítve."
@@ -6590,7 +6641,7 @@ msgstr "rögzítve ekkor"
 msgid "Recorded what you sent."
 msgstr "Rögzítve, amit küldtél."
 
-#: src/postulo/applications/views.py:527
+#: src/postulo/applications/views.py:607
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Rögzítve: senki sem jelent meg."
@@ -7052,7 +7103,7 @@ msgstr "Szűrés"
 #: src/postulo/templates/core/search.html:4
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
-#: src/postulo/templates/jobs/company_list.html:77
+#: src/postulo/templates/jobs/company_list.html:81
 #, draft
 msgid "Search"
 msgstr "Keresés"
@@ -7096,6 +7147,22 @@ msgstr "Az irányítópult megtekintése"
 #, draft
 msgid "See the listings"
 msgstr "Hirdetések megtekintése"
+
+#: src/postulo/templates/applications/partials/application_row.html:11
+#: src/postulo/templates/jobs/partials/company_row.html:11
+#, python-format, draft
+msgid "Select %(what)s"
+msgstr "%(what)s kijelölése"
+
+#: src/postulo/templates/partials/table/bulk.html:15
+#, draft
+msgid "Select all on this page"
+msgstr "Az oldal összes elemének kijelölése"
+
+#: src/postulo/templates/partials/table/head.html:18
+#, draft
+msgid "Selected"
+msgstr "Kijelölve"
 
 #: src/postulo/templates/server/email.html:189
 #, draft
@@ -7460,7 +7527,7 @@ msgstr "SMTP-kiszolgáló"
 msgid "Snooze"
 msgstr "Szundi"
 
-#: src/postulo/applications/views.py:408
+#: src/postulo/applications/views.py:488
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Két hétre elhalasztva."
@@ -7572,6 +7639,7 @@ msgstr "Állapot"
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
 #: src/postulo/templates/applications/application_detail.html:48
+#: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
 #: src/postulo/templates/core/import_csv_map.html:66
 #, draft
@@ -7595,7 +7663,7 @@ msgstr "Állapotváltozás"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Állapot a táblázatban: %(text)s"
 
-#: src/postulo/applications/views.py:283
+#: src/postulo/applications/views.py:363
 #, draft
 msgid "Status updated."
 msgstr "Állapot frissítve."
@@ -7771,6 +7839,7 @@ msgstr "táblázatbeállítások"
 msgid "tag"
 msgstr "címke"
 
+#: src/postulo/templates/applications/partials/bulk_fields.html:14
 #: src/postulo/templates/applications/partials/filters.html:32
 #: src/postulo/templates/applications/tag_form.html:4
 #: src/postulo/templates/applications/tag_form.html:8
@@ -7950,7 +8019,7 @@ msgid "That does not look like a Europass file: it has no LearnerInfo section."
 msgstr ""
 "Ez nem úgy néz ki, mint egy Europass-fájl: nincs benne LearnerInfo szakasz."
 
-#: src/postulo/applications/views.py:314
+#: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
 msgstr "Ezt a bejegyzést nem sikerült menteni."
@@ -8051,7 +8120,7 @@ msgid ""
 msgstr ""
 "Ez nem Europass-fájl. A Postulo az önéletrajz-szerkesztő készítette XML-t és a europass.europa.eu exportálta JSON-t olvassa; ez egyik sem."
 
-#: src/postulo/applications/views.py:285
+#: src/postulo/applications/views.py:365
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Ez nem olyan állapot, amelyet a Postulo ismer."
@@ -8071,15 +8140,20 @@ msgstr "Ez nem olyan elem, amelyet a Postulo ismerne."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Ez nem Ed25519 nyilvános kulcs: %(error)s"
 
-#: src/postulo/applications/views.py:519
+#: src/postulo/applications/views.py:599
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Ez nem olyan eredmény, amelyet a Postulo ismer."
 
-#: src/postulo/applications/views.py:410
+#: src/postulo/applications/views.py:490
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Ezt a Postulo nem tudja megtenni vele."
+
+#: src/postulo/applications/views.py:179 src/postulo/jobs/views.py:110
+#, draft
+msgid "That is not something Postulo can do to several at once."
+msgstr "Ezt a Postulo nem tudja többön egyszerre elvégezni."
 
 #: src/postulo/core/server_views.py:1026 src/postulo/core/server_views.py:1067
 #, draft
@@ -8178,7 +8252,7 @@ msgstr "Ez a kép 5 MB-nál nagyobb. Kisebbet kérünk."
 msgid "That plugin is no longer installed."
 msgstr "Ez a bővítmény már nincs telepítve."
 
-#: src/postulo/applications/views.py:639
+#: src/postulo/applications/views.py:719
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Erre a javaslatra már válaszolt."
@@ -8394,12 +8468,12 @@ msgstr "A hirdetés, amellyé ez a rögzítés ellenőrzés után vált."
 msgid "The location"
 msgstr "A helyszín"
 
-#: src/postulo/jobs/views.py:243
+#: src/postulo/jobs/views.py:296
 #, draft
 msgid "The logo is gone."
 msgstr "A logó eltűnt."
 
-#: src/postulo/jobs/views.py:168
+#: src/postulo/jobs/views.py:221
 #, python-format, draft
 msgid "The logo was not changed: %(problem)s"
 msgstr "A logó nem változott: %(problem)s"
@@ -8603,7 +8677,7 @@ msgstr "Majd törlés"
 msgid "There are no links to check."
 msgstr "Nincs ellenőrizendő hivatkozás."
 
-#: src/postulo/jobs/views.py:237
+#: src/postulo/jobs/views.py:290
 #, draft
 msgid "There is no address to fetch it from again."
 msgstr "Nincs cím, ahonnan újra le lehetne tölteni."
@@ -8780,12 +8854,24 @@ msgstr "%(provider)s útján: nincs kód. Ez a példány ezt elegendőnek tekint
 msgid "Through %(provider)s: you are asked for a code as well."
 msgstr "%(provider)s útján: kódot is kérünk."
 
+#: src/postulo/templates/partials/table/bulk.html:27
+#, draft
+msgid "Tick rows to act on several at once."
+msgstr "Pipáljon ki sorokat, hogy többön egyszerre dolgozzon."
+
 #: src/postulo/jobs/capture_views.py:161
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
 msgstr ""
 "Bejelölve a hirdetés azonnal jelentkezéssé válik, ma elküldöttként megjelölve. Egyébként a hirdetéseid között várja a döntésedet."
+
+#: src/postulo/templates/partials/table/bulk.html:32
+#, draft
+msgid ""
+"Ticks last as long as the page. Changing a filter loads a fresh one and clears them."
+msgstr ""
+"A pipák addig tartanak, ameddig az oldal. Egy szűrő módosítása újat tölt be és törli őket."
 
 #: src/postulo/plugins/models.py:49
 #, draft
@@ -8838,7 +8924,7 @@ msgstr "Cím, cég vagy helyszín"
 msgid "TLS from the first byte"
 msgstr "TLS az első bájttól"
 
-#: src/postulo/templates/partials/table/head.html:68
+#: src/postulo/templates/partials/table/head.html:80
 #, draft
 msgid "to"
 msgstr "eddig"

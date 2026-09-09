@@ -22,15 +22,19 @@
     {% if companies %}
       <div class="card scroll-x p-0">
         <table class="w-full text-start text-sm">
-          {% include "partials/table/head.html" with table_id="companies-table" form_id="company-filters" %}
+          {% include "partials/table/head.html" with table_id="companies-table" form_id="company-filters" bulk_form_id="companies-bulk" %}
           <tbody>
             {% for company in companies %}
-              {% include "jobs/partials/company_row.html" with columns=table.visible %}
+              {% include "jobs/partials/company_row.html" with columns=table.visible bulk_form_id="companies-bulk" %}
             {% endfor %}
           </tbody>
         </table>
       </div>
       {% include "partials/table/pagination.html" with table_id="companies-table" %}
+      {% if bulk_industries %}
+        {% url 'jobs:company_bulk' as bulk_url %}
+        {% include "partials/table/bulk.html" with bulk_form_id="companies-bulk" bulk_action_url=bulk_url bulk_fields="jobs/partials/bulk_fields.html" %}
+      {% endif %}
     {% elif table.filters_active %}
       <div class="card py-12 text-center">
         <p class="mb-1 font-medium">{% translate "Nothing matches these filters" %}</p>

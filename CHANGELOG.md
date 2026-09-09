@@ -201,6 +201,40 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Tables can act on several rows at once** — tag applications, move them to a status, put
+  companies in a field of activity. Four decisions were forced by the shape of the feature and
+  each is taken in the code rather than left to a template.
+
+  **Owner scoping moves, and that is the whole risk.** Every view until now fetched *one*
+  object where a foreign id is a 404; a bulk action receives a list of ids from a browser,
+  which is exactly the shape of request that goes wrong. Every id is re-scoped and the action
+  works on the intersection — never on the list that was sent, and never by refusing the whole
+  batch, because refusing is an answer and an answer tells the sender which ids exist. Forty
+  ids of which thirty-nine are somebody else's changes the one and says "1 changed". Sixteen
+  tests in `tests/security/` hold that, including that the message never reports how many were
+  *sent*: the difference between sent and changed is a count of somebody else's rows.
+
+  **Additive only.** Deleting forty things is a different act from deleting one, and for a
+  company it cascades to every posting under it — which the interface says plainly for one
+  company and would be saying about an unseen number for forty. That confirmation deserves its
+  own design; until it has one there is no bulk delete.
+
+  **A changed query clears the selection.** Tick twelve, narrow to four, press the button —
+  every answer surprises somebody, and acting on twelve while showing four is the surprise with
+  consequences. The checkboxes are form state on a page and a filter change loads a fresh one,
+  so the rule is also what happens naturally and cannot drift out of true.
+
+  **Select-all means this page, and it is a button rather than a header checkbox.** A checkbox
+  in a header row is inert without script, and an inert control is worse than a missing one; the
+  script *adds* a button saying what it does. "All 340 matching" is not offered — it is a
+  different promise that has to work from the query rather than a list of ids.
+
+  It is a form before it is anything else: checkboxes sharing a name and a submit button are a
+  complete implementation, and everything scripted sits on top. The count is spoken through a
+  live region, because a selection that exists only as a column of ticks is not a selection.
+  Status changes go through the event log rather than `update()`, so forty applications moved
+  are forty applications that can say when they moved. (#134)
+
 - **A rule for what happens to a plugin's data when the plugin goes, written before any
   plugin owns data.** That timing is the point. Everything the newest plugin governs lives in
   core, so the question has never had to be answered — and the moment one is made

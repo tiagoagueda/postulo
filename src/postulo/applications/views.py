@@ -8,7 +8,7 @@ from functools import cached_property
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -144,7 +144,87 @@ class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
             **self.filter_context(),
             "table": self.table,
             "page_sizes": tables.PAGE_SIZES,
+            "bulk_tags": Tag.objects.for_user(self.request.user),
+            "bulk_statuses": Status.choices,
         }
+
+
+class ApplicationBulkView(LoginRequiredMixin, View):
+    """Tag several applications, or move several along, in one submission (#134).
+
+    Additive only, deliberately. Deleting forty applications is a different act from deleting
+    one and wants a confirmation of its own; until that exists there is no bulk delete.
+
+    Status changes go through `change_status`, not through `update()`. The event log is the
+    truth here, and forty applications quietly moved with no timeline entries would be forty
+    records that cannot say when they moved or why — which is the one thing the log exists for.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        from django.contrib import messages
+
+        from postulo.core import bulk
+
+        rows = bulk.chosen_rows(request, Application)
+        if not rows.exists():
+            messages.info(request, bulk.nothing_chosen())
+            return redirect(self._back(request))
+
+        action = request.POST.get(bulk.ACTION, "")
+        if action == "tag":
+            count = self._tag(request, rows)
+        elif action == "status":
+            count = self._status(request, rows)
+        else:
+            messages.error(request, _("That is not something Postulo can do to several at once."))
+            return redirect(self._back(request))
+
+        messages.success(request, bulk.changed(count, ApplicationsTable.noun))
+        return redirect(self._back(request))
+
+    def _tag(self, request: HttpRequest, rows) -> int:
+        """Add one of this person's own tags to each. Never creates one from a posted name.
+
+        A tag arriving as a *name* would let a bulk action invent taxonomy from a field
+        nobody looked at; a tag arriving as an id is one they already have, re-scoped like
+        everything else here.
+        """
+        tag = Tag.objects.for_user(request.user).filter(pk=_as_int(request.POST.get("tag"))).first()
+        if tag is None:
+            return 0
+        changed = 0
+        for application in rows:
+            if not application.tags.filter(pk=tag.pk).exists():
+                application.tags.add(tag)
+                changed += 1
+        return changed
+
+    def _status(self, request: HttpRequest, rows) -> int:
+        from .services import change_status
+
+        wanted = request.POST.get("status", "")
+        if wanted not in {value for value, _label in Status.choices}:
+            return 0
+        changed = 0
+        for application in rows:
+            # Returns None when the status was already that, which is not a change and must
+            # not be counted as one.
+            if change_status(application, wanted, actor=str(request.user)) is not None:
+                changed += 1
+        return changed
+
+    @staticmethod
+    def _back(request: HttpRequest) -> str:
+        from postulo.core.redirects import safe_next
+
+        return safe_next(request, reverse("applications:list"))
+
+
+def _as_int(raw) -> int:
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return 0
 
 
 class ApplicationBoardView(OwnedObjectMixin, ApplicationFilterMixin, ListView):

@@ -1,0 +1,17 @@
+{% load i18n %}
+{% comment %} One additive action. No bulk delete, and more pointedly here than elsewhere:
+   deleting a company cascades to every posting under it, which this page says plainly when
+   it is one company and would be saying about an unseen number when it is forty (#134).
+{% endcomment %}
+<div>
+  <label class="field-label" for="bulk-action">{% translate "Do this" %}</label>
+  <select id="bulk-action" name="bulk-action" class="field-input">
+    <option value="industry">{% translate "Add a field of activity" %}</option>
+  </select>
+</div>
+<div>
+  <label class="field-label" for="bulk-industry">{% translate "Field of activity" %}</label>
+  <select id="bulk-industry" name="industry" class="field-input">
+    {% for industry in bulk_industries %}<option value="{{ industry.pk }}">{{ industry.name }}</option>{% endfor %}
+  </select>
+</div>

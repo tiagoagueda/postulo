@@ -5,6 +5,7 @@ from __future__ import annotations
 from functools import cached_property
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpRequest, HttpResponse
@@ -80,7 +81,59 @@ class CompanyListView(OwnedObjectMixin, ListView):
         context["search"] = self.request.GET.get("q", "")
         context["table"] = self.table
         context["page_sizes"] = tables.PAGE_SIZES
+        # The bar is offered only where there is something to apply: no fields of activity
+        # means no additive action, and an action bar with an empty select is a promise the
+        # page cannot keep (#134).
+        context["bulk_industries"] = Industry.objects.for_user(self.request.user)
         return context
+
+
+class CompanyBulkView(LoginRequiredMixin, View):
+    """Put several companies in a field of activity at once (#134).
+
+    Additive only, and more pointedly here than for applications: deleting a company cascades
+    to every posting under it, which the interface says plainly when it is one company and
+    would be saying about an unseen number when it is forty.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        from django.contrib import messages
+
+        from postulo.core import bulk
+
+        rows = bulk.chosen_rows(request, Company)
+        if not rows.exists():
+            messages.info(request, bulk.nothing_chosen())
+            return redirect(self._back(request))
+
+        if request.POST.get(bulk.ACTION, "") != "industry":
+            messages.error(request, _("That is not something Postulo can do to several at once."))
+            return redirect(self._back(request))
+
+        count = self._industry(request, rows)
+        messages.success(request, bulk.changed(count, CompaniesTable.noun))
+        return redirect(self._back(request))
+
+    def _industry(self, request: HttpRequest, rows) -> int:
+        try:
+            wanted = int(request.POST.get("industry") or 0)
+        except (TypeError, ValueError):
+            return 0
+        industry = Industry.objects.for_user(request.user).filter(pk=wanted).first()
+        if industry is None:
+            return 0
+        changed = 0
+        for company in rows:
+            if not company.industries.filter(pk=industry.pk).exists():
+                company.industries.add(industry)
+                changed += 1
+        return changed
+
+    @staticmethod
+    def _back(request: HttpRequest) -> str:
+        from postulo.core.redirects import safe_next
+
+        return safe_next(request, reverse("jobs:company_list"))
 
 
 class CompanyDetailView(OwnedObjectMixin, DetailView):

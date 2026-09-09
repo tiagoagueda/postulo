@@ -1,0 +1,35 @@
+{% load i18n %}
+{% comment %} The bulk action bar (#134).
+
+   A form before it is anything else: checkboxes sharing a name and a submit button are a
+   complete implementation and need no script. It sits outside the table because the table
+   already lives inside the filter form and one form cannot hold another; the row
+   checkboxes join it by `form=` instead.
+
+   The count is a live region so that a selection exists for somebody who cannot see the
+   ticks. Without script it says nothing until the page reloads, which is honest: without
+   script there is nothing to count between page loads.
+{% endcomment %}
+<form method="post" id="{{ bulk_form_id }}" action="{{ bulk_action_url }}"
+      class="card mt-4 flex flex-wrap items-end gap-3" data-bulk-form
+      data-bulk-all-label="{% translate 'Select all on this page' %}">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  {% comment %} The count is said out loud, because a selection that exists only as a
+     column of ticks is not a selection for somebody using a screen reader. The two
+     sentences are attributes rather than script strings so they are translated like
+     everything else (#134). {% endcomment %}
+  <p class="w-full text-sm text-ink-500 dark:text-ink-400" data-bulk-count
+     aria-live="polite" aria-atomic="true"
+     data-bulk-one="{% translate 'One row ticked.' %}"
+     data-bulk-many="{% blocktranslate with count='{count}' %}{{ count }} rows ticked.{% endblocktranslate %}">
+    {% translate "Tick rows to act on several at once." %}
+  </p>
+  {% include bulk_fields %}
+  <button type="submit" class="btn-secondary">{% translate "Apply to the ticked rows" %}</button>
+  <p class="w-full text-xs text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed %}
+      Ticks last as long as the page. Changing a filter loads a fresh one and clears them.
+    {% endblocktranslate %}
+  </p>
+</form>

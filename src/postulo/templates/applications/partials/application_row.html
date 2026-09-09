@@ -1,5 +1,16 @@
 {% load i18n postulo %}
 <tr id="application-{{ application.pk }}" class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+  {% comment %} Belongs to the bulk form by `form=` rather than by nesting: the
+     table already sits inside the filter form, and one form cannot hold another
+     (#134). {% endcomment %}
+  {% if bulk_form_id %}
+    <td class="px-4 py-3">
+      <label class="tap-target justify-center">
+        <input type="checkbox" name="chosen" value="{{ application.pk }}" form="{{ bulk_form_id }}"
+               data-bulk-row aria-label="{% blocktranslate trimmed with what=application.posting.title %}Select {{ what }}{% endblocktranslate %}">
+      </label>
+    </td>
+  {% endif %}
   {% for column in columns %}
     {% if column.key == 'role' %}
       <td class="px-4 py-3">

@@ -1,0 +1,23 @@
+{% load i18n %}
+{% comment %} Additive only: tag them, or move them along. There is no bulk delete, because
+   deleting forty applications is a different act from deleting one and wants a confirmation
+   of its own (#134). {% endcomment %}
+<div>
+  <label class="field-label" for="bulk-action">{% translate "Do this" %}</label>
+  <select id="bulk-action" name="bulk-action" class="field-input">
+    <option value="tag">{% translate "Add a tag" %}</option>
+    <option value="status">{% translate "Move to status" %}</option>
+  </select>
+</div>
+<div>
+  <label class="field-label" for="bulk-tag">{% translate "Tag" %}</label>
+  <select id="bulk-tag" name="tag" class="field-input">
+    {% for tag in bulk_tags %}<option value="{{ tag.pk }}">{{ tag.name }}</option>{% endfor %}
+  </select>
+</div>
+<div>
+  <label class="field-label" for="bulk-status">{% translate "Status" %}</label>
+  <select id="bulk-status" name="status" class="field-input">
+    {% for value, label in bulk_statuses %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+  </select>
+</div>

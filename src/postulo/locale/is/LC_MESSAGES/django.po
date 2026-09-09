@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:28+0000\n"
+"POT-Creation-Date: 2026-09-09 16:50+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: íslenska\n"
@@ -38,6 +38,11 @@ msgstr "%(company)s ber þegar þetta auðkenni."
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s hefur þegar %(scheme)s-auðkenni: %(value)s."
 
+#: src/postulo/core/bulk.py:114
+#, python-format, draft
+msgid "%(count)d %(noun)s changed."
+msgstr "%(count)d %(noun)s breytt."
+
 #: src/postulo/plugins/views.py:206
 #, python-format, draft
 msgid ""
@@ -51,6 +56,11 @@ msgid "%(count)s application has gone quiet"
 msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "%(count)s umsókn er orðin hljóð"
 msgstr[1] "%(count)s umsóknir eru orðnar hljóðar"
+
+#: src/postulo/templates/partials/table/bulk.html:26
+#, python-format, draft
+msgid "%(count)s rows ticked."
+msgstr "%(count)s raðir merktar."
 
 #: src/postulo/templates/server/people.html:106
 #, python-format, draft
@@ -790,7 +800,7 @@ msgstr "Bæta við"
 msgid "Add %(name)s"
 msgstr "Bæta við %(name)s"
 
-#: src/postulo/templates/jobs/company_list.html:68
+#: src/postulo/templates/jobs/company_list.html:72
 #, draft
 msgid "Add a company"
 msgstr "Bæta við fyrirtæki"
@@ -801,6 +811,11 @@ msgstr "Bæta við fyrirtæki"
 #, draft
 msgid "Add a connection"
 msgstr "Bæta við tengingu"
+
+#: src/postulo/templates/jobs/partials/bulk_fields.html:9
+#, draft
+msgid "Add a field of activity"
+msgstr "Bæta við starfssviði"
 
 #: src/postulo/templates/jobs/listing_form.html:4
 #: src/postulo/templates/jobs/listing_form.html:8
@@ -819,6 +834,11 @@ msgstr "Bæta við geymslu"
 #, draft
 msgid "Add a skill"
 msgstr "Bæta við færni"
+
+#: src/postulo/templates/applications/partials/bulk_fields.html:9
+#, draft
+msgid "Add a tag"
+msgstr "Bæta við merki"
 
 #: src/postulo/templates/resume/europass_import.html:143
 #, draft
@@ -882,7 +902,7 @@ msgid ""
 msgstr ""
 "Bætti við %(total)s færslum. Engu var skrifað yfir; það sem tvöfaldaðist er þitt að eyða."
 
-#: src/postulo/applications/views.py:312 src/postulo/applications/views.py:656
+#: src/postulo/applications/views.py:392 src/postulo/applications/views.py:736
 #, draft
 msgid "Added to the timeline."
 msgstr "Bætt á tímalínuna."
@@ -1038,7 +1058,7 @@ msgstr "Svaraði %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/partials/table/head.html:53
+#: src/postulo/templates/partials/table/head.html:65
 #, draft
 msgid "Any"
 msgstr "Hvaða sem er"
@@ -1117,7 +1137,7 @@ msgstr "Umsókn"
 msgid "Application created"
 msgstr "Umsókn stofnuð"
 
-#: src/postulo/applications/views.py:265
+#: src/postulo/applications/views.py:345
 #, draft
 msgid "Application deleted."
 msgstr "Umsókn eytt."
@@ -1127,12 +1147,12 @@ msgstr "Umsókn eytt."
 msgid "Application recorded from the capture."
 msgstr "Umsókn skráð úr grípunni."
 
-#: src/postulo/applications/views.py:231 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:311 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Umsókn skráð."
 
-#: src/postulo/applications/views.py:255
+#: src/postulo/applications/views.py:335
 #, draft
 msgid "Application updated."
 msgstr "Umsókn uppfærð."
@@ -1140,7 +1160,7 @@ msgstr "Umsókn uppfærð."
 #: src/postulo/applications/apps.py:9 src/postulo/core/navigation.py:58
 #: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:44
 #: src/postulo/templates/applications/application_list.html:4
-#: src/postulo/templates/applications/application_list.html:64
+#: src/postulo/templates/applications/application_list.html:68
 #: src/postulo/templates/core/export.html:20
 #: src/postulo/templates/core/import_csv_done.html:14
 #: src/postulo/templates/jobs/posting_detail.html:100
@@ -1225,7 +1245,7 @@ msgstr "Sótt um í gegnum"
 msgid "applied through"
 msgstr "sótt um í gegnum"
 
-#: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/company_list.html:85
 #: src/postulo/templates/jobs/listing_apply.html:4
 #: src/postulo/templates/jobs/listing_list.html:118
 #: src/postulo/templates/jobs/posting_detail.html:44
@@ -1233,6 +1253,11 @@ msgstr "sótt um í gegnum"
 #, draft
 msgid "Apply"
 msgstr "Sækja um"
+
+#: src/postulo/templates/partials/table/bulk.html:30
+#, draft
+msgid "Apply to the ticked rows"
+msgstr "Beita á merktu raðirnar"
 
 #: src/postulo/templates/jobs/listing_apply.html:12
 #, python-format, draft
@@ -1383,7 +1408,7 @@ msgstr "Líftækni"
 #: src/postulo/core/navigation.py:62
 #: src/postulo/templates/applications/application_board.html:4
 #: src/postulo/templates/applications/application_board.html:9
-#: src/postulo/templates/applications/application_list.html:69
+#: src/postulo/templates/applications/application_list.html:73
 #, draft
 msgid "Board"
 msgstr "Tafla"
@@ -1650,7 +1675,7 @@ msgid ""
 msgstr ""
 "Breytingar sem gerðar eru hér eru sendar í næstu keyrslu; hin hliðin er lesin þá líka."
 
-#: src/postulo/applications/views.py:400
+#: src/postulo/applications/views.py:480
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Ýta á %(company)s um %(role)s"
@@ -1715,7 +1740,7 @@ msgstr "Veldu að minnsta kosti eitt skjal til að skrá."
 msgid "Choose what kind of identifier this is."
 msgstr "Veldu hvers konar auðkenni þetta er."
 
-#: src/postulo/applications/views.py:652
+#: src/postulo/applications/views.py:732
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Veldu fyrst hvaða umsókn þetta varðar."
@@ -1732,16 +1757,16 @@ msgstr "Klassískt"
 
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
-#: src/postulo/templates/jobs/company_list.html:83
+#: src/postulo/templates/jobs/company_list.html:87
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
 msgstr "Hreinsa"
 
 #: src/postulo/templates/applications/application_list.html:15
-#: src/postulo/templates/applications/application_list.html:40
+#: src/postulo/templates/applications/application_list.html:44
 #: src/postulo/templates/jobs/company_list.html:15
-#: src/postulo/templates/jobs/company_list.html:40
+#: src/postulo/templates/jobs/company_list.html:44
 #, draft
 msgid "Clear filters"
 msgstr "Hreinsa síur"
@@ -1820,7 +1845,7 @@ msgstr "Framundan"
 #: src/postulo/core/navigation.py:75 src/postulo/core/search.py:386
 #: src/postulo/templates/core/export.html:19
 #: src/postulo/templates/jobs/company_list.html:4
-#: src/postulo/templates/jobs/company_list.html:58
+#: src/postulo/templates/jobs/company_list.html:62
 #, draft
 msgid "Companies"
 msgstr "Fyrirtæki"
@@ -1862,12 +1887,12 @@ msgstr "Fyrirtæki"
 msgid "company"
 msgstr "fyrirtæki"
 
-#: src/postulo/jobs/views.py:186
+#: src/postulo/jobs/views.py:239
 #, draft
 msgid "Company added."
 msgstr "Fyrirtæki bætt við."
 
-#: src/postulo/jobs/views.py:257
+#: src/postulo/jobs/views.py:310
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Fyrirtæki eytt, ásamt auglýsingum þess."
@@ -1887,7 +1912,7 @@ msgstr "fyrirtækjaauðkenni"
 msgid "Company register number"
 msgstr "Kennitala fyrirtækis"
 
-#: src/postulo/jobs/views.py:198
+#: src/postulo/jobs/views.py:251
 #, draft
 msgid "Company updated."
 msgstr "Fyrirtæki uppfært."
@@ -2000,7 +2025,7 @@ msgstr "tengiliður"
 msgid "Contact"
 msgstr "Tengiliður"
 
-#: src/postulo/jobs/views.py:333
+#: src/postulo/jobs/views.py:386
 #, draft
 msgid "Contact added."
 msgstr "Tengilið bætt við."
@@ -2363,7 +2388,7 @@ msgstr "Hafna"
 msgid "Declined"
 msgstr "Hafnað"
 
-#: src/postulo/applications/views.py:644
+#: src/postulo/applications/views.py:724
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Hafnað. Þetta verður ekki lagt til aftur."
@@ -2522,6 +2547,12 @@ msgid ""
 "Django's admin is not running. It is off unless you ask for it: set <code>POSTULO_ADMIN_URL</code> to a path of your choosing to turn it on."
 msgstr ""
 "Stjórnborð Django er ekki í gangi. Það er slökkt nema þú biðjir um það: settu <code>POSTULO_ADMIN_URL</code> á slóð að eigin vali til að kveikja á því."
+
+#: src/postulo/templates/applications/partials/bulk_fields.html:7
+#: src/postulo/templates/jobs/partials/bulk_fields.html:7
+#, draft
+msgid "Do this"
+msgstr "Gerðu þetta"
 
 #: src/postulo/templates/documents/rendered_list.html:21
 #, draft
@@ -3024,7 +3055,7 @@ msgstr "Fax"
 msgid "Fetch my Gravatar again"
 msgstr "Sækja Gravatarinn minn aftur"
 
-#: src/postulo/jobs/views.py:240
+#: src/postulo/jobs/views.py:293
 #, draft
 msgid "Fetched again."
 msgstr "Sótt aftur."
@@ -3035,6 +3066,11 @@ msgid ""
 "Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only."
 msgstr ""
 "Sótt af PyPI þegar þetta er sett upp, ásamt öllu sem þau þurfa í sinni röð. Gátsumman hér að ofan nær aðeins til þessa hjóls."
+
+#: src/postulo/templates/jobs/partials/bulk_fields.html:13
+#, draft
+msgid "Field of activity"
+msgstr "Starfssvið"
 
 #: src/postulo/resume/models.py:85
 #, draft
@@ -3094,7 +3130,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Fyllt út þegar bréfið er sent með umsókn."
 
 #: src/postulo/templates/applications/partials/filters.html:45
-#: src/postulo/templates/partials/table/head.html:42
+#: src/postulo/templates/partials/table/head.html:54
 #, draft
 msgid "Filter"
 msgstr "Sía"
@@ -3145,12 +3181,12 @@ msgstr "Fylgja prófílnum þínum"
 msgid "Follow-up note"
 msgstr "Eftirfylgnimiði"
 
-#: src/postulo/applications/views.py:394
+#: src/postulo/applications/views.py:474
 #, draft
 msgid "Follow-up recorded."
 msgstr "Eftirfylgni skráð."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:391
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:471
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3193,7 +3229,7 @@ msgstr ""
 msgid "Forget the stored password"
 msgstr "Gleyma vistaða lykilorðinu"
 
-#: src/postulo/jobs/views.py:234
+#: src/postulo/jobs/views.py:287
 #, python-format, draft
 msgid "Found a logo at %(url)s."
 msgstr "Fann merki á %(url)s."
@@ -3231,7 +3267,7 @@ msgstr "Frysta og hengja við"
 
 #: src/postulo/resume/models.py:56 src/postulo/resume/models.py:87
 #: src/postulo/resume/models.py:141
-#: src/postulo/templates/partials/table/head.html:62
+#: src/postulo/templates/partials/table/head.html:74
 #, draft
 msgid "from"
 msgstr "frá"
@@ -3748,7 +3784,7 @@ msgid "index address"
 msgstr "yfirlitsvistfang"
 
 #: src/postulo/jobs/forms.py:36 src/postulo/jobs/tables.py:29
-#: src/postulo/templates/jobs/company_list.html:66
+#: src/postulo/templates/jobs/company_list.html:70
 #: src/postulo/templates/jobs/industry_list.html:4
 #: src/postulo/templates/jobs/industry_list.html:10
 #, draft
@@ -3772,7 +3808,7 @@ msgstr "atvinnugrein"
 msgid "Industry"
 msgstr "Atvinnugrein"
 
-#: src/postulo/jobs/views.py:291
+#: src/postulo/jobs/views.py:344
 #, draft
 msgid "Industry renamed."
 msgstr "Atvinnugrein endurnefnd."
@@ -3854,7 +3890,7 @@ msgstr "viðtal"
 msgid "Interview cancelled"
 msgstr "Viðtali aflýst"
 
-#: src/postulo/applications/views.py:473
+#: src/postulo/applications/views.py:553
 #, draft
 msgid "Interview recorded."
 msgstr "Viðtal skráð."
@@ -3864,7 +3900,7 @@ msgstr "Viðtal skráð."
 msgid "Interview scheduled"
 msgstr "Viðtal ráðgert"
 
-#: src/postulo/applications/views.py:475
+#: src/postulo/applications/views.py:555
 #, draft
 msgid "Interview scheduled."
 msgstr "Viðtal ráðgert."
@@ -3874,7 +3910,7 @@ msgstr "Viðtal ráðgert."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Viðtal á morgun: %(kind)s hjá %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:505
+#: src/postulo/applications/views.py:585
 #, draft
 msgid "Interview updated."
 msgstr "Viðtal uppfært."
@@ -4438,8 +4474,8 @@ msgstr "merki sótt"
 msgid "Logs"
 msgstr "Annálar"
 
-#: src/postulo/templates/applications/application_list.html:38
-#: src/postulo/templates/jobs/company_list.html:38
+#: src/postulo/templates/applications/application_list.html:42
+#: src/postulo/templates/jobs/company_list.html:42
 #: src/postulo/templates/server/logs.html:144
 #, draft
 msgid "Loosen one of them, or start again."
@@ -4583,7 +4619,7 @@ msgstr "Framleiðsla"
 msgid "Map a column to Company and one to Role first."
 msgstr "Tengdu fyrst dálk við Fyrirtæki og annan við Starf."
 
-#: src/postulo/applications/views.py:367
+#: src/postulo/applications/views.py:447
 #, draft
 msgid "Marked as done."
 msgstr "Merkt sem lokið."
@@ -4641,7 +4677,7 @@ msgstr "Valmynd"
 msgid "Merge into"
 msgstr "Sameina við"
 
-#: src/postulo/jobs/views.py:291
+#: src/postulo/jobs/views.py:344
 #, draft
 msgid "Merged."
 msgstr "Sameinað."
@@ -4726,6 +4762,11 @@ msgstr "Færa niður"
 msgid "Move it along"
 msgstr "Ýta því áfram"
 
+#: src/postulo/templates/applications/partials/bulk_fields.html:10
+#, draft
+msgid "Move to status"
+msgstr "Færa í stöðu"
+
 #: src/postulo/templates/documents/cv_detail.html:49
 #: src/postulo/templates/resume/overview.html:98
 #, draft
@@ -4764,7 +4805,7 @@ msgstr "heiti, ef Annað"
 msgid "Name, if Other"
 msgstr "Heiti, ef Annað"
 
-#: src/postulo/templates/jobs/company_list.html:79
+#: src/postulo/templates/jobs/company_list.html:83
 #, draft
 msgid "Name, location or industry"
 msgstr "Heiti, staðsetning eða atvinnugrein"
@@ -4905,7 +4946,7 @@ msgstr ""
 msgid "No catalogue lists %(name)s."
 msgstr "Engin skrá telur upp %(name)s."
 
-#: src/postulo/templates/jobs/company_list.html:44
+#: src/postulo/templates/jobs/company_list.html:48
 #, draft
 msgid ""
 "No companies yet. They are created for you when you record an application."
@@ -5254,7 +5295,7 @@ msgstr ""
 msgid "Nothing here"
 msgstr "Ekkert hér"
 
-#: src/postulo/templates/applications/application_list.html:44
+#: src/postulo/templates/applications/application_list.html:48
 #, draft
 msgid "Nothing here yet"
 msgstr "Ekkert hér enn"
@@ -5311,8 +5352,8 @@ msgstr "Ekkert er vistað fyrr en þú hefur farið yfir það."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Ekkert er sent á þjóninn sem lykilorð fyrr en nýtt er slegið inn."
 
-#: src/postulo/templates/applications/application_list.html:36
-#: src/postulo/templates/jobs/company_list.html:36
+#: src/postulo/templates/applications/application_list.html:40
+#: src/postulo/templates/jobs/company_list.html:40
 #, draft
 msgid "Nothing matches these filters"
 msgstr "Ekkert samsvarar þessum síum"
@@ -5434,6 +5475,11 @@ msgstr "Ekkert var frábrugðið."
 #, draft
 msgid "Nothing was installed."
 msgstr "Ekkert var sett upp."
+
+#: src/postulo/core/bulk.py:99
+#, draft
+msgid "Nothing was selected, so nothing changed."
+msgstr "Ekkert var valið, svo ekkert breyttist."
 
 #: src/postulo/templates/settings/dashboard.html:68
 #, draft
@@ -5627,6 +5673,11 @@ msgstr[0] ""
 msgstr[1] ""
 "%(total)s lyklar á þessum reikningi. Þeir skrá þig inn með fingrafari, andlitinu þínu eða PIN, og ekkert lykilorð er til að leka."
 
+#: src/postulo/templates/partials/table/bulk.html:25
+#, draft
+msgid "One row ticked."
+msgstr "Ein röð merkt."
+
 #: src/postulo/templates/server/email.html:130
 #, python-format, draft
 msgid ""
@@ -5693,7 +5744,7 @@ msgid ""
 msgstr ""
 "Opnar umsóknir án þess að nokkuð hafi heyrst, og þrennt sem gera má í því."
 
-#: src/postulo/templates/jobs/partials/company_row.html:36
+#: src/postulo/templates/jobs/partials/company_row.html:48
 #, draft
 msgid "Openings"
 msgstr "Lausar stöður"
@@ -6138,7 +6189,7 @@ msgstr "Vistfang auglýsingar"
 msgid "Posting details"
 msgstr "Nánar um auglýsinguna"
 
-#: src/postulo/jobs/views.py:390
+#: src/postulo/jobs/views.py:443
 #, draft
 msgid "Posting updated."
 msgstr "Auglýsing uppfærð."
@@ -6515,8 +6566,8 @@ msgstr "Skrá"
 #: src/postulo/templates/applications/application_board.html:16
 #: src/postulo/templates/applications/application_intake.html:4
 #: src/postulo/templates/applications/application_intake.html:8
-#: src/postulo/templates/applications/application_list.html:49
-#: src/postulo/templates/applications/application_list.html:70
+#: src/postulo/templates/applications/application_list.html:53
+#: src/postulo/templates/applications/application_list.html:74
 #: src/postulo/templates/core/dashboard.html:36
 #, draft
 msgid "Record an application"
@@ -6532,7 +6583,7 @@ msgstr "Skrá og breyta: umsóknum, auglýsingum, minnispunktum, áminningum, br
 msgid "Record the application"
 msgstr "Skrá umsóknina"
 
-#: src/postulo/templates/applications/application_list.html:46
+#: src/postulo/templates/applications/application_list.html:50
 #, draft
 msgid "Record the first application and the rest will follow."
 msgstr "Skráðu fyrstu umsóknina og afgangurinn fylgir."
@@ -6557,12 +6608,12 @@ msgid ""
 msgstr ""
 "Skráð gegn öllu sem sett er upp héðan, svo því verður ekki breytt síðar án þess að gera það uppsetta munaðarlaust."
 
-#: src/postulo/applications/views.py:526
+#: src/postulo/applications/views.py:606
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Skráð sem aflýst."
 
-#: src/postulo/applications/views.py:525
+#: src/postulo/applications/views.py:605
 #, draft
 msgid "Recorded as held."
 msgstr "Skráð sem haldið."
@@ -6582,7 +6633,7 @@ msgstr "skráð þann"
 msgid "Recorded what you sent."
 msgstr "Skráði hvað þú sendir."
 
-#: src/postulo/applications/views.py:527
+#: src/postulo/applications/views.py:607
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Skráð: enginn mætti."
@@ -7045,7 +7096,7 @@ msgstr "Forval"
 #: src/postulo/templates/core/search.html:4
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
-#: src/postulo/templates/jobs/company_list.html:77
+#: src/postulo/templates/jobs/company_list.html:81
 #, draft
 msgid "Search"
 msgstr "Leita"
@@ -7089,6 +7140,22 @@ msgstr "Sjá yfirlitið"
 #, draft
 msgid "See the listings"
 msgstr "Sjá auglýsingarnar"
+
+#: src/postulo/templates/applications/partials/application_row.html:11
+#: src/postulo/templates/jobs/partials/company_row.html:11
+#, python-format, draft
+msgid "Select %(what)s"
+msgstr "Velja %(what)s"
+
+#: src/postulo/templates/partials/table/bulk.html:15
+#, draft
+msgid "Select all on this page"
+msgstr "Velja allt á þessari síðu"
+
+#: src/postulo/templates/partials/table/head.html:18
+#, draft
+msgid "Selected"
+msgstr "Valið"
 
 #: src/postulo/templates/server/email.html:189
 #, draft
@@ -7453,7 +7520,7 @@ msgstr "SMTP-þjónn"
 msgid "Snooze"
 msgstr "Fresta"
 
-#: src/postulo/applications/views.py:408
+#: src/postulo/applications/views.py:488
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Frestað um tvær vikur."
@@ -7565,6 +7632,7 @@ msgstr "Staða"
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
 #: src/postulo/templates/applications/application_detail.html:48
+#: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
 #: src/postulo/templates/core/import_csv_map.html:66
 #, draft
@@ -7588,7 +7656,7 @@ msgstr "Stöðubreyting"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Staða í töflureikninum: %(text)s"
 
-#: src/postulo/applications/views.py:283
+#: src/postulo/applications/views.py:363
 #, draft
 msgid "Status updated."
 msgstr "Staða uppfærð."
@@ -7764,6 +7832,7 @@ msgstr "töflustillingar"
 msgid "tag"
 msgstr "merkimiði"
 
+#: src/postulo/templates/applications/partials/bulk_fields.html:14
 #: src/postulo/templates/applications/partials/filters.html:32
 #: src/postulo/templates/applications/tag_form.html:4
 #: src/postulo/templates/applications/tag_form.html:8
@@ -7942,7 +8011,7 @@ msgid "That does not look like a Europass file: it has no LearnerInfo section."
 msgstr ""
 "Þetta lítur ekki út eins og Europass-skrá: hana vantar LearnerInfo-hlutann."
 
-#: src/postulo/applications/views.py:314
+#: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
 msgstr "Ekki tókst að vista þá færslu."
@@ -8042,7 +8111,7 @@ msgid ""
 msgstr ""
 "Þetta er ekki Europass-skrá. Postulo les XML-ið sem ferilskrárritillinn bjó til og JSON-ið sem europass.europa.eu flytur út; þetta er hvorugt."
 
-#: src/postulo/applications/views.py:285
+#: src/postulo/applications/views.py:365
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Þetta er ekki staða sem Postulo þekkir."
@@ -8062,15 +8131,20 @@ msgstr "Þetta er ekki eining sem Postulo þekkir."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Þetta er ekki Ed25519-dreifilykill: %(error)s"
 
-#: src/postulo/applications/views.py:519
+#: src/postulo/applications/views.py:599
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Þetta er ekki niðurstaða sem Postulo þekkir."
 
-#: src/postulo/applications/views.py:410
+#: src/postulo/applications/views.py:490
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Þetta er ekki eitthvað sem Postulo getur gert í því."
+
+#: src/postulo/applications/views.py:179 src/postulo/jobs/views.py:110
+#, draft
+msgid "That is not something Postulo can do to several at once."
+msgstr "Þetta getur Postulo ekki gert við margar í einu."
 
 #: src/postulo/core/server_views.py:1026 src/postulo/core/server_views.py:1067
 #, draft
@@ -8170,7 +8244,7 @@ msgstr "Sú mynd er yfir 5 MB. Minni, takk."
 msgid "That plugin is no longer installed."
 msgstr "Sú viðbót er ekki lengur uppsett."
 
-#: src/postulo/applications/views.py:639
+#: src/postulo/applications/views.py:719
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Þeirri tillögu hefur þegar verið svarað."
@@ -8386,12 +8460,12 @@ msgstr "Auglýsingin sem þessi grípa varð að, eftir yfirferð."
 msgid "The location"
 msgstr "Staðsetningin"
 
-#: src/postulo/jobs/views.py:243
+#: src/postulo/jobs/views.py:296
 #, draft
 msgid "The logo is gone."
 msgstr "Merkið er horfið."
 
-#: src/postulo/jobs/views.py:168
+#: src/postulo/jobs/views.py:221
 #, python-format, draft
 msgid "The logo was not changed: %(problem)s"
 msgstr "Merkinu var ekki breytt: %(problem)s"
@@ -8592,7 +8666,7 @@ msgstr "Eyða síðan"
 msgid "There are no links to check."
 msgstr "Það eru engir tenglar til að athuga."
 
-#: src/postulo/jobs/views.py:237
+#: src/postulo/jobs/views.py:290
 #, draft
 msgid "There is no address to fetch it from again."
 msgstr "Það er ekkert vistfang til að sækja hana af aftur."
@@ -8770,12 +8844,24 @@ msgstr ""
 msgid "Through %(provider)s: you are asked for a code as well."
 msgstr "Gegnum %(provider)s: þú ert líka beðin um kóða."
 
+#: src/postulo/templates/partials/table/bulk.html:27
+#, draft
+msgid "Tick rows to act on several at once."
+msgstr "Merktu raðir til að vinna með margar í einu."
+
 #: src/postulo/jobs/capture_views.py:161
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
 msgstr ""
 "Sé hakað verður auglýsingin strax að umsókn, merkt sem sótt um í dag. Annars bíður hún í auglýsingunum þínum þangað til þú ákveður þig."
+
+#: src/postulo/templates/partials/table/bulk.html:32
+#, draft
+msgid ""
+"Ticks last as long as the page. Changing a filter loads a fresh one and clears them."
+msgstr ""
+"Merkingar endast jafnlengi og síðan. Að breyta síu hleður nýrri og hreinsar þær."
 
 #: src/postulo/plugins/models.py:49
 #, draft
@@ -8828,7 +8914,7 @@ msgstr "Titill, fyrirtæki eða staðsetning"
 msgid "TLS from the first byte"
 msgstr "TLS frá fyrsta bæti"
 
-#: src/postulo/templates/partials/table/head.html:68
+#: src/postulo/templates/partials/table/head.html:80
 #, draft
 msgid "to"
 msgstr "til"

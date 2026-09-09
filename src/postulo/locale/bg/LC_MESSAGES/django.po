@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:28+0000\n"
+"POT-Creation-Date: 2026-09-09 16:50+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -38,6 +38,11 @@ msgstr "%(company)s вече има този идентификатор."
 msgid "%(company)s already has a %(scheme)s identifier: %(value)s."
 msgstr "%(company)s вече има идентификатор %(scheme)s: %(value)s."
 
+#: src/postulo/core/bulk.py:114
+#, python-format, draft
+msgid "%(count)d %(noun)s changed."
+msgstr "%(count)d %(noun)s променени."
+
 #: src/postulo/plugins/views.py:206
 #, python-format, draft
 msgid ""
@@ -51,6 +56,11 @@ msgid "%(count)s application has gone quiet"
 msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "%(count)s кандидатура е замлъкнала"
 msgstr[1] "%(count)s кандидатури са замлъкнали"
+
+#: src/postulo/templates/partials/table/bulk.html:26
+#, python-format, draft
+msgid "%(count)s rows ticked."
+msgstr "%(count)s отметнати реда."
 
 #: src/postulo/templates/server/people.html:106
 #, python-format, draft
@@ -788,7 +798,7 @@ msgstr "Добавяне"
 msgid "Add %(name)s"
 msgstr "Добави %(name)s"
 
-#: src/postulo/templates/jobs/company_list.html:68
+#: src/postulo/templates/jobs/company_list.html:72
 #, draft
 msgid "Add a company"
 msgstr "Добавяне на компания"
@@ -799,6 +809,11 @@ msgstr "Добавяне на компания"
 #, draft
 msgid "Add a connection"
 msgstr "Добавяне на връзка"
+
+#: src/postulo/templates/jobs/partials/bulk_fields.html:9
+#, draft
+msgid "Add a field of activity"
+msgstr "Добавяне на област на дейност"
 
 #: src/postulo/templates/jobs/listing_form.html:4
 #: src/postulo/templates/jobs/listing_form.html:8
@@ -817,6 +832,11 @@ msgstr "Добавяне на хранилище"
 #, draft
 msgid "Add a skill"
 msgstr "Добавяне на умение"
+
+#: src/postulo/templates/applications/partials/bulk_fields.html:9
+#, draft
+msgid "Add a tag"
+msgstr "Добавяне на етикет"
 
 #: src/postulo/templates/resume/europass_import.html:143
 #, draft
@@ -880,7 +900,7 @@ msgid ""
 msgstr ""
 "Добавени са %(total)s записа. Нищо не е презаписано; каквото се окаже повторение, вие си го изтривате."
 
-#: src/postulo/applications/views.py:312 src/postulo/applications/views.py:656
+#: src/postulo/applications/views.py:392 src/postulo/applications/views.py:736
 #, draft
 msgid "Added to the timeline."
 msgstr "Добавено към хронологията."
@@ -1036,7 +1056,7 @@ msgstr "Отговори %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/partials/table/head.html:53
+#: src/postulo/templates/partials/table/head.html:65
 #, draft
 msgid "Any"
 msgstr "Всякакъв"
@@ -1116,7 +1136,7 @@ msgstr "Кандидатура"
 msgid "Application created"
 msgstr "Кандидатурата е създадена"
 
-#: src/postulo/applications/views.py:265
+#: src/postulo/applications/views.py:345
 #, draft
 msgid "Application deleted."
 msgstr "Кандидатурата е изтрита."
@@ -1126,12 +1146,12 @@ msgstr "Кандидатурата е изтрита."
 msgid "Application recorded from the capture."
 msgstr "Кандидатурата е записана от прихващането."
 
-#: src/postulo/applications/views.py:231 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:311 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Кандидатурата е записана."
 
-#: src/postulo/applications/views.py:255
+#: src/postulo/applications/views.py:335
 #, draft
 msgid "Application updated."
 msgstr "Кандидатурата е обновена."
@@ -1139,7 +1159,7 @@ msgstr "Кандидатурата е обновена."
 #: src/postulo/applications/apps.py:9 src/postulo/core/navigation.py:58
 #: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:44
 #: src/postulo/templates/applications/application_list.html:4
-#: src/postulo/templates/applications/application_list.html:64
+#: src/postulo/templates/applications/application_list.html:68
 #: src/postulo/templates/core/export.html:20
 #: src/postulo/templates/core/import_csv_done.html:14
 #: src/postulo/templates/jobs/posting_detail.html:100
@@ -1224,7 +1244,7 @@ msgstr "Кандидатствано чрез"
 msgid "applied through"
 msgstr "кандидатствано чрез"
 
-#: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/company_list.html:85
 #: src/postulo/templates/jobs/listing_apply.html:4
 #: src/postulo/templates/jobs/listing_list.html:118
 #: src/postulo/templates/jobs/posting_detail.html:44
@@ -1232,6 +1252,11 @@ msgstr "кандидатствано чрез"
 #, draft
 msgid "Apply"
 msgstr "Кандидатстване"
+
+#: src/postulo/templates/partials/table/bulk.html:30
+#, draft
+msgid "Apply to the ticked rows"
+msgstr "Приложи към отметнатите редове"
 
 #: src/postulo/templates/jobs/listing_apply.html:12
 #, python-format, draft
@@ -1381,7 +1406,7 @@ msgstr "Биотехнологии"
 #: src/postulo/core/navigation.py:62
 #: src/postulo/templates/applications/application_board.html:4
 #: src/postulo/templates/applications/application_board.html:9
-#: src/postulo/templates/applications/application_list.html:69
+#: src/postulo/templates/applications/application_list.html:73
 #, draft
 msgid "Board"
 msgstr "Табло"
@@ -1648,7 +1673,7 @@ msgid ""
 msgstr ""
 "Направените тук промени се изпращат при следващото изпълнение; тогава се чете и другата страна."
 
-#: src/postulo/applications/views.py:400
+#: src/postulo/applications/views.py:480
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Напомняне на %(company)s за %(role)s"
@@ -1713,7 +1738,7 @@ msgstr "Изберете поне един документ за записва�
 msgid "Choose what kind of identifier this is."
 msgstr "Изберете какъв вид идентификатор е това."
 
-#: src/postulo/applications/views.py:652
+#: src/postulo/applications/views.py:732
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Първо изберете за коя кандидатура се отнася."
@@ -1730,16 +1755,16 @@ msgstr "Класически"
 
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
-#: src/postulo/templates/jobs/company_list.html:83
+#: src/postulo/templates/jobs/company_list.html:87
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
 msgstr "Изчистване"
 
 #: src/postulo/templates/applications/application_list.html:15
-#: src/postulo/templates/applications/application_list.html:40
+#: src/postulo/templates/applications/application_list.html:44
 #: src/postulo/templates/jobs/company_list.html:15
-#: src/postulo/templates/jobs/company_list.html:40
+#: src/postulo/templates/jobs/company_list.html:44
 #, draft
 msgid "Clear filters"
 msgstr "Изчистване на филтрите"
@@ -1818,7 +1843,7 @@ msgstr "Предстоящи"
 #: src/postulo/core/navigation.py:75 src/postulo/core/search.py:386
 #: src/postulo/templates/core/export.html:19
 #: src/postulo/templates/jobs/company_list.html:4
-#: src/postulo/templates/jobs/company_list.html:58
+#: src/postulo/templates/jobs/company_list.html:62
 #, draft
 msgid "Companies"
 msgstr "Компании"
@@ -1860,12 +1885,12 @@ msgstr "Компания"
 msgid "company"
 msgstr "компания"
 
-#: src/postulo/jobs/views.py:186
+#: src/postulo/jobs/views.py:239
 #, draft
 msgid "Company added."
 msgstr "Компанията е добавена."
 
-#: src/postulo/jobs/views.py:257
+#: src/postulo/jobs/views.py:310
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Компанията е изтрита заедно с обявите ѝ."
@@ -1885,7 +1910,7 @@ msgstr "идентификатори на компания"
 msgid "Company register number"
 msgstr "Номер в търговския регистър"
 
-#: src/postulo/jobs/views.py:198
+#: src/postulo/jobs/views.py:251
 #, draft
 msgid "Company updated."
 msgstr "Компанията е обновена."
@@ -1998,7 +2023,7 @@ msgstr "контакт"
 msgid "Contact"
 msgstr "Контакт"
 
-#: src/postulo/jobs/views.py:333
+#: src/postulo/jobs/views.py:386
 #, draft
 msgid "Contact added."
 msgstr "Контактът е добавен."
@@ -2360,7 +2385,7 @@ msgstr "Отхвърли"
 msgid "Declined"
 msgstr "Отхвърлено"
 
-#: src/postulo/applications/views.py:644
+#: src/postulo/applications/views.py:724
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Отхвърлено. Няма да бъде предлагано отново."
@@ -2519,6 +2544,12 @@ msgid ""
 "Django's admin is not running. It is off unless you ask for it: set <code>POSTULO_ADMIN_URL</code> to a path of your choosing to turn it on."
 msgstr ""
 "Административният панел на Django не работи. Той е изключен, освен ако не го поискате: задайте <code>POSTULO_ADMIN_URL</code> на път по ваш избор, за да го включите."
+
+#: src/postulo/templates/applications/partials/bulk_fields.html:7
+#: src/postulo/templates/jobs/partials/bulk_fields.html:7
+#, draft
+msgid "Do this"
+msgstr "Направи това"
 
 #: src/postulo/templates/documents/rendered_list.html:21
 #, draft
@@ -3022,7 +3053,7 @@ msgstr "Факс"
 msgid "Fetch my Gravatar again"
 msgstr "Вземане на моя Gravatar отново"
 
-#: src/postulo/jobs/views.py:240
+#: src/postulo/jobs/views.py:293
 #, draft
 msgid "Fetched again."
 msgstr "Изтеглено отново."
@@ -3033,6 +3064,11 @@ msgid ""
 "Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only."
 msgstr ""
 "Изтеглят се от PyPI при инсталирането, заедно с всичко, от което те се нуждаят на свой ред. Контролната сума по-горе покрива само този пакет."
+
+#: src/postulo/templates/jobs/partials/bulk_fields.html:13
+#, draft
+msgid "Field of activity"
+msgstr "Област на дейност"
 
 #: src/postulo/resume/models.py:85
 #, draft
@@ -3093,7 +3129,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Попълва се, когато писмото се изпрати с кандидатура."
 
 #: src/postulo/templates/applications/partials/filters.html:45
-#: src/postulo/templates/partials/table/head.html:42
+#: src/postulo/templates/partials/table/head.html:54
 #, draft
 msgid "Filter"
 msgstr "Филтриране"
@@ -3144,12 +3180,12 @@ msgstr "Следване на профила"
 msgid "Follow-up note"
 msgstr "Бележка след интервю"
 
-#: src/postulo/applications/views.py:394
+#: src/postulo/applications/views.py:474
 #, draft
 msgid "Follow-up recorded."
 msgstr "Напомнянето е записано."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:391
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:471
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3192,7 +3228,7 @@ msgstr ""
 msgid "Forget the stored password"
 msgstr "Забрави съхранената парола"
 
-#: src/postulo/jobs/views.py:234
+#: src/postulo/jobs/views.py:287
 #, python-format, draft
 msgid "Found a logo at %(url)s."
 msgstr "Намерено лого на %(url)s."
@@ -3231,7 +3267,7 @@ msgstr "Замразяване и прикачване"
 
 #: src/postulo/resume/models.py:56 src/postulo/resume/models.py:87
 #: src/postulo/resume/models.py:141
-#: src/postulo/templates/partials/table/head.html:62
+#: src/postulo/templates/partials/table/head.html:74
 #, draft
 msgid "from"
 msgstr "от"
@@ -3746,7 +3782,7 @@ msgid "index address"
 msgstr "адрес на индекса"
 
 #: src/postulo/jobs/forms.py:36 src/postulo/jobs/tables.py:29
-#: src/postulo/templates/jobs/company_list.html:66
+#: src/postulo/templates/jobs/company_list.html:70
 #: src/postulo/templates/jobs/industry_list.html:4
 #: src/postulo/templates/jobs/industry_list.html:10
 #, draft
@@ -3770,7 +3806,7 @@ msgstr "отрасъл"
 msgid "Industry"
 msgstr "Отрасъл"
 
-#: src/postulo/jobs/views.py:291
+#: src/postulo/jobs/views.py:344
 #, draft
 msgid "Industry renamed."
 msgstr "Отрасълът е преименуван."
@@ -3852,7 +3888,7 @@ msgstr "интервю"
 msgid "Interview cancelled"
 msgstr "Интервюто е отменено"
 
-#: src/postulo/applications/views.py:473
+#: src/postulo/applications/views.py:553
 #, draft
 msgid "Interview recorded."
 msgstr "Интервюто е записано."
@@ -3862,7 +3898,7 @@ msgstr "Интервюто е записано."
 msgid "Interview scheduled"
 msgstr "Интервюто е насрочено"
 
-#: src/postulo/applications/views.py:475
+#: src/postulo/applications/views.py:555
 #, draft
 msgid "Interview scheduled."
 msgstr "Интервюто е насрочено."
@@ -3872,7 +3908,7 @@ msgstr "Интервюто е насрочено."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Интервю утре: %(kind)s в %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:505
+#: src/postulo/applications/views.py:585
 #, draft
 msgid "Interview updated."
 msgstr "Интервюто е обновено."
@@ -4434,8 +4470,8 @@ msgstr "логото е изтеглено"
 msgid "Logs"
 msgstr "Дневници"
 
-#: src/postulo/templates/applications/application_list.html:38
-#: src/postulo/templates/jobs/company_list.html:38
+#: src/postulo/templates/applications/application_list.html:42
+#: src/postulo/templates/jobs/company_list.html:42
 #: src/postulo/templates/server/logs.html:144
 #, draft
 msgid "Loosen one of them, or start again."
@@ -4579,7 +4615,7 @@ msgstr "Производство"
 msgid "Map a column to Company and one to Role first."
 msgstr "Първо съпоставете една колона с Компания и една с Позиция."
 
-#: src/postulo/applications/views.py:367
+#: src/postulo/applications/views.py:447
 #, draft
 msgid "Marked as done."
 msgstr "Отбелязано като готово."
@@ -4637,7 +4673,7 @@ msgstr "Меню"
 msgid "Merge into"
 msgstr "Сливане в"
 
-#: src/postulo/jobs/views.py:291
+#: src/postulo/jobs/views.py:344
 #, draft
 msgid "Merged."
 msgstr "Слято."
@@ -4722,6 +4758,11 @@ msgstr "Надолу"
 msgid "Move it along"
 msgstr "Придвижване напред"
 
+#: src/postulo/templates/applications/partials/bulk_fields.html:10
+#, draft
+msgid "Move to status"
+msgstr "Премести в състояние"
+
 #: src/postulo/templates/documents/cv_detail.html:49
 #: src/postulo/templates/resume/overview.html:98
 #, draft
@@ -4760,7 +4801,7 @@ msgstr "име, ако Друго"
 msgid "Name, if Other"
 msgstr "Име, ако е Друг"
 
-#: src/postulo/templates/jobs/company_list.html:79
+#: src/postulo/templates/jobs/company_list.html:83
 #, draft
 msgid "Name, location or industry"
 msgstr "Име, местоположение или отрасъл"
@@ -4901,7 +4942,7 @@ msgstr ""
 msgid "No catalogue lists %(name)s."
 msgstr "Никой каталог не съдържа %(name)s."
 
-#: src/postulo/templates/jobs/company_list.html:44
+#: src/postulo/templates/jobs/company_list.html:48
 #, draft
 msgid ""
 "No companies yet. They are created for you when you record an application."
@@ -5249,7 +5290,7 @@ msgstr ""
 msgid "Nothing here"
 msgstr "Тук няма нищо"
 
-#: src/postulo/templates/applications/application_list.html:44
+#: src/postulo/templates/applications/application_list.html:48
 #, draft
 msgid "Nothing here yet"
 msgstr "Тук още няма нищо"
@@ -5306,8 +5347,8 @@ msgstr "Нищо не се запазва, докато не го преглед
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "На сървъра не се изпраща парола, докато не бъде въведена нова."
 
-#: src/postulo/templates/applications/application_list.html:36
-#: src/postulo/templates/jobs/company_list.html:36
+#: src/postulo/templates/applications/application_list.html:40
+#: src/postulo/templates/jobs/company_list.html:40
 #, draft
 msgid "Nothing matches these filters"
 msgstr "Нищо не отговаря на тези филтри"
@@ -5430,6 +5471,11 @@ msgstr "Нищо не беше различно."
 #, draft
 msgid "Nothing was installed."
 msgstr "Нищо не беше инсталирано."
+
+#: src/postulo/core/bulk.py:99
+#, draft
+msgid "Nothing was selected, so nothing changed."
+msgstr "Нищо не беше избрано, така че нищо не се промени."
 
 #: src/postulo/templates/settings/dashboard.html:68
 #, draft
@@ -5624,6 +5670,11 @@ msgstr[0] ""
 msgstr[1] ""
 "%(total)s ключа за достъп в този профил. Вписват ви с пръстов отпечатък, лице или ПИН и няма парола, която да изтече."
 
+#: src/postulo/templates/partials/table/bulk.html:25
+#, draft
+msgid "One row ticked."
+msgstr "Един отметнат ред."
+
 #: src/postulo/templates/server/email.html:130
 #, python-format, draft
 msgid ""
@@ -5690,7 +5741,7 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Отворени кандидатури без отговор и трите неща, които може да направите."
 
-#: src/postulo/templates/jobs/partials/company_row.html:36
+#: src/postulo/templates/jobs/partials/company_row.html:48
 #, draft
 msgid "Openings"
 msgstr "Свободни позиции"
@@ -6135,7 +6186,7 @@ msgstr "Адрес на обявата"
 msgid "Posting details"
 msgstr "Подробности за обявата"
 
-#: src/postulo/jobs/views.py:390
+#: src/postulo/jobs/views.py:443
 #, draft
 msgid "Posting updated."
 msgstr "Обявата е обновена."
@@ -6514,8 +6565,8 @@ msgstr "Записване"
 #: src/postulo/templates/applications/application_board.html:16
 #: src/postulo/templates/applications/application_intake.html:4
 #: src/postulo/templates/applications/application_intake.html:8
-#: src/postulo/templates/applications/application_list.html:49
-#: src/postulo/templates/applications/application_list.html:70
+#: src/postulo/templates/applications/application_list.html:53
+#: src/postulo/templates/applications/application_list.html:74
 #: src/postulo/templates/core/dashboard.html:36
 #, draft
 msgid "Record an application"
@@ -6531,7 +6582,7 @@ msgstr "Записване и промяна: кандидатури, обяви
 msgid "Record the application"
 msgstr "Записване на кандидатурата"
 
-#: src/postulo/templates/applications/application_list.html:46
+#: src/postulo/templates/applications/application_list.html:50
 #, draft
 msgid "Record the first application and the rest will follow."
 msgstr "Запишете първата кандидатура и останалите ще последват."
@@ -6556,12 +6607,12 @@ msgid ""
 msgstr ""
 "Записва се при всичко, инсталирано оттук, затова не може да се променя по-късно, без да откъсне инсталираното от него."
 
-#: src/postulo/applications/views.py:526
+#: src/postulo/applications/views.py:606
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Записано като отменено."
 
-#: src/postulo/applications/views.py:525
+#: src/postulo/applications/views.py:605
 #, draft
 msgid "Recorded as held."
 msgstr "Записано като проведено."
@@ -6581,7 +6632,7 @@ msgstr "записано на"
 msgid "Recorded what you sent."
 msgstr "Изпратеното е записано."
 
-#: src/postulo/applications/views.py:527
+#: src/postulo/applications/views.py:607
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Записано: никой не се яви."
@@ -7043,7 +7094,7 @@ msgstr "Пресяване"
 #: src/postulo/templates/core/search.html:4
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
-#: src/postulo/templates/jobs/company_list.html:77
+#: src/postulo/templates/jobs/company_list.html:81
 #, draft
 msgid "Search"
 msgstr "Търсене"
@@ -7087,6 +7138,22 @@ msgstr "Виж таблото"
 #, draft
 msgid "See the listings"
 msgstr "Вижте обявите"
+
+#: src/postulo/templates/applications/partials/application_row.html:11
+#: src/postulo/templates/jobs/partials/company_row.html:11
+#, python-format, draft
+msgid "Select %(what)s"
+msgstr "Избери %(what)s"
+
+#: src/postulo/templates/partials/table/bulk.html:15
+#, draft
+msgid "Select all on this page"
+msgstr "Избери всички на тази страница"
+
+#: src/postulo/templates/partials/table/head.html:18
+#, draft
+msgid "Selected"
+msgstr "Избрано"
 
 #: src/postulo/templates/server/email.html:189
 #, draft
@@ -7452,7 +7519,7 @@ msgstr "SMTP сървър"
 msgid "Snooze"
 msgstr "Отлагане"
 
-#: src/postulo/applications/views.py:408
+#: src/postulo/applications/views.py:488
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Отложено с две седмици."
@@ -7564,6 +7631,7 @@ msgstr "Състояние"
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
 #: src/postulo/templates/applications/application_detail.html:48
+#: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
 #: src/postulo/templates/core/import_csv_map.html:66
 #, draft
@@ -7587,7 +7655,7 @@ msgstr "Промяна на статуса"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Статус в таблицата: %(text)s"
 
-#: src/postulo/applications/views.py:283
+#: src/postulo/applications/views.py:363
 #, draft
 msgid "Status updated."
 msgstr "Статусът е обновен."
@@ -7764,6 +7832,7 @@ msgstr "настройки на таблицата"
 msgid "tag"
 msgstr "етикет"
 
+#: src/postulo/templates/applications/partials/bulk_fields.html:14
 #: src/postulo/templates/applications/partials/filters.html:32
 #: src/postulo/templates/applications/tag_form.html:4
 #: src/postulo/templates/applications/tag_form.html:8
@@ -7941,7 +8010,7 @@ msgstr "Това не прилича на пълен уеб адрес."
 msgid "That does not look like a Europass file: it has no LearnerInfo section."
 msgstr "Това не прилича на файл на Europass: няма раздел LearnerInfo."
 
-#: src/postulo/applications/views.py:314
+#: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
 msgstr "Този запис не можа да бъде запазен."
@@ -8041,7 +8110,7 @@ msgid ""
 msgstr ""
 "Това не е файл на Europass. Postulo чете XML, който правеше редакторът на автобиографии, и JSON, който експортира europass.europa.eu; това не е нито едното, нито другото."
 
-#: src/postulo/applications/views.py:285
+#: src/postulo/applications/views.py:365
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Това не е статус, който Postulo разпознава."
@@ -8061,15 +8130,20 @@ msgstr "Това не е елемент, който Postulo познава."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Това не е публичен ключ Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:519
+#: src/postulo/applications/views.py:599
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Това не е резултат, който Postulo разпознава."
 
-#: src/postulo/applications/views.py:410
+#: src/postulo/applications/views.py:490
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Това не е нещо, което Postulo може да направи с нея."
+
+#: src/postulo/applications/views.py:179 src/postulo/jobs/views.py:110
+#, draft
+msgid "That is not something Postulo can do to several at once."
+msgstr "Това не е нещо, което Postulo може да направи наведнъж."
 
 #: src/postulo/core/server_views.py:1026 src/postulo/core/server_views.py:1067
 #, draft
@@ -8168,7 +8242,7 @@ msgstr "Тази снимка е над 5 MB. По-малка, моля."
 msgid "That plugin is no longer installed."
 msgstr "Тази добавка вече не е инсталирана."
 
-#: src/postulo/applications/views.py:639
+#: src/postulo/applications/views.py:719
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "На това предложение вече е отговорено."
@@ -8385,12 +8459,12 @@ msgstr "Обявата, в която се превърна това прихв�
 msgid "The location"
 msgstr "Местоположението"
 
-#: src/postulo/jobs/views.py:243
+#: src/postulo/jobs/views.py:296
 #, draft
 msgid "The logo is gone."
 msgstr "Логото го няма."
 
-#: src/postulo/jobs/views.py:168
+#: src/postulo/jobs/views.py:221
 #, python-format, draft
 msgid "The logo was not changed: %(problem)s"
 msgstr "Логото не беше променено: %(problem)s"
@@ -8590,7 +8664,7 @@ msgstr "После изтриване"
 msgid "There are no links to check."
 msgstr "Няма връзки за проверка."
 
-#: src/postulo/jobs/views.py:237
+#: src/postulo/jobs/views.py:290
 #, draft
 msgid "There is no address to fetch it from again."
 msgstr "Няма адрес, от който да се изтегли отново."
@@ -8766,12 +8840,24 @@ msgstr "Чрез %(provider)s: без код. Тази инстанция при
 msgid "Through %(provider)s: you are asked for a code as well."
 msgstr "Чрез %(provider)s: иска се и код."
 
+#: src/postulo/templates/partials/table/bulk.html:27
+#, draft
+msgid "Tick rows to act on several at once."
+msgstr "Отметнете редове, за да действате върху няколко наведнъж."
+
 #: src/postulo/jobs/capture_views.py:161
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
 msgstr ""
 "Отметнато, обявата веднага става кандидатура, отбелязана като изпратена днес. Иначе чака във вашите обяви да решите."
+
+#: src/postulo/templates/partials/table/bulk.html:32
+#, draft
+msgid ""
+"Ticks last as long as the page. Changing a filter loads a fresh one and clears them."
+msgstr ""
+"Отметките траят колкото страницата. Промяна на филтър зарежда нова и ги изчиства."
 
 #: src/postulo/plugins/models.py:49
 #, draft
@@ -8824,7 +8910,7 @@ msgstr "Заглавие, компания или местоположение"
 msgid "TLS from the first byte"
 msgstr "TLS от първия байт"
 
-#: src/postulo/templates/partials/table/head.html:68
+#: src/postulo/templates/partials/table/head.html:80
 #, draft
 msgid "to"
 msgstr "до"

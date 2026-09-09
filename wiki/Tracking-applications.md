@@ -150,6 +150,29 @@ The choice only appears if this instance can confirm a number at all, which need
 gateway the operator installed — Postulo ships none. Until then no number is nominated
 anywhere, and the interlock that keeps mail switched on stays shut for everybody.
 
+## Acting on several at once
+
+Tick rows in the table and the bar underneath applies one thing to all of them: add a tag, or
+move them to a status. The companies table does the same for a field of activity.
+
+**Only additive things**, and that is deliberate rather than unfinished. Deleting forty
+applications is a different act from deleting one, and deleting a company takes every posting
+under it with it — a confirmation naming an unseen number is a confirmation nobody reads. If
+bulk deletion arrives it will arrive with a design of its own.
+
+**Ticks last as long as the page.** Change a filter and you get a fresh page with nothing
+ticked. Every other answer surprises somebody: acting on twelve rows when four are shown is
+the surprise with consequences, so this is the one that stays.
+
+**Select all means this page**, and it is a button rather than a checkbox in the header — a
+header checkbox does nothing without JavaScript, and a control that does nothing is worse than
+one that is not there. Ticking rows works with scripts off; the button and the running count
+are what the script adds.
+
+Postulo says how many rows changed, which is not always how many you ticked: an application
+already in the status you chose has not changed, and nothing outside your own account is ever
+touched.
+
 ## Two views of the same thing
 
 - **Board** shows only live applications, in columns by status. Move one along with the
