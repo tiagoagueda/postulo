@@ -393,7 +393,9 @@ class RenderedListView(CopiesContextMixin, OwnedObjectMixin, ListView):
         return (
             super()
             .get_queryset()
-            .select_related("application", "application__posting", "cv", "cover_letter")
+            # `source` is a generic link with no join to follow, so the content type
+            # is what is worth fetching: the label a row shows comes from it (#130).
+            .select_related("application", "application__posting", "source_type")
         )
 
 

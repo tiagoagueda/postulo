@@ -30,8 +30,10 @@ from postulo import __version__
 #: single ``phone`` string on a profile and on a contact with a ``phone_numbers`` list;
 #: 5 added ``parent`` on a company, naming the company it belongs to; 9 added
 #: ``postal_addresses`` on a profile and on a contact, which had nowhere to go before
-#: (#92). The importer still reads every earlier format, filling the new fields in.
-FORMAT_VERSION = 9
+#: (#92); 10 replaced ``cv_id``/``cover_letter_id`` on a sent document with a
+#: ``source_kind`` and a ``source_ref``, so that a new kind of document is not a new
+#: column (#130). The importer still reads every earlier format, filling the new fields in.
+FORMAT_VERSION = 10
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -147,8 +149,6 @@ SENT_FIELDS = (
     "title",
     "kind",
     "application_id",
-    "cv_id",
-    "cover_letter_id",
     "checksum",
     "rendered_at",
 )
@@ -452,11 +452,15 @@ def build_document(user) -> dict:
     document["documents"]["sent"] = [
         {
             **_fields(sent, SENT_FIELDS),
+            # What made it, written as a kind and a local id rather than as one of two
+            # columns: an archive from a Postulo that has a fourth kind of document is
+            # still an archive this one can read the rest of (#130).
+            **_source_of(sent),
             "file": f"{MEDIA_PREFIX}{sent.file.name}" if sent.file else "",
             "source_text": sent.source_text,
             "copies": _copies(sent),
         }
-        for sent in RenderedDocument.objects.for_user(user).prefetch_related("copies")
+        for sent in RenderedDocument.objects.for_user(user).select_related("source_type")
     ]
 
     document["captures"] = [
@@ -487,6 +491,20 @@ def build_document(user) -> dict:
         "captures": len(document["captures"]),
     }
     return document
+
+
+def _source_of(sent) -> dict:
+    """Which authored thing a render came from, as a kind and a local id.
+
+    Empty where nothing made it: an uploaded file came from a file, and a render whose
+    source was deleted has none either. Both are ordinary states rather than gaps.
+    """
+    if not sent.source_type_id or not sent.source_id:
+        return {"source_kind": "", "source_ref": None}
+    return {
+        "source_kind": sent.source_type.model,
+        "source_ref": sent.source_id,
+    }
 
 
 def _copies(document) -> list[dict]:

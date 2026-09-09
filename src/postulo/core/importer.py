@@ -54,7 +54,28 @@ class ImportReport:
         ]
 
 
-def _restore_copies(user, entries: list, **document) -> None:
+def _source_of(entry: dict, cvs: dict, letters: dict):
+    """What made a sent document, in whichever shape the archive has it.
+
+    Format 10 writes ``source_kind`` and ``source_ref``; every earlier one wrote one of two
+    id columns, and an archive made last month is still an archive (#130). Both keys are
+    removed from ``entry``, because what remains goes straight to a model that has neither.
+
+    Returns ``None`` where the archive names nothing, or names something this archive did
+    not carry — a render with no source is an ordinary state rather than a gap.
+    """
+    cv = cvs.get(entry.pop("cv_id", None))
+    letter = letters.get(entry.pop("cover_letter_id", None))
+    kind = (entry.pop("source_kind", "") or "").lower()
+    ref = entry.pop("source_ref", None)
+    if kind == "cv":
+        return cvs.get(ref) or cv
+    if kind == "coverletter":
+        return letters.get(ref) or letter
+    return cv or letter
+
+
+def _restore_copies(user, entries: list, document) -> None:
     """Keep the references to copies in external stores, with no connection behind them.
 
     The archive says where a document went; the connection that took it there is a
@@ -75,7 +96,7 @@ def _restore_copies(user, entries: list, **document) -> None:
             external_url=str(entry.get("external_url", ""))[:500],
             sent_at=_dt(entry.get("sent_at")),
             next_attempt_at=None,
-            **document,
+            document=document,
         )
 
 
@@ -596,7 +617,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         else:
             upload.file.save(stored_name.rsplit("/", 1)[-1], ContentFile(content), save=False)
         upload.save()
-        _restore_copies(user, copies, upload=upload)
+        _restore_copies(user, copies, upload)
         uploads[old_id] = upload
         report.uploads += 1
         if replaces_id:
@@ -612,16 +633,14 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         sent_entry.pop("id", None)
         stored_name = sent_entry.pop("file", "")
         application = applications.get(sent_entry.pop("application_id", None))
-        cv = cvs.get(sent_entry.pop("cv_id", None))
-        letter = letters.get(sent_entry.pop("cover_letter_id", None))
+        source = _source_of(sent_entry, cvs, letters)
         rendered_at = _dt(sent_entry.pop("rendered_at", None))
         copies = sent_entry.pop("copies", [])
 
         sent = RenderedDocument(
             owner=user,
             application=application,
-            cv=cv,
-            cover_letter=letter,
+            source=source,
             **sent_entry,
         )
         if rendered_at:
@@ -632,7 +651,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         else:
             sent.file.save(stored_name.rsplit("/", 1)[-1], ContentFile(content), save=False)
         sent.save()
-        _restore_copies(user, copies, rendered=sent)
+        _restore_copies(user, copies, sent)
         report.sent_documents += 1
 
     # ----------------------------------------------------------------- captures

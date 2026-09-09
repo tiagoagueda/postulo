@@ -1208,6 +1208,30 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **A rendered document points at whatever made it, rather than at one of two columns.** The
+  documents app already held two authored kinds, and the plumbing around them named both:
+  `RenderedDocument` had a `cv` and a `cover_letter`, `DocumentCopy` had a `rendered` and an
+  `upload`, and `archiving.py` asked `isinstance` for what the columns could not say. A
+  portfolio, an email or a report would each have been two more nullable columns on two
+  models, a branch at every reader, and a migration.
+
+  `CVItem` decided this the other way one model over, and its docstring is the argument: six
+  nullable foreign keys with a check constraint say the same thing less clearly and need
+  widening every time a kind is added. Both links are generic now, so the next kind of
+  document is a package.
+
+  **The two `on_delete` behaviours are not the same one, and a generic link has neither, so
+  both are written out.** Deleting a CV must *not* delete the PDF an employer received — that
+  is the whole point of the model — so a receiver clears the link, which is the `SET_NULL`
+  the column used to carry. Deleting that PDF *must* delete the rows saying where its copies
+  went, so the cascade lives on a `GenericRelation` at each document. Getting either
+  backwards would lose somebody's record of what they sent, and each direction is a test.
+
+  The archive carries a kind and a local id instead of two columns (format 10), and the
+  importer reads both shapes. Listing documents with where their copies went is still two
+  queries rather than one per row — a generic link has no join to follow, so the batch
+  lookup is what answers for it. (#130)
+
 - **Choosing a language is one control now, and it says how each translation was made.**
   Thirty-nine radio rows sat beside a time zone field that is a single line, and the list
   will only get longer. It is a disclosure: closed it shows the language in use — flag, name

@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import hashlib
 
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import FileExtensionValidator
 from django.db import models
@@ -312,6 +312,14 @@ class UploadedDocument(OwnedModel):
         help_text=_("The earlier version this supersedes. The old file is kept."),
     )
 
+    #: Every copy of this file, and the cascade that used to be `on_delete` on the column:
+    #: deleting the file deletes the rows saying where its copies went (#130).
+    copies = GenericRelation(
+        "documents.DocumentCopy",
+        content_type_field="document_type",
+        object_id_field="document_id",
+    )
+
     class Meta:
         verbose_name = _("uploaded document")
         verbose_name_plural = _("uploaded documents")
@@ -350,34 +358,63 @@ class RenderedDocument(OwnedModel):
         related_name="rendered_documents",
         verbose_name=_("application"),
     )
-    cv = models.ForeignKey(
-        CV,
-        on_delete=models.SET_NULL,
+    #: What produced this PDF: a CV, a cover letter, or whatever kind arrives next.
+    #:
+    #: A generic link, for the reason `CVItem` already gives one model over: two nullable
+    #: foreign keys and an `isinstance` at every reader say the same thing less clearly and
+    #: need widening every time a kind is added. A portfolio, an email, a report -- each was
+    #: two columns and a migration; now each is a package (#130).
+    #:
+    #: **Legitimately empty.** An uploaded document came from a file rather than from
+    #: anything authored here, and a render whose source was deleted has none either. Every
+    #: reader copes with `None`, which is what `source_label` is for.
+    #:
+    #: **Deleting the source must not delete this**, which is why there is no
+    #: `GenericRelation` back from `CV` or `CoverLetter`: one would give a cascade, and the
+    #: whole point of this model is that a PDF an employer received survives somebody
+    #: tidying up their drafts. A receiver in `signals.py` clears the link instead, which is
+    #: the `SET_NULL` these columns used to carry, written out.
+    source_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="renders",
-        verbose_name=_("from CV"),
+        related_name="+",
+        verbose_name=_("kind of source"),
     )
-    cover_letter = models.ForeignKey(
-        CoverLetter,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="renders",
-        verbose_name=_("from cover letter"),
-    )
+    source_id = models.PositiveBigIntegerField(null=True, blank=True)
+    source = GenericForeignKey("source_type", "source_id")
 
     source_text = models.TextField(_("text as sent"), blank=True)
     checksum = models.CharField(_("checksum"), max_length=64, blank=True, editable=False)
     rendered_at = models.DateTimeField(_("rendered on"), default=timezone.now)
 
+    #: Every copy of this render, and the cascade that used to be `on_delete` on the
+    #: column: deleting a render deletes the rows saying where its copies went.
+    copies = GenericRelation(
+        "documents.DocumentCopy",
+        content_type_field="document_type",
+        object_id_field="document_id",
+    )
+
     class Meta:
         verbose_name = _("sent document")
         verbose_name_plural = _("sent documents")
-        ordering = ("-rendered_at",)
+        ordering = ("-rendered_at", "pk")
+        indexes = [models.Index(fields=("source_type", "source_id"))]
 
     def __str__(self) -> str:
         return self.title
+
+    @property
+    def source_label(self) -> str:
+        """What made this, in words, or empty where nothing did or nothing is left.
+
+        A reader asks this rather than `isinstance`, so a kind arriving later is a kind
+        this already describes.
+        """
+        source = self.source
+        return str(source) if source is not None else ""
 
     @staticmethod
     def checksum_for(content: bytes) -> str:
@@ -411,22 +448,17 @@ class DocumentCopy(OwnedModel):
     )
     store = models.CharField(_("store"), max_length=60)
     label = models.CharField(_("label"), max_length=100, blank=True)
-    rendered = models.ForeignKey(
-        RenderedDocument,
+    #: Which document was copied: a render, an upload, or whatever kind arrives next.
+    #: The cascade the two columns carried lives on the `GenericRelation` at each end, so
+    #: deleting a document still deletes the rows saying where its copies went (#130).
+    document_type = models.ForeignKey(
+        ContentType,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="copies",
-        verbose_name=_("sent document"),
+        verbose_name=_("kind of document"),
+        related_name="+",
     )
-    upload = models.ForeignKey(
-        UploadedDocument,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="copies",
-        verbose_name=_("uploaded document"),
-    )
+    document_id = models.PositiveBigIntegerField()
+    document = GenericForeignKey("document_type", "document_id")
 
     status = models.CharField(
         _("status"), max_length=10, choices=CopyStatus, default=CopyStatus.PENDING
@@ -446,31 +478,19 @@ class DocumentCopy(OwnedModel):
         verbose_name_plural = _("document copies")
         ordering = ("pk",)
         constraints = [
-            models.CheckConstraint(
-                condition=(
-                    models.Q(rendered__isnull=False, upload__isnull=True)
-                    | models.Q(rendered__isnull=True, upload__isnull=False)
-                ),
-                name="documents_copy_of_one_document",
-            ),
+            # The check constraint that said "exactly one of these two" is gone with the
+            # two: a generic link is exactly one thing by construction, which is one fewer
+            # rule to widen when a third kind of document arrives (#130).
             models.UniqueConstraint(
-                fields=("connection", "rendered"),
-                condition=models.Q(connection__isnull=False, rendered__isnull=False),
-                name="documents_copy_once_per_render",
-            ),
-            models.UniqueConstraint(
-                fields=("connection", "upload"),
-                condition=models.Q(connection__isnull=False, upload__isnull=False),
-                name="documents_copy_once_per_upload",
+                fields=("connection", "document_type", "document_id"),
+                condition=models.Q(connection__isnull=False),
+                name="documents_copy_once_per_document",
             ),
         ]
+        indexes = [models.Index(fields=("document_type", "document_id"))]
 
     def __str__(self) -> str:
         return f"{self.label or self.store}: {self.get_status_display()}"
-
-    @property
-    def document(self):
-        return self.rendered if self.rendered_id else self.upload
 
     @property
     def is_sent(self) -> bool:

@@ -53,7 +53,7 @@ def fill(user) -> dict[str, Path]:
         owner=user,
         title="Sent CV",
         kind="cv",
-        cv=cv,
+        source=cv,
         application=application,
         file=ContentFile(b"%PDF-1.7 sent", name="sent.pdf"),
         checksum="abc",

@@ -21,7 +21,7 @@ from django.utils.translation import gettext as _
 from postulo.plugins.models import Connection
 from postulo.plugins.secrets import SecretsUnreadable
 
-from .models import CopyStatus, DocumentCopy, DocumentKind, RenderedDocument, UploadedDocument
+from .models import CopyStatus, DocumentCopy, DocumentKind
 from .stores import documents_of, metadata_for, wants_kind
 
 logger = logging.getLogger(__name__)
@@ -35,9 +35,18 @@ BATCH = 50
 
 
 def _lookup(document) -> dict:
-    if isinstance(document, RenderedDocument):
-        return {"rendered": document}
-    return {"upload": document}
+    """How to find the copies of one document, whatever kind it is.
+
+    This used to ask `isinstance` because the columns could not say it. It asks the content
+    type now, so a third kind of document needs no branch here at all — which was the whole
+    point of moving the link (#130).
+    """
+    from django.contrib.contenttypes.models import ContentType
+
+    return {
+        "document_type": ContentType.objects.get_for_model(document),
+        "document_id": document.pk,
+    }
 
 
 def store_connections(user):
@@ -143,7 +152,9 @@ def pending_copies(now=None):
         DocumentCopy.objects.filter(status__in=(CopyStatus.PENDING, CopyStatus.FAILED))
         .filter(attempts__lt=MAX_ATTEMPTS)
         .filter(next_attempt_at__lte=now)
-        .select_related("connection", "rendered", "upload", "owner")
+        # No join to follow: a generic link is two columns. `document` is fetched per row
+        # where a caller needs it, and the batch above is what a list page uses (#130).
+        .select_related("connection", "owner")
         .order_by("next_attempt_at", "pk")
     )
 
@@ -178,23 +189,35 @@ def send_now(document) -> tuple[int, int]:
     return sent, failed
 
 
-def copies_for(documents) -> dict[tuple[str, int], list[DocumentCopy]]:
-    """The copies of many documents at once, keyed by (origin, pk), for a list page."""
-    renders = [d.pk for d in documents if isinstance(d, RenderedDocument)]
-    uploads = [d.pk for d in documents if isinstance(d, UploadedDocument)]
-    found: dict[tuple[str, int], list[DocumentCopy]] = {}
-    queryset = DocumentCopy.objects.filter(rendered_id__in=renders) | DocumentCopy.objects.filter(
-        upload_id__in=uploads
-    )
-    for copy in queryset.select_related("connection").order_by("pk"):
-        key = ("render", copy.rendered_id) if copy.rendered_id else ("upload", copy.upload_id)
-        found.setdefault(key, []).append(copy)
+def copies_for(documents) -> dict[tuple[int, int], list[DocumentCopy]]:
+    """The copies of many documents at once, keyed by (content type, pk), for a list page.
+
+    One query whatever the kinds are. A generic link has no join to `select_related`, which
+    the issue warned about — so this is the prefetch that answers it, and a page listing
+    documents with where their copies went still costs two queries rather than one per row
+    (#130).
+    """
+    from django.contrib.contenttypes.models import ContentType
+    from django.db.models import Q
+
+    wanted = Q()
+    for document in documents:
+        wanted |= Q(
+            document_type=ContentType.objects.get_for_model(document), document_id=document.pk
+        )
+    found: dict[tuple[int, int], list[DocumentCopy]] = {}
+    if not documents:
+        return found
+    for copy in DocumentCopy.objects.filter(wanted).select_related("connection").order_by("pk"):
+        found.setdefault((copy.document_type_id, copy.document_id), []).append(copy)
     return found
 
 
 def attach_copies(documents) -> None:
     """Give each document an ``archive_copies`` list, so a template can show their state."""
+    from django.contrib.contenttypes.models import ContentType
+
     found = copies_for(documents)
     for document in documents:
-        origin = "render" if isinstance(document, RenderedDocument) else "upload"
-        document.archive_copies = found.get((origin, document.pk), [])
+        key = (ContentType.objects.get_for_model(document).pk, document.pk)
+        document.archive_copies = found.get(key, [])

@@ -29,6 +29,7 @@ from postulo.documents.models import (
     CopyStatus,
     DocumentCopy,
     DocumentKind,
+    RenderedDocument,
     UploadedDocument,
 )
 from postulo.documents.rendering import snapshot_cv
@@ -40,6 +41,20 @@ from postulo.plugins.localstore import LocalStore
 from postulo.plugins.models import Connection
 
 pytestmark = pytest.mark.django_db
+
+
+def copies_of(document):
+    """Every copy of one document, whatever kind it is.
+
+    A copy points at its document with a generic link since #130, so this asks the content
+    type rather than one of two columns — which is the change that means a third kind of
+    document needs no new column and no new branch.
+    """
+    from django.contrib.contenttypes.models import ContentType
+
+    return DocumentCopy.objects.filter(
+        document_type=ContentType.objects.get_for_model(document), document_id=document.pk
+    )
 
 
 class ShelfStore:
@@ -188,14 +203,14 @@ def test_a_new_document_is_queued_for_every_store_that_wants_its_kind(user):
     a_store(user, "Off", enabled=False)
 
     upload = an_upload(user)
-    copies = list(DocumentCopy.objects.filter(upload=upload))
+    copies = list(copies_of(upload))
     assert [copy.connection_id for copy in copies] == [wants_all.pk]
     assert copies[0].status == CopyStatus.PENDING and copies[0].label == "All"
     assert copies[0].owner == user and copies[0].store == "shelf"
     assert ShelfStore.received == [], "nothing is sent inside the request"
 
     render = a_render(user)
-    assert DocumentCopy.objects.filter(rendered=render).count() == 2, "both stores take a CV"
+    assert copies_of(render).count() == 2, "both stores take a CV"
 
     # Scheduling again changes nothing.
     assert schedule_copies(upload) == [] and schedule_copies(render) == []
@@ -416,11 +431,11 @@ def test_references_travel_in_the_export_and_survive_an_import(user, other_user)
     assert report.uploads == 2 and report.sent_documents == 1
     restored = DocumentCopy.objects.filter(owner=other_user, status=CopyStatus.SENT)
     assert restored.count() == 2
-    copy = restored.get(upload__title="Diploma")
+    # Found through the generic link rather than a column, and its `document` is whatever
+    # kind it points at — which is what stops a third kind needing a third branch (#130).
+    copy = next(one for one in restored if getattr(one.document, "title", "") == "Diploma")
     assert copy.connection is None and copy.store == "shelf" and copy.label == "My shelf"
     assert copy.external_url == "https://shelf.example/1" and copy.sent_at is not None
     assert copy.next_attempt_at is None, "nothing to retry: it is a record, not a job"
-    assert (
-        upload.pk != copy.upload_id
-        and render.pk != restored.get(rendered__isnull=False).rendered_id
-    )
+    restored_render = next(one for one in restored if isinstance(one.document, RenderedDocument))
+    assert upload.pk != copy.document_id and render.pk != restored_render.document_id
