@@ -17,6 +17,8 @@ Nothing here has a `verified_at`, and no address is ever a way back into an acco
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 from django import forms
 from django.contrib.contenttypes.forms import (
     BaseGenericInlineFormSet,
@@ -93,6 +95,49 @@ def location_line(holder) -> str:
     return ", ".join(part for part in parts if part)
 
 
+# ------------------------------------------------------ what a country expects (#147)
+
+
+def rules_apply(person) -> bool:
+    """Whether the per-country rules act for this person.
+
+    Postulo asks the policy; the plugin says what there is to ask about. Off means every
+    address is free-form with neutral labels — which is the same code path a country with no
+    row already takes, rather than a second one nobody has seen.
+    """
+    from postulo.plugins.policy import decide
+    from postulo.plugins.postal_rules import POSTAL_RULES
+
+    return bool(decide(POSTAL_RULES, person).on)
+
+
+def label_for(part: str, country: str, *, person=None):
+    """What to call one part of an address, in the reader's language."""
+    from postulo.plugins import postal_rules
+
+    if person is not None and not rules_apply(person):
+        country = ""
+    return postal_rules.label_for(part, country)
+
+
+def warnings_for(address, *, person=None) -> list:
+    """What looks unusual about an address for its country. Never enough to refuse a save."""
+    from postulo.plugins import postal_rules
+
+    if person is not None and not rules_apply(person):
+        return []
+    return postal_rules.warnings_for(address)
+
+
+def render(address, *, person=None) -> list[str]:
+    """The address as lines, in the order its country writes them."""
+    from postulo.plugins import postal_rules
+
+    if person is not None and not rules_apply(person):
+        return [part for part in address.one_line(chr(10)).split(chr(10)) if part]
+    return postal_rules.render(address)
+
+
 # --------------------------------------------------------------- the rows on a page
 
 
@@ -136,6 +181,27 @@ class PostalAddressForm(forms.ModelForm):
         if data.get("kind") == PostalAddress.Kind.OTHER and not (data.get("label") or "").strip():
             self.add_error("label", _("Say what this address is."))
         return data
+
+    #: What this row's own country would usually expect. Filled by `_post_clean`.
+    country_notes: ClassVar[list] = []
+
+    def _post_clean(self):
+        """Notes rather than errors, and after the instance carries what was typed.
+
+        Deliberately not `add_error`: an address that fits no rule is still where somebody
+        lives, and refusing it would be the application telling them who it was written for.
+        `clean()` is too early — a ModelForm copies the cleaned data onto the instance here,
+        so asking before this point asks about the row as it was loaded (#147).
+        """
+        super()._post_clean()
+        self.country_notes = warnings_for(self.instance) if self.instance else []
+
+    def labels_for_country(self) -> dict:
+        """What to call each part, for the country currently chosen on this row."""
+        country = (self.data.get(self.add_prefix("country")) if self.is_bound else None) or (
+            self.initial.get("country") or getattr(self.instance, "country", "")
+        )
+        return {part: label_for(part, country) for part in ("postcode", "municipality", "region")}
 
 
 class BasePostalAddressFormSet(BaseGenericInlineFormSet):

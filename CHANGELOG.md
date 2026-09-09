@@ -227,6 +227,35 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **An address is now checked — and named — by the rules of its own country.** Which parts
+  are usually needed, what a postcode there looks like, what each field is *called*, and what
+  order the whole thing prints in.
+
+  **Naming the fields turned out to be the harder half, and it is not a translation problem.**
+  Somebody reading Postulo in Portuguese who enters a United States address should see
+  *Estado*; entering a Portuguese one, *Distrito*; a Japanese one, *Prefeitura*. The label
+  depends on the **address's** country and the language depends on the **reader**, and both
+  vary at once — nothing else here has that shape, because every other string is chosen by
+  the reader's language alone. So the table names a key and the catalogue supplies the word.
+
+  **Nothing refuses.** Every rule is a note. BFPO addresses, rural routes, informal
+  settlements, temporary accommodation, and a table that is simply wrong about somewhere: an
+  address that fits no rule is saved exactly as typed, because an application that will not
+  accept your address is telling you something about who it was written for. Ireland expects
+  no Eircode, because Eircode arrived in 2015 and plenty of addresses predate it.
+
+  **The rules are a curated table, and what was ruled out is written down.** Google's
+  `libaddressinput` is the set everybody reaches for, and a project that exists as an
+  alternative to services answering to somebody else's jurisdiction does not put that
+  jurisdiction in its address form — recorded in the module so nobody proposes it again. What
+  is left is the shape this codebase already uses for the country list, the language names and
+  the plural rules: rows decided rather than derived, with the reasoning per entry, no
+  third-party licence and no update pipeline. It records when it was last reviewed.
+
+  A country with no row gets no rules — free-form entry, neutral labels, and the parts printed
+  in the order they were entered — which is also exactly what switching the feature off does.
+  Off is the same code path rather than a second one nobody has seen. (#147)
+
 - **Postal addresses have somewhere to go.** Several per account, exactly one primary, on a
   person and on a contact — with the invariant in a database constraint rather than in
   whichever form saved last. `Profile.location` keeps working and keeps its meaning; this is

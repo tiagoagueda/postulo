@@ -75,8 +75,16 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "which is why Postulo defines it and every importer fills the same one"
         ),
     },
+    "postal_rules": {
+        "postulo.core": (
+            "`phones.country_name`: the country table, which was built for dialling codes "
+            "and is the same table an address needs. Two of them would be two things to "
+            "keep current (#147)"
+        ),
+    },
     "builtin": {},
     "phone_numbers": {},
+    "email_addresses": {},
 }
 
 

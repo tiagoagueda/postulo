@@ -11,11 +11,14 @@ class CoreConfig(AppConfig):
     def ready(self) -> None:
         from postulo.plugins import registry
         from postulo.plugins.phone_numbers import PhoneNumbersFeature
+        from postulo.plugins.postal_rules import PostalRulesFeature
 
         # Registers the dashboard widgets core owns.
         from . import widgets_builtin  # noqa: F401
 
         registry.register_builtin("feature", PhoneNumbersFeature)
+        # What a country expects of an address, and what it calls each part (#147).
+        registry.register_builtin("feature", PostalRulesFeature)
 
         # The contact channels Postulo already has, described by one contract (#146).
         from . import channels

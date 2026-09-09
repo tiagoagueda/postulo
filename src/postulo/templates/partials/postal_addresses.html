@@ -5,9 +5,9 @@
    outside the formset's prefixes, so the browser enforces "exactly one" before anything is
    posted — the same argument the telephone numbers make, for the same invariant.
 
-   The field labels here are the neutral ones. What a region is *called* depends on the
-   address's country and not on the reader's language — State, Distrito, Prefecture — and
-   saying that properly is #147.
+   Each part is called what its own country calls it, in the language the reader is using:
+   the label follows the country chosen on the row and the words follow the catalogue, and
+   both vary at once (#147). A country Postulo has no rules for gets the neutral words.
 {% endcomment %}
 <fieldset class="card mb-6" data-postal-addresses>
   <legend class="field-label px-1">{% translate "Postal addresses" %}</legend>
@@ -29,19 +29,24 @@
           <label class="field-label" for="{{ row.street.id_for_label }}">{% translate "Address" %}</label>
           {{ row.street|add_class:"field-input" }}
         </div>
+        {% comment %} Each part is called what its own country calls it — State, Distrito,
+           Prefecture — in the language the reader is using. The label follows the country
+           on the row, not the interface language, and both vary at once (#147).
+        {% endcomment %}
+        {% with names=row.labels_for_country %}
         <div class="mb-3 grid gap-3 sm:grid-cols-[minmax(0,9rem)_minmax(0,1fr)]">
           <div>
-            <label class="field-label" for="{{ row.postcode.id_for_label }}">{% translate "Postcode" %}</label>
+            <label class="field-label" for="{{ row.postcode.id_for_label }}">{{ names.postcode }}</label>
             {{ row.postcode|add_class:"field-input" }}
           </div>
           <div>
-            <label class="field-label" for="{{ row.municipality.id_for_label }}">{% translate "Town or city" %}</label>
+            <label class="field-label" for="{{ row.municipality.id_for_label }}">{{ names.municipality }}</label>
             {{ row.municipality|add_class:"field-input" }}
           </div>
         </div>
         <div class="mb-3 grid gap-3 sm:grid-cols-2">
           <div>
-            <label class="field-label" for="{{ row.region.id_for_label }}">{% translate "Region" %}</label>
+            <label class="field-label" for="{{ row.region.id_for_label }}">{{ names.region }}</label>
             {{ row.region|add_class:"field-input" }}
           </div>
           <div>
@@ -74,10 +79,17 @@
             {% endif %}
           </div>
         </div>
+        {% endwith %}
         {% for field in row.visible_fields %}
           {% include "partials/field_feedback.html" with field=field %}
         {% endfor %}
         {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        {% comment %} Notes, never errors. An address that fits no rule is still where
+           somebody lives, and the table is likelier to be wrong than they are (#147).
+        {% endcomment %}
+        {% for note in row.country_notes %}
+          <p class="mt-1 text-xs text-amber-700 dark:text-amber-300" data-country-note>{{ note }}</p>
+        {% endfor %}
       </li>
     {% endfor %}
   </ol>
