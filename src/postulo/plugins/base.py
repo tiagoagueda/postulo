@@ -408,6 +408,7 @@ class FeaturePlugin(Protocol):
 #: entry-point group each registers under. Sources are stateless and live apart.
 CONNECTED_KINDS = {
     "notifier": "postulo.notifiers",
+    "outbox": "postulo.outboxes",
     "store": "postulo.stores",
     "sync": "postulo.syncs",
 }
@@ -701,6 +702,35 @@ class SyncReport:
 
 
 @runtime_checkable
+class OutboxPlugin(ConnectedPlugin, Protocol):
+    """A connected plugin that sends mail **as the person**, from their own address.
+
+    The second half of #149, and a kind of its own because it is neither of the two that
+    already exist. A ``transport`` belongs to nobody: it is the instance's way of getting a
+    message out, ungoverned on purpose, because *forced off* for one is an account nobody
+    can recover. A ``notifier`` tells the person something. An outbox does neither -- it
+    carries their correspondence to somebody else, over their own server, under their own
+    name.
+
+    That distinction is not a taxonomy exercise. It is what keeps the invariant #104 and
+    #143 both rest on: **a person's own mail is never a way back into their account.**
+    ``recovery_routes()`` reads transports, and an outbox is not one, so a person switching
+    their own outbox off cannot lock themselves out -- by construction rather than by
+    anybody remembering.
+
+    ``send`` is given the message and the connection's configuration and secrets together.
+    It returns how many messages went. It raises when the server would not take it, and the
+    exception reaches the person: a bounce from their own domain is theirs to read, not the
+    instance's to swallow.
+
+    **The sender is not Postulo's to rewrite.** A message sent as somebody must leave with
+    their address on it -- their domain, their SPF record, their reputation, and their
+    bounces coming back to them. Rewriting a sender is what makes mail look forged.
+    """
+
+    def send(self, message, config: dict) -> int: ...
+
+
 class SyncPlugin(ConnectedPlugin, Protocol):
     """A connected plugin that keeps records here and records elsewhere the same.
 

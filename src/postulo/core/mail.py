@@ -11,6 +11,8 @@ from __future__ import annotations
 import smtplib
 import ssl
 
+from django.core.mail.backends.smtp import EmailBackend
+from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
 #: Split out only because it does not fit on a line inside the branch that raises it.
@@ -19,6 +21,29 @@ NO_STARTTLS = _("The server does not offer STARTTLS. Turn it off, or use a port 
 #: The port each kind of connection is conventionally offered on. Used only to explain a
 #: failure -- never to refuse one, because a relay on a port of its own is ordinary.
 CONVENTIONAL_PORTS = {"none": (25,), "starttls": (587, 25), "ssl": (465,)}
+
+
+class MailSecurity(TextChoices):
+    """How TLS gets onto an SMTP session. Two ways, and they are not interchangeable.
+
+    STARTTLS connects in the clear and asks the server to upgrade the socket; implicit TLS
+    hands over a certificate before a byte of SMTP is spoken. Point one at the other's port
+    and nothing happens until the timeout, because each is waiting for the other to speak.
+    """
+
+    NONE = "none", _("None")
+    STARTTLS = "starttls", _("STARTTLS, after connecting")
+    SSL = "ssl", _("TLS from the first byte")
+
+
+#: The port each kind of connection is normally offered on. A suggestion, filled in when
+#: nobody typed one -- never a correction of a port somebody did type, because a relay on a
+#: port of its own is an ordinary thing for a self-hosted instance to have.
+DEFAULT_MAIL_PORTS = {
+    MailSecurity.NONE: 25,
+    MailSecurity.STARTTLS: 587,
+    MailSecurity.SSL: 465,
+}
 
 
 class ConnectionFailed(Exception):
@@ -164,3 +189,46 @@ def _describe(error) -> str:
     if isinstance(detail, bytes):
         detail = detail.decode("utf-8", "replace")
     return detail or str(error)
+
+
+# --------------------------------------------------- dialling only where allowed
+
+
+class GuardedBackend(EmailBackend):
+    """Django's SMTP backend, dialling only where it is allowed to dial.
+
+    Here rather than in either plugin that uses it, because it is the same guard for both:
+    the instance sending as itself and a person sending as themselves are two callers of one
+    rule, and a rule with two implementations is a rule with one of them out of date (#149).
+
+    Django resolves the host inside `open()` and hands it straight to `smtplib`. That is the
+    right thing for a backend whose host is a settings constant and the wrong thing for one
+    whose host somebody typed, which is what the Email page makes it and what #149 makes it
+    for everybody. So the address is approved first and the connection is pinned to it, with
+    the name kept for the certificate (#148).
+    """
+
+    def open(self):
+        import functools
+
+        from postulo.core import destinations, mail
+
+        if self.connection:
+            return False
+        typed = self.host
+        approved = destinations.approve(typed, allow_private=mail.host_policy())
+        pinned = destinations.PinnedSMTP_SSL if self.use_ssl else destinations.PinnedSMTP
+        self.host = str(approved)
+        self._pinned_class = functools.partial(pinned, certificate_name=typed)
+        try:
+            return super().open()
+        finally:
+            # Put the name back, so anything reading the backend afterwards -- a log line,
+            # a summary on a page -- says the server somebody configured rather than a
+            # number nobody typed.
+            self.host = typed
+            self._pinned_class = None
+
+    @property
+    def connection_class(self):
+        return getattr(self, "_pinned_class", None) or super().connection_class

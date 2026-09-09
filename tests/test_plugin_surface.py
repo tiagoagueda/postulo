@@ -45,10 +45,18 @@ REACHING_PAST: dict[str, dict[str, str]] = {
         "postulo.core": "`site`: the instance's name and from-address, for the message it sends",
         "postulo.notifications.base": "`Notification`, which is what a notifier is handed",
     },
+    "own_mail": {
+        "postulo.core": "`mail`: the encryption choices, which are how TLS gets onto a session",
+        "postulo.core.mail": (
+            "the connection check, and the backend that dials only where it is allowed to "
+            "(#148). One guard for the instance's mail and the person's, rather than two "
+            "that can drift (#149)"
+        ),
+    },
     "smtp": {
-        "postulo.core": (
-            "`mail` to open an SMTP connection and prove it, and `destinations` for where the "
-            "server is allowed to dial (#148)"
+        "postulo.core": "`mail` to open an SMTP connection and prove it",
+        "postulo.core.mail": (
+            "the guarded backend, which is where the server is allowed to dial (#148)"
         ),
     },
     "localstore": {

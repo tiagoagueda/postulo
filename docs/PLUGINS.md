@@ -317,6 +317,41 @@ deliver: if `send()` is called, the person wanted it. The built-in
 one built outside the core, with `validate`, `summary`, a secret that is a list, and the
 destination policy applied to the servers its URLs name.
 
+### Outboxes
+
+An outbox sends mail **as the person**, from their own address, over their own server. It is
+a kind of its own rather than a second transport, and the reason is worth knowing before you
+write one:
+
+| | `transport` | `outbox` |
+| --- | --- | --- |
+| Belongs to | the instance | the person |
+| Sends as | the instance | the person |
+| Configured | *Server settings → Email* | *Settings → Connections* |
+| Switched off | never, while it is the way back in | by the person, or by an administrator |
+| Can carry a password reset | yes | **never** |
+
+That last row is the point. Getting back into an account reads transports, so nothing that
+is not a transport can become a way in — which is what makes "the person may switch this
+off" safe to offer at all.
+
+```python
+class MyOutbox:
+    ...
+    kind = "outbox"
+
+    def send(self, message, config) -> int:
+        """Send one Django EmailMessage. Return how many went. Raise if it would not go."""
+```
+
+**The sender is not yours to rewrite.** Postulo fills in the address the connection declares
+when the message has none, and refuses a message that claims a different one — it does not
+quietly replace it, because a message whose `From` was replaced is a message that looks
+forged. A bounce belongs to the person, not to the instance, and it can only reach them if
+their address is the one on the message.
+
+**Raise rather than swallow.** A rejection from somebody's own mail server is theirs to read.
+
 ### Stores
 
 A store keeps a *copy* of a document somewhere else — an archive such as Paperless, a

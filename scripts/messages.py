@@ -57,6 +57,11 @@ CALLS: dict[str, tuple[int, int | None, int | None]] = {
     "pgettext_lazy": (1, None, 0),
     "npgettext": (1, 2, 0),
     "npgettext_lazy": (1, 2, 0),
+    # Aliases. `messages.py` reads the source rather than importing it, so it knows a call
+    # by the name at the call site and by nothing else -- and three plugins import
+    # `gettext_lazy as _lazy`, which meant their descriptions were never extracted and
+    # never translatable, silently, for as long as they have existed (found in #149).
+    "_lazy": (0, None, None),
 }
 
 SKIP_DIRS = {"migrations", "static", "locale", "__pycache__"}

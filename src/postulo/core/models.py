@@ -19,6 +19,10 @@ from django.utils.translation import gettext_lazy as _
 
 from . import phones
 
+# MailSecurity is not a model -- it is how TLS gets onto an SMTP session, and it lives
+# beside the code that opens one (#149). Imported here because a field's choices need it.
+from .mail import MailSecurity
+
 
 class TimeStampedModel(models.Model):
     """Records when a row was created and last changed."""
@@ -315,29 +319,6 @@ class PhoneNumber(OwnedModel):
         self.verified_at = None
         self.is_recovery = False
         self.save(update_fields=["verified_at", "is_recovery", "updated_at"])
-
-
-class MailSecurity(models.TextChoices):
-    """How TLS gets onto an SMTP session. Two ways, and they are not interchangeable.
-
-    STARTTLS connects in the clear and asks the server to upgrade the socket; implicit TLS
-    hands over a certificate before a byte of SMTP is spoken. Point one at the other's port
-    and nothing happens until the timeout, because each is waiting for the other to speak.
-    """
-
-    NONE = "none", _("None")
-    STARTTLS = "starttls", _("STARTTLS, after connecting")
-    SSL = "ssl", _("TLS from the first byte")
-
-
-#: The port each kind of connection is normally offered on. A suggestion, filled in when
-#: nobody typed one -- never a correction of a port somebody did type, because a relay on a
-#: port of its own is an ordinary thing for a self-hosted instance to have.
-DEFAULT_MAIL_PORTS = {
-    MailSecurity.NONE: 25,
-    MailSecurity.STARTTLS: 587,
-    MailSecurity.SSL: 465,
-}
 
 
 class SiteSettings(models.Model):

@@ -236,7 +236,7 @@ class EmailForm(forms.ModelForm):
     TRANSPORT_PREFIX = "transport__"
 
     def __init__(self, *args, **kwargs):
-        from postulo.core.models import MailSecurity
+        from postulo.core.mail import MailSecurity
 
         super().__init__(*args, **kwargs)
         if "email_security" in self.fields:
@@ -285,7 +285,7 @@ class EmailForm(forms.ModelForm):
         on a port of its own is an ordinary thing for a self-hosted instance to have, and
         the surest way to make a setting page hated is to argue with what was typed into it.
         """
-        from postulo.core.models import DEFAULT_MAIL_PORTS
+        from postulo.core.mail import DEFAULT_MAIL_PORTS
 
         if "email_port" not in cleaned or "email_security" not in cleaned:
             return

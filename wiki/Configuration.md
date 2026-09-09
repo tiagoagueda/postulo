@@ -186,7 +186,20 @@ to go looking at the rest of your network. See
 ## Connections
 
 Plugins that talk to another service on a person's behalf — notifiers, document stores,
-synchronisation — keep their configuration under *Settings → Connections*.
+synchronisation, and sending as yourself — keep their configuration under *Settings →
+Connections*.
+
+**Mail has two halves and they are not the same thing.** What the instance sends —
+notifications, sign-in codes, the way back into an account — goes through the server's own
+settings on the *Email* page, and cannot be switched off while it is the last way anybody
+could get back in. What *you* send as yourself goes through **Your own email**: your server,
+your address, replies and bounces coming back to you. That half is yours to switch on and
+off, and an administrator may switch it off for an account — which means "you cannot send
+from your own address here", never "you cannot be notified".
+
+Sending as yourself needs your own server because there is no other honest way to do it:
+putting your address on a message that left this instance's server is spoofing, and a
+receiving server will bounce it or bin it.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
@@ -378,6 +391,7 @@ They bound what somebody who *has* one can make the server do.
 | Variable | Default | What it bounds |
 | --- | --- | --- |
 | `POSTULO_CAPTURE_RATE` | `30/h` | Captures, per account. The tightest of the three, because capture is the only thing that makes your server issue an outbound request to an address somebody else chose. |
+| `POSTULO_OUTBOX_RATE` | `60/h` | Messages one account may send **as itself**, through its own mail server. Low on purpose: this is the one thing here that reaches strangers rather than the person who made the mistake, and a job search is a few messages a day. |
 | `POSTULO_API_RATE` | `600/h` | API calls, **per token** rather than per account — so a token handed to something that misbehaves can be revoked without touching your own allowance. |
 | `POSTULO_ENDPOINT_RATE` | `120/h` | `/logs` and `/metrics`, per calling address. A shared token guards those, so there is no account to count against. |
 

@@ -369,6 +369,10 @@ ACCOUNT_RATE_LIMITS = {"admin_login": "10/m/ip,5/300s/key"}
 POSTULO_CAPTURE_RATE = env("POSTULO_CAPTURE_RATE", default="30/h")
 # Per token rather than per account, so revoking one revokes its allowance with it.
 POSTULO_API_RATE = env("POSTULO_API_RATE", default="600/h")
+# Mail somebody sends as themselves (#149). Per account, and low: this is the one surface
+# where a mistake reaches strangers rather than the person who made it, and a job search is
+# a few messages a day rather than a mailing list.
+POSTULO_OUTBOX_RATE = env("POSTULO_OUTBOX_RATE", default="60/h")
 # /logs and /metrics, which a shared token guards rather than an account, so this is keyed
 # on the caller's address. A collector polls on a schedule; this bounds one that does not.
 POSTULO_ENDPOINT_RATE = env("POSTULO_ENDPOINT_RATE", default="120/h")

@@ -227,6 +227,30 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Mail has two halves now: the instance's and yours.** The instance's was already there —
+  the SMTP transport, ungoverned on purpose, configured under *Server settings → Email*, and
+  refusing to be switched off while it is the last way anybody could get back in. The other
+  half is *Sending as yourself*: your own server, your own address, switchable by you or by
+  an administrator, under *Settings → Connections*.
+
+  **It is a new kind of plugin rather than a second transport, and that is the whole point.**
+  Getting back into an account reads transports. An outbox is not one, so a person switching
+  their own mail off cannot thereby remove their own way back in — the failure that made
+  transports ungoverned in the first place, arriving through a door nobody had locked. By
+  construction rather than by anybody remembering, and asserted.
+
+  **Sending as somebody is the half that needs settings of its own.** Putting your address on
+  a message that leaves the instance's server is spoofing: SPF says that server is not
+  authorised for your domain and a receiving server bounces it or bins it. So it goes over
+  your server with your address on it — your domain, your reputation, and replies and bounces
+  coming back to you, which is right. Postulo never rewrites the sender: a message whose
+  `From` was quietly replaced is a message that looks forged, so a mismatch is refused
+  instead. The same destination guard as the instance's own mail, and a per-account limit,
+  because this is the one surface where a mistake reaches strangers.
+
+  Switching it off means *you cannot send from your own address here* — not that you cannot
+  be notified. Everything the instance sends on its own account is untouched. (#149)
+
 - **Server settings → Plugins now lists what the instance can actually do, and says where
   each part of it came from.** It used to list what an administrator had installed — so the
   two built-in capture sources, which are classes in the image and never pass through the
@@ -1261,6 +1285,15 @@ All notable changes to Postulo are recorded here. The format follows
   complete, documented and one button, not the number of links pointing at it. (#86)
 
 ### 🐛 Fixed
+
+- **Three plugin descriptions were never translatable, and nobody could have noticed.**
+  `scripts/messages.py` reads the source rather than importing it, so it knows a translation
+  call by the name at the call site — and three plugins import `gettext_lazy as _lazy`, a
+  name it had never been told about. Their descriptions were therefore never extracted, so
+  the catalogues were complete and the strings were simply not in them: the one shape of
+  translation bug that a completeness check cannot see. The extractor knows the alias now, a
+  test fails on the next one somebody invents, and the strings are translated into all
+  thirty-nine European languages. (#149)
 
 - **The browser suite no longer fails whichever test happens to run after the fortieth
   sign-in.** Every one of them signs in, all from one address, and the limit that stops a

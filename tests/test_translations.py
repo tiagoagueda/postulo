@@ -458,3 +458,33 @@ def test_a_right_to_left_language_flips_the_page(client, user, settings):
     client.force_login(user)
     body = client.get(reverse("applications:list")).content.decode()
     assert 'lang="ar"' in body and 'dir="rtl"' in body
+
+
+def test_the_extractor_knows_every_name_a_translation_function_is_called_by(tool):
+    """`messages.py` reads the source rather than importing it, so it knows a call by the
+    name at the call site and by nothing else.
+
+    Three plugins imported `gettext_lazy as _lazy`, and their descriptions were therefore
+    never extracted and never translatable — silently, for as long as they had existed. The
+    catalogues were complete and the strings were not in them, which is the one shape of
+    translation bug nothing else here can see (found in #149).
+    """
+    import re
+
+    aliases = set()
+    for path in tool.sources():
+        if path.suffix != ".py":
+            continue
+        text = path.read_text(encoding="utf-8")
+        for original, alias in re.findall(
+            r"from django\.utils\.translation import (\w+) as (\w+)", text
+        ):
+            if original in tool.CALLS:
+                aliases.add(alias)
+
+    unknown = sorted(alias for alias in aliases if alias not in tool.CALLS)
+
+    assert not unknown, (
+        f"{unknown} name a translation function that scripts/messages.py does not know, so "
+        f"every string passed to them is silently untranslatable. Add each to CALLS."
+    )

@@ -136,8 +136,14 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_seven_of_them_across_six_kinds():
-    """A count, so that losing one to a bad import is a failure rather than a quiet absence."""
+def test_there_are_eight_of_them_across_seven_kinds():
+    """Named rather than counted, so that losing one to a bad import is a failure rather
+    than a quiet absence — and so that adding one is a line somebody wrote.
+
+    `own-mail` is the newest and the only one of its kind: mail a person sends **as
+    themselves**, which is neither the instance's transport nor a notifier telling them
+    something (#149).
+    """
     found = {
         manifest_of(plugin_class()).name
         for classes in registry.builtins().values()
@@ -151,6 +157,7 @@ def test_there_are_seven_of_them_across_six_kinds():
         "local",
         "europass",
         "smtp",
+        "own-mail",
         "phone-numbers",
     }
 

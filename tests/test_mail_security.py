@@ -31,7 +31,8 @@ import pytest
 from django.urls import reverse
 
 from postulo.core import destinations, mail, site
-from postulo.core.models import DEFAULT_MAIL_PORTS, MailSecurity, SiteSettings
+from postulo.core.mail import DEFAULT_MAIL_PORTS, MailSecurity
+from postulo.core.models import SiteSettings
 from postulo.core.server_forms import EmailForm
 
 pytestmark = pytest.mark.django_db

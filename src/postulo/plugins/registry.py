@@ -54,6 +54,10 @@ ENTRY_POINT_GROUP = "postulo.sources"
 #: need nothing from anybody; the connected kinds each need a `Connection`; a transport is
 #: instance plumbing and belongs to nobody in particular; a feature is a part of Postulo
 #: itself rather than anything outside it.
+#:
+#: An **outbox** is a connected kind and deliberately not a transport: it sends as the
+#: person rather than as the instance, so it is theirs to switch off -- which a transport
+#: could never be, because that is an account nobody can recover (#149).
 GROUPS = {
     "source": ENTRY_POINT_GROUP,
     "importer": IMPORTER_GROUP,

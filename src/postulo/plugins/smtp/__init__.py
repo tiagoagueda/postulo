@@ -15,47 +15,11 @@ verification email before there is a database row to read.
 
 from __future__ import annotations
 
-from django.core.mail.backends.smtp import EmailBackend
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
 
+from postulo.core.mail import GuardedBackend
 from postulo.plugins.api import FieldSpec, TestResult, declares, shipped
-
-
-class GuardedBackend(EmailBackend):
-    """Django's SMTP backend, dialling only where this instance is allowed to dial.
-
-    Django resolves the host inside `open()` and hands it straight to `smtplib`. That is the
-    right thing for a backend whose host is a settings constant and the wrong thing for one
-    whose host somebody typed, which is what the Email page makes it and what #149 makes it
-    for everybody. So the address is approved first and the connection is pinned to it, with
-    the name kept for the certificate (#148).
-    """
-
-    def open(self):
-        import functools
-
-        from postulo.core import destinations, mail
-
-        if self.connection:
-            return False
-        typed = self.host
-        approved = destinations.approve(typed, allow_private=mail.host_policy())
-        pinned = destinations.PinnedSMTP_SSL if self.use_ssl else destinations.PinnedSMTP
-        self.host = str(approved)
-        self._pinned_class = functools.partial(pinned, certificate_name=typed)
-        try:
-            return super().open()
-        finally:
-            # Put the name back, so anything reading the backend afterwards -- a log line,
-            # a summary on a page -- says the server somebody configured rather than a
-            # number nobody typed.
-            self.host = typed
-            self._pinned_class = None
-
-    @property
-    def connection_class(self):
-        return getattr(self, "_pinned_class", None) or super().connection_class
 
 
 @declares(

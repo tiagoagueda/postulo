@@ -536,7 +536,7 @@ def _admin_url() -> str:
 
 
 def _security_label(value: str) -> str:
-    from .models import MailSecurity
+    from .mail import MailSecurity
 
     try:
         return str(MailSecurity(value).label)

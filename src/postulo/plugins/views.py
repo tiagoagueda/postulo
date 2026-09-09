@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 
 KIND_LABELS = {
     "notifier": _("Notifications"),
+    "outbox": _("Sending as yourself"),
     "store": _("Document stores"),
     "sync": _("Synchronisation"),
 }
