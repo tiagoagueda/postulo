@@ -85,7 +85,10 @@ def test_no_page_references_an_element_that_is_not_there(live_server, page: Page
 
     failures: dict[str, str] = {}
     for path in signed_in_paths(
-        furnished["application"], furnished["company"], furnished["applicant"]
+        furnished["application"],
+        furnished["company"],
+        furnished["applicant"],
+        furnished["experience"],
     ):
         page.goto(f"{base}{path}")
         if "reauthenticate" in page.url:

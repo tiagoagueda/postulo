@@ -296,4 +296,4 @@ def test_the_format_version_moved(user):
     """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 10
+    assert export.FORMAT_VERSION == 11

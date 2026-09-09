@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import phone_field, phone_numbers, phones
+from postulo.core import languages, phone_field, phone_numbers, phones
 
 from . import avatars, identifiers
 from .models import Invite, PersonIdentifier, Profile
@@ -275,10 +275,28 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ("headline", "location", "website", "linkedin_url", "source_repo_url")
+        fields = (
+            "headline",
+            "location",
+            "record_language",
+            "website",
+            "linkedin_url",
+            "source_repo_url",
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # The same menu the interface language uses, so an option is written in the language
+        # it names. Blank is a real answer here rather than an omission: most people have
+        # one career in one language and never think about this again (#131).
+        self.fields["record_language"].widget = LanguageSelect(
+            choices=[("", _("The language you read Postulo in")), *languages.LANGUAGES]
+        )
+        self.fields["record_language"].required = False
+        self.fields["record_language"].help_text = _(
+            "Which language your experience, education and projects are typed in. A CV in "
+            "another language shows what you have translated, and says what it could not."
+        )
         # One box while *Several telephone numbers* is switched off, and none at all
         # while it is on: the rows are a formset of their own, and two controls writing
         # the same primary row would be two answers to one question.

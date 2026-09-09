@@ -73,6 +73,7 @@ from postulo.resume.models import (
     Project,
     Skill,
     SkillGroup,
+    Translation,
 )
 
 # --------------------------------------------------------------------- material
@@ -744,6 +745,25 @@ class Command(BaseCommand):
                     ),
                 )
             cvs.append(cv)
+
+        # One entry in two languages, so the demo shows what a French CV actually prints
+        # rather than leaving the feature to be imagined (#131). The employer keeps its own
+        # name; only the title, the place and the person's own words are translated.
+        Translation.objects.bulk_create(
+            Translation(
+                owner=user,
+                content_type=ContentType.objects.get_for_model(Experience),
+                object_id=experiences[0].pk,
+                language="fr-fr",
+                field=field,
+                text=text,
+            )
+            for field, text in {
+                "role": "Ingénieur back-end principal",
+                "location": "Lisbonne",
+                "summary": "J'ai maintenu en service ce dont les autres équipes dépendaient.",
+            }.items()
+        )
 
         letters = [
             CoverLetter.objects.create(

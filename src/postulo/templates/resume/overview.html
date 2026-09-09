@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Your career" %}{% endblock %}
 
@@ -89,6 +89,15 @@
                         {% endblocktranslate %}
                       </p>
                     {% endif %}
+                    {% with spoken=languages_by_entry|get_item:item %}
+                      {% if spoken %}
+                        <p class="text-xs text-ink-500 dark:text-ink-400">
+                          {% blocktranslate trimmed with names=spoken|join:", " %}
+                            Also in {{ names }}
+                          {% endblocktranslate %}
+                        </p>
+                      {% endif %}
+                    {% endwith %}
                   </div>
 
                   <div class="flex shrink-0 items-center gap-1">

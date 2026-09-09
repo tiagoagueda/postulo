@@ -27,5 +27,19 @@
         <a href="{% url 'resume:overview' %}" class="btn-ghost">{% translate "Cancel" %}</a>
       </div>
     </form>
+
+    {% if object and translatable %}
+      <p class="mt-6 text-sm text-ink-500 dark:text-ink-400">
+        {% if translated_into %}
+          {% blocktranslate trimmed with names=translated_into|join:", " %}
+            Also in {{ names }}
+          {% endblocktranslate %}
+        {% else %}
+          {% translate "This entry prints its original text on every CV." %}
+        {% endif %}
+        <a class="underline"
+           href="{% url 'resume:item_languages' section.slug object.pk %}">{% translate "Other languages" %}</a>
+      </p>
+    {% endif %}
   </div>
 {% endblock %}

@@ -13,10 +13,14 @@ override for a particular CV.
 
 from __future__ import annotations
 
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel
+
+from . import translating
 
 
 def split_highlights(text: str) -> list[str]:
@@ -30,6 +34,14 @@ class ResumeItem(OwnedModel):
     order = models.PositiveIntegerField(
         _("order"), default=0, help_text=_("Lower numbers appear first.")
     )
+
+    #: What this entry says in other languages, and the cascade that goes with it: an entry
+    #: deleted takes its translations, because a translation of nothing is nothing (#131).
+    #:
+    #: Declared on the abstract base so every kind gets one, `Certification` included --
+    #: which translates nothing, and whose relation is therefore always empty. One rule that
+    #: is sometimes vacuous beats seven declarations with one missing.
+    translations = GenericRelation("resume.Translation")
 
     class Meta:
         abstract = True
@@ -258,3 +270,49 @@ class Link(ResumeItem):
     @property
     def is_broken(self) -> bool:
         return self.check_status == LinkStatus.BROKEN
+
+
+class Translation(OwnedModel):
+    """What one field of one career entry says in one other language.
+
+    A row per field rather than a row per entry, and a row per entry rather than a column
+    per field, for reasons that pull in opposite directions and settle here. Columns per
+    field would need a migration for every field anybody ever wants to say differently, and
+    a table with the union of every model's translatable fields, most of them null on most
+    rows. A JSON map on the entry would need neither, and would also accept a field that
+    does not exist, a language that is not a language, and two spellings of the same key.
+
+    So: a generic link, exactly as `CVItem` and `PostalAddress` already use, with the field
+    name checked against `translating.TRANSLATABLE` when it is set. The constraint is what
+    a JSON map could not have — one text per field per language per entry, in the database
+    rather than in whoever wrote the last save (#131).
+
+    **Blank is withdrawal, not emptiness.** A translation somebody cleared renders as the
+    original, so `translating.stored_for` drops blank rows. The row is left alone rather
+    than deleted, because the alternative is a form that silently removes what it was given.
+    """
+
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, related_name="+", verbose_name=_("kind of entry")
+    )
+    object_id = models.PositiveIntegerField()
+    entry = GenericForeignKey("content_type", "object_id")
+
+    language = models.CharField(_("language"), max_length=10)
+    field = models.CharField(_("field"), max_length=translating.MAX_FIELD_LENGTH)
+    text = models.TextField(_("text"), blank=True)
+
+    class Meta:
+        verbose_name = _("translation")
+        verbose_name_plural = _("translations")
+        ordering = ("language", "field")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("content_type", "object_id", "language", "field"),
+                name="resume_one_text_per_field_per_language",
+            )
+        ]
+        indexes = [models.Index(fields=("content_type", "object_id", "language"))]
+
+    def __str__(self) -> str:
+        return f"{self.field} ({self.language})"

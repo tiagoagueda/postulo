@@ -19,12 +19,14 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
 
+from postulo.core import languages
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.plugins import base, registry
 
-from . import importing
+from . import forms as resume_forms
+from . import importing, translating
 from .models import (
     Certification,
     Education,
@@ -67,6 +69,17 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
             for slug in OVERVIEW_ORDER
         ]
         context["skills"] = Skill.objects.for_user(user).select_related("group")
+        # One query for the whole page rather than one per entry: a generic link has no
+        # join to follow, so the batch lookup is what answers for it (#131).
+        everything = [item for section in context["sections"] for item in section["items"]]
+        spoken = translating.languages_by_entry(everything)
+        # Keyed by the entry itself rather than by its content type and id: a template can
+        # say `map|get_item:item` and cannot say `map|get_item:(ct, pk)`.
+        context["languages_by_entry"] = {
+            entry: [languages.NATIVE_NAMES.get(code, code) for code in codes]
+            for entry in everything
+            if (codes := spoken.get(translating.key_of(entry)))
+        }
         context["counts"] = {
             "experience": Experience.objects.for_user(user).count(),
             "education": Education.objects.for_user(user).count(),
@@ -77,6 +90,89 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
             "skill_group": SkillGroup.objects.for_user(user).count(),
         }
         return context
+
+
+class ResumeItemTranslationsView(OwnedObjectMixin, View):
+    """What one entry says in the other languages somebody writes CVs in.
+
+    One screen per entry rather than a column per language on the editing form: most people
+    translate one or two entries into one language, and a form that asked for every field in
+    every language would be a wall nobody fills in. The list of what has been translated is
+    on the same page, because "which of these did I do?" is the question that brings somebody
+    back here (#131).
+    """
+
+    template_name = "resume/translations.html"
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        self.section = get_section(kwargs["section"])
+
+    def get_queryset(self):
+        return self.section.model.objects.for_user(self.request.user)
+
+    def get_object(self):
+        return get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
+
+    def chosen_language(self, request) -> str:
+        return translating.normalise(request.GET.get("language") or request.POST.get("language"))
+
+    def context(self, entry, language: str, form=None) -> dict:
+        stored = translating.stored_for(entry)
+        return {
+            "section": self.section,
+            "entry": entry,
+            "language": language,
+            "language_name": languages.NATIVE_NAMES.get(language, language),
+            "record_language": languages.NATIVE_NAMES.get(
+                translating.record_language_of(entry.owner), ""
+            ),
+            "translatable": translating.fields_for(entry),
+            "held": [
+                (
+                    code,
+                    languages.NATIVE_NAMES.get(code, code),
+                    [translating.field_label(entry, name) for name in sorted(fields)],
+                )
+                for code, fields in sorted(stored.items())
+            ],
+            "form": form,
+            "add_form": resume_forms.AddLanguageForm(exclude=stored),
+        }
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        entry = self.get_object()
+        language = self.chosen_language(request)
+        form = None
+        if language and translating.fields_for(entry):
+            form = resume_forms.TranslationForm(
+                entry=entry,
+                language=language,
+                initial=translating.stored_for(entry).get(language, {}),
+            )
+        return render(request, self.template_name, self.context(entry, language, form))
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        entry = self.get_object()
+        language = self.chosen_language(request)
+        if not language or not translating.fields_for(entry):
+            return redirect(reverse("resume:item_languages", args=[self.section.slug, entry.pk]))
+        form = resume_forms.TranslationForm(request.POST, entry=entry, language=language)
+        if not form.is_valid():  # pragma: no cover - every field is optional free text
+            return render(request, self.template_name, self.context(entry, language, form))
+        kept = form.save()
+        messages.success(
+            request,
+            _("Saved in %(language)s.")
+            % {"language": languages.NATIVE_NAMES.get(language, language)}
+            if kept
+            else _("Cleared: this entry prints its original text in %(language)s.")
+            % {"language": languages.NATIVE_NAMES.get(language, language)},
+        )
+        return redirect(
+            f"{reverse('resume:item_languages', args=[self.section.slug, entry.pk])}"
+            f"?language={language}"
+        )
 
 
 class SectionFormMixin(UserFormKwargsMixin):
@@ -114,6 +210,14 @@ class ResumeItemCreateView(OwnedObjectMixin, SectionFormMixin, OwnerFormMixin, C
 class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
     def get_queryset(self):
         return self.section.model.objects.for_user(self.request.user)
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["translatable"] = bool(translating.fields_for(self.object))
+        context["translated_into"] = [
+            languages.NATIVE_NAMES.get(code, code) for code in translating.languages_of(self.object)
+        ]
+        return context
 
     def form_valid(self, form):
         messages.success(self.request, _("Saved."))

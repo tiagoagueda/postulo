@@ -36,6 +36,35 @@ They render as a bulleted list. Keeping them as plain lines means reordering is 
 text, and a CV variant can replace the whole set with a textarea rather than a fiddly set
 of checkboxes.
 
+## The same entry in another language
+
+An entry can say the same thing in more than one language, so a French CV is a translation
+rather than a second career. Open an entry, then **Other languages**, pick a language, and
+fill in as much or as little as you like.
+
+**Every box is optional, and that is the point.** A job title is often the only thing worth
+translating; leave the summary empty and the original prints. Correcting a date, an
+employer or anything else on the entry corrects it in every language at once — that is the
+whole reason this is a translation and not a copy.
+
+**Some things are not translated, on purpose.** The organisation you worked for and the
+institution that taught you keep their own names: *Universidade de Lisboa* stays that on an
+English CV, and rendering it as "University of Lisbon" invents an employer who never
+existed. Certifications have no translations at all, because a credential's name and the
+body that issued it are that body's wording — an English rendering of it is not the same
+credential.
+
+What *can* be said differently is either your own words — a summary, your highlights, a
+project you named — or something that genuinely differs between languages: a job title, a
+city (Lisbon, Lisboa), a qualification, a grade on a scale that does not exist elsewhere.
+
+**Tell Postulo which language your record is written in**, under *Your details* on the
+profile page: it is what stops a CV in that same language reporting every entry as
+untranslated. Leave it blank and it follows the language you read Postulo in.
+
+A CV variant's own tailored highlights still win over a translation. Somebody who wrote
+highlights for one CV wrote them for the CV in front of them.
+
 ## Links: portfolios, profiles, videos
 
 **Documents → Your career record → Links**

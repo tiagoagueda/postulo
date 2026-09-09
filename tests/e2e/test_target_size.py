@@ -176,7 +176,12 @@ def test_everything_clickable_is_big_enough_to_hit(live_server, page: Page, furn
     sign_in(page, base)
     page.set_viewport_size({"width": 1280, "height": 900})
 
-    paths = signed_in_paths(furnished["application"], furnished["company"], furnished["applicant"])
+    paths = signed_in_paths(
+        furnished["application"],
+        furnished["company"],
+        furnished["applicant"],
+        furnished["experience"],
+    )
     found: dict[str, str] = {}
     for path in paths:
         page.goto(f"{base}{path}")

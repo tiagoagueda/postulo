@@ -361,6 +361,26 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         resume_map["skills"][old_id] = created
         report.resume_items += 1
 
+    # And what those entries say in other languages, once every entry has a new identity to
+    # point at. Absent from an archive written before format 11, which is not a problem: a
+    # career with no translations is what every career was until then (#131).
+    for row in document.get("resume", {}).get("translations", []):
+        target = resume_map.get(row.get("section", ""), {}).get(row.get("ref"))
+        text = (row.get("text") or "").strip()
+        if target is None or not text:
+            if target is None:
+                report.skipped.append(
+                    f"Translation of {row.get('section')}#{row.get('ref')}: no such record"
+                )
+            continue
+        resume.Translation.objects.update_or_create(
+            content_type=ContentType.objects.get_for_model(target),
+            object_id=target.pk,
+            language=row.get("language", ""),
+            field=row.get("field", ""),
+            defaults={"text": text, "owner": user},
+        )
+
     # ------------------------------------------------ companies and their work
     contacts: dict[int, Contact] = {}
     postings: dict[int, JobPosting] = {}

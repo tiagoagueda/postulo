@@ -72,11 +72,21 @@ working. See [Installing Postulo](Installing-Postulo#pdf-rendering).
 
 A CV variant has a **language** field, chosen from the languages this instance offers. It
 sets the language attribute of the rendered document, which matters for hyphenation and for
-screen readers — including the recruiter's. It does **not** translate anything: if you want
-a CV in French, write French into a French variant.
+screen readers — including the recruiter's.
 
 Left blank, it follows the language you read Postulo in rather than defaulting to English.
 Cover letters have the same field and behave the same way.
+
+**It also decides which text the CV prints.** Each career entry can be
+[written in more than one language](Your-career-record#the-same-entry-in-another-language),
+and a CV declaring French prints the French version of every entry that has one. An entry
+with nothing in French prints as it stands — a line in the wrong language is better than a
+gap where a job used to be — and the CV's own page lists those entries **before** you press
+*Export PDF*, with a link to each. Finding out from the PDF an employer already has is not
+finding out.
+
+A cover letter is different, and deliberately: a letter is prose you wrote rather than a
+selection from a record, so two languages means two letters.
 
 It also sets the document's **direction**. A CV written in Arabic or Hebrew is laid out
 right to left; one written in English is laid out left to right, whichever language you

@@ -33,7 +33,7 @@ from postulo import __version__
 #: (#92); 10 replaced ``cv_id``/``cover_letter_id`` on a sent document with a
 #: ``source_kind`` and a ``source_ref``, so that a new kind of document is not a new
 #: column (#130). The importer still reads every earlier format, filling the new fields in.
-FORMAT_VERSION = 10
+FORMAT_VERSION = 11
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -47,12 +47,26 @@ PROFILE_FIELDS = (
     "linkedin_url",
     "source_repo_url",
     "language",
+    "record_language",
     "time_zone",
     "theme",
     "table_settings",
     "quiet_after_days",
     "use_gravatar",
 )
+#: Which block of the archive a career entry's translations point into, by model name.
+#: The same map the importer reads the other way round, kept here because this is where the
+#: block names are decided (#131).
+TRANSLATION_SECTIONS = {
+    "experience": "experience",
+    "education": "education",
+    "project": "projects",
+    "skillgroup": "skill_groups",
+    "skill": "skills",
+    "certification": "certifications",
+    "languageskill": "languages",
+    "link": "links",
+}
 TAG_FIELDS = ("id", "name", "slug", "colour")
 COMPANY_FIELDS = (
     "id",
@@ -352,6 +366,21 @@ def build_document(user) -> dict:
     }  # fmt: skip
     for key, (model, names) in resume_sections.items():
         document["resume"][key] = [_fields(item, names) for item in model.objects.for_user(user)]
+
+    # What those entries say in other languages. A section name and a local id rather than a
+    # content type: a content type is this instance's row number for a model and means
+    # nothing in the file, whereas "experience #3" is resolvable anywhere (#131).
+    document["resume"]["translations"] = [
+        {
+            "section": TRANSLATION_SECTIONS[row.content_type.model],
+            "ref": row.object_id,
+            "language": row.language,
+            "field": row.field,
+            "text": row.text,
+        }
+        for row in resume.Translation.objects.for_user(user).select_related("content_type")
+        if row.content_type.model in TRANSLATION_SECTIONS and row.text.strip()
+    ]
 
     # --------------------------------------------------- companies and the rest
     companies = Company.objects.for_user(user).prefetch_related(

@@ -1219,6 +1219,45 @@ All notable changes to Postulo are recorded here. The format follows
   that must not happen here: deleting a CV has to leave the PDF an employer received exactly
   where it is, which was the whole reason `RenderedDocument` exists. (#130)
 
+### ✨ Added
+
+- **A career entry can say the same thing in more than one language.** At the document level
+  this already worked: a CV declares what it is written in, and the PDF is hyphenated,
+  justified and laid out for that rather than for whoever made it. One level down it did not.
+  The career record held one text per field, so a CV declaring `fr-fr` printed exactly the
+  same English job titles as one declaring `en-gb` — and the honest way to keep a CV in two
+  languages was to keep two careers, typed twice, drifting apart the moment a date changed.
+
+  **A second language is now a translation rather than a second record.** One row per entry,
+  per language, per field, and the entry itself is untouched: correcting an employer or a
+  date on the master copy corrects it in every language at once, which is the whole reason
+  there is a master copy. The database holds the rule that a JSON blob on the entry could
+  not have — one text per field per language, decided there rather than by whichever save
+  happened to be last.
+
+  **Which fields may be said differently is a decision per field, not a mechanism applied
+  uniformly.** An employer's name and an institution's are not translated: *Universidade de
+  Lisboa* stays that on an English CV, and rendering it otherwise invents an employer who
+  never existed. Certifications translate nothing at all, because a credential's name and
+  the body that issued it are that body's wording. What is offered is either the person's
+  own words or something that genuinely differs between languages — a job title, a city, a
+  qualification, a grade on a scale that does not exist elsewhere. Offering the box is what
+  would have caused the harm, so the boxes that would have caused it are not there.
+
+  **Falling back is visible, or it is a trap.** An entry with nothing in the CV's language
+  prints its original, because a blank line where a job used to be is worse than a line in
+  the wrong language. The CV's own page then lists which entries did that, with a link to
+  each, *before* the export button — the same rule themes settled one issue earlier, for the
+  same reason. Discovering it in the PDF an employer already has is not discovering it.
+
+  So the profile gains one small field: which language the career record itself is written
+  in. Without it, a CV in the record's own language would report every entry as untranslated
+  and the warning would be read once and ignored thereafter.
+
+  Every theme renders this without knowing it exists — a plugin's template written against
+  `entry.item.role` gets the French job title and could not have been asked to do anything
+  else. The archive carries the translations (format 11) and brings them back. (#131)
+
 ### 🔧 Changed
 
 - **A theme says which kinds of document it sets, and nothing offers a pairing it cannot

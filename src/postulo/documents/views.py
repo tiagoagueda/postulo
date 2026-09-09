@@ -12,10 +12,12 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from postulo.applications.models import Application
 from postulo.applications.services import record_event
+from postulo.core import languages
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
+from postulo.resume import translating
 
 from .forms import (
     AddCVItemsForm,
@@ -27,7 +29,13 @@ from .forms import (
 )
 from .models import CV, CoverLetter, CVItem, LetterKind, RenderedDocument, UploadedDocument
 from .pdf import PDFBackendUnavailable
-from .rendering import render_cv_html, render_letter_html, snapshot_cv, snapshot_letter
+from .rendering import (
+    document_language,
+    render_cv_html,
+    render_letter_html,
+    snapshot_cv,
+    snapshot_letter,
+)
 
 
 class PDFErrorMixin:
@@ -63,6 +71,12 @@ class CVDetailView(OwnedObjectMixin, DetailView):
         context["items"] = self.object.items.select_related("content_type").order_by("order", "pk")
         context["add_form"] = AddCVItemsForm(cv=self.object)
         context["renders"] = self.object.renders.all()[:10]
+        # Which entries will print their original text, said here rather than discovered in
+        # the PDF an employer already has (#131).
+        context["fell_back"] = translating.fallen_back(self.object)
+        context["document_language"] = languages.NATIVE_NAMES.get(
+            translating.normalise(document_language(self.object)), ""
+        )
         return context
 
 

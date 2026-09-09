@@ -73,19 +73,66 @@ class Section:
     items: list = field(default_factory=list)
 
 
+@dataclass
+class Entry:
+    """One entry as this CV prints it: in this CV's language, with its overrides.
+
+    A wrapper rather than the `CVItem` itself, and it keeps the two names a template already
+    reads — ``entry.item`` and ``entry.highlight_lines`` — so every theme renders a
+    translated CV without knowing translations exist. That matters most for the themes
+    Postulo has never seen: a plugin's template written against ``entry.item.role`` gets the
+    French job title for free, and could not have been asked to do anything else (#131).
+    """
+
+    cv_item: object
+    item: object
+
+    @property
+    def highlight_lines(self) -> list[str]:
+        """This variant's override, else the master copy in this CV's language.
+
+        The override wins over the translation, not the other way round. Somebody who wrote
+        highlights for *this* CV wrote them for the CV they were looking at, in the language
+        it declares, and a translation of the master copy is not a better answer than that.
+        """
+        from postulo.resume.models import split_highlights
+
+        if self.cv_item.override_highlights.strip():
+            return split_highlights(self.cv_item.override_highlights)
+        return split_highlights(getattr(self.item, "highlights", ""))
+
+
 def build_sections(cv: CV) -> list[Section]:
     """Group a CV's entries into sections, keeping the order the owner chose.
 
     Sections appear in the order their first entry does, so moving one experience to the
     top moves the whole Experience block with it, which is what someone dragging entries
     around expects.
+
+    Each entry reads in the language the CV declares. An entry with nothing to say in that
+    language says what it always said, because a blank line where a job used to be is worse
+    than a line in the wrong language — and `translating.fields_that_fell_back` is how the
+    person finds out which ones did, on the CV's page rather than in the PDF (#131).
     """
+    from postulo.resume import translating
+
+    # The language the PDF will declare, not the field: a CV that names none still says
+    # something in its `lang`, and text in one language under a declaration of another is
+    # the mismatch this whole feature exists to remove.
+    language = translating.normalise(document_language(cv))
+    cv_items = list(cv.included_items().order_by("order", "pk"))
+    entries = [cv_item.item for cv_item in cv_items]
+    overrides = translating.overrides_by_entry(entries, language)
+
     sections: dict[str, Section] = {}
-    for item in cv.included_items().order_by("order", "pk"):
-        kind = item.content_type.model
+    for cv_item, entry in zip(cv_items, entries, strict=True):
+        kind = cv_item.content_type.model
         if kind not in sections:
             sections[kind] = Section(kind=kind, label=str(SECTION_LABELS.get(kind, kind)))
-        sections[kind].items.append(item)
+        found = overrides.get(translating.key_of(entry)) if entry is not None else None
+        sections[kind].items.append(
+            Entry(cv_item=cv_item, item=translating.in_language(entry, language, found or {}))
+        )
     return list(sections.values())
 
 

@@ -147,7 +147,12 @@ def test_no_page_scrolls_sideways_at_320_pixels(live_server, page: Page, furnish
     sign_in(page, base)
     page.set_viewport_size({"width": NARROW, "height": 800})
 
-    paths = signed_in_paths(furnished["application"], furnished["company"], furnished["applicant"])
+    paths = signed_in_paths(
+        furnished["application"],
+        furnished["company"],
+        furnished["applicant"],
+        furnished["experience"],
+    )
     failures: dict[str, str] = {}
     for path in paths:
         page.goto(f"{base}{path}")

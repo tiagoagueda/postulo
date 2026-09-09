@@ -86,6 +86,7 @@ def furnished(applicant):
     from postulo.applications.models import Application, InterviewKind, Reminder, Status
     from postulo.applications.services import change_status, schedule_interview
     from postulo.jobs.models import Company, Contact, Industry, JobPosting
+    from postulo.resume.models import Experience
 
     company = Company.objects.create(owner=applicant, name="Aperture Science", location="Cambridge")
     company.industries.set(Industry.named(applicant, ["Research"]))
@@ -100,10 +101,24 @@ def furnished(applicant):
     schedule_interview(
         application, kind=InterviewKind.VIDEO, starts_at=timezone.now() + dt.timedelta(days=2)
     )
+    experience = Experience.objects.create(
+        owner=applicant,
+        organisation="Weyland-Yutani",
+        role="Backend engineer",
+        location="Lisbon",
+        start_date=dt.date(2019, 1, 1),
+        summary="Kept the services up.",
+        highlights="Cut deploy time.",
+    )
     applicant.is_staff = True
     applicant.is_superuser = True
     applicant.save()
-    return {"application": application, "company": company, "applicant": applicant}
+    return {
+        "application": application,
+        "company": company,
+        "applicant": applicant,
+        "experience": experience,
+    }
 
 
 def sign_in(page: Page, base: str) -> None:
@@ -114,11 +129,13 @@ def sign_in(page: Page, base: str) -> None:
     expect(page).to_have_url(f"{base}/")
 
 
-def signed_in_paths(a, c, me) -> list[str]:
-    """Every address the signed-in walk visits, given an application, a company and an account.
+def signed_in_paths(a, c, me, entry=None) -> list[str]:
+    """Every address the signed-in walk visits, given an application, a company, an account.
 
     Hoisted out of the test that grew it so other suites can walk the same list rather than
     keep a second one that drifts. `tests/test_page_coverage.py` holds it to the resolver.
+
+    ``entry`` is one career entry, for the pages that need one to exist.
     """
     return [
         "/",
@@ -205,6 +222,16 @@ def signed_in_paths(a, c, me) -> list[str]:
         # submitted, so nobody's password changes half way through the walk (#103).
         f"/accounts/recover/{_a_recovery_link_for(me)}/",
         "/accounts/recover/",
+        *(
+            [
+                f"/career/experience/{entry.pk}/edit/",
+                # Both halves: the list of languages, and the form for one of them.
+                f"/career/experience/{entry.pk}/languages/",
+                f"/career/experience/{entry.pk}/languages/?language=fr-fr",
+            ]
+            if entry is not None
+            else []
+        ),
     ]
 
 
@@ -251,7 +278,7 @@ def test_every_signed_in_page_has_no_violations(
     a = furnished["application"]
     c = furnished["company"]
     me = furnished["applicant"]
-    paths = signed_in_paths(a, c, me)
+    paths = signed_in_paths(a, c, me, furnished["experience"])
     failures = []
     for path in paths:
         page.goto(f"{base}{path}")
@@ -448,6 +475,7 @@ VISITED_URL_NAMES: tuple[str, ...] = (
     "resume:overview",
     "resume:item_create",
     "resume:item_update",
+    "resume:item_languages",
     "resume:item_delete",
     "resume:preview",
     "resume:europass_import",

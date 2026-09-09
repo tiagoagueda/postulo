@@ -24,6 +24,32 @@
     </div>
   </div>
 
+  {% if fell_back %}
+    {% comment %} Before the export button, not after it: finding this out from the PDF an
+       employer already has is not finding it out.
+    {% endcomment %}
+    <div class="alert-warning mb-6">
+      <p class="mb-2">
+        {% blocktranslate trimmed with tongue=document_language %}
+          Not yet written in {{ tongue }}. These print as they stand:
+        {% endblocktranslate %}
+      </p>
+      <ul class="ms-4 list-disc text-sm">
+        {% for missed in fell_back %}
+          <li>
+            {% if missed.section %}
+              <a class="underline"
+                 href="{% url 'resume:item_languages' missed.section missed.entry.pk %}"><bdi>{{ missed.label }}</bdi></a>
+            {% else %}
+              <bdi>{{ missed.label }}</bdi>
+            {% endif %}
+            <span class="text-ink-600 dark:text-ink-300">— {{ missed.named|join:", " }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
   <div class="grid gap-6 lg:grid-cols-3">
     <div class="lg:col-span-2">
       <h2 class="mb-3 font-medium">{% translate "What is on this CV" %}</h2>

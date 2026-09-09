@@ -262,6 +262,17 @@ class Profile(models.Model):
     )
 
     language = models.CharField(_("language"), max_length=10, blank=True)
+    #: Which language the career record itself is written in -- the job titles, the
+    #: summaries, the highlights -- as opposed to `language`, which is the interface. The
+    #: two are often different: somebody reading Postulo in English may have typed their
+    #: career in Portuguese, and a CV declaring `pt-pt` then needs no translations at all.
+    #:
+    #: Blank means "the same as the interface", which is the right guess and never a claim.
+    #: What it is actually for is knowing when *not* to warn: without it, every entry on a
+    #: CV in the record's own language would be reported as having fallen back (#131).
+    record_language = models.CharField(
+        _("language of your career record"), max_length=10, blank=True
+    )
     time_zone = models.CharField(_("time zone"), max_length=64, blank=True)
     theme = models.CharField(_("theme"), max_length=10, choices=Theme, default=Theme.SYSTEM)
     #: Keys from postulo.core.navigation that this person has chosen not to see in the

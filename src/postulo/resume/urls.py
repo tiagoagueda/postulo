@@ -16,6 +16,11 @@ urlpatterns = [
         "<slug:section>/<int:pk>/delete/", views.ResumeItemDeleteView.as_view(), name="item_delete"
     ),
     path(
+        "<slug:section>/<int:pk>/languages/",
+        views.ResumeItemTranslationsView.as_view(),
+        name="item_languages",
+    ),
+    path(
         "<slug:section>/<int:pk>/move/<str:direction>/",
         views.ResumeItemMoveView.as_view(),
         name="item_move",
