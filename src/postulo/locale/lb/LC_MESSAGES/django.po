@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Lëtzebuergesch\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s huet schonn en %(scheme)s-Identifikateur: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s geännert."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -939,6 +939,21 @@ msgstr "Reklamm a Marketing"
 #, draft
 msgid "Aerospace"
 msgstr "Loft- a Raumfaart"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Nach eng Kéier zoustëmmen"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Beim Ubidder zoustëmmen"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Zoustëmmung bei %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1964,18 +1979,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Mat %(host)s:%(port)s verbonnen. Kee Benotzernumm, also gouf sech net ugemellt."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Verbonnen. Testt et fir sécher ze sinn, datt et funktionéiert."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "Verbindung"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Verbindung ewechgeholl, mat de Geheimnisser."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr ""
@@ -1991,9 +2011,9 @@ msgstr "Verbindungssécherheet"
 msgid "Connection security"
 msgstr "Verbindungssécherheet"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2575,7 +2595,7 @@ msgstr "Dokumentkopien"
 msgid "document copy"
 msgstr "Dokumentkopie"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Dokumentespäicher"
@@ -2958,6 +2978,13 @@ msgstr "Alles, wat Dir geschriwwen hutt, steet scho an dësem CV."
 msgid "Everything, newest first."
 msgstr "Alles, dat Neitst fir d'éischt."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Genau esou, wéi se do steet, mat Schema an all Port. Wann dës Instanz ëmplënnert, registréiert déi nei, ier een nach eng Kéier probéiert sech ze verbannen."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3238,6 +3265,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Dat gespäichert Passwuert vergiessen"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Token vergiessen"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4032,7 +4064,7 @@ msgid ""
 msgstr ""
 "Et refuséiert éischter, näischt ze liwweren, wéi dës Anträg jidderengem ze weisen, deen et fënnt. Setzt POSTULO_LOGS_TOKEN, oder schalt POSTULO_LOGS_ENDPOINT_ENABLED aus."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Et funktionéiert."
@@ -5102,6 +5134,11 @@ msgstr "nee — nëmme bestehend Konten"
 msgid "No-show"
 msgstr "Net opgetaucht"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Deem huet nach keen zougestëmmt. Verbannt et nach eng Kéier."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5453,7 +5490,7 @@ msgstr "Näischt fir sech domat ze verbannen"
 msgid "Nothing to decide"
 msgstr "Näischt ze entscheeden"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5476,6 +5513,11 @@ msgstr "Näischt waart"
 msgid "Nothing was added."
 msgstr "Näischt gouf dobäigesat."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Et gouf näischt verbonnen. Keen huet iergendeppes zougestëmmt."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5497,7 +5539,7 @@ msgstr "Et war näischt ausgewielt, also huet sech näischt geännert."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Näischt. Den Iwwerbléck bitt un, eppes zréckzebréngen."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Benoriichtegungen"
@@ -6255,6 +6297,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo hëlt genau dës eng Säit, a soss näischt."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo huet et vergiess. Den Ubidder huet d'Erlaabnis weider, bis Dir se do och zréckzitt."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6694,6 +6743,17 @@ msgstr "Empfeelung"
 msgid "Refresh logo"
 msgstr "Logo nei huelen"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Registréiert dës Adress beim Ubidder"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Registréiert dës Instanz fir d'éischt beim Ubidder a späichert d'Client-ID."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7034,6 +7094,11 @@ msgstr "Späicheren"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Späichert d'Firma, fir nach en Identifikateur dobäizesetzen."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Späichert dat fir d'éischt, kommt duerno zréck an stëmmt zou."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7558,6 +7623,12 @@ msgid ""
 msgstr ""
 "Wien iwwer dësen Ubidder kënnt, gëtt bei deem Kont ugemellt, deen d'Adress huet, déi den Ubidder gëtt — virausgesat, den Ubidder seet, datt déi Adress bestätegt ass. Dat mécht eng Fro derwäert: nennt dësen Ubidder eng Adress nëmmen dann bestätegt, wann d'Persoun bewisen huet, datt se hir gehéiert? Wann Dir en selwer bedreift, ganz sécher jo. Wann en engem anere gehéiert, kuckt no, ier Dir Iech drop verlooss. Setzt POSTULO_OIDC_LINK_BY_EMAIL op false, fir ze verlaangen, datt sech all Persoun hei eemol umellt an den Ubidder vun hirer eegener Kontsäit aus verbënnt."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr ""
+"Een huet deem zougestëmmt. Testt et fir sécher ze sinn, datt et nach gëllt."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7803,7 +7874,7 @@ msgid ""
 msgstr ""
 "Een auszeschalten hält op, en ze benotzen, a läscht näischt: all Verbindung, déi Dir gemaach hutt, bleift genau esou, wéi se ass, a wann Dir en erëm uschalt, ass se onverännert do."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Synchronisatioun feelgeschloen: %(error)s"
@@ -7823,12 +7894,12 @@ msgstr "synchronisatiounslinken"
 msgid "Sync now"
 msgstr "Elo synchroniséieren"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Synchroniséiert: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Synchronisatioun"
@@ -7941,7 +8012,7 @@ msgstr "Virlagen erschéngen, wann Dir e Bréif mat enger Kandidatur schéckt."
 msgid "Test"
 msgstr "Testen"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Test feelgeschloen: %(message)s"
@@ -8004,6 +8075,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Déi Kette ass méi wéi %(limit)s Firmen déif, méi déif wéi all Grupp, deen Postulo sënnvoll zeechne kann."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Déi Verbindung gehéiert engem aneren."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Déi Verbindung schafft net mat Zoustëmmung."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Déi Verbindung gëtt et net méi."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8258,10 +8344,15 @@ msgstr "Déi Säit huet %(status)s zréckginn."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Dat Bild ass iwwer 5 MB. E méi klengt, wann ech gelift."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Dee Plugin ass net méi installéiert."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Déi Äntwert koum net vun enger Ufro déi Postulo gemaach huet."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8562,6 +8653,21 @@ msgid ""
 msgstr ""
 "Den Dossier fir privat Medien op dësem Server, wou all Dokument bleift, egal wouhin et soss nach kopéiert gëtt."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Den Ubidder huet %(status)s geäntwert."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Den Ubidder erneiert dat net. Een muss nach eng Kéier zoustëmmen."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "D'Äntwert vum Ubidder war net liesbar."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8843,6 +8949,13 @@ msgstr "Dës Zort Identifikateur steet schonn op der Lëscht."
 #, draft
 msgid "This number is already listed."
 msgstr "Dës Nummer steet schonn op der Lëscht."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Dës hëlt kee Passwuert. Dir stëmmt op der Säit vum Ubidder selwer zou, an deen gëtt Postulo en Token deen et erneiere kann. Dir kënnt déi Zoustëmmung do zu all Moment zréckzéien, a Postulo kann dat net fir Iech maachen."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9416,6 +9529,11 @@ msgstr "Wat wouhinner geet"
 #, draft
 msgid "What happened"
 msgstr "Wat geschitt ass"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Wourëms gefrot gëtt"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

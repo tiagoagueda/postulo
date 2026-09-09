@@ -48,6 +48,10 @@ EXCUSED: dict[str, str] = {
     "api:token_create": "a POST that mints a token and shows it once",
     "applications:bulk": "a POST from the table's action bar, which is visited",
     "jobs:company_bulk": "a POST from the table's action bar, which is visited",
+    "connections:consent": "a POST that sends somebody to a provider's own consent screen",
+    "connections:consent_callback": (
+        "where a provider sends them back: it reads a code and redirects, and renders nothing"
+    ),
     "core:import_csv_forget": "a POST that discards the stashed spreadsheet",
     "core:table_settings": "a POST that records which columns a table shows",
     "accounts:avatar_refresh": "a POST that fetches the picture again",

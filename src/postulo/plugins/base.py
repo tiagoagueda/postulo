@@ -478,6 +478,35 @@ def medium_of(transport) -> str:
     return value if value in MEDIUMS else DEFAULT_MEDIUM
 
 
+#: What a plugin needs a person to agree to, when it authenticates by consent rather than
+#: by a field somebody types (#150). It sits here beside `FieldSpec` because it is the same
+#: kind of thing: part of the vocabulary a plugin uses to say what it needs.
+@dataclass(frozen=True)
+class Consent:
+    """What a plugin needs a person to agree to, and where.
+
+    Declared by the plugin, conducted by Postulo. Everything here is the provider's; nothing
+    here is a secret, which is why it can sit in a manifest and be read on a page.
+    """
+
+    #: Where the person is sent to agree.
+    authorise_url: str
+    #: Where the code is exchanged for tokens, and where a refresh token is renewed.
+    token_url: str
+    #: What is being asked for, in the provider's own words.
+    scopes: tuple[str, ...]
+    #: What to call the provider on screen.
+    provider: str = ""
+    #: Extra query parameters the provider wants at the authorisation step. Google needs
+    #: `access_type=offline` to issue a refresh token at all, and `prompt=consent` to issue
+    #: one again for somebody who has already agreed once.
+    extra: dict = field(default_factory=dict)
+
+    @property
+    def scope(self) -> str:
+        return " ".join(self.scopes)
+
+
 @runtime_checkable
 class TransportPlugin(Protocol):
     """What something that carries a message off this machine must provide.

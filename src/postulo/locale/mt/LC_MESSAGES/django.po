@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Malti\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s diġà għandha identifikatur %(scheme)s: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s inbidlu."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -974,6 +974,21 @@ msgstr "Reklamar u marketing"
 #, draft
 msgid "Aerospace"
 msgstr "Ajruspazju"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Aqbel mill-ġdid"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Aqbel għand il-fornitur"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Qbil ma' %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -2002,18 +2017,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Konness ma' %(host)s:%(port)s. L-ebda username, għalhekk ma ġie awtentikat xejn."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Konnessa. Ittestjaha biex tkun ċert li taħdem."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "konnessjoni"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Konnessjoni mneħħija, sigrieti inklużi."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Konnessjoni ssejvjata. Ittestjaha biex tkun ċert li taħdem."
@@ -2028,9 +2048,9 @@ msgstr "sigurtà tal-konnessjoni"
 msgid "Connection security"
 msgstr "Sigurtà tal-konnessjoni"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2612,7 +2632,7 @@ msgstr "kopji ta' dokumenti"
 msgid "document copy"
 msgstr "kopja ta' dokument"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Ħażniet tad-dokumenti"
@@ -2993,6 +3013,13 @@ msgstr "Kulma ktibt diġà qiegħed fuq dan is-CV."
 msgid "Everything, newest first."
 msgstr "Kollox, l-aktar ġdid l-ewwel."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Eżattament kif tidher, inkluża l-iskema u kwalunkwe port. Jekk din l-istanza tinbidel, irreġistra dik il-ġdida qabel ma xi ħadd jipprova jerġa' jikkonnettja."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3272,6 +3299,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Insa l-password maħżuna"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Insa t-token"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4063,7 +4095,7 @@ msgid ""
 msgstr ""
 "Jirrifjuta li jservi xejn minflok jippubblika dawn ir-rekords lil kull min isib l-indirizz. Issettja POSTULO_LOGS_TOKEN, jew itfi POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Jaħdem."
@@ -5137,6 +5169,11 @@ msgstr "le — kontijiet eżistenti biss"
 msgid "No-show"
 msgstr "Ma dehrux"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Ħadd ma qabel ma' dan s'issa. Erġa' qabbadha."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5488,7 +5525,7 @@ msgstr "Xejn ma' xiex tikkonnettja"
 msgid "Nothing to decide"
 msgstr "Xejn x'tiddeċiedi"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5511,6 +5548,11 @@ msgstr "Xejn jistenna"
 msgid "Nothing was added."
 msgstr "Xejn ma ġie miżjud."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Xejn ma ġie konness. Ħadd ma qabel ma' xejn."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5532,7 +5574,7 @@ msgstr "Xejn ma kien magħżul, u għalhekk xejn ma nbidel."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Xejn. Id-dashboard se joffri li jerġa' jqiegħed xi ħaġa."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Notifiki"
@@ -6306,6 +6348,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo jġib din il-paġna waħda, u xejn aktar."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo nesih. Il-fornitur għad għandu l-permess sakemm tirtirah minn hemm ukoll."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6748,6 +6797,17 @@ msgstr "Referral"
 msgid "Refresh logo"
 msgstr "Erġa' ikseb il-logo"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Irreġistra dan l-indirizz mal-fornitur"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"L-ewwel irreġistra din l-istanza mal-fornitur, u ssalva l-identifikatur tal-klijent."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7087,6 +7147,11 @@ msgstr "Issejvja"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Issejvja l-kumpanija biex iżżid identifikatur ieħor."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Issalva dan l-ewwel, imbagħad erġa' lura u aqbel."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7611,6 +7676,11 @@ msgid ""
 msgstr ""
 "Min jasal permezz ta’ dan il-fornitur jidħol fil-kont li għandu l-indirizz mogħti, sakemm il-fornitur jgħid li l-indirizz huwa vverifikat. Għalhekk mistoqsija waħda tistħoqq tweġiba: dan il-fornitur isejjaħ indirizz ivverifikat biss meta l-persuna tkun ipprovat li huwa tagħha? Jekk tħaddmu int, kważi żgur. Jekk huwa ta’ ħaddieħor, iċċekkja qabel toqgħod fuqu. Issettja POSTULO_OIDC_LINK_BY_EMAIL għal false biex kulħadd ikollu jidħol hawn darba u jgħaqqad il-fornitur mill-paġna tal-kont tiegħu."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr "Xi ħadd qabel ma' dan. Ittestjah biex tkun ċert li għadu jgħodd."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7855,7 +7925,7 @@ msgid ""
 msgstr ""
 "Li titfi wieħed iwaqqaf l-użu tiegħu u ma jħassar xejn: il-konnessjonijiet li għamilt jibqgħu eżattament kif inhuma, u li terġa’ tixegħlu jġibhom lura mhux mibdula."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Is-sinkronizzazzjoni falliet: %(error)s"
@@ -7875,12 +7945,12 @@ msgstr "rabtiet ta' sinkronizzazzjoni"
 msgid "Sync now"
 msgstr "Sinkronizza issa"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Sinkronizzat: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Sinkronizzazzjoni"
@@ -7993,7 +8063,7 @@ msgstr "Il-mudelli jidhru meta tibgħat ittra ma' applikazzjoni."
 msgid "Test"
 msgstr "Ittestja"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "It-test falla: %(message)s"
@@ -8056,6 +8126,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Dik il-katina hija aktar fonda minn %(limit)s kumpaniji — aktar fonda milli Postulo jista' jpinġi bis-sens."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Dik il-konnessjoni hija ta' xi ħadd ieħor."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Dik il-konnessjoni ma tużax qbil."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Dik il-konnessjoni m'għadhiex teżisti."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8306,10 +8391,15 @@ msgstr "Dik il-paġna rritornat %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Dik l-istampa hija aktar minn 5 MB. Waħda iżgħar, jekk jogħġbok."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Dak il-plugin m'għadux installat."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Dik it-tweġiba ma ġietx minn talba li għamel Postulo."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8611,6 +8701,21 @@ msgid ""
 msgstr ""
 "Id-direttorju privat tal-midja fuq dan is-server, fejn jinsab kull dokument, kull fejn jiġi kkupjat ukoll."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Il-fornitur wieġeb %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Il-fornitur mhux se jġedded dan. Xi ħadd irid jaqbel miegħu mill-ġdid."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "It-tweġiba tal-fornitur ma setgħetx tinqara."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8893,6 +8998,13 @@ msgstr "Dan it-tip ta' identifikatur diġà elenkat."
 #, draft
 msgid "This number is already listed."
 msgstr "Dan in-numru diġà qiegħed fil-lista."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Din ma tiħux password. Taqbel fuq is-sit tal-fornitur innifsu, u dan jagħti lil Postulo token li jista' jġedded. Tista' tirtira dak il-qbil minn hemm f'kull ħin, u Postulo ma jistax jagħmlu minflokek."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9466,6 +9578,11 @@ msgstr "X'imur fejn"
 #, draft
 msgid "What happened"
 msgstr "X'ġara"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "X'qed jintalab"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

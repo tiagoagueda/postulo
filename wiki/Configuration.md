@@ -501,6 +501,40 @@ Most plugins hold nothing at all and uninstall without a word. Every plugin Post
 nothing: what the telephone-numbers plugin governs belongs to Postulo itself, and arrives and
 leaves with it.
 
+## A connection that needs consent instead of a password
+
+Most connections take a password or a token you paste in. Some providers do not offer one:
+Google and Microsoft 365 want you to agree on *their* site, and hand Postulo a token it can
+renew. Postulo can conduct that round trip, and a plugin says whether it needs one.
+
+**One address to register, shown on the connection's own page.** A provider has to know in
+advance where to send people back to, and that address is this instance's own — something a
+self-hosted application behind a proxy or a tunnel may not know about itself. Postulo prints
+the exact string; copy it into the provider's console as it appears, scheme and port included.
+If you move the instance, register the new address **before** anybody tries to connect again,
+or the consent screen ends in an error nobody can read.
+
+**What is being asked for is on the page too**, in the provider's own words, so nobody agrees
+to something they have not read.
+
+**Postulo cannot withdraw your agreement.** *Forget the token* makes Postulo stop using it and
+stop holding it; the grant itself lives at the provider and only you can revoke it there. The
+message says so rather than implying otherwise.
+
+**A refresh token is a longer-lived credential than a password**, and changing your password
+does not change it. It is stored encrypted under the same key as every other connection
+secret — which is why a weak `POSTULO_SECRET_KEY` stops the instance from starting.
+`docs/THREAT-MODEL.md` says the rest.
+
+**Sign-in and sending are two separate agreements**, on purpose. Signing in with a provider
+does not give Postulo permission to send mail as you, and Postulo does not ask for a mail scope
+at sign-in on the chance it might be wanted later. That is the over-broad consent this
+application is trying not to teach.
+
+Testing a connection like this proves the grant still stands before it proves anything else,
+because "consent was withdrawn" is the useful failure and the one a mail server cannot report:
+nothing is misconfigured, and the fix is to agree again.
+
 ## HTTPS
 
 These apply only under the production settings.

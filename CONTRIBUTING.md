@@ -363,6 +363,50 @@ cache rather than a code change: `apt-get upgrade` runs at build time (see `dock
 and *Configuration → The image and Debian's updates*), so a fresh build takes whatever Debian
 has published since.
 
+## A plugin that needs consent
+
+`FieldSpec` covers everything a person can type. For a provider that wants OAuth instead,
+declare what is being asked for and Postulo conducts the round trip:
+
+```python
+from postulo.plugins.base import Consent, FieldSpec
+
+
+class MyPlugin:
+    def config_fields(self) -> list[FieldSpec]:
+        # The client id and secret are still fields: they identify the *instance* to the
+        # provider, and an operator registers them by hand.
+        return [
+            FieldSpec("client_id", "Client id"),
+            FieldSpec("client_secret", "Client secret", type="password", secret=True),
+        ]
+
+    def needs_consent(self) -> Consent:
+        return Consent(
+            authorise_url="https://provider.example/authorise",
+            token_url="https://provider.example/token",
+            scopes=("https://provider.example/auth/send",),
+            provider="Provider",
+            extra={"access_type": "offline"},  # Google needs this to issue a refresh token
+        )
+```
+
+Postulo takes it from there: the redirect, the signed state, the code exchange, the encrypted
+tokens, and a refresh before every use. Ask for the token with
+`postulo.plugins.consent.access_token(connection)` — never keep one yourself, and never read
+the stored secrets directly, because refreshing is the part that has to happen at the moment
+of use.
+
+**Ask for the narrowest scope that does the job.** The scopes are shown to the person on the
+page before they agree, which is the point: a list nobody can read is a list nobody consented
+to.
+
+**Do not reach for the sign-in tokens.** allauth holds one for anybody who signed in through a
+provider, and it carries the scopes asked for at sign-in. Reusing it would mean asking for a
+mail scope at sign-in on the chance it might be useful later, which is precisely the
+over-broad consent this project should not teach — and allauth holds one token per account per
+application, so a second grant has nowhere to sit beside the first.
+
 ## A plugin that owns a table
 
 Most plugins own nothing. A source reads a page, an importer reads a file, a transport carries

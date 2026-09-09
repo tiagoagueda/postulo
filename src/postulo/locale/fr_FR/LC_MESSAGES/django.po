@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s a déjà un identifiant %(scheme)s : %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s modifiés."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -943,6 +943,21 @@ msgstr "Publicité et marketing"
 #, draft
 msgid "Aerospace"
 msgstr "Aérospatiale"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Consentir de nouveau"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Consentir chez le fournisseur"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Consentement auprès de %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1970,18 +1985,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Connecté à %(host)s:%(port)s. Aucun nom d'utilisateur, donc aucune authentification."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Connecté. Testez-le pour vous assurer qu'il fonctionne."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "connexion"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Connexion supprimée, secrets compris."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Connexion enregistrée. Testez-la pour vérifier qu'elle fonctionne."
@@ -1996,9 +2016,9 @@ msgstr "sécurité de la connexion"
 msgid "Connection security"
 msgstr "Sécurité de la connexion"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2580,7 +2600,7 @@ msgstr "copies de documents"
 msgid "document copy"
 msgstr "copie de document"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Dépôts de documents"
@@ -2962,6 +2982,13 @@ msgstr "Tout ce que vous avez écrit figure déjà sur ce CV."
 msgid "Everything, newest first."
 msgstr "Tout, du plus récent au plus ancien."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Exactement telle qu'elle apparaît, schéma et port compris. Si cette instance déménage, enregistrez la nouvelle avant que quiconque tente de se reconnecter."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3242,6 +3269,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Oublier le mot de passe enregistré"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Oublier le jeton"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4039,7 +4071,7 @@ msgid ""
 msgstr ""
 "Il refuse de servir quoi que ce soit plutôt que de publier ces entrées à quiconque le trouve. Définissez POSTULO_LOGS_TOKEN, ou désactivez POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Ça fonctionne."
@@ -5110,6 +5142,11 @@ msgstr "non — comptes existants uniquement"
 msgid "No-show"
 msgstr "Absence"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Personne n'y a encore consenti. Reconnectez-le."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5462,7 +5499,7 @@ msgstr "Rien à connecter"
 msgid "Nothing to decide"
 msgstr "Rien à trancher"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5485,6 +5522,11 @@ msgstr "Rien en attente"
 msgid "Nothing was added."
 msgstr "Rien n'a été ajouté."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Rien n'a été connecté. Personne n'a consenti à quoi que ce soit."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5506,7 +5548,7 @@ msgstr "Rien n'était sélectionné, donc rien n'a changé."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Rien. Le tableau de bord proposera d'y remettre quelque chose."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Notifications"
@@ -6265,6 +6307,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo récupère cette seule page, et rien d'autre."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo l'a oublié. Le fournisseur conserve l'autorisation tant que vous ne la retirez pas là-bas aussi."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6703,6 +6752,17 @@ msgstr "Recommandation"
 msgid "Refresh logo"
 msgstr "Récupérer le logo à nouveau"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Enregistrez cette adresse chez le fournisseur"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Enregistrez d'abord cette instance chez le fournisseur et enregistrez l'identifiant client."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7042,6 +7102,11 @@ msgstr "Enregistrer"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Enregistrez l'entreprise pour ajouter un autre identifiant."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Enregistrez ceci d'abord, puis revenez consentir."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7569,6 +7634,11 @@ msgid ""
 msgstr ""
 "Toute personne arrivant par ce fournisseur est connectée au compte auquel appartient l’adresse fournie, dès lors que le fournisseur indique que cette adresse est vérifiée. Une question mérite donc une réponse : ce fournisseur ne déclare-t-il une adresse vérifiée que lorsque la personne a prouvé qu’elle lui appartient ? Si vous l’administrez, presque certainement. S’il est à quelqu’un d’autre, vérifiez-le avant de vous y fier. Mettez POSTULO_OIDC_LINK_BY_EMAIL à false pour exiger que chacun se connecte ici une fois et relie le fournisseur depuis sa propre page de compte."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr "Quelqu'un y a consenti. Testez-le pour vérifier que cela tient toujours."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7814,7 +7884,7 @@ msgid ""
 msgstr ""
 "En désactiver un arrête son utilisation et n’efface rien : les connexions que vous avez créées restent exactement telles quelles, et le réactiver les rend inchangées."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "La synchronisation a échoué : %(error)s"
@@ -7834,12 +7904,12 @@ msgstr "liens de synchronisation"
 msgid "Sync now"
 msgstr "Synchroniser maintenant"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Synchronisé : %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Synchronisation"
@@ -7953,7 +8023,7 @@ msgstr ""
 msgid "Test"
 msgstr "Tester"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Échec du test : %(message)s"
@@ -8016,6 +8086,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Cette chaîne compte plus de %(limit)s entreprises, ce qui dépasse tout groupe que Postulo puisse représenter utilement."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Cette connexion appartient à quelqu'un d'autre."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Cette connexion n'utilise pas le consentement."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Cette connexion n'existe plus."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8269,10 +8354,15 @@ msgstr "Cette page a renvoyé %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Cette image dépasse 5 Mo. Une plus petite, s'il vous plaît."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ce plugin n'est plus installé."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Cette réponse ne provient pas d'une requête faite par Postulo."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8572,6 +8662,22 @@ msgid ""
 msgstr ""
 "Le répertoire de médias privé de ce serveur, où se trouve chaque document, où qu'il soit copié par ailleurs."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Le fournisseur a répondu %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr ""
+"Le fournisseur ne renouvellera pas cela. Quelqu'un doit y consentir de nouveau."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "La réponse du fournisseur était illisible."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8854,6 +8960,13 @@ msgstr "Ce type d'identifiant est déjà dans la liste."
 #, draft
 msgid "This number is already listed."
 msgstr "Ce numéro figure déjà dans la liste."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Celle-ci ne prend pas de mot de passe. Vous consentez sur le site du fournisseur lui-même, et il donne à Postulo un jeton qu'il peut renouveler. Vous pouvez retirer ce consentement là-bas à tout moment, et Postulo ne peut pas le faire pour vous."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9429,6 +9542,11 @@ msgstr "Quoi mettre où"
 #, draft
 msgid "What happened"
 msgstr "Ce qui s'est passé"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Ce qui est demandé"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

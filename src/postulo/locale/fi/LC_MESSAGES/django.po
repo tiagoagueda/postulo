@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -43,7 +43,7 @@ msgstr "Yrityksellä %(company)s on jo %(scheme)s-tunniste: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s muutettu."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -932,6 +932,21 @@ msgstr "Mainonta ja markkinointi"
 #, draft
 msgid "Aerospace"
 msgstr "Ilmailu ja avaruus"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Hyväksy uudelleen"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Hyväksy palveluntarjoajalla"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Hyväksyntä palvelussa %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1957,18 +1972,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Yhdistetty osoitteeseen %(host)s:%(port)s. Ei käyttäjätunnusta, joten mitään ei kirjattu sisään."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Yhdistetty. Testaa varmistaaksesi, että se toimii."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "yhteys"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Yhteys poistettu salaisuuksineen."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Yhteys tallennettu. Testaa se varmistaaksesi, että se toimii."
@@ -1983,9 +2003,9 @@ msgstr "yhteyden suojaus"
 msgid "Connection security"
 msgstr "Yhteyden suojaus"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2566,7 +2586,7 @@ msgstr "asiakirjakopiot"
 msgid "document copy"
 msgstr "asiakirjakopio"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Asiakirjavarastot"
@@ -2946,6 +2966,13 @@ msgstr "Kaikki kirjoittamasi on jo tässä CV:ssä."
 msgid "Everything, newest first."
 msgstr "Kaikki, uusin ensin."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Täsmälleen sellaisena kuin se näkyy, mukaan lukien skeema ja mahdollinen portti. Jos tämä instanssi muuttaa, rekisteröi uusi ennen kuin kukaan yrittää yhdistää uudelleen."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3225,6 +3252,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Unohda tallennettu salasana"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Unohda tunnus"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4016,7 +4048,7 @@ msgid ""
 msgstr ""
 "Se kieltäytyy tarjoamasta mitään sen sijaan, että julkaisisi nämä merkinnät kenelle tahansa, joka osoitteen löytää. Aseta POSTULO_LOGS_TOKEN tai kytke POSTULO_LOGS_ENDPOINT_ENABLED pois."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Se toimii."
@@ -5085,6 +5117,11 @@ msgstr "ei — vain olemassa olevat tilit"
 msgid "No-show"
 msgstr "Ei saapunut"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Kukaan ei ole vielä hyväksynyt tätä. Yhdistä se uudelleen."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5437,7 +5474,7 @@ msgstr "Ei mitään yhdistettävää"
 msgid "Nothing to decide"
 msgstr "Ei mitään päätettävää"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5460,6 +5497,11 @@ msgstr "Mikään ei odota"
 msgid "Nothing was added."
 msgstr "Mitään ei lisätty."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Mitään ei yhdistetty. Kukaan ei hyväksynyt mitään."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5481,7 +5523,7 @@ msgstr "Mitään ei ollut valittu, joten mikään ei muuttunut."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Ei mitään. Koontinäyttö tarjoutuu palauttamaan jotakin."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Ilmoitukset"
@@ -6235,6 +6277,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo hakee tämän yhden sivun eikä mitään muuta."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo unohti sen. Palveluntarjoajalla on lupa edelleen, kunnes peruutat sen sielläkin."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6675,6 +6724,17 @@ msgstr "Suositus"
 msgid "Refresh logo"
 msgstr "Hae tunnus uudelleen"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Rekisteröi tämä osoite palveluntarjoajalle"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Rekisteröi ensin tämä instanssi palveluntarjoajalle ja tallenna asiakastunniste."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7013,6 +7073,11 @@ msgstr "Tallenna"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Tallenna yritys lisätäksesi toisen tunnisteen."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Tallenna tämä ensin, palaa sitten hyväksymään."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7538,6 +7603,12 @@ msgid ""
 msgstr ""
 "Tämän tarjoajan kautta tuleva kirjataan sisään tilille, jolle annettu osoite kuuluu, kunhan tarjoaja sanoo osoitteen olevan vahvistettu. Siksi yhteen kysymykseen kannattaa vastata: kutsuuko tämä tarjoaja osoitetta vahvistetuksi vain silloin, kun henkilö on todistanut sen omakseen? Jos ylläpidät sitä itse, lähes varmasti. Jos se on jonkun muun, tarkista asia ennen kuin luotat siihen. Aseta POSTULO_OIDC_LINK_BY_EMAIL arvoon false, jolloin jokaisen on kirjauduttava tänne kerran ja yhdistettävä tarjoaja omalta tilisivultaan."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr ""
+"Joku on hyväksynyt tämän. Testaa varmistaaksesi, että se on yhä voimassa."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7782,7 +7853,7 @@ msgid ""
 msgstr ""
 "Sammuttaminen lopettaa käytön eikä poista mitään: tekemäsi yhteydet pysyvät täsmälleen ennallaan, ja takaisin päälle laittaminen tuo ne muuttumattomina."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Synkronointi epäonnistui: %(error)s"
@@ -7802,12 +7873,12 @@ msgstr "synkronointilinkit"
 msgid "Sync now"
 msgstr "Synkronoi nyt"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Synkronoitu: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Synkronointi"
@@ -7920,7 +7991,7 @@ msgstr "Mallit ilmestyvät, kun lähetät kirjeen hakemuksen mukana."
 msgid "Test"
 msgstr "Testaa"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Testi epäonnistui: %(message)s"
@@ -7983,6 +8054,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Ketju on syvempi kuin %(limit)s yritystä — syvempi kuin mitä Postulo voi mielekkäästi piirtää."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Tuo yhteys kuuluu jollekulle muulle."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Tuo yhteys ei käytä hyväksyntää."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Tuota yhteyttä ei enää ole."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8233,10 +8319,15 @@ msgstr "Tuo sivu palautti %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tuo kuva on yli 5 Mt. Pienempi, kiitos."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Tuota liitännäistä ei ole enää asennettu."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Tuo vastaus ei tullut Postulon tekemästä pyynnöstä."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8533,6 +8624,21 @@ msgid ""
 msgstr ""
 "Tämän palvelimen yksityinen mediahakemisto, jossa jokainen asiakirja on, minne tahansa se muuten kopioidaan."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Palveluntarjoaja vastasi %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Palveluntarjoaja ei uusi tätä. Jonkun on hyväksyttävä se uudelleen."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "Palveluntarjoajan vastausta ei voitu lukea."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8811,6 +8917,13 @@ msgstr "Tämäntyyppinen tunniste on jo luettelossa."
 #, draft
 msgid "This number is already listed."
 msgstr "Tämä numero on jo luettelossa."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Tämä ei ota salasanaa. Hyväksyt palveluntarjoajan omalla sivustolla, ja se antaa Postulolle tunnuksen, jonka se voi uusia. Voit peruuttaa hyväksynnän siellä milloin tahansa, eikä Postulo voi tehdä sitä puolestasi."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9382,6 +9495,11 @@ msgstr "Mikä minnekin"
 #, draft
 msgid "What happened"
 msgstr "Mitä tapahtui"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Mitä pyydetään"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: dansk\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s har allerede en %(scheme)s-identifikator: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s ændret."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -935,6 +935,21 @@ msgstr "Reklame og marketing"
 #, draft
 msgid "Aerospace"
 msgstr "Luft- og rumfart"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Giv samtykke igen"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Giv samtykke hos udbyderen"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Samtykke med %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1959,18 +1974,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Forbundet til %(host)s:%(port)s. Intet brugernavn, så der blev ikke logget ind."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Forbundet. Test det for at være sikker på, at det virker."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "forbindelse"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Forbindelse fjernet, inklusive hemmeligheder."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Forbindelse gemt. Test den for at sikre, at den virker."
@@ -1985,9 +2005,9 @@ msgstr "forbindelsens sikkerhed"
 msgid "Connection security"
 msgstr "Forbindelsens sikkerhed"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2567,7 +2587,7 @@ msgstr "dokumentkopier"
 msgid "document copy"
 msgstr "dokumentkopi"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Dokumentlagre"
@@ -2947,6 +2967,13 @@ msgstr "Alt, hvad du har skrevet, er allerede på dette CV."
 msgid "Everything, newest first."
 msgstr "Alt, nyeste først."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Præcis som det står, inklusive skema og eventuel port. Flytter denne instans, så registrér den nye, før nogen prøver at forbinde igen."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3227,6 +3254,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Glem den gemte adgangskode"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Glem token"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4020,7 +4052,7 @@ msgid ""
 msgstr ""
 "Det nægter at servere noget som helst frem for at offentliggøre disse poster til enhver, der finder adressen. Sæt POSTULO_LOGS_TOKEN, eller slå POSTULO_LOGS_ENDPOINT_ENABLED fra."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Det virker."
@@ -5091,6 +5123,11 @@ msgstr "nej — kun eksisterende konti"
 msgid "No-show"
 msgstr "Udeblev"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Ingen har givet samtykke til dette endnu. Forbind det igen."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5441,7 +5478,7 @@ msgstr "Intet at forbinde til"
 msgid "Nothing to decide"
 msgstr "Intet at tage stilling til"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5464,6 +5501,11 @@ msgstr "Intet venter"
 msgid "Nothing was added."
 msgstr "Intet blev tilføjet."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Intet blev forbundet. Ingen gav samtykke til noget."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5485,7 +5527,7 @@ msgstr "Intet var valgt, så intet blev ændret."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Ingenting. Dashboardet tilbyder at sætte noget tilbage."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Notifikationer"
@@ -6238,6 +6280,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo henter denne ene side og intet andet."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo har glemt det. Udbyderen har stadig tilladelsen, indtil du trækker den tilbage der også."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6676,6 +6725,16 @@ msgstr "Henvisning"
 msgid "Refresh logo"
 msgstr "Hent logoet igen"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Registrér denne adresse hos udbyderen"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr "Registrér først denne instans hos udbyderen, og gem klient-id'et."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7015,6 +7074,11 @@ msgstr "Gem"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Gem virksomheden for at tilføje endnu en identifikator."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Gem dette først, kom så tilbage og giv samtykke."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7539,6 +7603,12 @@ msgid ""
 msgstr ""
 "Den, der kommer via denne udbyder, logges ind på den konto, som ejer den angivne adresse, forudsat at udbyderen siger, at adressen er bekræftet. Derfor er ét spørgsmål værd at besvare: kalder denne udbyder kun en adresse bekræftet, når personen har bevist, at den er deres? Hvis du selv driver den, næsten helt sikkert. Er den andres, så tjek det, før du stoler på den. Sæt POSTULO_OIDC_LINK_BY_EMAIL til false for at kræve, at hver enkelt logger ind her én gang og forbinder udbyderen fra sin egen kontoside."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr ""
+"Nogen har givet samtykke til dette. Test det for at være sikker på, at det stadig gælder."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7783,7 +7853,7 @@ msgid ""
 msgstr ""
 "At slå et fra stopper brugen og sletter intet: de forbindelser, du har lavet, forbliver præcis som de er, og at slå det til igen giver dem uændret tilbage."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Synkronisering mislykkedes: %(error)s"
@@ -7803,12 +7873,12 @@ msgstr "synkroniseringslinks"
 msgid "Sync now"
 msgstr "Synkroniser nu"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Synkroniseret: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Synkronisering"
@@ -7921,7 +7991,7 @@ msgstr "Skabeloner dukker op, når du sender et brev med en ansøgning."
 msgid "Test"
 msgstr "Test"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Test mislykkedes: %(message)s"
@@ -7984,6 +8054,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Den kæde er mere end %(limit)s virksomheder dyb, dybere end nogen koncern Postulo kan tegne meningsfuldt."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Den forbindelse tilhører en anden."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Den forbindelse bruger ikke samtykke."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Den forbindelse findes ikke længere."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8233,10 +8318,15 @@ msgstr "Den side returnerede %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Det billede er over 5 MB. Et mindre, tak."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Det plugin er ikke længere installeret."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Det svar kom ikke fra en forespørgsel, Postulo har sendt."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8533,6 +8623,21 @@ msgid ""
 msgstr ""
 "Den private mediemappe på denne server, hvor hvert dokument ligger, uanset hvorhen det ellers kopieres."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Udbyderen svarede %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Udbyderen vil ikke forny dette. Nogen skal give samtykke igen."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "Udbyderens svar kunne ikke læses."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8810,6 +8915,13 @@ msgstr "Denne slags identifikator er allerede på listen."
 #, draft
 msgid "This number is already listed."
 msgstr "Dette nummer står allerede på listen."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Denne tager ikke en adgangskode. Du giver samtykke på udbyderens eget websted, og det giver Postulo et token, den kan forny. Du kan trække samtykket tilbage der når som helst, og Postulo kan ikke gøre det for dig."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9381,6 +9493,11 @@ msgstr "Hvad hører hvor"
 #, draft
 msgid "What happened"
 msgstr "Hvad der skete"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Hvad der bliver bedt om"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

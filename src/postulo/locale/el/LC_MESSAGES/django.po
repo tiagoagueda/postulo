@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Ελληνικά\n"
@@ -43,7 +43,7 @@ msgstr "Η %(company)s έχει ήδη αναγνωριστικό %(scheme)s: %(
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s άλλαξαν."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -942,6 +942,21 @@ msgstr "Διαφήμιση και μάρκετινγκ"
 #, draft
 msgid "Aerospace"
 msgstr "Αεροδιαστημική"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Συμφωνήστε ξανά"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Συμφωνήστε στον πάροχο"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Συμφωνία με %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1968,18 +1983,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Συνδέθηκε στο %(host)s:%(port)s. Χωρίς όνομα χρήστη, οπότε δεν έγινε καμία είσοδος."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Συνδέθηκε. Δοκιμάστε το για να βεβαιωθείτε ότι λειτουργεί."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "σύνδεση"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Η σύνδεση αφαιρέθηκε, μαζί με τα μυστικά."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Η σύνδεση αποθηκεύτηκε. Δοκιμάστε την για να βεβαιωθείτε ότι λειτουργεί."
@@ -1994,9 +2014,9 @@ msgstr "ασφάλεια σύνδεσης"
 msgid "Connection security"
 msgstr "Ασφάλεια σύνδεσης"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2578,7 +2598,7 @@ msgstr "αντίγραφα εγγράφων"
 msgid "document copy"
 msgstr "αντίγραφο εγγράφου"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Αποθήκες εγγράφων"
@@ -2959,6 +2979,13 @@ msgstr "Όλα όσα γράψατε είναι ήδη σε αυτό το βιο
 msgid "Everything, newest first."
 msgstr "Όλα, τα νεότερα πρώτα."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Ακριβώς όπως εμφανίζεται, μαζί με το σχήμα και τυχόν θύρα. Αν αυτή η εγκατάσταση μετακομίσει, καταχωρίστε τη νέα πριν προσπαθήσει κανείς να συνδεθεί ξανά."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3238,6 +3265,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Να ξεχαστεί ο αποθηκευμένος κωδικός"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Ξέχνα το διακριτικό"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4029,7 +4061,7 @@ msgid ""
 msgstr ""
 "Αρνείται να δώσει οτιδήποτε αντί να δημοσιεύσει αυτές τις εγγραφές σε όποιον βρει τη διεύθυνση. Ορίστε το POSTULO_LOGS_TOKEN ή απενεργοποιήστε το POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Λειτουργεί."
@@ -5099,6 +5131,11 @@ msgstr "όχι — μόνο υπάρχοντες λογαριασμοί"
 msgid "No-show"
 msgstr "Μη εμφάνιση"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Κανείς δεν έχει συμφωνήσει ακόμη. Συνδέστε το ξανά."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5453,7 +5490,7 @@ msgstr "Τίποτα για σύνδεση"
 msgid "Nothing to decide"
 msgstr "Τίποτα προς απόφαση"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5476,6 +5513,11 @@ msgstr "Τίποτα δεν περιμένει"
 msgid "Nothing was added."
 msgstr "Τίποτα δεν προστέθηκε."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Δεν συνδέθηκε τίποτα. Κανείς δεν συμφώνησε σε τίποτα."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5497,7 +5539,7 @@ msgstr "Δεν επιλέχθηκε τίποτα, άρα δεν άλλαξε τ�
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Τίποτα. Ο πίνακας θα προτείνει να επαναφέρετε κάτι."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Ειδοποιήσεις"
@@ -6259,6 +6301,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Το Postulo ανακτά αυτή τη μία σελίδα, και τίποτα άλλο."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Το Postulo το ξέχασε. Ο πάροχος εξακολουθεί να έχει την άδεια μέχρι να την αποσύρετε και εκεί."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6699,6 +6748,17 @@ msgstr "Σύσταση"
 msgid "Refresh logo"
 msgstr "Λήψη λογότυπου ξανά"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Καταχωρίστε αυτή τη διεύθυνση στον πάροχο"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Καταχωρίστε πρώτα αυτή την εγκατάσταση στον πάροχο και αποθηκεύστε το αναγνωριστικό πελάτη."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7040,6 +7100,11 @@ msgstr "Αποθήκευση"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Αποθηκεύστε την εταιρεία για να προσθέσετε άλλο αναγνωριστικό."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Αποθηκεύστε το πρώτα, μετά επιστρέψτε και συμφωνήστε."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7565,6 +7630,12 @@ msgid ""
 msgstr ""
 "Όποιος έρχεται μέσω αυτού του παρόχου συνδέεται στον λογαριασμό στον οποίο ανήκει η διεύθυνση που δίνεται, εφόσον ο πάροχος λέει ότι η διεύθυνση είναι επαληθευμένη. Αξίζει λοιπόν να απαντηθεί ένα ερώτημα: χαρακτηρίζει αυτός ο πάροχος μια διεύθυνση επαληθευμένη μόνο όταν το άτομο απέδειξε ότι του ανήκει; Αν τον διαχειρίζεστε εσείς, σχεδόν σίγουρα. Αν είναι ξένος, ελέγξτε το πριν βασιστείτε σε αυτόν. Θέστε το POSTULO_OIDC_LINK_BY_EMAIL σε false ώστε ο καθένας να συνδέεται εδώ μία φορά και να συνδέει τον πάροχο από τη σελίδα του λογαριασμού του."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr ""
+"Κάποιος έχει συμφωνήσει. Δοκιμάστε το για να βεβαιωθείτε ότι ισχύει ακόμη."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7810,7 +7881,7 @@ msgid ""
 msgstr ""
 "Η απενεργοποίηση σταματά τη χρήση και δεν διαγράφει τίποτα: οι συνδέσεις που έχετε φτιάξει μένουν ακριβώς όπως είναι, και η επανενεργοποίηση τις επιστρέφει αμετάβλητες."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Ο συγχρονισμός απέτυχε: %(error)s"
@@ -7830,12 +7901,12 @@ msgstr "σύνδεσμοι συγχρονισμού"
 msgid "Sync now"
 msgstr "Συγχρονισμός τώρα"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Συγχρονίστηκε: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Συγχρονισμός"
@@ -7948,7 +8019,7 @@ msgstr "Τα πρότυπα εμφανίζονται όταν στέλνετε �
 msgid "Test"
 msgstr "Δοκιμή"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Η δοκιμή απέτυχε: %(message)s"
@@ -8011,6 +8082,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Αυτή η αλυσίδα έχει βάθος πάνω από %(limit)s εταιρείες, περισσότερο από όσο μπορεί το Postulo να αποτυπώσει χρήσιμα."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Αυτή η σύνδεση ανήκει σε κάποιον άλλο."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Αυτή η σύνδεση δεν χρησιμοποιεί συγκατάθεση."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Αυτή η σύνδεση δεν υπάρχει πια."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8263,10 +8349,15 @@ msgstr "Αυτή η σελίδα επέστρεψε %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Αυτή η εικόνα ξεπερνά τα 5 MB. Μια μικρότερη, παρακαλώ."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Αυτό το πρόσθετο δεν είναι πλέον εγκατεστημένο."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Αυτή η απάντηση δεν ήρθε από αίτημα που έκανε το Postulo."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8567,6 +8658,21 @@ msgid ""
 msgstr ""
 "Ο ιδιωτικός κατάλογος πολυμέσων σε αυτόν τον διακομιστή, όπου βρίσκεται κάθε έγγραφο, όπου αλλού κι αν αντιγράφεται."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Ο πάροχος απάντησε %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Ο πάροχος δεν θα το ανανεώσει. Κάποιος πρέπει να συμφωνήσει ξανά."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "Η απάντηση του παρόχου δεν ήταν αναγνώσιμη."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8848,6 +8954,13 @@ msgstr "Αυτό το είδος αναγνωριστικού είναι ήδη 
 #, draft
 msgid "This number is already listed."
 msgstr "Αυτός ο αριθμός υπάρχει ήδη στη λίστα."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Αυτή δεν παίρνει κωδικό. Συμφωνείτε στον ίδιο τον ιστότοπο του παρόχου, και αυτός δίνει στο Postulo ένα διακριτικό που μπορεί να ανανεώνει. Μπορείτε να αποσύρετε αυτή τη συμφωνία εκεί ανά πάσα στιγμή, και το Postulo δεν μπορεί να το κάνει για εσάς."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9422,6 +9535,11 @@ msgstr "Τι πάει πού"
 #, draft
 msgid "What happened"
 msgstr "Τι συνέβη"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Τι ζητείται"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

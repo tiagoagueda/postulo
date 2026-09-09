@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: ქართული\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s უკვე აქვს %(scheme)s იდენტიფ�
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s შეიცვალა."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -935,6 +935,21 @@ msgstr "რეკლამა და მარკეტინგი"
 #, draft
 msgid "Aerospace"
 msgstr "საჰაერო-კოსმოსური დარგი"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "დაეთანხმეთ ხელახლა"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "დაეთანხმეთ პროვაიდერთან"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "დათანხმება %(provider)s-თან"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1962,18 +1977,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "დაკავშირდა %(host)s:%(port)s-თან. მომხმარებლის სახელი არ არის, ამიტომ შესვლა არ მომხდარა."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "დაკავშირებულია. შეამოწმეთ, რომ დარწმუნდეთ, რომ მუშაობს."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "კავშირი"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "კავშირი წაიშალა, საიდუმლოებებთან ერთად."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "კავშირი შენახულია. შეამოწმეთ, რომ დარწმუნდეთ, მუშაობს."
@@ -1988,9 +2008,9 @@ msgstr "კავშირის უსაფრთხოება"
 msgid "Connection security"
 msgstr "კავშირის უსაფრთხოება"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2572,7 +2592,7 @@ msgstr "დოკუმენტის ასლები"
 msgid "document copy"
 msgstr "დოკუმენტის ასლი"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "დოკუმენტების საცავები"
@@ -2952,6 +2972,13 @@ msgstr "ყველაფერი, რაც დაწერეთ, უკვ�
 msgid "Everything, newest first."
 msgstr "ყველაფერი, უახლესი პირველი."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"ზუსტად ისე, როგორც ჩანს, სქემისა და ნებისმიერი პორტის ჩათვლით. თუ ეს ინსტანცია გადავა, დაარეგისტრირეთ ახალი, სანამ ვინმე ხელახლა შეეცდება დაკავშირებას."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3232,6 +3259,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "შენახული პაროლის დავიწყება"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "დაივიწყე ტოკენი"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4024,7 +4056,7 @@ msgid ""
 msgstr ""
 "ის უარს ამბობს რამის გაცემაზე, ვიდრე ეს ჩანაწერები ყველასთვის გამოაქვეყნოს, ვინც მას იპოვის. დააყენეთ POSTULO_LOGS_TOKEN ან გამორთეთ POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "მუშაობს."
@@ -5094,6 +5126,11 @@ msgstr "არა — მხოლოდ არსებული ანგა�
 msgid "No-show"
 msgstr "არ გამოცხადდა"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "ამას ჯერ არავინ დათანხმებია. დააკავშირეთ ხელახლა."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5444,7 +5481,7 @@ msgstr "დასაკავშირებელი არაფერია"
 msgid "Nothing to decide"
 msgstr "გადასაწყვეტი არაფერია"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5467,6 +5504,11 @@ msgstr "არაფერი ელოდება"
 msgid "Nothing was added."
 msgstr "არაფერი დამატებულა."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "არაფერი დაკავშირებულა. არავინ არაფერს დათანხმებია."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5488,7 +5530,7 @@ msgstr "არაფერი იყო არჩეული, ამიტო�
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "არაფერი. მიმოხილვა შემოგთავაზებთ, რომ რამე დააბრუნოთ."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "შეტყობინებები"
@@ -6245,6 +6287,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo ჩამოტვირთავს ამ ერთ გვერდს და სხვა არაფერს."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo-მ დაივიწყა იგი. პროვაიდერს ნებართვა კვლავ აქვს, სანამ იქაც არ გამოიხმობთ."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6687,6 +6736,17 @@ msgstr "რეკომენდაციით"
 msgid "Refresh logo"
 msgstr "ლოგოს განახლება"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "დაარეგისტრირეთ ეს მისამართი პროვაიდერთან"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"ჯერ დაარეგისტრირეთ ეს ინსტანცია პროვაიდერთან და შეინახეთ კლიენტის იდენტიფიკატორი."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7027,6 +7087,11 @@ msgstr "შენახვა"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "შეინახეთ კომპანია, რომ კიდევ ერთი იდენტიფიკატორი დაამატოთ."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "ჯერ ეს შეინახეთ, შემდეგ დაბრუნდით და დაეთანხმეთ."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7551,6 +7616,11 @@ msgid ""
 msgstr ""
 "ვინც ამ პროვაიდერით მოდის, შედის როგორც ის ანგარიში, რომელსაც პროვაიდერის მიერ მითითებული მისამართი აქვს, სანამ პროვაიდერი ამბობს, რომ ეს მისამართი დადასტურებულია. ამიტომ ერთ კითხვას პასუხი ღირს: ეს პროვაიდერი მისამართს დადასტურებულად მხოლოდ მაშინ უწოდებს, როცა ადამიანმა დაამტკიცა, რომ მისია? თუ თავად მართავთ, თითქმის ნამდვილად. თუ სხვისია, შეამოწმეთ, სანამ ამას დაეყრდნობით. დააყენეთ POSTULO_OIDC_LINK_BY_EMAIL false-ზე, რომ თითოეულმა ადამიანმა აქ ერთხელ შემოვიდეს და პროვაიდერი თავისი ანგარიშის გვერდიდან დააკავშიროს."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr "ვიღაც დათანხმდა ამას. შეამოწმეთ, რომ დარწმუნდეთ, რომ ჯერ კიდევ ძალაშია."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7795,7 +7865,7 @@ msgid ""
 msgstr ""
 "ერთის გამორთვა გამოყენებას აჩერებს და არაფერს შლის: ყველა კავშირი, რომელიც შექმენით, ზუსტად ისე რჩება, როგორც არის, ხოლო ხელახლა ჩართვა მათ უცვლელად აბრუნებს."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "სინქრონიზაცია ვერ მოხერხდა: %(error)s"
@@ -7815,12 +7885,12 @@ msgstr "სინქრონიზაციის ბმულები"
 msgid "Sync now"
 msgstr "ახლავე სინქრონიზაცია"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "დასინქრონდა: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "სინქრონიზაცია"
@@ -7933,7 +8003,7 @@ msgstr "შაბლონები ჩნდება, როცა წერ�
 msgid "Test"
 msgstr "შემოწმება"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "შემოწმება ვერ მოხერხდა: %(message)s"
@@ -7996,6 +8066,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "ეს ჯაჭვი %(limit)s კომპანიაზე ღრმაა — უფრო ღრმა, ვიდრე Postulo-ს შეუძლია აზრიანად დახატოს."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "ეს კავშირი სხვას ეკუთვნის."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "ეს კავშირი თანხმობას არ იყენებს."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "ეს კავშირი აღარ არსებობს."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8244,10 +8329,15 @@ msgstr "იმ გვერდმა %(status)s დააბრუნა."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "ის სურათი 5 MB-ზე მეტია. უფრო პატარა, გთხოვთ."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "ის მოდული აღარ არის დაყენებული."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "ეს პასუხი არ მოვიდა Postulo-ს გაგზავნილი მოთხოვნიდან."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8544,6 +8634,21 @@ msgid ""
 msgstr ""
 "ამ სერვერზე არსებული კერძო მედიის საქაღალდე, სადაც თითოეული დოკუმენტი ინახება, სხვაგან სადაც არ უნდა იყოს დაკოპირებული."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "პროვაიდერმა უპასუხა %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "პროვაიდერი ამას არ განაახლებს. ვიღაცამ ხელახლა უნდა დათანხმდეს."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "პროვაიდერის პასუხი წაკითხვადი არ იყო."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8822,6 +8927,13 @@ msgstr "ამ სახის იდენტიფიკატორი უკ
 #, draft
 msgid "This number is already listed."
 msgstr "ეს ნომერი უკვე სიაშია."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"ეს პაროლს არ იღებს. თქვენ თანხმდებით თავად პროვაიდერის საიტზე, და ის Postulo-ს აძლევს ტოკენს, რომლის განახლებაც შეუძლია. ამ თანხმობის გამოხმობა იქ ნებისმიერ დროს შეგიძლიათ, და Postulo-ს ეს თქვენ მაგივრად არ შეუძლია."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9394,6 +9506,11 @@ msgstr "რა სად მიდის"
 #, draft
 msgid "What happened"
 msgstr "რა მოხდა"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "რა ითხოვება"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

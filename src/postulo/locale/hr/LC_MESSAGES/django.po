@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: hrvatski\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s već ima identifikator %(scheme)s: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s promijenjeno."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -953,6 +953,21 @@ msgstr "Oglašavanje i marketing"
 #, draft
 msgid "Aerospace"
 msgstr "Zrakoplovstvo i svemir"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Pristani ponovno"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Pristani kod pružatelja"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Pristanak s %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1978,18 +1993,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Povezano s %(host)s:%(port)s. Nema korisničkog imena pa ništa nije prijavljeno."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Povezano. Testirajte da budete sigurni da radi."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "veza"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Veza uklonjena, uključujući tajne."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Veza spremljena. Testirajte je da se uvjerite da radi."
@@ -2004,9 +2024,9 @@ msgstr "sigurnost veze"
 msgid "Connection security"
 msgstr "Sigurnost veze"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2588,7 +2608,7 @@ msgstr "kopije dokumenata"
 msgid "document copy"
 msgstr "kopija dokumenta"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Spremišta dokumenata"
@@ -2965,6 +2985,13 @@ msgstr "Sve što ste napisali već je u ovom životopisu."
 msgid "Everything, newest first."
 msgstr "Sve, najnovije prvo."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Točno kako piše, uključujući shemu i eventualni port. Ako se ova instanca preseli, registrirajte novu prije nego što se netko pokuša ponovno povezati."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3244,6 +3271,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Zaboravi spremljenu lozinku"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Zaboravi token"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4033,7 +4065,7 @@ msgid ""
 msgstr ""
 "Radije neće poslužiti ništa nego objaviti ove zapise bilo kome tko pronađe adresu. Postavite POSTULO_LOGS_TOKEN ili isključite POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Radi."
@@ -5104,6 +5136,11 @@ msgstr "ne — samo postojeći računi"
 msgid "No-show"
 msgstr "Nedolazak"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Nitko na ovo još nije pristao. Povežite to ponovno."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5453,7 +5490,7 @@ msgstr "Nema se na što povezati"
 msgid "Nothing to decide"
 msgstr "Nema što odlučiti"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5476,6 +5513,11 @@ msgstr "Ništa ne čeka"
 msgid "Nothing was added."
 msgstr "Ništa nije dodano."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Ništa nije povezano. Nitko ni na što nije pristao."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5497,7 +5539,7 @@ msgstr "Ništa nije bilo odabrano, pa se ništa nije promijenilo."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Ništa. Nadzorna ploča ponudit će da nešto vrati."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Obavijesti"
@@ -6262,6 +6304,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo dohvaća ovu jednu stranicu, i ništa drugo."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo je to zaboravio. Pružatelj i dalje ima dopuštenje dok ga i tamo ne povučete."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6703,6 +6752,17 @@ msgstr "Preporuka"
 msgid "Refresh logo"
 msgstr "Ponovno dohvati logotip"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Registrirajte ovu adresu kod pružatelja"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Prvo registrirajte ovu instancu kod pružatelja i spremite identifikator klijenta."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7043,6 +7103,11 @@ msgstr "Spremi"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Spremite tvrtku da dodate još jedan identifikator."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Prvo ovo spremite, pa se vratite i pristanite."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7567,6 +7632,11 @@ msgid ""
 msgstr ""
 "Tko dođe preko ovog pružatelja prijavljuje se na račun kojem pripada navedena adresa, sve dok pružatelj tvrdi da je adresa potvrđena. Zato se isplati odgovoriti na jedno pitanje: proglašava li ovaj pružatelj adresu potvrđenom samo kada je osoba dokazala da je njezina? Ako ga sami vodite, gotovo sigurno. Ako je tuđi, provjerite prije nego se pouzdate u njega. Postavite POSTULO_OIDC_LINK_BY_EMAIL na false kako bi se svatko morao jednom prijaviti ovdje i povezati pružatelja sa svoje stranice računa."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr "Netko je na ovo pristao. Testirajte da budete sigurni da još vrijedi."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7811,7 +7881,7 @@ msgid ""
 msgstr ""
 "Isključivanje zaustavlja korištenje i ništa ne briše: veze koje ste napravili ostaju točno kakve jesu, a ponovno uključivanje vraća ih nepromijenjene."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Sinkronizacija nije uspjela: %(error)s"
@@ -7831,12 +7901,12 @@ msgstr "veze sinkronizacije"
 msgid "Sync now"
 msgstr "Sinkroniziraj sada"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Sinkronizirano: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Sinkronizacija"
@@ -7949,7 +8019,7 @@ msgstr "Predlošci se pojavljuju kad šaljete pismo s prijavom."
 msgid "Test"
 msgstr "Testiraj"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Test nije uspio: %(message)s"
@@ -8012,6 +8082,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Taj je lanac dublji od %(limit)s tvrtki — dublje nego što Postulo može smisleno nacrtati."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Ta veza pripada nekom drugom."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Ta veza ne koristi pristanak."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Ta veza više ne postoji."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8262,10 +8347,15 @@ msgstr "Ta stranica je vratila %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Ta slika ima više od 5 MB. Manju, molim."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Taj dodatak više nije instaliran."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Taj odgovor nije došao od zahtjeva koji je Postulo poslao."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8565,6 +8655,21 @@ msgid ""
 msgstr ""
 "Privatna mapa medija na ovom poslužitelju, gdje se nalazi svaki dokument, kamo god se još kopirao."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Pružatelj je odgovorio %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Pružatelj ovo neće obnoviti. Netko mora ponovno pristati."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "Odgovor pružatelja nije bio čitljiv."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8842,6 +8947,13 @@ msgstr "Ova vrsta identifikatora već je na popisu."
 #, draft
 msgid "This number is already listed."
 msgstr "Ovaj je broj već na popisu."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Ova ne uzima lozinku. Pristajete na stranici samog pružatelja, a on Postulu daje token koji može obnavljati. Taj pristanak tamo možete povući bilo kada, a Postulo to ne može učiniti umjesto vas."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9412,6 +9524,11 @@ msgstr "Što ide kamo"
 #, draft
 msgid "What happened"
 msgstr "Što se dogodilo"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Što se traži"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

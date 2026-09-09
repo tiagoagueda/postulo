@@ -10,6 +10,7 @@ from __future__ import annotations
 import logging
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -134,8 +135,25 @@ class ConnectionFormView(OwnedObjectMixin, View):
                 "plugin": plugin,
                 "kind_label": KIND_LABELS.get(plugin.kind, plugin.kind),
                 "section_title": _("Connections"),
+                **self._consent_context(request, connection, plugin),
             },
         )
+
+    @staticmethod
+    def _consent_context(request, connection, plugin) -> dict:
+        from . import consent as consent_flow
+
+        wanted = consent_flow.wanted_by(plugin)
+        if wanted is None:
+            return {}
+        return {
+            "consent": wanted,
+            "consent_given": bool(connection.pk) and consent_flow.is_connected(connection),
+            # Shown rather than described: an operator registering a redirect URI by hand
+            # needs the exact string, and building one from a template is where this goes
+            # wrong (#150).
+            "consent_callback": consent_flow.callback_url(request),
+        }
 
     def get(self, request: HttpRequest, pk: int | None = None, kind=None, name=None):
         connection, plugin = self._load(request, pk, kind, name)
@@ -163,6 +181,70 @@ class ConnectionFormView(OwnedObjectMixin, View):
         return redirect("connections:list")
 
 
+class ConnectionConsentView(OwnedObjectMixin, View):
+    """Send somebody to the provider to agree (#150).
+
+    A POST rather than a link, because it starts a round trip that ends in a stored
+    credential, and a GET that does that is a GET somebody else's page can cause.
+    """
+
+    def get_queryset(self):
+        return Connection.objects.for_user(self.request.user)
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        from . import consent as consent_flow
+
+        connection = get_object_or_404(self.get_queryset(), pk=pk)
+        plugin = connection.plugin_instance
+        if plugin is None:
+            messages.error(request, _("That plugin is no longer installed."))
+            return redirect("connections:list")
+        if request.POST.get("forget"):
+            consent_flow.forget(connection)
+            messages.success(
+                request,
+                _(
+                    "Postulo has forgotten it. The provider still has the grant until you "
+                    "withdraw it there as well."
+                ),
+            )
+            return redirect("connections:list")
+        try:
+            where = consent_flow.start(connection, plugin, request)
+        except consent_flow.ConsentFailed as error:
+            messages.error(request, str(error))
+            return redirect("connections:edit", pk=connection.pk)
+        return redirect(where)
+
+
+class ConnectionConsentCallbackView(LoginRequiredMixin, View):
+    """Where every provider sends people back, for every connection on the instance.
+
+    One address rather than one per plugin, because it is the thing an operator registers by
+    hand: registering it once is the difference between this being usable and being a chore
+    repeated per provider (#150).
+    """
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        from . import consent as consent_flow
+
+        refused = request.GET.get("error", "")
+        if refused:
+            # A person who pressed *Cancel* has not done anything wrong, and the provider's
+            # own word for it is not a sentence anybody reads.
+            messages.info(request, _("Nothing was connected. Nobody agreed to anything."))
+            return redirect("connections:list")
+        try:
+            connection = consent_flow.finish(
+                request, request.GET.get("code", ""), request.GET.get("state", "")
+            )
+        except consent_flow.ConsentFailed as error:
+            messages.error(request, str(error))
+            return redirect("connections:list")
+        messages.success(request, _("Connected. Test it to make sure it works."))
+        return redirect("connections:edit", pk=connection.pk)
+
+
 class ConnectionTestView(OwnedObjectMixin, View):
     def get_queryset(self):
         return Connection.objects.for_user(self.request.user)
@@ -173,9 +255,21 @@ class ConnectionTestView(OwnedObjectMixin, View):
         if plugin is None:
             messages.error(request, _("That plugin is no longer installed."))
             return redirect("connections:list")
+        from . import consent as consent_flow
+
         try:
+            # For a connection that authenticates by consent, the first thing to prove is
+            # that the grant still stands: a provider refusing to renew is not a failure a
+            # mail server can report, and "consent was withdrawn" is fixed by agreeing again
+            # rather than by editing a field (#150).
+            if consent_flow.wanted_by(plugin) is not None:
+                consent_flow.access_token(connection)
             result = plugin.test(connection.full_config)
             ok, message = bool(result.ok), str(result.message or "")
+        except consent_flow.ConsentWithdrawn as error:
+            ok, message = False, str(error)
+        except consent_flow.ConsentFailed as error:
+            ok, message = False, str(error)
         except SecretsUnreadable as error:
             ok, message = False, str(error)
         except Exception as error:

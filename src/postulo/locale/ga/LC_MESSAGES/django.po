@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -43,7 +43,7 @@ msgstr "Tá aitheantóir %(scheme)s ag %(company)s cheana: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "Athraíodh %(count)d %(noun)s."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -999,6 +999,21 @@ msgstr "Fógraíocht agus margaíocht"
 #, draft
 msgid "Aerospace"
 msgstr "Aeraspás"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Toiligh arís"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Toiligh ag an soláthraí"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Toiliú le %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -2029,18 +2044,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Ceangailte le %(host)s:%(port)s. Gan ainm úsáideora, mar sin níor síníodh aon rud isteach."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Ceangailte. Tástáil é le bheith cinnte go n-oibríonn sé."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "nasc"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Nasc bainte, rúin san áireamh."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Nasc sábháilte. Tástáil é le cinntiú go n-oibríonn sé."
@@ -2055,9 +2075,9 @@ msgstr "slándáil an cheangail"
 msgid "Connection security"
 msgstr "Slándáil an cheangail"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2639,7 +2659,7 @@ msgstr "cóipeanna doiciméad"
 msgid "document copy"
 msgstr "cóip doiciméid"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Stórais doiciméad"
@@ -3021,6 +3041,13 @@ msgstr "Tá gach a bhfuil scríofa agat ar an CV seo cheana."
 msgid "Everything, newest first."
 msgstr "Gach rud, an ceann is nuaí ar dtús."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Go díreach mar atá sé, an scéim agus aon phort san áireamh. Má bhogann an t-ásc seo, cláraigh an ceann nua sula ndéanann duine iarracht ceangal arís."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3300,6 +3327,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Déan dearmad ar an bpasfhocal stóráilte"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Déan dearmad ar an gcomhartha"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4094,7 +4126,7 @@ msgid ""
 msgstr ""
 "Diúltaíonn sé aon rud a sheirbheáil seachas na taifid seo a fhoilsiú d’aon duine a aimsíonn é. Socraigh POSTULO_LOGS_TOKEN, nó múch POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Oibríonn sé."
@@ -5172,6 +5204,11 @@ msgstr "níl — cuntais atá ann cheana amháin"
 msgid "No-show"
 msgstr "Níor tháinig"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Níor thoiligh aon duine leis seo fós. Ceangail arís é."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5524,7 +5561,7 @@ msgstr "Níl aon rud le nascadh leis"
 msgid "Nothing to decide"
 msgstr "Níl aon rud le cinneadh"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5547,6 +5584,11 @@ msgstr "Níl aon rud ag fanacht"
 msgid "Nothing was added."
 msgstr "Níor cuireadh aon rud leis."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Níor ceanglaíodh aon rud. Níor thoiligh aon duine le haon rud."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5568,7 +5610,7 @@ msgstr "Níor roghnaíodh aon rud, mar sin níor athraigh aon rud."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Faic. Tairgfidh an painéal rud éigin a chur ar ais."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Fógraí"
@@ -6356,6 +6398,13 @@ msgid "Postulo fetches this one page, and nothing else."
 msgstr ""
 "Faigheann Postulo an leathanach amháin seo, agus ní dhéanann sé aon rud eile."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Rinne Postulo dearmad air. Tá an cead fós ag an soláthraí go dtí go dtarraingíonn tú siar ansin é freisin."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6800,6 +6849,17 @@ msgstr "Moladh"
 msgid "Refresh logo"
 msgstr "Faigh an lógó arís"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Cláraigh an seoladh seo leis an soláthraí"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Cláraigh an t-ásc seo leis an soláthraí ar dtús, agus sábháil aitheantóir an chliaint."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7140,6 +7200,11 @@ msgstr "Sábháil"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Sábháil an chuideachta chun aitheantóir eile a chur leis."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Sábháil é seo ar dtús, agus tar ar ais chun toiliú."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7666,6 +7731,12 @@ msgid ""
 msgstr ""
 "Duine a thagann tríd an soláthraí seo, sínítear isteach é sa chuntas ar leis an seoladh a thugtar, chomh fada is a deir an soláthraí go bhfuil an seoladh fíoraithe. Is fiú ceist amháin a fhreagairt mar sin: an nglaonn an soláthraí seo seoladh fíoraithe air ach amháin nuair a chruthaigh an duine gur leis é? Má ritheann tú féin é, is dócha go láidir. Más le duine eile é, seiceáil sula mbraitheann tú air. Socraigh POSTULO_OIDC_LINK_BY_EMAIL go false chun a éileamh go sínigh gach duine isteach anseo uair amháin agus go gceanglóidh siad an soláthraí óna leathanach cuntais féin."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr ""
+"Thoiligh duine éigin leis seo. Tástáil é le bheith cinnte go seasann sé fós."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7910,7 +7981,7 @@ msgid ""
 msgstr ""
 "Stopann ceann a mhúchadh a úsáid agus ní scriosann sé aon rud: fanann na naisc a rinne tú díreach mar atá siad, agus tugann é a lasadh arís ar ais gan athrú iad."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Theip ar an sioncrónú: %(error)s"
@@ -7930,12 +8001,12 @@ msgstr "naisc sioncrónaithe"
 msgid "Sync now"
 msgstr "Sioncronaigh anois"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Sioncronaithe: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Sioncronú"
@@ -8048,7 +8119,7 @@ msgstr "Taispeántar teimpléid nuair a sheolann tú litir le hiarratas."
 msgid "Test"
 msgstr "Tástáil"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Theip ar an tástáil: %(message)s"
@@ -8111,6 +8182,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Tá an slabhra sin níos doimhne ná %(limit)s cuideachta — níos doimhne ná mar is féidir le Postulo a tharraingt go húsáideach."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Baineann an ceangal sin le duine eile."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Ní úsáideann an ceangal sin toiliú."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Níl an ceangal sin ann a thuilleadh."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8362,10 +8448,15 @@ msgstr "Sheol an leathanach sin %(status)s ar ais."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tá an pictiúr sin os cionn 5 MB. Ceann níos lú, le do thoil."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Níl an breiseán sin suiteáilte a thuilleadh."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Níor tháinig an freagra sin ó iarratas a rinne Postulo."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8672,6 +8763,22 @@ msgid ""
 msgstr ""
 "An chomhadlann mheán phríobháideach ar an bhfreastalaí seo, áit a bhfuil gach doiciméad, cibé áit eile a gcóipeáiltear é."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "D'fhreagair an soláthraí %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr ""
+"Ní athnuafaidh an soláthraí é seo. Caithfidh duine éigin toiliú leis arís."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "Níorbh fhéidir freagra an tsoláthraí a léamh."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8958,6 +9065,13 @@ msgstr "Tá an cineál seo aitheantóra liostaithe cheana."
 #, draft
 msgid "This number is already listed."
 msgstr "Tá an uimhir seo ar an liosta cheana."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Ní ghlacann sé seo le pasfhocal. Toilíonn tú ar shuíomh an tsoláthraí féin, agus tugann sé comhartha do Postulo is féidir leis a athnuachan. Is féidir leat an toiliú sin a tharraingt siar ansin am ar bith, agus ní féidir le Postulo é a dhéanamh duit."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9532,6 +9646,11 @@ msgstr "Cad a théann cá háit"
 #, draft
 msgid "What happened"
 msgstr "Cad a tharla"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Cad atá á iarraidh"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

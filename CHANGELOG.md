@@ -201,6 +201,46 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A connection can say it needs consent rather than a password.** Every connection until
+  now authenticated with something a person could type — a field, a form, a stored secret, a
+  *Test* button — and OAuth is not that. It is a round trip through somebody else's website,
+  two HTTP requests, a browser redirect and a token that has to be renewed before every use,
+  none of which is a field. `Consent` sits beside `FieldSpec` as part of the vocabulary a
+  plugin uses to say what it needs, and Postulo conducts the round trip.
+
+  **Tokens live in the connection's own encrypted secrets, not in allauth's.** Reusing the
+  sign-in grant would have saved a great deal and been wrong twice over: it carries the scopes
+  asked for at sign-in, and asking for a mail scope at sign-in *so it might be useful later* is
+  exactly the over-broad consent this project should not be teaching — and allauth holds one
+  token per account per application, so a second grant has nowhere to sit beside the first. Two
+  grants, asked for when each is needed, in one store under one key.
+
+  **The callback address is shown, not described.** OAuth needs a redirect URI registered in
+  advance, and it is this instance's own public address — something a self-hosted application
+  behind a proxy may not know about itself, and which changes when somebody moves it. Getting
+  it wrong ends a consent screen in an error nobody can read, so the connection's page prints
+  the exact string. One address for the whole instance rather than one per plugin: registering
+  it by hand once is the difference between usable and a chore repeated per provider.
+
+  **The scopes are on the page too**, in the provider's own words, because a list nobody can
+  read is a list nobody consented to.
+
+  **"Consent was withdrawn" is a distinct failure**, which is what the *Test* button now means
+  for a connection like this: it proves the grant still stands before it proves anything else.
+  Nothing is misconfigured, nobody typed anything wrong, and the fix is to agree again — none
+  of which a mail server can tell you. A provider's other refusals are kept apart from it.
+
+  **The refresh goes through the guarded client**, because it is an outbound request in the
+  middle of delivering somebody's mail and deserves the destination policy, timeout and
+  redirect limit every other outbound request gets. And the state carried through the round
+  trip is signed, short-lived and checked against whoever is signed in when it comes back: a
+  callback is a request another page can cause.
+
+  `docs/THREAT-MODEL.md` gains the line the issue asked for — a refresh token outlives a
+  password and is not changed by changing one, and only the provider can revoke the grant.
+  `CONTRIBUTING.md` has the shape for plugin authors, including why not to reach for the
+  sign-in tokens. (#150)
+
 - **Tables can act on several rows at once** — tag applications, move them to a status, put
   companies in a field of activity. Four decisions were forced by the shape of the feature and
   each is taken in the code rather than left to a template.

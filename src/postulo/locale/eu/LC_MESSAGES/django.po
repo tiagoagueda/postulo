@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s enpresak jada %(scheme)s identifikatzailea du: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s aldatu dira."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -940,6 +940,21 @@ msgstr "Publizitatea eta marketina"
 #, draft
 msgid "Aerospace"
 msgstr "Aeroespaziala"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Onartu berriro"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Onartu hornitzailean"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "%(provider)s(r)ekin onartzea"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1966,18 +1981,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "%(host)s:%(port)s(e)ra konektatuta. Erabiltzaile-izenik ez, beraz ez da saiorik hasi."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Konektatuta. Probatu ondo dabilela ziurtatzeko."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "konexioa"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Konexioa kendu da, sekretuak barne."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Konexioa gorde da. Probatu funtzionatzen duela ziurtatzeko."
@@ -1992,9 +2012,9 @@ msgstr "konexioaren segurtasuna"
 msgid "Connection security"
 msgstr "Konexioaren segurtasuna"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2576,7 +2596,7 @@ msgstr "dokumentu-kopiak"
 msgid "document copy"
 msgstr "dokumentu-kopia"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Dokumentu-biltegiak"
@@ -2957,6 +2977,13 @@ msgstr "Idatzi duzun guztia jada CV honetan dago."
 msgid "Everything, newest first."
 msgstr "Dena, berriena lehenik."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Agertzen den bezala zehazki, eskema eta edozein ataka barne. Instantzia hau mugitzen bada, erregistratu berria inor berriro konektatzen saiatu aurretik."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3235,6 +3262,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Ahaztu gordetako pasahitza"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Ahaztu tokena"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4029,7 +4061,7 @@ msgid ""
 msgstr ""
 "Ezer ez zerbitzatzea nahiago du erregistro hauek aurkitzen dituen edonori argitaratzea baino. Ezarri POSTULO_LOGS_TOKEN, edo itzali POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Badabil."
@@ -5099,6 +5131,11 @@ msgstr "ez — lehendik dauden kontuak baino ez"
 msgid "No-show"
 msgstr "Ez zen agertu"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Inork ez du hau oraindik onartu. Konektatu berriro."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5449,7 +5486,7 @@ msgstr "Ez dago ezer konektatzeko"
 msgid "Nothing to decide"
 msgstr "Ez dago ezer erabakitzeko"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5472,6 +5509,11 @@ msgstr "Ez dago ezer zain"
 msgid "Nothing was added."
 msgstr "Ez da ezer gehitu."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Ez da ezer konektatu. Inork ez du ezer onartu."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5493,7 +5535,7 @@ msgstr "Ez zen ezer hautatu, beraz ez da ezer aldatu."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Ezer ez. Laburpenak zerbait itzultzeko eskainiko dizu."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Jakinarazpenak"
@@ -6250,6 +6292,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulok orri bakar hau jaisten du, eta beste ezer ez."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulok ahaztu du. Hornitzaileak baimena du oraindik, han ere kentzen ez duzun bitartean."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6690,6 +6739,17 @@ msgstr "Gomendioz"
 msgid "Refresh logo"
 msgstr "Freskatu logotipoa"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Erregistratu helbide hau hornitzailean"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Erregistratu lehenik instantzia hau hornitzailean, eta gorde bezeroaren identifikatzailea."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7030,6 +7090,11 @@ msgstr "Gorde"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Gorde enpresa beste identifikatzaile bat gehitzeko."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Gorde hau lehenik, eta itzuli gero onartzeko."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7554,6 +7619,11 @@ msgid ""
 msgstr ""
 "Hornitzaile honen bidez datorrena hornitzaileak ematen duen helbidea duen kontu gisa sartzen da, hornitzaileak helbide hori egiaztatuta dagoela dioen bitartean. Horrek galdera bat erantzuteko modukoa egiten du: hornitzaile honek helbide bat egiaztatutzat jotzen al du pertsonak berea dela frogatu duenean bakarrik? Zuk zeuk kudeatzen baduzu, ia ziur baietz. Beste norbaitena bada, egiaztatu horretan fidatu aurretik. Ezarri POSTULO_OIDC_LINK_BY_EMAIL false-ra pertsona bakoitzak hemen behin saioa hasi eta hornitzailea bere kontuaren orritik konekta dezan eskatzeko."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr "Norbaitek onartu du hau. Probatu oraindik balio duela ziurtatzeko."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7799,7 +7869,7 @@ msgid ""
 msgstr ""
 "Bat itzaltzeak erabilera gelditzen du eta ez du ezer ezabatzen: egin dituzun konexioak dauden-daudenean geratzen dira, eta berriro pizteak aldatu gabe itzultzen ditu."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Sinkronizazioak huts egin du: %(error)s"
@@ -7819,12 +7889,12 @@ msgstr "sinkronizazio-estekak"
 msgid "Sync now"
 msgstr "Sinkronizatu orain"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Sinkronizatuta: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Sinkronizazioa"
@@ -7937,7 +8007,7 @@ msgstr "Txantiloiak gutun bat eskaera batekin bidaltzean agertzen dira."
 msgid "Test"
 msgstr "Probatu"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Probak huts egin du: %(message)s"
@@ -8000,6 +8070,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Kate horrek %(limit)s enpresa baino sakonera handiagoa du, Postulok zentzuz marraztu dezakeena baino gehiago."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Konexio hori beste norbaitena da."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Konexio horrek ez du baimenik erabiltzen."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Konexio hori jada ez dago."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8254,10 +8339,15 @@ msgstr "Orri horrek %(status)s itzuli du."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Irudi hori 5 MB baino gehiagokoa da. Txikiago bat, mesedez."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Plugin hori ez dago jada instalatuta."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Erantzun hori ez dator Postulok egindako eskaera batetik."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8556,6 +8646,21 @@ msgid ""
 msgstr ""
 "Zerbitzari honetako euskarri pribatuen direktorioa, non dokumentu bakoitza gordetzen den beste nonbait ere kopiatzen bada ere."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Hornitzaileak %(status)s erantzun du."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Hornitzaileak ez du hau berrituko. Norbaitek berriro onartu behar du."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "Hornitzailearen erantzuna ezin izan da irakurri."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8834,6 +8939,13 @@ msgstr "Mota honetako identifikatzailea jada zerrendan dago."
 #, draft
 msgid "This number is already listed."
 msgstr "Zenbaki hau jada zerrendatuta dago."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Honek ez du pasahitzik hartzen. Hornitzailearen beraren gunean onartzen duzu, eta berritu dezakeen token bat ematen dio Postulori. Baimen hori han ken dezakezu edonoiz, eta Postulok ezin du zure ordez egin."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9405,6 +9517,11 @@ msgstr "Zer doan nora"
 #, draft
 msgid "What happened"
 msgstr "Zer gertatu den"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Zer eskatzen ari den"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

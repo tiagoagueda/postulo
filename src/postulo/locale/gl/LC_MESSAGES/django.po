@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: galego\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s xa ten un identificador %(scheme)s: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s cambiados."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -936,6 +936,21 @@ msgstr "Publicidade e mercadotecnia"
 #, draft
 msgid "Aerospace"
 msgstr "Aeroespacial"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Aceptar de novo"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Aceptar no provedor"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Aceptar con %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1960,18 +1975,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Conectado a %(host)s:%(port)s. Sen nome de usuario, así que non se iniciou sesión."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Conectado. Próbeo para asegurarse de que funciona."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "conexión"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Conexión eliminada, segredos incluídos."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Conexión gardada. Próbaa para asegurarte de que funciona."
@@ -1986,9 +2006,9 @@ msgstr "seguridade da conexión"
 msgid "Connection security"
 msgstr "Seguridade da conexión"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2570,7 +2590,7 @@ msgstr "copias do documento"
 msgid "document copy"
 msgstr "copia do documento"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Almacéns de documentos"
@@ -2950,6 +2970,13 @@ msgstr "Todo o que escribiches xa está neste CV."
 msgid "Everything, newest first."
 msgstr "Todo, o máis recente primeiro."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Exactamente como aparece, incluídos o esquema e calquera porto. Se esta instancia se muda, rexistre a nova antes de que alguén intente conectarse de novo."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3228,6 +3255,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Esquecer o contrasinal gardado"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Esquecer o testemuño"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4021,7 +4053,7 @@ msgid ""
 msgstr ""
 "Négase a servir nada antes ca publicar estes rexistros a calquera que a atope. Pon POSTULO_LOGS_TOKEN, ou apaga POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Funciona."
@@ -5089,6 +5121,11 @@ msgstr "non — só contas existentes"
 msgid "No-show"
 msgstr "Non se presentou"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Aínda ninguén o aceptou. Volva conectalo."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5440,7 +5477,7 @@ msgstr "Non hai nada ao que conectarse"
 msgid "Nothing to decide"
 msgstr "Non hai nada que decidir"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5463,6 +5500,11 @@ msgstr "Non hai nada agardando"
 msgid "Nothing was added."
 msgstr "Non se engadiu nada."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Non se conectou nada. Ninguén aceptou nada."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5484,7 +5526,7 @@ msgstr "Non se seleccionou nada, así que non cambiou nada."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Nada. O panel ofrecerache volver poñer algo."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Notificacións"
@@ -6238,6 +6280,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo descarga esta páxina, e nada máis."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo esqueceuno. O provedor segue tendo o permiso ata que o retire alí tamén."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6676,6 +6725,17 @@ msgstr "Recomendación"
 msgid "Refresh logo"
 msgstr "Actualizar o logotipo"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Rexistre este enderezo no provedor"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Rexistre primeiro esta instancia no provedor e garde o identificador de cliente."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7017,6 +7077,11 @@ msgstr "Gardar"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Garda a empresa para engadirlle outro identificador."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Garde isto primeiro, e despois volva e acepte."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7541,6 +7606,11 @@ msgid ""
 msgstr ""
 "Quen chega por este provedor entra como a conta que ten o enderezo que o provedor dá, sempre que o provedor diga que ese enderezo está verificado. Iso fai que pague a pena responder unha pregunta: este provedor só cualifica un enderezo de verificado cando a persoa demostrou que é seu? Se o xestionas ti, case seguro que si. Se é doutra persoa, compróbao antes de fiarte del. Pon POSTULO_OIDC_LINK_BY_EMAIL a false para esixir que cadaquén acceda aquí unha vez e conecte o provedor desde a súa propia páxina de conta."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr "Alguén o aceptou. Próbeo para asegurarse de que segue en pé."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7785,7 +7855,7 @@ msgid ""
 msgstr ""
 "Apagar un detén o seu uso e non borra nada: as conexións que fixeses quedan exactamente como están, e volver acendelo recupéraas sen cambios."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "A sincronización fallou: %(error)s"
@@ -7805,12 +7875,12 @@ msgstr "ligazóns de sincronización"
 msgid "Sync now"
 msgstr "Sincronizar agora"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Sincronizado: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Sincronización"
@@ -7923,7 +7993,7 @@ msgstr "Os modelos aparecen cando envías unha carta cunha candidatura."
 msgid "Test"
 msgstr "Probar"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "A proba fallou: %(message)s"
@@ -7986,6 +8056,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Esa cadea ten máis de %(limit)s empresas de profundidade, máis do que Postulo pode debuxar con sentido."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Esa conexión é doutra persoa."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Esa conexión non usa consentimento."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Esa conexión xa non existe."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8236,10 +8321,15 @@ msgstr "Esa páxina devolveu %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Esa imaxe pasa de 5 MB. Unha máis pequena, por favor."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ese complemento xa non está instalado."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Esa resposta non veu dunha petición que fixese Postulo."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8535,6 +8625,21 @@ msgid ""
 msgstr ""
 "O directorio de medios privados deste servidor, onde se garda cada documento onde queira que tamén se copie."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "O provedor respondeu %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "O provedor non o renovará. Alguén ten que aceptalo de novo."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "A resposta do provedor non se puido ler."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8812,6 +8917,13 @@ msgstr "Esta clase de identificador xa está na lista."
 #, draft
 msgid "This number is already listed."
 msgstr "Este número xa está na lista."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Esta non leva contrasinal. Vostede acepta no sitio do propio provedor, e este dálle a Postulo un testemuño que pode renovar. Pode retirar ese permiso alí en calquera momento, e Postulo non o pode facer por vostede."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9385,6 +9497,11 @@ msgstr "Que vai onde"
 #, draft
 msgid "What happened"
 msgstr "Que pasou"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Que se está a pedir"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

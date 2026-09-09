@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-08 12:24+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Türkçe\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s zaten bir %(scheme)s tanımlayıcısına sahip: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s değişti."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -935,6 +935,21 @@ msgstr "Reklam ve pazarlama"
 #, draft
 msgid "Aerospace"
 msgstr "Havacılık ve uzay"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Yeniden onayla"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Sağlayıcıda onayla"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "%(provider)s ile onaylama"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1958,18 +1973,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "%(host)s:%(port)s adresine bağlanıldı. Kullanıcı adı yok, bu yüzden giriş yapılmadı."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Bağlandı. Çalıştığından emin olmak için test edin."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "bağlantı"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Bağlantı, gizli bilgileriyle birlikte kaldırıldı."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Bağlantı kaydedildi. Çalıştığından emin olmak için sınayın."
@@ -1984,9 +2004,9 @@ msgstr "bağlantı güvenliği"
 msgid "Connection security"
 msgstr "Bağlantı güvenliği"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2568,7 +2588,7 @@ msgstr "belge kopyaları"
 msgid "document copy"
 msgstr "belge kopyası"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Belge depoları"
@@ -2949,6 +2969,13 @@ msgstr "Yazdığınız her şey zaten bu CV'de."
 msgid "Everything, newest first."
 msgstr "Her şey, en yenisi başta."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Şema ve varsa bağlantı noktası dâhil, göründüğü gibi tam olarak. Bu örnek taşınırsa, biri yeniden bağlanmayı denemeden önce yenisini kaydedin."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3228,6 +3255,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Saklanan parolayı unut"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Belirteci unut"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4019,7 +4051,7 @@ msgid ""
 msgstr ""
 "Bu kayıtları onu bulan herkese yayımlamaktansa hiçbir şey sunmayı reddediyor. POSTULO_LOGS_TOKEN'ı ayarlayın ya da POSTULO_LOGS_ENDPOINT_ENABLED'ı kapatın."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Çalışıyor."
@@ -5088,6 +5120,11 @@ msgstr "hayır — yalnızca var olan hesaplar"
 msgid "No-show"
 msgstr "Gelmedi"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Bunu henüz kimse onaylamadı. Yeniden bağlayın."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5440,7 +5477,7 @@ msgstr "Bağlanılacak bir şey yok"
 msgid "Nothing to decide"
 msgstr "Karar verilecek bir şey yok"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5463,6 +5500,11 @@ msgstr "Bekleyen bir şey yok"
 msgid "Nothing was added."
 msgstr "Hiçbir şey eklenmedi."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Hiçbir şey bağlanmadı. Kimse hiçbir şeyi onaylamadı."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5484,7 +5526,7 @@ msgstr "Hiçbir şey seçilmemişti, bu yüzden hiçbir şey değişmedi."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Hiçbiri. Gösterge paneli bir şeyi geri getirmeyi önerecek."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Bildirimler"
@@ -6239,6 +6281,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo bu tek sayfayı alır, başka hiçbir şeyi almaz."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo bunu unuttu. Siz orada da geri çekene kadar sağlayıcının izni durmaya devam eder."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6679,6 +6728,16 @@ msgstr "Tavsiye"
 msgid "Refresh logo"
 msgstr "Logoyu yenile"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Bu adresi sağlayıcıya kaydedin"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr "Önce bu örneği sağlayıcıya kaydedin ve istemci kimliğini saklayın."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7019,6 +7078,11 @@ msgstr "Kaydet"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Başka bir tanımlayıcı eklemek için şirketi kaydedin."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Önce bunu kaydedin, sonra dönüp onaylayın."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7543,6 +7607,11 @@ msgid ""
 msgstr ""
 "Bu sağlayıcı üzerinden gelen biri, sağlayıcı o adresi doğrulanmış saydığı sürece, verdiği adrese sahip hesap olarak giriş yapar. Bu da yanıtlanmaya değer tek bir soru doğurur: bu sağlayıcı bir adresi yalnızca kişi ona sahip olduğunu kanıtladığında mı doğrulanmış sayıyor? Onu siz işletiyorsanız neredeyse kesinlikle öyle. Başkasınınsa, buna güvenmeden önce denetleyin. Herkesin burada bir kez giriş yapmasını ve sağlayıcıyı kendi hesap sayfasından bağlamasını istemek için POSTULO_OIDC_LINK_BY_EMAIL değişkenini false yapın."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr "Biri bunu onayladı. Hâlâ geçerli olduğundan emin olmak için test edin."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7788,7 +7857,7 @@ msgid ""
 msgstr ""
 "Birini kapatmak kullanılmasını durdurur ve hiçbir şeyi silmez: kurduğunuz bağlantılar tam olduğu gibi kalır ve yeniden açmak onları değişmeden geri getirir."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Eşitleme başarısız: %(error)s"
@@ -7808,12 +7877,12 @@ msgstr "eşitleme bağlantıları"
 msgid "Sync now"
 msgstr "Şimdi eşitle"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Eşitlendi: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Eşitleme"
@@ -7926,7 +7995,7 @@ msgstr "Şablonlar, bir mektubu bir başvuruyla gönderdiğinizde belirir."
 msgid "Test"
 msgstr "Sına"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Sınama başarısız: %(message)s"
@@ -7989,6 +8058,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Bu zincir %(limit)s şirketten daha derin; Postulo'nun anlamlı biçimde çizebileceğinden daha derin."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "O bağlantı başkasına ait."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "O bağlantı onay kullanmıyor."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "O bağlantı artık yok."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8238,10 +8322,15 @@ msgstr "O sayfa %(status)s döndürdü."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "O resim 5 MB'tan büyük. Daha küçüğü, lütfen."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "O eklenti artık kurulu değil."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Bu yanıt Postulo'nun yaptığı bir istekten gelmedi."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8538,6 +8627,21 @@ msgid ""
 msgstr ""
 "Bu sunucudaki özel medya dizini; başka nereye kopyalanırsa kopyalansın her belge burada tutulur."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Sağlayıcı %(status)s yanıtını verdi."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Sağlayıcı bunu yenilemeyecek. Birinin yeniden onaylaması gerekiyor."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "Sağlayıcının yanıtı okunabilir değildi."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8812,6 +8916,13 @@ msgstr "Bu türden bir tanımlayıcı zaten listede."
 #, draft
 msgid "This number is already listed."
 msgstr "Bu numara zaten listede."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Bu parola almaz. Sağlayıcının kendi sitesinde onay verirsiniz ve o da Postulo'ya yenileyebileceği bir belirteç verir. Bu onayı orada istediğiniz zaman geri çekebilirsiniz; Postulo bunu sizin yerinize yapamaz."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9385,6 +9496,11 @@ msgstr "Ne nereye gider"
 #, draft
 msgid "What happened"
 msgstr "Ne oldu"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Ne isteniyor"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

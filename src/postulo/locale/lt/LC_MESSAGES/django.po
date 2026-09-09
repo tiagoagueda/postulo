@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s jau turi %(scheme)s identifikatorių: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s pakeista."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -953,6 +953,21 @@ msgstr "Reklama ir rinkodara"
 #, draft
 msgid "Aerospace"
 msgstr "Aviacija ir kosmosas"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Sutikti dar kartą"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Sutikti pas teikėją"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Sutikimas su %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1977,18 +1992,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Prisijungta prie %(host)s:%(port)s. Naudotojo vardo nėra, todėl niekas nebuvo autentifikuota."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Prijungta. Išbandykite, kad įsitikintumėte, jog veikia."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "ryšys"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Ryšys pašalintas kartu su paslaptimis."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Ryšys išsaugotas. Išbandykite jį, kad įsitikintumėte, jog veikia."
@@ -2003,9 +2023,9 @@ msgstr "ryšio saugumas"
 msgid "Connection security"
 msgstr "Ryšio saugumas"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2586,7 +2606,7 @@ msgstr "dokumentų kopijos"
 msgid "document copy"
 msgstr "dokumento kopija"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Dokumentų saugyklos"
@@ -2966,6 +2986,13 @@ msgstr "Viskas, ką parašėte, jau yra šiame CV."
 msgid "Everything, newest first."
 msgstr "Viskas, naujausi pirmiau."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Būtent taip, kaip parodyta, su schema ir bet kuriuo prievadu. Jei ši instancija persikels, užregistruokite naują, kol niekas nebandė prisijungti iš naujo."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3245,6 +3272,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Pamiršti išsaugotą slaptažodį"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Pamiršti prieigos raktą"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4036,7 +4068,7 @@ msgid ""
 msgstr ""
 "Jis atsisako ką nors pateikti, užuot paskelbęs šiuos įrašus visiems, kas ras adresą. Nustatykite POSTULO_LOGS_TOKEN arba išjunkite POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Veikia."
@@ -5105,6 +5137,11 @@ msgstr "ne — tik esamos paskyros"
 msgid "No-show"
 msgstr "Neatvyko"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Su tuo dar niekas nesutiko. Prijunkite iš naujo."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5455,7 +5492,7 @@ msgstr "Nėra prie ko jungtis"
 msgid "Nothing to decide"
 msgstr "Nėra ką spręsti"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5478,6 +5515,11 @@ msgstr "Niekas nelaukia"
 msgid "Nothing was added."
 msgstr "Niekas nepridėta."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Niekas nebuvo prijungta. Niekas su niekuo nesutiko."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5499,7 +5541,7 @@ msgstr "Niekas nebuvo pasirinkta, tad niekas nepasikeitė."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Nieko. Skydelis pasiūlys ką nors sugrąžinti."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Pranešimai"
@@ -6263,6 +6305,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo gauna tik šį vieną puslapį ir nieko daugiau."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo tai pamiršo. Teikėjas leidimą vis dar turi, kol jo neatšauksite ir ten."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6704,6 +6753,17 @@ msgstr "Rekomendacija"
 msgid "Refresh logo"
 msgstr "Atsisiųsti logotipą iš naujo"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Užregistruokite šį adresą pas teikėją"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Pirma užregistruokite šią instanciją pas teikėją ir išsaugokite kliento identifikatorių."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7042,6 +7102,11 @@ msgstr "Išsaugoti"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Išsaugokite įmonę, kad pridėtumėte dar vieną identifikatorių."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Pirma tai išsaugokite, tada grįžkite ir sutikite."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7566,6 +7631,11 @@ msgid ""
 msgstr ""
 "Kas ateina per šį teikėją, prijungiamas prie paskyros, kuriai priklauso nurodytas adresas, jei teikėjas teigia, kad adresas patvirtintas. Todėl verta atsakyti į vieną klausimą: ar šis teikėjas laiko adresą patvirtintu tik tada, kai žmogus įrodė, kad jis jo? Jei jį prižiūrite patys – beveik tikrai. Jei jis svetimas, patikrinkite prieš juo pasikliaudami. Nustatykite POSTULO_OIDC_LINK_BY_EMAIL į false, kad kiekvienas turėtų kartą prisijungti čia ir prijungti teikėją iš savo paskyros puslapio."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr "Kažkas su tuo sutiko. Išbandykite, kad įsitikintumėte, jog dar galioja."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7811,7 +7881,7 @@ msgid ""
 msgstr ""
 "Vieno išjungimas sustabdo jo naudojimą ir nieko neištrina: jūsų sukurti ryšiai lieka lygiai tokie patys, o vėl įjungus jie grįžta nepakitę."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Sinchronizuoti nepavyko: %(error)s"
@@ -7831,12 +7901,12 @@ msgstr "sinchronizavimo saitai"
 msgid "Sync now"
 msgstr "Sinchronizuoti dabar"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Sinchronizuota: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Sinchronizavimas"
@@ -7949,7 +8019,7 @@ msgstr "Šablonai atsiranda siunčiant laišką su paraiška."
 msgid "Test"
 msgstr "Išbandyti"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Bandymas nepavyko: %(message)s"
@@ -8012,6 +8082,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Ta grandinė gilesnė nei %(limit)s įmonės — giliau, nei Postulo gali prasmingai nupiešti."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Tas ryšys priklauso kitam."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Tas ryšys sutikimo nenaudoja."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "To ryšio nebėra."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8261,10 +8346,15 @@ msgstr "Tas puslapis grąžino %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tas paveikslėlis didesnis nei 5 MB. Prašome mažesnio."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Tas papildinys nebeįdiegtas."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Tas atsakymas atėjo ne iš Postulo pateikto užklausimo."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8562,6 +8652,21 @@ msgid ""
 msgstr ""
 "Privatus medijos katalogas šiame serveryje, kuriame yra kiekvienas dokumentas, kad ir kur jis dar būtų nukopijuotas."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Teikėjas atsakė %(status)s."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Teikėjas to neatnaujins. Kažkas turi sutikti iš naujo."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "Teikėjo atsakymo nepavyko perskaityti."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8841,6 +8946,13 @@ msgstr "Tokios rūšies identifikatorius jau sąraše."
 #, draft
 msgid "This number is already listed."
 msgstr "Šis numeris jau yra sąraše."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Šis slaptažodžio neima. Sutinkate paties teikėjo svetainėje, o jis duoda Postulo prieigos raktą, kurį šis gali atnaujinti. Tą sutikimą ten galite atšaukti bet kada, o Postulo to už jus padaryti negali."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9413,6 +9525,11 @@ msgstr "Kas kur"
 #, draft
 msgid "What happened"
 msgstr "Kas įvyko"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Ko prašoma"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

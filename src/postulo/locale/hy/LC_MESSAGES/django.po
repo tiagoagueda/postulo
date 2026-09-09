@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: հայերեն\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s-ն արդեն ունի %(scheme)s նույնացուցիչ՝
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s փոխվել է։"
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -937,6 +937,21 @@ msgstr "Գովազդ և մարքեթինգ"
 #, draft
 msgid "Aerospace"
 msgstr "Ավիատիեզերական ոլորտ"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Համաձայնվել կրկին"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Համաձայնվել մատակարարի մոտ"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Համաձայնություն %(provider)s-ի հետ"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1963,18 +1978,23 @@ msgstr "Միացավ %(host)s:%(port)s-ին և մուտք գործեց որպե�
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr "Միացավ %(host)s:%(port)s-ին։ Օգտանուն չկա, ուստի մուտք չի գործվել։"
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Միացված է։ Փորձարկեք՝ համոզվելու համար, որ աշխատում է։"
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "կապ"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Կապը հեռացվեց՝ գաղտնիքների հետ միասին։"
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Կապը պահպանվեց։ Փորձարկեք այն՝ համոզվելու համար, որ աշխատում է։"
@@ -1989,9 +2009,9 @@ msgstr "կապի անվտանգություն"
 msgid "Connection security"
 msgstr "Կապի անվտանգություն"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2573,7 +2593,7 @@ msgstr "փաստաթղթի պատճեններ"
 msgid "document copy"
 msgstr "փաստաթղթի պատճեն"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Փաստաթղթերի պահոցներ"
@@ -2955,6 +2975,13 @@ msgstr "Այն ամենը, ինչ գրել եք, արդեն այս CV-ում է�
 msgid "Everything, newest first."
 msgstr "Ամեն ինչ, ամենանորը՝ առաջինը։"
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Ճիշտ այնպես, ինչպես երևում է՝ ներառյալ սխեման և ցանկացած պորտ։ Եթե այս հանգույցը տեղափոխվի, գրանցեք նորը, նախքան որևէ մեկը կրկին կփորձի միանալ։"
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3233,6 +3260,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "Մոռանալ պահված գաղտնաբառը"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Մոռանալ նշանը"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4025,7 +4057,7 @@ msgid ""
 msgstr ""
 "Այն հրաժարվում է որևէ բան մատուցել՝ այս գրառումները բոլորին հրապարակելու փոխարեն, ով էլ որ գտնի։ Կարգավորեք POSTULO_LOGS_TOKEN-ը կամ անջատեք POSTULO_LOGS_ENDPOINT_ENABLED-ը։"
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Աշխատում է։"
@@ -5096,6 +5128,11 @@ msgstr "ոչ — միայն գոյություն ունեցող հաշիվներ
 msgid "No-show"
 msgstr "Չներկայացավ"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Սրան դեռ ոչ ոք չի համաձայնվել։ Միացրեք այն կրկին։"
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5446,7 +5483,7 @@ msgstr "Միանալու բան չկա"
 msgid "Nothing to decide"
 msgstr "Որոշելու բան չկա"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5469,6 +5506,11 @@ msgstr "Ոչինչ չի սպասում"
 msgid "Nothing was added."
 msgstr "Ոչինչ չավելացվեց։"
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Ոչինչ չմիացվեց։ Ոչ ոք ոչնչի չհամաձայնվեց։"
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5490,7 +5532,7 @@ msgstr "Ոչինչ չէր ընտրված, ուստի ոչինչ չփոխվեց։
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Ոչինչ։ Ընդհանուր տեսքը կառաջարկի ինչ-որ բան հետ բերել։"
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Ծանուցումներ"
@@ -6247,6 +6289,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo-ն բերում է այս մեկ էջը և ուրիշ ոչինչ։"
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"Postulo-ն մոռացել է այն։ Մատակարարը դեռ ունի թույլտվությունը, մինչև այն նաև այնտեղ հետ վերցնեք։"
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6688,6 +6737,17 @@ msgstr "Երաշխավորությամբ"
 msgid "Refresh logo"
 msgstr "Թարմացնել լոգոն"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Գրանցեք այս հասցեն մատակարարի մոտ"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Նախ գրանցեք այս հանգույցը մատակարարի մոտ և պահեք հաճախորդի նույնացուցիչը։"
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7028,6 +7088,11 @@ msgstr "Պահպանել"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Պահպանեք ընկերությունը՝ ևս մեկ նույնացուցիչ ավելացնելու համար։"
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Նախ պահեք սա, ապա վերադարձեք և համաձայնվեք։"
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7553,6 +7618,12 @@ msgid ""
 msgstr ""
 "Ով գալիս է այս մատակարարի միջոցով, մուտք է գործում որպես այն հաշիվը, որը կրում է մատակարարի տված հասցեն, քանի դեռ մատակարարն ասում է, որ այդ հասցեն հաստատված է։ Դա մեկ հարցը դարձնում է պատասխանելու արժանի՝ արդյո՞ք այս մատակարարը հասցեն հաստատված է անվանում միայն այն դեպքում, երբ մարդն ապացուցել է, որ իրենն է։ Եթե ինքներդ եք վարում, գրեթե անկասկած՝ այո։ Եթե ուրիշինն է, ստուգեք, նախքան դրան հենվեք։ Կարգավորեք POSTULO_OIDC_LINK_BY_EMAIL-ը false, որ յուրաքանչյուր մարդ մեկ անգամ այստեղ մուտք գործի և մատակարարը միացնի իր հաշվի էջից։"
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr ""
+"Ինչ-որ մեկը համաձայնվել է սրան։ Փորձարկեք՝ համոզվելու համար, որ դեռ ուժի մեջ է։"
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7798,7 +7869,7 @@ msgid ""
 msgstr ""
 "Մեկն անջատելը դադարեցնում է օգտագործումը և ոչինչ չի ջնջում. ձեր ստեղծած բոլոր կապերը մնում են ճիշտ այնպես, ինչպես կան, իսկ կրկին միացնելը դրանք վերադարձնում է անփոփոխ։"
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Համաժամեցումը ձախողվեց՝ %(error)s"
@@ -7818,12 +7889,12 @@ msgstr "համաժամեցման հղումներ"
 msgid "Sync now"
 msgstr "Համաժամեցնել հիմա"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Համաժամեցվեց՝ %(summary)s։"
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Համաժամեցում"
@@ -7936,7 +8007,7 @@ msgstr "Ձևանմուշները հայտնվում են, երբ նամակն ո
 msgid "Test"
 msgstr "Փորձարկել"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Փորձարկումը ձախողվեց՝ %(message)s"
@@ -7999,6 +8070,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Այդ շղթան ավելի խորն է, քան %(limit)s ընկերություն՝ ավելի խորը, քան Postulo-ն կարող է իմաստալից պատկերել։"
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Այդ միացումը պատկանում է ուրիշին։"
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Այդ միացումը համաձայնություն չի օգտագործում։"
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Այդ միացումն այլևս գոյություն չունի։"
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8248,10 +8334,15 @@ msgstr "Այդ էջը վերադարձրեց %(status)s։"
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Այդ նկարը 5 MB-ից ավելի է։ Ավելի փոքրը, խնդրում ենք։"
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Այդ հավելումն այլևս տեղադրված չէ։"
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Այդ պատասխանը չի եկել Postulo-ի կատարած հարցումից։"
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8551,6 +8642,21 @@ msgid ""
 msgstr ""
 "Այս սերվերի մասնավոր մեդիա թղթապանակը, որտեղ պահվում է յուրաքանչյուր փաստաթուղթ, ուր էլ որ այն նաև պատճենվի։"
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "Մատակարարը պատասխանեց %(status)s։"
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "Մատակարարը սա չի նորացնի։ Ինչ-որ մեկը պետք է կրկին համաձայնվի։"
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "Մատակարարի պատասխանը հնարավոր չեղավ կարդալ։"
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8829,6 +8935,13 @@ msgstr "Այս տեսակի նույնացուցիչն արդեն ցուցակո
 #, draft
 msgid "This number is already listed."
 msgstr "Այս համարն արդեն ցանկում է։"
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Սա գաղտնաբառ չի վերցնում։ Դուք համաձայնվում եք հենց մատակարարի կայքում, և նա Postulo-ին տալիս է նշան, որը կարող է նորացնել։ Այդ համաձայնությունը կարող եք ցանկացած պահի հետ վերցնել այնտեղ, և Postulo-ն դա ձեզ համար չի կարող անել։"
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9400,6 +9513,11 @@ msgstr "Ինչն ուր է գնում"
 #, draft
 msgid "What happened"
 msgstr "Ինչ տեղի ունեցավ"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Ինչ է խնդրվում"
 
 #: src/postulo/templates/core/export.html:17
 #, draft

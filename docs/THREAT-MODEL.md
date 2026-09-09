@@ -41,5 +41,8 @@ attack it and what is worth defending.
 6. A new secret is stored hashed if it only needs checking, encrypted if it needs using.
    The encrypted set now includes a mail password typed into *Server settings*, under the
    same key as every plugin connection's credentials — which is why #111 made a weak
-   `POSTULO_SECRET_KEY` a start-up refusal rather than a warning.
+   `POSTULO_SECRET_KEY` a start-up refusal rather than a warning. It also includes an
+   **OAuth refresh token**, which is a longer-lived credential than a password and is not
+   changed by changing one: somebody who takes it sends as that person until the grant is
+   withdrawn *at the provider*, which Postulo cannot do on their behalf.
 7. A new endpoint gets a test in `tests/security/` saying what an attacker would try.

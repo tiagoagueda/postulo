@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 16:50+0000\n"
+"POT-Creation-Date: 2026-09-09 17:09+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s már rendelkezik %(scheme)s azonosítóval: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s megváltozott."
 
-#: src/postulo/plugins/views.py:206
+#: src/postulo/plugins/views.py:300
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -936,6 +936,21 @@ msgstr "Reklám és marketing"
 #, draft
 msgid "Aerospace"
 msgstr "Repülés és űripar"
+
+#: src/postulo/templates/connections/form.html:98
+#, draft
+msgid "Agree again"
+msgstr "Beleegyezés újra"
+
+#: src/postulo/templates/connections/form.html:103
+#, draft
+msgid "Agree at the provider"
+msgstr "Beleegyezés a szolgáltatónál"
+
+#: src/postulo/templates/connections/form.html:57
+#, python-format, draft
+msgid "Agreeing with %(provider)s"
+msgstr "Beleegyezés a következőnél: %(provider)s"
 
 #: src/postulo/templates/documents/letter_list.html:22
 #, draft
@@ -1961,18 +1976,23 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Csatlakozva ide: %(host)s:%(port)s. Nincs felhasználónév, így semmi sem jelentkezett be."
 
+#: src/postulo/plugins/views.py:244
+#, draft
+msgid "Connected. Test it to make sure it works."
+msgstr "Csatlakoztatva. Tesztelje, hogy biztos legyen benne, hogy működik."
+
 #: src/postulo/documents/models.py:410 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
 msgstr "kapcsolat"
 
-#: src/postulo/plugins/views.py:253
+#: src/postulo/plugins/views.py:347
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Kapcsolat eltávolítva, a titkokkal együtt."
 
-#: src/postulo/plugins/views.py:162
+#: src/postulo/plugins/views.py:180
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Kapcsolat mentve. Teszteld, hogy biztosan működik-e."
@@ -1987,9 +2007,9 @@ msgstr "kapcsolat biztonsága"
 msgid "Connection security"
 msgstr "A kapcsolat biztonsága"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:88
-#: src/postulo/plugins/views.py:106 src/postulo/plugins/views.py:136
-#: src/postulo/plugins/views.py:249
+#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:89
+#: src/postulo/plugins/views.py:107 src/postulo/plugins/views.py:137
+#: src/postulo/plugins/views.py:343
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2571,7 +2591,7 @@ msgstr "dokumentummásolatok"
 msgid "document copy"
 msgstr "dokumentummásolat"
 
-#: src/postulo/plugins/views.py:32
+#: src/postulo/plugins/views.py:33
 #, draft
 msgid "Document stores"
 msgstr "Dokumentumtárak"
@@ -2953,6 +2973,13 @@ msgstr "Minden, amit írtál, már rajta van ezen az önéletrajzon."
 msgid "Everything, newest first."
 msgstr "Minden, a legújabbal kezdve."
 
+#: src/postulo/templates/connections/form.html:76
+#, draft
+msgid ""
+"Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
+msgstr ""
+"Pontosan úgy, ahogy megjelenik, a sémával és bármely porttal együtt. Ha ez a példány átköltözik, regisztrálja az újat, mielőtt bárki újra csatlakozni próbálna."
+
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
 msgid ""
@@ -3232,6 +3259,11 @@ msgstr ""
 #, draft
 msgid "Forget the stored password"
 msgstr "A tárolt jelszó elfelejtése"
+
+#: src/postulo/templates/connections/form.html:100
+#, draft
+msgid "Forget the token"
+msgstr "Token elfelejtése"
 
 #: src/postulo/jobs/views.py:287
 #, python-format, draft
@@ -4023,7 +4055,7 @@ msgid ""
 msgstr ""
 "Inkább semmit sem szolgál ki, mintsem hogy ezeket a bejegyzéseket bárkinek közzétegye, aki megtalálja a címet. Állítsa be a POSTULO_LOGS_TOKEN értékét, vagy kapcsolja ki a POSTULO_LOGS_ENDPOINT_ENABLED beállítást."
 
-#: src/postulo/plugins/views.py:186
+#: src/postulo/plugins/views.py:280
 #, draft
 msgid "It works."
 msgstr "Működik."
@@ -5093,6 +5125,11 @@ msgstr "nem — csak meglévő fiókok"
 msgid "No-show"
 msgstr "Nem jelent meg"
 
+#: src/postulo/plugins/consent.py:184
+#, draft
+msgid "Nobody has agreed to this yet. Connect it again."
+msgstr "Ebbe még senki nem egyezett bele. Csatlakoztassa újra."
+
 #: src/postulo/templates/widgets/durations.html:37
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
@@ -5444,7 +5481,7 @@ msgstr "Nincs mihez kapcsolódni"
 msgid "Nothing to decide"
 msgstr "Nincs mit eldönteni"
 
-#: src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:309
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5467,6 +5504,11 @@ msgstr "Semmi sem vár"
 msgid "Nothing was added."
 msgstr "Semmi sem került hozzáadásra."
 
+#: src/postulo/plugins/views.py:235
+#, draft
+msgid "Nothing was connected. Nobody agreed to anything."
+msgstr "Semmi nem lett csatlakoztatva. Senki nem egyezett bele semmibe."
+
 #: src/postulo/accounts/settings_views.py:143
 #: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
@@ -5488,7 +5530,7 @@ msgstr "Semmi nem volt kijelölve, így semmi nem változott."
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Semmi. Az irányítópult felajánlja, hogy visszatesz valamit."
 
-#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:31
+#: src/postulo/notifications/apps.py:8 src/postulo/plugins/views.py:32
 #, draft
 msgid "Notifications"
 msgstr "Értesítések"
@@ -6245,6 +6287,13 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "A Postulo ezt az egy oldalt kéri le, és semmi mást."
 
+#: src/postulo/plugins/views.py:206
+#, draft
+msgid ""
+"Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
+msgstr ""
+"A Postulo elfelejtette. A szolgáltatónál az engedély megmarad, amíg ott is vissza nem vonja."
+
 #: src/postulo/templates/server/plugins.html:122
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6687,6 +6736,17 @@ msgstr "Ajánlás"
 msgid "Refresh logo"
 msgstr "Logó újbóli letöltése"
 
+#: src/postulo/templates/connections/form.html:73
+#, draft
+msgid "Register this address with the provider"
+msgstr "Regisztrálja ezt a címet a szolgáltatónál"
+
+#: src/postulo/plugins/consent.py:111
+#, draft
+msgid "Register this instance with the provider first, and save the client id."
+msgstr ""
+"Előbb regisztrálja ezt a példányt a szolgáltatónál, és mentse el az ügyfélazonosítót."
+
 #: src/postulo/templates/server/signin.html:14
 #, draft
 msgid ""
@@ -7026,6 +7086,11 @@ msgstr "Mentés"
 #, draft
 msgid "Save the company to add another identifier."
 msgstr "Mentsd el a céget újabb azonosító hozzáadásához."
+
+#: src/postulo/templates/connections/form.html:108
+#, draft
+msgid "Save this first, then come back and agree."
+msgstr "Előbb mentse ezt el, aztán térjen vissza és egyezzen bele."
 
 #: src/postulo/templates/accounts/profile.html:159
 #, draft
@@ -7550,6 +7615,12 @@ msgid ""
 msgstr ""
 "Aki ezen a szolgáltatón keresztül érkezik, abba a fiókba jelentkezik be, amelyhez a megadott cím tartozik, feltéve hogy a szolgáltató szerint a cím megerősített. Egy kérdést tehát érdemes megválaszolni: ez a szolgáltató csak akkor nevez egy címet megerősítettnek, ha a személy bizonyította, hogy az övé? Ha Ön üzemelteti, szinte biztosan. Ha másé, ellenőrizze, mielőtt rá hagyatkozik. Állítsa a POSTULO_OIDC_LINK_BY_EMAIL értékét false-ra, hogy mindenkinek egyszer be kelljen jelentkeznie itt, és a saját fiókoldaláról kelljen összekapcsolnia a szolgáltatót."
 
+#: src/postulo/templates/connections/form.html:96
+#, draft
+msgid "Somebody has agreed to this. Test it to be sure it still stands."
+msgstr ""
+"Valaki beleegyezett ebbe. Tesztelje, hogy biztos legyen benne, hogy még áll."
+
 #: src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:66
 #: src/postulo/templates/server/plugins.html:208
@@ -7794,7 +7865,7 @@ msgid ""
 msgstr ""
 "Egy kikapcsolása megállítja a használatát és semmit sem töröl: az általad létrehozott kapcsolatok pontosan úgy maradnak, ahogy vannak, és a visszakapcsolás változatlanul hozza vissza őket."
 
-#: src/postulo/plugins/views.py:236
+#: src/postulo/plugins/views.py:330
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "A szinkronizálás nem sikerült: %(error)s"
@@ -7814,12 +7885,12 @@ msgstr "szinkronizálási kapcsolatok"
 msgid "Sync now"
 msgstr "Szinkronizálás most"
 
-#: src/postulo/plugins/views.py:238
+#: src/postulo/plugins/views.py:332
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Szinkronizálva: %(summary)s."
 
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:34
 #, draft
 msgid "Synchronisation"
 msgstr "Szinkronizálás"
@@ -7933,7 +8004,7 @@ msgstr ""
 msgid "Test"
 msgstr "Teszt"
 
-#: src/postulo/plugins/views.py:188
+#: src/postulo/plugins/views.py:282
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "A teszt sikertelen: %(message)s"
@@ -7996,6 +8067,21 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 "Ez a lánc több mint %(limit)s cég mély, mélyebb, mint amit a Postulo értelmesen ábrázolhat."
+
+#: src/postulo/plugins/consent.py:147
+#, draft
+msgid "That connection belongs to somebody else."
+msgstr "Az a kapcsolat valaki másé."
+
+#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#, draft
+msgid "That connection does not use consent."
+msgstr "Az a kapcsolat nem beleegyezéssel működik."
+
+#: src/postulo/plugins/consent.py:145
+#, draft
+msgid "That connection no longer exists."
+msgstr "Az a kapcsolat már nem létezik."
 
 #: src/postulo/jobs/models.py:418
 #, draft
@@ -8247,10 +8333,15 @@ msgstr "Ez az oldal ezt adta vissza: %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Ez a kép 5 MB-nál nagyobb. Kisebbet kérünk."
 
-#: src/postulo/plugins/views.py:174
+#: src/postulo/plugins/views.py:200 src/postulo/plugins/views.py:256
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ez a bővítmény már nincs telepítve."
+
+#: src/postulo/plugins/consent.py:140
+#, draft
+msgid "That reply did not come from a request Postulo made."
+msgstr "Az a válasz nem a Postulo által küldött kérésből jött."
 
 #: src/postulo/applications/views.py:719
 #, draft
@@ -8547,6 +8638,21 @@ msgid ""
 msgstr ""
 "A kiszolgáló privát médiakönyvtára, ahol minden dokumentum ott van, bárhová másolják is még."
 
+#: src/postulo/plugins/consent.py:241
+#, python-format, draft
+msgid "The provider answered %(status)s."
+msgstr "A szolgáltató %(status)s választ adott."
+
+#: src/postulo/plugins/consent.py:237
+#, draft
+msgid "The provider will not renew this. Somebody has to agree to it again."
+msgstr "A szolgáltató ezt nem újítja meg. Valakinek újra bele kell egyeznie."
+
+#: src/postulo/plugins/consent.py:246
+#, draft
+msgid "The provider's reply was not readable."
+msgstr "A szolgáltató válaszát nem lehetett elolvasni."
+
 #: src/postulo/templates/resume/europass_import.html:132
 #, draft
 msgid ""
@@ -8828,6 +8934,13 @@ msgstr "Ez a fajta azonosító már szerepel a listán."
 #, draft
 msgid "This number is already listed."
 msgstr "Ez a szám már szerepel a listán."
+
+#: src/postulo/templates/connections/form.html:62
+#, draft
+msgid ""
+"This one does not take a password. You agree at the provider's own site, and it hands Postulo a token it can renew. You can withdraw that agreement there at any time, and Postulo cannot do it for you."
+msgstr ""
+"Ez nem kér jelszót. A szolgáltató saját oldalán egyezik bele, és az ad a Postulónak egy tokent, amelyet meg tud újítani. Ezt a beleegyezést ott bármikor visszavonhatja, és a Postulo ezt nem teheti meg ön helyett."
 
 #: src/postulo/templates/jobs/listing_apply.html:15
 #, draft
@@ -9400,6 +9513,11 @@ msgstr "Mi hová kerül"
 #, draft
 msgid "What happened"
 msgstr "Mi történt"
+
+#: src/postulo/templates/connections/form.html:84
+#, draft
+msgid "What is being asked for"
+msgstr "Mit kérnek"
 
 #: src/postulo/templates/core/export.html:17
 #, draft
