@@ -376,10 +376,11 @@ longer use — deleting a word never deletes a company.
 up — in a spreadsheet you import, in a posting a browser extension captures, in another
 account's export — without anyone comparing spellings. A company can carry one of each:
 a **Wikidata** item (`Q…`), a **Legal Entity Identifier** (the 20-character LEI, checked
-for its check digits), a **company register number** with its country (`PT 501234567`,
-`FR 552081317`, `DE HRB 12345`), a **LinkedIn**, **Crunchbase** or **OpenCorporates**
-slug, and any number of *Other* ids with a name of your own (a DUNS number, an internal
-supplier code). Paste a whole address if that is what you have; Postulo keeps the id and
+for its check digits), an **ISNI** — which most universities have, and which is what an EU
+application form asks an institution for — a **company register number** with its country
+(`PT 501234567`, `FR 552081317`, `DE HRB 12345`), a **LinkedIn**, **Crunchbase** or
+**OpenCorporates** slug, and any number of *Other* ids with a name of your own (a DUNS
+number, an internal supplier code). Paste a whole address if that is what you have; Postulo keeps the id and
 links it back. One id names one company: giving a second company the same Wikidata item
 is refused with the name of the one that has it, because that is exactly the duplicate
 identifiers exist to prevent. The companies table has an optional column per kind, the

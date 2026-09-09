@@ -82,6 +82,14 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "keep current (#147)"
         ),
     },
+    "identifiers": {
+        "postulo.core.identifiers": (
+            "`Scheme`, and the two subject names. This is the one plugin whose whole content "
+            "*is* a core type: it contributes vocabulary rather than behaviour, and the shape "
+            "of that vocabulary has to be Postulo's or the tables could not read it. #109 "
+            "will put `Scheme` on the surface the day a third-party registry is a promise"
+        ),
+    },
     "builtin": {},
     "phone_numbers": {},
     "email_addresses": {},

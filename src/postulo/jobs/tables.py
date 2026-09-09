@@ -54,7 +54,7 @@ class CompaniesTable(Table):
         # One optional column per identifier scheme, hidden until asked for.
         *(
             Column(f"id_{key}", scheme.label)
-            for key, scheme in identifiers.SCHEMES.items()
+            for key, scheme in identifiers.schemes().items()
             if key != identifiers.OTHER
         ),
         Column(

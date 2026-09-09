@@ -21,6 +21,7 @@ from django.utils.formats import number_format
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core.identifiers import COMPANY, require, scheme_field
 from postulo.core.models import OwnedModel, OwnedQuerySet
 
 from . import identifiers
@@ -282,7 +283,7 @@ class CompanyIdentifier(OwnedModel):
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, related_name="identifiers", verbose_name=_("company")
     )
-    scheme = models.CharField(_("scheme"), max_length=20, choices=identifiers.CHOICES)
+    scheme = scheme_field(COMPANY)
     value = models.CharField(_("identifier"), max_length=100)
     label = models.CharField(
         _("name"),
@@ -323,11 +324,17 @@ class CompanyIdentifier(OwnedModel):
         if self.scheme != identifiers.OTHER:
             self.label = ""
 
+    def save(self, *args, **kwargs):
+        """Refuse a scheme that does not identify an organisation. See
+        `accounts.models.PersonIdentifier.save`."""
+        require(self.scheme, COMPANY)
+        return super().save(*args, **kwargs)
+
     @property
     def scheme_label(self) -> str:
         if self.scheme == identifiers.OTHER and self.label:
             return self.label
-        return str(identifiers.SCHEMES[self.scheme].label)
+        return identifiers.label_for(self.scheme)
 
     @property
     def url(self) -> str:

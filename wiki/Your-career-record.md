@@ -102,7 +102,14 @@ A name is not an identity. Two researchers share one, one researcher publishes u
 and a marriage or a transliteration turns one into another. An **ORCID** says which
 researcher you are regardless, and in academia it is what an application form asks for by
 name — so *Your details* takes one, along with a ResearcherID, a Scopus Author ID, an ISNI,
-or anything else under *Other* with a name you give it.
+your **Wikidata** item, your **LinkedIn** profile, or anything else under *Other* with a
+name you give it.
+
+**A scheme knows what it identifies.** Some identify people, some identify organisations,
+and three — ISNI, Wikidata and LinkedIn — identify both, which is why they now appear on
+your details as well as on a company. What identifies only a company is not offered here
+and is refused if something tries: an LEI is not a person, and a company register number
+is not one either.
 
 Paste the whole address if that is what you have; Postulo keeps the identifier. An ORCID's
 last character is a checksum, so a mistyped one is refused with the reason. Nothing is ever

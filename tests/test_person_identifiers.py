@@ -70,7 +70,7 @@ def test_where_an_identifier_links():
 
 def test_the_other_schemes_are_there_for_when_they_are_asked_for():
     for key in (identifiers.RESEARCHERID, identifiers.SCOPUS, identifiers.ISNI):
-        assert key in identifiers.SCHEMES
+        assert key in identifiers.schemes()
     assert identifiers.clean(identifiers.ISNI, "0000000122819553") == "0000 0001 2281 9553"
     assert identifiers.clean(identifiers.SCOPUS, "7004212771") == "7004212771"
 

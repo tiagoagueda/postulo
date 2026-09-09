@@ -188,7 +188,7 @@ class CompanyIdentifiersMixin:
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         context.setdefault("identifiers", self.get_identifiers())
-        context["identifier_schemes"] = identifiers.SCHEMES.values()
+        context["identifier_schemes"] = identifiers.schemes().values()
         return context
 
     def form_valid(self, form):

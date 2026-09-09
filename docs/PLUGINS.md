@@ -517,16 +517,20 @@ not so wide as to be meaningless.
 
 ## The plugins Postulo ships are packages like yours
 
-Seven of them, and they live where yours would:
+Eleven of them across eight kinds, and they live where yours would:
 
 ```text
 src/postulo/plugins/
     builtin/          schema.org and page-metadata, the two capture sources
     email/            the notifier that sends through the instance's mail settings
     smtp/             the transport underneath it
+    own_mail/         the outbox that sends as the person rather than as the instance
     localstore/       the store every document is in
     europass/         the importer, and the reader it is a declaration for
     phone_numbers/    the feature that switches several numbers per person on and off
+    email_addresses/  the feature that governs a page and owns no data at all
+    postal_rules/     what each country expects of an address, and what it calls each part
+    identifiers/      which external identifiers exist, and what each one identifies
 ```
 
 Each has its manifest, its `locale/`, and imports `postulo.plugins.api`. None of them
@@ -747,6 +751,43 @@ claiming an independent version number is inventing a fact, and one that ships w
 application changes when the application does. There are six of them, and a test walks every
 one and fails on a missing field, so this is not a rule the project asks of you and not of
 itself.
+
+## Identifier registries
+
+An **identifier** plugin says which external identifiers exist — ORCID, ISNI, Wikidata, a
+legal-entity identifier, a national company register number — what each should look like,
+where it links, whether its check digits add up, and **which subjects it identifies**:
+
+```python
+Scheme(ORCID, "ORCID", pattern=..., subjects={"person"})
+Scheme(LEI, "LEI", pattern=..., subjects={"company"})
+Scheme(ISNI, "ISNI", pattern=..., subjects={"person", "company"})
+```
+
+That last field is the whole point of the kind. Two registries kept two sets of choices, and
+the sets were not disjoint: ISNI identifies contributors *and* organisations by its own
+definition, Wikidata has items for both, LinkedIn has profiles and company pages. Keeping
+them apart had quietly picked a side for each, so a researcher could not record their
+Wikidata item and a university could not record its ISNI (#109).
+
+**A scheme owns no rows**, which is why this can be a plugin at all: `PersonIdentifier` and
+`CompanyIdentifier` are core models, migrated by core, and a plugin contributes only the
+vocabulary. A plugin that wanted to own a table could not, and that is a real limit rather
+than an oversight.
+
+**It cannot be switched off.** Every other kind answers *is this on for this person*; a
+registry answers *what does this key mean*. Off would leave every stored identifier without
+a label, a link or a check, which is not what *off* means anywhere else here — so
+`identifier` is ungoverned, alongside transports.
+
+**It cannot reach the network**, and neither may yours. A scheme validates what somebody
+typed and knows where it links; a checksum catches the typos a lookup would, which is the
+entire reason ORCID and the LEI have one.
+
+**No third-party group is advertised yet**, and the kind is internal for now. That is not
+shyness about the idea — `register` is one generic scheme for SIRET, NIF, Companies House,
+KvK and Handelsregister alike, and a plugin per country is the obvious next thing — but a
+third-party contract is a promise about breakage, and this one is not written.
 
 ## Importers
 

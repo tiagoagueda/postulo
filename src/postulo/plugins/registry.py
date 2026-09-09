@@ -33,10 +33,12 @@ from importlib.metadata import entry_points
 from .base import (
     CONNECTED_KINDS,
     FEATURE_GROUP,
+    IDENTIFIER_GROUP,
     IMPORTER_GROUP,
     TRANSPORT_GROUP,
     ConnectedPlugin,
     FeaturePlugin,
+    IdentifierPlugin,
     ImporterPlugin,
     JobPostingData,
     SourcePlugin,
@@ -59,11 +61,16 @@ ENTRY_POINT_GROUP = "postulo.sources"
 #: An **outbox** is a connected kind and deliberately not a transport: it sends as the
 #: person rather than as the instance, so it is theirs to switch off -- which a transport
 #: could never be, because that is an account nobody can recover (#149).
+#: An **identifier** plugin advertises no group at all. It is internal for now, and an
+#: empty group is how that is *enforced* rather than merely intended: `_load_third_party`
+#: returns nothing for one, so no package outside this process can contribute a scheme
+#: until there is a contract worth promising (#109).
 GROUPS = {
     "source": ENTRY_POINT_GROUP,
     "importer": IMPORTER_GROUP,
     "transport": TRANSPORT_GROUP,
     "feature": FEATURE_GROUP,
+    "identifier": IDENTIFIER_GROUP,
     **CONNECTED_KINDS,
 }
 
@@ -77,6 +84,7 @@ def _protocol_for(kind: str):
         "importer": ImporterPlugin,
         "transport": TransportPlugin,
         "feature": FeaturePlugin,
+        "identifier": IdentifierPlugin,
     }.get(kind, ConnectedPlugin)
 
 
@@ -170,6 +178,9 @@ def _load_third_party(kind: str) -> list:
     A broken plugin disables itself and is logged. It does not take the feature down with
     it: the built-in plugins are still perfectly able to do their job.
     """
+    if not GROUPS[kind]:
+        # No group advertised: this kind is internal, and nothing outside registers one.
+        return []
     protocol = _protocol_for(kind)
     plugins: list = []
     switched_off = _disabled()

@@ -370,6 +370,42 @@ class ImporterPlugin(Protocol):
 TRANSPORT_GROUP = "postulo.transports"
 
 
+# ------------------------------------------------------------------ identifiers
+
+#: Deliberately empty: an identifier plugin is internal only, and the registry treats a
+#: blank group as "nothing outside this process may register one" rather than as an
+#: oversight. A third-party contract is a promise about breakage, and this one is not
+#: written yet (#109).
+IDENTIFIER_GROUP = ""
+
+
+@runtime_checkable
+class IdentifierPlugin(Protocol):
+    """A registry of external identifier schemes.
+
+    Unlike every other kind here, this one is not asked to *do* anything and cannot be
+    switched off. A source reads a page, a notifier sends, a feature answers whether it is
+    on; an identifier plugin answers "what does this key mean" — a label, a pattern, a
+    checksum, a link, and which of a person and an organisation it identifies. Switching
+    that off would leave every stored identifier unreadable, which is not what *off* means
+    anywhere else in Postulo.
+
+    **A scheme owns no rows**, which is why this can be a plugin at all: the two identifier
+    tables are core models, migrated by core, and a plugin contributes only the vocabulary.
+
+    **It must not reach the network.** A scheme validates what somebody typed and knows
+    where it links; asking somebody else whether the identifier exists is a deliberate act
+    for another day, and a plugin is not the loophole for it.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"identifier"``.
+    kind: str
+    #: The schemes it contributes, each a `postulo.core.identifiers.Scheme`.
+    schemes: tuple
+
+
 # --------------------------------------------------------------------- features
 
 #: Where something that *changes what Postulo keeps* registers itself.

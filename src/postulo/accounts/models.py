@@ -20,6 +20,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core.identifiers import PERSON, require, scheme_field
+
 from . import identifiers
 from .validators import USERNAME_MAX_LENGTH, slug_from_email, username_validator
 
@@ -166,7 +168,7 @@ class PersonIdentifier(models.Model):
         related_name="identifiers",
         verbose_name=_("profile"),
     )
-    scheme = models.CharField(_("scheme"), max_length=20, choices=identifiers.CHOICES)
+    scheme = scheme_field(PERSON)
     value = models.CharField(_("identifier"), max_length=100)
     label = models.CharField(
         _("name"),
@@ -188,7 +190,18 @@ class PersonIdentifier(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.get_scheme_display()}: {self.value}"
+        return f"{self.scheme_label}: {self.value}"
+
+    def save(self, *args, **kwargs):
+        """Refuse a scheme that does not identify a person, by every route in.
+
+        `full_clean` catches it for a form and an import; this catches it for
+        ``objects.create`` and for anything a plugin writes directly. *No valid company
+        identifier is shown on the user data* was the ask, and a guarantee that holds only
+        where somebody remembered to validate is not one (#109).
+        """
+        require(self.scheme, PERSON)
+        return super().save(*args, **kwargs)
 
     def clean(self) -> None:
         """Tidy and check the value here, so nothing stores a half-typed identifier.
@@ -201,6 +214,10 @@ class PersonIdentifier(models.Model):
             self.value = identifiers.clean(self.scheme, self.value)
 
     @property
+    def scheme_label(self) -> str:
+        return identifiers.label_for(self.scheme)
+
+    @property
     def url(self) -> str:
         return identifiers.url_for(self.scheme, self.value)
 
@@ -209,7 +226,7 @@ class PersonIdentifier(models.Model):
         return (
             self.label
             if self.scheme == identifiers.OTHER and self.label
-            else str(self.get_scheme_display())
+            else identifiers.label_for(self.scheme)
         )
 
 

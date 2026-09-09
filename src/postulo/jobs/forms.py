@@ -195,7 +195,7 @@ class CompanyIdentifierForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # A blank first choice, so an untouched extra row counts as unchanged and is
         # dropped rather than complaining that its value is missing.
-        self.fields["scheme"].choices = [("", "—"), *identifiers.CHOICES]
+        self.fields["scheme"].choices = [("", "—"), *identifiers.choices()]
         self.fields["scheme"].required = False
         self.fields["value"].required = False
 

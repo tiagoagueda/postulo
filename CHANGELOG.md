@@ -1221,6 +1221,41 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **One registry of external identifiers, with a matrix saying which each one identifies.**
+  The separation asked for already existed and was the least interesting part: a company's
+  scheme could not appear on a person because of which module a form imported its choices
+  from. That is a convention, and a convention holds until somebody wires a form up
+  differently. It is a guarantee now — a scheme says which subjects it identifies, and a row
+  that disagrees is refused at the model by every route in, `objects.create` included.
+
+  **What the separation cost is the interesting part.** The two sets were not disjoint.
+  ISNI identifies contributors *and* organisations by its own definition; Wikidata has items
+  for both; LinkedIn has company pages and personal profiles alike. Two files that never had
+  to agree had quietly picked a side for each, so a researcher could not record their
+  Wikidata item and a university could not record its ISNI — which is exactly the identifier
+  an EU application form asks an institution for. Nobody had filed a bug about either; both
+  simply followed from the shape.
+
+  One scheme identifying two subjects also means one scheme needing two addresses, which two
+  registries could never have expressed: a LinkedIn company page and a personal profile are
+  different links, and both are now right.
+
+  **A new plugin kind, and one that governs nothing.** Every other kind answers *is this on
+  for this person*; a registry answers *what does this key mean*, so switching it off would
+  leave every stored identifier without a label, a link or a check. It is ungoverned
+  alongside transports, and internal-only — enforced rather than intended, since the kind
+  advertises no entry-point group at all. A plugin per national company register is the
+  obvious next thing (`register` is one generic scheme for SIRET, NIF, Companies House, KvK
+  and Handelsregister alike), but a third-party contract is a promise about breakage and
+  that one is not written yet.
+
+  **It can be a plugin because a scheme owns no rows.** The two identifier tables stay in
+  core, owned and migrated by core; what the plugin contributes is vocabulary. That is the
+  difference from the contact-details half of #100, which needed a plugin to own a table.
+
+  No validation got weaker: every pattern and both checksums came across, and the existing
+  tests pass unchanged rather than adjusted to fit. No key changed, so no row moved. (#109)
+
 - **A career entry can say the same thing in more than one language.** At the document level
   this already worked: a CV declares what it is written in, and the PDF is hyphenated,
   justified and laid out for that rather than for whoever made it. One level down it did not.

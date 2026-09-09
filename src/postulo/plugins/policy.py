@@ -42,7 +42,13 @@ GOVERNED_KINDS = ("source", "notifier", "store", "sync", "importer", "feature")
 
 #: The rest. Named rather than implied, because the guard below has to look a plugin up by
 #: name and "every kind that is not governed" is the honest way to write that.
-UNGOVERNED_KINDS = ("transport",)
+#:
+#: An **identifier** plugin is here for a different reason from a transport. A transport is
+#: instance plumbing nobody should be able to switch off; a registry of identifier schemes
+#: is not a behaviour at all. Every other kind answers "is this on for this person"; this one
+#: answers "what does this key mean", and off would leave every stored identifier without a
+#: label, a link or a check -- which is not what off means anywhere else here (#109).
+UNGOVERNED_KINDS = ("transport", "identifier")
 
 
 @dataclass(frozen=True)

@@ -98,7 +98,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         context.setdefault("numbers", self.get_numbers())
         context.setdefault("addresses", self.get_addresses())
         context["numbers_kept_back"] = phone_numbers.kept_back(self.object, self.request.user)
-        context["identifier_schemes"] = person_identifiers.SCHEMES.values()
+        context["identifier_schemes"] = person_identifiers.schemes().values()
         return context
 
     def form_valid(self, form):

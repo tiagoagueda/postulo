@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_ten_of_them_across_seven_kinds():
+def test_there_are_eleven_of_them_across_eight_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -144,6 +144,10 @@ def test_there_are_ten_of_them_across_seven_kinds():
     govern a page -- the second owns no data at all, since the addresses are allauth's, which
     is the honest limit of what a feature can be here (#145). `postal-rules` governs a table:
     what a country expects of an address, and what it calls each part (#147).
+
+    `identifiers` governs nothing at all, which is why its kind is ungoverned: it is a
+    vocabulary rather than a behaviour, and *off* would leave every stored identifier without
+    a label, a link or a check (#109).
     """
     found = {
         manifest_of(plugin_class()).name
@@ -162,6 +166,7 @@ def test_there_are_ten_of_them_across_seven_kinds():
         "phone-numbers",
         "email-addresses",
         "postal-rules",
+        "identifiers",
     }
 
 
