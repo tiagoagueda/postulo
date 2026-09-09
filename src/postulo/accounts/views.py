@@ -74,6 +74,20 @@ class ProfileView(LoginRequiredMixin, UpdateView):
             kwargs["data"] = self.request.POST
         return phone_numbers.formset_for(**kwargs)
 
+    def get_addresses(self):
+        """The postal rows. Always offered: no feature governs these, and nothing verifies
+        them — Postulo is not going to post anything (#92).
+        """
+        from postulo.core import phones, postal
+
+        kwargs = {
+            "holder": self.object,
+            "default_country": phones.default_country(getattr(self.object, "language", "")),
+        }
+        if self.request.method == "POST" and "addresses-TOTAL_FORMS" in self.request.POST:
+            kwargs["data"] = self.request.POST
+        return postal.formset_for(**kwargs)
+
     def get_context_data(self, **kwargs) -> dict:
         from postulo.core import phone_numbers
 
@@ -82,6 +96,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context.setdefault("identifiers", self.get_identifiers())
         context.setdefault("numbers", self.get_numbers())
+        context.setdefault("addresses", self.get_addresses())
         context["numbers_kept_back"] = phone_numbers.kept_back(self.object, self.request.user)
         context["identifier_schemes"] = person_identifiers.SCHEMES.values()
         return context
@@ -91,12 +106,17 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
         formset = self.get_identifiers()
         numbers = self.get_numbers()
-        invalid = (formset.is_bound and not formset.is_valid()) or (
-            numbers is not None and numbers.is_bound and not numbers.is_valid()
+        addresses = self.get_addresses()
+        invalid = (
+            (formset.is_bound and not formset.is_valid())
+            or (numbers is not None and numbers.is_bound and not numbers.is_valid())
+            or (addresses.is_bound and not addresses.is_valid())
         )
         if invalid:
             return self.render_to_response(
-                self.get_context_data(form=form, identifiers=formset, numbers=numbers)
+                self.get_context_data(
+                    form=form, identifiers=formset, numbers=numbers, addresses=addresses
+                )
             )
         with transaction.atomic():
             response = super().form_valid(form)
@@ -106,6 +126,9 @@ class ProfileView(LoginRequiredMixin, UpdateView):
             if numbers is not None and numbers.is_bound:
                 numbers.instance = self.object
                 numbers.save()
+            if addresses.is_bound:
+                addresses.instance = self.object
+                addresses.save()
         return self._after_saving(form, response)
 
     def _after_saving(self, form, response):

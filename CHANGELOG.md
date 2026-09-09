@@ -227,6 +227,40 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Postal addresses have somewhere to go.** Several per account, exactly one primary, on a
+  person and on a contact — with the invariant in a database constraint rather than in
+  whichever form saved last. `Profile.location` keeps working and keeps its meaning; this is
+  for the parts of an address that had nowhere to be.
+
+  **An address is not unique across the instance, and that is the point rather than an
+  omission.** A telephone number belongs to one person; a home does not. Spouses share one,
+  flatmates share one, an adult child at home shares one, and two siblings on a family
+  instance share one — and a family instance is exactly the kind of small self-hosted
+  deployment this project is built for. A uniqueness constraint would refuse the second
+  member of a household their own address *and* disclose, in refusing it, that somebody else
+  on this server lives there. So: unique per owner, so nobody lists their own home twice,
+  and freely shared between accounts. The page says so, because the numbers beside it make
+  the opposite trade.
+
+  **Valid cannot mean verified.** Deciding whether an address exists needs a per-country
+  reference database or a paid lookup — a network dependency, a cost and a stream of updates
+  — and Postulo has no use for the answer, because it is not going to post anything. An
+  address typed oddly is saved exactly as typed; only the comparison folds case and spacing.
+  Nothing here has a verification and nothing here can become a way back into an account.
+
+  **Postulo was throwing real addresses away, and has stopped.** A Europass file carries a
+  street and a postcode; the importer kept the town and the country and discarded the two
+  lines that make an address an address. Somebody exported their CV, imported it here, and
+  they were silently gone. They land now — filling blanks only, never arguing with an
+  address somebody typed.
+
+  The archive carries addresses (format 9), an import brings them back, and two people can
+  import the same one. The CV header still shows a town and a country and never a street:
+  guidance across most of Europe is that a precise address invites a reader to draw
+  conclusions about somebody from where they live, and putting one on a document sent to
+  strangers is not a default anybody chose. `docs/THREAT-MODEL.md` now says a home address is
+  the sharpest thing this application holds. (#92)
+
 - **Several email addresses is a feature you can switch off — and it governs the page, not
   the addresses.** Everything the request asked for already worked: allauth gives an account
   several addresses, exactly one primary, each verified independently, and that is the shape

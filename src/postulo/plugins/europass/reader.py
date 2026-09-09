@@ -142,6 +142,23 @@ def _make_date(year, month, day) -> dt.date | None:
         return None
 
 
+def _country_code(address) -> str:
+    """The two-letter code Europass puts on a country, or empty.
+
+    The code rather than the label: `PostalAddress.country` is ISO 3166-1 alpha-2, and the
+    label is a name in whatever language the file was written in.
+    """
+    country = _find(address, "Country")
+    if country is None:
+        return ""
+    return (_text(country, "Code") or "").strip().upper()[:2]
+
+
+def _json_country_code(address) -> str:
+    country = _obj(address.get("Country")) if isinstance(address, dict) else {}
+    return str(country.get("Code") or "").strip().upper()[:2]
+
+
 def _place(municipality: str, country: str) -> str:
     return ", ".join(part for part in (municipality, country) if part)
 
@@ -314,6 +331,17 @@ def _read_person(learner, record: Record) -> None:
             person["location"] = _place(
                 _text(address, "Municipality"), _text(address, "Country", "Label")
             )
+            # And the rest of it, which used to go in the bin. A Europass file carries a
+            # street and a postcode, and until #92 there was nowhere in Postulo to put
+            # them -- so somebody exported their CV, imported it here, and the two lines
+            # that make an address an address were silently gone.
+            person["address"] = {
+                "street": _text(address, "AddressLine"),
+                "postcode": _text(address, "PostalCode"),
+                "municipality": _text(address, "Municipality"),
+                "region": _text(address, "Region"),
+                "country": _country_code(address),
+            }
 
     headline = _find(learner, "Headline", "Description", "Label")
     if headline is not None:
@@ -598,6 +626,13 @@ def _read_json_person(learner: dict, record: Record) -> None:
         person["location"] = _place(
             _json_text(address, "Municipality"), _json_text(address, "Country", "Label")
         )
+        person["address"] = {
+            "street": _json_text(address, "AddressLine"),
+            "postcode": _json_text(address, "PostalCode"),
+            "municipality": _json_text(address, "Municipality"),
+            "region": _json_text(address, "Region"),
+            "country": _json_country_code(address),
+        }
 
     person["headline"] = _json_text(learner, "Headline", "Description")
     record.person = {key: value for key, value in person.items() if value}

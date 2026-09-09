@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 20:20+0000\n"
+"POT-Creation-Date: 2026-09-09 20:49+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: հայերեն\n"
@@ -193,7 +193,7 @@ msgid ""
 msgstr ""
 "%(label)s-ը դեռ պահում է %(count)d գրառում, և դրա հեռացումը դրանք կթողնի աղյուսակում, որը ոչինչ չի կարող կարդալ, արտահանել կամ վերականգնել։ Նախ դատարկեք այն հավելույթի սեփական էջերից, կամ դրա փոխարեն անջատեք հավելույթը — անջատումը պահպանում է ամեն ինչ։"
 
-#: src/postulo/jobs/models.py:678
+#: src/postulo/jobs/models.py:681
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s-ից %(high)s"
@@ -366,7 +366,7 @@ msgstr "%(role)s %(company)s-ում"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s %(company)s-ում — %(days)s օր"
 
-#: src/postulo/resume/importing.py:136
+#: src/postulo/resume/importing.py:172
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s՝ սկզբի ամսաթիվ չկա, ուստի չավելացվեց։"
@@ -449,6 +449,11 @@ msgstr "%(url)s-ը շատ ավելի մեծ է, քան կատալոգը պետք
 msgid "%(when)s ago"
 msgstr "%(when)s առաջ"
 
+#: src/postulo/core/models.py:413
+#, draft
+msgid "(empty address)"
+msgstr "(դատարկ հասցե)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -525,7 +530,7 @@ msgstr "CSV ֆայլ"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Ակնարկ միջերեսի համար, օրինակ՝ «սաթ» կամ «երկինք»։"
 
-#: src/postulo/core/models.py:344
+#: src/postulo/core/models.py:478
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Տող անվան տակ մուտքի էջում։ Ոչ պարտադիր։"
@@ -619,7 +624,7 @@ msgid ""
 msgstr ""
 "Հայտարարություն, որը նկատել եք։ Ընկերությունն ու վերնագիրը բավական են սկսելու համար. մնացածը կարող է ավելի ուշ գալ։"
 
-#: src/postulo/accounts/models.py:258
+#: src/postulo/accounts/models.py:261
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Պրոֆիլ GitHub-ում, Forgejo-ում, GitLab-ում կամ նմանատիպ վայրում։"
@@ -646,7 +651,7 @@ msgstr "Հիշեցման ժամկետը լրանում է"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Հիշեցման ժամկետը լրանում է մեկ օր շուտ, երբ մեկ օր շուտ կա։"
 
-#: src/postulo/accounts/models.py:441
+#: src/postulo/accounts/models.py:444
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Հիշեցում այն մասին, թե ում համար է սա։"
@@ -735,12 +740,12 @@ msgstr "Ընդունել"
 msgid "Accepted"
 msgstr "Ընդունված"
 
-#: src/postulo/accounts/models.py:455
+#: src/postulo/accounts/models.py:458
 #, draft
 msgid "accepted at"
 msgstr "ընդունվել է"
 
-#: src/postulo/accounts/models.py:462
+#: src/postulo/accounts/models.py:465
 #, draft
 msgid "accepted by"
 msgstr "ընդունել է"
@@ -920,10 +925,16 @@ msgstr "Ավելացվեց ձեր հայտարարություններին։"
 msgid "Added."
 msgstr "Ավելացված է։"
 
-#: src/postulo/jobs/models.py:710 src/postulo/resume/models.py:230
+#: src/postulo/core/models.py:378 src/postulo/jobs/models.py:713
+#: src/postulo/resume/models.py:230
 #, draft
 msgid "address"
 msgstr "հասցե"
+
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Հասցե"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -999,7 +1010,7 @@ msgstr ""
 msgid "Also"
 msgstr "Նաև"
 
-#: src/postulo/templates/accounts/profile.html:173
+#: src/postulo/templates/accounts/profile.html:174
 #, draft
 msgid "Also happens by itself when your primary address changes."
 msgstr "Տեղի է ունենում նաև ինքնաբերաբար, երբ ձեր հիմնական հասցեն փոխվում է։"
@@ -1047,7 +1058,7 @@ msgid ""
 msgstr ""
 "Ցանկը կոդի ցուցակ է, որն այստեղ է գործարկվելու, ուստի այն պետք է ստորագրված լինի և բանալին պետք է ձեզ մոտ լինի։ Պահոցը հետագայում անջատելը դադարեցնում է նրանից նոր տեղադրումներն ու թարմացումները. արդեն տեղադրվածը շարունակում է աշխատել։"
 
-#: src/postulo/templates/accounts/profile.html:107
+#: src/postulo/templates/accounts/profile.html:108
 #, draft
 msgid ""
 "An ORCID, or another public id that says which researcher you are. A name is not an identity — two people share one, one person publishes under three — and an application form for an academic post asks for this by name. Paste a whole address if that is what you have; Postulo keeps the id."
@@ -1140,7 +1151,7 @@ msgstr "Տեսք"
 #: src/postulo/applications/models.py:372
 #: src/postulo/applications/models.py:467
 #: src/postulo/applications/models.py:588 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:738
+#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:741
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1234,7 +1245,7 @@ msgstr "Դիմումներ՝ իրենց ժամանակագրություններ
 
 #: src/postulo/applications/analytics.py:31
 #: src/postulo/applications/models.py:40 src/postulo/applications/tables.py:46
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:633
+#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:636
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
 msgid "Applied"
@@ -1286,7 +1297,7 @@ msgstr "Կիրառել նշված տողերի վրա"
 msgid "Apply: %(title)s"
 msgstr "Դիմել՝ %(title)s"
 
-#: src/postulo/jobs/models.py:434
+#: src/postulo/jobs/models.py:437
 #, draft
 msgid "Apprenticeship"
 msgstr "Աշկերտություն"
@@ -1497,7 +1508,7 @@ msgid "Callback to register with it"
 msgstr "Հետկանչի հասցե՝ նրա մոտ գրանցվելու համար"
 
 #: src/postulo/templates/accounts/invite_form.html:24
-#: src/postulo/templates/accounts/profile.html:164
+#: src/postulo/templates/accounts/profile.html:165
 #: src/postulo/templates/applications/application_form.html:22
 #: src/postulo/templates/applications/application_intake.html:73
 #: src/postulo/templates/applications/interview_form.html:70
@@ -1537,7 +1548,7 @@ msgstr "Չեղարկված"
 msgid "Capture"
 msgstr "Որս"
 
-#: src/postulo/jobs/models.py:742
+#: src/postulo/jobs/models.py:745
 #, draft
 msgid "capture"
 msgstr "որս"
@@ -1579,7 +1590,7 @@ msgstr "Որսալ հայտարարություններ"
 msgid "Capture sources this instance has"
 msgstr "Որսի աղբյուրները, որ ունի այս տեղակայումը"
 
-#: src/postulo/jobs/models.py:714
+#: src/postulo/jobs/models.py:717
 #, draft
 msgid "captured from"
 msgstr "որսվել է"
@@ -1589,7 +1600,7 @@ msgstr "որսվել է"
 msgid "Captured: %(title)s"
 msgstr "Որսվեց՝ %(title)s"
 
-#: src/postulo/jobs/models.py:743
+#: src/postulo/jobs/models.py:746
 #, draft
 msgid "captures"
 msgstr "որսեր"
@@ -1771,7 +1782,7 @@ msgstr "Ընտրեք, թե ինչ տեսակի նույնացուցիչ է սա�
 msgid "Choose which application this is about first."
 msgstr "Նախ ընտրեք, թե որ դիմումին է սա վերաբերում։"
 
-#: src/postulo/accounts/models.py:251
+#: src/postulo/accounts/models.py:254
 #, draft
 msgid "City and country, as it should appear on a CV."
 msgstr "Քաղաքն ու երկիրը այնպես, ինչպես պետք է լինի CV-ում։"
@@ -1797,17 +1808,17 @@ msgstr "Մաքրել"
 msgid "Clear filters"
 msgstr "Մաքրել զտիչները"
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:633
+#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:636
 #, draft
 msgid "Closed"
 msgstr "Փակված"
 
-#: src/postulo/applications/models.py:209 src/postulo/jobs/models.py:574
+#: src/postulo/applications/models.py:209 src/postulo/jobs/models.py:577
 #, draft
 msgid "closed on"
 msgstr "փակվել է"
 
-#: src/postulo/jobs/models.py:461
+#: src/postulo/jobs/models.py:464
 #, draft
 msgid "Closed or already filled"
 msgstr "Փակված է կամ արդեն զբաղեցված"
@@ -1823,7 +1834,7 @@ msgstr "Փակվում է"
 msgid "Closing date"
 msgstr "Փակման ամսաթիվ"
 
-#: src/postulo/jobs/models.py:568
+#: src/postulo/jobs/models.py:571
 #, draft
 msgid "closing date"
 msgstr "փակման ամսաթիվ"
@@ -1838,7 +1849,7 @@ msgstr "Այս շաբաթ փակվում է՝ %(total)s"
 msgid "Code (GitHub, GitLab…)"
 msgstr "Կոդ (GitHub, GitLab…)"
 
-#: src/postulo/accounts/models.py:256
+#: src/postulo/accounts/models.py:259
 #, draft
 msgid "code repository"
 msgstr "կոդի պահոց"
@@ -1908,7 +1919,7 @@ msgstr "Ընկերություն"
 
 #: src/postulo/jobs/models.py:158 src/postulo/jobs/models.py:283
 #: src/postulo/jobs/models.py:354 src/postulo/jobs/models.py:382
-#: src/postulo/jobs/models.py:531 src/postulo/jobs/tables.py:15
+#: src/postulo/jobs/models.py:534 src/postulo/jobs/tables.py:15
 #, draft
 msgid "company"
 msgstr "ընկերություն"
@@ -2006,7 +2017,7 @@ msgstr "Կապը հեռացվեց՝ գաղտնիքների հետ միասին։
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Կապը պահպանվեց։ Փորձարկեք այն՝ համոզվելու համար, որ աշխատում է։"
 
-#: src/postulo/core/models.py:422
+#: src/postulo/core/models.py:556
 #, draft
 msgid "connection security"
 msgstr "կապի անվտանգություն"
@@ -2044,7 +2055,7 @@ msgstr "Շինարարություն"
 msgid "Consulting"
 msgstr "Խորհրդատվություն"
 
-#: src/postulo/jobs/models.py:406
+#: src/postulo/jobs/models.py:409
 #, draft
 msgid "contact"
 msgstr "կոնտակտ"
@@ -2065,7 +2076,7 @@ msgstr "Կոնտակտն ավելացվեց։"
 msgid "Contact block"
 msgstr "Կոնտակտային բլոկ"
 
-#: src/postulo/jobs/models.py:407
+#: src/postulo/jobs/models.py:410
 #, draft
 msgid "contacts"
 msgstr "կոնտակտներ"
@@ -2080,7 +2091,7 @@ msgstr "Պարունակում է"
 msgid "context"
 msgstr "համատեքստ"
 
-#: src/postulo/jobs/models.py:431
+#: src/postulo/jobs/models.py:434
 #, draft
 msgid "Contract"
 msgstr "Պայմանագիր"
@@ -2122,7 +2133,13 @@ msgid ""
 msgstr ""
 "Հաշվվում է ժամանակագրությունից, ուստի ներառված են նաև այն հարցազրույցները, որոնք գրանցվել են օրագրի գոյությունից առաջ։"
 
+#: src/postulo/core/models.py:384 src/postulo/core/postal.py:125
+#, draft
+msgid "country"
+msgstr "երկիր"
+
 #: src/postulo/core/phone_field.py:37
+#: src/postulo/templates/partials/postal_addresses.html:48
 #, draft
 msgid "Country"
 msgstr "Երկիր"
@@ -2159,13 +2176,13 @@ msgstr "Ստեղծել հրավեր"
 msgid "created"
 msgstr "ստեղծվել է"
 
-#: src/postulo/accounts/models.py:307 src/postulo/accounts/models.py:378
-#: src/postulo/accounts/models.py:452 src/postulo/core/models.py:30
+#: src/postulo/accounts/models.py:310 src/postulo/accounts/models.py:381
+#: src/postulo/accounts/models.py:455 src/postulo/core/models.py:30
 #, draft
 msgid "created at"
 msgstr "ստեղծման ժամանակ"
 
-#: src/postulo/accounts/models.py:450
+#: src/postulo/accounts/models.py:453
 #, draft
 msgid "created by"
 msgstr "ստեղծել է"
@@ -2180,7 +2197,7 @@ msgstr "հավատարմագրի հղում"
 msgid "Currency"
 msgstr "Արժույթ"
 
-#: src/postulo/jobs/models.py:557
+#: src/postulo/jobs/models.py:560
 #, draft
 msgid "currency"
 msgstr "արժույթ"
@@ -2235,7 +2252,7 @@ msgstr "Մուգ"
 msgid "Dashboard"
 msgstr "Ընդհանուր տեսք"
 
-#: src/postulo/accounts/models.py:288
+#: src/postulo/accounts/models.py:291
 #, draft
 msgid "dashboard widgets"
 msgstr "ընդհանուր տեսքի բաղադրիչներ"
@@ -2294,7 +2311,7 @@ msgid ""
 msgstr ""
 "Օրեր մինչև առաջին պատասխանը և առաջին հարցազրույցը՝ ամենաարագ, միջինական, ամենադանդաղ։"
 
-#: src/postulo/accounts/models.py:304
+#: src/postulo/accounts/models.py:307
 #, draft
 msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
@@ -2404,7 +2421,7 @@ msgstr "Որոշել է %(who)s-ը %(when)s"
 msgid "Decided by %(who)s."
 msgstr "Որոշել է %(who)s-ը։"
 
-#: src/postulo/jobs/models.py:589
+#: src/postulo/jobs/models.py:592
 #, draft
 msgid "decided on"
 msgstr "որոշման ամսաթիվ"
@@ -2424,12 +2441,12 @@ msgstr "Մերժված"
 msgid "Declined. It will not be suggested again."
 msgstr "Մերժված է։ Այլևս չի առաջարկվի։"
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:518
 #, draft
 msgid "default language"
 msgstr "լռելյայն լեզու"
 
-#: src/postulo/core/models.py:395
+#: src/postulo/core/models.py:529
 #, draft
 msgid "default time zone"
 msgstr "լռելյայն ժամային գոտի"
@@ -2513,7 +2530,7 @@ msgstr "Կախված է"
 msgid "Description"
 msgstr "Նկարագրություն"
 
-#: src/postulo/jobs/models.py:549 src/postulo/resume/models.py:233
+#: src/postulo/jobs/models.py:552 src/postulo/resume/models.py:233
 #, draft
 msgid "description"
 msgstr "նկարագրություն"
@@ -2556,8 +2573,8 @@ msgstr "Հրաժարվել"
 msgid "Discard this capture"
 msgstr "Հրաժարվել այս որսից"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:454
-#: src/postulo/jobs/models.py:693
+#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:457
+#: src/postulo/jobs/models.py:696
 #, draft
 msgid "Discarded"
 msgstr "Հրաժարված"
@@ -2760,7 +2777,7 @@ msgstr ""
 msgid "Email"
 msgstr "Էլ. փոստ"
 
-#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:436
+#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:439
 #: src/postulo/jobs/models.py:396 src/postulo/resume/views.py:333
 #, draft
 msgid "email address"
@@ -2796,7 +2813,7 @@ msgstr "Էլ. նամակ ուղարկվեց"
 msgid "Employment type"
 msgstr "Զբաղվածության տեսակ"
 
-#: src/postulo/jobs/models.py:539
+#: src/postulo/jobs/models.py:542
 #, draft
 msgid "employment type"
 msgstr "զբաղվածության տեսակ"
@@ -2806,7 +2823,7 @@ msgstr "զբաղվածության տեսակ"
 msgid "Empty"
 msgstr "Դատարկ"
 
-#: src/postulo/jobs/models.py:748
+#: src/postulo/jobs/models.py:751
 #, draft
 msgid "Empty capture"
 msgstr "Դատարկ որս"
@@ -3030,7 +3047,7 @@ msgstr "Ժամկետը լրանում է"
 msgid "expires"
 msgstr "ժամկետը լրանում է"
 
-#: src/postulo/accounts/models.py:379 src/postulo/accounts/models.py:453
+#: src/postulo/accounts/models.py:382 src/postulo/accounts/models.py:456
 #, draft
 msgid "expires at"
 msgstr "ժամկետը լրանում է ժամին"
@@ -3068,7 +3085,7 @@ msgstr "Արտահանված է առանձին"
 msgid "Failed"
 msgstr "Ձախողվեց"
 
-#: src/postulo/core/models.py:506 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:640 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Ձախողվեց՝ առանց ասելու, թե ինչու։"
@@ -3088,7 +3105,7 @@ msgstr "Ամենաարագ"
 msgid "Fax"
 msgstr "Ֆաքս"
 
-#: src/postulo/templates/accounts/profile.html:171
+#: src/postulo/templates/accounts/profile.html:172
 #, draft
 msgid "Fetch my Gravatar again"
 msgstr "Կրկին բերել իմ Gravatar-ը"
@@ -3283,7 +3300,7 @@ msgstr "Գտնվել է նրանց կայքում"
 msgid "Found via"
 msgstr "Գտնվել է միջոցով"
 
-#: src/postulo/jobs/models.py:544
+#: src/postulo/jobs/models.py:547
 #, draft
 msgid "found via"
 msgstr "գտնվել է միջոցով"
@@ -3293,7 +3310,7 @@ msgstr "գտնվել է միջոցով"
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Գտնվեց՝ %(names)s։ Կլրացվեն միայն այն դաշտերը, որ դատարկ եք թողել։"
 
-#: src/postulo/jobs/models.py:432
+#: src/postulo/jobs/models.py:435
 #, draft
 msgid "Freelance"
 msgstr "Ազատ զբաղվածություն"
@@ -3317,7 +3334,7 @@ msgstr "որտեղից"
 msgid "From"
 msgstr "Որտեղից"
 
-#: src/postulo/jobs/models.py:683
+#: src/postulo/jobs/models.py:686
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "%(low)s-ից"
@@ -3327,7 +3344,7 @@ msgstr "%(low)s-ից"
 msgid "From %(name)s."
 msgstr "%(name)s-ից։"
 
-#: src/postulo/core/models.py:430
+#: src/postulo/core/models.py:564
 #, draft
 msgid "from address"
 msgstr "ուղարկողի հասցե"
@@ -3374,7 +3391,7 @@ msgstr "կարգավիճակից"
 msgid "Frozen at the moment of sending"
 msgstr "Սառեցված է ուղարկման պահին"
 
-#: src/postulo/jobs/models.py:429
+#: src/postulo/jobs/models.py:432
 #, draft
 msgid "Full time"
 msgstr "Լրիվ դրույք"
@@ -3457,17 +3474,17 @@ msgstr "Ստացել են որևէ պատասխան"
 msgid "grade"
 msgstr "գնահատական"
 
-#: src/postulo/accounts/models.py:298
+#: src/postulo/accounts/models.py:301
 #, draft
 msgid "Gravatar checked on"
 msgstr "Gravatar-ը ստուգվել է"
 
-#: src/postulo/accounts/models.py:296
+#: src/postulo/accounts/models.py:299
 #, draft
 msgid "Gravatar copy"
 msgstr "Gravatar-ի պատճեն"
 
-#: src/postulo/accounts/views.py:121 src/postulo/accounts/views.py:161
+#: src/postulo/accounts/views.py:144 src/postulo/accounts/views.py:184
 #, draft
 msgid "Gravatar could not be reached just now. Try again later."
 msgstr "Gravatar-ին այս պահին չհաջողվեց հասնել։ Փորձեք ավելի ուշ։"
@@ -3478,7 +3495,7 @@ msgid "Gravatar had no picture for your address when last asked, on %(when)s."
 msgstr ""
 "Gravatar-ը ձեր հասցեի համար նկար չուներ, երբ վերջին անգամ հարցվեց՝ %(when)s։"
 
-#: src/postulo/accounts/views.py:117 src/postulo/accounts/views.py:160
+#: src/postulo/accounts/views.py:140 src/postulo/accounts/views.py:183
 #, draft
 msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr "Gravatar-ը ձեր հասցեի համար նկար չունի, ուստի մնում են ձեր սկզբնատառերը։"
@@ -3532,7 +3549,7 @@ msgstr "Կայացել է"
 msgid "hidden"
 msgstr "թաքցված"
 
-#: src/postulo/accounts/models.py:267
+#: src/postulo/accounts/models.py:270
 #, draft
 msgid "hidden navigation items"
 msgstr "թաքցված նավարկման տարրեր"
@@ -3553,10 +3570,17 @@ msgstr "առանցքային կետեր"
 msgid "highlights for this CV"
 msgstr "առանցքային կետեր այս CV-ի համար"
 
-#: src/postulo/core/models.py:134
+#: src/postulo/core/models.py:134 src/postulo/core/models.py:359
 #, draft
 msgid "Home"
 msgstr "Տուն"
+
+#: src/postulo/templates/partials/postal_addresses.html:15
+#, draft
+msgid ""
+"Home, work, wherever post reaches you — with one of them marked as the one to use. A form or a formal letter carries that one."
+msgstr ""
+"Տուն, աշխատանք, ուր էլ որ փոստը ձեզ հասնի՝ դրանցից մեկը նշված որպես օգտագործվողը։ Ձևաթուղթը կամ պաշտոնական նամակը կրում է հենց այն։"
 
 #: src/postulo/jobs/industries.py:35
 #, draft
@@ -3639,7 +3663,7 @@ msgstr "Ինչպես եք մուտք գործում՝ ձեր օգտանունը,
 msgid "However you prefer to group your search."
 msgstr "Ինչպես էլ որ նախընտրեք խմբավորել ձեր որոնումը։"
 
-#: src/postulo/jobs/models.py:424
+#: src/postulo/jobs/models.py:427
 #, draft
 msgid "Hybrid"
 msgstr "Հիբրիդային"
@@ -3660,7 +3684,7 @@ msgstr "նույնացուցիչ պահոցում"
 msgid "identifier"
 msgstr "նույնացուցիչ"
 
-#: src/postulo/templates/accounts/profile.html:128
+#: src/postulo/templates/accounts/profile.html:129
 #: src/postulo/templates/jobs/company_form.html:66
 #, draft
 msgid "Identifier"
@@ -3676,7 +3700,7 @@ msgstr "նույնացուցիչ աղբյուրում"
 msgid "identifiers"
 msgstr "նույնացուցիչներ"
 
-#: src/postulo/templates/accounts/profile.html:105
+#: src/postulo/templates/accounts/profile.html:106
 #: src/postulo/templates/jobs/company_form.html:48
 #, draft
 msgid "Identifiers"
@@ -3701,7 +3725,7 @@ msgid ""
 msgstr ""
 "Եթե դիմել եք ԵՄ հաստատության կամ ազգային զբաղվածության ծառայության միջոցով, այս ֆայլն արդեն ունեք։ Ամեն ինչ նորից մուտքագրելու փոխարեն՝ հանձնեք այն։"
 
-#: src/postulo/core/models.py:353
+#: src/postulo/core/models.py:487
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "որսի ժամանակ անտեսել robots.txt-ը"
@@ -3887,7 +3911,7 @@ msgstr "Տեղադրված է այս տեղակայման վրա"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Հավելում տեղադրելը Postulo-ի ներսում ուրիշի կոդ է գործարկում։"
 
-#: src/postulo/core/models.py:335
+#: src/postulo/core/models.py:469
 #, draft
 msgid "instance name"
 msgstr "տեղակայման անուն"
@@ -3907,7 +3931,7 @@ msgstr "Ապահովագրություն"
 msgid "Internal"
 msgstr "Ներքին"
 
-#: src/postulo/jobs/models.py:433
+#: src/postulo/jobs/models.py:436
 #, draft
 msgid "Internship"
 msgstr "Պրակտիկա"
@@ -3974,12 +3998,12 @@ msgstr "հարցազրույցներ"
 msgid "Interviews"
 msgstr "Հարցազրույցներ"
 
-#: src/postulo/accounts/models.py:468
+#: src/postulo/accounts/models.py:471
 #, draft
 msgid "invitation"
 msgstr "հրավեր"
 
-#: src/postulo/accounts/views.py:187
+#: src/postulo/accounts/views.py:210
 #, draft
 msgid ""
 "Invitation created. Send the person the link shown below; it can be used once."
@@ -3993,12 +4017,12 @@ msgid ""
 msgstr ""
 "Միայն հրավերով. գրանցման ձևը չի առաջարկվում։ Մարդկանց հրավիրեք Մարդիկ բաժնից։"
 
-#: src/postulo/accounts/views.py:203
+#: src/postulo/accounts/views.py:226
 #, draft
 msgid "Invitation revoked."
 msgstr "Հրավերը հետ կանչվեց։"
 
-#: src/postulo/accounts/models.py:469
+#: src/postulo/accounts/models.py:472
 #, draft
 msgid "invitations"
 msgstr "հրավերներ"
@@ -4010,7 +4034,7 @@ msgstr "հրավերներ"
 msgid "Invitations"
 msgstr "Հրավերներ"
 
-#: src/postulo/accounts/models.py:372 src/postulo/resume/models.py:156
+#: src/postulo/accounts/models.py:375 src/postulo/resume/models.py:156
 #, draft
 msgid "issued by"
 msgstr "տվել է"
@@ -4079,12 +4103,12 @@ msgstr "Նրա ֆայլը համընկնում է այն ամենի հետ, ին
 msgid "Job board"
 msgstr "Աշխատանքի կայք"
 
-#: src/postulo/jobs/models.py:594
+#: src/postulo/jobs/models.py:597
 #, draft
 msgid "job posting"
 msgstr "աշխատանքի հայտարարություն"
 
-#: src/postulo/jobs/models.py:595
+#: src/postulo/jobs/models.py:598
 #, draft
 msgid "job postings"
 msgstr "աշխատանքի հայտարարություններ"
@@ -4142,16 +4166,17 @@ msgstr ""
 #: src/postulo/applications/models.py:324
 #: src/postulo/applications/models.py:470
 #: src/postulo/applications/models.py:594 src/postulo/core/models.py:143
-#: src/postulo/documents/models.py:230 src/postulo/documents/models.py:292
-#: src/postulo/documents/models.py:342 src/postulo/plugins/models.py:169
-#: src/postulo/resume/models.py:231
+#: src/postulo/core/models.py:368 src/postulo/documents/models.py:230
+#: src/postulo/documents/models.py:292 src/postulo/documents/models.py:342
+#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:231
 #, draft
 msgid "kind"
 msgstr "տեսակ"
 
-#: src/postulo/templates/accounts/profile.html:124
+#: src/postulo/templates/accounts/profile.html:125
 #: src/postulo/templates/jobs/company_form.html:62
 #: src/postulo/templates/partials/phone_numbers.html:40
+#: src/postulo/templates/partials/postal_addresses.html:54
 #, draft
 msgid "Kind"
 msgstr "Տեսակ"
@@ -4171,7 +4196,7 @@ msgstr "ցուցադրվող անուն"
 msgid "Language"
 msgstr "Լեզու"
 
-#: src/postulo/accounts/models.py:261 src/postulo/documents/models.py:67
+#: src/postulo/accounts/models.py:264 src/postulo/documents/models.py:67
 #: src/postulo/documents/models.py:246 src/postulo/resume/models.py:185
 #: src/postulo/resume/models.py:191
 #, draft
@@ -4203,7 +4228,7 @@ msgstr "Լեզուներ"
 msgid "languages"
 msgstr "լեզուներ"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:528
 #, draft
 msgid "languages offered"
 msgstr "առաջարկվող լեզուներ"
@@ -4398,7 +4423,7 @@ msgstr "Հղում"
 msgid "link in the store"
 msgstr "հղում պահոցում"
 
-#: src/postulo/accounts/models.py:254 src/postulo/jobs/models.py:402
+#: src/postulo/accounts/models.py:257 src/postulo/jobs/models.py:405
 #, draft
 msgid "LinkedIn"
 msgstr "LinkedIn"
@@ -4441,7 +4466,7 @@ msgstr "Հղումներ, ուր ուղղորդել եք նրանց"
 msgid "listening"
 msgstr "լսում է"
 
-#: src/postulo/jobs/models.py:729
+#: src/postulo/jobs/models.py:732
 #: src/postulo/templates/core/import_csv_map.html:86
 #, draft
 msgid "listing"
@@ -4473,8 +4498,8 @@ msgid ""
 msgstr ""
 "Հայտարարությունները, դիմումները և դրանց ժամանակագրությունները, ընկերություններն ու մարդիկ, հիշեցումները, ուղարկածի տեքստը, նամակները, CV-ները, ֆայլերը և ձեր կարիերայի գրանցամատյանը — ամեն ինչ, ներառյալ փակվածն ու հրաժարվածը, քանի որ փնտրում եք մի բան, որ հիշում եք։"
 
-#: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:136
-#: src/postulo/jobs/models.py:534 src/postulo/resume/models.py:55
+#: src/postulo/accounts/models.py:251 src/postulo/jobs/models.py:136
+#: src/postulo/jobs/models.py:537 src/postulo/resume/models.py:55
 #: src/postulo/resume/models.py:86
 #, draft
 msgid "location"
@@ -4541,7 +4566,7 @@ msgstr "Փոքրատառեր, թվանշաններ, կետեր, ընդգծում
 msgid "Made"
 msgstr "Ստեղծված"
 
-#: src/postulo/core/models.py:461
+#: src/postulo/core/models.py:595
 #, draft
 msgid "mail failures in a row"
 msgstr "փոստի անընդմեջ ձախողում"
@@ -4562,7 +4587,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Այստեղ փոստը հաշիվ վերադառնալու միակ ճանապարհն է, ուստի մինչև այն նորից աշխատի, այս հանգույցի %(counter)s մարդկանցից ոչ մեկը չի կարողանա վերադառնալ, եթե մոռանա իր գաղտնաբառը։"
 
-#: src/postulo/core/models.py:457
+#: src/postulo/core/models.py:591
 #, draft
 msgid "mail last failed"
 msgstr "փոստը վերջին անգամ ձախողվել է"
@@ -4572,7 +4597,7 @@ msgstr "փոստը վերջին անգամ ձախողվել է"
 msgid "Mail last went out at %(when)s."
 msgstr "Փոստը վերջին անգամ դուրս է եկել %(when)s-ին։"
 
-#: src/postulo/core/models.py:456
+#: src/postulo/core/models.py:590
 #, draft
 msgid "mail last worked"
 msgstr "փոստը վերջին անգամ աշխատել է"
@@ -4591,7 +4616,7 @@ msgid ""
 msgstr ""
 "Փոստն այլևս նաև փոխադրումը տեղում չի պահում, քանի որ ճանապարհը, որը ոչինչ չի հասցնում, ոչ մեկին չի պաշտպանում։"
 
-#: src/postulo/core/models.py:434
+#: src/postulo/core/models.py:568
 #, draft
 msgid "mail transport"
 msgstr "փոստի փոխադրիչ"
@@ -4601,7 +4626,7 @@ msgstr "փոստի փոխադրիչ"
 msgid "Mail transport"
 msgstr "Փոստի փոխադրիչ"
 
-#: src/postulo/core/models.py:458
+#: src/postulo/core/models.py:592
 #, draft
 msgid "mail's last error"
 msgstr "փոստի վերջին սխալը"
@@ -4833,14 +4858,15 @@ msgstr "անուն"
 msgid "Name"
 msgstr "Անուն"
 
-#: src/postulo/core/models.py:145
+#: src/postulo/core/models.py:145 src/postulo/core/models.py:370
 #, draft
 msgid "name, if Other"
 msgstr "անուն, եթե Այլ"
 
-#: src/postulo/templates/accounts/profile.html:132
+#: src/postulo/templates/accounts/profile.html:133
 #: src/postulo/templates/jobs/company_form.html:70
 #: src/postulo/templates/partials/phone_numbers.html:44
+#: src/postulo/templates/partials/postal_addresses.html:58
 #, draft
 msgid "Name, if Other"
 msgstr "Անուն, եթե Այլ է"
@@ -4872,7 +4898,7 @@ msgstr "Երբեք"
 msgid "never used"
 msgstr "երբեք չի օգտագործվել"
 
-#: src/postulo/jobs/models.py:452
+#: src/postulo/jobs/models.py:455
 #, draft
 msgid "New"
 msgstr "Նոր"
@@ -5200,7 +5226,7 @@ msgid ""
 msgstr ""
 "Կազմաձևված չէ։ Կարգավորեք POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID և POSTULO_OIDC_CLIENT_SECRET միջավայրում՝ OpenID Connect մատակարարի մուտքի կոճակ առաջարկելու համար։"
 
-#: src/postulo/jobs/models.py:458
+#: src/postulo/jobs/models.py:461
 #, draft
 msgid "Not for me"
 msgstr "Ինձ համար չէ"
@@ -5266,7 +5292,7 @@ msgstr "Ցուցադրված չէ · %(name)s"
 msgid "not tested yet"
 msgstr "դեռ չի փորձարկվել"
 
-#: src/postulo/accounts/models.py:441
+#: src/postulo/accounts/models.py:444
 #, draft
 msgid "note"
 msgstr "նշում"
@@ -5287,7 +5313,7 @@ msgstr "Նշում (ոչ պարտադիր)"
 msgid "noted %(when)s"
 msgstr "նշվել է %(when)s"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:590
 #, draft
 msgid "noted on"
 msgstr "նշման ամսաթիվ"
@@ -5299,7 +5325,7 @@ msgid "Notes"
 msgstr "Նշումներ"
 
 #: src/postulo/documents/models.py:302 src/postulo/jobs/models.py:140
-#: src/postulo/jobs/models.py:403
+#: src/postulo/jobs/models.py:406
 #, draft
 msgid "notes"
 msgstr "նշումներ"
@@ -5573,7 +5599,7 @@ msgstr "Առաջարկ"
 msgid "Offer received"
 msgstr "Առաջարկ ստացվեց"
 
-#: src/postulo/core/models.py:382
+#: src/postulo/core/models.py:516
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr ""
@@ -5601,7 +5627,7 @@ msgstr "Պաշտոնական"
 msgid "older than a week"
 msgstr "մեկ շաբաթից հին"
 
-#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:423
+#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:426
 #, draft
 msgid "On site"
 msgstr "Տեղում"
@@ -5787,7 +5813,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Թափուր տեղեր"
 
-#: src/postulo/accounts/models.py:438
+#: src/postulo/accounts/models.py:441
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Ոչ պարտադիր։ Եթե նշված է, հրավերը կարող է օգտագործել միայն այս հասցեն։"
@@ -5833,8 +5859,9 @@ msgstr "Սկզբնական հայտարարությունը"
 #: src/postulo/accounts/identifiers.py:73 src/postulo/applications/models.py:87
 #: src/postulo/applications/models.py:291
 #: src/postulo/applications/models.py:410 src/postulo/core/models.py:137
-#: src/postulo/documents/models.py:280 src/postulo/jobs/identifiers.py:95
-#: src/postulo/jobs/models.py:462 src/postulo/resume/models.py:207
+#: src/postulo/core/models.py:362 src/postulo/documents/models.py:280
+#: src/postulo/jobs/identifiers.py:95 src/postulo/jobs/models.py:465
+#: src/postulo/resume/models.py:207
 #, draft
 msgid "Other"
 msgstr "Այլ"
@@ -5904,7 +5931,7 @@ msgstr "Էջերի բաժանում"
 msgid "Panel"
 msgstr "Վահանակ"
 
-#: src/postulo/jobs/models.py:719
+#: src/postulo/jobs/models.py:722
 #, draft
 msgid "parsed posting"
 msgstr "վերլուծված հայտարարություն"
@@ -5924,7 +5951,7 @@ msgstr "<a href=\"%(parent_url)s\" class=\"underline\">%(name)s</a>-ի մաս"
 msgid "Part of this company"
 msgstr "Այս ընկերության մաս"
 
-#: src/postulo/jobs/models.py:430
+#: src/postulo/jobs/models.py:433
 #, draft
 msgid "Part time"
 msgstr "Կես դրույք"
@@ -5939,7 +5966,7 @@ msgstr "Մասամբ թարգմանված"
 msgid "Passkeys"
 msgstr "Անցաբանալիներ"
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:549
 #, draft
 msgid "password"
 msgstr "գաղտնաբառ"
@@ -5994,22 +6021,22 @@ msgstr "Միայն սպասման մեջ"
 msgid "People"
 msgstr "Մարդիկ"
 
-#: src/postulo/jobs/models.py:440
+#: src/postulo/jobs/models.py:443
 #, draft
 msgid "Per day"
 msgstr "Օրական"
 
-#: src/postulo/jobs/models.py:441
+#: src/postulo/jobs/models.py:444
 #, draft
 msgid "Per hour"
 msgstr "Ժամական"
 
-#: src/postulo/jobs/models.py:439
+#: src/postulo/jobs/models.py:442
 #, draft
 msgid "Per month"
 msgstr "Ամսական"
 
-#: src/postulo/jobs/models.py:438
+#: src/postulo/jobs/models.py:441
 #, draft
 msgid "Per year"
 msgstr "Տարեկան"
@@ -6024,7 +6051,7 @@ msgstr "Ժամանակահատված"
 msgid "Permissions"
 msgstr "Թույլտվություններ"
 
-#: src/postulo/accounts/models.py:364 src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:367 src/postulo/plugins/models.py:120
 #, draft
 msgid "person"
 msgstr "մարդ"
@@ -6066,7 +6093,7 @@ msgstr "հեռախոս"
 msgid "Phone screen"
 msgstr "Հեռախոսազրույց"
 
-#: src/postulo/accounts/models.py:291
+#: src/postulo/accounts/models.py:294
 #, draft
 msgid "picture"
 msgstr "նկար"
@@ -6136,7 +6163,7 @@ msgstr "Հավելումներ %(name)s-ի համար"
 msgid "Plugins for this account"
 msgstr "Հավելումներ այս հաշվի համար"
 
-#: src/postulo/accounts/models.py:274
+#: src/postulo/accounts/models.py:277
 #, draft
 msgid "plugins switched off"
 msgstr "անջատված հավելումներ"
@@ -6162,7 +6189,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP կամ GIF՝ մինչև 5 MB։ Նկարը կտրվում է քառակուսու և մաքրվում է այն ամենից, ինչ ֆայլը գիտեր նկարահանման վայրի մասին։"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:540
 #, draft
 msgid "port"
 msgstr "պորտ"
@@ -6196,7 +6223,38 @@ msgstr "Պորտֆոլիոներ, պրոֆիլներ և տեսանյութեր, 
 msgid "Positions"
 msgstr "Պաշտոններ"
 
-#: src/postulo/jobs/models.py:566
+#: src/postulo/core/models.py:361
+#, draft
+msgid "Postal"
+msgstr "Փոստային"
+
+#: src/postulo/core/models.py:393
+#, draft
+msgid "postal address"
+msgstr "փոստային հասցե"
+
+#: src/postulo/accounts/models.py:249 src/postulo/core/models.py:394
+#: src/postulo/jobs/models.py:404
+#, draft
+msgid "postal addresses"
+msgstr "փոստային հասցեներ"
+
+#: src/postulo/templates/partials/postal_addresses.html:13
+#, draft
+msgid "Postal addresses"
+msgstr "Փոստային հասցեներ"
+
+#: src/postulo/core/models.py:379
+#, draft
+msgid "postcode"
+msgstr "փոստային ինդեքս"
+
+#: src/postulo/templates/partials/postal_addresses.html:34
+#, draft
+msgid "Postcode"
+msgstr "Փոստային ինդեքս"
+
+#: src/postulo/jobs/models.py:569
 #, draft
 msgid "posted on"
 msgstr "հրապարակման ամսաթիվ"
@@ -6232,7 +6290,7 @@ msgstr "Հայտարարությունը թարմացվեց։"
 msgid "Posting URL"
 msgstr "Հայտարարության URL"
 
-#: src/postulo/jobs/models.py:542
+#: src/postulo/jobs/models.py:545
 #, draft
 msgid "posting URL"
 msgstr "հայտարարության url"
@@ -6342,12 +6400,13 @@ msgstr "Նախադիտում"
 msgid "Previous"
 msgstr "Նախորդ"
 
-#: src/postulo/core/models.py:154
+#: src/postulo/core/models.py:154 src/postulo/core/models.py:385
 #, draft
 msgid "primary"
 msgstr "հիմնական"
 
 #: src/postulo/templates/partials/phone_numbers.html:57
+#: src/postulo/templates/partials/postal_addresses.html:69
 #: src/postulo/templates/settings/account.html:52
 #, draft
 msgid "Primary"
@@ -6373,12 +6432,12 @@ msgstr "Մասնավոր և տեղական հասցեները մերժվում �
 msgid "proficiency"
 msgstr "տիրապետման մակարդակ"
 
-#: src/postulo/accounts/models.py:167 src/postulo/accounts/models.py:311
+#: src/postulo/accounts/models.py:167 src/postulo/accounts/models.py:314
 #, draft
 msgid "profile"
 msgstr "պրոֆիլ"
 
-#: src/postulo/accounts/models.py:312
+#: src/postulo/accounts/models.py:315
 #, draft
 msgid "profiles"
 msgstr "պրոֆիլներ"
@@ -6492,7 +6551,7 @@ msgstr "Հերթում գտնվող առաջադրանքներ"
 msgid "Quiet"
 msgstr "Լուռ"
 
-#: src/postulo/accounts/models.py:301
+#: src/postulo/accounts/models.py:304
 #, draft
 msgid "quiet after"
 msgstr "լուռ այս ժամկետից հետո"
@@ -6549,7 +6608,7 @@ msgstr ""
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Կարդացվել է որպես Europass XML՝ ձևաչափը, որ ստեղծում էր CV խմբագրիչը։"
 
-#: src/postulo/jobs/models.py:711
+#: src/postulo/jobs/models.py:714
 #, draft
 msgid "read by"
 msgstr "կարդացել է"
@@ -6680,7 +6739,7 @@ msgstr "Գրանցվեց, թե ինչ եք ուղարկել։"
 msgid "Recorded: nobody showed up."
 msgstr "Գրանցվեց՝ ոչ ոք չներկայացավ։"
 
-#: src/postulo/accounts/models.py:386
+#: src/postulo/accounts/models.py:389
 #, draft
 msgid "recovery link"
 msgstr "վերականգնման հղում"
@@ -6691,7 +6750,7 @@ msgstr "վերականգնման հղում"
 msgid "Recovery link"
 msgstr "Վերականգնման հղում"
 
-#: src/postulo/accounts/models.py:387
+#: src/postulo/accounts/models.py:390
 #, draft
 msgid "recovery links"
 msgstr "վերականգնման հղումներ"
@@ -6721,6 +6780,16 @@ msgstr "Երաշխավորությամբ"
 msgid "Refresh logo"
 msgstr "Թարմացնել լոգոն"
 
+#: src/postulo/core/models.py:383
+#, draft
+msgid "region"
+msgstr "մարզ"
+
+#: src/postulo/templates/partials/postal_addresses.html:44
+#, draft
+msgid "Region"
+msgstr "Մարզ"
+
 #: src/postulo/templates/connections/form.html:73
 #, draft
 msgid "Register this address with the provider"
@@ -6738,7 +6807,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr "Գրանցումը բաց է. ցանկացած ոք, ով գտնի հասցեն, կարող է հաշիվ ստեղծել։"
 
-#: src/postulo/core/models.py:347
+#: src/postulo/core/models.py:481
 #, draft
 msgid "registration open"
 msgstr "գրանցումը բաց է"
@@ -6794,7 +6863,7 @@ msgid "Reminders that have come due, each with a button to mark it done."
 msgstr ""
 "Հիշեցումներ, որոնց ժամկետը հասել է, յուրաքանչյուրը՝ կատարված նշելու կոճակով։"
 
-#: src/postulo/jobs/models.py:425
+#: src/postulo/jobs/models.py:428
 #, draft
 msgid "Remote"
 msgstr "Հեռավար"
@@ -6804,12 +6873,13 @@ msgstr "Հեռավար"
 msgid "remote address"
 msgstr "հեռավոր հասցե"
 
-#: src/postulo/templates/accounts/profile.html:137
+#: src/postulo/templates/accounts/profile.html:138
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
 #: src/postulo/templates/partials/phone_numbers.html:82
+#: src/postulo/templates/partials/postal_addresses.html:73
 #: src/postulo/templates/server/plugins.html:151
 #: src/postulo/templates/server/plugins.html:279
 #, draft
@@ -6939,7 +7009,7 @@ msgstr "հետ կանչված"
 msgid "Revoked"
 msgstr "Չեղարկված"
 
-#: src/postulo/accounts/models.py:381
+#: src/postulo/accounts/models.py:384
 #, draft
 msgid "revoked at"
 msgstr "չեղարկվել է"
@@ -7017,12 +7087,12 @@ msgstr "Աշխատավարձ (մեկ թիվ կամ միջակայք)"
 msgid "Salary from"
 msgstr "Աշխատավարձ՝ սկսած"
 
-#: src/postulo/jobs/models.py:552
+#: src/postulo/jobs/models.py:555
 #, draft
 msgid "salary from"
 msgstr "աշխատավարձ՝ սկսած"
 
-#: src/postulo/jobs/models.py:559
+#: src/postulo/jobs/models.py:562
 #, draft
 msgid "salary period"
 msgstr "աշխատավարձի ժամանակահատված"
@@ -7032,12 +7102,12 @@ msgstr "աշխատավարձի ժամանակահատված"
 msgid "Salary to"
 msgstr "Աշխատավարձ՝ մինչև"
 
-#: src/postulo/jobs/models.py:555
+#: src/postulo/jobs/models.py:558
 #, draft
 msgid "salary to"
 msgstr "աշխատավարձ՝ մինչև"
 
-#: src/postulo/templates/accounts/profile.html:163
+#: src/postulo/templates/accounts/profile.html:164
 #: src/postulo/templates/applications/application_form.html:21
 #: src/postulo/templates/applications/application_intake.html:72
 #: src/postulo/templates/applications/interview_form.html:68
@@ -7078,7 +7148,7 @@ msgstr "Պահպանեք ընկերությունը՝ ևս մեկ նույնաց
 msgid "Save this first, then come back and agree."
 msgstr "Նախ պահեք սա, ապա վերադարձեք և համաձայնվեք։"
 
-#: src/postulo/templates/accounts/profile.html:159
+#: src/postulo/templates/accounts/profile.html:160
 #, draft
 msgid "Save to add another identifier."
 msgstr "Պահպանեք՝ ևս մեկ նույնացուցիչ ավելացնելու համար։"
@@ -7101,6 +7171,11 @@ msgstr "Պահվեց ձեր հայտարարություններում։ Որո�
 #, draft
 msgid "Saved."
 msgstr "Պահպանվեց։"
+
+#: src/postulo/core/postal.py:137
+#, draft
+msgid "Say what this address is."
+msgstr "Ասեք՝ ինչ հասցե է սա։"
 
 #: src/postulo/jobs/models.py:322
 #, draft
@@ -7360,7 +7435,7 @@ msgstr "Սահմանել գաղտնաբառը"
 msgid "Set up"
 msgstr "Կարգավորել"
 
-#: src/postulo/jobs/models.py:577
+#: src/postulo/jobs/models.py:580
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Նշեք, երբ պաշտոնն այլևս հասանելի չէ։"
@@ -7401,7 +7476,7 @@ msgstr "Դյուրանցումներ"
 msgid "Shortlist"
 msgstr "Կարճ ցուցակ"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:453
+#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:456
 #, draft
 msgid "Shortlisted"
 msgstr "Կարճ ցուցակում"
@@ -7437,7 +7512,7 @@ msgstr "Ցուցադրել նավարկման մեջ"
 msgid "Show past too"
 msgstr "Ցուցադրել նաև անցածները"
 
-#: src/postulo/core/models.py:338
+#: src/postulo/core/models.py:472
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Ցուցադրվում է վերնագրում և մուտքի էջում։"
@@ -7448,7 +7523,7 @@ msgstr "Ցուցադրվում է վերնագրում և մուտքի էջու�
 msgid "Sign in"
 msgstr "Մուտք գործել"
 
-#: src/postulo/core/models.py:379
+#: src/postulo/core/models.py:513
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "մուտք էլ. փոստով ուղարկված կոդով"
@@ -7491,7 +7566,7 @@ msgstr "Մուտք է գործում գոյություն ունեցող հաշ�
 msgid "Single sign-on"
 msgstr "Միասնական մուտք"
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:492
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "միասնական մուտքը հաշվվում է որպես երկրորդ գործոն"
@@ -7506,7 +7581,7 @@ msgstr "Միասնական մուտքը հաշվվում է որպես երկր�
 msgid "Site search"
 msgstr "Որոնում կայքում"
 
-#: src/postulo/core/models.py:474 src/postulo/core/models.py:475
+#: src/postulo/core/models.py:608 src/postulo/core/models.py:609
 #, draft
 msgid "site settings"
 msgstr "կայքի կարգավորումներ"
@@ -7569,7 +7644,7 @@ msgstr "Ամենադանդաղ"
 msgid "slug"
 msgstr "կարճ անուն"
 
-#: src/postulo/core/models.py:404
+#: src/postulo/core/models.py:538
 #, draft
 msgid "SMTP server"
 msgstr "SMTP սերվեր"
@@ -7625,7 +7700,7 @@ msgid ""
 msgstr ""
 "Աղբյուրը հայտարարության «գտնվել է միջոցով» դաշտն է։ Լրացրեք այն, և այս աղյուսակը կսկսի արդարացնել իր տեղը։"
 
-#: src/postulo/jobs/models.py:712
+#: src/postulo/jobs/models.py:715
 #, draft
 msgid "source version"
 msgstr "տարբերակը աղբյուրում"
@@ -7682,7 +7757,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, միանալուց հետո"
 
-#: src/postulo/jobs/models.py:581 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:584 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "վիճակ"
@@ -7706,7 +7781,7 @@ msgstr "Կարգավիճակ"
 
 #: src/postulo/applications/models.py:197
 #: src/postulo/applications/models.py:611 src/postulo/documents/models.py:432
-#: src/postulo/jobs/models.py:721
+#: src/postulo/jobs/models.py:724
 #, draft
 msgid "status"
 msgstr "կարգավիճակ"
@@ -7899,7 +7974,7 @@ msgstr "Համաժամեցում"
 msgid "Table"
 msgstr "Աղյուսակ"
 
-#: src/postulo/accounts/models.py:277
+#: src/postulo/accounts/models.py:280
 #, draft
 msgid "table settings"
 msgstr "աղյուսակի կարգավորումներ"
@@ -7917,7 +7992,7 @@ msgstr "պիտակ"
 msgid "Tag"
 msgstr "Պիտակ"
 
-#: src/postulo/core/models.py:341
+#: src/postulo/core/models.py:475
 #, draft
 msgid "tagline"
 msgstr "կարգախոս"
@@ -8017,17 +8092,17 @@ msgstr "Փորձարկել կապը"
 msgid "text as sent"
 msgstr "տեքստն այնպես, ինչպես ուղարկվել է"
 
-#: src/postulo/core/models.py:450
+#: src/postulo/core/models.py:584
 #, draft
 msgid "text configuration"
 msgstr "հաղորդագրությունների կարգավորում"
 
-#: src/postulo/core/models.py:451
+#: src/postulo/core/models.py:585
 #, draft
 msgid "text secrets"
 msgstr "հաղորդագրությունների գաղտնիքներ"
 
-#: src/postulo/core/models.py:449
+#: src/postulo/core/models.py:583
 #, draft
 msgid "text transport"
 msgstr "հաղորդագրությունների փոխադրում"
@@ -8081,7 +8156,7 @@ msgstr "Այդ միացումը համաձայնություն չի օգտագո
 msgid "That connection no longer exists."
 msgstr "Այդ միացումն այլևս գոյություն չունի։"
 
-#: src/postulo/jobs/models.py:418
+#: src/postulo/jobs/models.py:421
 #, draft
 msgid "That department belongs to a different company."
 msgstr "Այդ բաժինը պատկանում է այլ ընկերության։"
@@ -8155,7 +8230,7 @@ msgstr "Այդ հոսթի անունը չհաջողվեց լուծել։"
 msgid "That image is far larger than a logo needs to be."
 msgstr "Այդ նկարը շատ ավելի մեծ է, քան լոգոյին պետք է։"
 
-#: src/postulo/accounts/views.py:199
+#: src/postulo/accounts/views.py:222
 #, draft
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Այդ հրավերն արդեն ընդունված է և չի կարող հետ կանչվել։"
@@ -8210,7 +8285,7 @@ msgstr "Դա Postulo-ն չի կարող անել միանգամից մի քան�
 msgid "That is not something this page does."
 msgstr "Սա այն չէ, ինչ անում է այս էջը։"
 
-#: src/postulo/accounts/views.py:293
+#: src/postulo/accounts/views.py:316
 #, draft
 msgid "That is not the address on this account."
 msgstr "Սա այս հաշվի հասցեն չէ։"
@@ -8342,7 +8417,7 @@ msgstr "Հասցեն պատասխանեց %(code)s։"
 msgid "The address answered with nothing."
 msgstr "Հասցեն ոչնչով պատասխանեց։"
 
-#: src/postulo/jobs/models.py:571
+#: src/postulo/jobs/models.py:574
 #, draft
 msgid "The application deadline, if stated."
 msgstr "Դիմումի վերջնաժամկետը, եթե նշված է։"
@@ -8500,12 +8575,12 @@ msgstr ""
 msgid "The LEI's check digits do not match."
 msgstr "LEI-ի ստուգիչ թվանշանները չեն համընկնում։"
 
-#: src/postulo/jobs/models.py:730
+#: src/postulo/jobs/models.py:733
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "Հայտարարությունը, որին վերածվեց այս որսը՝ վերանայումից հետո։"
 
-#: src/postulo/jobs/models.py:460
+#: src/postulo/jobs/models.py:463
 #, draft
 msgid "The location"
 msgstr "Գտնվելու վայրը"
@@ -8562,7 +8637,7 @@ msgid ""
 msgstr ""
 "Գաղտնաբառը սահմանում է <code>%(variable)s</code>-ը միջավայրում. փոխեք այնտեղ։ Այստեղ այն երբեք չի ցուցադրվում։"
 
-#: src/postulo/jobs/models.py:459
+#: src/postulo/jobs/models.py:462
 #, draft
 msgid "The pay"
 msgstr "Վարձատրությունը"
@@ -8705,7 +8780,7 @@ msgstr ""
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Անիվը մետատվյալներ չունի. այն կարող է վնասված լինել։"
 
-#: src/postulo/accounts/models.py:263 src/postulo/documents/models.py:65
+#: src/postulo/accounts/models.py:266 src/postulo/documents/models.py:65
 #: src/postulo/documents/models.py:241
 #, draft
 msgid "theme"
@@ -8784,6 +8859,11 @@ msgstr "Այս գրառումները կարող են անվանել մարդկ�
 msgid "They did not show up"
 msgstr "Նրանք չներկայացան"
 
+#: src/postulo/core/postal.py:159
+#, draft
+msgid "This address is already listed."
+msgstr "Այս հասցեն արդեն ցանկում է։"
+
 #: src/postulo/jobs/logos.py:281
 #, draft
 msgid "This company has no website recorded."
@@ -8831,7 +8911,7 @@ msgid ""
 msgstr ""
 "Այս տեղակայումը SMTP-ով չի ուղարկում, ուստի ստորև բերված կարգավորումները գրանցված են և չեն օգտագործվում։ Դա բնական է մշակման ընթացքում, որտեղ փոստը տպվում է վահանակում։"
 
-#: src/postulo/accounts/views.py:227
+#: src/postulo/accounts/views.py:250
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
 msgstr "Այս հրավերը %(email)s-ի համար է։ Խնդրում ենք գրանցվել այդ հասցեով։"
@@ -8937,7 +9017,7 @@ msgstr "մակարդակ"
 msgid "Time zone"
 msgstr "Ժամային գոտի"
 
-#: src/postulo/accounts/models.py:262
+#: src/postulo/accounts/models.py:265
 #, draft
 msgid "time zone"
 msgstr "ժամային գոտի"
@@ -8957,13 +9037,13 @@ msgstr "ժամանակագրության գրառում"
 msgid "Timeout"
 msgstr "Սպասման ժամկետ"
 
-#: src/postulo/core/models.py:428
+#: src/postulo/core/models.py:562
 #, draft
 msgid "timeout in seconds"
 msgstr "սպասման ժամկետը վայրկյաններով"
 
 #: src/postulo/documents/models.py:291 src/postulo/documents/models.py:341
-#: src/postulo/jobs/models.py:533 src/postulo/resume/models.py:229
+#: src/postulo/jobs/models.py:536 src/postulo/resume/models.py:229
 #, draft
 msgid "title"
 msgstr "վերնագիր"
@@ -9003,7 +9083,7 @@ msgstr "կարգավիճակին"
 msgid "Today's date"
 msgstr "Այսօրվա ամսաթիվը"
 
-#: src/postulo/accounts/models.py:433
+#: src/postulo/accounts/models.py:436
 #, draft
 msgid "token"
 msgstr "թոքեն"
@@ -9034,6 +9114,16 @@ msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr ""
 "Չափազանց շատ հարցումներ՝ թույլատրված է %(times)d յուրաքանչյուր %(seconds)d վայրկյանում։"
 
+#: src/postulo/core/models.py:380
+#, draft
+msgid "town or city"
+msgstr "քաղաք"
+
+#: src/postulo/templates/partials/postal_addresses.html:38
+#, draft
+msgid "Town or city"
+msgstr "Քաղաք"
+
 #: src/postulo/templates/core/export.html:43
 #, draft
 msgid ""
@@ -9046,12 +9136,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Տրանսպորտ և լոգիստիկա"
 
-#: src/postulo/core/models.py:439
+#: src/postulo/core/models.py:573
 #, draft
 msgid "transport configuration"
 msgstr "փոխադրիչի կազմաձևում"
 
-#: src/postulo/core/models.py:441
+#: src/postulo/core/models.py:575
 #, draft
 msgid "transport secrets"
 msgstr "փոխադրիչի գաղտնիքներ"
@@ -9061,12 +9151,12 @@ msgstr "փոխադրիչի գաղտնիքներ"
 msgid "Try fewer words, or a different spelling."
 msgstr "Փորձեք ավելի քիչ բառ կամ այլ ուղղագրություն։"
 
-#: src/postulo/accounts/views.py:153
+#: src/postulo/accounts/views.py:176
 #, draft
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Նախ միացրեք «Օգտագործել իմ Gravatar-ը»։"
 
-#: src/postulo/jobs/models.py:692
+#: src/postulo/jobs/models.py:695
 #, draft
 msgid "Turned into an application"
 msgstr "Վերածվեց դիմումի"
@@ -9128,13 +9218,20 @@ msgstr "Անհայտ նույնացուցիչի սխեմա։"
 msgid "Unknown PDF backend %(name)r. Choose from: auto, weasyprint, chromium."
 msgstr "Անհայտ PDF շարժիչ %(name)r։ Ընտրեք՝ auto, weasyprint, chromium։"
 
+#: src/postulo/templates/partials/postal_addresses.html:91
+#, draft
+msgid ""
+"Unlike a telephone number, an address is not kept once on this instance — people share a home. You cannot list the same one twice yourself."
+msgstr ""
+"Ի տարբերություն հեռախոսահամարի՝ հասցեն այս օրինակում մեկ անգամ չի պահվում. մարդիկ կիսում են տունը։ Դուք սակայն չեք կարող նույնը երկու անգամ նշել։"
+
 #: src/postulo/resume/models.py:58 src/postulo/resume/models.py:88
 #: src/postulo/resume/models.py:142
 #, draft
 msgid "until"
 msgstr "մինչև"
 
-#: src/postulo/jobs/models.py:685
+#: src/postulo/jobs/models.py:688
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "մինչև %(high)s"
@@ -9144,13 +9241,13 @@ msgstr "մինչև %(high)s"
 msgid "Update the preview"
 msgstr "Թարմացնել նախադիտումը"
 
-#: src/postulo/accounts/models.py:308 src/postulo/core/models.py:31
-#: src/postulo/core/models.py:463
+#: src/postulo/accounts/models.py:311 src/postulo/core/models.py:31
+#: src/postulo/core/models.py:597
 #, draft
 msgid "updated at"
 msgstr "թարմացման ամսաթիվ"
 
-#: src/postulo/core/models.py:470
+#: src/postulo/core/models.py:604
 #, draft
 msgid "updated by"
 msgstr "թարմացրել է"
@@ -9217,7 +9314,7 @@ msgstr "Օգտագործեք PNG, JPEG, WebP կամ GIF։"
 msgid "Use my Gravatar"
 msgstr "Օգտագործել իմ Gravatar-ը"
 
-#: src/postulo/accounts/models.py:293
+#: src/postulo/accounts/models.py:296
 #, draft
 msgid "use my Gravatar"
 msgstr "օգտագործել իմ Gravatar-ը"
@@ -9239,7 +9336,7 @@ msgstr ""
 msgid "Used"
 msgstr "Օգտագործված"
 
-#: src/postulo/accounts/models.py:380
+#: src/postulo/accounts/models.py:383
 #, draft
 msgid "used at"
 msgstr "օգտագործվել է"
@@ -9255,7 +9352,7 @@ msgstr "օգտվող"
 msgid "Username"
 msgstr "Օգտանուն"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:411
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:545
 #, draft
 msgid "username"
 msgstr "օգտանուն"
@@ -9338,7 +9435,7 @@ msgstr "Տեսանյութ"
 msgid "Video call"
 msgstr "Տեսազանգ"
 
-#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:691
+#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:694
 #, draft
 msgid "Waiting for review"
 msgstr "Սպասում է վերանայման"
@@ -9385,7 +9482,7 @@ msgid ""
 msgstr ""
 "WeasyPrint-ը տեղադրվում է Postulo-ի հետ, բայց նրան պետք են Pango-ն և նրա համակարգային գրադարանները։ Debian-ում կամ Ubuntu-ում՝ apt install libpango-1.0-0 libpangoft2-1.0-0։ Windows-ում դրանք դժվար է ձեռք բերել, ուստի փոխարենը օգտագործեք chromium շարժիչը։ Տես https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
-#: src/postulo/accounts/models.py:253 src/postulo/jobs/models.py:132
+#: src/postulo/accounts/models.py:256 src/postulo/jobs/models.py:132
 #: src/postulo/resume/views.py:335
 #, draft
 msgid "website"
@@ -9442,7 +9539,7 @@ msgstr "Ինչը չհաջողվեց կարդալ"
 msgid "What each plugin does, for everybody"
 msgstr "Ինչ է անում յուրաքանչյուր հավելում՝ բոլորի համար"
 
-#: src/postulo/templates/accounts/profile.html:151
+#: src/postulo/templates/accounts/profile.html:152
 #: src/postulo/templates/jobs/company_form.html:89
 #, draft
 msgid "What goes where"
@@ -9607,7 +9704,7 @@ msgstr "Երբ"
 msgid "When accepting should also move the application."
 msgstr "Երբ ընդունելը պետք է նաև տեղափոխի դիմումը։"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:590
 #, draft
 msgid "When it entered your listings."
 msgstr "Երբ այն մտավ ձեր հայտարարությունների մեջ։"
@@ -9659,7 +9756,7 @@ msgstr "Ինչպես են գործերը"
 msgid "Where this company lists its openings."
 msgstr "Որտեղ է այս ընկերությունը հրապարակում իր թափուր տեղերը։"
 
-#: src/postulo/jobs/models.py:547
+#: src/postulo/jobs/models.py:550
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr ""
@@ -9675,12 +9772,12 @@ msgstr "որտեղ եք ապրում"
 msgid "Where your job search stands today."
 msgstr "Որտեղ է այսօր ձեր աշխատանքի որոնումը։"
 
-#: src/postulo/core/models.py:350
+#: src/postulo/core/models.py:484
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Արդյոք ցանկացած ոք, ով գտնի հասցեն, կարող է հաշիվ ստեղծել։"
 
-#: src/postulo/core/models.py:361
+#: src/postulo/core/models.py:495
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9715,7 +9812,7 @@ msgid ""
 msgstr ""
 "Ո՞ր լեզվով է գրված այս տարբերակը։ Թողեք դատարկ՝ ձեր պրոֆիլին հետևելու համար։"
 
-#: src/postulo/jobs/models.py:717
+#: src/postulo/jobs/models.py:720
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Postulo-ի ո՞ր մասն է սա ստեղծել՝ վեբ միջերեսը, թե՞ API-ն։"
@@ -9740,7 +9837,7 @@ msgstr "ում հետ եք հանդիպում"
 msgid "Why"
 msgstr "Ինչու"
 
-#: src/postulo/jobs/models.py:584
+#: src/postulo/jobs/models.py:587
 #, draft
 msgid "why it was discarded"
 msgstr "ինչու է հրաժարվել"
@@ -9780,7 +9877,7 @@ msgstr "Ում հետ՝ %(people)s"
 msgid "Withdrawn"
 msgstr "Հետ վերցված"
 
-#: src/postulo/core/models.py:133
+#: src/postulo/core/models.py:133 src/postulo/core/models.py:360
 #, draft
 msgid "Work"
 msgstr "Աշխատանք"
@@ -9796,7 +9893,7 @@ msgstr "աշխատել է %(when)s"
 msgid "Working arrangement"
 msgstr "Աշխատանքի ձևը"
 
-#: src/postulo/jobs/models.py:536
+#: src/postulo/jobs/models.py:539
 #, draft
 msgid "working arrangement"
 msgstr "աշխատանքի ձևը"
@@ -9895,7 +9992,7 @@ msgstr "Այդ անունով պիտակ արդեն ունեք։"
 msgid "You already have that industry."
 msgstr "Այդ ոլորտն արդեն ունեք։"
 
-#: src/postulo/accounts/views.py:220
+#: src/postulo/accounts/views.py:243
 #, draft
 msgid "You are already signed in."
 msgstr "Դուք արդեն մուտք եք գործել։"
@@ -9991,7 +10088,7 @@ msgid ""
 msgstr ""
 "Դրանից հետո դուք միևնույն է մուտք կգործեք և կտաք ձեր երկրորդ գործոնը, եթե ունեք։ Այս հղումը փոխում է գաղտնաբառը և ուրիշ ոչինչ։"
 
-#: src/postulo/accounts/views.py:302
+#: src/postulo/accounts/views.py:325
 #, draft
 msgid "Your account and everything in it have been deleted."
 msgstr "Ձեր հաշիվը և նրա մեջ եղած ամեն ինչ ջնջվել է։"
@@ -10033,6 +10130,13 @@ msgstr "Ձեր կարիերան"
 msgid "Your career record"
 msgstr "Ձեր կարիերայի գրանցամատյանը"
 
+#: src/postulo/templates/partials/postal_addresses.html:97
+#, draft
+msgid ""
+"Your CV header shows a town and a country and never a street, whatever is here."
+msgstr ""
+"Ձեր ինքնակենսագրականի վերնագիրը ցույց է տալիս քաղաք և երկիր, երբեք ոչ փողոց՝ ինչ էլ որ այստեղ լինի։"
+
 #: src/postulo/templates/resume/overview.html:20
 #: src/postulo/templates/widgets/shortcuts.html:13
 #, draft
@@ -10044,7 +10148,7 @@ msgstr "Ձեր CV-ները"
 msgid "Your dashboard is empty"
 msgstr "Ձեր ընդհանուր տեսքը դատարկ է"
 
-#: src/postulo/accounts/views.py:280 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:303 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -10064,12 +10168,12 @@ msgstr "Ձեր վերջնաժամկետը"
 msgid "Your details"
 msgstr "Ձեր տվյալները"
 
-#: src/postulo/accounts/views.py:112
+#: src/postulo/accounts/views.py:135
 #, draft
 msgid "Your details have been saved."
 msgstr "Ձեր տվյալները պահպանվեցին։"
 
-#: src/postulo/accounts/views.py:159
+#: src/postulo/accounts/views.py:182
 #, draft
 msgid "Your Gravatar has been fetched again."
 msgstr "Ձեր Gravatar-ը կրկին բերվեց։"
@@ -10103,7 +10207,7 @@ msgid ""
 msgstr ""
 "Ձեր անունը և կոնտակտային բլոկը, որը կտպվի ձեր CV-ների վրա։ Ինչպես է Postulo-ն վարվում ձեզ հետ — թեմա, լեզու, օգտանուն, հասցեներ — գտնվում է <a href=\"%(settings_url)s\" class=\"underline\">Կարգավորումներում</a>։"
 
-#: src/postulo/core/models.py:148
+#: src/postulo/core/models.py:148 src/postulo/core/models.py:373
 #, draft
 msgid "Your name for it, when none of the kinds above fits."
 msgstr ""
@@ -10124,7 +10228,7 @@ msgstr "Ձեր անունը, էլ. փոստը և գտնվելու վայրը՝ �
 msgid "Your own name"
 msgstr "Ձեր սեփական անունը"
 
-#: src/postulo/accounts/views.py:379
+#: src/postulo/accounts/views.py:402
 #, draft
 msgid "Your password is set. Sign in with it."
 msgstr "Ձեր գաղտնաբառը սահմանված է։ Մուտք գործեք դրանով։"

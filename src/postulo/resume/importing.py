@@ -72,6 +72,33 @@ class Report:
         return sum(self.added.values())
 
 
+def _write_address(profile, owner, parts: dict) -> bool:
+    """Put a read address on a profile that has none. Returns whether anything was written.
+
+    Only where the profile has no address at all: an import fills blanks and never argues
+    with what somebody entered. An address is not verified and never will be -- Postulo is
+    not going to post anything -- so there is nothing here to earn or to lose (#92).
+    """
+    from postulo.core import postal
+    from postulo.core.models import PostalAddress
+
+    if not any((parts.get(key) or "").strip() for key in ("street", "postcode", "municipality")):
+        return False
+    if postal.for_holder(profile).exists():
+        return False
+    PostalAddress.objects.create(
+        owner=owner,
+        holder=profile,
+        street=(parts.get("street") or "")[:400],
+        postcode=(parts.get("postcode") or "")[:20],
+        municipality=(parts.get("municipality") or "")[:120],
+        region=(parts.get("region") or "")[:120],
+        country=(parts.get("country") or "")[:2],
+        is_primary=True,
+    )
+    return True
+
+
 def apply(owner, record: Record) -> Report:
     """Write what was found. Only ever adds; nothing existing is changed or removed.
 
@@ -111,7 +138,16 @@ def apply(owner, record: Record) -> Report:
         if changed:
             fields = [*changed, "updated_at"] if hasattr(profile, "updated_at") else changed
             profile.save(update_fields=fields)
-        report.profile_filled = [*changed, *(["phone"] if wrote_number else [])]
+        # The address, which until #92 was thrown away on the way in: a Europass file
+        # carries a street and a postcode and Postulo kept only the town and the country.
+        # Same rule as everything else here -- written only where there is nothing, so an
+        # import never overwrites an address somebody typed themselves.
+        wrote_address = _write_address(profile, owner, record.person.get("address") or {})
+        report.profile_filled = [
+            *changed,
+            *(["phone"] if wrote_number else []),
+            *(["address"] if wrote_address else []),
+        ]
 
         # An ORCID somebody already has is theirs; a second one is not an improvement.
         orcid = record.person.get("orcid")

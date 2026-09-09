@@ -291,6 +291,9 @@ def test_an_import_lands_numbers_unverified(user, django_user_model):
 
 
 def test_the_format_version_moved(user):
+    """Pinned so that adding to the archive is a line somebody wrote. 9 added postal
+    addresses on a profile and on a contact (#92).
+    """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 8
+    assert export.FORMAT_VERSION == 9

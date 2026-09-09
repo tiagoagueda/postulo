@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 20:20+0000\n"
+"POT-Creation-Date: 2026-09-09 20:49+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: македонски\n"
@@ -193,7 +193,7 @@ msgid ""
 msgstr ""
 "%(label)s сè уште држи %(count)d запис(и) и неговото деинсталирање би ги оставило во табела што ништо не може да ја чита, извезува ниту враќа. Прво испразнете ја од страниците на самиот приклучок, или наместо тоа исклучете го приклучокот — исклучувањето задржува сè."
 
-#: src/postulo/jobs/models.py:678
+#: src/postulo/jobs/models.py:681
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s до %(high)s"
@@ -365,7 +365,7 @@ msgstr "%(role)s во %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s во %(company)s — %(days)s дена"
 
-#: src/postulo/resume/importing.py:136
+#: src/postulo/resume/importing.py:172
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: нема датум на почеток, па не беше додадена."
@@ -448,6 +448,11 @@ msgstr "%(url)s е многу поголем отколку што треба д
 msgid "%(when)s ago"
 msgstr "пред %(when)s"
 
+#: src/postulo/core/models.py:413
+#, draft
+msgid "(empty address)"
+msgstr "(празна адреса)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -523,7 +528,7 @@ msgstr "CSV датотека"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Навестување за интерфејсот, како „килибар“ или „небо“."
 
-#: src/postulo/core/models.py:344
+#: src/postulo/core/models.py:478
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Ред под името на страницата за најава. Незадолжително."
@@ -616,7 +621,7 @@ msgid ""
 msgstr ""
 "Оглас што сте го забележале. Компанијата и насловот се доволни за почеток; останатото може да дојде подоцна."
 
-#: src/postulo/accounts/models.py:258
+#: src/postulo/accounts/models.py:261
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Профил на GitHub, Forgejo, GitLab или слично."
@@ -643,7 +648,7 @@ msgstr "Потсетник доспева"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Потсетник доспева ден порано, кога има ден порано."
 
-#: src/postulo/accounts/models.py:441
+#: src/postulo/accounts/models.py:444
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Потсетник за кого е ова."
@@ -732,12 +737,12 @@ msgstr "Прифати"
 msgid "Accepted"
 msgstr "Прифатено"
 
-#: src/postulo/accounts/models.py:455
+#: src/postulo/accounts/models.py:458
 #, draft
 msgid "accepted at"
 msgstr "прифатено на"
 
-#: src/postulo/accounts/models.py:462
+#: src/postulo/accounts/models.py:465
 #, draft
 msgid "accepted by"
 msgstr "прифатено од"
@@ -917,10 +922,16 @@ msgstr "Додадено во вашите огласи."
 msgid "Added."
 msgstr "Додадено."
 
-#: src/postulo/jobs/models.py:710 src/postulo/resume/models.py:230
+#: src/postulo/core/models.py:378 src/postulo/jobs/models.py:713
+#: src/postulo/resume/models.py:230
 #, draft
 msgid "address"
 msgstr "адреса"
+
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Адреса"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -995,7 +1006,7 @@ msgstr "Се нудат сите, а и јазик додаден во подо�
 msgid "Also"
 msgstr "Исто така"
 
-#: src/postulo/templates/accounts/profile.html:173
+#: src/postulo/templates/accounts/profile.html:174
 #, draft
 msgid "Also happens by itself when your primary address changes."
 msgstr "Се случува и само од себе кога ќе се промени вашата примарна адреса."
@@ -1043,7 +1054,7 @@ msgid ""
 msgstr ""
 "Индексот е список код што ќе се извршува тука, па мора да биде потпишан и клучот мора да го имате вие. Исклучувањето на складиште подоцна ги запира новите инсталации и ажурирања од него; она што е веќе инсталирано продолжува да работи."
 
-#: src/postulo/templates/accounts/profile.html:107
+#: src/postulo/templates/accounts/profile.html:108
 #, draft
 msgid ""
 "An ORCID, or another public id that says which researcher you are. A name is not an identity — two people share one, one person publishes under three — and an application form for an academic post asks for this by name. Paste a whole address if that is what you have; Postulo keeps the id."
@@ -1134,7 +1145,7 @@ msgstr "Изглед"
 #: src/postulo/applications/models.py:372
 #: src/postulo/applications/models.py:467
 #: src/postulo/applications/models.py:588 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:738
+#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:741
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1227,7 +1238,7 @@ msgstr "Пријави, со нивните временски линии"
 
 #: src/postulo/applications/analytics.py:31
 #: src/postulo/applications/models.py:40 src/postulo/applications/tables.py:46
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:633
+#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:636
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
 msgid "Applied"
@@ -1279,7 +1290,7 @@ msgstr "Примени на означените редови"
 msgid "Apply: %(title)s"
 msgstr "Пријави се: %(title)s"
 
-#: src/postulo/jobs/models.py:434
+#: src/postulo/jobs/models.py:437
 #, draft
 msgid "Apprenticeship"
 msgstr "Приправништво"
@@ -1490,7 +1501,7 @@ msgid "Callback to register with it"
 msgstr "Повратна адреса за регистрација кај него"
 
 #: src/postulo/templates/accounts/invite_form.html:24
-#: src/postulo/templates/accounts/profile.html:164
+#: src/postulo/templates/accounts/profile.html:165
 #: src/postulo/templates/applications/application_form.html:22
 #: src/postulo/templates/applications/application_intake.html:73
 #: src/postulo/templates/applications/interview_form.html:70
@@ -1530,7 +1541,7 @@ msgstr "Откажано"
 msgid "Capture"
 msgstr "Фаќање"
 
-#: src/postulo/jobs/models.py:742
+#: src/postulo/jobs/models.py:745
 #, draft
 msgid "capture"
 msgstr "фаќање"
@@ -1572,7 +1583,7 @@ msgstr "Фаќање огласи"
 msgid "Capture sources this instance has"
 msgstr "Извори за фаќање што ги има оваа инсталација"
 
-#: src/postulo/jobs/models.py:714
+#: src/postulo/jobs/models.py:717
 #, draft
 msgid "captured from"
 msgstr "фатено од"
@@ -1582,7 +1593,7 @@ msgstr "фатено од"
 msgid "Captured: %(title)s"
 msgstr "Фатено: %(title)s"
 
-#: src/postulo/jobs/models.py:743
+#: src/postulo/jobs/models.py:746
 #, draft
 msgid "captures"
 msgstr "фаќања"
@@ -1764,7 +1775,7 @@ msgstr "Изберете каков идентификатор е ова."
 msgid "Choose which application this is about first."
 msgstr "Прво изберете на која пријава се однесува ова."
 
-#: src/postulo/accounts/models.py:251
+#: src/postulo/accounts/models.py:254
 #, draft
 msgid "City and country, as it should appear on a CV."
 msgstr "Град и држава, како што треба да стои на CV."
@@ -1790,17 +1801,17 @@ msgstr "Исчисти"
 msgid "Clear filters"
 msgstr "Исчисти филтри"
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:633
+#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:636
 #, draft
 msgid "Closed"
 msgstr "Затворено"
 
-#: src/postulo/applications/models.py:209 src/postulo/jobs/models.py:574
+#: src/postulo/applications/models.py:209 src/postulo/jobs/models.py:577
 #, draft
 msgid "closed on"
 msgstr "затворено на"
 
-#: src/postulo/jobs/models.py:461
+#: src/postulo/jobs/models.py:464
 #, draft
 msgid "Closed or already filled"
 msgstr "Затворено или веќе пополнето"
@@ -1816,7 +1827,7 @@ msgstr "Се затвора"
 msgid "Closing date"
 msgstr "Датум на затворање"
 
-#: src/postulo/jobs/models.py:568
+#: src/postulo/jobs/models.py:571
 #, draft
 msgid "closing date"
 msgstr "датум на затворање"
@@ -1831,7 +1842,7 @@ msgstr "Се затвора оваа недела: %(total)s"
 msgid "Code (GitHub, GitLab…)"
 msgstr "Код (GitHub, GitLab…)"
 
-#: src/postulo/accounts/models.py:256
+#: src/postulo/accounts/models.py:259
 #, draft
 msgid "code repository"
 msgstr "складиште на код"
@@ -1901,7 +1912,7 @@ msgstr "Компанија"
 
 #: src/postulo/jobs/models.py:158 src/postulo/jobs/models.py:283
 #: src/postulo/jobs/models.py:354 src/postulo/jobs/models.py:382
-#: src/postulo/jobs/models.py:531 src/postulo/jobs/tables.py:15
+#: src/postulo/jobs/models.py:534 src/postulo/jobs/tables.py:15
 #, draft
 msgid "company"
 msgstr "компанија"
@@ -1999,7 +2010,7 @@ msgstr "Врската е отстранета, заедно со тајните
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Врската е зачувана. Тестирајте ја за да бидете сигурни дека работи."
 
-#: src/postulo/core/models.py:422
+#: src/postulo/core/models.py:556
 #, draft
 msgid "connection security"
 msgstr "безбедност на врската"
@@ -2037,7 +2048,7 @@ msgstr "Градежништво"
 msgid "Consulting"
 msgstr "Консалтинг"
 
-#: src/postulo/jobs/models.py:406
+#: src/postulo/jobs/models.py:409
 #, draft
 msgid "contact"
 msgstr "контакт"
@@ -2058,7 +2069,7 @@ msgstr "Контактот е додаден."
 msgid "Contact block"
 msgstr "Блок со контакти"
 
-#: src/postulo/jobs/models.py:407
+#: src/postulo/jobs/models.py:410
 #, draft
 msgid "contacts"
 msgstr "контакти"
@@ -2073,7 +2084,7 @@ msgstr "Содржи"
 msgid "context"
 msgstr "контекст"
 
-#: src/postulo/jobs/models.py:431
+#: src/postulo/jobs/models.py:434
 #, draft
 msgid "Contract"
 msgstr "Договор"
@@ -2115,7 +2126,13 @@ msgid ""
 msgstr ""
 "Се брои од временската линија, па се вклучени и интервјуата запишани пред да постои дневникот."
 
+#: src/postulo/core/models.py:384 src/postulo/core/postal.py:125
+#, draft
+msgid "country"
+msgstr "држава"
+
 #: src/postulo/core/phone_field.py:37
+#: src/postulo/templates/partials/postal_addresses.html:48
 #, draft
 msgid "Country"
 msgstr "Држава"
@@ -2152,13 +2169,13 @@ msgstr "Создај покана"
 msgid "created"
 msgstr "создадено"
 
-#: src/postulo/accounts/models.py:307 src/postulo/accounts/models.py:378
-#: src/postulo/accounts/models.py:452 src/postulo/core/models.py:30
+#: src/postulo/accounts/models.py:310 src/postulo/accounts/models.py:381
+#: src/postulo/accounts/models.py:455 src/postulo/core/models.py:30
 #, draft
 msgid "created at"
 msgstr "создадено на"
 
-#: src/postulo/accounts/models.py:450
+#: src/postulo/accounts/models.py:453
 #, draft
 msgid "created by"
 msgstr "создал"
@@ -2173,7 +2190,7 @@ msgstr "врска со податоци за пристап"
 msgid "Currency"
 msgstr "Валута"
 
-#: src/postulo/jobs/models.py:557
+#: src/postulo/jobs/models.py:560
 #, draft
 msgid "currency"
 msgstr "валута"
@@ -2228,7 +2245,7 @@ msgstr "Темно"
 msgid "Dashboard"
 msgstr "Преглед"
 
-#: src/postulo/accounts/models.py:288
+#: src/postulo/accounts/models.py:291
 #, draft
 msgid "dashboard widgets"
 msgstr "модули на прегледот"
@@ -2287,7 +2304,7 @@ msgid ""
 msgstr ""
 "Дена до првиот одговор и до првото интервју: најбрзо, медијана, најбавно."
 
-#: src/postulo/accounts/models.py:304
+#: src/postulo/accounts/models.py:307
 #, draft
 msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
@@ -2397,7 +2414,7 @@ msgstr "Одлучил %(who)s на %(when)s"
 msgid "Decided by %(who)s."
 msgstr "Одлучил %(who)s."
 
-#: src/postulo/jobs/models.py:589
+#: src/postulo/jobs/models.py:592
 #, draft
 msgid "decided on"
 msgstr "одлучено на"
@@ -2417,12 +2434,12 @@ msgstr "Одбиено"
 msgid "Declined. It will not be suggested again."
 msgstr "Одбиено. Нема повеќе да се предлага."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:518
 #, draft
 msgid "default language"
 msgstr "стандарден јазик"
 
-#: src/postulo/core/models.py:395
+#: src/postulo/core/models.py:529
 #, draft
 msgid "default time zone"
 msgstr "стандардна временска зона"
@@ -2506,7 +2523,7 @@ msgstr "Зависи од"
 msgid "Description"
 msgstr "Опис"
 
-#: src/postulo/jobs/models.py:549 src/postulo/resume/models.py:233
+#: src/postulo/jobs/models.py:552 src/postulo/resume/models.py:233
 #, draft
 msgid "description"
 msgstr "опис"
@@ -2549,8 +2566,8 @@ msgstr "Отфрли"
 msgid "Discard this capture"
 msgstr "Отфрли го ова фаќање"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:454
-#: src/postulo/jobs/models.py:693
+#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:457
+#: src/postulo/jobs/models.py:696
 #, draft
 msgid "Discarded"
 msgstr "Отфрлено"
@@ -2752,7 +2769,7 @@ msgstr ""
 msgid "Email"
 msgstr "Е-пошта"
 
-#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:436
+#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:439
 #: src/postulo/jobs/models.py:396 src/postulo/resume/views.py:333
 #, draft
 msgid "email address"
@@ -2788,7 +2805,7 @@ msgstr "Испратена е-пошта"
 msgid "Employment type"
 msgstr "Вид на вработување"
 
-#: src/postulo/jobs/models.py:539
+#: src/postulo/jobs/models.py:542
 #, draft
 msgid "employment type"
 msgstr "вид на вработување"
@@ -2798,7 +2815,7 @@ msgstr "вид на вработување"
 msgid "Empty"
 msgstr "Празно"
 
-#: src/postulo/jobs/models.py:748
+#: src/postulo/jobs/models.py:751
 #, draft
 msgid "Empty capture"
 msgstr "Празно фаќање"
@@ -3021,7 +3038,7 @@ msgstr "Истекува"
 msgid "expires"
 msgstr "истекува"
 
-#: src/postulo/accounts/models.py:379 src/postulo/accounts/models.py:453
+#: src/postulo/accounts/models.py:382 src/postulo/accounts/models.py:456
 #, draft
 msgid "expires at"
 msgstr "истекува во"
@@ -3059,7 +3076,7 @@ msgstr "Извезено одделно"
 msgid "Failed"
 msgstr "Не успеа"
 
-#: src/postulo/core/models.py:506 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:640 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Не успеа, без да каже зошто."
@@ -3079,7 +3096,7 @@ msgstr "Најбрзо"
 msgid "Fax"
 msgstr "Факс"
 
-#: src/postulo/templates/accounts/profile.html:171
+#: src/postulo/templates/accounts/profile.html:172
 #, draft
 msgid "Fetch my Gravatar again"
 msgstr "Преземи го мојот Gravatar повторно"
@@ -3275,7 +3292,7 @@ msgstr "Најдено на нивната веб страница"
 msgid "Found via"
 msgstr "Најдено преку"
 
-#: src/postulo/jobs/models.py:544
+#: src/postulo/jobs/models.py:547
 #, draft
 msgid "found via"
 msgstr "најдено преку"
@@ -3285,7 +3302,7 @@ msgstr "најдено преку"
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Најдени: %(names)s. Ќе се пополнат само оние што сте ги оставиле празни."
 
-#: src/postulo/jobs/models.py:432
+#: src/postulo/jobs/models.py:435
 #, draft
 msgid "Freelance"
 msgstr "Слободна професија"
@@ -3309,7 +3326,7 @@ msgstr "од"
 msgid "From"
 msgstr "Од"
 
-#: src/postulo/jobs/models.py:683
+#: src/postulo/jobs/models.py:686
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "од %(low)s"
@@ -3319,7 +3336,7 @@ msgstr "од %(low)s"
 msgid "From %(name)s."
 msgstr "Од %(name)s."
 
-#: src/postulo/core/models.py:430
+#: src/postulo/core/models.py:564
 #, draft
 msgid "from address"
 msgstr "адреса на испраќачот"
@@ -3366,7 +3383,7 @@ msgstr "од статус"
 msgid "Frozen at the moment of sending"
 msgstr "Замрзнато во моментот на испраќање"
 
-#: src/postulo/jobs/models.py:429
+#: src/postulo/jobs/models.py:432
 #, draft
 msgid "Full time"
 msgstr "Полно работно време"
@@ -3449,17 +3466,17 @@ msgstr "Добија каков било одговор"
 msgid "grade"
 msgstr "оценка"
 
-#: src/postulo/accounts/models.py:298
+#: src/postulo/accounts/models.py:301
 #, draft
 msgid "Gravatar checked on"
 msgstr "Gravatar проверен на"
 
-#: src/postulo/accounts/models.py:296
+#: src/postulo/accounts/models.py:299
 #, draft
 msgid "Gravatar copy"
 msgstr "Копија од Gravatar"
 
-#: src/postulo/accounts/views.py:121 src/postulo/accounts/views.py:161
+#: src/postulo/accounts/views.py:144 src/postulo/accounts/views.py:184
 #, draft
 msgid "Gravatar could not be reached just now. Try again later."
 msgstr "До Gravatar не можеше да се стигне во моментов. Обидете се подоцна."
@@ -3470,7 +3487,7 @@ msgid "Gravatar had no picture for your address when last asked, on %(when)s."
 msgstr ""
 "Gravatar немаше слика за вашата адреса кога беше прашан последен пат, на %(when)s."
 
-#: src/postulo/accounts/views.py:117 src/postulo/accounts/views.py:160
+#: src/postulo/accounts/views.py:140 src/postulo/accounts/views.py:183
 #, draft
 msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr "Gravatar нема слика за вашата адреса, па остануваат вашите иницијали."
@@ -3524,7 +3541,7 @@ msgstr "Одржано"
 msgid "hidden"
 msgstr "скриено"
 
-#: src/postulo/accounts/models.py:267
+#: src/postulo/accounts/models.py:270
 #, draft
 msgid "hidden navigation items"
 msgstr "скриени ставки за навигација"
@@ -3545,10 +3562,17 @@ msgstr "истакнати точки"
 msgid "highlights for this CV"
 msgstr "истакнати точки за ова CV"
 
-#: src/postulo/core/models.py:134
+#: src/postulo/core/models.py:134 src/postulo/core/models.py:359
 #, draft
 msgid "Home"
 msgstr "Дома"
+
+#: src/postulo/templates/partials/postal_addresses.html:15
+#, draft
+msgid ""
+"Home, work, wherever post reaches you — with one of them marked as the one to use. A form or a formal letter carries that one."
+msgstr ""
+"Дома, работа, каде и да ве стигне поштата — со една од нив означена како онаа што се користи. Образец или службено писмо ја носи таа."
 
 #: src/postulo/jobs/industries.py:35
 #, draft
@@ -3630,7 +3654,7 @@ msgstr ""
 msgid "However you prefer to group your search."
 msgstr "Како и да претпочитате да го групирате вашето барање."
 
-#: src/postulo/jobs/models.py:424
+#: src/postulo/jobs/models.py:427
 #, draft
 msgid "Hybrid"
 msgstr "Хибридно"
@@ -3651,7 +3675,7 @@ msgstr "идентификатор во складиштето"
 msgid "identifier"
 msgstr "идентификатор"
 
-#: src/postulo/templates/accounts/profile.html:128
+#: src/postulo/templates/accounts/profile.html:129
 #: src/postulo/templates/jobs/company_form.html:66
 #, draft
 msgid "Identifier"
@@ -3667,7 +3691,7 @@ msgstr "идентификатор кај изворот"
 msgid "identifiers"
 msgstr "идентификатори"
 
-#: src/postulo/templates/accounts/profile.html:105
+#: src/postulo/templates/accounts/profile.html:106
 #: src/postulo/templates/jobs/company_form.html:48
 #, draft
 msgid "Identifiers"
@@ -3692,7 +3716,7 @@ msgid ""
 msgstr ""
 "Ако сте се пријавувале во институција на ЕУ или преку национална служба за вработување, оваа датотека веќе ја имате. Наместо сè да пишувате одново, предадете ја."
 
-#: src/postulo/core/models.py:353
+#: src/postulo/core/models.py:487
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "игнорирај robots.txt при фаќање"
@@ -3878,7 +3902,7 @@ msgstr "Инсталирано на оваа инсталација"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Инсталирањето на додаток извршува туѓ код внатре во Postulo."
 
-#: src/postulo/core/models.py:335
+#: src/postulo/core/models.py:469
 #, draft
 msgid "instance name"
 msgstr "име на инсталацијата"
@@ -3898,7 +3922,7 @@ msgstr "Осигурување"
 msgid "Internal"
 msgstr "Внатрешно"
 
-#: src/postulo/jobs/models.py:433
+#: src/postulo/jobs/models.py:436
 #, draft
 msgid "Internship"
 msgstr "Пракса"
@@ -3965,12 +3989,12 @@ msgstr "интервјуа"
 msgid "Interviews"
 msgstr "Интервјуа"
 
-#: src/postulo/accounts/models.py:468
+#: src/postulo/accounts/models.py:471
 #, draft
 msgid "invitation"
 msgstr "покана"
 
-#: src/postulo/accounts/views.py:187
+#: src/postulo/accounts/views.py:210
 #, draft
 msgid ""
 "Invitation created. Send the person the link shown below; it can be used once."
@@ -3984,12 +4008,12 @@ msgid ""
 msgstr ""
 "Само со покана: формуларот за регистрација не се нуди. Поканувајте луѓе од делот Луѓе."
 
-#: src/postulo/accounts/views.py:203
+#: src/postulo/accounts/views.py:226
 #, draft
 msgid "Invitation revoked."
 msgstr "Поканата е повлечена."
 
-#: src/postulo/accounts/models.py:469
+#: src/postulo/accounts/models.py:472
 #, draft
 msgid "invitations"
 msgstr "покани"
@@ -4001,7 +4025,7 @@ msgstr "покани"
 msgid "Invitations"
 msgstr "Покани"
 
-#: src/postulo/accounts/models.py:372 src/postulo/resume/models.py:156
+#: src/postulo/accounts/models.py:375 src/postulo/resume/models.py:156
 #, draft
 msgid "issued by"
 msgstr "издадено од"
@@ -4071,12 +4095,12 @@ msgstr ""
 msgid "Job board"
 msgstr "Огласник за работа"
 
-#: src/postulo/jobs/models.py:594
+#: src/postulo/jobs/models.py:597
 #, draft
 msgid "job posting"
 msgstr "оглас за работа"
 
-#: src/postulo/jobs/models.py:595
+#: src/postulo/jobs/models.py:598
 #, draft
 msgid "job postings"
 msgstr "огласи за работа"
@@ -4134,16 +4158,17 @@ msgstr ""
 #: src/postulo/applications/models.py:324
 #: src/postulo/applications/models.py:470
 #: src/postulo/applications/models.py:594 src/postulo/core/models.py:143
-#: src/postulo/documents/models.py:230 src/postulo/documents/models.py:292
-#: src/postulo/documents/models.py:342 src/postulo/plugins/models.py:169
-#: src/postulo/resume/models.py:231
+#: src/postulo/core/models.py:368 src/postulo/documents/models.py:230
+#: src/postulo/documents/models.py:292 src/postulo/documents/models.py:342
+#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:231
 #, draft
 msgid "kind"
 msgstr "вид"
 
-#: src/postulo/templates/accounts/profile.html:124
+#: src/postulo/templates/accounts/profile.html:125
 #: src/postulo/templates/jobs/company_form.html:62
 #: src/postulo/templates/partials/phone_numbers.html:40
+#: src/postulo/templates/partials/postal_addresses.html:54
 #, draft
 msgid "Kind"
 msgstr "Вид"
@@ -4163,7 +4188,7 @@ msgstr "прикажано име"
 msgid "Language"
 msgstr "Јазик"
 
-#: src/postulo/accounts/models.py:261 src/postulo/documents/models.py:67
+#: src/postulo/accounts/models.py:264 src/postulo/documents/models.py:67
 #: src/postulo/documents/models.py:246 src/postulo/resume/models.py:185
 #: src/postulo/resume/models.py:191
 #, draft
@@ -4195,7 +4220,7 @@ msgstr "Јазици"
 msgid "languages"
 msgstr "јазици"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:528
 #, draft
 msgid "languages offered"
 msgstr "понудени јазици"
@@ -4390,7 +4415,7 @@ msgstr "Врска"
 msgid "link in the store"
 msgstr "врска во складиштето"
 
-#: src/postulo/accounts/models.py:254 src/postulo/jobs/models.py:402
+#: src/postulo/accounts/models.py:257 src/postulo/jobs/models.py:405
 #, draft
 msgid "LinkedIn"
 msgstr "LinkedIn"
@@ -4433,7 +4458,7 @@ msgstr "Врски кон кои сте ги упатиле"
 msgid "listening"
 msgstr "слуша"
 
-#: src/postulo/jobs/models.py:729
+#: src/postulo/jobs/models.py:732
 #: src/postulo/templates/core/import_csv_map.html:86
 #, draft
 msgid "listing"
@@ -4465,8 +4490,8 @@ msgid ""
 msgstr ""
 "Огласите, пријавите и нивните временски линии, компаниите и луѓето, потсетниците, текстот на тоа што сте го испратиле, писмата, CV-ата, датотеките и вашиот кариерен запис — сè, вклучувајќи го затвореното и отфрленото, зашто барате нешто што го помните."
 
-#: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:136
-#: src/postulo/jobs/models.py:534 src/postulo/resume/models.py:55
+#: src/postulo/accounts/models.py:251 src/postulo/jobs/models.py:136
+#: src/postulo/jobs/models.py:537 src/postulo/resume/models.py:55
 #: src/postulo/resume/models.py:86
 #, draft
 msgid "location"
@@ -4533,7 +4558,7 @@ msgstr "Мали букви, цифри, точки, долни црти и цр
 msgid "Made"
 msgstr "Направена"
 
-#: src/postulo/core/models.py:461
+#: src/postulo/core/models.py:595
 #, draft
 msgid "mail failures in a row"
 msgstr "неуспешни испраќања по ред"
@@ -4554,7 +4579,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Тука поштата е единствениот пат назад во сметка, па додека ова повторно не проработи, никој од %(counter)s-те луѓе на оваа инстанца нема да може да се врати ако ја заборави лозинката."
 
-#: src/postulo/core/models.py:457
+#: src/postulo/core/models.py:591
 #, draft
 msgid "mail last failed"
 msgstr "поштата последен пат не успеа"
@@ -4564,7 +4589,7 @@ msgstr "поштата последен пат не успеа"
 msgid "Mail last went out at %(when)s."
 msgstr "Поштата последен пат излезе во %(when)s."
 
-#: src/postulo/core/models.py:456
+#: src/postulo/core/models.py:590
 #, draft
 msgid "mail last worked"
 msgstr "поштата последен пат работеше"
@@ -4583,7 +4608,7 @@ msgid ""
 msgstr ""
 "Поштата повеќе не го држи ниту транспортот на место, зашто пат што ништо не доставува не штити никого."
 
-#: src/postulo/core/models.py:434
+#: src/postulo/core/models.py:568
 #, draft
 msgid "mail transport"
 msgstr "пренос на пошта"
@@ -4593,7 +4618,7 @@ msgstr "пренос на пошта"
 msgid "Mail transport"
 msgstr "Пренос на пошта"
 
-#: src/postulo/core/models.py:458
+#: src/postulo/core/models.py:592
 #, draft
 msgid "mail's last error"
 msgstr "последна грешка на поштата"
@@ -4825,14 +4850,15 @@ msgstr "име"
 msgid "Name"
 msgstr "Име"
 
-#: src/postulo/core/models.py:145
+#: src/postulo/core/models.py:145 src/postulo/core/models.py:370
 #, draft
 msgid "name, if Other"
 msgstr "име, ако Друго"
 
-#: src/postulo/templates/accounts/profile.html:132
+#: src/postulo/templates/accounts/profile.html:133
 #: src/postulo/templates/jobs/company_form.html:70
 #: src/postulo/templates/partials/phone_numbers.html:44
+#: src/postulo/templates/partials/postal_addresses.html:58
 #, draft
 msgid "Name, if Other"
 msgstr "Име, ако е Друго"
@@ -4864,7 +4890,7 @@ msgstr "Никогаш"
 msgid "never used"
 msgstr "никогаш користено"
 
-#: src/postulo/jobs/models.py:452
+#: src/postulo/jobs/models.py:455
 #, draft
 msgid "New"
 msgstr "Ново"
@@ -5190,7 +5216,7 @@ msgid ""
 msgstr ""
 "Не е конфигурирано. Поставете POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID и POSTULO_OIDC_CLIENT_SECRET во околината за да понудите копче за најава преку OpenID Connect провајдер."
 
-#: src/postulo/jobs/models.py:458
+#: src/postulo/jobs/models.py:461
 #, draft
 msgid "Not for me"
 msgstr "Не е за мене"
@@ -5256,7 +5282,7 @@ msgstr "Не е прикажано · %(name)s"
 msgid "not tested yet"
 msgstr "сè уште не е тестирано"
 
-#: src/postulo/accounts/models.py:441
+#: src/postulo/accounts/models.py:444
 #, draft
 msgid "note"
 msgstr "белешка"
@@ -5277,7 +5303,7 @@ msgstr "Белешка (незадолжително)"
 msgid "noted %(when)s"
 msgstr "забележано %(when)s"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:590
 #, draft
 msgid "noted on"
 msgstr "забележано на"
@@ -5289,7 +5315,7 @@ msgid "Notes"
 msgstr "Белешки"
 
 #: src/postulo/documents/models.py:302 src/postulo/jobs/models.py:140
-#: src/postulo/jobs/models.py:403
+#: src/postulo/jobs/models.py:406
 #, draft
 msgid "notes"
 msgstr "белешки"
@@ -5565,7 +5591,7 @@ msgstr "Понуда"
 msgid "Offer received"
 msgstr "Примена понуда"
 
-#: src/postulo/core/models.py:382
+#: src/postulo/core/models.py:516
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Се нуди само додека поштата на оваа инстанца навистина стигнува."
@@ -5592,7 +5618,7 @@ msgstr "Официјално"
 msgid "older than a week"
 msgstr "постаро од една недела"
 
-#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:423
+#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:426
 #, draft
 msgid "On site"
 msgstr "На локација"
@@ -5778,7 +5804,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Слободни места"
 
-#: src/postulo/accounts/models.py:438
+#: src/postulo/accounts/models.py:441
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
@@ -5825,8 +5851,9 @@ msgstr "Изворен оглас"
 #: src/postulo/accounts/identifiers.py:73 src/postulo/applications/models.py:87
 #: src/postulo/applications/models.py:291
 #: src/postulo/applications/models.py:410 src/postulo/core/models.py:137
-#: src/postulo/documents/models.py:280 src/postulo/jobs/identifiers.py:95
-#: src/postulo/jobs/models.py:462 src/postulo/resume/models.py:207
+#: src/postulo/core/models.py:362 src/postulo/documents/models.py:280
+#: src/postulo/jobs/identifiers.py:95 src/postulo/jobs/models.py:465
+#: src/postulo/resume/models.py:207
 #, draft
 msgid "Other"
 msgstr "Друго"
@@ -5896,7 +5923,7 @@ msgstr "Страничење"
 msgid "Panel"
 msgstr "Плоча"
 
-#: src/postulo/jobs/models.py:719
+#: src/postulo/jobs/models.py:722
 #, draft
 msgid "parsed posting"
 msgstr "анализиран оглас"
@@ -5916,7 +5943,7 @@ msgstr "Дел од <a href=\"%(parent_url)s\" class=\"underline\">%(name)s</a>"
 msgid "Part of this company"
 msgstr "Дел од оваа компанија"
 
-#: src/postulo/jobs/models.py:430
+#: src/postulo/jobs/models.py:433
 #, draft
 msgid "Part time"
 msgstr "Скратено работно време"
@@ -5931,7 +5958,7 @@ msgstr "Делумно преведено"
 msgid "Passkeys"
 msgstr "Пристапни клучеви"
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:549
 #, draft
 msgid "password"
 msgstr "лозинка"
@@ -5985,22 +6012,22 @@ msgstr "Само во исчекување"
 msgid "People"
 msgstr "Луѓе"
 
-#: src/postulo/jobs/models.py:440
+#: src/postulo/jobs/models.py:443
 #, draft
 msgid "Per day"
 msgstr "Дневно"
 
-#: src/postulo/jobs/models.py:441
+#: src/postulo/jobs/models.py:444
 #, draft
 msgid "Per hour"
 msgstr "На час"
 
-#: src/postulo/jobs/models.py:439
+#: src/postulo/jobs/models.py:442
 #, draft
 msgid "Per month"
 msgstr "Месечно"
 
-#: src/postulo/jobs/models.py:438
+#: src/postulo/jobs/models.py:441
 #, draft
 msgid "Per year"
 msgstr "Годишно"
@@ -6015,7 +6042,7 @@ msgstr "Период"
 msgid "Permissions"
 msgstr "Дозволи"
 
-#: src/postulo/accounts/models.py:364 src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:367 src/postulo/plugins/models.py:120
 #, draft
 msgid "person"
 msgstr "личност"
@@ -6057,7 +6084,7 @@ msgstr "телефон"
 msgid "Phone screen"
 msgstr "Телефонски разговор"
 
-#: src/postulo/accounts/models.py:291
+#: src/postulo/accounts/models.py:294
 #, draft
 msgid "picture"
 msgstr "слика"
@@ -6127,7 +6154,7 @@ msgstr "Додатоци за %(name)s"
 msgid "Plugins for this account"
 msgstr "Додатоци за оваа сметка"
 
-#: src/postulo/accounts/models.py:274
+#: src/postulo/accounts/models.py:277
 #, draft
 msgid "plugins switched off"
 msgstr "исклучени додатоци"
@@ -6153,7 +6180,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP или GIF до 5 MB. Сликата се сече на квадрат и ѝ се брише сè што датотеката знаела за тоа каде е снимена."
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:540
 #, draft
 msgid "port"
 msgstr "порта"
@@ -6187,7 +6214,38 @@ msgstr "Портфолија, профили и видеа кон кои сте 
 msgid "Positions"
 msgstr "Работни места"
 
-#: src/postulo/jobs/models.py:566
+#: src/postulo/core/models.py:361
+#, draft
+msgid "Postal"
+msgstr "Поштенска"
+
+#: src/postulo/core/models.py:393
+#, draft
+msgid "postal address"
+msgstr "поштенска адреса"
+
+#: src/postulo/accounts/models.py:249 src/postulo/core/models.py:394
+#: src/postulo/jobs/models.py:404
+#, draft
+msgid "postal addresses"
+msgstr "поштенски адреси"
+
+#: src/postulo/templates/partials/postal_addresses.html:13
+#, draft
+msgid "Postal addresses"
+msgstr "Поштенски адреси"
+
+#: src/postulo/core/models.py:379
+#, draft
+msgid "postcode"
+msgstr "поштенски број"
+
+#: src/postulo/templates/partials/postal_addresses.html:34
+#, draft
+msgid "Postcode"
+msgstr "Поштенски број"
+
+#: src/postulo/jobs/models.py:569
 #, draft
 msgid "posted on"
 msgstr "објавено на"
@@ -6223,7 +6281,7 @@ msgstr "Огласот е ажуриран."
 msgid "Posting URL"
 msgstr "URL на огласот"
 
-#: src/postulo/jobs/models.py:542
+#: src/postulo/jobs/models.py:545
 #, draft
 msgid "posting URL"
 msgstr "url на огласот"
@@ -6333,12 +6391,13 @@ msgstr "Преглед"
 msgid "Previous"
 msgstr "Претходно"
 
-#: src/postulo/core/models.py:154
+#: src/postulo/core/models.py:154 src/postulo/core/models.py:385
 #, draft
 msgid "primary"
 msgstr "главен"
 
 #: src/postulo/templates/partials/phone_numbers.html:57
+#: src/postulo/templates/partials/postal_addresses.html:69
 #: src/postulo/templates/settings/account.html:52
 #, draft
 msgid "Primary"
@@ -6364,12 +6423,12 @@ msgstr "Приватните и локалните адреси се одбив�
 msgid "proficiency"
 msgstr "ниво на владеење"
 
-#: src/postulo/accounts/models.py:167 src/postulo/accounts/models.py:311
+#: src/postulo/accounts/models.py:167 src/postulo/accounts/models.py:314
 #, draft
 msgid "profile"
 msgstr "профил"
 
-#: src/postulo/accounts/models.py:312
+#: src/postulo/accounts/models.py:315
 #, draft
 msgid "profiles"
 msgstr "профили"
@@ -6483,7 +6542,7 @@ msgstr "Задачи во ред"
 msgid "Quiet"
 msgstr "Тивко"
 
-#: src/postulo/accounts/models.py:301
+#: src/postulo/accounts/models.py:304
 #, draft
 msgid "quiet after"
 msgstr "тивко по"
@@ -6540,7 +6599,7 @@ msgstr ""
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Прочитано како Europass XML, форматот што го создаваше уредувачот на CV."
 
-#: src/postulo/jobs/models.py:711
+#: src/postulo/jobs/models.py:714
 #, draft
 msgid "read by"
 msgstr "прочитано од"
@@ -6669,7 +6728,7 @@ msgstr "Запишано е што сте испратиле."
 msgid "Recorded: nobody showed up."
 msgstr "Запишано: никој не се појави."
 
-#: src/postulo/accounts/models.py:386
+#: src/postulo/accounts/models.py:389
 #, draft
 msgid "recovery link"
 msgstr "врска за враќање"
@@ -6680,7 +6739,7 @@ msgstr "врска за враќање"
 msgid "Recovery link"
 msgstr "Врска за враќање"
 
-#: src/postulo/accounts/models.py:387
+#: src/postulo/accounts/models.py:390
 #, draft
 msgid "recovery links"
 msgstr "врски за враќање"
@@ -6710,6 +6769,16 @@ msgstr "Преку препорака"
 msgid "Refresh logo"
 msgstr "Освежи го логото"
 
+#: src/postulo/core/models.py:383
+#, draft
+msgid "region"
+msgstr "регион"
+
+#: src/postulo/templates/partials/postal_addresses.html:44
+#, draft
+msgid "Region"
+msgstr "Регион"
+
 #: src/postulo/templates/connections/form.html:73
 #, draft
 msgid "Register this address with the provider"
@@ -6728,7 +6797,7 @@ msgid ""
 msgstr ""
 "Регистрацијата е отворена: секој што ќе ја најде адресата може да создаде сметка."
 
-#: src/postulo/core/models.py:347
+#: src/postulo/core/models.py:481
 #, draft
 msgid "registration open"
 msgstr "регистрацијата е отворена"
@@ -6784,7 +6853,7 @@ msgid "Reminders that have come due, each with a button to mark it done."
 msgstr ""
 "Потсетници на кои им дошло времето, секој со копче за означување како завршен."
 
-#: src/postulo/jobs/models.py:425
+#: src/postulo/jobs/models.py:428
 #, draft
 msgid "Remote"
 msgstr "Од далечина"
@@ -6794,12 +6863,13 @@ msgstr "Од далечина"
 msgid "remote address"
 msgstr "оддалечена адреса"
 
-#: src/postulo/templates/accounts/profile.html:137
+#: src/postulo/templates/accounts/profile.html:138
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
 #: src/postulo/templates/partials/phone_numbers.html:82
+#: src/postulo/templates/partials/postal_addresses.html:73
 #: src/postulo/templates/server/plugins.html:151
 #: src/postulo/templates/server/plugins.html:279
 #, draft
@@ -6929,7 +6999,7 @@ msgstr "повлечено"
 msgid "Revoked"
 msgstr "Отповикана"
 
-#: src/postulo/accounts/models.py:381
+#: src/postulo/accounts/models.py:384
 #, draft
 msgid "revoked at"
 msgstr "отповикана на"
@@ -7007,12 +7077,12 @@ msgstr "Плата (една бројка или распон)"
 msgid "Salary from"
 msgstr "Плата од"
 
-#: src/postulo/jobs/models.py:552
+#: src/postulo/jobs/models.py:555
 #, draft
 msgid "salary from"
 msgstr "плата од"
 
-#: src/postulo/jobs/models.py:559
+#: src/postulo/jobs/models.py:562
 #, draft
 msgid "salary period"
 msgstr "период на платата"
@@ -7022,12 +7092,12 @@ msgstr "период на платата"
 msgid "Salary to"
 msgstr "Плата до"
 
-#: src/postulo/jobs/models.py:555
+#: src/postulo/jobs/models.py:558
 #, draft
 msgid "salary to"
 msgstr "плата до"
 
-#: src/postulo/templates/accounts/profile.html:163
+#: src/postulo/templates/accounts/profile.html:164
 #: src/postulo/templates/applications/application_form.html:21
 #: src/postulo/templates/applications/application_intake.html:72
 #: src/postulo/templates/applications/interview_form.html:68
@@ -7068,7 +7138,7 @@ msgstr "Зачувајте ја компанијата за да додадет�
 msgid "Save this first, then come back and agree."
 msgstr "Прво зачувајте го ова, па вратете се и согласете се."
 
-#: src/postulo/templates/accounts/profile.html:159
+#: src/postulo/templates/accounts/profile.html:160
 #, draft
 msgid "Save to add another identifier."
 msgstr "Зачувајте за да додадете уште еден идентификатор."
@@ -7091,6 +7161,11 @@ msgstr "Зачувано во вашите огласи. Одлучете за �
 #, draft
 msgid "Saved."
 msgstr "Зачувано."
+
+#: src/postulo/core/postal.py:137
+#, draft
+msgid "Say what this address is."
+msgstr "Кажете што е оваа адреса."
 
 #: src/postulo/jobs/models.py:322
 #, draft
@@ -7350,7 +7425,7 @@ msgstr "Постави ја лозинката"
 msgid "Set up"
 msgstr "Постави"
 
-#: src/postulo/jobs/models.py:577
+#: src/postulo/jobs/models.py:580
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Поставете кога работното место повеќе не е достапно."
@@ -7391,7 +7466,7 @@ msgstr "Кратенки"
 msgid "Shortlist"
 msgstr "Во потесен избор"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:453
+#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:456
 #, draft
 msgid "Shortlisted"
 msgstr "Во потесен избор"
@@ -7427,7 +7502,7 @@ msgstr "Прикажи во навигацијата"
 msgid "Show past too"
 msgstr "Прикажи ги и минатите"
 
-#: src/postulo/core/models.py:338
+#: src/postulo/core/models.py:472
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Се прикажува во заглавјето и на страницата за најава."
@@ -7438,7 +7513,7 @@ msgstr "Се прикажува во заглавјето и на страниц
 msgid "Sign in"
 msgstr "Најави се"
 
-#: src/postulo/core/models.py:379
+#: src/postulo/core/models.py:513
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "најава со код испратен по е-пошта"
@@ -7481,7 +7556,7 @@ msgstr "Се најавува на постојна сметка преку е-�
 msgid "Single sign-on"
 msgstr "Единствена најава"
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:492
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "единствената најава се брои како втор фактор"
@@ -7496,7 +7571,7 @@ msgstr "Единствената најава се брои како втор ф
 msgid "Site search"
 msgstr "Пребарување на страницата"
 
-#: src/postulo/core/models.py:474 src/postulo/core/models.py:475
+#: src/postulo/core/models.py:608 src/postulo/core/models.py:609
 #, draft
 msgid "site settings"
 msgstr "поставки на страницата"
@@ -7559,7 +7634,7 @@ msgstr "Најбавно"
 msgid "slug"
 msgstr "кратко име"
 
-#: src/postulo/core/models.py:404
+#: src/postulo/core/models.py:538
 #, draft
 msgid "SMTP server"
 msgstr "SMTP сервер"
@@ -7615,7 +7690,7 @@ msgid ""
 msgstr ""
 "Изворот е полето „најдено преку“ на оглас. Пополнете го и оваа табела почнува да го заслужува своето место."
 
-#: src/postulo/jobs/models.py:712
+#: src/postulo/jobs/models.py:715
 #, draft
 msgid "source version"
 msgstr "верзија кај изворот"
@@ -7672,7 +7747,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, по поврзувањето"
 
-#: src/postulo/jobs/models.py:581 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:584 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "состојба"
@@ -7696,7 +7771,7 @@ msgstr "Статус"
 
 #: src/postulo/applications/models.py:197
 #: src/postulo/applications/models.py:611 src/postulo/documents/models.py:432
-#: src/postulo/jobs/models.py:721
+#: src/postulo/jobs/models.py:724
 #, draft
 msgid "status"
 msgstr "статус"
@@ -7889,7 +7964,7 @@ msgstr "Синхронизација"
 msgid "Table"
 msgstr "Табела"
 
-#: src/postulo/accounts/models.py:277
+#: src/postulo/accounts/models.py:280
 #, draft
 msgid "table settings"
 msgstr "поставки на табелата"
@@ -7907,7 +7982,7 @@ msgstr "ознака"
 msgid "Tag"
 msgstr "Ознака"
 
-#: src/postulo/core/models.py:341
+#: src/postulo/core/models.py:475
 #, draft
 msgid "tagline"
 msgstr "слоган"
@@ -8007,17 +8082,17 @@ msgstr "Тестирај ја врската"
 msgid "text as sent"
 msgstr "текст како што беше испратен"
 
-#: src/postulo/core/models.py:450
+#: src/postulo/core/models.py:584
 #, draft
 msgid "text configuration"
 msgstr "конфигурација на пораки"
 
-#: src/postulo/core/models.py:451
+#: src/postulo/core/models.py:585
 #, draft
 msgid "text secrets"
 msgstr "тајни на пораки"
 
-#: src/postulo/core/models.py:449
+#: src/postulo/core/models.py:583
 #, draft
 msgid "text transport"
 msgstr "транспорт на пораки"
@@ -8071,7 +8146,7 @@ msgstr "Таа врска не користи согласност."
 msgid "That connection no longer exists."
 msgstr "Таа врска повеќе не постои."
 
-#: src/postulo/jobs/models.py:418
+#: src/postulo/jobs/models.py:421
 #, draft
 msgid "That department belongs to a different company."
 msgstr "Тој оддел припаѓа на друга компанија."
@@ -8145,7 +8220,7 @@ msgstr "Тоа име на хост не можеше да се разреши."
 msgid "That image is far larger than a logo needs to be."
 msgstr "Таа слика е далеку поголема отколку што треба да биде лого."
 
-#: src/postulo/accounts/views.py:199
+#: src/postulo/accounts/views.py:222
 #, draft
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Таа покана е веќе прифатена и не може да се повлече."
@@ -8200,7 +8275,7 @@ msgstr "Тоа не е нешто што Postulo може да го направ
 msgid "That is not something this page does."
 msgstr "Тоа не е нешто што го прави оваа страница."
 
-#: src/postulo/accounts/views.py:293
+#: src/postulo/accounts/views.py:316
 #, draft
 msgid "That is not the address on this account."
 msgstr "Тоа не е адресата на оваа сметка."
@@ -8332,7 +8407,7 @@ msgstr "Адресата одговори %(code)s."
 msgid "The address answered with nothing."
 msgstr "Адресата одговори со ништо."
 
-#: src/postulo/jobs/models.py:571
+#: src/postulo/jobs/models.py:574
 #, draft
 msgid "The application deadline, if stated."
 msgstr "Рокот за пријава, ако е наведен."
@@ -8490,12 +8565,12 @@ msgstr ""
 msgid "The LEI's check digits do not match."
 msgstr "Контролните цифри на LEI не се совпаѓаат."
 
-#: src/postulo/jobs/models.py:730
+#: src/postulo/jobs/models.py:733
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "Огласот во кој се претвори ова фаќање, по прегледот."
 
-#: src/postulo/jobs/models.py:460
+#: src/postulo/jobs/models.py:463
 #, draft
 msgid "The location"
 msgstr "Локацијата"
@@ -8550,7 +8625,7 @@ msgid ""
 msgstr ""
 "Лозинката ја поставува <code>%(variable)s</code> во околината; променете ја таму. Тука никогаш не се прикажува."
 
-#: src/postulo/jobs/models.py:459
+#: src/postulo/jobs/models.py:462
 #, draft
 msgid "The pay"
 msgstr "Платата"
@@ -8694,7 +8769,7 @@ msgstr ""
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Тркалото нема метаподатоци; можеби е оштетено."
 
-#: src/postulo/accounts/models.py:263 src/postulo/documents/models.py:65
+#: src/postulo/accounts/models.py:266 src/postulo/documents/models.py:65
 #: src/postulo/documents/models.py:241
 #, draft
 msgid "theme"
@@ -8773,6 +8848,11 @@ msgstr "Овие записи може да именуваат луѓе и ни�
 msgid "They did not show up"
 msgstr "Тие не се појавија"
 
+#: src/postulo/core/postal.py:159
+#, draft
+msgid "This address is already listed."
+msgstr "Оваа адреса веќе е на списокот."
+
 #: src/postulo/jobs/logos.py:281
 #, draft
 msgid "This company has no website recorded."
@@ -8819,7 +8899,7 @@ msgid ""
 msgstr ""
 "Оваа инсталација не испраќа преку SMTP, па поставките подолу се запишани и не се користат. Тоа е нормално при развој, каде што поштата се печати во конзолата."
 
-#: src/postulo/accounts/views.py:227
+#: src/postulo/accounts/views.py:250
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
 msgstr "Оваа покана е за %(email)s. Регистрирајте се со таа адреса."
@@ -8925,7 +9005,7 @@ msgstr "ниво"
 msgid "Time zone"
 msgstr "Временска зона"
 
-#: src/postulo/accounts/models.py:262
+#: src/postulo/accounts/models.py:265
 #, draft
 msgid "time zone"
 msgstr "временска зона"
@@ -8945,13 +9025,13 @@ msgstr "ставка на временската линија"
 msgid "Timeout"
 msgstr "Истек на времето"
 
-#: src/postulo/core/models.py:428
+#: src/postulo/core/models.py:562
 #, draft
 msgid "timeout in seconds"
 msgstr "истек на времето во секунди"
 
 #: src/postulo/documents/models.py:291 src/postulo/documents/models.py:341
-#: src/postulo/jobs/models.py:533 src/postulo/resume/models.py:229
+#: src/postulo/jobs/models.py:536 src/postulo/resume/models.py:229
 #, draft
 msgid "title"
 msgstr "наслов"
@@ -8991,7 +9071,7 @@ msgstr "во статус"
 msgid "Today's date"
 msgstr "Денешен датум"
 
-#: src/postulo/accounts/models.py:433
+#: src/postulo/accounts/models.py:436
 #, draft
 msgid "token"
 msgstr "токен"
@@ -9021,6 +9101,16 @@ msgstr "Премногу пораки. Обидете се повторно на
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr "Премногу барања: %(times)d дозволени на секои %(seconds)d секунди."
 
+#: src/postulo/core/models.py:380
+#, draft
+msgid "town or city"
+msgstr "место"
+
+#: src/postulo/templates/partials/postal_addresses.html:38
+#, draft
+msgid "Town or city"
+msgstr "Место"
+
 #: src/postulo/templates/core/export.html:43
 #, draft
 msgid ""
@@ -9033,12 +9123,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Транспорт и логистика"
 
-#: src/postulo/core/models.py:439
+#: src/postulo/core/models.py:573
 #, draft
 msgid "transport configuration"
 msgstr "конфигурација на преносот"
 
-#: src/postulo/core/models.py:441
+#: src/postulo/core/models.py:575
 #, draft
 msgid "transport secrets"
 msgstr "тајни на преносот"
@@ -9048,12 +9138,12 @@ msgstr "тајни на преносот"
 msgid "Try fewer words, or a different spelling."
 msgstr "Обидете се со помалку зборови, или со друг правопис."
 
-#: src/postulo/accounts/views.py:153
+#: src/postulo/accounts/views.py:176
 #, draft
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Прво вклучете „Користи го мојот Gravatar“."
 
-#: src/postulo/jobs/models.py:692
+#: src/postulo/jobs/models.py:695
 #, draft
 msgid "Turned into an application"
 msgstr "Претворено во пријава"
@@ -9117,13 +9207,20 @@ msgstr "Непозната шема на идентификатор."
 msgid "Unknown PDF backend %(name)r. Choose from: auto, weasyprint, chromium."
 msgstr "Непознат PDF систем %(name)r. Изберете меѓу: auto, weasyprint, chromium."
 
+#: src/postulo/templates/partials/postal_addresses.html:91
+#, draft
+msgid ""
+"Unlike a telephone number, an address is not kept once on this instance — people share a home. You cannot list the same one twice yourself."
+msgstr ""
+"За разлика од телефонски број, адресата не се чува само еднаш на оваа инстанца — луѓето делат дом. Вие сепак не можете да ја наведете истата двапати."
+
 #: src/postulo/resume/models.py:58 src/postulo/resume/models.py:88
 #: src/postulo/resume/models.py:142
 #, draft
 msgid "until"
 msgstr "до"
 
-#: src/postulo/jobs/models.py:685
+#: src/postulo/jobs/models.py:688
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "до %(high)s"
@@ -9133,13 +9230,13 @@ msgstr "до %(high)s"
 msgid "Update the preview"
 msgstr "Ажурирај го прегледот"
 
-#: src/postulo/accounts/models.py:308 src/postulo/core/models.py:31
-#: src/postulo/core/models.py:463
+#: src/postulo/accounts/models.py:311 src/postulo/core/models.py:31
+#: src/postulo/core/models.py:597
 #, draft
 msgid "updated at"
 msgstr "ажурирано на"
 
-#: src/postulo/core/models.py:470
+#: src/postulo/core/models.py:604
 #, draft
 msgid "updated by"
 msgstr "ажурирал"
@@ -9206,7 +9303,7 @@ msgstr "Користете PNG, JPEG, WebP или GIF."
 msgid "Use my Gravatar"
 msgstr "Користи го мојот Gravatar"
 
-#: src/postulo/accounts/models.py:293
+#: src/postulo/accounts/models.py:296
 #, draft
 msgid "use my Gravatar"
 msgstr "користи го мојот Gravatar"
@@ -9228,7 +9325,7 @@ msgstr ""
 msgid "Used"
 msgstr "Искористена"
 
-#: src/postulo/accounts/models.py:380
+#: src/postulo/accounts/models.py:383
 #, draft
 msgid "used at"
 msgstr "искористена на"
@@ -9244,7 +9341,7 @@ msgstr "корисник"
 msgid "Username"
 msgstr "Корисничко име"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:411
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:545
 #, draft
 msgid "username"
 msgstr "корисничко име"
@@ -9327,7 +9424,7 @@ msgstr "Видео"
 msgid "Video call"
 msgstr "Видео повик"
 
-#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:691
+#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:694
 #, draft
 msgid "Waiting for review"
 msgstr "Чека преглед"
@@ -9374,7 +9471,7 @@ msgid ""
 msgstr ""
 "WeasyPrint се инсталира заедно со Postulo, но му требаат Pango и неговите системски библиотеки. На Debian или Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. На Windows тешко се набавуваат, па наместо тоа користете го chromium системот. Погледнете https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
-#: src/postulo/accounts/models.py:253 src/postulo/jobs/models.py:132
+#: src/postulo/accounts/models.py:256 src/postulo/jobs/models.py:132
 #: src/postulo/resume/views.py:335
 #, draft
 msgid "website"
@@ -9431,7 +9528,7 @@ msgstr "Што не можеше да се прочита"
 msgid "What each plugin does, for everybody"
 msgstr "Што прави секој додаток, за сите"
 
-#: src/postulo/templates/accounts/profile.html:151
+#: src/postulo/templates/accounts/profile.html:152
 #: src/postulo/templates/jobs/company_form.html:89
 #, draft
 msgid "What goes where"
@@ -9597,7 +9694,7 @@ msgstr "Кога"
 msgid "When accepting should also move the application."
 msgstr "Кога прифаќањето треба и да ја помести пријавата."
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:590
 #, draft
 msgid "When it entered your listings."
 msgstr "Кога влегол во вашите огласи."
@@ -9649,7 +9746,7 @@ msgstr "Како стојат работите"
 msgid "Where this company lists its openings."
 msgstr "Каде оваа компанија ги објавува своите слободни места."
 
-#: src/postulo/jobs/models.py:547
+#: src/postulo/jobs/models.py:550
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr ""
@@ -9665,12 +9762,12 @@ msgstr "каде живеете"
 msgid "Where your job search stands today."
 msgstr "Каде стои вашето барање работа денес."
 
-#: src/postulo/core/models.py:350
+#: src/postulo/core/models.py:484
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Дали секој што ќе ја најде адресата може да создаде сметка."
 
-#: src/postulo/core/models.py:361
+#: src/postulo/core/models.py:495
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9705,7 +9802,7 @@ msgid ""
 msgstr ""
 "На кој јазик е напишана оваа варијанта. Оставете празно за да го следите вашиот профил."
 
-#: src/postulo/jobs/models.py:717
+#: src/postulo/jobs/models.py:720
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Кој дел од Postulo го создал ова: веб интерфејсот, или API-то."
@@ -9730,7 +9827,7 @@ msgstr "со кого се среќавате"
 msgid "Why"
 msgstr "Зошто"
 
-#: src/postulo/jobs/models.py:584
+#: src/postulo/jobs/models.py:587
 #, draft
 msgid "why it was discarded"
 msgstr "зошто е отфрлено"
@@ -9770,7 +9867,7 @@ msgstr "Со: %(people)s"
 msgid "Withdrawn"
 msgstr "Повлечено"
 
-#: src/postulo/core/models.py:133
+#: src/postulo/core/models.py:133 src/postulo/core/models.py:360
 #, draft
 msgid "Work"
 msgstr "Работа"
@@ -9786,7 +9883,7 @@ msgstr "работеше %(when)s"
 msgid "Working arrangement"
 msgstr "Начин на работа"
 
-#: src/postulo/jobs/models.py:536
+#: src/postulo/jobs/models.py:539
 #, draft
 msgid "working arrangement"
 msgstr "начин на работа"
@@ -9885,7 +9982,7 @@ msgstr "Веќе имате ознака со тоа име."
 msgid "You already have that industry."
 msgstr "Веќе ја имате таа дејност."
 
-#: src/postulo/accounts/views.py:220
+#: src/postulo/accounts/views.py:243
 #, draft
 msgid "You are already signed in."
 msgstr "Веќе сте најавени."
@@ -9982,7 +10079,7 @@ msgid ""
 msgstr ""
 "Потоа сепак ќе се најавите и ќе го дадете вашиот втор фактор, ако имате. Оваа врска ја менува лозинката и ништо друго."
 
-#: src/postulo/accounts/views.py:302
+#: src/postulo/accounts/views.py:325
 #, draft
 msgid "Your account and everything in it have been deleted."
 msgstr "Вашата сметка и сè во неа е избришано."
@@ -10024,6 +10121,13 @@ msgstr "Вашата кариера"
 msgid "Your career record"
 msgstr "Вашиот кариерен запис"
 
+#: src/postulo/templates/partials/postal_addresses.html:97
+#, draft
+msgid ""
+"Your CV header shows a town and a country and never a street, whatever is here."
+msgstr ""
+"Заглавието на вашето CV прикажува место и држава, а никогаш улица, што и да има тука."
+
 #: src/postulo/templates/resume/overview.html:20
 #: src/postulo/templates/widgets/shortcuts.html:13
 #, draft
@@ -10035,7 +10139,7 @@ msgstr "Вашите CV-а"
 msgid "Your dashboard is empty"
 msgstr "Вашиот преглед е празен"
 
-#: src/postulo/accounts/views.py:280 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:303 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -10055,12 +10159,12 @@ msgstr "Вашиот рок"
 msgid "Your details"
 msgstr "Вашите лични податоци"
 
-#: src/postulo/accounts/views.py:112
+#: src/postulo/accounts/views.py:135
 #, draft
 msgid "Your details have been saved."
 msgstr "Вашите податоци се зачувани."
 
-#: src/postulo/accounts/views.py:159
+#: src/postulo/accounts/views.py:182
 #, draft
 msgid "Your Gravatar has been fetched again."
 msgstr "Вашиот Gravatar е преземен повторно."
@@ -10094,7 +10198,7 @@ msgid ""
 msgstr ""
 "Вашето име и блокот со контакти што ќе се печати на вашите CV-а. Како Postulo се однесува кон вас — тема, јазик, корисничко име, адреси — се наоѓа под <a href=\"%(settings_url)s\" class=\"underline\">Поставки</a>."
 
-#: src/postulo/core/models.py:148
+#: src/postulo/core/models.py:148 src/postulo/core/models.py:373
 #, draft
 msgid "Your name for it, when none of the kinds above fits."
 msgstr "Вашето име за него, кога ниту еден од видовите погоре не одговара."
@@ -10114,7 +10218,7 @@ msgstr "Вашето име, е-поштата и локацијата, земе
 msgid "Your own name"
 msgstr "Вашето сопствено име"
 
-#: src/postulo/accounts/views.py:379
+#: src/postulo/accounts/views.py:402
 #, draft
 msgid "Your password is set. Sign in with it."
 msgstr "Вашата лозинка е поставена. Најавете се со неа."

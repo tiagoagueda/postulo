@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 20:20+0000\n"
+"POT-Creation-Date: 2026-09-09 20:49+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Malti\n"
@@ -217,7 +217,7 @@ msgid ""
 msgstr ""
 "%(label)s għadu jżomm %(count)d rekord(s), u li tneħħih iħallihom f'tabella li xejn ma jista' jaqra, jesporta jew jirrestawra. Battalha l-ewwel mill-paġni tal-plugin innifsu, jew inkella itfi l-plugin — mitfi jżomm kollox."
 
-#: src/postulo/jobs/models.py:678
+#: src/postulo/jobs/models.py:681
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "minn %(low)s sa %(high)s"
@@ -389,7 +389,7 @@ msgstr "%(role)s ma' %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s ma' %(company)s — %(days)s jum"
 
-#: src/postulo/resume/importing.py:136
+#: src/postulo/resume/importing.py:172
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: l-ebda data tal-bidu, għalhekk ma żdiedx."
@@ -483,6 +483,11 @@ msgstr "%(url)s huwa ferm akbar milli għandu jkun katalgu."
 msgid "%(when)s ago"
 msgstr "%(when)s ilu"
 
+#: src/postulo/core/models.py:413
+#, draft
+msgid "(empty address)"
+msgstr "(indirizz vojt)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -558,7 +563,7 @@ msgstr "Fajl CSV"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Ħjiel għall-interfaċċa, bħal “amber” jew “sky”."
 
-#: src/postulo/core/models.py:344
+#: src/postulo/core/models.py:478
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Linja taħt l-isem fil-paġna tal-login. Fakultattiv."
@@ -655,7 +660,7 @@ msgid ""
 msgstr ""
 "Avviż li nnutajt. Il-kumpanija u t-titlu biżżejjed biex tibda; il-bqija jista' jiġi wara."
 
-#: src/postulo/accounts/models.py:258
+#: src/postulo/accounts/models.py:261
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Profil fuq GitHub, Forgejo, GitLab jew simili."
@@ -682,7 +687,7 @@ msgstr "Tfakkira tiskadi"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Tfakkira tiskadi jum qabel, meta jkun hemm jum qabel."
 
-#: src/postulo/accounts/models.py:441
+#: src/postulo/accounts/models.py:444
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Nota dwar għal min hi."
@@ -772,12 +777,12 @@ msgstr "Aċċetta"
 msgid "Accepted"
 msgstr "Aċċettata"
 
-#: src/postulo/accounts/models.py:455
+#: src/postulo/accounts/models.py:458
 #, draft
 msgid "accepted at"
 msgstr "aċċettata fi"
 
-#: src/postulo/accounts/models.py:462
+#: src/postulo/accounts/models.py:465
 #, draft
 msgid "accepted by"
 msgstr "aċċettata minn"
@@ -957,10 +962,16 @@ msgstr "Miżjud mal-avviżi tiegħek."
 msgid "Added."
 msgstr "Miżjud."
 
-#: src/postulo/jobs/models.py:710 src/postulo/resume/models.py:230
+#: src/postulo/core/models.py:378 src/postulo/jobs/models.py:713
+#: src/postulo/resume/models.py:230
 #, draft
 msgid "address"
 msgstr "indirizz"
+
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Indirizz"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -1037,7 +1048,7 @@ msgstr "Jiġu offruti kollha, u anke lingwa miżjuda f'verżjoni aktar tard."
 msgid "Also"
 msgstr "Ukoll"
 
-#: src/postulo/templates/accounts/profile.html:173
+#: src/postulo/templates/accounts/profile.html:174
 #, draft
 msgid "Also happens by itself when your primary address changes."
 msgstr "Jiġri wkoll waħdu meta jinbidel l-indirizz primarju tiegħek."
@@ -1085,7 +1096,7 @@ msgid ""
 msgstr ""
 "Indiċi hu lista ta’ kodiċi li se jitħaddem hawn, għalhekk irid ikun iffirmat u int trid iżżomm iċ-ċavetta. Li tintefa repożitorju aktar tard iwaqqaf installazzjonijiet u aġġornamenti ġodda minnu; dak li diġà hu installat ikompli jaħdem."
 
-#: src/postulo/templates/accounts/profile.html:107
+#: src/postulo/templates/accounts/profile.html:108
 #, draft
 msgid ""
 "An ORCID, or another public id that says which researcher you are. A name is not an identity — two people share one, one person publishes under three — and an application form for an academic post asks for this by name. Paste a whole address if that is what you have; Postulo keeps the id."
@@ -1177,7 +1188,7 @@ msgstr "Dehra"
 #: src/postulo/applications/models.py:372
 #: src/postulo/applications/models.py:467
 #: src/postulo/applications/models.py:588 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:738
+#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:741
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1271,7 +1282,7 @@ msgstr "Applikazzjonijiet, bil-kronoloġiji tagħhom"
 
 #: src/postulo/applications/analytics.py:31
 #: src/postulo/applications/models.py:40 src/postulo/applications/tables.py:46
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:633
+#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:636
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
 msgid "Applied"
@@ -1323,7 +1334,7 @@ msgstr "Applika mar-ringieli mmarkati"
 msgid "Apply: %(title)s"
 msgstr "Applika: %(title)s"
 
-#: src/postulo/jobs/models.py:434
+#: src/postulo/jobs/models.py:437
 #, draft
 msgid "Apprenticeship"
 msgstr "Apprendistat"
@@ -1535,7 +1546,7 @@ msgid "Callback to register with it"
 msgstr "URL ta' callback biex tirreġistra mal-fornitur"
 
 #: src/postulo/templates/accounts/invite_form.html:24
-#: src/postulo/templates/accounts/profile.html:164
+#: src/postulo/templates/accounts/profile.html:165
 #: src/postulo/templates/applications/application_form.html:22
 #: src/postulo/templates/applications/application_intake.html:73
 #: src/postulo/templates/applications/interview_form.html:70
@@ -1575,7 +1586,7 @@ msgstr "Ikkanċellata"
 msgid "Capture"
 msgstr "Aqbad"
 
-#: src/postulo/jobs/models.py:742
+#: src/postulo/jobs/models.py:745
 #, draft
 msgid "capture"
 msgstr "qbid"
@@ -1617,7 +1628,7 @@ msgstr "Aqbad avviżi"
 msgid "Capture sources this instance has"
 msgstr "Sorsi ta' qbid ta' din l-istanza"
 
-#: src/postulo/jobs/models.py:714
+#: src/postulo/jobs/models.py:717
 #, draft
 msgid "captured from"
 msgstr "maqbud minn"
@@ -1627,7 +1638,7 @@ msgstr "maqbud minn"
 msgid "Captured: %(title)s"
 msgstr "Maqbud: %(title)s"
 
-#: src/postulo/jobs/models.py:743
+#: src/postulo/jobs/models.py:746
 #, draft
 msgid "captures"
 msgstr "qbidiet"
@@ -1809,7 +1820,7 @@ msgstr "Agħżel liema tip ta' identifikatur hu dan."
 msgid "Choose which application this is about first."
 msgstr "L-ewwel agħżel ma' liema applikazzjoni għandha x'taqsam."
 
-#: src/postulo/accounts/models.py:251
+#: src/postulo/accounts/models.py:254
 #, draft
 msgid "City and country, as it should appear on a CV."
 msgstr "Belt u pajjiż, kif għandhom jidhru fuq CV."
@@ -1835,17 +1846,17 @@ msgstr "Ikklerja"
 msgid "Clear filters"
 msgstr "Ikklerja l-filtri"
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:633
+#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:636
 #, draft
 msgid "Closed"
 msgstr "Magħluq"
 
-#: src/postulo/applications/models.py:209 src/postulo/jobs/models.py:574
+#: src/postulo/applications/models.py:209 src/postulo/jobs/models.py:577
 #, draft
 msgid "closed on"
 msgstr "magħluq fi"
 
-#: src/postulo/jobs/models.py:461
+#: src/postulo/jobs/models.py:464
 #, draft
 msgid "Closed or already filled"
 msgstr "Magħluq jew diġà mimli"
@@ -1861,7 +1872,7 @@ msgstr "Jagħlaq"
 msgid "Closing date"
 msgstr "Data tal-għeluq"
 
-#: src/postulo/jobs/models.py:568
+#: src/postulo/jobs/models.py:571
 #, draft
 msgid "closing date"
 msgstr "data tal-għeluq"
@@ -1876,7 +1887,7 @@ msgstr "Jagħlqu din il-ġimgħa: %(total)s"
 msgid "Code (GitHub, GitLab…)"
 msgstr "Kodiċi (GitHub, GitLab…)"
 
-#: src/postulo/accounts/models.py:256
+#: src/postulo/accounts/models.py:259
 #, draft
 msgid "code repository"
 msgstr "repożitorju tal-kodiċi"
@@ -1946,7 +1957,7 @@ msgstr "Kumpanija"
 
 #: src/postulo/jobs/models.py:158 src/postulo/jobs/models.py:283
 #: src/postulo/jobs/models.py:354 src/postulo/jobs/models.py:382
-#: src/postulo/jobs/models.py:531 src/postulo/jobs/tables.py:15
+#: src/postulo/jobs/models.py:534 src/postulo/jobs/tables.py:15
 #, draft
 msgid "company"
 msgstr "kumpanija"
@@ -2045,7 +2056,7 @@ msgstr "Konnessjoni mneħħija, sigrieti inklużi."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Konnessjoni ssejvjata. Ittestjaha biex tkun ċert li taħdem."
 
-#: src/postulo/core/models.py:422
+#: src/postulo/core/models.py:556
 #, draft
 msgid "connection security"
 msgstr "sigurtà tal-konnessjoni"
@@ -2083,7 +2094,7 @@ msgstr "Kostruzzjoni"
 msgid "Consulting"
 msgstr "Konsulenza"
 
-#: src/postulo/jobs/models.py:406
+#: src/postulo/jobs/models.py:409
 #, draft
 msgid "contact"
 msgstr "kuntatt"
@@ -2104,7 +2115,7 @@ msgstr "Kuntatt miżjud."
 msgid "Contact block"
 msgstr "Blokk tal-kuntatt"
 
-#: src/postulo/jobs/models.py:407
+#: src/postulo/jobs/models.py:410
 #, draft
 msgid "contacts"
 msgstr "kuntatti"
@@ -2119,7 +2130,7 @@ msgstr "Li fih"
 msgid "context"
 msgstr "kuntest"
 
-#: src/postulo/jobs/models.py:431
+#: src/postulo/jobs/models.py:434
 #, draft
 msgid "Contract"
 msgstr "Kuntratt"
@@ -2161,7 +2172,13 @@ msgid ""
 msgstr ""
 "Magħdud mill-kronoloġija, għalhekk intervisti rreġistrati qabel ma kien jeżisti d-djarju huma inklużi."
 
+#: src/postulo/core/models.py:384 src/postulo/core/postal.py:125
+#, draft
+msgid "country"
+msgstr "pajjiż"
+
 #: src/postulo/core/phone_field.py:37
+#: src/postulo/templates/partials/postal_addresses.html:48
 #, draft
 msgid "Country"
 msgstr "Pajjiż"
@@ -2198,13 +2215,13 @@ msgstr "Oħloq stedina"
 msgid "created"
 msgstr "maħluqa"
 
-#: src/postulo/accounts/models.py:307 src/postulo/accounts/models.py:378
-#: src/postulo/accounts/models.py:452 src/postulo/core/models.py:30
+#: src/postulo/accounts/models.py:310 src/postulo/accounts/models.py:381
+#: src/postulo/accounts/models.py:455 src/postulo/core/models.py:30
 #, draft
 msgid "created at"
 msgstr "maħluq fi"
 
-#: src/postulo/accounts/models.py:450
+#: src/postulo/accounts/models.py:453
 #, draft
 msgid "created by"
 msgstr "maħluq minn"
@@ -2219,7 +2236,7 @@ msgstr "link tal-kredenzjal"
 msgid "Currency"
 msgstr "Munita"
 
-#: src/postulo/jobs/models.py:557
+#: src/postulo/jobs/models.py:560
 #, draft
 msgid "currency"
 msgstr "munita"
@@ -2274,7 +2291,7 @@ msgstr "Skur"
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: src/postulo/accounts/models.py:288
+#: src/postulo/accounts/models.py:291
 #, draft
 msgid "dashboard widgets"
 msgstr "widgets tad-dashboard"
@@ -2333,7 +2350,7 @@ msgid ""
 msgstr ""
 "Jiem sal-ewwel tweġiba u sal-ewwel intervista: l-eħfef, il-medjan, l-itwal."
 
-#: src/postulo/accounts/models.py:304
+#: src/postulo/accounts/models.py:307
 #, draft
 msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
@@ -2443,7 +2460,7 @@ msgstr "Deċiż minn %(who)s fi %(when)s"
 msgid "Decided by %(who)s."
 msgstr "Deċiż minn %(who)s."
 
-#: src/postulo/jobs/models.py:589
+#: src/postulo/jobs/models.py:592
 #, draft
 msgid "decided on"
 msgstr "deċiża fi"
@@ -2463,12 +2480,12 @@ msgstr "Irrifjutata"
 msgid "Declined. It will not be suggested again."
 msgstr "Irrifjutata. Mhux se terġa' tiġi ssuġġerita."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:518
 #, draft
 msgid "default language"
 msgstr "lingwa awtomatika"
 
-#: src/postulo/core/models.py:395
+#: src/postulo/core/models.py:529
 #, draft
 msgid "default time zone"
 msgstr "żona tal-ħin awtomatika"
@@ -2552,7 +2569,7 @@ msgstr "Jiddependi minn"
 msgid "Description"
 msgstr "Deskrizzjoni"
 
-#: src/postulo/jobs/models.py:549 src/postulo/resume/models.py:233
+#: src/postulo/jobs/models.py:552 src/postulo/resume/models.py:233
 #, draft
 msgid "description"
 msgstr "deskrizzjoni"
@@ -2595,8 +2612,8 @@ msgstr "Skarta"
 msgid "Discard this capture"
 msgstr "Skarta dan il-qbid"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:454
-#: src/postulo/jobs/models.py:693
+#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:457
+#: src/postulo/jobs/models.py:696
 #, draft
 msgid "Discarded"
 msgstr "Skartat"
@@ -2798,7 +2815,7 @@ msgstr ""
 msgid "Email"
 msgstr "Email"
 
-#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:436
+#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:439
 #: src/postulo/jobs/models.py:396 src/postulo/resume/views.py:333
 #, draft
 msgid "email address"
@@ -2834,7 +2851,7 @@ msgstr "Email mibgħuta"
 msgid "Employment type"
 msgstr "Tip ta' impjieg"
 
-#: src/postulo/jobs/models.py:539
+#: src/postulo/jobs/models.py:542
 #, draft
 msgid "employment type"
 msgstr "tip ta' impjieg"
@@ -2844,7 +2861,7 @@ msgstr "tip ta' impjieg"
 msgid "Empty"
 msgstr "Vojt"
 
-#: src/postulo/jobs/models.py:748
+#: src/postulo/jobs/models.py:751
 #, draft
 msgid "Empty capture"
 msgstr "Qbid vojt"
@@ -3068,7 +3085,7 @@ msgstr "Jiskadi"
 msgid "expires"
 msgstr "jiskadi"
 
-#: src/postulo/accounts/models.py:379 src/postulo/accounts/models.py:453
+#: src/postulo/accounts/models.py:382 src/postulo/accounts/models.py:456
 #, draft
 msgid "expires at"
 msgstr "jiskadi fi"
@@ -3106,7 +3123,7 @@ msgstr "Esportat waħdu"
 msgid "Failed"
 msgstr "Falla"
 
-#: src/postulo/core/models.py:506 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:640 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Falla mingħajr ma qal għaliex."
@@ -3126,7 +3143,7 @@ msgstr "L-aktar mgħaġġel"
 msgid "Fax"
 msgstr "Faks"
 
-#: src/postulo/templates/accounts/profile.html:171
+#: src/postulo/templates/accounts/profile.html:172
 #, draft
 msgid "Fetch my Gravatar again"
 msgstr "Erġa' ġib il-Gravatar tiegħi"
@@ -3322,7 +3339,7 @@ msgstr "Instab fis-sit tagħhom"
 msgid "Found via"
 msgstr "Misjub permezz ta'"
 
-#: src/postulo/jobs/models.py:544
+#: src/postulo/jobs/models.py:547
 #, draft
 msgid "found via"
 msgstr "misjub permezz ta'"
@@ -3332,7 +3349,7 @@ msgstr "misjub permezz ta'"
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Instab: %(names)s. Jimtlew biss l-oqsma li ħallejt vojta."
 
-#: src/postulo/jobs/models.py:432
+#: src/postulo/jobs/models.py:435
 #, draft
 msgid "Freelance"
 msgstr "Freelance"
@@ -3356,7 +3373,7 @@ msgstr "minn"
 msgid "From"
 msgstr "Minn"
 
-#: src/postulo/jobs/models.py:683
+#: src/postulo/jobs/models.py:686
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "minn %(low)s"
@@ -3366,7 +3383,7 @@ msgstr "minn %(low)s"
 msgid "From %(name)s."
 msgstr "Mingħand %(name)s."
 
-#: src/postulo/core/models.py:430
+#: src/postulo/core/models.py:564
 #, draft
 msgid "from address"
 msgstr "indirizz tal-mittent"
@@ -3413,7 +3430,7 @@ msgstr "mill-istatus"
 msgid "Frozen at the moment of sending"
 msgstr "Iffriżat fil-mument tal-bgħit"
 
-#: src/postulo/jobs/models.py:429
+#: src/postulo/jobs/models.py:432
 #, draft
 msgid "Full time"
 msgstr "Full time"
@@ -3496,17 +3513,17 @@ msgstr "Ħadet xi tweġiba"
 msgid "grade"
 msgstr "grad"
 
-#: src/postulo/accounts/models.py:298
+#: src/postulo/accounts/models.py:301
 #, draft
 msgid "Gravatar checked on"
 msgstr "Gravatar iċċekkjat fi"
 
-#: src/postulo/accounts/models.py:296
+#: src/postulo/accounts/models.py:299
 #, draft
 msgid "Gravatar copy"
 msgstr "Kopja tal-Gravatar"
 
-#: src/postulo/accounts/views.py:121 src/postulo/accounts/views.py:161
+#: src/postulo/accounts/views.py:144 src/postulo/accounts/views.py:184
 #, draft
 msgid "Gravatar could not be reached just now. Try again later."
 msgstr "Gravatar ma setax jintlaħaq bħalissa. Erġa' pprova aktar tard."
@@ -3517,7 +3534,7 @@ msgid "Gravatar had no picture for your address when last asked, on %(when)s."
 msgstr ""
 "Gravatar ma kellu l-ebda stampa għall-indirizz tiegħek meta ġie mistoqsi l-aħħar, fi %(when)s."
 
-#: src/postulo/accounts/views.py:117 src/postulo/accounts/views.py:160
+#: src/postulo/accounts/views.py:140 src/postulo/accounts/views.py:183
 #, draft
 msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr ""
@@ -3572,7 +3589,7 @@ msgstr "Saret"
 msgid "hidden"
 msgstr "moħbi"
 
-#: src/postulo/accounts/models.py:267
+#: src/postulo/accounts/models.py:270
 #, draft
 msgid "hidden navigation items"
 msgstr "elementi tan-navigazzjoni moħbija"
@@ -3593,10 +3610,17 @@ msgstr "punti ewlenin"
 msgid "highlights for this CV"
 msgstr "punti ewlenin għal dan is-CV"
 
-#: src/postulo/core/models.py:134
+#: src/postulo/core/models.py:134 src/postulo/core/models.py:359
 #, draft
 msgid "Home"
 msgstr "Dar"
+
+#: src/postulo/templates/partials/postal_addresses.html:15
+#, draft
+msgid ""
+"Home, work, wherever post reaches you — with one of them marked as the one to use. A form or a formal letter carries that one."
+msgstr ""
+"Dar, xogħol, kull fejn jasallek il-posta — b'wieħed minnhom immarkat bħala dak li jintuża. Formola jew ittra formali ġġorr dak."
 
 #: src/postulo/jobs/industries.py:35
 #, draft
@@ -3678,7 +3702,7 @@ msgstr ""
 msgid "However you prefer to group your search."
 msgstr "Kif tippreferi tiġbor it-tfittxija tiegħek."
 
-#: src/postulo/jobs/models.py:424
+#: src/postulo/jobs/models.py:427
 #, draft
 msgid "Hybrid"
 msgstr "Ibridu"
@@ -3699,7 +3723,7 @@ msgstr "id fil-maħżen"
 msgid "identifier"
 msgstr "identifikatur"
 
-#: src/postulo/templates/accounts/profile.html:128
+#: src/postulo/templates/accounts/profile.html:129
 #: src/postulo/templates/jobs/company_form.html:66
 #, draft
 msgid "Identifier"
@@ -3715,7 +3739,7 @@ msgstr "identifikatur fis-sors"
 msgid "identifiers"
 msgstr "identifikaturi"
 
-#: src/postulo/templates/accounts/profile.html:105
+#: src/postulo/templates/accounts/profile.html:106
 #: src/postulo/templates/jobs/company_form.html:48
 #, draft
 msgid "Identifiers"
@@ -3740,7 +3764,7 @@ msgid ""
 msgstr ""
 "Jekk applikajt ma' istituzzjoni tal-UE jew permezz ta' servizz nazzjonali tal-impjiegi, dan il-fajl diġà għandek. Minflok tittajpja kollox mill-ġdid, agħtih hawn."
 
-#: src/postulo/core/models.py:353
+#: src/postulo/core/models.py:487
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "injora robots.txt waqt il-qbid"
@@ -3926,7 +3950,7 @@ msgstr "Installat fuq din l-istanza"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Li tinstalla plugin iħaddem il-kodiċi ta' ħaddieħor ġewwa Postulo."
 
-#: src/postulo/core/models.py:335
+#: src/postulo/core/models.py:469
 #, draft
 msgid "instance name"
 msgstr "isem tal-istanza"
@@ -3946,7 +3970,7 @@ msgstr "Assigurazzjoni"
 msgid "Internal"
 msgstr "Intern"
 
-#: src/postulo/jobs/models.py:433
+#: src/postulo/jobs/models.py:436
 #, draft
 msgid "Internship"
 msgstr "Internship"
@@ -4013,12 +4037,12 @@ msgstr "intervisti"
 msgid "Interviews"
 msgstr "Intervisti"
 
-#: src/postulo/accounts/models.py:468
+#: src/postulo/accounts/models.py:471
 #, draft
 msgid "invitation"
 msgstr "stedina"
 
-#: src/postulo/accounts/views.py:187
+#: src/postulo/accounts/views.py:210
 #, draft
 msgid ""
 "Invitation created. Send the person the link shown below; it can be used once."
@@ -4032,12 +4056,12 @@ msgid ""
 msgstr ""
 "Bi stedina biss: il-formola tar-reġistrazzjoni mhix offruta. Stieden nies mit-taqsima Nies."
 
-#: src/postulo/accounts/views.py:203
+#: src/postulo/accounts/views.py:226
 #, draft
 msgid "Invitation revoked."
 msgstr "Stedina revokata."
 
-#: src/postulo/accounts/models.py:469
+#: src/postulo/accounts/models.py:472
 #, draft
 msgid "invitations"
 msgstr "stediniet"
@@ -4049,7 +4073,7 @@ msgstr "stediniet"
 msgid "Invitations"
 msgstr "Stediniet"
 
-#: src/postulo/accounts/models.py:372 src/postulo/resume/models.py:156
+#: src/postulo/accounts/models.py:375 src/postulo/resume/models.py:156
 #, draft
 msgid "issued by"
 msgstr "maħruġa minn"
@@ -4116,12 +4140,12 @@ msgstr "Il-fajl tiegħu jaqbel ma' dak li ffirma r-repożitorju uffiċjali."
 msgid "Job board"
 msgstr "Portal tax-xogħol"
 
-#: src/postulo/jobs/models.py:594
+#: src/postulo/jobs/models.py:597
 #, draft
 msgid "job posting"
 msgstr "avviż tax-xogħol"
 
-#: src/postulo/jobs/models.py:595
+#: src/postulo/jobs/models.py:598
 #, draft
 msgid "job postings"
 msgstr "avviżi tax-xogħol"
@@ -4179,16 +4203,17 @@ msgstr ""
 #: src/postulo/applications/models.py:324
 #: src/postulo/applications/models.py:470
 #: src/postulo/applications/models.py:594 src/postulo/core/models.py:143
-#: src/postulo/documents/models.py:230 src/postulo/documents/models.py:292
-#: src/postulo/documents/models.py:342 src/postulo/plugins/models.py:169
-#: src/postulo/resume/models.py:231
+#: src/postulo/core/models.py:368 src/postulo/documents/models.py:230
+#: src/postulo/documents/models.py:292 src/postulo/documents/models.py:342
+#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:231
 #, draft
 msgid "kind"
 msgstr "tip"
 
-#: src/postulo/templates/accounts/profile.html:124
+#: src/postulo/templates/accounts/profile.html:125
 #: src/postulo/templates/jobs/company_form.html:62
 #: src/postulo/templates/partials/phone_numbers.html:40
+#: src/postulo/templates/partials/postal_addresses.html:54
 #, draft
 msgid "Kind"
 msgstr "Tip"
@@ -4208,7 +4233,7 @@ msgstr "tikketta"
 msgid "Language"
 msgstr "Lingwa"
 
-#: src/postulo/accounts/models.py:261 src/postulo/documents/models.py:67
+#: src/postulo/accounts/models.py:264 src/postulo/documents/models.py:67
 #: src/postulo/documents/models.py:246 src/postulo/resume/models.py:185
 #: src/postulo/resume/models.py:191
 #, draft
@@ -4240,7 +4265,7 @@ msgstr "Lingwi"
 msgid "languages"
 msgstr "lingwi"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:528
 #, draft
 msgid "languages offered"
 msgstr "lingwi offruti"
@@ -4435,7 +4460,7 @@ msgstr "Link"
 msgid "link in the store"
 msgstr "link fil-maħżen"
 
-#: src/postulo/accounts/models.py:254 src/postulo/jobs/models.py:402
+#: src/postulo/accounts/models.py:257 src/postulo/jobs/models.py:405
 #, draft
 msgid "LinkedIn"
 msgstr "LinkedIn"
@@ -4478,7 +4503,7 @@ msgstr "Links li għalihom għaddejthom"
 msgid "listening"
 msgstr "smigħ"
 
-#: src/postulo/jobs/models.py:729
+#: src/postulo/jobs/models.py:732
 #: src/postulo/templates/core/import_csv_map.html:86
 #, draft
 msgid "listing"
@@ -4510,8 +4535,8 @@ msgid ""
 msgstr ""
 "Avviżi, applikazzjonijiet u l-kronoloġiji tagħhom, kumpaniji u nies, tfakkiriet, it-test ta' dak li bgħatt, ittri, CVs, fajls u r-rekord tal-karriera tiegħek — kollox, inkluż dak magħluq jew skartat, għax qed tfittex xi ħaġa li tiftakar."
 
-#: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:136
-#: src/postulo/jobs/models.py:534 src/postulo/resume/models.py:55
+#: src/postulo/accounts/models.py:251 src/postulo/jobs/models.py:136
+#: src/postulo/jobs/models.py:537 src/postulo/resume/models.py:55
 #: src/postulo/resume/models.py:86
 #, draft
 msgid "location"
@@ -4578,7 +4603,7 @@ msgstr "Ittri żgħar, ċifri, punti, underscores u sing."
 msgid "Made"
 msgstr "Magħmul"
 
-#: src/postulo/core/models.py:461
+#: src/postulo/core/models.py:595
 #, draft
 msgid "mail failures in a row"
 msgstr "falliment tal-posta wara xulxin"
@@ -4603,7 +4628,7 @@ msgstr[2] ""
 msgstr[3] ""
 "Hawn il-posta hija l-unika triq lura f'kont, u għalhekk sakemm dan jerġa' jaħdem ħadd mill-%(counter)s persuni fuq din l-istanza ma jista' jerġa' jidħol jekk jinsa l-password tiegħu."
 
-#: src/postulo/core/models.py:457
+#: src/postulo/core/models.py:591
 #, draft
 msgid "mail last failed"
 msgstr "il-posta l-aħħar falliet"
@@ -4613,7 +4638,7 @@ msgstr "il-posta l-aħħar falliet"
 msgid "Mail last went out at %(when)s."
 msgstr "Il-posta l-aħħar ħarġet fil-%(when)s."
 
-#: src/postulo/core/models.py:456
+#: src/postulo/core/models.py:590
 #, draft
 msgid "mail last worked"
 msgstr "il-posta l-aħħar ħadmet"
@@ -4632,7 +4657,7 @@ msgid ""
 msgstr ""
 "Il-posta lanqas ma żżomm aktar it-trasport f'postu, għax triq li ma twassal xejn ma tipproteġi lil ħadd."
 
-#: src/postulo/core/models.py:434
+#: src/postulo/core/models.py:568
 #, draft
 msgid "mail transport"
 msgstr "trasport tal-posta"
@@ -4642,7 +4667,7 @@ msgstr "trasport tal-posta"
 msgid "Mail transport"
 msgstr "Trasport tal-posta"
 
-#: src/postulo/core/models.py:458
+#: src/postulo/core/models.py:592
 #, draft
 msgid "mail's last error"
 msgstr "l-aħħar żball tal-posta"
@@ -4874,14 +4899,15 @@ msgstr "isem"
 msgid "Name"
 msgstr "Isem"
 
-#: src/postulo/core/models.py:145
+#: src/postulo/core/models.py:145 src/postulo/core/models.py:370
 #, draft
 msgid "name, if Other"
 msgstr "isem, jekk Ieħor"
 
-#: src/postulo/templates/accounts/profile.html:132
+#: src/postulo/templates/accounts/profile.html:133
 #: src/postulo/templates/jobs/company_form.html:70
 #: src/postulo/templates/partials/phone_numbers.html:44
+#: src/postulo/templates/partials/postal_addresses.html:58
 #, draft
 msgid "Name, if Other"
 msgstr "Isem, jekk Ieħor"
@@ -4913,7 +4939,7 @@ msgstr "Qatt"
 msgid "never used"
 msgstr "qatt ma ntuża"
 
-#: src/postulo/jobs/models.py:452
+#: src/postulo/jobs/models.py:455
 #, draft
 msgid "New"
 msgstr "Ġdid"
@@ -5240,7 +5266,7 @@ msgid ""
 msgstr ""
 "Mhux ikkonfigurat. Issettja POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID u POSTULO_OIDC_CLIENT_SECRET fl-ambjent biex toffri buttuna tal-login għal fornitur OpenID Connect."
 
-#: src/postulo/jobs/models.py:458
+#: src/postulo/jobs/models.py:461
 #, draft
 msgid "Not for me"
 msgstr "Mhux għalija"
@@ -5306,7 +5332,7 @@ msgstr "Mhux muri · %(name)s"
 msgid "not tested yet"
 msgstr "għadu mhux ittestjat"
 
-#: src/postulo/accounts/models.py:441
+#: src/postulo/accounts/models.py:444
 #, draft
 msgid "note"
 msgstr "nota"
@@ -5327,7 +5353,7 @@ msgstr "Nota (fakultattiva)"
 msgid "noted %(when)s"
 msgstr "innutat %(when)s"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:590
 #, draft
 msgid "noted on"
 msgstr "innutat fi"
@@ -5339,7 +5365,7 @@ msgid "Notes"
 msgstr "Noti"
 
 #: src/postulo/documents/models.py:302 src/postulo/jobs/models.py:140
-#: src/postulo/jobs/models.py:403
+#: src/postulo/jobs/models.py:406
 #, draft
 msgid "notes"
 msgstr "noti"
@@ -5614,7 +5640,7 @@ msgstr "Offerta"
 msgid "Offer received"
 msgstr "Offerta riċevuta"
 
-#: src/postulo/core/models.py:382
+#: src/postulo/core/models.py:516
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Offrut biss sakemm il-posta ta' din l-istanza tabilħaqq tasal."
@@ -5641,7 +5667,7 @@ msgstr "Uffiċjali"
 msgid "older than a week"
 msgstr "eqdem minn ġimgħa"
 
-#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:423
+#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:426
 #, draft
 msgid "On site"
 msgstr "Fuq il-post"
@@ -5846,7 +5872,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Postijiet vakanti"
 
-#: src/postulo/accounts/models.py:438
+#: src/postulo/accounts/models.py:441
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Fakultattiv. Jekk issettjat, dan l-indirizz biss jista' juża l-istedina."
@@ -5892,8 +5918,9 @@ msgstr "Avviż oriġinali"
 #: src/postulo/accounts/identifiers.py:73 src/postulo/applications/models.py:87
 #: src/postulo/applications/models.py:291
 #: src/postulo/applications/models.py:410 src/postulo/core/models.py:137
-#: src/postulo/documents/models.py:280 src/postulo/jobs/identifiers.py:95
-#: src/postulo/jobs/models.py:462 src/postulo/resume/models.py:207
+#: src/postulo/core/models.py:362 src/postulo/documents/models.py:280
+#: src/postulo/jobs/identifiers.py:95 src/postulo/jobs/models.py:465
+#: src/postulo/resume/models.py:207
 #, draft
 msgid "Other"
 msgstr "Ieħor"
@@ -5963,7 +5990,7 @@ msgstr "Paġinazzjoni"
 msgid "Panel"
 msgstr "Panel"
 
-#: src/postulo/jobs/models.py:719
+#: src/postulo/jobs/models.py:722
 #, draft
 msgid "parsed posting"
 msgstr "avviż analizzat"
@@ -5983,7 +6010,7 @@ msgstr "Parti minn <a href=\"%(parent_url)s\" class=\"underline\">%(name)s</a>"
 msgid "Part of this company"
 msgstr "Partijiet minn din il-kumpanija"
 
-#: src/postulo/jobs/models.py:430
+#: src/postulo/jobs/models.py:433
 #, draft
 msgid "Part time"
 msgstr "Part time"
@@ -5998,7 +6025,7 @@ msgstr "Tradott parzjalment"
 msgid "Passkeys"
 msgstr "Passkeys"
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:549
 #, draft
 msgid "password"
 msgstr "password"
@@ -6052,22 +6079,22 @@ msgstr "Pendenti biss"
 msgid "People"
 msgstr "Nies"
 
-#: src/postulo/jobs/models.py:440
+#: src/postulo/jobs/models.py:443
 #, draft
 msgid "Per day"
 msgstr "Kuljum"
 
-#: src/postulo/jobs/models.py:441
+#: src/postulo/jobs/models.py:444
 #, draft
 msgid "Per hour"
 msgstr "Fis-siegħa"
 
-#: src/postulo/jobs/models.py:439
+#: src/postulo/jobs/models.py:442
 #, draft
 msgid "Per month"
 msgstr "Fix-xahar"
 
-#: src/postulo/jobs/models.py:438
+#: src/postulo/jobs/models.py:441
 #, draft
 msgid "Per year"
 msgstr "Fis-sena"
@@ -6082,7 +6109,7 @@ msgstr "Perjodu"
 msgid "Permissions"
 msgstr "Permessi"
 
-#: src/postulo/accounts/models.py:364 src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:367 src/postulo/plugins/models.py:120
 #, draft
 msgid "person"
 msgstr "persuna"
@@ -6124,7 +6151,7 @@ msgstr "telefon"
 msgid "Phone screen"
 msgstr "Skrinjar bit-telefon"
 
-#: src/postulo/accounts/models.py:291
+#: src/postulo/accounts/models.py:294
 #, draft
 msgid "picture"
 msgstr "stampa"
@@ -6194,7 +6221,7 @@ msgstr "Plugins għal %(name)s"
 msgid "Plugins for this account"
 msgstr "Plugins ta’ dan il-kont"
 
-#: src/postulo/accounts/models.py:274
+#: src/postulo/accounts/models.py:277
 #, draft
 msgid "plugins switched off"
 msgstr "plugins mitfija"
@@ -6220,7 +6247,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP jew GIF sa 5 MB. Tinqata' kwadra u titneħħa minn kulma l-fajl kien jaf dwar fejn ittieħdet."
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:540
 #, draft
 msgid "port"
 msgstr "port"
@@ -6254,7 +6281,38 @@ msgstr "Portfolios, profili u vidjows li għalihom għaddejthom."
 msgid "Positions"
 msgstr "Karigi"
 
-#: src/postulo/jobs/models.py:566
+#: src/postulo/core/models.py:361
+#, draft
+msgid "Postal"
+msgstr "Postali"
+
+#: src/postulo/core/models.py:393
+#, draft
+msgid "postal address"
+msgstr "indirizz postali"
+
+#: src/postulo/accounts/models.py:249 src/postulo/core/models.py:394
+#: src/postulo/jobs/models.py:404
+#, draft
+msgid "postal addresses"
+msgstr "indirizzi postali"
+
+#: src/postulo/templates/partials/postal_addresses.html:13
+#, draft
+msgid "Postal addresses"
+msgstr "Indirizzi postali"
+
+#: src/postulo/core/models.py:379
+#, draft
+msgid "postcode"
+msgstr "kodiċi postali"
+
+#: src/postulo/templates/partials/postal_addresses.html:34
+#, draft
+msgid "Postcode"
+msgstr "Kodiċi postali"
+
+#: src/postulo/jobs/models.py:569
 #, draft
 msgid "posted on"
 msgstr "ippubblikat fi"
@@ -6290,7 +6348,7 @@ msgstr "Avviż aġġornat."
 msgid "Posting URL"
 msgstr "URL tal-avviż"
 
-#: src/postulo/jobs/models.py:542
+#: src/postulo/jobs/models.py:545
 #, draft
 msgid "posting URL"
 msgstr "URL tal-avviż"
@@ -6400,12 +6458,13 @@ msgstr "Anteprima"
 msgid "Previous"
 msgstr "Preċedenti"
 
-#: src/postulo/core/models.py:154
+#: src/postulo/core/models.py:154 src/postulo/core/models.py:385
 #, draft
 msgid "primary"
 msgstr "prinċipali"
 
 #: src/postulo/templates/partials/phone_numbers.html:57
+#: src/postulo/templates/partials/postal_addresses.html:69
 #: src/postulo/templates/settings/account.html:52
 #, draft
 msgid "Primary"
@@ -6431,12 +6490,12 @@ msgstr "Indirizzi privati u lokali jiġu rrifjutati."
 msgid "proficiency"
 msgstr "profiċjenza"
 
-#: src/postulo/accounts/models.py:167 src/postulo/accounts/models.py:311
+#: src/postulo/accounts/models.py:167 src/postulo/accounts/models.py:314
 #, draft
 msgid "profile"
 msgstr "profil"
 
-#: src/postulo/accounts/models.py:312
+#: src/postulo/accounts/models.py:315
 #, draft
 msgid "profiles"
 msgstr "profili"
@@ -6550,7 +6609,7 @@ msgstr "Kompiti fil-kju"
 msgid "Quiet"
 msgstr "Siekta"
 
-#: src/postulo/accounts/models.py:301
+#: src/postulo/accounts/models.py:304
 #, draft
 msgid "quiet after"
 msgstr "siekta wara"
@@ -6610,7 +6669,7 @@ msgstr "Moqri bħala Europass JSON, il-format li jesporta europass.europa.eu."
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Moqri bħala Europass XML, il-format li għamel l-editur tas-CV."
 
-#: src/postulo/jobs/models.py:711
+#: src/postulo/jobs/models.py:714
 #, draft
 msgid "read by"
 msgstr "moqri minn"
@@ -6739,7 +6798,7 @@ msgstr "Irreġistrat dak li bgħatt."
 msgid "Recorded: nobody showed up."
 msgstr "Irreġistrat: ħadd ma deher."
 
-#: src/postulo/accounts/models.py:386
+#: src/postulo/accounts/models.py:389
 #, draft
 msgid "recovery link"
 msgstr "link ta' rkupru"
@@ -6750,7 +6809,7 @@ msgstr "link ta' rkupru"
 msgid "Recovery link"
 msgstr "Link ta' rkupru"
 
-#: src/postulo/accounts/models.py:387
+#: src/postulo/accounts/models.py:390
 #, draft
 msgid "recovery links"
 msgstr "links ta' rkupru"
@@ -6780,6 +6839,16 @@ msgstr "Referral"
 msgid "Refresh logo"
 msgstr "Erġa' ikseb il-logo"
 
+#: src/postulo/core/models.py:383
+#, draft
+msgid "region"
+msgstr "reġjun"
+
+#: src/postulo/templates/partials/postal_addresses.html:44
+#, draft
+msgid "Region"
+msgstr "Reġjun"
+
 #: src/postulo/templates/connections/form.html:73
 #, draft
 msgid "Register this address with the provider"
@@ -6798,7 +6867,7 @@ msgid ""
 msgstr ""
 "Ir-reġistrazzjoni hija miftuħa: kull min isib l-indirizz jista' joħloq kont."
 
-#: src/postulo/core/models.py:347
+#: src/postulo/core/models.py:481
 #, draft
 msgid "registration open"
 msgstr "reġistrazzjoni miftuħa"
@@ -6853,7 +6922,7 @@ msgstr "Tfakkiriet"
 msgid "Reminders that have come due, each with a button to mark it done."
 msgstr "Tfakkiriet li waslu, kull wieħed b'buttuna biex timmarkah lest."
 
-#: src/postulo/jobs/models.py:425
+#: src/postulo/jobs/models.py:428
 #, draft
 msgid "Remote"
 msgstr "Remot"
@@ -6863,12 +6932,13 @@ msgstr "Remot"
 msgid "remote address"
 msgstr "indirizz remot"
 
-#: src/postulo/templates/accounts/profile.html:137
+#: src/postulo/templates/accounts/profile.html:138
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
 #: src/postulo/templates/partials/phone_numbers.html:82
+#: src/postulo/templates/partials/postal_addresses.html:73
 #: src/postulo/templates/server/plugins.html:151
 #: src/postulo/templates/server/plugins.html:279
 #, draft
@@ -6997,7 +7067,7 @@ msgstr "revokat"
 msgid "Revoked"
 msgstr "Revokat"
 
-#: src/postulo/accounts/models.py:381
+#: src/postulo/accounts/models.py:384
 #, draft
 msgid "revoked at"
 msgstr "revokat fi"
@@ -7075,12 +7145,12 @@ msgstr "Salarju (figura waħda jew firxa)"
 msgid "Salary from"
 msgstr "Salarju minn"
 
-#: src/postulo/jobs/models.py:552
+#: src/postulo/jobs/models.py:555
 #, draft
 msgid "salary from"
 msgstr "salarju minn"
 
-#: src/postulo/jobs/models.py:559
+#: src/postulo/jobs/models.py:562
 #, draft
 msgid "salary period"
 msgstr "perjodu tas-salarju"
@@ -7090,12 +7160,12 @@ msgstr "perjodu tas-salarju"
 msgid "Salary to"
 msgstr "Salarju sa"
 
-#: src/postulo/jobs/models.py:555
+#: src/postulo/jobs/models.py:558
 #, draft
 msgid "salary to"
 msgstr "salarju sa"
 
-#: src/postulo/templates/accounts/profile.html:163
+#: src/postulo/templates/accounts/profile.html:164
 #: src/postulo/templates/applications/application_form.html:21
 #: src/postulo/templates/applications/application_intake.html:72
 #: src/postulo/templates/applications/interview_form.html:68
@@ -7136,7 +7206,7 @@ msgstr "Issejvja l-kumpanija biex iżżid identifikatur ieħor."
 msgid "Save this first, then come back and agree."
 msgstr "Issalva dan l-ewwel, imbagħad erġa' lura u aqbel."
 
-#: src/postulo/templates/accounts/profile.html:159
+#: src/postulo/templates/accounts/profile.html:160
 #, draft
 msgid "Save to add another identifier."
 msgstr "Issejvja biex iżżid identifikatur ieħor."
@@ -7159,6 +7229,11 @@ msgstr "Issejvjat fl-avviżi tiegħek. Iddeċiedi dwaru meta tkun lest."
 #, draft
 msgid "Saved."
 msgstr "Issejvjat."
+
+#: src/postulo/core/postal.py:137
+#, draft
+msgid "Say what this address is."
+msgstr "Għid x'inhu dan l-indirizz."
 
 #: src/postulo/jobs/models.py:322
 #, draft
@@ -7417,7 +7492,7 @@ msgstr "Issettja l-password"
 msgid "Set up"
 msgstr "Issettja"
 
-#: src/postulo/jobs/models.py:577
+#: src/postulo/jobs/models.py:580
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Issettja meta l-post vakanti ma jibqax disponibbli."
@@ -7458,7 +7533,7 @@ msgstr "Shortcuts"
 msgid "Shortlist"
 msgstr "Shortlist"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:453
+#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:456
 #, draft
 msgid "Shortlisted"
 msgstr "Fix-shortlist"
@@ -7494,7 +7569,7 @@ msgstr "Uri fin-navigazzjoni"
 msgid "Show past too"
 msgstr "Uri wkoll dawk li għaddew"
 
-#: src/postulo/core/models.py:338
+#: src/postulo/core/models.py:472
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Jintwera fl-intestatura u fil-paġna tal-login."
@@ -7505,7 +7580,7 @@ msgstr "Jintwera fl-intestatura u fil-paġna tal-login."
 msgid "Sign in"
 msgstr "Idħol"
 
-#: src/postulo/core/models.py:379
+#: src/postulo/core/models.py:513
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "dħul b'kodiċi mibgħut bl-email"
@@ -7548,7 +7623,7 @@ msgstr "Jidħol f’kont eżistenti bl-email"
 msgid "Single sign-on"
 msgstr "Single sign-on"
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:492
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "id-dħul uniku jgħodd bħala t-tieni fattur"
@@ -7563,7 +7638,7 @@ msgstr "Id-dħul uniku jgħodd bħala t-tieni fattur"
 msgid "Site search"
 msgstr "Fittex fis-sit"
 
-#: src/postulo/core/models.py:474 src/postulo/core/models.py:475
+#: src/postulo/core/models.py:608 src/postulo/core/models.py:609
 #, draft
 msgid "site settings"
 msgstr "settings tas-sit"
@@ -7626,7 +7701,7 @@ msgstr "L-aktar bil-mod"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:404
+#: src/postulo/core/models.py:538
 #, draft
 msgid "SMTP server"
 msgstr "Server SMTP"
@@ -7681,7 +7756,7 @@ msgid ""
 msgstr ""
 "Sors huwa l-qasam “misjub permezz ta'” fuq avviż. Imlih u din it-tabella tibda taqla' postha."
 
-#: src/postulo/jobs/models.py:712
+#: src/postulo/jobs/models.py:715
 #, draft
 msgid "source version"
 msgstr "verżjoni tas-sors"
@@ -7738,7 +7813,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, wara l-konnessjoni"
 
-#: src/postulo/jobs/models.py:581 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:584 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "stat"
@@ -7762,7 +7837,7 @@ msgstr "Status"
 
 #: src/postulo/applications/models.py:197
 #: src/postulo/applications/models.py:611 src/postulo/documents/models.py:432
-#: src/postulo/jobs/models.py:721
+#: src/postulo/jobs/models.py:724
 #, draft
 msgid "status"
 msgstr "status"
@@ -7954,7 +8029,7 @@ msgstr "Sinkronizzazzjoni"
 msgid "Table"
 msgstr "Tabella"
 
-#: src/postulo/accounts/models.py:277
+#: src/postulo/accounts/models.py:280
 #, draft
 msgid "table settings"
 msgstr "settings tat-tabella"
@@ -7972,7 +8047,7 @@ msgstr "tag"
 msgid "Tag"
 msgstr "Tag"
 
-#: src/postulo/core/models.py:341
+#: src/postulo/core/models.py:475
 #, draft
 msgid "tagline"
 msgstr "tagline"
@@ -8072,17 +8147,17 @@ msgstr "Ittestja l-konnessjoni"
 msgid "text as sent"
 msgstr "test kif intbagħat"
 
-#: src/postulo/core/models.py:450
+#: src/postulo/core/models.py:584
 #, draft
 msgid "text configuration"
 msgstr "konfigurazzjoni tal-messaġġi"
 
-#: src/postulo/core/models.py:451
+#: src/postulo/core/models.py:585
 #, draft
 msgid "text secrets"
 msgstr "sigrieti tal-messaġġi"
 
-#: src/postulo/core/models.py:449
+#: src/postulo/core/models.py:583
 #, draft
 msgid "text transport"
 msgstr "trasport tal-messaġġi"
@@ -8136,7 +8211,7 @@ msgstr "Dik il-konnessjoni ma tużax qbil."
 msgid "That connection no longer exists."
 msgstr "Dik il-konnessjoni m'għadhiex teżisti."
 
-#: src/postulo/jobs/models.py:418
+#: src/postulo/jobs/models.py:421
 #, draft
 msgid "That department belongs to a different company."
 msgstr "Dak id-dipartiment jappartjeni lil kumpanija oħra."
@@ -8210,7 +8285,7 @@ msgstr "Dak il-hostname ma setax jiġi riżolt."
 msgid "That image is far larger than a logo needs to be."
 msgstr "Din l-immaġni hija ferm akbar milli jeħtieġ logo."
 
-#: src/postulo/accounts/views.py:199
+#: src/postulo/accounts/views.py:222
 #, draft
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Dik l-istedina diġà ġiet aċċettata u ma tistax tiġi revokata."
@@ -8265,7 +8340,7 @@ msgstr "Dak Postulo ma jistax jagħmlu fuq bosta f'daqqa."
 msgid "That is not something this page does."
 msgstr "Din il-paġna ma tagħmilx dan."
 
-#: src/postulo/accounts/views.py:293
+#: src/postulo/accounts/views.py:316
 #, draft
 msgid "That is not the address on this account."
 msgstr "Dak mhuwiex l-indirizz fuq dan il-kont."
@@ -8398,7 +8473,7 @@ msgstr "L-indirizz wieġeb %(code)s."
 msgid "The address answered with nothing."
 msgstr "L-indirizz wieġeb b'xejn."
 
-#: src/postulo/jobs/models.py:571
+#: src/postulo/jobs/models.py:574
 #, draft
 msgid "The application deadline, if stated."
 msgstr "L-iskadenza tal-applikazzjoni, jekk dikjarata."
@@ -8559,12 +8634,12 @@ msgstr ""
 msgid "The LEI's check digits do not match."
 msgstr "Iċ-ċifri ta' kontroll tal-LEI ma jaqblux."
 
-#: src/postulo/jobs/models.py:730
+#: src/postulo/jobs/models.py:733
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "L-avviż li sar dan il-qbid, ladarba rrevedut."
 
-#: src/postulo/jobs/models.py:460
+#: src/postulo/jobs/models.py:463
 #, draft
 msgid "The location"
 msgstr "Il-post"
@@ -8619,7 +8694,7 @@ msgid ""
 msgstr ""
 "Il-password hija ssettjata minn <code>%(variable)s</code> fl-ambjent; ibdilha hemm. Qatt ma tintwera hawn."
 
-#: src/postulo/jobs/models.py:459
+#: src/postulo/jobs/models.py:462
 #, draft
 msgid "The pay"
 msgstr "Il-paga"
@@ -8762,7 +8837,7 @@ msgstr ""
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Il-wheel m'għandux metadata; jista' jkun bil-ħsara."
 
-#: src/postulo/accounts/models.py:263 src/postulo/documents/models.py:65
+#: src/postulo/accounts/models.py:266 src/postulo/documents/models.py:65
 #: src/postulo/documents/models.py:241
 #, draft
 msgid "theme"
@@ -8845,6 +8920,11 @@ msgstr "Dawn ir-rekords jistgħu jsemmu nies u l-applikazzjonijiet tagħhom."
 msgid "They did not show up"
 msgstr "Ma dehrux"
 
+#: src/postulo/core/postal.py:159
+#, draft
+msgid "This address is already listed."
+msgstr "Dan l-indirizz diġà huwa elenkat."
+
 #: src/postulo/jobs/logos.py:281
 #, draft
 msgid "This company has no website recorded."
@@ -8891,7 +8971,7 @@ msgid ""
 msgstr ""
 "Din l-istanza ma tibgħatx permezz ta' SMTP, għalhekk is-settings hawn taħt jiġu rreġistrati u mhux użati. Dan huwa normali fl-iżvilupp, fejn il-posta tiġi stampata fuq il-konsol."
 
-#: src/postulo/accounts/views.py:227
+#: src/postulo/accounts/views.py:250
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
 msgstr ""
@@ -8998,7 +9078,7 @@ msgstr "livell"
 msgid "Time zone"
 msgstr "Żona tal-ħin"
 
-#: src/postulo/accounts/models.py:262
+#: src/postulo/accounts/models.py:265
 #, draft
 msgid "time zone"
 msgstr "żona tal-ħin"
@@ -9018,13 +9098,13 @@ msgstr "entrata fil-linja taż-żmien"
 msgid "Timeout"
 msgstr "Timeout"
 
-#: src/postulo/core/models.py:428
+#: src/postulo/core/models.py:562
 #, draft
 msgid "timeout in seconds"
 msgstr "timeout f'sekondi"
 
 #: src/postulo/documents/models.py:291 src/postulo/documents/models.py:341
-#: src/postulo/jobs/models.py:533 src/postulo/resume/models.py:229
+#: src/postulo/jobs/models.py:536 src/postulo/resume/models.py:229
 #, draft
 msgid "title"
 msgstr "titlu"
@@ -9064,7 +9144,7 @@ msgstr "għall-istatus"
 msgid "Today's date"
 msgstr "Id-data tal-lum"
 
-#: src/postulo/accounts/models.py:433
+#: src/postulo/accounts/models.py:436
 #, draft
 msgid "token"
 msgstr "token"
@@ -9094,6 +9174,16 @@ msgstr "Wisq messaġġi. Erġa' pprova dalwaqt."
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr "Wisq talbiet: %(times)d huma permessi kull %(seconds)d sekondi."
 
+#: src/postulo/core/models.py:380
+#, draft
+msgid "town or city"
+msgstr "belt"
+
+#: src/postulo/templates/partials/postal_addresses.html:38
+#, draft
+msgid "Town or city"
+msgstr "Belt"
+
 #: src/postulo/templates/core/export.html:43
 #, draft
 msgid ""
@@ -9106,12 +9196,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Trasport u loġistika"
 
-#: src/postulo/core/models.py:439
+#: src/postulo/core/models.py:573
 #, draft
 msgid "transport configuration"
 msgstr "konfigurazzjoni tat-trasport"
 
-#: src/postulo/core/models.py:441
+#: src/postulo/core/models.py:575
 #, draft
 msgid "transport secrets"
 msgstr "sigrieti tat-trasport"
@@ -9121,12 +9211,12 @@ msgstr "sigrieti tat-trasport"
 msgid "Try fewer words, or a different spelling."
 msgstr "Ipprova inqas kliem, jew ortografija differenti."
 
-#: src/postulo/accounts/views.py:153
+#: src/postulo/accounts/views.py:176
 #, draft
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Ixgħel “Uża l-Gravatar tiegħi” l-ewwel."
 
-#: src/postulo/jobs/models.py:692
+#: src/postulo/jobs/models.py:695
 #, draft
 msgid "Turned into an application"
 msgstr "Mibdula f'applikazzjoni"
@@ -9190,13 +9280,20 @@ msgid "Unknown PDF backend %(name)r. Choose from: auto, weasyprint, chromium."
 msgstr ""
 "Backend tal-PDF mhux magħruf %(name)r. Agħżel minn: auto, weasyprint, chromium."
 
+#: src/postulo/templates/partials/postal_addresses.html:91
+#, draft
+msgid ""
+"Unlike a telephone number, an address is not kept once on this instance — people share a home. You cannot list the same one twice yourself."
+msgstr ""
+"B'differenza minn numru tat-telefown, indirizz mhuwiex miżmum darba fuq din l-istanza — in-nies jaqsmu dar. Int ma tistax telenka l-istess darbtejn."
+
 #: src/postulo/resume/models.py:58 src/postulo/resume/models.py:88
 #: src/postulo/resume/models.py:142
 #, draft
 msgid "until"
 msgstr "sa"
 
-#: src/postulo/jobs/models.py:685
+#: src/postulo/jobs/models.py:688
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "sa %(high)s"
@@ -9206,13 +9303,13 @@ msgstr "sa %(high)s"
 msgid "Update the preview"
 msgstr "Aġġorna l-anteprima"
 
-#: src/postulo/accounts/models.py:308 src/postulo/core/models.py:31
-#: src/postulo/core/models.py:463
+#: src/postulo/accounts/models.py:311 src/postulo/core/models.py:31
+#: src/postulo/core/models.py:597
 #, draft
 msgid "updated at"
 msgstr "aġġornat fi"
 
-#: src/postulo/core/models.py:470
+#: src/postulo/core/models.py:604
 #, draft
 msgid "updated by"
 msgstr "aġġornat minn"
@@ -9278,7 +9375,7 @@ msgstr "Uża PNG, JPEG, WebP jew GIF."
 msgid "Use my Gravatar"
 msgstr "Uża l-Gravatar tiegħi"
 
-#: src/postulo/accounts/models.py:293
+#: src/postulo/accounts/models.py:296
 #, draft
 msgid "use my Gravatar"
 msgstr "uża l-Gravatar tiegħi"
@@ -9300,7 +9397,7 @@ msgstr ""
 msgid "Used"
 msgstr "Użat"
 
-#: src/postulo/accounts/models.py:380
+#: src/postulo/accounts/models.py:383
 #, draft
 msgid "used at"
 msgstr "użat fi"
@@ -9316,7 +9413,7 @@ msgstr "utent"
 msgid "Username"
 msgstr "Isem tal-utent"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:411
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:545
 #, draft
 msgid "username"
 msgstr "isem tal-utent"
@@ -9399,7 +9496,7 @@ msgstr "Vidjow"
 msgid "Video call"
 msgstr "Sejħa bil-vidjo"
 
-#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:691
+#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:694
 #, draft
 msgid "Waiting for review"
 msgstr "Tistenna reviżjoni"
@@ -9446,7 +9543,7 @@ msgid ""
 msgstr ""
 "WeasyPrint huwa installat ma' Postulo, iżda jeħtieġ Pango u l-libreriji tas-sistema tiegħu. Fuq Debian jew Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. Fuq Windows huma diffiċli biex tiksibhom, għalhekk uża l-backend chromium minflok. Ara https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
-#: src/postulo/accounts/models.py:253 src/postulo/jobs/models.py:132
+#: src/postulo/accounts/models.py:256 src/postulo/jobs/models.py:132
 #: src/postulo/resume/views.py:335
 #, draft
 msgid "website"
@@ -9503,7 +9600,7 @@ msgstr "X'ma setax jinqara"
 msgid "What each plugin does, for everybody"
 msgstr "X’jagħmel kull plugin, għal kulħadd"
 
-#: src/postulo/templates/accounts/profile.html:151
+#: src/postulo/templates/accounts/profile.html:152
 #: src/postulo/templates/jobs/company_form.html:89
 #, draft
 msgid "What goes where"
@@ -9668,7 +9765,7 @@ msgstr "Meta"
 msgid "When accepting should also move the application."
 msgstr "Meta l-aċċettazzjoni għandha ċċaqlaq ukoll l-applikazzjoni."
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:590
 #, draft
 msgid "When it entered your listings."
 msgstr "Meta daħal fl-avviżi tiegħek."
@@ -9720,7 +9817,7 @@ msgstr "Fejn waslu l-affarijiet"
 msgid "Where this company lists its openings."
 msgstr "Fejn din il-kumpanija telenka l-postijiet vakanti tagħha."
 
-#: src/postulo/jobs/models.py:547
+#: src/postulo/jobs/models.py:550
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Fejn iltqajt miegħu: portal tax-xogħol, referral, is-sit tal-kumpanija."
@@ -9735,12 +9832,12 @@ msgstr "fejn tgħix"
 msgid "Where your job search stands today."
 msgstr "Fejn tinsab it-tfittxija tiegħek għax-xogħol illum."
 
-#: src/postulo/core/models.py:350
+#: src/postulo/core/models.py:484
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Jekk kull min isib l-indirizz jistax joħloq kont."
 
-#: src/postulo/core/models.py:361
+#: src/postulo/core/models.py:495
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9776,7 +9873,7 @@ msgid ""
 msgstr ""
 "B'liema lingwa huwa miktub dan il-varjant. Ħalli vojt biex isegwi l-profil tiegħek."
 
-#: src/postulo/jobs/models.py:717
+#: src/postulo/jobs/models.py:720
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Liema parti ta' Postulo pproduċiet dan: l-interfaċċa tal-web, jew l-API."
@@ -9801,7 +9898,7 @@ msgstr "ma' min qed tiltaqa'"
 msgid "Why"
 msgstr "Għaliex"
 
-#: src/postulo/jobs/models.py:584
+#: src/postulo/jobs/models.py:587
 #, draft
 msgid "why it was discarded"
 msgstr "għaliex ġie skartat"
@@ -9841,7 +9938,7 @@ msgstr "Ma': %(people)s"
 msgid "Withdrawn"
 msgstr "Irtirata"
 
-#: src/postulo/core/models.py:133
+#: src/postulo/core/models.py:133 src/postulo/core/models.py:360
 #, draft
 msgid "Work"
 msgstr "Xogħol"
@@ -9857,7 +9954,7 @@ msgstr "ħadem %(when)s"
 msgid "Working arrangement"
 msgstr "Arranġament tax-xogħol"
 
-#: src/postulo/jobs/models.py:536
+#: src/postulo/jobs/models.py:539
 #, draft
 msgid "working arrangement"
 msgstr "arranġament tax-xogħol"
@@ -9956,7 +10053,7 @@ msgstr "Diġà għandek tag b'dak l-isem."
 msgid "You already have that industry."
 msgstr "Diġà għandek dik l-industrija."
 
-#: src/postulo/accounts/views.py:220
+#: src/postulo/accounts/views.py:243
 #, draft
 msgid "You are already signed in."
 msgstr "Diġà dħalt."
@@ -10056,7 +10153,7 @@ msgid ""
 msgstr ""
 "Xorta se tidħol wara, u tagħti t-tieni fattur tiegħek jekk għandek wieħed. Dan il-link ibiddel il-password u xejn iżjed."
 
-#: src/postulo/accounts/views.py:302
+#: src/postulo/accounts/views.py:325
 #, draft
 msgid "Your account and everything in it have been deleted."
 msgstr "Il-kont tiegħek u kulma kien fih tħassru."
@@ -10098,6 +10195,13 @@ msgstr "Il-karriera tiegħek"
 msgid "Your career record"
 msgstr "Ir-rekord tal-karriera tiegħek"
 
+#: src/postulo/templates/partials/postal_addresses.html:97
+#, draft
+msgid ""
+"Your CV header shows a town and a country and never a street, whatever is here."
+msgstr ""
+"L-intestatura tas-CV tiegħek turi belt u pajjiż u qatt triq, ikun xi jkun hawn."
+
 #: src/postulo/templates/resume/overview.html:20
 #: src/postulo/templates/widgets/shortcuts.html:13
 #, draft
@@ -10109,7 +10213,7 @@ msgstr "Is-CVs tiegħek"
 msgid "Your dashboard is empty"
 msgstr "Id-dashboard tiegħek huwa vojt"
 
-#: src/postulo/accounts/views.py:280 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:303 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -10129,12 +10233,12 @@ msgstr "L-iskadenza tiegħek"
 msgid "Your details"
 msgstr "Id-dettalji tiegħek"
 
-#: src/postulo/accounts/views.py:112
+#: src/postulo/accounts/views.py:135
 #, draft
 msgid "Your details have been saved."
 msgstr "Id-dettalji tiegħek ġew issejvjati."
 
-#: src/postulo/accounts/views.py:159
+#: src/postulo/accounts/views.py:182
 #, draft
 msgid "Your Gravatar has been fetched again."
 msgstr "Il-Gravatar tiegħek inġieb mill-ġdid."
@@ -10168,7 +10272,7 @@ msgid ""
 msgstr ""
 "Ismek u l-blokk tal-kuntatt li se jiġi stampat fuq is-CVs tiegħek. Kif jaġixxi Postulo għalik — tema, lingwa, isem tal-utent, indirizzi — jinsab taħt <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
 
-#: src/postulo/core/models.py:148
+#: src/postulo/core/models.py:148 src/postulo/core/models.py:373
 #, draft
 msgid "Your name for it, when none of the kinds above fits."
 msgstr "L-isem tiegħek għalih, meta ebda wieħed mit-tipi ta' fuq ma jaqbel."
@@ -10188,7 +10292,7 @@ msgstr "Ismek, email u post, meħuda mill-profil tiegħek."
 msgid "Your own name"
 msgstr "Ismek stess"
 
-#: src/postulo/accounts/views.py:379
+#: src/postulo/accounts/views.py:402
 #, draft
 msgid "Your password is set. Sign in with it."
 msgstr "Il-password tiegħek hija ssettjata. Idħol biha."

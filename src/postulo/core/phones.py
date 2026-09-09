@@ -334,6 +334,25 @@ def countries() -> list[Country]:
     return [Country(code, dialling, name) for code, dialling, name in COUNTRIES]
 
 
+def country_name(code: str) -> str:
+    """The English name of a country by its alpha-2 code, or the code if it is unknown.
+
+    The table is a triple -- code, dialling prefix, name -- because it was built for
+    telephone numbers. Anything that only wants the name asks here rather than unpacking
+    it, which is what stops the third element becoming a magic index in four places (#92).
+    """
+    wanted = (code or "").strip().upper()
+    for alpha2, _prefix, name in COUNTRIES:
+        if alpha2 == wanted:
+            return name
+    return wanted
+
+
+def country_choices() -> list[tuple[str, str]]:
+    """Every country as a form choice, by name."""
+    return sorted(((alpha2, name) for alpha2, _prefix, name in COUNTRIES), key=lambda row: row[1])
+
+
 def default_country(language: str = "") -> str:
     """Which country to offer first, given what somebody reads Postulo in."""
     return FROM_LANGUAGE.get((language or "").lower(), "")

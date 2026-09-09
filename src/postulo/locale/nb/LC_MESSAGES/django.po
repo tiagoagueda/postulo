@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 20:20+0000\n"
+"POT-Creation-Date: 2026-09-09 20:49+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: norsk bokmål\n"
@@ -193,7 +193,7 @@ msgid ""
 msgstr ""
 "%(label)s inneholder fortsatt %(count)d post(er), og å avinstallere den ville etterlate dem i en tabell som ingenting kan lese, eksportere eller gjenopprette. Tøm den først fra programtilleggets egne sider, eller slå av programtillegget i stedet — av beholder alt."
 
-#: src/postulo/jobs/models.py:678
+#: src/postulo/jobs/models.py:681
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s til %(high)s"
@@ -365,7 +365,7 @@ msgstr "%(role)s hos %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s hos %(company)s — %(days)s dager"
 
-#: src/postulo/resume/importing.py:136
+#: src/postulo/resume/importing.py:172
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: ingen startdato, så den ble ikke lagt til."
@@ -448,6 +448,11 @@ msgstr "%(url)s er mye større enn en katalog bør være."
 msgid "%(when)s ago"
 msgstr "%(when)s siden"
 
+#: src/postulo/core/models.py:413
+#, draft
+msgid "(empty address)"
+msgstr "(tom adresse)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -523,7 +528,7 @@ msgstr "En CSV-fil"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Et hint til grensesnittet, for eksempel «rav» eller «himmel»."
 
-#: src/postulo/core/models.py:344
+#: src/postulo/core/models.py:478
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "En linje under navnet på innloggingssiden. Valgfritt."
@@ -617,7 +622,7 @@ msgid ""
 msgstr ""
 "En annonse du har lagt merke til. Selskapet og tittelen er nok til å begynne; resten kan komme senere."
 
-#: src/postulo/accounts/models.py:258
+#: src/postulo/accounts/models.py:261
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "En profil på GitHub, Forgejo, GitLab eller lignende."
@@ -644,7 +649,7 @@ msgstr "En påminnelse forfaller"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "En påminnelse forfaller dagen før, når det finnes en dag før."
 
-#: src/postulo/accounts/models.py:441
+#: src/postulo/accounts/models.py:444
 #, draft
 msgid "A reminder of who this is for."
 msgstr "En påminnelse om hvem dette er for."
@@ -733,12 +738,12 @@ msgstr "Godta"
 msgid "Accepted"
 msgstr "Godtatt"
 
-#: src/postulo/accounts/models.py:455
+#: src/postulo/accounts/models.py:458
 #, draft
 msgid "accepted at"
 msgstr "godtatt den"
 
-#: src/postulo/accounts/models.py:462
+#: src/postulo/accounts/models.py:465
 #, draft
 msgid "accepted by"
 msgstr "godtatt av"
@@ -918,10 +923,16 @@ msgstr "Lagt til i utlysningene dine."
 msgid "Added."
 msgstr "Lagt til."
 
-#: src/postulo/jobs/models.py:710 src/postulo/resume/models.py:230
+#: src/postulo/core/models.py:378 src/postulo/jobs/models.py:713
+#: src/postulo/resume/models.py:230
 #, draft
 msgid "address"
 msgstr "adresse"
+
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Adresse"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -996,7 +1007,7 @@ msgstr "Alle tilbys, og et språk fra en senere utgivelse også."
 msgid "Also"
 msgstr "Også"
 
-#: src/postulo/templates/accounts/profile.html:173
+#: src/postulo/templates/accounts/profile.html:174
 #, draft
 msgid "Also happens by itself when your primary address changes."
 msgstr "Skjer også av seg selv når hovedadressen din endres."
@@ -1044,7 +1055,7 @@ msgid ""
 msgstr ""
 "En indeks er en liste over kode som skal kjøre her, så den må være signert og du må ha nøkkelen. Å slå av et depot senere stopper nye installasjoner og oppdateringer derfra; det som allerede er installert fortsetter å virke."
 
-#: src/postulo/templates/accounts/profile.html:107
+#: src/postulo/templates/accounts/profile.html:108
 #, draft
 msgid ""
 "An ORCID, or another public id that says which researcher you are. A name is not an identity — two people share one, one person publishes under three — and an application form for an academic post asks for this by name. Paste a whole address if that is what you have; Postulo keeps the id."
@@ -1135,7 +1146,7 @@ msgstr "Utseende"
 #: src/postulo/applications/models.py:372
 #: src/postulo/applications/models.py:467
 #: src/postulo/applications/models.py:588 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:738
+#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:741
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1228,7 +1239,7 @@ msgstr "Søknader, med tidslinjene sine"
 
 #: src/postulo/applications/analytics.py:31
 #: src/postulo/applications/models.py:40 src/postulo/applications/tables.py:46
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:633
+#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:636
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
 msgid "Applied"
@@ -1280,7 +1291,7 @@ msgstr "Bruk på de avhukede radene"
 msgid "Apply: %(title)s"
 msgstr "Send søknad: %(title)s"
 
-#: src/postulo/jobs/models.py:434
+#: src/postulo/jobs/models.py:437
 #, draft
 msgid "Apprenticeship"
 msgstr "Lærlingplass"
@@ -1491,7 +1502,7 @@ msgid "Callback to register with it"
 msgstr "Tilbakekallsadresse å registrere hos den"
 
 #: src/postulo/templates/accounts/invite_form.html:24
-#: src/postulo/templates/accounts/profile.html:164
+#: src/postulo/templates/accounts/profile.html:165
 #: src/postulo/templates/applications/application_form.html:22
 #: src/postulo/templates/applications/application_intake.html:73
 #: src/postulo/templates/applications/interview_form.html:70
@@ -1531,7 +1542,7 @@ msgstr "Avlyst"
 msgid "Capture"
 msgstr "Fangst"
 
-#: src/postulo/jobs/models.py:742
+#: src/postulo/jobs/models.py:745
 #, draft
 msgid "capture"
 msgstr "fangst"
@@ -1573,7 +1584,7 @@ msgstr "Fang annonser"
 msgid "Capture sources this instance has"
 msgstr "Fangstkilder denne installasjonen har"
 
-#: src/postulo/jobs/models.py:714
+#: src/postulo/jobs/models.py:717
 #, draft
 msgid "captured from"
 msgstr "fanget fra"
@@ -1583,7 +1594,7 @@ msgstr "fanget fra"
 msgid "Captured: %(title)s"
 msgstr "Fanget: %(title)s"
 
-#: src/postulo/jobs/models.py:743
+#: src/postulo/jobs/models.py:746
 #, draft
 msgid "captures"
 msgstr "fangster"
@@ -1765,7 +1776,7 @@ msgstr "Velg hva slags identifikator dette er."
 msgid "Choose which application this is about first."
 msgstr "Velg hvilken søknad dette gjelder først."
 
-#: src/postulo/accounts/models.py:251
+#: src/postulo/accounts/models.py:254
 #, draft
 msgid "City and country, as it should appear on a CV."
 msgstr "By og land, slik det skal stå på en CV."
@@ -1791,17 +1802,17 @@ msgstr "Tøm"
 msgid "Clear filters"
 msgstr "Tøm filtre"
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:633
+#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:636
 #, draft
 msgid "Closed"
 msgstr "Lukket"
 
-#: src/postulo/applications/models.py:209 src/postulo/jobs/models.py:574
+#: src/postulo/applications/models.py:209 src/postulo/jobs/models.py:577
 #, draft
 msgid "closed on"
 msgstr "lukket den"
 
-#: src/postulo/jobs/models.py:461
+#: src/postulo/jobs/models.py:464
 #, draft
 msgid "Closed or already filled"
 msgstr "Lukket eller allerede besatt"
@@ -1817,7 +1828,7 @@ msgstr "Lukkes"
 msgid "Closing date"
 msgstr "Sluttdato"
 
-#: src/postulo/jobs/models.py:568
+#: src/postulo/jobs/models.py:571
 #, draft
 msgid "closing date"
 msgstr "sluttdato"
@@ -1832,7 +1843,7 @@ msgstr "Lukkes denne uken: %(total)s"
 msgid "Code (GitHub, GitLab…)"
 msgstr "Kode (GitHub, GitLab …)"
 
-#: src/postulo/accounts/models.py:256
+#: src/postulo/accounts/models.py:259
 #, draft
 msgid "code repository"
 msgstr "kodedepot"
@@ -1902,7 +1913,7 @@ msgstr "Selskap"
 
 #: src/postulo/jobs/models.py:158 src/postulo/jobs/models.py:283
 #: src/postulo/jobs/models.py:354 src/postulo/jobs/models.py:382
-#: src/postulo/jobs/models.py:531 src/postulo/jobs/tables.py:15
+#: src/postulo/jobs/models.py:534 src/postulo/jobs/tables.py:15
 #, draft
 msgid "company"
 msgstr "selskap"
@@ -2000,7 +2011,7 @@ msgstr "Tilkobling fjernet, hemmeligheter og alt."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Tilkobling lagret. Test den for å være sikker på at den virker."
 
-#: src/postulo/core/models.py:422
+#: src/postulo/core/models.py:556
 #, draft
 msgid "connection security"
 msgstr "tilkoblingens sikkerhet"
@@ -2038,7 +2049,7 @@ msgstr "Bygg og anlegg"
 msgid "Consulting"
 msgstr "Rådgivning"
 
-#: src/postulo/jobs/models.py:406
+#: src/postulo/jobs/models.py:409
 #, draft
 msgid "contact"
 msgstr "kontakt"
@@ -2059,7 +2070,7 @@ msgstr "Kontakt lagt til."
 msgid "Contact block"
 msgstr "Kontaktblokk"
 
-#: src/postulo/jobs/models.py:407
+#: src/postulo/jobs/models.py:410
 #, draft
 msgid "contacts"
 msgstr "kontakter"
@@ -2074,7 +2085,7 @@ msgstr "Inneholder"
 msgid "context"
 msgstr "sammenheng"
 
-#: src/postulo/jobs/models.py:431
+#: src/postulo/jobs/models.py:434
 #, draft
 msgid "Contract"
 msgstr "Kontrakt"
@@ -2116,7 +2127,13 @@ msgid ""
 msgstr ""
 "Telles fra tidslinjen, så intervjuer ført opp før dagboken fantes er med."
 
+#: src/postulo/core/models.py:384 src/postulo/core/postal.py:125
+#, draft
+msgid "country"
+msgstr "land"
+
 #: src/postulo/core/phone_field.py:37
+#: src/postulo/templates/partials/postal_addresses.html:48
 #, draft
 msgid "Country"
 msgstr "Land"
@@ -2153,13 +2170,13 @@ msgstr "Opprett invitasjon"
 msgid "created"
 msgstr "opprettet"
 
-#: src/postulo/accounts/models.py:307 src/postulo/accounts/models.py:378
-#: src/postulo/accounts/models.py:452 src/postulo/core/models.py:30
+#: src/postulo/accounts/models.py:310 src/postulo/accounts/models.py:381
+#: src/postulo/accounts/models.py:455 src/postulo/core/models.py:30
 #, draft
 msgid "created at"
 msgstr "opprettet den"
 
-#: src/postulo/accounts/models.py:450
+#: src/postulo/accounts/models.py:453
 #, draft
 msgid "created by"
 msgstr "opprettet av"
@@ -2174,7 +2191,7 @@ msgstr "legitimasjonslenke"
 msgid "Currency"
 msgstr "Valuta"
 
-#: src/postulo/jobs/models.py:557
+#: src/postulo/jobs/models.py:560
 #, draft
 msgid "currency"
 msgstr "valuta"
@@ -2229,7 +2246,7 @@ msgstr "Mørkt"
 msgid "Dashboard"
 msgstr "Oversikt"
 
-#: src/postulo/accounts/models.py:288
+#: src/postulo/accounts/models.py:291
 #, draft
 msgid "dashboard widgets"
 msgstr "oversiktsmoduler"
@@ -2287,7 +2304,7 @@ msgid ""
 "Days to a first reply and to a first interview: fastest, median, slowest."
 msgstr "Dager til første svar og til første intervju: raskest, median, tregest."
 
-#: src/postulo/accounts/models.py:304
+#: src/postulo/accounts/models.py:307
 #, draft
 msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
@@ -2396,7 +2413,7 @@ msgstr "Avgjort av %(who)s den %(when)s"
 msgid "Decided by %(who)s."
 msgstr "Avgjort av %(who)s."
 
-#: src/postulo/jobs/models.py:589
+#: src/postulo/jobs/models.py:592
 #, draft
 msgid "decided on"
 msgstr "avgjort den"
@@ -2416,12 +2433,12 @@ msgstr "Avslått"
 msgid "Declined. It will not be suggested again."
 msgstr "Avslått. Det blir ikke foreslått igjen."
 
-#: src/postulo/core/models.py:384
+#: src/postulo/core/models.py:518
 #, draft
 msgid "default language"
 msgstr "standardspråk"
 
-#: src/postulo/core/models.py:395
+#: src/postulo/core/models.py:529
 #, draft
 msgid "default time zone"
 msgstr "standard tidssone"
@@ -2505,7 +2522,7 @@ msgstr "Avhenger av"
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: src/postulo/jobs/models.py:549 src/postulo/resume/models.py:233
+#: src/postulo/jobs/models.py:552 src/postulo/resume/models.py:233
 #, draft
 msgid "description"
 msgstr "beskrivelse"
@@ -2548,8 +2565,8 @@ msgstr "Forkast"
 msgid "Discard this capture"
 msgstr "Forkast denne fangsten"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:454
-#: src/postulo/jobs/models.py:693
+#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:457
+#: src/postulo/jobs/models.py:696
 #, draft
 msgid "Discarded"
 msgstr "Forkastet"
@@ -2751,7 +2768,7 @@ msgstr ""
 msgid "Email"
 msgstr "E-post"
 
-#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:436
+#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:439
 #: src/postulo/jobs/models.py:396 src/postulo/resume/views.py:333
 #, draft
 msgid "email address"
@@ -2787,7 +2804,7 @@ msgstr "E-post sendt"
 msgid "Employment type"
 msgstr "Ansettelsesform"
 
-#: src/postulo/jobs/models.py:539
+#: src/postulo/jobs/models.py:542
 #, draft
 msgid "employment type"
 msgstr "ansettelsesform"
@@ -2797,7 +2814,7 @@ msgstr "ansettelsesform"
 msgid "Empty"
 msgstr "Tom"
 
-#: src/postulo/jobs/models.py:748
+#: src/postulo/jobs/models.py:751
 #, draft
 msgid "Empty capture"
 msgstr "Tom fangst"
@@ -3020,7 +3037,7 @@ msgstr "Utløper"
 msgid "expires"
 msgstr "utløper"
 
-#: src/postulo/accounts/models.py:379 src/postulo/accounts/models.py:453
+#: src/postulo/accounts/models.py:382 src/postulo/accounts/models.py:456
 #, draft
 msgid "expires at"
 msgstr "utløper klokken"
@@ -3058,7 +3075,7 @@ msgstr "Eksportert for seg"
 msgid "Failed"
 msgstr "Mislyktes"
 
-#: src/postulo/core/models.py:506 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:640 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Mislyktes uten å si hvorfor."
@@ -3078,7 +3095,7 @@ msgstr "Raskest"
 msgid "Fax"
 msgstr "Faks"
 
-#: src/postulo/templates/accounts/profile.html:171
+#: src/postulo/templates/accounts/profile.html:172
 #, draft
 msgid "Fetch my Gravatar again"
 msgstr "Hent Gravataren min på nytt"
@@ -3275,7 +3292,7 @@ msgstr "Funnet på nettstedet deres"
 msgid "Found via"
 msgstr "Funnet via"
 
-#: src/postulo/jobs/models.py:544
+#: src/postulo/jobs/models.py:547
 #, draft
 msgid "found via"
 msgstr "funnet via"
@@ -3285,7 +3302,7 @@ msgstr "funnet via"
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Fant: %(names)s. Bare de du har latt stå tomme fylles ut."
 
-#: src/postulo/jobs/models.py:432
+#: src/postulo/jobs/models.py:435
 #, draft
 msgid "Freelance"
 msgstr "Frilans"
@@ -3309,7 +3326,7 @@ msgstr "fra"
 msgid "From"
 msgstr "Fra"
 
-#: src/postulo/jobs/models.py:683
+#: src/postulo/jobs/models.py:686
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "fra %(low)s"
@@ -3319,7 +3336,7 @@ msgstr "fra %(low)s"
 msgid "From %(name)s."
 msgstr "Fra %(name)s."
 
-#: src/postulo/core/models.py:430
+#: src/postulo/core/models.py:564
 #, draft
 msgid "from address"
 msgstr "fra-adresse"
@@ -3366,7 +3383,7 @@ msgstr "fra status"
 msgid "Frozen at the moment of sending"
 msgstr "Fryst i sendeøyeblikket"
 
-#: src/postulo/jobs/models.py:429
+#: src/postulo/jobs/models.py:432
 #, draft
 msgid "Full time"
 msgstr "Heltid"
@@ -3449,17 +3466,17 @@ msgstr "Fikk noe svar"
 msgid "grade"
 msgstr "karakter"
 
-#: src/postulo/accounts/models.py:298
+#: src/postulo/accounts/models.py:301
 #, draft
 msgid "Gravatar checked on"
 msgstr "Gravatar sjekket den"
 
-#: src/postulo/accounts/models.py:296
+#: src/postulo/accounts/models.py:299
 #, draft
 msgid "Gravatar copy"
 msgstr "Gravatar-kopi"
 
-#: src/postulo/accounts/views.py:121 src/postulo/accounts/views.py:161
+#: src/postulo/accounts/views.py:144 src/postulo/accounts/views.py:184
 #, draft
 msgid "Gravatar could not be reached just now. Try again later."
 msgstr "Gravatar kunne ikke nås akkurat nå. Prøv igjen senere."
@@ -3470,7 +3487,7 @@ msgid "Gravatar had no picture for your address when last asked, on %(when)s."
 msgstr ""
 "Gravatar hadde ikke noe bilde for adressen din sist det ble spurt, den %(when)s."
 
-#: src/postulo/accounts/views.py:117 src/postulo/accounts/views.py:160
+#: src/postulo/accounts/views.py:140 src/postulo/accounts/views.py:183
 #, draft
 msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr ""
@@ -3525,7 +3542,7 @@ msgstr "Gjennomført"
 msgid "hidden"
 msgstr "skjult"
 
-#: src/postulo/accounts/models.py:267
+#: src/postulo/accounts/models.py:270
 #, draft
 msgid "hidden navigation items"
 msgstr "skjulte navigasjonspunkter"
@@ -3546,10 +3563,17 @@ msgstr "høydepunkter"
 msgid "highlights for this CV"
 msgstr "høydepunkter for denne CV-en"
 
-#: src/postulo/core/models.py:134
+#: src/postulo/core/models.py:134 src/postulo/core/models.py:359
 #, draft
 msgid "Home"
 msgstr "Hjemme"
+
+#: src/postulo/templates/partials/postal_addresses.html:15
+#, draft
+msgid ""
+"Home, work, wherever post reaches you — with one of them marked as the one to use. A form or a formal letter carries that one."
+msgstr ""
+"Hjemme, jobb, hvor enn posten når deg — med én av dem merket som den som brukes. Et skjema eller et formelt brev bærer den."
 
 #: src/postulo/jobs/industries.py:35
 #, draft
@@ -3632,7 +3656,7 @@ msgstr ""
 msgid "However you prefer to group your search."
 msgstr "Hvordan du helst vil gruppere søket ditt."
 
-#: src/postulo/jobs/models.py:424
+#: src/postulo/jobs/models.py:427
 #, draft
 msgid "Hybrid"
 msgstr "Hybrid"
@@ -3653,7 +3677,7 @@ msgstr "id i lageret"
 msgid "identifier"
 msgstr "identifikator"
 
-#: src/postulo/templates/accounts/profile.html:128
+#: src/postulo/templates/accounts/profile.html:129
 #: src/postulo/templates/jobs/company_form.html:66
 #, draft
 msgid "Identifier"
@@ -3669,7 +3693,7 @@ msgstr "identifikator hos kilden"
 msgid "identifiers"
 msgstr "identifikatorer"
 
-#: src/postulo/templates/accounts/profile.html:105
+#: src/postulo/templates/accounts/profile.html:106
 #: src/postulo/templates/jobs/company_form.html:48
 #, draft
 msgid "Identifiers"
@@ -3694,7 +3718,7 @@ msgid ""
 msgstr ""
 "Har du søkt til en EU-institusjon eller gjennom en nasjonal arbeidsformidling, har du allerede denne filen. I stedet for å skrive alt på nytt, lever den fra deg."
 
-#: src/postulo/core/models.py:353
+#: src/postulo/core/models.py:487
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "ignorer robots.txt ved fangst"
@@ -3880,7 +3904,7 @@ msgstr "Installert på denne installasjonen"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Å installere en utvidelse kjører andres kode inne i Postulo."
 
-#: src/postulo/core/models.py:335
+#: src/postulo/core/models.py:469
 #, draft
 msgid "instance name"
 msgstr "installasjonsnavn"
@@ -3900,7 +3924,7 @@ msgstr "Forsikring"
 msgid "Internal"
 msgstr "Intern"
 
-#: src/postulo/jobs/models.py:433
+#: src/postulo/jobs/models.py:436
 #, draft
 msgid "Internship"
 msgstr "Praksisplass"
@@ -3967,12 +3991,12 @@ msgstr "intervjuer"
 msgid "Interviews"
 msgstr "Intervjuer"
 
-#: src/postulo/accounts/models.py:468
+#: src/postulo/accounts/models.py:471
 #, draft
 msgid "invitation"
 msgstr "invitasjon"
 
-#: src/postulo/accounts/views.py:187
+#: src/postulo/accounts/views.py:210
 #, draft
 msgid ""
 "Invitation created. Send the person the link shown below; it can be used once."
@@ -3986,12 +4010,12 @@ msgid ""
 msgstr ""
 "Bare med invitasjon: registreringsskjemaet tilbys ikke. Inviter folk fra Personer-delen."
 
-#: src/postulo/accounts/views.py:203
+#: src/postulo/accounts/views.py:226
 #, draft
 msgid "Invitation revoked."
 msgstr "Invitasjon trukket tilbake."
 
-#: src/postulo/accounts/models.py:469
+#: src/postulo/accounts/models.py:472
 #, draft
 msgid "invitations"
 msgstr "invitasjoner"
@@ -4003,7 +4027,7 @@ msgstr "invitasjoner"
 msgid "Invitations"
 msgstr "Invitasjoner"
 
-#: src/postulo/accounts/models.py:372 src/postulo/resume/models.py:156
+#: src/postulo/accounts/models.py:375 src/postulo/resume/models.py:156
 #, draft
 msgid "issued by"
 msgstr "utstedt av"
@@ -4071,12 +4095,12 @@ msgstr "Filen stemmer med det det offisielle arkivet har signert."
 msgid "Job board"
 msgstr "Stillingsportal"
 
-#: src/postulo/jobs/models.py:594
+#: src/postulo/jobs/models.py:597
 #, draft
 msgid "job posting"
 msgstr "stillingsannonse"
 
-#: src/postulo/jobs/models.py:595
+#: src/postulo/jobs/models.py:598
 #, draft
 msgid "job postings"
 msgstr "stillingsannonser"
@@ -4133,16 +4157,17 @@ msgstr ""
 #: src/postulo/applications/models.py:324
 #: src/postulo/applications/models.py:470
 #: src/postulo/applications/models.py:594 src/postulo/core/models.py:143
-#: src/postulo/documents/models.py:230 src/postulo/documents/models.py:292
-#: src/postulo/documents/models.py:342 src/postulo/plugins/models.py:169
-#: src/postulo/resume/models.py:231
+#: src/postulo/core/models.py:368 src/postulo/documents/models.py:230
+#: src/postulo/documents/models.py:292 src/postulo/documents/models.py:342
+#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:231
 #, draft
 msgid "kind"
 msgstr "type"
 
-#: src/postulo/templates/accounts/profile.html:124
+#: src/postulo/templates/accounts/profile.html:125
 #: src/postulo/templates/jobs/company_form.html:62
 #: src/postulo/templates/partials/phone_numbers.html:40
+#: src/postulo/templates/partials/postal_addresses.html:54
 #, draft
 msgid "Kind"
 msgstr "Type"
@@ -4162,7 +4187,7 @@ msgstr "visningsnavn"
 msgid "Language"
 msgstr "Språk"
 
-#: src/postulo/accounts/models.py:261 src/postulo/documents/models.py:67
+#: src/postulo/accounts/models.py:264 src/postulo/documents/models.py:67
 #: src/postulo/documents/models.py:246 src/postulo/resume/models.py:185
 #: src/postulo/resume/models.py:191
 #, draft
@@ -4194,7 +4219,7 @@ msgstr "Språk"
 msgid "languages"
 msgstr "språk"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:528
 #, draft
 msgid "languages offered"
 msgstr "tilbudte språk"
@@ -4389,7 +4414,7 @@ msgstr "Lenke"
 msgid "link in the store"
 msgstr "lenke i lageret"
 
-#: src/postulo/accounts/models.py:254 src/postulo/jobs/models.py:402
+#: src/postulo/accounts/models.py:257 src/postulo/jobs/models.py:405
 #, draft
 msgid "LinkedIn"
 msgstr "LinkedIn"
@@ -4432,7 +4457,7 @@ msgstr "Lenker du pekte dem mot"
 msgid "listening"
 msgstr "lytting"
 
-#: src/postulo/jobs/models.py:729
+#: src/postulo/jobs/models.py:732
 #: src/postulo/templates/core/import_csv_map.html:86
 #, draft
 msgid "listing"
@@ -4464,8 +4489,8 @@ msgid ""
 msgstr ""
 "Utlysninger, søknader og tidslinjene deres, selskaper og personer, påminnelser, teksten i det du sendte, brev, CV-er, filer og karrierejournalen din — alt, også det som er lukket eller forkastet, fordi du leter etter noe du husker."
 
-#: src/postulo/accounts/models.py:248 src/postulo/jobs/models.py:136
-#: src/postulo/jobs/models.py:534 src/postulo/resume/models.py:55
+#: src/postulo/accounts/models.py:251 src/postulo/jobs/models.py:136
+#: src/postulo/jobs/models.py:537 src/postulo/resume/models.py:55
 #: src/postulo/resume/models.py:86
 #, draft
 msgid "location"
@@ -4532,7 +4557,7 @@ msgstr "Små bokstaver, sifre, punktum, understrek og bindestrek."
 msgid "Made"
 msgstr "Laget"
 
-#: src/postulo/core/models.py:461
+#: src/postulo/core/models.py:595
 #, draft
 msgid "mail failures in a row"
 msgstr "post-feil på rad"
@@ -4553,7 +4578,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Post er den eneste veien tilbake til en konto her, så inntil dette virker igjen kommer ingen av de %(counter)s personene på denne instansen inn igjen hvis de glemmer passordet sitt."
 
-#: src/postulo/core/models.py:457
+#: src/postulo/core/models.py:591
 #, draft
 msgid "mail last failed"
 msgstr "posten feilet sist"
@@ -4563,7 +4588,7 @@ msgstr "posten feilet sist"
 msgid "Mail last went out at %(when)s."
 msgstr "Posten gikk sist ut %(when)s."
 
-#: src/postulo/core/models.py:456
+#: src/postulo/core/models.py:590
 #, draft
 msgid "mail last worked"
 msgstr "posten virket sist"
@@ -4582,7 +4607,7 @@ msgid ""
 msgstr ""
 "Posten holder heller ikke lenger transporten på plass, for en vei som ikke leverer noe beskytter ingen."
 
-#: src/postulo/core/models.py:434
+#: src/postulo/core/models.py:568
 #, draft
 msgid "mail transport"
 msgstr "e-posttransport"
@@ -4592,7 +4617,7 @@ msgstr "e-posttransport"
 msgid "Mail transport"
 msgstr "E-posttransport"
 
-#: src/postulo/core/models.py:458
+#: src/postulo/core/models.py:592
 #, draft
 msgid "mail's last error"
 msgstr "postens siste feil"
@@ -4824,14 +4849,15 @@ msgstr "navn"
 msgid "Name"
 msgstr "Navn"
 
-#: src/postulo/core/models.py:145
+#: src/postulo/core/models.py:145 src/postulo/core/models.py:370
 #, draft
 msgid "name, if Other"
 msgstr "navn, hvis Annet"
 
-#: src/postulo/templates/accounts/profile.html:132
+#: src/postulo/templates/accounts/profile.html:133
 #: src/postulo/templates/jobs/company_form.html:70
 #: src/postulo/templates/partials/phone_numbers.html:44
+#: src/postulo/templates/partials/postal_addresses.html:58
 #, draft
 msgid "Name, if Other"
 msgstr "Navn, hvis Annet"
@@ -4863,7 +4889,7 @@ msgstr "Aldri"
 msgid "never used"
 msgstr "aldri brukt"
 
-#: src/postulo/jobs/models.py:452
+#: src/postulo/jobs/models.py:455
 #, draft
 msgid "New"
 msgstr "Ny"
@@ -5190,7 +5216,7 @@ msgid ""
 msgstr ""
 "Ikke satt opp. Sett POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID og POSTULO_OIDC_CLIENT_SECRET i miljøet for å tilby en innloggingsknapp for en OpenID Connect-leverandør."
 
-#: src/postulo/jobs/models.py:458
+#: src/postulo/jobs/models.py:461
 #, draft
 msgid "Not for me"
 msgstr "Ikke for meg"
@@ -5256,7 +5282,7 @@ msgstr "Ikke vist · %(name)s"
 msgid "not tested yet"
 msgstr "ikke testet ennå"
 
-#: src/postulo/accounts/models.py:441
+#: src/postulo/accounts/models.py:444
 #, draft
 msgid "note"
 msgstr "notat"
@@ -5277,7 +5303,7 @@ msgstr "Notat (valgfritt)"
 msgid "noted %(when)s"
 msgstr "notert %(when)s"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:590
 #, draft
 msgid "noted on"
 msgstr "notert den"
@@ -5289,7 +5315,7 @@ msgid "Notes"
 msgstr "Notater"
 
 #: src/postulo/documents/models.py:302 src/postulo/jobs/models.py:140
-#: src/postulo/jobs/models.py:403
+#: src/postulo/jobs/models.py:406
 #, draft
 msgid "notes"
 msgstr "notater"
@@ -5564,7 +5590,7 @@ msgstr "Tilbud"
 msgid "Offer received"
 msgstr "Tilbud mottatt"
 
-#: src/postulo/core/models.py:382
+#: src/postulo/core/models.py:516
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Tilbys bare mens posten til denne instansen faktisk kommer fram."
@@ -5591,7 +5617,7 @@ msgstr "Offisiell"
 msgid "older than a week"
 msgstr "eldre enn en uke"
 
-#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:423
+#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:426
 #, draft
 msgid "On site"
 msgstr "På stedet"
@@ -5774,7 +5800,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Ledige stillinger"
 
-#: src/postulo/accounts/models.py:438
+#: src/postulo/accounts/models.py:441
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Valgfritt. Er den satt, kan bare denne adressen bruke invitasjonen."
@@ -5820,8 +5846,9 @@ msgstr "Opprinnelig annonse"
 #: src/postulo/accounts/identifiers.py:73 src/postulo/applications/models.py:87
 #: src/postulo/applications/models.py:291
 #: src/postulo/applications/models.py:410 src/postulo/core/models.py:137
-#: src/postulo/documents/models.py:280 src/postulo/jobs/identifiers.py:95
-#: src/postulo/jobs/models.py:462 src/postulo/resume/models.py:207
+#: src/postulo/core/models.py:362 src/postulo/documents/models.py:280
+#: src/postulo/jobs/identifiers.py:95 src/postulo/jobs/models.py:465
+#: src/postulo/resume/models.py:207
 #, draft
 msgid "Other"
 msgstr "Annet"
@@ -5891,7 +5918,7 @@ msgstr "Sideinndeling"
 msgid "Panel"
 msgstr "Panel"
 
-#: src/postulo/jobs/models.py:719
+#: src/postulo/jobs/models.py:722
 #, draft
 msgid "parsed posting"
 msgstr "tolket annonse"
@@ -5911,7 +5938,7 @@ msgstr "Del av <a href=\"%(parent_url)s\" class=\"underline\">%(name)s</a>"
 msgid "Part of this company"
 msgstr "En del av dette selskapet"
 
-#: src/postulo/jobs/models.py:430
+#: src/postulo/jobs/models.py:433
 #, draft
 msgid "Part time"
 msgstr "Deltid"
@@ -5926,7 +5953,7 @@ msgstr "Delvis oversatt"
 msgid "Passkeys"
 msgstr "Passnøkler"
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:549
 #, draft
 msgid "password"
 msgstr "passord"
@@ -5980,22 +6007,22 @@ msgstr "Bare ventende"
 msgid "People"
 msgstr "Personer"
 
-#: src/postulo/jobs/models.py:440
+#: src/postulo/jobs/models.py:443
 #, draft
 msgid "Per day"
 msgstr "Per dag"
 
-#: src/postulo/jobs/models.py:441
+#: src/postulo/jobs/models.py:444
 #, draft
 msgid "Per hour"
 msgstr "Per time"
 
-#: src/postulo/jobs/models.py:439
+#: src/postulo/jobs/models.py:442
 #, draft
 msgid "Per month"
 msgstr "Per måned"
 
-#: src/postulo/jobs/models.py:438
+#: src/postulo/jobs/models.py:441
 #, draft
 msgid "Per year"
 msgstr "Per år"
@@ -6010,7 +6037,7 @@ msgstr "Periode"
 msgid "Permissions"
 msgstr "Rettigheter"
 
-#: src/postulo/accounts/models.py:364 src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:367 src/postulo/plugins/models.py:120
 #, draft
 msgid "person"
 msgstr "person"
@@ -6052,7 +6079,7 @@ msgstr "telefon"
 msgid "Phone screen"
 msgstr "Telefonintervju"
 
-#: src/postulo/accounts/models.py:291
+#: src/postulo/accounts/models.py:294
 #, draft
 msgid "picture"
 msgstr "bilde"
@@ -6122,7 +6149,7 @@ msgstr "Utvidelser for %(name)s"
 msgid "Plugins for this account"
 msgstr "Utvidelser for denne kontoen"
 
-#: src/postulo/accounts/models.py:274
+#: src/postulo/accounts/models.py:277
 #, draft
 msgid "plugins switched off"
 msgstr "utvidelser slått av"
@@ -6148,7 +6175,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP eller GIF opptil 5 MB. Det beskjæres til et kvadrat og renses for alt filen visste om hvor det ble tatt."
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:540
 #, draft
 msgid "port"
 msgstr "port"
@@ -6182,7 +6209,38 @@ msgstr "Porteføljer, profiler og videoer du pekte dem mot."
 msgid "Positions"
 msgstr "Stillinger"
 
-#: src/postulo/jobs/models.py:566
+#: src/postulo/core/models.py:361
+#, draft
+msgid "Postal"
+msgstr "Post"
+
+#: src/postulo/core/models.py:393
+#, draft
+msgid "postal address"
+msgstr "postadresse"
+
+#: src/postulo/accounts/models.py:249 src/postulo/core/models.py:394
+#: src/postulo/jobs/models.py:404
+#, draft
+msgid "postal addresses"
+msgstr "postadresser"
+
+#: src/postulo/templates/partials/postal_addresses.html:13
+#, draft
+msgid "Postal addresses"
+msgstr "Postadresser"
+
+#: src/postulo/core/models.py:379
+#, draft
+msgid "postcode"
+msgstr "postnummer"
+
+#: src/postulo/templates/partials/postal_addresses.html:34
+#, draft
+msgid "Postcode"
+msgstr "Postnummer"
+
+#: src/postulo/jobs/models.py:569
 #, draft
 msgid "posted on"
 msgstr "publisert den"
@@ -6218,7 +6276,7 @@ msgstr "Annonse oppdatert."
 msgid "Posting URL"
 msgstr "Annonse-URL"
 
-#: src/postulo/jobs/models.py:542
+#: src/postulo/jobs/models.py:545
 #, draft
 msgid "posting URL"
 msgstr "annonse-URL"
@@ -6328,12 +6386,13 @@ msgstr "Forhåndsvisning"
 msgid "Previous"
 msgstr "Forrige"
 
-#: src/postulo/core/models.py:154
+#: src/postulo/core/models.py:154 src/postulo/core/models.py:385
 #, draft
 msgid "primary"
 msgstr "primært"
 
 #: src/postulo/templates/partials/phone_numbers.html:57
+#: src/postulo/templates/partials/postal_addresses.html:69
 #: src/postulo/templates/settings/account.html:52
 #, draft
 msgid "Primary"
@@ -6359,12 +6418,12 @@ msgstr "Private og lokale adresser avvises."
 msgid "proficiency"
 msgstr "ferdighetsnivå"
 
-#: src/postulo/accounts/models.py:167 src/postulo/accounts/models.py:311
+#: src/postulo/accounts/models.py:167 src/postulo/accounts/models.py:314
 #, draft
 msgid "profile"
 msgstr "profil"
 
-#: src/postulo/accounts/models.py:312
+#: src/postulo/accounts/models.py:315
 #, draft
 msgid "profiles"
 msgstr "profiler"
@@ -6478,7 +6537,7 @@ msgstr "Oppgaver i kø"
 msgid "Quiet"
 msgstr "Stille"
 
-#: src/postulo/accounts/models.py:301
+#: src/postulo/accounts/models.py:304
 #, draft
 msgid "quiet after"
 msgstr "stille etter"
@@ -6534,7 +6593,7 @@ msgstr "Lest som Europass JSON, formatet europass.europa.eu eksporterer."
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Lest som Europass XML, formatet CV-redigereren laget."
 
-#: src/postulo/jobs/models.py:711
+#: src/postulo/jobs/models.py:714
 #, draft
 msgid "read by"
 msgstr "lest av"
@@ -6663,7 +6722,7 @@ msgstr "Førte opp hva du sendte."
 msgid "Recorded: nobody showed up."
 msgstr "Ført opp: ingen møtte opp."
 
-#: src/postulo/accounts/models.py:386
+#: src/postulo/accounts/models.py:389
 #, draft
 msgid "recovery link"
 msgstr "gjenopprettingslenke"
@@ -6674,7 +6733,7 @@ msgstr "gjenopprettingslenke"
 msgid "Recovery link"
 msgstr "Gjenopprettingslenke"
 
-#: src/postulo/accounts/models.py:387
+#: src/postulo/accounts/models.py:390
 #, draft
 msgid "recovery links"
 msgstr "gjenopprettingslenker"
@@ -6704,6 +6763,16 @@ msgstr "Anbefaling"
 msgid "Refresh logo"
 msgstr "Oppdater logo"
 
+#: src/postulo/core/models.py:383
+#, draft
+msgid "region"
+msgstr "region"
+
+#: src/postulo/templates/partials/postal_addresses.html:44
+#, draft
+msgid "Region"
+msgstr "Region"
+
 #: src/postulo/templates/connections/form.html:73
 #, draft
 msgid "Register this address with the provider"
@@ -6721,7 +6790,7 @@ msgid ""
 msgstr ""
 "Registrering er åpen: hvem som helst som finner adressen kan opprette en konto."
 
-#: src/postulo/core/models.py:347
+#: src/postulo/core/models.py:481
 #, draft
 msgid "registration open"
 msgstr "registrering åpen"
@@ -6776,7 +6845,7 @@ msgstr "Påminnelser"
 msgid "Reminders that have come due, each with a button to mark it done."
 msgstr "Påminnelser som har forfalt, hver med en knapp for å merke den ferdig."
 
-#: src/postulo/jobs/models.py:425
+#: src/postulo/jobs/models.py:428
 #, draft
 msgid "Remote"
 msgstr "Hjemmefra"
@@ -6786,12 +6855,13 @@ msgstr "Hjemmefra"
 msgid "remote address"
 msgstr "ekstern adresse"
 
-#: src/postulo/templates/accounts/profile.html:137
+#: src/postulo/templates/accounts/profile.html:138
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
 #: src/postulo/templates/partials/phone_numbers.html:82
+#: src/postulo/templates/partials/postal_addresses.html:73
 #: src/postulo/templates/server/plugins.html:151
 #: src/postulo/templates/server/plugins.html:279
 #, draft
@@ -6920,7 +6990,7 @@ msgstr "trukket tilbake"
 msgid "Revoked"
 msgstr "Trukket tilbake"
 
-#: src/postulo/accounts/models.py:381
+#: src/postulo/accounts/models.py:384
 #, draft
 msgid "revoked at"
 msgstr "trukket tilbake"
@@ -6998,12 +7068,12 @@ msgstr "Lønn (ett tall eller et spenn)"
 msgid "Salary from"
 msgstr "Lønn fra"
 
-#: src/postulo/jobs/models.py:552
+#: src/postulo/jobs/models.py:555
 #, draft
 msgid "salary from"
 msgstr "lønn fra"
 
-#: src/postulo/jobs/models.py:559
+#: src/postulo/jobs/models.py:562
 #, draft
 msgid "salary period"
 msgstr "lønnsperiode"
@@ -7013,12 +7083,12 @@ msgstr "lønnsperiode"
 msgid "Salary to"
 msgstr "Lønn til"
 
-#: src/postulo/jobs/models.py:555
+#: src/postulo/jobs/models.py:558
 #, draft
 msgid "salary to"
 msgstr "lønn til"
 
-#: src/postulo/templates/accounts/profile.html:163
+#: src/postulo/templates/accounts/profile.html:164
 #: src/postulo/templates/applications/application_form.html:21
 #: src/postulo/templates/applications/application_intake.html:72
 #: src/postulo/templates/applications/interview_form.html:68
@@ -7059,7 +7129,7 @@ msgstr "Lagre selskapet for å legge til en identifikator til."
 msgid "Save this first, then come back and agree."
 msgstr "Lagre dette først, kom så tilbake og samtykk."
 
-#: src/postulo/templates/accounts/profile.html:159
+#: src/postulo/templates/accounts/profile.html:160
 #, draft
 msgid "Save to add another identifier."
 msgstr "Lagre for å legge til en identifikator til."
@@ -7082,6 +7152,11 @@ msgstr "Lagret i utlysningene dine. Ta stilling til den når du er klar."
 #, draft
 msgid "Saved."
 msgstr "Lagret."
+
+#: src/postulo/core/postal.py:137
+#, draft
+msgid "Say what this address is."
+msgstr "Si hva denne adressen er."
 
 #: src/postulo/jobs/models.py:322
 #, draft
@@ -7340,7 +7415,7 @@ msgstr "Sett passordet"
 msgid "Set up"
 msgstr "Konfigurer"
 
-#: src/postulo/jobs/models.py:577
+#: src/postulo/jobs/models.py:580
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Sett når stillingen ikke lenger er tilgjengelig."
@@ -7381,7 +7456,7 @@ msgstr "Snarveier"
 msgid "Shortlist"
 msgstr "Sett på kortliste"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:453
+#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:456
 #, draft
 msgid "Shortlisted"
 msgstr "På kortlisten"
@@ -7417,7 +7492,7 @@ msgstr "Vis i navigasjonen"
 msgid "Show past too"
 msgstr "Vis tidligere også"
 
-#: src/postulo/core/models.py:338
+#: src/postulo/core/models.py:472
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Vises i toppfeltet og på innloggingssiden."
@@ -7428,7 +7503,7 @@ msgstr "Vises i toppfeltet og på innloggingssiden."
 msgid "Sign in"
 msgstr "Logg inn"
 
-#: src/postulo/core/models.py:379
+#: src/postulo/core/models.py:513
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "logg inn med en kode sendt på e-post"
@@ -7471,7 +7546,7 @@ msgstr "Logger inn på en eksisterende konto via e-post"
 msgid "Single sign-on"
 msgstr "Enkel pålogging"
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:492
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "enkel pålogging teller som andre faktor"
@@ -7486,7 +7561,7 @@ msgstr "Enkel pålogging teller som andre faktor"
 msgid "Site search"
 msgstr "Søk på nettstedet"
 
-#: src/postulo/core/models.py:474 src/postulo/core/models.py:475
+#: src/postulo/core/models.py:608 src/postulo/core/models.py:609
 #, draft
 msgid "site settings"
 msgstr "nettstedsinnstillinger"
@@ -7549,7 +7624,7 @@ msgstr "Tregest"
 msgid "slug"
 msgstr "kortnavn"
 
-#: src/postulo/core/models.py:404
+#: src/postulo/core/models.py:538
 #, draft
 msgid "SMTP server"
 msgstr "SMTP-server"
@@ -7605,7 +7680,7 @@ msgid ""
 msgstr ""
 "Kilde er «funnet via»-feltet på en annonse. Fyll det ut, så begynner denne tabellen å gjøre seg fortjent til plassen."
 
-#: src/postulo/jobs/models.py:712
+#: src/postulo/jobs/models.py:715
 #, draft
 msgid "source version"
 msgstr "versjon hos kilden"
@@ -7662,7 +7737,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, etter tilkobling"
 
-#: src/postulo/jobs/models.py:581 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:584 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "tilstand"
@@ -7686,7 +7761,7 @@ msgstr "Status"
 
 #: src/postulo/applications/models.py:197
 #: src/postulo/applications/models.py:611 src/postulo/documents/models.py:432
-#: src/postulo/jobs/models.py:721
+#: src/postulo/jobs/models.py:724
 #, draft
 msgid "status"
 msgstr "status"
@@ -7878,7 +7953,7 @@ msgstr "Synkronisering"
 msgid "Table"
 msgstr "Tabell"
 
-#: src/postulo/accounts/models.py:277
+#: src/postulo/accounts/models.py:280
 #, draft
 msgid "table settings"
 msgstr "tabellinnstillinger"
@@ -7896,7 +7971,7 @@ msgstr "etikett"
 msgid "Tag"
 msgstr "Etikett"
 
-#: src/postulo/core/models.py:341
+#: src/postulo/core/models.py:475
 #, draft
 msgid "tagline"
 msgstr "slagord"
@@ -7996,17 +8071,17 @@ msgstr "Test tilkoblingen"
 msgid "text as sent"
 msgstr "tekst slik den ble sendt"
 
-#: src/postulo/core/models.py:450
+#: src/postulo/core/models.py:584
 #, draft
 msgid "text configuration"
 msgstr "meldingsoppsett"
 
-#: src/postulo/core/models.py:451
+#: src/postulo/core/models.py:585
 #, draft
 msgid "text secrets"
 msgstr "meldingshemmeligheter"
 
-#: src/postulo/core/models.py:449
+#: src/postulo/core/models.py:583
 #, draft
 msgid "text transport"
 msgstr "meldingstransport"
@@ -8060,7 +8135,7 @@ msgstr "Den tilkoblingen bruker ikke samtykke."
 msgid "That connection no longer exists."
 msgstr "Den tilkoblingen finnes ikke lenger."
 
-#: src/postulo/jobs/models.py:418
+#: src/postulo/jobs/models.py:421
 #, draft
 msgid "That department belongs to a different company."
 msgstr "Den avdelingen hører til et annet selskap."
@@ -8135,7 +8210,7 @@ msgstr "Det vertsnavnet kunne ikke slås opp."
 msgid "That image is far larger than a logo needs to be."
 msgstr "Det bildet er langt større enn en logo trenger å være."
 
-#: src/postulo/accounts/views.py:199
+#: src/postulo/accounts/views.py:222
 #, draft
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Den invitasjonen er allerede godtatt og kan ikke trekkes tilbake."
@@ -8191,7 +8266,7 @@ msgstr "Det kan ikke Postulo gjøre med flere om gangen."
 msgid "That is not something this page does."
 msgstr "Det er ikke noe denne siden gjør."
 
-#: src/postulo/accounts/views.py:293
+#: src/postulo/accounts/views.py:316
 #, draft
 msgid "That is not the address on this account."
 msgstr "Det er ikke adressen på denne kontoen."
@@ -8323,7 +8398,7 @@ msgstr "Adressen svarte %(code)s."
 msgid "The address answered with nothing."
 msgstr "Adressen svarte med ingenting."
 
-#: src/postulo/jobs/models.py:571
+#: src/postulo/jobs/models.py:574
 #, draft
 msgid "The application deadline, if stated."
 msgstr "Søknadsfristen, hvis den er oppgitt."
@@ -8479,12 +8554,12 @@ msgstr ""
 msgid "The LEI's check digits do not match."
 msgstr "LEI-ens kontrollsifre stemmer ikke."
 
-#: src/postulo/jobs/models.py:730
+#: src/postulo/jobs/models.py:733
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "Utlysningen denne fangsten ble til, etter gjennomgang."
 
-#: src/postulo/jobs/models.py:460
+#: src/postulo/jobs/models.py:463
 #, draft
 msgid "The location"
 msgstr "Stedet"
@@ -8539,7 +8614,7 @@ msgid ""
 msgstr ""
 "Passordet settes av <code>%(variable)s</code> i miljøet; endre det der. Det vises aldri her."
 
-#: src/postulo/jobs/models.py:459
+#: src/postulo/jobs/models.py:462
 #, draft
 msgid "The pay"
 msgstr "Lønnen"
@@ -8682,7 +8757,7 @@ msgstr "Hjulet stemmer ikke med kontrollsummen katalogen publiserte for det."
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Hjulet har ingen metadata; det kan være skadet."
 
-#: src/postulo/accounts/models.py:263 src/postulo/documents/models.py:65
+#: src/postulo/accounts/models.py:266 src/postulo/documents/models.py:65
 #: src/postulo/documents/models.py:241
 #, draft
 msgid "theme"
@@ -8761,6 +8836,11 @@ msgstr "Disse postene kan navngi personer og søknadene deres."
 msgid "They did not show up"
 msgstr "De møtte ikke opp"
 
+#: src/postulo/core/postal.py:159
+#, draft
+msgid "This address is already listed."
+msgstr "Denne adressen står der allerede."
+
 #: src/postulo/jobs/logos.py:281
 #, draft
 msgid "This company has no website recorded."
@@ -8807,7 +8887,7 @@ msgid ""
 msgstr ""
 "Denne installasjonen sender ikke over SMTP, så innstillingene under er ført opp og ikke i bruk. Det er normalt under utvikling, der e-post skrives til konsollen."
 
-#: src/postulo/accounts/views.py:227
+#: src/postulo/accounts/views.py:250
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
 msgstr "Denne invitasjonen er for %(email)s. Registrer deg med den adressen."
@@ -8914,7 +8994,7 @@ msgstr "nivå"
 msgid "Time zone"
 msgstr "Tidssone"
 
-#: src/postulo/accounts/models.py:262
+#: src/postulo/accounts/models.py:265
 #, draft
 msgid "time zone"
 msgstr "tidssone"
@@ -8934,13 +9014,13 @@ msgstr "tidslinjeoppføring"
 msgid "Timeout"
 msgstr "Tidsavbrudd"
 
-#: src/postulo/core/models.py:428
+#: src/postulo/core/models.py:562
 #, draft
 msgid "timeout in seconds"
 msgstr "tidsavbrudd i sekunder"
 
 #: src/postulo/documents/models.py:291 src/postulo/documents/models.py:341
-#: src/postulo/jobs/models.py:533 src/postulo/resume/models.py:229
+#: src/postulo/jobs/models.py:536 src/postulo/resume/models.py:229
 #, draft
 msgid "title"
 msgstr "tittel"
@@ -8980,7 +9060,7 @@ msgstr "til status"
 msgid "Today's date"
 msgstr "Dagens dato"
 
-#: src/postulo/accounts/models.py:433
+#: src/postulo/accounts/models.py:436
 #, draft
 msgid "token"
 msgstr "token"
@@ -9010,6 +9090,16 @@ msgstr "For mange meldinger. Prøv igjen om litt."
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr "For mange forespørsler: %(times)d tillatt hvert %(seconds)d sekund."
 
+#: src/postulo/core/models.py:380
+#, draft
+msgid "town or city"
+msgstr "sted"
+
+#: src/postulo/templates/partials/postal_addresses.html:38
+#, draft
+msgid "Town or city"
+msgstr "Sted"
+
 #: src/postulo/templates/core/export.html:43
 #, draft
 msgid ""
@@ -9022,12 +9112,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Transport og logistikk"
 
-#: src/postulo/core/models.py:439
+#: src/postulo/core/models.py:573
 #, draft
 msgid "transport configuration"
 msgstr "transportoppsett"
 
-#: src/postulo/core/models.py:441
+#: src/postulo/core/models.py:575
 #, draft
 msgid "transport secrets"
 msgstr "transporthemmeligheter"
@@ -9037,12 +9127,12 @@ msgstr "transporthemmeligheter"
 msgid "Try fewer words, or a different spelling."
 msgstr "Prøv færre ord, eller en annen skrivemåte."
 
-#: src/postulo/accounts/views.py:153
+#: src/postulo/accounts/views.py:176
 #, draft
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Slå på «Bruk Gravataren min» først."
 
-#: src/postulo/jobs/models.py:692
+#: src/postulo/jobs/models.py:695
 #, draft
 msgid "Turned into an application"
 msgstr "Ble til en søknad"
@@ -9106,13 +9196,20 @@ msgstr "Ukjent identifikatorskjema."
 msgid "Unknown PDF backend %(name)r. Choose from: auto, weasyprint, chromium."
 msgstr "Ukjent PDF-motor %(name)r. Velg blant: auto, weasyprint, chromium."
 
+#: src/postulo/templates/partials/postal_addresses.html:91
+#, draft
+msgid ""
+"Unlike a telephone number, an address is not kept once on this instance — people share a home. You cannot list the same one twice yourself."
+msgstr ""
+"I motsetning til et telefonnummer holdes en adresse ikke bare én gang på denne instansen — folk deler hjem. Du selv kan ikke føre opp den samme to ganger."
+
 #: src/postulo/resume/models.py:58 src/postulo/resume/models.py:88
 #: src/postulo/resume/models.py:142
 #, draft
 msgid "until"
 msgstr "til"
 
-#: src/postulo/jobs/models.py:685
+#: src/postulo/jobs/models.py:688
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "opptil %(high)s"
@@ -9122,13 +9219,13 @@ msgstr "opptil %(high)s"
 msgid "Update the preview"
 msgstr "Oppdater forhåndsvisningen"
 
-#: src/postulo/accounts/models.py:308 src/postulo/core/models.py:31
-#: src/postulo/core/models.py:463
+#: src/postulo/accounts/models.py:311 src/postulo/core/models.py:31
+#: src/postulo/core/models.py:597
 #, draft
 msgid "updated at"
 msgstr "oppdatert den"
 
-#: src/postulo/core/models.py:470
+#: src/postulo/core/models.py:604
 #, draft
 msgid "updated by"
 msgstr "oppdatert av"
@@ -9195,7 +9292,7 @@ msgstr "Bruk en PNG, JPEG, WebP eller GIF."
 msgid "Use my Gravatar"
 msgstr "Bruk Gravataren min"
 
-#: src/postulo/accounts/models.py:293
+#: src/postulo/accounts/models.py:296
 #, draft
 msgid "use my Gravatar"
 msgstr "bruk Gravataren min"
@@ -9217,7 +9314,7 @@ msgstr ""
 msgid "Used"
 msgstr "Brukt"
 
-#: src/postulo/accounts/models.py:380
+#: src/postulo/accounts/models.py:383
 #, draft
 msgid "used at"
 msgstr "brukt"
@@ -9233,7 +9330,7 @@ msgstr "bruker"
 msgid "Username"
 msgstr "Brukernavn"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:411
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:545
 #, draft
 msgid "username"
 msgstr "brukernavn"
@@ -9316,7 +9413,7 @@ msgstr "Video"
 msgid "Video call"
 msgstr "Videosamtale"
 
-#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:691
+#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:694
 #, draft
 msgid "Waiting for review"
 msgstr "Venter på gjennomgang"
@@ -9363,7 +9460,7 @@ msgid ""
 msgstr ""
 "WeasyPrint installeres sammen med Postulo, men den trenger Pango og systembibliotekene dens. På Debian eller Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. På Windows er de tungvinte å skaffe, så bruk chromium-motoren i stedet. Se https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
-#: src/postulo/accounts/models.py:253 src/postulo/jobs/models.py:132
+#: src/postulo/accounts/models.py:256 src/postulo/jobs/models.py:132
 #: src/postulo/resume/views.py:335
 #, draft
 msgid "website"
@@ -9420,7 +9517,7 @@ msgstr "Hva som ikke kunne leses"
 msgid "What each plugin does, for everybody"
 msgstr "Hva hver utvidelse gjør, for alle"
 
-#: src/postulo/templates/accounts/profile.html:151
+#: src/postulo/templates/accounts/profile.html:152
 #: src/postulo/templates/jobs/company_form.html:89
 #, draft
 msgid "What goes where"
@@ -9587,7 +9684,7 @@ msgstr "Når"
 msgid "When accepting should also move the application."
 msgstr "Når det å godta også skal flytte søknaden."
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:590
 #, draft
 msgid "When it entered your listings."
 msgstr "Når den kom inn i utlysningene dine."
@@ -9639,7 +9736,7 @@ msgstr "Hvor det står"
 msgid "Where this company lists its openings."
 msgstr "Hvor dette selskapet lyser ut stillingene sine."
 
-#: src/postulo/jobs/models.py:547
+#: src/postulo/jobs/models.py:550
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr ""
@@ -9655,12 +9752,12 @@ msgstr "hvor du bor"
 msgid "Where your job search stands today."
 msgstr "Hvor jobbsøket ditt står i dag."
 
-#: src/postulo/core/models.py:350
+#: src/postulo/core/models.py:484
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Om hvem som helst som finner adressen kan opprette en konto."
 
-#: src/postulo/core/models.py:361
+#: src/postulo/core/models.py:495
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9696,7 +9793,7 @@ msgid ""
 msgstr ""
 "Hvilket språk denne varianten er skrevet på. La stå tomt for å følge profilen din."
 
-#: src/postulo/jobs/models.py:717
+#: src/postulo/jobs/models.py:720
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Hvilken del av Postulo som lagde dette: nettgrensesnittet, eller API-et."
@@ -9721,7 +9818,7 @@ msgstr "hvem du møter"
 msgid "Why"
 msgstr "Hvorfor"
 
-#: src/postulo/jobs/models.py:584
+#: src/postulo/jobs/models.py:587
 #, draft
 msgid "why it was discarded"
 msgstr "hvorfor den ble forkastet"
@@ -9761,7 +9858,7 @@ msgstr "Med: %(people)s"
 msgid "Withdrawn"
 msgstr "Trukket"
 
-#: src/postulo/core/models.py:133
+#: src/postulo/core/models.py:133 src/postulo/core/models.py:360
 #, draft
 msgid "Work"
 msgstr "Arbeid"
@@ -9777,7 +9874,7 @@ msgstr "virket %(when)s"
 msgid "Working arrangement"
 msgstr "Arbeidsform"
 
-#: src/postulo/jobs/models.py:536
+#: src/postulo/jobs/models.py:539
 #, draft
 msgid "working arrangement"
 msgstr "arbeidsform"
@@ -9876,7 +9973,7 @@ msgstr "Du har allerede en etikett med det navnet."
 msgid "You already have that industry."
 msgstr "Du har allerede den bransjen."
 
-#: src/postulo/accounts/views.py:220
+#: src/postulo/accounts/views.py:243
 #, draft
 msgid "You are already signed in."
 msgstr "Du er allerede logget inn."
@@ -9973,7 +10070,7 @@ msgid ""
 msgstr ""
 "Du logger inn etterpå likevel, og gir din andre faktor hvis du har en. Denne lenken endrer passordet og ingenting annet."
 
-#: src/postulo/accounts/views.py:302
+#: src/postulo/accounts/views.py:325
 #, draft
 msgid "Your account and everything in it have been deleted."
 msgstr "Kontoen din og alt i den er slettet."
@@ -10015,6 +10112,13 @@ msgstr "Karrieren din"
 msgid "Your career record"
 msgstr "Karrierejournalen din"
 
+#: src/postulo/templates/partials/postal_addresses.html:97
+#, draft
+msgid ""
+"Your CV header shows a town and a country and never a street, whatever is here."
+msgstr ""
+"CV-hodet ditt viser sted og land og aldri en gate, uansett hva som står her."
+
 #: src/postulo/templates/resume/overview.html:20
 #: src/postulo/templates/widgets/shortcuts.html:13
 #, draft
@@ -10026,7 +10130,7 @@ msgstr "CV-ene dine"
 msgid "Your dashboard is empty"
 msgstr "Oversikten din er tom"
 
-#: src/postulo/accounts/views.py:280 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:303 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -10046,12 +10150,12 @@ msgstr "Fristen din"
 msgid "Your details"
 msgstr "Opplysningene dine"
 
-#: src/postulo/accounts/views.py:112
+#: src/postulo/accounts/views.py:135
 #, draft
 msgid "Your details have been saved."
 msgstr "Opplysningene dine er lagret."
 
-#: src/postulo/accounts/views.py:159
+#: src/postulo/accounts/views.py:182
 #, draft
 msgid "Your Gravatar has been fetched again."
 msgstr "Gravataren din er hentet på nytt."
@@ -10084,7 +10188,7 @@ msgid ""
 msgstr ""
 "Navnet ditt og kontaktblokken som skrives ut på CV-ene dine. Hvordan Postulo oppfører seg for deg — tema, språk, brukernavn, adresser — ligger under <a href=\"%(settings_url)s\" class=\"underline\">Innstillinger</a>."
 
-#: src/postulo/core/models.py:148
+#: src/postulo/core/models.py:148 src/postulo/core/models.py:373
 #, draft
 msgid "Your name for it, when none of the kinds above fits."
 msgstr "Ditt eget navn på det, når ingen av typene over passer."
@@ -10104,7 +10208,7 @@ msgstr "Navnet ditt, e-posten din og stedet ditt, hentet fra profilen din."
 msgid "Your own name"
 msgstr "Ditt eget navn"
 
-#: src/postulo/accounts/views.py:379
+#: src/postulo/accounts/views.py:402
 #, draft
 msgid "Your password is set. Sign in with it."
 msgstr "Passordet ditt er satt. Logg inn med det."

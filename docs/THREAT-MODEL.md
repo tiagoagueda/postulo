@@ -20,6 +20,30 @@ attack it and what is worth defending.
 | **Someone with the token of a browser extension** | The capture API only | Scopes: an extension's token holds `captures` and nothing else, so the worst it can do is fill a review queue the person will decline. Revoke it from Settings. |
 | **A vulnerability disclosed in a dependency** | Whatever that library does | Dependencies are audited against the advisory databases on every push and weekly; the process for a disclosure is in `SECURITY.md`. |
 
+## What is most worth defending
+
+Not everything here is equally sensitive, and it is worth naming the top of that list rather
+than letting it be discovered.
+
+**A home address is the sharpest thing this application holds.** Since #92 Postulo stores
+postal addresses as structured rows — street, postcode, town — for the account holder and for
+contacts. A leaked application history is embarrassing; a leaked home address is somewhere
+somebody can be found. Three consequences, and each is a rule rather than an intention:
+
+- It is an `OwnedModel` like everything else, so the sweep in `tests/` covers it and another
+  account's address is a `404` and never a `403`.
+- It is **not unique across the instance**, deliberately. Two people at one address is a
+  household, and a uniqueness constraint would refuse the second one *and* disclose, in
+  refusing, that somebody else on this server lives there. The telephone numbers make the
+  opposite trade knowingly, and the message there says so out loud.
+- A CV header prints a town and a country and never a street. That is what stops a home
+  address reaching a stranger by default, and `Profile.location` staying its own line is the
+  mechanism rather than a convention.
+
+**Nothing about an address is verified, and nothing about it is a way back in.** Postulo is
+not going to post anything, so *valid* means well-formed enough to be used. An address can
+never become a recovery route by accident, because there is no flag on it that could.
+
 ## What is out of scope
 
 - The operator's own machine. Root on the host reads everything; that is true of any

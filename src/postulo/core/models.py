@@ -321,6 +321,140 @@ class PhoneNumber(OwnedModel):
         self.save(update_fields=["verified_at", "is_recovery", "updated_at"])
 
 
+class PostalAddress(OwnedModel):
+    """One postal address belonging to a person or to a contact.
+
+    A generic relation, for the reason :class:`PhoneNumber` gives: the holder is
+    heterogeneous, and two nullable foreign keys with a check constraint would say the same
+    thing less clearly while needing a migration every time a third kind of holder appears.
+
+    **Not unique across the instance, and that is the point rather than an omission.** A
+    telephone number belongs to one person; a postal address does not. Spouses share one,
+    flatmates share one, an adult child living at home shares one, and two siblings on a
+    family instance share one -- and a family instance is exactly the kind of small
+    self-hosted deployment this project is built for. A uniqueness constraint would refuse
+    the second member of a household their own address *and* disclose, in refusing it, that
+    somebody else on this server lives there. So: unique **per owner**, so one person cannot
+    list the same address twice, and freely shared between accounts (#92).
+
+    **Valid cannot mean verified.** Deciding whether an address exists needs a per-country
+    reference database or a paid lookup service -- a network dependency, a cost, and a
+    stream of updates. `phones.py` refuses the equivalent for telephone numbers and says
+    why: Postulo has no use for the answer, because it is not going to dial anything. Nor is
+    it going to post anything. Valid here means well-formed enough to be used, and an
+    address somebody types oddly is saved exactly as typed.
+
+    **The parts, not the format.** These five are what every format agrees on; where the
+    postcode goes and whether a region is named at all differ by country, so the parts are
+    stored and the rendering decides the order (#147).
+
+    **The primary is not for the CV header.** Guidance across most of Europe is that a CV
+    carries a city and a country and not a street -- partly because the street is irrelevant
+    and partly because a precise address invites a reader to draw conclusions about somebody
+    from where they live. `Profile.location` stays its own overridable line. Anything else
+    would quietly put people's home addresses on documents they send to strangers.
+    """
+
+    class Kind(models.TextChoices):
+        HOME = "home", _("Home")
+        WORK = "work", _("Work")
+        POSTAL = "postal", _("Postal")
+        OTHER = "other", _("Other")
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveBigIntegerField()
+    holder = GenericForeignKey("content_type", "object_id")
+
+    kind = models.CharField(_("kind"), max_length=20, choices=Kind.choices, blank=True)
+    label = models.CharField(
+        _("name, if Other"),
+        max_length=60,
+        blank=True,
+        help_text=_("Your name for it, when none of the kinds above fits."),
+    )
+    #: The street and whatever goes with it -- a number, a floor, a door, a second line.
+    #: One field rather than three, because how many lines a street address takes is one of
+    #: the things that differs by country, and splitting it here would be deciding that.
+    street = models.TextField(_("address"), blank=True)
+    postcode = models.CharField(_("postcode"), max_length=20, blank=True)
+    municipality = models.CharField(_("town or city"), max_length=120, blank=True)
+    #: A state, a province, a district, a prefecture. What it is *called* depends on the
+    #: address's country rather than on the reader's language, which is #147's problem.
+    region = models.CharField(_("region"), max_length=120, blank=True)
+    country = models.CharField(_("country"), max_length=2, blank=True)
+    is_primary = models.BooleanField(_("primary"), default=False)
+
+    #: What the uniqueness constraint compares: the parts, folded, joined. Written by
+    #: `save`, never by a form -- a value a constraint depends on cannot be somebody's to
+    #: type. Case and spacing vary in what people type and mean nothing here.
+    comparable = models.CharField(max_length=300, blank=True, db_index=True)
+
+    class Meta:
+        verbose_name = _("postal address")
+        verbose_name_plural = _("postal addresses")
+        ordering = ("-is_primary", "created_at", "pk")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("content_type", "object_id"),
+                condition=Q(is_primary=True),
+                name="one_primary_address_per_holder",
+            ),
+            # Per owner, never across the instance. Somebody listing the same address twice
+            # is a mistake worth catching; two people sharing one is a household.
+            models.UniqueConstraint(
+                fields=("owner", "comparable"),
+                condition=~Q(comparable=""),
+                name="address_unique_per_owner",
+            ),
+        ]
+        indexes = [models.Index(fields=("content_type", "object_id"))]
+
+    def __str__(self) -> str:
+        return self.one_line() or str(_("(empty address)"))
+
+    def save(self, *args, **kwargs):
+        for field in ("street", "postcode", "municipality", "region"):
+            setattr(self, field, (getattr(self, field) or "").strip())
+        self.country = (self.country or "").strip().upper()
+        if self.kind != self.Kind.OTHER:
+            self.label = ""
+        self.comparable = self.comparable_form()
+        return super().save(*args, **kwargs)
+
+    def comparable_form(self) -> str:
+        """The parts folded to something two typings of one address agree on.
+
+        Case and interior spacing, and nothing cleverer: an address written *Rua do Exemplo
+        1* and *rua do exemplo  1* is the same address, and one written *Rua do Exemplo 1A*
+        is not. Guessing past that needs the reference database this deliberately does not
+        have.
+        """
+        parts = (self.street, self.postcode, self.municipality, self.region, self.country)
+        folded = " ".join(" ".join(str(part or "").split()) for part in parts)
+        return folded.casefold().strip()[:300]
+
+    @property
+    def is_empty(self) -> bool:
+        return not self.comparable_form()
+
+    def one_line(self, separator: str = ", ") -> str:
+        """The parts in the order they were entered, for a list or a log line.
+
+        Not a rendering: printing an address correctly is per country and belongs to #147.
+        This is what to show where an address needs to be recognised rather than posted.
+        """
+        from postulo.core import phones
+
+        parts = [
+            self.street,
+            self.postcode,
+            self.municipality,
+            self.region,
+            phones.country_name(self.country),
+        ]
+        return separator.join(part for part in (p.strip() for p in parts if p) if part)
+
+
 class SiteSettings(models.Model):
     """Instance policy an administrator may change from the interface. One row.
 

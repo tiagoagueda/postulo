@@ -114,6 +114,10 @@ def account_is_empty(user) -> bool:
     )
 
 
+#: What an address row must have something in to be worth restoring at all.
+ADDRESS_PARTS = ("street", "postcode", "municipality", "region", "country")
+
+
 def _phone_rows(entry: dict) -> list[dict]:
     """Take the telephone numbers out of a record, in whichever shape the file has them.
 
@@ -127,6 +131,52 @@ def _phone_rows(entry: dict) -> list[dict]:
     if not rows and legacy:
         rows = [{"number": legacy, "is_primary": True}]
     return [row for row in rows if (row.get("number") or "").strip()]
+
+
+def _address_rows(entry: dict) -> list[dict]:
+    """Take the postal addresses out of a record. Format 9 is the first to carry any.
+
+    Removed from ``entry`` because what remains goes straight to a model that has no such
+    field. An archive from before format 9 simply has none, which is not a loss: there was
+    nowhere to keep one (#92).
+    """
+    rows = entry.pop("postal_addresses", None) or []
+    return [row for row in rows if any((row.get(part) or "").strip() for part in ADDRESS_PARTS)]
+
+
+def _restore_postal_addresses(holder, owner, rows: list[dict]) -> None:
+    """Recreate a holder's addresses.
+
+    No skipping, and that is the difference from the numbers above. Addresses are unique
+    per owner rather than across the instance, so an archive can never collide with
+    somebody else's -- two people at one address is a household. Within one import a
+    repeated address is dropped, because listing the same one twice is the mistake the
+    constraint exists to catch.
+    """
+    from postulo.core.models import PostalAddress
+
+    primary_taken = False
+    seen: set[str] = set()
+    for row in rows:
+        address = PostalAddress(
+            owner=owner,
+            holder=holder,
+            kind=(row.get("kind") or ""),
+            label=(row.get("label") or ""),
+            street=(row.get("street") or ""),
+            postcode=(row.get("postcode") or ""),
+            municipality=(row.get("municipality") or ""),
+            region=(row.get("region") or ""),
+            country=(row.get("country") or ""),
+            is_primary=bool(row.get("is_primary")) and not primary_taken,
+        )
+        comparable = address.comparable_form()
+        if comparable in seen:
+            continue
+        seen.add(comparable)
+        if address.is_primary:
+            primary_taken = True
+        address.save()
 
 
 def _restore_phone_numbers(holder, owner, rows: list[dict]) -> None:
@@ -209,6 +259,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             user.save(update_fields=["username"])
     profile_data = dict(account.get("profile") or {})
     numbers = _phone_rows(profile_data)
+    addresses = _address_rows(profile_data)
     profile = getattr(user, "profile", None)
     if profile and profile_data:
         for name, value in profile_data.items():
@@ -217,6 +268,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         profile.save()
     if profile:
         _restore_phone_numbers(profile, user, numbers)
+        _restore_postal_addresses(profile, user, addresses)
     for row in account.get("identifiers") or []:
         scheme = (row.get("scheme") or "").strip()
         value = (row.get("value") or "").strip()
@@ -355,6 +407,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         for contact_entry in contact_entries:
             old_id = contact_entry.pop("id", None)
             numbers = _phone_rows(contact_entry)
+            contact_addresses = _address_rows(contact_entry)
             department_name = (contact_entry.pop("department", "") or "").strip()[:120]
             contact = Contact.objects.create(owner=user, company=company, **contact_entry)
             if department_name:
@@ -364,6 +417,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                 contact.department = department
                 contact.save(update_fields=["department"])
             _restore_phone_numbers(contact, user, numbers)
+            _restore_postal_addresses(contact, user, contact_addresses)
             contacts[old_id] = contact
 
         for posting_entry in posting_entries:

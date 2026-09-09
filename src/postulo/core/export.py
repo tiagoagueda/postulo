@@ -28,10 +28,10 @@ from postulo import __version__
 #: each application, the ``actor`` on events, the table layout on the profile, and a list
 #: of ``industries`` on a company where there was one ``industry`` string; 4 replaced the
 #: single ``phone`` string on a profile and on a contact with a ``phone_numbers`` list;
-#: 5 added ``parent`` on a company, naming the company it belongs to. The
-#: importer still reads every earlier
-#: format, filling the new fields in.
-FORMAT_VERSION = 8
+#: 5 added ``parent`` on a company, naming the company it belongs to; 9 added
+#: ``postal_addresses`` on a profile and on a contact, which had nowhere to go before
+#: (#92). The importer still reads every earlier format, filling the new fields in.
+FORMAT_VERSION = 9
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -70,6 +70,18 @@ CONTACT_FIELDS = ("id", "name", "role", "email", "linkedin_url", "notes")
 #: What one telephone number is, in the file. Every number a holder has, in order, with
 #: the primary marked -- not the primary alone.
 PHONE_NUMBER_FIELDS = ("kind", "label", "number", "is_primary", "verified_at", "is_recovery")
+#: An address has no verification and is never a way back in, so it carries neither: it
+#: is the parts, and which one is primary (#92).
+POSTAL_ADDRESS_FIELDS = (
+    "kind",
+    "label",
+    "street",
+    "postcode",
+    "municipality",
+    "region",
+    "country",
+    "is_primary",
+)
 POSTING_FIELDS = (
     "id",
     "title",
@@ -226,6 +238,15 @@ def _phone_numbers(holder) -> list[dict]:
     return [_fields(row, PHONE_NUMBER_FIELDS) for row in holder.phone_numbers.all()]
 
 
+def _postal_addresses(holder) -> list[dict]:
+    """Every address this holder has. Taking your data out has to include where you live.
+
+    Same rule as the numbers above: what is recorded rather than what the interface is
+    showing, so a plugin toggle never becomes data loss by the back door.
+    """
+    return [_fields(row, POSTAL_ADDRESS_FIELDS) for row in holder.postal_addresses.all()]
+
+
 def _plugin_data(user) -> dict:
     from postulo.plugins import data
 
@@ -269,7 +290,11 @@ def build_document(user) -> dict:
             "first_name": user.first_name,
             "last_name": user.last_name,
             "profile": (
-                {**_fields(profile, PROFILE_FIELDS), "phone_numbers": _phone_numbers(profile)}
+                {
+                    **_fields(profile, PROFILE_FIELDS),
+                    "phone_numbers": _phone_numbers(profile),
+                    "postal_addresses": _postal_addresses(profile),
+                }
                 if profile
                 else {}
             ),
@@ -357,6 +382,7 @@ def build_document(user) -> dict:
                         **_fields(contact, CONTACT_FIELDS),
                         "department": contact.department.name if contact.department_id else "",
                         "phone_numbers": _phone_numbers(contact),
+                        "postal_addresses": _postal_addresses(contact),
                     }
                     for contact in company.contacts.all()
                 ],

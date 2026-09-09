@@ -244,6 +244,9 @@ class Profile(models.Model):
     #: without this a deleted profile would leave its telephone numbers behind, still
     #: holding their claim on the instance-wide uniqueness rule.
     phone_numbers = GenericRelation("core.PhoneNumber", verbose_name=_("telephone numbers"))
+    #: And the same for postal addresses, which are the same shape and the same
+    #: cascade -- deleting the holder deletes them (#92).
+    postal_addresses = GenericRelation("core.PostalAddress", verbose_name=_("postal addresses"))
     location = models.CharField(
         _("location"),
         max_length=120,
