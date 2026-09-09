@@ -17,7 +17,7 @@ from django.views.generic import RedirectView, TemplateView, UpdateView
 
 from postulo.core import site, widgets
 
-from . import passkeys, sso
+from . import addresses, passkeys, sso
 from .forms import AccountForm, AppearanceForm, LocaleForm
 from .models import Profile
 
@@ -83,6 +83,10 @@ class AccountView(SettingsSectionMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context["addresses"] = self.request.user.emailaddress_set.order_by("-primary", "email")
         context["email_url"] = reverse("account_email")
+        # Whether the page for managing several addresses is offered at all (#145). A
+        # feature governs what Postulo offers; the addresses themselves are allauth's,
+        # and switching this off deletes none of them.
+        context["several_addresses"] = addresses.is_offered(self.request.user)
         context["password_url"] = reverse("account_change_password")
         context["mfa_enabled"] = get_mfa_adapter().is_mfa_enabled(self.request.user)
         # A fourth way in, on a page that already explains three (#153).

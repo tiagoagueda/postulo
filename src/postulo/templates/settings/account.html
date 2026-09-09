@@ -35,7 +35,12 @@
           {% endif %}
         </p>
       </div>
-      <a href="{{ email_url }}" class="btn-secondary shrink-0">{% translate "Manage" %}</a>
+      {% comment %} Offered only where the feature is, and always where somebody already
+         has more than one address: taking the page away from them would take away the
+         way back in on the day a work address stops working (#145). {% endcomment %}
+      {% if several_addresses %}
+        <a href="{{ email_url }}" class="btn-secondary shrink-0">{% translate "Manage" %}</a>
+      {% endif %}
     </div>
     <ul class="divide-y divide-ink-200 text-sm dark:divide-ink-800">
       {% for address in addresses %}

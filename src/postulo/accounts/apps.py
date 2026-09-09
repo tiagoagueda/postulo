@@ -9,4 +9,12 @@ class AccountsConfig(AppConfig):
     verbose_name = _("Accounts")
 
     def ready(self) -> None:
+        from postulo.plugins import registry
+        from postulo.plugins.email_addresses import EmailAddressesFeature
+
         from . import signals  # noqa: F401  (registers the receivers)
+
+        # Governs the *page*, not the addresses: those are allauth's, with allauth's
+        # flows reading them, and a plugin that cannot verify an address cannot
+        # honestly own one (#145).
+        registry.register_builtin("feature", EmailAddressesFeature)

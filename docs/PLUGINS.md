@@ -782,8 +782,22 @@ A **feature** is a capability of Postulo itself, switched on and off through the
 the same policy and the same explanation as everything else here. It is the only kind that
 does not talk to anything outside the application.
 
-Postulo ships one, `phone-numbers`, which governs whether a person and their contacts may
-hold more than one telephone number.
+Postulo ships two. `phone-numbers` governs whether a person and their contacts may hold more
+than one telephone number; `email-addresses` governs whether the page for managing several
+email addresses is offered.
+
+**A feature governs what Postulo offers and uses. It does not have to own the data.**
+`email-addresses` owns none at all — the addresses belong to allauth, with allauth's flows
+reading them, and a plugin that cannot verify an address cannot honestly own one. Switching
+it off offers the primary address alone and stops offering the page; it deletes nothing,
+exactly as switching `phone-numbers` off leaves every number where it was.
+
+**A feature that could strand somebody needs a floor, and the floor goes below the policy.**
+Hiding the addresses page from somebody who keeps a spare because their work address is about
+to stop working takes away their way back in on the day they need it — so it is never hidden
+from an account that already has more than one address, whatever the policy says. If
+switching your feature off could cost somebody something they cannot get back, that is the
+shape to copy.
 
 ```toml
 [project.entry-points."postulo.features"]

@@ -136,13 +136,13 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_eight_of_them_across_seven_kinds():
+def test_there_are_nine_of_them_across_seven_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
-    `own-mail` is the newest and the only one of its kind: mail a person sends **as
-    themselves**, which is neither the instance's transport nor a notifier telling them
-    something (#149).
+    Two of them govern a page rather than a service: `phone-numbers` and
+    `email-addresses`. The second owns no data at all -- the addresses are allauth's -- and
+    that is the honest limit of what a feature can be here (#145).
     """
     found = {
         manifest_of(plugin_class()).name
@@ -159,6 +159,7 @@ def test_there_are_eight_of_them_across_seven_kinds():
         "smtp",
         "own-mail",
         "phone-numbers",
+        "email-addresses",
     }
 
 

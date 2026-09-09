@@ -227,6 +227,29 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Several email addresses is a feature you can switch off — and it governs the page, not
+  the addresses.** Everything the request asked for already worked: allauth gives an account
+  several addresses, exactly one primary, each verified independently, and that is the shape
+  telephone numbers were built to copy. What was missing was the framing, and framing it
+  raised a better question than it answered.
+
+  **A feature may govern a page it does not own the data behind.** The model belongs to a
+  library, with its migrations behind it and its own flows reading it — verification,
+  password reset, signing in by address, linking a social account — and a plugin that cannot
+  verify an address cannot honestly own one. So *off* means Postulo offers the primary
+  address and stops offering the management page, and it deletes nothing because it owns
+  nothing. That is the same thing `phone-numbers` does: a feature governs what Postulo offers
+  and uses, and neither of them destroys anything to do it.
+
+  **What off could have cost is the reason there is a floor under it.** Somebody keeps a
+  second address because the first is a work account they are about to lose; hiding the page
+  does not remove that address, but it removes their ability to promote it on the day they
+  need to — a lock-out arriving through a setting nobody thought was about getting back in.
+  So the page is never withheld from an account that already has more than one address, or
+  from one whose only address is unverified, whatever the policy says.
+
+  Worth saying plainly: with those floors, the visible change is a link disappearing. (#145)
+
 - **Mail has two halves now: the instance's and yours.** The instance's was already there —
   the SMTP transport, ungoverned on purpose, configured under *Server settings → Email*, and
   refusing to be switched off while it is the last way anybody could get back in. The other
