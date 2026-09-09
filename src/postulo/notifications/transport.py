@@ -231,7 +231,20 @@ def all_routes(*, without: str = "") -> list[Route]:
         ),
         Route(name="passkey", exists=not accounts_needing_email()),
         Route(name="text", exists=_text_reaches_everybody(without)),
+        Route(name="administrator", exists=_an_administrator_reaches_everybody()),
     ]
+
+
+def _an_administrator_reaches_everybody() -> bool:
+    """Whether an administrator could issue a link for every account (#103).
+
+    The route that needs no third party at all, and the one that finally lets an instance
+    switch mail off. It reaches everybody but the person doing the issuing, so a lone
+    administrator without a passkey is the one account it does not cover.
+    """
+    from postulo.accounts import recovery
+
+    return not recovery.accounts_no_administrator_can_reach()
 
 
 def _text_reaches_everybody(without: str = "") -> bool:

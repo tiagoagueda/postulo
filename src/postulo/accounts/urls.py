@@ -16,4 +16,9 @@ urlpatterns = [
     # Deliberately singular and distinct from the management URLs above, so that a
     # token can never be mistaken for a primary key.
     path("invitation/<str:token>/", views.InviteAcceptView.as_view(), name="invite_accept"),
+    # Singular and separate for the same reason the invitation URL is: a token must never
+    # be able to arrive where a primary key is expected. The form the link leads to has no
+    # token in its address, so the secret does not travel in a Referer header (#103).
+    path("recover/<str:token>/", views.RecoveryLinkView.as_view(), name="recovery_open"),
+    path("recover/", views.RecoverySetPasswordView.as_view(), name="recovery_set"),
 ]

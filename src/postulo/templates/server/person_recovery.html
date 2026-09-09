@@ -1,0 +1,103 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="mx-auto max-w-2xl">
+    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Recovery link" %}</h2>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed with name=person.get_full_name|default:person.email minutes=lifetime_minutes %}
+        A single-use link that lets {{ name }} choose a new password, good for {{ minutes }}
+        minutes. Postulo does not send it anywhere: you hand it over yourself, by whatever
+        means you already trust.
+      {% endblocktranslate %}
+    </p>
+
+    {% comment %} Rendered exactly once, on the response that made it. Nothing stores the
+       token, so leaving this page is the last chance to copy it -- which is the property
+       that makes the row below an honest record rather than a second copy of the secret
+       (#103). {% endcomment %}
+    {% if token_url %}
+      <div class="alert-success mb-6" role="status" data-recovery-link>
+        <p class="mb-2 font-medium">{% translate "Copy this now. It is not shown again." %}</p>
+        <p class="mb-3 break-all font-mono text-sm">{{ token_url }}</p>
+        <p class="text-sm">
+          {% blocktranslate trimmed with name=person.get_full_name|default:person.email %}
+            Give it to {{ name }} in person, on the telephone, or however else you would
+            prove it was you. Anyone who has it can set the password on that account.
+          {% endblocktranslate %}
+        </p>
+      </div>
+    {% endif %}
+
+    {% if is_yourself %}
+      <div class="alert-info mb-6 text-sm" role="note" data-yourself>
+        {% blocktranslate trimmed %}
+          This is your own account. A link you make for yourself is not a way back in — you
+          had to sign in to make it. If you are the only administrator here, a passkey or a
+          second administrator is what covers you.
+        {% endblocktranslate %}
+      </div>
+    {% endif %}
+
+    <form method="post" class="mb-8">
+      {% csrf_token %}
+      <button type="submit" class="btn-primary">
+        {% translate "Make a link" %}
+      </button>
+    </form>
+
+    <h3 class="mb-2 font-medium">{% translate "Links issued for this account" %}</h3>
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Kept after they are used or expire, because taking somebody's account back is not
+        something to be able to do without a trace.
+      {% endblocktranslate %}
+    </p>
+    {% if links %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-start text-ink-500 dark:text-ink-400">
+              <th scope="col" class="py-2 text-start font-medium">{% translate "Made" %}</th>
+              <th scope="col" class="py-2 text-start font-medium">{% translate "By" %}</th>
+              <th scope="col" class="py-2 text-start font-medium">{% translate "State" %}</th>
+              <th scope="col" class="py-2 text-end font-medium"><span class="sr-only">{% translate "Actions" %}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for link in links %}
+              <tr class="border-t border-ink-200 dark:border-ink-700">
+                <td class="py-2">{{ link.created_at }}</td>
+                <td class="py-2">{{ link.issued_by.get_full_name|default:link.issued_by.username|default:"—" }}</td>
+                <td class="py-2">
+                  {% if link.state == "live" %}{% translate "Waiting to be used" %}
+                  {% elif link.state == "used" %}{% translate "Used" %}
+                  {% elif link.state == "revoked" %}{% translate "Revoked" %}
+                  {% else %}{% translate "Expired" %}{% endif %}
+                </td>
+                <td class="py-2 text-end">
+                  {% if link.state == "live" %}
+                    <form method="post">
+                      {% csrf_token %}
+                      <button type="submit" name="revoke" value="1" class="text-red-600 underline dark:text-red-400">
+                        {% translate "Stop it working" %}
+                      </button>
+                    </form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "None yet." %}</p>
+    {% endif %}
+
+    <p class="mt-8">
+      <a href="{% url 'server:people' %}" class="text-brand-600 underline dark:text-brand-400">
+        {% translate "Back to People" %}
+      </a>
+    </p>
+  </div>
+{% endblock %}

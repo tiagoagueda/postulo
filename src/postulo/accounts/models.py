@@ -329,6 +329,84 @@ class Profile(models.Model):
         return int(self.updated_at.timestamp()) if self.updated_at else 0
 
 
+class RecoveryLinkQuerySet(models.QuerySet):
+    def live(self) -> RecoveryLinkQuerySet:
+        """Links that would work if somebody opened one right now."""
+        return self.filter(
+            used_at__isnull=True, revoked_at__isnull=True, expires_at__gt=timezone.now()
+        )
+
+
+class RecoveryLink(models.Model):
+    """One single-use way back into one account, issued by an administrator (#103).
+
+    Not an `OwnedModel`. It is a record of an administrative act about an account rather than
+    something the account holder owns, which is also why it stays out of their export: an
+    archive of somebody's job search should not contain the administrative history of their
+    password.
+
+    The row outlives the link. Used, revoked or expired, it stays as the trace of who took
+    whose account back and when — the one thing an administrator doing this should not be
+    able to do silently. There is no audit trail in *Server settings* yet and building one is
+    somebody else's issue; a full account takeover leaving no record at all is not a thing to
+    wait for it with.
+    """
+
+    #: An hour. A link that still works next week is a link that has been sitting in a chat
+    #: log for a week, and the person it was made for is standing next to the administrator
+    #: or on the telephone to them right now.
+    LIFETIME = timedelta(hours=1)
+
+    person = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="recovery_links",
+        verbose_name=_("person"),
+    )
+    issued_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("issued by"),
+    )
+    #: SHA-256 of the token, because a link only ever needs checking. Nothing anywhere keeps
+    #: the token itself: it is shown to the administrator once and then exists only in
+    #: whatever they wrote it into.
+    token_fingerprint = models.CharField(max_length=64, unique=True, editable=False)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    expires_at = models.DateTimeField(_("expires at"))
+    used_at = models.DateTimeField(_("used at"), null=True, blank=True)
+    revoked_at = models.DateTimeField(_("revoked at"), null=True, blank=True)
+
+    objects = RecoveryLinkQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("recovery link")
+        verbose_name_plural = _("recovery links")
+        ordering = ("-created_at",)
+        indexes = [models.Index(fields=("person", "-created_at"))]
+
+    def __str__(self) -> str:
+        return f"recovery link for {self.person_id}"
+
+    @property
+    def is_live(self) -> bool:
+        return self.used_at is None and self.revoked_at is None and self.expires_at > timezone.now()
+
+    @property
+    def state(self) -> str:
+        """What happened to it, for the page that lists them."""
+        if self.used_at is not None:
+            return "used"
+        if self.revoked_at is not None:
+            return "revoked"
+        if self.expires_at <= timezone.now():
+            return "expired"
+        return "live"
+
+
 class InviteQuerySet(models.QuerySet):
     def pending(self) -> InviteQuerySet:
         """Invitations that could still be accepted right now."""

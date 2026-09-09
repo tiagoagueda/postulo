@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 14:55+0000\n"
+"POT-Creation-Date: 2026-09-09 15:16+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: հայերեն\n"
@@ -52,7 +52,7 @@ msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "%(count)s դիմում լռել է"
 msgstr[1] "%(count)s դիմում լռել է"
 
-#: src/postulo/templates/server/people.html:103
+#: src/postulo/templates/server/people.html:106
 #, python-format, draft
 msgid ""
 "%(counter)s administrator. The last one cannot be removed, deactivated or deleted."
@@ -169,7 +169,7 @@ msgstr "%(kind)s-ը նշանակվեց %(when)s-ին"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s՝ %(title)s %(company)s-ում"
 
-#: src/postulo/notifications/transport.py:298
+#: src/postulo/notifications/transport.py:311
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -181,12 +181,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s-ից %(high)s"
 
-#: src/postulo/core/server_views.py:1122
+#: src/postulo/core/server_views.py:1197
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s-ը տեղադրված է կատալոգից։"
 
-#: src/postulo/core/server_views.py:1072
+#: src/postulo/core/server_views.py:1147
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -245,7 +245,7 @@ msgid ""
 msgstr ""
 "%(name)s-ը մաքուր Python չէ։ Postulo-ն տեղադրում է միայն բոլոր հարթակների համար կառուցված անիվներ (py3-none-any). այս պատկերը կոմպիլյատոր չունի։"
 
-#: src/postulo/core/server_views.py:293
+#: src/postulo/core/server_views.py:363
 #, python-format, draft
 msgid "%(name)s is now @%(username)s."
 msgstr "%(name)s-ն այժմ @%(username)s է։"
@@ -255,19 +255,19 @@ msgstr "%(name)s-ն այժմ @%(username)s է։"
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s-ն այժմ ադմինիստրատոր է։"
 
-#: src/postulo/core/server_views.py:1176
+#: src/postulo/core/server_views.py:1251
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s-ը հեռացվել է։ Վերագործարկեք Postulo-ն՝ համոզվելու համար, որ նրանից ոչինչ բեռնված չի մնացել։"
 
-#: src/postulo/core/server_views.py:1155
+#: src/postulo/core/server_views.py:1230
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s-ն անջատված է. նրա ֆայլերը դեռ այստեղ են։"
 
-#: src/postulo/core/server_views.py:1157
+#: src/postulo/core/server_views.py:1232
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s-ը կրկին միացված է։"
@@ -539,7 +539,7 @@ msgid ""
 msgstr ""
 "Անցաբանալին կապված է այն հասցեի հետ, որտեղ այն ստեղծել եք, իսկ այստեղ դա %(host)s է։ Այս տեղակայմանը այլ անունով հասնելը կամ այն տեղափոխելը ձեր անցաբանալիները հետը չի տանի։"
 
-#: src/postulo/templates/server/email.html:154
+#: src/postulo/templates/server/email.html:169
 #, draft
 msgid "A password is stored. It is never shown, not even its length."
 msgstr "Գաղտնաբառ պահված է։ Այն երբեք ցույց չի տրվում, ոչ էլ նրա երկարությունը։"
@@ -615,7 +615,7 @@ msgstr "Հիշեցման ժամկետը լրանում է"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Հիշեցման ժամկետը լրանում է մեկ օր շուտ, երբ մեկ օր շուտ կա։"
 
-#: src/postulo/accounts/models.py:363
+#: src/postulo/accounts/models.py:441
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Հիշեցում այն մասին, թե ում համար է սա։"
@@ -631,6 +631,13 @@ msgstr ""
 #, draft
 msgid "A short professional title, such as “Backend engineer”."
 msgstr "Կարճ մասնագիտական վերնագիր, օրինակ՝ «Backend ինժեներ»։"
+
+#: src/postulo/templates/server/person_recovery.html:8
+#, python-format, draft
+msgid ""
+"A single-use link that lets %(name)s choose a new password, good for %(minutes)s minutes. Postulo does not send it anywhere: you hand it over yourself, by whatever means you already trust."
+msgstr ""
+"Մեկանգամյա հղում, որով %(name)s-ը կարող է ընտրել նոր գաղտնաբառ, վավեր է %(minutes)s րոպե։ Postulo-ն այն ոչ մի տեղ չի ուղարկում. դուք ինքներդ եք փոխանցում՝ այն ճանապարհով, որին արդեն վստահում եք։"
 
 #: src/postulo/accounts/identifiers.py:75
 #, draft
@@ -657,7 +664,7 @@ msgid ""
 msgstr ""
 "Ձևանմուշ Postulo-ի սեփական սյուներով և մեկ օրինակելի տողով։ Լրացրեք և վերբեռնեք վերևում։"
 
-#: src/postulo/core/server_views.py:640
+#: src/postulo/core/server_views.py:715
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Փորձնական հաղորդագրություն %(name)s-ից"
@@ -669,7 +676,7 @@ msgid ""
 msgstr ""
 "Թոքենը թույլ է տալիս Postulo-ից դուրս գործիքին գործել ձեր փոխարեն՝ զննարկչի ընդլայնում, որը հայտարարություն է հանձնում, գործակալ, որը ձեր որոնումն է կարդում — և անում է միայն այն, ինչ նրա շրջանակները թույլ են տալիս։ Սա մուտք չէ. այն երբեք չի հասնում վեբ միջերես, և երկգործոն հաստատումը նրա վրա չի տարածվում։"
 
-#: src/postulo/templates/server/people.html:110
+#: src/postulo/templates/server/people.html:113
 #, draft
 msgid ""
 "A username is unique across the instance whoever changes it, and people can change their own under Settings."
@@ -697,12 +704,12 @@ msgstr "Ընդունել"
 msgid "Accepted"
 msgstr "Ընդունված"
 
-#: src/postulo/accounts/models.py:377
+#: src/postulo/accounts/models.py:455
 #, draft
 msgid "accepted at"
 msgstr "ընդունվել է"
 
-#: src/postulo/accounts/models.py:384
+#: src/postulo/accounts/models.py:462
 #, draft
 msgid "accepted by"
 msgstr "ընդունել է"
@@ -745,6 +752,7 @@ msgstr ""
 #: src/postulo/templates/accounts/invite_list.html:29
 #: src/postulo/templates/jobs/listing_list.html:75
 #: src/postulo/templates/server/people.html:36
+#: src/postulo/templates/server/person_recovery.html:65
 #, draft
 msgid "Actions"
 msgstr "Գործողություններ"
@@ -959,6 +967,13 @@ msgstr "Հասցե կամ հղում զանգին։"
 #, draft
 msgid "An administrator decided this for your account."
 msgstr "Սա ձեր հաշվի համար որոշել է ադմինիստրատորը։"
+
+#: src/postulo/templates/account/recovery_set_password.html:7
+#, python-format, draft
+msgid ""
+"An administrator made this link for %(name)s. It works once, and this is that once."
+msgstr ""
+"Ադմինիստրատորը այս հղումը ստեղծել է %(name)s-ի համար։ Այն աշխատում է մեկ անգամ, և դա հիմա է։"
 
 #: src/postulo/templates/core/export.html:51
 #, draft
@@ -1308,6 +1323,7 @@ msgid "Back in your listings."
 msgstr "Կրկին ձեր հայտարարություններում։"
 
 #: src/postulo/templates/server/person_delete.html:16
+#: src/postulo/templates/server/person_recovery.html:100
 #, draft
 msgid "Back to People"
 msgstr "Հետ դեպի Մարդիկ"
@@ -1376,6 +1392,11 @@ msgstr "Աղյուսակի ներմուծում"
 #, draft
 msgid "built in"
 msgstr "ներկառուցված"
+
+#: src/postulo/templates/server/person_recovery.html:63
+#, draft
+msgid "By"
+msgstr "Ում կողմից"
 
 #: src/postulo/applications/widgets.py:258
 #, draft
@@ -1454,7 +1475,7 @@ msgstr "Չեղարկել"
 msgid "Cancelled"
 msgstr "Չեղարկված"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:398
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:468
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1659,7 +1680,12 @@ msgstr "Ստուգիչ գումար"
 msgid "Choose a Europass file first."
 msgstr "Նախ ընտրեք Europass ֆայլ։"
 
-#: src/postulo/core/server_views.py:1003
+#: src/postulo/templates/account/recovery_set_password.html:5
+#, draft
+msgid "Choose a new password"
+msgstr "Ընտրեք նոր գաղտնաբառ"
+
+#: src/postulo/core/server_views.py:1078
 #, draft
 msgid "Choose a package first."
 msgstr "Նախ ընտրեք փաթեթ։"
@@ -2003,6 +2029,11 @@ msgstr "զրույց"
 msgid "Copy this now"
 msgstr "Պատճենեք սա հիմա"
 
+#: src/postulo/templates/server/person_recovery.html:22
+#, draft
+msgid "Copy this now. It is not shown again."
+msgstr "Պատճենեք հիմա։ Այն կրկին չի ցուցադրվի։"
+
 #: src/postulo/core/apps.py:9
 #, draft
 msgid "Core"
@@ -2062,13 +2093,13 @@ msgstr "Ստեղծել հրավեր"
 msgid "created"
 msgstr "ստեղծվել է"
 
-#: src/postulo/accounts/models.py:307 src/postulo/accounts/models.py:374
-#: src/postulo/core/models.py:26
+#: src/postulo/accounts/models.py:307 src/postulo/accounts/models.py:378
+#: src/postulo/accounts/models.py:452 src/postulo/core/models.py:26
 #, draft
 msgid "created at"
 msgstr "ստեղծման ժամանակ"
 
-#: src/postulo/accounts/models.py:372
+#: src/postulo/accounts/models.py:450
 #, draft
 msgid "created by"
 msgstr "ստեղծել է"
@@ -2204,7 +2235,7 @@ msgid ""
 msgstr ""
 "Օրեր, երբ ոչինչ չի կատարվում և ոչինչ պլանավորված չէ, նախքան Postulo-ն կհարցնի։"
 
-#: src/postulo/templates/server/people.html:86
+#: src/postulo/templates/server/people.html:89
 #, draft
 msgid "Deactivate"
 msgstr "Անջատել"
@@ -2337,7 +2368,7 @@ msgstr "լռելյայն լեզու"
 msgid "default time zone"
 msgstr "լռելյայն ժամային գոտի"
 
-#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:418
+#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:488
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -2363,7 +2394,7 @@ msgstr "Պաշտպանություն"
 msgid "Delete"
 msgstr "Ջնջել"
 
-#: src/postulo/templates/server/people.html:90
+#: src/postulo/templates/server/people.html:93
 #: src/postulo/templates/server/person_delete.html:6
 #, draft
 msgid "Delete account"
@@ -2650,7 +2681,7 @@ msgstr ""
 "Ցանկացած Europass ձևաչափ՝ JSON, որը europass.europa.eu-ն այսօր արտահանում է, կամ XML, որը հին CV խմբագրիչն էր ստեղծում և որը ձեր սկավառակի վրա եղած ավելի հին արտահանումը դեռ է։ Postulo-ն ինքն է պարզում, թե որն է, ցույց է տալիս ձեզ, թե ինչ կա նրա մեջ, և ոչինչ չի գրում, մինչև չասեք։"
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:524
+#: src/postulo/core/server_views.py:594
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
 #: src/postulo/templates/server/people.html:46
@@ -2658,7 +2689,7 @@ msgstr ""
 msgid "Email"
 msgstr "Էլ. փոստ"
 
-#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:358
+#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:436
 #: src/postulo/jobs/models.py:396 src/postulo/resume/views.py:333
 #, draft
 msgid "email address"
@@ -2900,6 +2931,7 @@ msgid "experience"
 msgstr "փորձ"
 
 #: src/postulo/templates/accounts/invite_list.html:40
+#: src/postulo/templates/server/person_recovery.html:77
 #, draft
 msgid "Expired"
 msgstr "Ժամկետանց"
@@ -2920,7 +2952,7 @@ msgstr "Ժամկետը լրանում է"
 msgid "expires"
 msgstr "ժամկետը լրանում է"
 
-#: src/postulo/accounts/models.py:375
+#: src/postulo/accounts/models.py:379 src/postulo/accounts/models.py:453
 #, draft
 msgid "expires at"
 msgstr "ժամկետը լրանում է ժամին"
@@ -3288,6 +3320,13 @@ msgid ""
 msgstr ""
 "«Մնացել է անպատասխան»-ը դիտավորյալ առանձին է հաշվվում մերժումից։ Գործատուն, որը դադարել է պատասխանել, ձեզ չի մերժել. նա ուղղակի ոչինչ չասաց։"
 
+#: src/postulo/templates/server/person_recovery.html:25
+#, python-format, draft
+msgid ""
+"Give it to %(name)s in person, on the telephone, or however else you would prove it was you. Anyone who has it can set the password on that account."
+msgstr ""
+"Տվեք այն %(name)s-ին անձամբ, հեռախոսով կամ ցանկացած այլ եղանակով, որով կապացուցեիք, որ դա դուք եք։ Ով ունի այն, կարող է սահմանել այդ հաշվի գաղտնաբառը։"
+
 #: src/postulo/api/views.py:54
 #, draft
 msgid "Give the token a name and at least one scope."
@@ -3555,7 +3594,7 @@ msgstr "Նույնացուցիչներ"
 msgid "Identifies itself as"
 msgstr "Ներկայանում է որպես"
 
-#: src/postulo/core/server_views.py:642
+#: src/postulo/core/server_views.py:717
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3770,7 +3809,7 @@ msgstr "հաստատություն"
 msgid "Insurance"
 msgstr "Ապահովագրություն"
 
-#: src/postulo/core/server_views.py:722
+#: src/postulo/core/server_views.py:797
 #, draft
 msgid "Internal"
 msgstr "Ներքին"
@@ -3842,7 +3881,7 @@ msgstr "հարցազրույցներ"
 msgid "Interviews"
 msgstr "Հարցազրույցներ"
 
-#: src/postulo/accounts/models.py:390
+#: src/postulo/accounts/models.py:468
 #, draft
 msgid "invitation"
 msgstr "հրավեր"
@@ -3866,7 +3905,7 @@ msgstr ""
 msgid "Invitation revoked."
 msgstr "Հրավերը հետ կանչվեց։"
 
-#: src/postulo/accounts/models.py:391
+#: src/postulo/accounts/models.py:469
 #, draft
 msgid "invitations"
 msgstr "հրավերներ"
@@ -3878,7 +3917,7 @@ msgstr "հրավերներ"
 msgid "Invitations"
 msgstr "Հրավերներ"
 
-#: src/postulo/resume/models.py:156
+#: src/postulo/accounts/models.py:372 src/postulo/resume/models.py:156
 #, draft
 msgid "issued by"
 msgstr "տվել է"
@@ -3899,6 +3938,13 @@ msgstr ""
 #, draft
 msgid "It cannot end before it starts."
 msgstr "Այն չի կարող ավարտվել սկսվելուց առաջ։"
+
+#: src/postulo/templates/account/recovery_unusable.html:11
+#, draft
+msgid ""
+"It may have been used already, or it may have run out. Ask whoever gave it to you for another one."
+msgstr ""
+"Հնարավոր է՝ այն արդեն օգտագործվել է կամ ժամկետը լրացել է։ Խնդրեք նորը նրանից, ով տվել է ձեզ։"
 
 #: src/postulo/resume/links.py:76
 #, draft
@@ -3954,6 +4000,13 @@ msgid ""
 "Keep more than one number for yourself and for the people you deal with — a mobile, a desk line, a switchboard — with one of them marked as the one to use. Switched off, Postulo shows and uses the primary number only; the others stay recorded and come back untouched when it is switched on again."
 msgstr ""
 "Պահեք մեկից ավելի համար ձեզ և այն մարդկանց համար, ում հետ գործ ունեք — բջջային, ֆիքսված գիծ, հեռախոսակայան — մեկը նշված որպես օգտագործվողը։ Անջատված լինելիս Postulo-ն ցույց է տալիս և օգտագործում միայն հիմնական համարը. մնացածը մնում են գրանցված և վերադառնում են անփոփոխ, հենց որ այն նորից միացվի։"
+
+#: src/postulo/templates/server/person_recovery.html:52
+#, draft
+msgid ""
+"Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
+msgstr ""
+"Պահվում է օգտագործվելուց կամ ժամկետը լրանալուց հետո, քանի որ որևէ մեկի հաշիվը հետ վերցնելը չպետք է հնարավոր լինի առանց հետքի։"
 
 #: src/postulo/jobs/forms.py:61
 #, draft
@@ -4256,6 +4309,11 @@ msgstr "Հղումներ"
 msgid "links"
 msgstr "հղումներ"
 
+#: src/postulo/templates/server/person_recovery.html:50
+#, draft
+msgid "Links issued for this account"
+msgstr "Այս հաշվի համար տրված հղումներ"
+
 #: src/postulo/applications/models.py:226
 #, draft
 msgid "links sent"
@@ -4346,7 +4404,7 @@ msgstr "լոգոյի հասցե"
 msgid "logo fetched"
 msgstr "լոգոն բերվել է"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:364
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:434
 #: src/postulo/templates/server/logs.html:5
 #, draft
 msgid "Logs"
@@ -4373,6 +4431,11 @@ msgstr "Փոքր թվերն առաջինն են հայտնվում։"
 #, draft
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Փոքրատառեր, թվանշաններ, կետեր, ընդգծումներ և գծիկներ։"
+
+#: src/postulo/templates/server/person_recovery.html:62
+#, draft
+msgid "Made"
+msgstr "Ստեղծված"
 
 #: src/postulo/core/models.py:397
 #, draft
@@ -4409,6 +4472,13 @@ msgstr "Փոստը վերջին անգամ դուրս է եկել %(when)s-ին�
 #, draft
 msgid "mail last worked"
 msgstr "փոստը վերջին անգամ աշխատել է"
+
+#: src/postulo/templates/server/email.html:103
+#, draft
+msgid ""
+"Mail may be switched off here, because somebody who is locked out has another way back in. Nobody could create a new account, though: a new account has to verify an address before it exists. Close registration first, or keep mail working."
+msgstr ""
+"Փոստը կարելի է անջատել այստեղ, քանի որ դրսում փակվածն ունի վերադառնալու այլ ճանապարհ։ Սակայն ոչ ոք չէր կարողանա նոր հաշիվ ստեղծել. նոր հաշիվը պետք է հաստատի հասցե՝ նախքան գոյություն ունենալը։ Նախ փակեք գրանցումը կամ պահեք փոստն աշխատող։"
 
 #: src/postulo/templates/server/email.html:81
 #, draft
@@ -4452,7 +4522,12 @@ msgstr "Հիմնական կոնտակտ"
 msgid "Maintainer"
 msgstr "Սպասարկող"
 
-#: src/postulo/templates/server/people.html:77
+#: src/postulo/templates/server/person_recovery.html:46
+#, draft
+msgid "Make a link"
+msgstr "Ստեղծել հղում"
+
+#: src/postulo/templates/server/people.html:80
 #, draft
 msgid "Make administrator"
 msgstr "Դարձնել ադմինիստրատոր"
@@ -4814,7 +4889,7 @@ msgstr ""
 msgid "no company"
 msgstr "ընկերություն չկա"
 
-#: src/postulo/core/server_views.py:620
+#: src/postulo/core/server_views.py:695
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Կապ չկա՝ %(why)s"
@@ -4989,6 +5064,11 @@ msgstr "ոչ մեկը պիտանի չէ"
 msgid "none yet"
 msgstr "դեռ ոչ մեկը"
 
+#: src/postulo/templates/server/person_recovery.html:95
+#, draft
+msgid "None yet."
+msgstr "Դեռ ոչ մեկը։"
+
 #: src/postulo/applications/models.py:92
 #, draft
 msgid "Normal"
@@ -5052,7 +5132,7 @@ msgstr "Չի գրանցվել"
 msgid "Not sent yet"
 msgstr "Դեռ ուղարկված չէ"
 
-#: src/postulo/core/server_views.py:474
+#: src/postulo/core/server_views.py:544
 #, draft
 msgid "Not set"
 msgstr "Սահմանված չէ"
@@ -5082,7 +5162,7 @@ msgstr "Ցուցադրված չէ · %(name)s"
 msgid "not tested yet"
 msgstr "դեռ չի փորձարկվել"
 
-#: src/postulo/accounts/models.py:363
+#: src/postulo/accounts/models.py:441
 #, draft
 msgid "note"
 msgstr "նշում"
@@ -5318,12 +5398,12 @@ msgid "Nothing was added."
 msgstr "Ոչինչ չավելացվեց։"
 
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:845 src/postulo/core/server_views.py:879
+#: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
 msgid "Nothing was different."
 msgstr "Ոչինչ տարբեր չէր։"
 
-#: src/postulo/core/server_views.py:1041
+#: src/postulo/core/server_views.py:1116
 #, draft
 msgid "Nothing was installed."
 msgstr "Ոչինչ չտեղադրվեց։"
@@ -5515,7 +5595,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Այս հաշվում %(total)s անցաբանալի կա։ Դրանք ձեզ մուտք են թողնում մատնահետքով, ձեր դեմքով կամ PIN-ով, և արտահոսելու գաղտնաբառ չկա։"
 
-#: src/postulo/templates/server/email.html:115
+#: src/postulo/templates/server/email.html:130
 #, python-format, draft
 msgid ""
 "One setting below is stored here and overridden by the environment. Remove that variable and the stored value takes over, without anybody editing anything."
@@ -5580,7 +5660,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Թափուր տեղեր"
 
-#: src/postulo/accounts/models.py:360
+#: src/postulo/accounts/models.py:438
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Ոչ պարտադիր։ Եթե նշված է, հրավերը կարող է օգտագործել միայն այս հասցեն։"
@@ -5784,8 +5864,8 @@ msgstr "Միայն սպասման մեջ"
 
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
 #: src/postulo/core/server_views.py:145 src/postulo/core/server_views.py:231
-#: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:273
-#: src/postulo/jobs/tables.py:50
+#: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:326
+#: src/postulo/core/server_views.py:343 src/postulo/jobs/tables.py:50
 #: src/postulo/templates/jobs/company_detail.html:141
 #: src/postulo/templates/server/people.html:7
 #, draft
@@ -5822,7 +5902,7 @@ msgstr "Ժամանակահատված"
 msgid "Permissions"
 msgstr "Թույլտվություններ"
 
-#: src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:364 src/postulo/plugins/models.py:120
 #, draft
 msgid "person"
 msgstr "մարդ"
@@ -5915,7 +5995,7 @@ msgid "plugin repository"
 msgstr "հավելումների պահոց"
 
 #: src/postulo/accounts/settings_views.py:119
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:676
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:751
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -5923,7 +6003,7 @@ msgstr "հավելումների պահոց"
 msgid "Plugins"
 msgstr "Հավելումներ"
 
-#: src/postulo/core/server_views.py:874
+#: src/postulo/core/server_views.py:949
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -6314,7 +6394,7 @@ msgid_plural "quiet for %(days)s days"
 msgstr[0] "լուռ է %(days)s օր"
 msgstr[1] "լուռ է %(days)s օր"
 
-#: src/postulo/templates/server/people.html:86
+#: src/postulo/templates/server/people.html:89
 #, draft
 msgid "Reactivate"
 msgstr "Կրկին ակտիվացնել"
@@ -6472,6 +6552,22 @@ msgstr "Գրանցվեց, թե ինչ եք ուղարկել։"
 msgid "Recorded: nobody showed up."
 msgstr "Գրանցվեց՝ ոչ ոք չներկայացավ։"
 
+#: src/postulo/accounts/models.py:386
+#, draft
+msgid "recovery link"
+msgstr "վերականգնման հղում"
+
+#: src/postulo/templates/server/people.html:74
+#: src/postulo/templates/server/person_recovery.html:6
+#, draft
+msgid "Recovery link"
+msgstr "Վերականգնման հղում"
+
+#: src/postulo/accounts/models.py:387
+#, draft
+msgid "recovery links"
+msgstr "վերականգնման հղումներ"
+
 #: src/postulo/applications/models.py:85
 #, draft
 msgid "Recruiter"
@@ -6581,7 +6677,7 @@ msgstr "հեռավոր հասցե"
 msgid "Remove"
 msgstr "Հեռացնել"
 
-#: src/postulo/templates/server/people.html:77
+#: src/postulo/templates/server/people.html:80
 #, draft
 msgid "Remove administrator"
 msgstr "Հեռացնել ադմինիստրատորին"
@@ -6699,6 +6795,16 @@ msgstr "Հետ կանչել"
 msgid "revoked"
 msgstr "հետ կանչված"
 
+#: src/postulo/templates/server/person_recovery.html:76
+#, draft
+msgid "Revoked"
+msgstr "Չեղարկված"
+
+#: src/postulo/accounts/models.py:381
+#, draft
+msgid "revoked at"
+msgstr "չեղարկվել է"
+
 #: src/postulo/templates/server/capture.html:27
 #, draft
 msgid "robots.txt is currently honoured."
@@ -6811,7 +6917,7 @@ msgstr "աշխատավարձ՝ մինչև"
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
 #: src/postulo/templates/server/defaults.html:72
-#: src/postulo/templates/server/email.html:160
+#: src/postulo/templates/server/email.html:175
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:93
@@ -6845,9 +6951,9 @@ msgstr "Պահվեց ձեր հայտարարություններում։ Որո�
 
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:319 src/postulo/core/server_views.py:447
-#: src/postulo/core/server_views.py:845 src/postulo/core/server_views.py:879
-#: src/postulo/core/server_views.py:975 src/postulo/resume/views.py:119
+#: src/postulo/core/server_views.py:389 src/postulo/core/server_views.py:517
+#: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
+#: src/postulo/core/server_views.py:1050 src/postulo/resume/views.py:119
 #, draft
 msgid "Saved."
 msgstr "Պահպանվեց։"
@@ -6949,12 +7055,12 @@ msgstr "Տեսնել ընդհանուր տեսքը"
 msgid "See the listings"
 msgstr "Տեսնել հայտարարությունները"
 
-#: src/postulo/templates/server/email.html:174
+#: src/postulo/templates/server/email.html:189
 #, draft
 msgid "Send a real message"
 msgstr "Ուղարկել իրական հաղորդագրություն"
 
-#: src/postulo/templates/server/email.html:180
+#: src/postulo/templates/server/email.html:195
 #, draft
 msgid "Send a test message"
 msgstr "Ուղարկել փորձնական հաղորդագրություն"
@@ -6985,7 +7091,7 @@ msgstr "Ուղարկել հասցեին"
 msgid "Send to stores now"
 msgstr "Ուղարկել պահոցներ հիմա"
 
-#: src/postulo/core/server_views.py:652
+#: src/postulo/core/server_views.py:727
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Ուղարկումը ձախողվեց՝ %(error)s"
@@ -7019,7 +7125,7 @@ msgstr "Ուղարկված փաստաթղթեր"
 msgid "sent on"
 msgstr "ուղարկման ամսաթիվ"
 
-#: src/postulo/core/server_views.py:655 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:730 src/postulo/notifications/email.py:85
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Ուղարկվեց %(to)s-ին։"
@@ -7084,6 +7190,11 @@ msgstr ""
 msgid "set in the environment"
 msgstr "կարգավորված է միջավայրում"
 
+#: src/postulo/templates/account/recovery_set_password.html:18
+#, draft
+msgid "Set the password"
+msgstr "Սահմանել գաղտնաբառը"
+
 #: src/postulo/templates/settings/account.html:134
 #, draft
 msgid "Set up"
@@ -7097,7 +7208,7 @@ msgstr "Նշեք, երբ պաշտոնն այլևս հասանելի չէ։"
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:108 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:21
-#: src/postulo/templates/server/email.html:130
+#: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
 #, draft
@@ -7171,6 +7282,7 @@ msgstr "Ցուցադրել նաև անցածները"
 msgid "Shown in the header and on the sign-in page."
 msgstr "Ցուցադրվում է վերնագրում և մուտքի էջում։"
 
+#: src/postulo/templates/account/recovery_unusable.html:16
 #: src/postulo/templates/base.html:128 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
@@ -7188,7 +7300,7 @@ msgstr ""
 msgid "Sign out"
 msgstr "Դուրս գալ"
 
-#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:335
+#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:405
 #: src/postulo/templates/server/signin.html:5
 #, draft
 msgid "Sign-in"
@@ -7400,6 +7512,7 @@ msgid "state"
 msgstr "վիճակ"
 
 #: src/postulo/templates/jobs/listing_list.html:74
+#: src/postulo/templates/server/person_recovery.html:64
 #, draft
 msgid "State"
 msgstr "Վիճակ"
@@ -7454,6 +7567,11 @@ msgid ""
 "Still live, in conversation, offers, and what you sent in the last month."
 msgstr ""
 "Դեռ կենդանի, զրույցի մեջ, առաջարկներ, և այն, ինչ ուղարկել եք վերջին ամսում։"
+
+#: src/postulo/templates/server/person_recovery.html:84
+#, draft
+msgid "Stop it working"
+msgstr "Դարձնել անգործուն"
 
 #: src/postulo/documents/models.py:412
 #, draft
@@ -7700,7 +7818,7 @@ msgstr "Փորձարկել"
 msgid "Test failed: %(message)s"
 msgstr "Փորձարկումը ձախողվեց՝ %(message)s"
 
-#: src/postulo/templates/server/email.html:166
+#: src/postulo/templates/server/email.html:181
 #, draft
 msgid "Test the connection"
 msgstr "Փորձարկել կապը"
@@ -7863,6 +7981,11 @@ msgstr "Այդ նկարը շատ ավելի մեծ է, քան լոգոյին պ�
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Այդ հրավերն արդեն ընդունված է և չի կարող հետ կանչվել։"
 
+#: src/postulo/core/server_views.py:295
+#, draft
+msgid "That is a lot of recovery links. Try again shortly."
+msgstr "Դա շատ վերականգնման հղում է։ Փորձեք շուտով նորից։"
+
 #: src/postulo/jobs/logos.py:122
 #, draft
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
@@ -7905,7 +8028,7 @@ msgstr "Սա արդյունք չէ, որ Postulo-ն ճանաչում է։"
 msgid "That is not something Postulo can do about it."
 msgstr "Սա այն չէ, ինչ Postulo-ն կարող է անել դրա հետ։"
 
-#: src/postulo/core/server_views.py:951 src/postulo/core/server_views.py:992
+#: src/postulo/core/server_views.py:1026 src/postulo/core/server_views.py:1067
 #, draft
 msgid "That is not something this page does."
 msgstr "Սա այն չէ, ինչ անում է այս էջը։"
@@ -7931,6 +8054,21 @@ msgstr "Սա օգտանունը չէ։"
 msgid "That is the last administrator. Appoint another first."
 msgstr "Սա վերջին ադմինիստրատորն է։ Նախ մեկ ուրիշին նշանակեք։"
 
+#: src/postulo/templates/account/recovery_unusable.html:5
+#, draft
+msgid "That link cannot be used"
+msgstr "Այդ հղումը հնարավոր չէ օգտագործել"
+
+#: src/postulo/accounts/recovery.py:90 src/postulo/accounts/recovery.py:93
+#, draft
+msgid "That link cannot be used."
+msgstr "Այդ հղումը հնարավոր չէ օգտագործել։"
+
+#: src/postulo/core/server_views.py:317
+#, draft
+msgid "That link will not work any more."
+msgstr "Այդ հղումն այլևս չի աշխատի։"
+
 #: src/postulo/core/channels.py:262
 #, draft
 msgid ""
@@ -7952,7 +8090,7 @@ msgid ""
 msgstr ""
 "Այդ ORCID-ի վերջին թվանշանը մնացածին չի համապատասխանում, ուստի դրանցից մեկում վրիպակ կա։"
 
-#: src/postulo/core/server_views.py:1050 src/postulo/core/server_views.py:1055
+#: src/postulo/core/server_views.py:1125 src/postulo/core/server_views.py:1130
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Այդ փաթեթն այլևս չի սպասում. կրկին վերբեռնեք այն։"
@@ -8038,7 +8176,7 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Կատալոգի ստորագրությունը կամ բանալին ընթեռնելի չէ՝ %(error)s"
 
-#: src/postulo/core/server_views.py:1107
+#: src/postulo/core/server_views.py:1182
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Կատալոգները պատասխանեցին և դեռ ոչինչ չեն թվարկում։"
@@ -8094,7 +8232,7 @@ msgstr "Ներբեռնվածը շատ ավելի մեծ է, քան հավելո�
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Նախորդ տարբերակը, որին սա փոխարինում է։ Հին ֆայլը պահվում է։"
 
-#: src/postulo/core/server_views.py:910 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:985 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Միջավայրը սահմանում է «%(name)s», ուստի սա այստեղ չի կարող փոխվել։"
@@ -8160,7 +8298,7 @@ msgstr "Տեղադրիչը մերժեց այն՝ %(error)s"
 msgid "The job title"
 msgstr "Աշխատանքի անվանումը"
 
-#: src/postulo/core/server_views.py:967
+#: src/postulo/core/server_views.py:1042
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -8209,7 +8347,7 @@ msgstr "Լոգոն վերացավ։"
 msgid "The logo was not changed: %(problem)s"
 msgstr "Լոգոն չփոխվեց՝ %(problem)s"
 
-#: src/postulo/core/server_views.py:657 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:732 src/postulo/notifications/email.py:84
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Փոստի շարժիչը ոչինչ չընդունեց։"
@@ -8227,7 +8365,7 @@ msgid ""
 msgstr ""
 "Օրագրի հաջորդ հարցազրույցները և բոլոր նրանք, որ անցել են առանց արդյունքի։"
 
-#: src/postulo/core/server_views.py:940
+#: src/postulo/core/server_views.py:1015
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Պաշտոնական պահոցը դատարկվում է, ոչ թե հեռացվում։"
@@ -8237,7 +8375,7 @@ msgstr "Պաշտոնական պահոցը դատարկվում է, ոչ թե հ�
 msgid "The opening paragraph, if you use one."
 msgstr "Բացող պարբերությունը, եթե օգտագործում եք։"
 
-#: src/postulo/templates/server/email.html:147
+#: src/postulo/templates/server/email.html:162
 #, python-format, draft
 msgid ""
 "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -8249,7 +8387,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Վարձատրությունը"
 
-#: src/postulo/core/server_views.py:723
+#: src/postulo/core/server_views.py:798
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Հավելումները, որոնք գալիս են Postulo-ի ներսում։ Ոչինչ չի բերվում։"
@@ -8410,7 +8548,7 @@ msgstr "Հասցե չկա, որտեղից այն նորից բերվի։"
 msgid "There is no file to send."
 msgstr "Ուղարկելու ֆայլ չկա։"
 
-#: src/postulo/core/server_views.py:905
+#: src/postulo/core/server_views.py:980
 #, draft
 msgid "There is no repository by that name."
 msgstr "Այդ անունով պահոց չկա։"
@@ -8535,6 +8673,13 @@ msgstr ""
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Սա այն է, ինչ պատրաստվում եք տեղադրել։ Դեռ ոչինչ տեղադրված չէ։"
 
+#: src/postulo/templates/server/person_recovery.html:35
+#, draft
+msgid ""
+"This is your own account. A link you make for yourself is not a way back in — you had to sign in to make it. If you are the only administrator here, a passkey or a second administrator is what covers you."
+msgstr ""
+"Սա ձեր սեփական հաշիվն է։ Ձեզ համար ստեղծված հղումը վերադարձի ճանապարհ չէ. այն ստեղծելու համար ստիպված էիք մուտք գործել։ Եթե դուք այստեղ միակ ադմինիստրատորն եք, ձեզ պաշտպանում է մուտքի բանալին կամ երկրորդ ադմինիստրատորը։"
+
 #: src/postulo/accounts/forms.py:463 src/postulo/jobs/forms.py:227
 #, draft
 msgid "This kind of identifier is already listed."
@@ -8654,7 +8799,7 @@ msgstr "կարգավիճակին"
 msgid "Today's date"
 msgstr "Այսօրվա ամսաթիվը"
 
-#: src/postulo/accounts/models.py:355
+#: src/postulo/accounts/models.py:433
 #, draft
 msgid "token"
 msgstr "թոքեն"
@@ -8879,6 +9024,16 @@ msgid ""
 msgstr ""
 "Օգտագործեք status կամ interviews վերջնակետերը. ժամանակագրությունը դրանք ինքն է գրանցում։"
 
+#: src/postulo/templates/server/person_recovery.html:75
+#, draft
+msgid "Used"
+msgstr "Օգտագործված"
+
+#: src/postulo/accounts/models.py:380
+#, draft
+msgid "used at"
+msgstr "օգտագործվել է"
+
 #: src/postulo/accounts/models.py:122 src/postulo/accounts/models.py:233
 #, draft
 msgid "user"
@@ -8905,7 +9060,7 @@ msgstr "Օգտանուն կամ էլ. փոստ"
 msgid "users"
 msgstr "օգտվողներ"
 
-#: src/postulo/templates/server/email.html:176
+#: src/postulo/templates/server/email.html:191
 #, draft
 msgid ""
 "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
@@ -8997,6 +9152,11 @@ msgstr "Միայն պատասխանի սպասողները"
 #, draft
 msgid "Waiting to be sent"
 msgstr "Սպասում է ուղարկման"
+
+#: src/postulo/templates/server/person_recovery.html:74
+#, draft
+msgid "Waiting to be used"
+msgstr "Սպասում է օգտագործման"
 
 #: src/postulo/templates/core/import_csv_map.html:78
 #, python-format, draft
@@ -9594,6 +9754,13 @@ msgstr "Դուք ամեն ինչ հանել եք դրանից։ Ինչ-որ բա
 msgid "You will be asked for the current one first."
 msgstr "Նախ ձեզնից ընթացիկը կխնդրեն։"
 
+#: src/postulo/templates/account/recovery_set_password.html:24
+#, draft
+msgid ""
+"You will still sign in afterwards, and still give your second factor if you have one. This link changes the password and nothing else."
+msgstr ""
+"Դրանից հետո դուք միևնույն է մուտք կգործեք և կտաք ձեր երկրորդ գործոնը, եթե ունեք։ Այս հղումը փոխում է գաղտնաբառը և ուրիշ ոչինչ։"
+
 #: src/postulo/accounts/views.py:301
 #, draft
 msgid "Your account and everything in it have been deleted."
@@ -9727,6 +9894,11 @@ msgstr "Ձեր անունը, էլ. փոստը և գտնվելու վայրը՝ �
 msgid "Your own name"
 msgstr "Ձեր սեփական անունը"
 
+#: src/postulo/accounts/views.py:378
+#, draft
+msgid "Your password is set. Sign in with it."
+msgstr "Ձեր գաղտնաբառը սահմանված է։ Մուտք գործեք դրանով։"
+
 #: src/postulo/templates/accounts/profile.html:25
 #, draft
 msgid "Your picture"
@@ -9742,20 +9914,20 @@ msgstr "ձեր պաշտոնը"
 msgid "Your username has been changed."
 msgstr "Ձեր օգտանունը փոխվեց։"
 
-#: src/postulo/core/server_views.py:946
+#: src/postulo/core/server_views.py:1021
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr ""
 "«%(name)s»-ը վերացավ։ Այն ամենը, ինչ տեղադրվել է նրանից, մնում է տեղադրված։"
 
-#: src/postulo/core/server_views.py:931
+#: src/postulo/core/server_views.py:1006
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "«%(name)s»-ն անջատված է։ Նրանից ոչ մի նոր բան չի տեղադրվում և չի թարմացվում. արդեն տեղադրվածը շարունակում է աշխատել։"
 
-#: src/postulo/core/server_views.py:928
+#: src/postulo/core/server_views.py:1003
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""

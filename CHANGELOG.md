@@ -201,6 +201,46 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **An administrator can issue a way back into an account, so mail is no longer the only
+  one.** Email was the single route, which made the interlock refusing to switch the mail
+  transport off while it is the last way in correct *and* permanent: on an instance with no
+  second route it could never open. Now it can.
+
+  The route needs no third party at all, and that is why it is first of the three candidates
+  rather than SMS. An administrator makes a single-use link and hands it over by whatever
+  means they already trust — in person, on the telephone. No gateway, no vendor, no cost, and
+  it is the answer for the family or small-team instance where the administrator is in the
+  same room.
+
+  A link like this is a whole account in a URL, so four properties carry the weight.
+  **Short-lived** — an hour, because a URL that still works next week has been sitting in a
+  chat log for a week. **Single-use**, and *opening* it does not spend it: a link-preview bot
+  in the chat an administrator sent it through would otherwise burn somebody's only way back
+  in by fetching it. **Shown once**, to the administrator who asked, and never mailed, logged
+  or displayed again — handing it over is their job, and doing it over the channel this
+  replaces would be absurd. **Recorded**, and the record outlives the link: who issued it, for
+  whom, when, and what became of it, because taking somebody's account back should not be
+  possible without a trace.
+
+  **It sets a password; it does not sign anybody in.** The smallest blast radius available.
+  A person who uses one still signs in afterwards and still meets their second factor, so a
+  link that goes astray is a password change on an account whose other factors are untouched.
+  The token never appears in the address of the form it leads to either, so it does not travel
+  in a `Referer` header or a synced browser history.
+
+  **An administrator cannot usefully issue one for themselves**, because making one needs
+  signing in and the person who forgot their password cannot. So the route reaches everybody
+  *but* the issuer: two administrators cover each other, one administrator covers everybody
+  else, and a lone administrator without a passkey is the single account it does not reach.
+  Counted rather than assumed, so the answer changes the moment somebody is made an
+  administrator.
+
+  **And it covers getting existing people back in, not admitting new ones.** A new account
+  still has to verify an address before it exists, so an instance with mail off can recover
+  its people and cannot take on more. The Email page says that where somebody is about to act
+  on the lock being open, rather than leaving them to discover it when the first sign-up
+  fails. (#103)
+
 - **Postulo can carry a text message, and ships nothing that sends one.** Both halves are
   the feature. There was no SMS anywhere — one comment naming it as a route that had not
   landed — and a telephone number cannot be confirmed until something can reach one.

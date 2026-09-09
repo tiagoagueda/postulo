@@ -260,6 +260,76 @@ class PersonDeleteView(StaffRequiredMixin, View):
         return redirect("server:people")
 
 
+class PersonRecoveryView(StaffRequiredMixin, View):
+    """Issue somebody a single-use way back into their account (#103).
+
+    The route that needs no third party: an administrator makes a link and hands it over by
+    whatever means they already trust. That is the whole design, and its smallness is the
+    point — a family or small-team instance can now switch mail off, which was impossible
+    while email was the only way back in.
+
+    **The link is shown once, here, and nowhere else.** It is not mailed, not logged and not
+    displayed again on a later visit: handing it over is the administrator's job, and doing
+    it over the channel this exists to replace would be absurd. What survives is the row —
+    who issued it, for whom, when, and what became of it.
+    """
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        return render(request, "server/person_recovery.html", self._context(request, pk))
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        from postulo.accounts import recovery
+        from postulo.core import throttle
+
+        person = get_object_or_404(get_user_model(), pk=pk)
+        if request.POST.get("revoke"):
+            return self._revoke(request, person)
+
+        try:
+            throttle.consume(
+                "recovery-link", request.user, throttle.rate_for("POSTULO_RECOVERY_RATE")
+            )
+        except throttle.TooOften:
+            messages.error(
+                request,
+                _("That is a lot of recovery links. Try again shortly."),
+            )
+            return redirect("server:person_recovery", pk=person.pk)
+
+        _link, token = recovery.issue(person, by=request.user)
+        context = self._context(request, person.pk)
+        # Handed to the template rather than to a message, because a message would survive
+        # into the next page and the next request. This exists for exactly one render.
+        context["token_url"] = request.build_absolute_uri(
+            reverse("accounts:recovery_open", args=[token])
+        )
+        return render(request, "server/person_recovery.html", context)
+
+    def _revoke(self, request: HttpRequest, person) -> HttpResponse:
+        from django.utils import timezone
+
+        from postulo.accounts.models import RecoveryLink
+
+        stopped = (
+            RecoveryLink.objects.live().filter(person=person).update(revoked_at=timezone.now())
+        )
+        if stopped:
+            messages.success(request, _("That link will not work any more."))
+        return redirect("server:person_recovery", pk=person.pk)
+
+    def _context(self, request: HttpRequest, pk: int) -> dict:
+        from postulo.accounts.models import RecoveryLink
+
+        person = get_object_or_404(get_user_model(), pk=pk)
+        return {
+            "person": person,
+            "section_title": _("People"),
+            "links": RecoveryLink.objects.filter(person=person)[:10],
+            "lifetime_minutes": int(RecoveryLink.LIFETIME.total_seconds() // 60),
+            "is_yourself": person.pk == request.user.pk,
+        }
+
+
 class PersonUsernameView(StaffRequiredMixin, UpdateView):
     """Change somebody's username on their behalf.
 
@@ -557,6 +627,11 @@ class EmailView(PolicyView):
             if chosen is not None and context["mailer"]["pluggable"]
             else ""
         )
+        # The other half of the answer, and the one #103 said the lock has to be explicit
+        # about: getting existing people back in and admitting new ones are different
+        # questions. A recovery link answers the first; nothing answers the second, because
+        # a new account has to verify an address before it exists.
+        context["signup_needs_mail"] = not context["locked"] and site.registration_open()
         return context
 
 

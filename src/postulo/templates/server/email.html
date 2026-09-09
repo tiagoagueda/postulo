@@ -88,6 +88,20 @@
     </p>
   {% endif %}
 
+  {% comment %} Getting existing people back in and admitting new ones are different
+     questions, and a recovery route answers only the first: a new account must verify an
+     address before it exists (#103). Said where somebody is about to act on the lock being
+     open, rather than discovered when the first sign-up fails. {% endcomment %}
+  {% if signup_needs_mail %}
+    <div class="alert-warning mb-4 text-sm" role="note" data-signup-needs-mail>
+      {% blocktranslate trimmed %}
+        Mail may be switched off here, because somebody who is locked out has another way
+        back in. Nobody could create a new account, though: a new account has to verify an
+        address before it exists. Close registration first, or keep mail working.
+      {% endblocktranslate %}
+    </div>
+  {% endif %}
+
   {% if locked %}
     {% comment %} Said here rather than only at the moment somebody tries to switch the
        package off, so an administrator planning a change finds out before they plan it.

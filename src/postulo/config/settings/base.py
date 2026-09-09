@@ -365,6 +365,10 @@ POSTULO_NUMBER_RATE = env("POSTULO_NUMBER_RATE", default="20/h")
 # costs nothing; this costs money per message.
 POSTULO_TEXT_RATE = env("POSTULO_TEXT_RATE", default="5/h")
 POSTULO_TEXT_PER_NUMBER_RATE = env("POSTULO_TEXT_PER_NUMBER_RATE", default="3/h")
+# Recovery links one administrator may issue in an hour. Each one is a whole account in a
+# URL, so this is deliberately low: an administrator helping people back in one at a time
+# never notices it, and a compromised administrator session cannot mint fifty (#103).
+POSTULO_RECOVERY_RATE = env("POSTULO_RECOVERY_RATE", default="10/h")
 
 # ---------------------------------------------------------- internationalisation
 

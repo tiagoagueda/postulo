@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 14:55+0000\n"
+"POT-Creation-Date: 2026-09-09 15:16+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: bosanski\n"
@@ -53,7 +53,7 @@ msgstr[0] "%(count)s prijava je utihnula"
 msgstr[1] "%(count)s prijave su utihnule"
 msgstr[2] "%(count)s prijava je utihnulo"
 
-#: src/postulo/templates/server/people.html:103
+#: src/postulo/templates/server/people.html:106
 #, python-format, draft
 msgid ""
 "%(counter)s administrator. The last one cannot be removed, deactivated or deleted."
@@ -181,7 +181,7 @@ msgstr "%(kind)s zakazan za %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s u %(company)s"
 
-#: src/postulo/notifications/transport.py:298
+#: src/postulo/notifications/transport.py:311
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -193,12 +193,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s do %(high)s"
 
-#: src/postulo/core/server_views.py:1122
+#: src/postulo/core/server_views.py:1197
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s je instaliran iz kataloga."
 
-#: src/postulo/core/server_views.py:1072
+#: src/postulo/core/server_views.py:1147
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -256,7 +256,7 @@ msgid ""
 msgstr ""
 "%(name)s nije čisti Python. Postulo instalira samo točkove građene za svaku platformu (py3-none-any); ova slika nema kompajler."
 
-#: src/postulo/core/server_views.py:293
+#: src/postulo/core/server_views.py:363
 #, python-format, draft
 msgid "%(name)s is now @%(username)s."
 msgstr "%(name)s je sada @%(username)s."
@@ -266,19 +266,19 @@ msgstr "%(name)s je sada @%(username)s."
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s je sada administrator."
 
-#: src/postulo/core/server_views.py:1176
+#: src/postulo/core/server_views.py:1251
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s je uklonjen. Ponovo pokrenite Postulo da biste bili sigurni da ništa od njega nije ostalo učitano."
 
-#: src/postulo/core/server_views.py:1155
+#: src/postulo/core/server_views.py:1230
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s je isključen; njegove datoteke su i dalje ovdje."
 
-#: src/postulo/core/server_views.py:1157
+#: src/postulo/core/server_views.py:1232
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s je ponovo uključen."
@@ -554,7 +554,7 @@ msgid ""
 msgstr ""
 "Pristupni ključ vezan je za adresu na kojoj ste ga napravili, a to je ovdje %(host)s. Dolazak na ovu instalaciju pod drugim imenom, ili njeno premještanje, neće ponijeti vaše pristupne ključeve."
 
-#: src/postulo/templates/server/email.html:154
+#: src/postulo/templates/server/email.html:169
 #, draft
 msgid "A password is stored. It is never shown, not even its length."
 msgstr "Lozinka je pohranjena. Nikada se ne prikazuje, čak ni njena dužina."
@@ -631,7 +631,7 @@ msgstr "Podsjetnik dospijeva"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Podsjetnik dospijeva dan ranije, kada dan ranije postoji."
 
-#: src/postulo/accounts/models.py:363
+#: src/postulo/accounts/models.py:441
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Podsjetnik kome je ovo namijenjeno."
@@ -647,6 +647,13 @@ msgstr ""
 #, draft
 msgid "A short professional title, such as “Backend engineer”."
 msgstr "Kratak profesionalni naziv, poput „Backend inženjer“."
+
+#: src/postulo/templates/server/person_recovery.html:8
+#, python-format, draft
+msgid ""
+"A single-use link that lets %(name)s choose a new password, good for %(minutes)s minutes. Postulo does not send it anywhere: you hand it over yourself, by whatever means you already trust."
+msgstr ""
+"Jednokratna veza kojom %(name)s može izabrati novu lozinku, važi %(minutes)s minuta. Postulo je nikuda ne šalje: predajete je sami, načinom kojem ionako vjerujete."
 
 #: src/postulo/accounts/identifiers.py:75
 #, draft
@@ -673,7 +680,7 @@ msgid ""
 msgstr ""
 "Predložak s vlastitim kolonama Postula i jednim primjerom reda. Popunite ga i otpremite gore."
 
-#: src/postulo/core/server_views.py:640
+#: src/postulo/core/server_views.py:715
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Probna poruka od %(name)s"
@@ -685,7 +692,7 @@ msgid ""
 msgstr ""
 "Token omogućava alatu izvan Postula da djeluje umjesto vas — dodatak za preglednik koji predaje oglas, agent koji čita vašu pretragu — i radi samo ono što njegovi opsezi dopuštaju. To nije prijava: nikada ne dopire do web sučelja, i dvofaktorska potvrda se na njega ne odnosi."
 
-#: src/postulo/templates/server/people.html:110
+#: src/postulo/templates/server/people.html:113
 #, draft
 msgid ""
 "A username is unique across the instance whoever changes it, and people can change their own under Settings."
@@ -713,12 +720,12 @@ msgstr "Prihvati"
 msgid "Accepted"
 msgstr "Prihvaćeno"
 
-#: src/postulo/accounts/models.py:377
+#: src/postulo/accounts/models.py:455
 #, draft
 msgid "accepted at"
 msgstr "prihvaćeno"
 
-#: src/postulo/accounts/models.py:384
+#: src/postulo/accounts/models.py:462
 #, draft
 msgid "accepted by"
 msgstr "prihvatio"
@@ -761,6 +768,7 @@ msgstr ""
 #: src/postulo/templates/accounts/invite_list.html:29
 #: src/postulo/templates/jobs/listing_list.html:75
 #: src/postulo/templates/server/people.html:36
+#: src/postulo/templates/server/person_recovery.html:65
 #, draft
 msgid "Actions"
 msgstr "Radnje"
@@ -975,6 +983,13 @@ msgstr "Adresa ili veza na poziv."
 #, draft
 msgid "An administrator decided this for your account."
 msgstr "Ovo je za vaš račun odlučio administrator."
+
+#: src/postulo/templates/account/recovery_set_password.html:7
+#, python-format, draft
+msgid ""
+"An administrator made this link for %(name)s. It works once, and this is that once."
+msgstr ""
+"Administrator je napravio ovu vezu za %(name)s. Radi jednom, i to je sada."
 
 #: src/postulo/templates/core/export.html:51
 #, draft
@@ -1322,6 +1337,7 @@ msgid "Back in your listings."
 msgstr "Ponovo u vašim oglasima."
 
 #: src/postulo/templates/server/person_delete.html:16
+#: src/postulo/templates/server/person_recovery.html:100
 #, draft
 msgid "Back to People"
 msgstr "Nazad na Ljude"
@@ -1390,6 +1406,11 @@ msgstr "Unošenje tabele"
 #, draft
 msgid "built in"
 msgstr "ugrađeno"
+
+#: src/postulo/templates/server/person_recovery.html:63
+#, draft
+msgid "By"
+msgstr "Od"
 
 #: src/postulo/applications/widgets.py:258
 #, draft
@@ -1468,7 +1489,7 @@ msgstr "Odustani"
 msgid "Cancelled"
 msgstr "Otkazano"
 
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:398
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:468
 #: src/postulo/templates/server/capture.html:5
 #, draft
 msgid "Capture"
@@ -1673,7 +1694,12 @@ msgstr "Kontrolna suma"
 msgid "Choose a Europass file first."
 msgstr "Prvo odaberite Europass datoteku."
 
-#: src/postulo/core/server_views.py:1003
+#: src/postulo/templates/account/recovery_set_password.html:5
+#, draft
+msgid "Choose a new password"
+msgstr "Izaberite novu lozinku"
+
+#: src/postulo/core/server_views.py:1078
 #, draft
 msgid "Choose a package first."
 msgstr "Prvo odaberite paket."
@@ -2018,6 +2044,11 @@ msgstr "razgovor"
 msgid "Copy this now"
 msgstr "Kopirajte ovo sada"
 
+#: src/postulo/templates/server/person_recovery.html:22
+#, draft
+msgid "Copy this now. It is not shown again."
+msgstr "Kopirajte je sada. Neće biti ponovo prikazana."
+
 #: src/postulo/core/apps.py:9
 #, draft
 msgid "Core"
@@ -2077,13 +2108,13 @@ msgstr "Stvori pozivnicu"
 msgid "created"
 msgstr "stvoreno"
 
-#: src/postulo/accounts/models.py:307 src/postulo/accounts/models.py:374
-#: src/postulo/core/models.py:26
+#: src/postulo/accounts/models.py:307 src/postulo/accounts/models.py:378
+#: src/postulo/accounts/models.py:452 src/postulo/core/models.py:26
 #, draft
 msgid "created at"
 msgstr "stvoreno u"
 
-#: src/postulo/accounts/models.py:372
+#: src/postulo/accounts/models.py:450
 #, draft
 msgid "created by"
 msgstr "stvorio"
@@ -2219,7 +2250,7 @@ msgid ""
 msgstr ""
 "Dani u kojima se ništa ne dešava i ništa nije planirano, prije nego što Postulo upita."
 
-#: src/postulo/templates/server/people.html:86
+#: src/postulo/templates/server/people.html:89
 #, draft
 msgid "Deactivate"
 msgstr "Deaktiviraj"
@@ -2352,7 +2383,7 @@ msgstr "zadani jezik"
 msgid "default time zone"
 msgstr "zadana vremenska zona"
 
-#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:418
+#: src/postulo/core/server_sections.py:48 src/postulo/core/server_views.py:488
 #: src/postulo/templates/server/defaults.html:5
 #, draft
 msgid "Defaults"
@@ -2378,7 +2409,7 @@ msgstr "Odbrana"
 msgid "Delete"
 msgstr "Obriši"
 
-#: src/postulo/templates/server/people.html:90
+#: src/postulo/templates/server/people.html:93
 #: src/postulo/templates/server/person_delete.html:6
 #, draft
 msgid "Delete account"
@@ -2663,7 +2694,7 @@ msgstr ""
 "Bilo koji Europass format: JSON koji europass.europa.eu izvozi danas, ili XML koji je stvarao stari CV uređivač i kakav je i dalje stariji izvoz na vašem disku. Postulo sam prepoznaje koji je, pokazuje vam šta je u njemu i ne zapisuje ništa dok ne kažete."
 
 #: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:524
+#: src/postulo/core/server_views.py:594
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
 #: src/postulo/templates/server/people.html:46
@@ -2671,7 +2702,7 @@ msgstr ""
 msgid "Email"
 msgstr "E-pošta"
 
-#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:358
+#: src/postulo/accounts/models.py:114 src/postulo/accounts/models.py:436
 #: src/postulo/jobs/models.py:396 src/postulo/resume/views.py:333
 #, draft
 msgid "email address"
@@ -2911,6 +2942,7 @@ msgid "experience"
 msgstr "iskustvo"
 
 #: src/postulo/templates/accounts/invite_list.html:40
+#: src/postulo/templates/server/person_recovery.html:77
 #, draft
 msgid "Expired"
 msgstr "Isteklo"
@@ -2931,7 +2963,7 @@ msgstr "Ističe"
 msgid "expires"
 msgstr "ističe"
 
-#: src/postulo/accounts/models.py:375
+#: src/postulo/accounts/models.py:379 src/postulo/accounts/models.py:453
 #, draft
 msgid "expires at"
 msgstr "ističe u"
@@ -3300,6 +3332,13 @@ msgid ""
 msgstr ""
 "„Bez odgovora“ broji se odvojeno od odbijanja s razlogom. Poslodavac koji je prestao odgovarati nije vas odbio; nije rekao ništa."
 
+#: src/postulo/templates/server/person_recovery.html:25
+#, python-format, draft
+msgid ""
+"Give it to %(name)s in person, on the telephone, or however else you would prove it was you. Anyone who has it can set the password on that account."
+msgstr ""
+"Dajte je %(name)s lično, telefonom ili na bilo koji drugi način kojim biste dokazali da ste to vi. Ko god je ima, može postaviti lozinku tog računa."
+
 #: src/postulo/api/views.py:54
 #, draft
 msgid "Give the token a name and at least one scope."
@@ -3564,7 +3603,7 @@ msgstr "Identifikatori"
 msgid "Identifies itself as"
 msgstr "Predstavlja se kao"
 
-#: src/postulo/core/server_views.py:642
+#: src/postulo/core/server_views.py:717
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3779,7 +3818,7 @@ msgstr "ustanova"
 msgid "Insurance"
 msgstr "Osiguranje"
 
-#: src/postulo/core/server_views.py:722
+#: src/postulo/core/server_views.py:797
 #, draft
 msgid "Internal"
 msgstr "Interno"
@@ -3851,7 +3890,7 @@ msgstr "intervjui"
 msgid "Interviews"
 msgstr "Intervjui"
 
-#: src/postulo/accounts/models.py:390
+#: src/postulo/accounts/models.py:468
 #, draft
 msgid "invitation"
 msgstr "pozivnica"
@@ -3875,7 +3914,7 @@ msgstr ""
 msgid "Invitation revoked."
 msgstr "Pozivnica povučena."
 
-#: src/postulo/accounts/models.py:391
+#: src/postulo/accounts/models.py:469
 #, draft
 msgid "invitations"
 msgstr "pozivnice"
@@ -3887,7 +3926,7 @@ msgstr "pozivnice"
 msgid "Invitations"
 msgstr "Pozivnice"
 
-#: src/postulo/resume/models.py:156
+#: src/postulo/accounts/models.py:372 src/postulo/resume/models.py:156
 #, draft
 msgid "issued by"
 msgstr "izdao"
@@ -3908,6 +3947,13 @@ msgstr ""
 #, draft
 msgid "It cannot end before it starts."
 msgstr "Ne može završiti prije nego počne."
+
+#: src/postulo/templates/account/recovery_unusable.html:11
+#, draft
+msgid ""
+"It may have been used already, or it may have run out. Ask whoever gave it to you for another one."
+msgstr ""
+"Možda je već iskorištena, ili je istekla. Zatražite novu od onoga ko vam ju je dao."
 
 #: src/postulo/resume/links.py:76
 #, draft
@@ -3963,6 +4009,13 @@ msgid ""
 "Keep more than one number for yourself and for the people you deal with — a mobile, a desk line, a switchboard — with one of them marked as the one to use. Switched off, Postulo shows and uses the primary number only; the others stay recorded and come back untouched when it is switched on again."
 msgstr ""
 "Čuvajte više od jednog broja za sebe i za ljude s kojima imate posla — mobitel, fiksnu liniju, centralu — s jednim označenim kao onaj koji se koristi. Isključeno, Postulo prikazuje i koristi samo glavni broj; ostali ostaju zapisani i vraćaju se netaknuti čim se ponovo uključi."
+
+#: src/postulo/templates/server/person_recovery.html:52
+#, draft
+msgid ""
+"Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
+msgstr ""
+"Čuva se nakon upotrebe ili isteka, jer oduzimanje nečijeg računa ne smije biti moguće bez traga."
 
 #: src/postulo/jobs/forms.py:61
 #, draft
@@ -4265,6 +4318,11 @@ msgstr "Veze"
 msgid "links"
 msgstr "veze"
 
+#: src/postulo/templates/server/person_recovery.html:50
+#, draft
+msgid "Links issued for this account"
+msgstr "Veze izdate za ovaj račun"
+
 #: src/postulo/applications/models.py:226
 #, draft
 msgid "links sent"
@@ -4355,7 +4413,7 @@ msgstr "adresa logotipa"
 msgid "logo fetched"
 msgstr "logo preuzet"
 
-#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:364
+#: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:434
 #: src/postulo/templates/server/logs.html:5
 #, draft
 msgid "Logs"
@@ -4382,6 +4440,11 @@ msgstr "Manji brojevi pojavljuju se prvi."
 #, draft
 msgid "Lowercase letters, digits, dots, underscores and hyphens."
 msgstr "Mala slova, cifre, tačke, donje crte i crtice."
+
+#: src/postulo/templates/server/person_recovery.html:62
+#, draft
+msgid "Made"
+msgstr "Napravljena"
 
 #: src/postulo/core/models.py:397
 #, draft
@@ -4420,6 +4483,13 @@ msgstr "Pošta je posljednji put poslana u %(when)s."
 #, draft
 msgid "mail last worked"
 msgstr "pošta posljednji put uspjela"
+
+#: src/postulo/templates/server/email.html:103
+#, draft
+msgid ""
+"Mail may be switched off here, because somebody who is locked out has another way back in. Nobody could create a new account, though: a new account has to verify an address before it exists. Close registration first, or keep mail working."
+msgstr ""
+"Pošta se ovdje smije isključiti, jer neko zaključan izvana ima drugi put nazad. Niko, međutim, ne bi mogao napraviti novi račun: novi račun mora potvrditi adresu prije nego što postoji. Prvo zatvorite registraciju ili zadržite poštu u funkciji."
 
 #: src/postulo/templates/server/email.html:81
 #, draft
@@ -4463,7 +4533,12 @@ msgstr "Glavni kontakt"
 msgid "Maintainer"
 msgstr "Održavatelj"
 
-#: src/postulo/templates/server/people.html:77
+#: src/postulo/templates/server/person_recovery.html:46
+#, draft
+msgid "Make a link"
+msgstr "Napravi vezu"
+
+#: src/postulo/templates/server/people.html:80
 #, draft
 msgid "Make administrator"
 msgstr "Postavi za administratora"
@@ -4824,7 +4899,7 @@ msgstr "Još nema kompanija. Stvaraju se za vas kada zabilježite prijavu."
 msgid "no company"
 msgstr "nema kompanije"
 
-#: src/postulo/core/server_views.py:620
+#: src/postulo/core/server_views.py:695
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Nema veze: %(why)s"
@@ -4998,6 +5073,11 @@ msgstr "nijedan upotrebljiv"
 msgid "none yet"
 msgstr "još nijedan"
 
+#: src/postulo/templates/server/person_recovery.html:95
+#, draft
+msgid "None yet."
+msgstr "Još nijedna."
+
 #: src/postulo/applications/models.py:92
 #, draft
 msgid "Normal"
@@ -5061,7 +5141,7 @@ msgstr "Nije zabilježeno"
 msgid "Not sent yet"
 msgstr "Još nije poslano"
 
-#: src/postulo/core/server_views.py:474
+#: src/postulo/core/server_views.py:544
 #, draft
 msgid "Not set"
 msgstr "Nije postavljeno"
@@ -5091,7 +5171,7 @@ msgstr "Nije prikazano · %(name)s"
 msgid "not tested yet"
 msgstr "još nije testirano"
 
-#: src/postulo/accounts/models.py:363
+#: src/postulo/accounts/models.py:441
 #, draft
 msgid "note"
 msgstr "bilješka"
@@ -5327,12 +5407,12 @@ msgid "Nothing was added."
 msgstr "Ništa nije dodano."
 
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:845 src/postulo/core/server_views.py:879
+#: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
 #, draft
 msgid "Nothing was different."
 msgstr "Ništa nije bilo drugačije."
 
-#: src/postulo/core/server_views.py:1041
+#: src/postulo/core/server_views.py:1116
 #, draft
 msgid "Nothing was installed."
 msgstr "Ništa nije instalirano."
@@ -5533,7 +5613,7 @@ msgstr[1] ""
 msgstr[2] ""
 "%(total)s pristupnih ključeva na ovom računu. Prijavljuju vas otiskom prsta, vašim licem ili PIN-om, i nema lozinke koja bi mogla procuriti."
 
-#: src/postulo/templates/server/email.html:115
+#: src/postulo/templates/server/email.html:130
 #, python-format, draft
 msgid ""
 "One setting below is stored here and overridden by the environment. Remove that variable and the stored value takes over, without anybody editing anything."
@@ -5599,7 +5679,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Otvorena mjesta"
 
-#: src/postulo/accounts/models.py:360
+#: src/postulo/accounts/models.py:438
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
@@ -5803,8 +5883,8 @@ msgstr "Samo na čekanju"
 
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
 #: src/postulo/core/server_views.py:145 src/postulo/core/server_views.py:231
-#: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:273
-#: src/postulo/jobs/tables.py:50
+#: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:326
+#: src/postulo/core/server_views.py:343 src/postulo/jobs/tables.py:50
 #: src/postulo/templates/jobs/company_detail.html:141
 #: src/postulo/templates/server/people.html:7
 #, draft
@@ -5841,7 +5921,7 @@ msgstr "Period"
 msgid "Permissions"
 msgstr "Dozvole"
 
-#: src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:364 src/postulo/plugins/models.py:120
 #, draft
 msgid "person"
 msgstr "osoba"
@@ -5934,7 +6014,7 @@ msgid "plugin repository"
 msgstr "repozitorij dodataka"
 
 #: src/postulo/accounts/settings_views.py:119
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:676
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:751
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -5942,7 +6022,7 @@ msgstr "repozitorij dodataka"
 msgid "Plugins"
 msgstr "Dodaci"
 
-#: src/postulo/core/server_views.py:874
+#: src/postulo/core/server_views.py:949
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -6335,7 +6415,7 @@ msgstr[0] "tiho %(days)s dan"
 msgstr[1] "tiho %(days)s dana"
 msgstr[2] "tiho %(days)s dana"
 
-#: src/postulo/templates/server/people.html:86
+#: src/postulo/templates/server/people.html:89
 #, draft
 msgid "Reactivate"
 msgstr "Ponovo aktiviraj"
@@ -6490,6 +6570,22 @@ msgstr "Zabilježeno šta ste poslali."
 msgid "Recorded: nobody showed up."
 msgstr "Zabilježeno: niko se nije pojavio."
 
+#: src/postulo/accounts/models.py:386
+#, draft
+msgid "recovery link"
+msgstr "veza za oporavak"
+
+#: src/postulo/templates/server/people.html:74
+#: src/postulo/templates/server/person_recovery.html:6
+#, draft
+msgid "Recovery link"
+msgstr "Veza za oporavak"
+
+#: src/postulo/accounts/models.py:387
+#, draft
+msgid "recovery links"
+msgstr "veze za oporavak"
+
 #: src/postulo/applications/models.py:85
 #, draft
 msgid "Recruiter"
@@ -6599,7 +6695,7 @@ msgstr "udaljena adresa"
 msgid "Remove"
 msgstr "Ukloni"
 
-#: src/postulo/templates/server/people.html:77
+#: src/postulo/templates/server/people.html:80
 #, draft
 msgid "Remove administrator"
 msgstr "Ukloni administratora"
@@ -6717,6 +6813,16 @@ msgstr "Povuci"
 msgid "revoked"
 msgstr "povučeno"
 
+#: src/postulo/templates/server/person_recovery.html:76
+#, draft
+msgid "Revoked"
+msgstr "Opozvana"
+
+#: src/postulo/accounts/models.py:381
+#, draft
+msgid "revoked at"
+msgstr "opozvana"
+
 #: src/postulo/templates/server/capture.html:27
 #, draft
 msgid "robots.txt is currently honoured."
@@ -6829,7 +6935,7 @@ msgstr "plata do"
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
 #: src/postulo/templates/server/defaults.html:72
-#: src/postulo/templates/server/email.html:160
+#: src/postulo/templates/server/email.html:175
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:93
@@ -6863,9 +6969,9 @@ msgstr "Sačuvano u vaše oglase. Odlučite o tome kada budete spremni."
 
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:141
-#: src/postulo/core/server_views.py:319 src/postulo/core/server_views.py:447
-#: src/postulo/core/server_views.py:845 src/postulo/core/server_views.py:879
-#: src/postulo/core/server_views.py:975 src/postulo/resume/views.py:119
+#: src/postulo/core/server_views.py:389 src/postulo/core/server_views.py:517
+#: src/postulo/core/server_views.py:920 src/postulo/core/server_views.py:954
+#: src/postulo/core/server_views.py:1050 src/postulo/resume/views.py:119
 #, draft
 msgid "Saved."
 msgstr "Sačuvano."
@@ -6967,12 +7073,12 @@ msgstr "Pogledaj pregled"
 msgid "See the listings"
 msgstr "Pogledaj oglase"
 
-#: src/postulo/templates/server/email.html:174
+#: src/postulo/templates/server/email.html:189
 #, draft
 msgid "Send a real message"
 msgstr "Pošalji stvarnu poruku"
 
-#: src/postulo/templates/server/email.html:180
+#: src/postulo/templates/server/email.html:195
 #, draft
 msgid "Send a test message"
 msgstr "Pošalji probnu poruku"
@@ -7003,7 +7109,7 @@ msgstr "Pošalji na"
 msgid "Send to stores now"
 msgstr "Pošalji u skladišta sada"
 
-#: src/postulo/core/server_views.py:652
+#: src/postulo/core/server_views.py:727
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Slanje nije uspjelo: %(error)s"
@@ -7037,7 +7143,7 @@ msgstr "Poslani dokumenti"
 msgid "sent on"
 msgstr "poslano"
 
-#: src/postulo/core/server_views.py:655 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:730 src/postulo/notifications/email.py:85
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Poslano na %(to)s."
@@ -7101,6 +7207,11 @@ msgstr ""
 msgid "set in the environment"
 msgstr "postavljeno u okruženju"
 
+#: src/postulo/templates/account/recovery_set_password.html:18
+#, draft
+msgid "Set the password"
+msgstr "Postavi lozinku"
+
 #: src/postulo/templates/settings/account.html:134
 #, draft
 msgid "Set up"
@@ -7114,7 +7225,7 @@ msgstr "Postavite kada mjesto više nije dostupno."
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:108 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:21
-#: src/postulo/templates/server/email.html:130
+#: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
 #, draft
@@ -7188,6 +7299,7 @@ msgstr "Prikaži i prošle"
 msgid "Shown in the header and on the sign-in page."
 msgstr "Prikazuje se u zaglavlju i na stranici za prijavu."
 
+#: src/postulo/templates/account/recovery_unusable.html:16
 #: src/postulo/templates/base.html:128 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
@@ -7205,7 +7317,7 @@ msgstr ""
 msgid "Sign out"
 msgstr "Odjavi se"
 
-#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:335
+#: src/postulo/core/server_sections.py:28 src/postulo/core/server_views.py:405
 #: src/postulo/templates/server/signin.html:5
 #, draft
 msgid "Sign-in"
@@ -7417,6 +7529,7 @@ msgid "state"
 msgstr "stanje"
 
 #: src/postulo/templates/jobs/listing_list.html:74
+#: src/postulo/templates/server/person_recovery.html:64
 #, draft
 msgid "State"
 msgstr "Stanje"
@@ -7471,6 +7584,11 @@ msgid ""
 "Still live, in conversation, offers, and what you sent in the last month."
 msgstr ""
 "I dalje živo, u razgovoru, ponude, i ono što ste poslali u zadnjih mjesec dana."
+
+#: src/postulo/templates/server/person_recovery.html:84
+#, draft
+msgid "Stop it working"
+msgstr "Onemogući je"
 
 #: src/postulo/documents/models.py:412
 #, draft
@@ -7717,7 +7835,7 @@ msgstr "Testiraj"
 msgid "Test failed: %(message)s"
 msgstr "Test nije uspio: %(message)s"
 
-#: src/postulo/templates/server/email.html:166
+#: src/postulo/templates/server/email.html:181
 #, draft
 msgid "Test the connection"
 msgstr "Testiraj vezu"
@@ -7880,6 +7998,11 @@ msgstr "Ta slika je daleko veća nego što logo treba biti."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Ta pozivnica je već prihvaćena i ne može se povući."
 
+#: src/postulo/core/server_views.py:295
+#, draft
+msgid "That is a lot of recovery links. Try again shortly."
+msgstr "To je mnogo veza za oporavak. Pokušajte ponovo uskoro."
+
 #: src/postulo/jobs/logos.py:122
 #, draft
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
@@ -7922,7 +8045,7 @@ msgstr "To nije ishod koji Postulo poznaje."
 msgid "That is not something Postulo can do about it."
 msgstr "To nije nešto što Postulo može uraditi po tom pitanju."
 
-#: src/postulo/core/server_views.py:951 src/postulo/core/server_views.py:992
+#: src/postulo/core/server_views.py:1026 src/postulo/core/server_views.py:1067
 #, draft
 msgid "That is not something this page does."
 msgstr "To nije nešto što ova stranica radi."
@@ -7948,6 +8071,21 @@ msgstr "To nije korisničko ime."
 msgid "That is the last administrator. Appoint another first."
 msgstr "To je posljednji administrator. Prvo imenujte drugog."
 
+#: src/postulo/templates/account/recovery_unusable.html:5
+#, draft
+msgid "That link cannot be used"
+msgstr "Ta veza se ne može upotrijebiti"
+
+#: src/postulo/accounts/recovery.py:90 src/postulo/accounts/recovery.py:93
+#, draft
+msgid "That link cannot be used."
+msgstr "Ta veza se ne može upotrijebiti."
+
+#: src/postulo/core/server_views.py:317
+#, draft
+msgid "That link will not work any more."
+msgstr "Ta veza više neće raditi."
+
 #: src/postulo/core/channels.py:262
 #, draft
 msgid ""
@@ -7969,7 +8107,7 @@ msgid ""
 msgstr ""
 "Zadnja cifra tog ORCID-a ne odgovara ostatku, pa je jedno od toga tipfeler."
 
-#: src/postulo/core/server_views.py:1050 src/postulo/core/server_views.py:1055
+#: src/postulo/core/server_views.py:1125 src/postulo/core/server_views.py:1130
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Taj paket više ne čeka; otpremite ga ponovo."
@@ -8055,7 +8193,7 @@ msgstr "Potpis kataloga ne odgovara njegovom sadržaju; nije korišten."
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Potpis ili ključ kataloga nije čitljiv: %(error)s"
 
-#: src/postulo/core/server_views.py:1107
+#: src/postulo/core/server_views.py:1182
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Katalozi su odgovorili i još ništa ne navode."
@@ -8111,7 +8249,7 @@ msgstr "Preuzeto je daleko veće nego što dodatak treba biti."
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Ranija verzija koju ova zamjenjuje. Stara datoteka se čuva."
 
-#: src/postulo/core/server_views.py:910 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:985 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Okruženje postavlja „%(name)s“, pa se to ovdje ne može promijeniti."
@@ -8177,7 +8315,7 @@ msgstr "Instalater ga je odbio: %(error)s"
 msgid "The job title"
 msgstr "Naziv posla"
 
-#: src/postulo/core/server_views.py:967
+#: src/postulo/core/server_views.py:1042
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -8228,7 +8366,7 @@ msgstr "Logo je nestao."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logo nije promijenjen: %(problem)s"
 
-#: src/postulo/core/server_views.py:657 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:732 src/postulo/notifications/email.py:84
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Pozadinski sistem pošte nije prihvatio ništa."
@@ -8244,7 +8382,7 @@ msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Sljedeći intervjui u dnevniku, i svi koji su prošli bez ishoda."
 
-#: src/postulo/core/server_views.py:940
+#: src/postulo/core/server_views.py:1015
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Zvanični repozitorij se prazni, ne uklanja."
@@ -8254,7 +8392,7 @@ msgstr "Zvanični repozitorij se prazni, ne uklanja."
 msgid "The opening paragraph, if you use one."
 msgstr "Uvodni odlomak, ako ga koristite."
 
-#: src/postulo/templates/server/email.html:147
+#: src/postulo/templates/server/email.html:162
 #, python-format, draft
 msgid ""
 "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -8266,7 +8404,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Plaća"
 
-#: src/postulo/core/server_views.py:723
+#: src/postulo/core/server_views.py:798
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Dodaci koji se isporučuju unutar Postula. Ništa se ne preuzima."
@@ -8426,7 +8564,7 @@ msgstr "Nema adrese s koje bi se ponovo preuzeo."
 msgid "There is no file to send."
 msgstr "Nema datoteke za slanje."
 
-#: src/postulo/core/server_views.py:905
+#: src/postulo/core/server_views.py:980
 #, draft
 msgid "There is no repository by that name."
 msgstr "Ne postoji repozitorij s tim imenom."
@@ -8552,6 +8690,13 @@ msgstr ""
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Ovo je ono što ćete instalirati. Još ništa nije instalirano."
 
+#: src/postulo/templates/server/person_recovery.html:35
+#, draft
+msgid ""
+"This is your own account. A link you make for yourself is not a way back in — you had to sign in to make it. If you are the only administrator here, a passkey or a second administrator is what covers you."
+msgstr ""
+"Ovo je vaš vlastiti račun. Veza koju napravite za sebe nije put nazad: morali ste se prijaviti da biste je napravili. Ako ste ovdje jedini administrator, pokriva vas pristupni ključ ili drugi administrator."
+
 #: src/postulo/accounts/forms.py:463 src/postulo/jobs/forms.py:227
 #, draft
 msgid "This kind of identifier is already listed."
@@ -8671,7 +8816,7 @@ msgstr "u status"
 msgid "Today's date"
 msgstr "Današnji datum"
 
-#: src/postulo/accounts/models.py:355
+#: src/postulo/accounts/models.py:433
 #, draft
 msgid "token"
 msgstr "token"
@@ -8897,6 +9042,16 @@ msgid ""
 msgstr ""
 "Koristite krajnje tačke status ili interviews; vremenska crta ih bilježi sama."
 
+#: src/postulo/templates/server/person_recovery.html:75
+#, draft
+msgid "Used"
+msgstr "Iskorištena"
+
+#: src/postulo/accounts/models.py:380
+#, draft
+msgid "used at"
+msgstr "iskorištena"
+
 #: src/postulo/accounts/models.py:122 src/postulo/accounts/models.py:233
 #, draft
 msgid "user"
@@ -8923,7 +9078,7 @@ msgstr "Korisničko ime ili e-pošta"
 msgid "users"
 msgstr "korisnici"
 
-#: src/postulo/templates/server/email.html:176
+#: src/postulo/templates/server/email.html:191
 #, draft
 msgid ""
 "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
@@ -9016,6 +9171,11 @@ msgstr "Samo koje čekaju odgovor"
 #, draft
 msgid "Waiting to be sent"
 msgstr "Čeka slanje"
+
+#: src/postulo/templates/server/person_recovery.html:74
+#, draft
+msgid "Waiting to be used"
+msgstr "Čeka na upotrebu"
 
 #: src/postulo/templates/core/import_csv_map.html:78
 #, python-format, draft
@@ -9614,6 +9774,13 @@ msgstr "Skinuli ste sve s njega. Vratite nešto kad god želite."
 msgid "You will be asked for the current one first."
 msgstr "Prvo će vas pitati za trenutnu."
 
+#: src/postulo/templates/account/recovery_set_password.html:24
+#, draft
+msgid ""
+"You will still sign in afterwards, and still give your second factor if you have one. This link changes the password and nothing else."
+msgstr ""
+"Nakon toga ćete se svejedno prijaviti i dati svoj drugi faktor ako ga imate. Ova veza mijenja lozinku i ništa drugo."
+
 #: src/postulo/accounts/views.py:301
 #, draft
 msgid "Your account and everything in it have been deleted."
@@ -9745,6 +9912,11 @@ msgstr "Vaše ime, e-pošta i lokacija, preuzeti iz vašeg profila."
 msgid "Your own name"
 msgstr "Vaše vlastito ime"
 
+#: src/postulo/accounts/views.py:378
+#, draft
+msgid "Your password is set. Sign in with it."
+msgstr "Vaša lozinka je postavljena. Prijavite se njome."
+
 #: src/postulo/templates/accounts/profile.html:25
 #, draft
 msgid "Your picture"
@@ -9760,20 +9932,20 @@ msgstr "vaše radno mjesto"
 msgid "Your username has been changed."
 msgstr "Vaše korisničko ime je promijenjeno."
 
-#: src/postulo/core/server_views.py:946
+#: src/postulo/core/server_views.py:1021
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr ""
 "„%(name)s“ je nestao. Sve što je iz njega instalirano ostaje instalirano."
 
-#: src/postulo/core/server_views.py:931
+#: src/postulo/core/server_views.py:1006
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "„%(name)s“ je isključen. Iz njega se ništa novo ne instalira ni ne ažurira; ono što je već instalirano nastavlja raditi."
 
-#: src/postulo/core/server_views.py:928
+#: src/postulo/core/server_views.py:1003
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr "„%(name)s“ je uključen. Iz njega se dodaci mogu instalirati i ažurirati."

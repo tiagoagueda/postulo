@@ -232,21 +232,34 @@ def test_the_lock_refuses_while_email_is_the_only_way_back_in(db, admin):
 
 
 def test_the_lock_opens_by_itself_once_there_is_another_way_in(db, admin):
-    """A rule, not a name check: nothing here mentions SMTP, and nothing had to be deleted."""
+    """A rule, not a name check: nothing here mentions SMTP, and nothing had to be deleted.
+
+    The passkey the lone administrator gains covers them twice over now — as a passkey, and
+    because an administrator who can sign in can issue anybody else a recovery link (#103).
+    Both routes appearing is the rule working, not the test drifting.
+    """
     assert transport.refuse_switching_off("smtp")
 
     give_a_passkey(admin)
 
-    assert transport.recovery_routes(without="smtp") == ["passkey"]
+    assert transport.recovery_routes(without="smtp") == ["passkey", "administrator"]
     assert transport.refuse_switching_off("smtp") == ""
 
 
-def test_one_account_without_a_passkey_is_enough_to_keep_it_shut(db, admin, django_user_model):
-    give_a_passkey(admin)
+def test_one_account_without_a_passkey_is_enough_to_keep_the_passkey_route_out(
+    db, admin, django_user_model
+):
+    """The passkey route needs *everybody* to hold one, which is what makes it a route.
+
+    The administrator route is kept out of the picture here by leaving the administrator
+    without a passkey: they cannot issue themselves a link, so nothing covers them, and this
+    stays a test about the passkey rule (#103 has the other half).
+    """
     django_user_model.objects.create_user(
         email="other@example.org", username="other", password="a-long-enough-password-42"
     )
 
+    assert "passkey" not in transport.recovery_routes(without="smtp")
     assert transport.refuse_switching_off("smtp")
 
 

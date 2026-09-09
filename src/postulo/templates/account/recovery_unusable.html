@@ -1,0 +1,16 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1 class="mb-1 text-xl font-semibold tracking-tight">{% translate "That link cannot be used" %}</h1>
+  {% comment %} One sentence for every reason -- spent, revoked, expired, never existed.
+     Saying which would tell somebody holding a bad link whether it was ever a real one, and
+     a link is a whole account (#103). {% endcomment %}
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed %}
+      It may have been used already, or it may have run out. Ask whoever gave it to you for
+      another one.
+    {% endblocktranslate %}
+  </p>
+  <a href="{% url 'account_login' %}" class="btn-primary w-full text-center">{% translate "Sign in" %}</a>
+{% endblock %}

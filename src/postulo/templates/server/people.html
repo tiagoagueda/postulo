@@ -68,6 +68,9 @@
                     <a href="{% url 'server:person_plugins' person.pk %}" class="menu-item">
                       {% icon "settings" %}{% translate "Plugins for this account" %}
                     </a>
+                    <a href="{% url 'server:person_recovery' person.pk %}" class="menu-item">
+                      {% icon "shield" %}{% translate "Recovery link" %}
+                    </a>
                     <form method="post" action="{% url 'server:person_admin' person.pk %}">
                       {% csrf_token %}
                       <button type="submit" class="menu-item">

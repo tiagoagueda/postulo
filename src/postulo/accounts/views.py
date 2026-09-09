@@ -300,3 +300,80 @@ class DeleteAccountView(LoginRequiredMixin, View):
             return redirect("account_login")
         messages.success(request, _("Your account and everything in it have been deleted."))
         return redirect("account_login")
+
+
+# ---------------------------------------------------- a link an administrator issued
+
+
+#: Where the ticket sits between opening the link and choosing a password. The token is not
+#: carried into the form's own URL, so it never reaches a `Referer` header, a browser history
+#: entry shared with a synced profile, or a screenshot of the address bar (#103).
+RECOVERY_SESSION_KEY = "recovery-link"
+
+
+class RecoveryLinkView(View):
+    """Open a link an administrator handed over, and go to the form without the token."""
+
+    def get(self, request: HttpRequest, token: str) -> HttpResponse:
+        from . import recovery
+
+        try:
+            link = recovery.find(token)
+        except recovery.Unusable as unusable:
+            return render(
+                request, "account/recovery_unusable.html", {"why": str(unusable)}, status=404
+            )
+        # Not spent here. A link-preview bot in the chat application an administrator used
+        # to hand this over would otherwise burn somebody's only way back in by fetching it.
+        request.session[RECOVERY_SESSION_KEY] = link.pk
+        return redirect("accounts:recovery_set")
+
+
+class RecoverySetPasswordView(View):
+    """Choose a new password, which is the whole of what a recovery link does.
+
+    Deliberately not a sign-in. A person who uses one still signs in afterwards and still
+    meets their second factor if they have one, so a link that goes astray is a password
+    change on an account whose other factors are untouched rather than a session.
+    """
+
+    template_name = "account/recovery_set_password.html"
+
+    def _link(self, request: HttpRequest):
+        from .models import RecoveryLink
+
+        pk = request.session.get(RECOVERY_SESSION_KEY)
+        if not pk:
+            return None
+        link = RecoveryLink.objects.filter(pk=pk).first()
+        return link if link is not None and link.is_live else None
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        from allauth.account.forms import ResetPasswordKeyForm
+
+        link = self._link(request)
+        if link is None:
+            return render(request, "account/recovery_unusable.html", status=404)
+        return render(
+            request,
+            self.template_name,
+            {"form": ResetPasswordKeyForm(user=link.person), "person": link.person},
+        )
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        from allauth.account.forms import ResetPasswordKeyForm
+
+        from . import recovery
+
+        link = self._link(request)
+        if link is None:
+            return render(request, "account/recovery_unusable.html", status=404)
+        form = ResetPasswordKeyForm(user=link.person, data=request.POST)
+        if not form.is_valid():
+            return render(
+                request, self.template_name, {"form": form, "person": link.person}, status=400
+            )
+        recovery.spend(link, form.cleaned_data["password1"])
+        request.session.pop(RECOVERY_SESSION_KEY, None)
+        messages.success(request, _("Your password is set. Sign in with it."))
+        return redirect("account_login")

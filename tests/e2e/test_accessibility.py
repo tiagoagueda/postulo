@@ -199,7 +199,21 @@ def signed_in_paths(a, c, me) -> list[str]:
         "/career/import/",
         "/server/logs/",
         "/accounts/invitations/new/",
+        f"/server/people/{me.pk}/recovery/",
+        # The two halves of a recovery link, walked in order: the first sets the ticket in
+        # the session and redirects, the second is the form it lands on. Only fetched, never
+        # submitted, so nobody's password changes half way through the walk (#103).
+        f"/accounts/recover/{_a_recovery_link_for(me)}/",
+        "/accounts/recover/",
     ]
+
+
+def _a_recovery_link_for(person) -> str:
+    """A live token, so the form the link leads to can be looked at like any other page."""
+    from postulo.accounts import recovery
+
+    _link, token = recovery.issue(person, by=person)
+    return token
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
@@ -445,6 +459,9 @@ VISITED_URL_NAMES: tuple[str, ...] = (
     "server:person_plugins",
     "server:person_username",
     "server:person_delete",
+    "server:person_recovery",
+    "accounts:recovery_open",
+    "accounts:recovery_set",
     "server:signin",
     "server:email",
     "server:plugins",

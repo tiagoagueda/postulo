@@ -263,3 +263,43 @@ line:
 ```sh
 uv run manage.py changepassword alex.morgan     # the username, not the address
 ```
+
+## Getting somebody back in without email
+
+Until now the only way back into an account was a password-reset email, which made mail
+something every instance had to keep working for ever. An administrator can now issue a
+**recovery link** instead: *Server settings → People → ⋯ → Recovery link*.
+
+It needs no third party, no gateway and no cost. You make a link, and you hand it over
+yourself — in person, on the telephone, through whatever channel you would already use to
+prove it was you. Postulo does not send it anywhere, and that is the point: sending it over
+the channel this exists to replace would be absurd.
+
+**The link is shown once.** Nothing stores it — the row keeps only a fingerprint — so
+leaving the page is the last chance to copy it. If you lose it, make another; the old one
+stops working the moment you do.
+
+**It sets a password. It does not sign anybody in.** They still sign in afterwards, and
+still give their second factor if they have one. A link that goes astray is a password
+change on an account whose other factors are untouched, not a session.
+
+**It lasts an hour and works once.** Opening it does not spend it — a link-preview bot in
+the chat you sent it through would otherwise burn it — but choosing a password does.
+
+**Every one is recorded**, and the record survives the link: who issued it, for whom, when,
+and whether it was used, revoked or left to expire. Taking somebody's account back is not
+something anybody should be able to do without a trace.
+
+**You cannot issue one for yourself in any useful sense.** Making a link needs signing in,
+and the person who has forgotten their password cannot. So an administrator is covered by
+whatever else covers them: a passkey, or a second administrator. On an instance with one
+administrator and no passkey, that administrator is the one account this route does not
+reach — and Postulo says so on the page and keeps the mail lock shut accordingly.
+
+### What this changes about switching mail off
+
+With a route that reaches everybody, *Server settings → Email* stops refusing to let the
+mail transport go. **That covers getting existing people back in, and nothing else.** A new
+account still has to verify an address before it exists, so an instance with mail switched
+off can recover the people it has and cannot admit new ones. The Email page says so where you
+would act on it, rather than leaving you to find out when the first sign-up fails.
