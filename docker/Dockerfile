@@ -21,6 +21,10 @@ RUN npm ci --no-audit --no-fund
 # here even though nothing in it is executed.
 COPY assets ./assets
 COPY src ./src
+# Not minified, and the same command a contributor runs, so the image's copy and the
+# committed one are byte for byte the same file. WhiteNoise compresses what it serves and
+# minifying first saves 819 bytes of the 11 kB it sends -- which is not worth a stylesheet
+# nobody can read a diff of (#159).
 RUN npm run build:css
 
 

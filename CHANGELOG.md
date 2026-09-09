@@ -1128,6 +1128,24 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Rebuilding the stylesheet no longer produces a diff nothing can read.** `app.css` is a
+  build artefact that is committed on purpose — Postulo runs without Node — and Tailwind was
+  writing it minified, as one line of 76 kB. So every rebuild produced a two-line diff a
+  hundred kilobytes wide: a terminal wrapped it into thousands of rows, a review tool
+  truncated it, a pager could stall on it, and `git add -p` was unusable. Reported from a
+  terminal that stopped part way through one.
+
+  It is written out now. That is not only about being able to scroll past it: a Tailwind
+  upgrade quietly changing a base rule is exactly the sort of thing a diff should catch, and
+  nobody could see one. The cost was measured rather than guessed — 819 bytes of the 11 kB
+  WhiteNoise actually sends, because compression removes almost everything minification does
+  — and a stylesheet a person can reason about is worth eight per cent of one response.
+
+  The image builds it with the same command, so its copy and the committed one stay byte for
+  byte identical, and CI still fails on a stale one. Git is told the file is generated, so a
+  forge collapses it by default — but it stays diffable, because the diff is now worth
+  reading. (#159)
+
 - **Port 465 could not be configured at all, so half the mail providers there are could
   not be used.** There are two ways of putting TLS on an SMTP session. STARTTLS connects in
   the clear and asks the server to upgrade the socket, which is ports 587 and 25; implicit

@@ -24,7 +24,7 @@ uv run ruff format .
 uv run ruff check --fix .
 uv run pytest
 uv run manage.py makemigrations --check --dry-run
-npm run build:css            # only if you touched assets/css/
+npm run build:css            # only if you touched assets/css/ or a template's classes
 ```
 
 Continuous integration runs all of the above across Python 3.12, 3.13, and 3.14, plus

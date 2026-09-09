@@ -211,7 +211,8 @@ Postulo uses whichever works, preferring WeasyPrint. Export is optional: trackin
 applications and writing letters need no renderer at all.
 
 Node is **not** required to run Postulo: the compiled stylesheet is committed. It is
-only needed to change the CSS, in which case:
+only needed to change the CSS, or to add a Tailwind class a template did not use before,
+in which case:
 
 ```sh
 npm install
