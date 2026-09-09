@@ -507,10 +507,19 @@ def install_wheel(
 
 
 def remove(name: str) -> Installed:
-    """Take a plugin off the instance: its files, and its line in the record."""
+    """Take a plugin off the instance: its files, and its line in the record.
+
+    Refused while anything it owns still holds rows (#128). Not a courtesy check the page
+    happens to do first: this is the last door, and a management command or a shell reaching
+    `remove()` directly would otherwise leave a table nothing can read.
+    """
+    from . import data
+
     entry = installed(name)
     if entry is None:
         raise InstallError(str(_("%(name)s is not installed.")) % {"name": name})
+    if refusal := data.refuse_removing(name):
+        raise InstallError(refusal)
     for path in _paths_of(entry.name):
         if path.is_dir():
             shutil.rmtree(path, ignore_errors=True)

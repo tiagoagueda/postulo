@@ -477,6 +477,30 @@ can say which of the two reasons applies.
 confirmation to be sent again — one limit across every kind, because a resend button is a way
 to make somebody's phone buzz forty times.
 
+## When a plugin will not uninstall
+
+Postulo refuses to uninstall a plugin while it still holds records, and says how many. That is
+a rule rather than a hiccup:
+
+> A plugin that owns a table may not be uninstalled while that table holds anything.
+
+Uninstalling anyway would leave those records in a table nothing can read, export or restore —
+present in every backup, absent from the export of the person whose data it is, and invisible
+to `migrate`. Deleting them for you would make removing a package a data-destroying act, when
+you may only be swapping it for a newer build.
+
+Two ways forward, and they are different things:
+
+- **Switch the plugin off instead.** Off keeps everything and offers nothing. Everything comes
+  back untouched when you switch it on again. If what you wanted was to stop using it, this is
+  the answer.
+- **Empty it first**, from the plugin's own pages, and then uninstall. Export anything you want
+  to keep before you do.
+
+Most plugins hold nothing at all and uninstall without a word. Every plugin Postulo ships holds
+nothing: what the telephone-numbers plugin governs belongs to Postulo itself, and arrives and
+leaves with it.
+
 ## HTTPS
 
 These apply only under the production settings.

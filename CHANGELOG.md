@@ -201,6 +201,42 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A rule for what happens to a plugin's data when the plugin goes, written before any
+  plugin owns data.** That timing is the point. Everything the newest plugin governs lives in
+  core, so the question has never had to be answered — and the moment one is made
+  self-contained it becomes a Django app with a migration history of its own, and three
+  questions arrive at once with no answers.
+
+  > A plugin that owns a table may not be uninstalled while that table holds anything.
+
+  Postulo refuses, names how many records are in the way, and leaves both the package and the
+  data alone. **Two other answers were open and neither is safe.** *Keep the table* leaves data
+  nothing can read, export or restore — present in every backup, absent from the export of the
+  person whose data it is, invisible to `migrate`; that is the failure the export exists to
+  prevent. *Delete it behind a confirmation* makes removing a package a data-destroying act,
+  when somebody may only be swapping it for a newer build of the same plugin — and Postulo
+  promises in thirty-nine languages that switching a plugin **off** deletes nothing, so putting
+  *uninstall* on the other side of that promise is a distinction nobody holds in their head at
+  the moment it matters.
+
+  Refusing is also the shape this codebase already uses three times over: the last
+  administrator, the mail transport that is the last way back in, the plugin that is somebody's
+  only recovery route. A refusal naming what holds it is something a person can act on.
+
+  **Off and uninstalled are now different acts**, and the difference finally carries weight.
+  Off keeps everything and offers nothing; uninstalled is refused while there is anything to
+  take away with the code.
+
+  **And an archive cannot be quietly incomplete.** A plugin that owns a person's data says how
+  to put it in their export; one that owns data and cannot say gets its models *named* in the
+  archive under `not_carried`, because a silent gap is discovered on restore and a stated one
+  while the original still exists. A plugin that raises while exporting is named the same way
+  rather than taking somebody's whole archive down with it. `FORMAT_VERSION` is 8.
+
+  The refusal lives on `remove()` and not only on the page, so a management command or a shell
+  meets the same rule. `CONTRIBUTING.md` has the rule for plugin authors, including why
+  `export_for` is not optional in spirit and why owning a table means shipping migrations. (#128)
+
 - **An instance can offer signing in with a code sent to the primary address.** allauth has
   carried the feature all along and it was switched off; what was missing was the decisions.
   *Server settings → Sign-in* now has the switch, off until an administrator says otherwise.

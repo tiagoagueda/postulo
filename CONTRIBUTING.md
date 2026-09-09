@@ -363,6 +363,53 @@ cache rather than a code change: `apt-get upgrade` runs at build time (see `dock
 and *Configuration → The image and Debian's updates*), so a fresh build takes whatever Debian
 has published since.
 
+## A plugin that owns a table
+
+Most plugins own nothing. A source reads a page, an importer reads a file, a transport carries
+a message; none of them keeps anything, and any of them can be moved out of core without a
+further thought. **A plugin that owns a model is a different animal**, and there is one rule.
+
+> A plugin that owns a table may not be uninstalled while that table holds anything.
+
+Postulo refuses, says how many records are in the way, and leaves both the package and the
+data alone. Two other answers were open and neither is safe. *Uninstall and keep the table*
+leaves data nothing can read, export or restore — the failure the export exists to prevent.
+*Uninstall and delete, behind a confirmation* makes removing a package a data-destroying act:
+somebody swapping a plugin for a newer build of the same plugin loses everything it held, and
+Postulo promises in thirty-nine languages that switching a plugin **off** deletes nothing.
+Putting *uninstall* on the other side of that promise is a distinction nobody holds in their
+head at the moment it matters.
+
+**Off and uninstalled are now different acts.** Off keeps everything and offers nothing.
+Uninstalled takes the code away, and is refused while there is anything to take away with it.
+
+What a plugin that owns a model has to do:
+
+```python
+class MyPlugin:
+    name = "my-plugin"
+    #: Django labels. Postulo counts these before letting the package go.
+    owns_models = ("my_plugin.Thing",)
+
+    def export_for(self, person) -> list[dict]:
+        """This person's rows, for their archive. See below."""
+        return [{"what": row.what} for row in Thing.objects.filter(owner=person)]
+```
+
+**`export_for` is not optional in spirit.** A plugin that owns a person's data and cannot put
+it in their archive gets its models *named* in that archive under `not_carried`, because an
+archive that is quietly incomplete is discovered when somebody restores it, and one that says
+which part is missing is discovered while they still have the original. Write the method.
+
+**Ship your own migrations, and be in `INSTALLED_APPS`.** Django needs the app loaded to see
+the model at all. Because the package cannot be uninstalled while its table holds anything, the
+table is always empty when the app goes — so its migrations reverse cleanly and there is never
+a migration referring to a module that no longer imports.
+
+**Emptying the table is your job to offer.** The refusal tells somebody to empty it from the
+plugin's own pages; those pages are yours, and while the plugin is installed is exactly when
+they can be asked.
+
 ## Licence
 
 Contributions are accepted under the [AGPL-3.0-or-later](LICENSE) licence that covers

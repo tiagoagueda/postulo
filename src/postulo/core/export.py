@@ -31,7 +31,7 @@ from postulo import __version__
 #: 5 added ``parent`` on a company, naming the company it belongs to. The
 #: importer still reads every earlier
 #: format, filling the new fields in.
-FORMAT_VERSION = 7
+FORMAT_VERSION = 8
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -226,6 +226,15 @@ def _phone_numbers(holder) -> list[dict]:
     return [_fields(row, PHONE_NUMBER_FIELDS) for row in holder.phone_numbers.all()]
 
 
+def _plugin_data(user) -> dict:
+    from postulo.plugins import data
+
+    try:
+        return data.export_sections(user)
+    except Exception:  # pragma: no cover - an archive is worth more than a tidy section
+        return {"carried": {}, "not_carried": ["unknown"]}
+
+
 def build_document(user) -> dict:
     """Assemble everything belonging to ``user`` as one nested document."""
     from postulo.accounts.models import Profile
@@ -248,6 +257,12 @@ def build_document(user) -> dict:
                 "meaningful anywhere else."
             ),
         },
+        # What the plugins hold, and what they could not carry. A plugin that owns a table
+        # says how to put a person's rows in their archive; one that owns a table and cannot
+        # say is *named* here rather than passed over, because an archive that is quietly
+        # incomplete is discovered on restore and one that says so is discovered while the
+        # original still exists (#128).
+        "plugins": _plugin_data(user),
         "account": {
             "username": user.username,
             "email": user.email,

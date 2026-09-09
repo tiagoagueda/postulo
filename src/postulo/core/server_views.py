@@ -1235,12 +1235,19 @@ class PluginActionView(StaffRequiredMixin, View):
 
     def _remove(self, request: HttpRequest) -> HttpResponse:
         from postulo.notifications import transport
+        from postulo.plugins import data as plugin_data
         from postulo.plugins.installing import InstallError, remove
 
         name = request.POST.get("name", "")
-        if refusal := transport.refuse_removing_distribution(name):
-            messages.error(request, refusal)
-            return redirect("server:plugins")
+        # Two refusals, both named after what they protect: the mail this instance sends
+        # (#104), and the records this package still holds (#128).
+        for refusal in (
+            transport.refuse_removing_distribution(name),
+            plugin_data.refuse_removing(name),
+        ):
+            if refusal:
+                messages.error(request, refusal)
+                return redirect("server:plugins")
         try:
             entry = remove(name)
         except InstallError as error:
