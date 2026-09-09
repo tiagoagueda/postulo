@@ -1,9 +1,19 @@
 # Postulo, as one image.
 #
-# Two stages. Node builds the stylesheet and is then thrown away, so the image that
-# actually runs carries Python and nothing else — the compiled CSS is committed to the
-# repository as well, but building it here means the image is right even if somebody
-# forgot to rebuild before committing.
+# Three stages, and the runtime is the only one that ships. Node builds the stylesheet;
+# Python builds the environment and compiles the catalogues; the runtime copies in what
+# runs and nothing else.
+#
+# **The stage boundary is what makes the trimming real** (#157). While the Python side was
+# single-stage, every intermediate was already in a layer and a later `RUN rm` freed
+# nothing — 296 MB of uv's download cache and 19 MB of `.po` source catalogues shipped
+# because they could not be deleted afterwards, only never written. Copying forward the
+# `.venv`, the source and the collected static is the version of that which stays true as
+# the build grows: what is not copied is not there, without anybody having to remember a
+# flag.
+#
+# The stylesheet is committed to the repository as well, but building it here means the
+# image is right even if somebody forgot to rebuild before committing.
 #
 # The runtime installs Pango, because WeasyPrint is the default PDF renderer and loads it
 # through the system linker. That is the one place a container earns its keep over a
@@ -28,9 +38,84 @@ COPY src ./src
 RUN npm run build:css
 
 
+# --------------------------------------------------------------- python build
+# Thrown away whole. Everything here — uv, the lock, the `.po` catalogues, whatever git
+# the extra-packages step needed — exists only to produce two directories: the virtual
+# environment, and the source with its catalogues compiled.
+FROM python:3.14-slim-bookworm AS build
+
+COPY --from=ghcr.io/astral-sh/uv:0.12 /uv /usr/local/bin/uv
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/app/.venv \
+    PATH="/app/.venv/bin:$PATH"
+
+WORKDIR /app
+
+# Dependencies first, so a change to the application does not re-resolve them.
+COPY pyproject.toml uv.lock README.md ./
+
+# `--no-default-groups`, not `--no-dev`. `--no-dev` omits the group called `dev` and
+# nothing else, and `pyproject.toml` declares two — `dev` and `e2e` — with both in
+# `default-groups` so that `uv sync` never quietly removes the browser test's
+# dependencies. The line therefore read correctly and installed Playwright anyway: 136 MB
+# of test tool, bundling its own Node.js runtime, in an image that runs neither (#154).
+# Naming the groups to exclude would need editing every time one is added; excluding all
+# of them and asking for the extra by name stays right on its own.
+#
+# `--no-cache`: uv unpacks every wheel into ~/.cache/uv and keeps it, 296 MB of it (#154).
+# This
+# stage no longer ships, so the cache would go away regardless — the flag stays because it
+# also keeps the build's own disk use honest, and because the reasoning that put it here is
+# the reasoning that says not to write what nothing reads.
+RUN uv sync --locked --no-default-groups --extra server --no-cache
+
+COPY src ./src
+COPY scripts/messages.py ./scripts/messages.py
+
+# The translation catalogues are committed as .po text; Django reads the compiled .mo,
+# which this writes in plain Python — no gettext in the image. Every set of them, since a
+# plugin Postulo ships carries its own (#127).
+#
+# Then the .po files go: 476 files and 20 MB of source that nothing at run time reads, of
+# which the six plugin catalogues are the newest part. `status.json` is not one of them —
+# the language picker reads it to say how far along each translation is — so this deletes
+# by extension rather than by directory.
+RUN python scripts/messages.py compile \
+    && find src -name '*.po' -delete
+
+# Plugins baked into the image. A plugin is an ordinary Python package installed into
+# Postulo's environment; this argument takes any number of them, in whatever form pip
+# accepts — a name from an index, a wheel URL, git+https://… — and installs them at
+# build time so the image is complete and immutable. Git is needed only for the git form,
+# and this stage does not ship, so it is simply left behind rather than purged. The core's
+# lock is a constraint, so a plugin can never change the version of a package Postulo
+# itself pins.
+ARG POSTULO_EXTRA_PACKAGES=""
+RUN if [ -n "$POSTULO_EXTRA_PACKAGES" ]; then \
+        apt-get update \
+        && apt-get upgrade -y \
+        && apt-get install -y --no-install-recommends git \
+        && uv export --locked --no-dev --extra server --no-hashes --no-emit-project \
+            --output-file /tmp/constraints.txt \
+        && uv pip install --no-cache --constraint /tmp/constraints.txt $POSTULO_EXTRA_PACKAGES \
+        && rm -rf /var/lib/apt/lists/*; \
+    fi
+
+
 # -------------------------------------------------------------------- runtime
 FROM python:3.14-slim-bookworm AS runtime
 
+# The same base as the build stage, which is what makes copying a virtual environment
+# between them sound: `pyvenv.cfg` and every console script name an interpreter by
+# absolute path, and here it is the same interpreter at the same path.
+#
+# uv is kept, and it is a decision rather than an oversight: 45 MB of the image is this
+# binary, and `plugins/installing.py` prefers it "where the image put it", falling back to
+# pip. Dropping it would not break installing a plugin through the interface; it would make
+# it slower and hand an operator a different resolver than the one this project tests with.
+# A working feature is worth more than 45 MB of a 400 MB image (#157).
 COPY --from=ghcr.io/astral-sh/uv:0.12 /uv /usr/local/bin/uv
 
 ENV PYTHONUNBUFFERED=1 \
@@ -82,50 +167,10 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Dependencies first, so a change to the application does not re-resolve them.
-COPY pyproject.toml uv.lock README.md ./
-COPY src ./src
-COPY scripts/messages.py ./scripts/messages.py
-
-# The translation catalogues are committed as .po text; Django reads the compiled .mo,
-# which this writes in plain Python — no gettext in the image.
-RUN python scripts/messages.py compile
-
-# `--no-default-groups`, not `--no-dev`. `--no-dev` omits the group called `dev` and
-# nothing else, and `pyproject.toml` declares two — `dev` and `e2e` — with both in
-# `default-groups` so that `uv sync` never quietly removes the browser test's
-# dependencies. The line therefore read correctly and installed Playwright anyway: 136 MB
-# of test tool, bundling its own Node.js runtime, in an image that runs neither (#154).
-# Naming the groups to exclude would need editing every time one is added; excluding all
-# of them and asking for the extra by name stays right on its own.
-#
-# `--no-cache`: uv unpacks every wheel into ~/.cache/uv and keeps it. In a single-stage
-# build that cache is 296 MB of the shipped image, including wheels for packages that were
-# never installed — and deleting it in a later layer would free nothing, because the bytes
-# are already below. The plugin install a few lines down has said `--no-cache` since it was
-# written; this is the same reasoning applied to the step that installs everything else.
-RUN uv sync --locked --no-default-groups --extra server --no-cache
-
-# Plugins baked into the image. A plugin is an ordinary Python package installed into
-# Postulo's environment; this argument takes any number of them, in whatever form pip
-# accepts — a name from an index, a wheel URL, git+https://… — and installs them at
-# build time so the image is complete and immutable. Git is needed only for the git
-# form, and only for the length of this step; it is removed again so the runtime image
-# stays as small as it was. The core's lock is a constraint, so a plugin can never
-# change the version of a package Postulo itself pins.
-ARG POSTULO_EXTRA_PACKAGES=""
-RUN if [ -n "$POSTULO_EXTRA_PACKAGES" ]; then \
-        apt-get update \
-        && apt-get upgrade -y \
-        && apt-get install -y --no-install-recommends git \
-        && uv export --locked --no-dev --extra server --no-hashes --no-emit-project \
-            --output-file /tmp/constraints.txt \
-        && uv pip install --no-cache --constraint /tmp/constraints.txt $POSTULO_EXTRA_PACKAGES \
-        && rm -f /tmp/constraints.txt \
-        && apt-get purge -y git && apt-get autoremove -y \
-        && rm -rf /var/lib/apt/lists/*; \
-    fi
-
+# What runs, and nothing that built it: the environment, the source with its compiled
+# catalogues, and the entry point. No lock, no uv cache, no `.po`, no build scripts.
+COPY --from=build /app/.venv ./.venv
+COPY --from=build /app/src ./src
 COPY manage.py ./
 COPY --from=styles /build/src/postulo/static/css/app.css ./src/postulo/static/css/app.css
 
@@ -141,9 +186,18 @@ COPY --from=styles /build/src/postulo/static/css/app.css ./src/postulo/static/cs
 # settings to refuse anything under 50, and the image stopped building (#121). A longer
 # literal would have satisfied the rule while still being a published constant somebody
 # could paste into a .env. A random one satisfies it for the reason the rule exists.
+#
+# Plain `python`, which PATH resolves to the copied environment. It used to be `uv run
+# --no-sync`, which needed the lock and the manifest present in this stage purely so that
+# uv would agree to run a command; nothing else here wants them (#157).
+#
+# This collects Django admin's 6.6 MB whether or not an operator sets POSTULO_ADMIN_URL,
+# because the admin is installed and its URL is read at run time. Making it a build
+# argument would hand somebody an image whose admin page is missing its stylesheet the day
+# they decide to enable it, which is a worse thing to own than 6.6 MB.
 RUN POSTULO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(64))')" \
     POSTULO_ALLOWED_HOSTS=localhost \
-    uv run --no-sync manage.py collectstatic --noinput --clear
+    python manage.py collectstatic --noinput --clear
 
 COPY docker/entrypoint.sh /usr/local/bin/postulo-entrypoint
 RUN chmod +x /usr/local/bin/postulo-entrypoint \

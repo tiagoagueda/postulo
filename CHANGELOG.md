@@ -1017,6 +1017,28 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **The image now contains what it runs, rather than everything used to build it.** The
+  Python side of the build was a single stage, so every intermediate was already sealed into
+  a layer by the time anything could remove it — a later `RUN rm` frees nothing, because the
+  bytes are below. That is how 296 MB of uv's download cache shipped, and it is why 20 MB of
+  `.po` source catalogues shipped too: Django reads the compiled `.mo`, and nothing at run
+  time has ever opened a `.po`.
+
+  Building the environment and compiling the catalogues in a stage of their own makes the
+  deletion real rather than decorative, and makes the same true of whatever the build needs
+  next: what is not copied forward is not there, with no flag for anybody to remember. The
+  extra-packages step gets simpler as a side effect — git is left behind with the stage
+  instead of being purged — and `collectstatic` runs as plain `python`, so the lock and the
+  manifest no longer have to be present in the shipping image purely to satisfy `uv run`.
+
+  **Two savings are deliberately not taken, and the reasons are beside them.** uv stays: 45 MB
+  of binary, and dropping it would not break installing a plugin through the interface but
+  would make it slower and hand an operator a resolver this project does not test with.
+  Django admin's collected assets stay: the admin's URL is read at run time and
+  `collectstatic` runs at build time, so making it a build argument would hand somebody an
+  image whose admin page loses its stylesheet the day they enable it. Neither is worth what
+  it saves. (#157)
+
 - **Every plugin Postulo ships is now its own package, and a test says so.** They were
   scattered through the applications they happened to be useful to — the notifier and the
   transport in `notifications`, the store in `documents`, the importer in `resume`, and the

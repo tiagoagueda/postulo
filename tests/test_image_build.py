@@ -193,3 +193,76 @@ def test_the_base_image_is_not_pinned_by_digest():
         assert "@sha256:" not in line, (
             "pinned by digest: see #155 before deciding this, and keep the upgrade"
         )
+
+
+# ------------------------------------------------ what the finished image contains
+
+
+def stages() -> dict[str, str]:
+    """The Dockerfile split at each `FROM ... AS name`, so a check can ask *which stage*.
+
+    Which is the whole point of #157: the same `RUN rm` frees 20 MB in a stage that is
+    thrown away and nothing at all in the stage that ships, because there the bytes are
+    already in a layer below.
+    """
+    source = DOCKERFILE.read_text(encoding="utf-8")
+    found: dict[str, str] = {}
+    name = None
+    for line in source.splitlines():
+        start = re.match(r"^FROM .* AS (?P<name>\w+)\s*$", line)
+        if start:
+            name = start["name"]
+            found[name] = ""
+            continue
+        if name:
+            found[name] += line + "\n"
+    return found
+
+
+def test_the_stage_reader_finds_what_it_is_looking_for():
+    """A test that reads a file has to be shown failing, or it passes on an empty match."""
+    assert set(stages()) == {"styles", "build", "runtime"}
+    assert "npm run build:css" in stages()["styles"]
+
+
+def test_the_shipping_stage_installs_nothing_it_could_have_been_handed():
+    """A build step in the final stage leaves its intermediates in the image forever.
+
+    That is how 296 MB of uv's download cache and 20 MB of `.po` source shipped: not
+    because anybody wanted them, but because by the time anything could delete them the
+    bytes were already in a layer below (#157).
+    """
+    runtime = stages()["runtime"]
+
+    assert "uv sync" not in runtime, "the environment is built in the build stage"
+    assert "COPY --from=build /app/.venv" in runtime, "and copied in whole"
+
+
+def test_the_source_catalogues_do_not_ship():
+    """20 MB of `.po` that nothing at run time reads: Django reads the compiled `.mo`.
+
+    Deleted in the same layer that compiles them, in the stage that does not ship, so the
+    bytes are never in an image at all. By extension rather than by directory, because
+    `locale/status.json` sits among them and the language picker reads it to say how far
+    along each translation is.
+    """
+    build = stages()["build"]
+
+    assert "find src -name '*.po' -delete" in build
+    assert "*.po" not in stages()["runtime"], "deleting it there would free nothing"
+
+
+def test_the_image_keeps_uv_on_purpose():
+    """45 MB, and the largest saving this deliberately does not take (#157).
+
+    `plugins/installing.py` prefers uv "where the image put it" and falls back to pip.
+    Dropping it would not break installing a plugin; it would make it slower and hand an
+    operator a resolver this project does not test with. The comment beside it is the
+    decision, and this is what fails if somebody removes the binary without the argument.
+    """
+    runtime = stages()["runtime"]
+
+    assert "/usr/local/bin/uv" in runtime
+    assert "installing.py" in runtime or "plugins/installing" in runtime, (
+        "the reason it is kept has to stay next to it"
+    )
