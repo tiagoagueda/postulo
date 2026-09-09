@@ -10,8 +10,8 @@ class DocumentsConfig(AppConfig):
 
     def ready(self) -> None:
         from postulo.plugins import registry
+        from postulo.plugins.localstore import LocalStore
 
         from . import signals  # noqa: F401 - connects the receivers
-        from .stores import LocalStore
 
         registry.register_builtin("store", LocalStore)

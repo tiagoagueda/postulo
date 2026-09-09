@@ -10,7 +10,6 @@ class ResumeConfig(AppConfig):
 
     def ready(self) -> None:
         from postulo.plugins import registry
-
-        from .importers import EuropassImporter
+        from postulo.plugins.europass import EuropassImporter
 
         registry.register_builtin("importer", EuropassImporter)

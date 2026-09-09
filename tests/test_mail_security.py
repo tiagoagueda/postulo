@@ -190,9 +190,9 @@ def test_an_unconventional_port_is_not_second_guessed():
 
 
 def test_the_send_path_sets_use_ssl_and_never_both():
-    from postulo.notifications.smtp import SMTPTransport
+    from postulo.plugins.smtp import SMTPTransport
 
-    with mock.patch("postulo.notifications.smtp.GuardedBackend") as backend:
+    with mock.patch("postulo.plugins.smtp.GuardedBackend") as backend:
         SMTPTransport().deliver([], {"host": "h", "port": 465, "security": "ssl"})
 
     kwargs = backend.call_args.kwargs
@@ -200,9 +200,9 @@ def test_the_send_path_sets_use_ssl_and_never_both():
 
 
 def test_the_send_path_sets_use_tls_for_starttls():
-    from postulo.notifications.smtp import SMTPTransport
+    from postulo.plugins.smtp import SMTPTransport
 
-    with mock.patch("postulo.notifications.smtp.GuardedBackend") as backend:
+    with mock.patch("postulo.plugins.smtp.GuardedBackend") as backend:
         SMTPTransport().deliver([], {"host": "h", "port": 587, "security": "starttls"})
 
     kwargs = backend.call_args.kwargs
@@ -210,9 +210,9 @@ def test_the_send_path_sets_use_tls_for_starttls():
 
 
 def test_neither_flag_is_set_without_a_choice():
-    from postulo.notifications.smtp import SMTPTransport
+    from postulo.plugins.smtp import SMTPTransport
 
-    with mock.patch("postulo.notifications.smtp.GuardedBackend") as backend:
+    with mock.patch("postulo.plugins.smtp.GuardedBackend") as backend:
         SMTPTransport().deliver([], {"host": "h", "port": 25, "security": "none"})
 
     kwargs = backend.call_args.kwargs

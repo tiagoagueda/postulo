@@ -57,6 +57,9 @@ from .base import (
     ConnectedPlugin,
     # -------------------------------------------------- what a plugin declares
     Consent,
+    # ------------------------------------------- what a store is handed, and gives back
+    DocumentMetadata,
+    ExternalRef,
     FeaturePlugin,
     FieldSpec,
     ImporterPlugin,
@@ -65,6 +68,7 @@ from .base import (
     JobPostingData,
     Manifest,
     SourcePlugin,
+    StorePlugin,
     SyncPlugin,
     SyncReport,
     # ----------------------------------------------------- what it hands back
@@ -87,6 +91,8 @@ __all__ = [
     "TEXT",
     "ConnectedPlugin",
     "Consent",
+    "DocumentMetadata",
+    "ExternalRef",
     "FeaturePlugin",
     "FieldSpec",
     "ImportRefused",
@@ -96,6 +102,7 @@ __all__ = [
     "OwnedModel",
     "OwnedQuerySet",
     "SourcePlugin",
+    "StorePlugin",
     "SyncPlugin",
     "SyncReport",
     "TestResult",

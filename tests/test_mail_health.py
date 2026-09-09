@@ -32,11 +32,11 @@ from django.utils import timezone
 from postulo.core import site
 from postulo.core.models import SiteSettings
 from postulo.notifications import transport
-from postulo.notifications.smtp import SMTPTransport
 from postulo.notifications.transport import PluggableBackend
 from postulo.plugins import registry
 from postulo.plugins.base import FieldSpec
 from postulo.plugins.base import TestResult as PluginTestResult
+from postulo.plugins.smtp import SMTPTransport
 
 pytestmark = pytest.mark.django_db
 

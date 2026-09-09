@@ -173,14 +173,19 @@ def test_a_built_in_plugin_finds_the_catalogue_beside_it_rather_than_postulos():
     )
 
 
-def test_a_built_in_that_has_not_moved_its_strings_still_finds_postulos():
-    """Which is what lets #129 move the built-ins out one at a time rather than all at once."""
+def test_a_module_with_no_catalogue_beside_it_falls_back_to_postulos():
+    """Which is what let #129 move the built-ins out one at a time rather than all at once.
+
+    Every plugin Postulo ships has its own catalogue now, so the example here is an ordinary
+    core module -- but the fallback is the behaviour that made the staging possible, and the
+    next plugin to be extracted from core relies on it again on its way out.
+    """
     from pathlib import Path as _Path
 
     import postulo
 
     package = _Path(postulo.__file__).resolve().parent
-    assert plugin_locale.locale_dir_of("postulo.notifications.smtp") == package / "locale"
+    assert plugin_locale.locale_dir_of("postulo.notifications.base") == package / "locale"
 
 
 def test_a_package_without_a_locale_directory_registers_nothing(settings):

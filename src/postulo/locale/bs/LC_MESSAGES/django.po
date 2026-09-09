@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 18:14+0000\n"
+"POT-Creation-Date: 2026-09-09 18:30+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: bosanski\n"
@@ -319,12 +319,12 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s bi promijenio ono o čemu Postulo sam ovisi. %(problems)s"
 
-#: src/postulo/documents/rendering.py:245
+#: src/postulo/documents/rendering.py:247
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/documents/rendering.py:225
+#: src/postulo/documents/rendering.py:227
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
@@ -364,7 +364,7 @@ msgstr "%(role)s u %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s u %(company)s — %(days)s dana"
 
-#: src/postulo/resume/europass.py:802
+#: src/postulo/resume/importing.py:136
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: nema datuma početka, pa nije dodana."
@@ -447,11 +447,6 @@ msgstr "%(url)s je odgovorio %(code)s."
 #, python-format, draft
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr "%(url)s je mnogo veći nego što katalog treba biti."
-
-#: src/postulo/resume/europass.py:606
-#, python-format, draft
-msgid "%(what)s was in the file but could not be read."
-msgstr "%(what)s je bio u datoteci, ali se nije mogao pročitati."
 
 #: src/postulo/templates/server/overview.html:61
 #, python-format, draft
@@ -770,11 +765,6 @@ msgstr "Meni računa, %(name)s"
 #, draft
 msgid "Accounts"
 msgstr "Računi"
-
-#: src/postulo/resume/europass.py:716
-#, draft
-msgid "Achievements"
-msgstr "Postignuća"
 
 #: src/postulo/applications/analytics.py:32
 #: src/postulo/applications/models.py:41
@@ -2738,8 +2728,7 @@ msgid "Edit interview"
 msgstr "Uredi intervju"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
-#: src/postulo/resume/europass.py:661 src/postulo/resume/registry.py:41
-#: src/postulo/resume/registry.py:42
+#: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
 #: src/postulo/templates/resume/europass_import.html:67
 #: src/postulo/templates/resume/preview.html:45
 #, draft
@@ -3141,11 +3130,6 @@ msgstr "Datoteka sačuvana."
 #, draft
 msgid "Files"
 msgstr "Datoteke"
-
-#: src/postulo/documents/stores.py:112
-#, draft
-msgid "Files are kept under this instance's private media."
-msgstr "Datoteke se čuvaju u privatnim medijima ove instalacije."
 
 #: src/postulo/applications/models.py:233
 #, draft
@@ -4102,13 +4086,6 @@ msgstr "Poslovi"
 msgid "Join the call"
 msgstr "Pridruži se pozivu"
 
-#: src/postulo/core/features.py:31
-#, draft
-msgid ""
-"Keep more than one number for yourself and for the people you deal with — a mobile, a desk line, a switchboard — with one of them marked as the one to use. Switched off, Postulo shows and uses the primary number only; the others stay recorded and come back untouched when it is switched on again."
-msgstr ""
-"Čuvajte više od jednog broja za sebe i za ljude s kojima imate posla — mobitel, fiksnu liniju, centralu — s jednim označenim kao onaj koji se koristi. Isključeno, Postulo prikazuje i koristi samo glavni broj; ostali ostaju zapisani i vraćaju se netaknuti čim se ponovo uključi."
-
 #: src/postulo/templates/server/person_recovery.html:52
 #, draft
 msgid ""
@@ -4129,7 +4106,7 @@ msgid ""
 msgstr ""
 "Čuva se u %(file)s i rotira po veličini, pa ovo ne može napuniti disk. Sve ovdje ide i u konzolu, odakle to čita <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4965,11 +4942,6 @@ msgstr "Ne"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Ni adrese ni ključa, pa se odatle ništa ne nudi."
 
-#: src/postulo/notifications/email.py:69
-#, draft
-msgid "No address to send to."
-msgstr "Nema adrese za slanje."
-
 #: src/postulo/plugins/catalogue.py:223
 #, python-format, draft
 msgid "No catalogue called “%(name)s” is configured."
@@ -5096,11 +5068,6 @@ msgstr "Nema zabilježenih oglasa za ovu kompaniju."
 #, draft
 msgid "no role"
 msgstr "nema radnog mjesta"
-
-#: src/postulo/notifications/smtp.py:119
-#, draft
-msgid "No server set."
-msgstr "Server nije postavljen."
 
 #: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
@@ -5545,11 +5512,6 @@ msgstr "Ništa. Pregled će ponuditi da nešto vrati."
 #, draft
 msgid "Notifications"
 msgstr "Obavještenja"
-
-#: src/postulo/notifications/email.py:71
-#, draft
-msgid "Notifications are set up"
-msgstr "Obavještenja su postavljena"
 
 #: src/postulo/applications/models.py:378
 #, draft
@@ -6077,7 +6039,7 @@ msgstr "Lična stranica"
 msgid "Pharmaceuticals"
 msgstr "Farmacija"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:302
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -7128,7 +7090,7 @@ msgstr "Sačuvano."
 msgid "Say what this identifier is."
 msgstr "Recite šta je ovaj identifikator."
 
-#: src/postulo/core/phone_numbers.py:315
+#: src/postulo/core/phone_numbers.py:316
 #, draft
 msgid "Say what this number is."
 msgstr "Recite šta je ovaj broj."
@@ -7262,11 +7224,6 @@ msgid "Send it as a bearer token. To check that one works, and see its scopes:"
 msgstr ""
 "Šaljite ga kao bearer token. Da biste provjerili radi li neki i vidjeli njegove opsege:"
 
-#: src/postulo/notifications/email.py:50
-#, draft
-msgid "Send to"
-msgstr "Pošalji na"
-
 #: src/postulo/templates/documents/partials/copies.html:20
 #, draft
 msgid "Send to stores now"
@@ -7306,7 +7263,7 @@ msgstr "Poslani dokumenti"
 msgid "sent on"
 msgstr "poslano"
 
-#: src/postulo/core/server_views.py:730 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:730
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Poslano na %(to)s."
@@ -7404,11 +7361,6 @@ msgstr "Odjeljci postavki"
 #, draft
 msgid "Settled"
 msgstr "Riješeno"
-
-#: src/postulo/core/features.py:29
-#, draft
-msgid "Several telephone numbers"
-msgstr "Više telefonskih brojeva"
 
 #: src/postulo/core/widgets_builtin.py:17
 #, draft
@@ -8105,11 +8057,6 @@ msgstr "Ovo ne izgleda kao %(scheme)s identifikator (na primjer %(example)s)."
 msgid "That does not look like a complete web address."
 msgstr "Ovo ne izgleda kao potpuna web adresa."
 
-#: src/postulo/resume/europass.py:312 src/postulo/resume/europass.py:585
-#, draft
-msgid "That does not look like a Europass file: it has no LearnerInfo section."
-msgstr "Ovo ne izgleda kao Europass datoteka: nema odjeljak LearnerInfo."
-
 #: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
@@ -8148,30 +8095,10 @@ msgstr "Ta datoteka je veća od %(limit)s MB."
 msgid "That file is larger than a logo should be."
 msgstr "Ta datoteka je veća nego što logo treba biti."
 
-#: src/postulo/resume/europass.py:569
-#, python-format, draft
-msgid "That file is not readable JSON: %(reason)s"
-msgstr "Ta datoteka nije čitljiv JSON: %(reason)s"
-
-#: src/postulo/resume/europass.py:304
-#, python-format, draft
-msgid "That file is not readable XML: %(reason)s"
-msgstr "Ta datoteka nije čitljiv XML: %(reason)s"
-
-#: src/postulo/resume/europass.py:566
-#, draft
-msgid "That file is not UTF-8, so it is not a Europass export."
-msgstr "Ta datoteka nije UTF-8, pa nije Europass izvoz."
-
 #: src/postulo/resume/views.py:253
 #, python-format, draft
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Ta datoteka je preko %(limit)s MB. CV nije toliko velik."
-
-#: src/postulo/resume/europass.py:574
-#, python-format, draft
-msgid "That file nests more than %(limit)s levels deep, so it was not read."
-msgstr "Ta datoteka je ugniježđena dublje od %(limit)s nivoa, pa nije pročitana."
 
 #: src/postulo/resume/views.py:287
 #, draft
@@ -8202,13 +8129,6 @@ msgstr "To je mnogo veza za oporavak. Pokušajte ponovo uskoro."
 #, draft
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "To je SVG, koji Postulo još ne čuva. PNG ili JPEG odgovara."
-
-#: src/postulo/resume/europass.py:223
-#, draft
-msgid ""
-"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
-msgstr ""
-"To nije Europass datoteka. Postulo čita XML koji je stvarao CV uređivač i JSON koji izvozi europass.europa.eu; ovo nije ni jedno ni drugo."
 
 #: src/postulo/applications/views.py:365
 #, draft
@@ -8293,12 +8213,12 @@ msgid ""
 msgstr ""
 "Taj broj nema državu ispred sebe, pa ga nigdje drugdje nije moguće nazvati. Odaberite državu ili ga napišite počevši sa +."
 
-#: src/postulo/core/phone_numbers.py:395
+#: src/postulo/core/phone_numbers.py:396
 #, draft
 msgid "That number has to be confirmed before it can get you back in."
 msgstr "Taj broj mora biti potvrđen prije nego što vas može vratiti nazad."
 
-#: src/postulo/core/phone_numbers.py:32
+#: src/postulo/core/phone_numbers.py:33
 #, draft
 msgid ""
 "That number is already recorded on this instance. Telephone numbers are kept unique across every account here, so it may belong to somebody else's records."
@@ -8469,13 +8389,6 @@ msgstr "Okruženje postavlja „%(name)s“, pa se to ovdje ne može promijeniti
 msgid "the escape hatch, for anything this area does not cover"
 msgstr "izlaz u nuždi, za sve što ovo područje ne pokriva"
 
-#: src/postulo/resume/importers.py:32
-#, draft
-msgid ""
-"The European CV format: the XML the Europass editor produces and the JSON europass.europa.eu exports."
-msgstr ""
-"Evropski CV format: XML koji stvara Europass uređivač i JSON koji izvozi europass.europa.eu."
-
 #: src/postulo/templates/jobs/industry_list.html:12
 #, draft
 msgid ""
@@ -8569,7 +8482,7 @@ msgstr "Logo je nestao."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logo nije promijenjen: %(problem)s"
 
-#: src/postulo/core/server_views.py:732 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Pozadinski sistem pošte nije prihvatio ništa."
@@ -8630,13 +8543,6 @@ msgstr "Oglas"
 #, draft
 msgid "The posting itself"
 msgstr "Sam oglas"
-
-#: src/postulo/documents/stores.py:91
-#, draft
-msgid ""
-"The private media directory on this server, where every document is kept whatever else it is also copied to."
-msgstr ""
-"Privatni direktorij medija na ovom serveru, gdje se čuva svaki dokument, gdje god se još kopirao."
 
 #: src/postulo/plugins/consent.py:241
 #, python-format, draft
@@ -8849,7 +8755,6 @@ msgstr "Za ovu kompaniju nije zabilježena web stranica."
 msgid "This identifier is already listed."
 msgstr "Ovaj identifikator je već na spisku."
 
-#: src/postulo/documents/stores.py:89
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -8903,13 +8808,6 @@ msgid ""
 msgstr ""
 "Ovo je standardni raspored. Dok nešto ne promijenite, modul dodan u kasnijem izdanju pojavit će se ovdje sam; kada jednom rasporedite stranicu, novi ostaju izvan nje dok ne zatražite."
 
-#: src/postulo/notifications/email.py:73
-#, draft
-msgid ""
-"This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
-msgstr ""
-"Ovo je probna poruka s vaše Postulo veze za obavještenja. Podsjetnici i hvatanja stizat će na isti način."
-
 #: src/postulo/templates/server/plugins.html:281
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -8927,7 +8825,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Ova vrsta identifikatora već je na spisku."
 
-#: src/postulo/core/phone_numbers.py:341
+#: src/postulo/core/phone_numbers.py:342
 #, draft
 msgid "This number is already listed."
 msgstr "Ovaj broj je već na spisku."
@@ -9333,12 +9231,6 @@ msgstr ""
 #, draft
 msgid "Using a token"
 msgstr "Korištenje tokena"
-
-#: src/postulo/notifications/email.py:52
-#, draft
-msgid "Usually your own address. Anything the instance's mail can reach."
-msgstr ""
-"Obično vaša vlastita adresa. Bilo šta do čega pošta instalacije može doprijeti."
 
 #: src/postulo/jobs/industries.py:26
 #, draft
@@ -9842,11 +9734,6 @@ msgstr "Povučeno"
 msgid "Work"
 msgstr "Posao"
 
-#: src/postulo/resume/europass.py:638
-#, draft
-msgid "Work experience"
-msgstr "Radno iskustvo"
-
 #: src/postulo/templates/connections/list.html:35
 #, python-format, draft
 msgid "worked %(when)s"
@@ -9987,7 +9874,7 @@ msgid ""
 msgstr ""
 "Već ste se prijavili na ovaj. Bilježenje druge prijave je u redu; obje ostaju u zapisu."
 
-#: src/postulo/core/phone_numbers.py:165
+#: src/postulo/core/phone_numbers.py:166
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

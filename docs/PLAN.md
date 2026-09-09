@@ -172,9 +172,11 @@ postulo/
 │   ├── documents/            # CV variants, cover letters, uploads, rendering   (M3)
 │   ├── jobs/                 # Company, Contact, JobPosting, capture         (M2/M4)
 │   ├── applications/         # Application, events, reminders, analytics    (M2/M5)
-│   ├── plugins/              # registry, api surface, built-in sources          (M4)
-│   │   └── builtin/locale/   # a shipped plugin's own catalogues (scripts/messages.py
-│   │                         # walks every set, not just core's)
+│   ├── plugins/              # registry, api surface, and the seven Postulo ships (M4)
+│   │   ├── builtin/          # each is a package: manifest, locale/, code — nothing
+│   │   ├── email/  smtp/     # of it in core, and a test that says so
+│   │   ├── europass/         # (tests/test_plugin_surface.py)
+│   │   └── localstore/  phone_numbers/
 │   └── api/                  # ninja routers, capture tokens                    (M4)
 └── tests/
 ```

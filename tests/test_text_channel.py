@@ -102,7 +102,7 @@ def test_nonsense_falls_back_to_mail_rather_than_disappearing():
 
 
 def test_the_shipped_mail_transport_says_mail():
-    from postulo.notifications.smtp import SMTPTransport
+    from postulo.plugins.smtp import SMTPTransport
 
     assert base.medium_of(SMTPTransport()) == base.MAIL
 

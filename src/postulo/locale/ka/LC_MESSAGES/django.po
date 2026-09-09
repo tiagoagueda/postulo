@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 18:14+0000\n"
+"POT-Creation-Date: 2026-09-09 18:30+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: ქართული\n"
@@ -308,12 +308,12 @@ msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr ""
 "%(name)s შეცვლიდა იმას, რაზეც თავად Postulo არის დამოკიდებული. %(problems)s"
 
-#: src/postulo/documents/rendering.py:245
+#: src/postulo/documents/rendering.py:247
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/documents/rendering.py:225
+#: src/postulo/documents/rendering.py:227
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
@@ -353,7 +353,7 @@ msgstr "%(role)s კომპანიაში %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s კომპანიაში %(company)s — %(days)s დღე"
 
-#: src/postulo/resume/europass.py:802
+#: src/postulo/resume/importing.py:136
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: დაწყების თარიღი არ არის, ამიტომ არ დაემატა."
@@ -430,11 +430,6 @@ msgstr "%(url)s-მა უპასუხა %(code)s."
 #, python-format, draft
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr "%(url)s ბევრად უფრო დიდია, ვიდრე კატალოგი უნდა იყოს."
-
-#: src/postulo/resume/europass.py:606
-#, python-format, draft
-msgid "%(what)s was in the file but could not be read."
-msgstr "%(what)s ფაილში იყო, მაგრამ ვერ წაიკითხა."
 
 #: src/postulo/templates/server/overview.html:61
 #, python-format, draft
@@ -752,11 +747,6 @@ msgstr "ანგარიშის მენიუ, %(name)s"
 #, draft
 msgid "Accounts"
 msgstr "ანგარიშები"
-
-#: src/postulo/resume/europass.py:716
-#, draft
-msgid "Achievements"
-msgstr "მიღწევები"
 
 #: src/postulo/applications/analytics.py:32
 #: src/postulo/applications/models.py:41
@@ -2723,8 +2713,7 @@ msgid "Edit interview"
 msgstr "გასაუბრების რედაქტირება"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
-#: src/postulo/resume/europass.py:661 src/postulo/resume/registry.py:41
-#: src/postulo/resume/registry.py:42
+#: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
 #: src/postulo/templates/resume/europass_import.html:67
 #: src/postulo/templates/resume/preview.html:45
 #, draft
@@ -3127,11 +3116,6 @@ msgstr "ფაილი შენახულია."
 #, draft
 msgid "Files"
 msgstr "ფაილები"
-
-#: src/postulo/documents/stores.py:112
-#, draft
-msgid "Files are kept under this instance's private media."
-msgstr "ფაილები ინახება ამ ინსტალაციის კერძო მედიაში."
 
 #: src/postulo/applications/models.py:233
 #, draft
@@ -4092,13 +4076,6 @@ msgstr "სამსახურები"
 msgid "Join the call"
 msgstr "ზარში შესვლა"
 
-#: src/postulo/core/features.py:31
-#, draft
-msgid ""
-"Keep more than one number for yourself and for the people you deal with — a mobile, a desk line, a switchboard — with one of them marked as the one to use. Switched off, Postulo shows and uses the primary number only; the others stay recorded and come back untouched when it is switched on again."
-msgstr ""
-"შეინახეთ ერთზე მეტი ნომერი თქვენთვის და იმ ადამიანებისთვის, ვისთანაც საქმე გაქვთ — მობილური, ფიქსირებული ხაზი, სატელეფონო ცენტრი — ერთი მათგანი მონიშნული როგორც გამოსაყენებელი. გამორთულია რომ, Postulo აჩვენებს და იყენებს მხოლოდ მთავარ ნომერს; დანარჩენები ჩაწერილი რჩება და უცვლელად ბრუნდება, როგორც კი ისევ ჩაირთვება."
-
 #: src/postulo/templates/server/person_recovery.html:52
 #, draft
 msgid ""
@@ -4119,7 +4096,7 @@ msgid ""
 msgstr ""
 "ინახება %(file)s-ში და ბრუნავს ზომის მიხედვით, ამიტომ დისკს ვერ შეავსებს. აქაური ყველაფერი კონსოლშიც მიდის, საიდანაც მას <code>docker logs</code> კითხულობს."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4953,11 +4930,6 @@ msgstr "არა"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "არც მისამართი, არც გასაღები, ამიტომ იქიდან არაფერი გვთავაზობა."
 
-#: src/postulo/notifications/email.py:69
-#, draft
-msgid "No address to send to."
-msgstr "გასაგზავნი მისამართი არ არის."
-
 #: src/postulo/plugins/catalogue.py:223
 #, python-format, draft
 msgid "No catalogue called “%(name)s” is configured."
@@ -5085,11 +5057,6 @@ msgstr "ამ კომპანიისთვის ვაკანსიე�
 #, draft
 msgid "no role"
 msgstr "პოზიცია არ არის"
-
-#: src/postulo/notifications/smtp.py:119
-#, draft
-msgid "No server set."
-msgstr "სერვერი არ არის მითითებული."
 
 #: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
@@ -5534,11 +5501,6 @@ msgstr "არაფერი. მიმოხილვა შემოგთა
 #, draft
 msgid "Notifications"
 msgstr "შეტყობინებები"
-
-#: src/postulo/notifications/email.py:71
-#, draft
-msgid "Notifications are set up"
-msgstr "შეტყობინებები დაყენებულია"
 
 #: src/postulo/applications/models.py:378
 #, draft
@@ -6057,7 +6019,7 @@ msgstr "პირადი საიტი"
 msgid "Pharmaceuticals"
 msgstr "ფარმაცევტიკა"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:302
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -7110,7 +7072,7 @@ msgstr "შენახულია."
 msgid "Say what this identifier is."
 msgstr "თქვით, რა არის ეს იდენტიფიკატორი."
 
-#: src/postulo/core/phone_numbers.py:315
+#: src/postulo/core/phone_numbers.py:316
 #, draft
 msgid "Say what this number is."
 msgstr "თქვით, რა ნომერია ეს."
@@ -7244,11 +7206,6 @@ msgid "Send it as a bearer token. To check that one works, and see its scopes:"
 msgstr ""
 "გააგზავნეთ როგორც bearer ტოკენი. რომ შეამოწმოთ, მუშაობს თუ არა და ნახოთ მისი უფლებები:"
 
-#: src/postulo/notifications/email.py:50
-#, draft
-msgid "Send to"
-msgstr "გაგზავნა მისამართზე"
-
 #: src/postulo/templates/documents/partials/copies.html:20
 #, draft
 msgid "Send to stores now"
@@ -7288,7 +7245,7 @@ msgstr "გაგზავნილი დოკუმენტები"
 msgid "sent on"
 msgstr "გაგზავნის თარიღი"
 
-#: src/postulo/core/server_views.py:730 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:730
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "გაგზავნილია %(to)s-ზე."
@@ -7386,11 +7343,6 @@ msgstr "პარამეტრების განყოფილებე�
 #, draft
 msgid "Settled"
 msgstr "დასრულებული"
-
-#: src/postulo/core/features.py:29
-#, draft
-msgid "Several telephone numbers"
-msgstr "რამდენიმე ტელეფონის ნომერი"
 
 #: src/postulo/core/widgets_builtin.py:17
 #, draft
@@ -8086,11 +8038,6 @@ msgstr "ეს არ ჰგავს %(scheme)s იდენტიფიკა�
 msgid "That does not look like a complete web address."
 msgstr "ეს არ ჰგავს სრულ ვებმისამართს."
 
-#: src/postulo/resume/europass.py:312 src/postulo/resume/europass.py:585
-#, draft
-msgid "That does not look like a Europass file: it has no LearnerInfo section."
-msgstr "ეს არ ჰგავს Europass ფაილს: მას LearnerInfo განყოფილება არ აქვს."
-
 #: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
@@ -8129,30 +8076,10 @@ msgstr "ის ფაილი %(limit)s MB-ზე დიდია."
 msgid "That file is larger than a logo should be."
 msgstr "ის ფაილი უფრო დიდია, ვიდრე ლოგო უნდა იყოს."
 
-#: src/postulo/resume/europass.py:569
-#, python-format, draft
-msgid "That file is not readable JSON: %(reason)s"
-msgstr "ის ფაილი წასაკითხი JSON არ არის: %(reason)s"
-
-#: src/postulo/resume/europass.py:304
-#, python-format, draft
-msgid "That file is not readable XML: %(reason)s"
-msgstr "ის ფაილი წასაკითხი XML არ არის: %(reason)s"
-
-#: src/postulo/resume/europass.py:566
-#, draft
-msgid "That file is not UTF-8, so it is not a Europass export."
-msgstr "ის ფაილი UTF-8 არ არის, ამიტომ Europass-ის ექსპორტი არ არის."
-
 #: src/postulo/resume/views.py:253
 #, python-format, draft
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "ის ფაილი %(limit)s MB-ზე მეტია. CV ასეთი დიდი არ არის."
-
-#: src/postulo/resume/europass.py:574
-#, python-format, draft
-msgid "That file nests more than %(limit)s levels deep, so it was not read."
-msgstr "ის ფაილი %(limit)s დონეზე ღრმად არის ჩალაგებული, ამიტომ არ წაიკითხა."
 
 #: src/postulo/resume/views.py:287
 #, draft
@@ -8183,13 +8110,6 @@ msgstr "ეს ბევრი აღდგენის ბმულია. ს�
 #, draft
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "ეს არის SVG, რომელსაც Postulo ჯერ არ ინახავს. PNG ან JPEG გამოდგება."
-
-#: src/postulo/resume/europass.py:223
-#, draft
-msgid ""
-"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
-msgstr ""
-"ეს არ არის Europass ფაილი. Postulo კითხულობს XML-ს, რომელსაც CV-ის რედაქტორი ქმნიდა, და JSON-ს, რომელსაც europass.europa.eu ექსპორტირებს; ეს არც ერთია, არც მეორე."
 
 #: src/postulo/applications/views.py:365
 #, draft
@@ -8274,12 +8194,12 @@ msgid ""
 msgstr ""
 "ამ ნომრის წინ ქვეყანა არ არის, ამიტომ სხვა ადგილიდან მისი აკრეფა შეუძლებელია. აირჩიეთ ქვეყანა, ან დაწერეთ იგი +-ით დაწყებული."
 
-#: src/postulo/core/phone_numbers.py:395
+#: src/postulo/core/phone_numbers.py:396
 #, draft
 msgid "That number has to be confirmed before it can get you back in."
 msgstr "ეს ნომერი უნდა დადასტურდეს, სანამ ის შეძლებს თქვენს დაბრუნებას."
 
-#: src/postulo/core/phone_numbers.py:32
+#: src/postulo/core/phone_numbers.py:33
 #, draft
 msgid ""
 "That number is already recorded on this instance. Telephone numbers are kept unique across every account here, so it may belong to somebody else's records."
@@ -8448,13 +8368,6 @@ msgstr "გარემო აყენებს „%(name)s“-ს, ამი�
 msgid "the escape hatch, for anything this area does not cover"
 msgstr "სათადარიგო გამოსავალი ყველაფრისთვის, რასაც ეს სფერო არ ფარავს"
 
-#: src/postulo/resume/importers.py:32
-#, draft
-msgid ""
-"The European CV format: the XML the Europass editor produces and the JSON europass.europa.eu exports."
-msgstr ""
-"ევროპული CV-ის ფორმატი: XML, რომელსაც Europass-ის რედაქტორი ქმნის, და JSON, რომელსაც europass.europa.eu ექსპორტირებს."
-
 #: src/postulo/templates/jobs/industry_list.html:12
 #, draft
 msgid ""
@@ -8546,7 +8459,7 @@ msgstr "ლოგო აღარ არის."
 msgid "The logo was not changed: %(problem)s"
 msgstr "ლოგო არ შეცვლილა: %(problem)s"
 
-#: src/postulo/core/server_views.py:732 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "ფოსტის ძრავამ არაფერი მიიღო."
@@ -8607,13 +8520,6 @@ msgstr "ვაკანსია"
 #, draft
 msgid "The posting itself"
 msgstr "თავად ვაკანსია"
-
-#: src/postulo/documents/stores.py:91
-#, draft
-msgid ""
-"The private media directory on this server, where every document is kept whatever else it is also copied to."
-msgstr ""
-"ამ სერვერზე არსებული კერძო მედიის საქაღალდე, სადაც თითოეული დოკუმენტი ინახება, სხვაგან სადაც არ უნდა იყოს დაკოპირებული."
 
 #: src/postulo/plugins/consent.py:241
 #, python-format, draft
@@ -8826,7 +8732,6 @@ msgstr "ამ კომპანიისთვის ვებგვერდ�
 msgid "This identifier is already listed."
 msgstr "ეს იდენტიფიკატორი უკვე სიაშია."
 
-#: src/postulo/documents/stores.py:89
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -8880,13 +8785,6 @@ msgid ""
 msgstr ""
 "ეს სტანდარტული განლაგებაა. სანამ რამეს არ შეცვლით, მოგვიანებით გამოშვებაში დამატებული მოდული აქ თავისით გამოჩნდება; როგორც კი გვერდს დაალაგებთ, ახლები მის გარეთ რჩება, სანამ არ მოითხოვთ."
 
-#: src/postulo/notifications/email.py:73
-#, draft
-msgid ""
-"This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
-msgstr ""
-"ეს არის სატესტო შეტყობინება თქვენი Postulo-ს შეტყობინებების კავშირიდან. შეხსენებები და აღებები იმავე გზით მოვა."
-
 #: src/postulo/templates/server/plugins.html:281
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -8904,7 +8802,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "ამ სახის იდენტიფიკატორი უკვე სიაშია."
 
-#: src/postulo/core/phone_numbers.py:341
+#: src/postulo/core/phone_numbers.py:342
 #, draft
 msgid "This number is already listed."
 msgstr "ეს ნომერი უკვე სიაშია."
@@ -9309,12 +9207,6 @@ msgstr ""
 #, draft
 msgid "Using a token"
 msgstr "ტოკენის გამოყენება"
-
-#: src/postulo/notifications/email.py:52
-#, draft
-msgid "Usually your own address. Anything the instance's mail can reach."
-msgstr ""
-"ჩვეულებრივ თქვენივე მისამართი. ნებისმიერი, სადამდეც ინსტალაციის ფოსტა აღწევს."
 
 #: src/postulo/jobs/industries.py:26
 #, draft
@@ -9819,11 +9711,6 @@ msgstr "გატანილია"
 msgid "Work"
 msgstr "სამსახური"
 
-#: src/postulo/resume/europass.py:638
-#, draft
-msgid "Work experience"
-msgstr "სამუშაო გამოცდილება"
-
 #: src/postulo/templates/connections/list.html:35
 #, python-format, draft
 msgid "worked %(when)s"
@@ -9964,7 +9851,7 @@ msgid ""
 msgstr ""
 "ამაზე უკვე გაგიკეთებიათ განაცხადი. მეორე განაცხადის აღრიცხვა ნორმალურია; ორივე ჩანაწერში რჩება."
 
-#: src/postulo/core/phone_numbers.py:165
+#: src/postulo/core/phone_numbers.py:166
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

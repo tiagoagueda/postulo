@@ -18,7 +18,8 @@ from django.urls import reverse
 from postulo.accounts import identifiers
 from postulo.accounts.models import PersonIdentifier
 from postulo.plugins import base
-from postulo.resume import europass
+from postulo.plugins.europass import reader as europass
+from postulo.resume import importing
 from postulo.resume.models import (
     Education,
     Experience,
@@ -188,7 +189,7 @@ def test_a_file_over_the_cap_is_not_parsed():
 def test_applying_writes_everything_it_found(user):
     record = europass.read(FIXTURE.read_bytes())
 
-    report = europass.apply(user, record)
+    report = importing.apply(user, record)
 
     assert Experience.objects.filter(owner=user).count() == 2
     assert Education.objects.filter(owner=user).count() == 1
@@ -206,7 +207,7 @@ def test_an_import_never_overwrites_what_is_already_there(user):
     profile.headline = "Staff engineer, mostly Python"
     profile.save(update_fields=["headline"])
 
-    europass.apply(user, europass.read(FIXTURE.read_bytes()))
+    importing.apply(user, europass.read(FIXTURE.read_bytes()))
 
     user.refresh_from_db()
     profile.refresh_from_db()
@@ -220,7 +221,7 @@ def test_an_import_never_overwrites_what_is_already_there(user):
 def test_a_heading_that_already_exists_is_used_rather_than_repeated(user):
     SkillGroup.objects.create(owner=user, name="Digital")
 
-    europass.apply(user, europass.read(FIXTURE.read_bytes()))
+    importing.apply(user, europass.read(FIXTURE.read_bytes()))
 
     assert SkillGroup.objects.filter(owner=user, name="Digital").count() == 1
     assert Skill.objects.filter(owner=user, group__name="Digital").count() == 3
@@ -229,13 +230,13 @@ def test_a_heading_that_already_exists_is_used_rather_than_repeated(user):
 def test_experience_without_a_start_is_left_out(user):
     data = MINIMAL.replace(b'<Period><From year="2020"/></Period>', b"")
 
-    europass.apply(user, europass.read(data))
+    importing.apply(user, europass.read(data))
 
     assert not Experience.objects.filter(owner=user).exists()
 
 
 def test_one_persons_import_does_not_touch_another(user, other_user):
-    europass.apply(user, europass.read(FIXTURE.read_bytes()))
+    importing.apply(user, europass.read(FIXTURE.read_bytes()))
 
     assert not Experience.objects.filter(owner=other_user).exists()
     assert not SkillGroup.objects.filter(owner=other_user).exists()
@@ -498,7 +499,7 @@ def test_an_orcid_among_the_websites_becomes_an_identifier(user):
     # The first website is still the website; the ORCID does not take its place.
     assert record.person["website"] == "https://alex.example.org"
 
-    europass.apply(user, record)
+    importing.apply(user, record)
 
     identifier = PersonIdentifier.objects.get(profile=user.profile)
     assert identifier.scheme == identifiers.ORCID
@@ -511,7 +512,7 @@ def test_an_orcid_that_fails_its_checksum_is_dropped_rather_than_saved(user):
     record = europass.read(data)
 
     assert "orcid" not in record.person
-    europass.apply(user, record)
+    importing.apply(user, record)
     assert not PersonIdentifier.objects.filter(profile=user.profile).exists()
 
 
@@ -520,7 +521,7 @@ def test_an_orcid_somebody_already_has_is_left_alone(user):
         profile=user.profile, scheme=identifiers.ORCID, value="0000-0001-5109-3700"
     )
 
-    europass.apply(user, europass.read(FIXTURE.read_bytes()))
+    importing.apply(user, europass.read(FIXTURE.read_bytes()))
 
     identifiers_held = PersonIdentifier.objects.filter(profile=user.profile)
     assert identifiers_held.count() == 1
@@ -533,7 +534,7 @@ def test_an_orcid_somebody_already_has_is_left_alone(user):
 def test_experience_without_a_start_is_named_rather_than_dropped_quietly(user):
     data = MINIMAL.replace(b'<Period><From year="2020"/></Period>', b"")
 
-    report = europass.apply(user, europass.read(data))
+    report = importing.apply(user, europass.read(data))
 
     assert not Experience.objects.filter(owner=user).exists()
     assert report.skipped == ["Engineer: no start date, so it was not added."]

@@ -203,7 +203,9 @@ def _keep(document: RenderedDocument, filename: str, content: bytes) -> None:
 
     External stores get their copies once the document is saved, through the scheduler.
     """
-    from .stores import LocalStore, metadata_for
+    from postulo.plugins.localstore import LocalStore
+
+    from .stores import metadata_for
 
     LocalStore().put(
         document,

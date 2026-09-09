@@ -13,7 +13,8 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from postulo.resume import europass
+from postulo.plugins.europass import reader
+from postulo.resume import importing
 
 
 class Command(BaseCommand):
@@ -47,8 +48,8 @@ class Command(BaseCommand):
             raise CommandError(f"No account called {wanted!r}")
 
         try:
-            record = europass.read(path.read_bytes())
-        except europass.EuropassError as error:
+            record = reader.read(path.read_bytes())
+        except reader.EuropassError as error:
             raise CommandError(str(error)) from error
 
         counts = record.counts()
@@ -69,7 +70,7 @@ class Command(BaseCommand):
             return
 
         with transaction.atomic():
-            report = europass.apply(owner, record)
+            report = importing.apply(owner, record)
 
         self.stdout.write(self.style.SUCCESS(f"Added {report.total} entries for {owner}."))
         for kind, total in sorted(report.added.items()):

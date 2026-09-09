@@ -1,4 +1,4 @@
-"""Where a document's bytes go: the store contract, and the local store that is built in.
+"""What Postulo knows about the documents it stores, and where their bytes live.
 
 Postulo keeps every file — a rendered CV, a rendered letter, a file a person uploaded —
 under its own private media, and serves it through a permission check. That is the
@@ -12,108 +12,23 @@ enough metadata to file it sensibly, and gives back a reference (its id there, a
 Postulo keeps beside the document and carries in the export. The local store is expressed
 through the same contract so that there is one code path and a plugin is not a special
 case; it simply cannot be switched off.
+
+The contract itself -- ``DocumentMetadata``, ``ExternalRef``, ``StorePlugin`` -- is part of
+``postulo.plugins.api``, because it is what a store author writes against; and the local
+store is ``postulo.plugins.localstore``, because it is a plugin and every plugin Postulo
+ships is its own package (#129). What is left here is Postulo's side of the arrangement:
+the metadata it assembles, and where a document can be downloaded from.
 """
 
 from __future__ import annotations
 
 import mimetypes
-from dataclasses import dataclass, field
-from datetime import date, datetime
-from typing import Protocol, runtime_checkable
 
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 
-from postulo.plugins.api import ConnectedPlugin, FieldSpec, TestResult, declares, shipped
+from postulo.plugins.api import DocumentMetadata, FieldSpec
 
 from .models import DocumentKind, RenderedDocument, UploadedDocument
-
-
-@dataclass(frozen=True)
-class DocumentMetadata:
-    """What an archive needs to file a document without opening it.
-
-    Everything here is a plain value, so a store never has to import Postulo's models to
-    make sense of what it was given. ``kind`` is a :class:`DocumentKind` value; ``origin``
-    says whether this is a render Postulo produced or a file the person uploaded.
-    """
-
-    kind: str
-    kind_label: str
-    origin: str  # "render" or "upload"
-    title: str
-    filename: str
-    content_type: str
-    created_at: datetime
-    checksum: str = ""
-    size: int = 0
-    company: str = ""
-    role: str = ""
-    application_url: str = ""
-    sent_on: date | None = None
-    language: str = ""
-    tags: tuple[str, ...] = field(default_factory=tuple)
-
-
-@dataclass(frozen=True)
-class ExternalRef:
-    """Where a copy went: which store, its id there, and a link if the store has one."""
-
-    store: str
-    id: str
-    url: str = ""
-
-
-@runtime_checkable
-class StorePlugin(ConnectedPlugin, Protocol):
-    """A connected plugin that keeps a copy of a document somewhere.
-
-    ``put`` receives the document, its open file, the metadata above, the connection's
-    configuration and secrets together, and the person. It returns a reference, or
-    ``None`` to say *not for me* — an archive for paperwork may decline a video, say —
-    and raises on failure; Postulo retries later and shows the error on the document.
-    ``delete`` and ``browse`` are optional and not yet called by the core.
-    """
-
-    def put(
-        self, document, file, metadata: DocumentMetadata, config: dict, user
-    ) -> ExternalRef | None: ...
-
-
-# ---------------------------------------------------------------- the local store
-
-
-@declares(
-    shipped(
-        name="local",
-        label=_("This instance"),
-        kind="store",
-        description=_(
-            "The private media directory on this server, where every document is kept "
-            "whatever else it is also copied to."
-        ),
-    )
-)
-class LocalStore:
-    """Private media on this instance: the store every document is in, always.
-
-    It is a plugin in shape only. It takes no connection, appears on no form and cannot
-    be removed; it exists so that the code writing a file and the code copying it
-    elsewhere speak the same contract.
-    """
-
-    #: Not offered under Settings → Connections: it needs nothing from anyone.
-    needs_connection = False
-
-    def config_fields(self) -> list[FieldSpec]:
-        return []
-
-    def test(self, config: dict) -> TestResult:
-        return TestResult(True, str(_("Files are kept under this instance's private media.")))
-
-    def put(self, document, file, metadata: DocumentMetadata, config: dict, user) -> ExternalRef:
-        document.file.save(metadata.filename, file, save=False)
-        return ExternalRef(store=self.name, id=document.file.name, url=download_path(document))
 
 
 def download_path(document) -> str:

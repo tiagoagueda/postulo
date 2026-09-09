@@ -13,8 +13,8 @@ from django.db import IntegrityError, transaction
 from django.urls import reverse
 
 from postulo.core import phone_numbers
-from postulo.core.features import PHONE_NUMBERS
 from postulo.core.models import PhoneNumber
+from postulo.plugins.phone_numbers import PHONE_NUMBERS
 
 pytestmark = pytest.mark.django_db
 

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 18:14+0000\n"
+"POT-Creation-Date: 2026-09-09 18:30+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Nederlands\n"
@@ -309,12 +309,12 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s zou veranderen waar Postulo zelf van afhangt. %(problems)s"
 
-#: src/postulo/documents/rendering.py:245
+#: src/postulo/documents/rendering.py:247
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/documents/rendering.py:225
+#: src/postulo/documents/rendering.py:227
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — cv"
@@ -354,7 +354,7 @@ msgstr "%(role)s bij %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s bij %(company)s — %(days)s dagen"
 
-#: src/postulo/resume/europass.py:802
+#: src/postulo/resume/importing.py:136
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: geen begindatum, dus niet toegevoegd."
@@ -430,11 +430,6 @@ msgstr "%(url)s antwoordde %(code)s."
 #, python-format, draft
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr "%(url)s is veel groter dan een catalogus hoort te zijn."
-
-#: src/postulo/resume/europass.py:606
-#, python-format, draft
-msgid "%(what)s was in the file but could not be read."
-msgstr "%(what)s stond in het bestand maar kon niet worden gelezen."
 
 #: src/postulo/templates/server/overview.html:61
 #, python-format, draft
@@ -754,11 +749,6 @@ msgstr "Accountmenu, %(name)s"
 #, draft
 msgid "Accounts"
 msgstr "Accounts"
-
-#: src/postulo/resume/europass.py:716
-#, draft
-msgid "Achievements"
-msgstr "Prestaties"
 
 #: src/postulo/applications/analytics.py:32
 #: src/postulo/applications/models.py:41
@@ -2723,8 +2713,7 @@ msgid "Edit interview"
 msgstr "Gesprek bewerken"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
-#: src/postulo/resume/europass.py:661 src/postulo/resume/registry.py:41
-#: src/postulo/resume/registry.py:42
+#: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
 #: src/postulo/templates/resume/europass_import.html:67
 #: src/postulo/templates/resume/preview.html:45
 #, draft
@@ -3129,11 +3118,6 @@ msgstr "Bestand opgeslagen."
 #, draft
 msgid "Files"
 msgstr "Bestanden"
-
-#: src/postulo/documents/stores.py:112
-#, draft
-msgid "Files are kept under this instance's private media."
-msgstr "Bestanden staan in de privémedia van deze instantie."
 
 #: src/postulo/applications/models.py:233
 #, draft
@@ -4095,13 +4079,6 @@ msgstr "Banen"
 msgid "Join the call"
 msgstr "Deelnemen aan het gesprek"
 
-#: src/postulo/core/features.py:31
-#, draft
-msgid ""
-"Keep more than one number for yourself and for the people you deal with — a mobile, a desk line, a switchboard — with one of them marked as the one to use. Switched off, Postulo shows and uses the primary number only; the others stay recorded and come back untouched when it is switched on again."
-msgstr ""
-"Bewaar meer dan één nummer voor uzelf en voor de mensen met wie u te maken hebt — een mobiel, een vaste lijn, een centrale — met er één aangemerkt als de nummer om te gebruiken. Uitgeschakeld toont en gebruikt Postulo alleen het primaire nummer; de rest blijft bewaard en komt ongewijzigd terug zodra het weer aan gaat."
-
 #: src/postulo/templates/server/person_recovery.html:52
 #, draft
 msgid ""
@@ -4122,7 +4099,7 @@ msgid ""
 msgstr ""
 "Bewaard in %(file)s en op grootte geroteerd, dus dit kan de schijf niet vullen. Alles hier gaat ook naar de console, waar <code>docker logs</code> het leest."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4956,11 +4933,6 @@ msgstr "Nee"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Geen adres en geen sleutel, dus er wordt niets uit aangeboden."
 
-#: src/postulo/notifications/email.py:69
-#, draft
-msgid "No address to send to."
-msgstr "Geen adres om naar te sturen."
-
 #: src/postulo/plugins/catalogue.py:223
 #, python-format, draft
 msgid "No catalogue called “%(name)s” is configured."
@@ -5088,11 +5060,6 @@ msgstr "Geen vacatures vastgelegd voor dit bedrijf."
 #, draft
 msgid "no role"
 msgstr "geen functie"
-
-#: src/postulo/notifications/smtp.py:119
-#, draft
-msgid "No server set."
-msgstr "Geen server ingesteld."
 
 #: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
@@ -5539,11 +5506,6 @@ msgstr "Niets. Het dashboard biedt aan om iets terug te zetten."
 #, draft
 msgid "Notifications"
 msgstr "Meldingen"
-
-#: src/postulo/notifications/email.py:71
-#, draft
-msgid "Notifications are set up"
-msgstr "Meldingen zijn ingesteld"
 
 #: src/postulo/applications/models.py:378
 #, draft
@@ -6061,7 +6023,7 @@ msgstr "Eigen website"
 msgid "Pharmaceuticals"
 msgstr "Farmacie"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:302
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -7110,7 +7072,7 @@ msgstr "Opgeslagen."
 msgid "Say what this identifier is."
 msgstr "Zeg wat deze identificatie is."
 
-#: src/postulo/core/phone_numbers.py:315
+#: src/postulo/core/phone_numbers.py:316
 #, draft
 msgid "Say what this number is."
 msgstr "Zeg wat dit nummer is."
@@ -7244,11 +7206,6 @@ msgid "Send it as a bearer token. To check that one works, and see its scopes:"
 msgstr ""
 "Stuur het mee als bearer-token. Om te controleren dat een token werkt, en zijn bereiken te zien:"
 
-#: src/postulo/notifications/email.py:50
-#, draft
-msgid "Send to"
-msgstr "Sturen naar"
-
 #: src/postulo/templates/documents/partials/copies.html:20
 #, draft
 msgid "Send to stores now"
@@ -7288,7 +7245,7 @@ msgstr "Verstuurde documenten"
 msgid "sent on"
 msgstr "verzonden op"
 
-#: src/postulo/core/server_views.py:730 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:730
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Verstuurd naar %(to)s."
@@ -7388,11 +7345,6 @@ msgstr "Instellingsonderdelen"
 #, draft
 msgid "Settled"
 msgstr "Afgerond"
-
-#: src/postulo/core/features.py:29
-#, draft
-msgid "Several telephone numbers"
-msgstr "Meerdere telefoonnummers"
 
 #: src/postulo/core/widgets_builtin.py:17
 #, draft
@@ -8092,11 +8044,6 @@ msgstr ""
 msgid "That does not look like a complete web address."
 msgstr "Dat ziet er niet uit als een volledig webadres."
 
-#: src/postulo/resume/europass.py:312 src/postulo/resume/europass.py:585
-#, draft
-msgid "That does not look like a Europass file: it has no LearnerInfo section."
-msgstr "Dit lijkt geen Europass-bestand: het heeft geen LearnerInfo-sectie."
-
 #: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
@@ -8135,31 +8082,10 @@ msgstr "Dat bestand is groter dan %(limit)s MB."
 msgid "That file is larger than a logo should be."
 msgstr "Dit bestand is groter dan een logo hoort te zijn."
 
-#: src/postulo/resume/europass.py:569
-#, python-format, draft
-msgid "That file is not readable JSON: %(reason)s"
-msgstr "Dat bestand is geen leesbare JSON: %(reason)s"
-
-#: src/postulo/resume/europass.py:304
-#, python-format, draft
-msgid "That file is not readable XML: %(reason)s"
-msgstr "Dat bestand is geen leesbare XML: %(reason)s"
-
-#: src/postulo/resume/europass.py:566
-#, draft
-msgid "That file is not UTF-8, so it is not a Europass export."
-msgstr "Dat bestand is geen UTF-8 en dus geen Europass-export."
-
 #: src/postulo/resume/views.py:253
 #, python-format, draft
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Dat bestand is groter dan %(limit)s MB. Zo groot is een cv niet."
-
-#: src/postulo/resume/europass.py:574
-#, python-format, draft
-msgid "That file nests more than %(limit)s levels deep, so it was not read."
-msgstr ""
-"Dat bestand is meer dan %(limit)s niveaus diep genest en is daarom niet gelezen."
 
 #: src/postulo/resume/views.py:287
 #, draft
@@ -8190,13 +8116,6 @@ msgstr "Dat zijn veel herstellinks. Probeer het straks opnieuw."
 #, draft
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Dat is een SVG, die Postulo nog niet bewaart. Een PNG of JPEG voldoet."
-
-#: src/postulo/resume/europass.py:223
-#, draft
-msgid ""
-"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
-msgstr ""
-"Dat is geen Europass-bestand. Postulo leest de XML die de cv-editor maakte en de JSON die europass.europa.eu exporteert; dit is geen van beide."
 
 #: src/postulo/applications/views.py:365
 #, draft
@@ -8281,12 +8200,12 @@ msgid ""
 msgstr ""
 "Voor dat nummer staat geen land, dus het kan nergens anders vandaan gebeld worden. Kies het land, of schrijf het met een + ervoor."
 
-#: src/postulo/core/phone_numbers.py:395
+#: src/postulo/core/phone_numbers.py:396
 #, draft
 msgid "That number has to be confirmed before it can get you back in."
 msgstr "Dat nummer moet bevestigd zijn voordat het je weer binnen kan laten."
 
-#: src/postulo/core/phone_numbers.py:32
+#: src/postulo/core/phone_numbers.py:33
 #, draft
 msgid ""
 "That number is already recorded on this instance. Telephone numbers are kept unique across every account here, so it may belong to somebody else's records."
@@ -8457,13 +8376,6 @@ msgstr "De omgeving stelt “%(name)s” in, dus dit kan hier niet worden gewijz
 msgid "the escape hatch, for anything this area does not cover"
 msgstr "de ontsnappingsroute, voor alles wat dit onderdeel niet dekt"
 
-#: src/postulo/resume/importers.py:32
-#, draft
-msgid ""
-"The European CV format: the XML the Europass editor produces and the JSON europass.europa.eu exports."
-msgstr ""
-"Het Europese cv-formaat: de XML die de Europass-editor maakt en de JSON die europass.europa.eu exporteert."
-
 #: src/postulo/templates/jobs/industry_list.html:12
 #, draft
 msgid ""
@@ -8556,7 +8468,7 @@ msgstr "Het logo is weg."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Het logo is niet gewijzigd: %(problem)s"
 
-#: src/postulo/core/server_views.py:732 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "De mailbackend accepteerde niets."
@@ -8618,13 +8530,6 @@ msgstr "De vacature"
 #, draft
 msgid "The posting itself"
 msgstr "De vacature zelf"
-
-#: src/postulo/documents/stores.py:91
-#, draft
-msgid ""
-"The private media directory on this server, where every document is kept whatever else it is also copied to."
-msgstr ""
-"De privé-mediamap op deze server, waar elk document staat, waar het verder ook naartoe wordt gekopieerd."
 
 #: src/postulo/plugins/consent.py:241
 #, python-format, draft
@@ -8838,7 +8743,6 @@ msgstr "Voor dit bedrijf is geen website vastgelegd."
 msgid "This identifier is already listed."
 msgstr "Deze identificatie staat al in de lijst."
 
-#: src/postulo/documents/stores.py:89
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -8893,13 +8797,6 @@ msgid ""
 msgstr ""
 "Dit is de standaardindeling. Zolang u niets verandert, verschijnt een widget die in een latere versie is toegevoegd hier vanzelf; zodra u de pagina hebt ingedeeld, blijven nieuwe eraf tot u erom vraagt."
 
-#: src/postulo/notifications/email.py:73
-#, draft
-msgid ""
-"This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
-msgstr ""
-"Dit is het testbericht van uw Postulo-meldingskoppeling. Herinneringen en vastleggingen komen op dezelfde manier aan."
-
 #: src/postulo/templates/server/plugins.html:281
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -8917,7 +8814,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Dit soort identificatie staat al in de lijst."
 
-#: src/postulo/core/phone_numbers.py:341
+#: src/postulo/core/phone_numbers.py:342
 #, draft
 msgid "This number is already listed."
 msgstr "Dit nummer staat al in de lijst."
@@ -9322,11 +9219,6 @@ msgstr ""
 #, draft
 msgid "Using a token"
 msgstr "Een token gebruiken"
-
-#: src/postulo/notifications/email.py:52
-#, draft
-msgid "Usually your own address. Anything the instance's mail can reach."
-msgstr "Meestal uw eigen adres. Alles wat de mail van de instantie kan bereiken."
 
 #: src/postulo/jobs/industries.py:26
 #, draft
@@ -9834,11 +9726,6 @@ msgstr "Ingetrokken"
 msgid "Work"
 msgstr "Werk"
 
-#: src/postulo/resume/europass.py:638
-#, draft
-msgid "Work experience"
-msgstr "Werkervaring"
-
 #: src/postulo/templates/connections/list.html:35
 #, python-format, draft
 msgid "worked %(when)s"
@@ -9979,7 +9866,7 @@ msgid ""
 msgstr ""
 "U hebt hier al eerder gesolliciteerd. Een tweede sollicitatie vastleggen is prima; beide blijven in het dossier."
 
-#: src/postulo/core/phone_numbers.py:165
+#: src/postulo/core/phone_numbers.py:166
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

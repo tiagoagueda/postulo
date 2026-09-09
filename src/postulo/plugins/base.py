@@ -338,7 +338,7 @@ class ImporterPlugin(Protocol):
     a *file*. No base class, as everywhere else here.
 
     ``read`` returns whatever the importing app understands — today a
-    ``postulo.resume.europass.Record``. This protocol does not name that type, because the
+    ``postulo.resume.importing.Record``. This protocol does not name that type, because the
     plugin machinery has no business depending on the resume app, and because the built-in
     is the only implementation until #105 writes the contract for anybody else's.
 
@@ -605,6 +605,64 @@ class ConnectedPlugin(Protocol):
     def test(self, config: dict) -> TestResult:
         """Try the configuration for real — one request, one message — and report."""
         ...
+
+
+# ------------------------------------------------------------- keeping a document
+
+# What a store is handed and what it gives back. Here rather than in `documents`
+# because it is what a store author writes against, and `postulo.plugins.api` is the
+# only module a plugin may import (#126, #129).
+
+
+@dataclass(frozen=True)
+class DocumentMetadata:
+    """What an archive needs to file a document without opening it.
+
+    Everything here is a plain value, so a store never has to import Postulo's models to
+    make sense of what it was given. ``kind`` is a :class:`DocumentKind` value; ``origin``
+    says whether this is a render Postulo produced or a file the person uploaded.
+    """
+
+    kind: str
+    kind_label: str
+    origin: str  # "render" or "upload"
+    title: str
+    filename: str
+    content_type: str
+    created_at: dt.datetime
+    checksum: str = ""
+    size: int = 0
+    company: str = ""
+    role: str = ""
+    application_url: str = ""
+    sent_on: dt.date | None = None
+    language: str = ""
+    tags: tuple[str, ...] = field(default_factory=tuple)
+
+
+@dataclass(frozen=True)
+class ExternalRef:
+    """Where a copy went: which store, its id there, and a link if the store has one."""
+
+    store: str
+    id: str
+    url: str = ""
+
+
+@runtime_checkable
+class StorePlugin(ConnectedPlugin, Protocol):
+    """A connected plugin that keeps a copy of a document somewhere.
+
+    ``put`` receives the document, its open file, the metadata above, the connection's
+    configuration and secrets together, and the person. It returns a reference, or
+    ``None`` to say *not for me* — an archive for paperwork may decline a video, say —
+    and raises on failure; Postulo retries later and shows the error on the document.
+    ``delete`` and ``browse`` are optional and not yet called by the core.
+    """
+
+    def put(
+        self, document, file, metadata: DocumentMetadata, config: dict, user
+    ) -> ExternalRef | None: ...
 
 
 # ------------------------------------------------------------------------- syncs

@@ -19,8 +19,9 @@ from django.contrib.contenttypes import forms as generic_forms
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
+from postulo.plugins.phone_numbers import PHONE_NUMBERS
+
 from . import phone_field, phones
-from .features import PHONE_NUMBERS
 from .models import PhoneNumber
 
 #: What somebody is told when the number they typed is already recorded here.

@@ -186,8 +186,8 @@ def test_a_narrow_save_still_takes_it_away(user):
 
 def forced_off_for(person) -> None:
     """An administrator switching *several telephone numbers* off for one account."""
-    from postulo.core.features import PHONE_NUMBERS
     from postulo.plugins.models import PluginPolicy
+    from postulo.plugins.phone_numbers import PHONE_NUMBERS
 
     PluginPolicy.objects.create(
         plugin=PHONE_NUMBERS, person=person, state=PluginPolicy.State.FORCED_OFF

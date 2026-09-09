@@ -32,13 +32,13 @@ from django.urls import reverse
 
 from postulo.core.models import SiteSettings
 from postulo.notifications import transport
-from postulo.notifications.smtp import SMTPTransport
 from postulo.notifications.transport import PluggableBackend
 from postulo.plugins import policy, registry
 from postulo.plugins.base import FieldSpec
 
 # Aliased: pytest would try to collect anything called Test* as a test class.
 from postulo.plugins.base import TestResult as PluginTestResult
+from postulo.plugins.smtp import SMTPTransport
 
 pytestmark = pytest.mark.django_db
 

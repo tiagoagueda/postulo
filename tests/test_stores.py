@@ -32,15 +32,11 @@ from postulo.documents.models import (
     UploadedDocument,
 )
 from postulo.documents.rendering import snapshot_cv
-from postulo.documents.stores import (
-    DocumentMetadata,
-    ExternalRef,
-    LocalStore,
-    StorePlugin,
-    metadata_for,
-)
+from postulo.documents.stores import metadata_for
 from postulo.jobs.models import Company, JobPosting
 from postulo.plugins import registry
+from postulo.plugins.api import DocumentMetadata, ExternalRef, StorePlugin
+from postulo.plugins.localstore import LocalStore
 from postulo.plugins.models import Connection
 
 pytestmark = pytest.mark.django_db

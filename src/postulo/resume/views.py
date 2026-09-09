@@ -24,7 +24,7 @@ from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.plugins import base, registry
 
-from . import europass
+from . import importing
 from .models import (
     Certification,
     Education,
@@ -300,7 +300,7 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
 
         record = _from_session(raw)
         with transaction.atomic():
-            report = europass.apply(request.user, record)
+            report = importing.apply(request.user, record)
 
         request.session.pop(self.SESSION_KEY, None)
         request.session.pop(f"{self.SESSION_KEY}_data", None)
@@ -383,7 +383,7 @@ def _proficiency_label(value):
         return value
 
 
-def _summarise(record: europass.Record) -> dict:
+def _summarise(record: importing.Record) -> dict:
     """What the review page shows: enough to recognise the file, not the whole of it."""
     return {
         "counts": record.counts(),
@@ -406,7 +406,7 @@ def _summarise(record: europass.Record) -> dict:
     }
 
 
-def _to_session(record: europass.Record) -> dict:
+def _to_session(record: importing.Record) -> dict:
     """The record as something a session can hold: dates become strings."""
     return {
         "person": record.person,
@@ -432,8 +432,8 @@ def _to_session(record: europass.Record) -> dict:
     }
 
 
-def _from_session(raw: dict) -> europass.Record:
-    return europass.Record(
+def _from_session(raw: dict) -> importing.Record:
+    return importing.Record(
         person=raw.get("person", {}),
         experience=[
             {

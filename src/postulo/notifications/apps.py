@@ -13,10 +13,9 @@ class NotificationsConfig(AppConfig):
         # writes the words, the transport gets those words off this machine. One sits on the
         # other, and merging them would make notification settings and delivery settings the
         # same form (#104).
+        from postulo.plugins.email import EmailNotifier
         from postulo.plugins.registry import register_builtin
-
-        from .email import EmailNotifier
-        from .smtp import SMTPTransport
+        from postulo.plugins.smtp import SMTPTransport
 
         register_builtin("notifier", EmailNotifier)
         register_builtin("transport", SMTPTransport)

@@ -10,10 +10,10 @@ class CoreConfig(AppConfig):
 
     def ready(self) -> None:
         from postulo.plugins import registry
+        from postulo.plugins.phone_numbers import PhoneNumbersFeature
 
         # Registers the dashboard widgets core owns.
         from . import widgets_builtin  # noqa: F401
-        from .features import PhoneNumbersFeature
 
         registry.register_builtin("feature", PhoneNumbersFeature)
 

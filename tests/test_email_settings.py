@@ -36,7 +36,7 @@ from postulo.plugins import registry, secrets
 @contextlib.contextmanager
 def _only_transport(plugin_class):
     """Run with one transport registered and SMTP out of the way, then put it back."""
-    from postulo.notifications.smtp import SMTPTransport
+    from postulo.plugins.smtp import SMTPTransport
 
     registry.unregister_builtin("transport", SMTPTransport)
     registry.register_builtin("transport", plugin_class)

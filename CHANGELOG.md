@@ -1017,6 +1017,37 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Every plugin Postulo ships is now its own package, and a test says so.** They were
+  scattered through the applications they happened to be useful to — the notifier and the
+  transport in `notifications`, the store in `documents`, the importer in `resume`, and the
+  telephone-numbers feature written entirely inside `core` a week after the plugin
+  documentation said not to. Each is now `postulo/plugins/<name>/`, with its manifest, its
+  catalogues and its code in one place, exactly like a plugin somebody else writes.
+
+  **The measure was never that the directories moved.** It is that the next one cannot be
+  written in the wrong place without something failing, so the test takes its list from the
+  registry rather than from a list in the test: a built-in added tomorrow is checked
+  tomorrow, including the one nobody remembers to add to a list. It fails on a plugin
+  outside `postulo.plugins`, one with no catalogues of its own, and one that imports
+  anything from Postulo but the declared surface without a written reason.
+
+  **Nothing Postulo ships touches the database any more**, which is the part worth keeping.
+  Getting there meant drawing two lines the code had already argued for: the career record
+  an importer fills in is Postulo's shape rather than Europass's — so Postulo defines it,
+  every importer fills the same one, and writing it moved to `resume.importing` — and the
+  store contract a plugin author writes against joined `postulo.plugins.api`, so the local
+  store imports it from where everybody else does. Ownership scoping done wrong in a plugin
+  is how one person sees another's data; the way not to get it wrong in seven places is not
+  to need it in seven places.
+
+  Twenty-seven strings moved into six new catalogues, each keeping the translation it
+  already had in all thirty-nine European languages. Four dependencies on core disappeared
+  outright; the five that remain are recorded with the reason each is a reason to depend on
+  Postulo rather than a failure of discipline. Built-ins still register through
+  `register_builtin()` rather than an entry point, deliberately: an entry point would be a
+  slower import of a module in the same distribution, and would cost the documented
+  ordering that lets a third-party plugin take precedence over Postulo's own. (#129)
+
 - **A plugin's state is drawn around its checkbox, not only inside it.** *Settings →
   Plugins* is a column of rows, and reading which of a dozen are on meant looking at each
   13-pixel tick in turn. A ring of colour — green around a ticked box, red around one that

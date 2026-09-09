@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 18:14+0000\n"
+"POT-Creation-Date: 2026-09-09 18:30+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Ελληνικά\n"
@@ -311,12 +311,12 @@ msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr ""
 "Το %(name)s θα άλλαζε αυτά από τα οποία εξαρτάται το ίδιο το Postulo. %(problems)s"
 
-#: src/postulo/documents/rendering.py:245
+#: src/postulo/documents/rendering.py:247
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/documents/rendering.py:225
+#: src/postulo/documents/rendering.py:227
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — βιογραφικό"
@@ -356,7 +356,7 @@ msgstr "%(role)s στην %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s στην %(company)s — %(days)s ημέρες"
 
-#: src/postulo/resume/europass.py:802
+#: src/postulo/resume/importing.py:136
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: χωρίς ημερομηνία έναρξης, οπότε δεν προστέθηκε."
@@ -434,11 +434,6 @@ msgstr "Το %(url)s απάντησε %(code)s."
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr ""
 "Το %(url)s είναι πολύ μεγαλύτερο απ' ό,τι θα έπρεπε να είναι ένας κατάλογος."
-
-#: src/postulo/resume/europass.py:606
-#, python-format, draft
-msgid "%(what)s was in the file but could not be read."
-msgstr "%(what)s υπήρχε στο αρχείο αλλά δεν μπόρεσε να διαβαστεί."
 
 #: src/postulo/templates/server/overview.html:61
 #, python-format, draft
@@ -759,11 +754,6 @@ msgstr "Μενού λογαριασμού, %(name)s"
 #, draft
 msgid "Accounts"
 msgstr "Λογαριασμοί"
-
-#: src/postulo/resume/europass.py:716
-#, draft
-msgid "Achievements"
-msgstr "Διακρίσεις"
 
 #: src/postulo/applications/analytics.py:32
 #: src/postulo/applications/models.py:41
@@ -2729,8 +2719,7 @@ msgid "Edit interview"
 msgstr "Επεξεργασία συνέντευξης"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
-#: src/postulo/resume/europass.py:661 src/postulo/resume/registry.py:41
-#: src/postulo/resume/registry.py:42
+#: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
 #: src/postulo/templates/resume/europass_import.html:67
 #: src/postulo/templates/resume/preview.html:45
 #, draft
@@ -3134,11 +3123,6 @@ msgstr "Το αρχείο αποθηκεύτηκε."
 #, draft
 msgid "Files"
 msgstr "Αρχεία"
-
-#: src/postulo/documents/stores.py:112
-#, draft
-msgid "Files are kept under this instance's private media."
-msgstr "Τα αρχεία φυλάσσονται στα ιδιωτικά μέσα αυτής της εγκατάστασης."
 
 #: src/postulo/applications/models.py:233
 #, draft
@@ -4097,13 +4081,6 @@ msgstr "Θέσεις εργασίας"
 msgid "Join the call"
 msgstr "Συμμετοχή στην κλήση"
 
-#: src/postulo/core/features.py:31
-#, draft
-msgid ""
-"Keep more than one number for yourself and for the people you deal with — a mobile, a desk line, a switchboard — with one of them marked as the one to use. Switched off, Postulo shows and uses the primary number only; the others stay recorded and come back untouched when it is switched on again."
-msgstr ""
-"Κρατήστε περισσότερους από έναν αριθμούς για εσάς και για τους ανθρώπους με τους οποίους συναλλάσσεστε — ένα κινητό, μια σταθερή γραμμή, ένα τηλεφωνικό κέντρο — με έναν σημειωμένο ως αυτόν που θα χρησιμοποιείται. Απενεργοποιημένο, το Postulo δείχνει και χρησιμοποιεί μόνο τον κύριο αριθμό· οι υπόλοιποι παραμένουν καταχωρισμένοι και επιστρέφουν ανέπαφοι μόλις ενεργοποιηθεί ξανά."
-
 #: src/postulo/templates/server/person_recovery.html:52
 #, draft
 msgid ""
@@ -4124,7 +4101,7 @@ msgid ""
 msgstr ""
 "Φυλάσσεται στο %(file)s και εναλλάσσεται κατά μέγεθος, οπότε δεν μπορεί να γεμίσει τον δίσκο. Όλα εδώ πηγαίνουν και στην κονσόλα, όπου τα διαβάζει το <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4958,11 +4935,6 @@ msgstr "Όχι"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Χωρίς διεύθυνση και χωρίς κλειδί, οπότε δεν προσφέρεται τίποτα από αυτό."
 
-#: src/postulo/notifications/email.py:69
-#, draft
-msgid "No address to send to."
-msgstr "Δεν υπάρχει διεύθυνση αποστολής."
-
 #: src/postulo/plugins/catalogue.py:223
 #, python-format, draft
 msgid "No catalogue called “%(name)s” is configured."
@@ -5090,11 +5062,6 @@ msgstr "Δεν έχουν καταγραφεί αγγελίες για αυτή 
 #, draft
 msgid "no role"
 msgstr "χωρίς ρόλο"
-
-#: src/postulo/notifications/smtp.py:119
-#, draft
-msgid "No server set."
-msgstr "Δεν έχει οριστεί διακομιστής."
 
 #: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
@@ -5543,11 +5510,6 @@ msgstr "Τίποτα. Ο πίνακας θα προτείνει να επανα�
 #, draft
 msgid "Notifications"
 msgstr "Ειδοποιήσεις"
-
-#: src/postulo/notifications/email.py:71
-#, draft
-msgid "Notifications are set up"
-msgstr "Οι ειδοποιήσεις έχουν ρυθμιστεί"
 
 #: src/postulo/applications/models.py:378
 #, draft
@@ -6069,7 +6031,7 @@ msgstr "Προσωπικός ιστότοπος"
 msgid "Pharmaceuticals"
 msgstr "Φαρμακευτική"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:302
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -7123,7 +7085,7 @@ msgstr "Αποθηκεύτηκε."
 msgid "Say what this identifier is."
 msgstr "Πείτε τι είναι αυτό το αναγνωριστικό."
 
-#: src/postulo/core/phone_numbers.py:315
+#: src/postulo/core/phone_numbers.py:316
 #, draft
 msgid "Say what this number is."
 msgstr "Πείτε τι είναι αυτός ο αριθμός."
@@ -7257,11 +7219,6 @@ msgid "Send it as a bearer token. To check that one works, and see its scopes:"
 msgstr ""
 "Στείλτε το ως διακριτικό bearer. Για να ελέγξετε ότι ένα λειτουργεί και να δείτε τα πεδία του:"
 
-#: src/postulo/notifications/email.py:50
-#, draft
-msgid "Send to"
-msgstr "Αποστολή σε"
-
 #: src/postulo/templates/documents/partials/copies.html:20
 #, draft
 msgid "Send to stores now"
@@ -7301,7 +7258,7 @@ msgstr "Απεσταλμένα έγγραφα"
 msgid "sent on"
 msgstr "στάλθηκε στις"
 
-#: src/postulo/core/server_views.py:730 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:730
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Στάλθηκε σε %(to)s."
@@ -7400,11 +7357,6 @@ msgstr "Ενότητες ρυθμίσεων"
 #, draft
 msgid "Settled"
 msgstr "Διευθετήθηκε"
-
-#: src/postulo/core/features.py:29
-#, draft
-msgid "Several telephone numbers"
-msgstr "Πολλοί αριθμοί τηλεφώνου"
 
 #: src/postulo/core/widgets_builtin.py:17
 #, draft
@@ -8103,11 +8055,6 @@ msgstr ""
 msgid "That does not look like a complete web address."
 msgstr "Αυτό δεν μοιάζει με πλήρη διεύθυνση ιστού."
 
-#: src/postulo/resume/europass.py:312 src/postulo/resume/europass.py:585
-#, draft
-msgid "That does not look like a Europass file: it has no LearnerInfo section."
-msgstr "Αυτό δεν μοιάζει με αρχείο Europass: δεν έχει ενότητα LearnerInfo."
-
 #: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
@@ -8146,31 +8093,10 @@ msgstr "Αυτό το αρχείο είναι μεγαλύτερο από %(limi
 msgid "That file is larger than a logo should be."
 msgstr "Αυτό το αρχείο είναι μεγαλύτερο απ' ό,τι θα έπρεπε ένα λογότυπο."
 
-#: src/postulo/resume/europass.py:569
-#, python-format, draft
-msgid "That file is not readable JSON: %(reason)s"
-msgstr "Το αρχείο δεν είναι αναγνώσιμο JSON: %(reason)s"
-
-#: src/postulo/resume/europass.py:304
-#, python-format, draft
-msgid "That file is not readable XML: %(reason)s"
-msgstr "Το αρχείο δεν είναι αναγνώσιμο XML: %(reason)s"
-
-#: src/postulo/resume/europass.py:566
-#, draft
-msgid "That file is not UTF-8, so it is not a Europass export."
-msgstr "Το αρχείο δεν είναι σε UTF-8, οπότε δεν είναι εξαγωγή Europass."
-
 #: src/postulo/resume/views.py:253
 #, python-format, draft
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Το αρχείο ξεπερνά τα %(limit)s MB. Τόσο μεγάλο δεν είναι ένα βιογραφικό."
-
-#: src/postulo/resume/europass.py:574
-#, python-format, draft
-msgid "That file nests more than %(limit)s levels deep, so it was not read."
-msgstr ""
-"Το αρχείο είναι ένθετο σε περισσότερα από %(limit)s επίπεδα, οπότε δεν διαβάστηκε."
 
 #: src/postulo/resume/views.py:287
 #, draft
@@ -8201,13 +8127,6 @@ msgstr "Αυτοί είναι πολλοί σύνδεσμοι ανάκτησης
 #, draft
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Αυτό είναι SVG, που το Postulo δεν κρατά ακόμη. Ένα PNG ή JPEG κάνει."
-
-#: src/postulo/resume/europass.py:223
-#, draft
-msgid ""
-"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
-msgstr ""
-"Αυτό δεν είναι αρχείο Europass. Το Postulo διαβάζει το XML που παρήγαγε ο επεξεργαστής βιογραφικού και το JSON που εξάγει το europass.europa.eu· αυτό δεν είναι κανένα από τα δύο."
 
 #: src/postulo/applications/views.py:365
 #, draft
@@ -8292,13 +8211,13 @@ msgid ""
 msgstr ""
 "Αυτός ο αριθμός δεν έχει χώρα μπροστά του, οπότε δεν μπορεί να κληθεί από πουθενά αλλού. Επιλέξτε τη χώρα ή γράψτε τον ξεκινώντας με +."
 
-#: src/postulo/core/phone_numbers.py:395
+#: src/postulo/core/phone_numbers.py:396
 #, draft
 msgid "That number has to be confirmed before it can get you back in."
 msgstr ""
 "Αυτός ο αριθμός πρέπει να επιβεβαιωθεί πριν μπορέσει να σας ξαναβάλει μέσα."
 
-#: src/postulo/core/phone_numbers.py:32
+#: src/postulo/core/phone_numbers.py:33
 #, draft
 msgid ""
 "That number is already recorded on this instance. Telephone numbers are kept unique across every account here, so it may belong to somebody else's records."
@@ -8471,13 +8390,6 @@ msgstr "Το περιβάλλον ορίζει «%(name)s», οπότε δεν �
 msgid "the escape hatch, for anything this area does not cover"
 msgstr "η έξοδος κινδύνου, για ό,τι δεν καλύπτει αυτή η περιοχή"
 
-#: src/postulo/resume/importers.py:32
-#, draft
-msgid ""
-"The European CV format: the XML the Europass editor produces and the JSON europass.europa.eu exports."
-msgstr ""
-"Η ευρωπαϊκή μορφή βιογραφικού: το XML που παράγει ο επεξεργαστής Europass και το JSON που εξάγει το europass.europa.eu."
-
 #: src/postulo/templates/jobs/industry_list.html:12
 #, draft
 msgid ""
@@ -8569,7 +8481,7 @@ msgstr "Το λογότυπο έφυγε."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Το λογότυπο δεν άλλαξε: %(problem)s"
 
-#: src/postulo/core/server_views.py:732 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Το σύστημα αλληλογραφίας δεν δέχτηκε τίποτα."
@@ -8631,13 +8543,6 @@ msgstr "Η αγγελία"
 #, draft
 msgid "The posting itself"
 msgstr "Η ίδια η αγγελία"
-
-#: src/postulo/documents/stores.py:91
-#, draft
-msgid ""
-"The private media directory on this server, where every document is kept whatever else it is also copied to."
-msgstr ""
-"Ο ιδιωτικός κατάλογος πολυμέσων σε αυτόν τον διακομιστή, όπου βρίσκεται κάθε έγγραφο, όπου αλλού κι αν αντιγράφεται."
 
 #: src/postulo/plugins/consent.py:241
 #, python-format, draft
@@ -8852,7 +8757,6 @@ msgstr "Αυτή η εταιρεία δεν έχει καταχωρισμένο 
 msgid "This identifier is already listed."
 msgstr "Αυτό το αναγνωριστικό είναι ήδη στη λίστα."
 
-#: src/postulo/documents/stores.py:89
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -8907,13 +8811,6 @@ msgid ""
 msgstr ""
 "Αυτή είναι η τυπική διάταξη. Όσο δεν αλλάζετε τίποτα, ένα στοιχείο που προστέθηκε σε επόμενη έκδοση θα εμφανιστεί εδώ μόνο του· μόλις διατάξετε τη σελίδα, τα νέα μένουν εκτός μέχρι να τα ζητήσετε."
 
-#: src/postulo/notifications/email.py:73
-#, draft
-msgid ""
-"This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
-msgstr ""
-"Αυτό είναι το δοκιμαστικό μήνυμα από τη σύνδεση ειδοποιήσεων του Postulo. Οι υπενθυμίσεις και οι συλλήψεις θα φτάνουν με τον ίδιο τρόπο."
-
 #: src/postulo/templates/server/plugins.html:281
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -8931,7 +8828,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Αυτό το είδος αναγνωριστικού είναι ήδη στη λίστα."
 
-#: src/postulo/core/phone_numbers.py:341
+#: src/postulo/core/phone_numbers.py:342
 #, draft
 msgid "This number is already listed."
 msgstr "Αυτός ο αριθμός υπάρχει ήδη στη λίστα."
@@ -9337,12 +9234,6 @@ msgstr ""
 #, draft
 msgid "Using a token"
 msgstr "Χρήση διακριτικού"
-
-#: src/postulo/notifications/email.py:52
-#, draft
-msgid "Usually your own address. Anything the instance's mail can reach."
-msgstr ""
-"Συνήθως η δική σας διεύθυνση. Οτιδήποτε μπορεί να φτάσει η αλληλογραφία της εγκατάστασης."
 
 #: src/postulo/jobs/industries.py:26
 #, draft
@@ -9853,11 +9744,6 @@ msgstr "Αποσύρθηκε"
 msgid "Work"
 msgstr "Εργασία"
 
-#: src/postulo/resume/europass.py:638
-#, draft
-msgid "Work experience"
-msgstr "Επαγγελματική εμπειρία"
-
 #: src/postulo/templates/connections/list.html:35
 #, python-format, draft
 msgid "worked %(when)s"
@@ -10000,7 +9886,7 @@ msgid ""
 msgstr ""
 "Έχετε ξανακάνει αίτηση σε αυτή. Η καταγραφή δεύτερης αίτησης είναι εντάξει· και οι δύο μένουν στο ιστορικό."
 
-#: src/postulo/core/phone_numbers.py:165
+#: src/postulo/core/phone_numbers.py:166
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

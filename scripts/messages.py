@@ -693,17 +693,18 @@ def stats_for(catalogue: Catalogue) -> dict[str, int]:
     }
 
 
-def _combined(rows: list[dict[str, int]]) -> dict[str, int]:
-    total = sum(row["total"] for row in rows)
-    translated = sum(row["translated"] for row in rows)
-    return {
-        "total": total,
-        "translated": translated,
-        "drafts": sum(row["drafts"] for row in rows),
-        "fuzzy": sum(row["fuzzy"] for row in rows),
-        "reviewed": sum(row["reviewed"] for row in rows),
-        "percent": round(100 * translated / total) if total else 0,
-    }
+def _as_the_reader_sees_it(catalogues: list[Catalogue]) -> Catalogue:
+    """Every set's messages merged the way Django merges them: the first one wins.
+
+    Two sets can hold the same English string, and the reader is shown one of them --
+    Postulo's own, because its catalogue is read first. Counting both would report more
+    strings than exist and would count the copy nobody sees.
+    """
+    merged: dict[tuple[str | None, str], Message] = {}
+    for catalogue in catalogues:
+        for key, message in catalogue.messages.items():
+            merged.setdefault(key, message)
+    return Catalogue(header={}, messages=merged)
 
 
 def cmd_stats(write: bool) -> int:
@@ -715,14 +716,14 @@ def cmd_stats(write: bool) -> int:
     """
     report: dict[str, dict[str, int]] = {}
     for code in translated_languages():
-        rows = [
-            stats_for(parse(po_path(code, subject).read_text(encoding="utf-8")))
+        found = [
+            parse(po_path(code, subject).read_text(encoding="utf-8"))
             for subject in catalogue_sets()
             if po_path(code, subject).exists()
         ]
-        if not rows:
+        if not found:
             continue
-        report[code] = _combined(rows)
+        report[code] = stats_for(_as_the_reader_sees_it(found))
     width = max((len(NATIVE_NAMES[c]) for c in report), default=10)
     for code, row in report.items():
         state = f"{row['percent']:3d} %"

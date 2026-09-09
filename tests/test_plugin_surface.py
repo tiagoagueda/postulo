@@ -1,21 +1,26 @@
-"""What a plugin may import from Postulo, and the plugins that still reach past it (#126).
+"""Every plugin Postulo ships is its own package, and imports only the surface (#126, #129).
 
-> a plugin, even a internal must be a self-contained as possible ... and dont depende on
-> the core
+> and imperative is that a plugin, even a internal must be a self-contained as possible
+> having is own manifest, is own locale, etc, and dont depende on the core
 
-That could not be enforced, or even checked, while there was no written answer to *depend on
-what, then*. `postulo.plugins.api` is that answer, and this file is what makes it real: a rule
-nobody checks drifts back within a release.
+The measure of that imperative is not that some directories moved. It is this file: the
+next `phone-numbers` cannot be written inside core without a test saying so. So the list of
+plugins is **taken from the registry**, never written down here — a built-in added tomorrow
+is checked tomorrow, including the one nobody remembered to add to a list.
 
-The check reads the source rather than importing it, so a module that reaches past the surface
-fails here whether or not the import is ever executed — a lazy `from postulo.core import site`
-inside a method is exactly as much of a dependency as one at the top of the file, and is the
-shape most of the ones below take.
+Three things are asked of each of them: it is a package under `postulo.plugins`, it carries
+its own catalogues, and it imports `postulo.plugins.api` and nothing else from Postulo.
 
-**`REACHING_PAST` is not a list of exemptions.** It is the map of what #129 has still to move,
-each entry saying what the plugin needs and therefore what has to become part of the surface or
-part of the plugin. It may shrink. A new entry is a decision somebody has to make on purpose,
-which is the whole point of the test failing on one.
+The import check reads the source rather than importing it, so a module that reaches past
+the surface fails here whether or not the import is ever executed — a lazy
+`from postulo.core import site` inside a method is exactly as much of a dependency as one at
+the top of the file, and is the shape most of the ones below take. Relative imports are
+resolved, because a dependency spelled with a dot is still a dependency.
+
+**`REACHING_PAST` is not a list of exemptions.** Every entry is a reason a plugin has to
+depend on Postulo rather than a failure of discipline, and says which. A new entry is a
+decision somebody has to make on purpose, which is the whole point of the test failing on
+one; a stale entry fails too, because one nobody removed hides the next real dependency.
 """
 
 from __future__ import annotations
@@ -27,82 +32,87 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1] / "src" / "postulo"
 
-#: Every module holding a plugin Postulo ships, and the plugins in it.
-SHIPPED = {
-    "plugins/builtin/__init__.py": "the two built-in sources",
-    "notifications/email.py": "the email notifier",
-    "notifications/smtp.py": "the SMTP transport",
-    "documents/stores.py": "the local store",
-    "resume/europass.py": "the Europass importer",
-    "core/features.py": "the telephone-numbers feature",
-}
-
 #: The one module a plugin may import from, and the reason there is exactly one.
 SURFACE = "postulo.plugins.api"
 
-#: What each shipped plugin still reaches past the surface for, and why. Every line is work
-#: #129 has to do: either the name becomes part of the surface, or it moves into the plugin.
+#: Where a plugin Postulo ships has to live. Not a convention — the check below.
+HOME = "postulo.plugins."
+
+#: What each shipped plugin still reaches past the surface for, and why. Every line is
+#: either a name that should become part of the surface, or work left to do.
 REACHING_PAST: dict[str, dict[str, str]] = {
-    "notifications/email.py": {
+    "email": {
         "postulo.core": "`site`: the instance's name and from-address, for the message it sends",
         "postulo.notifications.base": "`Notification`, which is what a notifier is handed",
     },
-    "notifications/smtp.py": {
+    "smtp": {
         "postulo.core": (
             "`mail` to open an SMTP connection and prove it, and `destinations` for where the "
             "server is allowed to dial (#148)"
         ),
     },
-    "documents/stores.py": {
-        "postulo.documents.models": (
-            "`DocumentKind`, `RenderedDocument`, `UploadedDocument`: the rows whose files it "
-            "is storing. The data question #129 names, and the reason the store cannot move "
-            "before it is answered"
-        ),
-        "postulo.notifications.base": "an absolute URL for a document it has stored",
-    },
-    "resume/europass.py": {
-        "postulo.accounts": "`identifiers`: the schemes a Europass file carries",
-        "postulo.accounts.models": "`PersonIdentifier`, to write those onto a profile",
-        "postulo.core": "`phone_numbers`, to write the numbers it read",
-        "postulo.resume.models": (
-            "`Education`, `Experience`, `LanguageSkill`, `Project`, `Skill`, `SkillGroup`: "
-            "the rows a read Europass file becomes"
+    "localstore": {
+        "postulo.documents.stores": (
+            "`download_path`: where Postulo serves a document from, which is Postulo's to "
+            "know and the store's to hand back"
         ),
     },
-    "core/features.py": {},
-    "plugins/builtin/__init__.py": {},
+    "europass": {
+        "postulo.accounts": (
+            "`identifiers`: the schemes an ORCID in a Europass file is checked against. #109 "
+            "would make this a registry of its own"
+        ),
+        "postulo.resume.importing": (
+            "`Record`: the career record it fills in. Postulo's shape rather than Europass's, "
+            "which is why Postulo defines it and every importer fills the same one"
+        ),
+    },
+    "builtin": {},
+    "phone_numbers": {},
 }
 
 
-def _package_of(path: Path) -> list[str]:
-    """The dotted package a file lives in, e.g. `postulo.plugins.builtin` for its `__init__`."""
+def shipped() -> dict[str, str]:
+    """Every plugin Postulo ships, by package, from the registry rather than from a list.
+
+    A list here would be a list to forget to add to, and the plugin nobody added would be
+    exactly the one written in the wrong place. `builtins()` is what the application itself
+    believes it ships.
+    """
+    from postulo.plugins import registry
+
+    found: dict[str, list[str]] = {}
+    for kind, classes in registry.builtins().items():
+        for plugin_class in classes:
+            module = plugin_class.__module__
+            if not module.startswith("postulo"):
+                continue  # a plugin a test registered, which is not Postulo's to answer for
+            found.setdefault(module, []).append(f"{plugin_class.__name__} ({kind})")
+    return {module: ", ".join(sorted(names)) for module, names in sorted(found.items())}
+
+
+def package_of(module: str) -> Path:
+    return ROOT.joinpath(*module.removeprefix("postulo.").split("."))
+
+
+def sources_of(module: str) -> list[Path]:
+    """Every Python file in a plugin's package, because a plugin is more than its `__init__`."""
+    return sorted(package_of(module).rglob("*.py"))
+
+
+def _package_parts(path: Path) -> list[str]:
     return ["postulo", *path.relative_to(ROOT).parts[:-1]]
 
 
-def _own_package(path: Path) -> str | None:
-    """What counts as *inside* this plugin, for a plugin that is a package.
-
-    A plugin that has become a package has an inside, and reaching into it is not reaching
-    past the surface -- `plugins/builtin` carrying the HTML helper it is the only user of is
-    the point of #129, not a violation. A plugin still living as a single module in a core
-    app has no inside, and an import from the app around it is exactly the dependency the
-    rule is about.
-    """
-    return ".".join(_package_of(path)) if path.name == "__init__.py" else None
-
-
-def postulo_imports(path: Path) -> set[str]:
+def postulo_imports(path: Path, *, mine: str) -> set[str]:
     """Every `postulo.*` module this file imports, at any depth, read rather than run.
 
-    Relative imports are resolved to the module they name. `from .base import shipped`
-    inside `plugins/builtin/` is a dependency on `postulo.plugins.base` exactly as much as
-    spelling it out would be, and counting only the absolute form let one hide here until
-    #127 moved the file and turned it into `..base` (#126).
+    `mine` is the plugin's own package: reaching into it is not reaching past the surface. A
+    plugin that has become a package has an inside, and `europass` keeping its reader beside
+    its declaration is the point of #129 rather than a violation of it.
     """
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    package = _package_of(path)
-    mine = _own_package(path)
+    package = _package_parts(path)
     found: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom):
@@ -111,64 +121,133 @@ def postulo_imports(path: Path) -> set[str]:
                 module = ".".join([*base, node.module] if node.module else base)
             else:
                 module = node.module or ""
-            if module.startswith("postulo") and not _is_mine(module, mine):
-                found.add(module)
+            names = [module]
         elif isinstance(node, ast.Import):
-            for alias in node.names:
-                if alias.name.startswith("postulo") and not _is_mine(alias.name, mine):
-                    found.add(alias.name)
+            names = [alias.name for alias in node.names]
+        else:
+            continue
+        for name in names:
+            if name.startswith("postulo") and not (name == mine or name.startswith(f"{mine}.")):
+                found.add(name)
     return found
 
 
-def _is_mine(module: str, mine: str | None) -> bool:
-    return mine is not None and (module == mine or module.startswith(f"{mine}."))
+def reaching(module: str) -> set[str]:
+    """What a whole plugin package imports from Postulo."""
+    found: set[str] = set()
+    for path in sources_of(module):
+        found |= postulo_imports(path, mine=module)
+    return found
 
 
-@pytest.mark.parametrize("path", sorted(SHIPPED), ids=lambda p: p)
-def test_a_shipped_plugin_imports_the_surface_or_something_written_down(path: str):
+def names() -> list[str]:
+    return sorted(shipped())
+
+
+def short_name(module: str) -> str:
+    return module.rpartition(".")[2]
+
+
+# ------------------------------------------------------- a plugin is its own package
+
+
+def test_postulo_ships_the_plugins_it_says_it_does():
+    """A sanity check on the check: an empty registry would make everything below pass."""
+    assert len(shipped()) >= 6, shipped()
+
+
+@pytest.mark.parametrize("module", names(), ids=short_name)
+def test_every_plugin_postulo_ships_lives_in_its_own_package(module: str):
+    """The measure of #129, and the reason it was worth doing at all.
+
+    `phone-numbers` was written a week before that issue, entirely inside `core`, by somebody
+    who had just read the plugin documentation. Nothing pulled the other way. This is what
+    pulls the other way.
+    """
+    assert module.startswith(HOME), (
+        f"{shipped()[module]} lives in {module}. A plugin Postulo ships belongs in its own "
+        f"package under {HOME}* — its manifest, its catalogues and its code in one place, "
+        f"the same as a plugin somebody else writes."
+    )
+    package = package_of(module)
+    assert (package / "__init__.py").exists(), f"{module} is a module, not a package"
+
+
+@pytest.mark.parametrize("module", names(), ids=short_name)
+def test_every_plugin_postulo_ships_carries_its_own_catalogues(module: str):
+    """`docs/PLUGINS.md` says a plugin's strings are never added to Postulo's catalogues.
+
+    That was a rule third parties kept and every built-in broke, until #127 taught the
+    tooling about several catalogue sets. `tests/test_translations.py` is what keeps each of
+    these complete; this is what keeps one from quietly not existing.
+    """
+    locale = package_of(module) / "locale"
+
+    assert locale.is_dir(), f"{module} has no locale/ of its own"
+    assert list(locale.glob("*/LC_MESSAGES/django.po")), f"{module}: locale/ is empty"
+
+
+# ----------------------------------------------------------- and imports the surface
+
+
+@pytest.mark.parametrize("module", names(), ids=short_name)
+def test_a_shipped_plugin_imports_the_surface_or_something_written_down(module: str):
     """The rule, and the only way past it is a line somebody wrote deliberately."""
-    reaching = postulo_imports(ROOT / path)
-    allowed = {SURFACE} | set(REACHING_PAST.get(path, {}))
+    allowed = {SURFACE} | set(REACHING_PAST.get(short_name(module), {}))
 
-    past = sorted(reaching - allowed)
+    past = sorted(reaching(module) - allowed)
 
     assert not past, (
-        f"{SHIPPED[path]} reaches past the plugin surface: {past}. Either add the name to "
+        f"{shipped()[module]} reaches past the plugin surface: {past}. Either add the name to "
         f"postulo.plugins.api, or record the dependency in REACHING_PAST with the reason it "
         f"is needed — a new one is a decision, not an accident."
     )
 
 
-@pytest.mark.parametrize("path", sorted(SHIPPED), ids=lambda p: p)
-def test_nothing_recorded_has_quietly_been_fixed(path: str):
+@pytest.mark.parametrize("module", names(), ids=short_name)
+def test_nothing_recorded_has_quietly_been_fixed(module: str):
     """A stale entry would let a real dependency back in behind it."""
-    reaching = postulo_imports(ROOT / path)
-
-    stale = sorted(set(REACHING_PAST.get(path, {})) - reaching)
+    stale = sorted(set(REACHING_PAST.get(short_name(module), {})) - reaching(module))
 
     assert not stale, (
-        f"{SHIPPED[path]} no longer imports {stale}. Delete those lines from REACHING_PAST: "
-        f"the list is the map of what is left to do, and a stale entry hides the next one."
+        f"{shipped()[module]} no longer imports {stale}. Delete those lines from "
+        f"REACHING_PAST: the list is the map of what is left to do, and a stale entry hides "
+        f"the next one."
     )
 
 
-def test_the_stateless_plugins_need_only_the_surface():
+def test_nothing_is_recorded_for_a_plugin_that_no_longer_exists():
+    recorded = set(REACHING_PAST)
+    real = {short_name(module) for module in shipped()}
+
+    assert recorded <= real, f"REACHING_PAST names plugins that are gone: {sorted(recorded - real)}"
+
+
+def test_the_plugins_that_hold_no_data_need_only_the_surface():
     """The check that the surface is not so wide as to be meaningless.
 
-    The two built-in sources need the surface and nothing else, which is what the shape of a
-    source makes possible: a URL and some HTML in, a `JobPostingData` out.
-
-    They used to appear to need *nothing*, and that was an artefact rather than a fact: they
-    reached for `postulo.plugins.base` through a relative import, which the checker did not
-    resolve. #127 moved the file, the relative import changed depth, and the pretence ended.
+    Two shapes reach it. A **source** is a URL and some HTML in, a `JobPostingData` out. A
+    **feature** is a declaration and nothing else. Neither has a reason to know anything
+    about Postulo beyond what it is handed, and neither does.
     """
-    assert postulo_imports(ROOT / "plugins/builtin/__init__.py") == {SURFACE}
-    assert REACHING_PAST["plugins/builtin/__init__.py"] == {}
+    assert reaching("postulo.plugins.builtin") == {SURFACE}
+    assert reaching("postulo.plugins.phone_numbers") == {SURFACE}
 
 
-def test_a_feature_needs_only_the_surface():
-    """A feature is a declaration, so it should reach for nothing else, and does not."""
-    assert postulo_imports(ROOT / "core/features.py") == {SURFACE}
+def test_no_plugin_postulo_ships_reaches_for_a_model():
+    """The deeper result of #129, and the one worth keeping.
+
+    An importer turns bytes into a record, a store writes a file, a notifier sends a message,
+    and Postulo does the scoping. Nothing Postulo ships queries the database itself — which
+    matters because ownership scoping done wrong in a plugin is how one person sees another's
+    data, and the way not to get it wrong in seven places is not to need it in seven places.
+    """
+    offenders = {
+        module: sorted(name for name in reaching(module) if name.endswith(".models"))
+        for module in shipped()
+    }
+
+    assert not any(offenders.values()), {k: v for k, v in offenders.items() if v}
 
 
 # --------------------------------------------------------------- what the surface is
@@ -206,6 +285,19 @@ def test_the_surface_holds_the_four_reasons_a_plugin_has_to_depend_on_postulo():
     assert api.safe_next is not None, "or a plugin bounces somebody off the instance"
     assert api.client is not None, "or a plugin dials where the server should not"
     assert api.access_token is not None, "or a plugin keeps a token instead of refreshing it"
+
+
+def test_the_surface_holds_the_store_contract():
+    """What a store is handed and what it gives back, which used to live in `documents`.
+
+    A store author writes against those three, so they belong where a plugin may import them
+    from — and the local store now imports them from exactly there, like anybody else's.
+    """
+    from postulo.plugins import api
+
+    assert api.DocumentMetadata is not None
+    assert api.ExternalRef is not None
+    assert api.StorePlugin is not None
 
 
 def test_importing_the_surface_touches_no_database():

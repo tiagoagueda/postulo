@@ -14,7 +14,7 @@ from django.urls import reverse
 
 from postulo import __version__
 from postulo.plugins import base, registry
-from postulo.resume.importers import EuropassImporter
+from postulo.plugins.europass import EuropassImporter
 
 pytestmark = pytest.mark.django_db
 
@@ -82,7 +82,7 @@ def test_a_doctype_in_json_is_not_an_attack():
 
 def test_europass_errors_are_the_kind_s_errors():
     """So a view catches one exception rather than knowing every importer's own."""
-    from postulo.resume import europass
+    from postulo.plugins.europass import reader as europass
 
     assert issubclass(europass.EuropassError, base.ImportRefused)
 
@@ -126,7 +126,7 @@ def test_the_page_asks_the_registry_rather_than_naming_europass(client, user, mo
     A fake one is registered here, claims the file, and its record is what the review page
     shows — which could not happen if the view still called `europass.read` itself.
     """
-    from postulo.resume import europass
+    from postulo.plugins.europass import reader as europass
 
     class OnlyMine:
         name = "only-mine"

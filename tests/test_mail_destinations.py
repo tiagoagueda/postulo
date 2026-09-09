@@ -242,7 +242,7 @@ def test_the_operators_switch_still_wins_over_the_page(monkeypatch):
 
 
 def test_sending_dials_the_approved_address(monkeypatch):
-    from postulo.notifications.smtp import GuardedBackend
+    from postulo.plugins.smtp import GuardedBackend
 
     monkeypatch.setattr(destinations, "addresses_for", answering(PUBLIC))
     backend = GuardedBackend(alias="default", host="mail.example.org", port=25)
@@ -262,7 +262,7 @@ def test_sending_dials_the_approved_address(monkeypatch):
 
 def test_the_backend_reports_the_name_afterwards(monkeypatch):
     """A log line or a page summary should say the server somebody configured."""
-    from postulo.notifications.smtp import GuardedBackend
+    from postulo.plugins.smtp import GuardedBackend
 
     monkeypatch.setattr(destinations, "addresses_for", answering(PUBLIC))
     monkeypatch.setattr("django.core.mail.backends.smtp.EmailBackend.open", lambda self: True)
@@ -274,7 +274,7 @@ def test_the_backend_reports_the_name_afterwards(monkeypatch):
 
 
 def test_sending_to_a_private_address_is_refused(monkeypatch):
-    from postulo.notifications.smtp import GuardedBackend
+    from postulo.plugins.smtp import GuardedBackend
 
     monkeypatch.setattr(destinations, "addresses_for", answering(PRIVATE))
     monkeypatch.delenv("POSTULO_EMAIL_HOST", raising=False)
@@ -289,7 +289,7 @@ def test_sending_to_a_private_address_is_refused(monkeypatch):
 
 def test_an_already_open_connection_is_not_re_approved(monkeypatch):
     """`open()` returning early is Django's contract, and the guard must not break it."""
-    from postulo.notifications.smtp import GuardedBackend
+    from postulo.plugins.smtp import GuardedBackend
 
     called = mock.Mock(side_effect=AssertionError("resolved an open connection"))
     monkeypatch.setattr(destinations, "addresses_for", called)

@@ -14,10 +14,10 @@ from postulo.applications.models import Application, Reminder, Status
 from postulo.jobs.models import Company, JobPosting
 from postulo.notifications import base
 from postulo.notifications.base import Notification, absolute_url
-from postulo.notifications.email import EmailNotifier
 from postulo.notifications.management.commands.send_due_reminders import announce_due_reminders
 from postulo.notifications.service import notify
 from postulo.plugins import registry
+from postulo.plugins.email import EmailNotifier
 from postulo.plugins.models import Connection
 
 pytestmark = pytest.mark.django_db

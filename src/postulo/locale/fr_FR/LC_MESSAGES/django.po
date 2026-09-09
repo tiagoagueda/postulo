@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 18:14+0000\n"
+"POT-Creation-Date: 2026-09-09 18:30+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -311,12 +311,12 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s changerait ce dont Postulo lui-même dépend. %(problems)s"
 
-#: src/postulo/documents/rendering.py:245
+#: src/postulo/documents/rendering.py:247
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/documents/rendering.py:225
+#: src/postulo/documents/rendering.py:227
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
@@ -357,7 +357,7 @@ msgstr "%(role)s chez %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s chez %(company)s — %(days)s jours"
 
-#: src/postulo/resume/europass.py:802
+#: src/postulo/resume/importing.py:136
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s : pas de date de début, donc non ajouté."
@@ -434,11 +434,6 @@ msgstr "%(url)s a répondu %(code)s."
 #, python-format, draft
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr "%(url)s est bien plus gros qu'un catalogue ne devrait l'être."
-
-#: src/postulo/resume/europass.py:606
-#, python-format, draft
-msgid "%(what)s was in the file but could not be read."
-msgstr "%(what)s figurait dans le fichier mais n'a pas pu être lu."
 
 #: src/postulo/templates/server/overview.html:61
 #, python-format, draft
@@ -760,11 +755,6 @@ msgstr "Menu du compte, %(name)s"
 #, draft
 msgid "Accounts"
 msgstr "Comptes"
-
-#: src/postulo/resume/europass.py:716
-#, draft
-msgid "Achievements"
-msgstr "Réalisations"
 
 #: src/postulo/applications/analytics.py:32
 #: src/postulo/applications/models.py:41
@@ -2731,8 +2721,7 @@ msgid "Edit interview"
 msgstr "Modifier l'entretien"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
-#: src/postulo/resume/europass.py:661 src/postulo/resume/registry.py:41
-#: src/postulo/resume/registry.py:42
+#: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
 #: src/postulo/templates/resume/europass_import.html:67
 #: src/postulo/templates/resume/preview.html:45
 #, draft
@@ -3137,11 +3126,6 @@ msgstr "Fichier enregistré."
 #, draft
 msgid "Files"
 msgstr "Fichiers"
-
-#: src/postulo/documents/stores.py:112
-#, draft
-msgid "Files are kept under this instance's private media."
-msgstr "Les fichiers sont conservés dans les médias privés de cette instance."
 
 #: src/postulo/applications/models.py:233
 #, draft
@@ -4107,13 +4091,6 @@ msgstr "Emplois"
 msgid "Join the call"
 msgstr "Rejoindre la visioconférence"
 
-#: src/postulo/core/features.py:31
-#, draft
-msgid ""
-"Keep more than one number for yourself and for the people you deal with — a mobile, a desk line, a switchboard — with one of them marked as the one to use. Switched off, Postulo shows and uses the primary number only; the others stay recorded and come back untouched when it is switched on again."
-msgstr ""
-"Gardez plus d'un numéro pour vous-même et pour les personnes que vous côtoyez — un mobile, une ligne fixe, un standard — avec l'un d'eux marqué comme celui à utiliser. Désactivé, Postulo affiche et utilise uniquement le numéro principal ; les autres restent enregistrés et reviennent intacts dès qu'il est réactivé."
-
 #: src/postulo/templates/server/person_recovery.html:52
 #, draft
 msgid ""
@@ -4133,7 +4110,7 @@ msgid ""
 msgstr ""
 "Conservé dans %(file)s et alterné selon la taille, il ne peut donc pas remplir le disque. Tout ce qui est ici va aussi vers la console, où <code>docker logs</code> le lit."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4967,11 +4944,6 @@ msgstr "Non"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Ni adresse ni clé : rien n’est proposé depuis ce dépôt."
 
-#: src/postulo/notifications/email.py:69
-#, draft
-msgid "No address to send to."
-msgstr "Aucune adresse de destination."
-
 #: src/postulo/plugins/catalogue.py:223
 #, python-format, draft
 msgid "No catalogue called “%(name)s” is configured."
@@ -5101,11 +5073,6 @@ msgstr "Aucune annonce enregistrée pour cette entreprise."
 #, draft
 msgid "no role"
 msgstr "pas de poste"
-
-#: src/postulo/notifications/smtp.py:119
-#, draft
-msgid "No server set."
-msgstr "Aucun serveur défini."
 
 #: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
@@ -5552,11 +5519,6 @@ msgstr "Rien. Le tableau de bord proposera d'y remettre quelque chose."
 #, draft
 msgid "Notifications"
 msgstr "Notifications"
-
-#: src/postulo/notifications/email.py:71
-#, draft
-msgid "Notifications are set up"
-msgstr "Les notifications sont configurées"
 
 #: src/postulo/applications/models.py:378
 #, draft
@@ -6076,7 +6038,7 @@ msgstr "Site personnel"
 msgid "Pharmaceuticals"
 msgstr "Pharmacie"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:302
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -7125,7 +7087,7 @@ msgstr "Enregistré."
 msgid "Say what this identifier is."
 msgstr "Indiquez ce qu'est cet identifiant."
 
-#: src/postulo/core/phone_numbers.py:315
+#: src/postulo/core/phone_numbers.py:316
 #, draft
 msgid "Say what this number is."
 msgstr "Dites ce qu'est ce numéro."
@@ -7259,11 +7221,6 @@ msgid "Send it as a bearer token. To check that one works, and see its scopes:"
 msgstr ""
 "Envoyez-le comme jeton bearer. Pour vérifier qu'il fonctionne et voir ses portées :"
 
-#: src/postulo/notifications/email.py:50
-#, draft
-msgid "Send to"
-msgstr "Envoyer à"
-
 #: src/postulo/templates/documents/partials/copies.html:20
 #, draft
 msgid "Send to stores now"
@@ -7303,7 +7260,7 @@ msgstr "Documents envoyés"
 msgid "sent on"
 msgstr "envoyé le"
 
-#: src/postulo/core/server_views.py:730 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:730
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Envoyé à %(to)s."
@@ -7404,11 +7361,6 @@ msgstr "Sections des paramètres"
 #, draft
 msgid "Settled"
 msgstr "Réglée"
-
-#: src/postulo/core/features.py:29
-#, draft
-msgid "Several telephone numbers"
-msgstr "Plusieurs numéros de téléphone"
 
 #: src/postulo/core/widgets_builtin.py:17
 #, draft
@@ -8107,12 +8059,6 @@ msgstr ""
 msgid "That does not look like a complete web address."
 msgstr "Cela ne ressemble pas à une adresse web complète."
 
-#: src/postulo/resume/europass.py:312 src/postulo/resume/europass.py:585
-#, draft
-msgid "That does not look like a Europass file: it has no LearnerInfo section."
-msgstr ""
-"Cela ne ressemble pas à un fichier Europass : il n'a pas de section LearnerInfo."
-
 #: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
@@ -8151,31 +8097,10 @@ msgstr "Ce fichier dépasse %(limit)s Mo."
 msgid "That file is larger than a logo should be."
 msgstr "Ce fichier est plus gros qu'un logo ne devrait l'être."
 
-#: src/postulo/resume/europass.py:569
-#, python-format, draft
-msgid "That file is not readable JSON: %(reason)s"
-msgstr "Ce fichier n'est pas du JSON lisible : %(reason)s"
-
-#: src/postulo/resume/europass.py:304
-#, python-format, draft
-msgid "That file is not readable XML: %(reason)s"
-msgstr "Ce fichier n'est pas du XML lisible : %(reason)s"
-
-#: src/postulo/resume/europass.py:566
-#, draft
-msgid "That file is not UTF-8, so it is not a Europass export."
-msgstr "Ce fichier n'est pas en UTF-8, ce n'est donc pas un export Europass."
-
 #: src/postulo/resume/views.py:253
 #, python-format, draft
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Ce fichier dépasse %(limit)s Mo. Un CV n'est pas si gros."
-
-#: src/postulo/resume/europass.py:574
-#, python-format, draft
-msgid "That file nests more than %(limit)s levels deep, so it was not read."
-msgstr ""
-"Ce fichier est imbriqué sur plus de %(limit)s niveaux, il n'a donc pas été lu."
 
 #: src/postulo/resume/views.py:287
 #, draft
@@ -8207,13 +8132,6 @@ msgstr "Cela fait beaucoup de liens de secours. Réessayez dans un instant."
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr ""
 "C'est un SVG, que Postulo ne conserve pas encore. Un PNG ou un JPEG convient."
-
-#: src/postulo/resume/europass.py:223
-#, draft
-msgid ""
-"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
-msgstr ""
-"Ce n'est pas un fichier Europass. Postulo lit le XML produit par l'éditeur de CV et le JSON qu'exporte europass.europa.eu ; celui-ci n'est ni l'un ni l'autre."
 
 #: src/postulo/applications/views.py:365
 #, draft
@@ -8298,12 +8216,12 @@ msgid ""
 msgstr ""
 "Ce numéro n'a aucun pays devant lui, il ne peut donc être composé de nulle part ailleurs. Choisissez le pays, ou écrivez-le en commençant par +."
 
-#: src/postulo/core/phone_numbers.py:395
+#: src/postulo/core/phone_numbers.py:396
 #, draft
 msgid "That number has to be confirmed before it can get you back in."
 msgstr "Ce numéro doit être confirmé avant de pouvoir vous faire revenir."
 
-#: src/postulo/core/phone_numbers.py:32
+#: src/postulo/core/phone_numbers.py:33
 #, draft
 msgid ""
 "That number is already recorded on this instance. Telephone numbers are kept unique across every account here, so it may belong to somebody else's records."
@@ -8475,13 +8393,6 @@ msgstr "L’environnement fixe « %(name)s » : il ne peut pas être modifié ic
 msgid "the escape hatch, for anything this area does not cover"
 msgstr "la porte de sortie, pour tout ce que cet espace ne couvre pas"
 
-#: src/postulo/resume/importers.py:32
-#, draft
-msgid ""
-"The European CV format: the XML the Europass editor produces and the JSON europass.europa.eu exports."
-msgstr ""
-"Le format européen de CV : le XML que produit l’éditeur Europass et le JSON qu’exporte europass.europa.eu."
-
 #: src/postulo/templates/jobs/industry_list.html:12
 #, draft
 msgid ""
@@ -8573,7 +8484,7 @@ msgstr "Le logo n'est plus là."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Le logo n'a pas été changé : %(problem)s"
 
-#: src/postulo/core/server_views.py:732 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Le serveur de messagerie n'a rien accepté."
@@ -8635,13 +8546,6 @@ msgstr "L'annonce"
 #, draft
 msgid "The posting itself"
 msgstr "L'annonce elle-même"
-
-#: src/postulo/documents/stores.py:91
-#, draft
-msgid ""
-"The private media directory on this server, where every document is kept whatever else it is also copied to."
-msgstr ""
-"Le répertoire de médias privé de ce serveur, où se trouve chaque document, où qu'il soit copié par ailleurs."
 
 #: src/postulo/plugins/consent.py:241
 #, python-format, draft
@@ -8857,7 +8761,6 @@ msgstr "Cette entreprise n'a pas de site enregistré."
 msgid "This identifier is already listed."
 msgstr "Cet identifiant est déjà dans la liste."
 
-#: src/postulo/documents/stores.py:89
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -8912,13 +8815,6 @@ msgid ""
 msgstr ""
 "C'est la disposition standard. Tant que vous n'y touchez pas, un widget ajouté dans une version ultérieure apparaîtra ici tout seul ; une fois la page organisée, les nouveaux restent à l'écart jusqu'à ce que vous les demandiez."
 
-#: src/postulo/notifications/email.py:73
-#, draft
-msgid ""
-"This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
-msgstr ""
-"Ceci est le message de test de votre connexion de notifications Postulo. Les rappels et les captures arriveront de la même manière."
-
 #: src/postulo/templates/server/plugins.html:281
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -8937,7 +8833,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Ce type d'identifiant est déjà dans la liste."
 
-#: src/postulo/core/phone_numbers.py:341
+#: src/postulo/core/phone_numbers.py:342
 #, draft
 msgid "This number is already listed."
 msgstr "Ce numéro figure déjà dans la liste."
@@ -9344,12 +9240,6 @@ msgstr ""
 #, draft
 msgid "Using a token"
 msgstr "Utiliser un jeton"
-
-#: src/postulo/notifications/email.py:52
-#, draft
-msgid "Usually your own address. Anything the instance's mail can reach."
-msgstr ""
-"Généralement votre propre adresse. Tout ce que le courrier de l'instance peut atteindre."
 
 #: src/postulo/jobs/industries.py:26
 #, draft
@@ -9858,11 +9748,6 @@ msgstr "Retirée"
 msgid "Work"
 msgstr "Professionnel"
 
-#: src/postulo/resume/europass.py:638
-#, draft
-msgid "Work experience"
-msgstr "Expérience professionnelle"
-
 #: src/postulo/templates/connections/list.html:35
 #, python-format, draft
 msgid "worked %(when)s"
@@ -10005,7 +9890,7 @@ msgid ""
 msgstr ""
 "Vous avez déjà postulé à celle-ci. Enregistrer une seconde candidature est possible ; les deux restent au dossier."
 
-#: src/postulo/core/phone_numbers.py:165
+#: src/postulo/core/phone_numbers.py:166
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

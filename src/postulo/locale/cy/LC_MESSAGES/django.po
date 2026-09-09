@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 18:14+0000\n"
+"POT-Creation-Date: 2026-09-09 18:30+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Cymraeg\n"
@@ -332,12 +332,12 @@ msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr ""
 "Byddai %(name)s yn newid yr hyn y mae Postulo ei hun yn dibynnu arno. %(problems)s"
 
-#: src/postulo/documents/rendering.py:245
+#: src/postulo/documents/rendering.py:247
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/documents/rendering.py:225
+#: src/postulo/documents/rendering.py:227
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — CV"
@@ -378,7 +378,7 @@ msgstr "%(role)s yn %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s yn %(company)s — %(days)s diwrnod"
 
-#: src/postulo/resume/europass.py:802
+#: src/postulo/resume/importing.py:136
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: dim dyddiad cychwyn, felly ni chafodd ei ychwanegu."
@@ -467,11 +467,6 @@ msgstr "Atebodd %(url)s %(code)s."
 #, python-format, draft
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr "Mae %(url)s yn llawer mwy nag y dylai catalog fod."
-
-#: src/postulo/resume/europass.py:606
-#, python-format, draft
-msgid "%(what)s was in the file but could not be read."
-msgstr "Roedd %(what)s yn y ffeil, ond ni ellid ei ddarllen."
 
 #: src/postulo/templates/server/overview.html:61
 #, python-format, draft
@@ -795,11 +790,6 @@ msgstr "Dewislen y cyfrif, %(name)s"
 #, draft
 msgid "Accounts"
 msgstr "Cyfrifon"
-
-#: src/postulo/resume/europass.py:716
-#, draft
-msgid "Achievements"
-msgstr "Cyflawniadau"
 
 #: src/postulo/applications/analytics.py:32
 #: src/postulo/applications/models.py:41
@@ -2766,8 +2756,7 @@ msgid "Edit interview"
 msgstr "Golygu'r cyfweliad"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
-#: src/postulo/resume/europass.py:661 src/postulo/resume/registry.py:41
-#: src/postulo/resume/registry.py:42
+#: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
 #: src/postulo/templates/resume/europass_import.html:67
 #: src/postulo/templates/resume/preview.html:45
 #, draft
@@ -3171,11 +3160,6 @@ msgstr "Cadwyd y ffeil."
 #, draft
 msgid "Files"
 msgstr "Ffeiliau"
-
-#: src/postulo/documents/stores.py:112
-#, draft
-msgid "Files are kept under this instance's private media."
-msgstr "Cedwir ffeiliau o dan gyfryngau preifat y gosodiad hwn."
 
 #: src/postulo/applications/models.py:233
 #, draft
@@ -4138,13 +4122,6 @@ msgstr "Swyddi"
 msgid "Join the call"
 msgstr "Ymuno â'r alwad"
 
-#: src/postulo/core/features.py:31
-#, draft
-msgid ""
-"Keep more than one number for yourself and for the people you deal with — a mobile, a desk line, a switchboard — with one of them marked as the one to use. Switched off, Postulo shows and uses the primary number only; the others stay recorded and come back untouched when it is switched on again."
-msgstr ""
-"Cadwch fwy nag un rhif i chi eich hun ac i'r bobl rydych yn delio â nhw — ffôn symudol, llinell ddesg, switsfwrdd — gydag un wedi'i nodi fel yr un i'w ddefnyddio. Wedi'i ddiffodd, dim ond y prif rif y mae Postulo'n ei ddangos ac yn ei ddefnyddio; mae'r gweddill yn aros wedi'u cofnodi ac yn dod yn ôl yn ddigyffwrdd cyn gynted ag y caiff ei droi ymlaen eto."
-
 #: src/postulo/templates/server/person_recovery.html:52
 #, draft
 msgid ""
@@ -4165,7 +4142,7 @@ msgid ""
 msgstr ""
 "Cedwir ef yn %(file)s ac fe'i cylchdroir yn ôl maint, felly ni all hyn lenwi'r ddisg. Mae popeth yma'n mynd i'r consol hefyd, lle mae <code>docker logs</code> yn ei ddarllen."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -5003,11 +4980,6 @@ msgstr "Na"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Dim cyfeiriad a dim allwedd, felly ni chynigir dim oddi yno."
 
-#: src/postulo/notifications/email.py:69
-#, draft
-msgid "No address to send to."
-msgstr "Dim cyfeiriad i anfon ato."
-
 #: src/postulo/plugins/catalogue.py:223
 #, python-format, draft
 msgid "No catalogue called “%(name)s” is configured."
@@ -5134,11 +5106,6 @@ msgstr "Dim hysbysebion wedi'u cofnodi ar gyfer y cwmni hwn."
 #, draft
 msgid "no role"
 msgstr "dim swydd"
-
-#: src/postulo/notifications/smtp.py:119
-#, draft
-msgid "No server set."
-msgstr "Dim gweinydd wedi'i osod."
 
 #: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
@@ -5585,11 +5552,6 @@ msgstr "Dim. Bydd y trosolwg yn cynnig dod â rhywbeth yn ôl."
 #, draft
 msgid "Notifications"
 msgstr "Hysbysiadau"
-
-#: src/postulo/notifications/email.py:71
-#, draft
-msgid "Notifications are set up"
-msgstr "Mae hysbysiadau wedi'u sefydlu"
 
 #: src/postulo/applications/models.py:378
 #, draft
@@ -6127,7 +6089,7 @@ msgstr "Safle personol"
 msgid "Pharmaceuticals"
 msgstr "Fferylliaeth"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:302
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -7183,7 +7145,7 @@ msgstr "Cadwyd."
 msgid "Say what this identifier is."
 msgstr "Dywedwch beth yw'r dynodydd hwn."
 
-#: src/postulo/core/phone_numbers.py:315
+#: src/postulo/core/phone_numbers.py:316
 #, draft
 msgid "Say what this number is."
 msgstr "Dywedwch beth yw'r rhif hwn."
@@ -7317,11 +7279,6 @@ msgid "Send it as a bearer token. To check that one works, and see its scopes:"
 msgstr ""
 "Anfonwch ef fel tocyn bearer. I wirio bod un yn gweithio, a gweld ei gwmpasau:"
 
-#: src/postulo/notifications/email.py:50
-#, draft
-msgid "Send to"
-msgstr "Anfon at"
-
 #: src/postulo/templates/documents/partials/copies.html:20
 #, draft
 msgid "Send to stores now"
@@ -7361,7 +7318,7 @@ msgstr "Dogfennau a anfonwyd"
 msgid "sent on"
 msgstr "anfonwyd ar"
 
-#: src/postulo/core/server_views.py:730 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:730
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Anfonwyd at %(to)s."
@@ -7460,11 +7417,6 @@ msgstr "Adrannau'r gosodiadau"
 #, draft
 msgid "Settled"
 msgstr "Wedi'i setlo"
-
-#: src/postulo/core/features.py:29
-#, draft
-msgid "Several telephone numbers"
-msgstr "Sawl rhif ffôn"
 
 #: src/postulo/core/widgets_builtin.py:17
 #, draft
@@ -8162,12 +8114,6 @@ msgstr ""
 msgid "That does not look like a complete web address."
 msgstr "Nid yw hwn yn edrych fel cyfeiriad gwe cyflawn."
 
-#: src/postulo/resume/europass.py:312 src/postulo/resume/europass.py:585
-#, draft
-msgid "That does not look like a Europass file: it has no LearnerInfo section."
-msgstr ""
-"Nid yw hwn yn edrych fel ffeil Europass: nid oes ganddi adran LearnerInfo."
-
 #: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
@@ -8206,31 +8152,10 @@ msgstr "Mae'r ffeil honno'n fwy na %(limit)s MB."
 msgid "That file is larger than a logo should be."
 msgstr "Mae'r ffeil honno'n fwy nag y dylai logo fod."
 
-#: src/postulo/resume/europass.py:569
-#, python-format, draft
-msgid "That file is not readable JSON: %(reason)s"
-msgstr "Nid yw'r ffeil honno'n JSON darllenadwy: %(reason)s"
-
-#: src/postulo/resume/europass.py:304
-#, python-format, draft
-msgid "That file is not readable XML: %(reason)s"
-msgstr "Nid yw'r ffeil honno'n XML darllenadwy: %(reason)s"
-
-#: src/postulo/resume/europass.py:566
-#, draft
-msgid "That file is not UTF-8, so it is not a Europass export."
-msgstr "Nid yw'r ffeil honno'n UTF-8, felly nid allforiad Europass mohoni."
-
 #: src/postulo/resume/views.py:253
 #, python-format, draft
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Mae'r ffeil honno dros %(limit)s MB. Nid yw CV mor fawr â hynny."
-
-#: src/postulo/resume/europass.py:574
-#, python-format, draft
-msgid "That file nests more than %(limit)s levels deep, so it was not read."
-msgstr ""
-"Mae'r ffeil honno wedi'i nythu'n ddyfnach na %(limit)s lefel, felly ni chafodd ei darllen."
 
 #: src/postulo/resume/views.py:287
 #, draft
@@ -8263,13 +8188,6 @@ msgstr ""
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr ""
 "SVG yw hwnnw, nad yw Postulo yn ei gadw eto. Mae PNG neu JPEG yn gweithio."
-
-#: src/postulo/resume/europass.py:223
-#, draft
-msgid ""
-"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
-msgstr ""
-"Nid ffeil Europass mo hon. Mae Postulo yn darllen yr XML a gynhyrchodd y golygydd CV a'r JSON y mae europass.europa.eu yn ei allforio; nid yw hon yn un o'r ddau."
 
 #: src/postulo/applications/views.py:365
 #, draft
@@ -8354,12 +8272,12 @@ msgid ""
 msgstr ""
 "Nid oes gwlad o flaen y rhif hwnnw, felly ni ellir ei ddeialu o unman arall. Dewiswch y wlad, neu ysgrifennwch ef gan ddechrau â +."
 
-#: src/postulo/core/phone_numbers.py:395
+#: src/postulo/core/phone_numbers.py:396
 #, draft
 msgid "That number has to be confirmed before it can get you back in."
 msgstr "Rhaid cadarnhau'r rhif hwnnw cyn iddo allu eich cael yn ôl i mewn."
 
-#: src/postulo/core/phone_numbers.py:32
+#: src/postulo/core/phone_numbers.py:33
 #, draft
 msgid ""
 "That number is already recorded on this instance. Telephone numbers are kept unique across every account here, so it may belong to somebody else's records."
@@ -8531,13 +8449,6 @@ msgstr "Mae'r amgylchedd yn gosod «%(name)s», felly ni ellir ei newid yma."
 msgid "the escape hatch, for anything this area does not cover"
 msgstr "y ddihangfa, ar gyfer unrhyw beth nad yw'r maes hwn yn ei gwmpasu"
 
-#: src/postulo/resume/importers.py:32
-#, draft
-msgid ""
-"The European CV format: the XML the Europass editor produces and the JSON europass.europa.eu exports."
-msgstr ""
-"Fformat CV Ewrop: yr XML y mae golygydd Europass yn ei gynhyrchu a'r JSON y mae europass.europa.eu yn ei allforio."
-
 #: src/postulo/templates/jobs/industry_list.html:12
 #, draft
 msgid ""
@@ -8633,7 +8544,7 @@ msgstr "Mae'r logo wedi mynd."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Ni newidiwyd y logo: %(problem)s"
 
-#: src/postulo/core/server_views.py:732 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Ni dderbyniodd yr injan bost ddim."
@@ -8695,13 +8606,6 @@ msgstr "Yr hysbyseb"
 #, draft
 msgid "The posting itself"
 msgstr "Yr hysbyseb ei hun"
-
-#: src/postulo/documents/stores.py:91
-#, draft
-msgid ""
-"The private media directory on this server, where every document is kept whatever else it is also copied to."
-msgstr ""
-"Y cyfeiriadur cyfryngau preifat ar y gweinydd hwn, lle cedwir pob dogfen beth bynnag arall y caiff ei chopïo iddo."
 
 #: src/postulo/plugins/consent.py:241
 #, python-format, draft
@@ -8919,7 +8823,6 @@ msgstr "Nid oes gwefan wedi'i chofnodi ar gyfer y cwmni hwn."
 msgid "This identifier is already listed."
 msgstr "Mae'r dynodydd hwn eisoes ar y rhestr."
 
-#: src/postulo/documents/stores.py:89
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -8975,13 +8878,6 @@ msgid ""
 msgstr ""
 "Dyma'r drefn safonol. Nes i chi newid rhywbeth, bydd teclyn a ychwanegir mewn fersiwn ddiweddarach yn ymddangos yma ohono'i hun; unwaith i chi drefnu'r dudalen, mae rhai newydd yn aros oddi arni nes i chi ofyn."
 
-#: src/postulo/notifications/email.py:73
-#, draft
-msgid ""
-"This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
-msgstr ""
-"Dyma'r neges brawf o'ch cysylltiad hysbysiadau Postulo. Bydd atgoffwyr a dalfeydd yn cyrraedd yr un ffordd."
-
 #: src/postulo/templates/server/plugins.html:281
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -8999,7 +8895,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Mae'r math hwn o ddynodydd eisoes ar y rhestr."
 
-#: src/postulo/core/phone_numbers.py:341
+#: src/postulo/core/phone_numbers.py:342
 #, draft
 msgid "This number is already listed."
 msgstr "Mae'r rhif hwn eisoes ar y rhestr."
@@ -9404,12 +9300,6 @@ msgstr ""
 #, draft
 msgid "Using a token"
 msgstr "Defnyddio tocyn"
-
-#: src/postulo/notifications/email.py:52
-#, draft
-msgid "Usually your own address. Anything the instance's mail can reach."
-msgstr ""
-"Fel arfer eich cyfeiriad eich hun. Unrhyw beth y gall post y gosodiad ei gyrraedd."
 
 #: src/postulo/jobs/industries.py:26
 #, draft
@@ -9919,11 +9809,6 @@ msgstr "Wedi'i thynnu'n ôl"
 msgid "Work"
 msgstr "Gwaith"
 
-#: src/postulo/resume/europass.py:638
-#, draft
-msgid "Work experience"
-msgstr "Profiad gwaith"
-
 #: src/postulo/templates/connections/list.html:35
 #, python-format, draft
 msgid "worked %(when)s"
@@ -10066,7 +9951,7 @@ msgid ""
 msgstr ""
 "Rydych wedi gwneud cais am hon o'r blaen. Mae cofnodi ail gais yn iawn; mae'r ddau'n aros ar y cofnod."
 
-#: src/postulo/core/phone_numbers.py:165
+#: src/postulo/core/phone_numbers.py:166
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

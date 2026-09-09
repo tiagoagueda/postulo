@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 18:14+0000\n"
+"POT-Creation-Date: 2026-09-09 18:30+0000\n"
 "PO-Revision-Date: 2026-09-08 10:23+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: українська\n"
@@ -320,12 +320,12 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s змінив би те, від чого залежить сам Postulo. %(problems)s"
 
-#: src/postulo/documents/rendering.py:245
+#: src/postulo/documents/rendering.py:247
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/documents/rendering.py:225
+#: src/postulo/documents/rendering.py:227
 #, python-format, draft
 msgid "%(name)s — CV"
 msgstr "%(name)s — резюме"
@@ -365,7 +365,7 @@ msgstr "%(role)s у %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s у %(company)s — %(days)s днів"
 
-#: src/postulo/resume/europass.py:802
+#: src/postulo/resume/importing.py:136
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: немає дати початку, тож його не додано."
@@ -448,11 +448,6 @@ msgstr "%(url)s відповів %(code)s."
 #, python-format, draft
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr "%(url)s значно більший, ніж має бути каталог."
-
-#: src/postulo/resume/europass.py:606
-#, python-format, draft
-msgid "%(what)s was in the file but could not be read."
-msgstr "%(what)s було у файлі, але прочитати не вдалося."
 
 #: src/postulo/templates/server/overview.html:61
 #, python-format, draft
@@ -770,11 +765,6 @@ msgstr "Меню облікового запису, %(name)s"
 #, draft
 msgid "Accounts"
 msgstr "Облікові записи"
-
-#: src/postulo/resume/europass.py:716
-#, draft
-msgid "Achievements"
-msgstr "Досягнення"
 
 #: src/postulo/applications/analytics.py:32
 #: src/postulo/applications/models.py:41
@@ -2737,8 +2727,7 @@ msgid "Edit interview"
 msgstr "Редагувати співбесіду"
 
 #: src/postulo/documents/rendering.py:24 src/postulo/jobs/industries.py:21
-#: src/postulo/resume/europass.py:661 src/postulo/resume/registry.py:41
-#: src/postulo/resume/registry.py:42
+#: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
 #: src/postulo/templates/resume/europass_import.html:67
 #: src/postulo/templates/resume/preview.html:45
 #, draft
@@ -3140,11 +3129,6 @@ msgstr "Файл збережено."
 #, draft
 msgid "Files"
 msgstr "Файли"
-
-#: src/postulo/documents/stores.py:112
-#, draft
-msgid "Files are kept under this instance's private media."
-msgstr "Файли зберігаються в приватних медіа цієї інстанції."
 
 #: src/postulo/applications/models.py:233
 #, draft
@@ -4103,13 +4087,6 @@ msgstr "Вакансії"
 msgid "Join the call"
 msgstr "Долучитися до дзвінка"
 
-#: src/postulo/core/features.py:31
-#, draft
-msgid ""
-"Keep more than one number for yourself and for the people you deal with — a mobile, a desk line, a switchboard — with one of them marked as the one to use. Switched off, Postulo shows and uses the primary number only; the others stay recorded and come back untouched when it is switched on again."
-msgstr ""
-"Зберігайте більш ніж один номер для себе і для людей, з якими маєте справу — мобільний, стаціонарну лінію, комутатор — з одним позначеним як той, що використовується. Вимкнено, Postulo показує й використовує лише основний номер; решта лишаються записаними й повертаються недоторканими, щойно його ввімкнуть знову."
-
 #: src/postulo/templates/server/person_recovery.html:52
 #, draft
 msgid ""
@@ -4129,7 +4106,7 @@ msgid ""
 msgstr ""
 "Зберігається у %(file)s і ротується за розміром, тож це не заповнить диск. Усе тут також іде в консоль, звідки його читає <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4965,11 +4942,6 @@ msgstr "Ні"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Ні адреси, ні ключа, тож звідти нічого не пропонується."
 
-#: src/postulo/notifications/email.py:69
-#, draft
-msgid "No address to send to."
-msgstr "Немає адреси для надсилання."
-
 #: src/postulo/plugins/catalogue.py:223
 #, python-format, draft
 msgid "No catalogue called “%(name)s” is configured."
@@ -5096,11 +5068,6 @@ msgstr "Для цієї компанії вакансій не записано.
 #, draft
 msgid "no role"
 msgstr "без посади"
-
-#: src/postulo/notifications/smtp.py:119
-#, draft
-msgid "No server set."
-msgstr "Сервер не вказано."
 
 #: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:76
 #, draft
@@ -5546,11 +5513,6 @@ msgstr "Нічого. Панель запропонує щось поверну�
 #, draft
 msgid "Notifications"
 msgstr "Сповіщення"
-
-#: src/postulo/notifications/email.py:71
-#, draft
-msgid "Notifications are set up"
-msgstr "Сповіщення налаштовано"
 
 #: src/postulo/applications/models.py:378
 #, draft
@@ -6076,7 +6038,7 @@ msgstr "Особистий сайт"
 msgid "Pharmaceuticals"
 msgstr "Фармацевтика"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:302
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -7127,7 +7089,7 @@ msgstr "Збережено."
 msgid "Say what this identifier is."
 msgstr "Зазначте, що це за ідентифікатор."
 
-#: src/postulo/core/phone_numbers.py:315
+#: src/postulo/core/phone_numbers.py:316
 #, draft
 msgid "Say what this number is."
 msgstr "Скажіть, що це за номер."
@@ -7261,11 +7223,6 @@ msgid "Send it as a bearer token. To check that one works, and see its scopes:"
 msgstr ""
 "Надсилайте його як bearer-токен. Щоб перевірити, що він працює, і побачити його області:"
 
-#: src/postulo/notifications/email.py:50
-#, draft
-msgid "Send to"
-msgstr "Надіслати до"
-
 #: src/postulo/templates/documents/partials/copies.html:20
 #, draft
 msgid "Send to stores now"
@@ -7305,7 +7262,7 @@ msgstr "Надіслані документи"
 msgid "sent on"
 msgstr "надіслано"
 
-#: src/postulo/core/server_views.py:730 src/postulo/notifications/email.py:85
+#: src/postulo/core/server_views.py:730
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Надіслано до %(to)s."
@@ -7403,11 +7360,6 @@ msgstr "Розділи налаштувань"
 #, draft
 msgid "Settled"
 msgstr "Вирішено"
-
-#: src/postulo/core/features.py:29
-#, draft
-msgid "Several telephone numbers"
-msgstr "Кілька номерів телефону"
 
 #: src/postulo/core/widgets_builtin.py:17
 #, draft
@@ -8104,11 +8056,6 @@ msgstr "Це не схоже на ідентифікатор %(scheme)s (нап�
 msgid "That does not look like a complete web address."
 msgstr "Це не схоже на повну вебадресу."
 
-#: src/postulo/resume/europass.py:312 src/postulo/resume/europass.py:585
-#, draft
-msgid "That does not look like a Europass file: it has no LearnerInfo section."
-msgstr "Це не схоже на файл Europass: у ньому немає розділу LearnerInfo."
-
 #: src/postulo/applications/views.py:394
 #, draft
 msgid "That entry could not be saved."
@@ -8147,31 +8094,10 @@ msgstr "Той файл більший за %(limit)s МБ."
 msgid "That file is larger than a logo should be."
 msgstr "Той файл більший, ніж має бути логотип."
 
-#: src/postulo/resume/europass.py:569
-#, python-format, draft
-msgid "That file is not readable JSON: %(reason)s"
-msgstr "Той файл не є придатним для читання JSON: %(reason)s"
-
-#: src/postulo/resume/europass.py:304
-#, python-format, draft
-msgid "That file is not readable XML: %(reason)s"
-msgstr "Той файл не є придатним для читання XML: %(reason)s"
-
-#: src/postulo/resume/europass.py:566
-#, draft
-msgid "That file is not UTF-8, so it is not a Europass export."
-msgstr "Той файл не в UTF-8, тож це не експорт Europass."
-
 #: src/postulo/resume/views.py:253
 #, python-format, draft
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Той файл більший за %(limit)s МБ. Резюме таким не буває."
-
-#: src/postulo/resume/europass.py:574
-#, python-format, draft
-msgid "That file nests more than %(limit)s levels deep, so it was not read."
-msgstr ""
-"У тому файлі вкладеність глибша за %(limit)s рівнів, тож його не прочитано."
 
 #: src/postulo/resume/views.py:287
 #, draft
@@ -8202,13 +8128,6 @@ msgstr "Це багато посилань для відновлення. Спр
 #, draft
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Це SVG, який Postulo поки не зберігає. Підійде PNG або JPEG."
-
-#: src/postulo/resume/europass.py:223
-#, draft
-msgid ""
-"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
-msgstr ""
-"Це не файл Europass. Postulo читає XML, який створював редактор резюме, і JSON, який експортує europass.europa.eu; це ані те, ані те."
 
 #: src/postulo/applications/views.py:365
 #, draft
@@ -8293,12 +8212,12 @@ msgid ""
 msgstr ""
 "Перед цим номером немає країни, тож звідусіль іншого його не набрати. Виберіть країну або запишіть його, почавши з +."
 
-#: src/postulo/core/phone_numbers.py:395
+#: src/postulo/core/phone_numbers.py:396
 #, draft
 msgid "That number has to be confirmed before it can get you back in."
 msgstr "Цей номер має бути підтверджений, перш ніж зможе повернути вас назад."
 
-#: src/postulo/core/phone_numbers.py:32
+#: src/postulo/core/phone_numbers.py:33
 #, draft
 msgid ""
 "That number is already recorded on this instance. Telephone numbers are kept unique across every account here, so it may belong to somebody else's records."
@@ -8467,13 +8386,6 @@ msgstr "Середовище задає «%(name)s», тож тут це не з
 msgid "the escape hatch, for anything this area does not cover"
 msgstr "запасний вихід, для всього, чого цей розділ не охоплює"
 
-#: src/postulo/resume/importers.py:32
-#, draft
-msgid ""
-"The European CV format: the XML the Europass editor produces and the JSON europass.europa.eu exports."
-msgstr ""
-"Європейський формат резюме: XML, який створює редактор Europass, і JSON, який експортує europass.europa.eu."
-
 #: src/postulo/templates/jobs/industry_list.html:12
 #, draft
 msgid ""
@@ -8566,7 +8478,7 @@ msgstr "Логотип зник."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Логотип не змінено: %(problem)s"
 
-#: src/postulo/core/server_views.py:732 src/postulo/notifications/email.py:84
+#: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Поштовий бекенд нічого не прийняв."
@@ -8628,13 +8540,6 @@ msgstr "Вакансія"
 #, draft
 msgid "The posting itself"
 msgstr "Сама вакансія"
-
-#: src/postulo/documents/stores.py:91
-#, draft
-msgid ""
-"The private media directory on this server, where every document is kept whatever else it is also copied to."
-msgstr ""
-"Тека приватних медіа на цьому сервері, де зберігається кожен документ, хоч би куди його ще копіювали."
 
 #: src/postulo/plugins/consent.py:241
 #, python-format, draft
@@ -8848,7 +8753,6 @@ msgstr "Для цієї компанії не записано вебсайту.
 msgid "This identifier is already listed."
 msgstr "Цей ідентифікатор уже в переліку."
 
-#: src/postulo/documents/stores.py:89
 #: src/postulo/templates/server/defaults.html:13
 #, draft
 msgid "This instance"
@@ -8903,13 +8807,6 @@ msgid ""
 msgstr ""
 "Це стандартне розташування. Доки ви нічого не змінили, віджет, доданий у пізнішому випуску, з’явиться тут сам; щойно ви впорядкували сторінку, нові лишаються поза нею, доки ви не попросите."
 
-#: src/postulo/notifications/email.py:73
-#, draft
-msgid ""
-"This is the test message from your Postulo notifications connection. Reminders and captures will arrive the same way."
-msgstr ""
-"Це тестове повідомлення від вашого з’єднання сповіщень Postulo. Нагадування й захоплення приходитимуть так само."
-
 #: src/postulo/templates/server/plugins.html:281
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -8927,7 +8824,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Ідентифікатор такого виду вже в переліку."
 
-#: src/postulo/core/phone_numbers.py:341
+#: src/postulo/core/phone_numbers.py:342
 #, draft
 msgid "This number is already listed."
 msgstr "Цей номер уже є в списку."
@@ -9331,11 +9228,6 @@ msgstr ""
 #, draft
 msgid "Using a token"
 msgstr "Як користуватися токеном"
-
-#: src/postulo/notifications/email.py:52
-#, draft
-msgid "Usually your own address. Anything the instance's mail can reach."
-msgstr "Зазвичай ваша власна адреса. Будь-яка, куди дістає пошта цієї інстанції."
 
 #: src/postulo/jobs/industries.py:26
 #, draft
@@ -9839,11 +9731,6 @@ msgstr "Відкликано"
 msgid "Work"
 msgstr "Робота"
 
-#: src/postulo/resume/europass.py:638
-#, draft
-msgid "Work experience"
-msgstr "Досвід роботи"
-
 #: src/postulo/templates/connections/list.html:35
 #, python-format, draft
 msgid "worked %(when)s"
@@ -9984,7 +9871,7 @@ msgid ""
 msgstr ""
 "Ви вже сюди подавалися. Записати другу заявку — нормально; обидві лишаються в записі."
 
-#: src/postulo/core/phone_numbers.py:165
+#: src/postulo/core/phone_numbers.py:166
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

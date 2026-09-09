@@ -312,7 +312,7 @@ class MyNotifier:
 back to their address or name if your service needs one. Every notifier connection
 automatically carries a switch per event, so your plugin never has to ask which events to
 deliver: if `send()` is called, the person wanted it. The built-in
-`postulo.notifications.email.EmailNotifier` is forty lines and a fair template;
+`postulo.plugins.email` is forty lines and a fair template;
 [postulo-apprise](https://source.tiagoagueda.com/postulo/postulo-apprise) is a complete
 one built outside the core, with `validate`, `summary`, a secret that is a list, and the
 destination policy applied to the servers its URLs name.
@@ -325,7 +325,7 @@ review of what was sent never depend on a store, and a job search does not stop 
 an archive server is down. A store adds one method:
 
 ```python
-from postulo.documents.stores import DocumentMetadata, ExternalRef
+from postulo.plugins.api import DocumentMetadata, ExternalRef
 
 
 class MyStore:
@@ -349,8 +349,8 @@ Postulo calls `put` from the scheduler, never inside a request, except when a pe
 presses *Send to stores now*. Every store connection carries a switch per document kind,
 so your plugin never asks which kinds to keep: if `put` is called, the person wanted it.
 `browse()` and `delete()` are reserved for a later stage and not called yet. The
-built-in `postulo.documents.stores.LocalStore` is the same contract applied to private
-media, and cannot be switched off.
+built-in `postulo.plugins.localstore` is the same contract applied to private media, and
+cannot be switched off.
 
 ### Syncs
 
@@ -477,6 +477,39 @@ the test fails until somebody writes down why.
 Today the two built-in **sources** import nothing from Postulo at all, and the
 telephone-numbers **feature** imports only the surface. That is the check that the surface is
 not so wide as to be meaningless.
+
+## The plugins Postulo ships are packages like yours
+
+Seven of them, and they live where yours would:
+
+```text
+src/postulo/plugins/
+    builtin/          schema.org and page-metadata, the two capture sources
+    email/            the notifier that sends through the instance's mail settings
+    smtp/             the transport underneath it
+    localstore/       the store every document is in
+    europass/         the importer, and the reader it is a declaration for
+    phone_numbers/    the feature that switches several numbers per person on and off
+```
+
+Each has its manifest, its `locale/`, and imports `postulo.plugins.api`. None of them
+touches the database: an importer turns bytes into a record, a store writes a file, a
+notifier sends a message, and Postulo does the ownership scoping. That is not tidiness —
+scoping done wrong in a plugin is how one person sees another's data, and the way not to
+get it wrong in seven places is not to need it in seven places.
+
+**This is checked, not asserted.** `tests/test_plugin_surface.py` takes the list from the
+registry rather than from a list in the test, so a built-in added tomorrow is checked
+tomorrow. It fails on one that lives outside `postulo.plugins`, one with no catalogues of
+its own, one that imports a model, and one that imports anything else from Postulo without
+a written reason.
+
+**What a built-in does differently, and why.** It registers through `register_builtin()`
+rather than an entry point. An entry point would buy nothing — the module is in the same
+distribution, so the lookup is a slower import — and would cost the ordering `docs` promises
+just above: third-party plugins are tried first, and built-ins last, so yours can take
+precedence over Postulo's. Entry points resolve in one list with no way to say *after
+everything else*.
 
 ## Saying who you are
 
