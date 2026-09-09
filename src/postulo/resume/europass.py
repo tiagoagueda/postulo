@@ -57,7 +57,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.accounts import identifiers
 from postulo.core import phone_numbers
-from postulo.plugins.base import MAX_IMPORT_BYTES, ImportRefused, refuse_unreadable
+from postulo.plugins.api import MAX_IMPORT_BYTES, ImportRefused, refuse_unreadable
 
 #: Kept as a name because the interface and the tests use it, but the number belongs to
 #: the importer kind now: every importer gets the same cap, not just this one.

@@ -201,6 +201,36 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A written, enforced answer to "a plugin should not depend on the core": depend on
+  `postulo.plugins.api`, and nothing else.** The imperative could not be checked — or even
+  argued about — while there was no answer to *depend on what, then*. Now there is one module
+  that is a promise, everything else is this month's internals, and a test walks every plugin
+  Postulo ships and fails on one that reaches past it.
+
+  **Total independence was never the goal.** A plugin holding one person's data must scope it
+  with `for_user()` or one person sees another's; a redirect that skips `safe_next` bounces
+  somebody off the instance; an outbound request that skips the guarded client dials where the
+  server should not; a consenting connection that keeps a token has stopped refreshing it.
+  Those four are *reasons* to depend on Postulo, and the imperative is served by making them a
+  small named set rather than by pretending they are avoidable.
+
+  **The promise about breakage is made now, deliberately.** Having no surface was free, and it
+  stops being free the moment #129 moves shipped plugins into their own packages — a package
+  outside `src/postulo` has to know what it may import, and deferring the promise means either
+  deferring that work or setting a boundary by accident. From here a change to any of these
+  names is a deprecation entry first and a removal later, never a silent rename.
+
+  **Enforcement is what makes it real**, and it reads the source rather than importing it: a
+  lazy `from postulo.core import site` inside a method is exactly as much of a dependency as
+  one at the top of a file, and is the shape most of the remaining ones take. The plugins that
+  still reach past the surface are recorded with what each needs — that list is the map of what
+  #129 has left to move, a new entry has to be written on purpose, and a stale one fails too,
+  because an entry nobody removed hides the next real dependency.
+
+  The two built-in sources import nothing from Postulo at all and the telephone-numbers feature
+  imports only the surface, which is the check that the surface is not so wide as to mean
+  nothing. (#126)
+
 - **A connection can say it needs consent rather than a password.** Every connection until
   now authenticated with something a person could type — a field, a form, a stored secret, a
   *Test* button — and OAuth is not that. It is a round trip through somebody else's website,

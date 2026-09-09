@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from django.utils.translation import gettext_lazy as _
 
-from postulo.plugins.base import declares, shipped
+from postulo.plugins.api import declares, shipped
 
 #: The identifier the policy rows key on. Changing it orphans every decision an
 #: administrator has recorded about it, so it is fixed the way a source's name is.

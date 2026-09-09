@@ -407,6 +407,60 @@ a second call finds the first suggestion and changes nothing, whether it is wait
 accepted or declined. That is what lets a mailbox be read every five minutes without
 asking the same question twice.
 
+## What you may import from Postulo
+
+One module, and it is a promise:
+
+```python
+from postulo.plugins.api import FieldSpec, TestResult, declares, shipped
+```
+
+**Everything else in `postulo` is this month's internals.** `postulo.plugins.base`,
+`postulo.core`, `postulo.accounts` — whatever they look like today, they may move in a patch
+release without a word. `postulo.plugins.api` is the only thing that will not.
+
+**Total independence is not the goal and cannot be.** Four things are reasons to depend on
+Postulo, and skipping any of them breaks something the project promises rather than merely
+being untidy:
+
+| You need | Because |
+| --- | --- |
+| `OwnedModel`, `OwnedQuerySet` | a plugin holding one person's data scopes it with `for_user()`, or one person sees another's |
+| `safe_next` | a redirect that skips it is a way to bounce somebody off the instance |
+| `client` | an outbound request that skips it is a way to make the server dial where it should not |
+| `access_token` | ask for a token at the moment of use; a plugin that keeps one has stopped refreshing it |
+
+The rest of the surface is what you declare and what you hand back: `Manifest`, `declares`,
+`shipped`, `manifest_of`, `label_of`, `description_of`; `FieldSpec`, `TestResult`, `Consent`;
+`JobPostingData`, `SyncReport`, `TextMessage`; `MAX_IMPORT_BYTES`, `ImportRefused`,
+`refuse_unreadable`; `MAIL`, `TEXT`, `MEDIUMS`, `medium_of`; and every protocol.
+
+Asking for anything else raises, and says where to look:
+
+```
+AttributeError: 'Connection' is not part of the plugin surface. See docs/PLUGINS.md.
+```
+
+### What the promise is worth
+
+These names keep working across a minor release. A change to one is a `### ⚠️ Deprecated`
+entry first and a `### 🗑️ Removed` entry in a later release, never a silent rename. That is
+the cost of having a surface at all, taken deliberately: without one, #129 would move every
+shipped plugin into its own package against a boundary nobody had written down, which is how
+a surface gets set by accident instead of on purpose.
+
+### What is not settled yet
+
+What a dashboard widget is handed, and what a template may extend beyond the base, are open
+questions. A plugin needing either is reaching past the surface knowingly — and
+`tests/test_plugin_surface.py` records every shipped plugin that does, with the reason. That
+list is the map of what is left to move, and a new entry has to be added on purpose, because
+the test fails until somebody writes down why.
+
+Today the two built-in **sources** import nothing from Postulo at all, and the
+telephone-numbers **feature** imports only the surface. That is the check that the surface is
+not so wide as to be meaningless.
+
 ## Saying who you are
 
 Everything a plugin says about itself goes in one place: a **manifest**.

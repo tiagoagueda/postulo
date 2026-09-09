@@ -19,7 +19,7 @@ from django.core.mail.backends.smtp import EmailBackend
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
 
-from postulo.plugins.base import FieldSpec, TestResult, declares, shipped
+from postulo.plugins.api import FieldSpec, TestResult, declares, shipped
 
 
 class GuardedBackend(EmailBackend):

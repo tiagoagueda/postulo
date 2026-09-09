@@ -24,7 +24,7 @@ from typing import Protocol, runtime_checkable
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from postulo.plugins.base import ConnectedPlugin, FieldSpec, TestResult, declares, shipped
+from postulo.plugins.api import ConnectedPlugin, FieldSpec, TestResult, declares, shipped
 
 from .models import DocumentKind, RenderedDocument, UploadedDocument
 
