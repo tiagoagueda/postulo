@@ -823,6 +823,33 @@ manage.py plugins remove postulo-apprise
 manage.py plugins sync                         # what the entry point runs at boot
 ```
 
+## Where a plugin says it came from
+
+*Server settings → Plugins* labels every plugin with its provenance, and the label describes
+evidence rather than intent:
+
+| Label | What it means | Removable |
+| --- | --- | --- |
+| **Internal** | Ships inside Postulo | No — switched off for people through the policy rows |
+| **Official** | Its file matches what the official repository signed | Yes |
+| **Custom** | Its file matches what a repository on this instance signed | Yes |
+| **Uploaded** | Nothing here signed this file | Yes |
+
+**An upload can be official, and a name cannot make it so.** A zip carries no evidence of who
+published it — so what is checked is the file. A signed index publishes each release's
+SHA-256; a wheel whose bytes match one *is* the file that repository published, whatever route
+it took. One byte of difference and it is not. If no repository can be reached at the moment
+the question is asked, the answer is **Uploaded**, never a guess.
+
+**Which repository is official is a key, not a name.** Anybody can call a repository
+`postulo`; nobody else can sign with Postulo's key. Postulo publishes no catalogue yet, so
+nothing is official on any instance today.
+
+**None of this means safe.** Installing a plugin runs somebody else's code inside Postulo,
+and that is as true of an official plugin as of any other. It also says nothing about
+dependencies: the signature and the checksum cover the plugin's own wheel, and its
+requirements are resolved from PyPI at install time and are whatever was served that day.
+
 ## Publishing to a catalogue
 
 A catalogue is one JSON file listing plugins, and beside it a detached Ed25519 signature

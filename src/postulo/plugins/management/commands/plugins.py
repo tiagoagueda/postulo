@@ -49,10 +49,6 @@ class Command(BaseCommand):
 
     def _list(self, options) -> None:
         rows = installing.status()
-        if not rows:
-            self.stdout.write("No plugins are installed on the data volume.")
-            self.stdout.write(f"They would live in {installing.plugins_dir()}.")
-            return
         for row in rows:
             state = []
             if row["disabled"]:
@@ -60,9 +56,17 @@ class Command(BaseCommand):
             if not row["present"]:
                 state.append("not loadable — run `plugins sync`")
             suffix = f"  ({', '.join(state)})" if state else ""
-            self.stdout.write(f"{row['name']} {row['version']}  [{row['origin']}]{suffix}")
+            where = row["provenance"]
+            if row.get("repository"):
+                where = f"{where}: {row['repository']}"
+            self.stdout.write(f"{row['name']} {row['version']}  [{where}]{suffix}")
             for point in row["entry_points"]:
                 self.stdout.write(f"    {point}")
+        # The built-ins are always here, so "nothing" means nothing *installed* -- which is
+        # a different sentence and the one an administrator is actually asking about (#94).
+        if not any(row["removable"] for row in rows):
+            self.stdout.write("Nothing is installed on the data volume; the rest ships inside.")
+            self.stdout.write(f"An installed plugin would live in {installing.plugins_dir()}.")
 
     # --------------------------------------------------------------- install
 

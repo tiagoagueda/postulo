@@ -506,6 +506,23 @@ def install_wheel(
     return entry
 
 
+def is_internal(name: str) -> bool:
+    """Whether ``name`` is a plugin that ships inside Postulo rather than one installed.
+
+    Asked by name, because that is what a form posts and what a command takes. A built-in
+    has no line in the record, so every route that removes or disables one is really being
+    asked to do something to a plugin it cannot see -- and answering "no such plugin" would
+    be true and useless. This is what lets those routes say why instead (#94).
+    """
+    from . import registry
+
+    return any(
+        getattr(plugin_class, "name", "") == name
+        for classes in registry.builtins().values()
+        for plugin_class in classes
+    )
+
+
 def remove(name: str) -> Installed:
     """Take a plugin off the instance: its files, and its line in the record.
 
@@ -515,6 +532,10 @@ def remove(name: str) -> Installed:
     """
     from . import data
 
+    if is_internal(name):
+        raise InstallError(
+            str(_("%(name)s ships inside Postulo and cannot be removed.")) % {"name": name}
+        )
     entry = installed(name)
     if entry is None:
         raise InstallError(str(_("%(name)s is not installed.")) % {"name": name})
@@ -566,7 +587,22 @@ def _prune_empty_directories() -> None:
 
 
 def set_disabled(name: str, disabled: bool) -> Installed:
-    """Stop a plugin loading, or let it load again. Its files stay where they are."""
+    """Stop a plugin loading, or let it load again. Its files stay where they are.
+
+    Not the way a built-in is switched off. `plugins/policy.py` decides those, per person
+    and per instance, with a record of who decided -- and this record has no line to write
+    on for a plugin that was never installed (#94).
+    """
+    if is_internal(name):
+        raise InstallError(
+            str(
+                _(
+                    "%(name)s ships inside Postulo. Switch it off under "
+                    "Server settings → Plugins instead."
+                )
+            )
+            % {"name": name}
+        )
     record = read_record()
     for entry in record:
         if canonicalise(entry.name) == canonicalise(name):
@@ -687,5 +723,65 @@ def _forget_metadata_cache() -> None:
 
 
 def status() -> list[dict]:
-    """The record, with whether each plugin is actually importable right now."""
-    return [{**asdict(entry), "present": _is_present(entry.name)} for entry in read_record()]
+    """Everything this instance can do, and where each part of it came from.
+
+    The record *and the built-ins*, because until #94 this page listed what an
+    administrator had installed and not what the instance could actually do -- so somebody
+    asking "can this instance read a posting off a page" was looking in the wrong place.
+    The two built-in sources never pass through here; they are Python classes in the image.
+
+    Provenance is derived rather than stored: an upload is checked against what the enabled
+    repositories currently sign, so a file that matches one is named as theirs however it
+    arrived. The checksums are fetched once for the whole list rather than once per row.
+    """
+    from . import provenance, registry
+
+    rows = []
+    for plugin_class in _every_builtin(registry):
+        mark = provenance.of_builtin(plugin_class)
+        # The same keys an installed row has, filled in with what is true of a built-in:
+        # no checksum, nobody installed it, no date. One shape means every reader of this
+        # list -- the page, the command, a future one -- works on both kinds (#94).
+        rows.append(
+            {
+                **asdict(Installed(name=getattr(plugin_class, "name", ""), version="")),
+                "version": str(getattr(plugin_class, "version", "") or ""),
+                "origin": "internal",
+                "present": True,
+                "removable": mark.removable,
+                "provenance": mark.kind,
+                "provenance_label": mark.label,
+                "provenance_explanation": mark.explanation,
+                "repository": "",
+                "summary": str(getattr(plugin_class, "description", "") or ""),
+            }
+        )
+
+    entries = read_record()
+    digests = provenance.signed_digests() if entries else {}
+    for entry in entries:
+        mark = provenance.of_record(entry, digests=digests)
+        rows.append(
+            {
+                **asdict(entry),
+                "present": _is_present(entry.name),
+                "removable": mark.removable,
+                "provenance": mark.kind,
+                "provenance_label": mark.label,
+                "provenance_explanation": mark.explanation,
+                "repository": mark.repository,
+            }
+        )
+    return rows
+
+
+def _every_builtin(registry) -> list:
+    """One instance of each plugin Postulo ships, whatever kind it is."""
+    seen: list = []
+    for classes in registry.builtins().values():
+        for plugin_class in classes:
+            try:
+                seen.append(plugin_class())
+            except Exception:  # pragma: no cover - a built-in that will not instantiate
+                logger.exception("Built-in plugin %r could not be described", plugin_class)
+    return sorted(seen, key=lambda plugin: getattr(plugin, "name", ""))

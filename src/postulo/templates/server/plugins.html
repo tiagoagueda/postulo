@@ -194,6 +194,19 @@
                 {% if not plugin.present %}
                   <span class="ms-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200">{% translate "not loaded" %}</span>
                 {% endif %}
+                {% comment %} Where it came from, derived rather than declared: an upload
+                   is named as a repository's only when its checksum matches what that
+                   repository signed. Deliberately not styled as a reassurance -- installing
+                   a plugin runs somebody else's code whatever this says (#94). {% endcomment %}
+                <span class="ms-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300"
+                      data-provenance="{{ plugin.provenance }}"
+                      title="{{ plugin.provenance_explanation }}">{{ plugin.provenance_label }}</span>
+              </p>
+              <p class="text-xs text-ink-500 dark:text-ink-400">
+                {{ plugin.provenance_explanation }}
+                {% if plugin.repository %}
+                  <bdi>{{ plugin.repository }}</bdi>
+                {% endif %}
               </p>
               {% comment %} Read from the wheel at install time and, until #97, dropped
                  the moment this page had shown it once. An administrator could see who
@@ -236,21 +249,31 @@
                 </details>
               {% endif %}
             </div>
+            {% comment %} A built-in has no line in the record, so neither button has
+               anything to act on. Saying so beside the row is better than a control that
+               fails when pressed -- and better than leaving the row out, because what the
+               instance can do is the question this page answers (#94). {% endcomment %}
             <div class="flex items-center gap-1">
-              <form method="post" action="{% url 'server:plugin_action' %}">
-                {% csrf_token %}
-                <input type="hidden" name="name" value="{{ plugin.name }}">
-                <input type="hidden" name="action" value="{% if plugin.disabled %}enable{% else %}disable{% endif %}">
-                <button type="submit" class="btn-secondary px-3 py-1 text-xs">
-                  {% if plugin.disabled %}{% translate "Switch on" %}{% else %}{% translate "Switch off" %}{% endif %}
-                </button>
-              </form>
-              <form method="post" action="{% url 'server:plugin_action' %}">
-                {% csrf_token %}
-                <input type="hidden" name="name" value="{{ plugin.name }}">
-                <input type="hidden" name="action" value="remove">
-                <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">{% translate "Remove" %}</button>
-              </form>
+              {% if plugin.removable %}
+                <form method="post" action="{% url 'server:plugin_action' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="name" value="{{ plugin.name }}">
+                  <input type="hidden" name="action" value="{% if plugin.disabled %}enable{% else %}disable{% endif %}">
+                  <button type="submit" class="btn-secondary px-3 py-1 text-xs">
+                    {% if plugin.disabled %}{% translate "Switch on" %}{% else %}{% translate "Switch off" %}{% endif %}
+                  </button>
+                </form>
+                <form method="post" action="{% url 'server:plugin_action' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="name" value="{{ plugin.name }}">
+                  <input type="hidden" name="action" value="remove">
+                  <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">{% translate "Remove" %}</button>
+                </form>
+              {% else %}
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {% translate "Switched off for people above, not removed." %}
+                </p>
+              {% endif %}
             </div>
           </li>
         {% endfor %}

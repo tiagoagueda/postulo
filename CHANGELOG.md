@@ -227,6 +227,35 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Server settings → Plugins now lists what the instance can actually do, and says where
+  each part of it came from.** It used to list what an administrator had installed — so the
+  two built-in capture sources, which are classes in the image and never pass through the
+  installer, were missing from the page somebody would look at to answer "can this instance
+  read a posting off a page". They are there now, marked internal, with no button that could
+  not work: a built-in has no line in the record for Remove or Switch off to act on, and is
+  governed for people through the policy rows above instead.
+
+  **The hard half is labelling an upload, and it comes down to one sentence: a zip is a zip.**
+  A file somebody uploads carries no evidence of who published it, and calling it official
+  because it is named after an official plugin would be worse than not labelling it at all.
+  So the label describes evidence: a signed index publishes each release's SHA-256, and a
+  wheel whose bytes match one is byte-for-byte the file that repository signed, however it
+  reached the instance. One byte of difference and it is not. When no repository can be
+  reached — switched off, unreachable, an index that will not verify — the answer is
+  *uploaded* rather than a guess.
+
+  **Which repository counts as official is decided by a key, never by a name**, because
+  anybody can call their repository `postulo` and nobody else can sign with Postulo's key.
+  Postulo publishes no catalogue yet, so nothing is official today and every installed plugin
+  is custom or uploaded — which is the truthful thing for the page to say, and it changes by
+  adding a key rather than by writing this again.
+
+  **The badge does not quietly mean "safe".** Installing a plugin runs somebody else's code
+  inside Postulo, and that is as true of an official one; the page still says so. Nor does it
+  cover dependencies: the signature and the checksum are about the plugin's own wheel, and its
+  requirements come from PyPI at install time. Neither sentence beside a badge says otherwise,
+  and a test holds them to it. (#94)
+
 - **A plugin can carry a logo, and Postulo serves it.** The manifest has had a `logo` field
   since #97 with nothing rendering it. Now a plugin names a file inside its own package and
   it appears beside the plugin's name.

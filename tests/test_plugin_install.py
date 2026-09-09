@@ -554,7 +554,9 @@ def test_the_command_lists_installs_and_removes(tmp_path, plugins_dir, installer
 
     out = StringIO()
     call_command("plugins", "list", stdout=out)
-    assert "No plugins are installed" in out.getvalue()
+    # The built-ins are always listed, so "nothing" is about what was installed (#94).
+    assert "Nothing is installed on the data volume" in out.getvalue()
+    assert "[internal]" in out.getvalue(), "and what ships inside is shown too"
 
     out = StringIO()
     call_command("plugins", "install", str(a_wheel(tmp_path)), stdout=out)
@@ -563,7 +565,9 @@ def test_the_command_lists_installs_and_removes(tmp_path, plugins_dir, installer
 
     out = StringIO()
     call_command("plugins", "list", stdout=out)
-    assert "postulo-example 1.0  [upload]" in out.getvalue()
+    assert "postulo-example 1.0  [uploaded]" in out.getvalue(), (
+        "nothing signed this file, and that is the whole truth about it"
+    )
 
     out = StringIO()
     call_command("plugins", "disable", "postulo-example", stdout=out)
