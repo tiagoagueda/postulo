@@ -15,7 +15,8 @@ class PluginsConfig(AppConfig):
         is found exactly as one installed with pip would be.
         """
         from .installing import activate
-        from .registry import register_builtin_locales
+        from .registry import register_builtin_locales, register_builtin_themes
 
         activate()
         register_builtin_locales()
+        register_builtin_themes()

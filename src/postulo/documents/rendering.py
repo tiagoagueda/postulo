@@ -12,6 +12,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
+from . import themes
 from .models import CV, CoverLetter, DocumentKind, RenderedDocument
 from .pdf import html_to_pdf
 
@@ -117,7 +118,7 @@ def contact_details(owner) -> dict:
 def render_cv_html(cv: CV) -> str:
     """Render a CV variant to a complete, self-contained HTML document."""
     return render_to_string(
-        f"documents/themes/{cv.theme}/cv.html",
+        themes.template_for(cv.theme, themes.Kind.CV),
         {
             "cv": cv,
             "sections": build_sections(cv),
@@ -177,7 +178,7 @@ def render_letter_html(letter: CoverLetter, application=None) -> str:
     """Render a cover letter, with its placeholders filled in."""
     values = letter_values(letter, application)
     return render_to_string(
-        f"documents/themes/{letter.theme}/letter.html",
+        themes.template_for(letter.theme, themes.Kind.LETTER),
         {
             "letter": letter,
             "subject": fill_placeholders(letter.subject, values),

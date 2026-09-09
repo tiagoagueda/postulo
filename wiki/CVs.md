@@ -31,13 +31,27 @@ page. Useful for something you want back next month without having to find it ag
 
 ## Themes
 
-Two, for now:
+Two come with Postulo:
 
 - **Plain** — a clean sans-serif layout. Sober and unremarkable, which is usually right.
 - **Classic** — a serif layout with small caps and a centred contact block.
 
 Both are A4 with generous margins, and both avoid splitting a single job across a page
-break.
+break, and both set every kind of document Postulo writes.
+
+**A plugin can add more.** The menu lists whatever is installed, and a theme from a plugin
+appears there under its own name with no further setting to change. A theme does not have
+to set everything, though — one written for letters will simply not be offered here, and
+you will see it on the letter form instead. Nothing offers you a pairing it cannot then
+produce; that is the point of the menu being shorter on one page than on another.
+
+**A theme is markup, so it arrives the way code arrives**: inside a plugin an administrator
+chose to install, having seen who wrote it. There is no upload box for themes, and there
+will not be one.
+
+**If a plugin is removed**, the CVs that used its theme keep working — they fall back to
+Plain and still export. Nothing is lost except the look, and choosing another theme puts
+that right.
 
 **Contact details** are taken from your profile, not retyped per CV. Untick *include
 contact details* for a variant that will be sent through a system that strips them

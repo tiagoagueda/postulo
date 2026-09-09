@@ -10,6 +10,7 @@ from postulo.jobs.forms import OwnerScopedModelForm
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
+from . import themes
 from .models import (
     CV,
     LETTER_STARTERS,
@@ -17,7 +18,6 @@ from .models import (
     CoverLetter,
     CVItem,
     LetterKind,
-    Theme,
     UploadedDocument,
 )
 
@@ -56,7 +56,45 @@ class LanguageChoiceMixin:
             field.required = False
 
 
-class CVForm(LanguageChoiceMixin, OwnerScopedModelForm):
+class ThemeChoiceMixin:
+    """Offer only the themes that set this kind of document.
+
+    The picker is where #132 is actually answered. A theme declares what it sets; refusing
+    a pair at render time would be a message after the export button, which is exactly the
+    thing the issue calls out. So the pair never gets chosen: a theme that does not set
+    this kind is not in the menu, and the validator on the field says the same thing to
+    anything that arrives another way.
+
+    A list rather than the model's ``choices`` because the model has none any more --
+    choices are frozen into migrations, and a theme from an installed plugin is not known
+    when a migration is written.
+    """
+
+    #: Which `themes.Kind` this form's document is.
+    theme_kind = ""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        field = self.fields.get("theme")
+        if field is None:
+            return
+        choices = themes.choices_for(self.theme_kind)
+        self.fields["theme"] = forms.ChoiceField(
+            label=field.label,
+            help_text=field.help_text,
+            required=field.required,
+            choices=choices,
+        )
+        # A document whose theme came from a plugin that has since been removed opens on the
+        # theme it is actually being rendered in, rather than on an error about a field
+        # nobody touched. It already looks like this; the form stops pretending otherwise.
+        if self.initial.get("theme") not in {value for value, _label in choices}:
+            self.initial["theme"] = themes.DEFAULT
+
+
+class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
+    theme_kind = themes.Kind.CV
+
     class Meta:
         model = CV
         fields = ("name", "headline", "summary", "theme", "language", "show_contact_details")
@@ -132,13 +170,15 @@ class AddCVItemsForm(forms.Form):
         return chosen
 
 
-class CoverLetterForm(LanguageChoiceMixin, OwnerScopedModelForm):
+class CoverLetterForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
     """A letter of any of the four kinds.
 
     A new letter starts from the kind's own text rather than an empty box: what a
     motivation letter is supposed to look like is not obvious, and a shape on the page
     says it better than help text underneath.
     """
+
+    theme_kind = themes.Kind.LETTER
 
     class Meta:
         model = CoverLetter
@@ -152,7 +192,7 @@ class CoverLetterForm(LanguageChoiceMixin, OwnerScopedModelForm):
         kind = self.initial.get("kind") or LetterKind.COVER
         self.initial.setdefault("kind", kind)
         self.initial.setdefault("body", str(LETTER_STARTERS.get(kind, "")))
-        self.initial.setdefault("theme", LETTER_THEMES.get(kind, Theme.PLAIN))
+        self.initial.setdefault("theme", LETTER_THEMES.get(kind, themes.DEFAULT))
 
 
 class UploadedDocumentForm(OwnerScopedModelForm):

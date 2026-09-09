@@ -27,7 +27,6 @@ from postulo.documents.models import (
     CVItem,
     DocumentKind,
     LetterKind,
-    Theme,
 )
 from postulo.documents.rendering import build_sections, snapshot_letter
 from postulo.jobs.models import Company, JobPosting
@@ -268,7 +267,7 @@ def test_a_letter_has_a_kind_and_starts_from_that_kinds_shape(client, user):
             "kind": LetterKind.MOTIVATION,
             "subject": "",
             "body": str(LETTER_STARTERS[LetterKind.MOTIVATION]),
-            "theme": Theme.CLASSIC,
+            "theme": "classic",
         },
     )
     letter = CoverLetter.objects.get(owner=user)
@@ -277,11 +276,15 @@ def test_a_letter_has_a_kind_and_starts_from_that_kinds_shape(client, user):
 
 
 def test_every_kind_has_its_own_starter_and_a_default_theme():
+    from postulo.documents import themes
     from postulo.documents.models import LETTER_THEMES
 
     for kind in LetterKind:
         assert str(LETTER_STARTERS[kind]).strip(), kind
-        assert LETTER_THEMES[kind] in {value for value, _label in Theme.choices}
+        # A theme the registry knows *and* one that sets letters: the pair is what #132
+        # made checkable, and a starter pointing at a theme that cannot set it is the
+        # exact failure that used to wait until somebody pressed Export.
+        assert LETTER_THEMES[kind] in {theme.name for theme in themes.for_kind(themes.Kind.LETTER)}
     # A motivation letter is sectioned prose; a cover letter is addressed and short.
     assert "Dear " in str(LETTER_STARTERS[LetterKind.COVER])
     assert "Why this work" in str(LETTER_STARTERS[LetterKind.MOTIVATION])

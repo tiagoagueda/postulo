@@ -31,6 +31,8 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel
 
+from . import themes
+
 
 def upload_to_documents(instance, filename: str) -> str:
     """Store files under the owner, so a stray path can only ever reach one person.
@@ -40,16 +42,22 @@ def upload_to_documents(instance, filename: str) -> str:
     return f"documents/{instance.owner_id}/{timezone.now():%Y/%m}/{filename}"
 
 
-class Theme(models.TextChoices):
-    """Built-in rendering themes.
+def theme_field(kind: str) -> models.CharField:
+    """The column a document's theme lives in.
 
-    Kept as choices rather than user-editable rows: a theme is a Django template plus a
-    stylesheet, and letting people upload those would mean executing their markup during
-    rendering. User themes belong behind a deliberate decision, not in the first version.
+    Not `choices`, which is what it was. Choices are frozen into every migration that
+    touches the field, so a theme arriving from an installed plugin could never be one --
+    and a theme that is only ever two names is a theme that has to be taught every new kind
+    of document by hand. The name is a string now, validated against
+    `postulo.documents.themes` at the moment it is set, and every existing row keeps the
+    value it already had (#132).
     """
-
-    PLAIN = "plain", _("Plain")
-    CLASSIC = "classic", _("Classic")
+    return models.CharField(
+        _("theme"),
+        max_length=themes.MAX_NAME_LENGTH,
+        default=themes.DEFAULT,
+        validators=[themes.SetsThisKind(kind)],
+    )
 
 
 class CV(OwnedModel):
@@ -62,7 +70,7 @@ class CV(OwnedModel):
     summary = models.TextField(
         _("summary"), blank=True, help_text=_("The opening paragraph, if you use one.")
     )
-    theme = models.CharField(_("theme"), max_length=20, choices=Theme, default=Theme.PLAIN)
+    theme = theme_field(themes.Kind.CV)
     language = models.CharField(
         _("language"),
         max_length=10,
@@ -90,6 +98,16 @@ class CV(OwnedModel):
 
     def get_absolute_url(self) -> str:
         return reverse("documents:cv_detail", args=[self.pk])
+
+    @property
+    def theme_label(self) -> str:
+        """The theme's name in words, for the pages that mention it.
+
+        What ``get_theme_display()`` used to be. It cannot be any more, and the reason is
+        the point of #132: a label read out of ``choices`` can only ever name a theme
+        compiled into the model, so a theme from a plugin would have shown as a bare slug.
+        """
+        return themes.label_for(self.theme)
 
     def included_items(self):
         """The items that will actually be rendered, in order."""
@@ -238,7 +256,7 @@ class CoverLetter(OwnedModel):
         default=True,
         help_text=_("Templates appear when you send a letter with an application."),
     )
-    theme = models.CharField(_("theme"), max_length=20, choices=Theme, default=Theme.PLAIN)
+    theme = theme_field(themes.Kind.LETTER)
     #: What the body is written in. A letter to a Portuguese employer is written in
     #: Portuguese, and the PDF has to say so: a screen reader reading it out is often the
     #: recruiter's, and hyphenation and justification follow the declaration too.
@@ -261,6 +279,11 @@ class CoverLetter(OwnedModel):
 
     def get_absolute_url(self) -> str:
         return reverse("documents:letter_detail", args=[self.pk])
+
+    @property
+    def theme_label(self) -> str:
+        """The theme's name in words. See `CV.theme_label`."""
+        return themes.label_for(self.theme)
 
     @property
     def document_kind(self) -> str:

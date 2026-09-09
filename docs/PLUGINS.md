@@ -503,11 +503,13 @@ a surface gets set by accident instead of on purpose.
 
 ### What is not settled yet
 
-What a dashboard widget is handed, and what a template may extend beyond the base, are open
-questions. A plugin needing either is reaching past the surface knowingly — and
-`tests/test_plugin_surface.py` records every shipped plugin that does, with the reason. That
-list is the map of what is left to move, and a new entry has to be added on purpose, because
-the test fails until somebody writes down why.
+What a dashboard widget is handed is an open question. A plugin needing it is reaching past
+the surface knowingly — and `tests/test_plugin_surface.py` records every shipped plugin that
+does, with the reason. That list is the map of what is left to move, and a new entry has to
+be added on purpose, because the test fails until somebody writes down why.
+
+What a *document* template may be is settled: `Theme` and `ThemeKind` are on the surface, and
+**A theme, if you set documents** below is the whole of it.
 
 Today the two built-in **sources** import nothing from Postulo at all, and the
 telephone-numbers **feature** imports only the surface. That is the check that the surface is
@@ -603,6 +605,74 @@ The rule has to be the same for every mark, which is why it is written here rath
 decided per logo: a rule that only works for the logos a project happens to like is not a
 rule. Where a mark's owner permits redistribution, the shape to copy is
 `src/postulo/static/flags/LICENSE.txt` — the notice travels with the files.
+
+## A theme, if you set documents
+
+A **theme** is a way of setting a CV or a letter: a template per kind, and the CSS inlined
+in it. Declare one and Postulo offers it in the picker beside its own.
+
+```python
+from postulo.plugins.api import Theme, ThemeKind, Manifest, declares
+
+
+@declares(Manifest(name="vellum", kind="feature", label="Vellum"))
+class Vellum:
+    themes = [
+        Theme(
+            name="vellum",
+            label=_("Vellum"),
+            templates={ThemeKind.LETTER: "vellum/letter.html"},
+            provider="Vellum Press",
+        )
+    ]
+```
+
+Put the templates in a `templates/` directory beside your package, exactly as you put your
+catalogues in `locale/`. Registering the plugin puts that directory on the path Django looks
+for templates in; nothing is copied and nothing is compiled.
+
+```text
+vellum/
+    __init__.py
+    locale/
+    templates/
+        vellum/
+            letter.html
+```
+
+**`templates` is the declaration.** A theme sets what it has a template for, and nothing
+else. If yours sets letters but not CVs, say so by having only the one file: the CV picker
+will not offer it, and asking for the pair directly raises `CannotRender` with a sentence in
+it rather than a missing-template traceback. A theme that answered for a kind it had never
+seen by falling back to Postulo's `plain` would put somebody's Vellum letter beside a plain
+CV in one envelope, which is the same bad outcome said too late to do anything about.
+
+**Your template owes the reader a language and a direction.** Postulo hands you
+`document_language` and `document_direction`; a template that ignores them renders an Arabic
+CV left to right. The simplest way to get this right is to extend Postulo's own base:
+
+```django
+{% extends "documents/themes/base_letter.html" %}
+{% block page_styles %}…{% endblock %}
+```
+
+which is a template, not a Python import, and is what Postulo's own two themes do.
+
+**What you may not do is ship markup somebody else wrote at runtime.** There is no upload
+form for themes and there will not be one: rendering executes the template, so an
+uploadable theme is remote code execution with a file picker on it. Your templates run
+because an administrator installed *your plugin*, having read its author, licence and
+source — the same trust that already lets it hold their credentials, not a new one.
+
+**Names.** Postulo's own — `plain` and `classic` — are not yours to take, and the first
+plugin to claim any other name keeps it; a second is logged and ignored. Sixty characters is
+the limit, because a column has to hold it.
+
+**`provider` is shown to the person choosing.** The picker reads "Vellum, from Vellum Press"
+where you give one, and just the label where you do not. Postulo's own carry none, because
+there is nothing to distinguish them from — but a theme of yours is markup that runs when
+somebody exports a document, and whose it is belongs beside the name rather than in a page
+they would have to go looking for.
 
 ## Saying who you are
 

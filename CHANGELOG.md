@@ -1208,6 +1208,48 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **A theme says which kinds of document it sets, and nothing offers a pairing it cannot
+  produce.** A theme used to be two things at once: two choices frozen into the model, and a
+  directory holding one template per kind. Two themes and two kinds is four templates; five
+  kinds is ten, and a theme that had never been taught a kind resolved to a path that did not
+  exist — a missing-template traceback at the moment somebody pressed *Export PDF*, which is
+  the worst possible time to find out.
+
+  **A theme declares what it sets by having a template for it**, so the two cannot drift
+  apart, and the picker on each form offers only the themes that set that kind. Falling back
+  to `plain` instead would have put somebody's Classic CV beside a plain portfolio in one
+  envelope, and the pair would not have looked like one person's application — the same bad
+  outcome, said too late to do anything about. Refusing is not the harsher answer here; it is
+  the same answer, in time.
+
+  **A theme name nothing recognises is a different question and gets the opposite answer.** A
+  theme that cannot set this kind is a live choice somebody could still make. A theme left
+  behind by a plugin that was uninstalled is a row remembering something that has gone, and
+  refusing there would mean removing a plugin had quietly taken somebody's CV with it. So
+  that one falls back and still exports.
+
+  **`Theme` stops being `TextChoices`, because choices are a migration boundary.** They are
+  written into every migration that touches the field, so a theme arriving from an installed
+  plugin could never have been one of them. The column is a validated name now and every
+  existing row keeps its value; the validator travels with the column rather than living only
+  in the form, because the form is one of several doors.
+
+  **Themes may now arrive from an installed plugin, and from nowhere else.** A plugin
+  declares them and ships a `templates/` directory beside its package, exactly as it already
+  ships `locale/`; registering the plugin puts that directory on Django's search path,
+  appended, so a plugin can add a page of markup but never replace one of Postulo's. There is
+  no upload form for themes and there will not be one: rendering executes the template, so an
+  uploadable theme is remote code execution with a file picker on it. A plugin's markup runs
+  because an administrator installed the plugin, having read its author, licence and source —
+  and the picker says so, naming a plugin's theme with whoever provides it, because the menu
+  is the only place a person meets a theme.
+
+  `Theme` and `ThemeKind` join the plugin surface, which settles one of the two questions
+  `postulo.plugins.api` had listed as open. Honouring the document's language and direction
+  is part of the contract a theme takes on, stated rather than hoped for, and each of
+  Postulo's own is held to it by a test that renders an Arabic CV and looks for the
+  direction. (#132)
+
 - **A rendered document points at whatever made it, rather than at one of two columns.** The
   documents app already held two authored kinds, and the plumbing around them named both:
   `RenderedDocument` had a `cv` and a `cover_letter`, `DocumentCopy` had a `rendered` and an

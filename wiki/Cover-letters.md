@@ -72,4 +72,6 @@ that is not your own. CVs have the same field, and behave the same way.
 ## Themes
 
 The same two as CVs — Plain and Classic — laid out as a letter: your contact block, the
-recipient, the date, a subject line, then the body.
+recipient, the date, a subject line, then the body. A plugin may add others, and the menu
+here lists exactly the ones that can set a letter — which is not always the same list the
+CV form shows. See [Themes](CVs#themes).

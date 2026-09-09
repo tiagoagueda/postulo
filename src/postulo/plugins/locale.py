@@ -32,8 +32,8 @@ def _directory_of(module_name: str) -> Path | None:
     return Path(file).resolve().parent if file else None
 
 
-def locale_dir_of(module_name: str) -> Path | None:
-    """The nearest ``locale/`` at or above the package ``module_name`` lives in.
+def nearest_directory(module_name: str, name: str) -> Path | None:
+    """The nearest directory called ``name`` at or above the package ``module_name`` is in.
 
     Nearest, rather than the top-level package's, because a plugin Postulo ships lives
     *inside* ``postulo`` — and ``postulo/locale`` is Postulo's own catalogue, so a rule
@@ -45,6 +45,11 @@ def locale_dir_of(module_name: str) -> Path | None:
     For a third-party plugin the two rules agree: a package with its catalogues beside it
     is found at the first step, and one that keeps them at the distribution root is found
     on the way up.
+
+    Written once and given a parameter because ``locale/`` turned out not to be the only
+    thing a plugin keeps beside itself: ``templates/`` follows the identical rule for the
+    identical reason (#132), and two copies of this loop would be two places to fix the
+    day the rule is wrong.
     """
     inner = _directory_of(module_name)
     outer = _directory_of(module_name.partition(".")[0])
@@ -52,12 +57,17 @@ def locale_dir_of(module_name: str) -> Path | None:
         return None
     candidate = inner
     while True:
-        locale = candidate / "locale"
-        if locale.is_dir():
-            return locale
+        found = candidate / name
+        if found.is_dir():
+            return found
         if candidate == outer or candidate.parent == candidate:
             return None
         candidate = candidate.parent
+
+
+def locale_dir_of(module_name: str) -> Path | None:
+    """The nearest ``locale/`` at or above the package ``module_name`` lives in."""
+    return nearest_directory(module_name, "locale")
 
 
 def register_locale_dir(path: Path | str) -> bool:

@@ -44,6 +44,7 @@ from .base import (
 )
 from .builtin import BUILTIN_SOURCES
 from .locale import register_plugin_locale
+from .themes import register_plugin_themes
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +113,9 @@ def register_builtin(kind: str, plugin_class: type) -> None:
     # every plugin Postulo ships breaks (#127). One that has not moved its strings yet
     # finds Postulo's own catalogue, which is already registered, and nothing happens.
     register_plugin_locale(plugin_class.__module__)
+    # And its themes, for the same reason: a plugin that sets documents brings the markup
+    # that sets them, and nothing else may hand a template to the renderer (#132).
+    register_plugin_themes(plugin_class)
     _cache.pop(kind, None)
 
 
@@ -138,6 +142,19 @@ def register_builtin_locales() -> None:
     for classes in builtins().values():
         for plugin_class in classes:
             register_plugin_locale(plugin_class.__module__)
+
+
+def register_builtin_themes() -> None:
+    """Register the themes of every built-in, for the reason the catalogues are swept.
+
+    None of Postulo's own plugins declares one today; Postulo's two themes are its own and
+    need no plugin to arrive. The sweep exists so that the first one that does is registered
+    by the same path a third-party plugin's is, rather than by a line somebody remembers to
+    add (#132).
+    """
+    for classes in builtins().values():
+        for plugin_class in classes:
+            register_plugin_themes(plugin_class)
 
 
 def unregister_builtin(kind: str, plugin_class: type) -> None:
@@ -167,6 +184,8 @@ def _load_third_party(kind: str) -> list:
 
         # Every plugin holds its own translations: a locale/ next to its package.
         register_plugin_locale(entry_point.module)
+        # And, if it sets documents, the templates that set them (#132).
+        register_plugin_themes(plugin, entry_point.module)
 
         if not isinstance(plugin, protocol):
             logger.error(

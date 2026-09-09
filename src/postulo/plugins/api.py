@@ -27,10 +27,11 @@ of them is a `### ⚠️ Deprecated` entry first and a `### 🗑️ Removed` ent
 release, never a silent rename. Anything reached through `postulo.plugins.base`,
 `postulo.core` or any other module may move without warning, whatever it looks like today.
 
-**What is deliberately not here yet.** What a dashboard widget is handed (#125) and what a
-template may extend beyond the base are unsettled; a plugin needing either is reaching past
-this on purpose, and `tests/test_plugin_surface.py` records the ones that do with the reason.
-That list is the map of what #129 still has to move.
+**What is deliberately not here yet.** What a dashboard widget is handed (#125) is
+unsettled; a plugin needing it is reaching past this on purpose, and
+`tests/test_plugin_surface.py` records the ones that do with the reason. That list is the
+map of what #129 still has to move. What a *document* template may be is settled: `Theme`
+and `ThemeKind` below, plus a ``templates/`` directory beside the package (#132).
 """
 
 from __future__ import annotations
@@ -43,6 +44,8 @@ if TYPE_CHECKING:  # pragma: no cover - the five names `__getattr__` resolves at
     # is reachable before the app registry is ready.
     from postulo.core.models import OwnedModel, OwnedQuerySet
     from postulo.core.redirects import safe_next
+    from postulo.documents.themes import Kind as ThemeKind
+    from postulo.documents.themes import Theme
 
     from .consent import access_token
     from .http import client
@@ -109,6 +112,8 @@ __all__ = [
     "SyncReport",
     "TestResult",
     "TextMessage",
+    "Theme",
+    "ThemeKind",
     "TransportPlugin",
     "access_token",
     "client",
@@ -147,6 +152,14 @@ def __getattr__(name: str):
         from .http import client
 
         return client
+    if name in ("Theme", "ThemeKind"):
+        # How a plugin sets a document: one `Theme` per way of setting it, declaring which
+        # kinds it can set by having a template for each. The templates live in a
+        # `templates/` directory beside the package and go on Django's search path when the
+        # plugin is registered -- which is the only way markup reaches the renderer (#132).
+        from postulo.documents import themes
+
+        return themes.Kind if name == "ThemeKind" else themes.Theme
     if name == "access_token":
         # For a connection that authenticates by consent: ask for the token at the moment of
         # use, never keep one, because refreshing is the part that has to happen then (#150).

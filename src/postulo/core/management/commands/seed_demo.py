@@ -47,7 +47,6 @@ from postulo.documents.models import (
     DocumentKind,
     LetterKind,
     RenderedDocument,
-    Theme,
     UploadedDocument,
 )
 from postulo.documents.pdf import PDFBackendUnavailable, get_pdf_backend
@@ -707,14 +706,14 @@ class Command(BaseCommand):
             (
                 "Backend, English",
                 "Backend engineer",
-                Theme.PLAIN,
+                "plain",
                 "Ten years of building services that stay up, and of tidying up after the "
                 "ones that did not.",
             ),
             (
                 "Platform, English",
                 "Platform engineer",
-                Theme.CLASSIC,
+                "classic",
                 "I make deployments boring.",
             ),
         ]:
@@ -772,7 +771,7 @@ class Command(BaseCommand):
                     "{{ name }}"
                 ),
                 is_template=True,
-                theme=Theme.CLASSIC,
+                theme="classic",
             ),
             CoverLetter.objects.create(
                 owner=user,
@@ -793,7 +792,7 @@ class Command(BaseCommand):
                     "{{ name }}\n{{ date }}"
                 ),
                 is_template=True,
-                theme=Theme.CLASSIC,
+                theme="classic",
             ),
             CoverLetter.objects.create(
                 owner=user,
