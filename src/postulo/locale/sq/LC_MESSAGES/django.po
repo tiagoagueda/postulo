@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: shqip\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s u caktua për %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s te %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -499,7 +499,7 @@ msgstr "Një skedar CSV"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Një sugjerim për ndërfaqen, si „qelibar“ ose „qiell“."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Një rresht nën emrin në faqen e hyrjes. Opsionale."
@@ -516,7 +516,14 @@ msgid ""
 msgstr ""
 "Një celular, një linjë fikse, një centralist — sa ia vlen të mbahen, me një të shënuar si ai që duhet përdorur. Dokumentet e shtypin atë."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Një numër duhet të konfirmohet përpara se të mund t'ju kthejë brenda. Në këtë nuk ka përgjigjur askush."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1937,7 +1944,7 @@ msgstr "Lidhja u hoq, bashkë me sekretet."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Lidhja u ruajt. Testojeni për t'u siguruar se punon."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "siguria e lidhjes"
@@ -2355,12 +2362,12 @@ msgstr "Refuzuar"
 msgid "Declined. It will not be suggested again."
 msgstr "Refuzuar. Nuk do të sugjerohet më."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "gjuha e parazgjedhur"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "zona kohore e parazgjedhur"
@@ -2986,7 +2993,7 @@ msgstr "Eksportuar veçmas"
 msgid "Failed"
 msgstr "Dështoi"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Dështoi pa thënë pse."
@@ -3241,7 +3248,7 @@ msgstr "nga %(low)s"
 msgid "From %(name)s."
 msgstr "Nga %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "adresa e dërguesit"
@@ -3302,6 +3309,16 @@ msgstr "Lojëra"
 #, draft
 msgid "Get"
 msgstr "Merr"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Më kthen brenda"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Më kthen brenda — duhet konfirmuar së pari"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3602,7 +3619,7 @@ msgid ""
 msgstr ""
 "Nëse keni aplikuar në një institucion të BE-së ose përmes një shërbimi kombëtar punësimi, këtë skedar e keni tashmë. Në vend që ta shkruani gjithçka sërish, dorëzojeni."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "shpërfill robots.txt gjatë kapjes"
@@ -3789,7 +3806,7 @@ msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr ""
 "Instalimi i një shtojce ekzekuton kodin e dikujt tjetër brenda Postulo-s."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "emri i instalimit"
@@ -4015,7 +4032,7 @@ msgid ""
 msgstr ""
 "Ruhet në %(file)s dhe rrotullohet sipas madhësisë, prandaj kjo nuk mund ta mbushë diskun. Gjithçka këtu shkon edhe në konsolë, ku e lexon <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4093,7 +4110,7 @@ msgstr "Gjuhë"
 msgid "languages"
 msgstr "gjuhë"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "gjuhë të ofruara"
@@ -4431,7 +4448,7 @@ msgstr "Shkronja të vogla, shifra, pika, nënvija dhe vija."
 msgid "Made"
 msgstr "Krijuar"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "dështime poste me radhë"
@@ -4452,7 +4469,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Këtu posta është e vetmja rrugë kthimi në një llogari, prandaj derisa kjo të funksionojë sërish asnjë nga %(counter)s personat në këtë instancë nuk mund të kthehet nëse harron fjalëkalimin."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "posta dështoi së fundmi"
@@ -4462,7 +4479,7 @@ msgstr "posta dështoi së fundmi"
 msgid "Mail last went out at %(when)s."
 msgstr "Posta doli për herë të fundit në %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "posta funksionoi së fundmi"
@@ -4481,7 +4498,7 @@ msgid ""
 msgstr ""
 "Posta nuk e mban më as transportin në vend, sepse një rrugë që nuk dorëzon asgjë nuk mbron askënd."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "transporti i postës"
@@ -4491,7 +4508,7 @@ msgstr "transporti i postës"
 msgid "Mail transport"
 msgstr "Transporti i postës"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "gabimi i fundit i postës"
@@ -5036,7 +5053,7 @@ msgstr "Askush nuk u paraqit për %(kind)s"
 msgid "Non-profit"
 msgstr "Jofitimprurëse"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Asnjë"
@@ -5626,6 +5643,13 @@ msgstr "Renditen vetëm zërat që nuk janë tashmë në këtë CV."
 msgid "Only http and https addresses can be captured."
 msgstr "Mund të kapen vetëm adresa http dhe https."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Vetëm një nga numrat tuaj mund t'ju kthejë në llogarinë tuaj. Ky i përket dikujt me të cilin keni punë."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5807,7 +5831,7 @@ msgstr "Përkthyer pjesërisht"
 msgid "Passkeys"
 msgstr "Çelësa kalimi"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "fjalëkalim"
@@ -5916,7 +5940,7 @@ msgstr "Faqe personale"
 msgid "Pharmaceuticals"
 msgstr "Farmaceutikë"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6029,7 +6053,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP ose GIF deri në 5 MB. Pritet në katror dhe i hiqet gjithçka që skedari dinte për vendin ku u shkrep."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "porta"
@@ -6586,7 +6610,7 @@ msgid ""
 msgstr ""
 "Regjistrimi është i hapur: kushdo që gjen adresën mund të krijojë një llogari."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "regjistrimi i hapur"
@@ -6657,7 +6681,7 @@ msgstr "adresë e largët"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6950,7 +6974,7 @@ msgstr "U ruajt."
 msgid "Say what this identifier is."
 msgstr "Thoni çfarë është ky identifikues."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Thoni çfarë është ky numër."
@@ -7263,7 +7287,7 @@ msgstr "Shfaq në navigim"
 msgid "Show past too"
 msgstr "Shfaq edhe të kaluarat"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Shfaqet në kokë dhe në faqen e hyrjes."
@@ -7307,7 +7331,7 @@ msgstr "Hyn në një llogari ekzistuese përmes emailit"
 msgid "Single sign-on"
 msgstr "Hyrje e vetme"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "hyrja e vetme numërohet si faktori i dytë"
@@ -7322,7 +7346,7 @@ msgstr "Hyrja e vetme numërohet si faktori i dytë"
 msgid "Site search"
 msgstr "Kërkim në faqe"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "cilësimet e faqes"
@@ -7385,7 +7409,7 @@ msgstr "Më e ngadalta"
 msgid "slug"
 msgstr "emër i shkurtër"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "Server SMTP"
@@ -7487,7 +7511,7 @@ msgid ""
 msgstr ""
 "STARTTLS lidhet dhe pastaj përmirëson lidhjen, gjë që e pret porta 587. TLS që nga bajti i parë është ajo që pret porta 465. Nuk janë të këmbyeshme: drejtoni njërën drejt portës së tjetrës dhe secila pret që tjetra të flasë."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, pas lidhjes"
@@ -7713,7 +7737,7 @@ msgstr "etiketë"
 msgid "Tag"
 msgstr "Etiketë"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "moto"
@@ -7767,12 +7791,12 @@ msgstr "telefon"
 msgid "Telephone number"
 msgstr "Numër telefoni"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "numër telefoni"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7813,17 +7837,17 @@ msgstr "Testo lidhjen"
 msgid "text as sent"
 msgstr "teksti siç u dërgua"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "konfigurimi i mesazheve"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "sekretet e mesazheve"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "transporti i mesazheve"
@@ -8062,6 +8086,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Ai numër nuk ka asnjë shtet përpara, prandaj nuk mund të formohet nga asnjë vend tjetër. Zgjidhni shtetin, ose shkruajeni duke filluar me +."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Ai numër duhet të konfirmohet përpara se të mund t'ju kthejë brenda."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8350,6 +8379,13 @@ msgstr ""
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Intervistat e ardhshme në ditar, dhe ato që kaluan pa përfundim."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Numri që ju kthen brenda është i ndarë nga ai që printojnë dokumentet tuaja, prandaj ndryshimi i atij që formon një rekrutues nuk ndryshon mënyrën si provoni se jeni ju. Duhet konfirmuar së pari, dhe fikja e numrave të shumtë të telefonit nuk jua heq kurrë."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8669,7 +8705,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Ky lloj identifikuesi është tashmë në listë."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Ky numër është tashmë në listë."
@@ -8737,7 +8773,7 @@ msgstr "zë i vijës kohore"
 msgid "Timeout"
 msgstr "Skadim kohe"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "skadim kohe në sekonda"
@@ -8753,7 +8789,7 @@ msgstr "titull"
 msgid "Title, company or location"
 msgstr "Titulli, kompania ose vendndodhja"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS që nga bajti i parë"
@@ -8825,12 +8861,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Transport dhe logjistikë"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "konfigurimi i transportit"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "sekretet e transportit"
@@ -8926,12 +8962,12 @@ msgid "Update the preview"
 msgstr "Përditëso paraparjen"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "përditësuar më"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "përditësuar nga"
@@ -9030,7 +9066,7 @@ msgstr "përdorues"
 msgid "Username"
 msgstr "Emri i përdoruesit"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "emri i përdoruesit"
@@ -9147,6 +9183,11 @@ msgstr "Në pritje për t'u përdorur"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "ishte „%(text)s“"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "rrugë kthimi në llogari"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9446,12 +9487,12 @@ msgstr "ku jetoni"
 msgid "Where your job search stands today."
 msgstr "Ku qëndron sot kërkimi juaj për punë."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Nëse kushdo që gjen adresën mund të krijojë një llogari."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9696,7 +9737,7 @@ msgid ""
 msgstr ""
 "Keni aplikuar për këtë më parë. Regjistrimi i një aplikimi të dytë është në rregull; të dyja mbeten në regjistër."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s sovittu: %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s, %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -498,7 +498,7 @@ msgstr "CSV-tiedosto"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Vihje käyttöliittymälle, esimerkiksi ”amber” tai ”sky”."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Rivi nimen alla kirjautumissivulla. Valinnainen."
@@ -515,7 +515,14 @@ msgid ""
 msgstr ""
 "Matkapuhelin, lankalinja, vaihde — niin monta kuin kannattaa säilyttää, yksi merkittynä käytettäväksi. Asiakirjat tulostavat sen."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Numero on vahvistettava, ennen kuin se voi päästää sinut takaisin. Tähän ei ole vastannut kukaan."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1934,7 +1941,7 @@ msgstr "Yhteys poistettu salaisuuksineen."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Yhteys tallennettu. Testaa se varmistaaksesi, että se toimii."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "yhteyden suojaus"
@@ -2351,12 +2358,12 @@ msgstr "Hylätty"
 msgid "Declined. It will not be suggested again."
 msgstr "Hylätty. Sitä ei ehdoteta uudelleen."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "oletuskieli"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "oletusaikavyöhyke"
@@ -2981,7 +2988,7 @@ msgstr "Viety erikseen"
 msgid "Failed"
 msgstr "Epäonnistui"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Epäonnistui syytä kertomatta."
@@ -3236,7 +3243,7 @@ msgstr "alkaen %(low)s"
 msgid "From %(name)s."
 msgstr "Lähettäjä %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "lähettäjän osoite"
@@ -3297,6 +3304,16 @@ msgstr "Pelit"
 #, draft
 msgid "Get"
 msgstr "Hae"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Päästää minut takaisin"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Päästää minut takaisin — vahvistettava ensin"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3599,7 +3616,7 @@ msgid ""
 msgstr ""
 "Jos olet hakenut töitä EU-toimielimestä tai kansallisen työvoimapalvelun kautta, sinulla on tämä tiedosto jo. Sen sijaan että kirjoittaisit kaiken uudelleen, anna se tänne."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "ohita robots.txt kaapattaessa"
@@ -3785,7 +3802,7 @@ msgstr "Asennettu tälle palvelimelle"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Lisäosan asentaminen ajaa jonkun toisen koodia Postulon sisällä."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "instanssin nimi"
@@ -4012,7 +4029,7 @@ msgid ""
 msgstr ""
 "Säilytetään tiedostossa %(file)s ja kierrätetään koon mukaan, joten se ei voi täyttää levyä. Kaikki tämä menee myös konsoliin, josta <code>docker logs</code> lukee sen."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4090,7 +4107,7 @@ msgstr "Kielet"
 msgid "languages"
 msgstr "kielet"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "tarjotut kielet"
@@ -4428,7 +4445,7 @@ msgstr "Pieniä kirjaimia, numeroita, pisteitä, alaviivoja ja yhdysmerkkejä."
 msgid "Made"
 msgstr "Tehty"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "postivirhettä peräkkäin"
@@ -4449,7 +4466,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Posti on täällä ainoa tie takaisin tilille, joten kunnes tämä taas toimii, kukaan tämän instanssin %(counter)s ihmisestä ei pääse takaisin, jos unohtaa salasanansa."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "posti epäonnistui viimeksi"
@@ -4459,7 +4476,7 @@ msgstr "posti epäonnistui viimeksi"
 msgid "Mail last went out at %(when)s."
 msgstr "Posti lähti viimeksi %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "posti toimi viimeksi"
@@ -4478,7 +4495,7 @@ msgid ""
 msgstr ""
 "Posti ei pidä enää kuljetustakaan paikallaan, sillä reitti joka ei toimita mitään ei suojaa ketään."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "postin kuljetustapa"
@@ -4488,7 +4505,7 @@ msgstr "postin kuljetustapa"
 msgid "Mail transport"
 msgstr "Postin kuljetustapa"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "postin viimeisin virhe"
@@ -5033,7 +5050,7 @@ msgstr "Kukaan ei saapunut: %(kind)s"
 msgid "Non-profit"
 msgstr "Voittoa tavoittelematon"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Ei mitään"
@@ -5625,6 +5642,13 @@ msgstr "Vain merkinnät, jotka eivät vielä ole tässä CV:ssä, luetellaan."
 msgid "Only http and https addresses can be captured."
 msgstr "Vain http- ja https-osoitteita voi kaapata."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Vain yksi omista numeroistasi voi päästää sinut takaisin tilillesi. Tämä kuuluu jollekulle, jonka kanssa asioit."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5806,7 +5830,7 @@ msgstr "Osittain käännetty"
 msgid "Passkeys"
 msgstr "Avaimet"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "salasana"
@@ -5915,7 +5939,7 @@ msgstr "Oma sivusto"
 msgid "Pharmaceuticals"
 msgstr "Lääketeollisuus"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6028,7 +6052,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP tai GIF, enintään 5 Mt. Kuva rajataan neliöksi ja siitä poistetaan kaikki, mitä tiedosto tiesi kuvauspaikasta."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "portti"
@@ -6587,7 +6611,7 @@ msgid ""
 msgstr ""
 "Rekisteröityminen on avoin: kuka tahansa osoitteen löytävä voi luoda tilin."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "rekisteröityminen avoin"
@@ -6657,7 +6681,7 @@ msgstr "etäosoite"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6948,7 +6972,7 @@ msgstr "Tallennettu."
 msgid "Say what this identifier is."
 msgstr "Kerro, mikä tämä tunniste on."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Kerro, mikä numero tämä on."
@@ -7262,7 +7286,7 @@ msgstr "Näytä valikossa"
 msgid "Show past too"
 msgstr "Näytä myös menneet"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Näytetään ylätunnisteessa ja kirjautumissivulla."
@@ -7306,7 +7330,7 @@ msgstr "Kirjautuu olemassa olevaan tiliin sähköpostilla"
 msgid "Single sign-on"
 msgstr "Kertakirjautuminen"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "kertakirjautuminen käy toisesta tekijästä"
@@ -7321,7 +7345,7 @@ msgstr "Kertakirjautuminen käy toisesta tekijästä"
 msgid "Site search"
 msgstr "Sivustohaku"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "sivuston asetukset"
@@ -7384,7 +7408,7 @@ msgstr "Hitain"
 msgid "slug"
 msgstr "tunnus"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "SMTP-palvelin"
@@ -7486,7 +7510,7 @@ msgid ""
 msgstr ""
 "STARTTLS yhdistää ja päivittää sitten yhteyden, mitä portti 587 odottaa. TLS ensimmäisestä tavusta on se, mitä portti 465 odottaa. Ne eivät ole vaihdettavissa: osoita toinen toisen porttiin, ja kumpikin odottaa toisen puhuvan."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, yhdistämisen jälkeen"
@@ -7712,7 +7736,7 @@ msgstr "tunniste"
 msgid "Tag"
 msgstr "Tunniste"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "iskulause"
@@ -7766,12 +7790,12 @@ msgstr "puhelin"
 msgid "Telephone number"
 msgstr "Puhelinnumero"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "puhelinnumero"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7812,17 +7836,17 @@ msgstr "Testaa yhteys"
 msgid "text as sent"
 msgstr "teksti lähetetyssä muodossa"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "viestiasetukset"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "viestisalaisuudet"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "viestien kuljetus"
@@ -8060,6 +8084,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Tuon numeron edessä ei ole maata, joten siihen ei voi soittaa mistään muualta. Valitse maa tai kirjoita se +-merkillä alkaen."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Tuo numero on vahvistettava, ennen kuin se voi päästää sinut takaisin."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8346,6 +8375,13 @@ msgstr "Päätietue. CV-versio poimii tästä; se ei koskaan kopioi sitä."
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Seuraavat haastattelut kalenterissa ja ne, jotka menivät ilman tulosta."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Numero, joka päästää sinut takaisin, on eri kuin se, jonka asiakirjasi tulostavat, joten rekrytoijan soittaman numeron vaihtaminen ei muuta sitä, miten todistat olevasi sinä. Se on ensin vahvistettava, eikä useiden puhelinnumeroiden sammuttaminen koskaan vie sitä pois."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8667,7 +8703,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Tämäntyyppinen tunniste on jo luettelossa."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Tämä numero on jo luettelossa."
@@ -8735,7 +8771,7 @@ msgstr "aikajanan merkintä"
 msgid "Timeout"
 msgstr "Aikakatkaisu"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "aikakatkaisu sekunteina"
@@ -8751,7 +8787,7 @@ msgstr "otsikko"
 msgid "Title, company or location"
 msgstr "Otsikko, yritys tai sijainti"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS ensimmäisestä tavusta"
@@ -8823,12 +8859,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Kuljetus ja logistiikka"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "kuljetuksen asetukset"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "kuljetuksen salaisuudet"
@@ -8924,12 +8960,12 @@ msgid "Update the preview"
 msgstr "Päivitä esikatselu"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "päivitetty"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "päivittäjä"
@@ -9027,7 +9063,7 @@ msgstr "käyttäjä"
 msgid "Username"
 msgstr "Käyttäjänimi"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "käyttäjänimi"
@@ -9144,6 +9180,11 @@ msgstr "Odottaa käyttöä"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "oli ”%(text)s”"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "tie takaisin tilille"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9443,12 +9484,12 @@ msgstr "missä asut"
 msgid "Where your job search stands today."
 msgstr "Missä työnhakusi on tänään."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Voiko kuka tahansa osoitteen löytävä luoda tilin."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9691,7 +9732,7 @@ msgid ""
 msgstr ""
 "Olet hakenut tätä aiemmin. Toisen hakemuksen kirjaaminen on aivan sallittua; molemmat säilyvät."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

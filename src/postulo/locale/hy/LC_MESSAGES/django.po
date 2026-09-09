@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: հայերեն\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s-ը նշանակվեց %(when)s-ին"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s՝ %(title)s %(company)s-ում"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -501,7 +501,7 @@ msgstr "CSV ֆայլ"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Ակնարկ միջերեսի համար, օրինակ՝ «սաթ» կամ «երկինք»։"
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Տող անվան տակ մուտքի էջում։ Ոչ պարտադիր։"
@@ -518,7 +518,14 @@ msgid ""
 msgstr ""
 "Բջջային, ֆիքսված գիծ, հեռախոսակայան — այնքան, որքան արժե պահել, մեկը նշված որպես օգտագործվողը։ Փաստաթղթերը տպում են հենց այն։"
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Համարը պետք է հաստատվի, նախքան այն կարողանա ձեզ հետ բերել։ Այս համարին ոչ ոք չի պատասխանել։"
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1940,7 +1947,7 @@ msgstr "Կապը հեռացվեց՝ գաղտնիքների հետ միասին։
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Կապը պահպանվեց։ Փորձարկեք այն՝ համոզվելու համար, որ աշխատում է։"
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "կապի անվտանգություն"
@@ -2358,12 +2365,12 @@ msgstr "Մերժված"
 msgid "Declined. It will not be suggested again."
 msgstr "Մերժված է։ Այլևս չի առաջարկվի։"
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "լռելյայն լեզու"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "լռելյայն ժամային գոտի"
@@ -2990,7 +2997,7 @@ msgstr "Արտահանված է առանձին"
 msgid "Failed"
 msgstr "Ձախողվեց"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Ձախողվեց՝ առանց ասելու, թե ինչու։"
@@ -3244,7 +3251,7 @@ msgstr "%(low)s-ից"
 msgid "From %(name)s."
 msgstr "%(name)s-ից։"
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "ուղարկողի հասցե"
@@ -3305,6 +3312,16 @@ msgstr "Խաղեր"
 #, draft
 msgid "Get"
 msgstr "Ստանալ"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Ինձ հետ է բերում"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Ինձ հետ է բերում — նախ պետք է հաստատել"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3608,7 +3625,7 @@ msgid ""
 msgstr ""
 "Եթե դիմել եք ԵՄ հաստատության կամ ազգային զբաղվածության ծառայության միջոցով, այս ֆայլն արդեն ունեք։ Ամեն ինչ նորից մուտքագրելու փոխարեն՝ հանձնեք այն։"
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "որսի ժամանակ անտեսել robots.txt-ը"
@@ -3794,7 +3811,7 @@ msgstr "Տեղադրված է այս տեղակայման վրա"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Հավելում տեղադրելը Postulo-ի ներսում ուրիշի կոդ է գործարկում։"
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "տեղակայման անուն"
@@ -4021,7 +4038,7 @@ msgid ""
 msgstr ""
 "Պահվում է %(file)s-ում և պտտվում է ըստ չափի, ուստի սա չի կարող լցնել սկավառակը։ Այստեղի ամեն ինչ գնում է նաև վահանակ, որտեղից այն կարդում է <code>docker logs</code>-ը։"
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4099,7 +4116,7 @@ msgstr "Լեզուներ"
 msgid "languages"
 msgstr "լեզուներ"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "առաջարկվող լեզուներ"
@@ -4437,7 +4454,7 @@ msgstr "Փոքրատառեր, թվանշաններ, կետեր, ընդգծում
 msgid "Made"
 msgstr "Ստեղծված"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "փոստի անընդմեջ ձախողում"
@@ -4458,7 +4475,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Այստեղ փոստը հաշիվ վերադառնալու միակ ճանապարհն է, ուստի մինչև այն նորից աշխատի, այս հանգույցի %(counter)s մարդկանցից ոչ մեկը չի կարողանա վերադառնալ, եթե մոռանա իր գաղտնաբառը։"
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "փոստը վերջին անգամ ձախողվել է"
@@ -4468,7 +4485,7 @@ msgstr "փոստը վերջին անգամ ձախողվել է"
 msgid "Mail last went out at %(when)s."
 msgstr "Փոստը վերջին անգամ դուրս է եկել %(when)s-ին։"
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "փոստը վերջին անգամ աշխատել է"
@@ -4487,7 +4504,7 @@ msgid ""
 msgstr ""
 "Փոստն այլևս նաև փոխադրումը տեղում չի պահում, քանի որ ճանապարհը, որը ոչինչ չի հասցնում, ոչ մեկին չի պաշտպանում։"
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "փոստի փոխադրիչ"
@@ -4497,7 +4514,7 @@ msgstr "փոստի փոխադրիչ"
 msgid "Mail transport"
 msgstr "Փոստի փոխադրիչ"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "փոստի վերջին սխալը"
@@ -5044,7 +5061,7 @@ msgstr "Ոչ ոք չներկայացավ %(kind)s-ին"
 msgid "Non-profit"
 msgstr "Ոչ առևտրային կազմակերպություն"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Չկա"
@@ -5636,6 +5653,13 @@ msgstr "Թվարկվում են միայն այն գրառումները, որո
 msgid "Only http and https addresses can be captured."
 msgstr "Կարելի է որսալ միայն http և https հասցեներ։"
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Ձեր հաշիվ ձեզ կարող է վերադարձնել միայն ձեր սեփական համարներից մեկը։ Սա պատկանում է մեկին, ում հետ գործ ունեք։"
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5817,7 +5841,7 @@ msgstr "Մասամբ թարգմանված"
 msgid "Passkeys"
 msgstr "Անցաբանալիներ"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "գաղտնաբառ"
@@ -5927,7 +5951,7 @@ msgstr "Անձնական կայք"
 msgid "Pharmaceuticals"
 msgstr "Դեղագործություն"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6040,7 +6064,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP կամ GIF՝ մինչև 5 MB։ Նկարը կտրվում է քառակուսու և մաքրվում է այն ամենից, ինչ ֆայլը գիտեր նկարահանման վայրի մասին։"
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "պորտ"
@@ -6599,7 +6623,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr "Գրանցումը բաց է. ցանկացած ոք, ով գտնի հասցեն, կարող է հաշիվ ստեղծել։"
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "գրանցումը բաց է"
@@ -6670,7 +6694,7 @@ msgstr "հեռավոր հասցե"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6963,7 +6987,7 @@ msgstr "Պահպանվեց։"
 msgid "Say what this identifier is."
 msgstr "Ասեք, թե ինչ է այս նույնացուցիչը։"
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Ասեք, թե ինչ համար է սա։"
@@ -7277,7 +7301,7 @@ msgstr "Ցուցադրել նավարկման մեջ"
 msgid "Show past too"
 msgstr "Ցուցադրել նաև անցածները"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Ցուցադրվում է վերնագրում և մուտքի էջում։"
@@ -7321,7 +7345,7 @@ msgstr "Մուտք է գործում գոյություն ունեցող հաշ�
 msgid "Single sign-on"
 msgstr "Միասնական մուտք"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "միասնական մուտքը հաշվվում է որպես երկրորդ գործոն"
@@ -7336,7 +7360,7 @@ msgstr "Միասնական մուտքը հաշվվում է որպես երկր�
 msgid "Site search"
 msgstr "Որոնում կայքում"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "կայքի կարգավորումներ"
@@ -7399,7 +7423,7 @@ msgstr "Ամենադանդաղ"
 msgid "slug"
 msgstr "կարճ անուն"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "SMTP սերվեր"
@@ -7501,7 +7525,7 @@ msgid ""
 msgstr ""
 "STARTTLS-ը միանում է և հետո բարձրացնում կապը, ինչը սպասում է 587 դարպասը։ TLS առաջին բայթից այն է, ինչ սպասում է 465 դարպասը։ Դրանք փոխարինելի չեն. ուղղեք մեկը մյուսի դարպասին, և յուրաքանչյուրը սպասում է, որ մյուսը խոսի։"
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, միանալուց հետո"
@@ -7728,7 +7752,7 @@ msgstr "պիտակ"
 msgid "Tag"
 msgstr "Պիտակ"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "կարգախոս"
@@ -7782,12 +7806,12 @@ msgstr "հեռախոս"
 msgid "Telephone number"
 msgstr "Հեռախոսահամար"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "հեռախոսահամար"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7828,17 +7852,17 @@ msgstr "Փորձարկել կապը"
 msgid "text as sent"
 msgstr "տեքստն այնպես, ինչպես ուղարկվել է"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "հաղորդագրությունների կարգավորում"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "հաղորդագրությունների գաղտնիքներ"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "հաղորդագրությունների փոխադրում"
@@ -8075,6 +8099,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Այդ համարի առջև երկիր չկա, ուստի այլ տեղից այն հնարավոր չէ հավաքել։ Ընտրեք երկիրը կամ գրեք այն +-ով սկսելով։"
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Այդ համարը պետք է հաստատվի, նախքան այն կարողանա ձեզ հետ բերել։"
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8364,6 +8393,13 @@ msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr ""
 "Օրագրի հաջորդ հարցազրույցները և բոլոր նրանք, որ անցել են առանց արդյունքի։"
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Ձեզ հետ բերող համարը առանձին է այն համարից, որը տպում են ձեր փաստաթղթերը. այսպիսով փոխելով այն, ինչ հավաքում է հավաքագրողը, չեք փոխում, թե ինչպես եք ապացուցում, որ դա դուք եք։ Այն նախ պետք է հաստատվի, և մի քանի հեռախոսահամարների անջատումը երբեք չի հեռացնում այն։"
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8685,7 +8721,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Այս տեսակի նույնացուցիչն արդեն ցուցակում է։"
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Այս համարն արդեն ցանկում է։"
@@ -8753,7 +8789,7 @@ msgstr "ժամանակագրության գրառում"
 msgid "Timeout"
 msgstr "Սպասման ժամկետ"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "սպասման ժամկետը վայրկյաններով"
@@ -8769,7 +8805,7 @@ msgstr "վերնագիր"
 msgid "Title, company or location"
 msgstr "Վերնագիր, ընկերություն կամ գտնվելու վայր"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS առաջին բայթից"
@@ -8842,12 +8878,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Տրանսպորտ և լոգիստիկա"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "փոխադրիչի կազմաձևում"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "փոխադրիչի գաղտնիքներ"
@@ -8941,12 +8977,12 @@ msgid "Update the preview"
 msgstr "Թարմացնել նախադիտումը"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "թարմացման ամսաթիվ"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "թարմացրել է"
@@ -9045,7 +9081,7 @@ msgstr "օգտվող"
 msgid "Username"
 msgstr "Օգտանուն"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "օգտանուն"
@@ -9162,6 +9198,11 @@ msgstr "Սպասում է օգտագործման"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "էր «%(text)s»"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "հաշիվ վերադառնալու ճանապարհ"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9460,12 +9501,12 @@ msgstr "որտեղ եք ապրում"
 msgid "Where your job search stands today."
 msgstr "Որտեղ է այսօր ձեր աշխատանքի որոնումը։"
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Արդյոք ցանկացած ոք, ով գտնի հասցեն, կարող է հաշիվ ստեղծել։"
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9708,7 +9749,7 @@ msgid ""
 msgstr ""
 "Դուք արդեն դիմել եք սրան։ Երկրորդ դիմում գրանցելը նորմալ է. երկուսն էլ մնում են գրանցամատյանում։"
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

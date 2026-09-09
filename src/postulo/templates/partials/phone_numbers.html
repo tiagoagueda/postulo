@@ -54,6 +54,26 @@
                      {% if row.instance.is_primary %}checked{% endif %}>
               <span>{% translate "Primary" %}</span>
             </label>
+            {% comment %} Kept apart from Primary on purpose: the primary is what a
+               document prints and a recruiter dials, so tying the two together would mean
+               changing the number on a CV silently changed a way into the account (#144).
+               Offered only where the instance could confirm a number at all, because a
+               control nobody can use beside a promise nobody can keep is worse than no
+               control (#143). {% endcomment %}
+            {% if numbers.recovery_can_be_chosen %}
+              <label class="inline-flex items-center gap-2 py-1.5" data-recovery-choice>
+                <input type="radio" name="{{ numbers.prefix }}-recovery" value="{{ row.prefix }}"
+                       {% if row.instance.is_recovery %}checked{% endif %}
+                       {% if not row.instance.is_verified %}disabled{% endif %}>
+                <span>
+                  {% if row.instance.is_verified %}
+                    {% translate "Gets me back in" %}
+                  {% else %}
+                    {% translate "Gets me back in — needs confirming first" %}
+                  {% endif %}
+                </span>
+              </label>
+            {% endif %}
             {% if row.instance.pk %}
               <label class="inline-flex items-center gap-2 py-1.5">
                 {{ row.DELETE }} <span>{% translate "Remove" %}</span>
@@ -74,4 +94,13 @@
       so rather than taking it from whoever has it.
     {% endblocktranslate %}
   </p>
+  {% if numbers.recovery_can_be_chosen %}
+    <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        The number that gets you back in is separate from the one your documents print, so
+        changing what a recruiter dials does not change how you prove it is you. It has to
+        be confirmed first, and switching off several telephone numbers never takes it away.
+      {% endblocktranslate %}
+    </p>
+  {% endif %}
 </fieldset>

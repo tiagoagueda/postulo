@@ -87,23 +87,39 @@ def mine(person) -> models.QuerySet[PhoneNumber]:
 
 
 def recovery_candidates(person) -> list[PhoneNumber]:
-    """This person's numbers that could get them back into their account.
+    """This person's numbers that *could* be made the way back into their account.
 
-    Three conditions, and all three are load-bearing. The number is one of *theirs*, not one
-    they merely recorded. It was proved, which today means none of them are: nothing can send
-    to a number yet (#143), so this list is empty on every instance and that is the correct
-    answer rather than a placeholder. And the proof is still fresh, because carriers reissue
-    numbers and a stale proof describes somebody who may no longer answer there.
+    Two conditions. The number is one of *theirs*, not one they merely recorded. And it was
+    proved recently enough to still describe somebody who answers there — which today means
+    none of them are, because nothing can send to a number yet (#143). An empty list on every
+    instance is the correct answer rather than a placeholder.
     """
     return [row for row in mine(person) if row.is_verified]
 
 
+def recovery_number(person) -> PhoneNumber | None:
+    """The number that would get this person back in, or nothing.
+
+    **Read regardless of the `phone-numbers` feature being on for them**, and that is the
+    boundary this draws (#144). Recovery is instance policy; a feature plugin is a per-person
+    preference. A per-person switch that could silently decide whether an account is
+    recoverable is the wrong shape — an administrator switching a feature off for somebody
+    would quietly remove their way back in, which is the failure the transport interlock
+    exists to prevent, arriving through a different door.
+
+    So the plugin governs what is *shown and used*, exactly as it always has, and never
+    whether somebody can get back into their account.
+    """
+    chosen = mine(person).filter(is_recovery=True).first()
+    return chosen if chosen is not None and chosen.is_verified else None
+
+
 def can_get_back_in(person) -> bool:
     """Whether a telephone number is a way back in for this person, today."""
-    return bool(recovery_candidates(person))
+    return recovery_number(person) is not None
 
 
-def accounts_without_a_verified_number() -> int:
+def accounts_without_a_recovery_number() -> int:
     """Active accounts that a text message could not get back into.
 
     Counted rather than assumed, exactly as the passkey count is: on every instance today
@@ -120,6 +136,7 @@ def accounts_without_a_verified_number() -> int:
     fresh_enough = timezone.now() - PhoneNumber.VERIFICATION_LASTS
     with_one = PhoneNumber.objects.filter(
         content_type=ContentType.objects.get_for_model(Profile),
+        is_recovery=True,
         verified_at__gte=fresh_enough,
     ).values_list("owner_id", flat=True)
     return get_user_model().objects.filter(is_active=True).exclude(pk__in=with_one).count()
@@ -187,6 +204,38 @@ def collision_noticed(person) -> None:
     from . import throttle
 
     throttle.consume("number-collision", person, throttle.rate_for("POSTULO_NUMBER_RATE"))
+
+
+def can_be_chosen_here() -> bool:
+    """Whether nominating a number is a thing this instance can offer at all.
+
+    Postulo ships no way to send to a telephone, so on almost every instance the answer is
+    no — and a control nobody can use, beside a promise nobody can keep, is worse than no
+    control. It appears by itself on an instance whose operator installs a gateway (#143).
+    """
+    from . import channels
+
+    return channels.confirmable(channels.TelephoneChannel())
+
+
+@transaction.atomic
+def set_recovery(number: PhoneNumber | None, *, owner) -> None:
+    """Make this the account's way back in, and the only one.
+
+    Cleared first and set second, because the partial unique index means the two-of-them
+    state cannot exist even for the length of a statement — the same shape `set_primary`
+    has, for a flag with more riding on it.
+    """
+    PhoneNumber.objects.filter(owner=owner, is_recovery=True).exclude(
+        pk=getattr(number, "pk", None)
+    ).update(is_recovery=False)
+    if number is None or number.is_recovery:
+        return
+    number.is_recovery = True
+    # The model's own refusals, not the form's: this is reached from a shell and an import
+    # test as well as from the page.
+    number.clean()
+    number.save(update_fields=["is_recovery", "updated_at"])
 
 
 @transaction.atomic
@@ -318,7 +367,37 @@ class BasePhoneNumberFormSet(generic_forms.BaseGenericInlineFormSet):
             wanted = existing or self.instance.phone_numbers.first()
         if wanted is not None:
             set_primary(wanted)
+        self._settle_the_recovery_number()
         return saved
+
+    def _settle_the_recovery_number(self) -> None:
+        """Which number gets this account back in, if the instance can offer the choice.
+
+        Kept apart from the primary on purpose (#144): the primary is what a document prints
+        and a recruiter dials, and coupling the two would mean changing the number on a CV
+        silently changed a way back into the account.
+
+        Nothing is chosen by default, and an empty answer clears it rather than falling back
+        to something — a route somebody did not ask for is not one they will remember having.
+        """
+        if not can_be_chosen_here():
+            return
+        named = (self.data.get(f"{self.prefix}-recovery") or "").strip()
+        wanted = None
+        for form in self.forms:
+            if form.prefix == named and form.instance.pk and not form.cleaned_data.get("DELETE"):
+                wanted = form.instance
+                break
+        if wanted is not None and not wanted.is_verified:
+            # Refused rather than ignored: the person picked a number nobody has answered
+            # on, and silently choosing nothing would leave them believing they had a route.
+            self.non_form_errors().append(
+                str(_("That number has to be confirmed before it can get you back in."))
+            )
+            return
+        # The account, not the holder: the holder is a profile and the flag belongs to
+        # whoever owns the row.
+        set_recovery(wanted, owner=self.asked_by)
 
 
 def formset_for(
@@ -349,4 +428,7 @@ def formset_for(
         form_kwargs={"default_country": default_country},
     )
     formset.asked_by = asked_by
+    # Read by the template, so the choice appears the day an operator installs a gateway
+    # and never before it (#144).
+    formset.recovery_can_be_chosen = can_be_chosen_here()
     return formset

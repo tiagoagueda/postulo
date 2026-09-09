@@ -154,6 +154,17 @@ class PhoneNumber(OwnedModel):
     #: checked. A migration granting them verification would pre-position whoever typed a
     #: stranger's number a month ago, which is why this starts empty and is earned (#142).
     verified_at = models.DateTimeField(_("verified"), null=True, blank=True)
+    #: Whether this is the number that gets its owner back into their account.
+    #:
+    #: **Deliberately not `is_primary`.** The primary is what a document prints — it is on
+    #: somebody's CV, and a recruiter dials it. Making the same row the way back into the
+    #: account couples "the number I publish" to "the number that proves I am me", so
+    #: changing the number on a CV would silently change a recovery route. A separate flag
+    #: removes the problem rather than warning about it (#144).
+    #:
+    #: Only ever true on a number held by the owner's own profile, and only on one that was
+    #: verified: a claim nobody checked cannot be a way in. `clean()` refuses both.
+    is_recovery = models.BooleanField(_("way back into the account"), default=False)
 
     #: How long a proof lasts before it is worth asking again. An address is forever in a
     #: way a number is not: people give up numbers and carriers reissue them, so a proof
@@ -177,6 +188,14 @@ class PhoneNumber(OwnedModel):
                 condition=~Q(normalised=""),
                 name="phone_number_unique_across_the_instance",
             ),
+            # One way back in per account, in the database rather than in whichever form
+            # saved last -- the same argument the primary constraint makes, for a flag with
+            # more riding on it.
+            models.UniqueConstraint(
+                fields=("owner",),
+                condition=Q(is_recovery=True),
+                name="one_recovery_number_per_account",
+            ),
         ]
         indexes = [models.Index(fields=("content_type", "object_id"))]
 
@@ -195,9 +214,54 @@ class PhoneNumber(OwnedModel):
         # was never about the number now stored (#142).
         if self.pk and previous and previous != self.normalised:
             self.verified_at = None
+            # And it stops being a way back in, for the same reason and in the same breath:
+            # a route to a number nobody has answered on is not a route (#144).
+            self.is_recovery = False
             if "update_fields" in kwargs and kwargs["update_fields"] is not None:
-                kwargs["update_fields"] = {*kwargs["update_fields"], "verified_at"}
+                kwargs["update_fields"] = {
+                    *kwargs["update_fields"],
+                    "verified_at",
+                    "is_recovery",
+                }
         return super().save(*args, **kwargs)
+
+    def clean(self) -> None:
+        """Refuse the two ways this flag could mean something it does not.
+
+        A contact's number is one this account *recorded*, never one this account *is*, and a
+        number nobody proved is a claim rather than a channel. Checked here rather than only
+        in the form, because the API, a management command and a shell all reach the model.
+        """
+        from django.core.exceptions import ValidationError
+
+        super().clean()
+        if not self.is_recovery:
+            return
+        if not self._holder_is_a_profile():
+            raise ValidationError(
+                {
+                    "is_recovery": _(
+                        "Only one of your own numbers can get you back into your account. "
+                        "This one belongs to somebody you deal with."
+                    )
+                }
+            )
+        if not self.is_verified:
+            raise ValidationError(
+                {
+                    "is_recovery": _(
+                        "A number has to be confirmed before it can get you back in. "
+                        "Nobody has answered on this one."
+                    )
+                }
+            )
+
+    def _holder_is_a_profile(self) -> bool:
+        from django.contrib.contenttypes.models import ContentType
+
+        from postulo.accounts.models import Profile
+
+        return self.content_type_id == ContentType.objects.get_for_model(Profile).pk
 
     @property
     def kind_label(self) -> str:
@@ -246,10 +310,11 @@ class PhoneNumber(OwnedModel):
 
     def forget_verification(self) -> None:
         """Unprove it, because the number itself changed and that is a new claim."""
-        if self.verified_at is None:
+        if self.verified_at is None and not self.is_recovery:
             return
         self.verified_at = None
-        self.save(update_fields=["verified_at", "updated_at"])
+        self.is_recovery = False
+        self.save(update_fields=["verified_at", "is_recovery", "updated_at"])
 
 
 class MailSecurity(models.TextChoices):

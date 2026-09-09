@@ -201,6 +201,37 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A confirmed telephone number can be the way back into an account**, joining email and a
+  passkey — and on this release no number is one anywhere, because nothing can confirm a
+  number until an operator installs a text gateway. The route exists and refuses to pretend,
+  which is the same shape the two pieces underneath it took.
+
+  **It is deliberately not the primary number.** The primary is what a CV and a letter print
+  and what a recruiter dials; making the same row the way back in would mean somebody who
+  changes the number on their CV silently changes how they prove they are themselves. A
+  separate choice removes the coupling instead of warning about it, and one per account is
+  enforced by a partial unique index rather than by whichever form saved last.
+
+  **Only a confirmed number of your own.** A recruiter's switchboard is a number an account
+  recorded, never one it is, and a number nobody answered on is a claim rather than a channel.
+  Both refusals sit on the model rather than only on the form, because the API, a management
+  command and a shell all reach it. Editing the digits takes the nomination away with the
+  confirmation it rested on, in the same breath.
+
+  **Switching the plugin off cannot remove somebody's way back in.** That is a boundary worth
+  naming: recovery is instance policy and a feature plugin is a per-person preference, so an
+  administrator switching *several telephone numbers* off for one account must not quietly
+  decide whether that account is recoverable — which is the failure the transport interlock
+  exists to prevent, arriving through a different door. The plugin governs what is shown and
+  used, exactly as it always has, and recovery reads past it.
+
+  The count of accounts with nothing but email grows a second clause rather than an
+  assumption, and both halves are required: an account has a route when it has nominated a
+  confirmed number **and** the instance has something that can reach one. An archive cannot
+  carry a nomination in either — the importer drops it with the confirmation it depends on,
+  or a file could nominate a way into an account on an instance that never checked the number.
+  `FORMAT_VERSION` is 7. (#144)
+
 - **An administrator can issue a way back into an account, so mail is no longer the only
   one.** Email was the single route, which made the interlock refusing to switch the mail
   transport off while it is the last way in correct *and* permanent: on an instance with no

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -205,7 +205,7 @@ msgstr "%(kind)s sceidealta don %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s ag %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -555,7 +555,7 @@ msgstr "Comhad CSV"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Leid don chomhéadan, mar “amber” nó “sky”."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Líne faoin ainm ar an leathanach sínithe isteach. Roghnach."
@@ -573,7 +573,14 @@ msgid ""
 msgstr ""
 "Fón póca, líne dheisce, lasc-chlár — an oiread agus is fiú a choinneáil, agus ceann amháin marcáilte mar an ceann atá le húsáid. Priontálann cáipéisí an ceann sin."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Caithfear uimhir a dheimhniú sula bhféadfaidh sí tú a chur ar ais isteach. Níor fhreagair aon duine ar an gceann seo."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -2006,7 +2013,7 @@ msgstr "Nasc bainte, rúin san áireamh."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Nasc sábháilte. Tástáil é le cinntiú go n-oibríonn sé."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "slándáil an cheangail"
@@ -2424,12 +2431,12 @@ msgstr "Diúltaithe"
 msgid "Declined. It will not be suggested again."
 msgstr "Diúltaithe. Ní mholfar arís é."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "teanga réamhshocraithe"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "crios ama réamhshocraithe"
@@ -3056,7 +3063,7 @@ msgstr "Easpórtáilte ina aonar"
 msgid "Failed"
 msgstr "Theip air"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Theip air gan a rá cén fáth."
@@ -3311,7 +3318,7 @@ msgstr "ó %(low)s"
 msgid "From %(name)s."
 msgstr "Ó %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "seoladh an tseoltóra"
@@ -3372,6 +3379,16 @@ msgstr "Cluichí"
 #, draft
 msgid "Get"
 msgstr "Faigh"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Cuireann sí ar ais isteach mé"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Cuireann sí ar ais isteach mé — ní mór í a dheimhniú ar dtús"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3676,7 +3693,7 @@ msgid ""
 msgstr ""
 "Má chuir tú isteach ar phost in institiúid de chuid an AE nó trí sheirbhís fostaíochta náisiúnta, tá an comhad seo agat cheana. In ionad an t-iomlán a chlóscríobh arís, tabhair dúinn é."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "déan neamhaird de robots.txt agus tú ag gabháil"
@@ -3863,7 +3880,7 @@ msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr ""
 "Nuair a shuiteálann tú breiseán, ritheann cód duine eile taobh istigh de Postulo."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "ainm an áisc"
@@ -4090,7 +4107,7 @@ msgid ""
 msgstr ""
 "Coinnithe i %(file)s agus rothlaithe de réir méide, mar sin ní féidir leis an diosca a líonadh. Téann gach rud anseo chuig an gconsól freisin, áit a léann <code>docker logs</code> é."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4168,7 +4185,7 @@ msgstr "Teangacha"
 msgid "languages"
 msgstr "teangacha"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "teangacha a thairgtear"
@@ -4506,7 +4523,7 @@ msgstr "Litreacha beaga, digití, poncanna, fostríoca agus fleiscíní."
 msgid "Made"
 msgstr "Déanta"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "teip phoist as a chéile"
@@ -4533,7 +4550,7 @@ msgstr[3] ""
 msgstr[4] ""
 "Is é an post an t-aon bhealach ar ais isteach i gcuntas anseo, mar sin go dtí go n-oibríonn sé arís ní bheidh aon duine de na %(counter)s duine ar an ásc seo in ann teacht ar ais isteach má dhéanann siad dearmad ar a bpasfhocal."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "theip ar an bpost go deireanach"
@@ -4543,7 +4560,7 @@ msgstr "theip ar an bpost go deireanach"
 msgid "Mail last went out at %(when)s."
 msgstr "Chuaigh post amach den uair dheireanach ag %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "d'oibrigh an post go deireanach"
@@ -4562,7 +4579,7 @@ msgid ""
 msgstr ""
 "Ní choinníonn an post an t-iompar ina áit a thuilleadh ach oiread, mar ní chosnaíonn bealach nach seachadann faic aon duine."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "iompar an phoist"
@@ -4572,7 +4589,7 @@ msgstr "iompar an phoist"
 msgid "Mail transport"
 msgstr "Iompar an phoist"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "earráid dheireanach an phoist"
@@ -5120,7 +5137,7 @@ msgstr "Níor tháinig aon duine chuig an %(kind)s"
 msgid "Non-profit"
 msgstr "Neamhbhrabúsach"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Ceann ar bith"
@@ -5745,6 +5762,13 @@ msgstr "Ní liostaítear ach iontrálacha nach bhfuil ar an CV seo cheana."
 msgid "Only http and https addresses can be captured."
 msgstr "Ní féidir ach seoltaí http agus https a ghabháil."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Ní féidir ach le ceann de d'uimhreacha féin tú a chur ar ais isteach i do chuntas. Baineann an ceann seo le duine a mbíonn tú ag plé leis."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5927,7 +5951,7 @@ msgstr "Aistrithe go páirteach"
 msgid "Passkeys"
 msgstr "Eochracha rochtana"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "pasfhocal"
@@ -6036,7 +6060,7 @@ msgstr "Suíomh pearsanta"
 msgid "Pharmaceuticals"
 msgstr "Cógaisíocht"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6149,7 +6173,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP nó GIF suas le 5 MB. Gearrtar go cearnóg é agus baintear de aon rud a bhí ar eolas ag an gcomhad faoin áit ar tógadh é."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "port"
@@ -6713,7 +6737,7 @@ msgid ""
 msgstr ""
 "Tá clárú oscailte: is féidir le haon duine a aimsíonn an seoladh cuntas a chruthú."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "clárú oscailte"
@@ -6783,7 +6807,7 @@ msgstr "cianseoladh"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -7076,7 +7100,7 @@ msgstr "Sábháilte."
 msgid "Say what this identifier is."
 msgstr "Abair cad é an t-aitheantóir seo."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Abair cad é an uimhir seo."
@@ -7391,7 +7415,7 @@ msgstr "Taispeáin sa nascleanúint"
 msgid "Show past too"
 msgstr "Taispeáin cinn caite freisin"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Taispeántar sa cheanntásc agus ar an leathanach sínithe isteach."
@@ -7435,7 +7459,7 @@ msgstr "Sínigh isteach i gcuntas atá ann trí ríomhphost"
 msgid "Single sign-on"
 msgstr "Síniú isteach aonair"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "áirítear síniú isteach aonair mar an dara fachtóir"
@@ -7450,7 +7474,7 @@ msgstr "Áirítear síniú isteach aonair mar an dara fachtóir"
 msgid "Site search"
 msgstr "Cuardach suímh"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "socruithe suímh"
@@ -7513,7 +7537,7 @@ msgstr "Is moille"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "Freastalaí SMTP"
@@ -7615,7 +7639,7 @@ msgid ""
 msgstr ""
 "Ceanglaíonn STARTTLS agus uasghrádaíonn sé ansin, rud a bhfuil port 587 ag súil leis. Is é TLS ón gcéad bheart a bhfuil port 465 ag súil leis. Ní féidir iad a mhalartú: dírigh ceann amháin ar phort an chinn eile agus bíonn gach ceann ag fanacht go labhraíonn an ceann eile."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, tar éis ceangail"
@@ -7841,7 +7865,7 @@ msgstr "clib"
 msgid "Tag"
 msgstr "Clib"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "mana"
@@ -7895,12 +7919,12 @@ msgstr "teileafón"
 msgid "Telephone number"
 msgstr "Uimhir theileafóin"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "uimhir theileafóin"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7941,17 +7965,17 @@ msgstr "Tástáil an ceangal"
 msgid "text as sent"
 msgstr "téacs mar a seoladh"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "cumraíocht teachtaireachtaí"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "rúin teachtaireachtaí"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "iompar teachtaireachtaí"
@@ -8189,6 +8213,12 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Níl tír ar bith os comhair na huimhreach sin, mar sin ní féidir í a dhiailiú ó áit ar bith eile. Roghnaigh an tír, nó scríobh í ag tosú le +."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr ""
+"Caithfear an uimhir sin a dheimhniú sula bhféadfaidh sí tú a chur ar ais isteach."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8485,6 +8515,13 @@ msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr ""
 "Na chéad agallaimh eile sa dialann, agus na cinn a chuaigh thart gan toradh."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Tá an uimhir a chuireann ar ais isteach tú scartha ón gceann a phriontálann do cháipéisí, mar sin ní athraíonn athrú na huimhreach a dhiailíonn earcaitheoir an chaoi a gcruthaíonn tú gur tusa atá ann. Ní mór í a dheimhniú ar dtús, agus ní bhaineann múchadh uimhreacha teileafóin iomadúla riamh uait í."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8814,7 +8851,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Tá an cineál seo aitheantóra liostaithe cheana."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Tá an uimhir seo ar an liosta cheana."
@@ -8881,7 +8918,7 @@ msgstr "iontráil amlíne"
 msgid "Timeout"
 msgstr "Teorainn ama"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "teorainn ama i soicindí"
@@ -8897,7 +8934,7 @@ msgstr "teideal"
 msgid "Title, company or location"
 msgstr "Teideal, cuideachta nó suíomh"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS ón gcéad bheart"
@@ -8969,12 +9006,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Iompar agus lóistíocht"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "cumraíocht an iompair"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "rúin an iompair"
@@ -9071,12 +9108,12 @@ msgid "Update the preview"
 msgstr "Nuashonraigh an réamhamharc"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "nuashonraithe ar"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "nuashonraithe ag"
@@ -9175,7 +9212,7 @@ msgstr "úsáideoir"
 msgid "Username"
 msgstr "Ainm úsáideora"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "ainm úsáideora"
@@ -9293,6 +9330,11 @@ msgstr "Ag fanacht le húsáid"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "“%(text)s” a bhí ann"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "bealach ar ais isteach sa chuntas"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9595,12 +9637,12 @@ msgstr "cá bhfuil tú i do chónaí"
 msgid "Where your job search stands today."
 msgstr "Cá seasann do chuardach poist inniu."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Cibé an féidir le haon duine a aimsíonn an seoladh cuntas a chruthú."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9847,7 +9889,7 @@ msgid ""
 msgstr ""
 "Chuir tú iarratas chuig an gceann seo roimhe seo. Tá sé ceart go leor dara hiarratas a thaifeadadh; fanann an dá cheann ar an taifead."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

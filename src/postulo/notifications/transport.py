@@ -260,7 +260,7 @@ def _text_reaches_everybody(without: str = "") -> bool:
         return False
     from postulo.core import phone_numbers
 
-    return not phone_numbers.accounts_without_a_verified_number()
+    return not phone_numbers.accounts_without_a_recovery_number()
 
 
 def recovery_routes(*, without: str = "") -> list[str]:
@@ -274,14 +274,35 @@ def accounts_needing_email() -> int:
     Counted rather than assumed. On a typical instance this is every account and the lock is
     shut, which is the honest answer; on one where every person holds a passkey it is zero
     and the lock opens, which is the reason not to hardcode the answer.
+
+    A second clause rather than a second assumption (#144): an account with a confirmed
+    recovery number, on an instance that can send to one, is not an account that needs email.
+    Both halves are required — a number is only a route while something can reach it.
     """
     from allauth.mfa.models import Authenticator
     from django.contrib.auth import get_user_model
 
-    with_a_passkey = Authenticator.objects.filter(type=Authenticator.Type.WEBAUTHN).values_list(
-        "user_id", flat=True
+    from postulo.core.models import PhoneNumber
+
+    covered = set(
+        Authenticator.objects.filter(type=Authenticator.Type.WEBAUTHN).values_list(
+            "user_id", flat=True
+        )
     )
-    return get_user_model().objects.filter(is_active=True).exclude(pk__in=with_a_passkey).count()
+    if selected(base.TEXT) is not None:
+        from django.contrib.contenttypes.models import ContentType
+        from django.utils import timezone
+
+        from postulo.accounts.models import Profile
+
+        covered |= set(
+            PhoneNumber.objects.filter(
+                content_type=ContentType.objects.get_for_model(Profile),
+                is_recovery=True,
+                verified_at__gte=timezone.now() - PhoneNumber.VERIFICATION_LASTS,
+            ).values_list("owner_id", flat=True)
+        )
+    return get_user_model().objects.filter(is_active=True).exclude(pk__in=covered).count()
 
 
 def refuse_switching_off(name: str) -> str:

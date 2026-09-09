@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: íslenska\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s ráðgert %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s hjá %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -499,7 +499,7 @@ msgstr "CSV-skrá"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Vísbending fyrir viðmótið, til dæmis „rafgult“ eða „himinblátt“."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Lína undir nafninu á innskráningarsíðunni. Valfrjálst."
@@ -516,7 +516,14 @@ msgid ""
 msgstr ""
 "Farsími, borðlína, skiptiborð — eins mörg og þess virði er að geyma, með eitt merkt sem það sem á að nota. Skjöl prenta það."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Númer verður að vera staðfest áður en það getur hleypt þér inn aftur. Enginn hefur svarað á þessu."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1937,7 +1944,7 @@ msgstr "Tenging fjarlægð, leyndarmálum og öllu."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Tenging vistuð. Prófaðu hana til að ganga úr skugga um að hún virki."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "öryggi tengingar"
@@ -2354,12 +2361,12 @@ msgstr "Hafnað"
 msgid "Declined. It will not be suggested again."
 msgstr "Hafnað. Þetta verður ekki lagt til aftur."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "sjálfgefið tungumál"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "sjálfgefið tímabelti"
@@ -2985,7 +2992,7 @@ msgstr "Flutt út sér"
 msgid "Failed"
 msgstr "Mistókst"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Mistókst án þess að segja hvers vegna."
@@ -3239,7 +3246,7 @@ msgstr "frá %(low)s"
 msgid "From %(name)s."
 msgstr "Frá %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "sendandavistfang"
@@ -3300,6 +3307,16 @@ msgstr "Leikir"
 #, draft
 msgid "Get"
 msgstr "Sækja"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Hleypir mér inn aftur"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Hleypir mér inn aftur — þarf að staðfesta fyrst"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3604,7 +3621,7 @@ msgid ""
 msgstr ""
 "Ef þú hefur sótt um hjá ESB-stofnun eða gegnum opinbera vinnumiðlun áttu þessa skrá þegar. Í stað þess að skrifa allt aftur, réttu hana fram."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "hunsa robots.txt við grípu"
@@ -3790,7 +3807,7 @@ msgstr "Uppsett á þessu uppsetti"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Að setja upp viðbót keyrir kóða annarra inni í Postulo."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "heiti uppsets"
@@ -4018,7 +4035,7 @@ msgid ""
 msgstr ""
 "Geymt í %(file)s og velt eftir stærð, svo þetta getur ekki fyllt diskinn. Allt hér fer einnig í stjórnborðið, þar sem <code>docker logs</code> les það."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4096,7 +4113,7 @@ msgstr "Tungumál"
 msgid "languages"
 msgstr "tungumál"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "tungumál í boði"
@@ -4434,7 +4451,7 @@ msgstr "Lágstafir, tölustafir, punktar, undirstrik og bandstrik."
 msgid "Made"
 msgstr "Búinn til"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "póstvillur í röð"
@@ -4455,7 +4472,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Póstur er eina leiðin til baka inn á reikning hér, svo þar til þetta virkar aftur kemst enginn af %(counter)s einstaklingunum á þessu tilviki inn aftur ef þeir gleyma lykilorðinu sínu."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "póstur brást síðast"
@@ -4465,7 +4482,7 @@ msgstr "póstur brást síðast"
 msgid "Mail last went out at %(when)s."
 msgstr "Pósturinn fór síðast út %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "pósturinn virkaði síðast"
@@ -4484,7 +4501,7 @@ msgid ""
 msgstr ""
 "Pósturinn heldur ekki lengur flutningnum á sínum stað heldur, því leið sem afhendir ekkert verndar engan."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "póstflutningsleið"
@@ -4494,7 +4511,7 @@ msgstr "póstflutningsleið"
 msgid "Mail transport"
 msgstr "Póstflutningsleið"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "síðasta póstvilla"
@@ -5040,7 +5057,7 @@ msgstr "Enginn mætti í %(kind)s"
 msgid "Non-profit"
 msgstr "Félagasamtök"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Ekkert"
@@ -5631,6 +5648,13 @@ msgstr "Aðeins færslur sem eru ekki þegar á þessari ferilskrá eru taldar u
 msgid "Only http and https addresses can be captured."
 msgstr "Aðeins http- og https-vistföng má grípa."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Aðeins eitt af þínum eigin númerum getur hleypt þér aftur inn á reikninginn þinn. Þetta tilheyrir einhverjum sem þú átt í samskiptum við."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5812,7 +5836,7 @@ msgstr "Að hluta þýtt"
 msgid "Passkeys"
 msgstr "Lyklar"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "lykilorð"
@@ -5922,7 +5946,7 @@ msgstr "Eigin vefsíða"
 msgid "Pharmaceuticals"
 msgstr "Lyf"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6035,7 +6059,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP eða GIF allt að 5 MB. Hún er skorin í ferning og hreinsuð af öllu sem skráin vissi um hvar hún var tekin."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "gátt"
@@ -6591,7 +6615,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr "Skráning er opin: hver sem finnur vistfangið má stofna reikning."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "skráning opin"
@@ -6662,7 +6686,7 @@ msgstr "fjarlægt vistfang"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6955,7 +6979,7 @@ msgstr "Vistað."
 msgid "Say what this identifier is."
 msgstr "Segðu hvað þetta auðkenni er."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Segðu hvað þetta númer er."
@@ -7268,7 +7292,7 @@ msgstr "Sýna í leiðsögn"
 msgid "Show past too"
 msgstr "Sýna líka liðið"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Sýnt í hausnum og á innskráningarsíðunni."
@@ -7312,7 +7336,7 @@ msgstr "Skráir inn á reikning sem þegar er til með tölvupósti"
 msgid "Single sign-on"
 msgstr "Einfaldur aðgangur"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "einfaldur aðgangur telst sem annar þátturinn"
@@ -7327,7 +7351,7 @@ msgstr "Einfaldur aðgangur telst sem annar þátturinn"
 msgid "Site search"
 msgstr "Leit á vefnum"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "vefstillingar"
@@ -7390,7 +7414,7 @@ msgstr "Hægast"
 msgid "slug"
 msgstr "stuttnefni"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "SMTP-þjónn"
@@ -7492,7 +7516,7 @@ msgid ""
 msgstr ""
 "STARTTLS tengist og uppfærir svo tenginguna, sem er það sem gátt 587 væntir. TLS frá fyrsta bæti er það sem gátt 465 væntir. Þau eru ekki víxlanleg: beindu öðru að gátt hins og hvort um sig bíður eftir að hitt tali."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, eftir tengingu"
@@ -7718,7 +7742,7 @@ msgstr "merkimiði"
 msgid "Tag"
 msgstr "Merkimiði"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "slagorð"
@@ -7772,12 +7796,12 @@ msgstr "sími"
 msgid "Telephone number"
 msgstr "Símanúmer"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "símanúmer"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7818,17 +7842,17 @@ msgstr "Prófa tenginguna"
 msgid "text as sent"
 msgstr "texti eins og hann var sendur"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "skilaboðastillingar"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "skilaboðaleyndarmál"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "skilaboðaflutningur"
@@ -8066,6 +8090,12 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Það er ekkert land framan við þetta númer, svo það er ekki hægt að hringja í það annars staðar frá. Veldu landið, eða skrifaðu það með + fremst."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr ""
+"Það númer verður að vera staðfest áður en það getur hleypt þér inn aftur."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8353,6 +8383,13 @@ msgstr ""
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Næstu viðtöl í dagbókinni, og þau sem liðu án niðurstöðu."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Númerið sem hleypir þér inn aftur er aðskilið frá því sem skjölin þín prenta, svo að breyta því sem ráðningaraðili hringir í breytir ekki því hvernig þú sannar að þetta sért þú. Það þarf að staðfesta fyrst, og að slökkva á mörgum símanúmerum tekur það aldrei af þér."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8673,7 +8710,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Þessi gerð auðkennis er þegar á listanum."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Þetta númer er þegar á listanum."
@@ -8741,7 +8778,7 @@ msgstr "tímalínufærsla"
 msgid "Timeout"
 msgstr "Tímamörk"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "tímamörk í sekúndum"
@@ -8757,7 +8794,7 @@ msgstr "titill"
 msgid "Title, company or location"
 msgstr "Titill, fyrirtæki eða staðsetning"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS frá fyrsta bæti"
@@ -8829,12 +8866,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Flutningar"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "uppsetning flutningsleiðar"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "leyndarmál flutningsleiðar"
@@ -8930,12 +8967,12 @@ msgid "Update the preview"
 msgstr "Uppfæra forskoðunina"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "uppfært þann"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "uppfært af"
@@ -9033,7 +9070,7 @@ msgstr "notandi"
 msgid "Username"
 msgstr "Notandanafn"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "notandanafn"
@@ -9150,6 +9187,11 @@ msgstr "Bíður notkunar"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "var „%(text)s“"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "leið aftur inn á reikninginn"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9449,12 +9491,12 @@ msgstr "hvar þú býrð"
 msgid "Where your job search stands today."
 msgstr "Hvernig atvinnuleitin þín stendur í dag."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Hvort hver sem finnur vistfangið megi stofna reikning."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9697,7 +9739,7 @@ msgid ""
 msgstr ""
 "Þú hefur sótt um þessa áður. Það er í lagi að skrá aðra umsókn; báðar standa áfram."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

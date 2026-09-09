@@ -276,6 +276,8 @@ def test_a_gateway_alone_is_not_a_route_either(user):
 def test_it_becomes_a_route_when_every_account_has_a_confirmed_number(user):
     row = PhoneNumber.objects.create(owner=user, holder=user.profile, number="+351912345678")
     row.record_verified()
+    row.is_recovery = True
+    row.save(update_fields=["is_recovery"])
 
     with installed():
         registry.plugins("transport", refresh=True)
@@ -286,6 +288,8 @@ def test_it_becomes_a_route_when_every_account_has_a_confirmed_number(user):
 def test_one_account_without_one_is_enough_to_keep_it_out(user, django_user_model):
     row = PhoneNumber.objects.create(owner=user, holder=user.profile, number="+351912345678")
     row.record_verified()
+    row.is_recovery = True
+    row.save(update_fields=["is_recovery"])
     django_user_model.objects.create_user(
         email="other@example.org", username="other", password="a-long-enough-password-42"
     )
@@ -318,4 +322,4 @@ def test_a_number_on_a_contact_does_not_count(user):
         registry.plugins("transport", refresh=True)
 
         assert "text" not in transport.recovery_routes()
-        assert phone_numbers.accounts_without_a_verified_number() == 1
+        assert phone_numbers.accounts_without_a_recovery_number() == 1

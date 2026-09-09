@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: ქართული\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s დაინიშნა %(when)s-ისთვის"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s კომპანიაში %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -499,7 +499,7 @@ msgstr "CSV ფაილი"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "მინიშნება ინტერფეისისთვის, მაგალითად „ქარვისფერი“ ან „ცისფერი“."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "სტრიქონი სახელის ქვემოთ შესვლის გვერდზე. არასავალდებულო."
@@ -516,7 +516,14 @@ msgid ""
 msgstr ""
 "მობილური, ფიქსირებული ხაზი, სატელეფონო ცენტრი — იმდენი, რამდენის შენახვაც ღირს, ერთი მათგანი მონიშნული როგორც გამოსაყენებელი. დოკუმენტები სწორედ მას ბეჭდავს."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"ნომერი უნდა დადასტურდეს, სანამ ის შეძლებს თქვენს დაბრუნებას. ამაზე არავის უპასუხია."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1939,7 +1946,7 @@ msgstr "კავშირი წაიშალა, საიდუმლოე
 msgid "Connection saved. Test it to make sure it works."
 msgstr "კავშირი შენახულია. შეამოწმეთ, რომ დარწმუნდეთ, მუშაობს."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "კავშირის უსაფრთხოება"
@@ -2357,12 +2364,12 @@ msgstr "უარყოფილია"
 msgid "Declined. It will not be suggested again."
 msgstr "უარყოფილია. აღარ შემოგთავაზდებათ."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "ნაგულისხმევი ენა"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "ნაგულისხმევი დროის სარტყელი"
@@ -2987,7 +2994,7 @@ msgstr "ექსპორტირებულია ცალკე"
 msgid "Failed"
 msgstr "ვერ მოხერხდა"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "ვერ მოხერხდა, მიზეზის თქმის გარეშე."
@@ -3243,7 +3250,7 @@ msgstr "%(low)s-დან"
 msgid "From %(name)s."
 msgstr "%(name)s-სგან."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "გამგზავნის მისამართი"
@@ -3304,6 +3311,16 @@ msgstr "თამაშები"
 #, draft
 msgid "Get"
 msgstr "მიღება"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "მაბრუნებს უკან"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "მაბრუნებს უკან — ჯერ დადასტურებაა საჭირო"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3607,7 +3624,7 @@ msgid ""
 msgstr ""
 "თუ ევროკავშირის დაწესებულებაში ან ეროვნული დასაქმების სამსახურის გავლით გაგიკეთებიათ განაცხადი, ეს ფაილი უკვე გაქვთ. იმის ნაცვლად, რომ ყველაფერი თავიდან აკრიფოთ, უბრალოდ გადმოეცით."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "აღებისას robots.txt-ის იგნორირება"
@@ -3793,7 +3810,7 @@ msgstr "დაყენებულია ამ ინსტალაცია�
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "მოდულის დაყენება Postulo-ს შიგნით სხვისი კოდის გაშვებას ნიშნავს."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "ინსტალაციის სახელი"
@@ -4020,7 +4037,7 @@ msgid ""
 msgstr ""
 "ინახება %(file)s-ში და ბრუნავს ზომის მიხედვით, ამიტომ დისკს ვერ შეავსებს. აქაური ყველაფერი კონსოლშიც მიდის, საიდანაც მას <code>docker logs</code> კითხულობს."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4098,7 +4115,7 @@ msgstr "ენები"
 msgid "languages"
 msgstr "ენები"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "შემოთავაზებული ენები"
@@ -4436,7 +4453,7 @@ msgstr "პატარა ასოები, ციფრები, წერ�
 msgid "Made"
 msgstr "შექმნილია"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "ფოსტის ზედიზედ წარუმატებლობა"
@@ -4457,7 +4474,7 @@ msgstr[0] ""
 msgstr[1] ""
 "აქ ფოსტა ანგარიშში დაბრუნების ერთადერთი გზაა, ამიტომ სანამ ეს ისევ არ იმუშავებს, ამ ინსტანციის %(counter)s ადამიანიდან ვერცერთი ვერ დაბრუნდება, თუ პაროლს დაივიწყებს."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "ფოსტა ბოლოს ვერ გაიგზავნა"
@@ -4467,7 +4484,7 @@ msgstr "ფოსტა ბოლოს ვერ გაიგზავნა"
 msgid "Mail last went out at %(when)s."
 msgstr "ფოსტა ბოლოს გავიდა %(when)s-ზე."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "ფოსტამ ბოლოს იმუშავა"
@@ -4486,7 +4503,7 @@ msgid ""
 msgstr ""
 "ფოსტა აღარც ტრანსპორტს ინარჩუნებს ადგილზე, რადგან გზა, რომელიც არაფერს აწვდის, არავის იცავს."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "ფოსტის ტრანსპორტი"
@@ -4496,7 +4513,7 @@ msgstr "ფოსტის ტრანსპორტი"
 msgid "Mail transport"
 msgstr "ფოსტის ტრანსპორტი"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "ფოსტის ბოლო შეცდომა"
@@ -5042,7 +5059,7 @@ msgstr "%(kind)s-ზე ვერავინ გამოცხადდა"
 msgid "Non-profit"
 msgstr "არაკომერციული ორგანიზაცია"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "არცერთი"
@@ -5634,6 +5651,13 @@ msgstr "ჩამოთვლილია მხოლოდ ის ჩანა
 msgid "Only http and https addresses can be captured."
 msgstr "აღება მხოლოდ http და https მისამართებზეა შესაძლებელი."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"თქვენს ანგარიშში დაბრუნება მხოლოდ თქვენს საკუთარ ნომრებიდან ერთს შეუძლია. ეს ეკუთვნის ვინმეს, ვისთანაც საქმე გაქვთ."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5816,7 +5840,7 @@ msgstr "ნაწილობრივ თარგმნილი"
 msgid "Passkeys"
 msgstr "წვდომის გასაღებები"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "პაროლი"
@@ -5925,7 +5949,7 @@ msgstr "პირადი საიტი"
 msgid "Pharmaceuticals"
 msgstr "ფარმაცევტიკა"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6038,7 +6062,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP ან GIF 5 MB-მდე. სურათი კვადრატად იჭრება და ეშლება ყველაფერი, რაც ფაილმა იცოდა გადაღების ადგილის შესახებ."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "პორტი"
@@ -6599,7 +6623,7 @@ msgid ""
 msgstr ""
 "რეგისტრაცია ღიაა: ყველას, ვინც მისამართს იპოვის, შეუძლია ანგარიშის შექმნა."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "რეგისტრაცია ღიაა"
@@ -6670,7 +6694,7 @@ msgstr "დაშორებული მისამართი"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6962,7 +6986,7 @@ msgstr "შენახულია."
 msgid "Say what this identifier is."
 msgstr "თქვით, რა არის ეს იდენტიფიკატორი."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "თქვით, რა ნომერია ეს."
@@ -7275,7 +7299,7 @@ msgstr "ნავიგაციაში ჩვენება"
 msgid "Show past too"
 msgstr "წარსულებიც აჩვენე"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "ჩანს თავსართში და შესვლის გვერდზე."
@@ -7319,7 +7343,7 @@ msgstr "არსებულ ანგარიშში შედის ელ
 msgid "Single sign-on"
 msgstr "ერთიანი შესვლა"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "ერთიანი შესვლა მეორე ფაქტორად ითვლება"
@@ -7334,7 +7358,7 @@ msgstr "ერთიანი შესვლა მეორე ფაქტო
 msgid "Site search"
 msgstr "ძებნა საიტზე"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "საიტის პარამეტრები"
@@ -7397,7 +7421,7 @@ msgstr "ყველაზე ნელი"
 msgid "slug"
 msgstr "მოკლე სახელი"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "SMTP სერვერი"
@@ -7499,7 +7523,7 @@ msgid ""
 msgstr ""
 "STARTTLS ჯერ უკავშირდება და შემდეგ ანახლებს კავშირს, რასაც ელოდება პორტი 587. TLS პირველივე ბაიტიდან არის ის, რასაც ელოდება პორტი 465. ისინი ურთიერთშემცვლელი არ არიან: მიმართეთ ერთი მეორის პორტს და თითოეული ელოდება, რომ მეორემ დაიწყოს ლაპარაკი."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, დაკავშირების შემდეგ"
@@ -7725,7 +7749,7 @@ msgstr "იარლიყი"
 msgid "Tag"
 msgstr "იარლიყი"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "დევიზი"
@@ -7779,12 +7803,12 @@ msgstr "ტელეფონი"
 msgid "Telephone number"
 msgstr "ტელეფონის ნომერი"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "ტელეფონის ნომერი"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7825,17 +7849,17 @@ msgstr "კავშირის შემოწმება"
 msgid "text as sent"
 msgstr "ტექსტი ისე, როგორც გაიგზავნა"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "შეტყობინებების კონფიგურაცია"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "შეტყობინებების საიდუმლოებები"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "შეტყობინებების ტრანსპორტი"
@@ -8072,6 +8096,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "ამ ნომრის წინ ქვეყანა არ არის, ამიტომ სხვა ადგილიდან მისი აკრეფა შეუძლებელია. აირჩიეთ ქვეყანა, ან დაწერეთ იგი +-ით დაწყებული."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "ეს ნომერი უნდა დადასტურდეს, სანამ ის შეძლებს თქვენს დაბრუნებას."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8357,6 +8386,13 @@ msgstr "მთავარი ჩანაწერი. CV-ის ვარი�
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "შემდეგი გასაუბრებები დღიურში, და ის, რაც შედეგის გარეშე ჩაიარა."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"ნომერი, რომელიც გაბრუნებთ, გამოყოფილია იმისგან, რომელსაც თქვენი დოკუმენტები ბეჭდავენ, ამიტომ იმის შეცვლა, რასაც დამსაქმებელი კრეფს, არ ცვლის იმას, როგორ ამტკიცებთ, რომ ეს თქვენ ხართ. ჯერ უნდა დადასტურდეს, და რამდენიმე ტელეფონის ნომრის გამორთვა მას არასოდეს გართმევთ."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8678,7 +8714,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "ამ სახის იდენტიფიკატორი უკვე სიაშია."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "ეს ნომერი უკვე სიაშია."
@@ -8746,7 +8782,7 @@ msgstr "ქრონოლოგიის ჩანაწერი"
 msgid "Timeout"
 msgstr "დროის ამოწურვა"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "დროის ამოწურვა წამებში"
@@ -8762,7 +8798,7 @@ msgstr "სათაური"
 msgid "Title, company or location"
 msgstr "სათაური, კომპანია ან ადგილმდებარეობა"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS პირველივე ბაიტიდან"
@@ -8834,12 +8870,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "ტრანსპორტი და ლოგისტიკა"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "ტრანსპორტის კონფიგურაცია"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "ტრანსპორტის საიდუმლოებები"
@@ -8934,12 +8970,12 @@ msgid "Update the preview"
 msgstr "წინასწარი ხედის განახლება"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "განახლების დრო"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "განმაახლებელი"
@@ -9038,7 +9074,7 @@ msgstr "მომხმარებელი"
 msgid "Username"
 msgstr "მომხმარებლის სახელი"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "მომხმარებლის სახელი"
@@ -9156,6 +9192,11 @@ msgstr "ელოდება გამოყენებას"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "იყო „%(text)s“"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "ანგარიშში დაბრუნების გზა"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9454,12 +9495,12 @@ msgstr "სად ცხოვრობთ"
 msgid "Where your job search stands today."
 msgstr "სად დგას დღეს თქვენი სამსახურის ძიება."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "შეუძლია თუ არა ანგარიშის შექმნა ყველას, ვინც მისამართს იპოვის."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9702,7 +9743,7 @@ msgid ""
 msgstr ""
 "ამაზე უკვე გაგიკეთებიათ განაცხადი. მეორე განაცხადის აღრიცხვა ნორმალურია; ორივე ჩანაწერში რჩება."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

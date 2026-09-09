@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s kitűzve: %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s, %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -500,7 +500,7 @@ msgstr "CSV-fájl"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Tipp a felületnek, például „amber” vagy „sky”."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Egy sor a név alatt a bejelentkezési oldalon. Nem kötelező."
@@ -517,7 +517,14 @@ msgid ""
 msgstr ""
 "Mobil, vezetékes vonal, központ — annyi, amennyit érdemes megőrizni, közülük egy megjelölve használandóként. A dokumentumok azt nyomtatják."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Egy számot meg kell erősíteni, mielőtt visszaengedhetne. Erre senki nem válaszolt."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1938,7 +1945,7 @@ msgstr "Kapcsolat eltávolítva, a titkokkal együtt."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Kapcsolat mentve. Teszteld, hogy biztosan működik-e."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "kapcsolat biztonsága"
@@ -2356,12 +2363,12 @@ msgstr "Elutasítva"
 msgid "Declined. It will not be suggested again."
 msgstr "Elutasítva. Többé nem lesz javasolva."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "alapértelmezett nyelv"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "alapértelmezett időzóna"
@@ -2988,7 +2995,7 @@ msgstr "Külön exportálva"
 msgid "Failed"
 msgstr "Sikertelen"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Sikertelen, indoklás nélkül."
@@ -3244,7 +3251,7 @@ msgstr "%(low)s-tól/-től"
 msgid "From %(name)s."
 msgstr "Tőle: %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "feladó címe"
@@ -3305,6 +3312,16 @@ msgstr "Játékipar"
 #, draft
 msgid "Get"
 msgstr "Lekérés"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Ezzel jutok vissza"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Ezzel jutok vissza — előbb meg kell erősíteni"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3606,7 +3623,7 @@ msgid ""
 msgstr ""
 "Ha uniós intézményhez vagy nemzeti munkaügyi szolgálaton keresztül pályázott, ez a fájl már megvan. Ahelyett, hogy mindent újra begépelne, adja át."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "robots.txt figyelmen kívül hagyása rögzítéskor"
@@ -3793,7 +3810,7 @@ msgstr "Ezen a példányon telepítve"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Egy bővítmény telepítése más valaki kódját futtatja a Postulón belül."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "példány neve"
@@ -4019,7 +4036,7 @@ msgid ""
 msgstr ""
 "A %(file)s fájlban tárolva, méret szerint forgatva, így nem töltheti meg a lemezt. Minden itt lévő a konzolra is kikerül, ahonnan a <code>docker logs</code> olvassa."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4097,7 +4114,7 @@ msgstr "Nyelvek"
 msgid "languages"
 msgstr "nyelvek"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "kínált nyelvek"
@@ -4435,7 +4452,7 @@ msgstr "Kisbetűk, számjegyek, pontok, aláhúzások és kötőjelek."
 msgid "Made"
 msgstr "Készült"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "egymást követő levélhiba"
@@ -4456,7 +4473,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Itt a levél az egyetlen út vissza egy fiókba, így amíg ez újra nem működik, ennek a példánynak a %(counter)s embere közül senki nem tud visszajutni, ha elfelejti a jelszavát."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "a levelezés utoljára hibázott"
@@ -4466,7 +4483,7 @@ msgstr "a levelezés utoljára hibázott"
 msgid "Mail last went out at %(when)s."
 msgstr "A levél utoljára %(when)s ment ki."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "a levelezés utoljára működött"
@@ -4485,7 +4502,7 @@ msgid ""
 msgstr ""
 "A levelezés már a szállítót sem tartja a helyén, mert egy út, amely semmit nem kézbesít, senkit nem véd."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "levélszállító"
@@ -4495,7 +4512,7 @@ msgstr "levélszállító"
 msgid "Mail transport"
 msgstr "Levélszállító"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "a levelezés utolsó hibája"
@@ -5041,7 +5058,7 @@ msgstr "Senki sem jelent meg a(z) %(kind)s alkalmon"
 msgid "Non-profit"
 msgstr "Nonprofit"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Nincs"
@@ -5633,6 +5650,13 @@ msgstr ""
 msgid "Only http and https addresses can be captured."
 msgstr "Csak http és https címek rögzíthetők."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Csak az ön saját számainak egyike juttathatja vissza a fiókjába. Ez azé, akivel kapcsolatban áll."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5815,7 +5839,7 @@ msgstr "Részben lefordítva"
 msgid "Passkeys"
 msgstr "Hozzáférési kulcsok"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "jelszó"
@@ -5925,7 +5949,7 @@ msgstr "Saját honlap"
 msgid "Pharmaceuticals"
 msgstr "Gyógyszeripar"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6038,7 +6062,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP vagy GIF, legfeljebb 5 MB. Négyzetre vágjuk, és eltávolítunk belőle mindent, amit a fájl a készítés helyéről tudott."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "port"
@@ -6599,7 +6623,7 @@ msgid ""
 msgstr ""
 "A regisztráció nyitott: bárki, aki megtalálja a címet, létrehozhat fiókot."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "regisztráció nyitva"
@@ -6669,7 +6693,7 @@ msgstr "távoli cím"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6961,7 +6985,7 @@ msgstr "Mentve."
 msgid "Say what this identifier is."
 msgstr "Add meg, mi ez az azonosító."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Mondja meg, mi ez a szám."
@@ -7274,7 +7298,7 @@ msgstr "Megjelenítés a navigációban"
 msgid "Show past too"
 msgstr "A múltbeliek is"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "A fejlécben és a bejelentkezési oldalon jelenik meg."
@@ -7318,7 +7342,7 @@ msgstr "Bejelentkezés meglévő fiókba e-maillel"
 msgid "Single sign-on"
 msgstr "Egyszeri bejelentkezés"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "az egyszeri bejelentkezés második tényezőnek számít"
@@ -7333,7 +7357,7 @@ msgstr "Az egyszeri bejelentkezés második tényezőnek számít"
 msgid "Site search"
 msgstr "Keresés a webhelyen"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "webhelybeállítások"
@@ -7396,7 +7420,7 @@ msgstr "Leglassabb"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "SMTP-kiszolgáló"
@@ -7498,7 +7522,7 @@ msgid ""
 msgstr ""
 "A STARTTLS csatlakozik, majd emeli a kapcsolatot, ezt várja az 587-es port. A TLS az első bájttól az, amit a 465-ös port vár. Nem cserélhetők fel: irányítsa az egyiket a másik portjára, és mindkettő arra vár, hogy a másik szólaljon meg."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, csatlakozás után"
@@ -7724,7 +7748,7 @@ msgstr "címke"
 msgid "Tag"
 msgstr "Címke"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "mottó"
@@ -7778,12 +7802,12 @@ msgstr "telefon"
 msgid "Telephone number"
 msgstr "Telefonszám"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "telefonszám"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7825,17 +7849,17 @@ msgstr "Kapcsolat tesztelése"
 msgid "text as sent"
 msgstr "elküldött szöveg"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "üzenetek beállítása"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "üzenetek titkai"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "üzenetek szállítója"
@@ -8074,6 +8098,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Az előtt a szám előtt nincs ország, így máshonnan nem hívható. Válassza ki az országot, vagy írja +-szal kezdve."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Ezt a számot meg kell erősíteni, mielőtt visszaengedhetné."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8360,6 +8389,13 @@ msgstr "A törzsrekord. Az önéletrajz-változat ebből válogat; soha nem más
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "A naptár következő interjúi, és azok, amelyek eredmény nélkül teltek el."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"A szám, amellyel visszajut, elkülönül attól, amelyet a dokumentumai kinyomtatnak, így annak megváltoztatása, amit egy toborzó hív, nem változtat azon, hogyan igazolja, hogy ön az. Előbb meg kell erősíteni, és a több telefonszám kikapcsolása soha nem veszi el."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8684,7 +8720,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Ez a fajta azonosító már szerepel a listán."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Ez a szám már szerepel a listán."
@@ -8751,7 +8787,7 @@ msgstr "idővonal-bejegyzés"
 msgid "Timeout"
 msgstr "Időkorlát"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "időkorlát másodpercben"
@@ -8767,7 +8803,7 @@ msgstr "cím"
 msgid "Title, company or location"
 msgstr "Cím, cég vagy helyszín"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS az első bájttól"
@@ -8839,12 +8875,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Szállítás és logisztika"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "szállító beállításai"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "szállító titkai"
@@ -8941,12 +8977,12 @@ msgid "Update the preview"
 msgstr "Előnézet frissítése"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "frissítve ekkor"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "frissítette"
@@ -9045,7 +9081,7 @@ msgstr "felhasználó"
 msgid "Username"
 msgstr "Felhasználónév"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "felhasználónév"
@@ -9162,6 +9198,11 @@ msgstr "Felhasználásra vár"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "ez volt: „%(text)s”"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "út vissza a fiókba"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9460,12 +9501,12 @@ msgstr "hol lakik"
 msgid "Where your job search stands today."
 msgstr "Hol tart ma az álláskeresésed."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Létrehozhat-e fiókot bárki, aki megtalálja a címet."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9709,7 +9750,7 @@ msgid ""
 msgstr ""
 "Ide már jelentkeztél korábban. Egy második jelentkezés rögzítése rendben van; mindkettő megmarad."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

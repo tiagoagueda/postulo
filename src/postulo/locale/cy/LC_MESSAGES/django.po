@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Cymraeg\n"
@@ -192,7 +192,7 @@ msgstr "Trefnwyd %(kind)s ar gyfer %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s yn %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -536,7 +536,7 @@ msgstr "Ffeil CSV"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Awgrym ar gyfer y rhyngwyneb, fel «ambr» neu «awyr»."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Llinell o dan yr enw ar y dudalen fewngofnodi. Dewisol."
@@ -554,7 +554,14 @@ msgid ""
 msgstr ""
 "Ffôn symudol, llinell ddesg, switsfwrdd — cynifer ag sy'n werth eu cadw, gydag un wedi'i nodi fel yr un i'w ddefnyddio. Dyna'r un y mae dogfennau'n ei argraffu."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Rhaid cadarnhau rhif cyn iddo allu eich cael yn ôl i mewn. Nid oes neb wedi ateb ar hwn."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1982,7 +1989,7 @@ msgstr "Tynnwyd y cysylltiad, gan gynnwys y cyfrinachau."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Cadwyd y cysylltiad. Profwch ef i sicrhau ei fod yn gweithio."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "diogelwch y cysylltiad"
@@ -2400,12 +2407,12 @@ msgstr "Wedi'i wrthod"
 msgid "Declined. It will not be suggested again."
 msgstr "Wedi'i wrthod. Ni chaiff ei awgrymu eto."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "iaith ddiofyn"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "parth amser diofyn"
@@ -3031,7 +3038,7 @@ msgstr "Allforiwyd ar wahân"
 msgid "Failed"
 msgstr "Methodd"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Methodd heb ddweud pam."
@@ -3286,7 +3293,7 @@ msgstr "o %(low)s"
 msgid "From %(name)s."
 msgstr "Gan %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "cyfeiriad yr anfonwr"
@@ -3347,6 +3354,16 @@ msgstr "Gemau"
 #, draft
 msgid "Get"
 msgstr "Nôl"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Yn fy nghael i'n ôl i mewn"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Yn fy nghael i'n ôl i mewn — angen ei gadarnhau yn gyntaf"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3653,7 +3670,7 @@ msgid ""
 msgstr ""
 "Os ydych wedi gwneud cais i sefydliad yr UE neu drwy wasanaeth cyflogaeth cenedlaethol, mae'r ffeil hon gennych eisoes. Yn hytrach na theipio'r cyfan eto, trosglwyddwch hi."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "anwybyddu robots.txt wrth ddal"
@@ -3839,7 +3856,7 @@ msgstr "Wedi'i osod ar y gosodiad hwn"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Mae gosod ategyn yn rhedeg cod rhywun arall y tu mewn i Postulo."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "enw'r gosodiad"
@@ -4066,7 +4083,7 @@ msgid ""
 msgstr ""
 "Cedwir ef yn %(file)s ac fe'i cylchdroir yn ôl maint, felly ni all hyn lenwi'r ddisg. Mae popeth yma'n mynd i'r consol hefyd, lle mae <code>docker logs</code> yn ei ddarllen."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4144,7 +4161,7 @@ msgstr "Ieithoedd"
 msgid "languages"
 msgstr "ieithoedd"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "ieithoedd a gynigir"
@@ -4482,7 +4499,7 @@ msgstr "Llythrennau bach, digidau, dotiau, tanlinellau a chysylltnodau."
 msgid "Made"
 msgstr "Crëwyd"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "methiannau post yn olynol"
@@ -4507,7 +4524,7 @@ msgstr[2] ""
 msgstr[3] ""
 "Post yw'r unig ffordd yn ôl i mewn i gyfrif yma, felly hyd nes y bydd hyn yn gweithio eto ni all yr un o'r %(counter)s o bobl ar y llwyfan hwn ddod yn ôl i mewn os byddant yn anghofio eu cyfrinair."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "methiant diwethaf y post"
@@ -4517,7 +4534,7 @@ msgstr "methiant diwethaf y post"
 msgid "Mail last went out at %(when)s."
 msgstr "Aeth post allan ddiwethaf am %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "y tro diwethaf i'r post weithio"
@@ -4536,7 +4553,7 @@ msgid ""
 msgstr ""
 "Nid yw'r post yn dal y cludiant yn ei le mwyach chwaith, oherwydd nid yw llwybr nad yw'n danfon dim yn amddiffyn neb."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "cludiant post"
@@ -4546,7 +4563,7 @@ msgstr "cludiant post"
 msgid "Mail transport"
 msgstr "Cludiant post"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "gwall diwethaf y post"
@@ -5091,7 +5108,7 @@ msgstr "Ni ddaeth neb i'r %(kind)s"
 msgid "Non-profit"
 msgstr "Dim er elw"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Dim"
@@ -5703,6 +5720,13 @@ msgstr "Dim ond cofnodion nad ydynt eisoes ar y CV hwn a restrir."
 msgid "Only http and https addresses can be captured."
 msgstr "Dim ond cyfeiriadau http a https y gellir eu dal."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Dim ond un o'ch rhifau eich hun all eich cael yn ôl i mewn i'ch cyfrif. Mae hwn yn perthyn i rywun rydych yn delio ag ef."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5886,7 +5910,7 @@ msgstr "Wedi'i chyfieithu'n rhannol"
 msgid "Passkeys"
 msgstr "Allweddi mynediad"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "cyfrinair"
@@ -5996,7 +6020,7 @@ msgstr "Safle personol"
 msgid "Pharmaceuticals"
 msgstr "Fferylliaeth"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6109,7 +6133,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP neu GIF hyd at 5 MB. Caiff ei dorri'n sgwâr a'i lanhau o unrhyw beth a wyddai'r ffeil am ble y'i tynnwyd."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "porth"
@@ -6672,7 +6696,7 @@ msgid ""
 msgstr ""
 "Mae cofrestru ar agor: caiff unrhyw un sy'n dod o hyd i'r cyfeiriad greu cyfrif."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "cofrestru ar agor"
@@ -6743,7 +6767,7 @@ msgstr "cyfeiriad pell"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -7036,7 +7060,7 @@ msgstr "Cadwyd."
 msgid "Say what this identifier is."
 msgstr "Dywedwch beth yw'r dynodydd hwn."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Dywedwch beth yw'r rhif hwn."
@@ -7350,7 +7374,7 @@ msgstr "Dangos yn y llywio"
 msgid "Show past too"
 msgstr "Dangos y rhai a fu hefyd"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Dangosir yn y pennawd ac ar y dudalen fewngofnodi."
@@ -7394,7 +7418,7 @@ msgstr "Yn mewngofnodi i gyfrif sy'n bodoli drwy e-bost"
 msgid "Single sign-on"
 msgstr "Mewngofnodi sengl"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "mae mewngofnodi sengl yn cyfrif fel yr ail ffactor"
@@ -7409,7 +7433,7 @@ msgstr "Mae mewngofnodi sengl yn cyfrif fel yr ail ffactor"
 msgid "Site search"
 msgstr "Chwilio'r safle"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "gosodiadau'r safle"
@@ -7472,7 +7496,7 @@ msgstr "Arafaf"
 msgid "slug"
 msgstr "enw byr"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "Gweinydd SMTP"
@@ -7574,7 +7598,7 @@ msgid ""
 msgstr ""
 "Mae STARTTLS yn cysylltu ac yna'n uwchraddio, sef yr hyn y mae porth 587 yn ei ddisgwyl. TLS o'r beit cyntaf yw'r hyn y mae porth 465 yn ei ddisgwyl. Nid ydynt yn gyfnewidiol: anelwch un at borth y llall ac mae pob un yn aros i'r llall siarad."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, ar ôl cysylltu"
@@ -7800,7 +7824,7 @@ msgstr "tag"
 msgid "Tag"
 msgstr "Tag"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "arwyddair"
@@ -7854,12 +7878,12 @@ msgstr "ffôn"
 msgid "Telephone number"
 msgstr "Rhif ffôn"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "rhif ffôn"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7900,17 +7924,17 @@ msgstr "Profi'r cysylltiad"
 msgid "text as sent"
 msgstr "testun fel yr anfonwyd"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "cyfluniad negeseuon"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "cyfrinachau negeseuon"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "cludiant negeseuon"
@@ -8152,6 +8176,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Nid oes gwlad o flaen y rhif hwnnw, felly ni ellir ei ddeialu o unman arall. Dewiswch y wlad, neu ysgrifennwch ef gan ddechrau â +."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Rhaid cadarnhau'r rhif hwnnw cyn iddo allu eich cael yn ôl i mewn."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8445,6 +8474,13 @@ msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr ""
 "Y cyfweliadau nesaf yn y dyddiadur, ac unrhyw rai a aeth heibio heb ganlyniad."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Mae'r rhif sy'n eich cael yn ôl i mewn ar wahân i'r un mae eich dogfennau'n ei argraffu, felly nid yw newid yr hyn mae recriwtiwr yn ei ddeialu yn newid sut rydych yn profi mai chi ydyw. Rhaid ei gadarnhau yn gyntaf, ac nid yw diffodd sawl rhif ffôn byth yn ei gymryd i ffwrdd."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8773,7 +8809,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Mae'r math hwn o ddynodydd eisoes ar y rhestr."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Mae'r rhif hwn eisoes ar y rhestr."
@@ -8841,7 +8877,7 @@ msgstr "cofnod llinell amser"
 msgid "Timeout"
 msgstr "Terfyn amser"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "terfyn amser mewn eiliadau"
@@ -8857,7 +8893,7 @@ msgstr "teitl"
 msgid "Title, company or location"
 msgstr "Teitl, cwmni neu leoliad"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS o'r beit cyntaf"
@@ -8929,12 +8965,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Trafnidiaeth a logisteg"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "ffurfweddiad y cludiant"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "cyfrinachau'r cludiant"
@@ -9029,12 +9065,12 @@ msgid "Update the preview"
 msgstr "Diweddaru'r rhagolwg"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "diweddarwyd ar"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "diweddarwyd gan"
@@ -9133,7 +9169,7 @@ msgstr "defnyddiwr"
 msgid "Username"
 msgstr "Enw defnyddiwr"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "enw defnyddiwr"
@@ -9251,6 +9287,11 @@ msgstr "Yn aros i gael ei defnyddio"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "«%(text)s» oedd"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "ffordd yn ôl i mewn i'r cyfrif"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9553,12 +9594,12 @@ msgstr "ble rydych yn byw"
 msgid "Where your job search stands today."
 msgstr "Ble mae eich chwiliad am waith arni heddiw."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "A gaiff unrhyw un sy'n dod o hyd i'r cyfeiriad greu cyfrif."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9804,7 +9845,7 @@ msgid ""
 msgstr ""
 "Rydych wedi gwneud cais am hon o'r blaen. Mae cofnodi ail gais yn iawn; mae'r ddau'n aros ar y cofnod."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

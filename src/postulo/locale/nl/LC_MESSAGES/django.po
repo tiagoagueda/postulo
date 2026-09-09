@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Nederlands\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s gepland op %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s bij %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -499,7 +499,7 @@ msgstr "Een CSV-bestand"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Een hint voor de interface, zoals “amber” of “sky”."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Een regel onder de naam op de inlogpagina. Optioneel."
@@ -516,7 +516,14 @@ msgid ""
 msgstr ""
 "Een mobiel, een vaste lijn, een centrale — zoveel als de moeite waard is, met er één aangemerkt als de nummer om te gebruiken. Documenten drukken dat nummer af."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Een nummer moet bevestigd zijn voordat het je weer binnen kan laten. Op dit nummer heeft niemand geantwoord."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1939,7 +1946,7 @@ msgstr "Koppeling verwijderd, geheimen inbegrepen."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Koppeling opgeslagen. Test haar om te zien of ze werkt."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "beveiliging van de verbinding"
@@ -2357,12 +2364,12 @@ msgstr "Afgewezen"
 msgid "Declined. It will not be suggested again."
 msgstr "Afgewezen. Het wordt niet opnieuw voorgesteld."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "standaardtaal"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "standaardtijdzone"
@@ -2989,7 +2996,7 @@ msgstr "Apart geëxporteerd"
 msgid "Failed"
 msgstr "Mislukt"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Mislukt zonder te zeggen waarom."
@@ -3246,7 +3253,7 @@ msgstr "vanaf %(low)s"
 msgid "From %(name)s."
 msgstr "Van %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "afzenderadres"
@@ -3307,6 +3314,16 @@ msgstr "Gaming"
 #, draft
 msgid "Get"
 msgstr "Ophalen"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Laat me weer binnen"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Laat me weer binnen — moet eerst bevestigd worden"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3610,7 +3627,7 @@ msgid ""
 msgstr ""
 "Hebt u gesolliciteerd bij een EU-instelling of via een nationale arbeidsbemiddeling, dan hebt u dit bestand al. In plaats van alles opnieuw te typen: geef het hier."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "robots.txt negeren bij vastleggen"
@@ -3796,7 +3813,7 @@ msgstr "Geïnstalleerd op deze instantie"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Een plug-in installeren voert andermans code uit binnen Postulo."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "naam van de instantie"
@@ -4023,7 +4040,7 @@ msgid ""
 msgstr ""
 "Bewaard in %(file)s en op grootte geroteerd, dus dit kan de schijf niet vullen. Alles hier gaat ook naar de console, waar <code>docker logs</code> het leest."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4101,7 +4118,7 @@ msgstr "Talen"
 msgid "languages"
 msgstr "talen"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "aangeboden talen"
@@ -4439,7 +4456,7 @@ msgstr "Kleine letters, cijfers, punten, underscores en koppeltekens."
 msgid "Made"
 msgstr "Gemaakt"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "mailfouten op rij"
@@ -4460,7 +4477,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Mail is hier de enige weg terug in een account, dus tot dit weer werkt kan geen van de %(counter)s personen op deze instantie er nog in als ze hun wachtwoord vergeten."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "mail laatst mislukt"
@@ -4470,7 +4487,7 @@ msgstr "mail laatst mislukt"
 msgid "Mail last went out at %(when)s."
 msgstr "De mail ging voor het laatst uit om %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "mail werkte voor het laatst"
@@ -4489,7 +4506,7 @@ msgid ""
 msgstr ""
 "De mail houdt ook het transport niet langer op zijn plaats, want een weg die niets bezorgt beschermt niemand."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "e-mailtransport"
@@ -4499,7 +4516,7 @@ msgstr "e-mailtransport"
 msgid "Mail transport"
 msgstr "E-mailtransport"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "laatste mailfout"
@@ -5045,7 +5062,7 @@ msgstr "Niemand kwam opdagen voor het %(kind)s"
 msgid "Non-profit"
 msgstr "Non-profit"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Geen"
@@ -5638,6 +5655,13 @@ msgstr "Alleen vermeldingen die nog niet op dit cv staan worden getoond."
 msgid "Only http and https addresses can be captured."
 msgstr "Alleen http- en https-adressen kunnen worden vastgelegd."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Alleen een van je eigen nummers kan je weer in je account laten. Dit is van iemand met wie je zaken doet."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5820,7 +5844,7 @@ msgstr "Gedeeltelijk vertaald"
 msgid "Passkeys"
 msgstr "Passkeys"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "wachtwoord"
@@ -5929,7 +5953,7 @@ msgstr "Eigen website"
 msgid "Pharmaceuticals"
 msgstr "Farmacie"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6042,7 +6066,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP of GIF tot 5 MB. Het wordt vierkant bijgesneden en ontdaan van alles wat het bestand wist over waar het is genomen."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "poort"
@@ -6601,7 +6625,7 @@ msgid ""
 msgstr ""
 "Registratie staat open: iedereen die het adres vindt kan een account aanmaken."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "registratie open"
@@ -6671,7 +6695,7 @@ msgstr "extern adres"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6963,7 +6987,7 @@ msgstr "Opgeslagen."
 msgid "Say what this identifier is."
 msgstr "Zeg wat deze identificatie is."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Zeg wat dit nummer is."
@@ -7278,7 +7302,7 @@ msgstr "Tonen in de navigatie"
 msgid "Show past too"
 msgstr "Ook voorbije tonen"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Getoond in de kop en op de inlogpagina."
@@ -7322,7 +7346,7 @@ msgstr "Meldt aan bij een bestaand account via e-mail"
 msgid "Single sign-on"
 msgstr "Single sign-on"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "eenmalige aanmelding telt als tweede factor"
@@ -7337,7 +7361,7 @@ msgstr "Eenmalige aanmelding telt als tweede factor"
 msgid "Site search"
 msgstr "Zoeken op de site"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "site-instellingen"
@@ -7400,7 +7424,7 @@ msgstr "Traagst"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "SMTP-server"
@@ -7502,7 +7526,7 @@ msgid ""
 msgstr ""
 "STARTTLS verbindt en waardeert daarna op, wat poort 587 verwacht. TLS vanaf de eerste byte is wat poort 465 verwacht. Ze zijn niet uitwisselbaar: richt de een op de poort van de ander en elk wacht tot de ander iets zegt."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, na het verbinden"
@@ -7729,7 +7753,7 @@ msgstr "tag"
 msgid "Tag"
 msgstr "Tag"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "slogan"
@@ -7783,12 +7807,12 @@ msgstr "telefoon"
 msgid "Telephone number"
 msgstr "Telefoonnummer"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "telefoonnummer"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7830,17 +7854,17 @@ msgstr "Test de verbinding"
 msgid "text as sent"
 msgstr "tekst zoals verstuurd"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "berichtinstellingen"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "berichtgeheimen"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "berichttransport"
@@ -8079,6 +8103,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Voor dat nummer staat geen land, dus het kan nergens anders vandaan gebeld worden. Kies het land, of schrijf het met een + ervoor."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Dat nummer moet bevestigd zijn voordat het je weer binnen kan laten."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8368,6 +8397,13 @@ msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr ""
 "De eerstvolgende gesprekken in de agenda, en die zonder genoteerde uitkomst."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Het nummer dat je weer binnenlaat staat los van het nummer dat je documenten afdrukken, dus het nummer wijzigen dat een recruiter belt verandert niet hoe je bewijst dat jij het bent. Het moet eerst bevestigd worden, en meerdere telefoonnummers uitschakelen neemt het je nooit af."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8691,7 +8727,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Dit soort identificatie staat al in de lijst."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Dit nummer staat al in de lijst."
@@ -8758,7 +8794,7 @@ msgstr "tijdlijnvermelding"
 msgid "Timeout"
 msgstr "Time-out"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "time-out in seconden"
@@ -8774,7 +8810,7 @@ msgstr "titel"
 msgid "Title, company or location"
 msgstr "Titel, bedrijf of locatie"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS vanaf de eerste byte"
@@ -8846,12 +8882,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Transport en logistiek"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "transportconfiguratie"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "transportgeheimen"
@@ -8947,12 +8983,12 @@ msgid "Update the preview"
 msgstr "Voorbeeld bijwerken"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "bijgewerkt op"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "bijgewerkt door"
@@ -9051,7 +9087,7 @@ msgstr "gebruiker"
 msgid "Username"
 msgstr "Gebruikersnaam"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "gebruikersnaam"
@@ -9168,6 +9204,11 @@ msgstr "Wacht op gebruik"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "was “%(text)s”"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "weg terug in het account"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9468,12 +9509,12 @@ msgstr "waar u woont"
 msgid "Where your job search stands today."
 msgstr "Waar uw zoektocht naar werk vandaag staat."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Of iedereen die het adres vindt een account mag aanmaken."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9717,7 +9758,7 @@ msgid ""
 msgstr ""
 "U hebt hier al eerder gesolliciteerd. Een tweede sollicitatie vastleggen is prima; beide blijven in het dossier."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

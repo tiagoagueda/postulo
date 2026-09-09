@@ -131,6 +131,25 @@ which numbers have accounts here, so after a score of them in an hour Postulo sa
 answer will be available again instead. You will not meet this while recording your own
 numbers: only the informative answer is counted.
 
+### The number that gets you back in
+
+A confirmed number of your own can be nominated as the way back into your account, joining
+email and a passkey. Two things about it are deliberate.
+
+**It is not the primary.** The primary is what your CV and letters print — a recruiter dials
+it. If the same row were also your way back in, changing the number on your CV would silently
+change how you prove you are you. They are separate choices, and changing one never touches
+the other.
+
+**Switching off *several telephone numbers* never takes it away.** That plugin decides what
+Postulo shows and uses; it does not decide whether you can get back into your account. An
+administrator turning a feature off for somebody must not quietly remove their way in, so
+recovery reads a confirmed number regardless of it.
+
+The choice only appears if this instance can confirm a number at all, which needs a text
+gateway the operator installed — Postulo ships none. Until then no number is nominated
+anywhere, and the interlock that keeps mail switched on stays shut for everybody.
+
 ## Two views of the same thing
 
 - **Board** shows only live applications, in columns by status. Move one along with the

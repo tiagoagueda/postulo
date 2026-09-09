@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Malti\n"
@@ -193,7 +193,7 @@ msgstr "%(kind)s skedata għal %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s ma' %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -534,7 +534,7 @@ msgstr "Fajl CSV"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Ħjiel għall-interfaċċa, bħal “amber” jew “sky”."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Linja taħt l-isem fil-paġna tal-login. Fakultattiv."
@@ -551,7 +551,14 @@ msgid ""
 msgstr ""
 "Mowbajl, linja fissa, ċentralin — kemm jiswa li żżomm, b'wieħed immarkat bħala dak li għandu jintuża. Id-dokumenti jistampaw dak."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Numru jrid jiġi kkonfermat qabel ma jkun jista' jdaħħlek lura. Ħadd ma wieġeb fuq dan."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1979,7 +1986,7 @@ msgstr "Konnessjoni mneħħija, sigrieti inklużi."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Konnessjoni ssejvjata. Ittestjaha biex tkun ċert li taħdem."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "sigurtà tal-konnessjoni"
@@ -2397,12 +2404,12 @@ msgstr "Irrifjutata"
 msgid "Declined. It will not be suggested again."
 msgstr "Irrifjutata. Mhux se terġa' tiġi ssuġġerita."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "lingwa awtomatika"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "żona tal-ħin awtomatika"
@@ -3028,7 +3035,7 @@ msgstr "Esportat waħdu"
 msgid "Failed"
 msgstr "Falla"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Falla mingħajr ma qal għaliex."
@@ -3283,7 +3290,7 @@ msgstr "minn %(low)s"
 msgid "From %(name)s."
 msgstr "Mingħand %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "indirizz tal-mittent"
@@ -3344,6 +3351,16 @@ msgstr "Logħob"
 #, draft
 msgid "Get"
 msgstr "Ġib"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Idaħħalni lura"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Idaħħalni lura — irid jiġi kkonfermat l-ewwel"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3647,7 +3664,7 @@ msgid ""
 msgstr ""
 "Jekk applikajt ma' istituzzjoni tal-UE jew permezz ta' servizz nazzjonali tal-impjiegi, dan il-fajl diġà għandek. Minflok tittajpja kollox mill-ġdid, agħtih hawn."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "injora robots.txt waqt il-qbid"
@@ -3833,7 +3850,7 @@ msgstr "Installat fuq din l-istanza"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Li tinstalla plugin iħaddem il-kodiċi ta' ħaddieħor ġewwa Postulo."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "isem tal-istanza"
@@ -4059,7 +4076,7 @@ msgid ""
 msgstr ""
 "Miżmum f’%(file)s u mibdul skont id-daqs, għalhekk ma jistax jimla d-diska. Kollox hawn imur ukoll fil-console, fejn <code>docker logs</code> jaqrah."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4137,7 +4154,7 @@ msgstr "Lingwi"
 msgid "languages"
 msgstr "lingwi"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "lingwi offruti"
@@ -4475,7 +4492,7 @@ msgstr "Ittri żgħar, ċifri, punti, underscores u sing."
 msgid "Made"
 msgstr "Magħmul"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "falliment tal-posta wara xulxin"
@@ -4500,7 +4517,7 @@ msgstr[2] ""
 msgstr[3] ""
 "Hawn il-posta hija l-unika triq lura f'kont, u għalhekk sakemm dan jerġa' jaħdem ħadd mill-%(counter)s persuni fuq din l-istanza ma jista' jerġa' jidħol jekk jinsa l-password tiegħu."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "il-posta l-aħħar falliet"
@@ -4510,7 +4527,7 @@ msgstr "il-posta l-aħħar falliet"
 msgid "Mail last went out at %(when)s."
 msgstr "Il-posta l-aħħar ħarġet fil-%(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "il-posta l-aħħar ħadmet"
@@ -4529,7 +4546,7 @@ msgid ""
 msgstr ""
 "Il-posta lanqas ma żżomm aktar it-trasport f'postu, għax triq li ma twassal xejn ma tipproteġi lil ħadd."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "trasport tal-posta"
@@ -4539,7 +4556,7 @@ msgstr "trasport tal-posta"
 msgid "Mail transport"
 msgstr "Trasport tal-posta"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "l-aħħar żball tal-posta"
@@ -5085,7 +5102,7 @@ msgstr "Ħadd ma deher għall-%(kind)s"
 msgid "Non-profit"
 msgstr "Mhux għall-profitt"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Xejn"
@@ -5697,6 +5714,13 @@ msgstr "Jiġu elenkati biss entrati li għadhom mhumiex fuq dan is-CV."
 msgid "Only http and https addresses can be captured."
 msgstr "Jistgħu jinqabdu biss indirizzi http u https."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Wieħed biss min-numri tiegħek stess jista' jdaħħlek lura fil-kont tiegħek. Dan jappartjeni lil xi ħadd li tittratta miegħu."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5878,7 +5902,7 @@ msgstr "Tradott parzjalment"
 msgid "Passkeys"
 msgstr "Passkeys"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "password"
@@ -5987,7 +6011,7 @@ msgstr "Sit personali"
 msgid "Pharmaceuticals"
 msgstr "Farmaċewtika"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6100,7 +6124,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP jew GIF sa 5 MB. Tinqata' kwadra u titneħħa minn kulma l-fajl kien jaf dwar fejn ittieħdet."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "port"
@@ -6661,7 +6685,7 @@ msgid ""
 msgstr ""
 "Ir-reġistrazzjoni hija miftuħa: kull min isib l-indirizz jista' joħloq kont."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "reġistrazzjoni miftuħa"
@@ -6731,7 +6755,7 @@ msgstr "indirizz remot"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -7023,7 +7047,7 @@ msgstr "Issejvjat."
 msgid "Say what this identifier is."
 msgstr "Għid x'inhu dan l-identifikatur."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Għid x'inhu dan in-numru."
@@ -7336,7 +7360,7 @@ msgstr "Uri fin-navigazzjoni"
 msgid "Show past too"
 msgstr "Uri wkoll dawk li għaddew"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Jintwera fl-intestatura u fil-paġna tal-login."
@@ -7380,7 +7404,7 @@ msgstr "Jidħol f’kont eżistenti bl-email"
 msgid "Single sign-on"
 msgstr "Single sign-on"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "id-dħul uniku jgħodd bħala t-tieni fattur"
@@ -7395,7 +7419,7 @@ msgstr "Id-dħul uniku jgħodd bħala t-tieni fattur"
 msgid "Site search"
 msgstr "Fittex fis-sit"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "settings tas-sit"
@@ -7458,7 +7482,7 @@ msgstr "L-aktar bil-mod"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "Server SMTP"
@@ -7560,7 +7584,7 @@ msgid ""
 msgstr ""
 "STARTTLS jgħaqqad u mbagħad jaġġorna, li huwa dak li jistenna l-port 587. TLS mill-ewwel byte huwa dak li jistenna l-port 465. Mhumiex interkambjabbli: immira wieħed lejn il-port tal-ieħor u kull wieħed jistenna li l-ieħor jitkellem."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, wara l-konnessjoni"
@@ -7786,7 +7810,7 @@ msgstr "tag"
 msgid "Tag"
 msgstr "Tag"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "tagline"
@@ -7840,12 +7864,12 @@ msgstr "telefown"
 msgid "Telephone number"
 msgstr "Numru tat-telefon"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "numru tat-telefon"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7886,17 +7910,17 @@ msgstr "Ittestja l-konnessjoni"
 msgid "text as sent"
 msgstr "test kif intbagħat"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "konfigurazzjoni tal-messaġġi"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "sigrieti tal-messaġġi"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "trasport tal-messaġġi"
@@ -8134,6 +8158,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Dak in-numru m'għandu l-ebda pajjiż quddiemu, u għalhekk ma jistax jiġi mċempel minn imkien ieħor. Agħżel il-pajjiż, jew iktbu billi tibda b'+."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Dak in-numru jrid jiġi kkonfermat qabel ma jkun jista' jdaħħlek lura."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8425,6 +8454,13 @@ msgstr "Ir-rekord ewlieni. Varjant tas-CV jagħżel minn dan; qatt ma jikkopjah.
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "L-intervisti li jmiss fid-djarju, u dawk li għaddew mingħajr riżultat."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"In-numru li jdaħħlek lura huwa separat minn dak li jistampaw id-dokumenti tiegħek, u għalhekk li tibdel dak li jċempel reklutatur ma jbiddilx kif tipprova li int int. Irid jiġi kkonfermat l-ewwel, u t-tifi ta' numri tat-telefon multipli qatt ma jeħodhulek."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8750,7 +8786,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Dan it-tip ta' identifikatur diġà elenkat."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Dan in-numru diġà qiegħed fil-lista."
@@ -8818,7 +8854,7 @@ msgstr "entrata fil-linja taż-żmien"
 msgid "Timeout"
 msgstr "Timeout"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "timeout f'sekondi"
@@ -8834,7 +8870,7 @@ msgstr "titlu"
 msgid "Title, company or location"
 msgstr "Titlu, kumpanija jew post"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS mill-ewwel byte"
@@ -8906,12 +8942,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Trasport u loġistika"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "konfigurazzjoni tat-trasport"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "sigrieti tat-trasport"
@@ -9007,12 +9043,12 @@ msgid "Update the preview"
 msgstr "Aġġorna l-anteprima"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "aġġornat fi"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "aġġornat minn"
@@ -9111,7 +9147,7 @@ msgstr "utent"
 msgid "Username"
 msgstr "Isem tal-utent"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "isem tal-utent"
@@ -9229,6 +9265,11 @@ msgstr "Qed jistenna li jintuża"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "kienet “%(text)s”"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "triq lura fil-kont"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9526,12 +9567,12 @@ msgstr "fejn tgħix"
 msgid "Where your job search stands today."
 msgstr "Fejn tinsab it-tfittxija tiegħek għax-xogħol illum."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Jekk kull min isib l-indirizz jistax joħloq kont."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9775,7 +9816,7 @@ msgid ""
 msgstr ""
 "Diġà applikajt għal dan qabel. Li tirreġistra t-tieni applikazzjoni huwa tajjeb; it-tnejn jibqgħu fir-rekord."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Ελληνικά\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s προγραμματίστηκε για %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s στην %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -503,7 +503,7 @@ msgstr "Ένα αρχείο CSV"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Μια υπόδειξη για τη διεπαφή, όπως «amber» ή «sky»."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Μια γραμμή κάτω από το όνομα στη σελίδα σύνδεσης. Προαιρετικό."
@@ -520,7 +520,14 @@ msgid ""
 msgstr ""
 "Ένα κινητό, μια σταθερή γραμμή, ένα τηλεφωνικό κέντρο — όσα αξίζει να κρατήσετε, με ένα σημειωμένο ως αυτό που θα χρησιμοποιείται. Τα έγγραφα τυπώνουν εκείνο."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Ένας αριθμός πρέπει να επιβεβαιωθεί πριν μπορέσει να σας ξαναβάλει μέσα. Σε αυτόν δεν απάντησε κανείς."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1945,7 +1952,7 @@ msgstr "Η σύνδεση αφαιρέθηκε, μαζί με τα μυστικ�
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Η σύνδεση αποθηκεύτηκε. Δοκιμάστε την για να βεβαιωθείτε ότι λειτουργεί."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "ασφάλεια σύνδεσης"
@@ -2363,12 +2370,12 @@ msgstr "Απορρίφθηκε"
 msgid "Declined. It will not be suggested again."
 msgstr "Απορρίφθηκε. Δεν θα προταθεί ξανά."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "προεπιλεγμένη γλώσσα"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "προεπιλεγμένη ζώνη ώρας"
@@ -2994,7 +3001,7 @@ msgstr "Εξήχθη ξεχωριστά"
 msgid "Failed"
 msgstr "Απέτυχε"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Απέτυχε χωρίς να πει γιατί."
@@ -3249,7 +3256,7 @@ msgstr "από %(low)s"
 msgid "From %(name)s."
 msgstr "Από %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "διεύθυνση αποστολέα"
@@ -3310,6 +3317,16 @@ msgstr "Παιχνίδια"
 #, draft
 msgid "Get"
 msgstr "Λήψη"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Με ξαναβάζει μέσα"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Με ξαναβάζει μέσα — χρειάζεται πρώτα επιβεβαίωση"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3612,7 +3629,7 @@ msgid ""
 msgstr ""
 "Αν έχετε υποβάλει αίτηση σε θεσμικό όργανο της ΕΕ ή μέσω εθνικής υπηρεσίας απασχόλησης, έχετε ήδη αυτό το αρχείο. Αντί να τα πληκτρολογήσετε όλα ξανά, δώστε το."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "αγνόηση του robots.txt κατά τη σύλληψη"
@@ -3798,7 +3815,7 @@ msgstr "Εγκατεστημένα σε αυτή την εγκατάσταση"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Η εγκατάσταση ενός πρόσθετου εκτελεί ξένο κώδικα μέσα στο Postulo."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "όνομα εγκατάστασης"
@@ -4025,7 +4042,7 @@ msgid ""
 msgstr ""
 "Φυλάσσεται στο %(file)s και εναλλάσσεται κατά μέγεθος, οπότε δεν μπορεί να γεμίσει τον δίσκο. Όλα εδώ πηγαίνουν και στην κονσόλα, όπου τα διαβάζει το <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4103,7 +4120,7 @@ msgstr "Γλώσσες"
 msgid "languages"
 msgstr "γλώσσες"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "προσφερόμενες γλώσσες"
@@ -4441,7 +4458,7 @@ msgstr "Πεζά γράμματα, ψηφία, τελείες, κάτω παύλ
 msgid "Made"
 msgstr "Δημιουργήθηκε"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "αποτυχίες αλληλογραφίας στη σειρά"
@@ -4462,7 +4479,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Η αλληλογραφία είναι εδώ ο μόνος δρόμος πίσω σε έναν λογαριασμό, οπότε ώσπου να ξαναλειτουργήσει κανένα από τα %(counter)s άτομα σε αυτή την εγκατάσταση δεν μπορεί να ξαναμπεί αν ξεχάσει τον κωδικό του."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "τελευταία αποτυχία αλληλογραφίας"
@@ -4472,7 +4489,7 @@ msgstr "τελευταία αποτυχία αλληλογραφίας"
 msgid "Mail last went out at %(when)s."
 msgstr "Η αλληλογραφία βγήκε τελευταία φορά στις %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "τελευταία φορά που λειτούργησε η αλληλογραφία"
@@ -4491,7 +4508,7 @@ msgid ""
 msgstr ""
 "Η αλληλογραφία δεν κρατά πια ούτε τη μεταφορά στη θέση της, γιατί μια διαδρομή που δεν παραδίδει τίποτα δεν προστατεύει κανέναν."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "μεταφορέας αλληλογραφίας"
@@ -4501,7 +4518,7 @@ msgstr "μεταφορέας αλληλογραφίας"
 msgid "Mail transport"
 msgstr "Μεταφορέας αλληλογραφίας"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "τελευταίο σφάλμα αλληλογραφίας"
@@ -5047,7 +5064,7 @@ msgstr "Κανείς δεν εμφανίστηκε στο %(kind)s"
 msgid "Non-profit"
 msgstr "Μη κερδοσκοπικός τομέας"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Καμία"
@@ -5644,6 +5661,13 @@ msgstr "Εμφανίζονται μόνο καταχωρίσεις που δεν
 msgid "Only http and https addresses can be captured."
 msgstr "Μόνο διευθύνσεις http και https μπορούν να συλληφθούν."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Μόνο ένας από τους δικούς σας αριθμούς μπορεί να σας ξαναβάλει στον λογαριασμό σας. Αυτός ανήκει σε κάποιον με τον οποίο συναλλάσσεστε."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5827,7 +5851,7 @@ msgstr "Μερικώς μεταφρασμένο"
 msgid "Passkeys"
 msgstr "Κλειδιά πρόσβασης"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "κωδικός πρόσβασης"
@@ -5937,7 +5961,7 @@ msgstr "Προσωπικός ιστότοπος"
 msgid "Pharmaceuticals"
 msgstr "Φαρμακευτική"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6051,7 +6075,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP ή GIF έως 5 MB. Περικόπτεται σε τετράγωνο και αφαιρείται ό,τι ήξερε το αρχείο για το πού τραβήχτηκε."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "θύρα"
@@ -6611,7 +6635,7 @@ msgid ""
 msgstr ""
 "Η εγγραφή είναι ανοιχτή: όποιος βρει τη διεύθυνση μπορεί να δημιουργήσει λογαριασμό."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "εγγραφή ανοιχτή"
@@ -6682,7 +6706,7 @@ msgstr "απομακρυσμένη διεύθυνση"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6975,7 +6999,7 @@ msgstr "Αποθηκεύτηκε."
 msgid "Say what this identifier is."
 msgstr "Πείτε τι είναι αυτό το αναγνωριστικό."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Πείτε τι είναι αυτός ο αριθμός."
@@ -7289,7 +7313,7 @@ msgstr "Εμφάνιση στην πλοήγηση"
 msgid "Show past too"
 msgstr "Εμφάνιση και παρελθόντων"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Εμφανίζεται στην κεφαλίδα και στη σελίδα σύνδεσης."
@@ -7333,7 +7357,7 @@ msgstr "Σύνδεση σε υπάρχοντα λογαριασμό μέσω ema
 msgid "Single sign-on"
 msgstr "Ενιαία σύνδεση"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "η ενιαία σύνδεση μετρά ως δεύτερος παράγοντας"
@@ -7348,7 +7372,7 @@ msgstr "Η ενιαία σύνδεση μετρά ως δεύτερος παρά
 msgid "Site search"
 msgstr "Αναζήτηση στον ιστότοπο"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "ρυθμίσεις ιστότοπου"
@@ -7411,7 +7435,7 @@ msgstr "Βραδύτερο"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "Διακομιστής SMTP"
@@ -7513,7 +7537,7 @@ msgid ""
 msgstr ""
 "Το STARTTLS συνδέεται και μετά αναβαθμίζει, που είναι αυτό που περιμένει η θύρα 587. Το TLS από το πρώτο byte είναι αυτό που περιμένει η θύρα 465. Δεν είναι εναλλάξιμα: στρέψτε το ένα στη θύρα του άλλου και το καθένα περιμένει να μιλήσει το άλλο."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, μετά τη σύνδεση"
@@ -7740,7 +7764,7 @@ msgstr "ετικέτα"
 msgid "Tag"
 msgstr "Ετικέτα"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "σύνθημα"
@@ -7794,12 +7818,12 @@ msgstr "τηλέφωνο"
 msgid "Telephone number"
 msgstr "Αριθμός τηλεφώνου"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "αριθμός τηλεφώνου"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7840,17 +7864,17 @@ msgstr "Δοκιμή της σύνδεσης"
 msgid "text as sent"
 msgstr "κείμενο όπως στάλθηκε"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "ρύθμιση μηνυμάτων"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "μυστικά μηνυμάτων"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "μεταφορά μηνυμάτων"
@@ -8089,6 +8113,12 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Αυτός ο αριθμός δεν έχει χώρα μπροστά του, οπότε δεν μπορεί να κληθεί από πουθενά αλλού. Επιλέξτε τη χώρα ή γράψτε τον ξεκινώντας με +."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr ""
+"Αυτός ο αριθμός πρέπει να επιβεβαιωθεί πριν μπορέσει να σας ξαναβάλει μέσα."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8379,6 +8409,13 @@ msgstr ""
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Οι επόμενες συνεντεύξεις στο ημερολόγιο, και όσες πέρασαν χωρίς έκβαση."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Ο αριθμός που σας ξαναβάζει μέσα είναι χωριστός από αυτόν που τυπώνουν τα έγγραφά σας, οπότε αλλάζοντας αυτόν που καλεί ένας υπεύθυνος προσλήψεων δεν αλλάζετε τον τρόπο που αποδεικνύετε ότι είστε εσείς. Πρέπει πρώτα να επιβεβαιωθεί, και το κλείσιμο των πολλαπλών αριθμών τηλεφώνου δεν σας τον αφαιρεί ποτέ."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8703,7 +8740,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Αυτό το είδος αναγνωριστικού είναι ήδη στη λίστα."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Αυτός ο αριθμός υπάρχει ήδη στη λίστα."
@@ -8770,7 +8807,7 @@ msgstr "καταχώριση χρονολογίου"
 msgid "Timeout"
 msgstr "Χρονικό όριο"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "χρονικό όριο σε δευτερόλεπτα"
@@ -8786,7 +8823,7 @@ msgstr "τίτλος"
 msgid "Title, company or location"
 msgstr "Τίτλος, εταιρεία ή τοποθεσία"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS από το πρώτο byte"
@@ -8859,12 +8896,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Μεταφορές και εφοδιαστική"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "ρυθμίσεις μεταφορέα"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "μυστικά μεταφορέα"
@@ -8960,12 +8997,12 @@ msgid "Update the preview"
 msgstr "Ενημέρωση της προεπισκόπησης"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "ενημερώθηκε στις"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "ενημερώθηκε από"
@@ -9064,7 +9101,7 @@ msgstr "χρήστης"
 msgid "Username"
 msgstr "Όνομα χρήστη"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "όνομα χρήστη"
@@ -9182,6 +9219,11 @@ msgstr "Περιμένει να χρησιμοποιηθεί"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "ήταν «%(text)s»"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "δρόμος επιστροφής στον λογαριασμό"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9485,12 +9527,12 @@ msgstr "πού μένετε"
 msgid "Where your job search stands today."
 msgstr "Πού βρίσκεται η αναζήτηση εργασίας σας σήμερα."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Αν όποιος βρει τη διεύθυνση μπορεί να δημιουργήσει λογαριασμό."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9736,7 +9778,7 @@ msgid ""
 msgstr ""
 "Έχετε ξανακάνει αίτηση σε αυτή. Η καταγραφή δεύτερης αίτησης είναι εντάξει· και οι δύο μένουν στο ιστορικό."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: čeština\n"
@@ -178,7 +178,7 @@ msgstr "%(kind)s naplánován na %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s ve firmě %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -512,7 +512,7 @@ msgstr "Soubor CSV"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Nápověda pro rozhraní, například „amber“ nebo „sky“."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Řádek pod názvem na přihlašovací stránce. Nepovinné."
@@ -529,7 +529,14 @@ msgid ""
 msgstr ""
 "Mobil, pevná linka, ústředna — kolik jich stojí za to si nechat, s jedním označeným jako ten, který se má používat. Dokumenty tisknou právě ten."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Číslo musí být potvrzeno, než vás může dostat zpět. Na tomto se nikdo neozval."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1949,7 +1956,7 @@ msgstr "Připojení odebráno, včetně tajemství."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Připojení uloženo. Otestujte ho, ať víte, že funguje."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "zabezpečení spojení"
@@ -2366,12 +2373,12 @@ msgstr "Odmítnuto"
 msgid "Declined. It will not be suggested again."
 msgstr "Odmítnuto. Už to nebude navrženo."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "výchozí jazyk"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "výchozí časové pásmo"
@@ -2995,7 +3002,7 @@ msgstr "Exportováno samostatně"
 msgid "Failed"
 msgstr "Selhalo"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Selhalo bez udání důvodu."
@@ -3250,7 +3257,7 @@ msgstr "od %(low)s"
 msgid "From %(name)s."
 msgstr "Od %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "adresa odesílatele"
@@ -3311,6 +3318,16 @@ msgstr "Hry"
 #, draft
 msgid "Get"
 msgstr "Získat"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Dostane mě zpět"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Dostane mě zpět — nejdřív je třeba potvrdit"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3612,7 +3629,7 @@ msgid ""
 msgstr ""
 "Pokud jste se hlásili do instituce EU nebo přes úřad práce, tento soubor už máte. Místo abyste všechno psali znovu, prostě ho předejte."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "při zachytávání ignorovat robots.txt"
@@ -3798,7 +3815,7 @@ msgstr "Nainstalováno na této instanci"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Instalace zásuvného modulu spustí cizí kód uvnitř Postula."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "název instance"
@@ -4024,7 +4041,7 @@ msgid ""
 msgstr ""
 "Uloženo v %(file)s a rotováno podle velikosti, takže to nemůže zaplnit disk. Vše zde jde také do konzole, odkud to čte <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4102,7 +4119,7 @@ msgstr "Jazyky"
 msgid "languages"
 msgstr "jazyky"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "nabízené jazyky"
@@ -4439,7 +4456,7 @@ msgstr "Malá písmena, číslice, tečky, podtržítka a pomlčky."
 msgid "Made"
 msgstr "Vytvořeno"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "chyb pošty za sebou"
@@ -4462,7 +4479,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Pošta je tady jediná cesta zpět do účtu, takže dokud to zase nezačne fungovat, nikdo z %(counter)s lidí na této instanci se nedostane zpět, pokud zapomene heslo."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "pošta naposledy selhala"
@@ -4472,7 +4489,7 @@ msgstr "pošta naposledy selhala"
 msgid "Mail last went out at %(when)s."
 msgstr "Pošta naposledy odešla v %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "pošta naposledy fungovala"
@@ -4491,7 +4508,7 @@ msgid ""
 msgstr ""
 "Pošta už nedrží na místě ani transport, protože cesta, která nic nedoručí, nikoho nechrání."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "transport pošty"
@@ -4501,7 +4518,7 @@ msgstr "transport pošty"
 msgid "Mail transport"
 msgstr "Transport pošty"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "poslední chyba pošty"
@@ -5046,7 +5063,7 @@ msgstr "Na %(kind)s se nikdo nedostavil"
 msgid "Non-profit"
 msgstr "Neziskový sektor"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Žádné"
@@ -5646,6 +5663,13 @@ msgstr "Uvedeny jsou jen položky, které v tomto CV ještě nejsou."
 msgid "Only http and https addresses can be captured."
 msgstr "Zachytávat lze jen adresy http a https."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Zpět do vašeho účtu vás může dostat jen jedno z vašich vlastních čísel. Toto patří někomu, s kým jednáte."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5826,7 +5850,7 @@ msgstr "Částečně přeloženo"
 msgid "Passkeys"
 msgstr "Přístupové klíče"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "heslo"
@@ -5935,7 +5959,7 @@ msgstr "Osobní web"
 msgid "Pharmaceuticals"
 msgstr "Farmacie"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6048,7 +6072,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP nebo GIF do 5 MB. Ořízne se na čtverec a zbaví se všeho, co soubor věděl o místě pořízení."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "port"
@@ -6607,7 +6631,7 @@ msgid ""
 msgstr ""
 "Registrace je otevřená: kdokoli, kdo najde adresu, si může vytvořit účet."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "registrace otevřená"
@@ -6677,7 +6701,7 @@ msgstr "vzdálená adresa"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6969,7 +6993,7 @@ msgstr "Uloženo."
 msgid "Say what this identifier is."
 msgstr "Řekněte, co je tento identifikátor."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Řekněte, co je to za číslo."
@@ -7282,7 +7306,7 @@ msgstr "Zobrazovat v navigaci"
 msgid "Show past too"
 msgstr "Zobrazit i minulé"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Zobrazeno v záhlaví a na přihlašovací stránce."
@@ -7326,7 +7350,7 @@ msgstr "Přihlášení k existujícímu účtu e-mailem"
 msgid "Single sign-on"
 msgstr "Jednotné přihlášení"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "jednotné přihlášení se počítá jako druhý faktor"
@@ -7341,7 +7365,7 @@ msgstr "Jednotné přihlášení se počítá jako druhý faktor"
 msgid "Site search"
 msgstr "Hledání na webu"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "nastavení webu"
@@ -7404,7 +7428,7 @@ msgstr "Nejpomalejší"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "Server SMTP"
@@ -7506,7 +7530,7 @@ msgid ""
 msgstr ""
 "STARTTLS se připojí a poté spojení povýší, což očekává port 587. TLS od prvního bajtu očekává port 465. Nejsou zaměnitelné: namiřte jedno na port druhého a každý čeká, až promluví ten druhý."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, po připojení"
@@ -7732,7 +7756,7 @@ msgstr "štítek"
 msgid "Tag"
 msgstr "Štítek"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "slogan"
@@ -7786,12 +7810,12 @@ msgstr "telefon"
 msgid "Telephone number"
 msgstr "Telefonní číslo"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "telefonní číslo"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7832,17 +7856,17 @@ msgstr "Otestovat připojení"
 msgid "text as sent"
 msgstr "text, jak byl odeslán"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "nastavení zpráv"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "tajemství zpráv"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "přenos zpráv"
@@ -8080,6 +8104,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Před tímto číslem není žádná země, takže odjinud se na ně nedá zavolat. Zvolte zemi, nebo je napište začínající znakem +."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Toto číslo musí být potvrzeno, než vás může dostat zpět."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8367,6 +8396,13 @@ msgstr "Hlavní záznam. Varianta CV z něj vybírá; nikdy ho nekopíruje."
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Nejbližší pohovory v diáři a ty, které proběhly bez výsledku."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Číslo, které vás dostane zpět, je oddělené od toho, které tisknou vaše dokumenty, takže změna toho, co vytáčí náborář, nemění, jak dokazujete, že jste to vy. Nejdřív musí být potvrzeno, a vypnutí několika telefonních čísel vám ho nikdy nevezme."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8687,7 +8723,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Tento druh identifikátoru už je v seznamu."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Toto číslo už je v seznamu."
@@ -8754,7 +8790,7 @@ msgstr "záznam v časové ose"
 msgid "Timeout"
 msgstr "Časový limit"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "časový limit v sekundách"
@@ -8770,7 +8806,7 @@ msgstr "název"
 msgid "Title, company or location"
 msgstr "Název, firma nebo místo"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS od prvního bajtu"
@@ -8842,12 +8878,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Doprava a logistika"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "konfigurace transportu"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "tajemství transportu"
@@ -8942,12 +8978,12 @@ msgid "Update the preview"
 msgstr "Aktualizovat náhled"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "aktualizováno dne"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "aktualizoval(a)"
@@ -9046,7 +9082,7 @@ msgstr "uživatel"
 msgid "Username"
 msgstr "Uživatelské jméno"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "uživatelské jméno"
@@ -9163,6 +9199,11 @@ msgstr "Čeká na použití"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "bylo „%(text)s“"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "cesta zpět do účtu"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9459,12 +9500,12 @@ msgstr "kde bydlíte"
 msgid "Where your job search stands today."
 msgstr "Kde je dnes vaše hledání práce."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Zda si kdokoli, kdo najde adresu, může vytvořit účet."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9707,7 +9748,7 @@ msgid ""
 msgstr ""
 "Sem už jste se dříve hlásili. Zaznamenat druhou žádost je v pořádku; obě zůstanou v záznamu."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

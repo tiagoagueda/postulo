@@ -151,6 +151,10 @@ def _restore_phone_numbers(holder, owner, rows: list[dict]) -> None:
         # claim this one never checked; landing it verified would import a way back into an
         # account from a file (#142). Nothing here sets it, and this comment is why.
         row.pop("verified_at", None)
+        # And with it the recovery flag, which means nothing without the verification it
+        # rests on: importing one would give an archive the power to nominate a way into an
+        # account on an instance that never confirmed the number (#144).
+        row.pop("is_recovery", None)
         PhoneNumber.objects.create(
             owner=owner,
             holder=holder,

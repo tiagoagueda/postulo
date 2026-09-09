@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: română\n"
@@ -181,7 +181,7 @@ msgstr "%(kind)s programat pentru %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s la %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -517,7 +517,7 @@ msgstr "Un fișier CSV"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Un indiciu pentru interfață, de exemplu „amber” sau „sky”."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Un rând sub nume pe pagina de autentificare. Opțional."
@@ -534,7 +534,14 @@ msgid ""
 msgstr ""
 "Un mobil, o linie fixă, o centrală — câte merită păstrate, cu unul marcat drept cel de folosit. Documentele îl tipăresc pe acela."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Un număr trebuie confirmat înainte de a vă putea readuce înăuntru. La acesta nu a răspuns nimeni."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1962,7 +1969,7 @@ msgstr "Conexiune eliminată, inclusiv secretele."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Conexiune salvată. Testeaz-o ca să te asiguri că funcționează."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "securitatea conexiunii"
@@ -2380,12 +2387,12 @@ msgstr "Refuzată"
 msgid "Declined. It will not be suggested again."
 msgstr "Refuzată. Nu va mai fi sugerată."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "limbă implicită"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "fus orar implicit"
@@ -3011,7 +3018,7 @@ msgstr "Exportat separat"
 msgid "Failed"
 msgstr "Eșuat"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "A eșuat fără să spună de ce."
@@ -3268,7 +3275,7 @@ msgstr "de la %(low)s"
 msgid "From %(name)s."
 msgstr "De la %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "adresa expeditorului"
@@ -3329,6 +3336,16 @@ msgstr "Jocuri"
 #, draft
 msgid "Get"
 msgstr "Preia"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Mă readuce înăuntru"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Mă readuce înăuntru — trebuie confirmat mai întâi"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3631,7 +3648,7 @@ msgid ""
 msgstr ""
 "Dacă ați candidat la o instituție a UE sau prin serviciul public de ocupare, aveți deja acest fișier. În loc să tastați totul din nou, predați-l."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "ignoră robots.txt la captare"
@@ -3817,7 +3834,7 @@ msgstr "Instalat pe această instanță"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Instalarea unui modul rulează codul altcuiva în interiorul Postulo."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "numele instanței"
@@ -4045,7 +4062,7 @@ msgid ""
 msgstr ""
 "Păstrat în %(file)s și rotit după dimensiune, deci nu poate umple discul. Tot ce se află aici merge și în consolă, de unde îl citește <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4123,7 +4140,7 @@ msgstr "Limbi"
 msgid "languages"
 msgstr "limbi"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "limbi oferite"
@@ -4461,7 +4478,7 @@ msgstr "Litere mici, cifre, puncte, liniuțe de subliniere și cratime."
 msgid "Made"
 msgstr "Creat"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "eșecuri de poștă la rând"
@@ -4484,7 +4501,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Aici poșta este singura cale înapoi într-un cont, așa că până când aceasta funcționează din nou niciuna dintre cele %(counter)s persoane de pe această instanță nu se poate întoarce dacă își uită parola."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "poșta a eșuat ultima dată"
@@ -4494,7 +4511,7 @@ msgstr "poșta a eșuat ultima dată"
 msgid "Mail last went out at %(when)s."
 msgstr "Poșta a plecat ultima dată la %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "poșta a funcționat ultima dată"
@@ -4513,7 +4530,7 @@ msgid ""
 msgstr ""
 "Poșta nu mai ține nici transportul pe loc, pentru că o cale care nu livrează nimic nu protejează pe nimeni."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "transportul poștei"
@@ -4523,7 +4540,7 @@ msgstr "transportul poștei"
 msgid "Mail transport"
 msgstr "Transportul poștei"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "ultima eroare a poștei"
@@ -5069,7 +5086,7 @@ msgstr "Nimeni nu s-a prezentat la %(kind)s"
 msgid "Non-profit"
 msgstr "Non-profit"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Niciuna"
@@ -5675,6 +5692,13 @@ msgstr "Sunt listate doar intrările care nu sunt deja în acest CV."
 msgid "Only http and https addresses can be captured."
 msgstr "Doar adresele http și https pot fi captate."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Doar unul dintre numerele dumneavoastră vă poate readuce în contul dumneavoastră. Acesta aparține cuiva cu care aveți de-a face."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5856,7 +5880,7 @@ msgstr "Tradus parțial"
 msgid "Passkeys"
 msgstr "Chei de acces"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "parolă"
@@ -5965,7 +5989,7 @@ msgstr "Sit personal"
 msgid "Pharmaceuticals"
 msgstr "Farmaceutic"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6078,7 +6102,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP sau GIF de până la 5 MB. Este decupată pătrat și curățată de tot ce știa fișierul despre locul unde a fost făcută."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "port"
@@ -6638,7 +6662,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr "Înregistrarea este deschisă: oricine găsește adresa poate crea un cont."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "înregistrare deschisă"
@@ -6708,7 +6732,7 @@ msgstr "adresă la distanță"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -7000,7 +7024,7 @@ msgstr "Salvat."
 msgid "Say what this identifier is."
 msgstr "Spune ce este acest identificator."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Spune ce este acest număr."
@@ -7313,7 +7337,7 @@ msgstr "Arată în navigare"
 msgid "Show past too"
 msgstr "Arată și cele trecute"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Afișat în antet și pe pagina de autentificare."
@@ -7357,7 +7381,7 @@ msgstr "Se conectează la un cont existent prin e-mail"
 msgid "Single sign-on"
 msgstr "Autentificare unică"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "autentificarea unică contează ca al doilea factor"
@@ -7372,7 +7396,7 @@ msgstr "Autentificarea unică contează ca al doilea factor"
 msgid "Site search"
 msgstr "Căutare în site"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "setările site-ului"
@@ -7435,7 +7459,7 @@ msgstr "Cel mai lent"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "Server SMTP"
@@ -7537,7 +7561,7 @@ msgid ""
 msgstr ""
 "STARTTLS se conectează și apoi ridică conexiunea, ceea ce așteaptă portul 587. TLS de la primul octet este ceea ce așteaptă portul 465. Nu sunt interschimbabile: îndreptați unul spre portul celuilalt și fiecare așteaptă ca celălalt să vorbească."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, după conectare"
@@ -7763,7 +7787,7 @@ msgstr "etichetă"
 msgid "Tag"
 msgstr "Etichetă"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "slogan"
@@ -7817,12 +7841,12 @@ msgstr "telefon"
 msgid "Telephone number"
 msgstr "Număr de telefon"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "număr de telefon"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7863,17 +7887,17 @@ msgstr "Testați conexiunea"
 msgid "text as sent"
 msgstr "text așa cum a fost trimis"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "configurarea mesajelor"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "secretele mesajelor"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "transportul mesajelor"
@@ -8112,6 +8136,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "În fața acelui număr nu este nicio țară, așa că nu poate fi format din altă parte. Alegeți țara sau scrieți-l începând cu +."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Acel număr trebuie confirmat înainte de a vă putea readuce înăuntru."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8401,6 +8430,13 @@ msgstr ""
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Următoarele interviuri din agendă și cele trecute fără rezultat."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Numărul care vă readuce înăuntru este separat de cel pe care îl tipăresc documentele dumneavoastră, așa că schimbarea celui pe care îl formează un recrutor nu schimbă felul în care dovediți că sunteți dumneavoastră. Trebuie confirmat mai întâi, iar oprirea mai multor numere de telefon nu vi-l ia niciodată."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8726,7 +8762,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Acest tip de identificator este deja în listă."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Acest număr este deja în listă."
@@ -8794,7 +8830,7 @@ msgstr "intrare în cronologie"
 msgid "Timeout"
 msgstr "Expirare"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "expirare în secunde"
@@ -8810,7 +8846,7 @@ msgstr "titlu"
 msgid "Title, company or location"
 msgstr "Titlu, companie sau locație"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS de la primul octet"
@@ -8883,12 +8919,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Transport și logistică"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "configurația transportului"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "secretele transportului"
@@ -8984,12 +9020,12 @@ msgid "Update the preview"
 msgstr "Actualizează previzualizarea"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "actualizat la"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "actualizat de"
@@ -9088,7 +9124,7 @@ msgstr "utilizator"
 msgid "Username"
 msgstr "Nume de utilizator"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "nume de utilizator"
@@ -9205,6 +9241,11 @@ msgstr "Așteaptă să fie folosit"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "era „%(text)s”"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "cale înapoi în cont"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9505,12 +9546,12 @@ msgstr "unde locuiți"
 msgid "Where your job search stands today."
 msgstr "Unde se află azi căutarea ta de job."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Dacă oricine găsește adresa poate crea un cont."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9754,7 +9795,7 @@ msgid ""
 msgstr ""
 "Ai mai candidat la acesta. Înregistrarea unei a doua candidaturi este în regulă; ambele rămân în evidență."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

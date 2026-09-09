@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -169,7 +169,7 @@ msgstr "%(kind)s %(when)s egunerako antolatu da"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s %(company)s enpresan"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -501,7 +501,7 @@ msgstr "CSV fitxategi bat"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Interfazerako aholku bat, adibidez «anbar» edo «zeru»."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Izenaren azpiko lerro bat saioa hasteko orrian. Aukerakoa."
@@ -519,7 +519,14 @@ msgid ""
 msgstr ""
 "Mugikor bat, finko bat, zentralita bat — gordetzea merezi duten adina, bat erabili beharrekoa dela markatuta. Dokumentuek hura inprimatzen dute."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Zenbaki bat baieztatu behar da zu barrura itzultzeko gai izan aurretik. Honetan inork ez du erantzun."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1943,7 +1950,7 @@ msgstr "Konexioa kendu da, sekretuak barne."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Konexioa gorde da. Probatu funtzionatzen duela ziurtatzeko."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "konexioaren segurtasuna"
@@ -2361,12 +2368,12 @@ msgstr "Baztertuta"
 msgid "Declined. It will not be suggested again."
 msgstr "Baztertuta. Ez da berriro iradokiko."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "hizkuntza lehenetsia"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "ordu-eremu lehenetsia"
@@ -2992,7 +2999,7 @@ msgstr "Aparte esportatuta"
 msgid "Failed"
 msgstr "Huts egin du"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Huts egin du zergatik esan gabe."
@@ -3246,7 +3253,7 @@ msgstr "%(low)s(e)tik"
 msgid "From %(name)s."
 msgstr "%(name)s(e)tik."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "bidaltzailearen helbidea"
@@ -3307,6 +3314,16 @@ msgstr "Jokoak"
 #, draft
 msgid "Get"
 msgstr "Eskuratu"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Barrura itzultzen nau"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Barrura itzultzen nau — lehenik baieztatu behar da"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3611,7 +3628,7 @@ msgid ""
 msgstr ""
 "EBko erakunde bati edo enplegu-zerbitzu nazional baten bidez eskaera egin baduzu, fitxategi hau jada baduzu. Dena berriro idatzi beharrean, eman ezazu."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "ez ikusi robots.txt harrapatzean"
@@ -3798,7 +3815,7 @@ msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr ""
 "Plugin bat instalatzeak beste norbaiten kodea exekutatzen du Postuloren barruan."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "instalazioaren izena"
@@ -4025,7 +4042,7 @@ msgid ""
 msgstr ""
 "%(file)s fitxategian gordetzen da eta tamainaren arabera biratzen, beraz honek ezin du diskoa bete. Hemengo guztia kontsolara ere joaten da, non <code>docker logs</code>(e)k irakurtzen duen."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4103,7 +4120,7 @@ msgstr "Hizkuntzak"
 msgid "languages"
 msgstr "hizkuntzak"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "eskainitako hizkuntzak"
@@ -4441,7 +4458,7 @@ msgstr "Minuskulak, zifrak, puntuak, azpimarrak eta marratxoak."
 msgid "Made"
 msgstr "Egina"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "posta-hutsegite jarraian"
@@ -4462,7 +4479,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Hemen posta da kontu batera itzultzeko bide bakarra, beraz, berriro funtzionatu arte instantzia honetako %(counter)s pertsonetako inork ezingo du sartu pasahitza ahazten badu."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "postaren azken hutsegitea"
@@ -4472,7 +4489,7 @@ msgstr "postaren azken hutsegitea"
 msgid "Mail last went out at %(when)s."
 msgstr "Posta azkenekoz %(when)s atera zen."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "posta azkenekoz ondo ibili zen"
@@ -4491,7 +4508,7 @@ msgid ""
 msgstr ""
 "Postak ez du jada garraioa ere bere lekuan eusten, ezer entregatzen ez duen bideak ez baitu inor babesten."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "posta-garraioa"
@@ -4501,7 +4518,7 @@ msgstr "posta-garraioa"
 msgid "Mail transport"
 msgstr "Posta-garraioa"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "postaren azken errorea"
@@ -5047,7 +5064,7 @@ msgstr "Inor ez zen agertu %(kind)s ekitaldira"
 msgid "Non-profit"
 msgstr "Irabazi-asmorik gabekoa"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Bat ere ez"
@@ -5639,6 +5656,13 @@ msgstr "CV honetan oraindik ez dauden sarrerak baino ez dira zerrendatzen."
 msgid "Only http and https addresses can be captured."
 msgstr "http eta https helbideak baino ezin dira harrapatu."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Zure zenbakietako bat baino ezin da zure kontura itzuli. Hau tratatzen duzun norbaitena da."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5821,7 +5845,7 @@ msgstr "Partzialki itzulia"
 msgid "Passkeys"
 msgstr "Sarbide-gakoak"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "pasahitza"
@@ -5930,7 +5954,7 @@ msgstr "Gune pertsonala"
 msgid "Pharmaceuticals"
 msgstr "Farmazia"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6043,7 +6067,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP edo GIF 5 MB arte. Karratu batera mozten da eta fitxategiak non atera zen jakiten zuen guztia kentzen zaio."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "ataka"
@@ -6602,7 +6626,7 @@ msgid ""
 msgstr ""
 "Erregistroa irekita dago: helbidea aurkitzen duen edonork sor dezake kontu bat."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "erregistroa irekita"
@@ -6672,7 +6696,7 @@ msgstr "urruneko helbidea"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6965,7 +6989,7 @@ msgstr "Gorde da."
 msgid "Say what this identifier is."
 msgstr "Esan zer den identifikatzaile hau."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Esan zer zenbaki den hau."
@@ -7278,7 +7302,7 @@ msgstr "Erakutsi nabigazioan"
 msgid "Show past too"
 msgstr "Erakutsi iraganekoak ere"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Goiburuan eta saio-hasierako orrian erakusten da."
@@ -7322,7 +7346,7 @@ msgstr "Lehendik dagoen kontu batean sartzen da postaz"
 msgid "Single sign-on"
 msgstr "Saio-hasiera bakarra"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "saio-hasiera bakarra bigarren faktoretzat hartzen da"
@@ -7337,7 +7361,7 @@ msgstr "Saio-hasiera bakarra bigarren faktoretzat hartzen da"
 msgid "Site search"
 msgstr "Bilaketa gunean"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "gunearen ezarpenak"
@@ -7400,7 +7424,7 @@ msgstr "Motelena"
 msgid "slug"
 msgstr "izen laburra"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "SMTP zerbitzaria"
@@ -7502,7 +7526,7 @@ msgid ""
 msgstr ""
 "STARTTLS konektatu eta gero eguneratzen da, 587 atakak espero duena. TLS lehen bytetik da 465 atakak espero duena. Ez dira trukagarriak: bata bestearen atakara zuzenduz gero, bakoitza bestea hitz egiteko zain geratzen da."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, konektatu ondoren"
@@ -7729,7 +7753,7 @@ msgstr "etiketa"
 msgid "Tag"
 msgstr "Etiketa"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "leloa"
@@ -7783,12 +7807,12 @@ msgstr "telefonoa"
 msgid "Telephone number"
 msgstr "Telefono-zenbakia"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "telefono zenbakia"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7829,17 +7853,17 @@ msgstr "Probatu konexioa"
 msgid "text as sent"
 msgstr "testua bidali zen bezala"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "mezuen konfigurazioa"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "mezuen sekretuak"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "mezuen garraioa"
@@ -8081,6 +8105,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Zenbaki horrek ez du herrialderik aurrean, beraz ezin da beste inondik markatu. Aukeratu herrialdea, edo idatzi + ikurrarekin hasita."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Zenbaki hori baieztatu behar da zu barrura itzultzeko gai izan aurretik."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8369,6 +8398,13 @@ msgstr ""
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Egunkariko hurrengo elkarrizketak, eta emaitzarik gabe pasatu direnak."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Zu barrura itzultzen zaituen zenbakia zure dokumentuek inprimatzen dutenetik bereizita dago, beraz kontratatzaile batek markatzen duena aldatzeak ez du aldatzen zu zarela nola frogatzen duzun. Lehenik baieztatu behar da, eta hainbat telefono-zenbaki itzaltzeak ez dizu inoiz kentzen."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8690,7 +8726,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Mota honetako identifikatzailea jada zerrendan dago."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Zenbaki hau jada zerrendatuta dago."
@@ -8758,7 +8794,7 @@ msgstr "denbora-lerroko sarrera"
 msgid "Timeout"
 msgstr "Denbora-muga"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "denbora-muga segundotan"
@@ -8774,7 +8810,7 @@ msgstr "izenburua"
 msgid "Title, company or location"
 msgstr "Izenburua, enpresa edo kokapena"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS lehen bytetik"
@@ -8846,12 +8882,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Garraioa eta logistika"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "garraioaren konfigurazioa"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "garraioaren sekretuak"
@@ -8946,12 +8982,12 @@ msgid "Update the preview"
 msgstr "Eguneratu aurrebista"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "eguneratze-data"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "nork eguneratua"
@@ -9050,7 +9086,7 @@ msgstr "erabiltzailea"
 msgid "Username"
 msgstr "Erabiltzaile-izena"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "erabiltzaile-izena"
@@ -9167,6 +9203,11 @@ msgstr "Erabiltzeko zain"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "«%(text)s» zen"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "kontura itzultzeko bidea"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9468,12 +9509,12 @@ msgstr "non bizi zaren"
 msgid "Where your job search stands today."
 msgstr "Non dagoen gaur zure lan-bilaketa."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Helbidea aurkitzen duen edonork kontu bat sor dezakeen ala ez."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9717,7 +9758,7 @@ msgid ""
 msgstr ""
 "Honi lehenago ere egin diozu eskaera. Bigarren eskaera bat jasotzea ondo dago; biak geratzen dira erregistroan."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

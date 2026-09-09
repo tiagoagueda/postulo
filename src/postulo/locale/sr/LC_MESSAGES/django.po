@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 15:16+0000\n"
+"POT-Creation-Date: 2026-09-09 15:47+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: српски\n"
@@ -181,7 +181,7 @@ msgstr "%(kind)s заказан за %(when)s"
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s у %(company)s"
 
-#: src/postulo/notifications/transport.py:311
+#: src/postulo/notifications/transport.py:332
 #, python-format, draft
 msgid ""
 "%(label)s is how this instance sends mail, and mail is the only way back into an account here — %(count)d of them would have no way in. Set up another transport first."
@@ -516,7 +516,7 @@ msgstr "CSV датотека"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Наговештај за интерфејс, попут „ћилибар“ или „небо“."
 
-#: src/postulo/core/models.py:298
+#: src/postulo/core/models.py:363
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Ред испод имена на страници за пријаву. Необавезно."
@@ -533,7 +533,14 @@ msgid ""
 msgstr ""
 "Мобилни, фиксна линија, централа — колико их вреди чувати, с једним означеним као онај који се користи. Документи штампају управо њега."
 
-#: src/postulo/templates/partials/phone_numbers.html:74
+#: src/postulo/core/models.py:252
+#, draft
+msgid ""
+"A number has to be confirmed before it can get you back in. Nobody has answered on this one."
+msgstr ""
+"Број мора бити потврђен пре него што вас може вратити назад. На овај се нико није јавио."
+
+#: src/postulo/templates/partials/phone_numbers.html:95
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1956,7 +1963,7 @@ msgstr "Веза уклоњена, заједно са тајнама."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Веза сачувана. Тестирајте је да бисте били сигурни да ради."
 
-#: src/postulo/core/models.py:358
+#: src/postulo/core/models.py:423
 #, draft
 msgid "connection security"
 msgstr "безбедност везе"
@@ -2374,12 +2381,12 @@ msgstr "Одбијено"
 msgid "Declined. It will not be suggested again."
 msgstr "Одбијено. Неће се више предлагати."
 
-#: src/postulo/core/models.py:320
+#: src/postulo/core/models.py:385
 #, draft
 msgid "default language"
 msgstr "подразумевани језик"
 
-#: src/postulo/core/models.py:331
+#: src/postulo/core/models.py:396
 #, draft
 msgid "default time zone"
 msgstr "подразумевана временска зона"
@@ -3002,7 +3009,7 @@ msgstr "Извезено засебно"
 msgid "Failed"
 msgstr "Није успело"
 
-#: src/postulo/core/models.py:442 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:507 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Није успело, без објашњења зашто."
@@ -3257,7 +3264,7 @@ msgstr "од %(low)s"
 msgid "From %(name)s."
 msgstr "Од %(name)s."
 
-#: src/postulo/core/models.py:366
+#: src/postulo/core/models.py:431
 #, draft
 msgid "from address"
 msgstr "адреса пошиљаоца"
@@ -3318,6 +3325,16 @@ msgstr "Игре"
 #, draft
 msgid "Get"
 msgstr "Преузми"
+
+#: src/postulo/templates/partials/phone_numbers.html:73
+#, draft
+msgid "Gets me back in"
+msgstr "Враћа ме назад"
+
+#: src/postulo/templates/partials/phone_numbers.html:75
+#, draft
+msgid "Gets me back in — needs confirming first"
+msgstr "Враћа ме назад — прво треба потврда"
 
 #: src/postulo/applications/models.py:49
 #: src/postulo/templates/widgets/gone_quiet.html:55
@@ -3618,7 +3635,7 @@ msgid ""
 msgstr ""
 "Ако сте се пријављивали институцији ЕУ или преко националне службе за запошљавање, ову датотеку већ имате. Уместо да све поново куцате, предајте је."
 
-#: src/postulo/core/models.py:307
+#: src/postulo/core/models.py:372
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "занемари robots.txt при хватању"
@@ -3804,7 +3821,7 @@ msgstr "Инсталирано на овој инсталацији"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Инсталирање додатка покреће туђи код унутар Postula."
 
-#: src/postulo/core/models.py:289
+#: src/postulo/core/models.py:354
 #, draft
 msgid "instance name"
 msgstr "назив инсталације"
@@ -4031,7 +4048,7 @@ msgid ""
 msgstr ""
 "Чува се у %(file)s и ротира по величини, па ово не може да напуни диск. Све овде иде и у конзолу, одакле то чита <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:255
+#: src/postulo/accounts/forms.py:293 src/postulo/core/phone_numbers.py:304
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4109,7 +4126,7 @@ msgstr "Језици"
 msgid "languages"
 msgstr "језици"
 
-#: src/postulo/core/models.py:330
+#: src/postulo/core/models.py:395
 #, draft
 msgid "languages offered"
 msgstr "понуђени језици"
@@ -4447,7 +4464,7 @@ msgstr "Мала слова, цифре, тачке, доње црте и црт
 msgid "Made"
 msgstr "Направљена"
 
-#: src/postulo/core/models.py:397
+#: src/postulo/core/models.py:462
 #, draft
 msgid "mail failures in a row"
 msgstr "неуспелих слања заредом"
@@ -4470,7 +4487,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Овде је пошта једини пут назад у налог, па док ово поново не проради, ниједна од %(counter)s особе на овој инстанци не може да се врати ако заборави лозинку."
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:458
 #, draft
 msgid "mail last failed"
 msgstr "пошта последњи пут није успела"
@@ -4480,7 +4497,7 @@ msgstr "пошта последњи пут није успела"
 msgid "Mail last went out at %(when)s."
 msgstr "Пошта је последњи пут послата у %(when)s."
 
-#: src/postulo/core/models.py:392
+#: src/postulo/core/models.py:457
 #, draft
 msgid "mail last worked"
 msgstr "пошта је последњи пут радила"
@@ -4499,7 +4516,7 @@ msgid ""
 msgstr ""
 "Пошта више не држи ни транспорт на месту, јер пут који ништа не испоручује никога не штити."
 
-#: src/postulo/core/models.py:370
+#: src/postulo/core/models.py:435
 #, draft
 msgid "mail transport"
 msgstr "пренос поште"
@@ -4509,7 +4526,7 @@ msgstr "пренос поште"
 msgid "Mail transport"
 msgstr "Пренос поште"
 
-#: src/postulo/core/models.py:394
+#: src/postulo/core/models.py:459
 #, draft
 msgid "mail's last error"
 msgstr "последња грешка поште"
@@ -5054,7 +5071,7 @@ msgstr "Нико се није појавио на %(kind)s"
 msgid "Non-profit"
 msgstr "Непрофитна организација"
 
-#: src/postulo/core/models.py:263
+#: src/postulo/core/models.py:328
 #, draft
 msgid "None"
 msgstr "Нема"
@@ -5656,6 +5673,13 @@ msgstr "Наведени су само уноси којих још нема н�
 msgid "Only http and https addresses can be captured."
 msgstr "Могу да се хватају само http и https адресе."
 
+#: src/postulo/core/models.py:243
+#, draft
+msgid ""
+"Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+"Само вас један од ваших сопствених бројева може вратити у ваш налог. Овај припада некоме с ким пословно сарађујете."
+
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
 msgid "Only what is still live. Settled applications live in the table."
@@ -5838,7 +5862,7 @@ msgstr "Делимично преведено"
 msgid "Passkeys"
 msgstr "Приступни кључеви"
 
-#: src/postulo/core/models.py:351
+#: src/postulo/core/models.py:416
 #, draft
 msgid "password"
 msgstr "лозинка"
@@ -5947,7 +5971,7 @@ msgstr "Лична страница"
 msgid "Pharmaceuticals"
 msgstr "Фармација"
 
-#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:252
+#: src/postulo/accounts/forms.py:288 src/postulo/core/phone_numbers.py:301
 #: src/postulo/jobs/forms.py:350
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6060,7 +6084,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP или GIF до 5 MB. Слика се сече на квадрат и брише јој се све што је датотека знала о томе где је снимљена."
 
-#: src/postulo/core/models.py:342
+#: src/postulo/core/models.py:407
 #, draft
 msgid "port"
 msgstr "порт"
@@ -6618,7 +6642,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr "Регистрација је отворена: свако ко нађе адресу може да направи налог."
 
-#: src/postulo/core/models.py:301
+#: src/postulo/core/models.py:366
 #, draft
 msgid "registration open"
 msgstr "регистрација отворена"
@@ -6689,7 +6713,7 @@ msgstr "удаљена адреса"
 #: src/postulo/templates/connections/list.html:70
 #: src/postulo/templates/documents/cv_detail.html:60
 #: src/postulo/templates/jobs/company_form.html:75
-#: src/postulo/templates/partials/phone_numbers.html:61
+#: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/server/plugins.html:146
 #: src/postulo/templates/server/plugins.html:254
 #, draft
@@ -6981,7 +7005,7 @@ msgstr "Сачувано."
 msgid "Say what this identifier is."
 msgstr "Реците шта је овај идентификатор."
 
-#: src/postulo/core/phone_numbers.py:266
+#: src/postulo/core/phone_numbers.py:315
 #, draft
 msgid "Say what this number is."
 msgstr "Реците шта је овај број."
@@ -7294,7 +7318,7 @@ msgstr "Прикажи у навигацији"
 msgid "Show past too"
 msgstr "Прикажи и прошле"
 
-#: src/postulo/core/models.py:292
+#: src/postulo/core/models.py:357
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Приказује се у заглављу и на страници за пријаву."
@@ -7338,7 +7362,7 @@ msgstr "Пријављује се на постојећи налог путем 
 msgid "Single sign-on"
 msgstr "Јединствена пријава"
 
-#: src/postulo/core/models.py:312
+#: src/postulo/core/models.py:377
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "јединствена пријава броји се као други фактор"
@@ -7353,7 +7377,7 @@ msgstr "Јединствена пријава броји се као други 
 msgid "Site search"
 msgstr "Претрага странице"
 
-#: src/postulo/core/models.py:410 src/postulo/core/models.py:411
+#: src/postulo/core/models.py:475 src/postulo/core/models.py:476
 #, draft
 msgid "site settings"
 msgstr "подешавања странице"
@@ -7416,7 +7440,7 @@ msgstr "Најспорије"
 msgid "slug"
 msgstr "кратко име"
 
-#: src/postulo/core/models.py:340
+#: src/postulo/core/models.py:405
 #, draft
 msgid "SMTP server"
 msgstr "SMTP сервер"
@@ -7518,7 +7542,7 @@ msgid ""
 msgstr ""
 "STARTTLS се повеже па надогради везу, што очекује порт 587. TLS од првог бајта је оно што очекује порт 465. Нису заменљиви: усмерите један на порт другог и сваки чека да онај други проговори."
 
-#: src/postulo/core/models.py:264
+#: src/postulo/core/models.py:329
 #, draft
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, након повезивања"
@@ -7745,7 +7769,7 @@ msgstr "ознака"
 msgid "Tag"
 msgstr "Ознака"
 
-#: src/postulo/core/models.py:295
+#: src/postulo/core/models.py:360
 #, draft
 msgid "tagline"
 msgstr "слоган"
@@ -7799,12 +7823,12 @@ msgstr "телефон"
 msgid "Telephone number"
 msgstr "Број телефона"
 
-#: src/postulo/core/models.py:166
+#: src/postulo/core/models.py:177
 #, draft
 msgid "telephone number"
 msgstr "телефонски број"
 
-#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:167
+#: src/postulo/accounts/models.py:246 src/postulo/core/models.py:178
 #: src/postulo/jobs/models.py:401
 #, draft
 msgid "telephone numbers"
@@ -7845,17 +7869,17 @@ msgstr "Тестирај везу"
 msgid "text as sent"
 msgstr "текст какав је послат"
 
-#: src/postulo/core/models.py:386
+#: src/postulo/core/models.py:451
 #, draft
 msgid "text configuration"
 msgstr "конфигурација порука"
 
-#: src/postulo/core/models.py:387
+#: src/postulo/core/models.py:452
 #, draft
 msgid "text secrets"
 msgstr "тајне порука"
 
-#: src/postulo/core/models.py:385
+#: src/postulo/core/models.py:450
 #, draft
 msgid "text transport"
 msgstr "транспорт порука"
@@ -8092,6 +8116,11 @@ msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
 msgstr ""
 "Испред тог броја нема државе, па се одникуда другде не може позвати. Изаберите државу или га напишите почевши са +."
+
+#: src/postulo/core/phone_numbers.py:395
+#, draft
+msgid "That number has to be confirmed before it can get you back in."
+msgstr "Тај број мора бити потврђен пре него што вас може вратити назад."
 
 #: src/postulo/core/phone_numbers.py:32
 #, draft
@@ -8381,6 +8410,13 @@ msgstr "Главни запис. Варијанта CV-ја бира из њег
 msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Следећи интервјуи у дневнику, и сви који су прошли без исхода."
+
+#: src/postulo/templates/partials/phone_numbers.html:102
+#, draft
+msgid ""
+"The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
+msgstr ""
+"Број који вас враћа назад одвојен је од оног који ваши документи штампају, па промена оног који зове послодавац не мења како доказујете да сте то ви. Прво мора бити потврђен, а искључивање више телефонских бројева никада вам га не одузима."
 
 #: src/postulo/core/server_views.py:1015
 #, draft
@@ -8702,7 +8738,7 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Ова врста идентификатора већ је на списку."
 
-#: src/postulo/core/phone_numbers.py:292
+#: src/postulo/core/phone_numbers.py:341
 #, draft
 msgid "This number is already listed."
 msgstr "Овај број је већ на списку."
@@ -8770,7 +8806,7 @@ msgstr "унос временске линије"
 msgid "Timeout"
 msgstr "Истек времена"
 
-#: src/postulo/core/models.py:364
+#: src/postulo/core/models.py:429
 #, draft
 msgid "timeout in seconds"
 msgstr "истек времена у секундама"
@@ -8786,7 +8822,7 @@ msgstr "наслов"
 msgid "Title, company or location"
 msgstr "Наслов, компанија или локација"
 
-#: src/postulo/core/models.py:265
+#: src/postulo/core/models.py:330
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS од првог бајта"
@@ -8858,12 +8894,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Транспорт и логистика"
 
-#: src/postulo/core/models.py:375
+#: src/postulo/core/models.py:440
 #, draft
 msgid "transport configuration"
 msgstr "конфигурација преноса"
 
-#: src/postulo/core/models.py:377
+#: src/postulo/core/models.py:442
 #, draft
 msgid "transport secrets"
 msgstr "тајне преноса"
@@ -8959,12 +8995,12 @@ msgid "Update the preview"
 msgstr "Ажурирај преглед"
 
 #: src/postulo/accounts/models.py:308 src/postulo/core/models.py:27
-#: src/postulo/core/models.py:399
+#: src/postulo/core/models.py:464
 #, draft
 msgid "updated at"
 msgstr "ажурирано"
 
-#: src/postulo/core/models.py:406
+#: src/postulo/core/models.py:471
 #, draft
 msgid "updated by"
 msgstr "ажурирао"
@@ -9063,7 +9099,7 @@ msgstr "корисник"
 msgid "Username"
 msgstr "Корисничко име"
 
-#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:347
+#: src/postulo/accounts/models.py:107 src/postulo/core/models.py:412
 #, draft
 msgid "username"
 msgstr "корисничко име"
@@ -9181,6 +9217,11 @@ msgstr "Чека на употребу"
 #, python-format, draft
 msgid "was “%(text)s”"
 msgstr "било је „%(text)s“"
+
+#: src/postulo/core/models.py:167
+#, draft
+msgid "way back into the account"
+msgstr "пут назад у налог"
 
 #: src/postulo/templates/account/partials/password_meter.html:13
 #, draft
@@ -9477,12 +9518,12 @@ msgstr "где живите"
 msgid "Where your job search stands today."
 msgstr "Како ваша потрага за послом стоји данас."
 
-#: src/postulo/core/models.py:304
+#: src/postulo/core/models.py:369
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Може ли свако ко нађе адресу да направи налог."
 
-#: src/postulo/core/models.py:315
+#: src/postulo/core/models.py:380
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -9725,7 +9766,7 @@ msgid ""
 msgstr ""
 "Већ сте се пријавили на овај. Бележење друге пријаве је у реду; обе остају у запису."
 
-#: src/postulo/core/phone_numbers.py:148
+#: src/postulo/core/phone_numbers.py:165
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."

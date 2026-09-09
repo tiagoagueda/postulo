@@ -293,4 +293,4 @@ def test_an_import_lands_numbers_unverified(user, django_user_model):
 def test_the_format_version_moved(user):
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 6
+    assert export.FORMAT_VERSION == 7

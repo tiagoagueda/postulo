@@ -31,7 +31,7 @@ from postulo import __version__
 #: 5 added ``parent`` on a company, naming the company it belongs to. The
 #: importer still reads every earlier
 #: format, filling the new fields in.
-FORMAT_VERSION = 6
+FORMAT_VERSION = 7
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -69,7 +69,7 @@ CONTACT_FIELDS = ("id", "name", "role", "email", "linkedin_url", "notes")
 #: department belongs to one company, so the company's block is where it can be resolved.
 #: What one telephone number is, in the file. Every number a holder has, in order, with
 #: the primary marked -- not the primary alone.
-PHONE_NUMBER_FIELDS = ("kind", "label", "number", "is_primary", "verified_at")
+PHONE_NUMBER_FIELDS = ("kind", "label", "number", "is_primary", "verified_at", "is_recovery")
 POSTING_FIELDS = (
     "id",
     "title",
