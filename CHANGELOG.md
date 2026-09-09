@@ -8,6 +8,32 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **The image is scanned now, by the project rather than by somebody remembering.**
+  Everything in the two issues beside this one was found by running Trivy and Grype by hand,
+  on a machine that happened to have them pulled for something else. Neither finding was new
+  and both had been in the image since it was built — which is the argument: `pip-audit`
+  covers Postulo's own Python lock, and says nothing about the base image, the apt packages,
+  what `uv sync` actually installed, or anything left behind in a layer.
+
+  It runs before the push, because a gate after one is a report about something already
+  published. And it runs the same `scripts/scan-image.sh` a person runs, rather than a second
+  description of the same intent that can drift from the first.
+
+  **Two choices in how it is set up are what decide whether it survives.** Both scanners, not
+  one: on the image that started this they disagreed usefully, Grype finding the only
+  actionable Debian update that Trivy did not mark fixable, Trivy finding Python packages and
+  a leftover cache that Grype's scan did not see at all. And the gate is *fixable* findings
+  rather than severe ones: six CRITICALs with no fix available is the ordinary state of a
+  Debian base image, and a build that fails daily for reasons nobody can act on is switched
+  off within a fortnight.
+
+  The unfixable half is recorded rather than dropped, together with the secret and
+  misconfiguration scans that came back clean — that half is what nobody writes down, and it
+  is what says the image is in the state you think it is. Each run also keeps a CycloneDX
+  bill of materials, which is worth more to somebody self-hosting Postulo than this run's
+  verdict: it lets them scan the release next year, against a database that does not exist
+  yet. (#156)
+
 - **A telephone number now has a verified state, and on this release nothing is verified.**
   That is the point rather than a shortfall. Numbers have been storable since they arrived,
   unique across the instance and first-come-first-served, with no way to prove one — which was

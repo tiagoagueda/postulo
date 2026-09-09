@@ -13,6 +13,13 @@
 # next door has one job and always completes. The repository variable that used to gate it
 # is gone with the automatic trigger it gated -- a switch on a thing that only happens when
 # you press the button is a second way of saying no.
+#
+# **It is also where the image is scanned** (#156). Everything in #155 and #157 was found by
+# running two scanners by hand on a machine that happened to have them; neither finding was
+# new, and both had been in the image since it was built. A scan somebody remembers to run
+# is not a scan the project runs. So the native-architecture image is built and scanned
+# first, and the multi-architecture push happens only if that passes -- a gate after the
+# push would be a report about something already published.
 name: Image
 
 on:
@@ -58,6 +65,51 @@ jobs:
         run: |
           echo "$REGISTRY_TOKEN" | docker login "${GITHUB_SERVER_URL#https://}" \
             -u "$REGISTRY_USER" --password-stdin
+
+      # Built for this runner only, into its daemon, so there is something to scan. The
+      # multi-architecture build below reuses the layers, so this costs a scan rather than
+      # a second build.
+      - name: Build the image this runner can scan
+        run: docker build -f docker/Dockerfile -t postulo:scan .
+
+      # The same script a person runs, rather than a second description of the same
+      # intent that can drift from it. Both scanners, gated on findings with a fix
+      # available: six unfixable CRITICALs is the normal state of a Debian base image, and
+      # a gate that fails every day for reasons nobody can act on is switched off within a
+      # fortnight.
+      #
+      # Both tools download a vulnerability database, so this step needs the network.
+      - name: Scan it, with both scanners
+        run: ./scripts/scan-image.sh postulo:scan
+
+      # The half nobody writes down. The scan that produced #155 and #157 also came back
+      # clean on secrets and misconfiguration, and that result is worth keeping: it says
+      # the image is in the state somebody thinks it is.
+      - name: Record what the scan found, including the part that was clean
+        if: always()
+        run: |
+          {
+            echo '## Image scan'
+            echo
+            echo '<details><summary>Everything both scanners saw, fixable or not</summary>'
+            echo
+            echo '```'
+            cat .scan/trivy-full.txt 2>/dev/null || echo 'no report'
+            echo '```'
+            echo
+            echo '</details>'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # A signed list of what is in the image is more use to somebody self-hosting Postulo
+      # than this run's verdict: it lets them scan the release later, against a database
+      # that does not exist yet.
+      - name: Keep the bill of materials
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ inputs.tag }}
+          path: .scan/sbom.cdx.json
+          if-no-files-found: warn
 
       - name: Build for amd64 and arm64 and push
         env:

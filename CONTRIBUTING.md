@@ -269,6 +269,27 @@ finishes, which is how v0.2.0's release came to look unfinished long after it wa
 (#81). A workflow nobody starts cannot queue. Without a docker runner,
 `scripts/check-image.sh` builds and checks the image wherever there is a Docker daemon.
 
+**The image is scanned before it is pushed.** `scripts/scan-image.sh` runs Trivy and Grype
+over it, and `image.yml` calls that same script rather than describing the intent a second
+time. Two things about how it is set up are deliberate:
+
+- **Both scanners.** They disagree usefully. On the image that produced #155 and #157, Grype
+  found the only actionable Debian update, which Trivy did not mark fixable; Trivy found the
+  Python packages and a leftover uv cache, which Grype's deb-and-binary scan did not see at
+  all. Running one and believing it would have missed half of it.
+- **The gate is fixable findings, not severe ones.** Six CRITICALs with no fix available is
+  the normal state of a Debian base image, and a build that fails every day for reasons
+  nobody can act on gets switched off within a fortnight. What stops a push is something
+  somebody can do something about.
+
+The unfixable half is reported rather than hidden, along with the secret and misconfiguration
+scans — a scan that records only its failures throws away the half saying the image is in the
+state you think it is. Each run keeps a CycloneDX bill of materials, which is more use to
+somebody self-hosting Postulo than this run's verdict: it lets them scan the release later,
+against a database that does not exist yet.
+
+Both scanners download a vulnerability database, so the step needs the network.
+
 ### Giving a runner the `docker` label
 
 A `forgejo-runner` that runs jobs in containers already has a daemon — it needs one to

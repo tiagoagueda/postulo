@@ -266,3 +266,78 @@ def test_the_image_keeps_uv_on_purpose():
     assert "installing.py" in runtime or "plugins/installing" in runtime, (
         "the reason it is kept has to stay next to it"
     )
+
+
+# ------------------------------------------------------------- what scans the image
+
+
+IMAGE_WORKFLOW = ROOT / ".forgejo" / "workflows" / "image.yml"
+SCAN_SCRIPT = ROOT / "scripts" / "scan-image.sh"
+
+
+def image_steps() -> list[dict]:
+    import yaml
+
+    workflow = yaml.safe_load(IMAGE_WORKFLOW.read_text(encoding="utf-8"))
+    return workflow["jobs"]["image"]["steps"]
+
+
+def test_the_workflow_reader_finds_what_it_is_looking_for():
+    """A test that reads a file has to be shown failing, or it passes on an empty match."""
+    names = [step.get("name", step.get("uses", "")) for step in image_steps()]
+    assert any("push" in name for name in names), names
+
+
+def test_the_image_is_scanned_before_it_is_pushed():
+    """A gate after the push is a report about something already published (#156).
+
+    Everything in #155 and #157 was found by running two scanners by hand on a machine that
+    happened to have them pulled. Neither finding was new; both had been in the image since
+    it was built. This is what makes the next one not depend on somebody remembering.
+    """
+    names = [step.get("name", step.get("uses", "")) for step in image_steps()]
+    scanning = next(i for i, name in enumerate(names) if "Scan" in name)
+    pushing = next(i for i, name in enumerate(names) if "push" in name)
+
+    assert scanning < pushing, f"the scan has to gate the push: {names}"
+
+
+def test_the_workflow_and_a_person_run_the_same_scan():
+    """Two descriptions of one intent drift. The workflow calls the script."""
+    scanning = next(step for step in image_steps() if "Scan" in step.get("name", ""))
+
+    assert "scripts/scan-image.sh" in scanning["run"]
+    assert SCAN_SCRIPT.is_file()
+
+
+def test_the_scan_fails_only_on_something_somebody_can_do_about():
+    """Six unfixable CRITICALs is the normal state of a Debian base image.
+
+    A gate on severity alone fails every day for reasons nobody can act on, and is switched
+    off within a fortnight. A gate on *fixable* findings is one worth stopping for — which
+    is the difference between a check the project runs and a check it used to run.
+    """
+    script = SCAN_SCRIPT.read_text(encoding="utf-8")
+
+    assert "--ignore-unfixed" in script, "trivy"
+    assert "--only-fixed" in script, "grype"
+
+
+def test_the_scan_runs_both_tools():
+    """They disagreed usefully: Grype found the only actionable Debian update, which Trivy
+    did not mark fixable; Trivy found the Python packages and the leftover cache, which
+    Grype's deb-and-binary scan did not see at all. One would have missed half of it.
+    """
+    script = SCAN_SCRIPT.read_text(encoding="utf-8")
+
+    assert "aquasec/trivy:" in script, "pinned, or the gate changes under you"
+    assert "anchore/grype:" in script
+
+
+def test_a_release_carries_a_bill_of_materials():
+    """More use to somebody self-hosting Postulo than this run's verdict on this image:
+    it lets them scan the release later, against a database that does not exist yet.
+    """
+    assert "cyclonedx" in SCAN_SCRIPT.read_text(encoding="utf-8")
+    kept = [step for step in image_steps() if "sbom" in str(step.get("with", {})).lower()]
+    assert kept, "the SBOM has to leave the runner"
