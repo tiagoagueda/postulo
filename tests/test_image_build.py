@@ -60,15 +60,36 @@ def test_the_reader_finds_what_it_is_looking_for():
 
 # ------------------------------------------------- what the image installs, and keeps
 
-#: The line that builds the runtime environment. Read rather than run, because nothing here
-#: builds an image (#81) and the last two mistakes in this file both looked correct.
+#: The lines that build the runtime environment. Read rather than run, because nothing here
+#: builds an image (#81) and the last three mistakes in this file all looked correct.
 SYNC = re.compile(r"^RUN uv sync .*$", re.M)
 
 
-def sync_line() -> str:
+def sync_lines() -> list[str]:
     found = SYNC.findall(DOCKERFILE.read_text(encoding="utf-8"))
-    assert len(found) == 1, f"expected one `uv sync` line, found {len(found)}"
-    return found[0]
+    assert found, "expected the environment to be built with `uv sync`"
+    return found
+
+
+def test_the_project_is_installed_once_its_source_is_there():
+    """#166: `uv sync` installs the project as well as its dependencies.
+
+    #157 put the dependencies first, so that a change to the application would not re-resolve
+    them, and left the one sync above `COPY src`. With no source to build, every image build
+    failed on "Expected a Python module at: src/postulo/__init__.py" -- and nobody knew until
+    the test instance's deploy, because nothing here builds an image (#81). A sync before
+    the source may only install dependencies; one after it has to install the project.
+    """
+    build = stages()["build"]
+    source = build.index("COPY src ./src")
+    before = [m.group(0) for m in SYNC.finditer(build) if m.start() < source]
+    after = [m.group(0) for m in SYNC.finditer(build) if m.start() > source]
+
+    for line in before:
+        assert "--no-install-project" in line, f"runs before there is a project: {line}"
+    assert after, "nothing installs the project once its source has been copied"
+    for line in after:
+        assert "--no-install-project" not in line, f"leaves the project out: {line}"
 
 
 def test_the_sync_excludes_every_dependency_group():
@@ -79,10 +100,9 @@ def test_the_sync_excludes_every_dependency_group():
     tool, bundling a Node.js runtime, in an image that runs neither. Naming groups to exclude
     goes stale the moment a third is added; excluding all of them does not.
     """
-    line = sync_line()
-
-    assert "--no-default-groups" in line, line
-    assert "--no-dev" not in line, "names one group and misses the others"
+    for line in sync_lines():
+        assert "--no-default-groups" in line, line
+        assert "--no-dev" not in line, "names one group and misses the others"
 
 
 def test_the_sync_keeps_no_download_cache():
@@ -91,7 +111,8 @@ def test_the_sync_keeps_no_download_cache():
     Deleting it in a later layer frees nothing — the bytes are already below — so it has to
     not be written in the first place.
     """
-    assert "--no-cache" in sync_line(), sync_line()
+    for line in sync_lines():
+        assert "--no-cache" in line, line
 
 
 def test_every_group_in_the_project_is_covered_by_that_flag():

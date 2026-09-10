@@ -69,10 +69,19 @@ COPY pyproject.toml uv.lock README.md ./
 # stage no longer ships, so the cache would go away regardless — the flag stays because it
 # also keeps the build's own disk use honest, and because the reasoning that put it here is
 # the reasoning that says not to write what nothing reads.
-RUN uv sync --locked --no-default-groups --extra server --no-cache
+#
+# Twice, and `--no-install-project` only on the first. `uv sync` installs the project as well
+# as its dependencies, and before `COPY src` there is no project to install: with one sync
+# up here every build failed on "Expected a Python module at: src/postulo/__init__.py", from
+# #157 until the test instance's deploy built an image for the first time since (#166). The
+# second sync, once the source is here, installs Postulo itself and nothing else, so a change
+# to the application still does not re-resolve a single dependency.
+RUN uv sync --locked --no-default-groups --extra server --no-cache --no-install-project
 
 COPY src ./src
 COPY scripts/messages.py ./scripts/messages.py
+
+RUN uv sync --locked --no-default-groups --extra server --no-cache
 
 # The translation catalogues are committed as .po text; Django reads the compiled .mo,
 # which this writes in plain Python — no gettext in the image. Every set of them, since a

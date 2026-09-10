@@ -1386,6 +1386,15 @@ All notable changes to Postulo are recorded here. The format follows
   now the interface and nothing else, and twenty-four utilities nothing used — among them
   every physical one — have gone. (#164)
 
+- **The image builds again.** Giving the Python build a stage of its own (#157) put the
+  dependencies first, so that a change to the application would not re-resolve them, and
+  left the one `uv sync` above the line that copies the source — and `uv sync` installs the
+  project as well. Every image build since failed with *Expected a Python module at*
+  `src/postulo/__init__.py`, and nobody knew, because nothing in CI builds an image (#81):
+  the test instance's deploy was the first build since. The dependencies are synced before
+  the source with `--no-install-project`, Postulo after it, and a test reads the Dockerfile's
+  stages to hold that order. (#166)
+
 - **Pages that ran off a phone's screen in a longer language, and words squeezed out of their
   own space.** The arrange page's *Take … off* buttons carry a translated widget name, and
   sat in a group that was not allowed to give way: in Greek it pushed the page 64 pixels past
