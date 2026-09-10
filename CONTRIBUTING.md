@@ -211,9 +211,24 @@ root tells an assistant how this project works; keep it current when the rules c
 
 ## Documentation
 
-User documentation lives in [wiki/](wiki/) and is published to the project wiki with
-`scripts/publish-wiki.sh`. Editing it here rather than in the wiki interface means
-documentation changes are reviewed alongside the code that caused them.
+User documentation is the [wiki](https://source.tiagoagueda.com/postulo/postulo/wiki), and
+the wiki is its own git repository. Clone it beside your checkout of this one:
+
+```sh
+git clone https://source.tiagoagueda.com/postulo/postulo.wiki.git
+```
+
+Pages are written and committed there, and nowhere else: there is no copy in this repository
+to keep in step (#169). A change that needs a page ships with one — a commit to the wiki that
+names the same issue as the code, pushed when the code is.
+
+- **A file name is a page name.** `Installing-Postulo.md` is the page *Installing Postulo*.
+  `Home.md` is the front page, and `_Sidebar.md` is the navigation beside every page, so a
+  new page gets a line there.
+- **Links between pages** use the page name without the extension:
+  `[Configuration](Configuration)`.
+- **Images** go in `images/` and are referred to by a relative path, `images/postulo.png`;
+  Forgejo serves them from the wiki repository.
 
 Please keep it honest: the wiki says plainly what is not built yet, and a page that
 describes a feature which does not exist is a bug.

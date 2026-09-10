@@ -1464,6 +1464,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **The wiki is written where it is read.** Its pages lived in this repository's `wiki/` and
+  reached the Forgejo wiki only when somebody ran `scripts/publish-wiki.sh`. By the time
+  anybody looked, four pages — *Accessibility*, *Hardening*, *Listings*, *Reports* — had
+  never arrived, the other seventeen were five days old, and the images had never been
+  copied at all, so the wiki's front page had shown its logo broken since the day it was
+  added. The pages now live only in the `postulo.wiki` repository, the script and the copy
+  are gone, and `CONTRIBUTING.md` says how a page is written there. (#169)
+
 - **The dashboard is a grid of four columns, and a widget can be dragged into place.**
   The last of three: #123 settled where an arrangement is stored, #124 settled how a widget
   is moved by somebody not using a mouse, and this is the grid itself and the gesture.

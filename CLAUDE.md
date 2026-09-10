@@ -51,7 +51,8 @@ The compiled stylesheet is committed, so a template that gains a class ships a c
 nothing until it is rebuilt. `tests/test_stylesheet.py` fails on a stale one wherever
 `node_modules` is installed.
 
-A feature ships with its tests, its wiki page (authored in `wiki/`) and a CHANGELOG
+A feature ships with its tests, its wiki page (a commit to the `postulo.wiki` repository,
+beside this one, naming the same issue) and a CHANGELOG
 entry under *Unreleased*, in one of six marked sections — `### ✨ Added`, `### 🔧 Changed`,
 `### 🐛 Fixed`, `### 🔒 Security`, `### ⚠️ Deprecated`, `### 🗑️ Removed` — ending with the
 issue it closes. An entry says why, not what. Commit messages explain why, not what. Never create a release

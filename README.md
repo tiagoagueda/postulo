@@ -163,7 +163,8 @@ Postulo is in each language so nobody has to guess.
 ## Documentation
 
 - **[The wiki](https://source.tiagoagueda.com/postulo/postulo/wiki)** — installing,
-  configuring and using Postulo. Authored in [wiki/](wiki/) and published from there.
+  configuring and using Postulo. Its pages are their own repository,
+  [postulo.wiki](https://source.tiagoagueda.com/postulo/postulo.wiki).
 - [Implementation plan](docs/PLAN.md) — architecture, data model, and milestones
 - [Writing a capture source](docs/PLUGINS.md) — the plugin contract
 
