@@ -104,3 +104,36 @@ def test_a_table_narrowing_as_you_type_keeps_it(live_server, page: Page, applica
         page.wait_for_timeout(600)
 
     assert not breaches, "\n".join(breaches)
+
+
+def test_a_table_with_a_stored_column_width_keeps_it(
+    live_server, page: Page, applicant, strict_csp
+):
+    """A width is stored data applied to an element, which is the shape that breaches this.
+
+    `style-src 'self'` refuses a `style` attribute as firmly as it refuses a `<style>`
+    element, so a width written into the markup would be dropped by the browser and
+    reported as a violation on every load -- silently doing nothing, which is the worst of
+    both.
+    """
+    from postulo.accounts.models import Profile
+    from postulo.jobs.models import Company
+
+    Company.objects.create(owner=applicant, name="Aperture Science")
+    Profile.objects.filter(user=applicant).update(
+        table_settings={"companies": {"widths": {"name": 320}}}
+    )
+    base = live_server.url
+    breaches = watch(page)
+
+    page.goto(f"{base}/accounts/login/")
+    page.locator("input[name=login]").fill(EMAIL)
+    page.locator("input[name=password]").fill(PASSWORD)
+    page.locator("form").get_by_role("button", name="Sign In", exact=True).click()
+    page.wait_for_url(f"{base}/")
+
+    page.goto(f"{base}/jobs/companies/")
+    page.wait_for_load_state("networkidle")
+
+    assert not breaches, "\n".join(breaches)
+    assert page.locator('th[data-col="name"]').bounding_box()["width"] > 300, "and it applied"

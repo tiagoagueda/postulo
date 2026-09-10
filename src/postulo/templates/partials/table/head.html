@@ -7,6 +7,11 @@
    tells `app.js` there is anything to add a handle to. Without a script no handle exists:
    a width is a pointer gesture, and an inert control is worse than a missing one -- the
    columns size themselves exactly as they did, which is a complete fallback (#136).
+
+   A stored width travels as `data-col-width` and is applied by that same script, never as
+   a `style` attribute here. `style-src 'self'` refuses an inline style as firmly as it
+   refuses an inline script, so a width written into the markup is dropped by the browser
+   on a real deployment -- silently, which is the worst way for it to fail.
 {% endcomment %}
 <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
               dark:border-ink-800 dark:text-ink-400"
@@ -29,7 +34,7 @@
       <th scope="col"
           class="relative px-4 py-3 font-medium {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
           data-col="{{ header.key }}" data-col-label="{{ header.label }}"
-          {% if header.width %}style="width: {{ header.width }}px"{% endif %}
+          {% if header.width %}data-col-width="{{ header.width }}"{% endif %}
           {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
         {% if header.column.sortable %}
           {% comment %} `tap-target` rather than the bare `inline-flex` this used to have:

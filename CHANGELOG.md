@@ -1219,6 +1219,19 @@ All notable changes to Postulo are recorded here. The format follows
   that must not happen here: deleting a CV has to leave the PDF an employer received exactly
   where it is, which was the whole reason `RenderedDocument` exists. (#130)
 
+### 🐛 Fixed
+
+- **A stored column width did nothing on a real deployment.** It shipped as a `style`
+  attribute on the header cell, and the policy Postulo serves is `style-src 'self'`, which
+  refuses one as firmly as it refuses an inline script — so the browser dropped it, the
+  column sized itself, and the preference appeared not to save. Development never saw it
+  because the strict policy is production's: the browser test that covers widths runs under
+  the development settings, and the test that runs under the real policy visited no page
+  with a stored width. Both were true and neither could catch it, which is the gap that has
+  been closed alongside the width. The script that owns the handle applies it through the
+  DOM now, which the policy does not govern, and which is the coherent place for it — a
+  width is a pointer gesture, so it belongs to the script that provides the gesture. (#136)
+
 ### 🔧 Changed
 
 - **The dashboard is a grid of four columns, and a widget can be dragged into place.**

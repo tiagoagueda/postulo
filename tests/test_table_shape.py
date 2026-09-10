@@ -124,7 +124,26 @@ def test_a_stored_width_reaches_the_header(client, user):
 
     html = client.get(reverse(LIST)).content.decode()
 
-    assert 'style="width: 320px"' in html
+    assert 'data-col-width="320"' in html
+
+
+def test_a_stored_width_is_never_written_as_a_style_attribute(client, user):
+    """`style-src 'self'` refuses an inline style as firmly as it refuses an inline script.
+
+    A width in a `style` attribute works perfectly in development, where the policy is not
+    enforced, and is dropped by the browser on a real deployment -- so the column silently
+    sizes itself and the preference appears not to save. The script that owns the handle
+    applies the width instead, through the DOM, which the policy does not govern.
+    """
+    Company.objects.create(owner=user, name="Aperture Science")
+    tables.save_settings(
+        user, "companies", {"columns": ["name"], "page_size": 50, "widths": {"name": 320}}
+    )
+    client.force_login(user)
+
+    html = client.get(reverse(LIST)).content.decode()
+
+    assert "style=" not in html.split("<thead")[1].split("</thead>")[0]
 
 
 def test_a_width_is_a_preference_rather_than_a_question(client, user):

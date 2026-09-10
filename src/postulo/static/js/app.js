@@ -881,6 +881,13 @@
    * reload to confirm it would be a page load to tell somebody what they can see. A failed
    * save leaves the width for this page and loses it on the next one, which is the honest
    * outcome and not worth a dialogue.
+   *
+   * **And a stored width is applied here rather than written into the markup.** The policy
+   * this application serves is `style-src 'self'`, which refuses a `style` attribute as
+   * firmly as it refuses an inline script -- so a width in the template is dropped by the
+   * browser and does nothing at all on a real deployment, while working perfectly in
+   * development where the policy is not enforced. A style set through the DOM by a script
+   * the policy already allows is not an inline style and is not refused.
    */
   var RESIZE_STEP = 16;
 
@@ -1015,11 +1022,19 @@
     }
   }
 
+  function applyStoredWidth(cell) {
+    var stored = parseInt(cell.dataset.colWidth || "", 10);
+    if (stored) {
+      cell.style.width = stored + "px";
+    }
+  }
+
   function readyColumnWidths() {
     Array.prototype.forEach.call(
       document.querySelectorAll("thead[data-col-settings]"),
       function (head) {
         Array.prototype.forEach.call(head.querySelectorAll("th[data-col]"), function (cell) {
+          applyStoredWidth(cell);
           addHandle(head, cell);
         });
       }
