@@ -215,14 +215,14 @@ class DashboardView(SettingsSectionMixin, TemplateView):
         # "dismiss" changes nothing about the page and everything about the offer: a new
         # widget somebody said no to stops being new without going on.
         if action != "dismiss":
-            keys = self._rearrange(keys, action, key)
+            keys = self._rearrange(keys, action, key, request.POST)
 
         profile.dashboard_widgets = keys
         # Whatever was just acted on is decided about now, however it was decided.
         profile.dashboard_known = sorted(widgets.known_to(profile) | {key})
         profile.save(update_fields=["dashboard_widgets", "dashboard_known", "updated_at"])
 
-        if action in widgets.DIRECTIONS and key in keys:
+        if (action in widgets.DIRECTIONS or action == "place") and key in keys:
             self._say_where_it_landed(request, keys, key)
             # Focus follows the widget: the fragment is what takes somebody using a keyboard
             # or a screen reader to where it went, rather than to the top of the page.
@@ -256,7 +256,7 @@ class DashboardView(SettingsSectionMixin, TemplateView):
         return profile
 
     @staticmethod
-    def _rearrange(keys: list[str], action: str, key: str) -> list[str]:
+    def _rearrange(keys: list[str], action: str, key: str, data=None) -> list[str]:
         keys = list(keys)
         if action == "add":
             if key not in keys:
@@ -265,4 +265,9 @@ class DashboardView(SettingsSectionMixin, TemplateView):
             keys = [k for k in keys if k != key]
         elif action in widgets.DIRECTIONS:
             keys = widgets.move(keys, key, action)
+        elif action == "place":
+            # Where a drop lands. The same list the arrows edit, so dragging is an addition
+            # to the control that works everywhere rather than a second way of storing
+            # anything (#125).
+            keys = widgets.place(keys, key, data.get("to", ""))
         return keys

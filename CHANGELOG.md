@@ -1221,6 +1221,42 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **The dashboard is a grid of four columns, and a widget can be dragged into place.**
+  The last of three: #123 settled where an arrangement is stored, #124 settled how a widget
+  is moved by somebody not using a mouse, and this is the grid itself and the gesture.
+
+  **Four columns rather than five**, because four is the count in which the three widths
+  every widget already declares — a quarter, a half, a whole row — mean what they say. Five
+  has no half; a half-width widget in five columns is two columns or three, and every widget
+  would have had to be re-measured against a grid that divides by nothing.
+
+  **A widget has a width and a place in the order; the row falls out of the two.** That is
+  the whole model, and the reason it is worth stating is what it makes impossible: there is
+  no way to leave a hole in the middle of the page, no way to put two widgets in one cell,
+  and so no validating, no repairing, and no answer needed for what happens when a plugin is
+  uninstalled and its widget goes — the rest close up. A coordinate model would have needed
+  all three.
+
+  Dragging is added on top of the four arrows and does not replace them, which is the rule
+  this project has followed since the board learnt to drag: drag and drop fires on neither a
+  touch screen nor a keyboard. A drop posts to the same address the arrows post to and gets
+  the same sentence back saying which row and place it landed in, so a page arranged by
+  dragging and a page arranged by pressing arrows are the same page, saved the same way.
+  Nothing is draggable until the script makes it so, because an affordance that does nothing
+  is worse than none.
+
+  Widths stayed out of the person's hands on purpose. A width is the widget's own statement
+  about how much room it needs to be legible — a six-stage funnel is unreadable in a quarter
+  of a row — and what is being arranged is the order. A narrow screen gets one column, read
+  downwards; #73 is where the phone gets its own attention and this does not assume it
+  solved.
+
+  The "internal widgets plugin" the issue asked for is the registry that already exists,
+  named as one. Making a widget a plugin *kind* would put seventeen rows in *Server settings
+  → Plugins* for an administrator to switch off, and would need an entry-point contract
+  before anybody outside has asked for one; the part of that contract that actually matters
+  — a key that cannot collide with another provider's — shipped with #123. (#125)
+
 - **A column header clicks back to no sort at all, and a column can be dragged wider.**
   Two of the four features Dispatcharr's channel table had and Postulo's did not; the other
   two arrived with their prerequisites — selection with bulk actions, and editing in the

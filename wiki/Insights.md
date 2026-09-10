@@ -101,9 +101,13 @@ interview rate; it is one interview.
 described on this page sit under *What the record says*; the ones about today — gone quiet,
 interviews coming up, reminders due — sit under *What needs doing*.
 
-Add, remove and move with buttons rather than by dragging. Drag and drop does not fire on a
-touch screen and cannot be reached from a keyboard, so in Postulo it is always an addition
-to a control that works everywhere, never a replacement for one.
+Add, remove and move with buttons. You can **also drag a widget into place** with a mouse,
+but the buttons are the real control: drag and drop does not fire on a touch screen and
+cannot be reached from a keyboard, so in Postulo it is always an addition to a control that
+works everywhere, never a replacement for one. Dragging a widget onto another one puts it
+where that one was, and saves exactly what the arrows save — it is the same arrangement,
+reached a different way. With scripts blocked nothing looks draggable, because a control
+that does nothing is worse than no control.
 
 **Four arrows, because the dashboard is two-dimensional.** Widgets have widths and fill rows
 in order, so:
@@ -115,6 +119,23 @@ On a narrow screen there is one column and the two axes are the same move. An ar
 cannot go anywhere is shown but disabled, so the cluster keeps its shape and the arrow you
 reach for is where it was last time. After a move, the page comes back with the focus on the
 widget you moved and a line saying which row and place it landed in.
+
+## The grid it lands on
+
+**Four columns on a wide screen.** Every widget declares how much room it needs to be
+legible — a quarter of the row, a half, or the whole of it — and four is the count in which
+those three words mean what they say. Five columns has no half.
+
+**A widget has a width and a place in the order; the row it lands on falls out of the two.**
+There is nothing else to set, which is why there is no way to leave a hole in the middle of
+the page, put two widgets in the same cell, or end up with an arrangement that has to be
+repaired. When a plugin is uninstalled and its widget goes, the rest close up.
+
+The widths are not yours to choose. A width is the widget's own statement about how much
+room it needs — a funnel with six stages is unreadable in a quarter of a row — and what you
+arrange is the order.
+
+**On a narrow screen there is one column**, read downwards in the order you arranged.
 
 **The arrangement is yours from the day your account exists.** It starts as the standard
 one — the same seven widgets everybody starts with, computed against your own records and

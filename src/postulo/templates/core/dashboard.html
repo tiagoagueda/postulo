@@ -54,13 +54,29 @@
   </div>
 
   {% if page %}
-    {% comment %} Twelve columns, so a quarter, a half and a whole row all divide into it.
-       The widths are written out as literal classes rather than built from the widget's
-       own string: Tailwind reads the templates, and a class it never sees is a class it
-       never compiles. {% endcomment %}
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+    {% comment %} Four columns, which is what was asked for and the only one of the two
+       that divides (#125). Five divides by nothing useful: a half-width widget in five
+       columns is two columns or three and never half, and every widget declares its width
+       in exactly those words. Four takes a quarter, a half and a whole with no arithmetic
+       and no renaming.
+
+       **Packed, not placed.** A widget has a width and a place in the order; the row it
+       lands on falls out of the two. A coordinate model would admit two widgets in one cell
+       and a gap in the middle of the page, and would need validating, repairing, and
+       answering for when a plugin is uninstalled and leaves a hole. This model cannot
+       represent either, so none of that code exists.
+
+       **One column on a narrow screen, in reading order**, which is the order the person
+       arranged. #73 is open on the phone and this does not assume it solved: what a phone
+       gets is the same arrangement read downwards, which is the only reading of it that
+       does not need a second answer.
+
+       The spans are written out as literal classes rather than built from the widget's own
+       string: Tailwind reads the templates, and a class it never sees is a class it never
+       compiles. {% endcomment %}
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
       {% for item in page %}
-        <section class="{% if item.spec.width == 'quarter' %}lg:col-span-3{% elif item.spec.width == 'half' %}lg:col-span-6{% else %}lg:col-span-12{% endif %}"
+        <section class="{% if item.spec.width == 'quarter' %}lg:col-span-1{% elif item.spec.width == 'half' %}lg:col-span-2{% else %}lg:col-span-4{% endif %}"
                  data-widget="{{ item.spec.key }}">
           {% render_widget item %}
         </section>

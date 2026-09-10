@@ -20,11 +20,18 @@
          narrow screen there is one column and the two axes are the same move. Every one is
          a form that posts, because dragging does not fire on a touch screen and cannot be
          reached from a keyboard (#124).
+
+         Dragging is added on top of them (#125). `data-widget-list` is where a drop posts
+         to -- the same address the arrows post to -- and its presence is what tells
+         `app.js` there is anything to make draggable. Nothing here is draggable without a
+         script, because an affordance that does nothing is worse than none.
       {% endcomment %}
-      <ol class="divide-y divide-ink-100 dark:divide-ink-800">
+      <ol class="divide-y divide-ink-100 dark:divide-ink-800"
+          data-widget-list data-widget-place="{% url 'settings:dashboard' %}">
         {% for row in chosen %}
           <li class="flex flex-wrap items-center gap-3 px-4 py-3"
-              id="widget-{{ row.widget.key }}" tabindex="-1">
+              id="widget-{{ row.widget.key }}" tabindex="-1"
+              data-widget-row="{{ row.widget.key }}">
             <div class="min-w-0 flex-1">
               <p class="font-medium">{{ row.widget.label|default:row.widget.key }}</p>
               <p class="text-sm text-ink-500 dark:text-ink-400">{{ row.widget.blurb }}</p>

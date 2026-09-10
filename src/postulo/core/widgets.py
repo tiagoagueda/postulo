@@ -280,6 +280,26 @@ def can_move(keys: list[str], key: str, direction: str) -> bool:
     return move(keys, key, direction) != list(keys)
 
 
+def place(keys: list[str], key: str, position) -> list[str]:
+    """Put one widget at a given position in the order. What a drop means.
+
+    The same list the arrows edit, reached a different way: dragging is an addition to the
+    control that works everywhere and never a second place to store anything (#125). A
+    position outside the list is clamped rather than refused -- a drop past the last row is
+    somebody meaning *last*, not somebody making a mistake.
+    """
+    keys = list(keys)
+    if key not in keys:
+        return keys
+    try:
+        wanted = int(position)
+    except (TypeError, ValueError):
+        return keys
+    keys.remove(key)
+    keys.insert(max(0, min(len(keys), wanted)), key)
+    return keys
+
+
 def new_for(profile) -> list[Widget]:
     """Widgets this account has never been offered, in registration order.
 

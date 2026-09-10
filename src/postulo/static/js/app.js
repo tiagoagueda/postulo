@@ -1032,4 +1032,105 @@
     readyColumnWidths();
   }
 
+  /* ------------------------------------------------- dragging a widget into place
+   *
+   * The dashboard is a grid a person arranges, and this is the gesture that was asked for
+   * (#125). It is the *third* way to arrange it, not the first: the four arrows came first
+   * on purpose, because drag and drop does not fire on touch screens and is not reachable
+   * from a keyboard, and this file has said so since the board learnt to drag.
+   *
+   * **No new endpoint and no second store.** A drop posts to the same address the arrows
+   * post to, with the position it landed at, and the arrangement is the same ordered list
+   * it has always been -- so a page arranged by dragging and a page arranged by pressing
+   * arrows are the same page, saved the same way.
+   *
+   * **`draggable` is set here rather than in the template**, so that with this script
+   * blocked nothing looks draggable. An affordance that does nothing is worse than none.
+   */
+  function widgetRows(list) {
+    return Array.prototype.slice.call(list.querySelectorAll("[data-widget-row]"));
+  }
+
+  function postPlacement(list, key, index) {
+    var form = document.createElement("form");
+    form.method = "post";
+    form.action = list.dataset.widgetPlace || "";
+    form.hidden = true;
+    [
+      ["csrfmiddlewaretoken", (document.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || ""],
+      ["key", key],
+      ["to", String(index)],
+      ["action", "place"],
+    ].forEach(function (pair) {
+      var field = document.createElement("input");
+      field.type = "hidden";
+      field.name = pair[0];
+      field.value = pair[1];
+      form.appendChild(field);
+    });
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  var draggedWidget = null;
+
+  document.addEventListener("dragstart", function (event) {
+    var row = event.target.closest && event.target.closest("[data-widget-row]");
+    if (!row) {
+      return;
+    }
+    draggedWidget = row;
+    row.classList.add("opacity-50");
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      // Firefox will not start a drag without something on the transfer.
+      event.dataTransfer.setData("text/plain", row.dataset.widgetRow || "");
+    }
+  });
+
+  document.addEventListener("dragend", function () {
+    if (draggedWidget) {
+      draggedWidget.classList.remove("opacity-50");
+      draggedWidget = null;
+    }
+  });
+
+  document.addEventListener("dragover", function (event) {
+    var row = event.target.closest && event.target.closest("[data-widget-row]");
+    if (draggedWidget && row) {
+      event.preventDefault();
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "move";
+      }
+    }
+  });
+
+  document.addEventListener("drop", function (event) {
+    var row = event.target.closest && event.target.closest("[data-widget-row]");
+    if (!draggedWidget || !row || row === draggedWidget) {
+      return;
+    }
+    var list = row.closest("[data-widget-list]");
+    if (!list) {
+      return;
+    }
+    event.preventDefault();
+    postPlacement(list, draggedWidget.dataset.widgetRow, widgetRows(list).indexOf(row));
+  });
+
+  function readyWidgetDragging() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-widget-list] [data-widget-row]"),
+      function (row) {
+        row.draggable = true;
+        row.classList.add("cursor-grab");
+      }
+    );
+  }
+
+  document.addEventListener("DOMContentLoaded", readyWidgetDragging);
+  if (document.body) {
+    readyWidgetDragging();
+  }
+
 })();
