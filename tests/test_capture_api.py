@@ -5,6 +5,7 @@ matters more than what it accepts.
 """
 
 import json
+from decimal import Decimal
 
 import pytest
 from django.urls import reverse
@@ -138,6 +139,103 @@ def test_the_api_will_not_fetch_a_local_address(client, bearer, user):
 
     assert response.status_code == 422
     assert "private or local" in response.json()["detail"]
+    assert not Capture.objects.for_user(user).exists()
+
+
+# ------------------------------------------------ previewing, and correcting (#171)
+
+
+def post_preview(client, bearer, **payload):
+    return client.post(
+        "/api/v1/captures/preview",
+        data=json.dumps(payload),
+        content_type="application/json",
+        **bearer,
+    )
+
+
+def test_a_preview_says_what_was_read_and_keeps_nothing(client, bearer, user, monkeypatch):
+    """What a browser extension shows in its popup before anything is sent."""
+
+    def must_not_notify(*args, **kwargs):
+        raise AssertionError("a preview tells nobody anything")
+
+    monkeypatch.setattr("postulo.api.api.notify", must_not_notify)
+
+    response = post_preview(client, bearer, url="https://example.org/j/7", html=PAGE)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["url"] == "https://example.org/j/7"
+    assert body["source"]
+    assert body["data"]["title"] == "Research Engineer"
+    assert body["data"]["company_name"] == "Black Mesa"
+    assert not Capture.objects.for_user(user).exists()
+
+
+def test_a_preview_of_a_page_with_no_posting_is_refused_with_an_explanation(client, bearer):
+    response = post_preview(client, bearer, url="https://example.org/", html="<html></html>")
+
+    assert response.status_code == 422
+    assert "job posting" in response.json()["detail"]
+
+
+def test_a_preview_needs_the_captures_scope(client, db, user):
+    _record, raw = ApiToken.issue(user, "Reader", scopes=("read",))
+
+    response = post_preview(
+        client, {"HTTP_AUTHORIZATION": f"Bearer {raw}"}, url="https://example.org/j/7", html=PAGE
+    )
+
+    assert response.status_code == 403
+
+
+def test_without_corrections_the_capture_is_what_the_preview_said(client, bearer, user):
+    preview = post_preview(client, bearer, url="https://example.org/j/7", html=PAGE).json()
+
+    post_capture(client, bearer, url="https://example.org/j/7", html=PAGE)
+    capture = Capture.objects.for_user(user).get()
+
+    assert capture.data == preview["data"]
+    assert capture.source_name == preview["source"]
+
+
+def test_corrections_replace_what_was_read_and_nothing_else(client, bearer, user):
+    preview = post_preview(client, bearer, url="https://example.org/j/7", html=PAGE).json()
+
+    response = post_capture(
+        client,
+        bearer,
+        url="https://example.org/j/7",
+        html=PAGE,
+        data={"title": "Senior Research Engineer", "location": "Lyon", "salary_min": "55000"},
+    )
+
+    assert response.status_code == 201
+    assert response.json()["title"] == "Senior Research Engineer"
+    capture = Capture.objects.for_user(user).get()
+    assert capture.data["title"] == "Senior Research Engineer"
+    assert capture.data["location"] == "Lyon"
+    assert capture.data["company_name"] == "Black Mesa", "what nobody corrected is what was read"
+    assert capture.source_name == preview["source"], "the source is still what read the page"
+    assert capture.status == CaptureStatus.PENDING, "corrected is not the same as reviewed"
+    assert not Application.objects.for_user(user).exists()
+
+    client.force_login(user)
+    initial = client.get(reverse("jobs:capture_review", args=[capture.pk])).context["form"].initial
+    assert initial["title"] == "Senior Research Engineer"
+    assert initial["salary_min"] == Decimal("55000")
+
+
+@pytest.mark.parametrize(
+    "data",
+    [{"titel": "A typo"}, {"title": ""}, {"title": "   "}, {"salary_min": "a lot"}],
+    ids=["unknown field", "empty title", "blank title", "not a number"],
+)
+def test_corrections_that_do_not_make_a_posting_are_refused(client, bearer, user, data):
+    response = post_capture(client, bearer, url="https://example.org/j/7", html=PAGE, data=data)
+
+    assert response.status_code == 422
     assert not Capture.objects.for_user(user).exists()
 
 

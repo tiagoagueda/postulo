@@ -290,6 +290,20 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A capture can be looked at before it is sent, and corrected on the way.** The browser
+  extension used to send a page and hope: `POST /captures` read and stored it in one go, so
+  the first anybody saw of what the parser made of it was the review screen, a tab and a
+  sign-in away. `POST /captures/preview` answers with what a page would be captured as, and
+  which source read it, and stores nothing and tells nobody; the extension shows that in its
+  popup. `POST /captures` takes the fields the person changed as `data`: the page is still
+  read, so the capture's source stays the one that read it, and each field given replaces
+  what was read before the whole is checked exactly as a source's own output is. An unknown
+  field or an empty title is a 422.
+
+  **What a `captures` token may do has not moved.** A corrected capture is still pending,
+  and the review screen opens with the corrections filled in: corrected is not reviewed, and
+  a listing still exists only once somebody has saved it there. (#171)
+
 - **A portfolio is a document Postulo makes, and what kinds of document exist is said in one
   place.** The first of the three stages the issue itself proposes — *portfolios need the
   polymorphic link and the theme rule and nothing else* — and both of those shipped already:

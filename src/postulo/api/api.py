@@ -19,17 +19,19 @@ security policy forbids, and the schema is what a client consumes anyway.
 from __future__ import annotations
 
 import datetime as dt
+from decimal import Decimal
 
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI, Schema, Status
-from ninja.errors import HttpError
-from pydantic import Field
+from ninja.errors import HttpError, ValidationError
+from pydantic import ConfigDict, Field
+from pydantic import ValidationError as PydanticValidationError
 
 from postulo.jobs.models import Capture, CaptureStatus
 from postulo.notifications.base import Notification
 from postulo.notifications.service import notify
-from postulo.plugins.base import CaptureError
+from postulo.plugins.base import CaptureError, JobPostingData
 from postulo.plugins.fetching import fetch_page
 from postulo.plugins.registry import parse_page
 
@@ -61,8 +63,29 @@ api = NinjaAPI(
 )
 
 
-class CaptureIn(Schema):
-    """A posting somebody wants Postulo to look at."""
+class CorrectionsIn(Schema):
+    """The fields a person changed after seeing what was read. Every one is optional."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str | None = None
+    company_name: str | None = None
+    location: str | None = None
+    remote_type: str | None = None
+    employment_type: str | None = None
+    description: str | None = None
+    salary_min: Decimal | None = None
+    salary_max: Decimal | None = None
+    salary_currency: str | None = None
+    salary_period: str | None = None
+    posted_at: dt.date | None = None
+    closes_at: dt.date | None = None
+    url: str | None = None
+    source: str | None = None
+
+
+class PageIn(Schema):
+    """A page somebody wants Postulo to read."""
 
     url: str = Field(max_length=500)
     html: str | None = Field(
@@ -73,6 +96,25 @@ class CaptureIn(Schema):
             "capture a posting that is only visible to a signed-in reader."
         ),
     )
+
+
+class CaptureIn(PageIn):
+    """A posting somebody wants Postulo to look at."""
+
+    data: CorrectionsIn | None = Field(
+        default=None,
+        description=(
+            "Corrections to what the page is read as, typically made after a preview. "
+            "The page is still read; each field given replaces what was read, and the "
+            "result is checked exactly as a source's own output is."
+        ),
+    )
+
+
+class PreviewOut(Schema):
+    url: str
+    source: str
+    data: JobPostingData
 
 
 class CaptureOut(Schema):
@@ -131,25 +173,26 @@ def create_capture(request, payload: CaptureIn):
 
     Nothing is created beyond the capture itself. The owner still has to look at it and
     save it before a listing exists, because a parser reading somebody else's markup is
-    not a good enough reason to write to their records.
+    not a good enough reason to write to their records. Corrections sent with it change
+    what the review screen opens with, not that it has to be reviewed.
     """
     token: ApiToken = request.auth
     owner = token.owner
 
-    try:
-        if payload.html:
-            url, html = payload.url, payload.html
-        else:
-            fetched = fetch_page(payload.url)
-            url, html = fetched.url, fetched.html
-    except CaptureError as exc:
-        raise HttpError(422, str(exc)) from exc
+    url, data, source = _read(payload)
+    if payload.data is not None:
+        corrections = payload.data.model_dump(exclude_unset=True)
+        try:
+            data = JobPostingData.model_validate({**data.model_dump(), **corrections})
+        except PydanticValidationError as exc:
+            # Located where the request put it, as the payload's own refusals are.
+            raise ValidationError(
+                [
+                    {**error, "loc": ("body", "payload", "data", *error["loc"])}
+                    for error in exc.errors(include_url=False, include_context=False)
+                ]
+            ) from exc
 
-    result = parse_page(url, html)
-    if result is None:
-        raise HttpError(422, str(_("Nothing resembling a job posting was found there.")))
-
-    data, source = result
     capture = Capture.objects.create(
         owner=owner,
         url=url[:500],
@@ -171,6 +214,42 @@ def create_capture(request, payload: CaptureIn):
         ),
     )
     return Status(201, _as_output(request, capture))
+
+
+@api.post(
+    "/captures/preview",
+    response=PreviewOut,
+    auth=scope("captures"),
+    tags=["captures"],
+    summary="Read a posting without capturing it",
+)
+def preview_capture(request, payload: PageIn):
+    """Say what a page would be captured as, and store nothing.
+
+    For a client that shows the person what was read before sending it, so they can
+    correct it first: a browser extension's popup. Nothing is created and nobody is
+    notified; the same page sent to ``POST /captures`` afterwards is read again.
+    """
+    url, data, source = _read(payload)
+    return {"url": url, "source": source.name, "data": data}
+
+
+def _read(payload: PageIn):
+    """The page's address, what it was read as, and the source that read it; or a 422."""
+    try:
+        if payload.html:
+            url, html = payload.url, payload.html
+        else:
+            fetched = fetch_page(payload.url)
+            url, html = fetched.url, fetched.html
+    except CaptureError as exc:
+        raise HttpError(422, str(exc)) from exc
+
+    result = parse_page(url, html)
+    if result is None:
+        raise HttpError(422, str(_("Nothing resembling a job posting was found there.")))
+    data, source = result
+    return url, data, source
 
 
 @api.get(
