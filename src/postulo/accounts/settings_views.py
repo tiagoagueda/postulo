@@ -242,7 +242,7 @@ class DashboardView(SettingsSectionMixin, TemplateView):
             request,
             _("%(name)s is now in row %(row)s, place %(place)s.")
             % {
-                "name": widget.label or key,
+                "name": widget.called,
                 "row": row + 1,
                 "place": rows[row].index(key) + 1,
             },

@@ -16,8 +16,13 @@
   </form>
 
   <div class="card mb-6">
-    <div class="mb-3 flex items-start justify-between gap-4">
-      <div>
+    {% comment %} Each row on this page is what something is, beside the button that changes
+       it. The words claim twelve rem before the button may sit beside them, so on a phone it
+       goes underneath -- rather than squeezing them into a column a word wide or, in Dutch,
+       French and German, pushing past the edge of the screen, which it did at 320 pixels
+       while it was not allowed to give way (#165). {% endcomment %}
+    <div class="mb-3 flex flex-wrap items-start justify-between gap-4">
+      <div class="grow basis-48">
         <h3 class="font-medium">{% translate "Email addresses" %}</h3>
         <p class="text-sm text-ink-500 dark:text-ink-400">
           {% translate "Any of them signs you in. The primary one receives Postulo's mail." %}
@@ -39,7 +44,7 @@
          has more than one address: taking the page away from them would take away the
          way back in on the day a work address stops working (#145). {% endcomment %}
       {% if several_addresses %}
-        <a href="{{ email_url }}" class="btn-secondary shrink-0">{% translate "Manage" %}</a>
+        <a href="{{ email_url }}" class="btn-secondary">{% translate "Manage" %}</a>
       {% endif %}
     </div>
     <ul class="divide-y divide-ink-200 text-sm dark:divide-ink-800">
@@ -62,14 +67,14 @@
   </div>
 
   <div class="card mb-6">
-    <div class="flex items-start justify-between gap-4">
-      <div>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="grow basis-48">
         <h3 class="font-medium">{% translate "Password" %}</h3>
         <p class="text-sm text-ink-500 dark:text-ink-400">
           {% translate "You will be asked for the current one first." %}
         </p>
       </div>
-      <a href="{{ password_url }}" class="btn-secondary shrink-0">{% translate "Change password" %}</a>
+      <a href="{{ password_url }}" class="btn-secondary">{% translate "Change password" %}</a>
     </div>
   </div>
 
@@ -77,8 +82,8 @@
      answer and the one most people should reach for: nothing to type, nothing to leak, and
      two factors in a single gesture. {% endcomment %}
   <div class="card mb-6" data-passkeys="{{ passkeys.count }}">
-    <div class="flex items-start justify-between gap-4">
-      <div>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="grow basis-48">
         <h3 class="font-medium">{% translate "Passkeys" %}</h3>
         <p class="text-sm text-ink-500 dark:text-ink-400">
           {% if passkeys.count %}
@@ -96,7 +101,7 @@
       </div>
       {% if passkeys.usable %}
         <a href="{% if passkeys.count %}{{ passkeys_url }}{% else %}{{ add_passkey_url }}{% endif %}"
-           class="btn-secondary shrink-0">
+           class="btn-secondary">
           {% if passkeys.count %}{% translate "Manage" %}{% else %}{% translate "Add one" %}{% endif %}
         </a>
       {% endif %}
@@ -135,8 +140,8 @@
   </div>
 
   <div class="card" data-mfa-status="{% if mfa_enabled %}on{% else %}off{% endif %}">
-    <div class="flex items-start justify-between gap-4">
-      <div>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="grow basis-48">
         <h3 class="font-medium">{% translate "Two-factor authentication" %}</h3>
         <p class="text-sm text-ink-500 dark:text-ink-400">
           {% if mfa_enabled %}
@@ -146,7 +151,7 @@
           {% endif %}
         </p>
       </div>
-      <a href="{{ mfa_url }}" class="btn-secondary shrink-0">
+      <a href="{{ mfa_url }}" class="btn-secondary">
         {% if mfa_enabled %}{% translate "Manage" %}{% else %}{% translate "Set up" %}{% endif %}
       </a>
     </div>
@@ -178,8 +183,8 @@
 
   {% if sso_enabled %}
     <div class="card mt-6" data-sso="{{ sso_name }}">
-      <div class="flex items-start justify-between gap-4">
-        <div>
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="grow basis-48">
           <h3 class="font-medium">{% translate "Sign-in methods" %}</h3>
           <p class="text-sm text-ink-500 dark:text-ink-400">
             {% blocktranslate with provider=sso_name trimmed %}
@@ -188,7 +193,7 @@
             {% endblocktranslate %}
           </p>
         </div>
-        <a href="{{ connections_url }}" class="btn-secondary shrink-0">{% translate "Manage" %}</a>
+        <a href="{{ connections_url }}" class="btn-secondary">{% translate "Manage" %}</a>
       </div>
     </div>
   {% endif %}

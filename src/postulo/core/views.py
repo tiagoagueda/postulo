@@ -32,7 +32,7 @@ def home(request: HttpRequest):
             # has something this account has never been offered, and the arrange page is
             # where it waits (#123).
             "new_widgets": fresh,
-            "new_names": ", ".join(str(widget.label or widget.key) for widget in fresh),
+            "new_names": ", ".join(widget.called for widget in fresh),
         },
     )
 

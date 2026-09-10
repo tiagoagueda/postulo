@@ -184,8 +184,12 @@
     <div class="card mb-8 p-0">
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         {% for plugin in installed %}
+          {% comment %} The plugin claims twelve rem before anything sits beside it. A built-in's
+             row has a sentence there instead of buttons, and on a phone in English that
+             sentence fitted on one line with six pixels to spare -- which the description then
+             got, one letter to a line (#165). {% endcomment %}
           <li class="flex flex-wrap items-start gap-3 px-4 py-3" data-plugin="{{ plugin.name }}">
-            <div class="min-w-0 flex-1">
+            <div class="min-w-0 grow basis-48">
               <p class="font-medium">
                 {{ plugin.name }} <span class="text-ink-500 dark:text-ink-400">{{ plugin.version }}</span>
                 {% if plugin.disabled %}

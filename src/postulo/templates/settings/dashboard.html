@@ -32,11 +32,18 @@
           <li class="flex flex-wrap items-center gap-3 px-4 py-3"
               id="widget-{{ row.widget.key }}" tabindex="-1"
               data-widget-row="{{ row.widget.key }}">
-            <div class="min-w-0 flex-1">
-              <p class="font-medium">{{ row.widget.label|default:row.widget.key }}</p>
+            {% comment %} The name and its sentence claim twelve rem before the arrows may sit
+               beside them. Allowed to shrink to nothing, they were one word to a line on a
+               phone, with the longest running under the arrows (#165). {% endcomment %}
+            <div class="min-w-0 grow basis-48">
+              <p class="font-medium">{{ row.widget.called }}</p>
               <p class="text-sm text-ink-500 dark:text-ink-400">{{ row.widget.blurb }}</p>
             </div>
-            <div class="flex shrink-0 items-center gap-2">
+            {% comment %} Allowed to wrap and to give way, never `shrink-0`: this group holds a
+               button whose words include a translated widget name, and a group that cannot
+               shrink around words it cannot predict pushes the page sideways on a phone --
+               in Greek by 64 pixels (#165). {% endcomment %}
+            <div class="flex flex-wrap items-center gap-2">
               <div class="grid grid-cols-3 gap-1">
                 <div></div>
                 {% include "settings/partials/move_widget.html" with widget=row.widget way="up" allowed=row.up icon="arrow-up" %}
@@ -53,7 +60,7 @@
                 <input type="hidden" name="key" value="{{ row.widget.key }}">
                 <button type="submit" name="action" value="remove"
                         class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
-                  {% blocktranslate with name=row.widget.label trimmed %}
+                  {% blocktranslate with name=row.widget.called trimmed %}
                     Take {{ name }} off
                   {% endblocktranslate %}
                 </button>
@@ -81,16 +88,16 @@
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         {% for widget in fresh %}
           <li class="flex flex-wrap items-center gap-3 px-4 py-3">
-            <div class="min-w-0 flex-1">
-              <p class="font-medium">{{ widget.label|default:widget.key }}</p>
+            <div class="min-w-0 grow basis-48">
+              <p class="font-medium">{{ widget.called }}</p>
               <p class="text-sm text-ink-500 dark:text-ink-400">{{ widget.blurb }}</p>
             </div>
-            <div class="flex shrink-0 items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="key" value="{{ widget.key }}">
                 <button type="submit" name="action" value="add" class="btn-secondary px-3 py-1 text-sm">
-                  {% blocktranslate with name=widget.label trimmed %}
+                  {% blocktranslate with name=widget.called trimmed %}
                     Add {{ name }}
                   {% endblocktranslate %}
                 </button>
@@ -99,7 +106,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="key" value="{{ widget.key }}">
                 <button type="submit" name="action" value="dismiss" class="btn-ghost px-3 py-1 text-sm">
-                  {% blocktranslate with name=widget.label trimmed %}
+                  {% blocktranslate with name=widget.called trimmed %}
                     Not {{ name }}
                   {% endblocktranslate %}
                 </button>
@@ -122,15 +129,15 @@
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
           {% for widget in items %}
             <li class="flex flex-wrap items-center gap-3 px-4 py-3">
-              <div class="min-w-0 flex-1">
-                <p class="font-medium">{{ widget.label|default:widget.key }}</p>
+              <div class="min-w-0 grow basis-48">
+                <p class="font-medium">{{ widget.called }}</p>
                 <p class="text-sm text-ink-500 dark:text-ink-400">{{ widget.blurb }}</p>
               </div>
-              <form method="post" class="shrink-0">
+              <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="key" value="{{ widget.key }}">
                 <button type="submit" name="action" value="add" class="btn-secondary px-3 py-1 text-sm">
-                  {% blocktranslate with name=widget.label trimmed %}
+                  {% blocktranslate with name=widget.called trimmed %}
                     Add {{ name }}
                   {% endblocktranslate %}
                 </button>

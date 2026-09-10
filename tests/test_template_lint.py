@@ -122,6 +122,38 @@ def test_the_side_detector_knows_the_difference():
     ]
 
 
+# ----------------------------------------------------- a box that scrolls on purpose
+
+#: A scroll utility on its own. `.scroll-x` in the stylesheet is the same thing made safe.
+BARE_SCROLL = re.compile(r"(?<![-\w:])overflow-(?:x-)?(?:auto|scroll)(?![-\w])")
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_a_table_scrolls_in_the_box_made_for_it(path: Path):
+    """`.scroll-x` is `relative overflow-x-auto`, and `relative` is the half that is easy to
+    leave out: without it an absolutely positioned `.sr-only` label is confined by the page
+    rather than by the box, escapes it, and scrolls the page sideways (#113). The report and
+    the recovery page were both written with the bare utility after that was learned, and in
+    Greek the recovery page scrolled 12 pixels for a label nobody can see (#165).
+    """
+    text = path.read_text(encoding="utf-8")
+    found = [text.count("\n", 0, m.start()) + 1 for m in BARE_SCROLL.finditer(text)]
+    assert not found, (
+        f"{path.name}: a bare scroll utility at line(s) {found}. Use `scroll-x`, which is "
+        "positioned, so nothing absolutely placed inside it can escape it."
+    )
+
+
+def test_the_scroll_detector_knows_the_difference():
+    assert BARE_SCROLL.search('class="overflow-x-auto"')
+    assert BARE_SCROLL.search('class="rounded overflow-auto p-2"')
+    assert not BARE_SCROLL.search('class="scroll-x"')
+    assert not BARE_SCROLL.search('class="overflow-hidden truncate"')
+    assert not BARE_SCROLL.search('class="md:overflow-x-auto"'), "a variant is its own case"
+
+
 # --------------------------------------------------- icons that point sideways
 
 #: Names that would still be vertical, or meaningless, mirrored. Everything else whose

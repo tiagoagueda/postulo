@@ -110,6 +110,21 @@
   }
 
   /*
+   * A heading is set large, and one word of it can be wider than a phone: German, Dutch,
+   * Finnish and Greek build long words out of ordinary ones, and "Wiederherstellungslink"
+   * is 300 pixels at text-2xl in a 288-pixel column (#165). `break-word` breaks only a word
+   * that cannot fit on a line of its own, so no heading that fits today changes. Not
+   * `anywhere`, which would let a heading beside something give up its width to it; and not
+   * `hyphens: auto`, which would re-hyphenate ordinary headings wherever the browser has the
+   * dictionary.
+   */
+  h1,
+  h2,
+  h3 {
+    overflow-wrap: break-word;
+  }
+
+  /*
    * Machine text is never in the reader's script. A package name, a version, a checksum,
    * an entry point: all Latin, and all liable to sit inside an Arabic or Hebrew line where
    * the bidirectional algorithm resolves the punctuation around them against the

@@ -34,9 +34,11 @@ us about a barrier.
 - **Things you click are big enough to hit.** Every button, link and switch is at least
   24 by 24 pixels, or else has that much clear space around it. This matters most on a
   phone, with a tremor, or with any pointer that is not a mouse on a desk.
-- **Nothing scrolls sideways.** At 320 pixels — the width a normal window has at 400%
-  zoom — every page reads in one column, top to bottom. Only a data table scrolls across,
-  in its own box, because a table needs its two dimensions to mean anything.
+- **Nothing scrolls sideways, in any language.** At 320 pixels — the width a normal window
+  has at 400% zoom — every page reads in one column, top to bottom, in Greek and German as
+  well as in English, and no sentence is squeezed into a strip beside a button. Only a data
+  table scrolls across, in its own box, because a table needs its two dimensions to mean
+  anything.
 - **A rejected form says why, to a screen reader too.** When a field is refused, the
   control is marked invalid *and* points at the message explaining it, so the reason is read
   out with the field rather than sitting in red where only eyes can find it.
@@ -81,6 +83,19 @@ layout at a width rather than about a document. Nothing had ever looked at these
 narrow, and every one of them scrolled, by an identical 331 pixels: a single row of
 navigation links that did not care how wide the window was. The failure names the element
 rather than the page, because that is the difference between a fix and a search.
+
+The walk is taken in three languages: English, Greek and German. A page is made of
+translated words, and a word that cannot break is as wide as its language makes it. While
+the walk was English only, the dashboard's arrange page fitted with seven pixels to spare on
+one machine and was eight over on another, and in Greek it was 64 over on every machine.
+Greek and German are there because they drew widest of the European catalogues where they
+were measured.
+
+It also asks a second question, of every box that holds words: do they fit inside it? A row of
+words beside buttons that will not give way does not scroll when it fails — it hands the words
+whatever width is left over. On the arrange page that was a column one word wide, with the
+longest written across the arrows; each built-in plugin's description got six pixels. The
+page was exactly as wide as the screen, and half of it could not be read.
 
 It is worth being plain about the limit of the automated half. The sign-in page passed
 every one of those checks, in both themes, while being rendered with no styling at all:

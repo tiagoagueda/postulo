@@ -148,7 +148,9 @@
       </div>
     {% endif %}
 
-    <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+    {% comment %} `wrap-anywhere`: a path has no spaces, and on some systems no hyphens
+       either, so a long one would otherwise run off a phone's screen (#165). {% endcomment %}
+    <p class="mt-4 text-xs text-ink-500 wrap-anywhere dark:text-ink-400">
       {% blocktranslate with file=path trimmed %}
         Kept in {{ file }} and rotated by size, so this cannot fill the disk. Everything here
         also goes to the console, where <code>docker logs</code> reads it.

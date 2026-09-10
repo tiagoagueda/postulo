@@ -1362,6 +1362,33 @@ All notable changes to Postulo are recorded here. The format follows
   now the interface and nothing else, and twenty-four utilities nothing used — among them
   every physical one — have gone. (#164)
 
+- **Pages that ran off a phone's screen in a longer language, and words squeezed out of their
+  own space.** The arrange page's *Take … off* buttons carry a translated widget name, and
+  sat in a group that was not allowed to give way: in Greek it pushed the page 64 pixels past
+  the edge of a phone, in German 31 — and in English 8, on CI's fonts, which is how it was
+  found. The interview list's outcome buttons did the same by 143 pixels in Greek, the account
+  page's buttons in Dutch, French and German, and four list headings in Dutch. Those groups now
+  wrap, and the words beside them claim twelve rem before anything may sit next to them, so on
+  a phone the buttons go underneath.
+
+  Where the buttons *did* fit, the same layout failed quietly, with nothing to scroll: the
+  words were left whatever was over. The arrange page had a column one word wide, a career
+  entry had fourteen pixels in Greek, and each built-in plugin's description had six in
+  English, with the longest word written across whatever was beside it. The browser suite now
+  walks every page in Greek and German as well as English, and fails on words that run out of
+  their own box as well as on a page that scrolls.
+
+  Walking in Greek found two more. The recovery page's table had a hidden *Actions* label that
+  escaped its scroll box and dragged the page sideways, because the report and that page had
+  been given a bare `overflow-x-auto` rather than the positioned `scroll-x` #113 made for
+  exactly this; the template lint now refuses the bare one. And a heading may break a word too
+  long for a phone — *Wiederherstellungslink* is wider than one — rather than run off its edge.
+
+  The *Suggestions* widget, which draws its own heading, had no name anywhere else: the arrange
+  page showed its key, its button read "Take  off", and its four arrows told a screen reader
+  "Move  up a row". Every widget now has a name in words, and registering one without it is
+  refused. (#165)
+
 - **The CV page and the letter page open again.** Making a rendered document point at
   whatever produced it took `related_name="renders"` with the two columns it replaced, and
   both detail pages ask for exactly that — so anyone opening one got a server error instead

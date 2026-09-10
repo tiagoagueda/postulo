@@ -87,10 +87,21 @@ class Widget:
     #: Who provides it. Empty for Postulo's own; a plugin's name otherwise, and then the key
     #: has to be namespaced with it -- see `register`.
     provider: str = ""
+    #: What it is called wherever it is *referred to* rather than headed: the arrange page, the
+    #: buttons that move it, the line saying a new one is waiting. The label, when there is one.
+    #: A widget that draws its own heading -- or none -- says its name here, or the arrange
+    #: page reads "Take  off" and a screen reader hears four arrows that do not say what they
+    #: move (#165).
+    name: str = ""
 
     def __post_init__(self) -> None:
         if self.width not in WIDTHS:
             raise ValueError(f"{self.key}: width must be one of {WIDTHS}")
+
+    @property
+    def called(self) -> str:
+        """The widget's name in words. What every sentence *about* a widget says."""
+        return str(self.name or self.label)
 
 
 #: Every widget, keyed and in registration order. Apps fill this from ``AppConfig.ready``.
@@ -116,6 +127,12 @@ def register(widget: Widget) -> Widget:
         )
     if sep and not widget.provider:
         raise ValueError(f"{widget.key!r}: a namespaced key needs the provider that owns it.")
+    if not (widget.name or widget.label):
+        # Refused here rather than papered over with the key: a key is a code, and the arrange
+        # page, its buttons and a screen reader all need words (#165).
+        raise ValueError(
+            f"{widget.key!r}: a widget needs a label, or a name when it draws its own heading."
+        )
     REGISTRY[widget.key] = widget
     return widget
 

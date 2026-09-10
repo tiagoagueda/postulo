@@ -52,8 +52,11 @@
           <div class="card p-0">
             <ul class="divide-y divide-ink-100 dark:divide-ink-800">
               {% for item in section.items %}
-                <li class="flex items-start gap-3 px-4 py-3">
-                  <div class="min-w-0 flex-1">
+                {% comment %} The entry claims twelve rem before its four buttons may sit beside
+                   it. In Greek, "Edit" and "Delete" are long enough that the entry was left
+                   fourteen pixels, with its title written over the arrows (#165). {% endcomment %}
+                <li class="flex flex-wrap items-start gap-3 px-4 py-3">
+                  <div class="min-w-0 grow basis-48">
                     <p class="font-medium">{{ item }}</p>
                     {% if section.spec.slug == 'link' %}
                       <p class="truncate text-sm text-ink-500 dark:text-ink-400">
@@ -100,7 +103,7 @@
                     {% endwith %}
                   </div>
 
-                  <div class="flex shrink-0 items-center gap-1">
+                  <div class="flex flex-wrap items-center gap-1">
                     <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'up' %}">
                       {% csrf_token %}
                       <button type="submit" class="btn-ghost px-2 py-1 text-xs"

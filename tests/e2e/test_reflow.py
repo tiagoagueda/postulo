@@ -19,6 +19,18 @@ table, a diagram -- is exempt by the criterion itself, and Postulo puts those in
 `overflow-x: auto` box. That box scrolls; the page does not. So an element inside something
 that scrolls on purpose is not reported, and an element that pushes the document itself
 wider is.
+
+**Words that run out of their box.** The other way to lose content at this width does not
+scroll at all. A row of words beside a group of buttons that will not give way leaves the
+words whatever is over -- on the arrange page, a column one word wide, with the longest
+written across the arrows beside it, and on the career page fourteen pixels in Greek. The
+page is exactly as wide as the screen and half of it cannot be read, so the walk also asks
+every box holding text whether its words fit inside it.
+
+**In which languages.** A page is made of translated words, and a word that cannot break is as
+wide as its language makes it. The walk used to be English only, which is how the arrange page
+reached CI fitting in English with seven pixels to spare on one machine and eight over on
+another, while in Greek it was 64 over on any machine at all (#165).
 """
 
 from __future__ import annotations
@@ -33,6 +45,12 @@ pytestmark = pytest.mark.e2e
 
 #: The criterion's width. 400% zoom on a 1280-pixel window lands here.
 NARROW = 320
+
+#: The languages the walk is taken in: the one the interface is written in, and the two that
+#: drew widest of the European catalogues where they were measured -- Greek, whose letters are
+#: wider, and German, whose compounds do not break. Both overflowed pages that fit in English
+#: (#165). A catalogue that draws wider still belongs on this list.
+LANGUAGES = ("en", "el", "de")
 
 SCROLLS_SIDEWAYS = r"""() => {
   const limit = document.documentElement.clientWidth;
@@ -141,10 +159,48 @@ SCROLLS_SIDEWAYS = r"""() => {
   };
 }"""
 
+#: Every box that holds words and is narrower than they are: its text runs out over whatever
+#: sits beside it. Only boxes that let it show -- one that clips or scrolls on purpose, like
+#: `truncate` or a table's own scroll box, is doing what it was told -- and only boxes, since
+#: an inline run of text has no width of its own to be too narrow for.
+SPILLS = r"""() => {
+  const out = [];
+  for (const el of document.querySelectorAll('body *')) {
+    // Drawn at all: the inside of a closed <details> is still in the tree, with boxes of no
+    // meaning, and only the browser can say it is not on the screen.
+    if (!el.checkVisibility({visibilityProperty: true})) continue;
+    const style = getComputedStyle(el);
+    if (style.display === 'inline' || style.display === 'contents') continue;
+    if (style.overflowX !== 'visible') continue;
+    if (el.clientWidth <= 1) continue;
+    const words = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+    if (!words) continue;
+    if (el.scrollWidth > el.clientWidth + 1) {
+      out.push({
+        box: el.clientWidth,
+        needs: el.scrollWidth,
+        what: el.outerHTML.replace(/\s+/g, ' ').slice(0, 120),
+      });
+    }
+  }
+  return out;
+}"""
 
-def test_no_page_scrolls_sideways_at_320_pixels(live_server, page: Page, furnished):  # noqa: F811
+
+@pytest.mark.parametrize("language", LANGUAGES)
+def test_no_page_scrolls_sideways_at_320_pixels(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+    language,
+):
+    from postulo.accounts.models import Profile
+
     base = live_server.url
     sign_in(page, base)
+    # The account's own setting, the way a person would choose it, rather than the browser's:
+    # it is what every page after signing in is drawn in.
+    Profile.objects.filter(user=furnished["applicant"]).update(language=language)
     page.set_viewport_size({"width": NARROW, "height": 800})
 
     paths = signed_in_paths(
@@ -160,6 +216,12 @@ def test_no_page_scrolls_sideways_at_320_pixels(live_server, page: Page, furnish
             page.locator("input[name=password]").fill(PASSWORD)
             page.locator("form").get_by_role("button").first.click()
             page.goto(f"{base}{path}")
+
+        for spill in page.evaluate(SPILLS):
+            failures.setdefault(
+                f"words {spill['needs']}px wide in a box of {spill['box']}px  {spill['what']}",
+                path,
+            )
 
         result = page.evaluate(SCROLLS_SIDEWAYS)
         if not result["reached"]:
@@ -196,8 +258,8 @@ def test_no_page_scrolls_sideways_at_320_pixels(live_server, page: Page, furnish
 
     report = "\n".join(f"  {where}\n    {what}" for what, where in sorted(failures.items()))
     assert not failures, (
-        f"{len(failures)} element(s) push the page sideways at {NARROW}px "
-        f"(WCAG 2.2 SC 1.4.10 Reflow):\n{report}"
+        f"{len(failures)} element(s) push the page sideways, or run out of their own box, "
+        f"at {NARROW}px in {language!r} (WCAG 2.2 SC 1.4.10 Reflow):\n{report}"
     )
 
 

@@ -7,6 +7,8 @@ it. Which of those happens is decided by whether the stored list says what is sh
 what is hidden, and that is a decision worth a test rather than a comment.
 """
 
+import re
+
 import pytest
 from django.urls import reverse
 
@@ -55,6 +57,43 @@ def test_a_width_that_is_not_one_of_the_three_is_refused():
             context=lambda sources: {},
             width="two-thirds",
         )
+
+
+def test_every_widget_has_a_name_in_words_rather_than_its_key():
+    """The arrange page names each widget, its buttons say which one they take off, and its
+    four arrows tell a screen reader what they move. A key is a code, not a name (#165).
+    """
+    for widget in widgets.all_widgets():
+        assert widget.called.strip(), widget.key
+        assert widget.called != widget.key, widget.key
+
+
+def test_a_widget_with_neither_a_label_nor_a_name_is_refused():
+    """Refused when it is registered, rather than found on the arrange page as "Take  off"."""
+    nameless = widgets.Widget(
+        key="test_nameless",
+        label="",
+        blurb="Draws its own heading, and forgot to say what it is called.",
+        template="widgets/shortcuts.html",
+        context=lambda sources: {},
+    )
+
+    with pytest.raises(ValueError, match="needs a label, or a name"):
+        widgets.register(nameless)
+    assert "test_nameless" not in widgets.REGISTRY
+
+
+def test_a_widget_that_draws_its_own_heading_is_called_by_its_name():
+    suggestions = widgets.get("suggestions")
+
+    assert str(suggestions.label) == ""
+    assert suggestions.called == "Suggestions from plugins"
+
+
+def test_a_widget_with_a_heading_is_called_by_it():
+    counters = widgets.get("counters")
+
+    assert counters.called == str(counters.label)
 
 
 def test_registering_the_same_key_twice_is_a_mistake_not_an_override():
@@ -265,3 +304,57 @@ def test_the_arranging_page_lists_what_is_on_and_what_is_off(client, user):
     offered = {w.key for _group, items in response.context["available"] for w in items}
     assert "counters" not in offered
     assert "funnel" in offered
+
+
+def spoken(html: str) -> str:
+    """The page's text with the markup gone and the whitespace a template leaves folded."""
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+
+
+def test_the_arranging_page_names_a_widget_without_a_heading(client, user):
+    """The suggestions line has no heading on the dashboard. On the arrange page it used to
+    be called by its key, taken off by a button that read "Take  off", and moved by four
+    arrows that did not say what they moved (#165).
+    """
+    choose(user, ["suggestions", "counters"])
+    client.force_login(user)
+
+    text = spoken(client.get(reverse(ARRANGE)).content.decode())
+
+    assert "Take Suggestions from plugins off" in text
+    assert "Move Suggestions from plugins down a row" in text
+    assert "Move Suggestions from plugins one place later" in text
+    assert "Take off" not in text
+    assert "Move up a row" not in text and "Move down a row" not in text
+    assert " suggestions " not in text, "the key is shown where a name belongs"
+
+
+def test_the_sentence_after_a_move_names_the_widget(client, user):
+    choose(user, ["counters", "suggestions"])
+    client.force_login(user)
+
+    html = client.post(
+        reverse(ARRANGE), {"action": "left", "key": "suggestions"}, follow=True
+    ).content.decode()
+
+    assert "Suggestions from plugins is now in row 1, place 1." in spoken(html)
+
+
+def test_nothing_on_the_arranging_page_refuses_to_give_way(client, user):
+    """Every group on a row holds words somebody translated -- a widget's name, "Take ...
+    off", "Add ..." -- and a group that cannot shrink or wrap around words nobody can predict
+    pushes the page sideways on a phone. In Greek it was 64 pixels (#165). The browser suite
+    measures the page; this says the reason, in the one place a template could reintroduce it.
+    """
+    client.force_login(user)
+    choose(user, ["counters"])
+
+    html = client.get(reverse(ARRANGE)).content.decode()
+    # The page's own lists, and not the settings sidebar round them, which is not made of
+    # widget names and may keep its width.
+    lists = html[html.index("data-widget-list") : html.index("</main>")]
+
+    # An icon is the one thing here with a fixed width, and keeps it.
+    rigid = re.findall(r"<(?!svg\b)(\w+)[^>]*\bshrink-0\b", lists)
+
+    assert rigid == [], f"{rigid} cannot give way around the words inside them"

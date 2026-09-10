@@ -42,7 +42,10 @@
                 {{ interview.starts_at|date:"H:i" }}–{{ interview.ends_at|date:"H:i" }}
               </p>
             </div>
-            <div class="min-w-0 flex-1">
+            {% comment %} Twelve rem before it sits beside the date, or on a phone the details
+               are a column a word wide -- and "Videogespräch" is wider than that (#165).
+               {% endcomment %}
+            <div class="min-w-0 grow basis-48">
               <p class="text-sm">
                 <span class="font-medium">{{ interview.get_kind_display }}</span>
                 ·
@@ -71,7 +74,10 @@
                 <p class="mt-1 text-xs text-amber-700 dark:text-amber-400">{% translate "How did it go?" %}</p>
               {% endif %}
             </div>
-            <div class="flex shrink-0 items-center gap-1">
+            {% comment %} Allowed to wrap, for the reason the arrange page's buttons are: the
+               outcome buttons are translated words, and in Greek this group was 143 pixels
+               wider than a phone (#165). {% endcomment %}
+            <div class="flex flex-wrap items-center gap-1">
               {% if interview.is_scheduled %}
                 {% include "applications/partials/interview_outcome.html" with next=request.get_full_path %}
                 <a href="{% url 'applications:interview_update' interview.pk %}" class="btn-ghost px-2 py-1 text-xs">

@@ -105,7 +105,10 @@ def _insight(sources: Sources) -> dict:
 register(
     Widget(
         key="suggestions",
+        # No heading: on the dashboard it is one line, or nothing when nothing is waiting. But
+        # the arrange page still has to be able to say what it is moving (#165).
         label="",
+        name=_("Suggestions from plugins"),
         blurb=_("A line when a plugin thinks something happened and is waiting for you."),
         template="widgets/suggestions.html",
         context=_suggestions,
