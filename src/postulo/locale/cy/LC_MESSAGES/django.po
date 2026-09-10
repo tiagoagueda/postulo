@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Cymraeg\n"
@@ -84,7 +84,7 @@ msgstr[1] "Pob un o'r %(counter)s"
 msgstr[2] "Pob un o'r %(counter)s"
 msgstr[3] "Pob un o'r %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1142,6 +1142,7 @@ msgid "an unknown file type"
 msgstr "math ffeil anhysbys"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "a %(more)s arall"
@@ -1541,6 +1542,11 @@ msgstr "Gan"
 msgid "By industry"
 msgstr "Yn ôl sector"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "Yn ôl enw, neu yn ôl cod NACE"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1599,7 +1605,7 @@ msgstr "Cyfeiriad dychwelyd i gofrestru gydag ef"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1867,6 +1873,7 @@ msgstr "Clasurol"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2140,7 +2147,7 @@ msgstr "cyswllt"
 msgid "Contact"
 msgstr "Cyswllt"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Ychwanegwyd y cyswllt."
@@ -2543,7 +2550,7 @@ msgstr "Amddiffyn"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2802,7 +2809,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2822,6 +2828,11 @@ msgstr "Golygu'r cais"
 #, draft
 msgid "Edit interview"
 msgstr "Golygu'r cyfweliad"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Golygu neu uno"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3279,6 +3290,11 @@ msgstr "Cyllid"
 #, draft
 msgid "Find logo"
 msgstr "Chwilio am logo"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Dod o hyd i un"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3943,7 +3959,7 @@ msgstr "sector"
 msgid "Industry"
 msgstr "Sector"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Ailenwyd y sector."
@@ -4846,7 +4862,7 @@ msgstr "Dewislen"
 msgid "Merge into"
 msgstr "Uno â"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Unwyd."
@@ -4953,6 +4969,7 @@ msgid "Move up"
 msgstr "Symud i fyny"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "adran NACE"
@@ -5173,10 +5190,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Dim sectorau wedi'u cofnodi ar gyfer y cwmnïau y gwnaethoch gais iddynt."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Dim sectorau eto. Maen nhw'n ymddangos wrth i chi ddisgrifio cwmnïau."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Dim sectorau eto. Maen nhw’n ymddangos yma wrth i chi eu rhoi i gwmnïau — mae ffurflen y cwmni’n awgrymu rhestr hir, ac mae popeth a deipiwch yn ymuno â’ch un chi."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5520,6 +5539,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Dim byd yma"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Nid oes dim yma’n cyfateb i hynny. Dim ond y meysydd rydych wedi’u defnyddio go iawn sy’n ymddangos ar y dudalen hon."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5999,7 +6025,7 @@ msgid ""
 msgstr ""
 "Ceisiadau agored heb glywed dim, a'r tri pheth y gellir eu gwneud am hynny."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Swyddi gwag"
@@ -6471,7 +6497,7 @@ msgstr "Cyfeiriad yr hysbyseb"
 msgid "Posting details"
 msgstr "Manylion yr hysbyseb"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Diweddarwyd yr hysbyseb."
@@ -7312,7 +7338,7 @@ msgstr "cyflog hyd at"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7427,6 +7453,7 @@ msgstr "Sgrinio"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Chwilio"
@@ -7879,7 +7906,7 @@ msgid ""
 msgstr ""
 "Caiff rhywun sy'n cyrraedd drwy'r darparwr hwn ei fewngofnodi fel y cyfrif sy'n dal y cyfeiriad y mae'n ei roi, cyn belled â bod y darparwr yn dweud bod y cyfeiriad hwnnw wedi'i ddilysu. Mae hynny'n gwneud un cwestiwn yn werth ei ateb: a yw'r darparwr hwn ond yn galw cyfeiriad yn ddilys pan fydd y person wedi profi mai ef biau ef? Os chi sy'n ei redeg, bron yn sicr. Os un rhywun arall ydyw, gwiriwch cyn dibynnu arno. Gosodwch POSTULO_OIDC_LINK_BY_EMAIL i false i fynnu bod pob person yn mewngofnodi yma unwaith ac yn cysylltu'r darparwr o'i dudalen gyfrif ei hun."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9394,7 +9421,7 @@ msgstr "Trowch «Defnyddio fy Ngravatar» ymlaen yn gyntaf."
 msgid "Turned into an application"
 msgstr "Wedi troi'n gais"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "Dau sillafiad o'r un peth? Golygwch un a'i uno â'r llall."

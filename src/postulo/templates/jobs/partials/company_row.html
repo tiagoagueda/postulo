@@ -26,8 +26,32 @@
     {% elif column.key == 'location' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.location|default:"—" }}</td>
     {% elif column.key == 'industry' %}
+      {% comment %} Labels rather than a comma-separated run, and the same chip the form
+         draws (#141). A bank that is also an insurer and a software house is three; a
+         conglomerate is more, and a narrow cell has to look right at both. Past four the
+         rest are counted rather than listed, because a cell that grows without limit pushes
+         every other column off the screen.
+      {% endcomment %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
-        {% for industry in company.industries.all %}{% if not forloop.first %}, {% endif %}{{ industry.name }}{% empty %}—{% endfor %}
+        {% with held=company.industries.all %}
+          {% if held %}
+            <span class="flex flex-wrap items-center gap-1">
+              {% for industry in held|slice:":4" %}
+                <span class="chip py-0 pe-3 text-xs"
+                      {% if industry.code %}title="NACE {{ industry.code }}"{% endif %}>
+                  <span class="chip-text">{{ industry.name }}</span>
+                </span>
+              {% endfor %}
+              {% if held|length > 4 %}
+                <span class="text-xs tabular-nums">
+                  {% blocktranslate with more=held|length|add:"-4" trimmed %}
+                    and {{ more }} more
+                  {% endblocktranslate %}
+                </span>
+              {% endif %}
+            </span>
+          {% else %}—{% endif %}
+        {% endwith %}
       </td>
     {% elif column.key == 'postings' %}
       <td class="px-4 py-3 text-end tabular-nums">{{ company.posting_count }}</td>

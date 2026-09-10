@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: italiano\n"
@@ -80,7 +80,7 @@ msgid_plural "All %(counter)s"
 msgstr[0] "%(counter)s candidatura"
 msgstr[1] "Tutte e %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1102,6 +1102,7 @@ msgid "an unknown file type"
 msgstr "un tipo di file sconosciuto"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "e altri %(more)s"
@@ -1502,6 +1503,11 @@ msgstr "Da"
 msgid "By industry"
 msgstr "Per settore"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "Per nome, o per codice NACE"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1560,7 +1566,7 @@ msgstr "URL di ritorno da registrare presso il provider"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1828,6 +1834,7 @@ msgstr "Classico"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2100,7 +2107,7 @@ msgstr "contatto"
 msgid "Contact"
 msgstr "Contatto"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Contatto aggiunto."
@@ -2503,7 +2510,7 @@ msgstr "Difesa"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2762,7 +2769,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2782,6 +2788,11 @@ msgstr "Modifica candidatura"
 #, draft
 msgid "Edit interview"
 msgstr "Modifica colloquio"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Modifica o unisci"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3240,6 +3251,11 @@ msgstr "Finanza"
 #, draft
 msgid "Find logo"
 msgstr "Trova il logo"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Trovarne uno"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3900,7 +3916,7 @@ msgstr "settore"
 msgid "Industry"
 msgstr "Settore"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Settore rinominato."
@@ -4799,7 +4815,7 @@ msgstr "Menu"
 msgid "Merge into"
 msgstr "Unisci in"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Unito."
@@ -4906,6 +4922,7 @@ msgid "Move up"
 msgstr "Sposta in alto"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "divisione NACE"
@@ -5128,10 +5145,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Nessun settore registrato per le aziende a cui si è candidato."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Ancora nessun settore. Compaiono man mano che descrivi le aziende."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Ancora nessun settore. Compaiono qui man mano che li assegna alle aziende — il modulo dell’azienda ne suggerisce un lungo elenco, e tutto ciò che scrive entra nel suo."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5476,6 +5495,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Niente qui"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Qui non c’è nulla che corrisponda. In questa pagina compaiono solo i campi che ha davvero usato."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5937,7 +5963,7 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Candidature aperte senza notizie, e le tre cose da fare al riguardo."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Posizioni aperte"
@@ -6407,7 +6433,7 @@ msgstr "Indirizzo dell'annuncio"
 msgid "Posting details"
 msgstr "Dettagli dell'annuncio"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Annuncio aggiornato."
@@ -7242,7 +7268,7 @@ msgstr "retribuzione fino a"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7357,6 +7383,7 @@ msgstr "Preselezione"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Cerca"
@@ -7808,7 +7835,7 @@ msgid ""
 msgstr ""
 "Chi arriva tramite questo fornitore viene fatto accedere all’account a cui appartiene l’indirizzo indicato, purché il fornitore dichiari che l’indirizzo è verificato. Vale quindi la pena rispondere a una domanda: questo fornitore definisce un indirizzo verificato solo quando la persona ha dimostrato che le appartiene? Se lo gestisci tu, quasi certamente. Se è di altri, verificalo prima di affidartici. Imposta POSTULO_OIDC_LINK_BY_EMAIL su false per richiedere che ognuno acceda qui una volta e colleghi il fornitore dalla propria pagina dell’account."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9311,7 +9338,7 @@ msgstr "Attiva prima «Usa il mio Gravatar»."
 msgid "Turned into an application"
 msgstr "Trasformato in candidatura"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "Due grafie della stessa cosa? Modificane una e uniscila all'altra."

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-06 21:17+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: isiXhosa\n"
@@ -76,7 +76,7 @@ msgid_plural "All %(counter)s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -952,6 +952,7 @@ msgid "an unknown file type"
 msgstr ""
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format
 msgid "and %(more)s more"
 msgstr ""
@@ -1278,6 +1279,10 @@ msgstr ""
 msgid "By industry"
 msgstr ""
 
+#: src/postulo/templates/jobs/industry_list.html:29
+msgid "By name, or by NACE code"
+msgstr ""
+
 #: src/postulo/resume/models.py:189
 msgid "C1 — advanced"
 msgstr ""
@@ -1329,7 +1334,7 @@ msgstr ""
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1550,6 +1555,7 @@ msgstr ""
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 msgid "Clear"
 msgstr ""
@@ -1775,7 +1781,7 @@ msgstr ""
 msgid "Contact"
 msgstr ""
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 msgid "Contact added."
 msgstr ""
 
@@ -2089,7 +2095,7 @@ msgstr ""
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2300,7 +2306,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2316,6 +2321,10 @@ msgstr ""
 #: src/postulo/templates/applications/interview_form.html:4
 #: src/postulo/templates/applications/interview_form.html:14
 msgid "Edit interview"
+msgstr ""
+
+#: src/postulo/templates/jobs/industry_list.html:63
+msgid "Edit or merge"
 msgstr ""
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
@@ -2677,6 +2686,10 @@ msgstr ""
 
 #: src/postulo/templates/jobs/company_detail.html:42
 msgid "Find logo"
+msgstr ""
+
+#: src/postulo/templates/jobs/industry_list.html:26
+msgid "Find one"
 msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
@@ -3213,7 +3226,7 @@ msgstr ""
 msgid "Industry"
 msgstr ""
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 msgid "Industry renamed."
 msgstr ""
 
@@ -3935,7 +3948,7 @@ msgstr ""
 msgid "Merge into"
 msgstr ""
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 msgid "Merged."
 msgstr ""
 
@@ -4028,6 +4041,7 @@ msgid "Move up"
 msgstr ""
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 msgid "NACE division"
 msgstr ""
 
@@ -4209,8 +4223,9 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr ""
 
-#: src/postulo/templates/jobs/industry_list.html:51
-msgid "No industries yet. They appear as you describe companies."
+#: src/postulo/templates/jobs/industry_list.html:84
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
 msgstr ""
 
 #: src/postulo/templates/connections/pick.html:28
@@ -4492,6 +4507,11 @@ msgstr ""
 
 #: src/postulo/templates/jobs/listing_list.html:168
 msgid "Nothing here"
+msgstr ""
+
+#: src/postulo/templates/jobs/industry_list.html:78
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
 msgstr ""
 
 #: src/postulo/templates/applications/application_list.html:48
@@ -4860,7 +4880,7 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr ""
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 msgid "Openings"
 msgstr ""
 
@@ -5241,7 +5261,7 @@ msgstr ""
 msgid "Posting details"
 msgstr ""
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 msgid "Posting updated."
 msgstr ""
 
@@ -5915,7 +5935,7 @@ msgstr ""
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -6013,6 +6033,7 @@ msgstr ""
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 msgid "Search"
 msgstr ""
 
@@ -6380,7 +6401,7 @@ msgid ""
 "Somebody arriving through this provider is signed in as the account holding the address it gives, so long as the provider says that address is verified. That makes one question worth answering: does this provider only call an address verified when the person proved they hold it? If you run it, almost certainly. If it is somebody else's, check before you rely on it. Set POSTULO_OIDC_LINK_BY_EMAIL to false to require each person to sign in here once and connect the provider from their own account page."
 msgstr ""
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
 msgstr ""
@@ -7602,7 +7623,7 @@ msgstr ""
 msgid "Turned into an application"
 msgstr ""
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr ""
 

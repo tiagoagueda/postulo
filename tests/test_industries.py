@@ -123,7 +123,10 @@ def test_the_company_page_and_table_show_every_industry(client, user):
     assert "data-industries" in page and "Software" in page and "Research" in page
 
     table = client.get(reverse("jobs:company_list")).content.decode()
-    assert "Software, Research" in table or "Research, Software" in table
+    # Labels rather than a comma-separated run, since #141: the same chip the form draws.
+    row = table.split('id="company-1"')[1].split("</tr>")[0]
+    assert "Software" in row and "Research" in row
+    assert row.count("chip") >= 2
 
     narrowed = client.get(reverse("jobs:company_list"), {"industry": "soft"})
     assert [c.name for c in narrowed.context["companies"]] == ["Aperture Science"]

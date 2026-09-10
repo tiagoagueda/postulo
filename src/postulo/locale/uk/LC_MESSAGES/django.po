@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-08 10:23+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: українська\n"
@@ -84,7 +84,7 @@ msgstr[0] "%(counter)s заявка"
 msgstr[1] "Усі %(counter)s"
 msgstr[2] "Усі %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1116,6 +1116,7 @@ msgid "an unknown file type"
 msgstr "невідомий тип файлу"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "і ще %(more)s"
@@ -1513,6 +1514,11 @@ msgstr "Ким"
 msgid "By industry"
 msgstr "За галуззю"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "За назвою або за кодом NACE"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1571,7 +1577,7 @@ msgstr "Зворотний виклик для реєстрації"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1839,6 +1845,7 @@ msgstr "Класичний"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2111,7 +2118,7 @@ msgstr "контакт"
 msgid "Contact"
 msgstr "Контакт"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Контакт додано."
@@ -2514,7 +2521,7 @@ msgstr "Оборона"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2772,7 +2779,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2792,6 +2798,11 @@ msgstr "Редагувати заявку"
 #, draft
 msgid "Edit interview"
 msgstr "Редагувати співбесіду"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Редагувати або об’єднати"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3247,6 +3258,11 @@ msgstr "Фінанси"
 #, draft
 msgid "Find logo"
 msgstr "Знайти логотип"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Знайти якусь"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3907,7 +3923,7 @@ msgstr "галузь"
 msgid "Industry"
 msgstr "Галузь"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Галузь перейменовано."
@@ -4806,7 +4822,7 @@ msgstr "Меню"
 msgid "Merge into"
 msgstr "Об’єднати з"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Об’єднано."
@@ -4913,6 +4929,7 @@ msgid "Move up"
 msgstr "Перемістити вгору"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "розділ NACE"
@@ -5133,10 +5150,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Для компаній, куди ви подавалися, галузей не записано."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Галузей поки немає. Вони з’являються, коли ви описуєте компанії."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Галузей ще немає. Вони з’являються тут, коли ви надаєте їх компаніям — форма компанії пропонує довгий список, а все, що ви впишете, приєднується до вашого."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5480,6 +5499,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Тут нічого немає"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Тут нічого цьому не відповідає. На цій сторінці є лише ті галузі, які ви справді використали."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5947,7 +5973,7 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Відкриті заявки без жодної звістки і три речі, які можна з цим зробити."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Вакансії"
@@ -6418,7 +6444,7 @@ msgstr "Адреса вакансії"
 msgid "Posting details"
 msgstr "Подробиці вакансії"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Вакансію оновлено."
@@ -7254,7 +7280,7 @@ msgstr "зарплата до"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7369,6 +7395,7 @@ msgstr "Первинний відбір"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Пошук"
@@ -7820,7 +7847,7 @@ msgid ""
 msgstr ""
 "Хто приходить через цього постачальника, входить як обліковий запис із тією адресою, яку постачальник назвав, — за умови, що постачальник каже, що адресу підтверджено. Через це варто відповісти на одне питання: чи називає цей постачальник адресу підтвердженою лише тоді, коли людина довела, що вона їй належить? Якщо ви керуєте ним самі — майже напевно. Якщо він чужий — перевірте, перш ніж на це покладатися. Встановіть POSTULO_OIDC_LINK_BY_EMAIL у false, щоб кожна людина мусила один раз увійти тут і під’єднати постачальника зі своєї сторінки облікового запису."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9321,7 +9348,7 @@ msgstr "Спершу ввімкніть «Використовувати мій 
 msgid "Turned into an application"
 msgstr "Перетворено на заявку"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "Два написання того самого? Відредагуйте одне й об’єднайте його з іншим."

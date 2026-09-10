@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: svenska\n"
@@ -80,7 +80,7 @@ msgid_plural "All %(counter)s"
 msgstr[0] "%(counter)s ansökan"
 msgstr[1] "Alla %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1098,6 +1098,7 @@ msgid "an unknown file type"
 msgstr "en okänd filtyp"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "och %(more)s till"
@@ -1495,6 +1496,11 @@ msgstr "Av"
 msgid "By industry"
 msgstr "Per bransch"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "Efter namn, eller efter NACE-kod"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1553,7 +1559,7 @@ msgstr "Återanrops-URL att registrera hos leverantören"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1821,6 +1827,7 @@ msgstr "Klassisk"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2093,7 +2100,7 @@ msgstr "kontakt"
 msgid "Contact"
 msgstr "Kontakt"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Kontakt tillagd."
@@ -2495,7 +2502,7 @@ msgstr "Försvar"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2754,7 +2761,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2774,6 +2780,11 @@ msgstr "Redigera ansökan"
 #, draft
 msgid "Edit interview"
 msgstr "Redigera intervju"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Redigera eller slå ihop"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3230,6 +3241,11 @@ msgstr "Finans"
 #, draft
 msgid "Find logo"
 msgstr "Hitta logotyp"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Hitta en"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3888,7 +3904,7 @@ msgstr "bransch"
 msgid "Industry"
 msgstr "Bransch"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Bransch omdöpt."
@@ -4786,7 +4802,7 @@ msgstr "Meny"
 msgid "Merge into"
 msgstr "Slå ihop med"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Ihopslagen."
@@ -4893,6 +4909,7 @@ msgid "Move up"
 msgstr "Flytta upp"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "NACE-huvudgrupp"
@@ -5113,10 +5130,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Inga branscher registrerade på de företag du har sökt hos."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Inga branscher ännu. De dyker upp när du beskriver företag."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Inga branscher än. De dyker upp här när du ger dem till företag — företagsformuläret föreslår en lång lista, och allt du skriver hamnar i din egen."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5460,6 +5479,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Inget här"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Ingenting här stämmer med det. På den här sidan finns bara de områden du faktiskt har använt."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5914,7 +5940,7 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Öppna ansökningar utan svar, och de tre sakerna du kan göra åt det."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Lediga tjänster"
@@ -6385,7 +6411,7 @@ msgstr "Annonsens adress"
 msgid "Posting details"
 msgstr "Annonsens detaljer"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Annons uppdaterad."
@@ -7219,7 +7245,7 @@ msgstr "lön till"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7334,6 +7360,7 @@ msgstr "Urval"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Sök"
@@ -7785,7 +7812,7 @@ msgid ""
 msgstr ""
 "Den som kommer via den här leverantören loggas in på det konto som den angivna adressen tillhör, förutsatt att leverantören säger att adressen är verifierad. Därför är en fråga värd att besvara: kallar den här leverantören en adress verifierad enbart när personen har bevisat att den är deras? Om du driver den själv, nästan säkert. Är den någon annans, kontrollera innan du förlitar dig på den. Sätt POSTULO_OIDC_LINK_BY_EMAIL till false för att kräva att var och en loggar in här en gång och kopplar leverantören från sin egen kontosida."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9286,7 +9313,7 @@ msgstr "Slå först på ”Använd min Gravatar”."
 msgid "Turned into an application"
 msgstr "Omvandlad till en ansökan"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr ""

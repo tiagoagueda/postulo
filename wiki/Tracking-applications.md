@@ -384,6 +384,17 @@ all three), and **Companies → Industries** is where you rename one, merge two 
 the same thing, or delete a word you no longer use — deleting a word never deletes a
 company.
 
+**In the table they are labels too**, up to four of them; past that the rest are counted,
+because a cell that grows without limit pushes every other column off the screen. Filtering
+by industry is a box you type in rather than a menu — the same control whether your
+vocabulary holds five words or three hundred.
+
+**Companies → Industries** is where you manage the list. Once it holds more than a handful
+there is a search box that matches the name *or* the NACE code, each row shows its code
+where it has one, and *Edit or merge* is where two spellings of one thing become one. Only
+fields you have actually given to a company appear there: the long list on the company form
+is a list of suggestions, not a list of rows.
+
 **They are shown as labels.** The ones a company is in appear as removable chips; typing in
 the box beside them finds one you already have, or adds one you do not. A name that does not
 exist yet is drawn differently — outlined rather than filled — so you can see it is new

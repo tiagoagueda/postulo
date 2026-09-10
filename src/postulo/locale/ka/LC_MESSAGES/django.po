@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: ქართული\n"
@@ -80,7 +80,7 @@ msgid_plural "All %(counter)s"
 msgstr[0] "%(counter)s განაცხადი"
 msgstr[1] "ყველა %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1098,6 +1098,7 @@ msgid "an unknown file type"
 msgstr "უცნობი ფაილის ტიპი"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "და კიდევ %(more)s"
@@ -1498,6 +1499,11 @@ msgstr "ვისგან"
 msgid "By industry"
 msgstr "დარგის მიხედვით"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "სახელით ან NACE კოდით"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1556,7 +1562,7 @@ msgstr "უკუგამოძახების მისამართი �
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1824,6 +1830,7 @@ msgstr "კლასიკური"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2097,7 +2104,7 @@ msgstr "კონტაქტი"
 msgid "Contact"
 msgstr "კონტაქტი"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "კონტაქტი დაემატა."
@@ -2500,7 +2507,7 @@ msgstr "თავდაცვა"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2759,7 +2766,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2779,6 +2785,11 @@ msgstr "განაცხადის რედაქტირება"
 #, draft
 msgid "Edit interview"
 msgstr "გასაუბრების რედაქტირება"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "რედაქტირება ან შერწყმა"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3236,6 +3247,11 @@ msgstr "ფინანსები"
 #, draft
 msgid "Find logo"
 msgstr "ლოგოს პოვნა"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "იპოვეთ ერთი"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3897,7 +3913,7 @@ msgstr "დარგი"
 msgid "Industry"
 msgstr "დარგი"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "დარგს სახელი შეეცვალა."
@@ -4795,7 +4811,7 @@ msgstr "მენიუ"
 msgid "Merge into"
 msgstr "გაერთიანება"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "გაერთიანდა."
@@ -4902,6 +4918,7 @@ msgid "Move up"
 msgstr "ზემოთ გადატანა"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "NACE განყოფილება"
@@ -5123,10 +5140,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "იმ კომპანიებისთვის, სადაც განაცხადი გააკეთეთ, დარგები აღრიცხული არ არის."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "ჯერ დარგები არ არის. ისინი ჩნდება, როცა კომპანიებს აღწერთ."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"ჯერ დარგები არ არის. ისინი აქ ჩნდება, როცა კომპანიებს ანიჭებთ — კომპანიის ფორმა გრძელ ჩამონათვალს გთავაზობთ და ყველაფერი, რასაც აკრეფთ, თქვენსას უერთდება."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5471,6 +5490,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "აქ არაფერია"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"აქ ამას არაფერი ემთხვევა. ამ გვერდზე მხოლოდ ის სფეროებია, რომლებიც ნამდვილად გამოიყენეთ."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5930,7 +5956,7 @@ msgid ""
 msgstr ""
 "ღია განაცხადები, რომლებზეც არაფერი გსმენიათ, და სამი რამ, რაც ამის შესახებ შეიძლება გააკეთოთ."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "ვაკანტური ადგილები"
@@ -6401,7 +6427,7 @@ msgstr "ვაკანსიის მისამართი"
 msgid "Posting details"
 msgstr "ვაკანსიის დეტალები"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "ვაკანსია განახლდა."
@@ -7239,7 +7265,7 @@ msgstr "ხელფასი მდე"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7354,6 +7380,7 @@ msgstr "წინასწარი შერჩევა"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "ძებნა"
@@ -7805,7 +7832,7 @@ msgid ""
 msgstr ""
 "ვინც ამ პროვაიდერით მოდის, შედის როგორც ის ანგარიში, რომელსაც პროვაიდერის მიერ მითითებული მისამართი აქვს, სანამ პროვაიდერი ამბობს, რომ ეს მისამართი დადასტურებულია. ამიტომ ერთ კითხვას პასუხი ღირს: ეს პროვაიდერი მისამართს დადასტურებულად მხოლოდ მაშინ უწოდებს, როცა ადამიანმა დაამტკიცა, რომ მისია? თუ თავად მართავთ, თითქმის ნამდვილად. თუ სხვისია, შეამოწმეთ, სანამ ამას დაეყრდნობით. დააყენეთ POSTULO_OIDC_LINK_BY_EMAIL false-ზე, რომ თითოეულმა ადამიანმა აქ ერთხელ შემოვიდეს და პროვაიდერი თავისი ანგარიშის გვერდიდან დააკავშიროს."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9301,7 +9328,7 @@ msgstr "ჯერ ჩართეთ „ჩემი Gravatar-ის გამ�
 msgid "Turned into an application"
 msgstr "განაცხადად იქცა"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "ერთი და იმავეს ორი დაწერილობა? დაარედაქტირეთ ერთი და მეორეს შეაერთეთ."

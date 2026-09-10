@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenčina\n"
@@ -83,7 +83,7 @@ msgstr[0] "%(counter)s žiadosť"
 msgstr[1] "Všetky %(counter)s"
 msgstr[2] "Všetkých %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1114,6 +1114,7 @@ msgid "an unknown file type"
 msgstr "neznámy typ súboru"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "a %(more)s ďalších"
@@ -1511,6 +1512,11 @@ msgstr "Kým"
 msgid "By industry"
 msgstr "Podľa odvetvia"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "Podľa názvu alebo kódu NACE"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1569,7 +1575,7 @@ msgstr "Spätná adresa na registráciu u poskytovateľa"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1837,6 +1843,7 @@ msgstr "Klasický"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2109,7 +2116,7 @@ msgstr "kontakt"
 msgid "Contact"
 msgstr "Kontakt"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Kontakt pridaný."
@@ -2511,7 +2518,7 @@ msgstr "Obrana"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2769,7 +2776,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2789,6 +2795,11 @@ msgstr "Upraviť žiadosť"
 #, draft
 msgid "Edit interview"
 msgstr "Upraviť pohovor"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Upraviť alebo zlúčiť"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3245,6 +3256,11 @@ msgstr "Financie"
 #, draft
 msgid "Find logo"
 msgstr "Nájsť logo"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Nájsť nejaké"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3903,7 +3919,7 @@ msgstr "odvetvie"
 msgid "Industry"
 msgstr "Odvetvie"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Odvetvie premenované."
@@ -4803,7 +4819,7 @@ msgstr "Ponuka"
 msgid "Merge into"
 msgstr "Zlúčiť do"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Zlúčené."
@@ -4910,6 +4926,7 @@ msgid "Move up"
 msgstr "Nahor"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "divízia NACE"
@@ -5130,10 +5147,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Pri firmách, kam ste sa hlásili, nie sú zaznamenané odvetvia."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Zatiaľ žiadne odvetvia. Objavujú sa, ako opisujete firmy."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Zatiaľ žiadne odvetvia. Objavujú sa tu, ako ich priraďujete firmám — formulár firmy ponúka dlhý zoznam a všetko, čo napíšete, sa pridá k tomu vášmu."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5478,6 +5497,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Nič tu nie je"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Nič tu tomu nezodpovedá. Na tejto stránke sú len oblasti, ktoré ste naozaj použili."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5943,7 +5969,7 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Otvorené prihlášky bez odozvy a tri veci, ktoré sa s tým dajú robiť."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Voľné miesta"
@@ -6413,7 +6439,7 @@ msgstr "Adresa inzerátu"
 msgid "Posting details"
 msgstr "Podrobnosti inzerátu"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Inzerát aktualizovaný."
@@ -7248,7 +7274,7 @@ msgstr "plat do"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7363,6 +7389,7 @@ msgstr "Predvýber"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Hľadať"
@@ -7814,7 +7841,7 @@ msgid ""
 msgstr ""
 "Kto príde cez tohto poskytovateľa, prihlási sa do účtu, ktorému patrí uvedená adresa, pokiaľ poskytovateľ tvrdí, že adresa je overená. Oplatí sa preto odpovedať na jednu otázku: označuje tento poskytovateľ adresu za overenú iba vtedy, keď človek preukázal, že mu patrí? Ak ho prevádzkujete vy, takmer isto. Ak je cudzí, overte si to skôr, než sa naň spoľahnete. Nastavte POSTULO_OIDC_LINK_BY_EMAIL na false, aby sa každý musel raz prihlásiť tu a poskytovateľa si pripojiť zo svojej stránky účtu."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9313,7 +9340,7 @@ msgstr "Najprv zapnite „Používať môj Gravatar“."
 msgid "Turned into an application"
 msgstr "Premenené na žiadosť"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "Dva zápisy toho istého? Upravte jeden a zlúčte ho do druhého."

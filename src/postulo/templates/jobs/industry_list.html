@@ -17,13 +17,38 @@
       </a>
     </div>
 
+    {% if total > 8 or q %}
+      {% comment %} Only once there is enough to search through. A box above a list of five
+         is a control asking to be ignored (#141). {% endcomment %}
+      <form method="get" role="search" class="mb-4 flex items-end gap-3">
+        <div class="flex-1">
+          <label class="field-label" for="industry-search">{% translate "Find one" %}</label>
+          <input type="search" id="industry-search" name="q" value="{{ q }}"
+                 class="field-input" autocomplete="off"
+                 placeholder="{% translate 'By name, or by NACE code' %}">
+        </div>
+        <button type="submit" class="btn-secondary mb-0">{% translate "Search" %}</button>
+        {% if q %}
+          <a href="{% url 'jobs:industry_list' %}" class="btn-ghost mb-0">{% translate "Clear" %}</a>
+        {% endif %}
+      </form>
+    {% endif %}
+
     {% if industries %}
       <div class="card p-0">
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
           {% for industry in industries %}
-            <li class="flex items-center gap-3 px-4 py-3">
-              <a href="{% url 'jobs:company_list' %}?industry={{ industry.name|urlencode }}" class="flex-1 hover:underline">
-                {{ industry.name }}
+            <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+              <a href="{% url 'jobs:company_list' %}?industry={{ industry.name|urlencode }}"
+                 class="min-w-0 flex-1 hover:underline">
+                <bdi>{{ industry.name }}</bdi>
+                {% if industry.code %}
+                  {% comment %} What the standard bought beyond coverage: a code an
+                     employment office recognises, beside the person's own word for it. {% endcomment %}
+                  <span class="ms-1 rounded bg-ink-100 px-1.5 py-0.5 text-xs tabular-nums
+                               text-ink-600 dark:bg-ink-800 dark:text-ink-300"
+                        title="{% translate 'NACE division' %}">{{ industry.code }}</span>
+                {% endif %}
               </a>
               <span class="text-xs text-ink-400 tabular-nums">
                 {% blocktranslate count counter=industry.company_count trimmed %}
@@ -33,7 +58,7 @@
                 {% endblocktranslate %}
               </span>
               <a href="{% url 'jobs:industry_update' industry.pk %}" class="btn-ghost px-2 py-1 text-xs">
-                {% translate "Edit" %}
+                {% translate "Edit or merge" %}
               </a>
               <a href="{% url 'jobs:industry_delete' industry.pk %}"
                  class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
@@ -46,9 +71,18 @@
       <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
         {% translate "Two spellings of the same thing? Edit one and merge it into the other." %}
       </p>
+    {% elif q %}
+      <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          Nothing here matches that. Only fields you have actually used appear on this page.
+        {% endblocktranslate %}
+      </div>
     {% else %}
       <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
-        {% translate "No industries yet. They appear as you describe companies." %}
+        {% blocktranslate trimmed %}
+          No industries yet. They appear here as you give them to companies — the company
+          form suggests a long list, and anything you type joins your own.
+        {% endblocktranslate %}
       </div>
     {% endif %}
   </div>

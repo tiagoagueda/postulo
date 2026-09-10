@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: hrvatski\n"
@@ -84,7 +84,7 @@ msgstr[0] "%(counter)s prijava"
 msgstr[1] "Sve %(counter)s"
 msgstr[2] "Svih %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1116,6 +1116,7 @@ msgid "an unknown file type"
 msgstr "nepoznata vrsta datoteke"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "i još %(more)s"
@@ -1514,6 +1515,11 @@ msgstr "Od"
 msgid "By industry"
 msgstr "Po djelatnosti"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "Po nazivu ili po NACE oznaci"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1572,7 +1578,7 @@ msgstr "Povratni URL za registraciju kod pružatelja"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1840,6 +1846,7 @@ msgstr "Klasičan"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2112,7 +2119,7 @@ msgstr "kontakt"
 msgid "Contact"
 msgstr "Kontakt"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Kontakt dodan."
@@ -2515,7 +2522,7 @@ msgstr "Obrana"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2773,7 +2780,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2793,6 +2799,11 @@ msgstr "Uredi prijavu"
 #, draft
 msgid "Edit interview"
 msgstr "Uredi razgovor"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Uredi ili spoji"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3248,6 +3259,11 @@ msgstr "Financije"
 #, draft
 msgid "Find logo"
 msgstr "Pronađi logotip"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Pronađi neku"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3905,7 +3921,7 @@ msgstr "djelatnost"
 msgid "Industry"
 msgstr "Djelatnost"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Djelatnost preimenovana."
@@ -4807,7 +4823,7 @@ msgstr "Izbornik"
 msgid "Merge into"
 msgstr "Spoji u"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Spojeno."
@@ -4914,6 +4930,7 @@ msgid "Move up"
 msgstr "Premjesti gore"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "odjeljak NACE"
@@ -5134,10 +5151,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Za tvrtke kojima ste se prijavili nisu zabilježene djelatnosti."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Još nema djelatnosti. Pojavljuju se kako opisujete tvrtke."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Još nema djelatnosti. Pojavljuju se ovdje kako ih dodjeljujete tvrtkama — obrazac tvrtke predlaže dugačak popis, a sve što upišete pridružuje se vašemu."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5481,6 +5500,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Ovdje nema ničega"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Ovdje se ništa ne podudara s tim. Na ovoj su stranici samo područja koja ste doista koristili."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5947,7 +5973,7 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Otvorene prijave bez glasa, i tri stvari koje možete s tim učiniti."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Otvorena radna mjesta"
@@ -6418,7 +6444,7 @@ msgstr "Adresa oglasa"
 msgid "Posting details"
 msgstr "Pojedinosti oglasa"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Oglas ažuriran."
@@ -7255,7 +7281,7 @@ msgstr "plaća do"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7370,6 +7396,7 @@ msgstr "Predodabir"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Traži"
@@ -7821,7 +7848,7 @@ msgid ""
 msgstr ""
 "Tko dođe preko ovog pružatelja prijavljuje se na račun kojem pripada navedena adresa, sve dok pružatelj tvrdi da je adresa potvrđena. Zato se isplati odgovoriti na jedno pitanje: proglašava li ovaj pružatelj adresu potvrđenom samo kada je osoba dokazala da je njezina? Ako ga sami vodite, gotovo sigurno. Ako je tuđi, provjerite prije nego se pouzdate u njega. Postavite POSTULO_OIDC_LINK_BY_EMAIL na false kako bi se svatko morao jednom prijaviti ovdje i povezati pružatelja sa svoje stranice računa."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9317,7 +9344,7 @@ msgstr "Prvo uključite „Koristi moj Gravatar“."
 msgid "Turned into an application"
 msgstr "Pretvoreno u prijavu"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "Dva pisanja iste stvari? Uredite jedno i spojite ga u drugo."

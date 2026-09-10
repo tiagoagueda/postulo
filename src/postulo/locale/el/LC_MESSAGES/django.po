@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Ελληνικά\n"
@@ -80,7 +80,7 @@ msgid_plural "All %(counter)s"
 msgstr[0] "%(counter)s αίτηση"
 msgstr[1] "Και οι %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1105,6 +1105,7 @@ msgid "an unknown file type"
 msgstr "άγνωστος τύπος αρχείου"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "και %(more)s ακόμη"
@@ -1504,6 +1505,11 @@ msgstr "Από"
 msgid "By industry"
 msgstr "Ανά κλάδο"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "Κατά όνομα ή κατά κωδικό NACE"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1562,7 +1568,7 @@ msgstr "Διεύθυνση επιστροφής για καταχώριση στ
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1830,6 +1836,7 @@ msgstr "Κλασικό"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2103,7 +2110,7 @@ msgstr "επαφή"
 msgid "Contact"
 msgstr "Επαφή"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Η επαφή προστέθηκε."
@@ -2506,7 +2513,7 @@ msgstr "Άμυνα"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2765,7 +2772,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2785,6 +2791,11 @@ msgstr "Επεξεργασία αίτησης"
 #, draft
 msgid "Edit interview"
 msgstr "Επεξεργασία συνέντευξης"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Επεξεργασία ή συγχώνευση"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3242,6 +3253,11 @@ msgstr "Χρηματοοικονομικά"
 #, draft
 msgid "Find logo"
 msgstr "Εύρεση λογότυπου"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Βρείτε έναν"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3902,7 +3918,7 @@ msgstr "κλάδος"
 msgid "Industry"
 msgstr "Κλάδος"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Ο κλάδος μετονομάστηκε."
@@ -4802,7 +4818,7 @@ msgstr "Μενού"
 msgid "Merge into"
 msgstr "Συγχώνευση σε"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Συγχωνεύθηκε."
@@ -4909,6 +4925,7 @@ msgid "Move up"
 msgstr "Μετακίνηση πάνω"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "κλάδος NACE"
@@ -5130,10 +5147,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Δεν έχουν καταγραφεί κλάδοι στις εταιρείες όπου κάνατε αίτηση."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Δεν υπάρχουν κλάδοι ακόμη. Εμφανίζονται καθώς περιγράφετε εταιρείες."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Δεν υπάρχουν ακόμη κλάδοι. Εμφανίζονται εδώ καθώς τους δίνετε σε εταιρείες — η φόρμα της εταιρείας προτείνει μια μεγάλη λίστα, και ό,τι πληκτρολογείτε προστίθεται στη δική σας."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5479,6 +5498,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Τίποτα εδώ"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Τίποτα εδώ δεν ταιριάζει με αυτό. Σε αυτή τη σελίδα εμφανίζονται μόνο οι τομείς που έχετε πράγματι χρησιμοποιήσει."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5944,7 +5970,7 @@ msgid ""
 msgstr ""
 "Ανοιχτές αιτήσεις χωρίς νέα, και τα τρία πράγματα που μπορείτε να κάνετε."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Ανοιχτές θέσεις"
@@ -6417,7 +6443,7 @@ msgstr "Διεύθυνση αγγελίας"
 msgid "Posting details"
 msgstr "Λεπτομέρειες αγγελίας"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Η αγγελία ενημερώθηκε."
@@ -7255,7 +7281,7 @@ msgstr "μισθός έως"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7370,6 +7396,7 @@ msgstr "Προεπιλογή"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Αναζήτηση"
@@ -7822,7 +7849,7 @@ msgid ""
 msgstr ""
 "Όποιος έρχεται μέσω αυτού του παρόχου συνδέεται στον λογαριασμό στον οποίο ανήκει η διεύθυνση που δίνεται, εφόσον ο πάροχος λέει ότι η διεύθυνση είναι επαληθευμένη. Αξίζει λοιπόν να απαντηθεί ένα ερώτημα: χαρακτηρίζει αυτός ο πάροχος μια διεύθυνση επαληθευμένη μόνο όταν το άτομο απέδειξε ότι του ανήκει; Αν τον διαχειρίζεστε εσείς, σχεδόν σίγουρα. Αν είναι ξένος, ελέγξτε το πριν βασιστείτε σε αυτόν. Θέστε το POSTULO_OIDC_LINK_BY_EMAIL σε false ώστε ο καθένας να συνδέεται εδώ μία φορά και να συνδέει τον πάροχο από τη σελίδα του λογαριασμού του."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9329,7 +9356,7 @@ msgstr "Ενεργοποιήστε πρώτα το «Χρήση του Gravatar 
 msgid "Turned into an application"
 msgstr "Μετατράπηκε σε αίτηση"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr ""

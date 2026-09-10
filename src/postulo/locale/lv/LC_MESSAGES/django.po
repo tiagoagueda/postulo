@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: latviešu\n"
@@ -81,7 +81,7 @@ msgstr[0] "%(counter)s pieteikums"
 msgstr[1] "Visi %(counter)s"
 msgstr[2] "Visi %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1113,6 +1113,7 @@ msgid "an unknown file type"
 msgstr "nezināms faila tips"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "un vēl %(more)s"
@@ -1510,6 +1511,11 @@ msgstr "Kurš izveidoja"
 msgid "By industry"
 msgstr "Pa nozarēm"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "Pēc nosaukuma vai NACE koda"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1568,7 +1574,7 @@ msgstr "Atgriezeniskais URL, ko reģistrēt pie pakalpojuma sniedzēja"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1836,6 +1842,7 @@ msgstr "Klasisks"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2109,7 +2116,7 @@ msgstr "kontakts"
 msgid "Contact"
 msgstr "Kontakts"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Kontakts pievienots."
@@ -2511,7 +2518,7 @@ msgstr "Aizsardzība"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2769,7 +2776,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2789,6 +2795,11 @@ msgstr "Rediģēt pieteikumu"
 #, draft
 msgid "Edit interview"
 msgstr "Rediģēt interviju"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Rediģēt vai apvienot"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3244,6 +3255,11 @@ msgstr "Finanses"
 #, draft
 msgid "Find logo"
 msgstr "Atrast logotipu"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Atrast kādu"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3901,7 +3917,7 @@ msgstr "nozare"
 msgid "Industry"
 msgstr "Nozare"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Nozare pārdēvēta."
@@ -4801,7 +4817,7 @@ msgstr "Izvēlne"
 msgid "Merge into"
 msgstr "Apvienot ar"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Apvienots."
@@ -4908,6 +4924,7 @@ msgid "Move up"
 msgstr "Uz augšu"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "NACE nodaļa"
@@ -5128,10 +5145,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Uzņēmumiem, kuriem esat pieteicies, nav norādītas nozares."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Nozaru vēl nav. Tās parādās, kad aprakstāt uzņēmumus."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Nozaru vēl nav. Tās parādās šeit, kad piešķirat tās uzņēmumiem — uzņēmuma veidlapa piedāvā garu sarakstu, un viss, ko ierakstāt, pievienojas jūsējam."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5475,6 +5494,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Šeit nekā nav"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Šeit nekas tam neatbilst. Šajā lapā ir tikai tās jomas, ko esat tiešām izmantojis."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5941,7 +5967,7 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Atvērtie pieteikumi bez ziņām un trīs lietas, ko ar tiem darīt."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Vakances"
@@ -6411,7 +6437,7 @@ msgstr "Sludinājuma adrese"
 msgid "Posting details"
 msgstr "Sludinājuma informācija"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Sludinājums atjaunināts."
@@ -7247,7 +7273,7 @@ msgstr "alga līdz"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7362,6 +7388,7 @@ msgstr "Atlase"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Meklēt"
@@ -7813,7 +7840,7 @@ msgid ""
 msgstr ""
 "Tas, kurš ienāk caur šo pakalpojumu sniedzēju, tiek pieteikts kontā, kuram pieder norādītā adrese, ja vien sniedzējs apgalvo, ka adrese ir apstiprināta. Tāpēc ir vērts atbildēt uz vienu jautājumu: vai šis sniedzējs sauc adresi par apstiprinātu tikai tad, kad cilvēks ir pierādījis, ka tā ir viņa? Ja to uzturat jūs paši, gandrīz noteikti. Ja tas ir kāda cita, pārbaudiet, pirms uz to paļaujaties. Iestatiet POSTULO_OIDC_LINK_BY_EMAIL uz false, lai katram vienreiz būtu jāpiesakās šeit un jāpievieno sniedzējs no savas konta lapas."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9310,7 +9337,7 @@ msgstr "Vispirms ieslēdziet “Lietot manu Gravatar”."
 msgid "Turned into an application"
 msgstr "Pārvērsts par pieteikumu"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr ""

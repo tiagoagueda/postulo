@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -92,7 +92,7 @@ msgstr[2] "Gach ceann den %(counter)s"
 msgstr[3] "Gach ceann den %(counter)s"
 msgstr[4] "Gach ceann den %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1165,6 +1165,7 @@ msgid "an unknown file type"
 msgstr "cineál comhaid anaithnid"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "agus %(more)s eile"
@@ -1565,6 +1566,11 @@ msgstr "Ag"
 msgid "By industry"
 msgstr "De réir tionscail"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "De réir ainm, nó de réir chód NACE"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1623,7 +1629,7 @@ msgstr "URL aisghlaoch le clárú leis"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1891,6 +1897,7 @@ msgstr "Clasaiceach"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2163,7 +2170,7 @@ msgstr "teagmhálaí"
 msgid "Contact"
 msgstr "Teagmhálaí"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Teagmhálaí curtha leis."
@@ -2566,7 +2573,7 @@ msgstr "Cosaint"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2826,7 +2833,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2846,6 +2852,11 @@ msgstr "Cuir iarratas in eagar"
 #, draft
 msgid "Edit interview"
 msgstr "Cuir agallamh in eagar"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Cuir in eagar nó cumaisc"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3303,6 +3314,11 @@ msgstr "Airgeadas"
 #, draft
 msgid "Find logo"
 msgstr "Aimsigh lógó"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Ceann a aimsiú"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3965,7 +3981,7 @@ msgstr "tionscal"
 msgid "Industry"
 msgstr "Tionscal"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Tionscal athainmnithe."
@@ -4871,7 +4887,7 @@ msgstr "Roghchlár"
 msgid "Merge into"
 msgstr "Cumaisc isteach i"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Cumaiscthe."
@@ -4978,6 +4994,7 @@ msgid "Move up"
 msgstr "Bog suas"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "rannán NACE"
@@ -5200,11 +5217,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Níl aon tionscail taifeadta ar na cuideachtaí ar chuir tú isteach orthu."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
 msgstr ""
-"Níl aon tionscail fós. Taispeántar iad de réir mar a dhéanann tú cur síos ar chuideachtaí."
+"Gan earnálacha go fóill. Tagann siad anseo de réir mar a thugann tú do chuideachtaí iad — molann foirm na cuideachta liosta fada, agus téann gach a gclóscríobhann tú isteach i do cheann féin."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5549,6 +5567,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Níl aon rud anseo"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Níl aon rud anseo a mheaitseálann é sin. Ní thaispeántar ar an leathanach seo ach na réimsí a d’úsáid tú i ndáiríre."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -6040,7 +6065,7 @@ msgid ""
 msgstr ""
 "Iarratais oscailte gan scéala, agus na trí rud is féidir a dhéanamh fúthu."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Folúntais"
@@ -6511,7 +6536,7 @@ msgstr "Seoladh an fhógra"
 msgid "Posting details"
 msgstr "Sonraí an fhógra"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Fógra nuashonraithe."
@@ -7352,7 +7377,7 @@ msgstr "tuarastal go"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7467,6 +7492,7 @@ msgstr "Scagadh"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Cuardaigh"
@@ -7920,7 +7946,7 @@ msgid ""
 msgstr ""
 "Duine a thagann tríd an soláthraí seo, sínítear isteach é sa chuntas ar leis an seoladh a thugtar, chomh fada is a deir an soláthraí go bhfuil an seoladh fíoraithe. Is fiú ceist amháin a fhreagairt mar sin: an nglaonn an soláthraí seo seoladh fíoraithe air ach amháin nuair a chruthaigh an duine gur leis é? Má ritheann tú féin é, is dócha go láidir. Más le duine eile é, seiceáil sula mbraitheann tú air. Socraigh POSTULO_OIDC_LINK_BY_EMAIL go false chun a éileamh go sínigh gach duine isteach anseo uair amháin agus go gceanglóidh siad an soláthraí óna leathanach cuntais féin."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9437,7 +9463,7 @@ msgstr "Cuir “Úsáid mo Gravatar” ar siúl ar dtús."
 msgid "Turned into an application"
 msgstr "Iompaithe ina iarratas"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr ""

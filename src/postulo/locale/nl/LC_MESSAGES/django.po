@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Nederlands\n"
@@ -80,7 +80,7 @@ msgid_plural "All %(counter)s"
 msgstr[0] "%(counter)s sollicitatie"
 msgstr[1] "Alle %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1099,6 +1099,7 @@ msgid "an unknown file type"
 msgstr "een onbekend bestandstype"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "en nog %(more)s"
@@ -1498,6 +1499,11 @@ msgstr "Door"
 msgid "By industry"
 msgstr "Per sector"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "Op naam, of op NACE-code"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1556,7 +1562,7 @@ msgstr "Callback-URL om bij de aanbieder te registreren"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1824,6 +1830,7 @@ msgstr "Klassiek"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2097,7 +2104,7 @@ msgstr "contact"
 msgid "Contact"
 msgstr "Contact"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Contact toegevoegd."
@@ -2500,7 +2507,7 @@ msgstr "Defensie"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2759,7 +2766,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2779,6 +2785,11 @@ msgstr "Sollicitatie bewerken"
 #, draft
 msgid "Edit interview"
 msgstr "Gesprek bewerken"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Bewerken of samenvoegen"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3238,6 +3249,11 @@ msgstr "Financiën"
 #, draft
 msgid "Find logo"
 msgstr "Logo zoeken"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Er een vinden"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3900,7 +3916,7 @@ msgstr "sector"
 msgid "Industry"
 msgstr "Sector"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Sector hernoemd."
@@ -4799,7 +4815,7 @@ msgstr "Menu"
 msgid "Merge into"
 msgstr "Samenvoegen met"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Samengevoegd."
@@ -4906,6 +4922,7 @@ msgid "Move up"
 msgstr "Omhoog"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "NACE-afdeling"
@@ -5127,10 +5144,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Geen branches vastgelegd bij de bedrijven waar u hebt gesolliciteerd."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Nog geen sectoren. Ze verschijnen terwijl u bedrijven beschrijft."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Nog geen sectoren. Ze verschijnen hier zodra u ze aan bedrijven geeft — het bedrijfsformulier stelt een lange lijst voor, en alles wat u typt komt bij die van u."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5475,6 +5494,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Niets hier"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Hier komt niets overeen. Op deze pagina staan alleen de vakgebieden die u echt hebt gebruikt."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5935,7 +5961,7 @@ msgid ""
 msgstr ""
 "Open sollicitaties zonder nieuws, en de drie dingen die u eraan kunt doen."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Vacatures"
@@ -6406,7 +6432,7 @@ msgstr "Adres van de vacature"
 msgid "Posting details"
 msgstr "Details van de vacature"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Vacature bijgewerkt."
@@ -7240,7 +7266,7 @@ msgstr "salaris tot"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7355,6 +7381,7 @@ msgstr "Screening"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Zoeken"
@@ -7808,7 +7835,7 @@ msgid ""
 msgstr ""
 "Wie via deze aanbieder binnenkomt, wordt aangemeld bij het account waartoe het opgegeven adres behoort, mits de aanbieder zegt dat het adres geverifieerd is. Eén vraag is dus het beantwoorden waard: noemt deze aanbieder een adres alleen geverifieerd wanneer de persoon heeft aangetoond dat het van hen is? Als je hem zelf beheert, vrijwel zeker. Is hij van iemand anders, controleer dat dan voordat je erop vertrouwt. Zet POSTULO_OIDC_LINK_BY_EMAIL op false om te eisen dat iedereen hier één keer aanmeldt en de aanbieder vanaf de eigen accountpagina koppelt."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9312,7 +9339,7 @@ msgstr "Schakel eerst “Mijn Gravatar gebruiken” in."
 msgid "Turned into an application"
 msgstr "Omgezet in een sollicitatie"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr ""

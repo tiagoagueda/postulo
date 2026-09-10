@@ -1219,6 +1219,28 @@ All notable changes to Postulo are recorded here. The format follows
   that must not happen here: deleting a CV has to leave the PDF an employer received exactly
   where it is, which was the whole reason `RenderedDocument` exists. (#130)
 
+### 🔧 Changed
+
+- **The two halves of choosing a company's sector meet, and the consequences are handled.**
+  The list is NACE Rev. 2.1 and the picker is chips; what was left was everything that
+  follows from a vocabulary that can now be long.
+
+  The companies table draws industries as labels rather than a comma-separated run, showing
+  four and counting the rest — a bank that is also an insurer and a software house is three,
+  a conglomerate is more, and the cell is already narrow. Filtering stays a box you type in
+  rather than a menu, which is the same control at thirty-two names and at three hundred and
+  the only one that stays usable at both.
+
+  **Companies → Industries** gains a search that matches a name or a NACE code, shows each
+  code beside the person's own word for it, and says *Edit or merge* rather than *Edit*,
+  because merging is exactly the tool somebody needs after picking from a standard list
+  beside their own words. Only what has actually been given to a company appears there — the
+  classification is a list of suggestions, not a list of rows, which is what made it safe to
+  make the suggestions long.
+
+  Nothing renames a word somebody wrote themselves, and a company in three fields still
+  counts in three. (#141)
+
 ### ✨ Added
 
 - **A company's name can be changed where it sits, and a refusal has somewhere to go.**

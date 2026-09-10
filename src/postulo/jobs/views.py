@@ -329,14 +329,35 @@ class CompanyDeleteView(OwnedObjectMixin, DeleteView):
 
 
 class IndustryListView(OwnedObjectMixin, ListView):
-    """The person's vocabulary of industries, with how many companies each holds."""
+    """The person's vocabulary of industries, with how many companies each holds.
+
+    **Searchable, because this list is no longer necessarily short.** A vocabulary seeded
+    from a classification of the whole economy can run to dozens of words, and a page that
+    can only be scrolled is a page where merging two spellings means finding both by eye
+    (#141). The box narrows by name and by NACE code, server-side, like every other filter
+    in Postulo.
+
+    A row appears here only once a company has been given that industry -- the classification
+    is a list of *suggestions*, not a list of rows -- so this page grows at the speed somebody
+    actually uses it, which is the reason it was safe to make the suggestions long.
+    """
 
     model = Industry
     template_name = "jobs/industry_list.html"
     context_object_name = "industries"
 
     def get_queryset(self):
-        return super().get_queryset().annotate(company_count=Count("companies", distinct=True))
+        found = super().get_queryset().annotate(company_count=Count("companies", distinct=True))
+        wanted = self.request.GET.get("q", "").strip()
+        if wanted:
+            found = found.filter(Q(name__icontains=wanted) | Q(code__startswith=wanted))
+        return found
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["q"] = self.request.GET.get("q", "").strip()
+        context["total"] = Industry.objects.for_user(self.request.user).count()
+        return context
 
 
 class IndustryCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):

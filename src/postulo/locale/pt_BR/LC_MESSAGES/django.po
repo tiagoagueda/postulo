@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: português (Portugal)\n"
@@ -80,7 +80,7 @@ msgid_plural "All %(counter)s"
 msgstr[0] "%(counter)s candidatura"
 msgstr[1] "Todas as %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1099,6 +1099,7 @@ msgid "an unknown file type"
 msgstr "um tipo de arquivo desconhecido"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "e mais %(more)s"
@@ -1499,6 +1500,11 @@ msgstr "Por"
 msgid "By industry"
 msgstr "Por setor"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "Por nome, ou por código NACE"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1557,7 +1563,7 @@ msgstr "URL de retorno a registar no fornecedor"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1825,6 +1831,7 @@ msgstr "Clássico"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2097,7 +2104,7 @@ msgstr "contato"
 msgid "Contact"
 msgstr "Contato"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Contato adicionado."
@@ -2499,7 +2506,7 @@ msgstr "Defesa"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2757,7 +2764,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2777,6 +2783,11 @@ msgstr "Editar candidatura"
 #, draft
 msgid "Edit interview"
 msgstr "Editar entrevista"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Editar ou juntar"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3235,6 +3246,11 @@ msgstr "Finanças"
 #, draft
 msgid "Find logo"
 msgstr "Procurar logótipo"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Encontrar um"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3898,7 +3914,7 @@ msgstr "setor"
 msgid "Industry"
 msgstr "Setor"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Setor renomeado."
@@ -4794,7 +4810,7 @@ msgstr "Menu"
 msgid "Merge into"
 msgstr "Fundir em"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Fundido."
@@ -4901,6 +4917,7 @@ msgid "Move up"
 msgstr "Mover para cima"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "divisão NACE"
@@ -5122,10 +5139,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "Não há setores registados nas empresas a que se candidatou."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Ainda não há setores. Aparecem à medida que descreve empresas."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Ainda não há setores. Aparecem aqui conforme você os atribui a empresas — o formulário da empresa sugere uma lista longa, e tudo o que você escrever entra na sua."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5470,6 +5489,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Nada aqui"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Nada aqui corresponde a isso. Nesta página só aparecem os campos que você usou mesmo."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5930,7 +5956,7 @@ msgid ""
 msgstr ""
 "Candidaturas abertas sem notícias, e as três coisas que pode fazer quanto a isso."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Vagas"
@@ -6400,7 +6426,7 @@ msgstr "Endereço do anúncio"
 msgid "Posting details"
 msgstr "Detalhes do anúncio"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Anúncio atualizado."
@@ -7232,7 +7258,7 @@ msgstr "salário até"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7347,6 +7373,7 @@ msgstr "Triagem"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Pesquisar"
@@ -7798,7 +7825,7 @@ msgid ""
 msgstr ""
 "Quem chega através deste fornecedor inicia sessão na conta a que pertence o endereço indicado, desde que o fornecedor diga que o endereço está verificado. Vale por isso a pena responder a uma pergunta: este fornecedor só considera um endereço verificado quando a pessoa provou que é seu? Se for o próprio a mantê-lo, quase de certeza. Se for de outra pessoa, verifique antes de confiar nele. Defina POSTULO_OIDC_LINK_BY_EMAIL como false para exigir que cada pessoa inicie sessão aqui uma vez e ligue o fornecedor a partir da sua própria página de conta."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9296,7 +9323,7 @@ msgstr "Ative primeiro «Usar o meu Gravatar»."
 msgid "Turned into an application"
 msgstr "Convertida em candidatura"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "Duas grafias da mesma coisa? Edite uma e funda-a na outra."

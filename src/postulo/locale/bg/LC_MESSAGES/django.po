@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 00:53+0000\n"
+"POT-Creation-Date: 2026-09-10 02:52+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -80,7 +80,7 @@ msgid_plural "All %(counter)s"
 msgstr[0] "%(counter)s кандидатура"
 msgstr[1] "Всички %(counter)s"
 
-#: src/postulo/templates/jobs/industry_list.html:29
+#: src/postulo/templates/jobs/industry_list.html:56
 #, python-format, draft
 msgid "%(counter)s company"
 msgid_plural "%(counter)s companies"
@@ -1096,6 +1096,7 @@ msgid "an unknown file type"
 msgstr "неизвестен тип файл"
 
 #: src/postulo/applications/quiet.py:113
+#: src/postulo/templates/jobs/partials/company_row.html:50
 #, python-format, draft
 msgid "and %(more)s more"
 msgstr "и още %(more)s"
@@ -1494,6 +1495,11 @@ msgstr "От"
 msgid "By industry"
 msgstr "По отрасъл"
 
+#: src/postulo/templates/jobs/industry_list.html:29
+#, draft
+msgid "By name, or by NACE code"
+msgstr "По име или по код по NACE"
+
 #: src/postulo/resume/models.py:189
 #, draft
 msgid "C1 — advanced"
@@ -1552,7 +1558,7 @@ msgstr "Callback URL за регистриране при доставчика"
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:26
-#: src/postulo/templates/partials/table/cell.html:37
+#: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
@@ -1820,6 +1826,7 @@ msgstr "Класически"
 #: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/applications/partials/filters.html:51
 #: src/postulo/templates/jobs/company_list.html:87
+#: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2092,7 +2099,7 @@ msgstr "контакт"
 msgid "Contact"
 msgstr "Контакт"
 
-#: src/postulo/jobs/views.py:400
+#: src/postulo/jobs/views.py:421
 #, draft
 msgid "Contact added."
 msgstr "Контактът е добавен."
@@ -2493,7 +2500,7 @@ msgstr "Отбрана"
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:51
-#: src/postulo/templates/jobs/industry_list.html:40
+#: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:23
@@ -2752,7 +2759,6 @@ msgstr ""
 #: src/postulo/templates/documents/upload_list.html:37
 #: src/postulo/templates/jobs/company_detail.html:38
 #: src/postulo/templates/jobs/company_detail.html:174
-#: src/postulo/templates/jobs/industry_list.html:36
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2772,6 +2778,11 @@ msgstr "Редактиране на кандидатурата"
 #, draft
 msgid "Edit interview"
 msgstr "Редактиране на интервюто"
+
+#: src/postulo/templates/jobs/industry_list.html:63
+#, draft
+msgid "Edit or merge"
+msgstr "Редактиране или сливане"
 
 #: src/postulo/documents/rendering.py:25 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
@@ -3231,6 +3242,11 @@ msgstr "Финанси"
 #, draft
 msgid "Find logo"
 msgstr "Намери лого"
+
+#: src/postulo/templates/jobs/industry_list.html:26
+#, draft
+msgid "Find one"
+msgstr "Намерете някой"
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -3891,7 +3907,7 @@ msgstr "отрасъл"
 msgid "Industry"
 msgstr "Отрасъл"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Industry renamed."
 msgstr "Отрасълът е преименуван."
@@ -4789,7 +4805,7 @@ msgstr "Меню"
 msgid "Merge into"
 msgstr "Сливане в"
 
-#: src/postulo/jobs/views.py:358
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Merged."
 msgstr "Слято."
@@ -4896,6 +4912,7 @@ msgid "Move up"
 msgstr "Нагоре"
 
 #: src/postulo/jobs/models.py:47
+#: src/postulo/templates/jobs/industry_list.html:52
 #, draft
 msgid "NACE division"
 msgstr "раздел по NACE"
@@ -5116,10 +5133,12 @@ msgstr ""
 msgid "No industries recorded against the companies you have applied to."
 msgstr "За компаниите, в които сте кандидатствали, няма записани отрасли."
 
-#: src/postulo/templates/jobs/industry_list.html:51
+#: src/postulo/templates/jobs/industry_list.html:84
 #, draft
-msgid "No industries yet. They appear as you describe companies."
-msgstr "Още няма отрасли. Появяват се, докато описвате компании."
+msgid ""
+"No industries yet. They appear here as you give them to companies — the company form suggests a long list, and anything you type joins your own."
+msgstr ""
+"Още няма отрасли. Появяват се тук, докато ги задавате на компании — формулярът на компанията предлага дълъг списък, а всичко, което напишете, се присъединява към вашия."
 
 #: src/postulo/templates/connections/pick.html:28
 #, draft
@@ -5464,6 +5483,13 @@ msgstr ""
 #, draft
 msgid "Nothing here"
 msgstr "Тук няма нищо"
+
+#: src/postulo/templates/jobs/industry_list.html:78
+#, draft
+msgid ""
+"Nothing here matches that. Only fields you have actually used appear on this page."
+msgstr ""
+"Тук нищо не съвпада с това. На тази страница са само областите, които наистина сте използвали."
 
 #: src/postulo/templates/applications/application_list.html:48
 #, draft
@@ -5923,7 +5949,7 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Отворени кандидатури без отговор и трите неща, които може да направите."
 
-#: src/postulo/templates/jobs/partials/company_row.html:51
+#: src/postulo/templates/jobs/partials/company_row.html:76
 #, draft
 msgid "Openings"
 msgstr "Свободни позиции"
@@ -6394,7 +6420,7 @@ msgstr "Адрес на обявата"
 msgid "Posting details"
 msgstr "Подробности за обявата"
 
-#: src/postulo/jobs/views.py:457
+#: src/postulo/jobs/views.py:478
 #, draft
 msgid "Posting updated."
 msgstr "Обявата е обновена."
@@ -7229,7 +7255,7 @@ msgstr "заплата до"
 #: src/postulo/templates/jobs/contact_form.html:37
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
-#: src/postulo/templates/partials/table/cell.html:34
+#: src/postulo/templates/partials/table/cell.html:32
 #: src/postulo/templates/resume/item_form.html:26
 #: src/postulo/templates/resume/translations.html:85
 #: src/postulo/templates/server/capture.html:44
@@ -7344,6 +7370,7 @@ msgstr "Пресяване"
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:81
+#: src/postulo/templates/jobs/industry_list.html:31
 #, draft
 msgid "Search"
 msgstr "Търсене"
@@ -7796,7 +7823,7 @@ msgid ""
 msgstr ""
 "Човек, който идва през този доставчик, влиза в профила, който притежава посочения адрес, стига доставчикът да казва, че адресът е потвърден. Затова си струва да си отговорите на един въпрос: този доставчик обявява ли адрес за потвърден само когато човекът е доказал, че го притежава? Ако вие го управлявате, почти сигурно. Ако е чужд, проверете, преди да разчитате на него. Задайте POSTULO_OIDC_LINK_BY_EMAIL на false, за да изисквате всеки да влезе тук веднъж и да свърже доставчика от своята страница на профила."
 
-#: src/postulo/core/cells.py:58
+#: src/postulo/core/cells.py:63
 #, draft
 msgid ""
 "Somebody else changed this while you were editing. This is what it says now."
@@ -9292,7 +9319,7 @@ msgstr "Първо включете „Използване на моя Gravatar
 msgid "Turned into an application"
 msgstr "Превърната в кандидатура"
 
-#: src/postulo/templates/jobs/industry_list.html:47
+#: src/postulo/templates/jobs/industry_list.html:74
 #, draft
 msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr "Два правописа на едно и също? Редактирайте единия и го слейте в другия."
