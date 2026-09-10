@@ -55,6 +55,11 @@ class Column:
     numeric: bool = False
     #: Extra classes for the header and cells (a minimum width, say).
     css: str = ""
+    #: The form field this cell edits, where it can be edited at all. Empty means the value
+    #: is drawn and nothing else -- a count is not editable because it is a count, a date
+    #: read off a posting belongs to the posting, and a status goes through a service that
+    #: writes a timeline entry, so a cell that skipped it would be worse than no cell (#135).
+    editable: str = ""
 
     @property
     def name(self) -> str:

@@ -52,6 +52,11 @@ EXCUSED: dict[str, str] = {
     "api:token_create": "a POST that mints a token and shows it once",
     "applications:bulk": "a POST from the table's action bar, which is visited",
     "jobs:company_bulk": "a POST from the table's action bar, which is visited",
+    "jobs:company_cell": (
+        "one cell of the companies table, as a fragment rather than a page. It has no "
+        "layout of its own to check; `tests/e2e/test_editable_cells.py` opens it in the "
+        "table it belongs to and runs axe over the page with the editor showing (#135)"
+    ),
     "connections:consent": "a POST that sends somebody to a provider's own consent screen",
     "connections:consent_callback": (
         "where a provider sends them back: it reads a code and redirects, and renders nothing"

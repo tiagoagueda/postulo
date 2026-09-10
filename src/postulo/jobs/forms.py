@@ -89,20 +89,29 @@ class CompanyForm(OwnerScopedModelForm):
         widgets = {"notes": forms.Textarea(attrs={"rows": 4})}
 
     def scope_querysets(self) -> None:
-        # The parent is offered as this person's other companies, minus this one and
-        # everything already under it. `Company.clean` refuses a loop anyway; refusing
-        # something the form offered is worse than not offering it.
-        companies = Company.objects.for_user(self.user)
-        if self.instance and self.instance.pk:
-            excluded = {self.instance.pk, *(c.pk for c in self.instance.descendants())}
-            companies = companies.exclude(pk__in=excluded)
-        self.fields["parent"].queryset = companies
-        self.fields["parent"].empty_label = _("Not part of another company")
+        """Narrow every field this form actually has to this person's own rows.
 
-        self.fields["industries"].queryset = Industry.objects.for_user(self.user)
-        if self.instance.pk and self.instance.logo_source_url:
+        Each one is guarded, because this form is also used one field at a time: an
+        editable cell builds a version of it holding only the column being changed, so that
+        a cell refuses exactly what the page refuses (#135). Scoping a field that is not
+        there would make that impossible for the sake of an assumption nothing needs.
+        """
+        if "parent" in self.fields:
+            # The parent is offered as this person's other companies, minus this one and
+            # everything already under it. `Company.clean` refuses a loop anyway; refusing
+            # something the form offered is worse than not offering it.
+            companies = Company.objects.for_user(self.user)
+            if self.instance and self.instance.pk:
+                excluded = {self.instance.pk, *(c.pk for c in self.instance.descendants())}
+                companies = companies.exclude(pk__in=excluded)
+            self.fields["parent"].queryset = companies
+            self.fields["parent"].empty_label = _("Not part of another company")
+
+        if "industries" in self.fields:
+            self.fields["industries"].queryset = Industry.objects.for_user(self.user)
+        if "logo_url" in self.fields and self.instance.pk and self.instance.logo_source_url:
             self.fields["logo_url"].initial = self.instance.logo_source_url
-        if not (self.instance.pk and self.instance.logo):
+        if "remove_logo" in self.fields and not (self.instance.pk and self.instance.logo):
             del self.fields["remove_logo"]
 
     def clean_logo_upload(self):

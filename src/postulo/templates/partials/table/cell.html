@@ -1,0 +1,46 @@
+{% load i18n postulo %}
+{% comment %}
+  One value in a table: shown, or being changed (#135).
+
+  **The editor is a small form, so the refusal has somewhere to go.** That is the whole
+  question this answers. A cell four columns wide has nowhere to put an error — under it
+  breaks the row, a toast is gone before a screen reader reaches it, a tooltip is never
+  announced — so while it is being edited the cell *is* a form: an input, the same
+  `field_feedback` every other field in Postulo uses, and `aria-invalid` on the input. The
+  row is taller while that is true, which it already was, because it is holding an input.
+
+  **With no script this is a link to the form**, which is exactly what the table did before
+  any of this existed. `hx-get` only does something where htmx is there to do it.
+
+  A span rather than the whole cell, so a column that draws something else beside the value
+  — a logo, an icon — keeps it while the value is being changed.
+{% endcomment %}
+<span data-cell id="cell-{{ column.key }}-{{ object.pk }}">
+  {% if editing %}
+    <form hx-post="{{ cell_url }}" hx-target="closest [data-cell]" hx-swap="outerHTML"
+          class="inline-block align-top" data-cell-editor>
+      {% csrf_token %}
+      <input type="hidden" name="stamp" value="{{ stamp }}">
+      <label class="sr-only" for="{{ field.id_for_label }}">{{ column.label }}</label>
+      {{ field|add_class:"field-input" }}
+      {% comment %} The same partial every other field uses, and it already carries
+         `role="alert"` for exactly this: an error inserted into a live page by a swap. A
+         second announcement here would be the same sentence twice. {% endcomment %}
+      {% include "partials/field_feedback.html" with field=field %}
+      <span class="mt-1 flex items-center gap-2">
+        <button type="submit" class="btn-primary px-2 py-1 text-xs">{% translate "Save" %}</button>
+        <button type="button" class="btn-ghost px-2 py-1 text-xs"
+                hx-get="{{ cell_url }}?abandon=1"
+                hx-target="closest [data-cell]" hx-swap="outerHTML">{% translate "Cancel" %}</button>
+      </span>
+    </form>
+  {% else %}
+    <a href="{{ form_url }}" class="font-medium hover:underline" data-cell-open
+       hx-get="{{ cell_url }}" hx-target="closest [data-cell]"
+       hx-swap="outerHTML">{{ value|default:"—" }}</a>
+    {% if message %}
+      <span class="mt-1 block text-sm text-amber-700 dark:text-amber-400"
+            role="status">{{ message }}</span>
+    {% endif %}
+  {% endif %}
+</span>

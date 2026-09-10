@@ -16,9 +16,11 @@
       <td class="px-4 py-3">
         <span class="flex items-center gap-2">
           {% company_logo company %}
-          <a href="{{ company.get_absolute_url }}" class="font-medium hover:underline">
-            {{ company.name }}
-          </a>
+          {% comment %} Changed where it sits, or -- with no script -- a link to the form,
+             which is exactly what this was before (#135). {% endcomment %}
+          {% url 'jobs:company_cell' company.pk 'name' as cell_url %}
+          {% url 'jobs:company_update' company.pk as form_url %}
+          {% include "partials/table/cell.html" with object=company value=company.name editing=False message="" cell_url=cell_url form_url=form_url %}
         </span>
       </td>
     {% elif column.key == 'location' %}

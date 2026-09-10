@@ -820,4 +820,48 @@
   document.body && readyEveryLabelBox();
   document.addEventListener("htmx:afterSwap", readyEveryLabelBox);
 
+  /* --------------------------------------------------------------- editing a cell
+   *
+   * A value changed where it sits (#135). htmx does the swapping; this does the two things
+   * htmx cannot, and both are about the keyboard.
+   *
+   * **Focus follows the swap.** Opening an editor puts the caret in it; saving or
+   * abandoning puts focus back on the value it came from. Without this, every edit throws
+   * somebody to the top of a re-rendered table, which is the failure the issue names.
+   *
+   * **Escape abandons.** Enter is the form's own submit, which needs nothing; Escape is not
+   * a form key and has to be asked for.
+   */
+  document.addEventListener("htmx:afterSwap", function (event) {
+    var cell = event.target.closest ? event.target.closest("[data-cell]") : null;
+    if (!cell) {
+      return;
+    }
+    var input = cell.querySelector("[data-cell-editor] input:not([type=hidden])");
+    if (input) {
+      input.focus();
+      input.select();
+      return;
+    }
+    var link = cell.querySelector("[data-cell-open]");
+    if (link) {
+      link.focus();
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") {
+      return;
+    }
+    var editor = event.target.closest ? event.target.closest("[data-cell-editor]") : null;
+    if (!editor) {
+      return;
+    }
+    var cancel = editor.querySelector("[hx-get]");
+    if (cancel) {
+      event.preventDefault();
+      cancel.click();
+    }
+  });
+
 })();

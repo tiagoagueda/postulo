@@ -350,6 +350,18 @@ A company can be recorded as part of another. Applying to Google, to DeepMind an
 Waymo is applying to three companies you already know are one group; saying so on the
 company form means the page names the owner and lists what belongs to it.
 
+**A company's name can be changed where it sits.** Click it in the table and the cell
+becomes a box; Enter saves, Escape puts it back, and focus stays on the row rather than
+throwing you to the top of the page. If the name clashes with one you already have, the
+refusal appears in the cell with the value that caused it, in the same words the company
+form would have used — because it *is* the company form, narrowed to one field. If somebody
+else changed the row while you were typing, the save is refused and you are shown what it
+says now, rather than quietly overwriting them.
+
+Only the name. A count is not editable because it is a count, and a date read off a posting
+belongs to the posting. With scripts switched off, clicking the name opens the company form,
+which is exactly what it did before.
+
 **Nothing is inherited.** A subsidiary keeps its own industries, its own logo, its own
 notes. An inheritance rule would be one more thing to hold in your head, and naming the
 parent on the page is what you actually wanted to know.

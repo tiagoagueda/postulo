@@ -1219,6 +1219,39 @@ All notable changes to Postulo are recorded here. The format follows
   that must not happen here: deleting a CV has to leave the PDF an employer received exactly
   where it is, which was the whole reason `RenderedDocument` exists. (#130)
 
+### ✨ Added
+
+- **A company's name can be changed where it sits, and a refusal has somewhere to go.**
+  Every edit in Postulo was a page — fine for a company nobody looks at twice, tiring for a
+  list of forty where the thing wanted is one word in one cell.
+
+  **The interesting half is the refusal.** A form has somewhere to put one: under a labelled
+  field, in a form with a heading, which is the arrangement `aria-describedby` and
+  `aria-invalid` were wired for. A cell four columns wide has nowhere — under it breaks the
+  row, a toast is gone before a screen reader reaches it, a tooltip is never announced. So
+  the answer, decided once rather than improvised per column: while it is being edited the
+  cell *is* a form, and the refusal goes exactly where every other refusal in Postulo goes.
+  That turned out to need almost nothing new — `partials/field_feedback.html` already
+  carries `role="alert"`, with a comment saying the role earns its place *through htmx*,
+  because an error inserted into a live page is what it is for. A cell arriving through a
+  swap is precisely that.
+
+  **Every editable cell posts to the form the page already uses**, narrowed to one field, so
+  a cell refuses exactly what the page refuses in exactly the same words. A cell that wrote
+  the field directly would be a second way of saving to keep in step with the first, and the
+  day it drifted would be the day something was saved without its rules.
+
+  **A column that cannot be edited cannot be edited by address either.** `Column.editable`
+  sits beside `sort` and `filter` in the table definition, and the view checks it — a count
+  is not editable because it is a count, a date read off a posting belongs to the posting,
+  and a status is not offered here at all because it goes through a service that writes a
+  timeline entry.
+
+  **Two tabs, both editing, is answered rather than ignored**: the editor carries the row's
+  timestamp and a save whose stamp has moved is refused with what the row says now. Focus
+  follows the edit and comes back to the value afterwards; Escape abandons; and with no
+  script the cell is a link to the form, which is exactly what it was before. (#135)
+
 ### 🔧 Changed
 
 - **Industries and tags are chosen as labels now, not as tick boxes.** Industries were a row

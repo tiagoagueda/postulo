@@ -16,6 +16,7 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from postulo.core import tables
+from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin, PhoneNumbersMixin
 from postulo.core.redirects import safe_next
@@ -86,6 +87,19 @@ class CompanyListView(OwnedObjectMixin, ListView):
         # page cannot keep (#134).
         context["bulk_industries"] = Industry.objects.for_user(self.request.user)
         return context
+
+
+class CompanyCellView(LoginRequiredMixin, EditableCellView):
+    """One cell of the companies table, changed where it sits (#135).
+
+    Three attributes and the machinery does the rest, which is the measure of whether the
+    second table to want this is a view or a paragraph.
+    """
+
+    model = Company
+    form_class = CompanyForm
+    columns = CompaniesTable.columns
+    form_url_name = "jobs:company_update"
 
 
 class CompanyBulkView(LoginRequiredMixin, View):

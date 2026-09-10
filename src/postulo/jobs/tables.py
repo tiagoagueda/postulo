@@ -14,7 +14,20 @@ class CompaniesTable(Table):
     extra_params = ("q",)
     noun = (_("company"), _("companies"))
     columns = (
-        Column("name", _("Name"), sort=("name",), filter="text", lookups=("name",), default=True),
+        # The one column here that can be changed where it sits, and the one worth
+        # choosing first: it has a real refusal to place -- two companies of one name
+        # in one account -- which is the question #135 exists to answer. The counts
+        # cannot be edited because they are counts, and the dates belong to the rows
+        # they are counted from.
+        Column(
+            "name",
+            _("Name"),
+            sort=("name",),
+            filter="text",
+            lookups=("name",),
+            default=True,
+            editable="name",
+        ),
         Column(
             "location",
             _("Location"),

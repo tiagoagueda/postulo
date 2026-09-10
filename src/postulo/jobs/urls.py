@@ -11,6 +11,11 @@ urlpatterns = [
     path("companies/new/", views.CompanyCreateView.as_view(), name="company_create"),
     path("companies/<int:pk>/", views.CompanyDetailView.as_view(), name="company_detail"),
     path("companies/<int:pk>/edit/", views.CompanyUpdateView.as_view(), name="company_update"),
+    path(
+        "companies/<int:pk>/cell/<slug:column>/",
+        views.CompanyCellView.as_view(),
+        name="company_cell",
+    ),
     path("companies/<int:pk>/logo/", views.CompanyLogoView.as_view(), name="company_logo"),
     path(
         "companies/<int:pk>/logo/<str:action>/",
