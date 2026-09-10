@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: shqip\n"
@@ -271,6 +271,11 @@ msgstr "%(name)s tani është @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s tani është administrator."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s tani është në rreshtin %(row)s, vendi %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -722,7 +727,7 @@ msgid ""
 msgstr ""
 "Një emër përdoruesi është unik në të gjithë instalimin kushdo që e ndryshon, dhe njerëzit mund të ndryshojnë të vetin te Cilësimet."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -813,8 +818,8 @@ msgstr "Veprime për %(name)s"
 msgid "Add"
 msgstr "Shto"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Shto %(name)s"
@@ -1422,7 +1427,7 @@ msgstr "Kthehu te njerëzit"
 msgid "Back to the entry"
 msgstr "Kthehu te zëri"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Kthehu te rregullimi standard"
@@ -2267,7 +2272,7 @@ msgstr "CV"
 msgid "Dark"
 msgstr "E errët"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4848,15 +4853,25 @@ msgstr "Zhvendos %(column)s poshtë"
 msgid "Move %(column)s up"
 msgstr "Zhvendos %(column)s lart"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Zhvendos %(name)s poshtë"
+msgid "Move %(name)s down a row"
+msgstr "Zhvendos %(name)s një rresht poshtë"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Zhvendos %(name)s lart"
+msgid "Move %(name)s one place earlier"
+msgstr "Zhvendos %(name)s një vend më përpara"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Zhvendos %(name)s një vend më prapa"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Zhvendos %(name)s një rresht lart"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -4985,7 +5000,7 @@ msgstr "Letër e re"
 msgid "New reminder"
 msgstr "Kujtesë e re"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "E re që nga hera e fundit që e rregulluat këtë"
@@ -5269,7 +5284,7 @@ msgstr "Ende asnjë. Ky zë e shtyp tekstin e tij origjinal në çdo CV."
 msgid "Normal"
 msgstr "Normale"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Jo %(name)s"
@@ -5359,7 +5374,7 @@ msgid ""
 msgstr ""
 "Ende i pashfaqur: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">rregulloni panelin tuaj</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Nuk shfaqet · %(name)s"
@@ -5636,7 +5651,7 @@ msgstr "Nuk u instalua asgjë."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Nuk u zgjodh asgjë, prandaj nuk ndryshoi asgjë."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Asgjë. Pamja e përgjithshme do të ofrojë të kthejë diçka."
@@ -7341,7 +7356,7 @@ msgstr "Shih aplikimet"
 msgid "See the board"
 msgstr "Shih tabelën"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Shih pamjen e përgjithshme"
@@ -8100,7 +8115,7 @@ msgstr "Përshtat këtë zë"
 msgid "tailored for this CV"
 msgstr "përshtatur për këtë CV"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Hiq %(name)s"
@@ -8335,7 +8350,7 @@ msgstr "Ky nuk është status që Postulo e njeh."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Kjo nuk është rrotë: Postulo instalon skedarë .whl."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Ky nuk është modul që Postulo e njeh."
@@ -8939,7 +8954,7 @@ msgstr "Ata nuk u paraqitën"
 msgid "This address is already listed."
 msgstr "Kjo adresë është tashmë në listë."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

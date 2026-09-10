@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Nederlands\n"
@@ -272,6 +272,11 @@ msgstr "%(name)s heet nu @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s is nu beheerder."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s staat nu op rij %(row)s, plaats %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -724,7 +729,7 @@ msgid ""
 msgstr ""
 "Een gebruikersnaam is uniek op de hele instantie, wie hem ook wijzigt, en iedereen kan de eigen naam wijzigen onder Instellingen."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -815,8 +820,8 @@ msgstr "Acties voor %(name)s"
 msgid "Add"
 msgstr "Toevoegen"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "%(name)s toevoegen"
@@ -1423,7 +1428,7 @@ msgstr "Terug naar personen"
 msgid "Back to the entry"
 msgstr "Terug naar het item"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Terug naar de standaardindeling"
@@ -2270,7 +2275,7 @@ msgstr "Cv's"
 msgid "Dark"
 msgstr "Donker"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4857,15 +4862,25 @@ msgstr "%(column)s omlaag"
 msgid "Move %(column)s up"
 msgstr "%(column)s omhoog"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "%(name)s omlaag"
+msgid "Move %(name)s down a row"
+msgstr "%(name)s een rij omlaag verplaatsen"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "%(name)s omhoog"
+msgid "Move %(name)s one place earlier"
+msgstr "%(name)s een plaats naar voren verplaatsen"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "%(name)s een plaats naar achteren verplaatsen"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "%(name)s een rij omhoog verplaatsen"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -4994,7 +5009,7 @@ msgstr "Nieuwe brief"
 msgid "New reminder"
 msgstr "Nieuwe herinnering"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Nieuw sinds u dit voor het laatst indeelde"
@@ -5279,7 +5294,7 @@ msgstr "Nog geen. Dit item drukt zijn oorspronkelijke tekst af op elk cv."
 msgid "Normal"
 msgstr "Normaal"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Geen %(name)s"
@@ -5369,7 +5384,7 @@ msgid ""
 msgstr ""
 "Nog niet getoond: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">uw dashboard indelen</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Niet getoond · %(name)s"
@@ -5650,7 +5665,7 @@ msgstr "Er is niets geïnstalleerd."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Er was niets geselecteerd, dus er is niets gewijzigd."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Niets. Het dashboard biedt aan om iets terug te zetten."
@@ -7357,7 +7372,7 @@ msgstr "De sollicitaties bekijken"
 msgid "See the board"
 msgstr "Het bord bekijken"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Naar het dashboard"
@@ -8120,7 +8135,7 @@ msgstr "Deze vermelding afstemmen"
 msgid "tailored for this CV"
 msgstr "afgestemd op dit cv"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "%(name)s eraf halen"
@@ -8356,7 +8371,7 @@ msgstr "Dat is geen status die Postulo kent."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Dat is geen wheel: Postulo installeert .whl-bestanden."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Dat is geen widget die Postulo kent."
@@ -8964,7 +8979,7 @@ msgstr "Ze kwamen niet opdagen"
 msgid "This address is already listed."
 msgstr "Dit adres staat er al bij."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

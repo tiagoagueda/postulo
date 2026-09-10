@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -270,6 +270,11 @@ msgstr "%(name)s вече е @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s вече е администратор."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s вече е на ред %(row)s, място %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -721,7 +726,7 @@ msgid ""
 msgstr ""
 "Потребителското име е уникално в цялата инстанция, който и да го променя, и всеки може да смени своето в Настройки."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -812,8 +817,8 @@ msgstr "Действия за %(name)s"
 msgid "Add"
 msgstr "Добавяне"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Добави %(name)s"
@@ -1419,7 +1424,7 @@ msgstr "Обратно към хората"
 msgid "Back to the entry"
 msgstr "Обратно към записа"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Обратно към стандартната подредба"
@@ -2265,7 +2270,7 @@ msgstr "CV-та"
 msgid "Dark"
 msgstr "Тъмна"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4847,15 +4852,25 @@ msgstr "Преместване на %(column)s надолу"
 msgid "Move %(column)s up"
 msgstr "Преместване на %(column)s нагоре"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Премести %(name)s надолу"
+msgid "Move %(name)s down a row"
+msgstr "Преместване на %(name)s един ред надолу"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Премести %(name)s нагоре"
+msgid "Move %(name)s one place earlier"
+msgstr "Преместване на %(name)s едно място по-напред"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Преместване на %(name)s едно място по-назад"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Преместване на %(name)s един ред нагоре"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -4984,7 +4999,7 @@ msgstr "Ново писмо"
 msgid "New reminder"
 msgstr "Ново напомняне"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Ново, откакто подредихте това за последно"
@@ -5269,7 +5284,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Нормален"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Без %(name)s"
@@ -5359,7 +5374,7 @@ msgid ""
 msgstr ""
 "Още не се показва: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">подредете таблото си</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Не се показва · %(name)s"
@@ -5638,7 +5653,7 @@ msgstr "Нищо не беше инсталирано."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Нищо не беше избрано, така че нищо не се промени."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Нищо. Таблото ще предложи да върне нещо."
@@ -7346,7 +7361,7 @@ msgstr "Вижте кандидатурите"
 msgid "See the board"
 msgstr "Вижте таблото"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Виж таблото"
@@ -8107,7 +8122,7 @@ msgstr "Нагаждане на този запис"
 msgid "tailored for this CV"
 msgstr "нагоден за това CV"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Махни %(name)s"
@@ -8341,7 +8356,7 @@ msgstr "Това не е статус, който Postulo разпознава."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Това не е wheel: Postulo инсталира .whl файлове."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Това не е елемент, който Postulo познава."
@@ -8944,7 +8959,7 @@ msgstr "Не се явиха"
 msgid "This address is already listed."
 msgstr "Този адрес вече е в списъка."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

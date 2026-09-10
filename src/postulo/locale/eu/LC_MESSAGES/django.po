@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -271,6 +271,11 @@ msgstr "%(name)s orain @%(username)s da."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s orain administratzailea da."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s orain %(row)s. errenkadan dago, %(place)s. tokian."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -727,7 +732,7 @@ msgid ""
 msgstr ""
 "Erabiltzaile-izena bakarra da instalazio osoan nork aldatzen duen ere, eta bakoitzak berea alda dezake Ezarpenetan."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -818,8 +823,8 @@ msgstr "%(name)s(r)en ekintzak"
 msgid "Add"
 msgstr "Gehitu"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Gehitu %(name)s"
@@ -1427,7 +1432,7 @@ msgstr "Itzuli jendera"
 msgid "Back to the entry"
 msgstr "Itzuli sarrerara"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Itzuli antolaketa estandarrera"
@@ -2274,7 +2279,7 @@ msgstr "CVak"
 msgid "Dark"
 msgstr "Iluna"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4860,15 +4865,25 @@ msgstr "Mugitu %(column)s behera"
 msgid "Move %(column)s up"
 msgstr "Mugitu %(column)s gora"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Mugitu %(name)s behera"
+msgid "Move %(name)s down a row"
+msgstr "Jaitsi %(name)s errenkada bat"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Mugitu %(name)s gora"
+msgid "Move %(name)s one place earlier"
+msgstr "Aurreratu %(name)s toki bat"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Atzeratu %(name)s toki bat"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Igo %(name)s errenkada bat"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -4997,7 +5012,7 @@ msgstr "Gutun berria"
 msgid "New reminder"
 msgstr "Oroigarri berria"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Berria azkeneko aldiz antolatu zenuenetik"
@@ -5283,7 +5298,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Arrunta"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "%(name)s ez"
@@ -5373,7 +5388,7 @@ msgid ""
 msgstr ""
 "Oraindik erakutsi gabe: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">antolatu zure arbela</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Ez da erakusten · %(name)s"
@@ -5652,7 +5667,7 @@ msgstr "Ez da ezer instalatu."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Ez zen ezer hautatu, beraz ez da ezer aldatu."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Ezer ez. Laburpenak zerbait itzultzeko eskainiko dizu."
@@ -7362,7 +7377,7 @@ msgstr "Ikusi eskaerak"
 msgid "See the board"
 msgstr "Ikusi taula"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Ikusi laburpena"
@@ -8122,7 +8137,7 @@ msgstr "Egokitu sarrera hau"
 msgid "tailored for this CV"
 msgstr "CV honetarako egokitua"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Kendu %(name)s"
@@ -8359,7 +8374,7 @@ msgstr "Hori ez da Postulok ezagutzen duen egoera bat."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Hori ez da gurpil bat: Postulok .whl fitxategiak instalatzen ditu."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Hori ez da Postulok ezagutzen duen modulu bat."
@@ -8965,7 +8980,7 @@ msgstr "Ez ziren agertu"
 msgid "This address is already listed."
 msgstr "Helbide hau jada zerrendatuta dago."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: eesti\n"
@@ -271,6 +271,11 @@ msgstr "%(name)s on nüüd @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s on nüüd administraator."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s on nüüd real %(row)s, kohal %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -722,7 +727,7 @@ msgid ""
 msgstr ""
 "Kasutajanimi on kogu eksemplaris ainulaadne, kes seda ka ei muudaks, ja igaüks saab enda oma Seadetes muuta."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -813,8 +818,8 @@ msgstr "Toimingud kasutajale %(name)s"
 msgid "Add"
 msgstr "Lisa"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Lisa %(name)s"
@@ -1420,7 +1425,7 @@ msgstr "Tagasi inimeste juurde"
 msgid "Back to the entry"
 msgstr "Tagasi kirje juurde"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Tagasi tavapärase paigutuse juurde"
@@ -2267,7 +2272,7 @@ msgstr "CV-d"
 msgid "Dark"
 msgstr "Tume"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4846,15 +4851,25 @@ msgstr "Teisalda %(column)s alla"
 msgid "Move %(column)s up"
 msgstr "Teisalda %(column)s üles"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Liiguta %(name)s alla"
+msgid "Move %(name)s down a row"
+msgstr "Liiguta %(name)s rida allapoole"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Liiguta %(name)s üles"
+msgid "Move %(name)s one place earlier"
+msgstr "Liiguta %(name)s üks koht ettepoole"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Liiguta %(name)s üks koht tahapoole"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Liiguta %(name)s rida ülespoole"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -4983,7 +4998,7 @@ msgstr "Uus kiri"
 msgid "New reminder"
 msgstr "Uus meeldetuletus"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Uus sellest ajast, kui selle viimati korrastasite"
@@ -5268,7 +5283,7 @@ msgstr "Veel ühtegi. See kirje trükib oma algse teksti igal CV-l."
 msgid "Normal"
 msgstr "Tavaline"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Mitte %(name)s"
@@ -5358,7 +5373,7 @@ msgid ""
 msgstr ""
 "Veel ei näidata: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">korrastage oma töölaud</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Ei kuvata · %(name)s"
@@ -5636,7 +5651,7 @@ msgstr "Midagi ei paigaldatud."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Midagi ei olnud valitud, seega ei muutunud midagi."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Mitte midagi. Töölaud pakub midagi tagasi tuua."
@@ -7340,7 +7355,7 @@ msgstr "Vaata kandideerimisi"
 msgid "See the board"
 msgstr "Vaata tahvlit"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Vaata töölauda"
@@ -8101,7 +8116,7 @@ msgstr "Kohanda seda kirjet"
 msgid "tailored for this CV"
 msgstr "kohandatud selle CV jaoks"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Eemalda %(name)s"
@@ -8335,7 +8350,7 @@ msgstr "See ei ole olek, mida Postulo tunneb."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "See pole wheel: Postulo paigaldab .whl-faile."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "See pole vidin, mida Postulo tunneb."
@@ -8937,7 +8952,7 @@ msgstr "Nad ei ilmunud"
 msgid "This address is already listed."
 msgstr "See aadress on juba loetletud."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

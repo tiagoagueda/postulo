@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: português (Portugal)\n"
@@ -271,6 +271,11 @@ msgstr "%(name)s passou a ser @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s é agora administrador."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s está agora na linha %(row)s, lugar %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -723,7 +728,7 @@ msgid ""
 msgstr ""
 "Um nome de usuário é único em toda a instância, seja quem for que o altere, e cada pessoa pode alterar o seu em Configurações."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -814,8 +819,8 @@ msgstr "Ações para %(name)s"
 msgid "Add"
 msgstr "Adicionar"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Adicionar %(name)s"
@@ -1424,7 +1429,7 @@ msgstr "Voltar a pessoas"
 msgid "Back to the entry"
 msgstr "Voltar para a entrada"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Voltar à disposição padrão"
@@ -2270,7 +2275,7 @@ msgstr "CV"
 msgid "Dark"
 msgstr "Escuro"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4852,15 +4857,25 @@ msgstr "Mover %(column)s para baixo"
 msgid "Move %(column)s up"
 msgstr "Mover %(column)s para cima"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Descer %(name)s"
+msgid "Move %(name)s down a row"
+msgstr "Descer %(name)s uma linha"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Subir %(name)s"
+msgid "Move %(name)s one place earlier"
+msgstr "Adiantar %(name)s um lugar"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Atrasar %(name)s um lugar"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Subir %(name)s uma linha"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -4989,7 +5004,7 @@ msgstr "Nova carta"
 msgid "New reminder"
 msgstr "Novo lembrete"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Novo desde a última vez que você organizou isto"
@@ -5275,7 +5290,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Normal"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "%(name)s não"
@@ -5365,7 +5380,7 @@ msgid ""
 msgstr ""
 "Ainda não mostrado: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">organizar seu painel</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Não mostrado · %(name)s"
@@ -5644,7 +5659,7 @@ msgstr "Não foi instalado nada."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Nada foi selecionado, então nada mudou."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Nada. O painel há de oferecer-se para repor alguma coisa."
@@ -7349,7 +7364,7 @@ msgstr "Ver as candidaturas"
 msgid "See the board"
 msgstr "Ver o quadro"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Ver o painel"
@@ -8108,7 +8123,7 @@ msgstr "Adaptar esta entrada"
 msgid "tailored for this CV"
 msgstr "adaptada para este CV"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Retirar %(name)s"
@@ -8342,7 +8357,7 @@ msgstr "Isso não é um estado que o Postulo reconheça."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Isso não é um wheel: o Postulo instala arquivos .whl."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Isso não é um widget que o Postulo conheça."
@@ -8947,7 +8962,7 @@ msgstr "Não compareceram"
 msgid "This address is already listed."
 msgstr "Este endereço já está listado."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

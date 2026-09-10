@@ -151,13 +151,23 @@ class PluginsView(SettingsSectionMixin, TemplateView):
 class DashboardView(SettingsSectionMixin, TemplateView):
     """Arranging the dashboard: which widgets, in what order.
 
-    A list with buttons rather than dragging. The board can drag since #35, but that took
-    real work to make reachable without a mouse, and arranging is done once and then not
-    again — a form that posts is keyboard-workable, screen-reader-workable and
-    script-free for nothing.
+    Buttons rather than dragging, and four of them rather than two. Drag and drop does not
+    fire on touch screens and is not reachable from a keyboard, so `static/js/app.js` states
+    the rule this page obeys: dragging is an addition to the control that works everywhere,
+    never a replacement for it. That makes this a prerequisite for a grid rather than a
+    refinement of a list (#124).
+
+    **One dimension is not two, and the dashboard is a flow rather than a matrix.** Widgets
+    have widths and fill rows in order, so there is no cell to name — which rules out a row
+    and column picker, and rules out a "move this one, then choose a destination" mode that
+    would need two interactions and state between them to work with scripts off. So *left*
+    and *right* move one place, *up* and *down* move a whole row, and on a narrow screen the
+    two axes coincide because there is only one column.
 
     Every action is a POST to this address, which is what makes it survive a reload and
-    behave under the back button.
+    behave under the back button. The redirect carries a fragment so focus lands on the
+    widget that moved, and a message says which row and place it landed in — a move that
+    happens in silence is a move somebody using a screen reader has to go looking for.
     """
 
     template_name = "settings/dashboard.html"
@@ -170,7 +180,15 @@ class DashboardView(SettingsSectionMixin, TemplateView):
         # Anything this account has never been offered, shown apart and first: a widget a
         # release or a plugin added waits here rather than walking onto the page (#123).
         fresh = [widget for widget in widgets.new_for(profile) if widget.key not in chosen]
-        context["chosen"] = [widgets.get(key) for key in chosen]
+        context["chosen"] = [
+            {
+                "widget": widgets.get(key),
+                # Which of the four would change anything, so a button that cannot act says
+                # so rather than posting and doing nothing (#124).
+                **{way: widgets.can_move(chosen, key, way) for way in widgets.DIRECTIONS},
+            }
+            for key in chosen
+        ]
         context["fresh"] = fresh
         context["available"] = [
             (group, [w for w in items if w.key not in chosen and w not in fresh])
@@ -203,7 +221,32 @@ class DashboardView(SettingsSectionMixin, TemplateView):
         # Whatever was just acted on is decided about now, however it was decided.
         profile.dashboard_known = sorted(widgets.known_to(profile) | {key})
         profile.save(update_fields=["dashboard_widgets", "dashboard_known", "updated_at"])
+
+        if action in widgets.DIRECTIONS and key in keys:
+            self._say_where_it_landed(request, keys, key)
+            # Focus follows the widget: the fragment is what takes somebody using a keyboard
+            # or a screen reader to where it went, rather than to the top of the page.
+            return redirect(f"{reverse('settings:dashboard')}#widget-{key}")
         return redirect("settings:dashboard")
+
+    @staticmethod
+    def _say_where_it_landed(request, keys: list[str], key: str) -> None:
+        """Row and place rather than a direction: it is what somebody actually wants to know,
+        it is the same sentence for all four buttons, and it is two numbers because the
+        control is two-dimensional.
+        """
+        rows = widgets.rows_of(keys)
+        row = widgets.row_of(keys, key)
+        widget = widgets.get(key)
+        messages.success(
+            request,
+            _("%(name)s is now in row %(row)s, place %(place)s.")
+            % {
+                "name": widget.label or key,
+                "row": row + 1,
+                "place": rows[row].index(key) + 1,
+            },
+        )
 
     def _profile(self) -> Profile:
         profile, created = Profile.objects.get_or_create(user=self.request.user)
@@ -220,9 +263,6 @@ class DashboardView(SettingsSectionMixin, TemplateView):
                 keys.append(key)
         elif action == "remove":
             keys = [k for k in keys if k != key]
-        elif action in {"up", "down"} and key in keys:
-            index = keys.index(key)
-            target = index - 1 if action == "up" else index + 1
-            if 0 <= target < len(keys):
-                keys[index], keys[target] = keys[target], keys[index]
+        elif action in widgets.DIRECTIONS:
+            keys = widgets.move(keys, key, action)
         return keys

@@ -1221,6 +1221,28 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **A widget can be placed in two dimensions without a mouse.** *Move up* and *move down*
+  are a complete vocabulary for a list and not for a grid, and `app.js` states the rule that
+  makes this a prerequisite rather than a refinement: drag and drop does not fire on touch
+  screens and is not reachable from a keyboard, so it is an addition to the control that
+  works everywhere, never a replacement for it. The grid cannot ship until the control
+  exists.
+
+  **The dashboard is a flow rather than a matrix, and that chose the mechanism.** Widgets
+  have widths and fill rows in order, so there is no cell to name — which rules out a
+  row-and-column picker, and rules out a "move this one, then choose a destination" mode
+  that would need two interactions and state between them to work with scripts off. What is
+  left is four directions over the order: *left* and *right* move one place, *up* and *down*
+  move a whole row. On a narrow screen there is one column and the two axes are the same
+  move, which is what *up* means when there is only one column.
+
+  Every one of them is still a form that posts. An arrow that cannot act is disabled rather
+  than absent, so the cluster keeps its shape and the arrow somebody reaches for is where it
+  was last time; the redirect carries a fragment so focus lands on the widget that moved;
+  and a message says which row and place it landed in, because a move that happens in
+  silence is a move somebody using a screen reader has to go looking for. Two new arrows
+  joined the icon set, and the stylesheet already mirrors that pair for right-to-left. (#124)
+
 - **Every account owns its dashboard arrangement from the day the account exists.** Nothing
   was ever shared between accounts — two people who had never arranged anything were looking
   at the same *list of keys*, each computed against their own records — but the arrangement

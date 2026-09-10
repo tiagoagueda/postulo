@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: íslenska\n"
@@ -271,6 +271,11 @@ msgstr "%(name)s er nú @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s er nú stjórnandi."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s er nú í röð %(row)s, sæti %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -723,7 +728,7 @@ msgid ""
 msgstr ""
 "Notandanafn er einkvæmt á uppsettinu hver sem breytir því, og fólk getur breytt sínu eigin undir Stillingum."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -814,8 +819,8 @@ msgstr "Aðgerðir fyrir %(name)s"
 msgid "Add"
 msgstr "Bæta við"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Bæta við %(name)s"
@@ -1421,7 +1426,7 @@ msgstr "Aftur í fólk"
 msgid "Back to the entry"
 msgstr "Aftur í færsluna"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Aftur í venjulega uppröðun"
@@ -2267,7 +2272,7 @@ msgstr "Ferilskrár"
 msgid "Dark"
 msgstr "Dökkt"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4851,15 +4856,25 @@ msgstr "Færa %(column)s niður"
 msgid "Move %(column)s up"
 msgstr "Færa %(column)s upp"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Færa %(name)s niður"
+msgid "Move %(name)s down a row"
+msgstr "Færa %(name)s niður um eina röð"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Færa %(name)s upp"
+msgid "Move %(name)s one place earlier"
+msgstr "Færa %(name)s um eitt sæti framar"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Færa %(name)s um eitt sæti aftar"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Færa %(name)s upp um eina röð"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -4988,7 +5003,7 @@ msgstr "Nýtt bréf"
 msgid "New reminder"
 msgstr "Ný áminning"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Nýtt síðan þú raðaðir þessu síðast"
@@ -5274,7 +5289,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Venjulegt"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Ekki %(name)s"
@@ -5364,7 +5379,7 @@ msgid ""
 msgstr ""
 "Ekki sýnt enn: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">raða yfirlitinu þínu</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Ekki sýnt · %(name)s"
@@ -5642,7 +5657,7 @@ msgstr "Ekkert var sett upp."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Ekkert var valið, svo ekkert breyttist."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Ekkert. Yfirlitið mun bjóðast til að sækja eitthvað til baka."
@@ -7348,7 +7363,7 @@ msgstr "Sjá umsóknirnar"
 msgid "See the board"
 msgstr "Sjá töfluna"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Sjá yfirlitið"
@@ -8108,7 +8123,7 @@ msgstr "Sníða þessa færslu"
 msgid "tailored for this CV"
 msgstr "sniðið að þessari ferilskrá"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Taka %(name)s af"
@@ -8342,7 +8357,7 @@ msgstr "Þetta er ekki staða sem Postulo þekkir."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Þetta er ekki hjól: Postulo setur upp .whl-skrár."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Þetta er ekki eining sem Postulo þekkir."
@@ -8947,7 +8962,7 @@ msgstr "Þau mættu ekki"
 msgid "This address is already listed."
 msgstr "Þetta heimilisfang er þegar skráð."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

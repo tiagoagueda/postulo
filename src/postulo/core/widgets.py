@@ -56,6 +56,15 @@ from django.utils.functional import cached_property
 #: template turns these into classes by name so Tailwind can see them in a template.
 WIDTHS = ("quarter", "half", "full")
 
+#: How wide a row is, and what each width takes up in it. Twelve, because a quarter, a half
+#: and a whole row all divide into it -- the same twelve the dashboard template draws.
+ROW_UNITS = 12
+UNITS = {"quarter": 3, "half": 6, "full": 12}
+
+#: The four ways a widget can be moved. Named here so the view, the template and the test
+#: all mean the same four (#124).
+DIRECTIONS = ("up", "down", "left", "right")
+
 
 @dataclass(frozen=True)
 class Widget:
@@ -178,6 +187,97 @@ def known_to(profile) -> set[str]:
     """
     stored = getattr(profile, "dashboard_known", None)
     return set(stored) if stored else set(all_keys())
+
+
+# ------------------------------------------------------- moving one, in two directions
+#
+# *Move up* and *move down* are a complete vocabulary for a list and not for a grid, which
+# is the whole of #124: a control that works everywhere has to exist before dragging can be
+# added on top of it, because dragging reaches only some of the people who use this page.
+#
+# **The dashboard is a flow rather than a matrix**, and that decides the vocabulary. Widgets
+# have widths and fill rows in order, so there is no cell to name -- which rules out a row
+# and column picker, and rules out a "move this one, then click a destination" mode that
+# would need two interactions and state between them to work without scripts.
+#
+# So: four directions over the order.
+#
+# * **left** and **right** move one place, which is what the two buttons already did.
+# * **up** and **down** move a whole row, which is the direction a list could not express.
+#
+# On a narrow screen every widget is one column wide and the two axes coincide. That is not
+# a degradation: it is what "up" means when there is only one column, and the same POST
+# does it.
+
+
+def rows_of(keys: list[str]) -> list[list[str]]:
+    """The keys grouped as the wide layout draws them.
+
+    A row takes widgets in order until the next one would not fit, exactly as the twelve
+    columns in the template fill up. Computed rather than stored, so it stays true when
+    somebody changes a widget's width.
+    """
+    rows: list[list[str]] = []
+    used = ROW_UNITS
+    for key in keys:
+        widget = REGISTRY.get(key)
+        width = UNITS.get(widget.width if widget else "half", UNITS["half"])
+        if used + width > ROW_UNITS:
+            rows.append([])
+            used = 0
+        rows[-1].append(key)
+        used += width
+    return rows
+
+
+def row_of(keys: list[str], key: str) -> int:
+    """Which row this key is drawn on, or -1."""
+    for number, row in enumerate(rows_of(keys)):
+        if key in row:
+            return number
+    return -1
+
+
+def move(keys: list[str], key: str, direction: str) -> list[str]:
+    """One widget, one step, in one of four directions. Returns the new order.
+
+    Out of range is a no-op rather than a wrap: somebody pressing *up* on the top row means
+    to find out that it is the top row, not to send the widget to the bottom.
+    """
+    keys = list(keys)
+    if key not in keys or direction not in ("left", "right", "up", "down"):
+        return keys
+    index = keys.index(key)
+
+    if direction in ("left", "right"):
+        target = index - 1 if direction == "left" else index + 1
+        if 0 <= target < len(keys):
+            keys[index], keys[target] = keys[target], keys[index]
+        return keys
+
+    rows = rows_of(keys)
+    here = row_of(keys, key)
+    if direction == "up":
+        if here <= 0:
+            return keys
+        # In front of the row above, which is where a widget lands when it moves up a row.
+        target = keys.index(rows[here - 1][0])
+    else:
+        if here < 0 or here >= len(rows) - 1:
+            return keys
+        # Behind the row below, for the same reason the other way round.
+        target = keys.index(rows[here + 1][-1])
+
+    moved = keys.pop(index)
+    if index < target:
+        target -= 1
+    keys.insert(target if direction == "up" else target + 1, moved)
+    return keys
+
+
+def can_move(keys: list[str], key: str, direction: str) -> bool:
+    """Whether that direction would change anything. What disables a button."""
+    return move(keys, key, direction) != list(keys)
 
 
 def new_for(profile) -> list[Widget]:

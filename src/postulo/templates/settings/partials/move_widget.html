@@ -1,0 +1,28 @@
+{% load i18n postulo %}
+{% comment %}
+  One of the four moves, as a form that posts. Written once rather than four times, because
+  four near-identical blocks is four places for one of them to drift (#124).
+
+  A button that cannot act is disabled rather than absent: the cluster keeps its shape, so
+  the arrow somebody reaches for is where it was last time.
+{% endcomment %}
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="key" value="{{ widget.key }}">
+  <button type="submit" name="action" value="{{ way }}"
+          class="btn-ghost flex h-8 w-8 items-center justify-center p-0 text-xs"
+          {% if not allowed %}disabled{% endif %}>
+    {% icon icon class="h-4 w-4" %}
+    <span class="sr-only">
+      {% if way == 'up' %}
+        {% blocktranslate with name=widget.label trimmed %}Move {{ name }} up a row{% endblocktranslate %}
+      {% elif way == 'down' %}
+        {% blocktranslate with name=widget.label trimmed %}Move {{ name }} down a row{% endblocktranslate %}
+      {% elif way == 'left' %}
+        {% blocktranslate with name=widget.label trimmed %}Move {{ name }} one place earlier{% endblocktranslate %}
+      {% else %}
+        {% blocktranslate with name=widget.label trimmed %}Move {{ name }} one place later{% endblocktranslate %}
+      {% endif %}
+    </span>
+  </button>
+</form>

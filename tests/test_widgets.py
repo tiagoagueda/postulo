@@ -153,23 +153,31 @@ def test_removing_a_widget_takes_it_off(client, user):
     assert arrangement(user) == ["counters", "funnel"]
 
 
-def test_moving_a_widget_up_and_down(client, user):
+def test_moving_a_widget_one_place(client, user):
+    """*left* and *right* are what the old *up* and *down* did: one place in the order.
+
+    They were renamed because a grid needs four directions and *up* had to mean the other
+    thing — a whole row rather than one place (#124).
+    """
     choose(user, ["counters", "shortcuts", "funnel"])
     client.force_login(user)
 
-    client.post(reverse(ARRANGE), {"action": "up", "key": "funnel"})
+    client.post(reverse(ARRANGE), {"action": "left", "key": "funnel"})
     assert arrangement(user) == ["counters", "funnel", "shortcuts"]
 
-    client.post(reverse(ARRANGE), {"action": "down", "key": "counters"})
+    client.post(reverse(ARRANGE), {"action": "right", "key": "counters"})
     assert arrangement(user) == ["funnel", "counters", "shortcuts"]
 
 
 def test_moving_the_first_one_up_or_the_last_one_down_does_nothing(client, user):
+    """Out of range is a no-op rather than a wrap: somebody pressing *up* on the top row
+    means to find out that it is the top row.
+    """
     choose(user, ["counters", "shortcuts"])
     client.force_login(user)
 
-    client.post(reverse(ARRANGE), {"action": "up", "key": "counters"})
-    client.post(reverse(ARRANGE), {"action": "down", "key": "shortcuts"})
+    for action, key in (("up", "counters"), ("down", "shortcuts"), ("left", "counters")):
+        client.post(reverse(ARRANGE), {"action": action, "key": key})
 
     assert arrangement(user) == ["counters", "shortcuts"]
 
@@ -253,7 +261,7 @@ def test_the_arranging_page_lists_what_is_on_and_what_is_off(client, user):
 
     response = client.get(reverse(ARRANGE))
 
-    assert [w.key for w in response.context["chosen"]] == ["counters"]
+    assert [row["widget"].key for row in response.context["chosen"]] == ["counters"]
     offered = {w.key for _group, items in response.context["available"] for w in items}
     assert "counters" not in offered
     assert "funnel" in offered

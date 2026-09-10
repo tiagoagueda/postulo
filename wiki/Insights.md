@@ -101,9 +101,20 @@ interview rate; it is one interview.
 described on this page sit under *What the record says*; the ones about today — gone quiet,
 interviews coming up, reminders due — sit under *What needs doing*.
 
-Add, remove and reorder with buttons rather than by dragging. Arranging is done once and
-then not again, and a form that posts works with a keyboard, with a screen reader and with
-scripts switched off, which dragging does not.
+Add, remove and move with buttons rather than by dragging. Drag and drop does not fire on a
+touch screen and cannot be reached from a keyboard, so in Postulo it is always an addition
+to a control that works everywhere, never a replacement for one.
+
+**Four arrows, because the dashboard is two-dimensional.** Widgets have widths and fill rows
+in order, so:
+
+- **left** and **right** move a widget one place — swapping it with its neighbour;
+- **up** and **down** move it a whole row, past everything sharing the row above or below.
+
+On a narrow screen there is one column and the two axes are the same move. An arrow that
+cannot go anywhere is shown but disabled, so the cluster keeps its shape and the arrow you
+reach for is where it was last time. After a move, the page comes back with the focus on the
+widget you moved and a line saying which row and place it landed in.
 
 **The arrangement is yours from the day your account exists.** It starts as the standard
 one — the same seven widgets everybody starts with, computed against your own records and

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenščina\n"
@@ -295,6 +295,11 @@ msgstr "%(name)s je zdaj @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s je zdaj skrbnik."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s je zdaj v vrstici %(row)s, na mestu %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -762,7 +767,7 @@ msgid ""
 msgstr ""
 "Uporabniško ime je edinstveno na celotni instanci, kdorkoli ga spremeni, in vsak lahko svojega spremeni v Nastavitvah."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -853,8 +858,8 @@ msgstr "Dejanja za %(name)s"
 msgid "Add"
 msgstr "Dodaj"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Dodaj %(name)s"
@@ -1462,7 +1467,7 @@ msgstr "Nazaj na osebe"
 msgid "Back to the entry"
 msgstr "Nazaj na vnos"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Nazaj na običajno razporeditev"
@@ -2309,7 +2314,7 @@ msgstr "Življenjepisi"
 msgid "Dark"
 msgstr "Temno"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4891,15 +4896,25 @@ msgstr "Premakni %(column)s navzdol"
 msgid "Move %(column)s up"
 msgstr "Premakni %(column)s navzgor"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Premakni %(name)s navzdol"
+msgid "Move %(name)s down a row"
+msgstr "Premakni %(name)s eno vrstico navzdol"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Premakni %(name)s navzgor"
+msgid "Move %(name)s one place earlier"
+msgstr "Premakni %(name)s eno mesto prej"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Premakni %(name)s eno mesto pozneje"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Premakni %(name)s eno vrstico navzgor"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -5028,7 +5043,7 @@ msgstr "Novo pismo"
 msgid "New reminder"
 msgstr "Nov opomnik"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Novo, odkar ste to nazadnje uredili"
@@ -5313,7 +5328,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Običajna"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Ne %(name)s"
@@ -5403,7 +5418,7 @@ msgid ""
 msgstr ""
 "Še ni prikazano: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">uredite svojo nadzorno ploščo</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Ni prikazano · %(name)s"
@@ -5680,7 +5695,7 @@ msgstr "Nič ni bilo nameščeno."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Nič ni bilo izbrano, zato se ni nič spremenilo."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Nič. Nadzorna plošča bo ponudila, da kaj vrne."
@@ -7410,7 +7425,7 @@ msgstr "Poglej prijave"
 msgid "See the board"
 msgstr "Poglej tablo"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Poglej nadzorno ploščo"
@@ -8169,7 +8184,7 @@ msgstr "Prilagodi ta vnos"
 msgid "tailored for this CV"
 msgstr "prilagojeno za ta življenjepis"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Odstrani %(name)s"
@@ -8403,7 +8418,7 @@ msgstr "To ni stanje, ki ga Postulo pozna."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "To ni kolo: Postulo namešča datoteke .whl."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "To ni gradnik, ki bi ga Postulo poznal."
@@ -9014,7 +9029,7 @@ msgstr "Niso prišli"
 msgid "This address is already listed."
 msgstr "Ta naslov je že na seznamu."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: српски\n"
@@ -282,6 +282,11 @@ msgstr "%(name)s је сада @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s је сада администратор."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s је сада у реду %(row)s, на месту %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -741,7 +746,7 @@ msgid ""
 msgstr ""
 "Корисничко име јединствено је на целој инсталацији ко год га мењао, а људи могу променити своје под Подешавањима."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -832,8 +837,8 @@ msgstr "Радње за %(name)s"
 msgid "Add"
 msgstr "Додај"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Додај %(name)s"
@@ -1440,7 +1445,7 @@ msgstr "Назад на људе"
 msgid "Back to the entry"
 msgstr "Назад на унос"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Назад на стандардни распоред"
@@ -2286,7 +2291,7 @@ msgstr "CV-јеви"
 msgid "Dark"
 msgstr "Тамно"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4866,15 +4871,25 @@ msgstr "Помери %(column)s доле"
 msgid "Move %(column)s up"
 msgstr "Помери %(column)s горе"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Помери %(name)s доле"
+msgid "Move %(name)s down a row"
+msgstr "Помери %(name)s један ред доле"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Помери %(name)s горе"
+msgid "Move %(name)s one place earlier"
+msgstr "Помери %(name)s једно место раније"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Помери %(name)s једно место касније"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Помери %(name)s један ред горе"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -5003,7 +5018,7 @@ msgstr "Ново писмо"
 msgid "New reminder"
 msgstr "Нови подсетник"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Ново откад сте ово последњи пут распоредили"
@@ -5287,7 +5302,7 @@ msgstr "Још ниједан. Овај унос штампа свој изво�
 msgid "Normal"
 msgstr "Нормално"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Не %(name)s"
@@ -5377,7 +5392,7 @@ msgid ""
 msgstr ""
 "Још се не приказује: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">распоредите своју контролну таблу</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Није приказано · %(name)s"
@@ -5655,7 +5670,7 @@ msgstr "Ништа није инсталирано."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Ништа није било изабрано, па се ништа није променило."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Ништа. Преглед ће понудити да нешто врати."
@@ -7373,7 +7388,7 @@ msgstr "Погледај пријаве"
 msgid "See the board"
 msgstr "Погледај таблу"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Погледај преглед"
@@ -8133,7 +8148,7 @@ msgstr "Прилагоди овај унос"
 msgid "tailored for this CV"
 msgstr "прилагођено овом CV-ју"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Скини %(name)s"
@@ -8367,7 +8382,7 @@ msgstr "То није статус који Postulo познаје."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "То није точак: Postulo инсталира .whl датотеке."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "То није модул за који Postulo зна."
@@ -8974,7 +8989,7 @@ msgstr "Нису се појавили"
 msgid "This address is already listed."
 msgstr "Ова адреса је већ на листи."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

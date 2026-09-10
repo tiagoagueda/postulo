@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenčina\n"
@@ -281,6 +281,11 @@ msgstr "%(name)s je teraz @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s je teraz správcom."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s je teraz v riadku %(row)s, na mieste %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -739,7 +744,7 @@ msgid ""
 msgstr ""
 "Používateľské meno je jedinečné v celej inštancii, nech ho mení ktokoľvek, a každý si môže svoje zmeniť v Nastaveniach."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -830,8 +835,8 @@ msgstr "Akcie pre %(name)s"
 msgid "Add"
 msgstr "Pridať"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Pridať %(name)s"
@@ -1436,7 +1441,7 @@ msgstr "Späť na osoby"
 msgid "Back to the entry"
 msgstr "Späť na záznam"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Späť na štandardné usporiadanie"
@@ -2282,7 +2287,7 @@ msgstr "CV"
 msgid "Dark"
 msgstr "Tmavý"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4861,15 +4866,25 @@ msgstr "Presunúť %(column)s nadol"
 msgid "Move %(column)s up"
 msgstr "Presunúť %(column)s nahor"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Posunúť %(name)s nadol"
+msgid "Move %(name)s down a row"
+msgstr "Posunúť %(name)s o riadok nadol"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Posunúť %(name)s nahor"
+msgid "Move %(name)s one place earlier"
+msgstr "Posunúť %(name)s o jedno miesto skôr"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Posunúť %(name)s o jedno miesto neskôr"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Posunúť %(name)s o riadok nahor"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -4998,7 +5013,7 @@ msgstr "Nový list"
 msgid "New reminder"
 msgstr "Nová pripomienka"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Nové odvtedy, ako ste to naposledy usporiadali"
@@ -5283,7 +5298,7 @@ msgstr "Zatiaľ žiadne. Tento záznam tlačí svoj pôvodný text v každom ži
 msgid "Normal"
 msgstr "Normálna"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Nie %(name)s"
@@ -5373,7 +5388,7 @@ msgid ""
 msgstr ""
 "Zatiaľ nezobrazené: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">usporiadajte svoj prehľad</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Nezobrazené · %(name)s"
@@ -5650,7 +5665,7 @@ msgstr "Nič nebolo nainštalované."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Nič nebolo vybrané, takže sa nič nezmenilo."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Nič. Nástenka ponúkne, že niečo vráti."
@@ -7365,7 +7380,7 @@ msgstr "Zobraziť žiadosti"
 msgid "See the board"
 msgstr "Zobraziť nástenku"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Zobraziť nástenku"
@@ -8125,7 +8140,7 @@ msgstr "Prispôsobiť túto položku"
 msgid "tailored for this CV"
 msgstr "prispôsobené pre toto CV"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Odobrať %(name)s"
@@ -8359,7 +8374,7 @@ msgstr "To nie je stav, ktorý Postulo pozná."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "To nie je wheel: Postulo inštaluje súbory .whl."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "To nie je prvok, ktorý by Postulo poznalo."
@@ -8965,7 +8980,7 @@ msgstr "Nedostavili sa"
 msgid "This address is already listed."
 msgstr "Táto adresa už je v zozname."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

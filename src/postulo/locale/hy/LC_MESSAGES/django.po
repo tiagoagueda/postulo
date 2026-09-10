@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: հայերեն\n"
@@ -271,6 +271,11 @@ msgstr "%(name)s-ն այժմ @%(username)s է։"
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s-ն այժմ ադմինիստրատոր է։"
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s-ը այժմ %(row)s տողում է, %(place)s տեղում։"
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -724,7 +729,7 @@ msgid ""
 msgstr ""
 "Օգտանունը եզակի է ողջ տեղակայման վրա, ով էլ որ փոխի, և մարդիկ կարող են իրենցը փոխել Կարգավորումներում։"
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -815,8 +820,8 @@ msgstr "Գործողություններ %(name)s-ի համար"
 msgid "Add"
 msgstr "Ավելացնել"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Ավելացնել %(name)s"
@@ -1425,7 +1430,7 @@ msgstr "Հետ դեպի մարդիկ"
 msgid "Back to the entry"
 msgstr "Վերադառնալ գրառմանը"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Հետ դեպի ստանդարտ դասավորություն"
@@ -2270,7 +2275,7 @@ msgstr "CV-ներ"
 msgid "Dark"
 msgstr "Մուգ"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4854,15 +4859,25 @@ msgstr "Տեղափոխել %(column)s-ը ներքև"
 msgid "Move %(column)s up"
 msgstr "Տեղափոխել %(column)s-ը վերև"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Տեղափոխել %(name)s-ը ներքև"
+msgid "Move %(name)s down a row"
+msgstr "Տեղափոխել %(name)s-ը մեկ տող ներքև"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Տեղափոխել %(name)s-ը վերև"
+msgid "Move %(name)s one place earlier"
+msgstr "Տեղափոխել %(name)s-ը մեկ տեղ առաջ"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Տեղափոխել %(name)s-ը մեկ տեղ հետ"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Տեղափոխել %(name)s-ը մեկ տող վերև"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -4991,7 +5006,7 @@ msgstr "Նոր նամակ"
 msgid "New reminder"
 msgstr "Նոր հիշեցում"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Նոր՝ այն պահից, երբ վերջին անգամ դասավորեցիք սա"
@@ -5278,7 +5293,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Սովորական"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Ոչ %(name)s"
@@ -5368,7 +5383,7 @@ msgid ""
 msgstr ""
 "Դեռ ցուցադրված չէ: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">դասավորեք ձեր վահանակը</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Ցուցադրված չէ · %(name)s"
@@ -5646,7 +5661,7 @@ msgstr "Ոչինչ չտեղադրվեց։"
 msgid "Nothing was selected, so nothing changed."
 msgstr "Ոչինչ չէր ընտրված, ուստի ոչինչ չփոխվեց։"
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Ոչինչ։ Ընդհանուր տեսքը կառաջարկի ինչ-որ բան հետ բերել։"
@@ -7357,7 +7372,7 @@ msgstr "Տեսնել դիմումները"
 msgid "See the board"
 msgstr "Տեսնել տախտակը"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Տեսնել ընդհանուր տեսքը"
@@ -8119,7 +8134,7 @@ msgstr "Հարմարեցնել այս գրառումը"
 msgid "tailored for this CV"
 msgstr "հարմարեցված է այս CV-ի համար"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Հանել %(name)s-ը"
@@ -8353,7 +8368,7 @@ msgstr "Սա կարգավիճակ չէ, որ Postulo-ն ճանաչում է։"
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Սա անիվ չէ. Postulo-ն տեղադրում է .whl ֆայլեր։"
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Սա բաղադրիչ չէ, որ Postulo-ն գիտի։"
@@ -8959,7 +8974,7 @@ msgstr "Նրանք չներկայացան"
 msgid "This address is already listed."
 msgstr "Այս հասցեն արդեն ցանկում է։"
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

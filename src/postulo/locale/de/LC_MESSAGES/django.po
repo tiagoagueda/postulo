@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Deutsch\n"
@@ -272,6 +272,11 @@ msgstr "%(name)s heißt jetzt @%(username)s."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s ist jetzt Administrator."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "%(name)s steht jetzt in Zeile %(row)s an Position %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -727,7 +732,7 @@ msgid ""
 msgstr ""
 "Ein Benutzername ist auf der ganzen Instanz eindeutig, egal wer ihn ändert, und jede Person kann ihren eigenen unter Einstellungen ändern."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -818,8 +823,8 @@ msgstr "Aktionen für %(name)s"
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "%(name)s hinzufügen"
@@ -1428,7 +1433,7 @@ msgstr "Zurück zu Personen"
 msgid "Back to the entry"
 msgstr "Zurück zum Eintrag"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Zurück zur Standardanordnung"
@@ -2274,7 +2279,7 @@ msgstr "Lebensläufe"
 msgid "Dark"
 msgstr "Dunkel"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4866,15 +4871,25 @@ msgstr "%(column)s nach unten"
 msgid "Move %(column)s up"
 msgstr "%(column)s nach oben"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "%(name)s nach unten verschieben"
+msgid "Move %(name)s down a row"
+msgstr "%(name)s eine Zeile nach unten verschieben"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "%(name)s nach oben verschieben"
+msgid "Move %(name)s one place earlier"
+msgstr "%(name)s eine Position nach vorn verschieben"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "%(name)s eine Position nach hinten verschieben"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "%(name)s eine Zeile nach oben verschieben"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -5003,7 +5018,7 @@ msgstr "Neues Anschreiben"
 msgid "New reminder"
 msgstr "Neue Erinnerung"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Neu seit Ihrer letzten Anordnung"
@@ -5290,7 +5305,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Normal"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Kein %(name)s"
@@ -5380,7 +5395,7 @@ msgid ""
 msgstr ""
 "Noch nicht angezeigt: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">Dashboard anordnen</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Nicht angezeigt · %(name)s"
@@ -5661,7 +5676,7 @@ msgstr "Es wurde nichts installiert."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Es war nichts ausgewählt, also hat sich nichts geändert."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Nichts. Das Dashboard bietet an, etwas zurückzuholen."
@@ -7370,7 +7385,7 @@ msgstr "Bewerbungen ansehen"
 msgid "See the board"
 msgstr "Board ansehen"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Zum Dashboard"
@@ -8132,7 +8147,7 @@ msgstr "Diesen Eintrag anpassen"
 msgid "tailored for this CV"
 msgstr "für diesen Lebenslauf angepasst"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "%(name)s entfernen"
@@ -8370,7 +8385,7 @@ msgstr "Das ist kein Status, den Postulo kennt."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Das ist kein Wheel: Postulo installiert .whl-Dateien."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Das ist kein Widget, das Postulo kennt."
@@ -8978,7 +8993,7 @@ msgstr "Niemand ist erschienen"
 msgid "This address is already listed."
 msgstr "Diese Adresse ist bereits aufgeführt."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."

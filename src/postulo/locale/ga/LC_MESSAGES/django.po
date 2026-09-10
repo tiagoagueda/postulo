@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-09 23:54+0000\n"
+"POT-Creation-Date: 2026-09-10 00:12+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -308,6 +308,11 @@ msgstr "Is @%(username)s é/í %(name)s anois."
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "Is riarthóir é/í %(name)s anois."
+
+#: src/postulo/accounts/settings_views.py:243
+#, python-format, draft
+msgid "%(name)s is now in row %(row)s, place %(place)s."
+msgstr "Tá %(name)s anois i ró %(row)s, áit %(place)s."
 
 #: src/postulo/core/server_views.py:1261
 #, python-format, draft
@@ -786,7 +791,7 @@ msgid ""
 msgstr ""
 "Tá ainm úsáideora uathúil ar fud an áisc, cibé duine a athraíonn é, agus is féidir le daoine a gceann féin a athrú faoi Socruithe."
 
-#: src/postulo/templates/settings/dashboard.html:165
+#: src/postulo/templates/settings/dashboard.html:158
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -877,8 +882,8 @@ msgstr "Gníomhartha do %(name)s"
 msgid "Add"
 msgstr "Cuir leis"
 
-#: src/postulo/templates/settings/dashboard.html:95
-#: src/postulo/templates/settings/dashboard.html:135
+#: src/postulo/templates/settings/dashboard.html:88
+#: src/postulo/templates/settings/dashboard.html:128
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Cuir %(name)s leis"
@@ -1490,7 +1495,7 @@ msgstr "Ar ais chuig daoine"
 msgid "Back to the entry"
 msgstr "Ar ais chuig an iontráil"
 
-#: src/postulo/templates/settings/dashboard.html:153
+#: src/postulo/templates/settings/dashboard.html:146
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Ar ais go dtí an leagan amach caighdeánach"
@@ -2336,7 +2341,7 @@ msgstr "CVanna"
 msgid "Dark"
 msgstr "Dorcha"
 
-#: src/postulo/accounts/settings_views.py:164 src/postulo/core/navigation.py:42
+#: src/postulo/accounts/settings_views.py:174 src/postulo/core/navigation.py:42
 #: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/core/dashboard.html:4
 #: src/postulo/templates/settings/dashboard.html:5
@@ -4929,15 +4934,25 @@ msgstr "Bog %(column)s síos"
 msgid "Move %(column)s up"
 msgstr "Bog %(column)s suas"
 
-#: src/postulo/templates/settings/dashboard.html:46
+#: src/postulo/templates/settings/partials/move_widget.html:20
 #, python-format, draft
-msgid "Move %(name)s down"
-msgstr "Bog %(name)s síos"
+msgid "Move %(name)s down a row"
+msgstr "Bog %(name)s síos ró amháin"
 
-#: src/postulo/templates/settings/dashboard.html:33
+#: src/postulo/templates/settings/partials/move_widget.html:22
 #, python-format, draft
-msgid "Move %(name)s up"
-msgstr "Bog %(name)s suas"
+msgid "Move %(name)s one place earlier"
+msgstr "Bog %(name)s áit amháin chun tosaigh"
+
+#: src/postulo/templates/settings/partials/move_widget.html:24
+#, python-format, draft
+msgid "Move %(name)s one place later"
+msgstr "Bog %(name)s áit amháin chun deiridh"
+
+#: src/postulo/templates/settings/partials/move_widget.html:18
+#, python-format, draft
+msgid "Move %(name)s up a row"
+msgstr "Bog %(name)s suas ró amháin"
 
 #: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:112
@@ -5066,7 +5081,7 @@ msgstr "Litir nua"
 msgid "New reminder"
 msgstr "Meabhrúchán nua"
 
-#: src/postulo/templates/settings/dashboard.html:81
+#: src/postulo/templates/settings/dashboard.html:74
 #, draft
 msgid "New since you last arranged this"
 msgstr "Nua ó rinne tú an leathanach seo a leagan amach"
@@ -5354,7 +5369,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Gnáth"
 
-#: src/postulo/templates/settings/dashboard.html:104
+#: src/postulo/templates/settings/dashboard.html:97
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Gan %(name)s"
@@ -5444,7 +5459,7 @@ msgid ""
 msgstr ""
 "Gan taispeáint fós: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">leag amach do phainéal</a>."
 
-#: src/postulo/templates/settings/dashboard.html:120
+#: src/postulo/templates/settings/dashboard.html:113
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Gan taispeáint · %(name)s"
@@ -5724,7 +5739,7 @@ msgstr "Níor suiteáladh aon rud."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Níor roghnaíodh aon rud, mar sin níor athraigh aon rud."
 
-#: src/postulo/templates/settings/dashboard.html:68
+#: src/postulo/templates/settings/dashboard.html:61
 #, draft
 msgid "Nothing. The dashboard will offer to bring something back."
 msgstr "Faic. Tairgfidh an painéal rud éigin a chur ar ais."
@@ -7469,7 +7484,7 @@ msgstr "Féach na hiarratais"
 msgid "See the board"
 msgstr "Féach an clár"
 
-#: src/postulo/templates/settings/dashboard.html:148
+#: src/postulo/templates/settings/dashboard.html:141
 #, draft
 msgid "See the dashboard"
 msgstr "Féach ar an bpainéal"
@@ -8231,7 +8246,7 @@ msgstr "Cuir an iontráil seo in oiriúint"
 msgid "tailored for this CV"
 msgstr "curtha in oiriúint don CV seo"
 
-#: src/postulo/templates/settings/dashboard.html:57
+#: src/postulo/templates/settings/dashboard.html:50
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Bain %(name)s de"
@@ -8465,7 +8480,7 @@ msgstr "Ní stádas é sin a aithníonn Postulo."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Ní roth é sin: suiteálann Postulo comhaid .whl."
 
-#: src/postulo/accounts/settings_views.py:195
+#: src/postulo/accounts/settings_views.py:213
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Ní giuirléid í sin a aithníonn Postulo."
@@ -9087,7 +9102,7 @@ msgstr "Níor tháinig siad"
 msgid "This address is already listed."
 msgstr "Tá an seoladh seo liostaithe cheana."
 
-#: src/postulo/templates/settings/dashboard.html:160
+#: src/postulo/templates/settings/dashboard.html:153
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
