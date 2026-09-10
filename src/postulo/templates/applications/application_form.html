@@ -13,9 +13,16 @@
     <form method="post" novalidate>
       {% csrf_token %}
       <div class="card mb-6">
+        {% comment %} Tags are drawn as removable labels rather than as a scrolling box
+           you ctrl-click, so they are lifted out of the loop; `new_tags` goes with them
+           because it is the other half of the same control (#139).
+        {% endcomment %}
         {% for field in form %}
-          {% include "partials/field.html" with field=field %}
+          {% if field.name != "tags" and field.name != "new_tags" %}
+            {% include "partials/field.html" with field=field %}
+          {% endif %}
         {% endfor %}
+        {% include "partials/tags_field.html" with form=form %}
       </div>
       <div class="flex items-center gap-3">
         <button type="submit" class="btn-primary">{% translate "Save" %}</button>

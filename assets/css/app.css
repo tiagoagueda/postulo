@@ -227,6 +227,38 @@
       dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-ink-100;
   }
 
+  /* A chosen label, and the button that takes it off again (#139).
+   *
+   * The remove button is 24 by 24 with a gap between chips, because SC 2.5.8 has caught
+   * this project twice already -- once at 19 pixels on the plugins page, once on the
+   * telephone rows -- and a x in the corner of a pill is exactly the shape that fails.
+   *
+   * Colours: the text sits on its own ground at 4.5:1 and the border reads against the
+   * card at 3:1, in both themes. A chip that arrives as a new name is outlined rather than
+   * filled, so "this one does not exist yet" is visible before anything is saved. */
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-ink-200 bg-ink-100
+      py-0.5 ps-3 pe-0.5 text-sm text-ink-900
+      dark:border-ink-700 dark:bg-ink-800 dark:text-ink-100;
+  }
+
+  .chip-new {
+    @apply border-dashed border-brand-500 bg-transparent text-brand-700
+      dark:border-brand-400 dark:text-brand-300;
+  }
+
+  .chip-text {
+    @apply truncate;
+  }
+
+  .chip-remove {
+    @apply flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-base
+      leading-none text-ink-600 hover:bg-ink-200 hover:text-ink-900
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+      focus-visible:outline-brand-600
+      dark:text-ink-300 dark:hover:bg-ink-700 dark:hover:text-ink-100;
+  }
+
   .card {
     @apply rounded-xl border border-ink-200 bg-white p-6 shadow-sm
       dark:border-ink-800 dark:bg-ink-900;

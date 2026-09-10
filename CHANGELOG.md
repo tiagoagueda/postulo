@@ -1221,6 +1221,34 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Industries and tags are chosen as labels now, not as tick boxes.** Industries were a row
+  of checkboxes; tags were Django's default scrolling box you ctrl-click. Neither was a
+  label, and nothing in Postulo drew a chip — so this is a new control rather than a
+  restyling of an old one, and it is written once and used in both places.
+
+  **Layered, never substituted.** The checkboxes, the multiple select and the box for a name
+  that does not exist yet are all still in the page, still submitting; the chips are drawn
+  over the top and those are hidden. With the script blocked the forms are exactly what they
+  were, which is the rule the board's dragging already follows.
+
+  **A name that is new looks new before anything is saved** — outlined rather than filled —
+  because otherwise people create *Fintech*, *FinTech* and *fintech* and find out afterwards
+  that the slug collapsed them. Tags gained the same "add one that does not exist yet" that
+  industries always had, matched by slug, and a tag made this way keeps no colour: colours
+  are chosen on the tags page, where there is room to see them beside each other.
+
+  **The keyboard vocabulary is a decision, and one of its conventions is deliberately not
+  followed.** Enter commits what was typed rather than submitting the form; Escape abandons
+  it; the arrows walk between labels, mapped through the reading direction; every remove
+  button carries the name inside it, so eight of them are eight different announcements
+  rather than eight identical ones; and adding or removing one says so in a live region.
+  **Backspace does not delete the last label** — it is the convention, and it is also a way
+  to delete something by pressing the key you press to correct a typo, in a control whose
+  values are somebody's own words.
+
+  The remove button is 24 by 24 with room around it, which SC 2.5.8 has caught this project
+  over twice already, and the × sits at the end edge rather than the right. (#139)
+
 - **A widget can be placed in two dimensions without a mouse.** *Move up* and *move down*
   are a complete vocabulary for a list and not for a grid, and `app.js` states the rule that
   makes this a prerequisite rather than a refinement: drag and drop does not fire on touch

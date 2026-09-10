@@ -125,10 +125,26 @@ class ApplicationDetailsForm(UserAwareForm):
     tags = forms.ModelMultipleChoiceField(
         label=_("Tags"), queryset=Tag.objects.none(), required=False
     )
+    new_tags = forms.CharField(
+        label=_("New tags"),
+        required=False,
+        help_text=_("Separate them with commas. A tag you have already keeps its colour."),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["tags"].queryset = Tag.objects.for_user(self.user)
+
+    def chosen_tags(self) -> list:
+        """The tags this form asked for: the ones ticked, plus any typed that did not exist.
+
+        A control that offers to add a label somebody has not used before needs somewhere
+        for the label to land, and `Tag.named` is where -- matched by slug, so *Remote* and
+        *remote* stay one tag (#139).
+        """
+        typed = Tag.named(self.user, Tag.split(self.cleaned_data.get("new_tags", "")))
+        chosen = list(self.cleaned_data.get("tags") or [])
+        return chosen + [tag for tag in typed if tag not in chosen]
 
     @property
     def application_data(self) -> dict:
@@ -158,10 +174,40 @@ class ApplicationForm(OwnerScopedModelForm):
     would leave a status the log cannot explain.
     """
 
+    new_tags = forms.CharField(
+        label=_("New tags"),
+        required=False,
+        help_text=_("Separate them with commas. A tag you have already keeps its colour."),
+    )
+
     class Meta:
         model = Application
         fields = ("status", "channel", "priority", "deadline", "contact", "tags")
         widgets = {"deadline": forms.DateInput(attrs={"type": "date"})}
+
+    def save(self, commit: bool = True):
+        """Save, then add any tag that was typed rather than ticked.
+
+        After ``save_m2m``, because Django writes the ticked ones there and adding to the
+        set before it would be overwritten by it (#139).
+        """
+        application = super().save(commit=commit)
+        if commit:
+            self._add_typed_tags(application)
+        else:
+            saved_m2m = self.save_m2m
+
+            def save_m2m():
+                saved_m2m()
+                self._add_typed_tags(application)
+
+            self.save_m2m = save_m2m
+        return application
+
+    def _add_typed_tags(self, application) -> None:
+        typed = Tag.named(self.user, Tag.split(self.cleaned_data.get("new_tags", "")))
+        if typed:
+            application.tags.add(*typed)
 
     def scope_querysets(self) -> None:
         self.fields["tags"].queryset = Tag.objects.for_user(self.user)

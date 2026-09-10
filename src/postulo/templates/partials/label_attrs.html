@@ -1,0 +1,12 @@
+{% load i18n %}{% comment %}
+  What `app.js` needs to draw one control for choosing several labels, wherever a form
+  already has a control for it (#139).
+
+  Attributes rather than markup, because the two places that want this do not draw their
+  native controls the same way: industries are a hand-laid row of checkboxes, tags are a
+  multiple select. Sharing the *wrapper* shares everything that has to agree -- the
+  attribute names and the words -- while each form keeps the control that works with no
+  script at all, which is the thing the chips are layered over rather than replacing.
+
+  The words are here because a string built in JavaScript is a string no catalogue has.
+{% endcomment %}data-labels data-labels-heading="labels-{{ field.html_name }}-heading"{% if new_field %} data-labels-new="{{ new_field.id_for_label }}"{% endif %} data-labels-remove="{% translate 'Remove {label}' %}" data-labels-added="{% translate '{label} added' %}" data-labels-removed="{% translate '{label} removed' %}" data-labels-new-hint="{% translate '{label} — new' %}" data-labels-placeholder="{% translate 'Type to find one, or add a new one' %}" data-labels-empty="{% translate 'None chosen yet' %}"

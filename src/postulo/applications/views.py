@@ -306,7 +306,7 @@ class ApplicationCreateView(OwnedObjectMixin, View):
             posting_data=form.posting_data,
             application_data=form.application_data,
         )
-        application.tags.set(form.cleaned_data["tags"])
+        application.tags.set(form.chosen_tags())
 
         messages.success(request, _("Application recorded."))
         return redirect(application.get_absolute_url())

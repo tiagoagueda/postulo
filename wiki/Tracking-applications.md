@@ -372,6 +372,17 @@ all three), and **Companies → Industries** is where you rename one, merge two 
 the same thing, or delete a word you no longer use — deleting a word never deletes a
 company.
 
+**They are shown as labels.** The ones a company is in appear as removable chips; typing in
+the box beside them finds one you already have, or adds one you do not. A name that does not
+exist yet is drawn differently — outlined rather than filled — so you can see it is new
+*before* saving, which is what stops *Fintech*, *FinTech* and *fintech* from being created
+and then quietly collapsed into one. **Tags on an application work exactly the same way**,
+because it is one control rather than two.
+
+With scripts switched off you get the tick boxes and the multiple select that were always
+there, and the form does the same thing. The labels are an addition, never a replacement —
+the same rule the board's dragging follows.
+
 **What the suggestions are.** Two vocabularies, in one list. First a short set of familiar
 words — *Software*, *Banking*, *Gaming* — because those are what people actually type. Then
 the 87 divisions of **NACE Rev. 2.1**, the European Union's classification of economic

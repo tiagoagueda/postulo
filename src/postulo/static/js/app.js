@@ -532,4 +532,292 @@
       chooseLanguage(found);
     }
   });
+  /* ------------------------------------------------------------------ labels
+   *
+   * Choosing several things, shown as removable labels rather than as tick boxes (#139).
+   *
+   * **Layered, never substituted.** The markup already holds the control that works
+   * everywhere -- a checkbox per industry, a multiple select for tags, and a box for a name
+   * that does not exist yet. This draws chips over the top and hides those; they keep
+   * submitting, because a hidden element still posts. With this script blocked the form is
+   * exactly what it was, which is the same rule the board's dragging follows.
+   *
+   * **Backspace does not remove the last chip.** It is the convention and it is also a way
+   * to delete something by pressing the key you press to correct a typo -- in a control
+   * whose values are somebody's own vocabulary, that is a bad trade. Every chip has a
+   * remove button, reachable by Tab and by the arrow keys.
+   *
+   * **A new name is visible as new before anything is saved.** Otherwise people create
+   * Fintech, FinTech and fintech and find out afterwards that the slug collapsed them.
+   */
+  function labelSources(box) {
+    /* The control this is layered over, found by its container.
+     *
+     * Not by an id: a checkbox group is a fieldset of inputs rather than one labelled
+     * control, so Django gives it no id to point at -- `id_for_label` is empty by design.
+     */
+    var holder = box.querySelector("[data-labels-existing]");
+    if (!holder) {
+      return null;
+    }
+    var select = holder.querySelector("select[multiple]");
+    if (select) {
+      return { native: select, boxes: null };
+    }
+    var boxes = holder.querySelectorAll('input[type="checkbox"]');
+    return boxes.length ? { native: holder, boxes: boxes } : null;
+  }
+
+  function labelValues(box) {
+    /* Every option this control knows, as {name, on, set(bool)}. */
+    var found = labelSources(box);
+    if (!found) {
+      return [];
+    }
+    if (found.boxes) {
+      return Array.prototype.map.call(found.boxes, function (input) {
+        var label = input.closest("label") || input.parentNode;
+        return {
+          name: (label ? label.textContent : input.value).trim(),
+          get on() {
+            return input.checked;
+          },
+          set: function (want) {
+            input.checked = want;
+          },
+        };
+      });
+    }
+    return Array.prototype.map.call(found.native.options, function (option) {
+      return {
+        name: option.textContent.trim(),
+        get on() {
+          return option.selected;
+        },
+        set: function (want) {
+          option.selected = want;
+        },
+      };
+    });
+  }
+
+  function typedNames(field) {
+    if (!field || !field.value.trim()) {
+      return [];
+    }
+    return field.value
+      .split(/[;,/]/)
+      .map(function (part) {
+        return part.trim();
+      })
+      .filter(Boolean);
+  }
+
+  function writeTyped(field, names) {
+    if (field) {
+      field.value = names.join(", ");
+    }
+  }
+
+  function sayIt(box, template, name) {
+    var live = box.querySelector("[data-labels-live]");
+    if (live && template) {
+      live.textContent = template.replace("{label}", name);
+    }
+  }
+
+  function drawLabels(box) {
+    var list = box.querySelector("[data-labels-chips]");
+    var input = box.querySelector("[data-labels-input]");
+    var options = box.querySelector("[data-labels-options]");
+    var newField = box.dataset.labelsNew ? document.getElementById(box.dataset.labelsNew) : null;
+    if (!list) {
+      return;
+    }
+    var values = labelValues(box);
+    var typed = typedNames(newField);
+    list.textContent = "";
+
+    var chosen = values.filter(function (value) {
+      return value.on;
+    });
+    if (!chosen.length && !typed.length) {
+      var empty = document.createElement("li");
+      empty.className = "text-sm text-ink-500 dark:text-ink-400";
+      empty.textContent = box.dataset.labelsEmpty || "";
+      list.appendChild(empty);
+    }
+
+    chosen.forEach(function (value) {
+      list.appendChild(chipFor(box, value.name, false, function () {
+        value.set(false);
+        sayIt(box, box.dataset.labelsRemoved, value.name);
+        drawLabels(box);
+      }));
+    });
+    typed.forEach(function (name) {
+      list.appendChild(chipFor(box, name, true, function () {
+        writeTyped(newField, typedNames(newField).filter(function (other) {
+          return other !== name;
+        }));
+        sayIt(box, box.dataset.labelsRemoved, name);
+        drawLabels(box);
+      }));
+    });
+
+    if (options && input) {
+      options.textContent = "";
+      values
+        .filter(function (value) {
+          return !value.on;
+        })
+        .forEach(function (value) {
+          var option = document.createElement("option");
+          option.value = value.name;
+          options.appendChild(option);
+        });
+      input.disabled = !newField && !options.childElementCount;
+    }
+  }
+
+  function chipFor(box, name, isNew, remove) {
+    var item = document.createElement("li");
+    var chip = document.createElement("span");
+    chip.className = isNew ? "chip chip-new" : "chip";
+    var text = document.createElement("span");
+    text.className = "chip-text";
+    text.textContent = isNew ? (box.dataset.labelsNewHint || "{label}").replace("{label}", name) : name;
+    chip.appendChild(text);
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "chip-remove";
+    button.dataset.labelsChip = "";
+    button.setAttribute(
+      "aria-label",
+      (box.dataset.labelsRemove || "Remove {label}").replace("{label}", name)
+    );
+    button.textContent = "\u00d7";
+    button.addEventListener("click", remove);
+    chip.appendChild(button);
+    item.appendChild(chip);
+    return item;
+  }
+
+  function commitTyped(box) {
+    var input = box.querySelector("[data-labels-input]");
+    var newField = box.dataset.labelsNew ? document.getElementById(box.dataset.labelsNew) : null;
+    var wanted = (input.value || "").trim();
+    if (!wanted) {
+      return;
+    }
+    var match = labelValues(box).filter(function (value) {
+      return value.name.toLowerCase() === wanted.toLowerCase();
+    })[0];
+    if (match) {
+      match.set(true);
+    } else if (newField) {
+      var typed = typedNames(newField);
+      if (
+        !typed.some(function (name) {
+          return name.toLowerCase() === wanted.toLowerCase();
+        })
+      ) {
+        typed.push(wanted);
+        writeTyped(newField, typed);
+      }
+    } else {
+      return;
+    }
+    input.value = "";
+    sayIt(box, box.dataset.labelsAdded, wanted);
+    drawLabels(box);
+  }
+
+  function readyLabels(box) {
+    if (box.dataset.labelsReady || !labelSources(box)) {
+      return;
+    }
+    box.dataset.labelsReady = "1";
+
+    var chips = document.createElement("ul");
+    chips.className = "flex flex-wrap items-center gap-2";
+    chips.dataset.labelsChips = "";
+    chips.setAttribute("aria-labelledby", box.dataset.labelsHeading);
+
+    var field = document.createElement("input");
+    field.type = "text";
+    field.className = "field-input mt-2";
+    field.dataset.labelsInput = "";
+    field.autocomplete = "off";
+    field.placeholder = box.dataset.labelsPlaceholder || "";
+    field.setAttribute("aria-labelledby", box.dataset.labelsHeading);
+
+    var options = document.createElement("datalist");
+    options.id = box.dataset.labelsHeading + "-options";
+    options.dataset.labelsOptions = "";
+    field.setAttribute("list", options.id);
+
+    var live = document.createElement("p");
+    live.className = "sr-only";
+    live.dataset.labelsLive = "";
+    live.setAttribute("role", "status");
+
+    field.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        // The form would otherwise submit, which is not what pressing Enter in a box that
+        // adds something means.
+        event.preventDefault();
+        commitTyped(box);
+      } else if (event.key === "Escape") {
+        field.value = "";
+      }
+    });
+    field.addEventListener("change", function () {
+      commitTyped(box);
+    });
+
+    // Left and right walk the chips, mapped through the reading direction so the arrow
+    // that means "the one before" is the one that points that way on the screen.
+    chips.addEventListener("keydown", function (event) {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return;
+      }
+      var buttons = Array.prototype.slice.call(chips.querySelectorAll("[data-labels-chip]"));
+      var here = buttons.indexOf(document.activeElement);
+      if (here === -1) {
+        return;
+      }
+      var backwards = getComputedStyle(chips).direction === "rtl";
+      var step = (event.key === "ArrowLeft") === backwards ? 1 : -1;
+      var next = buttons[here + step];
+      if (next) {
+        event.preventDefault();
+        next.focus();
+      }
+    });
+
+    var native = box.querySelector("[data-labels-existing]");
+    var newBox = box.querySelector("[data-labels-newbox]");
+    box.insertBefore(chips, native);
+    box.insertBefore(field, native);
+    box.insertBefore(options, native);
+    box.insertBefore(live, native);
+    if (native) {
+      native.hidden = true;
+    }
+    if (newBox) {
+      newBox.hidden = true;
+    }
+    drawLabels(box);
+  }
+
+  function readyEveryLabelBox() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-labels]"), readyLabels);
+  }
+
+  document.addEventListener("DOMContentLoaded", readyEveryLabelBox);
+  document.body && readyEveryLabelBox();
+  document.addEventListener("htmx:afterSwap", readyEveryLabelBox);
+
 })();

@@ -6,6 +6,7 @@ search. Rather than trusting each view to remember a filter, every user-owned mo
 inherits an owner and a queryset that knows how to scope itself.
 """
 
+import re
 from datetime import timedelta
 
 from django.conf import settings
@@ -101,6 +102,37 @@ class Tag(OwnedModel):
         if not self.slug:
             self.slug = slugify(self.name)[:60]
         super().save(*args, **kwargs)
+
+    @classmethod
+    def named(cls, owner, names) -> "list[Tag]":
+        """The owner's tags with these names, made if missing, in the order given.
+
+        The same helper `jobs.Industry` has, and for the same reason: matching by slug is
+        what stops *Remote*, *remote* and *REMOTE* from becoming three tags. A control that
+        offers to add a label somebody has not used before needs somewhere for that label to
+        land, and this is it (#139).
+
+        A tag made this way has no colour. Colours are chosen on the tags page, where there
+        is room to see them beside each other.
+        """
+        found: list[Tag] = []
+        seen: set[str] = set()
+        for raw in names:
+            name = str(raw).strip()[:60]
+            slug = slugify(name)[:60]
+            if not name or not slug or slug in seen:
+                continue
+            seen.add(slug)
+            tag, _created = cls.objects.get_or_create(
+                owner=owner, slug=slug, defaults={"name": name}
+            )
+            found.append(tag)
+        return found
+
+    @classmethod
+    def split(cls, text: str) -> list[str]:
+        """Names out of a typed list: commas, semicolons and slashes all separate."""
+        return [part.strip() for part in re.split(r"[;,/]", text or "") if part.strip()]
 
 
 class PhoneNumber(OwnedModel):
