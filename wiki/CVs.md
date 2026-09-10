@@ -69,6 +69,12 @@ produce; that is the point of the menu being shorter on one page than on another
 chose to install, having seen who wrote it. There is no upload box for themes, and there
 will not be one.
 
+**A theme draws only what it carries.** The renderer fetches nothing while it draws — not a
+file on the server, not an address on the network — so a stylesheet, an image or a font a
+theme wants has to be inside it: its CSS inline, and anything else as a `data:` address.
+One it points at by address is left out of the PDF rather than fetched, which is what keeps
+a theme from reading the server's disk into somebody's CV.
+
 **If a plugin is removed**, the CVs that used its theme keep working — they fall back to
 Plain and still export. Nothing is lost except the look, and choosing another theme puts
 that right.

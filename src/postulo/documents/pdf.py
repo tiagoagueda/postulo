@@ -86,9 +86,32 @@ class WeasyPrintBackend:
         return _is_importable("weasyprint")
 
     def render(self, html: str) -> bytes:
+        # Nothing but the document goes to `write_pdf`. Its `stylesheets` and `xmp_metadata`
+        # arguments were the two that ignored the document's fetcher and built one of their
+        # own until WeasyPrint 70 (CVE-2026-55073); Postulo passes neither (#163).
+        return self.document(html).write_pdf()
+
+    def document(self, html: str):
+        """The WeasyPrint document `render` writes, holding the only fetcher it may use."""
         from weasyprint import HTML  # imported late: needs system libraries
 
-        return HTML(string=html).write_pdf()
+        return HTML(string=html, url_fetcher=self.fetcher())
+
+    @staticmethod
+    def fetcher():
+        """What WeasyPrint may fetch while it draws: ``data:`` addresses, and nothing else.
+
+        Every document Postulo renders carries its own CSS and embeds whatever it shows, so
+        there is nothing to fetch -- and until this, that was true only because the templates
+        happened to be written that way. WeasyPrint's own fetcher opens ``file:``, ``http:``,
+        ``https:`` and ``ftp:`` addresses and follows redirects, and a theme a plugin ships
+        (#132) is markup Postulo did not write. With this, an ``<img>``, a ``<link>`` or a
+        ``url()`` pointing at ``file:///etc/passwd`` or at an address inside the network draws
+        nothing, instead of drawing what it found into a PDF somebody downloads (#163).
+        """
+        from weasyprint.urls import URLFetcher  # imported late, as above
+
+        return URLFetcher(allowed_protocols={"data"}, allow_redirects=False)
 
 
 class ChromiumBackend:
@@ -107,8 +130,12 @@ class ChromiumBackend:
             browser = playwright.chromium.launch()
             try:
                 page = browser.new_page()
-                # The document is self-contained: themes inline their CSS, so nothing
-                # is fetched and the renderer never reaches the network or the disk.
+                # The document is self-contained: themes inline their CSS, so there is
+                # nothing to fetch. Every request the page makes is refused anyway rather
+                # than trusted not to happen -- the counterpart of WeasyPrint's fetcher. A
+                # `data:` address is not a request, so what a document embeds still draws
+                # (#163).
+                page.route("**/*", lambda route: route.abort())
                 page.set_content(html, wait_until="load")
                 return page.pdf(
                     format=PAGE_FORMAT,

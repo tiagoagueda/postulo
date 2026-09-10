@@ -8,6 +8,30 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **WeasyPrint 70, for CVE-2026-55073, and renderers that fetch nothing a document does not
+  carry.** The advisory, published on 9 September, is two `write_pdf` arguments —
+  `stylesheets` and `xmp_metadata` — that ignored the document's URL fetcher and read local
+  files or internal addresses into the PDF. Postulo passes neither, so it was not exposed
+  that way, and **both released versions are affected all the same**: v0.2.0 and v0.2.1 lock
+  WeasyPrint 69.0, and the dependency audit refuses them from that day. The requirement is
+  now `weasyprint>=70`, so an installation cannot resolve to the old one either.
+
+  Postulo had set no fetcher at all, so WeasyPrint's default applied — every protocol,
+  redirects followed — and nothing came of it only because every template it ships inlines
+  its CSS and embeds what it shows. That is now enforced rather than assumed, before a theme
+  from a plugin puts markup nobody here wrote in front of the renderer: WeasyPrint may fetch
+  `data:` addresses and nothing else, and Chromium refuses every request the page makes. A
+  stylesheet, image or font a document points at by address is left out of the PDF instead
+  of fetched.
+
+  And the suite now draws real PDFs: every kind of document in every theme, the report, and
+  a document set right to left. Until this it rendered every PDF through a stand-in, so an
+  upgrade of the renderer — a new major version every release — was covered by nothing.
+
+  **Installing without the image?** Add `libharfbuzz-subset0` beside the Pango packages.
+  WeasyPrint 70 warns at start-up without it and says a later version will require it; the
+  image, CI and the install instructions all have it now. (#163)
+
 - **Mail that Microsoft 365 and Google will still accept, before Microsoft stops accepting
   the old kind.** Microsoft switches SMTP AUTH basic authentication off by default for
   existing Exchange Online tenants at the end of December 2026. On the code before this, an

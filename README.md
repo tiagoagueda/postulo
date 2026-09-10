@@ -197,7 +197,7 @@ PDF export uses **WeasyPrint**, which is installed with Postulo. On Linux it nee
 Pango:
 
 ```sh
-sudo apt install libpango-1.0-0 libpangoft2-1.0-0     # Debian and Ubuntu
+sudo apt install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0     # Debian and Ubuntu
 ```
 
 Those libraries are awkward to obtain on Windows, so a fallback renderer exists there:

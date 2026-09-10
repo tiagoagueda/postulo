@@ -36,7 +36,7 @@ WeasyPrint is installed with Postulo, so this almost always means its system lib
 are missing rather than the package:
 
 ```sh
-sudo apt install libpango-1.0-0 libpangoft2-1.0-0     # Debian and Ubuntu
+sudo apt install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0     # Debian and Ubuntu
 ```
 
 On Windows those libraries are impractical; use the fallback renderer instead:

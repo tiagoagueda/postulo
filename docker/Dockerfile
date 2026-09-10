@@ -157,10 +157,13 @@ ENV PYTHONUNBUFFERED=1 \
 # build. It belongs in this RUN, after `update` and before `install`: a layer of its own
 # would either run against a stale index or be served from cache while the install was
 # not. tests/test_image_build.py holds it in that order.
+#
+# `libharfbuzz-subset0` because WeasyPrint 70 warns at import without it and says a later
+# version will require it (#163).
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
-        libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libfontconfig1 \
+        libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 \
         fonts-dejavu-core fonts-noto-core \
         curl \
     && rm -rf /var/lib/apt/lists/*

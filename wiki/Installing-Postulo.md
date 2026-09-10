@@ -32,8 +32,10 @@ installation; the rest of this page is detail and the alternative without a cont
 - **[uv](https://docs.astral.sh/uv/)** to install dependencies
 - **git**
 - **Pango**, if you want PDF export and are installing without a container. On Debian
-  or Ubuntu: `sudo apt install libpango-1.0-0 libpangoft2-1.0-0`. The image already has
-  it. Postulo works without it; you simply cannot export PDFs.
+  or Ubuntu: `sudo apt install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0` —
+  the last one because WeasyPrint warns without it and a later version will require it.
+  The image already has all three. Postulo works without them; you simply cannot export
+  PDFs.
 
 Node is **not** required. The stylesheet is compiled and committed; Node is only needed
 if you want to change the CSS.
@@ -219,7 +221,7 @@ What it does need is Pango and its companion libraries, which are one package ma
 command away on Linux:
 
 ```sh
-sudo apt install libpango-1.0-0 libpangoft2-1.0-0     # Debian and Ubuntu
+sudo apt install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0     # Debian and Ubuntu
 sudo dnf install pango                                 # Fedora
 sudo apk add pango                                     # Alpine
 ```
