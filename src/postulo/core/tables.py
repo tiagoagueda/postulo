@@ -26,6 +26,12 @@ from django.db.models import F, Q
 from django.http import QueryDict
 from django.utils.translation import gettext_lazy as _
 
+#: What a column may be dragged to. Narrower than the lower bound is a column nobody can
+#: read and nobody can grab again; wider than the upper one is a table that scrolls sideways
+#: for one column's sake (#136).
+MIN_WIDTH = 64
+MAX_WIDTH = 900
+
 PAGE_SIZES = (25, 50, 100)
 DEFAULT_PAGE_SIZE = 50
 
@@ -76,10 +82,17 @@ class Header:
 
     column: Column
     state: str = ""  # "asc", "desc" or ""
-    next_sort: str = ""
+    #: What the header links to next. ``None`` clears the sort, which is the third state:
+    #: there was no way to undo a sort except by editing the address (#136).
+    next_sort: str | None = ""
     value: str = ""
     value_from: str = ""
     value_to: str = ""
+    #: What clicking the header would do, in words. The arrow says it to somebody who can
+    #: see it; this says it to everybody else.
+    hint: str = ""
+    #: How wide this person likes the column, or 0 for *let it size itself* (#136).
+    width: int = 0
 
     @property
     def key(self) -> str:
@@ -141,6 +154,17 @@ class Table:
         chosen = [self.by_key[key] for key in keys if key in self.by_key]
         return chosen or [self.by_key[key] for key in self.default_columns()]
 
+    def width_of(self, column: Column) -> int:
+        """How wide this person likes this column, in pixels, or 0 for *let it size itself*.
+
+        A width is a preference rather than a question, so it lives on the profile beside
+        which columns show and how many rows a page holds -- and follows the person to every
+        device rather than cluttering every link (#136).
+        """
+        widths = self.settings.get("widths")
+        value = widths.get(column.key) if isinstance(widths, dict) else None
+        return value if isinstance(value, int) and MIN_WIDTH <= value <= MAX_WIDTH else 0
+
     @property
     def visible_keys(self) -> set[str]:
         return {column.key for column in self.visible}
@@ -199,14 +223,38 @@ class Table:
             return ""
         return "desc" if self.sort.startswith("-") else "asc"
 
-    def next_sort(self, column: Column) -> str:
-        """What clicking this header should sort by: the other direction if it is active."""
-        state = self.sort_state(column)
-        if state == "asc":
-            return f"-{column.key}"
-        if state == "desc":
-            return column.key
-        return f"-{column.key}" if column.newest_first else column.key
+    def next_sort(self, column: Column) -> str | None:
+        """What clicking this header sorts by next, cycling back to the table's own order.
+
+        Three states rather than two: a click sorted one way, a click sorted the other, and
+        a click that gave up and went back. There was no way to undo a sort except editing
+        the address, which is a real gap however small the fix (#136).
+
+        ``None`` means *no sort of mine* — the template drops the parameter, and `sort`
+        falls back to `default_sort`. A column that **is** the default sort has no such
+        state to return to, so it keeps cycling between the two directions rather than
+        offering a third click that changes nothing.
+        """
+        first = f"-{column.key}" if column.newest_first else column.key
+        second = column.key if column.newest_first else f"-{column.key}"
+        if not self.sort_state(column):
+            return first
+        if self.sort == first:
+            return second
+        if self.default_sort.removeprefix("-") == column.key:
+            return first
+        return None
+
+    def sort_hint(self, column: Column) -> str:
+        """What clicking would do, in words, for the link nobody can see an arrow on."""
+        wanted = self.next_sort(column)
+        if wanted is None:
+            return str(_("Stop sorting by %(column)s") % {"column": str(column.label).lower()})
+        if wanted.startswith("-"):
+            return str(
+                _("Sort by %(column)s, highest first") % {"column": str(column.label).lower()}
+            )
+        return str(_("Sort by %(column)s, lowest first") % {"column": str(column.label).lower()})
 
     # ----------------------------------------------------------------- filters
 
@@ -265,6 +313,8 @@ class Table:
                 column=column,
                 state=self.sort_state(column),
                 next_sort=self.next_sort(column),
+                hint=self.sort_hint(column),
+                width=self.width_of(column),
             )
             if column.filter in ("text", "choice"):
                 header.value = self.params.get(column.name, "")
@@ -318,7 +368,23 @@ class Table:
         if page_size not in PAGE_SIZES:
             page_size = DEFAULT_PAGE_SIZE
 
-        return {"columns": columns, "page_size": page_size}
+        widths = dict((current or {}).get("widths") or {})
+        # One column at a time, because a width arrives from a drag rather than from a form
+        # somebody filled in: `width` names the column and `px` says how wide.
+        key = data.get("width", "")
+        if key in {column.key for column in cls.columns}:
+            try:
+                pixels = int(data.get("px", ""))
+            except ValueError:
+                pixels = 0
+            if pixels:
+                widths[key] = max(MIN_WIDTH, min(MAX_WIDTH, pixels))
+            else:
+                # Zero is *let it size itself again*, which has to be reachable or a column
+                # dragged too narrow once is too narrow for ever.
+                widths.pop(key, None)
+
+        return {"columns": columns, "page_size": page_size, "widths": widths}
 
 
 def _date(text: str) -> dt.date | None:

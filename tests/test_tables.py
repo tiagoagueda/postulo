@@ -231,7 +231,12 @@ def test_column_choices_round_trip_through_the_profile(client, user, search):
     assert response.status_code == 302 and response["Location"] == url + "?sort=role"
 
     stored = Profile.objects.get(user=user).table_settings["applications"]
-    assert stored == {"columns": ["company", "role", "deadline", "tags"], "page_size": 25}
+    # `widths` joined the stored shape in #136 and is empty until a column is dragged.
+    assert stored == {
+        "columns": ["company", "role", "deadline", "tags"],
+        "page_size": 25,
+        "widths": {},
+    }
 
     response = client.get(url)
     assert [c.key for c in response.context["table"].visible] == [

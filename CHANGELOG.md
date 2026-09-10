@@ -1221,6 +1221,34 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **A column header clicks back to no sort at all, and a column can be dragged wider.**
+  Two of the four features Dispatcharr's channel table had and Postulo's did not; the other
+  two arrived with their prerequisites — selection with bulk actions, and editing in the
+  cell — which is why these two were left until last rather than done first.
+
+  Sorting was two-state and never returned to the table's own order, so there was no way to
+  undo a sort except by editing the address. It cycles through three now. A column that *is*
+  the table's default sort keeps two, because there is nothing to go back to and a third
+  click that changes nothing is worse than two honest states. And since the third state
+  takes the arrow away, every header now says in words what clicking it would do.
+
+  **A width is a preference, so it lives where preferences live.** Beside which columns show
+  and how many rows a page holds, on the profile, following the person to every device
+  rather than cluttering every link — which is the line this project already drew between a
+  question and a preference, and the one thing from that table that was deliberately *not*
+  adopted: theirs keeps the query in session storage and the sort in memory, so a reload
+  loses the sort and a filtered view cannot be sent to anybody.
+
+  The handle is the one place a script is unavoidable, since a width is a pointer gesture.
+  It is still an addition rather than a replacement: without a script no handle exists at
+  all and the columns size themselves exactly as before. And it is not pointer-only — the
+  handle is a button, the arrow keys widen and narrow it, and *Home* lets the column size
+  itself again, because a column dragged too narrow once must not be too narrow for ever.
+
+  Row reordering was not taken and is not meant to be: a channel list has an order somebody
+  chose, a company list has an order somebody *sorted*, and dragging a row in a sorted table
+  means either abandoning the sort or lying about it. (#136)
+
 - **The two halves of choosing a company's sector meet, and the consequences are handled.**
   The list is NACE Rev. 2.1 and the picker is chips; what was left was everything that
   follows from a vocabulary that can now be long.

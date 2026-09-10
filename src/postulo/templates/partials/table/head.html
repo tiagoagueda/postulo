@@ -3,8 +3,17 @@
    Every input is associated with the filter form (`form=`) so the plain Apply button
    works without scripts, and carries htmx attributes so typing narrows the table live.
    Text inputs are preserved across swaps, so a keystroke in flight is never lost. {% endcomment %}
+{% comment %} `data-col-settings` is where a width is saved, and its presence is what
+   tells `app.js` there is anything to add a handle to. Without a script no handle exists:
+   a width is a pointer gesture, and an inert control is worse than a missing one -- the
+   columns size themselves exactly as they did, which is a complete fallback (#136).
+{% endcomment %}
 <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
-              dark:border-ink-800 dark:text-ink-400">
+              dark:border-ink-800 dark:text-ink-400"
+       data-col-settings="{% url 'core:table_settings' table.name %}"
+       data-col-here="{{ request.get_full_path }}"
+       data-col-wider="{% translate 'Widen {column}' %}"
+       data-col-reset="{% translate 'Let {column} size itself' %}">
   <tr>
     {% comment %} The selection column, present only where a bulk form exists. The header
        holds no checkbox: one would be inert without script, and an inert control is worse
@@ -17,7 +26,10 @@
       </th>
     {% endif %}
     {% for header in table.headers %}
-      <th scope="col" class="px-4 py-3 font-medium {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
+      <th scope="col"
+          class="relative px-4 py-3 font-medium {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
+          data-col="{{ header.key }}" data-col-label="{{ header.label }}"
+          {% if header.width %}style="width: {{ header.width }}px"{% endif %}
           {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
         {% if header.column.sortable %}
           {% comment %} `tap-target` rather than the bare `inline-flex` this used to have:
@@ -33,6 +45,9 @@
             {% elif header.state == 'desc' %}
               {% icon "arrow-down" class="size-3.5" %}
             {% endif %}
+            {% comment %} Three states now, so the arrow no longer says the whole of what a
+               click does -- the third one takes the arrow away (#136). {% endcomment %}
+            <span class="sr-only">{{ header.hint }}</span>
           </a>
         {% else %}
           {{ header.label }}

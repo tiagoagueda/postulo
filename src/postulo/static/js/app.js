@@ -864,4 +864,172 @@
     }
   });
 
+  /* --------------------------------------------------------- resizing a column
+   *
+   * A column width is the one preference in a table that can only be *asked for* with a
+   * pointer, so this is the one place a script is unavoidable (#136). It is still an
+   * addition rather than a replacement: without it the columns size themselves exactly as
+   * they always did, which is a complete fallback, and the handle does not exist at all --
+   * an inert control is worse than a missing one, which is the same reason the bulk bar's
+   * *Select all* is added here rather than drawn by the template.
+   *
+   * **It is not pointer-only, though the gesture is.** The handle is a button: the arrow
+   * keys widen and narrow it, and Home lets the column size itself again. A control that
+   * only a mouse can reach is a control half the people using this application cannot use.
+   *
+   * **The width is saved in the background.** The page already shows the new width, so a
+   * reload to confirm it would be a page load to tell somebody what they can see. A failed
+   * save leaves the width for this page and loses it on the next one, which is the honest
+   * outcome and not worth a dialogue.
+   */
+  var RESIZE_STEP = 16;
+
+  function tokenFor(head) {
+    var field = document.querySelector("input[name=csrfmiddlewaretoken]");
+    return field ? field.value : "";
+  }
+
+  function saveWidth(head, key, pixels) {
+    var body = new URLSearchParams();
+    body.set("width", key);
+    body.set("px", String(pixels));
+    body.set("next", head.dataset.colHere || "/");
+    // Every column that is currently shown, so `clean_settings` keeps them rather than
+    // falling back to the defaults: it reads one form, and this is that form.
+    Array.prototype.forEach.call(head.querySelectorAll("th[data-col]"), function (cell) {
+      body.append("order", cell.dataset.col);
+      body.append("show", cell.dataset.col);
+    });
+    fetch(head.dataset.colSettings, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRFToken": tokenFor(head),
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: body.toString(),
+      credentials: "same-origin",
+    }).catch(function () {
+      /* The width is applied either way; losing it on the next load is the whole cost. */
+    });
+  }
+
+  function widthNow(cell) {
+    return Math.round(cell.getBoundingClientRect().width);
+  }
+
+  function setWidth(head, cell, pixels) {
+    if (!pixels) {
+      cell.style.width = "";
+      saveWidth(head, cell.dataset.col, 0);
+      return;
+    }
+    var wanted = Math.max(64, Math.min(900, Math.round(pixels)));
+    cell.style.width = wanted + "px";
+    return wanted;
+  }
+
+  function addHandle(head, cell) {
+    if (cell.querySelector("[data-col-handle]")) {
+      return;
+    }
+    var handle = document.createElement("button");
+    handle.type = "button";
+    handle.dataset.colHandle = "";
+    handle.className = "col-handle";
+    handle.setAttribute(
+      "aria-label",
+      (head.dataset.colWider || "Widen {column}").replace("{column}", cell.dataset.colLabel || "")
+    );
+    handle.title = handle.getAttribute("aria-label");
+
+    var dragging = false;
+    var startX = 0;
+    var startWidth = 0;
+
+    handle.addEventListener("pointerdown", function (event) {
+      dragging = true;
+      startX = event.clientX;
+      startWidth = widthNow(cell);
+      handle.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    handle.addEventListener("pointermove", function (event) {
+      if (!dragging) {
+        return;
+      }
+      // Away from the start edge widens, whichever side of the screen that is.
+      var backwards = getComputedStyle(cell).direction === "rtl";
+      var moved = (event.clientX - startX) * (backwards ? -1 : 1);
+      setWidth(head, cell, startWidth + moved);
+    });
+    handle.addEventListener("pointerup", function (event) {
+      if (!dragging) {
+        return;
+      }
+      dragging = false;
+      handle.releasePointerCapture(event.pointerId);
+      saveWidth(head, cell.dataset.col, widthNow(cell));
+    });
+    handle.addEventListener("keydown", function (event) {
+      var backwards = getComputedStyle(cell).direction === "rtl";
+      var step = 0;
+      if (event.key === "ArrowRight") {
+        step = backwards ? -RESIZE_STEP : RESIZE_STEP;
+      } else if (event.key === "ArrowLeft") {
+        step = backwards ? RESIZE_STEP : -RESIZE_STEP;
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        setWidth(head, cell, 0);
+        say(head, (head.dataset.colReset || "").replace("{column}", cell.dataset.colLabel || ""));
+        return;
+      }
+      if (!step) {
+        return;
+      }
+      event.preventDefault();
+      var wanted = setWidth(head, cell, widthNow(cell) + step);
+      saveWidth(head, cell.dataset.col, wanted);
+    });
+
+    // The room the handle needs, added with it: a 24-wide target over a 16-pixel padding
+    // would sit on the header's own link, and SC 2.5.8 wants both to be reachable (#136).
+    cell.classList.add("has-col-handle");
+    cell.appendChild(handle);
+  }
+
+  function say(head, words) {
+    var live = head.querySelector("[data-col-live]");
+    if (!live) {
+      live = document.createElement("caption");
+      live.className = "sr-only";
+      live.dataset.colLive = "";
+      live.setAttribute("role", "status");
+      var table = head.closest("table");
+      if (table) {
+        table.insertBefore(live, table.firstChild);
+      }
+    }
+    if (words) {
+      live.textContent = words;
+    }
+  }
+
+  function readyColumnWidths() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll("thead[data-col-settings]"),
+      function (head) {
+        Array.prototype.forEach.call(head.querySelectorAll("th[data-col]"), function (cell) {
+          addHandle(head, cell);
+        });
+      }
+    );
+  }
+
+  document.addEventListener("DOMContentLoaded", readyColumnWidths);
+  document.addEventListener("htmx:afterSwap", readyColumnWidths);
+  if (document.body) {
+    readyColumnWidths();
+  }
+
 })();

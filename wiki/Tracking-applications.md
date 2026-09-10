@@ -196,8 +196,10 @@ so the menu is the way that works everywhere, and dragging is an addition to it.
 
 The table is yours to arrange, and the same is true of the **Companies** table.
 
-- **Sort** by clicking a column header; click again for the other direction. Dates sort
-  newest first on the first click. The arrow shows which column is in charge.
+- **Sort** by clicking a column header; click again for the other direction, and a third
+  time to stop sorting by it and go back to the table's own order. Dates sort newest first
+  on the first click. The arrow shows which column is in charge, and every header also says
+  in words what clicking it would do — including that it would stop.
 - **Narrow by typing in the header.** Beneath each header that can filter sits an input:
   text columns match anything containing what you type, dates take a from and a to, and
   choices such as priority are a list. The table updates as you type; without scripts, the
@@ -210,9 +212,15 @@ The table is yours to arrange, and the same is true of the **Companies** table.
   website, careers page, notes, last activity and the date added. *Reset* restores the
   usual layout.
 
+- **Drag a column wider or narrower** by its end edge. The handle is a button as well as a
+  drag: give it focus and the arrow keys widen and narrow it, and *Home* lets the column
+  size itself again. Widths are saved as you go. With scripts switched off there is no
+  handle at all and the columns size themselves, exactly as they always did.
+
 Sort and filters live in the address, so a view you have set up can be bookmarked or sent
-to someone, and the back button works. Which columns show, and how many rows a page holds,
-are a preference: they are saved to your account and follow you to every device.
+to someone, and the back button works. Which columns show, how wide they are, and how many
+rows a page holds are a preference: they are saved to your account and follow you to every
+device.
 
 ## The timeline
 

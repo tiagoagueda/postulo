@@ -259,6 +259,25 @@
       dark:text-ink-300 dark:hover:bg-ink-700 dark:hover:text-ink-100;
   }
 
+  /* The grab area at the end edge of a column header (#136). Wider than it looks: the
+     visible line is one pixel and the target is eight, with the full header height behind
+     it, which is what makes it catchable by a finger as well as a mouse. It is pinned to
+     the end edge with a logical utility, because the last column is the end edge and not
+     the right one -- and the lint that reads this file would catch the other spelling. */
+  .col-handle {
+    @apply absolute inset-y-0 end-0 w-6 cursor-col-resize touch-none border-0 bg-transparent p-0
+      hover:bg-brand-500/40
+      focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2
+      focus-visible:outline-brand-600;
+  }
+
+  /* Room for the handle to be 24 wide without covering the header's own link. Added by the
+     script at the same moment the handle is, so a page with no script keeps the padding it
+     always had rather than reserving space for a control that is not there. */
+  .has-col-handle {
+    @apply pe-8;
+  }
+
   .card {
     @apply rounded-xl border border-ink-200 bg-white p-6 shadow-sm
       dark:border-ink-800 dark:bg-ink-900;
