@@ -71,13 +71,22 @@ class ConsentWithdrawn(ConsentFailed):
     """
 
 
-def wanted_by(plugin) -> Consent | None:
-    """What this plugin needs consent for, or nothing if it authenticates by field."""
+def wanted_by(plugin, config: dict | None = None) -> Consent | None:
+    """What this plugin needs consent for, or nothing if it authenticates by field.
+
+    ``config`` is the connection's own settings, handed to a plugin whose `needs_consent`
+    takes them. Your own email is the first that does: whether it needs consent at all
+    depends on which provider the person chose, and a mail server of their own needs none
+    (#151). A plugin whose method takes nothing is asked the way it always was.
+    """
+    import inspect
+
     asks = getattr(plugin, "needs_consent", None)
     if asks is None:
         return None
     try:
-        found = asks()
+        takes_config = bool(inspect.signature(asks).parameters)
+        found = asks(dict(config or {})) if takes_config else asks()
     except Exception:  # pragma: no cover - a broken plugin must not break the page listing it
         return None
     return found if isinstance(found, Consent) else None
@@ -102,7 +111,7 @@ def start(connection, plugin, request) -> str:
     """Where to send the person, with a state value only this instance could have made."""
     from urllib.parse import urlencode
 
-    consent = wanted_by(plugin)
+    consent = wanted_by(plugin, connection.config)
     if consent is None:
         raise ConsentFailed(str(_("That connection does not use consent.")))
     client_id = str((connection.config or {}).get("client_id") or "")
@@ -147,7 +156,7 @@ def finish(request, code: str, state: str):
         raise ConsentFailed(str(_("That connection belongs to somebody else.")))
 
     plugin = connection.plugin_instance
-    consent = wanted_by(plugin) if plugin is not None else None
+    consent = wanted_by(plugin, connection.config) if plugin is not None else None
     if consent is None:
         raise ConsentFailed(str(_("That connection does not use consent.")))
 
@@ -178,7 +187,7 @@ def access_token(connection) -> str:
         return token
 
     plugin = connection.plugin_instance
-    consent = wanted_by(plugin) if plugin is not None else None
+    consent = wanted_by(plugin, connection.config) if plugin is not None else None
     refresh = str(secrets.get(REFRESH_TOKEN) or "")
     if consent is None or not refresh:
         raise ConsentWithdrawn(str(_("Nobody has agreed to this yet. Connect it again.")))
@@ -212,21 +221,22 @@ def forget(connection) -> None:
 # ------------------------------------------------------------------------ the wire
 
 
-def _ask_for_tokens(consent: Consent, connection, form: dict) -> dict:
-    """One request to the provider's token endpoint, through the guarded client."""
+def exchange(token_url: str, *, client_id: str, client_secret: str, form: dict) -> dict:
+    """One request to a provider's token endpoint, through the guarded client.
+
+    Free of `Connection`, because the instance's own mail needs exactly this and is not one
+    (#151). A refresh happens while somebody's mail is being sent, so it goes through
+    `plugins/http.py` and gets the destination policy, the timeout and the redirect limit
+    every other outbound request gets, rather than a bare post.
+    """
     import httpx
 
     from . import http
 
-    config = connection.config or {}
-    body = {
-        **form,
-        "client_id": str(config.get("client_id") or ""),
-        "client_secret": str(connection.secrets.get("client_secret") or ""),
-    }
+    body = {**form, "client_id": client_id, "client_secret": client_secret}
     try:
         with http.client() as session:
-            response = session.post(consent.token_url, data=body)
+            response = session.post(token_url, data=body)
     except http.DestinationRefused as error:
         raise ConsentFailed(str(error)) from error
     except httpx.HTTPError as error:
@@ -244,6 +254,17 @@ def _ask_for_tokens(consent: Consent, connection, form: dict) -> dict:
         return response.json()
     except ValueError as error:
         raise ConsentFailed(str(_("The provider's reply was not readable."))) from error
+
+
+def _ask_for_tokens(consent: Consent, connection, form: dict) -> dict:
+    """`exchange`, with a connection's own client credentials."""
+    config = connection.config or {}
+    return exchange(
+        consent.token_url,
+        client_id=str(config.get("client_id") or ""),
+        client_secret=str(connection.secrets.get("client_secret") or ""),
+        form=form,
+    )
 
 
 def _says_the_grant_is_gone(response) -> bool:

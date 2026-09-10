@@ -8,6 +8,45 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **Mail that Microsoft 365 and Google will still accept, before Microsoft stops accepting
+  the old kind.** Microsoft switches SMTP AUTH basic authentication off by default for
+  existing Exchange Online tenants at the end of December 2026. On the code before this, an
+  instance sending through Microsoft 365 would lose the ability to send password resets on
+  that date, with no configuration that fixed it — which is people locked out, not a
+  modernisation. XOAUTH2 now works on both halves of the mail plugin: the instance's own
+  transport and a person's own outbox.
+
+  **It takes no dependency.** XOAUTH2 is one SASL string carrying a username and a bearer
+  token, and `smtplib` already speaks SASL; a provider's SDK on the path that delivers
+  password resets would have been a large dependency and somebody else's HTTP client to
+  solve a dozen lines. The subtle part is that `smtplib` base64-encodes what it is handed,
+  and a string encoded twice is refused with a message that says nothing about why — so
+  that is tested on the wire rather than asserted.
+
+  **Two grants for the instance, because two different people are consenting.** *Signed in
+  once* is an operator agreeing on the provider's page as the mailbox that sends, which
+  needs no administrator of anything and works at both providers. *The application sends on
+  its own* is Microsoft's client-credentials route, with nobody's session involved, which
+  suits a server better but needs a tenant administrator. Google's equivalent is a
+  different grant again, so the page refuses that pair before it is saved rather than
+  letting it fail at the first password reset.
+
+  **A token can stop working on its own, and a password cannot.** A provider may withdraw a
+  grant when a password changes or a mailbox goes unused. When it does, the send fails with
+  the provider's own words and is counted like any other mail failure — so the recovery lock
+  that keeps email switched on while it is the only way back into an account stops counting
+  email as that way once it has failed, instead of going on believing in a route that has
+  quietly closed. A consent that comes back without a refresh token is refused on the spot,
+  because it would work for an hour and then stop for good.
+
+  **The instance's consent comes back through the address a person's does**, so an operator
+  registers one address, not two; the two are told apart by a signing salt each, so neither
+  can be passed off as the other, and only the administrator who started one can finish it.
+  The client secret and the tokens are kept encrypted under the same key as every other
+  secret, never in a column or a cache. **Nothing removes the password**: a relay of your
+  own, Mailcow, Postfix and Gmail with an app password sign in exactly as they did, and an
+  instance that never opens the Email page behaves exactly as it did. (#151)
+
 - **The image is scanned now, by the project rather than by somebody remembering.**
   Everything in the two issues beside this one was found by running Trivy and Grype by hand,
   on a machine that happened to have them pulled for something else. Neither finding was new

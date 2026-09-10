@@ -131,6 +131,14 @@ def send(person, message) -> int:
     throttle.consume("outbox", person.pk, throttle.rate_for(RATE_SETTING))
 
     plugin = outbox_for(person)
+    from postulo.plugins import consent
+
+    if consent.wanted_by(plugin, connection.config) is not None:
+        # Renewed here, where the connection is to hand, so the plugin is handed a token good
+        # for the next minute rather than one that lapsed in the night. A grant the provider
+        # will no longer renew goes up as `ConsentWithdrawn`, which says what to do about it
+        # -- agree again -- where an SMTP refusal would say nothing useful (#151).
+        consent.access_token(connection)
     sent = plugin.send(message, connection.full_config)
     # Never the recipients, never the body. What is useful in a log is that somebody sent
     # something and it went; who they wrote to is theirs.

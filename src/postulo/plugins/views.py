@@ -188,7 +188,7 @@ class ConnectionFormView(OwnedObjectMixin, View):
     def _consent_context(request, connection, plugin) -> dict:
         from . import consent as consent_flow
 
-        wanted = consent_flow.wanted_by(plugin)
+        wanted = consent_flow.wanted_by(plugin, connection.config if connection.pk else {})
         if wanted is None:
             return {}
         return {
@@ -271,7 +271,16 @@ class ConnectionConsentCallbackView(LoginRequiredMixin, View):
     """
 
     def get(self, request: HttpRequest) -> HttpResponse:
+        from postulo.core import mail_auth
+
         from . import consent as consent_flow
+
+        state = request.GET.get("state", "")
+        # The instance's own mail comes back here too, so an operator registers one address
+        # rather than two. Its state is signed with a salt of its own, which is how the two
+        # are told apart without either being readable as the other (#151).
+        if mail_auth.is_mail_consent(state):
+            return self._mail(request, state)
 
         refused = request.GET.get("error", "")
         if refused:
@@ -288,6 +297,23 @@ class ConnectionConsentCallbackView(LoginRequiredMixin, View):
             return redirect("connections:list")
         messages.success(request, _("Connected. Test it to make sure it works."))
         return redirect("connections:edit", pk=connection.pk)
+
+    @staticmethod
+    def _mail(request: HttpRequest, state: str) -> HttpResponse:
+        from postulo.core import mail_auth
+
+        if request.GET.get("error", ""):
+            messages.info(request, _("Nothing was connected. Nobody agreed to anything."))
+            return redirect("server:email")
+        try:
+            mail_auth.finish_consent(request, request.GET.get("code", ""), state)
+        except mail_auth.TokenUnavailable as error:
+            messages.error(request, str(error))
+            return redirect("server:email")
+        messages.success(
+            request, _("Signed in to the mail provider. Test the connection to make sure.")
+        )
+        return redirect("server:email")
 
 
 class ConnectionTestView(OwnedObjectMixin, View):
@@ -307,7 +333,7 @@ class ConnectionTestView(OwnedObjectMixin, View):
             # that the grant still stands: a provider refusing to renew is not a failure a
             # mail server can report, and "consent was withdrawn" is fixed by agreeing again
             # rather than by editing a field (#150).
-            if consent_flow.wanted_by(plugin) is not None:
+            if consent_flow.wanted_by(plugin, connection.config) is not None:
                 consent_flow.access_token(connection)
             result = plugin.test(connection.full_config)
             ok, message = bool(result.ok), str(result.message or "")

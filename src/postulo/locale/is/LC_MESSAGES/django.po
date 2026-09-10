@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:54+0000\n"
+"POT-Creation-Date: 2026-09-10 08:21+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: íslenska\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s hefur þegar %(scheme)s-auðkenni: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s breytt."
 
-#: src/postulo/plugins/views.py:345
+#: src/postulo/plugins/views.py:371
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -222,12 +222,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s til %(high)s"
 
-#: src/postulo/core/server_views.py:1200
+#: src/postulo/core/server_views.py:1272
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s er sett upp úr skránni."
 
-#: src/postulo/core/server_views.py:1150
+#: src/postulo/core/server_views.py:1222
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -301,19 +301,19 @@ msgstr "%(name)s er nú stjórnandi."
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "%(name)s er nú í röð %(row)s, sæti %(place)s."
 
-#: src/postulo/core/server_views.py:1261
+#: src/postulo/core/server_views.py:1333
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s er fjarlægð. Endurræstu Postulo til að vera viss um að ekkert af henni sé enn hlaðið."
 
-#: src/postulo/core/server_views.py:1233
+#: src/postulo/core/server_views.py:1305
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s er slökkt; skrárnar hennar eru enn hér."
 
-#: src/postulo/core/server_views.py:1235
+#: src/postulo/core/server_views.py:1307
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s er kveikt aftur."
@@ -380,6 +380,18 @@ msgstr "%(package)s: þarf %(wanted)s, og Postulo hefur %(have)s."
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s gat ekki athugað þessar stillingar: %(error)s"
+
+#: src/postulo/core/mail_auth.py:234
+#, python-format, draft
+msgid "%(provider)s does not let an application send on its own."
+msgstr "%(provider)s leyfir forriti ekki að senda upp á eigin spýtur."
+
+#: src/postulo/core/server_forms.py:343
+#, python-format, draft
+msgid ""
+"%(provider)s does not let an application send on its own. Choose “Signed in once”."
+msgstr ""
+"%(provider)s leyfir forriti ekki að senda upp á eigin spýtur. Veldu „Skráð inn einu sinni“."
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
@@ -483,7 +495,7 @@ msgstr "%(url)s er miklu stærri en skrá ætti að vera."
 msgid "%(when)s ago"
 msgstr "fyrir %(when)s"
 
-#: src/postulo/core/models.py:445
+#: src/postulo/core/models.py:448
 #, draft
 msgid "(empty address)"
 msgstr "(tómt heimilisfang)"
@@ -538,6 +550,11 @@ msgid ""
 msgstr ""
 "Vafraviðbót þarf aðeins þá fyrstu. Gefðu umboði aðeins lestur þangað til þú treystir því fyrir skrifum."
 
+#: src/postulo/templates/server/email.html:210
+#, draft
+msgid "A client secret is stored. It is never shown."
+msgstr "Leynilykill biðlara er vistaður. Hann er aldrei sýndur."
+
 #: src/postulo/jobs/models.py:196
 #, draft
 msgid "A company cannot be part of itself."
@@ -570,12 +587,12 @@ msgstr "Fyrirtæki, starf, setning úr bréfi, nafn …"
 msgid "A CSV file"
 msgstr "CSV-skrá"
 
-#: src/postulo/core/models.py:87
+#: src/postulo/core/models.py:90
 #, draft
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Vísbending fyrir viðmótið, til dæmis „rafgult“ eða „himinblátt“."
 
-#: src/postulo/core/models.py:510
+#: src/postulo/core/models.py:513
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Lína undir nafninu á innskráningarsíðunni. Valfrjálst."
@@ -597,7 +614,7 @@ msgstr ""
 msgid "A month"
 msgstr "Mánuður"
 
-#: src/postulo/core/models.py:288
+#: src/postulo/core/models.py:291
 #, draft
 msgid ""
 "A number has to be confirmed before it can get you back in. Nobody has answered on this one."
@@ -625,10 +642,22 @@ msgid ""
 msgstr ""
 "Lykill er bundinn vistfanginu sem þú bjóst hann til á, sem hér er %(host)s. Að ná í þetta uppsett undir öðru nafni, eða flytja það, tekur lyklana þína ekki með."
 
-#: src/postulo/templates/server/email.html:169
+#: src/postulo/core/server_forms.py:228
+#, draft
+msgid ""
+"A password is right for your own mail server, and for Gmail with an app password. Microsoft 365 stops accepting passwords for sending mail by default at the end of December 2026; after that it needs XOAUTH2."
+msgstr ""
+"Lykilorð hentar þínum eigin póstþjóni og Gmail með forritslykilorði. Microsoft 365 hættir sjálfgefið að taka við lykilorðum til að senda póst í lok desember 2026; eftir það þarf XOAUTH2."
+
+#: src/postulo/templates/server/email.html:171
 #, draft
 msgid "A password is stored. It is never shown, not even its length."
 msgstr "Lykilorð er vistað. Það er aldrei sýnt, ekki einu sinni lengdin."
+
+#: src/postulo/core/mail_auth.py:46
+#, draft
+msgid "A password, or an app password"
+msgstr "Lykilorð, eða forritslykilorð"
 
 #: src/postulo/templates/widgets/suggestions.html:6
 #, python-format, draft
@@ -756,7 +785,7 @@ msgid ""
 msgstr ""
 "Sniðmát með eigin dálkum Postulo og einni sýnisröð. Fylltu það út og hlaðið því upp hér að ofan."
 
-#: src/postulo/core/server_views.py:715
+#: src/postulo/core/server_views.py:787
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Prófskilaboð frá %(name)s"
@@ -1011,7 +1040,7 @@ msgstr "Bætt við."
 msgid "Address"
 msgstr "Heimilisfang"
 
-#: src/postulo/core/models.py:410 src/postulo/jobs/models.py:740
+#: src/postulo/core/models.py:413 src/postulo/jobs/models.py:740
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
@@ -1440,6 +1469,11 @@ msgstr ""
 msgid "attempts"
 msgstr "tilraunir"
 
+#: src/postulo/core/models.py:607
+#, draft
+msgid "authentication"
+msgstr "auðkenning"
+
 #: src/postulo/jobs/industries.py:83
 #, draft
 msgid "Automotive"
@@ -1865,10 +1899,15 @@ msgstr "Veldu Europass-skrá fyrst."
 msgid "Choose a new password"
 msgstr "Veldu nýtt lykilorð"
 
-#: src/postulo/core/server_views.py:1081
+#: src/postulo/core/server_views.py:1153
 #, draft
 msgid "Choose a package first."
 msgstr "Veldu pakka fyrst."
+
+#: src/postulo/core/mail_auth.py:312
+#, draft
+msgid "Choose an identity provider and save it first."
+msgstr "Veldu fyrst auðkennisveitu og vistaðu hana."
 
 #: src/postulo/templates/core/import_csv_map.html:102
 #, draft
@@ -1922,6 +1961,16 @@ msgstr "Hreinsa síur"
 msgid "Cleared: this entry prints its original text in %(language)s."
 msgstr "Tæmt: þessi færsla prentar upprunalegan texta sinn á %(language)s."
 
+#: src/postulo/core/models.py:613
+#, draft
+msgid "client ID"
+msgstr "auðkenni biðlara"
+
+#: src/postulo/core/server_forms.py:245
+#, draft
+msgid "Client secret"
+msgstr "Leynilykill biðlara"
+
 #: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:663
 #, draft
 msgid "Closed"
@@ -1968,7 +2017,7 @@ msgstr "Kóði (GitHub, GitLab …)"
 msgid "code repository"
 msgstr "kóðageymsla"
 
-#: src/postulo/core/models.py:84
+#: src/postulo/core/models.py:87
 #, draft
 msgid "colour"
 msgstr "litur"
@@ -2097,18 +2146,23 @@ msgstr "Tengja"
 msgid "Connect %(plugin)s"
 msgstr "Tengja %(plugin)s"
 
-#: src/postulo/core/mail.py:133
+#: src/postulo/core/mail.py:145
+#, python-format, draft
+msgid "Connected to %(host)s:%(port)s and signed in as %(user)s with a token."
+msgstr "Tengt við %(host)s:%(port)s og skráð inn sem %(user)s með tóka."
+
+#: src/postulo/core/mail.py:151
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Tengt við %(host)s:%(port)s og skráð inn sem %(user)s."
 
-#: src/postulo/core/mail.py:138
+#: src/postulo/core/mail.py:156
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Tengt við %(host)s:%(port)s. Ekkert notandanafn, svo ekkert var skráð inn."
 
-#: src/postulo/plugins/views.py:289
+#: src/postulo/plugins/views.py:298
 #, draft
 msgid "Connected. Test it to make sure it works."
 msgstr "Tengt. Prófaðu það til að vera viss um að það virki."
@@ -2119,7 +2173,7 @@ msgstr "Tengt. Prófaðu það til að vera viss um að það virki."
 msgid "connection"
 msgstr "tenging"
 
-#: src/postulo/plugins/views.py:392
+#: src/postulo/plugins/views.py:418
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Tenging fjarlægð, leyndarmálum og öllu."
@@ -2129,7 +2183,7 @@ msgstr "Tenging fjarlægð, leyndarmálum og öllu."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Tenging vistuð. Prófaðu hana til að ganga úr skugga um að hún virki."
 
-#: src/postulo/core/models.py:588
+#: src/postulo/core/models.py:591
 #, draft
 msgid "connection security"
 msgstr "öryggi tengingar"
@@ -2141,7 +2195,7 @@ msgstr "Öryggi tengingar"
 
 #: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:388
+#: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2259,7 +2313,7 @@ msgid ""
 msgstr ""
 "Talið af tímalínunni, svo viðtöl sem skráð voru áður en dagbókin varð til eru með."
 
-#: src/postulo/core/models.py:416 src/postulo/core/postal.py:170
+#: src/postulo/core/models.py:419 src/postulo/core/postal.py:170
 #, draft
 msgid "country"
 msgstr "land"
@@ -2304,7 +2358,7 @@ msgid "created"
 msgstr "stofnað"
 
 #: src/postulo/accounts/models.py:344 src/postulo/accounts/models.py:415
-#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:31
+#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:34
 #, draft
 msgid "created at"
 msgstr "stofnað þann"
@@ -2573,12 +2627,12 @@ msgstr "Hafnað"
 msgid "Declined. It will not be suggested again."
 msgstr "Hafnað. Þetta verður ekki lagt til aftur."
 
-#: src/postulo/core/models.py:550
+#: src/postulo/core/models.py:553
 #, draft
 msgid "default language"
 msgstr "sjálfgefið tungumál"
 
-#: src/postulo/core/models.py:561
+#: src/postulo/core/models.py:564
 #, draft
 msgid "default time zone"
 msgstr "sjálfgefið tímabelti"
@@ -2693,6 +2747,11 @@ msgstr "Svaraði ekki"
 #, draft
 msgid "did not answer when last checked"
 msgstr "svaraði ekki við síðustu athugun"
+
+#: src/postulo/core/models.py:612
+#, draft
+msgid "directory (tenant) ID"
+msgstr "auðkenni möppu (leigjanda)"
 
 #: src/postulo/templates/jobs/capture_list.html:45
 #: src/postulo/templates/jobs/listing_list.html:44
@@ -3239,7 +3298,7 @@ msgstr "Flutt út sér"
 msgid "Failed"
 msgstr "Mistókst"
 
-#: src/postulo/core/models.py:672 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:696 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Mistókst án þess að segja hvers vegna."
@@ -3254,7 +3313,7 @@ msgstr "Sýning"
 msgid "Fastest"
 msgstr "Hraðast"
 
-#: src/postulo/core/models.py:168
+#: src/postulo/core/models.py:171
 #, draft
 msgid "Fax"
 msgstr "Fax"
@@ -3444,6 +3503,11 @@ msgid ""
 msgstr ""
 "Að þvinga eitthvað á lætur það ekki keyra: tilkynnandi, geymsla eða samstilling þarf auðkenni sem aðeins þessi manneskja getur gefið. Það þýðir að hún má nota það og má ekki slökkva á því."
 
+#: src/postulo/templates/server/email.html:247
+#, draft
+msgid "Forget the grant"
+msgstr "Gleyma heimildinni"
+
 #: src/postulo/core/server_forms.py:218
 #, draft
 msgid "Forget the stored password"
@@ -3518,7 +3582,7 @@ msgstr "frá %(low)s"
 msgid "From %(name)s."
 msgstr "Frá %(name)s."
 
-#: src/postulo/core/models.py:596
+#: src/postulo/core/models.py:599
 #, draft
 msgid "from address"
 msgstr "sendandavistfang"
@@ -3638,6 +3702,11 @@ msgstr "Fengu eitthvert svar"
 msgid "grade"
 msgstr "einkunn"
 
+#: src/postulo/core/models.py:609
+#, draft
+msgid "grant"
+msgstr "heimild"
+
 #: src/postulo/accounts/models.py:335
 #, draft
 msgid "Gravatar checked on"
@@ -3735,7 +3804,7 @@ msgstr "hápunktar"
 msgid "highlights for this CV"
 msgstr "hápunktar fyrir þessa ferilskrá"
 
-#: src/postulo/core/models.py:166 src/postulo/core/models.py:391
+#: src/postulo/core/models.py:169 src/postulo/core/models.py:394
 #, draft
 msgid "Home"
 msgstr "Heima"
@@ -3805,6 +3874,11 @@ msgstr "Hversu reglulega"
 #, draft
 msgid "How the first rows will be read"
 msgstr "Hvernig fyrstu raðirnar verða lesnar"
+
+#: src/postulo/core/server_forms.py:236
+#, draft
+msgid "How the token is obtained"
+msgstr "Hvernig tókinn fæst"
 
 #: src/postulo/templates/server/capture.html:7
 #, draft
@@ -3887,7 +3961,17 @@ msgstr "Auðkenni"
 msgid "Identifies itself as"
 msgstr "Kynnir sig sem"
 
-#: src/postulo/core/server_views.py:717
+#: src/postulo/core/models.py:608
+#, draft
+msgid "identity provider"
+msgstr "auðkennisveita"
+
+#: src/postulo/core/server_forms.py:234
+#, draft
+msgid "Identity provider"
+msgstr "Auðkennisveita"
+
+#: src/postulo/core/server_views.py:789
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3901,7 +3985,7 @@ msgid ""
 msgstr ""
 "Ef þú hefur sótt um hjá ESB-stofnun eða gegnum opinbera vinnumiðlun áttu þessa skrá þegar. Í stað þess að skrifa allt aftur, réttu hana fram."
 
-#: src/postulo/core/models.py:519
+#: src/postulo/core/models.py:522
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "hunsa robots.txt við grípu"
@@ -4087,7 +4171,7 @@ msgstr "Uppsett á þessu uppsetti"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Að setja upp viðbót keyrir kóða annarra inni í Postulo."
 
-#: src/postulo/core/models.py:501
+#: src/postulo/core/models.py:504
 #, draft
 msgid "instance name"
 msgstr "heiti uppsets"
@@ -4102,7 +4186,7 @@ msgstr "stofnun"
 msgid "Insurance"
 msgstr "Tryggingar"
 
-#: src/postulo/core/server_views.py:797 src/postulo/plugins/provenance.py:59
+#: src/postulo/core/server_views.py:869 src/postulo/plugins/provenance.py:59
 #, draft
 msgid "Internal"
 msgstr "Innri"
@@ -4265,7 +4349,7 @@ msgid ""
 msgstr ""
 "Hún neitar að bera fram nokkuð frekar en að birta þessar færslur hverjum sem finnur hana. Settu POSTULO_LOGS_TOKEN, eða slökktu á POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:325
+#: src/postulo/plugins/views.py:351
 #, draft
 msgid "It works."
 msgstr "Það virkar."
@@ -4357,8 +4441,8 @@ msgstr ""
 
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
-#: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
+#: src/postulo/core/models.py:403 src/postulo/documents/models.py:112
 #: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
 #: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:243
@@ -4443,7 +4527,7 @@ msgstr "Tungumál"
 msgid "languages"
 msgstr "tungumál"
 
-#: src/postulo/core/models.py:560
+#: src/postulo/core/models.py:563
 #, draft
 msgid "languages offered"
 msgstr "tungumál í boði"
@@ -4557,7 +4641,7 @@ msgid "Leave a box empty and that line prints as it is written above it."
 msgstr ""
 "Skildu reit eftir auðan og sú lína prentast eins og hún stendur fyrir ofan."
 
-#: src/postulo/core/server_forms.py:215
+#: src/postulo/core/server_forms.py:215 src/postulo/core/server_forms.py:248
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "Skildu eftir autt til að halda því sem þegar er vistað."
@@ -4805,7 +4889,7 @@ msgstr "Lágstafir, tölustafir, punktar, undirstrik og bandstrik."
 msgid "Made"
 msgstr "Búinn til"
 
-#: src/postulo/core/models.py:627
+#: src/postulo/core/models.py:651
 #, draft
 msgid "mail failures in a row"
 msgstr "póstvillur í röð"
@@ -4826,7 +4910,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Póstur er eina leiðin til baka inn á reikning hér, svo þar til þetta virkar aftur kemst enginn af %(counter)s einstaklingunum á þessu tilviki inn aftur ef þeir gleyma lykilorðinu sínu."
 
-#: src/postulo/core/models.py:623
+#: src/postulo/core/models.py:647
 #, draft
 msgid "mail last failed"
 msgstr "póstur brást síðast"
@@ -4836,7 +4920,7 @@ msgstr "póstur brást síðast"
 msgid "Mail last went out at %(when)s."
 msgstr "Pósturinn fór síðast út %(when)s."
 
-#: src/postulo/core/models.py:622
+#: src/postulo/core/models.py:646
 #, draft
 msgid "mail last worked"
 msgstr "pósturinn virkaði síðast"
@@ -4855,17 +4939,22 @@ msgid ""
 msgstr ""
 "Pósturinn heldur ekki lengur flutningnum á sínum stað heldur, því leið sem afhendir ekkert verndar engan."
 
-#: src/postulo/core/models.py:600
+#: src/postulo/core/models.py:619
+#, draft
+msgid "mail OAuth secrets"
+msgstr "OAuth-leyndarmál pósts"
+
+#: src/postulo/core/models.py:624
 #, draft
 msgid "mail transport"
 msgstr "póstflutningsleið"
 
-#: src/postulo/core/server_forms.py:313
+#: src/postulo/core/server_forms.py:383
 #, draft
 msgid "Mail transport"
 msgstr "Póstflutningsleið"
 
-#: src/postulo/core/models.py:624
+#: src/postulo/core/models.py:648
 #, draft
 msgid "mail's last error"
 msgstr "síðasta póstvilla"
@@ -4986,12 +5075,19 @@ msgstr "Sameina við"
 msgid "Merged."
 msgstr "Sameinað."
 
+#: src/postulo/core/server_forms.py:284
+#, draft
+msgid ""
+"Microsoft only: the directory the application is registered in. Leave blank for an application that accepts any directory."
+msgstr ""
+"Aðeins Microsoft: mappan sem forritið er skráð í. Hafðu autt fyrir forrit sem tekur við hvaða möppu sem er."
+
 #: src/postulo/documents/models.py:221
 #, draft
 msgid "Missing entry"
 msgstr "Færsla vantar"
 
-#: src/postulo/core/models.py:164
+#: src/postulo/core/models.py:167
 #, draft
 msgid "Mobile"
 msgstr "Farsími"
@@ -5100,7 +5196,7 @@ msgid "NACE division"
 msgstr "NACE-deild"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/core/models.py:84 src/postulo/documents/models.py:109
 #: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
@@ -5119,7 +5215,7 @@ msgstr "heiti"
 msgid "Name"
 msgstr "Heiti"
 
-#: src/postulo/core/models.py:177 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
 #, draft
 msgid "name, if Other"
 msgstr "heiti, ef Annað"
@@ -5289,7 +5385,7 @@ msgstr "Engin fyrirtæki enn. Þau eru stofnuð fyrir þig þegar þú skráir u
 msgid "no company"
 msgstr "ekkert fyrirtæki"
 
-#: src/postulo/core/server_views.py:695
+#: src/postulo/core/server_views.py:739
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Engin tenging: %(why)s"
@@ -5304,6 +5400,11 @@ msgstr "Engar tengingar enn"
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
 "Engin skjalageymsla er tengd. Bættu einni við undir Stillingar → Tengingar."
+
+#: src/postulo/core/mail_auth.py:213 src/postulo/core/mail_auth.py:369
+#, draft
+msgid "No identity provider is chosen for mail."
+msgstr "Engin auðkennisveita er valin fyrir póst."
 
 #: src/postulo/templates/widgets/industries.html:41
 #, draft
@@ -5385,7 +5486,7 @@ msgstr "Engar auglýsingar skráðar fyrir þetta fyrirtæki."
 msgid "no role"
 msgstr "ekkert starf"
 
-#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:101
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:112
 #, draft
 msgid "No server to connect to."
 msgstr "Enginn þjónn til að tengjast."
@@ -5430,7 +5531,7 @@ msgstr "nei — aðeins reikningar sem þegar eru til"
 msgid "No-show"
 msgstr "Mætti ekki"
 
-#: src/postulo/plugins/consent.py:184
+#: src/postulo/plugins/consent.py:193
 #, draft
 msgid "Nobody has agreed to this yet. Connect it again."
 msgstr "Enginn hefur samþykkt þetta enn. Tengdu það aftur."
@@ -5439,6 +5540,18 @@ msgstr "Enginn hefur samþykkt þetta enn. Tengdu það aftur."
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
 msgstr "Enginn hefur svarað enn, svo ekkert er til að tímamæla."
+
+#: src/postulo/core/mail_auth.py:242
+#, draft
+msgid "Nobody has signed in to the mail provider yet. Connect it first."
+msgstr "Enginn hefur enn skráð sig inn hjá póstveitunni. Tengdu hana fyrst."
+
+#: src/postulo/templates/server/email.html:251
+#, draft
+msgid ""
+"Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
+msgstr ""
+"Enginn hefur enn skráð sig inn, svo ekkert er hægt að senda. Vistaðu stillingarnar hér að ofan og skráðu þig svo inn á síðu veitunnar sem pósthólfið sem þetta tilvik sendir frá."
 
 #: src/postulo/templates/jobs/company_detail.html:231
 #, draft
@@ -5581,7 +5694,7 @@ msgstr "ekki stillt"
 msgid "Not set here — the environment or the default applies"
 msgstr "Ekki stillt hér — umhverfið eða sjálfgildið gildir"
 
-#: src/postulo/core/server_forms.py:246
+#: src/postulo/core/server_forms.py:276
 #, draft
 msgid "Not set — the environment decides"
 msgstr "Ekki stillt — umhverfið ræður"
@@ -5835,7 +5948,7 @@ msgstr "Ekkert til að tengjast"
 msgid "Nothing to decide"
 msgstr "Ekkert til að ákveða"
 
-#: src/postulo/plugins/views.py:354
+#: src/postulo/plugins/views.py:380
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5863,18 +5976,18 @@ msgstr "Ekkert bíður"
 msgid "Nothing was added."
 msgstr "Engu var bætt við."
 
-#: src/postulo/plugins/views.py:280
+#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
 #, draft
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "Ekkert var tengt. Enginn samþykkti neitt."
 
 #: src/postulo/accounts/settings_views.py:147
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
 #, draft
 msgid "Nothing was different."
 msgstr "Ekkert var frábrugðið."
 
-#: src/postulo/core/server_views.py:1119
+#: src/postulo/core/server_views.py:1191
 #, draft
 msgid "Nothing was installed."
 msgstr "Ekkert var sett upp."
@@ -5948,7 +6061,7 @@ msgstr "Tilboð"
 msgid "Offer received"
 msgstr "Tilboð móttekið"
 
-#: src/postulo/core/models.py:548
+#: src/postulo/core/models.py:551
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Aðeins í boði á meðan póstur þessa tilviks kemst raunverulega til skila."
@@ -6145,17 +6258,29 @@ msgstr "Aðeins %(name)s"
 msgid "Only entries not already on it are listed."
 msgstr "Aðeins færslur sem eru ekki þegar á því eru taldar upp."
 
+#: src/postulo/templates/server/email.html:187
+#, draft
+msgid ""
+"Only for a provider that no longer accepts a password. Your own mail server needs none of this."
+msgstr ""
+"Aðeins fyrir veitu sem tekur ekki lengur við lykilorðum. Þinn eigin póstþjónn þarf ekkert af þessu."
+
 #: src/postulo/plugins/fetching.py:121
 #, draft
 msgid "Only http and https addresses can be captured."
 msgstr "Aðeins http- og https-vistföng má grípa."
 
-#: src/postulo/core/models.py:279
+#: src/postulo/core/models.py:282
 #, draft
 msgid ""
 "Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
 msgstr ""
 "Aðeins eitt af þínum eigin númerum getur hleypt þér aftur inn á reikninginn þinn. Þetta tilheyrir einhverjum sem þú átt í samskiptum við."
+
+#: src/postulo/core/mail_auth.py:364
+#, draft
+msgid "Only the administrator who started this can finish it."
+msgstr "Aðeins stjórnandinn sem byrjaði þetta getur lokið því."
 
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
@@ -6225,8 +6350,8 @@ msgid "Original posting"
 msgstr "Upphafleg auglýsing"
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
-#: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
+#: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
 #: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
 #: src/postulo/resume/models.py:219
 #, draft
@@ -6275,7 +6400,7 @@ msgstr "Aðeins útistandandi"
 msgid "Overview"
 msgstr "Samantekt"
 
-#: src/postulo/core/models.py:64
+#: src/postulo/core/models.py:67
 #, draft
 msgid "owner"
 msgstr "eigandi"
@@ -6349,7 +6474,7 @@ msgstr "Að hluta þýtt"
 msgid "Passkeys"
 msgstr "Lyklar"
 
-#: src/postulo/core/models.py:581
+#: src/postulo/core/models.py:584
 #, draft
 msgid "password"
 msgstr "lykilorð"
@@ -6471,7 +6596,7 @@ msgstr "Lyf"
 msgid "Phone"
 msgstr "Sími"
 
-#: src/postulo/core/models.py:182
+#: src/postulo/core/models.py:185
 #, draft
 msgid "phone"
 msgstr "sími"
@@ -6532,7 +6657,7 @@ msgid "plugin repository"
 msgstr "viðbótargeymsla"
 
 #: src/postulo/accounts/settings_views.py:125
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:751
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:823
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -6540,7 +6665,7 @@ msgstr "viðbótargeymsla"
 msgid "Plugins"
 msgstr "Viðbætur"
 
-#: src/postulo/core/server_views.py:952
+#: src/postulo/core/server_views.py:1024
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -6577,7 +6702,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP eða GIF allt að 5 MB. Hún er skorin í ferning og hreinsuð af öllu sem skráin vissi um hvar hún var tekin."
 
-#: src/postulo/core/models.py:572
+#: src/postulo/core/models.py:575
 #, draft
 msgid "port"
 msgstr "gátt"
@@ -6613,17 +6738,17 @@ msgstr "Verkefnasöfn, prófílar og myndbönd sem þú beindir þeim á."
 msgid "Positions"
 msgstr "Stöður"
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:396
 #, draft
 msgid "Postal"
 msgstr "Póstur"
 
-#: src/postulo/core/models.py:425
+#: src/postulo/core/models.py:428
 #, draft
 msgid "postal address"
 msgstr "heimilisfang"
 
-#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:426
+#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:429
 #: src/postulo/jobs/models.py:431
 #, draft
 msgid "postal addresses"
@@ -6634,7 +6759,7 @@ msgstr "heimilisföng"
 msgid "Postal addresses"
 msgstr "Heimilisföng"
 
-#: src/postulo/core/models.py:411
+#: src/postulo/core/models.py:414
 #, draft
 msgid "postcode"
 msgstr "póstnúmer"
@@ -6729,6 +6854,13 @@ msgid ""
 msgstr ""
 "Postulo hefur gleymt því. Þjónustuveitan hefur leyfið enn þar til þú dregur það til baka þar líka."
 
+#: src/postulo/core/server_views.py:759
+#, draft
+msgid ""
+"Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
+msgstr ""
+"Postulo hefur gleymt heimildinni. Veitan heldur henni þar til þú afturkallar hana þar líka."
+
 #: src/postulo/templates/server/plugins.html:127
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6798,7 +6930,7 @@ msgstr "Forskoðun"
 msgid "Previous"
 msgstr "Fyrri"
 
-#: src/postulo/core/models.py:186 src/postulo/core/models.py:417
+#: src/postulo/core/models.py:189 src/postulo/core/models.py:420
 #, draft
 msgid "primary"
 msgstr "aðal"
@@ -7187,7 +7319,7 @@ msgstr "Ábending"
 msgid "Refresh logo"
 msgstr "Endurnýja merki"
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:418
 #, draft
 msgid "region"
 msgstr "svæði"
@@ -7197,7 +7329,12 @@ msgstr "svæði"
 msgid "Register this address with the provider"
 msgstr "Skráðu þetta vistfang hjá þjónustuveitunni"
 
-#: src/postulo/plugins/consent.py:111
+#: src/postulo/core/mail_auth.py:316
+#, draft
+msgid "Register this instance with the provider first, and save the client ID."
+msgstr "Skráðu þetta tilvik fyrst hjá veitunni og vistaðu auðkenni biðlarans."
+
+#: src/postulo/plugins/consent.py:120
 #, draft
 msgid "Register this instance with the provider first, and save the client id."
 msgstr ""
@@ -7209,7 +7346,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr "Skráning er opin: hver sem finnur vistfangið má stofna reikning."
 
-#: src/postulo/core/models.py:513
+#: src/postulo/core/models.py:516
 #, draft
 msgid "registration open"
 msgstr "skráning opin"
@@ -7548,7 +7685,7 @@ msgstr "laun til"
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
 #: src/postulo/templates/server/defaults.html:72
-#: src/postulo/templates/server/email.html:175
+#: src/postulo/templates/server/email.html:222
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:98
@@ -7594,8 +7731,8 @@ msgstr ""
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:147
 #: src/postulo/core/server_views.py:389 src/postulo/core/server_views.py:517
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
-#: src/postulo/core/server_views.py:1053 src/postulo/resume/views.py:223
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
+#: src/postulo/core/server_views.py:1125 src/postulo/resume/views.py:223
 #, draft
 msgid "Saved."
 msgstr "Vistað."
@@ -7719,12 +7856,12 @@ msgstr "Velja allt á þessari síðu"
 msgid "Selected"
 msgstr "Valið"
 
-#: src/postulo/templates/server/email.html:189
+#: src/postulo/templates/server/email.html:261
 #, draft
 msgid "Send a real message"
 msgstr "Senda alvöru skilaboð"
 
-#: src/postulo/templates/server/email.html:195
+#: src/postulo/templates/server/email.html:267
 #, draft
 msgid "Send a test message"
 msgstr "Senda prófskilaboð"
@@ -7755,7 +7892,7 @@ msgstr "Senda í geymslur núna"
 msgid "Sending as yourself"
 msgstr "Senda sem þú sjálf"
 
-#: src/postulo/core/server_views.py:727
+#: src/postulo/core/server_views.py:799
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Sending mistókst: %(error)s"
@@ -7790,7 +7927,7 @@ msgstr "Send skjöl"
 msgid "sent on"
 msgstr "sent þann"
 
-#: src/postulo/core/server_views.py:730
+#: src/postulo/core/server_views.py:802
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Sent á %(to)s."
@@ -7951,7 +8088,7 @@ msgstr "Sýna líka liðið"
 msgid "Show this period"
 msgstr "Sýna þetta tímabil"
 
-#: src/postulo/core/models.py:504
+#: src/postulo/core/models.py:507
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Sýnt í hausnum og á innskráningarsíðunni."
@@ -7962,7 +8099,17 @@ msgstr "Sýnt í hausnum og á innskráningarsíðunni."
 msgid "Sign in"
 msgstr "Skrá inn"
 
-#: src/postulo/core/models.py:545
+#: src/postulo/templates/server/email.html:246
+#, draft
+msgid "Sign in again"
+msgstr "Skrá inn aftur"
+
+#: src/postulo/templates/server/email.html:253
+#, draft
+msgid "Sign in to the provider"
+msgstr "Skrá inn hjá veitunni"
+
+#: src/postulo/core/models.py:548
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "innskráning með kóða sendum í tölvupósti"
@@ -7995,6 +8142,40 @@ msgstr "Innskráning"
 msgid "Sign-in methods"
 msgstr "Innskráningarleiðir"
 
+#: src/postulo/core/mail_auth.py:65
+#, draft
+msgid "Signed in once, as the mailbox that sends"
+msgstr "Skráð inn einu sinni, sem pósthólfið sem sendir"
+
+#: src/postulo/core/server_forms.py:238
+#, draft
+msgid ""
+"Signed in once: somebody agrees on the provider's consent screen, as the mailbox that sends, and needs no administrator. The application sends on its own: Microsoft only, and needs a tenant administrator to grant the permission."
+msgstr ""
+"Skráð inn einu sinni: einhver samþykkir á samþykkissíðu veitunnar, sem pósthólfið sem sendir, án nokkurs stjórnanda. Forritið sendir upp á eigin spýtur: aðeins Microsoft, og stjórnandi leigjanda þarf að veita heimildina."
+
+#: src/postulo/plugins/views.py:314
+#, draft
+msgid "Signed in to the mail provider. Test the connection to make sure."
+msgstr "Skráð inn hjá póstveitunni. Prófaðu tenginguna til að vera viss."
+
+#: src/postulo/templates/server/email.html:243
+#, draft
+msgid ""
+"Signed in. The provider can withdraw this at any time — if a password is changed, or the account is not used for months — and mail then stops. The page above says so the moment a send fails."
+msgstr ""
+"Skráð inn. Veitan getur afturkallað þetta hvenær sem er — ef lykilorði er breytt eða reikningurinn er ónotaður mánuðum saman — og þá hættir pósturinn. Síðan hér að ofan segir frá því um leið og sending mistekst."
+
+#: src/postulo/core/server_forms.py:226
+#, draft
+msgid "Signing in"
+msgstr "Innskráning"
+
+#: src/postulo/templates/server/email.html:185
+#, draft
+msgid "Signing in with a token"
+msgstr "Innskráning með tóka"
+
 #: src/postulo/templates/server/signin.html:32
 #, draft
 msgid "Signs in to an existing account by e-mail"
@@ -8005,7 +8186,7 @@ msgstr "Skráir inn á reikning sem þegar er til með tölvupósti"
 msgid "Single sign-on"
 msgstr "Einfaldur aðgangur"
 
-#: src/postulo/core/models.py:524
+#: src/postulo/core/models.py:527
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "einfaldur aðgangur telst sem annar þátturinn"
@@ -8020,7 +8201,7 @@ msgstr "Einfaldur aðgangur telst sem annar þátturinn"
 msgid "Site search"
 msgstr "Leit á vefnum"
 
-#: src/postulo/core/models.py:640 src/postulo/core/models.py:641
+#: src/postulo/core/models.py:664 src/postulo/core/models.py:665
 #, draft
 msgid "site settings"
 msgstr "vefstillingar"
@@ -8078,12 +8259,12 @@ msgstr "sleppt"
 msgid "Slowest"
 msgstr "Hægast"
 
-#: src/postulo/core/models.py:82 src/postulo/jobs/models.py:42
+#: src/postulo/core/models.py:85 src/postulo/jobs/models.py:42
 #, draft
 msgid "slug"
 msgstr "stuttnefni"
 
-#: src/postulo/core/models.py:570
+#: src/postulo/core/models.py:573
 #, draft
 msgid "SMTP server"
 msgstr "SMTP-þjónn"
@@ -8373,7 +8554,7 @@ msgstr "Slökkva"
 msgid "Switch on"
 msgstr "Kveikja"
 
-#: src/postulo/core/models.py:167
+#: src/postulo/core/models.py:170
 #, draft
 msgid "Switchboard"
 msgstr "Skiptiborð"
@@ -8402,7 +8583,7 @@ msgid ""
 msgstr ""
 "Að slökkva á einni stöðvar notkun hennar og eyðir engu: allar tengingar sem þú hefur búið til standa nákvæmlega eins og þær eru, og að kveikja aftur skilar þeim óbreyttum."
 
-#: src/postulo/plugins/views.py:375
+#: src/postulo/plugins/views.py:401
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Samstilling mistókst: %(error)s"
@@ -8422,7 +8603,7 @@ msgstr "samstillingartenglar"
 msgid "Sync now"
 msgstr "Samstilla núna"
 
-#: src/postulo/plugins/views.py:377
+#: src/postulo/plugins/views.py:403
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Samstillt: %(summary)s."
@@ -8442,7 +8623,7 @@ msgstr "Tafla"
 msgid "table settings"
 msgstr "töflustillingar"
 
-#: src/postulo/core/models.py:91
+#: src/postulo/core/models.py:94
 #, draft
 msgid "tag"
 msgstr "merkimiði"
@@ -8455,7 +8636,7 @@ msgstr "merkimiði"
 msgid "Tag"
 msgstr "Merkimiði"
 
-#: src/postulo/core/models.py:507
+#: src/postulo/core/models.py:510
 #, draft
 msgid "tagline"
 msgstr "slagorð"
@@ -8468,7 +8649,7 @@ msgstr "slagorð"
 msgid "Tags"
 msgstr "Merkimiðar"
 
-#: src/postulo/applications/models.py:241 src/postulo/core/models.py:92
+#: src/postulo/applications/models.py:241 src/postulo/core/models.py:95
 #, draft
 msgid "tags"
 msgstr "merkimiðar"
@@ -8509,12 +8690,12 @@ msgstr "sími"
 msgid "Telephone number"
 msgstr "Símanúmer"
 
-#: src/postulo/core/models.py:213
+#: src/postulo/core/models.py:216
 #, draft
 msgid "telephone number"
 msgstr "símanúmer"
 
-#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:214
+#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:217
 #: src/postulo/jobs/models.py:428
 #, draft
 msgid "telephone numbers"
@@ -8540,12 +8721,12 @@ msgstr "Sniðmát birtast þegar þú sendir bréf með umsókn."
 msgid "Test"
 msgstr "Prófa"
 
-#: src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:353
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Prófun mistókst: %(message)s"
 
-#: src/postulo/templates/server/email.html:181
+#: src/postulo/templates/server/email.html:228
 #, draft
 msgid "Test the connection"
 msgstr "Prófa tenginguna"
@@ -8560,17 +8741,17 @@ msgstr "texti"
 msgid "text as sent"
 msgstr "texti eins og hann var sendur"
 
-#: src/postulo/core/models.py:616
+#: src/postulo/core/models.py:640
 #, draft
 msgid "text configuration"
 msgstr "skilaboðastillingar"
 
-#: src/postulo/core/models.py:617
+#: src/postulo/core/models.py:641
 #, draft
 msgid "text secrets"
 msgstr "skilaboðaleyndarmál"
 
-#: src/postulo/core/models.py:615
+#: src/postulo/core/models.py:639
 #, draft
 msgid "text transport"
 msgstr "skilaboðaflutningur"
@@ -8609,17 +8790,17 @@ msgid ""
 msgstr ""
 "Sú keðja er dýpri en %(limit)s fyrirtæki, dýpri en nokkur samstæða sem Postulo getur teiknað að gagni."
 
-#: src/postulo/plugins/consent.py:147
+#: src/postulo/plugins/consent.py:156
 #, draft
 msgid "That connection belongs to somebody else."
 msgstr "Sú tenging tilheyrir öðrum."
 
-#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#: src/postulo/plugins/consent.py:116 src/postulo/plugins/consent.py:161
 #, draft
 msgid "That connection does not use consent."
 msgstr "Sú tenging notar ekki samþykki."
 
-#: src/postulo/plugins/consent.py:145
+#: src/postulo/plugins/consent.py:154
 #, draft
 msgid "That connection no longer exists."
 msgstr "Sú tenging er ekki lengur til."
@@ -8748,7 +8929,7 @@ msgstr "Þetta er ekki eitthvað sem Postulo getur gert í því."
 msgid "That is not something Postulo can do to several at once."
 msgstr "Þetta getur Postulo ekki gert við margar í einu."
 
-#: src/postulo/core/server_views.py:1029 src/postulo/core/server_views.py:1070
+#: src/postulo/core/server_views.py:1101 src/postulo/core/server_views.py:1142
 #, draft
 msgid "That is not something this page does."
 msgstr "Þetta er ekki eitthvað sem þessi síða gerir."
@@ -8809,7 +8990,7 @@ msgid ""
 msgstr ""
 "Þetta númer er þegar skráð á þessari uppsetningu. Símanúmer eru höfð einstök á öllum aðgöngum hér, svo það kann að tilheyra gögnum einhvers annars."
 
-#: src/postulo/core/server_views.py:1128 src/postulo/core/server_views.py:1133
+#: src/postulo/core/server_views.py:1200 src/postulo/core/server_views.py:1205
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Sá pakki bíður ekki lengur; hlaðið honum upp aftur."
@@ -8834,12 +9015,12 @@ msgstr "Sú síða skilaði %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Sú mynd er yfir 5 MB. Minni, takk."
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:301
+#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Sú viðbót er ekki lengur uppsett."
 
-#: src/postulo/plugins/consent.py:140
+#: src/postulo/core/mail_auth.py:360 src/postulo/plugins/consent.py:149
 #, draft
 msgid "That reply did not come from a request Postulo made."
 msgstr "Það svar kom ekki frá beiðni sem Postulo sendi."
@@ -8889,6 +9070,11 @@ msgstr "Vistfangið svaraði engu."
 msgid "The application deadline, if stated."
 msgstr "Umsóknarfresturinn, sé hann gefinn upp."
 
+#: src/postulo/core/mail_auth.py:66
+#, draft
+msgid "The application sends on its own"
+msgstr "Forritið sendir upp á eigin spýtur"
+
 #: src/postulo/plugins/catalogue.py:184
 #, draft
 msgid "The catalogue is not readable JSON."
@@ -8905,10 +9091,17 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Undirritun eða lykill skrárinnar er ekki læsilegur: %(error)s"
 
-#: src/postulo/core/server_views.py:1185
+#: src/postulo/core/server_views.py:1257
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Skrárnar svöruðu, og telja ekkert upp enn."
+
+#: src/postulo/templates/server/email.html:203
+#, python-format, draft
+msgid ""
+"The client secret is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
+msgstr ""
+"Leynilykill biðlara er stilltur með <code>%(variable)s</code> í umhverfinu; breyttu honum þar. Hann er aldrei sýndur hér."
 
 #: src/postulo/templates/applications/application_intake.html:10
 #, draft
@@ -8966,7 +9159,7 @@ msgstr "Fyrri útgáfan sem þessi leysir af hólmi. Gamla skráin er geymd."
 msgid "The employer as a whole"
 msgstr "Vinnuveitandinn í heild"
 
-#: src/postulo/core/server_views.py:988 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:1060 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Umhverfið stillir „%(name)s“, svo því verður ekki breytt hér."
@@ -9018,7 +9211,7 @@ msgstr "Uppsetningarforritið hafnaði henni: %(error)s"
 msgid "The job title"
 msgstr "Starfsheitið"
 
-#: src/postulo/core/server_views.py:1045
+#: src/postulo/core/server_views.py:1117
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -9085,10 +9278,15 @@ msgid ""
 msgstr ""
 "Lengsta bilið er mælt innan þessa tímabils. Tímabil sem er enn í gangi er talið fram að þeim degi sem þetta var búið til. Vika merkt (að hluta) nær út fyrir tímabilið; ekkert utan þess er talið með."
 
-#: src/postulo/core/server_views.py:732
+#: src/postulo/core/server_views.py:804
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Póstbakendinn tók ekki við neinu."
+
+#: src/postulo/templates/server/email.html:240
+#, draft
+msgid "The mailbox this instance sends from"
+msgstr "Pósthólfið sem þetta tilvik sendir frá"
 
 #: src/postulo/templates/resume/preview.html:12
 #, draft
@@ -9109,7 +9307,7 @@ msgid ""
 msgstr ""
 "Númerið sem hleypir þér inn aftur er aðskilið frá því sem skjölin þín prenta, svo að breyta því sem ráðningaraðili hringir í breytir ekki því hvernig þú sannar að þetta sért þú. Það þarf að staðfesta fyrst, og að slökkva á mörgum símanúmerum tekur það aldrei af þér."
 
-#: src/postulo/core/server_views.py:1018
+#: src/postulo/core/server_views.py:1090
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Opinbera geymslan er tæmd, ekki fjarlægð."
@@ -9129,7 +9327,7 @@ msgstr "Það á undan"
 msgid "The opening paragraph, if you use one."
 msgstr "Upphafsmálsgreinin, ef þú notar hana."
 
-#: src/postulo/templates/server/email.html:162
+#: src/postulo/templates/server/email.html:164
 #, python-format, draft
 msgid ""
 "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -9141,7 +9339,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Launin"
 
-#: src/postulo/core/server_views.py:798
+#: src/postulo/core/server_views.py:870
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Viðbæturnar sem fylgja inni í Postulo. Ekkert er sótt."
@@ -9163,18 +9361,25 @@ msgstr "auglýsingin"
 msgid "The posting itself"
 msgstr "Auglýsingin sjálf"
 
-#: src/postulo/plugins/consent.py:241
+#: src/postulo/plugins/consent.py:251
 #, python-format, draft
 msgid "The provider answered %(status)s."
 msgstr "Þjónustuveitan svaraði %(status)s."
 
-#: src/postulo/plugins/consent.py:237
+#: src/postulo/core/mail_auth.py:388
+#, draft
+msgid ""
+"The provider sent no refresh token, so mail would stop within the hour. Check that offline access is allowed for this application."
+msgstr ""
+"Veitan sendi engan endurnýjunartóka, svo pósturinn myndi hætta innan klukkustundar. Athugaðu að aðgangur án tengingar sé leyfður fyrir þetta forrit."
+
+#: src/postulo/plugins/consent.py:247
 #, draft
 msgid "The provider will not renew this. Somebody has to agree to it again."
 msgstr ""
 "Þjónustuveitan endurnýjar þetta ekki. Einhver þarf að samþykkja það aftur."
 
-#: src/postulo/plugins/consent.py:246
+#: src/postulo/plugins/consent.py:256
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "Svar þjónustuveitunnar var ekki læsilegt."
@@ -9212,7 +9417,7 @@ msgid ""
 msgstr ""
 "Þjónninn býður ekki STARTTLS. Slökktu á því, eða notaðu gátt sem gerir það."
 
-#: src/postulo/core/mail.py:122
+#: src/postulo/core/mail.py:134
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "Þjónninn hafnaði þessum auðkennum: %(detail)s"
@@ -9248,6 +9453,11 @@ msgstr "Vefurinn vísar Postulo frá, eða auglýsingin krefst innskráningar"
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "robots.txt vefsins er virt."
+
+#: src/postulo/core/mail_auth.py:220
+#, draft
+msgid "The stored mail credentials cannot be read on this instance."
+msgstr "Ekki er hægt að lesa vistuð póstauðkenni á þessu tilviki."
 
 #: src/postulo/templates/settings/appearance.html:7
 #, draft
@@ -9314,7 +9524,7 @@ msgstr "Það er ekkert vistfang til að sækja hana af aftur."
 msgid "There is no file to send."
 msgstr "Það er engin skrá til að senda."
 
-#: src/postulo/core/server_views.py:983
+#: src/postulo/core/server_views.py:1055
 #, draft
 msgid "There is no repository by that name."
 msgstr "Það er engin geymsla með því nafni."
@@ -9550,7 +9760,7 @@ msgstr "tímalínufærsla"
 msgid "Timeout"
 msgstr "Tímamörk"
 
-#: src/postulo/core/models.py:594
+#: src/postulo/core/models.py:597
 #, draft
 msgid "timeout in seconds"
 msgstr "tímamörk í sekúndum"
@@ -9631,7 +9841,7 @@ msgstr "Of mörg skilaboð. Reyndu aftur fljótlega."
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr "Of margar beiðnir: %(times)d leyfðar á hverjum %(seconds)d sekúndum."
 
-#: src/postulo/core/models.py:412
+#: src/postulo/core/models.py:415
 #, draft
 msgid "town or city"
 msgstr "staður"
@@ -9658,12 +9868,12 @@ msgstr "þýðingar"
 msgid "Transport and logistics"
 msgstr "Flutningar"
 
-#: src/postulo/core/models.py:605
+#: src/postulo/core/models.py:629
 #, draft
 msgid "transport configuration"
 msgstr "uppsetning flutningsleiðar"
 
-#: src/postulo/core/models.py:607
+#: src/postulo/core/models.py:631
 #, draft
 msgid "transport secrets"
 msgstr "leyndarmál flutningsleiðar"
@@ -9770,13 +9980,13 @@ msgstr "allt að %(high)s"
 msgid "Update the preview"
 msgstr "Uppfæra forskoðunina"
 
-#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:32
-#: src/postulo/core/models.py:629
+#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:35
+#: src/postulo/core/models.py:653
 #, draft
 msgid "updated at"
 msgstr "uppfært þann"
 
-#: src/postulo/core/models.py:636
+#: src/postulo/core/models.py:660
 #, draft
 msgid "updated by"
 msgstr "uppfært af"
@@ -9884,7 +10094,7 @@ msgstr "notandi"
 msgid "Username"
 msgstr "Notandanafn"
 
-#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:577
+#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:580
 #, draft
 msgid "username"
 msgstr "notandanafn"
@@ -9899,7 +10109,7 @@ msgstr "Notandanafn eða netfang"
 msgid "users"
 msgstr "notendur"
 
-#: src/postulo/templates/server/email.html:191
+#: src/postulo/templates/server/email.html:263
 #, draft
 msgid ""
 "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
@@ -9916,7 +10126,7 @@ msgstr "Að nota teikn"
 msgid "Utilities"
 msgstr "Veitur"
 
-#: src/postulo/core/models.py:192
+#: src/postulo/core/models.py:195
 #, draft
 msgid "verified"
 msgstr "staðfest"
@@ -9997,7 +10207,7 @@ msgstr "Bíður notkunar"
 msgid "was “%(text)s”"
 msgstr "var „%(text)s“"
 
-#: src/postulo/core/models.py:203
+#: src/postulo/core/models.py:206
 #, draft
 msgid "way back into the account"
 msgstr "leið aftur inn á reikninginn"
@@ -10083,7 +10293,7 @@ msgstr "Hvað kom til baka"
 msgid "What came back in this period"
 msgstr "Hvað kom til baka á þessu tímabili"
 
-#: src/postulo/core/server_forms.py:316
+#: src/postulo/core/server_forms.py:386
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "Hvað ber póstinn af þessari vél."
@@ -10287,6 +10497,13 @@ msgstr "Þegar samþykki á líka að færa umsóknina."
 msgid "When it entered your listings."
 msgstr "Hvenær hún barst í auglýsingarnar þínar."
 
+#: src/postulo/templates/server/email.html:215
+#, draft
+msgid ""
+"When you register this instance with the provider, give it this address to send people back to:"
+msgstr ""
+"Þegar þú skráir þetta tilvik hjá veitunni skaltu gefa henni þetta vistfang til að senda fólk aftur til:"
+
 #: src/postulo/applications/models.py:527
 #, draft
 msgid "where"
@@ -10356,12 +10573,12 @@ msgstr "hvar þú býrð"
 msgid "Where your job search stands today."
 msgstr "Hvernig atvinnuleitin þín stendur í dag."
 
-#: src/postulo/core/models.py:516
+#: src/postulo/core/models.py:519
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Hvort hver sem finnur vistfangið megi stofna reikning."
 
-#: src/postulo/core/models.py:527
+#: src/postulo/core/models.py:530
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -10488,7 +10705,7 @@ msgstr "Með: %(people)s"
 msgid "Withdrawn"
 msgstr "Dregið til baka"
 
-#: src/postulo/core/models.py:165 src/postulo/core/models.py:392
+#: src/postulo/core/models.py:168 src/postulo/core/models.py:395
 #, draft
 msgid "Work"
 msgstr "Vinna"
@@ -10546,6 +10763,11 @@ msgstr ""
 #, draft
 msgid "written, not yet read by a speaker"
 msgstr "skrifað, ekki enn lesið af málhafa"
+
+#: src/postulo/core/mail_auth.py:47
+#, draft
+msgid "XOAUTH2, with a token from the provider"
+msgstr "XOAUTH2, með tóka frá veitunni"
 
 #: src/postulo/core/server_forms.py:14
 #, draft
@@ -10831,7 +11053,7 @@ msgid ""
 msgstr ""
 "Nafnið þitt og tengiliðareiturinn sem prentaður verður á ferilskrárnar þínar. Hvernig Postulo hegðar sér gagnvart þér — þema, tungumál, notandanafn, vistföng — er undir <a href=\"%(settings_url)s\" class=\"underline\">Stillingum</a>."
 
-#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
+#: src/postulo/core/models.py:183 src/postulo/core/models.py:408
 #, draft
 msgid "Your name for it, when none of the kinds above fits."
 msgstr "Þitt eigið heiti á því, þegar engin tegundanna hér að ofan á við."
@@ -10907,20 +11129,20 @@ msgstr "· hluti þessarar viku er utan tímabilsins"
 msgid "· still running"
 msgstr "· enn í gangi"
 
-#: src/postulo/core/server_views.py:1024
+#: src/postulo/core/server_views.py:1096
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr ""
 "„%(name)s“ er horfin. Allt sem sett var upp úr henni stendur áfram uppsett."
 
-#: src/postulo/core/server_views.py:1009
+#: src/postulo/core/server_views.py:1081
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "„%(name)s“ er slökkt. Ekkert nýtt er sett upp eða uppfært úr henni; það sem þegar var uppsett heldur áfram að virka."
 
-#: src/postulo/core/server_views.py:1006
+#: src/postulo/core/server_views.py:1078
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr "„%(name)s“ er kveikt. Setja má upp og uppfæra viðbætur úr henni."

@@ -16,6 +16,7 @@ urlpatterns = [
     path("sign-in/", views.SignInView.as_view(), name="signin"),
     path("email/", views.EmailView.as_view(), name="email"),
     path("email/test/", views.EmailTestView.as_view(), name="email_test"),
+    path("email/consent/", views.EmailConsentView.as_view(), name="email_consent"),
     path(
         "email/connection/",
         views.EmailConnectionTestView.as_view(),

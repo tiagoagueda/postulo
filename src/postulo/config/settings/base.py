@@ -532,6 +532,15 @@ POSTULO_EMAIL_SECURITY = (
     .lower()
 )
 POSTULO_EMAIL_TIMEOUT = env.int("POSTULO_EMAIL_TIMEOUT", default=10)
+# How the server is told who is connecting: "password" (the default, and what a relay of
+# your own wants) or "xoauth2", which Microsoft 365 requires from the end of December 2026
+# and Google accepts (#151). The OAuth half is only read when this says xoauth2.
+POSTULO_EMAIL_AUTH = env.str("POSTULO_EMAIL_AUTH", default="password").strip().lower()
+POSTULO_EMAIL_OAUTH_PROVIDER = env.str("POSTULO_EMAIL_OAUTH_PROVIDER", default="").strip().lower()
+POSTULO_EMAIL_OAUTH_GRANT = env.str("POSTULO_EMAIL_OAUTH_GRANT", default="").strip().lower()
+POSTULO_EMAIL_OAUTH_TENANT = env("POSTULO_EMAIL_OAUTH_TENANT", default="")
+POSTULO_EMAIL_OAUTH_CLIENT_ID = env("POSTULO_EMAIL_OAUTH_CLIENT_ID", default="")
+POSTULO_EMAIL_OAUTH_CLIENT_SECRET = env("POSTULO_EMAIL_OAUTH_CLIENT_SECRET", default="")
 
 # --------------------------------------------------------------------- logging
 

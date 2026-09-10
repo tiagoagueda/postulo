@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:54+0000\n"
+"POT-Creation-Date: 2026-09-10 08:21+0000\n"
 "PO-Revision-Date: 2026-09-06 21:17+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Tshivenḓa\n"
@@ -42,7 +42,7 @@ msgstr ""
 msgid "%(count)d %(noun)s changed."
 msgstr ""
 
-#: src/postulo/plugins/views.py:345
+#: src/postulo/plugins/views.py:371
 #, python-format
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -214,12 +214,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr ""
 
-#: src/postulo/core/server_views.py:1200
+#: src/postulo/core/server_views.py:1272
 #, python-format
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1150
+#: src/postulo/core/server_views.py:1222
 #, python-format
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -288,18 +288,18 @@ msgstr ""
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1261
+#: src/postulo/core/server_views.py:1333
 #, python-format
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1233
+#: src/postulo/core/server_views.py:1305
 #, python-format
 msgid "%(name)s is switched off; its files are still here."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1235
+#: src/postulo/core/server_views.py:1307
 #, python-format
 msgid "%(name)s is switched on again."
 msgstr ""
@@ -361,6 +361,17 @@ msgstr ""
 #: src/postulo/plugins/forms.py:200
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
+msgstr ""
+
+#: src/postulo/core/mail_auth.py:234
+#, python-format
+msgid "%(provider)s does not let an application send on its own."
+msgstr ""
+
+#: src/postulo/core/server_forms.py:343
+#, python-format
+msgid ""
+"%(provider)s does not let an application send on its own. Choose “Signed in once”."
 msgstr ""
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
@@ -465,7 +476,7 @@ msgstr ""
 msgid "%(when)s ago"
 msgstr ""
 
-#: src/postulo/core/models.py:445
+#: src/postulo/core/models.py:448
 msgid "(empty address)"
 msgstr ""
 
@@ -501,6 +512,10 @@ msgid ""
 "A browser extension needs only the first. Give an agent read alone until you trust it with write."
 msgstr ""
 
+#: src/postulo/templates/server/email.html:210
+msgid "A client secret is stored. It is never shown."
+msgstr ""
+
 #: src/postulo/jobs/models.py:196
 msgid "A company cannot be part of itself."
 msgstr ""
@@ -526,11 +541,11 @@ msgstr ""
 msgid "A CSV file"
 msgstr ""
 
-#: src/postulo/core/models.py:87
+#: src/postulo/core/models.py:90
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr ""
 
-#: src/postulo/core/models.py:510
+#: src/postulo/core/models.py:513
 msgid "A line under the name on the sign-in page. Optional."
 msgstr ""
 
@@ -547,7 +562,7 @@ msgstr ""
 msgid "A month"
 msgstr ""
 
-#: src/postulo/core/models.py:288
+#: src/postulo/core/models.py:291
 msgid ""
 "A number has to be confirmed before it can get you back in. Nobody has answered on this one."
 msgstr ""
@@ -569,8 +584,17 @@ msgid ""
 "A passkey is tied to the address you made it at, which here is %(host)s. Reaching this instance by another name, or moving it, will not carry your passkeys over."
 msgstr ""
 
-#: src/postulo/templates/server/email.html:169
+#: src/postulo/core/server_forms.py:228
+msgid ""
+"A password is right for your own mail server, and for Gmail with an app password. Microsoft 365 stops accepting passwords for sending mail by default at the end of December 2026; after that it needs XOAUTH2."
+msgstr ""
+
+#: src/postulo/templates/server/email.html:171
 msgid "A password is stored. It is never shown, not even its length."
+msgstr ""
+
+#: src/postulo/core/mail_auth.py:46
+msgid "A password, or an app password"
 msgstr ""
 
 #: src/postulo/templates/widgets/suggestions.html:6
@@ -670,7 +694,7 @@ msgid ""
 "A template with Postulo's own columns and one example row. Fill it in and upload it above."
 msgstr ""
 
-#: src/postulo/core/server_views.py:715
+#: src/postulo/core/server_views.py:787
 #, python-format
 msgid "A test message from %(name)s"
 msgstr ""
@@ -883,7 +907,7 @@ msgstr ""
 msgid "Address"
 msgstr ""
 
-#: src/postulo/core/models.py:410 src/postulo/jobs/models.py:740
+#: src/postulo/core/models.py:413 src/postulo/jobs/models.py:740
 #: src/postulo/resume/models.py:242
 msgid "address"
 msgstr ""
@@ -1237,6 +1261,10 @@ msgstr ""
 msgid "attempts"
 msgstr ""
 
+#: src/postulo/core/models.py:607
+msgid "authentication"
+msgstr ""
+
 #: src/postulo/jobs/industries.py:83
 msgid "Automotive"
 msgstr ""
@@ -1588,8 +1616,12 @@ msgstr ""
 msgid "Choose a new password"
 msgstr ""
 
-#: src/postulo/core/server_views.py:1081
+#: src/postulo/core/server_views.py:1153
 msgid "Choose a package first."
+msgstr ""
+
+#: src/postulo/core/mail_auth.py:312
+msgid "Choose an identity provider and save it first."
 msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html:102
@@ -1636,6 +1668,14 @@ msgstr ""
 msgid "Cleared: this entry prints its original text in %(language)s."
 msgstr ""
 
+#: src/postulo/core/models.py:613
+msgid "client ID"
+msgstr ""
+
+#: src/postulo/core/server_forms.py:245
+msgid "Client secret"
+msgstr ""
+
 #: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:663
 msgid "Closed"
 msgstr ""
@@ -1674,7 +1714,7 @@ msgstr ""
 msgid "code repository"
 msgstr ""
 
-#: src/postulo/core/models.py:84
+#: src/postulo/core/models.py:87
 msgid "colour"
 msgstr ""
 
@@ -1780,17 +1820,22 @@ msgstr ""
 msgid "Connect %(plugin)s"
 msgstr ""
 
-#: src/postulo/core/mail.py:133
+#: src/postulo/core/mail.py:145
+#, python-format
+msgid "Connected to %(host)s:%(port)s and signed in as %(user)s with a token."
+msgstr ""
+
+#: src/postulo/core/mail.py:151
 #, python-format
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr ""
 
-#: src/postulo/core/mail.py:138
+#: src/postulo/core/mail.py:156
 #, python-format
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 
-#: src/postulo/plugins/views.py:289
+#: src/postulo/plugins/views.py:298
 msgid "Connected. Test it to make sure it works."
 msgstr ""
 
@@ -1799,7 +1844,7 @@ msgstr ""
 msgid "connection"
 msgstr ""
 
-#: src/postulo/plugins/views.py:392
+#: src/postulo/plugins/views.py:418
 msgid "Connection removed, secrets included."
 msgstr ""
 
@@ -1807,7 +1852,7 @@ msgstr ""
 msgid "Connection saved. Test it to make sure it works."
 msgstr ""
 
-#: src/postulo/core/models.py:588
+#: src/postulo/core/models.py:591
 msgid "connection security"
 msgstr ""
 
@@ -1817,7 +1862,7 @@ msgstr ""
 
 #: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:388
+#: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
 msgid "Connections"
 msgstr ""
@@ -1912,7 +1957,7 @@ msgid ""
 "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr ""
 
-#: src/postulo/core/models.py:416 src/postulo/core/postal.py:170
+#: src/postulo/core/models.py:419 src/postulo/core/postal.py:170
 msgid "country"
 msgstr ""
 
@@ -1949,7 +1994,7 @@ msgid "created"
 msgstr ""
 
 #: src/postulo/accounts/models.py:344 src/postulo/accounts/models.py:415
-#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:31
+#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:34
 msgid "created at"
 msgstr ""
 
@@ -2153,11 +2198,11 @@ msgstr ""
 msgid "Declined. It will not be suggested again."
 msgstr ""
 
-#: src/postulo/core/models.py:550
+#: src/postulo/core/models.py:553
 msgid "default language"
 msgstr ""
 
-#: src/postulo/core/models.py:561
+#: src/postulo/core/models.py:564
 msgid "default time zone"
 msgstr ""
 
@@ -2251,6 +2296,10 @@ msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html:55
 msgid "did not answer when last checked"
+msgstr ""
+
+#: src/postulo/core/models.py:612
+msgid "directory (tenant) ID"
 msgstr ""
 
 #: src/postulo/templates/jobs/capture_list.html:45
@@ -2687,7 +2736,7 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
-#: src/postulo/core/models.py:672 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:696 src/postulo/plugins/models.py:239
 msgid "Failed without saying why."
 msgstr ""
 
@@ -2699,7 +2748,7 @@ msgstr ""
 msgid "Fastest"
 msgstr ""
 
-#: src/postulo/core/models.py:168
+#: src/postulo/core/models.py:171
 msgid "Fax"
 msgstr ""
 
@@ -2852,6 +2901,10 @@ msgid ""
 "Forcing one on does not make it run: a notifier, a store or a synchronisation needs credentials only this person can give it. It means they may use it and may not switch it off."
 msgstr ""
 
+#: src/postulo/templates/server/email.html:247
+msgid "Forget the grant"
+msgstr ""
+
 #: src/postulo/core/server_forms.py:218
 msgid "Forget the stored password"
 msgstr ""
@@ -2917,7 +2970,7 @@ msgstr ""
 msgid "From %(name)s."
 msgstr ""
 
-#: src/postulo/core/models.py:596
+#: src/postulo/core/models.py:599
 msgid "from address"
 msgstr ""
 
@@ -3013,6 +3066,10 @@ msgstr ""
 msgid "grade"
 msgstr ""
 
+#: src/postulo/core/models.py:609
+msgid "grant"
+msgstr ""
+
 #: src/postulo/accounts/models.py:335
 msgid "Gravatar checked on"
 msgstr ""
@@ -3090,7 +3147,7 @@ msgstr ""
 msgid "highlights for this CV"
 msgstr ""
 
-#: src/postulo/core/models.py:166 src/postulo/core/models.py:391
+#: src/postulo/core/models.py:169 src/postulo/core/models.py:394
 msgid "Home"
 msgstr ""
 
@@ -3143,6 +3200,10 @@ msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html:57
 msgid "How the first rows will be read"
+msgstr ""
+
+#: src/postulo/core/server_forms.py:236
+msgid "How the token is obtained"
 msgstr ""
 
 #: src/postulo/templates/server/capture.html:7
@@ -3209,7 +3270,15 @@ msgstr ""
 msgid "Identifies itself as"
 msgstr ""
 
-#: src/postulo/core/server_views.py:717
+#: src/postulo/core/models.py:608
+msgid "identity provider"
+msgstr ""
+
+#: src/postulo/core/server_forms.py:234
+msgid "Identity provider"
+msgstr ""
+
+#: src/postulo/core/server_views.py:789
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr ""
@@ -3219,7 +3288,7 @@ msgid ""
 "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
 msgstr ""
 
-#: src/postulo/core/models.py:519
+#: src/postulo/core/models.py:522
 msgid "ignore robots.txt when capturing"
 msgstr ""
 
@@ -3373,7 +3442,7 @@ msgstr ""
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr ""
 
-#: src/postulo/core/models.py:501
+#: src/postulo/core/models.py:504
 msgid "instance name"
 msgstr ""
 
@@ -3385,7 +3454,7 @@ msgstr ""
 msgid "Insurance"
 msgstr ""
 
-#: src/postulo/core/server_views.py:797 src/postulo/plugins/provenance.py:59
+#: src/postulo/core/server_views.py:869 src/postulo/plugins/provenance.py:59
 msgid "Internal"
 msgstr ""
 
@@ -3514,7 +3583,7 @@ msgid ""
 "It refuses to serve anything rather than publishing these records to whoever finds it. Set POSTULO_LOGS_TOKEN, or turn POSTULO_LOGS_ENDPOINT_ENABLED off."
 msgstr ""
 
-#: src/postulo/plugins/views.py:325
+#: src/postulo/plugins/views.py:351
 msgid "It works."
 msgstr ""
 
@@ -3587,8 +3656,8 @@ msgstr ""
 
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
-#: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
+#: src/postulo/core/models.py:403 src/postulo/documents/models.py:112
 #: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
 #: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:243
@@ -3659,7 +3728,7 @@ msgstr ""
 msgid "languages"
 msgstr ""
 
-#: src/postulo/core/models.py:560
+#: src/postulo/core/models.py:563
 msgid "languages offered"
 msgstr ""
 
@@ -3751,7 +3820,7 @@ msgstr ""
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr ""
 
-#: src/postulo/core/server_forms.py:215
+#: src/postulo/core/server_forms.py:215 src/postulo/core/server_forms.py:248
 msgid "Leave blank to keep the one already stored."
 msgstr ""
 
@@ -3952,7 +4021,7 @@ msgstr ""
 msgid "Made"
 msgstr ""
 
-#: src/postulo/core/models.py:627
+#: src/postulo/core/models.py:651
 msgid "mail failures in a row"
 msgstr ""
 
@@ -3969,7 +4038,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/core/models.py:623
+#: src/postulo/core/models.py:647
 msgid "mail last failed"
 msgstr ""
 
@@ -3978,7 +4047,7 @@ msgstr ""
 msgid "Mail last went out at %(when)s."
 msgstr ""
 
-#: src/postulo/core/models.py:622
+#: src/postulo/core/models.py:646
 msgid "mail last worked"
 msgstr ""
 
@@ -3992,15 +4061,19 @@ msgid ""
 "Mail no longer holds the transport in place either, because a route that delivers nothing is not protecting anybody."
 msgstr ""
 
-#: src/postulo/core/models.py:600
-msgid "mail transport"
-msgstr ""
-
-#: src/postulo/core/server_forms.py:313
-msgid "Mail transport"
+#: src/postulo/core/models.py:619
+msgid "mail OAuth secrets"
 msgstr ""
 
 #: src/postulo/core/models.py:624
+msgid "mail transport"
+msgstr ""
+
+#: src/postulo/core/server_forms.py:383
+msgid "Mail transport"
+msgstr ""
+
+#: src/postulo/core/models.py:648
 msgid "mail's last error"
 msgstr ""
 
@@ -4097,11 +4170,16 @@ msgstr ""
 msgid "Merged."
 msgstr ""
 
+#: src/postulo/core/server_forms.py:284
+msgid ""
+"Microsoft only: the directory the application is registered in. Leave blank for an application that accepts any directory."
+msgstr ""
+
 #: src/postulo/documents/models.py:221
 msgid "Missing entry"
 msgstr ""
 
-#: src/postulo/core/models.py:164
+#: src/postulo/core/models.py:167
 msgid "Mobile"
 msgstr ""
 
@@ -4196,7 +4274,7 @@ msgid "NACE division"
 msgstr ""
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/core/models.py:84 src/postulo/documents/models.py:109
 #: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
@@ -4213,7 +4291,7 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: src/postulo/core/models.py:177 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
 msgid "name, if Other"
 msgstr ""
 
@@ -4352,7 +4430,7 @@ msgstr ""
 msgid "no company"
 msgstr ""
 
-#: src/postulo/core/server_views.py:695
+#: src/postulo/core/server_views.py:739
 #, python-format
 msgid "No connection: %(why)s"
 msgstr ""
@@ -4363,6 +4441,10 @@ msgstr ""
 
 #: src/postulo/documents/views.py:382
 msgid "No document store is connected. Add one under Settings → Connections."
+msgstr ""
+
+#: src/postulo/core/mail_auth.py:213 src/postulo/core/mail_auth.py:369
+msgid "No identity provider is chosen for mail."
 msgstr ""
 
 #: src/postulo/templates/widgets/industries.html:41
@@ -4428,7 +4510,7 @@ msgstr ""
 msgid "no role"
 msgstr ""
 
-#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:101
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:112
 msgid "No server to connect to."
 msgstr ""
 
@@ -4465,12 +4547,21 @@ msgstr ""
 msgid "No-show"
 msgstr ""
 
-#: src/postulo/plugins/consent.py:184
+#: src/postulo/plugins/consent.py:193
 msgid "Nobody has agreed to this yet. Connect it again."
 msgstr ""
 
 #: src/postulo/templates/widgets/durations.html:37
 msgid "Nobody has replied yet, so there is nothing to time."
+msgstr ""
+
+#: src/postulo/core/mail_auth.py:242
+msgid "Nobody has signed in to the mail provider yet. Connect it first."
+msgstr ""
+
+#: src/postulo/templates/server/email.html:251
+msgid ""
+"Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
 msgstr ""
 
 #: src/postulo/templates/jobs/company_detail.html:231
@@ -4587,7 +4678,7 @@ msgstr ""
 msgid "Not set here — the environment or the default applies"
 msgstr ""
 
-#: src/postulo/core/server_forms.py:246
+#: src/postulo/core/server_forms.py:276
 msgid "Not set — the environment decides"
 msgstr ""
 
@@ -4795,7 +4886,7 @@ msgstr ""
 msgid "Nothing to decide"
 msgstr ""
 
-#: src/postulo/plugins/views.py:354
+#: src/postulo/plugins/views.py:380
 #, python-format
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -4818,16 +4909,16 @@ msgstr ""
 msgid "Nothing was added."
 msgstr ""
 
-#: src/postulo/plugins/views.py:280
+#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr ""
 
 #: src/postulo/accounts/settings_views.py:147
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
 msgid "Nothing was different."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1119
+#: src/postulo/core/server_views.py:1191
 msgid "Nothing was installed."
 msgstr ""
 
@@ -4885,7 +4976,7 @@ msgstr ""
 msgid "Offer received"
 msgstr ""
 
-#: src/postulo/core/models.py:548
+#: src/postulo/core/models.py:551
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr ""
 
@@ -5048,13 +5139,22 @@ msgstr ""
 msgid "Only entries not already on it are listed."
 msgstr ""
 
+#: src/postulo/templates/server/email.html:187
+msgid ""
+"Only for a provider that no longer accepts a password. Your own mail server needs none of this."
+msgstr ""
+
 #: src/postulo/plugins/fetching.py:121
 msgid "Only http and https addresses can be captured."
 msgstr ""
 
-#: src/postulo/core/models.py:279
+#: src/postulo/core/models.py:282
 msgid ""
 "Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
+msgstr ""
+
+#: src/postulo/core/mail_auth.py:364
+msgid "Only the administrator who started this can finish it."
 msgstr ""
 
 #: src/postulo/templates/applications/application_board.html:11
@@ -5111,8 +5211,8 @@ msgid "Original posting"
 msgstr ""
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
-#: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
+#: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
 #: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
 #: src/postulo/resume/models.py:219
 msgid "Other"
@@ -5152,7 +5252,7 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
-#: src/postulo/core/models.py:64
+#: src/postulo/core/models.py:67
 msgid "owner"
 msgstr ""
 
@@ -5214,7 +5314,7 @@ msgstr ""
 msgid "Passkeys"
 msgstr ""
 
-#: src/postulo/core/models.py:581
+#: src/postulo/core/models.py:584
 msgid "password"
 msgstr ""
 
@@ -5313,7 +5413,7 @@ msgstr ""
 msgid "Phone"
 msgstr ""
 
-#: src/postulo/core/models.py:182
+#: src/postulo/core/models.py:185
 msgid "phone"
 msgstr ""
 
@@ -5362,14 +5462,14 @@ msgid "plugin repository"
 msgstr ""
 
 #: src/postulo/accounts/settings_views.py:125
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:751
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:823
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
 msgid "Plugins"
 msgstr ""
 
-#: src/postulo/core/server_views.py:952
+#: src/postulo/core/server_views.py:1024
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format
 msgid "Plugins for %(name)s"
@@ -5398,7 +5498,7 @@ msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
 msgstr ""
 
-#: src/postulo/core/models.py:572
+#: src/postulo/core/models.py:575
 msgid "port"
 msgstr ""
 
@@ -5427,15 +5527,15 @@ msgstr ""
 msgid "Positions"
 msgstr ""
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:396
 msgid "Postal"
 msgstr ""
 
-#: src/postulo/core/models.py:425
+#: src/postulo/core/models.py:428
 msgid "postal address"
 msgstr ""
 
-#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:426
+#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:429
 #: src/postulo/jobs/models.py:431
 msgid "postal addresses"
 msgstr ""
@@ -5444,7 +5544,7 @@ msgstr ""
 msgid "Postal addresses"
 msgstr ""
 
-#: src/postulo/core/models.py:411
+#: src/postulo/core/models.py:414
 msgid "postcode"
 msgstr ""
 
@@ -5519,6 +5619,11 @@ msgid ""
 "Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
 msgstr ""
 
+#: src/postulo/core/server_views.py:759
+msgid ""
+"Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html:127
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
 msgstr ""
@@ -5573,7 +5678,7 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
-#: src/postulo/core/models.py:186 src/postulo/core/models.py:417
+#: src/postulo/core/models.py:189 src/postulo/core/models.py:420
 msgid "primary"
 msgstr ""
 
@@ -5891,7 +5996,7 @@ msgstr ""
 msgid "Refresh logo"
 msgstr ""
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:418
 msgid "region"
 msgstr ""
 
@@ -5899,7 +6004,11 @@ msgstr ""
 msgid "Register this address with the provider"
 msgstr ""
 
-#: src/postulo/plugins/consent.py:111
+#: src/postulo/core/mail_auth.py:316
+msgid "Register this instance with the provider first, and save the client ID."
+msgstr ""
+
+#: src/postulo/plugins/consent.py:120
 msgid "Register this instance with the provider first, and save the client id."
 msgstr ""
 
@@ -5908,7 +6017,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr ""
 
-#: src/postulo/core/models.py:513
+#: src/postulo/core/models.py:516
 msgid "registration open"
 msgstr ""
 
@@ -6188,7 +6297,7 @@ msgstr ""
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
 #: src/postulo/templates/server/defaults.html:72
-#: src/postulo/templates/server/email.html:175
+#: src/postulo/templates/server/email.html:222
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:98
@@ -6227,8 +6336,8 @@ msgstr ""
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:147
 #: src/postulo/core/server_views.py:389 src/postulo/core/server_views.py:517
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
-#: src/postulo/core/server_views.py:1053 src/postulo/resume/views.py:223
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
+#: src/postulo/core/server_views.py:1125 src/postulo/resume/views.py:223
 msgid "Saved."
 msgstr ""
 
@@ -6330,11 +6439,11 @@ msgstr ""
 msgid "Selected"
 msgstr ""
 
-#: src/postulo/templates/server/email.html:189
+#: src/postulo/templates/server/email.html:261
 msgid "Send a real message"
 msgstr ""
 
-#: src/postulo/templates/server/email.html:195
+#: src/postulo/templates/server/email.html:267
 msgid "Send a test message"
 msgstr ""
 
@@ -6358,7 +6467,7 @@ msgstr ""
 msgid "Sending as yourself"
 msgstr ""
 
-#: src/postulo/core/server_views.py:727
+#: src/postulo/core/server_views.py:799
 #, python-format
 msgid "Sending failed: %(error)s"
 msgstr ""
@@ -6388,7 +6497,7 @@ msgstr ""
 msgid "sent on"
 msgstr ""
 
-#: src/postulo/core/server_views.py:730
+#: src/postulo/core/server_views.py:802
 #, python-format
 msgid "Sent to %(to)s."
 msgstr ""
@@ -6521,7 +6630,7 @@ msgstr ""
 msgid "Show this period"
 msgstr ""
 
-#: src/postulo/core/models.py:504
+#: src/postulo/core/models.py:507
 msgid "Shown in the header and on the sign-in page."
 msgstr ""
 
@@ -6530,7 +6639,15 @@ msgstr ""
 msgid "Sign in"
 msgstr ""
 
-#: src/postulo/core/models.py:545
+#: src/postulo/templates/server/email.html:246
+msgid "Sign in again"
+msgstr ""
+
+#: src/postulo/templates/server/email.html:253
+msgid "Sign in to the provider"
+msgstr ""
+
+#: src/postulo/core/models.py:548
 msgid "sign in with a code sent by email"
 msgstr ""
 
@@ -6556,6 +6673,32 @@ msgstr ""
 msgid "Sign-in methods"
 msgstr ""
 
+#: src/postulo/core/mail_auth.py:65
+msgid "Signed in once, as the mailbox that sends"
+msgstr ""
+
+#: src/postulo/core/server_forms.py:238
+msgid ""
+"Signed in once: somebody agrees on the provider's consent screen, as the mailbox that sends, and needs no administrator. The application sends on its own: Microsoft only, and needs a tenant administrator to grant the permission."
+msgstr ""
+
+#: src/postulo/plugins/views.py:314
+msgid "Signed in to the mail provider. Test the connection to make sure."
+msgstr ""
+
+#: src/postulo/templates/server/email.html:243
+msgid ""
+"Signed in. The provider can withdraw this at any time — if a password is changed, or the account is not used for months — and mail then stops. The page above says so the moment a send fails."
+msgstr ""
+
+#: src/postulo/core/server_forms.py:226
+msgid "Signing in"
+msgstr ""
+
+#: src/postulo/templates/server/email.html:185
+msgid "Signing in with a token"
+msgstr ""
+
 #: src/postulo/templates/server/signin.html:32
 msgid "Signs in to an existing account by e-mail"
 msgstr ""
@@ -6564,7 +6707,7 @@ msgstr ""
 msgid "Single sign-on"
 msgstr ""
 
-#: src/postulo/core/models.py:524
+#: src/postulo/core/models.py:527
 msgid "single sign-on counts as the second factor"
 msgstr ""
 
@@ -6576,7 +6719,7 @@ msgstr ""
 msgid "Site search"
 msgstr ""
 
-#: src/postulo/core/models.py:640 src/postulo/core/models.py:641
+#: src/postulo/core/models.py:664 src/postulo/core/models.py:665
 msgid "site settings"
 msgstr ""
 
@@ -6623,11 +6766,11 @@ msgstr ""
 msgid "Slowest"
 msgstr ""
 
-#: src/postulo/core/models.py:82 src/postulo/jobs/models.py:42
+#: src/postulo/core/models.py:85 src/postulo/jobs/models.py:42
 msgid "slug"
 msgstr ""
 
-#: src/postulo/core/models.py:570
+#: src/postulo/core/models.py:573
 msgid "SMTP server"
 msgstr ""
 
@@ -6865,7 +7008,7 @@ msgstr ""
 msgid "Switch on"
 msgstr ""
 
-#: src/postulo/core/models.py:167
+#: src/postulo/core/models.py:170
 msgid "Switchboard"
 msgstr ""
 
@@ -6887,7 +7030,7 @@ msgid ""
 "Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
 msgstr ""
 
-#: src/postulo/plugins/views.py:375
+#: src/postulo/plugins/views.py:401
 #, python-format
 msgid "Sync failed: %(error)s"
 msgstr ""
@@ -6904,7 +7047,7 @@ msgstr ""
 msgid "Sync now"
 msgstr ""
 
-#: src/postulo/plugins/views.py:377
+#: src/postulo/plugins/views.py:403
 #, python-format
 msgid "Synced: %(summary)s."
 msgstr ""
@@ -6921,7 +7064,7 @@ msgstr ""
 msgid "table settings"
 msgstr ""
 
-#: src/postulo/core/models.py:91
+#: src/postulo/core/models.py:94
 msgid "tag"
 msgstr ""
 
@@ -6932,7 +7075,7 @@ msgstr ""
 msgid "Tag"
 msgstr ""
 
-#: src/postulo/core/models.py:507
+#: src/postulo/core/models.py:510
 msgid "tagline"
 msgstr ""
 
@@ -6943,7 +7086,7 @@ msgstr ""
 msgid "Tags"
 msgstr ""
 
-#: src/postulo/applications/models.py:241 src/postulo/core/models.py:92
+#: src/postulo/applications/models.py:241 src/postulo/core/models.py:95
 msgid "tags"
 msgstr ""
 
@@ -6977,11 +7120,11 @@ msgstr ""
 msgid "Telephone number"
 msgstr ""
 
-#: src/postulo/core/models.py:213
+#: src/postulo/core/models.py:216
 msgid "telephone number"
 msgstr ""
 
-#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:214
+#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:217
 #: src/postulo/jobs/models.py:428
 msgid "telephone numbers"
 msgstr ""
@@ -7002,12 +7145,12 @@ msgstr ""
 msgid "Test"
 msgstr ""
 
-#: src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:353
 #, python-format
 msgid "Test failed: %(message)s"
 msgstr ""
 
-#: src/postulo/templates/server/email.html:181
+#: src/postulo/templates/server/email.html:228
 msgid "Test the connection"
 msgstr ""
 
@@ -7019,15 +7162,15 @@ msgstr ""
 msgid "text as sent"
 msgstr ""
 
-#: src/postulo/core/models.py:616
+#: src/postulo/core/models.py:640
 msgid "text configuration"
 msgstr ""
 
-#: src/postulo/core/models.py:617
+#: src/postulo/core/models.py:641
 msgid "text secrets"
 msgstr ""
 
-#: src/postulo/core/models.py:615
+#: src/postulo/core/models.py:639
 msgid "text transport"
 msgstr ""
 
@@ -7060,15 +7203,15 @@ msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
 msgstr ""
 
-#: src/postulo/plugins/consent.py:147
+#: src/postulo/plugins/consent.py:156
 msgid "That connection belongs to somebody else."
 msgstr ""
 
-#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#: src/postulo/plugins/consent.py:116 src/postulo/plugins/consent.py:161
 msgid "That connection does not use consent."
 msgstr ""
 
-#: src/postulo/plugins/consent.py:145
+#: src/postulo/plugins/consent.py:154
 msgid "That connection no longer exists."
 msgstr ""
 
@@ -7176,7 +7319,7 @@ msgstr ""
 msgid "That is not something Postulo can do to several at once."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1029 src/postulo/core/server_views.py:1070
+#: src/postulo/core/server_views.py:1101 src/postulo/core/server_views.py:1142
 msgid "That is not something this page does."
 msgstr ""
 
@@ -7223,7 +7366,7 @@ msgid ""
 "That number is already recorded on this instance. Telephone numbers are kept unique across every account here, so it may belong to somebody else's records."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1128 src/postulo/core/server_views.py:1133
+#: src/postulo/core/server_views.py:1200 src/postulo/core/server_views.py:1205
 msgid "That package is no longer waiting; upload it again."
 msgstr ""
 
@@ -7246,11 +7389,11 @@ msgstr ""
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr ""
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:301
+#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
 msgid "That plugin is no longer installed."
 msgstr ""
 
-#: src/postulo/plugins/consent.py:140
+#: src/postulo/core/mail_auth.py:360 src/postulo/plugins/consent.py:149
 msgid "That reply did not come from a request Postulo made."
 msgstr ""
 
@@ -7295,6 +7438,10 @@ msgstr ""
 msgid "The application deadline, if stated."
 msgstr ""
 
+#: src/postulo/core/mail_auth.py:66
+msgid "The application sends on its own"
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py:184
 msgid "The catalogue is not readable JSON."
 msgstr ""
@@ -7308,8 +7455,14 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr ""
 
-#: src/postulo/core/server_views.py:1185
+#: src/postulo/core/server_views.py:1257
 msgid "The catalogues answered, and list nothing yet."
+msgstr ""
+
+#: src/postulo/templates/server/email.html:203
+#, python-format
+msgid ""
+"The client secret is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
 msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html:10
@@ -7355,7 +7508,7 @@ msgstr ""
 msgid "The employer as a whole"
 msgstr ""
 
-#: src/postulo/core/server_views.py:988 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:1060 src/postulo/plugins/forms.py:55
 #, python-format
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr ""
@@ -7399,7 +7552,7 @@ msgstr ""
 msgid "The job title"
 msgstr ""
 
-#: src/postulo/core/server_views.py:1045
+#: src/postulo/core/server_views.py:1117
 #, python-format
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -7453,8 +7606,12 @@ msgid ""
 "The longest gap is measured inside this period. A period still running is counted up to the day this was produced. A week marked (part) reaches outside the period; nothing from outside it is counted."
 msgstr ""
 
-#: src/postulo/core/server_views.py:732
+#: src/postulo/core/server_views.py:804
 msgid "The mail backend accepted nothing."
+msgstr ""
+
+#: src/postulo/templates/server/email.html:240
+msgid "The mailbox this instance sends from"
 msgstr ""
 
 #: src/postulo/templates/resume/preview.html:12
@@ -7471,7 +7628,7 @@ msgid ""
 "The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1018
+#: src/postulo/core/server_views.py:1090
 msgid "The official repository is emptied, not removed."
 msgstr ""
 
@@ -7487,7 +7644,7 @@ msgstr ""
 msgid "The opening paragraph, if you use one."
 msgstr ""
 
-#: src/postulo/templates/server/email.html:162
+#: src/postulo/templates/server/email.html:164
 #, python-format
 msgid ""
 "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -7497,7 +7654,7 @@ msgstr ""
 msgid "The pay"
 msgstr ""
 
-#: src/postulo/core/server_views.py:798
+#: src/postulo/core/server_views.py:870
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr ""
 
@@ -7515,16 +7672,21 @@ msgstr ""
 msgid "The posting itself"
 msgstr ""
 
-#: src/postulo/plugins/consent.py:241
+#: src/postulo/plugins/consent.py:251
 #, python-format
 msgid "The provider answered %(status)s."
 msgstr ""
 
-#: src/postulo/plugins/consent.py:237
+#: src/postulo/core/mail_auth.py:388
+msgid ""
+"The provider sent no refresh token, so mail would stop within the hour. Check that offline access is allowed for this application."
+msgstr ""
+
+#: src/postulo/plugins/consent.py:247
 msgid "The provider will not renew this. Somebody has to agree to it again."
 msgstr ""
 
-#: src/postulo/plugins/consent.py:246
+#: src/postulo/plugins/consent.py:256
 msgid "The provider's reply was not readable."
 msgstr ""
 
@@ -7553,7 +7715,7 @@ msgid ""
 "The server does not offer STARTTLS. Turn it off, or use a port that does."
 msgstr ""
 
-#: src/postulo/core/mail.py:122
+#: src/postulo/core/mail.py:134
 #, python-format
 msgid "The server refused those credentials: %(detail)s"
 msgstr ""
@@ -7583,6 +7745,10 @@ msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html:47
 msgid "The site's robots.txt is honoured."
+msgstr ""
+
+#: src/postulo/core/mail_auth.py:220
+msgid "The stored mail credentials cannot be read on this instance."
 msgstr ""
 
 #: src/postulo/templates/settings/appearance.html:7
@@ -7638,7 +7804,7 @@ msgstr ""
 msgid "There is no file to send."
 msgstr ""
 
-#: src/postulo/core/server_views.py:983
+#: src/postulo/core/server_views.py:1055
 msgid "There is no repository by that name."
 msgstr ""
 
@@ -7824,7 +7990,7 @@ msgstr ""
 msgid "Timeout"
 msgstr ""
 
-#: src/postulo/core/models.py:594
+#: src/postulo/core/models.py:597
 msgid "timeout in seconds"
 msgstr ""
 
@@ -7890,7 +8056,7 @@ msgstr ""
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr ""
 
-#: src/postulo/core/models.py:412
+#: src/postulo/core/models.py:415
 msgid "town or city"
 msgstr ""
 
@@ -7911,11 +8077,11 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr ""
 
-#: src/postulo/core/models.py:605
+#: src/postulo/core/models.py:629
 msgid "transport configuration"
 msgstr ""
 
-#: src/postulo/core/models.py:607
+#: src/postulo/core/models.py:631
 msgid "transport secrets"
 msgstr ""
 
@@ -8003,12 +8169,12 @@ msgstr ""
 msgid "Update the preview"
 msgstr ""
 
-#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:32
-#: src/postulo/core/models.py:629
+#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:35
+#: src/postulo/core/models.py:653
 msgid "updated at"
 msgstr ""
 
-#: src/postulo/core/models.py:636
+#: src/postulo/core/models.py:660
 msgid "updated by"
 msgstr ""
 
@@ -8095,7 +8261,7 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:577
+#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:580
 msgid "username"
 msgstr ""
 
@@ -8107,7 +8273,7 @@ msgstr ""
 msgid "users"
 msgstr ""
 
-#: src/postulo/templates/server/email.html:191
+#: src/postulo/templates/server/email.html:263
 msgid ""
 "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr ""
@@ -8120,7 +8286,7 @@ msgstr ""
 msgid "Utilities"
 msgstr ""
 
-#: src/postulo/core/models.py:192
+#: src/postulo/core/models.py:195
 msgid "verified"
 msgstr ""
 
@@ -8187,7 +8353,7 @@ msgstr ""
 msgid "was “%(text)s”"
 msgstr ""
 
-#: src/postulo/core/models.py:203
+#: src/postulo/core/models.py:206
 msgid "way back into the account"
 msgstr ""
 
@@ -8261,7 +8427,7 @@ msgstr ""
 msgid "What came back in this period"
 msgstr ""
 
-#: src/postulo/core/server_forms.py:316
+#: src/postulo/core/server_forms.py:386
 msgid "What carries the mail off this machine."
 msgstr ""
 
@@ -8421,6 +8587,11 @@ msgstr ""
 msgid "When it entered your listings."
 msgstr ""
 
+#: src/postulo/templates/server/email.html:215
+msgid ""
+"When you register this instance with the provider, give it this address to send people back to:"
+msgstr ""
+
 #: src/postulo/applications/models.py:527
 msgid "where"
 msgstr ""
@@ -8475,11 +8646,11 @@ msgstr ""
 msgid "Where your job search stands today."
 msgstr ""
 
-#: src/postulo/core/models.py:516
+#: src/postulo/core/models.py:519
 msgid "Whether anyone who finds the address may create an account."
 msgstr ""
 
-#: src/postulo/core/models.py:527
+#: src/postulo/core/models.py:530
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
 msgstr ""
@@ -8580,7 +8751,7 @@ msgstr ""
 msgid "Withdrawn"
 msgstr ""
 
-#: src/postulo/core/models.py:165 src/postulo/core/models.py:392
+#: src/postulo/core/models.py:168 src/postulo/core/models.py:395
 msgid "Work"
 msgstr ""
 
@@ -8627,6 +8798,10 @@ msgstr ""
 #: src/postulo/templates/partials/translation_state.html:19
 #: src/postulo/templates/settings/locale.html:92
 msgid "written, not yet read by a speaker"
+msgstr ""
+
+#: src/postulo/core/mail_auth.py:47
+msgid "XOAUTH2, with a token from the provider"
 msgstr ""
 
 #: src/postulo/core/server_forms.py:14
@@ -8854,7 +9029,7 @@ msgid ""
 "Your name and the contact block that will be printed on your CVs. How Postulo behaves for you — theme, language, username, addresses — is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
 msgstr ""
 
-#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
+#: src/postulo/core/models.py:183 src/postulo/core/models.py:408
 msgid "Your name for it, when none of the kinds above fits."
 msgstr ""
 
@@ -8916,18 +9091,18 @@ msgstr ""
 msgid "· still running"
 msgstr ""
 
-#: src/postulo/core/server_views.py:1024
+#: src/postulo/core/server_views.py:1096
 #, python-format
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1009
+#: src/postulo/core/server_views.py:1081
 #, python-format
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1006
+#: src/postulo/core/server_views.py:1078
 #, python-format
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""

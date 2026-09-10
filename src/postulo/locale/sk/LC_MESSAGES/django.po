@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:54+0000\n"
+"POT-Creation-Date: 2026-09-10 08:21+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenčina\n"
@@ -42,7 +42,7 @@ msgstr "%(company)s už má identifikátor %(scheme)s: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s zmenené."
 
-#: src/postulo/plugins/views.py:345
+#: src/postulo/plugins/views.py:371
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -234,12 +234,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s až %(high)s"
 
-#: src/postulo/core/server_views.py:1200
+#: src/postulo/core/server_views.py:1272
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s je nainštalovaný z katalógu."
 
-#: src/postulo/core/server_views.py:1150
+#: src/postulo/core/server_views.py:1222
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -312,19 +312,19 @@ msgstr "%(name)s je teraz správcom."
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "%(name)s je teraz v riadku %(row)s, na mieste %(place)s."
 
-#: src/postulo/core/server_views.py:1261
+#: src/postulo/core/server_views.py:1333
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s bol odstránený. Reštartujte Postulo, aby ste mali istotu, že z neho nič nezostalo načítané."
 
-#: src/postulo/core/server_views.py:1233
+#: src/postulo/core/server_views.py:1305
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s je vypnutý; jeho súbory sú tu stále."
 
-#: src/postulo/core/server_views.py:1235
+#: src/postulo/core/server_views.py:1307
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s je opäť zapnutý."
@@ -390,6 +390,18 @@ msgstr "%(package)s: potrebuje %(wanted)s a Postulo má %(have)s."
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nemohol tieto nastavenia skontrolovať: %(error)s"
+
+#: src/postulo/core/mail_auth.py:234
+#, python-format, draft
+msgid "%(provider)s does not let an application send on its own."
+msgstr "%(provider)s nedovolí aplikácii odosielať samostatne."
+
+#: src/postulo/core/server_forms.py:343
+#, python-format, draft
+msgid ""
+"%(provider)s does not let an application send on its own. Choose “Signed in once”."
+msgstr ""
+"%(provider)s nedovolí aplikácii odosielať samostatne. Zvoľte „Raz prihlásené“."
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
@@ -500,7 +512,7 @@ msgstr "%(url)s je oveľa väčší, než by katalóg mal byť."
 msgid "%(when)s ago"
 msgstr "pred %(when)s"
 
-#: src/postulo/core/models.py:445
+#: src/postulo/core/models.py:448
 #, draft
 msgid "(empty address)"
 msgstr "(prázdna adresa)"
@@ -555,6 +567,11 @@ msgid ""
 msgstr ""
 "Rozšíreniu prehliadača stačí prvý. Agentovi dajte len čítanie, kým mu nebudete dôverovať so zápisom."
 
+#: src/postulo/templates/server/email.html:210
+#, draft
+msgid "A client secret is stored. It is never shown."
+msgstr "Tajný kľúč klienta je uložený. Nikdy sa nezobrazuje."
+
 #: src/postulo/jobs/models.py:196
 #, draft
 msgid "A company cannot be part of itself."
@@ -587,12 +604,12 @@ msgstr "Firma, pozícia, veta z listu, meno…"
 msgid "A CSV file"
 msgstr "Súbor CSV"
 
-#: src/postulo/core/models.py:87
+#: src/postulo/core/models.py:90
 #, draft
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Pomôcka pre rozhranie, napríklad „amber“ alebo „sky“."
 
-#: src/postulo/core/models.py:510
+#: src/postulo/core/models.py:513
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Riadok pod názvom na prihlasovacej stránke. Nepovinné."
@@ -614,7 +631,7 @@ msgstr ""
 msgid "A month"
 msgstr "Mesiac"
 
-#: src/postulo/core/models.py:288
+#: src/postulo/core/models.py:291
 #, draft
 msgid ""
 "A number has to be confirmed before it can get you back in. Nobody has answered on this one."
@@ -642,10 +659,22 @@ msgid ""
 msgstr ""
 "Prístupový kľúč je viazaný na adresu, na ktorej ste ho vytvorili, tu %(host)s. Dostať sa k tejto inštancii pod iným názvom alebo ju presunúť vaše prístupové kľúče so sebou nevezme."
 
-#: src/postulo/templates/server/email.html:169
+#: src/postulo/core/server_forms.py:228
+#, draft
+msgid ""
+"A password is right for your own mail server, and for Gmail with an app password. Microsoft 365 stops accepting passwords for sending mail by default at the end of December 2026; after that it needs XOAUTH2."
+msgstr ""
+"Heslo je správne pre váš vlastný poštový server a pre Gmail s heslom aplikácie. Microsoft 365 koncom decembra 2026 predvolene prestane prijímať heslá na odosielanie pošty; potom vyžaduje XOAUTH2."
+
+#: src/postulo/templates/server/email.html:171
 #, draft
 msgid "A password is stored. It is never shown, not even its length."
 msgstr "Heslo je uložené. Nikdy sa nezobrazuje, ani jeho dĺžka."
+
+#: src/postulo/core/mail_auth.py:46
+#, draft
+msgid "A password, or an app password"
+msgstr "Heslo alebo heslo aplikácie"
 
 #: src/postulo/templates/widgets/suggestions.html:6
 #, python-format, draft
@@ -773,7 +802,7 @@ msgid ""
 msgstr ""
 "Šablóna s vlastnými stĺpcami Postula a jedným ukážkovým riadkom. Vyplňte ju a nahrajte vyššie."
 
-#: src/postulo/core/server_views.py:715
+#: src/postulo/core/server_views.py:787
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Skúšobná správa od %(name)s"
@@ -1028,7 +1057,7 @@ msgstr "Pridané."
 msgid "Address"
 msgstr "Adresa"
 
-#: src/postulo/core/models.py:410 src/postulo/jobs/models.py:740
+#: src/postulo/core/models.py:413 src/postulo/jobs/models.py:740
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
@@ -1456,6 +1485,11 @@ msgstr "Musí sa ponúkať aspoň jeden jazyk, inak si nikto nič neprečíta."
 msgid "attempts"
 msgstr "pokusy"
 
+#: src/postulo/core/models.py:607
+#, draft
+msgid "authentication"
+msgstr "overovanie"
+
 #: src/postulo/jobs/industries.py:83
 #, draft
 msgid "Automotive"
@@ -1881,10 +1915,15 @@ msgstr "Najprv vyberte súbor Europass."
 msgid "Choose a new password"
 msgstr "Zvoľte nové heslo"
 
-#: src/postulo/core/server_views.py:1081
+#: src/postulo/core/server_views.py:1153
 #, draft
 msgid "Choose a package first."
 msgstr "Najprv zvoľte balík."
+
+#: src/postulo/core/mail_auth.py:312
+#, draft
+msgid "Choose an identity provider and save it first."
+msgstr "Najprv zvoľte poskytovateľa identity a uložte ho."
 
 #: src/postulo/templates/core/import_csv_map.html:102
 #, draft
@@ -1938,6 +1977,16 @@ msgstr "Vymazať filtre"
 msgid "Cleared: this entry prints its original text in %(language)s."
 msgstr "Vyprázdnené: tento záznam tlačí svoj pôvodný text v jazyku %(language)s."
 
+#: src/postulo/core/models.py:613
+#, draft
+msgid "client ID"
+msgstr "ID klienta"
+
+#: src/postulo/core/server_forms.py:245
+#, draft
+msgid "Client secret"
+msgstr "Tajný kľúč klienta"
+
 #: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:663
 #, draft
 msgid "Closed"
@@ -1984,7 +2033,7 @@ msgstr "Kód (GitHub, GitLab…)"
 msgid "code repository"
 msgstr "repozitár kódu"
 
-#: src/postulo/core/models.py:84
+#: src/postulo/core/models.py:87
 #, draft
 msgid "colour"
 msgstr "farba"
@@ -2113,18 +2162,23 @@ msgstr "Pripojiť"
 msgid "Connect %(plugin)s"
 msgstr "Pripojiť %(plugin)s"
 
-#: src/postulo/core/mail.py:133
+#: src/postulo/core/mail.py:145
+#, python-format, draft
+msgid "Connected to %(host)s:%(port)s and signed in as %(user)s with a token."
+msgstr "Pripojené k %(host)s:%(port)s a prihlásené ako %(user)s pomocou tokenu."
+
+#: src/postulo/core/mail.py:151
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Pripojené k %(host)s:%(port)s a prihlásené ako %(user)s."
 
-#: src/postulo/core/mail.py:138
+#: src/postulo/core/mail.py:156
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Pripojené k %(host)s:%(port)s. Bez používateľského mena, takže sa nič neprihlásilo."
 
-#: src/postulo/plugins/views.py:289
+#: src/postulo/plugins/views.py:298
 #, draft
 msgid "Connected. Test it to make sure it works."
 msgstr "Pripojené. Otestujte to, aby ste mali istotu, že to funguje."
@@ -2135,7 +2189,7 @@ msgstr "Pripojené. Otestujte to, aby ste mali istotu, že to funguje."
 msgid "connection"
 msgstr "pripojenie"
 
-#: src/postulo/plugins/views.py:392
+#: src/postulo/plugins/views.py:418
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Pripojenie odobraté vrátane tajomstiev."
@@ -2145,7 +2199,7 @@ msgstr "Pripojenie odobraté vrátane tajomstiev."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Pripojenie uložené. Otestujte ho, aby ste vedeli, že funguje."
 
-#: src/postulo/core/models.py:588
+#: src/postulo/core/models.py:591
 #, draft
 msgid "connection security"
 msgstr "zabezpečenie spojenia"
@@ -2157,7 +2211,7 @@ msgstr "Zabezpečenie spojenia"
 
 #: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:388
+#: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2275,7 +2329,7 @@ msgid ""
 msgstr ""
 "Počítané z časovej osi, takže pohovory zaznamenané pred vznikom diára sú zahrnuté."
 
-#: src/postulo/core/models.py:416 src/postulo/core/postal.py:170
+#: src/postulo/core/models.py:419 src/postulo/core/postal.py:170
 #, draft
 msgid "country"
 msgstr "krajina"
@@ -2320,7 +2374,7 @@ msgid "created"
 msgstr "vytvorené"
 
 #: src/postulo/accounts/models.py:344 src/postulo/accounts/models.py:415
-#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:31
+#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:34
 #, draft
 msgid "created at"
 msgstr "vytvorené dňa"
@@ -2589,12 +2643,12 @@ msgstr "Odmietnuté"
 msgid "Declined. It will not be suggested again."
 msgstr "Odmietnuté. Už to nebude navrhnuté."
 
-#: src/postulo/core/models.py:550
+#: src/postulo/core/models.py:553
 #, draft
 msgid "default language"
 msgstr "predvolený jazyk"
 
-#: src/postulo/core/models.py:561
+#: src/postulo/core/models.py:564
 #, draft
 msgid "default time zone"
 msgstr "predvolené časové pásmo"
@@ -2709,6 +2763,11 @@ msgstr "Neodpovedalo"
 #, draft
 msgid "did not answer when last checked"
 msgstr "pri poslednej kontrole neodpovedalo"
+
+#: src/postulo/core/models.py:612
+#, draft
+msgid "directory (tenant) ID"
+msgstr "ID adresára (nájomníka)"
 
 #: src/postulo/templates/jobs/capture_list.html:45
 #: src/postulo/templates/jobs/listing_list.html:44
@@ -3252,7 +3311,7 @@ msgstr "Exportované samostatne"
 msgid "Failed"
 msgstr "Zlyhalo"
 
-#: src/postulo/core/models.py:672 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:696 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Zlyhalo bez udania dôvodu."
@@ -3267,7 +3326,7 @@ msgstr "Veľtrh"
 msgid "Fastest"
 msgstr "Najrýchlejší"
 
-#: src/postulo/core/models.py:168
+#: src/postulo/core/models.py:171
 #, draft
 msgid "Fax"
 msgstr "Fax"
@@ -3458,6 +3517,11 @@ msgid ""
 msgstr ""
 "Vynútené zapnutie ho nerozbehne: oznamovač, úložisko alebo synchronizácia potrebuje prihlasovacie údaje, ktoré môže dať len táto osoba. Znamená to, že ho smie používať a nesmie vypnúť."
 
+#: src/postulo/templates/server/email.html:247
+#, draft
+msgid "Forget the grant"
+msgstr "Zabudnúť súhlas"
+
 #: src/postulo/core/server_forms.py:218
 #, draft
 msgid "Forget the stored password"
@@ -3532,7 +3596,7 @@ msgstr "od %(low)s"
 msgid "From %(name)s."
 msgstr "Od %(name)s."
 
-#: src/postulo/core/models.py:596
+#: src/postulo/core/models.py:599
 #, draft
 msgid "from address"
 msgstr "adresa odosielateľa"
@@ -3652,6 +3716,11 @@ msgstr "Dostalo nejakú odpoveď"
 msgid "grade"
 msgstr "známka"
 
+#: src/postulo/core/models.py:609
+#, draft
+msgid "grant"
+msgstr "súhlas"
+
 #: src/postulo/accounts/models.py:335
 #, draft
 msgid "Gravatar checked on"
@@ -3749,7 +3818,7 @@ msgstr "úspechy"
 msgid "highlights for this CV"
 msgstr "úspechy pre toto CV"
 
-#: src/postulo/core/models.py:166 src/postulo/core/models.py:391
+#: src/postulo/core/models.py:169 src/postulo/core/models.py:394
 #, draft
 msgid "Home"
 msgstr "Domov"
@@ -3817,6 +3886,11 @@ msgstr "Ako pravidelne"
 #, draft
 msgid "How the first rows will be read"
 msgstr "Ako sa prečítajú prvé riadky"
+
+#: src/postulo/core/server_forms.py:236
+#, draft
+msgid "How the token is obtained"
+msgstr "Ako sa token získava"
 
 #: src/postulo/templates/server/capture.html:7
 #, draft
@@ -3898,7 +3972,17 @@ msgstr "Identifikátory"
 msgid "Identifies itself as"
 msgstr "Predstavuje sa ako"
 
-#: src/postulo/core/server_views.py:717
+#: src/postulo/core/models.py:608
+#, draft
+msgid "identity provider"
+msgstr "poskytovateľ identity"
+
+#: src/postulo/core/server_forms.py:234
+#, draft
+msgid "Identity provider"
+msgstr "Poskytovateľ identity"
+
+#: src/postulo/core/server_views.py:789
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3912,7 +3996,7 @@ msgid ""
 msgstr ""
 "Ak ste sa uchádzali o miesto v inštitúcii EÚ alebo cez úrad práce, tento súbor už máte. Namiesto toho, aby ste všetko písali znova, jednoducho ho odovzdajte."
 
-#: src/postulo/core/models.py:519
+#: src/postulo/core/models.py:522
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "pri zachytávaní ignorovať robots.txt"
@@ -4098,7 +4182,7 @@ msgstr "Nainštalované v tejto inštancii"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Inštalácia zásuvného modulu spustí cudzí kód vnútri Postula."
 
-#: src/postulo/core/models.py:501
+#: src/postulo/core/models.py:504
 #, draft
 msgid "instance name"
 msgstr "názov inštancie"
@@ -4113,7 +4197,7 @@ msgstr "inštitúcia"
 msgid "Insurance"
 msgstr "Poisťovníctvo"
 
-#: src/postulo/core/server_views.py:797 src/postulo/plugins/provenance.py:59
+#: src/postulo/core/server_views.py:869 src/postulo/plugins/provenance.py:59
 #, draft
 msgid "Internal"
 msgstr "Interný"
@@ -4274,7 +4358,7 @@ msgid ""
 msgstr ""
 "Radšej neposkytne nič, než aby tieto záznamy zverejnil komukoľvek, kto adresu nájde. Nastavte POSTULO_LOGS_TOKEN, alebo vypnite POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:325
+#: src/postulo/plugins/views.py:351
 #, draft
 msgid "It works."
 msgstr "Funguje to."
@@ -4366,8 +4450,8 @@ msgstr ""
 
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
-#: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
+#: src/postulo/core/models.py:403 src/postulo/documents/models.py:112
 #: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
 #: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:243
@@ -4452,7 +4536,7 @@ msgstr "Jazyky"
 msgid "languages"
 msgstr "jazyky"
 
-#: src/postulo/core/models.py:560
+#: src/postulo/core/models.py:563
 #, draft
 msgid "languages offered"
 msgstr "ponúkané jazyky"
@@ -4566,7 +4650,7 @@ msgid "Leave a box empty and that line prints as it is written above it."
 msgstr ""
 "Nechajte pole prázdne a tento riadok sa vytlačí tak, ako je napísaný nad ním."
 
-#: src/postulo/core/server_forms.py:215
+#: src/postulo/core/server_forms.py:215 src/postulo/core/server_forms.py:248
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "Nechajte prázdne, ak chcete zachovať už uložené."
@@ -4814,7 +4898,7 @@ msgstr "Malé písmená, číslice, bodky, podčiarkovníky a pomlčky."
 msgid "Made"
 msgstr "Vytvorené"
 
-#: src/postulo/core/models.py:627
+#: src/postulo/core/models.py:651
 #, draft
 msgid "mail failures in a row"
 msgstr "chýb pošty za sebou"
@@ -4837,7 +4921,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Tu je pošta jediná cesta späť do účtu, takže kým to zase nezačne fungovať, nikto z %(counter)s ľudí na tejto inštancii sa nedostane späť, ak zabudne heslo."
 
-#: src/postulo/core/models.py:623
+#: src/postulo/core/models.py:647
 #, draft
 msgid "mail last failed"
 msgstr "pošta naposledy zlyhala"
@@ -4847,7 +4931,7 @@ msgstr "pošta naposledy zlyhala"
 msgid "Mail last went out at %(when)s."
 msgstr "Pošta naposledy odišla o %(when)s."
 
-#: src/postulo/core/models.py:622
+#: src/postulo/core/models.py:646
 #, draft
 msgid "mail last worked"
 msgstr "pošta naposledy fungovala"
@@ -4866,17 +4950,22 @@ msgid ""
 msgstr ""
 "Pošta už nedrží na mieste ani transport, pretože cesta, ktorá nič nedoručí, nikoho nechráni."
 
-#: src/postulo/core/models.py:600
+#: src/postulo/core/models.py:619
+#, draft
+msgid "mail OAuth secrets"
+msgstr "tajné údaje OAuth pre poštu"
+
+#: src/postulo/core/models.py:624
 #, draft
 msgid "mail transport"
 msgstr "transport pošty"
 
-#: src/postulo/core/server_forms.py:313
+#: src/postulo/core/server_forms.py:383
 #, draft
 msgid "Mail transport"
 msgstr "Transport pošty"
 
-#: src/postulo/core/models.py:624
+#: src/postulo/core/models.py:648
 #, draft
 msgid "mail's last error"
 msgstr "posledná chyba pošty"
@@ -4997,12 +5086,19 @@ msgstr "Zlúčiť do"
 msgid "Merged."
 msgstr "Zlúčené."
 
+#: src/postulo/core/server_forms.py:284
+#, draft
+msgid ""
+"Microsoft only: the directory the application is registered in. Leave blank for an application that accepts any directory."
+msgstr ""
+"Iba Microsoft: adresár, v ktorom je aplikácia registrovaná. Nechajte prázdne pre aplikáciu, ktorá prijíma akýkoľvek adresár."
+
 #: src/postulo/documents/models.py:221
 #, draft
 msgid "Missing entry"
 msgstr "Chýbajúca položka"
 
-#: src/postulo/core/models.py:164
+#: src/postulo/core/models.py:167
 #, draft
 msgid "Mobile"
 msgstr "Mobil"
@@ -5111,7 +5207,7 @@ msgid "NACE division"
 msgstr "divízia NACE"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/core/models.py:84 src/postulo/documents/models.py:109
 #: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
@@ -5130,7 +5226,7 @@ msgstr "názov"
 msgid "Name"
 msgstr "Názov"
 
-#: src/postulo/core/models.py:177 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
 #, draft
 msgid "name, if Other"
 msgstr "názov, ak Iné"
@@ -5300,7 +5396,7 @@ msgstr "Zatiaľ žiadne firmy. Vytvoria sa vám, keď zaznamenáte žiadosť."
 msgid "no company"
 msgstr "bez firmy"
 
-#: src/postulo/core/server_views.py:695
+#: src/postulo/core/server_views.py:739
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Žiadne pripojenie: %(why)s"
@@ -5315,6 +5411,11 @@ msgstr "Zatiaľ žiadne pripojenia"
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
 "Nie je pripojené žiadne úložisko dokumentov. Pridajte ho v Nastavenia → Pripojenia."
+
+#: src/postulo/core/mail_auth.py:213 src/postulo/core/mail_auth.py:369
+#, draft
+msgid "No identity provider is chosen for mail."
+msgstr "Pre poštu nie je zvolený žiadny poskytovateľ identity."
 
 #: src/postulo/templates/widgets/industries.html:41
 #, draft
@@ -5396,7 +5497,7 @@ msgstr "Pre túto firmu nie sú zaznamenané žiadne inzeráty."
 msgid "no role"
 msgstr "bez pozície"
 
-#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:101
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:112
 #, draft
 msgid "No server to connect to."
 msgstr "Žiadny server, ku ktorému sa pripojiť."
@@ -5442,7 +5543,7 @@ msgstr "nie — len existujúce účty"
 msgid "No-show"
 msgstr "Nedostavil sa"
 
-#: src/postulo/plugins/consent.py:184
+#: src/postulo/plugins/consent.py:193
 #, draft
 msgid "Nobody has agreed to this yet. Connect it again."
 msgstr "S týmto zatiaľ nikto nesúhlasil. Pripojte to znova."
@@ -5451,6 +5552,18 @@ msgstr "S týmto zatiaľ nikto nesúhlasil. Pripojte to znova."
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
 msgstr "Nikto ešte neodpovedal, takže nie je čo merať."
+
+#: src/postulo/core/mail_auth.py:242
+#, draft
+msgid "Nobody has signed in to the mail provider yet. Connect it first."
+msgstr "U poskytovateľa pošty sa zatiaľ nikto neprihlásil. Najprv ho pripojte."
+
+#: src/postulo/templates/server/email.html:251
+#, draft
+msgid ""
+"Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
+msgstr ""
+"Zatiaľ sa nikto neprihlásil, takže nemožno nič odoslať. Uložte nastavenia vyššie a potom sa na stránke poskytovateľa prihláste ako schránka, z ktorej táto inštancia odosiela."
 
 #: src/postulo/templates/jobs/company_detail.html:231
 #, draft
@@ -5592,7 +5705,7 @@ msgstr "nenastavené"
 msgid "Not set here — the environment or the default applies"
 msgstr "Tu nenastavené — platí prostredie alebo predvolená hodnota"
 
-#: src/postulo/core/server_forms.py:246
+#: src/postulo/core/server_forms.py:276
 #, draft
 msgid "Not set — the environment decides"
 msgstr "Nenastavené — rozhoduje prostredie"
@@ -5845,7 +5958,7 @@ msgstr "Nie je k čomu sa pripojiť"
 msgid "Nothing to decide"
 msgstr "Nie je o čom rozhodovať"
 
-#: src/postulo/plugins/views.py:354
+#: src/postulo/plugins/views.py:380
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5873,18 +5986,18 @@ msgstr "Nič nečaká"
 msgid "Nothing was added."
 msgstr "Nič nebolo pridané."
 
-#: src/postulo/plugins/views.py:280
+#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
 #, draft
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "Nič sa nepripojilo. Nikto s ničím nesúhlasil."
 
 #: src/postulo/accounts/settings_views.py:147
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
 #, draft
 msgid "Nothing was different."
 msgstr "Nič nebolo inak."
 
-#: src/postulo/core/server_views.py:1119
+#: src/postulo/core/server_views.py:1191
 #, draft
 msgid "Nothing was installed."
 msgstr "Nič nebolo nainštalované."
@@ -5958,7 +6071,7 @@ msgstr "Ponuka"
 msgid "Offer received"
 msgstr "Ponuka prijatá"
 
-#: src/postulo/core/models.py:548
+#: src/postulo/core/models.py:551
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Ponúka sa, len kým pošta tejto inštancie skutočne dochádza."
@@ -6168,17 +6281,29 @@ msgstr "Len %(name)s"
 msgid "Only entries not already on it are listed."
 msgstr "Uvedené sú len položky, ktoré v ňom ešte nie sú."
 
+#: src/postulo/templates/server/email.html:187
+#, draft
+msgid ""
+"Only for a provider that no longer accepts a password. Your own mail server needs none of this."
+msgstr ""
+"Iba pre poskytovateľa, ktorý už neprijíma heslá. Váš vlastný poštový server nič z toho nepotrebuje."
+
 #: src/postulo/plugins/fetching.py:121
 #, draft
 msgid "Only http and https addresses can be captured."
 msgstr "Zachytávať možno len adresy http a https."
 
-#: src/postulo/core/models.py:279
+#: src/postulo/core/models.py:282
 #, draft
 msgid ""
 "Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
 msgstr ""
 "Späť do vášho účtu vás môže dostať len jedno z vašich vlastných čísel. Toto patrí niekomu, s kým jednáte."
+
+#: src/postulo/core/mail_auth.py:364
+#, draft
+msgid "Only the administrator who started this can finish it."
+msgstr "Dokončiť to môže iba správca, ktorý to začal."
 
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
@@ -6247,8 +6372,8 @@ msgid "Original posting"
 msgstr "Pôvodný inzerát"
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
-#: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
+#: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
 #: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
 #: src/postulo/resume/models.py:219
 #, draft
@@ -6297,7 +6422,7 @@ msgstr "Len nevybavené"
 msgid "Overview"
 msgstr "Prehľad"
 
-#: src/postulo/core/models.py:64
+#: src/postulo/core/models.py:67
 #, draft
 msgid "owner"
 msgstr "vlastník"
@@ -6371,7 +6496,7 @@ msgstr "Čiastočne preložené"
 msgid "Passkeys"
 msgstr "Prístupové kľúče"
 
-#: src/postulo/core/models.py:581
+#: src/postulo/core/models.py:584
 #, draft
 msgid "password"
 msgstr "heslo"
@@ -6492,7 +6617,7 @@ msgstr "Farmácia"
 msgid "Phone"
 msgstr "Telefón"
 
-#: src/postulo/core/models.py:182
+#: src/postulo/core/models.py:185
 #, draft
 msgid "phone"
 msgstr "telefón"
@@ -6553,7 +6678,7 @@ msgid "plugin repository"
 msgstr "repozitár zásuvných modulov"
 
 #: src/postulo/accounts/settings_views.py:125
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:751
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:823
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -6561,7 +6686,7 @@ msgstr "repozitár zásuvných modulov"
 msgid "Plugins"
 msgstr "Pluginy"
 
-#: src/postulo/core/server_views.py:952
+#: src/postulo/core/server_views.py:1024
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -6598,7 +6723,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP alebo GIF do 5 MB. Oreže sa na štvorec a zbaví sa všetkého, čo súbor vedel o mieste vyhotovenia."
 
-#: src/postulo/core/models.py:572
+#: src/postulo/core/models.py:575
 #, draft
 msgid "port"
 msgstr "port"
@@ -6634,17 +6759,17 @@ msgstr "Portfóliá, profily a videá, na ktoré ste ich nasmerovali."
 msgid "Positions"
 msgstr "Pozície"
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:396
 #, draft
 msgid "Postal"
 msgstr "Poštová"
 
-#: src/postulo/core/models.py:425
+#: src/postulo/core/models.py:428
 #, draft
 msgid "postal address"
 msgstr "poštová adresa"
 
-#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:426
+#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:429
 #: src/postulo/jobs/models.py:431
 #, draft
 msgid "postal addresses"
@@ -6655,7 +6780,7 @@ msgstr "poštové adresy"
 msgid "Postal addresses"
 msgstr "Poštové adresy"
 
-#: src/postulo/core/models.py:411
+#: src/postulo/core/models.py:414
 #, draft
 msgid "postcode"
 msgstr "PSČ"
@@ -6750,6 +6875,12 @@ msgid ""
 msgstr ""
 "Postulo to zabudlo. Poskytovateľ povolenie stále má, kým ho neodvoláte aj tam."
 
+#: src/postulo/core/server_views.py:759
+#, draft
+msgid ""
+"Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
+msgstr "Postulo zabudlo súhlas. Poskytovateľ ho má, kým ho neodvoláte aj uňho."
+
 #: src/postulo/templates/server/plugins.html:127
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6819,7 +6950,7 @@ msgstr "Náhľad"
 msgid "Previous"
 msgstr "Predchádzajúce"
 
-#: src/postulo/core/models.py:186 src/postulo/core/models.py:417
+#: src/postulo/core/models.py:189 src/postulo/core/models.py:420
 #, draft
 msgid "primary"
 msgstr "hlavné"
@@ -7210,7 +7341,7 @@ msgstr "Odporúčanie"
 msgid "Refresh logo"
 msgstr "Získať logo znovu"
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:418
 #, draft
 msgid "region"
 msgstr "kraj"
@@ -7220,7 +7351,12 @@ msgstr "kraj"
 msgid "Register this address with the provider"
 msgstr "Zaregistrujte túto adresu u poskytovateľa"
 
-#: src/postulo/plugins/consent.py:111
+#: src/postulo/core/mail_auth.py:316
+#, draft
+msgid "Register this instance with the provider first, and save the client ID."
+msgstr "Najprv zaregistrujte túto inštanciu u poskytovateľa a uložte ID klienta."
+
+#: src/postulo/plugins/consent.py:120
 #, draft
 msgid "Register this instance with the provider first, and save the client id."
 msgstr ""
@@ -7233,7 +7369,7 @@ msgid ""
 msgstr ""
 "Registrácia je otvorená: ktokoľvek, kto nájde adresu, si môže vytvoriť účet."
 
-#: src/postulo/core/models.py:513
+#: src/postulo/core/models.py:516
 #, draft
 msgid "registration open"
 msgstr "registrácia otvorená"
@@ -7571,7 +7707,7 @@ msgstr "plat do"
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
 #: src/postulo/templates/server/defaults.html:72
-#: src/postulo/templates/server/email.html:175
+#: src/postulo/templates/server/email.html:222
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:98
@@ -7616,8 +7752,8 @@ msgstr "Uložené do vašich ponúk. Rozhodnite sa, keď budete pripravení."
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:147
 #: src/postulo/core/server_views.py:389 src/postulo/core/server_views.py:517
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
-#: src/postulo/core/server_views.py:1053 src/postulo/resume/views.py:223
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
+#: src/postulo/core/server_views.py:1125 src/postulo/resume/views.py:223
 #, draft
 msgid "Saved."
 msgstr "Uložené."
@@ -7741,12 +7877,12 @@ msgstr "Vybrať všetko na tejto stránke"
 msgid "Selected"
 msgstr "Vybrané"
 
-#: src/postulo/templates/server/email.html:189
+#: src/postulo/templates/server/email.html:261
 #, draft
 msgid "Send a real message"
 msgstr "Odoslať skutočnú správu"
 
-#: src/postulo/templates/server/email.html:195
+#: src/postulo/templates/server/email.html:267
 #, draft
 msgid "Send a test message"
 msgstr "Poslať skúšobnú správu"
@@ -7777,7 +7913,7 @@ msgstr "Odoslať do úložísk teraz"
 msgid "Sending as yourself"
 msgstr "Odosielanie za seba"
 
-#: src/postulo/core/server_views.py:727
+#: src/postulo/core/server_views.py:799
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Odoslanie zlyhalo: %(error)s"
@@ -7812,7 +7948,7 @@ msgstr "Odoslané dokumenty"
 msgid "sent on"
 msgstr "odoslané"
 
-#: src/postulo/core/server_views.py:730
+#: src/postulo/core/server_views.py:802
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Odoslané na %(to)s."
@@ -7973,7 +8109,7 @@ msgstr "Zobraziť aj minulé"
 msgid "Show this period"
 msgstr "Zobraziť toto obdobie"
 
-#: src/postulo/core/models.py:504
+#: src/postulo/core/models.py:507
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Zobrazené v hlavičke a na prihlasovacej stránke."
@@ -7984,7 +8120,17 @@ msgstr "Zobrazené v hlavičke a na prihlasovacej stránke."
 msgid "Sign in"
 msgstr "Prihlásiť sa"
 
-#: src/postulo/core/models.py:545
+#: src/postulo/templates/server/email.html:246
+#, draft
+msgid "Sign in again"
+msgstr "Prihlásiť sa znova"
+
+#: src/postulo/templates/server/email.html:253
+#, draft
+msgid "Sign in to the provider"
+msgstr "Prihlásiť sa u poskytovateľa"
+
+#: src/postulo/core/models.py:548
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "prihlásenie kódom zaslaným e-mailom"
@@ -8017,6 +8163,40 @@ msgstr "Prihlásenie"
 msgid "Sign-in methods"
 msgstr "Spôsoby prihlásenia"
 
+#: src/postulo/core/mail_auth.py:65
+#, draft
+msgid "Signed in once, as the mailbox that sends"
+msgstr "Raz prihlásené, ako schránka, ktorá odosiela"
+
+#: src/postulo/core/server_forms.py:238
+#, draft
+msgid ""
+"Signed in once: somebody agrees on the provider's consent screen, as the mailbox that sends, and needs no administrator. The application sends on its own: Microsoft only, and needs a tenant administrator to grant the permission."
+msgstr ""
+"Raz prihlásené: niekto súhlasí na obrazovke súhlasu poskytovateľa, ako schránka, ktorá odosiela, bez akéhokoľvek správcu. Aplikácia odosiela samostatne: iba Microsoft a správca nájomníka musí udeliť oprávnenie."
+
+#: src/postulo/plugins/views.py:314
+#, draft
+msgid "Signed in to the mail provider. Test the connection to make sure."
+msgstr "Prihlásené u poskytovateľa pošty. Pre istotu otestujte pripojenie."
+
+#: src/postulo/templates/server/email.html:243
+#, draft
+msgid ""
+"Signed in. The provider can withdraw this at any time — if a password is changed, or the account is not used for months — and mail then stops. The page above says so the moment a send fails."
+msgstr ""
+"Prihlásené. Poskytovateľ to môže kedykoľvek odvolať — keď sa zmení heslo alebo sa účet mesiace nepoužíva — a pošta potom prestane odchádzať. Stránka vyššie to povie, hneď ako odoslanie zlyhá."
+
+#: src/postulo/core/server_forms.py:226
+#, draft
+msgid "Signing in"
+msgstr "Prihlasovanie"
+
+#: src/postulo/templates/server/email.html:185
+#, draft
+msgid "Signing in with a token"
+msgstr "Prihlasovanie tokenom"
+
 #: src/postulo/templates/server/signin.html:32
 #, draft
 msgid "Signs in to an existing account by e-mail"
@@ -8027,7 +8207,7 @@ msgstr "Prihlási sa do existujúceho účtu e-mailom"
 msgid "Single sign-on"
 msgstr "Jednotné prihlásenie"
 
-#: src/postulo/core/models.py:524
+#: src/postulo/core/models.py:527
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "jednotné prihlásenie sa počíta ako druhý faktor"
@@ -8042,7 +8222,7 @@ msgstr "Jednotné prihlásenie sa počíta ako druhý faktor"
 msgid "Site search"
 msgstr "Hľadanie na webe"
 
-#: src/postulo/core/models.py:640 src/postulo/core/models.py:641
+#: src/postulo/core/models.py:664 src/postulo/core/models.py:665
 #, draft
 msgid "site settings"
 msgstr "nastavenia webu"
@@ -8100,12 +8280,12 @@ msgstr "preskočené"
 msgid "Slowest"
 msgstr "Najpomalší"
 
-#: src/postulo/core/models.py:82 src/postulo/jobs/models.py:42
+#: src/postulo/core/models.py:85 src/postulo/jobs/models.py:42
 #, draft
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:570
+#: src/postulo/core/models.py:573
 #, draft
 msgid "SMTP server"
 msgstr "Server SMTP"
@@ -8394,7 +8574,7 @@ msgstr "Vypnúť"
 msgid "Switch on"
 msgstr "Zapnúť"
 
-#: src/postulo/core/models.py:167
+#: src/postulo/core/models.py:170
 #, draft
 msgid "Switchboard"
 msgstr "Ústredňa"
@@ -8423,7 +8603,7 @@ msgid ""
 msgstr ""
 "Vypnutie zastaví používanie a nič nemaže: pripojenia, ktoré ste vytvorili, zostávajú presne také, aké sú, a opätovné zapnutie ich vráti bez zmeny."
 
-#: src/postulo/plugins/views.py:375
+#: src/postulo/plugins/views.py:401
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Synchronizácia zlyhala: %(error)s"
@@ -8443,7 +8623,7 @@ msgstr "väzby synchronizácie"
 msgid "Sync now"
 msgstr "Synchronizovať teraz"
 
-#: src/postulo/plugins/views.py:377
+#: src/postulo/plugins/views.py:403
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Synchronizované: %(summary)s."
@@ -8463,7 +8643,7 @@ msgstr "Tabuľka"
 msgid "table settings"
 msgstr "nastavenia tabuľky"
 
-#: src/postulo/core/models.py:91
+#: src/postulo/core/models.py:94
 #, draft
 msgid "tag"
 msgstr "štítok"
@@ -8476,7 +8656,7 @@ msgstr "štítok"
 msgid "Tag"
 msgstr "Štítok"
 
-#: src/postulo/core/models.py:507
+#: src/postulo/core/models.py:510
 #, draft
 msgid "tagline"
 msgstr "slogan"
@@ -8489,7 +8669,7 @@ msgstr "slogan"
 msgid "Tags"
 msgstr "Štítky"
 
-#: src/postulo/applications/models.py:241 src/postulo/core/models.py:92
+#: src/postulo/applications/models.py:241 src/postulo/core/models.py:95
 #, draft
 msgid "tags"
 msgstr "štítky"
@@ -8530,12 +8710,12 @@ msgstr "telefón"
 msgid "Telephone number"
 msgstr "Telefónne číslo"
 
-#: src/postulo/core/models.py:213
+#: src/postulo/core/models.py:216
 #, draft
 msgid "telephone number"
 msgstr "telefónne číslo"
 
-#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:214
+#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:217
 #: src/postulo/jobs/models.py:428
 #, draft
 msgid "telephone numbers"
@@ -8561,12 +8741,12 @@ msgstr "Šablóny sa objavia, keď posielate list so žiadosťou."
 msgid "Test"
 msgstr "Otestovať"
 
-#: src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:353
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Test zlyhal: %(message)s"
 
-#: src/postulo/templates/server/email.html:181
+#: src/postulo/templates/server/email.html:228
 #, draft
 msgid "Test the connection"
 msgstr "Otestovať pripojenie"
@@ -8581,17 +8761,17 @@ msgstr "text"
 msgid "text as sent"
 msgstr "text, ako bol odoslaný"
 
-#: src/postulo/core/models.py:616
+#: src/postulo/core/models.py:640
 #, draft
 msgid "text configuration"
 msgstr "nastavenie správ"
 
-#: src/postulo/core/models.py:617
+#: src/postulo/core/models.py:641
 #, draft
 msgid "text secrets"
 msgstr "tajomstvá správ"
 
-#: src/postulo/core/models.py:615
+#: src/postulo/core/models.py:639
 #, draft
 msgid "text transport"
 msgstr "prenos správ"
@@ -8630,17 +8810,17 @@ msgid ""
 msgstr ""
 "Ten reťazec je hlbší než %(limit)s spoločností — hlbšie, než dokáže Postulo zmysluplne vykresliť."
 
-#: src/postulo/plugins/consent.py:147
+#: src/postulo/plugins/consent.py:156
 #, draft
 msgid "That connection belongs to somebody else."
 msgstr "Toto pripojenie patrí niekomu inému."
 
-#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#: src/postulo/plugins/consent.py:116 src/postulo/plugins/consent.py:161
 #, draft
 msgid "That connection does not use consent."
 msgstr "Toto pripojenie nepoužíva súhlas."
 
-#: src/postulo/plugins/consent.py:145
+#: src/postulo/plugins/consent.py:154
 #, draft
 msgid "That connection no longer exists."
 msgstr "Toto pripojenie už neexistuje."
@@ -8769,7 +8949,7 @@ msgstr "To s tým Postulo urobiť nemôže."
 msgid "That is not something Postulo can do to several at once."
 msgstr "To Postulo nedokáže urobiť s viacerými naraz."
 
-#: src/postulo/core/server_views.py:1029 src/postulo/core/server_views.py:1070
+#: src/postulo/core/server_views.py:1101 src/postulo/core/server_views.py:1142
 #, draft
 msgid "That is not something this page does."
 msgstr "To táto stránka nerobí."
@@ -8829,7 +9009,7 @@ msgid ""
 msgstr ""
 "Toto číslo už je na tejto inštalácii zapísané. Telefónne čísla sa tu držia jedinečné naprieč všetkými účtami, takže môže patriť k záznamom niekoho iného."
 
-#: src/postulo/core/server_views.py:1128 src/postulo/core/server_views.py:1133
+#: src/postulo/core/server_views.py:1200 src/postulo/core/server_views.py:1205
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Ten balík už nečaká; nahrajte ho znova."
@@ -8854,12 +9034,12 @@ msgstr "Táto stránka vrátila %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tento obrázok má vyše 5 MB. Menší, prosím."
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:301
+#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Tento plugin už nie je nainštalovaný."
 
-#: src/postulo/plugins/consent.py:140
+#: src/postulo/core/mail_auth.py:360 src/postulo/plugins/consent.py:149
 #, draft
 msgid "That reply did not come from a request Postulo made."
 msgstr "Táto odpoveď neprišla z požiadavky, ktorú poslalo Postulo."
@@ -8909,6 +9089,11 @@ msgstr "Adresa odpovedala ničím."
 msgid "The application deadline, if stated."
 msgstr "Uzávierka prihlášok, ak je uvedená."
 
+#: src/postulo/core/mail_auth.py:66
+#, draft
+msgid "The application sends on its own"
+msgstr "Aplikácia odosiela samostatne"
+
 #: src/postulo/plugins/catalogue.py:184
 #, draft
 msgid "The catalogue is not readable JSON."
@@ -8924,10 +9109,17 @@ msgstr "Podpis katalógu nezodpovedá jeho obsahu; katalóg nebol použitý."
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Podpis alebo kľúč katalógu nie je čitateľný: %(error)s"
 
-#: src/postulo/core/server_views.py:1185
+#: src/postulo/core/server_views.py:1257
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Katalógy odpovedali a zatiaľ nič neuvádzajú."
+
+#: src/postulo/templates/server/email.html:203
+#, python-format, draft
+msgid ""
+"The client secret is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
+msgstr ""
+"Tajný kľúč klienta nastavuje <code>%(variable)s</code> v prostredí; zmeňte ho tam. Nikdy sa tu nezobrazuje."
 
 #: src/postulo/templates/applications/application_intake.html:10
 #, draft
@@ -8985,7 +9177,7 @@ msgstr "Skoršia verzia, ktorú táto nahrádza. Starý súbor sa zachová."
 msgid "The employer as a whole"
 msgstr "Zamestnávateľ ako celok"
 
-#: src/postulo/core/server_views.py:988 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:1060 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Prostredie nastavuje „%(name)s“, takže sa to tu nedá zmeniť."
@@ -9037,7 +9229,7 @@ msgstr "Inštalátor ho odmietol: %(error)s"
 msgid "The job title"
 msgstr "Názov pozície"
 
-#: src/postulo/core/server_views.py:1045
+#: src/postulo/core/server_views.py:1117
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -9107,10 +9299,15 @@ msgid ""
 msgstr ""
 "Najdlhšia medzera sa meria vnútri tohto obdobia. Prebiehajúce obdobie sa počíta do dňa, keď bol tento dokument vytvorený. Týždeň označený ako (časť) presahuje mimo obdobie; nič zvonka sa nepočíta."
 
-#: src/postulo/core/server_views.py:732
+#: src/postulo/core/server_views.py:804
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Poštový backend nič neprijal."
+
+#: src/postulo/templates/server/email.html:240
+#, draft
+msgid "The mailbox this instance sends from"
+msgstr "Schránka, z ktorej táto inštancia odosiela"
 
 #: src/postulo/templates/resume/preview.html:12
 #, draft
@@ -9130,7 +9327,7 @@ msgid ""
 msgstr ""
 "Číslo, ktoré vás dostane späť, je oddelené od toho, ktoré tlačia vaše dokumenty, takže zmena toho, čo vytáča náborár, nemení, ako dokazujete, že ste to vy. Najprv musí byť potvrdené, a vypnutie viacerých telefónnych čísel vám ho nikdy nevezme."
 
-#: src/postulo/core/server_views.py:1018
+#: src/postulo/core/server_views.py:1090
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Oficiálny repozitár sa vyprázdni, neodstraňuje sa."
@@ -9150,7 +9347,7 @@ msgstr "Predchádzajúce"
 msgid "The opening paragraph, if you use one."
 msgstr "Úvodný odsek, ak ho používate."
 
-#: src/postulo/templates/server/email.html:162
+#: src/postulo/templates/server/email.html:164
 #, python-format, draft
 msgid ""
 "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -9162,7 +9359,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Odmena"
 
-#: src/postulo/core/server_views.py:798
+#: src/postulo/core/server_views.py:870
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Zásuvné moduly dodávané vnútri Postula. Nič sa nesťahuje."
@@ -9184,17 +9381,24 @@ msgstr "inzerát"
 msgid "The posting itself"
 msgstr "Samotný inzerát"
 
-#: src/postulo/plugins/consent.py:241
+#: src/postulo/plugins/consent.py:251
 #, python-format, draft
 msgid "The provider answered %(status)s."
 msgstr "Poskytovateľ odpovedal %(status)s."
 
-#: src/postulo/plugins/consent.py:237
+#: src/postulo/core/mail_auth.py:388
+#, draft
+msgid ""
+"The provider sent no refresh token, so mail would stop within the hour. Check that offline access is allowed for this application."
+msgstr ""
+"Poskytovateľ neposlal obnovovací token, takže pošta by do hodiny prestala odchádzať. Skontrolujte, či je pre túto aplikáciu povolený offline prístup."
+
+#: src/postulo/plugins/consent.py:247
 #, draft
 msgid "The provider will not renew this. Somebody has to agree to it again."
 msgstr "Poskytovateľ to neobnoví. Niekto musí súhlasiť znova."
 
-#: src/postulo/plugins/consent.py:246
+#: src/postulo/plugins/consent.py:256
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "Odpoveď poskytovateľa sa nedala prečítať."
@@ -9232,7 +9436,7 @@ msgid ""
 msgstr ""
 "Server neponúka STARTTLS. Vypnite ho alebo použite port, ktorý ho ponúka."
 
-#: src/postulo/core/mail.py:122
+#: src/postulo/core/mail.py:134
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "Server tieto prihlasovacie údaje odmietol: %(detail)s"
@@ -9268,6 +9472,11 @@ msgstr "Web Postulo odmieta, alebo inzerát vyžaduje prihlásenie"
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "robots.txt webu sa rešpektuje."
+
+#: src/postulo/core/mail_auth.py:220
+#, draft
+msgid "The stored mail credentials cannot be read on this instance."
+msgstr "Uložené prihlasovacie údaje k pošte nemožno na tejto inštancii prečítať."
 
 #: src/postulo/templates/settings/appearance.html:7
 #, draft
@@ -9334,7 +9543,7 @@ msgstr "Nie je adresa, z ktorej by sa dalo získať znovu."
 msgid "There is no file to send."
 msgstr "Nie je žiadny súbor na odoslanie."
 
-#: src/postulo/core/server_views.py:983
+#: src/postulo/core/server_views.py:1055
 #, draft
 msgid "There is no repository by that name."
 msgstr "Repozitár s takým názvom neexistuje."
@@ -9570,7 +9779,7 @@ msgstr "záznam na časovej osi"
 msgid "Timeout"
 msgstr "Časový limit"
 
-#: src/postulo/core/models.py:594
+#: src/postulo/core/models.py:597
 #, draft
 msgid "timeout in seconds"
 msgstr "časový limit v sekundách"
@@ -9652,7 +9861,7 @@ msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr ""
 "Príliš veľa požiadaviek: povolených %(times)d každých %(seconds)d sekúnd."
 
-#: src/postulo/core/models.py:412
+#: src/postulo/core/models.py:415
 #, draft
 msgid "town or city"
 msgstr "obec"
@@ -9679,12 +9888,12 @@ msgstr "preklady"
 msgid "Transport and logistics"
 msgstr "Doprava a logistika"
 
-#: src/postulo/core/models.py:605
+#: src/postulo/core/models.py:629
 #, draft
 msgid "transport configuration"
 msgstr "konfigurácia transportu"
 
-#: src/postulo/core/models.py:607
+#: src/postulo/core/models.py:631
 #, draft
 msgid "transport secrets"
 msgstr "tajomstvá transportu"
@@ -9790,13 +9999,13 @@ msgstr "do %(high)s"
 msgid "Update the preview"
 msgstr "Aktualizovať náhľad"
 
-#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:32
-#: src/postulo/core/models.py:629
+#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:35
+#: src/postulo/core/models.py:653
 #, draft
 msgid "updated at"
 msgstr "aktualizované dňa"
 
-#: src/postulo/core/models.py:636
+#: src/postulo/core/models.py:660
 #, draft
 msgid "updated by"
 msgstr "aktualizoval(a)"
@@ -9905,7 +10114,7 @@ msgstr "používateľ"
 msgid "Username"
 msgstr "Používateľské meno"
 
-#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:577
+#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:580
 #, draft
 msgid "username"
 msgstr "používateľské meno"
@@ -9920,7 +10129,7 @@ msgstr "Používateľské meno alebo e-mail"
 msgid "users"
 msgstr "používatelia"
 
-#: src/postulo/templates/server/email.html:191
+#: src/postulo/templates/server/email.html:263
 #, draft
 msgid ""
 "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
@@ -9937,7 +10146,7 @@ msgstr "Použitie tokenu"
 msgid "Utilities"
 msgstr "Verejné služby"
 
-#: src/postulo/core/models.py:192
+#: src/postulo/core/models.py:195
 #, draft
 msgid "verified"
 msgstr "overené"
@@ -10018,7 +10227,7 @@ msgstr "Čaká na použitie"
 msgid "was “%(text)s”"
 msgstr "bolo „%(text)s“"
 
-#: src/postulo/core/models.py:203
+#: src/postulo/core/models.py:206
 #, draft
 msgid "way back into the account"
 msgstr "cesta späť do účtu"
@@ -10104,7 +10313,7 @@ msgstr "Čo sa vrátilo"
 msgid "What came back in this period"
 msgstr "Čo sa vrátilo v tomto období"
 
-#: src/postulo/core/server_forms.py:316
+#: src/postulo/core/server_forms.py:386
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "Čo odnáša poštu z tohto stroja."
@@ -10307,6 +10516,13 @@ msgstr "Keď má prijatie prihlášku aj posunúť."
 msgid "When it entered your listings."
 msgstr "Kedy sa dostala do vašich ponúk."
 
+#: src/postulo/templates/server/email.html:215
+#, draft
+msgid ""
+"When you register this instance with the provider, give it this address to send people back to:"
+msgstr ""
+"Keď budete túto inštanciu registrovať u poskytovateľa, zadajte mu túto adresu na návrat ľudí:"
+
 #: src/postulo/applications/models.py:527
 #, draft
 msgid "where"
@@ -10375,12 +10591,12 @@ msgstr "kde bývate"
 msgid "Where your job search stands today."
 msgstr "Kde je dnes vaše hľadanie práce."
 
-#: src/postulo/core/models.py:516
+#: src/postulo/core/models.py:519
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Či si ktokoľvek, kto nájde adresu, môže vytvoriť účet."
 
-#: src/postulo/core/models.py:527
+#: src/postulo/core/models.py:530
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -10507,7 +10723,7 @@ msgstr "S: %(people)s"
 msgid "Withdrawn"
 msgstr "Stiahnuté"
 
-#: src/postulo/core/models.py:165 src/postulo/core/models.py:392
+#: src/postulo/core/models.py:168 src/postulo/core/models.py:395
 #, draft
 msgid "Work"
 msgstr "Práca"
@@ -10565,6 +10781,11 @@ msgstr ""
 #, draft
 msgid "written, not yet read by a speaker"
 msgstr "napísané, hovoriaci zatiaľ nečítal"
+
+#: src/postulo/core/mail_auth.py:47
+#, draft
+msgid "XOAUTH2, with a token from the provider"
+msgstr "XOAUTH2, s tokenom od poskytovateľa"
 
 #: src/postulo/core/server_forms.py:14
 #, draft
@@ -10850,7 +11071,7 @@ msgid ""
 msgstr ""
 "Vaše meno a kontaktný blok, ktorý sa vytlačí na vaše CV. Ako sa k vám Postulo správa — motív, jazyk, používateľské meno, adresy — nájdete v <a href=\"%(settings_url)s\" class=\"underline\">Nastaveniach</a>."
 
-#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
+#: src/postulo/core/models.py:183 src/postulo/core/models.py:408
 #, draft
 msgid "Your name for it, when none of the kinds above fits."
 msgstr "Váš vlastný názov preň, keď sa žiaden z druhov vyššie nehodí."
@@ -10925,20 +11146,20 @@ msgstr "· časť tohto týždňa leží mimo obdobia"
 msgid "· still running"
 msgstr "· stále prebieha"
 
-#: src/postulo/core/server_views.py:1024
+#: src/postulo/core/server_views.py:1096
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr ""
 "„%(name)s“ je preč. Všetko, čo sa z neho nainštalovalo, zostáva nainštalované."
 
-#: src/postulo/core/server_views.py:1009
+#: src/postulo/core/server_views.py:1081
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "„%(name)s“ je vypnutý. Nič nové sa z neho neinštaluje ani neaktualizuje; čo bolo nainštalované, funguje ďalej."
 
-#: src/postulo/core/server_views.py:1006
+#: src/postulo/core/server_views.py:1078
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""

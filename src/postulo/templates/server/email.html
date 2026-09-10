@@ -136,6 +136,7 @@
     <div class="card mb-4">
       <h3 class="mb-3 font-medium">{% translate "Settings" %}</h3>
       {% for field in form %}
+        {% if field.name not in oauth_fields %}
         {% with variable=pinned|get_item:field.name %}
           {% if variable %}
             {% pinned_field field variable %}
@@ -143,6 +144,7 @@
             {% include "partials/field.html" with field=field %}
           {% endif %}
         {% endwith %}
+        {% endif %}
       {% endfor %}
       {% comment %} The password gets no field when the environment holds it, so it needs
          the line the other pinned fields carry beside their box, or it is the one setting
@@ -162,6 +164,50 @@
         {% endif %}
       {% endwith %}
     </div>
+
+    {% if form.email_auth %}
+      {% comment %} A card of its own rather than six more boxes in the list above, because
+         most instances never need it: a relay of the operator's own, and Gmail with an app
+         password, sign in the way they always have. It is here for Microsoft 365, which
+         stops accepting passwords for sending mail by default at the end of December 2026,
+         and for anybody whose provider has gone the same way (#151). {% endcomment %}
+      <div class="card mb-4" data-oauth>
+        <h3 class="mb-1 font-medium">{% translate "Signing in with a token" %}</h3>
+        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Only for a provider that no longer accepts a password. Your own mail server needs none of this." %}
+        </p>
+        {% for field in form %}
+          {% if field.name in oauth_fields %}
+            {% with variable=pinned|get_item:field.name %}
+              {% if variable %}
+                {% pinned_field field variable %}
+              {% else %}
+                {% include "partials/field.html" with field=field %}
+              {% endif %}
+            {% endwith %}
+          {% endif %}
+        {% endfor %}
+        {% with variable=pinned|get_item:'email_oauth_client_secret' %}
+          {% if variable %}
+            <p class="field-help" data-pinned="email_oauth_client_secret">
+              {% blocktranslate trimmed %}
+                The client secret is set by <code>{{ variable }}</code> in the environment;
+                change it there. It is never shown here.
+              {% endblocktranslate %}
+            </p>
+          {% elif has_client_secret %}
+            <p class="text-xs text-ink-500 dark:text-ink-400">
+              {% translate "A client secret is stored. It is never shown." %}
+            </p>
+          {% endif %}
+        {% endwith %}
+        <div class="mt-4 text-sm">
+          <p class="mb-1">{% translate "When you register this instance with the provider, give it this address to send people back to:" %}</p>
+          <p><code class="break-all" data-consent-callback>{{ consent_callback }}</code></p>
+        </div>
+      </div>
+    {% endif %}
+
     <div class="mb-8 flex flex-wrap items-center gap-2">
       <button type="submit" class="btn-primary">{% translate "Save" %}</button>
       {% comment %} Same form, different action: the connection test takes what is on screen
@@ -172,6 +218,30 @@
       </button>
     </div>
   </form>
+
+  {% if uses_mailbox_grant %}
+    {% comment %} Its own form, after the settings, because it posts somewhere else and
+       forms do not nest. It uses what is *saved*: the provider is told a client ID, and a
+       client ID nobody has saved is one the callback could not find again. {% endcomment %}
+    <form method="post" action="{% url 'server:email_consent' %}" class="card mb-4" data-mail-consent>
+      {% csrf_token %}
+      <h3 class="mb-1 font-medium">{% translate "The mailbox this instance sends from" %}</h3>
+      {% if has_consent %}
+        <p class="mb-3 text-sm">
+          {% translate "Signed in. The provider can withdraw this at any time — if a password is changed, or the account is not used for months — and mail then stops. The page above says so the moment a send fails." %}
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <button type="submit" class="btn-secondary">{% translate "Sign in again" %}</button>
+          <button type="submit" name="forget" value="1" class="btn-ghost">{% translate "Forget the grant" %}</button>
+        </div>
+      {% else %}
+        <p class="mb-3 text-sm">
+          {% translate "Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from." %}
+        </p>
+        <button type="submit" class="btn-primary">{% translate "Sign in to the provider" %}</button>
+      {% endif %}
+    </form>
+  {% endif %}
 
   <form method="post" action="{% url 'server:email_test' %}" novalidate>
     {% csrf_token %}

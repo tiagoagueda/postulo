@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:54+0000\n"
+"POT-Creation-Date: 2026-09-10 08:21+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Ελληνικά\n"
@@ -43,7 +43,7 @@ msgstr "Η %(company)s έχει ήδη αναγνωριστικό %(scheme)s: %(
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s άλλαξαν."
 
-#: src/postulo/plugins/views.py:345
+#: src/postulo/plugins/views.py:371
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -222,12 +222,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s έως %(high)s"
 
-#: src/postulo/core/server_views.py:1200
+#: src/postulo/core/server_views.py:1272
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "Το %(name)s %(version)s εγκαταστάθηκε από τον κατάλογο."
 
-#: src/postulo/core/server_views.py:1150
+#: src/postulo/core/server_views.py:1222
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -303,19 +303,19 @@ msgstr "Ο/Η %(name)s είναι τώρα διαχειριστής."
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "Το %(name)s βρίσκεται τώρα στη γραμμή %(row)s, θέση %(place)s."
 
-#: src/postulo/core/server_views.py:1261
+#: src/postulo/core/server_views.py:1333
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "Το %(name)s αφαιρέθηκε. Επανεκκινήστε το Postulo για να είστε βέβαιοι ότι τίποτα δικό του δεν έμεινε φορτωμένο."
 
-#: src/postulo/core/server_views.py:1233
+#: src/postulo/core/server_views.py:1305
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "Το %(name)s είναι απενεργοποιημένο· τα αρχεία του είναι ακόμη εδώ."
 
-#: src/postulo/core/server_views.py:1235
+#: src/postulo/core/server_views.py:1307
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "Το %(name)s ενεργοποιήθηκε ξανά."
@@ -382,6 +382,18 @@ msgstr "%(package)s: χρειάζεται %(wanted)s, και το Postulo έχε
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "Το %(plugin)s δεν μπόρεσε να ελέγξει αυτές τις ρυθμίσεις: %(error)s"
+
+#: src/postulo/core/mail_auth.py:234
+#, python-format, draft
+msgid "%(provider)s does not let an application send on its own."
+msgstr "Ο πάροχος %(provider)s δεν επιτρέπει σε εφαρμογή να στέλνει μόνη της."
+
+#: src/postulo/core/server_forms.py:343
+#, python-format, draft
+msgid ""
+"%(provider)s does not let an application send on its own. Choose “Signed in once”."
+msgstr ""
+"Ο πάροχος %(provider)s δεν επιτρέπει σε εφαρμογή να στέλνει μόνη της. Επιλέξτε «Σύνδεση μία φορά»."
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
@@ -487,7 +499,7 @@ msgstr ""
 msgid "%(when)s ago"
 msgstr "πριν από %(when)s"
 
-#: src/postulo/core/models.py:445
+#: src/postulo/core/models.py:448
 #, draft
 msgid "(empty address)"
 msgstr "(κενή διεύθυνση)"
@@ -542,6 +554,11 @@ msgid ""
 msgstr ""
 "Μια επέκταση φυλλομετρητή χρειάζεται μόνο το πρώτο. Δώστε σε έναν πράκτορα μόνο ανάγνωση μέχρι να τον εμπιστευτείτε για εγγραφή."
 
+#: src/postulo/templates/server/email.html:210
+#, draft
+msgid "A client secret is stored. It is never shown."
+msgstr "Έχει αποθηκευτεί μυστικό πελάτη. Δεν εμφανίζεται ποτέ."
+
 #: src/postulo/jobs/models.py:196
 #, draft
 msgid "A company cannot be part of itself."
@@ -574,12 +591,12 @@ msgstr "Μια εταιρεία, ένας ρόλος, μια φράση από �
 msgid "A CSV file"
 msgstr "Ένα αρχείο CSV"
 
-#: src/postulo/core/models.py:87
+#: src/postulo/core/models.py:90
 #, draft
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Μια υπόδειξη για τη διεπαφή, όπως «amber» ή «sky»."
 
-#: src/postulo/core/models.py:510
+#: src/postulo/core/models.py:513
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Μια γραμμή κάτω από το όνομα στη σελίδα σύνδεσης. Προαιρετικό."
@@ -601,7 +618,7 @@ msgstr ""
 msgid "A month"
 msgstr "Ένας μήνας"
 
-#: src/postulo/core/models.py:288
+#: src/postulo/core/models.py:291
 #, draft
 msgid ""
 "A number has to be confirmed before it can get you back in. Nobody has answered on this one."
@@ -629,11 +646,23 @@ msgid ""
 msgstr ""
 "Ένα κλειδί πρόσβασης δένεται με τη διεύθυνση στην οποία το δημιουργήσατε, εδώ %(host)s. Η πρόσβαση σε αυτή την εγκατάσταση με άλλο όνομα, ή η μετακίνησή της, δεν θα μεταφέρει τα κλειδιά σας."
 
-#: src/postulo/templates/server/email.html:169
+#: src/postulo/core/server_forms.py:228
+#, draft
+msgid ""
+"A password is right for your own mail server, and for Gmail with an app password. Microsoft 365 stops accepting passwords for sending mail by default at the end of December 2026; after that it needs XOAUTH2."
+msgstr ""
+"Ένας κωδικός πρόσβασης κάνει για τον δικό σας διακομιστή αλληλογραφίας και για το Gmail με κωδικό εφαρμογής. Το Microsoft 365 σταματά από προεπιλογή να δέχεται κωδικούς για αποστολή αλληλογραφίας στο τέλος Δεκεμβρίου 2026· μετά χρειάζεται XOAUTH2."
+
+#: src/postulo/templates/server/email.html:171
 #, draft
 msgid "A password is stored. It is never shown, not even its length."
 msgstr ""
 "Υπάρχει αποθηκευμένος κωδικός πρόσβασης. Δεν εμφανίζεται ποτέ, ούτε καν το μήκος του."
+
+#: src/postulo/core/mail_auth.py:46
+#, draft
+msgid "A password, or an app password"
+msgstr "Κωδικός πρόσβασης ή κωδικός εφαρμογής"
 
 #: src/postulo/templates/widgets/suggestions.html:6
 #, python-format, draft
@@ -762,7 +791,7 @@ msgid ""
 msgstr ""
 "Ένα πρότυπο με τις στήλες του Postulo και μία γραμμή παραδείγματος. Συμπληρώστε το και ανεβάστε το παραπάνω."
 
-#: src/postulo/core/server_views.py:715
+#: src/postulo/core/server_views.py:787
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Ένα δοκιμαστικό μήνυμα από %(name)s"
@@ -1017,7 +1046,7 @@ msgstr "Προστέθηκε."
 msgid "Address"
 msgstr "Διεύθυνση"
 
-#: src/postulo/core/models.py:410 src/postulo/jobs/models.py:740
+#: src/postulo/core/models.py:413 src/postulo/jobs/models.py:740
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
@@ -1448,6 +1477,11 @@ msgstr ""
 msgid "attempts"
 msgstr "προσπάθειες"
 
+#: src/postulo/core/models.py:607
+#, draft
+msgid "authentication"
+msgstr "ταυτοποίηση"
+
 #: src/postulo/jobs/industries.py:83
 #, draft
 msgid "Automotive"
@@ -1873,10 +1907,15 @@ msgstr "Επιλέξτε πρώτα ένα αρχείο Europass."
 msgid "Choose a new password"
 msgstr "Επιλέξτε νέο κωδικό"
 
-#: src/postulo/core/server_views.py:1081
+#: src/postulo/core/server_views.py:1153
 #, draft
 msgid "Choose a package first."
 msgstr "Επιλέξτε πρώτα ένα πακέτο."
+
+#: src/postulo/core/mail_auth.py:312
+#, draft
+msgid "Choose an identity provider and save it first."
+msgstr "Επιλέξτε πρώτα πάροχο ταυτότητας και αποθηκεύστε τον."
 
 #: src/postulo/templates/core/import_csv_map.html:102
 #, draft
@@ -1931,6 +1970,16 @@ msgid "Cleared: this entry prints its original text in %(language)s."
 msgstr ""
 "Άδειασε: αυτή η καταχώριση τυπώνει το αρχικό της κείμενο στα %(language)s."
 
+#: src/postulo/core/models.py:613
+#, draft
+msgid "client ID"
+msgstr "αναγνωριστικό πελάτη"
+
+#: src/postulo/core/server_forms.py:245
+#, draft
+msgid "Client secret"
+msgstr "Μυστικό πελάτη"
+
 #: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:663
 #, draft
 msgid "Closed"
@@ -1977,7 +2026,7 @@ msgstr "Κώδικας (GitHub, GitLab…)"
 msgid "code repository"
 msgstr "αποθετήριο κώδικα"
 
-#: src/postulo/core/models.py:84
+#: src/postulo/core/models.py:87
 #, draft
 msgid "colour"
 msgstr "χρώμα"
@@ -2106,18 +2155,23 @@ msgstr "Σύνδεση"
 msgid "Connect %(plugin)s"
 msgstr "Σύνδεση %(plugin)s"
 
-#: src/postulo/core/mail.py:133
+#: src/postulo/core/mail.py:145
+#, python-format, draft
+msgid "Connected to %(host)s:%(port)s and signed in as %(user)s with a token."
+msgstr "Συνδέθηκε με %(host)s:%(port)s ως %(user)s με διακριτικό."
+
+#: src/postulo/core/mail.py:151
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Συνδέθηκε στο %(host)s:%(port)s και έγινε είσοδος ως %(user)s."
 
-#: src/postulo/core/mail.py:138
+#: src/postulo/core/mail.py:156
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Συνδέθηκε στο %(host)s:%(port)s. Χωρίς όνομα χρήστη, οπότε δεν έγινε καμία είσοδος."
 
-#: src/postulo/plugins/views.py:289
+#: src/postulo/plugins/views.py:298
 #, draft
 msgid "Connected. Test it to make sure it works."
 msgstr "Συνδέθηκε. Δοκιμάστε το για να βεβαιωθείτε ότι λειτουργεί."
@@ -2128,7 +2182,7 @@ msgstr "Συνδέθηκε. Δοκιμάστε το για να βεβαιωθε
 msgid "connection"
 msgstr "σύνδεση"
 
-#: src/postulo/plugins/views.py:392
+#: src/postulo/plugins/views.py:418
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Η σύνδεση αφαιρέθηκε, μαζί με τα μυστικά."
@@ -2138,7 +2192,7 @@ msgstr "Η σύνδεση αφαιρέθηκε, μαζί με τα μυστικ�
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Η σύνδεση αποθηκεύτηκε. Δοκιμάστε την για να βεβαιωθείτε ότι λειτουργεί."
 
-#: src/postulo/core/models.py:588
+#: src/postulo/core/models.py:591
 #, draft
 msgid "connection security"
 msgstr "ασφάλεια σύνδεσης"
@@ -2150,7 +2204,7 @@ msgstr "Ασφάλεια σύνδεσης"
 
 #: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:388
+#: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2268,7 +2322,7 @@ msgid ""
 msgstr ""
 "Μετράται από το χρονολόγιο, οπότε οι συνεντεύξεις που καταγράφηκαν πριν υπάρξει το ημερολόγιο περιλαμβάνονται."
 
-#: src/postulo/core/models.py:416 src/postulo/core/postal.py:170
+#: src/postulo/core/models.py:419 src/postulo/core/postal.py:170
 #, draft
 msgid "country"
 msgstr "χώρα"
@@ -2313,7 +2367,7 @@ msgid "created"
 msgstr "δημιουργήθηκε"
 
 #: src/postulo/accounts/models.py:344 src/postulo/accounts/models.py:415
-#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:31
+#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:34
 #, draft
 msgid "created at"
 msgstr "δημιουργήθηκε στις"
@@ -2583,12 +2637,12 @@ msgstr "Απορρίφθηκε"
 msgid "Declined. It will not be suggested again."
 msgstr "Απορρίφθηκε. Δεν θα προταθεί ξανά."
 
-#: src/postulo/core/models.py:550
+#: src/postulo/core/models.py:553
 #, draft
 msgid "default language"
 msgstr "προεπιλεγμένη γλώσσα"
 
-#: src/postulo/core/models.py:561
+#: src/postulo/core/models.py:564
 #, draft
 msgid "default time zone"
 msgstr "προεπιλεγμένη ζώνη ώρας"
@@ -2703,6 +2757,11 @@ msgstr "Δεν απάντησε"
 #, draft
 msgid "did not answer when last checked"
 msgstr "δεν απάντησε στον τελευταίο έλεγχο"
+
+#: src/postulo/core/models.py:612
+#, draft
+msgid "directory (tenant) ID"
+msgstr "αναγνωριστικό καταλόγου (μισθωτή)"
 
 #: src/postulo/templates/jobs/capture_list.html:45
 #: src/postulo/templates/jobs/listing_list.html:44
@@ -3249,7 +3308,7 @@ msgstr "Εξήχθη ξεχωριστά"
 msgid "Failed"
 msgstr "Απέτυχε"
 
-#: src/postulo/core/models.py:672 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:696 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Απέτυχε χωρίς να πει γιατί."
@@ -3264,7 +3323,7 @@ msgstr "Έκθεση"
 msgid "Fastest"
 msgstr "Ταχύτερο"
 
-#: src/postulo/core/models.py:168
+#: src/postulo/core/models.py:171
 #, draft
 msgid "Fax"
 msgstr "Φαξ"
@@ -3455,6 +3514,11 @@ msgid ""
 msgstr ""
 "Η εξαναγκασμένη ενεργοποίηση δεν το κάνει να λειτουργεί: ένας ειδοποιητής, ένας αποθηκευτικός χώρος ή ένας συγχρονισμός χρειάζεται διαπιστευτήρια που μόνο αυτό το άτομο μπορεί να δώσει. Σημαίνει ότι μπορεί να το χρησιμοποιεί και δεν μπορεί να το απενεργοποιήσει."
 
+#: src/postulo/templates/server/email.html:247
+#, draft
+msgid "Forget the grant"
+msgstr "Λήθη της εξουσιοδότησης"
+
 #: src/postulo/core/server_forms.py:218
 #, draft
 msgid "Forget the stored password"
@@ -3529,7 +3593,7 @@ msgstr "από %(low)s"
 msgid "From %(name)s."
 msgstr "Από %(name)s."
 
-#: src/postulo/core/models.py:596
+#: src/postulo/core/models.py:599
 #, draft
 msgid "from address"
 msgstr "διεύθυνση αποστολέα"
@@ -3649,6 +3713,11 @@ msgstr "Έλαβε κάποια απάντηση"
 msgid "grade"
 msgstr "βαθμός"
 
+#: src/postulo/core/models.py:609
+#, draft
+msgid "grant"
+msgstr "εξουσιοδότηση"
+
 #: src/postulo/accounts/models.py:335
 #, draft
 msgid "Gravatar checked on"
@@ -3746,7 +3815,7 @@ msgstr "σημεία έμφασης"
 msgid "highlights for this CV"
 msgstr "σημεία έμφασης για αυτό το βιογραφικό"
 
-#: src/postulo/core/models.py:166 src/postulo/core/models.py:391
+#: src/postulo/core/models.py:169 src/postulo/core/models.py:394
 #, draft
 msgid "Home"
 msgstr "Οικία"
@@ -3815,6 +3884,11 @@ msgstr "Πόσο τακτικά"
 #, draft
 msgid "How the first rows will be read"
 msgstr "Πώς θα διαβαστούν οι πρώτες γραμμές"
+
+#: src/postulo/core/server_forms.py:236
+#, draft
+msgid "How the token is obtained"
+msgstr "Πώς λαμβάνεται το διακριτικό"
 
 #: src/postulo/templates/server/capture.html:7
 #, draft
@@ -3896,7 +3970,17 @@ msgstr "Αναγνωριστικά"
 msgid "Identifies itself as"
 msgstr "Παρουσιάζεται ως"
 
-#: src/postulo/core/server_views.py:717
+#: src/postulo/core/models.py:608
+#, draft
+msgid "identity provider"
+msgstr "πάροχος ταυτότητας"
+
+#: src/postulo/core/server_forms.py:234
+#, draft
+msgid "Identity provider"
+msgstr "Πάροχος ταυτότητας"
+
+#: src/postulo/core/server_views.py:789
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3910,7 +3994,7 @@ msgid ""
 msgstr ""
 "Αν έχετε υποβάλει αίτηση σε θεσμικό όργανο της ΕΕ ή μέσω εθνικής υπηρεσίας απασχόλησης, έχετε ήδη αυτό το αρχείο. Αντί να τα πληκτρολογήσετε όλα ξανά, δώστε το."
 
-#: src/postulo/core/models.py:519
+#: src/postulo/core/models.py:522
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "αγνόηση του robots.txt κατά τη σύλληψη"
@@ -4096,7 +4180,7 @@ msgstr "Εγκατεστημένα σε αυτή την εγκατάσταση"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Η εγκατάσταση ενός πρόσθετου εκτελεί ξένο κώδικα μέσα στο Postulo."
 
-#: src/postulo/core/models.py:501
+#: src/postulo/core/models.py:504
 #, draft
 msgid "instance name"
 msgstr "όνομα εγκατάστασης"
@@ -4111,7 +4195,7 @@ msgstr "ίδρυμα"
 msgid "Insurance"
 msgstr "Ασφάλειες"
 
-#: src/postulo/core/server_views.py:797 src/postulo/plugins/provenance.py:59
+#: src/postulo/core/server_views.py:869 src/postulo/plugins/provenance.py:59
 #, draft
 msgid "Internal"
 msgstr "Εσωτερικό"
@@ -4273,7 +4357,7 @@ msgid ""
 msgstr ""
 "Αρνείται να δώσει οτιδήποτε αντί να δημοσιεύσει αυτές τις εγγραφές σε όποιον βρει τη διεύθυνση. Ορίστε το POSTULO_LOGS_TOKEN ή απενεργοποιήστε το POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:325
+#: src/postulo/plugins/views.py:351
 #, draft
 msgid "It works."
 msgstr "Λειτουργεί."
@@ -4366,8 +4450,8 @@ msgstr ""
 
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
-#: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
+#: src/postulo/core/models.py:403 src/postulo/documents/models.py:112
 #: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
 #: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:243
@@ -4452,7 +4536,7 @@ msgstr "Γλώσσες"
 msgid "languages"
 msgstr "γλώσσες"
 
-#: src/postulo/core/models.py:560
+#: src/postulo/core/models.py:563
 #, draft
 msgid "languages offered"
 msgstr "προσφερόμενες γλώσσες"
@@ -4566,7 +4650,7 @@ msgid "Leave a box empty and that line prints as it is written above it."
 msgstr ""
 "Αφήστε ένα πλαίσιο κενό και η γραμμή τυπώνεται όπως είναι γραμμένη από πάνω."
 
-#: src/postulo/core/server_forms.py:215
+#: src/postulo/core/server_forms.py:215 src/postulo/core/server_forms.py:248
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "Αφήστε το κενό για να διατηρηθεί ο ήδη αποθηκευμένος."
@@ -4814,7 +4898,7 @@ msgstr "Πεζά γράμματα, ψηφία, τελείες, κάτω παύλ
 msgid "Made"
 msgstr "Δημιουργήθηκε"
 
-#: src/postulo/core/models.py:627
+#: src/postulo/core/models.py:651
 #, draft
 msgid "mail failures in a row"
 msgstr "αποτυχίες αλληλογραφίας στη σειρά"
@@ -4835,7 +4919,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Η αλληλογραφία είναι εδώ ο μόνος δρόμος πίσω σε έναν λογαριασμό, οπότε ώσπου να ξαναλειτουργήσει κανένα από τα %(counter)s άτομα σε αυτή την εγκατάσταση δεν μπορεί να ξαναμπεί αν ξεχάσει τον κωδικό του."
 
-#: src/postulo/core/models.py:623
+#: src/postulo/core/models.py:647
 #, draft
 msgid "mail last failed"
 msgstr "τελευταία αποτυχία αλληλογραφίας"
@@ -4845,7 +4929,7 @@ msgstr "τελευταία αποτυχία αλληλογραφίας"
 msgid "Mail last went out at %(when)s."
 msgstr "Η αλληλογραφία βγήκε τελευταία φορά στις %(when)s."
 
-#: src/postulo/core/models.py:622
+#: src/postulo/core/models.py:646
 #, draft
 msgid "mail last worked"
 msgstr "τελευταία φορά που λειτούργησε η αλληλογραφία"
@@ -4864,17 +4948,22 @@ msgid ""
 msgstr ""
 "Η αλληλογραφία δεν κρατά πια ούτε τη μεταφορά στη θέση της, γιατί μια διαδρομή που δεν παραδίδει τίποτα δεν προστατεύει κανέναν."
 
-#: src/postulo/core/models.py:600
+#: src/postulo/core/models.py:619
+#, draft
+msgid "mail OAuth secrets"
+msgstr "μυστικά OAuth αλληλογραφίας"
+
+#: src/postulo/core/models.py:624
 #, draft
 msgid "mail transport"
 msgstr "μεταφορέας αλληλογραφίας"
 
-#: src/postulo/core/server_forms.py:313
+#: src/postulo/core/server_forms.py:383
 #, draft
 msgid "Mail transport"
 msgstr "Μεταφορέας αλληλογραφίας"
 
-#: src/postulo/core/models.py:624
+#: src/postulo/core/models.py:648
 #, draft
 msgid "mail's last error"
 msgstr "τελευταίο σφάλμα αλληλογραφίας"
@@ -4995,12 +5084,19 @@ msgstr "Συγχώνευση σε"
 msgid "Merged."
 msgstr "Συγχωνεύθηκε."
 
+#: src/postulo/core/server_forms.py:284
+#, draft
+msgid ""
+"Microsoft only: the directory the application is registered in. Leave blank for an application that accepts any directory."
+msgstr ""
+"Μόνο Microsoft: ο κατάλογος στον οποίο είναι εγγεγραμμένη η εφαρμογή. Αφήστε κενό για εφαρμογή που δέχεται οποιονδήποτε κατάλογο."
+
 #: src/postulo/documents/models.py:221
 #, draft
 msgid "Missing entry"
 msgstr "Λείπει καταχώριση"
 
-#: src/postulo/core/models.py:164
+#: src/postulo/core/models.py:167
 #, draft
 msgid "Mobile"
 msgstr "Κινητό"
@@ -5109,7 +5205,7 @@ msgid "NACE division"
 msgstr "κλάδος NACE"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/core/models.py:84 src/postulo/documents/models.py:109
 #: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
@@ -5128,7 +5224,7 @@ msgstr "όνομα"
 msgid "Name"
 msgstr "Όνομα"
 
-#: src/postulo/core/models.py:177 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
 #, draft
 msgid "name, if Other"
 msgstr "όνομα, αν Άλλο"
@@ -5299,7 +5395,7 @@ msgstr ""
 msgid "no company"
 msgstr "χωρίς εταιρεία"
 
-#: src/postulo/core/server_views.py:695
+#: src/postulo/core/server_views.py:739
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Καμία σύνδεση: %(why)s"
@@ -5314,6 +5410,11 @@ msgstr "Δεν υπάρχουν συνδέσεις ακόμη"
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
 "Δεν έχει συνδεθεί αποθήκη εγγράφων. Προσθέστε μία στις Ρυθμίσεις → Συνδέσεις."
+
+#: src/postulo/core/mail_auth.py:213 src/postulo/core/mail_auth.py:369
+#, draft
+msgid "No identity provider is chosen for mail."
+msgstr "Δεν έχει επιλεγεί πάροχος ταυτότητας για την αλληλογραφία."
 
 #: src/postulo/templates/widgets/industries.html:41
 #, draft
@@ -5395,7 +5496,7 @@ msgstr "Δεν έχουν καταγραφεί αγγελίες για αυτή 
 msgid "no role"
 msgstr "χωρίς ρόλο"
 
-#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:101
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:112
 #, draft
 msgid "No server to connect to."
 msgstr "Δεν υπάρχει διακομιστής για σύνδεση."
@@ -5441,7 +5542,7 @@ msgstr "όχι — μόνο υπάρχοντες λογαριασμοί"
 msgid "No-show"
 msgstr "Μη εμφάνιση"
 
-#: src/postulo/plugins/consent.py:184
+#: src/postulo/plugins/consent.py:193
 #, draft
 msgid "Nobody has agreed to this yet. Connect it again."
 msgstr "Κανείς δεν έχει συμφωνήσει ακόμη. Συνδέστε το ξανά."
@@ -5450,6 +5551,19 @@ msgstr "Κανείς δεν έχει συμφωνήσει ακόμη. Συνδέ
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
 msgstr "Δεν έχει απαντήσει ακόμη κανείς, οπότε δεν υπάρχει τίποτα να μετρηθεί."
+
+#: src/postulo/core/mail_auth.py:242
+#, draft
+msgid "Nobody has signed in to the mail provider yet. Connect it first."
+msgstr ""
+"Κανείς δεν έχει συνδεθεί ακόμη στον πάροχο αλληλογραφίας. Συνδέστε τον πρώτα."
+
+#: src/postulo/templates/server/email.html:251
+#, draft
+msgid ""
+"Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
+msgstr ""
+"Κανείς δεν έχει συνδεθεί ακόμη, οπότε δεν μπορεί να σταλεί τίποτα. Αποθηκεύστε τις ρυθμίσεις παραπάνω και μετά συνδεθείτε στη σελίδα του παρόχου ως το γραμματοκιβώτιο από το οποίο στέλνει αυτή η εγκατάσταση."
 
 #: src/postulo/templates/jobs/company_detail.html:231
 #, draft
@@ -5592,7 +5706,7 @@ msgstr "μη ορισμένο"
 msgid "Not set here — the environment or the default applies"
 msgstr "Δεν ορίστηκε εδώ — ισχύει το περιβάλλον ή η προεπιλογή"
 
-#: src/postulo/core/server_forms.py:246
+#: src/postulo/core/server_forms.py:276
 #, draft
 msgid "Not set — the environment decides"
 msgstr "Δεν έχει οριστεί — αποφασίζει το περιβάλλον"
@@ -5850,7 +5964,7 @@ msgstr "Τίποτα για σύνδεση"
 msgid "Nothing to decide"
 msgstr "Τίποτα προς απόφαση"
 
-#: src/postulo/plugins/views.py:354
+#: src/postulo/plugins/views.py:380
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5878,18 +5992,18 @@ msgstr "Τίποτα δεν περιμένει"
 msgid "Nothing was added."
 msgstr "Τίποτα δεν προστέθηκε."
 
-#: src/postulo/plugins/views.py:280
+#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
 #, draft
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "Δεν συνδέθηκε τίποτα. Κανείς δεν συμφώνησε σε τίποτα."
 
 #: src/postulo/accounts/settings_views.py:147
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
 #, draft
 msgid "Nothing was different."
 msgstr "Τίποτα δεν ήταν διαφορετικό."
 
-#: src/postulo/core/server_views.py:1119
+#: src/postulo/core/server_views.py:1191
 #, draft
 msgid "Nothing was installed."
 msgstr "Δεν εγκαταστάθηκε τίποτα."
@@ -5963,7 +6077,7 @@ msgstr "Προσφορά"
 msgid "Offer received"
 msgstr "Ελήφθη προσφορά"
 
-#: src/postulo/core/models.py:548
+#: src/postulo/core/models.py:551
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr ""
@@ -6163,17 +6277,29 @@ msgstr "Μόνο %(name)s"
 msgid "Only entries not already on it are listed."
 msgstr "Εμφανίζονται μόνο οι καταχωρίσεις που δεν υπάρχουν ήδη μέσα."
 
+#: src/postulo/templates/server/email.html:187
+#, draft
+msgid ""
+"Only for a provider that no longer accepts a password. Your own mail server needs none of this."
+msgstr ""
+"Μόνο για πάροχο που δεν δέχεται πια κωδικούς. Ο δικός σας διακομιστής αλληλογραφίας δεν χρειάζεται τίποτα από αυτά."
+
 #: src/postulo/plugins/fetching.py:121
 #, draft
 msgid "Only http and https addresses can be captured."
 msgstr "Μόνο διευθύνσεις http και https μπορούν να συλληφθούν."
 
-#: src/postulo/core/models.py:279
+#: src/postulo/core/models.py:282
 #, draft
 msgid ""
 "Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
 msgstr ""
 "Μόνο ένας από τους δικούς σας αριθμούς μπορεί να σας ξαναβάλει στον λογαριασμό σας. Αυτός ανήκει σε κάποιον με τον οποίο συναλλάσσεστε."
+
+#: src/postulo/core/mail_auth.py:364
+#, draft
+msgid "Only the administrator who started this can finish it."
+msgstr "Μόνο ο διαχειριστής που το ξεκίνησε μπορεί να το ολοκληρώσει."
 
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
@@ -6245,8 +6371,8 @@ msgid "Original posting"
 msgstr "Αρχική αγγελία"
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
-#: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
+#: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
 #: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
 #: src/postulo/resume/models.py:219
 #, draft
@@ -6295,7 +6421,7 @@ msgstr "Μόνο εκκρεμείς"
 msgid "Overview"
 msgstr "Επισκόπηση"
 
-#: src/postulo/core/models.py:64
+#: src/postulo/core/models.py:67
 #, draft
 msgid "owner"
 msgstr "κάτοχος"
@@ -6369,7 +6495,7 @@ msgstr "Μερικώς μεταφρασμένο"
 msgid "Passkeys"
 msgstr "Κλειδιά πρόσβασης"
 
-#: src/postulo/core/models.py:581
+#: src/postulo/core/models.py:584
 #, draft
 msgid "password"
 msgstr "κωδικός πρόσβασης"
@@ -6491,7 +6617,7 @@ msgstr "Φαρμακευτική"
 msgid "Phone"
 msgstr "Τηλέφωνο"
 
-#: src/postulo/core/models.py:182
+#: src/postulo/core/models.py:185
 #, draft
 msgid "phone"
 msgstr "τηλέφωνο"
@@ -6553,7 +6679,7 @@ msgid "plugin repository"
 msgstr "αποθετήριο πρόσθετων"
 
 #: src/postulo/accounts/settings_views.py:125
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:751
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:823
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -6561,7 +6687,7 @@ msgstr "αποθετήριο πρόσθετων"
 msgid "Plugins"
 msgstr "Πρόσθετα"
 
-#: src/postulo/core/server_views.py:952
+#: src/postulo/core/server_views.py:1024
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -6598,7 +6724,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP ή GIF έως 5 MB. Περικόπτεται σε τετράγωνο και αφαιρείται ό,τι ήξερε το αρχείο για το πού τραβήχτηκε."
 
-#: src/postulo/core/models.py:572
+#: src/postulo/core/models.py:575
 #, draft
 msgid "port"
 msgstr "θύρα"
@@ -6634,17 +6760,17 @@ msgstr "Χαρτοφυλάκια, προφίλ και βίντεο που του
 msgid "Positions"
 msgstr "Θέσεις"
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:396
 #, draft
 msgid "Postal"
 msgstr "Ταχυδρομική"
 
-#: src/postulo/core/models.py:425
+#: src/postulo/core/models.py:428
 #, draft
 msgid "postal address"
 msgstr "ταχυδρομική διεύθυνση"
 
-#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:426
+#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:429
 #: src/postulo/jobs/models.py:431
 #, draft
 msgid "postal addresses"
@@ -6655,7 +6781,7 @@ msgstr "ταχυδρομικές διευθύνσεις"
 msgid "Postal addresses"
 msgstr "Ταχυδρομικές διευθύνσεις"
 
-#: src/postulo/core/models.py:411
+#: src/postulo/core/models.py:414
 #, draft
 msgid "postcode"
 msgstr "ταχυδρομικός κώδικας"
@@ -6751,6 +6877,13 @@ msgid ""
 msgstr ""
 "Το Postulo το ξέχασε. Ο πάροχος εξακολουθεί να έχει την άδεια μέχρι να την αποσύρετε και εκεί."
 
+#: src/postulo/core/server_views.py:759
+#, draft
+msgid ""
+"Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
+msgstr ""
+"Το Postulo ξέχασε την εξουσιοδότηση. Ο πάροχος τη διατηρεί μέχρι να την ανακαλέσετε κι εκεί."
+
 #: src/postulo/templates/server/plugins.html:127
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6820,7 +6953,7 @@ msgstr "Προεπισκόπηση"
 msgid "Previous"
 msgstr "Προηγούμενο"
 
-#: src/postulo/core/models.py:186 src/postulo/core/models.py:417
+#: src/postulo/core/models.py:189 src/postulo/core/models.py:420
 #, draft
 msgid "primary"
 msgstr "κύριος"
@@ -7211,7 +7344,7 @@ msgstr "Σύσταση"
 msgid "Refresh logo"
 msgstr "Λήψη λογότυπου ξανά"
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:418
 #, draft
 msgid "region"
 msgstr "περιφέρεια"
@@ -7221,7 +7354,13 @@ msgstr "περιφέρεια"
 msgid "Register this address with the provider"
 msgstr "Καταχωρίστε αυτή τη διεύθυνση στον πάροχο"
 
-#: src/postulo/plugins/consent.py:111
+#: src/postulo/core/mail_auth.py:316
+#, draft
+msgid "Register this instance with the provider first, and save the client ID."
+msgstr ""
+"Εγγράψτε πρώτα αυτή την εγκατάσταση στον πάροχο και αποθηκεύστε το αναγνωριστικό πελάτη."
+
+#: src/postulo/plugins/consent.py:120
 #, draft
 msgid "Register this instance with the provider first, and save the client id."
 msgstr ""
@@ -7234,7 +7373,7 @@ msgid ""
 msgstr ""
 "Η εγγραφή είναι ανοιχτή: όποιος βρει τη διεύθυνση μπορεί να δημιουργήσει λογαριασμό."
 
-#: src/postulo/core/models.py:513
+#: src/postulo/core/models.py:516
 #, draft
 msgid "registration open"
 msgstr "εγγραφή ανοιχτή"
@@ -7574,7 +7713,7 @@ msgstr "μισθός έως"
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
 #: src/postulo/templates/server/defaults.html:72
-#: src/postulo/templates/server/email.html:175
+#: src/postulo/templates/server/email.html:222
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:98
@@ -7619,8 +7758,8 @@ msgstr "Αποθηκεύτηκε στις αγγελίες σας. Αποφασ�
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:147
 #: src/postulo/core/server_views.py:389 src/postulo/core/server_views.py:517
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
-#: src/postulo/core/server_views.py:1053 src/postulo/resume/views.py:223
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
+#: src/postulo/core/server_views.py:1125 src/postulo/resume/views.py:223
 #, draft
 msgid "Saved."
 msgstr "Αποθηκεύτηκε."
@@ -7744,12 +7883,12 @@ msgstr "Επιλογή όλων σε αυτή τη σελίδα"
 msgid "Selected"
 msgstr "Επιλεγμένο"
 
-#: src/postulo/templates/server/email.html:189
+#: src/postulo/templates/server/email.html:261
 #, draft
 msgid "Send a real message"
 msgstr "Αποστολή πραγματικού μηνύματος"
 
-#: src/postulo/templates/server/email.html:195
+#: src/postulo/templates/server/email.html:267
 #, draft
 msgid "Send a test message"
 msgstr "Αποστολή δοκιμαστικού μηνύματος"
@@ -7780,7 +7919,7 @@ msgstr "Αποστολή στις αποθήκες τώρα"
 msgid "Sending as yourself"
 msgstr "Αποστολή ως ο εαυτός σας"
 
-#: src/postulo/core/server_views.py:727
+#: src/postulo/core/server_views.py:799
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Η αποστολή απέτυχε: %(error)s"
@@ -7815,7 +7954,7 @@ msgstr "Απεσταλμένα έγγραφα"
 msgid "sent on"
 msgstr "στάλθηκε στις"
 
-#: src/postulo/core/server_views.py:730
+#: src/postulo/core/server_views.py:802
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Στάλθηκε σε %(to)s."
@@ -7977,7 +8116,7 @@ msgstr "Εμφάνιση και παρελθόντων"
 msgid "Show this period"
 msgstr "Δείξε αυτή την περίοδο"
 
-#: src/postulo/core/models.py:504
+#: src/postulo/core/models.py:507
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Εμφανίζεται στην κεφαλίδα και στη σελίδα σύνδεσης."
@@ -7988,7 +8127,17 @@ msgstr "Εμφανίζεται στην κεφαλίδα και στη σελί�
 msgid "Sign in"
 msgstr "Σύνδεση"
 
-#: src/postulo/core/models.py:545
+#: src/postulo/templates/server/email.html:246
+#, draft
+msgid "Sign in again"
+msgstr "Νέα σύνδεση"
+
+#: src/postulo/templates/server/email.html:253
+#, draft
+msgid "Sign in to the provider"
+msgstr "Σύνδεση στον πάροχο"
+
+#: src/postulo/core/models.py:548
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "σύνδεση με κωδικό που στέλνεται με email"
@@ -8021,6 +8170,41 @@ msgstr "Σύνδεση"
 msgid "Sign-in methods"
 msgstr "Μέθοδοι σύνδεσης"
 
+#: src/postulo/core/mail_auth.py:65
+#, draft
+msgid "Signed in once, as the mailbox that sends"
+msgstr "Σύνδεση μία φορά, ως το γραμματοκιβώτιο που στέλνει"
+
+#: src/postulo/core/server_forms.py:238
+#, draft
+msgid ""
+"Signed in once: somebody agrees on the provider's consent screen, as the mailbox that sends, and needs no administrator. The application sends on its own: Microsoft only, and needs a tenant administrator to grant the permission."
+msgstr ""
+"Σύνδεση μία φορά: κάποιος συναινεί στην οθόνη συναίνεσης του παρόχου, ως το γραμματοκιβώτιο που στέλνει, χωρίς κανέναν διαχειριστή. Η εφαρμογή στέλνει μόνη της: μόνο Microsoft, και ένας διαχειριστής μισθωτή πρέπει να δώσει την άδεια."
+
+#: src/postulo/plugins/views.py:314
+#, draft
+msgid "Signed in to the mail provider. Test the connection to make sure."
+msgstr ""
+"Συνδεθήκατε στον πάροχο αλληλογραφίας. Δοκιμάστε τη σύνδεση για σιγουριά."
+
+#: src/postulo/templates/server/email.html:243
+#, draft
+msgid ""
+"Signed in. The provider can withdraw this at any time — if a password is changed, or the account is not used for months — and mail then stops. The page above says so the moment a send fails."
+msgstr ""
+"Συνδεθήκατε. Ο πάροχος μπορεί να το ανακαλέσει ανά πάσα στιγμή — αν αλλάξει κωδικός ή ο λογαριασμός μείνει αχρησιμοποίητος για μήνες — και τότε η αλληλογραφία σταματά. Η σελίδα παραπάνω το λέει μόλις αποτύχει μια αποστολή."
+
+#: src/postulo/core/server_forms.py:226
+#, draft
+msgid "Signing in"
+msgstr "Σύνδεση"
+
+#: src/postulo/templates/server/email.html:185
+#, draft
+msgid "Signing in with a token"
+msgstr "Σύνδεση με διακριτικό"
+
 #: src/postulo/templates/server/signin.html:32
 #, draft
 msgid "Signs in to an existing account by e-mail"
@@ -8031,7 +8215,7 @@ msgstr "Σύνδεση σε υπάρχοντα λογαριασμό μέσω ema
 msgid "Single sign-on"
 msgstr "Ενιαία σύνδεση"
 
-#: src/postulo/core/models.py:524
+#: src/postulo/core/models.py:527
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "η ενιαία σύνδεση μετρά ως δεύτερος παράγοντας"
@@ -8046,7 +8230,7 @@ msgstr "Η ενιαία σύνδεση μετρά ως δεύτερος παρά
 msgid "Site search"
 msgstr "Αναζήτηση στον ιστότοπο"
 
-#: src/postulo/core/models.py:640 src/postulo/core/models.py:641
+#: src/postulo/core/models.py:664 src/postulo/core/models.py:665
 #, draft
 msgid "site settings"
 msgstr "ρυθμίσεις ιστότοπου"
@@ -8104,12 +8288,12 @@ msgstr "παραλείφθηκαν"
 msgid "Slowest"
 msgstr "Βραδύτερο"
 
-#: src/postulo/core/models.py:82 src/postulo/jobs/models.py:42
+#: src/postulo/core/models.py:85 src/postulo/jobs/models.py:42
 #, draft
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:570
+#: src/postulo/core/models.py:573
 #, draft
 msgid "SMTP server"
 msgstr "Διακομιστής SMTP"
@@ -8399,7 +8583,7 @@ msgstr "Απενεργοποίηση"
 msgid "Switch on"
 msgstr "Ενεργοποίηση"
 
-#: src/postulo/core/models.py:167
+#: src/postulo/core/models.py:170
 #, draft
 msgid "Switchboard"
 msgstr "Τηλεφωνικό κέντρο"
@@ -8428,7 +8612,7 @@ msgid ""
 msgstr ""
 "Η απενεργοποίηση σταματά τη χρήση και δεν διαγράφει τίποτα: οι συνδέσεις που έχετε φτιάξει μένουν ακριβώς όπως είναι, και η επανενεργοποίηση τις επιστρέφει αμετάβλητες."
 
-#: src/postulo/plugins/views.py:375
+#: src/postulo/plugins/views.py:401
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Ο συγχρονισμός απέτυχε: %(error)s"
@@ -8448,7 +8632,7 @@ msgstr "σύνδεσμοι συγχρονισμού"
 msgid "Sync now"
 msgstr "Συγχρονισμός τώρα"
 
-#: src/postulo/plugins/views.py:377
+#: src/postulo/plugins/views.py:403
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Συγχρονίστηκε: %(summary)s."
@@ -8468,7 +8652,7 @@ msgstr "Πίνακας"
 msgid "table settings"
 msgstr "ρυθμίσεις πίνακα"
 
-#: src/postulo/core/models.py:91
+#: src/postulo/core/models.py:94
 #, draft
 msgid "tag"
 msgstr "ετικέτα"
@@ -8481,7 +8665,7 @@ msgstr "ετικέτα"
 msgid "Tag"
 msgstr "Ετικέτα"
 
-#: src/postulo/core/models.py:507
+#: src/postulo/core/models.py:510
 #, draft
 msgid "tagline"
 msgstr "σύνθημα"
@@ -8494,7 +8678,7 @@ msgstr "σύνθημα"
 msgid "Tags"
 msgstr "Ετικέτες"
 
-#: src/postulo/applications/models.py:241 src/postulo/core/models.py:92
+#: src/postulo/applications/models.py:241 src/postulo/core/models.py:95
 #, draft
 msgid "tags"
 msgstr "ετικέτες"
@@ -8535,12 +8719,12 @@ msgstr "τηλέφωνο"
 msgid "Telephone number"
 msgstr "Αριθμός τηλεφώνου"
 
-#: src/postulo/core/models.py:213
+#: src/postulo/core/models.py:216
 #, draft
 msgid "telephone number"
 msgstr "αριθμός τηλεφώνου"
 
-#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:214
+#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:217
 #: src/postulo/jobs/models.py:428
 #, draft
 msgid "telephone numbers"
@@ -8566,12 +8750,12 @@ msgstr "Τα πρότυπα εμφανίζονται όταν στέλνετε �
 msgid "Test"
 msgstr "Δοκιμή"
 
-#: src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:353
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Η δοκιμή απέτυχε: %(message)s"
 
-#: src/postulo/templates/server/email.html:181
+#: src/postulo/templates/server/email.html:228
 #, draft
 msgid "Test the connection"
 msgstr "Δοκιμή της σύνδεσης"
@@ -8586,17 +8770,17 @@ msgstr "κείμενο"
 msgid "text as sent"
 msgstr "κείμενο όπως στάλθηκε"
 
-#: src/postulo/core/models.py:616
+#: src/postulo/core/models.py:640
 #, draft
 msgid "text configuration"
 msgstr "ρύθμιση μηνυμάτων"
 
-#: src/postulo/core/models.py:617
+#: src/postulo/core/models.py:641
 #, draft
 msgid "text secrets"
 msgstr "μυστικά μηνυμάτων"
 
-#: src/postulo/core/models.py:615
+#: src/postulo/core/models.py:639
 #, draft
 msgid "text transport"
 msgstr "μεταφορά μηνυμάτων"
@@ -8635,17 +8819,17 @@ msgid ""
 msgstr ""
 "Αυτή η αλυσίδα έχει βάθος πάνω από %(limit)s εταιρείες, περισσότερο από όσο μπορεί το Postulo να αποτυπώσει χρήσιμα."
 
-#: src/postulo/plugins/consent.py:147
+#: src/postulo/plugins/consent.py:156
 #, draft
 msgid "That connection belongs to somebody else."
 msgstr "Αυτή η σύνδεση ανήκει σε κάποιον άλλο."
 
-#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#: src/postulo/plugins/consent.py:116 src/postulo/plugins/consent.py:161
 #, draft
 msgid "That connection does not use consent."
 msgstr "Αυτή η σύνδεση δεν χρησιμοποιεί συγκατάθεση."
 
-#: src/postulo/plugins/consent.py:145
+#: src/postulo/plugins/consent.py:154
 #, draft
 msgid "That connection no longer exists."
 msgstr "Αυτή η σύνδεση δεν υπάρχει πια."
@@ -8775,7 +8959,7 @@ msgstr "Αυτό δεν είναι κάτι που μπορεί να κάνει 
 msgid "That is not something Postulo can do to several at once."
 msgstr "Αυτό δεν μπορεί να το κάνει το Postulo σε πολλά μαζί."
 
-#: src/postulo/core/server_views.py:1029 src/postulo/core/server_views.py:1070
+#: src/postulo/core/server_views.py:1101 src/postulo/core/server_views.py:1142
 #, draft
 msgid "That is not something this page does."
 msgstr "Αυτό δεν το κάνει αυτή η σελίδα."
@@ -8836,7 +9020,7 @@ msgid ""
 msgstr ""
 "Αυτός ο αριθμός είναι ήδη καταχωρισμένος σε αυτή την εγκατάσταση. Οι αριθμοί τηλεφώνου κρατιούνται μοναδικοί για όλους τους λογαριασμούς εδώ, οπότε μπορεί να ανήκει στα δεδομένα κάποιου άλλου."
 
-#: src/postulo/core/server_views.py:1128 src/postulo/core/server_views.py:1133
+#: src/postulo/core/server_views.py:1200 src/postulo/core/server_views.py:1205
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Αυτό το πακέτο δεν περιμένει πια· ανεβάστε το ξανά."
@@ -8861,12 +9045,12 @@ msgstr "Αυτή η σελίδα επέστρεψε %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Αυτή η εικόνα ξεπερνά τα 5 MB. Μια μικρότερη, παρακαλώ."
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:301
+#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Αυτό το πρόσθετο δεν είναι πλέον εγκατεστημένο."
 
-#: src/postulo/plugins/consent.py:140
+#: src/postulo/core/mail_auth.py:360 src/postulo/plugins/consent.py:149
 #, draft
 msgid "That reply did not come from a request Postulo made."
 msgstr "Αυτή η απάντηση δεν ήρθε από αίτημα που έκανε το Postulo."
@@ -8917,6 +9101,11 @@ msgstr "Η διεύθυνση απάντησε χωρίς τίποτα."
 msgid "The application deadline, if stated."
 msgstr "Η προθεσμία αίτησης, αν αναφέρεται."
 
+#: src/postulo/core/mail_auth.py:66
+#, draft
+msgid "The application sends on its own"
+msgstr "Η εφαρμογή στέλνει μόνη της"
+
 #: src/postulo/plugins/catalogue.py:184
 #, draft
 msgid "The catalogue is not readable JSON."
@@ -8933,10 +9122,17 @@ msgstr ""
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Η υπογραφή ή το κλειδί του καταλόγου δεν διαβάζεται: %(error)s"
 
-#: src/postulo/core/server_views.py:1185
+#: src/postulo/core/server_views.py:1257
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Οι κατάλογοι απάντησαν, και δεν περιλαμβάνουν ακόμη τίποτα."
+
+#: src/postulo/templates/server/email.html:203
+#, python-format, draft
+msgid ""
+"The client secret is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
+msgstr ""
+"Το μυστικό πελάτη ορίζεται από το <code>%(variable)s</code> στο περιβάλλον· αλλάξτε το εκεί. Δεν εμφανίζεται ποτέ εδώ."
 
 #: src/postulo/templates/applications/application_intake.html:10
 #, draft
@@ -8995,7 +9191,7 @@ msgstr "Η προηγούμενη εκδοχή που αυτή αντικαθι�
 msgid "The employer as a whole"
 msgstr "Ο εργοδότης στο σύνολό του"
 
-#: src/postulo/core/server_views.py:988 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:1060 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Το περιβάλλον ορίζει «%(name)s», οπότε δεν μπορεί να αλλάξει εδώ."
@@ -9047,7 +9243,7 @@ msgstr "Ο εγκαταστάτης το απέρριψε: %(error)s"
 msgid "The job title"
 msgstr "Ο τίτλος θέσης"
 
-#: src/postulo/core/server_views.py:1045
+#: src/postulo/core/server_views.py:1117
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -9115,10 +9311,15 @@ msgid ""
 msgstr ""
 "Το μεγαλύτερο κενό μετριέται μέσα σε αυτή την περίοδο. Μια περίοδος που ακόμη τρέχει μετριέται μέχρι την ημέρα που παρήχθη αυτό. Μια εβδομάδα με την ένδειξη (μερικώς) εκτείνεται εκτός της περιόδου· τίποτα εκτός αυτής δεν μετριέται."
 
-#: src/postulo/core/server_views.py:732
+#: src/postulo/core/server_views.py:804
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Το σύστημα αλληλογραφίας δεν δέχτηκε τίποτα."
+
+#: src/postulo/templates/server/email.html:240
+#, draft
+msgid "The mailbox this instance sends from"
+msgstr "Το γραμματοκιβώτιο από το οποίο στέλνει αυτή η εγκατάσταση"
 
 #: src/postulo/templates/resume/preview.html:12
 #, draft
@@ -9139,7 +9340,7 @@ msgid ""
 msgstr ""
 "Ο αριθμός που σας ξαναβάζει μέσα είναι χωριστός από αυτόν που τυπώνουν τα έγγραφά σας, οπότε αλλάζοντας αυτόν που καλεί ένας υπεύθυνος προσλήψεων δεν αλλάζετε τον τρόπο που αποδεικνύετε ότι είστε εσείς. Πρέπει πρώτα να επιβεβαιωθεί, και το κλείσιμο των πολλαπλών αριθμών τηλεφώνου δεν σας τον αφαιρεί ποτέ."
 
-#: src/postulo/core/server_views.py:1018
+#: src/postulo/core/server_views.py:1090
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Το επίσημο αποθετήριο αδειάζει, δεν αφαιρείται."
@@ -9159,7 +9360,7 @@ msgstr "Η προηγούμενη"
 msgid "The opening paragraph, if you use one."
 msgstr "Η εισαγωγική παράγραφος, αν χρησιμοποιείτε."
 
-#: src/postulo/templates/server/email.html:162
+#: src/postulo/templates/server/email.html:164
 #, python-format, draft
 msgid ""
 "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -9171,7 +9372,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Οι αποδοχές"
 
-#: src/postulo/core/server_views.py:798
+#: src/postulo/core/server_views.py:870
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Τα πρόσθετα που έρχονται μέσα στο Postulo. Δεν λαμβάνεται τίποτα."
@@ -9193,17 +9394,24 @@ msgstr "η αγγελία"
 msgid "The posting itself"
 msgstr "Η ίδια η αγγελία"
 
-#: src/postulo/plugins/consent.py:241
+#: src/postulo/plugins/consent.py:251
 #, python-format, draft
 msgid "The provider answered %(status)s."
 msgstr "Ο πάροχος απάντησε %(status)s."
 
-#: src/postulo/plugins/consent.py:237
+#: src/postulo/core/mail_auth.py:388
+#, draft
+msgid ""
+"The provider sent no refresh token, so mail would stop within the hour. Check that offline access is allowed for this application."
+msgstr ""
+"Ο πάροχος δεν έστειλε διακριτικό ανανέωσης, οπότε η αλληλογραφία θα σταματούσε μέσα σε μία ώρα. Ελέγξτε ότι επιτρέπεται η πρόσβαση εκτός σύνδεσης για αυτή την εφαρμογή."
+
+#: src/postulo/plugins/consent.py:247
 #, draft
 msgid "The provider will not renew this. Somebody has to agree to it again."
 msgstr "Ο πάροχος δεν θα το ανανεώσει. Κάποιος πρέπει να συμφωνήσει ξανά."
 
-#: src/postulo/plugins/consent.py:246
+#: src/postulo/plugins/consent.py:256
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "Η απάντηση του παρόχου δεν ήταν αναγνώσιμη."
@@ -9241,7 +9449,7 @@ msgid ""
 msgstr ""
 "Ο διακομιστής δεν προσφέρει STARTTLS. Απενεργοποιήστε το ή χρησιμοποιήστε θύρα που το προσφέρει."
 
-#: src/postulo/core/mail.py:122
+#: src/postulo/core/mail.py:134
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "Ο διακομιστής απέρριψε αυτά τα διαπιστευτήρια: %(detail)s"
@@ -9279,6 +9487,12 @@ msgstr "Ο ιστότοπος απορρίπτει το Postulo, ή η αγγε�
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "Το robots.txt του ιστότοπου τηρείται."
+
+#: src/postulo/core/mail_auth.py:220
+#, draft
+msgid "The stored mail credentials cannot be read on this instance."
+msgstr ""
+"Τα αποθηκευμένα διαπιστευτήρια αλληλογραφίας δεν μπορούν να διαβαστούν σε αυτή την εγκατάσταση."
 
 #: src/postulo/templates/settings/appearance.html:7
 #, draft
@@ -9347,7 +9561,7 @@ msgstr "Δεν υπάρχει διεύθυνση από την οποία να �
 msgid "There is no file to send."
 msgstr "Δεν υπάρχει αρχείο για αποστολή."
 
-#: src/postulo/core/server_views.py:983
+#: src/postulo/core/server_views.py:1055
 #, draft
 msgid "There is no repository by that name."
 msgstr "Δεν υπάρχει αποθετήριο με αυτό το όνομα."
@@ -9582,7 +9796,7 @@ msgstr "καταχώριση χρονολογίου"
 msgid "Timeout"
 msgstr "Χρονικό όριο"
 
-#: src/postulo/core/models.py:594
+#: src/postulo/core/models.py:597
 #, draft
 msgid "timeout in seconds"
 msgstr "χρονικό όριο σε δευτερόλεπτα"
@@ -9664,7 +9878,7 @@ msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr ""
 "Πάρα πολλά αιτήματα: επιτρέπονται %(times)d κάθε %(seconds)d δευτερόλεπτα."
 
-#: src/postulo/core/models.py:412
+#: src/postulo/core/models.py:415
 #, draft
 msgid "town or city"
 msgstr "πόλη"
@@ -9691,12 +9905,12 @@ msgstr "μεταφράσεις"
 msgid "Transport and logistics"
 msgstr "Μεταφορές και εφοδιαστική"
 
-#: src/postulo/core/models.py:605
+#: src/postulo/core/models.py:629
 #, draft
 msgid "transport configuration"
 msgstr "ρυθμίσεις μεταφορέα"
 
-#: src/postulo/core/models.py:607
+#: src/postulo/core/models.py:631
 #, draft
 msgid "transport secrets"
 msgstr "μυστικά μεταφορέα"
@@ -9803,13 +10017,13 @@ msgstr "έως %(high)s"
 msgid "Update the preview"
 msgstr "Ενημέρωση της προεπισκόπησης"
 
-#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:32
-#: src/postulo/core/models.py:629
+#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:35
+#: src/postulo/core/models.py:653
 #, draft
 msgid "updated at"
 msgstr "ενημερώθηκε στις"
 
-#: src/postulo/core/models.py:636
+#: src/postulo/core/models.py:660
 #, draft
 msgid "updated by"
 msgstr "ενημερώθηκε από"
@@ -9920,7 +10134,7 @@ msgstr "χρήστης"
 msgid "Username"
 msgstr "Όνομα χρήστη"
 
-#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:577
+#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:580
 #, draft
 msgid "username"
 msgstr "όνομα χρήστη"
@@ -9935,7 +10149,7 @@ msgstr "Όνομα χρήστη ή email"
 msgid "users"
 msgstr "χρήστες"
 
-#: src/postulo/templates/server/email.html:191
+#: src/postulo/templates/server/email.html:263
 #, draft
 msgid ""
 "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
@@ -9952,7 +10166,7 @@ msgstr "Χρήση διακριτικού"
 msgid "Utilities"
 msgstr "Υπηρεσίες κοινής ωφέλειας"
 
-#: src/postulo/core/models.py:192
+#: src/postulo/core/models.py:195
 #, draft
 msgid "verified"
 msgstr "επαληθευμένο"
@@ -10033,7 +10247,7 @@ msgstr "Περιμένει να χρησιμοποιηθεί"
 msgid "was “%(text)s”"
 msgstr "ήταν «%(text)s»"
 
-#: src/postulo/core/models.py:203
+#: src/postulo/core/models.py:206
 #, draft
 msgid "way back into the account"
 msgstr "δρόμος επιστροφής στον λογαριασμό"
@@ -10120,7 +10334,7 @@ msgstr "Τι ήρθε πίσω"
 msgid "What came back in this period"
 msgstr "Τι ήρθε πίσω σε αυτή την περίοδο"
 
-#: src/postulo/core/server_forms.py:316
+#: src/postulo/core/server_forms.py:386
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "Αυτό που μεταφέρει την αλληλογραφία έξω από αυτό το μηχάνημα."
@@ -10326,6 +10540,13 @@ msgstr "Όταν η αποδοχή πρέπει και να μετακινήσε
 msgid "When it entered your listings."
 msgstr "Πότε μπήκε στις αγγελίες σας."
 
+#: src/postulo/templates/server/email.html:215
+#, draft
+msgid ""
+"When you register this instance with the provider, give it this address to send people back to:"
+msgstr ""
+"Όταν εγγράφετε αυτή την εγκατάσταση στον πάροχο, δώστε του αυτή τη διεύθυνση επιστροφής:"
+
 #: src/postulo/applications/models.py:527
 #, draft
 msgid "where"
@@ -10396,12 +10617,12 @@ msgstr "πού μένετε"
 msgid "Where your job search stands today."
 msgstr "Πού βρίσκεται η αναζήτηση εργασίας σας σήμερα."
 
-#: src/postulo/core/models.py:516
+#: src/postulo/core/models.py:519
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Αν όποιος βρει τη διεύθυνση μπορεί να δημιουργήσει λογαριασμό."
 
-#: src/postulo/core/models.py:527
+#: src/postulo/core/models.py:530
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -10529,7 +10750,7 @@ msgstr "Με: %(people)s"
 msgid "Withdrawn"
 msgstr "Αποσύρθηκε"
 
-#: src/postulo/core/models.py:165 src/postulo/core/models.py:392
+#: src/postulo/core/models.py:168 src/postulo/core/models.py:395
 #, draft
 msgid "Work"
 msgstr "Εργασία"
@@ -10588,6 +10809,11 @@ msgstr ""
 #, draft
 msgid "written, not yet read by a speaker"
 msgstr "γραμμένο, δεν έχει διαβαστεί ακόμη από ομιλητή"
+
+#: src/postulo/core/mail_auth.py:47
+#, draft
+msgid "XOAUTH2, with a token from the provider"
+msgstr "XOAUTH2, με διακριτικό από τον πάροχο"
 
 #: src/postulo/core/server_forms.py:14
 #, draft
@@ -10874,7 +11100,7 @@ msgid ""
 msgstr ""
 "Το όνομά σας και το μπλοκ επικοινωνίας που θα τυπωθεί στα βιογραφικά σας. Το πώς συμπεριφέρεται το Postulo για εσάς — θέμα, γλώσσα, όνομα χρήστη, διευθύνσεις — βρίσκεται στις <a href=\"%(settings_url)s\" class=\"underline\">Ρυθμίσεις</a>."
 
-#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
+#: src/postulo/core/models.py:183 src/postulo/core/models.py:408
 #, draft
 msgid "Your name for it, when none of the kinds above fits."
 msgstr ""
@@ -10950,20 +11176,20 @@ msgstr "· μέρος αυτής της εβδομάδας είναι εκτός
 msgid "· still running"
 msgstr "· ακόμη σε εξέλιξη"
 
-#: src/postulo/core/server_views.py:1024
+#: src/postulo/core/server_views.py:1096
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr ""
 "Το «%(name)s» έφυγε. Ό,τι εγκαταστάθηκε από αυτό παραμένει εγκατεστημένο."
 
-#: src/postulo/core/server_views.py:1009
+#: src/postulo/core/server_views.py:1081
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "Το «%(name)s» είναι ανενεργό. Δεν εγκαθίσταται ούτε ενημερώνεται τίποτα νέο από αυτό· ό,τι ήταν εγκατεστημένο συνεχίζει να λειτουργεί."
 
-#: src/postulo/core/server_views.py:1006
+#: src/postulo/core/server_views.py:1078
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""

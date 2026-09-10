@@ -42,9 +42,10 @@ class SMTPTransport:
         return []
 
     def test(self, config: dict) -> TestResult:
-        from postulo.core import mail
+        from postulo.core import mail, mail_auth
 
         try:
+            token = _token(config)
             report = mail.check_connection(
                 host=str(config.get("host") or ""),
                 port=int(config.get("port") or 25),
@@ -52,8 +53,9 @@ class SMTPTransport:
                 password=str(config.get("password") or ""),
                 security=str(config.get("security") or ""),
                 timeout=int(config.get("timeout") or 10),
+                token=token,
             )
-        except mail.ConnectionFailed as error:
+        except (mail.ConnectionFailed, mail_auth.TokenUnavailable) as error:
             return TestResult(False, str(error))
         return TestResult(True, report)
 
@@ -74,6 +76,9 @@ class SMTPTransport:
             use_tls=config.get("security") == "starttls",
             use_ssl=config.get("security") == "ssl",
             timeout=config.get("timeout"),
+            # Fetched per delivery rather than once, for the same reason the backend is
+            # built fresh: a token nearing its expiry is renewed on the way out (#151).
+            oauth_token=_token(config),
         )
         return backend.send_messages(messages) or 0
 
@@ -81,4 +86,26 @@ class SMTPTransport:
         host = config.get("host") or ""
         if not host:
             return str(_("No server set."))
+        if _uses_a_token(config):
+            return f"{host}:{config.get('port') or 25} · XOAUTH2"
         return f"{host}:{config.get('port') or 25}"
+
+
+def _uses_a_token(config: dict) -> bool:
+    from postulo.core import mail_auth
+
+    return str(config.get("auth") or "") == mail_auth.MailAuth.XOAUTH2
+
+
+def _token(config: dict) -> str:
+    """The bearer token to sign in with, or nothing when this instance signs in by password.
+
+    `TokenUnavailable` goes up rather than being swallowed into an empty string: a send
+    attempted with no token against a server that wants one would fail with *authentication
+    unsuccessful*, which is true and says nothing about the grant that actually lapsed.
+    """
+    if not _uses_a_token(config):
+        return ""
+    from postulo.core import mail_auth
+
+    return mail_auth.instance_token(config)

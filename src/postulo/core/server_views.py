@@ -604,7 +604,31 @@ class EmailView(PolicyView):
             initial={"to": self.request.user.email}
         )
         context["shadowed"] = site.email_shadowed()
-        context["has_password"] = SiteSettings.get().has_email_password
+        row = SiteSettings.get()
+        context["has_password"] = row.has_email_password
+        context["has_client_secret"] = row.has_email_client_secret
+        context["has_consent"] = row.has_email_consent
+        # The address to register with the provider, shown rather than described: a wrong
+        # one ends a consent screen in an error nobody can read (#148).
+        from postulo.plugins import consent
+
+        context["consent_callback"] = consent.callback_url(self.request)
+        from . import mail_auth
+
+        resolved = site.email_settings()
+        context["oauth_fields"] = [
+            "email_auth",
+            "email_oauth_provider",
+            "email_oauth_grant",
+            "email_oauth_tenant",
+            "email_oauth_client_id",
+            "email_oauth_client_secret",
+        ]
+        context["uses_mailbox_grant"] = (
+            resolved["auth"] == mail_auth.MailAuth.XOAUTH2
+            and (resolved["oauth_grant"] or mail_auth.MailGrant.MAILBOX)
+            == mail_auth.MailGrant.MAILBOX
+        )
         context["mail_health"] = site.mail_health()
         # Mail failing matters at all times; it matters *urgently* when mail is the only
         # way back into an account, because then nobody who forgets a password can get in
@@ -682,7 +706,26 @@ class EmailConnectionTestView(StaffRequiredMixin, View):
         else:
             security = typed_security
 
+        from . import mail_auth
+
+        # XOAUTH2 takes what is on screen for everything an operator types, and the stored
+        # grant for the token -- the grant is the one thing a form cannot hold, because it
+        # was issued by a provider after somebody agreed (#151).
+        oauth = {
+            key: value(field)
+            for field, key in site.EMAIL_FIELDS.items()
+            if key.startswith("oauth_") and field not in site.EMAIL_SECRET_FIELDS
+        }
+        typed_secret = request.POST.get("email_oauth_client_secret", "")
+        oauth["oauth_client_secret"] = (
+            typed_secret
+            if typed_secret and "email_oauth_client_secret" not in pinned
+            else resolved["oauth_client_secret"]
+        )
+        auth = str(value("email_auth"))
+
         try:
+            token = mail_auth.instance_token(oauth) if auth == mail_auth.MailAuth.XOAUTH2 else ""
             report = mail.check_connection(
                 host=str(value("email_host")),
                 port=int(value("email_port", int)),
@@ -690,12 +733,41 @@ class EmailConnectionTestView(StaffRequiredMixin, View):
                 password=password,
                 security=security,
                 timeout=int(value("email_timeout", int)),
+                token=token,
             )
-        except mail.ConnectionFailed as error:
+        except (mail.ConnectionFailed, mail_auth.TokenUnavailable) as error:
             messages.error(request, _("No connection: %(why)s") % {"why": error})
         else:
             messages.success(request, report)
         return redirect("server:email")
+
+
+class EmailConsentView(StaffRequiredMixin, View):
+    """Sign in to the mail provider once, as the mailbox this instance sends from (#151).
+
+    A POST rather than a link, because it starts a round trip that ends in a stored
+    credential -- and this one sends the password resets.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        from . import mail_auth
+
+        if request.POST.get("forget"):
+            mail_auth.forget_consent()
+            messages.success(
+                request,
+                _(
+                    "Postulo has forgotten the grant. The provider still has it until you "
+                    "withdraw it there as well."
+                ),
+            )
+            return redirect("server:email")
+        try:
+            where = mail_auth.start_consent(request)
+        except mail_auth.TokenUnavailable as error:
+            messages.error(request, str(error))
+            return redirect("server:email")
+        return redirect(where)
 
 
 class EmailTestView(StaffRequiredMixin, View):

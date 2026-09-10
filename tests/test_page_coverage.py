@@ -65,6 +65,10 @@ EXCUSED: dict[str, str] = {
     ),
     "core:import_csv_forget": "a POST that discards the stashed spreadsheet",
     "core:table_settings": "a POST that records which columns a table shows",
+    "server:email_consent": (
+        "a POST that sends an administrator to the mail provider's consent screen; the "
+        "button is on the Email page, which the suite visits"
+    ),
     "accounts:avatar_refresh": "a POST that fetches the picture again",
     "accounts:theme": "a POST from the theme switch in the header",
     "accounts:invite_revoke": "a POST that withdraws an invitation",

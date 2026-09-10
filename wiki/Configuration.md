@@ -355,6 +355,66 @@ for implicit TLS, 25 for neither. A port you type is never changed.
 still honoured for the two states it can express — `true` means STARTTLS — so a `.env` that
 has worked since 0.1.0 goes on meaning what it meant. Where both are set, the newer one wins.
 
+### Signing in with a token: Microsoft 365 and Google
+
+**Start by working out which reader you are**, because most of you need none of this.
+
+- **Your own mail server** — Postfix, Mailcow, an institutional relay, your hosting
+  provider's SMTP. Nothing changes. Leave *Signing in* alone; a username and a password is
+  what your server wants and will go on wanting.
+- **Gmail or Google Workspace, with an app password.** Nothing changes either, while Google
+  keeps allowing app passwords for your account. A token is available if you would rather.
+- **Microsoft 365 (Exchange Online).** This section is for you, and it has a date on it.
+  Microsoft switches **SMTP AUTH basic authentication off by default for existing tenants at
+  the end of December 2026**, off by default for new tenants after that, and has announced a
+  final removal for the second half of 2027. After that date a username and password stops
+  working, and **an instance that sends password resets through Microsoft 365 cannot send
+  them** — which means nobody who forgets a password can get back in. Only XOAUTH2 works
+  afterwards.
+
+This is *your choice of mail provider being supported*, not Postulo depending on one. An
+instance with its own mail server needs no application registered anywhere.
+
+**What XOAUTH2 needs from you.** An application registered with the provider, which gives
+you a **client ID** and a **client secret**. *Server settings → Email* shows the exact
+address to give the provider as the place to send people back to — register that one, not
+one you construct yourself, because a wrong one ends the provider's consent screen in an
+error nobody can read.
+
+Then choose *Signing in → XOAUTH2*, the provider, and one of two ways of getting the token:
+
+- **Signed in once, as the mailbox that sends.** Save the settings, then press *Sign in to
+  the provider* and agree on the provider's own page *as the mailbox this instance sends
+  from*. Postulo keeps the refresh token it is given and renews the access token as it is
+  used. **Works at both providers and needs no administrator of anything.**
+- **The application sends on its own.** Microsoft only: the client-credentials grant, with
+  nobody's session involved. It needs a **tenant administrator** to give the application the
+  permission to send, scoped to one mailbox. It suits a server better — nothing lapses
+  because a person left — if you can get that permission granted. Google's equivalent is a
+  service account with domain-wide delegation, which is a different grant again and is not
+  offered here rather than offered and broken; the page refuses the pair before it is saved.
+
+**The environment can pin all of it**, the way it pins the host: `POSTULO_EMAIL_AUTH`
+(`password` or `xoauth2`), `POSTULO_EMAIL_OAUTH_PROVIDER` (`google` or `microsoft`),
+`POSTULO_EMAIL_OAUTH_GRANT` (`mailbox` or `application`), `POSTULO_EMAIL_OAUTH_TENANT`
+(Microsoft's directory, or blank), `POSTULO_EMAIL_OAUTH_CLIENT_ID` and
+`POSTULO_EMAIL_OAUTH_CLIENT_SECRET`. The client secret is write-only on the page, like the
+password: it is never shown, and a blank box keeps the one stored.
+
+**A token can stop working on its own, and a password cannot.** A provider may withdraw a
+grant when the mailbox's password changes, when it is not used for months, or when somebody
+revokes it. When that happens the next message fails with the provider's own words, and that
+failure is counted exactly like any other — so the section below shows it, and the lock that
+keeps email switched on while it is the only way back into an account stops counting email
+as a way back once it has failed a few times in a row. *Sign in again* fixes it. *Forget the
+grant* drops the tokens Postulo holds; the provider keeps the grant until you withdraw it
+there as well, which Postulo cannot do on your behalf.
+
+**People's own outboxes** (*Settings → Connections → Your own email*) can sign in the same
+way: choose *Google* or *Microsoft 365* under *Sign in with*, give the client ID and secret,
+and press *Connect* to agree on the provider's page as yourself. The operator can share the
+instance's registration if they choose to; the address to register is the same one.
+
 ### Whether mail is actually getting through
 
 *Server settings → Email* says when mail last went out, and, when the last few messages

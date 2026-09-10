@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:54+0000\n"
+"POT-Creation-Date: 2026-09-10 08:21+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: română\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s are deja un identificator %(scheme)s: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s modificate."
 
-#: src/postulo/plugins/views.py:345
+#: src/postulo/plugins/views.py:371
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -235,12 +235,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "de la %(low)s la %(high)s"
 
-#: src/postulo/core/server_views.py:1200
+#: src/postulo/core/server_views.py:1272
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s este instalat din catalog."
 
-#: src/postulo/core/server_views.py:1150
+#: src/postulo/core/server_views.py:1222
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -314,19 +314,19 @@ msgstr "%(name)s este acum administrator."
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "%(name)s este acum pe rândul %(row)s, locul %(place)s."
 
-#: src/postulo/core/server_views.py:1261
+#: src/postulo/core/server_views.py:1333
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s a fost eliminat. Reporniți Postulo ca să fiți sigur că nu a rămas nimic din el încărcat."
 
-#: src/postulo/core/server_views.py:1233
+#: src/postulo/core/server_views.py:1305
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s este oprit; fișierele lui sunt încă aici."
 
-#: src/postulo/core/server_views.py:1235
+#: src/postulo/core/server_views.py:1307
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s este pornit din nou."
@@ -393,6 +393,18 @@ msgstr "%(package)s: are nevoie de %(wanted)s, iar Postulo are %(have)s."
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nu a putut verifica aceste setări: %(error)s"
+
+#: src/postulo/core/mail_auth.py:234
+#, python-format, draft
+msgid "%(provider)s does not let an application send on its own."
+msgstr "%(provider)s nu permite unei aplicații să trimită singură."
+
+#: src/postulo/core/server_forms.py:343
+#, python-format, draft
+msgid ""
+"%(provider)s does not let an application send on its own. Choose “Signed in once”."
+msgstr ""
+"%(provider)s nu permite unei aplicații să trimită singură. Alege „Autentificat o singură dată”."
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
@@ -502,7 +514,7 @@ msgstr "%(url)s este mult mai mare decât ar trebui să fie un catalog."
 msgid "%(when)s ago"
 msgstr "acum %(when)s"
 
-#: src/postulo/core/models.py:445
+#: src/postulo/core/models.py:448
 #, draft
 msgid "(empty address)"
 msgstr "(adresă goală)"
@@ -557,6 +569,11 @@ msgid ""
 msgstr ""
 "O extensie de browser are nevoie doar de primul. Dă unui agent doar citire până când ai încredere în el pentru scriere."
 
+#: src/postulo/templates/server/email.html:210
+#, draft
+msgid "A client secret is stored. It is never shown."
+msgstr "Un secret de client este salvat. Nu este afișat niciodată."
+
 #: src/postulo/jobs/models.py:196
 #, draft
 msgid "A company cannot be part of itself."
@@ -589,12 +606,12 @@ msgstr "O companie, un post, o frază dintr-o scrisoare, un nume…"
 msgid "A CSV file"
 msgstr "Un fișier CSV"
 
-#: src/postulo/core/models.py:87
+#: src/postulo/core/models.py:90
 #, draft
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Un indiciu pentru interfață, de exemplu „amber” sau „sky”."
 
-#: src/postulo/core/models.py:510
+#: src/postulo/core/models.py:513
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Un rând sub nume pe pagina de autentificare. Opțional."
@@ -616,7 +633,7 @@ msgstr ""
 msgid "A month"
 msgstr "O lună"
 
-#: src/postulo/core/models.py:288
+#: src/postulo/core/models.py:291
 #, draft
 msgid ""
 "A number has to be confirmed before it can get you back in. Nobody has answered on this one."
@@ -644,11 +661,23 @@ msgid ""
 msgstr ""
 "O cheie de acces este legată de adresa la care ați creat-o, aici %(host)s. Accesarea acestei instanțe sub alt nume sau mutarea ei nu vă va aduce cheile de acces."
 
-#: src/postulo/templates/server/email.html:169
+#: src/postulo/core/server_forms.py:228
+#, draft
+msgid ""
+"A password is right for your own mail server, and for Gmail with an app password. Microsoft 365 stops accepting passwords for sending mail by default at the end of December 2026; after that it needs XOAUTH2."
+msgstr ""
+"O parolă este potrivită pentru propriul server de e-mail și pentru Gmail cu o parolă de aplicație. Microsoft 365 nu mai acceptă implicit parole pentru trimiterea e-mailurilor de la sfârșitul lui decembrie 2026; după aceea are nevoie de XOAUTH2."
+
+#: src/postulo/templates/server/email.html:171
 #, draft
 msgid "A password is stored. It is never shown, not even its length."
 msgstr ""
 "O parolă este stocată. Nu este niciodată afișată, nici măcar lungimea ei."
+
+#: src/postulo/core/mail_auth.py:46
+#, draft
+msgid "A password, or an app password"
+msgstr "O parolă sau o parolă de aplicație"
 
 #: src/postulo/templates/widgets/suggestions.html:6
 #, python-format, draft
@@ -778,7 +807,7 @@ msgid ""
 msgstr ""
 "Un șablon cu coloanele proprii Postulo și un rând exemplu. Completează-l și încarcă-l mai sus."
 
-#: src/postulo/core/server_views.py:715
+#: src/postulo/core/server_views.py:787
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Un mesaj de test de la %(name)s"
@@ -1033,7 +1062,7 @@ msgstr "Adăugat."
 msgid "Address"
 msgstr "Adresă"
 
-#: src/postulo/core/models.py:410 src/postulo/jobs/models.py:740
+#: src/postulo/core/models.py:413 src/postulo/jobs/models.py:740
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
@@ -1466,6 +1495,11 @@ msgstr "Cel puțin o limbă trebuie oferită, altfel nimeni nu poate citi nimic.
 msgid "attempts"
 msgstr "încercări"
 
+#: src/postulo/core/models.py:607
+#, draft
+msgid "authentication"
+msgstr "autentificare"
+
 #: src/postulo/jobs/industries.py:83
 #, draft
 msgid "Automotive"
@@ -1891,10 +1925,15 @@ msgstr "Alegeți mai întâi un fișier Europass."
 msgid "Choose a new password"
 msgstr "Alegeți o parolă nouă"
 
-#: src/postulo/core/server_views.py:1081
+#: src/postulo/core/server_views.py:1153
 #, draft
 msgid "Choose a package first."
 msgstr "Alegeți mai întâi un pachet."
+
+#: src/postulo/core/mail_auth.py:312
+#, draft
+msgid "Choose an identity provider and save it first."
+msgstr "Alege mai întâi un furnizor de identitate și salvează-l."
 
 #: src/postulo/templates/core/import_csv_map.html:102
 #, draft
@@ -1948,6 +1987,16 @@ msgstr "Golește filtrele"
 msgid "Cleared: this entry prints its original text in %(language)s."
 msgstr "Golit: această intrare tipărește textul original în %(language)s."
 
+#: src/postulo/core/models.py:613
+#, draft
+msgid "client ID"
+msgstr "ID client"
+
+#: src/postulo/core/server_forms.py:245
+#, draft
+msgid "Client secret"
+msgstr "Secret client"
+
 #: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:663
 #, draft
 msgid "Closed"
@@ -1994,7 +2043,7 @@ msgstr "Cod (GitHub, GitLab…)"
 msgid "code repository"
 msgstr "depozit de cod"
 
-#: src/postulo/core/models.py:84
+#: src/postulo/core/models.py:87
 #, draft
 msgid "colour"
 msgstr "culoare"
@@ -2123,18 +2172,23 @@ msgstr "Conectează"
 msgid "Connect %(plugin)s"
 msgstr "Conectează %(plugin)s"
 
-#: src/postulo/core/mail.py:133
+#: src/postulo/core/mail.py:145
+#, python-format, draft
+msgid "Connected to %(host)s:%(port)s and signed in as %(user)s with a token."
+msgstr "Conectat la %(host)s:%(port)s și autentificat ca %(user)s cu un token."
+
+#: src/postulo/core/mail.py:151
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Conectat la %(host)s:%(port)s și autentificat ca %(user)s."
 
-#: src/postulo/core/mail.py:138
+#: src/postulo/core/mail.py:156
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Conectat la %(host)s:%(port)s. Fără nume de utilizator, deci nu s-a autentificat nimic."
 
-#: src/postulo/plugins/views.py:289
+#: src/postulo/plugins/views.py:298
 #, draft
 msgid "Connected. Test it to make sure it works."
 msgstr "Conectat. Testați ca să vă asigurați că funcționează."
@@ -2145,7 +2199,7 @@ msgstr "Conectat. Testați ca să vă asigurați că funcționează."
 msgid "connection"
 msgstr "conexiune"
 
-#: src/postulo/plugins/views.py:392
+#: src/postulo/plugins/views.py:418
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Conexiune eliminată, inclusiv secretele."
@@ -2155,7 +2209,7 @@ msgstr "Conexiune eliminată, inclusiv secretele."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Conexiune salvată. Testeaz-o ca să te asiguri că funcționează."
 
-#: src/postulo/core/models.py:588
+#: src/postulo/core/models.py:591
 #, draft
 msgid "connection security"
 msgstr "securitatea conexiunii"
@@ -2167,7 +2221,7 @@ msgstr "Securitatea conexiunii"
 
 #: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:388
+#: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2285,7 +2339,7 @@ msgid ""
 msgstr ""
 "Numărate din cronologie, așa că interviurile înregistrate înainte să existe agenda sunt incluse."
 
-#: src/postulo/core/models.py:416 src/postulo/core/postal.py:170
+#: src/postulo/core/models.py:419 src/postulo/core/postal.py:170
 #, draft
 msgid "country"
 msgstr "țară"
@@ -2330,7 +2384,7 @@ msgid "created"
 msgstr "creată"
 
 #: src/postulo/accounts/models.py:344 src/postulo/accounts/models.py:415
-#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:31
+#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:34
 #, draft
 msgid "created at"
 msgstr "creat la"
@@ -2600,12 +2654,12 @@ msgstr "Refuzată"
 msgid "Declined. It will not be suggested again."
 msgstr "Refuzată. Nu va mai fi sugerată."
 
-#: src/postulo/core/models.py:550
+#: src/postulo/core/models.py:553
 #, draft
 msgid "default language"
 msgstr "limbă implicită"
 
-#: src/postulo/core/models.py:561
+#: src/postulo/core/models.py:564
 #, draft
 msgid "default time zone"
 msgstr "fus orar implicit"
@@ -2720,6 +2774,11 @@ msgstr "Nu a răspuns"
 #, draft
 msgid "did not answer when last checked"
 msgstr "nu a răspuns la ultima verificare"
+
+#: src/postulo/core/models.py:612
+#, draft
+msgid "directory (tenant) ID"
+msgstr "ID director (chiriaș)"
 
 #: src/postulo/templates/jobs/capture_list.html:45
 #: src/postulo/templates/jobs/listing_list.html:44
@@ -3266,7 +3325,7 @@ msgstr "Exportat separat"
 msgid "Failed"
 msgstr "Eșuat"
 
-#: src/postulo/core/models.py:672 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:696 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "A eșuat fără să spună de ce."
@@ -3281,7 +3340,7 @@ msgstr "Târg"
 msgid "Fastest"
 msgstr "Cel mai rapid"
 
-#: src/postulo/core/models.py:168
+#: src/postulo/core/models.py:171
 #, draft
 msgid "Fax"
 msgstr "Fax"
@@ -3473,6 +3532,11 @@ msgid ""
 msgstr ""
 "Pornirea forțată nu îl face să funcționeze: un notificator, un depozit sau o sincronizare are nevoie de date pe care doar această persoană le poate da. Înseamnă că îl poate folosi și nu îl poate opri."
 
+#: src/postulo/templates/server/email.html:247
+#, draft
+msgid "Forget the grant"
+msgstr "Uită autorizarea"
+
 #: src/postulo/core/server_forms.py:218
 #, draft
 msgid "Forget the stored password"
@@ -3548,7 +3612,7 @@ msgstr "de la %(low)s"
 msgid "From %(name)s."
 msgstr "De la %(name)s."
 
-#: src/postulo/core/models.py:596
+#: src/postulo/core/models.py:599
 #, draft
 msgid "from address"
 msgstr "adresa expeditorului"
@@ -3668,6 +3732,11 @@ msgstr "A primit vreun răspuns"
 msgid "grade"
 msgstr "notă"
 
+#: src/postulo/core/models.py:609
+#, draft
+msgid "grant"
+msgstr "autorizare"
+
 #: src/postulo/accounts/models.py:335
 #, draft
 msgid "Gravatar checked on"
@@ -3765,7 +3834,7 @@ msgstr "repere"
 msgid "highlights for this CV"
 msgstr "repere pentru acest CV"
 
-#: src/postulo/core/models.py:166 src/postulo/core/models.py:391
+#: src/postulo/core/models.py:169 src/postulo/core/models.py:394
 #, draft
 msgid "Home"
 msgstr "Acasă"
@@ -3834,6 +3903,11 @@ msgstr "Cu ce regularitate"
 #, draft
 msgid "How the first rows will be read"
 msgstr "Cum vor fi citite primele rânduri"
+
+#: src/postulo/core/server_forms.py:236
+#, draft
+msgid "How the token is obtained"
+msgstr "Cum se obține tokenul"
 
 #: src/postulo/templates/server/capture.html:7
 #, draft
@@ -3915,7 +3989,17 @@ msgstr "Identificatori"
 msgid "Identifies itself as"
 msgstr "Se identifică drept"
 
-#: src/postulo/core/server_views.py:717
+#: src/postulo/core/models.py:608
+#, draft
+msgid "identity provider"
+msgstr "furnizor de identitate"
+
+#: src/postulo/core/server_forms.py:234
+#, draft
+msgid "Identity provider"
+msgstr "Furnizor de identitate"
+
+#: src/postulo/core/server_views.py:789
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3929,7 +4013,7 @@ msgid ""
 msgstr ""
 "Dacă ați candidat la o instituție a UE sau prin serviciul public de ocupare, aveți deja acest fișier. În loc să tastați totul din nou, predați-l."
 
-#: src/postulo/core/models.py:519
+#: src/postulo/core/models.py:522
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "ignoră robots.txt la captare"
@@ -4115,7 +4199,7 @@ msgstr "Instalat pe această instanță"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Instalarea unui modul rulează codul altcuiva în interiorul Postulo."
 
-#: src/postulo/core/models.py:501
+#: src/postulo/core/models.py:504
 #, draft
 msgid "instance name"
 msgstr "numele instanței"
@@ -4130,7 +4214,7 @@ msgstr "instituție"
 msgid "Insurance"
 msgstr "Asigurări"
 
-#: src/postulo/core/server_views.py:797 src/postulo/plugins/provenance.py:59
+#: src/postulo/core/server_views.py:869 src/postulo/plugins/provenance.py:59
 #, draft
 msgid "Internal"
 msgstr "Intern"
@@ -4293,7 +4377,7 @@ msgid ""
 msgstr ""
 "Refuză să servească orice, în loc să publice aceste înregistrări oricui găsește adresa. Setați POSTULO_LOGS_TOKEN sau dezactivați POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:325
+#: src/postulo/plugins/views.py:351
 #, draft
 msgid "It works."
 msgstr "Funcționează."
@@ -4386,8 +4470,8 @@ msgstr ""
 
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
-#: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
+#: src/postulo/core/models.py:403 src/postulo/documents/models.py:112
 #: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
 #: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:243
@@ -4472,7 +4556,7 @@ msgstr "Limbi"
 msgid "languages"
 msgstr "limbi"
 
-#: src/postulo/core/models.py:560
+#: src/postulo/core/models.py:563
 #, draft
 msgid "languages offered"
 msgstr "limbi oferite"
@@ -4586,7 +4670,7 @@ msgid "Leave a box empty and that line prints as it is written above it."
 msgstr ""
 "Lăsați o casetă goală și acel rând se tipărește așa cum este scris deasupra."
 
-#: src/postulo/core/server_forms.py:215
+#: src/postulo/core/server_forms.py:215 src/postulo/core/server_forms.py:248
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "Lăsați gol pentru a păstra parola deja stocată."
@@ -4834,7 +4918,7 @@ msgstr "Litere mici, cifre, puncte, liniuțe de subliniere și cratime."
 msgid "Made"
 msgstr "Creat"
 
-#: src/postulo/core/models.py:627
+#: src/postulo/core/models.py:651
 #, draft
 msgid "mail failures in a row"
 msgstr "eșecuri de poștă la rând"
@@ -4857,7 +4941,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Aici poșta este singura cale înapoi într-un cont, așa că până când aceasta funcționează din nou niciuna dintre cele %(counter)s persoane de pe această instanță nu se poate întoarce dacă își uită parola."
 
-#: src/postulo/core/models.py:623
+#: src/postulo/core/models.py:647
 #, draft
 msgid "mail last failed"
 msgstr "poșta a eșuat ultima dată"
@@ -4867,7 +4951,7 @@ msgstr "poșta a eșuat ultima dată"
 msgid "Mail last went out at %(when)s."
 msgstr "Poșta a plecat ultima dată la %(when)s."
 
-#: src/postulo/core/models.py:622
+#: src/postulo/core/models.py:646
 #, draft
 msgid "mail last worked"
 msgstr "poșta a funcționat ultima dată"
@@ -4886,17 +4970,22 @@ msgid ""
 msgstr ""
 "Poșta nu mai ține nici transportul pe loc, pentru că o cale care nu livrează nimic nu protejează pe nimeni."
 
-#: src/postulo/core/models.py:600
+#: src/postulo/core/models.py:619
+#, draft
+msgid "mail OAuth secrets"
+msgstr "secrete OAuth pentru e-mail"
+
+#: src/postulo/core/models.py:624
 #, draft
 msgid "mail transport"
 msgstr "transportul poștei"
 
-#: src/postulo/core/server_forms.py:313
+#: src/postulo/core/server_forms.py:383
 #, draft
 msgid "Mail transport"
 msgstr "Transportul poștei"
 
-#: src/postulo/core/models.py:624
+#: src/postulo/core/models.py:648
 #, draft
 msgid "mail's last error"
 msgstr "ultima eroare a poștei"
@@ -5017,12 +5106,19 @@ msgstr "Contopește în"
 msgid "Merged."
 msgstr "Contopit."
 
+#: src/postulo/core/server_forms.py:284
+#, draft
+msgid ""
+"Microsoft only: the directory the application is registered in. Leave blank for an application that accepts any directory."
+msgstr ""
+"Doar Microsoft: directorul în care este înregistrată aplicația. Lasă gol pentru o aplicație care acceptă orice director."
+
 #: src/postulo/documents/models.py:221
 #, draft
 msgid "Missing entry"
 msgstr "Intrare lipsă"
 
-#: src/postulo/core/models.py:164
+#: src/postulo/core/models.py:167
 #, draft
 msgid "Mobile"
 msgstr "Mobil"
@@ -5131,7 +5227,7 @@ msgid "NACE division"
 msgstr "diviziune NACE"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/core/models.py:84 src/postulo/documents/models.py:109
 #: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
@@ -5150,7 +5246,7 @@ msgstr "nume"
 msgid "Name"
 msgstr "Nume"
 
-#: src/postulo/core/models.py:177 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
 #, draft
 msgid "name, if Other"
 msgstr "nume, dacă Altul"
@@ -5321,7 +5417,7 @@ msgstr ""
 msgid "no company"
 msgstr "fără companie"
 
-#: src/postulo/core/server_views.py:695
+#: src/postulo/core/server_views.py:739
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Nicio conexiune: %(why)s"
@@ -5336,6 +5432,11 @@ msgstr "Nicio conexiune încă"
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
 "Niciun depozit de documente nu este conectat. Adăugați unul în Setări → Conexiuni."
+
+#: src/postulo/core/mail_auth.py:213 src/postulo/core/mail_auth.py:369
+#, draft
+msgid "No identity provider is chosen for mail."
+msgstr "Nu este ales niciun furnizor de identitate pentru e-mail."
 
 #: src/postulo/templates/widgets/industries.html:41
 #, draft
@@ -5417,7 +5518,7 @@ msgstr "Niciun anunț înregistrat pentru această companie."
 msgid "no role"
 msgstr "fără post"
 
-#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:101
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:112
 #, draft
 msgid "No server to connect to."
 msgstr "Niciun server la care să se conecteze."
@@ -5462,7 +5563,7 @@ msgstr "nu — doar conturile existente"
 msgid "No-show"
 msgstr "Neprezentare"
 
-#: src/postulo/plugins/consent.py:184
+#: src/postulo/plugins/consent.py:193
 #, draft
 msgid "Nobody has agreed to this yet. Connect it again."
 msgstr "Nimeni nu a consimțit încă la asta. Conectați-o din nou."
@@ -5471,6 +5572,19 @@ msgstr "Nimeni nu a consimțit încă la asta. Conectați-o din nou."
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
 msgstr "Nimeni nu a răspuns încă, așa că nu este nimic de cronometrat."
+
+#: src/postulo/core/mail_auth.py:242
+#, draft
+msgid "Nobody has signed in to the mail provider yet. Connect it first."
+msgstr ""
+"Nimeni nu s-a autentificat încă la furnizorul de e-mail. Conectează-l mai întâi."
+
+#: src/postulo/templates/server/email.html:251
+#, draft
+msgid ""
+"Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
+msgstr ""
+"Nimeni nu s-a autentificat încă, deci nu se poate trimite nimic. Salvează setările de mai sus, apoi autentifică-te pe pagina furnizorului ca fiind căsuța din care trimite această instanță."
 
 #: src/postulo/templates/jobs/company_detail.html:231
 #, draft
@@ -5612,7 +5726,7 @@ msgstr "nesetat"
 msgid "Not set here — the environment or the default applies"
 msgstr "Nesetat aici — se aplică mediul sau valoarea implicită"
 
-#: src/postulo/core/server_forms.py:246
+#: src/postulo/core/server_forms.py:276
 #, draft
 msgid "Not set — the environment decides"
 msgstr "Nesetat — decide mediul"
@@ -5869,7 +5983,7 @@ msgstr "Nimic la care să te conectezi"
 msgid "Nothing to decide"
 msgstr "Nimic de decis"
 
-#: src/postulo/plugins/views.py:354
+#: src/postulo/plugins/views.py:380
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5897,18 +6011,18 @@ msgstr "Nimic în așteptare"
 msgid "Nothing was added."
 msgstr "Nimic nu a fost adăugat."
 
-#: src/postulo/plugins/views.py:280
+#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
 #, draft
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "Nu s-a conectat nimic. Nimeni nu a consimțit la nimic."
 
 #: src/postulo/accounts/settings_views.py:147
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
 #, draft
 msgid "Nothing was different."
 msgstr "Nimic nu era diferit."
 
-#: src/postulo/core/server_views.py:1119
+#: src/postulo/core/server_views.py:1191
 #, draft
 msgid "Nothing was installed."
 msgstr "Nu a fost instalat nimic."
@@ -5982,7 +6096,7 @@ msgstr "Ofertă"
 msgid "Offer received"
 msgstr "Ofertă primită"
 
-#: src/postulo/core/models.py:548
+#: src/postulo/core/models.py:551
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Oferit doar cât timp poșta acestei instanțe chiar ajunge."
@@ -6193,17 +6307,29 @@ msgstr "Doar %(name)s"
 msgid "Only entries not already on it are listed."
 msgstr "Sunt listate doar intrările care nu sunt deja în el."
 
+#: src/postulo/templates/server/email.html:187
+#, draft
+msgid ""
+"Only for a provider that no longer accepts a password. Your own mail server needs none of this."
+msgstr ""
+"Doar pentru un furnizor care nu mai acceptă parole. Propriul tău server de e-mail nu are nevoie de nimic din toate acestea."
+
 #: src/postulo/plugins/fetching.py:121
 #, draft
 msgid "Only http and https addresses can be captured."
 msgstr "Doar adresele http și https pot fi captate."
 
-#: src/postulo/core/models.py:279
+#: src/postulo/core/models.py:282
 #, draft
 msgid ""
 "Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
 msgstr ""
 "Doar unul dintre numerele dumneavoastră vă poate readuce în contul dumneavoastră. Acesta aparține cuiva cu care aveți de-a face."
+
+#: src/postulo/core/mail_auth.py:364
+#, draft
+msgid "Only the administrator who started this can finish it."
+msgstr "Doar administratorul care a început poate termina."
 
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
@@ -6273,8 +6399,8 @@ msgid "Original posting"
 msgstr "Anunțul original"
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
-#: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
+#: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
 #: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
 #: src/postulo/resume/models.py:219
 #, draft
@@ -6323,7 +6449,7 @@ msgstr "Doar restante"
 msgid "Overview"
 msgstr "Prezentare generală"
 
-#: src/postulo/core/models.py:64
+#: src/postulo/core/models.py:67
 #, draft
 msgid "owner"
 msgstr "proprietar"
@@ -6397,7 +6523,7 @@ msgstr "Tradus parțial"
 msgid "Passkeys"
 msgstr "Chei de acces"
 
-#: src/postulo/core/models.py:581
+#: src/postulo/core/models.py:584
 #, draft
 msgid "password"
 msgstr "parolă"
@@ -6518,7 +6644,7 @@ msgstr "Farmaceutic"
 msgid "Phone"
 msgstr "Telefon"
 
-#: src/postulo/core/models.py:182
+#: src/postulo/core/models.py:185
 #, draft
 msgid "phone"
 msgstr "telefon"
@@ -6579,7 +6705,7 @@ msgid "plugin repository"
 msgstr "depozit de extensii"
 
 #: src/postulo/accounts/settings_views.py:125
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:751
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:823
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -6587,7 +6713,7 @@ msgstr "depozit de extensii"
 msgid "Plugins"
 msgstr "Pluginuri"
 
-#: src/postulo/core/server_views.py:952
+#: src/postulo/core/server_views.py:1024
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -6624,7 +6750,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP sau GIF de până la 5 MB. Este decupată pătrat și curățată de tot ce știa fișierul despre locul unde a fost făcută."
 
-#: src/postulo/core/models.py:572
+#: src/postulo/core/models.py:575
 #, draft
 msgid "port"
 msgstr "port"
@@ -6660,17 +6786,17 @@ msgstr "Portofolii, profiluri și videoclipuri către care i-ați îndrumat."
 msgid "Positions"
 msgstr "Posturi"
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:396
 #, draft
 msgid "Postal"
 msgstr "Poștală"
 
-#: src/postulo/core/models.py:425
+#: src/postulo/core/models.py:428
 #, draft
 msgid "postal address"
 msgstr "adresă poștală"
 
-#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:426
+#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:429
 #: src/postulo/jobs/models.py:431
 #, draft
 msgid "postal addresses"
@@ -6681,7 +6807,7 @@ msgstr "adrese poștale"
 msgid "Postal addresses"
 msgstr "Adrese poștale"
 
-#: src/postulo/core/models.py:411
+#: src/postulo/core/models.py:414
 #, draft
 msgid "postcode"
 msgstr "cod poștal"
@@ -6776,6 +6902,13 @@ msgid ""
 msgstr ""
 "Postulo l-a uitat. Furnizorul păstrează permisiunea până când o retrageți și acolo."
 
+#: src/postulo/core/server_views.py:759
+#, draft
+msgid ""
+"Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
+msgstr ""
+"Postulo a uitat autorizarea. Furnizorul o păstrează până o retragi și acolo."
+
 #: src/postulo/templates/server/plugins.html:127
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6845,7 +6978,7 @@ msgstr "Previzualizare"
 msgid "Previous"
 msgstr "Anterior"
 
-#: src/postulo/core/models.py:186 src/postulo/core/models.py:417
+#: src/postulo/core/models.py:189 src/postulo/core/models.py:420
 #, draft
 msgid "primary"
 msgstr "principal"
@@ -7238,7 +7371,7 @@ msgstr "Recomandare"
 msgid "Refresh logo"
 msgstr "Obține sigla din nou"
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:418
 #, draft
 msgid "region"
 msgstr "regiune"
@@ -7248,7 +7381,13 @@ msgstr "regiune"
 msgid "Register this address with the provider"
 msgstr "Înregistrați această adresă la furnizor"
 
-#: src/postulo/plugins/consent.py:111
+#: src/postulo/core/mail_auth.py:316
+#, draft
+msgid "Register this instance with the provider first, and save the client ID."
+msgstr ""
+"Înregistrează mai întâi această instanță la furnizor și salvează ID-ul client."
+
+#: src/postulo/plugins/consent.py:120
 #, draft
 msgid "Register this instance with the provider first, and save the client id."
 msgstr ""
@@ -7260,7 +7399,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr "Înregistrarea este deschisă: oricine găsește adresa poate crea un cont."
 
-#: src/postulo/core/models.py:513
+#: src/postulo/core/models.py:516
 #, draft
 msgid "registration open"
 msgstr "înregistrare deschisă"
@@ -7598,7 +7737,7 @@ msgstr "salariu până la"
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
 #: src/postulo/templates/server/defaults.html:72
-#: src/postulo/templates/server/email.html:175
+#: src/postulo/templates/server/email.html:222
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:98
@@ -7643,8 +7782,8 @@ msgstr "Salvat în anunțurile tale. Decide când ești pregătit."
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:147
 #: src/postulo/core/server_views.py:389 src/postulo/core/server_views.py:517
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
-#: src/postulo/core/server_views.py:1053 src/postulo/resume/views.py:223
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
+#: src/postulo/core/server_views.py:1125 src/postulo/resume/views.py:223
 #, draft
 msgid "Saved."
 msgstr "Salvat."
@@ -7768,12 +7907,12 @@ msgstr "Selectează tot pe această pagină"
 msgid "Selected"
 msgstr "Selectat"
 
-#: src/postulo/templates/server/email.html:189
+#: src/postulo/templates/server/email.html:261
 #, draft
 msgid "Send a real message"
 msgstr "Trimite un mesaj real"
 
-#: src/postulo/templates/server/email.html:195
+#: src/postulo/templates/server/email.html:267
 #, draft
 msgid "Send a test message"
 msgstr "Trimite un mesaj de test"
@@ -7804,7 +7943,7 @@ msgstr "Trimite acum către depozite"
 msgid "Sending as yourself"
 msgstr "Trimiterea în nume propriu"
 
-#: src/postulo/core/server_views.py:727
+#: src/postulo/core/server_views.py:799
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Trimiterea a eșuat: %(error)s"
@@ -7839,7 +7978,7 @@ msgstr "Documente trimise"
 msgid "sent on"
 msgstr "trimis la"
 
-#: src/postulo/core/server_views.py:730
+#: src/postulo/core/server_views.py:802
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Trimis către %(to)s."
@@ -8001,7 +8140,7 @@ msgstr "Arată și cele trecute"
 msgid "Show this period"
 msgstr "Arată această perioadă"
 
-#: src/postulo/core/models.py:504
+#: src/postulo/core/models.py:507
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Afișat în antet și pe pagina de autentificare."
@@ -8012,7 +8151,17 @@ msgstr "Afișat în antet și pe pagina de autentificare."
 msgid "Sign in"
 msgstr "Autentificare"
 
-#: src/postulo/core/models.py:545
+#: src/postulo/templates/server/email.html:246
+#, draft
+msgid "Sign in again"
+msgstr "Autentifică-te din nou"
+
+#: src/postulo/templates/server/email.html:253
+#, draft
+msgid "Sign in to the provider"
+msgstr "Autentifică-te la furnizor"
+
+#: src/postulo/core/models.py:548
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "autentificare cu un cod trimis prin e-mail"
@@ -8045,6 +8194,41 @@ msgstr "Autentificare"
 msgid "Sign-in methods"
 msgstr "Metode de autentificare"
 
+#: src/postulo/core/mail_auth.py:65
+#, draft
+msgid "Signed in once, as the mailbox that sends"
+msgstr "Autentificat o singură dată, ca fiind căsuța care trimite"
+
+#: src/postulo/core/server_forms.py:238
+#, draft
+msgid ""
+"Signed in once: somebody agrees on the provider's consent screen, as the mailbox that sends, and needs no administrator. The application sends on its own: Microsoft only, and needs a tenant administrator to grant the permission."
+msgstr ""
+"Autentificat o singură dată: cineva acceptă pe ecranul de consimțământ al furnizorului, ca fiind căsuța care trimite, fără niciun administrator. Aplicația trimite singură: doar Microsoft și are nevoie ca un administrator al chiriașului să acorde permisiunea."
+
+#: src/postulo/plugins/views.py:314
+#, draft
+msgid "Signed in to the mail provider. Test the connection to make sure."
+msgstr ""
+"Autentificat la furnizorul de e-mail. Testează conexiunea ca să fii sigur."
+
+#: src/postulo/templates/server/email.html:243
+#, draft
+msgid ""
+"Signed in. The provider can withdraw this at any time — if a password is changed, or the account is not used for months — and mail then stops. The page above says so the moment a send fails."
+msgstr ""
+"Autentificat. Furnizorul poate retrage asta oricând — dacă se schimbă o parolă sau contul nu e folosit luni de zile — iar atunci e-mailul se oprește. Pagina de mai sus spune asta de îndată ce o trimitere eșuează."
+
+#: src/postulo/core/server_forms.py:226
+#, draft
+msgid "Signing in"
+msgstr "Autentificare"
+
+#: src/postulo/templates/server/email.html:185
+#, draft
+msgid "Signing in with a token"
+msgstr "Autentificare cu un token"
+
 #: src/postulo/templates/server/signin.html:32
 #, draft
 msgid "Signs in to an existing account by e-mail"
@@ -8055,7 +8239,7 @@ msgstr "Se conectează la un cont existent prin e-mail"
 msgid "Single sign-on"
 msgstr "Autentificare unică"
 
-#: src/postulo/core/models.py:524
+#: src/postulo/core/models.py:527
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "autentificarea unică contează ca al doilea factor"
@@ -8070,7 +8254,7 @@ msgstr "Autentificarea unică contează ca al doilea factor"
 msgid "Site search"
 msgstr "Căutare în site"
 
-#: src/postulo/core/models.py:640 src/postulo/core/models.py:641
+#: src/postulo/core/models.py:664 src/postulo/core/models.py:665
 #, draft
 msgid "site settings"
 msgstr "setările site-ului"
@@ -8128,12 +8312,12 @@ msgstr "omise"
 msgid "Slowest"
 msgstr "Cel mai lent"
 
-#: src/postulo/core/models.py:82 src/postulo/jobs/models.py:42
+#: src/postulo/core/models.py:85 src/postulo/jobs/models.py:42
 #, draft
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:570
+#: src/postulo/core/models.py:573
 #, draft
 msgid "SMTP server"
 msgstr "Server SMTP"
@@ -8422,7 +8606,7 @@ msgstr "Oprește"
 msgid "Switch on"
 msgstr "Pornește"
 
-#: src/postulo/core/models.py:167
+#: src/postulo/core/models.py:170
 #, draft
 msgid "Switchboard"
 msgstr "Centrală"
@@ -8451,7 +8635,7 @@ msgid ""
 msgstr ""
 "Oprirea unuia îi întrerupe folosirea și nu șterge nimic: conexiunile pe care le-ați creat rămân exact cum sunt, iar repornirea le aduce înapoi neschimbate."
 
-#: src/postulo/plugins/views.py:375
+#: src/postulo/plugins/views.py:401
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Sincronizarea a eșuat: %(error)s"
@@ -8471,7 +8655,7 @@ msgstr "legături de sincronizare"
 msgid "Sync now"
 msgstr "Sincronizează acum"
 
-#: src/postulo/plugins/views.py:377
+#: src/postulo/plugins/views.py:403
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Sincronizat: %(summary)s."
@@ -8491,7 +8675,7 @@ msgstr "Tabel"
 msgid "table settings"
 msgstr "setările tabelului"
 
-#: src/postulo/core/models.py:91
+#: src/postulo/core/models.py:94
 #, draft
 msgid "tag"
 msgstr "etichetă"
@@ -8504,7 +8688,7 @@ msgstr "etichetă"
 msgid "Tag"
 msgstr "Etichetă"
 
-#: src/postulo/core/models.py:507
+#: src/postulo/core/models.py:510
 #, draft
 msgid "tagline"
 msgstr "slogan"
@@ -8517,7 +8701,7 @@ msgstr "slogan"
 msgid "Tags"
 msgstr "Etichete"
 
-#: src/postulo/applications/models.py:241 src/postulo/core/models.py:92
+#: src/postulo/applications/models.py:241 src/postulo/core/models.py:95
 #, draft
 msgid "tags"
 msgstr "etichete"
@@ -8558,12 +8742,12 @@ msgstr "telefon"
 msgid "Telephone number"
 msgstr "Număr de telefon"
 
-#: src/postulo/core/models.py:213
+#: src/postulo/core/models.py:216
 #, draft
 msgid "telephone number"
 msgstr "număr de telefon"
 
-#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:214
+#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:217
 #: src/postulo/jobs/models.py:428
 #, draft
 msgid "telephone numbers"
@@ -8589,12 +8773,12 @@ msgstr "Șabloanele apar când trimiți o scrisoare cu o candidatură."
 msgid "Test"
 msgstr "Testează"
 
-#: src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:353
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Testul a eșuat: %(message)s"
 
-#: src/postulo/templates/server/email.html:181
+#: src/postulo/templates/server/email.html:228
 #, draft
 msgid "Test the connection"
 msgstr "Testați conexiunea"
@@ -8609,17 +8793,17 @@ msgstr "text"
 msgid "text as sent"
 msgstr "text așa cum a fost trimis"
 
-#: src/postulo/core/models.py:616
+#: src/postulo/core/models.py:640
 #, draft
 msgid "text configuration"
 msgstr "configurarea mesajelor"
 
-#: src/postulo/core/models.py:617
+#: src/postulo/core/models.py:641
 #, draft
 msgid "text secrets"
 msgstr "secretele mesajelor"
 
-#: src/postulo/core/models.py:615
+#: src/postulo/core/models.py:639
 #, draft
 msgid "text transport"
 msgstr "transportul mesajelor"
@@ -8658,17 +8842,17 @@ msgid ""
 msgstr ""
 "Acel lanț are mai mult de %(limit)s companii în adâncime, mai mult decât poate desena Postulo cu folos."
 
-#: src/postulo/plugins/consent.py:147
+#: src/postulo/plugins/consent.py:156
 #, draft
 msgid "That connection belongs to somebody else."
 msgstr "Acea conexiune aparține altcuiva."
 
-#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#: src/postulo/plugins/consent.py:116 src/postulo/plugins/consent.py:161
 #, draft
 msgid "That connection does not use consent."
 msgstr "Acea conexiune nu folosește consimțământ."
 
-#: src/postulo/plugins/consent.py:145
+#: src/postulo/plugins/consent.py:154
 #, draft
 msgid "That connection no longer exists."
 msgstr "Acea conexiune nu mai există."
@@ -8798,7 +8982,7 @@ msgstr "Asta nu este ceva ce Postulo poate face în privința ei."
 msgid "That is not something Postulo can do to several at once."
 msgstr "Asta Postulo nu poate face pentru mai multe deodată."
 
-#: src/postulo/core/server_views.py:1029 src/postulo/core/server_views.py:1070
+#: src/postulo/core/server_views.py:1101 src/postulo/core/server_views.py:1142
 #, draft
 msgid "That is not something this page does."
 msgstr "Nu asta face această pagină."
@@ -8858,7 +9042,7 @@ msgid ""
 msgstr ""
 "Acel număr este deja înregistrat pe această instanță. Numerele de telefon sunt ținute unice pentru toate conturile de aici, deci poate aparține datelor altcuiva."
 
-#: src/postulo/core/server_views.py:1128 src/postulo/core/server_views.py:1133
+#: src/postulo/core/server_views.py:1200 src/postulo/core/server_views.py:1205
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Pachetul acela nu mai așteaptă; încărcați-l din nou."
@@ -8883,12 +9067,12 @@ msgstr "Pagina aceea a returnat %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Imaginea aceea are peste 5 MB. Una mai mică, te rog."
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:301
+#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Pluginul acela nu mai este instalat."
 
-#: src/postulo/plugins/consent.py:140
+#: src/postulo/core/mail_auth.py:360 src/postulo/plugins/consent.py:149
 #, draft
 msgid "That reply did not come from a request Postulo made."
 msgstr "Acel răspuns nu a venit dintr-o cerere făcută de Postulo."
@@ -8938,6 +9122,11 @@ msgstr "Adresa a răspuns fără nimic."
 msgid "The application deadline, if stated."
 msgstr "Termenul de candidatură, dacă este menționat."
 
+#: src/postulo/core/mail_auth.py:66
+#, draft
+msgid "The application sends on its own"
+msgstr "Aplicația trimite singură"
+
 #: src/postulo/plugins/catalogue.py:184
 #, draft
 msgid "The catalogue is not readable JSON."
@@ -8953,10 +9142,17 @@ msgstr "Semnătura catalogului nu corespunde conținutului său; nu a fost folos
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Semnătura sau cheia catalogului nu poate fi citită: %(error)s"
 
-#: src/postulo/core/server_views.py:1185
+#: src/postulo/core/server_views.py:1257
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Cataloagele au răspuns și încă nu conțin nimic."
+
+#: src/postulo/templates/server/email.html:203
+#, python-format, draft
+msgid ""
+"The client secret is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
+msgstr ""
+"Secretul client este setat de <code>%(variable)s</code> în mediu; schimbă-l acolo. Nu este afișat niciodată aici."
 
 #: src/postulo/templates/applications/application_intake.html:10
 #, draft
@@ -9015,7 +9211,7 @@ msgstr ""
 msgid "The employer as a whole"
 msgstr "Angajatorul în ansamblu"
 
-#: src/postulo/core/server_views.py:988 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:1060 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Mediul stabilește „%(name)s”, deci nu poate fi schimbat aici."
@@ -9067,7 +9263,7 @@ msgstr "Programul de instalare l-a refuzat: %(error)s"
 msgid "The job title"
 msgstr "Titlul postului"
 
-#: src/postulo/core/server_views.py:1045
+#: src/postulo/core/server_views.py:1117
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -9136,10 +9332,15 @@ msgid ""
 msgstr ""
 "Cea mai lungă pauză se măsoară în interiorul acestei perioade. O perioadă încă în curs este numărată până în ziua în care a fost produs acest document. O săptămână marcată cu (parțial) iese din perioadă; nimic din afara ei nu este numărat."
 
-#: src/postulo/core/server_views.py:732
+#: src/postulo/core/server_views.py:804
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Backend-ul de e-mail nu a acceptat nimic."
+
+#: src/postulo/templates/server/email.html:240
+#, draft
+msgid "The mailbox this instance sends from"
+msgstr "Căsuța din care trimite această instanță"
 
 #: src/postulo/templates/resume/preview.html:12
 #, draft
@@ -9160,7 +9361,7 @@ msgid ""
 msgstr ""
 "Numărul care vă readuce înăuntru este separat de cel pe care îl tipăresc documentele dumneavoastră, așa că schimbarea celui pe care îl formează un recrutor nu schimbă felul în care dovediți că sunteți dumneavoastră. Trebuie confirmat mai întâi, iar oprirea mai multor numere de telefon nu vi-l ia niciodată."
 
-#: src/postulo/core/server_views.py:1018
+#: src/postulo/core/server_views.py:1090
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Depozitul oficial se golește, nu se elimină."
@@ -9180,7 +9381,7 @@ msgstr "Cea dinainte"
 msgid "The opening paragraph, if you use one."
 msgstr "Paragraful de deschidere, dacă folosești unul."
 
-#: src/postulo/templates/server/email.html:162
+#: src/postulo/templates/server/email.html:164
 #, python-format, draft
 msgid ""
 "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -9192,7 +9393,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Remunerația"
 
-#: src/postulo/core/server_views.py:798
+#: src/postulo/core/server_views.py:870
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Extensiile livrate în interiorul Postulo. Nu se descarcă nimic."
@@ -9214,17 +9415,24 @@ msgstr "anunțul"
 msgid "The posting itself"
 msgstr "Anunțul în sine"
 
-#: src/postulo/plugins/consent.py:241
+#: src/postulo/plugins/consent.py:251
 #, python-format, draft
 msgid "The provider answered %(status)s."
 msgstr "Furnizorul a răspuns %(status)s."
 
-#: src/postulo/plugins/consent.py:237
+#: src/postulo/core/mail_auth.py:388
+#, draft
+msgid ""
+"The provider sent no refresh token, so mail would stop within the hour. Check that offline access is allowed for this application."
+msgstr ""
+"Furnizorul nu a trimis niciun token de reîmprospătare, deci e-mailul s-ar opri în mai puțin de o oră. Verifică dacă accesul offline este permis pentru această aplicație."
+
+#: src/postulo/plugins/consent.py:247
 #, draft
 msgid "The provider will not renew this. Somebody has to agree to it again."
 msgstr "Furnizorul nu va reînnoi asta. Cineva trebuie să consimtă din nou."
 
-#: src/postulo/plugins/consent.py:246
+#: src/postulo/plugins/consent.py:256
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "Răspunsul furnizorului nu a putut fi citit."
@@ -9262,7 +9470,7 @@ msgid ""
 msgstr ""
 "Serverul nu oferă STARTTLS. Dezactivați-l sau folosiți un port care îl oferă."
 
-#: src/postulo/core/mail.py:122
+#: src/postulo/core/mail.py:134
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "Serverul a refuzat acele credențiale: %(detail)s"
@@ -9299,6 +9507,12 @@ msgstr "Site-ul refuză Postulo sau anunțul necesită autentificare"
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "robots.txt al site-ului este respectat."
+
+#: src/postulo/core/mail_auth.py:220
+#, draft
+msgid "The stored mail credentials cannot be read on this instance."
+msgstr ""
+"Datele de autentificare pentru e-mail salvate nu pot fi citite pe această instanță."
 
 #: src/postulo/templates/settings/appearance.html:7
 #, draft
@@ -9366,7 +9580,7 @@ msgstr "Nu există nicio adresă de unde să fie obținută din nou."
 msgid "There is no file to send."
 msgstr "Nu există niciun fișier de trimis."
 
-#: src/postulo/core/server_views.py:983
+#: src/postulo/core/server_views.py:1055
 #, draft
 msgid "There is no repository by that name."
 msgstr "Nu există niciun depozit cu acest nume."
@@ -9605,7 +9819,7 @@ msgstr "intrare în cronologie"
 msgid "Timeout"
 msgstr "Expirare"
 
-#: src/postulo/core/models.py:594
+#: src/postulo/core/models.py:597
 #, draft
 msgid "timeout in seconds"
 msgstr "expirare în secunde"
@@ -9687,7 +9901,7 @@ msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr ""
 "Prea multe cereri: sunt permise %(times)d la fiecare %(seconds)d secunde."
 
-#: src/postulo/core/models.py:412
+#: src/postulo/core/models.py:415
 #, draft
 msgid "town or city"
 msgstr "localitate"
@@ -9714,12 +9928,12 @@ msgstr "traduceri"
 msgid "Transport and logistics"
 msgstr "Transport și logistică"
 
-#: src/postulo/core/models.py:605
+#: src/postulo/core/models.py:629
 #, draft
 msgid "transport configuration"
 msgstr "configurația transportului"
 
-#: src/postulo/core/models.py:607
+#: src/postulo/core/models.py:631
 #, draft
 msgid "transport secrets"
 msgstr "secretele transportului"
@@ -9826,13 +10040,13 @@ msgstr "până la %(high)s"
 msgid "Update the preview"
 msgstr "Actualizează previzualizarea"
 
-#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:32
-#: src/postulo/core/models.py:629
+#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:35
+#: src/postulo/core/models.py:653
 #, draft
 msgid "updated at"
 msgstr "actualizat la"
 
-#: src/postulo/core/models.py:636
+#: src/postulo/core/models.py:660
 #, draft
 msgid "updated by"
 msgstr "actualizat de"
@@ -9942,7 +10156,7 @@ msgstr "utilizator"
 msgid "Username"
 msgstr "Nume de utilizator"
 
-#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:577
+#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:580
 #, draft
 msgid "username"
 msgstr "nume de utilizator"
@@ -9957,7 +10171,7 @@ msgstr "Nume de utilizator sau e-mail"
 msgid "users"
 msgstr "utilizatori"
 
-#: src/postulo/templates/server/email.html:191
+#: src/postulo/templates/server/email.html:263
 #, draft
 msgid ""
 "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
@@ -9974,7 +10188,7 @@ msgstr "Folosirea unui token"
 msgid "Utilities"
 msgstr "Utilități"
 
-#: src/postulo/core/models.py:192
+#: src/postulo/core/models.py:195
 #, draft
 msgid "verified"
 msgstr "verificat"
@@ -10055,7 +10269,7 @@ msgstr "Așteaptă să fie folosit"
 msgid "was “%(text)s”"
 msgstr "era „%(text)s”"
 
-#: src/postulo/core/models.py:203
+#: src/postulo/core/models.py:206
 #, draft
 msgid "way back into the account"
 msgstr "cale înapoi în cont"
@@ -10141,7 +10355,7 @@ msgstr "Ce a venit înapoi"
 msgid "What came back in this period"
 msgstr "Ce a venit înapoi în această perioadă"
 
-#: src/postulo/core/server_forms.py:316
+#: src/postulo/core/server_forms.py:386
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "Ceea ce duce poșta în afara acestei mașini."
@@ -10346,6 +10560,13 @@ msgstr "Când acceptarea trebuie să mute și candidatura."
 msgid "When it entered your listings."
 msgstr "Când a intrat în anunțurile tale."
 
+#: src/postulo/templates/server/email.html:215
+#, draft
+msgid ""
+"When you register this instance with the provider, give it this address to send people back to:"
+msgstr ""
+"Când înregistrezi această instanță la furnizor, dă-i această adresă la care să trimită oamenii înapoi:"
+
 #: src/postulo/applications/models.py:527
 #, draft
 msgid "where"
@@ -10415,12 +10636,12 @@ msgstr "unde locuiți"
 msgid "Where your job search stands today."
 msgstr "Unde se află azi căutarea ta de job."
 
-#: src/postulo/core/models.py:516
+#: src/postulo/core/models.py:519
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Dacă oricine găsește adresa poate crea un cont."
 
-#: src/postulo/core/models.py:527
+#: src/postulo/core/models.py:530
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -10548,7 +10769,7 @@ msgstr "Cu: %(people)s"
 msgid "Withdrawn"
 msgstr "Retrasă"
 
-#: src/postulo/core/models.py:165 src/postulo/core/models.py:392
+#: src/postulo/core/models.py:168 src/postulo/core/models.py:395
 #, draft
 msgid "Work"
 msgstr "Serviciu"
@@ -10606,6 +10827,11 @@ msgstr ""
 #, draft
 msgid "written, not yet read by a speaker"
 msgstr "scris, încă necitit de un vorbitor"
+
+#: src/postulo/core/mail_auth.py:47
+#, draft
+msgid "XOAUTH2, with a token from the provider"
+msgstr "XOAUTH2, cu un token de la furnizor"
 
 #: src/postulo/core/server_forms.py:14
 #, draft
@@ -10893,7 +11119,7 @@ msgid ""
 msgstr ""
 "Numele tău și blocul de contact care va fi tipărit pe CV-urile tale. Cum se comportă Postulo pentru tine — temă, limbă, nume de utilizator, adrese — se află în <a href=\"%(settings_url)s\" class=\"underline\">Setări</a>."
 
-#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
+#: src/postulo/core/models.py:183 src/postulo/core/models.py:408
 #, draft
 msgid "Your name for it, when none of the kinds above fits."
 msgstr ""
@@ -10969,19 +11195,19 @@ msgstr "· o parte din această săptămână este în afara perioadei"
 msgid "· still running"
 msgstr "· încă în curs"
 
-#: src/postulo/core/server_views.py:1024
+#: src/postulo/core/server_views.py:1096
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr "„%(name)s” nu mai există. Tot ce s-a instalat din el rămâne instalat."
 
-#: src/postulo/core/server_views.py:1009
+#: src/postulo/core/server_views.py:1081
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "„%(name)s” este oprit. Din el nu se instalează și nu se actualizează nimic nou; ce era instalat continuă să funcționeze."
 
-#: src/postulo/core/server_views.py:1006
+#: src/postulo/core/server_views.py:1078
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr "„%(name)s” este pornit. Din el se pot instala și actualiza extensii."

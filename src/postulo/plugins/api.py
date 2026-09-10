@@ -47,7 +47,7 @@ if TYPE_CHECKING:  # pragma: no cover - the five names `__getattr__` resolves at
     from postulo.documents.themes import Kind as ThemeKind
     from postulo.documents.themes import Theme
 
-    from .consent import access_token
+    from .consent import ACCESS_TOKEN, access_token
     from .http import client
 
 from .base import (
@@ -89,6 +89,7 @@ from .base import (
 )
 
 __all__ = [
+    "ACCESS_TOKEN",
     "MAIL",
     "MAX_IMPORT_BYTES",
     "MEDIUMS",
@@ -166,4 +167,12 @@ def __getattr__(name: str):
         from .consent import access_token
 
         return access_token
+    if name == "ACCESS_TOKEN":
+        # Where a consent plugin finds its token in the settings it is handed. A plugin whose
+        # `send` is given settings rather than the connection cannot call `access_token`
+        # itself, so Postulo renews the token first -- before a send and before a test -- and
+        # this is the key it is then under (#151).
+        from .consent import ACCESS_TOKEN
+
+        return ACCESS_TOKEN
     raise AttributeError(f"{name!r} is not part of the plugin surface. See docs/PLUGINS.md.")

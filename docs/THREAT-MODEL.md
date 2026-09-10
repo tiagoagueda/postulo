@@ -68,5 +68,8 @@ never become a recovery route by accident, because there is no flag on it that c
    `POSTULO_SECRET_KEY` a start-up refusal rather than a warning. It also includes an
    **OAuth refresh token**, which is a longer-lived credential than a password and is not
    changed by changing one: somebody who takes it sends as that person until the grant is
-   withdrawn *at the provider*, which Postulo cannot do on their behalf.
+   withdrawn *at the provider*, which Postulo cannot do on their behalf. Since #151 that
+   includes the **instance's own mailbox**: the refresh token and client secret for the mail
+   that sends password resets sit encrypted on the policy row, and a callback finishing that
+   consent is refused unless the signed-in administrator is the one who started it.
 7. A new endpoint gets a test in `tests/security/` saying what an attacker would try.

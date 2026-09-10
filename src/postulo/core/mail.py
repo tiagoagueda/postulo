@@ -77,7 +77,14 @@ def _mismatch(security: str, port: int) -> str:
 
 
 def check_connection(
-    *, host: str, port: int, username: str, password: str, security: str, timeout: int
+    *,
+    host: str,
+    port: int,
+    username: str,
+    password: str,
+    security: str,
+    timeout: int,
+    token: str = "",
 ) -> str:
     """Prove a set of SMTP settings without sending a message to anybody.
 
@@ -85,6 +92,10 @@ def check_connection(
     to do nothing, and hang up. That exercises every part of the configuration a real send
     depends on — reachability, the certificate, the credentials — and involves no third
     party who then has to be told to ignore an email.
+
+    ``token`` signs in with XOAUTH2 instead of the password, which is what Microsoft 365
+    requires from the end of December 2026 (#151). The same call, so the button that proves a
+    password configuration proves an OAuth one too, and they cannot disagree about how.
 
     The values are the caller's, deliberately, so that a configuration can be tried before
     it is saved. Testing what is stored would mean overwriting whatever works in order to
@@ -107,8 +118,9 @@ def check_connection(
                     raise ConnectionFailed(str(NO_STARTTLS))
                 server.starttls(context=ssl.create_default_context())
                 server.ehlo()
-            if username:
-                server.login(username, password)
+            from . import mail_auth
+
+            mail_auth.authenticate(server, username=username, password=password, token=token)
             server.noop()
     except ConnectionFailed:
         raise
@@ -129,6 +141,12 @@ def check_connection(
         detail = f"{type(error).__name__}: {error}"
         raise ConnectionFailed(f"{hint} ({detail})" if hint else detail) from error
 
+    if token:
+        return str(_("Connected to %(host)s:%(port)s and signed in as %(user)s with a token.")) % {
+            "host": host,
+            "port": port,
+            "user": username,
+        }
     if username:
         return str(_("Connected to %(host)s:%(port)s and signed in as %(user)s.")) % {
             "host": host,
@@ -208,10 +226,23 @@ class GuardedBackend(EmailBackend):
     the name kept for the certificate (#148).
     """
 
+    def __init__(self, *args, oauth_token: str = "", **kwargs):
+        """``oauth_token`` signs in with XOAUTH2 rather than the password (#151).
+
+        Django authenticates inside `open()` and only with a password, before it publishes
+        the connection. So a token session is opened with no password -- Django then signs
+        in with nothing -- and authenticated here straight afterwards, on the same socket.
+        A token wins where both were given, for the reason `mail_auth.authenticate` says.
+        """
+        super().__init__(*args, **kwargs)
+        self.oauth_token = oauth_token
+        if oauth_token:
+            self.password = ""
+
     def open(self):
         import functools
 
-        from postulo.core import destinations, mail
+        from postulo.core import destinations, mail, mail_auth
 
         if self.connection:
             return False
@@ -221,13 +252,27 @@ class GuardedBackend(EmailBackend):
         self.host = str(approved)
         self._pinned_class = functools.partial(pinned, certificate_name=typed)
         try:
-            return super().open()
+            opened = super().open()
         finally:
             # Put the name back, so anything reading the backend afterwards -- a log line,
             # a summary on a page -- says the server somebody configured rather than a
             # number nobody typed.
             self.host = typed
             self._pinned_class = None
+        if opened and self.oauth_token:
+            try:
+                mail_auth.authenticate(
+                    self.connection, username=self.username, token=self.oauth_token
+                )
+            except OSError:
+                # `smtplib`'s errors are `OSError`s, so this is the same net Django casts.
+                # An unauthenticated session is closed rather than left to try a send and
+                # fail again with a less useful message.
+                self.close()
+                if not self.fail_silently:
+                    raise
+                return None
+        return opened
 
     @property
     def connection_class(self):

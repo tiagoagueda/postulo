@@ -21,8 +21,11 @@ from django.utils.translation import gettext_lazy as _
 from . import phones
 
 # MailSecurity is not a model -- it is how TLS gets onto an SMTP session, and it lives
-# beside the code that opens one (#149). Imported here because a field's choices need it.
+# beside the code that opens one (#149). MailAuth and MailGrant are how that session proves
+# who it is, and live beside the mechanism (#151). Imported here because a field's choices
+# need them.
 from .mail import MailSecurity
+from .mail_auth import MailAuth, MailGrant
 
 
 class TimeStampedModel(models.Model):
@@ -595,6 +598,27 @@ class SiteSettings(models.Model):
     )
     email_from = models.EmailField(_("from address"), blank=True)
 
+    # --- and how it proves who it is (#151) --------------------------------------------
+    #
+    # Blank means a password, which is what every instance has had and what a self-hosted
+    # relay wants. XOAUTH2 exists because Microsoft is switching SMTP AUTH basic
+    # authentication off by default at the end of December 2026, after which an instance
+    # sending through Microsoft 365 cannot send a password reset at all.
+    email_auth = models.CharField(_("authentication"), max_length=10, blank=True, choices=MailAuth)
+    email_oauth_provider = models.CharField(_("identity provider"), max_length=20, blank=True)
+    email_oauth_grant = models.CharField(_("grant"), max_length=20, blank=True, choices=MailGrant)
+    #: Microsoft wants the directory this application is registered in, in the path of every
+    #: OAuth address. Google wants nothing here.
+    email_oauth_tenant = models.CharField(_("directory (tenant) ID"), max_length=100, blank=True)
+    email_oauth_client_id = models.CharField(_("client ID"), max_length=255, blank=True)
+    #: The client secret, the refresh token, and the access token last fetched with them.
+    #: One encrypted store rather than a column each, the same shape a transport's secrets
+    #: use, because they are written and read together and never separately. Under the same
+    #: Fernet key as every other secret here (#111).
+    email_oauth_secrets_encrypted = models.TextField(
+        _("mail OAuth secrets"), blank=True, editable=False
+    )
+
     #: Which transport plugin carries the mail. Blank means the built-in SMTP one, so an
     #: instance that has never heard of transports keeps behaving exactly as it did.
     email_transport = models.CharField(_("mail transport"), max_length=60, blank=True)
@@ -730,6 +754,35 @@ class SiteSettings(models.Model):
         from postulo.plugins import secrets
 
         self.transport_secrets_encrypted = secrets.encrypt(values or {})
+
+    @property
+    def email_oauth_secrets(self) -> dict:
+        """The client secret and the tokens, decrypted. See the column."""
+        from postulo.plugins import secrets
+
+        return secrets.decrypt(self.email_oauth_secrets_encrypted)
+
+    @email_oauth_secrets.setter
+    def email_oauth_secrets(self, values: dict) -> None:
+        from postulo.plugins import secrets
+
+        self.email_oauth_secrets_encrypted = secrets.encrypt(values or {})
+
+    @property
+    def has_email_client_secret(self) -> bool:
+        """Whether one is stored. As with the password, the page may say this and no more."""
+        try:
+            return bool(self.email_oauth_secrets.get("client_secret"))
+        except Exception:
+            return bool(self.email_oauth_secrets_encrypted)
+
+    @property
+    def has_email_consent(self) -> bool:
+        """Whether somebody has agreed once, as the mailbox that sends."""
+        try:
+            return bool(self.email_oauth_secrets.get("refresh_token"))
+        except Exception:
+            return False
 
     @property
     def has_email_password(self) -> bool:

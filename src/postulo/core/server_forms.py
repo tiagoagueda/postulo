@@ -220,6 +220,34 @@ class EmailForm(forms.ModelForm):
         help_text=_("Nothing is sent to the server as a password until a new one is entered."),
     )
 
+    # --- XOAUTH2 (#151). Offered beside the password, never instead of it: a relay of
+    # the operator's own authenticates the way it always has, and that is most instances.
+    email_auth = forms.ChoiceField(
+        label=_("Signing in"),
+        required=False,
+        help_text=_(
+            "A password is right for your own mail server, and for Gmail with an app "
+            "password. Microsoft 365 stops accepting passwords for sending mail by default "
+            "at the end of December 2026; after that it needs XOAUTH2."
+        ),
+    )
+    email_oauth_provider = forms.ChoiceField(label=_("Identity provider"), required=False)
+    email_oauth_grant = forms.ChoiceField(
+        label=_("How the token is obtained"),
+        required=False,
+        help_text=_(
+            "Signed in once: somebody agrees on the provider's consent screen, as the mailbox "
+            "that sends, and needs no administrator. The application sends on its own: "
+            "Microsoft only, and needs a tenant administrator to grant the permission."
+        ),
+    )
+    email_oauth_client_secret = forms.CharField(
+        label=_("Client secret"),
+        required=False,
+        widget=forms.PasswordInput(render_value=False),
+        help_text=_("Leave blank to keep the one already stored."),
+    )
+
     class Meta:
         model = SiteSettings
         fields = (
@@ -229,6 +257,11 @@ class EmailForm(forms.ModelForm):
             "email_security",
             "email_timeout",
             "email_from",
+            "email_auth",
+            "email_oauth_provider",
+            "email_oauth_grant",
+            "email_oauth_tenant",
+            "email_oauth_client_id",
         )
 
     #: Prefix for the fields a non-SMTP transport declares, so its `host` cannot collide
@@ -236,16 +269,22 @@ class EmailForm(forms.ModelForm):
     TRANSPORT_PREFIX = "transport__"
 
     def __init__(self, *args, **kwargs):
+        from postulo.core import mail_auth
         from postulo.core.mail import MailSecurity
 
         super().__init__(*args, **kwargs)
+        unset = ("", _("Not set — the environment decides"))
         if "email_security" in self.fields:
             # An empty first choice, because blank means "not set here" for every column on
             # this page and the environment answers for it.
-            self.fields["email_security"].choices = [
-                ("", _("Not set — the environment decides")),
-                *MailSecurity.choices,
-            ]
+            self.fields["email_security"].choices = [unset, *MailSecurity.choices]
+        self.fields["email_auth"].choices = [unset, *mail_auth.MailAuth.choices]
+        self.fields["email_oauth_provider"].choices = [unset, *mail_auth.provider_choices()]
+        self.fields["email_oauth_grant"].choices = [unset, *mail_auth.MailGrant.choices]
+        self.fields["email_oauth_tenant"].help_text = _(
+            "Microsoft only: the directory the application is registered in. Leave blank "
+            "for an application that accepts any directory."
+        )
         self._add_transport_fields()
         self.pinned = {
             field: variable
@@ -256,12 +295,18 @@ class EmailForm(forms.ModelForm):
         for field, key in site.EMAIL_FIELDS.items():
             # The effective value, so a pinned field shows what is actually in force rather
             # than an empty box beside a note saying it comes from somewhere else.
-            if field in self.pinned and field in self.fields and field != "email_password":
+            if (
+                field in self.pinned
+                and field in self.fields
+                and field not in site.EMAIL_SECRET_FIELDS
+            ):
                 self.initial[field] = resolved[key]
         if "email_password" in self.pinned:
             # Nothing to type and nothing to forget: the environment holds it.
             del self.fields["email_password"]
             del self.fields["forget_email_password"]
+        if "email_oauth_client_secret" in self.pinned:
+            del self.fields["email_oauth_client_secret"]
         self.fields["email_host"].widget.attrs.setdefault("placeholder", "smtp.example.org")
         self.fields["email_from"].widget.attrs.setdefault("placeholder", "postulo@example.org")
 
@@ -275,7 +320,32 @@ class EmailForm(forms.ModelForm):
             cleaned.pop(field, None)
             self.errors.pop(field, None)
         self._suggest_the_port(cleaned)
+        self._refuse_a_grant_the_provider_lacks(cleaned)
         return cleaned
+
+    def _refuse_a_grant_the_provider_lacks(self, cleaned: dict) -> None:
+        """Say so on the page rather than at the first password reset.
+
+        Google has no client-credentials grant for SMTP -- its equivalent is a service
+        account, a different grant again -- so the pair would save and then fail on every
+        send, which is to say it would fail at the moment somebody is locked out.
+        """
+        from postulo.core import mail_auth
+
+        chosen = mail_auth.provider(cleaned.get("email_oauth_provider") or "")
+        if (
+            chosen is not None
+            and cleaned.get("email_oauth_grant") == mail_auth.MailGrant.APPLICATION
+            and not chosen.application_grant
+        ):
+            self.add_error(
+                "email_oauth_grant",
+                _(
+                    "%(provider)s does not let an application send on its own. Choose "
+                    "“Signed in once”."
+                )
+                % {"provider": chosen.label},
+            )
 
     @staticmethod
     def _suggest_the_port(cleaned: dict) -> None:
@@ -328,6 +398,12 @@ class EmailForm(forms.ModelForm):
             "email_username",
             "email_security",
             "email_timeout",
+            "email_auth",
+            "email_oauth_provider",
+            "email_oauth_grant",
+            "email_oauth_tenant",
+            "email_oauth_client_id",
+            "email_oauth_client_secret",
         ):
             self.fields.pop(name, None)
         self.fields.pop("email_password", None)
@@ -370,6 +446,16 @@ class EmailForm(forms.ModelForm):
                 row.email_password = ""
             elif self.cleaned_data.get("email_password"):
                 row.email_password = self.cleaned_data["email_password"]
+        if "email_oauth_client_secret" not in self.pinned and self.cleaned_data.get(
+            "email_oauth_client_secret"
+        ):
+            # Blank means "keep what is stored", as it does for the password. A new secret
+            # invalidates nothing already held: the refresh token was issued to the client,
+            # not to the secret, and survives a rotated one.
+            row.email_oauth_secrets = {
+                **row.email_oauth_secrets,
+                "client_secret": self.cleaned_data["email_oauth_client_secret"],
+            }
         if "email_transport" in self.fields:
             row.email_transport = self.cleaned_data.get("email_transport", "") or ""
         plain, secret = self._transport_answers()

@@ -24,6 +24,13 @@ not authorised for their domain, DKIM signs it as somebody else, and a receiving
 bounces it or bins it. There is no way to send as a person except over a server that is
 entitled to send as them, which is theirs and not Postulo's.
 
+**A password, or a token (#151).** Somebody on their own mail server signs in with a
+password, as they always have. Somebody on Google or Microsoft 365 can instead sign in once
+on the provider's own page, and mail leaves with a token that is renewed as it is used --
+which is what Microsoft requires from the end of December 2026, when it stops accepting
+passwords for sending mail by default. Whether this connection needs consent therefore
+depends on what the person chose, which is why `needs_consent` is handed the settings.
+
 **The address is a field rather than a guess.** It is not the account's sign-in address:
 plenty of people sign in with one address and correspond from another, and guessing would be
 a message going out with the wrong name on it. `postulo.core.correspondence` refuses to send
@@ -55,7 +62,7 @@ class OwnMail:
     """SMTP belonging to the person, used for correspondence they send."""
 
     def config_fields(self) -> list[FieldSpec]:
-        from postulo.core import mail
+        from postulo.core import mail, mail_auth
 
         return [
             FieldSpec(
@@ -84,6 +91,20 @@ class OwnMail:
                 required=False,
                 help=_lazy("Nearly every provider wants STARTTLS on 587. Some want TLS on 465."),
             ),
+            FieldSpec(
+                name="sign_in",
+                label=_lazy("Sign in with"),
+                type="choice",
+                choices=(
+                    ("", _lazy("A password, or an app password")),
+                    *mail_auth.provider_choices(),
+                ),
+                required=False,
+                help=_lazy(
+                    "A password is right for your own mail server. Choose your provider to "
+                    "sign in on its own page instead, which Microsoft 365 will require."
+                ),
+            ),
             FieldSpec(name="username", label=_lazy("Username"), type="text", required=False),
             FieldSpec(
                 name="password",
@@ -96,7 +117,50 @@ class OwnMail:
                     "app-specific password here rather than the one you sign in with."
                 ),
             ),
+            # The application registration a provider hands out. Only read when a provider
+            # is chosen above; a person on their own server leaves them empty.
+            FieldSpec(
+                name="client_id",
+                label=_lazy("Client ID"),
+                type="text",
+                required=False,
+                help=_lazy(
+                    "Only when signing in with a provider: from the application registered "
+                    "with it. Ask whoever runs this instance whether they have one to share."
+                ),
+            ),
+            FieldSpec(
+                name="client_secret",
+                label=_lazy("Client secret"),
+                type="password",
+                secret=True,
+                required=False,
+            ),
+            FieldSpec(
+                name="tenant",
+                label=_lazy("Directory (tenant) ID"),
+                type="text",
+                required=False,
+                help=_lazy("Microsoft only. Leave blank to accept any directory."),
+            ),
         ]
+
+    def needs_consent(self, config: dict):
+        """Consent from the chosen provider, or nothing for a mail server of one's own."""
+        from postulo.core import mail_auth
+        from postulo.plugins.api import Consent
+
+        chosen = mail_auth.provider(str(config.get("sign_in") or ""))
+        if chosen is None:
+            return None
+        tenant = str(config.get("tenant") or "")
+        return Consent(
+            authorise_url=chosen.authorise(tenant),
+            token_url=chosen.token(tenant),
+            scopes=chosen.scopes,
+            provider=str(chosen.label),
+            extra=dict(chosen.extra),
+        )
 
     def test(self, config: dict) -> TestResult:
         """Prove the settings without sending anything to anybody else.
@@ -115,6 +179,7 @@ class OwnMail:
                 password=str(config.get("password") or ""),
                 security=str(config.get("security") or ""),
                 timeout=10,
+                token=_token(config),
             )
         except mail.ConnectionFailed as error:
             return TestResult(False, str(error))
@@ -134,6 +199,7 @@ class OwnMail:
             use_tls=config.get("security") == "starttls",
             use_ssl=config.get("security") == "ssl",
             timeout=20,
+            oauth_token=_token(config),
         )
         return backend.send_messages([message]) or 0
 
@@ -143,6 +209,22 @@ class OwnMail:
         if not address:
             return str(_("No address set."))
         return f"{address} · {host}" if host else str(address)
+
+
+def _token(config: dict) -> str:
+    """The access token to sign in with, or nothing for a password.
+
+    Renewed before it gets here -- by `correspondence.send` on the way out and by the test
+    button before it asks -- because both have the connection and this has only its
+    settings. A provider chosen with no token yet is a person who has not agreed, and the
+    server's own refusal would say so less clearly than nothing being sent at all.
+    """
+    from postulo.core import mail_auth
+    from postulo.plugins.api import ACCESS_TOKEN
+
+    if mail_auth.provider(str(config.get("sign_in") or "")) is None:
+        return ""
+    return str(config.get(ACCESS_TOKEN) or "")
 
 
 def _port(config: dict) -> int:

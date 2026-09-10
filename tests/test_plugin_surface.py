@@ -46,7 +46,11 @@ REACHING_PAST: dict[str, dict[str, str]] = {
         "postulo.notifications.base": "`Notification`, which is what a notifier is handed",
     },
     "own_mail": {
-        "postulo.core": "`mail`: the encryption choices, which are how TLS gets onto a session",
+        "postulo.core": (
+            "`mail`: the encryption choices, which are how TLS gets onto a session; and "
+            "`mail_auth`: the identity-provider presets a person picks from to sign in with a "
+            "token rather than a password (#151)"
+        ),
         "postulo.core.mail": (
             "the connection check, and the backend that dials only where it is allowed to "
             "(#148). One guard for the instance's mail and the person's, rather than two "
@@ -54,7 +58,10 @@ REACHING_PAST: dict[str, dict[str, str]] = {
         ),
     },
     "smtp": {
-        "postulo.core": "`mail` to open an SMTP connection and prove it",
+        "postulo.core": (
+            "`mail` to open an SMTP connection and prove it, and `mail_auth` for the "
+            "instance's own token when it signs in with XOAUTH2 (#151)"
+        ),
         "postulo.core.mail": (
             "the guarded backend, which is where the server is allowed to dial (#148)"
         ),

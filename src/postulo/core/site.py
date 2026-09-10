@@ -36,6 +36,12 @@ ENV_OVERRIDES = {
     "email_security": ("POSTULO_EMAIL_SECURITY", "POSTULO_EMAIL_USE_TLS"),
     "email_timeout": "POSTULO_EMAIL_TIMEOUT",
     "email_from": "POSTULO_DEFAULT_FROM_EMAIL",
+    "email_auth": "POSTULO_EMAIL_AUTH",
+    "email_oauth_provider": "POSTULO_EMAIL_OAUTH_PROVIDER",
+    "email_oauth_grant": "POSTULO_EMAIL_OAUTH_GRANT",
+    "email_oauth_tenant": "POSTULO_EMAIL_OAUTH_TENANT",
+    "email_oauth_client_id": "POSTULO_EMAIL_OAUTH_CLIENT_ID",
+    "email_oauth_client_secret": "POSTULO_EMAIL_OAUTH_CLIENT_SECRET",
 }
 
 #: Email field on the policy row → the key the SMTP backend wants. One mapping, so the
@@ -49,7 +55,18 @@ EMAIL_FIELDS = {
     "email_security": "security",
     "email_timeout": "timeout",
     "email_from": "from_address",
+    # How the session proves who it is (#151). In the same mapping as the rest so the form,
+    # the resolution and the shadowing warning cannot disagree about them either.
+    "email_auth": "auth",
+    "email_oauth_provider": "oauth_provider",
+    "email_oauth_grant": "oauth_grant",
+    "email_oauth_tenant": "oauth_tenant",
+    "email_oauth_client_id": "oauth_client_id",
+    "email_oauth_client_secret": "oauth_client_secret",
 }
+
+#: The fields that are secrets: never rendered, blank meaning "keep what is stored".
+EMAIL_SECRET_FIELDS = ("email_password", "email_oauth_client_secret")
 
 
 def env_variables() -> tuple[str, ...]:
@@ -225,6 +242,8 @@ def _stored_email(row: SiteSettings, field: str):
     """What the policy row holds for one email field, or ``None`` for "nothing"."""
     if field == "email_password":
         return row.email_password or None
+    if field == "email_oauth_client_secret":
+        return row.email_oauth_secrets.get("client_secret") or None
     value = getattr(row, field)
     return None if value in ("", None) else value
 
@@ -246,6 +265,12 @@ def email_settings() -> dict:
         "security": settings.POSTULO_EMAIL_SECURITY,
         "timeout": settings.POSTULO_EMAIL_TIMEOUT,
         "from_address": settings.DEFAULT_FROM_EMAIL,
+        "auth": settings.POSTULO_EMAIL_AUTH,
+        "oauth_provider": settings.POSTULO_EMAIL_OAUTH_PROVIDER,
+        "oauth_grant": settings.POSTULO_EMAIL_OAUTH_GRANT,
+        "oauth_tenant": settings.POSTULO_EMAIL_OAUTH_TENANT,
+        "oauth_client_id": settings.POSTULO_EMAIL_OAUTH_CLIENT_ID,
+        "oauth_client_secret": settings.POSTULO_EMAIL_OAUTH_CLIENT_SECRET,
     }
     try:
         row = current()

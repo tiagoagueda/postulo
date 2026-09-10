@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:54+0000\n"
+"POT-Creation-Date: 2026-09-10 08:21+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: galego\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s xa ten un identificador %(scheme)s: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s cambiados."
 
-#: src/postulo/plugins/views.py:345
+#: src/postulo/plugins/views.py:371
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -222,12 +222,12 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "de %(low)s a %(high)s"
 
-#: src/postulo/core/server_views.py:1200
+#: src/postulo/core/server_views.py:1272
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s instalouse desde o catálogo."
 
-#: src/postulo/core/server_views.py:1150
+#: src/postulo/core/server_views.py:1222
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
@@ -301,19 +301,19 @@ msgstr "%(name)s agora é administrador."
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "%(name)s está agora na fila %(row)s, lugar %(place)s."
 
-#: src/postulo/core/server_views.py:1261
+#: src/postulo/core/server_views.py:1333
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s quitouse. Reinicia Postulo para asegurarte de que non queda nada del cargado."
 
-#: src/postulo/core/server_views.py:1233
+#: src/postulo/core/server_views.py:1305
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s está apagado; os seus ficheiros aínda están aquí."
 
-#: src/postulo/core/server_views.py:1235
+#: src/postulo/core/server_views.py:1307
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s volveu acenderse."
@@ -379,6 +379,18 @@ msgstr "%(package)s: precisa %(wanted)s, e Postulo ten %(have)s."
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s non puido comprobar estas opcións: %(error)s"
+
+#: src/postulo/core/mail_auth.py:234
+#, python-format, draft
+msgid "%(provider)s does not let an application send on its own."
+msgstr "%(provider)s non permite que unha aplicación envíe pola súa conta."
+
+#: src/postulo/core/server_forms.py:343
+#, python-format, draft
+msgid ""
+"%(provider)s does not let an application send on its own. Choose “Signed in once”."
+msgstr ""
+"%(provider)s non permite que unha aplicación envíe pola súa conta. Escolle «Coa sesión iniciada unha vez»."
 
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
@@ -482,7 +494,7 @@ msgstr "%(url)s é moito máis grande do que debería ser un catálogo."
 msgid "%(when)s ago"
 msgstr "hai %(when)s"
 
-#: src/postulo/core/models.py:445
+#: src/postulo/core/models.py:448
 #, draft
 msgid "(empty address)"
 msgstr "(enderezo baleiro)"
@@ -537,6 +549,11 @@ msgid ""
 msgstr ""
 "Unha extensión de navegador só precisa a primeira. A un axente dálle só lectura ata que confíes nel para escribir."
 
+#: src/postulo/templates/server/email.html:210
+#, draft
+msgid "A client secret is stored. It is never shown."
+msgstr "Hai un segredo de cliente gardado. Nunca se amosa."
+
 #: src/postulo/jobs/models.py:196
 #, draft
 msgid "A company cannot be part of itself."
@@ -569,12 +586,12 @@ msgstr "Unha empresa, un posto, unha frase dunha carta, un nome…"
 msgid "A CSV file"
 msgstr "Un ficheiro CSV"
 
-#: src/postulo/core/models.py:87
+#: src/postulo/core/models.py:90
 #, draft
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Unha indicación para a interface, como «ámbar» ou «ceo»."
 
-#: src/postulo/core/models.py:510
+#: src/postulo/core/models.py:513
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Unha liña baixo o nome na páxina de acceso. Opcional."
@@ -596,7 +613,7 @@ msgstr ""
 msgid "A month"
 msgstr "Un mes"
 
-#: src/postulo/core/models.py:288
+#: src/postulo/core/models.py:291
 #, draft
 msgid ""
 "A number has to be confirmed before it can get you back in. Nobody has answered on this one."
@@ -624,11 +641,23 @@ msgid ""
 msgstr ""
 "Unha chave de acceso está ligada ao enderezo onde a creaches, que aquí é %(host)s. Chegar a esta instalación con outro nome, ou movela, non levará as túas chaves de acceso."
 
-#: src/postulo/templates/server/email.html:169
+#: src/postulo/core/server_forms.py:228
+#, draft
+msgid ""
+"A password is right for your own mail server, and for Gmail with an app password. Microsoft 365 stops accepting passwords for sending mail by default at the end of December 2026; after that it needs XOAUTH2."
+msgstr ""
+"Un contrasinal é o axeitado para o teu propio servidor de correo, e para Gmail cun contrasinal de aplicación. Microsoft 365 deixa de aceptar contrasinais para enviar correo de forma predeterminada a finais de decembro de 2026; a partir de entón precisa XOAUTH2."
+
+#: src/postulo/templates/server/email.html:171
 #, draft
 msgid "A password is stored. It is never shown, not even its length."
 msgstr ""
 "Hai un contrasinal gardado. Non se amosa nunca, nin sequera a súa lonxitude."
+
+#: src/postulo/core/mail_auth.py:46
+#, draft
+msgid "A password, or an app password"
+msgstr "Un contrasinal, ou un contrasinal de aplicación"
 
 #: src/postulo/templates/widgets/suggestions.html:6
 #, python-format, draft
@@ -756,7 +785,7 @@ msgid ""
 msgstr ""
 "Un modelo coas columnas propias de Postulo e unha fila de exemplo. Énchea e súbea arriba."
 
-#: src/postulo/core/server_views.py:715
+#: src/postulo/core/server_views.py:787
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Unha mensaxe de proba de %(name)s"
@@ -1011,7 +1040,7 @@ msgstr "Engadido."
 msgid "Address"
 msgstr "Enderezo"
 
-#: src/postulo/core/models.py:410 src/postulo/jobs/models.py:740
+#: src/postulo/core/models.py:413 src/postulo/jobs/models.py:740
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
@@ -1440,6 +1469,11 @@ msgstr "Hai que ofrecer polo menos un idioma, ou ninguén poderá ler nada."
 msgid "attempts"
 msgstr "intentos"
 
+#: src/postulo/core/models.py:607
+#, draft
+msgid "authentication"
+msgstr "autenticación"
+
 #: src/postulo/jobs/industries.py:83
 #, draft
 msgid "Automotive"
@@ -1865,10 +1899,15 @@ msgstr "Escolle primeiro un ficheiro Europass."
 msgid "Choose a new password"
 msgstr "Escolla un novo contrasinal"
 
-#: src/postulo/core/server_views.py:1081
+#: src/postulo/core/server_views.py:1153
 #, draft
 msgid "Choose a package first."
 msgstr "Escolle primeiro un paquete."
+
+#: src/postulo/core/mail_auth.py:312
+#, draft
+msgid "Choose an identity provider and save it first."
+msgstr "Escolle primeiro un provedor de identidade e gárdao."
 
 #: src/postulo/templates/core/import_csv_map.html:102
 #, draft
@@ -1922,6 +1961,16 @@ msgstr "Limpar os filtros"
 msgid "Cleared: this entry prints its original text in %(language)s."
 msgstr "Baleirado: esta entrada imprime o texto orixinal en %(language)s."
 
+#: src/postulo/core/models.py:613
+#, draft
+msgid "client ID"
+msgstr "ID de cliente"
+
+#: src/postulo/core/server_forms.py:245
+#, draft
+msgid "Client secret"
+msgstr "Segredo de cliente"
+
 #: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:663
 #, draft
 msgid "Closed"
@@ -1968,7 +2017,7 @@ msgstr "Código (GitHub, GitLab…)"
 msgid "code repository"
 msgstr "repositorio de código"
 
-#: src/postulo/core/models.py:84
+#: src/postulo/core/models.py:87
 #, draft
 msgid "colour"
 msgstr "cor"
@@ -2097,18 +2146,24 @@ msgstr "Conectar"
 msgid "Connect %(plugin)s"
 msgstr "Conectar %(plugin)s"
 
-#: src/postulo/core/mail.py:133
+#: src/postulo/core/mail.py:145
+#, python-format, draft
+msgid "Connected to %(host)s:%(port)s and signed in as %(user)s with a token."
+msgstr ""
+"Conectado a %(host)s:%(port)s coa sesión iniciada como %(user)s mediante un token."
+
+#: src/postulo/core/mail.py:151
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s and signed in as %(user)s."
 msgstr "Conectado a %(host)s:%(port)s e identificado como %(user)s."
 
-#: src/postulo/core/mail.py:138
+#: src/postulo/core/mail.py:156
 #, python-format, draft
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Conectado a %(host)s:%(port)s. Sen nome de usuario, así que non se iniciou sesión."
 
-#: src/postulo/plugins/views.py:289
+#: src/postulo/plugins/views.py:298
 #, draft
 msgid "Connected. Test it to make sure it works."
 msgstr "Conectado. Próbeo para asegurarse de que funciona."
@@ -2119,7 +2174,7 @@ msgstr "Conectado. Próbeo para asegurarse de que funciona."
 msgid "connection"
 msgstr "conexión"
 
-#: src/postulo/plugins/views.py:392
+#: src/postulo/plugins/views.py:418
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Conexión eliminada, segredos incluídos."
@@ -2129,7 +2184,7 @@ msgstr "Conexión eliminada, segredos incluídos."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Conexión gardada. Próbaa para asegurarte de que funciona."
 
-#: src/postulo/core/models.py:588
+#: src/postulo/core/models.py:591
 #, draft
 msgid "connection security"
 msgstr "seguridade da conexión"
@@ -2141,7 +2196,7 @@ msgstr "Seguridade da conexión"
 
 #: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:388
+#: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2259,7 +2314,7 @@ msgid ""
 msgstr ""
 "Cóntase desde a cronoloxía, así que entran as entrevistas rexistradas antes de que existise a axenda."
 
-#: src/postulo/core/models.py:416 src/postulo/core/postal.py:170
+#: src/postulo/core/models.py:419 src/postulo/core/postal.py:170
 #, draft
 msgid "country"
 msgstr "país"
@@ -2304,7 +2359,7 @@ msgid "created"
 msgstr "creada"
 
 #: src/postulo/accounts/models.py:344 src/postulo/accounts/models.py:415
-#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:31
+#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:34
 #, draft
 msgid "created at"
 msgstr "creada o"
@@ -2574,12 +2629,12 @@ msgstr "Rexeitada"
 msgid "Declined. It will not be suggested again."
 msgstr "Rexeitada. Non se volverá suxerir."
 
-#: src/postulo/core/models.py:550
+#: src/postulo/core/models.py:553
 #, draft
 msgid "default language"
 msgstr "lingua predeterminada"
 
-#: src/postulo/core/models.py:561
+#: src/postulo/core/models.py:564
 #, draft
 msgid "default time zone"
 msgstr "fuso horario predeterminado"
@@ -2694,6 +2749,11 @@ msgstr "Non respondeu"
 #, draft
 msgid "did not answer when last checked"
 msgstr "non respondeu na última comprobación"
+
+#: src/postulo/core/models.py:612
+#, draft
+msgid "directory (tenant) ID"
+msgstr "ID de directorio (inquilino)"
 
 #: src/postulo/templates/jobs/capture_list.html:45
 #: src/postulo/templates/jobs/listing_list.html:44
@@ -3239,7 +3299,7 @@ msgstr "Exportado á parte"
 msgid "Failed"
 msgstr "Fallou"
 
-#: src/postulo/core/models.py:672 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:696 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Fallou sen dicir por que."
@@ -3254,7 +3314,7 @@ msgstr "Feira"
 msgid "Fastest"
 msgstr "O máis rápido"
 
-#: src/postulo/core/models.py:168
+#: src/postulo/core/models.py:171
 #, draft
 msgid "Fax"
 msgstr "Fax"
@@ -3444,6 +3504,11 @@ msgid ""
 msgstr ""
 "Forzalo a aceso non fai que funcione: un notificador, un almacén ou unha sincronización precisan credenciais que só esta persoa pode dar. Significa que a pode usar e non a pode apagar."
 
+#: src/postulo/templates/server/email.html:247
+#, draft
+msgid "Forget the grant"
+msgstr "Esquecer a autorización"
+
 #: src/postulo/core/server_forms.py:218
 #, draft
 msgid "Forget the stored password"
@@ -3518,7 +3583,7 @@ msgstr "desde %(low)s"
 msgid "From %(name)s."
 msgstr "De %(name)s."
 
-#: src/postulo/core/models.py:596
+#: src/postulo/core/models.py:599
 #, draft
 msgid "from address"
 msgstr "enderezo do remitente"
@@ -3638,6 +3703,11 @@ msgstr "Recibiron algunha resposta"
 msgid "grade"
 msgstr "nota"
 
+#: src/postulo/core/models.py:609
+#, draft
+msgid "grant"
+msgstr "autorización"
+
 #: src/postulo/accounts/models.py:335
 #, draft
 msgid "Gravatar checked on"
@@ -3735,7 +3805,7 @@ msgstr "puntos destacados"
 msgid "highlights for this CV"
 msgstr "puntos destacados para este CV"
 
-#: src/postulo/core/models.py:166 src/postulo/core/models.py:391
+#: src/postulo/core/models.py:169 src/postulo/core/models.py:394
 #, draft
 msgid "Home"
 msgstr "Casa"
@@ -3805,6 +3875,11 @@ msgstr "Con que regularidade"
 #, draft
 msgid "How the first rows will be read"
 msgstr "Como se lerán as primeiras filas"
+
+#: src/postulo/core/server_forms.py:236
+#, draft
+msgid "How the token is obtained"
+msgstr "Como se obtén o token"
 
 #: src/postulo/templates/server/capture.html:7
 #, draft
@@ -3888,7 +3963,17 @@ msgstr "Identificadores"
 msgid "Identifies itself as"
 msgstr "Preséntase como"
 
-#: src/postulo/core/server_views.py:717
+#: src/postulo/core/models.py:608
+#, draft
+msgid "identity provider"
+msgstr "provedor de identidade"
+
+#: src/postulo/core/server_forms.py:234
+#, draft
+msgid "Identity provider"
+msgstr "Provedor de identidade"
+
+#: src/postulo/core/server_views.py:789
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -3902,7 +3987,7 @@ msgid ""
 msgstr ""
 "Se te presentaches a unha institución da UE ou por un servizo de emprego estatal, xa tes este ficheiro. No canto de escribilo todo de novo, entrégao."
 
-#: src/postulo/core/models.py:519
+#: src/postulo/core/models.py:522
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "ignorar robots.txt ao capturar"
@@ -4088,7 +4173,7 @@ msgstr "Instalado nesta instalación"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Instalar un complemento executa código doutra persoa dentro de Postulo."
 
-#: src/postulo/core/models.py:501
+#: src/postulo/core/models.py:504
 #, draft
 msgid "instance name"
 msgstr "nome da instalación"
@@ -4103,7 +4188,7 @@ msgstr "institución"
 msgid "Insurance"
 msgstr "Seguros"
 
-#: src/postulo/core/server_views.py:797 src/postulo/plugins/provenance.py:59
+#: src/postulo/core/server_views.py:869 src/postulo/plugins/provenance.py:59
 #, draft
 msgid "Internal"
 msgstr "Interno"
@@ -4264,7 +4349,7 @@ msgid ""
 msgstr ""
 "Négase a servir nada antes ca publicar estes rexistros a calquera que a atope. Pon POSTULO_LOGS_TOKEN, ou apaga POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:325
+#: src/postulo/plugins/views.py:351
 #, draft
 msgid "It works."
 msgstr "Funciona."
@@ -4355,8 +4440,8 @@ msgstr ""
 
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
-#: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
+#: src/postulo/core/models.py:403 src/postulo/documents/models.py:112
 #: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
 #: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:243
@@ -4441,7 +4526,7 @@ msgstr "Linguas"
 msgid "languages"
 msgstr "linguas"
 
-#: src/postulo/core/models.py:560
+#: src/postulo/core/models.py:563
 #, draft
 msgid "languages offered"
 msgstr "idiomas ofrecidos"
@@ -4555,7 +4640,7 @@ msgid "Leave a box empty and that line prints as it is written above it."
 msgstr ""
 "Deixe unha caixa baleira e esa liña imprímese tal como está escrita enriba."
 
-#: src/postulo/core/server_forms.py:215
+#: src/postulo/core/server_forms.py:215 src/postulo/core/server_forms.py:248
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "Déixao en branco para conservar o que xa está gardado."
@@ -4803,7 +4888,7 @@ msgstr "Minúsculas, cifras, puntos, guións baixos e guións."
 msgid "Made"
 msgstr "Creada"
 
-#: src/postulo/core/models.py:627
+#: src/postulo/core/models.py:651
 #, draft
 msgid "mail failures in a row"
 msgstr "fallos de correo seguidos"
@@ -4824,7 +4909,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Aquí o correo é o único xeito de volver entrar nunha conta, así que ata que volva funcionar ningunha das %(counter)s persoas desta instancia poderá entrar se esquece o seu contrasinal."
 
-#: src/postulo/core/models.py:623
+#: src/postulo/core/models.py:647
 #, draft
 msgid "mail last failed"
 msgstr "último fallo do correo"
@@ -4834,7 +4919,7 @@ msgstr "último fallo do correo"
 msgid "Mail last went out at %(when)s."
 msgstr "O correo saíu por última vez ás %(when)s."
 
-#: src/postulo/core/models.py:622
+#: src/postulo/core/models.py:646
 #, draft
 msgid "mail last worked"
 msgstr "última vez que o correo funcionou"
@@ -4853,17 +4938,22 @@ msgid ""
 msgstr ""
 "O correo tampouco suxeita xa o transporte, porque unha vía que non entrega nada non protexe a ninguén."
 
-#: src/postulo/core/models.py:600
+#: src/postulo/core/models.py:619
+#, draft
+msgid "mail OAuth secrets"
+msgstr "segredos OAuth do correo"
+
+#: src/postulo/core/models.py:624
 #, draft
 msgid "mail transport"
 msgstr "transporte de correo"
 
-#: src/postulo/core/server_forms.py:313
+#: src/postulo/core/server_forms.py:383
 #, draft
 msgid "Mail transport"
 msgstr "Transporte de correo"
 
-#: src/postulo/core/models.py:624
+#: src/postulo/core/models.py:648
 #, draft
 msgid "mail's last error"
 msgstr "último erro do correo"
@@ -4984,12 +5074,19 @@ msgstr "Fusionar con"
 msgid "Merged."
 msgstr "Fusionado."
 
+#: src/postulo/core/server_forms.py:284
+#, draft
+msgid ""
+"Microsoft only: the directory the application is registered in. Leave blank for an application that accepts any directory."
+msgstr ""
+"Só Microsoft: o directorio no que está rexistrada a aplicación. Déixao baleiro para unha aplicación que acepta calquera directorio."
+
 #: src/postulo/documents/models.py:221
 #, draft
 msgid "Missing entry"
 msgstr "Falta a entrada"
 
-#: src/postulo/core/models.py:164
+#: src/postulo/core/models.py:167
 #, draft
 msgid "Mobile"
 msgstr "Móbil"
@@ -5098,7 +5195,7 @@ msgid "NACE division"
 msgstr "división NACE"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/core/models.py:84 src/postulo/documents/models.py:109
 #: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
@@ -5117,7 +5214,7 @@ msgstr "nome"
 msgid "Name"
 msgstr "Nome"
 
-#: src/postulo/core/models.py:177 src/postulo/core/models.py:402
+#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
 #, draft
 msgid "name, if Other"
 msgstr "nome, se Outro"
@@ -5287,7 +5384,7 @@ msgstr "Aínda non hai empresas. Créanse soas cando rexistras unha candidatura.
 msgid "no company"
 msgstr "sen empresa"
 
-#: src/postulo/core/server_views.py:695
+#: src/postulo/core/server_views.py:739
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Sen conexión: %(why)s"
@@ -5302,6 +5399,11 @@ msgstr "Aínda non hai conexións"
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
 "Non hai ningún almacén de documentos conectado. Engade un en Configuración → Conexións."
+
+#: src/postulo/core/mail_auth.py:213 src/postulo/core/mail_auth.py:369
+#, draft
+msgid "No identity provider is chosen for mail."
+msgstr "Non se escolleu ningún provedor de identidade para o correo."
 
 #: src/postulo/templates/widgets/industries.html:41
 #, draft
@@ -5383,7 +5485,7 @@ msgstr "Non hai ofertas rexistradas para esta empresa."
 msgid "no role"
 msgstr "sen posto"
 
-#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:101
+#: src/postulo/core/destinations.py:53 src/postulo/core/mail.py:112
 #, draft
 msgid "No server to connect to."
 msgstr "Non hai ningún servidor ao que conectarse."
@@ -5428,7 +5530,7 @@ msgstr "non — só contas existentes"
 msgid "No-show"
 msgstr "Non se presentou"
 
-#: src/postulo/plugins/consent.py:184
+#: src/postulo/plugins/consent.py:193
 #, draft
 msgid "Nobody has agreed to this yet. Connect it again."
 msgstr "Aínda ninguén o aceptou. Volva conectalo."
@@ -5437,6 +5539,18 @@ msgstr "Aínda ninguén o aceptou. Volva conectalo."
 #, draft
 msgid "Nobody has replied yet, so there is nothing to time."
 msgstr "Aínda non respondeu ninguén, así que non hai nada que cronometrar."
+
+#: src/postulo/core/mail_auth.py:242
+#, draft
+msgid "Nobody has signed in to the mail provider yet. Connect it first."
+msgstr "Aínda ninguén iniciou sesión no provedor de correo. Conéctao primeiro."
+
+#: src/postulo/templates/server/email.html:251
+#, draft
+msgid ""
+"Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
+msgstr ""
+"Aínda ninguén iniciou sesión, polo que non se pode enviar nada. Garda a configuración de arriba e despois inicia sesión na páxina do provedor como a caixa de correo desde a que envía esta instancia."
 
 #: src/postulo/templates/jobs/company_detail.html:231
 #, draft
@@ -5578,7 +5692,7 @@ msgstr "sen definir"
 msgid "Not set here — the environment or the default applies"
 msgstr "Non definido aquí — aplícase o contorno ou o valor predeterminado"
 
-#: src/postulo/core/server_forms.py:246
+#: src/postulo/core/server_forms.py:276
 #, draft
 msgid "Not set — the environment decides"
 msgstr "Sen definir — decide o contorno"
@@ -5833,7 +5947,7 @@ msgstr "Non hai nada ao que conectarse"
 msgid "Nothing to decide"
 msgstr "Non hai nada que decidir"
 
-#: src/postulo/plugins/views.py:354
+#: src/postulo/plugins/views.py:380
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5861,18 +5975,18 @@ msgstr "Non hai nada agardando"
 msgid "Nothing was added."
 msgstr "Non se engadiu nada."
 
-#: src/postulo/plugins/views.py:280
+#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
 #, draft
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "Non se conectou nada. Ninguén aceptou nada."
 
 #: src/postulo/accounts/settings_views.py:147
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
 #, draft
 msgid "Nothing was different."
 msgstr "Non había nada distinto."
 
-#: src/postulo/core/server_views.py:1119
+#: src/postulo/core/server_views.py:1191
 #, draft
 msgid "Nothing was installed."
 msgstr "Non se instalou nada."
@@ -5946,7 +6060,7 @@ msgstr "Oferta"
 msgid "Offer received"
 msgstr "Oferta recibida"
 
-#: src/postulo/core/models.py:548
+#: src/postulo/core/models.py:551
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Só se ofrece mentres o correo desta instancia chega de verdade."
@@ -6143,17 +6257,29 @@ msgstr "Só %(name)s"
 msgid "Only entries not already on it are listed."
 msgstr "Só se listan as entradas que aínda non están nel."
 
+#: src/postulo/templates/server/email.html:187
+#, draft
+msgid ""
+"Only for a provider that no longer accepts a password. Your own mail server needs none of this."
+msgstr ""
+"Só para un provedor que xa non acepta contrasinais. O teu propio servidor de correo non precisa nada disto."
+
 #: src/postulo/plugins/fetching.py:121
 #, draft
 msgid "Only http and https addresses can be captured."
 msgstr "Só se poden capturar enderezos http e https."
 
-#: src/postulo/core/models.py:279
+#: src/postulo/core/models.py:282
 #, draft
 msgid ""
 "Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
 msgstr ""
 "Só un dos seus propios números pode devolverlle o acceso á súa conta. Este é de alguén con quen trata."
+
+#: src/postulo/core/mail_auth.py:364
+#, draft
+msgid "Only the administrator who started this can finish it."
+msgstr "Só o administrador que comezou isto pode rematalo."
 
 #: src/postulo/templates/applications/application_board.html:11
 #, draft
@@ -6223,8 +6349,8 @@ msgid "Original posting"
 msgstr "Oferta orixinal"
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
-#: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
+#: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
 #: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
 #: src/postulo/resume/models.py:219
 #, draft
@@ -6273,7 +6399,7 @@ msgstr "Só pendentes de pechar"
 msgid "Overview"
 msgstr "Resumo"
 
-#: src/postulo/core/models.py:64
+#: src/postulo/core/models.py:67
 #, draft
 msgid "owner"
 msgstr "propietario"
@@ -6347,7 +6473,7 @@ msgstr "Traducida parcialmente"
 msgid "Passkeys"
 msgstr "Chaves de acceso"
 
-#: src/postulo/core/models.py:581
+#: src/postulo/core/models.py:584
 #, draft
 msgid "password"
 msgstr "contrasinal"
@@ -6468,7 +6594,7 @@ msgstr "Farmacéutica"
 msgid "Phone"
 msgstr "Teléfono"
 
-#: src/postulo/core/models.py:182
+#: src/postulo/core/models.py:185
 #, draft
 msgid "phone"
 msgstr "teléfono"
@@ -6529,7 +6655,7 @@ msgid "plugin repository"
 msgstr "repositorio de complementos"
 
 #: src/postulo/accounts/settings_views.py:125
-#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:751
+#: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:823
 #: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
@@ -6537,7 +6663,7 @@ msgstr "repositorio de complementos"
 msgid "Plugins"
 msgstr "Complementos"
 
-#: src/postulo/core/server_views.py:952
+#: src/postulo/core/server_views.py:1024
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -6574,7 +6700,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP ou GIF ata 5 MB. Recórtase a un cadrado e quítaselle todo o que o ficheiro soubese sobre onde se fixo."
 
-#: src/postulo/core/models.py:572
+#: src/postulo/core/models.py:575
 #, draft
 msgid "port"
 msgstr "porto"
@@ -6610,17 +6736,17 @@ msgstr "Portafolios, perfís e vídeos aos que os dirixiches."
 msgid "Positions"
 msgstr "Postos"
 
-#: src/postulo/core/models.py:393
+#: src/postulo/core/models.py:396
 #, draft
 msgid "Postal"
 msgstr "Postal"
 
-#: src/postulo/core/models.py:425
+#: src/postulo/core/models.py:428
 #, draft
 msgid "postal address"
 msgstr "enderezo postal"
 
-#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:426
+#: src/postulo/accounts/models.py:266 src/postulo/core/models.py:429
 #: src/postulo/jobs/models.py:431
 #, draft
 msgid "postal addresses"
@@ -6631,7 +6757,7 @@ msgstr "enderezos postais"
 msgid "Postal addresses"
 msgstr "Enderezos postais"
 
-#: src/postulo/core/models.py:411
+#: src/postulo/core/models.py:414
 #, draft
 msgid "postcode"
 msgstr "código postal"
@@ -6726,6 +6852,13 @@ msgid ""
 msgstr ""
 "Postulo esqueceuno. O provedor segue tendo o permiso ata que o retire alí tamén."
 
+#: src/postulo/core/server_views.py:759
+#, draft
+msgid ""
+"Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
+msgstr ""
+"Postulo esqueceu a autorización. O provedor consérvaa ata que tamén a retires alí."
+
 #: src/postulo/templates/server/plugins.html:127
 #, draft
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
@@ -6795,7 +6928,7 @@ msgstr "Vista previa"
 msgid "Previous"
 msgstr "Anterior"
 
-#: src/postulo/core/models.py:186 src/postulo/core/models.py:417
+#: src/postulo/core/models.py:189 src/postulo/core/models.py:420
 #, draft
 msgid "primary"
 msgstr "principal"
@@ -7184,7 +7317,7 @@ msgstr "Recomendación"
 msgid "Refresh logo"
 msgstr "Actualizar o logotipo"
 
-#: src/postulo/core/models.py:415
+#: src/postulo/core/models.py:418
 #, draft
 msgid "region"
 msgstr "rexión"
@@ -7194,7 +7327,12 @@ msgstr "rexión"
 msgid "Register this address with the provider"
 msgstr "Rexistre este enderezo no provedor"
 
-#: src/postulo/plugins/consent.py:111
+#: src/postulo/core/mail_auth.py:316
+#, draft
+msgid "Register this instance with the provider first, and save the client ID."
+msgstr "Rexistra primeiro esta instancia no provedor e garda o ID de cliente."
+
+#: src/postulo/plugins/consent.py:120
 #, draft
 msgid "Register this instance with the provider first, and save the client id."
 msgstr ""
@@ -7207,7 +7345,7 @@ msgid ""
 msgstr ""
 "O rexistro está aberto: calquera que atope o enderezo pode crear unha conta."
 
-#: src/postulo/core/models.py:513
+#: src/postulo/core/models.py:516
 #, draft
 msgid "registration open"
 msgstr "rexistro aberto"
@@ -7547,7 +7685,7 @@ msgstr "salario ata"
 #: src/postulo/templates/server/capture.html:44
 #: src/postulo/templates/server/defaults.html:38
 #: src/postulo/templates/server/defaults.html:72
-#: src/postulo/templates/server/email.html:175
+#: src/postulo/templates/server/email.html:222
 #: src/postulo/templates/server/person_plugins.html:89
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:98
@@ -7592,8 +7730,8 @@ msgstr "Gardado nas túas ofertas. Xa o decidirás cando queiras."
 #: src/postulo/accounts/settings_views.py:35
 #: src/postulo/accounts/settings_views.py:147
 #: src/postulo/core/server_views.py:389 src/postulo/core/server_views.py:517
-#: src/postulo/core/server_views.py:923 src/postulo/core/server_views.py:957
-#: src/postulo/core/server_views.py:1053 src/postulo/resume/views.py:223
+#: src/postulo/core/server_views.py:995 src/postulo/core/server_views.py:1029
+#: src/postulo/core/server_views.py:1125 src/postulo/resume/views.py:223
 #, draft
 msgid "Saved."
 msgstr "Gardado."
@@ -7717,12 +7855,12 @@ msgstr "Seleccionar todo nesta páxina"
 msgid "Selected"
 msgstr "Seleccionado"
 
-#: src/postulo/templates/server/email.html:189
+#: src/postulo/templates/server/email.html:261
 #, draft
 msgid "Send a real message"
 msgstr "Enviar unha mensaxe de verdade"
 
-#: src/postulo/templates/server/email.html:195
+#: src/postulo/templates/server/email.html:267
 #, draft
 msgid "Send a test message"
 msgstr "Enviar unha mensaxe de proba"
@@ -7753,7 +7891,7 @@ msgstr "Enviar aos almacéns agora"
 msgid "Sending as yourself"
 msgstr "Enviar como vostede"
 
-#: src/postulo/core/server_views.py:727
+#: src/postulo/core/server_views.py:799
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "O envío fallou: %(error)s"
@@ -7788,7 +7926,7 @@ msgstr "Documentos enviados"
 msgid "sent on"
 msgstr "enviado o"
 
-#: src/postulo/core/server_views.py:730
+#: src/postulo/core/server_views.py:802
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Enviado a %(to)s."
@@ -7949,7 +8087,7 @@ msgstr "Amosar tamén as pasadas"
 msgid "Show this period"
 msgstr "Amosar este período"
 
-#: src/postulo/core/models.py:504
+#: src/postulo/core/models.py:507
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Amósase na cabeceira e na páxina de acceso."
@@ -7960,7 +8098,17 @@ msgstr "Amósase na cabeceira e na páxina de acceso."
 msgid "Sign in"
 msgstr "Acceder"
 
-#: src/postulo/core/models.py:545
+#: src/postulo/templates/server/email.html:246
+#, draft
+msgid "Sign in again"
+msgstr "Iniciar sesión de novo"
+
+#: src/postulo/templates/server/email.html:253
+#, draft
+msgid "Sign in to the provider"
+msgstr "Iniciar sesión no provedor"
+
+#: src/postulo/core/models.py:548
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "iniciar sesión cun código enviado por correo"
@@ -7993,6 +8141,40 @@ msgstr "Acceso"
 msgid "Sign-in methods"
 msgstr "Xeitos de acceder"
 
+#: src/postulo/core/mail_auth.py:65
+#, draft
+msgid "Signed in once, as the mailbox that sends"
+msgstr "Coa sesión iniciada unha vez, como a caixa de correo que envía"
+
+#: src/postulo/core/server_forms.py:238
+#, draft
+msgid ""
+"Signed in once: somebody agrees on the provider's consent screen, as the mailbox that sends, and needs no administrator. The application sends on its own: Microsoft only, and needs a tenant administrator to grant the permission."
+msgstr ""
+"Coa sesión iniciada unha vez: alguén acepta na pantalla de consentimento do provedor, como a caixa de correo que envía, sen precisar administrador. A aplicación envía pola súa conta: só Microsoft, e require que un administrador do inquilino conceda o permiso."
+
+#: src/postulo/plugins/views.py:314
+#, draft
+msgid "Signed in to the mail provider. Test the connection to make sure."
+msgstr "Sesión iniciada no provedor de correo. Proba a conexión para asegurarte."
+
+#: src/postulo/templates/server/email.html:243
+#, draft
+msgid ""
+"Signed in. The provider can withdraw this at any time — if a password is changed, or the account is not used for months — and mail then stops. The page above says so the moment a send fails."
+msgstr ""
+"Sesión iniciada. O provedor pode retirala en calquera momento —se se cambia un contrasinal ou a conta non se usa durante meses— e entón o correo detense. A páxina de arriba dío en canto falla un envío."
+
+#: src/postulo/core/server_forms.py:226
+#, draft
+msgid "Signing in"
+msgstr "Inicio de sesión"
+
+#: src/postulo/templates/server/email.html:185
+#, draft
+msgid "Signing in with a token"
+msgstr "Inicio de sesión cun token"
+
 #: src/postulo/templates/server/signin.html:32
 #, draft
 msgid "Signs in to an existing account by e-mail"
@@ -8003,7 +8185,7 @@ msgstr "Entra nunha conta existente por correo"
 msgid "Single sign-on"
 msgstr "Inicio de sesión único"
 
-#: src/postulo/core/models.py:524
+#: src/postulo/core/models.py:527
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "o inicio de sesión único conta como segundo factor"
@@ -8018,7 +8200,7 @@ msgstr "O inicio de sesión único conta como segundo factor"
 msgid "Site search"
 msgstr "Busca no sitio"
 
-#: src/postulo/core/models.py:640 src/postulo/core/models.py:641
+#: src/postulo/core/models.py:664 src/postulo/core/models.py:665
 #, draft
 msgid "site settings"
 msgstr "configuración do sitio"
@@ -8076,12 +8258,12 @@ msgstr "omitida"
 msgid "Slowest"
 msgstr "O máis lento"
 
-#: src/postulo/core/models.py:82 src/postulo/jobs/models.py:42
+#: src/postulo/core/models.py:85 src/postulo/jobs/models.py:42
 #, draft
 msgid "slug"
 msgstr "nome curto"
 
-#: src/postulo/core/models.py:570
+#: src/postulo/core/models.py:573
 #, draft
 msgid "SMTP server"
 msgstr "Servidor SMTP"
@@ -8369,7 +8551,7 @@ msgstr "Apagar"
 msgid "Switch on"
 msgstr "Acender"
 
-#: src/postulo/core/models.py:167
+#: src/postulo/core/models.py:170
 #, draft
 msgid "Switchboard"
 msgstr "Central"
@@ -8398,7 +8580,7 @@ msgid ""
 msgstr ""
 "Apagar un detén o seu uso e non borra nada: as conexións que fixeses quedan exactamente como están, e volver acendelo recupéraas sen cambios."
 
-#: src/postulo/plugins/views.py:375
+#: src/postulo/plugins/views.py:401
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "A sincronización fallou: %(error)s"
@@ -8418,7 +8600,7 @@ msgstr "ligazóns de sincronización"
 msgid "Sync now"
 msgstr "Sincronizar agora"
 
-#: src/postulo/plugins/views.py:377
+#: src/postulo/plugins/views.py:403
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Sincronizado: %(summary)s."
@@ -8438,7 +8620,7 @@ msgstr "Táboa"
 msgid "table settings"
 msgstr "configuración da táboa"
 
-#: src/postulo/core/models.py:91
+#: src/postulo/core/models.py:94
 #, draft
 msgid "tag"
 msgstr "etiqueta"
@@ -8451,7 +8633,7 @@ msgstr "etiqueta"
 msgid "Tag"
 msgstr "Etiqueta"
 
-#: src/postulo/core/models.py:507
+#: src/postulo/core/models.py:510
 #, draft
 msgid "tagline"
 msgstr "lema"
@@ -8464,7 +8646,7 @@ msgstr "lema"
 msgid "Tags"
 msgstr "Etiquetas"
 
-#: src/postulo/applications/models.py:241 src/postulo/core/models.py:92
+#: src/postulo/applications/models.py:241 src/postulo/core/models.py:95
 #, draft
 msgid "tags"
 msgstr "etiquetas"
@@ -8505,12 +8687,12 @@ msgstr "teléfono"
 msgid "Telephone number"
 msgstr "Número de teléfono"
 
-#: src/postulo/core/models.py:213
+#: src/postulo/core/models.py:216
 #, draft
 msgid "telephone number"
 msgstr "número de teléfono"
 
-#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:214
+#: src/postulo/accounts/models.py:263 src/postulo/core/models.py:217
 #: src/postulo/jobs/models.py:428
 #, draft
 msgid "telephone numbers"
@@ -8536,12 +8718,12 @@ msgstr "Os modelos aparecen cando envías unha carta cunha candidatura."
 msgid "Test"
 msgstr "Probar"
 
-#: src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:353
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "A proba fallou: %(message)s"
 
-#: src/postulo/templates/server/email.html:181
+#: src/postulo/templates/server/email.html:228
 #, draft
 msgid "Test the connection"
 msgstr "Probar a conexión"
@@ -8556,17 +8738,17 @@ msgstr "texto"
 msgid "text as sent"
 msgstr "texto tal como se enviou"
 
-#: src/postulo/core/models.py:616
+#: src/postulo/core/models.py:640
 #, draft
 msgid "text configuration"
 msgstr "configuración das mensaxes"
 
-#: src/postulo/core/models.py:617
+#: src/postulo/core/models.py:641
 #, draft
 msgid "text secrets"
 msgstr "segredos das mensaxes"
 
-#: src/postulo/core/models.py:615
+#: src/postulo/core/models.py:639
 #, draft
 msgid "text transport"
 msgstr "transporte das mensaxes"
@@ -8605,17 +8787,17 @@ msgid ""
 msgstr ""
 "Esa cadea ten máis de %(limit)s empresas de profundidade, máis do que Postulo pode debuxar con sentido."
 
-#: src/postulo/plugins/consent.py:147
+#: src/postulo/plugins/consent.py:156
 #, draft
 msgid "That connection belongs to somebody else."
 msgstr "Esa conexión é doutra persoa."
 
-#: src/postulo/plugins/consent.py:107 src/postulo/plugins/consent.py:152
+#: src/postulo/plugins/consent.py:116 src/postulo/plugins/consent.py:161
 #, draft
 msgid "That connection does not use consent."
 msgstr "Esa conexión non usa consentimento."
 
-#: src/postulo/plugins/consent.py:145
+#: src/postulo/plugins/consent.py:154
 #, draft
 msgid "That connection no longer exists."
 msgstr "Esa conexión xa non existe."
@@ -8744,7 +8926,7 @@ msgstr "Isto non é algo que Postulo poida facer con iso."
 msgid "That is not something Postulo can do to several at once."
 msgstr "Iso non é algo que Postulo poida facer a varios á vez."
 
-#: src/postulo/core/server_views.py:1029 src/postulo/core/server_views.py:1070
+#: src/postulo/core/server_views.py:1101 src/postulo/core/server_views.py:1142
 #, draft
 msgid "That is not something this page does."
 msgstr "Isto non é algo que faga esta páxina."
@@ -8804,7 +8986,7 @@ msgid ""
 msgstr ""
 "Ese número xa está rexistrado nesta instalación. Os números de teléfono mantéñense únicos en todas as contas de aquí, así que pode pertencer aos rexistros doutra persoa."
 
-#: src/postulo/core/server_views.py:1128 src/postulo/core/server_views.py:1133
+#: src/postulo/core/server_views.py:1200 src/postulo/core/server_views.py:1205
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Ese paquete xa non agarda; súbeo de novo."
@@ -8829,12 +9011,12 @@ msgstr "Esa páxina devolveu %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Esa imaxe pasa de 5 MB. Unha máis pequena, por favor."
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:301
+#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ese complemento xa non está instalado."
 
-#: src/postulo/plugins/consent.py:140
+#: src/postulo/core/mail_auth.py:360 src/postulo/plugins/consent.py:149
 #, draft
 msgid "That reply did not come from a request Postulo made."
 msgstr "Esa resposta non veu dunha petición que fixese Postulo."
@@ -8884,6 +9066,11 @@ msgstr "O enderezo respondeu con nada."
 msgid "The application deadline, if stated."
 msgstr "O prazo da candidatura, se se indica."
 
+#: src/postulo/core/mail_auth.py:66
+#, draft
+msgid "The application sends on its own"
+msgstr "A aplicación envía pola súa conta"
+
 #: src/postulo/plugins/catalogue.py:184
 #, draft
 msgid "The catalogue is not readable JSON."
@@ -8899,10 +9086,17 @@ msgstr "A sinatura do catálogo non liga co seu contido; non se usou."
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "A sinatura ou a chave do catálogo non se poden ler: %(error)s"
 
-#: src/postulo/core/server_views.py:1185
+#: src/postulo/core/server_views.py:1257
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Os catálogos responderon, e aínda non listan nada."
+
+#: src/postulo/templates/server/email.html:203
+#, python-format, draft
+msgid ""
+"The client secret is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
+msgstr ""
+"O segredo de cliente fíxao <code>%(variable)s</code> no ambiente; cámbiao alí. Nunca se amosa aquí."
 
 #: src/postulo/templates/applications/application_intake.html:10
 #, draft
@@ -8960,7 +9154,7 @@ msgstr "A versión anterior que esta substitúe. O ficheiro antigo consérvase."
 msgid "The employer as a whole"
 msgstr "O empregador no seu conxunto"
 
-#: src/postulo/core/server_views.py:988 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:1060 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "O contorno pon «%(name)s», así que isto non se pode cambiar aquí."
@@ -9012,7 +9206,7 @@ msgstr "O instalador rexeitouno: %(error)s"
 msgid "The job title"
 msgstr "O cargo"
 
-#: src/postulo/core/server_views.py:1045
+#: src/postulo/core/server_views.py:1117
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
@@ -9079,10 +9273,15 @@ msgid ""
 msgstr ""
 "O intervalo máis longo mídese dentro deste período. Un período en curso cóntase ata o día en que se produciu isto. Unha semana marcada con (parcial) esténdese fóra do período; nada de fóra del se conta."
 
-#: src/postulo/core/server_views.py:732
+#: src/postulo/core/server_views.py:804
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "O motor de correo non aceptou nada."
+
+#: src/postulo/templates/server/email.html:240
+#, draft
+msgid "The mailbox this instance sends from"
+msgstr "A caixa de correo desde a que envía esta instancia"
 
 #: src/postulo/templates/resume/preview.html:12
 #, draft
@@ -9102,7 +9301,7 @@ msgid ""
 msgstr ""
 "O número que lle devolve o acceso é distinto do que imprimen os seus documentos, así que cambiar o que marca un recrutador non cambia como demostra que é vostede. Antes ten que confirmarse, e apagar varios números de teléfono nunca llo quita."
 
-#: src/postulo/core/server_views.py:1018
+#: src/postulo/core/server_views.py:1090
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "O repositorio oficial baléirase, non se elimina."
@@ -9122,7 +9321,7 @@ msgstr "O anterior"
 msgid "The opening paragraph, if you use one."
 msgstr "O parágrafo de apertura, se usas un."
 
-#: src/postulo/templates/server/email.html:162
+#: src/postulo/templates/server/email.html:164
 #, python-format, draft
 msgid ""
 "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -9134,7 +9333,7 @@ msgstr ""
 msgid "The pay"
 msgstr "A retribución"
 
-#: src/postulo/core/server_views.py:798
+#: src/postulo/core/server_views.py:870
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Os complementos que veñen dentro de Postulo. Non se descarga nada."
@@ -9156,17 +9355,24 @@ msgstr "a oferta"
 msgid "The posting itself"
 msgstr "A propia oferta"
 
-#: src/postulo/plugins/consent.py:241
+#: src/postulo/plugins/consent.py:251
 #, python-format, draft
 msgid "The provider answered %(status)s."
 msgstr "O provedor respondeu %(status)s."
 
-#: src/postulo/plugins/consent.py:237
+#: src/postulo/core/mail_auth.py:388
+#, draft
+msgid ""
+"The provider sent no refresh token, so mail would stop within the hour. Check that offline access is allowed for this application."
+msgstr ""
+"O provedor non enviou ningún token de actualización, polo que o correo deteríase en menos dunha hora. Comproba que o acceso sen conexión está permitido para esta aplicación."
+
+#: src/postulo/plugins/consent.py:247
 #, draft
 msgid "The provider will not renew this. Somebody has to agree to it again."
 msgstr "O provedor non o renovará. Alguén ten que aceptalo de novo."
 
-#: src/postulo/plugins/consent.py:246
+#: src/postulo/plugins/consent.py:256
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "A resposta do provedor non se puido ler."
@@ -9203,7 +9409,7 @@ msgid ""
 "The server does not offer STARTTLS. Turn it off, or use a port that does."
 msgstr "O servidor non ofrece STARTTLS. Apágao, ou usa un porto que si o ofreza."
 
-#: src/postulo/core/mail.py:122
+#: src/postulo/core/mail.py:134
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "O servidor rexeitou esas credenciais: %(detail)s"
@@ -9240,6 +9446,11 @@ msgstr "O sitio rexeita Postulo, ou a oferta pide iniciar sesión"
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "Respéctase o robots.txt do sitio."
+
+#: src/postulo/core/mail_auth.py:220
+#, draft
+msgid "The stored mail credentials cannot be read on this instance."
+msgstr "As credenciais de correo gardadas non se poden ler nesta instancia."
 
 #: src/postulo/templates/settings/appearance.html:7
 #, draft
@@ -9307,7 +9518,7 @@ msgstr "Non hai ningún enderezo desde onde volver descargala."
 msgid "There is no file to send."
 msgstr "Non hai ningún ficheiro que enviar."
 
-#: src/postulo/core/server_views.py:983
+#: src/postulo/core/server_views.py:1055
 #, draft
 msgid "There is no repository by that name."
 msgstr "Non hai ningún repositorio con ese nome."
@@ -9542,7 +9753,7 @@ msgstr "entrada da cronoloxía"
 msgid "Timeout"
 msgstr "Tempo de espera"
 
-#: src/postulo/core/models.py:594
+#: src/postulo/core/models.py:597
 #, draft
 msgid "timeout in seconds"
 msgstr "tempo de espera en segundos"
@@ -9623,7 +9834,7 @@ msgstr "Demasiadas mensaxes. Ténteo de novo en breve."
 msgid "Too many requests: %(times)d allowed every %(seconds)d seconds."
 msgstr "Demasiadas peticións: %(times)d permitidas cada %(seconds)d segundos."
 
-#: src/postulo/core/models.py:412
+#: src/postulo/core/models.py:415
 #, draft
 msgid "town or city"
 msgstr "localidade"
@@ -9650,12 +9861,12 @@ msgstr "traducións"
 msgid "Transport and logistics"
 msgstr "Transporte e loxística"
 
-#: src/postulo/core/models.py:605
+#: src/postulo/core/models.py:629
 #, draft
 msgid "transport configuration"
 msgstr "configuración do transporte"
 
-#: src/postulo/core/models.py:607
+#: src/postulo/core/models.py:631
 #, draft
 msgid "transport secrets"
 msgstr "segredos do transporte"
@@ -9762,13 +9973,13 @@ msgstr "ata %(high)s"
 msgid "Update the preview"
 msgstr "Actualizar a vista previa"
 
-#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:32
-#: src/postulo/core/models.py:629
+#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:35
+#: src/postulo/core/models.py:653
 #, draft
 msgid "updated at"
 msgstr "actualizada o"
 
-#: src/postulo/core/models.py:636
+#: src/postulo/core/models.py:660
 #, draft
 msgid "updated by"
 msgstr "actualizada por"
@@ -9877,7 +10088,7 @@ msgstr "usuario"
 msgid "Username"
 msgstr "Nome de usuario"
 
-#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:577
+#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:580
 #, draft
 msgid "username"
 msgstr "nome de usuario"
@@ -9892,7 +10103,7 @@ msgstr "Nome de usuario ou correo"
 msgid "users"
 msgstr "usuarios"
 
-#: src/postulo/templates/server/email.html:191
+#: src/postulo/templates/server/email.html:263
 #, draft
 msgid ""
 "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
@@ -9909,7 +10120,7 @@ msgstr "Usar un testemuño"
 msgid "Utilities"
 msgstr "Servizos públicos"
 
-#: src/postulo/core/models.py:192
+#: src/postulo/core/models.py:195
 #, draft
 msgid "verified"
 msgstr "verificado"
@@ -9990,7 +10201,7 @@ msgstr "Agardando a ser usada"
 msgid "was “%(text)s”"
 msgstr "era «%(text)s»"
 
-#: src/postulo/core/models.py:203
+#: src/postulo/core/models.py:206
 #, draft
 msgid "way back into the account"
 msgstr "maneira de volver á conta"
@@ -10076,7 +10287,7 @@ msgstr "Que volveu"
 msgid "What came back in this period"
 msgstr "Que volveu neste período"
 
-#: src/postulo/core/server_forms.py:316
+#: src/postulo/core/server_forms.py:386
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "Que saca o correo desta máquina."
@@ -10280,6 +10491,13 @@ msgstr "Cando aceptala teña que mover tamén a candidatura."
 msgid "When it entered your listings."
 msgstr "Cando entrou nas túas ofertas."
 
+#: src/postulo/templates/server/email.html:215
+#, draft
+msgid ""
+"When you register this instance with the provider, give it this address to send people back to:"
+msgstr ""
+"Cando rexistres esta instancia no provedor, dálle este enderezo para devolver a xente:"
+
 #: src/postulo/applications/models.py:527
 #, draft
 msgid "where"
@@ -10349,12 +10567,12 @@ msgstr "onde vives"
 msgid "Where your job search stands today."
 msgstr "Onde está hoxe a túa procura de emprego."
 
-#: src/postulo/core/models.py:516
+#: src/postulo/core/models.py:519
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Se calquera que atope o enderezo pode crear unha conta."
 
-#: src/postulo/core/models.py:527
+#: src/postulo/core/models.py:530
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -10482,7 +10700,7 @@ msgstr "Con: %(people)s"
 msgid "Withdrawn"
 msgstr "Retirada"
 
-#: src/postulo/core/models.py:165 src/postulo/core/models.py:392
+#: src/postulo/core/models.py:168 src/postulo/core/models.py:395
 #, draft
 msgid "Work"
 msgstr "Traballo"
@@ -10540,6 +10758,11 @@ msgstr ""
 #, draft
 msgid "written, not yet read by a speaker"
 msgstr "escrito, aínda non lido por un falante"
+
+#: src/postulo/core/mail_auth.py:47
+#, draft
+msgid "XOAUTH2, with a token from the provider"
+msgstr "XOAUTH2, cun token do provedor"
 
 #: src/postulo/core/server_forms.py:14
 #, draft
@@ -10825,7 +11048,7 @@ msgid ""
 msgstr ""
 "O teu nome e o bloque de contacto que se imprimirá nos teus CV. Como se comporta Postulo contigo — tema, lingua, nome de usuario, enderezos — está en <a href=\"%(settings_url)s\" class=\"underline\">Configuración</a>."
 
-#: src/postulo/core/models.py:180 src/postulo/core/models.py:405
+#: src/postulo/core/models.py:183 src/postulo/core/models.py:408
 #, draft
 msgid "Your name for it, when none of the kinds above fits."
 msgstr "O nome que lle dá vostede, cando ningún dos tipos de arriba encaixa."
@@ -10900,19 +11123,19 @@ msgstr "· parte desta semana queda fóra do período"
 msgid "· still running"
 msgstr "· aínda en curso"
 
-#: src/postulo/core/server_views.py:1024
+#: src/postulo/core/server_views.py:1096
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr "«%(name)s» xa non está. Todo o que se instalou del queda instalado."
 
-#: src/postulo/core/server_views.py:1009
+#: src/postulo/core/server_views.py:1081
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "«%(name)s» está apagado. De alí non se instala nin se actualiza nada novo; o que xa estaba instalado segue a funcionar."
 
-#: src/postulo/core/server_views.py:1006
+#: src/postulo/core/server_views.py:1078
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""

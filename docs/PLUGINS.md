@@ -481,11 +481,18 @@ being untidy:
 | `safe_next` | a redirect that skips it is a way to bounce somebody off the instance |
 | `client` | an outbound request that skips it is a way to make the server dial where it should not |
 | `access_token` | ask for a token at the moment of use; a plugin that keeps one has stopped refreshing it |
+| `ACCESS_TOKEN` | where a consent plugin whose method is handed *settings* rather than a connection finds the token Postulo renewed for it just before a send or a test (#151) |
 
 The rest of the surface is what you declare and what you hand back: `Manifest`, `declares`,
 `shipped`, `manifest_of`, `label_of`, `description_of`; `FieldSpec`, `TestResult`, `Consent`;
 `JobPostingData`, `SyncReport`, `TextMessage`; `MAX_IMPORT_BYTES`, `ImportRefused`,
 `refuse_unreadable`; `MAIL`, `TEXT`, `MEDIUMS`, `medium_of`; and every protocol.
+
+**`needs_consent` may take the connection's settings.** A plugin that always authenticates
+by consent declares `needs_consent(self)` and returns a `Consent`. One that sometimes does —
+*Your own email* signs in with a password for a server of one's own and by consent for Google
+or Microsoft 365 — declares `needs_consent(self, config)` and returns `None` when the settings
+say a password. Postulo passes the settings to whichever form the method takes (#151).
 
 Asking for anything else raises, and says where to look:
 
