@@ -206,7 +206,7 @@ def test_every_plugin_postulo_ships_lives_in_its_own_package(module: str):
 
 @pytest.mark.parametrize("module", names(), ids=short_name)
 def test_every_plugin_postulo_ships_carries_its_own_catalogues(module: str):
-    """`docs/PLUGINS.md` says a plugin's strings are never added to Postulo's catalogues.
+    """*Writing a plugin* says a plugin's strings are never added to Postulo's catalogues.
 
     That was a rule third parties kept and every built-in broke, until #127 taught the
     tooling about several catalogue sets. `tests/test_translations.py` is what keeps each of
@@ -300,7 +300,7 @@ def test_asking_for_something_else_says_where_to_look():
         api.Connection  # noqa: B018
 
     assert "not part of the plugin surface" in str(raised.value)
-    assert "docs/PLUGINS.md" in str(raised.value)
+    assert "/wiki/Writing-a-plugin" in str(raised.value)
 
 
 def test_the_surface_holds_the_four_reasons_a_plugin_has_to_depend_on_postulo():

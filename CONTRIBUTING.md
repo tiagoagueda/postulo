@@ -233,6 +233,12 @@ names the same issue as the code, pushed when the code is.
 Please keep it honest: the wiki says plainly what is not built yet, and a page that
 describes a feature which does not exist is a bug.
 
+Three pages are held to the code by `tests/test_wiki_surface.py` whenever the wiki is
+checked out beside this repository: *The API* lists every call with its scope, *Health,
+metrics and logs* every endpoint for machines and every metric, and *Writing a plugin*
+every name `postulo.plugins.api` promises and every kind of plugin. A new call, metric or
+name fails the suite until its line is written.
+
 ## Translations
 
 Postulo is written in British English and translated from there. French and Portuguese

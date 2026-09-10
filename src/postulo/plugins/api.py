@@ -128,6 +128,9 @@ __all__ = [
     "shipped",
 ]
 
+#: Where a plugin author reads what the names above are for, and why nothing else is (#170).
+_GUIDE = "https://source.tiagoagueda.com/postulo/postulo/wiki/Writing-a-plugin"
+
 
 def __getattr__(name: str):
     """The half of the surface that cannot be imported at module load.
@@ -175,4 +178,4 @@ def __getattr__(name: str):
         from .consent import ACCESS_TOKEN
 
         return ACCESS_TOKEN
-    raise AttributeError(f"{name!r} is not part of the plugin surface. See docs/PLUGINS.md.")
+    raise AttributeError(f"{name!r} is not part of the plugin surface. See {_GUIDE}")

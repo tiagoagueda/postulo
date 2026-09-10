@@ -1,6 +1,6 @@
 """Every plugin holds its own translations, and the registry reads them.
 
-Including the plugins Postulo ships, since #127: `docs/PLUGINS.md` has always said a
+Including the plugins Postulo ships, since #127: *Writing a plugin* has always said a
 plugin's strings are never added to Postulo's catalogues, and that was a rule every
 built-in broke. What decides the two of them is the order of `LOCALE_PATHS`, so the order
 is asserted here rather than assumed.

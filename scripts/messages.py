@@ -71,7 +71,7 @@ SKIP_DIRS = {"migrations", "static", "locale", "__pycache__"}
 class CatalogueSet:
     """A directory of source, and the catalogues that hold the strings written in it.
 
-    Postulo used to have exactly one, and `docs/PLUGINS.md` has always said a plugin's
+    Postulo used to have exactly one, and *Writing a plugin* has always said a plugin's
     strings are never added to Postulo's catalogues -- a rule that was true of every
     third-party plugin and false of every plugin Postulo ships (#127). A plugin that
     carries its own catalogues is a second set, and everything below walks all of them so
@@ -616,7 +616,7 @@ def cmd_compile() -> int:
     """Every set, in one pass.
 
     A plugin that ships inside the image is compiled here rather than by a build step of
-    its own: `docs/PLUGINS.md` tells a third party to ship its `.mo` files, and a built-in
+    its own: *Writing a plugin* tells a third party to ship its `.mo` files, and a built-in
     has no separate release to ship them in (#127).
     """
     written = 0

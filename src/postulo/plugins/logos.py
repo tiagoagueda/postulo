@@ -27,7 +27,7 @@ produced from what the plugin shipped rather than the plugin's file passed throu
 **A plugin with no logo is normal**, not an error: the interface falls back to the initials
 tile it already uses for a person with no picture and a company with no logo, so nothing is
 ever a broken image. Postulo ships no logo for any of its own built-ins, and that is a
-decision rather than an omission — see ``docs/PLUGINS.md``.
+decision rather than an omission — see *Writing a plugin* in the wiki.
 """
 
 from __future__ import annotations

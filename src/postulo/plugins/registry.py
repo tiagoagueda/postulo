@@ -117,7 +117,7 @@ def register_builtin(kind: str, plugin_class: type) -> None:
     registered = _builtin.setdefault(kind, [])
     if plugin_class not in registered:
         registered.append(plugin_class)
-    # A built-in holds its own translations too, or the rule in docs/PLUGINS.md is one
+    # A built-in holds its own translations too, or the rule in *Writing a plugin* is one
     # every plugin Postulo ships breaks (#127). One that has not moved its strings yet
     # finds Postulo's own catalogue, which is already registered, and nothing happens.
     register_plugin_locale(plugin_class.__module__)

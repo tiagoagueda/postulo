@@ -1464,6 +1464,17 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Every API Postulo has is in the wiki, and a test says when one is not.** *The API* named
+  every call but kept the scope of each in prose, and the three addresses that answer machines
+  about the instance — `/healthz`, `/metrics`, `/logs` — were rows in *Configuration* that
+  never said what they return. They have *Health, metrics and logs* now, down to each metric.
+  The plugin guide was the core repository's `docs/PLUGINS.md`, not the wiki, and it never
+  named the interface each kind of plugin satisfies; it is *Writing a plugin* in the wiki, with
+  every kind, its entry-point group and its interface, and every name `postulo.plugins.api`
+  promises. `docs/PLUGINS.md` stays as a pointer, because every plugin's metadata links to
+  it. `tests/test_wiki_surface.py` reads the wiki beside the checkout against the code, both
+  ways, so a call, a metric or a promised name without its line fails. (#170)
+
 - **The wiki is written where it is read.** Its pages lived in this repository's `wiki/` and
   reached the Forgejo wiki only when somebody ran `scripts/publish-wiki.sh`. By the time
   anybody looked, four pages — *Accessibility*, *Hardening*, *Listings*, *Reports* — had

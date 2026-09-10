@@ -213,7 +213,7 @@ help rather than fight that.
 ## Plugins
 
 A plugin's strings are the plugin's to translate: its `locale/` directory sits beside the
-package and Postulo reads it when the plugin loads. See `docs/PLUGINS.md`.
+package and Postulo reads it when the plugin loads. See [Writing a plugin](https://source.tiagoagueda.com/postulo/postulo/wiki/Writing-a-plugin).
 
 That is true of the plugins Postulo ships as well. Their catalogues live beside their
 packages — `src/postulo/plugins/builtin/locale/` for the two built-in capture sources —

@@ -105,7 +105,7 @@ feature cannot be made to work for someone, that is a bug, and it is filed as on
 - **Modular by design.** Anything that could reasonably vary — where a posting is read
   from, how you are told about things, how a PDF is produced — sits behind an interface
   that a separately installed package can implement. Postulo's own implementations are
-  plugins that happen to ship in the box. See [docs/PLUGINS.md](docs/PLUGINS.md).
+  plugins that happen to ship in the box. See [Writing a plugin](https://source.tiagoagueda.com/postulo/postulo/wiki/Writing-a-plugin).
 
 ## Written with AI, answered for by people
 
@@ -166,7 +166,7 @@ Postulo is in each language so nobody has to guess.
   configuring and using Postulo. Its pages are their own repository,
   [postulo.wiki](https://source.tiagoagueda.com/postulo/postulo.wiki).
 - [Implementation plan](docs/PLAN.md) — architecture, data model, and milestones
-- [Writing a capture source](docs/PLUGINS.md) — the plugin contract
+- [Writing a plugin](https://source.tiagoagueda.com/postulo/postulo/wiki/Writing-a-plugin) — the plugin contract, and every name a plugin may import
 
 ## Running it
 
