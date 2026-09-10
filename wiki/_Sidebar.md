@@ -17,7 +17,7 @@
 - [Insights and the dashboard](Insights)
 - [Reports](Reports)
 - [Your career record](Your-career-record)
-- [CVs](CVs)
+- [CVs and portfolios](CVs)
 - [Letters](Cover-letters)
 - [Files and what you sent](Files-and-what-you-sent)
 - [The API](The-capture-API)

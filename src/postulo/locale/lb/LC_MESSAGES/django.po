@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:20+0000\n"
+"POT-Creation-Date: 2026-09-10 05:54+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Lëtzebuergesch\n"
@@ -172,6 +172,11 @@ msgstr ""
 #, python-format, draft
 msgid "%(kilobytes)s on disk"
 msgstr "%(kilobytes)s op der Disk"
+
+#: src/postulo/documents/views.py:91
+#, python-format, draft
+msgid "%(kind)s created. Now choose what goes on it."
+msgstr "%(kind)s ugeluecht. Wielt elo, wat dropp steet."
 
 #: src/postulo/applications/services.py:356
 #, python-format, draft
@@ -345,15 +350,11 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s géif änneren, wourop Postulo selwer ugewisen ass. %(problems)s"
 
-#: src/postulo/documents/rendering.py:295
+#: src/postulo/documents/rendering.py:279
+#: src/postulo/documents/rendering.py:304
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
-
-#: src/postulo/documents/rendering.py:275
-#, python-format, draft
-msgid "%(name)s — CV"
-msgstr "%(name)s — CV"
 
 #: src/postulo/templates/base.html:46
 #, python-format, draft
@@ -401,18 +402,18 @@ msgstr "%(role)s: keen Ufanksdatum, also gouf se net dobäigesat."
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s identifizéiert net dës Zort Saach."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:391
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d Kopië geschéckt, %(failed)d hu feelgeschloen; all Dokument seet wéi eng."
 
-#: src/postulo/documents/views.py:393
+#: src/postulo/documents/views.py:397
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d Kopië geschéckt."
 
-#: src/postulo/documents/themes.py:191
+#: src/postulo/documents/themes.py:193
 #, python-format, draft
 msgid "%(theme)s, from %(provider)s"
 msgstr "%(theme)s, vum %(provider)s"
@@ -441,7 +442,7 @@ msgid_plural "%(total)s companies"
 msgstr[0] "%(total)s Firma"
 msgstr[1] "%(total)s Firmen"
 
-#: src/postulo/templates/documents/cv_list.html:29
+#: src/postulo/templates/documents/cv_list.html:38
 #, python-format, draft
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
@@ -501,7 +502,7 @@ msgid ""
 msgstr ""
 "<strong>%(name)s</strong>: %(rows)s Zeilen. D'Vermutungen hei ënnendrënner kommen aus den Titelnimm; verbessert, wat néideg ass, a kuckt dann d'Virschau, ier Dir importéiert."
 
-#: src/postulo/documents/models.py:218
+#: src/postulo/documents/models.py:263
 #, draft
 msgid ""
 "[What you are applying for, and the one thing that makes you the person for it.]\n"
@@ -935,7 +936,7 @@ msgstr "En Etikett derbäisetzen"
 msgid "Add all of this"
 msgstr "Dat alles dobäisetzen"
 
-#: src/postulo/templates/documents/cv_detail.html:127
+#: src/postulo/templates/documents/cv_detail.html:132
 #, draft
 msgid "Add entries"
 msgstr "Andréi dobäisetzen"
@@ -955,10 +956,10 @@ msgstr "Ee dobäisetzen"
 msgid "Add the first one."
 msgstr "Setzt deen éischten dobäi."
 
-#: src/postulo/templates/documents/cv_detail.html:145
+#: src/postulo/templates/documents/cv_detail.html:150
 #, draft
-msgid "Add to CV"
-msgstr "An de CV dobäisetzen"
+msgid "Add these"
+msgstr "Dës derbäisetzen"
 
 #: src/postulo/templates/jobs/listing_form.html:53
 #, draft
@@ -980,7 +981,7 @@ msgstr "Dobäigesat"
 msgid "added"
 msgstr "dobäigesat"
 
-#: src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:135
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "%(count)s Andréi dobäigesat."
@@ -1234,7 +1235,7 @@ msgstr "Erscheinungsbild"
 #: src/postulo/applications/models.py:424
 #: src/postulo/applications/models.py:519
 #: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:408 src/postulo/jobs/models.py:768
+#: src/postulo/documents/models.py:475 src/postulo/jobs/models.py:768
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1401,7 +1402,7 @@ msgstr "Bewerben: %(title)s"
 msgid "Apprenticeship"
 msgstr "Léierplaz"
 
-#: src/postulo/documents/models.py:475
+#: src/postulo/documents/models.py:551
 #, draft
 msgid "Archived"
 msgstr "Archivéiert"
@@ -1438,7 +1439,7 @@ msgstr "Bewäertung oder Test"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Op mannst eng Sprooch muss ugebuede ginn, soss kann keen eppes liesen."
 
-#: src/postulo/documents/models.py:517
+#: src/postulo/documents/models.py:593
 #, draft
 msgid "attempts"
 msgstr "Versich"
@@ -1550,7 +1551,7 @@ msgstr "Biotechnologie"
 msgid "Board"
 msgstr "Tafel"
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 #, draft
 msgid "body"
 msgstr "Kierper"
@@ -1761,7 +1762,7 @@ msgstr "Gedroe vum Transport %(label)s, Versioun %(version)s."
 msgid "Catalogues"
 msgstr "Katalogen"
 
-#: src/postulo/documents/models.py:326
+#: src/postulo/documents/kinds.py:145 src/postulo/documents/models.py:371
 #, draft
 msgid "Certificate"
 msgstr "Zertifikat"
@@ -1848,7 +1849,7 @@ msgstr "All kontrolléieren"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Kontrolléiert %(when)s: %(detail)s"
 
-#: src/postulo/documents/models.py:438
+#: src/postulo/documents/models.py:505
 #, draft
 msgid "checksum"
 msgstr "Prüfsumm"
@@ -1878,7 +1879,7 @@ msgstr "Wielt fir d'éischt e Package."
 msgid "Choose another file"
 msgstr "En anere Fichier wielen"
 
-#: src/postulo/documents/forms.py:268
+#: src/postulo/documents/forms.py:287
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Wielt op mannst een Dokument fir ze notéieren."
@@ -1898,7 +1899,7 @@ msgstr "Wielt fir d'éischt, ëm wéi eng Kandidatur et geet."
 msgid "City and country, as it should appear on a CV."
 msgstr "Stad a Land, sou wéi et an engem CV stoe soll."
 
-#: src/postulo/documents/themes.py:118
+#: src/postulo/documents/themes.py:120
 #, draft
 msgid "Classic"
 msgstr "Klassesch"
@@ -2116,7 +2117,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Verbonnen. Testt et fir sécher ze sinn, datt et funktionéiert."
 
-#: src/postulo/documents/models.py:496 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:572 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
@@ -2279,7 +2280,8 @@ msgstr "Land"
 msgid "Country the number is in"
 msgstr "Land, zu deem d'Nummer gehéiert"
 
-#: src/postulo/documents/models.py:203 src/postulo/documents/models.py:324
+#: src/postulo/documents/kinds.py:134 src/postulo/documents/models.py:248
+#: src/postulo/documents/models.py:369
 #: src/postulo/templates/documents/letter_form.html:4
 #: src/postulo/templates/documents/letter_form.html:16
 #, draft
@@ -2337,8 +2339,9 @@ msgstr "Währung"
 msgid "Custom"
 msgstr "Personaliséiert"
 
-#: src/postulo/documents/forms.py:234 src/postulo/documents/models.py:105
-#: src/postulo/documents/models.py:146 src/postulo/documents/models.py:323
+#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:125
+#: src/postulo/documents/models.py:96 src/postulo/documents/models.py:134
+#: src/postulo/documents/models.py:191 src/postulo/documents/models.py:368
 #: src/postulo/documents/themes.py:71
 #: src/postulo/templates/documents/cv_form.html:4
 #: src/postulo/templates/documents/cv_form.html:8
@@ -2346,29 +2349,28 @@ msgstr "Personaliséiert"
 msgid "CV"
 msgstr "CV"
 
-#: src/postulo/documents/views.py:89
-#, draft
-msgid "CV created. Now choose what goes on it."
-msgstr "CV ugeluecht. Wielt elo, wat drakënnt."
-
-#: src/postulo/documents/models.py:166
+#: src/postulo/documents/models.py:211
 #, draft
 msgid "CV entries"
 msgstr "CV-Andréi"
 
-#: src/postulo/documents/models.py:165
+#: src/postulo/documents/models.py:210
 #, draft
 msgid "CV entry"
 msgstr "CV-Andrag"
 
-#: src/postulo/core/search.py:391 src/postulo/documents/models.py:106
+#: src/postulo/core/search.py:391 src/postulo/documents/models.py:135
 #: src/postulo/templates/accounts/delete_account.html:23
 #: src/postulo/templates/core/export.html:21
-#: src/postulo/templates/documents/cv_list.html:4
-#: src/postulo/templates/documents/cv_list.html:9
 #, draft
 msgid "CVs"
 msgstr "CVen"
+
+#: src/postulo/templates/documents/cv_list.html:4
+#: src/postulo/templates/documents/cv_list.html:15
+#, draft
+msgid "CVs and portfolios"
+msgstr "Liewensleef a Portfolioen"
 
 #: src/postulo/accounts/models.py:144
 #, draft
@@ -2474,7 +2476,7 @@ msgstr "Delai"
 msgid "Deadline"
 msgstr "Delai"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:277
 #, draft
 msgid ""
 "Dear [name],\n"
@@ -2495,7 +2497,7 @@ msgstr ""
 "Mat frëndleche Gréiss,\n"
 "{{ name }}"
 
-#: src/postulo/documents/models.py:212
+#: src/postulo/documents/models.py:257
 #, draft
 msgid ""
 "Dear {{ company }},\n"
@@ -2516,7 +2518,7 @@ msgstr ""
 "Mat frëndleche Gréiss,\n"
 "{{ name }}"
 
-#: src/postulo/documents/models.py:226
+#: src/postulo/documents/models.py:271
 #, draft
 msgid ""
 "Dear {{ company }},\n"
@@ -2600,7 +2602,7 @@ msgstr "Verteidegung"
 
 #: src/postulo/templates/applications/application_detail.html:42
 #: src/postulo/templates/applications/tag_list.html:32
-#: src/postulo/templates/documents/cv_detail.html:23
+#: src/postulo/templates/documents/cv_detail.html:24
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:58
@@ -2745,12 +2747,12 @@ msgstr "Dat maachen"
 msgid "Document"
 msgstr "Dokument"
 
-#: src/postulo/documents/models.py:527
+#: src/postulo/documents/models.py:603
 #, draft
 msgid "document copies"
 msgstr "Dokumentkopien"
 
-#: src/postulo/documents/models.py:526
+#: src/postulo/documents/models.py:602
 #, draft
 msgid "document copy"
 msgstr "Dokumentkopie"
@@ -2768,7 +2770,7 @@ msgstr "Dokumentespäicher"
 msgid "Documents"
 msgstr "Dokumenter"
 
-#: src/postulo/documents/views.py:476
+#: src/postulo/documents/views.py:480
 #, draft
 msgid "Documents sent"
 msgstr "Geschéckt Dokumenter"
@@ -2793,7 +2795,7 @@ msgstr "fäerdeg den"
 
 #: src/postulo/templates/documents/application_documents.html:35
 #: src/postulo/templates/documents/application_documents.html:75
-#: src/postulo/templates/documents/cv_detail.html:117
+#: src/postulo/templates/documents/cv_detail.html:122
 #: src/postulo/templates/documents/rendered_list.html:49
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
@@ -3097,7 +3099,7 @@ msgid ""
 msgstr ""
 "All Posten, deen Dir haat. Schreift d'Héichpunkten eemol; passt se pro CV méi spéit un."
 
-#: src/postulo/documents/views.py:396
+#: src/postulo/documents/views.py:400
 #, draft
 msgid "Every store already has this document."
 msgstr "All Späicher huet dëst Dokument scho."
@@ -3148,10 +3150,10 @@ msgstr ""
 msgid "Everything you have written"
 msgstr "Alles, wat Dir geschriwwen hutt"
 
-#: src/postulo/templates/documents/cv_detail.html:149
+#: src/postulo/templates/documents/cv_detail.html:154
 #, draft
-msgid "Everything you have written is already on this CV."
-msgstr "Alles, wat Dir geschriwwen hutt, steet scho an dësem CV."
+msgid "Everything you have written is already on it."
+msgstr "Alles, wat Dir geschriwwen hutt, steet scho dropp."
 
 #: src/postulo/templates/applications/interview_list.html:12
 #, draft
@@ -3230,7 +3232,7 @@ msgstr ""
 msgid "Export everything"
 msgstr "Alles exportéieren"
 
-#: src/postulo/templates/documents/cv_detail.html:19
+#: src/postulo/templates/documents/cv_detail.html:20
 #, draft
 msgid "Export PDF"
 msgstr "PDF exportéieren"
@@ -3240,7 +3242,7 @@ msgstr "PDF exportéieren"
 msgid "Exported on its own"
 msgstr "Separat exportéiert"
 
-#: src/postulo/documents/models.py:476
+#: src/postulo/documents/models.py:552
 #, draft
 msgid "Failed"
 msgstr "Feelgeschloen"
@@ -3302,12 +3304,12 @@ msgstr "Studiefach"
 msgid "Figures appear once you have applied for something."
 msgstr "D'Zuele erschéngen, soubal Dir Iech op eppes bewuerf hutt."
 
-#: src/postulo/documents/models.py:343 src/postulo/documents/models.py:400
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:467
 #, draft
 msgid "file"
 msgstr "Fichier"
 
-#: src/postulo/documents/views.py:310
+#: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Fichier gespäichert."
@@ -3335,7 +3337,7 @@ msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
 "Fichieren, déi Dir scho hat, am Géigesaz zu Dokumenter, déi Postulo erstallt huet."
 
-#: src/postulo/documents/forms.py:239
+#: src/postulo/documents/forms.py:258
 #, draft
 msgid "Files you have already"
 msgstr "Fichieren, déi Dir scho hutt"
@@ -3398,12 +3400,12 @@ msgstr "Éischte Wäert"
 msgid "First, take everything with you"
 msgstr "Huelt fir d'éischt alles mat"
 
-#: src/postulo/documents/forms.py:38
+#: src/postulo/documents/forms.py:39
 #, draft
 msgid "Follow your profile"
 msgstr "Ärem Profil follegen"
 
-#: src/postulo/documents/models.py:206
+#: src/postulo/documents/models.py:251
 #, draft
 msgid "Follow-up note"
 msgstr "Nofassnotiz"
@@ -3434,7 +3436,7 @@ msgstr "Fir"
 msgid "For example, “BSc Computer Science”."
 msgstr "Zum Beispill „Bachelor an der Informatik“."
 
-#: src/postulo/documents/models.py:83
+#: src/postulo/documents/models.py:109
 #, draft
 msgid "For you, not for the employer: “Backend, English”."
 msgstr "Fir Iech, net fir den Employeur: „Backend, Englesch“."
@@ -3693,7 +3695,7 @@ msgstr "geschitt"
 msgid "happened on"
 msgstr "geschitt den"
 
-#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:85
+#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:114
 #: src/postulo/resume/views.py:441
 #, draft
 msgid "headline"
@@ -3715,7 +3717,7 @@ msgstr "Gesondheetskontroll"
 msgid "Held"
 msgstr "Ofgehalen"
 
-#: src/postulo/templates/documents/cv_detail.html:69
+#: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "hidden"
 msgstr "verstoppt"
@@ -3736,7 +3738,7 @@ msgstr "Héich"
 msgid "highlights"
 msgstr "Héichpunkten"
 
-#: src/postulo/documents/models.py:159
+#: src/postulo/documents/models.py:204
 #, draft
 msgid "highlights for this CV"
 msgstr "Héichpunkte fir dëse CV"
@@ -3856,7 +3858,7 @@ msgstr "Hybrid"
 msgid "I have already applied to this one"
 msgstr "Ech hu mech op dëse scho bewuerf"
 
-#: src/postulo/documents/models.py:515
+#: src/postulo/documents/models.py:591
 #, draft
 msgid "id in the store"
 msgstr "Identifikateur am Späicher"
@@ -4007,12 +4009,12 @@ msgstr "am %(kind)s, deen Dir de %(when)s un %(company)s geschéckt hutt"
 msgid "In the diary"
 msgstr "Am Agenda"
 
-#: src/postulo/documents/models.py:99
+#: src/postulo/documents/models.py:128
 #, draft
 msgid "include contact details"
 msgstr "Kontaktdaten dobäisetzen"
 
-#: src/postulo/documents/models.py:154
+#: src/postulo/documents/models.py:199
 #, draft
 msgid "included"
 msgstr "dobäi"
@@ -4367,9 +4369,10 @@ msgstr ""
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:269
-#: src/postulo/documents/models.py:341 src/postulo/documents/models.py:399
-#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:243
+#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
+#: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
+#: src/postulo/resume/models.py:243
 #, draft
 msgid "kind"
 msgstr "Zort"
@@ -4383,7 +4386,7 @@ msgstr "Zort"
 msgid "Kind"
 msgstr "Zort"
 
-#: src/postulo/documents/models.py:506
+#: src/postulo/documents/models.py:582
 #, draft
 msgid "kind of document"
 msgstr "Aart vum Dokument"
@@ -4393,7 +4396,7 @@ msgstr "Aart vum Dokument"
 msgid "kind of entry"
 msgstr "Aart vum Entrée"
 
-#: src/postulo/documents/models.py:432
+#: src/postulo/documents/models.py:499
 #, draft
 msgid "kind of source"
 msgstr "Aart vun der Quell"
@@ -4403,7 +4406,7 @@ msgstr "Aart vun der Quell"
 msgid "Kinds of letter"
 msgstr "Zorte vu Bréiwer"
 
-#: src/postulo/documents/models.py:499 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:575 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "Uweisungsnumm"
@@ -4414,8 +4417,8 @@ msgstr "Uweisungsnumm"
 msgid "Language"
 msgstr "Sprooch"
 
-#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:91
-#: src/postulo/documents/models.py:285 src/postulo/resume/models.py:197
+#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:120
+#: src/postulo/documents/models.py:330 src/postulo/resume/models.py:197
 #: src/postulo/resume/models.py:203 src/postulo/resume/models.py:301
 #, draft
 msgid "language"
@@ -4487,7 +4490,7 @@ msgstr "Gréisste gelies Säit"
 msgid "Last activity"
 msgstr "Lescht Aktivitéit"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "last attempt"
 msgstr "leschte Versuch"
@@ -4502,7 +4505,7 @@ msgstr "lescht Kontroll"
 msgid "last checked"
 msgstr "fir d'lescht kontrolléiert"
 
-#: src/postulo/documents/models.py:523 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:599 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "leschte Feeler"
@@ -4600,12 +4603,12 @@ msgstr "Loosst dëse Zougangsschlëssel mech eleng umellen"
 msgid "Let {column} size itself"
 msgstr "Loosst {column} seng Breet selwer bestëmmen"
 
-#: src/postulo/documents/forms.py:236 src/postulo/documents/themes.py:72
+#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Bréif"
 
-#: src/postulo/documents/models.py:294
+#: src/postulo/documents/models.py:339
 #, draft
 msgid "letter"
 msgstr "Bréif"
@@ -4619,7 +4622,7 @@ msgstr "Bréif"
 msgid "Letters"
 msgstr "Bréiwer"
 
-#: src/postulo/documents/models.py:295
+#: src/postulo/documents/models.py:340
 #, draft
 msgid "letters"
 msgstr "Bréiwer"
@@ -4655,7 +4658,7 @@ msgstr "Link"
 msgid "Link"
 msgstr "Link"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:592
 #, draft
 msgid "link in the store"
 msgstr "Link am Späicher"
@@ -4692,7 +4695,7 @@ msgid ""
 msgstr ""
 "Linken op d'Plazen, op déi eng Aarbechtssich zréckkënnt: d'Tafel, d'CVen, d'Firmen."
 
-#: src/postulo/documents/forms.py:245
+#: src/postulo/documents/forms.py:264
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -4994,7 +4997,7 @@ msgstr "Zesummeleeë mat"
 msgid "Merged."
 msgstr "Zesummegeluecht."
 
-#: src/postulo/documents/models.py:176
+#: src/postulo/documents/models.py:221
 #, draft
 msgid "Missing entry"
 msgstr "Andrag feelt"
@@ -5038,7 +5041,8 @@ msgid ""
 msgstr ""
 "Déi meescht Leit hale eng Aarbechtssich an enger Tabell fest, bis et wéi deet. Bréngt se hei eran, anstatt se nei ze tippen: ee CSV, egal wéi eng Kolonnen, Titelen an egal wéi enger Sprooch. Dir gesitt, wéi all Kolonn gelies gëtt, ier eppes gespäichert gëtt."
 
-#: src/postulo/documents/models.py:204 src/postulo/documents/models.py:325
+#: src/postulo/documents/kinds.py:140 src/postulo/documents/models.py:249
+#: src/postulo/documents/models.py:370
 #, draft
 msgid "Motivation letter"
 msgstr "Motivatiounsschreiwen"
@@ -5078,7 +5082,7 @@ msgstr "%(name)s eng Plaz no hanne réckelen"
 msgid "Move %(name)s up a row"
 msgstr "%(name)s eng Zeil erop réckelen"
 
-#: src/postulo/templates/documents/cv_detail.html:81
+#: src/postulo/templates/documents/cv_detail.html:86
 #: src/postulo/templates/resume/overview.html:112
 #, draft
 msgid "Move down"
@@ -5094,7 +5098,7 @@ msgstr "Weiderréckelen"
 msgid "Move to status"
 msgstr "An de Status réckelen"
 
-#: src/postulo/templates/documents/cv_detail.html:76
+#: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:107
 #, draft
 msgid "Move up"
@@ -5107,8 +5111,8 @@ msgid "NACE division"
 msgstr "NACE-Ofdeelung"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:83
-#: src/postulo/documents/models.py:267 src/postulo/jobs/models.py:41
+#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
 #: src/postulo/plugins/models.py:48 src/postulo/resume/models.py:116
@@ -5176,11 +5180,11 @@ msgstr "Nei"
 msgid "New accounts"
 msgstr "Nei Konten"
 
-#: src/postulo/templates/documents/cv_list.html:16
-#: src/postulo/templates/documents/cv_list.html:47
+#: src/postulo/templates/documents/cv_list.html:22
+#: src/postulo/templates/documents/cv_list.html:56
 #, draft
-msgid "New CV"
-msgstr "Neie CV"
+msgid "New CV or portfolio"
+msgstr "Neie Liewenslaf oder Portfolio"
 
 #: src/postulo/templates/jobs/industry_list.html:16
 #, draft
@@ -5238,7 +5242,7 @@ msgstr "Neitste Backup"
 msgid "Next"
 msgstr "Weider"
 
-#: src/postulo/documents/models.py:519
+#: src/postulo/documents/models.py:595
 #, draft
 msgid "next attempt"
 msgstr "nächste Versuch"
@@ -5307,12 +5311,7 @@ msgstr "Keng Verbindung: %(why)s"
 msgid "No connections yet"
 msgstr "Nach keng Verbindungen"
 
-#: src/postulo/templates/documents/cv_list.html:41
-#, draft
-msgid "No CVs yet"
-msgstr "Nach keng CVen"
-
-#: src/postulo/documents/views.py:378
+#: src/postulo/documents/views.py:382
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5418,12 +5417,12 @@ msgstr "Nach keng Virschléi"
 msgid "No tags yet."
 msgstr "Nach keng Etiketten."
 
-#: src/postulo/documents/themes.py:249
+#: src/postulo/documents/themes.py:251
 #, python-format, draft
 msgid "No theme called “%(theme)s” is installed."
 msgstr "Et ass kee Design mam Numm „%(theme)s“ installéiert."
 
-#: src/postulo/documents/themes.py:224
+#: src/postulo/documents/themes.py:226
 #, draft
 msgid "No theme is installed that can set this document."
 msgstr "Et ass kee Design installéiert, dat dëst Dokument setze kann."
@@ -5519,7 +5518,7 @@ msgstr "Normal"
 msgid "Not %(name)s"
 msgstr "Kee %(name)s"
 
-#: src/postulo/documents/models.py:477
+#: src/postulo/documents/models.py:553
 #, draft
 msgid "Not accepted"
 msgstr "Net ugeholl"
@@ -5615,7 +5614,7 @@ msgstr "Net gewisen · %(name)s"
 msgid "not tested yet"
 msgstr "nach net getest"
 
-#: src/postulo/templates/documents/cv_detail.html:34
+#: src/postulo/templates/documents/cv_detail.html:35
 #, python-format, draft
 msgid "Not yet written in %(tongue)s. These print as they stand:"
 msgstr ""
@@ -5653,7 +5652,7 @@ msgstr "notéiert den"
 msgid "Notes"
 msgstr "Notizen"
 
-#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:150
+#: src/postulo/documents/models.py:403 src/postulo/jobs/models.py:150
 #: src/postulo/jobs/models.py:433
 #, draft
 msgid "notes"
@@ -5694,6 +5693,7 @@ msgstr ""
 "Hei passt näischt dozou. Op dëser Säit stinn nëmmen d’Beräicher, déi Dir wierklech benotzt hutt."
 
 #: src/postulo/templates/applications/application_list.html:48
+#: src/postulo/templates/documents/cv_list.html:50
 #, draft
 msgid "Nothing here yet"
 msgstr "Hei ass nach näischt"
@@ -5771,16 +5771,16 @@ msgstr "Näischt passt op „%(term)s“"
 msgid "Nothing on %(host)s could be used as a logo."
 msgstr "Näischt op %(host)s konnt als Logo benotzt ginn."
 
+#: src/postulo/templates/documents/cv_detail.html:101
+#, draft
+msgid "Nothing on it yet. Choose some entries below."
+msgstr "Nach näischt dropp. Wielt hei ënnen e puer Antréien."
+
 #: src/postulo/templates/connections/confirm_delete.html:13
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "Um anere Service gëtt näischt ugefaasst. Dir kënnt Iech méi spéit erëm verbannen."
-
-#: src/postulo/templates/documents/cv_detail.html:96
-#, draft
-msgid "Nothing on this CV yet. Choose some entries below."
-msgstr "Nach näischt an dësem CV. Wielt e puer Andréi hei ënnendrënner."
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -5871,7 +5871,7 @@ msgstr "Nach näischt eropgelueden."
 msgid "Nothing waiting"
 msgstr "Näischt waart"
 
-#: src/postulo/documents/views.py:115 src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:119 src/postulo/documents/views.py:135
 #, draft
 msgid "Nothing was added."
 msgstr "Näischt gouf dobäigesat."
@@ -6136,10 +6136,12 @@ msgid ""
 msgstr ""
 "Een, deen scho stattfonnt huet, gëtt direkt als ofgehalen op d'Zäitlinn notéiert."
 
-#: src/postulo/templates/documents/cv_list.html:11
+#: src/postulo/templates/documents/cv_list.html:17
 #, draft
-msgid "One variant per kind of role. Each selects from your career record."
-msgstr "Eng Variant pro Zort Posten. All eenzel wielt aus Ärem Karriäredossier."
+msgid ""
+"One variant per kind of role. Each selects from your career record; a portfolio leads with the work."
+msgstr ""
+"Eng Versioun pro Aart vu Plaz. Jiddereng wielt aus Ärem Wee; e Portfolio fänkt mat der Aarbecht un."
 
 #: src/postulo/templates/accounts/delete_account.html:37
 #, draft
@@ -6153,10 +6155,10 @@ msgstr ""
 msgid "Only %(name)s"
 msgstr "Nëmmen %(name)s"
 
-#: src/postulo/templates/documents/cv_detail.html:129
+#: src/postulo/templates/documents/cv_detail.html:134
 #, draft
-msgid "Only entries not already on this CV are listed."
-msgstr "Et ginn nëmmen Andréi opgelëscht, déi net schonn an dësem CV sinn."
+msgid "Only entries not already on it are listed."
+msgstr "Nëmmen Antréien, déi nach net dropp stinn, ginn opgelëscht."
 
 #: src/postulo/plugins/fetching.py:121
 #, draft
@@ -6218,7 +6220,7 @@ msgstr "Oder lued ee erop"
 msgid "ORCID"
 msgstr "ORCID"
 
-#: src/postulo/documents/models.py:152 src/postulo/resume/models.py:35
+#: src/postulo/documents/models.py:197 src/postulo/resume/models.py:35
 #, draft
 msgid "order"
 msgstr "Reiefolleg"
@@ -6241,8 +6243,9 @@ msgstr "Ursprénglech Annonce"
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
 #: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/models.py:329
-#: src/postulo/jobs/models.py:492 src/postulo/resume/models.py:219
+#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
+#: src/postulo/resume/models.py:219
 #, draft
 msgid "Other"
 msgstr "Aner"
@@ -6387,7 +6390,7 @@ msgstr ""
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr "Kleeft den Text an. Annoncë verschwannen aus dem Netz; Är Kopie net."
 
-#: src/postulo/documents/views.py:189
+#: src/postulo/documents/views.py:193
 #, draft
 msgid "PDF created."
 msgstr "PDF erstallt."
@@ -6504,12 +6507,12 @@ msgstr "Bild"
 msgid "Placeholders"
 msgstr "Platzhalter"
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 #, draft
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr "Platzhalter wéi {{ company }} ginn beim Verschécken ausgefëllt."
 
-#: src/postulo/documents/themes.py:117
+#: src/postulo/documents/themes.py:119
 #, draft
 msgid "Plain"
 msgstr "Einfach"
@@ -6609,7 +6612,9 @@ msgid ""
 msgstr ""
 "De Port 465 erwaart TLS vum éischte Byte un a waart dofir op e Certificat, während Postulo op e Gruss waart. Wielt „TLS vum éischte Byte un“ oder benotzt de Port 587 mat STARTTLS."
 
-#: src/postulo/documents/models.py:327 src/postulo/resume/models.py:213
+#: src/postulo/documents/kinds.py:128 src/postulo/documents/models.py:97
+#: src/postulo/documents/models.py:372 src/postulo/documents/themes.py:72
+#: src/postulo/resume/models.py:213
 #, draft
 msgid "Portfolio"
 msgstr "Portfolio"
@@ -6783,6 +6788,7 @@ msgid "preparation notes"
 msgstr "Virbereedungsnotizen"
 
 #: src/postulo/templates/documents/themes/base_cv.html:98
+#: src/postulo/templates/documents/themes/base_portfolio.html:67
 #: src/postulo/templates/resume/preview.html:28
 #, draft
 msgid "present"
@@ -6795,7 +6801,7 @@ msgid ""
 msgstr ""
 "Dréckt op „No Aktualiséierunge kucken“, fir ze huelen, wat d'Katalogen ubidden. Postulo hëlt se net vun eleng."
 
-#: src/postulo/templates/documents/cv_detail.html:16
+#: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
 #, draft
@@ -7148,7 +7154,7 @@ msgstr "notéiert vun"
 msgid "recorded on"
 msgstr "notéiert den"
 
-#: src/postulo/documents/views.py:479
+#: src/postulo/documents/views.py:483
 #, draft
 msgid "Recorded what you sent."
 msgstr "Notéiert, wat Dir geschéckt hutt."
@@ -7184,7 +7190,7 @@ msgstr "Recruteur"
 msgid "Redirects followed"
 msgstr "Ëmleedunge gefollegt"
 
-#: src/postulo/documents/models.py:328
+#: src/postulo/documents/kinds.py:146 src/postulo/documents/models.py:373
 #, draft
 msgid "Reference"
 msgstr "Referenz"
@@ -7297,7 +7303,7 @@ msgstr "Remote-Adress"
 #: src/postulo/templates/accounts/profile.html:139
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
-#: src/postulo/templates/documents/cv_detail.html:87
+#: src/postulo/templates/documents/cv_detail.html:92
 #: src/postulo/templates/jobs/company_form.html:80
 #: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/partials/postal_addresses.html:79
@@ -7337,17 +7343,17 @@ msgstr "{label} ewechhuelen"
 msgid "removed on the other side"
 msgstr "op der anerer Säit ewechgeholl"
 
-#: src/postulo/documents/models.py:439
+#: src/postulo/documents/models.py:506
 #, draft
 msgid "rendered on"
 msgstr "erstallt den"
 
-#: src/postulo/documents/models.py:360
+#: src/postulo/documents/models.py:412
 #, draft
 msgid "replaces"
 msgstr "ersetzt"
 
-#: src/postulo/documents/models.py:161
+#: src/postulo/documents/models.py:206
 #, draft
 msgid "Replaces the master highlights on this variant only. One per line."
 msgstr "Ersetzt d'Haapt-Héichpunkten nëmmen op dëser Variant. Ee pro Zeil."
@@ -7396,7 +7402,7 @@ msgstr "CV"
 msgid "Retail"
 msgstr "Handel"
 
-#: src/postulo/documents/models.py:276
+#: src/postulo/documents/models.py:321
 #, draft
 msgid "reusable template"
 msgstr "widderverwendbar Virlag"
@@ -7779,12 +7785,12 @@ msgstr "D'Schécke feelgeschloen: %(error)s"
 msgid "Sent"
 msgstr "Geschéckt"
 
-#: src/postulo/documents/models.py:450
+#: src/postulo/documents/models.py:526
 #, draft
 msgid "sent document"
 msgstr "geschéckt dokument"
 
-#: src/postulo/documents/models.py:451
+#: src/postulo/documents/models.py:527
 #, draft
 msgid "sent documents"
 msgstr "geschéckt dokumenter"
@@ -7797,7 +7803,7 @@ msgstr "geschéckt dokumenter"
 msgid "Sent documents"
 msgstr "Geschéckt Dokumenter"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:598
 #, draft
 msgid "sent on"
 msgstr "geschéckt den"
@@ -7888,7 +7894,7 @@ msgstr "Gëtt gesat, wann d'Plaz net méi fräi ass."
 
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:108 src/postulo/templates/core/export.html:4
-#: src/postulo/templates/documents/cv_detail.html:21
+#: src/postulo/templates/documents/cv_detail.html:22
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -8183,7 +8189,7 @@ msgstr "Installéiert Quellen"
 msgid "speaking"
 msgstr "schwätzen"
 
-#: src/postulo/documents/models.py:205
+#: src/postulo/documents/models.py:250
 #, draft
 msgid "Speculative letter"
 msgstr "Initiativbréif"
@@ -8251,7 +8257,7 @@ msgid "Status"
 msgstr "Status"
 
 #: src/postulo/applications/models.py:198
-#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:513
+#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:589
 #: src/postulo/jobs/models.py:751
 #, draft
 msgid "status"
@@ -8307,7 +8313,7 @@ msgstr "Ausser Kraaft setzen"
 msgid "Stop sorting by %(column)s"
 msgstr "Net méi no %(column)s zortéieren"
 
-#: src/postulo/documents/models.py:498
+#: src/postulo/documents/models.py:574
 #, draft
 msgid "store"
 msgstr "späicher"
@@ -8322,7 +8328,7 @@ msgstr "Gëtt gespäichert; loosst et eidel, fir de bestoende Wäert ze halen."
 msgid "Strong"
 msgstr "Staark"
 
-#: src/postulo/documents/models.py:271
+#: src/postulo/documents/models.py:316
 #, draft
 msgid "subject"
 msgstr "sujet"
@@ -8353,7 +8359,7 @@ msgstr "virschléi"
 msgid "Suggestions"
 msgstr "Virschléi"
 
-#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:87
+#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:116
 #: src/postulo/resume/models.py:72 src/postulo/resume/models.py:155
 #, draft
 msgid "summary"
@@ -8364,7 +8370,7 @@ msgstr "zesummefaassung"
 msgid "superseded"
 msgstr "ersat"
 
-#: src/postulo/documents/forms.py:209
+#: src/postulo/documents/forms.py:228
 #, draft
 msgid "Supersedes"
 msgstr "Ersetzt"
@@ -8486,7 +8492,7 @@ msgstr "Etiketten"
 msgid "tags"
 msgstr "etiketten"
 
-#: src/postulo/templates/documents/cv_detail.html:84
+#: src/postulo/templates/documents/cv_detail.html:89
 #, draft
 msgid "Tailor"
 msgstr "Upassen"
@@ -8497,10 +8503,10 @@ msgstr "Upassen"
 msgid "Tailor this entry"
 msgstr "Dësen Andrag upassen"
 
-#: src/postulo/templates/documents/cv_detail.html:67
+#: src/postulo/templates/documents/cv_detail.html:72
 #, draft
-msgid "tailored for this CV"
-msgstr "fir dëse CV ugepasst"
+msgid "tailored for this one"
+msgstr "dofir ugepasst"
 
 #: src/postulo/templates/settings/dashboard.html:57
 #, python-format, draft
@@ -8543,7 +8549,7 @@ msgstr "Telefonsnummeren"
 msgid "Template"
 msgstr "Virlag"
 
-#: src/postulo/documents/models.py:278
+#: src/postulo/documents/models.py:323
 #, draft
 msgid "Templates appear when you send a letter with an application."
 msgstr "Virlagen erschéngen, wann Dir e Bréif mat enger Kandidatur schéckt."
@@ -8568,7 +8574,7 @@ msgstr "D'Verbindung testen"
 msgid "text"
 msgstr "Text"
 
-#: src/postulo/documents/models.py:437
+#: src/postulo/documents/models.py:504
 #, draft
 msgid "text as sent"
 msgstr "text, wéi en geschéckt gouf"
@@ -8681,7 +8687,7 @@ msgstr "Dee Fichier ass eidel."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Dee Fichier ass méi grouss wéi %(limit)s MB, also gouf en net gelies."
 
-#: src/postulo/documents/forms.py:215
+#: src/postulo/documents/forms.py:234
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Dee Fichier ass méi grouss wéi %(limit)s MB."
@@ -8879,7 +8885,7 @@ msgstr "De PDF-Motor %(name)s ass konfiguréiert, awer net benotzbar. %(hint)s"
 msgid "The %(plugin)s plugin is not installed."
 msgstr "De Plugin %(plugin)s ass net installéiert."
 
-#: src/postulo/documents/themes.py:227 src/postulo/documents/themes.py:255
+#: src/postulo/documents/themes.py:229 src/postulo/documents/themes.py:257
 #, python-format, draft
 msgid "The %(theme)s theme does not set this kind of document."
 msgstr "De Design %(theme)s setzt dës Zort Dokument net."
@@ -8937,7 +8943,7 @@ msgstr ""
 msgid "The company this one belongs to, if it belongs to one."
 msgstr "D'Firma, zu där dës hei gehéiert, wa se zu enger gehéiert."
 
-#: src/postulo/documents/models.py:260
+#: src/postulo/documents/models.py:305
 #, draft
 msgid "The company you are applying to"
 msgstr "D'Firma, bei där Dir Iech bewierft"
@@ -8947,7 +8953,7 @@ msgstr "D'Firma, bei där Dir Iech bewierft"
 msgid "The connection is gone or switched off."
 msgstr "D'Verbindung ass fort oder ausgeschalt."
 
-#: src/postulo/documents/views.py:383
+#: src/postulo/documents/views.py:387
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "D'Kopie konnt net geschéckt ginn; d'Dokument seet firwat."
@@ -8971,7 +8977,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "Den Eroflued ass vill méi grouss, wéi e Plugin soll sinn."
 
-#: src/postulo/documents/models.py:361
+#: src/postulo/documents/models.py:413
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr ""
@@ -9029,7 +9035,7 @@ msgstr "Den Installateur konnt net lafe: %(error)s"
 msgid "The installer refused it: %(error)s"
 msgstr "Den Installateur huet et ofgewisen: %(error)s"
 
-#: src/postulo/documents/models.py:261
+#: src/postulo/documents/models.py:306
 #, draft
 msgid "The job title"
 msgstr "D'Stellenbezeechnung"
@@ -9142,7 +9148,7 @@ msgstr "Déi nächst"
 msgid "The one before"
 msgstr "Déi virdrun"
 
-#: src/postulo/documents/models.py:87
+#: src/postulo/documents/models.py:116
 #, draft
 msgid "The opening paragraph, if you use one."
 msgstr "Den éischte Paragraf, wann Dir ee benotzt."
@@ -9576,7 +9582,7 @@ msgstr "Zäitlimit"
 msgid "timeout in seconds"
 msgstr "zäitlimit a sekonnen"
 
-#: src/postulo/documents/models.py:340 src/postulo/documents/models.py:398
+#: src/postulo/documents/models.py:385 src/postulo/documents/models.py:462
 #: src/postulo/jobs/models.py:563 src/postulo/resume/models.py:241
 #, draft
 msgid "title"
@@ -9617,7 +9623,7 @@ msgstr "Fir eng Annonce z'iwwerginn (brauch d'Berechtegung fir Erfaassungen):"
 msgid "to status"
 msgstr "op de status"
 
-#: src/postulo/documents/models.py:264
+#: src/postulo/documents/models.py:309
 #, draft
 msgid "Today's date"
 msgstr "D'Datum vun haut"
@@ -9750,7 +9756,7 @@ msgstr "Tippt Är Adress, %(email)s, fir ze bestätegen"
 msgid "Unavailable — not offered at all"
 msgstr "Net verfügbar — gëtt guer net ugebueden"
 
-#: src/postulo/documents/models.py:156
+#: src/postulo/documents/models.py:201
 #, draft
 msgid "Uncheck to keep the entry on this variant but leave it off the page."
 msgstr ""
@@ -9825,12 +9831,12 @@ msgstr "Eroplueden an d'Kolonne verbannen"
 msgid "Uploaded"
 msgstr "Eropgelueden"
 
-#: src/postulo/documents/models.py:373
+#: src/postulo/documents/models.py:437
 #, draft
 msgid "uploaded document"
 msgstr "eropgelueden dokument"
 
-#: src/postulo/documents/models.py:374
+#: src/postulo/documents/models.py:438
 #, draft
 msgid "uploaded documents"
 msgstr "eropgelueden dokumenter"
@@ -9949,7 +9955,7 @@ msgstr "bestätegt"
 msgid "Verified"
 msgstr "Bestätegt"
 
-#: src/postulo/documents/models.py:353
+#: src/postulo/documents/models.py:405
 #: src/postulo/templates/documents/upload_list.html:27
 #, draft
 msgid "version"
@@ -9965,7 +9971,7 @@ msgstr "Versioun"
 msgid "version tag"
 msgstr "versiounskennzeechnung"
 
-#: src/postulo/templates/documents/cv_detail.html:101
+#: src/postulo/templates/documents/cv_detail.html:106
 #, draft
 msgid "Versions you have sent"
 msgstr "Versiounen, déi Dir geschéckt hutt"
@@ -10005,7 +10011,7 @@ msgstr "Waart op eng Äntwert"
 msgid "Waiting only"
 msgstr "Nëmmen déi, déi waarden"
 
-#: src/postulo/documents/models.py:474
+#: src/postulo/documents/models.py:550
 #, draft
 msgid "Waiting to be sent"
 msgstr "Waart drop, geschéckt ze ginn"
@@ -10155,10 +10161,10 @@ msgstr ""
 msgid "What is in the file"
 msgstr "Wat am Fichier steet"
 
-#: src/postulo/templates/documents/cv_detail.html:56
-#, draft
-msgid "What is on this CV"
-msgstr "Wat op dësem CV steet"
+#: src/postulo/templates/documents/cv_detail.html:58
+#, python-format, draft
+msgid "What is on this %(kind)s"
+msgstr "Wat op dësem %(kind)s steet"
 
 #: src/postulo/templates/settings/plugins.html:7
 #, draft
@@ -10333,7 +10339,7 @@ msgid ""
 msgstr ""
 "Wou d'Pluginnen, déi fir Iech handelen, hir Servicer fannen, a wéi si sech do umellen. D'Geheimnisser gi verschlësselt gespäichert an ni méi gewisen."
 
-#: src/postulo/documents/models.py:262
+#: src/postulo/documents/models.py:307
 #, draft
 msgid "Where the role is based"
 msgstr "Wou de Posten ass"
@@ -10408,14 +10414,14 @@ msgstr "Wéi eng Kolonn ass wat?"
 msgid "Which device or tool this is for."
 msgstr "Fir wéi een Apparat oder wéi ee Programm dat hei ass."
 
-#: src/postulo/documents/models.py:288
+#: src/postulo/documents/models.py:333
 #, draft
 msgid ""
 "Which language this letter is written in. Leave blank to follow your profile."
 msgstr ""
 "A wéi enger Sprooch dëse Bréif geschriwwen ass. Loosst et eidel, fir Ärem Profil ze follegen."
 
-#: src/postulo/documents/models.py:94
+#: src/postulo/documents/models.py:123
 #, draft
 msgid ""
 "Which language this variant is written in. Leave blank to follow your profile."
@@ -10546,12 +10552,12 @@ msgstr "géif se op %(status)s réckelen"
 msgid "Write one well, then let placeholders do the rest."
 msgstr "Schreift een uerdentlech, an da loosst d'Platzhalter de Rescht maachen."
 
-#: src/postulo/templates/documents/cv_detail.html:151
+#: src/postulo/templates/documents/cv_detail.html:156
 #, draft
 msgid "Write some more."
 msgstr "Schreift nach e bëssen."
 
-#: src/postulo/templates/documents/cv_list.html:43
+#: src/postulo/templates/documents/cv_list.html:52
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Schreift fir d'éischt Är Karriär op, a baut duerno Variante dovun."
@@ -10615,10 +10621,10 @@ msgstr ""
 msgid "You already have a company with that name."
 msgstr "Dir hutt schonn eng Firma mat deem Numm."
 
-#: src/postulo/documents/forms.py:111
+#: src/postulo/documents/forms.py:130
 #, draft
-msgid "You already have a CV with that name."
-msgstr "Dir hutt schonn e CV mat deem Numm."
+msgid "You already have a CV or portfolio with that name."
+msgstr "Dir hutt scho e Liewenslaf oder e Portfolio mat deem Numm."
 
 #: src/postulo/applications/forms.py:356
 #, draft
@@ -10756,8 +10762,8 @@ msgid ""
 msgstr ""
 "Äre Browser mécht en Zougangsschlëssel nëmmen op enger Säit, déi iwwer HTTPS kënnt. Dës Installatioun gëtt iwwer einfachen HTTP erreecht, also kënnen hei keng Zougangsschlësselen ugebuede ginn. Dat ass d'Regel vum Browser an keng Astellung op dësem Server."
 
-#: src/postulo/templates/documents/cv_list.html:15
-#: src/postulo/templates/documents/cv_list.html:46
+#: src/postulo/templates/documents/cv_list.html:21
+#: src/postulo/templates/documents/cv_list.html:55
 #: src/postulo/templates/resume/overview.html:4
 #: src/postulo/templates/resume/overview.html:9
 #, draft
@@ -10868,12 +10874,12 @@ msgstr "Äre Numm dofir, wann keng vun den Zorten hei uewen passt."
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "Äre Numm dofir: „Telegram“, „Paperless doheem“."
 
-#: src/postulo/documents/models.py:101
+#: src/postulo/documents/models.py:130
 #, draft
 msgid "Your name, email and location, taken from your profile."
 msgstr "Äre Numm, Är E-Mail an Äre Uert, aus Ärem Profil geholl."
 
-#: src/postulo/documents/models.py:263
+#: src/postulo/documents/models.py:308
 #, draft
 msgid "Your own name"
 msgstr "Äre eegenen Numm"

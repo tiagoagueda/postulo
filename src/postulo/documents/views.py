@@ -86,7 +86,11 @@ class CVCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, Create
     template_name = "documents/cv_form.html"
 
     def form_valid(self, form):
-        messages.success(self.request, _("CV created. Now choose what goes on it."))
+        messages.success(
+            self.request,
+            _("%(kind)s created. Now choose what goes on it.")
+            % {"kind": form.instance.get_kind_display()},
+        )
         return super().form_valid(form)
 
 

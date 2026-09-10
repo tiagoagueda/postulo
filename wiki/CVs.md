@@ -1,6 +1,6 @@
-# CVs
+# CVs and portfolios
 
-**Documents → CVs**
+**Documents → CVs and portfolios**
 
 A CV in Postulo is a **variant**: a selection of entries from [your career
 record](Your-career-record), in an order you choose, with a theme.
@@ -8,10 +8,27 @@ record](Your-career-record), in an order you choose, with a theme.
 Make one variant per *kind* of role you apply for, not one per application. Three or four
 is normal. One per application means maintaining forty documents.
 
+## A CV, or a portfolio
+
+The same page holds both, because they are the same thing selected and laid out differently.
+
+- A **CV** is a career read backwards: what you did, where, and when, with the dates
+  carrying the argument.
+- A **portfolio** is the work first — projects, and the things they point at — with the
+  career following as context, set small.
+
+Choose which on the form. Everything else is identical: the same career record, the same
+tailoring, the same *included* switch, the same export. A portfolio picks from its own
+family of themes, because the difference is one of structure rather than of styling.
+
+**"Portfolios of different kinds"** — a developer's, a designer's, a researcher's — is
+answered by the theme and by what you select, not by a third setting. They differ in exactly
+those two things, and both are already yours to choose.
+
 ## Building one
 
-1. **New CV.** Give it a name for your own use — "Backend, English" — plus an optional
-   headline and opening summary.
+1. **New CV or portfolio.** Give it a name for your own use — "Backend, English" — plus an
+   optional headline and opening summary.
 2. **Add entries.** The panel on the CV page lists everything from your career record
    that is not already on this CV, grouped by kind. Tick what belongs and add it.
 3. **Order it.** The arrows move entries up and down. Sections appear in the order their
@@ -36,8 +53,11 @@ Two come with Postulo:
 - **Plain** — a clean sans-serif layout. Sober and unremarkable, which is usually right.
 - **Classic** — a serif layout with small caps and a centred contact block.
 
-Both are A4 with generous margins, and both avoid splitting a single job across a page
-break, and both set every kind of document Postulo writes.
+Both are A4 with generous margins, both avoid splitting a single job — or a single piece
+of work — across a page break, and both set every kind of document Postulo writes,
+portfolios included. A theme from a plugin only appears in the menu for the kinds it says it
+can set, so a theme that has never been taught to lay out a portfolio is simply not offered
+for one.
 
 **A plugin can add more.** The menu lists whatever is installed, and a theme from a plugin
 appears there under its own name with no further setting to change. A theme does not have

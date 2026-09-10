@@ -21,6 +21,26 @@ def other_user(db):
 
 
 @pytest.fixture(autouse=True)
+def _no_inherited_language():
+    """Every test starts in the instance's own language, whatever the last one left active.
+
+    `LocaleMiddleware` activates a language per request and nothing deactivates it
+    afterwards, so a test that signs in as somebody reading Postulo in Portuguese leaves
+    Portuguese active in the thread for every test that follows. It shows up as a test
+    asserting an English string and being handed a translated one -- passing alone, failing
+    in company, and failing differently depending on which tests ran before it, which is the
+    worst shape a failure can have.
+
+    Reset after rather than before, so a test that activates a language on purpose is left
+    alone while it runs and cleans up after itself either way.
+    """
+    from django.utils import translation
+
+    yield
+    translation.deactivate()
+
+
+@pytest.fixture(autouse=True)
 def _no_inherited_environment(monkeypatch):
     """No test inherits the developer's `.env`.
 

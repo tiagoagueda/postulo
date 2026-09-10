@@ -1,0 +1,53 @@
+{% extends "documents/themes/base_portfolio.html" %}
+
+{% block page_styles %}
+      body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 10pt;
+        line-height: 1.45;
+      }
+
+      @page { size: A4; margin: 18mm; }
+      * { box-sizing: border-box; }
+      body { margin: 0; color: #16181d; }
+      h1 { margin: 0 0 2px; font-size: 20pt; letter-spacing: -0.01em; }
+      p { margin: 0; }
+      ul { margin: 6px 0 0; padding-inline-start: 16px; }
+      li { margin-bottom: 3px; }
+      .headline { color: #4a4f5a; }
+      .details { margin-top: 6px; color: #4a4f5a; font-size: 8.5pt; }
+      .details span:not(:last-child)::after { content: " · "; }
+      .summary { margin: 14px 0; }
+      .block { margin-top: 16px; }
+      .block h2 { break-after: avoid; }
+      h2 {
+        font-size: 9pt;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+        border-bottom: 1px solid #e3e5e9;
+        padding-bottom: 3px;
+        margin: 0 0 8px;
+      }
+      /* The work is the argument, so a piece gets room and never splits across a page. */
+      .piece { margin-bottom: 14px; break-inside: avoid; }
+      .piece-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+      .piece-name { font-weight: 600; font-size: 11.5pt; }
+      .org { color: #4a4f5a; }
+      .dates { color: #6b7280; white-space: nowrap; font-variant-numeric: tabular-nums; }
+      .summary-line { margin-top: 4px; }
+      .where { margin-top: 4px; color: #6b7280; font-size: 8.5pt; word-break: break-all; }
+      .places { list-style: none; padding-inline-start: 0; }
+      .places li { margin-bottom: 6px; }
+      .places .piece-name { font-size: 10pt; }
+      .places .org, .places .where { display: block; }
+      /* The career is context here, so it is set small and tight. */
+      .background { list-style: none; padding-inline-start: 0; font-size: 9pt; }
+      .background li {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: baseline;
+      }
+      .background .piece-name { font-weight: 600; font-size: 9pt; }
+{% endblock %}

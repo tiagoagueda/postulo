@@ -31,7 +31,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel
 
-from . import themes
+from . import kinds, themes
 
 
 def upload_to_documents(instance, filename: str) -> str:
@@ -76,11 +76,40 @@ def renders_of(draft):
     ).order_by("-rendered_at", "pk")
 
 
+class CVKind(models.TextChoices):
+    """What sort of document this selection is, which decides its shape rather than its name.
+
+    A **CV** is a career read backwards: what you did, where, and when, with the dates
+    carrying the argument. A **portfolio** is the work first — projects and the things they
+    point at — with the career as context rather than as the spine.
+
+    One model rather than two, for the reason `CoverLetter` already holds four shapes: a
+    portfolio *is* a selection from the career record with its own layout, and it would use
+    every line of `CVItem`'s machinery unchanged. Two near-identical models would be two
+    forms, two lists, two exporters and two of every future change (#133).
+
+    And *of different kinds* -- a developer's portfolio, a designer's, a researcher's -- is
+    answered by the theme rather than by a third value here. They differ in what they select
+    and how they are laid out, and both of those are already somebody's to choose.
+    """
+
+    CV = "cv", _("CV")
+    PORTFOLIO = "portfolio", _("Portfolio")
+
+
+#: What each kind starts out set in. A portfolio leads with the work, so it gets the theme
+#: written for that; a CV keeps the one it has always had.
+CV_THEMES = {CVKind.CV: "plain", CVKind.PORTFOLIO: "plain"}
+
+
 class CV(OwnedModel):
     """A named selection of your career, aimed at a particular kind of role."""
 
     name = models.CharField(
         _("name"), max_length=120, help_text=_("For you, not for the employer: “Backend, English”.")
+    )
+    kind = models.CharField(
+        _("kind"), max_length=20, choices=CVKind, default=CVKind.CV, db_index=True
     )
     headline = models.CharField(_("headline"), max_length=200, blank=True)
     summary = models.TextField(
@@ -133,6 +162,22 @@ class CV(OwnedModel):
     def included_items(self):
         """The items that will actually be rendered, in order."""
         return self.items.filter(is_included=True).select_related("content_type")
+
+    @property
+    def document_kind(self) -> str:
+        """Which kind of document a render of this is filed as.
+
+        The same shape `CoverLetter` uses: the model's own vocabulary of shapes maps onto the
+        one a *file* is labelled with, rather than the two being kept in step by hand (#133).
+        """
+        return DocumentKind.PORTFOLIO if self.kind == CVKind.PORTFOLIO else DocumentKind.CV
+
+    @property
+    def theme_kind(self) -> str:
+        """Which theme vocabulary sets this. What the picker and the renderer both ask."""
+        from . import themes
+
+        return themes.Kind.PORTFOLIO if self.kind == CVKind.PORTFOLIO else themes.Kind.CV
 
 
 class CVItem(OwnedModel):
@@ -338,7 +383,14 @@ class UploadedDocument(OwnedModel):
     """
 
     title = models.CharField(_("title"), max_length=200)
-    kind = models.CharField(_("kind"), max_length=20, choices=DocumentKind, default=DocumentKind.CV)
+    #: The choices come from the registry rather than from the enumeration, so a kind a
+    #: plugin adds reaches this picker without a migration -- which is what makes "a kind is
+    #: a plugin" mean something. The *values* stay in `DocumentKind`, because a value in a
+    #: database column is stored, exported and read by the API, and is not a thing to
+    #: compute (#133).
+    kind = models.CharField(
+        _("kind"), max_length=20, choices=kinds.choices, default=DocumentKind.CV
+    )
     file = models.FileField(
         _("file"),
         upload_to=upload_to_documents,
@@ -369,6 +421,18 @@ class UploadedDocument(OwnedModel):
         object_id_field="document_id",
     )
 
+    #: What a store is told this is, and where to fetch it. Declared on the model rather
+    #: than asked with `isinstance` in `stores.py`, so a third thing that holds a file needs
+    #: no branch there at all -- which is what "stores keep working without knowing about
+    #: kinds" has to mean if it is to survive a fourth (#133).
+    archive_origin = "upload"
+    download_url_name = "documents:upload_download"
+
+    @property
+    def archived_at(self):
+        """When a store should say this document is from. See `archive_origin`."""
+        return self.created_at
+
     class Meta:
         verbose_name = _("uploaded document")
         verbose_name_plural = _("uploaded documents")
@@ -396,7 +460,10 @@ class RenderedDocument(OwnedModel):
     """
 
     title = models.CharField(_("title"), max_length=250)
-    kind = models.CharField(_("kind"), max_length=20, choices=DocumentKind, default=DocumentKind.CV)
+    #: From the registry, as an upload's is, and for the same reason (#133).
+    kind = models.CharField(
+        _("kind"), max_length=20, choices=kinds.choices, default=DocumentKind.CV
+    )
     file = models.FileField(_("file"), upload_to=upload_to_documents)
 
     application = models.ForeignKey(
@@ -445,6 +512,15 @@ class RenderedDocument(OwnedModel):
         content_type_field="document_type",
         object_id_field="document_id",
     )
+
+    #: See `UploadedDocument.archive_origin`. A render is dated by when it was rendered,
+    #: which is when the employer got it, not by when the row happened to be written.
+    archive_origin = "render"
+    download_url_name = "documents:rendered_download"
+
+    @property
+    def archived_at(self):
+        return self.rendered_at
 
     class Meta:
         verbose_name = _("sent document")

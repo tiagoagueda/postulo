@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:20+0000\n"
+"POT-Creation-Date: 2026-09-10 05:54+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: српски\n"
@@ -186,6 +186,11 @@ msgstr ""
 msgid "%(kilobytes)s on disk"
 msgstr "%(kilobytes)s на диску"
 
+#: src/postulo/documents/views.py:91
+#, python-format, draft
+msgid "%(kind)s created. Now choose what goes on it."
+msgstr "%(kind)s направљено. Сада одаберите шта иде у њега."
+
 #: src/postulo/applications/services.py:356
 #, python-format, draft
 msgid "%(kind)s held"
@@ -356,15 +361,11 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s би променио оно од чега сам Postulo зависи. %(problems)s"
 
-#: src/postulo/documents/rendering.py:295
+#: src/postulo/documents/rendering.py:279
+#: src/postulo/documents/rendering.py:304
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
-
-#: src/postulo/documents/rendering.py:275
-#, python-format, draft
-msgid "%(name)s — CV"
-msgstr "%(name)s — CV"
 
 #: src/postulo/templates/base.html:46
 #, python-format, draft
@@ -411,18 +412,18 @@ msgstr "%(role)s: нема датума почетка, па није додат
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s не означава ову врсту ствари."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:391
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d копија послато, %(failed)d није успело; сваки документ каже који."
 
-#: src/postulo/documents/views.py:393
+#: src/postulo/documents/views.py:397
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d копија послато."
 
-#: src/postulo/documents/themes.py:191
+#: src/postulo/documents/themes.py:193
 #, python-format, draft
 msgid "%(theme)s, from %(provider)s"
 msgstr "%(theme)s, од %(provider)s"
@@ -453,7 +454,7 @@ msgstr[0] "%(total)s компанија"
 msgstr[1] "%(total)s компаније"
 msgstr[2] "%(total)s компанија"
 
-#: src/postulo/templates/documents/cv_list.html:29
+#: src/postulo/templates/documents/cv_list.html:38
 #, python-format, draft
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
@@ -517,7 +518,7 @@ msgid ""
 msgstr ""
 "<strong>%(name)s</strong>: %(rows)s редова. Претпоставке испод долазе из имена заглавља; исправите их по потреби, па погледајте преглед пре увоза."
 
-#: src/postulo/documents/models.py:218
+#: src/postulo/documents/models.py:263
 #, draft
 msgid ""
 "[What you are applying for, and the one thing that makes you the person for it.]\n"
@@ -951,7 +952,7 @@ msgstr "Додај ознаку"
 msgid "Add all of this"
 msgstr "Додај све ово"
 
-#: src/postulo/templates/documents/cv_detail.html:127
+#: src/postulo/templates/documents/cv_detail.html:132
 #, draft
 msgid "Add entries"
 msgstr "Додај уносе"
@@ -971,10 +972,10 @@ msgstr "Додај један"
 msgid "Add the first one."
 msgstr "Додајте први."
 
-#: src/postulo/templates/documents/cv_detail.html:145
+#: src/postulo/templates/documents/cv_detail.html:150
 #, draft
-msgid "Add to CV"
-msgstr "Додај у CV"
+msgid "Add these"
+msgstr "Додај ове"
 
 #: src/postulo/templates/jobs/listing_form.html:53
 #, draft
@@ -996,7 +997,7 @@ msgstr "Додато"
 msgid "added"
 msgstr "додато"
 
-#: src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:135
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "Додато %(count)s уноса."
@@ -1250,7 +1251,7 @@ msgstr "Изглед"
 #: src/postulo/applications/models.py:424
 #: src/postulo/applications/models.py:519
 #: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:408 src/postulo/jobs/models.py:768
+#: src/postulo/documents/models.py:475 src/postulo/jobs/models.py:768
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1417,7 +1418,7 @@ msgstr "Пријави се: %(title)s"
 msgid "Apprenticeship"
 msgstr "Приправништво"
 
-#: src/postulo/documents/models.py:475
+#: src/postulo/documents/models.py:551
 #, draft
 msgid "Archived"
 msgstr "Архивирано"
@@ -1454,7 +1455,7 @@ msgstr "Процена или тест"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Мора се нудити бар један језик, иначе нико ништа не може да прочита."
 
-#: src/postulo/documents/models.py:517
+#: src/postulo/documents/models.py:593
 #, draft
 msgid "attempts"
 msgstr "покушаји"
@@ -1566,7 +1567,7 @@ msgstr "Биотехнологија"
 msgid "Board"
 msgstr "Табла"
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 #, draft
 msgid "body"
 msgstr "тело"
@@ -1777,7 +1778,7 @@ msgstr "Носи га пренос %(label)s, верзија %(version)s."
 msgid "Catalogues"
 msgstr "Каталози"
 
-#: src/postulo/documents/models.py:326
+#: src/postulo/documents/kinds.py:145 src/postulo/documents/models.py:371
 #, draft
 msgid "Certificate"
 msgstr "Сертификат"
@@ -1864,7 +1865,7 @@ msgstr "Провери све"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Проверено %(when)s: %(detail)s"
 
-#: src/postulo/documents/models.py:438
+#: src/postulo/documents/models.py:505
 #, draft
 msgid "checksum"
 msgstr "контролна сума"
@@ -1894,7 +1895,7 @@ msgstr "Прво одаберите пакет."
 msgid "Choose another file"
 msgstr "Одабери другу датотеку"
 
-#: src/postulo/documents/forms.py:268
+#: src/postulo/documents/forms.py:287
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Одаберите бар један документ за бележење."
@@ -1914,7 +1915,7 @@ msgstr "Прво одаберите на коју се пријаву ово о�
 msgid "City and country, as it should appear on a CV."
 msgstr "Град и држава, онако како треба да стоји на CV-ју."
 
-#: src/postulo/documents/themes.py:118
+#: src/postulo/documents/themes.py:120
 #, draft
 msgid "Classic"
 msgstr "Класично"
@@ -2132,7 +2133,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Повезано. Тестирајте да бисте били сигурни да ради."
 
-#: src/postulo/documents/models.py:496 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:572 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
@@ -2294,7 +2295,8 @@ msgstr "Држава"
 msgid "Country the number is in"
 msgstr "Држава којој број припада"
 
-#: src/postulo/documents/models.py:203 src/postulo/documents/models.py:324
+#: src/postulo/documents/kinds.py:134 src/postulo/documents/models.py:248
+#: src/postulo/documents/models.py:369
 #: src/postulo/templates/documents/letter_form.html:4
 #: src/postulo/templates/documents/letter_form.html:16
 #, draft
@@ -2352,8 +2354,9 @@ msgstr "валута"
 msgid "Custom"
 msgstr "Прилагођено"
 
-#: src/postulo/documents/forms.py:234 src/postulo/documents/models.py:105
-#: src/postulo/documents/models.py:146 src/postulo/documents/models.py:323
+#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:125
+#: src/postulo/documents/models.py:96 src/postulo/documents/models.py:134
+#: src/postulo/documents/models.py:191 src/postulo/documents/models.py:368
 #: src/postulo/documents/themes.py:71
 #: src/postulo/templates/documents/cv_form.html:4
 #: src/postulo/templates/documents/cv_form.html:8
@@ -2361,29 +2364,28 @@ msgstr "Прилагођено"
 msgid "CV"
 msgstr "CV"
 
-#: src/postulo/documents/views.py:89
-#, draft
-msgid "CV created. Now choose what goes on it."
-msgstr "CV направљен. Сада одаберите шта иде на њега."
-
-#: src/postulo/documents/models.py:166
+#: src/postulo/documents/models.py:211
 #, draft
 msgid "CV entries"
 msgstr "Уноси у CV"
 
-#: src/postulo/documents/models.py:165
+#: src/postulo/documents/models.py:210
 #, draft
 msgid "CV entry"
 msgstr "Унос у CV"
 
-#: src/postulo/core/search.py:391 src/postulo/documents/models.py:106
+#: src/postulo/core/search.py:391 src/postulo/documents/models.py:135
 #: src/postulo/templates/accounts/delete_account.html:23
 #: src/postulo/templates/core/export.html:21
-#: src/postulo/templates/documents/cv_list.html:4
-#: src/postulo/templates/documents/cv_list.html:9
 #, draft
 msgid "CVs"
 msgstr "CV-јеви"
+
+#: src/postulo/templates/documents/cv_list.html:4
+#: src/postulo/templates/documents/cv_list.html:15
+#, draft
+msgid "CVs and portfolios"
+msgstr "Биографије и портфолији"
 
 #: src/postulo/accounts/models.py:144
 #, draft
@@ -2489,7 +2491,7 @@ msgstr "рок"
 msgid "Deadline"
 msgstr "Рок"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:277
 #, draft
 msgid ""
 "Dear [name],\n"
@@ -2510,7 +2512,7 @@ msgstr ""
 "С поштовањем,\n"
 "{{ name }}"
 
-#: src/postulo/documents/models.py:212
+#: src/postulo/documents/models.py:257
 #, draft
 msgid ""
 "Dear {{ company }},\n"
@@ -2531,7 +2533,7 @@ msgstr ""
 "С поштовањем,\n"
 "{{ name }}"
 
-#: src/postulo/documents/models.py:226
+#: src/postulo/documents/models.py:271
 #, draft
 msgid ""
 "Dear {{ company }},\n"
@@ -2615,7 +2617,7 @@ msgstr "Одбрана"
 
 #: src/postulo/templates/applications/application_detail.html:42
 #: src/postulo/templates/applications/tag_list.html:32
-#: src/postulo/templates/documents/cv_detail.html:23
+#: src/postulo/templates/documents/cv_detail.html:24
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:58
@@ -2760,12 +2762,12 @@ msgstr "Уради ово"
 msgid "Document"
 msgstr "Документ"
 
-#: src/postulo/documents/models.py:527
+#: src/postulo/documents/models.py:603
 #, draft
 msgid "document copies"
 msgstr "копије документа"
 
-#: src/postulo/documents/models.py:526
+#: src/postulo/documents/models.py:602
 #, draft
 msgid "document copy"
 msgstr "копија документа"
@@ -2783,7 +2785,7 @@ msgstr "Складишта докумената"
 msgid "Documents"
 msgstr "Документи"
 
-#: src/postulo/documents/views.py:476
+#: src/postulo/documents/views.py:480
 #, draft
 msgid "Documents sent"
 msgstr "Послати документи"
@@ -2807,7 +2809,7 @@ msgstr "завршено"
 
 #: src/postulo/templates/documents/application_documents.html:35
 #: src/postulo/templates/documents/application_documents.html:75
-#: src/postulo/templates/documents/cv_detail.html:117
+#: src/postulo/templates/documents/cv_detail.html:122
 #: src/postulo/templates/documents/rendered_list.html:49
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
@@ -3108,7 +3110,7 @@ msgid ""
 msgstr ""
 "Свако радно место на којем сте били. Напишите истакнуто једном; прилагодите га за сваки CV касније."
 
-#: src/postulo/documents/views.py:396
+#: src/postulo/documents/views.py:400
 #, draft
 msgid "Every store already has this document."
 msgstr "Свако складиште већ има овај документ."
@@ -3158,10 +3160,10 @@ msgstr "Све што API нуди описано је на <code>%(url)s</code>
 msgid "Everything you have written"
 msgstr "Све што сте написали"
 
-#: src/postulo/templates/documents/cv_detail.html:149
+#: src/postulo/templates/documents/cv_detail.html:154
 #, draft
-msgid "Everything you have written is already on this CV."
-msgstr "Све што сте написали већ је на овом CV-ју."
+msgid "Everything you have written is already on it."
+msgstr "Све што сте написали већ је у њему."
 
 #: src/postulo/templates/applications/interview_list.html:12
 #, draft
@@ -3240,7 +3242,7 @@ msgstr ""
 msgid "Export everything"
 msgstr "Извези све"
 
-#: src/postulo/templates/documents/cv_detail.html:19
+#: src/postulo/templates/documents/cv_detail.html:20
 #, draft
 msgid "Export PDF"
 msgstr "Извези PDF"
@@ -3250,7 +3252,7 @@ msgstr "Извези PDF"
 msgid "Exported on its own"
 msgstr "Извезено засебно"
 
-#: src/postulo/documents/models.py:476
+#: src/postulo/documents/models.py:552
 #, draft
 msgid "Failed"
 msgstr "Није успело"
@@ -3312,12 +3314,12 @@ msgstr "област студија"
 msgid "Figures appear once you have applied for something."
 msgstr "Бројке се појављују чим се на нешто пријавите."
 
-#: src/postulo/documents/models.py:343 src/postulo/documents/models.py:400
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:467
 #, draft
 msgid "file"
 msgstr "датотека"
 
-#: src/postulo/documents/views.py:310
+#: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Датотека сачувана."
@@ -3345,7 +3347,7 @@ msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
 "Датотеке које сте већ имали, за разлику од докумената које је Postulo направио."
 
-#: src/postulo/documents/forms.py:239
+#: src/postulo/documents/forms.py:258
 #, draft
 msgid "Files you have already"
 msgstr "Датотеке које већ имате"
@@ -3408,12 +3410,12 @@ msgstr "Прва вредност"
 msgid "First, take everything with you"
 msgstr "Прво понесите све са собом"
 
-#: src/postulo/documents/forms.py:38
+#: src/postulo/documents/forms.py:39
 #, draft
 msgid "Follow your profile"
 msgstr "Прати ваш профил"
 
-#: src/postulo/documents/models.py:206
+#: src/postulo/documents/models.py:251
 #, draft
 msgid "Follow-up note"
 msgstr "Белешка о праћењу"
@@ -3444,7 +3446,7 @@ msgstr "За"
 msgid "For example, “BSc Computer Science”."
 msgstr "На пример, „BSc рачунарство“."
 
-#: src/postulo/documents/models.py:83
+#: src/postulo/documents/models.py:109
 #, draft
 msgid "For you, not for the employer: “Backend, English”."
 msgstr "За вас, не за послодавца: „Backend, енглески“."
@@ -3703,7 +3705,7 @@ msgstr "десило се"
 msgid "happened on"
 msgstr "десило се"
 
-#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:85
+#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:114
 #: src/postulo/resume/views.py:441
 #, draft
 msgid "headline"
@@ -3725,7 +3727,7 @@ msgstr "Провера здравља"
 msgid "Held"
 msgstr "Одржано"
 
-#: src/postulo/templates/documents/cv_detail.html:69
+#: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "hidden"
 msgstr "скривено"
@@ -3746,7 +3748,7 @@ msgstr "Висок"
 msgid "highlights"
 msgstr "истакнуто"
 
-#: src/postulo/documents/models.py:159
+#: src/postulo/documents/models.py:204
 #, draft
 msgid "highlights for this CV"
 msgstr "истакнуто за овај CV"
@@ -3862,7 +3864,7 @@ msgstr "Хибридно"
 msgid "I have already applied to this one"
 msgstr "Већ сам се пријавио на овај"
 
-#: src/postulo/documents/models.py:515
+#: src/postulo/documents/models.py:591
 #, draft
 msgid "id in the store"
 msgstr "идентификатор у складишту"
@@ -4013,12 +4015,12 @@ msgstr "у %(kind)s који сте послали компанији %(company)
 msgid "In the diary"
 msgstr "У дневнику"
 
-#: src/postulo/documents/models.py:99
+#: src/postulo/documents/models.py:128
 #, draft
 msgid "include contact details"
 msgstr "укључи контакт податке"
 
-#: src/postulo/documents/models.py:154
+#: src/postulo/documents/models.py:199
 #, draft
 msgid "included"
 msgstr "укључено"
@@ -4371,9 +4373,10 @@ msgstr ""
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:269
-#: src/postulo/documents/models.py:341 src/postulo/documents/models.py:399
-#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:243
+#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
+#: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
+#: src/postulo/resume/models.py:243
 #, draft
 msgid "kind"
 msgstr "врста"
@@ -4387,7 +4390,7 @@ msgstr "врста"
 msgid "Kind"
 msgstr "Врста"
 
-#: src/postulo/documents/models.py:506
+#: src/postulo/documents/models.py:582
 #, draft
 msgid "kind of document"
 msgstr "врста документа"
@@ -4397,7 +4400,7 @@ msgstr "врста документа"
 msgid "kind of entry"
 msgstr "врста уноса"
 
-#: src/postulo/documents/models.py:432
+#: src/postulo/documents/models.py:499
 #, draft
 msgid "kind of source"
 msgstr "врста извора"
@@ -4407,7 +4410,7 @@ msgstr "врста извора"
 msgid "Kinds of letter"
 msgstr "Врсте писама"
 
-#: src/postulo/documents/models.py:499 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:575 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "приказано име"
@@ -4418,8 +4421,8 @@ msgstr "приказано име"
 msgid "Language"
 msgstr "Језик"
 
-#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:91
-#: src/postulo/documents/models.py:285 src/postulo/resume/models.py:197
+#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:120
+#: src/postulo/documents/models.py:330 src/postulo/resume/models.py:197
 #: src/postulo/resume/models.py:203 src/postulo/resume/models.py:301
 #, draft
 msgid "language"
@@ -4491,7 +4494,7 @@ msgstr "Највећа прочитана страница"
 msgid "Last activity"
 msgstr "Последња активност"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "last attempt"
 msgstr "последњи покушај"
@@ -4506,7 +4509,7 @@ msgstr "последња провера"
 msgid "last checked"
 msgstr "последњи пут проверено"
 
-#: src/postulo/documents/models.py:523 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:599 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "последња грешка"
@@ -4603,12 +4606,12 @@ msgstr "Нека ме овај приступни кључ пријави сам
 msgid "Let {column} size itself"
 msgstr "Нека колона {column} сама одреди ширину"
 
-#: src/postulo/documents/forms.py:236 src/postulo/documents/themes.py:72
+#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Писмо"
 
-#: src/postulo/documents/models.py:294
+#: src/postulo/documents/models.py:339
 #, draft
 msgid "letter"
 msgstr "писмо"
@@ -4622,7 +4625,7 @@ msgstr "писмо"
 msgid "Letters"
 msgstr "Писма"
 
-#: src/postulo/documents/models.py:295
+#: src/postulo/documents/models.py:340
 #, draft
 msgid "letters"
 msgstr "писма"
@@ -4658,7 +4661,7 @@ msgstr "веза"
 msgid "Link"
 msgstr "Веза"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:592
 #, draft
 msgid "link in the store"
 msgstr "веза у складишту"
@@ -4695,7 +4698,7 @@ msgid ""
 msgstr ""
 "Везе на места на која се потрага за послом враћа: табла, CV-јеви, компаније."
 
-#: src/postulo/documents/forms.py:245
+#: src/postulo/documents/forms.py:264
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -4999,7 +5002,7 @@ msgstr "Споји у"
 msgid "Merged."
 msgstr "Спојено."
 
-#: src/postulo/documents/models.py:176
+#: src/postulo/documents/models.py:221
 #, draft
 msgid "Missing entry"
 msgstr "Недостаје унос"
@@ -5043,7 +5046,8 @@ msgid ""
 msgstr ""
 "Већина људи прати потрагу за послом у табели док то не почне да смета. Донесите је овамо уместо да све поново куцате: један CSV, било које колоне, заглавља на било ком језику. Видећете како се свака колона чита пре него што се ишта сачува."
 
-#: src/postulo/documents/models.py:204 src/postulo/documents/models.py:325
+#: src/postulo/documents/kinds.py:140 src/postulo/documents/models.py:249
+#: src/postulo/documents/models.py:370
 #, draft
 msgid "Motivation letter"
 msgstr "Писмо мотивације"
@@ -5083,7 +5087,7 @@ msgstr "Помери %(name)s једно место касније"
 msgid "Move %(name)s up a row"
 msgstr "Помери %(name)s један ред горе"
 
-#: src/postulo/templates/documents/cv_detail.html:81
+#: src/postulo/templates/documents/cv_detail.html:86
 #: src/postulo/templates/resume/overview.html:112
 #, draft
 msgid "Move down"
@@ -5099,7 +5103,7 @@ msgstr "Помери даље"
 msgid "Move to status"
 msgstr "Премести у статус"
 
-#: src/postulo/templates/documents/cv_detail.html:76
+#: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:107
 #, draft
 msgid "Move up"
@@ -5112,8 +5116,8 @@ msgid "NACE division"
 msgstr "област NACE"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:83
-#: src/postulo/documents/models.py:267 src/postulo/jobs/models.py:41
+#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
 #: src/postulo/plugins/models.py:48 src/postulo/resume/models.py:116
@@ -5181,11 +5185,11 @@ msgstr "Ново"
 msgid "New accounts"
 msgstr "Нови налози"
 
-#: src/postulo/templates/documents/cv_list.html:16
-#: src/postulo/templates/documents/cv_list.html:47
+#: src/postulo/templates/documents/cv_list.html:22
+#: src/postulo/templates/documents/cv_list.html:56
 #, draft
-msgid "New CV"
-msgstr "Нови CV"
+msgid "New CV or portfolio"
+msgstr "Нова биографија или портфолио"
 
 #: src/postulo/templates/jobs/industry_list.html:16
 #, draft
@@ -5243,7 +5247,7 @@ msgstr "Најновија резервна копија"
 msgid "Next"
 msgstr "Напред"
 
-#: src/postulo/documents/models.py:519
+#: src/postulo/documents/models.py:595
 #, draft
 msgid "next attempt"
 msgstr "следећи покушај"
@@ -5311,12 +5315,7 @@ msgstr "Нема везе: %(why)s"
 msgid "No connections yet"
 msgstr "Још нема веза"
 
-#: src/postulo/templates/documents/cv_list.html:41
-#, draft
-msgid "No CVs yet"
-msgstr "Још нема CV-јева"
-
-#: src/postulo/documents/views.py:378
+#: src/postulo/documents/views.py:382
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5422,12 +5421,12 @@ msgstr "Још нема предлога"
 msgid "No tags yet."
 msgstr "Још нема ознака."
 
-#: src/postulo/documents/themes.py:249
+#: src/postulo/documents/themes.py:251
 #, python-format, draft
 msgid "No theme called “%(theme)s” is installed."
 msgstr "Није инсталирана ниједна тема под називом „%(theme)s”."
 
-#: src/postulo/documents/themes.py:224
+#: src/postulo/documents/themes.py:226
 #, draft
 msgid "No theme is installed that can set this document."
 msgstr "Није инсталирана ниједна тема која може да обликује овај документ."
@@ -5523,7 +5522,7 @@ msgstr "Нормално"
 msgid "Not %(name)s"
 msgstr "Не %(name)s"
 
-#: src/postulo/documents/models.py:477
+#: src/postulo/documents/models.py:553
 #, draft
 msgid "Not accepted"
 msgstr "Није прихваћено"
@@ -5619,7 +5618,7 @@ msgstr "Није приказано · %(name)s"
 msgid "not tested yet"
 msgstr "још није тестирано"
 
-#: src/postulo/templates/documents/cv_detail.html:34
+#: src/postulo/templates/documents/cv_detail.html:35
 #, python-format, draft
 msgid "Not yet written in %(tongue)s. These print as they stand:"
 msgstr "Још није написано на %(tongue)s. Ови се штампају онакви какви јесу:"
@@ -5656,7 +5655,7 @@ msgstr "забележено"
 msgid "Notes"
 msgstr "Белешке"
 
-#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:150
+#: src/postulo/documents/models.py:403 src/postulo/jobs/models.py:150
 #: src/postulo/jobs/models.py:433
 #, draft
 msgid "notes"
@@ -5697,6 +5696,7 @@ msgstr ""
 "Овде се ништа не подудара с тим. На овој страници су само области које сте заиста користили."
 
 #: src/postulo/templates/applications/application_list.html:48
+#: src/postulo/templates/documents/cv_list.html:50
 #, draft
 msgid "Nothing here yet"
 msgstr "Овде још нема ничега"
@@ -5774,15 +5774,15 @@ msgstr "Ништа не одговара упиту „%(term)s“"
 msgid "Nothing on %(host)s could be used as a logo."
 msgstr "Ништа на %(host)s није могло да се искористи као лого."
 
+#: src/postulo/templates/documents/cv_detail.html:101
+#, draft
+msgid "Nothing on it yet. Choose some entries below."
+msgstr "У њему још нема ничега. Одаберите испод неколико уноса."
+
 #: src/postulo/templates/connections/confirm_delete.html:13
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Ништа на другој услузи се не дира. Можете поново да се повежете касније."
-
-#: src/postulo/templates/documents/cv_detail.html:96
-#, draft
-msgid "Nothing on this CV yet. Choose some entries below."
-msgstr "Још ништа на овом CV-ју. Одаберите неколико уноса испод."
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -5873,7 +5873,7 @@ msgstr "Још ништа није отпремљено."
 msgid "Nothing waiting"
 msgstr "Ништа не чека"
 
-#: src/postulo/documents/views.py:115 src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:119 src/postulo/documents/views.py:135
 #, draft
 msgid "Nothing was added."
 msgstr "Ништа није додато."
@@ -6149,11 +6149,12 @@ msgid ""
 "One that has already happened is recorded straight onto the timeline as held."
 msgstr "Онај који се већ десио бележи се одмах на временску линију као одржан."
 
-#: src/postulo/templates/documents/cv_list.html:11
+#: src/postulo/templates/documents/cv_list.html:17
 #, draft
-msgid "One variant per kind of role. Each selects from your career record."
+msgid ""
+"One variant per kind of role. Each selects from your career record; a portfolio leads with the work."
 msgstr ""
-"Једна варијанта по врсти радног места. Свака бира из вашег каријерног записа."
+"Једна верзија по врсти посла. Свака бира из вашег пута; портфолио почиње радом."
 
 #: src/postulo/templates/accounts/delete_account.html:37
 #, draft
@@ -6167,10 +6168,10 @@ msgstr ""
 msgid "Only %(name)s"
 msgstr "Само %(name)s"
 
-#: src/postulo/templates/documents/cv_detail.html:129
+#: src/postulo/templates/documents/cv_detail.html:134
 #, draft
-msgid "Only entries not already on this CV are listed."
-msgstr "Наведени су само уноси којих још нема на овом CV-ју."
+msgid "Only entries not already on it are listed."
+msgstr "Наведени су само уноси којих још нема у њему."
 
 #: src/postulo/plugins/fetching.py:121
 #, draft
@@ -6231,7 +6232,7 @@ msgstr "Или отпремите један"
 msgid "ORCID"
 msgstr "ORCID"
 
-#: src/postulo/documents/models.py:152 src/postulo/resume/models.py:35
+#: src/postulo/documents/models.py:197 src/postulo/resume/models.py:35
 #, draft
 msgid "order"
 msgstr "редослед"
@@ -6254,8 +6255,9 @@ msgstr "Изворни оглас"
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
 #: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/models.py:329
-#: src/postulo/jobs/models.py:492 src/postulo/resume/models.py:219
+#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
+#: src/postulo/resume/models.py:219
 #, draft
 msgid "Other"
 msgstr "Остало"
@@ -6400,7 +6402,7 @@ msgstr ""
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr "Налепите текст. Огласи нестају са веба; ваша копија неће."
 
-#: src/postulo/documents/views.py:189
+#: src/postulo/documents/views.py:193
 #, draft
 msgid "PDF created."
 msgstr "PDF направљен."
@@ -6517,12 +6519,12 @@ msgstr "слика"
 msgid "Placeholders"
 msgstr "Резервисана места"
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 #, draft
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr "Резервисана места попут {{ company }} попуњавају се при слању."
 
-#: src/postulo/documents/themes.py:117
+#: src/postulo/documents/themes.py:119
 #, draft
 msgid "Plain"
 msgstr "Једноставно"
@@ -6622,7 +6624,9 @@ msgid ""
 msgstr ""
 "Порт 465 очекује TLS од првог бајта, па чека сертификат док Postulo чека поздрав. Изаберите „TLS од првог бајта“ или користите порт 587 са STARTTLS."
 
-#: src/postulo/documents/models.py:327 src/postulo/resume/models.py:213
+#: src/postulo/documents/kinds.py:128 src/postulo/documents/models.py:97
+#: src/postulo/documents/models.py:372 src/postulo/documents/themes.py:72
+#: src/postulo/resume/models.py:213
 #, draft
 msgid "Portfolio"
 msgstr "Портфолио"
@@ -6795,6 +6799,7 @@ msgid "preparation notes"
 msgstr "белешке за припрему"
 
 #: src/postulo/templates/documents/themes/base_cv.html:98
+#: src/postulo/templates/documents/themes/base_portfolio.html:67
 #: src/postulo/templates/resume/preview.html:28
 #, draft
 msgid "present"
@@ -6807,7 +6812,7 @@ msgid ""
 msgstr ""
 "Притисните Провери ажурирања да бисте преузели оно што каталози нуде. Postulo их не преузима сам."
 
-#: src/postulo/templates/documents/cv_detail.html:16
+#: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
 #, draft
@@ -7161,7 +7166,7 @@ msgstr "забележио"
 msgid "recorded on"
 msgstr "забележено"
 
-#: src/postulo/documents/views.py:479
+#: src/postulo/documents/views.py:483
 #, draft
 msgid "Recorded what you sent."
 msgstr "Забележено шта сте послали."
@@ -7197,7 +7202,7 @@ msgstr "Регрутер"
 msgid "Redirects followed"
 msgstr "Праћених преусмерења"
 
-#: src/postulo/documents/models.py:328
+#: src/postulo/documents/kinds.py:146 src/postulo/documents/models.py:373
 #, draft
 msgid "Reference"
 msgstr "Препорука"
@@ -7309,7 +7314,7 @@ msgstr "удаљена адреса"
 #: src/postulo/templates/accounts/profile.html:139
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
-#: src/postulo/templates/documents/cv_detail.html:87
+#: src/postulo/templates/documents/cv_detail.html:92
 #: src/postulo/templates/jobs/company_form.html:80
 #: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/partials/postal_addresses.html:79
@@ -7349,17 +7354,17 @@ msgstr "Уклони {label}"
 msgid "removed on the other side"
 msgstr "уклоњено са друге стране"
 
-#: src/postulo/documents/models.py:439
+#: src/postulo/documents/models.py:506
 #, draft
 msgid "rendered on"
 msgstr "направљено"
 
-#: src/postulo/documents/models.py:360
+#: src/postulo/documents/models.py:412
 #, draft
 msgid "replaces"
 msgstr "замењује"
 
-#: src/postulo/documents/models.py:161
+#: src/postulo/documents/models.py:206
 #, draft
 msgid "Replaces the master highlights on this variant only. One per line."
 msgstr "Замењује главне истакнуте ставке само на овој варијанти. Једна по реду."
@@ -7408,7 +7413,7 @@ msgstr "Биографија"
 msgid "Retail"
 msgstr "Малопродаја"
 
-#: src/postulo/documents/models.py:276
+#: src/postulo/documents/models.py:321
 #, draft
 msgid "reusable template"
 msgstr "шаблон за вишекратну употребу"
@@ -7791,12 +7796,12 @@ msgstr "Слање није успело: %(error)s"
 msgid "Sent"
 msgstr "Послато"
 
-#: src/postulo/documents/models.py:450
+#: src/postulo/documents/models.py:526
 #, draft
 msgid "sent document"
 msgstr "послат документ"
 
-#: src/postulo/documents/models.py:451
+#: src/postulo/documents/models.py:527
 #, draft
 msgid "sent documents"
 msgstr "послати документи"
@@ -7809,7 +7814,7 @@ msgstr "послати документи"
 msgid "Sent documents"
 msgstr "Послати документи"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:598
 #, draft
 msgid "sent on"
 msgstr "послато"
@@ -7900,7 +7905,7 @@ msgstr "Поставите када место више није доступн�
 
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:108 src/postulo/templates/core/export.html:4
-#: src/postulo/templates/documents/cv_detail.html:21
+#: src/postulo/templates/documents/cv_detail.html:22
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -8193,7 +8198,7 @@ msgstr "Инсталирани извори"
 msgid "speaking"
 msgstr "говор"
 
-#: src/postulo/documents/models.py:205
+#: src/postulo/documents/models.py:250
 #, draft
 msgid "Speculative letter"
 msgstr "Иницијативно писмо"
@@ -8261,7 +8266,7 @@ msgid "Status"
 msgstr "Статус"
 
 #: src/postulo/applications/models.py:198
-#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:513
+#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:589
 #: src/postulo/jobs/models.py:751
 #, draft
 msgid "status"
@@ -8317,7 +8322,7 @@ msgstr "Онемогући је"
 msgid "Stop sorting by %(column)s"
 msgstr "Престани да сортираш по %(column)s"
 
-#: src/postulo/documents/models.py:498
+#: src/postulo/documents/models.py:574
 #, draft
 msgid "store"
 msgstr "складиште"
@@ -8332,7 +8337,7 @@ msgstr "Похрањено; оставите празно да задржите 
 msgid "Strong"
 msgstr "Јака"
 
-#: src/postulo/documents/models.py:271
+#: src/postulo/documents/models.py:316
 #, draft
 msgid "subject"
 msgstr "тема"
@@ -8363,7 +8368,7 @@ msgstr "предлози"
 msgid "Suggestions"
 msgstr "Предлози"
 
-#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:87
+#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:116
 #: src/postulo/resume/models.py:72 src/postulo/resume/models.py:155
 #, draft
 msgid "summary"
@@ -8374,7 +8379,7 @@ msgstr "сажетак"
 msgid "superseded"
 msgstr "замењено"
 
-#: src/postulo/documents/forms.py:209
+#: src/postulo/documents/forms.py:228
 #, draft
 msgid "Supersedes"
 msgstr "Замењује"
@@ -8496,7 +8501,7 @@ msgstr "Ознаке"
 msgid "tags"
 msgstr "ознаке"
 
-#: src/postulo/templates/documents/cv_detail.html:84
+#: src/postulo/templates/documents/cv_detail.html:89
 #, draft
 msgid "Tailor"
 msgstr "Прилагоди"
@@ -8507,10 +8512,10 @@ msgstr "Прилагоди"
 msgid "Tailor this entry"
 msgstr "Прилагоди овај унос"
 
-#: src/postulo/templates/documents/cv_detail.html:67
+#: src/postulo/templates/documents/cv_detail.html:72
 #, draft
-msgid "tailored for this CV"
-msgstr "прилагођено овом CV-ју"
+msgid "tailored for this one"
+msgstr "прилагођено за овај"
 
 #: src/postulo/templates/settings/dashboard.html:57
 #, python-format, draft
@@ -8553,7 +8558,7 @@ msgstr "Телефонски бројеви"
 msgid "Template"
 msgstr "Шаблон"
 
-#: src/postulo/documents/models.py:278
+#: src/postulo/documents/models.py:323
 #, draft
 msgid "Templates appear when you send a letter with an application."
 msgstr "Шаблони се појављују када писмо пошаљете уз пријаву."
@@ -8578,7 +8583,7 @@ msgstr "Тестирај везу"
 msgid "text"
 msgstr "текст"
 
-#: src/postulo/documents/models.py:437
+#: src/postulo/documents/models.py:504
 #, draft
 msgid "text as sent"
 msgstr "текст какав је послат"
@@ -8690,7 +8695,7 @@ msgstr "Та датотека је празна."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Та датотека је већа од %(limit)s MB, па није прочитана."
 
-#: src/postulo/documents/forms.py:215
+#: src/postulo/documents/forms.py:234
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Та датотека је већа од %(limit)s MB."
@@ -8887,7 +8892,7 @@ msgstr ""
 msgid "The %(plugin)s plugin is not installed."
 msgstr "Додатак %(plugin)s није инсталиран."
 
-#: src/postulo/documents/themes.py:227 src/postulo/documents/themes.py:255
+#: src/postulo/documents/themes.py:229 src/postulo/documents/themes.py:257
 #, python-format, draft
 msgid "The %(theme)s theme does not set this kind of document."
 msgstr "Тема %(theme)s не обликује ову врсту документа."
@@ -8944,7 +8949,7 @@ msgstr ""
 msgid "The company this one belongs to, if it belongs to one."
 msgstr "Компанија којој ова припада, ако припада некој."
 
-#: src/postulo/documents/models.py:260
+#: src/postulo/documents/models.py:305
 #, draft
 msgid "The company you are applying to"
 msgstr "Компанија којој се пријављујете"
@@ -8954,7 +8959,7 @@ msgstr "Компанија којој се пријављујете"
 msgid "The connection is gone or switched off."
 msgstr "Веза је нестала или је искључена."
 
-#: src/postulo/documents/views.py:383
+#: src/postulo/documents/views.py:387
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "Копија није могла да се пошаље; документ каже зашто."
@@ -8978,7 +8983,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "Преузето је далеко веће него што додатак треба да буде."
 
-#: src/postulo/documents/models.py:361
+#: src/postulo/documents/models.py:413
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Ранија верзија коју ова замењује. Стара датотека се чува."
@@ -9035,7 +9040,7 @@ msgstr "Инсталатер није могао да се покрене: %(err
 msgid "The installer refused it: %(error)s"
 msgstr "Инсталатер га је одбио: %(error)s"
 
-#: src/postulo/documents/models.py:261
+#: src/postulo/documents/models.py:306
 #, draft
 msgid "The job title"
 msgstr "Назив посла"
@@ -9148,7 +9153,7 @@ msgstr "Следећи"
 msgid "The one before"
 msgstr "Претходни"
 
-#: src/postulo/documents/models.py:87
+#: src/postulo/documents/models.py:116
 #, draft
 msgid "The opening paragraph, if you use one."
 msgstr "Уводни пасус, ако га користите."
@@ -9578,7 +9583,7 @@ msgstr "Истек времена"
 msgid "timeout in seconds"
 msgstr "истек времена у секундама"
 
-#: src/postulo/documents/models.py:340 src/postulo/documents/models.py:398
+#: src/postulo/documents/models.py:385 src/postulo/documents/models.py:462
 #: src/postulo/jobs/models.py:563 src/postulo/resume/models.py:241
 #, draft
 msgid "title"
@@ -9619,7 +9624,7 @@ msgstr "За предају огласа (тражи опсег captures):"
 msgid "to status"
 msgstr "у статус"
 
-#: src/postulo/documents/models.py:264
+#: src/postulo/documents/models.py:309
 #, draft
 msgid "Today's date"
 msgstr "Данашњи датум"
@@ -9751,7 +9756,7 @@ msgstr "Упишите своју адресу, %(email)s, за потврду"
 msgid "Unavailable — not offered at all"
 msgstr "Недоступно — уопште се не нуди"
 
-#: src/postulo/documents/models.py:156
+#: src/postulo/documents/models.py:201
 #, draft
 msgid "Uncheck to keep the entry on this variant but leave it off the page."
 msgstr ""
@@ -9827,12 +9832,12 @@ msgstr "Отпремите и повежите колоне"
 msgid "Uploaded"
 msgstr "Отпремљено"
 
-#: src/postulo/documents/models.py:373
+#: src/postulo/documents/models.py:437
 #, draft
 msgid "uploaded document"
 msgstr "отпремљен документ"
 
-#: src/postulo/documents/models.py:374
+#: src/postulo/documents/models.py:438
 #, draft
 msgid "uploaded documents"
 msgstr "отпремљени документи"
@@ -9951,7 +9956,7 @@ msgstr "потврђен"
 msgid "Verified"
 msgstr "Потврђено"
 
-#: src/postulo/documents/models.py:353
+#: src/postulo/documents/models.py:405
 #: src/postulo/templates/documents/upload_list.html:27
 #, draft
 msgid "version"
@@ -9967,7 +9972,7 @@ msgstr "Верзија"
 msgid "version tag"
 msgstr "ознака верзије"
 
-#: src/postulo/templates/documents/cv_detail.html:101
+#: src/postulo/templates/documents/cv_detail.html:106
 #, draft
 msgid "Versions you have sent"
 msgstr "Верзије које сте послали"
@@ -10007,7 +10012,7 @@ msgstr "Чека одговор"
 msgid "Waiting only"
 msgstr "Само које чекају одговор"
 
-#: src/postulo/documents/models.py:474
+#: src/postulo/documents/models.py:550
 #, draft
 msgid "Waiting to be sent"
 msgstr "Чека слање"
@@ -10156,10 +10161,10 @@ msgstr "Шта је у дневнику, најскорије прво. Зака
 msgid "What is in the file"
 msgstr "Шта је у датотеци"
 
-#: src/postulo/templates/documents/cv_detail.html:56
-#, draft
-msgid "What is on this CV"
-msgstr "Шта је на овом CV-ју"
+#: src/postulo/templates/documents/cv_detail.html:58
+#, python-format, draft
+msgid "What is on this %(kind)s"
+msgstr "Шта је у овом: %(kind)s"
 
 #: src/postulo/templates/settings/plugins.html:7
 #, draft
@@ -10331,7 +10336,7 @@ msgid ""
 msgstr ""
 "Где додаци који раде за вас налазе своје услуге и како се пријављују. Тајне се чувају шифроване и никада се више не приказују."
 
-#: src/postulo/documents/models.py:262
+#: src/postulo/documents/models.py:307
 #, draft
 msgid "Where the role is based"
 msgstr "Где се радно место налази"
@@ -10403,14 +10408,14 @@ msgstr "Која колона је која?"
 msgid "Which device or tool this is for."
 msgstr "За који уређај или алат је ово."
 
-#: src/postulo/documents/models.py:288
+#: src/postulo/documents/models.py:333
 #, draft
 msgid ""
 "Which language this letter is written in. Leave blank to follow your profile."
 msgstr ""
 "На ком језику је ово писмо написано. Оставите празно да бисте пратили свој профил."
 
-#: src/postulo/documents/models.py:94
+#: src/postulo/documents/models.py:123
 #, draft
 msgid ""
 "Which language this variant is written in. Leave blank to follow your profile."
@@ -10540,12 +10545,12 @@ msgstr "померило би то у %(status)s"
 msgid "Write one well, then let placeholders do the rest."
 msgstr "Напишите једно добро, а остало нека ураде резервисана места."
 
-#: src/postulo/templates/documents/cv_detail.html:151
+#: src/postulo/templates/documents/cv_detail.html:156
 #, draft
 msgid "Write some more."
 msgstr "Напишите још мало."
 
-#: src/postulo/templates/documents/cv_list.html:43
+#: src/postulo/templates/documents/cv_list.html:52
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Прво запишите своју каријеру, па из ње градите варијанте."
@@ -10609,10 +10614,10 @@ msgstr ""
 msgid "You already have a company with that name."
 msgstr "Већ имате компанију с тим именом."
 
-#: src/postulo/documents/forms.py:111
+#: src/postulo/documents/forms.py:130
 #, draft
-msgid "You already have a CV with that name."
-msgstr "Већ имате CV с тим именом."
+msgid "You already have a CV or portfolio with that name."
+msgstr "Већ имате биографију или портфолио с тим називом."
 
 #: src/postulo/applications/forms.py:356
 #, draft
@@ -10752,8 +10757,8 @@ msgid ""
 msgstr ""
 "Ваш прегледач ће направити приступни кључ само на страници послуженој преко HTTPS-а. До ове инсталације долази се обичним HTTP-ом, па приступни кључеви овде не могу да се понуде. То је правило прегледача, а не подешавање на овом серверу."
 
-#: src/postulo/templates/documents/cv_list.html:15
-#: src/postulo/templates/documents/cv_list.html:46
+#: src/postulo/templates/documents/cv_list.html:21
+#: src/postulo/templates/documents/cv_list.html:55
 #: src/postulo/templates/resume/overview.html:4
 #: src/postulo/templates/resume/overview.html:9
 #, draft
@@ -10863,12 +10868,12 @@ msgstr "Ваш сопствени назив за њега, кад ниједн�
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "Ваше име за њега: „Telegram“, „Paperless код куће“."
 
-#: src/postulo/documents/models.py:101
+#: src/postulo/documents/models.py:130
 #, draft
 msgid "Your name, email and location, taken from your profile."
 msgstr "Ваше име, е-пошта и локација, преузети из вашег профила."
 
-#: src/postulo/documents/models.py:263
+#: src/postulo/documents/models.py:308
 #, draft
 msgid "Your own name"
 msgstr "Ваше сопствено име"

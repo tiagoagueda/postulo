@@ -69,6 +69,7 @@ class Kind(models.TextChoices):
     """
 
     CV = "cv", _("CV")
+    PORTFOLIO = "portfolio", _("Portfolio")
     LETTER = "letter", _("Letter")
 
 
@@ -107,6 +108,7 @@ def _shipped(name: str, label) -> Theme:
         label=label,
         templates={
             Kind.CV: f"documents/themes/{name}/cv.html",
+            Kind.PORTFOLIO: f"documents/themes/{name}/portfolio.html",
             Kind.LETTER: f"documents/themes/{name}/letter.html",
         },
     )

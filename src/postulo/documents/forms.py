@@ -17,6 +17,7 @@ from .models import (
     LETTER_THEMES,
     CoverLetter,
     CVItem,
+    CVKind,
     LetterKind,
     UploadedDocument,
 )
@@ -93,12 +94,30 @@ class ThemeChoiceMixin:
 
 
 class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
-    theme_kind = themes.Kind.CV
-
     class Meta:
         model = CV
-        fields = ("name", "headline", "summary", "theme", "language", "show_contact_details")
+        fields = (
+            "name",
+            "kind",
+            "headline",
+            "summary",
+            "theme",
+            "language",
+            "show_contact_details",
+        )
         widgets = {"summary": forms.Textarea(attrs={"rows": 4})}
+
+    @property
+    def theme_kind(self) -> str:
+        """Which themes to offer: the ones that set whatever this is.
+
+        A property rather than the class attribute it used to be, because one form now
+        covers two shapes -- and a portfolio offered a theme that only knows how to set a CV
+        is exactly the pair #132 exists to keep out of the menu (#133).
+        """
+        raw = self.data.get(self.add_prefix("kind")) if self.is_bound else None
+        kind = raw or getattr(self.instance, "kind", "") or CVKind.CV
+        return themes.Kind.PORTFOLIO if kind == CVKind.PORTFOLIO else themes.Kind.CV
 
     def clean_name(self) -> str:
         name = self.cleaned_data["name"].strip()
@@ -108,7 +127,7 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
         if self.instance.pk:
             clash = clash.exclude(pk=self.instance.pk)
         if clash.exists():
-            raise forms.ValidationError(_("You already have a CV with that name."))
+            raise forms.ValidationError(_("You already have a CV or portfolio with that name."))
         return name
 
 

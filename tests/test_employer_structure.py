@@ -395,7 +395,7 @@ def test_the_archive_carries_the_attachment_and_restores_it(user, other_user):
 
     archive = zipfile.ZipFile(export_module.write_archive(user))
     document = json.loads(archive.read(export_module.MANIFEST_NAME))
-    assert document["postulo"]["format"] == 13
+    assert document["postulo"]["format"] >= 13, "the format that added this, or later"
     importer.load(other_user, archive)
 
     restored = Application.objects.for_user(other_user).get()

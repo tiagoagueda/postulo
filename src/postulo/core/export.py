@@ -34,8 +34,9 @@ from postulo import __version__
 #: ``source_kind`` and a ``source_ref``, so that a new kind of document is not a new
 #: column (#130). The importer still reads every earlier format, filling the new fields in.
 #: 13 added ``department`` and ``department_company`` on an application, naming which
-#: part of an employer the attempt was aimed at (#138).
-FORMAT_VERSION = 13
+#: part of an employer the attempt was aimed at (#138); 14 added ``kind`` on a CV, which
+#: is what tells a portfolio from a CV (#133).
+FORMAT_VERSION = 14
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -162,7 +163,19 @@ INTERVIEW_FIELDS = (
     "reminder_id",
     "created_at",
 )
-CV_FIELDS = ("id", "name", "headline", "summary", "theme", "language", "show_contact_details")
+CV_FIELDS = (
+    "id",
+    "name",
+    # A CV or a portfolio: the same model and the same machinery, told apart by this (#133).
+    # Written by name, so an archive from before format 14 restores as a CV, which is what
+    # every one of them was.
+    "kind",
+    "headline",
+    "summary",
+    "theme",
+    "language",
+    "show_contact_details",
+)
 LETTER_FIELDS = ("id", "name", "kind", "subject", "body", "theme", "is_template", "language")
 UPLOAD_FIELDS = ("id", "title", "kind", "notes", "version", "replaces_id", "created_at")
 SENT_FIELDS = (
@@ -477,10 +490,7 @@ def build_document(user) -> dict:
     # --------------------------------------------------------------- documents
     document["documents"]["cvs"] = [
         {
-            **_fields(
-                cv,
-                ("id", "name", "headline", "summary", "theme", "language", "show_contact_details"),
-            ),
+            **_fields(cv, CV_FIELDS),
             "entries": [
                 {
                     "kind": item.content_type.model,

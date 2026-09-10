@@ -28,13 +28,20 @@ from django.urls import reverse
 
 from postulo.plugins.api import DocumentMetadata, FieldSpec
 
-from .models import DocumentKind, RenderedDocument, UploadedDocument
+from . import kinds
+from .models import RenderedDocument, UploadedDocument
 
 
 def download_path(document) -> str:
-    if isinstance(document, RenderedDocument):
-        return reverse("documents:rendered_download", args=[document.pk]) if document.pk else ""
-    return reverse("documents:upload_download", args=[document.pk]) if document.pk else ""
+    """Where this document can be fetched from, asked of the document itself.
+
+    It used to be an `isinstance` against the two models that hold a file. A third one --
+    and a report, a portfolio rendered elsewhere or anything a plugin brings would be a
+    third -- would have needed a branch here, in a module whose whole point is that a store
+    never learns what kinds of document exist (#133).
+    """
+    name = getattr(document, "download_url_name", "")
+    return reverse(name, args=[document.pk]) if name and document.pk else ""
 
 
 # ---------------------------------------------------------------------- metadata
@@ -44,7 +51,7 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
     """Describe a render or an upload for a store."""
     from postulo.notifications.base import absolute_url
 
-    is_render = isinstance(document, RenderedDocument)
+    origin = getattr(document, "archive_origin", "upload")
     name = filename or (document.file.name.rsplit("/", 1)[-1] if document.file else "")
     content_type = mimetypes.guess_type(name)[0] or "application/octet-stream"
     application = getattr(document, "application", None)
@@ -61,11 +68,13 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
             size = document.file.size
         except (OSError, ValueError):
             size = 0
-    when = document.rendered_at if is_render else document.created_at
+    when = getattr(document, "archived_at", None) or document.created_at
     return DocumentMetadata(
         kind=document.kind,
-        kind_label=str(DocumentKind(document.kind).label),
-        origin="render" if is_render else "upload",
+        # From the registry, so a kind a plugin brought is named rather than shown as a raw
+        # value -- and so that this module needs no list of its own (#133).
+        kind_label=kinds.label_for(document.kind),
+        origin=origin,
         title=document.title,
         filename=name,
         content_type=content_type,
@@ -75,7 +84,7 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
         company=company,
         role=role,
         application_url=application_url,
-        sent_on=when.date() if is_render and application is not None else None,
+        sent_on=when.date() if origin == "render" and application is not None else None,
         language=getattr(profile, "language", "") or "",
         tags=("postulo", document.kind),
     )
@@ -85,12 +94,14 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
 
 
 def kind_specs() -> list[FieldSpec]:
-    """The per-kind switches every store connection carries. All on by default."""
+    """The per-kind switches every store connection carries. All on by default.
+
+    From the registry, so a kind a plugin adds gets its own switch on every store's
+    connection form without anything here being edited (#133).
+    """
     return [
-        FieldSpec(
-            f"kind_{kind.value}", str(kind.label), type="boolean", required=False, default=True
-        )
-        for kind in DocumentKind
+        FieldSpec(f"kind_{key}", str(label), type="boolean", required=False, default=True)
+        for key, label in kinds.choices()
     ]
 
 
@@ -99,11 +110,11 @@ def wants_kind(config: dict, kind: str) -> bool:
     return bool(config.get(f"kind_{kind}", True))
 
 
-def documents_of(user, kinds: set[str] | None = None):
+def documents_of(user, wanted: set[str] | None = None):
     """Every render and upload of ``user``, optionally of the given kinds."""
     renders = RenderedDocument.objects.for_user(user)
     uploads = UploadedDocument.objects.for_user(user)
-    if kinds is not None:
-        renders = renders.filter(kind__in=kinds)
-        uploads = uploads.filter(kind__in=kinds)
+    if wanted is not None:
+        renders = renders.filter(kind__in=wanted)
+        uploads = uploads.filter(kind__in=wanted)
     return [*renders, *uploads]

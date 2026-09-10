@@ -6,8 +6,9 @@
 {% block content %}
   <div class="mb-6 flex flex-wrap items-start gap-4">
     <div>
-      <h1 class="text-2xl font-semibold tracking-tight">{{ cv.name }}</h1>
+      <h1 class="text-2xl font-semibold tracking-tight"><bdi>{{ cv.name }}</bdi></h1>
       <p class="text-sm text-ink-500 dark:text-ink-400">
+        {{ cv.get_kind_display }} ·
         <bdi>{{ cv.headline|default:"" }}</bdi>{% if cv.headline %} · {% endif %}{{ cv.theme_label }}
       </p>
     </div>
@@ -52,7 +53,11 @@
 
   <div class="grid gap-6 lg:grid-cols-3">
     <div class="lg:col-span-2">
-      <h2 class="mb-3 font-medium">{% translate "What is on this CV" %}</h2>
+      <h2 class="mb-3 font-medium">
+        {% blocktranslate trimmed with kind=cv.get_kind_display|lower %}
+          What is on this {{ kind }}
+        {% endblocktranslate %}
+      </h2>
       {% if items %}
         <div class="card p-0">
           <ul class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -63,7 +68,7 @@
                   <p class="text-xs text-ink-500 dark:text-ink-400">
                     {{ item.content_type.name|capfirst }}
                     {% if item.override_highlights %}
-                      · <span class="text-brand-600 dark:text-brand-400">{% translate "tailored for this CV" %}</span>
+                      · <span class="text-brand-600 dark:text-brand-400">{% translate "tailored for this one" %}</span>
                     {% endif %}
                     {% if not item.is_included %} · {% translate "hidden" %}{% endif %}
                   </p>
@@ -92,7 +97,7 @@
         </div>
       {% else %}
         <div class="card text-sm text-ink-500 dark:text-ink-400">
-          {% translate "Nothing on this CV yet. Choose some entries below." %}
+          {% translate "Nothing on it yet. Choose some entries below." %}
         </div>
       {% endif %}
 
@@ -125,7 +130,7 @@
       <div class="card">
         <h2 class="mb-1 font-medium">{% translate "Add entries" %}</h2>
         <p class="mb-4 text-xs text-ink-500 dark:text-ink-400">
-          {% translate "Only entries not already on this CV are listed." %}
+          {% translate "Only entries not already on it are listed." %}
         </p>
 
         {% if add_form.groups %}
@@ -141,11 +146,11 @@
                 </fieldset>
               {% endfor %}
             </div>
-            <button type="submit" class="btn-primary mt-4 w-full">{% translate "Add to CV" %}</button>
+            <button type="submit" class="btn-primary mt-4 w-full">{% translate "Add these" %}</button>
           </form>
         {% else %}
           <p class="text-sm text-ink-500 dark:text-ink-400">
-            {% translate "Everything you have written is already on this CV." %}
+            {% translate "Everything you have written is already on it." %}
             <a href="{% url 'resume:overview' %}" class="text-brand-600 underline dark:text-brand-400">
               {% translate "Write some more." %}
             </a>

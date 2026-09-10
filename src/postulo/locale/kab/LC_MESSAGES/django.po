@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:20+0000\n"
+"POT-Creation-Date: 2026-09-10 05:54+0000\n"
 "PO-Revision-Date: 2026-09-06 21:17+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Taqbaylit\n"
@@ -165,6 +165,11 @@ msgstr ""
 #: src/postulo/templates/server/logs.html:78
 #, python-format
 msgid "%(kilobytes)s on disk"
+msgstr ""
+
+#: src/postulo/documents/views.py:91
+#, python-format
+msgid "%(kind)s created. Now choose what goes on it."
 msgstr ""
 
 #: src/postulo/applications/services.py:356
@@ -327,14 +332,10 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr ""
 
-#: src/postulo/documents/rendering.py:295
+#: src/postulo/documents/rendering.py:279
+#: src/postulo/documents/rendering.py:304
 #, python-format
 msgid "%(name)s — %(kind)s"
-msgstr ""
-
-#: src/postulo/documents/rendering.py:275
-#, python-format
-msgid "%(name)s — CV"
 msgstr ""
 
 #: src/postulo/templates/base.html:46
@@ -382,17 +383,17 @@ msgstr ""
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr ""
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:391
 #, python-format
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 
-#: src/postulo/documents/views.py:393
+#: src/postulo/documents/views.py:397
 #, python-format
 msgid "%(sent)d copies sent."
 msgstr ""
 
-#: src/postulo/documents/themes.py:191
+#: src/postulo/documents/themes.py:193
 #, python-format
 msgid "%(theme)s, from %(provider)s"
 msgstr ""
@@ -421,7 +422,7 @@ msgid_plural "%(total)s companies"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/templates/documents/cv_list.html:29
+#: src/postulo/templates/documents/cv_list.html:38
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
@@ -478,7 +479,7 @@ msgid ""
 "<strong>%(name)s</strong>: %(rows)s rows. The guesses below come from the header names; correct any of them, then check the preview before importing."
 msgstr ""
 
-#: src/postulo/documents/models.py:218
+#: src/postulo/documents/models.py:263
 msgid ""
 "[What you are applying for, and the one thing that makes you the person for it.]\n"
 "\n"
@@ -818,7 +819,7 @@ msgstr ""
 msgid "Add all of this"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:127
+#: src/postulo/templates/documents/cv_detail.html:132
 msgid "Add entries"
 msgstr ""
 
@@ -834,8 +835,8 @@ msgstr ""
 msgid "Add the first one."
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:145
-msgid "Add to CV"
+#: src/postulo/templates/documents/cv_detail.html:150
+msgid "Add these"
 msgstr ""
 
 #: src/postulo/templates/jobs/listing_form.html:53
@@ -854,7 +855,7 @@ msgstr ""
 msgid "added"
 msgstr ""
 
-#: src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:135
 #, python-format
 msgid "Added %(count)s entries."
 msgstr ""
@@ -1065,7 +1066,7 @@ msgstr ""
 #: src/postulo/applications/models.py:424
 #: src/postulo/applications/models.py:519
 #: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:408 src/postulo/jobs/models.py:768
+#: src/postulo/documents/models.py:475 src/postulo/jobs/models.py:768
 #: src/postulo/templates/core/import_csv_map.html:84
 msgid "application"
 msgstr ""
@@ -1202,7 +1203,7 @@ msgstr ""
 msgid "Apprenticeship"
 msgstr ""
 
-#: src/postulo/documents/models.py:475
+#: src/postulo/documents/models.py:551
 msgid "Archived"
 msgstr ""
 
@@ -1232,7 +1233,7 @@ msgstr ""
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr ""
 
-#: src/postulo/documents/models.py:517
+#: src/postulo/documents/models.py:593
 msgid "attempts"
 msgstr ""
 
@@ -1322,7 +1323,7 @@ msgstr ""
 msgid "Board"
 msgstr ""
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 msgid "body"
 msgstr ""
 
@@ -1499,7 +1500,7 @@ msgstr ""
 msgid "Catalogues"
 msgstr ""
 
-#: src/postulo/documents/models.py:326
+#: src/postulo/documents/kinds.py:145 src/postulo/documents/models.py:371
 msgid "Certificate"
 msgstr ""
 
@@ -1571,7 +1572,7 @@ msgstr ""
 msgid "Checked %(when)s: %(detail)s"
 msgstr ""
 
-#: src/postulo/documents/models.py:438
+#: src/postulo/documents/models.py:505
 msgid "checksum"
 msgstr ""
 
@@ -1595,7 +1596,7 @@ msgstr ""
 msgid "Choose another file"
 msgstr ""
 
-#: src/postulo/documents/forms.py:268
+#: src/postulo/documents/forms.py:287
 msgid "Choose at least one document to record."
 msgstr ""
 
@@ -1611,7 +1612,7 @@ msgstr ""
 msgid "City and country, as it should appear on a CV."
 msgstr ""
 
-#: src/postulo/documents/themes.py:118
+#: src/postulo/documents/themes.py:120
 msgid "Classic"
 msgstr ""
 
@@ -1793,7 +1794,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr ""
 
-#: src/postulo/documents/models.py:496 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:572 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 msgid "connection"
 msgstr ""
@@ -1924,7 +1925,8 @@ msgstr ""
 msgid "Country the number is in"
 msgstr ""
 
-#: src/postulo/documents/models.py:203 src/postulo/documents/models.py:324
+#: src/postulo/documents/kinds.py:134 src/postulo/documents/models.py:248
+#: src/postulo/documents/models.py:369
 #: src/postulo/templates/documents/letter_form.html:4
 #: src/postulo/templates/documents/letter_form.html:16
 msgid "Cover letter"
@@ -1971,32 +1973,32 @@ msgstr ""
 msgid "Custom"
 msgstr ""
 
-#: src/postulo/documents/forms.py:234 src/postulo/documents/models.py:105
-#: src/postulo/documents/models.py:146 src/postulo/documents/models.py:323
+#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:125
+#: src/postulo/documents/models.py:96 src/postulo/documents/models.py:134
+#: src/postulo/documents/models.py:191 src/postulo/documents/models.py:368
 #: src/postulo/documents/themes.py:71
 #: src/postulo/templates/documents/cv_form.html:4
 #: src/postulo/templates/documents/cv_form.html:8
 msgid "CV"
 msgstr ""
 
-#: src/postulo/documents/views.py:89
-msgid "CV created. Now choose what goes on it."
-msgstr ""
-
-#: src/postulo/documents/models.py:166
+#: src/postulo/documents/models.py:211
 msgid "CV entries"
 msgstr ""
 
-#: src/postulo/documents/models.py:165
+#: src/postulo/documents/models.py:210
 msgid "CV entry"
 msgstr ""
 
-#: src/postulo/core/search.py:391 src/postulo/documents/models.py:106
+#: src/postulo/core/search.py:391 src/postulo/documents/models.py:135
 #: src/postulo/templates/accounts/delete_account.html:23
 #: src/postulo/templates/core/export.html:21
-#: src/postulo/templates/documents/cv_list.html:4
-#: src/postulo/templates/documents/cv_list.html:9
 msgid "CVs"
+msgstr ""
+
+#: src/postulo/templates/documents/cv_list.html:4
+#: src/postulo/templates/documents/cv_list.html:15
+msgid "CVs and portfolios"
 msgstr ""
 
 #: src/postulo/accounts/models.py:144
@@ -2081,7 +2083,7 @@ msgstr ""
 msgid "Deadline"
 msgstr ""
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:277
 msgid ""
 "Dear [name],\n"
 "\n"
@@ -2093,7 +2095,7 @@ msgid ""
 "{{ name }}"
 msgstr ""
 
-#: src/postulo/documents/models.py:212
+#: src/postulo/documents/models.py:257
 msgid ""
 "Dear {{ company }},\n"
 "\n"
@@ -2105,7 +2107,7 @@ msgid ""
 "{{ name }}"
 msgstr ""
 
-#: src/postulo/documents/models.py:226
+#: src/postulo/documents/models.py:271
 msgid ""
 "Dear {{ company }},\n"
 "\n"
@@ -2170,7 +2172,7 @@ msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:42
 #: src/postulo/templates/applications/tag_list.html:32
-#: src/postulo/templates/documents/cv_detail.html:23
+#: src/postulo/templates/documents/cv_detail.html:24
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:58
@@ -2289,11 +2291,11 @@ msgstr ""
 msgid "Document"
 msgstr ""
 
-#: src/postulo/documents/models.py:527
+#: src/postulo/documents/models.py:603
 msgid "document copies"
 msgstr ""
 
-#: src/postulo/documents/models.py:526
+#: src/postulo/documents/models.py:602
 msgid "document copy"
 msgstr ""
 
@@ -2308,7 +2310,7 @@ msgstr ""
 msgid "Documents"
 msgstr ""
 
-#: src/postulo/documents/views.py:476
+#: src/postulo/documents/views.py:480
 msgid "Documents sent"
 msgstr ""
 
@@ -2328,7 +2330,7 @@ msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html:35
 #: src/postulo/templates/documents/application_documents.html:75
-#: src/postulo/templates/documents/cv_detail.html:117
+#: src/postulo/templates/documents/cv_detail.html:122
 #: src/postulo/templates/documents/rendered_list.html:49
 #: src/postulo/templates/documents/upload_list.html:35
 msgid "Download"
@@ -2569,7 +2571,7 @@ msgid ""
 "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr ""
 
-#: src/postulo/documents/views.py:396
+#: src/postulo/documents/views.py:400
 msgid "Every store already has this document."
 msgstr ""
 
@@ -2608,8 +2610,8 @@ msgstr ""
 msgid "Everything you have written"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:149
-msgid "Everything you have written is already on this CV."
+#: src/postulo/templates/documents/cv_detail.html:154
+msgid "Everything you have written is already on it."
 msgstr ""
 
 #: src/postulo/templates/applications/interview_list.html:12
@@ -2673,7 +2675,7 @@ msgstr ""
 msgid "Export everything"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:19
+#: src/postulo/templates/documents/cv_detail.html:20
 msgid "Export PDF"
 msgstr ""
 
@@ -2681,7 +2683,7 @@ msgstr ""
 msgid "Exported on its own"
 msgstr ""
 
-#: src/postulo/documents/models.py:476
+#: src/postulo/documents/models.py:552
 msgid "Failed"
 msgstr ""
 
@@ -2730,11 +2732,11 @@ msgstr ""
 msgid "Figures appear once you have applied for something."
 msgstr ""
 
-#: src/postulo/documents/models.py:343 src/postulo/documents/models.py:400
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:467
 msgid "file"
 msgstr ""
 
-#: src/postulo/documents/views.py:310
+#: src/postulo/documents/views.py:314
 msgid "File saved."
 msgstr ""
 
@@ -2756,7 +2758,7 @@ msgstr ""
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
 
-#: src/postulo/documents/forms.py:239
+#: src/postulo/documents/forms.py:258
 msgid "Files you have already"
 msgstr ""
 
@@ -2808,11 +2810,11 @@ msgstr ""
 msgid "First, take everything with you"
 msgstr ""
 
-#: src/postulo/documents/forms.py:38
+#: src/postulo/documents/forms.py:39
 msgid "Follow your profile"
 msgstr ""
 
-#: src/postulo/documents/models.py:206
+#: src/postulo/documents/models.py:251
 msgid "Follow-up note"
 msgstr ""
 
@@ -2837,7 +2839,7 @@ msgstr ""
 msgid "For example, “BSc Computer Science”."
 msgstr ""
 
-#: src/postulo/documents/models.py:83
+#: src/postulo/documents/models.py:109
 msgid "For you, not for the employer: “Backend, English”."
 msgstr ""
 
@@ -3049,7 +3051,7 @@ msgstr ""
 msgid "happened on"
 msgstr ""
 
-#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:85
+#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:114
 #: src/postulo/resume/views.py:441
 msgid "headline"
 msgstr ""
@@ -3067,7 +3069,7 @@ msgstr ""
 msgid "Held"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:69
+#: src/postulo/templates/documents/cv_detail.html:74
 msgid "hidden"
 msgstr ""
 
@@ -3084,7 +3086,7 @@ msgstr ""
 msgid "highlights"
 msgstr ""
 
-#: src/postulo/documents/models.py:159
+#: src/postulo/documents/models.py:204
 msgid "highlights for this CV"
 msgstr ""
 
@@ -3176,7 +3178,7 @@ msgstr ""
 msgid "I have already applied to this one"
 msgstr ""
 
-#: src/postulo/documents/models.py:515
+#: src/postulo/documents/models.py:591
 msgid "id in the store"
 msgstr ""
 
@@ -3301,11 +3303,11 @@ msgstr ""
 msgid "In the diary"
 msgstr ""
 
-#: src/postulo/documents/models.py:99
+#: src/postulo/documents/models.py:128
 msgid "include contact details"
 msgstr ""
 
-#: src/postulo/documents/models.py:154
+#: src/postulo/documents/models.py:199
 msgid "included"
 msgstr ""
 
@@ -3586,9 +3588,10 @@ msgstr ""
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:269
-#: src/postulo/documents/models.py:341 src/postulo/documents/models.py:399
-#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:243
+#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
+#: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
+#: src/postulo/resume/models.py:243
 msgid "kind"
 msgstr ""
 
@@ -3600,7 +3603,7 @@ msgstr ""
 msgid "Kind"
 msgstr ""
 
-#: src/postulo/documents/models.py:506
+#: src/postulo/documents/models.py:582
 msgid "kind of document"
 msgstr ""
 
@@ -3608,7 +3611,7 @@ msgstr ""
 msgid "kind of entry"
 msgstr ""
 
-#: src/postulo/documents/models.py:432
+#: src/postulo/documents/models.py:499
 msgid "kind of source"
 msgstr ""
 
@@ -3616,7 +3619,7 @@ msgstr ""
 msgid "Kinds of letter"
 msgstr ""
 
-#: src/postulo/documents/models.py:499 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:575 src/postulo/plugins/models.py:173
 msgid "label"
 msgstr ""
 
@@ -3625,8 +3628,8 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:91
-#: src/postulo/documents/models.py:285 src/postulo/resume/models.py:197
+#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:120
+#: src/postulo/documents/models.py:330 src/postulo/resume/models.py:197
 #: src/postulo/resume/models.py:203 src/postulo/resume/models.py:301
 msgid "language"
 msgstr ""
@@ -3685,7 +3688,7 @@ msgstr ""
 msgid "Last activity"
 msgstr ""
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:597
 msgid "last attempt"
 msgstr ""
 
@@ -3697,7 +3700,7 @@ msgstr ""
 msgid "last checked"
 msgstr ""
 
-#: src/postulo/documents/models.py:523 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:599 src/postulo/plugins/models.py:182
 msgid "last error"
 msgstr ""
 
@@ -3776,11 +3779,11 @@ msgstr ""
 msgid "Let {column} size itself"
 msgstr ""
 
-#: src/postulo/documents/forms.py:236 src/postulo/documents/themes.py:72
+#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
 msgid "Letter"
 msgstr ""
 
-#: src/postulo/documents/models.py:294
+#: src/postulo/documents/models.py:339
 msgid "letter"
 msgstr ""
 
@@ -3792,7 +3795,7 @@ msgstr ""
 msgid "Letters"
 msgstr ""
 
-#: src/postulo/documents/models.py:295
+#: src/postulo/documents/models.py:340
 msgid "letters"
 msgstr ""
 
@@ -3821,7 +3824,7 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:592
 msgid "link in the store"
 msgstr ""
 
@@ -3850,7 +3853,7 @@ msgid ""
 "Links to the places a job search goes back to: the board, CVs, companies."
 msgstr ""
 
-#: src/postulo/documents/forms.py:245
+#: src/postulo/documents/forms.py:264
 #: src/postulo/templates/documents/application_documents.html:47
 msgid "Links you pointed them at"
 msgstr ""
@@ -4094,7 +4097,7 @@ msgstr ""
 msgid "Merged."
 msgstr ""
 
-#: src/postulo/documents/models.py:176
+#: src/postulo/documents/models.py:221
 msgid "Missing entry"
 msgstr ""
 
@@ -4130,7 +4133,8 @@ msgid ""
 "Most people track a job search in a spreadsheet until it hurts. Bring it here rather than retyping it: one CSV, any columns, any language of headers. You will see how each column is read before anything is saved."
 msgstr ""
 
-#: src/postulo/documents/models.py:204 src/postulo/documents/models.py:325
+#: src/postulo/documents/kinds.py:140 src/postulo/documents/models.py:249
+#: src/postulo/documents/models.py:370
 msgid "Motivation letter"
 msgstr ""
 
@@ -4168,7 +4172,7 @@ msgstr ""
 msgid "Move %(name)s up a row"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:81
+#: src/postulo/templates/documents/cv_detail.html:86
 #: src/postulo/templates/resume/overview.html:112
 msgid "Move down"
 msgstr ""
@@ -4181,7 +4185,7 @@ msgstr ""
 msgid "Move to status"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:76
+#: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:107
 msgid "Move up"
 msgstr ""
@@ -4192,8 +4196,8 @@ msgid "NACE division"
 msgstr ""
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:83
-#: src/postulo/documents/models.py:267 src/postulo/jobs/models.py:41
+#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
 #: src/postulo/plugins/models.py:48 src/postulo/resume/models.py:116
@@ -4249,9 +4253,9 @@ msgstr ""
 msgid "New accounts"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_list.html:16
-#: src/postulo/templates/documents/cv_list.html:47
-msgid "New CV"
+#: src/postulo/templates/documents/cv_list.html:22
+#: src/postulo/templates/documents/cv_list.html:56
+msgid "New CV or portfolio"
 msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html:16
@@ -4300,7 +4304,7 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: src/postulo/documents/models.py:519
+#: src/postulo/documents/models.py:595
 msgid "next attempt"
 msgstr ""
 
@@ -4357,11 +4361,7 @@ msgstr ""
 msgid "No connections yet"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_list.html:41
-msgid "No CVs yet"
-msgstr ""
-
-#: src/postulo/documents/views.py:378
+#: src/postulo/documents/views.py:382
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
 
@@ -4444,12 +4444,12 @@ msgstr ""
 msgid "No tags yet."
 msgstr ""
 
-#: src/postulo/documents/themes.py:249
+#: src/postulo/documents/themes.py:251
 #, python-format
 msgid "No theme called “%(theme)s” is installed."
 msgstr ""
 
-#: src/postulo/documents/themes.py:224
+#: src/postulo/documents/themes.py:226
 msgid "No theme is installed that can set this document."
 msgstr ""
 
@@ -4528,7 +4528,7 @@ msgstr ""
 msgid "Not %(name)s"
 msgstr ""
 
-#: src/postulo/documents/models.py:477
+#: src/postulo/documents/models.py:553
 msgid "Not accepted"
 msgstr ""
 
@@ -4606,7 +4606,7 @@ msgstr ""
 msgid "not tested yet"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:34
+#: src/postulo/templates/documents/cv_detail.html:35
 #, python-format
 msgid "Not yet written in %(tongue)s. These print as they stand:"
 msgstr ""
@@ -4638,7 +4638,7 @@ msgstr ""
 msgid "Notes"
 msgstr ""
 
-#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:150
+#: src/postulo/documents/models.py:403 src/postulo/jobs/models.py:150
 #: src/postulo/jobs/models.py:433
 msgid "notes"
 msgstr ""
@@ -4671,6 +4671,7 @@ msgid ""
 msgstr ""
 
 #: src/postulo/templates/applications/application_list.html:48
+#: src/postulo/templates/documents/cv_list.html:50
 msgid "Nothing here yet"
 msgstr ""
 
@@ -4734,12 +4735,12 @@ msgstr ""
 msgid "Nothing on %(host)s could be used as a logo."
 msgstr ""
 
-#: src/postulo/templates/connections/confirm_delete.html:13
-msgid "Nothing on the other service is touched. You can connect it again later."
+#: src/postulo/templates/documents/cv_detail.html:101
+msgid "Nothing on it yet. Choose some entries below."
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:96
-msgid "Nothing on this CV yet. Choose some entries below."
+#: src/postulo/templates/connections/confirm_delete.html:13
+msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
@@ -4813,7 +4814,7 @@ msgstr ""
 msgid "Nothing waiting"
 msgstr ""
 
-#: src/postulo/documents/views.py:115 src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:119 src/postulo/documents/views.py:135
 msgid "Nothing was added."
 msgstr ""
 
@@ -5028,8 +5029,9 @@ msgid ""
 "One that has already happened is recorded straight onto the timeline as held."
 msgstr ""
 
-#: src/postulo/templates/documents/cv_list.html:11
-msgid "One variant per kind of role. Each selects from your career record."
+#: src/postulo/templates/documents/cv_list.html:17
+msgid ""
+"One variant per kind of role. Each selects from your career record; a portfolio leads with the work."
 msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html:37
@@ -5042,8 +5044,8 @@ msgstr ""
 msgid "Only %(name)s"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:129
-msgid "Only entries not already on this CV are listed."
+#: src/postulo/templates/documents/cv_detail.html:134
+msgid "Only entries not already on it are listed."
 msgstr ""
 
 #: src/postulo/plugins/fetching.py:121
@@ -5091,7 +5093,7 @@ msgstr ""
 msgid "ORCID"
 msgstr ""
 
-#: src/postulo/documents/models.py:152 src/postulo/resume/models.py:35
+#: src/postulo/documents/models.py:197 src/postulo/resume/models.py:35
 msgid "order"
 msgstr ""
 
@@ -5110,8 +5112,9 @@ msgstr ""
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
 #: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/models.py:329
-#: src/postulo/jobs/models.py:492 src/postulo/resume/models.py:219
+#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
+#: src/postulo/resume/models.py:219
 msgid "Other"
 msgstr ""
 
@@ -5230,7 +5233,7 @@ msgstr ""
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr ""
 
-#: src/postulo/documents/views.py:189
+#: src/postulo/documents/views.py:193
 msgid "PDF created."
 msgstr ""
 
@@ -5326,11 +5329,11 @@ msgstr ""
 msgid "Placeholders"
 msgstr ""
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr ""
 
-#: src/postulo/documents/themes.py:117
+#: src/postulo/documents/themes.py:119
 msgid "Plain"
 msgstr ""
 
@@ -5410,7 +5413,9 @@ msgid ""
 "Port 465 expects TLS from the first byte, so it is waiting for a certificate while Postulo waits for a greeting. Choose “TLS from the first byte”, or use port 587 with STARTTLS."
 msgstr ""
 
-#: src/postulo/documents/models.py:327 src/postulo/resume/models.py:213
+#: src/postulo/documents/kinds.py:128 src/postulo/documents/models.py:97
+#: src/postulo/documents/models.py:372 src/postulo/documents/themes.py:72
+#: src/postulo/resume/models.py:213
 msgid "Portfolio"
 msgstr ""
 
@@ -5546,6 +5551,7 @@ msgid "preparation notes"
 msgstr ""
 
 #: src/postulo/templates/documents/themes/base_cv.html:98
+#: src/postulo/templates/documents/themes/base_portfolio.html:67
 #: src/postulo/templates/resume/preview.html:28
 msgid "present"
 msgstr ""
@@ -5555,7 +5561,7 @@ msgid ""
 "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:16
+#: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
 msgid "Preview"
@@ -5844,7 +5850,7 @@ msgstr ""
 msgid "recorded on"
 msgstr ""
 
-#: src/postulo/documents/views.py:479
+#: src/postulo/documents/views.py:483
 msgid "Recorded what you sent."
 msgstr ""
 
@@ -5873,7 +5879,7 @@ msgstr ""
 msgid "Redirects followed"
 msgstr ""
 
-#: src/postulo/documents/models.py:328
+#: src/postulo/documents/kinds.py:146 src/postulo/documents/models.py:373
 msgid "Reference"
 msgstr ""
 
@@ -5963,7 +5969,7 @@ msgstr ""
 #: src/postulo/templates/accounts/profile.html:139
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
-#: src/postulo/templates/documents/cv_detail.html:87
+#: src/postulo/templates/documents/cv_detail.html:92
 #: src/postulo/templates/jobs/company_form.html:80
 #: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/partials/postal_addresses.html:79
@@ -5996,15 +6002,15 @@ msgstr ""
 msgid "removed on the other side"
 msgstr ""
 
-#: src/postulo/documents/models.py:439
+#: src/postulo/documents/models.py:506
 msgid "rendered on"
 msgstr ""
 
-#: src/postulo/documents/models.py:360
+#: src/postulo/documents/models.py:412
 msgid "replaces"
 msgstr ""
 
-#: src/postulo/documents/models.py:161
+#: src/postulo/documents/models.py:206
 msgid "Replaces the master highlights on this variant only. One per line."
 msgstr ""
 
@@ -6044,7 +6050,7 @@ msgstr ""
 msgid "Retail"
 msgstr ""
 
-#: src/postulo/documents/models.py:276
+#: src/postulo/documents/models.py:321
 msgid "reusable template"
 msgstr ""
 
@@ -6363,11 +6369,11 @@ msgstr ""
 msgid "Sent"
 msgstr ""
 
-#: src/postulo/documents/models.py:450
+#: src/postulo/documents/models.py:526
 msgid "sent document"
 msgstr ""
 
-#: src/postulo/documents/models.py:451
+#: src/postulo/documents/models.py:527
 msgid "sent documents"
 msgstr ""
 
@@ -6378,7 +6384,7 @@ msgstr ""
 msgid "Sent documents"
 msgstr ""
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:598
 msgid "sent on"
 msgstr ""
 
@@ -6454,7 +6460,7 @@ msgstr ""
 
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:108 src/postulo/templates/core/export.html:4
-#: src/postulo/templates/documents/cv_detail.html:21
+#: src/postulo/templates/documents/cv_detail.html:22
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -6692,7 +6698,7 @@ msgstr ""
 msgid "speaking"
 msgstr ""
 
-#: src/postulo/documents/models.py:205
+#: src/postulo/documents/models.py:250
 msgid "Speculative letter"
 msgstr ""
 
@@ -6748,7 +6754,7 @@ msgid "Status"
 msgstr ""
 
 #: src/postulo/applications/models.py:198
-#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:513
+#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:589
 #: src/postulo/jobs/models.py:751
 msgid "status"
 msgstr ""
@@ -6795,7 +6801,7 @@ msgstr ""
 msgid "Stop sorting by %(column)s"
 msgstr ""
 
-#: src/postulo/documents/models.py:498
+#: src/postulo/documents/models.py:574
 msgid "store"
 msgstr ""
 
@@ -6807,7 +6813,7 @@ msgstr ""
 msgid "Strong"
 msgstr ""
 
-#: src/postulo/documents/models.py:271
+#: src/postulo/documents/models.py:316
 msgid "subject"
 msgstr ""
 
@@ -6832,7 +6838,7 @@ msgstr ""
 msgid "Suggestions"
 msgstr ""
 
-#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:87
+#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:116
 #: src/postulo/resume/models.py:72 src/postulo/resume/models.py:155
 msgid "summary"
 msgstr ""
@@ -6841,7 +6847,7 @@ msgstr ""
 msgid "superseded"
 msgstr ""
 
-#: src/postulo/documents/forms.py:209
+#: src/postulo/documents/forms.py:228
 msgid "Supersedes"
 msgstr ""
 
@@ -6941,7 +6947,7 @@ msgstr ""
 msgid "tags"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:84
+#: src/postulo/templates/documents/cv_detail.html:89
 msgid "Tailor"
 msgstr ""
 
@@ -6950,8 +6956,8 @@ msgstr ""
 msgid "Tailor this entry"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:67
-msgid "tailored for this CV"
+#: src/postulo/templates/documents/cv_detail.html:72
+msgid "tailored for this one"
 msgstr ""
 
 #: src/postulo/templates/settings/dashboard.html:57
@@ -6988,7 +6994,7 @@ msgstr ""
 msgid "Template"
 msgstr ""
 
-#: src/postulo/documents/models.py:278
+#: src/postulo/documents/models.py:323
 msgid "Templates appear when you send a letter with an application."
 msgstr ""
 
@@ -7009,7 +7015,7 @@ msgstr ""
 msgid "text"
 msgstr ""
 
-#: src/postulo/documents/models.py:437
+#: src/postulo/documents/models.py:504
 msgid "text as sent"
 msgstr ""
 
@@ -7102,7 +7108,7 @@ msgstr ""
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr ""
 
-#: src/postulo/documents/forms.py:215
+#: src/postulo/documents/forms.py:234
 #, python-format
 msgid "That file is larger than %(limit)s MB."
 msgstr ""
@@ -7267,7 +7273,7 @@ msgstr ""
 msgid "The %(plugin)s plugin is not installed."
 msgstr ""
 
-#: src/postulo/documents/themes.py:227 src/postulo/documents/themes.py:255
+#: src/postulo/documents/themes.py:229 src/postulo/documents/themes.py:257
 #, python-format
 msgid "The %(theme)s theme does not set this kind of document."
 msgstr ""
@@ -7315,7 +7321,7 @@ msgstr ""
 msgid "The company this one belongs to, if it belongs to one."
 msgstr ""
 
-#: src/postulo/documents/models.py:260
+#: src/postulo/documents/models.py:305
 msgid "The company you are applying to"
 msgstr ""
 
@@ -7323,7 +7329,7 @@ msgstr ""
 msgid "The connection is gone or switched off."
 msgstr ""
 
-#: src/postulo/documents/views.py:383
+#: src/postulo/documents/views.py:387
 msgid "The copy could not be sent; the document says why."
 msgstr ""
 
@@ -7341,7 +7347,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr ""
 
-#: src/postulo/documents/models.py:361
+#: src/postulo/documents/models.py:413
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr ""
 
@@ -7389,7 +7395,7 @@ msgstr ""
 msgid "The installer refused it: %(error)s"
 msgstr ""
 
-#: src/postulo/documents/models.py:261
+#: src/postulo/documents/models.py:306
 msgid "The job title"
 msgstr ""
 
@@ -7477,7 +7483,7 @@ msgstr ""
 msgid "The one before"
 msgstr ""
 
-#: src/postulo/documents/models.py:87
+#: src/postulo/documents/models.py:116
 msgid "The opening paragraph, if you use one."
 msgstr ""
 
@@ -7822,7 +7828,7 @@ msgstr ""
 msgid "timeout in seconds"
 msgstr ""
 
-#: src/postulo/documents/models.py:340 src/postulo/documents/models.py:398
+#: src/postulo/documents/models.py:385 src/postulo/documents/models.py:462
 #: src/postulo/jobs/models.py:563 src/postulo/resume/models.py:241
 msgid "title"
 msgstr ""
@@ -7855,7 +7861,7 @@ msgstr ""
 msgid "to status"
 msgstr ""
 
-#: src/postulo/documents/models.py:264
+#: src/postulo/documents/models.py:309
 msgid "Today's date"
 msgstr ""
 
@@ -7963,7 +7969,7 @@ msgstr ""
 msgid "Unavailable — not offered at all"
 msgstr ""
 
-#: src/postulo/documents/models.py:156
+#: src/postulo/documents/models.py:201
 msgid "Uncheck to keep the entry on this variant but leave it off the page."
 msgstr ""
 
@@ -8025,11 +8031,11 @@ msgstr ""
 msgid "Uploaded"
 msgstr ""
 
-#: src/postulo/documents/models.py:373
+#: src/postulo/documents/models.py:437
 msgid "uploaded document"
 msgstr ""
 
-#: src/postulo/documents/models.py:374
+#: src/postulo/documents/models.py:438
 msgid "uploaded documents"
 msgstr ""
 
@@ -8122,7 +8128,7 @@ msgstr ""
 msgid "Verified"
 msgstr ""
 
-#: src/postulo/documents/models.py:353
+#: src/postulo/documents/models.py:405
 #: src/postulo/templates/documents/upload_list.html:27
 msgid "version"
 msgstr ""
@@ -8135,7 +8141,7 @@ msgstr ""
 msgid "version tag"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:101
+#: src/postulo/templates/documents/cv_detail.html:106
 msgid "Versions you have sent"
 msgstr ""
 
@@ -8168,7 +8174,7 @@ msgstr ""
 msgid "Waiting only"
 msgstr ""
 
-#: src/postulo/documents/models.py:474
+#: src/postulo/documents/models.py:550
 msgid "Waiting to be sent"
 msgstr ""
 
@@ -8294,8 +8300,9 @@ msgstr ""
 msgid "What is in the file"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:56
-msgid "What is on this CV"
+#: src/postulo/templates/documents/cv_detail.html:58
+#, python-format
+msgid "What is on this %(kind)s"
 msgstr ""
 
 #: src/postulo/templates/settings/plugins.html:7
@@ -8431,7 +8438,7 @@ msgid ""
 "Where the plugins that act for you find their services, and how they sign in. Secrets are stored encrypted and never shown again."
 msgstr ""
 
-#: src/postulo/documents/models.py:262
+#: src/postulo/documents/models.py:307
 msgid "Where the role is based"
 msgstr ""
 
@@ -8489,12 +8496,12 @@ msgstr ""
 msgid "Which device or tool this is for."
 msgstr ""
 
-#: src/postulo/documents/models.py:288
+#: src/postulo/documents/models.py:333
 msgid ""
 "Which language this letter is written in. Leave blank to follow your profile."
 msgstr ""
 
-#: src/postulo/documents/models.py:94
+#: src/postulo/documents/models.py:123
 msgid ""
 "Which language this variant is written in. Leave blank to follow your profile."
 msgstr ""
@@ -8600,11 +8607,11 @@ msgstr ""
 msgid "Write one well, then let placeholders do the rest."
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:151
+#: src/postulo/templates/documents/cv_detail.html:156
 msgid "Write some more."
 msgstr ""
 
-#: src/postulo/templates/documents/cv_list.html:43
+#: src/postulo/templates/documents/cv_list.html:52
 msgid "Write your career down first, then build variants from it."
 msgstr ""
 
@@ -8653,8 +8660,8 @@ msgstr ""
 msgid "You already have a company with that name."
 msgstr ""
 
-#: src/postulo/documents/forms.py:111
-msgid "You already have a CV with that name."
+#: src/postulo/documents/forms.py:130
+msgid "You already have a CV or portfolio with that name."
 msgstr ""
 
 #: src/postulo/applications/forms.py:356
@@ -8763,8 +8770,8 @@ msgid ""
 "Your browser will only make a passkey on a page served over HTTPS. This instance is being reached over plain HTTP, so passkeys cannot be offered here. That is the browser's rule, not a setting on this server."
 msgstr ""
 
-#: src/postulo/templates/documents/cv_list.html:15
-#: src/postulo/templates/documents/cv_list.html:46
+#: src/postulo/templates/documents/cv_list.html:21
+#: src/postulo/templates/documents/cv_list.html:55
 #: src/postulo/templates/resume/overview.html:4
 #: src/postulo/templates/resume/overview.html:9
 msgid "Your career"
@@ -8855,11 +8862,11 @@ msgstr ""
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr ""
 
-#: src/postulo/documents/models.py:101
+#: src/postulo/documents/models.py:130
 msgid "Your name, email and location, taken from your profile."
 msgstr ""
 
-#: src/postulo/documents/models.py:263
+#: src/postulo/documents/models.py:308
 msgid "Your own name"
 msgstr ""
 

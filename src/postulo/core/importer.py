@@ -247,7 +247,14 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     from postulo.accounts.models import PersonIdentifier
     from postulo.applications.models import Application, ApplicationEvent, Interview, Reminder
     from postulo.core.models import Tag
-    from postulo.documents.models import CV, CoverLetter, CVItem, RenderedDocument, UploadedDocument
+    from postulo.documents.models import (
+        CV,
+        CoverLetter,
+        CVItem,
+        CVKind,
+        RenderedDocument,
+        UploadedDocument,
+    )
     from postulo.jobs import identifiers
     from postulo.jobs.models import Capture, Company, Contact, Department, Industry, JobPosting
     from postulo.jobs.services import set_identifiers
@@ -630,6 +637,11 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         # A CV is content rather than an identity, so a clash gets a new name instead of
         # being merged into whatever happens to share its title.
         cv_entry["name"] = _free_cv_name(user, cv_entry.get("name", ""))
+        # An archive can say anything, and one written before format 14 says nothing at all.
+        # A kind Postulo does not know restores as a CV, which is what every archive before
+        # this held and the honest reading of an unknown one (#133).
+        if cv_entry.get("kind") not in {value for value, _label in CVKind.choices}:
+            cv_entry.pop("kind", None)
         cv = CV.objects.create(owner=user, **cv_entry)
         cvs[old_id] = cv
         report.cvs += 1

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:20+0000\n"
+"POT-Creation-Date: 2026-09-10 05:54+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -212,6 +212,11 @@ msgstr ""
 msgid "%(kilobytes)s on disk"
 msgstr "%(kilobytes)s ar an diosca"
 
+#: src/postulo/documents/views.py:91
+#, python-format, draft
+msgid "%(kind)s created. Now choose what goes on it."
+msgstr "Cruthaíodh %(kind)s. Roghnaigh anois cad a bheidh air."
+
 #: src/postulo/applications/services.py:356
 #, python-format, draft
 msgid "%(kind)s held"
@@ -384,15 +389,11 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "D'athródh %(name)s an méid a bhraitheann Postulo féin air. %(problems)s"
 
-#: src/postulo/documents/rendering.py:295
+#: src/postulo/documents/rendering.py:279
+#: src/postulo/documents/rendering.py:304
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
-
-#: src/postulo/documents/rendering.py:275
-#, python-format, draft
-msgid "%(name)s — CV"
-msgstr "%(name)s — CV"
 
 #: src/postulo/templates/base.html:46
 #, python-format, draft
@@ -440,18 +441,18 @@ msgstr "%(role)s: gan dáta tosaigh, mar sin níor cuireadh leis é."
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "Ní aithníonn %(scheme)s an cineál seo ruda."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:391
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d cóip seolta, %(failed)d ar theip orthu; deir gach doiciméad cé acu."
 
-#: src/postulo/documents/views.py:393
+#: src/postulo/documents/views.py:397
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d cóip seolta."
 
-#: src/postulo/documents/themes.py:191
+#: src/postulo/documents/themes.py:193
 #, python-format, draft
 msgid "%(theme)s, from %(provider)s"
 msgstr "%(theme)s, ó %(provider)s"
@@ -486,7 +487,7 @@ msgstr[2] "%(total)s chuideachta"
 msgstr[3] "%(total)s gcuideachta"
 msgstr[4] "%(total)s cuideachta"
 
-#: src/postulo/templates/documents/cv_list.html:29
+#: src/postulo/templates/documents/cv_list.html:38
 #, python-format, draft
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
@@ -558,7 +559,7 @@ msgid ""
 msgstr ""
 "<strong>%(name)s</strong>: %(rows)s ró. Tagann na buillí faoi thuairim thíos ó ainmneacha na gceanntásc; ceartaigh aon cheann acu, ansin seiceáil an réamhamharc sula n-iompórtálann tú."
 
-#: src/postulo/documents/models.py:218
+#: src/postulo/documents/models.py:263
 #, draft
 msgid ""
 "[What you are applying for, and the one thing that makes you the person for it.]\n"
@@ -998,7 +999,7 @@ msgstr "Cuir clib leis"
 msgid "Add all of this"
 msgstr "Cuir seo ar fad leis"
 
-#: src/postulo/templates/documents/cv_detail.html:127
+#: src/postulo/templates/documents/cv_detail.html:132
 #, draft
 msgid "Add entries"
 msgstr "Cuir iontrálacha leis"
@@ -1018,10 +1019,10 @@ msgstr "Cuir ceann leis"
 msgid "Add the first one."
 msgstr "Cuir an chéad cheann leis."
 
-#: src/postulo/templates/documents/cv_detail.html:145
+#: src/postulo/templates/documents/cv_detail.html:150
 #, draft
-msgid "Add to CV"
-msgstr "Cuir leis an CV"
+msgid "Add these"
+msgstr "Cuir iad seo leis"
 
 #: src/postulo/templates/jobs/listing_form.html:53
 #, draft
@@ -1043,7 +1044,7 @@ msgstr "Curtha leis"
 msgid "added"
 msgstr "curtha leis"
 
-#: src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:135
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "Cuireadh %(count)s iontráil leis."
@@ -1301,7 +1302,7 @@ msgstr "Cuma"
 #: src/postulo/applications/models.py:424
 #: src/postulo/applications/models.py:519
 #: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:408 src/postulo/jobs/models.py:768
+#: src/postulo/documents/models.py:475 src/postulo/jobs/models.py:768
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1468,7 +1469,7 @@ msgstr "Déan iarratas: %(title)s"
 msgid "Apprenticeship"
 msgstr "Printíseacht"
 
-#: src/postulo/documents/models.py:475
+#: src/postulo/documents/models.py:551
 #, draft
 msgid "Archived"
 msgstr "Cartlannaithe"
@@ -1506,7 +1507,7 @@ msgid "At least one language has to be offered, or nobody can read anything."
 msgstr ""
 "Caithfear teanga amháin ar a laghad a thairiscint, nó ní féidir le duine ar bith aon rud a léamh."
 
-#: src/postulo/documents/models.py:517
+#: src/postulo/documents/models.py:593
 #, draft
 msgid "attempts"
 msgstr "iarrachtaí"
@@ -1618,7 +1619,7 @@ msgstr "Biteicneolaíocht"
 msgid "Board"
 msgstr "Clár"
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 #, draft
 msgid "body"
 msgstr "corp"
@@ -1829,7 +1830,7 @@ msgstr "Iompartha ag an iompar %(label)s, leagan %(version)s."
 msgid "Catalogues"
 msgstr "Catalóga"
 
-#: src/postulo/documents/models.py:326
+#: src/postulo/documents/kinds.py:145 src/postulo/documents/models.py:371
 #, draft
 msgid "Certificate"
 msgstr "Teastas"
@@ -1916,7 +1917,7 @@ msgstr "Seiceáil iad go léir"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Seiceáilte %(when)s: %(detail)s"
 
-#: src/postulo/documents/models.py:438
+#: src/postulo/documents/models.py:505
 #, draft
 msgid "checksum"
 msgstr "suim sheiceála"
@@ -1946,7 +1947,7 @@ msgstr "Roghnaigh pacáiste ar dtús."
 msgid "Choose another file"
 msgstr "Roghnaigh comhad eile"
 
-#: src/postulo/documents/forms.py:268
+#: src/postulo/documents/forms.py:287
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Roghnaigh doiciméad amháin ar a laghad le taifeadadh."
@@ -1966,7 +1967,7 @@ msgstr "Roghnaigh ar dtús cén t-iarratas lena mbaineann sé."
 msgid "City and country, as it should appear on a CV."
 msgstr "Cathair agus tír, mar ba chóir dóibh a bheith ar CV."
 
-#: src/postulo/documents/themes.py:118
+#: src/postulo/documents/themes.py:120
 #, draft
 msgid "Classic"
 msgstr "Clasaiceach"
@@ -2184,7 +2185,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Ceangailte. Tástáil é le bheith cinnte go n-oibríonn sé."
 
-#: src/postulo/documents/models.py:496 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:572 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
@@ -2346,7 +2347,8 @@ msgstr "Tír"
 msgid "Country the number is in"
 msgstr "An tír ina bhfuil an uimhir"
 
-#: src/postulo/documents/models.py:203 src/postulo/documents/models.py:324
+#: src/postulo/documents/kinds.py:134 src/postulo/documents/models.py:248
+#: src/postulo/documents/models.py:369
 #: src/postulo/templates/documents/letter_form.html:4
 #: src/postulo/templates/documents/letter_form.html:16
 #, draft
@@ -2404,8 +2406,9 @@ msgstr "airgeadra"
 msgid "Custom"
 msgstr "Saincheaptha"
 
-#: src/postulo/documents/forms.py:234 src/postulo/documents/models.py:105
-#: src/postulo/documents/models.py:146 src/postulo/documents/models.py:323
+#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:125
+#: src/postulo/documents/models.py:96 src/postulo/documents/models.py:134
+#: src/postulo/documents/models.py:191 src/postulo/documents/models.py:368
 #: src/postulo/documents/themes.py:71
 #: src/postulo/templates/documents/cv_form.html:4
 #: src/postulo/templates/documents/cv_form.html:8
@@ -2413,29 +2416,28 @@ msgstr "Saincheaptha"
 msgid "CV"
 msgstr "CV"
 
-#: src/postulo/documents/views.py:89
-#, draft
-msgid "CV created. Now choose what goes on it."
-msgstr "CV cruthaithe. Roghnaigh anois cad a théann air."
-
-#: src/postulo/documents/models.py:166
+#: src/postulo/documents/models.py:211
 #, draft
 msgid "CV entries"
 msgstr "Iontrálacha CV"
 
-#: src/postulo/documents/models.py:165
+#: src/postulo/documents/models.py:210
 #, draft
 msgid "CV entry"
 msgstr "Iontráil CV"
 
-#: src/postulo/core/search.py:391 src/postulo/documents/models.py:106
+#: src/postulo/core/search.py:391 src/postulo/documents/models.py:135
 #: src/postulo/templates/accounts/delete_account.html:23
 #: src/postulo/templates/core/export.html:21
-#: src/postulo/templates/documents/cv_list.html:4
-#: src/postulo/templates/documents/cv_list.html:9
 #, draft
 msgid "CVs"
 msgstr "CVanna"
+
+#: src/postulo/templates/documents/cv_list.html:4
+#: src/postulo/templates/documents/cv_list.html:15
+#, draft
+msgid "CVs and portfolios"
+msgstr "CVanna agus punanna"
 
 #: src/postulo/accounts/models.py:144
 #, draft
@@ -2541,7 +2543,7 @@ msgstr "spriocdháta"
 msgid "Deadline"
 msgstr "Spriocdháta"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:277
 #, draft
 msgid ""
 "Dear [name],\n"
@@ -2562,7 +2564,7 @@ msgstr ""
 "Le dea-mhéin,\n"
 "{{ name }}"
 
-#: src/postulo/documents/models.py:212
+#: src/postulo/documents/models.py:257
 #, draft
 msgid ""
 "Dear {{ company }},\n"
@@ -2583,7 +2585,7 @@ msgstr ""
 "Le dea-mhéin,\n"
 "{{ name }}"
 
-#: src/postulo/documents/models.py:226
+#: src/postulo/documents/models.py:271
 #, draft
 msgid ""
 "Dear {{ company }},\n"
@@ -2667,7 +2669,7 @@ msgstr "Cosaint"
 
 #: src/postulo/templates/applications/application_detail.html:42
 #: src/postulo/templates/applications/tag_list.html:32
-#: src/postulo/templates/documents/cv_detail.html:23
+#: src/postulo/templates/documents/cv_detail.html:24
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:58
@@ -2812,12 +2814,12 @@ msgstr "Déan é seo"
 msgid "Document"
 msgstr "Doiciméad"
 
-#: src/postulo/documents/models.py:527
+#: src/postulo/documents/models.py:603
 #, draft
 msgid "document copies"
 msgstr "cóipeanna doiciméad"
 
-#: src/postulo/documents/models.py:526
+#: src/postulo/documents/models.py:602
 #, draft
 msgid "document copy"
 msgstr "cóip doiciméid"
@@ -2835,7 +2837,7 @@ msgstr "Stórais doiciméad"
 msgid "Documents"
 msgstr "Doiciméid"
 
-#: src/postulo/documents/views.py:476
+#: src/postulo/documents/views.py:480
 #, draft
 msgid "Documents sent"
 msgstr "Doiciméid seolta"
@@ -2859,7 +2861,7 @@ msgstr "déanta ar"
 
 #: src/postulo/templates/documents/application_documents.html:35
 #: src/postulo/templates/documents/application_documents.html:75
-#: src/postulo/templates/documents/cv_detail.html:117
+#: src/postulo/templates/documents/cv_detail.html:122
 #: src/postulo/templates/documents/rendered_list.html:49
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
@@ -3164,7 +3166,7 @@ msgid ""
 msgstr ""
 "Gach ról a bhí agat. Scríobh na buaicphointí uair amháin; cuir in oiriúint iad de réir CV níos déanaí."
 
-#: src/postulo/documents/views.py:396
+#: src/postulo/documents/views.py:400
 #, draft
 msgid "Every store already has this document."
 msgstr "Tá an doiciméad seo ag gach stór cheana."
@@ -3214,10 +3216,10 @@ msgstr "Tá gach a dtairgeann an API le fáil ag <code>%(url)s</code>, in OpenAP
 msgid "Everything you have written"
 msgstr "Gach a bhfuil scríofa agat"
 
-#: src/postulo/templates/documents/cv_detail.html:149
+#: src/postulo/templates/documents/cv_detail.html:154
 #, draft
-msgid "Everything you have written is already on this CV."
-msgstr "Tá gach a bhfuil scríofa agat ar an CV seo cheana."
+msgid "Everything you have written is already on it."
+msgstr "Tá gach rud a scríobh tú air cheana."
 
 #: src/postulo/templates/applications/interview_list.html:12
 #, draft
@@ -3296,7 +3298,7 @@ msgstr ""
 msgid "Export everything"
 msgstr "Easpórtáil gach rud"
 
-#: src/postulo/templates/documents/cv_detail.html:19
+#: src/postulo/templates/documents/cv_detail.html:20
 #, draft
 msgid "Export PDF"
 msgstr "Easpórtáil PDF"
@@ -3306,7 +3308,7 @@ msgstr "Easpórtáil PDF"
 msgid "Exported on its own"
 msgstr "Easpórtáilte ina aonar"
 
-#: src/postulo/documents/models.py:476
+#: src/postulo/documents/models.py:552
 #, draft
 msgid "Failed"
 msgstr "Theip air"
@@ -3368,12 +3370,12 @@ msgstr "réimse staidéir"
 msgid "Figures appear once you have applied for something."
 msgstr "Taispeántar figiúirí nuair a bheidh iarratas déanta agat ar rud éigin."
 
-#: src/postulo/documents/models.py:343 src/postulo/documents/models.py:400
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:467
 #, draft
 msgid "file"
 msgstr "comhad"
 
-#: src/postulo/documents/views.py:310
+#: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Comhad sábháilte."
@@ -3400,7 +3402,7 @@ msgstr "Comhaid a bhí agat cheana"
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr "Comhaid a bhí agat cheana, seachas doiciméid a rindreáil Postulo."
 
-#: src/postulo/documents/forms.py:239
+#: src/postulo/documents/forms.py:258
 #, draft
 msgid "Files you have already"
 msgstr "Comhaid atá agat cheana"
@@ -3463,12 +3465,12 @@ msgstr "Céad luach"
 msgid "First, take everything with you"
 msgstr "Ar dtús, tabhair gach rud leat"
 
-#: src/postulo/documents/forms.py:38
+#: src/postulo/documents/forms.py:39
 #, draft
 msgid "Follow your profile"
 msgstr "Lean do phróifíl"
 
-#: src/postulo/documents/models.py:206
+#: src/postulo/documents/models.py:251
 #, draft
 msgid "Follow-up note"
 msgstr "Nóta i ndiaidh agallaimh"
@@ -3499,7 +3501,7 @@ msgstr "Do"
 msgid "For example, “BSc Computer Science”."
 msgstr "Mar shampla, “BSc Ríomheolaíocht”."
 
-#: src/postulo/documents/models.py:83
+#: src/postulo/documents/models.py:109
 #, draft
 msgid "For you, not for the employer: “Backend, English”."
 msgstr "Duitse, ní don fhostóir: “Cúlchríoch, Béarla”."
@@ -3761,7 +3763,7 @@ msgstr "tharla"
 msgid "happened on"
 msgstr "tharla ar"
 
-#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:85
+#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:114
 #: src/postulo/resume/views.py:441
 #, draft
 msgid "headline"
@@ -3783,7 +3785,7 @@ msgstr "Seiceáil sláinte"
 msgid "Held"
 msgstr "Ar siúl"
 
-#: src/postulo/templates/documents/cv_detail.html:69
+#: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "hidden"
 msgstr "folaithe"
@@ -3804,7 +3806,7 @@ msgstr "Ard"
 msgid "highlights"
 msgstr "buaicphointí"
 
-#: src/postulo/documents/models.py:159
+#: src/postulo/documents/models.py:204
 #, draft
 msgid "highlights for this CV"
 msgstr "buaicphointí don CV seo"
@@ -3922,7 +3924,7 @@ msgstr "Hibrideach"
 msgid "I have already applied to this one"
 msgstr "Chuir mé iarratas chuig an gceann seo cheana"
 
-#: src/postulo/documents/models.py:515
+#: src/postulo/documents/models.py:591
 #, draft
 msgid "id in the store"
 msgstr "aitheantas sa stór"
@@ -4073,12 +4075,12 @@ msgstr "sa %(kind)s a sheol tú chuig %(company)s ar %(when)s"
 msgid "In the diary"
 msgstr "Sa dialann"
 
-#: src/postulo/documents/models.py:99
+#: src/postulo/documents/models.py:128
 #, draft
 msgid "include contact details"
 msgstr "cuir sonraí teagmhála san áireamh"
 
-#: src/postulo/documents/models.py:154
+#: src/postulo/documents/models.py:199
 #, draft
 msgid "included"
 msgstr "san áireamh"
@@ -4431,9 +4433,10 @@ msgstr ""
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:269
-#: src/postulo/documents/models.py:341 src/postulo/documents/models.py:399
-#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:243
+#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
+#: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
+#: src/postulo/resume/models.py:243
 #, draft
 msgid "kind"
 msgstr "cineál"
@@ -4447,7 +4450,7 @@ msgstr "cineál"
 msgid "Kind"
 msgstr "Cineál"
 
-#: src/postulo/documents/models.py:506
+#: src/postulo/documents/models.py:582
 #, draft
 msgid "kind of document"
 msgstr "cineál cáipéise"
@@ -4457,7 +4460,7 @@ msgstr "cineál cáipéise"
 msgid "kind of entry"
 msgstr "cineál iontrála"
 
-#: src/postulo/documents/models.py:432
+#: src/postulo/documents/models.py:499
 #, draft
 msgid "kind of source"
 msgstr "cineál foinse"
@@ -4467,7 +4470,7 @@ msgstr "cineál foinse"
 msgid "Kinds of letter"
 msgstr "Cineálacha litreach"
 
-#: src/postulo/documents/models.py:499 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:575 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "lipéad"
@@ -4478,8 +4481,8 @@ msgstr "lipéad"
 msgid "Language"
 msgstr "Teanga"
 
-#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:91
-#: src/postulo/documents/models.py:285 src/postulo/resume/models.py:197
+#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:120
+#: src/postulo/documents/models.py:330 src/postulo/resume/models.py:197
 #: src/postulo/resume/models.py:203 src/postulo/resume/models.py:301
 #, draft
 msgid "language"
@@ -4551,7 +4554,7 @@ msgstr "An leathanach is mó a léadh"
 msgid "Last activity"
 msgstr "Gníomhaíocht dheireanach"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "last attempt"
 msgstr "an iarracht dheireanach"
@@ -4566,7 +4569,7 @@ msgstr "an tseiceáil dheireanach"
 msgid "last checked"
 msgstr "seiceáilte go deireanach"
 
-#: src/postulo/documents/models.py:523 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:599 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "earráid dheireanach"
@@ -4664,12 +4667,12 @@ msgstr "Lig don eochair rochtana seo mé a shíniú isteach léi féin"
 msgid "Let {column} size itself"
 msgstr "Lig do {column} a mhéid féin a shocrú"
 
-#: src/postulo/documents/forms.py:236 src/postulo/documents/themes.py:72
+#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Litir"
 
-#: src/postulo/documents/models.py:294
+#: src/postulo/documents/models.py:339
 #, draft
 msgid "letter"
 msgstr "litir"
@@ -4683,7 +4686,7 @@ msgstr "litir"
 msgid "Letters"
 msgstr "Litreacha"
 
-#: src/postulo/documents/models.py:295
+#: src/postulo/documents/models.py:340
 #, draft
 msgid "letters"
 msgstr "litreacha"
@@ -4719,7 +4722,7 @@ msgstr "nasc"
 msgid "Link"
 msgstr "Nasc"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:592
 #, draft
 msgid "link in the store"
 msgstr "nasc sa stór"
@@ -4756,7 +4759,7 @@ msgid ""
 msgstr ""
 "Naisc chuig na háiteanna a bhfilleann cuardach poist orthu: an clár, na CVanna, na cuideachtaí."
 
-#: src/postulo/documents/forms.py:245
+#: src/postulo/documents/forms.py:264
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -5064,7 +5067,7 @@ msgstr "Cumaisc isteach i"
 msgid "Merged."
 msgstr "Cumaiscthe."
 
-#: src/postulo/documents/models.py:176
+#: src/postulo/documents/models.py:221
 #, draft
 msgid "Missing entry"
 msgstr "Iontráil ar iarraidh"
@@ -5108,7 +5111,8 @@ msgid ""
 msgstr ""
 "Rianaíonn formhór na ndaoine cuardach poist i scarbhileog go dtí go ngortaíonn sé. Tabhair anseo é seachas é a athchlóscríobh: CSV amháin, colúin ar bith, ceanntásca i dteanga ar bith. Feicfidh tú conas a léitear gach colún sula sábháiltear aon rud."
 
-#: src/postulo/documents/models.py:204 src/postulo/documents/models.py:325
+#: src/postulo/documents/kinds.py:140 src/postulo/documents/models.py:249
+#: src/postulo/documents/models.py:370
 #, draft
 msgid "Motivation letter"
 msgstr "Litir spreagtha"
@@ -5148,7 +5152,7 @@ msgstr "Bog %(name)s áit amháin chun deiridh"
 msgid "Move %(name)s up a row"
 msgstr "Bog %(name)s suas ró amháin"
 
-#: src/postulo/templates/documents/cv_detail.html:81
+#: src/postulo/templates/documents/cv_detail.html:86
 #: src/postulo/templates/resume/overview.html:112
 #, draft
 msgid "Move down"
@@ -5164,7 +5168,7 @@ msgstr "Bog ar aghaidh é"
 msgid "Move to status"
 msgstr "Bog go stádas"
 
-#: src/postulo/templates/documents/cv_detail.html:76
+#: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:107
 #, draft
 msgid "Move up"
@@ -5177,8 +5181,8 @@ msgid "NACE division"
 msgstr "rannán NACE"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:83
-#: src/postulo/documents/models.py:267 src/postulo/jobs/models.py:41
+#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
 #: src/postulo/plugins/models.py:48 src/postulo/resume/models.py:116
@@ -5246,11 +5250,11 @@ msgstr "Nua"
 msgid "New accounts"
 msgstr "Cuntais nua"
 
-#: src/postulo/templates/documents/cv_list.html:16
-#: src/postulo/templates/documents/cv_list.html:47
+#: src/postulo/templates/documents/cv_list.html:22
+#: src/postulo/templates/documents/cv_list.html:56
 #, draft
-msgid "New CV"
-msgstr "CV nua"
+msgid "New CV or portfolio"
+msgstr "CV nó punann nua"
 
 #: src/postulo/templates/jobs/industry_list.html:16
 #, draft
@@ -5308,7 +5312,7 @@ msgstr "An cúltaca is nuaí"
 msgid "Next"
 msgstr "Ar aghaidh"
 
-#: src/postulo/documents/models.py:519
+#: src/postulo/documents/models.py:595
 #, draft
 msgid "next attempt"
 msgstr "an chéad iarracht eile"
@@ -5378,12 +5382,7 @@ msgstr "Gan ceangal: %(why)s"
 msgid "No connections yet"
 msgstr "Níl aon naisc fós"
 
-#: src/postulo/templates/documents/cv_list.html:41
-#, draft
-msgid "No CVs yet"
-msgstr "Níl aon CVanna fós"
-
-#: src/postulo/documents/views.py:378
+#: src/postulo/documents/views.py:382
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5489,12 +5488,12 @@ msgstr "Gan mholtaí go fóill"
 msgid "No tags yet."
 msgstr "Níl aon chlibeanna fós."
 
-#: src/postulo/documents/themes.py:249
+#: src/postulo/documents/themes.py:251
 #, python-format, draft
 msgid "No theme called “%(theme)s” is installed."
 msgstr "Níl aon téama darb ainm “%(theme)s” suiteáilte."
 
-#: src/postulo/documents/themes.py:224
+#: src/postulo/documents/themes.py:226
 #, draft
 msgid "No theme is installed that can set this document."
 msgstr "Níl aon téama suiteáilte atá in ann an cháipéis seo a leagan amach."
@@ -5591,7 +5590,7 @@ msgstr "Gnáth"
 msgid "Not %(name)s"
 msgstr "Gan %(name)s"
 
-#: src/postulo/documents/models.py:477
+#: src/postulo/documents/models.py:553
 #, draft
 msgid "Not accepted"
 msgstr "Níor glacadh leis"
@@ -5687,7 +5686,7 @@ msgstr "Gan taispeáint · %(name)s"
 msgid "not tested yet"
 msgstr "níor tástáladh fós"
 
-#: src/postulo/templates/documents/cv_detail.html:34
+#: src/postulo/templates/documents/cv_detail.html:35
 #, python-format, draft
 msgid "Not yet written in %(tongue)s. These print as they stand:"
 msgstr "Gan scríobh i %(tongue)s go fóill. Priontáiltear iad seo mar atá siad:"
@@ -5724,7 +5723,7 @@ msgstr "tugtha faoi deara ar"
 msgid "Notes"
 msgstr "Nótaí"
 
-#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:150
+#: src/postulo/documents/models.py:403 src/postulo/jobs/models.py:150
 #: src/postulo/jobs/models.py:433
 #, draft
 msgid "notes"
@@ -5765,6 +5764,7 @@ msgstr ""
 "Níl aon rud anseo a mheaitseálann é sin. Ní thaispeántar ar an leathanach seo ach na réimsí a d’úsáid tú i ndáiríre."
 
 #: src/postulo/templates/applications/application_list.html:48
+#: src/postulo/templates/documents/cv_list.html:50
 #, draft
 msgid "Nothing here yet"
 msgstr "Níl aon rud anseo fós"
@@ -5843,16 +5843,16 @@ msgstr "Ní mheaitseálann aon rud “%(term)s”"
 msgid "Nothing on %(host)s could be used as a logo."
 msgstr "Ní raibh aon rud ar %(host)s inúsáidte mar lógó."
 
+#: src/postulo/templates/documents/cv_detail.html:101
+#, draft
+msgid "Nothing on it yet. Choose some entries below."
+msgstr "Níl aon rud air fós. Roghnaigh roinnt iontrálacha thíos."
+
 #: src/postulo/templates/connections/confirm_delete.html:13
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "Ní bhaintear le haon rud ar an tseirbhís eile. Is féidir leat é a nascadh arís níos déanaí."
-
-#: src/postulo/templates/documents/cv_detail.html:96
-#, draft
-msgid "Nothing on this CV yet. Choose some entries below."
-msgstr "Níl aon rud ar an CV seo fós. Roghnaigh roinnt iontrálacha thíos."
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -5943,7 +5943,7 @@ msgstr "Níor uaslódáladh aon rud fós."
 msgid "Nothing waiting"
 msgstr "Níl aon rud ag fanacht"
 
-#: src/postulo/documents/views.py:115 src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:119 src/postulo/documents/views.py:135
 #, draft
 msgid "Nothing was added."
 msgstr "Níor cuireadh aon rud leis."
@@ -6244,11 +6244,12 @@ msgid ""
 msgstr ""
 "Taifeadtar ceann atá tarlaithe cheana díreach ar an amlíne mar a bhí ar siúl."
 
-#: src/postulo/templates/documents/cv_list.html:11
+#: src/postulo/templates/documents/cv_list.html:17
 #, draft
-msgid "One variant per kind of role. Each selects from your career record."
+msgid ""
+"One variant per kind of role. Each selects from your career record; a portfolio leads with the work."
 msgstr ""
-"Leagan amháin in aghaidh an chineáil róil. Roghnaíonn gach ceann ó do thaifead gairme."
+"Leagan amháin do gach cineál poist. Roghnaíonn gach ceann as do chonair; tosaíonn punann leis an obair."
 
 #: src/postulo/templates/accounts/delete_account.html:37
 #, draft
@@ -6262,10 +6263,10 @@ msgstr ""
 msgid "Only %(name)s"
 msgstr "%(name)s amháin"
 
-#: src/postulo/templates/documents/cv_detail.html:129
+#: src/postulo/templates/documents/cv_detail.html:134
 #, draft
-msgid "Only entries not already on this CV are listed."
-msgstr "Ní liostaítear ach iontrálacha nach bhfuil ar an CV seo cheana."
+msgid "Only entries not already on it are listed."
+msgstr "Ní liostaítear ach iontrálacha nach bhfuil air cheana."
 
 #: src/postulo/plugins/fetching.py:121
 #, draft
@@ -6326,7 +6327,7 @@ msgstr "Nó uaslódáil ceann"
 msgid "ORCID"
 msgstr "ORCID"
 
-#: src/postulo/documents/models.py:152 src/postulo/resume/models.py:35
+#: src/postulo/documents/models.py:197 src/postulo/resume/models.py:35
 #, draft
 msgid "order"
 msgstr "ord"
@@ -6349,8 +6350,9 @@ msgstr "Fógra bunaidh"
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
 #: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/models.py:329
-#: src/postulo/jobs/models.py:492 src/postulo/resume/models.py:219
+#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
+#: src/postulo/resume/models.py:219
 #, draft
 msgid "Other"
 msgstr "Eile"
@@ -6495,7 +6497,7 @@ msgstr ""
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr "Greamaigh an téacs. Imíonn fógraí ón ngréasán; ní imeoidh do chóip."
 
-#: src/postulo/documents/views.py:189
+#: src/postulo/documents/views.py:193
 #, draft
 msgid "PDF created."
 msgstr "PDF cruthaithe."
@@ -6612,12 +6614,12 @@ msgstr "pictiúr"
 msgid "Placeholders"
 msgstr "Áitchoinneálaithe"
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 #, draft
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr "Líontar áitchoinneálaithe ar nós {{ company }} nuair a sheoltar iad."
 
-#: src/postulo/documents/themes.py:117
+#: src/postulo/documents/themes.py:119
 #, draft
 msgid "Plain"
 msgstr "Simplí"
@@ -6717,7 +6719,9 @@ msgid ""
 msgstr ""
 "Bíonn port 465 ag súil le TLS ón gcéad bheart, mar sin tá sé ag fanacht le teastas agus Postulo ag fanacht le beannacht. Roghnaigh “TLS ón gcéad bheart” nó bain úsáid as port 587 le STARTTLS."
 
-#: src/postulo/documents/models.py:327 src/postulo/resume/models.py:213
+#: src/postulo/documents/kinds.py:128 src/postulo/documents/models.py:97
+#: src/postulo/documents/models.py:372 src/postulo/documents/themes.py:72
+#: src/postulo/resume/models.py:213
 #, draft
 msgid "Portfolio"
 msgstr "Punann"
@@ -6891,6 +6895,7 @@ msgid "preparation notes"
 msgstr "nótaí ullmhúcháin"
 
 #: src/postulo/templates/documents/themes/base_cv.html:98
+#: src/postulo/templates/documents/themes/base_portfolio.html:67
 #: src/postulo/templates/resume/preview.html:28
 #, draft
 msgid "present"
@@ -6903,7 +6908,7 @@ msgid ""
 msgstr ""
 "Brúigh Seiceáil le haghaidh nuashonruithe chun a bhfuil á thairiscint ag na catalóga a fháil. Ní fhaigheann Postulo iad uaidh féin."
 
-#: src/postulo/templates/documents/cv_detail.html:16
+#: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
 #, draft
@@ -7261,7 +7266,7 @@ msgstr "taifeadta ag"
 msgid "recorded on"
 msgstr "taifeadta ar"
 
-#: src/postulo/documents/views.py:479
+#: src/postulo/documents/views.py:483
 #, draft
 msgid "Recorded what you sent."
 msgstr "Taifeadta a bhfuil seolta agat."
@@ -7297,7 +7302,7 @@ msgstr "Earcaitheoir"
 msgid "Redirects followed"
 msgstr "Atreoruithe a leanadh"
 
-#: src/postulo/documents/models.py:328
+#: src/postulo/documents/kinds.py:146 src/postulo/documents/models.py:373
 #, draft
 msgid "Reference"
 msgstr "Tagairt"
@@ -7409,7 +7414,7 @@ msgstr "cianseoladh"
 #: src/postulo/templates/accounts/profile.html:139
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
-#: src/postulo/templates/documents/cv_detail.html:87
+#: src/postulo/templates/documents/cv_detail.html:92
 #: src/postulo/templates/jobs/company_form.html:80
 #: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/partials/postal_addresses.html:79
@@ -7449,17 +7454,17 @@ msgstr "Bain {label}"
 msgid "removed on the other side"
 msgstr "bainte ar an taobh eile"
 
-#: src/postulo/documents/models.py:439
+#: src/postulo/documents/models.py:506
 #, draft
 msgid "rendered on"
 msgstr "rindreáilte ar"
 
-#: src/postulo/documents/models.py:360
+#: src/postulo/documents/models.py:412
 #, draft
 msgid "replaces"
 msgstr "tagann in ionad"
 
-#: src/postulo/documents/models.py:161
+#: src/postulo/documents/models.py:206
 #, draft
 msgid "Replaces the master highlights on this variant only. One per line."
 msgstr ""
@@ -7509,7 +7514,7 @@ msgstr "Athchoimre"
 msgid "Retail"
 msgstr "Miondíol"
 
-#: src/postulo/documents/models.py:276
+#: src/postulo/documents/models.py:321
 #, draft
 msgid "reusable template"
 msgstr "teimpléad in-athúsáidte"
@@ -7892,12 +7897,12 @@ msgstr "Theip ar an seoladh: %(error)s"
 msgid "Sent"
 msgstr "Seolta"
 
-#: src/postulo/documents/models.py:450
+#: src/postulo/documents/models.py:526
 #, draft
 msgid "sent document"
 msgstr "doiciméad seolta"
 
-#: src/postulo/documents/models.py:451
+#: src/postulo/documents/models.py:527
 #, draft
 msgid "sent documents"
 msgstr "doiciméid seolta"
@@ -7910,7 +7915,7 @@ msgstr "doiciméid seolta"
 msgid "Sent documents"
 msgstr "Doiciméid seolta"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:598
 #, draft
 msgid "sent on"
 msgstr "seolta ar"
@@ -8003,7 +8008,7 @@ msgstr "Socraigh nuair nach bhfuil an folúntas ar fáil a thuilleadh."
 
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:108 src/postulo/templates/core/export.html:4
-#: src/postulo/templates/documents/cv_detail.html:21
+#: src/postulo/templates/documents/cv_detail.html:22
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -8298,7 +8303,7 @@ msgstr "Foinsí suiteáilte"
 msgid "speaking"
 msgstr "labhairt"
 
-#: src/postulo/documents/models.py:205
+#: src/postulo/documents/models.py:250
 #, draft
 msgid "Speculative letter"
 msgstr "Litir gan iarraidh"
@@ -8366,7 +8371,7 @@ msgid "Status"
 msgstr "Stádas"
 
 #: src/postulo/applications/models.py:198
-#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:513
+#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:589
 #: src/postulo/jobs/models.py:751
 #, draft
 msgid "status"
@@ -8421,7 +8426,7 @@ msgstr "Cuir ó fheidhm é"
 msgid "Stop sorting by %(column)s"
 msgstr "Stop ag sórtáil de réir %(column)s"
 
-#: src/postulo/documents/models.py:498
+#: src/postulo/documents/models.py:574
 #, draft
 msgid "store"
 msgstr "stór"
@@ -8436,7 +8441,7 @@ msgstr "Stóráilte; fág bán chun an luach reatha a choinneáil."
 msgid "Strong"
 msgstr "Láidir"
 
-#: src/postulo/documents/models.py:271
+#: src/postulo/documents/models.py:316
 #, draft
 msgid "subject"
 msgstr "ábhar"
@@ -8467,7 +8472,7 @@ msgstr "moltaí"
 msgid "Suggestions"
 msgstr "Moltaí"
 
-#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:87
+#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:116
 #: src/postulo/resume/models.py:72 src/postulo/resume/models.py:155
 #, draft
 msgid "summary"
@@ -8478,7 +8483,7 @@ msgstr "achoimre"
 msgid "superseded"
 msgstr "curtha in ionad"
 
-#: src/postulo/documents/forms.py:209
+#: src/postulo/documents/forms.py:228
 #, draft
 msgid "Supersedes"
 msgstr "Tagann in ionad"
@@ -8600,7 +8605,7 @@ msgstr "Clibeanna"
 msgid "tags"
 msgstr "clibeanna"
 
-#: src/postulo/templates/documents/cv_detail.html:84
+#: src/postulo/templates/documents/cv_detail.html:89
 #, draft
 msgid "Tailor"
 msgstr "Cuir in oiriúint"
@@ -8611,10 +8616,10 @@ msgstr "Cuir in oiriúint"
 msgid "Tailor this entry"
 msgstr "Cuir an iontráil seo in oiriúint"
 
-#: src/postulo/templates/documents/cv_detail.html:67
+#: src/postulo/templates/documents/cv_detail.html:72
 #, draft
-msgid "tailored for this CV"
-msgstr "curtha in oiriúint don CV seo"
+msgid "tailored for this one"
+msgstr "curtha in oiriúint dó seo"
 
 #: src/postulo/templates/settings/dashboard.html:57
 #, python-format, draft
@@ -8657,7 +8662,7 @@ msgstr "Uimhreacha teileafóin"
 msgid "Template"
 msgstr "Teimpléad"
 
-#: src/postulo/documents/models.py:278
+#: src/postulo/documents/models.py:323
 #, draft
 msgid "Templates appear when you send a letter with an application."
 msgstr "Taispeántar teimpléid nuair a sheolann tú litir le hiarratas."
@@ -8682,7 +8687,7 @@ msgstr "Tástáil an ceangal"
 msgid "text"
 msgstr "téacs"
 
-#: src/postulo/documents/models.py:437
+#: src/postulo/documents/models.py:504
 #, draft
 msgid "text as sent"
 msgstr "téacs mar a seoladh"
@@ -8794,7 +8799,7 @@ msgstr "Tá an comhad seo folamh."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Tá an comhad seo níos mó ná %(limit)s MB, mar sin níor léadh é."
 
-#: src/postulo/documents/forms.py:215
+#: src/postulo/documents/forms.py:234
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Tá an comhad sin níos mó ná %(limit)s MB."
@@ -8991,7 +8996,7 @@ msgstr "Tá an t-inneall PDF %(name)s cumraithe ach níl sé inúsáidte. %(hint
 msgid "The %(plugin)s plugin is not installed."
 msgstr "Níl an breiseán %(plugin)s suiteáilte."
 
-#: src/postulo/documents/themes.py:227 src/postulo/documents/themes.py:255
+#: src/postulo/documents/themes.py:229 src/postulo/documents/themes.py:257
 #, python-format, draft
 msgid "The %(theme)s theme does not set this kind of document."
 msgstr "Ní leagann an téama %(theme)s an cineál cáipéise seo amach."
@@ -9049,7 +9054,7 @@ msgid "The company this one belongs to, if it belongs to one."
 msgstr ""
 "An chuideachta lena mbaineann an ceann seo, má bhaineann sí le ceann ar bith."
 
-#: src/postulo/documents/models.py:260
+#: src/postulo/documents/models.py:305
 #, draft
 msgid "The company you are applying to"
 msgstr "An chuideachta a bhfuil tú ag cur isteach uirthi"
@@ -9059,7 +9064,7 @@ msgstr "An chuideachta a bhfuil tú ag cur isteach uirthi"
 msgid "The connection is gone or switched off."
 msgstr "Tá an ceangal imithe nó múchta."
 
-#: src/postulo/documents/views.py:383
+#: src/postulo/documents/views.py:387
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "Níorbh fhéidir an chóip a sheoladh; deir an doiciméad cén fáth."
@@ -9083,7 +9088,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "Tá an íoslódáil i bhfad níos mó ná mar ba cheart do bhreiseán a bheith."
 
-#: src/postulo/documents/models.py:361
+#: src/postulo/documents/models.py:413
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr ""
@@ -9141,7 +9146,7 @@ msgstr "Níorbh fhéidir an suiteálaí a rith: %(error)s"
 msgid "The installer refused it: %(error)s"
 msgstr "Dhiúltaigh an suiteálaí dó: %(error)s"
 
-#: src/postulo/documents/models.py:261
+#: src/postulo/documents/models.py:306
 #, draft
 msgid "The job title"
 msgstr "Teideal an phoist"
@@ -9260,7 +9265,7 @@ msgstr "An chéad cheann eile"
 msgid "The one before"
 msgstr "An ceann roimhe"
 
-#: src/postulo/documents/models.py:87
+#: src/postulo/documents/models.py:116
 #, draft
 msgid "The opening paragraph, if you use one."
 msgstr "An t-alt tosaigh, má úsáideann tú ceann."
@@ -9699,7 +9704,7 @@ msgstr "Teorainn ama"
 msgid "timeout in seconds"
 msgstr "teorainn ama i soicindí"
 
-#: src/postulo/documents/models.py:340 src/postulo/documents/models.py:398
+#: src/postulo/documents/models.py:385 src/postulo/documents/models.py:462
 #: src/postulo/jobs/models.py:563 src/postulo/resume/models.py:241
 #, draft
 msgid "title"
@@ -9740,7 +9745,7 @@ msgstr "Chun fógra a thabhairt ar láimh (teastaíonn an scóip captures):"
 msgid "to status"
 msgstr "go stádas"
 
-#: src/postulo/documents/models.py:264
+#: src/postulo/documents/models.py:309
 #, draft
 msgid "Today's date"
 msgstr "Dáta an lae inniu"
@@ -9873,7 +9878,7 @@ msgstr "Clóscríobh do sheoladh, %(email)s, chun deimhniú"
 msgid "Unavailable — not offered at all"
 msgstr "Níl ar fáil — ní chuirtear ar fáil ar chor ar bith"
 
-#: src/postulo/documents/models.py:156
+#: src/postulo/documents/models.py:201
 #, draft
 msgid "Uncheck to keep the entry on this variant but leave it off the page."
 msgstr ""
@@ -9949,12 +9954,12 @@ msgstr "Uaslódáil agus mapáil na colúin"
 msgid "Uploaded"
 msgstr "Uaslódáilte"
 
-#: src/postulo/documents/models.py:373
+#: src/postulo/documents/models.py:437
 #, draft
 msgid "uploaded document"
 msgstr "doiciméad uaslódáilte"
 
-#: src/postulo/documents/models.py:374
+#: src/postulo/documents/models.py:438
 #, draft
 msgid "uploaded documents"
 msgstr "doiciméid uaslódáilte"
@@ -10073,7 +10078,7 @@ msgstr "fíoraithe"
 msgid "Verified"
 msgstr "Fíoraithe"
 
-#: src/postulo/documents/models.py:353
+#: src/postulo/documents/models.py:405
 #: src/postulo/templates/documents/upload_list.html:27
 #, draft
 msgid "version"
@@ -10089,7 +10094,7 @@ msgstr "Leagan"
 msgid "version tag"
 msgstr "clib leagain"
 
-#: src/postulo/templates/documents/cv_detail.html:101
+#: src/postulo/templates/documents/cv_detail.html:106
 #, draft
 msgid "Versions you have sent"
 msgstr "Leaganacha a sheol tú"
@@ -10129,7 +10134,7 @@ msgstr "Ag fanacht le freagra"
 msgid "Waiting only"
 msgstr "Ag fanacht amháin"
 
-#: src/postulo/documents/models.py:474
+#: src/postulo/documents/models.py:550
 #, draft
 msgid "Waiting to be sent"
 msgstr "Ag fanacht le seoladh"
@@ -10280,10 +10285,10 @@ msgstr ""
 msgid "What is in the file"
 msgstr "A bhfuil sa chomhad"
 
-#: src/postulo/templates/documents/cv_detail.html:56
-#, draft
-msgid "What is on this CV"
-msgstr "Cad atá ar an CV seo"
+#: src/postulo/templates/documents/cv_detail.html:58
+#, python-format, draft
+msgid "What is on this %(kind)s"
+msgstr "Cad atá ar an %(kind)s seo"
 
 #: src/postulo/templates/settings/plugins.html:7
 #, draft
@@ -10458,7 +10463,7 @@ msgid ""
 msgstr ""
 "Cá bhfaigheann na breiseáin a ghníomhaíonn ar do shon a seirbhísí, agus conas a shíníonn siad isteach. Stóráiltear rúin criptithe agus ní thaispeántar arís iad."
 
-#: src/postulo/documents/models.py:262
+#: src/postulo/documents/models.py:307
 #, draft
 msgid "Where the role is based"
 msgstr "Cá bhfuil an ról lonnaithe"
@@ -10532,14 +10537,14 @@ msgstr "Cén colún atá i gceist?"
 msgid "Which device or tool this is for."
 msgstr "Cén gléas nó uirlis dó seo."
 
-#: src/postulo/documents/models.py:288
+#: src/postulo/documents/models.py:333
 #, draft
 msgid ""
 "Which language this letter is written in. Leave blank to follow your profile."
 msgstr ""
 "Cén teanga ina bhfuil an litir seo scríofa. Fág folamh chun do phróifíl a leanúint."
 
-#: src/postulo/documents/models.py:94
+#: src/postulo/documents/models.py:123
 #, draft
 msgid ""
 "Which language this variant is written in. Leave blank to follow your profile."
@@ -10671,12 +10676,12 @@ msgid "Write one well, then let placeholders do the rest."
 msgstr ""
 "Scríobh ceann amháin go maith, ansin lig do na háitchoinneálaithe an chuid eile a dhéanamh."
 
-#: src/postulo/templates/documents/cv_detail.html:151
+#: src/postulo/templates/documents/cv_detail.html:156
 #, draft
 msgid "Write some more."
 msgstr "Scríobh beagán níos mó."
 
-#: src/postulo/templates/documents/cv_list.html:43
+#: src/postulo/templates/documents/cv_list.html:52
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Scríobh do ghairm síos ar dtús, ansin tóg leaganacha uaidh."
@@ -10740,10 +10745,10 @@ msgstr ""
 msgid "You already have a company with that name."
 msgstr "Tá cuideachta leis an ainm sin agat cheana."
 
-#: src/postulo/documents/forms.py:111
+#: src/postulo/documents/forms.py:130
 #, draft
-msgid "You already have a CV with that name."
-msgstr "Tá CV leis an ainm sin agat cheana."
+msgid "You already have a CV or portfolio with that name."
+msgstr "Tá CV nó punann den ainm sin agat cheana."
 
 #: src/postulo/applications/forms.py:356
 #, draft
@@ -10888,8 +10893,8 @@ msgid ""
 msgstr ""
 "Ní chruthóidh do bhrabhsálaí eochair rochtana ach ar leathanach a fhreastalaítear thar HTTPS. Baintear amach an t-ásc seo thar ghnáth-HTTP, mar sin ní féidir eochracha rochtana a thairiscint anseo. Riail an bhrabhsálaí atá ann, ní socrú ar an bhfreastalaí seo."
 
-#: src/postulo/templates/documents/cv_list.html:15
-#: src/postulo/templates/documents/cv_list.html:46
+#: src/postulo/templates/documents/cv_list.html:21
+#: src/postulo/templates/documents/cv_list.html:55
 #: src/postulo/templates/resume/overview.html:4
 #: src/postulo/templates/resume/overview.html:9
 #, draft
@@ -11001,12 +11006,12 @@ msgstr ""
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "D'ainm air: “Telegram”, “Paperless sa bhaile”."
 
-#: src/postulo/documents/models.py:101
+#: src/postulo/documents/models.py:130
 #, draft
 msgid "Your name, email and location, taken from your profile."
 msgstr "D'ainm, do ríomhphost agus do shuíomh, tógtha ó do phróifíl."
 
-#: src/postulo/documents/models.py:263
+#: src/postulo/documents/models.py:308
 #, draft
 msgid "Your own name"
 msgstr "D'ainm féin"

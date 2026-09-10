@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 05:20+0000\n"
+"POT-Creation-Date: 2026-09-10 05:54+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -172,6 +172,11 @@ msgstr ""
 #, python-format, draft
 msgid "%(kilobytes)s on disk"
 msgstr "%(kilobytes)s a lemezen"
+
+#: src/postulo/documents/views.py:91
+#, python-format, draft
+msgid "%(kind)s created. Now choose what goes on it."
+msgstr "%(kind)s létrehozva. Most válaszd ki, mi kerüljön rá."
 
 #: src/postulo/applications/services.py:356
 #, python-format, draft
@@ -345,15 +350,11 @@ msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr ""
 "A(z) %(name)s megváltoztatná azt, amitől maga a Postulo függ. %(problems)s"
 
-#: src/postulo/documents/rendering.py:295
+#: src/postulo/documents/rendering.py:279
+#: src/postulo/documents/rendering.py:304
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
-
-#: src/postulo/documents/rendering.py:275
-#, python-format, draft
-msgid "%(name)s — CV"
-msgstr "%(name)s — önéletrajz"
 
 #: src/postulo/templates/base.html:46
 #, python-format, draft
@@ -400,18 +401,18 @@ msgstr "%(role)s: nincs kezdő dátum, ezért nem került hozzáadásra."
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "A(z) %(scheme)s nem ilyesmit azonosít."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:391
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d másolat elküldve, %(failed)d sikertelen; minden dokumentum megmondja, melyik."
 
-#: src/postulo/documents/views.py:393
+#: src/postulo/documents/views.py:397
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d másolat elküldve."
 
-#: src/postulo/documents/themes.py:191
+#: src/postulo/documents/themes.py:193
 #, python-format, draft
 msgid "%(theme)s, from %(provider)s"
 msgstr "%(theme)s, tőle: %(provider)s"
@@ -440,7 +441,7 @@ msgid_plural "%(total)s companies"
 msgstr[0] "%(total)s cég"
 msgstr[1] "%(total)s cég"
 
-#: src/postulo/templates/documents/cv_list.html:29
+#: src/postulo/templates/documents/cv_list.html:38
 #, python-format, draft
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
@@ -500,7 +501,7 @@ msgid ""
 msgstr ""
 "<strong>%(name)s</strong>: %(rows)s sor. Az alábbi javaslatok a fejlécek neveiből származnak; javítsd, amit kell, majd ellenőrizd az előnézetet importálás előtt."
 
-#: src/postulo/documents/models.py:218
+#: src/postulo/documents/models.py:263
 #, draft
 msgid ""
 "[What you are applying for, and the one thing that makes you the person for it.]\n"
@@ -932,7 +933,7 @@ msgstr "Címke hozzáadása"
 msgid "Add all of this"
 msgstr "Mindezt hozzáadom"
 
-#: src/postulo/templates/documents/cv_detail.html:127
+#: src/postulo/templates/documents/cv_detail.html:132
 #, draft
 msgid "Add entries"
 msgstr "Bejegyzések hozzáadása"
@@ -952,10 +953,10 @@ msgstr "Vegyen fel egyet"
 msgid "Add the first one."
 msgstr "Add hozzá az elsőt."
 
-#: src/postulo/templates/documents/cv_detail.html:145
+#: src/postulo/templates/documents/cv_detail.html:150
 #, draft
-msgid "Add to CV"
-msgstr "Hozzáadás az önéletrajzhoz"
+msgid "Add these"
+msgstr "Ezek hozzáadása"
 
 #: src/postulo/templates/jobs/listing_form.html:53
 #, draft
@@ -977,7 +978,7 @@ msgstr "Hozzáadva"
 msgid "added"
 msgstr "hozzáadva"
 
-#: src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:135
 #, python-format, draft
 msgid "Added %(count)s entries."
 msgstr "%(count)s bejegyzés hozzáadva."
@@ -1230,7 +1231,7 @@ msgstr "Megjelenés"
 #: src/postulo/applications/models.py:424
 #: src/postulo/applications/models.py:519
 #: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:408 src/postulo/jobs/models.py:768
+#: src/postulo/documents/models.py:475 src/postulo/jobs/models.py:768
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1397,7 +1398,7 @@ msgstr "Jelentkezés: %(title)s"
 msgid "Apprenticeship"
 msgstr "Tanulószerződés"
 
-#: src/postulo/documents/models.py:475
+#: src/postulo/documents/models.py:551
 #, draft
 msgid "Archived"
 msgstr "Archiválva"
@@ -1435,7 +1436,7 @@ msgid "At least one language has to be offered, or nobody can read anything."
 msgstr ""
 "Legalább egy nyelvet kínálni kell, különben senki sem tud semmit elolvasni."
 
-#: src/postulo/documents/models.py:517
+#: src/postulo/documents/models.py:593
 #, draft
 msgid "attempts"
 msgstr "próbálkozások"
@@ -1547,7 +1548,7 @@ msgstr "Biotechnológia"
 msgid "Board"
 msgstr "Tábla"
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 #, draft
 msgid "body"
 msgstr "törzsszöveg"
@@ -1758,7 +1759,7 @@ msgstr "Szállítja: %(label)s, %(version)s verzió."
 msgid "Catalogues"
 msgstr "Katalógusok"
 
-#: src/postulo/documents/models.py:326
+#: src/postulo/documents/kinds.py:145 src/postulo/documents/models.py:371
 #, draft
 msgid "Certificate"
 msgstr "Tanúsítvány"
@@ -1845,7 +1846,7 @@ msgstr "Mind ellenőrzése"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Ellenőrizve %(when)s: %(detail)s"
 
-#: src/postulo/documents/models.py:438
+#: src/postulo/documents/models.py:505
 #, draft
 msgid "checksum"
 msgstr "ellenőrző összeg"
@@ -1875,7 +1876,7 @@ msgstr "Előbb válasszon csomagot."
 msgid "Choose another file"
 msgstr "Másik fájl választása"
 
-#: src/postulo/documents/forms.py:268
+#: src/postulo/documents/forms.py:287
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Válassz legalább egy rögzítendő dokumentumot."
@@ -1895,7 +1896,7 @@ msgstr "Először válassza ki, melyik jelentkezésről van szó."
 msgid "City and country, as it should appear on a CV."
 msgstr "Város és ország, ahogy az önéletrajzon szerepelnie kell."
 
-#: src/postulo/documents/themes.py:118
+#: src/postulo/documents/themes.py:120
 #, draft
 msgid "Classic"
 msgstr "Klasszikus"
@@ -2114,7 +2115,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Csatlakoztatva. Tesztelje, hogy biztos legyen benne, hogy működik."
 
-#: src/postulo/documents/models.py:496 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:572 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:255
 #, draft
 msgid "connection"
@@ -2276,7 +2277,8 @@ msgstr "Ország"
 msgid "Country the number is in"
 msgstr "A szám országa"
 
-#: src/postulo/documents/models.py:203 src/postulo/documents/models.py:324
+#: src/postulo/documents/kinds.py:134 src/postulo/documents/models.py:248
+#: src/postulo/documents/models.py:369
 #: src/postulo/templates/documents/letter_form.html:4
 #: src/postulo/templates/documents/letter_form.html:16
 #, draft
@@ -2334,8 +2336,9 @@ msgstr "pénznem"
 msgid "Custom"
 msgstr "Egyéni"
 
-#: src/postulo/documents/forms.py:234 src/postulo/documents/models.py:105
-#: src/postulo/documents/models.py:146 src/postulo/documents/models.py:323
+#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:125
+#: src/postulo/documents/models.py:96 src/postulo/documents/models.py:134
+#: src/postulo/documents/models.py:191 src/postulo/documents/models.py:368
 #: src/postulo/documents/themes.py:71
 #: src/postulo/templates/documents/cv_form.html:4
 #: src/postulo/templates/documents/cv_form.html:8
@@ -2343,29 +2346,28 @@ msgstr "Egyéni"
 msgid "CV"
 msgstr "Önéletrajz"
 
-#: src/postulo/documents/views.py:89
-#, draft
-msgid "CV created. Now choose what goes on it."
-msgstr "Önéletrajz létrehozva. Most válaszd ki, mi kerüljön bele."
-
-#: src/postulo/documents/models.py:166
+#: src/postulo/documents/models.py:211
 #, draft
 msgid "CV entries"
 msgstr "Önéletrajz-bejegyzések"
 
-#: src/postulo/documents/models.py:165
+#: src/postulo/documents/models.py:210
 #, draft
 msgid "CV entry"
 msgstr "Önéletrajz-bejegyzés"
 
-#: src/postulo/core/search.py:391 src/postulo/documents/models.py:106
+#: src/postulo/core/search.py:391 src/postulo/documents/models.py:135
 #: src/postulo/templates/accounts/delete_account.html:23
 #: src/postulo/templates/core/export.html:21
-#: src/postulo/templates/documents/cv_list.html:4
-#: src/postulo/templates/documents/cv_list.html:9
 #, draft
 msgid "CVs"
 msgstr "Önéletrajzok"
+
+#: src/postulo/templates/documents/cv_list.html:4
+#: src/postulo/templates/documents/cv_list.html:15
+#, draft
+msgid "CVs and portfolios"
+msgstr "Önéletrajzok és portfóliók"
 
 #: src/postulo/accounts/models.py:144
 #, draft
@@ -2471,7 +2473,7 @@ msgstr "határidő"
 msgid "Deadline"
 msgstr "Határidő"
 
-#: src/postulo/documents/models.py:232
+#: src/postulo/documents/models.py:277
 #, draft
 msgid ""
 "Dear [name],\n"
@@ -2492,7 +2494,7 @@ msgstr ""
 "Üdvözlettel,\n"
 "{{ name }}"
 
-#: src/postulo/documents/models.py:212
+#: src/postulo/documents/models.py:257
 #, draft
 msgid ""
 "Dear {{ company }},\n"
@@ -2513,7 +2515,7 @@ msgstr ""
 "Üdvözlettel,\n"
 "{{ name }}"
 
-#: src/postulo/documents/models.py:226
+#: src/postulo/documents/models.py:271
 #, draft
 msgid ""
 "Dear {{ company }},\n"
@@ -2597,7 +2599,7 @@ msgstr "Védelem"
 
 #: src/postulo/templates/applications/application_detail.html:42
 #: src/postulo/templates/applications/tag_list.html:32
-#: src/postulo/templates/documents/cv_detail.html:23
+#: src/postulo/templates/documents/cv_detail.html:24
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
 #: src/postulo/templates/jobs/company_detail.html:58
@@ -2742,12 +2744,12 @@ msgstr "Ezt tedd"
 msgid "Document"
 msgstr "Dokumentum"
 
-#: src/postulo/documents/models.py:527
+#: src/postulo/documents/models.py:603
 #, draft
 msgid "document copies"
 msgstr "dokumentummásolatok"
 
-#: src/postulo/documents/models.py:526
+#: src/postulo/documents/models.py:602
 #, draft
 msgid "document copy"
 msgstr "dokumentummásolat"
@@ -2765,7 +2767,7 @@ msgstr "Dokumentumtárak"
 msgid "Documents"
 msgstr "Dokumentumok"
 
-#: src/postulo/documents/views.py:476
+#: src/postulo/documents/views.py:480
 #, draft
 msgid "Documents sent"
 msgstr "Elküldött dokumentumok"
@@ -2790,7 +2792,7 @@ msgstr "kész ekkor"
 
 #: src/postulo/templates/documents/application_documents.html:35
 #: src/postulo/templates/documents/application_documents.html:75
-#: src/postulo/templates/documents/cv_detail.html:117
+#: src/postulo/templates/documents/cv_detail.html:122
 #: src/postulo/templates/documents/rendered_list.html:49
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
@@ -3093,7 +3095,7 @@ msgid ""
 msgstr ""
 "Minden betöltött pozíció. Írd meg egyszer a kiemeléseket; később önéletrajzonként szabd testre őket."
 
-#: src/postulo/documents/views.py:396
+#: src/postulo/documents/views.py:400
 #, draft
 msgid "Every store already has this document."
 msgstr "Minden tárolóban megvan már ez a dokumentum."
@@ -3144,10 +3146,10 @@ msgstr ""
 msgid "Everything you have written"
 msgstr "Minden, amit írtál"
 
-#: src/postulo/templates/documents/cv_detail.html:149
+#: src/postulo/templates/documents/cv_detail.html:154
 #, draft
-msgid "Everything you have written is already on this CV."
-msgstr "Minden, amit írtál, már rajta van ezen az önéletrajzon."
+msgid "Everything you have written is already on it."
+msgstr "Minden, amit írtál, már rajta van."
 
 #: src/postulo/templates/applications/interview_list.html:12
 #, draft
@@ -3226,7 +3228,7 @@ msgstr ""
 msgid "Export everything"
 msgstr "Minden exportálása"
 
-#: src/postulo/templates/documents/cv_detail.html:19
+#: src/postulo/templates/documents/cv_detail.html:20
 #, draft
 msgid "Export PDF"
 msgstr "PDF exportálása"
@@ -3236,7 +3238,7 @@ msgstr "PDF exportálása"
 msgid "Exported on its own"
 msgstr "Külön exportálva"
 
-#: src/postulo/documents/models.py:476
+#: src/postulo/documents/models.py:552
 #, draft
 msgid "Failed"
 msgstr "Sikertelen"
@@ -3298,12 +3300,12 @@ msgstr "szakterület"
 msgid "Figures appear once you have applied for something."
 msgstr "A számok akkor jelennek meg, ha már jelentkeztél valahova."
 
-#: src/postulo/documents/models.py:343 src/postulo/documents/models.py:400
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:467
 #, draft
 msgid "file"
 msgstr "fájl"
 
-#: src/postulo/documents/views.py:310
+#: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Fájl mentve."
@@ -3331,7 +3333,7 @@ msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
 "Fájlok, amelyek már megvoltak, szemben a Postulo által előállított dokumentumokkal."
 
-#: src/postulo/documents/forms.py:239
+#: src/postulo/documents/forms.py:258
 #, draft
 msgid "Files you have already"
 msgstr "Fájlok, amelyek már megvannak"
@@ -3394,12 +3396,12 @@ msgstr "Első érték"
 msgid "First, take everything with you"
 msgstr "Először vigyél magaddal mindent"
 
-#: src/postulo/documents/forms.py:38
+#: src/postulo/documents/forms.py:39
 #, draft
 msgid "Follow your profile"
 msgstr "A profilod szerint"
 
-#: src/postulo/documents/models.py:206
+#: src/postulo/documents/models.py:251
 #, draft
 msgid "Follow-up note"
 msgstr "Interjú utáni jegyzet"
@@ -3430,7 +3432,7 @@ msgstr "Kinek"
 msgid "For example, “BSc Computer Science”."
 msgstr "Például „BSc informatika”."
 
-#: src/postulo/documents/models.py:83
+#: src/postulo/documents/models.py:109
 #, draft
 msgid "For you, not for the employer: “Backend, English”."
 msgstr "Neked szól, nem a munkaadónak: „Backend, angol”."
@@ -3690,7 +3692,7 @@ msgstr "történt"
 msgid "happened on"
 msgstr "történt ekkor"
 
-#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:85
+#: src/postulo/accounts/models.py:254 src/postulo/documents/models.py:114
 #: src/postulo/resume/views.py:441
 #, draft
 msgid "headline"
@@ -3712,7 +3714,7 @@ msgstr "Állapotellenőrzés"
 msgid "Held"
 msgstr "Megtartva"
 
-#: src/postulo/templates/documents/cv_detail.html:69
+#: src/postulo/templates/documents/cv_detail.html:74
 #, draft
 msgid "hidden"
 msgstr "rejtett"
@@ -3733,7 +3735,7 @@ msgstr "Magas"
 msgid "highlights"
 msgstr "kiemelések"
 
-#: src/postulo/documents/models.py:159
+#: src/postulo/documents/models.py:204
 #, draft
 msgid "highlights for this CV"
 msgstr "kiemelések ehhez az önéletrajzhoz"
@@ -3850,7 +3852,7 @@ msgstr "Hibrid"
 msgid "I have already applied to this one"
 msgstr "Ide már jelentkeztem"
 
-#: src/postulo/documents/models.py:515
+#: src/postulo/documents/models.py:591
 #, draft
 msgid "id in the store"
 msgstr "azonosító a tárolóban"
@@ -4002,12 +4004,12 @@ msgstr ""
 msgid "In the diary"
 msgstr "A naptárban"
 
-#: src/postulo/documents/models.py:99
+#: src/postulo/documents/models.py:128
 #, draft
 msgid "include contact details"
 msgstr "elérhetőségek megadása"
 
-#: src/postulo/documents/models.py:154
+#: src/postulo/documents/models.py:199
 #, draft
 msgid "included"
 msgstr "benne van"
@@ -4358,9 +4360,10 @@ msgstr ""
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
-#: src/postulo/core/models.py:400 src/postulo/documents/models.py:269
-#: src/postulo/documents/models.py:341 src/postulo/documents/models.py:399
-#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:243
+#: src/postulo/core/models.py:400 src/postulo/documents/models.py:112
+#: src/postulo/documents/models.py:314 src/postulo/documents/models.py:392
+#: src/postulo/documents/models.py:465 src/postulo/plugins/models.py:169
+#: src/postulo/resume/models.py:243
 #, draft
 msgid "kind"
 msgstr "fajta"
@@ -4374,7 +4377,7 @@ msgstr "fajta"
 msgid "Kind"
 msgstr "Fajta"
 
-#: src/postulo/documents/models.py:506
+#: src/postulo/documents/models.py:582
 #, draft
 msgid "kind of document"
 msgstr "dokumentum típusa"
@@ -4384,7 +4387,7 @@ msgstr "dokumentum típusa"
 msgid "kind of entry"
 msgstr "bejegyzés típusa"
 
-#: src/postulo/documents/models.py:432
+#: src/postulo/documents/models.py:499
 #, draft
 msgid "kind of source"
 msgstr "forrás típusa"
@@ -4394,7 +4397,7 @@ msgstr "forrás típusa"
 msgid "Kinds of letter"
 msgstr "Levéltípusok"
 
-#: src/postulo/documents/models.py:499 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:575 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "címke"
@@ -4405,8 +4408,8 @@ msgstr "címke"
 msgid "Language"
 msgstr "Nyelv"
 
-#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:91
-#: src/postulo/documents/models.py:285 src/postulo/resume/models.py:197
+#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:120
+#: src/postulo/documents/models.py:330 src/postulo/resume/models.py:197
 #: src/postulo/resume/models.py:203 src/postulo/resume/models.py:301
 #, draft
 msgid "language"
@@ -4478,7 +4481,7 @@ msgstr "Legnagyobb beolvasott oldal"
 msgid "Last activity"
 msgstr "Utolsó tevékenység"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "last attempt"
 msgstr "utolsó próbálkozás"
@@ -4493,7 +4496,7 @@ msgstr "legutóbbi ellenőrzés"
 msgid "last checked"
 msgstr "legutóbb ellenőrizve"
 
-#: src/postulo/documents/models.py:523 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:599 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "utolsó hiba"
@@ -4591,12 +4594,12 @@ msgstr "Ez a hozzáférési kulcs magában is jelentkeztessen be"
 msgid "Let {column} size itself"
 msgstr "Hagyja, hogy a(z) {column} maga állítsa be a szélességét"
 
-#: src/postulo/documents/forms.py:236 src/postulo/documents/themes.py:72
+#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Levél"
 
-#: src/postulo/documents/models.py:294
+#: src/postulo/documents/models.py:339
 #, draft
 msgid "letter"
 msgstr "levél"
@@ -4610,7 +4613,7 @@ msgstr "levél"
 msgid "Letters"
 msgstr "Levelek"
 
-#: src/postulo/documents/models.py:295
+#: src/postulo/documents/models.py:340
 #, draft
 msgid "letters"
 msgstr "levelek"
@@ -4646,7 +4649,7 @@ msgstr "link"
 msgid "Link"
 msgstr "Link"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:592
 #, draft
 msgid "link in the store"
 msgstr "hivatkozás a tárolóban"
@@ -4683,7 +4686,7 @@ msgid ""
 msgstr ""
 "Hivatkozások azokra a helyekre, ahová az álláskeresés visszatér: tábla, önéletrajzok, cégek."
 
-#: src/postulo/documents/forms.py:245
+#: src/postulo/documents/forms.py:264
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -4985,7 +4988,7 @@ msgstr "Összevonás ebbe"
 msgid "Merged."
 msgstr "Összevonva."
 
-#: src/postulo/documents/models.py:176
+#: src/postulo/documents/models.py:221
 #, draft
 msgid "Missing entry"
 msgstr "Hiányzó bejegyzés"
@@ -5029,7 +5032,8 @@ msgid ""
 msgstr ""
 "A legtöbben táblázatban követik az álláskeresésüket, amíg fájni nem kezd. Hozd ide ahelyett, hogy újragépelnéd: egy CSV, bármilyen oszlopokkal, bármilyen nyelvű fejlécekkel. Látni fogod, hogyan olvassuk be az egyes oszlopokat, mielőtt bármi mentésre kerülne."
 
-#: src/postulo/documents/models.py:204 src/postulo/documents/models.py:325
+#: src/postulo/documents/kinds.py:140 src/postulo/documents/models.py:249
+#: src/postulo/documents/models.py:370
 #, draft
 msgid "Motivation letter"
 msgstr "Motivációs levél"
@@ -5069,7 +5073,7 @@ msgstr "%(name)s mozgatása egy hellyel hátrébb"
 msgid "Move %(name)s up a row"
 msgstr "%(name)s mozgatása egy sorral feljebb"
 
-#: src/postulo/templates/documents/cv_detail.html:81
+#: src/postulo/templates/documents/cv_detail.html:86
 #: src/postulo/templates/resume/overview.html:112
 #, draft
 msgid "Move down"
@@ -5085,7 +5089,7 @@ msgstr "Továbbléptetés"
 msgid "Move to status"
 msgstr "Áthelyezés állapotba"
 
-#: src/postulo/templates/documents/cv_detail.html:76
+#: src/postulo/templates/documents/cv_detail.html:81
 #: src/postulo/templates/resume/overview.html:107
 #, draft
 msgid "Move up"
@@ -5098,8 +5102,8 @@ msgid "NACE division"
 msgstr "NACE-ágazat"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:81 src/postulo/documents/models.py:83
-#: src/postulo/documents/models.py:267 src/postulo/jobs/models.py:41
+#: src/postulo/core/models.py:81 src/postulo/documents/models.py:109
+#: src/postulo/documents/models.py:312 src/postulo/jobs/models.py:41
 #: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
 #: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
 #: src/postulo/plugins/models.py:48 src/postulo/resume/models.py:116
@@ -5167,11 +5171,11 @@ msgstr "Új"
 msgid "New accounts"
 msgstr "Új fiókok"
 
-#: src/postulo/templates/documents/cv_list.html:16
-#: src/postulo/templates/documents/cv_list.html:47
+#: src/postulo/templates/documents/cv_list.html:22
+#: src/postulo/templates/documents/cv_list.html:56
 #, draft
-msgid "New CV"
-msgstr "Új önéletrajz"
+msgid "New CV or portfolio"
+msgstr "Új önéletrajz vagy portfólió"
 
 #: src/postulo/templates/jobs/industry_list.html:16
 #, draft
@@ -5229,7 +5233,7 @@ msgstr "Legújabb biztonsági mentés"
 msgid "Next"
 msgstr "Következő"
 
-#: src/postulo/documents/models.py:519
+#: src/postulo/documents/models.py:595
 #, draft
 msgid "next attempt"
 msgstr "következő próbálkozás"
@@ -5298,12 +5302,7 @@ msgstr "Nincs kapcsolat: %(why)s"
 msgid "No connections yet"
 msgstr "Még nincsenek kapcsolatok"
 
-#: src/postulo/templates/documents/cv_list.html:41
-#, draft
-msgid "No CVs yet"
-msgstr "Még nincsenek önéletrajzok"
-
-#: src/postulo/documents/views.py:378
+#: src/postulo/documents/views.py:382
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5409,12 +5408,12 @@ msgstr "Még nincs javaslat"
 msgid "No tags yet."
 msgstr "Még nincsenek címkék."
 
-#: src/postulo/documents/themes.py:249
+#: src/postulo/documents/themes.py:251
 #, python-format, draft
 msgid "No theme called “%(theme)s” is installed."
 msgstr "Nincs telepítve „%(theme)s” nevű téma."
 
-#: src/postulo/documents/themes.py:224
+#: src/postulo/documents/themes.py:226
 #, draft
 msgid "No theme is installed that can set this document."
 msgstr ""
@@ -5512,7 +5511,7 @@ msgstr "Normál"
 msgid "Not %(name)s"
 msgstr "Nem %(name)s"
 
-#: src/postulo/documents/models.py:477
+#: src/postulo/documents/models.py:553
 #, draft
 msgid "Not accepted"
 msgstr "Nem fogadták el"
@@ -5608,7 +5607,7 @@ msgstr "Nem látható · %(name)s"
 msgid "not tested yet"
 msgstr "még nem tesztelt"
 
-#: src/postulo/templates/documents/cv_detail.html:34
+#: src/postulo/templates/documents/cv_detail.html:35
 #, python-format, draft
 msgid "Not yet written in %(tongue)s. These print as they stand:"
 msgstr ""
@@ -5646,7 +5645,7 @@ msgstr "feljegyezve ekkor"
 msgid "Notes"
 msgstr "Jegyzetek"
 
-#: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:150
+#: src/postulo/documents/models.py:403 src/postulo/jobs/models.py:150
 #: src/postulo/jobs/models.py:433
 #, draft
 msgid "notes"
@@ -5687,6 +5686,7 @@ msgstr ""
 "Itt semmi sem felel meg ennek. Ezen az oldalon csak azok a területek szerepelnek, amelyeket tényleg használt."
 
 #: src/postulo/templates/applications/application_list.html:48
+#: src/postulo/templates/documents/cv_list.html:50
 #, draft
 msgid "Nothing here yet"
 msgstr "Még nincs itt semmi"
@@ -5764,16 +5764,16 @@ msgstr "Semmi sem felel meg ennek: „%(term)s”"
 msgid "Nothing on %(host)s could be used as a logo."
 msgstr "A(z) %(host)s oldalon semmi sem volt logónak használható."
 
+#: src/postulo/templates/documents/cv_detail.html:101
+#, draft
+msgid "Nothing on it yet. Choose some entries below."
+msgstr "Még nincs rajta semmi. Válassz alább néhány bejegyzést."
+
 #: src/postulo/templates/connections/confirm_delete.html:13
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "A másik szolgáltatáson semmi sem változik. Később újra kapcsolódhatsz hozzá."
-
-#: src/postulo/templates/documents/cv_detail.html:96
-#, draft
-msgid "Nothing on this CV yet. Choose some entries below."
-msgstr "Még semmi sincs ezen az önéletrajzon. Válassz bejegyzéseket lent."
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -5864,7 +5864,7 @@ msgstr "Még semmi sincs feltöltve."
 msgid "Nothing waiting"
 msgstr "Semmi sem vár"
 
-#: src/postulo/documents/views.py:115 src/postulo/documents/views.py:131
+#: src/postulo/documents/views.py:119 src/postulo/documents/views.py:135
 #, draft
 msgid "Nothing was added."
 msgstr "Semmi sem került hozzáadásra."
@@ -6128,10 +6128,12 @@ msgid ""
 "One that has already happened is recorded straight onto the timeline as held."
 msgstr "Ami már megtörtént, közvetlenül megtartottként kerül az idővonalra."
 
-#: src/postulo/templates/documents/cv_list.html:11
+#: src/postulo/templates/documents/cv_list.html:17
 #, draft
-msgid "One variant per kind of role. Each selects from your career record."
-msgstr "Pozíciófajtánként egy változat. Mindegyik a pályafutásodból válogat."
+msgid ""
+"One variant per kind of role. Each selects from your career record; a portfolio leads with the work."
+msgstr ""
+"Munkakörönként egy változat. Mindegyik a pályádból válogat; a portfólió a munkával kezdődik."
 
 #: src/postulo/templates/accounts/delete_account.html:37
 #, draft
@@ -6145,11 +6147,10 @@ msgstr ""
 msgid "Only %(name)s"
 msgstr "Csak %(name)s"
 
-#: src/postulo/templates/documents/cv_detail.html:129
+#: src/postulo/templates/documents/cv_detail.html:134
 #, draft
-msgid "Only entries not already on this CV are listed."
-msgstr ""
-"Csak azok a bejegyzések szerepelnek, amelyek még nincsenek ezen az önéletrajzon."
+msgid "Only entries not already on it are listed."
+msgstr "Csak azok a bejegyzések szerepelnek, amelyek még nincsenek rajta."
 
 #: src/postulo/plugins/fetching.py:121
 #, draft
@@ -6210,7 +6211,7 @@ msgstr "Vagy töltsön fel egyet"
 msgid "ORCID"
 msgstr "ORCID"
 
-#: src/postulo/documents/models.py:152 src/postulo/resume/models.py:35
+#: src/postulo/documents/models.py:197 src/postulo/resume/models.py:35
 #, draft
 msgid "order"
 msgstr "sorrend"
@@ -6233,8 +6234,9 @@ msgstr "Eredeti hirdetés"
 
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
 #: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
-#: src/postulo/core/models.py:394 src/postulo/documents/models.py:329
-#: src/postulo/jobs/models.py:492 src/postulo/resume/models.py:219
+#: src/postulo/core/models.py:394 src/postulo/documents/kinds.py:147
+#: src/postulo/documents/models.py:374 src/postulo/jobs/models.py:492
+#: src/postulo/resume/models.py:219
 #, draft
 msgid "Other"
 msgstr "Egyéb"
@@ -6380,7 +6382,7 @@ msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr ""
 "Illeszd be a szöveget. A hirdetések eltűnnek a webről; a te másolatod nem."
 
-#: src/postulo/documents/views.py:189
+#: src/postulo/documents/views.py:193
 #, draft
 msgid "PDF created."
 msgstr "PDF létrehozva."
@@ -6497,12 +6499,12 @@ msgstr "kép"
 msgid "Placeholders"
 msgstr "Helyőrzők"
 
-#: src/postulo/documents/models.py:273
+#: src/postulo/documents/models.py:318
 #, draft
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr "A(z) {{ company }} típusú helyőrzők küldéskor töltődnek ki."
 
-#: src/postulo/documents/themes.py:117
+#: src/postulo/documents/themes.py:119
 #, draft
 msgid "Plain"
 msgstr "Egyszerű"
@@ -6602,7 +6604,9 @@ msgid ""
 msgstr ""
 "A 465-ös port TLS-t vár az első bájttól, így tanúsítványra vár, miközben a Postulo üdvözlésre vár. Válassza a „TLS az első bájttól” lehetőséget, vagy használja az 587-es portot STARTTLS-sel."
 
-#: src/postulo/documents/models.py:327 src/postulo/resume/models.py:213
+#: src/postulo/documents/kinds.py:128 src/postulo/documents/models.py:97
+#: src/postulo/documents/models.py:372 src/postulo/documents/themes.py:72
+#: src/postulo/resume/models.py:213
 #, draft
 msgid "Portfolio"
 msgstr "Portfólió"
@@ -6775,6 +6779,7 @@ msgid "preparation notes"
 msgstr "felkészülési jegyzetek"
 
 #: src/postulo/templates/documents/themes/base_cv.html:98
+#: src/postulo/templates/documents/themes/base_portfolio.html:67
 #: src/postulo/templates/resume/preview.html:28
 #, draft
 msgid "present"
@@ -6787,7 +6792,7 @@ msgid ""
 msgstr ""
 "Nyomja meg a Frissítések keresése gombot, hogy lehívja, amit a katalógusok kínálnak. A Postulo magától nem hívja le őket."
 
-#: src/postulo/templates/documents/cv_detail.html:16
+#: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
 #, draft
@@ -7143,7 +7148,7 @@ msgstr "rögzítette"
 msgid "recorded on"
 msgstr "rögzítve ekkor"
 
-#: src/postulo/documents/views.py:479
+#: src/postulo/documents/views.py:483
 #, draft
 msgid "Recorded what you sent."
 msgstr "Rögzítve, amit küldtél."
@@ -7179,7 +7184,7 @@ msgstr "Toborzó"
 msgid "Redirects followed"
 msgstr "Követett átirányítások"
 
-#: src/postulo/documents/models.py:328
+#: src/postulo/documents/kinds.py:146 src/postulo/documents/models.py:373
 #, draft
 msgid "Reference"
 msgstr "Referencia"
@@ -7291,7 +7296,7 @@ msgstr "távoli cím"
 #: src/postulo/templates/accounts/profile.html:139
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:70
-#: src/postulo/templates/documents/cv_detail.html:87
+#: src/postulo/templates/documents/cv_detail.html:92
 #: src/postulo/templates/jobs/company_form.html:80
 #: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/partials/postal_addresses.html:79
@@ -7331,17 +7336,17 @@ msgstr "{label} eltávolítása"
 msgid "removed on the other side"
 msgstr "a másik oldalon eltávolítva"
 
-#: src/postulo/documents/models.py:439
+#: src/postulo/documents/models.py:506
 #, draft
 msgid "rendered on"
 msgstr "előállítva ekkor"
 
-#: src/postulo/documents/models.py:360
+#: src/postulo/documents/models.py:412
 #, draft
 msgid "replaces"
 msgstr "ezt váltja"
 
-#: src/postulo/documents/models.py:161
+#: src/postulo/documents/models.py:206
 #, draft
 msgid "Replaces the master highlights on this variant only. One per line."
 msgstr "Csak ebben a változatban váltja fel a törzs kiemeléseit. Soronként egy."
@@ -7390,7 +7395,7 @@ msgstr "Önéletrajz"
 msgid "Retail"
 msgstr "Kiskereskedelem"
 
-#: src/postulo/documents/models.py:276
+#: src/postulo/documents/models.py:321
 #, draft
 msgid "reusable template"
 msgstr "újrafelhasználható sablon"
@@ -7773,12 +7778,12 @@ msgstr "A küldés sikertelen: %(error)s"
 msgid "Sent"
 msgstr "Elküldve"
 
-#: src/postulo/documents/models.py:450
+#: src/postulo/documents/models.py:526
 #, draft
 msgid "sent document"
 msgstr "elküldött dokumentum"
 
-#: src/postulo/documents/models.py:451
+#: src/postulo/documents/models.py:527
 #, draft
 msgid "sent documents"
 msgstr "elküldött dokumentumok"
@@ -7791,7 +7796,7 @@ msgstr "elküldött dokumentumok"
 msgid "Sent documents"
 msgstr "Elküldött dokumentumok"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:598
 #, draft
 msgid "sent on"
 msgstr "elküldve"
@@ -7882,7 +7887,7 @@ msgstr "Állítsd be, amikor a pozíció már nem elérhető."
 
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:108 src/postulo/templates/core/export.html:4
-#: src/postulo/templates/documents/cv_detail.html:21
+#: src/postulo/templates/documents/cv_detail.html:22
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
 #: src/postulo/templates/settings/base.html:12
@@ -8176,7 +8181,7 @@ msgstr "Telepített források"
 msgid "speaking"
 msgstr "beszéd"
 
-#: src/postulo/documents/models.py:205
+#: src/postulo/documents/models.py:250
 #, draft
 msgid "Speculative letter"
 msgstr "Spontán jelentkezés"
@@ -8244,7 +8249,7 @@ msgid "Status"
 msgstr "Állapot"
 
 #: src/postulo/applications/models.py:198
-#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:513
+#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:589
 #: src/postulo/jobs/models.py:751
 #, draft
 msgid "status"
@@ -8299,7 +8304,7 @@ msgstr "Tegye hatálytalanná"
 msgid "Stop sorting by %(column)s"
 msgstr "Ne rendezzen %(column)s szerint"
 
-#: src/postulo/documents/models.py:498
+#: src/postulo/documents/models.py:574
 #, draft
 msgid "store"
 msgstr "tároló"
@@ -8314,7 +8319,7 @@ msgstr "Tárolva; hagyd üresen a jelenlegi érték megtartásához."
 msgid "Strong"
 msgstr "Erős"
 
-#: src/postulo/documents/models.py:271
+#: src/postulo/documents/models.py:316
 #, draft
 msgid "subject"
 msgstr "tárgy"
@@ -8345,7 +8350,7 @@ msgstr "javaslatok"
 msgid "Suggestions"
 msgstr "Javaslatok"
 
-#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:87
+#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:116
 #: src/postulo/resume/models.py:72 src/postulo/resume/models.py:155
 #, draft
 msgid "summary"
@@ -8356,7 +8361,7 @@ msgstr "összefoglaló"
 msgid "superseded"
 msgstr "felváltva"
 
-#: src/postulo/documents/forms.py:209
+#: src/postulo/documents/forms.py:228
 #, draft
 msgid "Supersedes"
 msgstr "Ezt váltja fel"
@@ -8478,7 +8483,7 @@ msgstr "Címkék"
 msgid "tags"
 msgstr "címkék"
 
-#: src/postulo/templates/documents/cv_detail.html:84
+#: src/postulo/templates/documents/cv_detail.html:89
 #, draft
 msgid "Tailor"
 msgstr "Testreszabás"
@@ -8489,10 +8494,10 @@ msgstr "Testreszabás"
 msgid "Tailor this entry"
 msgstr "Bejegyzés testreszabása"
 
-#: src/postulo/templates/documents/cv_detail.html:67
+#: src/postulo/templates/documents/cv_detail.html:72
 #, draft
-msgid "tailored for this CV"
-msgstr "ehhez az önéletrajzhoz testreszabva"
+msgid "tailored for this one"
+msgstr "ehhez igazítva"
 
 #: src/postulo/templates/settings/dashboard.html:57
 #, python-format, draft
@@ -8535,7 +8540,7 @@ msgstr "Telefonszámok"
 msgid "Template"
 msgstr "Sablon"
 
-#: src/postulo/documents/models.py:278
+#: src/postulo/documents/models.py:323
 #, draft
 msgid "Templates appear when you send a letter with an application."
 msgstr ""
@@ -8561,7 +8566,7 @@ msgstr "Kapcsolat tesztelése"
 msgid "text"
 msgstr "szöveg"
 
-#: src/postulo/documents/models.py:437
+#: src/postulo/documents/models.py:504
 #, draft
 msgid "text as sent"
 msgstr "elküldött szöveg"
@@ -8673,7 +8678,7 @@ msgstr "Ez a fájl üres."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Ez a fájl nagyobb %(limit)s MB-nál, ezért nem lett beolvasva."
 
-#: src/postulo/documents/forms.py:215
+#: src/postulo/documents/forms.py:234
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Ez a fájl nagyobb %(limit)s MB-nál."
@@ -8869,7 +8874,7 @@ msgstr "A(z) %(name)s PDF-motor be van állítva, de nem használható. %(hint)s
 msgid "The %(plugin)s plugin is not installed."
 msgstr "A(z) %(plugin)s bővítmény nincs telepítve."
 
-#: src/postulo/documents/themes.py:227 src/postulo/documents/themes.py:255
+#: src/postulo/documents/themes.py:229 src/postulo/documents/themes.py:257
 #, python-format, draft
 msgid "The %(theme)s theme does not set this kind of document."
 msgstr "A(z) %(theme)s téma nem szerkeszti meg ezt a dokumentumfajtát."
@@ -8926,7 +8931,7 @@ msgstr ""
 msgid "The company this one belongs to, if it belongs to one."
 msgstr "A cég, amelyhez ez tartozik, ha tartozik valamelyikhez."
 
-#: src/postulo/documents/models.py:260
+#: src/postulo/documents/models.py:305
 #, draft
 msgid "The company you are applying to"
 msgstr "A cég, ahová jelentkezel"
@@ -8936,7 +8941,7 @@ msgstr "A cég, ahová jelentkezel"
 msgid "The connection is gone or switched off."
 msgstr "A kapcsolat megszűnt vagy ki van kapcsolva."
 
-#: src/postulo/documents/views.py:383
+#: src/postulo/documents/views.py:387
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "A másolatot nem sikerült elküldeni; a dokumentum megmondja, miért."
@@ -8960,7 +8965,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "A letöltés sokkal nagyobb, mint amekkora egy bővítmény lehet."
 
-#: src/postulo/documents/models.py:361
+#: src/postulo/documents/models.py:413
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "A korábbi változat, amelyet ez felvált. A régi fájl megmarad."
@@ -9018,7 +9023,7 @@ msgstr "A telepítőt nem sikerült futtatni: %(error)s"
 msgid "The installer refused it: %(error)s"
 msgstr "A telepítő elutasította: %(error)s"
 
-#: src/postulo/documents/models.py:261
+#: src/postulo/documents/models.py:306
 #, draft
 msgid "The job title"
 msgstr "A munkakör"
@@ -9128,7 +9133,7 @@ msgstr "A következő"
 msgid "The one before"
 msgstr "Az előző"
 
-#: src/postulo/documents/models.py:87
+#: src/postulo/documents/models.py:116
 #, draft
 msgid "The opening paragraph, if you use one."
 msgstr "A nyitóbekezdés, ha használsz ilyet."
@@ -9561,7 +9566,7 @@ msgstr "Időkorlát"
 msgid "timeout in seconds"
 msgstr "időkorlát másodpercben"
 
-#: src/postulo/documents/models.py:340 src/postulo/documents/models.py:398
+#: src/postulo/documents/models.py:385 src/postulo/documents/models.py:462
 #: src/postulo/jobs/models.py:563 src/postulo/resume/models.py:241
 #, draft
 msgid "title"
@@ -9602,7 +9607,7 @@ msgstr "Hirdetés átadásához (a captures hatókör szükséges):"
 msgid "to status"
 msgstr "erre az állapotra"
 
-#: src/postulo/documents/models.py:264
+#: src/postulo/documents/models.py:309
 #, draft
 msgid "Today's date"
 msgstr "Mai dátum"
@@ -9735,7 +9740,7 @@ msgstr "A megerősítéshez írd be a címedet: %(email)s"
 msgid "Unavailable — not offered at all"
 msgstr "Nem elérhető — egyáltalán nem kínáljuk fel"
 
-#: src/postulo/documents/models.py:156
+#: src/postulo/documents/models.py:201
 #, draft
 msgid "Uncheck to keep the entry on this variant but leave it off the page."
 msgstr ""
@@ -9811,12 +9816,12 @@ msgstr "Feltöltés és az oszlopok hozzárendelése"
 msgid "Uploaded"
 msgstr "Feltöltve"
 
-#: src/postulo/documents/models.py:373
+#: src/postulo/documents/models.py:437
 #, draft
 msgid "uploaded document"
 msgstr "feltöltött dokumentum"
 
-#: src/postulo/documents/models.py:374
+#: src/postulo/documents/models.py:438
 #, draft
 msgid "uploaded documents"
 msgstr "feltöltött dokumentumok"
@@ -9935,7 +9940,7 @@ msgstr "megerősítve"
 msgid "Verified"
 msgstr "Ellenőrizve"
 
-#: src/postulo/documents/models.py:353
+#: src/postulo/documents/models.py:405
 #: src/postulo/templates/documents/upload_list.html:27
 #, draft
 msgid "version"
@@ -9951,7 +9956,7 @@ msgstr "Verzió"
 msgid "version tag"
 msgstr "verziócímke"
 
-#: src/postulo/templates/documents/cv_detail.html:101
+#: src/postulo/templates/documents/cv_detail.html:106
 #, draft
 msgid "Versions you have sent"
 msgstr "Elküldött változatok"
@@ -9991,7 +9996,7 @@ msgstr "Válaszra vár"
 msgid "Waiting only"
 msgstr "Csak a várakozók"
 
-#: src/postulo/documents/models.py:474
+#: src/postulo/documents/models.py:550
 #, draft
 msgid "Waiting to be sent"
 msgstr "Küldésre vár"
@@ -10141,10 +10146,10 @@ msgstr ""
 msgid "What is in the file"
 msgstr "Mi van a fájlban"
 
-#: src/postulo/templates/documents/cv_detail.html:56
-#, draft
-msgid "What is on this CV"
-msgstr "Mi van ezen az önéletrajzon"
+#: src/postulo/templates/documents/cv_detail.html:58
+#, python-format, draft
+msgid "What is on this %(kind)s"
+msgstr "Mi van ezen: %(kind)s"
 
 #: src/postulo/templates/settings/plugins.html:7
 #, draft
@@ -10317,7 +10322,7 @@ msgid ""
 msgstr ""
 "Hol találják meg a nevedben eljáró bővítmények a szolgáltatásaikat, és hogyan jelentkeznek be. A titkok titkosítva tárolódnak, és soha nem jelennek meg újra."
 
-#: src/postulo/documents/models.py:262
+#: src/postulo/documents/models.py:307
 #, draft
 msgid "Where the role is based"
 msgstr "Hol van a pozíció"
@@ -10390,14 +10395,14 @@ msgstr "Melyik oszlop micsoda?"
 msgid "Which device or tool this is for."
 msgstr "Melyik eszközhöz vagy programhoz való."
 
-#: src/postulo/documents/models.py:288
+#: src/postulo/documents/models.py:333
 #, draft
 msgid ""
 "Which language this letter is written in. Leave blank to follow your profile."
 msgstr ""
 "Milyen nyelven íródott ez a levél. Hagyja üresen, hogy a profilját kövesse."
 
-#: src/postulo/documents/models.py:94
+#: src/postulo/documents/models.py:123
 #, draft
 msgid ""
 "Which language this variant is written in. Leave blank to follow your profile."
@@ -10527,12 +10532,12 @@ msgstr "áthelyezné ide: %(status)s"
 msgid "Write one well, then let placeholders do the rest."
 msgstr "Írj meg egyet jól, aztán hagyd, hogy a helyőrzők elvégezzék a többit."
 
-#: src/postulo/templates/documents/cv_detail.html:151
+#: src/postulo/templates/documents/cv_detail.html:156
 #, draft
 msgid "Write some more."
 msgstr "Írj még egy kicsit."
 
-#: src/postulo/templates/documents/cv_list.html:43
+#: src/postulo/templates/documents/cv_list.html:52
 #, draft
 msgid "Write your career down first, then build variants from it."
 msgstr "Először írd le a pályafutásodat, aztán építs belőle változatokat."
@@ -10596,10 +10601,10 @@ msgstr ""
 msgid "You already have a company with that name."
 msgstr "Már van ilyen nevű céged."
 
-#: src/postulo/documents/forms.py:111
+#: src/postulo/documents/forms.py:130
 #, draft
-msgid "You already have a CV with that name."
-msgstr "Már van ilyen nevű önéletrajzod."
+msgid "You already have a CV or portfolio with that name."
+msgstr "Már van ilyen nevű önéletrajzod vagy portfóliód."
 
 #: src/postulo/applications/forms.py:356
 #, draft
@@ -10736,8 +10741,8 @@ msgid ""
 msgstr ""
 "A böngészője csak HTTPS-en kiszolgált oldalon hoz létre hozzáférési kulcsot. Ezt a példányt sima HTTP-n éri el, ezért itt nem kínálhatók hozzáférési kulcsok. Ez a böngésző szabálya, nem e kiszolgáló beállítása."
 
-#: src/postulo/templates/documents/cv_list.html:15
-#: src/postulo/templates/documents/cv_list.html:46
+#: src/postulo/templates/documents/cv_list.html:21
+#: src/postulo/templates/documents/cv_list.html:55
 #: src/postulo/templates/resume/overview.html:4
 #: src/postulo/templates/resume/overview.html:9
 #, draft
@@ -10847,12 +10852,12 @@ msgstr "Az Ön saját neve rá, ha a fenti fajták egyike sem illik."
 msgid "Your name for it: “Telegram”, “Paperless at home”."
 msgstr "Az általad adott név: „Telegram”, „Paperless otthon”."
 
-#: src/postulo/documents/models.py:101
+#: src/postulo/documents/models.py:130
 #, draft
 msgid "Your name, email and location, taken from your profile."
 msgstr "A neved, e-mail-címed és helyszíned, a profilodból."
 
-#: src/postulo/documents/models.py:263
+#: src/postulo/documents/models.py:308
 #, draft
 msgid "Your own name"
 msgstr "A saját neved"

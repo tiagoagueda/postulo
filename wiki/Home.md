@@ -84,7 +84,7 @@ feature cannot be made to work for someone, that is a bug, and it is filed as on
 | Stop retyping adverts | [Capturing postings](Capturing-postings) |
 | See what the record adds up to | [Insights and the dashboard](Insights) |
 | Show an employment office you have been looking | [Reports](Reports) |
-| Write your CV once and tailor it | [Your career record](Your-career-record) and [CVs](CVs) |
+| Write your CV once and tailor it | [Your career record](Your-career-record) and [CVs and portfolios](CVs) |
 | Reuse a letter properly, of any of the four kinds | [Letters](Cover-letters) |
 | Know what you sent to whom | [Files and what you sent](Files-and-what-you-sent) |
 | Share the instance with someone | [Accounts and invitations](Accounts-and-invitations) |

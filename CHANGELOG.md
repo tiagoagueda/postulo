@@ -227,6 +227,35 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A portfolio is a document Postulo makes, and what kinds of document exist is said in one
+  place.** The first of the three stages the issue itself proposes — *portfolios need the
+  polymorphic link and the theme rule and nothing else* — and both of those shipped already:
+  a render points at whatever made it and a copy at whatever it copied (#130), and a theme
+  declares which kinds it can set (#132).
+
+  **A portfolio is a CV with a different shape**, not a second model. It *is* a selection
+  from the career record with its own layout, and it uses every line of the same machinery —
+  the same entries, the same tailoring, the same *included* switch. Two near-identical models
+  would have been two forms, two lists, two exporters and two of every future change. The
+  precedent was already here: a letter has carried four shapes told apart by a field since
+  it arrived. And *portfolios of different kinds* — a developer's, a designer's, a
+  researcher's — is answered by the theme and by what is selected, which are the two things
+  they actually differ in and are already the person's to choose.
+
+  **The kind vocabulary was doing two jobs and now derives from one.** It labelled an
+  uploaded file *and* a rendered one, with a letter mapping its own shapes onto it by hand —
+  two vocabularies with no relation, waiting to disagree. Everything said *about* a kind now
+  comes from one registry, and the pickers read it through a callable, so a kind a plugin
+  registers reaches every menu and every store's per-kind switch without a migration. That
+  is what makes "a kind is a plugin" something other than a phrase.
+
+  **And a store stopped asking what it was holding.** The last two places that checked
+  render-or-upload now ask the document itself, so a third thing that holds a file needs no
+  branch — proven by a test that describes a class the store code has never heard of.
+
+  Reports and emails are deliberately not here; #162 records what each still needs settled
+  and why guessing at it now would be designing against nothing. (#133)
+
 - **An employer can be a structure, and an application can say which part of it the attempt
   was for.** The last of three: a company inside a company shipped with #55, a department
   inside a company with #137, and this is the attachment, the switch, and the question a
@@ -1289,6 +1318,15 @@ All notable changes to Postulo are recorded here. The format follows
   where it is, which was the whole reason `RenderedDocument` exists. (#130)
 
 ### 🐛 Fixed
+
+- **A test could be handed a translated string because of which test ran before it.**
+  `LocaleMiddleware` activates a language per request and nothing deactivated it afterwards,
+  so a test that signed in as somebody reading Postulo in Portuguese left Portuguese active
+  for every test that followed. It showed up as a test asserting an English message and
+  getting a Portuguese one — passing alone, failing in company, and failing differently
+  depending on the order, which is the worst shape a failure can have. Every test now starts
+  in the instance's own language. Found while adding the portfolio tests, which is to say by
+  accident. (#133)
 
 - **A team nobody had been recorded at did not survive an export.** A department travelled
   only as a name beside a contact, so a team with no contact simply vanished from the

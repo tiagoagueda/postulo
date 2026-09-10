@@ -13,7 +13,7 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from . import themes
-from .models import CV, CoverLetter, DocumentKind, RenderedDocument
+from .models import CV, CoverLetter, RenderedDocument
 from .pdf import html_to_pdf
 
 #: Only these placeholders are substituted, and only these.
@@ -163,9 +163,13 @@ def contact_details(owner) -> dict:
 
 
 def render_cv_html(cv: CV) -> str:
-    """Render a CV variant to a complete, self-contained HTML document."""
+    """Render a CV variant to a complete, self-contained HTML document.
+
+    The kind decides which theme vocabulary sets it: a portfolio leads with the work and a
+    CV with the career, and that is a difference in structure rather than in styling (#133).
+    """
     return render_to_string(
-        themes.template_for(cv.theme, themes.Kind.CV),
+        themes.template_for(cv.theme, cv.theme_kind),
         {
             "cv": cv,
             "sections": build_sections(cv),
@@ -272,12 +276,17 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
     """
     html = render_cv_html(cv)
     content = html_to_pdf(html, backend=backend)
-    title = gettext("%(name)s — CV") % {"name": cv.name}
+    title = gettext("%(name)s — %(kind)s") % {
+        "name": cv.name,
+        "kind": str(cv.get_kind_display()),
+    }
 
     document = RenderedDocument(
         owner=cv.owner,
         title=title,
-        kind=DocumentKind.CV,
+        # What the model says it is, rather than a constant: a portfolio filed as a CV is a
+        # document an employment office or a store would then mislabel (#133).
+        kind=cv.document_kind,
         source=cv,
         application=application,
         source_text=html,

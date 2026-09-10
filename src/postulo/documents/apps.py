@@ -12,6 +12,11 @@ class DocumentsConfig(AppConfig):
         from postulo.plugins import registry
         from postulo.plugins.localstore import LocalStore
 
-        from . import signals  # noqa: F401 - connects the receivers
+        from . import kinds, signals  # noqa: F401 - connects the receivers
+
+        # What kinds of document exist, said once. Here rather than at import time,
+        # because a registry filled while a module loads is a registry that is empty in
+        # whichever test imported it first (#133).
+        kinds.register_the_ones_postulo_has()
 
         registry.register_builtin("store", LocalStore)
