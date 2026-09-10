@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 04:00+0000\n"
+"POT-Creation-Date: 2026-09-10 04:15+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: српски\n"
@@ -92,6 +92,14 @@ msgstr[0] "%(counter)s компанија"
 msgstr[1] "%(counter)s компаније"
 msgstr[2] "%(counter)s компанија"
 
+#: src/postulo/templates/applications/report.html:117
+#, python-format, draft
+msgid "%(counter)s day"
+msgid_plural "%(counter)s days"
+msgstr[0] "%(counter)s дан"
+msgstr[1] "%(counter)s дана"
+msgstr[2] "%(counter)s дана"
+
 #: src/postulo/templates/applications/application_detail.html:267
 #, python-format, draft
 msgid "%(counter)s earlier"
@@ -148,6 +156,11 @@ msgid_plural "%(days)s days ago"
 msgstr[0] "пре %(days)s дан"
 msgstr[1] "пре %(days)s дана"
 msgstr[2] "пре %(days)s дана"
+
+#: src/postulo/applications/reports.py:106
+#, python-format, draft
+msgid "%(from)s to %(to)s"
+msgstr "%(from)s – %(to)s"
 
 #: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
 #, python-format, draft
@@ -485,6 +498,11 @@ msgstr "пре %(when)s"
 msgid "(empty address)"
 msgstr "(празна адреса)"
 
+#: src/postulo/templates/applications/report_print.html:99
+#, draft
+msgid "(part)"
+msgstr "(део)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -540,6 +558,13 @@ msgstr "Компанија не може бити део саме себе."
 msgid "A company carries one identifier per scheme."
 msgstr "Компанија носи један идентификатор по шеми."
 
+#: src/postulo/templates/applications/report.html:201
+#, draft
+msgid ""
+"A company in several fields counts in each of them, so these can add up to more than everything."
+msgstr ""
+"Фирма која послује у више делатности рачуна се у свакој од њих, па збир може бити већи од целине."
+
 #: src/postulo/templates/widgets/industries.html:37
 #, draft
 msgid "A company in several industries counts in each of them."
@@ -576,6 +601,11 @@ msgid ""
 "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr ""
 "Мобилни, фиксна линија, централа — колико их вреди чувати, с једним означеним као онај који се користи. Документи штампају управо њега."
+
+#: src/postulo/templates/applications/report.html:41
+#, draft
+msgid "A month"
+msgstr "Месец"
 
 #: src/postulo/core/models.py:288
 #, draft
@@ -667,6 +697,11 @@ msgid ""
 msgstr ""
 "Python точак (<code>.whl</code>) грађен за сваку платформу. Postulo чита шта о себи каже и показује вам то пре него што се ишта инсталира."
 
+#: src/postulo/templates/applications/report.html:42
+#, draft
+msgid "A quarter"
+msgstr "Квартал"
+
 #: src/postulo/templates/server/logs.html:146
 #, draft
 msgid "A quiet log is the one you want."
@@ -686,6 +721,11 @@ msgstr "Подсетник доспева дан раније, када дан �
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Подсетник коме је ово намењено."
+
+#: src/postulo/templates/widgets/shortcuts.html:25
+#, draft
+msgid "A report on a period"
+msgstr "Извештај о периоду"
 
 #: src/postulo/templates/core/home.html:13
 #, draft
@@ -745,6 +785,12 @@ msgid ""
 "A username is unique across the instance whoever changes it, and people can change their own under Settings."
 msgstr ""
 "Корисничко име јединствено је на целој инсталацији ко год га мењао, а људи могу променити своје под Подешавањима."
+
+#: src/postulo/templates/applications/report.html:111
+#: src/postulo/templates/applications/report_print.html:81
+#, draft
+msgid "A week, on average"
+msgstr "Недељно, у просеку"
 
 #: src/postulo/templates/settings/dashboard.html:165
 #, draft
@@ -950,7 +996,7 @@ msgid ""
 msgstr ""
 "Додато %(total)s уноса. Ништа није преписано; све што се удвостручило ваше је да обришете."
 
-#: src/postulo/applications/views.py:392 src/postulo/applications/views.py:736
+#: src/postulo/applications/views.py:393 src/postulo/applications/views.py:820
 #, draft
 msgid "Added to the timeline."
 msgstr "Додато на временску линију."
@@ -965,16 +1011,17 @@ msgstr "Додато у ваше огласе."
 msgid "Added."
 msgstr "Додато."
 
+#: src/postulo/applications/reports.py:478
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Адреса"
+
 #: src/postulo/core/models.py:410 src/postulo/jobs/models.py:729
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "адреса"
-
-#: src/postulo/templates/partials/postal_addresses.html:29
-#, draft
-msgid "Address"
-msgstr "Адреса"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -1209,7 +1256,7 @@ msgstr "Пријава"
 msgid "Application created"
 msgstr "Пријава створена"
 
-#: src/postulo/applications/views.py:345
+#: src/postulo/applications/views.py:346
 #, draft
 msgid "Application deleted."
 msgstr "Пријава обрисана."
@@ -1219,12 +1266,12 @@ msgstr "Пријава обрисана."
 msgid "Application recorded from the capture."
 msgstr "Пријава забележена из хватања."
 
-#: src/postulo/applications/views.py:311 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:312 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Пријава забележена."
 
-#: src/postulo/applications/views.py:335
+#: src/postulo/applications/views.py:336
 #, draft
 msgid "Application updated."
 msgstr "Пријава ажурирана."
@@ -1250,11 +1297,24 @@ msgstr "пријаве"
 msgid "Applications by month"
 msgstr "Пријаве по месецима"
 
+#: src/postulo/templates/applications/report_print.html:177
+#, draft
+msgid "Applications drafted but never sent are not counted."
+msgstr "Пријаве које су написане, али никада послате, не рачунају се."
+
+#: src/postulo/templates/applications/report.html:210
+#, draft
+msgid ""
+"Applications drafted but never sent are not counted. An employment office is asking what was sent."
+msgstr ""
+"Пријаве које су написане, али никада послате, не рачунају се. Национална служба за запошљавање пита шта је послато."
+
 #: src/postulo/notifications/base.py:29
 #, draft
 msgid "Applications go quiet"
 msgstr "Пријаве утихну"
 
+#: src/postulo/templates/applications/report_print.html:77
 #: src/postulo/templates/widgets/insight_counters.html:17
 #, draft
 msgid "Applications sent"
@@ -1301,7 +1361,10 @@ msgstr "Пријављено у последњих 30 дана"
 msgid "applied on"
 msgstr "пријављено"
 
+#: src/postulo/applications/reports.py:474
 #: src/postulo/templates/applications/application_detail.html:137
+#: src/postulo/templates/applications/report.html:225
+#: src/postulo/templates/applications/report_print.html:149
 #, draft
 msgid "Applied on"
 msgstr "Пријављено"
@@ -1764,7 +1827,7 @@ msgid ""
 msgstr ""
 "Промене направљене овде шаљу се у следећем пролазу; друга страна се тада такође чита."
 
-#: src/postulo/applications/views.py:480
+#: src/postulo/applications/views.py:481
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Подсети %(company)s на %(role)s"
@@ -1829,7 +1892,7 @@ msgstr "Одаберите бар један документ за бележе�
 msgid "Choose what kind of identifier this is."
 msgstr "Одаберите какав је ово идентификатор."
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:816
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Прво одаберите на коју се пријаву ово односи."
@@ -1965,8 +2028,10 @@ msgstr "Створене компаније"
 msgid "Companies you have applied to"
 msgstr "Компаније којима сте се пријавили"
 
-#: src/postulo/applications/forms.py:43 src/postulo/applications/tables.py:27
-#: src/postulo/core/csv_import.py:38
+#: src/postulo/applications/forms.py:43 src/postulo/applications/reports.py:475
+#: src/postulo/applications/tables.py:27 src/postulo/core/csv_import.py:38
+#: src/postulo/templates/applications/report.html:226
+#: src/postulo/templates/applications/report_print.html:150
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
@@ -2180,6 +2245,20 @@ msgstr "Није могло да се преузме: %(error)s"
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Није могло да се прочита %(site)s: %(error)s"
 
+#: src/postulo/templates/applications/report_print.html:141
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here."
+msgstr ""
+"Рачуна се према томе када се догодило, па одговор који у овом периоду стигне на старију пријаву припада овде."
+
+#: src/postulo/templates/applications/report.html:174
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
+msgstr ""
+"Рачуна се према томе када се догодило, па одговор који у овом периоду стигне на старију пријаву припада овде. То је друго питање од онога шта је послато, и то двоје остаје одвојено."
+
 #: src/postulo/templates/widgets/interviews_summary.html:30
 #, draft
 msgid ""
@@ -2349,6 +2428,11 @@ msgstr "Понуђени датуми:"
 msgid "Dates written as"
 msgstr "Датуми се пишу као"
 
+#: src/postulo/templates/applications/report.html:44
+#, draft
+msgid "Dates you choose"
+msgstr "Датуми које сами изаберете"
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2491,7 +2575,7 @@ msgstr "Одбиј"
 msgid "Declined"
 msgstr "Одбијено"
 
-#: src/postulo/applications/views.py:724
+#: src/postulo/applications/views.py:808
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Одбијено. Неће се више предлагати."
@@ -2715,6 +2799,16 @@ msgstr "завршено"
 #, draft
 msgid "Download"
 msgstr "Преузми"
+
+#: src/postulo/templates/applications/report.html:20
+#, draft
+msgid "Download CSV"
+msgstr "Преузми CSV"
+
+#: src/postulo/templates/applications/report.html:23
+#, draft
+msgid "Download PDF"
+msgstr "Преузми PDF"
 
 #: src/postulo/templates/accounts/delete_account.html:41
 #: src/postulo/templates/core/export.html:36
@@ -2950,6 +3044,12 @@ msgid ""
 msgstr ""
 "Сваки налог на овој инсталацији. Администратори виде налоге, никада нечије пријаве или документе."
 
+#: src/postulo/templates/applications/report.html:208
+#: src/postulo/templates/applications/report_print.html:144
+#, draft
+msgid "Every application, in order"
+msgstr "Све пријаве, редом"
+
 #: src/postulo/jobs/forms.py:286
 #, draft
 msgid ""
@@ -3121,7 +3221,7 @@ msgstr ""
 "Објаснити шта је пошло по злу често значи рећи на коју се везу, коју компанију или који документ то односило. Ништа овде не садржи садржај документа, али према овој страници се односите као према остатку инсталације пре него што ишта од ње поделите."
 
 #: src/postulo/templates/core/export.html:8
-#: src/postulo/templates/widgets/shortcuts.html:25
+#: src/postulo/templates/widgets/shortcuts.html:28
 #, draft
 msgid "Export everything"
 msgstr "Извези све"
@@ -3278,6 +3378,12 @@ msgstr "Име"
 msgid "first name"
 msgstr "име"
 
+#: src/postulo/templates/applications/report.html:178
+#: src/postulo/templates/applications/report_print.html:125
+#, draft
+msgid "First replies"
+msgstr "Први одговори"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -3298,12 +3404,12 @@ msgstr "Прати ваш профил"
 msgid "Follow-up note"
 msgstr "Белешка о праћењу"
 
-#: src/postulo/applications/views.py:474
+#: src/postulo/applications/views.py:475
 #, draft
 msgid "Follow-up recorded."
 msgstr "Праћење забележено."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:471
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:472
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3361,7 +3467,10 @@ msgstr "Нађен лого на %(url)s."
 msgid "Found on their website"
 msgstr "Нађено на њиховој веб страници"
 
-#: src/postulo/applications/forms.py:57 src/postulo/core/csv_import.py:50
+#: src/postulo/applications/forms.py:57 src/postulo/applications/reports.py:477
+#: src/postulo/core/csv_import.py:50
+#: src/postulo/templates/applications/report.html:228
+#: src/postulo/templates/applications/report_print.html:152
 #: src/postulo/templates/jobs/posting_detail.html:81
 #, draft
 msgid "Found via"
@@ -3394,6 +3503,7 @@ msgstr "Замрзни и приложи"
 msgid "from"
 msgstr "од"
 
+#: src/postulo/templates/applications/report.html:55
 #: src/postulo/templates/server/email.html:27
 #: src/postulo/templates/server/logs.html:51
 #: src/postulo/templates/server/logs.html:89
@@ -3675,10 +3785,21 @@ msgstr "Колико је пријава икада достигло сваку 
 msgid "How many applications reached one, how many were held, and of what kind."
 msgstr "Колико је пријава достигло интервју, колико их је одржано и које врсте."
 
+#: src/postulo/templates/applications/report.html:65
+#, draft
+msgid "How many weeks"
+msgstr "Колико недеља"
+
 #: src/postulo/applications/widgets.py:271
 #, draft
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Колико сте слали, месец за месецом, да се тихи период види."
+
+#: src/postulo/templates/applications/report.html:96
+#: src/postulo/templates/applications/report_print.html:73
+#, draft
+msgid "How regularly"
+msgstr "Колико редовно"
 
 #: src/postulo/templates/core/import_csv_map.html:57
 #, draft
@@ -4005,7 +4126,7 @@ msgstr "интервју"
 msgid "Interview cancelled"
 msgstr "Интервју отказан"
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Interview recorded."
 msgstr "Интервју забележен."
@@ -4015,7 +4136,7 @@ msgstr "Интервју забележен."
 msgid "Interview scheduled"
 msgstr "Интервју заказан"
 
-#: src/postulo/applications/views.py:555
+#: src/postulo/applications/views.py:556
 #, draft
 msgid "Interview scheduled."
 msgstr "Интервју заказан."
@@ -4025,7 +4146,7 @@ msgstr "Интервју заказан."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Интервју сутра: %(kind)s у %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:585
+#: src/postulo/applications/views.py:586
 #, draft
 msgid "Interview updated."
 msgstr "Интервју ажуриран."
@@ -4051,6 +4172,12 @@ msgstr "интервјуи"
 #, draft
 msgid "Interviews"
 msgstr "Интервјуи"
+
+#: src/postulo/templates/applications/report.html:182
+#: src/postulo/templates/applications/report_print.html:129
+#, draft
+msgid "Interviews attended"
+msgstr "Обављени разговори"
 
 #: src/postulo/accounts/models.py:505
 #, draft
@@ -4167,6 +4294,16 @@ msgstr "оглас за посао"
 msgid "job postings"
 msgstr "огласи за посао"
 
+#: src/postulo/templates/applications/report_print.html:65
+#, draft
+msgid "Job search report"
+msgstr "Извештај о тражењу посла"
+
+#: src/postulo/templates/applications/report_print.html:23
+#, python-format, draft
+msgid "Job search report · %(period)s"
+msgstr "Извештај о тражењу посла · %(period)s"
+
 #: src/postulo/applications/forms.py:44
 #, draft
 msgid "Job title"
@@ -4228,6 +4365,7 @@ msgid "kind"
 msgstr "врста"
 
 #: src/postulo/templates/accounts/profile.html:126
+#: src/postulo/templates/applications/report.html:39
 #: src/postulo/templates/jobs/company_form.html:67
 #: src/postulo/templates/partials/phone_numbers.html:40
 #: src/postulo/templates/partials/postal_addresses.html:60
@@ -4331,7 +4469,10 @@ msgstr ""
 msgid "Largest page read"
 msgstr "Највећа прочитана страница"
 
+#: src/postulo/applications/reports.py:480
 #: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:75
+#: src/postulo/templates/applications/report.html:230
+#: src/postulo/templates/applications/report_print.html:154
 #, draft
 msgid "Last activity"
 msgstr "Последња активност"
@@ -4624,6 +4765,16 @@ msgstr "лого преузет"
 msgid "Logs"
 msgstr "Дневници"
 
+#: src/postulo/templates/applications/report.html:115
+#, draft
+msgid "Longest gap"
+msgstr "Најдужи прекид"
+
+#: src/postulo/templates/applications/report_print.html:85
+#, draft
+msgid "Longest gap, in days"
+msgstr "Најдужи прекид, у данима"
+
 #: src/postulo/templates/applications/application_list.html:42
 #: src/postulo/templates/jobs/company_list.html:42
 #: src/postulo/templates/server/logs.html:144
@@ -4756,7 +4907,7 @@ msgstr "Постави за администратора"
 msgid "Manage"
 msgstr "Управљај"
 
-#: src/postulo/templates/widgets/shortcuts.html:28
+#: src/postulo/templates/widgets/shortcuts.html:31
 #, draft
 msgid "Manage tags"
 msgstr "Управљај ознакама"
@@ -4771,7 +4922,7 @@ msgstr "Производња"
 msgid "Map a column to Company and one to Role first."
 msgstr "Прво повежите једну колону са Компанијом, а другу са Радним местом."
 
-#: src/postulo/applications/views.py:447
+#: src/postulo/applications/views.py:448
 #, draft
 msgid "Marked as done."
 msgstr "Означено као готово."
@@ -4850,6 +5001,11 @@ msgstr "Мобилни"
 #, draft
 msgid "Money and dates"
 msgstr "Новац и датуми"
+
+#: src/postulo/templates/applications/report.html:48
+#, draft
+msgid "Month"
+msgstr "Месец"
 
 #: src/postulo/templates/core/import_csv_map.html:49
 #, draft
@@ -5302,6 +5458,12 @@ msgstr "Непрофитна организација"
 msgid "None"
 msgstr "Нема"
 
+#: src/postulo/templates/applications/report.html:149
+#: src/postulo/templates/applications/report_print.html:111
+#, draft
+msgid "none"
+msgstr "ниједна"
+
 #: src/postulo/templates/partials/label_attrs.html:12
 #, draft
 msgid "None chosen yet"
@@ -5391,6 +5553,7 @@ msgstr "Није део друге компаније"
 
 #: src/postulo/applications/analytics.py:296
 #: src/postulo/applications/analytics.py:314
+#: src/postulo/applications/reports.py:446
 #, draft
 msgid "Not recorded"
 msgstr "Није забележено"
@@ -5675,6 +5838,11 @@ msgid ""
 msgstr ""
 "Нема шта да се стави у ред: сваки документ одабраних врста већ је на списку за %(label)s."
 
+#: src/postulo/templates/applications/partials/report_tally.html:30
+#, draft
+msgid "Nothing to show for this period."
+msgstr "Нема шта да се прикаже у овом периоду."
+
 #: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
@@ -5711,6 +5879,18 @@ msgstr "Ништа није инсталирано."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Ништа није било изабрано, па се ништа није променило."
+
+#: src/postulo/templates/applications/report_print.html:174
+#, draft
+msgid "Nothing was sent in this period."
+msgstr "У овом периоду није послато ништа."
+
+#: src/postulo/templates/applications/report.html:261
+#, draft
+msgid ""
+"Nothing was sent in this period. That is what the report says, and it is a fact like any other."
+msgstr ""
+"У овом периоду није послато ништа. То извештај каже и то је чињеница као и свака друга."
 
 #: src/postulo/templates/settings/dashboard.html:68
 #, draft
@@ -5769,6 +5949,8 @@ msgstr "Понуда примљена"
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Нуди се само док пошта ове инстанце заиста стиже."
 
+#: src/postulo/templates/applications/report.html:186
+#: src/postulo/templates/applications/report_print.html:133
 #: src/postulo/templates/widgets/industries.html:13
 #: src/postulo/templates/widgets/insight_counters.html:33
 #: src/postulo/templates/widgets/sources.html:13
@@ -5835,6 +6017,14 @@ msgstr "Једном дневно"
 msgid "One achievement per line."
 msgstr "Једно постигнуће по реду."
 
+#: src/postulo/templates/applications/report.html:98
+#, python-format, draft
+msgid "One application sent in this period."
+msgid_plural "%(counter)s applications sent in this period."
+msgstr[0] "Једна пријава послата у овом периоду."
+msgstr[1] "%(counter)s пријаве послате у овом периоду."
+msgstr[2] "%(counter)s пријава послатих у овом периоду."
+
 #: src/postulo/templates/jobs/listing_list.html:23
 #, python-format, draft
 msgid "One capture waiting for review"
@@ -5842,6 +6032,14 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Једно хватање чека преглед"
 msgstr[1] "%(counter)s хватања чекају преглед"
 msgstr[2] "%(counter)s хватања чека преглед"
+
+#: src/postulo/templates/applications/report.html:212
+#, python-format, draft
+msgid "One draft in this period is left out."
+msgid_plural "%(counter)s drafts in this period are left out."
+msgstr[0] "Један нацрт из овог периода је изостављен."
+msgstr[1] "%(counter)s нацрта из овог периода су изостављена."
+msgstr[2] "%(counter)s нацрта из овог периода је изостављено."
 
 #: src/postulo/templates/connections/list.html:81
 #, python-format, draft
@@ -6049,6 +6247,11 @@ msgstr "Остале делатности"
 msgid "Other languages"
 msgstr "Други језици"
 
+#: src/postulo/templates/applications/report.html:77
+#, draft
+msgid "Other periods"
+msgstr "Други периоди"
+
 #: src/postulo/applications/models.py:485
 #, draft
 msgid "outcome"
@@ -6222,6 +6425,11 @@ msgstr "Годишње"
 #, draft
 msgid "Period"
 msgstr "Период"
+
+#: src/postulo/templates/applications/report_print.html:68
+#, python-format, draft
+msgid "Period: %(period)s"
+msgstr "Период: %(period)s"
 
 #: src/postulo/accounts/admin.py:24
 #, draft
@@ -6516,6 +6724,13 @@ msgstr ""
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
 msgstr "Postulo још не објављује каталог. Одавде се ништа не преузима."
 
+#: src/postulo/templates/applications/report.html:267
+#, draft
+msgid ""
+"Postulo sets no target. How many applications a period should hold is a benefit regime's rule or your own, never this software's."
+msgstr ""
+"Postulo не поставља никакав циљ. Колико пријава период треба да садржи правило је система накнада или ваше сопствено, никада овог софтвера."
+
 #: src/postulo/templates/api/token_list.html:23
 #, draft
 msgid ""
@@ -6598,6 +6813,18 @@ msgstr "приоритет"
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Приватне и локалне адресе се одбијају."
+
+#: src/postulo/templates/applications/report_print.html:195
+#, draft
+msgid ""
+"Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
+msgstr ""
+"Израдио Postulo из сопствених записа ове особе. Postulo не поставља никакав циљ: колико пријава период треба да садржи правило је система накнада или саме особе."
+
+#: src/postulo/templates/applications/report_print.html:70
+#, python-format, draft
+msgid "Produced on %(produced)s"
+msgstr "Израђено %(produced)s"
 
 #: src/postulo/resume/models.py:199
 #, draft
@@ -6691,6 +6918,11 @@ msgstr "Публикација"
 #, draft
 msgid "Putting it back"
 msgstr "Како вратити"
+
+#: src/postulo/applications/reports.py:102
+#, python-format, draft
+msgid "Q%(quarter)s %(year)s"
+msgstr "%(quarter)s. квартал %(year)s"
 
 #: src/postulo/resume/models.py:95
 #, draft
@@ -6875,12 +7107,12 @@ msgid ""
 msgstr ""
 "Бележи се уз све што је одавде инсталирано, па не може касније да се промени без остављања инсталираног без родитеља."
 
-#: src/postulo/applications/views.py:606
+#: src/postulo/applications/views.py:607
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Забележено као отказано."
 
-#: src/postulo/applications/views.py:605
+#: src/postulo/applications/views.py:606
 #, draft
 msgid "Recorded as held."
 msgstr "Забележено као одржано."
@@ -6900,7 +7132,7 @@ msgstr "забележено"
 msgid "Recorded what you sent."
 msgstr "Забележено шта сте послали."
 
-#: src/postulo/applications/views.py:607
+#: src/postulo/applications/views.py:608
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Забележено: нико се није појавио."
@@ -6993,6 +7225,12 @@ msgstr "Одбијено"
 #, draft
 msgid "Rejection received"
 msgstr "Одбијеница примљена"
+
+#: src/postulo/templates/applications/report.html:190
+#: src/postulo/templates/applications/report_print.html:137
+#, draft
+msgid "Rejections"
+msgstr "Одбијенице"
 
 #: src/postulo/applications/forms.py:281
 #, draft
@@ -7105,6 +7343,11 @@ msgid ""
 msgstr ""
 "Одговорили, одбили, заћутали, још чекате — шта је било с оним што сте послали."
 
+#: src/postulo/templates/applications/report.html:4
+#, python-format, draft
+msgid "Report · %(period)s"
+msgstr "Извештај · %(period)s"
+
 #: src/postulo/jobs/industries.py:75
 #, draft
 msgid "Research"
@@ -7189,7 +7432,10 @@ msgstr "robots.txt се тренутно поштује."
 msgid "robots.txt is currently ignored."
 msgstr "robots.txt се тренутно занемарује."
 
+#: src/postulo/applications/reports.py:476
 #: src/postulo/applications/tables.py:19
+#: src/postulo/templates/applications/report.html:227
+#: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
 #: src/postulo/templates/jobs/listing_list.html:70
 #: src/postulo/templates/server/people.html:35
@@ -7504,6 +7750,7 @@ msgstr "Слање у своје име"
 msgid "Sending failed: %(error)s"
 msgstr "Слање није успело: %(error)s"
 
+#: src/postulo/templates/applications/report.html:107
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
@@ -7689,6 +7936,11 @@ msgstr "Прикажи у навигацији"
 msgid "Show past too"
 msgstr "Прикажи и прошле"
 
+#: src/postulo/templates/applications/report.html:72
+#, draft
+msgid "Show this period"
+msgstr "Прикажи овај период"
+
 #: src/postulo/core/models.py:504
 #, draft
 msgid "Shown in the header and on the sign-in page."
@@ -7831,7 +8083,7 @@ msgstr "SMTP сервер"
 msgid "Snooze"
 msgstr "Одложи"
 
-#: src/postulo/applications/views.py:488
+#: src/postulo/applications/views.py:489
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Одложено за две недеље."
@@ -7961,11 +8213,14 @@ msgid "State"
 msgstr "Стање"
 
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:224
+#: src/postulo/applications/reports.py:479
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
 #: src/postulo/templates/applications/application_detail.html:48
 #: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
+#: src/postulo/templates/applications/report.html:229
+#: src/postulo/templates/applications/report_print.html:153
 #: src/postulo/templates/core/import_csv_map.html:66
 #, draft
 msgid "Status"
@@ -7988,7 +8243,7 @@ msgstr "Промена статуса"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Статус у табели: %(text)s"
 
-#: src/postulo/applications/views.py:363
+#: src/postulo/applications/views.py:364
 #, draft
 msgid "Status updated."
 msgstr "Статус ажуриран."
@@ -8374,7 +8629,7 @@ msgstr "Ово не изгледа као %(scheme)s идентификатор 
 msgid "That does not look like a complete web address."
 msgstr "Ово не изгледа као потпуна веб адреса."
 
-#: src/postulo/applications/views.py:394
+#: src/postulo/applications/views.py:395
 #, draft
 msgid "That entry could not be saved."
 msgstr "Тај унос није могао да се сачува."
@@ -8447,7 +8702,7 @@ msgstr "То је много веза за опоравак. Покушајте 
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "То је SVG, који Postulo још не чува. PNG или JPEG одговара."
 
-#: src/postulo/applications/views.py:365
+#: src/postulo/applications/views.py:366
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "То није статус који Postulo познаје."
@@ -8467,17 +8722,17 @@ msgstr "То није модул за који Postulo зна."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "То није Ed25519 јавни кључ: %(error)s"
 
-#: src/postulo/applications/views.py:599
+#: src/postulo/applications/views.py:600
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "То није исход који Postulo познаје."
 
-#: src/postulo/applications/views.py:490
+#: src/postulo/applications/views.py:491
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "То није нешто што Postulo може да уради по том питању."
 
-#: src/postulo/applications/views.py:179 src/postulo/jobs/views.py:124
+#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:124
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "То није нешто што Postulo може да уради за више њих одједном."
@@ -8577,7 +8832,7 @@ msgstr "Тај додатак више није инсталиран."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Тај одговор није дошао од захтева који је Postulo послао."
 
-#: src/postulo/applications/views.py:719
+#: src/postulo/applications/views.py:803
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "На тај предлог је већ одговорено."
@@ -8758,6 +9013,11 @@ msgstr ""
 msgid "The language you read Postulo in"
 msgstr "Језик на ком читате Postulo"
 
+#: src/postulo/templates/applications/report.html:43
+#, draft
+msgid "The last few weeks"
+msgstr "Последњих неколико недеља"
+
 #: src/postulo/templates/server/email.html:62
 #, python-format, draft
 msgid "The last message this instance tried to send failed, at %(when)s."
@@ -8797,6 +9057,20 @@ msgstr "Лого је нестао."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Лого није промењен: %(problem)s"
 
+#: src/postulo/templates/applications/report.html:167
+#, draft
+msgid ""
+"The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
+msgstr ""
+"Најдужи прекид мери се унутар овог периода, па се тишина која је почела пре њега не уноси у њега. Период који још траје рачуна се само до данас."
+
+#: src/postulo/templates/applications/report_print.html:118
+#, draft
+msgid ""
+"The longest gap is measured inside this period. A period still running is counted up to the day this was produced. A week marked (part) reaches outside the period; nothing from outside it is counted."
+msgstr ""
+"Најдужи прекид мери се унутар овог периода. Период који још траје рачуна се до дана када је ово израђено. Недеља означена са (део) протеже се изван периода; ништа изван њега се не рачуна."
+
 #: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
@@ -8825,6 +9099,16 @@ msgstr ""
 msgid "The official repository is emptied, not removed."
 msgstr "Званични репозиторијум се празни, не уклања."
 
+#: src/postulo/templates/applications/report.html:83
+#, draft
+msgid "The one after"
+msgstr "Следећи"
+
+#: src/postulo/templates/applications/report.html:79
+#, draft
+msgid "The one before"
+msgstr "Претходни"
+
 #: src/postulo/documents/models.py:87
 #, draft
 msgid "The opening paragraph, if you use one."
@@ -8851,6 +9135,11 @@ msgstr "Додаци који се испоручују унутар Postula. Н
 #, draft
 msgid "The posting"
 msgstr "Оглас"
+
+#: src/postulo/templates/applications/report.html:245
+#, draft
+msgid "the posting"
+msgstr "оглас"
 
 #: src/postulo/templates/applications/application_intake.html:64
 #: src/postulo/templates/jobs/capture_review.html:58
@@ -9132,6 +9421,11 @@ msgstr "Ова позивница је за %(email)s. Региструјте с
 msgid "This invitation may only be used with the address it was sent to."
 msgstr "Ова позивница може да се користи само са адресом на коју је послата."
 
+#: src/postulo/templates/applications/report.html:88
+#, draft
+msgid "This is the most recent period."
+msgstr "Ово је најновији период."
+
 #: src/postulo/templates/server/plugins.html:311
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -9260,6 +9554,11 @@ msgstr "Наслов, компанија или локација"
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS од првог бајта"
+
+#: src/postulo/templates/applications/report.html:59
+#, draft
+msgid "To"
+msgstr "До"
 
 #: src/postulo/templates/partials/table/head.html:101
 #, draft
@@ -9555,6 +9854,11 @@ msgstr "Искоришћена"
 msgid "used at"
 msgstr "искоришћена"
 
+#: src/postulo/templates/applications/report.html:51
+#, draft
+msgid "Used for a month, and for the quarter that month falls in."
+msgstr "Користи се за месец и за квартал у који тај месец пада."
+
 #: src/postulo/accounts/models.py:124 src/postulo/accounts/models.py:250
 #, draft
 msgid "user"
@@ -9708,6 +10012,23 @@ msgstr "веб страница"
 msgid "Website"
 msgstr "Веб страница"
 
+#: src/postulo/templates/applications/report.html:135
+#: src/postulo/templates/applications/report.html:161
+#: src/postulo/templates/applications/report_print.html:98
+#, python-format, draft
+msgid "Week of %(day)s"
+msgstr "Недеља од %(day)s"
+
+#: src/postulo/templates/applications/report.html:125
+#, draft
+msgid "Weeks in a row, up to now"
+msgstr "Недеља заредом, досад"
+
+#: src/postulo/templates/applications/report_print.html:89
+#, draft
+msgid "Weeks with none"
+msgstr "Недеље без иједне"
+
 #: src/postulo/templates/core/dashboard.html:38
 #, python-format, draft
 msgid "Welcome back, %(name)s"
@@ -9737,6 +10058,16 @@ msgstr "шта би надзор требало да испитује"
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "С чим нови налог почиње. Свако може да промени своје."
+
+#: src/postulo/templates/applications/report.html:172
+#, draft
+msgid "What came back"
+msgstr "Шта се вратило"
+
+#: src/postulo/templates/applications/report_print.html:121
+#, draft
+msgid "What came back in this period"
+msgstr "Шта се вратило у овом периоду"
 
 #: src/postulo/core/server_forms.py:316
 #, draft
@@ -9813,6 +10144,11 @@ msgstr "шта каже"
 msgid "What it says it is"
 msgstr "Шта каже да јесте"
 
+#: src/postulo/templates/applications/report.html:200
+#, draft
+msgid "What kind of employer"
+msgstr "Каква врста послодавца"
+
 #: src/postulo/applications/widgets.py:25
 #: src/postulo/core/widgets_builtin.py:22
 #, draft
@@ -9884,6 +10220,13 @@ msgstr "Како га назвати"
 #, draft
 msgid "what to do"
 msgstr "шта урадити"
+
+#: src/postulo/templates/applications/report.html:15
+#, draft
+msgid ""
+"What was sent, how regularly, and what came back. Nothing outside the period is counted."
+msgstr ""
+"Шта је послато, колико редовно и шта се вратило. Ништа изван периода се не рачуна."
 
 #: src/postulo/templates/accounts/delete_account.html:18
 #, draft
@@ -9964,6 +10307,12 @@ msgstr "Где је потписани индекс објављен. Његов
 msgid "Where they came from"
 msgstr "Одакле су дошли"
 
+#: src/postulo/templates/applications/report.html:198
+#: src/postulo/templates/applications/report_print.html:181
+#, draft
+msgid "Where they were found"
+msgstr "Где су пронађене"
+
 #: src/postulo/applications/widgets.py:121
 #, draft
 msgid "Where things stand"
@@ -10040,6 +10389,11 @@ msgstr ""
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Који део Postula је ово направио: веб интерфејс или API."
+
+#: src/postulo/templates/applications/report.html:36
+#, draft
+msgid "Which period"
+msgstr "Који период"
 
 #: src/postulo/templates/connections/pick.html:7
 #, draft
@@ -10407,7 +10761,7 @@ msgstr "Ваш рок"
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
 #: src/postulo/templates/base.html:105
-#: src/postulo/templates/widgets/shortcuts.html:31
+#: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"
 msgstr "Ваши подаци о вама"
@@ -10426,6 +10780,11 @@ msgstr "Ваш Gravatar је поново преузет."
 #, draft
 msgid "Your initials"
 msgstr "Ваши иницијали"
+
+#: src/postulo/templates/applications/report.html:10
+#, python-format, draft
+msgid "Your job search in %(period)s"
+msgstr "Ваше тражење посла у периоду %(period)s"
 
 #: src/postulo/core/views.py:67
 #, draft
@@ -10504,6 +10863,16 @@ msgstr "{label} уклоњена"
 #, draft
 msgid "{label} — new"
 msgstr "{label} — нова"
+
+#: src/postulo/templates/applications/report.html:144
+#, draft
+msgid "· part of this week is outside the period"
+msgstr "· део ове недеље је изван периода"
+
+#: src/postulo/templates/applications/report.html:137
+#, draft
+msgid "· still running"
+msgstr "· још траје"
 
 #: src/postulo/core/server_views.py:1024
 #, python-format, draft

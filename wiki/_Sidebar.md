@@ -15,6 +15,7 @@
 - [Tracking applications](Tracking-applications)
 - [Capturing postings](Capturing-postings)
 - [Insights and the dashboard](Insights)
+- [Reports](Reports)
 - [Your career record](Your-career-record)
 - [CVs](CVs)
 - [Letters](Cover-letters)

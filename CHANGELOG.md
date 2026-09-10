@@ -227,6 +227,42 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A report about a period, to hand to an employment office or to read yourself.** Two
+  different people ask for this and they want the same document. Unemployment benefit in most
+  of Europe is conditional on actually looking, evidenced — and until now the only way to hand
+  those facts over was to copy them out by hand, which is exactly the work that makes people
+  stop keeping records at all. The other reader is the person searching: a month of looking
+  feels like nothing happened, and *eleven applications across four weeks, none in the week of
+  the 12th* is the difference between a feeling and a fact.
+
+  **Regularity is what it is named for, so the cadence is the top of the page** — a bar per
+  week, the empty weeks saying *none* in words rather than being an invisible gap, the average
+  per week, the longest gap and the run of weeks up to now. Underneath is the evidence: every
+  application sent in the period, with where it was found, the address of the posting, its
+  status and the date of the last thing that happened.
+
+  **Two questions, kept apart rather than added together.** *Sent in this period* reads
+  applications by when they went out. *What came back* reads the event log by when the event
+  happened, so a reply arriving in September to an August application is September activity —
+  which it is. Folding the two together would give a figure that is true of neither.
+
+  **The period is in the address**, which makes a report for a particular month a thing to
+  bookmark and to send to somebody: the same line this project already draws between a
+  question and a preference. There is no link into the future, because a report about next
+  month is a blank page pretending to be a document.
+
+  Out as a **PDF** carrying the person's name, the period and the day it was produced —
+  because a document with no date is not evidence of anything — and as **CSV** for anybody who
+  wants to do their own sums. Nothing is stored: a report is computed when it is asked for,
+  from records that are already the truth, which is what makes it a snapshot of the record at
+  a moment.
+
+  **Postulo sets no target anywhere on the page**, and says so on it. How many applications a
+  period should hold is a benefit regime's rule or the person's own, never this software's.
+  Drafts never sent are left out, and the page says how many, so the absence is stated rather
+  than silent. (#56)
+
+
 - **An address is now checked — and named — by the rules of its own country.** Which parts
   are usually needed, what a postcode there looks like, what each field is *called*, and what
   order the whole thing prints in.

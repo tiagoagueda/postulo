@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 04:00+0000\n"
+"POT-Creation-Date: 2026-09-10 04:15+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Ελληνικά\n"
@@ -87,6 +87,13 @@ msgid_plural "%(counter)s companies"
 msgstr[0] "%(counter)s εταιρεία"
 msgstr[1] "%(counter)s εταιρείες"
 
+#: src/postulo/templates/applications/report.html:117
+#, python-format, draft
+msgid "%(counter)s day"
+msgid_plural "%(counter)s days"
+msgstr[0] "%(counter)s ημέρα"
+msgstr[1] "%(counter)s ημέρες"
+
 #: src/postulo/templates/applications/application_detail.html:267
 #, python-format, draft
 msgid "%(counter)s earlier"
@@ -136,6 +143,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "πριν από %(days)s ημέρα"
 msgstr[1] "πριν από %(days)s ημέρες"
+
+#: src/postulo/applications/reports.py:106
+#, python-format, draft
+msgid "%(from)s to %(to)s"
+msgstr "%(from)s έως %(to)s"
 
 #: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
 #, python-format, draft
@@ -472,6 +484,11 @@ msgstr "πριν από %(when)s"
 msgid "(empty address)"
 msgstr "(κενή διεύθυνση)"
 
+#: src/postulo/templates/applications/report_print.html:99
+#, draft
+msgid "(part)"
+msgstr "(μερικώς)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -527,6 +544,13 @@ msgstr "Μια εταιρεία δεν μπορεί να είναι μέρος �
 msgid "A company carries one identifier per scheme."
 msgstr "Μια εταιρεία έχει ένα αναγνωριστικό ανά σχήμα."
 
+#: src/postulo/templates/applications/report.html:201
+#, draft
+msgid ""
+"A company in several fields counts in each of them, so these can add up to more than everything."
+msgstr ""
+"Μια εταιρεία σε περισσότερους κλάδους μετράει σε καθέναν από αυτούς, οπότε το άθροισμα μπορεί να ξεπερνά το σύνολο."
+
 #: src/postulo/templates/widgets/industries.html:37
 #, draft
 msgid "A company in several industries counts in each of them."
@@ -563,6 +587,11 @@ msgid ""
 "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr ""
 "Ένα κινητό, μια σταθερή γραμμή, ένα τηλεφωνικό κέντρο — όσα αξίζει να κρατήσετε, με ένα σημειωμένο ως αυτό που θα χρησιμοποιείται. Τα έγγραφα τυπώνουν εκείνο."
+
+#: src/postulo/templates/applications/report.html:41
+#, draft
+msgid "A month"
+msgstr "Ένας μήνας"
 
 #: src/postulo/core/models.py:288
 #, draft
@@ -654,6 +683,11 @@ msgid ""
 msgstr ""
 "Ένα wheel της Python (<code>.whl</code>) φτιαγμένο για κάθε πλατφόρμα. Το Postulo διαβάζει τι λέει για τον εαυτό του και σας το δείχνει πριν εγκατασταθεί οτιδήποτε."
 
+#: src/postulo/templates/applications/report.html:42
+#, draft
+msgid "A quarter"
+msgstr "Ένα τρίμηνο"
+
 #: src/postulo/templates/server/logs.html:146
 #, draft
 msgid "A quiet log is the one you want."
@@ -674,6 +708,11 @@ msgstr ""
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Μια σημείωση για το σε ποιον απευθύνεται."
+
+#: src/postulo/templates/widgets/shortcuts.html:25
+#, draft
+msgid "A report on a period"
+msgstr "Μια αναφορά για μια περίοδο"
 
 #: src/postulo/templates/core/home.html:13
 #, draft
@@ -733,6 +772,12 @@ msgid ""
 "A username is unique across the instance whoever changes it, and people can change their own under Settings."
 msgstr ""
 "Ένα όνομα χρήστη είναι μοναδικό σε όλη την εγκατάσταση, όποιος κι αν το αλλάξει, και ο καθένας μπορεί να αλλάξει το δικό του στις Ρυθμίσεις."
+
+#: src/postulo/templates/applications/report.html:111
+#: src/postulo/templates/applications/report_print.html:81
+#, draft
+msgid "A week, on average"
+msgstr "Ανά εβδομάδα, κατά μέσο όρο"
 
 #: src/postulo/templates/settings/dashboard.html:165
 #, draft
@@ -938,7 +983,7 @@ msgid ""
 msgstr ""
 "Προστέθηκαν %(total)s καταχωρίσεις. Τίποτα δεν αντικαταστάθηκε· ό,τι αποδειχθεί διπλό είναι δικό σας να το διαγράψετε."
 
-#: src/postulo/applications/views.py:392 src/postulo/applications/views.py:736
+#: src/postulo/applications/views.py:393 src/postulo/applications/views.py:820
 #, draft
 msgid "Added to the timeline."
 msgstr "Προστέθηκε στο χρονολόγιο."
@@ -953,16 +998,17 @@ msgstr "Προστέθηκε στις αγγελίες σας."
 msgid "Added."
 msgstr "Προστέθηκε."
 
+#: src/postulo/applications/reports.py:478
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Διεύθυνση"
+
 #: src/postulo/core/models.py:410 src/postulo/jobs/models.py:729
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "διεύθυνση"
-
-#: src/postulo/templates/partials/postal_addresses.html:29
-#, draft
-msgid "Address"
-msgstr "Διεύθυνση"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -1198,7 +1244,7 @@ msgstr "Αίτηση"
 msgid "Application created"
 msgstr "Η αίτηση δημιουργήθηκε"
 
-#: src/postulo/applications/views.py:345
+#: src/postulo/applications/views.py:346
 #, draft
 msgid "Application deleted."
 msgstr "Η αίτηση διαγράφηκε."
@@ -1208,12 +1254,12 @@ msgstr "Η αίτηση διαγράφηκε."
 msgid "Application recorded from the capture."
 msgstr "Η αίτηση καταγράφηκε από τη σύλληψη."
 
-#: src/postulo/applications/views.py:311 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:312 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Η αίτηση καταγράφηκε."
 
-#: src/postulo/applications/views.py:335
+#: src/postulo/applications/views.py:336
 #, draft
 msgid "Application updated."
 msgstr "Η αίτηση ενημερώθηκε."
@@ -1239,11 +1285,24 @@ msgstr "αιτήσεις"
 msgid "Applications by month"
 msgstr "Αιτήσεις ανά μήνα"
 
+#: src/postulo/templates/applications/report_print.html:177
+#, draft
+msgid "Applications drafted but never sent are not counted."
+msgstr "Οι αιτήσεις που γράφτηκαν αλλά δεν στάλθηκαν ποτέ δεν μετρώνται."
+
+#: src/postulo/templates/applications/report.html:210
+#, draft
+msgid ""
+"Applications drafted but never sent are not counted. An employment office is asking what was sent."
+msgstr ""
+"Οι αιτήσεις που γράφτηκαν αλλά δεν στάλθηκαν ποτέ δεν μετρώνται. Μια υπηρεσία απασχόλησης ρωτά τι στάλθηκε."
+
 #: src/postulo/notifications/base.py:29
 #, draft
 msgid "Applications go quiet"
 msgstr "Οι αιτήσεις σιωπούν"
 
+#: src/postulo/templates/applications/report_print.html:77
 #: src/postulo/templates/widgets/insight_counters.html:17
 #, draft
 msgid "Applications sent"
@@ -1289,7 +1348,10 @@ msgstr "Υποβλήθηκαν τις τελευταίες 30 ημέρες"
 msgid "applied on"
 msgstr "υποβλήθηκε στις"
 
+#: src/postulo/applications/reports.py:474
 #: src/postulo/templates/applications/application_detail.html:137
+#: src/postulo/templates/applications/report.html:225
+#: src/postulo/templates/applications/report_print.html:149
 #, draft
 msgid "Applied on"
 msgstr "Υποβλήθηκε στις"
@@ -1753,7 +1815,7 @@ msgid ""
 msgstr ""
 "Οι αλλαγές που γίνονται εδώ στέλνονται στην επόμενη εκτέλεση· τότε διαβάζεται και η άλλη πλευρά."
 
-#: src/postulo/applications/views.py:480
+#: src/postulo/applications/views.py:481
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Επικοινωνία με %(company)s για %(role)s"
@@ -1818,7 +1880,7 @@ msgstr "Επιλέξτε τουλάχιστον ένα έγγραφο προς �
 msgid "Choose what kind of identifier this is."
 msgstr "Επιλέξτε τι είδους αναγνωριστικό είναι αυτό."
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:816
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Επιλέξτε πρώτα σε ποια αίτηση αναφέρεται."
@@ -1955,8 +2017,10 @@ msgstr "Εταιρείες που δημιουργήθηκαν"
 msgid "Companies you have applied to"
 msgstr "Εταιρείες στις οποίες κάνατε αίτηση"
 
-#: src/postulo/applications/forms.py:43 src/postulo/applications/tables.py:27
-#: src/postulo/core/csv_import.py:38
+#: src/postulo/applications/forms.py:43 src/postulo/applications/reports.py:475
+#: src/postulo/applications/tables.py:27 src/postulo/core/csv_import.py:38
+#: src/postulo/templates/applications/report.html:226
+#: src/postulo/templates/applications/report_print.html:150
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
@@ -2170,6 +2234,20 @@ msgstr "Δεν μπόρεσε να ληφθεί: %(error)s"
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Δεν μπόρεσε να διαβαστεί το %(site)s: %(error)s"
 
+#: src/postulo/templates/applications/report_print.html:141
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here."
+msgstr ""
+"Μετριέται με βάση το πότε συνέβη, οπότε μια απάντηση που φτάνει σε αυτή την περίοδο σε παλαιότερη αίτηση ανήκει εδώ."
+
+#: src/postulo/templates/applications/report.html:174
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
+msgstr ""
+"Μετριέται με βάση το πότε συνέβη, οπότε μια απάντηση που φτάνει σε αυτή την περίοδο σε παλαιότερη αίτηση ανήκει εδώ. Αυτό είναι διαφορετικό ερώτημα από το τι στάλθηκε, και τα δύο κρατιούνται χωριστά."
+
 #: src/postulo/templates/widgets/interviews_summary.html:30
 #, draft
 msgid ""
@@ -2339,6 +2417,11 @@ msgstr "Ημερομηνίες που προτάθηκαν:"
 msgid "Dates written as"
 msgstr "Οι ημερομηνίες γράφονται ως"
 
+#: src/postulo/templates/applications/report.html:44
+#, draft
+msgid "Dates you choose"
+msgstr "Ημερομηνίες που επιλέγεις"
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2481,7 +2564,7 @@ msgstr "Απόρριψη"
 msgid "Declined"
 msgstr "Απορρίφθηκε"
 
-#: src/postulo/applications/views.py:724
+#: src/postulo/applications/views.py:808
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Απορρίφθηκε. Δεν θα προταθεί ξανά."
@@ -2705,6 +2788,16 @@ msgstr "ολοκληρώθηκε στις"
 #, draft
 msgid "Download"
 msgstr "Λήψη"
+
+#: src/postulo/templates/applications/report.html:20
+#, draft
+msgid "Download CSV"
+msgstr "Λήψη CSV"
+
+#: src/postulo/templates/applications/report.html:23
+#, draft
+msgid "Download PDF"
+msgstr "Λήψη PDF"
 
 #: src/postulo/templates/accounts/delete_account.html:41
 #: src/postulo/templates/core/export.html:36
@@ -2942,6 +3035,12 @@ msgid ""
 msgstr ""
 "Κάθε λογαριασμός σε αυτή την εγκατάσταση. Οι διαχειριστές βλέπουν λογαριασμούς, ποτέ τις αιτήσεις ή τα έγγραφα κανενός."
 
+#: src/postulo/templates/applications/report.html:208
+#: src/postulo/templates/applications/report_print.html:144
+#, draft
+msgid "Every application, in order"
+msgstr "Όλες οι αιτήσεις, με τη σειρά"
+
 #: src/postulo/jobs/forms.py:286
 #, draft
 msgid ""
@@ -3114,7 +3213,7 @@ msgstr ""
 "Το να εξηγήσει κανείς τι πήγε στραβά συχνά σημαίνει να πει σε ποια σύνδεση, σε ποια εταιρεία ή σε ποιο έγγραφο συνέβη. Εδώ δεν υπάρχει το περιεχόμενο κανενός εγγράφου, αλλά αντιμετωπίστε αυτή τη σελίδα όπως την υπόλοιπη εγκατάσταση πριν μοιραστείτε οτιδήποτε από αυτήν."
 
 #: src/postulo/templates/core/export.html:8
-#: src/postulo/templates/widgets/shortcuts.html:25
+#: src/postulo/templates/widgets/shortcuts.html:28
 #, draft
 msgid "Export everything"
 msgstr "Εξαγωγή όλων"
@@ -3270,6 +3369,12 @@ msgstr "Όνομα"
 msgid "first name"
 msgstr "όνομα"
 
+#: src/postulo/templates/applications/report.html:178
+#: src/postulo/templates/applications/report_print.html:125
+#, draft
+msgid "First replies"
+msgstr "Πρώτες απαντήσεις"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -3290,12 +3395,12 @@ msgstr "Ακολουθεί το προφίλ σας"
 msgid "Follow-up note"
 msgstr "Σημείωμα μετά τη συνέντευξη"
 
-#: src/postulo/applications/views.py:474
+#: src/postulo/applications/views.py:475
 #, draft
 msgid "Follow-up recorded."
 msgstr "Η επικοινωνία καταγράφηκε."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:471
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:472
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3354,7 +3459,10 @@ msgstr "Βρέθηκε λογότυπο στο %(url)s."
 msgid "Found on their website"
 msgstr "Βρέθηκε στον ιστότοπό τους"
 
-#: src/postulo/applications/forms.py:57 src/postulo/core/csv_import.py:50
+#: src/postulo/applications/forms.py:57 src/postulo/applications/reports.py:477
+#: src/postulo/core/csv_import.py:50
+#: src/postulo/templates/applications/report.html:228
+#: src/postulo/templates/applications/report_print.html:152
 #: src/postulo/templates/jobs/posting_detail.html:81
 #, draft
 msgid "Found via"
@@ -3387,6 +3495,7 @@ msgstr "Πάγωμα και επισύναψη"
 msgid "from"
 msgstr "από"
 
+#: src/postulo/templates/applications/report.html:55
 #: src/postulo/templates/server/email.html:27
 #: src/postulo/templates/server/logs.html:51
 #: src/postulo/templates/server/logs.html:89
@@ -3670,10 +3779,21 @@ msgstr ""
 msgid "How many applications reached one, how many were held, and of what kind."
 msgstr "Πόσες αιτήσεις έφτασαν σε συνέντευξη, πόσες έγιναν και τι είδους."
 
+#: src/postulo/templates/applications/report.html:65
+#, draft
+msgid "How many weeks"
+msgstr "Πόσες εβδομάδες"
+
 #: src/postulo/applications/widgets.py:271
 #, draft
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Πόσα στείλατε, μήνα με μήνα, ώστε να φαίνεται μια ήσυχη περίοδος."
+
+#: src/postulo/templates/applications/report.html:96
+#: src/postulo/templates/applications/report_print.html:73
+#, draft
+msgid "How regularly"
+msgstr "Πόσο τακτικά"
 
 #: src/postulo/templates/core/import_csv_map.html:57
 #, draft
@@ -4000,7 +4120,7 @@ msgstr "συνέντευξη"
 msgid "Interview cancelled"
 msgstr "Η συνέντευξη ακυρώθηκε"
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Interview recorded."
 msgstr "Η συνέντευξη καταγράφηκε."
@@ -4010,7 +4130,7 @@ msgstr "Η συνέντευξη καταγράφηκε."
 msgid "Interview scheduled"
 msgstr "Η συνέντευξη προγραμματίστηκε"
 
-#: src/postulo/applications/views.py:555
+#: src/postulo/applications/views.py:556
 #, draft
 msgid "Interview scheduled."
 msgstr "Η συνέντευξη προγραμματίστηκε."
@@ -4020,7 +4140,7 @@ msgstr "Η συνέντευξη προγραμματίστηκε."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Συνέντευξη αύριο: %(kind)s στην %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:585
+#: src/postulo/applications/views.py:586
 #, draft
 msgid "Interview updated."
 msgstr "Η συνέντευξη ενημερώθηκε."
@@ -4046,6 +4166,12 @@ msgstr "συνεντεύξεις"
 #, draft
 msgid "Interviews"
 msgstr "Συνεντεύξεις"
+
+#: src/postulo/templates/applications/report.html:182
+#: src/postulo/templates/applications/report_print.html:129
+#, draft
+msgid "Interviews attended"
+msgstr "Συνεντεύξεις που έγιναν"
 
 #: src/postulo/accounts/models.py:505
 #, draft
@@ -4162,6 +4288,16 @@ msgstr "αγγελία εργασίας"
 msgid "job postings"
 msgstr "αγγελίες εργασίας"
 
+#: src/postulo/templates/applications/report_print.html:65
+#, draft
+msgid "Job search report"
+msgstr "Αναφορά αναζήτησης εργασίας"
+
+#: src/postulo/templates/applications/report_print.html:23
+#, python-format, draft
+msgid "Job search report · %(period)s"
+msgstr "Αναφορά αναζήτησης εργασίας · %(period)s"
+
 #: src/postulo/applications/forms.py:44
 #, draft
 msgid "Job title"
@@ -4223,6 +4359,7 @@ msgid "kind"
 msgstr "είδος"
 
 #: src/postulo/templates/accounts/profile.html:126
+#: src/postulo/templates/applications/report.html:39
 #: src/postulo/templates/jobs/company_form.html:67
 #: src/postulo/templates/partials/phone_numbers.html:40
 #: src/postulo/templates/partials/postal_addresses.html:60
@@ -4326,7 +4463,10 @@ msgstr ""
 msgid "Largest page read"
 msgstr "Μεγαλύτερη σελίδα που διαβάστηκε"
 
+#: src/postulo/applications/reports.py:480
 #: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:75
+#: src/postulo/templates/applications/report.html:230
+#: src/postulo/templates/applications/report_print.html:154
 #, draft
 msgid "Last activity"
 msgstr "Τελευταία δραστηριότητα"
@@ -4620,6 +4760,16 @@ msgstr "λογότυπο που λήφθηκε"
 msgid "Logs"
 msgstr "Αρχεία καταγραφής"
 
+#: src/postulo/templates/applications/report.html:115
+#, draft
+msgid "Longest gap"
+msgstr "Μεγαλύτερο κενό"
+
+#: src/postulo/templates/applications/report_print.html:85
+#, draft
+msgid "Longest gap, in days"
+msgstr "Μεγαλύτερο κενό, σε ημέρες"
+
 #: src/postulo/templates/applications/application_list.html:42
 #: src/postulo/templates/jobs/company_list.html:42
 #: src/postulo/templates/server/logs.html:144
@@ -4750,7 +4900,7 @@ msgstr "Ορισμός ως διαχειριστή"
 msgid "Manage"
 msgstr "Διαχείριση"
 
-#: src/postulo/templates/widgets/shortcuts.html:28
+#: src/postulo/templates/widgets/shortcuts.html:31
 #, draft
 msgid "Manage tags"
 msgstr "Διαχείριση ετικετών"
@@ -4765,7 +4915,7 @@ msgstr "Μεταποίηση"
 msgid "Map a column to Company and one to Role first."
 msgstr "Αντιστοιχίστε πρώτα μια στήλη στην Εταιρεία και μία στον Ρόλο."
 
-#: src/postulo/applications/views.py:447
+#: src/postulo/applications/views.py:448
 #, draft
 msgid "Marked as done."
 msgstr "Σημειώθηκε ως ολοκληρωμένο."
@@ -4844,6 +4994,11 @@ msgstr "Κινητό"
 #, draft
 msgid "Money and dates"
 msgstr "Χρήματα και ημερομηνίες"
+
+#: src/postulo/templates/applications/report.html:48
+#, draft
+msgid "Month"
+msgstr "Μήνας"
 
 #: src/postulo/templates/core/import_csv_map.html:49
 #, draft
@@ -5298,6 +5453,12 @@ msgstr "Μη κερδοσκοπικός τομέας"
 msgid "None"
 msgstr "Καμία"
 
+#: src/postulo/templates/applications/report.html:149
+#: src/postulo/templates/applications/report_print.html:111
+#, draft
+msgid "none"
+msgstr "καμία"
+
 #: src/postulo/templates/partials/label_attrs.html:12
 #, draft
 msgid "None chosen yet"
@@ -5388,6 +5549,7 @@ msgstr "Δεν ανήκει σε άλλη εταιρεία"
 
 #: src/postulo/applications/analytics.py:296
 #: src/postulo/applications/analytics.py:314
+#: src/postulo/applications/reports.py:446
 #, draft
 msgid "Not recorded"
 msgstr "Δεν καταγράφηκε"
@@ -5676,6 +5838,11 @@ msgid ""
 msgstr ""
 "Τίποτα για την ουρά: κάθε έγγραφο των επιλεγμένων ειδών βρίσκεται ήδη στη λίστα για %(label)s."
 
+#: src/postulo/templates/applications/partials/report_tally.html:30
+#, draft
+msgid "Nothing to show for this period."
+msgstr "Τίποτα να δείξουμε για αυτή την περίοδο."
+
 #: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
@@ -5712,6 +5879,18 @@ msgstr "Δεν εγκαταστάθηκε τίποτα."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Δεν επιλέχθηκε τίποτα, άρα δεν άλλαξε τίποτα."
+
+#: src/postulo/templates/applications/report_print.html:174
+#, draft
+msgid "Nothing was sent in this period."
+msgstr "Δεν στάλθηκε τίποτα σε αυτή την περίοδο."
+
+#: src/postulo/templates/applications/report.html:261
+#, draft
+msgid ""
+"Nothing was sent in this period. That is what the report says, and it is a fact like any other."
+msgstr ""
+"Δεν στάλθηκε τίποτα σε αυτή την περίοδο. Αυτό λέει η αναφορά, και είναι ένα γεγονός όπως κάθε άλλο."
 
 #: src/postulo/templates/settings/dashboard.html:68
 #, draft
@@ -5771,6 +5950,8 @@ msgid "Offered only while this instance's mail is actually getting through."
 msgstr ""
 "Προσφέρεται μόνο όσο η αλληλογραφία αυτής της εγκατάστασης φτάνει πραγματικά."
 
+#: src/postulo/templates/applications/report.html:186
+#: src/postulo/templates/applications/report_print.html:133
 #: src/postulo/templates/widgets/industries.html:13
 #: src/postulo/templates/widgets/insight_counters.html:33
 #: src/postulo/templates/widgets/sources.html:13
@@ -5837,12 +6018,26 @@ msgstr "Μία φορά την ημέρα"
 msgid "One achievement per line."
 msgstr "Ένα επίτευγμα ανά γραμμή."
 
+#: src/postulo/templates/applications/report.html:98
+#, python-format, draft
+msgid "One application sent in this period."
+msgid_plural "%(counter)s applications sent in this period."
+msgstr[0] "Μία αίτηση στάλθηκε σε αυτή την περίοδο."
+msgstr[1] "%(counter)s αιτήσεις στάλθηκαν σε αυτή την περίοδο."
+
 #: src/postulo/templates/jobs/listing_list.html:23
 #, python-format, draft
 msgid "One capture waiting for review"
 msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Μία σύλληψη αναμένει έλεγχο"
 msgstr[1] "%(counter)s συλλήψεις αναμένουν έλεγχο"
+
+#: src/postulo/templates/applications/report.html:212
+#, python-format, draft
+msgid "One draft in this period is left out."
+msgid_plural "%(counter)s drafts in this period are left out."
+msgstr[0] "Ένα πρόχειρο αυτής της περιόδου μένει εκτός."
+msgstr[1] "%(counter)s πρόχειρα αυτής της περιόδου μένουν εκτός."
 
 #: src/postulo/templates/connections/list.html:81
 #, python-format, draft
@@ -6043,6 +6238,11 @@ msgstr "Άλλοι κλάδοι"
 msgid "Other languages"
 msgstr "Άλλες γλώσσες"
 
+#: src/postulo/templates/applications/report.html:77
+#, draft
+msgid "Other periods"
+msgstr "Άλλες περίοδοι"
+
 #: src/postulo/applications/models.py:485
 #, draft
 msgid "outcome"
@@ -6217,6 +6417,11 @@ msgstr "Ανά έτος"
 #, draft
 msgid "Period"
 msgstr "Περίοδος"
+
+#: src/postulo/templates/applications/report_print.html:68
+#, python-format, draft
+msgid "Period: %(period)s"
+msgstr "Περίοδος: %(period)s"
 
 #: src/postulo/accounts/admin.py:24
 #, draft
@@ -6513,6 +6718,13 @@ msgstr ""
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
 msgstr "Το Postulo δεν δημοσιεύει ακόμη κατάλογο. Δεν λαμβάνεται τίποτα από εδώ."
 
+#: src/postulo/templates/applications/report.html:267
+#, draft
+msgid ""
+"Postulo sets no target. How many applications a period should hold is a benefit regime's rule or your own, never this software's."
+msgstr ""
+"Το Postulo δεν θέτει κανέναν στόχο. Πόσες αιτήσεις πρέπει να έχει μια περίοδος είναι κανόνας ενός συστήματος επιδομάτων ή δικός σου, ποτέ αυτού του λογισμικού."
+
 #: src/postulo/templates/api/token_list.html:23
 #, draft
 msgid ""
@@ -6595,6 +6807,18 @@ msgstr "προτεραιότητα"
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Ιδιωτικές και τοπικές διευθύνσεις απορρίπτονται."
+
+#: src/postulo/templates/applications/report_print.html:195
+#, draft
+msgid ""
+"Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
+msgstr ""
+"Παρήχθη από το Postulo από τα δικά της αρχεία αυτού του ατόμου. Το Postulo δεν θέτει κανέναν στόχο: πόσες αιτήσεις πρέπει να έχει μια περίοδος είναι κανόνας ενός συστήματος επιδομάτων ή του ίδιου του ατόμου."
+
+#: src/postulo/templates/applications/report_print.html:70
+#, python-format, draft
+msgid "Produced on %(produced)s"
+msgstr "Παρήχθη στις %(produced)s"
 
 #: src/postulo/resume/models.py:199
 #, draft
@@ -6688,6 +6912,11 @@ msgstr "Δημοσίευση"
 #, draft
 msgid "Putting it back"
 msgstr "Επαναφορά"
+
+#: src/postulo/applications/reports.py:102
+#, python-format, draft
+msgid "Q%(quarter)s %(year)s"
+msgstr "%(quarter)sο τρίμηνο %(year)s"
 
 #: src/postulo/resume/models.py:95
 #, draft
@@ -6872,12 +7101,12 @@ msgid ""
 msgstr ""
 "Καταγράφεται σε ό,τι εγκαθίσταται από εδώ, οπότε δεν μπορεί να αλλάξει αργότερα χωρίς να αποσυνδέσει όσα εγκατέστησε."
 
-#: src/postulo/applications/views.py:606
+#: src/postulo/applications/views.py:607
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Καταγράφηκε ως ακυρωμένη."
 
-#: src/postulo/applications/views.py:605
+#: src/postulo/applications/views.py:606
 #, draft
 msgid "Recorded as held."
 msgstr "Καταγράφηκε ως πραγματοποιημένη."
@@ -6897,7 +7126,7 @@ msgstr "καταγράφηκε στις"
 msgid "Recorded what you sent."
 msgstr "Καταγράφηκαν όσα στείλατε."
 
-#: src/postulo/applications/views.py:607
+#: src/postulo/applications/views.py:608
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Καταγράφηκε: κανείς δεν εμφανίστηκε."
@@ -6991,6 +7220,12 @@ msgstr "Απορρίφθηκε"
 #, draft
 msgid "Rejection received"
 msgstr "Ελήφθη απόρριψη"
+
+#: src/postulo/templates/applications/report.html:190
+#: src/postulo/templates/applications/report_print.html:137
+#, draft
+msgid "Rejections"
+msgstr "Απορρίψεις"
 
 #: src/postulo/applications/forms.py:281
 #, draft
@@ -7104,6 +7339,11 @@ msgid ""
 msgstr ""
 "Απαντήθηκε, απορρίφθηκε, σώπασε, ακόμη περιμένει — τι απέγινε ό,τι στείλατε."
 
+#: src/postulo/templates/applications/report.html:4
+#, python-format, draft
+msgid "Report · %(period)s"
+msgstr "Αναφορά · %(period)s"
+
 #: src/postulo/jobs/industries.py:75
 #, draft
 msgid "Research"
@@ -7188,7 +7428,10 @@ msgstr "Το robots.txt τηρείται αυτή τη στιγμή."
 msgid "robots.txt is currently ignored."
 msgstr "Το robots.txt αγνοείται αυτή τη στιγμή."
 
+#: src/postulo/applications/reports.py:476
 #: src/postulo/applications/tables.py:19
+#: src/postulo/templates/applications/report.html:227
+#: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
 #: src/postulo/templates/jobs/listing_list.html:70
 #: src/postulo/templates/server/people.html:35
@@ -7503,6 +7746,7 @@ msgstr "Αποστολή ως ο εαυτός σας"
 msgid "Sending failed: %(error)s"
 msgstr "Η αποστολή απέτυχε: %(error)s"
 
+#: src/postulo/templates/applications/report.html:107
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
@@ -7689,6 +7933,11 @@ msgstr "Εμφάνιση στην πλοήγηση"
 msgid "Show past too"
 msgstr "Εμφάνιση και παρελθόντων"
 
+#: src/postulo/templates/applications/report.html:72
+#, draft
+msgid "Show this period"
+msgstr "Δείξε αυτή την περίοδο"
+
 #: src/postulo/core/models.py:504
 #, draft
 msgid "Shown in the header and on the sign-in page."
@@ -7831,7 +8080,7 @@ msgstr "Διακομιστής SMTP"
 msgid "Snooze"
 msgstr "Αναβολή"
 
-#: src/postulo/applications/views.py:488
+#: src/postulo/applications/views.py:489
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Αναβλήθηκε για δύο εβδομάδες."
@@ -7962,11 +8211,14 @@ msgid "State"
 msgstr "Κατάσταση"
 
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:224
+#: src/postulo/applications/reports.py:479
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
 #: src/postulo/templates/applications/application_detail.html:48
 #: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
+#: src/postulo/templates/applications/report.html:229
+#: src/postulo/templates/applications/report_print.html:153
 #: src/postulo/templates/core/import_csv_map.html:66
 #, draft
 msgid "Status"
@@ -7989,7 +8241,7 @@ msgstr "Αλλαγή κατάστασης"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Κατάσταση στο υπολογιστικό φύλλο: %(text)s"
 
-#: src/postulo/applications/views.py:363
+#: src/postulo/applications/views.py:364
 #, draft
 msgid "Status updated."
 msgstr "Η κατάσταση ενημερώθηκε."
@@ -8376,7 +8628,7 @@ msgstr ""
 msgid "That does not look like a complete web address."
 msgstr "Αυτό δεν μοιάζει με πλήρη διεύθυνση ιστού."
 
-#: src/postulo/applications/views.py:394
+#: src/postulo/applications/views.py:395
 #, draft
 msgid "That entry could not be saved."
 msgstr "Αυτή η καταχώριση δεν μπόρεσε να αποθηκευτεί."
@@ -8449,7 +8701,7 @@ msgstr "Αυτοί είναι πολλοί σύνδεσμοι ανάκτησης
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Αυτό είναι SVG, που το Postulo δεν κρατά ακόμη. Ένα PNG ή JPEG κάνει."
 
-#: src/postulo/applications/views.py:365
+#: src/postulo/applications/views.py:366
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Αυτή δεν είναι κατάσταση που αναγνωρίζει το Postulo."
@@ -8469,17 +8721,17 @@ msgstr "Αυτό δεν είναι στοιχείο που γνωρίζει το
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Αυτό δεν είναι δημόσιο κλειδί Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:599
+#: src/postulo/applications/views.py:600
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Αυτό δεν είναι αποτέλεσμα που αναγνωρίζει το Postulo."
 
-#: src/postulo/applications/views.py:490
+#: src/postulo/applications/views.py:491
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Αυτό δεν είναι κάτι που μπορεί να κάνει το Postulo γι' αυτή."
 
-#: src/postulo/applications/views.py:179 src/postulo/jobs/views.py:124
+#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:124
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "Αυτό δεν μπορεί να το κάνει το Postulo σε πολλά μαζί."
@@ -8580,7 +8832,7 @@ msgstr "Αυτό το πρόσθετο δεν είναι πλέον εγκατε
 msgid "That reply did not come from a request Postulo made."
 msgstr "Αυτή η απάντηση δεν ήρθε από αίτημα που έκανε το Postulo."
 
-#: src/postulo/applications/views.py:719
+#: src/postulo/applications/views.py:803
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Σε αυτή την πρόταση έχει ήδη απαντηθεί."
@@ -8763,6 +9015,11 @@ msgstr ""
 msgid "The language you read Postulo in"
 msgstr "Η γλώσσα στην οποία διαβάζετε το Postulo"
 
+#: src/postulo/templates/applications/report.html:43
+#, draft
+msgid "The last few weeks"
+msgstr "Οι τελευταίες εβδομάδες"
+
 #: src/postulo/templates/server/email.html:62
 #, python-format, draft
 msgid "The last message this instance tried to send failed, at %(when)s."
@@ -8800,6 +9057,20 @@ msgstr "Το λογότυπο έφυγε."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Το λογότυπο δεν άλλαξε: %(problem)s"
 
+#: src/postulo/templates/applications/report.html:167
+#, draft
+msgid ""
+"The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
+msgstr ""
+"Το μεγαλύτερο κενό μετριέται μέσα σε αυτή την περίοδο, οπότε μια σιωπή που ξεκίνησε πριν από αυτήν δεν μεταφέρεται μέσα. Μια περίοδος που ακόμη τρέχει μετριέται μόνο μέχρι σήμερα."
+
+#: src/postulo/templates/applications/report_print.html:118
+#, draft
+msgid ""
+"The longest gap is measured inside this period. A period still running is counted up to the day this was produced. A week marked (part) reaches outside the period; nothing from outside it is counted."
+msgstr ""
+"Το μεγαλύτερο κενό μετριέται μέσα σε αυτή την περίοδο. Μια περίοδος που ακόμη τρέχει μετριέται μέχρι την ημέρα που παρήχθη αυτό. Μια εβδομάδα με την ένδειξη (μερικώς) εκτείνεται εκτός της περιόδου· τίποτα εκτός αυτής δεν μετριέται."
+
 #: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
@@ -8829,6 +9100,16 @@ msgstr ""
 msgid "The official repository is emptied, not removed."
 msgstr "Το επίσημο αποθετήριο αδειάζει, δεν αφαιρείται."
 
+#: src/postulo/templates/applications/report.html:83
+#, draft
+msgid "The one after"
+msgstr "Η επόμενη"
+
+#: src/postulo/templates/applications/report.html:79
+#, draft
+msgid "The one before"
+msgstr "Η προηγούμενη"
+
 #: src/postulo/documents/models.py:87
 #, draft
 msgid "The opening paragraph, if you use one."
@@ -8855,6 +9136,11 @@ msgstr "Τα πρόσθετα που έρχονται μέσα στο Postulo. �
 #, draft
 msgid "The posting"
 msgstr "Η αγγελία"
+
+#: src/postulo/templates/applications/report.html:245
+#, draft
+msgid "the posting"
+msgstr "η αγγελία"
 
 #: src/postulo/templates/applications/application_intake.html:64
 #: src/postulo/templates/jobs/capture_review.html:58
@@ -9139,6 +9425,11 @@ msgid "This invitation may only be used with the address it was sent to."
 msgstr ""
 "Αυτή η πρόσκληση μπορεί να χρησιμοποιηθεί μόνο με τη διεύθυνση στην οποία στάλθηκε."
 
+#: src/postulo/templates/applications/report.html:88
+#, draft
+msgid "This is the most recent period."
+msgstr "Αυτή είναι η πιο πρόσφατη περίοδος."
+
 #: src/postulo/templates/server/plugins.html:311
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -9267,6 +9558,11 @@ msgstr "Τίτλος, εταιρεία ή τοποθεσία"
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS από το πρώτο byte"
+
+#: src/postulo/templates/applications/report.html:59
+#, draft
+msgid "To"
+msgstr "Έως"
 
 #: src/postulo/templates/partials/table/head.html:101
 #, draft
@@ -9563,6 +9859,12 @@ msgstr "Χρησιμοποιήθηκε"
 msgid "used at"
 msgstr "χρησιμοποιήθηκε στις"
 
+#: src/postulo/templates/applications/report.html:51
+#, draft
+msgid "Used for a month, and for the quarter that month falls in."
+msgstr ""
+"Χρησιμοποιείται για έναν μήνα, και για το τρίμηνο στο οποίο πέφτει αυτός ο μήνας."
+
 #: src/postulo/accounts/models.py:124 src/postulo/accounts/models.py:250
 #, draft
 msgid "user"
@@ -9716,6 +10018,23 @@ msgstr "ιστότοπος"
 msgid "Website"
 msgstr "Ιστότοπος"
 
+#: src/postulo/templates/applications/report.html:135
+#: src/postulo/templates/applications/report.html:161
+#: src/postulo/templates/applications/report_print.html:98
+#, python-format, draft
+msgid "Week of %(day)s"
+msgstr "Εβδομάδα από %(day)s"
+
+#: src/postulo/templates/applications/report.html:125
+#, draft
+msgid "Weeks in a row, up to now"
+msgstr "Εβδομάδες στη σειρά, μέχρι τώρα"
+
+#: src/postulo/templates/applications/report_print.html:89
+#, draft
+msgid "Weeks with none"
+msgstr "Εβδομάδες χωρίς καμία"
+
 #: src/postulo/templates/core/dashboard.html:38
 #, python-format, draft
 msgid "Welcome back, %(name)s"
@@ -9746,6 +10065,16 @@ msgstr "τι πρέπει να ελέγχει ένας επόπτης"
 msgid "What a new account starts with. Each person can change theirs."
 msgstr ""
 "Με τι ξεκινά ένας νέος λογαριασμός. Ο καθένας μπορεί να αλλάξει το δικό του."
+
+#: src/postulo/templates/applications/report.html:172
+#, draft
+msgid "What came back"
+msgstr "Τι ήρθε πίσω"
+
+#: src/postulo/templates/applications/report_print.html:121
+#, draft
+msgid "What came back in this period"
+msgstr "Τι ήρθε πίσω σε αυτή την περίοδο"
 
 #: src/postulo/core/server_forms.py:316
 #, draft
@@ -9823,6 +10152,11 @@ msgstr "τι λέει"
 msgid "What it says it is"
 msgstr "Τι λέει ότι είναι"
 
+#: src/postulo/templates/applications/report.html:200
+#, draft
+msgid "What kind of employer"
+msgstr "Τι είδους εργοδότης"
+
 #: src/postulo/applications/widgets.py:25
 #: src/postulo/core/widgets_builtin.py:22
 #, draft
@@ -9896,6 +10230,13 @@ msgstr "Πώς να ονομάζεται"
 #, draft
 msgid "what to do"
 msgstr "τι να κάνετε"
+
+#: src/postulo/templates/applications/report.html:15
+#, draft
+msgid ""
+"What was sent, how regularly, and what came back. Nothing outside the period is counted."
+msgstr ""
+"Τι στάλθηκε, πόσο τακτικά, και τι ήρθε πίσω. Τίποτα εκτός της περιόδου δεν μετριέται."
 
 #: src/postulo/templates/accounts/delete_account.html:18
 #, draft
@@ -9979,6 +10320,12 @@ msgstr ""
 msgid "Where they came from"
 msgstr "Από πού ήρθαν"
 
+#: src/postulo/templates/applications/report.html:198
+#: src/postulo/templates/applications/report_print.html:181
+#, draft
+msgid "Where they were found"
+msgstr "Πού βρέθηκαν"
+
 #: src/postulo/applications/widgets.py:121
 #, draft
 msgid "Where things stand"
@@ -10056,6 +10403,11 @@ msgstr ""
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Ποιο μέρος του Postulo το παρήγαγε: η διεπαφή ιστού ή το API."
+
+#: src/postulo/templates/applications/report.html:36
+#, draft
+msgid "Which period"
+msgstr "Ποια περίοδος"
 
 #: src/postulo/templates/connections/pick.html:7
 #, draft
@@ -10424,7 +10776,7 @@ msgstr "Η προθεσμία σας"
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
 #: src/postulo/templates/base.html:105
-#: src/postulo/templates/widgets/shortcuts.html:31
+#: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"
 msgstr "Τα στοιχεία σας"
@@ -10443,6 +10795,11 @@ msgstr "Το Gravatar σας ανακτήθηκε ξανά."
 #, draft
 msgid "Your initials"
 msgstr "Τα αρχικά σας"
+
+#: src/postulo/templates/applications/report.html:10
+#, python-format, draft
+msgid "Your job search in %(period)s"
+msgstr "Η αναζήτηση εργασίας σου σε %(period)s"
 
 #: src/postulo/core/views.py:67
 #, draft
@@ -10523,6 +10880,16 @@ msgstr "Αφαιρέθηκε {label}"
 #, draft
 msgid "{label} — new"
 msgstr "{label} — νέα"
+
+#: src/postulo/templates/applications/report.html:144
+#, draft
+msgid "· part of this week is outside the period"
+msgstr "· μέρος αυτής της εβδομάδας είναι εκτός της περιόδου"
+
+#: src/postulo/templates/applications/report.html:137
+#, draft
+msgid "· still running"
+msgstr "· ακόμη σε εξέλιξη"
 
 #: src/postulo/core/server_views.py:1024
 #, python-format, draft

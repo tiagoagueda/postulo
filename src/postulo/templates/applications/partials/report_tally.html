@@ -1,0 +1,33 @@
+{% load i18n %}
+{% comment %} Where the effort went, under one heading: sources on one side, the kinds of
+   employer on the other. Written once because they are the same table twice, and the
+   report is the only place either appears at this length (#56).
+
+   A share as well as a count, because "eleven from a job board" means one thing in a
+   period of twelve and another in a period of ninety.
+{% endcomment %}
+<section class="card p-0" aria-labelledby="tally-{{ heading|slugify }}">
+  <h2 id="tally-{{ heading|slugify }}" class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
+    {{ heading }}
+  </h2>
+  {% if rows %}
+    <ul class="divide-y divide-ink-100 text-sm dark:divide-ink-800">
+      {% for row in rows %}
+        <li class="flex items-baseline justify-between gap-3 px-4 py-2">
+          <span class="min-w-0 truncate"><bdi>{{ row.name }}</bdi></span>
+          <span class="shrink-0 tabular-nums">
+            {{ row.count }}
+            <span class="text-ink-500 dark:text-ink-400">· {% widthratio row.count total 100 %}%</span>
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+    {% if note %}
+      <p class="px-4 py-2 text-xs text-ink-500 dark:text-ink-400">{{ note }}</p>
+    {% endif %}
+  {% else %}
+    <p class="px-4 py-6 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Nothing to show for this period." %}
+    </p>
+  {% endif %}
+</section>

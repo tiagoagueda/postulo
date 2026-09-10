@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 04:00+0000\n"
+"POT-Creation-Date: 2026-09-10 04:15+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: svenska\n"
@@ -87,6 +87,13 @@ msgid_plural "%(counter)s companies"
 msgstr[0] "%(counter)s företag"
 msgstr[1] "%(counter)s företag"
 
+#: src/postulo/templates/applications/report.html:117
+#, python-format, draft
+msgid "%(counter)s day"
+msgid_plural "%(counter)s days"
+msgstr[0] "%(counter)s dag"
+msgstr[1] "%(counter)s dagar"
+
 #: src/postulo/templates/applications/application_detail.html:267
 #, python-format, draft
 msgid "%(counter)s earlier"
@@ -136,6 +143,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "%(days)s dag sedan"
 msgstr[1] "%(days)s dagar sedan"
+
+#: src/postulo/applications/reports.py:106
+#, python-format, draft
+msgid "%(from)s to %(to)s"
+msgstr "%(from)s till %(to)s"
 
 #: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
 #, python-format, draft
@@ -468,6 +480,11 @@ msgstr "%(when)s sedan"
 msgid "(empty address)"
 msgstr "(tom adress)"
 
+#: src/postulo/templates/applications/report_print.html:99
+#, draft
+msgid "(part)"
+msgstr "(delvis)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -523,6 +540,13 @@ msgstr "Ett företag kan inte vara en del av sig självt."
 msgid "A company carries one identifier per scheme."
 msgstr "Ett företag har en identifierare per schema."
 
+#: src/postulo/templates/applications/report.html:201
+#, draft
+msgid ""
+"A company in several fields counts in each of them, so these can add up to more than everything."
+msgstr ""
+"Ett företag inom flera branscher räknas i var och en av dem, så detta kan summera till mer än det hela."
+
 #: src/postulo/templates/widgets/industries.html:37
 #, draft
 msgid "A company in several industries counts in each of them."
@@ -559,6 +583,11 @@ msgid ""
 "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr ""
 "En mobil, en fast linje, en växel — så många som är värda att spara, med en markerad som den som ska användas. Dokument skriver ut den."
+
+#: src/postulo/templates/applications/report.html:41
+#, draft
+msgid "A month"
+msgstr "En månad"
 
 #: src/postulo/core/models.py:288
 #, draft
@@ -649,6 +678,11 @@ msgid ""
 msgstr ""
 "En Python-wheel (<code>.whl</code>) byggd för vilken plattform som helst. Postulo läser vad den säger om sig själv och visar dig det innan något installeras."
 
+#: src/postulo/templates/applications/report.html:42
+#, draft
+msgid "A quarter"
+msgstr "Ett kvartal"
+
 #: src/postulo/templates/server/logs.html:146
 #, draft
 msgid "A quiet log is the one you want."
@@ -668,6 +702,11 @@ msgstr "En påminnelse förfaller en dag i förväg, när det finns en dag i fö
 #, draft
 msgid "A reminder of who this is for."
 msgstr "En minnesanteckning om vem detta är till."
+
+#: src/postulo/templates/widgets/shortcuts.html:25
+#, draft
+msgid "A report on a period"
+msgstr "En rapport om en period"
 
 #: src/postulo/templates/core/home.html:13
 #, draft
@@ -727,6 +766,12 @@ msgid ""
 "A username is unique across the instance whoever changes it, and people can change their own under Settings."
 msgstr ""
 "Ett användarnamn är unikt över hela instansen oavsett vem som ändrar det, och var och en kan ändra sitt eget under Inställningar."
+
+#: src/postulo/templates/applications/report.html:111
+#: src/postulo/templates/applications/report_print.html:81
+#, draft
+msgid "A week, on average"
+msgstr "Per vecka, i genomsnitt"
 
 #: src/postulo/templates/settings/dashboard.html:165
 #, draft
@@ -932,7 +977,7 @@ msgid ""
 msgstr ""
 "La till %(total)s poster. Ingenting skrevs över; det som är dubbelt tar du bort själv."
 
-#: src/postulo/applications/views.py:392 src/postulo/applications/views.py:736
+#: src/postulo/applications/views.py:393 src/postulo/applications/views.py:820
 #, draft
 msgid "Added to the timeline."
 msgstr "Tillagt på tidslinjen."
@@ -947,16 +992,17 @@ msgstr "Tillagd bland dina annonser."
 msgid "Added."
 msgstr "Tillagt."
 
+#: src/postulo/applications/reports.py:478
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Adress"
+
 #: src/postulo/core/models.py:410 src/postulo/jobs/models.py:729
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "adress"
-
-#: src/postulo/templates/partials/postal_addresses.html:29
-#, draft
-msgid "Address"
-msgstr "Adress"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -1190,7 +1236,7 @@ msgstr "Ansökan"
 msgid "Application created"
 msgstr "Ansökan skapad"
 
-#: src/postulo/applications/views.py:345
+#: src/postulo/applications/views.py:346
 #, draft
 msgid "Application deleted."
 msgstr "Ansökan raderad."
@@ -1200,12 +1246,12 @@ msgstr "Ansökan raderad."
 msgid "Application recorded from the capture."
 msgstr "Ansökan registrerad från infångningen."
 
-#: src/postulo/applications/views.py:311 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:312 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Ansökan registrerad."
 
-#: src/postulo/applications/views.py:335
+#: src/postulo/applications/views.py:336
 #, draft
 msgid "Application updated."
 msgstr "Ansökan uppdaterad."
@@ -1231,11 +1277,24 @@ msgstr "ansökningar"
 msgid "Applications by month"
 msgstr "Ansökningar per månad"
 
+#: src/postulo/templates/applications/report_print.html:177
+#, draft
+msgid "Applications drafted but never sent are not counted."
+msgstr "Ansökningar som skrivits men aldrig skickats räknas inte."
+
+#: src/postulo/templates/applications/report.html:210
+#, draft
+msgid ""
+"Applications drafted but never sent are not counted. An employment office is asking what was sent."
+msgstr ""
+"Ansökningar som skrivits men aldrig skickats räknas inte. En arbetsförmedling frågar vad som skickades."
+
 #: src/postulo/notifications/base.py:29
 #, draft
 msgid "Applications go quiet"
 msgstr "Ansökningar tystnar"
 
+#: src/postulo/templates/applications/report_print.html:77
 #: src/postulo/templates/widgets/insight_counters.html:17
 #, draft
 msgid "Applications sent"
@@ -1281,7 +1340,10 @@ msgstr "Skickade de senaste 30 dagarna"
 msgid "applied on"
 msgstr "skickad den"
 
+#: src/postulo/applications/reports.py:474
 #: src/postulo/templates/applications/application_detail.html:137
+#: src/postulo/templates/applications/report.html:225
+#: src/postulo/templates/applications/report_print.html:149
 #, draft
 msgid "Applied on"
 msgstr "Skickad den"
@@ -1744,7 +1806,7 @@ msgid ""
 msgstr ""
 "Ändringar som görs här skickas vid nästa körning; den andra sidan läses då också."
 
-#: src/postulo/applications/views.py:480
+#: src/postulo/applications/views.py:481
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Följ upp %(company)s om %(role)s"
@@ -1809,7 +1871,7 @@ msgstr "Välj minst ett dokument att registrera."
 msgid "Choose what kind of identifier this is."
 msgstr "Välj vilken sorts identifierare detta är."
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:816
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Välj först vilken ansökan det gäller."
@@ -1945,8 +2007,10 @@ msgstr "Företag skapade"
 msgid "Companies you have applied to"
 msgstr "Företag du har sökt till"
 
-#: src/postulo/applications/forms.py:43 src/postulo/applications/tables.py:27
-#: src/postulo/core/csv_import.py:38
+#: src/postulo/applications/forms.py:43 src/postulo/applications/reports.py:475
+#: src/postulo/applications/tables.py:27 src/postulo/core/csv_import.py:38
+#: src/postulo/templates/applications/report.html:226
+#: src/postulo/templates/applications/report_print.html:150
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
@@ -2160,6 +2224,20 @@ msgstr "Kunde inte hämtas: %(error)s"
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Kunde inte läsa %(site)s: %(error)s"
 
+#: src/postulo/templates/applications/report_print.html:141
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here."
+msgstr ""
+"Räknas efter när det hände, så ett svar som kommer under den här perioden på en äldre ansökan hör hemma här."
+
+#: src/postulo/templates/applications/report.html:174
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
+msgstr ""
+"Räknas efter när det hände, så ett svar som kommer under den här perioden på en äldre ansökan hör hemma här. Det är en annan fråga än vad som skickades, och de två hålls isär."
+
 #: src/postulo/templates/widgets/interviews_summary.html:30
 #, draft
 msgid ""
@@ -2329,6 +2407,11 @@ msgstr "Föreslagna datum:"
 msgid "Dates written as"
 msgstr "Datum skrivna som"
 
+#: src/postulo/templates/applications/report.html:44
+#, draft
+msgid "Dates you choose"
+msgstr "Datum du väljer själv"
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2470,7 +2553,7 @@ msgstr "Avvisa"
 msgid "Declined"
 msgstr "Avvisad"
 
-#: src/postulo/applications/views.py:724
+#: src/postulo/applications/views.py:808
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Avvisad. Den föreslås inte igen."
@@ -2694,6 +2777,16 @@ msgstr "klar den"
 #, draft
 msgid "Download"
 msgstr "Ladda ner"
+
+#: src/postulo/templates/applications/report.html:20
+#, draft
+msgid "Download CSV"
+msgstr "Ladda ner CSV"
+
+#: src/postulo/templates/applications/report.html:23
+#, draft
+msgid "Download PDF"
+msgstr "Ladda ner PDF"
 
 #: src/postulo/templates/accounts/delete_account.html:41
 #: src/postulo/templates/core/export.html:36
@@ -2930,6 +3023,12 @@ msgid ""
 msgstr ""
 "Varje konto på den här instansen. Administratörer ser konton, aldrig någons ansökningar eller dokument."
 
+#: src/postulo/templates/applications/report.html:208
+#: src/postulo/templates/applications/report_print.html:144
+#, draft
+msgid "Every application, in order"
+msgstr "Alla ansökningar, i ordning"
+
 #: src/postulo/jobs/forms.py:286
 #, draft
 msgid ""
@@ -3102,7 +3201,7 @@ msgstr ""
 "Att förklara vad som gick fel innebär ofta att säga vilken anslutning, vilket företag eller vilket dokument det gällde. Här finns inget av ett dokuments innehåll, men behandla den här sidan som resten av instansen innan du delar något av den."
 
 #: src/postulo/templates/core/export.html:8
-#: src/postulo/templates/widgets/shortcuts.html:25
+#: src/postulo/templates/widgets/shortcuts.html:28
 #, draft
 msgid "Export everything"
 msgstr "Exportera allt"
@@ -3258,6 +3357,12 @@ msgstr "Förnamn"
 msgid "first name"
 msgstr "förnamn"
 
+#: src/postulo/templates/applications/report.html:178
+#: src/postulo/templates/applications/report_print.html:125
+#, draft
+msgid "First replies"
+msgstr "Första svaren"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -3278,12 +3383,12 @@ msgstr "Följ din profil"
 msgid "Follow-up note"
 msgstr "Anteckning efter intervjun"
 
-#: src/postulo/applications/views.py:474
+#: src/postulo/applications/views.py:475
 #, draft
 msgid "Follow-up recorded."
 msgstr "Uppföljning registrerad."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:471
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:472
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3341,7 +3446,10 @@ msgstr "Hittade en logotyp på %(url)s."
 msgid "Found on their website"
 msgstr "Hittad på deras webbplats"
 
-#: src/postulo/applications/forms.py:57 src/postulo/core/csv_import.py:50
+#: src/postulo/applications/forms.py:57 src/postulo/applications/reports.py:477
+#: src/postulo/core/csv_import.py:50
+#: src/postulo/templates/applications/report.html:228
+#: src/postulo/templates/applications/report_print.html:152
 #: src/postulo/templates/jobs/posting_detail.html:81
 #, draft
 msgid "Found via"
@@ -3374,6 +3482,7 @@ msgstr "Frys och bifoga"
 msgid "from"
 msgstr "från"
 
+#: src/postulo/templates/applications/report.html:55
 #: src/postulo/templates/server/email.html:27
 #: src/postulo/templates/server/logs.html:51
 #: src/postulo/templates/server/logs.html:89
@@ -3656,10 +3765,21 @@ msgid "How many applications reached one, how many were held, and of what kind."
 msgstr ""
 "Hur många ansökningar som nådde en, hur många som hölls och av vilket slag."
 
+#: src/postulo/templates/applications/report.html:65
+#, draft
+msgid "How many weeks"
+msgstr "Hur många veckor"
+
 #: src/postulo/applications/widgets.py:271
 #, draft
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Hur mycket du skickade, månad för månad, så att en tyst period syns."
+
+#: src/postulo/templates/applications/report.html:96
+#: src/postulo/templates/applications/report_print.html:73
+#, draft
+msgid "How regularly"
+msgstr "Hur regelbundet"
 
 #: src/postulo/templates/core/import_csv_map.html:57
 #, draft
@@ -3986,7 +4106,7 @@ msgstr "intervju"
 msgid "Interview cancelled"
 msgstr "Intervju inställd"
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Interview recorded."
 msgstr "Intervju registrerad."
@@ -3996,7 +4116,7 @@ msgstr "Intervju registrerad."
 msgid "Interview scheduled"
 msgstr "Intervju inbokad"
 
-#: src/postulo/applications/views.py:555
+#: src/postulo/applications/views.py:556
 #, draft
 msgid "Interview scheduled."
 msgstr "Intervju inbokad."
@@ -4006,7 +4126,7 @@ msgstr "Intervju inbokad."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Intervju i morgon: %(kind)s hos %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:585
+#: src/postulo/applications/views.py:586
 #, draft
 msgid "Interview updated."
 msgstr "Intervju uppdaterad."
@@ -4032,6 +4152,12 @@ msgstr "intervjuer"
 #, draft
 msgid "Interviews"
 msgstr "Intervjuer"
+
+#: src/postulo/templates/applications/report.html:182
+#: src/postulo/templates/applications/report_print.html:129
+#, draft
+msgid "Interviews attended"
+msgstr "Genomförda intervjuer"
 
 #: src/postulo/accounts/models.py:505
 #, draft
@@ -4147,6 +4273,16 @@ msgstr "jobbannons"
 msgid "job postings"
 msgstr "jobbannonser"
 
+#: src/postulo/templates/applications/report_print.html:65
+#, draft
+msgid "Job search report"
+msgstr "Rapport om jobbsökandet"
+
+#: src/postulo/templates/applications/report_print.html:23
+#, python-format, draft
+msgid "Job search report · %(period)s"
+msgstr "Rapport om jobbsökandet · %(period)s"
+
 #: src/postulo/applications/forms.py:44
 #, draft
 msgid "Job title"
@@ -4208,6 +4344,7 @@ msgid "kind"
 msgstr "typ"
 
 #: src/postulo/templates/accounts/profile.html:126
+#: src/postulo/templates/applications/report.html:39
 #: src/postulo/templates/jobs/company_form.html:67
 #: src/postulo/templates/partials/phone_numbers.html:40
 #: src/postulo/templates/partials/postal_addresses.html:60
@@ -4311,7 +4448,10 @@ msgstr ""
 msgid "Largest page read"
 msgstr "Största lästa sida"
 
+#: src/postulo/applications/reports.py:480
 #: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:75
+#: src/postulo/templates/applications/report.html:230
+#: src/postulo/templates/applications/report_print.html:154
 #, draft
 msgid "Last activity"
 msgstr "Senaste aktivitet"
@@ -4604,6 +4744,16 @@ msgstr "logotyp hämtad"
 msgid "Logs"
 msgstr "Loggar"
 
+#: src/postulo/templates/applications/report.html:115
+#, draft
+msgid "Longest gap"
+msgstr "Längsta uppehåll"
+
+#: src/postulo/templates/applications/report_print.html:85
+#, draft
+msgid "Longest gap, in days"
+msgstr "Längsta uppehåll, i dagar"
+
 #: src/postulo/templates/applications/application_list.html:42
 #: src/postulo/templates/jobs/company_list.html:42
 #: src/postulo/templates/server/logs.html:144
@@ -4734,7 +4884,7 @@ msgstr "Gör till administratör"
 msgid "Manage"
 msgstr "Hantera"
 
-#: src/postulo/templates/widgets/shortcuts.html:28
+#: src/postulo/templates/widgets/shortcuts.html:31
 #, draft
 msgid "Manage tags"
 msgstr "Hantera taggar"
@@ -4749,7 +4899,7 @@ msgstr "Tillverkning"
 msgid "Map a column to Company and one to Role first."
 msgstr "Koppla först en kolumn till Företag och en till Roll."
 
-#: src/postulo/applications/views.py:447
+#: src/postulo/applications/views.py:448
 #, draft
 msgid "Marked as done."
 msgstr "Markerad som klar."
@@ -4828,6 +4978,11 @@ msgstr "Mobil"
 #, draft
 msgid "Money and dates"
 msgstr "Pengar och datum"
+
+#: src/postulo/templates/applications/report.html:48
+#, draft
+msgid "Month"
+msgstr "Månad"
 
 #: src/postulo/templates/core/import_csv_map.html:49
 #, draft
@@ -5280,6 +5435,12 @@ msgstr "Ideell sektor"
 msgid "None"
 msgstr "Ingen"
 
+#: src/postulo/templates/applications/report.html:149
+#: src/postulo/templates/applications/report_print.html:111
+#, draft
+msgid "none"
+msgstr "inga"
+
 #: src/postulo/templates/partials/label_attrs.html:12
 #, draft
 msgid "None chosen yet"
@@ -5369,6 +5530,7 @@ msgstr "Inte en del av ett annat företag"
 
 #: src/postulo/applications/analytics.py:296
 #: src/postulo/applications/analytics.py:314
+#: src/postulo/applications/reports.py:446
 #, draft
 msgid "Not recorded"
 msgstr "Inte registrerat"
@@ -5652,6 +5814,11 @@ msgid ""
 msgstr ""
 "Inget att köa: alla dokument av de valda slagen finns redan på listan för %(label)s."
 
+#: src/postulo/templates/applications/partials/report_tally.html:30
+#, draft
+msgid "Nothing to show for this period."
+msgstr "Inget att visa för den här perioden."
+
 #: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
@@ -5688,6 +5855,18 @@ msgstr "Ingenting installerades."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Ingenting var valt, så ingenting ändrades."
+
+#: src/postulo/templates/applications/report_print.html:174
+#, draft
+msgid "Nothing was sent in this period."
+msgstr "Inget skickades under den här perioden."
+
+#: src/postulo/templates/applications/report.html:261
+#, draft
+msgid ""
+"Nothing was sent in this period. That is what the report says, and it is a fact like any other."
+msgstr ""
+"Inget skickades under den här perioden. Det är vad rapporten säger, och det är ett faktum som vilket annat som helst."
 
 #: src/postulo/templates/settings/dashboard.html:68
 #, draft
@@ -5746,6 +5925,8 @@ msgstr "Erbjudande mottaget"
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Erbjuds bara medan den här instansens post faktiskt kommer fram."
 
+#: src/postulo/templates/applications/report.html:186
+#: src/postulo/templates/applications/report_print.html:133
 #: src/postulo/templates/widgets/industries.html:13
 #: src/postulo/templates/widgets/insight_counters.html:33
 #: src/postulo/templates/widgets/sources.html:13
@@ -5812,12 +5993,26 @@ msgstr "En gång om dagen"
 msgid "One achievement per line."
 msgstr "En prestation per rad."
 
+#: src/postulo/templates/applications/report.html:98
+#, python-format, draft
+msgid "One application sent in this period."
+msgid_plural "%(counter)s applications sent in this period."
+msgstr[0] "En ansökan skickad under den här perioden."
+msgstr[1] "%(counter)s ansökningar skickade under den här perioden."
+
 #: src/postulo/templates/jobs/listing_list.html:23
 #, python-format, draft
 msgid "One capture waiting for review"
 msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "En infångning väntar på granskning"
 msgstr[1] "%(counter)s infångningar väntar på granskning"
+
+#: src/postulo/templates/applications/report.html:212
+#, python-format, draft
+msgid "One draft in this period is left out."
+msgid_plural "%(counter)s drafts in this period are left out."
+msgstr[0] "Ett utkast från den här perioden lämnas utanför."
+msgstr[1] "%(counter)s utkast från den här perioden lämnas utanför."
 
 #: src/postulo/templates/connections/list.html:81
 #, python-format, draft
@@ -6012,6 +6207,11 @@ msgstr "Andra branscher"
 msgid "Other languages"
 msgstr "Andra språk"
 
+#: src/postulo/templates/applications/report.html:77
+#, draft
+msgid "Other periods"
+msgstr "Andra perioder"
+
 #: src/postulo/applications/models.py:485
 #, draft
 msgid "outcome"
@@ -6186,6 +6386,11 @@ msgstr "Per år"
 #, draft
 msgid "Period"
 msgstr "Period"
+
+#: src/postulo/templates/applications/report_print.html:68
+#, python-format, draft
+msgid "Period: %(period)s"
+msgstr "Period: %(period)s"
 
 #: src/postulo/accounts/admin.py:24
 #, draft
@@ -6480,6 +6685,13 @@ msgstr ""
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
 msgstr "Postulo publicerar ännu ingen katalog. Inget hämtas härifrån."
 
+#: src/postulo/templates/applications/report.html:267
+#, draft
+msgid ""
+"Postulo sets no target. How many applications a period should hold is a benefit regime's rule or your own, never this software's."
+msgstr ""
+"Postulo sätter inget mål. Hur många ansökningar en period bör innehålla är en regel från ett ersättningssystem eller din egen, aldrig den här programvarans."
+
 #: src/postulo/templates/api/token_list.html:23
 #, draft
 msgid ""
@@ -6562,6 +6774,18 @@ msgstr "prioritet"
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Privata och lokala adresser avvisas."
+
+#: src/postulo/templates/applications/report_print.html:195
+#, draft
+msgid ""
+"Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
+msgstr ""
+"Framställd av Postulo ur den här personens egna uppgifter. Postulo sätter inget mål: hur många ansökningar en period bör innehålla är en regel från ett ersättningssystem eller personens egen."
+
+#: src/postulo/templates/applications/report_print.html:70
+#, python-format, draft
+msgid "Produced on %(produced)s"
+msgstr "Framställd den %(produced)s"
 
 #: src/postulo/resume/models.py:199
 #, draft
@@ -6655,6 +6879,11 @@ msgstr "Publikation"
 #, draft
 msgid "Putting it back"
 msgstr "Lägg tillbaka den"
+
+#: src/postulo/applications/reports.py:102
+#, python-format, draft
+msgid "Q%(quarter)s %(year)s"
+msgstr "K%(quarter)s %(year)s"
 
 #: src/postulo/resume/models.py:95
 #, draft
@@ -6838,12 +7067,12 @@ msgid ""
 msgstr ""
 "Antecknas på allt som installeras härifrån och kan därför inte ändras senare utan att koppla loss det som installerades."
 
-#: src/postulo/applications/views.py:606
+#: src/postulo/applications/views.py:607
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Registrerad som inställd."
 
-#: src/postulo/applications/views.py:605
+#: src/postulo/applications/views.py:606
 #, draft
 msgid "Recorded as held."
 msgstr "Registrerad som genomförd."
@@ -6863,7 +7092,7 @@ msgstr "registrerad den"
 msgid "Recorded what you sent."
 msgstr "Registrerade vad du skickade."
 
-#: src/postulo/applications/views.py:607
+#: src/postulo/applications/views.py:608
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Registrerat: ingen dök upp."
@@ -6957,6 +7186,12 @@ msgstr "Avvisad"
 #, draft
 msgid "Rejection received"
 msgstr "Avslag mottaget"
+
+#: src/postulo/templates/applications/report.html:190
+#: src/postulo/templates/applications/report_print.html:137
+#, draft
+msgid "Rejections"
+msgstr "Avslag"
 
 #: src/postulo/applications/forms.py:281
 #, draft
@@ -7068,6 +7303,11 @@ msgid ""
 msgstr ""
 "Besvarad, avslagen, tystnade, väntar än — vad det blev av det du skickade."
 
+#: src/postulo/templates/applications/report.html:4
+#, python-format, draft
+msgid "Report · %(period)s"
+msgstr "Rapport · %(period)s"
+
 #: src/postulo/jobs/industries.py:75
 #, draft
 msgid "Research"
@@ -7152,7 +7392,10 @@ msgstr "robots.txt respekteras för närvarande."
 msgid "robots.txt is currently ignored."
 msgstr "robots.txt ignoreras för närvarande."
 
+#: src/postulo/applications/reports.py:476
 #: src/postulo/applications/tables.py:19
+#: src/postulo/templates/applications/report.html:227
+#: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
 #: src/postulo/templates/jobs/listing_list.html:70
 #: src/postulo/templates/server/people.html:35
@@ -7467,6 +7710,7 @@ msgstr "Skicka som dig själv"
 msgid "Sending failed: %(error)s"
 msgstr "Sändningen misslyckades: %(error)s"
 
+#: src/postulo/templates/applications/report.html:107
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
@@ -7652,6 +7896,11 @@ msgstr "Visa i navigeringen"
 msgid "Show past too"
 msgstr "Visa även passerade"
 
+#: src/postulo/templates/applications/report.html:72
+#, draft
+msgid "Show this period"
+msgstr "Visa den här perioden"
+
 #: src/postulo/core/models.py:504
 #, draft
 msgid "Shown in the header and on the sign-in page."
@@ -7794,7 +8043,7 @@ msgstr "SMTP-server"
 msgid "Snooze"
 msgstr "Skjut upp"
 
-#: src/postulo/applications/views.py:488
+#: src/postulo/applications/views.py:489
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Uppskjuten två veckor."
@@ -7925,11 +8174,14 @@ msgid "State"
 msgstr "Tillstånd"
 
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:224
+#: src/postulo/applications/reports.py:479
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
 #: src/postulo/templates/applications/application_detail.html:48
 #: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
+#: src/postulo/templates/applications/report.html:229
+#: src/postulo/templates/applications/report_print.html:153
 #: src/postulo/templates/core/import_csv_map.html:66
 #, draft
 msgid "Status"
@@ -7952,7 +8204,7 @@ msgstr "Statusändring"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Status i kalkylbladet: %(text)s"
 
-#: src/postulo/applications/views.py:363
+#: src/postulo/applications/views.py:364
 #, draft
 msgid "Status updated."
 msgstr "Status uppdaterad."
@@ -8339,7 +8591,7 @@ msgstr ""
 msgid "That does not look like a complete web address."
 msgstr "Det ser inte ut som en fullständig webbadress."
 
-#: src/postulo/applications/views.py:394
+#: src/postulo/applications/views.py:395
 #, draft
 msgid "That entry could not be saved."
 msgstr "Den posten kunde inte sparas."
@@ -8413,7 +8665,7 @@ msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr ""
 "Det där är en SVG, som Postulo ännu inte behåller. En PNG eller JPEG duger."
 
-#: src/postulo/applications/views.py:365
+#: src/postulo/applications/views.py:366
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Det är inte en status Postulo känner till."
@@ -8433,17 +8685,17 @@ msgstr "Det är ingen widget som Postulo känner till."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Det är ingen offentlig Ed25519-nyckel: %(error)s"
 
-#: src/postulo/applications/views.py:599
+#: src/postulo/applications/views.py:600
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Det är inte ett utfall Postulo känner till."
 
-#: src/postulo/applications/views.py:490
+#: src/postulo/applications/views.py:491
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Det är inte något Postulo kan göra med den."
 
-#: src/postulo/applications/views.py:179 src/postulo/jobs/views.py:124
+#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:124
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "Det kan Postulo inte göra med flera samtidigt."
@@ -8543,7 +8795,7 @@ msgstr "Det tillägget är inte längre installerat."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Det svaret kom inte från en förfrågan som Postulo gjorde."
 
-#: src/postulo/applications/views.py:719
+#: src/postulo/applications/views.py:803
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Det förslaget är redan besvarat."
@@ -8723,6 +8975,11 @@ msgstr ""
 msgid "The language you read Postulo in"
 msgstr "Språket du läser Postulo på"
 
+#: src/postulo/templates/applications/report.html:43
+#, draft
+msgid "The last few weeks"
+msgstr "De senaste veckorna"
+
 #: src/postulo/templates/server/email.html:62
 #, python-format, draft
 msgid "The last message this instance tried to send failed, at %(when)s."
@@ -8760,6 +9017,20 @@ msgstr "Logotypen är borta."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logotypen ändrades inte: %(problem)s"
 
+#: src/postulo/templates/applications/report.html:167
+#, draft
+msgid ""
+"The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
+msgstr ""
+"Det längsta uppehållet mäts inom den här perioden, så en tystnad som började före den bärs inte in. En period som fortfarande pågår räknas bara fram till i dag."
+
+#: src/postulo/templates/applications/report_print.html:118
+#, draft
+msgid ""
+"The longest gap is measured inside this period. A period still running is counted up to the day this was produced. A week marked (part) reaches outside the period; nothing from outside it is counted."
+msgstr ""
+"Det längsta uppehållet mäts inom den här perioden. En period som fortfarande pågår räknas fram till den dag detta framställdes. En vecka märkt (delvis) sträcker sig utanför perioden; inget utanför den räknas."
+
 #: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
@@ -8788,6 +9059,16 @@ msgstr ""
 msgid "The official repository is emptied, not removed."
 msgstr "Det officiella arkivet töms, det tas inte bort."
 
+#: src/postulo/templates/applications/report.html:83
+#, draft
+msgid "The one after"
+msgstr "Den nästa"
+
+#: src/postulo/templates/applications/report.html:79
+#, draft
+msgid "The one before"
+msgstr "Den föregående"
+
 #: src/postulo/documents/models.py:87
 #, draft
 msgid "The opening paragraph, if you use one."
@@ -8814,6 +9095,11 @@ msgstr "De insticksmoduler som följer med Postulo. Inget hämtas."
 #, draft
 msgid "The posting"
 msgstr "Annonsen"
+
+#: src/postulo/templates/applications/report.html:245
+#, draft
+msgid "the posting"
+msgstr "annonsen"
 
 #: src/postulo/templates/applications/application_intake.html:64
 #: src/postulo/templates/jobs/capture_review.html:58
@@ -9095,6 +9381,11 @@ msgstr "Den här inbjudan är till %(email)s. Registrera dig med den adressen."
 msgid "This invitation may only be used with the address it was sent to."
 msgstr "Den här inbjudan kan bara användas med adressen den skickades till."
 
+#: src/postulo/templates/applications/report.html:88
+#, draft
+msgid "This is the most recent period."
+msgstr "Det här är den senaste perioden."
+
 #: src/postulo/templates/server/plugins.html:311
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -9225,6 +9516,11 @@ msgstr "Titel, företag eller plats"
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS från första byten"
+
+#: src/postulo/templates/applications/report.html:59
+#, draft
+msgid "To"
+msgstr "Till"
 
 #: src/postulo/templates/partials/table/head.html:101
 #, draft
@@ -9520,6 +9816,11 @@ msgstr "Använd"
 msgid "used at"
 msgstr "använd"
 
+#: src/postulo/templates/applications/report.html:51
+#, draft
+msgid "Used for a month, and for the quarter that month falls in."
+msgstr "Används för en månad, och för det kvartal månaden faller i."
+
 #: src/postulo/accounts/models.py:124 src/postulo/accounts/models.py:250
 #, draft
 msgid "user"
@@ -9673,6 +9974,23 @@ msgstr "webbplats"
 msgid "Website"
 msgstr "Webbplats"
 
+#: src/postulo/templates/applications/report.html:135
+#: src/postulo/templates/applications/report.html:161
+#: src/postulo/templates/applications/report_print.html:98
+#, python-format, draft
+msgid "Week of %(day)s"
+msgstr "Veckan från %(day)s"
+
+#: src/postulo/templates/applications/report.html:125
+#, draft
+msgid "Weeks in a row, up to now"
+msgstr "Veckor i rad, hittills"
+
+#: src/postulo/templates/applications/report_print.html:89
+#, draft
+msgid "Weeks with none"
+msgstr "Veckor utan någon"
+
 #: src/postulo/templates/core/dashboard.html:38
 #, python-format, draft
 msgid "Welcome back, %(name)s"
@@ -9702,6 +10020,16 @@ msgstr "vad en övervakare bör fråga"
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "Vad ett nytt konto börjar med. Var och en kan ändra sitt."
+
+#: src/postulo/templates/applications/report.html:172
+#, draft
+msgid "What came back"
+msgstr "Vad som kom tillbaka"
+
+#: src/postulo/templates/applications/report_print.html:121
+#, draft
+msgid "What came back in this period"
+msgstr "Vad som kom tillbaka under den här perioden"
 
 #: src/postulo/core/server_forms.py:316
 #, draft
@@ -9778,6 +10106,11 @@ msgstr "vad den säger"
 msgid "What it says it is"
 msgstr "Vad den säger sig vara"
 
+#: src/postulo/templates/applications/report.html:200
+#, draft
+msgid "What kind of employer"
+msgstr "Vilken sorts arbetsgivare"
+
 #: src/postulo/applications/widgets.py:25
 #: src/postulo/core/widgets_builtin.py:22
 #, draft
@@ -9849,6 +10182,13 @@ msgstr "Vad den ska heta"
 #, draft
 msgid "what to do"
 msgstr "vad som ska göras"
+
+#: src/postulo/templates/applications/report.html:15
+#, draft
+msgid ""
+"What was sent, how regularly, and what came back. Nothing outside the period is counted."
+msgstr ""
+"Vad som skickades, hur regelbundet, och vad som kom tillbaka. Inget utanför perioden räknas."
 
 #: src/postulo/templates/accounts/delete_account.html:18
 #, draft
@@ -9931,6 +10271,12 @@ msgstr "Var det signerade indexet är publicerat. Signaturen ligger bredvid."
 msgid "Where they came from"
 msgstr "Var de kom ifrån"
 
+#: src/postulo/templates/applications/report.html:198
+#: src/postulo/templates/applications/report_print.html:181
+#, draft
+msgid "Where they were found"
+msgstr "Var de hittades"
+
 #: src/postulo/applications/widgets.py:121
 #, draft
 msgid "Where things stand"
@@ -10008,6 +10354,11 @@ msgstr ""
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Vilken del av Postulo som skapade detta: webbgränssnittet eller API:et."
+
+#: src/postulo/templates/applications/report.html:36
+#, draft
+msgid "Which period"
+msgstr "Vilken period"
 
 #: src/postulo/templates/connections/pick.html:7
 #, draft
@@ -10373,7 +10724,7 @@ msgstr "Din sista dag"
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
 #: src/postulo/templates/base.html:105
-#: src/postulo/templates/widgets/shortcuts.html:31
+#: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"
 msgstr "Dina uppgifter"
@@ -10392,6 +10743,11 @@ msgstr "Din Gravatar har hämtats igen."
 #, draft
 msgid "Your initials"
 msgstr "Dina initialer"
+
+#: src/postulo/templates/applications/report.html:10
+#, python-format, draft
+msgid "Your job search in %(period)s"
+msgstr "Ditt jobbsökande i %(period)s"
 
 #: src/postulo/core/views.py:67
 #, draft
@@ -10470,6 +10826,16 @@ msgstr "{label} borttagen"
 #, draft
 msgid "{label} — new"
 msgstr "{label} — ny"
+
+#: src/postulo/templates/applications/report.html:144
+#, draft
+msgid "· part of this week is outside the period"
+msgstr "· en del av den här veckan ligger utanför perioden"
+
+#: src/postulo/templates/applications/report.html:137
+#, draft
+msgid "· still running"
+msgstr "· pågår fortfarande"
 
 #: src/postulo/core/server_views.py:1024
 #, python-format, draft

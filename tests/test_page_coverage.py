@@ -39,6 +39,8 @@ EXCUSED: dict[str, str] = {
         "a redirect to the dashboard, which the suite visits; the figures it used to "
         "render are widgets there and are checked with the rest"
     ),
+    "applications:report_csv": "the report's evidence list arriving as a spreadsheet",
+    "applications:report_pdf": "the report arriving as a rendered PDF",
     "applications:interview_ics": "a calendar file for one interview",
     "applications:interview_calendar": "a calendar feed of every interview",
     "accounts:avatar": "an image, served through a permission check",

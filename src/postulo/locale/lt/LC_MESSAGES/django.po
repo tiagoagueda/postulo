@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 04:00+0000\n"
+"POT-Creation-Date: 2026-09-10 04:15+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -92,6 +92,14 @@ msgstr[0] "%(counter)s įmonė"
 msgstr[1] "%(counter)s įmonės"
 msgstr[2] "%(counter)s įmonių"
 
+#: src/postulo/templates/applications/report.html:117
+#, python-format, draft
+msgid "%(counter)s day"
+msgid_plural "%(counter)s days"
+msgstr[0] "%(counter)s diena"
+msgstr[1] "%(counter)s dienos"
+msgstr[2] "%(counter)s dienų"
+
 #: src/postulo/templates/applications/application_detail.html:267
 #, python-format, draft
 msgid "%(counter)s earlier"
@@ -148,6 +156,11 @@ msgid_plural "%(days)s days ago"
 msgstr[0] "prieš %(days)s dieną"
 msgstr[1] "prieš %(days)s dienas"
 msgstr[2] "prieš %(days)s dienų"
+
+#: src/postulo/applications/reports.py:106
+#, python-format, draft
+msgid "%(from)s to %(to)s"
+msgstr "%(from)s – %(to)s"
 
 #: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
 #, python-format, draft
@@ -485,6 +498,11 @@ msgstr "prieš %(when)s"
 msgid "(empty address)"
 msgstr "(tuščias adresas)"
 
+#: src/postulo/templates/applications/report_print.html:99
+#, draft
+msgid "(part)"
+msgstr "(dalis)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -540,6 +558,13 @@ msgstr "Įmonė negali būti savo pačios dalis."
 msgid "A company carries one identifier per scheme."
 msgstr "Įmonė turi po vieną identifikatorių kiekvienai schemai."
 
+#: src/postulo/templates/applications/report.html:201
+#, draft
+msgid ""
+"A company in several fields counts in each of them, so these can add up to more than everything."
+msgstr ""
+"Kelių sričių įmonė skaičiuojama kiekvienoje iš jų, todėl suma gali viršyti visumą."
+
 #: src/postulo/templates/widgets/industries.html:37
 #, draft
 msgid "A company in several industries counts in each of them."
@@ -576,6 +601,11 @@ msgid ""
 "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr ""
 "Mobilusis, fiksuota linija, komutatorius — tiek, kiek verta laikyti, vieną pažymėjus kaip tą, kurį naudoti. Dokumentai spausdina būtent jį."
+
+#: src/postulo/templates/applications/report.html:41
+#, draft
+msgid "A month"
+msgstr "Mėnuo"
 
 #: src/postulo/core/models.py:288
 #, draft
@@ -667,6 +697,11 @@ msgid ""
 msgstr ""
 "Python wheel (<code>.whl</code>), sukurtas bet kuriai platformai. Postulo perskaito, ką jis sako apie save, ir parodo tai jums prieš ką nors įdiegdamas."
 
+#: src/postulo/templates/applications/report.html:42
+#, draft
+msgid "A quarter"
+msgstr "Ketvirtis"
+
 #: src/postulo/templates/server/logs.html:146
 #, draft
 msgid "A quiet log is the one you want."
@@ -686,6 +721,11 @@ msgstr "Priminimas sueina diena anksčiau, kai ta diena yra."
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Pastaba, kam tai skirta."
+
+#: src/postulo/templates/widgets/shortcuts.html:25
+#, draft
+msgid "A report on a period"
+msgstr "Laikotarpio ataskaita"
 
 #: src/postulo/templates/core/home.html:13
 #, draft
@@ -744,6 +784,12 @@ msgid ""
 "A username is unique across the instance whoever changes it, and people can change their own under Settings."
 msgstr ""
 "Naudotojo vardas yra unikalus visoje instancijoje, kad ir kas jį keistų, o kiekvienas gali pakeisti savąjį Nustatymuose."
+
+#: src/postulo/templates/applications/report.html:111
+#: src/postulo/templates/applications/report_print.html:81
+#, draft
+msgid "A week, on average"
+msgstr "Per savaitę, vidutiniškai"
 
 #: src/postulo/templates/settings/dashboard.html:165
 #, draft
@@ -949,7 +995,7 @@ msgid ""
 msgstr ""
 "Pridėta %(total)s įrašų. Niekas nebuvo perrašyta; kas pasirodys besidubliuojantis, ištrinsite patys."
 
-#: src/postulo/applications/views.py:392 src/postulo/applications/views.py:736
+#: src/postulo/applications/views.py:393 src/postulo/applications/views.py:820
 #, draft
 msgid "Added to the timeline."
 msgstr "Pridėta į laiko juostą."
@@ -964,16 +1010,17 @@ msgstr "Pridėta į jūsų skelbimus."
 msgid "Added."
 msgstr "Pridėta."
 
+#: src/postulo/applications/reports.py:478
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Adresas"
+
 #: src/postulo/core/models.py:410 src/postulo/jobs/models.py:729
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "adresas"
-
-#: src/postulo/templates/partials/postal_addresses.html:29
-#, draft
-msgid "Address"
-msgstr "Adresas"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -1208,7 +1255,7 @@ msgstr "Paraiška"
 msgid "Application created"
 msgstr "Paraiška sukurta"
 
-#: src/postulo/applications/views.py:345
+#: src/postulo/applications/views.py:346
 #, draft
 msgid "Application deleted."
 msgstr "Paraiška ištrinta."
@@ -1218,12 +1265,12 @@ msgstr "Paraiška ištrinta."
 msgid "Application recorded from the capture."
 msgstr "Paraiška įrašyta iš fiksavimo."
 
-#: src/postulo/applications/views.py:311 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:312 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Paraiška įrašyta."
 
-#: src/postulo/applications/views.py:335
+#: src/postulo/applications/views.py:336
 #, draft
 msgid "Application updated."
 msgstr "Paraiška atnaujinta."
@@ -1249,11 +1296,24 @@ msgstr "paraiškos"
 msgid "Applications by month"
 msgstr "Paraiškos pagal mėnesį"
 
+#: src/postulo/templates/applications/report_print.html:177
+#, draft
+msgid "Applications drafted but never sent are not counted."
+msgstr "Parašytos, bet niekada neišsiųstos paraiškos neskaičiuojamos."
+
+#: src/postulo/templates/applications/report.html:210
+#, draft
+msgid ""
+"Applications drafted but never sent are not counted. An employment office is asking what was sent."
+msgstr ""
+"Parašytos, bet niekada neišsiųstos paraiškos neskaičiuojamos. Užimtumo tarnyba klausia, kas buvo išsiųsta."
+
 #: src/postulo/notifications/base.py:29
 #, draft
 msgid "Applications go quiet"
 msgstr "Paraiškos nutyla"
 
+#: src/postulo/templates/applications/report_print.html:77
 #: src/postulo/templates/widgets/insight_counters.html:17
 #, draft
 msgid "Applications sent"
@@ -1299,7 +1359,10 @@ msgstr "Pateikta per pastarąsias 30 dienų"
 msgid "applied on"
 msgstr "pateikta"
 
+#: src/postulo/applications/reports.py:474
 #: src/postulo/templates/applications/application_detail.html:137
+#: src/postulo/templates/applications/report.html:225
+#: src/postulo/templates/applications/report_print.html:149
 #, draft
 msgid "Applied on"
 msgstr "Pateikta"
@@ -1762,7 +1825,7 @@ msgid ""
 msgstr ""
 "Čia padaryti pakeitimai išsiunčiami per kitą vykdymą; tada perskaitoma ir kita pusė."
 
-#: src/postulo/applications/views.py:480
+#: src/postulo/applications/views.py:481
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Priminti %(company)s apie %(role)s"
@@ -1827,7 +1890,7 @@ msgstr "Pasirinkite bent vieną dokumentą įrašymui."
 msgid "Choose what kind of identifier this is."
 msgstr "Pasirinkite, kokios rūšies tai identifikatorius."
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:816
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Pirmiausia pasirinkite, su kuria paraiška tai susiję."
@@ -1963,8 +2026,10 @@ msgstr "Sukurtos įmonės"
 msgid "Companies you have applied to"
 msgstr "Įmonės, į kurias teikėte paraiškas"
 
-#: src/postulo/applications/forms.py:43 src/postulo/applications/tables.py:27
-#: src/postulo/core/csv_import.py:38
+#: src/postulo/applications/forms.py:43 src/postulo/applications/reports.py:475
+#: src/postulo/applications/tables.py:27 src/postulo/core/csv_import.py:38
+#: src/postulo/templates/applications/report.html:226
+#: src/postulo/templates/applications/report_print.html:150
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
@@ -2178,6 +2243,20 @@ msgstr "Nepavyko atsisiųsti: %(error)s"
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Nepavyko perskaityti %(site)s: %(error)s"
 
+#: src/postulo/templates/applications/report_print.html:141
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here."
+msgstr ""
+"Skaičiuojama pagal tai, kada tai įvyko, todėl atsakymas, gautas šiuo laikotarpiu į senesnę paraišką, priklauso čia."
+
+#: src/postulo/templates/applications/report.html:174
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
+msgstr ""
+"Skaičiuojama pagal tai, kada tai įvyko, todėl atsakymas, gautas šiuo laikotarpiu į senesnę paraišką, priklauso čia. Tai kitas klausimas nei tai, kas buvo išsiųsta, ir abu laikomi atskirai."
+
 #: src/postulo/templates/widgets/interviews_summary.html:30
 #, draft
 msgid ""
@@ -2347,6 +2426,11 @@ msgstr "Pasiūlytos datos:"
 msgid "Dates written as"
 msgstr "Datų rašymo formatas"
 
+#: src/postulo/templates/applications/report.html:44
+#, draft
+msgid "Dates you choose"
+msgstr "Jūsų pasirinktos datos"
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2488,7 +2572,7 @@ msgstr "Atmesti"
 msgid "Declined"
 msgstr "Atmesta"
 
-#: src/postulo/applications/views.py:724
+#: src/postulo/applications/views.py:808
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Atmesta. Daugiau nebus siūloma."
@@ -2712,6 +2796,16 @@ msgstr "atlikta"
 #, draft
 msgid "Download"
 msgstr "Atsisiųsti"
+
+#: src/postulo/templates/applications/report.html:20
+#, draft
+msgid "Download CSV"
+msgstr "Atsisiųsti CSV"
+
+#: src/postulo/templates/applications/report.html:23
+#, draft
+msgid "Download PDF"
+msgstr "Atsisiųsti PDF"
 
 #: src/postulo/templates/accounts/delete_account.html:41
 #: src/postulo/templates/core/export.html:36
@@ -2949,6 +3043,12 @@ msgid ""
 msgstr ""
 "Kiekviena šios instancijos paskyra. Administratoriai mato paskyras, bet niekada niekieno paraiškų ar dokumentų."
 
+#: src/postulo/templates/applications/report.html:208
+#: src/postulo/templates/applications/report_print.html:144
+#, draft
+msgid "Every application, in order"
+msgstr "Visos paraiškos iš eilės"
+
 #: src/postulo/jobs/forms.py:286
 #, draft
 msgid ""
@@ -3120,7 +3220,7 @@ msgstr ""
 "Paaiškinti, kas nepavyko, dažnai reiškia pasakyti, su kuriuo ryšiu, kuria įmone ar kuriuo dokumentu tai nutiko. Čia nėra jokio dokumento turinio, bet elkitės su šiuo puslapiu kaip su likusia instancija, prieš ką nors iš jo dalindamiesi."
 
 #: src/postulo/templates/core/export.html:8
-#: src/postulo/templates/widgets/shortcuts.html:25
+#: src/postulo/templates/widgets/shortcuts.html:28
 #, draft
 msgid "Export everything"
 msgstr "Eksportuoti viską"
@@ -3277,6 +3377,12 @@ msgstr "Vardas"
 msgid "first name"
 msgstr "vardas"
 
+#: src/postulo/templates/applications/report.html:178
+#: src/postulo/templates/applications/report_print.html:125
+#, draft
+msgid "First replies"
+msgstr "Pirmieji atsakymai"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -3297,12 +3403,12 @@ msgstr "Pagal jūsų profilį"
 msgid "Follow-up note"
 msgstr "Užrašas po pokalbio"
 
-#: src/postulo/applications/views.py:474
+#: src/postulo/applications/views.py:475
 #, draft
 msgid "Follow-up recorded."
 msgstr "Priminimas įrašytas."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:471
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:472
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3360,7 +3466,10 @@ msgstr "Rastas logotipas adresu %(url)s."
 msgid "Found on their website"
 msgstr "Rastas jų svetainėje"
 
-#: src/postulo/applications/forms.py:57 src/postulo/core/csv_import.py:50
+#: src/postulo/applications/forms.py:57 src/postulo/applications/reports.py:477
+#: src/postulo/core/csv_import.py:50
+#: src/postulo/templates/applications/report.html:228
+#: src/postulo/templates/applications/report_print.html:152
 #: src/postulo/templates/jobs/posting_detail.html:81
 #, draft
 msgid "Found via"
@@ -3394,6 +3503,7 @@ msgstr "Užšaldyti ir pridėti"
 msgid "from"
 msgstr "nuo"
 
+#: src/postulo/templates/applications/report.html:55
 #: src/postulo/templates/server/email.html:27
 #: src/postulo/templates/server/logs.html:51
 #: src/postulo/templates/server/logs.html:89
@@ -3676,10 +3786,21 @@ msgstr ""
 msgid "How many applications reached one, how many were held, and of what kind."
 msgstr "Kiek prašymų pasiekė pokalbį, kiek jų įvyko ir kokio pobūdžio."
 
+#: src/postulo/templates/applications/report.html:65
+#, draft
+msgid "How many weeks"
+msgstr "Kiek savaičių"
+
 #: src/postulo/applications/widgets.py:271
 #, draft
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Kiek siuntėte mėnesį po mėnesio, kad tylus laikotarpis būtų matomas."
+
+#: src/postulo/templates/applications/report.html:96
+#: src/postulo/templates/applications/report_print.html:73
+#, draft
+msgid "How regularly"
+msgstr "Kaip reguliariai"
 
 #: src/postulo/templates/core/import_csv_map.html:57
 #, draft
@@ -4006,7 +4127,7 @@ msgstr "pokalbis"
 msgid "Interview cancelled"
 msgstr "Pokalbis atšauktas"
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Interview recorded."
 msgstr "Pokalbis įrašytas."
@@ -4016,7 +4137,7 @@ msgstr "Pokalbis įrašytas."
 msgid "Interview scheduled"
 msgstr "Pokalbis suplanuotas"
 
-#: src/postulo/applications/views.py:555
+#: src/postulo/applications/views.py:556
 #, draft
 msgid "Interview scheduled."
 msgstr "Pokalbis suplanuotas."
@@ -4026,7 +4147,7 @@ msgstr "Pokalbis suplanuotas."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Pokalbis rytoj: %(kind)s, %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:585
+#: src/postulo/applications/views.py:586
 #, draft
 msgid "Interview updated."
 msgstr "Pokalbis atnaujintas."
@@ -4052,6 +4173,12 @@ msgstr "pokalbiai"
 #, draft
 msgid "Interviews"
 msgstr "Pokalbiai"
+
+#: src/postulo/templates/applications/report.html:182
+#: src/postulo/templates/applications/report_print.html:129
+#, draft
+msgid "Interviews attended"
+msgstr "Įvykę pokalbiai"
 
 #: src/postulo/accounts/models.py:505
 #, draft
@@ -4167,6 +4294,16 @@ msgstr "darbo skelbimas"
 msgid "job postings"
 msgstr "darbo skelbimai"
 
+#: src/postulo/templates/applications/report_print.html:65
+#, draft
+msgid "Job search report"
+msgstr "Darbo paieškos ataskaita"
+
+#: src/postulo/templates/applications/report_print.html:23
+#, python-format, draft
+msgid "Job search report · %(period)s"
+msgstr "Darbo paieškos ataskaita · %(period)s"
+
 #: src/postulo/applications/forms.py:44
 #, draft
 msgid "Job title"
@@ -4227,6 +4364,7 @@ msgid "kind"
 msgstr "rūšis"
 
 #: src/postulo/templates/accounts/profile.html:126
+#: src/postulo/templates/applications/report.html:39
 #: src/postulo/templates/jobs/company_form.html:67
 #: src/postulo/templates/partials/phone_numbers.html:40
 #: src/postulo/templates/partials/postal_addresses.html:60
@@ -4330,7 +4468,10 @@ msgstr ""
 msgid "Largest page read"
 msgstr "Didžiausias perskaitytas puslapis"
 
+#: src/postulo/applications/reports.py:480
 #: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:75
+#: src/postulo/templates/applications/report.html:230
+#: src/postulo/templates/applications/report_print.html:154
 #, draft
 msgid "Last activity"
 msgstr "Paskutinė veikla"
@@ -4623,6 +4764,16 @@ msgstr "logotipas atsisiųstas"
 msgid "Logs"
 msgstr "Žurnalai"
 
+#: src/postulo/templates/applications/report.html:115
+#, draft
+msgid "Longest gap"
+msgstr "Ilgiausia pertrauka"
+
+#: src/postulo/templates/applications/report_print.html:85
+#, draft
+msgid "Longest gap, in days"
+msgstr "Ilgiausia pertrauka, dienomis"
+
 #: src/postulo/templates/applications/application_list.html:42
 #: src/postulo/templates/jobs/company_list.html:42
 #: src/postulo/templates/server/logs.html:144
@@ -4755,7 +4906,7 @@ msgstr "Padaryti administratoriumi"
 msgid "Manage"
 msgstr "Tvarkyti"
 
-#: src/postulo/templates/widgets/shortcuts.html:28
+#: src/postulo/templates/widgets/shortcuts.html:31
 #, draft
 msgid "Manage tags"
 msgstr "Tvarkyti žymas"
@@ -4770,7 +4921,7 @@ msgstr "Gamyba"
 msgid "Map a column to Company and one to Role first."
 msgstr "Pirmiausia priskirkite vieną stulpelį Įmonei, o kitą Pareigoms."
 
-#: src/postulo/applications/views.py:447
+#: src/postulo/applications/views.py:448
 #, draft
 msgid "Marked as done."
 msgstr "Pažymėta kaip atlikta."
@@ -4849,6 +5000,11 @@ msgstr "Mobilusis"
 #, draft
 msgid "Money and dates"
 msgstr "Pinigai ir datos"
+
+#: src/postulo/templates/applications/report.html:48
+#, draft
+msgid "Month"
+msgstr "Mėnuo"
 
 #: src/postulo/templates/core/import_csv_map.html:49
 #, draft
@@ -5301,6 +5457,12 @@ msgstr "Ne pelno sektorius"
 msgid "None"
 msgstr "Nėra"
 
+#: src/postulo/templates/applications/report.html:149
+#: src/postulo/templates/applications/report_print.html:111
+#, draft
+msgid "none"
+msgstr "nė vienos"
+
 #: src/postulo/templates/partials/label_attrs.html:12
 #, draft
 msgid "None chosen yet"
@@ -5391,6 +5553,7 @@ msgstr "Nepriklauso kitai įmonei"
 
 #: src/postulo/applications/analytics.py:296
 #: src/postulo/applications/analytics.py:314
+#: src/postulo/applications/reports.py:446
 #, draft
 msgid "Not recorded"
 msgstr "Neįrašyta"
@@ -5675,6 +5838,11 @@ msgid ""
 msgstr ""
 "Nėra ko įtraukti į eilę: kiekvienas pasirinktų rūšių dokumentas jau yra %(label)s sąraše."
 
+#: src/postulo/templates/applications/partials/report_tally.html:30
+#, draft
+msgid "Nothing to show for this period."
+msgstr "Šiuo laikotarpiu nėra ką rodyti."
+
 #: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
@@ -5711,6 +5879,18 @@ msgstr "Nieko nebuvo įdiegta."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Niekas nebuvo pasirinkta, tad niekas nepasikeitė."
+
+#: src/postulo/templates/applications/report_print.html:174
+#, draft
+msgid "Nothing was sent in this period."
+msgstr "Šiuo laikotarpiu nieko nebuvo išsiųsta."
+
+#: src/postulo/templates/applications/report.html:261
+#, draft
+msgid ""
+"Nothing was sent in this period. That is what the report says, and it is a fact like any other."
+msgstr ""
+"Šiuo laikotarpiu nieko nebuvo išsiųsta. Tai sako ataskaita, ir tai faktas kaip ir bet kuris kitas."
 
 #: src/postulo/templates/settings/dashboard.html:68
 #, draft
@@ -5769,6 +5949,8 @@ msgid "Offered only while this instance's mail is actually getting through."
 msgstr ""
 "Siūloma tik tol, kol šios instancijos paštas iš tikrųjų pasiekia adresatą."
 
+#: src/postulo/templates/applications/report.html:186
+#: src/postulo/templates/applications/report_print.html:133
 #: src/postulo/templates/widgets/industries.html:13
 #: src/postulo/templates/widgets/insight_counters.html:33
 #: src/postulo/templates/widgets/sources.html:13
@@ -5835,6 +6017,14 @@ msgstr "Kartą per dieną"
 msgid "One achievement per line."
 msgstr "Vienas pasiekimas eilutėje."
 
+#: src/postulo/templates/applications/report.html:98
+#, python-format, draft
+msgid "One application sent in this period."
+msgid_plural "%(counter)s applications sent in this period."
+msgstr[0] "Viena paraiška, išsiųsta šiuo laikotarpiu."
+msgstr[1] "%(counter)s paraiškos, išsiųstos šiuo laikotarpiu."
+msgstr[2] "%(counter)s paraiškų, išsiųstų šiuo laikotarpiu."
+
 #: src/postulo/templates/jobs/listing_list.html:23
 #, python-format, draft
 msgid "One capture waiting for review"
@@ -5842,6 +6032,14 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Vienas fiksavimas laukia peržiūros"
 msgstr[1] "%(counter)s fiksavimai laukia peržiūros"
 msgstr[2] "%(counter)s fiksavimų laukia peržiūros"
+
+#: src/postulo/templates/applications/report.html:212
+#, python-format, draft
+msgid "One draft in this period is left out."
+msgid_plural "%(counter)s drafts in this period are left out."
+msgstr[0] "Vienas šio laikotarpio juodraštis paliekamas nuošalyje."
+msgstr[1] "%(counter)s šio laikotarpio juodraščiai paliekami nuošalyje."
+msgstr[2] "%(counter)s šio laikotarpio juodraščių paliekama nuošalyje."
 
 #: src/postulo/templates/connections/list.html:81
 #, python-format, draft
@@ -6047,6 +6245,11 @@ msgstr "Kitos šakos"
 msgid "Other languages"
 msgstr "Kitos kalbos"
 
+#: src/postulo/templates/applications/report.html:77
+#, draft
+msgid "Other periods"
+msgstr "Kiti laikotarpiai"
+
 #: src/postulo/applications/models.py:485
 #, draft
 msgid "outcome"
@@ -6220,6 +6423,11 @@ msgstr "Per metus"
 #, draft
 msgid "Period"
 msgstr "Laikotarpis"
+
+#: src/postulo/templates/applications/report_print.html:68
+#, python-format, draft
+msgid "Period: %(period)s"
+msgstr "Laikotarpis: %(period)s"
 
 #: src/postulo/accounts/admin.py:24
 #, draft
@@ -6514,6 +6722,13 @@ msgstr ""
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
 msgstr "Postulo dar neskelbia jokio katalogo. Iš čia nieko neparsiunčiama."
 
+#: src/postulo/templates/applications/report.html:267
+#, draft
+msgid ""
+"Postulo sets no target. How many applications a period should hold is a benefit regime's rule or your own, never this software's."
+msgstr ""
+"Postulo nenustato jokio tikslo. Kiek paraiškų turėtų būti per laikotarpį — tai išmokų sistemos arba jūsų pačių taisyklė, niekada ne šios programinės įrangos."
+
 #: src/postulo/templates/api/token_list.html:23
 #, draft
 msgid ""
@@ -6596,6 +6811,18 @@ msgstr "prioritetas"
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Privatūs ir vietiniai adresai atmetami."
+
+#: src/postulo/templates/applications/report_print.html:195
+#, draft
+msgid ""
+"Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
+msgstr ""
+"Parengta Postulo iš šio asmens paties įrašų. Postulo nenustato jokio tikslo: kiek paraiškų turėtų būti per laikotarpį — tai išmokų sistemos arba paties asmens taisyklė."
+
+#: src/postulo/templates/applications/report_print.html:70
+#, python-format, draft
+msgid "Produced on %(produced)s"
+msgstr "Parengta %(produced)s"
 
 #: src/postulo/resume/models.py:199
 #, draft
@@ -6689,6 +6916,11 @@ msgstr "Publikacija"
 #, draft
 msgid "Putting it back"
 msgstr "Grąžinimas atgal"
+
+#: src/postulo/applications/reports.py:102
+#, python-format, draft
+msgid "Q%(quarter)s %(year)s"
+msgstr "%(year)s m. %(quarter)s ketv."
 
 #: src/postulo/resume/models.py:95
 #, draft
@@ -6874,12 +7106,12 @@ msgid ""
 msgstr ""
 "Įrašoma prie visko, kas iš čia įdiegta, todėl vėliau negali pasikeisti neatsiejant to, ką įdiegė."
 
-#: src/postulo/applications/views.py:606
+#: src/postulo/applications/views.py:607
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Įrašyta kaip atšaukta."
 
-#: src/postulo/applications/views.py:605
+#: src/postulo/applications/views.py:606
 #, draft
 msgid "Recorded as held."
 msgstr "Įrašyta kaip įvykusi."
@@ -6899,7 +7131,7 @@ msgstr "įrašyta"
 msgid "Recorded what you sent."
 msgstr "Įrašyta, ką išsiuntėte."
 
-#: src/postulo/applications/views.py:607
+#: src/postulo/applications/views.py:608
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Įrašyta: niekas neatvyko."
@@ -6992,6 +7224,12 @@ msgstr "Atmesta"
 #, draft
 msgid "Rejection received"
 msgstr "Gautas atmetimas"
+
+#: src/postulo/templates/applications/report.html:190
+#: src/postulo/templates/applications/report_print.html:137
+#, draft
+msgid "Rejections"
+msgstr "Atmetimai"
 
 #: src/postulo/applications/forms.py:281
 #, draft
@@ -7103,6 +7341,11 @@ msgid ""
 msgstr ""
 "Atsakyta, atmesta, nutilo, vis dar laukia — kas nutiko tam, ką išsiuntėte."
 
+#: src/postulo/templates/applications/report.html:4
+#, python-format, draft
+msgid "Report · %(period)s"
+msgstr "Ataskaita · %(period)s"
+
 #: src/postulo/jobs/industries.py:75
 #, draft
 msgid "Research"
@@ -7187,7 +7430,10 @@ msgstr "robots.txt šiuo metu paisoma."
 msgid "robots.txt is currently ignored."
 msgstr "robots.txt šiuo metu nepaisoma."
 
+#: src/postulo/applications/reports.py:476
 #: src/postulo/applications/tables.py:19
+#: src/postulo/templates/applications/report.html:227
+#: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
 #: src/postulo/templates/jobs/listing_list.html:70
 #: src/postulo/templates/server/people.html:35
@@ -7502,6 +7748,7 @@ msgstr "Siuntimas savo vardu"
 msgid "Sending failed: %(error)s"
 msgstr "Siuntimas nepavyko: %(error)s"
 
+#: src/postulo/templates/applications/report.html:107
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
@@ -7687,6 +7934,11 @@ msgstr "Rodyti naršymo juostoje"
 msgid "Show past too"
 msgstr "Rodyti ir praėjusius"
 
+#: src/postulo/templates/applications/report.html:72
+#, draft
+msgid "Show this period"
+msgstr "Rodyti šį laikotarpį"
+
 #: src/postulo/core/models.py:504
 #, draft
 msgid "Shown in the header and on the sign-in page."
@@ -7829,7 +8081,7 @@ msgstr "SMTP serveris"
 msgid "Snooze"
 msgstr "Atidėti"
 
-#: src/postulo/applications/views.py:488
+#: src/postulo/applications/views.py:489
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Atidėta dviem savaitėms."
@@ -7959,11 +8211,14 @@ msgid "State"
 msgstr "Būklė"
 
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:224
+#: src/postulo/applications/reports.py:479
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
 #: src/postulo/templates/applications/application_detail.html:48
 #: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
+#: src/postulo/templates/applications/report.html:229
+#: src/postulo/templates/applications/report_print.html:153
 #: src/postulo/templates/core/import_csv_map.html:66
 #, draft
 msgid "Status"
@@ -7986,7 +8241,7 @@ msgstr "Būsenos pokytis"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Būsena skaičiuoklėje: %(text)s"
 
-#: src/postulo/applications/views.py:363
+#: src/postulo/applications/views.py:364
 #, draft
 msgid "Status updated."
 msgstr "Būsena atnaujinta."
@@ -8372,7 +8627,7 @@ msgstr "Tai nepanašu į %(scheme)s identifikatorių (pavyzdžiui, %(example)s).
 msgid "That does not look like a complete web address."
 msgstr "Tai nepanašu į pilną žiniatinklio adresą."
 
-#: src/postulo/applications/views.py:394
+#: src/postulo/applications/views.py:395
 #, draft
 msgid "That entry could not be saved."
 msgstr "Šio įrašo nepavyko išsaugoti."
@@ -8445,7 +8700,7 @@ msgstr "Tai daug atkūrimo nuorodų. Pabandykite netrukus dar kartą."
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Tai SVG, kurio Postulo dar nelaiko. Tinka PNG arba JPEG."
 
-#: src/postulo/applications/views.py:365
+#: src/postulo/applications/views.py:366
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Tai ne būsena, kurią Postulo atpažįsta."
@@ -8465,17 +8720,17 @@ msgstr "Tai ne valdiklis, kurį Postulo pažįsta."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Tai nėra Ed25519 viešasis raktas: %(error)s"
 
-#: src/postulo/applications/views.py:599
+#: src/postulo/applications/views.py:600
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Tai ne rezultatas, kurį Postulo atpažįsta."
 
-#: src/postulo/applications/views.py:490
+#: src/postulo/applications/views.py:491
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Postulo negali su ja to padaryti."
 
-#: src/postulo/applications/views.py:179 src/postulo/jobs/views.py:124
+#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:124
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "To Postulo negali padaryti keliems iš karto."
@@ -8575,7 +8830,7 @@ msgstr "Tas papildinys nebeįdiegtas."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Tas atsakymas atėjo ne iš Postulo pateikto užklausimo."
 
-#: src/postulo/applications/views.py:719
+#: src/postulo/applications/views.py:803
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Į tą pasiūlymą jau atsakyta."
@@ -8755,6 +9010,11 @@ msgstr ""
 msgid "The language you read Postulo in"
 msgstr "Kalba, kuria skaitote Postulo"
 
+#: src/postulo/templates/applications/report.html:43
+#, draft
+msgid "The last few weeks"
+msgstr "Kelios paskutinės savaitės"
+
 #: src/postulo/templates/server/email.html:62
 #, python-format, draft
 msgid "The last message this instance tried to send failed, at %(when)s."
@@ -8793,6 +9053,20 @@ msgstr "Logotipo nebėra."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logotipas nepakeistas: %(problem)s"
 
+#: src/postulo/templates/applications/report.html:167
+#, draft
+msgid ""
+"The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
+msgstr ""
+"Ilgiausia pertrauka matuojama šio laikotarpio viduje, todėl tyla, prasidėjusi anksčiau, į jį neįnešama. Dar vykstantis laikotarpis skaičiuojamas tik iki šiandien."
+
+#: src/postulo/templates/applications/report_print.html:118
+#, draft
+msgid ""
+"The longest gap is measured inside this period. A period still running is counted up to the day this was produced. A week marked (part) reaches outside the period; nothing from outside it is counted."
+msgstr ""
+"Ilgiausia pertrauka matuojama šio laikotarpio viduje. Dar vykstantis laikotarpis skaičiuojamas iki dienos, kurią tai buvo parengta. Savaitė, pažymėta (dalis), išeina už laikotarpio ribų; niekas iš išorės neskaičiuojama."
+
 #: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
@@ -8821,6 +9095,16 @@ msgstr ""
 msgid "The official repository is emptied, not removed."
 msgstr "Oficiali saugykla ištuštinama, o ne pašalinama."
 
+#: src/postulo/templates/applications/report.html:83
+#, draft
+msgid "The one after"
+msgstr "Kitas"
+
+#: src/postulo/templates/applications/report.html:79
+#, draft
+msgid "The one before"
+msgstr "Ankstesnis"
+
 #: src/postulo/documents/models.py:87
 #, draft
 msgid "The opening paragraph, if you use one."
@@ -8847,6 +9131,11 @@ msgstr "Papildiniai, tiekiami kartu su Postulo. Niekas neparsiunčiama."
 #, draft
 msgid "The posting"
 msgstr "Skelbimas"
+
+#: src/postulo/templates/applications/report.html:245
+#, draft
+msgid "the posting"
+msgstr "skelbimas"
 
 #: src/postulo/templates/applications/application_intake.html:64
 #: src/postulo/templates/jobs/capture_review.html:58
@@ -9129,6 +9418,11 @@ msgstr "Šis pakvietimas skirtas %(email)s. Registruokitės tuo adresu."
 msgid "This invitation may only be used with the address it was sent to."
 msgstr "Šį pakvietimą galima panaudoti tik su adresu, į kurį jis išsiųstas."
 
+#: src/postulo/templates/applications/report.html:88
+#, draft
+msgid "This is the most recent period."
+msgstr "Tai naujausias laikotarpis."
+
 #: src/postulo/templates/server/plugins.html:311
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -9257,6 +9551,11 @@ msgstr "Pavadinimas, įmonė ar vieta"
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS nuo pirmo baito"
+
+#: src/postulo/templates/applications/report.html:59
+#, draft
+msgid "To"
+msgstr "Iki"
 
 #: src/postulo/templates/partials/table/head.html:101
 #, draft
@@ -9551,6 +9850,11 @@ msgstr "Panaudota"
 msgid "used at"
 msgstr "panaudota"
 
+#: src/postulo/templates/applications/report.html:51
+#, draft
+msgid "Used for a month, and for the quarter that month falls in."
+msgstr "Naudojama mėnesiui ir ketvirčiui, į kurį tas mėnuo patenka."
+
 #: src/postulo/accounts/models.py:124 src/postulo/accounts/models.py:250
 #, draft
 msgid "user"
@@ -9704,6 +10008,23 @@ msgstr "svetainė"
 msgid "Website"
 msgstr "Svetainė"
 
+#: src/postulo/templates/applications/report.html:135
+#: src/postulo/templates/applications/report.html:161
+#: src/postulo/templates/applications/report_print.html:98
+#, python-format, draft
+msgid "Week of %(day)s"
+msgstr "Savaitė nuo %(day)s"
+
+#: src/postulo/templates/applications/report.html:125
+#, draft
+msgid "Weeks in a row, up to now"
+msgstr "Savaičių iš eilės, iki šiol"
+
+#: src/postulo/templates/applications/report_print.html:89
+#, draft
+msgid "Weeks with none"
+msgstr "Savaitės be nė vienos"
+
 #: src/postulo/templates/core/dashboard.html:38
 #, python-format, draft
 msgid "Welcome back, %(name)s"
@@ -9733,6 +10054,16 @@ msgstr "ką turėtų tikrinti stebėsena"
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "Nuo ko pradeda nauja paskyra. Kiekvienas gali pasikeisti savo."
+
+#: src/postulo/templates/applications/report.html:172
+#, draft
+msgid "What came back"
+msgstr "Kas sugrįžo"
+
+#: src/postulo/templates/applications/report_print.html:121
+#, draft
+msgid "What came back in this period"
+msgstr "Kas sugrįžo šiuo laikotarpiu"
 
 #: src/postulo/core/server_forms.py:316
 #, draft
@@ -9810,6 +10141,11 @@ msgstr "ką sako"
 msgid "What it says it is"
 msgstr "Kuo jis sakosi esąs"
 
+#: src/postulo/templates/applications/report.html:200
+#, draft
+msgid "What kind of employer"
+msgstr "Koks darbdavys"
+
 #: src/postulo/applications/widgets.py:25
 #: src/postulo/core/widgets_builtin.py:22
 #, draft
@@ -9881,6 +10217,13 @@ msgstr "Kaip jį pavadinti"
 #, draft
 msgid "what to do"
 msgstr "ką daryti"
+
+#: src/postulo/templates/applications/report.html:15
+#, draft
+msgid ""
+"What was sent, how regularly, and what came back. Nothing outside the period is counted."
+msgstr ""
+"Kas buvo išsiųsta, kaip reguliariai ir kas sugrįžo. Niekas už laikotarpio ribų neskaičiuojama."
 
 #: src/postulo/templates/accounts/delete_account.html:18
 #, draft
@@ -9963,6 +10306,12 @@ msgstr "Kur paskelbtas pasirašytas indeksas. Parašas yra šalia."
 msgid "Where they came from"
 msgstr "Iš kur jos atėjo"
 
+#: src/postulo/templates/applications/report.html:198
+#: src/postulo/templates/applications/report_print.html:181
+#, draft
+msgid "Where they were found"
+msgstr "Kur jos rastos"
+
 #: src/postulo/applications/widgets.py:121
 #, draft
 msgid "Where things stand"
@@ -10039,6 +10388,11 @@ msgstr ""
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Kuri Postulo dalis tai sukūrė: žiniatinklio sąsaja ar API."
+
+#: src/postulo/templates/applications/report.html:36
+#, draft
+msgid "Which period"
+msgstr "Kuris laikotarpis"
 
 #: src/postulo/templates/connections/pick.html:7
 #, draft
@@ -10405,7 +10759,7 @@ msgstr "Jūsų terminas"
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
 #: src/postulo/templates/base.html:105
-#: src/postulo/templates/widgets/shortcuts.html:31
+#: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"
 msgstr "Jūsų duomenys"
@@ -10424,6 +10778,11 @@ msgstr "Jūsų „Gravatar“ gautas iš naujo."
 #, draft
 msgid "Your initials"
 msgstr "Jūsų inicialai"
+
+#: src/postulo/templates/applications/report.html:10
+#, python-format, draft
+msgid "Your job search in %(period)s"
+msgstr "Jūsų darbo paieška %(period)s"
 
 #: src/postulo/core/views.py:67
 #, draft
@@ -10503,6 +10862,16 @@ msgstr "{label} pašalinta"
 #, draft
 msgid "{label} — new"
 msgstr "{label} — nauja"
+
+#: src/postulo/templates/applications/report.html:144
+#, draft
+msgid "· part of this week is outside the period"
+msgstr "· dalis šios savaitės yra už laikotarpio ribų"
+
+#: src/postulo/templates/applications/report.html:137
+#, draft
+msgid "· still running"
+msgstr "· dar vyksta"
 
 #: src/postulo/core/server_views.py:1024
 #, python-format, draft

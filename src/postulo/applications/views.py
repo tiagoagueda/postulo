@@ -12,6 +12,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import (
@@ -29,7 +30,7 @@ from postulo.core.models import Tag
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 
-from . import ical, quiet, suggestions
+from . import ical, quiet, reports, suggestions
 from .forms import (
     ApplicationForm,
     ApplicationIntakeForm,
@@ -675,6 +676,89 @@ class InsightsView(LoginRequiredMixin, RedirectView):
 
     pattern_name = "core:home"
     permanent = False
+
+
+# ------------------------------------------------------------------- reports
+
+
+class ReportView(LoginRequiredMixin, View):
+    """A report about a period: what was sent, how regularly, and what came back (#56).
+
+    **On request rather than scheduled.** A report arriving on the first of the month is
+    obvious once a scheduler and notifiers exist, and it is a different issue: this one had
+    to settle what is *on* the page, and that is answerable now. Scheduling a page nobody has
+    read yet would be scheduling a guess.
+
+    **The period lives in the address**, which makes it a question rather than a preference
+    -- the same line this project already draws for a table's sort and filters. A report for
+    a particular month is a thing to bookmark, to send to somebody, and to produce again next
+    year and get the same page back.
+    """
+
+    template_name = "applications/report.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        period = reports.period_from(request.GET)
+        report = reports.build(request.user, period)
+        earlier = period.shifted(-1)
+        later = period.shifted(1)
+        return render(
+            request,
+            self.template_name,
+            {
+                "report": report,
+                "period": period,
+                "earlier": urlencode(reports.as_query(earlier)) if earlier else "",
+                # Never a period that has not happened. A report about next month is a blank
+                # page pretending to be a document.
+                "later": (
+                    urlencode(reports.as_query(later))
+                    if later and later.start <= timezone.localdate()
+                    else ""
+                ),
+                "week_choices": reports.WEEK_CHOICES,
+                "kind": period.kind,
+                "on_month": period.start.strftime("%Y-%m"),
+                "on_quarter": f"{period.start.year}-Q{(period.start.month - 1) // 3 + 1}",
+                "weeks": period.days // 7,
+            },
+        )
+
+
+class ReportCSVView(LoginRequiredMixin, View):
+    """The evidence list as a spreadsheet, for anybody who wants to do their own sums."""
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        report = reports.build(request.user, reports.period_from(request.GET))
+        response = HttpResponse(reports.as_csv(report), content_type="text/csv; charset=utf-8")
+        name = reports.filename(report, "csv")
+        response["Content-Disposition"] = f'attachment; filename="{name}"'
+        return response
+
+
+class ReportPDFView(LoginRequiredMixin, View):
+    """The report as a document to hand over.
+
+    It carries the name, the period and the day it was produced, because a document with no
+    date is not evidence of anything.
+    """
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        from postulo.documents.pdf import PDFBackendUnavailable, html_to_pdf
+
+        report = reports.build(request.user, reports.period_from(request.GET))
+        html = render(request, "applications/report_print.html", {"report": report}).content
+        try:
+            pdf = html_to_pdf(html.decode())
+        except PDFBackendUnavailable as unavailable:
+            messages.error(request, str(unavailable))
+            return redirect(
+                f"{reverse('applications:report')}?{urlencode(reports.as_query(report.period))}"
+            )
+        response = HttpResponse(pdf, content_type="application/pdf")
+        name = reports.filename(report, "pdf")
+        response["Content-Disposition"] = f'attachment; filename="{name}"'
+        return response
 
 
 # --------------------------------------------------------------- suggestions

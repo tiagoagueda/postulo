@@ -1,0 +1,197 @@
+{% load i18n %}<!DOCTYPE html>
+{% comment %} The report as a document to hand over (#56).
+
+   A separate template from the page, not a print stylesheet over it. The page is a place
+   to choose a period and follow a link; the document is a fixed thing with a name, a
+   period and the date it was produced on it, because a document with no date is not
+   evidence of anything. Sharing one template would have meant hiding half of each from the
+   other.
+
+   **The stylesheet is inline here and only here.** Nothing serves this to a browser: it is
+   rendered to a PDF by WeasyPrint in the same process, so it never meets the content
+   security policy and must never fetch anything -- a renderer that reaches the network or
+   the disk for a stylesheet is a renderer that produces a different document depending on
+   where it runs.
+
+   **Every side is logical.** A report written in Arabic or Hebrew lays out from the other
+   edge, and WeasyPrint honours `dir` on the root element, so `margin-inline-start` is the
+   only kind of margin here.
+{% endcomment %}
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<head>
+  <meta charset="utf-8">
+  <title>{% blocktranslate with period=report.period.label %}Job search report · {{ period }}{% endblocktranslate %}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font: 8pt "DejaVu Sans", sans-serif;
+        color: #666;
+      }
+    }
+    body {
+      font: 10pt/1.45 "DejaVu Sans", sans-serif;
+      color: #111;
+      margin: 0;
+    }
+    h1 { font-size: 16pt; margin: 0 0 2mm; }
+    h2 { font-size: 11pt; margin: 8mm 0 2mm; border-bottom: 0.4pt solid #999; padding-bottom: 1mm; }
+    .meta { color: #444; font-size: 9pt; margin: 0 0 6mm; }
+    .meta div { margin-bottom: 0.5mm; }
+    .figures { display: flex; flex-wrap: wrap; gap: 6mm; margin-bottom: 4mm; }
+    .figure { min-inline-size: 30mm; }
+    .figure .value { font-size: 14pt; font-weight: bold; }
+    .figure .name { font-size: 8pt; color: #555; }
+    table { inline-size: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    th, td { text-align: start; padding: 1.5mm 2mm; vertical-align: top; }
+    thead th { border-bottom: 0.6pt solid #333; font-size: 8pt; text-transform: uppercase; }
+    tbody tr { border-bottom: 0.3pt solid #ddd; }
+    thead { display: table-header-group; }
+    tr { page-break-inside: avoid; }
+    .weeks td { padding: 0.8mm 2mm; }
+    .weeks .when { inline-size: 34mm; white-space: nowrap; }
+    .count { inline-size: 22mm; text-align: end; white-space: nowrap; }
+    .weeks .count { inline-size: 14mm; }
+    .part { color: #777; font-size: 7.5pt; }
+    .bar { block-size: 2.6mm; background: #2f5d8a; }
+    .bar-track { background: #e8e8e8; block-size: 2.6mm; }
+    .none { color: #777; }
+    .note { font-size: 8pt; color: #555; margin-top: 2mm; }
+  </style>
+</head>
+<body>
+  <h1>{% translate "Job search report" %}</h1>
+  <div class="meta">
+    <div><strong>{{ report.person }}</strong></div>
+    <div>{% blocktranslate with period=report.period.label %}Period: {{ period }}{% endblocktranslate %}
+      ({{ report.period.start|date:"DATE_FORMAT" }} – {{ report.period.end|date:"DATE_FORMAT" }})</div>
+    <div>{% blocktranslate with produced=report.produced_at|date:"DATETIME_FORMAT" %}Produced on {{ produced }}{% endblocktranslate %}</div>
+  </div>
+
+  <h2>{% translate "How regularly" %}</h2>
+  <div class="figures">
+    <div class="figure">
+      <div class="value">{{ report.total }}</div>
+      <div class="name">{% translate "Applications sent" %}</div>
+    </div>
+    <div class="figure">
+      <div class="value">{{ report.cadence.per_week|floatformat:1 }}</div>
+      <div class="name">{% translate "A week, on average" %}</div>
+    </div>
+    <div class="figure">
+      <div class="value">{{ report.cadence.longest_gap }}</div>
+      <div class="name">{% translate "Longest gap, in days" %}</div>
+    </div>
+    <div class="figure">
+      <div class="value">{{ report.cadence.empty_weeks }}</div>
+      <div class="name">{% translate "Weeks with none" %}</div>
+    </div>
+  </div>
+
+  <table class="weeks">
+    <tbody>
+      {% for week in report.cadence.weeks %}
+        <tr>
+          <td class="when">
+            {% blocktranslate with day=week.label %}Week of {{ day }}{% endblocktranslate %}
+            {% if week.partial %}<span class="part">{% translate "(part)" %}</span>{% endif %}
+          </td>
+          <td>
+            {% comment %} An inline width, which is exactly what the page may not do and this
+               may: nothing here is served to a browser, so no policy governs it, and
+               WeasyPrint has no `<progress>`. {% endcomment %}
+            <div class="bar-track">
+              <div class="bar" style="inline-size: {% widthratio week.count report.cadence.busiest 100 %}%"></div>
+            </div>
+          </td>
+          <td class="count {% if week.empty %}none{% endif %}">
+            {% if week.empty %}{% translate "none" %}{% else %}{{ week.count }}{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="note">
+    {% translate "The longest gap is measured inside this period. A period still running is counted up to the day this was produced. A week marked (part) reaches outside the period; nothing from outside it is counted." %}
+  </p>
+
+  <h2>{% translate "What came back in this period" %}</h2>
+  <div class="figures">
+    <div class="figure">
+      <div class="value">{{ report.happened.replies }}</div>
+      <div class="name">{% translate "First replies" %}</div>
+    </div>
+    <div class="figure">
+      <div class="value">{{ report.happened.interviews }}</div>
+      <div class="name">{% translate "Interviews attended" %}</div>
+    </div>
+    <div class="figure">
+      <div class="value">{{ report.happened.offers }}</div>
+      <div class="name">{% translate "Offers" %}</div>
+    </div>
+    <div class="figure">
+      <div class="value">{{ report.happened.rejections }}</div>
+      <div class="name">{% translate "Rejections" %}</div>
+    </div>
+  </div>
+  <p class="note">
+    {% translate "Counted by when it happened, so a reply in this period to an older application belongs here." %}
+  </p>
+
+  <h2>{% translate "Every application, in order" %}</h2>
+  {% if report.evidence %}
+    <table>
+      <thead>
+        <tr>
+          <th>{% translate "Applied on" %}</th>
+          <th>{% translate "Company" %}</th>
+          <th>{% translate "Role" %}</th>
+          <th>{% translate "Found via" %}</th>
+          <th>{% translate "Status" %}</th>
+          <th>{% translate "Last activity" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in report.evidence %}
+          <tr>
+            <td>{{ row.applied_on|date:"DATE_FORMAT" }}</td>
+            <td><bdi>{{ row.company }}</bdi></td>
+            <td>
+              <bdi>{{ row.role }}</bdi>
+              {% if row.url %}<div class="note"><bdi>{{ row.url }}</bdi></div>{% endif %}
+            </td>
+            <td>{% if row.source %}<bdi>{{ row.source }}</bdi>{% else %}—{% endif %}</td>
+            <td>{{ row.status }}</td>
+            <td>{% if row.last_activity_on %}{{ row.last_activity_on|date:"DATE_FORMAT" }}{% else %}—{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>{% translate "Nothing was sent in this period." %}</p>
+  {% endif %}
+  <p class="note">
+    {% translate "Applications drafted but never sent are not counted." %}
+  </p>
+
+  {% if report.sources %}
+    <h2>{% translate "Where they were found" %}</h2>
+    <table>
+      <tbody>
+        {% for row in report.sources %}
+          <tr>
+            <td><bdi>{{ row.name }}</bdi></td>
+            <td class="count">{{ row.count }} · {% widthratio row.count report.total 100 %}%</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  <p class="note">
+    {% translate "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own." %}
+  </p>
+</body>
+</html>

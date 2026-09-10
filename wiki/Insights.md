@@ -152,6 +152,13 @@ itself on a dashboard nobody had arranged, which meant an upgrade could change y
 without asking; and it could never have worked for a widget that arrived with a plugin
 rather than with a release.
 
+## A period, rather than everything
+
+Everything on this page is computed across your whole record: it can say what your response
+rate is, and not what happened in March. For a period — a month, a quarter, the last few
+weeks — with the cadence at the top and every application listed underneath, ready to hand to
+an employment office as a PDF, see **[Reports](Reports)**.
+
 ## Exporting
 
 **Export everything** takes you to a complete copy of your data — see

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 04:00+0000\n"
+"POT-Creation-Date: 2026-09-10 04:15+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: latviešu\n"
@@ -89,6 +89,14 @@ msgstr[0] "%(counter)s uzņēmums"
 msgstr[1] "%(counter)s uzņēmumi"
 msgstr[2] "%(counter)s uzņēmumu"
 
+#: src/postulo/templates/applications/report.html:117
+#, python-format, draft
+msgid "%(counter)s day"
+msgid_plural "%(counter)s days"
+msgstr[0] "%(counter)s diena"
+msgstr[1] "%(counter)s dienas"
+msgstr[2] "%(counter)s dienu"
+
 #: src/postulo/templates/applications/application_detail.html:267
 #, python-format, draft
 msgid "%(counter)s earlier"
@@ -145,6 +153,11 @@ msgid_plural "%(days)s days ago"
 msgstr[0] "pirms %(days)s dienas"
 msgstr[1] "pirms %(days)s dienām"
 msgstr[2] "pirms %(days)s dienām"
+
+#: src/postulo/applications/reports.py:106
+#, python-format, draft
+msgid "%(from)s to %(to)s"
+msgstr "%(from)s – %(to)s"
 
 #: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
 #, python-format, draft
@@ -482,6 +495,11 @@ msgstr "pirms %(when)s"
 msgid "(empty address)"
 msgstr "(tukša adrese)"
 
+#: src/postulo/templates/applications/report_print.html:99
+#, draft
+msgid "(part)"
+msgstr "(daļa)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -537,6 +555,13 @@ msgstr "Uzņēmums nevar būt pats savā sastāvā."
 msgid "A company carries one identifier per scheme."
 msgstr "Uzņēmumam ir viens identifikators katrā shēmā."
 
+#: src/postulo/templates/applications/report.html:201
+#, draft
+msgid ""
+"A company in several fields counts in each of them, so these can add up to more than everything."
+msgstr ""
+"Uzņēmums, kas darbojas vairākās nozarēs, tiek skaitīts katrā no tām, tāpēc summa var pārsniegt kopumu."
+
 #: src/postulo/templates/widgets/industries.html:37
 #, draft
 msgid "A company in several industries counts in each of them."
@@ -573,6 +598,11 @@ msgid ""
 "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr ""
 "Mobilais, fiksētā līnija, centrāle — tik, cik vērts paturēt, vienu atzīmējot kā to, kuru lietot. Dokumenti drukā tieši to."
+
+#: src/postulo/templates/applications/report.html:41
+#, draft
+msgid "A month"
+msgstr "Mēnesis"
 
 #: src/postulo/core/models.py:288
 #, draft
@@ -664,6 +694,11 @@ msgid ""
 msgstr ""
 "Python wheel (<code>.whl</code>), kas būvēts jebkurai platformai. Postulo izlasa, ko tas saka par sevi, un parāda to jums, pirms kaut kas tiek instalēts."
 
+#: src/postulo/templates/applications/report.html:42
+#, draft
+msgid "A quarter"
+msgstr "Ceturksnis"
+
 #: src/postulo/templates/server/logs.html:146
 #, draft
 msgid "A quiet log is the one you want."
@@ -683,6 +718,11 @@ msgstr "Atgādinājuma termiņš pienāk dienu iepriekš, ja tāda diena ir."
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Piezīme par to, kam tā domāta."
+
+#: src/postulo/templates/widgets/shortcuts.html:25
+#, draft
+msgid "A report on a period"
+msgstr "Pārskats par periodu"
 
 #: src/postulo/templates/core/home.html:13
 #, draft
@@ -741,6 +781,12 @@ msgid ""
 "A username is unique across the instance whoever changes it, and people can change their own under Settings."
 msgstr ""
 "Lietotājvārds ir unikāls visā instancē, lai kurš to mainītu, un katrs var mainīt savējo Iestatījumos."
+
+#: src/postulo/templates/applications/report.html:111
+#: src/postulo/templates/applications/report_print.html:81
+#, draft
+msgid "A week, on average"
+msgstr "Nedēļā, vidēji"
 
 #: src/postulo/templates/settings/dashboard.html:165
 #, draft
@@ -946,7 +992,7 @@ msgid ""
 msgstr ""
 "Pievienoti %(total)s ieraksti. Nekas netika pārrakstīts; to, kas dublējas, izdzēsiet pats."
 
-#: src/postulo/applications/views.py:392 src/postulo/applications/views.py:736
+#: src/postulo/applications/views.py:393 src/postulo/applications/views.py:820
 #, draft
 msgid "Added to the timeline."
 msgstr "Pievienots laika skalai."
@@ -961,16 +1007,17 @@ msgstr "Pievienots jūsu sludinājumiem."
 msgid "Added."
 msgstr "Pievienots."
 
+#: src/postulo/applications/reports.py:478
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Adrese"
+
 #: src/postulo/core/models.py:410 src/postulo/jobs/models.py:729
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "adrese"
-
-#: src/postulo/templates/partials/postal_addresses.html:29
-#, draft
-msgid "Address"
-msgstr "Adrese"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -1205,7 +1252,7 @@ msgstr "Pieteikums"
 msgid "Application created"
 msgstr "Pieteikums izveidots"
 
-#: src/postulo/applications/views.py:345
+#: src/postulo/applications/views.py:346
 #, draft
 msgid "Application deleted."
 msgstr "Pieteikums dzēsts."
@@ -1215,12 +1262,12 @@ msgstr "Pieteikums dzēsts."
 msgid "Application recorded from the capture."
 msgstr "Pieteikums ierakstīts no tvēruma."
 
-#: src/postulo/applications/views.py:311 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:312 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Pieteikums ierakstīts."
 
-#: src/postulo/applications/views.py:335
+#: src/postulo/applications/views.py:336
 #, draft
 msgid "Application updated."
 msgstr "Pieteikums atjaunināts."
@@ -1246,11 +1293,24 @@ msgstr "pieteikumi"
 msgid "Applications by month"
 msgstr "Pieteikumi pa mēnešiem"
 
+#: src/postulo/templates/applications/report_print.html:177
+#, draft
+msgid "Applications drafted but never sent are not counted."
+msgstr "Sagatavotie, bet nekad nenosūtītie pieteikumi netiek skaitīti."
+
+#: src/postulo/templates/applications/report.html:210
+#, draft
+msgid ""
+"Applications drafted but never sent are not counted. An employment office is asking what was sent."
+msgstr ""
+"Sagatavotie, bet nekad nenosūtītie pieteikumi netiek skaitīti. Nodarbinātības dienests jautā, kas tika nosūtīts."
+
 #: src/postulo/notifications/base.py:29
 #, draft
 msgid "Applications go quiet"
 msgstr "Pieteikumi apklust"
 
+#: src/postulo/templates/applications/report_print.html:77
 #: src/postulo/templates/widgets/insight_counters.html:17
 #, draft
 msgid "Applications sent"
@@ -1296,7 +1356,10 @@ msgstr "Pieteikts pēdējās 30 dienās"
 msgid "applied on"
 msgstr "pieteikts"
 
+#: src/postulo/applications/reports.py:474
 #: src/postulo/templates/applications/application_detail.html:137
+#: src/postulo/templates/applications/report.html:225
+#: src/postulo/templates/applications/report_print.html:149
 #, draft
 msgid "Applied on"
 msgstr "Pieteikts"
@@ -1759,7 +1822,7 @@ msgid ""
 msgstr ""
 "Šeit veiktās izmaiņas tiek nosūtītas nākamajā palaišanā; tad tiek nolasīta arī otra puse."
 
-#: src/postulo/applications/views.py:480
+#: src/postulo/applications/views.py:481
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Atgādināt %(company)s par %(role)s"
@@ -1824,7 +1887,7 @@ msgstr "Izvēlieties vismaz vienu dokumentu ierakstīšanai."
 msgid "Choose what kind of identifier this is."
 msgstr "Izvēlieties, kāda veida identifikators tas ir."
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:816
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Vispirms izvēlieties, uz kuru pieteikumu tas attiecas."
@@ -1960,8 +2023,10 @@ msgstr "Izveidotie uzņēmumi"
 msgid "Companies you have applied to"
 msgstr "Uzņēmumi, kuros esat pieteicies"
 
-#: src/postulo/applications/forms.py:43 src/postulo/applications/tables.py:27
-#: src/postulo/core/csv_import.py:38
+#: src/postulo/applications/forms.py:43 src/postulo/applications/reports.py:475
+#: src/postulo/applications/tables.py:27 src/postulo/core/csv_import.py:38
+#: src/postulo/templates/applications/report.html:226
+#: src/postulo/templates/applications/report_print.html:150
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
@@ -2176,6 +2241,20 @@ msgstr "Neizdevās lejupielādēt: %(error)s"
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Neizdevās nolasīt %(site)s: %(error)s"
 
+#: src/postulo/templates/applications/report_print.html:141
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here."
+msgstr ""
+"Skaitīts pēc tā, kad tas notika, tāpēc atbilde, kas šajā periodā pienāk uz vecāku pieteikumu, pieder šeit."
+
+#: src/postulo/templates/applications/report.html:174
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
+msgstr ""
+"Skaitīts pēc tā, kad tas notika, tāpēc atbilde, kas šajā periodā pienāk uz vecāku pieteikumu, pieder šeit. Tas ir cits jautājums nekā tas, kas tika nosūtīts, un abi tiek turēti atsevišķi."
+
 #: src/postulo/templates/widgets/interviews_summary.html:30
 #, draft
 msgid ""
@@ -2345,6 +2424,11 @@ msgstr "Piedāvātie datumi:"
 msgid "Dates written as"
 msgstr "Datumu pieraksts"
 
+#: src/postulo/templates/applications/report.html:44
+#, draft
+msgid "Dates you choose"
+msgstr "Jūsu izvēlēti datumi"
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2486,7 +2570,7 @@ msgstr "Noraidīt"
 msgid "Declined"
 msgstr "Noraidīts"
 
-#: src/postulo/applications/views.py:724
+#: src/postulo/applications/views.py:808
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Noraidīts. Tas vairs netiks ieteikts."
@@ -2710,6 +2794,16 @@ msgstr "paveikts"
 #, draft
 msgid "Download"
 msgstr "Lejupielādēt"
+
+#: src/postulo/templates/applications/report.html:20
+#, draft
+msgid "Download CSV"
+msgstr "Lejupielādēt CSV"
+
+#: src/postulo/templates/applications/report.html:23
+#, draft
+msgid "Download PDF"
+msgstr "Lejupielādēt PDF"
 
 #: src/postulo/templates/accounts/delete_account.html:41
 #: src/postulo/templates/core/export.html:36
@@ -2945,6 +3039,12 @@ msgid ""
 msgstr ""
 "Katrs konts šajā instancē. Administratori redz kontus, nekad — kāda pieteikumus vai dokumentus."
 
+#: src/postulo/templates/applications/report.html:208
+#: src/postulo/templates/applications/report_print.html:144
+#, draft
+msgid "Every application, in order"
+msgstr "Visi pieteikumi, secībā"
+
 #: src/postulo/jobs/forms.py:286
 #, draft
 msgid ""
@@ -3116,7 +3216,7 @@ msgstr ""
 "Izskaidrot, kas nogāja greizi, bieži nozīmē pateikt, ar kuru savienojumu, kuru uzņēmumu vai kuru dokumentu tas notika. Šeit nav neviena dokumenta satura, bet izturieties pret šo lapu tāpat kā pret pārējo instanci, pirms kaut ko no tās kopīgojat."
 
 #: src/postulo/templates/core/export.html:8
-#: src/postulo/templates/widgets/shortcuts.html:25
+#: src/postulo/templates/widgets/shortcuts.html:28
 #, draft
 msgid "Export everything"
 msgstr "Eksportēt visu"
@@ -3272,6 +3372,12 @@ msgstr "Vārds"
 msgid "first name"
 msgstr "vārds"
 
+#: src/postulo/templates/applications/report.html:178
+#: src/postulo/templates/applications/report_print.html:125
+#, draft
+msgid "First replies"
+msgstr "Pirmās atbildes"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -3292,12 +3398,12 @@ msgstr "Sekot jūsu profilam"
 msgid "Follow-up note"
 msgstr "Piezīme pēc intervijas"
 
-#: src/postulo/applications/views.py:474
+#: src/postulo/applications/views.py:475
 #, draft
 msgid "Follow-up recorded."
 msgstr "Atgādinājums ierakstīts."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:471
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:472
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3355,7 +3461,10 @@ msgstr "Atrasts logotips vietnē %(url)s."
 msgid "Found on their website"
 msgstr "Atrasts viņu vietnē"
 
-#: src/postulo/applications/forms.py:57 src/postulo/core/csv_import.py:50
+#: src/postulo/applications/forms.py:57 src/postulo/applications/reports.py:477
+#: src/postulo/core/csv_import.py:50
+#: src/postulo/templates/applications/report.html:228
+#: src/postulo/templates/applications/report_print.html:152
 #: src/postulo/templates/jobs/posting_detail.html:81
 #, draft
 msgid "Found via"
@@ -3389,6 +3498,7 @@ msgstr "Iesaldēt un pievienot"
 msgid "from"
 msgstr "no"
 
+#: src/postulo/templates/applications/report.html:55
 #: src/postulo/templates/server/email.html:27
 #: src/postulo/templates/server/logs.html:51
 #: src/postulo/templates/server/logs.html:89
@@ -3669,10 +3779,21 @@ msgstr "Cik pieteikumu jebkad sasnieguši katru posmu, nolasīts no hronoloģija
 msgid "How many applications reached one, how many were held, and of what kind."
 msgstr "Cik pieteikumu nonāca līdz sarunai, cik notika un kāda veida."
 
+#: src/postulo/templates/applications/report.html:65
+#, draft
+msgid "How many weeks"
+msgstr "Cik nedēļu"
+
 #: src/postulo/applications/widgets.py:271
 #, draft
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Cik daudz sūtījāt mēnesi pēc mēneša, lai klusais posms būtu redzams."
+
+#: src/postulo/templates/applications/report.html:96
+#: src/postulo/templates/applications/report_print.html:73
+#, draft
+msgid "How regularly"
+msgstr "Cik regulāri"
 
 #: src/postulo/templates/core/import_csv_map.html:57
 #, draft
@@ -3999,7 +4120,7 @@ msgstr "intervija"
 msgid "Interview cancelled"
 msgstr "Intervija atcelta"
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Interview recorded."
 msgstr "Intervija ierakstīta."
@@ -4009,7 +4130,7 @@ msgstr "Intervija ierakstīta."
 msgid "Interview scheduled"
 msgstr "Intervija ieplānota"
 
-#: src/postulo/applications/views.py:555
+#: src/postulo/applications/views.py:556
 #, draft
 msgid "Interview scheduled."
 msgstr "Intervija ieplānota."
@@ -4019,7 +4140,7 @@ msgstr "Intervija ieplānota."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Intervija rīt: %(kind)s, %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:585
+#: src/postulo/applications/views.py:586
 #, draft
 msgid "Interview updated."
 msgstr "Intervija atjaunināta."
@@ -4045,6 +4166,12 @@ msgstr "intervijas"
 #, draft
 msgid "Interviews"
 msgstr "Intervijas"
+
+#: src/postulo/templates/applications/report.html:182
+#: src/postulo/templates/applications/report_print.html:129
+#, draft
+msgid "Interviews attended"
+msgstr "Apmeklētās pārrunas"
 
 #: src/postulo/accounts/models.py:505
 #, draft
@@ -4160,6 +4287,16 @@ msgstr "darba sludinājums"
 msgid "job postings"
 msgstr "darba sludinājumi"
 
+#: src/postulo/templates/applications/report_print.html:65
+#, draft
+msgid "Job search report"
+msgstr "Darba meklējumu pārskats"
+
+#: src/postulo/templates/applications/report_print.html:23
+#, python-format, draft
+msgid "Job search report · %(period)s"
+msgstr "Darba meklējumu pārskats · %(period)s"
+
 #: src/postulo/applications/forms.py:44
 #, draft
 msgid "Job title"
@@ -4220,6 +4357,7 @@ msgid "kind"
 msgstr "veids"
 
 #: src/postulo/templates/accounts/profile.html:126
+#: src/postulo/templates/applications/report.html:39
 #: src/postulo/templates/jobs/company_form.html:67
 #: src/postulo/templates/partials/phone_numbers.html:40
 #: src/postulo/templates/partials/postal_addresses.html:60
@@ -4323,7 +4461,10 @@ msgstr ""
 msgid "Largest page read"
 msgstr "Lielākā nolasītā lapa"
 
+#: src/postulo/applications/reports.py:480
 #: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:75
+#: src/postulo/templates/applications/report.html:230
+#: src/postulo/templates/applications/report_print.html:154
 #, draft
 msgid "Last activity"
 msgstr "Pēdējā aktivitāte"
@@ -4617,6 +4758,16 @@ msgstr "logotips lejupielādēts"
 msgid "Logs"
 msgstr "Žurnāli"
 
+#: src/postulo/templates/applications/report.html:115
+#, draft
+msgid "Longest gap"
+msgstr "Garākais pārtraukums"
+
+#: src/postulo/templates/applications/report_print.html:85
+#, draft
+msgid "Longest gap, in days"
+msgstr "Garākais pārtraukums, dienās"
+
 #: src/postulo/templates/applications/application_list.html:42
 #: src/postulo/templates/jobs/company_list.html:42
 #: src/postulo/templates/server/logs.html:144
@@ -4749,7 +4900,7 @@ msgstr "Padarīt par administratoru"
 msgid "Manage"
 msgstr "Pārvaldīt"
 
-#: src/postulo/templates/widgets/shortcuts.html:28
+#: src/postulo/templates/widgets/shortcuts.html:31
 #, draft
 msgid "Manage tags"
 msgstr "Pārvaldīt birkas"
@@ -4764,7 +4915,7 @@ msgstr "Ražošana"
 msgid "Map a column to Company and one to Role first."
 msgstr "Vispirms piesaistiet vienu kolonnu Uzņēmumam un vienu Amatam."
 
-#: src/postulo/applications/views.py:447
+#: src/postulo/applications/views.py:448
 #, draft
 msgid "Marked as done."
 msgstr "Atzīmēts kā paveikts."
@@ -4843,6 +4994,11 @@ msgstr "Mobilais"
 #, draft
 msgid "Money and dates"
 msgstr "Nauda un datumi"
+
+#: src/postulo/templates/applications/report.html:48
+#, draft
+msgid "Month"
+msgstr "Mēnesis"
 
 #: src/postulo/templates/core/import_csv_map.html:49
 #, draft
@@ -5295,6 +5451,12 @@ msgstr "Bezpeļņas sektors"
 msgid "None"
 msgstr "Nav"
 
+#: src/postulo/templates/applications/report.html:149
+#: src/postulo/templates/applications/report_print.html:111
+#, draft
+msgid "none"
+msgstr "neviena"
+
 #: src/postulo/templates/partials/label_attrs.html:12
 #, draft
 msgid "None chosen yet"
@@ -5384,6 +5546,7 @@ msgstr "Nav cita uzņēmuma sastāvā"
 
 #: src/postulo/applications/analytics.py:296
 #: src/postulo/applications/analytics.py:314
+#: src/postulo/applications/reports.py:446
 #, draft
 msgid "Not recorded"
 msgstr "Nav ierakstīts"
@@ -5668,6 +5831,11 @@ msgid ""
 msgstr ""
 "Nav ko likt rindā: katrs izvēlēto veidu dokuments jau ir %(label)s sarakstā."
 
+#: src/postulo/templates/applications/partials/report_tally.html:30
+#, draft
+msgid "Nothing to show for this period."
+msgstr "Šajā periodā nav ko rādīt."
+
 #: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
@@ -5704,6 +5872,18 @@ msgstr "Nekas netika instalēts."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Nekas nebija atlasīts, tāpēc nekas nemainījās."
+
+#: src/postulo/templates/applications/report_print.html:174
+#, draft
+msgid "Nothing was sent in this period."
+msgstr "Šajā periodā nekas netika nosūtīts."
+
+#: src/postulo/templates/applications/report.html:261
+#, draft
+msgid ""
+"Nothing was sent in this period. That is what the report says, and it is a fact like any other."
+msgstr ""
+"Šajā periodā nekas netika nosūtīts. To saka pārskats, un tas ir fakts tāpat kā jebkurš cits."
 
 #: src/postulo/templates/settings/dashboard.html:68
 #, draft
@@ -5762,6 +5942,8 @@ msgid "Offered only while this instance's mail is actually getting through."
 msgstr ""
 "Tiek piedāvāts tikai tik ilgi, kamēr šīs instances pasts patiešām nonāk galā."
 
+#: src/postulo/templates/applications/report.html:186
+#: src/postulo/templates/applications/report_print.html:133
 #: src/postulo/templates/widgets/industries.html:13
 #: src/postulo/templates/widgets/insight_counters.html:33
 #: src/postulo/templates/widgets/sources.html:13
@@ -5828,6 +6010,14 @@ msgstr "Reizi dienā"
 msgid "One achievement per line."
 msgstr "Viens sasniegums rindā."
 
+#: src/postulo/templates/applications/report.html:98
+#, python-format, draft
+msgid "One application sent in this period."
+msgid_plural "%(counter)s applications sent in this period."
+msgstr[0] "Viens pieteikums nosūtīts šajā periodā."
+msgstr[1] "%(counter)s pieteikumi nosūtīti šajā periodā."
+msgstr[2] "%(counter)s pieteikumu nosūtīts šajā periodā."
+
 #: src/postulo/templates/jobs/listing_list.html:23
 #, python-format, draft
 msgid "One capture waiting for review"
@@ -5835,6 +6025,14 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Viens tvērums gaida pārskatīšanu"
 msgstr[1] "%(counter)s tvērumi gaida pārskatīšanu"
 msgstr[2] "%(counter)s tvērumu gaida pārskatīšanu"
+
+#: src/postulo/templates/applications/report.html:212
+#, python-format, draft
+msgid "One draft in this period is left out."
+msgid_plural "%(counter)s drafts in this period are left out."
+msgstr[0] "Viens šī perioda melnraksts ir atstāts ārpusē."
+msgstr[1] "%(counter)s šī perioda melnraksti ir atstāti ārpusē."
+msgstr[2] "%(counter)s šī perioda melnrakstu ir atstāts ārpusē."
 
 #: src/postulo/templates/connections/list.html:81
 #, python-format, draft
@@ -6039,6 +6237,11 @@ msgstr "Citas nozares"
 msgid "Other languages"
 msgstr "Citas valodas"
 
+#: src/postulo/templates/applications/report.html:77
+#, draft
+msgid "Other periods"
+msgstr "Citi periodi"
+
 #: src/postulo/applications/models.py:485
 #, draft
 msgid "outcome"
@@ -6212,6 +6415,11 @@ msgstr "Gadā"
 #, draft
 msgid "Period"
 msgstr "Periods"
+
+#: src/postulo/templates/applications/report_print.html:68
+#, python-format, draft
+msgid "Period: %(period)s"
+msgstr "Periods: %(period)s"
 
 #: src/postulo/accounts/admin.py:24
 #, draft
@@ -6507,6 +6715,13 @@ msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
 msgstr ""
 "Postulo vēl nepublicē nevienu katalogu. No šejienes nekas netiek lejupielādēts."
 
+#: src/postulo/templates/applications/report.html:267
+#, draft
+msgid ""
+"Postulo sets no target. How many applications a period should hold is a benefit regime's rule or your own, never this software's."
+msgstr ""
+"Postulo neizvirza nekādu mērķi. Cik pieteikumu periodā jābūt, ir pabalstu sistēmas vai jūsu pašu noteikums, nekad šīs programmatūras."
+
 #: src/postulo/templates/api/token_list.html:23
 #, draft
 msgid ""
@@ -6589,6 +6804,18 @@ msgstr "prioritāte"
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Privātas un lokālas adreses tiek noraidītas."
+
+#: src/postulo/templates/applications/report_print.html:195
+#, draft
+msgid ""
+"Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
+msgstr ""
+"Sagatavojis Postulo no šīs personas pašas ierakstiem. Postulo neizvirza nekādu mērķi: cik pieteikumu periodā jābūt, ir pabalstu sistēmas vai pašas personas noteikums."
+
+#: src/postulo/templates/applications/report_print.html:70
+#, python-format, draft
+msgid "Produced on %(produced)s"
+msgstr "Sagatavots %(produced)s"
 
 #: src/postulo/resume/models.py:199
 #, draft
@@ -6682,6 +6909,11 @@ msgstr "Publikācija"
 #, draft
 msgid "Putting it back"
 msgstr "Atlikšana atpakaļ"
+
+#: src/postulo/applications/reports.py:102
+#, python-format, draft
+msgid "Q%(quarter)s %(year)s"
+msgstr "%(year)s. gada %(quarter)s. ceturksnis"
 
 #: src/postulo/resume/models.py:95
 #, draft
@@ -6867,12 +7099,12 @@ msgid ""
 msgstr ""
 "Tiek pierakstīts visam, kas no šejienes uzstādīts, tāpēc vēlāk to nevar mainīt, neatdalot uzstādīto."
 
-#: src/postulo/applications/views.py:606
+#: src/postulo/applications/views.py:607
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Ierakstīts kā atcelts."
 
-#: src/postulo/applications/views.py:605
+#: src/postulo/applications/views.py:606
 #, draft
 msgid "Recorded as held."
 msgstr "Ierakstīts kā notikusi."
@@ -6892,7 +7124,7 @@ msgstr "ierakstīts"
 msgid "Recorded what you sent."
 msgstr "Ierakstīts, ko nosūtījāt."
 
-#: src/postulo/applications/views.py:607
+#: src/postulo/applications/views.py:608
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Ierakstīts: neviens neieradās."
@@ -6985,6 +7217,12 @@ msgstr "Noraidīts"
 #, draft
 msgid "Rejection received"
 msgstr "Atteikums saņemts"
+
+#: src/postulo/templates/applications/report.html:190
+#: src/postulo/templates/applications/report_print.html:137
+#, draft
+msgid "Rejections"
+msgstr "Atteikumi"
 
 #: src/postulo/applications/forms.py:281
 #, draft
@@ -7096,6 +7334,11 @@ msgid ""
 msgstr ""
 "Atbildēts, noraidīts, apklusa, vēl gaida — kas notika ar to, ko nosūtījāt."
 
+#: src/postulo/templates/applications/report.html:4
+#, python-format, draft
+msgid "Report · %(period)s"
+msgstr "Pārskats · %(period)s"
+
 #: src/postulo/jobs/industries.py:75
 #, draft
 msgid "Research"
@@ -7180,7 +7423,10 @@ msgstr "robots.txt pašlaik tiek ievērots."
 msgid "robots.txt is currently ignored."
 msgstr "robots.txt pašlaik tiek ignorēts."
 
+#: src/postulo/applications/reports.py:476
 #: src/postulo/applications/tables.py:19
+#: src/postulo/templates/applications/report.html:227
+#: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
 #: src/postulo/templates/jobs/listing_list.html:70
 #: src/postulo/templates/server/people.html:35
@@ -7495,6 +7741,7 @@ msgstr "Sūtīšana savā vārdā"
 msgid "Sending failed: %(error)s"
 msgstr "Sūtīšana neizdevās: %(error)s"
 
+#: src/postulo/templates/applications/report.html:107
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
@@ -7680,6 +7927,11 @@ msgstr "Rādīt navigācijā"
 msgid "Show past too"
 msgstr "Rādīt arī pagājušās"
 
+#: src/postulo/templates/applications/report.html:72
+#, draft
+msgid "Show this period"
+msgstr "Rādīt šo periodu"
+
 #: src/postulo/core/models.py:504
 #, draft
 msgid "Shown in the header and on the sign-in page."
@@ -7822,7 +8074,7 @@ msgstr "SMTP serveris"
 msgid "Snooze"
 msgstr "Atlikt"
 
-#: src/postulo/applications/views.py:488
+#: src/postulo/applications/views.py:489
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Atlikts par divām nedēļām."
@@ -7953,11 +8205,14 @@ msgid "State"
 msgstr "Stāvoklis"
 
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:224
+#: src/postulo/applications/reports.py:479
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
 #: src/postulo/templates/applications/application_detail.html:48
 #: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
+#: src/postulo/templates/applications/report.html:229
+#: src/postulo/templates/applications/report_print.html:153
 #: src/postulo/templates/core/import_csv_map.html:66
 #, draft
 msgid "Status"
@@ -7980,7 +8235,7 @@ msgstr "Statusa maiņa"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Statuss izklājlapā: %(text)s"
 
-#: src/postulo/applications/views.py:363
+#: src/postulo/applications/views.py:364
 #, draft
 msgid "Status updated."
 msgstr "Statuss atjaunināts."
@@ -8365,7 +8620,7 @@ msgstr "Tas neizskatās pēc %(scheme)s identifikatora (piemēram, %(example)s).
 msgid "That does not look like a complete web address."
 msgstr "Tas neizskatās pēc pilnas tīmekļa adreses."
 
-#: src/postulo/applications/views.py:394
+#: src/postulo/applications/views.py:395
 #, draft
 msgid "That entry could not be saved."
 msgstr "Šo ierakstu nevarēja saglabāt."
@@ -8438,7 +8693,7 @@ msgstr "Tās ir daudz atkopšanas saišu. Mēģiniet drīz vēlreiz."
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Tas ir SVG, ko Postulo vēl neglabā. Der PNG vai JPEG."
 
-#: src/postulo/applications/views.py:365
+#: src/postulo/applications/views.py:366
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Tas nav statuss, ko Postulo atpazīst."
@@ -8458,17 +8713,17 @@ msgstr "Tas nav logrīks, ko Postulo pazīst."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Šī nav Ed25519 publiskā atslēga: %(error)s"
 
-#: src/postulo/applications/views.py:599
+#: src/postulo/applications/views.py:600
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Tas nav iznākums, ko Postulo atpazīst."
 
-#: src/postulo/applications/views.py:490
+#: src/postulo/applications/views.py:491
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Postulo to nevar ar to izdarīt."
 
-#: src/postulo/applications/views.py:179 src/postulo/jobs/views.py:124
+#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:124
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "To Postulo nevar izdarīt vairākiem uzreiz."
@@ -8568,7 +8823,7 @@ msgstr "Šis spraudnis vairs nav instalēts."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Šī atbilde nenāca no pieprasījuma, ko veica Postulo."
 
-#: src/postulo/applications/views.py:719
+#: src/postulo/applications/views.py:803
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Uz šo ieteikumu jau ir atbildēts."
@@ -8748,6 +9003,11 @@ msgstr ""
 msgid "The language you read Postulo in"
 msgstr "Valoda, kurā jūs lasāt Postulo"
 
+#: src/postulo/templates/applications/report.html:43
+#, draft
+msgid "The last few weeks"
+msgstr "Dažas pēdējās nedēļas"
+
 #: src/postulo/templates/server/email.html:62
 #, python-format, draft
 msgid "The last message this instance tried to send failed, at %(when)s."
@@ -8785,6 +9045,20 @@ msgstr "Logotipa vairs nav."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logotips netika mainīts: %(problem)s"
 
+#: src/postulo/templates/applications/report.html:167
+#, draft
+msgid ""
+"The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
+msgstr ""
+"Garākais pārtraukums tiek mērīts šī perioda iekšienē, tāpēc klusums, kas sākās pirms tam, tajā netiek ienests. Periods, kas vēl turpinās, tiek skaitīts tikai līdz šodienai."
+
+#: src/postulo/templates/applications/report_print.html:118
+#, draft
+msgid ""
+"The longest gap is measured inside this period. A period still running is counted up to the day this was produced. A week marked (part) reaches outside the period; nothing from outside it is counted."
+msgstr ""
+"Garākais pārtraukums tiek mērīts šī perioda iekšienē. Periods, kas vēl turpinās, tiek skaitīts līdz dienai, kad tas tika sagatavots. Nedēļa, kas atzīmēta ar (daļa), sniedzas ārpus perioda; nekas no ārpuses netiek skaitīts."
+
 #: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
@@ -8813,6 +9087,16 @@ msgstr ""
 msgid "The official repository is emptied, not removed."
 msgstr "Oficiālais repozitorijs tiek iztukšots, nevis noņemts."
 
+#: src/postulo/templates/applications/report.html:83
+#, draft
+msgid "The one after"
+msgstr "Nākamais"
+
+#: src/postulo/templates/applications/report.html:79
+#, draft
+msgid "The one before"
+msgstr "Iepriekšējais"
+
 #: src/postulo/documents/models.py:87
 #, draft
 msgid "The opening paragraph, if you use one."
@@ -8839,6 +9123,11 @@ msgstr "Spraudņi, kas nāk Postulo komplektā. Nekas netiek lejupielādēts."
 #, draft
 msgid "The posting"
 msgstr "Sludinājums"
+
+#: src/postulo/templates/applications/report.html:245
+#, draft
+msgid "the posting"
+msgstr "sludinājums"
 
 #: src/postulo/templates/applications/application_intake.html:64
 #: src/postulo/templates/jobs/capture_review.html:58
@@ -9121,6 +9410,11 @@ msgstr "Šis ielūgums ir adresēts %(email)s. Lūdzu, reģistrējieties ar šo 
 msgid "This invitation may only be used with the address it was sent to."
 msgstr "Šo ielūgumu var izmantot tikai ar adresi, uz kuru tas nosūtīts."
 
+#: src/postulo/templates/applications/report.html:88
+#, draft
+msgid "This is the most recent period."
+msgstr "Šis ir jaunākais periods."
+
 #: src/postulo/templates/server/plugins.html:311
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -9249,6 +9543,11 @@ msgstr "Nosaukums, uzņēmums vai atrašanās vieta"
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS no pirmā baita"
+
+#: src/postulo/templates/applications/report.html:59
+#, draft
+msgid "To"
+msgstr "Līdz"
 
 #: src/postulo/templates/partials/table/head.html:101
 #, draft
@@ -9545,6 +9844,11 @@ msgstr "Izmantota"
 msgid "used at"
 msgstr "izmantota"
 
+#: src/postulo/templates/applications/report.html:51
+#, draft
+msgid "Used for a month, and for the quarter that month falls in."
+msgstr "Izmanto mēnesim un ceturksnim, kurā šis mēnesis iekrīt."
+
 #: src/postulo/accounts/models.py:124 src/postulo/accounts/models.py:250
 #, draft
 msgid "user"
@@ -9698,6 +10002,23 @@ msgstr "vietne"
 msgid "Website"
 msgstr "Vietne"
 
+#: src/postulo/templates/applications/report.html:135
+#: src/postulo/templates/applications/report.html:161
+#: src/postulo/templates/applications/report_print.html:98
+#, python-format, draft
+msgid "Week of %(day)s"
+msgstr "Nedēļa no %(day)s"
+
+#: src/postulo/templates/applications/report.html:125
+#, draft
+msgid "Weeks in a row, up to now"
+msgstr "Nedēļas pēc kārtas, līdz šim"
+
+#: src/postulo/templates/applications/report_print.html:89
+#, draft
+msgid "Weeks with none"
+msgstr "Nedēļas bez nevienas"
+
 #: src/postulo/templates/core/dashboard.html:38
 #, python-format, draft
 msgid "Welcome back, %(name)s"
@@ -9727,6 +10048,16 @@ msgstr "kas monitoram jāaptaujā"
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "Ar ko sākas jauns konts. Katrs var mainīt savējo."
+
+#: src/postulo/templates/applications/report.html:172
+#, draft
+msgid "What came back"
+msgstr "Kas atgriezās"
+
+#: src/postulo/templates/applications/report_print.html:121
+#, draft
+msgid "What came back in this period"
+msgstr "Kas atgriezās šajā periodā"
 
 #: src/postulo/core/server_forms.py:316
 #, draft
@@ -9804,6 +10135,11 @@ msgstr "ko tas saka"
 msgid "What it says it is"
 msgstr "Kas tas, pēc paša teiktā, ir"
 
+#: src/postulo/templates/applications/report.html:200
+#, draft
+msgid "What kind of employer"
+msgstr "Kāda veida darba devējs"
+
 #: src/postulo/applications/widgets.py:25
 #: src/postulo/core/widgets_builtin.py:22
 #, draft
@@ -9875,6 +10211,13 @@ msgstr "Kā to saukt"
 #, draft
 msgid "what to do"
 msgstr "kas jādara"
+
+#: src/postulo/templates/applications/report.html:15
+#, draft
+msgid ""
+"What was sent, how regularly, and what came back. Nothing outside the period is counted."
+msgstr ""
+"Kas tika nosūtīts, cik regulāri un kas atgriezās. Nekas ārpus perioda netiek skaitīts."
 
 #: src/postulo/templates/accounts/delete_account.html:18
 #, draft
@@ -9955,6 +10298,12 @@ msgstr "Kur publicēts parakstītais indekss. Paraksts atrodas blakus."
 msgid "Where they came from"
 msgstr "No kurienes tie nāca"
 
+#: src/postulo/templates/applications/report.html:198
+#: src/postulo/templates/applications/report_print.html:181
+#, draft
+msgid "Where they were found"
+msgstr "Kur tie tika atrasti"
+
 #: src/postulo/applications/widgets.py:121
 #, draft
 msgid "Where things stand"
@@ -10031,6 +10380,11 @@ msgstr ""
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Kura Postulo daļa to radīja: tīmekļa saskarne vai API."
+
+#: src/postulo/templates/applications/report.html:36
+#, draft
+msgid "Which period"
+msgstr "Kurš periods"
 
 #: src/postulo/templates/connections/pick.html:7
 #, draft
@@ -10398,7 +10752,7 @@ msgstr "Jūsu termiņš"
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
 #: src/postulo/templates/base.html:105
-#: src/postulo/templates/widgets/shortcuts.html:31
+#: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"
 msgstr "Jūsu dati"
@@ -10417,6 +10771,11 @@ msgstr "Jūsu Gravatar ir iegūts vēlreiz."
 #, draft
 msgid "Your initials"
 msgstr "Jūsu iniciāļi"
+
+#: src/postulo/templates/applications/report.html:10
+#, python-format, draft
+msgid "Your job search in %(period)s"
+msgstr "Jūsu darba meklējumi %(period)s"
 
 #: src/postulo/core/views.py:67
 #, draft
@@ -10496,6 +10855,16 @@ msgstr "{label} noņemta"
 #, draft
 msgid "{label} — new"
 msgstr "{label} — jauna"
+
+#: src/postulo/templates/applications/report.html:144
+#, draft
+msgid "· part of this week is outside the period"
+msgstr "· daļa šīs nedēļas ir ārpus perioda"
+
+#: src/postulo/templates/applications/report.html:137
+#, draft
+msgid "· still running"
+msgstr "· vēl turpinās"
 
 #: src/postulo/core/server_views.py:1024
 #, python-format, draft

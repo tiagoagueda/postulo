@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% blocktranslate with period=period.label %}Report · {{ period }}{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+  <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="mb-1 text-2xl font-semibold tracking-tight">
+        {% blocktranslate with period=period.label trimmed %}
+          Your job search in {{ period }}
+        {% endblocktranslate %}
+      </h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "What was sent, how regularly, and what came back. Nothing outside the period is counted." %}
+      </p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <a href="{% url 'applications:report_csv' %}?{{ request.GET.urlencode }}" class="btn-ghost">
+        {% translate "Download CSV" %}
+      </a>
+      <a href="{% url 'applications:report_pdf' %}?{{ request.GET.urlencode }}" class="btn-primary">
+        {% translate "Download PDF" %}
+      </a>
+    </div>
+  </div>
+
+  {% comment %} The period lives in the address, which makes it a question rather than a
+     preference -- the line this project already draws for a table's sort and filters. A
+     report for a particular month is a thing to bookmark and to send to somebody, and the
+     same address next year gives the same page back (#56).
+  {% endcomment %}
+  <form method="get" class="card mb-6">
+    <fieldset>
+      <legend class="mb-3 font-medium">{% translate "Which period" %}</legend>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label class="field-label" for="report-period">{% translate "Kind" %}</label>
+          <select name="period" id="report-period" class="field-input">
+            <option value="month" {% if kind == 'month' %}selected{% endif %}>{% translate "A month" %}</option>
+            <option value="quarter" {% if kind == 'quarter' %}selected{% endif %}>{% translate "A quarter" %}</option>
+            <option value="weeks" {% if kind == 'weeks' %}selected{% endif %}>{% translate "The last few weeks" %}</option>
+            <option value="custom" {% if kind == 'custom' %}selected{% endif %}>{% translate "Dates you choose" %}</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="report-month">{% translate "Month" %}</label>
+          <input type="month" name="on" id="report-month" value="{{ on_month }}" class="field-input">
+          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+            {% translate "Used for a month, and for the quarter that month falls in." %}
+          </p>
+        </div>
+        <div>
+          <label class="field-label" for="report-from">{% translate "From" %}</label>
+          <input type="date" name="from" id="report-from" value="{{ period.start|date:'Y-m-d' }}" class="field-input">
+        </div>
+        <div>
+          <label class="field-label" for="report-to">{% translate "To" %}</label>
+          <input type="date" name="to" id="report-to" value="{{ period.end|date:'Y-m-d' }}" class="field-input">
+        </div>
+      </div>
+      <div class="mt-4 flex flex-wrap items-center gap-3">
+        <div>
+          <label class="field-label" for="report-weeks">{% translate "How many weeks" %}</label>
+          <select name="weeks" id="report-weeks" class="field-input">
+            {% for choice in week_choices %}
+              <option value="{{ choice }}" {% if choice == weeks %}selected{% endif %}>{{ choice }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn-primary mt-5">{% translate "Show this period" %}</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <nav class="mb-6 flex flex-wrap items-center gap-3 text-sm" aria-label="{% translate 'Other periods' %}">
+    {% if earlier %}
+      <a href="?{{ earlier }}" class="btn-ghost">{% translate "The one before" %}</a>
+    {% endif %}
+    <span class="font-medium">{{ period.label }}</span>
+    {% if later %}
+      <a href="?{{ later }}" class="btn-ghost">{% translate "The one after" %}</a>
+    {% else %}
+      {% comment %} No link into the future. A report about next month is a blank page
+         pretending to be a document. {% endcomment %}
+      <span class="text-ink-500 dark:text-ink-400">{% translate "This is the most recent period." %}</span>
+    {% endif %}
+  </nav>
+
+  {% comment %} Regularity is what the report is named for, so the cadence is the top of the
+     page rather than a summary underneath the list. {% endcomment %}
+  <section class="card mb-6" aria-labelledby="cadence-heading">
+    <h2 id="cadence-heading" class="mb-1 text-lg font-medium">{% translate "How regularly" %}</h2>
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate count counter=report.total trimmed %}
+        One application sent in this period.
+      {% plural %}
+        {{ counter }} applications sent in this period.
+      {% endblocktranslate %}
+    </p>
+
+    <dl class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Sent" %}</dt>
+        <dd class="text-2xl font-semibold tabular-nums">{{ report.total }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "A week, on average" %}</dt>
+        <dd class="text-2xl font-semibold tabular-nums">{{ report.cadence.per_week|floatformat:1 }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Longest gap" %}</dt>
+        <dd class="text-2xl font-semibold tabular-nums">
+          {% blocktranslate count counter=report.cadence.longest_gap trimmed %}
+            {{ counter }} day
+          {% plural %}
+            {{ counter }} days
+          {% endblocktranslate %}
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Weeks in a row, up to now" %}</dt>
+        <dd class="text-2xl font-semibold tabular-nums">{{ report.cadence.current_run }}</dd>
+      </div>
+    </dl>
+
+    <ul class="space-y-3">
+      {% for week in report.cadence.weeks %}
+        <li>
+          <div class="mb-1 flex items-baseline justify-between gap-3 text-sm">
+            <span>
+              {% blocktranslate with day=week.label trimmed %}Week of {{ day }}{% endblocktranslate %}
+              {% if week.in_progress %}
+                <span class="text-xs text-ink-500 dark:text-ink-400">{% translate "· still running" %}</span>
+              {% elif week.partial %}
+                {% comment %} A month rarely begins on the first day of a week, so the bars
+                   at each end cover fewer days than the rest. Said rather than hidden: a
+                   short bar that is short because the week was short misleads otherwise.
+                {% endcomment %}
+                <span class="text-xs text-ink-500 dark:text-ink-400">{% translate "· part of this week is outside the period" %}</span>
+              {% endif %}
+            </span>
+            <span class="tabular-nums {% if week.empty %}text-ink-500 dark:text-ink-400{% endif %}">
+              {% if week.empty %}
+                {% translate "none" %}
+              {% else %}
+                {{ week.count }}
+              {% endif %}
+            </span>
+          </div>
+          {% comment %} A real progress element: its value is an attribute rather than a
+             style, which the content security policy needs, and a screen reader announces
+             it with its value. An empty week says "none" in words beside a bar of zero
+             length, so it is marked without depending on colour. {% endcomment %}
+          <progress class="funnel-bar" value="{{ week.count }}" max="{{ report.cadence.busiest }}"
+                    aria-label="{% blocktranslate with day=week.label %}Week of {{ day }}{% endblocktranslate %}">{{ week.count }}</progress>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today." %}
+    </p>
+  </section>
+
+  <section class="card mb-6" aria-labelledby="happened-heading">
+    <h2 id="happened-heading" class="mb-1 text-lg font-medium">{% translate "What came back" %}</h2>
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart." %}
+    </p>
+    <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "First replies" %}</dt>
+        <dd class="text-2xl font-semibold tabular-nums">{{ report.happened.replies }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Interviews attended" %}</dt>
+        <dd class="text-2xl font-semibold tabular-nums">{{ report.happened.interviews }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Offers" %}</dt>
+        <dd class="text-2xl font-semibold tabular-nums">{{ report.happened.offers }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Rejections" %}</dt>
+        <dd class="text-2xl font-semibold tabular-nums">{{ report.happened.rejections }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  {% if report.sources or report.industries %}
+    <div class="mb-6 grid gap-6 lg:grid-cols-2">
+      {% translate "Where they were found" as found_heading %}
+      {% include "applications/partials/report_tally.html" with rows=report.sources total=report.total heading=found_heading %}
+      {% translate "What kind of employer" as kind_heading %}
+      {% translate "A company in several fields counts in each of them, so these can add up to more than everything." as kind_note %}
+      {% include "applications/partials/report_tally.html" with rows=report.industries total=report.total heading=kind_heading note=kind_note %}
+    </div>
+  {% endif %}
+
+  <section class="card p-0" aria-labelledby="evidence-heading">
+    <div class="border-b border-ink-100 px-4 py-3 dark:border-ink-800">
+      <h2 id="evidence-heading" class="font-medium">{% translate "Every application, in order" %}</h2>
+      <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Applications drafted but never sent are not counted. An employment office is asking what was sent." %}
+        {% if report.drafts %}
+          {% blocktranslate count counter=report.drafts trimmed %}
+            One draft in this period is left out.
+          {% plural %}
+            {{ counter }} drafts in this period are left out.
+          {% endblocktranslate %}
+        {% endif %}
+      </p>
+    </div>
+    {% if report.evidence %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
+            <tr>
+              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Applied on" %}</th>
+              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Company" %}</th>
+              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Role" %}</th>
+              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Found via" %}</th>
+              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Status" %}</th>
+              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Last activity" %}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for row in report.evidence %}
+              <tr>
+                <td class="whitespace-nowrap px-4 py-3 tabular-nums">{{ row.applied_on|date:"DATE_FORMAT" }}</td>
+                <td class="px-4 py-3"><bdi>{{ row.company }}</bdi></td>
+                <td class="px-4 py-3">
+                  <a href="{% url 'applications:detail' row.pk %}" class="text-brand-600 underline dark:text-brand-400">
+                    <bdi>{{ row.role }}</bdi>
+                  </a>
+                  {% if row.url %}
+                    <a href="{{ row.url }}" rel="noopener noreferrer nofollow" target="_blank"
+                       class="ms-1 text-xs text-ink-500 underline dark:text-ink-400">
+                      {% translate "the posting" %}
+                    </a>
+                  {% endif %}
+                </td>
+                <td class="px-4 py-3">{% if row.source %}<bdi>{{ row.source }}</bdi>{% else %}—{% endif %}</td>
+                <td class="px-4 py-3">{{ row.status }}</td>
+                <td class="whitespace-nowrap px-4 py-3 tabular-nums">
+                  {% if row.last_activity_on %}{{ row.last_activity_on|date:"DATE_FORMAT" }}{% else %}—{% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="px-4 py-6 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Nothing was sent in this period. That is what the report says, and it is a fact like any other." %}
+      </p>
+    {% endif %}
+  </section>
+
+  <p class="mt-6 text-xs text-ink-500 dark:text-ink-400">
+    {% translate "Postulo sets no target. How many applications a period should hold is a benefit regime's rule or your own, never this software's." %}
+  </p>
+{% endblock %}

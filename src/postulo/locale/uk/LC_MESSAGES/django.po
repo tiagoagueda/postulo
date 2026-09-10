@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 04:00+0000\n"
+"POT-Creation-Date: 2026-09-10 04:15+0000\n"
 "PO-Revision-Date: 2026-09-08 10:23+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: українська\n"
@@ -92,6 +92,14 @@ msgstr[0] "%(counter)s компанія"
 msgstr[1] "%(counter)s компанії"
 msgstr[2] "%(counter)s компаній"
 
+#: src/postulo/templates/applications/report.html:117
+#, python-format, draft
+msgid "%(counter)s day"
+msgid_plural "%(counter)s days"
+msgstr[0] "%(counter)s день"
+msgstr[1] "%(counter)s дні"
+msgstr[2] "%(counter)s днів"
+
 #: src/postulo/templates/applications/application_detail.html:267
 #, python-format, draft
 msgid "%(counter)s earlier"
@@ -148,6 +156,11 @@ msgid_plural "%(days)s days ago"
 msgstr[0] "%(days)s день тому"
 msgstr[1] "%(days)s дні тому"
 msgstr[2] "%(days)s днів тому"
+
+#: src/postulo/applications/reports.py:106
+#, python-format, draft
+msgid "%(from)s to %(to)s"
+msgstr "%(from)s – %(to)s"
 
 #: src/postulo/core/destinations.py:57 src/postulo/core/destinations.py:70
 #, python-format, draft
@@ -486,6 +499,11 @@ msgstr "%(when)s тому"
 msgid "(empty address)"
 msgstr "(порожня адреса)"
 
+#: src/postulo/templates/applications/report_print.html:99
+#, draft
+msgid "(part)"
+msgstr "(частина)"
+
 #: src/postulo/templates/core/import_csv_map.html:8
 #, python-format, draft
 msgid ""
@@ -541,6 +559,13 @@ msgstr "Компанія не може бути частиною самої се
 msgid "A company carries one identifier per scheme."
 msgstr "Компанія має один ідентифікатор на схему."
 
+#: src/postulo/templates/applications/report.html:201
+#, draft
+msgid ""
+"A company in several fields counts in each of them, so these can add up to more than everything."
+msgstr ""
+"Компанія, що працює в кількох галузях, рахується в кожній із них, тож сума може перевищити ціле."
+
 #: src/postulo/templates/widgets/industries.html:37
 #, draft
 msgid "A company in several industries counts in each of them."
@@ -577,6 +602,11 @@ msgid ""
 "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr ""
 "Мобільний, стаціонарна лінія, комутатор — стільки, скільки варто зберігати, з одним позначеним як той, що використовується. Документи друкують саме його."
+
+#: src/postulo/templates/applications/report.html:41
+#, draft
+msgid "A month"
+msgstr "Місяць"
 
 #: src/postulo/core/models.py:288
 #, draft
@@ -668,6 +698,11 @@ msgid ""
 msgstr ""
 "Колесо Python (<code>.whl</code>), зібране для будь-якої платформи. Postulo читає те, що воно каже про себе, і показує це вам, перш ніж щось встановити."
 
+#: src/postulo/templates/applications/report.html:42
+#, draft
+msgid "A quarter"
+msgstr "Квартал"
+
 #: src/postulo/templates/server/logs.html:146
 #, draft
 msgid "A quiet log is the one you want."
@@ -687,6 +722,11 @@ msgstr "Нагадування настає за день наперед, кол
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Нагадування про те, для кого це."
+
+#: src/postulo/templates/widgets/shortcuts.html:25
+#, draft
+msgid "A report on a period"
+msgstr "Звіт за період"
 
 #: src/postulo/templates/core/home.html:13
 #, draft
@@ -744,6 +784,12 @@ msgid ""
 "A username is unique across the instance whoever changes it, and people can change their own under Settings."
 msgstr ""
 "Ім’я користувача унікальне в межах інстанції, хто б його не змінював, і люди можуть змінити своє в налаштуваннях."
+
+#: src/postulo/templates/applications/report.html:111
+#: src/postulo/templates/applications/report_print.html:81
+#, draft
+msgid "A week, on average"
+msgstr "На тиждень, у середньому"
 
 #: src/postulo/templates/settings/dashboard.html:165
 #, draft
@@ -949,7 +995,7 @@ msgid ""
 msgstr ""
 "Додано %(total)s записів. Нічого не перезаписано; усе, що продублювалося, ви можете видалити самі."
 
-#: src/postulo/applications/views.py:392 src/postulo/applications/views.py:736
+#: src/postulo/applications/views.py:393 src/postulo/applications/views.py:820
 #, draft
 msgid "Added to the timeline."
 msgstr "Додано до стрічки."
@@ -964,16 +1010,17 @@ msgstr "Додано до ваших вакансій."
 msgid "Added."
 msgstr "Додано."
 
+#: src/postulo/applications/reports.py:478
+#: src/postulo/templates/partials/postal_addresses.html:29
+#, draft
+msgid "Address"
+msgstr "Адреса"
+
 #: src/postulo/core/models.py:410 src/postulo/jobs/models.py:729
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "адреса"
-
-#: src/postulo/templates/partials/postal_addresses.html:29
-#, draft
-msgid "Address"
-msgstr "Адреса"
 
 #: src/postulo/templates/server/people.html:54
 #, draft
@@ -1208,7 +1255,7 @@ msgstr "Заявка"
 msgid "Application created"
 msgstr "Заявку створено"
 
-#: src/postulo/applications/views.py:345
+#: src/postulo/applications/views.py:346
 #, draft
 msgid "Application deleted."
 msgstr "Заявку видалено."
@@ -1218,12 +1265,12 @@ msgstr "Заявку видалено."
 msgid "Application recorded from the capture."
 msgstr "Заявку записано із захоплення."
 
-#: src/postulo/applications/views.py:311 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:312 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Заявку записано."
 
-#: src/postulo/applications/views.py:335
+#: src/postulo/applications/views.py:336
 #, draft
 msgid "Application updated."
 msgstr "Заявку оновлено."
@@ -1249,11 +1296,24 @@ msgstr "заявки"
 msgid "Applications by month"
 msgstr "Заявки за місяцями"
 
+#: src/postulo/templates/applications/report_print.html:177
+#, draft
+msgid "Applications drafted but never sent are not counted."
+msgstr "Заявки, які написані, але ніколи не надіслані, не рахуються."
+
+#: src/postulo/templates/applications/report.html:210
+#, draft
+msgid ""
+"Applications drafted but never sent are not counted. An employment office is asking what was sent."
+msgstr ""
+"Заявки, які написані, але ніколи не надіслані, не рахуються. Центр зайнятості питає, що було надіслано."
+
 #: src/postulo/notifications/base.py:29
 #, draft
 msgid "Applications go quiet"
 msgstr "Заявки затихають"
 
+#: src/postulo/templates/applications/report_print.html:77
 #: src/postulo/templates/widgets/insight_counters.html:17
 #, draft
 msgid "Applications sent"
@@ -1299,7 +1359,10 @@ msgstr "Подано за останні 30 днів"
 msgid "applied on"
 msgstr "подано"
 
+#: src/postulo/applications/reports.py:474
 #: src/postulo/templates/applications/application_detail.html:137
+#: src/postulo/templates/applications/report.html:225
+#: src/postulo/templates/applications/report_print.html:149
 #, draft
 msgid "Applied on"
 msgstr "Подано"
@@ -1762,7 +1825,7 @@ msgid ""
 msgstr ""
 "Зроблені тут зміни надсилаються під час наступного запуску; інший бік тоді ж і читається."
 
-#: src/postulo/applications/views.py:480
+#: src/postulo/applications/views.py:481
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Нагадати %(company)s про %(role)s"
@@ -1827,7 +1890,7 @@ msgstr "Оберіть хоча б один документ для запису
 msgid "Choose what kind of identifier this is."
 msgstr "Оберіть, що це за ідентифікатор."
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:816
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Спершу оберіть, якої заявки це стосується."
@@ -1963,8 +2026,10 @@ msgstr "Компанії створено"
 msgid "Companies you have applied to"
 msgstr "Компанії, куди ви подавалися"
 
-#: src/postulo/applications/forms.py:43 src/postulo/applications/tables.py:27
-#: src/postulo/core/csv_import.py:38
+#: src/postulo/applications/forms.py:43 src/postulo/applications/reports.py:475
+#: src/postulo/applications/tables.py:27 src/postulo/core/csv_import.py:38
+#: src/postulo/templates/applications/report.html:226
+#: src/postulo/templates/applications/report_print.html:150
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
@@ -2178,6 +2243,20 @@ msgstr "Не вдалося отримати: %(error)s"
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Не вдалося прочитати %(site)s: %(error)s"
 
+#: src/postulo/templates/applications/report_print.html:141
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here."
+msgstr ""
+"Рахується за тим, коли це сталося, тож відповідь, що надходить у цьому періоді на давнішу заявку, належить сюди."
+
+#: src/postulo/templates/applications/report.html:174
+#, draft
+msgid ""
+"Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
+msgstr ""
+"Рахується за тим, коли це сталося, тож відповідь, що надходить у цьому періоді на давнішу заявку, належить сюди. Це інше питання, ніж те, що було надіслано, і обидва тримаються окремо."
+
 #: src/postulo/templates/widgets/interviews_summary.html:30
 #, draft
 msgid ""
@@ -2347,6 +2426,11 @@ msgstr "Запропоновані дати:"
 msgid "Dates written as"
 msgstr "Дати записуються як"
 
+#: src/postulo/templates/applications/report.html:44
+#, draft
+msgid "Dates you choose"
+msgstr "Дати на ваш вибір"
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2489,7 +2573,7 @@ msgstr "Відхилити"
 msgid "Declined"
 msgstr "Відхилено"
 
-#: src/postulo/applications/views.py:724
+#: src/postulo/applications/views.py:808
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Відхилено. Це більше не пропонуватиметься."
@@ -2713,6 +2797,16 @@ msgstr "виконано"
 #, draft
 msgid "Download"
 msgstr "Завантажити"
+
+#: src/postulo/templates/applications/report.html:20
+#, draft
+msgid "Download CSV"
+msgstr "Завантажити CSV"
+
+#: src/postulo/templates/applications/report.html:23
+#, draft
+msgid "Download PDF"
+msgstr "Завантажити PDF"
 
 #: src/postulo/templates/accounts/delete_account.html:41
 #: src/postulo/templates/core/export.html:36
@@ -2948,6 +3042,12 @@ msgid ""
 msgstr ""
 "Кожен обліковий запис у цій інстанції. Адміністратори бачать облікові записи, але ніколи чиїсь заявки чи документи."
 
+#: src/postulo/templates/applications/report.html:208
+#: src/postulo/templates/applications/report_print.html:144
+#, draft
+msgid "Every application, in order"
+msgstr "Усі заявки, по порядку"
+
 #: src/postulo/jobs/forms.py:286
 #, draft
 msgid ""
@@ -3119,7 +3219,7 @@ msgstr ""
 "Пояснення того, що пішло не так, часто означає назвати, якого з’єднання, якої компанії чи якого документа це стосувалося. Ніщо тут не містить вмісту документа, але ставтеся до цієї сторінки як до решти інстанції, перш ніж чимось із неї ділитися."
 
 #: src/postulo/templates/core/export.html:8
-#: src/postulo/templates/widgets/shortcuts.html:25
+#: src/postulo/templates/widgets/shortcuts.html:28
 #, draft
 msgid "Export everything"
 msgstr "Експортувати все"
@@ -3275,6 +3375,12 @@ msgstr "Ім’я"
 msgid "first name"
 msgstr "ім’я"
 
+#: src/postulo/templates/applications/report.html:178
+#: src/postulo/templates/applications/report_print.html:125
+#, draft
+msgid "First replies"
+msgstr "Перші відповіді"
+
 #: src/postulo/templates/core/import_csv_map.html:20
 #, draft
 msgid "First value"
@@ -3295,12 +3401,12 @@ msgstr "Слідкувати за вашим профілем"
 msgid "Follow-up note"
 msgstr "Нагадування"
 
-#: src/postulo/applications/views.py:474
+#: src/postulo/applications/views.py:475
 #, draft
 msgid "Follow-up recorded."
 msgstr "Нагадування записано."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:471
+#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:472
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3359,7 +3465,10 @@ msgstr "Знайдено логотип за %(url)s."
 msgid "Found on their website"
 msgstr "Знайдено на їхньому сайті"
 
-#: src/postulo/applications/forms.py:57 src/postulo/core/csv_import.py:50
+#: src/postulo/applications/forms.py:57 src/postulo/applications/reports.py:477
+#: src/postulo/core/csv_import.py:50
+#: src/postulo/templates/applications/report.html:228
+#: src/postulo/templates/applications/report_print.html:152
 #: src/postulo/templates/jobs/posting_detail.html:81
 #, draft
 msgid "Found via"
@@ -3392,6 +3501,7 @@ msgstr "Зафіксувати й додати"
 msgid "from"
 msgstr "з"
 
+#: src/postulo/templates/applications/report.html:55
 #: src/postulo/templates/server/email.html:27
 #: src/postulo/templates/server/logs.html:51
 #: src/postulo/templates/server/logs.html:89
@@ -3675,10 +3785,21 @@ msgid "How many applications reached one, how many were held, and of what kind."
 msgstr ""
 "Скільки заявок дійшли до співбесіди, скільки було відкладено і якого вони були типу."
 
+#: src/postulo/templates/applications/report.html:65
+#, draft
+msgid "How many weeks"
+msgstr "Скільки тижнів"
+
 #: src/postulo/applications/widgets.py:271
 #, draft
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Скільки ви надсилали, місяць за місяцем, щоб тихий проміжок було видно."
+
+#: src/postulo/templates/applications/report.html:96
+#: src/postulo/templates/applications/report_print.html:73
+#, draft
+msgid "How regularly"
+msgstr "Наскільки регулярно"
 
 #: src/postulo/templates/core/import_csv_map.html:57
 #, draft
@@ -4005,7 +4126,7 @@ msgstr "співбесіда"
 msgid "Interview cancelled"
 msgstr "Співбесіду скасовано"
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Interview recorded."
 msgstr "Співбесіду записано."
@@ -4015,7 +4136,7 @@ msgstr "Співбесіду записано."
 msgid "Interview scheduled"
 msgstr "Співбесіду заплановано"
 
-#: src/postulo/applications/views.py:555
+#: src/postulo/applications/views.py:556
 #, draft
 msgid "Interview scheduled."
 msgstr "Співбесіду заплановано."
@@ -4025,7 +4146,7 @@ msgstr "Співбесіду заплановано."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Співбесіда завтра: %(kind)s у %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:585
+#: src/postulo/applications/views.py:586
 #, draft
 msgid "Interview updated."
 msgstr "Співбесіду оновлено."
@@ -4051,6 +4172,12 @@ msgstr "співбесіди"
 #, draft
 msgid "Interviews"
 msgstr "Співбесіди"
+
+#: src/postulo/templates/applications/report.html:182
+#: src/postulo/templates/applications/report_print.html:129
+#, draft
+msgid "Interviews attended"
+msgstr "Проведені співбесіди"
 
 #: src/postulo/accounts/models.py:505
 #, draft
@@ -4166,6 +4293,16 @@ msgstr "вакансія"
 msgid "job postings"
 msgstr "вакансії"
 
+#: src/postulo/templates/applications/report_print.html:65
+#, draft
+msgid "Job search report"
+msgstr "Звіт про пошук роботи"
+
+#: src/postulo/templates/applications/report_print.html:23
+#, python-format, draft
+msgid "Job search report · %(period)s"
+msgstr "Звіт про пошук роботи · %(period)s"
+
 #: src/postulo/applications/forms.py:44
 #, draft
 msgid "Job title"
@@ -4226,6 +4363,7 @@ msgid "kind"
 msgstr "вид"
 
 #: src/postulo/templates/accounts/profile.html:126
+#: src/postulo/templates/applications/report.html:39
 #: src/postulo/templates/jobs/company_form.html:67
 #: src/postulo/templates/partials/phone_numbers.html:40
 #: src/postulo/templates/partials/postal_addresses.html:60
@@ -4329,7 +4467,10 @@ msgstr ""
 msgid "Largest page read"
 msgstr "Найбільша прочитана сторінка"
 
+#: src/postulo/applications/reports.py:480
 #: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:75
+#: src/postulo/templates/applications/report.html:230
+#: src/postulo/templates/applications/report_print.html:154
 #, draft
 msgid "Last activity"
 msgstr "Остання активність"
@@ -4622,6 +4763,16 @@ msgstr "логотип отримано"
 msgid "Logs"
 msgstr "Журнали"
 
+#: src/postulo/templates/applications/report.html:115
+#, draft
+msgid "Longest gap"
+msgstr "Найдовша перерва"
+
+#: src/postulo/templates/applications/report_print.html:85
+#, draft
+msgid "Longest gap, in days"
+msgstr "Найдовша перерва, у днях"
+
 #: src/postulo/templates/applications/application_list.html:42
 #: src/postulo/templates/jobs/company_list.html:42
 #: src/postulo/templates/server/logs.html:144
@@ -4754,7 +4905,7 @@ msgstr "Зробити адміністратором"
 msgid "Manage"
 msgstr "Керувати"
 
-#: src/postulo/templates/widgets/shortcuts.html:28
+#: src/postulo/templates/widgets/shortcuts.html:31
 #, draft
 msgid "Manage tags"
 msgstr "Керувати мітками"
@@ -4769,7 +4920,7 @@ msgstr "Виробництво"
 msgid "Map a column to Company and one to Role first."
 msgstr "Спершу зіставте один стовпець із «Компанія», а інший — із «Посада»."
 
-#: src/postulo/applications/views.py:447
+#: src/postulo/applications/views.py:448
 #, draft
 msgid "Marked as done."
 msgstr "Позначено як виконане."
@@ -4848,6 +4999,11 @@ msgstr "Мобільний"
 #, draft
 msgid "Money and dates"
 msgstr "Гроші й дати"
+
+#: src/postulo/templates/applications/report.html:48
+#, draft
+msgid "Month"
+msgstr "Місяць"
 
 #: src/postulo/templates/core/import_csv_map.html:49
 #, draft
@@ -5300,6 +5456,12 @@ msgstr "Неприбуткова організація"
 msgid "None"
 msgstr "Немає"
 
+#: src/postulo/templates/applications/report.html:149
+#: src/postulo/templates/applications/report_print.html:111
+#, draft
+msgid "none"
+msgstr "жодної"
+
 #: src/postulo/templates/partials/label_attrs.html:12
 #, draft
 msgid "None chosen yet"
@@ -5389,6 +5551,7 @@ msgstr "Не є частиною іншої компанії"
 
 #: src/postulo/applications/analytics.py:296
 #: src/postulo/applications/analytics.py:314
+#: src/postulo/applications/reports.py:446
 #, draft
 msgid "Not recorded"
 msgstr "Не записано"
@@ -5674,6 +5837,11 @@ msgid ""
 msgstr ""
 "Нема чого ставити в чергу: кожен документ обраних видів уже в переліку для %(label)s."
 
+#: src/postulo/templates/applications/partials/report_tally.html:30
+#, draft
+msgid "Nothing to show for this period."
+msgstr "Немає чого показати за цей період."
+
 #: src/postulo/templates/documents/upload_list.html:48
 #, draft
 msgid "Nothing uploaded yet."
@@ -5710,6 +5878,18 @@ msgstr "Нічого не встановлено."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Нічого не було вибрано, тож нічого не змінилося."
+
+#: src/postulo/templates/applications/report_print.html:174
+#, draft
+msgid "Nothing was sent in this period."
+msgstr "У цьому періоді нічого не було надіслано."
+
+#: src/postulo/templates/applications/report.html:261
+#, draft
+msgid ""
+"Nothing was sent in this period. That is what the report says, and it is a fact like any other."
+msgstr ""
+"У цьому періоді нічого не було надіслано. Це те, що каже звіт, і це факт, як і будь-який інший."
 
 #: src/postulo/templates/settings/dashboard.html:68
 #, draft
@@ -5768,6 +5948,8 @@ msgstr "Отримано пропозицію"
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Пропонується лише поки пошта цього вузла справді доходить."
 
+#: src/postulo/templates/applications/report.html:186
+#: src/postulo/templates/applications/report_print.html:133
 #: src/postulo/templates/widgets/industries.html:13
 #: src/postulo/templates/widgets/insight_counters.html:33
 #: src/postulo/templates/widgets/sources.html:13
@@ -5834,6 +6016,14 @@ msgstr "Раз на день"
 msgid "One achievement per line."
 msgstr "По одному досягненню в рядку."
 
+#: src/postulo/templates/applications/report.html:98
+#, python-format, draft
+msgid "One application sent in this period."
+msgid_plural "%(counter)s applications sent in this period."
+msgstr[0] "Одна заявка, надіслана в цьому періоді."
+msgstr[1] "%(counter)s заявки, надіслані в цьому періоді."
+msgstr[2] "%(counter)s заявок, надісланих у цьому періоді."
+
 #: src/postulo/templates/jobs/listing_list.html:23
 #, python-format, draft
 msgid "One capture waiting for review"
@@ -5841,6 +6031,14 @@ msgid_plural "%(counter)s captures waiting for review"
 msgstr[0] "Одне захоплення чекає на перегляд"
 msgstr[1] "%(counter)s захоплення чекають на перегляд"
 msgstr[2] "%(counter)s захоплень чекає на перегляд"
+
+#: src/postulo/templates/applications/report.html:212
+#, python-format, draft
+msgid "One draft in this period is left out."
+msgid_plural "%(counter)s drafts in this period are left out."
+msgstr[0] "Один чернетковий запис із цього періоду залишено поза увагою."
+msgstr[1] "%(counter)s чернеткові записи з цього періоду залишено поза увагою."
+msgstr[2] "%(counter)s чернеткових записів із цього періоду залишено поза увагою."
 
 #: src/postulo/templates/connections/list.html:81
 #, python-format, draft
@@ -6046,6 +6244,11 @@ msgstr "Інші галузі"
 msgid "Other languages"
 msgstr "Інші мови"
 
+#: src/postulo/templates/applications/report.html:77
+#, draft
+msgid "Other periods"
+msgstr "Інші періоди"
+
 #: src/postulo/applications/models.py:485
 #, draft
 msgid "outcome"
@@ -6219,6 +6422,11 @@ msgstr "За рік"
 #, draft
 msgid "Period"
 msgstr "Період"
+
+#: src/postulo/templates/applications/report_print.html:68
+#, python-format, draft
+msgid "Period: %(period)s"
+msgstr "Період: %(period)s"
 
 #: src/postulo/accounts/admin.py:24
 #, draft
@@ -6513,6 +6721,13 @@ msgstr ""
 msgid "Postulo publishes no catalogue yet. Nothing is fetched from here."
 msgstr "Postulo поки не публікує каталогу. Звідси нічого не завантажується."
 
+#: src/postulo/templates/applications/report.html:267
+#, draft
+msgid ""
+"Postulo sets no target. How many applications a period should hold is a benefit regime's rule or your own, never this software's."
+msgstr ""
+"Postulo не встановлює жодної цілі. Скільки заявок має містити період — це правило системи допомоги або ваше власне, ніколи не цього програмного забезпечення."
+
 #: src/postulo/templates/api/token_list.html:23
 #, draft
 msgid ""
@@ -6595,6 +6810,18 @@ msgstr "пріоритет"
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Приватні та локальні адреси відхиляються."
+
+#: src/postulo/templates/applications/report_print.html:195
+#, draft
+msgid ""
+"Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
+msgstr ""
+"Створено Postulo з власних записів цієї людини. Postulo не встановлює жодної цілі: скільки заявок має містити період — це правило системи допомоги або самої людини."
+
+#: src/postulo/templates/applications/report_print.html:70
+#, python-format, draft
+msgid "Produced on %(produced)s"
+msgstr "Створено %(produced)s"
 
 #: src/postulo/resume/models.py:199
 #, draft
@@ -6688,6 +6915,11 @@ msgstr "Публікація"
 #, draft
 msgid "Putting it back"
 msgstr "Як повернути назад"
+
+#: src/postulo/applications/reports.py:102
+#, python-format, draft
+msgid "Q%(quarter)s %(year)s"
+msgstr "%(quarter)s кв. %(year)s"
 
 #: src/postulo/resume/models.py:95
 #, draft
@@ -6872,12 +7104,12 @@ msgid ""
 msgstr ""
 "Записується для всього, встановленого звідси, тож пізніше його не змінити, не осиротивши встановленого."
 
-#: src/postulo/applications/views.py:606
+#: src/postulo/applications/views.py:607
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Записано як скасоване."
 
-#: src/postulo/applications/views.py:605
+#: src/postulo/applications/views.py:606
 #, draft
 msgid "Recorded as held."
 msgstr "Записано як проведене."
@@ -6897,7 +7129,7 @@ msgstr "записано"
 msgid "Recorded what you sent."
 msgstr "Записано, що ви надіслали."
 
-#: src/postulo/applications/views.py:607
+#: src/postulo/applications/views.py:608
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Записано: ніхто не прийшов."
@@ -6991,6 +7223,12 @@ msgstr "Відмовлено"
 #, draft
 msgid "Rejection received"
 msgstr "Отримано відмову"
+
+#: src/postulo/templates/applications/report.html:190
+#: src/postulo/templates/applications/report_print.html:137
+#, draft
+msgid "Rejections"
+msgstr "Відмови"
 
 #: src/postulo/applications/forms.py:281
 #, draft
@@ -7103,6 +7341,11 @@ msgid ""
 msgstr ""
 "Відповіли, відмовили, замовкли, ще чекаєте — що сталося з тим, що ви надіслали."
 
+#: src/postulo/templates/applications/report.html:4
+#, python-format, draft
+msgid "Report · %(period)s"
+msgstr "Звіт · %(period)s"
+
 #: src/postulo/jobs/industries.py:75
 #, draft
 msgid "Research"
@@ -7187,7 +7430,10 @@ msgstr "robots.txt наразі шанується."
 msgid "robots.txt is currently ignored."
 msgstr "robots.txt наразі ігнорується."
 
+#: src/postulo/applications/reports.py:476
 #: src/postulo/applications/tables.py:19
+#: src/postulo/templates/applications/report.html:227
+#: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
 #: src/postulo/templates/jobs/listing_list.html:70
 #: src/postulo/templates/server/people.html:35
@@ -7502,6 +7748,7 @@ msgstr "Надсилання від себе"
 msgid "Sending failed: %(error)s"
 msgstr "Не вдалося надіслати: %(error)s"
 
+#: src/postulo/templates/applications/report.html:107
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
@@ -7687,6 +7934,11 @@ msgstr "Показувати в навігації"
 msgid "Show past too"
 msgstr "Показувати й минулі"
 
+#: src/postulo/templates/applications/report.html:72
+#, draft
+msgid "Show this period"
+msgstr "Показати цей період"
+
 #: src/postulo/core/models.py:504
 #, draft
 msgid "Shown in the header and on the sign-in page."
@@ -7829,7 +8081,7 @@ msgstr "Сервер SMTP"
 msgid "Snooze"
 msgstr "Відкласти"
 
-#: src/postulo/applications/views.py:488
+#: src/postulo/applications/views.py:489
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Відкладено на два тижні."
@@ -7959,11 +8211,14 @@ msgid "State"
 msgstr "Стан"
 
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:224
+#: src/postulo/applications/reports.py:479
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
 #: src/postulo/templates/applications/application_detail.html:48
 #: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
+#: src/postulo/templates/applications/report.html:229
+#: src/postulo/templates/applications/report_print.html:153
 #: src/postulo/templates/core/import_csv_map.html:66
 #, draft
 msgid "Status"
@@ -7986,7 +8241,7 @@ msgstr "Зміна статусу"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Статус у таблиці: %(text)s"
 
-#: src/postulo/applications/views.py:363
+#: src/postulo/applications/views.py:364
 #, draft
 msgid "Status updated."
 msgstr "Статус оновлено."
@@ -8372,7 +8627,7 @@ msgstr "Це не схоже на ідентифікатор %(scheme)s (нап�
 msgid "That does not look like a complete web address."
 msgstr "Це не схоже на повну вебадресу."
 
-#: src/postulo/applications/views.py:394
+#: src/postulo/applications/views.py:395
 #, draft
 msgid "That entry could not be saved."
 msgstr "Той запис не вдалося зберегти."
@@ -8445,7 +8700,7 @@ msgstr "Це багато посилань для відновлення. Спр
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Це SVG, який Postulo поки не зберігає. Підійде PNG або JPEG."
 
-#: src/postulo/applications/views.py:365
+#: src/postulo/applications/views.py:366
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Такого статусу Postulo не знає."
@@ -8465,17 +8720,17 @@ msgstr "Такого віджета Postulo не знає."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Це не відкритий ключ Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:599
+#: src/postulo/applications/views.py:600
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Такого результату Postulo не знає."
 
-#: src/postulo/applications/views.py:490
+#: src/postulo/applications/views.py:491
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Із цим Postulo нічого такого зробити не може."
 
-#: src/postulo/applications/views.py:179 src/postulo/jobs/views.py:124
+#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:124
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "Цього Postulo не вміє робити для кількох одразу."
@@ -8575,7 +8830,7 @@ msgstr "Той додаток більше не встановлено."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Ця відповідь не надійшла із запиту, який зробив Postulo."
 
-#: src/postulo/applications/views.py:719
+#: src/postulo/applications/views.py:803
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "На ту пропозицію вже відповіли."
@@ -8755,6 +9010,11 @@ msgstr ""
 msgid "The language you read Postulo in"
 msgstr "Мова, якою ви читаєте Postulo"
 
+#: src/postulo/templates/applications/report.html:43
+#, draft
+msgid "The last few weeks"
+msgstr "Останні кілька тижнів"
+
 #: src/postulo/templates/server/email.html:62
 #, python-format, draft
 msgid "The last message this instance tried to send failed, at %(when)s."
@@ -8793,6 +9053,20 @@ msgstr "Логотип зник."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Логотип не змінено: %(problem)s"
 
+#: src/postulo/templates/applications/report.html:167
+#, draft
+msgid ""
+"The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
+msgstr ""
+"Найдовша перерва вимірюється всередині цього періоду, тож мовчання, що почалося раніше, до нього не переноситься. Період, що триває, рахується лише до сьогодні."
+
+#: src/postulo/templates/applications/report_print.html:118
+#, draft
+msgid ""
+"The longest gap is measured inside this period. A period still running is counted up to the day this was produced. A week marked (part) reaches outside the period; nothing from outside it is counted."
+msgstr ""
+"Найдовша перерва вимірюється всередині цього періоду. Період, що триває, рахується до дня, коли це було створено. Тиждень, позначений як (частина), виходить за межі періоду; ніщо поза ним не рахується."
+
 #: src/postulo/core/server_views.py:732
 #, draft
 msgid "The mail backend accepted nothing."
@@ -8822,6 +9096,16 @@ msgstr ""
 msgid "The official repository is emptied, not removed."
 msgstr "Офіційний репозиторій спорожняється, а не вилучається."
 
+#: src/postulo/templates/applications/report.html:83
+#, draft
+msgid "The one after"
+msgstr "Наступний"
+
+#: src/postulo/templates/applications/report.html:79
+#, draft
+msgid "The one before"
+msgstr "Попередній"
+
 #: src/postulo/documents/models.py:87
 #, draft
 msgid "The opening paragraph, if you use one."
@@ -8848,6 +9132,11 @@ msgstr "Додатки, що йдуть усередині Postulo. Нічого
 #, draft
 msgid "The posting"
 msgstr "Вакансія"
+
+#: src/postulo/templates/applications/report.html:245
+#, draft
+msgid "the posting"
+msgstr "оголошення"
 
 #: src/postulo/templates/applications/application_intake.html:64
 #: src/postulo/templates/jobs/capture_review.html:58
@@ -9131,6 +9420,11 @@ msgid "This invitation may only be used with the address it was sent to."
 msgstr ""
 "Цим запрошенням можна скористатися лише з адресою, на яку його надіслано."
 
+#: src/postulo/templates/applications/report.html:88
+#, draft
+msgid "This is the most recent period."
+msgstr "Це найновіший період."
+
 #: src/postulo/templates/server/plugins.html:311
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
@@ -9260,6 +9554,11 @@ msgstr "Назва, компанія або місце"
 #, draft
 msgid "TLS from the first byte"
 msgstr "TLS від першого байта"
+
+#: src/postulo/templates/applications/report.html:59
+#, draft
+msgid "To"
+msgstr "До"
 
 #: src/postulo/templates/partials/table/head.html:101
 #, draft
@@ -9553,6 +9852,11 @@ msgstr "Використано"
 msgid "used at"
 msgstr "використано"
 
+#: src/postulo/templates/applications/report.html:51
+#, draft
+msgid "Used for a month, and for the quarter that month falls in."
+msgstr "Використовується для місяця й для кварталу, у який цей місяць потрапляє."
+
 #: src/postulo/accounts/models.py:124 src/postulo/accounts/models.py:250
 #, draft
 msgid "user"
@@ -9706,6 +10010,23 @@ msgstr "вебсайт"
 msgid "Website"
 msgstr "Вебсайт"
 
+#: src/postulo/templates/applications/report.html:135
+#: src/postulo/templates/applications/report.html:161
+#: src/postulo/templates/applications/report_print.html:98
+#, python-format, draft
+msgid "Week of %(day)s"
+msgstr "Тиждень від %(day)s"
+
+#: src/postulo/templates/applications/report.html:125
+#, draft
+msgid "Weeks in a row, up to now"
+msgstr "Тижнів поспіль, дотепер"
+
+#: src/postulo/templates/applications/report_print.html:89
+#, draft
+msgid "Weeks with none"
+msgstr "Тижні без жодної"
+
 #: src/postulo/templates/core/dashboard.html:38
 #, python-format, draft
 msgid "Welcome back, %(name)s"
@@ -9735,6 +10056,16 @@ msgstr "що має опитувати монітор"
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "З чим починає новий обліковий запис. Кожен може змінити своє."
+
+#: src/postulo/templates/applications/report.html:172
+#, draft
+msgid "What came back"
+msgstr "Що повернулося"
+
+#: src/postulo/templates/applications/report_print.html:121
+#, draft
+msgid "What came back in this period"
+msgstr "Що повернулося в цьому періоді"
 
 #: src/postulo/core/server_forms.py:316
 #, draft
@@ -9811,6 +10142,11 @@ msgstr "що він каже"
 msgid "What it says it is"
 msgstr "Чим воно себе називає"
 
+#: src/postulo/templates/applications/report.html:200
+#, draft
+msgid "What kind of employer"
+msgstr "Який тип роботодавця"
+
 #: src/postulo/applications/widgets.py:25
 #: src/postulo/core/widgets_builtin.py:22
 #, draft
@@ -9882,6 +10218,13 @@ msgstr "Як це назвати"
 #, draft
 msgid "what to do"
 msgstr "що робити"
+
+#: src/postulo/templates/applications/report.html:15
+#, draft
+msgid ""
+"What was sent, how regularly, and what came back. Nothing outside the period is counted."
+msgstr ""
+"Що було надіслано, наскільки регулярно і що повернулося. Ніщо поза періодом не рахується."
 
 #: src/postulo/templates/accounts/delete_account.html:18
 #, draft
@@ -9962,6 +10305,12 @@ msgstr "Де опубліковано підписаний індекс. Йог�
 msgid "Where they came from"
 msgstr "Звідки вони взялися"
 
+#: src/postulo/templates/applications/report.html:198
+#: src/postulo/templates/applications/report_print.html:181
+#, draft
+msgid "Where they were found"
+msgstr "Де їх знайдено"
+
 #: src/postulo/applications/widgets.py:121
 #, draft
 msgid "Where things stand"
@@ -10039,6 +10388,11 @@ msgstr ""
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Яка частина Postulo це створила: вебінтерфейс чи API."
+
+#: src/postulo/templates/applications/report.html:36
+#, draft
+msgid "Which period"
+msgstr "Який період"
 
 #: src/postulo/templates/connections/pick.html:7
 #, draft
@@ -10406,7 +10760,7 @@ msgstr "Ваш крайній термін"
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:8
 #: src/postulo/templates/base.html:105
-#: src/postulo/templates/widgets/shortcuts.html:31
+#: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"
 msgstr "Ваші відомості"
@@ -10425,6 +10779,11 @@ msgstr "Ваш Gravatar отримано знову."
 #, draft
 msgid "Your initials"
 msgstr "Ваші ініціали"
+
+#: src/postulo/templates/applications/report.html:10
+#, python-format, draft
+msgid "Your job search in %(period)s"
+msgstr "Ваш пошук роботи в %(period)s"
 
 #: src/postulo/core/views.py:67
 #, draft
@@ -10503,6 +10862,16 @@ msgstr "{label} вилучено"
 #, draft
 msgid "{label} — new"
 msgstr "{label} — нова"
+
+#: src/postulo/templates/applications/report.html:144
+#, draft
+msgid "· part of this week is outside the period"
+msgstr "· частина цього тижня поза періодом"
+
+#: src/postulo/templates/applications/report.html:137
+#, draft
+msgid "· still running"
+msgstr "· ще триває"
 
 #: src/postulo/core/server_views.py:1024
 #, python-format, draft

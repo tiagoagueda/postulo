@@ -75,6 +75,7 @@ def test_the_pages_behind_a_sign_in_keep_it_too(live_server, page: Page, applica
         "/applications/",
         "/applications/board/",
         "/applications/insights/",
+        "/applications/report/",
         "/documents/cvs/",
         "/settings/account/",
         "/settings/appearance/",
