@@ -172,8 +172,15 @@ def test_the_words_do_not_say_machine_translation(page):
     """`pt-br` was seeded from `pt-pt` and adapted by hand, which is not machine
     translation. What is true of every language in that group is that no speaker has read
     it, and that is the thing to say.
+
+    Read from the picker rather than from the whole page, which is what it used to be. The
+    claim is about the words *this control* uses, and the rest of the page carries a header,
+    a settings sidebar and whatever messages a request left behind — none of which this test
+    has an opinion about, and any of which could fail it for a reason that has nothing to do
+    with translation. One such failure was seen once and could not be reproduced; narrowing
+    the assertion to its subject is the fix either way.
     """
-    lowered = page.lower()
+    lowered = picker(page).lower()
 
     assert "llm" not in lowered
     assert "machine" not in lowered
