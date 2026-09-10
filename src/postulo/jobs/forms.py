@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core import phone_field, phone_numbers, phones
 
-from . import identifiers, industries, logos
+from . import identifiers, industries, logos, structure
 from .models import Company, CompanyIdentifier, Contact, Department, Industry, JobPosting
 
 
@@ -96,6 +96,12 @@ class CompanyForm(OwnerScopedModelForm):
         a cell refuses exactly what the page refuses (#135). Scoping a field that is not
         there would make that impossible for the sake of an assumption nothing needs.
         """
+        if "parent" in self.fields and not structure.structure_allowed(self.user):
+            # The feature is off, so the field is not offered. Not cleared: the link stays
+            # exactly where it is and comes back when the feature does, which is what "off
+            # deletes nothing" means everywhere else here too (#138).
+            del self.fields["parent"]
+
         if "parent" in self.fields:
             # The parent is offered as this person's other companies, minus this one and
             # everything already under it. `Company.clean` refuses a loop anyway; refusing
@@ -383,7 +389,11 @@ class ContactForm(OwnerScopedModelForm):
 
     def scope_querysets(self) -> None:
         self.fields["company"].queryset = Company.objects.for_user(self.user)
-        if self.instance and self.instance.pk and self.instance.department_id:
+        if not structure.structure_allowed(self.user):
+            # Off, so a contact is simply somebody at a company, which is what it was
+            # before departments existed. The row keeps its department (#138).
+            del self.fields["new_department"]
+        elif self.instance and self.instance.pk and self.instance.department_id:
             self.fields["new_department"].initial = self.instance.department.name
 
     @property
@@ -403,7 +413,8 @@ class ContactForm(OwnerScopedModelForm):
         if commit and not self.several_numbers:
             phone_numbers.save_only_number(contact, self.user, self.cleaned_data.get("phone", ""))
         if commit:
-            self._save_department(contact)
+            if "new_department" in self.fields:
+                self._save_department(contact)
         return contact
 
     def _save_department(self, contact) -> None:

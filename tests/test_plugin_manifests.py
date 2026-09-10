@@ -136,14 +136,16 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_eleven_of_them_across_eight_kinds():
+def test_there_are_twelve_of_them_across_eight_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
-    Three govern something other than a service. `phone-numbers` and `email-addresses`
+    Four govern something other than a service. `phone-numbers` and `email-addresses`
     govern a page -- the second owns no data at all, since the addresses are allauth's, which
     is the honest limit of what a feature can be here (#145). `postal-rules` governs a table:
     what a country expects of an address, and what it calls each part (#147).
+    `employer-structure` governs a shape: whether an employer may be more than one company,
+    and whether an application may say which part of it the attempt was for (#138).
 
     `identifiers` governs nothing at all, which is why its kind is ungoverned: it is a
     vocabulary rather than a behaviour, and *off* would leave every stored identifier without
@@ -166,6 +168,7 @@ def test_there_are_eleven_of_them_across_eight_kinds():
         "phone-numbers",
         "email-addresses",
         "postal-rules",
+        "employer-structure",
         "identifiers",
     }
 

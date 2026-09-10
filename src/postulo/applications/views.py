@@ -268,10 +268,26 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
     context_object_name = "application"
 
     def get_queryset(self):
-        return super().get_queryset().select_related("posting", "posting__company", "contact")
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "posting",
+                "posting__company",
+                "posting__company__parent",
+                "contact",
+                "department",
+                "department__company",
+            )
+        )
 
     def get_context_data(self, **kwargs) -> dict:
+        from postulo.jobs import structure
+
         context = super().get_context_data(**kwargs)
+        # One answer about one person, decided here rather than asked of each block.
+        context["structure_on"] = structure.structure_allowed(self.request.user)
+        context["group"] = structure.group_of(self.object.posting.company, self.request.user)
         context["events"] = self.object.events.all()
         context["reminders"] = self.object.reminders.filter(done_at__isnull=True)
         interviews = list(self.object.interviews.prefetch_related("contacts"))

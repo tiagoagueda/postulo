@@ -10,6 +10,7 @@ class CoreConfig(AppConfig):
 
     def ready(self) -> None:
         from postulo.plugins import registry
+        from postulo.plugins.employer_structure import EmployerStructureFeature
         from postulo.plugins.phone_numbers import PhoneNumbersFeature
         from postulo.plugins.postal_rules import PostalRulesFeature
 
@@ -19,6 +20,8 @@ class CoreConfig(AppConfig):
         registry.register_builtin("feature", PhoneNumbersFeature)
         # What a country expects of an address, and what it calls each part (#147).
         registry.register_builtin("feature", PostalRulesFeature)
+        # An employer as a structure rather than a single name (#138).
+        registry.register_builtin("feature", EmployerStructureFeature)
 
         # The contact channels Postulo already has, described by one contract (#146).
         from . import channels

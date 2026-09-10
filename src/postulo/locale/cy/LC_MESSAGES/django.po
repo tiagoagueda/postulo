@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-10 04:15+0000\n"
+"POT-Creation-Date: 2026-09-10 05:20+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Cymraeg\n"
@@ -28,7 +28,7 @@ msgstr ""
 msgid "%(company)s already carries %(scheme)s %(value)s."
 msgstr "Mae %(company)s eisoes yn cario %(scheme)s %(value)s."
 
-#: src/postulo/jobs/forms.py:256
+#: src/postulo/jobs/forms.py:262
 #, python-format, draft
 msgid "%(company)s already carries this identifier."
 msgstr "Mae %(company)s eisoes yn cario'r dynodydd hwn."
@@ -102,7 +102,7 @@ msgstr[1] "%(counter)s ddiwrnod"
 msgstr[2] "%(counter)s diwrnod"
 msgstr[3] "%(counter)s diwrnod"
 
-#: src/postulo/templates/applications/application_detail.html:267
+#: src/postulo/templates/applications/application_detail.html:293
 #, python-format, draft
 msgid "%(counter)s earlier"
 msgid_plural "%(counter)s earlier"
@@ -169,6 +169,13 @@ msgstr[1] "%(days)s ddiwrnod yn ôl"
 msgstr[2] "%(days)s diwrnod yn ôl"
 msgstr[3] "%(days)s diwrnod yn ôl"
 
+#: src/postulo/applications/models.py:290
+#, python-format, draft
+msgid ""
+"%(department)s is at %(company)s, which is not part of the same employer as this posting."
+msgstr ""
+"Mae %(department)s yn %(company)s, nad yw’n rhan o’r un cyflogwr â’r hysbyseb hwn."
+
 #: src/postulo/applications/reports.py:106
 #, python-format, draft
 msgid "%(from)s to %(to)s"
@@ -230,7 +237,7 @@ msgid ""
 msgstr ""
 "Mae %(label)s yn dal i ddal %(count)d cofnod, a byddai ei ddadosod yn eu gadael mewn tabl na all dim ei ddarllen, ei allforio na'i adfer. Gwagiwch ef o dudalennau'r ategyn ei hun yn gyntaf, neu diffoddwch yr ategyn yn lle hynny — mae diffodd yn cadw popeth."
 
-#: src/postulo/jobs/models.py:697
+#: src/postulo/jobs/models.py:708
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s i %(high)s"
@@ -737,7 +744,7 @@ msgstr "Dyddlyfr tawel yw'r un rydych ei eisiau."
 msgid "A reminder falls due"
 msgstr "Mae atgoffwr yn ddyledus"
 
-#: src/postulo/applications/forms.py:284
+#: src/postulo/applications/forms.py:298
 #, draft
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Mae atgoffwr yn ddyledus y diwrnod cynt, pan fo diwrnod cynt."
@@ -839,7 +846,7 @@ msgstr "A2 — sylfaenol"
 msgid "Accept"
 msgstr "Derbyn"
 
-#: src/postulo/applications/models.py:46 src/postulo/applications/models.py:550
+#: src/postulo/applications/models.py:47 src/postulo/applications/models.py:602
 #: src/postulo/templates/accounts/invite_list.html:38
 #, draft
 msgid "Accepted"
@@ -873,10 +880,15 @@ msgid "Accounts"
 msgstr "Cyfrifon"
 
 #: src/postulo/applications/analytics.py:32
-#: src/postulo/applications/models.py:41
+#: src/postulo/applications/models.py:42
 #, draft
 msgid "Acknowledged"
 msgstr "Wedi'i nodi"
+
+#: src/postulo/templates/jobs/company_detail.html:124
+#, python-format, draft
+msgid "Across the %(name)s group"
+msgstr "Ar draws grŵp %(name)s cyfan"
 
 #: src/postulo/templates/core/import_csv_map.html:95
 #, python-format, draft
@@ -898,8 +910,8 @@ msgstr "Gweithredoedd"
 msgid "Actions for %(name)s"
 msgstr "Gweithredoedd ar gyfer %(name)s"
 
-#: src/postulo/templates/applications/application_detail.html:293
-#: src/postulo/templates/jobs/company_detail.html:143
+#: src/postulo/templates/applications/application_detail.html:319
+#: src/postulo/templates/jobs/company_detail.html:192
 #: src/postulo/templates/resume/overview.html:37
 #: src/postulo/templates/resume/overview.html:42
 #: src/postulo/templates/server/plugins.html:183
@@ -969,7 +981,7 @@ msgstr "Ychwanegu hyn i gyd"
 msgid "Add entries"
 msgstr "Ychwanegu cofnodion"
 
-#: src/postulo/templates/applications/application_detail.html:69
+#: src/postulo/templates/applications/application_detail.html:82
 #, draft
 msgid "Add entry"
 msgstr "Ychwanegu cofnod"
@@ -994,12 +1006,12 @@ msgstr "Ychwanegu at y CV"
 msgid "Add to listings"
 msgstr "Ychwanegu at yr hysbysebion"
 
-#: src/postulo/templates/applications/application_detail.html:60
+#: src/postulo/templates/applications/application_detail.html:73
 #, draft
 msgid "Add to the timeline"
 msgstr "Ychwanegu at y llinell amser"
 
-#: src/postulo/jobs/tables.py:79
+#: src/postulo/jobs/tables.py:89
 #, draft
 msgid "Added"
 msgstr "Ychwanegwyd"
@@ -1021,7 +1033,7 @@ msgid ""
 msgstr ""
 "Ychwanegwyd %(total)s cofnod. Ni chafodd dim ei drosysgrifo; unrhyw beth a ddyblygwyd, chi biau ei ddileu."
 
-#: src/postulo/applications/views.py:393 src/postulo/applications/views.py:820
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:836
 #, draft
 msgid "Added to the timeline."
 msgstr "Ychwanegwyd at y llinell amser."
@@ -1042,7 +1054,7 @@ msgstr "Ychwanegwyd."
 msgid "Address"
 msgstr "Cyfeiriad"
 
-#: src/postulo/core/models.py:410 src/postulo/jobs/models.py:729
+#: src/postulo/core/models.py:410 src/postulo/jobs/models.py:740
 #: src/postulo/resume/models.py:242
 #, draft
 msgid "address"
@@ -1097,7 +1109,7 @@ msgstr[3] "Pob un o'r %(counter)s yn %(label)s"
 msgid "All %(ok)d links still answer."
 msgstr "Mae'r %(ok)d dolen i gyd yn dal i ateb."
 
-#: src/postulo/templates/applications/application_detail.html:195
+#: src/postulo/templates/applications/application_detail.html:221
 #, draft
 msgid "All documents"
 msgstr "Pob dogfen"
@@ -1139,7 +1151,7 @@ msgstr "Hefyd yn %(names)s"
 msgid "An 'other' identifier needs a name."
 msgstr "Mae angen enw ar ddynodydd «arall»."
 
-#: src/postulo/applications/models.py:478
+#: src/postulo/applications/models.py:530
 #, draft
 msgid "An address, or the link to the call."
 msgstr "Cyfeiriad, neu'r ddolen i'r alwad."
@@ -1260,12 +1272,12 @@ msgstr "Tocynnau API"
 msgid "Appearance"
 msgstr "Golwg"
 
-#: src/postulo/applications/models.py:243
-#: src/postulo/applications/models.py:322
-#: src/postulo/applications/models.py:372
-#: src/postulo/applications/models.py:467
-#: src/postulo/applications/models.py:588 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:408 src/postulo/jobs/models.py:757
+#: src/postulo/applications/models.py:264
+#: src/postulo/applications/models.py:374
+#: src/postulo/applications/models.py:424
+#: src/postulo/applications/models.py:519
+#: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
+#: src/postulo/documents/models.py:408 src/postulo/jobs/models.py:768
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1283,7 +1295,7 @@ msgstr "Cais"
 msgid "Application created"
 msgstr "Crëwyd y cais"
 
-#: src/postulo/applications/views.py:346
+#: src/postulo/applications/views.py:362
 #, draft
 msgid "Application deleted."
 msgstr "Dilëwyd y cais."
@@ -1293,18 +1305,18 @@ msgstr "Dilëwyd y cais."
 msgid "Application recorded from the capture."
 msgstr "Cofnodwyd y cais o'r ddalfa."
 
-#: src/postulo/applications/views.py:312 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:328 src/postulo/jobs/listing_views.py:170
 #, draft
 msgid "Application recorded."
 msgstr "Cofnodwyd y cais."
 
-#: src/postulo/applications/views.py:336
+#: src/postulo/applications/views.py:352
 #, draft
 msgid "Application updated."
 msgstr "Diweddarwyd y cais."
 
 #: src/postulo/applications/apps.py:9 src/postulo/core/navigation.py:58
-#: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:57
+#: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:60
 #: src/postulo/templates/applications/application_list.html:4
 #: src/postulo/templates/applications/application_list.html:68
 #: src/postulo/templates/core/export.html:20
@@ -1314,7 +1326,7 @@ msgstr "Diweddarwyd y cais."
 msgid "Applications"
 msgstr "Ceisiadau"
 
-#: src/postulo/applications/models.py:244 src/postulo/applications/tables.py:15
+#: src/postulo/applications/models.py:265 src/postulo/applications/tables.py:15
 #, draft
 msgid "applications"
 msgstr "ceisiadau"
@@ -1371,8 +1383,8 @@ msgid "Applications, with their timelines"
 msgstr "Ceisiadau, gyda'u llinellau amser"
 
 #: src/postulo/applications/analytics.py:31
-#: src/postulo/applications/models.py:40 src/postulo/applications/tables.py:46
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:652
+#: src/postulo/applications/models.py:41 src/postulo/applications/tables.py:46
+#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:663
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
 msgid "Applied"
@@ -1383,13 +1395,13 @@ msgstr "Wedi gwneud cais"
 msgid "Applied in the last 30 days"
 msgstr "Cais yn y 30 diwrnod diwethaf"
 
-#: src/postulo/applications/models.py:203
+#: src/postulo/applications/models.py:204
 #, draft
 msgid "applied on"
 msgstr "gwnaed cais ar"
 
 #: src/postulo/applications/reports.py:474
-#: src/postulo/templates/applications/application_detail.html:137
+#: src/postulo/templates/applications/application_detail.html:150
 #: src/postulo/templates/applications/report.html:225
 #: src/postulo/templates/applications/report_print.html:149
 #, draft
@@ -1398,12 +1410,12 @@ msgstr "Gwnaed cais ar"
 
 #: src/postulo/applications/forms.py:117 src/postulo/applications/tables.py:71
 #: src/postulo/core/csv_import.py:49
-#: src/postulo/templates/applications/application_detail.html:131
+#: src/postulo/templates/applications/application_detail.html:144
 #, draft
 msgid "Applied through"
 msgstr "Gwnaed cais drwy"
 
-#: src/postulo/applications/models.py:199
+#: src/postulo/applications/models.py:200
 #, draft
 msgid "applied through"
 msgstr "gwnaed cais drwy"
@@ -1427,7 +1439,7 @@ msgstr "Cymhwyso i'r rhesi a diciwyd"
 msgid "Apply: %(title)s"
 msgstr "Gwneud cais: %(title)s"
 
-#: src/postulo/jobs/models.py:453
+#: src/postulo/jobs/models.py:464
 #, draft
 msgid "Apprenticeship"
 msgstr "Prentisiaeth"
@@ -1453,13 +1465,13 @@ msgid "Arrange it"
 msgstr "Trefnwch hi"
 
 #: src/postulo/applications/analytics.py:35
-#: src/postulo/applications/models.py:44
+#: src/postulo/applications/models.py:45
 #, draft
 msgid "Assessment"
 msgstr "Asesiad"
 
-#: src/postulo/applications/models.py:287
-#: src/postulo/applications/models.py:409
+#: src/postulo/applications/models.py:339
+#: src/postulo/applications/models.py:461
 #, draft
 msgid "Assessment or test"
 msgstr "Asesiad neu brawf"
@@ -1621,7 +1633,7 @@ msgstr "C1 — uwch"
 msgid "C2 — proficient"
 msgstr "C2 — meistrolaeth"
 
-#: src/postulo/templates/applications/application_detail.html:245
+#: src/postulo/templates/applications/application_detail.html:271
 #, draft
 msgid "Calendar"
 msgstr "Calendr"
@@ -1633,12 +1645,12 @@ msgstr "Calendr"
 msgid "Calendar file"
 msgstr "Ffeil galendr"
 
-#: src/postulo/applications/models.py:492
+#: src/postulo/applications/models.py:544
 #, draft
 msgid "calendar identifier"
 msgstr "dynodydd calendr"
 
-#: src/postulo/applications/models.py:283
+#: src/postulo/applications/models.py:335
 #, draft
 msgid "Call"
 msgstr "Galwad"
@@ -1678,7 +1690,7 @@ msgstr "Cyfeiriad dychwelyd i gofrestru gydag ef"
 msgid "Cancel"
 msgstr "Canslo"
 
-#: src/postulo/applications/models.py:416
+#: src/postulo/applications/models.py:468
 #: src/postulo/templates/applications/partials/interview_outcome.html:11
 #, draft
 msgid "Cancelled"
@@ -1690,7 +1702,7 @@ msgstr "Wedi'i ganslo"
 msgid "Capture"
 msgstr "Dalfa"
 
-#: src/postulo/jobs/models.py:761
+#: src/postulo/jobs/models.py:772
 #, draft
 msgid "capture"
 msgstr "dalfa"
@@ -1732,7 +1744,7 @@ msgstr "Dal hysbysebion"
 msgid "Capture sources this instance has"
 msgstr "Ffynonellau dal sydd gan y gosodiad hwn"
 
-#: src/postulo/jobs/models.py:733
+#: src/postulo/jobs/models.py:744
 #, draft
 msgid "captured from"
 msgstr "daliwyd o"
@@ -1742,7 +1754,7 @@ msgstr "daliwyd o"
 msgid "Captured: %(title)s"
 msgstr "Daliwyd: %(title)s"
 
-#: src/postulo/jobs/models.py:762
+#: src/postulo/jobs/models.py:773
 #, draft
 msgid "captures"
 msgstr "dalfeydd"
@@ -1776,8 +1788,8 @@ msgstr "Cofnod gyrfa"
 msgid "careers page"
 msgstr "tudalen swyddi"
 
-#: src/postulo/jobs/tables.py:65
-#: src/postulo/templates/jobs/company_detail.html:81
+#: src/postulo/jobs/tables.py:75
+#: src/postulo/templates/jobs/company_detail.html:88
 #, draft
 msgid "Careers page"
 msgstr "Tudalen swyddi"
@@ -1854,7 +1866,7 @@ msgid ""
 msgstr ""
 "Caiff newidiadau a wneir yma eu gwthio ar y rhediad nesaf; caiff yr ochr arall ei darllen bryd hynny hefyd."
 
-#: src/postulo/applications/views.py:481
+#: src/postulo/applications/views.py:497
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Atgoffa %(company)s am %(role)s"
@@ -1914,12 +1926,12 @@ msgstr "Dewis ffeil arall"
 msgid "Choose at least one document to record."
 msgstr "Dewiswch o leiaf un ddogfen i'w chofnodi."
 
-#: src/postulo/accounts/forms.py:459 src/postulo/jobs/forms.py:218
+#: src/postulo/accounts/forms.py:459 src/postulo/jobs/forms.py:224
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Dewiswch pa fath o ddynodydd yw hwn."
 
-#: src/postulo/applications/views.py:816
+#: src/postulo/applications/views.py:832
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Dewiswch pa gais y mae hyn yn ymwneud ag ef yn gyntaf."
@@ -1957,17 +1969,17 @@ msgid "Cleared: this entry prints its original text in %(language)s."
 msgstr ""
 "Wedi’i wagio: mae’r cofnod hwn yn argraffu ei destun gwreiddiol yn %(language)s."
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:652
+#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:663
 #, draft
 msgid "Closed"
 msgstr "Wedi cau"
 
-#: src/postulo/applications/models.py:209 src/postulo/jobs/models.py:593
+#: src/postulo/applications/models.py:210 src/postulo/jobs/models.py:604
 #, draft
 msgid "closed on"
 msgstr "caewyd ar"
 
-#: src/postulo/jobs/models.py:480
+#: src/postulo/jobs/models.py:491
 #, draft
 msgid "Closed or already filled"
 msgstr "Wedi cau neu eisoes wedi'i lenwi"
@@ -1983,7 +1995,7 @@ msgstr "Yn cau"
 msgid "Closing date"
 msgstr "Dyddiad cau"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:598
 #, draft
 msgid "closing date"
 msgstr "dyddiad cau"
@@ -2036,7 +2048,7 @@ msgstr "Ar y gweill"
 msgid "Companies"
 msgstr "Cwmnïau"
 
-#: src/postulo/jobs/models.py:169 src/postulo/jobs/tables.py:15
+#: src/postulo/jobs/models.py:169 src/postulo/jobs/tables.py:18
 #, draft
 msgid "companies"
 msgstr "cwmnïau"
@@ -2068,39 +2080,39 @@ msgstr "Cwmnïau rydych wedi gwneud cais iddynt"
 msgid "Company"
 msgstr "Cwmni"
 
-#: src/postulo/jobs/models.py:168 src/postulo/jobs/models.py:293
-#: src/postulo/jobs/models.py:370 src/postulo/jobs/models.py:398
-#: src/postulo/jobs/models.py:550 src/postulo/jobs/tables.py:15
+#: src/postulo/jobs/models.py:168 src/postulo/jobs/models.py:304
+#: src/postulo/jobs/models.py:381 src/postulo/jobs/models.py:409
+#: src/postulo/jobs/models.py:561 src/postulo/jobs/tables.py:18
 #, draft
 msgid "company"
 msgstr "cwmni"
 
-#: src/postulo/jobs/views.py:253
+#: src/postulo/jobs/views.py:300
 #, draft
 msgid "Company added."
 msgstr "Ychwanegwyd y cwmni."
 
-#: src/postulo/jobs/views.py:324
+#: src/postulo/jobs/views.py:371
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Dilëwyd y cwmni, ynghyd â'i hysbysebion."
 
-#: src/postulo/jobs/models.py:305
+#: src/postulo/jobs/models.py:316
 #, draft
 msgid "company identifier"
 msgstr "dynodydd cwmni"
 
-#: src/postulo/jobs/models.py:306
+#: src/postulo/jobs/models.py:317
 #, draft
 msgid "company identifiers"
 msgstr "dynodyddion cwmni"
 
-#: src/postulo/jobs/views.py:265
+#: src/postulo/jobs/views.py:312
 #, draft
 msgid "Company updated."
 msgstr "Diweddarwyd y cwmni."
 
-#: src/postulo/applications/models.py:81
+#: src/postulo/applications/models.py:82
 #, draft
 msgid "Company website"
 msgstr "Gwefan y cwmni"
@@ -2202,7 +2214,7 @@ msgstr "Adeiladu"
 msgid "Consulting"
 msgstr "Ymgynghori"
 
-#: src/postulo/jobs/models.py:425
+#: src/postulo/jobs/models.py:436
 #, draft
 msgid "contact"
 msgstr "cyswllt"
@@ -2213,7 +2225,7 @@ msgstr "cyswllt"
 msgid "Contact"
 msgstr "Cyswllt"
 
-#: src/postulo/jobs/views.py:421
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Contact added."
 msgstr "Ychwanegwyd y cyswllt."
@@ -2223,7 +2235,7 @@ msgstr "Ychwanegwyd y cyswllt."
 msgid "Contact block"
 msgstr "Bloc cyswllt"
 
-#: src/postulo/jobs/models.py:426
+#: src/postulo/jobs/models.py:437
 #, draft
 msgid "contacts"
 msgstr "cysylltiadau"
@@ -2233,12 +2245,12 @@ msgstr "cysylltiadau"
 msgid "Containing"
 msgstr "Yn cynnwys"
 
-#: src/postulo/applications/models.py:608
+#: src/postulo/applications/models.py:660
 #, draft
 msgid "context"
 msgstr "cyd-destun"
 
-#: src/postulo/jobs/models.py:450
+#: src/postulo/jobs/models.py:461
 #, draft
 msgid "Contract"
 msgstr "Contract"
@@ -2358,7 +2370,7 @@ msgstr "dolen dystiolaeth"
 msgid "Currency"
 msgstr "Arian cyfred"
 
-#: src/postulo/jobs/models.py:576
+#: src/postulo/jobs/models.py:587
 #, draft
 msgid "currency"
 msgstr "arian cyfred"
@@ -2441,7 +2453,7 @@ msgstr "Cronfa ddata"
 msgid "Date applied"
 msgstr "Dyddiad y cais"
 
-#: src/postulo/applications/models.py:606
+#: src/postulo/applications/models.py:658
 #, draft
 msgid "dates offered"
 msgstr "dyddiadau a gynigiwyd"
@@ -2495,7 +2507,7 @@ msgstr "Dadactifadu"
 msgid "Deactivated"
 msgstr "Wedi'i ddadactifadu"
 
-#: src/postulo/applications/models.py:208
+#: src/postulo/applications/models.py:209
 #, draft
 msgid "deadline"
 msgstr "dyddiad cau"
@@ -2588,7 +2600,7 @@ msgstr "Penderfynwyd gan %(who)s ar %(when)s"
 msgid "Decided by %(who)s."
 msgstr "Penderfynwyd gan %(who)s."
 
-#: src/postulo/jobs/models.py:608
+#: src/postulo/jobs/models.py:619
 #, draft
 msgid "decided on"
 msgstr "penderfynwyd ar"
@@ -2598,12 +2610,12 @@ msgstr "penderfynwyd ar"
 msgid "Decline"
 msgstr "Gwrthod"
 
-#: src/postulo/applications/models.py:551
+#: src/postulo/applications/models.py:603
 #, draft
 msgid "Declined"
 msgstr "Wedi'i wrthod"
 
-#: src/postulo/applications/views.py:808
+#: src/postulo/applications/views.py:824
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Wedi'i wrthod. Ni chaiff ei awgrymu eto."
@@ -2629,12 +2641,12 @@ msgstr "Gwerthoedd diofyn"
 msgid "Defence"
 msgstr "Amddiffyn"
 
-#: src/postulo/templates/applications/application_detail.html:29
+#: src/postulo/templates/applications/application_detail.html:42
 #: src/postulo/templates/applications/tag_list.html:32
 #: src/postulo/templates/documents/cv_detail.html:23
 #: src/postulo/templates/documents/letter_detail.html:21
 #: src/postulo/templates/documents/upload_list.html:40
-#: src/postulo/templates/jobs/company_detail.html:51
+#: src/postulo/templates/jobs/company_detail.html:58
 #: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
@@ -2671,17 +2683,19 @@ msgstr "Dileu'r cyfrif"
 msgid "Delete your own account from Settings, not from here."
 msgstr "Dilëwch eich cyfrif eich hun yn y Gosodiadau, nid o'r fan hon."
 
-#: src/postulo/jobs/forms.py:340
-#, draft
-msgid "Department"
-msgstr "Adran"
-
-#: src/postulo/jobs/models.py:375 src/postulo/jobs/models.py:408
+#: src/postulo/applications/models.py:237 src/postulo/jobs/models.py:386
+#: src/postulo/jobs/models.py:419
 #, draft
 msgid "department"
 msgstr "adran"
 
-#: src/postulo/jobs/models.py:376
+#: src/postulo/jobs/forms.py:346
+#: src/postulo/templates/applications/application_detail.html:162
+#, draft
+msgid "Department"
+msgstr "Adran"
+
+#: src/postulo/jobs/models.py:387
 #, draft
 msgid "departments"
 msgstr "adrannau"
@@ -2697,7 +2711,7 @@ msgstr "Yn dibynnu ar"
 msgid "Description"
 msgstr "Disgrifiad"
 
-#: src/postulo/jobs/models.py:568 src/postulo/resume/models.py:245
+#: src/postulo/jobs/models.py:579 src/postulo/resume/models.py:245
 #, draft
 msgid "description"
 msgstr "disgrifiad"
@@ -2707,12 +2721,12 @@ msgstr "disgrifiad"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Dylunio (Behance, Dribbble…)"
 
-#: src/postulo/applications/models.py:596
+#: src/postulo/applications/models.py:648
 #, draft
 msgid "detail"
 msgstr "manylyn"
 
-#: src/postulo/applications/models.py:327
+#: src/postulo/applications/models.py:379
 #, draft
 msgid "details"
 msgstr "manylion"
@@ -2740,8 +2754,8 @@ msgstr "Taflu"
 msgid "Discard this capture"
 msgstr "Taflu'r ddalfa hon"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:473
-#: src/postulo/jobs/models.py:712
+#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:484
+#: src/postulo/jobs/models.py:723
 #, draft
 msgid "Discarded"
 msgstr "Wedi'i thaflu"
@@ -2790,7 +2804,7 @@ msgid "Document stores"
 msgstr "Storfeydd dogfennau"
 
 #: src/postulo/core/navigation.py:65 src/postulo/documents/apps.py:9
-#: src/postulo/templates/applications/application_detail.html:171
+#: src/postulo/templates/applications/application_detail.html:197
 #: src/postulo/templates/documents/application_documents.html:4
 #: src/postulo/templates/documents/application_documents.html:10
 #, draft
@@ -2807,14 +2821,14 @@ msgstr "Dogfennau a anfonwyd"
 msgid "Documents you already had. Nothing here is served publicly."
 msgstr "Dogfennau oedd gennych eisoes. Ni weinir dim yma'n gyhoeddus."
 
-#: src/postulo/templates/applications/application_detail.html:309
+#: src/postulo/templates/applications/application_detail.html:335
 #: src/postulo/templates/applications/reminder_list.html:45
 #: src/postulo/templates/widgets/due_reminders.html:23
 #, draft
 msgid "Done"
 msgstr "Wedi'i wneud"
 
-#: src/postulo/applications/models.py:376
+#: src/postulo/applications/models.py:428
 #, draft
 msgid "done on"
 msgstr "gwnaed ar"
@@ -2854,7 +2868,7 @@ msgstr "Lawrlwytho'r ffeiliau eu hunain"
 msgid "Download the template"
 msgstr "Lawrlwytho'r templed"
 
-#: src/postulo/applications/models.py:39
+#: src/postulo/applications/models.py:40
 #, draft
 msgid "Draft"
 msgstr "Drafft"
@@ -2895,15 +2909,15 @@ msgid ""
 msgstr ""
 "Ed25519, base64. Hebddo nid oes catalog: nid yw rhestr heb ei llofnodi o gyfeiriadau i redeg cod ohonynt yn rhywbeth y bydd Postulo yn ei gynnig."
 
-#: src/postulo/templates/applications/application_detail.html:26
-#: src/postulo/templates/applications/application_detail.html:248
+#: src/postulo/templates/applications/application_detail.html:39
+#: src/postulo/templates/applications/application_detail.html:274
 #: src/postulo/templates/applications/interview_list.html:78
 #: src/postulo/templates/applications/tag_list.html:28
 #: src/postulo/templates/connections/list.html:68
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:37
-#: src/postulo/templates/jobs/company_detail.html:38
-#: src/postulo/templates/jobs/company_detail.html:174
+#: src/postulo/templates/jobs/company_detail.html:45
+#: src/postulo/templates/jobs/company_detail.html:223
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:115
 #: src/postulo/templates/resume/preview.html:15
@@ -2949,7 +2963,7 @@ msgid ""
 msgstr ""
 "Y naill fformat Europass neu'r llall: y JSON y mae europass.europa.eu yn ei allforio heddiw, neu'r XML a gynhyrchodd yr hen olygydd CV ac sy'n dal i fod yn allforiad hŷn ar eich disg. Mae Postulo yn gweithio allan pa un ydyw, yn dangos i chi beth sydd ynddo, ac nid yw'n ysgrifennu dim nes i chi ddweud."
 
-#: src/postulo/applications/models.py:83 src/postulo/core/server_sections.py:32
+#: src/postulo/applications/models.py:84 src/postulo/core/server_sections.py:32
 #: src/postulo/core/server_views.py:594
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
@@ -2959,7 +2973,7 @@ msgid "Email"
 msgstr "E-bost"
 
 #: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:473
-#: src/postulo/jobs/models.py:412 src/postulo/resume/views.py:437
+#: src/postulo/jobs/models.py:423 src/postulo/resume/views.py:437
 #, draft
 msgid "email address"
 msgstr "cyfeiriad e-bost"
@@ -2979,12 +2993,12 @@ msgstr "Cyfeiriad e-bost (dewisol)"
 msgid "Email addresses"
 msgstr "Cyfeiriadau e-bost"
 
-#: src/postulo/applications/models.py:282
+#: src/postulo/applications/models.py:334
 #, draft
 msgid "Email received"
 msgstr "E-bost wedi'i dderbyn"
 
-#: src/postulo/applications/models.py:281
+#: src/postulo/applications/models.py:333
 #, draft
 msgid "Email sent"
 msgstr "E-bost wedi'i anfon"
@@ -2994,7 +3008,7 @@ msgstr "E-bost wedi'i anfon"
 msgid "Employment type"
 msgstr "Math o gyflogaeth"
 
-#: src/postulo/jobs/models.py:558
+#: src/postulo/jobs/models.py:569
 #, draft
 msgid "employment type"
 msgstr "math o gyflogaeth"
@@ -3004,7 +3018,7 @@ msgstr "math o gyflogaeth"
 msgid "Empty"
 msgstr "Gwag"
 
-#: src/postulo/jobs/models.py:767
+#: src/postulo/jobs/models.py:778
 #, draft
 msgid "Empty capture"
 msgstr "Dalfa wag"
@@ -3014,7 +3028,7 @@ msgstr "Dalfa wag"
 msgid "Empty for the instance default; an account for an exception to it."
 msgstr "Gwag ar gyfer diofyn y gosodiad; cyfrif ar gyfer eithriad iddo."
 
-#: src/postulo/applications/models.py:589
+#: src/postulo/applications/models.py:641
 #, draft
 msgid "Empty when the source could not tell which application it is about."
 msgstr "Gwag pan na allai'r ffynhonnell ddweud pa gais y mae'n ymwneud ag ef."
@@ -3024,7 +3038,7 @@ msgstr "Gwag pan na allai'r ffynhonnell ddweud pa gais y mae'n ymwneud ag ef."
 msgid "enabled"
 msgstr "wedi'i alluogi"
 
-#: src/postulo/applications/models.py:473
+#: src/postulo/applications/models.py:525
 #, draft
 msgid "ends"
 msgstr "yn gorffen"
@@ -3046,17 +3060,17 @@ msgid ""
 msgstr ""
 "Mae Europass yn cofnodi pum lefel fesul iaith ac mae Postulo yn cadw un, felly cymerir yr isaf. Newidiwch ef wedyn os nad dyna'r un y byddech yn ei hawlio."
 
-#: src/postulo/applications/models.py:341
+#: src/postulo/applications/models.py:393
 #, draft
 msgid "event"
 msgstr "digwyddiad"
 
-#: src/postulo/applications/models.py:86
+#: src/postulo/applications/models.py:87
 #, draft
 msgid "Event or fair"
 msgstr "Digwyddiad neu ffair"
 
-#: src/postulo/applications/models.py:342
+#: src/postulo/applications/models.py:394
 #, draft
 msgid "events"
 msgstr "digwyddiadau"
@@ -3079,7 +3093,7 @@ msgstr ""
 msgid "Every application, in order"
 msgstr "Pob cais, yn nhrefn"
 
-#: src/postulo/jobs/forms.py:286
+#: src/postulo/jobs/forms.py:292
 #, draft
 msgid ""
 "Every company under this industry moves to the one chosen, and this one goes."
@@ -3297,7 +3311,7 @@ msgstr "Ffacs"
 msgid "Fetch my Gravatar again"
 msgstr "Nôl fy Ngravatar eto"
 
-#: src/postulo/jobs/views.py:307
+#: src/postulo/jobs/views.py:354
 #, draft
 msgid "Fetched again."
 msgstr "Nôlwyd eto."
@@ -3346,7 +3360,7 @@ msgstr "Cadwyd y ffeil."
 msgid "Files"
 msgstr "Ffeiliau"
 
-#: src/postulo/applications/models.py:233
+#: src/postulo/applications/models.py:254
 #, draft
 msgid "files sent"
 msgstr "ffeiliau a anfonwyd"
@@ -3356,7 +3370,7 @@ msgstr "ffeiliau a anfonwyd"
 msgid "Files you already had"
 msgstr "Ffeiliau oedd gennych eisoes"
 
-#: src/postulo/applications/models.py:234
+#: src/postulo/applications/models.py:255
 #, draft
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr "Ffeiliau oedd gennych eisoes, yn wahanol i ddogfennau a luniodd Postulo."
@@ -3387,7 +3401,7 @@ msgstr "Hidlo yn ôl %(column)s"
 msgid "Finance"
 msgstr "Cyllid"
 
-#: src/postulo/templates/jobs/company_detail.html:42
+#: src/postulo/templates/jobs/company_detail.html:49
 #, draft
 msgid "Find logo"
 msgstr "Chwilio am logo"
@@ -3434,12 +3448,12 @@ msgstr "Dilyn eich proffil"
 msgid "Follow-up note"
 msgstr "Nodyn dilyn i fyny"
 
-#: src/postulo/applications/views.py:475
+#: src/postulo/applications/views.py:491
 #, draft
 msgid "Follow-up recorded."
 msgstr "Cofnodwyd y dilyniant."
 
-#: src/postulo/applications/models.py:290 src/postulo/applications/views.py:472
+#: src/postulo/applications/models.py:342 src/postulo/applications/views.py:488
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3487,7 +3501,7 @@ msgstr "Anghofio'r cyfrinair a gadwyd"
 msgid "Forget the token"
 msgstr "Anghofio'r tocyn"
 
-#: src/postulo/jobs/views.py:301
+#: src/postulo/jobs/views.py:348
 #, python-format, draft
 msgid "Found a logo at %(url)s."
 msgstr "Canfuwyd logo yn %(url)s."
@@ -3506,7 +3520,7 @@ msgstr "Canfuwyd ar eu gwefan"
 msgid "Found via"
 msgstr "Canfuwyd drwy"
 
-#: src/postulo/jobs/models.py:563
+#: src/postulo/jobs/models.py:574
 #, draft
 msgid "found via"
 msgstr "canfuwyd drwy"
@@ -3517,7 +3531,7 @@ msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr ""
 "Canfuwyd: %(names)s. Dim ond y rhai a adawyd gennych yn wag a gaiff eu llenwi."
 
-#: src/postulo/jobs/models.py:451
+#: src/postulo/jobs/models.py:462
 #, draft
 msgid "Freelance"
 msgstr "Llawrydd"
@@ -3542,7 +3556,7 @@ msgstr "o"
 msgid "From"
 msgstr "O"
 
-#: src/postulo/jobs/models.py:702
+#: src/postulo/jobs/models.py:713
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "o %(low)s"
@@ -3579,7 +3593,7 @@ msgstr "O Gravatar"
 msgid "From level"
 msgstr "O lefel"
 
-#: src/postulo/applications/models.py:329
+#: src/postulo/applications/models.py:381
 #, draft
 msgid "from status"
 msgstr "o statws"
@@ -3589,7 +3603,7 @@ msgstr "o statws"
 msgid "Frozen at the moment of sending"
 msgstr "Wedi'i rewi ar adeg yr anfon"
 
-#: src/postulo/jobs/models.py:448
+#: src/postulo/jobs/models.py:459
 #, draft
 msgid "Full time"
 msgstr "Amser llawn"
@@ -3599,7 +3613,7 @@ msgstr "Amser llawn"
 msgid "Gaming"
 msgstr "Gemau"
 
-#: src/postulo/templates/applications/application_detail.html:189
+#: src/postulo/templates/applications/application_detail.html:215
 #, draft
 msgid "Get"
 msgstr "Nôl"
@@ -3614,7 +3628,7 @@ msgstr "Yn fy nghael i'n ôl i mewn"
 msgid "Gets me back in — needs confirming first"
 msgstr "Yn fy nghael i'n ôl i mewn — angen ei gadarnhau yn gyntaf"
 
-#: src/postulo/applications/models.py:49
+#: src/postulo/applications/models.py:50
 #: src/postulo/templates/widgets/gone_quiet.html:55
 #: src/postulo/templates/widgets/outcomes.html:18
 #, draft
@@ -3712,12 +3726,12 @@ msgid ""
 msgstr ""
 "Grwpiwch sgiliau cysylltiedig o dan bennawd, fel «Ieithoedd» neu «Seilwaith»."
 
-#: src/postulo/applications/models.py:597
+#: src/postulo/applications/models.py:649
 #, draft
 msgid "happened"
 msgstr "digwyddodd"
 
-#: src/postulo/applications/models.py:325
+#: src/postulo/applications/models.py:377
 #, draft
 msgid "happened on"
 msgstr "digwyddodd ar"
@@ -3738,7 +3752,7 @@ msgstr "Iechyd"
 msgid "Health check"
 msgstr "Gwiriad iechyd"
 
-#: src/postulo/applications/models.py:415
+#: src/postulo/applications/models.py:467
 #: src/postulo/templates/applications/partials/interview_outcome.html:8
 #, draft
 msgid "Held"
@@ -3754,7 +3768,7 @@ msgstr "cudd"
 msgid "hidden navigation items"
 msgstr "eitemau llywio cudd"
 
-#: src/postulo/applications/models.py:93
+#: src/postulo/applications/models.py:94
 #, draft
 msgid "High"
 msgstr "Uchel"
@@ -3792,7 +3806,7 @@ msgstr "Lletygarwch a thwristiaeth"
 msgid "How choosy you have been"
 msgstr "Pa mor ddewisol rydych chi wedi bod"
 
-#: src/postulo/templates/applications/application_detail.html:254
+#: src/postulo/templates/applications/application_detail.html:280
 #: src/postulo/templates/applications/interview_list.html:71
 #, draft
 msgid "How did it go?"
@@ -3875,7 +3889,7 @@ msgstr ""
 msgid "However you prefer to group your search."
 msgstr "Pa bynnag ffordd y mae'n well gennych grwpio'ch chwiliad."
 
-#: src/postulo/jobs/models.py:443
+#: src/postulo/jobs/models.py:454
 #, draft
 msgid "Hybrid"
 msgstr "Hybrid"
@@ -3891,7 +3905,7 @@ msgid "id in the store"
 msgstr "dynodydd yn y storfa"
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
-#: src/postulo/jobs/models.py:296 src/postulo/plugins/models.py:262
+#: src/postulo/jobs/models.py:307 src/postulo/plugins/models.py:262
 #, draft
 msgid "identifier"
 msgstr "dynodydd"
@@ -3902,7 +3916,7 @@ msgstr "dynodydd"
 msgid "Identifier"
 msgstr "Dynodydd"
 
-#: src/postulo/applications/models.py:592
+#: src/postulo/applications/models.py:644
 #, draft
 msgid "identifier at the source"
 msgstr "dynodydd yn y ffynhonnell"
@@ -4056,7 +4070,7 @@ msgstr "Cyfeiriad y mynegai"
 msgid "index address"
 msgstr "cyfeiriad y mynegai"
 
-#: src/postulo/jobs/forms.py:36 src/postulo/jobs/tables.py:42
+#: src/postulo/jobs/forms.py:36 src/postulo/jobs/tables.py:45
 #: src/postulo/templates/jobs/company_list.html:70
 #: src/postulo/templates/jobs/industry_list.html:4
 #: src/postulo/templates/jobs/industry_list.html:10
@@ -4081,7 +4095,7 @@ msgstr "sector"
 msgid "Industry"
 msgstr "Sector"
 
-#: src/postulo/jobs/views.py:379
+#: src/postulo/jobs/views.py:426
 #, draft
 msgid "Industry renamed."
 msgstr "Ailenwyd y sector."
@@ -4143,37 +4157,37 @@ msgstr "Yswiriant"
 msgid "Internal"
 msgstr "Mewnol"
 
-#: src/postulo/jobs/models.py:452
+#: src/postulo/jobs/models.py:463
 #, draft
 msgid "Internship"
 msgstr "Interniaeth"
 
-#: src/postulo/applications/models.py:284
+#: src/postulo/applications/models.py:336
 #, draft
 msgid "Interview"
 msgstr "Cyfweliad"
 
-#: src/postulo/applications/models.py:506
+#: src/postulo/applications/models.py:558
 #, draft
 msgid "interview"
 msgstr "cyfweliad"
 
-#: src/postulo/applications/models.py:286
+#: src/postulo/applications/models.py:338
 #, draft
 msgid "Interview cancelled"
 msgstr "Canslwyd y cyfweliad"
 
-#: src/postulo/applications/views.py:554
+#: src/postulo/applications/views.py:570
 #, draft
 msgid "Interview recorded."
 msgstr "Cofnodwyd y cyfweliad."
 
-#: src/postulo/applications/models.py:285
+#: src/postulo/applications/models.py:337
 #, draft
 msgid "Interview scheduled"
 msgstr "Trefnwyd y cyfweliad"
 
-#: src/postulo/applications/views.py:556
+#: src/postulo/applications/views.py:572
 #, draft
 msgid "Interview scheduled."
 msgstr "Trefnwyd y cyfweliad."
@@ -4183,25 +4197,25 @@ msgstr "Trefnwyd y cyfweliad."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Cyfweliad yfory: %(kind)s yn %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:586
+#: src/postulo/applications/views.py:602
 #, draft
 msgid "Interview updated."
 msgstr "Diweddarwyd y cyfweliad."
 
 #: src/postulo/applications/analytics.py:34
-#: src/postulo/applications/models.py:43
+#: src/postulo/applications/models.py:44
 #, draft
 msgid "Interviewing"
 msgstr "Mewn cyfweliadau"
 
-#: src/postulo/applications/models.py:507
+#: src/postulo/applications/models.py:559
 #, draft
 msgid "interviews"
 msgstr "cyfweliadau"
 
 #: src/postulo/applications/widgets.py:234
 #: src/postulo/templates/accounts/delete_account.html:22
-#: src/postulo/templates/applications/application_detail.html:207
+#: src/postulo/templates/applications/application_detail.html:233
 #: src/postulo/templates/applications/interview_list.html:4
 #: src/postulo/templates/applications/interview_list.html:9
 #: src/postulo/templates/widgets/industries.html:12
@@ -4276,7 +4290,7 @@ msgid ""
 msgstr ""
 "Gall ddarllen a newid popeth ar y gosodiad hwn, i bob person arno. Gosodwch ddim ond yr hyn rydych wedi'i ddarllen neu y mae gennych reswm i ymddiried ynddo. Ni chaiff dim ei ddiweddaru'n awtomatig byth: newid cod yw diweddariad, ac mae gweinyddwr yn clicio arno."
 
-#: src/postulo/applications/forms.py:325
+#: src/postulo/applications/forms.py:339
 #, draft
 msgid "It cannot end before it starts."
 msgstr "Ni all ddod i ben cyn iddo ddechrau."
@@ -4315,17 +4329,17 @@ msgstr "Mae ei ffeil yn cyfateb i'r hyn a lofnododd storfa ar yr enghraifft hon.
 msgid "Its file matches what the official repository signed."
 msgstr "Mae ei ffeil yn cyfateb i'r hyn a lofnododd y storfa swyddogol."
 
-#: src/postulo/applications/models.py:82
+#: src/postulo/applications/models.py:83
 #, draft
 msgid "Job board"
 msgstr "Safle swyddi"
 
-#: src/postulo/jobs/models.py:613
+#: src/postulo/jobs/models.py:624
 #, draft
 msgid "job posting"
 msgstr "hysbyseb swydd"
 
-#: src/postulo/jobs/models.py:614
+#: src/postulo/jobs/models.py:625
 #, draft
 msgid "job postings"
 msgstr "hysbysebion swydd"
@@ -4350,7 +4364,7 @@ msgstr "Teitl y swydd"
 msgid "Jobs"
 msgstr "Swyddi"
 
-#: src/postulo/templates/applications/application_detail.html:227
+#: src/postulo/templates/applications/application_detail.html:253
 #: src/postulo/templates/applications/interview_list.html:60
 #, draft
 msgid "Join the call"
@@ -4383,16 +4397,16 @@ msgid ""
 msgstr ""
 "Cedwir ef ar y ffurf ryngwladol, fel y gellir ei ffonio o unrhyw le. Cymerir rhif sydd eisoes yn dechrau â + fel y mae."
 
-#: src/postulo/jobs/forms.py:366
+#: src/postulo/jobs/forms.py:372
 #, draft
 msgid ""
 "Kept in the international form, so you can still ring it from another country. A number that already starts with + is taken as it is."
 msgstr ""
 "Cedwir ef ar y ffurf ryngwladol, fel y gallwch ei ffonio o wlad arall hefyd. Cymerir rhif sydd eisoes yn dechrau â + fel y mae."
 
-#: src/postulo/applications/models.py:324
-#: src/postulo/applications/models.py:470
-#: src/postulo/applications/models.py:594 src/postulo/core/models.py:175
+#: src/postulo/applications/models.py:376
+#: src/postulo/applications/models.py:522
+#: src/postulo/applications/models.py:646 src/postulo/core/models.py:175
 #: src/postulo/core/models.py:400 src/postulo/documents/models.py:269
 #: src/postulo/documents/models.py:341 src/postulo/documents/models.py:399
 #: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:243
@@ -4506,7 +4520,7 @@ msgid "Largest page read"
 msgstr "Y dudalen fwyaf a ddarllenwyd"
 
 #: src/postulo/applications/reports.py:480
-#: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:75
+#: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:85
 #: src/postulo/templates/applications/report.html:230
 #: src/postulo/templates/applications/report_print.html:154
 #, draft
@@ -4606,7 +4620,7 @@ msgstr "Gadewch yn wag os mai hon yw eich swydd bresennol."
 msgid "Leaving"
 msgstr "Yn gadael"
 
-#: src/postulo/applications/forms.py:306
+#: src/postulo/applications/forms.py:320
 #, draft
 msgid "Left blank, it lasts an hour."
 msgstr "Os gedir yn wag, mae'n para awr."
@@ -4686,7 +4700,7 @@ msgstr "Dolen"
 msgid "link in the store"
 msgstr "dolen yn y storfa"
 
-#: src/postulo/accounts/models.py:274 src/postulo/jobs/models.py:421
+#: src/postulo/accounts/models.py:274 src/postulo/jobs/models.py:432
 #, draft
 msgid "LinkedIn"
 msgstr "LinkedIn"
@@ -4706,7 +4720,7 @@ msgstr "dolenni"
 msgid "Links issued for this account"
 msgstr "Dolenni a gyhoeddwyd ar gyfer y cyfrif hwn"
 
-#: src/postulo/applications/models.py:226
+#: src/postulo/applications/models.py:247
 #, draft
 msgid "links sent"
 msgstr "dolenni a anfonwyd"
@@ -4729,7 +4743,7 @@ msgstr "Dolenni y cyfeirioch chi nhw atynt"
 msgid "listening"
 msgstr "yn gwrando"
 
-#: src/postulo/jobs/models.py:748
+#: src/postulo/jobs/models.py:759
 #: src/postulo/templates/core/import_csv_map.html:86
 #, draft
 msgid "listing"
@@ -4762,15 +4776,15 @@ msgstr ""
 "Hysbysebion, ceisiadau a'u llinellau amser, cwmnïau a phobl, atgoffwyr, testun yr hyn a anfonoch, llythyrau, CVau, ffeiliau a'ch cofnod gyrfa — popeth, gan gynnwys yr hyn sydd wedi cau neu wedi'i daflu, am eich bod yn chwilio am rywbeth rydych yn ei gofio."
 
 #: src/postulo/accounts/models.py:268 src/postulo/jobs/models.py:146
-#: src/postulo/jobs/models.py:553 src/postulo/resume/models.py:67
+#: src/postulo/jobs/models.py:564 src/postulo/resume/models.py:67
 #: src/postulo/resume/models.py:98
 #, draft
 msgid "location"
 msgstr "lleoliad"
 
 #: src/postulo/applications/forms.py:46 src/postulo/applications/tables.py:35
-#: src/postulo/core/csv_import.py:42 src/postulo/jobs/tables.py:33
-#: src/postulo/templates/applications/application_detail.html:113
+#: src/postulo/core/csv_import.py:42 src/postulo/jobs/tables.py:36
+#: src/postulo/templates/applications/application_detail.html:126
 #: src/postulo/templates/jobs/listing_list.html:72
 #, draft
 msgid "Location"
@@ -4819,7 +4833,7 @@ msgstr "Y bwlch hiraf, mewn dyddiau"
 msgid "Loosen one of them, or start again."
 msgstr "Llaciwch un ohonynt, neu dechreuwch eto."
 
-#: src/postulo/applications/models.py:91
+#: src/postulo/applications/models.py:92
 #, draft
 msgid "Low"
 msgstr "Isel"
@@ -4913,12 +4927,12 @@ msgstr "gwall diwethaf y post"
 msgid "Main"
 msgstr "Prif"
 
-#: src/postulo/applications/models.py:217
+#: src/postulo/applications/models.py:218
 #, draft
 msgid "main contact"
 msgstr "prif gyswllt"
 
-#: src/postulo/templates/applications/application_detail.html:149
+#: src/postulo/templates/applications/application_detail.html:175
 #, draft
 msgid "Main contact"
 msgstr "Prif gyswllt"
@@ -4961,7 +4975,7 @@ msgstr "Gweithgynhyrchu"
 msgid "Map a column to Company and one to Role first."
 msgstr "Mapiwch golofn i Gwmni ac un i Swydd yn gyntaf."
 
-#: src/postulo/applications/views.py:448
+#: src/postulo/applications/views.py:464
 #, draft
 msgid "Marked as done."
 msgstr "Wedi'i farcio fel wedi'i wneud."
@@ -5014,12 +5028,12 @@ msgstr "Aelod"
 msgid "Menu"
 msgstr "Dewislen"
 
-#: src/postulo/jobs/forms.py:283
+#: src/postulo/jobs/forms.py:289
 #, draft
 msgid "Merge into"
 msgstr "Uno â"
 
-#: src/postulo/jobs/views.py:379
+#: src/postulo/jobs/views.py:426
 #, draft
 msgid "Merged."
 msgstr "Unwyd."
@@ -5114,7 +5128,7 @@ msgstr "Symud %(name)s un rhes i fyny"
 msgid "Move down"
 msgstr "Symud i lawr"
 
-#: src/postulo/templates/applications/application_detail.html:43
+#: src/postulo/templates/applications/application_detail.html:56
 #, draft
 msgid "Move it along"
 msgstr "Ei symud yn ei blaen"
@@ -5139,8 +5153,8 @@ msgstr "adran NACE"
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
 #: src/postulo/core/models.py:81 src/postulo/documents/models.py:83
 #: src/postulo/documents/models.py:267 src/postulo/jobs/models.py:41
-#: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:298
-#: src/postulo/jobs/models.py:372 src/postulo/jobs/models.py:410
+#: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
+#: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
 #: src/postulo/plugins/models.py:48 src/postulo/resume/models.py:116
 #: src/postulo/resume/models.py:131 src/postulo/resume/models.py:150
 #: src/postulo/resume/models.py:167
@@ -5148,7 +5162,7 @@ msgstr "adran NACE"
 msgid "name"
 msgstr "enw"
 
-#: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:24
+#: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:27
 #: src/postulo/templates/server/people.html:32
 #: src/postulo/templates/server/people.html:45
 #: src/postulo/templates/server/plugins.html:314
@@ -5196,7 +5210,7 @@ msgstr "Byth"
 msgid "never used"
 msgstr "ni ddefnyddiwyd erioed"
 
-#: src/postulo/jobs/models.py:471
+#: src/postulo/jobs/models.py:482
 #, draft
 msgid "New"
 msgstr "Newydd"
@@ -5412,7 +5426,12 @@ msgid ""
 msgstr ""
 "Dim pobl wedi'u cofnodi yn y cwmni hwn eto. Ychwanegwch nhw o <a href=\"%(company_url)s\" class=\"underline\">dudalen y cwmni</a> i enwi pwy rydych yn cyfarfod."
 
-#: src/postulo/templates/jobs/company_detail.html:112
+#: src/postulo/templates/jobs/company_detail.html:158
+#, draft
+msgid "No postings recorded anywhere in this group."
+msgstr "Dim hysbysebion wedi’u cofnodi yn unman yn y grŵp hwn."
+
+#: src/postulo/templates/jobs/company_detail.html:160
 #, draft
 msgid "No postings recorded for this company."
 msgstr "Dim hysbysebion wedi'u cofnodi ar gyfer y cwmni hwn."
@@ -5477,7 +5496,7 @@ msgstr "Nid oes neb wedi cytuno i hyn eto. Cysylltwch ef eto."
 msgid "Nobody has replied yet, so there is nothing to time."
 msgstr "Nid oes neb wedi ateb eto, felly nid oes dim i'w amseru."
 
-#: src/postulo/templates/jobs/company_detail.html:182
+#: src/postulo/templates/jobs/company_detail.html:231
 #, draft
 msgid "Nobody recorded here yet."
 msgstr "Neb wedi'i gofnodi yma eto."
@@ -5508,7 +5527,7 @@ msgstr "dim"
 msgid "None chosen yet"
 msgstr "Dim un wedi’i ddewis eto"
 
-#: src/postulo/templates/applications/application_detail.html:315
+#: src/postulo/templates/applications/application_detail.html:341
 #, draft
 msgid "None outstanding."
 msgstr "Dim ar ôl."
@@ -5533,7 +5552,7 @@ msgstr "Dim eto."
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Dim eto. Mae’r cofnod hwn yn argraffu ei destun gwreiddiol ar bob CV."
 
-#: src/postulo/applications/models.py:92
+#: src/postulo/applications/models.py:93
 #, draft
 msgid "Normal"
 msgstr "Arferol"
@@ -5565,7 +5584,7 @@ msgid ""
 msgstr ""
 "Heb ei ffurfweddu. Gosodwch POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID a POSTULO_OIDC_CLIENT_SECRET yn yr amgylchedd i gynnig botwm mewngofnodi ar gyfer darparwr OpenID Connect."
 
-#: src/postulo/jobs/models.py:477
+#: src/postulo/jobs/models.py:488
 #, draft
 msgid "Not for me"
 msgstr "Ddim i mi"
@@ -5585,7 +5604,7 @@ msgstr "heb ei lwytho"
 msgid "Not matched to an application."
 msgstr "Heb ei gysylltu â chais."
 
-#: src/postulo/jobs/forms.py:108
+#: src/postulo/jobs/forms.py:114
 #, draft
 msgid "Not part of another company"
 msgstr "Ddim yn rhan o gwmni arall"
@@ -5649,13 +5668,13 @@ msgstr "Heb ei ysgrifennu yn %(tongue)s eto. Argraffir y rhain fel y maent:"
 msgid "note"
 msgstr "nodyn"
 
-#: src/postulo/applications/forms.py:226 src/postulo/applications/models.py:280
+#: src/postulo/applications/forms.py:240 src/postulo/applications/models.py:332
 #, draft
 msgid "Note"
 msgstr "Nodyn"
 
 #: src/postulo/accounts/forms.py:638
-#: src/postulo/templates/applications/application_detail.html:52
+#: src/postulo/templates/applications/application_detail.html:65
 #, draft
 msgid "Note (optional)"
 msgstr "Nodyn (dewisol)"
@@ -5665,19 +5684,19 @@ msgstr "Nodyn (dewisol)"
 msgid "noted %(when)s"
 msgstr "nodwyd %(when)s"
 
-#: src/postulo/jobs/models.py:606
+#: src/postulo/jobs/models.py:617
 #, draft
 msgid "noted on"
 msgstr "nodwyd ar"
 
-#: src/postulo/core/csv_import.py:53 src/postulo/jobs/tables.py:66
-#: src/postulo/templates/jobs/company_detail.html:134
+#: src/postulo/core/csv_import.py:53 src/postulo/jobs/tables.py:76
+#: src/postulo/templates/jobs/company_detail.html:183
 #, draft
 msgid "Notes"
 msgstr "Nodiadau"
 
 #: src/postulo/documents/models.py:351 src/postulo/jobs/models.py:150
-#: src/postulo/jobs/models.py:422
+#: src/postulo/jobs/models.py:433
 #, draft
 msgid "notes"
 msgstr "nodiadau"
@@ -5813,7 +5832,7 @@ msgid ""
 msgstr ""
 "Nid oes dim ar y cofnod hwn yn cael ei gyfieithu. Geiriau’r corff hwnnw yw enw tystysgrif a’r corff a’i dyfarnodd, ac ni fyddai cofnod mewn iaith arall yr un cymhwyster."
 
-#: src/postulo/templates/applications/application_detail.html:102
+#: src/postulo/templates/applications/application_detail.html:115
 #, draft
 msgid "Nothing recorded against this one yet."
 msgstr "Dim byd wedi'i gofnodi am hwn eto."
@@ -5823,7 +5842,7 @@ msgstr "Dim byd wedi'i gofnodi am hwn eto."
 msgid "Nothing recorded for this application yet."
 msgstr "Dim byd wedi'i gofnodi ar gyfer y cais hwn eto."
 
-#: src/postulo/templates/applications/application_detail.html:199
+#: src/postulo/templates/applications/application_detail.html:225
 #: src/postulo/templates/widgets/recent_activity.html:26
 #: src/postulo/templates/widgets/sources.html:56
 #, draft
@@ -5847,7 +5866,7 @@ msgid ""
 msgstr ""
 "Ni chadwyd dim. Mae hysbysebion yn diflannu o'r we; mae gludo'r testun yn cadw'ch copi chi."
 
-#: src/postulo/templates/applications/application_detail.html:262
+#: src/postulo/templates/applications/application_detail.html:288
 #, draft
 msgid "Nothing scheduled."
 msgstr "Dim byd wedi'i drefnu."
@@ -5943,7 +5962,7 @@ msgstr "Dim. Bydd y trosolwg yn cynnig dod â rhywbeth yn ôl."
 msgid "Notifications"
 msgstr "Hysbysiadau"
 
-#: src/postulo/applications/models.py:378
+#: src/postulo/applications/models.py:430
 #, draft
 msgid "notified on"
 msgstr "hysbyswyd ar"
@@ -5975,12 +5994,12 @@ msgstr ""
 "I ffwrdd. Mae cod o ap dilysu, y gofynnir amdano ar ôl y cyfrinair, yn golygu nad yw cyfrinair sydd wedi gollwng ar ei ben ei hun yn ddigon."
 
 #: src/postulo/applications/analytics.py:36
-#: src/postulo/applications/models.py:45
+#: src/postulo/applications/models.py:46
 #, draft
 msgid "Offer"
 msgstr "Cynnig"
 
-#: src/postulo/applications/models.py:288
+#: src/postulo/applications/models.py:340
 #, draft
 msgid "Offer received"
 msgstr "Cynnig wedi dod"
@@ -6014,7 +6033,7 @@ msgstr "Swyddogol"
 msgid "older than a week"
 msgstr "hŷn nag wythnos"
 
-#: src/postulo/applications/models.py:407 src/postulo/jobs/models.py:442
+#: src/postulo/applications/models.py:459 src/postulo/jobs/models.py:453
 #, draft
 msgid "On site"
 msgstr "Ar y safle"
@@ -6194,6 +6213,11 @@ msgid ""
 msgstr ""
 "Un zip gyda phob cofnod a phob ffeil, sy'n mewnforio i gyfrif newydd ar unrhyw Postulo."
 
+#: src/postulo/templates/jobs/company_detail.html:118
+#, python-format, draft
+msgid "Only %(name)s"
+msgstr "%(name)s yn unig"
+
 #: src/postulo/templates/documents/cv_detail.html:129
 #, draft
 msgid "Only entries not already on this CV are listed."
@@ -6231,7 +6255,7 @@ msgid ""
 msgstr ""
 "Ceisiadau agored heb glywed dim, a'r tri pheth y gellir eu gwneud am hynny."
 
-#: src/postulo/templates/jobs/partials/company_row.html:76
+#: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
 msgstr "Swyddi gwag"
@@ -6274,16 +6298,16 @@ msgstr "sefydliad"
 msgid "Origin"
 msgstr "Tarddiad"
 
-#: src/postulo/templates/applications/application_detail.html:159
+#: src/postulo/templates/applications/application_detail.html:185
 #: src/postulo/templates/jobs/posting_detail.html:95
 #, draft
 msgid "Original posting"
 msgstr "Yr hysbyseb wreiddiol"
 
-#: src/postulo/applications/models.py:87 src/postulo/applications/models.py:291
-#: src/postulo/applications/models.py:410 src/postulo/core/models.py:169
+#: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
+#: src/postulo/applications/models.py:462 src/postulo/core/models.py:169
 #: src/postulo/core/models.py:394 src/postulo/documents/models.py:329
-#: src/postulo/jobs/models.py:481 src/postulo/resume/models.py:219
+#: src/postulo/jobs/models.py:492 src/postulo/resume/models.py:219
 #, draft
 msgid "Other"
 msgstr "Arall"
@@ -6304,7 +6328,7 @@ msgstr "Ieithoedd eraill"
 msgid "Other periods"
 msgstr "Cyfnodau eraill"
 
-#: src/postulo/applications/models.py:485
+#: src/postulo/applications/models.py:537
 #, draft
 msgid "outcome"
 msgstr "canlyniad"
@@ -6359,12 +6383,12 @@ msgstr "Cod y dudalen"
 msgid "Pagination"
 msgstr "Tudalennu"
 
-#: src/postulo/applications/models.py:408
+#: src/postulo/applications/models.py:460
 #, draft
 msgid "Panel"
 msgstr "Panel"
 
-#: src/postulo/jobs/models.py:738
+#: src/postulo/jobs/models.py:749
 #, draft
 msgid "parsed posting"
 msgstr "hysbyseb wedi'i dosrannu"
@@ -6374,17 +6398,22 @@ msgstr "hysbyseb wedi'i dosrannu"
 msgid "part of"
 msgstr "rhan o"
 
-#: src/postulo/templates/jobs/company_detail.html:18
+#: src/postulo/jobs/tables.py:71
+#, draft
+msgid "Part of"
+msgstr "Rhan o"
+
+#: src/postulo/templates/jobs/company_detail.html:19
 #, python-format, draft
 msgid "Part of <a href=\"%(parent_url)s\" class=\"underline\">%(name)s</a>"
 msgstr "Rhan o <a href=\"%(parent_url)s\" class=\"underline\">%(name)s</a>"
 
-#: src/postulo/templates/jobs/company_detail.html:117
+#: src/postulo/templates/jobs/company_detail.html:166
 #, draft
 msgid "Part of this company"
 msgstr "Rhan o'r cwmni hwn"
 
-#: src/postulo/jobs/models.py:449
+#: src/postulo/jobs/models.py:460
 #, draft
 msgid "Part time"
 msgstr "Rhan amser"
@@ -6447,29 +6476,29 @@ msgstr "Dim ond y rhai sy'n aros"
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
 #: src/postulo/core/server_views.py:145 src/postulo/core/server_views.py:231
 #: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:326
-#: src/postulo/core/server_views.py:343 src/postulo/jobs/tables.py:63
-#: src/postulo/templates/jobs/company_detail.html:141
+#: src/postulo/core/server_views.py:343 src/postulo/jobs/tables.py:73
+#: src/postulo/templates/jobs/company_detail.html:190
 #: src/postulo/templates/server/people.html:7
 #, draft
 msgid "People"
 msgstr "Pobl"
 
-#: src/postulo/jobs/models.py:459
+#: src/postulo/jobs/models.py:470
 #, draft
 msgid "Per day"
 msgstr "Y dydd"
 
-#: src/postulo/jobs/models.py:460
+#: src/postulo/jobs/models.py:471
 #, draft
 msgid "Per hour"
 msgstr "Yr awr"
 
-#: src/postulo/jobs/models.py:458
+#: src/postulo/jobs/models.py:469
 #, draft
 msgid "Per month"
 msgstr "Y mis"
 
-#: src/postulo/jobs/models.py:457
+#: src/postulo/jobs/models.py:468
 #, draft
 msgid "Per year"
 msgstr "Y flwyddyn"
@@ -6515,7 +6544,7 @@ msgid "Pharmaceuticals"
 msgstr "Fferylliaeth"
 
 #: src/postulo/accounts/forms.py:306 src/postulo/core/phone_numbers.py:302
-#: src/postulo/jobs/forms.py:363
+#: src/postulo/jobs/forms.py:369
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
 msgid "Phone"
@@ -6526,7 +6555,7 @@ msgstr "Ffôn"
 msgid "phone"
 msgstr "ffôn"
 
-#: src/postulo/applications/models.py:405
+#: src/postulo/applications/models.py:457
 #, draft
 msgid "Phone screen"
 msgstr "Sgwrs ffôn"
@@ -6651,7 +6680,7 @@ msgstr ""
 msgid "Portfolio"
 msgstr "Portffolio"
 
-#: src/postulo/applications/models.py:227
+#: src/postulo/applications/models.py:248
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Portffolios, proffiliau a fideos y cyfeirioch chi nhw atynt."
@@ -6672,7 +6701,7 @@ msgid "postal address"
 msgstr "cyfeiriad post"
 
 #: src/postulo/accounts/models.py:266 src/postulo/core/models.py:426
-#: src/postulo/jobs/models.py:420
+#: src/postulo/jobs/models.py:431
 #, draft
 msgid "postal addresses"
 msgstr "cyfeiriadau post"
@@ -6687,12 +6716,12 @@ msgstr "Cyfeiriadau post"
 msgid "postcode"
 msgstr "cod post"
 
-#: src/postulo/jobs/models.py:585
+#: src/postulo/jobs/models.py:596
 #, draft
 msgid "posted on"
 msgstr "cyhoeddwyd ar"
 
-#: src/postulo/applications/models.py:194
+#: src/postulo/applications/models.py:195
 #, draft
 msgid "posting"
 msgstr "hysbyseb"
@@ -6708,12 +6737,12 @@ msgstr "Hysbyseb"
 msgid "Posting address"
 msgstr "Cyfeiriad yr hysbyseb"
 
-#: src/postulo/templates/applications/application_detail.html:164
+#: src/postulo/templates/applications/application_detail.html:190
 #, draft
 msgid "Posting details"
 msgstr "Manylion yr hysbyseb"
 
-#: src/postulo/jobs/views.py:478
+#: src/postulo/jobs/views.py:525
 #, draft
 msgid "Posting updated."
 msgstr "Diweddarwyd yr hysbyseb."
@@ -6723,16 +6752,21 @@ msgstr "Diweddarwyd yr hysbyseb."
 msgid "Posting URL"
 msgstr "URL yr hysbyseb"
 
-#: src/postulo/jobs/models.py:561
+#: src/postulo/jobs/models.py:572
 #, draft
 msgid "posting URL"
 msgstr "url yr hysbyseb"
 
-#: src/postulo/jobs/tables.py:49
-#: src/postulo/templates/jobs/company_detail.html:88
+#: src/postulo/jobs/tables.py:52
+#: src/postulo/templates/jobs/company_detail.html:112
 #, draft
 msgid "Postings"
 msgstr "Hysbysebion"
+
+#: src/postulo/templates/jobs/company_detail.html:108
+#, python-format, draft
+msgid "Postings across the %(name)s group"
+msgstr "Hysbysebion ar draws grŵp %(name)s cyfan"
 
 #: src/postulo/templates/jobs/capture_list.html:11
 #, draft
@@ -6808,7 +6842,7 @@ msgstr ""
 msgid "prefix"
 msgstr "rhagddodiad"
 
-#: src/postulo/applications/models.py:483
+#: src/postulo/applications/models.py:535
 #, draft
 msgid "preparation notes"
 msgstr "nodiadau paratoi"
@@ -6857,7 +6891,7 @@ msgstr "Prif"
 msgid "Priority"
 msgstr "Blaenoriaeth"
 
-#: src/postulo/applications/models.py:200
+#: src/postulo/applications/models.py:201
 #, draft
 msgid "priority"
 msgstr "blaenoriaeth"
@@ -7008,7 +7042,7 @@ msgstr "Tawel"
 msgid "quiet after"
 msgstr "tawel ar ôl"
 
-#: src/postulo/applications/models.py:238
+#: src/postulo/applications/models.py:259
 #, draft
 msgid "quiet announced on"
 msgstr "cyhoeddwyd tawelwch ar"
@@ -7064,7 +7098,7 @@ msgstr ""
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Darllenwyd fel Europass XML, y fformat a gynhyrchodd y golygydd CV."
 
-#: src/postulo/jobs/models.py:730
+#: src/postulo/jobs/models.py:741
 #, draft
 msgid "read by"
 msgstr "darllenwyd gan"
@@ -7114,7 +7148,7 @@ msgstr "Eiddo"
 msgid "Recent activity"
 msgstr "Gweithgarwch diweddar"
 
-#: src/postulo/templates/applications/application_detail.html:55
+#: src/postulo/templates/applications/application_detail.html:68
 #, draft
 msgid "Record"
 msgstr "Cofnodi"
@@ -7144,7 +7178,7 @@ msgstr "Cofnodi'r cais"
 msgid "Record the first application and the rest will follow."
 msgstr "Cofnodwch y cais cyntaf a bydd y gweddill yn dilyn."
 
-#: src/postulo/templates/applications/application_detail.html:174
+#: src/postulo/templates/applications/application_detail.html:200
 #: src/postulo/templates/documents/application_documents.html:16
 #: src/postulo/templates/documents/send.html:4
 #: src/postulo/templates/documents/send.html:8
@@ -7164,22 +7198,22 @@ msgid ""
 msgstr ""
 "Caiff ei gofnodi yn erbyn popeth a osodir oddi yma, felly ni all newid yn ddiweddarach heb amddifadu'r hyn a osododd."
 
-#: src/postulo/applications/views.py:607
+#: src/postulo/applications/views.py:623
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Cofnodwyd fel wedi'i ganslo."
 
-#: src/postulo/applications/views.py:606
+#: src/postulo/applications/views.py:622
 #, draft
 msgid "Recorded as held."
 msgstr "Cofnodwyd fel wedi'i gynnal."
 
-#: src/postulo/applications/models.py:334
+#: src/postulo/applications/models.py:386
 #, draft
 msgid "recorded by"
 msgstr "cofnodwyd gan"
 
-#: src/postulo/applications/models.py:336
+#: src/postulo/applications/models.py:388
 #, draft
 msgid "recorded on"
 msgstr "cofnodwyd ar"
@@ -7189,7 +7223,7 @@ msgstr "cofnodwyd ar"
 msgid "Recorded what you sent."
 msgstr "Cofnodwyd yr hyn a anfonoch."
 
-#: src/postulo/applications/views.py:608
+#: src/postulo/applications/views.py:624
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Cofnodwyd: ni ddaeth neb."
@@ -7210,7 +7244,7 @@ msgstr "Dolen adfer"
 msgid "recovery links"
 msgstr "dolenni adfer"
 
-#: src/postulo/applications/models.py:85
+#: src/postulo/applications/models.py:86
 #, draft
 msgid "Recruiter"
 msgstr "Recriwtiwr"
@@ -7225,12 +7259,12 @@ msgstr "Ailgyfeiriadau a ddilynwyd"
 msgid "Reference"
 msgstr "Geirda"
 
-#: src/postulo/applications/models.py:84
+#: src/postulo/applications/models.py:85
 #, draft
 msgid "Referral"
 msgstr "Argymhelliad"
 
-#: src/postulo/templates/jobs/company_detail.html:47
+#: src/postulo/templates/jobs/company_detail.html:54
 #, draft
 msgid "Refresh logo"
 msgstr "Adnewyddu'r logo"
@@ -7273,13 +7307,13 @@ msgstr "Cofrestru ar agor"
 msgid "Reinstall"
 msgstr "Ailosod"
 
-#: src/postulo/applications/models.py:47
+#: src/postulo/applications/models.py:48
 #: src/postulo/templates/widgets/outcomes.html:14
 #, draft
 msgid "Rejected"
 msgstr "Wedi'i wrthod"
 
-#: src/postulo/applications/models.py:289
+#: src/postulo/applications/models.py:341
 #, draft
 msgid "Rejection received"
 msgstr "Daeth gwrthodiad"
@@ -7290,24 +7324,24 @@ msgstr "Daeth gwrthodiad"
 msgid "Rejections"
 msgstr "Gwrthodiadau"
 
-#: src/postulo/applications/forms.py:281
+#: src/postulo/applications/forms.py:295
 #, draft
 msgid "Remind me the day before"
 msgstr "Atgoffwch fi y diwrnod cynt"
 
-#: src/postulo/applications/models.py:383
-#: src/postulo/applications/models.py:500
+#: src/postulo/applications/models.py:435
+#: src/postulo/applications/models.py:552
 #, draft
 msgid "reminder"
 msgstr "atgoffwr"
 
-#: src/postulo/applications/models.py:384
+#: src/postulo/applications/models.py:436
 #, draft
 msgid "reminders"
 msgstr "atgoffwyr"
 
 #: src/postulo/core/navigation.py:76 src/postulo/core/search.py:388
-#: src/postulo/templates/applications/application_detail.html:290
+#: src/postulo/templates/applications/application_detail.html:316
 #: src/postulo/templates/applications/reminder_list.html:4
 #: src/postulo/templates/applications/reminder_list.html:8
 #, draft
@@ -7320,7 +7354,7 @@ msgid "Reminders that have come due, each with a button to mark it done."
 msgstr ""
 "Atgoffwyr sydd wedi dod yn ddyledus, pob un â botwm i'w farcio'n wedi'i wneud."
 
-#: src/postulo/jobs/models.py:444
+#: src/postulo/jobs/models.py:455
 #, draft
 msgid "Remote"
 msgstr "O bell"
@@ -7455,7 +7489,7 @@ msgstr "Adolygu'r ddalfa"
 msgid "Reviewed by a speaker"
 msgstr "Adolygwyd gan siaradwr"
 
-#: src/postulo/applications/models.py:621
+#: src/postulo/applications/models.py:673
 #, draft
 msgid "reviewed on"
 msgstr "adolygwyd ar"
@@ -7503,7 +7537,7 @@ msgstr "Anwybyddir robots.txt ar hyn o bryd."
 msgid "Role"
 msgstr "Swydd"
 
-#: src/postulo/jobs/models.py:411 src/postulo/resume/models.py:66
+#: src/postulo/jobs/models.py:422 src/postulo/resume/models.py:66
 #, draft
 msgid "role"
 msgstr "swydd"
@@ -7541,7 +7575,7 @@ msgid "Run"
 msgstr "Rhedeg"
 
 #: src/postulo/applications/tables.py:79
-#: src/postulo/templates/applications/application_detail.html:125
+#: src/postulo/templates/applications/application_detail.html:138
 #: src/postulo/templates/jobs/posting_detail.html:75
 #, draft
 msgid "Salary"
@@ -7557,12 +7591,12 @@ msgstr "Cyflog (un ffigur neu ystod)"
 msgid "Salary from"
 msgstr "Cyflog o"
 
-#: src/postulo/jobs/models.py:571
+#: src/postulo/jobs/models.py:582
 #, draft
 msgid "salary from"
 msgstr "cyflog o"
 
-#: src/postulo/jobs/models.py:578
+#: src/postulo/jobs/models.py:589
 #, draft
 msgid "salary period"
 msgstr "cyfnod cyflog"
@@ -7572,7 +7606,7 @@ msgstr "cyfnod cyflog"
 msgid "Salary to"
 msgstr "Cyflog hyd at"
 
-#: src/postulo/jobs/models.py:574
+#: src/postulo/jobs/models.py:585
 #, draft
 msgid "salary to"
 msgstr "cyflog hyd at"
@@ -7654,7 +7688,7 @@ msgstr "Cadwyd."
 msgid "Say what this address is."
 msgstr "Dywedwch beth yw'r cyfeiriad hwn."
 
-#: src/postulo/jobs/models.py:332
+#: src/postulo/jobs/models.py:343
 #, draft
 msgid "Say what this identifier is."
 msgstr "Dywedwch beth yw'r dynodydd hwn."
@@ -7664,7 +7698,7 @@ msgstr "Dywedwch beth yw'r dynodydd hwn."
 msgid "Say what this number is."
 msgstr "Dywedwch beth yw'r rhif hwn."
 
-#: src/postulo/templates/applications/application_detail.html:210
+#: src/postulo/templates/applications/application_detail.html:236
 #: src/postulo/templates/applications/interview_form.html:68
 #, draft
 msgid "Schedule"
@@ -7676,7 +7710,7 @@ msgstr "Trefnu"
 msgid "Schedule an interview"
 msgstr "Trefnu cyfweliad"
 
-#: src/postulo/applications/models.py:414
+#: src/postulo/applications/models.py:466
 #, draft
 msgid "Scheduled"
 msgstr "Wedi'i drefnu"
@@ -7697,7 +7731,7 @@ msgid "scopes"
 msgstr "cwmpasau"
 
 #: src/postulo/applications/analytics.py:33
-#: src/postulo/applications/models.py:42
+#: src/postulo/applications/models.py:43
 #, draft
 msgid "Screening"
 msgstr "Sgrinio"
@@ -7885,7 +7919,7 @@ msgid ""
 msgstr ""
 "Gosodwch <code>POSTULO_PLUGIN_CATALOGUES</code> i gofnodion <code>enw|url|allwedd-gyhoeddus</code>, wedi'u gwahanu gan gomas. Rhaid i'r mynegai fod wedi'i lofnodi â'r allwedd honno, a rhaid i bob olwyn gyfateb i'r swm gwirio y mae'r mynegai llofnodedig yn ei gario, neu ni chaiff dim ei osod."
 
-#: src/postulo/applications/models.py:206
+#: src/postulo/applications/models.py:207
 #, draft
 msgid "Set automatically the first time the status becomes “Applied”."
 msgstr "Caiff ei osod yn awtomatig y tro cyntaf y daw'r statws yn «Gwnaed cais»."
@@ -7919,7 +7953,7 @@ msgstr "Gosod y cyfrinair"
 msgid "Set up"
 msgstr "Sefydlu"
 
-#: src/postulo/jobs/models.py:596
+#: src/postulo/jobs/models.py:607
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Gosodwch pan nad yw'r swydd ar gael mwyach."
@@ -7960,7 +7994,7 @@ msgstr "Llwybrau byr"
 msgid "Shortlist"
 msgstr "Rhestr fer"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:472
+#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:483
 #, draft
 msgid "Shortlisted"
 msgstr "Ar y rhestr fer"
@@ -8143,7 +8177,7 @@ msgstr "Gweinydd SMTP"
 msgid "Snooze"
 msgstr "Gohirio"
 
-#: src/postulo/applications/views.py:489
+#: src/postulo/applications/views.py:505
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Gohiriwyd am bythefnos."
@@ -8206,7 +8240,7 @@ msgid ""
 msgstr ""
 "Y ffynhonnell yw'r maes «canfuwyd drwy» ar hysbyseb. Llenwch ef a bydd y tabl hwn yn dechrau ennill ei le."
 
-#: src/postulo/jobs/models.py:731
+#: src/postulo/jobs/models.py:742
 #, draft
 msgid "source version"
 msgstr "fersiwn yn y ffynhonnell"
@@ -8246,7 +8280,7 @@ msgstr "Dechrau o:"
 msgid "Starting clean instead?"
 msgstr "Dechrau o'r dechrau yn lle hynny?"
 
-#: src/postulo/applications/models.py:472
+#: src/postulo/applications/models.py:524
 #, draft
 msgid "starts"
 msgstr "yn dechrau"
@@ -8263,7 +8297,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, ar ôl cysylltu"
 
-#: src/postulo/jobs/models.py:600 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:611 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "cyflwr"
@@ -8274,11 +8308,11 @@ msgstr "cyflwr"
 msgid "State"
 msgstr "Cyflwr"
 
-#: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:224
+#: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:238
 #: src/postulo/applications/reports.py:479
 #: src/postulo/applications/tables.py:43 src/postulo/core/csv_import.py:43
 #: src/postulo/templates/accounts/invite_list.html:26
-#: src/postulo/templates/applications/application_detail.html:48
+#: src/postulo/templates/applications/application_detail.html:61
 #: src/postulo/templates/applications/partials/bulk_fields.html:20
 #: src/postulo/templates/applications/partials/filters.html:14
 #: src/postulo/templates/applications/report.html:229
@@ -8288,14 +8322,14 @@ msgstr "Cyflwr"
 msgid "Status"
 msgstr "Statws"
 
-#: src/postulo/applications/models.py:197
-#: src/postulo/applications/models.py:611 src/postulo/documents/models.py:513
-#: src/postulo/jobs/models.py:740
+#: src/postulo/applications/models.py:198
+#: src/postulo/applications/models.py:663 src/postulo/documents/models.py:513
+#: src/postulo/jobs/models.py:751
 #, draft
 msgid "status"
 msgstr "statws"
 
-#: src/postulo/applications/models.py:279
+#: src/postulo/applications/models.py:331
 #, draft
 msgid "Status change"
 msgstr "Newid statws"
@@ -8305,7 +8339,7 @@ msgstr "Newid statws"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Statws yn y daenlen: %(text)s"
 
-#: src/postulo/applications/views.py:364
+#: src/postulo/applications/views.py:380
 #, draft
 msgid "Status updated."
 msgstr "Diweddarwyd y statws."
@@ -8364,22 +8398,22 @@ msgstr "Cryf"
 msgid "subject"
 msgstr "pwnc"
 
-#: src/postulo/applications/models.py:591
+#: src/postulo/applications/models.py:643
 #, draft
 msgid "suggested by"
 msgstr "awgrymwyd gan"
 
-#: src/postulo/applications/models.py:599
+#: src/postulo/applications/models.py:651
 #, draft
 msgid "suggested status"
 msgstr "statws a awgrymwyd"
 
-#: src/postulo/applications/models.py:626
+#: src/postulo/applications/models.py:678
 #, draft
 msgid "suggestion"
 msgstr "awgrym"
 
-#: src/postulo/applications/models.py:627
+#: src/postulo/applications/models.py:679
 #, draft
 msgid "suggestions"
 msgstr "awgrymiadau"
@@ -8390,7 +8424,7 @@ msgstr "awgrymiadau"
 msgid "Suggestions"
 msgstr "Awgrymiadau"
 
-#: src/postulo/applications/models.py:326 src/postulo/documents/models.py:87
+#: src/postulo/applications/models.py:378 src/postulo/documents/models.py:87
 #: src/postulo/resume/models.py:72 src/postulo/resume/models.py:155
 #, draft
 msgid "summary"
@@ -8518,7 +8552,7 @@ msgstr "arwyddair"
 msgid "Tags"
 msgstr "Tagiau"
 
-#: src/postulo/applications/models.py:220 src/postulo/core/models.py:92
+#: src/postulo/applications/models.py:241 src/postulo/core/models.py:92
 #, draft
 msgid "tags"
 msgstr "tagiau"
@@ -8565,7 +8599,7 @@ msgid "telephone number"
 msgstr "rhif ffôn"
 
 #: src/postulo/accounts/models.py:263 src/postulo/core/models.py:214
-#: src/postulo/jobs/models.py:417
+#: src/postulo/jobs/models.py:428
 #, draft
 msgid "telephone numbers"
 msgstr "rhifau ffôn"
@@ -8674,7 +8708,7 @@ msgstr "Nid yw'r cysylltiad hwnnw'n defnyddio cytundeb."
 msgid "That connection no longer exists."
 msgstr "Nid yw'r cysylltiad hwnnw'n bodoli mwyach."
 
-#: src/postulo/jobs/models.py:437
+#: src/postulo/jobs/models.py:448
 #, draft
 msgid "That department belongs to a different company."
 msgstr "Mae'r adran honno'n perthyn i gwmni arall."
@@ -8691,7 +8725,7 @@ msgstr ""
 msgid "That does not look like a complete web address."
 msgstr "Nid yw hwn yn edrych fel cyfeiriad gwe cyflawn."
 
-#: src/postulo/applications/views.py:395
+#: src/postulo/applications/views.py:411
 #, draft
 msgid "That entry could not be saved."
 msgstr "Ni ellid cadw'r cofnod hwnnw."
@@ -8723,7 +8757,7 @@ msgstr "Mae'r ffeil honno'n fwy na %(limit)s MB, felly ni chafodd ei darllen."
 msgid "That file is larger than %(limit)s MB."
 msgstr "Mae'r ffeil honno'n fwy na %(limit)s MB."
 
-#: src/postulo/jobs/forms.py:121 src/postulo/jobs/logos.py:128
+#: src/postulo/jobs/forms.py:127 src/postulo/jobs/logos.py:128
 #: src/postulo/jobs/logos.py:172
 #, draft
 msgid "That file is larger than a logo should be."
@@ -8766,7 +8800,7 @@ msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr ""
 "SVG yw hwnnw, nad yw Postulo yn ei gadw eto. Mae PNG neu JPEG yn gweithio."
 
-#: src/postulo/applications/views.py:366
+#: src/postulo/applications/views.py:382
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Nid yw hwnnw'n statws y mae Postulo yn ei adnabod."
@@ -8786,17 +8820,17 @@ msgstr "Nid yw hwnnw'n declyn y mae Postulo yn gwybod amdano."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Nid allwedd gyhoeddus Ed25519 mo honno: %(error)s"
 
-#: src/postulo/applications/views.py:600
+#: src/postulo/applications/views.py:616
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Nid yw hwnnw'n ganlyniad y mae Postulo yn ei adnabod."
 
-#: src/postulo/applications/views.py:491
+#: src/postulo/applications/views.py:507
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Nid yw hwnnw'n rhywbeth y gall Postulo ei wneud amdano."
 
-#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:124
+#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:151
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "Nid yw hynny'n rhywbeth y gall Postulo ei wneud i sawl un ar unwaith."
@@ -8896,7 +8930,7 @@ msgstr "Nid yw'r ategyn hwnnw wedi'i osod mwyach."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Ni ddaeth yr ateb hwnnw o gais a wnaeth Postulo."
 
-#: src/postulo/applications/views.py:803
+#: src/postulo/applications/views.py:819
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Mae'r awgrym hwnnw eisoes wedi'i ateb."
@@ -8937,7 +8971,7 @@ msgstr "Atebodd y cyfeiriad %(code)s."
 msgid "The address answered with nothing."
 msgstr "Atebodd y cyfeiriad â dim."
 
-#: src/postulo/jobs/models.py:590
+#: src/postulo/jobs/models.py:601
 #, draft
 msgid "The application deadline, if stated."
 msgstr "Y dyddiad cau ar gyfer y cais, os nodir."
@@ -9013,6 +9047,11 @@ msgstr "Mae'r lawrlwythiad yn llawer mwy nag y dylai ategyn fod."
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Y fersiwn gynharach y mae hon yn ei disodli. Cedwir yr hen ffeil."
+
+#: src/postulo/applications/forms.py:232
+#, draft
+msgid "The employer as a whole"
+msgstr "Y cyflogwr yn ei gyfanrwydd"
 
 #: src/postulo/core/server_views.py:988 src/postulo/plugins/forms.py:55
 #, python-format, draft
@@ -9104,22 +9143,22 @@ msgid ""
 msgstr ""
 "Y deg peth diwethaf a gofnododd y llinell amser, ar ba gais bynnag yr oeddent."
 
-#: src/postulo/jobs/models.py:749
+#: src/postulo/jobs/models.py:760
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "Yr hysbyseb y daeth y ddalfa hon yn un ohoni, ar ôl ei hadolygu."
 
-#: src/postulo/jobs/models.py:479
+#: src/postulo/jobs/models.py:490
 #, draft
 msgid "The location"
 msgstr "Y lleoliad"
 
-#: src/postulo/jobs/views.py:310
+#: src/postulo/jobs/views.py:357
 #, draft
 msgid "The logo is gone."
 msgstr "Mae'r logo wedi mynd."
 
-#: src/postulo/jobs/views.py:235
+#: src/postulo/jobs/views.py:282
 #, python-format, draft
 msgid "The logo was not changed: %(problem)s"
 msgstr "Ni newidiwyd y logo: %(problem)s"
@@ -9189,7 +9228,7 @@ msgid ""
 msgstr ""
 "Caiff y cyfrinair ei osod gan <code>%(variable)s</code> yn yr amgylchedd; newidiwch ef yno. Ni chaiff ei ddangos yma byth."
 
-#: src/postulo/jobs/models.py:478
+#: src/postulo/jobs/models.py:489
 #, draft
 msgid "The pay"
 msgstr "Y tâl"
@@ -9199,7 +9238,7 @@ msgstr "Y tâl"
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Yr ategion sy'n dod y tu mewn i Postulo. Ni nôlir dim."
 
-#: src/postulo/templates/applications/application_detail.html:109
+#: src/postulo/templates/applications/application_detail.html:122
 #, draft
 msgid "The posting"
 msgstr "Yr hysbyseb"
@@ -9309,7 +9348,7 @@ msgid ""
 msgstr ""
 "Mae'r switsh ar y dde uchaf yn beicio drwy'r un tri; hwn yw'r fersiwn benodol."
 
-#: src/postulo/jobs/forms.py:343
+#: src/postulo/jobs/forms.py:349
 #, draft
 msgid ""
 "The team they are in, if you know it. A new name joins the company's list."
@@ -9323,7 +9362,7 @@ msgid ""
 msgstr ""
 "Gosodir y parth amser gan yr amgylchedd: <code>%(variable)s</code> = %(zone)s. Tynnwch ef o'r amgylchedd i'w newid yma."
 
-#: src/postulo/applications/forms.py:83 src/postulo/jobs/forms.py:461
+#: src/postulo/applications/forms.py:83 src/postulo/jobs/forms.py:472
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "Ni all y ffigur uchaf fod yn is na'r un isaf."
@@ -9359,7 +9398,7 @@ msgstr "Yna dileu"
 msgid "There are no links to check."
 msgstr "Nid oes dolenni i'w gwirio."
 
-#: src/postulo/jobs/views.py:304
+#: src/postulo/jobs/views.py:351
 #, draft
 msgid "There is no address to fetch it from again."
 msgstr "Nid oes cyfeiriad i'w nôl ohono eto."
@@ -9416,7 +9455,7 @@ msgstr ""
 msgid "These records can name people and their applications."
 msgstr "Gall y cofnodion hyn enwi pobl a'u ceisiadau."
 
-#: src/postulo/applications/models.py:417
+#: src/postulo/applications/models.py:469
 #, draft
 msgid "They did not show up"
 msgstr "Ni ddaethon nhw"
@@ -9443,7 +9482,7 @@ msgstr "Nid oes gwefan wedi'i chofnodi ar gyfer y cwmni hwn."
 msgid "This entry prints its original text on every CV."
 msgstr "Mae’r cofnod hwn yn argraffu ei destun gwreiddiol ar bob CV."
 
-#: src/postulo/accounts/forms.py:484 src/postulo/jobs/forms.py:243
+#: src/postulo/accounts/forms.py:484 src/postulo/jobs/forms.py:249
 #, draft
 msgid "This identifier is already listed."
 msgstr "Mae'r dynodydd hwn eisoes ar y rhestr."
@@ -9513,7 +9552,7 @@ msgid ""
 msgstr ""
 "Eich cyfrif eich hun yw hwn. Nid yw dolen a wnewch i chi'ch hun yn ffordd yn ôl — bu'n rhaid i chi fewngofnodi i'w gwneud. Os mai chi yw'r unig weinyddwr yma, allwedd mynediad neu ail weinyddwr sy'n eich cwmpasu."
 
-#: src/postulo/accounts/forms.py:481 src/postulo/jobs/forms.py:240
+#: src/postulo/accounts/forms.py:481 src/postulo/jobs/forms.py:246
 #, draft
 msgid "This kind of identifier is already listed."
 msgstr "Mae'r math hwn o ddynodydd eisoes ar y rhestr."
@@ -9600,7 +9639,7 @@ msgstr "parth amser"
 msgid "Time zone for new accounts"
 msgstr "Parth amser ar gyfer cyfrifon newydd"
 
-#: src/postulo/applications/models.py:619
+#: src/postulo/applications/models.py:671
 #, draft
 msgid "timeline entry"
 msgstr "cofnod llinell amser"
@@ -9616,7 +9655,7 @@ msgid "timeout in seconds"
 msgstr "terfyn amser mewn eiliadau"
 
 #: src/postulo/documents/models.py:340 src/postulo/documents/models.py:398
-#: src/postulo/jobs/models.py:552 src/postulo/resume/models.py:241
+#: src/postulo/jobs/models.py:563 src/postulo/resume/models.py:241
 #, draft
 msgid "title"
 msgstr "teitl"
@@ -9651,7 +9690,7 @@ msgstr "I benderfynu"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "I drosglwyddo hysbyseb (mae angen y cwmpas captures):"
 
-#: src/postulo/applications/models.py:330
+#: src/postulo/applications/models.py:382
 #, draft
 msgid "to status"
 msgstr "i statws"
@@ -9738,7 +9777,7 @@ msgstr "Rhowch gynnig ar lai o eiriau, neu sillafiad gwahanol."
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Trowch «Defnyddio fy Ngravatar» ymlaen yn gyntaf."
 
-#: src/postulo/jobs/models.py:711
+#: src/postulo/jobs/models.py:722
 #, draft
 msgid "Turned into an application"
 msgstr "Wedi troi'n gais"
@@ -9763,7 +9802,7 @@ msgstr "Teipiwch o leiaf ddau nod."
 msgid "Type it in instead"
 msgstr "Teipiwch ef i mewn yn lle hynny"
 
-#: src/postulo/accounts/forms.py:461 src/postulo/jobs/forms.py:220
+#: src/postulo/accounts/forms.py:461 src/postulo/jobs/forms.py:226
 #, draft
 msgid "Type the identifier."
 msgstr "Teipiwch y dynodydd."
@@ -9819,7 +9858,7 @@ msgstr ""
 msgid "until"
 msgstr "tan"
 
-#: src/postulo/jobs/models.py:704
+#: src/postulo/jobs/models.py:715
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "hyd at %(high)s"
@@ -10014,7 +10053,7 @@ msgstr "Fersiynau rydych wedi'u hanfon"
 msgid "Very weak"
 msgstr "Gwan iawn"
 
-#: src/postulo/templates/applications/application_detail.html:85
+#: src/postulo/templates/applications/application_detail.html:98
 #, python-format, draft
 msgid "via %(actor)s"
 msgstr "drwy %(actor)s"
@@ -10024,12 +10063,12 @@ msgstr "drwy %(actor)s"
 msgid "Video"
 msgstr "Fideo"
 
-#: src/postulo/applications/models.py:406
+#: src/postulo/applications/models.py:458
 #, draft
 msgid "Video call"
 msgstr "Galwad fideo"
 
-#: src/postulo/applications/models.py:549 src/postulo/jobs/models.py:710
+#: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:721
 #, draft
 msgid "Waiting for review"
 msgstr "Yn aros am adolygiad"
@@ -10082,8 +10121,8 @@ msgstr ""
 msgid "website"
 msgstr "gwefan"
 
-#: src/postulo/jobs/tables.py:64
-#: src/postulo/templates/jobs/company_detail.html:77
+#: src/postulo/jobs/tables.py:74
+#: src/postulo/templates/jobs/company_detail.html:84
 #, draft
 msgid "Website"
 msgstr "Gwefan"
@@ -10166,7 +10205,7 @@ msgstr "Beth mae pob ategyn yn ei wneud, i bawb"
 msgid "What goes where"
 msgstr "Beth sy'n mynd i ble"
 
-#: src/postulo/templates/applications/application_detail.html:73
+#: src/postulo/templates/applications/application_detail.html:86
 #: src/postulo/templates/server/logs.html:90
 #, draft
 msgid "What happened"
@@ -10211,7 +10250,7 @@ msgstr ""
 msgid "What it may do"
 msgstr "Beth y caiff ei wneud"
 
-#: src/postulo/applications/models.py:595
+#: src/postulo/applications/models.py:647
 #, draft
 msgid "what it says"
 msgstr "beth mae'n ei ddweud"
@@ -10249,7 +10288,7 @@ msgid ""
 msgstr ""
 "Beth mae'r trosolwg yn ei ddangos, ac ym mha drefn. Mae popeth a arferai fod ar Fewnwelediadau yma fel teclyn; tynnwch yr hyn nad ydych byth yn ei ddarllen a rhowch y gweddill lle mynnoch."
 
-#: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:301
+#: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:312
 #, draft
 msgid "What the identifier is, when the scheme is Other."
 msgstr "Beth yw'r dynodydd, pan mai Arall yw'r cynllun."
@@ -10295,7 +10334,7 @@ msgstr "Beth mae'r gosodiad hwn yn ei redeg, a ble mae ei ddata."
 msgid "What to call it"
 msgstr "Beth i'w alw"
 
-#: src/postulo/applications/models.py:374
+#: src/postulo/applications/models.py:426
 #, draft
 msgid "what to do"
 msgstr "beth i'w wneud"
@@ -10331,7 +10370,7 @@ msgid "What you type here is what a CV in that language prints instead."
 msgstr ""
 "Yr hyn a deipiwch yma yw’r hyn y mae CV yn yr iaith honno yn ei argraffu yn ei le."
 
-#: src/postulo/applications/models.py:375
+#: src/postulo/applications/models.py:427
 #, draft
 msgid "when"
 msgstr "pryd"
@@ -10342,17 +10381,17 @@ msgstr "pryd"
 msgid "When"
 msgstr "Pryd"
 
-#: src/postulo/applications/models.py:603
+#: src/postulo/applications/models.py:655
 #, draft
 msgid "When accepting should also move the application."
 msgstr "Pryd y dylai derbyn symud y cais hefyd."
 
-#: src/postulo/jobs/models.py:606
+#: src/postulo/jobs/models.py:617
 #, draft
 msgid "When it entered your listings."
 msgstr "Pryd y daeth i mewn i'ch hysbysebion."
 
-#: src/postulo/applications/models.py:475
+#: src/postulo/applications/models.py:527
 #, draft
 msgid "where"
 msgstr "ble"
@@ -10406,7 +10445,7 @@ msgstr "Ble mae pethau arni"
 msgid "Where this company lists its openings."
 msgstr "Ble mae'r cwmni hwn yn hysbysebu ei swyddi gwag."
 
-#: src/postulo/jobs/models.py:566
+#: src/postulo/jobs/models.py:577
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Ble y daethoch ar ei thraws: safle swyddi, argymhelliad, safle'r cwmni."
@@ -10468,10 +10507,15 @@ msgid ""
 msgstr ""
 "Ym mha iaith y mae eich profiad, eich addysg a’ch prosiectau wedi’u teipio. Mae CV mewn iaith arall yn dangos yr hyn rydych wedi’i gyfieithu, ac yn dweud beth na allai."
 
-#: src/postulo/jobs/models.py:736
+#: src/postulo/jobs/models.py:747
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Pa ran o Postulo a luniodd hwn: y rhyngwyneb gwe, neu'r API."
+
+#: src/postulo/applications/models.py:238
+#, draft
+msgid "Which part of the employer this was for, if you know."
+msgstr "Ar gyfer pa ran o’r cyflogwr yr oedd hyn, os ydych yn gwybod."
 
 #: src/postulo/templates/applications/report.html:36
 #, draft
@@ -10488,7 +10532,7 @@ msgstr "Ar gyfer pa ategyn y dylai'r cysylltiad hwn fod?"
 msgid "Who may create an account here."
 msgstr "Pwy gaiff greu cyfrif yma."
 
-#: src/postulo/applications/models.py:481
+#: src/postulo/applications/models.py:533
 #, draft
 msgid "who you are meeting"
 msgstr "pwy rydych yn cyfarfod"
@@ -10498,7 +10542,7 @@ msgstr "pwy rydych yn cyfarfod"
 msgid "Why"
 msgstr "Pam"
 
-#: src/postulo/jobs/models.py:603
+#: src/postulo/jobs/models.py:614
 #, draft
 msgid "why it was discarded"
 msgstr "pam y cafodd ei thaflu"
@@ -10518,7 +10562,7 @@ msgstr "Lledu {column}"
 msgid "widgets already offered"
 msgstr "teclynnau a gynigiwyd eisoes"
 
-#: src/postulo/templates/applications/application_detail.html:235
+#: src/postulo/templates/applications/application_detail.html:261
 #, draft
 msgid "With"
 msgstr "Gyda"
@@ -10544,7 +10588,7 @@ msgstr "Gyda chyfrinair: gofynnir i chi am god. Bob amser."
 msgid "With: %(people)s"
 msgstr "Gyda: %(people)s"
 
-#: src/postulo/applications/models.py:48
+#: src/postulo/applications/models.py:49
 #, draft
 msgid "Withdrawn"
 msgstr "Wedi'i thynnu'n ôl"
@@ -10560,12 +10604,12 @@ msgid "worked %(when)s"
 msgstr "gweithiodd %(when)s"
 
 #: src/postulo/applications/forms.py:48
-#: src/postulo/templates/applications/application_detail.html:119
+#: src/postulo/templates/applications/application_detail.html:132
 #, draft
 msgid "Working arrangement"
 msgstr "Trefniant gweithio"
 
-#: src/postulo/jobs/models.py:555
+#: src/postulo/jobs/models.py:566
 #, draft
 msgid "working arrangement"
 msgstr "trefniant gweithio"
@@ -10646,7 +10690,7 @@ msgid ""
 msgstr ""
 "Ie: gall rhywun sydd wedi anghofio ei gyfrinair ofyn am god i'w brif gyfeiriad a'i deipio'n ôl. Cod ac nid dolen, oherwydd bod sganwyr post yn dilyn dolenni a byddent yn ei wario cyn i'r person ei ddarllen. Nid yw byth yn ail ffactor: gofynnir am yr ap dilysu o hyd. Yn cael ei gynnig dim ond tra bo post y llwyfan hwn wir yn cyrraedd."
 
-#: src/postulo/jobs/forms.py:193
+#: src/postulo/jobs/forms.py:199
 #, draft
 msgid "You already have a company with that name."
 msgstr "Mae gennych gwmni â'r enw hwnnw eisoes."
@@ -10656,12 +10700,12 @@ msgstr "Mae gennych gwmni â'r enw hwnnw eisoes."
 msgid "You already have a CV with that name."
 msgstr "Mae gennych CV â'r enw hwnnw eisoes."
 
-#: src/postulo/applications/forms.py:342
+#: src/postulo/applications/forms.py:356
 #, draft
 msgid "You already have a tag with that name."
 msgstr "Mae gennych dag â'r enw hwnnw eisoes."
 
-#: src/postulo/jobs/forms.py:311
+#: src/postulo/jobs/forms.py:317
 #, draft
 msgid "You already have that industry."
 msgstr "Mae gennych y sector hwnnw eisoes."
@@ -10842,7 +10886,7 @@ msgid "Your data"
 msgstr "Eich data"
 
 #: src/postulo/applications/forms.py:123
-#: src/postulo/templates/applications/application_detail.html:143
+#: src/postulo/templates/applications/application_detail.html:156
 #, draft
 msgid "Your deadline"
 msgstr "Eich dyddiad cau"
@@ -10953,6 +10997,16 @@ msgstr "{label} wedi’i dynnu"
 #, draft
 msgid "{label} — new"
 msgstr "{label} — newydd"
+
+#: src/postulo/templates/jobs/company_detail.html:24
+#, python-format, draft
+msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
+msgstr "· yng ngrŵp <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a>"
+
+#: src/postulo/templates/applications/application_detail.html:21
+#, python-format, draft
+msgid "· part of %(name)s"
+msgstr "· rhan o %(name)s"
 
 #: src/postulo/templates/applications/report.html:144
 #, draft

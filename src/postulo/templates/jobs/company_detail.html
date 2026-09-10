@@ -10,13 +10,20 @@
       <h1 class="text-2xl font-semibold tracking-tight">{{ company.name }}</h1>
       {% comment %} The parent is named rather than its details inherited: a subsidiary keeps
          its own industries, logo and notes, and knowing who owns it is what the reader
-         wanted (#55). {% endcomment %}
-      {% if company.parent %}
+         wanted (#55). It comes from the view rather than from the object, because whether
+         a structure is offered at all is one answer about one person (#138). {% endcomment %}
+      {% if parent %}
         <p class="text-sm text-ink-500 dark:text-ink-400">
-          {% url 'jobs:company_detail' company.parent.pk as parent_url %}
-          {% blocktranslate trimmed with name=company.parent.name %}
+          {% url 'jobs:company_detail' parent.pk as parent_url %}
+          {% blocktranslate trimmed with name=parent.name %}
             Part of <a href="{{ parent_url }}" class="underline">{{ name }}</a>
           {% endblocktranslate %}
+          {% if group and group.pk != parent.pk %}
+            {% url 'jobs:company_detail' group.pk as group_url %}
+            {% blocktranslate trimmed with name=group.name %}
+              · in the <a href="{{ group_url }}" class="underline">{{ name }}</a> group
+            {% endblocktranslate %}
+          {% endif %}
         </p>
       {% endif %}
       {% if company.location %}
@@ -84,7 +91,41 @@
 
   <div class="grid gap-6 lg:grid-cols-3">
     <div class="lg:col-span-2">
-      <h2 class="mb-3 font-medium">{% translate "Postings" %}</h2>
+      {% comment %} A hierarchy that silently keeps counting leaves is a hierarchy that
+         changes nothing, so this says which reading it is showing and offers the other.
+         The default is this company alone, which is what every figure in Postulo has
+         always meant: changing what a number means without being asked would be the worse
+         half of the same mistake (#138).
+
+         In the address, because it is a question rather than a preference -- the same line
+         drawn for a table's sort and filters.
+      {% endcomment %}
+      <div class="mb-3 flex flex-wrap items-baseline justify-between gap-3">
+        <h2 class="font-medium">
+          {% if showing_group %}
+            {% blocktranslate trimmed with name=group.name %}
+              Postings across the {{ name }} group
+            {% endblocktranslate %}
+          {% else %}
+            {% translate "Postings" %}
+          {% endif %}
+        </h2>
+        {% if in_a_group %}
+          {% if showing_group %}
+            <a href="?" class="text-sm underline">
+              {% blocktranslate trimmed with name=company.name %}
+                Only {{ name }}
+              {% endblocktranslate %}
+            </a>
+          {% else %}
+            <a href="?across={{ across_group }}" class="text-sm underline">
+              {% blocktranslate trimmed with name=group.name %}
+                Across the {{ name }} group
+              {% endblocktranslate %}
+            </a>
+          {% endif %}
+        {% endif %}
+      </div>
       {% if postings %}
         <div class="card p-0">
           <ul class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -94,6 +135,9 @@
                   {{ posting.title }}
                 </a>
                 <p class="text-sm text-ink-500 dark:text-ink-400">
+                  {% if showing_group and posting.company_id != company.pk %}
+                    <bdi>{{ posting.company.name }}</bdi> ·
+                  {% endif %}
                   {{ posting.location|default:"—" }}
                   {% for application in posting.applications.all %}
                     ·
@@ -108,7 +152,11 @@
         </div>
       {% else %}
         <div class="card text-sm text-ink-500 dark:text-ink-400">
-          {% translate "No postings recorded for this company." %}
+          {% if showing_group %}
+            {% translate "No postings recorded anywhere in this group." %}
+          {% else %}
+            {% translate "No postings recorded for this company." %}
+          {% endif %}
         </div>
       {% endif %}
 

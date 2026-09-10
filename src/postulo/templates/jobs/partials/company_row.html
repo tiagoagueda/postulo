@@ -57,6 +57,16 @@
       <td class="px-4 py-3 text-end tabular-nums">{{ company.posting_count }}</td>
     {% elif column.key == 'applications' %}
       <td class="px-4 py-3 text-end tabular-nums">{{ company.application_count }}</td>
+    {% elif column.key == 'parent' %}
+      {% comment %} The company this one is part of, as recorded, with a link that narrows
+         the table to that whole ownership tree -- which is the table's half of the company
+         page's *across the group* (#138). {% endcomment %}
+      <td class="px-4 py-3">
+        {% if company.parent %}
+          <a href="{% url 'jobs:company_list' %}?group={{ company.parent.name|urlencode }}"
+             class="underline"><bdi>{{ company.parent.name }}</bdi></a>
+        {% else %}—{% endif %}
+      </td>
     {% elif column.key == 'contacts' %}
       <td class="px-4 py-3 text-end tabular-nums">{{ company.contact_count }}</td>
     {% elif column.key == 'website' %}

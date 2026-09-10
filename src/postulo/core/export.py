@@ -33,7 +33,9 @@ from postulo import __version__
 #: (#92); 10 replaced ``cv_id``/``cover_letter_id`` on a sent document with a
 #: ``source_kind`` and a ``source_ref``, so that a new kind of document is not a new
 #: column (#130). The importer still reads every earlier format, filling the new fields in.
-FORMAT_VERSION = 12
+#: 13 added ``department`` and ``department_company`` on an application, naming which
+#: part of an employer the attempt was aimed at (#138).
+FORMAT_VERSION = 13
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -395,7 +397,9 @@ def build_document(user) -> dict:
         "postings__applications__events",
         "postings__applications__reminders",
         "postings__applications__interviews__contacts",
+        "postings__applications__department__company",
         "postings__applications__sent_links",
+        "departments",
     )
     for company in companies:
         document["companies"].append(
@@ -407,6 +411,11 @@ def build_document(user) -> dict:
                 # matched. An empty string is a company that belongs to nobody.
                 "parent": company.parent.name if company.parent_id else "",
                 "industries": [industry.name for industry in company.industries.all()],
+                # The teams inside this company, as records of their own. They used to
+                # travel only as a name beside a contact, which silently dropped every
+                # department nobody had been recorded at -- and a team you applied to before
+                # you knew anybody there is exactly the ordinary case (#138).
+                "departments": [team.name for team in company.departments.all()],
                 "identifiers": [
                     {"scheme": i.scheme, "value": i.value, "label": i.label}
                     for i in company.identifiers.all()
@@ -426,6 +435,19 @@ def build_document(user) -> dict:
                         "applications": [
                             {
                                 **_fields(application, APPLICATION_FIELDS),
+                                # Which part of the employer this was aimed at, by name
+                                # and by the company holding it -- a department may sit
+                                # at another company in the same group, and an id means
+                                # nothing in another instance. Resolved in a second pass
+                                # on import, as the ownership tree is (#138).
+                                "department": (
+                                    application.department.name if application.department_id else ""
+                                ),
+                                "department_company": (
+                                    application.department.company.name
+                                    if application.department_id
+                                    else ""
+                                ),
                                 "tags": [tag.slug for tag in application.tags.all()],
                                 "sent_link_ids": [link.pk for link in application.sent_links.all()],
                                 "events": [

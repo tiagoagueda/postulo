@@ -182,7 +182,7 @@ class ApplicationForm(OwnerScopedModelForm):
 
     class Meta:
         model = Application
-        fields = ("status", "channel", "priority", "deadline", "contact", "tags")
+        fields = ("status", "channel", "priority", "deadline", "department", "contact", "tags")
         widgets = {"deadline": forms.DateInput(attrs={"type": "date"})}
 
     def save(self, commit: bool = True):
@@ -210,12 +210,26 @@ class ApplicationForm(OwnerScopedModelForm):
             application.tags.add(*typed)
 
     def scope_querysets(self) -> None:
+        from postulo.jobs import structure
+
         self.fields["tags"].queryset = Tag.objects.for_user(self.user)
         contacts = Contact.objects.for_user(self.user).select_related("company")
         if self.instance.pk:
             # The contacts worth offering are the ones at this company.
             contacts = contacts.filter(company=self.instance.posting.company_id)
         self.fields["contact"].queryset = contacts
+
+        # Which part of the employer this was aimed at (#138). Offered only where the
+        # feature is on *and* there is something to choose: a picker of one empty option is
+        # a control asking to be ignored. Not offered is not the same as cleared -- a
+        # department already named stays on the row and comes back with the feature.
+        company = self.instance.posting.company if self.instance.pk else None
+        departments = structure.departments_for(company, self.user)
+        if not departments.exists():
+            del self.fields["department"]
+        else:
+            self.fields["department"].queryset = departments
+            self.fields["department"].empty_label = _("The employer as a whole")
 
 
 class StatusChangeForm(forms.Form):

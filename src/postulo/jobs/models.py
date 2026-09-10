@@ -235,6 +235,17 @@ class Company(OwnedModel):
             seen.add(node.pk)
         return node
 
+    def group_members(self) -> list[Company]:
+        """Every company in this one's group: the top of the chain and everything under it.
+
+        What "the same employer" means once an employer is a tree (#138). Used to decide
+        whether a department may be named on an application -- a posting at the Irish arm
+        can perfectly well be for the group's engineering team, and refusing that would make
+        the tree decorative.
+        """
+        top = self.group
+        return [top, *top.descendants()]
+
     def descendants(self) -> list[Company]:
         """Every company under this one, breadth first, without repeating a visit."""
         found: list[Company] = []

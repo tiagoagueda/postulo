@@ -59,7 +59,11 @@ class CompanyListView(OwnedObjectMixin, ListView):
         # The table's ordering always ends in the key, so pagination over the aggregated
         # rows never repeats or skips one between pages.
         queryset = (
-            super().get_queryset().with_table_data().prefetch_related("industries", "identifiers")
+            super()
+            .get_queryset()
+            .with_table_data()
+            .select_related("parent")
+            .prefetch_related("industries", "identifiers")
         )
         search = self.request.GET.get("q", "").strip()
         if search:
@@ -69,8 +73,30 @@ class CompanyListView(OwnedObjectMixin, ListView):
                 | Q(industries__name__icontains=search)
                 | Q(identifiers__value__icontains=search)
             )
+        queryset = self._within_group(queryset)
         # A company in two matching industries is still one row.
         return self.table.apply(queryset).distinct()
+
+    def _within_group(self, queryset):
+        """Narrow to one ownership tree, when `?group=` names a company in one.
+
+        A walk rather than a join: an ownership chain is arbitrarily deep and the depth cap
+        is ten, so expressing "anywhere in this group" as a lookup would be ten outer joins
+        on every row of every page. Two small queries instead, and the answer is exact.
+
+        An unknown name narrows to nothing rather than to everything, because a filter that
+        silently does not apply is worse than one that shows an empty page.
+        """
+        from . import structure
+
+        wanted = self.request.GET.get("group", "").strip()
+        if not wanted or not structure.structure_allowed(self.request.user):
+            return queryset
+        tops = Company.objects.for_user(self.request.user).filter(name__iexact=wanted)
+        members: set[int] = set()
+        for top in tops.select_related("parent"):
+            members.update(member.pk for member in top.group_members())
+        return queryset.filter(pk__in=members)
 
     def get_template_names(self) -> list[str]:
         if self.request.htmx and not self.request.htmx.history_restore_request:
@@ -86,6 +112,7 @@ class CompanyListView(OwnedObjectMixin, ListView):
         # means no additive action, and an action bar with an empty select is a promise the
         # page cannot keep (#134).
         context["bulk_industries"] = Industry.objects.for_user(self.request.user)
+        context["group"] = self.request.GET.get("group", "").strip()
         return context
 
 
@@ -168,15 +195,35 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
     def get_context_data(self, **kwargs) -> dict:
         from postulo.core import phone_numbers
 
+        from . import structure
+
         context = super().get_context_data(**kwargs)
+        person = self.request.user
+        # A hierarchy that silently keeps counting leaves is a hierarchy that changes
+        # nothing, so the page asks which reading it is showing -- and defaults to the one
+        # every figure in Postulo has always meant, this company alone (#138).
+        across = self.request.GET.get("across", "")
+        counted = structure.companies_counted(self.object, person, across=across)
+        context["across"] = across
+        context["across_group"] = structure.ACROSS_GROUP
+        context["showing_group"] = len(counted) > 1
+        context["in_a_group"] = structure.in_a_group(self.object, person)
+        context["group"] = structure.group_of(self.object, person)
+        context["parent"] = structure.parent_of(self.object, person)
+        context["children"] = structure.children_of(self.object, person)
         context["contacts"] = self.object.contacts.select_related("department").prefetch_related(
             "phone_numbers"
         )
-        context["children"] = self.object.children.all()
-        context["postings"] = self.object.postings.prefetch_related("applications")
+        context["postings"] = (
+            JobPosting.objects.for_user(person)
+            .filter(company__in=counted)
+            .select_related("company")
+            .prefetch_related("applications")
+        )
         # Decided once for the page rather than per contact: it is one answer about one
         # person, and asking it per row would be a query per row for the same answer.
-        context["several_numbers"] = phone_numbers.several_allowed(self.request.user)
+        context["several_numbers"] = phone_numbers.several_allowed(person)
+        context["structure_on"] = structure.structure_allowed(person)
         return context
 
 

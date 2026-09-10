@@ -227,6 +227,39 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **An employer can be a structure, and an application can say which part of it the attempt
+  was for.** The last of three: a company inside a company shipped with #55, a department
+  inside a company with #137, and this is the attachment, the switch, and the question a
+  tree makes every count answer.
+
+  **"Attached to any of the four" turns out to be three fields, not four.** A posting's
+  company is the company applied to, whatever height of the tree it sits at, so *parent
+  company* and *child company* are the same column holding different rows; a contact was
+  already a direct optional link. Only the department was missing.
+
+  **The shape it was given is the decision the issue turned on**, and the plugin toggle
+  settled it. Naming a department *enriches* the posting's company rather than replacing it,
+  so that column stays required and every application has exactly one employer however this
+  is set. Had the employer link itself been made polymorphic — a posting pointing at a
+  company, a department or a person — then switching the feature off would leave applications
+  attached to departments with no company to fall back to, which is a toggle that breaks a
+  page rather than a toggle. A department anywhere in the employer's *group* may be named,
+  because an application through the Irish arm can be for the group's engineering team;
+  anywhere else is refused in a sentence naming the employer it is actually at.
+
+  **Every count now says which reading it is showing.** A company page counts that company,
+  exactly as it always did, and offers *across the group* beside the heading where there is a
+  group — in the address, so a page counting a whole group can be bookmarked and sent.
+  Changing what a number means without being asked would be the other half of the same
+  mistake a hierarchy is meant to fix, so the default did not move. The companies table gains
+  a **Part of** column whose name narrows the table to that whole ownership tree,
+  grandchildren included.
+
+  All of it is one feature plugin, **Employers with a structure**, on by default so an
+  upgrade takes nothing away. Off is exactly what Postulo did before any of this existed —
+  one company per posting and nothing else — and deletes nothing: the parents, the
+  departments and the attachments stay recorded and come back untouched. (#138)
+
 - **A report about a period, to hand to an employment office or to read yourself.** Two
   different people ask for this and they want the same document. Unemployment benefit in most
   of Europe is conditional on actually looking, evidenced — and until now the only way to hand
@@ -1256,6 +1289,13 @@ All notable changes to Postulo are recorded here. The format follows
   where it is, which was the whole reason `RenderedDocument` exists. (#130)
 
 ### 🐛 Fixed
+
+- **A team nobody had been recorded at did not survive an export.** A department travelled
+  only as a name beside a contact, so a team with no contact simply vanished from the
+  archive — and *a team you applied to before you knew anybody there* is exactly the ordinary
+  case the model was written for. Departments are now records of their own in the file. Found
+  by the new attachment failing to restore, which is the argument for the round-trip test
+  being a round trip. (#138)
 
 - **A stored column width did nothing on a real deployment.** It shipped as a `style`
   attribute on the header cell, and the policy Postulo serves is `style-src 'self'`, which

@@ -383,6 +383,53 @@ stops a mistake becoming a page that walks for ever.
 The relation travels in your export, written as the parent's **name** rather than as an
 internal number, so a restored archive keeps its groups.
 
+### Which part of the employer an application was for
+
+An application can name a **department** as well as a company: not *Google*, but *Google's
+engineering team*.
+
+**The company is still the employer.** Naming a department adds detail to the link the
+posting already carries; it never replaces it. That matters more than it sounds — it is the
+reason the whole structure can be switched off without leaving an application attached to a
+team with no employer behind it.
+
+Any department **anywhere in that employer's group** may be named. An application through
+the Irish arm can be for the group's engineering team, and refusing that would make the
+group decorative. A department at another employer is refused, in a sentence saying which
+employer it is at.
+
+The box appears only when the employer has a department to choose. A department that is
+later renamed out of existence leaves the application where it is, at the company.
+
+### Counting the group, or counting the company
+
+Once an employer is more than one company, every count has two readings, and Postulo says
+which one it is showing.
+
+**A company page counts that company** — the same as it always did. Where the company is in
+a group it offers *Across the {group} group* beside the heading, which counts every company
+in the tree and names the company each posting is at. The choice is in the address, so a
+page counting a whole group is a page you can bookmark and send.
+
+Changing what a number means without being asked would be the other half of the same
+mistake, which is why the default never moved.
+
+**The companies table** can show a **Part of** column: the company each row belongs to, as
+you recorded it. Its name is a link that narrows the table to that whole ownership tree —
+grandchildren included — so *show me everything under Alphabet* is one click. Each row still
+counts itself, which is true and visible.
+
+### Switching all of this off
+
+*One company is part of another*, *departments*, and *which part an application was for* are
+one feature — **Employers with a structure** — and it can be switched off per person under
+*Settings → Plugins*, or for the whole instance by an administrator.
+
+**Off is exactly what Postulo did before any of it existed.** One company per posting, one
+name on the page, contacts hanging directly off a company. **Nothing is deleted to get
+there**: the parent links, the departments and the attachments stay exactly where they are,
+and the day it is switched back on they are all still there.
+
 **Industries** are the fields a company operates in, in your own words, and a company may
 be in several — a bank that is also an insurer and a software house is all three. Tick the
 ones you already use on the company form, or type new ones separated by commas. The

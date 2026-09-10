@@ -391,6 +391,11 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     #: its child does.
     wants_parent: dict[int, str] = {}
 
+    #: The department each application named, as (company name, department name).
+    #: Applied after the tree, because a department at a parent company is only
+    #: findable once that company and its departments exist (#138).
+    wants_department: dict[int, tuple[str, str]] = {}
+
     for company_entry in document.get("companies", []):
         contact_entries = company_entry.pop("contacts", [])
         posting_entries = company_entry.pop("postings", [])
@@ -402,6 +407,14 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             industry_names = Industry.split(company_entry.get("industry", ""))
         company_entry.pop("industry", None)
         identifier_entries = company_entry.pop("identifiers", None) or []
+        # Format 13 writes the teams as records of their own. Before it they travelled
+        # only as a name beside a contact, so a team nobody had been recorded at was
+        # silently dropped -- which is exactly the ordinary case (#138).
+        department_names = [
+            str(name).strip()[:120]
+            for name in (company_entry.pop("departments", None) or [])
+            if str(name).strip()
+        ]
         logo_name = company_entry.pop("logo_file", "")
         # Resolved after every company in the file exists: a parent may be named before it
         # has been read, and an archive written before format 5 names none at all.
@@ -434,6 +447,8 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             wants_parent[company.pk] = parent_name
         if industry_names:
             company.industries.add(*Industry.named(user, industry_names))
+        for department_name in department_names:
+            Department.objects.get_or_create(owner=user, company=company, name=department_name)
         for entry in identifier_entries:
             try:
                 set_identifiers(
@@ -492,6 +507,12 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                 old_id = application_entry.pop("id", None)
                 application_entry.pop("created_at", None)
                 contact_id = application_entry.pop("contact_id", None)
+                # The department may be at another company in the same group, which may
+                # not exist yet. Held and resolved after the ownership tree, below (#138).
+                wants_department[old_id] = (
+                    (application_entry.pop("department_company", "") or "").strip(),
+                    (application_entry.pop("department", "") or "").strip(),
+                )
 
                 application_entry["applied_at"] = _dt(application_entry.get("applied_at"))
                 application_entry["closed_at"] = _dt(application_entry.get("closed_at"))
@@ -574,6 +595,22 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             parent = by_name.get(name.casefold())
             if parent is not None and parent.pk != child_pk:
                 Company.objects.filter(pk=child_pk).update(parent=parent)
+
+    # And then which part of an employer each application was aimed at, once both the
+    # departments and the tree they hang off exist. A department the archive names but the
+    # file does not hold is left unattached rather than invented: the application keeps its
+    # company, which is the employer of record and was never in doubt (#138).
+    for old_application_id, (company_name, department_name) in wants_department.items():
+        application = applications.get(old_application_id)
+        if application is None or not department_name or not company_name:
+            continue
+        department = (
+            Department.objects.for_user(user)
+            .filter(company__name__iexact=company_name, name__iexact=department_name)
+            .first()
+        )
+        if department is not None:
+            Application.objects.filter(pk=application.pk).update(department=department)
 
     # ---------------------------------------------------------------- documents
     documents = document.get("documents", {})

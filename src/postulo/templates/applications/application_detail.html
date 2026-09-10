@@ -6,10 +6,22 @@
 {% block content %}
   <div class="mb-6 flex flex-wrap items-start gap-4">
     <div class="min-w-0">
+      {% comment %} The company applied to, and the group above it where the two differ.
+         The company is the employer of record and stays first: naming a department or a
+         parent enriches that link rather than replacing it, which is what lets the whole
+         structure be switched off without leaving an application with no employer (#138).
+      {% endcomment %}
       <p class="text-sm text-ink-500 dark:text-ink-400">
         <a href="{{ application.posting.company.get_absolute_url }}" class="hover:underline">
-          {{ application.posting.company.name }}
+          <bdi>{{ application.posting.company.name }}</bdi>
         </a>
+        {% if group and group.pk != application.posting.company_id %}
+          <a href="{{ group.get_absolute_url }}" class="hover:underline">
+            {% blocktranslate trimmed with name=group.name %}
+              · part of {{ name }}
+            {% endblocktranslate %}
+          </a>
+        {% endif %}
       </p>
       <h1 class="text-2xl font-semibold tracking-tight">{{ application.posting.title }}</h1>
       <div class="mt-2 flex flex-wrap items-center gap-2">
@@ -141,6 +153,19 @@
             <div>
               <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Your deadline" %}</dt>
               <dd>{{ application.deadline|date:"j F Y" }}</dd>
+            </div>
+          {% endif %}
+          {% if structure_on and application.department %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Department" %}</dt>
+              <dd>
+                <bdi>{{ application.department.name }}</bdi>
+                {% if application.department.company_id != application.posting.company_id %}
+                  <span class="text-xs text-ink-500 dark:text-ink-400">
+                    <bdi>{{ application.department.company.name }}</bdi>
+                  </span>
+                {% endif %}
+              </dd>
             </div>
           {% endif %}
           {% if application.contact %}

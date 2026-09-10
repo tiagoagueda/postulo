@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, F, OuterRef, Subquery
 from django.db.models.functions import Coalesce, Now
@@ -216,6 +217,26 @@ class Application(OwnedModel):
         related_name="applications",
         verbose_name=_("main contact"),
     )
+    #: Which part of the employer this was aimed at (#138).
+    #:
+    #: **The finer attachment enriches the existing one rather than replacing it.** The
+    #: posting keeps its company and that column stays required, so every application has
+    #: exactly one employer however this is set -- which is what makes the whole structure
+    #: safe to switch off. Were the employer link itself polymorphic instead, turning the
+    #: plugin off would leave applications attached to departments with no company to fall
+    #: back to, and a plugin toggle that breaks a page is not a toggle.
+    #:
+    #: `SET_NULL` for the same reason a contact is: a team being renamed out of existence
+    #: must not take the attempt with it.
+    department = models.ForeignKey(
+        "jobs.Department",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="applications",
+        verbose_name=_("department"),
+        help_text=_("Which part of the employer this was for, if you know."),
+    )
     tags = models.ManyToManyField(
         Tag, blank=True, related_name="applications", verbose_name=_("tags")
     )
@@ -251,6 +272,32 @@ class Application(OwnedModel):
     def get_absolute_url(self) -> str:
         return reverse("applications:detail", args=[self.pk])
 
+    def clean(self) -> None:
+        """A department has to belong to the employer this application was sent to.
+
+        Anywhere in that employer's *group*, not only at the company on the posting: an
+        application through the Irish arm can be for the group's engineering team, and
+        refusing that would make the tree decorative. Anywhere outside it is a mistake, and
+        one worth naming rather than silently clearing.
+        """
+        super().clean()
+        if self.department_id is None or self.posting_id is None:
+            return
+        allowed = {company.pk for company in self.posting.company.group_members()}
+        if self.department.company_id not in allowed:
+            raise ValidationError(
+                {
+                    "department": _(
+                        "%(department)s is at %(company)s, which is not part of the same "
+                        "employer as this posting."
+                    )
+                    % {
+                        "department": self.department.name,
+                        "company": self.department.company.name,
+                    }
+                }
+            )
+
     @property
     def is_open(self) -> bool:
         return self.status in OPEN_STATUSES
@@ -258,6 +305,11 @@ class Application(OwnedModel):
     @property
     def company(self):
         return self.posting.company
+
+    @property
+    def group(self):
+        """The employer at the top of the chain. The same company where there is no tree."""
+        return self.posting.company.group
 
     @property
     def days_since_applied(self) -> int | None:
