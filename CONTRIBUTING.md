@@ -29,7 +29,9 @@ npm run build:css            # only if you touched assets/css/ or a template's c
 
 Continuous integration runs all of the above across Python 3.12, 3.13, and 3.14, plus
 `manage.py check --deploy` against production settings, and it fails if the committed
-stylesheet has drifted from its source.
+stylesheet has drifted from its source. So does `uv run pytest` on your machine, once
+`npm ci` has installed the Tailwind CLI: `tests/test_stylesheet.py` rebuilds it and compares,
+which is the difference between finding out before the push and after it.
 
 There is also a browser test of the critical path (sign in, capture, review, board, record
 what was sent, export), which is left out of the default run because it needs a browser:

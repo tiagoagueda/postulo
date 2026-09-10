@@ -1,7 +1,31 @@
-@import "tailwindcss";
+/*
+ * `source(none)` turns off Tailwind's automatic detection, which scans the whole repository --
+ * the tests, the wiki, the changelog -- as well as whatever is named below. With it on, a word
+ * in a test's docstring was enough to put a class in the stylesheet every page loads (#164).
+ * What compiles here is decided by what the interface is made of, and nothing else.
+ */
+@import "tailwindcss" source(none);
 
 /* Templates and Python live outside this directory, so point Tailwind at them. */
 @source "../../src/postulo";
+
+/*
+ * But not the templates that become PDFs. They carry their own inline stylesheet and never
+ * load this one, and the scanner reads the words in that CSS as candidate classes -- which is
+ * how `border-collapse` appeared in this file with nothing on any page using it (#164).
+ * Leaving them out makes what is compiled here exactly what the interface can use.
+ */
+@source not "../../src/postulo/templates/documents/themes";
+@source not "../../src/postulo/templates/applications/report_print.html";
+
+/*
+ * Nor the stylesheet this compiles to, which lives inside the tree above. Tailwind skips its
+ * own output only when the output *is* that file, so a build written anywhere else read the
+ * last build as a source: its base layer's `border-collapse: collapse` became a utility, and
+ * whatever the previous build held fed the next one. What compiles must depend on the
+ * templates alone, not on where the result is written (#164).
+ */
+@source not "../../src/postulo/static/css";
 
 /*
  * Dark mode has three states. An explicit profile preference stamps data-theme on the

@@ -1345,6 +1345,23 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The report page was missing two of its own classes, and the stylesheet was being fed by
+  prose.** The report arrived without a stylesheet rebuild, so its *Show this period* button
+  sat out of line and its two tallies stacked on a wide screen, because `mt-5` and
+  `lg:grid-cols-2` compiled to nothing. Only CI noticed, after the push; the ordinary suite
+  now rebuilds the stylesheet and compares wherever the Tailwind CLI is installed, and the
+  build is on the checklist.
+
+  Chasing a third, phantom class turned up the real problem: **what compiled depended on
+  more than the interface.** Tailwind's automatic detection scanned the whole repository, so a
+  word in a test's docstring, the wiki or the changelog could put a class in the stylesheet
+  every page loads — the template lint's own list of forbidden physical utilities was
+  compiling them. The compiled file sat inside the scanned tree, so a build written anywhere
+  but over it read the previous build as a source. And the templates that become PDFs, which
+  never load this stylesheet, had the words in their inline CSS read as classes. The scan is
+  now the interface and nothing else, and twenty-four utilities nothing used — among them
+  every physical one — have gone. (#164)
+
 - **The CV page and the letter page open again.** Making a rendered document point at
   whatever produced it took `related_name="renders"` with the two columns it replaced, and
   both detail pages ask for exactly that — so anyone opening one got a server error instead

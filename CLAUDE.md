@@ -44,7 +44,12 @@ uv run ruff check . && uv run ruff format --check .
 uv run pytest                                    # in-memory SQLite, warnings are errors
 uv run pytest -m e2e --browser chromium          # the critical path plus axe-core
 uv run python scripts/messages.py extract --check && uv run python scripts/messages.py check
+npm run build:css                                # then commit src/postulo/static/css/app.css
 ```
+
+The compiled stylesheet is committed, so a template that gains a class ships a class that does
+nothing until it is rebuilt. `tests/test_stylesheet.py` fails on a stale one wherever
+`node_modules` is installed.
 
 A feature ships with its tests, its wiki page (authored in `wiki/`) and a CHANGELOG
 entry under *Unreleased*, in one of six marked sections — `### ✨ Added`, `### 🔧 Changed`,
