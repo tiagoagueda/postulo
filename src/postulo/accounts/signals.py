@@ -17,10 +17,12 @@ def create_profile(sender, instance, created, **kwargs) -> None:
     """Give every new user a profile, so views never have to wonder whether one exists.
 
     A new profile starts from the instance defaults an administrator may have set for
-    language and time zone; the person can change both under Settings.
+    language and time zone, and from the standard dashboard arrangement, which becomes
+    that account's own the moment it is written (#123). The person can change all three
+    under Settings.
     """
     if created:
-        from postulo.core import site
+        from postulo.core import site, widgets
 
         profile, made = Profile.objects.get_or_create(user=instance)
         if made:
@@ -28,7 +30,18 @@ def create_profile(sender, instance, created, **kwargs) -> None:
             if row.default_language or row.default_time_zone:
                 profile.language = row.default_language
                 profile.time_zone = row.default_time_zone
-                profile.save(update_fields=["language", "time_zone", "updated_at"])
+            # An arrangement of its own from the day the account exists, rather than one
+            # computed from the registry every time somebody looks (#123).
+            widgets.seed(profile)
+            profile.save(
+                update_fields=[
+                    "language",
+                    "time_zone",
+                    "dashboard_widgets",
+                    "dashboard_known",
+                    "updated_at",
+                ]
+            )
 
 
 @receiver(user_signed_up, dispatch_uid="postulo_first_account")

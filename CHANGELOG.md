@@ -1219,6 +1219,36 @@ All notable changes to Postulo are recorded here. The format follows
   that must not happen here: deleting a CV has to leave the PDF an employer received exactly
   where it is, which was the whole reason `RenderedDocument` exists. (#130)
 
+### 🔧 Changed
+
+- **Every account owns its dashboard arrangement from the day the account exists.** Nothing
+  was ever shared between accounts — two people who had never arranged anything were looking
+  at the same *list of keys*, each computed against their own records — but the arrangement
+  itself belonged to nobody until somebody touched the setting. It is stored now, from the
+  moment the profile is, which is what a grid needs before a widget can be dragged into
+  anything.
+
+  **The null that meant *never arranged* was load-bearing, and what it carried is now
+  written down.** It made a widget added in a later release appear for anybody who had never
+  arranged their dashboard. With every account holding a list, nobody is ever "never
+  arranged" — so the rule moves to a seen set: every key an account has already decided
+  about, and a key in neither list is new *to that account*. That is the one of the three
+  candidates that also works when the new widget arrived with a plugin installed on a
+  Tuesday rather than with a release, which a generation marker could not.
+
+  **The trade is made knowingly.** A new widget no longer walks onto a page by itself; it
+  waits on the arrange page under *New*, with the dashboard naming what is waiting, and
+  saying no is an answer that is remembered. Strictly that is one fewer thing happening
+  without being asked — the old behaviour changed somebody's page during an upgrade.
+
+  **And the key namespace is decided while it is free**: a bare key is Postulo's, anybody
+  else's is `provider:key`, and registering the wrong shape is an error at start-up. A key
+  lands inside every stored arrangement, so a collision found after people have arranged
+  their dashboards is a data migration of every one of them. The arrangement travels in the
+  archive now too (format 12), and the seen set with it — without that, a restore would
+  announce every widget in Postulo as new to somebody who has been reading their own
+  dashboard for a year. (#123)
+
 ### ✨ Added
 
 - **The list of areas of activity is a classification now, not thirty-two names somebody

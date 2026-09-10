@@ -167,11 +167,16 @@ class DashboardView(SettingsSectionMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         profile = self._profile()
         chosen = widgets.keys_for(profile)
+        # Anything this account has never been offered, shown apart and first: a widget a
+        # release or a plugin added waits here rather than walking onto the page (#123).
+        fresh = [widget for widget in widgets.new_for(profile) if widget.key not in chosen]
         context["chosen"] = [widgets.get(key) for key in chosen]
+        context["fresh"] = fresh
         context["available"] = [
-            (group, [w for w in items if w.key not in chosen]) for group, items in widgets.groups()
+            (group, [w for w in items if w.key not in chosen and w not in fresh])
+            for group, items in widgets.groups()
         ]
-        context["is_default"] = not widgets.has_arranged(profile)
+        context["is_standard"] = widgets.is_standard(profile)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -181,22 +186,30 @@ class DashboardView(SettingsSectionMixin, TemplateView):
         key = request.POST.get("key", "")
 
         if action == "reset":
-            # None, not []: back to "never arranged", which is what reset means.
-            profile.dashboard_widgets = None
-            profile.save(update_fields=["dashboard_widgets"])
+            # This account's own copy of the standard arrangement, not an absence of one:
+            # reset means "give me the standard page", and it is still this account's (#123).
+            widgets.seed(profile)
+            profile.save(update_fields=["dashboard_widgets", "dashboard_known", "updated_at"])
             return redirect("settings:dashboard")
-        elif key in widgets.REGISTRY:
-            keys = self._rearrange(keys, action, key)
-        else:
+        if key not in widgets.REGISTRY:
             messages.error(request, _("That is not a widget Postulo knows about."))
             return redirect("settings:dashboard")
+        # "dismiss" changes nothing about the page and everything about the offer: a new
+        # widget somebody said no to stops being new without going on.
+        if action != "dismiss":
+            keys = self._rearrange(keys, action, key)
 
         profile.dashboard_widgets = keys
-        profile.save(update_fields=["dashboard_widgets"])
+        # Whatever was just acted on is decided about now, however it was decided.
+        profile.dashboard_known = sorted(widgets.known_to(profile) | {key})
+        profile.save(update_fields=["dashboard_widgets", "dashboard_known", "updated_at"])
         return redirect("settings:dashboard")
 
     def _profile(self) -> Profile:
-        profile, _created = Profile.objects.get_or_create(user=self.request.user)
+        profile, created = Profile.objects.get_or_create(user=self.request.user)
+        if created:
+            widgets.seed(profile)
+            profile.save(update_fields=["dashboard_widgets", "dashboard_known", "updated_at"])
         return profile
 
     @staticmethod

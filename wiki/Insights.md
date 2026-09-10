@@ -105,10 +105,20 @@ Add, remove and reorder with buttons rather than by dragging. Arranging is done 
 then not again, and a form that posts works with a keyboard, with a screen reader and with
 scripts switched off, which dragging does not.
 
-**Until you change something, the arrangement is the standard one**, and a widget added in a
-later release appears on it by itself. **Once you have arranged the page it is yours**, and
-new widgets stay off it until you ask for them. *Back to the standard arrangement* undoes
-the whole thing.
+**The arrangement is yours from the day your account exists.** It starts as the standard
+one — the same seven widgets everybody starts with, computed against your own records and
+nobody else's — and it is stored against your account rather than worked out afresh each
+time. *Back to the standard arrangement* gives you that starting page back.
+
+**Nothing ever arrives on it without being asked.** A widget added in a later release, or
+brought by a plugin somebody installed, waits under *New since you last arranged this* with
+two buttons: add it, or say no. Saying no is remembered, so it is not offered again. Until
+you have answered, the dashboard itself says what is waiting.
+
+That is a deliberate change from how this used to work. A new widget used to appear by
+itself on a dashboard nobody had arranged, which meant an upgrade could change your page
+without asking; and it could never have worked for a widget that arrived with a plugin
+rather than with a release.
 
 ## Exporting
 

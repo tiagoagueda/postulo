@@ -315,9 +315,15 @@ class Profile(models.Model):
     #: What is stored is what was *chosen*, the opposite way round from
     #: ``hidden_nav_items`` and on purpose: a widget added in a later release should appear
     #: for somebody who never arranged anything, and stay off the page of somebody who did.
-    dashboard_widgets = models.JSONField(
-        _("dashboard widgets"), null=True, blank=True, default=None
-    )
+    dashboard_widgets = models.JSONField(_("dashboard widgets"), blank=True, default=list)
+    #: Every widget key this account has already decided about -- on the page or off it.
+    #:
+    #: A key in neither this nor `dashboard_widgets` is new *to this account*, whether it
+    #: arrived in a release or with a plugin installed on a Tuesday. That is what replaced
+    #: a null arrangement meaning "never arranged": every account owns a list now, so
+    #: nobody is ever "never arranged", and the rule the null carried had to be written
+    #: down somewhere rather than dropped (#123).
+    dashboard_known = models.JSONField(_("widgets already offered"), blank=True, default=list)
     #: A picture the person uploaded, re-encoded to a square; beats the Gravatar.
     avatar = models.ImageField(_("picture"), upload_to=upload_to_avatars, blank=True)
     #: Opt-in: fetch the Gravatar for the primary address, once, server-side.

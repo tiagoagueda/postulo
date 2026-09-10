@@ -33,7 +33,7 @@ from postulo import __version__
 #: (#92); 10 replaced ``cv_id``/``cover_letter_id`` on a sent document with a
 #: ``source_kind`` and a ``source_ref``, so that a new kind of document is not a new
 #: column (#130). The importer still reads every earlier format, filling the new fields in.
-FORMAT_VERSION = 11
+FORMAT_VERSION = 12
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -51,6 +51,11 @@ PROFILE_FIELDS = (
     "time_zone",
     "theme",
     "table_settings",
+    # An arrangement belongs to the account, so it travels with the account (#123). The
+    # seen set goes too: without it a restore would announce every widget in Postulo as
+    # new to somebody who has been reading their own dashboard for a year.
+    "dashboard_widgets",
+    "dashboard_known",
     "quiet_after_days",
     "use_gravatar",
 )

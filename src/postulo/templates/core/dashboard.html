@@ -16,6 +16,21 @@
     </div>
   {% endif %}
 
+  {% if new_widgets %}
+    <div class="alert-info mb-6" role="status">
+      <p>
+        {% url 'settings:dashboard' as arrange_url %}
+        {% comment %} The names rather than a count: it says the same thing and tells you
+           whether you care, which a number does not.
+        {% endcomment %}
+        {% blocktranslate with names=new_names trimmed %}
+          Not shown yet: {{ names }} ·
+          <a href="{{ arrange_url }}" class="font-medium underline">arrange your dashboard</a>.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  {% endif %}
+
   <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
     <div>
       <h1 class="mb-1 text-2xl font-semibold tracking-tight">

@@ -22,7 +22,19 @@ def home(request: HttpRequest):
         return render(request, "core/home.html")
 
     profile = getattr(request.user, "profile", None)
-    return render(request, "core/dashboard.html", {"page": widgets.build_page(request, profile)})
+    fresh = widgets.new_for(profile)
+    return render(
+        request,
+        "core/dashboard.html",
+        {
+            "page": widgets.build_page(request, profile),
+            # Said here rather than by a widget arriving unannounced: a release or a plugin
+            # has something this account has never been offered, and the arrange page is
+            # where it waits (#123).
+            "new_widgets": fresh,
+            "new_names": ", ".join(str(widget.label or widget.key) for widget in fresh),
+        },
+    )
 
 
 def healthz(request: HttpRequest) -> JsonResponse:

@@ -185,12 +185,16 @@ def test_arranging_for_the_first_time_starts_from_the_defaults(client, user):
 
 
 def test_going_back_to_the_standard_arrangement_forgets_the_choice(client, user):
+    """Reset writes this account's own copy of the standard arrangement rather than
+    clearing the field: every account owns one from the day it exists, and *the standard
+    page* is a thing to be given rather than an absence to fall back into (#123).
+    """
     choose(user, ["funnel"])
     client.force_login(user)
 
     client.post(reverse(ARRANGE), {"action": "reset"})
 
-    assert arrangement(user) is None
+    assert arrangement(user) == widgets.default_keys()
     assert widgets.keys_for(user.profile) == widgets.default_keys()
 
 
