@@ -437,6 +437,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **A CV's page no longer says “What is on this cv”.** The heading put the kind's label,
+  lowercased, into a sentence — which flattened an acronym in English, French and
+  Portuguese and misspelt a noun in German, and which could never agree in a language where
+  the two kinds take different articles. It is two sentences now, chosen by kind: *What is
+  on this CV* and *What is on this portfolio*. The same `|lower` was applied to a salary's
+  period (*Pro Jahr* → *pro jahr*) and to a copy's status after a store's name; both now
+  show the label as the catalogue wrote it. Filled in English, French and Portuguese; the
+  other catalogues get the two new strings at the release sweep. (#168)
+
 - **The suggestions page fits on a phone once there is a suggestion on it.** The accept form
   for a suggestion not yet matched to an application carries a select as wide as the longest
   application title, in a group that could not shrink — 45 pixels past the edge of a

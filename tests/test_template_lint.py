@@ -198,3 +198,34 @@ def test_the_icon_lister_reads_the_committed_set():
     found = horizontal_icons()
     assert "chevron-right" in found, "the bundled set has changed; check this still works"
     assert "arrow-up" not in found and "chevron-down" not in found
+
+
+# ------------------------------------------------------- a label, lowercased
+
+
+def lowercased_labels(text: str) -> list[int]:
+    """Line numbers where a choice's translated label is lowercased by the template."""
+    return [
+        text.count("\n", 0, match.start()) + 1
+        for match in re.finditer(r"get_\w+_display\s*\|\s*lower\b", text)
+    ]
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_lowercases_a_translated_label(path: Path):
+    """`|lower` is English typography. Applied to a label a translator wrote, it flattens an
+    acronym in French and Portuguese and misspells every noun in German, and no catalogue
+    can undo it. A CV's page said "What is on this cv" for a release because of it (#168).
+    A label goes on the page as the catalogue wrote it; a sentence that needs another form
+    of it is another string.
+    """
+    lines = lowercased_labels(path.read_text(encoding="utf-8"))
+    assert not lines, f"{path.name}: a translated label is lowercased at line(s) {lines}"
+
+
+def test_the_label_detector_knows_the_difference():
+    assert lowercased_labels("{{ copy.get_status_display|lower }}") == [1]
+    assert lowercased_labels("x\n{% blocktranslate with kind=cv.get_kind_display | lower %}") == [2]
+    assert lowercased_labels("{{ copy.get_status_display }}\n{{ code|lower }}") == []

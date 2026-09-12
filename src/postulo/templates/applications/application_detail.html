@@ -134,7 +134,10 @@
           {% if application.posting.salary_display %}
             <div>
               <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Salary" %}</dt>
-              <dd>{{ application.posting.salary_display }} ({{ application.posting.get_salary_period_display|lower }})</dd>
+              {% comment %} The period's label as the catalogue wrote it, not lowercased by the
+                 template: `|lower` is English typography, and in German it turned *Pro Jahr*
+                 into a spelling mistake (#168). {% endcomment %}
+              <dd>{{ application.posting.salary_display }} · {{ application.posting.get_salary_period_display }}</dd>
             </div>
           {% endif %}
           {% if application.channel %}

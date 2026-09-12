@@ -56,10 +56,12 @@
      *Add entries* card beside this one ended up off the screen (#167). {% endcomment %}
   <div class="grid gap-6 lg:grid-cols-3">
     <div class="min-w-0 lg:col-span-2">
+      {% comment %} Two sentences, chosen by kind, rather than one with the kind's label
+         dropped into a slot: a noun in a slot cannot agree with the words around it in every
+         language, and the `|lower` that made "cv" of "CV" was English typography applied to
+         German nouns and to an acronym (#168). `CVKind` has exactly these two. {% endcomment %}
       <h2 class="mb-3 font-medium">
-        {% blocktranslate trimmed with kind=cv.get_kind_display|lower %}
-          What is on this {{ kind }}
-        {% endblocktranslate %}
+        {% if cv.kind == "portfolio" %}{% translate "What is on this portfolio" %}{% else %}{% translate "What is on this CV" %}{% endif %}
       </h2>
       {% if items %}
         <div class="card p-0">

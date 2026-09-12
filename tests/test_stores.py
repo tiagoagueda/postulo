@@ -331,20 +331,20 @@ def test_the_pages_say_how_each_copy_is_getting_on(client, user):
     client.force_login(user)
 
     html = client.get(reverse("documents:upload_list")).content.decode()
-    assert "My shelf: waiting to be sent" in html
+    assert "My shelf: Waiting to be sent" in html, "the label as the catalogue wrote it (#168)"
     assert reverse("documents:upload_archive", args=[upload.pk]) in html
 
     ShelfStore.fail_with = "shelf is full"
     send_pending()
     html = client.get(reverse("documents:rendered_list")).content.decode()
-    assert "My shelf: failed — RuntimeError: shelf is full" in html
+    assert "My shelf: Failed — RuntimeError: shelf is full" in html
 
     ShelfStore.fail_with = None
     DocumentCopy.objects.update(next_attempt_at=timezone.now())
     send_pending()
     html = client.get(reverse("documents:application_documents", args=[render.application.pk]))
     html = html.content.decode()
-    assert 'href="https://shelf.example/1"' in html and "archived" in html
+    assert 'href="https://shelf.example/1"' in html and "Archived" in html
 
 
 def test_send_now_tries_at_once_and_is_private(client, user, other_user):

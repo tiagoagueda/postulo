@@ -493,6 +493,22 @@ def test_a_snapshot_downloads_as_a_pdf(cv, fake_backend):
     assert document.download_name == f"{document.title}.pdf"
 
 
+def test_a_cv_page_names_its_kind_in_a_whole_sentence(client, user, db):
+    """The heading used to lowercase the kind's label into a slot -- "What is on this cv" --
+    which flattened an acronym here and misspelt a noun in German. Two sentences now, one
+    per kind, so nothing is re-cased and nothing has to agree with a slot (#168)."""
+    from postulo.documents.models import CVKind
+
+    cv = CV.objects.create(owner=user, name="Backend", kind=CVKind.CV)
+    portfolio = CV.objects.create(owner=user, name="Work", kind=CVKind.PORTFOLIO)
+    client.force_login(user)
+
+    assert "What is on this CV" in client.get(cv.get_absolute_url()).content.decode()
+    page = client.get(portfolio.get_absolute_url()).content.decode()
+    assert "What is on this portfolio" in page
+    assert "this cv" not in page and "this Cv" not in page
+
+
 def test_a_snapshot_is_delivered_only_to_its_owner(client, user, other_user, cv, fake_backend):
     document = snapshot_cv(cv, backend=fake_backend)
 
