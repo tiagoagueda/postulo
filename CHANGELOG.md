@@ -343,7 +343,9 @@ All notable changes to Postulo are recorded here. The format follows
 
   Three faults, none of them in this workflow, all of them in the release path, and all
   found by the simple act of running it. That is what a channel nobody had ever exercised
-  was hiding.
+  was hiding — and two of them needed only a file to be *read*, not run, so
+  `tests/test_shell_scripts.py` now reads every tracked shell script: it parses under
+  `bash -n`, git records it executable, and it starts with a shebang.
 
   `CONTRIBUTING.md` § *Giving a runner the `docker` label* said to declare `docker:host` and
   **was wrong** for a containerised runner: `host` runs the job inside the runner container,

@@ -41,9 +41,8 @@ OUT="${SCAN_OUTPUT_DIR:-$ROOT/.scan}"
 # clean host, because the findings behind #155 and #157 were produced on a machine that
 # already had some Trivy pulled, and the pin was never the thing that fetched it (#190).
 #
-# Check a version exists before pinning it:
-#   curl -s -o /dev/null -w '%{http_code}
-' #     https://hub.docker.com/v2/repositories/aquasec/trivy/tags/<version>
+# Check a tag exists before pinning it: a 200 from the registry's tag endpoint.
+#   curl -sI https://hub.docker.com/v2/repositories/aquasec/trivy/tags/0.74.0
 TRIVY="${TRIVY_IMAGE:-aquasec/trivy:0.74.0}"
 # This one is real, and eighteen minor versions behind v0.118.0. Left alone deliberately:
 # a newer scanner finds more, which is good and is also a gate that starts failing for
