@@ -290,6 +290,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Forty postings from one results page, announced once.** The browser extension can now
+  read every posting a page lists and send the ones you tick, each as its own capture from
+  the same page, so a failure loses one and not forty. On this side that needed one thing:
+  `POST /api/v1/captures` takes an optional `batch` — how many are coming and which this one
+  is — and announces the first with the count, *Captured 40 postings from example.org*,
+  rather than notifying forty times for one deliberate gesture. A capture read off a results
+  page is a stub — title, company, place — which is what a listing to triage needs. (#177)
+
 - **Your career lists its sections down the side, with a count beside each.** Seven sections
   down one page, each a list with no ceiling, and nothing on the page said what was below the
   fold: the only way to learn it held *Languages* was to reach the bottom. The sidebar

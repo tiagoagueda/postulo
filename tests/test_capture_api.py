@@ -239,6 +239,80 @@ def test_corrections_that_do_not_make_a_posting_are_refused(client, bearer, user
     assert not Capture.objects.for_user(user).exists()
 
 
+RESULTS = (
+    '<html><head><script type="application/ld+json">'
+    + json.dumps(
+        {
+            "@context": "https://schema.org/",
+            "@type": "ItemList",
+            "itemListElement": [
+                {
+                    "@type": "JobPosting",
+                    "title": title,
+                    "url": f"https://careers.blackmesa.example/jobs/{number}",
+                    "hiringOrganization": {"name": "Black Mesa"},
+                    "description": "<p>Science.</p>",
+                }
+                for number, title in ((1, "Research Engineer"), (2, "Test Engineer"), (3, "Clerk"))
+            ],
+        }
+    )
+    + "</script></head></html>"
+)
+
+
+@pytest.fixture
+def announced(monkeypatch):
+    """Every notification the API sends, in order."""
+    sent = []
+    monkeypatch.setattr(
+        "postulo.api.api.notify", lambda owner, notification: sent.append(notification)
+    )
+    return sent
+
+
+def test_several_from_one_page_are_announced_once_with_the_count(client, bearer, user, announced):
+    """Forty notifications for one button would be worse than none (#177). The first says
+    how many are coming; the rest arrive quietly, each still its own capture."""
+    for position, number in enumerate((1, 2, 3), start=1):
+        response = post_capture(
+            client,
+            bearer,
+            url=f"https://careers.blackmesa.example/jobs/{number}",
+            html=RESULTS,
+            batch={"size": 3, "position": position},
+        )
+        assert response.status_code == 201, response.content
+
+    titles = sorted(c.data["title"] for c in Capture.objects.for_user(user))
+    assert titles == ["Clerk", "Research Engineer", "Test Engineer"], "each its own capture"
+    assert len(announced) == 1
+    assert announced[0].title == "Captured 3 postings from careers.blackmesa.example"
+    assert "Research Engineer" in announced[0].body
+    assert announced[0].url.endswith("/jobs/captures/")
+
+
+def test_a_capture_on_its_own_is_announced_as_before(client, bearer, user, announced):
+    response = post_capture(client, bearer, url="https://example.org/j/7", html=PAGE)
+    assert response.status_code == 201
+    assert [n.title for n in announced] == ["Captured: Research Engineer"]
+
+
+@pytest.mark.parametrize(
+    "batch",
+    [
+        {"size": 1, "position": 1},
+        {"size": 3, "position": 4},
+        {"size": 3, "position": 0},
+        {"size": 3},
+    ],
+)
+def test_a_batch_that_makes_no_sense_is_refused(client, bearer, user, batch):
+    response = post_capture(client, bearer, url="https://example.org/j/7", html=PAGE, batch=batch)
+    assert response.status_code == 422, response.content
+    assert not Capture.objects.for_user(user).exists()
+
+
 def test_listing_shows_only_your_own_pending_captures(client, bearer, user, other_user):
     post_capture(client, bearer, url="https://example.org/j/7", html=PAGE)
     Capture.objects.create(

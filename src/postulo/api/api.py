@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime as dt
 from decimal import Decimal
+from urllib.parse import urlsplit
 
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -98,9 +99,30 @@ class PageIn(Schema):
     )
 
 
+class BatchIn(Schema):
+    """Where this capture stands among several sent together, from one page.
+
+    A results page holds forty postings and a browser extension sends each as its own
+    capture -- the same page, a different ``url`` -- so that a failure loses one and not
+    forty (#177). What the server needs to know is only that they belong together: the
+    first of the batch is announced, with how many are coming, and the rest arrive quietly.
+    Forty notifications for one deliberate gesture would be worse than none.
+    """
+
+    size: int = Field(ge=2, le=500, description="How many captures the gesture sends.")
+    position: int = Field(ge=1, description="This capture's place in it, from 1.")
+
+
 class CaptureIn(PageIn):
     """A posting somebody wants Postulo to look at."""
 
+    batch: BatchIn | None = Field(
+        default=None,
+        description=(
+            "Set when several captures are sent together from one page: the first is "
+            "announced with the count, the rest are not announced at all."
+        ),
+    )
     data: CorrectionsIn | None = Field(
         default=None,
         description=(
@@ -193,6 +215,18 @@ def create_capture(request, payload: CaptureIn):
                 ]
             ) from exc
 
+    batch = payload.batch
+    if batch is not None and batch.position > batch.size:
+        raise ValidationError(
+            [
+                {
+                    "type": "less_than_equal",
+                    "loc": ("body", "payload", "batch", "position"),
+                    "msg": str(_("A capture cannot come after the last of its batch.")),
+                }
+            ]
+        )
+
     capture = Capture.objects.create(
         owner=owner,
         url=url[:500],
@@ -204,15 +238,37 @@ def create_capture(request, payload: CaptureIn):
     )
     # The one event a person cannot see coming: something arrived from outside. Their
     # notifiers, if any, hear about it; the capture is saved whether or not they do.
-    notify(
-        owner,
-        Notification(
-            event="capture_received",
-            title=str(_("Captured: %(title)s") % {"title": data.title}),
-            body=" · ".join(part for part in (data.company_name, data.location) if part),
-            url=request.build_absolute_uri(reverse("jobs:capture_review", args=[capture.pk])),
-        ),
-    )
+    #
+    # Unless it came with thirty-nine others because somebody pressed one button: then the
+    # first says how many are on their way and the rest say nothing (#177). It is announced
+    # on the first rather than the last because the last may never come -- a refused one
+    # is retried later, on its own -- and a promise of forty is nearer the truth than
+    # silence about all of them.
+    review_url = request.build_absolute_uri(reverse("jobs:capture_review", args=[capture.pk]))
+    where = " · ".join(part for part in (data.company_name, data.location) if part)
+    if batch is None:
+        notify(
+            owner,
+            Notification(
+                event="capture_received",
+                title=str(_("Captured: %(title)s") % {"title": data.title}),
+                body=where,
+                url=review_url,
+            ),
+        )
+    elif batch.position == 1:
+        notify(
+            owner,
+            Notification(
+                event="capture_received",
+                title=str(
+                    _("Captured %(count)s postings from %(host)s")
+                    % {"count": batch.size, "host": urlsplit(url).hostname or url}
+                ),
+                body=str(_("The first: %(title)s") % {"title": data.title}),
+                url=request.build_absolute_uri(reverse("jobs:capture_list")),
+            ),
+        )
     return Status(201, _as_output(request, capture))
 
 
