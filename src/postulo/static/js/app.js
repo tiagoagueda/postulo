@@ -117,6 +117,17 @@
     dragging = null;
   });
 
+  /* `dragenter` as well as `dragover`, and both cancelled. The specification makes an
+   * element a drop target only once *both* are cancelled; Chromium accepts `dragover`
+   * alone, Firefox does not, and refuses the drop with nothing logged. The suite runs
+   * `--browser chromium`, so it agreed with the one browser that forgives the omission
+   * (#174). */
+  document.addEventListener("dragenter", function (event) {
+    if (dragging && columnOf(event.target)) {
+      event.preventDefault();
+    }
+  });
+
   document.addEventListener("dragover", function (event) {
     var column = columnOf(event.target);
     if (!dragging || !column) {
@@ -1107,6 +1118,15 @@
     if (draggedWidget) {
       draggedWidget.classList.remove("opacity-50");
       draggedWidget = null;
+    }
+  });
+
+  /* Both, and for the reason the board drag gives above: an element is a drop target only
+   * where `dragenter` and `dragover` are each cancelled, and Firefox holds to that. */
+  document.addEventListener("dragenter", function (event) {
+    var row = event.target.closest && event.target.closest("[data-widget-row]");
+    if (draggedWidget && row) {
+      event.preventDefault();
     }
   });
 

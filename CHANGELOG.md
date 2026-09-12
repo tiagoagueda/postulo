@@ -290,6 +290,25 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Dragging worked in Chromium and did nothing in Firefox, and the tests agreed with
+  Chromium.** Neither drag cancelled `dragenter`. The specification makes an element a drop
+  target only once *both* `dragenter` and `dragover` are cancelled; Chromium forgives the
+  omission and Firefox does not, so arranging the dashboard by dragging a widget (#125) and
+  moving a card between board columns both sprang back with nothing posted and nothing
+  logged, for anybody using Firefox.
+
+  **Both drags had it**, because both were written the same way — the board's cards and the
+  dashboard's rows — so both are fixed here rather than one being left with a known copy of
+  the fault in the same file.
+
+  The tests could not have caught it. They dispatch four synthetic `DragEvent`s including
+  the drop itself, so they exercise the handlers and pass whether or not a browser would
+  ever have delivered that drop; and the browser suite runs `--browser chromium`, the one
+  browser that forgives this. Both helpers now send `dragenter` as a browser would, and each
+  file gains a test that asks the handlers the question the browser asks — *was this event
+  cancelled?* — which fails without the fix in Chromium, so it needs no second browser to
+  keep watch. (#174)
+
 - **A chip with no remove button had almost no padding at its end.** On *Documents → CVs*
   the kind tag sat hard against its own right edge, twelve pixels of space on one side and
   two on the other. `.chip` was shaped around a button it did not have: the two pixels are

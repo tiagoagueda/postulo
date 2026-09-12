@@ -43,7 +43,12 @@ def application(applicant):
 
 
 def drag(page: Page, card, column) -> None:
-    """A real HTML5 drag, which Playwright's high-level helpers do not perform."""
+    """A real HTML5 drag, which Playwright's high-level helpers do not perform.
+
+    `dragenter` before `dragover` because the specification needs both cancelled before an
+    element is a drop target, and firing only the second was how #174 hid: the events the
+    test sent were not the events a browser sends.
+    """
     page.evaluate(
         """([card, column]) => {
             const transfer = new DataTransfer();
@@ -51,6 +56,7 @@ def drag(page: Page, card, column) -> None:
                 new DragEvent(type, {bubbles: true, cancelable: true, dataTransfer: transfer})
             );
             fire(card, 'dragstart');
+            fire(column, 'dragenter');
             fire(column, 'dragover');
             fire(column, 'drop');
             fire(card, 'dragend');
@@ -104,3 +110,36 @@ def test_the_status_menu_still_does_the_same_thing(live_server, page: Page, appl
     application.refresh_from_db()
     assert application.status == Status.OFFER
     assert page.locator("#board-drag-help").count() == 1, "and the cards say so to a reader"
+
+
+def test_a_column_accepts_the_drag_before_the_drop(live_server, page: Page, application):
+    """The same rule the widget rows are held to: `dragenter` and `dragover` both cancelled,
+    or Firefox never lets the card land (#174).
+
+    The assertions above dispatch the drop themselves, so they pass whether or not a real
+    browser would have delivered it. This asks the handlers the question the browser asks.
+    """
+    base = live_server.url
+    sign_in(page, base)
+    page.goto(f"{base}/applications/board/")
+
+    card = page.locator(f"[data-card='{application.pk}']").element_handle()
+    column = page.locator("[data-board-column='interviewing']").element_handle()
+    cancelled = page.evaluate(
+        """([card, column]) => {
+            const transfer = new DataTransfer();
+            const fire = (target, type) => {
+                const event = new DragEvent(
+                    type, {bubbles: true, cancelable: true, dataTransfer: transfer}
+                );
+                target.dispatchEvent(event);
+                return event.defaultPrevented;
+            };
+            fire(card, 'dragstart');
+            return {enter: fire(column, 'dragenter'), over: fire(column, 'dragover')};
+        }""",
+        [card, column],
+    )
+
+    assert cancelled["over"], "dragover is cancelled"
+    assert cancelled["enter"], "and so is dragenter, or Firefox refuses the drop"

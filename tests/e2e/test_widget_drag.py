@@ -33,7 +33,11 @@ def open_the_arrange_page(page: Page, live_server) -> None:
 
 
 def drag(page: Page, row, onto) -> None:
-    """A real HTML5 drag, which Playwright's high-level helpers do not perform."""
+    """A real HTML5 drag, which Playwright's high-level helpers do not perform.
+
+    `dragenter` before `dragover`: both have to be cancelled before an element is a drop
+    target, and sending only the second was how #174 hid for a release.
+    """
     page.evaluate(
         """([row, onto]) => {
             const transfer = new DataTransfer();
@@ -41,6 +45,7 @@ def drag(page: Page, row, onto) -> None:
                 new DragEvent(type, {bubbles: true, cancelable: true, dataTransfer: transfer})
             );
             fire(row, 'dragstart');
+            fire(onto, 'dragenter');
             fire(onto, 'dragover');
             fire(onto, 'drop');
             fire(row, 'dragend');
@@ -139,3 +144,34 @@ def test_a_narrow_screen_reads_downwards(page: Page, live_server, applicant):
 
     for earlier, later in pairwise(boxes):
         assert later["y"] >= earlier["y"] + earlier["height"] - 1, "stacked, not side by side"
+
+
+def test_a_row_accepts_the_drag_before_the_drop(page: Page, live_server, applicant):
+    """An element is a drop target only where `dragenter` *and* `dragover` are cancelled.
+
+    Chromium accepts `dragover` alone and Firefox does not, so for a release this looked
+    like a working feature here and did nothing there (#174). Asserting that each event was
+    cancelled catches it in the browser the suite already runs, which the drop assertions
+    above cannot: they dispatch the drop themselves, so they pass whether or not a real
+    browser would ever have delivered it.
+    """
+    open_the_arrange_page(page, live_server)
+
+    cancelled = page.evaluate(
+        """([row, onto]) => {
+            const transfer = new DataTransfer();
+            const fire = (target, type) => {
+                const event = new DragEvent(
+                    type, {bubbles: true, cancelable: true, dataTransfer: transfer}
+                );
+                target.dispatchEvent(event);
+                return event.defaultPrevented;
+            };
+            fire(row, 'dragstart');
+            return {enter: fire(onto, 'dragenter'), over: fire(onto, 'dragover')};
+        }""",
+        [rows(page).first.element_handle(), rows(page).nth(2).element_handle()],
+    )
+
+    assert cancelled["over"], "dragover is cancelled"
+    assert cancelled["enter"], "and so is dragenter, or Firefox refuses the drop"
