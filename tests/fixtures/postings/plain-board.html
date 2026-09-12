@@ -1,0 +1,65 @@
+<!doctype html>
+<!-- Modelled on a live Greenhouse job board page, September 2026. Greenhouse is one of the
+     most widely used applicant tracking systems and its advert pages carry **no JSON-LD and
+     no microdata at all** - this is the fallback's most important case, not an edge one.
+
+     What it does carry:
+       * og:title is the job title, clean
+       * og:description is the *location*, not a description
+       * <title> is "Job Application for <job> at <company>" - the only place the company appears
+       * no og:site_name
+     So company and location are both on the page, in places no standard says to look, and
+     are left empty for the person to fill in. That is the honest result and this fixture
+     records it; see the note in the .json. -->
+<html lang="en">
+  <head>
+    <title>Job Application for Test Chamber Engineer at Aperture Science</title>
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Test Chamber Engineer" />
+    <meta property="og:description" content="Remote, Lisbon" />
+    <meta property="og:url" content="https://careers.aperture.example/openings/8556658002" />
+    <meta property="og:image" content="https://s2-recruiting.cdn.greenhouse.io/logos/400/aperture.png" />
+  </head>
+  <body>
+    <header>
+      <a href="/aperture">Aperture Science</a>
+    </header>
+    <nav aria-label="Breadcrumb">Home / Jobs / Engineering</nav>
+    <main class="main font-secondary job-post">
+      <div class="job-post-container">
+        <h1>Test Chamber Engineer</h1>
+        <p>Remote, Lisbon</p>
+        <div class="job__description body">
+          <p>Aperture Science builds the chambers others only fall through. You will own
+            portal surface calibration from the first prototype to the last cake.</p>
+          <h3>What you will do</h3>
+          <ul>
+            <li>Calibrate portal surfaces against the standard aperture</li>
+            <li>Keep the cake logistics pipeline honest</li>
+            <li>Review chamber designs for unintended exits</li>
+          </ul>
+          <h3>What we ask</h3>
+          <ul>
+            <li>Several years building something physical that had to work</li>
+            <li>A habit of writing down why, not only what</li>
+          </ul>
+        </div>
+        <form id="application-form">
+          <h3>Apply for this job</h3>
+          <label>Name<input name="name" /></label>
+          <button type="submit">Submit application</button>
+        </form>
+      </div>
+    </main>
+    <aside>
+      <h4>Other openings</h4>
+      <ul>
+        <li><a href="/aperture/jobs/1">Portal Technician</a></li>
+        <li><a href="/aperture/jobs/2">Cake Logistics Lead</a></li>
+      </ul>
+    </aside>
+    <footer>
+      <p>Powered by Greenhouse. Terms. Privacy. Your Privacy Choices.</p>
+    </footer>
+  </body>
+</html>

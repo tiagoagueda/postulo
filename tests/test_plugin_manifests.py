@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_twelve_of_them_across_eight_kinds():
+def test_there_are_thirteen_of_them_across_eight_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -158,6 +158,7 @@ def test_there_are_twelve_of_them_across_eight_kinds():
     }
 
     assert found == {
+        "board",
         "schema.org",
         "page-metadata",
         "email",

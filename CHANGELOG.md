@@ -290,6 +290,56 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **The sources read the posting the page is showing, in whichever way the board wrote it.**
+  Four faults, all found by reading real adverts rather than hand-written objects, and none
+  of them catchable by any test that existed. A results page carries a `JobPosting` for every
+  hit and the first was taken, so a capture from one brought back whichever advert the board
+  listed first; the one naming the page's own address now wins. A posting hung off an
+  `ItemList`, which is how several large aggregators publish, was invisible — only `@graph`
+  was followed. **Microdata and RDFa are read**, so the older recruitment systems and
+  public-sector boards that publish `itemprop` markup and no script stop falling through to
+  the fallback and coming back with the page's `<title>` as the job title; it is the same
+  schema.org vocabulary in the spellings the standard also defines, so it is the same source
+  reading it rather than a second one. And fields were read from one place where boards write
+  them in two: the office named on `hiringOrganization.address` rather than `jobLocation` was
+  lost outright, `estimatedSalary` was never read, `applicantLocationRequirements` — which
+  schema.org defines as where an applicant may be *for a job done remotely* — never counted
+  as remote, and a currency was kept with no amount behind it, so captures arrived saying
+  "USD, per year" and nothing else because boards write a `0–0` placeholder into every advert.
+
+  **For the boards that publish nothing a standard can read, a recipe.** LinkedIn embeds no
+  JSON-LD and no microdata and marks the company and the place with class names only, and
+  Greenhouse — which hosts a very large share of what people apply through — publishes
+  nothing either. `plugins/builtin/boards/` holds one module per board behind a source that
+  runs first and lets the standards fill whatever it left empty, so a board that starts
+  publishing JSON-LD improves without its recipe being touched and a recipe that rots because
+  a board redesigned costs the fields it used to fill rather than the capture. A recipe states
+  only what it is sure of: LinkedIn shows its date as "2 months ago", relative and in the
+  reader's language, so no date is stated at all. Its employment type is read the way this
+  sort of thing should be — every value in the criteria list is offered to Postulo's own
+  vocabulary and the one it recognises wins, so "Full-time" is read, "Mid-Senior level" is
+  not, and a page in a language whose words Postulo does not know leaves the field for a
+  person rather than guessing.
+
+  Two fixes came out of the same page and help every board. Where a page gives **exactly one
+  `<h1>`** outside its furniture, that is a better job title than the one it declares for
+  sharing — LinkedIn's is "*company* hiring *job* in *place* | LinkedIn". And **link density**
+  reaches what no landmark rule can: "similar searches" and "people also viewed" are plain
+  `<section>`s marked with a class name and nothing else, and a block whose text is
+  overwhelmingly inside a lot of links is a list of links whatever tag it uses.
+
+  All of it is held to **whole pages now, not hand-written objects**. `tests/fixtures/postings/`
+  carries eight, each with the expected reading beside it and a note saying what that board
+  does differently; every quirk in them was taken from a live page. **The browser extension
+  carries the same eight** and is held to the same values, because a page read in somebody's
+  browser has to come out identical to that page read here when it is sent — and every field
+  of all eight was checked between the two, and against live LinkedIn, Greenhouse and We Work
+  Remotely pages. To make that comparable, `htmlutil` assembles the tag stream into a small
+  tree before walking it: still the standard library's parser, still no C extension, but
+  microdata nesting and "is this paragraph inside the navigation" are questions about nesting
+  that a stream cannot answer without guessing differently from the DOM the extension walks.
+  (#176)
+
 - **A capture can be looked at before it is sent, and corrected on the way.** The browser
   extension used to send a page and hope: `POST /captures` read and stored it in one go, so
   the first anybody saw of what the parser made of it was the review screen, a tab and a

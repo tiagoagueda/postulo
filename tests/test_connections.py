@@ -111,6 +111,7 @@ def test_the_registry_knows_kinds_and_finds_plugins_by_name():
         registry.plugins("weather")
     # Sources are untouched by the generalisation.
     assert [source.name for source in registry.available_sources()] == [
+        "board",
         "schema.org",
         "page-metadata",
     ]

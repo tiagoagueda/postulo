@@ -1,0 +1,53 @@
+<!doctype html>
+<!-- The same vocabulary written into the markup instead of into a script. Older applicant
+     tracking systems and a good many public-sector boards publish JobPosting this way and
+     never emit a line of JSON-LD; before the reader understood itemprop, every one of them
+     fell through to the fallback and came back with the page's <title> as the job title.
+
+     Exercising, besides the plain case:
+       * nested itemscope for hiringOrganization and for jobLocation/PostalAddress
+       * <meta itemprop> carrying a value that is not shown to a reader
+       * <time datetime> as a date
+       * itemtype written as http:// rather than https:// -->
+<html lang="en">
+  <head>
+    <title>Careers | Aperture Science</title>
+  </head>
+  <body>
+    <nav>Home Careers Contact</nav>
+    <article itemscope itemtype="http://schema.org/JobPosting">
+      <h1 itemprop="title">Portal Surface Technician</h1>
+      <p>
+        <span itemprop="hiringOrganization" itemscope itemtype="http://schema.org/Organization">
+          <span itemprop="name">Aperture Science</span>
+        </span>
+      </p>
+      <div itemprop="jobLocation" itemscope itemtype="http://schema.org/Place">
+        <div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+          <span itemprop="addressLocality">Lisbon</span>
+          <span itemprop="addressRegion">Lisboa</span>
+          <meta itemprop="addressCountry" content="PT" />
+        </div>
+      </div>
+      <meta itemprop="employmentType" content="CONTRACTOR" />
+      <p>Posted <time itemprop="datePosted" datetime="2026-09-01">1 September 2026</time></p>
+      <p>Closes <time itemprop="validThrough" datetime="2026-10-15">15 October 2026</time></p>
+      <div itemprop="baseSalary" itemscope itemtype="http://schema.org/MonetaryAmount">
+        <meta itemprop="currency" content="EUR" />
+        <span itemprop="value" itemscope itemtype="http://schema.org/QuantitativeValue">
+          <meta itemprop="minValue" content="48000" />
+          <meta itemprop="maxValue" content="57000" />
+          <meta itemprop="unitText" content="YEAR" />
+        </span>
+      </div>
+      <div itemprop="description">
+        <p>Calibrate portal surfaces against the standard aperture.</p>
+        <ul>
+          <li>Hard hats provided</li>
+          <li>Cake on completion</li>
+        </ul>
+      </div>
+    </article>
+    <footer>Aperture Science. All rights reserved.</footer>
+  </body>
+</html>

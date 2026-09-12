@@ -1,0 +1,104 @@
+<!doctype html>
+<!-- Modelled on a live LinkedIn advert, September 2026. LinkedIn publishes no JSON-LD and
+     no microdata, and everything worth having is behind a class name, which is why it has a
+     recipe (`plugins/builtin/boards/linkedin.py`).
+
+     The four things the recipe is written against, all of them real:
+       * og:title is "<company> hiring <job> in <place> | LinkedIn", so the declared title is
+         useless as a job title and the <h1> is the one to read
+       * `topcard__flavor--bullet` is on the place AND on the applicant count; the count also
+         carries `--metadata`, which is the only thing telling them apart
+       * the posted date is "2 months ago" -- relative, in the reader's language, so the
+         recipe states no date at all rather than inventing one
+       * the page ends in thousands of characters of "<role> jobs / <n> open jobs", which is
+         what the link-density rule exists for
+
+     The advert prose is written here; only the shape is theirs. -->
+<html lang="en">
+  <head>
+    <title>Aperture Science hiring Portal Surface Technician in Lisbon, Portugal | LinkedIn</title>
+    <meta property="og:title" content="Aperture Science hiring Portal Surface Technician in Lisbon, Portugal | LinkedIn" />
+    <meta property="og:description" content="Posted 9:41:02 AM. We are seeking a calibration-minded technician…See this and similar jobs on LinkedIn." />
+    <meta property="og:url" content="https://pt.linkedin.com/jobs/view/portal-surface-technician-at-aperture-science-4435670736" />
+  </head>
+  <body>
+    <header class="header">
+      <nav class="nav"><a href="/feed">Feed</a> <a href="/jobs">Jobs</a></nav>
+    </header>
+    <main class="main">
+      <section class="core-rail">
+        <div class="top-card-layout__entity-info">
+          <h1 class="top-card-layout__title topcard__title">Portal Surface Technician</h1>
+          <h4 class="top-card-layout__second-subline">
+            <div class="topcard__flavor-row">
+              <span class="topcard__flavor">
+                <a class="topcard__org-name-link topcard__flavor--black-link"
+                   href="https://pt.linkedin.com/company/aperture-science">
+                  Aperture Science
+                </a>
+              </span>
+              <span class="topcard__flavor topcard__flavor--bullet"> Lisbon, Portugal </span>
+            </div>
+            <div class="topcard__flavor-row">
+              <span class="posted-time-ago__text topcard__flavor--metadata">2 months ago</span>
+              <span class="num-applicants__caption topcard__flavor--metadata topcard__flavor--bullet">188 applicants</span>
+            </div>
+          </h4>
+        </div>
+        <section class="core-section-container">
+          <div class="description__text description__text--rich">
+            <div class="show-more-less-html">
+              <p>Aperture Science builds the chambers others only fall through. You will own
+                portal surface calibration from the first prototype to the last cake.</p>
+              <h3>What you will do</h3>
+              <ul>
+                <li>Calibrate portal surfaces against the standard aperture</li>
+                <li>Keep the cake logistics pipeline honest</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <!-- The criteria list, outside the description. Both the heading and the value are
+             in the reader's language; only a value Postulo's own vocabulary recognises is
+             taken, which is why "Mid-Senior level" above "Full-time" changes nothing. -->
+        <ul class="description__job-criteria-list">
+          <li class="description__job-criteria-item">
+            <h3 class="description__job-criteria-subheader">Seniority level</h3>
+            <span class="description__job-criteria-text description__job-criteria-text--criteria">Mid-Senior level</span>
+          </li>
+          <li class="description__job-criteria-item">
+            <h3 class="description__job-criteria-subheader">Employment type</h3>
+            <span class="description__job-criteria-text description__job-criteria-text--criteria">Full-time</span>
+          </li>
+          <li class="description__job-criteria-item">
+            <h3 class="description__job-criteria-subheader">Job function</h3>
+            <span class="description__job-criteria-text description__job-criteria-text--criteria">Engineering</span>
+          </li>
+        </ul>
+      </section>
+      <section class="right-rail">
+        <section class="aside-section-container people-also-viewed">
+          <h2>People also viewed</h2>
+          <ul>
+            <li><a href="/jobs/view/1">Chamber Cleaner</a></li>
+            <li><a href="/jobs/view/2">Cake Logistics Lead</a></li>
+            <li><a href="/jobs/view/3">Portal Technician</a></li>
+          </ul>
+        </section>
+        <section class="related-jserps">
+          <h2>Similar searches</h2>
+          <ul>
+            <li><a href="/jobs/technician">Technician jobs</a> 6,557 open jobs</li>
+            <li><a href="/jobs/scientist">Scientist jobs</a> 6,219 open jobs</li>
+            <li><a href="/jobs/engineer">Engineer jobs</a> 3,411 open jobs</li>
+            <li><a href="/jobs/analyst">Analyst jobs</a> 1,915 open jobs</li>
+            <li><a href="/jobs/chemist">Chemist jobs</a> 664 open jobs</li>
+            <li><a href="/jobs/lawyer">Lawyer jobs</a> 876 open jobs</li>
+            <li><a href="/jobs/teacher">Teacher jobs</a> 776 open jobs</li>
+          </ul>
+        </section>
+      </section>
+    </main>
+    <footer><p>LinkedIn Corporation © 2026</p></footer>
+  </body>
+</html>

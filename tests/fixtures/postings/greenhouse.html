@@ -1,0 +1,59 @@
+<!doctype html>
+<!-- Modelled on a live Greenhouse board page, September 2026. Greenhouse hosts a very large
+     share of the adverts people actually apply through and publishes no structured data at
+     all, so it has a recipe (`plugins/builtin/boards/greenhouse.py`).
+
+     What the recipe is written against, all of it real:
+       * the company is only in the logo's alt text, written as "<Company> Logo"
+       * `job__title` wraps the heading AND `job__location`, so reading the container gives
+         "AI Engineer\n\nRemote, Bangalore" as a job title
+       * `job__location` has an inline icon before its text
+       * og:description is the *location*, not a description, which is why nothing reads it
+
+     The advert prose is written here; only the shape is theirs. -->
+<html lang="en">
+  <head>
+    <title>Job Application for Test Chamber Engineer at Aperture Science</title>
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Test Chamber Engineer" />
+    <meta property="og:description" content="Remote, Lisbon" />
+    <meta property="og:url" content="https://job-boards.greenhouse.io/aperture/jobs/8556658002" />
+  </head>
+  <body>
+    <div class="job-post-container">
+      <div class="image-container">
+        <a href="https://job-boards.greenhouse.io/aperture" class="logo">
+          <img src="https://s2-recruiting.cdn.greenhouse.io/logos/400/aperture.png" alt="Aperture Science Logo" />
+        </a>
+      </div>
+      <div>
+        <div class="job__tags"></div>
+        <div class="job__header">
+          <div class="job__title">
+            <h1 class="section-header section-header--large">Test Chamber Engineer</h1>
+            <div class="job__location">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 3z" /></svg>
+              Remote, Lisbon
+            </div>
+          </div>
+        </div>
+        <div class="job__description body">
+          <p>Aperture Science builds the chambers others only fall through. You will own
+            portal surface calibration from the first prototype to the last cake.</p>
+          <h3>What you will do</h3>
+          <ul>
+            <li>Calibrate portal surfaces against the standard aperture</li>
+            <li>Keep the cake logistics pipeline honest</li>
+            <li>Review chamber designs for unintended exits</li>
+          </ul>
+        </div>
+        <form id="application-form">
+          <h3>Apply for this job</h3>
+          <label>Name<input name="name" /></label>
+          <button type="submit">Submit application</button>
+        </form>
+      </div>
+    </div>
+    <footer><p>Powered by Greenhouse. Terms. Privacy.</p></footer>
+  </body>
+</html>
