@@ -375,6 +375,14 @@ All notable changes to Postulo are recorded here. The format follows
   `tests/test_shell_scripts.py` now reads every tracked shell script: it parses under
   `bash -n`, git records it executable, and it starts with a shebang.
 
+  **And old dev images are pruned.** Every push adds a pinned tag, and nothing ever took one
+  away. The job now ends by keeping the newest five and removing the rest — together with
+  the per-architecture manifests only they referenced, because a manifest nothing names
+  still holds its layers — and nothing else: releases, `latest`, `dev`, and anything
+  untagged the run did not itself orphan, such as a push in flight from another workflow,
+  are never candidates. `scripts/prune-dev-images.py` does it, and does it by hand with
+  `--dry-run`.
+
   `CONTRIBUTING.md` § *Giving a runner the `docker` label* said to declare `docker:host` and
   **was wrong** for a containerised runner: `host` runs the job inside the runner container,
   which is Alpine with no node and no docker CLI, so `actions/checkout` fails before

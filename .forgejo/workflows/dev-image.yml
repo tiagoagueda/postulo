@@ -27,6 +27,12 @@
 # images are run on is a Raspberry Pi. An amd64-only dev image is one nobody can deploy,
 # which would leave the channel building something to look at rather than something to run.
 # QEMU binfmt is registered on the runner, so `linux/arm64` costs time and nothing else.
+#
+# **Old dev images are pruned here, after the push.** Every push adds a pinned tag and
+# nothing else ever takes one away; the newest `DEV_IMAGES_KEPT` stay -- enough to roll an
+# instance back -- and `scripts/prune-dev-images.py` removes the rest, together with the
+# per-architecture manifests only they referenced. It runs in this job because this job is
+# the only thing that adds one, and after the push so the tag it just made is the newest.
 name: Dev image
 
 on:
@@ -112,6 +118,21 @@ jobs:
           tags=""
           for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
           docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
+
+      # A failure here fails the run, deliberately: the image is already published, but a
+      # prune that stopped working -- a token that lost its scope -- would otherwise be found
+      # by a full disk.
+      - name: Prune old dev images
+        env:
+          FORGEJO_USER: ${{ secrets.REGISTRY_USER }}
+          FORGEJO_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+          REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
+          DEV_IMAGES_KEPT: 5
+        run: |
+          registry="${REGISTRY_HOST:-${GITHUB_SERVER_URL#http*://}}"
+          repository="$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          python3 scripts/prune-dev-images.py --registry "$registry" \
+            --owner "${repository%%/*}" --package "${repository##*/}" --keep "$DEV_IMAGES_KEPT"
 
       # What was built, and from what. A dev tag moves, so the commit is the only thing that
       # identifies what somebody is running.

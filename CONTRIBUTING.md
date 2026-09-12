@@ -299,9 +299,17 @@ and free to change a database in ways a release will not. Quote the pinned tag i
 report; `:dev` moves and says nothing about what somebody was running.
 
 It is scanned by the same `scripts/scan-image.sh` a release is, because a dev image somebody
-runs against their own applications is an image. It is built for this runner's architecture
-only: the release does `linux/arm64` through QEMU, which is slow and one more thing to go
-wrong, and anybody needing another architecture wants a release.
+runs against their own applications is an image. It is built for `linux/amd64` and
+`linux/arm64`, as the release is, because the instance these images exist to be run on is a
+Raspberry Pi — an amd64-only dev image would be one nobody could deploy.
+
+**Old ones are pruned.** Every push adds a pinned tag, so the job ends by running
+`scripts/prune-dev-images.py`: the newest five pinned dev tags stay (`DEV_IMAGES_KEPT` in the
+workflow) and the rest go, together with the per-architecture manifests only they referenced
+— a manifest nothing names still holds its layers. Releases, `latest` and `dev` are never
+candidates, and nothing untagged that the run did not itself orphan is touched. Run it by
+hand with `--dry-run` to see what it would do; it needs `FORGEJO_USER` and `FORGEJO_TOKEN`
+in the environment, never on the command line.
 
 **Why this may run on a push when the release image may not.** The runner answering the
 `docker` label is a *second runner instance registered to this repository alone*, so Forgejo
@@ -376,9 +384,8 @@ With that, an automatic trigger becomes reasonable: `dev-image.yml` builds on ev
 `main`. Without it — a shared runner with `automount` — it is not, and the trigger is the
 first thing to reconsider if the runner arrangement ever changes.
 
-QEMU binfmt is still needed on the **host** for the release's `linux/arm64` half:
-`docker run --privileged --rm tonistiigi/binfmt --install all`. The dev image is built for
-the native architecture only and needs none of it.
+QEMU binfmt is still needed on the **host** for the `linux/arm64` half of both images:
+`docker run --privileged --rm tonistiigi/binfmt --install all`.
 
 ### Starting the image workflow
 
