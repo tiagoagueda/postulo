@@ -52,9 +52,16 @@ jobs:
           # Through the environment rather than expanded into the script: a value that
           # reaches a shell as text is data, one that is pasted into it is code.
           RELEASE_TAG: ${{ inputs.tag }}
+          # `GITHUB_SERVER_URL` is the address the *runner* reaches Forgejo at, which on a
+          # compose deployment is an internal name -- `http://server:3000`. The daemon that
+          # pushes runs on the host, cannot resolve that, and an image named after it could
+          # not be pulled by anybody. So the registry is the `REGISTRY_HOST` repository
+          # variable, falling back to the server URL with either scheme stripped, for an
+          # instance where the two are the same (#190).
+          REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
         run: |
           version="${RELEASE_TAG#v}"
-          registry="${GITHUB_SERVER_URL#https://}"
+          registry="${REGISTRY_HOST:-${GITHUB_SERVER_URL#http*://}}"
           image="${registry}/${GITHUB_REPOSITORY}"
           echo "tags=${image}:${version},${image}:${version%.*},${image}:latest" >> "$GITHUB_OUTPUT"
 
@@ -62,8 +69,10 @@ jobs:
         env:
           REGISTRY_USER: ${{ secrets.REGISTRY_USER }}
           REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+          REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
         run: |
-          echo "$REGISTRY_TOKEN" | docker login "${GITHUB_SERVER_URL#https://}" \
+          registry="${REGISTRY_HOST:-${GITHUB_SERVER_URL#http*://}}"
+          echo "$REGISTRY_TOKEN" | docker login "$registry" \
             -u "$REGISTRY_USER" --password-stdin
 
       # Built for this runner only, into its daemon, so there is something to scan. The

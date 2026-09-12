@@ -317,6 +317,15 @@ All notable changes to Postulo are recorded here. The format follows
   remembering. The workflow says the same thing twice, in the trigger and in an `if` on the
   branch, because a branch filter is one edit away from being wider than somebody meant.
 
+  **The first run found a fault in the release path too, and fixed it.** Both workflows
+  built the registry address as `${GITHUB_SERVER_URL#https://}`. `GITHUB_SERVER_URL` is the
+  address the *runner* reaches Forgejo at, which on a compose deployment is the internal
+  `http://server:3000` — so the strip left the scheme on, and the daemon that pushes runs on
+  the host and cannot resolve a compose name anyway. `image.yml` has carried the same line
+  since it was written and has never run, so it had never shown it. Both now read a
+  `REGISTRY_HOST` repository variable and fall back to the server URL with either scheme
+  stripped.
+
   `CONTRIBUTING.md` § *Giving a runner the `docker` label* said to declare `docker:host` and
   **was wrong** for a containerised runner: `host` runs the job inside the runner container,
   which is Alpine with no node and no docker CLI, so `actions/checkout` fails before

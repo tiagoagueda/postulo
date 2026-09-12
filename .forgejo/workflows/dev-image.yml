@@ -61,10 +61,18 @@ jobs:
 
       - name: Work out the tags
         id: tags
+        env:
+          # `GITHUB_SERVER_URL` is the address the *runner* reaches Forgejo at, which on a
+          # compose deployment is an internal name -- `http://server:3000`. The daemon that
+          # pushes runs on the host, cannot resolve that, and an image named after it could
+          # not be pulled by anybody. So the registry is the `REGISTRY_HOST` repository
+          # variable, falling back to the server URL with either scheme stripped, for an
+          # instance where the two are the same (#190).
+          REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
         run: |
           version="$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/postulo/__init__.py)"
           test -n "$version" || { echo "no version in src/postulo/__init__.py"; exit 1; }
-          registry="${GITHUB_SERVER_URL#https://}"
+          registry="${REGISTRY_HOST:-${GITHUB_SERVER_URL#http*://}}"
           image="${registry}/${GITHUB_REPOSITORY}"
           short="$(git rev-parse --short HEAD)"
           # `:dev` moves; the second one is what a bug report can name. Never `:latest`.
@@ -75,8 +83,10 @@ jobs:
         env:
           REGISTRY_USER: ${{ secrets.REGISTRY_USER }}
           REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+          REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
         run: |
-          echo "$REGISTRY_TOKEN" | docker login "${GITHUB_SERVER_URL#https://}" \
+          registry="${REGISTRY_HOST:-${GITHUB_SERVER_URL#http*://}}"
+          echo "$REGISTRY_TOKEN" | docker login "$registry" \
             -u "$REGISTRY_USER" --password-stdin
 
       # Into this runner's daemon first, so there is something to scan before anything is
