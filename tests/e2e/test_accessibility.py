@@ -84,7 +84,13 @@ def furnished(applicant):
     from django.core.files.base import ContentFile
     from django.utils import timezone
 
-    from postulo.applications.models import Application, InterviewKind, Reminder, Status
+    from postulo.applications.models import (
+        Application,
+        EventKind,
+        InterviewKind,
+        Reminder,
+        Status,
+    )
     from postulo.applications.services import change_status, schedule_interview
     from postulo.jobs.models import Company, Contact, Industry, JobPosting
     from postulo.resume.models import Experience
@@ -155,6 +161,23 @@ def furnished(applicant):
     connection = Connection.objects.create(
         owner=applicant, kind="notifier", plugin="email", label="My email"
     )
+    # A suggestion a plugin filed that nothing has matched to an application: the state in
+    # which the accept form carries a select, which #167 measured at 45 pixels over the edge
+    # of a phone in English and the walk had never reached. Filed through the service, as a
+    # plugin would, with the body, context and dates a mailbox reader actually sends.
+    from postulo.applications import suggestions
+
+    suggestion, _ = suggestions.suggest(
+        applicant,
+        source="imap",
+        external_id="<interview-42@blackmesa.test>",
+        kind=EventKind.EMAIL_RECEIVED,
+        summary="Interview invitation from Black Mesa",
+        body="We would like to invite you to an interview next week.",
+        suggested_status=Status.INTERVIEWING,
+        proposed_dates=(dt.date(2026, 9, 21), dt.date(2026, 9, 22)),
+        context={"From": "jobs@blackmesa.test", "Subject": "Interview invitation"},
+    )
 
     applicant.is_staff = True
     applicant.is_superuser = True
@@ -175,6 +198,7 @@ def furnished(applicant):
         "capture": capture,
         "interview": interview,
         "connection": connection,
+        "suggestion": suggestion,
     }
 
 

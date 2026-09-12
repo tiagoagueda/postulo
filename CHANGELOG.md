@@ -437,6 +437,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The suggestions page fits on a phone once there is a suggestion on it.** The accept form
+  for a suggestion not yet matched to an application carries a select as wide as the longest
+  application title, in a group that could not shrink — 45 pixels past the edge of a
+  320-pixel screen in English, 60 in Greek, 70 in German, on exactly the page a mail or
+  calendar plugin's first suggestion lands on. The group wraps under the words now and the
+  select gives way. The walk had never reached that state: its fixture had no suggestion, so
+  the page was only ever checked empty. It has a pending, unmatched one now, filed the way a
+  plugin files one, so axe and the reflow check read the page with something on it — the
+  last of what #167 found and left undone. (#167)
+
 - **Escape closes a cell editor however quickly it is pressed.** The editor arrives by a
   swap, and htmx wires what it swapped in — the Cancel button Escape clicks — only when the
   swap settles, 20 ms later by default, while the caret is put in the input the moment it

@@ -28,8 +28,14 @@
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         {% for suggestion in suggestions %}
           <li class="px-4 py-4" data-suggestion="{{ suggestion.pk }}">
+            {% comment %} `grow basis-48` rather than `flex-1`, and no `shrink-0` on the
+               group beside it: `flex-1` is `flex: 1 1 0%`, so the words claimed no width
+               before anything wrapped, and `shrink-0` meant the group could never be
+               narrower than its select -- which is as wide as the longest application
+               title, 330 pixels against the 238 a phone leaves. The group wraps under the
+               words now and the select gives way inside it (#167). {% endcomment %}
             <div class="flex flex-wrap items-start gap-3">
-              <div class="min-w-0 flex-1">
+              <div class="min-w-0 grow basis-48">
                 <p class="font-medium">{{ suggestion.summary }}</p>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   {{ suggestion.get_kind_display }}
@@ -64,14 +70,14 @@
                 {% endif %}
               </div>
 
-              <div class="shrink-0">
+              <div class="min-w-0 max-w-full">
                 {% if suggestion.is_pending %}
                   <form method="post" action="{% url 'applications:suggestion_action' suggestion.pk 'accept' %}"
                         class="flex flex-wrap items-center justify-end gap-2">
                     {% csrf_token %}
                     {% if not suggestion.application %}
                       <label class="sr-only" for="application-{{ suggestion.pk }}">{% translate "Application" %}</label>
-                      <select name="application" id="application-{{ suggestion.pk }}" class="field-input py-1 text-sm" required>
+                      <select name="application" id="application-{{ suggestion.pk }}" class="field-input min-w-0 max-w-full py-1 text-sm" required>
                         <option value="">{% translate "Which application?" %}</option>
                         {% for application in open_applications %}
                           <option value="{{ application.pk }}">{{ application.posting.title }} — {{ application.posting.company.name }}</option>
