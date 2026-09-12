@@ -32,7 +32,7 @@ There is no company behind Postulo, no funding round, no paid tier waiting to ap
 enough people depend on it. One person writes it, and what it costs to keep going comes
 from people who decided it was worth something.
 
-<a href="https://buymeacoffee.com/tiagoagueda"><img src="assets/support/buy-me-a-coffee.png" alt="Buy me a coffee" height="44"></a>
+<a href="https://www.buymeacoffee.com/tiagoagueda"><img src="assets/support/buy-me-a-coffee-qr.png" alt="Buy me a coffee — scan to open buymeacoffee.com/tiagoagueda" width="165" height="165"></a>
 
 Nothing is owed. Nothing is unlocked by it, now or later — that is what the paragraph above
 promises and it is not negotiable. And **nothing inside Postulo will ever ask you for

@@ -64,7 +64,7 @@ project. They are not.
 | --- | --- | --- | --- |
 | Lucide icons | `src/postulo/static/icons/` | [Lucide](https://lucide.dev) | ISC; each file keeps its own `@license` comment |
 | flag-icons artwork | `src/postulo/static/flags/` | [lipis/flag-icons](https://github.com/lipis/flag-icons) | MIT; the notice sits beside the files as `LICENSE.txt` |
-| Buy Me a Coffee banner | `assets/support/` | Buy Me a Coffee | An approved banner, used to link to the project's own account. See the notice beside it. |
+| Buy Me a Coffee banner and QR code | `assets/support/` | Buy Me a Coffee | Both published by Buy Me a Coffee for people to use, and used to link to the project's own account. The code is scaled and nothing else. See the notice beside them. |
 
 The first two are copyright licences and are satisfied by carrying their notices. The third
 is a mark, which is not licensed at all — hence this file.

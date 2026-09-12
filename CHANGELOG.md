@@ -290,6 +290,26 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **The support link is a QR code now, because a button can only be pressed by whoever is
+  already holding the device.** A README is read on a laptop, shown over a shoulder,
+  projected in a talk, pasted into a screenshot. In every one of those the *Buy me a coffee*
+  button was visible and unusable. The code is the same link in a form a second device can
+  pick up, and it replaces the button in the README, in `FUNDING.md` and on the wiki's home
+  page. The wiki sidebar keeps its text link: a sidebar has no room for a code.
+
+  **It was read back rather than trusted.** The code has little margin — stylised round
+  modules with the cup over the centre — and scaling it is not a matter of picking a round
+  number: a strict decoder reads the 3000px original at 300, 330, 375 and 440 pixels and
+  fails at 360, 400, 500 and every size above. 330 is shipped because it decoded under every
+  resampling tried, and `assets/support/NOTICE.txt` records that, along with what was done
+  to the file and what it resolves to. A phone is far more forgiving than a strict decoder;
+  anything that regenerates or resizes this file should still read it back first.
+
+  `TRADEMARKS.md` covers the code as well as the banner now. The banner file stays in the
+  tree, unshown, because links to it exist outside this repository. Nothing about the
+  promise changes: this is still the only place Postulo asks, and **nothing inside the
+  application ever will**. (#172)
+
 - **A plugin's kind and where it came from no longer wear the same badge, and the kind is a
   word in your language.** Both pages that list plugins drew two different facts as
   identical grey pills side by side, so nothing said that *importer* and *official* answer
