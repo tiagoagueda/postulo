@@ -144,19 +144,27 @@ def contact_details(owner) -> dict:
     this person makes no difference here — the document has always shown one, and the
     primary is what "one" means now.
     """
-    from postulo.core import phone_numbers
+    from postulo.core import phone_numbers, web_links
 
     profile = getattr(owner, "profile", None)
     primary = phone_numbers.primary_for(profile) if profile is not None else None
+    # One link of each kind, the primary, under the names the themes have always read --
+    # a theme somebody wrote against the three columns keeps working (#189).
+    links = web_links.primaries_for(profile) if profile is not None else {}
+
+    def link(kind: str) -> str:
+        row = links.get(kind)
+        return row.url if row else ""
+
     return {
         "name": owner.get_full_name() or owner.display_name,
         "email": owner.email,
         "headline": getattr(profile, "headline", ""),
         "phone": primary.number if primary else "",
         "location": getattr(profile, "location", ""),
-        "website": getattr(profile, "website", ""),
-        "linkedin_url": getattr(profile, "linkedin_url", ""),
-        "source_repo_url": getattr(profile, "source_repo_url", ""),
+        "website": link(web_links.Kind.WEBSITE),
+        "linkedin_url": link(web_links.Kind.SOCIAL),
+        "source_repo_url": link(web_links.Kind.REPOSITORY),
         # Beside the website and the LinkedIn address, which is where a reader looks.
         "identifiers": list(profile.identifiers.all()) if profile is not None else [],
     }

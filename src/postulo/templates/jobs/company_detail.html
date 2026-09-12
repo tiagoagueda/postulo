@@ -216,6 +216,15 @@
                     {% if contact.email %}
                       <p class="truncate text-xs text-ink-500 dark:text-ink-400">{{ contact.email }}</p>
                     {% endif %}
+                    {% for link in contact.web_links.all %}
+                      {% if link.is_primary or link.kind in several_links %}
+                        <p class="truncate text-xs text-ink-500 dark:text-ink-400">
+                          <a href="{{ link.url }}" rel="noopener noreferrer external" target="_blank"
+                             class="underline">{{ link.display }}</a>
+                          <span class="text-ink-400 dark:text-ink-500">{{ link.kind_label }}</span>
+                        </p>
+                      {% endif %}
+                    {% endfor %}
                   </div>
                   <a href="{% url 'jobs:contact_update' contact.pk %}"
                      class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>

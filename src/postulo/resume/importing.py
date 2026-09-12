@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from django.utils.translation import gettext as _
 
 from postulo.accounts import identifiers
-from postulo.core import phone_numbers
+from postulo.core import phone_numbers, web_links
 
 
 @dataclass
@@ -115,11 +115,19 @@ def apply(owner, record: Record) -> Report:
     profile = getattr(owner, "profile", None)
     if profile is not None and record.person:
         changed = []
-        for field_name in ("headline", "location", "website"):
+        for field_name in ("headline", "location"):
             value = record.person.get(field_name)
             if value and not getattr(profile, field_name, ""):
                 setattr(profile, field_name, value[:200])
                 changed.append(field_name)
+        # The website is a row of its own now (#189), filled on the same terms as the
+        # number below: only where there is nothing, so an import never overwrites what
+        # somebody typed.
+        site = (record.person.get("website") or "").strip()[:500]
+        wrote_site = False
+        if site and web_links.primary_for(profile, web_links.Kind.WEBSITE) is None:
+            web_links.save_only_link(profile, owner, web_links.Kind.WEBSITE, site)
+            wrote_site = True
         # The telephone number is a row of its own now, and the same rule applies to it:
         # filled in only where there is nothing there, so an import never overwrites what
         # somebody typed. A number this instance already holds is left alone rather than
@@ -145,6 +153,7 @@ def apply(owner, record: Record) -> Report:
         wrote_address = _write_address(profile, owner, record.person.get("address") or {})
         report.profile_filled = [
             *changed,
+            *(["website"] if wrote_site else []),
             *(["phone"] if wrote_number else []),
             *(["address"] if wrote_address else []),
         ]

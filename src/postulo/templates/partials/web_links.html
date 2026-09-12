@@ -1,0 +1,62 @@
+{% load i18n postulo %}
+{% comment %} A person's addresses on the web, one block per kind -- social profiles, code
+   repositories, websites -- each offered only while its own feature is on for this person,
+   and each with the one to show marked (#189).
+
+   The primary is a radio rather than a checkbox per row, and the radios share one name
+   outside the formset's prefixes, so the browser enforces "exactly one" before anything is
+   posted. The radio's value is the row's form prefix and not its primary key, because
+   somebody adding their first two links is choosing between rows that do not have keys yet.
+{% endcomment %}
+{% for block in links %}
+  <fieldset class="card mb-6" data-web-links="{{ block.kind }}">
+    <legend class="field-label px-1">{{ block.block.legend }}</legend>
+    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{{ block.block.intro }}</p>
+    {{ block.management_form }}
+    {% if block.non_form_errors %}
+      <div class="alert-error mb-3">{{ block.non_form_errors }}</div>
+    {% endif %}
+    <ol class="space-y-3">
+      {% for row in block %}
+        <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
+          {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
+          {% comment %} The address on its own line, because it is the subject of the row
+             and the long thing in it; the name and the controls share the line under.
+          {% endcomment %}
+          <div class="mb-3">
+            <label class="field-label" for="{{ row.url.id_for_label }}">{% translate "Address" %}</label>
+            {{ row.url|add_class:"field-input" }}
+          </div>
+          <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div>
+              <label class="field-label" for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
+              {{ row.label|add_class:"field-input" }}
+            </div>
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-1 pb-1 text-sm">
+              <label class="inline-flex items-center gap-2 py-1.5">
+                <input type="radio" name="{{ block.prefix }}-primary" value="{{ row.prefix }}"
+                       {% if row.instance.is_primary %}checked{% endif %}>
+                <span>{% translate "Primary" %}</span>
+              </label>
+              {% if row.instance.pk %}
+                <label class="inline-flex items-center gap-2 py-1.5">
+                  {{ row.DELETE }} <span>{% translate "Remove" %}</span>
+                </label>
+              {% endif %}
+            </div>
+          </div>
+          {% for field in row.visible_fields %}
+            {% include "partials/field_feedback.html" with field=field %}
+          {% endfor %}
+          {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </li>
+      {% endfor %}
+    </ol>
+    <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Left blank, the name is the address's host. Postulo never opens a link on its own —
+        not to check it, not for a picture.
+      {% endblocktranslate %}
+    </p>
+  </fieldset>
+{% endfor %}

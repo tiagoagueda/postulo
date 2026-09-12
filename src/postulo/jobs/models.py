@@ -429,7 +429,9 @@ class Contact(OwnedModel):
     #: And the same for postal addresses, which are the same shape and the same
     #: cascade -- deleting the holder deletes them (#92).
     postal_addresses = GenericRelation("core.PostalAddress", verbose_name=_("postal addresses"))
-    linkedin_url = models.URLField(_("LinkedIn"), blank=True)
+    #: And for the addresses on the web -- a LinkedIn was one column here until #189, and
+    #: a social profile, a repository or a website is a row of one table now.
+    web_links = GenericRelation("core.WebLink", verbose_name=_("web links"))
     notes = models.TextField(_("notes"), blank=True)
 
     class Meta:

@@ -165,6 +165,63 @@ def _address_rows(entry: dict) -> list[dict]:
     return [row for row in rows if any((row.get(part) or "").strip() for part in ADDRESS_PARTS)]
 
 
+#: The single columns an archive before format 15 wrote, and the kind each becomes. A
+#: contact only ever had the LinkedIn one; popping the others off it costs nothing.
+LEGACY_LINK_COLUMNS = (
+    ("website", "website"),
+    ("linkedin_url", "social"),
+    ("source_repo_url", "repository"),
+)
+
+
+def _link_rows(entry: dict) -> list[dict]:
+    """Take the web links out of a record, in whichever shape the file has them.
+
+    Format 15 writes a ``web_links`` list. Everything before it wrote a column per kind --
+    ``website``, ``linkedin_url``, ``source_repo_url`` -- and each of those becomes the
+    single primary link of its kind it always was (#189). Every key is removed from
+    ``entry``, because what remains is passed straight to a model that has none of them.
+    """
+    from postulo.core.web_links import KINDS
+
+    rows = entry.pop("web_links", None) or []
+    for column, kind in LEGACY_LINK_COLUMNS:
+        legacy = (entry.pop(column, "") or "").strip()
+        if legacy and not any(row.get("kind") == kind for row in rows):
+            rows.append({"kind": kind, "url": legacy, "is_primary": True})
+    return [row for row in rows if (row.get("url") or "").strip() and row.get("kind") in KINDS]
+
+
+def _restore_web_links(holder, owner, rows: list[dict]) -> None:
+    """Recreate a holder's links.
+
+    Unique per holder, so nothing here can collide with anybody else's; a repeated address
+    within one import is dropped, and the first row of each kind to claim the primary
+    keeps it.
+    """
+    from postulo.core.models import WebLink
+
+    primary_taken: set[str] = set()
+    seen: set[str] = set()
+    for row in rows:
+        url = (row.get("url") or "").strip()[:500]
+        if url in seen:
+            continue
+        seen.add(url)
+        kind = row.get("kind")
+        is_primary = bool(row.get("is_primary")) and kind not in primary_taken
+        if is_primary:
+            primary_taken.add(kind)
+        WebLink.objects.create(
+            owner=owner,
+            holder=holder,
+            kind=kind,
+            label=(row.get("label") or "")[:60],
+            url=url,
+            is_primary=is_primary,
+        )
+
+
 def _restore_postal_addresses(holder, owner, rows: list[dict]) -> None:
     """Recreate a holder's addresses.
 
@@ -288,6 +345,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     profile_data = dict(account.get("profile") or {})
     numbers = _phone_rows(profile_data)
     addresses = _address_rows(profile_data)
+    links = _link_rows(profile_data)
     profile = getattr(user, "profile", None)
     if profile and profile_data:
         for name, value in profile_data.items():
@@ -297,6 +355,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     if profile:
         _restore_phone_numbers(profile, user, numbers)
         _restore_postal_addresses(profile, user, addresses)
+        _restore_web_links(profile, user, links)
     for row in account.get("identifiers") or []:
         scheme = (row.get("scheme") or "").strip()
         value = (row.get("value") or "").strip()
@@ -471,6 +530,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             old_id = contact_entry.pop("id", None)
             numbers = _phone_rows(contact_entry)
             contact_addresses = _address_rows(contact_entry)
+            contact_links = _link_rows(contact_entry)
             department_name = (contact_entry.pop("department", "") or "").strip()[:120]
             contact = Contact.objects.create(owner=user, company=company, **contact_entry)
             if department_name:
@@ -481,6 +541,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                 contact.save(update_fields=["department"])
             _restore_phone_numbers(contact, user, numbers)
             _restore_postal_addresses(contact, user, contact_addresses)
+            _restore_web_links(contact, user, contact_links)
             contacts[old_id] = contact
 
         for posting_entry in posting_entries:

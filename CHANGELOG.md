@@ -290,6 +290,25 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Several social profiles, several code repositories, several websites — three plugins,
+  one table.** A person's presence online was four single boxes: a website, a LinkedIn and
+  a code repository on your details, and a LinkedIn on each contact. Somebody with a GitHub
+  *and* a Codeberg, or a personal Mastodon beside a professional LinkedIn, put the second in
+  the notes or nowhere. The four columns are rows of one table now — a kind, an address, a
+  name to call it by, and which one of each kind is the primary — attached to your profile
+  and to every contact, exactly as telephone numbers and postal addresses are. Three feature
+  plugins govern it, one per kind, because they are three decisions: an administrator
+  content to let people list every forge they publish on may still want one LinkedIn and
+  nothing else on a CV header. Each ships switched on; switched off, Postulo shows and uses
+  the primary of that kind only, which is exactly the one box it had before, and tells you
+  how many others it is keeping back. Nothing is deleted on the way out, an export carries
+  every row regardless, and an archive from before this reads back in with its columns as
+  rows. The kind names the sort of thing rather than the host — *social profile*, not
+  LinkedIn — so the next network is not a release. A CV prints the primary of each kind
+  where it always did; the company page lists a contact's links by the same rule; the API
+  keeps `linkedin_url` where it was, as the primary social profile, with `web_links` beside
+  it. Postulo never opens a link on its own — not to check it, not for a picture. (#189)
+
 - **Capturing an advert you already hold says so, before it is made.** Nothing checked
   whether a posting had been captured before: the same advert on Monday and again on
   Thursday made two captures and, reviewed, two listings for one job. Told now, not
@@ -805,7 +824,6 @@ All notable changes to Postulo are recorded here. The format follows
   period should hold is a benefit regime's rule or the person's own, never this software's.
   Drafts never sent are left out, and the page says how many, so the absence is stated rather
   than silent. (#56)
-
 
 - **An address is now checked — and named — by the rules of its own country.** Which parts
   are usually needed, what a postcode there looks like, what each field is *called*, and what

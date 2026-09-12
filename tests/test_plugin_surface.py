@@ -100,6 +100,9 @@ REACHING_PAST: dict[str, dict[str, str]] = {
     "builtin": {},
     "phone_numbers": {},
     "email_addresses": {},
+    "social_profiles": {},
+    "repositories": {},
+    "websites": {},
 }
 
 
@@ -263,6 +266,8 @@ def test_the_plugins_that_hold_no_data_need_only_the_surface():
     """
     assert reaching("postulo.plugins.builtin") == {SURFACE}
     assert reaching("postulo.plugins.phone_numbers") == {SURFACE}
+    for package in ("social_profiles", "repositories", "websites"):
+        assert reaching(f"postulo.plugins.{package}") == {SURFACE}, package
 
 
 def test_no_plugin_postulo_ships_reaches_for_a_model():

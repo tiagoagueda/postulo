@@ -264,20 +264,15 @@ class Profile(models.Model):
     #: And the same for postal addresses, which are the same shape and the same
     #: cascade -- deleting the holder deletes them (#92).
     postal_addresses = GenericRelation("core.PostalAddress", verbose_name=_("postal addresses"))
+    #: And for the addresses on the web -- social profiles, repositories, websites -- which
+    #: were three single columns here until #189 and are rows of one table now.
+    web_links = GenericRelation("core.WebLink", verbose_name=_("web links"))
     location = models.CharField(
         _("location"),
         max_length=120,
         blank=True,
         help_text=_("City and country, as it should appear on a CV."),
     )
-    website = models.URLField(_("website"), blank=True)
-    linkedin_url = models.URLField(_("LinkedIn"), blank=True)
-    source_repo_url = models.URLField(
-        _("code repository"),
-        blank=True,
-        help_text=_("A profile on GitHub, Forgejo, GitLab or similar."),
-    )
-
     language = models.CharField(_("language"), max_length=10, blank=True)
     #: Which language the career record itself is written in -- the job titles, the
     #: summaries, the highlights -- as opposed to `language`, which is the interface. The

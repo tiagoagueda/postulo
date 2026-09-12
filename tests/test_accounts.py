@@ -37,9 +37,6 @@ def test_saving_the_profile_stores_details_and_name(client, user):
             "headline": "Backend engineer",
             "phone": "",
             "location": "Paris, France",
-            "website": "",
-            "linkedin_url": "",
-            "source_repo_url": "",
         },
     )
 
@@ -62,9 +59,6 @@ def test_the_profile_page_only_ever_edits_your_own(client, user, other_user):
             "headline": "",
             "phone": "",
             "location": "",
-            "website": "",
-            "linkedin_url": "",
-            "source_repo_url": "",
             "language": "",
             "time_zone": "",
             "theme": Theme.SYSTEM,

@@ -50,6 +50,13 @@ class PhoneNumberOut(Schema):
     is_primary: bool = False
 
 
+class WebLinkOut(Schema):
+    kind: str
+    label: str = ""
+    url: str
+    is_primary: bool = False
+
+
 class ContactOut(Schema):
     id: int
     company_id: int
@@ -60,7 +67,11 @@ class ContactOut(Schema):
     #: against the earlier shape keeps working. `phone_numbers` is the whole list.
     phone: str = ""
     phone_numbers: list[PhoneNumberOut] = Field(default_factory=list)
+    #: The primary social profile, where the single LinkedIn address has always been, so a
+    #: client written against the earlier shape keeps working. `web_links` is the whole
+    #: list, of every kind (#189).
     linkedin_url: str = ""
+    web_links: list[WebLinkOut] = Field(default_factory=list)
     notes: str = ""
 
 
@@ -101,7 +112,8 @@ class ContactIn(Schema):
     role: str = Field(default="", max_length=200)
     email: str = Field(default="", max_length=254)
     phone: str = Field(default="", max_length=40)
-    linkedin_url: str = Field(default="", max_length=200)
+    #: Saved as the contact's primary social profile (#189).
+    linkedin_url: str = Field(default="", max_length=500)
     notes: str = ""
 
 
@@ -521,6 +533,11 @@ def _primary_number(holder) -> str:
     return row.number if row else ""
 
 
+def _primary_link(holder, kind: str) -> str:
+    row = next((n for n in holder.web_links.all() if n.is_primary and n.kind == kind), None)
+    return row.url if row else ""
+
+
 def contact_out(contact) -> dict:
     return {
         "id": contact.pk,
@@ -540,7 +557,11 @@ def contact_out(contact) -> dict:
             }
             for row in contact.phone_numbers.all()
         ],
-        "linkedin_url": contact.linkedin_url,
+        "linkedin_url": _primary_link(contact, "social"),
+        "web_links": [
+            {"kind": row.kind, "label": row.label, "url": row.url, "is_primary": row.is_primary}
+            for row in contact.web_links.all()
+        ],
         "notes": contact.notes,
     }
 

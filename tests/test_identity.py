@@ -211,9 +211,6 @@ def profile_post(**overrides):
         "headline": "",
         "phone": "",
         "location": "",
-        "website": "",
-        "linkedin_url": "",
-        "source_repo_url": "",
     }
     data.update(overrides)
     return data

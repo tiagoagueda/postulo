@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:35+0000\n"
+"POT-Creation-Date: 2026-09-12 19:57+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -230,7 +230,7 @@ msgid ""
 msgstr ""
 "%(label)s vis dar laiko %(count)d įrašą (-us), ir jį pašalinus jie liktų lentelėje, kurios niekas negali nei perskaityti, nei eksportuoti, nei atkurti. Pirma ją ištuštinkite paties papildinio puslapiuose arba geriau išjunkite papildinį — išjungus viskas išlieka."
 
-#: src/postulo/jobs/models.py:708
+#: src/postulo/jobs/models.py:710
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "nuo %(low)s iki %(high)s"
@@ -361,8 +361,8 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s pakeistų tai, nuo ko priklauso pats Postulo. %(problems)s"
 
-#: src/postulo/documents/rendering.py:279
-#: src/postulo/documents/rendering.py:304
+#: src/postulo/documents/rendering.py:287
+#: src/postulo/documents/rendering.py:312
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
@@ -414,7 +414,7 @@ msgstr "%(role)s, %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s, %(company)s — %(days)s d."
 
-#: src/postulo/resume/importing.py:172
+#: src/postulo/resume/importing.py:181
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: nėra pradžios datos, todėl nepridėta."
@@ -620,7 +620,7 @@ msgstr "CSV failas"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Užuomina sąsajai, pvz., „amber“ arba „sky“."
 
-#: src/postulo/core/models.py:513
+#: src/postulo/core/models.py:605
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Eilutė po pavadinimu prisijungimo puslapyje. Neprivaloma."
@@ -629,6 +629,11 @@ msgstr "Eilutė po pavadinimu prisijungimo puslapyje. Neprivaloma."
 #, draft
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr "Eilutė, kai papildinys mano, kad kažkas nutiko, ir jūsų laukia."
+
+#: src/postulo/core/web_links.py:67
+msgid ""
+"A LinkedIn, a Mastodon, a Bluesky — as many as are worth showing, with one of them marked as the one to show. Documents print that one."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html:49
 msgid ""
@@ -692,6 +697,11 @@ msgstr "Slaptažodis yra išsaugotas. Jis niekada nerodomas, net ir jo ilgis."
 msgid "A password, or an app password"
 msgstr "Slaptažodis arba programos slaptažodis"
 
+#: src/postulo/core/web_links.py:109
+msgid ""
+"A personal site, a blog, a portfolio — as many as are worth showing, with one of them marked as the one to show. Documents print that one."
+msgstr ""
+
 #: src/postulo/templates/widgets/suggestions.html:6
 #, python-format, draft
 msgid ""
@@ -737,7 +747,12 @@ msgid ""
 msgstr ""
 "Skelbimas, kurį pastebėjote. Pradžiai užtenka įmonės ir pavadinimo; likusi dalis gali atsirasti vėliau."
 
-#: src/postulo/accounts/models.py:278
+#: src/postulo/core/web_links.py:88
+msgid ""
+"A profile on a forge, or one project worth showing — as many as are worth listing, with one of them marked as the one to show. Documents print that one."
+msgstr ""
+
+#: src/postulo/core/web_links.py:93
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Profilis „GitHub“, „Forgejo“, „GitLab“ ar panašiai."
@@ -769,7 +784,7 @@ msgstr "Priminimas sueina"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Priminimas sueina diena anksčiau, kai ta diena yra."
 
-#: src/postulo/accounts/models.py:478
+#: src/postulo/accounts/models.py:473
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Pastaba, kam tai skirta."
@@ -871,12 +886,12 @@ msgstr "Priimti"
 msgid "Accepted"
 msgstr "Priimta"
 
-#: src/postulo/accounts/models.py:492
+#: src/postulo/accounts/models.py:487
 #, draft
 msgid "accepted at"
 msgstr "priimta"
 
-#: src/postulo/accounts/models.py:499
+#: src/postulo/accounts/models.py:494
 #, draft
 msgid "accepted by"
 msgstr "priėmė"
@@ -1069,12 +1084,13 @@ msgstr "Pridėta."
 
 #: src/postulo/applications/reports.py:478
 #: src/postulo/templates/partials/postal_addresses.html:29
+#: src/postulo/templates/partials/web_links.html:28
 #, draft
 msgid "Address"
 msgstr "Adresas"
 
-#: src/postulo/core/models.py:413 src/postulo/jobs/models.py:740
-#: src/postulo/resume/models.py:242
+#: src/postulo/core/models.py:413 src/postulo/core/models.py:539
+#: src/postulo/jobs/models.py:742 src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "adresas"
@@ -1148,7 +1164,7 @@ msgid ""
 "All of them are offered, and a language added in a later release will be too."
 msgstr "Siūlomos visos, taip pat ir kalba, pridėta vėlesnėje laidoje."
 
-#: src/postulo/templates/accounts/profile.html:175
+#: src/postulo/templates/accounts/profile.html:181
 #, draft
 msgid "Also happens by itself when your primary address changes."
 msgstr "Įvyksta ir savaime, kai pasikeičia jūsų pagrindinis adresas."
@@ -1202,7 +1218,7 @@ msgid ""
 msgstr ""
 "Indeksas yra čia vykdomo kodo sąrašas, todėl jis turi būti pasirašytas ir jūs turite turėti raktą. Vėliau išjungus saugyklą, iš jos nebediegiama ir neatnaujinama; kas jau įdiegta, veikia toliau."
 
-#: src/postulo/templates/accounts/profile.html:109
+#: src/postulo/templates/accounts/profile.html:115
 #, draft
 msgid ""
 "An ORCID, or another public id that says which researcher you are. A name is not an identity — two people share one, one person publishes under three — and an application form for an academic post asks for this by name. Paste a whole address if that is what you have; Postulo keeps the id."
@@ -1289,7 +1305,7 @@ msgstr "Išvaizda"
 #: src/postulo/applications/models.py:424
 #: src/postulo/applications/models.py:519
 #: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:490 src/postulo/jobs/models.py:768
+#: src/postulo/documents/models.py:490 src/postulo/jobs/models.py:770
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1395,7 +1411,7 @@ msgstr "Paraiškos su laiko juostomis"
 
 #: src/postulo/applications/analytics.py:31
 #: src/postulo/applications/models.py:41 src/postulo/applications/tables.py:46
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:663
+#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:665
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
 msgid "Applied"
@@ -1450,7 +1466,7 @@ msgstr "Taikyti pažymėtoms eilutėms"
 msgid "Apply: %(title)s"
 msgstr "Teikti paraišką: %(title)s"
 
-#: src/postulo/jobs/models.py:464
+#: src/postulo/jobs/models.py:466
 #, draft
 msgid "Apprenticeship"
 msgstr "Pameistrystė"
@@ -1497,7 +1513,7 @@ msgstr "Turi būti siūloma bent viena kalba, kitaip niekas nieko neperskaitys."
 msgid "attempts"
 msgstr "bandymai"
 
-#: src/postulo/core/models.py:607
+#: src/postulo/core/models.py:699
 #, draft
 msgid "authentication"
 msgstr "tapatybės nustatymas"
@@ -1677,7 +1693,7 @@ msgid "Callback to register with it"
 msgstr "Grąžinimo URL, registruotinas pas teikėją"
 
 #: src/postulo/templates/accounts/invite_form.html:24
-#: src/postulo/templates/accounts/profile.html:166
+#: src/postulo/templates/accounts/profile.html:172
 #: src/postulo/templates/applications/application_form.html:30
 #: src/postulo/templates/applications/application_intake.html:73
 #: src/postulo/templates/applications/interview_form.html:70
@@ -1691,7 +1707,7 @@ msgstr "Grąžinimo URL, registruotinas pas teikėją"
 #: src/postulo/templates/documents/send.html:32
 #: src/postulo/templates/documents/upload_form.html:21
 #: src/postulo/templates/jobs/company_form.html:106
-#: src/postulo/templates/jobs/contact_form.html:38
+#: src/postulo/templates/jobs/contact_form.html:42
 #: src/postulo/templates/jobs/industry_form.html:21
 #: src/postulo/templates/jobs/listing_apply.html:44
 #: src/postulo/templates/jobs/listing_form.html:54
@@ -1718,7 +1734,7 @@ msgstr "Atšaukta"
 msgid "Capture"
 msgstr "Fiksuoti"
 
-#: src/postulo/jobs/models.py:772
+#: src/postulo/jobs/models.py:774
 #, draft
 msgid "capture"
 msgstr "fiksavimas"
@@ -1765,7 +1781,7 @@ msgstr "Šio egzemplioriaus fiksavimo šaltiniai"
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
 
-#: src/postulo/jobs/models.py:744
+#: src/postulo/jobs/models.py:746
 #, draft
 msgid "captured from"
 msgstr "užfiksuota iš"
@@ -1775,7 +1791,7 @@ msgstr "užfiksuota iš"
 msgid "Captured: %(title)s"
 msgstr "Užfiksuota: %(title)s"
 
-#: src/postulo/jobs/models.py:773
+#: src/postulo/jobs/models.py:775
 #, draft
 msgid "captures"
 msgstr "fiksavimai"
@@ -1956,7 +1972,7 @@ msgstr "Pasirinkti kitą failą"
 msgid "Choose at least one document to record."
 msgstr "Pasirinkite bent vieną dokumentą įrašymui."
 
-#: src/postulo/accounts/forms.py:459 src/postulo/jobs/forms.py:224
+#: src/postulo/accounts/forms.py:464 src/postulo/jobs/forms.py:224
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Pasirinkite, kokios rūšies tai identifikatorius."
@@ -1966,7 +1982,7 @@ msgstr "Pasirinkite, kokios rūšies tai identifikatorius."
 msgid "Choose which application this is about first."
 msgstr "Pirmiausia pasirinkite, su kuria paraiška tai susiję."
 
-#: src/postulo/accounts/models.py:271
+#: src/postulo/accounts/models.py:274
 #, draft
 msgid "City and country, as it should appear on a CV."
 msgstr "Miestas ir šalis, kaip turi atrodyti CV."
@@ -1998,7 +2014,7 @@ msgstr "Išvalyti filtrus"
 msgid "Cleared: this entry prints its original text in %(language)s."
 msgstr "Ištuštinta: šis įrašas spausdina savo pirminį tekstą %(language)s kalba."
 
-#: src/postulo/core/models.py:613
+#: src/postulo/core/models.py:705
 #, draft
 msgid "client ID"
 msgstr "kliento ID"
@@ -2008,17 +2024,17 @@ msgstr "kliento ID"
 msgid "Client secret"
 msgstr "Kliento paslaptis"
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:663
+#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:665
 #, draft
 msgid "Closed"
 msgstr "Uždaryta"
 
-#: src/postulo/applications/models.py:210 src/postulo/jobs/models.py:604
+#: src/postulo/applications/models.py:210 src/postulo/jobs/models.py:606
 #, draft
 msgid "closed on"
 msgstr "uždaryta"
 
-#: src/postulo/jobs/models.py:491
+#: src/postulo/jobs/models.py:493
 #, draft
 msgid "Closed or already filled"
 msgstr "Uždaryta arba jau užimta"
@@ -2034,7 +2050,7 @@ msgstr "Užsidaro"
 msgid "Closing date"
 msgstr "Pabaigos data"
 
-#: src/postulo/jobs/models.py:598
+#: src/postulo/jobs/models.py:600
 #, draft
 msgid "closing date"
 msgstr "pabaigos data"
@@ -2049,10 +2065,13 @@ msgstr "Baigiasi šią savaitę: %(total)s"
 msgid "Code (GitHub, GitLab…)"
 msgstr "Kodas (GitHub, GitLab…)"
 
-#: src/postulo/accounts/models.py:276
-#, draft
-msgid "code repository"
-msgstr "kodo saugykla"
+#: src/postulo/core/web_links.py:87
+msgid "Code repositories"
+msgstr ""
+
+#: src/postulo/core/models.py:525 src/postulo/core/web_links.py:92
+msgid "Code repository"
+msgstr ""
 
 #: src/postulo/core/models.py:87
 #, draft
@@ -2121,17 +2140,17 @@ msgstr "Įmonė"
 
 #: src/postulo/jobs/models.py:168 src/postulo/jobs/models.py:304
 #: src/postulo/jobs/models.py:381 src/postulo/jobs/models.py:409
-#: src/postulo/jobs/models.py:561 src/postulo/jobs/tables.py:18
+#: src/postulo/jobs/models.py:563 src/postulo/jobs/tables.py:18
 #, draft
 msgid "company"
 msgstr "įmonė"
 
-#: src/postulo/jobs/views.py:300
+#: src/postulo/jobs/views.py:308
 #, draft
 msgid "Company added."
 msgstr "Įmonė pridėta."
 
-#: src/postulo/jobs/views.py:371
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Įmonė ištrinta kartu su jos skelbimais."
@@ -2146,7 +2165,7 @@ msgstr "įmonės identifikatorius"
 msgid "company identifiers"
 msgstr "įmonės identifikatoriai"
 
-#: src/postulo/jobs/views.py:312
+#: src/postulo/jobs/views.py:320
 #, draft
 msgid "Company updated."
 msgstr "Įmonė atnaujinta."
@@ -2221,7 +2240,7 @@ msgstr "Ryšys pašalintas kartu su paslaptimis."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Ryšys išsaugotas. Išbandykite jį, kad įsitikintumėte, jog veikia."
 
-#: src/postulo/core/models.py:591
+#: src/postulo/core/models.py:683
 #, draft
 msgid "connection security"
 msgstr "ryšio saugumas"
@@ -2244,7 +2263,7 @@ msgstr "Ryšiai"
 msgid "connections"
 msgstr "ryšiai"
 
-#: src/postulo/accounts/forms.py:400
+#: src/postulo/accounts/forms.py:405
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Laikyti paraišką nutilusia po"
@@ -2259,7 +2278,7 @@ msgstr "Statyba"
 msgid "Consulting"
 msgstr "Konsultavimas"
 
-#: src/postulo/jobs/models.py:436
+#: src/postulo/jobs/models.py:438
 #, draft
 msgid "contact"
 msgstr "kontaktas"
@@ -2270,7 +2289,7 @@ msgstr "kontaktas"
 msgid "Contact"
 msgstr "Kontaktas"
 
-#: src/postulo/jobs/views.py:468
+#: src/postulo/jobs/views.py:485
 #, draft
 msgid "Contact added."
 msgstr "Kontaktas pridėtas."
@@ -2280,7 +2299,7 @@ msgstr "Kontaktas pridėtas."
 msgid "Contact block"
 msgstr "Kontaktų blokas"
 
-#: src/postulo/jobs/models.py:437
+#: src/postulo/jobs/models.py:439
 #, draft
 msgid "contacts"
 msgstr "kontaktai"
@@ -2295,7 +2314,7 @@ msgstr "Kuriame yra"
 msgid "context"
 msgstr "kontekstas"
 
-#: src/postulo/jobs/models.py:461
+#: src/postulo/jobs/models.py:463
 #, draft
 msgid "Contract"
 msgstr "Terminuota sutartis"
@@ -2395,13 +2414,13 @@ msgstr "Kurti pakvietimą"
 msgid "created"
 msgstr "sukurta"
 
-#: src/postulo/accounts/models.py:344 src/postulo/accounts/models.py:415
-#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:34
+#: src/postulo/accounts/models.py:339 src/postulo/accounts/models.py:410
+#: src/postulo/accounts/models.py:484 src/postulo/core/models.py:34
 #, draft
 msgid "created at"
 msgstr "sukurta"
 
-#: src/postulo/accounts/models.py:487
+#: src/postulo/accounts/models.py:482
 #, draft
 msgid "created by"
 msgstr "sukūrė"
@@ -2416,7 +2435,7 @@ msgstr "pažymėjimo nuoroda"
 msgid "Currency"
 msgstr "Valiuta"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:589
 #, draft
 msgid "currency"
 msgstr "valiuta"
@@ -2472,7 +2491,7 @@ msgstr "Tamsi"
 msgid "Dashboard"
 msgstr "Skydelis"
 
-#: src/postulo/accounts/models.py:318
+#: src/postulo/accounts/models.py:313
 #, draft
 msgid "dashboard widgets"
 msgstr "skydelio valdikliai"
@@ -2536,7 +2555,7 @@ msgid ""
 msgstr ""
 "Dienos iki pirmo atsakymo ir iki pirmo pokalbio: greičiausia, mediana, lėčiausia."
 
-#: src/postulo/accounts/models.py:341
+#: src/postulo/accounts/models.py:336
 #, draft
 msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
@@ -2645,7 +2664,7 @@ msgstr "Nusprendė %(who)s %(when)s"
 msgid "Decided by %(who)s."
 msgstr "Nusprendė %(who)s."
 
-#: src/postulo/jobs/models.py:619
+#: src/postulo/jobs/models.py:621
 #, draft
 msgid "decided on"
 msgstr "nuspręsta"
@@ -2665,12 +2684,12 @@ msgstr "Atmesta"
 msgid "Declined. It will not be suggested again."
 msgstr "Atmesta. Daugiau nebus siūloma."
 
-#: src/postulo/core/models.py:553
+#: src/postulo/core/models.py:645
 #, draft
 msgid "default language"
 msgstr "numatytoji kalba"
 
-#: src/postulo/core/models.py:564
+#: src/postulo/core/models.py:656
 #, draft
 msgid "default time zone"
 msgstr "numatytoji laiko juosta"
@@ -2756,7 +2775,7 @@ msgstr "Priklauso nuo"
 msgid "Description"
 msgstr "Aprašymas"
 
-#: src/postulo/jobs/models.py:579 src/postulo/resume/models.py:245
+#: src/postulo/jobs/models.py:581 src/postulo/resume/models.py:245
 #, draft
 msgid "description"
 msgstr "aprašymas"
@@ -2786,7 +2805,7 @@ msgstr "Neatsakė"
 msgid "did not answer when last checked"
 msgstr "paskutinį kartą tikrinant neatsakė"
 
-#: src/postulo/core/models.py:612
+#: src/postulo/core/models.py:704
 #, draft
 msgid "directory (tenant) ID"
 msgstr "katalogo (nuomininko) ID"
@@ -2804,8 +2823,8 @@ msgstr "Atmesti"
 msgid "Discard this capture"
 msgstr "Atmesti šį fiksavimą"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:484
-#: src/postulo/jobs/models.py:723
+#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:486
+#: src/postulo/jobs/models.py:725
 #, draft
 msgid "Discarded"
 msgstr "Atmesta"
@@ -2971,7 +2990,7 @@ msgstr ""
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:46
 #: src/postulo/templates/jobs/company_detail.html:45
-#: src/postulo/templates/jobs/company_detail.html:223
+#: src/postulo/templates/jobs/company_detail.html:232
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:131
 #: src/postulo/templates/resume/preview.html:15
@@ -3026,7 +3045,7 @@ msgstr ""
 msgid "Email"
 msgstr "El. paštas"
 
-#: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:473
+#: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:468
 #: src/postulo/jobs/models.py:423 src/postulo/resume/views.py:451
 #, draft
 msgid "email address"
@@ -3037,7 +3056,7 @@ msgstr "el. pašto adresas"
 msgid "Email address"
 msgstr "El. pašto adresas"
 
-#: src/postulo/accounts/forms.py:637
+#: src/postulo/accounts/forms.py:642
 #, draft
 msgid "Email address (optional)"
 msgstr "El. pašto adresas (neprivaloma)"
@@ -3062,7 +3081,7 @@ msgstr "Išsiųstas el. laiškas"
 msgid "Employment type"
 msgstr "Įdarbinimo tipas"
 
-#: src/postulo/jobs/models.py:569
+#: src/postulo/jobs/models.py:571
 #, draft
 msgid "employment type"
 msgstr "įdarbinimo tipas"
@@ -3072,7 +3091,7 @@ msgstr "įdarbinimo tipas"
 msgid "Empty"
 msgstr "Tuščia"
 
-#: src/postulo/jobs/models.py:778
+#: src/postulo/jobs/models.py:780
 #, draft
 msgid "Empty capture"
 msgstr "Tuščias fiksavimas"
@@ -3210,7 +3229,7 @@ msgid ""
 msgstr ""
 "Viskas dingsta iš karto, ir niekas to nesugrąžins. Pirmiausia pasidarykite eksportą."
 
-#: src/postulo/accounts/forms.py:390
+#: src/postulo/accounts/forms.py:395
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
@@ -3301,7 +3320,7 @@ msgstr "Baigia galioti"
 msgid "expires"
 msgstr "baigia galioti"
 
-#: src/postulo/accounts/models.py:416 src/postulo/accounts/models.py:490
+#: src/postulo/accounts/models.py:411 src/postulo/accounts/models.py:485
 #, draft
 msgid "expires at"
 msgstr "baigia galioti"
@@ -3339,7 +3358,7 @@ msgstr "Eksportuota atskirai"
 msgid "Failed"
 msgstr "Nepavyko"
 
-#: src/postulo/core/models.py:696 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:788 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Nepavyko, nepaaiškinus kodėl."
@@ -3363,12 +3382,12 @@ msgstr "Faksas"
 msgid "Feature"
 msgstr ""
 
-#: src/postulo/templates/accounts/profile.html:173
+#: src/postulo/templates/accounts/profile.html:179
 #, draft
 msgid "Fetch my Gravatar again"
 msgstr "Iš naujo gauti mano „Gravatar“"
 
-#: src/postulo/jobs/views.py:354
+#: src/postulo/jobs/views.py:362
 #, draft
 msgid "Fetched again."
 msgstr "Atsisiųsta iš naujo."
@@ -3564,7 +3583,7 @@ msgstr "Pamiršti išsaugotą slaptažodį"
 msgid "Forget the token"
 msgstr "Pamiršti prieigos raktą"
 
-#: src/postulo/jobs/views.py:348
+#: src/postulo/jobs/views.py:356
 #, python-format, draft
 msgid "Found a logo at %(url)s."
 msgstr "Rastas logotipas adresu %(url)s."
@@ -3583,7 +3602,7 @@ msgstr "Rastas jų svetainėje"
 msgid "Found via"
 msgstr "Rasta per"
 
-#: src/postulo/jobs/models.py:574
+#: src/postulo/jobs/models.py:576
 #, draft
 msgid "found via"
 msgstr "rasta per"
@@ -3594,7 +3613,7 @@ msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr ""
 "Rasta: %(names)s. Bus užpildyti tik tie laukai, kuriuos palikote tuščius."
 
-#: src/postulo/jobs/models.py:462
+#: src/postulo/jobs/models.py:464
 #, draft
 msgid "Freelance"
 msgstr "Laisvai samdomas"
@@ -3619,7 +3638,7 @@ msgstr "nuo"
 msgid "From"
 msgstr "Nuo"
 
-#: src/postulo/jobs/models.py:713
+#: src/postulo/jobs/models.py:715
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "nuo %(low)s"
@@ -3629,7 +3648,7 @@ msgstr "nuo %(low)s"
 msgid "From %(name)s."
 msgstr "Nuo %(name)s."
 
-#: src/postulo/core/models.py:599
+#: src/postulo/core/models.py:691
 #, draft
 msgid "from address"
 msgstr "siuntėjo adresas"
@@ -3666,7 +3685,7 @@ msgstr "iš būsenos"
 msgid "Frozen at the moment of sending"
 msgstr "Užšaldyta siuntimo akimirką"
 
-#: src/postulo/jobs/models.py:459
+#: src/postulo/jobs/models.py:461
 #, draft
 msgid "Full time"
 msgstr "Visa darbo diena"
@@ -3749,22 +3768,22 @@ msgstr "Gavo bet kokį atsakymą"
 msgid "grade"
 msgstr "pažymys"
 
-#: src/postulo/core/models.py:609
+#: src/postulo/core/models.py:701
 #, draft
 msgid "grant"
 msgstr "leidimas"
 
-#: src/postulo/accounts/models.py:335
+#: src/postulo/accounts/models.py:330
 #, draft
 msgid "Gravatar checked on"
 msgstr "„Gravatar“ patikrintas"
 
-#: src/postulo/accounts/models.py:333
+#: src/postulo/accounts/models.py:328
 #, draft
 msgid "Gravatar copy"
 msgstr "„Gravatar“ kopija"
 
-#: src/postulo/accounts/views.py:144 src/postulo/accounts/views.py:184
+#: src/postulo/accounts/views.py:151 src/postulo/accounts/views.py:191
 #, draft
 msgid "Gravatar could not be reached just now. Try again later."
 msgstr "„Gravatar“ šiuo metu nepasiekiamas. Bandykite vėliau."
@@ -3775,7 +3794,7 @@ msgid "Gravatar had no picture for your address when last asked, on %(when)s."
 msgstr ""
 "Paskutinį kartą klausiant %(when)s „Gravatar“ neturėjo paveikslėlio jūsų adresui."
 
-#: src/postulo/accounts/views.py:140 src/postulo/accounts/views.py:183
+#: src/postulo/accounts/views.py:147 src/postulo/accounts/views.py:190
 #, draft
 msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr "„Gravatar“ neturi paveikslėlio jūsų adresui, todėl lieka jūsų inicialai."
@@ -3829,7 +3848,7 @@ msgstr "Įvyko"
 msgid "hidden"
 msgstr "paslėpta"
 
-#: src/postulo/accounts/models.py:298
+#: src/postulo/accounts/models.py:293
 #, draft
 msgid "hidden navigation items"
 msgstr "paslėpti naršymo elementai"
@@ -3957,7 +3976,7 @@ msgstr "Kaip prisijungiate: jūsų naudotojo vardas, adresai, slaptažodis."
 msgid "However you prefer to group your search."
 msgstr "Kaip tik norite grupuoti savo paiešką."
 
-#: src/postulo/jobs/models.py:454
+#: src/postulo/jobs/models.py:456
 #, draft
 msgid "Hybrid"
 msgstr "Hibridinis"
@@ -3978,7 +3997,7 @@ msgstr "id saugykloje"
 msgid "identifier"
 msgstr "identifikatorius"
 
-#: src/postulo/templates/accounts/profile.html:130
+#: src/postulo/templates/accounts/profile.html:136
 #: src/postulo/templates/jobs/company_form.html:71
 #, draft
 msgid "Identifier"
@@ -3995,7 +4014,7 @@ msgid "identifiers"
 msgstr "identifikatoriai"
 
 #: src/postulo/plugins/kinds.py:33
-#: src/postulo/templates/accounts/profile.html:107
+#: src/postulo/templates/accounts/profile.html:113
 #: src/postulo/templates/jobs/company_form.html:53
 #, draft
 msgid "Identifiers"
@@ -4006,7 +4025,7 @@ msgstr "Identifikatoriai"
 msgid "Identifies itself as"
 msgstr "Prisistato kaip"
 
-#: src/postulo/core/models.py:608
+#: src/postulo/core/models.py:700
 #, draft
 msgid "identity provider"
 msgstr "tapatybės teikėjas"
@@ -4030,7 +4049,7 @@ msgid ""
 msgstr ""
 "Jei kreipėtės į ES instituciją arba per nacionalinę užimtumo tarnybą, šį failą jau turite. Užuot viską rinkę iš naujo, tiesiog jį pateikite."
 
-#: src/postulo/core/models.py:522
+#: src/postulo/core/models.py:614
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "fiksuojant nepaisyti robots.txt"
@@ -4178,7 +4197,7 @@ msgstr "šaka"
 msgid "Industry"
 msgstr "Šaka"
 
-#: src/postulo/jobs/views.py:426
+#: src/postulo/jobs/views.py:434
 #, draft
 msgid "Industry renamed."
 msgstr "Šaka pervadinta."
@@ -4220,7 +4239,7 @@ msgstr "Įdiegta šiame egzemplioriuje"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Papildinio įdiegimas paleidžia svetimą kodą Postulo viduje."
 
-#: src/postulo/core/models.py:504
+#: src/postulo/core/models.py:596
 #, draft
 msgid "instance name"
 msgstr "instancijos pavadinimas"
@@ -4240,7 +4259,7 @@ msgstr "Draudimas"
 msgid "Internal"
 msgstr "Vidinis"
 
-#: src/postulo/jobs/models.py:463
+#: src/postulo/jobs/models.py:465
 #, draft
 msgid "Internship"
 msgstr "Stažuotė"
@@ -4313,12 +4332,12 @@ msgstr "Pokalbiai"
 msgid "Interviews attended"
 msgstr "Įvykę pokalbiai"
 
-#: src/postulo/accounts/models.py:505
+#: src/postulo/accounts/models.py:500
 #, draft
 msgid "invitation"
 msgstr "pakvietimas"
 
-#: src/postulo/accounts/views.py:210
+#: src/postulo/accounts/views.py:217
 #, draft
 msgid ""
 "Invitation created. Send the person the link shown below; it can be used once."
@@ -4332,12 +4351,12 @@ msgid ""
 msgstr ""
 "Tik su pakvietimu: registracijos forma nesiūloma. Kvieskite žmones iš skilties „Žmonės“."
 
-#: src/postulo/accounts/views.py:226
+#: src/postulo/accounts/views.py:233
 #, draft
 msgid "Invitation revoked."
 msgstr "Pakvietimas atšauktas."
 
-#: src/postulo/accounts/models.py:506
+#: src/postulo/accounts/models.py:501
 #, draft
 msgid "invitations"
 msgstr "pakvietimai"
@@ -4349,7 +4368,7 @@ msgstr "pakvietimai"
 msgid "Invitations"
 msgstr "Pakvietimai"
 
-#: src/postulo/accounts/models.py:409 src/postulo/resume/models.py:168
+#: src/postulo/accounts/models.py:404 src/postulo/resume/models.py:168
 #, draft
 msgid "issued by"
 msgstr "išdavė"
@@ -4417,12 +4436,12 @@ msgstr "Jo failas atitinka tai, ką pasirašė oficiali saugykla."
 msgid "Job board"
 msgstr "Darbo skelbimų portalas"
 
-#: src/postulo/jobs/models.py:624
+#: src/postulo/jobs/models.py:626
 #, draft
 msgid "job posting"
 msgstr "darbo skelbimas"
 
-#: src/postulo/jobs/models.py:625
+#: src/postulo/jobs/models.py:627
 #, draft
 msgid "job postings"
 msgstr "darbo skelbimai"
@@ -4472,7 +4491,7 @@ msgid ""
 msgstr ""
 "Laikoma faile %(file)s ir kaitaliojama pagal dydį, todėl negali užpildyti disko. Viskas čia patenka ir į konsolę, iš kur tai skaito <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:311 src/postulo/core/phone_numbers.py:305
+#: src/postulo/accounts/forms.py:308 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4489,15 +4508,15 @@ msgstr ""
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
-#: src/postulo/core/models.py:403 src/postulo/documents/models.py:113
-#: src/postulo/documents/models.py:315 src/postulo/documents/models.py:393
-#: src/postulo/documents/models.py:480 src/postulo/plugins/models.py:169
-#: src/postulo/resume/models.py:243
+#: src/postulo/core/models.py:403 src/postulo/core/models.py:532
+#: src/postulo/documents/models.py:113 src/postulo/documents/models.py:315
+#: src/postulo/documents/models.py:393 src/postulo/documents/models.py:480
+#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:243
 #, draft
 msgid "kind"
 msgstr "rūšis"
 
-#: src/postulo/templates/accounts/profile.html:126
+#: src/postulo/templates/accounts/profile.html:132
 #: src/postulo/templates/applications/report.html:39
 #: src/postulo/templates/jobs/company_form.html:67
 #: src/postulo/templates/partials/phone_numbers.html:40
@@ -4531,13 +4550,13 @@ msgstr "Laiškų rūšys"
 msgid "label"
 msgstr "žyma"
 
-#: src/postulo/accounts/forms.py:599 src/postulo/resume/forms.py:186
+#: src/postulo/accounts/forms.py:604 src/postulo/resume/forms.py:186
 #: src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Kalba"
 
-#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:121
+#: src/postulo/accounts/models.py:276 src/postulo/documents/models.py:121
 #: src/postulo/documents/models.py:331 src/postulo/resume/models.py:197
 #: src/postulo/resume/models.py:203 src/postulo/resume/models.py:301
 #, draft
@@ -4556,7 +4575,7 @@ msgstr "Kalba ir laikas"
 msgid "Language for new accounts"
 msgstr "Naujų paskyrų kalba"
 
-#: src/postulo/accounts/models.py:291
+#: src/postulo/accounts/models.py:286
 #, draft
 msgid "language of your career record"
 msgstr "jūsų karjeros aprašo kalba"
@@ -4574,7 +4593,7 @@ msgstr "Kalbos"
 msgid "languages"
 msgstr "kalbos"
 
-#: src/postulo/core/models.py:563
+#: src/postulo/core/models.py:655
 #, draft
 msgid "languages offered"
 msgstr "siūlomos kalbos"
@@ -4708,6 +4727,11 @@ msgstr "Išėjimas"
 msgid "Left blank, it lasts an hour."
 msgstr "Palikus tuščią, galioja valandą."
 
+#: src/postulo/templates/partials/web_links.html:57
+msgid ""
+"Left blank, the name is the address's host. Postulo never opens a link on its own — not to check it, not for a picture."
+msgstr ""
+
 #: src/postulo/jobs/industries.py:94
 #, draft
 msgid "Legal"
@@ -4783,10 +4807,10 @@ msgstr "Nuoroda"
 msgid "link in the store"
 msgstr "nuoroda saugykloje"
 
-#: src/postulo/accounts/models.py:274 src/postulo/jobs/models.py:432
-#, draft
-msgid "LinkedIn"
-msgstr "LinkedIn"
+#: src/postulo/core/models.py:537
+msgid ""
+"LinkedIn, Codeberg, a blog — what to call it. Left blank, the host is shown."
+msgstr ""
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:70
 #, draft
@@ -4825,7 +4849,7 @@ msgstr "Nuorodos, į kurias juos nukreipėte"
 msgid "listening"
 msgstr "klausymas"
 
-#: src/postulo/jobs/models.py:759
+#: src/postulo/jobs/models.py:761
 #: src/postulo/templates/core/import_csv_map.html:86
 #, draft
 msgid "listing"
@@ -4857,8 +4881,8 @@ msgid ""
 msgstr ""
 "Skelbimai, paraiškos ir jų laiko juostos, įmonės ir žmonės, priminimai, išsiųstų dokumentų tekstas, laiškai, CV, failai ir jūsų karjeros įrašas — viskas, įskaitant uždarytus ar atmestus, nes ieškote to, ką prisimenate."
 
-#: src/postulo/accounts/models.py:268 src/postulo/jobs/models.py:146
-#: src/postulo/jobs/models.py:564 src/postulo/resume/models.py:67
+#: src/postulo/accounts/models.py:271 src/postulo/jobs/models.py:146
+#: src/postulo/jobs/models.py:566 src/postulo/resume/models.py:67
 #: src/postulo/resume/models.py:98
 #, draft
 msgid "location"
@@ -4935,7 +4959,7 @@ msgstr "Mažosios raidės, skaitmenys, taškai, pabraukimai ir brūkšneliai."
 msgid "Made"
 msgstr "Sukurta"
 
-#: src/postulo/core/models.py:651
+#: src/postulo/core/models.py:743
 #, draft
 msgid "mail failures in a row"
 msgstr "pašto klaidų iš eilės"
@@ -4958,7 +4982,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Čia paštas yra vienintelis kelias atgal į paskyrą, tad kol tai vėl neveiks, nė vienas iš %(counter)s šios instancijos žmonių negalės grįžti, jei pamirš slaptažodį."
 
-#: src/postulo/core/models.py:647
+#: src/postulo/core/models.py:739
 #, draft
 msgid "mail last failed"
 msgstr "paštas paskutinį kartą nepavyko"
@@ -4968,7 +4992,7 @@ msgstr "paštas paskutinį kartą nepavyko"
 msgid "Mail last went out at %(when)s."
 msgstr "Paštas paskutinį kartą išėjo %(when)s."
 
-#: src/postulo/core/models.py:646
+#: src/postulo/core/models.py:738
 #, draft
 msgid "mail last worked"
 msgstr "paštas paskutinį kartą veikė"
@@ -4987,12 +5011,12 @@ msgid ""
 msgstr ""
 "Paštas nebelaiko vietoje nė transporto, nes kelias, kuris nieko nepristato, nieko neapsaugo."
 
-#: src/postulo/core/models.py:619
+#: src/postulo/core/models.py:711
 #, draft
 msgid "mail OAuth secrets"
 msgstr "pašto OAuth paslaptys"
 
-#: src/postulo/core/models.py:624
+#: src/postulo/core/models.py:716
 #, draft
 msgid "mail transport"
 msgstr "pašto transportas"
@@ -5002,7 +5026,7 @@ msgstr "pašto transportas"
 msgid "Mail transport"
 msgstr "Pašto transportas"
 
-#: src/postulo/core/models.py:648
+#: src/postulo/core/models.py:740
 #, draft
 msgid "mail's last error"
 msgstr "paskutinė pašto klaida"
@@ -5118,7 +5142,7 @@ msgstr "Meniu"
 msgid "Merge into"
 msgstr "Sulieti į"
 
-#: src/postulo/jobs/views.py:426
+#: src/postulo/jobs/views.py:434
 #, draft
 msgid "Merged."
 msgstr "Sulieta."
@@ -5244,18 +5268,19 @@ msgid "NACE division"
 msgstr "NACE skyrius"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:84 src/postulo/documents/models.py:110
-#: src/postulo/documents/models.py:313 src/postulo/jobs/models.py:41
-#: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
-#: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
-#: src/postulo/plugins/models.py:48 src/postulo/resume/models.py:116
-#: src/postulo/resume/models.py:131 src/postulo/resume/models.py:150
-#: src/postulo/resume/models.py:167
+#: src/postulo/core/models.py:84 src/postulo/core/models.py:534
+#: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
+#: src/postulo/jobs/models.py:41 src/postulo/jobs/models.py:126
+#: src/postulo/jobs/models.py:309 src/postulo/jobs/models.py:383
+#: src/postulo/jobs/models.py:421 src/postulo/plugins/models.py:48
+#: src/postulo/resume/models.py:116 src/postulo/resume/models.py:131
+#: src/postulo/resume/models.py:150 src/postulo/resume/models.py:167
 #, draft
 msgid "name"
 msgstr "pavadinimas"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:27
+#: src/postulo/templates/partials/web_links.html:33
 #: src/postulo/templates/server/people.html:32
 #: src/postulo/templates/server/people.html:45
 #: src/postulo/templates/server/plugins.html:320
@@ -5268,7 +5293,7 @@ msgstr "Pavadinimas"
 msgid "name, if Other"
 msgstr "pavadinimas, jei Kita"
 
-#: src/postulo/templates/accounts/profile.html:134
+#: src/postulo/templates/accounts/profile.html:140
 #: src/postulo/templates/jobs/company_form.html:75
 #: src/postulo/templates/partials/phone_numbers.html:44
 #: src/postulo/templates/partials/postal_addresses.html:64
@@ -5303,7 +5328,7 @@ msgstr "Niekada"
 msgid "never used"
 msgstr "niekada nenaudotas"
 
-#: src/postulo/jobs/models.py:482
+#: src/postulo/jobs/models.py:484
 #, draft
 msgid "New"
 msgstr "Nauja"
@@ -5601,7 +5626,7 @@ msgid ""
 msgstr ""
 "Dar niekas neprisijungė, todėl nieko negalima išsiųsti. Įrašykite nustatymus aukščiau, tada prisijunkite teikėjo puslapyje kaip pašto dėžutė, iš kurios siunčia šis egzempliorius."
 
-#: src/postulo/templates/jobs/company_detail.html:231
+#: src/postulo/templates/jobs/company_detail.html:240
 #, draft
 msgid "Nobody recorded here yet."
 msgstr "Čia dar niekas neįrašytas."
@@ -5690,7 +5715,7 @@ msgid ""
 msgstr ""
 "Nesukonfigūruota. Aplinkoje nustatykite POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID ir POSTULO_OIDC_CLIENT_SECRET, kad pasiūlytumėte prisijungimo per „OpenID Connect“ teikėją mygtuką."
 
-#: src/postulo/jobs/models.py:488
+#: src/postulo/jobs/models.py:490
 #, draft
 msgid "Not for me"
 msgstr "Ne man"
@@ -5769,7 +5794,7 @@ msgstr "dar neišbandyta"
 msgid "Not yet written in %(tongue)s. These print as they stand:"
 msgstr "Dar neparašyta %(tongue)s kalba. Šie spausdinami tokie, kokie yra:"
 
-#: src/postulo/accounts/models.py:478
+#: src/postulo/accounts/models.py:473
 #, draft
 msgid "note"
 msgstr "pastaba"
@@ -5779,7 +5804,7 @@ msgstr "pastaba"
 msgid "Note"
 msgstr "Pastaba"
 
-#: src/postulo/accounts/forms.py:638
+#: src/postulo/accounts/forms.py:643
 #: src/postulo/templates/applications/application_detail.html:65
 #, draft
 msgid "Note (optional)"
@@ -5790,7 +5815,7 @@ msgstr "Pastaba (neprivaloma)"
 msgid "noted %(when)s"
 msgstr "pastebėta %(when)s"
 
-#: src/postulo/jobs/models.py:617
+#: src/postulo/jobs/models.py:619
 #, draft
 msgid "noted on"
 msgstr "pastebėta"
@@ -5802,7 +5827,7 @@ msgid "Notes"
 msgstr "Pastabos"
 
 #: src/postulo/documents/models.py:404 src/postulo/jobs/models.py:150
-#: src/postulo/jobs/models.py:433
+#: src/postulo/jobs/models.py:435
 #, draft
 msgid "notes"
 msgstr "pastabos"
@@ -6114,7 +6139,7 @@ msgstr "Pasiūlymas"
 msgid "Offer received"
 msgstr "Gautas pasiūlymas"
 
-#: src/postulo/core/models.py:551
+#: src/postulo/core/models.py:643
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr ""
@@ -6144,7 +6169,7 @@ msgstr "Oficialus"
 msgid "older than a week"
 msgstr "senesni nei savaitės"
 
-#: src/postulo/applications/models.py:459 src/postulo/jobs/models.py:453
+#: src/postulo/applications/models.py:459 src/postulo/jobs/models.py:455
 #, draft
 msgid "On site"
 msgstr "Vietoje"
@@ -6381,7 +6406,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Laisvos vietos"
 
-#: src/postulo/accounts/models.py:475
+#: src/postulo/accounts/models.py:470
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Neprivaloma. Jei nustatyta, pakvietimą gali panaudoti tik šis adresas."
@@ -6427,7 +6452,7 @@ msgstr "Pradinis skelbimas"
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
 #: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
 #: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
-#: src/postulo/documents/models.py:375 src/postulo/jobs/models.py:492
+#: src/postulo/documents/models.py:375 src/postulo/jobs/models.py:494
 #: src/postulo/resume/models.py:219
 #, draft
 msgid "Other"
@@ -6509,7 +6534,7 @@ msgstr "Puslapiavimas"
 msgid "Panel"
 msgstr "Komisija"
 
-#: src/postulo/jobs/models.py:749
+#: src/postulo/jobs/models.py:751
 #, draft
 msgid "parsed posting"
 msgstr "išanalizuotas skelbimas"
@@ -6534,7 +6559,7 @@ msgstr "<a href=\"%(parent_url)s\" class=\"underline\">%(name)s</a> dalis"
 msgid "Part of this company"
 msgstr "Šios įmonės dalys"
 
-#: src/postulo/jobs/models.py:460
+#: src/postulo/jobs/models.py:462
 #, draft
 msgid "Part time"
 msgstr "Ne visa darbo diena"
@@ -6549,7 +6574,7 @@ msgstr "Iš dalies išversta"
 msgid "Passkeys"
 msgstr "Prieigos raktai"
 
-#: src/postulo/core/models.py:584
+#: src/postulo/core/models.py:676
 #, draft
 msgid "password"
 msgstr "slaptažodis"
@@ -6603,22 +6628,22 @@ msgstr "Tik laukiantys"
 msgid "People"
 msgstr "Žmonės"
 
-#: src/postulo/jobs/models.py:470
+#: src/postulo/jobs/models.py:472
 #, draft
 msgid "Per day"
 msgstr "Per dieną"
 
-#: src/postulo/jobs/models.py:471
+#: src/postulo/jobs/models.py:473
 #, draft
 msgid "Per hour"
 msgstr "Per valandą"
 
-#: src/postulo/jobs/models.py:469
+#: src/postulo/jobs/models.py:471
 #, draft
 msgid "Per month"
 msgstr "Per mėnesį"
 
-#: src/postulo/jobs/models.py:468
+#: src/postulo/jobs/models.py:470
 #, draft
 msgid "Per year"
 msgstr "Per metus"
@@ -6638,7 +6663,7 @@ msgstr "Laikotarpis: %(period)s"
 msgid "Permissions"
 msgstr "Leidimai"
 
-#: src/postulo/accounts/models.py:401 src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:396 src/postulo/plugins/models.py:120
 #, draft
 msgid "person"
 msgstr "asmuo"
@@ -6663,7 +6688,7 @@ msgstr "Asmeninė svetainė"
 msgid "Pharmaceuticals"
 msgstr "Farmacija"
 
-#: src/postulo/accounts/forms.py:306 src/postulo/core/phone_numbers.py:302
+#: src/postulo/accounts/forms.py:303 src/postulo/core/phone_numbers.py:302
 #: src/postulo/jobs/forms.py:369
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6680,7 +6705,7 @@ msgstr "telefonas"
 msgid "Phone screen"
 msgstr "Pokalbis telefonu"
 
-#: src/postulo/accounts/models.py:328
+#: src/postulo/accounts/models.py:323
 #, draft
 msgid "picture"
 msgstr "paveikslėlis"
@@ -6750,7 +6775,7 @@ msgstr "%(name)s papildiniai"
 msgid "Plugins for this account"
 msgstr "Šios paskyros papildiniai"
 
-#: src/postulo/accounts/models.py:305
+#: src/postulo/accounts/models.py:300
 #, draft
 msgid "plugins switched off"
 msgstr "išjungti papildiniai"
@@ -6776,7 +6801,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP arba GIF iki 5 MB. Apkerpamas iki kvadrato ir išvalomas nuo visko, ką failas žinojo apie fotografavimo vietą."
 
-#: src/postulo/core/models.py:575
+#: src/postulo/core/models.py:667
 #, draft
 msgid "port"
 msgstr "prievadas"
@@ -6838,7 +6863,7 @@ msgstr "Pašto adresai"
 msgid "postcode"
 msgstr "pašto kodas"
 
-#: src/postulo/jobs/models.py:596
+#: src/postulo/jobs/models.py:598
 #, draft
 msgid "posted on"
 msgstr "paskelbta"
@@ -6864,7 +6889,7 @@ msgstr "Skelbimo adresas"
 msgid "Posting details"
 msgstr "Skelbimo duomenys"
 
-#: src/postulo/jobs/views.py:525
+#: src/postulo/jobs/views.py:548
 #, draft
 msgid "Posting updated."
 msgstr "Skelbimas atnaujintas."
@@ -6874,7 +6899,7 @@ msgstr "Skelbimas atnaujintas."
 msgid "Posting URL"
 msgstr "Skelbimo URL"
 
-#: src/postulo/jobs/models.py:572
+#: src/postulo/jobs/models.py:574
 #, draft
 msgid "posting URL"
 msgstr "skelbimo URL"
@@ -7009,12 +7034,14 @@ msgid "Previous"
 msgstr "Ankstesnis"
 
 #: src/postulo/core/models.py:189 src/postulo/core/models.py:420
+#: src/postulo/core/models.py:540
 #, draft
 msgid "primary"
 msgstr "pagrindinis"
 
 #: src/postulo/templates/partials/phone_numbers.html:57
 #: src/postulo/templates/partials/postal_addresses.html:75
+#: src/postulo/templates/partials/web_links.html:40
 #: src/postulo/templates/settings/account.html:58
 #, draft
 msgid "Primary"
@@ -7052,12 +7079,12 @@ msgstr "Parengta %(produced)s"
 msgid "proficiency"
 msgstr "lygis"
 
-#: src/postulo/accounts/models.py:169 src/postulo/accounts/models.py:348
+#: src/postulo/accounts/models.py:169 src/postulo/accounts/models.py:343
 #, draft
 msgid "profile"
 msgstr "profilis"
 
-#: src/postulo/accounts/models.py:349
+#: src/postulo/accounts/models.py:344
 #, draft
 msgid "profiles"
 msgstr "profiliai"
@@ -7171,7 +7198,7 @@ msgstr "Eilėje laukiančios užduotys"
 msgid "Quiet"
 msgstr "Nutilo"
 
-#: src/postulo/accounts/models.py:338
+#: src/postulo/accounts/models.py:333
 #, draft
 msgid "quiet after"
 msgstr "nutilo po"
@@ -7230,7 +7257,7 @@ msgstr ""
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Perskaityta kaip Europass XML — formatas, kurį kūrė CV rengyklė."
 
-#: src/postulo/jobs/models.py:741
+#: src/postulo/jobs/models.py:743
 #, draft
 msgid "read by"
 msgstr "perskaitė"
@@ -7359,7 +7386,7 @@ msgstr "Įrašyta, ką išsiuntėte."
 msgid "Recorded: nobody showed up."
 msgstr "Įrašyta: niekas neatvyko."
 
-#: src/postulo/accounts/models.py:423
+#: src/postulo/accounts/models.py:418
 #, draft
 msgid "recovery link"
 msgstr "atkūrimo nuoroda"
@@ -7370,7 +7397,7 @@ msgstr "atkūrimo nuoroda"
 msgid "Recovery link"
 msgstr "Atkūrimo nuoroda"
 
-#: src/postulo/accounts/models.py:424
+#: src/postulo/accounts/models.py:419
 #, draft
 msgid "recovery links"
 msgstr "atkūrimo nuorodos"
@@ -7428,7 +7455,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr "Registracija atvira: kiekvienas, radęs adresą, gali susikurti paskyrą."
 
-#: src/postulo/core/models.py:516
+#: src/postulo/core/models.py:608
 #, draft
 msgid "registration open"
 msgstr "registracija atvira"
@@ -7489,7 +7516,7 @@ msgstr "Priminimai"
 msgid "Reminders that have come due, each with a button to mark it done."
 msgstr "Suėję priminimai, kiekvienas su mygtuku pažymėti atliktu."
 
-#: src/postulo/jobs/models.py:455
+#: src/postulo/jobs/models.py:457
 #, draft
 msgid "Remote"
 msgstr "Nuotoliniu būdu"
@@ -7499,13 +7526,14 @@ msgstr "Nuotoliniu būdu"
 msgid "remote address"
 msgstr "nuotolinis adresas"
 
-#: src/postulo/templates/accounts/profile.html:139
+#: src/postulo/templates/accounts/profile.html:145
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:74
 #: src/postulo/templates/documents/cv_detail.html:106
 #: src/postulo/templates/jobs/company_form.html:80
 #: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/partials/postal_addresses.html:79
+#: src/postulo/templates/partials/web_links.html:44
 #: src/postulo/templates/server/plugins.html:151
 #: src/postulo/templates/server/plugins.html:285
 #, draft
@@ -7644,7 +7672,7 @@ msgstr "atšaukta"
 msgid "Revoked"
 msgstr "Atšaukta"
 
-#: src/postulo/accounts/models.py:418
+#: src/postulo/accounts/models.py:413
 #, draft
 msgid "revoked at"
 msgstr "atšaukta"
@@ -7725,12 +7753,12 @@ msgstr "Atlyginimas (vienas skaičius arba intervalas)"
 msgid "Salary from"
 msgstr "Atlyginimas nuo"
 
-#: src/postulo/jobs/models.py:582
+#: src/postulo/jobs/models.py:584
 #, draft
 msgid "salary from"
 msgstr "atlyginimas nuo"
 
-#: src/postulo/jobs/models.py:589
+#: src/postulo/jobs/models.py:591
 #, draft
 msgid "salary period"
 msgstr "atlyginimo laikotarpis"
@@ -7740,12 +7768,12 @@ msgstr "atlyginimo laikotarpis"
 msgid "Salary to"
 msgstr "Atlyginimas iki"
 
-#: src/postulo/jobs/models.py:585
+#: src/postulo/jobs/models.py:587
 #, draft
 msgid "salary to"
 msgstr "atlyginimas iki"
 
-#: src/postulo/templates/accounts/profile.html:165
+#: src/postulo/templates/accounts/profile.html:171
 #: src/postulo/templates/applications/application_form.html:29
 #: src/postulo/templates/applications/application_intake.html:72
 #: src/postulo/templates/applications/interview_form.html:68
@@ -7757,7 +7785,7 @@ msgstr "atlyginimas iki"
 #: src/postulo/templates/documents/letter_form.html:28
 #: src/postulo/templates/documents/upload_form.html:20
 #: src/postulo/templates/jobs/company_form.html:105
-#: src/postulo/templates/jobs/contact_form.html:37
+#: src/postulo/templates/jobs/contact_form.html:41
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
 #: src/postulo/templates/partials/table/cell.html:32
@@ -7788,7 +7816,7 @@ msgstr "Išsaugokite įmonę, kad pridėtumėte dar vieną identifikatorių."
 msgid "Save this first, then come back and agree."
 msgstr "Pirma tai išsaugokite, tada grįžkite ir sutikite."
 
-#: src/postulo/templates/accounts/profile.html:161
+#: src/postulo/templates/accounts/profile.html:167
 #, draft
 msgid "Save to add another identifier."
 msgstr "Išsaugokite, kad pridėtumėte dar vieną identifikatorių."
@@ -8086,7 +8114,7 @@ msgstr "Nustatyti slaptažodį"
 msgid "Set up"
 msgstr "Nustatyti"
 
-#: src/postulo/jobs/models.py:607
+#: src/postulo/jobs/models.py:609
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Nustatykite, kai vieta nebėra laisva."
@@ -8127,7 +8155,7 @@ msgstr "Spartieji klavišai"
 msgid "Shortlist"
 msgstr "Trumpasis sąrašas"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:483
+#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:485
 #, draft
 msgid "Shortlisted"
 msgstr "Trumpajame sąraše"
@@ -8153,7 +8181,7 @@ msgstr "Rodyti viską"
 msgid "Show done too"
 msgstr "Rodyti ir atliktus"
 
-#: src/postulo/accounts/forms.py:387
+#: src/postulo/accounts/forms.py:392
 #, draft
 msgid "Show in the navigation"
 msgstr "Rodyti naršymo juostoje"
@@ -8168,7 +8196,7 @@ msgstr "Rodyti ir praėjusius"
 msgid "Show this period"
 msgstr "Rodyti šį laikotarpį"
 
-#: src/postulo/core/models.py:507
+#: src/postulo/core/models.py:599
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Rodoma antraštėje ir prisijungimo puslapyje."
@@ -8189,7 +8217,7 @@ msgstr "Prisijungti dar kartą"
 msgid "Sign in to the provider"
 msgstr "Prisijungti pas teikėją"
 
-#: src/postulo/core/models.py:548
+#: src/postulo/core/models.py:640
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "prisijungimas el. paštu atsiųstu kodu"
@@ -8266,7 +8294,7 @@ msgstr "Prisijungia prie esamos paskyros el. paštu"
 msgid "Single sign-on"
 msgstr "Vieningas prisijungimas"
 
-#: src/postulo/core/models.py:527
+#: src/postulo/core/models.py:619
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "vienkartinis prisijungimas laikomas antruoju veiksniu"
@@ -8281,7 +8309,7 @@ msgstr "Vienkartinis prisijungimas laikomas antruoju veiksniu"
 msgid "Site search"
 msgstr "Paieška svetainėje"
 
-#: src/postulo/core/models.py:664 src/postulo/core/models.py:665
+#: src/postulo/core/models.py:756 src/postulo/core/models.py:757
 #, draft
 msgid "site settings"
 msgstr "svetainės nustatymai"
@@ -8344,7 +8372,7 @@ msgstr "Lėčiausias"
 msgid "slug"
 msgstr "slug"
 
-#: src/postulo/core/models.py:573
+#: src/postulo/core/models.py:665
 #, draft
 msgid "SMTP server"
 msgstr "SMTP serveris"
@@ -8359,11 +8387,49 @@ msgstr "Atidėti"
 msgid "Snoozed for two weeks."
 msgstr "Atidėta dviem savaitėms."
 
+#: src/postulo/core/models.py:524 src/postulo/core/web_links.py:71
+msgid "Social profile"
+msgstr ""
+
+#: src/postulo/core/web_links.py:66
+msgid "Social profiles"
+msgstr ""
+
 #: src/postulo/jobs/industries.py:64
 #: src/postulo/templates/server/overview.html:23
 #, draft
 msgid "Software"
 msgstr "Programinė įranga"
+
+#: src/postulo/core/web_links.py:94
+msgid ""
+"Some code repositories are kept and not shown, because <em>Several code repositories</em> is switched off. They come back untouched if it is switched on."
+msgstr ""
+
+#: src/postulo/core/web_links.py:98
+msgid ""
+"Some code repositories are kept for this contact and not shown, because <em>Several code repositories</em> is switched off."
+msgstr ""
+
+#: src/postulo/core/web_links.py:73
+msgid ""
+"Some social profiles are kept and not shown, because <em>Several social profiles</em> is switched off. They come back untouched if it is switched on."
+msgstr ""
+
+#: src/postulo/core/web_links.py:77
+msgid ""
+"Some social profiles are kept for this contact and not shown, because <em>Several social profiles</em> is switched off."
+msgstr ""
+
+#: src/postulo/core/web_links.py:115
+msgid ""
+"Some websites are kept and not shown, because <em>Several websites</em> is switched off. They come back untouched if it is switched on."
+msgstr ""
+
+#: src/postulo/core/web_links.py:119
+msgid ""
+"Some websites are kept for this contact and not shown, because <em>Several websites</em> is switched off."
+msgstr ""
 
 #: src/postulo/accounts/models.py:114
 #, draft
@@ -8415,7 +8481,7 @@ msgid ""
 msgstr ""
 "Šaltinis — skelbimo laukas „rasta per“. Užpildykite jį, ir ši lentelė pradės pateisinti savo vietą."
 
-#: src/postulo/jobs/models.py:742
+#: src/postulo/jobs/models.py:744
 #, draft
 msgid "source version"
 msgstr "šaltinio versija"
@@ -8472,7 +8538,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, prisijungus"
 
-#: src/postulo/jobs/models.py:611 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:613 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "būklė"
@@ -8499,7 +8565,7 @@ msgstr "Būsena"
 
 #: src/postulo/applications/models.py:198
 #: src/postulo/applications/models.py:663 src/postulo/documents/models.py:609
-#: src/postulo/jobs/models.py:751
+#: src/postulo/jobs/models.py:753
 #, draft
 msgid "status"
 msgstr "būsena"
@@ -8702,7 +8768,7 @@ msgstr "Sinchronizavimas"
 msgid "Table"
 msgstr "Lentelė"
 
-#: src/postulo/accounts/models.py:308
+#: src/postulo/accounts/models.py:303
 #, draft
 msgid "table settings"
 msgstr "lentelės nustatymai"
@@ -8720,7 +8786,7 @@ msgstr "žyma"
 msgid "Tag"
 msgstr "Žyma"
 
-#: src/postulo/core/models.py:510
+#: src/postulo/core/models.py:602
 #, draft
 msgid "tagline"
 msgstr "šūkis"
@@ -8825,17 +8891,17 @@ msgstr "tekstas"
 msgid "text as sent"
 msgstr "tekstas toks, koks išsiųstas"
 
-#: src/postulo/core/models.py:640
+#: src/postulo/core/models.py:732
 #, draft
 msgid "text configuration"
 msgstr "žinučių konfigūracija"
 
-#: src/postulo/core/models.py:641
+#: src/postulo/core/models.py:733
 #, draft
 msgid "text secrets"
 msgstr "žinučių paslaptys"
 
-#: src/postulo/core/models.py:639
+#: src/postulo/core/models.py:731
 #, draft
 msgid "text transport"
 msgstr "žinučių perdavimas"
@@ -8889,7 +8955,7 @@ msgstr "Tas ryšys sutikimo nenaudoja."
 msgid "That connection no longer exists."
 msgstr "To ryšio nebėra."
 
-#: src/postulo/jobs/models.py:448
+#: src/postulo/jobs/models.py:450
 #, draft
 msgid "That department belongs to a different company."
 msgstr "Tas skyrius priklauso kitai įmonei."
@@ -8963,7 +9029,7 @@ msgstr "Nepavyko išspręsti to serverio vardo."
 msgid "That image is far larger than a logo needs to be."
 msgstr "Šis paveikslėlis kur kas didesnis, nei logotipui reikia."
 
-#: src/postulo/accounts/views.py:222
+#: src/postulo/accounts/views.py:229
 #, draft
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Tas pakvietimas jau priimtas ir negali būti atšauktas."
@@ -9008,7 +9074,7 @@ msgstr "Tai ne rezultatas, kurį Postulo atpažįsta."
 msgid "That is not something Postulo can do about it."
 msgstr "Postulo negali su ja to padaryti."
 
-#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:151
+#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:156
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "To Postulo negali padaryti keliems iš karto."
@@ -9018,7 +9084,7 @@ msgstr "To Postulo negali padaryti keliems iš karto."
 msgid "That is not something this page does."
 msgstr "Šis puslapis to nedaro."
 
-#: src/postulo/accounts/views.py:316
+#: src/postulo/accounts/views.py:323
 #, draft
 msgid "That is not the address on this account."
 msgstr "Tai ne šios paskyros adresas."
@@ -9093,7 +9159,7 @@ msgstr "Tas puslapis didesnis nei %(limit)s MB, todėl nebuvo perskaitytas."
 msgid "That page returned %(status)s."
 msgstr "Tas puslapis grąžino %(status)s."
 
-#: src/postulo/accounts/forms.py:331
+#: src/postulo/accounts/forms.py:330
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Tas paveikslėlis didesnis nei 5 MB. Prašome mažesnio."
@@ -9148,7 +9214,7 @@ msgstr "Adresas atsakė %(code)s."
 msgid "The address answered with nothing."
 msgstr "Adresas atsakė niekuo."
 
-#: src/postulo/jobs/models.py:601
+#: src/postulo/jobs/models.py:603
 #, draft
 msgid "The application deadline, if stated."
 msgstr "Paraiškų teikimo terminas, jei nurodytas."
@@ -9305,7 +9371,7 @@ msgid ""
 msgstr ""
 "„%(name)s“ raktas buvo pakeistas. Tas raktas yra vienintelis dalykas tarp jo indekso ir čia vykdomo kodo, todėl įsitikinkite, kad jis gautas iš patikimo šaltinio."
 
-#: src/postulo/accounts/forms.py:293
+#: src/postulo/accounts/forms.py:290
 #, draft
 msgid "The language you read Postulo in"
 msgstr "Kalba, kuria skaitote Postulo"
@@ -9333,22 +9399,22 @@ msgid ""
 "The last ten things the timeline recorded, whichever application they were on."
 msgstr "Dešimt paskutinių chronologijos įrašų, kad ir dėl kurio prašymo."
 
-#: src/postulo/jobs/models.py:760
+#: src/postulo/jobs/models.py:762
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "Skelbimas, kuriuo po peržiūros tapo šis fiksavimas."
 
-#: src/postulo/jobs/models.py:490
+#: src/postulo/jobs/models.py:492
 #, draft
 msgid "The location"
 msgstr "Vieta"
 
-#: src/postulo/jobs/views.py:357
+#: src/postulo/jobs/views.py:365
 #, draft
 msgid "The logo is gone."
 msgstr "Logotipo nebėra."
 
-#: src/postulo/jobs/views.py:282
+#: src/postulo/jobs/views.py:290
 #, python-format, draft
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logotipas nepakeistas: %(problem)s"
@@ -9422,7 +9488,7 @@ msgid ""
 msgstr ""
 "Slaptažodį nustato <code>%(variable)s</code> aplinkoje; keiskite jį ten. Čia jis niekada nerodomas."
 
-#: src/postulo/jobs/models.py:489
+#: src/postulo/jobs/models.py:491
 #, draft
 msgid "The pay"
 msgstr "Atlygis"
@@ -9568,7 +9634,7 @@ msgid ""
 msgstr ""
 "Laiko juosta nustatyta aplinkos: <code>%(variable)s</code> = %(zone)s. Pašalinkite iš aplinkos, kad pakeistumėte čia."
 
-#: src/postulo/applications/forms.py:83 src/postulo/jobs/forms.py:472
+#: src/postulo/applications/forms.py:83 src/postulo/jobs/forms.py:475
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "Viršutinis skaičius negali būti mažesnis už apatinį."
@@ -9583,7 +9649,7 @@ msgstr "Wheel neatitinka kontrolinės sumos, kurią katalogas jam paskelbė."
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Wheel neturi metaduomenų; jis gali būti sugadintas."
 
-#: src/postulo/accounts/models.py:294 src/postulo/documents/models.py:57
+#: src/postulo/accounts/models.py:289 src/postulo/documents/models.py:57
 #, draft
 msgid "theme"
 msgstr "tema"
@@ -9603,7 +9669,7 @@ msgstr "Tada ištrinti"
 msgid "There are no links to check."
 msgstr "Nėra nuorodų, kurias reikėtų patikrinti."
 
-#: src/postulo/jobs/views.py:351
+#: src/postulo/jobs/views.py:359
 #, draft
 msgid "There is no address to fetch it from again."
 msgstr "Nėra adreso, iš kurio jį atsisiųsti iš naujo."
@@ -9669,7 +9735,7 @@ msgstr "Neatvyko"
 msgid "This address is already in your listings, since %(when)s."
 msgstr ""
 
-#: src/postulo/core/postal.py:225
+#: src/postulo/core/postal.py:225 src/postulo/core/web_links.py:323
 #, draft
 msgid "This address is already listed."
 msgstr "Šis adresas jau yra sąraše."
@@ -9691,7 +9757,7 @@ msgstr "Šiai įmonei nenurodyta svetainė."
 msgid "This entry prints its original text on every CV."
 msgstr "Šis įrašas spausdina savo pirminį tekstą kiekviename CV."
 
-#: src/postulo/accounts/forms.py:484 src/postulo/jobs/forms.py:249
+#: src/postulo/accounts/forms.py:489 src/postulo/jobs/forms.py:249
 #, draft
 msgid "This identifier is already listed."
 msgstr "Šis identifikatorius jau sąraše."
@@ -9732,7 +9798,7 @@ msgid ""
 msgstr ""
 "Ši instancija nesiunčia per SMTP, todėl toliau esantys nustatymai įrašomi, bet nenaudojami. Kuriant tai įprasta: paštas spausdinamas konsolėje."
 
-#: src/postulo/accounts/views.py:250
+#: src/postulo/accounts/views.py:257
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
 msgstr "Šis pakvietimas skirtas %(email)s. Registruokitės tuo adresu."
@@ -9759,7 +9825,7 @@ msgid ""
 msgstr ""
 "Tai jūsų pačių paskyra. Nuoroda, kurią pasidarote sau, nėra kelias atgal — kad ją pasidarytumėte, turėjote prisijungti. Jei čia esate vienintelis administratorius, jus dengia prieigos raktas arba antras administratorius."
 
-#: src/postulo/accounts/forms.py:481 src/postulo/jobs/forms.py:246
+#: src/postulo/accounts/forms.py:486 src/postulo/jobs/forms.py:246
 #, draft
 msgid "This kind of identifier is already listed."
 msgstr "Tokios rūšies identifikatorius jau sąraše."
@@ -9830,12 +9896,12 @@ msgstr ""
 msgid "tier"
 msgstr "lygis"
 
-#: src/postulo/accounts/forms.py:605
+#: src/postulo/accounts/forms.py:610
 #, draft
 msgid "Time zone"
 msgstr "Laiko juosta"
 
-#: src/postulo/accounts/models.py:293
+#: src/postulo/accounts/models.py:288
 #, draft
 msgid "time zone"
 msgstr "laiko juosta"
@@ -9855,13 +9921,13 @@ msgstr "laiko juostos įrašas"
 msgid "Timeout"
 msgstr "Laukimo laikas"
 
-#: src/postulo/core/models.py:597
+#: src/postulo/core/models.py:689
 #, draft
 msgid "timeout in seconds"
 msgstr "laukimo laikas sekundėmis"
 
 #: src/postulo/documents/models.py:386 src/postulo/documents/models.py:477
-#: src/postulo/jobs/models.py:563 src/postulo/resume/models.py:241
+#: src/postulo/jobs/models.py:565 src/postulo/resume/models.py:241
 #, draft
 msgid "title"
 msgstr "pavadinimas"
@@ -9906,7 +9972,7 @@ msgstr "į būseną"
 msgid "Today's date"
 msgstr "Šios dienos data"
 
-#: src/postulo/accounts/models.py:470
+#: src/postulo/accounts/models.py:465
 #, draft
 msgid "token"
 msgstr "žetonas"
@@ -9967,12 +10033,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Transportas ir logistika"
 
-#: src/postulo/core/models.py:629
+#: src/postulo/core/models.py:721
 #, draft
 msgid "transport configuration"
 msgstr "transporto konfigūracija"
 
-#: src/postulo/core/models.py:631
+#: src/postulo/core/models.py:723
 #, draft
 msgid "transport secrets"
 msgstr "transporto paslaptys"
@@ -9982,12 +10048,12 @@ msgstr "transporto paslaptys"
 msgid "Try fewer words, or a different spelling."
 msgstr "Pabandykite mažiau žodžių arba kitokią rašybą."
 
-#: src/postulo/accounts/views.py:176
+#: src/postulo/accounts/views.py:183
 #, draft
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Pirmiausia įjunkite „Naudoti mano „Gravatar““."
 
-#: src/postulo/jobs/models.py:722
+#: src/postulo/jobs/models.py:724
 #, draft
 msgid "Turned into an application"
 msgstr "Pavirto paraiška"
@@ -10012,7 +10078,7 @@ msgstr "Įveskite bent du simbolius."
 msgid "Type it in instead"
 msgstr "Verčiau įvesti ranka"
 
-#: src/postulo/accounts/forms.py:461 src/postulo/jobs/forms.py:226
+#: src/postulo/accounts/forms.py:466 src/postulo/jobs/forms.py:226
 #, draft
 msgid "Type the identifier."
 msgstr "Įveskite identifikatorių."
@@ -10069,7 +10135,7 @@ msgstr ""
 msgid "until"
 msgstr "iki"
 
-#: src/postulo/jobs/models.py:715
+#: src/postulo/jobs/models.py:717
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "iki %(high)s"
@@ -10079,13 +10145,13 @@ msgstr "iki %(high)s"
 msgid "Update the preview"
 msgstr "Atnaujinti peržiūrą"
 
-#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:35
-#: src/postulo/core/models.py:653
+#: src/postulo/accounts/models.py:340 src/postulo/core/models.py:35
+#: src/postulo/core/models.py:745
 #, draft
 msgid "updated at"
 msgstr "atnaujinta"
 
-#: src/postulo/core/models.py:660
+#: src/postulo/core/models.py:752
 #, draft
 msgid "updated by"
 msgstr "atnaujino"
@@ -10141,7 +10207,7 @@ msgid ""
 msgstr ""
 "Naudokite nuo 3 iki 32 mažųjų raidžių, skaitmenų, taškų, pabraukimų ar brūkšnelių, pradėdami ir baigdami raide arba skaitmeniu."
 
-#: src/postulo/accounts/forms.py:334
+#: src/postulo/accounts/forms.py:333
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Naudokite PNG, JPEG, WebP arba GIF."
@@ -10151,7 +10217,7 @@ msgstr "Naudokite PNG, JPEG, WebP arba GIF."
 msgid "Use my Gravatar"
 msgstr "Naudoti mano „Gravatar“"
 
-#: src/postulo/accounts/models.py:330
+#: src/postulo/accounts/models.py:325
 #, draft
 msgid "use my Gravatar"
 msgstr "naudoti mano „Gravatar“"
@@ -10173,7 +10239,7 @@ msgstr ""
 msgid "Used"
 msgstr "Panaudota"
 
-#: src/postulo/accounts/models.py:417
+#: src/postulo/accounts/models.py:412
 #, draft
 msgid "used at"
 msgstr "panaudota"
@@ -10188,13 +10254,13 @@ msgstr "Naudojama mėnesiui ir ketvirčiui, į kurį tas mėnuo patenka."
 msgid "user"
 msgstr "naudotojas"
 
-#: src/postulo/accounts/forms.py:615 src/postulo/templates/server/email.html:20
+#: src/postulo/accounts/forms.py:620 src/postulo/templates/server/email.html:20
 #: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
 msgstr "Naudotojo vardas"
 
-#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:580
+#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:672
 #, draft
 msgid "username"
 msgstr "naudotojo vardas"
@@ -10277,7 +10343,7 @@ msgstr "Vaizdo įrašas"
 msgid "Video call"
 msgstr "Vaizdo skambutis"
 
-#: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:721
+#: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:723
 #, draft
 msgid "Waiting for review"
 msgstr "Laukia peržiūros"
@@ -10324,17 +10390,30 @@ msgid ""
 msgstr ""
 "„WeasyPrint“ įdiegiamas kartu su Postulo, bet jam reikia „Pango“ ir jo sistemos bibliotekų. „Debian“ ar „Ubuntu“: apt install libpango-1.0-0 libpangoft2-1.0-0. „Windows“ jas gauti keblu, todėl vietoj to naudokite chromium variklį. Žr. https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
-#: src/postulo/accounts/models.py:273 src/postulo/jobs/models.py:142
-#: src/postulo/resume/views.py:453
-#, draft
-msgid "website"
-msgstr "svetainė"
+#: src/postulo/core/models.py:543
+msgid "web link"
+msgstr ""
 
+#: src/postulo/accounts/models.py:269 src/postulo/core/models.py:544
+#: src/postulo/jobs/models.py:434
+msgid "web links"
+msgstr ""
+
+#: src/postulo/core/models.py:526 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:74
 #: src/postulo/templates/jobs/company_detail.html:84
 #, draft
 msgid "Website"
 msgstr "Svetainė"
+
+#: src/postulo/jobs/models.py:142 src/postulo/resume/views.py:453
+#, draft
+msgid "website"
+msgstr "svetainė"
+
+#: src/postulo/core/web_links.py:108
+msgid "Websites"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:135
 #: src/postulo/templates/applications/report.html:161
@@ -10408,7 +10487,7 @@ msgstr "Ko nepavyko perskaityti"
 msgid "What each plugin does, for everybody"
 msgstr "Ką daro kiekvienas papildinys, visiems"
 
-#: src/postulo/templates/accounts/profile.html:153
+#: src/postulo/templates/accounts/profile.html:159
 #: src/postulo/templates/jobs/company_form.html:94
 #, draft
 msgid "What goes where"
@@ -10566,7 +10645,7 @@ msgstr "Kas bus ištrinta"
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Ką pastebėjote ir dar neapsisprendėte, ir kas baigiasi šią savaitę."
 
-#: src/postulo/accounts/forms.py:617
+#: src/postulo/accounts/forms.py:622
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -10595,7 +10674,7 @@ msgstr "Kada"
 msgid "When accepting should also move the application."
 msgstr "Kai priėmimas turi ir pastumti paraišką."
 
-#: src/postulo/jobs/models.py:617
+#: src/postulo/jobs/models.py:619
 #, draft
 msgid "When it entered your listings."
 msgstr "Kada pateko į jūsų skelbimus."
@@ -10660,7 +10739,7 @@ msgstr "Kaip einasi"
 msgid "Where this company lists its openings."
 msgstr "Kur ši įmonė skelbia laisvas vietas."
 
-#: src/postulo/jobs/models.py:577
+#: src/postulo/jobs/models.py:579
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Kur jį radote: darbo portalas, rekomendacija, įmonės svetainė."
@@ -10675,12 +10754,12 @@ msgstr "kur gyvenate"
 msgid "Where your job search stands today."
 msgstr "Kur šiandien jūsų darbo paieška."
 
-#: src/postulo/core/models.py:519
+#: src/postulo/core/models.py:611
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Ar kiekvienas, radęs adresą, gali susikurti paskyrą."
 
-#: src/postulo/core/models.py:530
+#: src/postulo/core/models.py:622
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -10715,14 +10794,14 @@ msgid ""
 msgstr ""
 "Kokia kalba parašytas šis variantas. Palikite tuščią, kad atitiktų profilį."
 
-#: src/postulo/accounts/forms.py:296
+#: src/postulo/accounts/forms.py:293
 #, draft
 msgid ""
 "Which language your experience, education and projects are typed in. A CV in another language shows what you have translated, and says what it could not."
 msgstr ""
 "Kokia kalba surašyta jūsų patirtis, išsilavinimas ir projektai. Kita kalba parengtas CV parodo, ką išvertėte, ir pasako, ko negalėjo."
 
-#: src/postulo/jobs/models.py:747
+#: src/postulo/jobs/models.py:749
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Kuri Postulo dalis tai sukūrė: žiniatinklio sąsaja ar API."
@@ -10757,7 +10836,7 @@ msgstr "su kuo susitinkate"
 msgid "Why"
 msgstr "Kodėl"
 
-#: src/postulo/jobs/models.py:614
+#: src/postulo/jobs/models.py:616
 #, draft
 msgid "why it was discarded"
 msgstr "kodėl atmesta"
@@ -10772,7 +10851,7 @@ msgstr "Kodėl eilutės praleistos"
 msgid "Widen {column}"
 msgstr "Praplėsti stulpelį {column}"
 
-#: src/postulo/accounts/models.py:326
+#: src/postulo/accounts/models.py:321
 #, draft
 msgid "widgets already offered"
 msgstr "jau pasiūlyti valdikliai"
@@ -10823,7 +10902,7 @@ msgstr "veikė %(when)s"
 msgid "Working arrangement"
 msgstr "Darbo forma"
 
-#: src/postulo/jobs/models.py:566
+#: src/postulo/jobs/models.py:568
 #, draft
 msgid "working arrangement"
 msgstr "darbo forma"
@@ -10927,7 +11006,7 @@ msgstr "Jau turite žymą tokiu pavadinimu."
 msgid "You already have that industry."
 msgstr "Jau turite šią šaką."
 
-#: src/postulo/accounts/views.py:243
+#: src/postulo/accounts/views.py:250
 #, draft
 msgid "You are already signed in."
 msgstr "Jau esate prisijungę."
@@ -11025,7 +11104,7 @@ msgid ""
 msgstr ""
 "Po to vis tiek prisijungsite ir nurodysite antrąjį veiksnį, jei jį turite. Ši nuoroda keičia slaptažodį ir nieko daugiau."
 
-#: src/postulo/accounts/views.py:325
+#: src/postulo/accounts/views.py:332
 #, draft
 msgid "Your account and everything in it have been deleted."
 msgstr "Jūsų paskyra ir viskas joje ištrinta."
@@ -11092,7 +11171,7 @@ msgstr "Jūsų CV"
 msgid "Your dashboard is empty"
 msgstr "Jūsų skydelis tuščias"
 
-#: src/postulo/accounts/views.py:303 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:310 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -11112,12 +11191,12 @@ msgstr "Jūsų terminas"
 msgid "Your details"
 msgstr "Jūsų duomenys"
 
-#: src/postulo/accounts/views.py:135
+#: src/postulo/accounts/views.py:142
 #, draft
 msgid "Your details have been saved."
 msgstr "Jūsų duomenys išsaugoti."
 
-#: src/postulo/accounts/views.py:182
+#: src/postulo/accounts/views.py:189
 #, draft
 msgid "Your Gravatar has been fetched again."
 msgstr "Jūsų „Gravatar“ gautas iš naujo."
@@ -11136,6 +11215,10 @@ msgstr "Jūsų darbo paieška %(period)s"
 #, draft
 msgid "Your job search, on your server."
 msgstr "Jūsų darbo paieška, jūsų serveryje."
+
+#: src/postulo/core/web_links.py:72
+msgid "Your LinkedIn, or wherever a recruiter should look you up."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html:34
 #, draft
@@ -11176,7 +11259,11 @@ msgstr "Jūsų vardas, el. paštas ir vieta iš jūsų profilio."
 msgid "Your own name"
 msgstr "Jūsų paties vardas"
 
-#: src/postulo/accounts/views.py:402
+#: src/postulo/core/web_links.py:114
+msgid "Your own site, if you have one."
+msgstr ""
+
+#: src/postulo/accounts/views.py:409
 #, draft
 msgid "Your password is set. Sign in with it."
 msgstr "Jūsų slaptažodis nustatytas. Prisijunkite juo."

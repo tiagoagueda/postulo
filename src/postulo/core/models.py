@@ -490,6 +490,98 @@ class PostalAddress(OwnedModel):
         return separator.join(part for part in (p.strip() for p in parts if p) if part)
 
 
+class WebLink(OwnedModel):
+    """One address on the web belonging to a person or to a contact.
+
+    A social profile, a code repository, a website: three kinds, and a row for each of the
+    several a person may have of each. A generic relation, for the reason
+    :class:`PhoneNumber` gives, and the same holders -- a profile and a contact -- with the
+    same cascade written on the relation (#189).
+
+    **The kind is the sort of thing, never the host.** *Social profile* rather than
+    LinkedIn, *Code repository* rather than GitHub: a list of brand names ages every time
+    somebody's Forgejo instance or the next network appears, and ``resume.LinkKind`` set
+    the precedent of describing the sort. The host is what the ``label`` is for, when
+    somebody wants to name it, and what is shown when they do not.
+
+    **One primary per kind, per holder.** The primary is the row a CV header prints and
+    the row that stays offered when the kind's feature is switched off -- so "off" is
+    exactly the one-box-per-kind Postulo had before this table existed.
+
+    **Never fetched.** ``resume.Link`` sets the standard and this inherits it: Postulo does
+    not open a link on its own, not for a favicon, not for an avatar, not to check that it
+    answers. The only thing worse than a job tracker that fetches nothing is one quietly
+    making requests nobody asked for.
+
+    **Unique per holder, not across the instance.** A number belongs to one person; a
+    website does not. Two contacts at one company share its site, two people on a family
+    instance share a blog, and refusing the second would disclose in refusing it that
+    somebody else here has the same address. The same address listed twice for one holder
+    is a mistake worth catching, and that is all the constraint says.
+    """
+
+    class Kind(models.TextChoices):
+        SOCIAL = "social", _("Social profile")
+        REPOSITORY = "repository", _("Code repository")
+        WEBSITE = "website", _("Website")
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveBigIntegerField()
+    holder = GenericForeignKey("content_type", "object_id")
+
+    kind = models.CharField(_("kind"), max_length=20, choices=Kind.choices)
+    label = models.CharField(
+        _("name"),
+        max_length=60,
+        blank=True,
+        help_text=_("LinkedIn, Codeberg, a blog — what to call it. Left blank, the host is shown."),
+    )
+    url = models.URLField(_("address"), max_length=500)
+    is_primary = models.BooleanField(_("primary"), default=False)
+
+    class Meta:
+        verbose_name = _("web link")
+        verbose_name_plural = _("web links")
+        ordering = ("-is_primary", "created_at", "pk")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("content_type", "object_id", "kind"),
+                condition=Q(is_primary=True),
+                name="one_primary_web_link_per_holder_and_kind",
+            ),
+            models.UniqueConstraint(
+                fields=("content_type", "object_id", "url"),
+                name="web_link_unique_per_holder",
+            ),
+        ]
+        indexes = [models.Index(fields=("content_type", "object_id"))]
+
+    def __str__(self) -> str:
+        return self.display
+
+    def save(self, *args, **kwargs):
+        self.url = (self.url or "").strip()
+        self.label = (self.label or "").strip()
+        return super().save(*args, **kwargs)
+
+    @property
+    def host(self) -> str:
+        """The address's host without a leading ``www.``, which is how a reader names it."""
+        from urllib.parse import urlsplit
+
+        host = urlsplit(self.url).netloc.lower()
+        return host[4:] if host.startswith("www.") else host
+
+    @property
+    def display(self) -> str:
+        """What to print for it: the name somebody gave it, or failing that the host."""
+        return self.label or self.host or self.url
+
+    @property
+    def kind_label(self) -> str:
+        return str(self.get_kind_display())
+
+
 class SiteSettings(models.Model):
     """Instance policy an administrator may change from the interface. One row.
 

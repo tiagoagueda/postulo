@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import languages, phone_field, phone_numbers, phones
+from postulo.core import languages, phone_field, phone_numbers, phones, web_links
 
 from . import avatars, identifiers
 from .models import Invite, PersonIdentifier, Profile
@@ -279,9 +279,6 @@ class ProfileForm(forms.ModelForm):
             "headline",
             "location",
             "record_language",
-            "website",
-            "linkedin_url",
-            "source_repo_url",
         )
 
     def __init__(self, *args, **kwargs):
@@ -313,6 +310,8 @@ class ProfileForm(forms.ModelForm):
                     "number that already starts with + is taken as it is."
                 ),
             )
+        # And one box per kind of link whose feature is off, on the same terms (#189).
+        web_links.add_single_boxes(self, getattr(self.instance, "user", None), holder=self.instance)
         if self.instance and self.instance.pk:
             if not self.several_numbers:
                 primary = phone_numbers.primary_for(self.instance)
@@ -338,6 +337,11 @@ class ProfileForm(forms.ModelForm):
             raise forms.ValidationError(str(exc)) from exc
         return upload
 
+    @property
+    def link_boxes(self) -> list:
+        """The one-box-per-kind fields, for the template to lay out where the columns were."""
+        return web_links.single_boxes(self)
+
     def clean_phone(self) -> str:
         typed = (self.cleaned_data.get("phone") or "").strip()
         primary = phone_numbers.primary_for(self.instance) if self.instance.pk else None
@@ -357,6 +361,7 @@ class ProfileForm(forms.ModelForm):
             self._save_picture(profile)
             if not self.several_numbers:
                 phone_numbers.save_only_number(profile, user, self.cleaned_data.get("phone", ""))
+            web_links.save_single_boxes(self, profile, user)
         return profile
 
     #: How the Gravatar fetch went, for the view to word its message: found, none, error, "".

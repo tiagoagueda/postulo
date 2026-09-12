@@ -256,6 +256,14 @@ def placeholder_pdf(title: str) -> bytes:
     return bytes(out)
 
 
+def _seed_link(holder, owner, kind: str, url: str) -> None:
+    """Give a seeded holder its one link of a kind, where it has none."""
+    from postulo.core.web_links import primary_for, save_only_link
+
+    if primary_for(holder, kind) is None:
+        save_only_link(holder, owner, kind, url)
+
+
 def _seed_phone(holder, owner, number: str) -> None:
     """Give a seeded holder its primary number, skipping one already on this instance."""
     from postulo.core.phone_numbers import save_only_number, taken_elsewhere
@@ -367,10 +375,10 @@ class Command(BaseCommand):
         profile.headline = "Backend engineer"
         _seed_phone(profile, user, "+33 6 00 00 00 00")
         profile.location = "Paris, France"
-        profile.website = "https://alexmorgan.example"
-        profile.linkedin_url = "https://www.linkedin.com/in/alex-morgan-example"
-        profile.source_repo_url = "https://source.example/alexmorgan"
         profile.save()
+        _seed_link(profile, user, "website", "https://alexmorgan.example")
+        _seed_link(profile, user, "social", "https://www.linkedin.com/in/alex-morgan-example")
+        _seed_link(profile, user, "repository", "https://source.example/alexmorgan")
 
         # ---- career ----------------------------------------------------------
         experiences = [

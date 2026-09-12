@@ -294,8 +294,9 @@ def test_the_format_version_moved(user):
     """Pinned so that adding to the archive is a line somebody wrote. 9 added postal
     addresses on a profile and on a contact (#92); 13 added the departments inside a company
     and which one an application named (#138); 14 added the kind of a CV, which is what tells
-    a portfolio from one (#133).
+    a portfolio from one (#133); 15 replaced the four single link columns on a profile and a
+    contact with a ``web_links`` list (#189).
     """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 14
+    assert export.FORMAT_VERSION == 15

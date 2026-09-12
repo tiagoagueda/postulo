@@ -11,7 +11,7 @@ from django import forms
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import phone_field, phone_numbers, phones
+from postulo.core import phone_field, phone_numbers, phones, web_links
 
 from . import identifiers, industries, logos, structure
 from .models import Company, CompanyIdentifier, Contact, Department, Industry, JobPosting
@@ -352,7 +352,7 @@ class ContactForm(OwnerScopedModelForm):
 
     class Meta:
         model = Contact
-        fields = ("name", "role", "company", "email", "linkedin_url", "notes")
+        fields = ("name", "role", "company", "email", "notes")
         widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
 
     def __init__(self, *args, **kwargs):
@@ -377,6 +377,8 @@ class ContactForm(OwnerScopedModelForm):
             if self.instance and self.instance.pk:
                 primary = phone_numbers.primary_for(self.instance)
                 self.fields["phone"].initial = primary.number if primary else ""
+        # And one box per kind of link whose feature is off, on the same terms (#189).
+        web_links.add_single_boxes(self, self.user, holder=self.instance)
 
     def clean_phone(self) -> str:
         typed = (self.cleaned_data.get("phone") or "").strip()
@@ -413,6 +415,7 @@ class ContactForm(OwnerScopedModelForm):
         if commit and not self.several_numbers:
             phone_numbers.save_only_number(contact, self.user, self.cleaned_data.get("phone", ""))
         if commit:
+            web_links.save_single_boxes(self, contact, self.user)
             if "new_department" in self.fields:
                 self._save_department(contact)
         return contact

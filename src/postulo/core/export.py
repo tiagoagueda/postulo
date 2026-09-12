@@ -35,8 +35,11 @@ from postulo import __version__
 #: column (#130). The importer still reads every earlier format, filling the new fields in.
 #: 13 added ``department`` and ``department_company`` on an application, naming which
 #: part of an employer the attempt was aimed at (#138); 14 added ``kind`` on a CV, which
-#: is what tells a portfolio from a CV (#133).
-FORMAT_VERSION = 14
+#: is what tells a portfolio from a CV (#133). 15 replaced ``website``, ``linkedin_url``
+#: and ``source_repo_url`` on a profile and ``linkedin_url`` on a contact with a
+#: ``web_links`` list, each row a kind, an address and whether it is the primary of its
+#: kind (#189).
+FORMAT_VERSION = 15
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -46,9 +49,6 @@ MEDIA_PREFIX = "media/"
 PROFILE_FIELDS = (
     "headline",
     "location",
-    "website",
-    "linkedin_url",
-    "source_repo_url",
     "language",
     "record_language",
     "time_zone",
@@ -88,7 +88,7 @@ COMPANY_FIELDS = (
     "logo_fetched_at",
     "created_at",
 )
-CONTACT_FIELDS = ("id", "name", "role", "email", "linkedin_url", "notes")
+CONTACT_FIELDS = ("id", "name", "role", "email", "notes")
 #: A contact's team, written as a name beside them rather than as a table of its own: a
 #: department belongs to one company, so the company's block is where it can be resolved.
 #: What one telephone number is, in the file. Every number a holder has, in order, with
@@ -106,6 +106,9 @@ POSTAL_ADDRESS_FIELDS = (
     "country",
     "is_primary",
 )
+#: What one address on the web is, in the file: every link a holder has, of every kind, in
+#: order, with the primary of each kind marked -- not the primaries alone (#189).
+WEB_LINK_FIELDS = ("kind", "label", "url", "is_primary")
 POSTING_FIELDS = (
     "id",
     "title",
@@ -281,6 +284,11 @@ def _postal_addresses(holder) -> list[dict]:
     return [_fields(row, POSTAL_ADDRESS_FIELDS) for row in holder.postal_addresses.all()]
 
 
+def _web_links(holder) -> list[dict]:
+    """Every link this holder has, of every kind. Same rule as the numbers above."""
+    return [_fields(row, WEB_LINK_FIELDS) for row in holder.web_links.all()]
+
+
 def _plugin_data(user) -> dict:
     from postulo.plugins import data
 
@@ -328,6 +336,7 @@ def build_document(user) -> dict:
                     **_fields(profile, PROFILE_FIELDS),
                     "phone_numbers": _phone_numbers(profile),
                     "postal_addresses": _postal_addresses(profile),
+                    "web_links": _web_links(profile),
                 }
                 if profile
                 else {}
@@ -439,6 +448,7 @@ def build_document(user) -> dict:
                         "department": contact.department.name if contact.department_id else "",
                         "phone_numbers": _phone_numbers(contact),
                         "postal_addresses": _postal_addresses(contact),
+                        "web_links": _web_links(contact),
                     }
                     for contact in company.contacts.all()
                 ],

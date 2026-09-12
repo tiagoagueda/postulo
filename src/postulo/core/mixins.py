@@ -36,6 +36,49 @@ class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
         return self.request.user.is_staff
 
 
+class WebLinksMixin:
+    """The link blocks on a view whose object holds them, for the reason the telephone
+    mixin below gives: one place for "the kind's feature may be off", "a create view has
+    no holder yet" and "saved inside the same transaction as the form or not at all".
+
+    ``links`` in the context is the list of formsets for the kinds that are on -- empty
+    while every kind is off, which is the template's signal that the boxes on the form
+    are the whole control (#189).
+    """
+
+    def link_holder(self):
+        return getattr(self, "object", None)
+
+    def get_web_links(self) -> list:
+        from postulo.core import web_links
+
+        data = self.request.POST if self.request.method == "POST" else None
+        return web_links.formsets_for(self.link_holder(), self.request.user, data=data)
+
+    def web_links_invalid(self, formsets: list) -> bool:
+        return any(formset.is_bound and not formset.is_valid() for formset in formsets)
+
+    def save_web_links(self, formsets: list, holder) -> None:
+        for formset in formsets:
+            if not formset.is_bound:
+                continue
+            formset.instance = holder
+            for form in formset.forms:
+                form.instance.owner = holder.owner if hasattr(holder, "owner") else holder.user
+            formset.save()
+
+    def get_context_data(self, **kwargs) -> dict:
+        from postulo.core import web_links
+
+        context = super().get_context_data(**kwargs)
+        context.setdefault("links", self.get_web_links())
+        holder = self.link_holder()
+        context["links_kept_back"] = (
+            web_links.kept_back(holder, self.request.user) if holder is not None else []
+        )
+        return context
+
+
 class PhoneNumbersMixin:
     """The telephone rows on a view whose object holds them.
 

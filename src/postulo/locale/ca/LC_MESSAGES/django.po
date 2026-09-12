@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:35+0000\n"
+"POT-Creation-Date: 2026-09-12 19:57+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: català\n"
@@ -217,7 +217,7 @@ msgid ""
 msgstr ""
 "%(label)s encara conté %(count)d registre(s), i desinstal·lar-lo els deixaria en una taula que res no pot llegir, exportar ni restaurar. Buideu-la primer des de les pàgines del connector mateix, o apagueu el connector en comptes d'això — apagar-lo ho conserva tot."
 
-#: src/postulo/jobs/models.py:708
+#: src/postulo/jobs/models.py:710
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "de %(low)s a %(high)s"
@@ -350,8 +350,8 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s canviaria allò de què depèn el mateix Postulo. %(problems)s"
 
-#: src/postulo/documents/rendering.py:279
-#: src/postulo/documents/rendering.py:304
+#: src/postulo/documents/rendering.py:287
+#: src/postulo/documents/rendering.py:312
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
@@ -403,7 +403,7 @@ msgstr "%(role)s a %(company)s"
 msgid "%(role)s at %(company)s — %(days)s days"
 msgstr "%(role)s a %(company)s — %(days)s dies"
 
-#: src/postulo/resume/importing.py:172
+#: src/postulo/resume/importing.py:181
 #, python-format, draft
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s: sense data d'inici, així que no s'ha afegit."
@@ -603,7 +603,7 @@ msgstr "Un fitxer CSV"
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "Un indici per a la interfície, com ara «ambre» o «cel»."
 
-#: src/postulo/core/models.py:513
+#: src/postulo/core/models.py:605
 #, draft
 msgid "A line under the name on the sign-in page. Optional."
 msgstr "Una línia sota el nom a la pàgina d'accés. Opcional."
@@ -612,6 +612,11 @@ msgstr "Una línia sota el nom a la pàgina d'accés. Opcional."
 #, draft
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr "Una línia quan un connector creu que ha passat alguna cosa i us espera."
+
+#: src/postulo/core/web_links.py:67
+msgid ""
+"A LinkedIn, a Mastodon, a Bluesky — as many as are worth showing, with one of them marked as the one to show. Documents print that one."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html:49
 msgid ""
@@ -676,6 +681,11 @@ msgstr ""
 msgid "A password, or an app password"
 msgstr "Una contrasenya, o una contrasenya d’aplicació"
 
+#: src/postulo/core/web_links.py:109
+msgid ""
+"A personal site, a blog, a portfolio — as many as are worth showing, with one of them marked as the one to show. Documents print that one."
+msgstr ""
+
 #: src/postulo/templates/widgets/suggestions.html:6
 #, python-format, draft
 msgid ""
@@ -720,7 +730,12 @@ msgid ""
 msgstr ""
 "Una oferta que heu vist. L'empresa i el títol ja són prou per començar; la resta pot venir més tard."
 
-#: src/postulo/accounts/models.py:278
+#: src/postulo/core/web_links.py:88
+msgid ""
+"A profile on a forge, or one project worth showing — as many as are worth listing, with one of them marked as the one to show. Documents print that one."
+msgstr ""
+
+#: src/postulo/core/web_links.py:93
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Un perfil a GitHub, Forgejo, GitLab o similar."
@@ -752,7 +767,7 @@ msgstr "Venç un recordatori"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Un recordatori venç el dia abans, quan hi ha dia abans."
 
-#: src/postulo/accounts/models.py:478
+#: src/postulo/accounts/models.py:473
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Un recordatori de per a qui és això."
@@ -855,12 +870,12 @@ msgstr "Accepta"
 msgid "Accepted"
 msgstr "Acceptada"
 
-#: src/postulo/accounts/models.py:492
+#: src/postulo/accounts/models.py:487
 #, draft
 msgid "accepted at"
 msgstr "acceptada el"
 
-#: src/postulo/accounts/models.py:499
+#: src/postulo/accounts/models.py:494
 #, draft
 msgid "accepted by"
 msgstr "acceptada per"
@@ -1053,12 +1068,13 @@ msgstr "Afegit."
 
 #: src/postulo/applications/reports.py:478
 #: src/postulo/templates/partials/postal_addresses.html:29
+#: src/postulo/templates/partials/web_links.html:28
 #, draft
 msgid "Address"
 msgstr "Adreça"
 
-#: src/postulo/core/models.py:413 src/postulo/jobs/models.py:740
-#: src/postulo/resume/models.py:242
+#: src/postulo/core/models.py:413 src/postulo/core/models.py:539
+#: src/postulo/jobs/models.py:742 src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "adreça"
@@ -1131,7 +1147,7 @@ msgid ""
 "All of them are offered, and a language added in a later release will be too."
 msgstr "S'ofereixen tots, i un idioma afegit en una versió posterior també."
 
-#: src/postulo/templates/accounts/profile.html:175
+#: src/postulo/templates/accounts/profile.html:181
 #, draft
 msgid "Also happens by itself when your primary address changes."
 msgstr "També passa tot sol quan canvia la vostra adreça principal."
@@ -1185,7 +1201,7 @@ msgid ""
 msgstr ""
 "Un índex és una llista de codi que s'executarà aquí, així que ha d'estar signat i la clau l'heu de tenir vosaltres. Apagar un dipòsit més endavant atura les instal·lacions i actualitzacions noves que en vinguin; el que ja hi ha instal·lat continua funcionant."
 
-#: src/postulo/templates/accounts/profile.html:109
+#: src/postulo/templates/accounts/profile.html:115
 #, draft
 msgid ""
 "An ORCID, or another public id that says which researcher you are. A name is not an identity — two people share one, one person publishes under three — and an application form for an academic post asks for this by name. Paste a whole address if that is what you have; Postulo keeps the id."
@@ -1272,7 +1288,7 @@ msgstr "Aparença"
 #: src/postulo/applications/models.py:424
 #: src/postulo/applications/models.py:519
 #: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:490 src/postulo/jobs/models.py:768
+#: src/postulo/documents/models.py:490 src/postulo/jobs/models.py:770
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1379,7 +1395,7 @@ msgstr "Candidatures, amb les seves cronologies"
 
 #: src/postulo/applications/analytics.py:31
 #: src/postulo/applications/models.py:41 src/postulo/applications/tables.py:46
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:663
+#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:665
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
 msgid "Applied"
@@ -1434,7 +1450,7 @@ msgstr "Aplica a les files marcades"
 msgid "Apply: %(title)s"
 msgstr "Presenta't: %(title)s"
 
-#: src/postulo/jobs/models.py:464
+#: src/postulo/jobs/models.py:466
 #, draft
 msgid "Apprenticeship"
 msgstr "Aprenentatge"
@@ -1481,7 +1497,7 @@ msgstr "S'ha d'oferir almenys un idioma, o ningú no podrà llegir res."
 msgid "attempts"
 msgstr "intents"
 
-#: src/postulo/core/models.py:607
+#: src/postulo/core/models.py:699
 #, draft
 msgid "authentication"
 msgstr "autenticació"
@@ -1661,7 +1677,7 @@ msgid "Callback to register with it"
 msgstr "Adreça de retorn per registrar-s'hi"
 
 #: src/postulo/templates/accounts/invite_form.html:24
-#: src/postulo/templates/accounts/profile.html:166
+#: src/postulo/templates/accounts/profile.html:172
 #: src/postulo/templates/applications/application_form.html:30
 #: src/postulo/templates/applications/application_intake.html:73
 #: src/postulo/templates/applications/interview_form.html:70
@@ -1675,7 +1691,7 @@ msgstr "Adreça de retorn per registrar-s'hi"
 #: src/postulo/templates/documents/send.html:32
 #: src/postulo/templates/documents/upload_form.html:21
 #: src/postulo/templates/jobs/company_form.html:106
-#: src/postulo/templates/jobs/contact_form.html:38
+#: src/postulo/templates/jobs/contact_form.html:42
 #: src/postulo/templates/jobs/industry_form.html:21
 #: src/postulo/templates/jobs/listing_apply.html:44
 #: src/postulo/templates/jobs/listing_form.html:54
@@ -1702,7 +1718,7 @@ msgstr "Cancel·lada"
 msgid "Capture"
 msgstr "Captura"
 
-#: src/postulo/jobs/models.py:772
+#: src/postulo/jobs/models.py:774
 #, draft
 msgid "capture"
 msgstr "captura"
@@ -1749,7 +1765,7 @@ msgstr "Fonts de captura que té aquesta instal·lació"
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
 
-#: src/postulo/jobs/models.py:744
+#: src/postulo/jobs/models.py:746
 #, draft
 msgid "captured from"
 msgstr "capturada de"
@@ -1759,7 +1775,7 @@ msgstr "capturada de"
 msgid "Captured: %(title)s"
 msgstr "Capturada: %(title)s"
 
-#: src/postulo/jobs/models.py:773
+#: src/postulo/jobs/models.py:775
 #, draft
 msgid "captures"
 msgstr "captures"
@@ -1940,7 +1956,7 @@ msgstr "Tria un altre fitxer"
 msgid "Choose at least one document to record."
 msgstr "Trieu com a mínim un document per registrar."
 
-#: src/postulo/accounts/forms.py:459 src/postulo/jobs/forms.py:224
+#: src/postulo/accounts/forms.py:464 src/postulo/jobs/forms.py:224
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Trieu quina mena d'identificador és."
@@ -1950,7 +1966,7 @@ msgstr "Trieu quina mena d'identificador és."
 msgid "Choose which application this is about first."
 msgstr "Trieu primer a quina candidatura fa referència."
 
-#: src/postulo/accounts/models.py:271
+#: src/postulo/accounts/models.py:274
 #, draft
 msgid "City and country, as it should appear on a CV."
 msgstr "Ciutat i país, tal com han de sortir en un CV."
@@ -1982,7 +1998,7 @@ msgstr "Neteja els filtres"
 msgid "Cleared: this entry prints its original text in %(language)s."
 msgstr "Buidat: aquesta entrada imprimeix el text original en %(language)s."
 
-#: src/postulo/core/models.py:613
+#: src/postulo/core/models.py:705
 #, draft
 msgid "client ID"
 msgstr "ID de client"
@@ -1992,17 +2008,17 @@ msgstr "ID de client"
 msgid "Client secret"
 msgstr "Secret de client"
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:663
+#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:665
 #, draft
 msgid "Closed"
 msgstr "Tancada"
 
-#: src/postulo/applications/models.py:210 src/postulo/jobs/models.py:604
+#: src/postulo/applications/models.py:210 src/postulo/jobs/models.py:606
 #, draft
 msgid "closed on"
 msgstr "tancada el"
 
-#: src/postulo/jobs/models.py:491
+#: src/postulo/jobs/models.py:493
 #, draft
 msgid "Closed or already filled"
 msgstr "Tancada o ja coberta"
@@ -2018,7 +2034,7 @@ msgstr "Es tanca"
 msgid "Closing date"
 msgstr "Data de tancament"
 
-#: src/postulo/jobs/models.py:598
+#: src/postulo/jobs/models.py:600
 #, draft
 msgid "closing date"
 msgstr "data de tancament"
@@ -2033,10 +2049,13 @@ msgstr "Es tanca aquesta setmana: %(total)s"
 msgid "Code (GitHub, GitLab…)"
 msgstr "Codi (GitHub, GitLab…)"
 
-#: src/postulo/accounts/models.py:276
-#, draft
-msgid "code repository"
-msgstr "dipòsit de codi"
+#: src/postulo/core/web_links.py:87
+msgid "Code repositories"
+msgstr ""
+
+#: src/postulo/core/models.py:525 src/postulo/core/web_links.py:92
+msgid "Code repository"
+msgstr ""
 
 #: src/postulo/core/models.py:87
 #, draft
@@ -2105,17 +2124,17 @@ msgstr "Empresa"
 
 #: src/postulo/jobs/models.py:168 src/postulo/jobs/models.py:304
 #: src/postulo/jobs/models.py:381 src/postulo/jobs/models.py:409
-#: src/postulo/jobs/models.py:561 src/postulo/jobs/tables.py:18
+#: src/postulo/jobs/models.py:563 src/postulo/jobs/tables.py:18
 #, draft
 msgid "company"
 msgstr "empresa"
 
-#: src/postulo/jobs/views.py:300
+#: src/postulo/jobs/views.py:308
 #, draft
 msgid "Company added."
 msgstr "Empresa afegida."
 
-#: src/postulo/jobs/views.py:371
+#: src/postulo/jobs/views.py:379
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Empresa esborrada, juntament amb les seves ofertes."
@@ -2130,7 +2149,7 @@ msgstr "identificador d'empresa"
 msgid "company identifiers"
 msgstr "identificadors d'empresa"
 
-#: src/postulo/jobs/views.py:312
+#: src/postulo/jobs/views.py:320
 #, draft
 msgid "Company updated."
 msgstr "Empresa actualitzada."
@@ -2205,7 +2224,7 @@ msgstr "Connexió eliminada, secrets inclosos."
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Connexió desada. Proveu-la per assegurar-vos que funciona."
 
-#: src/postulo/core/models.py:591
+#: src/postulo/core/models.py:683
 #, draft
 msgid "connection security"
 msgstr "seguretat de la connexió"
@@ -2228,7 +2247,7 @@ msgstr "Connexions"
 msgid "connections"
 msgstr "connexions"
 
-#: src/postulo/accounts/forms.py:400
+#: src/postulo/accounts/forms.py:405
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Considera una candidatura en silenci després de"
@@ -2243,7 +2262,7 @@ msgstr "Construcció"
 msgid "Consulting"
 msgstr "Consultoria"
 
-#: src/postulo/jobs/models.py:436
+#: src/postulo/jobs/models.py:438
 #, draft
 msgid "contact"
 msgstr "contacte"
@@ -2254,7 +2273,7 @@ msgstr "contacte"
 msgid "Contact"
 msgstr "Contacte"
 
-#: src/postulo/jobs/views.py:468
+#: src/postulo/jobs/views.py:485
 #, draft
 msgid "Contact added."
 msgstr "Contacte afegit."
@@ -2264,7 +2283,7 @@ msgstr "Contacte afegit."
 msgid "Contact block"
 msgstr "Bloc de contacte"
 
-#: src/postulo/jobs/models.py:437
+#: src/postulo/jobs/models.py:439
 #, draft
 msgid "contacts"
 msgstr "contactes"
@@ -2279,7 +2298,7 @@ msgstr "Que contingui"
 msgid "context"
 msgstr "context"
 
-#: src/postulo/jobs/models.py:461
+#: src/postulo/jobs/models.py:463
 #, draft
 msgid "Contract"
 msgstr "Contracte"
@@ -2379,13 +2398,13 @@ msgstr "Crea una invitació"
 msgid "created"
 msgstr "creada"
 
-#: src/postulo/accounts/models.py:344 src/postulo/accounts/models.py:415
-#: src/postulo/accounts/models.py:489 src/postulo/core/models.py:34
+#: src/postulo/accounts/models.py:339 src/postulo/accounts/models.py:410
+#: src/postulo/accounts/models.py:484 src/postulo/core/models.py:34
 #, draft
 msgid "created at"
 msgstr "creada el"
 
-#: src/postulo/accounts/models.py:487
+#: src/postulo/accounts/models.py:482
 #, draft
 msgid "created by"
 msgstr "creada per"
@@ -2400,7 +2419,7 @@ msgstr "enllaç de credencials"
 msgid "Currency"
 msgstr "Moneda"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:589
 #, draft
 msgid "currency"
 msgstr "moneda"
@@ -2456,7 +2475,7 @@ msgstr "Fosc"
 msgid "Dashboard"
 msgstr "Tauler"
 
-#: src/postulo/accounts/models.py:318
+#: src/postulo/accounts/models.py:313
 #, draft
 msgid "dashboard widgets"
 msgstr "ginys del tauler"
@@ -2520,7 +2539,7 @@ msgid ""
 msgstr ""
 "Dies fins a la primera resposta i fins a la primera entrevista: el més ràpid, la mediana, el més lent."
 
-#: src/postulo/accounts/models.py:341
+#: src/postulo/accounts/models.py:336
 #, draft
 msgid ""
 "Days without anything happening, and nothing planned, before Postulo asks."
@@ -2630,7 +2649,7 @@ msgstr "Decidida per %(who)s el %(when)s"
 msgid "Decided by %(who)s."
 msgstr "Decidida per %(who)s."
 
-#: src/postulo/jobs/models.py:619
+#: src/postulo/jobs/models.py:621
 #, draft
 msgid "decided on"
 msgstr "decidida el"
@@ -2650,12 +2669,12 @@ msgstr "Rebutjada"
 msgid "Declined. It will not be suggested again."
 msgstr "Rebutjada. No es tornarà a suggerir."
 
-#: src/postulo/core/models.py:553
+#: src/postulo/core/models.py:645
 #, draft
 msgid "default language"
 msgstr "llengua per defecte"
 
-#: src/postulo/core/models.py:564
+#: src/postulo/core/models.py:656
 #, draft
 msgid "default time zone"
 msgstr "fus horari per defecte"
@@ -2741,7 +2760,7 @@ msgstr "Depèn de"
 msgid "Description"
 msgstr "Descripció"
 
-#: src/postulo/jobs/models.py:579 src/postulo/resume/models.py:245
+#: src/postulo/jobs/models.py:581 src/postulo/resume/models.py:245
 #, draft
 msgid "description"
 msgstr "descripció"
@@ -2771,7 +2790,7 @@ msgstr "No ha respost"
 msgid "did not answer when last checked"
 msgstr "no va respondre l'última comprovació"
 
-#: src/postulo/core/models.py:612
+#: src/postulo/core/models.py:704
 #, draft
 msgid "directory (tenant) ID"
 msgstr "ID de directori (inquilí)"
@@ -2789,8 +2808,8 @@ msgstr "Descarta"
 msgid "Discard this capture"
 msgstr "Descarta aquesta captura"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:484
-#: src/postulo/jobs/models.py:723
+#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:486
+#: src/postulo/jobs/models.py:725
 #, draft
 msgid "Discarded"
 msgstr "Descartada"
@@ -2956,7 +2975,7 @@ msgstr ""
 #: src/postulo/templates/documents/letter_detail.html:18
 #: src/postulo/templates/documents/upload_list.html:46
 #: src/postulo/templates/jobs/company_detail.html:45
-#: src/postulo/templates/jobs/company_detail.html:223
+#: src/postulo/templates/jobs/company_detail.html:232
 #: src/postulo/templates/jobs/posting_detail.html:52
 #: src/postulo/templates/resume/overview.html:131
 #: src/postulo/templates/resume/preview.html:15
@@ -3011,7 +3030,7 @@ msgstr ""
 msgid "Email"
 msgstr "Correu"
 
-#: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:473
+#: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:468
 #: src/postulo/jobs/models.py:423 src/postulo/resume/views.py:451
 #, draft
 msgid "email address"
@@ -3022,7 +3041,7 @@ msgstr "adreça de correu"
 msgid "Email address"
 msgstr "Adreça electrònica"
 
-#: src/postulo/accounts/forms.py:637
+#: src/postulo/accounts/forms.py:642
 #, draft
 msgid "Email address (optional)"
 msgstr "Adreça de correu (opcional)"
@@ -3047,7 +3066,7 @@ msgstr "Correu enviat"
 msgid "Employment type"
 msgstr "Tipus de contracte"
 
-#: src/postulo/jobs/models.py:569
+#: src/postulo/jobs/models.py:571
 #, draft
 msgid "employment type"
 msgstr "tipus de contracte"
@@ -3057,7 +3076,7 @@ msgstr "tipus de contracte"
 msgid "Empty"
 msgstr "Buit"
 
-#: src/postulo/jobs/models.py:778
+#: src/postulo/jobs/models.py:780
 #, draft
 msgid "Empty capture"
 msgstr "Captura buida"
@@ -3195,7 +3214,7 @@ msgid ""
 msgstr ""
 "Tot desapareix, de cop, i ningú no ho pot recuperar. Feu abans l'exportació."
 
-#: src/postulo/accounts/forms.py:390
+#: src/postulo/accounts/forms.py:395
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
@@ -3286,7 +3305,7 @@ msgstr "Caduca"
 msgid "expires"
 msgstr "caduca"
 
-#: src/postulo/accounts/models.py:416 src/postulo/accounts/models.py:490
+#: src/postulo/accounts/models.py:411 src/postulo/accounts/models.py:485
 #, draft
 msgid "expires at"
 msgstr "caduca a les"
@@ -3324,7 +3343,7 @@ msgstr "Exportat a part"
 msgid "Failed"
 msgstr "Ha fallat"
 
-#: src/postulo/core/models.py:696 src/postulo/plugins/models.py:239
+#: src/postulo/core/models.py:788 src/postulo/plugins/models.py:239
 #, draft
 msgid "Failed without saying why."
 msgstr "Ha fallat sense dir per què."
@@ -3348,12 +3367,12 @@ msgstr "Fax"
 msgid "Feature"
 msgstr ""
 
-#: src/postulo/templates/accounts/profile.html:173
+#: src/postulo/templates/accounts/profile.html:179
 #, draft
 msgid "Fetch my Gravatar again"
 msgstr "Torna a baixar el meu Gravatar"
 
-#: src/postulo/jobs/views.py:354
+#: src/postulo/jobs/views.py:362
 #, draft
 msgid "Fetched again."
 msgstr "Baixat de nou."
@@ -3550,7 +3569,7 @@ msgstr "Oblida la contrasenya desada"
 msgid "Forget the token"
 msgstr "Oblida el testimoni"
 
-#: src/postulo/jobs/views.py:348
+#: src/postulo/jobs/views.py:356
 #, python-format, draft
 msgid "Found a logo at %(url)s."
 msgstr "S'ha trobat un logotip a %(url)s."
@@ -3569,7 +3588,7 @@ msgstr "Trobat al seu lloc web"
 msgid "Found via"
 msgstr "Trobada per"
 
-#: src/postulo/jobs/models.py:574
+#: src/postulo/jobs/models.py:576
 #, draft
 msgid "found via"
 msgstr "trobada per"
@@ -3579,7 +3598,7 @@ msgstr "trobada per"
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Trobats: %(names)s. Només s'ompliran els que hàgiu deixat buits."
 
-#: src/postulo/jobs/models.py:462
+#: src/postulo/jobs/models.py:464
 #, draft
 msgid "Freelance"
 msgstr "Autònom"
@@ -3604,7 +3623,7 @@ msgstr "de"
 msgid "From"
 msgstr "De"
 
-#: src/postulo/jobs/models.py:713
+#: src/postulo/jobs/models.py:715
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "des de %(low)s"
@@ -3614,7 +3633,7 @@ msgstr "des de %(low)s"
 msgid "From %(name)s."
 msgstr "De %(name)s."
 
-#: src/postulo/core/models.py:599
+#: src/postulo/core/models.py:691
 #, draft
 msgid "from address"
 msgstr "adreça del remitent"
@@ -3651,7 +3670,7 @@ msgstr "des de l'estat"
 msgid "Frozen at the moment of sending"
 msgstr "Congelat en el moment de l'enviament"
 
-#: src/postulo/jobs/models.py:459
+#: src/postulo/jobs/models.py:461
 #, draft
 msgid "Full time"
 msgstr "Jornada completa"
@@ -3734,22 +3753,22 @@ msgstr "Han rebut alguna resposta"
 msgid "grade"
 msgstr "nota"
 
-#: src/postulo/core/models.py:609
+#: src/postulo/core/models.py:701
 #, draft
 msgid "grant"
 msgstr "autorització"
 
-#: src/postulo/accounts/models.py:335
+#: src/postulo/accounts/models.py:330
 #, draft
 msgid "Gravatar checked on"
 msgstr "Gravatar comprovat el"
 
-#: src/postulo/accounts/models.py:333
+#: src/postulo/accounts/models.py:328
 #, draft
 msgid "Gravatar copy"
 msgstr "Còpia de Gravatar"
 
-#: src/postulo/accounts/views.py:144 src/postulo/accounts/views.py:184
+#: src/postulo/accounts/views.py:151 src/postulo/accounts/views.py:191
 #, draft
 msgid "Gravatar could not be reached just now. Try again later."
 msgstr ""
@@ -3761,7 +3780,7 @@ msgid "Gravatar had no picture for your address when last asked, on %(when)s."
 msgstr ""
 "Gravatar no tenia cap imatge per a la vostra adreça l'última vegada que se li va preguntar, el %(when)s."
 
-#: src/postulo/accounts/views.py:140 src/postulo/accounts/views.py:183
+#: src/postulo/accounts/views.py:147 src/postulo/accounts/views.py:190
 #, draft
 msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr ""
@@ -3816,7 +3835,7 @@ msgstr "Feta"
 msgid "hidden"
 msgstr "amagat"
 
-#: src/postulo/accounts/models.py:298
+#: src/postulo/accounts/models.py:293
 #, draft
 msgid "hidden navigation items"
 msgstr "elements de navegació amagats"
@@ -3947,7 +3966,7 @@ msgstr ""
 msgid "However you prefer to group your search."
 msgstr "Com preferiu agrupar la vostra cerca."
 
-#: src/postulo/jobs/models.py:454
+#: src/postulo/jobs/models.py:456
 #, draft
 msgid "Hybrid"
 msgstr "Híbrid"
@@ -3968,7 +3987,7 @@ msgstr "identificador al magatzem"
 msgid "identifier"
 msgstr "identificador"
 
-#: src/postulo/templates/accounts/profile.html:130
+#: src/postulo/templates/accounts/profile.html:136
 #: src/postulo/templates/jobs/company_form.html:71
 #, draft
 msgid "Identifier"
@@ -3985,7 +4004,7 @@ msgid "identifiers"
 msgstr "identificadors"
 
 #: src/postulo/plugins/kinds.py:33
-#: src/postulo/templates/accounts/profile.html:107
+#: src/postulo/templates/accounts/profile.html:113
 #: src/postulo/templates/jobs/company_form.html:53
 #, draft
 msgid "Identifiers"
@@ -3996,7 +4015,7 @@ msgstr "Identificadors"
 msgid "Identifies itself as"
 msgstr "Es presenta com"
 
-#: src/postulo/core/models.py:608
+#: src/postulo/core/models.py:700
 #, draft
 msgid "identity provider"
 msgstr "proveïdor d’identitat"
@@ -4020,7 +4039,7 @@ msgid ""
 msgstr ""
 "Si us heu presentat a una institució de la UE o per un servei d'ocupació estatal, ja teniu aquest fitxer. En lloc de tornar-ho a escriure tot, doneu-lo."
 
-#: src/postulo/core/models.py:522
+#: src/postulo/core/models.py:614
 #, draft
 msgid "ignore robots.txt when capturing"
 msgstr "ignora robots.txt en capturar"
@@ -4168,7 +4187,7 @@ msgstr "sector"
 msgid "Industry"
 msgstr "Sector"
 
-#: src/postulo/jobs/views.py:426
+#: src/postulo/jobs/views.py:434
 #, draft
 msgid "Industry renamed."
 msgstr "Sector reanomenat."
@@ -4210,7 +4229,7 @@ msgstr "Instal·lat en aquesta instal·lació"
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Instal·lar un connector executa codi d'algú altre dins de Postulo."
 
-#: src/postulo/core/models.py:504
+#: src/postulo/core/models.py:596
 #, draft
 msgid "instance name"
 msgstr "nom de la instal·lació"
@@ -4230,7 +4249,7 @@ msgstr "Assegurances"
 msgid "Internal"
 msgstr "Intern"
 
-#: src/postulo/jobs/models.py:463
+#: src/postulo/jobs/models.py:465
 #, draft
 msgid "Internship"
 msgstr "Pràctiques"
@@ -4303,12 +4322,12 @@ msgstr "Entrevistes"
 msgid "Interviews attended"
 msgstr "Entrevistes fetes"
 
-#: src/postulo/accounts/models.py:505
+#: src/postulo/accounts/models.py:500
 #, draft
 msgid "invitation"
 msgstr "invitació"
 
-#: src/postulo/accounts/views.py:210
+#: src/postulo/accounts/views.py:217
 #, draft
 msgid ""
 "Invitation created. Send the person the link shown below; it can be used once."
@@ -4322,12 +4341,12 @@ msgid ""
 msgstr ""
 "Només amb invitació: el formulari de registre no s'ofereix. Convideu gent des de la secció Persones."
 
-#: src/postulo/accounts/views.py:226
+#: src/postulo/accounts/views.py:233
 #, draft
 msgid "Invitation revoked."
 msgstr "Invitació revocada."
 
-#: src/postulo/accounts/models.py:506
+#: src/postulo/accounts/models.py:501
 #, draft
 msgid "invitations"
 msgstr "invitacions"
@@ -4339,7 +4358,7 @@ msgstr "invitacions"
 msgid "Invitations"
 msgstr "Invitacions"
 
-#: src/postulo/accounts/models.py:409 src/postulo/resume/models.py:168
+#: src/postulo/accounts/models.py:404 src/postulo/resume/models.py:168
 #, draft
 msgid "issued by"
 msgstr "emesa per"
@@ -4408,12 +4427,12 @@ msgstr "El seu fitxer coincideix amb el que va signar el repositori oficial."
 msgid "Job board"
 msgstr "Portal de feina"
 
-#: src/postulo/jobs/models.py:624
+#: src/postulo/jobs/models.py:626
 #, draft
 msgid "job posting"
 msgstr "oferta de feina"
 
-#: src/postulo/jobs/models.py:625
+#: src/postulo/jobs/models.py:627
 #, draft
 msgid "job postings"
 msgstr "ofertes de feina"
@@ -4463,7 +4482,7 @@ msgid ""
 msgstr ""
 "Es guarda a %(file)s i rota per mida, així que això no pot omplir el disc. Tot això també va a la consola, on ho llegeix <code>docker logs</code>."
 
-#: src/postulo/accounts/forms.py:311 src/postulo/core/phone_numbers.py:305
+#: src/postulo/accounts/forms.py:308 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -4480,15 +4499,15 @@ msgstr ""
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
-#: src/postulo/core/models.py:403 src/postulo/documents/models.py:113
-#: src/postulo/documents/models.py:315 src/postulo/documents/models.py:393
-#: src/postulo/documents/models.py:480 src/postulo/plugins/models.py:169
-#: src/postulo/resume/models.py:243
+#: src/postulo/core/models.py:403 src/postulo/core/models.py:532
+#: src/postulo/documents/models.py:113 src/postulo/documents/models.py:315
+#: src/postulo/documents/models.py:393 src/postulo/documents/models.py:480
+#: src/postulo/plugins/models.py:169 src/postulo/resume/models.py:243
 #, draft
 msgid "kind"
 msgstr "tipus"
 
-#: src/postulo/templates/accounts/profile.html:126
+#: src/postulo/templates/accounts/profile.html:132
 #: src/postulo/templates/applications/report.html:39
 #: src/postulo/templates/jobs/company_form.html:67
 #: src/postulo/templates/partials/phone_numbers.html:40
@@ -4522,13 +4541,13 @@ msgstr "Tipus de carta"
 msgid "label"
 msgstr "nom visible"
 
-#: src/postulo/accounts/forms.py:599 src/postulo/resume/forms.py:186
+#: src/postulo/accounts/forms.py:604 src/postulo/resume/forms.py:186
 #: src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Llengua"
 
-#: src/postulo/accounts/models.py:281 src/postulo/documents/models.py:121
+#: src/postulo/accounts/models.py:276 src/postulo/documents/models.py:121
 #: src/postulo/documents/models.py:331 src/postulo/resume/models.py:197
 #: src/postulo/resume/models.py:203 src/postulo/resume/models.py:301
 #, draft
@@ -4547,7 +4566,7 @@ msgstr "Llengua i hora"
 msgid "Language for new accounts"
 msgstr "Llengua per als comptes nous"
 
-#: src/postulo/accounts/models.py:291
+#: src/postulo/accounts/models.py:286
 #, draft
 msgid "language of your career record"
 msgstr "idioma de la vostra trajectòria"
@@ -4565,7 +4584,7 @@ msgstr "Llengües"
 msgid "languages"
 msgstr "llengües"
 
-#: src/postulo/core/models.py:563
+#: src/postulo/core/models.py:655
 #, draft
 msgid "languages offered"
 msgstr "idiomes oferts"
@@ -4699,6 +4718,11 @@ msgstr "Marxa"
 msgid "Left blank, it lasts an hour."
 msgstr "Deixat en blanc, dura una hora."
 
+#: src/postulo/templates/partials/web_links.html:57
+msgid ""
+"Left blank, the name is the address's host. Postulo never opens a link on its own — not to check it, not for a picture."
+msgstr ""
+
 #: src/postulo/jobs/industries.py:94
 #, draft
 msgid "Legal"
@@ -4774,10 +4798,10 @@ msgstr "Enllaç"
 msgid "link in the store"
 msgstr "enllaç al magatzem"
 
-#: src/postulo/accounts/models.py:274 src/postulo/jobs/models.py:432
-#, draft
-msgid "LinkedIn"
-msgstr "LinkedIn"
+#: src/postulo/core/models.py:537
+msgid ""
+"LinkedIn, Codeberg, a blog — what to call it. Left blank, the host is shown."
+msgstr ""
 
 #: src/postulo/documents/rendering.py:27 src/postulo/resume/registry.py:70
 #, draft
@@ -4817,7 +4841,7 @@ msgstr "Enllaços on els vau adreçar"
 msgid "listening"
 msgstr "escolta"
 
-#: src/postulo/jobs/models.py:759
+#: src/postulo/jobs/models.py:761
 #: src/postulo/templates/core/import_csv_map.html:86
 #, draft
 msgid "listing"
@@ -4849,8 +4873,8 @@ msgid ""
 msgstr ""
 "Ofertes, candidatures i les seves cronologies, empreses i persones, recordatoris, el text del que vau enviar, cartes, CV, fitxers i el vostre historial professional — tot, inclòs el que és tancat o descartat, perquè busqueu una cosa que recordeu."
 
-#: src/postulo/accounts/models.py:268 src/postulo/jobs/models.py:146
-#: src/postulo/jobs/models.py:564 src/postulo/resume/models.py:67
+#: src/postulo/accounts/models.py:271 src/postulo/jobs/models.py:146
+#: src/postulo/jobs/models.py:566 src/postulo/resume/models.py:67
 #: src/postulo/resume/models.py:98
 #, draft
 msgid "location"
@@ -4927,7 +4951,7 @@ msgstr "Minúscules, xifres, punts, guions baixos i guions."
 msgid "Made"
 msgstr "Creat"
 
-#: src/postulo/core/models.py:651
+#: src/postulo/core/models.py:743
 #, draft
 msgid "mail failures in a row"
 msgstr "errors de correu seguits"
@@ -4948,7 +4972,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Aquí el correu és l'única manera de tornar a entrar en un compte, així que fins que no torni a funcionar cap de les %(counter)s persones d'aquesta instància no podrà entrar si oblida la contrasenya."
 
-#: src/postulo/core/models.py:647
+#: src/postulo/core/models.py:739
 #, draft
 msgid "mail last failed"
 msgstr "darrer error del correu"
@@ -4958,7 +4982,7 @@ msgstr "darrer error del correu"
 msgid "Mail last went out at %(when)s."
 msgstr "El correu va sortir per darrera vegada a les %(when)s."
 
-#: src/postulo/core/models.py:646
+#: src/postulo/core/models.py:738
 #, draft
 msgid "mail last worked"
 msgstr "darrera vegada que el correu va funcionar"
@@ -4977,12 +5001,12 @@ msgid ""
 msgstr ""
 "El correu tampoc reté ja el transport, perquè una via que no lliura res no protegeix ningú."
 
-#: src/postulo/core/models.py:619
+#: src/postulo/core/models.py:711
 #, draft
 msgid "mail OAuth secrets"
 msgstr "secrets OAuth del correu"
 
-#: src/postulo/core/models.py:624
+#: src/postulo/core/models.py:716
 #, draft
 msgid "mail transport"
 msgstr "transport de correu"
@@ -4992,7 +5016,7 @@ msgstr "transport de correu"
 msgid "Mail transport"
 msgstr "Transport de correu"
 
-#: src/postulo/core/models.py:648
+#: src/postulo/core/models.py:740
 #, draft
 msgid "mail's last error"
 msgstr "darrer error del correu"
@@ -5108,7 +5132,7 @@ msgstr "Menú"
 msgid "Merge into"
 msgstr "Fusiona amb"
 
-#: src/postulo/jobs/views.py:426
+#: src/postulo/jobs/views.py:434
 #, draft
 msgid "Merged."
 msgstr "Fusionat."
@@ -5234,18 +5258,19 @@ msgid "NACE division"
 msgstr "divisió NACE"
 
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
-#: src/postulo/core/models.py:84 src/postulo/documents/models.py:110
-#: src/postulo/documents/models.py:313 src/postulo/jobs/models.py:41
-#: src/postulo/jobs/models.py:126 src/postulo/jobs/models.py:309
-#: src/postulo/jobs/models.py:383 src/postulo/jobs/models.py:421
-#: src/postulo/plugins/models.py:48 src/postulo/resume/models.py:116
-#: src/postulo/resume/models.py:131 src/postulo/resume/models.py:150
-#: src/postulo/resume/models.py:167
+#: src/postulo/core/models.py:84 src/postulo/core/models.py:534
+#: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
+#: src/postulo/jobs/models.py:41 src/postulo/jobs/models.py:126
+#: src/postulo/jobs/models.py:309 src/postulo/jobs/models.py:383
+#: src/postulo/jobs/models.py:421 src/postulo/plugins/models.py:48
+#: src/postulo/resume/models.py:116 src/postulo/resume/models.py:131
+#: src/postulo/resume/models.py:150 src/postulo/resume/models.py:167
 #, draft
 msgid "name"
 msgstr "nom"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:27
+#: src/postulo/templates/partials/web_links.html:33
 #: src/postulo/templates/server/people.html:32
 #: src/postulo/templates/server/people.html:45
 #: src/postulo/templates/server/plugins.html:320
@@ -5258,7 +5283,7 @@ msgstr "Nom"
 msgid "name, if Other"
 msgstr "nom, si Altre"
 
-#: src/postulo/templates/accounts/profile.html:134
+#: src/postulo/templates/accounts/profile.html:140
 #: src/postulo/templates/jobs/company_form.html:75
 #: src/postulo/templates/partials/phone_numbers.html:44
 #: src/postulo/templates/partials/postal_addresses.html:64
@@ -5293,7 +5318,7 @@ msgstr "Mai"
 msgid "never used"
 msgstr "no s'ha usat mai"
 
-#: src/postulo/jobs/models.py:482
+#: src/postulo/jobs/models.py:484
 #, draft
 msgid "New"
 msgstr "Nou"
@@ -5592,7 +5617,7 @@ msgid ""
 msgstr ""
 "Encara ningú no ha iniciat sessió, així que no es pot enviar res. Desa la configuració de dalt i després inicia sessió a la pàgina del proveïdor com la bústia des de la qual envia aquesta instància."
 
-#: src/postulo/templates/jobs/company_detail.html:231
+#: src/postulo/templates/jobs/company_detail.html:240
 #, draft
 msgid "Nobody recorded here yet."
 msgstr "Encara no hi ha ningú registrat aquí."
@@ -5680,7 +5705,7 @@ msgid ""
 msgstr ""
 "Sense configurar. Poseu POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID i POSTULO_OIDC_CLIENT_SECRET a l'entorn per oferir un botó d'accés per a un proveïdor OpenID Connect."
 
-#: src/postulo/jobs/models.py:488
+#: src/postulo/jobs/models.py:490
 #, draft
 msgid "Not for me"
 msgstr "No és per a mi"
@@ -5759,7 +5784,7 @@ msgstr "encara no provat"
 msgid "Not yet written in %(tongue)s. These print as they stand:"
 msgstr "Encara no escrit en %(tongue)s. Aquestes s’imprimeixen tal com són:"
 
-#: src/postulo/accounts/models.py:478
+#: src/postulo/accounts/models.py:473
 #, draft
 msgid "note"
 msgstr "nota"
@@ -5769,7 +5794,7 @@ msgstr "nota"
 msgid "Note"
 msgstr "Nota"
 
-#: src/postulo/accounts/forms.py:638
+#: src/postulo/accounts/forms.py:643
 #: src/postulo/templates/applications/application_detail.html:65
 #, draft
 msgid "Note (optional)"
@@ -5780,7 +5805,7 @@ msgstr "Nota (opcional)"
 msgid "noted %(when)s"
 msgstr "anotat %(when)s"
 
-#: src/postulo/jobs/models.py:617
+#: src/postulo/jobs/models.py:619
 #, draft
 msgid "noted on"
 msgstr "anotat el"
@@ -5792,7 +5817,7 @@ msgid "Notes"
 msgstr "Notes"
 
 #: src/postulo/documents/models.py:404 src/postulo/jobs/models.py:150
-#: src/postulo/jobs/models.py:433
+#: src/postulo/jobs/models.py:435
 #, draft
 msgid "notes"
 msgstr "notes"
@@ -6108,7 +6133,7 @@ msgstr "Oferta"
 msgid "Offer received"
 msgstr "Oferta rebuda"
 
-#: src/postulo/core/models.py:551
+#: src/postulo/core/models.py:643
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Només s'ofereix mentre el correu d'aquesta instància arriba de veritat."
@@ -6137,7 +6162,7 @@ msgstr "Oficial"
 msgid "older than a week"
 msgstr "de fa més d'una setmana"
 
-#: src/postulo/applications/models.py:459 src/postulo/jobs/models.py:453
+#: src/postulo/applications/models.py:459 src/postulo/jobs/models.py:455
 #, draft
 msgid "On site"
 msgstr "Presencial"
@@ -6362,7 +6387,7 @@ msgstr ""
 msgid "Openings"
 msgstr "Vacants"
 
-#: src/postulo/accounts/models.py:475
+#: src/postulo/accounts/models.py:470
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Opcional. Si s'indica, només aquesta adreça pot fer servir la invitació."
@@ -6408,7 +6433,7 @@ msgstr "Oferta original"
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
 #: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
 #: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
-#: src/postulo/documents/models.py:375 src/postulo/jobs/models.py:492
+#: src/postulo/documents/models.py:375 src/postulo/jobs/models.py:494
 #: src/postulo/resume/models.py:219
 #, draft
 msgid "Other"
@@ -6490,7 +6515,7 @@ msgstr "Paginació"
 msgid "Panel"
 msgstr "Panell"
 
-#: src/postulo/jobs/models.py:749
+#: src/postulo/jobs/models.py:751
 #, draft
 msgid "parsed posting"
 msgstr "oferta analitzada"
@@ -6515,7 +6540,7 @@ msgstr "Forma part de <a href=\"%(parent_url)s\" class=\"underline\">%(name)s</a
 msgid "Part of this company"
 msgstr "Forma part d'aquesta empresa"
 
-#: src/postulo/jobs/models.py:460
+#: src/postulo/jobs/models.py:462
 #, draft
 msgid "Part time"
 msgstr "Jornada parcial"
@@ -6530,7 +6555,7 @@ msgstr "Traduïda parcialment"
 msgid "Passkeys"
 msgstr "Claus d'accés"
 
-#: src/postulo/core/models.py:584
+#: src/postulo/core/models.py:676
 #, draft
 msgid "password"
 msgstr "contrasenya"
@@ -6584,22 +6609,22 @@ msgstr "Només pendents"
 msgid "People"
 msgstr "Persones"
 
-#: src/postulo/jobs/models.py:470
+#: src/postulo/jobs/models.py:472
 #, draft
 msgid "Per day"
 msgstr "Al dia"
 
-#: src/postulo/jobs/models.py:471
+#: src/postulo/jobs/models.py:473
 #, draft
 msgid "Per hour"
 msgstr "A l'hora"
 
-#: src/postulo/jobs/models.py:469
+#: src/postulo/jobs/models.py:471
 #, draft
 msgid "Per month"
 msgstr "Al mes"
 
-#: src/postulo/jobs/models.py:468
+#: src/postulo/jobs/models.py:470
 #, draft
 msgid "Per year"
 msgstr "A l'any"
@@ -6619,7 +6644,7 @@ msgstr "Període: %(period)s"
 msgid "Permissions"
 msgstr "Permisos"
 
-#: src/postulo/accounts/models.py:401 src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:396 src/postulo/plugins/models.py:120
 #, draft
 msgid "person"
 msgstr "persona"
@@ -6644,7 +6669,7 @@ msgstr "Lloc personal"
 msgid "Pharmaceuticals"
 msgstr "Farmacèutica"
 
-#: src/postulo/accounts/forms.py:306 src/postulo/core/phone_numbers.py:302
+#: src/postulo/accounts/forms.py:303 src/postulo/core/phone_numbers.py:302
 #: src/postulo/jobs/forms.py:369
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
@@ -6661,7 +6686,7 @@ msgstr "telèfon"
 msgid "Phone screen"
 msgstr "Entrevista telefònica"
 
-#: src/postulo/accounts/models.py:328
+#: src/postulo/accounts/models.py:323
 #, draft
 msgid "picture"
 msgstr "imatge"
@@ -6731,7 +6756,7 @@ msgstr "Connectors per a %(name)s"
 msgid "Plugins for this account"
 msgstr "Connectors per a aquest compte"
 
-#: src/postulo/accounts/models.py:305
+#: src/postulo/accounts/models.py:300
 #, draft
 msgid "plugins switched off"
 msgstr "connectors apagats"
@@ -6757,7 +6782,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, WebP o GIF fins a 5 MB. Es retalla a un quadrat i se li treu tot el que el fitxer sabia sobre on es va fer."
 
-#: src/postulo/core/models.py:575
+#: src/postulo/core/models.py:667
 #, draft
 msgid "port"
 msgstr "port"
@@ -6819,7 +6844,7 @@ msgstr "Adreces postals"
 msgid "postcode"
 msgstr "codi postal"
 
-#: src/postulo/jobs/models.py:596
+#: src/postulo/jobs/models.py:598
 #, draft
 msgid "posted on"
 msgstr "publicada el"
@@ -6845,7 +6870,7 @@ msgstr "Adreça de l'oferta"
 msgid "Posting details"
 msgstr "Detalls de l'oferta"
 
-#: src/postulo/jobs/views.py:525
+#: src/postulo/jobs/views.py:548
 #, draft
 msgid "Posting updated."
 msgstr "Oferta actualitzada."
@@ -6855,7 +6880,7 @@ msgstr "Oferta actualitzada."
 msgid "Posting URL"
 msgstr "URL de l'oferta"
 
-#: src/postulo/jobs/models.py:572
+#: src/postulo/jobs/models.py:574
 #, draft
 msgid "posting URL"
 msgstr "url de l'oferta"
@@ -6990,12 +7015,14 @@ msgid "Previous"
 msgstr "Anterior"
 
 #: src/postulo/core/models.py:189 src/postulo/core/models.py:420
+#: src/postulo/core/models.py:540
 #, draft
 msgid "primary"
 msgstr "principal"
 
 #: src/postulo/templates/partials/phone_numbers.html:57
 #: src/postulo/templates/partials/postal_addresses.html:75
+#: src/postulo/templates/partials/web_links.html:40
 #: src/postulo/templates/settings/account.html:58
 #, draft
 msgid "Primary"
@@ -7033,12 +7060,12 @@ msgstr "Produït el %(produced)s"
 msgid "proficiency"
 msgstr "nivell"
 
-#: src/postulo/accounts/models.py:169 src/postulo/accounts/models.py:348
+#: src/postulo/accounts/models.py:169 src/postulo/accounts/models.py:343
 #, draft
 msgid "profile"
 msgstr "perfil"
 
-#: src/postulo/accounts/models.py:349
+#: src/postulo/accounts/models.py:344
 #, draft
 msgid "profiles"
 msgstr "perfils"
@@ -7152,7 +7179,7 @@ msgstr "Tasques a la cua"
 msgid "Quiet"
 msgstr "En silenci"
 
-#: src/postulo/accounts/models.py:338
+#: src/postulo/accounts/models.py:333
 #, draft
 msgid "quiet after"
 msgstr "en silenci després de"
@@ -7208,7 +7235,7 @@ msgstr "Llegit com a Europass JSON, el format que exporta europass.europa.eu."
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Llegit com a Europass XML, el format que produïa l'editor de CV."
 
-#: src/postulo/jobs/models.py:741
+#: src/postulo/jobs/models.py:743
 #, draft
 msgid "read by"
 msgstr "llegida per"
@@ -7337,7 +7364,7 @@ msgstr "S'ha registrat què vau enviar."
 msgid "Recorded: nobody showed up."
 msgstr "Registrat: no s'hi va presentar ningú."
 
-#: src/postulo/accounts/models.py:423
+#: src/postulo/accounts/models.py:418
 #, draft
 msgid "recovery link"
 msgstr "enllaç de recuperació"
@@ -7348,7 +7375,7 @@ msgstr "enllaç de recuperació"
 msgid "Recovery link"
 msgstr "Enllaç de recuperació"
 
-#: src/postulo/accounts/models.py:424
+#: src/postulo/accounts/models.py:419
 #, draft
 msgid "recovery links"
 msgstr "enllaços de recuperació"
@@ -7405,7 +7432,7 @@ msgid ""
 "Registration is open: anyone who finds the address may create an account."
 msgstr "El registre és obert: qualsevol que trobi l'adreça pot crear un compte."
 
-#: src/postulo/core/models.py:516
+#: src/postulo/core/models.py:608
 #, draft
 msgid "registration open"
 msgstr "registre obert"
@@ -7467,7 +7494,7 @@ msgid "Reminders that have come due, each with a button to mark it done."
 msgstr ""
 "Recordatoris que ja han vençut, cadascun amb un botó per marcar-lo com a fet."
 
-#: src/postulo/jobs/models.py:455
+#: src/postulo/jobs/models.py:457
 #, draft
 msgid "Remote"
 msgstr "Remot"
@@ -7477,13 +7504,14 @@ msgstr "Remot"
 msgid "remote address"
 msgstr "adreça remota"
 
-#: src/postulo/templates/accounts/profile.html:139
+#: src/postulo/templates/accounts/profile.html:145
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:74
 #: src/postulo/templates/documents/cv_detail.html:106
 #: src/postulo/templates/jobs/company_form.html:80
 #: src/postulo/templates/partials/phone_numbers.html:82
 #: src/postulo/templates/partials/postal_addresses.html:79
+#: src/postulo/templates/partials/web_links.html:44
 #: src/postulo/templates/server/plugins.html:151
 #: src/postulo/templates/server/plugins.html:285
 #, draft
@@ -7623,7 +7651,7 @@ msgstr "revocada"
 msgid "Revoked"
 msgstr "Revocat"
 
-#: src/postulo/accounts/models.py:418
+#: src/postulo/accounts/models.py:413
 #, draft
 msgid "revoked at"
 msgstr "revocat el"
@@ -7704,12 +7732,12 @@ msgstr "Sou (una xifra o una forquilla)"
 msgid "Salary from"
 msgstr "Sou des de"
 
-#: src/postulo/jobs/models.py:582
+#: src/postulo/jobs/models.py:584
 #, draft
 msgid "salary from"
 msgstr "sou des de"
 
-#: src/postulo/jobs/models.py:589
+#: src/postulo/jobs/models.py:591
 #, draft
 msgid "salary period"
 msgstr "període del sou"
@@ -7719,12 +7747,12 @@ msgstr "període del sou"
 msgid "Salary to"
 msgstr "Sou fins a"
 
-#: src/postulo/jobs/models.py:585
+#: src/postulo/jobs/models.py:587
 #, draft
 msgid "salary to"
 msgstr "sou fins a"
 
-#: src/postulo/templates/accounts/profile.html:165
+#: src/postulo/templates/accounts/profile.html:171
 #: src/postulo/templates/applications/application_form.html:29
 #: src/postulo/templates/applications/application_intake.html:72
 #: src/postulo/templates/applications/interview_form.html:68
@@ -7736,7 +7764,7 @@ msgstr "sou fins a"
 #: src/postulo/templates/documents/letter_form.html:28
 #: src/postulo/templates/documents/upload_form.html:20
 #: src/postulo/templates/jobs/company_form.html:105
-#: src/postulo/templates/jobs/contact_form.html:37
+#: src/postulo/templates/jobs/contact_form.html:41
 #: src/postulo/templates/jobs/industry_form.html:20
 #: src/postulo/templates/jobs/posting_form.html:20
 #: src/postulo/templates/partials/table/cell.html:32
@@ -7767,7 +7795,7 @@ msgstr "Deseu l'empresa per afegir-hi un altre identificador."
 msgid "Save this first, then come back and agree."
 msgstr "Deseu això primer, i després torneu i accepteu."
 
-#: src/postulo/templates/accounts/profile.html:161
+#: src/postulo/templates/accounts/profile.html:167
 #, draft
 msgid "Save to add another identifier."
 msgstr "Deseu per afegir un altre identificador."
@@ -8066,7 +8094,7 @@ msgstr "Posa la contrasenya"
 msgid "Set up"
 msgstr "Configura"
 
-#: src/postulo/jobs/models.py:607
+#: src/postulo/jobs/models.py:609
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Poseu-hi la data quan la vacant ja no estigui disponible."
@@ -8107,7 +8135,7 @@ msgstr "Dreceres"
 msgid "Shortlist"
 msgstr "Preselecciona"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:483
+#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:485
 #, draft
 msgid "Shortlisted"
 msgstr "Preseleccionada"
@@ -8133,7 +8161,7 @@ msgstr "Mostra-ho tot"
 msgid "Show done too"
 msgstr "Mostra també les fetes"
 
-#: src/postulo/accounts/forms.py:387
+#: src/postulo/accounts/forms.py:392
 #, draft
 msgid "Show in the navigation"
 msgstr "Mostra a la navegació"
@@ -8148,7 +8176,7 @@ msgstr "Mostra també les passades"
 msgid "Show this period"
 msgstr "Mostra aquest període"
 
-#: src/postulo/core/models.py:507
+#: src/postulo/core/models.py:599
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Es mostra a la capçalera i a la pàgina d'accés."
@@ -8169,7 +8197,7 @@ msgstr "Torna a iniciar sessió"
 msgid "Sign in to the provider"
 msgstr "Inicia sessió al proveïdor"
 
-#: src/postulo/core/models.py:548
+#: src/postulo/core/models.py:640
 #, draft
 msgid "sign in with a code sent by email"
 msgstr "iniciar sessió amb un codi enviat per correu"
@@ -8247,7 +8275,7 @@ msgstr "Entra en un compte existent per correu"
 msgid "Single sign-on"
 msgstr "Inici de sessió únic"
 
-#: src/postulo/core/models.py:527
+#: src/postulo/core/models.py:619
 #, draft
 msgid "single sign-on counts as the second factor"
 msgstr "l'inici de sessió únic compta com a segon factor"
@@ -8262,7 +8290,7 @@ msgstr "L'inici de sessió únic compta com a segon factor"
 msgid "Site search"
 msgstr "Cerca al lloc"
 
-#: src/postulo/core/models.py:664 src/postulo/core/models.py:665
+#: src/postulo/core/models.py:756 src/postulo/core/models.py:757
 #, draft
 msgid "site settings"
 msgstr "configuració del lloc"
@@ -8325,7 +8353,7 @@ msgstr "El més lent"
 msgid "slug"
 msgstr "nom curt"
 
-#: src/postulo/core/models.py:573
+#: src/postulo/core/models.py:665
 #, draft
 msgid "SMTP server"
 msgstr "Servidor SMTP"
@@ -8340,11 +8368,49 @@ msgstr "Ajorna"
 msgid "Snoozed for two weeks."
 msgstr "Ajornada dues setmanes."
 
+#: src/postulo/core/models.py:524 src/postulo/core/web_links.py:71
+msgid "Social profile"
+msgstr ""
+
+#: src/postulo/core/web_links.py:66
+msgid "Social profiles"
+msgstr ""
+
 #: src/postulo/jobs/industries.py:64
 #: src/postulo/templates/server/overview.html:23
 #, draft
 msgid "Software"
 msgstr "Programari"
+
+#: src/postulo/core/web_links.py:94
+msgid ""
+"Some code repositories are kept and not shown, because <em>Several code repositories</em> is switched off. They come back untouched if it is switched on."
+msgstr ""
+
+#: src/postulo/core/web_links.py:98
+msgid ""
+"Some code repositories are kept for this contact and not shown, because <em>Several code repositories</em> is switched off."
+msgstr ""
+
+#: src/postulo/core/web_links.py:73
+msgid ""
+"Some social profiles are kept and not shown, because <em>Several social profiles</em> is switched off. They come back untouched if it is switched on."
+msgstr ""
+
+#: src/postulo/core/web_links.py:77
+msgid ""
+"Some social profiles are kept for this contact and not shown, because <em>Several social profiles</em> is switched off."
+msgstr ""
+
+#: src/postulo/core/web_links.py:115
+msgid ""
+"Some websites are kept and not shown, because <em>Several websites</em> is switched off. They come back untouched if it is switched on."
+msgstr ""
+
+#: src/postulo/core/web_links.py:119
+msgid ""
+"Some websites are kept for this contact and not shown, because <em>Several websites</em> is switched off."
+msgstr ""
 
 #: src/postulo/accounts/models.py:114
 #, draft
@@ -8397,7 +8463,7 @@ msgid ""
 msgstr ""
 "L'origen és el camp «trobada per» d'una oferta. Ompliu-lo i aquesta taula començarà a guanyar-se el lloc."
 
-#: src/postulo/jobs/models.py:742
+#: src/postulo/jobs/models.py:744
 #, draft
 msgid "source version"
 msgstr "versió a l'origen"
@@ -8454,7 +8520,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, després de connectar"
 
-#: src/postulo/jobs/models.py:611 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:613 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "estat"
@@ -8481,7 +8547,7 @@ msgstr "Estat"
 
 #: src/postulo/applications/models.py:198
 #: src/postulo/applications/models.py:663 src/postulo/documents/models.py:609
-#: src/postulo/jobs/models.py:751
+#: src/postulo/jobs/models.py:753
 #, draft
 msgid "status"
 msgstr "estat"
@@ -8683,7 +8749,7 @@ msgstr "Sincronització"
 msgid "Table"
 msgstr "Taula"
 
-#: src/postulo/accounts/models.py:308
+#: src/postulo/accounts/models.py:303
 #, draft
 msgid "table settings"
 msgstr "configuració de la taula"
@@ -8701,7 +8767,7 @@ msgstr "etiqueta"
 msgid "Tag"
 msgstr "Etiqueta"
 
-#: src/postulo/core/models.py:510
+#: src/postulo/core/models.py:602
 #, draft
 msgid "tagline"
 msgstr "lema"
@@ -8806,17 +8872,17 @@ msgstr "text"
 msgid "text as sent"
 msgstr "text tal com es va enviar"
 
-#: src/postulo/core/models.py:640
+#: src/postulo/core/models.py:732
 #, draft
 msgid "text configuration"
 msgstr "configuració dels missatges"
 
-#: src/postulo/core/models.py:641
+#: src/postulo/core/models.py:733
 #, draft
 msgid "text secrets"
 msgstr "secrets dels missatges"
 
-#: src/postulo/core/models.py:639
+#: src/postulo/core/models.py:731
 #, draft
 msgid "text transport"
 msgstr "transport dels missatges"
@@ -8870,7 +8936,7 @@ msgstr "Aquesta connexió no fa servir consentiment."
 msgid "That connection no longer exists."
 msgstr "Aquesta connexió ja no existeix."
 
-#: src/postulo/jobs/models.py:448
+#: src/postulo/jobs/models.py:450
 #, draft
 msgid "That department belongs to a different company."
 msgstr "Aquest departament pertany a una altra empresa."
@@ -8944,7 +9010,7 @@ msgstr "Aquell nom de servidor no s'ha pogut resoldre."
 msgid "That image is far larger than a logo needs to be."
 msgstr "Aquella imatge és molt més gran del que un logotip necessita."
 
-#: src/postulo/accounts/views.py:222
+#: src/postulo/accounts/views.py:229
 #, draft
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Aquella invitació ja s'ha acceptat i no es pot revocar."
@@ -8989,7 +9055,7 @@ msgstr "Això no és un desenllaç que Postulo conegui."
 msgid "That is not something Postulo can do about it."
 msgstr "Això no és una cosa que Postulo hi pugui fer."
 
-#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:151
+#: src/postulo/applications/views.py:180 src/postulo/jobs/views.py:156
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "Això no és una cosa que Postulo pugui fer a diversos alhora."
@@ -8999,7 +9065,7 @@ msgstr "Això no és una cosa que Postulo pugui fer a diversos alhora."
 msgid "That is not something this page does."
 msgstr "Això no és una cosa que faci aquesta pàgina."
 
-#: src/postulo/accounts/views.py:316
+#: src/postulo/accounts/views.py:323
 #, draft
 msgid "That is not the address on this account."
 msgstr "Aquesta no és l'adreça d'aquest compte."
@@ -9074,7 +9140,7 @@ msgstr "Aquella pàgina és més gran de %(limit)s MB, així que no s'ha llegit.
 msgid "That page returned %(status)s."
 msgstr "Aquella pàgina ha retornat %(status)s."
 
-#: src/postulo/accounts/forms.py:331
+#: src/postulo/accounts/forms.py:330
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Aquella imatge passa de 5 MB. Una de més petita, si us plau."
@@ -9130,7 +9196,7 @@ msgstr "L'adreça ha respost %(code)s."
 msgid "The address answered with nothing."
 msgstr "L'adreça ha respost amb res."
 
-#: src/postulo/jobs/models.py:601
+#: src/postulo/jobs/models.py:603
 #, draft
 msgid "The application deadline, if stated."
 msgstr "El termini de la candidatura, si s'indica."
@@ -9288,7 +9354,7 @@ msgid ""
 msgstr ""
 "La clau de «%(name)s» s'ha substituït. Aquella clau és l'única cosa que hi ha entre el seu índex i el codi que s'executa aquí, així que assegureu-vos que ve d'un lloc de confiança."
 
-#: src/postulo/accounts/forms.py:293
+#: src/postulo/accounts/forms.py:290
 #, draft
 msgid "The language you read Postulo in"
 msgstr "L’idioma en què llegiu Postulo"
@@ -9315,22 +9381,22 @@ msgid ""
 msgstr ""
 "Les últimes deu coses que ha registrat la cronologia, fossin de la candidatura que fossin."
 
-#: src/postulo/jobs/models.py:760
+#: src/postulo/jobs/models.py:762
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "L'oferta en què s'ha convertit aquesta captura, un cop revisada."
 
-#: src/postulo/jobs/models.py:490
+#: src/postulo/jobs/models.py:492
 #, draft
 msgid "The location"
 msgstr "La ubicació"
 
-#: src/postulo/jobs/views.py:357
+#: src/postulo/jobs/views.py:365
 #, draft
 msgid "The logo is gone."
 msgstr "El logotip ja no hi és."
 
-#: src/postulo/jobs/views.py:282
+#: src/postulo/jobs/views.py:290
 #, python-format, draft
 msgid "The logo was not changed: %(problem)s"
 msgstr "El logotip no s'ha canviat: %(problem)s"
@@ -9405,7 +9471,7 @@ msgid ""
 msgstr ""
 "La contrasenya la defineix <code>%(variable)s</code> a l'entorn; canvieu-la allà. Aquí no es mostra mai."
 
-#: src/postulo/jobs/models.py:489
+#: src/postulo/jobs/models.py:491
 #, draft
 msgid "The pay"
 msgstr "La retribució"
@@ -9552,7 +9618,7 @@ msgid ""
 msgstr ""
 "El fus horari el defineix l'entorn: <code>%(variable)s</code> = %(zone)s. Traieu-lo de l'entorn per canviar-lo aquí."
 
-#: src/postulo/applications/forms.py:83 src/postulo/jobs/forms.py:472
+#: src/postulo/applications/forms.py:83 src/postulo/jobs/forms.py:475
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "La xifra de dalt no pot ser més baixa que la de baix."
@@ -9568,7 +9634,7 @@ msgstr ""
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "La roda no té metadades; pot ser que estigui malmesa."
 
-#: src/postulo/accounts/models.py:294 src/postulo/documents/models.py:57
+#: src/postulo/accounts/models.py:289 src/postulo/documents/models.py:57
 #, draft
 msgid "theme"
 msgstr "tema"
@@ -9588,7 +9654,7 @@ msgstr "Després esborra"
 msgid "There are no links to check."
 msgstr "No hi ha cap enllaç per comprovar."
 
-#: src/postulo/jobs/views.py:351
+#: src/postulo/jobs/views.py:359
 #, draft
 msgid "There is no address to fetch it from again."
 msgstr "No hi ha cap adreça per tornar-la a baixar."
@@ -9652,7 +9718,7 @@ msgstr "No s'hi van presentar"
 msgid "This address is already in your listings, since %(when)s."
 msgstr ""
 
-#: src/postulo/core/postal.py:225
+#: src/postulo/core/postal.py:225 src/postulo/core/web_links.py:323
 #, draft
 msgid "This address is already listed."
 msgstr "Aquesta adreça ja hi és."
@@ -9674,7 +9740,7 @@ msgstr "D'aquesta empresa no hi ha cap lloc web registrat."
 msgid "This entry prints its original text on every CV."
 msgstr "Aquesta entrada imprimeix el text original a tots els CV."
 
-#: src/postulo/accounts/forms.py:484 src/postulo/jobs/forms.py:249
+#: src/postulo/accounts/forms.py:489 src/postulo/jobs/forms.py:249
 #, draft
 msgid "This identifier is already listed."
 msgstr "Aquest identificador ja és a la llista."
@@ -9715,7 +9781,7 @@ msgid ""
 msgstr ""
 "Aquesta instal·lació no envia per SMTP, així que la configuració de sota queda registrada i no s'utilitza. És normal en desenvolupament, on el correu s'imprimeix a la consola."
 
-#: src/postulo/accounts/views.py:250
+#: src/postulo/accounts/views.py:257
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
 msgstr "Aquesta invitació és per a %(email)s. Registreu-vos amb aquella adreça."
@@ -9742,7 +9808,7 @@ msgid ""
 msgstr ""
 "Aquest és el vostre propi compte. Un enllaç que us feu a vosaltres mateixos no és una manera de tornar: heu hagut d'iniciar sessió per fer-lo. Si sou l'única administració aquí, el que us cobreix és una clau d'accés o una segona administració."
 
-#: src/postulo/accounts/forms.py:481 src/postulo/jobs/forms.py:246
+#: src/postulo/accounts/forms.py:486 src/postulo/jobs/forms.py:246
 #, draft
 msgid "This kind of identifier is already listed."
 msgstr "Aquesta mena d'identificador ja és a la llista."
@@ -9814,12 +9880,12 @@ msgstr ""
 msgid "tier"
 msgstr "nivell"
 
-#: src/postulo/accounts/forms.py:605
+#: src/postulo/accounts/forms.py:610
 #, draft
 msgid "Time zone"
 msgstr "Fus horari"
 
-#: src/postulo/accounts/models.py:293
+#: src/postulo/accounts/models.py:288
 #, draft
 msgid "time zone"
 msgstr "fus horari"
@@ -9839,13 +9905,13 @@ msgstr "entrada de la cronologia"
 msgid "Timeout"
 msgstr "Temps d'espera"
 
-#: src/postulo/core/models.py:597
+#: src/postulo/core/models.py:689
 #, draft
 msgid "timeout in seconds"
 msgstr "temps d'espera en segons"
 
 #: src/postulo/documents/models.py:386 src/postulo/documents/models.py:477
-#: src/postulo/jobs/models.py:563 src/postulo/resume/models.py:241
+#: src/postulo/jobs/models.py:565 src/postulo/resume/models.py:241
 #, draft
 msgid "title"
 msgstr "títol"
@@ -9890,7 +9956,7 @@ msgstr "a l'estat"
 msgid "Today's date"
 msgstr "Data d'avui"
 
-#: src/postulo/accounts/models.py:470
+#: src/postulo/accounts/models.py:465
 #, draft
 msgid "token"
 msgstr "testimoni"
@@ -9951,12 +10017,12 @@ msgstr ""
 msgid "Transport and logistics"
 msgstr "Transport i logística"
 
-#: src/postulo/core/models.py:629
+#: src/postulo/core/models.py:721
 #, draft
 msgid "transport configuration"
 msgstr "configuració del transport"
 
-#: src/postulo/core/models.py:631
+#: src/postulo/core/models.py:723
 #, draft
 msgid "transport secrets"
 msgstr "secrets del transport"
@@ -9966,12 +10032,12 @@ msgstr "secrets del transport"
 msgid "Try fewer words, or a different spelling."
 msgstr "Proveu amb menys paraules, o amb una altra grafia."
 
-#: src/postulo/accounts/views.py:176
+#: src/postulo/accounts/views.py:183
 #, draft
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Enceneu primer «Fes servir el meu Gravatar»."
 
-#: src/postulo/jobs/models.py:722
+#: src/postulo/jobs/models.py:724
 #, draft
 msgid "Turned into an application"
 msgstr "Convertida en candidatura"
@@ -9997,7 +10063,7 @@ msgstr "Escriviu com a mínim dos caràcters."
 msgid "Type it in instead"
 msgstr "Escriviu-ho a mà"
 
-#: src/postulo/accounts/forms.py:461 src/postulo/jobs/forms.py:226
+#: src/postulo/accounts/forms.py:466 src/postulo/jobs/forms.py:226
 #, draft
 msgid "Type the identifier."
 msgstr "Escriviu l'identificador."
@@ -10054,7 +10120,7 @@ msgstr ""
 msgid "until"
 msgstr "fins a"
 
-#: src/postulo/jobs/models.py:715
+#: src/postulo/jobs/models.py:717
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "fins a %(high)s"
@@ -10064,13 +10130,13 @@ msgstr "fins a %(high)s"
 msgid "Update the preview"
 msgstr "Actualitza la previsualització"
 
-#: src/postulo/accounts/models.py:345 src/postulo/core/models.py:35
-#: src/postulo/core/models.py:653
+#: src/postulo/accounts/models.py:340 src/postulo/core/models.py:35
+#: src/postulo/core/models.py:745
 #, draft
 msgid "updated at"
 msgstr "actualitzada el"
 
-#: src/postulo/core/models.py:660
+#: src/postulo/core/models.py:752
 #, draft
 msgid "updated by"
 msgstr "actualitzada per"
@@ -10126,7 +10192,7 @@ msgid ""
 msgstr ""
 "Feu servir de 3 a 32 minúscules, xifres, punts, guions baixos o guions, començant i acabant amb una lletra o una xifra."
 
-#: src/postulo/accounts/forms.py:334
+#: src/postulo/accounts/forms.py:333
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Feu servir un PNG, JPEG, WebP o GIF."
@@ -10136,7 +10202,7 @@ msgstr "Feu servir un PNG, JPEG, WebP o GIF."
 msgid "Use my Gravatar"
 msgstr "Fes servir el meu Gravatar"
 
-#: src/postulo/accounts/models.py:330
+#: src/postulo/accounts/models.py:325
 #, draft
 msgid "use my Gravatar"
 msgstr "fes servir el meu Gravatar"
@@ -10158,7 +10224,7 @@ msgstr ""
 msgid "Used"
 msgstr "Usat"
 
-#: src/postulo/accounts/models.py:417
+#: src/postulo/accounts/models.py:412
 #, draft
 msgid "used at"
 msgstr "usat el"
@@ -10173,13 +10239,13 @@ msgstr "S’utilitza per a un mes, i per al trimestre en què cau aquest mes."
 msgid "user"
 msgstr "usuari"
 
-#: src/postulo/accounts/forms.py:615 src/postulo/templates/server/email.html:20
+#: src/postulo/accounts/forms.py:620 src/postulo/templates/server/email.html:20
 #: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
 msgstr "Nom d'usuari"
 
-#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:580
+#: src/postulo/accounts/models.py:109 src/postulo/core/models.py:672
 #, draft
 msgid "username"
 msgstr "nom d'usuari"
@@ -10262,7 +10328,7 @@ msgstr "Vídeo"
 msgid "Video call"
 msgstr "Videotrucada"
 
-#: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:721
+#: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:723
 #, draft
 msgid "Waiting for review"
 msgstr "Esperant revisió"
@@ -10309,17 +10375,30 @@ msgid ""
 msgstr ""
 "El WeasyPrint s'instal·la amb Postulo, però necessita Pango i les seves biblioteques de sistema. A Debian o Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0. A Windows són incòmodes d'obtenir, així que feu servir el motor chromium. Vegeu https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
 
-#: src/postulo/accounts/models.py:273 src/postulo/jobs/models.py:142
-#: src/postulo/resume/views.py:453
-#, draft
-msgid "website"
-msgstr "lloc web"
+#: src/postulo/core/models.py:543
+msgid "web link"
+msgstr ""
 
+#: src/postulo/accounts/models.py:269 src/postulo/core/models.py:544
+#: src/postulo/jobs/models.py:434
+msgid "web links"
+msgstr ""
+
+#: src/postulo/core/models.py:526 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:74
 #: src/postulo/templates/jobs/company_detail.html:84
 #, draft
 msgid "Website"
 msgstr "Lloc web"
+
+#: src/postulo/jobs/models.py:142 src/postulo/resume/views.py:453
+#, draft
+msgid "website"
+msgstr "lloc web"
+
+#: src/postulo/core/web_links.py:108
+msgid "Websites"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:135
 #: src/postulo/templates/applications/report.html:161
@@ -10393,7 +10472,7 @@ msgstr "Què no s'ha pogut llegir"
 msgid "What each plugin does, for everybody"
 msgstr "Què fa cada connector, per a tothom"
 
-#: src/postulo/templates/accounts/profile.html:153
+#: src/postulo/templates/accounts/profile.html:159
 #: src/postulo/templates/jobs/company_form.html:94
 #, draft
 msgid "What goes where"
@@ -10552,7 +10631,7 @@ msgstr "Què s'esborrarà"
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Què heu vist i encara no heu tocat, i què es tanca aquesta setmana."
 
-#: src/postulo/accounts/forms.py:617
+#: src/postulo/accounts/forms.py:622
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -10581,7 +10660,7 @@ msgstr "Quan"
 msgid "When accepting should also move the application."
 msgstr "Quan acceptar-la també hagi de moure la candidatura."
 
-#: src/postulo/jobs/models.py:617
+#: src/postulo/jobs/models.py:619
 #, draft
 msgid "When it entered your listings."
 msgstr "Quan va entrar a les vostres ofertes."
@@ -10646,7 +10725,7 @@ msgstr "Com estan les coses"
 msgid "Where this company lists its openings."
 msgstr "On publica aquesta empresa les seves vacants."
 
-#: src/postulo/jobs/models.py:577
+#: src/postulo/jobs/models.py:579
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr ""
@@ -10662,12 +10741,12 @@ msgstr "on viviu"
 msgid "Where your job search stands today."
 msgstr "On és avui la vostra cerca de feina."
 
-#: src/postulo/core/models.py:519
+#: src/postulo/core/models.py:611
 #, draft
 msgid "Whether anyone who finds the address may create an account."
 msgstr "Si qualsevol que trobi l'adreça pot crear un compte."
 
-#: src/postulo/core/models.py:530
+#: src/postulo/core/models.py:622
 #, draft
 msgid ""
 "Whether somebody who arrived through the identity provider is asked for a code as well."
@@ -10702,14 +10781,14 @@ msgid ""
 msgstr ""
 "En quina llengua està escrita aquesta variant. Deixeu-ho en blanc per seguir el vostre perfil."
 
-#: src/postulo/accounts/forms.py:296
+#: src/postulo/accounts/forms.py:293
 #, draft
 msgid ""
 "Which language your experience, education and projects are typed in. A CV in another language shows what you have translated, and says what it could not."
 msgstr ""
 "En quin idioma teniu escrites l’experiència, la formació i els projectes. Un CV en un altre idioma mostra el que heu traduït i diu el que no ha pogut."
 
-#: src/postulo/jobs/models.py:747
+#: src/postulo/jobs/models.py:749
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Quina part de Postulo ho ha generat: la interfície web, o l'API."
@@ -10744,7 +10823,7 @@ msgstr "amb qui us reuniu"
 msgid "Why"
 msgstr "Per què"
 
-#: src/postulo/jobs/models.py:614
+#: src/postulo/jobs/models.py:616
 #, draft
 msgid "why it was discarded"
 msgstr "per què es va descartar"
@@ -10759,7 +10838,7 @@ msgstr "Per què s'han omès files"
 msgid "Widen {column}"
 msgstr "Eixampla {column}"
 
-#: src/postulo/accounts/models.py:326
+#: src/postulo/accounts/models.py:321
 #, draft
 msgid "widgets already offered"
 msgstr "widgets ja oferts"
@@ -10810,7 +10889,7 @@ msgstr "va funcionar %(when)s"
 msgid "Working arrangement"
 msgstr "Modalitat de treball"
 
-#: src/postulo/jobs/models.py:566
+#: src/postulo/jobs/models.py:568
 #, draft
 msgid "working arrangement"
 msgstr "modalitat de treball"
@@ -10914,7 +10993,7 @@ msgstr "Ja teniu una etiqueta amb aquest nom."
 msgid "You already have that industry."
 msgstr "Ja teniu aquest sector."
 
-#: src/postulo/accounts/views.py:243
+#: src/postulo/accounts/views.py:250
 #, draft
 msgid "You are already signed in."
 msgstr "Ja teniu la sessió iniciada."
@@ -11011,7 +11090,7 @@ msgid ""
 msgstr ""
 "Després iniciareu sessió igualment, i donareu el vostre segon factor si en teniu. Aquest enllaç canvia la contrasenya i res més."
 
-#: src/postulo/accounts/views.py:325
+#: src/postulo/accounts/views.py:332
 #, draft
 msgid "Your account and everything in it have been deleted."
 msgstr "El vostre compte i tot el que hi havia s'han esborrat."
@@ -11078,7 +11157,7 @@ msgstr "Els vostres CV"
 msgid "Your dashboard is empty"
 msgstr "El vostre tauler és buit"
 
-#: src/postulo/accounts/views.py:303 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:310 src/postulo/core/settings_sections.py:110
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -11098,12 +11177,12 @@ msgstr "El vostre termini"
 msgid "Your details"
 msgstr "Les vostres dades personals"
 
-#: src/postulo/accounts/views.py:135
+#: src/postulo/accounts/views.py:142
 #, draft
 msgid "Your details have been saved."
 msgstr "Les vostres dades s'han desat."
 
-#: src/postulo/accounts/views.py:182
+#: src/postulo/accounts/views.py:189
 #, draft
 msgid "Your Gravatar has been fetched again."
 msgstr "El vostre Gravatar s'ha tornat a baixar."
@@ -11122,6 +11201,10 @@ msgstr "La teva cerca de feina el %(period)s"
 #, draft
 msgid "Your job search, on your server."
 msgstr "La vostra cerca de feina, al vostre servidor."
+
+#: src/postulo/core/web_links.py:72
+msgid "Your LinkedIn, or wherever a recruiter should look you up."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html:34
 #, draft
@@ -11162,7 +11245,11 @@ msgstr "El vostre nom, correu i ubicació, trets del vostre perfil."
 msgid "Your own name"
 msgstr "El vostre propi nom"
 
-#: src/postulo/accounts/views.py:402
+#: src/postulo/core/web_links.py:114
+msgid "Your own site, if you have one."
+msgstr ""
+
+#: src/postulo/accounts/views.py:409
 #, draft
 msgid "Your password is set. Sign in with it."
 msgstr "La vostra contrasenya està posada. Inicieu-hi sessió."

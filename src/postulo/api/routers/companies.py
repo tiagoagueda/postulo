@@ -99,10 +99,13 @@ def patch_company(request, pk: int, payload: CompanyPatch):
     summary="Add a contact at a company",
 )
 def add_contact(request, pk: int, payload: ContactIn):
-    from postulo.core import phone_numbers
+    from postulo.core import phone_numbers, web_links
 
     company = _detail(request, pk)
     fields = payload.dict()
+    # One LinkedIn address in the payload, as there has always been, written to the row
+    # that is the contact's primary social profile now (#189).
+    linkedin = (fields.pop("linkedin_url", "") or "").strip()
     # One number in the payload, as there has always been, written to the row that holds
     # it. A client sending a number somebody here already has is told so rather than
     # silently given a contact without one.
@@ -114,4 +117,6 @@ def add_contact(request, pk: int, payload: ContactIn):
     contact = Contact.objects.create(owner=request.auth.owner, company=company, **fields)
     if number:
         phone_numbers.save_only_number(contact, request.auth.owner, number)
+    if linkedin:
+        web_links.save_only_link(contact, request.auth.owner, web_links.Kind.SOCIAL, linkedin)
     return Status(201, contact_out(contact))

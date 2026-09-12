@@ -18,7 +18,12 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from postulo.core import tables
 from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_private_file
-from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin, PhoneNumbersMixin
+from postulo.core.mixins import (
+    OwnedObjectMixin,
+    OwnerFormMixin,
+    PhoneNumbersMixin,
+    WebLinksMixin,
+)
 from postulo.core.redirects import safe_next
 
 from . import identifiers, logos
@@ -193,7 +198,7 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         )
 
     def get_context_data(self, **kwargs) -> dict:
-        from postulo.core import phone_numbers
+        from postulo.core import phone_numbers, web_links
 
         from . import structure
 
@@ -212,7 +217,7 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         context["parent"] = structure.parent_of(self.object, person)
         context["children"] = structure.children_of(self.object, person)
         context["contacts"] = self.object.contacts.select_related("department").prefetch_related(
-            "phone_numbers"
+            "phone_numbers", "web_links"
         )
         context["postings"] = (
             JobPosting.objects.for_user(person)
@@ -223,6 +228,9 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         # Decided once for the page rather than per contact: it is one answer about one
         # person, and asking it per row would be a query per row for the same answer.
         context["several_numbers"] = phone_numbers.several_allowed(person)
+        # The kinds of link this person is offered several of; a contact's other rows of
+        # a kind that is off stay unlisted, exactly as the numbers do (#189).
+        context["several_links"] = web_links.offered_kinds(person)
         context["structure_on"] = structure.structure_allowed(person)
         return context
 
@@ -437,7 +445,12 @@ class IndustryDeleteView(OwnedObjectMixin, DeleteView):
 
 
 class ContactCreateView(
-    OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, PhoneNumbersMixin, CreateView
+    OwnedObjectMixin,
+    UserFormKwargsMixin,
+    OwnerFormMixin,
+    PhoneNumbersMixin,
+    WebLinksMixin,
+    CreateView,
 ):
     model = Contact
     form_class = ContactForm
@@ -460,16 +473,22 @@ class ContactCreateView(
 
     def form_valid(self, form):
         numbers = self.get_phone_numbers()
-        if self.phone_numbers_invalid(numbers):
-            return self.render_to_response(self.get_context_data(form=form, numbers=numbers))
+        links = self.get_web_links()
+        if self.phone_numbers_invalid(numbers) or self.web_links_invalid(links):
+            return self.render_to_response(
+                self.get_context_data(form=form, numbers=numbers, links=links)
+            )
         with transaction.atomic():
             response = super().form_valid(form)
             self.save_phone_numbers(numbers, self.object)
+            self.save_web_links(links, self.object)
         messages.success(self.request, _("Contact added."))
         return response
 
 
-class ContactUpdateView(OwnedObjectMixin, UserFormKwargsMixin, PhoneNumbersMixin, UpdateView):
+class ContactUpdateView(
+    OwnedObjectMixin, UserFormKwargsMixin, PhoneNumbersMixin, WebLinksMixin, UpdateView
+):
     model = Contact
     form_class = ContactForm
     template_name = "jobs/contact_form.html"
@@ -481,11 +500,15 @@ class ContactUpdateView(OwnedObjectMixin, UserFormKwargsMixin, PhoneNumbersMixin
 
     def form_valid(self, form):
         numbers = self.get_phone_numbers()
-        if self.phone_numbers_invalid(numbers):
-            return self.render_to_response(self.get_context_data(form=form, numbers=numbers))
+        links = self.get_web_links()
+        if self.phone_numbers_invalid(numbers) or self.web_links_invalid(links):
+            return self.render_to_response(
+                self.get_context_data(form=form, numbers=numbers, links=links)
+            )
         with transaction.atomic():
             response = super().form_valid(form)
             self.save_phone_numbers(numbers, self.object)
+            self.save_web_links(links, self.object)
         return response
 
 

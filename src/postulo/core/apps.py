@@ -13,6 +13,9 @@ class CoreConfig(AppConfig):
         from postulo.plugins.employer_structure import EmployerStructureFeature
         from postulo.plugins.phone_numbers import PhoneNumbersFeature
         from postulo.plugins.postal_rules import PostalRulesFeature
+        from postulo.plugins.repositories import RepositoriesFeature
+        from postulo.plugins.social_profiles import SocialProfilesFeature
+        from postulo.plugins.websites import WebsitesFeature
 
         # Registers the dashboard widgets core owns.
         from . import widgets_builtin  # noqa: F401
@@ -22,6 +25,10 @@ class CoreConfig(AppConfig):
         registry.register_builtin("feature", PostalRulesFeature)
         # An employer as a structure rather than a single name (#138).
         registry.register_builtin("feature", EmployerStructureFeature)
+        # A person's addresses on the web, three kinds and a switch for each (#189).
+        registry.register_builtin("feature", SocialProfilesFeature)
+        registry.register_builtin("feature", RepositoriesFeature)
+        registry.register_builtin("feature", WebsitesFeature)
 
         # The contact channels Postulo already has, described by one contract (#146).
         from . import channels

@@ -23,7 +23,7 @@ from django.views.generic import CreateView, ListView, UpdateView
 
 from postulo.core.context_processors import theme_switch
 from postulo.core.files import serve_private_file
-from postulo.core.mixins import StaffRequiredMixin
+from postulo.core.mixins import StaffRequiredMixin, WebLinksMixin
 from postulo.core.redirects import safe_next
 
 from . import avatars, deletion
@@ -32,7 +32,7 @@ from .forms import InviteForm, PersonIdentifierFormSet, ProfileForm
 from .models import Invite, Profile, Theme
 
 
-class ProfileView(LoginRequiredMixin, UpdateView):
+class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
     """Edit your own details. There is no view of anyone else's."""
 
     model = Profile
@@ -107,15 +107,21 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         formset = self.get_identifiers()
         numbers = self.get_numbers()
         addresses = self.get_addresses()
+        links = self.get_web_links()
         invalid = (
             (formset.is_bound and not formset.is_valid())
             or (numbers is not None and numbers.is_bound and not numbers.is_valid())
             or (addresses.is_bound and not addresses.is_valid())
+            or self.web_links_invalid(links)
         )
         if invalid:
             return self.render_to_response(
                 self.get_context_data(
-                    form=form, identifiers=formset, numbers=numbers, addresses=addresses
+                    form=form,
+                    identifiers=formset,
+                    numbers=numbers,
+                    addresses=addresses,
+                    links=links,
                 )
             )
         with transaction.atomic():
@@ -129,6 +135,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
             if addresses.is_bound:
                 addresses.instance = self.object
                 addresses.save()
+            self.save_web_links(links, self.object)
         return self._after_saving(form, response)
 
     def _after_saving(self, form, response):

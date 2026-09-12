@@ -26,6 +26,9 @@
             {% endblocktranslate %}
           </p>
         {% endif %}
+        {% for block, count in links_kept_back %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">{{ block.kept_back_contact }}</p>
+        {% endfor %}
       </div>
       {% if form.department_suggestions %}
         <datalist id="department-suggestions">
@@ -33,6 +36,7 @@
         </datalist>
       {% endif %}
       {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
+      {% include "partials/web_links.html" %}
       <div class="flex items-center gap-3">
         <button type="submit" class="btn-primary">{% translate "Save" %}</button>
         <a href="{% url 'jobs:company_list' %}" class="btn-ghost">{% translate "Cancel" %}</a>
