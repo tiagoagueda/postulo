@@ -437,6 +437,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Escape closes a cell editor however quickly it is pressed.** The editor arrives by a
+  swap, and htmx wires what it swapped in — the Cancel button Escape clicks — only when the
+  swap settles, 20 ms later by default, while the caret is put in the input the moment it
+  lands. For those 20 ms Escape reached a button nothing was listening to, and did nothing.
+  No hand is that quick; the browser suite was, one run in three, and the flake it reported
+  was this. The handler now has htmx process the editor before clicking, a no-op once the
+  settle has done it, and a test widens the window to two seconds and presses inside it.
+  (#161)
+
 - **The image scan can now be told from its own failure.** `scripts/scan-image.sh` has three
   outcomes instead of one red step: exit 0 for nothing fixable, 1 for fixable findings, and
   2 when the scan did not complete — a scanner that failed to run, a bill of materials that

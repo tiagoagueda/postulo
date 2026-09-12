@@ -871,6 +871,16 @@
     var cancel = editor.querySelector("[hx-get]");
     if (cancel) {
       event.preventDefault();
+      // The editor arrived by a swap, and htmx wires what it swapped in -- this button's
+      // hx-get among it -- only when the swap *settles*, 20 ms later by default. Focus is
+      // put in the input the moment it lands (above), so for those 20 ms an Escape reached
+      // a Cancel that nothing was listening to, and did nothing. A hand is never that quick;
+      // a browser test is, one run in three (#161). Processing is idempotent -- htmx skips
+      // an element it has already initialised -- so this wires the button if the settle
+      // has not yet, and is a no-op if it has.
+      if (window.htmx) {
+        window.htmx.process(editor);
+      }
       cancel.click();
     }
   });

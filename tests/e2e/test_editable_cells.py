@@ -88,6 +88,27 @@ def test_escape_abandons_and_keeps_the_old_value(page: Page, live_server, applic
     assert company.name == "Aperture Science"
 
 
+def test_escape_works_before_htmx_has_wired_the_editor(page: Page, live_server, applicant):
+    """The editor arrives by a swap, and htmx wires what it swapped in -- the Cancel button
+    Escape clicks -- only when the swap *settles*, 20 ms later by default, while focus is put
+    in the input the moment it lands. For those 20 ms Escape reached a Cancel that nothing
+    was listening to, which a browser test is fast enough to hit one run in three (#161).
+
+    The window is widened to two seconds here, so the race is not a race: an Escape pressed
+    inside it must still abandon the edit.
+    """
+    page.add_init_script(
+        "document.addEventListener('DOMContentLoaded', function () {"
+        " htmx.config.defaultSettleDelay = 2000; });"
+    )
+    open_the_editor(page, live_server, applicant)
+
+    page.locator("[data-cell-editor] input:not([type=hidden])").press("Escape")
+
+    expect(page.locator("[data-cell-editor]")).to_have_count(0)
+    expect(page.locator("[data-cell-open]").first).to_contain_text("Aperture Science")
+
+
 def test_a_refusal_appears_in_the_cell_and_the_value_stays_to_be_fixed(
     page: Page, live_server, applicant
 ):
