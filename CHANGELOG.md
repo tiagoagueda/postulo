@@ -437,6 +437,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **An uploaded file downloads under its own extension.** Every download was called
+  `<title>.pdf`, whatever had been uploaded, so a `.docx` or a `.txt` arrived as a file no
+  PDF viewer would open — served as `application/pdf` too, since the type is guessed from
+  the name. The name is the title with the upload's own extension now, on the page and over
+  the API alike; a snapshot of what was sent is still `<title>.pdf`, because that is always
+  what it is. (#193)
+
 - **A file's edit form no longer shows where Postulo keeps it.** Editing an uploaded file
   said *Currently: documents/1/2026/09/reference.txt* — the storage path, carrying the
   account id and the month of the upload, inside a link to `/media/` that nothing serves. It

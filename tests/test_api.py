@@ -165,6 +165,21 @@ def test_documents_and_insights_read(client, user, search):
     assert insights["selectivity"] == 50.0
 
 
+def test_an_upload_downloads_under_its_own_extension_over_the_api(client, user):
+    """The API named every upload `<title>.pdf` as well (#193)."""
+    bearer = issue(user, "read", "documents:read")
+    upload = UploadedDocument.objects.create(
+        owner=user, title="Portfolio", kind="portfolio", file=ContentFile(b"PK", name="p.docx")
+    )
+    download = client.get(f"/api/v1/documents/upload/{upload.pk}/download", **bearer)
+    try:
+        assert download.status_code == 200
+        assert 'filename="Portfolio.docx"' in download["Content-Disposition"]
+        assert not download["Content-Type"].startswith("application/pdf")
+    finally:
+        download.close()
+
+
 # --------------------------------------------------------------------- writes
 
 

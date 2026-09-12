@@ -468,6 +468,31 @@ def test_the_edit_form_names_the_file_rather_than_where_it_is_kept(client, user,
     assert "/media/" not in html, "nothing serves /media/, so a link there is a dead one"
 
 
+def test_an_upload_downloads_as_what_it_is(client, user, db):
+    """Every download used to be called `<title>.pdf`, whatever was uploaded, so a `.txt` or
+    a `.docx` arrived as a file no PDF viewer would open -- with the content type to match,
+    since that is guessed from the name (#193)."""
+    document = UploadedDocument.objects.create(
+        owner=user, title="Reference", file=SimpleUploadedFile("reference.txt", b"a reference")
+    )
+    assert document.download_name == "Reference.txt"
+
+    client.force_login(user)
+    response = client.get(reverse("documents:upload_download", args=[document.pk]))
+    try:
+        assert response.status_code == 200
+        assert 'filename="Reference.txt"' in response["Content-Disposition"]
+        assert response["Content-Type"].startswith("text/plain")
+    finally:
+        response.close()
+
+
+def test_a_snapshot_downloads_as_a_pdf(cv, fake_backend):
+    """A render is always the PDF Postulo drew, whatever its source was called."""
+    document = snapshot_cv(cv, backend=fake_backend)
+    assert document.download_name == f"{document.title}.pdf"
+
+
 def test_a_snapshot_is_delivered_only_to_its_owner(client, user, other_user, cv, fake_backend):
     document = snapshot_cv(cv, backend=fake_backend)
 

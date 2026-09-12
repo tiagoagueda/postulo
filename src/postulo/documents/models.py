@@ -20,6 +20,7 @@ have edited eleven times since.
 from __future__ import annotations
 
 import hashlib
+import posixpath
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -450,6 +451,20 @@ class UploadedDocument(OwnedModel):
         """Whether anything supersedes this version."""
         return not self.replaced_by.exists()
 
+    @property
+    def download_name(self) -> str:
+        """What the file is called on the way out: the title, with the upload's own extension.
+
+        The extension is the one thing that tells an operating system what the bytes are,
+        and it comes from the stored name, which keeps the upload's. Every download used to
+        be called `<title>.pdf`, so a `.docx` arrived as a Word document no PDF viewer would
+        open -- served as `application/pdf` too, since the type is guessed from the name
+        (#193). The stem is the title because that is the name the person gave it; the
+        stored stem may carry the suffix Django adds to keep two uploads apart.
+        """
+        suffix = posixpath.splitext(self.file.name)[1] if self.file else ""
+        return f"{self.title}{suffix}"
+
 
 class RenderedDocument(OwnedModel):
     """A PDF exactly as it was sent, kept unchanged.
@@ -517,6 +532,11 @@ class RenderedDocument(OwnedModel):
     #: which is when the employer got it, not by when the row happened to be written.
     archive_origin = "render"
     download_url_name = "documents:rendered_download"
+
+    @property
+    def download_name(self) -> str:
+        """What the file is called on the way out. A render is always a PDF Postulo drew."""
+        return f"{self.title}.pdf"
 
     @property
     def archived_at(self):
