@@ -169,6 +169,12 @@ def test_the_chip_is_a_target_of_the_size_the_guidelines_ask_for():
 def test_nothing_names_a_side_of_the_page():
     """The × sits at the end edge, not the right. The template lint covers markup; this
     covers the stylesheet the chips are drawn with.
+
+    This used to assert `ps-3` and `pe-0.5` on `.chip`, which pinned the asymmetry rather
+    than the intent: the two pixels at the end were where the remove button went, and a
+    chip *without* one -- a CV's kind, a company's industries -- got them and nothing to
+    fill them (#185). The padding is even now and the button takes its own space back, so
+    what is worth asserting is that both are still said in logical terms.
     """
     import re
     from pathlib import Path
@@ -179,7 +185,8 @@ def test_nothing_names_a_side_of_the_page():
     )
 
     assert not re.search(r"\b(pl|pr|ml|mr)-", chips)
-    assert "ps-3" in chips and "pe-0.5" in chips
+    assert "px-3" in chips, "a chip pads both ends, so one without a button is not short"
+    assert "-me-" in chips, "and the button pulls its own end back, at the end edge"
 
 
 def test_the_script_does_not_replace_the_control_it_is_layered_over():

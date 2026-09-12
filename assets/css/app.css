@@ -275,9 +275,15 @@
    * Colours: the text sits on its own ground at 4.5:1 and the border reads against the
    * card at 3:1, in both themes. A chip that arrives as a new name is outlined rather than
    * filled, so "this one does not exist yet" is visible before anything is saved. */
+  /* Padded evenly, because most chips are only a word. Two of the three places that draw
+     one have no remove button -- a CV's kind, a company's industries -- and they used to
+     get the 2 pixels the button was meant to fill, so the text sat against the end border
+     and one caller had patched it back with `pe-3` (#185). The button takes its own space
+     back below, which is the right way round: the thing that changes the padding is the
+     thing that is there. */
   .chip {
     @apply inline-flex items-center gap-1 rounded-full border border-ink-200 bg-ink-100
-      py-0.5 ps-3 pe-0.5 text-sm text-ink-900
+      py-0.5 px-3 text-sm text-ink-900
       dark:border-ink-700 dark:bg-ink-800 dark:text-ink-100;
   }
 
@@ -290,8 +296,11 @@
     @apply truncate;
   }
 
+  /* `-me-2.5` eats most of the chip's end padding: the button is 24 pixels of its own
+     target and does not need 12 more beside it, so a chip with one looks as it always did
+     while a chip without one is no longer short of an end. */
   .chip-remove {
-    @apply flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-base
+    @apply -me-2.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-base
       leading-none text-ink-600 hover:bg-ink-200 hover:text-ink-900
       focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
       focus-visible:outline-brand-600

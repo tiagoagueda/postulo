@@ -288,6 +288,26 @@ All notable changes to Postulo are recorded here. The format follows
   Overview*, which linked to the admin as "the escape hatch", says plainly that there is not
   one and which variable turns it on, rather than linking to a 404. (#116)
 
+### 🐛 Fixed
+
+- **A chip with no remove button had almost no padding at its end.** On *Documents → CVs*
+  the kind tag sat hard against its own right edge, twelve pixels of space on one side and
+  two on the other. `.chip` was shaped around a button it did not have: the two pixels are
+  where `.chip-remove` goes, and the button supplies the visual space, so a chip holding only
+  a word got the gap and nothing to fill it. Two of the three places that draw one have no
+  button — a CV's kind and a company's industries — and the company row had already patched
+  it by hand with `pe-3`, which is the sort of workaround that says the class is wrong rather
+  than the caller.
+
+  So the class changed rather than the third caller: a chip pads both ends, and the remove
+  button pulls its own end back with `-me-2.5`. A chip with a button looks exactly as it did;
+  one without is no longer short of an end; and the fourth caller will be right without
+  knowing any of this. The company row's `pe-3` is gone.
+
+  The test that guarded this pinned `ps-3` and `pe-0.5`, which is to say it pinned the
+  asymmetry rather than the intent — its own docstring says the intent is that the × sits at
+  the end edge and not the right. It now asserts that, and that a chip pads both ends. (#185)
+
 ### 🔧 Changed
 
 - **Server overview: the card at the bottom has lost its heading.** It said *Also*, which
