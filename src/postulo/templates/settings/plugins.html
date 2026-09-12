@@ -44,7 +44,9 @@
                      class="tap-target font-medium {% if not row.theirs %}text-ink-500 dark:text-ink-400{% endif %}">
                 {{ row.label }}
               </label>
-              <span class="ms-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{{ row.kind }}</span>
+              <span class="ms-1 inline-flex flex-wrap items-center gap-1">
+                {% include "partials/plugin_tags.html" with kind_label=row.kind_label kind_tone=row.kind_tone provenance=row.provenance provenance_label=row.provenance_label provenance_explanation=row.provenance_explanation %}
+              </span>
               {% if row.description %}
                 <p class="text-xs text-ink-500 dark:text-ink-400">{{ row.description }}</p>
               {% endif %}

@@ -1,0 +1,25 @@
+{% load i18n %}
+{% comment %} A plugin's kind, and where it came from, drawn the same way on both pages that
+   draw them — a person's Settings → Plugins and an administrator's Server → Plugins. They
+   were identical grey pills side by side, so nothing said that *importer* and *official*
+   answer different questions, and the kind was the untranslated slug (#184).
+
+   The kind takes colour because it is a category from a small fixed set. The origin stays
+   grey because it is a fact and not a rating, which `server/plugins.html` has said since
+   #94: installing a plugin runs somebody else's code whatever the tag says, and a green
+   *Official* badge would read as a reassurance nobody can give.
+
+   Both tags carry their own word, so colour is never the only carrier.
+
+   Takes `kind_label`, `kind_tone`, and optionally `provenance`, `provenance_label` and
+   `provenance_explanation`. A plugin with no provenance — nothing said where it came from —
+   draws no origin tag rather than an empty one.
+{% endcomment %}
+{% if kind_label %}
+  <span class="tag {{ kind_tone }}">{{ kind_label }}</span>
+{% endif %}
+{% if provenance_label %}
+  <span class="tag tag-grey"
+        data-provenance="{{ provenance }}"
+        title="{{ provenance_explanation }}">{{ provenance_label }}</span>
+{% endif %}

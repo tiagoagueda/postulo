@@ -287,6 +287,45 @@
       dark:border-ink-700 dark:bg-ink-800 dark:text-ink-100;
   }
 
+  /* A small pill naming a category, on the two plugin pages (#184). Distinct from `.chip`,
+     which is a removable token in a field: a tag is read, never dismissed, so it has no
+     button and pads evenly.
+
+     Every tone reaches 4.5:1 against its own ground in both themes, and the word inside is
+     what a screen reader announces -- the colour is a second signal for people scanning a
+     list, never the only one. `tag-grey` is where a plugin came from, deliberately plain. */
+  .tag {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+
+  .tag-grey {
+    @apply bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-300;
+  }
+
+  .tag-blue {
+    @apply bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200;
+  }
+
+  .tag-amber {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200;
+  }
+
+  .tag-violet {
+    @apply bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200;
+  }
+
+  .tag-teal {
+    @apply bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-200;
+  }
+
+  .tag-green {
+    @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200;
+  }
+
+  .tag-rose {
+    @apply bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-200;
+  }
+
   .chip-new {
     @apply border-dashed border-brand-500 bg-transparent text-brand-700
       dark:border-brand-400 dark:text-brand-300;

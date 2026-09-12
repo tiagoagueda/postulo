@@ -288,6 +288,30 @@ All notable changes to Postulo are recorded here. The format follows
   Overview*, which linked to the admin as "the escape hatch", says plainly that there is not
   one and which variable turns it on, rather than linking to a 404. (#116)
 
+### 🔧 Changed
+
+- **A plugin's kind and where it came from no longer wear the same badge, and the kind is a
+  word in your language.** Both pages that list plugins drew two different facts as
+  identical grey pills side by side, so nothing said that *importer* and *official* answer
+  different questions — and the kind was the raw slug, so a French reader was shown "source"
+  and "feature" in English. The person's own *Settings → Plugins* did not show where a plugin
+  came from at all, which is the page where it matters most.
+
+  The kind now takes colour, because it is a category from a small fixed set and colour is
+  what makes eight of them scannable in a list. **Where it came from stays grey**, and that
+  is not a default: `server/plugins.html` has said since #94 that provenance is *"deliberately
+  not styled as a reassurance — installing a plugin runs somebody else's code whatever this
+  says"*, and a green *Official* badge would undo that sentence. Both pages now draw both
+  tags through one partial, so they cannot drift apart again, and the origin appears on the
+  settings page for the first time.
+
+  Colour is never the only carrier: every tag says its own word, each tone reaches 4.5:1
+  against its own ground in both themes, and the palette repeats across the eight kinds on
+  purpose — eight hues told apart at a glance is more than a palette honestly gives, so kinds
+  rarely seen together share one and lean on the word. A kind this version does not know
+  shows its slug in the neutral tone rather than nothing, because a third-party plugin may
+  declare one added after this release. (#184)
+
 ### 🐛 Fixed
 
 - **Dragging worked in Chromium and did nothing in Firefox, and the tests agreed with

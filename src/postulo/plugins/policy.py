@@ -192,8 +192,13 @@ def overview(person) -> list[dict]:
     forced off is included, because being told it was switched off for you is the whole
     difference between the two states.
     """
-    from . import base
+    from . import base, installing, kinds
     from .registry import plugins
+
+    # Where each plugin came from, read once for the whole page rather than per row: the
+    # answer for an installed one involves the record and the repositories' checksums, and
+    # asking eight times would ask eight times (#184).
+    marks = {row["name"]: row for row in installing.status()}
 
     rows = []
     for kind in GOVERNED_KINDS:
@@ -201,12 +206,18 @@ def overview(person) -> list[dict]:
             decision = decide(plugin.name, person)
             if not decision.offered:
                 continue
+            mark = marks.get(plugin.name, {})
             rows.append(
                 {
                     "name": plugin.name,
                     "label": base.label_of(plugin),
                     "description": base.description_of(plugin),
                     "kind": kind,
+                    "kind_label": kinds.label_for(kind),
+                    "kind_tone": kinds.tone_for(kind),
+                    "provenance": mark.get("provenance", ""),
+                    "provenance_label": mark.get("provenance_label", ""),
+                    "provenance_explanation": mark.get("provenance_explanation", ""),
                     "on": decision.on,
                     "theirs": decision.theirs,
                     "why": decision.explain(),

@@ -201,10 +201,11 @@
                 {% comment %} Where it came from, derived rather than declared: an upload
                    is named as a repository's only when its checksum matches what that
                    repository signed. Deliberately not styled as a reassurance -- installing
-                   a plugin runs somebody else's code whatever this says (#94). {% endcomment %}
-                <span class="ms-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300"
-                      data-provenance="{{ plugin.provenance }}"
-                      title="{{ plugin.provenance_explanation }}">{{ plugin.provenance_label }}</span>
+                   a plugin runs somebody else's code whatever this says (#94) -- which is
+                   why it stays grey while a kind takes colour (#184). {% endcomment %}
+                <span class="ms-2 inline-flex flex-wrap items-center gap-1">
+                  {% include "partials/plugin_tags.html" with provenance=plugin.provenance provenance_label=plugin.provenance_label provenance_explanation=plugin.provenance_explanation %}
+                </span>
               </p>
               <p class="text-xs text-ink-500 dark:text-ink-400">
                 {{ plugin.provenance_explanation }}
