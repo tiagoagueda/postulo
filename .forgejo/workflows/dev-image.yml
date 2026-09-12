@@ -23,10 +23,10 @@
 # image. #155 and #157 were both found in an image built and published without one, and a
 # gate skipped "just for dev" is not a gate.
 #
-# **Native architecture only**, unlike the release. The release builds `linux/arm64` through
-# QEMU binfmt, which is slow and one more thing on the host that fails confusingly when it
-# is missing. A dev image exists to try a change on; whoever needs it on another
-# architecture is doing something a release should be doing.
+# **Two architectures, like the release**, and for a concrete reason: the instance these
+# images are run on is a Raspberry Pi. An amd64-only dev image is one nobody can deploy,
+# which would leave the channel building something to look at rather than something to run.
+# QEMU binfmt is registered on the runner, so `linux/arm64` costs time and nothing else.
 name: Dev image
 
 on:
@@ -99,14 +99,16 @@ jobs:
       - name: Scan it, with both scanners
         run: ./scripts/scan-image.sh postulo:dev-scan
 
-      - name: Push it
+      # The scan above read the native build; this rebuilds for both architectures and
+      # pushes. buildx reuses the layers, so the arm64 half is the only new work.
+      - name: Build for amd64 and arm64 and push
         env:
           TAGS: ${{ steps.tags.outputs.tags }}
         run: |
-          for tag in $(echo "$TAGS" | tr ',' ' '); do
-            docker tag postulo:dev-scan "$tag"
-            docker push "$tag"
-          done
+          docker buildx create --use --name postulo-dev >/dev/null 2>&1 || docker buildx use postulo-dev
+          tags=""
+          for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
+          docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
 
       # What was built, and from what. A dev tag moves, so the commit is the only thing that
       # identifies what somebody is running.

@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import datetime as dt
 import hashlib
+import importlib.util
 import json
 import logging
 import re
@@ -384,10 +385,30 @@ def check(info: PackageInfo) -> None:
 
 
 def installer() -> list[str]:
-    """The command that installs, preferring uv where the image put it."""
+    """The command that installs, preferring uv where the image put it.
+
+    The pip branch is for an ordinary installation -- a `pip install postulo` on somebody's
+    server, where pip is certainly there and uv may not be. **The container has no pip**
+    since #190: it carries uv deliberately, and the copy pip vendors for its own cache was
+    the only fixable High the image scan could find. So in the image this always takes the
+    first branch, and outside it always takes whichever exists.
+
+    Neither is a real state -- a stripped image somebody built themselves -- and it used to
+    produce `No module named pip` from a subprocess, which says nothing about what to do.
+    """
     uv = shutil.which("uv")
     if uv:
         return [uv, "pip", "install", "--python", sys.executable]
+    if importlib.util.find_spec("pip") is None:
+        raise InstallError(
+            str(
+                _(
+                    "Nothing here can install a plugin: this environment has neither uv nor "
+                    "pip. Postulo's own image ships uv; an image built without it needs one "
+                    "of the two on the path."
+                )
+            )
+        )
     return [sys.executable, "-m", "pip", "install", "--disable-pip-version-check"]
 
 

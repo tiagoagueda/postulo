@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 12:35+0000\n"
+"POT-Creation-Date: 2026-09-12 13:49+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -259,14 +259,14 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s vėl gali prisijungti."
 
-#: src/postulo/plugins/installing.py:371
+#: src/postulo/plugins/installing.py:372
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s nedeklaruoja jokio Postulo įėjimo taško, tad jo įdiegimas nieko neduotų. Papildinys registruojasi vienoje iš: %(groups)s."
 
-#: src/postulo/plugins/installing.py:462
+#: src/postulo/plugins/installing.py:483
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s neatitinka kontrolinės sumos, su kuria buvo paskelbtas."
@@ -286,12 +286,12 @@ msgstr "%(name)s nebėra: paskyra, jos įrašai ir %(files)s failų diske."
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s nebėra administratorius."
 
-#: src/postulo/plugins/installing.py:541 src/postulo/plugins/installing.py:612
+#: src/postulo/plugins/installing.py:562 src/postulo/plugins/installing.py:633
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s neįdiegtas."
 
-#: src/postulo/plugins/installing.py:361
+#: src/postulo/plugins/installing.py:362
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -337,12 +337,12 @@ msgid ""
 msgstr ""
 "%(name)s yra kalba, kuria pradedama nauja paskyra, todėl jos negalima nustoti siūlyti. Pirmiausia pakeiskite numatytąją kalbą."
 
-#: src/postulo/plugins/installing.py:537
+#: src/postulo/plugins/installing.py:558
 #, python-format, draft
 msgid "%(name)s ships inside Postulo and cannot be removed."
 msgstr "%(name)s yra Postulo dalis ir jo pašalinti negalima."
 
-#: src/postulo/plugins/installing.py:599
+#: src/postulo/plugins/installing.py:620
 #, python-format, draft
 msgid ""
 "%(name)s ships inside Postulo. Switch it off under Server settings → Plugins instead."
@@ -356,7 +356,7 @@ msgid ""
 msgstr ""
 "%(name)s prisijungia kaip <strong>%(current)s</strong>. Naujas naudotojo vardas šioje instancijoje turi būti laisvas; didžiosios raidės jo neskiria."
 
-#: src/postulo/plugins/installing.py:381
+#: src/postulo/plugins/installing.py:382
 #, python-format, draft
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s pakeistų tai, nuo ko priklauso pats Postulo. %(problems)s"
@@ -382,7 +382,7 @@ msgstr "%(ok)d atsakė, %(broken)d ne; tos, kurios neatsakė, pasako kodėl."
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:347
+#: src/postulo/plugins/installing.py:348
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: reikia %(wanted)s, o Postulo turi %(have)s."
@@ -5810,6 +5810,11 @@ msgstr ""
 msgid "Nothing here"
 msgstr "Čia nieko nėra"
 
+#: src/postulo/plugins/installing.py:405
+msgid ""
+"Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
+msgstr ""
+
 #: src/postulo/templates/jobs/industry_list.html:78
 #, draft
 msgid ""
@@ -8941,7 +8946,7 @@ msgstr "Tai SVG, kurio Postulo dar nelaiko. Tinka PNG arba JPEG."
 msgid "That is not a status Postulo recognises."
 msgstr "Tai ne būsena, kurią Postulo atpažįsta."
 
-#: src/postulo/plugins/installing.py:246
+#: src/postulo/plugins/installing.py:247
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Tai ne wheel: Postulo diegia .whl failus."
@@ -9236,12 +9241,12 @@ msgstr "Failas tuščias."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Failas didesnis nei 2 MB. Darbo paieška ne tokia didelė."
 
-#: src/postulo/plugins/installing.py:440
+#: src/postulo/plugins/installing.py:461
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "Nepavyko paleisti diegimo programos: %(error)s"
 
-#: src/postulo/plugins/installing.py:444
+#: src/postulo/plugins/installing.py:465
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "Diegimo programa jį atmetė: %(error)s"
@@ -9531,7 +9536,7 @@ msgstr "Viršutinis skaičius negali būti mažesnis už apatinį."
 msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr "Wheel neatitinka kontrolinės sumos, kurią katalogas jam paskelbė."
 
-#: src/postulo/plugins/installing.py:251
+#: src/postulo/plugins/installing.py:252
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Wheel neturi metaduomenų; jis gali būti sugadintas."

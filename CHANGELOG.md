@@ -349,6 +349,21 @@ All notable changes to Postulo are recorded here. The format follows
   shell and the daemon share a filesystem. Trivy writes to stdout now, which grype already
   did, and both mounts are gone.
 
+  **The first scan then found something real, and it is gone.** The only fixable High in
+  the image was `msgpack` 1.1.2 — **pip's vendored copy**, arriving with
+  `python:3.14-slim-bookworm`. Not in `uv.lock`, not in the virtual environment, not
+  importable by Postulo, so no dependency bump reached it. **pip is removed from the
+  runtime image**: nothing there needs it, because `plugins/installing.py` prefers `uv`,
+  which the image already carries deliberately. The pip branch of `installer()` stays — it
+  is the right answer for an ordinary `pip install postulo` on somebody's server — and it
+  now says plainly what is wrong if it ever finds neither, instead of producing
+  *No module named pip* from a subprocess.
+
+  **The dev image builds for arm64 as well**, reversing the native-only decision above for
+  a concrete reason: the instance these images are run on is a Raspberry Pi, and an
+  amd64-only dev image is one nobody can deploy. QEMU binfmt is registered on the runner, so
+  the second architecture costs time and nothing else.
+
   Four faults, none of them in this workflow, all of them in the release path, and all
   found by the simple act of running it. That is what a channel nobody had ever exercised
   was hiding — and two of them needed only a file to be *read*, not run, so

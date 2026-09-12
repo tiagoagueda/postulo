@@ -211,6 +211,20 @@ RUN POSTULO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe
     POSTULO_ALLOWED_HOSTS=localhost \
     python manage.py collectstatic --noinput --clear
 
+# The interpreter's own pip goes, and it is a security decision rather than slimming
+# (#190). pip vendors a copy of msgpack for its HTTP cache, and that copy -- 1.1.2, from
+# the base image -- was the **only fixable High** the first container scan could find. It
+# is not in `uv.lock`, not in the virtual environment and not importable by Postulo, so no
+# dependency bump reaches it; the package simply arrives with `python:3.14-slim-bookworm`
+# and carries whatever its vendored tree carries.
+#
+# Nothing here needs it. `plugins/installing.py` prefers `uv`, which this image copies in
+# deliberately a few lines above, and uv is a standalone binary that installs a plugin
+# without pip present. The pip branch of `installer()` stays, because it is the right
+# answer for an ordinary `pip install postulo` on somebody's server -- it is simply never
+# taken in this image. `installer()` now says so plainly if it ever finds neither.
+RUN python -m pip uninstall -y pip     && rm -rf /usr/local/lib/python3.14/site-packages/pip               /usr/local/lib/python3.14/site-packages/pip-*.dist-info     && python -c "import importlib.util, sys; sys.exit(importlib.util.find_spec('pip') is not None)"     && uv --version
+
 COPY docker/entrypoint.sh /usr/local/bin/postulo-entrypoint
 RUN chmod +x /usr/local/bin/postulo-entrypoint \
     && useradd --system --create-home --uid 1000 postulo \
