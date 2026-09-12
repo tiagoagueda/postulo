@@ -326,6 +326,13 @@ All notable changes to Postulo are recorded here. The format follows
   `REGISTRY_HOST` repository variable and fall back to the server URL with either scheme
   stripped.
 
+  **And a second one: the shell scripts were not executable.** `scripts/scan-image.sh` and
+  `scripts/check-image.sh` were recorded as `100644`, so `./scripts/scan-image.sh` — which
+  is how `CONTRIBUTING.md` tells a person to run it, and how both image workflows call it —
+  failed with *Permission denied* on any Linux checkout. They were written on a machine with
+  `core.fileMode false`, so the bit was never recorded and nothing that ran them had ever
+  run from a fresh clone.
+
   `CONTRIBUTING.md` § *Giving a runner the `docker` label* said to declare `docker:host` and
   **was wrong** for a containerised runner: `host` runs the job inside the runner container,
   which is Alpine with no node and no docker CLI, so `actions/checkout` fails before
