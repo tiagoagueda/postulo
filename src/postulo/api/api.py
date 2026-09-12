@@ -29,6 +29,7 @@ from ninja.errors import HttpError, ValidationError
 from pydantic import ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
 
+from postulo.jobs.known import known
 from postulo.jobs.models import Capture, CaptureStatus
 from postulo.notifications.base import Notification
 from postulo.notifications.service import notify
@@ -137,6 +138,46 @@ class PreviewOut(Schema):
     url: str
     source: str
     data: JobPostingData
+
+
+class KnownQueryIn(Schema):
+    """One posting to ask about: its address, and its title at its company."""
+
+    url: str = Field(max_length=500)
+    title: str = Field(default="", max_length=250)
+    company: str = Field(default="", max_length=250)
+
+
+class KnownIn(Schema):
+    """Postings to ask about together -- one for a popup, forty for a results page."""
+
+    postings: list[KnownQueryIn] = Field(max_length=100)
+
+
+class KnownListingOut(Schema):
+    id: int
+    title: str
+    company_name: str
+    url: str
+    state: str
+    created_at: dt.datetime
+    listing_url: str
+
+
+class KnownCaptureOut(Schema):
+    id: int
+    title: str
+    created_at: dt.datetime
+    review_url: str
+
+
+class KnownOut(Schema):
+    """What the owner already holds for one address: told, so they can decide (#178)."""
+
+    url: str
+    listings: list[KnownListingOut]
+    captures: list[KnownCaptureOut]
+    similar: list[KnownListingOut]
 
 
 class CaptureOut(Schema):
@@ -319,6 +360,59 @@ def list_captures(request):
     token: ApiToken = request.auth
     captures = Capture.objects.for_user(token.owner).filter(status=CaptureStatus.PENDING)[:50]
     return [_as_output(request, capture) for capture in captures]
+
+
+@api.post(
+    "/captures/known",
+    response=list[KnownOut],
+    auth=scope("captures"),
+    tags=["captures"],
+    summary="Ask whether postings have been captured before",
+)
+def known_captures(request, payload: KnownIn):
+    """Say what the owner already holds for each posting, and store nothing.
+
+    For a client that would rather tell the person before sending than show them a
+    duplicate afterwards: a listing at that address however it was spelled, a capture of it
+    still waiting for review, and -- more softly -- a listing with that title at that
+    company, which is how a board that mints a fresh address per visit hides a duplicate.
+    Nothing is refused on the strength of it; the answer is theirs (#178).
+    """
+    owner = request.auth.owner
+
+    def listing(posting) -> dict:
+        return {
+            "id": posting.pk,
+            "title": posting.title,
+            "company_name": posting.company.name,
+            "url": posting.url,
+            "state": posting.state,
+            "created_at": posting.created_at,
+            "listing_url": request.build_absolute_uri(posting.get_absolute_url()),
+        }
+
+    def waiting(capture) -> dict:
+        return {
+            "id": capture.pk,
+            "title": capture.data.get("title", ""),
+            "created_at": capture.created_at,
+            "review_url": request.build_absolute_uri(
+                reverse("jobs:capture_review", args=[capture.pk])
+            ),
+        }
+
+    answers = []
+    for asked in payload.postings:
+        seen = known(owner, asked.url, asked.title, asked.company)
+        answers.append(
+            {
+                "url": asked.url,
+                "listings": [listing(posting) for posting in seen.listings],
+                "captures": [waiting(capture) for capture in seen.captures],
+                "similar": [listing(posting) for posting in seen.similar],
+            }
+        )
+    return answers
 
 
 api.add_router("/applications", applications.router)

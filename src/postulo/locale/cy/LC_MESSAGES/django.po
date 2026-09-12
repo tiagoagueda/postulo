@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Cymraeg\n"
@@ -589,8 +589,14 @@ msgid ""
 msgstr ""
 "Dim ond y cyntaf sydd ei angen ar estyniad porwr. Rhowch ddarllen yn unig i asiant nes i chi ymddiried ynddo i ysgrifennu."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -645,6 +651,11 @@ msgstr "Llinell o dan yr enw ar y dudalen fewngofnodi. Dewisol."
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr ""
 "Llinell pan fydd ategyn yn meddwl bod rhywbeth wedi digwydd ac yn aros amdanoch."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1329,7 +1340,7 @@ msgstr "Crëwyd y cais"
 msgid "Application deleted."
 msgstr "Dilëwyd y cais."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Cofnodwyd y cais o'r ddalfa."
@@ -1763,7 +1774,7 @@ msgid ""
 msgstr ""
 "Daliwch hysbyseb o'i chyfeiriad, neu ychwanegwch un â llaw, a bydd yn aros amdanoch yma."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Taflwyd y ddalfa."
@@ -1778,7 +1789,7 @@ msgstr "Dal hysbysebion"
 msgid "Capture sources this instance has"
 msgstr "Ffynonellau dal sydd gan y gosodiad hwn"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1788,7 +1799,7 @@ msgstr ""
 msgid "captured from"
 msgstr "daliwyd o"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Daliwyd: %(title)s"
@@ -2819,7 +2830,7 @@ msgstr "ID cyfeiriadur (tenant)"
 msgid "Discard"
 msgstr "Taflu"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Taflu'r ddalfa hon"
@@ -3966,7 +3977,7 @@ msgid "How this instance works, rather than a choice anybody holds."
 msgstr ""
 "Sut mae'r gosodiad hwn yn gweithio, yn hytrach na dewis y mae rhywun yn berchen arno."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Sut mae hyn yn gweithio"
@@ -3987,7 +3998,7 @@ msgstr "Pa bynnag ffordd y mae'n well gennych grwpio'ch chwiliad."
 msgid "Hybrid"
 msgstr "Hybrid"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Rwyf eisoes wedi gwneud cais am hon"
@@ -4616,7 +4627,7 @@ msgstr "Ieithoedd y mae’r cofnod hwn yn eu siarad"
 msgid "Languages this instance offers"
 msgstr "Ieithoedd y mae'r gosodiad hwn yn eu cynnig"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4703,7 +4714,7 @@ msgstr "defnyddiwyd ddiwethaf"
 msgid "last worked"
 msgstr "gweithiodd ddiwethaf"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Yn nes ymlaen"
@@ -5170,7 +5181,7 @@ msgid "Mobile"
 msgstr "Symudol"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5923,7 +5934,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Nid oes dim wedi'i osod y gall person gael barn amdano."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Ni chaiff dim ei gadw nes i chi ei adolygu."
@@ -5990,12 +6001,12 @@ msgstr "Dim byd wedi'i gofnodi ar gyfer y cais hwn eto."
 msgid "Nothing recorded yet."
 msgstr "Dim byd wedi'i gofnodi eto."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Ni chanfuwyd dim byd tebyg i hysbyseb swydd ar y dudalen honno."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Ni chanfuwyd dim byd tebyg i hysbyseb swydd yno."
@@ -6293,7 +6304,7 @@ msgstr[2] ""
 msgstr[3] ""
 "Cedwir %(counter)s rhif arall ar gyfer y cyswllt hwn heb eu dangos, am fod <em>Sawl rhif ffôn</em> wedi'i ddiffodd."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr "Nôlir un dudalen — yr un a gludoch. Nid yw Postulo yn cropian byth."
@@ -6415,6 +6426,11 @@ msgid ""
 msgstr ""
 "Ceisiadau agored heb glywed dim, a'r tri pheth y gellir eu gwneud am hynny."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6426,7 +6442,7 @@ msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
 "Dewisol. Os caiff ei osod, dim ond y cyfeiriad hwn a gaiff ddefnyddio'r gwahoddiad."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6532,7 +6548,7 @@ msgstr "Pecyn"
 msgid "Page %(current)s of %(total)s"
 msgstr "Tudalen %(current)s o %(total)s"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Cod y dudalen"
@@ -6895,7 +6911,7 @@ msgstr "hysbyseb"
 msgid "Posting"
 msgstr "Hysbyseb"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Cyfeiriad yr hysbyseb"
@@ -6957,7 +6973,7 @@ msgid ""
 msgstr ""
 "Mae Postulo yn nôl y llun ar gyfer eich prif gyfeiriad o gravatar.com unwaith, yn cadw copi, ac yn dangos hwnnw. Ni nôlir dim wrth i dudalennau gael eu gweld. Dad-diciwch ef a chaiff y copi ei ddileu."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Mae Postulo yn nôl yr un dudalen hon, a dim byd arall."
@@ -7031,6 +7047,10 @@ msgid ""
 msgstr ""
 "Pwyswch «Chwilio am ddiweddariadau» i nôl yr hyn y mae'r catalogau'n ei gynnig. Nid yw Postulo yn eu nôl ohono'i hun."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -7067,7 +7087,7 @@ msgstr "Blaenoriaeth"
 msgid "priority"
 msgstr "blaenoriaeth"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Gwrthodir cyfeiriadau preifat a lleol."
@@ -7299,7 +7319,7 @@ msgstr ""
 msgid "Read it"
 msgstr "Ei ddarllen"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Darllen y dudalen"
@@ -7836,7 +7856,7 @@ msgstr "Cadwch hwn yn gyntaf, yna dewch yn ôl a chytuno."
 msgid "Save to add another identifier."
 msgstr "Cadwch i ychwanegu dynodydd arall."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Cadw i'r hysbysebion"
@@ -7846,7 +7866,7 @@ msgstr "Cadw i'r hysbysebion"
 msgid "Saved in %(language)s."
 msgstr "Cadwyd yn %(language)s."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Cadwyd i'ch hysbysebion. Penderfynwch amdani pan fyddwch yn barod."
@@ -8467,7 +8487,7 @@ msgstr ""
 msgid "source version"
 msgstr "fersiwn yn y ffynhonnell"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Ffynonellau wedi'u gosod"
@@ -9329,7 +9349,7 @@ msgstr "Mae'r ffeil yn wag."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Mae'r ffeil dros 2 MB. Nid yw chwiliad am waith mor fawr â hynny."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9498,7 +9518,7 @@ msgid "the posting"
 msgstr "yr hysbyseb"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9534,7 +9554,7 @@ msgstr ""
 "Mae gweddill y ffeil yn dal yn werth ei mewnforio. Nid yw'r hyn a restrir yma, a gallwch ei ychwanegu â llaw wedyn."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9587,12 +9607,12 @@ msgid ""
 msgstr ""
 "Gwrthododd y safle y cais (%(status)s). Mae safleoedd mawr yn aml y tu ôl i amddiffyniad rhag botiau sy'n troi popeth nad yw'n borwr i ffwrdd, hyd yn oed pan fo'r dudalen yn berffaith weladwy i chi. Gludwch god y dudalen isod yn lle hynny."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Mae'r safle'n gwrthod Postulo, neu mae angen mewngofnodi ar yr hysbyseb"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "Parchir robots.txt y safle."
@@ -9720,6 +9740,12 @@ msgstr "Gall y cofnodion hyn enwi pobl a'u ceisiadau."
 #, draft
 msgid "They did not show up"
 msgstr "Ni ddaethon nhw"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9866,7 +9892,7 @@ msgstr "Drwy %(provider)s: gofynnir am god hefyd."
 msgid "Tick rows to act on several at once."
 msgstr "Ticiwch resi i weithredu ar sawl un ar unwaith."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -10062,7 +10088,7 @@ msgstr "Dilysu dau ffactor"
 msgid "Type at least two characters."
 msgstr "Teipiwch o leiaf ddau nod."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Teipiwch ef i mewn yn lle hynny"

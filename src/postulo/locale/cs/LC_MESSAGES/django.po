@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: čeština\n"
@@ -564,8 +564,14 @@ msgid ""
 msgstr ""
 "Rozšíření prohlížeče potřebuje jen první. Agentovi dejte jen čtení, dokud mu nebudete věřit zápis."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -619,6 +625,11 @@ msgstr "Řádek pod názvem na přihlašovací stránce. Nepovinné."
 #, draft
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr "Řádek, když si zásuvný modul myslí, že se něco stalo, a čeká na vás."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1296,7 +1307,7 @@ msgstr "Žádost vytvořena"
 msgid "Application deleted."
 msgstr "Žádost smazána."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Žádost zaznamenána ze zachycení."
@@ -1729,7 +1740,7 @@ msgid ""
 msgstr ""
 "Zachyťte inzerát z jeho adresy, nebo ho přidejte ručně, a bude tu na vás čekat."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Zachycení zahozeno."
@@ -1744,7 +1755,7 @@ msgstr "Zachytávat inzeráty"
 msgid "Capture sources this instance has"
 msgstr "Zdroje zachytávání této instance"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1754,7 +1765,7 @@ msgstr ""
 msgid "captured from"
 msgstr "zachyceno z"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Zachyceno: %(title)s"
@@ -2783,7 +2794,7 @@ msgstr "ID adresáře (tenanta)"
 msgid "Discard"
 msgstr "Zahodit"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Zahodit toto zachycení"
@@ -3924,7 +3935,7 @@ msgstr ""
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "Jak tato instance funguje, nikoli volba, která by komukoli náležela."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Jak to funguje"
@@ -3944,7 +3955,7 @@ msgstr "Jak si chcete své hledání seskupit."
 msgid "Hybrid"
 msgstr "Hybridní"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Sem už jsem se hlásil(a)"
@@ -4572,7 +4583,7 @@ msgstr "Jazyky, kterými tento záznam mluví"
 msgid "Languages this instance offers"
 msgstr "Jazyky, které tato instalace nabízí"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4659,7 +4670,7 @@ msgstr "naposledy použito"
 msgid "last worked"
 msgstr "naposledy fungovalo"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Později"
@@ -5123,7 +5134,7 @@ msgid "Mobile"
 msgstr "Mobil"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5875,7 +5886,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Není nainstalováno nic, k čemu by osoba mohla mít názor."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Nic se neuloží, dokud to nezkontrolujete."
@@ -5940,12 +5951,12 @@ msgstr "K této žádosti zatím nic zaznamenáno."
 msgid "Nothing recorded yet."
 msgstr "Zatím nic zaznamenáno."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Na té stránce nebylo nalezeno nic, co by připomínalo pracovní inzerát."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Tam nebylo nalezeno nic, co by připomínalo pracovní inzerát."
@@ -6234,7 +6245,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Ještě %(counter)s čísel se pro tento kontakt drží a nezobrazuje, protože <em>Několik telefonních čísel</em> je vypnuto."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr ""
@@ -6351,6 +6362,11 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Otevřené přihlášky bez odezvy a tři věci, které se s tím dají dělat."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6361,7 +6377,7 @@ msgstr "Volná místa"
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Nepovinné. Pokud je nastaveno, pozvánku může použít jen tato adresa."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6467,7 +6483,7 @@ msgstr "Balíček"
 msgid "Page %(current)s of %(total)s"
 msgstr "Stránka %(current)s z %(total)s"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Zdrojový kód stránky"
@@ -6829,7 +6845,7 @@ msgstr "inzerát"
 msgid "Posting"
 msgstr "Inzerát"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Adresa inzerátu"
@@ -6891,7 +6907,7 @@ msgid ""
 msgstr ""
 "Postulo jednou načte obrázek pro vaši hlavní adresu z gravatar.com, uchová kopii a tu zobrazuje. Při prohlížení stránek se nic nestahuje. Odškrtněte a kopie se smaže."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo načte tuto jedinou stránku a nic jiného."
@@ -6965,6 +6981,10 @@ msgid ""
 msgstr ""
 "Stiskněte „Zkontrolovat aktualizace“ a stáhne se, co katalogy nabízejí. Postulo je samo nestahuje."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -7001,7 +7021,7 @@ msgstr "Priorita"
 msgid "priority"
 msgstr "priorita"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Soukromé a místní adresy jsou odmítány."
@@ -7229,7 +7249,7 @@ msgstr "Číst vše: žádosti, nabídky, firmy, dokumenty, přehledy"
 msgid "Read it"
 msgstr "Přečíst ho"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Přečíst stránku"
@@ -7763,7 +7783,7 @@ msgstr "Nejprve to uložte, pak se vraťte a souhlaste."
 msgid "Save to add another identifier."
 msgstr "Uložte, chcete-li přidat další identifikátor."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Uložit do nabídek"
@@ -7773,7 +7793,7 @@ msgstr "Uložit do nabídek"
 msgid "Saved in %(language)s."
 msgstr "Uloženo v jazyce %(language)s."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Uloženo do vašich nabídek. Rozhodněte se, až budete připraveni."
@@ -8391,7 +8411,7 @@ msgstr ""
 msgid "source version"
 msgstr "verze zdroje"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Nainstalované zdroje"
@@ -9247,7 +9267,7 @@ msgstr "Soubor je prázdný."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Soubor má přes 2 MB. Hledání práce není tak velké."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9413,7 +9433,7 @@ msgid "the posting"
 msgstr "inzerát"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9449,7 +9469,7 @@ msgstr ""
 "Zbytek souboru stojí za import. To, co je uvedeno zde, ne, a můžete to poté doplnit ručně."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9500,12 +9520,12 @@ msgid ""
 msgstr ""
 "Web požadavek odmítl (%(status)s). Velké weby často sedí za ochranou proti botům, která odmítá vše, co není prohlížeč, i když je stránka pro vás dokonale viditelná. Vložte místo toho níže zdrojový kód stránky."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Web Postulo odmítá, nebo inzerát vyžaduje přihlášení"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "robots.txt webu je respektován."
@@ -9629,6 +9649,12 @@ msgstr "Tyto záznamy mohou jmenovat osoby a jejich přihlášky."
 #, draft
 msgid "They did not show up"
 msgstr "Nedostavili se"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9772,7 +9798,7 @@ msgstr "Přes %(provider)s: budete požádáni také o kód."
 msgid "Tick rows to act on several at once."
 msgstr "Zaškrtněte řádky, abyste s několika naložili najednou."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -9968,7 +9994,7 @@ msgstr "Dvoufázové ověření"
 msgid "Type at least two characters."
 msgstr "Zadejte alespoň dva znaky."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Zadat ručně místo toho"

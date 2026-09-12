@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-08 10:23+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: українська\n"
@@ -569,8 +569,14 @@ msgid ""
 msgstr ""
 "Розширенню браузера потрібне лише перше. Дайте агентові саме читання, доки не довірите йому запис."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -624,6 +630,11 @@ msgstr "Рядок під назвою на сторінці входу. Нео�
 #, draft
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr "Рядок, коли додаток вважає, що щось сталося, і чекає на вас."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1301,7 +1312,7 @@ msgstr "Заявку створено"
 msgid "Application deleted."
 msgstr "Заявку видалено."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Заявку записано із захоплення."
@@ -1734,7 +1745,7 @@ msgid ""
 msgstr ""
 "Захопіть вакансію за її адресою або додайте вручну — і вона чекатиме тут на вас."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Захоплення відкинуто."
@@ -1749,7 +1760,7 @@ msgstr "Захоплювати вакансії"
 msgid "Capture sources this instance has"
 msgstr "Джерела захоплення, які має ця інстанція"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1759,7 +1770,7 @@ msgstr ""
 msgid "captured from"
 msgstr "захоплено з"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Захоплено: %(title)s"
@@ -2789,7 +2800,7 @@ msgstr "ідентифікатор каталогу (клієнта Microsoft)"
 msgid "Discard"
 msgstr "Відкинути"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Відкинути це захоплення"
@@ -3930,7 +3941,7 @@ msgstr ""
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "Як працює ця інстанція, а не вибір, який комусь належить."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Як це працює"
@@ -3950,7 +3961,7 @@ msgstr "Як вам зручніше групувати свій пошук."
 msgid "Hybrid"
 msgstr "Гібридний"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Я вже сюди подавався"
@@ -4578,7 +4589,7 @@ msgstr "Мови, якими говорить цей запис"
 msgid "Languages this instance offers"
 msgstr "Мови, які пропонує це встановлення"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4665,7 +4676,7 @@ msgstr "востаннє використано"
 msgid "last worked"
 msgstr "востаннє працювало"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Пізніше"
@@ -5129,7 +5140,7 @@ msgid "Mobile"
 msgstr "Мобільний"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5881,7 +5892,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Не встановлено нічого, щодо чого людина могла б мати думку."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Нічого не зберігається, доки ви це не переглянете."
@@ -5947,12 +5958,12 @@ msgstr "Щодо цієї заявки поки нічого не записан
 msgid "Nothing recorded yet."
 msgstr "Поки нічого не записано."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "На тій сторінці не знайдено нічого схожого на вакансію."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Там не знайдено нічого схожого на вакансію."
@@ -6243,7 +6254,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Ще %(counter)s номерів зберігається для цього контакту й не показується, бо <em>Кілька номерів телефону</em> вимкнено."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr ""
@@ -6358,6 +6369,11 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Відкриті заявки без жодної звістки і три речі, які можна з цим зробити."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6369,7 +6385,7 @@ msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
 "Необов’язково. Якщо задано, лише ця адреса зможе скористатися запрошенням."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6475,7 +6491,7 @@ msgstr "Пакунок"
 msgid "Page %(current)s of %(total)s"
 msgstr "Сторінка %(current)s з %(total)s"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Код сторінки"
@@ -6837,7 +6853,7 @@ msgstr "вакансія"
 msgid "Posting"
 msgstr "Вакансія"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Адреса вакансії"
@@ -6899,7 +6915,7 @@ msgid ""
 msgstr ""
 "Postulo один раз завантажує зображення для вашої основної адреси з gravatar.com, зберігає копію і показує її. Під час перегляду сторінок нічого не завантажується. Зніміть позначку — і копію буде видалено."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo завантажує цю одну сторінку і більше нічого."
@@ -6973,6 +6989,10 @@ msgid ""
 msgstr ""
 "Натисніть «Перевірити оновлення», щоб дізнатися, що пропонують каталоги. Postulo не звертається до них сам."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -7009,7 +7029,7 @@ msgstr "Пріоритет"
 msgid "priority"
 msgstr "пріоритет"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Приватні та локальні адреси відхиляються."
@@ -7237,7 +7257,7 @@ msgstr "Читати все: заявки, вакансії, компанії, �
 msgid "Read it"
 msgstr "Прочитати"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Прочитати сторінку"
@@ -7773,7 +7793,7 @@ msgstr "Спершу збережіть це, потім поверніться 
 msgid "Save to add another identifier."
 msgstr "Збережіть, щоб додати ще один ідентифікатор."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Зберегти до вакансій"
@@ -7783,7 +7803,7 @@ msgstr "Зберегти до вакансій"
 msgid "Saved in %(language)s."
 msgstr "Збережено мовою %(language)s."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Збережено до ваших вакансій. Вирішите, коли будете готові."
@@ -8401,7 +8421,7 @@ msgstr ""
 msgid "source version"
 msgstr "версія у джерелі"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Встановлені джерела"
@@ -9259,7 +9279,7 @@ msgstr "Файл порожній."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Файл більший за 2 МБ. Пошук роботи таким не буває."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9425,7 +9445,7 @@ msgid "the posting"
 msgstr "оголошення"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9461,7 +9481,7 @@ msgstr ""
 "Решту файлу все одно варто імпортувати. Перелічене тут — ні, і ви можете додати його вручну потім."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9513,12 +9533,12 @@ msgid ""
 msgstr ""
 "Сайт відхилив запит (%(status)s). Великі сайти часто ховаються за захистом від ботів, який відвертає все, що не є браузером, навіть коли сторінка вам чудово видна. Натомість вставте код сторінки нижче."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Сайт відмовляє Postulo, або вакансія потребує входу"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "robots.txt сайту шанується."
@@ -9643,6 +9663,12 @@ msgstr "Ці записи можуть називати людей та їхні
 #, draft
 msgid "They did not show up"
 msgstr "Вони не прийшли"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9788,7 +9814,7 @@ msgstr "Через %(provider)s: у вас питають ще й код."
 msgid "Tick rows to act on several at once."
 msgstr "Позначте рядки, щоб діяти на кількох одразу."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -9984,7 +10010,7 @@ msgstr "Двофакторна автентифікація"
 msgid "Type at least two characters."
 msgstr "Введіть щонайменше два символи."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Натомість введіть вручну"

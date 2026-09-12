@@ -20,6 +20,38 @@
       </p>
     {% endif %}
 
+    {% comment %} Told, not refused (#178): what the person already holds for this address, or
+       for this title at this company, said where they decide -- saving anyway or discarding
+       below are both theirs. The second kind is softer: a board that mints a fresh address
+       per visit hides a duplicate this way, and a company with two openings of one title
+       looks the same. {% endcomment %}
+    {% if known %}
+      <div class="alert-warning mb-6" role="status" data-known>
+        {% for listing in known.listings %}
+          <p>
+            {% blocktranslate trimmed with when=listing.created_at|date:"j M Y" %}
+              This address is already in your listings, since {{ when }}.
+            {% endblocktranslate %}
+            <a href="{{ listing.get_absolute_url }}" class="underline">{{ listing.title }} — {{ listing.company.name }}</a>
+          </p>
+        {% endfor %}
+        {% for other in known.captures %}
+          <p>
+            {% blocktranslate trimmed with when=other.created_at|date:"j M Y" %}
+              A capture of this address from {{ when }} is still waiting for review.
+            {% endblocktranslate %}
+            <a href="{{ other.get_absolute_url }}" class="underline">{% translate "Open it" %}</a>
+          </p>
+        {% endfor %}
+        {% for listing in known.similar %}
+          <p>
+            {% translate "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert." %}
+            <a href="{{ listing.get_absolute_url }}" class="underline">{{ listing.title }} — {{ listing.company.name }}</a>
+          </p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
     <form method="post" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}

@@ -290,6 +290,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Capturing an advert you already hold says so, before it is made.** Nothing checked
+  whether a posting had been captured before: the same advert on Monday and again on
+  Thursday made two captures and, reviewed, two listings for one job. Told now, not
+  refused — a constraint would be wrong, since boards reuse addresses and an edited advert
+  is worth capturing again. The web form says *this address is already in your listings,
+  since 3 September*, with a link, before anything is fetched, and pressing the button again
+  captures it anyway; the review screen says it too, and more softly names a listing with
+  the same title at the same company, which is how a board that mints a fresh address per
+  visit hides a duplicate. The browser extension asks `POST /api/v1/captures/known` — one
+  request for one posting or forty — and says *captured before* in the popup. Addresses are
+  matched as #176 matches them: without the scheme, the `www.` or a trailing slash. (#178)
+
 - **Forty postings from one results page, announced once.** The browser extension can now
   read every posting a page lists and send the ones you tick, each as its own capture from
   the same page, so a failure loses one and not forty. On this side that needed one thing:

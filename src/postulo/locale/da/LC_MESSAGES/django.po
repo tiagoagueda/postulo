@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: dansk\n"
@@ -550,8 +550,14 @@ msgid ""
 msgstr ""
 "En browserudvidelse behøver kun det første. Giv en agent kun læseadgang, indtil du stoler på den med skriveadgang."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -605,6 +611,11 @@ msgstr "En linje under navnet på login-siden. Valgfri."
 #, draft
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr "En linje, når et plugin tror, der er sket noget, og venter på dig."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1281,7 +1292,7 @@ msgstr "Ansøgning oprettet"
 msgid "Application deleted."
 msgstr "Ansøgning slettet."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Ansøgning registreret fra indfangningen."
@@ -1715,7 +1726,7 @@ msgid ""
 msgstr ""
 "Indfang et opslag fra dets adresse, eller tilføj et i hånden, så venter det her på dig."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Indfangning kasseret."
@@ -1730,7 +1741,7 @@ msgstr "Indfang opslag"
 msgid "Capture sources this instance has"
 msgstr "Denne instans' opsamlingskilder"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1740,7 +1751,7 @@ msgstr ""
 msgid "captured from"
 msgstr "indfanget fra"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Indfanget: %(title)s"
@@ -2767,7 +2778,7 @@ msgstr "mappe-id (lejer)"
 msgid "Discard"
 msgstr "Kassér"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Kassér denne indfangning"
@@ -3912,7 +3923,7 @@ msgstr ""
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "Hvordan denne instans fungerer, ikke et valg nogen har."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Sådan virker det"
@@ -3932,7 +3943,7 @@ msgstr "Uanset hvordan du foretrækker at gruppere din søgning."
 msgid "Hybrid"
 msgstr "Hybrid"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Jeg har allerede søgt denne"
@@ -4562,7 +4573,7 @@ msgstr "Sprog som denne post taler"
 msgid "Languages this instance offers"
 msgstr "Sprog denne installation tilbyder"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4649,7 +4660,7 @@ msgstr "sidst brugt"
 msgid "last worked"
 msgstr "kørte sidst"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Senere"
@@ -5111,7 +5122,7 @@ msgid "Mobile"
 msgstr "Mobil"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5864,7 +5875,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Der er intet installeret, som en person kan have en mening om."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Intet gemmes, før du har gennemset det."
@@ -5929,12 +5940,12 @@ msgstr "Intet registreret for denne ansøgning endnu."
 msgid "Nothing recorded yet."
 msgstr "Intet registreret endnu."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Intet, der ligner et jobopslag, blev fundet på den side."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Intet, der ligner et jobopslag, blev fundet der."
@@ -6217,7 +6228,7 @@ msgstr[0] ""
 msgstr[1] ""
 "%(counter)s numre mere gemmes for denne kontakt og vises ikke, fordi <em>Flere telefonnumre</em> er slået fra."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr "Én side hentes — den, du indsatte. Postulo crawler aldrig."
@@ -6329,6 +6340,11 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Åbne ansøgninger uden svar, og de tre ting du kan gøre ved det."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6339,7 +6355,7 @@ msgstr "Ledige stillinger"
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Valgfri. Hvis angivet, må kun denne adresse bruge invitationen."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6445,7 +6461,7 @@ msgstr "Pakke"
 msgid "Page %(current)s of %(total)s"
 msgstr "Side %(current)s af %(total)s"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Sidens kildekode"
@@ -6807,7 +6823,7 @@ msgstr "opslag"
 msgid "Posting"
 msgstr "Opslag"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Opslagets adresse"
@@ -6869,7 +6885,7 @@ msgid ""
 msgstr ""
 "Postulo henter billedet til din primære adresse fra gravatar.com én gang, beholder en kopi og viser den. Intet hentes, mens sider vises. Fjern fluebenet, så slettes kopien."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo henter denne ene side og intet andet."
@@ -6943,6 +6959,10 @@ msgid ""
 msgstr ""
 "Tryk på Søg efter opdateringer for at hente, hvad katalogerne tilbyder. Postulo henter dem ikke af sig selv."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -6979,7 +6999,7 @@ msgstr "Prioritet"
 msgid "priority"
 msgstr "prioritet"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Private og lokale adresser afvises."
@@ -7205,7 +7225,7 @@ msgstr "Læs alt: ansøgninger, opslag, virksomheder, dokumenter, indsigt"
 msgid "Read it"
 msgstr "Læs den"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Læs siden"
@@ -7738,7 +7758,7 @@ msgstr "Gem dette først, kom så tilbage og giv samtykke."
 msgid "Save to add another identifier."
 msgstr "Gem for at tilføje endnu en identifikator."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Gem i opslag"
@@ -7748,7 +7768,7 @@ msgstr "Gem i opslag"
 msgid "Saved in %(language)s."
 msgstr "Gemt på %(language)s."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Gemt i dine opslag. Beslut dig, når du er klar."
@@ -8366,7 +8386,7 @@ msgstr ""
 msgid "source version"
 msgstr "kildeversion"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Installerede kilder"
@@ -9224,7 +9244,7 @@ msgstr "Filen er tom."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Filen er over 2 MB. En jobsøgning er ikke så stor."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9387,7 +9407,7 @@ msgid "the posting"
 msgstr "opslaget"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9423,7 +9443,7 @@ msgstr ""
 "Resten af filen er stadig værd at importere. Det, der står her, er ikke, og du kan tilføje det i hånden bagefter."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9475,12 +9495,12 @@ msgid ""
 msgstr ""
 "Webstedet afviste forespørgslen (%(status)s). Store websteder sidder ofte bag botbeskyttelse, der afviser alt, der ikke er en browser, selv når siden er fuldt synlig for dig. Indsæt sidens kildekode nedenfor i stedet."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Webstedet afviser Postulo, eller opslaget kræver login"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "Webstedets robots.txt respekteres."
@@ -9603,6 +9623,12 @@ msgstr "Disse poster kan nævne personer og deres ansøgninger."
 #, draft
 msgid "They did not show up"
 msgstr "De mødte ikke op"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9746,7 +9772,7 @@ msgstr "Via %(provider)s: du bliver også bedt om en kode."
 msgid "Tick rows to act on several at once."
 msgstr "Markér rækker for at handle på flere på én gang."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -9943,7 +9969,7 @@ msgstr "Tofaktorgodkendelse"
 msgid "Type at least two characters."
 msgstr "Skriv mindst to tegn."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Skriv det ind i stedet"

@@ -27,6 +27,7 @@ from postulo.plugins.fetching import fetch_page
 from postulo.plugins.policy import plugins_for
 from postulo.plugins.registry import parse_page
 
+from .known import known
 from .models import Capture, CaptureStatus
 
 
@@ -65,11 +66,11 @@ class CaptureCreateView(OwnedObjectMixin, View):
     def get_queryset(self):
         return Capture.objects.for_user(self.request.user)
 
-    def _render(self, request: HttpRequest, form: CaptureURLForm) -> HttpResponse:
+    def _render(self, request: HttpRequest, form: CaptureURLForm, known_=None) -> HttpResponse:
         return render(
             request,
             self.template_name,
-            {"form": form, "sources": plugins_for(request.user, "source")},
+            {"form": form, "sources": plugins_for(request.user, "source"), "known": known_},
         )
 
     def get(self, request: HttpRequest) -> HttpResponse:
@@ -79,6 +80,15 @@ class CaptureCreateView(OwnedObjectMixin, View):
         form = CaptureURLForm(request.POST)
         if not form.is_valid():
             return self._render(request, form)
+
+        # Told before anything is fetched, and asked once: an address already in the
+        # person's listings, or already waiting for review, is shown with a link, and the
+        # same form submitted again -- `anyway` set -- is their answer (#178). A duplicate
+        # is theirs to want; it is not this form's to make in silence.
+        if request.POST.get("anyway") != "1":
+            seen = known(request.user, form.cleaned_data["url"])
+            if seen.listings or seen.captures:
+                return self._render(request, form, known_=seen)
 
         # Before anything is fetched or parsed. Capture is the one surface that makes this
         # server talk to somebody else's, and nothing bounded how fast an account could ask
@@ -199,10 +209,29 @@ class CaptureReviewView(OwnedObjectMixin, View):
             "description": data.description,
         }
 
+    def _known(self, capture: Capture):
+        """What the person already holds for this address, said before they save it (#178).
+
+        A capture can be reviewed long after it arrived, so the review screen says it as
+        well as the form and the extension did.
+        """
+        data = capture.posting_data
+        return known(
+            self.request.user,
+            data.url or capture.url,
+            data.title,
+            data.company_name,
+            except_capture=capture.pk,
+        )
+
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         capture = get_object_or_404(self.get_queryset(), pk=pk)
         form = review_form_class()(initial=self._initial(capture), user=request.user)
-        return render(request, self.template_name, {"capture": capture, "form": form})
+        return render(
+            request,
+            self.template_name,
+            {"capture": capture, "form": form, "known": self._known(capture)},
+        )
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         from postulo.applications.models import Priority, Status
@@ -215,7 +244,11 @@ class CaptureReviewView(OwnedObjectMixin, View):
         capture = get_object_or_404(self.get_queryset(), pk=pk)
         form = review_form_class()(request.POST, user=request.user)
         if not form.is_valid():
-            return render(request, self.template_name, {"capture": capture, "form": form})
+            return render(
+                request,
+                self.template_name,
+                {"capture": capture, "form": form, "known": self._known(capture)},
+            )
 
         company = get_or_create_company(request.user, form.cleaned_data["company_name"])
         listing = create_listing(request.user, company=company, posting_data=form.posting_data)

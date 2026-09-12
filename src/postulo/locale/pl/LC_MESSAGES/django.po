@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: polski\n"
@@ -568,8 +568,14 @@ msgid ""
 msgstr ""
 "Rozszerzeniu przeglądarki wystarczy pierwszy. Agentowi daj tylko odczyt, dopóki nie zaufasz mu z zapisem."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -623,6 +629,11 @@ msgstr "Linia pod nazwą na stronie logowania. Opcjonalna."
 #, draft
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr "Linijka, gdy wtyczka sądzi, że coś się wydarzyło, i czeka na Ciebie."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1301,7 +1312,7 @@ msgstr "Utworzono aplikację"
 msgid "Application deleted."
 msgstr "Usunięto aplikację."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Zapisano aplikację z przechwycenia."
@@ -1734,7 +1745,7 @@ msgid ""
 msgstr ""
 "Przechwyć ogłoszenie z jego adresu albo dodaj ręcznie, a będzie tu na ciebie czekać."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Odrzucono przechwycenie."
@@ -1749,7 +1760,7 @@ msgstr "Przechwytuj ogłoszenia"
 msgid "Capture sources this instance has"
 msgstr "Źródła przechwytywania tej instancji"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1759,7 +1770,7 @@ msgstr ""
 msgid "captured from"
 msgstr "przechwycono z"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Przechwycono: %(title)s"
@@ -2789,7 +2800,7 @@ msgstr "identyfikator katalogu (dzierżawy)"
 msgid "Discard"
 msgstr "Odrzuć"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Odrzuć to przechwycenie"
@@ -3932,7 +3943,7 @@ msgid "How this instance works, rather than a choice anybody holds."
 msgstr ""
 "Sposób działania tej instancji, a nie wybór, który komukolwiek przysługuje."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Jak to działa"
@@ -3952,7 +3963,7 @@ msgstr "Jakkolwiek wolisz grupować swoje poszukiwania."
 msgid "Hybrid"
 msgstr "Hybrydowo"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Już tu aplikowałem"
@@ -4581,7 +4592,7 @@ msgstr "Języki, którymi mówi ten wpis"
 msgid "Languages this instance offers"
 msgstr "Języki oferowane przez tę instalację"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4668,7 +4679,7 @@ msgstr "ostatnio użyty"
 msgid "last worked"
 msgstr "ostatnio działało"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Później"
@@ -5133,7 +5144,7 @@ msgid "Mobile"
 msgstr "Komórka"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5886,7 +5897,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Nie zainstalowano niczego, o czym osoba mogłaby mieć zdanie."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Nic nie zostanie zapisane, dopóki tego nie sprawdzisz."
@@ -5953,12 +5964,12 @@ msgstr "Dla tej aplikacji jeszcze nic nie zapisano."
 msgid "Nothing recorded yet."
 msgstr "Jeszcze nic nie zapisano."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Na tej stronie nie znaleziono nic przypominającego ogłoszenie o pracę."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Nie znaleziono tam nic przypominającego ogłoszenie o pracę."
@@ -6248,7 +6259,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Jeszcze %(counter)s numerów jest trzymanych dla tego kontaktu i niepokazywanych, bo <em>Kilka numerów telefonu</em> jest wyłączone."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr ""
@@ -6364,6 +6375,11 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Otwarte zgłoszenia bez odzewu i trzy rzeczy, które można z tym zrobić."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6374,7 +6390,7 @@ msgstr "Wakaty"
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Opcjonalnie. Jeśli ustawione, tylko ten adres może użyć zaproszenia."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6480,7 +6496,7 @@ msgstr "Pakiet"
 msgid "Page %(current)s of %(total)s"
 msgstr "Strona %(current)s z %(total)s"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Źródło strony"
@@ -6842,7 +6858,7 @@ msgstr "ogłoszenie"
 msgid "Posting"
 msgstr "Ogłoszenie"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Adres ogłoszenia"
@@ -6904,7 +6920,7 @@ msgid ""
 msgstr ""
 "Postulo raz pobiera obrazek dla twojego głównego adresu z gravatar.com, zachowuje kopię i ją pokazuje. Podczas przeglądania stron nic nie jest pobierane. Odznacz, a kopia zostanie usunięta."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo pobiera tę jedną stronę i nic więcej."
@@ -6979,6 +6995,10 @@ msgid ""
 msgstr ""
 "Naciśnij Sprawdź aktualizacje, aby pobrać to, co oferują katalogi. Postulo nie pobiera ich z własnej woli."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -7015,7 +7035,7 @@ msgstr "Priorytet"
 msgid "priority"
 msgstr "priorytet"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Adresy prywatne i lokalne są odrzucane."
@@ -7244,7 +7264,7 @@ msgstr "Odczyt wszystkiego: aplikacje, oferty, firmy, dokumenty, statystyki"
 msgid "Read it"
 msgstr "Odczytaj go"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Odczytaj stronę"
@@ -7779,7 +7799,7 @@ msgstr "Najpierw to zapisz, potem wróć i zgódź się."
 msgid "Save to add another identifier."
 msgstr "Zapisz, aby dodać kolejny identyfikator."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Zapisz w ofertach"
@@ -7789,7 +7809,7 @@ msgstr "Zapisz w ofertach"
 msgid "Saved in %(language)s."
 msgstr "Zapisano w języku %(language)s."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Zapisano w twoich ofertach. Zdecyduj, kiedy będziesz gotowy."
@@ -8408,7 +8428,7 @@ msgstr ""
 msgid "source version"
 msgstr "wersja źródła"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Zainstalowane źródła"
@@ -9267,7 +9287,7 @@ msgstr "Plik jest pusty."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Plik ma ponad 2 MB. Poszukiwanie pracy nie jest aż tak duże."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9433,7 +9453,7 @@ msgid "the posting"
 msgstr "ogłoszenie"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9469,7 +9489,7 @@ msgstr ""
 "Resztę pliku wciąż warto zaimportować. Tego, co wypisano tutaj, nie, i możesz to potem dodać ręcznie."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9521,12 +9541,12 @@ msgid ""
 msgstr ""
 "Strona odrzuciła żądanie (%(status)s). Duże witryny często siedzą za ochroną przed botami, która odrzuca wszystko, co nie jest przeglądarką, nawet gdy strona jest dla ciebie doskonale widoczna. Zamiast tego wklej poniżej źródło strony."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Strona odrzuca Postulo lub ogłoszenie wymaga logowania"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "robots.txt witryny jest respektowany."
@@ -9652,6 +9672,12 @@ msgstr "Te wpisy mogą wymieniać osoby i ich aplikacje."
 #, draft
 msgid "They did not show up"
 msgstr "Nie pojawili się"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9795,7 +9821,7 @@ msgstr "Przez %(provider)s: prosimy również o kod."
 msgid "Tick rows to act on several at once."
 msgstr "Zaznacz wiersze, aby zadziałać na kilku naraz."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -9991,7 +10017,7 @@ msgstr "Uwierzytelnianie dwuskładnikowe"
 msgid "Type at least two characters."
 msgstr "Wpisz co najmniej dwa znaki."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Wpisz zamiast tego"

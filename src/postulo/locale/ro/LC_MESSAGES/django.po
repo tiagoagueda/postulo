@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: română\n"
@@ -569,8 +569,14 @@ msgid ""
 msgstr ""
 "O extensie de browser are nevoie doar de primul. Dă unui agent doar citire până când ai încredere în el pentru scriere."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -624,6 +630,11 @@ msgstr "Un rând sub nume pe pagina de autentificare. Opțional."
 #, draft
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr "Un rând când un plugin crede că s-a întâmplat ceva și vă așteaptă."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1308,7 +1319,7 @@ msgstr "Candidatură creată"
 msgid "Application deleted."
 msgstr "Candidatură ștearsă."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Candidatură înregistrată din captare."
@@ -1742,7 +1753,7 @@ msgid ""
 msgstr ""
 "Captează un anunț de la adresa lui sau adaugă unul manual, iar el te așteaptă aici."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Captare respinsă."
@@ -1757,7 +1768,7 @@ msgstr "Captează anunțuri"
 msgid "Capture sources this instance has"
 msgstr "Sursele de captare ale acestei instanțe"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1767,7 +1778,7 @@ msgstr ""
 msgid "captured from"
 msgstr "captat de la"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Captat: %(title)s"
@@ -2796,7 +2807,7 @@ msgstr "ID director (chiriaș)"
 msgid "Discard"
 msgstr "Respinge"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Respinge această captare"
@@ -3942,7 +3953,7 @@ msgstr ""
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "Cum funcționează această instanță, nu o alegere care să îi revină cuiva."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Cum funcționează"
@@ -3962,7 +3973,7 @@ msgstr "Oricum preferi să îți grupezi căutarea."
 msgid "Hybrid"
 msgstr "Hibrid"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Am candidat deja la acesta"
@@ -4593,7 +4604,7 @@ msgstr "Limbile pe care le vorbește această intrare"
 msgid "Languages this instance offers"
 msgstr "Limbile pe care le oferă această instanță"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4680,7 +4691,7 @@ msgstr "ultima utilizare"
 msgid "last worked"
 msgstr "ultima funcționare"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Mai târziu"
@@ -5145,7 +5156,7 @@ msgid "Mobile"
 msgstr "Mobil"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5899,7 +5910,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Nu este instalat nimic despre care o persoană să poată avea o părere."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Nimic nu este salvat până nu ai verificat."
@@ -5966,13 +5977,13 @@ msgstr "Nimic înregistrat pentru această candidatură încă."
 msgid "Nothing recorded yet."
 msgstr "Nimic înregistrat încă."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr ""
 "Nimic care să semene cu un anunț de angajare nu a fost găsit pe acea pagină."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Nimic care să semene cu un anunț de angajare nu a fost găsit acolo."
@@ -6263,7 +6274,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Încă %(counter)s de numere sunt păstrate pentru acest contact și nearătate, pentru că <em>Mai multe numere de telefon</em> este oprit."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr ""
@@ -6381,6 +6392,11 @@ msgid ""
 msgstr ""
 "Candidaturi deschise fără veste, și cele trei lucruri de făcut în privința lor."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6391,7 +6407,7 @@ msgstr "Posturi vacante"
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Opțional. Dacă este setat, doar această adresă poate folosi invitația."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6497,7 +6513,7 @@ msgstr "Pachet"
 msgid "Page %(current)s of %(total)s"
 msgstr "Pagina %(current)s din %(total)s"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Sursa paginii"
@@ -6859,7 +6875,7 @@ msgstr "anunț"
 msgid "Posting"
 msgstr "Anunț"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Adresa anunțului"
@@ -6921,7 +6937,7 @@ msgid ""
 msgstr ""
 "Postulo preia o dată imaginea pentru adresa ta principală de la gravatar.com, păstrează o copie și o afișează pe aceea. Nimic nu este preluat în timp ce sunt vizualizate paginile. Debifează și copia este ștearsă."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo preia această unică pagină și nimic altceva."
@@ -6995,6 +7011,10 @@ msgid ""
 msgstr ""
 "Apăsați Caută actualizări ca să aduceți ce oferă cataloagele. Postulo nu le aduce din proprie inițiativă."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -7031,7 +7051,7 @@ msgstr "Prioritate"
 msgid "priority"
 msgstr "prioritate"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Adresele private și locale sunt refuzate."
@@ -7260,7 +7280,7 @@ msgstr "Citește tot: candidaturi, anunțuri, companii, documente, statistici"
 msgid "Read it"
 msgstr "Citește-l"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Citește pagina"
@@ -7795,7 +7815,7 @@ msgstr "Salvați asta mai întâi, apoi reveniți și consimțiți."
 msgid "Save to add another identifier."
 msgstr "Salvați pentru a adăuga alt identificator."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Salvează la anunțuri"
@@ -7805,7 +7825,7 @@ msgstr "Salvează la anunțuri"
 msgid "Saved in %(language)s."
 msgstr "Salvat în %(language)s."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Salvat în anunțurile tale. Decide când ești pregătit."
@@ -8425,7 +8445,7 @@ msgstr ""
 msgid "source version"
 msgstr "versiunea sursei"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Surse instalate"
@@ -9284,7 +9304,7 @@ msgstr "Fișierul este gol."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Fișierul depășește 2 MB. O căutare de job nu este atât de mare."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9450,7 +9470,7 @@ msgid "the posting"
 msgstr "anunțul"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9486,7 +9506,7 @@ msgstr ""
 "Restul fișierului merită totuși importat. Ce este listat aici nu, iar îl puteți adăuga manual după aceea."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9539,12 +9559,12 @@ msgid ""
 msgstr ""
 "Site-ul a refuzat cererea (%(status)s). Site-urile mari stau adesea în spatele unei protecții anti-bot care respinge tot ce nu este un browser, chiar și când pagina îți este perfect vizibilă. Lipește în schimb sursa paginii mai jos."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Site-ul refuză Postulo sau anunțul necesită autentificare"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "robots.txt al site-ului este respectat."
@@ -9670,6 +9690,12 @@ msgstr "Aceste înregistrări pot numi persoane și candidaturile lor."
 #, draft
 msgid "They did not show up"
 msgstr "Nu s-au prezentat"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9816,7 +9842,7 @@ msgstr "Prin %(provider)s: vi se cere și un cod."
 msgid "Tick rows to act on several at once."
 msgstr "Bifați rânduri pentru a acționa asupra mai multora deodată."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -10014,7 +10040,7 @@ msgstr "Autentificare în doi pași"
 msgid "Type at least two characters."
 msgstr "Tastează cel puțin două caractere."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Tastează-l în schimb"

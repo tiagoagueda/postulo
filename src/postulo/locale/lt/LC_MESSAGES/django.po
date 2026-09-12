@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: lietuvių\n"
@@ -568,8 +568,14 @@ msgid ""
 msgstr ""
 "Naršyklės plėtiniui reikia tik pirmojo. Agentui duokite tik skaitymą, kol nepasitikėsite juo rašyti."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -623,6 +629,11 @@ msgstr "Eilutė po pavadinimu prisijungimo puslapyje. Neprivaloma."
 #, draft
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr "Eilutė, kai papildinys mano, kad kažkas nutiko, ir jūsų laukia."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1301,7 +1312,7 @@ msgstr "Paraiška sukurta"
 msgid "Application deleted."
 msgstr "Paraiška ištrinta."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Paraiška įrašyta iš fiksavimo."
@@ -1734,7 +1745,7 @@ msgid ""
 msgstr ""
 "Užfiksuokite skelbimą pagal jo adresą arba pridėkite ranka, ir jis lauks jūsų čia."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Fiksavimas atmestas."
@@ -1749,7 +1760,7 @@ msgstr "Fiksuoti skelbimus"
 msgid "Capture sources this instance has"
 msgstr "Šio egzemplioriaus fiksavimo šaltiniai"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1759,7 +1770,7 @@ msgstr ""
 msgid "captured from"
 msgstr "užfiksuota iš"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Užfiksuota: %(title)s"
@@ -2788,7 +2799,7 @@ msgstr "katalogo (nuomininko) ID"
 msgid "Discard"
 msgstr "Atmesti"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Atmesti šį fiksavimą"
@@ -3931,7 +3942,7 @@ msgstr ""
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "Kaip ši instancija veikia, o ne kieno nors pasirinkimas."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Kaip tai veikia"
@@ -3951,7 +3962,7 @@ msgstr "Kaip tik norite grupuoti savo paiešką."
 msgid "Hybrid"
 msgstr "Hibridinis"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Jau teikiau paraišką į šį"
@@ -4579,7 +4590,7 @@ msgstr "Kalbos, kuriomis kalba šis įrašas"
 msgid "Languages this instance offers"
 msgstr "Kalbos, kurias siūlo šis diegimas"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4666,7 +4677,7 @@ msgstr "paskutinį kartą naudota"
 msgid "last worked"
 msgstr "paskutinį kartą veikė"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Vėliau"
@@ -5130,7 +5141,7 @@ msgid "Mobile"
 msgstr "Mobilusis"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5883,7 +5894,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Nėra įdiegta nieko, apie ką asmuo galėtų turėti nuomonę."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Niekas neišsaugoma, kol neperžiūrėsite."
@@ -5948,12 +5959,12 @@ msgstr "Apie šią paraišką dar nieko neįrašyta."
 msgid "Nothing recorded yet."
 msgstr "Dar nieko neįrašyta."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Tame puslapyje nerasta nieko, kas primintų darbo skelbimą."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Ten nerasta nieko, kas primintų darbo skelbimą."
@@ -6244,7 +6255,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Dar %(counter)s numerių laikoma šiam kontaktui ir nerodoma, nes <em>Keli telefono numeriai</em> yra išjungti."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr ""
@@ -6360,6 +6371,11 @@ msgid ""
 "Open applications with nothing heard, and the three things to do about it."
 msgstr "Atviri prašymai be žinių ir trys dalykai, ką su jais daryti."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6370,7 +6386,7 @@ msgstr "Laisvos vietos"
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Neprivaloma. Jei nustatyta, pakvietimą gali panaudoti tik šis adresas."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6476,7 +6492,7 @@ msgstr "Paketas"
 msgid "Page %(current)s of %(total)s"
 msgstr "Puslapis %(current)s iš %(total)s"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Puslapio šaltinis"
@@ -6838,7 +6854,7 @@ msgstr "skelbimas"
 msgid "Posting"
 msgstr "Skelbimas"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Skelbimo adresas"
@@ -6900,7 +6916,7 @@ msgid ""
 msgstr ""
 "Postulo vieną kartą gauna jūsų pagrindinio adreso paveikslėlį iš gravatar.com, išsaugo kopiją ir rodo ją. Peržiūrint puslapius niekas nesiunčiama. Nuėmus žymėjimą kopija ištrinama."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo gauna tik šį vieną puslapį ir nieko daugiau."
@@ -6974,6 +6990,10 @@ msgid ""
 msgstr ""
 "Paspauskite „Tikrinti atnaujinimus“, kad parsisiųstumėte, ką siūlo katalogai. Postulo pats jų netraukia."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -7010,7 +7030,7 @@ msgstr "Prioritetas"
 msgid "priority"
 msgstr "prioritetas"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Privatūs ir vietiniai adresai atmetami."
@@ -7239,7 +7259,7 @@ msgstr "Skaityti viską: paraiškos, skelbimai, įmonės, dokumentai, įžvalgos
 msgid "Read it"
 msgstr "Perskaityk"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Skaityti puslapį"
@@ -7773,7 +7793,7 @@ msgstr "Pirma tai išsaugokite, tada grįžkite ir sutikite."
 msgid "Save to add another identifier."
 msgstr "Išsaugokite, kad pridėtumėte dar vieną identifikatorių."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Išsaugoti skelbimuose"
@@ -7783,7 +7803,7 @@ msgstr "Išsaugoti skelbimuose"
 msgid "Saved in %(language)s."
 msgstr "Įrašyta %(language)s kalba."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Išsaugota jūsų skelbimuose. Nuspręskite, kai būsite pasiruošę."
@@ -8400,7 +8420,7 @@ msgstr ""
 msgid "source version"
 msgstr "šaltinio versija"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Įdiegti šaltiniai"
@@ -9258,7 +9278,7 @@ msgstr "Failas tuščias."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Failas didesnis nei 2 MB. Darbo paieška ne tokia didelė."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9423,7 +9443,7 @@ msgid "the posting"
 msgstr "skelbimas"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9459,7 +9479,7 @@ msgstr ""
 "Likusią failo dalį vis tiek verta importuoti. To, kas išvardyta čia, ne, ir vėliau galėsite tai pridėti ranka."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9511,12 +9531,12 @@ msgid ""
 msgstr ""
 "Svetainė atmetė užklausą (%(status)s). Didelės svetainės dažnai naudoja apsaugą nuo robotų, atmetančią viską, kas nėra naršyklė, net kai puslapis jums puikiai matomas. Vietoj to žemiau įklijuokite puslapio šaltinį."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Svetainė atmeta Postulo arba skelbimui reikia prisijungti"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "Svetainės robots.txt paisoma."
@@ -9642,6 +9662,12 @@ msgstr "Šiuose įrašuose gali būti minimi žmonės ir jų paraiškos."
 #, draft
 msgid "They did not show up"
 msgstr "Neatvyko"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9785,7 +9811,7 @@ msgstr "Per %(provider)s: jūsų taip pat paprašys kodo."
 msgid "Tick rows to act on several at once."
 msgstr "Pažymėkite eilutes, kad veiktumėte su keliomis iš karto."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -9981,7 +10007,7 @@ msgstr "Dviejų veiksnių autentifikacija"
 msgid "Type at least two characters."
 msgstr "Įveskite bent du simbolius."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Verčiau įvesti ranka"

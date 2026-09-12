@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -609,8 +609,14 @@ msgid ""
 msgstr ""
 "Ní theastaíonn ach an chéad cheann ó eisínteacht bhrabhsálaí. Ná tabhair do ghníomhaire ach léamh go dtí go mbeidh muinín agat as chun scríobh."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -665,6 +671,11 @@ msgstr "Líne faoin ainm ar an leathanach sínithe isteach. Roghnach."
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr ""
 "Líne nuair a cheapann breiseán gur tharla rud éigin agus é ag fanacht ort."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1353,7 +1364,7 @@ msgstr "Iarratas cruthaithe"
 msgid "Application deleted."
 msgstr "Iarratas scriosta."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Iarratas taifeadta ón ngabháil."
@@ -1788,7 +1799,7 @@ msgid ""
 msgstr ""
 "Gabh fógra óna sheoladh, nó cuir ceann leis de láimh, agus fanann sé anseo leat."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Gabháil caite i leataobh."
@@ -1803,7 +1814,7 @@ msgstr "Gabh fógraí"
 msgid "Capture sources this instance has"
 msgstr "Foinsí gabhála an ásc seo"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1813,7 +1824,7 @@ msgstr ""
 msgid "captured from"
 msgstr "gafa ó"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Gafa: %(title)s"
@@ -2843,7 +2854,7 @@ msgstr "aitheantas eolaire (tionónta)"
 msgid "Discard"
 msgstr "Caith i leataobh"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Caith an ghabháil seo i leataobh"
@@ -3989,7 +4000,7 @@ msgstr ""
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "An chaoi a n-oibríonn an t-ásc seo, seachas rogha atá ag aon duine."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Conas a oibríonn sé seo"
@@ -4010,7 +4021,7 @@ msgstr "Cibé bealach is fearr leat do chuardach a ghrúpáil."
 msgid "Hybrid"
 msgstr "Hibrideach"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Chuir mé iarratas chuig an gceann seo cheana"
@@ -4640,7 +4651,7 @@ msgstr "Teangacha a labhraíonn an iontráil seo"
 msgid "Languages this instance offers"
 msgstr "Teangacha a thairgeann an tsuiteáil seo"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4727,7 +4738,7 @@ msgstr "úsáidte go deireanach"
 msgid "last worked"
 msgstr "oibrithe go deireanach"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Níos déanaí"
@@ -5196,7 +5207,7 @@ msgid "Mobile"
 msgstr "Fón póca"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5952,7 +5963,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Níl aon rud suiteáilte ar féidir le duine tuairim a bheith aige faoi."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Ní shábháiltear aon rud go dtí go mbeidh sé athbhreithnithe agat."
@@ -6019,12 +6030,12 @@ msgstr "Níl aon rud taifeadta don iarratas seo fós."
 msgid "Nothing recorded yet."
 msgstr "Níl aon rud taifeadta fós."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Níor aimsíodh aon rud cosúil le fógra poist ar an leathanach sin."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Níor aimsíodh aon rud cosúil le fógra poist ansin."
@@ -6331,7 +6342,7 @@ msgstr[3] ""
 msgstr[4] ""
 "Coinnítear %(counter)s uimhir eile don teagmhálaí seo gan iad a thaispeáint, mar go bhfuil <em>Roinnt uimhreacha teileafóin</em> múchta."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr ""
@@ -6457,6 +6468,11 @@ msgid ""
 msgstr ""
 "Iarratais oscailte gan scéala, agus na trí rud is féidir a dhéanamh fúthu."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6468,7 +6484,7 @@ msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
 "Roghnach. Má shocraítear é, ní féidir ach leis an seoladh seo an cuireadh a úsáid."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6574,7 +6590,7 @@ msgstr "Pacáiste"
 msgid "Page %(current)s of %(total)s"
 msgstr "Leathanach %(current)s de %(total)s"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Foinse an leathanaigh"
@@ -6936,7 +6952,7 @@ msgstr "fógra"
 msgid "Posting"
 msgstr "Fógra"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Seoladh an fhógra"
@@ -6998,7 +7014,7 @@ msgid ""
 msgstr ""
 "Faigheann Postulo an pictiúr do do phríomhsheoladh ó gravatar.com uair amháin, coinníonn sé cóip, agus taispeánann sé í sin. Ní fhaightear aon rud agus leathanaigh á bhféachaint. Díthiceáil é agus scriostar an chóip."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr ""
@@ -7073,6 +7089,10 @@ msgid ""
 msgstr ""
 "Brúigh Seiceáil le haghaidh nuashonruithe chun a bhfuil á thairiscint ag na catalóga a fháil. Ní fhaigheann Postulo iad uaidh féin."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -7109,7 +7129,7 @@ msgstr "Tosaíocht"
 msgid "priority"
 msgstr "tosaíocht"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Diúltaítear do sheoltaí príobháideacha agus áitiúla."
@@ -7341,7 +7361,7 @@ msgstr "Léigh gach rud: iarratais, fógraí, cuideachtaí, doiciméid, léargai
 msgid "Read it"
 msgstr "Léigh é"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Léigh an leathanach"
@@ -7877,7 +7897,7 @@ msgstr "Sábháil é seo ar dtús, agus tar ar ais chun toiliú."
 msgid "Save to add another identifier."
 msgstr "Sábháil chun aitheantóir eile a chur leis."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Sábháil chuig fógraí"
@@ -7887,7 +7907,7 @@ msgstr "Sábháil chuig fógraí"
 msgid "Saved in %(language)s."
 msgstr "Sábháilte i %(language)s."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Sábháilte i do chuid fógraí. Déan cinneadh faoi nuair a bheidh tú réidh."
@@ -8509,7 +8529,7 @@ msgstr ""
 msgid "source version"
 msgstr "leagan foinse"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Foinsí suiteáilte"
@@ -9369,7 +9389,7 @@ msgstr "Tá an comhad folamh."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Tá an comhad os cionn 2 MB. Níl cuardach poist chomh mór sin."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9541,7 +9561,7 @@ msgid "the posting"
 msgstr "an fógra"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9578,7 +9598,7 @@ msgstr ""
 "Is fiú an chuid eile den chomhad a iompórtáil fós. Níl an méid atá liostaithe anseo, agus is féidir leat é a chur leis de láimh ina dhiaidh sin."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9630,12 +9650,12 @@ msgid ""
 msgstr ""
 "Dhiúltaigh an suíomh don iarratas (%(status)s). Is minic a bhíonn suímh mhóra taobh thiar de chosaint bhota a chuireann ó dhoras aon rud nach brabhsálaí é, fiú nuair atá an leathanach le feiceáil go breá agatsa. Greamaigh foinse an leathanaigh thíos ina ionad."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Diúltaíonn an suíomh do Postulo, nó teastaíonn logáil isteach ón bhfógra"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "Urramaítear robots.txt an tsuímh."
@@ -9765,6 +9785,12 @@ msgstr "Is féidir leis na taifid seo daoine agus a n-iarratais a ainmniú."
 #, draft
 msgid "They did not show up"
 msgstr "Níor tháinig siad"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9910,7 +9936,7 @@ msgstr "Trí %(provider)s: iarrtar cód ort chomh maith."
 msgid "Tick rows to act on several at once."
 msgstr "Ticeáil rónna chun gníomhú ar roinnt acu ag an am céanna."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -10107,7 +10133,7 @@ msgstr "Fíordheimhniú dhá fhachtóir"
 msgid "Type at least two characters."
 msgstr "Clóscríobh dhá charachtar ar a laghad."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Clóscríobh isteach é ina ionad"

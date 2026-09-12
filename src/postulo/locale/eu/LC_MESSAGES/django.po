@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -552,8 +552,14 @@ msgid ""
 msgstr ""
 "Nabigatzailearen luzapen batek lehena baino ez du behar. Agente bati irakurtzeko baimena bakarrik eman idazteko fidatu arte."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -608,6 +614,11 @@ msgstr "Izenaren azpiko lerro bat saioa hasteko orrian. Aukerakoa."
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr ""
 "Lerro bat plugin batek zerbait gertatu dela uste duenean eta zure zain dagoenean."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1288,7 +1299,7 @@ msgstr "Eskaera sortu da"
 msgid "Application deleted."
 msgstr "Eskaera ezabatu da."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Eskaera harrapaketatik jaso da."
@@ -1722,7 +1733,7 @@ msgid ""
 msgstr ""
 "Harrapatu iragarki bat bere helbidetik, edo gehitu bat eskuz, eta hemen itxarongo dizu."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Harrapaketa baztertu da."
@@ -1737,7 +1748,7 @@ msgstr "Harrapatu iragarkiak"
 msgid "Capture sources this instance has"
 msgstr "Instalazio honek dituen harrapaketa-iturriak"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1747,7 +1758,7 @@ msgstr ""
 msgid "captured from"
 msgstr "nondik harrapatua"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Harrapatuta: %(title)s"
@@ -2778,7 +2789,7 @@ msgstr "direktorioaren (maizterraren) IDa"
 msgid "Discard"
 msgstr "Baztertu"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Baztertu harrapaketa hau"
@@ -3922,7 +3933,7 @@ msgstr ""
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "Nola dabilen instalazio hau, eta ez inoren aukera bat."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Nola dabilen hau"
@@ -3943,7 +3954,7 @@ msgstr "Zure bilaketa nola elkartu nahiago duzun."
 msgid "Hybrid"
 msgstr "Hibridoa"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Honi jada eskaera egin diot"
@@ -4574,7 +4585,7 @@ msgstr "Sarrera honek hitz egiten dituen hizkuntzak"
 msgid "Languages this instance offers"
 msgstr "Instalazio honek eskaintzen dituen hizkuntzak"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4661,7 +4672,7 @@ msgstr "azkenekoz erabilia"
 msgid "last worked"
 msgstr "azkenekoz ibili zen"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Geroago"
@@ -5124,7 +5135,7 @@ msgid "Mobile"
 msgstr "Mugikorra"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5879,7 +5890,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Ez dago instalatuta pertsona batek iritzia izan dezakeen ezer."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Ez da ezer gordetzen berrikusi arte."
@@ -5944,12 +5955,12 @@ msgstr "Eskaera honi buruz oraindik ez da ezer jaso."
 msgid "Nothing recorded yet."
 msgstr "Oraindik ez da ezer jaso."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Orri horretan ez da lan-iragarki baten antzeko ezer aurkitu."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Han ez da lan-iragarki baten antzeko ezer aurkitu."
@@ -6233,7 +6244,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Beste %(counter)s zenbaki gordeta daude kontaktu honentzat eta ez dira erakusten, <em>Hainbat telefono zenbaki</em> itzalita dagoelako."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr ""
@@ -6346,6 +6357,11 @@ msgid ""
 msgstr ""
 "Ezer entzun ez den eskaera irekiak, eta horri buruz egin daitezkeen hiru gauzak."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6357,7 +6373,7 @@ msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
 "Aukerakoa. Ezarriz gero, helbide honek baino ezin izango du gonbidapena erabili."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6463,7 +6479,7 @@ msgstr "Paketea"
 msgid "Page %(current)s of %(total)s"
 msgstr "%(current)s orria %(total)s(e)tik"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Orriaren iturburua"
@@ -6825,7 +6841,7 @@ msgstr "iragarkia"
 msgid "Posting"
 msgstr "Iragarkia"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Iragarkiaren helbidea"
@@ -6887,7 +6903,7 @@ msgid ""
 msgstr ""
 "Postulok behin jaisten du zure helbide nagusiaren irudia gravatar.com gunetik, kopia bat gordetzen du eta hura erakusten. Ez da ezer jaisten orriak ikusten diren bitartean. Kendu marka eta kopia ezabatuko da."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulok orri bakar hau jaisten du, eta beste ezer ez."
@@ -6962,6 +6978,10 @@ msgid ""
 msgstr ""
 "Sakatu «Egiaztatu eguneratzeak» katalogoek eskaintzen dutena jaisteko. Postulok ez ditu bere kabuz jaisten."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -6998,7 +7018,7 @@ msgstr "Lehentasuna"
 msgid "priority"
 msgstr "lehentasuna"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Helbide pribatuak eta lokalak baztertzen dira."
@@ -7225,7 +7245,7 @@ msgstr "Dena irakurri: eskaerak, iragarkiak, enpresak, dokumentuak, datuak"
 msgid "Read it"
 msgstr "Irakurri"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Irakurri orria"
@@ -7760,7 +7780,7 @@ msgstr "Gorde hau lehenik, eta itzuli gero onartzeko."
 msgid "Save to add another identifier."
 msgstr "Gorde beste identifikatzaile bat gehitzeko."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Gorde iragarkietan"
@@ -7770,7 +7790,7 @@ msgstr "Gorde iragarkietan"
 msgid "Saved in %(language)s."
 msgstr "%(language)s hizkuntzan gordeta."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Zure iragarkietan gorde da. Prest zaudenean erabakiko duzu."
@@ -8389,7 +8409,7 @@ msgstr ""
 msgid "source version"
 msgstr "bertsioa iturrian"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Instalatutako iturriak"
@@ -9251,7 +9271,7 @@ msgstr "Fitxategia hutsik dago."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Fitxategia 2 MB baino gehiagokoa da. Lan-bilaketa bat ez da hain handia."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9416,7 +9436,7 @@ msgid "the posting"
 msgstr "iragarkia"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9452,7 +9472,7 @@ msgstr ""
 "Fitxategiaren gainerakoa inportatzea merezi du hala ere. Hemen zerrendatutakoa ez, eta eskuz gehi dezakezu gero."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9504,12 +9524,12 @@ msgid ""
 msgstr ""
 "Guneak eskaera baztertu du (%(status)s). Gune handiak sarri bot-babesen atzean egoten dira, nabigatzailea ez den guztia atzera botatzen dutenak, orria zuri ondo ikusten zaizunean ere. Itsatsi orriaren iturburua behean haren ordez."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Guneak Postulo baztertzen du, edo iragarkiak saioa hastea eskatzen du"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "Gunearen robots.txt errespetatzen da."
@@ -9633,6 +9653,12 @@ msgstr "Erregistro hauek pertsonak eta haien eskaerak izenda ditzakete."
 #, draft
 msgid "They did not show up"
 msgstr "Ez ziren agertu"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9777,7 +9803,7 @@ msgstr "%(provider)s bidez: kode bat ere eskatzen zaizu."
 msgid "Tick rows to act on several at once."
 msgstr "Markatu errenkadak askorekin batera jarduteko."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -9973,7 +9999,7 @@ msgstr "Bi faktoreko autentifikazioa"
 msgid "Type at least two characters."
 msgstr "Idatzi gutxienez bi karaktere."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Idatzi eskuz haren ordez"

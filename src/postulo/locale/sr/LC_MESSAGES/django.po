@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-12 19:08+0000\n"
+"POT-Creation-Date: 2026-09-12 19:35+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: српски\n"
@@ -568,8 +568,14 @@ msgid ""
 msgstr ""
 "Додатку за прегледач треба само прво. Агенту дајте само читање док му не поверите писање."
 
-#: src/postulo/api/api.py:225
+#: src/postulo/api/api.py:266
 msgid "A capture cannot come after the last of its batch."
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_form.html:32
+#: src/postulo/templates/jobs/capture_review.html:41
+#, python-format
+msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 
 #: src/postulo/templates/server/email.html:210
@@ -623,6 +629,11 @@ msgstr "Ред испод имена на страници за пријаву. 
 #, draft
 msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr "Ред када додатак мисли да се нешто десило и чека вас."
+
+#: src/postulo/templates/jobs/capture_review.html:49
+msgid ""
+"A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
+msgstr ""
 
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
@@ -1302,7 +1313,7 @@ msgstr "Пријава створена"
 msgid "Application deleted."
 msgstr "Пријава обрисана."
 
-#: src/postulo/jobs/capture_views.py:237
+#: src/postulo/jobs/capture_views.py:270
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Пријава забележена из хватања."
@@ -1736,7 +1747,7 @@ msgid ""
 msgstr ""
 "Ухватите оглас са његове адресе или додајте један ручно, и чекаће вас овде."
 
-#: src/postulo/jobs/capture_views.py:253
+#: src/postulo/jobs/capture_views.py:286
 #, draft
 msgid "Capture discarded."
 msgstr "Хватање одбачено."
@@ -1751,7 +1762,7 @@ msgstr "Хватање огласа"
 msgid "Capture sources this instance has"
 msgstr "Извори хватања које ова инсталација има"
 
-#: src/postulo/api/api.py:265
+#: src/postulo/api/api.py:306
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1761,7 +1772,7 @@ msgstr ""
 msgid "captured from"
 msgstr "ухваћено са"
 
-#: src/postulo/api/api.py:254
+#: src/postulo/api/api.py:295
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Ухваћено: %(title)s"
@@ -2790,7 +2801,7 @@ msgstr "ID директоријума (закупца)"
 msgid "Discard"
 msgstr "Одбаци"
 
-#: src/postulo/templates/jobs/capture_review.html:86
+#: src/postulo/templates/jobs/capture_review.html:119
 #, draft
 msgid "Discard this capture"
 msgstr "Одбаци ово хватање"
@@ -3929,7 +3940,7 @@ msgstr ""
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "Како ова инсталација ради, а не избор који неко има."
 
-#: src/postulo/templates/jobs/capture_form.html:44
+#: src/postulo/templates/jobs/capture_form.html:71
 #, draft
 msgid "How this works"
 msgstr "Како ово ради"
@@ -3949,7 +3960,7 @@ msgstr "Како год да вам одговара да групишете с�
 msgid "Hybrid"
 msgstr "Хибридно"
 
-#: src/postulo/jobs/capture_views.py:159
+#: src/postulo/jobs/capture_views.py:169
 #, draft
 msgid "I have already applied to this one"
 msgstr "Већ сам се пријавио на овај"
@@ -4579,7 +4590,7 @@ msgstr "Језици којима овај унос говори"
 msgid "Languages this instance offers"
 msgstr "Језици које ова инсталација нуди"
 
-#: src/postulo/templates/jobs/capture_form.html:27
+#: src/postulo/templates/jobs/capture_form.html:54
 #, draft
 msgid ""
 "Large employers often sit behind bot protection that turns away anything that is not a browser. Open the posting in your browser, view the page source, and paste it here. Postulo will read what you paste and fetch nothing."
@@ -4666,7 +4677,7 @@ msgstr "последњи пут коришћено"
 msgid "last worked"
 msgstr "последњи пут радило"
 
-#: src/postulo/templates/jobs/capture_review.html:79
+#: src/postulo/templates/jobs/capture_review.html:112
 #, draft
 msgid "Later"
 msgstr "Касније"
@@ -5130,7 +5141,7 @@ msgid "Mobile"
 msgstr "Мобилни"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5882,7 +5893,7 @@ msgstr ""
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Није инсталирано ништа о чему би особа могла да има мишљење."
 
-#: src/postulo/templates/jobs/capture_form.html:49
+#: src/postulo/templates/jobs/capture_form.html:76
 #, draft
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Ништа се не чува док то не прегледате."
@@ -5947,12 +5958,12 @@ msgstr "За ову пријаву још ништа није забележен
 msgid "Nothing recorded yet."
 msgstr "Још ништа није забележено."
 
-#: src/postulo/jobs/capture_views.py:114
+#: src/postulo/jobs/capture_views.py:124
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "На тој страници није нађено ништа што личи на оглас за посао."
 
-#: src/postulo/api/api.py:306
+#: src/postulo/api/api.py:347
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Тамо није нађено ништа што личи на оглас за посао."
@@ -6243,7 +6254,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Још %(counter)s бројева се чува за овај контакт и не приказује, јер је <em>Више телефонских бројева</em> искључено."
 
-#: src/postulo/templates/jobs/capture_form.html:46
+#: src/postulo/templates/jobs/capture_form.html:73
 #, draft
 msgid "One page is fetched — the one you pasted. Postulo never crawls."
 msgstr ""
@@ -6360,6 +6371,11 @@ msgid ""
 msgstr ""
 "Отворене пријаве без икаквог гласа и три ствари које се с тим могу урадити."
 
+#: src/postulo/templates/jobs/capture_form.html:35
+#: src/postulo/templates/jobs/capture_review.html:44
+msgid "Open it"
+msgstr ""
+
 #: src/postulo/templates/jobs/partials/company_row.html:87
 #, draft
 msgid "Openings"
@@ -6371,7 +6387,7 @@ msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
 "Необавезно. Ако је постављено, позивницу може да искористи само ова адреса."
 
-#: src/postulo/jobs/capture_views.py:53
+#: src/postulo/jobs/capture_views.py:54
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6477,7 +6493,7 @@ msgstr "Пакет"
 msgid "Page %(current)s of %(total)s"
 msgstr "Страница %(current)s од %(total)s"
 
-#: src/postulo/jobs/capture_views.py:50
+#: src/postulo/jobs/capture_views.py:51
 #, draft
 msgid "Page source"
 msgstr "Изворни код странице"
@@ -6839,7 +6855,7 @@ msgstr "оглас"
 msgid "Posting"
 msgstr "Оглас"
 
-#: src/postulo/jobs/capture_views.py:44
+#: src/postulo/jobs/capture_views.py:45
 #, draft
 msgid "Posting address"
 msgstr "Адреса огласа"
@@ -6901,7 +6917,7 @@ msgid ""
 msgstr ""
 "Postulo једном преузима слику за вашу примарну адресу са gravatar.com, чува копију и приказује њу. Ништа се не преузима док се странице гледају. Одзначите и копија се брише."
 
-#: src/postulo/jobs/capture_views.py:47
+#: src/postulo/jobs/capture_views.py:48
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo преузима ову једну страницу и ништа више."
@@ -6975,6 +6991,10 @@ msgid ""
 msgstr ""
 "Притисните Провери ажурирања да бисте преузели оно што каталози нуде. Postulo их не преузима сам."
 
+#: src/postulo/templates/jobs/capture_form.html:38
+msgid "Press “Read the page” again to capture it anyway."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html:17
 #: src/postulo/templates/documents/letter_detail.html:16
 #: src/postulo/templates/resume/overview.html:19
@@ -7011,7 +7031,7 @@ msgstr "Приоритет"
 msgid "priority"
 msgstr "приоритет"
 
-#: src/postulo/templates/jobs/capture_form.html:48
+#: src/postulo/templates/jobs/capture_form.html:75
 #, draft
 msgid "Private and local addresses are refused."
 msgstr "Приватне и локалне адресе се одбијају."
@@ -7239,7 +7259,7 @@ msgstr "Читање свега: пријаве, огласи, компаниј�
 msgid "Read it"
 msgstr "Прочитај"
 
-#: src/postulo/templates/jobs/capture_form.html:36
+#: src/postulo/templates/jobs/capture_form.html:63
 #, draft
 msgid "Read the page"
 msgstr "Прочитај страницу"
@@ -7773,7 +7793,7 @@ msgstr "Прво ово сачувајте, па се вратите и прис
 msgid "Save to add another identifier."
 msgstr "Сачувајте да бисте додали још један идентификатор."
 
-#: src/postulo/templates/jobs/capture_review.html:78
+#: src/postulo/templates/jobs/capture_review.html:111
 #, draft
 msgid "Save to listings"
 msgstr "Сачувај у огласе"
@@ -7783,7 +7803,7 @@ msgstr "Сачувај у огласе"
 msgid "Saved in %(language)s."
 msgstr "Сачувано на %(language)s."
 
-#: src/postulo/jobs/capture_views.py:241
+#: src/postulo/jobs/capture_views.py:274
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Сачувано у ваше огласе. Одлучите о томе када будете спремни."
@@ -8400,7 +8420,7 @@ msgstr ""
 msgid "source version"
 msgstr "верзија на извору"
 
-#: src/postulo/templates/jobs/capture_form.html:52
+#: src/postulo/templates/jobs/capture_form.html:79
 #, draft
 msgid "Sources installed"
 msgstr "Инсталирани извори"
@@ -9259,7 +9279,7 @@ msgstr "Датотека је празна."
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Датотека је преко 2 MB. Потрага за послом није толико велика."
 
-#: src/postulo/api/api.py:268
+#: src/postulo/api/api.py:309
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -9425,7 +9445,7 @@ msgid "the posting"
 msgstr "оглас"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:58
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9461,7 +9481,7 @@ msgstr ""
 "Остатак датотеке ипак вреди увести. Оно што је овде наведено не вреди, и можете га додати ручно после."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:30
+#: src/postulo/templates/jobs/capture_review.html:63
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9514,12 +9534,12 @@ msgid ""
 msgstr ""
 "Страница је одбила захтев (%(status)s). Велике странице често стоје иза заштите од ботова која одбија све што није прегледач, чак и када је страница вама савршено видљива. Уместо тога налепите изворни код странице испод."
 
-#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_form.html:51
 #, draft
 msgid "The site refuses Postulo, or the posting needs a login"
 msgstr "Страница одбија Postulo, или оглас тражи пријаву"
 
-#: src/postulo/templates/jobs/capture_form.html:47
+#: src/postulo/templates/jobs/capture_form.html:74
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "robots.txt странице се поштује."
@@ -9642,6 +9662,12 @@ msgstr "Ови записи могу да именују људе и њихов�
 #, draft
 msgid "They did not show up"
 msgstr "Нису се појавили"
+
+#: src/postulo/templates/jobs/capture_form.html:24
+#: src/postulo/templates/jobs/capture_review.html:33
+#, python-format
+msgid "This address is already in your listings, since %(when)s."
+msgstr ""
 
 #: src/postulo/core/postal.py:225
 #, draft
@@ -9786,7 +9812,7 @@ msgstr "Преко %(provider)s: тражи се и код."
 msgid "Tick rows to act on several at once."
 msgstr "Означите редове да бисте деловали на више њих одједном."
 
-#: src/postulo/jobs/capture_views.py:161
+#: src/postulo/jobs/capture_views.py:171
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -9981,7 +10007,7 @@ msgstr "Двофакторска потврда идентитета"
 msgid "Type at least two characters."
 msgstr "Упишите бар два знака."
 
-#: src/postulo/templates/jobs/capture_form.html:38
+#: src/postulo/templates/jobs/capture_form.html:65
 #, draft
 msgid "Type it in instead"
 msgstr "Уместо тога упишите ручно"
