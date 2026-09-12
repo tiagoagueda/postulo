@@ -73,7 +73,10 @@ jobs:
           version="$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/postulo/__init__.py)"
           test -n "$version" || { echo "no version in src/postulo/__init__.py"; exit 1; }
           registry="${REGISTRY_HOST:-${GITHUB_SERVER_URL#http*://}}"
-          image="${registry}/${GITHUB_REPOSITORY}"
+          # Lowercased: this instance's owner is `Postulo` and a Docker repository name
+          # may not carry a capital, so the tag was refused outright (#190).
+          repository="$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          image="${registry}/${repository}"
           short="$(git rev-parse --short HEAD)"
           # `:dev` moves; the second one is what a bug report can name. Never `:latest`.
           echo "tags=${image}:dev,${image}:${version}-dev.${short}" >> "$GITHUB_OUTPUT"

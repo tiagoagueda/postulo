@@ -62,7 +62,10 @@ jobs:
         run: |
           version="${RELEASE_TAG#v}"
           registry="${REGISTRY_HOST:-${GITHUB_SERVER_URL#http*://}}"
-          image="${registry}/${GITHUB_REPOSITORY}"
+          # Lowercased: this instance's owner is `Postulo` and a Docker repository name
+          # may not carry a capital, so the tag was refused outright (#190).
+          repository="$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          image="${registry}/${repository}"
           echo "tags=${image}:${version},${image}:${version%.*},${image}:latest" >> "$GITHUB_OUTPUT"
 
       - name: Sign in to the registry

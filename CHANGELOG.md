@@ -364,7 +364,12 @@ All notable changes to Postulo are recorded here. The format follows
   amd64-only dev image is one nobody can deploy. QEMU binfmt is registered on the runner, so
   the second architecture costs time and nothing else.
 
-  Four faults, none of them in this workflow, all of them in the release path, and all
+  **And a fifth: the image name carried a capital.** `GITHUB_REPOSITORY` is
+  `Postulo/postulo` on this instance, and a Docker repository name may not have one, so the
+  tag was refused outright — after a full multi-architecture build. Lowercased in both
+  workflows.
+
+  Five faults, none of them in this workflow, all of them in the release path, and all
   found by the simple act of running it. That is what a channel nobody had ever exercised
   was hiding — and two of them needed only a file to be *read*, not run, so
   `tests/test_shell_scripts.py` now reads every tracked shell script: it parses under
