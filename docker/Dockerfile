@@ -223,7 +223,19 @@ RUN POSTULO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe
 # without pip present. The pip branch of `installer()` stays, because it is the right
 # answer for an ordinary `pip install postulo` on somebody's server -- it is simply never
 # taken in this image. `installer()` now says so plainly if it ever finds neither.
-RUN python -m pip uninstall -y pip     && rm -rf /usr/local/lib/python3.14/site-packages/pip               /usr/local/lib/python3.14/site-packages/pip-*.dist-info     && python -c "import importlib.util, sys; sys.exit(importlib.util.find_spec('pip') is not None)"     && uv --version
+# Removed rather than uninstalled, and checked with the **base** interpreter by absolute
+# path. `python` here is `/app/.venv/bin/python` -- PATH puts the environment first -- and
+# that one never had pip, so `python -m pip uninstall` failed with *No module named pip*
+# before removing anything. Which says something worth keeping: `installer()`'s pip branch
+# could not have worked in this image even before pip was taken out of the interpreter,
+# because `sys.executable` is the environment's python and pip was never in there.
+RUN rm -rf /usr/local/lib/python3.14/site-packages/pip \
+           /usr/local/lib/python3.14/site-packages/pip-*.dist-info \
+    && if /usr/local/bin/python -c "import pip" 2>/dev/null; then \
+           echo "pip is still importable by the base interpreter" >&2; \
+           exit 1; \
+       fi \
+    && uv --version
 
 COPY docker/entrypoint.sh /usr/local/bin/postulo-entrypoint
 RUN chmod +x /usr/local/bin/postulo-entrypoint \
