@@ -290,6 +290,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Your career lists its sections down the side, with a count beside each.** Seven sections
+  down one page, each a list with no ceiling, and nothing on the page said what was below the
+  fold: the only way to learn it held *Languages* was to reach the bottom. The sidebar
+  Settings uses now stands beside the sections as anchors — *Experience 12*, *Languages 0* —
+  sticky on a wide screen so it is there wherever you have scrolled to, a strip that scrolls
+  sideways on a phone. A section with nothing in it is listed all the same; that is how you
+  find out the page can hold it. The entry for the section on the screen is marked as you
+  read, and the list is one template shared with Settings, so the two cannot drift apart.
+  (#175)
+
 - **A dev channel: every push to `main` publishes an image, so a change can be run before it
   is released.** `dev-image.yml` builds, scans and pushes `:dev` alongside a pinnable
   `:<version>-dev.<short sha>` — quote the pinned one in a bug report, because `:dev` moves

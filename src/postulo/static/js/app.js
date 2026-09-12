@@ -885,6 +885,70 @@
     }
   });
 
+  /* ------------------------------------------------------- a page's own sections
+   *
+   * The career page is seven sections down one scroll, and its sidebar lists them as
+   * anchors. Which one is being looked at is a question only the browser can answer, so
+   * this answers it: the last section whose top has passed a line two-fifths of the way
+   * down the window carries `aria-current="location"` -- location rather than page,
+   * because they are all one page (#175). At the bottom of the page it is the last
+   * section, whatever the line says: a short final section can never reach the line,
+   * and the person who scrolled to it is looking at it. Without this the list still
+   * navigates; it only stops saying where you are.
+   */
+  (function () {
+    var links = document.querySelectorAll("[data-section-link]");
+    if (!links.length) {
+      return;
+    }
+    var sections = [];
+    links.forEach(function (link) {
+      var section = document.getElementById(link.getAttribute("data-section-link"));
+      if (section) {
+        sections.push(section);
+      }
+    });
+    if (!sections.length) {
+      return;
+    }
+    var scheduled = false;
+    function mark() {
+      scheduled = false;
+      var line = window.innerHeight * 0.4;
+      var current = sections[0];
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i].getBoundingClientRect().top <= line) {
+          current = sections[i];
+        }
+      }
+      var height = document.documentElement.scrollHeight;
+      if (window.innerHeight + window.scrollY >= height - 2) {
+        current = sections[sections.length - 1];
+      }
+      links.forEach(function (link) {
+        var here = link.getAttribute("data-section-link") === current.id;
+        link.classList.toggle("nav-link-active", here);
+        link.classList.toggle("nav-link", !here);
+        if (here) {
+          link.setAttribute("aria-current", "location");
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      });
+    }
+    // Once per frame however often the page scrolls; a scroll listener that lays out on
+    // every event is how a page starts to stutter.
+    function schedule() {
+      if (!scheduled) {
+        scheduled = true;
+        window.requestAnimationFrame(mark);
+      }
+    }
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    mark();
+  })();
+
   /* --------------------------------------------------------- resizing a column
    *
    * A column width is the one preference in a table that can only be *asked for* with a

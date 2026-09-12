@@ -64,9 +64,23 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
         context["sections"] = [
             {
                 "spec": SECTIONS[slug],
-                "items": SECTIONS[slug].model.objects.for_user(user),
+                "items": list(SECTIONS[slug].model.objects.for_user(user)),
             }
             for slug in OVERVIEW_ORDER
+        ]
+        # The sidebar: one anchor per section, with how many entries it holds. A section
+        # with nothing in it is listed all the same -- that is how somebody finds out the
+        # page can hold their languages at all (#175).
+        context["section_nav"] = [
+            {
+                "href": f"#section-{section['spec'].slug}",
+                "anchor": f"section-{section['spec'].slug}",
+                "label": section["spec"].plural,
+                "icon": "",
+                "count": len(section["items"]),
+                "current": "",
+            }
+            for section in context["sections"]
         ]
         context["skills"] = Skill.objects.for_user(user).select_related("group")
         # One query for the whole page rather than one per entry: a generic link has no

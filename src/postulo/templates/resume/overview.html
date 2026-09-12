@@ -21,136 +21,148 @@
     </div>
   </div>
 
-  <div class="space-y-8">
-    {% for section in sections %}
-      <section>
-        <div class="mb-3 flex items-center gap-3">
-          <h2 class="font-medium">{{ section.spec.plural }}</h2>
-          {% if section.spec.slug == 'link' and section.items %}
-            <form method="post" action="{% url 'resume:link_check_all' %}" class="ms-auto">
-              {% csrf_token %}
-              <input type="hidden" name="next" value="{{ request.get_full_path }}">
-              <button type="submit" class="text-sm text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Check them all" %}</button>
-            </form>
-            <a href="{% url 'resume:item_create' section.spec.slug %}"
-               class="text-sm text-brand-600 underline dark:text-brand-400">
-              {% translate "Add" %}
-            </a>
-          {% else %}
-            <a href="{% url 'resume:item_create' section.spec.slug %}"
-               class="ms-auto text-sm text-brand-600 underline dark:text-brand-400">
-              {% translate "Add" %}
-            </a>
+  {% comment %} Seven sections down one page, each a list with no ceiling, so the page is
+     navigated rather than traversed: the sidebar Settings uses, with the sections as
+     anchors and a count beside each. Sticky from `lg` up, so it is there wherever somebody
+     has scrolled to; a strip that scrolls sideways on a phone (#175). {% endcomment %}
+  <div class="lg:flex lg:items-start lg:gap-10">
+    <aside class="mb-6 lg:sticky lg:top-4 lg:mb-0 lg:w-56 lg:shrink-0">
+      <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
+        {% translate "On this page" %}
+      </p>
+      {% sidebar section_nav _("Career sections") %}
+    </aside>
+    <div class="min-w-0 flex-1 space-y-8">
+      {% for section in sections %}
+        <section id="section-{{ section.spec.slug }}">
+          <div class="mb-3 flex items-center gap-3">
+            <h2 class="font-medium">{{ section.spec.plural }}</h2>
+            {% if section.spec.slug == 'link' and section.items %}
+              <form method="post" action="{% url 'resume:link_check_all' %}" class="ms-auto">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="text-sm text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Check them all" %}</button>
+              </form>
+              <a href="{% url 'resume:item_create' section.spec.slug %}"
+                 class="text-sm text-brand-600 underline dark:text-brand-400">
+                {% translate "Add" %}
+              </a>
+            {% else %}
+              <a href="{% url 'resume:item_create' section.spec.slug %}"
+                 class="ms-auto text-sm text-brand-600 underline dark:text-brand-400">
+                {% translate "Add" %}
+              </a>
+            {% endif %}
+          </div>
+
+          {% if section.spec.blurb %}
+            <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">{{ section.spec.blurb }}</p>
           {% endif %}
-        </div>
 
-        {% if section.spec.blurb %}
-          <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">{{ section.spec.blurb }}</p>
-        {% endif %}
-
-        {% if section.items %}
-          <div class="card p-0">
-            <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-              {% for item in section.items %}
-                {% comment %} The entry claims twelve rem before its four buttons may sit beside
-                   it. In Greek, "Edit" and "Delete" are long enough that the entry was left
-                   fourteen pixels, with its title written over the arrows (#165). {% endcomment %}
-                <li class="flex flex-wrap items-start gap-3 px-4 py-3">
-                  <div class="min-w-0 grow basis-48">
-                    <p class="font-medium">{{ item }}</p>
-                    {% if section.spec.slug == 'link' %}
-                      <p class="truncate text-sm text-ink-500 dark:text-ink-400">
-                        {{ item.get_kind_display }} ·
-                        <a href="{{ item.url }}" rel="noopener" class="underline">{{ item.url }}</a>
-                      </p>
-                      {% if item.checked_at %}
-                        <p class="text-xs {% if item.is_broken %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
-                          {% blocktranslate with when=item.checked_at|date:"j M Y" detail=item.check_detail trimmed %}
-                            Checked {{ when }}: {{ detail }}
-                          {% endblocktranslate %}
+          {% if section.items %}
+            <div class="card p-0">
+              <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+                {% for item in section.items %}
+                  {% comment %} The entry claims twelve rem before its four buttons may sit beside
+                     it. In Greek, "Edit" and "Delete" are long enough that the entry was left
+                     fourteen pixels, with its title written over the arrows (#165). {% endcomment %}
+                  <li class="flex flex-wrap items-start gap-3 px-4 py-3">
+                    <div class="min-w-0 grow basis-48">
+                      <p class="font-medium">{{ item }}</p>
+                      {% if section.spec.slug == 'link' %}
+                        <p class="truncate text-sm text-ink-500 dark:text-ink-400">
+                          {{ item.get_kind_display }} ·
+                          <a href="{{ item.url }}" rel="noopener" class="underline">{{ item.url }}</a>
                         </p>
-                      {% endif %}
-                      <form method="post" action="{% url 'resume:link_check' item.pk %}" class="mt-1">
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                        <button type="submit" class="text-xs text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Check it answers" %}</button>
-                      </form>
-                    {% elif section.spec.slug == 'skill-group' %}
-                      <p class="text-sm text-ink-500 dark:text-ink-400">
-                        {% if item.skill_names %}
-                          {{ item.skill_names|join:", " }}
-                        {% else %}
-                          {% translate "No skills in this group yet" %}
+                        {% if item.checked_at %}
+                          <p class="text-xs {% if item.is_broken %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
+                            {% blocktranslate with when=item.checked_at|date:"j M Y" detail=item.check_detail trimmed %}
+                              Checked {{ when }}: {{ detail }}
+                            {% endblocktranslate %}
+                          </p>
                         {% endif %}
-                      </p>
-                    {% elif item.highlight_lines %}
-                      <p class="text-sm text-ink-500 dark:text-ink-400">
-                        {% blocktranslate trimmed count total=item.highlight_lines|length %}
-                          {{ total }} highlight
-                        {% plural %}
-                          {{ total }} highlights
-                        {% endblocktranslate %}
-                      </p>
-                    {% endif %}
-                    {% with spoken=languages_by_entry|get_item:item %}
-                      {% if spoken %}
-                        <p class="text-xs text-ink-500 dark:text-ink-400">
-                          {% blocktranslate trimmed with names=spoken|join:", " %}
-                            Also in {{ names }}
+                        <form method="post" action="{% url 'resume:link_check' item.pk %}" class="mt-1">
+                          {% csrf_token %}
+                          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                          <button type="submit" class="text-xs text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Check it answers" %}</button>
+                        </form>
+                      {% elif section.spec.slug == 'skill-group' %}
+                        <p class="text-sm text-ink-500 dark:text-ink-400">
+                          {% if item.skill_names %}
+                            {{ item.skill_names|join:", " }}
+                          {% else %}
+                            {% translate "No skills in this group yet" %}
+                          {% endif %}
+                        </p>
+                      {% elif item.highlight_lines %}
+                        <p class="text-sm text-ink-500 dark:text-ink-400">
+                          {% blocktranslate trimmed count total=item.highlight_lines|length %}
+                            {{ total }} highlight
+                          {% plural %}
+                            {{ total }} highlights
                           {% endblocktranslate %}
                         </p>
                       {% endif %}
-                    {% endwith %}
-                  </div>
+                      {% with spoken=languages_by_entry|get_item:item %}
+                        {% if spoken %}
+                          <p class="text-xs text-ink-500 dark:text-ink-400">
+                            {% blocktranslate trimmed with names=spoken|join:", " %}
+                              Also in {{ names }}
+                            {% endblocktranslate %}
+                          </p>
+                        {% endif %}
+                      {% endwith %}
+                    </div>
 
-                  <div class="flex flex-wrap items-center gap-1">
-                    <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'up' %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn-ghost px-2 py-1 text-xs"
-                              aria-label="{% translate 'Move up' %}">↑</button>
-                    </form>
-                    <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'down' %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn-ghost px-2 py-1 text-xs"
-                              aria-label="{% translate 'Move down' %}">↓</button>
-                    </form>
-                    <a href="{% url 'resume:item_update' section.spec.slug item.pk %}"
-                       class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
-                    <a href="{% url 'resume:item_delete' section.spec.slug item.pk %}"
-                       class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
-                      {% translate "Delete" %}
-                    </a>
-                  </div>
-                </li>
-
-                {% if section.spec.slug == 'skill-group' %}
-                  <li class="bg-ink-50 px-4 py-2 dark:bg-ink-950">
-                    <div class="flex flex-wrap items-center gap-2">
-                      {% for skill in item.skills.all %}
-                        <a href="{% url 'resume:item_update' 'skill' skill.pk %}"
-                           class="rounded bg-ink-100 px-2 py-0.5 text-xs hover:bg-ink-200
-                                  dark:bg-ink-800 dark:hover:bg-ink-700">{{ skill.name }}</a>
-                      {% endfor %}
-                      <a href="{% url 'resume:item_create' 'skill' %}"
-                         class="text-xs text-brand-600 underline dark:text-brand-400">
-                        {% translate "Add a skill" %}
+                    <div class="flex flex-wrap items-center gap-1">
+                      <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'up' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                                aria-label="{% translate 'Move up' %}">↑</button>
+                      </form>
+                      <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'down' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                                aria-label="{% translate 'Move down' %}">↓</button>
+                      </form>
+                      <a href="{% url 'resume:item_update' section.spec.slug item.pk %}"
+                         class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
+                      <a href="{% url 'resume:item_delete' section.spec.slug item.pk %}"
+                         class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                        {% translate "Delete" %}
                       </a>
                     </div>
                   </li>
-                {% endif %}
-              {% endfor %}
-            </ul>
-          </div>
-        {% else %}
-          <div class="card text-sm text-ink-500 dark:text-ink-400">
-            {% translate "Nothing here yet." %}
-            <a href="{% url 'resume:item_create' section.spec.slug %}"
-               class="text-brand-600 underline dark:text-brand-400">
-              {% translate "Add the first one." %}
-            </a>
-          </div>
-        {% endif %}
-      </section>
-    {% endfor %}
+
+                  {% if section.spec.slug == 'skill-group' %}
+                    <li class="bg-ink-50 px-4 py-2 dark:bg-ink-950">
+                      <div class="flex flex-wrap items-center gap-2">
+                        {% for skill in item.skills.all %}
+                          <a href="{% url 'resume:item_update' 'skill' skill.pk %}"
+                             class="rounded bg-ink-100 px-2 py-0.5 text-xs hover:bg-ink-200
+                                    dark:bg-ink-800 dark:hover:bg-ink-700">{{ skill.name }}</a>
+                        {% endfor %}
+                        <a href="{% url 'resume:item_create' 'skill' %}"
+                           class="text-xs text-brand-600 underline dark:text-brand-400">
+                          {% translate "Add a skill" %}
+                        </a>
+                      </div>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% else %}
+            <div class="card text-sm text-ink-500 dark:text-ink-400">
+              {% translate "Nothing here yet." %}
+              <a href="{% url 'resume:item_create' section.spec.slug %}"
+                 class="text-brand-600 underline dark:text-brand-400">
+                {% translate "Add the first one." %}
+              </a>
+            </div>
+          {% endif %}
+        </section>
+      {% endfor %}
+    </div>
   </div>
 {% endblock %}

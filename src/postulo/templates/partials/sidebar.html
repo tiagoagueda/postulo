@@ -1,0 +1,27 @@
+{% load postulo %}
+{% comment %}
+  One sidebar for two jobs: the pages of an area, as Settings and Server use it, and the
+  sections of one long page, as Your career does (#175). Each entry is an `href` and a
+  `label`, and may carry an `icon`, a `count`, an `anchor` (the id of the section it points
+  at) and `current` -- "page" for the page being looked at, "location" for the section on
+  the screen, which app.js sets for anchors since only the browser knows. A horizontal
+  strip that scrolls on a narrow screen, a column from `lg` up.
+{% endcomment %}
+<nav aria-label="{{ label }}">
+  <ul class="flex gap-1 scroll-x lg:flex-col">
+    {% for entry in entries %}
+      <li class="shrink-0">
+        <a href="{{ entry.href }}"
+           class="{% if entry.current %}nav-link-active{% else %}nav-link{% endif %} flex items-center gap-2"
+           {% if entry.current %}aria-current="{{ entry.current }}"{% endif %}
+           {% if entry.anchor %}data-section-link="{{ entry.anchor }}"{% endif %}>
+          {% if entry.icon %}{% icon entry.icon class="size-4" %}{% endif %}
+          <span class="min-w-0">{{ entry.label }}</span>
+          {% if entry.count is not None %}
+            <span class="ms-auto rounded-full bg-ink-100 px-2 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{{ entry.count }}</span>
+          {% endif %}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

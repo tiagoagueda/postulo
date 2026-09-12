@@ -12,6 +12,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 register = template.Library()
 
@@ -372,16 +373,25 @@ def pinned_field(field: BoundField, variable: str) -> dict:
 
 
 def _sidebar(context, sections) -> dict:
+    """The pages of an area as sidebar entries, the one being looked at marked `page`."""
     request = context.get("request")
     return {
-        "sections": [
-            {"section": section, "active": request is not None and section.is_active(request)}
+        "label": _("Settings sections"),
+        "entries": [
+            {
+                "href": reverse(section.url_name),
+                "label": section.label,
+                "icon": section.icon,
+                "count": None,
+                "anchor": "",
+                "current": "page" if request is not None and section.is_active(request) else "",
+            }
             for section in sections
-        ]
+        ],
     }
 
 
-@register.inclusion_tag("settings/sidebar.html", takes_context=True)
+@register.inclusion_tag("partials/sidebar.html", takes_context=True)
 def settings_sidebar(context) -> dict:
     """The sections of the Settings area, with the one being looked at marked."""
     from postulo.core.settings_sections import sections
@@ -389,12 +399,22 @@ def settings_sidebar(context) -> dict:
     return _sidebar(context, sections())
 
 
-@register.inclusion_tag("settings/sidebar.html", takes_context=True)
+@register.inclusion_tag("partials/sidebar.html", takes_context=True)
 def server_sidebar(context) -> dict:
     """The sections of the Server settings area, for administrators."""
     from postulo.core.server_sections import SECTIONS
 
     return _sidebar(context, SECTIONS)
+
+
+@register.inclusion_tag("partials/sidebar.html")
+def sidebar(entries, label) -> dict:
+    """The same sidebar, for entries a page built itself -- its own sections, as anchors.
+
+    Settings navigates between pages and Your career within one; the list is the same
+    shape either way, and one template means the two cannot drift apart (#175).
+    """
+    return {"entries": entries, "label": label}
 
 
 @register.simple_tag(takes_context=True)
