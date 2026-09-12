@@ -341,7 +341,15 @@ All notable changes to Postulo are recorded here. The format follows
   is real and eighteen versions behind; left alone on purpose, since a newer scanner is a
   gate that starts failing for reasons unrelated to the change being made.
 
-  Three faults, none of them in this workflow, all of them in the release path, and all
+  **And a fourth, the subtlest: the scan reports went to the host.** `scan-image.sh` gave
+  the scanner containers `-v "$OUT:/out"`. A bind mount is resolved by the **daemon**,
+  against the host's filesystem — and this script now runs *inside* a container with the
+  socket mounted in, so the scanner wrote its reports into a directory on the host that the
+  caller could not see, and every `cat` after it failed. It worked on a laptop, where the
+  shell and the daemon share a filesystem. Trivy writes to stdout now, which grype already
+  did, and both mounts are gone.
+
+  Four faults, none of them in this workflow, all of them in the release path, and all
   found by the simple act of running it. That is what a channel nobody had ever exercised
   was hiding — and two of them needed only a file to be *read*, not run, so
   `tests/test_shell_scripts.py` now reads every tracked shell script: it parses under

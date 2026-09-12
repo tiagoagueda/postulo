@@ -64,11 +64,17 @@ fi
 # The scanners run as containers and read the image out of the daemon, so nothing has to be
 # installed on the machine doing the scanning. The cache volumes are what keep a second run
 # from downloading both databases again.
+#
+# **Reports come back on stdout, never through a bind mount.** A `-v "$OUT:/out"` here is
+# resolved by the *daemon*, against the host filesystem -- so where this script itself runs
+# inside a container with the socket mounted in, which is how CI runs it, the scanner wrote
+# into a directory on the host the caller could not see, and every `cat` after it failed.
+# Redirecting stdout writes the file wherever this shell is: the same place on a laptop,
+# the right place in CI. Grype was already written this way (#190).
 trivy() {
     $DOCKER run --rm \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v postulo-trivy-cache:/root/.cache \
-        -v "$OUT:/out" \
         "$TRIVY" "$@"
 }
 
@@ -76,21 +82,20 @@ grype() {
     $DOCKER run --rm \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v postulo-grype-cache:/root/.cache/grype \
-        -v "$OUT:/out" \
         "$GRYPE" "$@"
 }
 
 echo
 echo "== Everything either tool can see, fixable or not =="
-trivy image --scanners vuln,secret,misconfig --format table \
-    --output /out/trivy-full.txt "$IMAGE" || true
+trivy image --scanners vuln,secret,misconfig --format table "$IMAGE" \
+    > "$OUT/trivy-full.txt" || true
 cat "$OUT/trivy-full.txt" || true
 
 echo
 echo "== A bill of materials, so somebody can scan this again next year =="
 # Against a database that does not exist yet, which is more use to somebody self-hosting
 # Postulo than today's verdict on today's image.
-trivy image --format cyclonedx --output /out/sbom.cdx.json "$IMAGE"
+trivy image --format cyclonedx "$IMAGE" > "$OUT/sbom.cdx.json"
 echo "wrote $OUT/sbom.cdx.json"
 
 echo
@@ -98,7 +103,7 @@ echo "== The gate: findings with a fix available =="
 failed=0
 
 trivy image --scanners vuln --ignore-unfixed --severity "$SEVERITY" \
-    --format table --output /out/trivy-fixable.txt "$IMAGE"
+    --format table "$IMAGE" > "$OUT/trivy-fixable.txt"
 cat "$OUT/trivy-fixable.txt"
 trivy image --scanners vuln --ignore-unfixed --severity "$SEVERITY" \
     --exit-code 1 --quiet "$IMAGE" || failed=1
