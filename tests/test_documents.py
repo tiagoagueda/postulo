@@ -447,6 +447,27 @@ def test_an_uploaded_file_is_delivered_only_to_its_owner(client, user, other_use
         response.close()
 
 
+def test_the_edit_form_names_the_file_rather_than_where_it_is_kept(client, user, db):
+    """Django's file widget shows the *storage* path -- the account id and the month of the
+    upload -- inside a link to /media/, which nothing serves. The person is shown the name of
+    the file they uploaded, and nothing about where Postulo keeps it (#191)."""
+    import posixpath
+
+    document = UploadedDocument.objects.create(
+        owner=user, title="Reference", file=SimpleUploadedFile("reference.txt", b"a reference")
+    )
+    stored = document.file.name
+    assert stored.startswith(f"documents/{user.pk}/"), "the path carries the account id"
+
+    client.force_login(user)
+    html = client.get(reverse("documents:upload_update", args=[document.pk])).content.decode()
+
+    assert posixpath.basename(stored) in html
+    assert stored not in html, "the storage path is Postulo's, not the person's"
+    assert f"documents/{user.pk}/" not in html
+    assert "/media/" not in html, "nothing serves /media/, so a link there is a dead one"
+
+
 def test_a_snapshot_is_delivered_only_to_its_owner(client, user, other_user, cv, fake_backend):
     document = snapshot_cv(cv, backend=fake_backend)
 

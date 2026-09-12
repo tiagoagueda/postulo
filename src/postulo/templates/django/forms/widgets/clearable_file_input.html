@@ -1,0 +1,12 @@
+{% load postulo %}{% comment %}
+  Django's own template puts the *stored* path here -- "Currently: documents/1/2026/09/x.txt"
+  -- which carries the account id and the month, inside a link to /media/ that nothing
+  serves: media leaves only through a view that has checked who is asking. The question the
+  field asks is "which file is this?", and the answer is its name (#191). The rest of the
+  template is Django's, kept identical so the clear checkbox and the input behave as every
+  file field expects.
+{% endcomment %}{% if widget.is_initial %}{{ widget.initial_text }}: {{ widget.value|file_name }}{% if not widget.required %}
+<input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}{% if widget.attrs.checked %} checked{% endif %}>
+<label for="{{ widget.checkbox_id }}">{{ widget.clear_checkbox_label }}</label>{% endif %}<br>
+{{ widget.input_text }}:{% endif %}
+<input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>

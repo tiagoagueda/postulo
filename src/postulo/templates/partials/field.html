@@ -1,8 +1,9 @@
 {% load postulo %}
 {% comment %} `wrap-anywhere` because a widget may put text here that Postulo did not write
-   and cannot hyphenate. Django renders a bound file field as "Currently: <storage path>",
-   and a path has no spaces in it -- 252 unbreakable pixels against the 238 a 320-pixel
-   screen leaves, in every language, which is what ran the upload form off a phone (#167).
+   and cannot hyphenate. A bound file field says "Currently: <file name>", and a file name
+   has no spaces in it -- the storage path it used to show was 252 unbreakable pixels
+   against the 238 a 320-pixel screen leaves, in every language, which is what ran the
+   upload form off a phone (#167). The path is gone (#191); a long name still cannot break.
 {% endcomment %}
 <div class="mb-4 wrap-anywhere">
   <label class="field-label" for="{{ field.id_for_label }}">

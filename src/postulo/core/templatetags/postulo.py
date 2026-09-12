@@ -1,6 +1,7 @@
 """Small template helpers used across the interface."""
 
 import functools
+import posixpath
 import re
 import zlib
 from pathlib import Path
@@ -325,6 +326,18 @@ def add_class(field: BoundField, css_classes: str) -> BoundField:
     existing = field.field.widget.attrs.get("class", "")
     merged = f"{existing} {css_classes}".strip()
     return field.as_widget(attrs={"class": merged})
+
+
+@register.filter
+def file_name(value) -> str:
+    """The name of a stored file, without the path Postulo keeps it at.
+
+    A ``FieldFile`` prints as its storage name -- ``documents/1/2026/09/reference.txt`` --
+    which carries the owner's account id and the month of the upload. Neither is the
+    person's to care about, and a form that shows them is describing the filing system
+    rather than answering "which file is this?" (#191).
+    """
+    return posixpath.basename(str(value or ""))
 
 
 @register.inclusion_tag("partials/field_pinned.html")

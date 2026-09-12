@@ -429,6 +429,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **A file's edit form no longer shows where Postulo keeps it.** Editing an uploaded file
+  said *Currently: documents/1/2026/09/reference.txt* — the storage path, carrying the
+  account id and the month of the upload, inside a link to `/media/` that nothing serves. It
+  says *Currently: reference.txt* now. The path was Postulo's filing system thinking aloud:
+  not the person's to care about, a second answer beside the *Title* field above it, and on
+  a shared screen an account id. Django's file widget template is overridden once, for every
+  file field, so no form has to remember. (#191)
+
 - **The accessibility walk claimed thirty-five pages it never opened, and six of the pages
   it had never opened were broken.** `tests/test_page_coverage.py` insisted every URL
   pattern was either visited by the browser suite or excused in writing — but "visited"
