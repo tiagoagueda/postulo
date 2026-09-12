@@ -290,6 +290,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Server overview: the card at the bottom has lost its heading.** It said *Also*, which
+  names nothing — the other headings on that page are *Overview*, *Software* and *Data*, each
+  saying what is under it, and this one said only that there was more, which the reader can
+  already see. It is the heading somebody writes when a card has collected what did not fit
+  elsewhere, and that is what the card is: a link to the health check, and a link to Django's
+  admin or a note saying it is off. Both say what they are and where they go, so the card
+  carries itself. (#183)
+
 - **Twenty-four languages are no longer translated before anybody has read the English
   once.** `test_every_european_union_language_stays_complete` held the twenty-four European
   Union catalogues at 100% on every commit, which made adding one user-facing string cost
