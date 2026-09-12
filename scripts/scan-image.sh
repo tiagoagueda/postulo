@@ -25,6 +25,18 @@
 # that came back clean. A scan that records only what it failed on throws away the half that
 # says the image is in the state you think it is.
 #
+# **Three outcomes, told apart by exit code and by `$OUT/verdict.txt`.**
+#
+#   0  nothing fixable -- the image may be published
+#   1  fixable findings at $SEVERITY or above -- the gate
+#   2  the scan did not complete -- a scanner that failed to run, a report that came back
+#      empty. Not a finding, and it must not look like one: the first time this ran in CI
+#      a plumbing fault made the step red in exactly the way a finding does, and a gate that
+#      cannot be told from its own failure is not reporting anything (#192).
+#
+# The verdict file is removed before anything runs, so a run that dies leaves no verdict
+# rather than yesterday's.
+#
 # Both tools download a vulnerability database, so this needs the network. That is fine for
 # CI and worth knowing before anything depends on it at a release with no connection.
 set -euo pipefail
@@ -53,7 +65,26 @@ GRYPE="${GRYPE_IMAGE:-anchore/grype:v0.100.0}"
 SEVERITY="${SCAN_SEVERITY:-HIGH,CRITICAL}"
 GRYPE_SEVERITY="${GRYPE_SEVERITY:-high}"
 
+#: What Trivy exits with when it finds something. Not 1: Trivy exits 1 for its own
+#: failures too, and the whole point is telling the two apart.
+FOUND=3
+
 mkdir -p "$OUT"
+rm -f "$OUT/verdict.txt"
+
+verdict() {
+    printf '%s\n' "$1" > "$OUT/verdict.txt"
+}
+
+# The scan could not be completed. Says so on stderr, in the verdict, and in the exit code,
+# and says nothing about the image -- because nothing is known about it.
+incomplete() {
+    echo >&2
+    echo "The scan did not complete: $1." >&2
+    echo "That is not a finding. Nothing here says the image is clean; nothing here says it is not." >&2
+    verdict "incomplete: $1"
+    exit 2
+}
 
 if [ -z "$IMAGE" ]; then
     IMAGE="postulo:scan"
@@ -70,7 +101,7 @@ fi
 # inside a container with the socket mounted in, which is how CI runs it, the scanner wrote
 # into a directory on the host the caller could not see, and every `cat` after it failed.
 # Redirecting stdout writes the file wherever this shell is: the same place on a laptop,
-# the right place in CI. Grype was already written this way (#190).
+# the right place in CI. Grype was already written this way (#190, #192).
 trivy() {
     $DOCKER run --rm \
         -v /var/run/docker.sock:/var/run/docker.sock \
@@ -87,34 +118,56 @@ grype() {
 
 echo
 echo "== Everything either tool can see, fixable or not =="
+# Informational: the gate below is what decides, so a hiccup here is reported, not fatal.
 trivy image --scanners vuln,secret,misconfig --format table "$IMAGE" \
-    > "$OUT/trivy-full.txt" || true
+    > "$OUT/trivy-full.txt" || echo "(the full report did not complete; the gate below still decides)"
 cat "$OUT/trivy-full.txt" || true
 
 echo
 echo "== A bill of materials, so somebody can scan this again next year =="
 # Against a database that does not exist yet, which is more use to somebody self-hosting
-# Postulo than today's verdict on today's image.
-trivy image --format cyclonedx "$IMAGE" > "$OUT/sbom.cdx.json"
+# Postulo than today's verdict on today's image. The release keeps it as an artifact, so a
+# release without one is a scan that did not complete.
+trivy image --format cyclonedx "$IMAGE" > "$OUT/sbom.cdx.json" \
+    || incomplete "trivy could not write the bill of materials"
+[ -s "$OUT/sbom.cdx.json" ] || incomplete "the bill of materials came back empty"
 echo "wrote $OUT/sbom.cdx.json"
 
 echo
 echo "== The gate: findings with a fix available =="
 failed=0
 
-trivy image --scanners vuln --ignore-unfixed --severity "$SEVERITY" \
-    --format table "$IMAGE" > "$OUT/trivy-fixable.txt"
+# One run: the report and the verdict from the same scan, told apart by the exit code.
+status=0
+trivy image --scanners vuln --ignore-unfixed --severity "$SEVERITY" --exit-code "$FOUND" \
+    --format table "$IMAGE" > "$OUT/trivy-fixable.txt" || status=$?
 cat "$OUT/trivy-fixable.txt"
-trivy image --scanners vuln --ignore-unfixed --severity "$SEVERITY" \
-    --exit-code 1 --quiet "$IMAGE" || failed=1
+case "$status" in
+    0) ;;
+    "$FOUND") failed=1 ;;
+    *) incomplete "trivy exited $status" ;;
+esac
 
+# Grype exits 1 for findings and 1 for its own failures, and has no flag to change that.
+# The difference is whether it produced a report: a table on stdout is findings; nothing on
+# stdout with a non-zero exit is a scanner that did not run.
+status=0
 grype "$IMAGE" --only-fixed --fail-on "$GRYPE_SEVERITY" -o table > "$OUT/grype-fixable.txt" \
-    || failed=1
+    || status=$?
 cat "$OUT/grype-fixable.txt"
+if [ "$status" -ne 0 ]; then
+    if [ -s "$OUT/grype-fixable.txt" ]; then
+        failed=1
+    else
+        incomplete "grype exited $status with no report"
+    fi
+fi
 
 echo
 if [ "$failed" -ne 0 ]; then
+    verdict "findings"
     echo "Fixable findings at $SEVERITY or above. Reports in $OUT."
     exit 1
 fi
+verdict "clean"
 echo "Nothing fixable at $SEVERITY or above. Reports in $OUT."

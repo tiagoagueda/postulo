@@ -103,6 +103,10 @@ jobs:
           {
             echo '## Image scan'
             echo
+            # Three outcomes, not one red step: clean, findings, or a scan that did not
+            # complete -- which is not a finding and must not read as one (#192).
+            echo "**Verdict:** $(cat .scan/verdict.txt 2>/dev/null || echo 'none -- the scan script did not get as far as writing one')"
+            echo
             echo '<details><summary>Everything both scanners saw, fixable or not</summary>'
             echo
             echo '```'

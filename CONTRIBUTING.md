@@ -346,6 +346,14 @@ against a database that does not exist yet.
 
 Both scanners download a vulnerability database, so the step needs the network.
 
+**Three outcomes, not one red step.** The script exits 0 when nothing fixable was found, 1
+on fixable findings — the gate — and 2 when the scan did not complete: a scanner that failed
+to run, a bill of materials that came back empty. The last is not a finding and must not
+read as one; it says nothing about the image, and says so. `.scan/verdict.txt` holds which
+of the three it was (`clean`, `findings`, or `incomplete: <why>`), and both image workflows
+put it at the top of their run summary. `tests/test_scan_image.py` drives all three through
+a fake `docker`, so the reading of the scanners is tested without running them (#192).
+
 ### Giving a runner the `docker` label
 
 **Not `docker:host`, if the runner is itself a container.** That was the advice here until

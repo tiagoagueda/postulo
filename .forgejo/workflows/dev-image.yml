@@ -111,6 +111,7 @@ jobs:
       # The scan above read the native build; this rebuilds for both architectures and
       # pushes. buildx reuses the layers, so the arm64 half is the only new work.
       - name: Build for amd64 and arm64 and push
+        id: push
         env:
           TAGS: ${{ steps.tags.outputs.tags }}
         run: |
@@ -135,7 +136,8 @@ jobs:
             --owner "${repository%%/*}" --package "${repository##*/}" --keep "$DEV_IMAGES_KEPT"
 
       # What was built, and from what. A dev tag moves, so the commit is the only thing that
-      # identifies what somebody is running.
+      # identifies what somebody is running. The scan's verdict sits here because a scan that
+      # did not complete is not a finding and must not read as one (#192).
       - name: Say what this is
         if: always()
         run: |
@@ -144,6 +146,16 @@ jobs:
             echo
             echo "Built from \`${GITHUB_SHA}\` on \`${GITHUB_REF_NAME}\`."
             echo
+            echo "**Scan:** $(cat .scan/verdict.txt 2>/dev/null || echo 'no verdict -- the scan script did not get as far as writing one')"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Only when the push actually happened. Keyed to that step rather than to the job,
+      # because a failure *after* the push -- the prune -- is a published image all the same.
+      - name: Say how to pull it
+        if: always() && steps.push.outcome == 'success'
+        run: |
+          {
             echo '```'
             echo 'docker pull ${{ steps.tags.outputs.pinned }}'
             echo '```'
@@ -151,3 +163,8 @@ jobs:
             echo 'Not a release. Never tagged `latest`, unsupported, and it may change a'
             echo 'database in ways a release will not.'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Say that nothing was published
+        if: always() && steps.push.outcome != 'success'
+        run: |
+          echo 'Nothing was published: the push step did not run, or did not succeed.' >> "$GITHUB_STEP_SUMMARY"

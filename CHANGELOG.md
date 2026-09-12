@@ -437,6 +437,19 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The image scan can now be told from its own failure.** `scripts/scan-image.sh` has three
+  outcomes instead of one red step: exit 0 for nothing fixable, 1 for fixable findings, and
+  2 when the scan did not complete — a scanner that failed to run, a bill of materials that
+  came back empty — which says nothing about the image and now says so, on stderr and in
+  `.scan/verdict.txt`, which both image workflows put at the top of their run summary. Trivy
+  runs once for the gate rather than twice, with an exit code of its own for findings; Grype
+  exits 1 for everything, so its verdict is read from whether a report came out. A verdict
+  left by an earlier run is removed before anything starts, and the dev image's summary no
+  longer offers a `docker pull` for an image that was never pushed. The root cause — reports
+  written through a bind mount the daemon resolved against the host — went with #190, and a
+  test now keeps every report on a redirect. `.scan/` is ignored, so a scan run by hand
+  leaves no untracked files behind. (#192)
+
 - **An uploaded file downloads under its own extension.** Every download was called
   `<title>.pdf`, whatever had been uploaded, so a `.docx` or a `.txt` arrived as a file no
   PDF viewer would open — served as `application/pdf` too, since the type is guessed from
