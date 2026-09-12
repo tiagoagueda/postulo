@@ -274,11 +274,17 @@ End the entry with the issue it closes, in brackets: `(#42)`.
 
 ## Making a release
 
-1. Move the *Unreleased* entries in `CHANGELOG.md` under a new `## [X.Y.Z] — YYYY-MM-DD`
+1. `uv run pytest -m release` — the promises that must hold in a published version rather
+   than in every commit. Today that is the twenty-four European Union catalogues being
+   complete. Ordinary work translates English, French and European Portuguese; **this is
+   where the rest are swept up**, and it is the only check between an unfinished catalogue
+   and a published version. Fill what it names (`scripts/messages.py extract` first if the
+   strings are new) and run it again until it passes.
+2. Move the *Unreleased* entries in `CHANGELOG.md` under a new `## [X.Y.Z] — YYYY-MM-DD`
    heading, and leave an empty *Unreleased* above it.
-2. Set the same version in `pyproject.toml` and in `src/postulo/__init__.py`.
-3. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree.
-4. Commit, then tag and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+3. Set the same version in `pyproject.toml` and in `src/postulo/__init__.py`.
+4. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree.
+5. Commit, then tag and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
 
 The `release` workflow does the rest, and it is one job: it refuses a tag that disagrees
 with the code or the changelog, builds the sdist and the wheel, and creates the Forgejo

@@ -288,6 +288,31 @@ All notable changes to Postulo are recorded here. The format follows
   Overview*, which linked to the admin as "the escape hatch", says plainly that there is not
   one and which variable turns it on, rather than linking to a 404. (#116)
 
+### 🔧 Changed
+
+- **Twenty-four languages are no longer translated before anybody has read the English
+  once.** `test_every_european_union_language_stays_complete` held the twenty-four European
+  Union catalogues at 100% on every commit, which made adding one user-facing string cost
+  twenty-four translations — made by the same hand that wrote the English a minute earlier,
+  on wording that had not settled, for no reader. The promise was always about a *published
+  version*: what somebody installs should not have a gap in a language Postulo offers them.
+  It was never about a branch halfway through a feature.
+
+  There is now a `release` marker — *a promise that must hold in a published version, not in
+  every commit* — deselected by default exactly as `e2e` already is, and
+  `uv run pytest -m release` is **step 1 of *Making a release***, before the changelog is
+  moved or anything is tagged. The same twenty-four must be complete, checked by the same
+  assertions; the check is simply first and deliberate rather than implicit in a suite that
+  had already run. Ordinary work translates English, French and European Portuguese, which is
+  enough to see a change in three languages and catch what only shows up in one — the long
+  German string that broke a row in #165 was found that way.
+
+  Nothing else is marked. Plural rules, placeholder consistency, catalogue currency, the
+  "a started catalogue actually translates" gate and the render-in-every-language walk still
+  run on every commit, because those catch mistakes rather than measure completeness. The
+  risk is stated plainly in the issue: somebody can now commit a string only three languages
+  have, and that is only safe while the release step stays a hard gate. (#182)
+
 ### ✨ Added
 
 - **The sources read the posting the page is showing, in whichever way the board wrote it.**

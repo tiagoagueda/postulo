@@ -155,15 +155,29 @@ def test_the_settings_offer_the_african_languages_too():
         assert code in codes, f"{code} is missing from the languages Postulo offers"
 
 
+@pytest.mark.release
 @pytest.mark.parametrize(
     ("name", "code"), [pair for pair in EVERY if pair[1] in EUROPEAN_UNION], ids=str
 )
 def test_every_european_union_language_stays_complete(name, code, catalogues):
-    """Finished in 0.2.0. A later phase must not quietly leave a gap in one of these.
+    """Finished in 0.2.0. A published version must not quietly leave a gap in one of these.
 
     Every set, which is the whole reason #127 was allowed to give a plugin its own
     catalogue: for a plugin Postulo ships, Postulo is the author, and a string that leaves
     this test's sight is not translated by somebody else -- it is quietly untranslated.
+
+    **Marked `release`, so it is deselected by default and run before a tag.** The promise
+    is about what somebody installs, not about what is on a branch halfway through a feature.
+    Holding every commit to twenty-four languages meant translating twenty-four times before
+    a string had been read by anybody, and the translations were made by the same hand that
+    wrote the English a minute earlier -- work with a real cost and no reader. While a change
+    is being made, English, French and European Portuguese are enough to see it in three
+    languages and catch what only shows up in one. The sweep happens once, deliberately,
+    against strings that have settled.
+
+    `uv run pytest -m release` is step 1 of *Making a release* in `CONTRIBUTING.md`, and it
+    is the only thing standing between an unfinished catalogue and a published version, so
+    it does not get skipped when it is inconvenient.
     """
     catalogue = catalogues[name, code]
     missing = [m.msgid for m in catalogue.messages.values() if not m.translated]

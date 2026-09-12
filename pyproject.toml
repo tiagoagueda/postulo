@@ -130,10 +130,12 @@ known-first-party = ["postulo"]
 DJANGO_SETTINGS_MODULE = "postulo.config.settings.test"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-# Browser tests are opted into with `-m e2e`; a command-line -m replaces this one.
-addopts = "--strict-markers --strict-config -m 'not e2e'"
+# Browser and release tests are opted into with `-m e2e` or `-m release`; a command-line
+# -m replaces this one.
+addopts = "--strict-markers --strict-config -m 'not e2e and not release'"
 markers = [
     "e2e: drives a real browser against a live server; needs `playwright install chromium`",
+    "release: a promise that must hold in a published version, not in every commit",
 ]
 filterwarnings = ["error"]
 
