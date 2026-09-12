@@ -35,7 +35,19 @@ IMAGE="${1:-}"
 OUT="${SCAN_OUTPUT_DIR:-$ROOT/.scan}"
 
 # Pinned, because a scanner that changes under you changes what the gate means.
-TRIVY="${TRIVY_IMAGE:-aquasec/trivy:0.68.0}"
+#
+# `aquasec/trivy:0.68.0` was pinned here and **does not exist** -- there is no such tag on
+# Docker Hub and there never was. Nothing noticed until the dev channel ran this from a
+# clean host, because the findings behind #155 and #157 were produced on a machine that
+# already had some Trivy pulled, and the pin was never the thing that fetched it (#190).
+#
+# Check a version exists before pinning it:
+#   curl -s -o /dev/null -w '%{http_code}
+' #     https://hub.docker.com/v2/repositories/aquasec/trivy/tags/<version>
+TRIVY="${TRIVY_IMAGE:-aquasec/trivy:0.74.0}"
+# This one is real, and eighteen minor versions behind v0.118.0. Left alone deliberately:
+# a newer scanner finds more, which is good and is also a gate that starts failing for
+# reasons unrelated to whatever change is being made. Worth bumping on its own.
 GRYPE="${GRYPE_IMAGE:-anchore/grype:v0.100.0}"
 
 #: What a fixable finding at or above this level does: stop.

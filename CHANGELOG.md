@@ -333,6 +333,18 @@ All notable changes to Postulo are recorded here. The format follows
   `core.fileMode false`, so the bit was never recorded and nothing that ran them had ever
   run from a fresh clone.
 
+  **And a third: the pinned Trivy did not exist.** `scripts/scan-image.sh` pinned
+  `aquasec/trivy:0.68.0`, and there is no such tag on Docker Hub — there never was. The
+  findings behind #155 and #157 came from running the scanners by hand on a machine that
+  already had Trivy pulled, so the pin was never the thing that fetched it. Corrected to
+  `0.74.0`, with the one-line check for whether a tag exists written beside it. Grype's pin
+  is real and eighteen versions behind; left alone on purpose, since a newer scanner is a
+  gate that starts failing for reasons unrelated to the change being made.
+
+  Three faults, none of them in this workflow, all of them in the release path, and all
+  found by the simple act of running it. That is what a channel nobody had ever exercised
+  was hiding.
+
   `CONTRIBUTING.md` § *Giving a runner the `docker` label* said to declare `docker:host` and
   **was wrong** for a containerised runner: `host` runs the job inside the runner container,
   which is Alpine with no node and no docker CLI, so `actions/checkout` fails before
