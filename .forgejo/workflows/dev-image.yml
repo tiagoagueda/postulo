@@ -1,0 +1,117 @@
+# Builds a container image from `main`, so a feature can be run before it is released.
+#
+# Separate from `image.yml` on purpose. That one builds a **release**: it checks out a tag,
+# because "a release image built from a moving branch is an image nobody can reproduce", and
+# it moves `:latest`. This one is the opposite in both respects, and keeping the release path
+# untouched is worth more than sharing its steps — it has one job and it must stay simple.
+#
+# **Why this may run on a push when `image.yml` may not.** `image.yml` is
+# `workflow_dispatch` only because `runs-on: docker` reaches a daemon that is root on the
+# host, and the only thing stopping a job from getting there was that nobody pressed the
+# button. That is no longer what protects it. The runner answering the `docker` label is a
+# **second runner instance, registered to this repository alone**, so Forgejo will not
+# schedule any other repository's jobs onto it — enforced by the instance rather than by
+# every workflow author remembering. That is what makes an automatic trigger acceptable
+# here, and it is the thing to re-read before widening this trigger further (#190).
+#
+# **`:latest` is never touched.** A dev build reaching it would make `docker pull postulo`
+# a dev image for everybody. Two tags only: `:dev`, which moves, and a pinnable
+# `:<version>-dev.<short sha>`, because a floating tag nobody can name is no use in a bug
+# report.
+#
+# **The scan gate applies.** A dev image somebody runs against their own applications is an
+# image. #155 and #157 were both found in an image built and published without one, and a
+# gate skipped "just for dev" is not a gate.
+#
+# **Native architecture only**, unlike the release. The release builds `linux/arm64` through
+# QEMU binfmt, which is slow and one more thing on the host that fails confusingly when it
+# is missing. A dev image exists to try a change on; whoever needs it on another
+# architecture is doing something a release should be doing.
+name: Dev image
+
+on:
+  push:
+    branches: [main]
+  # Buildable by hand as well, for a rebuild without a commit to cause one.
+  workflow_dispatch:
+
+# Nothing is granted by default; this needs to read the code and write to the registry.
+permissions: {}
+
+# One at a time, and never two builds of the same branch racing to move `:dev`. A push that
+# lands mid-build cancels the older one, because the newer commit is the one anybody wants.
+concurrency:
+  group: dev-image
+  cancel-in-progress: true
+
+jobs:
+  image:
+    # Belt and braces beside the trigger. A branch filter is one edit away from being wider
+    # than somebody meant, and this says the same thing a second time where it is read.
+    if: github.ref_name == 'main'
+    runs-on: docker
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Work out the tags
+        id: tags
+        run: |
+          version="$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/postulo/__init__.py)"
+          test -n "$version" || { echo "no version in src/postulo/__init__.py"; exit 1; }
+          registry="${GITHUB_SERVER_URL#https://}"
+          image="${registry}/${GITHUB_REPOSITORY}"
+          short="$(git rev-parse --short HEAD)"
+          # `:dev` moves; the second one is what a bug report can name. Never `:latest`.
+          echo "tags=${image}:dev,${image}:${version}-dev.${short}" >> "$GITHUB_OUTPUT"
+          echo "pinned=${image}:${version}-dev.${short}" >> "$GITHUB_OUTPUT"
+
+      - name: Sign in to the registry
+        env:
+          REGISTRY_USER: ${{ secrets.REGISTRY_USER }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          echo "$REGISTRY_TOKEN" | docker login "${GITHUB_SERVER_URL#https://}" \
+            -u "$REGISTRY_USER" --password-stdin
+
+      # Into this runner's daemon first, so there is something to scan before anything is
+      # published. The push below reuses the layers.
+      - name: Build the image this runner can scan
+        run: docker build -f docker/Dockerfile -t postulo:dev-scan .
+
+      # The same script a person runs and the same one `image.yml` calls, rather than a
+      # third description of the same intent.
+      - name: Scan it, with both scanners
+        run: ./scripts/scan-image.sh postulo:dev-scan
+
+      - name: Push it
+        env:
+          TAGS: ${{ steps.tags.outputs.tags }}
+        run: |
+          for tag in $(echo "$TAGS" | tr ',' ' '); do
+            docker tag postulo:dev-scan "$tag"
+            docker push "$tag"
+          done
+
+      # What was built, and from what. A dev tag moves, so the commit is the only thing that
+      # identifies what somebody is running.
+      - name: Say what this is
+        if: always()
+        run: |
+          {
+            echo '## Dev image'
+            echo
+            echo "Built from \`${GITHUB_SHA}\` on \`${GITHUB_REF_NAME}\`."
+            echo
+            echo '```'
+            echo 'docker pull ${{ steps.tags.outputs.pinned }}'
+            echo '```'
+            echo
+            echo 'Not a release. Never tagged `latest`, unsupported, and it may change a'
+            echo 'database in ways a release will not.'
+          } >> "$GITHUB_STEP_SUMMARY"

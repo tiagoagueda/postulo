@@ -288,6 +288,43 @@ All notable changes to Postulo are recorded here. The format follows
   Overview*, which linked to the admin as "the escape hatch", says plainly that there is not
   one and which variable turns it on, rather than linking to a 404. (#116)
 
+### ✨ Added
+
+- **A dev channel: every push to `main` publishes an image, so a change can be run before it
+  is released.** `dev-image.yml` builds, scans and pushes `:dev` alongside a pinnable
+  `:<version>-dev.<short sha>` — quote the pinned one in a bug report, because `:dev` moves
+  and says nothing about what somebody was running. It is not a release: unsupported, and
+  free to change a database in ways a release will not.
+
+  **`:latest` is never touched**, which is the whole reason this is a separate workflow
+  rather than a second trigger on `image.yml`. That one exists to build a *release*: it
+  checks out a tag, because "a release image built from a moving branch is an image nobody
+  can reproduce", and it moves `:latest`. This one is the opposite in both respects, and the
+  release path is worth leaving alone.
+
+  **The scan gate applies.** A dev image somebody runs against their own applications is an
+  image, and #155 and #157 were both found in one built and published without a scan. It
+  calls the same `scripts/scan-image.sh` a person and a release both call. Built for the
+  native architecture only: the release does `linux/arm64` through QEMU, which is slow and
+  one more thing to fail, and anybody needing another architecture wants a release.
+
+  **Why this may run on a push when the release image may not.** `image.yml` is
+  `workflow_dispatch` only because `runs-on: docker` reaches a daemon that is root on the
+  host, and nothing but "nobody pressed the button" stopped a job getting there. That is no
+  longer what protects it: the runner answering the `docker` label is a **second runner
+  instance registered to this repository alone**, so Forgejo will not schedule another
+  repository's jobs onto it — enforced by the instance rather than by every workflow author
+  remembering. The workflow says the same thing twice, in the trigger and in an `if` on the
+  branch, because a branch filter is one edit away from being wider than somebody meant.
+
+  `CONTRIBUTING.md` § *Giving a runner the `docker` label* said to declare `docker:host` and
+  **was wrong** for a containerised runner: `host` runs the job inside the runner container,
+  which is Alpine with no node and no docker CLI, so `actions/checkout` fails before
+  anything reaches the daemon. It now describes what actually works — a container label on
+  an image that already carries the tools, `docker_host: automount`, and a *second* runner
+  scoped to one repository, because `container.docker_host` is per runner instance and
+  cannot be scoped to a label. (#190)
+
 ### 🔧 Changed
 
 - **The support link is a QR code now, because a button can only be pressed by whoever is

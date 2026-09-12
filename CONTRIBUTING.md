@@ -290,6 +290,25 @@ The `release` workflow does the rest, and it is one job: it refuses a tag that d
 with the code or the changelog, builds the sdist and the wheel, and creates the Forgejo
 release with the changelog section as its notes.
 
+### The dev channel
+
+Every push to `main` builds an image and publishes it as **`:dev`**, alongside a pinnable
+`:<version>-dev.<short sha>` — `dev-image.yml`. It exists so a change can be run somewhere
+real before it is in a release, and it is **not** a release: unsupported, never `:latest`,
+and free to change a database in ways a release will not. Quote the pinned tag in a bug
+report; `:dev` moves and says nothing about what somebody was running.
+
+It is scanned by the same `scripts/scan-image.sh` a release is, because a dev image somebody
+runs against their own applications is an image. It is built for this runner's architecture
+only: the release does `linux/arm64` through QEMU, which is slow and one more thing to go
+wrong, and anybody needing another architecture wants a release.
+
+**Why this may run on a push when the release image may not.** The runner answering the
+`docker` label is a *second runner instance registered to this repository alone*, so Forgejo
+will not schedule another repository's jobs onto it. That is what makes an automatic trigger
+acceptable — enforced by the instance, rather than by every workflow author remembering not
+to. Re-read that before widening the trigger.
+
 **The container image is a separate, deliberate act.** `image.yml` is started by hand, and
 it needs a runner advertising the `docker` label plus `REGISTRY_USER` and `REGISTRY_TOKEN`
 as secrets. It is not on the tag trigger, because Forgejo schedules a job before it evaluates the condition that would
@@ -321,35 +340,45 @@ Both scanners download a vulnerability database, so the step needs the network.
 
 ### Giving a runner the `docker` label
 
-A `forgejo-runner` that runs jobs in containers already has a daemon — it needs one to
-start those containers. What it does not do by default is let a *job* reach it. The label
-that does is declared in the runner's `config.yml`, with `host` where the others name an
-image:
+**Not `docker:host`, if the runner is itself a container.** That was the advice here until
+#190 and it does not work: `host` runs the job *inside the runner container*, and
+`code.forgejo.org/forgejo/runner` is Alpine with no node and no docker CLI, so
+`actions/checkout` — a JavaScript action — fails before anything reaches the daemon. The
+recipe assumed a runner installed on the host.
+
+What works, and what `ouranos` runs, is a **container label pointing at an image that
+already has the tools**, with the socket mounted into job containers:
 
 ```yaml
 runner:
   labels:
-    - "ubuntu-latest:docker://node:22-bookworm"
-    - "ubuntu-24.04:docker://node:22-bookworm"
-    - "ubuntu-22.04:docker://node:22-bookworm"
-    - "docker:host"
+    - "docker:docker://catthehacker/ubuntu:act-latest"
+container:
+  docker_host: "automount"
 ```
 
-`host` means the job runs on the machine rather than inside a container, which is how it
-reaches the daemon. Restart the runner and it declares the new label on connect; *Site
-administration → Actions → Runners* shows what it is advertising.
+`catthehacker/ubuntu:act-latest` ships node, git, the docker CLI and buildx, so there is no
+custom image to build and keep current. `automount` puts `/var/run/docker.sock` into the job
+container.
 
-Three things the host then needs, each of which fails in its own confusing way if missing:
-**node**, because `actions/checkout` is a JavaScript action and host mode runs it with the
-host's node; the runner's user in the **`docker` group**, or some other route to the socket;
-and **QEMU binfmt** registered — `docker run --privileged --rm tonistiigi/binfmt --install
-all` — or the `linux/arm64` half of the multi-arch build has no emulator and fails.
+**Use a second runner instance, not a label on the one you have.** This is the part that
+matters, and it is not obvious:
 
-**What that label costs, stated plainly.** A job on it runs as the runner's user with
-Docker, and Docker is root on that machine. The mitigation is that nothing schedules onto
-this label by itself: `image.yml` is `workflow_dispatch` only, so the only way to reach it
-is somebody pressing the button. Do not put the label on a runner that also serves
-`pull_request` from people who are not you.
+- **`container.docker_host` is per runner instance, not per label.** Setting `automount` on
+  a runner that also serves the ordinary `ubuntu-*` labels hands the socket to *every* job
+  it runs — and Docker is root on that machine. There is no way to scope it to one label.
+- **Register the second runner to one repository** (`--scope owner/repo`). Forgejo then
+  refuses to schedule anything else onto it. That is a stronger guarantee than "nothing
+  schedules onto this label by itself", because it is enforced by the instance rather than
+  by every workflow author remembering.
+
+With that, an automatic trigger becomes reasonable: `dev-image.yml` builds on every push to
+`main`. Without it — a shared runner with `automount` — it is not, and the trigger is the
+first thing to reconsider if the runner arrangement ever changes.
+
+QEMU binfmt is still needed on the **host** for the release's `linux/arm64` half:
+`docker run --privileged --rm tonistiigi/binfmt --install all`. The dev image is built for
+the native architecture only and needs none of it.
 
 ### Starting the image workflow
 
