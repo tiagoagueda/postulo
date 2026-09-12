@@ -32,7 +32,9 @@
       <header class="border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900">
         {% comment %} `relative` so the narrow-screen navigation panel below can pin itself to
            this row's two edges rather than to wherever the Menu button lands in it. {% endcomment %}
-        <div class="relative mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+        {% comment %} No cap: the masthead spans the screen, so it never sits narrower than a
+           table that has taken the width below it (#188). {% endcomment %}
+        <div class="relative flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
           {% comment %}
             When the Dashboard link is hidden the wordmark takes the job over properly:
             the active style on the dashboard, and a name that says where it goes.
@@ -125,14 +127,19 @@
       </header>
     {% endblock %}
 
-    <main id="main" tabindex="-1" class="mx-auto max-w-7xl px-4 py-8 outline-none">
+    {% comment %} `main_width` is the page's measure: 80rem -- 1280 pixels -- unless the page
+       says otherwise. A form, a detail page or a paragraph keeps it, because a wide page is
+       not a wide paragraph; a table, the board, the dashboard or a list empties the block
+       and takes the screen, which is what they were being denied on any monitor wider than
+       a laptop's (#188). {% endcomment %}
+    <main id="main" tabindex="-1" class="mx-auto {% block main_width %}max-w-7xl{% endblock %} px-4 py-8 outline-none">
       {% include "partials/messages.html" %}
       {# `main` exists so that an area such as Settings can wrap `content` in a layout of #}
       {# its own; pages — allauth's included — keep overriding `content` as they always did. #}
       {% block main %}{% block content %}{% endblock %}{% endblock %}
     </main>
 
-    <footer class="mx-auto flex max-w-7xl flex-wrap gap-x-4 px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
+    <footer class="flex flex-wrap gap-x-4 px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
       <span>
         {% blocktranslate trimmed %}
           Postulo — your job search, on your server.

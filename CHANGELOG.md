@@ -572,6 +572,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Grids use the whole screen; everything else keeps its measure.** Every page sat in a
+  1280-pixel column — `max-w-7xl` on `<main>` — so on a wide monitor a table with ten chosen
+  columns scrolled inside a box with grey on both sides, two nested scrolls to read one row.
+  `<main>` takes its width from the page now: the tables, the board, the dashboard and the
+  lists empty the cap and take the screen; forms, detail pages and prose keep the measure
+  they had, because a wide page is not a wide paragraph. The one criterion about line length,
+  SC 1.4.8, is level AAA, and its eighty-character measure is what the forms' `max-w-2xl`
+  already is. The header and footer span the width, so a masthead never sits narrower than
+  the table under it. Below 1280 pixels nothing changes. (#188)
+
 - **Server overview: the card at the bottom has lost its heading.** It said *Also*, which
   names nothing — the other headings on that page are *Overview*, *Software* and *Data*, each
   saying what is under it, and this one said only that there was more, which the reader can
