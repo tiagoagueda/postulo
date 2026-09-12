@@ -1,5 +1,10 @@
 {% load postulo %}
-<div class="mb-4">
+{% comment %} `wrap-anywhere` because a widget may put text here that Postulo did not write
+   and cannot hyphenate. Django renders a bound file field as "Currently: <storage path>",
+   and a path has no spaces in it -- 252 unbreakable pixels against the 238 a 320-pixel
+   screen leaves, in every language, which is what ran the upload form off a phone (#167).
+{% endcomment %}
+<div class="mb-4 wrap-anywhere">
   <label class="field-label" for="{{ field.id_for_label }}">
     {{ field.label }}
     {% if field.field.required %}<span aria-hidden="true" class="text-red-600">*</span>{% endif %}

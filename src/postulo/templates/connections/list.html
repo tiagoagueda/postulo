@@ -18,8 +18,11 @@
     <div class="card p-0">
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         {% for row in rows %}
+          {% comment %} `grow basis-48` rather than `flex-1`: the row already wrapped, but
+             `flex-1` is `flex: 1 1 0%`, so the words claimed no width of their own and were
+             squeezed to twelve pixels in Greek before anything wrapped (#167). {% endcomment %}
           <li class="flex flex-wrap items-center gap-3 px-4 py-3" data-connection="{{ row.connection.pk }}">
-            <div class="min-w-0 flex-1">
+            <div class="min-w-0 grow basis-48">
               <p class="font-medium">
                 {{ row.connection.label }}
                 {% if not row.connection.enabled %}

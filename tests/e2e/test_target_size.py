@@ -181,6 +181,7 @@ def test_everything_clickable_is_big_enough_to_hit(live_server, page: Page, furn
         furnished["company"],
         furnished["applicant"],
         furnished["experience"],
+        things=furnished,
     )
     found: dict[str, str] = {}
     for path in paths:

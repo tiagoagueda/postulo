@@ -208,6 +208,7 @@ def test_no_page_scrolls_sideways_at_320_pixels(
         furnished["company"],
         furnished["applicant"],
         furnished["experience"],
+        things=furnished,
     )
     failures: dict[str, str] = {}
     for path in paths:

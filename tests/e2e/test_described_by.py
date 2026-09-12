@@ -89,6 +89,7 @@ def test_no_page_references_an_element_that_is_not_there(live_server, page: Page
         furnished["company"],
         furnished["applicant"],
         furnished["experience"],
+        things=furnished,
     ):
         page.goto(f"{base}{path}")
         if "reauthenticate" in page.url:

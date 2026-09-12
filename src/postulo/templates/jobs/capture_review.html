@@ -64,7 +64,11 @@
           {{ form.already_applied }}
           <span>
             <span class="font-medium">{{ form.already_applied.label }}</span>
-            <span class="block text-ink-500 dark:text-ink-400">{{ form.already_applied.help_text }}</span>
+            {% comment %} The id Django's widget already points `aria-describedby` at. Without
+               it the input referenced an element that was not there, which is worse than no
+               description: a screen reader is told there is one (#167). {% endcomment %}
+            <span class="block text-ink-500 dark:text-ink-400"
+                  id="{{ form.already_applied.auto_id }}_helptext">{{ form.already_applied.help_text }}</span>
           </span>
         </label>
       </div>

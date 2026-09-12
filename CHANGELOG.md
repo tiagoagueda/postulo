@@ -334,6 +334,46 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The accessibility walk claimed thirty-five pages it never opened, and six of the pages
+  it had never opened were broken.** `tests/test_page_coverage.py` insisted every URL
+  pattern was either visited by the browser suite or excused in writing — but "visited"
+  meant "named in a hand-written tuple beside the walk", and nothing held the tuple to the
+  walk. It claimed 104 names and the walk reached 69. Every CV page and every letter page
+  past the list was counted as checked and had never been looked at.
+
+  **The claim is derived from the walk now**, by resolving the paths it actually visits, so
+  it cannot get ahead of it again. That turned the coverage test's output into an honest
+  list of thirty-four, and the walk was given what those pages need to exist: a CV with an
+  entry, a letter, an upload, a tag, a contact, an industry, a posting, a capture waiting
+  for review and a connection. Two routes answer POST only and are excused by name rather
+  than pretended at; `settings:index` stopped being excused as *"redirects to the appearance
+  page"*, because the walk visits `/settings/` itself and the excuse had become false.
+
+  **What the fuller walk then found**, none of which anything had ever measured:
+
+  - A CV's own page ran off a 320-pixel screen in Greek and German. Its entries are the row
+    #165 fixed on the career page, and this page had kept the old one: words beside a
+    `shrink-0` group of ↑, ↓, *Tailor* and *Remove*. The grid's column is sized by its
+    content, so the overflow took the *Add entries* card with it.
+  - The uploads list squeezed a title into 58 pixels in English and 13 in Greek, behind
+    *Download / Edit / Delete*.
+  - The connections list did the same, with `flex-1` — which is `flex: 1 1 0%`, so the words
+    claimed no width of their own before anything wrapped.
+  - The upload **edit** form scrolled sideways in every language, by exactly the same amount,
+    because Django renders a bound file field as `Currently: documents/1/2026/09/reference.txt`
+    — a path, with no spaces in it, 252 unbreakable pixels against the 238 a phone leaves.
+    The *new* form passed all along, which is why nothing had caught it.
+  - A checkbox on the applications filter was 20 pixels tall, against the 24 WCAG 2.2
+    SC 2.5.8 asks for.
+  - The capture review page pointed `aria-describedby` at a help-text element that was not
+    there — worse than no description, because a screen reader is told there is one.
+
+  All six are fixed. The preview pages are the one exemption, in writing and narrowly: a
+  preview returns *"the CV as HTML, exactly as the PDF renderer will see it"*, so axe is
+  reading a print document and asking it for `<main>`. Satisfying that would change every
+  PDF Postulo produces to answer a question nobody asks of a printed page. They stay in the
+  walk, so reflow and target size still read them; only axe looks away. (#167)
+
 - **Dragging worked in Chromium and did nothing in Firefox, and the tests agreed with
   Chromium.** Neither drag cancelled `dragenter`. The specification makes an element a drop
   target only once *both* `dragenter` and `dragover` are cancelled; Chromium forgives the

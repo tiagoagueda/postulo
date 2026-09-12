@@ -106,8 +106,12 @@ EXCUSED: dict[str, str] = {
     "connections:sync_now": "a POST that runs one synchronisation immediately",
     "connections:backfill": "a POST that queues everything a store has not received",
     "api:token_revoke": "a POST that withdraws an API token",
+    # `settings:index` used to sit here with the same reason and was removed in #167: the
+    # walk visits `/settings/` itself, so the pattern is reached and the excuse was false.
+    # This one stays because the walk visits `/server/overview/` and never `/server/`.
+    "documents:cv_add_items": "answers POST only; the form that posts to it is on the CV page",
+    "applications:interview_outcome": "answers POST only; recorded from the interview's own page",
     "server:index": "redirects to the overview, which is visited",
-    "settings:index": "redirects to the appearance page, which is visited",
     "openid_connect_login": "hands the browser to an identity provider",
     "openid_connect_callback": "returns from an identity provider",
     "accounts:invite_accept": "needs a token from an invitation that was actually sent",

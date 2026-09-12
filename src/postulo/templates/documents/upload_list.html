@@ -20,8 +20,13 @@
     <div class="card p-0">
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         {% for document in documents %}
-          <li class="flex items-center gap-3 px-4 py-3 {% if not document.is_current %}opacity-60{% endif %}">
-            <div class="min-w-0 flex-1">
+          {% comment %} The #165 row: the title and its line claim twelve rem before the three
+             links may sit beside them, and the group wraps rather than holding the row open.
+             With `flex-1` and no wrapping, "Download / Edit / Delete" left the title 58
+             pixels in English and 13 in Greek, and the page ran off a 320-pixel screen
+             (#167). {% endcomment %}
+          <li class="flex flex-wrap items-center gap-3 px-4 py-3 {% if not document.is_current %}opacity-60{% endif %}">
+            <div class="min-w-0 grow basis-48">
               <p class="font-medium">{{ document.title }}</p>
               <p class="text-xs text-ink-500 dark:text-ink-400">
                 {{ document.get_kind_display }} · {% translate "version" %} {{ document.version }}
@@ -31,14 +36,16 @@
               {% url 'documents:upload_archive' document.pk as send_url %}
               {% include "documents/partials/copies.html" with document=document send_url=send_url %}
             </div>
-            <a href="{% url 'documents:upload_download' document.pk %}"
-               class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
-            <a href="{% url 'documents:upload_update' document.pk %}"
-               class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
-            <a href="{% url 'documents:upload_delete' document.pk %}"
-               class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
-              {% translate "Delete" %}
-            </a>
+            <div class="flex flex-wrap items-center gap-2">
+              <a href="{% url 'documents:upload_download' document.pk %}"
+                 class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
+              <a href="{% url 'documents:upload_update' document.pk %}"
+                 class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
+              <a href="{% url 'documents:upload_delete' document.pk %}"
+                 class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                {% translate "Delete" %}
+              </a>
+            </div>
           </li>
         {% endfor %}
       </ul>
