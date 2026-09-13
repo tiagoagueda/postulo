@@ -290,6 +290,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Your details is one record, with its parts down the side.** The page held three cards
+  and a blurb sending you to Settings for your addresses — which had not been true for a
+  while: the telephone numbers, the postal addresses, the identifiers and now the links all
+  live on this page, in one long form. What was missing was any way to see that from the
+  top. The sidebar Settings and Your career use now stands beside the parts as anchors, a
+  count beside each list, sticky on a wide screen and a strip that scrolls sideways on a
+  phone. A part a feature has switched off is not on the page and so not in the nav, and
+  the blurb says what the page is: what Postulo knows about you as a candidate, as opposed
+  to how it behaves for you, which is Settings. (#180)
+
 - **Several social profiles, several code repositories, several websites — three plugins,
   one table.** A person's presence online was four single boxes: a website, a LinkedIn and
   a code repository on your details, and a LinkedIn on each contact. Somebody with a GitHub

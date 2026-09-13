@@ -99,7 +99,57 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
         context.setdefault("addresses", self.get_addresses())
         context["numbers_kept_back"] = phone_numbers.kept_back(self.object, self.request.user)
         context["identifier_schemes"] = person_identifiers.schemes().values()
+        context["section_nav"] = self._section_nav(context)
         return context
+
+    @staticmethod
+    def _section_nav(context: dict) -> list[dict]:
+        """The parts of the page, as anchors, with a count beside each list.
+
+        Built from what the page is actually drawing rather than from a fixed list: a
+        block a feature has switched off is not on the page, so it is not in the nav
+        either, and the count is the rows the block starts with (#180).
+        """
+
+        def entry(anchor: str, label, count=None) -> dict:
+            return {
+                "href": f"#{anchor}",
+                "anchor": anchor,
+                "label": label,
+                "icon": "",
+                "count": count,
+                "current": "",
+            }
+
+        entries = [
+            entry("section-picture", _("Your picture")),
+            entry("section-name", _("Your name")),
+            entry("section-contact", _("Contact block")),
+        ]
+        for block in context.get("links") or []:
+            entries.append(
+                entry(
+                    f"section-links-{block.kind}",
+                    block.block.legend,
+                    block.initial_form_count(),
+                )
+            )
+        numbers = context.get("numbers")
+        if numbers is not None:
+            entries.append(
+                entry("section-phones", _("Telephone numbers"), numbers.initial_form_count())
+            )
+        addresses = context.get("addresses")
+        if addresses is not None:
+            entries.append(
+                entry("section-addresses", _("Postal addresses"), addresses.initial_form_count())
+            )
+        identifiers = context.get("identifiers")
+        if identifiers is not None:
+            entries.append(
+                entry("section-identifiers", _("Identifiers"), identifiers.initial_form_count())
+            )
+        return entries
 
     def form_valid(self, form):
         from django.db import transaction

@@ -4,24 +4,37 @@
 {% block title %}{% translate "Your details" %}{% endblock %}
 
 {% block content %}
-  <div class="mx-auto max-w-2xl">
+  <div class="mx-auto max-w-4xl">
     <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Your details" %}</h1>
     <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
       {% url 'settings:index' as settings_url %}
       {% blocktranslate trimmed %}
-        Your name and the contact block that will be printed on your CVs. How Postulo
-        behaves for you — theme, language, username, addresses — is under
+        What Postulo knows about you as a candidate: the name, picture and contact block
+        your CVs print, and the numbers, addresses, links and identifiers behind them. How
+        Postulo behaves for you — theme, language, your account — is under
         <a href="{{ settings_url }}" class="underline">Settings</a>.
       {% endblocktranslate %}
     </p>
 
+  {% comment %} One record in several parts down one page, so it is navigated rather than
+     traversed: the sidebar Settings and Your career use, with the parts as anchors and a
+     count beside each list. A part a feature has switched off has no entry, because it has
+     no block (#180). {% endcomment %}
+  <div class="lg:flex lg:items-start lg:gap-10">
+    <aside class="mb-6 lg:sticky lg:top-4 lg:mb-0 lg:w-56 lg:shrink-0">
+      <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
+        {% translate "On this page" %}
+      </p>
+      {% sidebar section_nav _("Parts of your details") %}
+    </aside>
+    <div class="min-w-0 flex-1">
     <form method="post" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}
         <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
       {% endif %}
 
-      <div class="card mb-4" data-picture>
+      <div class="card mb-4" data-picture id="section-picture">
         <h2 class="mb-4 font-medium">{% translate "Your picture" %}</h2>
         <div class="flex flex-wrap items-start gap-6">
           <div class="shrink-0">
@@ -61,7 +74,7 @@
         </div>
       </div>
 
-      <div class="card mb-4">
+      <div class="card mb-4" id="section-name">
         <h2 class="mb-4 font-medium">{% translate "Your name" %}</h2>
         <div class="grid gap-x-4 sm:grid-cols-2">
           {% include "partials/field.html" with field=form.first_name %}
@@ -69,7 +82,7 @@
         </div>
       </div>
 
-      <div class="card mb-6">
+      <div class="card mb-6" id="section-contact">
         <h2 class="mb-4 font-medium">{% translate "Contact block" %}</h2>
         {% include "partials/field.html" with field=form.headline %}
         <div class="grid gap-x-4 sm:grid-cols-2">
@@ -107,7 +120,7 @@
       {% include "partials/web_links.html" %}
       {% include "partials/postal_addresses.html" %}
 
-      <fieldset class="card mb-6" data-identifiers>
+      <fieldset class="card mb-6" data-identifiers id="section-identifiers">
         <legend class="field-label px-1">{% translate "Identifiers" %}</legend>
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
           {% blocktranslate trimmed %}
@@ -180,5 +193,7 @@
         </span>
       </form>
     {% endif %}
+    </div>
+  </div>
   </div>
 {% endblock %}
