@@ -1,9 +1,7 @@
 """scripts/messages.py: extraction, the .po round trip, and the .mo it writes."""
 
 import gettext
-import importlib.util
 import io
-import sys
 from pathlib import Path
 
 import pytest
@@ -13,13 +11,10 @@ REPO = Path(__file__).resolve().parents[1]
 
 @pytest.fixture(scope="module")
 def tool():
-    spec = importlib.util.spec_from_file_location(
-        "messages_tool_unit", REPO / "scripts" / "messages.py"
-    )
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["messages_tool_unit"] = module
-    spec.loader.exec_module(module)
-    return module
+    from postulo.core import messages_tool
+
+    messages_tool.use(REPO)
+    return messages_tool
 
 
 PYTHON = """
@@ -182,3 +177,62 @@ def test_stats_count_drafts_apart_from_reviewed_work(tool):
         "reviewed": 2,
         "percent": 75,
     }
+
+
+# ------------------------------------------- the tool in a plugin's repository (#187)
+
+
+@pytest.fixture
+def plugin_repo(tmp_path, tool):
+    """A repository shaped like every official plugin: pyproject, src/<package>, a string."""
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "postulo-example"\nversion = "0.3.0"\n', encoding="utf-8"
+    )
+    package = tmp_path / "src" / "postulo_example"
+    package.mkdir(parents=True)
+    (package / "__init__.py").write_text(
+        'from django.utils.translation import gettext_lazy as _\n\nLABEL = _("Hello, world")\n',
+        encoding="utf-8",
+    )
+    yield tmp_path
+    tool.use(REPO)
+
+
+def test_the_tool_points_at_whichever_project_it_is_given(tool, plugin_repo):
+    project = tool.use(plugin_repo)
+    assert project.name == "postulo-example"
+    assert project.package == plugin_repo / "src" / "postulo_example"
+    assert not project.is_postulo
+
+    sets = tool.catalogue_sets()
+    assert [s.name for s in sets] == ["postulo-example"], "one set, the plugin's own"
+    assert sets[0].is_core, "the project's own set, whatever the project"
+
+
+def test_a_plugin_gets_every_slot_postulo_has_and_the_same_four_commands(tool, plugin_repo, capsys):
+    tool.use(plugin_repo)
+    locale = plugin_repo / "src" / "postulo_example" / "locale"
+
+    assert tool.cmd_extract(check=False) == 0
+    catalogues = sorted(locale.glob("*/LC_MESSAGES/django.po"))
+    assert len(catalogues) == len(tool.translated_languages()) == 68
+    french = tool.parse(
+        (locale / "fr_FR" / "LC_MESSAGES" / "django.po").read_text(encoding="utf-8")
+    )
+    assert [m.msgid for m in french.messages.values()] == ["Hello, world"]
+    assert "postulo-example" in (locale / "fr_FR" / "LC_MESSAGES" / "django.po").read_text(
+        encoding="utf-8"
+    ), "the header names the project, not Postulo"
+
+    assert tool.cmd_extract(check=True) == 0, "current the moment it is written"
+    assert tool.cmd_check() == 0
+    assert tool.cmd_compile() == 0
+    assert len(list(locale.glob("*/LC_MESSAGES/django.mo"))) == 68
+    out = capsys.readouterr().out
+    assert "68 catalogues compiled" in out
+
+
+def test_the_tool_refuses_a_directory_that_is_not_a_project(tool, tmp_path):
+    with pytest.raises(SystemExit, match="pyproject"):
+        tool.use(tmp_path)
+    tool.use(REPO)

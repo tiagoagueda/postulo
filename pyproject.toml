@@ -72,6 +72,10 @@ e2e = [
 [tool.uv]
 default-groups = ["dev", "e2e"]
 
+[project.scripts]
+# The catalogue tool, for a plugin repository to run against itself (#187).
+postulo-messages = "postulo.core.messages_tool:main"
+
 [build-system]
 requires = ["uv_build>=0.9,<0.13"]
 build-backend = "uv_build"
@@ -113,8 +117,10 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S105", "S106"]
-# Command-line tools talk to the person through print.
+# Command-line tools talk to the person through print. The catalogue tool is one, in
+# the package so a plugin repository can run it (#187).
 "scripts/*" = ["T201"]
+"src/postulo/core/messages_tool.py" = ["T201"]
 # Declarative Meta and admin classes hold dicts and lists by design; RUF012 wants
 # ClassVar on all of them, which adds noise to every Django class in the project.
 "src/postulo/*/forms.py" = ["RUF012"]

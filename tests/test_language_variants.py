@@ -11,8 +11,6 @@ its sibling rather than from English — which is a different provenance and nee
 
 from __future__ import annotations
 
-import importlib.util
-import sys
 from pathlib import Path
 
 import pytest
@@ -30,11 +28,10 @@ REPO = Path(__file__).resolve().parents[1]
 
 @pytest.fixture(scope="module")
 def tool():
-    spec = importlib.util.spec_from_file_location("messages_tool", REPO / "scripts" / "messages.py")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["messages_tool"] = module
-    spec.loader.exec_module(module)
-    return module
+    from postulo.core import messages_tool
+
+    messages_tool.use(REPO)
+    return messages_tool
 
 
 @pytest.fixture(scope="module")

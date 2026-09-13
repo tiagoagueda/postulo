@@ -290,6 +290,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A plugin repository can make its catalogues, not only compile them.** Every official
+  plugin carried the same copy-pasted compiler and two catalogues made by hand, and no way
+  to make the other sixty-six at all — so "in step with core" was not a matter of filling
+  in translations; there was nothing to fill in. Postulo's own catalogue tool is a module
+  now, `postulo.core.messages_tool`, installed as `postulo-messages` wherever Postulo is a
+  dependency, and pointed at whichever repository it is run from: `extract`, `extract
+  --check`, `check` and `compile` against a plugin's own `src/<package>/locale/`, creating
+  the same sixty-eight slots core has. `scripts/messages.py` is the same tool pointed at
+  this repository, and behaves exactly as before. (#187)
+
 - **A plugin that says which Postulo it is for is held to it.** A catalogue release has
   always carried `requires_postulo`, and the installer parsed it, stored it, and compared
   it to nothing: a plugin declaring `>=0.5` installed into 0.3 and the first anybody knew

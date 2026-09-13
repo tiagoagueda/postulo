@@ -14,8 +14,6 @@ does, with no list to remember to add it to.
 """
 
 import gettext
-import importlib.util
-import sys
 from pathlib import Path
 
 import pytest
@@ -30,12 +28,11 @@ CODES = [code for code, _name in languages.LANGUAGES if code != languages.SOURCE
 
 
 def _load_tool():
-    """`scripts/messages.py`, which is a script rather than a package."""
-    spec = importlib.util.spec_from_file_location("messages_tool", REPO / "scripts" / "messages.py")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["messages_tool"] = module
-    spec.loader.exec_module(module)
-    return module
+    """The tool, pointed at this repository (#187)."""
+    from postulo.core import messages_tool
+
+    messages_tool.use(REPO)
+    return messages_tool
 
 
 TOOL = _load_tool()
