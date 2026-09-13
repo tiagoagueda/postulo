@@ -16,6 +16,7 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
@@ -155,6 +156,37 @@ class CaptureListView(OwnedObjectMixin, ListView):
         return context
 
 
+def next_pending(user, *, after: Capture | None = None) -> Capture | None:
+    """The capture to look at next: the one after this in the queue, else the first left.
+
+    The queue is the list's order, newest first, so "next" is the next older one; once
+    the end is reached it wraps to whatever is still waiting, so a capture skipped once
+    comes round again rather than being lost (#179).
+    """
+    pending = Capture.objects.for_user(user).filter(status=CaptureStatus.PENDING)
+    if after is not None:
+        pending = pending.exclude(pk=after.pk)
+        following = pending.filter(created_at__lt=after.created_at).first()
+        if following is not None:
+            return following
+    return pending.first()
+
+
+def after_deciding(request: HttpRequest, decided: Capture) -> HttpResponse:
+    """Where *and next* goes once a capture is decided: the next one, or the list."""
+    following = next_pending(request.user, after=decided)
+    if following is None:
+        messages.info(request, _("That was the last capture waiting."))
+        return redirect("listings:list")
+    return redirect(following.get_absolute_url())
+
+
+#: Said beside a value the page did not state, so a default never reads as a reading. The
+#: sources stopped reporting a currency with no amount behind it (#176); the form still
+#: needs something in a select, and this is what makes that visibly a default (#179).
+NOT_ON_THE_PAGE = _("Not on the page — a default. Kept only beside an amount.")
+
+
 @functools.cache
 def review_form_class():
     """The posting half of intake, plus one question: has the person already applied?
@@ -224,14 +256,37 @@ class CaptureReviewView(OwnedObjectMixin, View):
             except_capture=capture.pk,
         )
 
+    def _form(self, request: HttpRequest, capture: Capture, data=None):
+        """The form, with the values the page never stated marked as defaults."""
+        form = review_form_class()(data, initial=self._initial(capture), user=request.user)
+        read = capture.posting_data
+        for name, stated in (
+            ("salary_currency", read.salary_currency),
+            ("salary_period", read.salary_period),
+        ):
+            if not stated:
+                form.fields[name].help_text = NOT_ON_THE_PAGE
+        return form
+
+    def _context(self, request: HttpRequest, capture: Capture, form) -> dict:
+        following = next_pending(request.user, after=capture)
+        return {
+            "capture": capture,
+            "form": form,
+            "known": self._known(capture),
+            "next_url": following.get_absolute_url() if following else "",
+            "queue_left": (
+                Capture.objects.for_user(request.user)
+                .filter(status=CaptureStatus.PENDING)
+                .exclude(pk=capture.pk)
+                .count()
+            ),
+        }
+
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         capture = get_object_or_404(self.get_queryset(), pk=pk)
-        form = review_form_class()(initial=self._initial(capture), user=request.user)
-        return render(
-            request,
-            self.template_name,
-            {"capture": capture, "form": form, "known": self._known(capture)},
-        )
+        form = self._form(request, capture)
+        return render(request, self.template_name, self._context(request, capture, form))
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         from postulo.applications.models import Priority, Status
@@ -242,13 +297,12 @@ class CaptureReviewView(OwnedObjectMixin, View):
         )
 
         capture = get_object_or_404(self.get_queryset(), pk=pk)
-        form = review_form_class()(request.POST, user=request.user)
+        form = self._form(request, capture, request.POST)
         if not form.is_valid():
-            return render(
-                request,
-                self.template_name,
-                {"capture": capture, "form": form, "known": self._known(capture)},
-            )
+            return render(request, self.template_name, self._context(request, capture, form))
+        # Pressed *and next*: the decision is recorded exactly as below, and the page moves
+        # on to the next capture rather than to what this one became (#179).
+        onwards = bool(request.POST.get("next"))
 
         company = get_or_create_company(request.user, form.cleaned_data["company_name"])
         listing = create_listing(request.user, company=company, posting_data=form.posting_data)
@@ -268,10 +322,14 @@ class CaptureReviewView(OwnedObjectMixin, View):
             capture.application = application
             capture.save(update_fields=["status", "posting", "application", "updated_at"])
             messages.success(request, _("Application recorded from the capture."))
+            if onwards:
+                return after_deciding(request, capture)
             return redirect(application.get_absolute_url())
 
         capture.save(update_fields=["status", "posting", "updated_at"])
         messages.success(request, _("Saved to your listings. Decide about it when you are ready."))
+        if onwards:
+            return after_deciding(request, capture)
         return redirect(listing.get_absolute_url())
 
 
@@ -284,6 +342,34 @@ class CaptureDiscardView(OwnedObjectMixin, View):
         capture.status = CaptureStatus.DISCARDED
         capture.save(update_fields=["status", "updated_at"])
         messages.success(request, _("Capture discarded."))
+        if request.POST.get("next"):
+            return after_deciding(request, capture)
+        return redirect("listings:list")
+
+
+class CaptureDiscardSelectedView(OwnedObjectMixin, View):
+    """Throw away several at once, from the list, with no form in between.
+
+    Most of triage is the second of three answers, given in under a second, and a page
+    load per answer is what made reviewing forty captures forty page loads (#179). Only
+    what is still pending and this person's own is touched; a stray id is ignored rather
+    than refused, because the honest outcome of "discard these" is how many went.
+    """
+
+    def get_queryset(self):
+        return Capture.objects.for_user(self.request.user)
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        chosen = [value for value in request.POST.getlist("selected") if value.isdigit()]
+        count = (
+            self.get_queryset()
+            .filter(pk__in=chosen, status=CaptureStatus.PENDING)
+            .update(status=CaptureStatus.DISCARDED, updated_at=timezone.now())
+        )
+        if count:
+            messages.success(request, _("Captures discarded: %(count)s.") % {"count": count})
+        else:
+            messages.info(request, _("Nothing was selected."))
         return redirect("listings:list")
 
 

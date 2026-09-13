@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-13 03:16+0000\n"
+"POT-Creation-Date: 2026-09-13 03:24+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Ελληνικά\n"
@@ -560,7 +560,7 @@ msgid "A capture cannot come after the last of its batch."
 msgstr "Μια σύλληψη δεν μπορεί να έρθει μετά την τελευταία της παρτίδας της."
 
 #: src/postulo/templates/jobs/capture_form.html:32
-#: src/postulo/templates/jobs/capture_review.html:41
+#: src/postulo/templates/jobs/capture_review.html:55
 #, python-format, draft
 msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr "Μια σύλληψη αυτής της διεύθυνσης από %(when)s αναμένει ακόμη έλεγχο."
@@ -624,7 +624,7 @@ msgid ""
 msgstr ""
 "Ένα LinkedIn, ένα Mastodon, ένα Bluesky – όσα αξίζει να φαίνονται, με ένα από αυτά σημειωμένο ως αυτό που θα φαίνεται. Τα έγγραφα τυπώνουν εκείνο."
 
-#: src/postulo/templates/jobs/capture_review.html:49
+#: src/postulo/templates/jobs/capture_review.html:63
 #, draft
 msgid ""
 "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -929,7 +929,7 @@ msgstr ""
 "Σε όλο το αρχείο: %(applications)s αιτήσεις, %(listings)s αγγελίες, %(skipped)s γραμμές παραλείφθηκαν ελλείψει εταιρείας ή ρόλου. Οι ήδη καταγεγραμμένες γραμμές εντοπίζονται και παραλείπονται κατά την εισαγωγή."
 
 #: src/postulo/templates/accounts/invite_list.html:29
-#: src/postulo/templates/jobs/listing_list.html:77
+#: src/postulo/templates/jobs/listing_list.html:92
 #: src/postulo/templates/server/people.html:36
 #: src/postulo/templates/server/person_recovery.html:65
 #, draft
@@ -982,7 +982,7 @@ msgstr "Προσθήκη γλώσσας"
 #: src/postulo/templates/jobs/listing_form.html:4
 #: src/postulo/templates/jobs/listing_form.html:8
 #: src/postulo/templates/jobs/listing_list.html:18
-#: src/postulo/templates/jobs/listing_list.html:168
+#: src/postulo/templates/jobs/listing_list.html:183
 #, draft
 msgid "Add a listing"
 msgstr "Προσθήκη αγγελίας"
@@ -1311,7 +1311,7 @@ msgstr "αίτηση"
 
 #: src/postulo/templates/applications/suggestion_list.html:82
 #: src/postulo/templates/jobs/capture_list.html:53
-#: src/postulo/templates/jobs/listing_list.html:132
+#: src/postulo/templates/jobs/listing_list.html:147
 #, draft
 msgid "Application"
 msgstr "Αίτηση"
@@ -1326,7 +1326,7 @@ msgstr "Η αίτηση δημιουργήθηκε"
 msgid "Application deleted."
 msgstr "Η αίτηση διαγράφηκε."
 
-#: src/postulo/jobs/capture_views.py:270
+#: src/postulo/jobs/capture_views.py:324
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Η αίτηση καταγράφηκε από τη σύλληψη."
@@ -1447,7 +1447,7 @@ msgstr "υποβλήθηκε μέσω"
 
 #: src/postulo/templates/jobs/company_list.html:87
 #: src/postulo/templates/jobs/listing_apply.html:4
-#: src/postulo/templates/jobs/listing_list.html:120
+#: src/postulo/templates/jobs/listing_list.html:135
 #: src/postulo/templates/jobs/posting_detail.html:44
 #: src/postulo/templates/partials/table/columns.html:49
 #, draft
@@ -1753,14 +1753,14 @@ msgstr "Σύλληψη αγγελίας"
 msgid "Capture a posting from its address and it will appear here."
 msgstr "Συλλάβετε μια αγγελία από τη διεύθυνσή της και θα εμφανιστεί εδώ."
 
-#: src/postulo/templates/jobs/listing_list.html:166
+#: src/postulo/templates/jobs/listing_list.html:181
 #, draft
 msgid ""
 "Capture a posting from its address, or add one by hand, and it waits here for you."
 msgstr ""
 "Συλλάβετε μια αγγελία από τη διεύθυνσή της, ή προσθέστε μία με το χέρι, και θα σας περιμένει εδώ."
 
-#: src/postulo/jobs/capture_views.py:286
+#: src/postulo/jobs/capture_views.py:344
 #, draft
 msgid "Capture discarded."
 msgstr "Η σύλληψη απορρίφθηκε."
@@ -1801,6 +1801,11 @@ msgstr "συλλήψεις"
 #, draft
 msgid "Captures"
 msgstr "Συλλήψεις"
+
+#: src/postulo/jobs/capture_views.py:370
+#, python-format
+msgid "Captures discarded: %(count)s."
+msgstr ""
 
 #: src/postulo/templates/applications/application_board.html:25
 #, draft
@@ -2040,7 +2045,7 @@ msgstr "έκλεισε στις"
 msgid "Closed or already filled"
 msgstr "Κλειστή ή ήδη καλυμμένη"
 
-#: src/postulo/templates/jobs/listing_list.html:75
+#: src/postulo/templates/jobs/listing_list.html:90
 #: src/postulo/templates/jobs/posting_detail.html:87
 #, draft
 msgid "Closes"
@@ -2136,7 +2141,7 @@ msgstr "Εταιρείες στις οποίες κάνατε αίτηση"
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
-#: src/postulo/templates/jobs/listing_list.html:73
+#: src/postulo/templates/jobs/listing_list.html:88
 #, draft
 msgid "Company"
 msgstr "Εταιρεία"
@@ -2815,14 +2820,22 @@ msgid "directory (tenant) ID"
 msgstr "αναγνωριστικό καταλόγου (μισθωτή)"
 
 #: src/postulo/templates/jobs/capture_list.html:47
-#: src/postulo/templates/jobs/listing_list.html:46
-#: src/postulo/templates/jobs/listing_list.html:116
+#: src/postulo/templates/jobs/listing_list.html:61
+#: src/postulo/templates/jobs/listing_list.html:131
 #: src/postulo/templates/jobs/posting_detail.html:42
 #, draft
 msgid "Discard"
 msgstr "Απόρριψη"
 
-#: src/postulo/templates/jobs/capture_review.html:119
+#: src/postulo/templates/jobs/capture_review.html:147
+msgid "Discard and next"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_list.html:39
+msgid "Discard the ticked ones"
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_review.html:142
 #, draft
 msgid "Discard this capture"
 msgstr "Απόρριψη αυτής της σύλληψης"
@@ -3988,7 +4001,7 @@ msgstr "Όπως προτιμάτε να ομαδοποιείτε την ανα�
 msgid "Hybrid"
 msgstr "Υβριδικό"
 
-#: src/postulo/jobs/capture_views.py:169
+#: src/postulo/jobs/capture_views.py:201
 #, draft
 msgid "I have already applied to this one"
 msgstr "Έχω ήδη κάνει αίτηση σε αυτή"
@@ -4515,6 +4528,11 @@ msgid ""
 msgstr ""
 "Αποθηκεύεται σε διεθνή μορφή, ώστε να μπορείτε να καλέσετε και από άλλη χώρα. Αριθμός που ήδη ξεκινά με + λαμβάνεται ως έχει."
 
+#: src/postulo/templates/jobs/capture_review.html:153
+msgid ""
+"Keys: <kbd>d</kbd> discards and moves on, <kbd>j</kbd> skips to the next, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves and moves on — while nothing is being typed."
+msgstr ""
+
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
@@ -4706,7 +4724,7 @@ msgstr "τελευταία χρήση"
 msgid "last worked"
 msgstr "τελευταία λειτουργία"
 
-#: src/postulo/templates/jobs/capture_review.html:112
+#: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
 msgstr "Αργότερα"
@@ -4870,7 +4888,7 @@ msgstr "κατανόηση προφορικού λόγου"
 msgid "listing"
 msgstr "αγγελία"
 
-#: src/postulo/templates/jobs/listing_list.html:55
+#: src/postulo/templates/jobs/listing_list.html:70
 #, draft
 msgid "Listing filters"
 msgstr "Φίλτρα αγγελιών"
@@ -4906,7 +4924,7 @@ msgstr "τοποθεσία"
 #: src/postulo/applications/forms.py:46 src/postulo/applications/tables.py:35
 #: src/postulo/core/csv_import.py:42 src/postulo/jobs/tables.py:36
 #: src/postulo/templates/applications/application_detail.html:126
-#: src/postulo/templates/jobs/listing_list.html:74
+#: src/postulo/templates/jobs/listing_list.html:89
 #, draft
 msgid "Location"
 msgstr "Τοποθεσία"
@@ -5178,7 +5196,7 @@ msgid "Mobile"
 msgstr "Κινητό"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:77
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5407,7 +5425,7 @@ msgid "Newest backup"
 msgstr "Νεότερο αντίγραφο ασφαλείας"
 
 #: src/postulo/templates/applications/suggestion_list.html:121
-#: src/postulo/templates/jobs/listing_list.html:157
+#: src/postulo/templates/jobs/listing_list.html:172
 #: src/postulo/templates/partials/table/pagination.html:19
 #, draft
 msgid "Next"
@@ -5751,6 +5769,10 @@ msgstr "δεν φορτώθηκε"
 msgid "Not matched to an application."
 msgstr "Δεν αντιστοιχίστηκε σε αίτηση."
 
+#: src/postulo/jobs/capture_views.py:187
+msgid "Not on the page — a default. Kept only beside an amount."
+msgstr ""
+
 #: src/postulo/jobs/forms.py:114
 #, draft
 msgid "Not part of another company"
@@ -5826,7 +5848,7 @@ msgstr "Σημείωση"
 msgid "Note (optional)"
 msgstr "Σημείωση (προαιρετικό)"
 
-#: src/postulo/templates/jobs/listing_list.html:86
+#: src/postulo/templates/jobs/listing_list.html:101
 #, python-format, draft
 msgid "noted %(when)s"
 msgstr "σημειώθηκε %(when)s"
@@ -5870,7 +5892,7 @@ msgid ""
 msgstr ""
 "Τίποτα δεν σίγησε για %(days)s ημέρες. Είτε τα έχετε υπό έλεγχο, είτε ήρθε η ώρα να στείλετε μερικές ακόμη."
 
-#: src/postulo/templates/jobs/listing_list.html:170
+#: src/postulo/templates/jobs/listing_list.html:185
 #, draft
 msgid "Nothing here"
 msgstr "Τίποτα εδώ"
@@ -6005,7 +6027,7 @@ msgstr "Τίποτα δεν έχει καταγραφεί για αυτή την
 msgid "Nothing recorded yet."
 msgstr "Τίποτα δεν έχει καταγραφεί ακόμη."
 
-#: src/postulo/jobs/capture_views.py:124
+#: src/postulo/jobs/capture_views.py:125
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr ""
@@ -6043,7 +6065,7 @@ msgstr "Τίποτα προς επικοινωνία."
 msgid "Nothing to connect to"
 msgstr "Τίποτα για σύνδεση"
 
-#: src/postulo/templates/jobs/listing_list.html:164
+#: src/postulo/templates/jobs/listing_list.html:179
 #, draft
 msgid "Nothing to decide"
 msgstr "Τίποτα προς απόφαση"
@@ -6096,6 +6118,10 @@ msgstr "Δεν εγκαταστάθηκε τίποτα."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Δεν επιλέχθηκε τίποτα, άρα δεν άλλαξε τίποτα."
+
+#: src/postulo/jobs/capture_views.py:372
+msgid "Nothing was selected."
+msgstr ""
 
 #: src/postulo/templates/applications/report_print.html:174
 #, draft
@@ -6413,7 +6439,7 @@ msgstr ""
 "Ανοιχτές αιτήσεις χωρίς νέα, και τα τρία πράγματα που μπορείτε να κάνετε."
 
 #: src/postulo/templates/jobs/capture_form.html:35
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:58
 #, draft
 msgid "Open it"
 msgstr "Άνοιγμα"
@@ -6429,7 +6455,7 @@ msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
 "Προαιρετικό. Αν οριστεί, μόνο αυτή η διεύθυνση μπορεί να χρησιμοποιήσει την πρόσκληση."
 
-#: src/postulo/jobs/capture_views.py:54
+#: src/postulo/jobs/capture_views.py:55
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6529,19 +6555,19 @@ msgid "Package"
 msgstr "Πακέτο"
 
 #: src/postulo/templates/applications/suggestion_list.html:116
-#: src/postulo/templates/jobs/listing_list.html:151
+#: src/postulo/templates/jobs/listing_list.html:166
 #: src/postulo/templates/partials/table/pagination.html:11
 #, python-format, draft
 msgid "Page %(current)s of %(total)s"
 msgstr "Σελίδα %(current)s από %(total)s"
 
-#: src/postulo/jobs/capture_views.py:51
+#: src/postulo/jobs/capture_views.py:52
 #, draft
 msgid "Page source"
 msgstr "Πηγαίος κώδικας σελίδας"
 
 #: src/postulo/templates/applications/suggestion_list.html:111
-#: src/postulo/templates/jobs/listing_list.html:145
+#: src/postulo/templates/jobs/listing_list.html:160
 #: src/postulo/templates/partials/table/pagination.html:3
 #, draft
 msgid "Pagination"
@@ -6904,7 +6930,7 @@ msgstr "αγγελία"
 msgid "Posting"
 msgstr "Αγγελία"
 
-#: src/postulo/jobs/capture_views.py:45
+#: src/postulo/jobs/capture_views.py:46
 #, draft
 msgid "Posting address"
 msgstr "Διεύθυνση αγγελίας"
@@ -6967,7 +6993,7 @@ msgid ""
 msgstr ""
 "Το Postulo ανακτά την εικόνα για την κύρια διεύθυνσή σας από το gravatar.com μία φορά, κρατά ένα αντίγραφο και δείχνει αυτό. Τίποτα δεν ανακτάται όσο βλέπετε σελίδες. Αποεπιλέξτε το και το αντίγραφο διαγράφεται."
 
-#: src/postulo/jobs/capture_views.py:48
+#: src/postulo/jobs/capture_views.py:49
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Το Postulo ανακτά αυτή τη μία σελίδα, και τίποτα άλλο."
@@ -7054,7 +7080,7 @@ msgid "Preview"
 msgstr "Προεπισκόπηση"
 
 #: src/postulo/templates/applications/suggestion_list.html:113
-#: src/postulo/templates/jobs/listing_list.html:148
+#: src/postulo/templates/jobs/listing_list.html:163
 #: src/postulo/templates/partials/table/pagination.html:8
 #, draft
 msgid "Previous"
@@ -7287,7 +7313,7 @@ msgstr ""
 msgid "read by"
 msgstr "διαβάστηκε από"
 
-#: src/postulo/templates/jobs/capture_review.html:10
+#: src/postulo/templates/jobs/capture_review.html:15
 #, python-format, draft
 msgid ""
 "Read by %(source)s. Check it before saving — a parser reading somebody else's markup gets things wrong, which is why nothing has been recorded yet."
@@ -7642,7 +7668,7 @@ msgstr "Έρευνα"
 msgid "Reset"
 msgstr "Επαναφορά"
 
-#: src/postulo/templates/jobs/listing_list.html:126
+#: src/postulo/templates/jobs/listing_list.html:141
 #: src/postulo/templates/jobs/posting_detail.html:49
 #, draft
 msgid "Restore"
@@ -7664,13 +7690,13 @@ msgid "reusable template"
 msgstr "επαναχρησιμοποιήσιμο πρότυπο"
 
 #: src/postulo/templates/jobs/capture_list.html:42
-#: src/postulo/templates/jobs/listing_list.html:41
+#: src/postulo/templates/jobs/listing_list.html:56
 #, draft
 msgid "Review"
 msgstr "Έλεγχος"
 
 #: src/postulo/templates/jobs/capture_review.html:4
-#: src/postulo/templates/jobs/capture_review.html:8
+#: src/postulo/templates/jobs/capture_review.html:13
 #, draft
 msgid "Review the capture"
 msgstr "Έλεγχος της σύλληψης"
@@ -7721,7 +7747,7 @@ msgstr "Το robots.txt αγνοείται αυτή τη στιγμή."
 #: src/postulo/templates/applications/report.html:227
 #: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
-#: src/postulo/templates/jobs/listing_list.html:72
+#: src/postulo/templates/jobs/listing_list.html:87
 #: src/postulo/templates/server/people.html:35
 #: src/postulo/templates/server/people.html:50
 #, draft
@@ -7835,6 +7861,10 @@ msgstr "μισθός έως"
 msgid "Save"
 msgstr "Αποθήκευση"
 
+#: src/postulo/templates/jobs/capture_review.html:130
+msgid "Save and next"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html:102
 #, draft
 msgid "Save the company to add another identifier."
@@ -7850,7 +7880,7 @@ msgstr "Αποθηκεύστε το πρώτα, μετά επιστρέψτε κ
 msgid "Save to add another identifier."
 msgstr "Αποθηκεύστε για να προσθέσετε άλλο αναγνωριστικό."
 
-#: src/postulo/templates/jobs/capture_review.html:111
+#: src/postulo/templates/jobs/capture_review.html:126
 #, draft
 msgid "Save to listings"
 msgstr "Αποθήκευση στις αγγελίες"
@@ -7860,7 +7890,7 @@ msgstr "Αποθήκευση στις αγγελίες"
 msgid "Saved in %(language)s."
 msgstr "Αποθηκεύτηκε στα %(language)s."
 
-#: src/postulo/jobs/capture_views.py:274
+#: src/postulo/jobs/capture_views.py:330
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Αποθηκεύτηκε στις αγγελίες σας. Αποφασίστε όταν είστε έτοιμοι."
@@ -8179,7 +8209,7 @@ msgstr "Μέρος του Postulo. Δεν μπορεί να αφαιρεθεί."
 msgid "Shortcuts"
 msgstr "Συντομεύσεις"
 
-#: src/postulo/templates/jobs/listing_list.html:109
+#: src/postulo/templates/jobs/listing_list.html:124
 #: src/postulo/templates/jobs/posting_detail.html:31
 #, draft
 msgid "Shortlist"
@@ -8388,6 +8418,10 @@ msgstr "δεξιότητες"
 msgid "Skip to content"
 msgstr "Μετάβαση στο περιεχόμενο"
 
+#: src/postulo/templates/jobs/capture_review.html:149
+msgid "Skip to the next"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:82
 #, draft
 msgid "skipped"
@@ -8589,7 +8623,7 @@ msgstr "STARTTLS, μετά τη σύνδεση"
 msgid "state"
 msgstr "κατάσταση"
 
-#: src/postulo/templates/jobs/listing_list.html:76
+#: src/postulo/templates/jobs/listing_list.html:91
 #: src/postulo/templates/server/person_recovery.html:64
 #, draft
 msgid "State"
@@ -9228,6 +9262,10 @@ msgstr "Αυτή η απάντηση δεν ήρθε από αίτημα που 
 msgid "That suggestion has already been answered."
 msgstr "Σε αυτή την πρόταση έχει ήδη απαντηθεί."
 
+#: src/postulo/jobs/capture_views.py:179
+msgid "That was the last capture waiting."
+msgstr ""
+
 #: src/postulo/jobs/models.py:203
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
@@ -9443,6 +9481,10 @@ msgstr[0] ""
 msgstr[1] ""
 "Τα τελευταία %(counter)s μηνύματα που προσπάθησε να στείλει αυτή η εγκατάσταση απέτυχαν. Το πιο πρόσφατο ήταν στις %(when)s."
 
+#: src/postulo/templates/jobs/capture_review.html:26
+msgid "The last one waiting."
+msgstr ""
+
 #: src/postulo/applications/widgets.py:177
 #, draft
 msgid ""
@@ -9561,7 +9603,7 @@ msgid "the posting"
 msgstr "η αγγελία"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:91
+#: src/postulo/templates/jobs/capture_review.html:105
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9597,7 +9639,7 @@ msgstr ""
 "Το υπόλοιπο αρχείο αξίζει και πάλι να εισαχθεί. Αυτά που αναφέρονται εδώ όχι, και μπορείτε να τα προσθέσετε με το χέρι αργότερα."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:63
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9783,7 +9825,7 @@ msgid "They did not show up"
 msgstr "Δεν εμφανίστηκαν"
 
 #: src/postulo/templates/jobs/capture_form.html:24
-#: src/postulo/templates/jobs/capture_review.html:33
+#: src/postulo/templates/jobs/capture_review.html:47
 #, python-format, draft
 msgid "This address is already in your listings, since %(when)s."
 msgstr "Αυτή η διεύθυνση είναι ήδη στις αγγελίες σας, από %(when)s."
@@ -9926,12 +9968,17 @@ msgstr "Μέσω %(provider)s: χωρίς κωδικό. Αυτή η εγκατά
 msgid "Through %(provider)s: you are asked for a code as well."
 msgstr "Μέσω %(provider)s: σας ζητείται και κωδικός."
 
+#: src/postulo/templates/jobs/listing_list.html:47
+#, python-format
+msgid "Tick %(title)s"
+msgstr ""
+
 #: src/postulo/templates/partials/table/bulk.html:27
 #, draft
 msgid "Tick rows to act on several at once."
 msgstr "Επιλέξτε γραμμές για να ενεργήσετε σε πολλές μαζί."
 
-#: src/postulo/jobs/capture_views.py:171
+#: src/postulo/jobs/capture_views.py:203
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -10400,6 +10447,11 @@ msgstr "Βίντεο"
 #, draft
 msgid "Video call"
 msgstr "Βιντεοκλήση"
+
+#: src/postulo/templates/jobs/capture_review.html:22
+#, python-format
+msgid "Waiting after this one: %(count)s."
+msgstr ""
 
 #: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:723
 #, draft

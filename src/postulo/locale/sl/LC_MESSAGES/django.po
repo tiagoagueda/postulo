@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-13 03:16+0000\n"
+"POT-Creation-Date: 2026-09-13 03:24+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenščina\n"
@@ -594,7 +594,7 @@ msgid "A capture cannot come after the last of its batch."
 msgstr "Zajem ne more priti za zadnjim iz svojega paketa."
 
 #: src/postulo/templates/jobs/capture_form.html:32
-#: src/postulo/templates/jobs/capture_review.html:41
+#: src/postulo/templates/jobs/capture_review.html:55
 #, python-format, draft
 msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr "Zajem tega naslova z dne %(when)s še čaka na pregled."
@@ -658,7 +658,7 @@ msgid ""
 msgstr ""
 "LinkedIn, Mastodon, Bluesky — toliko, kolikor jih je vredno pokazati, z enim od njih označenim kot tistim, ki se pokaže. Dokumenti natisnejo tistega."
 
-#: src/postulo/templates/jobs/capture_review.html:49
+#: src/postulo/templates/jobs/capture_review.html:63
 #, draft
 msgid ""
 "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -964,7 +964,7 @@ msgstr ""
 "V celotni datoteki: %(applications)s prijav, %(listings)s oglasov, %(skipped)s vrstic preskočenih zaradi manjkajočega podjetja ali delovnega mesta. Že zabeležene vrstice se ob uvozu prepoznajo in preskočijo."
 
 #: src/postulo/templates/accounts/invite_list.html:29
-#: src/postulo/templates/jobs/listing_list.html:77
+#: src/postulo/templates/jobs/listing_list.html:92
 #: src/postulo/templates/server/people.html:36
 #: src/postulo/templates/server/person_recovery.html:65
 #, draft
@@ -1017,7 +1017,7 @@ msgstr "Dodaj jezik"
 #: src/postulo/templates/jobs/listing_form.html:4
 #: src/postulo/templates/jobs/listing_form.html:8
 #: src/postulo/templates/jobs/listing_list.html:18
-#: src/postulo/templates/jobs/listing_list.html:168
+#: src/postulo/templates/jobs/listing_list.html:183
 #, draft
 msgid "Add a listing"
 msgstr "Dodaj oglas"
@@ -1346,7 +1346,7 @@ msgstr "prijava"
 
 #: src/postulo/templates/applications/suggestion_list.html:82
 #: src/postulo/templates/jobs/capture_list.html:53
-#: src/postulo/templates/jobs/listing_list.html:132
+#: src/postulo/templates/jobs/listing_list.html:147
 #, draft
 msgid "Application"
 msgstr "Prijava"
@@ -1361,7 +1361,7 @@ msgstr "Prijava ustvarjena"
 msgid "Application deleted."
 msgstr "Prijava izbrisana."
 
-#: src/postulo/jobs/capture_views.py:270
+#: src/postulo/jobs/capture_views.py:324
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Prijava zabeležena iz zajema."
@@ -1483,7 +1483,7 @@ msgstr "oddano prek"
 
 #: src/postulo/templates/jobs/company_list.html:87
 #: src/postulo/templates/jobs/listing_apply.html:4
-#: src/postulo/templates/jobs/listing_list.html:120
+#: src/postulo/templates/jobs/listing_list.html:135
 #: src/postulo/templates/jobs/posting_detail.html:44
 #: src/postulo/templates/partials/table/columns.html:49
 #, draft
@@ -1788,14 +1788,14 @@ msgstr "Zajemi oglas"
 msgid "Capture a posting from its address and it will appear here."
 msgstr "Zajemite oglas z njegovega naslova in prikazal se bo tukaj."
 
-#: src/postulo/templates/jobs/listing_list.html:166
+#: src/postulo/templates/jobs/listing_list.html:181
 #, draft
 msgid ""
 "Capture a posting from its address, or add one by hand, and it waits here for you."
 msgstr ""
 "Zajemite oglas z njegovega naslova ali ga dodajte ročno in čakal vas bo tukaj."
 
-#: src/postulo/jobs/capture_views.py:286
+#: src/postulo/jobs/capture_views.py:344
 #, draft
 msgid "Capture discarded."
 msgstr "Zajem zavržen."
@@ -1836,6 +1836,11 @@ msgstr "zajemi"
 #, draft
 msgid "Captures"
 msgstr "Zajemi"
+
+#: src/postulo/jobs/capture_views.py:370
+#, python-format
+msgid "Captures discarded: %(count)s."
+msgstr ""
 
 #: src/postulo/templates/applications/application_board.html:25
 #, draft
@@ -2075,7 +2080,7 @@ msgstr "zaprto dne"
 msgid "Closed or already filled"
 msgstr "Zaprto ali že zasedeno"
 
-#: src/postulo/templates/jobs/listing_list.html:75
+#: src/postulo/templates/jobs/listing_list.html:90
 #: src/postulo/templates/jobs/posting_detail.html:87
 #, draft
 msgid "Closes"
@@ -2171,7 +2176,7 @@ msgstr "Podjetja, kamor ste se prijavili"
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
-#: src/postulo/templates/jobs/listing_list.html:73
+#: src/postulo/templates/jobs/listing_list.html:88
 #, draft
 msgid "Company"
 msgstr "Podjetje"
@@ -2849,14 +2854,22 @@ msgid "directory (tenant) ID"
 msgstr "ID imenika (najemnika)"
 
 #: src/postulo/templates/jobs/capture_list.html:47
-#: src/postulo/templates/jobs/listing_list.html:46
-#: src/postulo/templates/jobs/listing_list.html:116
+#: src/postulo/templates/jobs/listing_list.html:61
+#: src/postulo/templates/jobs/listing_list.html:131
 #: src/postulo/templates/jobs/posting_detail.html:42
 #, draft
 msgid "Discard"
 msgstr "Zavrzi"
 
-#: src/postulo/templates/jobs/capture_review.html:119
+#: src/postulo/templates/jobs/capture_review.html:147
+msgid "Discard and next"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_list.html:39
+msgid "Discard the ticked ones"
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_review.html:142
 #, draft
 msgid "Discard this capture"
 msgstr "Zavrzi ta zajem"
@@ -4017,7 +4030,7 @@ msgstr "Kakorkoli želite združevati svoje iskanje."
 msgid "Hybrid"
 msgstr "Hibridno"
 
-#: src/postulo/jobs/capture_views.py:169
+#: src/postulo/jobs/capture_views.py:201
 #, draft
 msgid "I have already applied to this one"
 msgstr "Sem sem se že prijavil/-a"
@@ -4544,6 +4557,11 @@ msgid ""
 msgstr ""
 "Hrani se v mednarodni obliki, da lahko pokličete tudi iz druge države. Številka, ki se že začne z +, se vzame taka, kot je."
 
+#: src/postulo/templates/jobs/capture_review.html:153
+msgid ""
+"Keys: <kbd>d</kbd> discards and moves on, <kbd>j</kbd> skips to the next, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves and moves on — while nothing is being typed."
+msgstr ""
+
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
@@ -4735,7 +4753,7 @@ msgstr "nazadnje uporabljeno"
 msgid "last worked"
 msgstr "nazadnje delovalo"
 
-#: src/postulo/templates/jobs/capture_review.html:112
+#: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
 msgstr "Pozneje"
@@ -4899,7 +4917,7 @@ msgstr "poslušanje"
 msgid "listing"
 msgstr "oglas"
 
-#: src/postulo/templates/jobs/listing_list.html:55
+#: src/postulo/templates/jobs/listing_list.html:70
 #, draft
 msgid "Listing filters"
 msgstr "Filtri oglasov"
@@ -4935,7 +4953,7 @@ msgstr "lokacija"
 #: src/postulo/applications/forms.py:46 src/postulo/applications/tables.py:35
 #: src/postulo/core/csv_import.py:42 src/postulo/jobs/tables.py:36
 #: src/postulo/templates/applications/application_detail.html:126
-#: src/postulo/templates/jobs/listing_list.html:74
+#: src/postulo/templates/jobs/listing_list.html:89
 #, draft
 msgid "Location"
 msgstr "Lokacija"
@@ -5211,7 +5229,7 @@ msgid "Mobile"
 msgstr "Mobilni telefon"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:77
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5440,7 +5458,7 @@ msgid "Newest backup"
 msgstr "Najnovejša varnostna kopija"
 
 #: src/postulo/templates/applications/suggestion_list.html:121
-#: src/postulo/templates/jobs/listing_list.html:157
+#: src/postulo/templates/jobs/listing_list.html:172
 #: src/postulo/templates/partials/table/pagination.html:19
 #, draft
 msgid "Next"
@@ -5781,6 +5799,10 @@ msgstr "ni naloženo"
 msgid "Not matched to an application."
 msgstr "Ni povezano s prijavo."
 
+#: src/postulo/jobs/capture_views.py:187
+msgid "Not on the page — a default. Kept only beside an amount."
+msgstr ""
+
 #: src/postulo/jobs/forms.py:114
 #, draft
 msgid "Not part of another company"
@@ -5856,7 +5878,7 @@ msgstr "Opomba"
 msgid "Note (optional)"
 msgstr "Opomba (neobvezno)"
 
-#: src/postulo/templates/jobs/listing_list.html:86
+#: src/postulo/templates/jobs/listing_list.html:101
 #, python-format, draft
 msgid "noted %(when)s"
 msgstr "zabeleženo %(when)s"
@@ -5900,7 +5922,7 @@ msgid ""
 msgstr ""
 "Nič ni utihnilo že %(days)s dni. Ali imate vse pod nadzorom ali pa je čas, da jih pošljete še nekaj."
 
-#: src/postulo/templates/jobs/listing_list.html:170
+#: src/postulo/templates/jobs/listing_list.html:185
 #, draft
 msgid "Nothing here"
 msgstr "Tukaj ni ničesar"
@@ -6031,7 +6053,7 @@ msgstr "Za to prijavo še ni nič zabeleženo."
 msgid "Nothing recorded yet."
 msgstr "Še nič ni zabeleženo."
 
-#: src/postulo/jobs/capture_views.py:124
+#: src/postulo/jobs/capture_views.py:125
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Na tej strani ni bilo najdeno nič, kar bi bilo podobno oglasu za delo."
@@ -6068,7 +6090,7 @@ msgstr "Ni koga opomniti."
 msgid "Nothing to connect to"
 msgstr "Ni se s čim povezati"
 
-#: src/postulo/templates/jobs/listing_list.html:164
+#: src/postulo/templates/jobs/listing_list.html:179
 #, draft
 msgid "Nothing to decide"
 msgstr "Ni o čem odločati"
@@ -6121,6 +6143,10 @@ msgstr "Nič ni bilo nameščeno."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Nič ni bilo izbrano, zato se ni nič spremenilo."
+
+#: src/postulo/jobs/capture_views.py:372
+msgid "Nothing was selected."
+msgstr ""
 
 #: src/postulo/templates/applications/report_print.html:174
 #, draft
@@ -6460,7 +6486,7 @@ msgstr ""
 "Odprte prijave brez odziva in tri stvari, ki jih lahko naredite glede tega."
 
 #: src/postulo/templates/jobs/capture_form.html:35
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:58
 #, draft
 msgid "Open it"
 msgstr "Odpri ga"
@@ -6475,7 +6501,7 @@ msgstr "Prosta delovna mesta"
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Neobvezno. Če je nastavljeno, lahko vabilo uporabi samo ta naslov."
 
-#: src/postulo/jobs/capture_views.py:54
+#: src/postulo/jobs/capture_views.py:55
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6575,19 +6601,19 @@ msgid "Package"
 msgstr "Paket"
 
 #: src/postulo/templates/applications/suggestion_list.html:116
-#: src/postulo/templates/jobs/listing_list.html:151
+#: src/postulo/templates/jobs/listing_list.html:166
 #: src/postulo/templates/partials/table/pagination.html:11
 #, python-format, draft
 msgid "Page %(current)s of %(total)s"
 msgstr "Stran %(current)s od %(total)s"
 
-#: src/postulo/jobs/capture_views.py:51
+#: src/postulo/jobs/capture_views.py:52
 #, draft
 msgid "Page source"
 msgstr "Izvorna koda strani"
 
 #: src/postulo/templates/applications/suggestion_list.html:111
-#: src/postulo/templates/jobs/listing_list.html:145
+#: src/postulo/templates/jobs/listing_list.html:160
 #: src/postulo/templates/partials/table/pagination.html:3
 #, draft
 msgid "Pagination"
@@ -6948,7 +6974,7 @@ msgstr "oglas"
 msgid "Posting"
 msgstr "Oglas"
 
-#: src/postulo/jobs/capture_views.py:45
+#: src/postulo/jobs/capture_views.py:46
 #, draft
 msgid "Posting address"
 msgstr "Naslov oglasa"
@@ -7010,7 +7036,7 @@ msgid ""
 msgstr ""
 "Postulo enkrat pridobi sliko za vaš primarni naslov z gravatar.com, ohrani kopijo in jo prikazuje. Med ogledovanjem strani se nič ne pridobiva. Odznačite in kopija se izbriše."
 
-#: src/postulo/jobs/capture_views.py:48
+#: src/postulo/jobs/capture_views.py:49
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo pridobi to eno stran in nič drugega."
@@ -7097,7 +7123,7 @@ msgid "Preview"
 msgstr "Predogled"
 
 #: src/postulo/templates/applications/suggestion_list.html:113
-#: src/postulo/templates/jobs/listing_list.html:148
+#: src/postulo/templates/jobs/listing_list.html:163
 #: src/postulo/templates/partials/table/pagination.html:8
 #, draft
 msgid "Previous"
@@ -7334,7 +7360,7 @@ msgstr ""
 msgid "read by"
 msgstr "prebral"
 
-#: src/postulo/templates/jobs/capture_review.html:10
+#: src/postulo/templates/jobs/capture_review.html:15
 #, python-format, draft
 msgid ""
 "Read by %(source)s. Check it before saving — a parser reading somebody else's markup gets things wrong, which is why nothing has been recorded yet."
@@ -7685,7 +7711,7 @@ msgstr "Raziskave"
 msgid "Reset"
 msgstr "Ponastavi"
 
-#: src/postulo/templates/jobs/listing_list.html:126
+#: src/postulo/templates/jobs/listing_list.html:141
 #: src/postulo/templates/jobs/posting_detail.html:49
 #, draft
 msgid "Restore"
@@ -7707,13 +7733,13 @@ msgid "reusable template"
 msgstr "predloga za večkratno uporabo"
 
 #: src/postulo/templates/jobs/capture_list.html:42
-#: src/postulo/templates/jobs/listing_list.html:41
+#: src/postulo/templates/jobs/listing_list.html:56
 #, draft
 msgid "Review"
 msgstr "Preglej"
 
 #: src/postulo/templates/jobs/capture_review.html:4
-#: src/postulo/templates/jobs/capture_review.html:8
+#: src/postulo/templates/jobs/capture_review.html:13
 #, draft
 msgid "Review the capture"
 msgstr "Preglej zajem"
@@ -7764,7 +7790,7 @@ msgstr "robots.txt se trenutno prezre."
 #: src/postulo/templates/applications/report.html:227
 #: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
-#: src/postulo/templates/jobs/listing_list.html:72
+#: src/postulo/templates/jobs/listing_list.html:87
 #: src/postulo/templates/server/people.html:35
 #: src/postulo/templates/server/people.html:50
 #, draft
@@ -7878,6 +7904,10 @@ msgstr "plača do"
 msgid "Save"
 msgstr "Shrani"
 
+#: src/postulo/templates/jobs/capture_review.html:130
+msgid "Save and next"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html:102
 #, draft
 msgid "Save the company to add another identifier."
@@ -7893,7 +7923,7 @@ msgstr "Najprej to shranite, nato se vrnite in privolite."
 msgid "Save to add another identifier."
 msgstr "Shranite, da dodate še en identifikator."
 
-#: src/postulo/templates/jobs/capture_review.html:111
+#: src/postulo/templates/jobs/capture_review.html:126
 #, draft
 msgid "Save to listings"
 msgstr "Shrani med oglase"
@@ -7903,7 +7933,7 @@ msgstr "Shrani med oglase"
 msgid "Saved in %(language)s."
 msgstr "Shranjeno v jeziku %(language)s."
 
-#: src/postulo/jobs/capture_views.py:274
+#: src/postulo/jobs/capture_views.py:330
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Shranjeno med vaše oglase. Odločite se, ko boste pripravljeni."
@@ -8221,7 +8251,7 @@ msgstr "Del Postula. Ni ga mogoče odstraniti."
 msgid "Shortcuts"
 msgstr "Bližnjice"
 
-#: src/postulo/templates/jobs/listing_list.html:109
+#: src/postulo/templates/jobs/listing_list.html:124
 #: src/postulo/templates/jobs/posting_detail.html:31
 #, draft
 msgid "Shortlist"
@@ -8429,6 +8459,10 @@ msgstr "spretnosti"
 msgid "Skip to content"
 msgstr "Skoči na vsebino"
 
+#: src/postulo/templates/jobs/capture_review.html:149
+msgid "Skip to the next"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:82
 #, draft
 msgid "skipped"
@@ -8629,7 +8663,7 @@ msgstr "STARTTLS, po povezavi"
 msgid "state"
 msgstr "stanje"
 
-#: src/postulo/templates/jobs/listing_list.html:76
+#: src/postulo/templates/jobs/listing_list.html:91
 #: src/postulo/templates/server/person_recovery.html:64
 #, draft
 msgid "State"
@@ -9265,6 +9299,10 @@ msgstr "Ta odgovor ni prišel iz zahteve, ki jo je poslal Postulo."
 msgid "That suggestion has already been answered."
 msgstr "Na ta predlog je že odgovorjeno."
 
+#: src/postulo/jobs/capture_views.py:179
+msgid "That was the last capture waiting."
+msgstr ""
+
 #: src/postulo/jobs/models.py:203
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
@@ -9482,6 +9520,10 @@ msgstr[2] ""
 msgstr[3] ""
 "Zadnja %(counter)s sporočila, ki jih je ta instanca poskusila poslati, niso uspela. Najnovejše je bilo ob %(when)s."
 
+#: src/postulo/templates/jobs/capture_review.html:26
+msgid "The last one waiting."
+msgstr ""
+
 #: src/postulo/applications/widgets.py:177
 #, draft
 msgid ""
@@ -9600,7 +9642,7 @@ msgid "the posting"
 msgstr "oglas"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:91
+#: src/postulo/templates/jobs/capture_review.html:105
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9636,7 +9678,7 @@ msgstr ""
 "Preostanek datoteke je še vedno vreden uvoza. Kar je našteto tu, ni, in to lahko pozneje dodate ročno."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:63
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9820,7 +9862,7 @@ msgid "They did not show up"
 msgstr "Niso prišli"
 
 #: src/postulo/templates/jobs/capture_form.html:24
-#: src/postulo/templates/jobs/capture_review.html:33
+#: src/postulo/templates/jobs/capture_review.html:47
 #, python-format, draft
 msgid "This address is already in your listings, since %(when)s."
 msgstr "Ta naslov je že med vašimi oglasi, od %(when)s."
@@ -9963,12 +10005,17 @@ msgstr "Prek %(provider)s: brez kode. Ta instanca to šteje za dovolj."
 msgid "Through %(provider)s: you are asked for a code as well."
 msgstr "Prek %(provider)s: vprašani boste tudi za kodo."
 
+#: src/postulo/templates/jobs/listing_list.html:47
+#, python-format
+msgid "Tick %(title)s"
+msgstr ""
+
 #: src/postulo/templates/partials/table/bulk.html:27
 #, draft
 msgid "Tick rows to act on several at once."
 msgstr "Označite vrstice, da delujete na več naenkrat."
 
-#: src/postulo/jobs/capture_views.py:171
+#: src/postulo/jobs/capture_views.py:203
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -10433,6 +10480,11 @@ msgstr "Video"
 #, draft
 msgid "Video call"
 msgstr "Videoklic"
+
+#: src/postulo/templates/jobs/capture_review.html:22
+#, python-format
+msgid "Waiting after this one: %(count)s."
+msgstr ""
 
 #: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:723
 #, draft

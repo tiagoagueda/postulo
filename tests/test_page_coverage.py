@@ -80,6 +80,9 @@ EXCUSED: dict[str, str] = {
     "documents:rendered_archive": "a POST that files a sent document away",
     "documents:upload_archive": "a POST that files an uploaded document away",
     "jobs:capture_discard": "a POST that throws away a captured posting",
+    "jobs:capture_discard_selected": (
+        "a POST from the listings page's captures block, which is visited"
+    ),
     "listings:shortlist": "a POST from the listings table",
     "listings:discard": "a POST from the listings table",
     "listings:restore": "a POST that brings a discarded listing back",

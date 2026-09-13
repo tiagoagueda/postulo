@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-13 03:16+0000\n"
+"POT-Creation-Date: 2026-09-13 03:24+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -555,7 +555,7 @@ msgid "A capture cannot come after the last of its batch."
 msgstr "Kaappaus ei voi tulla eränsä viimeisen jälkeen."
 
 #: src/postulo/templates/jobs/capture_form.html:32
-#: src/postulo/templates/jobs/capture_review.html:41
+#: src/postulo/templates/jobs/capture_review.html:55
 #, python-format, draft
 msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr "Tämän osoitteen kaappaus ajalta %(when)s odottaa yhä tarkistusta."
@@ -619,7 +619,7 @@ msgid ""
 msgstr ""
 "LinkedIn, Mastodon, Bluesky – niin monta kuin kannattaa näyttää, ja yksi niistä merkittynä näytettäväksi. Asiakirjat tulostavat sen."
 
-#: src/postulo/templates/jobs/capture_review.html:49
+#: src/postulo/templates/jobs/capture_review.html:63
 #, draft
 msgid ""
 "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -919,7 +919,7 @@ msgstr ""
 "Koko tiedostossa: %(applications)s hakemusta, %(listings)s ilmoitusta, %(skipped)s riviä ohitettu yrityksen tai tehtävän puuttuessa. Jo kirjatut rivit tunnistetaan ja ohitetaan tuonnin aikana."
 
 #: src/postulo/templates/accounts/invite_list.html:29
-#: src/postulo/templates/jobs/listing_list.html:77
+#: src/postulo/templates/jobs/listing_list.html:92
 #: src/postulo/templates/server/people.html:36
 #: src/postulo/templates/server/person_recovery.html:65
 #, draft
@@ -972,7 +972,7 @@ msgstr "Lisää kieli"
 #: src/postulo/templates/jobs/listing_form.html:4
 #: src/postulo/templates/jobs/listing_form.html:8
 #: src/postulo/templates/jobs/listing_list.html:18
-#: src/postulo/templates/jobs/listing_list.html:168
+#: src/postulo/templates/jobs/listing_list.html:183
 #, draft
 msgid "Add a listing"
 msgstr "Lisää ilmoitus"
@@ -1300,7 +1300,7 @@ msgstr "hakemus"
 
 #: src/postulo/templates/applications/suggestion_list.html:82
 #: src/postulo/templates/jobs/capture_list.html:53
-#: src/postulo/templates/jobs/listing_list.html:132
+#: src/postulo/templates/jobs/listing_list.html:147
 #, draft
 msgid "Application"
 msgstr "Hakemus"
@@ -1315,7 +1315,7 @@ msgstr "Hakemus luotu"
 msgid "Application deleted."
 msgstr "Hakemus poistettu."
 
-#: src/postulo/jobs/capture_views.py:270
+#: src/postulo/jobs/capture_views.py:324
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Hakemus kirjattu kaappauksesta."
@@ -1436,7 +1436,7 @@ msgstr "haettu kanavalla"
 
 #: src/postulo/templates/jobs/company_list.html:87
 #: src/postulo/templates/jobs/listing_apply.html:4
-#: src/postulo/templates/jobs/listing_list.html:120
+#: src/postulo/templates/jobs/listing_list.html:135
 #: src/postulo/templates/jobs/posting_detail.html:44
 #: src/postulo/templates/partials/table/columns.html:49
 #, draft
@@ -1741,14 +1741,14 @@ msgstr "Kaappaa ilmoitus"
 msgid "Capture a posting from its address and it will appear here."
 msgstr "Kaappaa ilmoitus sen osoitteesta, niin se ilmestyy tänne."
 
-#: src/postulo/templates/jobs/listing_list.html:166
+#: src/postulo/templates/jobs/listing_list.html:181
 #, draft
 msgid ""
 "Capture a posting from its address, or add one by hand, and it waits here for you."
 msgstr ""
 "Kaappaa ilmoitus sen osoitteesta tai lisää käsin, niin se odottaa sinua täällä."
 
-#: src/postulo/jobs/capture_views.py:286
+#: src/postulo/jobs/capture_views.py:344
 #, draft
 msgid "Capture discarded."
 msgstr "Kaappaus hylätty."
@@ -1789,6 +1789,11 @@ msgstr "kaappaukset"
 #, draft
 msgid "Captures"
 msgstr "Kaappaukset"
+
+#: src/postulo/jobs/capture_views.py:370
+#, python-format
+msgid "Captures discarded: %(count)s."
+msgstr ""
 
 #: src/postulo/templates/applications/application_board.html:25
 #, draft
@@ -2028,7 +2033,7 @@ msgstr "suljettu"
 msgid "Closed or already filled"
 msgstr "Suljettu tai jo täytetty"
 
-#: src/postulo/templates/jobs/listing_list.html:75
+#: src/postulo/templates/jobs/listing_list.html:90
 #: src/postulo/templates/jobs/posting_detail.html:87
 #, draft
 msgid "Closes"
@@ -2124,7 +2129,7 @@ msgstr "Yritykset, joihin olet hakenut"
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
-#: src/postulo/templates/jobs/listing_list.html:73
+#: src/postulo/templates/jobs/listing_list.html:88
 #, draft
 msgid "Company"
 msgstr "Yritys"
@@ -2804,14 +2809,22 @@ msgid "directory (tenant) ID"
 msgstr "hakemiston (vuokraajan) tunnus"
 
 #: src/postulo/templates/jobs/capture_list.html:47
-#: src/postulo/templates/jobs/listing_list.html:46
-#: src/postulo/templates/jobs/listing_list.html:116
+#: src/postulo/templates/jobs/listing_list.html:61
+#: src/postulo/templates/jobs/listing_list.html:131
 #: src/postulo/templates/jobs/posting_detail.html:42
 #, draft
 msgid "Discard"
 msgstr "Hylkää"
 
-#: src/postulo/templates/jobs/capture_review.html:119
+#: src/postulo/templates/jobs/capture_review.html:147
+msgid "Discard and next"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_list.html:39
+msgid "Discard the ticked ones"
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_review.html:142
 #, draft
 msgid "Discard this capture"
 msgstr "Hylkää tämä kaappaus"
@@ -3976,7 +3989,7 @@ msgstr "Miten ikinä haluatkin ryhmitellä hakuasi."
 msgid "Hybrid"
 msgstr "Hybridi"
 
-#: src/postulo/jobs/capture_views.py:169
+#: src/postulo/jobs/capture_views.py:201
 #, draft
 msgid "I have already applied to this one"
 msgstr "Olen jo hakenut tätä"
@@ -4503,6 +4516,11 @@ msgid ""
 msgstr ""
 "Säilytetään kansainvälisessä muodossa, jotta voit soittaa myös toisesta maasta. Numero, joka jo alkaa +-merkillä, otetaan sellaisenaan."
 
+#: src/postulo/templates/jobs/capture_review.html:153
+msgid ""
+"Keys: <kbd>d</kbd> discards and moves on, <kbd>j</kbd> skips to the next, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves and moves on — while nothing is being typed."
+msgstr ""
+
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
@@ -4694,7 +4712,7 @@ msgstr "viimeksi käytetty"
 msgid "last worked"
 msgstr "viimeksi toiminut"
 
-#: src/postulo/templates/jobs/capture_review.html:112
+#: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
 msgstr "Myöhemmin"
@@ -4858,7 +4876,7 @@ msgstr "kuullun ymmärtäminen"
 msgid "listing"
 msgstr "ilmoitus"
 
-#: src/postulo/templates/jobs/listing_list.html:55
+#: src/postulo/templates/jobs/listing_list.html:70
 #, draft
 msgid "Listing filters"
 msgstr "Ilmoitussuodattimet"
@@ -4894,7 +4912,7 @@ msgstr "sijainti"
 #: src/postulo/applications/forms.py:46 src/postulo/applications/tables.py:35
 #: src/postulo/core/csv_import.py:42 src/postulo/jobs/tables.py:36
 #: src/postulo/templates/applications/application_detail.html:126
-#: src/postulo/templates/jobs/listing_list.html:74
+#: src/postulo/templates/jobs/listing_list.html:89
 #, draft
 msgid "Location"
 msgstr "Sijainti"
@@ -5166,7 +5184,7 @@ msgid "Mobile"
 msgstr "Matkapuhelin"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:77
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5395,7 +5413,7 @@ msgid "Newest backup"
 msgstr "Uusin varmuuskopio"
 
 #: src/postulo/templates/applications/suggestion_list.html:121
-#: src/postulo/templates/jobs/listing_list.html:157
+#: src/postulo/templates/jobs/listing_list.html:172
 #: src/postulo/templates/partials/table/pagination.html:19
 #, draft
 msgid "Next"
@@ -5736,6 +5754,10 @@ msgstr "ei ladattu"
 msgid "Not matched to an application."
 msgstr "Ei liitetty hakemukseen."
 
+#: src/postulo/jobs/capture_views.py:187
+msgid "Not on the page — a default. Kept only beside an amount."
+msgstr ""
+
 #: src/postulo/jobs/forms.py:114
 #, draft
 msgid "Not part of another company"
@@ -5811,7 +5833,7 @@ msgstr "Muistiinpano"
 msgid "Note (optional)"
 msgstr "Muistiinpano (valinnainen)"
 
-#: src/postulo/templates/jobs/listing_list.html:86
+#: src/postulo/templates/jobs/listing_list.html:101
 #, python-format, draft
 msgid "noted %(when)s"
 msgstr "merkitty %(when)s"
@@ -5855,7 +5877,7 @@ msgid ""
 msgstr ""
 "Mikään ei ole hiljentynyt %(days)s päivään. Joko homma on hallussa tai on aika lähettää muutama lisää."
 
-#: src/postulo/templates/jobs/listing_list.html:170
+#: src/postulo/templates/jobs/listing_list.html:185
 #, draft
 msgid "Nothing here"
 msgstr "Ei mitään"
@@ -5989,7 +6011,7 @@ msgstr "Tähän hakemukseen ei ole vielä kirjattu mitään."
 msgid "Nothing recorded yet."
 msgstr "Mitään ei ole vielä kirjattu."
 
-#: src/postulo/jobs/capture_views.py:124
+#: src/postulo/jobs/capture_views.py:125
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Sivulta ei löytynyt mitään työpaikkailmoitukselta näyttävää."
@@ -6026,7 +6048,7 @@ msgstr "Ei mitään kysyttävää."
 msgid "Nothing to connect to"
 msgstr "Ei mitään yhdistettävää"
 
-#: src/postulo/templates/jobs/listing_list.html:164
+#: src/postulo/templates/jobs/listing_list.html:179
 #, draft
 msgid "Nothing to decide"
 msgstr "Ei mitään päätettävää"
@@ -6079,6 +6101,10 @@ msgstr "Mitään ei asennettu."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Mitään ei ollut valittu, joten mikään ei muuttunut."
+
+#: src/postulo/jobs/capture_views.py:372
+msgid "Nothing was selected."
+msgstr ""
 
 #: src/postulo/templates/applications/report_print.html:174
 #, draft
@@ -6393,7 +6419,7 @@ msgstr ""
 "Avoimet hakemukset, joista ei ole kuulunut, ja kolme asiaa niiden suhteen."
 
 #: src/postulo/templates/jobs/capture_form.html:35
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:58
 #, draft
 msgid "Open it"
 msgstr "Avaa se"
@@ -6408,7 +6434,7 @@ msgstr "Avoimet paikat"
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Valinnainen. Jos asetettu, vain tämä osoite voi käyttää kutsua."
 
-#: src/postulo/jobs/capture_views.py:54
+#: src/postulo/jobs/capture_views.py:55
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6508,19 +6534,19 @@ msgid "Package"
 msgstr "Paketti"
 
 #: src/postulo/templates/applications/suggestion_list.html:116
-#: src/postulo/templates/jobs/listing_list.html:151
+#: src/postulo/templates/jobs/listing_list.html:166
 #: src/postulo/templates/partials/table/pagination.html:11
 #, python-format, draft
 msgid "Page %(current)s of %(total)s"
 msgstr "Sivu %(current)s / %(total)s"
 
-#: src/postulo/jobs/capture_views.py:51
+#: src/postulo/jobs/capture_views.py:52
 #, draft
 msgid "Page source"
 msgstr "Sivun lähdekoodi"
 
 #: src/postulo/templates/applications/suggestion_list.html:111
-#: src/postulo/templates/jobs/listing_list.html:145
+#: src/postulo/templates/jobs/listing_list.html:160
 #: src/postulo/templates/partials/table/pagination.html:3
 #, draft
 msgid "Pagination"
@@ -6881,7 +6907,7 @@ msgstr "ilmoitus"
 msgid "Posting"
 msgstr "Ilmoitus"
 
-#: src/postulo/jobs/capture_views.py:45
+#: src/postulo/jobs/capture_views.py:46
 #, draft
 msgid "Posting address"
 msgstr "Ilmoituksen osoite"
@@ -6943,7 +6969,7 @@ msgid ""
 msgstr ""
 "Postulo hakee ensisijaisen osoitteesi kuvan gravatar.comista kerran, säilyttää kopion ja näyttää sen. Sivuja katseltaessa ei haeta mitään. Poista valinta, niin kopio poistetaan."
 
-#: src/postulo/jobs/capture_views.py:48
+#: src/postulo/jobs/capture_views.py:49
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo hakee tämän yhden sivun eikä mitään muuta."
@@ -7030,7 +7056,7 @@ msgid "Preview"
 msgstr "Esikatselu"
 
 #: src/postulo/templates/applications/suggestion_list.html:113
-#: src/postulo/templates/jobs/listing_list.html:148
+#: src/postulo/templates/jobs/listing_list.html:163
 #: src/postulo/templates/partials/table/pagination.html:8
 #, draft
 msgid "Previous"
@@ -7263,7 +7289,7 @@ msgstr "Luettu Europass-XML-muodossa, jota CV-editori tuotti."
 msgid "read by"
 msgstr "lukija"
 
-#: src/postulo/templates/jobs/capture_review.html:10
+#: src/postulo/templates/jobs/capture_review.html:15
 #, python-format, draft
 msgid ""
 "Read by %(source)s. Check it before saving — a parser reading somebody else's markup gets things wrong, which is why nothing has been recorded yet."
@@ -7615,7 +7641,7 @@ msgstr "Tutkimus"
 msgid "Reset"
 msgstr "Palauta"
 
-#: src/postulo/templates/jobs/listing_list.html:126
+#: src/postulo/templates/jobs/listing_list.html:141
 #: src/postulo/templates/jobs/posting_detail.html:49
 #, draft
 msgid "Restore"
@@ -7637,13 +7663,13 @@ msgid "reusable template"
 msgstr "uudelleenkäytettävä malli"
 
 #: src/postulo/templates/jobs/capture_list.html:42
-#: src/postulo/templates/jobs/listing_list.html:41
+#: src/postulo/templates/jobs/listing_list.html:56
 #, draft
 msgid "Review"
 msgstr "Tarkista"
 
 #: src/postulo/templates/jobs/capture_review.html:4
-#: src/postulo/templates/jobs/capture_review.html:8
+#: src/postulo/templates/jobs/capture_review.html:13
 #, draft
 msgid "Review the capture"
 msgstr "Tarkista kaappaus"
@@ -7694,7 +7720,7 @@ msgstr "robots.txt-tiedosto ohitetaan tällä hetkellä."
 #: src/postulo/templates/applications/report.html:227
 #: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
-#: src/postulo/templates/jobs/listing_list.html:72
+#: src/postulo/templates/jobs/listing_list.html:87
 #: src/postulo/templates/server/people.html:35
 #: src/postulo/templates/server/people.html:50
 #, draft
@@ -7808,6 +7834,10 @@ msgstr "palkka enintään"
 msgid "Save"
 msgstr "Tallenna"
 
+#: src/postulo/templates/jobs/capture_review.html:130
+msgid "Save and next"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html:102
 #, draft
 msgid "Save the company to add another identifier."
@@ -7823,7 +7853,7 @@ msgstr "Tallenna tämä ensin, palaa sitten hyväksymään."
 msgid "Save to add another identifier."
 msgstr "Tallenna lisätäksesi toisen tunnisteen."
 
-#: src/postulo/templates/jobs/capture_review.html:111
+#: src/postulo/templates/jobs/capture_review.html:126
 #, draft
 msgid "Save to listings"
 msgstr "Tallenna ilmoituksiin"
@@ -7833,7 +7863,7 @@ msgstr "Tallenna ilmoituksiin"
 msgid "Saved in %(language)s."
 msgstr "Tallennettu kielellä %(language)s."
 
-#: src/postulo/jobs/capture_views.py:274
+#: src/postulo/jobs/capture_views.py:330
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Tallennettu ilmoituksiisi. Päätä, kun olet valmis."
@@ -8152,7 +8182,7 @@ msgstr "Kuuluu Postuloon. Sitä ei voi poistaa."
 msgid "Shortcuts"
 msgstr "Pikanäppäimet"
 
-#: src/postulo/templates/jobs/listing_list.html:109
+#: src/postulo/templates/jobs/listing_list.html:124
 #: src/postulo/templates/jobs/posting_detail.html:31
 #, draft
 msgid "Shortlist"
@@ -8360,6 +8390,10 @@ msgstr "taidot"
 msgid "Skip to content"
 msgstr "Siirry sisältöön"
 
+#: src/postulo/templates/jobs/capture_review.html:149
+msgid "Skip to the next"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:82
 #, draft
 msgid "skipped"
@@ -8561,7 +8595,7 @@ msgstr "STARTTLS, yhdistämisen jälkeen"
 msgid "state"
 msgstr "tila"
 
-#: src/postulo/templates/jobs/listing_list.html:76
+#: src/postulo/templates/jobs/listing_list.html:91
 #: src/postulo/templates/server/person_recovery.html:64
 #, draft
 msgid "State"
@@ -9197,6 +9231,10 @@ msgstr "Tuo vastaus ei tullut Postulon tekemästä pyynnöstä."
 msgid "That suggestion has already been answered."
 msgstr "Tähän ehdotukseen on jo vastattu."
 
+#: src/postulo/jobs/capture_views.py:179
+msgid "That was the last capture waiting."
+msgstr ""
+
 #: src/postulo/jobs/models.py:203
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
@@ -9410,6 +9448,10 @@ msgstr[0] ""
 msgstr[1] ""
 "Viimeiset %(counter)s viestiä, jotka tämä instanssi yritti lähettää, epäonnistuivat. Tuorein oli %(when)s."
 
+#: src/postulo/templates/jobs/capture_review.html:26
+msgid "The last one waiting."
+msgstr ""
+
 #: src/postulo/applications/widgets.py:177
 #, draft
 msgid ""
@@ -9526,7 +9568,7 @@ msgid "the posting"
 msgstr "ilmoitus"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:91
+#: src/postulo/templates/jobs/capture_review.html:105
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9562,7 +9604,7 @@ msgstr ""
 "Loput tiedostosta kannattaa silti tuoda. Tässä lueteltu ei kannata, ja voit lisätä sen käsin jälkeenpäin."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:63
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9746,7 +9788,7 @@ msgid "They did not show up"
 msgstr "He eivät saapuneet"
 
 #: src/postulo/templates/jobs/capture_form.html:24
-#: src/postulo/templates/jobs/capture_review.html:33
+#: src/postulo/templates/jobs/capture_review.html:47
 #, python-format, draft
 msgid "This address is already in your listings, since %(when)s."
 msgstr "Tämä osoite on jo ilmoituksissasi, alkaen %(when)s."
@@ -9890,12 +9932,17 @@ msgstr ""
 msgid "Through %(provider)s: you are asked for a code as well."
 msgstr "Palvelun %(provider)s kautta: sinulta kysytään myös koodi."
 
+#: src/postulo/templates/jobs/listing_list.html:47
+#, python-format
+msgid "Tick %(title)s"
+msgstr ""
+
 #: src/postulo/templates/partials/table/bulk.html:27
 #, draft
 msgid "Tick rows to act on several at once."
 msgstr "Rastita rivejä toimiaksesi usealle kerralla."
 
-#: src/postulo/jobs/capture_views.py:171
+#: src/postulo/jobs/capture_views.py:203
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -10362,6 +10409,11 @@ msgstr "Video"
 #, draft
 msgid "Video call"
 msgstr "Videopuhelu"
+
+#: src/postulo/templates/jobs/capture_review.html:22
+#, python-format
+msgid "Waiting after this one: %(count)s."
+msgstr ""
 
 #: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:723
 #, draft

@@ -290,6 +290,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Forty captures, and not forty page loads.** Reviewing what a board's search page
+  produced meant opening each capture, deciding, and landing back on the list — a full
+  page each — when most of the forty get the same answer in under a second. The review
+  page moves on by itself now: *Save and next* and *Discard and next* beside the plain
+  buttons, a *Skip to the next*, and a line saying how many are still waiting. Three keys
+  do what those buttons do, through the buttons — <kbd>d</kbd> discards and moves on,
+  <kbd>j</kbd> skips, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves and moves on — and never while
+  something is being typed. On the Listings page the captures block has a checkbox per
+  capture and one *Discard the ticked ones*, which is most of triage with no form at all.
+  And a currency or period the page never stated now says so beside the box, so a default
+  is visibly a default rather than looking like something that was read. (#179)
+
 - **Your details is one record, with its parts down the side.** The page held three cards
   and a blurb sending you to Settings for your addresses — which had not been true for a
   while: the telephone numbers, the postal addresses, the identifiers and now the links all

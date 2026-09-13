@@ -336,6 +336,39 @@
     closeMenus(event.target.closest("details[data-menu]"));
   });
 
+  // The capture review page is the one screen somebody works through forty times in a
+  // row, so it has keys: "d" discards and moves on, "j" skips to the next, Ctrl+Enter
+  // saves and moves on -- never while typing in a field, and only where the page marks
+  // itself. Each key presses the button that does the same thing, so the server path is
+  // the button's and the buttons stay the whole control (#179).
+  document.addEventListener("keydown", function (event) {
+    var page = document.querySelector("[data-capture-review]");
+    if (!page) {
+      return;
+    }
+    var active = document.activeElement;
+    var typing =
+      active &&
+      (active.tagName === "INPUT" ||
+        active.tagName === "TEXTAREA" ||
+        active.tagName === "SELECT" ||
+        active.isContentEditable);
+    var target = null;
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+      target = page.querySelector("[data-key-save-next]");
+    } else if (!typing && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      if (event.key === "d") {
+        target = page.querySelector("[data-key-discard-next]");
+      } else if (event.key === "j") {
+        target = page.querySelector("[data-key-next]");
+      }
+    }
+    if (target) {
+      event.preventDefault();
+      target.click();
+    }
+  });
+
   // "/" jumps to the search box, as on most sites with one, unless the person is
   // already typing somewhere.
   document.addEventListener("keydown", function (event) {

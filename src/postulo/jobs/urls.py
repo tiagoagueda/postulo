@@ -47,6 +47,11 @@ urlpatterns = [
         capture_views.CaptureDiscardView.as_view(),
         name="capture_discard",
     ),
+    path(
+        "captures/discard/",
+        capture_views.CaptureDiscardSelectedView.as_view(),
+        name="capture_discard_selected",
+    ),
     path("postings/new/", views.PostingCreateView.as_view(), name="posting_create"),
     path("postings/<int:pk>/", views.PostingDetailView.as_view(), name="posting_detail"),
     path("postings/<int:pk>/edit/", views.PostingUpdateView.as_view(), name="posting_update"),

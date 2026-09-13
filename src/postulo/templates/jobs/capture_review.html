@@ -4,13 +4,26 @@
 {% block title %}{% translate "Review the capture" %}{% endblock %}
 
 {% block content %}
-  <div class="mx-auto max-w-3xl">
+  {% comment %} The one screen somebody works through forty times in a row, so it moves
+     on by itself: *and next* beside each decision, a skip, and keys for all three that do
+     exactly what the buttons do, through the buttons. The buttons are the whole control;
+     the keys are a shortcut to them (#179). {% endcomment %}
+  <div class="mx-auto max-w-3xl" data-capture-review>
     <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Review the capture" %}</h1>
-    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+    <p class="mb-1 text-sm text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed with source=capture.source_name %}
         Read by {{ source }}. Check it before saving — a parser reading somebody else's
         markup gets things wrong, which is why nothing has been recorded yet.
       {% endblocktranslate %}
+    </p>
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400" data-queue>
+      {% if queue_left %}
+        {% blocktranslate trimmed with count=queue_left %}
+          Waiting after this one: {{ count }}.
+        {% endblocktranslate %}
+      {% else %}
+        {% translate "The last one waiting." %}
+      {% endif %}
     </p>
 
     {% if capture.url %}
@@ -105,17 +118,39 @@
         </label>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button type="submit" class="btn-primary">{% translate "Save to listings" %}</button>
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="submit" class="btn-primary" {% if not next_url %}data-key-save-next{% endif %}>
+          {% translate "Save to listings" %}
+        </button>
+        {% if next_url %}
+          <button type="submit" name="next" value="1" class="btn-secondary" data-key-save-next>
+            {% translate "Save and next" %}
+          </button>
+        {% endif %}
         <a href="{% url 'listings:list' %}" class="btn-ghost">{% translate "Later" %}</a>
       </div>
     </form>
 
-    <form method="post" action="{% url 'jobs:capture_discard' capture.pk %}" class="mt-6">
+    <form method="post" action="{% url 'jobs:capture_discard' capture.pk %}"
+          class="mt-6 flex flex-wrap items-center gap-3">
       {% csrf_token %}
-      <button type="submit" class="btn-ghost text-sm text-red-600 dark:text-red-400">
+      <button type="submit" class="btn-ghost text-sm text-red-600 dark:text-red-400"
+              {% if not next_url %}data-key-discard-next{% endif %}>
         {% translate "Discard this capture" %}
       </button>
+      {% if next_url %}
+        <button type="submit" name="next" value="1" data-key-discard-next
+                class="btn-ghost text-sm text-red-600 dark:text-red-400">
+          {% translate "Discard and next" %}
+        </button>
+        <a href="{{ next_url }}" class="btn-ghost text-sm" data-key-next>{% translate "Skip to the next" %}</a>
+      {% endif %}
     </form>
+    <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Keys: <kbd>d</kbd> discards and moves on, <kbd>j</kbd> skips to the next,
+        <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves and moves on — while nothing is being typed.
+      {% endblocktranslate %}
+    </p>
   </div>
 {% endblock %}

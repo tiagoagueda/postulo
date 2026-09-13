@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-13 03:16+0000\n"
+"POT-Creation-Date: 2026-09-13 03:24+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Malti\n"
@@ -593,7 +593,7 @@ msgid "A capture cannot come after the last of its batch."
 msgstr "Qbid ma jistax jiġi wara l-aħħar wieħed tal-lott tiegħu."
 
 #: src/postulo/templates/jobs/capture_form.html:32
-#: src/postulo/templates/jobs/capture_review.html:41
+#: src/postulo/templates/jobs/capture_review.html:55
 #, python-format, draft
 msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr "Qbid ta’ dan l-indirizz minn %(when)s għadu jistenna reviżjoni."
@@ -657,7 +657,7 @@ msgid ""
 msgstr ""
 "LinkedIn, Mastodon, Bluesky — kemm jiswew li jintwerew, b’wieħed minnhom immarkat bħala dak li jintwera. Id-dokumenti jistampaw lil dak."
 
-#: src/postulo/templates/jobs/capture_review.html:49
+#: src/postulo/templates/jobs/capture_review.html:63
 #, draft
 msgid ""
 "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -963,7 +963,7 @@ msgstr ""
 "Fil-fajl kollu: %(applications)s applikazzjonijiet, %(listings)s avviżi, %(skipped)s ringieli maqbuża għax nieqsa l-kumpanija jew ir-rwol. Ringieli diġà rreġistrati jinstabu u jinqabżu waqt l-importazzjoni."
 
 #: src/postulo/templates/accounts/invite_list.html:29
-#: src/postulo/templates/jobs/listing_list.html:77
+#: src/postulo/templates/jobs/listing_list.html:92
 #: src/postulo/templates/server/people.html:36
 #: src/postulo/templates/server/person_recovery.html:65
 #, draft
@@ -1016,7 +1016,7 @@ msgstr "Żid lingwa"
 #: src/postulo/templates/jobs/listing_form.html:4
 #: src/postulo/templates/jobs/listing_form.html:8
 #: src/postulo/templates/jobs/listing_list.html:18
-#: src/postulo/templates/jobs/listing_list.html:168
+#: src/postulo/templates/jobs/listing_list.html:183
 #, draft
 msgid "Add a listing"
 msgstr "Żid avviż"
@@ -1346,7 +1346,7 @@ msgstr "applikazzjoni"
 
 #: src/postulo/templates/applications/suggestion_list.html:82
 #: src/postulo/templates/jobs/capture_list.html:53
-#: src/postulo/templates/jobs/listing_list.html:132
+#: src/postulo/templates/jobs/listing_list.html:147
 #, draft
 msgid "Application"
 msgstr "Applikazzjoni"
@@ -1361,7 +1361,7 @@ msgstr "Applikazzjoni maħluqa"
 msgid "Application deleted."
 msgstr "Applikazzjoni mħassra."
 
-#: src/postulo/jobs/capture_views.py:270
+#: src/postulo/jobs/capture_views.py:324
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Applikazzjoni rreġistrata mill-qbid."
@@ -1483,7 +1483,7 @@ msgstr "applikat permezz ta'"
 
 #: src/postulo/templates/jobs/company_list.html:87
 #: src/postulo/templates/jobs/listing_apply.html:4
-#: src/postulo/templates/jobs/listing_list.html:120
+#: src/postulo/templates/jobs/listing_list.html:135
 #: src/postulo/templates/jobs/posting_detail.html:44
 #: src/postulo/templates/partials/table/columns.html:49
 #, draft
@@ -1789,14 +1789,14 @@ msgstr "Aqbad avviż"
 msgid "Capture a posting from its address and it will appear here."
 msgstr "Aqbad avviż mill-indirizz tiegħu u jidher hawn."
 
-#: src/postulo/templates/jobs/listing_list.html:166
+#: src/postulo/templates/jobs/listing_list.html:181
 #, draft
 msgid ""
 "Capture a posting from its address, or add one by hand, and it waits here for you."
 msgstr ""
 "Aqbad avviż mill-indirizz tiegħu, jew żid wieħed bl-idejn, u jistenniek hawn."
 
-#: src/postulo/jobs/capture_views.py:286
+#: src/postulo/jobs/capture_views.py:344
 #, draft
 msgid "Capture discarded."
 msgstr "Qbid skartat."
@@ -1837,6 +1837,11 @@ msgstr "qbidiet"
 #, draft
 msgid "Captures"
 msgstr "Qbidiet"
+
+#: src/postulo/jobs/capture_views.py:370
+#, python-format
+msgid "Captures discarded: %(count)s."
+msgstr ""
 
 #: src/postulo/templates/applications/application_board.html:25
 #, draft
@@ -2075,7 +2080,7 @@ msgstr "magħluq fi"
 msgid "Closed or already filled"
 msgstr "Magħluq jew diġà mimli"
 
-#: src/postulo/templates/jobs/listing_list.html:75
+#: src/postulo/templates/jobs/listing_list.html:90
 #: src/postulo/templates/jobs/posting_detail.html:87
 #, draft
 msgid "Closes"
@@ -2171,7 +2176,7 @@ msgstr "Kumpaniji li applikajt magħhom"
 #: src/postulo/templates/core/import_csv_map.html:63
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
-#: src/postulo/templates/jobs/listing_list.html:73
+#: src/postulo/templates/jobs/listing_list.html:88
 #, draft
 msgid "Company"
 msgstr "Kumpanija"
@@ -2850,14 +2855,22 @@ msgid "directory (tenant) ID"
 msgstr "ID tad-direttorju (kerrej)"
 
 #: src/postulo/templates/jobs/capture_list.html:47
-#: src/postulo/templates/jobs/listing_list.html:46
-#: src/postulo/templates/jobs/listing_list.html:116
+#: src/postulo/templates/jobs/listing_list.html:61
+#: src/postulo/templates/jobs/listing_list.html:131
 #: src/postulo/templates/jobs/posting_detail.html:42
 #, draft
 msgid "Discard"
 msgstr "Skarta"
 
-#: src/postulo/templates/jobs/capture_review.html:119
+#: src/postulo/templates/jobs/capture_review.html:147
+msgid "Discard and next"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_list.html:39
+msgid "Discard the ticked ones"
+msgstr ""
+
+#: src/postulo/templates/jobs/capture_review.html:142
 #, draft
 msgid "Discard this capture"
 msgstr "Skarta dan il-qbid"
@@ -4024,7 +4037,7 @@ msgstr "Kif tippreferi tiġbor it-tfittxija tiegħek."
 msgid "Hybrid"
 msgstr "Ibridu"
 
-#: src/postulo/jobs/capture_views.py:169
+#: src/postulo/jobs/capture_views.py:201
 #, draft
 msgid "I have already applied to this one"
 msgstr "Diġà applikajt għal dan"
@@ -4549,6 +4562,11 @@ msgid ""
 msgstr ""
 "Miżmum fil-forma internazzjonali, biex tkun tista’ ċċempel minn pajjiż ieħor. Numru li diġà jibda b’+ jittieħed kif inhu."
 
+#: src/postulo/templates/jobs/capture_review.html:153
+msgid ""
+"Keys: <kbd>d</kbd> discards and moves on, <kbd>j</kbd> skips to the next, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves and moves on — while nothing is being typed."
+msgstr ""
+
 #: src/postulo/applications/models.py:376
 #: src/postulo/applications/models.py:522
 #: src/postulo/applications/models.py:646 src/postulo/core/models.py:178
@@ -4740,7 +4758,7 @@ msgstr "l-aħħar użu"
 msgid "last worked"
 msgstr "l-aħħar li ħadem"
 
-#: src/postulo/templates/jobs/capture_review.html:112
+#: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
 msgstr "Aktar tard"
@@ -4903,7 +4921,7 @@ msgstr "smigħ"
 msgid "listing"
 msgstr "avviż"
 
-#: src/postulo/templates/jobs/listing_list.html:55
+#: src/postulo/templates/jobs/listing_list.html:70
 #, draft
 msgid "Listing filters"
 msgstr "Filtri tal-avviżi"
@@ -4939,7 +4957,7 @@ msgstr "post"
 #: src/postulo/applications/forms.py:46 src/postulo/applications/tables.py:35
 #: src/postulo/core/csv_import.py:42 src/postulo/jobs/tables.py:36
 #: src/postulo/templates/applications/application_detail.html:126
-#: src/postulo/templates/jobs/listing_list.html:74
+#: src/postulo/templates/jobs/listing_list.html:89
 #, draft
 msgid "Location"
 msgstr "Post"
@@ -5215,7 +5233,7 @@ msgid "Mobile"
 msgstr "Mowbajl"
 
 #: src/postulo/templates/applications/application_intake.html:37
-#: src/postulo/templates/jobs/capture_review.html:77
+#: src/postulo/templates/jobs/capture_review.html:91
 #: src/postulo/templates/jobs/listing_form.html:34
 #, draft
 msgid "Money and dates"
@@ -5444,7 +5462,7 @@ msgid "Newest backup"
 msgstr "L-aktar backup riċenti"
 
 #: src/postulo/templates/applications/suggestion_list.html:121
-#: src/postulo/templates/jobs/listing_list.html:157
+#: src/postulo/templates/jobs/listing_list.html:172
 #: src/postulo/templates/partials/table/pagination.html:19
 #, draft
 msgid "Next"
@@ -5785,6 +5803,10 @@ msgstr "mhux mgħobbi"
 msgid "Not matched to an application."
 msgstr "Mhux marbuta ma' applikazzjoni."
 
+#: src/postulo/jobs/capture_views.py:187
+msgid "Not on the page — a default. Kept only beside an amount."
+msgstr ""
+
 #: src/postulo/jobs/forms.py:114
 #, draft
 msgid "Not part of another company"
@@ -5860,7 +5882,7 @@ msgstr "Nota"
 msgid "Note (optional)"
 msgstr "Nota (fakultattiva)"
 
-#: src/postulo/templates/jobs/listing_list.html:86
+#: src/postulo/templates/jobs/listing_list.html:101
 #, python-format, draft
 msgid "noted %(when)s"
 msgstr "innutat %(when)s"
@@ -5904,7 +5926,7 @@ msgid ""
 msgstr ""
 "Xejn ma siket għal %(days)s jum. Jew int fuq kollox, jew wasal iż-żmien li tibgħat ftit aktar."
 
-#: src/postulo/templates/jobs/listing_list.html:170
+#: src/postulo/templates/jobs/listing_list.html:185
 #, draft
 msgid "Nothing here"
 msgstr "Xejn hawn"
@@ -6037,7 +6059,7 @@ msgstr "Xejn irreġistrat għal din l-applikazzjoni għalissa."
 msgid "Nothing recorded yet."
 msgstr "Xejn irreġistrat għalissa."
 
-#: src/postulo/jobs/capture_views.py:124
+#: src/postulo/jobs/capture_views.py:125
 #, draft
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Xejn li jixbah avviż tax-xogħol ma nstab fuq dik il-paġna."
@@ -6074,7 +6096,7 @@ msgstr "Xejn x'issegwi."
 msgid "Nothing to connect to"
 msgstr "Xejn ma' xiex tikkonnettja"
 
-#: src/postulo/templates/jobs/listing_list.html:164
+#: src/postulo/templates/jobs/listing_list.html:179
 #, draft
 msgid "Nothing to decide"
 msgstr "Xejn x'tiddeċiedi"
@@ -6127,6 +6149,10 @@ msgstr "Ma ġie installat xejn."
 #, draft
 msgid "Nothing was selected, so nothing changed."
 msgstr "Xejn ma kien magħżul, u għalhekk xejn ma nbidel."
+
+#: src/postulo/jobs/capture_views.py:372
+msgid "Nothing was selected."
+msgstr ""
 
 #: src/postulo/templates/applications/report_print.html:174
 #, draft
@@ -6464,7 +6490,7 @@ msgstr ""
 "Applikazzjonijiet miftuħa mingħajr aħbar, u t-tliet affarijiet li tista' tagħmel dwarhom."
 
 #: src/postulo/templates/jobs/capture_form.html:35
-#: src/postulo/templates/jobs/capture_review.html:44
+#: src/postulo/templates/jobs/capture_review.html:58
 #, draft
 msgid "Open it"
 msgstr "Iftaħha"
@@ -6479,7 +6505,7 @@ msgstr "Postijiet vakanti"
 msgid "Optional. If set, only this address may use the invitation."
 msgstr "Fakultattiv. Jekk issettjat, dan l-indirizz biss jista' juża l-istedina."
 
-#: src/postulo/jobs/capture_views.py:54
+#: src/postulo/jobs/capture_views.py:55
 #, draft
 msgid ""
 "Optional. If the site refuses Postulo, open the posting in your browser, view the page source, and paste it here. Nothing is fetched when you do."
@@ -6579,19 +6605,19 @@ msgid "Package"
 msgstr "Pakkett"
 
 #: src/postulo/templates/applications/suggestion_list.html:116
-#: src/postulo/templates/jobs/listing_list.html:151
+#: src/postulo/templates/jobs/listing_list.html:166
 #: src/postulo/templates/partials/table/pagination.html:11
 #, python-format, draft
 msgid "Page %(current)s of %(total)s"
 msgstr "Paġna %(current)s minn %(total)s"
 
-#: src/postulo/jobs/capture_views.py:51
+#: src/postulo/jobs/capture_views.py:52
 #, draft
 msgid "Page source"
 msgstr "Sors tal-paġna"
 
 #: src/postulo/templates/applications/suggestion_list.html:111
-#: src/postulo/templates/jobs/listing_list.html:145
+#: src/postulo/templates/jobs/listing_list.html:160
 #: src/postulo/templates/partials/table/pagination.html:3
 #, draft
 msgid "Pagination"
@@ -6952,7 +6978,7 @@ msgstr "avviż"
 msgid "Posting"
 msgstr "Avviż"
 
-#: src/postulo/jobs/capture_views.py:45
+#: src/postulo/jobs/capture_views.py:46
 #, draft
 msgid "Posting address"
 msgstr "Indirizz tal-avviż"
@@ -7014,7 +7040,7 @@ msgid ""
 msgstr ""
 "Postulo jġib l-istampa għall-indirizz primarju tiegħek minn gravatar.com darba, iżomm kopja, u juri dik. Xejn ma jinġieb waqt li jintwerew il-paġni. Neħħi l-marka u l-kopja titħassar."
 
-#: src/postulo/jobs/capture_views.py:48
+#: src/postulo/jobs/capture_views.py:49
 #, draft
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo jġib din il-paġna waħda, u xejn aktar."
@@ -7101,7 +7127,7 @@ msgid "Preview"
 msgstr "Anteprima"
 
 #: src/postulo/templates/applications/suggestion_list.html:113
-#: src/postulo/templates/jobs/listing_list.html:148
+#: src/postulo/templates/jobs/listing_list.html:163
 #: src/postulo/templates/partials/table/pagination.html:8
 #, draft
 msgid "Previous"
@@ -7337,7 +7363,7 @@ msgstr "Moqri bħala Europass XML, il-format li għamel l-editur tas-CV."
 msgid "read by"
 msgstr "moqri minn"
 
-#: src/postulo/templates/jobs/capture_review.html:10
+#: src/postulo/templates/jobs/capture_review.html:15
 #, python-format, draft
 msgid ""
 "Read by %(source)s. Check it before saving — a parser reading somebody else's markup gets things wrong, which is why nothing has been recorded yet."
@@ -7689,7 +7715,7 @@ msgstr "Riċerka"
 msgid "Reset"
 msgstr "Irrisettja"
 
-#: src/postulo/templates/jobs/listing_list.html:126
+#: src/postulo/templates/jobs/listing_list.html:141
 #: src/postulo/templates/jobs/posting_detail.html:49
 #, draft
 msgid "Restore"
@@ -7711,13 +7737,13 @@ msgid "reusable template"
 msgstr "mudell li jerġa' jintuża"
 
 #: src/postulo/templates/jobs/capture_list.html:42
-#: src/postulo/templates/jobs/listing_list.html:41
+#: src/postulo/templates/jobs/listing_list.html:56
 #, draft
 msgid "Review"
 msgstr "Irrevedi"
 
 #: src/postulo/templates/jobs/capture_review.html:4
-#: src/postulo/templates/jobs/capture_review.html:8
+#: src/postulo/templates/jobs/capture_review.html:13
 #, draft
 msgid "Review the capture"
 msgstr "Irrevedi l-qbid"
@@ -7768,7 +7794,7 @@ msgstr "robots.txt bħalissa qed jiġi injorat."
 #: src/postulo/templates/applications/report.html:227
 #: src/postulo/templates/applications/report_print.html:151
 #: src/postulo/templates/core/import_csv_map.html:64
-#: src/postulo/templates/jobs/listing_list.html:72
+#: src/postulo/templates/jobs/listing_list.html:87
 #: src/postulo/templates/server/people.html:35
 #: src/postulo/templates/server/people.html:50
 #, draft
@@ -7882,6 +7908,10 @@ msgstr "salarju sa"
 msgid "Save"
 msgstr "Issejvja"
 
+#: src/postulo/templates/jobs/capture_review.html:130
+msgid "Save and next"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html:102
 #, draft
 msgid "Save the company to add another identifier."
@@ -7897,7 +7927,7 @@ msgstr "Issalva dan l-ewwel, imbagħad erġa' lura u aqbel."
 msgid "Save to add another identifier."
 msgstr "Issejvja biex iżżid identifikatur ieħor."
 
-#: src/postulo/templates/jobs/capture_review.html:111
+#: src/postulo/templates/jobs/capture_review.html:126
 #, draft
 msgid "Save to listings"
 msgstr "Issejvja fl-avviżi"
@@ -7907,7 +7937,7 @@ msgstr "Issejvja fl-avviżi"
 msgid "Saved in %(language)s."
 msgstr "Salvat bil-%(language)s."
 
-#: src/postulo/jobs/capture_views.py:274
+#: src/postulo/jobs/capture_views.py:330
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Issejvjat fl-avviżi tiegħek. Iddeċiedi dwaru meta tkun lest."
@@ -8225,7 +8255,7 @@ msgstr "Parti minn Postulo. Ma jistax jitneħħa."
 msgid "Shortcuts"
 msgstr "Shortcuts"
 
-#: src/postulo/templates/jobs/listing_list.html:109
+#: src/postulo/templates/jobs/listing_list.html:124
 #: src/postulo/templates/jobs/posting_detail.html:31
 #, draft
 msgid "Shortlist"
@@ -8433,6 +8463,10 @@ msgstr "ħiliet"
 msgid "Skip to content"
 msgstr "Aqbeż għall-kontenut"
 
+#: src/postulo/templates/jobs/capture_review.html:149
+msgid "Skip to the next"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:82
 #, draft
 msgid "skipped"
@@ -8633,7 +8667,7 @@ msgstr "STARTTLS, wara l-konnessjoni"
 msgid "state"
 msgstr "stat"
 
-#: src/postulo/templates/jobs/listing_list.html:76
+#: src/postulo/templates/jobs/listing_list.html:91
 #: src/postulo/templates/server/person_recovery.html:64
 #, draft
 msgid "State"
@@ -9269,6 +9303,10 @@ msgstr "Dik it-tweġiba ma ġietx minn talba li għamel Postulo."
 msgid "That suggestion has already been answered."
 msgstr "Dak is-suġġeriment diġà ġie mwieġeb."
 
+#: src/postulo/jobs/capture_views.py:179
+msgid "That was the last capture waiting."
+msgstr ""
+
 #: src/postulo/jobs/models.py:203
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
@@ -9486,6 +9524,10 @@ msgstr[2] ""
 msgstr[3] ""
 "L-aħħar %(counter)s messaġġi li din l-istanza pruvat tibgħat fallew. L-aktar reċenti kien fil-%(when)s."
 
+#: src/postulo/templates/jobs/capture_review.html:26
+msgid "The last one waiting."
+msgstr ""
+
 #: src/postulo/applications/widgets.py:177
 #, draft
 msgid ""
@@ -9603,7 +9645,7 @@ msgid "the posting"
 msgstr "l-avviż"
 
 #: src/postulo/templates/applications/application_intake.html:64
-#: src/postulo/templates/jobs/capture_review.html:91
+#: src/postulo/templates/jobs/capture_review.html:105
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
 msgid "The posting itself"
@@ -9639,7 +9681,7 @@ msgstr ""
 "Il-bqija tal-fajl xorta jiswa li jiġi importat. Dak elenkat hawn le, u tista' żżidu bl-idejn wara."
 
 #: src/postulo/templates/applications/application_intake.html:23
-#: src/postulo/templates/jobs/capture_review.html:63
+#: src/postulo/templates/jobs/capture_review.html:77
 #: src/postulo/templates/jobs/listing_form.html:20
 #, draft
 msgid "The role"
@@ -9825,7 +9867,7 @@ msgid "They did not show up"
 msgstr "Ma dehrux"
 
 #: src/postulo/templates/jobs/capture_form.html:24
-#: src/postulo/templates/jobs/capture_review.html:33
+#: src/postulo/templates/jobs/capture_review.html:47
 #, python-format, draft
 msgid "This address is already in your listings, since %(when)s."
 msgstr "Dan l-indirizz diġà qiegħed fl-avviżi tiegħek, minn %(when)s."
@@ -9969,12 +10011,17 @@ msgstr ""
 msgid "Through %(provider)s: you are asked for a code as well."
 msgstr "Permezz ta’ %(provider)s: jintalab ukoll kodiċi."
 
+#: src/postulo/templates/jobs/listing_list.html:47
+#, python-format
+msgid "Tick %(title)s"
+msgstr ""
+
 #: src/postulo/templates/partials/table/bulk.html:27
 #, draft
 msgid "Tick rows to act on several at once."
 msgstr "Immarka ringieli biex taġixxi fuq bosta f'daqqa."
 
-#: src/postulo/jobs/capture_views.py:171
+#: src/postulo/jobs/capture_views.py:203
 #, draft
 msgid ""
 "Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
@@ -10440,6 +10487,11 @@ msgstr "Vidjow"
 #, draft
 msgid "Video call"
 msgstr "Sejħa bil-vidjo"
+
+#: src/postulo/templates/jobs/capture_review.html:22
+#, python-format
+msgid "Waiting after this one: %(count)s."
+msgstr ""
 
 #: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:723
 #, draft
