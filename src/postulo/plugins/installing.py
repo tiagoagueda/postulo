@@ -114,6 +114,12 @@ class Installed:
     licence: str = ""
     author: str = ""
     source_url: str = ""
+    #: Which Postulo the plugin says it is for, as the catalogue release declared it -- a
+    #: version specifier such as ``>=0.3,<1.0``. Empty for an upload, which declares
+    #: nothing: a wheel's own metadata cannot say it, since a plugin does not depend on
+    #: Postulo. Checked at install and shown on the page ever after, so a core upgrade
+    #: that leaves a plugin behind is visible there and not only in a log (#186).
+    requires_postulo: str = ""
     #: Everything that arrived alongside the wheel, as ``name==version``. The signature
     #: and the checksum cover the plugin's own file and nothing else: its requirements are
     #: resolved from PyPI at install time and are whatever was served that day. Recording
@@ -354,6 +360,37 @@ def conflicts_with_core(info: PackageInfo) -> list[str]:
 # ------------------------------------------------------------------ installing
 
 
+def fits(requirement: str, version: str | None = None) -> bool:
+    """Whether this Postulo is one the plugin says it is for.
+
+    ``requirement`` is a version specifier as a catalogue release carries it. Nothing
+    declared fits everything: the field is optional and a third party may reasonably not
+    know. A specifier that cannot be read raises, because a plugin that *tried* to say
+    which Postulo it needs and was misread is not one to install on a guess (#186).
+    """
+    from packaging.specifiers import InvalidSpecifier, SpecifierSet
+    from packaging.version import InvalidVersion, Version
+
+    from postulo import __version__
+
+    if not (requirement or "").strip():
+        return True
+    try:
+        wanted = SpecifierSet(requirement.strip())
+        have = Version(version or __version__)
+    except (InvalidSpecifier, InvalidVersion) as error:
+        raise ValueError(str(error)) from error
+    return wanted.contains(have, prereleases=True)
+
+
+def compatible(requirement: str) -> bool:
+    """`fits`, for a page: a specifier nobody can read counts as not fitting."""
+    try:
+        return fits(requirement)
+    except ValueError:
+        return False
+
+
 def check(info: PackageInfo) -> None:
     """Everything that must be true before a wheel is installed. Raises with the reason."""
     if not info.pure_python:
@@ -475,6 +512,7 @@ def install_wheel(
     source: str = "",
     by: str = "",
     expected_sha256: str = "",
+    requires_postulo: str = "",
 ) -> Installed:
     """Check a wheel, install it into the plugins directory, and record it."""
     info = read_wheel(wheel)
@@ -519,6 +557,7 @@ def install_wheel(
         licence=info.licence,
         author=info.author,
         source_url=info.source_url,
+        requires_postulo=requires_postulo,
     )
     record = [item for item in read_record() if canonicalise(item.name) != canonicalise(info.name)]
     write_record([*record, entry])
@@ -769,6 +808,7 @@ def status() -> list[dict]:
                 "version": str(getattr(plugin_class, "version", "") or ""),
                 "origin": "internal",
                 "present": True,
+                "compatible": True,
                 "removable": mark.removable,
                 "provenance": mark.kind,
                 "provenance_label": mark.label,
@@ -786,6 +826,9 @@ def status() -> list[dict]:
             {
                 **asdict(entry),
                 "present": _is_present(entry.name),
+                # Asked again on every page, not only at install: a core upgrade is what
+                # changes the answer, and the page is where it should show (#186).
+                "compatible": compatible(entry.requires_postulo),
                 "removable": mark.removable,
                 "provenance": mark.kind,
                 "provenance_label": mark.label,

@@ -10,9 +10,11 @@ The checks, in order, and each of them fatal:
 
 1. the index's signature verifies against the configured key (Ed25519);
 2. the plugin and version asked for are in the index;
-3. the wheel that arrives matches the SHA-256 the signed index gave.
+3. the release says which Postulo it is for, if it says anything, and this is one of them;
+4. the wheel that arrives matches the SHA-256 the signed index gave.
 
-So a mirror, a hijacked download host, or a modified index cannot ship code. What a
+So a mirror, a hijacked download host, or a modified index cannot ship code, and a plugin
+built for a Postulo this is not does not land only to fail at import (#186). What a
 catalogue cannot do is vouch for the plugin's behaviour; being listed means the people who
 publish that catalogue looked at it, which is a review and not a guarantee, and the page
 says so.
@@ -307,6 +309,7 @@ def install(plugin: str, *, by: str = ""):
             "; ".join(problems) or str(_("No catalogue is configured on this instance."))
         )
     listing, release = find(catalogues, plugin)
+    refuse_unless_it_fits(listing, release)
     with tempfile.TemporaryDirectory(prefix="postulo-plugin-") as scratch:
         wheel = download(release, Path(scratch))
         return install_wheel(
@@ -315,4 +318,39 @@ def install(plugin: str, *, by: str = ""):
             source=release.url,
             by=by,
             expected_sha256=release.sha256,
+            requires_postulo=release.requires_postulo,
+        )
+
+
+def refuse_unless_it_fits(listing: Listing, release: Release) -> None:
+    """The third check: a release that names the Postulo it is for is held to it.
+
+    Before the download, because nothing about the wheel changes the answer. The refusal
+    names both versions, so an administrator reading it knows which side has to move.
+    """
+    from postulo import __version__
+
+    from .installing import fits
+
+    try:
+        it_fits = fits(release.requires_postulo)
+    except ValueError as error:
+        raise CatalogueError(
+            str(
+                _(
+                    "%(name)s %(version)s says which Postulo it is for in a way this cannot "
+                    "read: %(spec)s."
+                )
+            )
+            % {"name": listing.name, "version": release.version, "spec": release.requires_postulo}
+        ) from error
+    if not it_fits:
+        raise CatalogueError(
+            str(_("%(name)s %(version)s is for Postulo %(wanted)s, and this is Postulo %(have)s."))
+            % {
+                "name": listing.name,
+                "version": release.version,
+                "wanted": release.requires_postulo,
+                "have": __version__,
+            }
         )
