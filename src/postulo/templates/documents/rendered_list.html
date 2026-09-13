@@ -31,6 +31,7 @@
             <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
               <td class="px-4 py-3">
                 {{ document.title }}
+                <span class="ms-1 text-xs text-ink-500 dark:text-ink-400">{{ document.get_kind_display }}</span>
                 {% url 'documents:rendered_archive' document.pk as send_url %}
                 {% include "documents/partials/copies.html" with document=document send_url=send_url %}
               </td>

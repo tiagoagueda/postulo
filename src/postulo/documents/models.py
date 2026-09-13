@@ -371,6 +371,8 @@ class DocumentKind(models.TextChoices):
     MOTIVATION_LETTER = "motivation_letter", _("Motivation letter")
     CERTIFICATE = "certificate", _("Certificate")
     PORTFOLIO = "portfolio", _("Portfolio")
+    #: A job-search report, frozen at the moment somebody downloads it (#162).
+    REPORT = "report", _("Report")
     REFERENCE = "reference", _("Reference")
     OTHER = "other", _("Other")
 

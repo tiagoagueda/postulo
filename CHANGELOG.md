@@ -290,6 +290,17 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A report you download is filed, and an email is not a kind.** The two document kinds
+  #133 deferred are decided. A job-search report was already composed, rendered and dated;
+  pressing *Download PDF* now also files it under Sent documents as a *report* — the text
+  it was built from, a checksum, a store copying it like a CV — because a report handed to
+  an employment office is exactly the document somebody wants kept. It is frozen at that
+  press and never on a page view: pressing twice on one day files one document, and
+  opening the address directly hands back the same PDF and records nothing. An email is
+  deliberately not a fifth kind: a message a transport carries is not a document, a kind
+  that composed mail would sit behind the lock on the last transport, and what is worth
+  keeping of one is what a letter's snapshot already keeps. (#162)
+
 - **A plugin repository can make its catalogues, not only compile them.** Every official
   plugin carried the same copy-pasted compiler and two catalogues made by hand, and no way
   to make the other sixty-six at all — so "in step with core" was not a matter of filling

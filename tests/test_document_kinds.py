@@ -322,3 +322,16 @@ def test_a_kind_the_archive_invents_restores_as_a_cv(user):
     importer.load(user, zipfile.ZipFile(buffer))
 
     assert CV.objects.for_user(user).get().kind == CVKind.CV
+
+
+def test_a_report_is_a_kind_postulo_makes_and_an_email_is_not(user):
+    """The two kinds #133 deferred, decided (#162)."""
+    from postulo.documents import stores
+
+    report = kinds.get(DocumentKind.REPORT)
+    assert report is not None and report.authored
+    assert kinds.theme_kind_for(DocumentKind.REPORT) == "", "its own print template, no theme"
+    assert "email" not in {kind.key for kind in kinds.REGISTRY.values()}
+    assert any(spec.name.endswith("report") for spec in stores.kind_specs()), (
+        "a store gets a switch for reports like any other kind"
+    )

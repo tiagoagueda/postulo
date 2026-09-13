@@ -22,6 +22,19 @@ of it already exists somewhere better: a theme declares its own templates (#132)
 `documents.rendering`. What was actually missing was a single answer to *what kinds are
 there, and which of them does Postulo make?* -- so that is what this is, and the wider
 surface waits until something outside needs it.
+
+**Two kinds #133 deferred, decided here (#162).** A *report* is a kind: it was already
+composed, rendered and dated by #56, and what adopting it adds is the delivery half -- a
+report somebody downloads is filed under Sent documents like a CV, and copied to a store
+the same way. It is frozen at that moment and never on a page view, because a snapshot
+and a page are different things and freezing one per view would fill the store with
+near-identical PDFs. An *email* is **not** a kind. An email that is a message is something
+a transport carries, and a kind that composed mail beside a transport that carries it
+would put a document feature behind the account-recovery lock #104 puts on the last
+transport. What is worth keeping about an email to a recruiter -- the text as sent,
+frozen, with a checksum -- is what a letter's render already keeps, and a follow-up note
+is a letter kind in all but name. So the fifth kind is not built, and this is where that
+was decided rather than left open.
 """
 
 from __future__ import annotations
@@ -141,6 +154,9 @@ def register_the_ones_postulo_has() -> None:
             authored=True,
             theme_kind=themes.Kind.LETTER,
         ),
+        # Composed here, from the record, at the moment somebody downloads it; laid out
+        # by its own print template rather than a theme, so no theme vocabulary (#162).
+        Kind(DocumentKind.REPORT, _("Report"), authored=True),
         # Held rather than authored: somebody else issues these, and Postulo keeps the file.
         Kind(DocumentKind.CERTIFICATE, _("Certificate")),
         Kind(DocumentKind.REFERENCE, _("Reference")),

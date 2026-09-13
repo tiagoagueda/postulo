@@ -305,6 +305,39 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
     return document
 
 
+def snapshot_report(owner, *, title: str, html: str, filename: str, backend=None):
+    """Freeze a report as a PDF, filed under Sent documents like a CV is (#162).
+
+    A report is computed from the record and never stored as a page; what is stored is
+    the document somebody handed over, at the moment they pressed *Download*. Pressing it
+    twice on the same day is one document: the HTML carries the day it was produced, so
+    an identical text is an identical report, and the one already filed is handed back
+    rather than a twin. Nothing links a report to a source -- there is no model behind
+    it -- so `source` stays empty, which every reader already copes with.
+    """
+    from .models import DocumentKind
+
+    existing = (
+        RenderedDocument.objects.for_user(owner)
+        .filter(kind=DocumentKind.REPORT, source_text=html)
+        .order_by("-rendered_at")
+        .first()
+    )
+    if existing is not None:
+        return existing
+    content = html_to_pdf(html, backend=backend)
+    document = RenderedDocument(
+        owner=owner,
+        title=title,
+        kind=DocumentKind.REPORT,
+        source_text=html,
+        checksum=RenderedDocument.checksum_for(content),
+    )
+    _keep(document, filename, content)
+    document.save()
+    return document
+
+
 def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> RenderedDocument:
     """Freeze a cover letter as a PDF, with its placeholders already resolved."""
     html = render_letter_html(letter, application)

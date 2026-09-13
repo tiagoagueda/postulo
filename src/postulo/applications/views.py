@@ -757,24 +757,62 @@ class ReportPDFView(LoginRequiredMixin, View):
 
     It carries the name, the period and the day it was produced, because a document with no
     date is not evidence of anything.
+
+    **Pressing the button files it; opening the address does not.** The button on the page
+    posts, and the PDF it hands back is also filed under Sent documents as a *report* -- a
+    document handed to an employment office is exactly the document somebody wants kept,
+    and a store copies it the way it copies a CV (#162). A GET is the same PDF and no
+    record: a bookmarked address, a link in a message, a crawler that follows one, must
+    never leave a document behind. The moment of freezing is a deliberate press.
     """
+
+    def _html(self, request: HttpRequest) -> tuple:
+        report = reports.build(request.user, reports.period_from(request.GET))
+        html = render(request, "applications/report_print.html", {"report": report}).content
+        return report, html.decode()
+
+    def _back_to_the_page(self, request: HttpRequest, report, unavailable) -> HttpResponse:
+        messages.error(request, str(unavailable))
+        return redirect(
+            f"{reverse('applications:report')}?{urlencode(reports.as_query(report.period))}"
+        )
 
     def get(self, request: HttpRequest) -> HttpResponse:
         from postulo.documents.pdf import PDFBackendUnavailable, html_to_pdf
 
-        report = reports.build(request.user, reports.period_from(request.GET))
-        html = render(request, "applications/report_print.html", {"report": report}).content
+        report, html = self._html(request)
         try:
-            pdf = html_to_pdf(html.decode())
+            pdf = html_to_pdf(html)
         except PDFBackendUnavailable as unavailable:
-            messages.error(request, str(unavailable))
-            return redirect(
-                f"{reverse('applications:report')}?{urlencode(reports.as_query(report.period))}"
-            )
+            return self._back_to_the_page(request, report, unavailable)
         response = HttpResponse(pdf, content_type="application/pdf")
         name = reports.filename(report, "pdf")
         response["Content-Disposition"] = f'attachment; filename="{name}"'
         return response
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        from postulo.core.files import serve_private_file
+        from postulo.documents.pdf import PDFBackendUnavailable
+        from postulo.documents.rendering import snapshot_report
+
+        report, html = self._html(request)
+        title = str(_("Job search report · %(period)s")) % {"period": report.period.label}
+        try:
+            document = snapshot_report(
+                request.user,
+                title=title,
+                html=html,
+                filename=reports.filename(report, "pdf"),
+            )
+        except PDFBackendUnavailable as unavailable:
+            return self._back_to_the_page(request, report, unavailable)
+        messages.success(
+            request,
+            _("Filed under Sent documents, dated today, so what you handed over is kept."),
+        )
+        return serve_private_file(
+            request, document.file, download_name=document.download_name, as_attachment=True
+        )
 
 
 # --------------------------------------------------------------- suggestions

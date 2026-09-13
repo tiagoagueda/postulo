@@ -578,3 +578,76 @@ def test_a_hand_written_entry_counts_like_any_other(user):
     report = reports.build(user, march(), today=dt.date(2026, 3, 31))
 
     assert report.evidence[0].last_activity_on == dt.date(2026, 3, 10)
+
+
+# ------------------------------------------------ a report is a document kind (#162)
+
+
+@pytest.fixture
+def drawn(monkeypatch):
+    """A renderer that draws nothing, so these run where WeasyPrint is not installed."""
+    monkeypatch.setattr(
+        "postulo.documents.rendering.html_to_pdf", lambda html, backend=None: b"%PDF-1.7 fake"
+    )
+
+
+def test_pressing_download_files_the_report_under_sent_documents(client, user, drawn):
+    from postulo.documents.models import DocumentKind, RenderedDocument
+
+    client.force_login(user)
+
+    response = client.post(reverse(PDF) + "?period=weeks&weeks=8")
+
+    assert response.status_code == 200
+    assert response["Content-Type"] == "application/pdf"
+    assert "attachment" in response["Content-Disposition"]
+    filed = RenderedDocument.objects.for_user(user).get()
+    assert filed.kind == DocumentKind.REPORT
+    assert filed.title.startswith("Job search report")
+    assert filed.source is None and filed.application is None
+    assert "<html" in filed.source_text, "the text it was built from, as a CV keeps its own"
+    assert filed.checksum and filed.file
+    response.close()
+
+
+def test_pressing_twice_on_one_day_files_one_document(client, user, drawn):
+    from postulo.documents.models import RenderedDocument
+
+    client.force_login(user)
+    for query in ("?period=weeks&weeks=8", "?period=weeks&weeks=8", "?period=weeks&weeks=4"):
+        # Closed by hand: a file response the test never reads would otherwise be
+        # finalised by the garbage collector, which the suite treats as a failure.
+        client.post(reverse(PDF) + query).close()
+
+    assert RenderedDocument.objects.for_user(user).count() == 2, "one per distinct report"
+
+
+def test_opening_the_address_hands_back_the_pdf_and_files_nothing(client, user, drawn, monkeypatch):
+    from postulo.documents.models import RenderedDocument
+
+    monkeypatch.setattr("postulo.documents.pdf.html_to_pdf", lambda html, backend=None: b"%PDF-")
+    client.force_login(user)
+
+    response = client.get(reverse(PDF))
+
+    assert response["Content-Type"] == "application/pdf"
+    assert not RenderedDocument.objects.for_user(user).exists(), "a GET leaves no record"
+
+
+def test_a_filed_report_is_listed_as_one_and_only_to_its_owner(client, user, other_user, drawn):
+    client.force_login(user)
+    client.post(reverse(PDF)).close()
+
+    html = client.get(reverse("documents:rendered_list")).content.decode()
+    assert "Job search report" in html and ">Report<" in html
+
+    client.force_login(other_user)
+    assert (
+        "Job search report" not in client.get(reverse("documents:rendered_list")).content.decode()
+    )
+
+
+def test_the_page_downloads_by_pressing_rather_than_following(client, user):
+    client.force_login(user)
+    html = client.get(reverse("applications:report")).content.decode()
+    assert 'method="post" action="' + reverse(PDF) in html
