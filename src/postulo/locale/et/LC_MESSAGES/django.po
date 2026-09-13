@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-13 03:24+0000\n"
+"POT-Creation-Date: 2026-09-13 03:33+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: eesti\n"
@@ -217,7 +217,7 @@ msgid ""
 msgstr ""
 "%(label)s hoiab veel %(count)d kirjet ja selle eemaldamine jätaks need tabelisse, mida miski ei suuda lugeda, eksportida ega taastada. Tühjendage see esmalt pistikprogrammi enda lehtedelt või lülitage pistikprogramm hoopis välja — välja lülitatuna säilib kõik."
 
-#: src/postulo/jobs/models.py:710
+#: src/postulo/jobs/models.py:730
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s kuni %(high)s"
@@ -567,7 +567,7 @@ msgstr "Selle aadressi püüdmine ajast %(when)s ootab endiselt ülevaatust."
 msgid "A client secret is stored. It is never shown."
 msgstr "Kliendi saladus on salvestatud. Seda ei näidata kunagi."
 
-#: src/postulo/jobs/models.py:196
+#: src/postulo/jobs/models.py:216
 #, draft
 msgid "A company cannot be part of itself."
 msgstr "Ettevõte ei saa olla iseenda osa."
@@ -1035,7 +1035,7 @@ msgstr "Lisa kuulutuste hulka"
 msgid "Add to the timeline"
 msgstr "Lisa ajajoonele"
 
-#: src/postulo/jobs/tables.py:89
+#: src/postulo/jobs/tables.py:125
 #, draft
 msgid "Added"
 msgstr "Lisatud"
@@ -1080,7 +1080,7 @@ msgid "Address"
 msgstr "Aadress"
 
 #: src/postulo/core/models.py:413 src/postulo/core/models.py:539
-#: src/postulo/jobs/models.py:742 src/postulo/resume/models.py:242
+#: src/postulo/jobs/models.py:762 src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "aadress"
@@ -1239,6 +1239,7 @@ msgstr "Vastas %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
 #: src/postulo/templates/partials/table/head.html:86
+#: src/postulo/templates/partials/table/narrow.html:27
 #, draft
 msgid "Any"
 msgstr "Mis tahes"
@@ -1294,7 +1295,7 @@ msgstr "Välimus"
 #: src/postulo/applications/models.py:424
 #: src/postulo/applications/models.py:519
 #: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:490 src/postulo/jobs/models.py:770
+#: src/postulo/documents/models.py:490 src/postulo/jobs/models.py:790
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1333,7 +1334,7 @@ msgid "Application updated."
 msgstr "Kandideerimine uuendatud."
 
 #: src/postulo/applications/apps.py:9 src/postulo/core/navigation.py:58
-#: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:60
+#: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:64
 #: src/postulo/templates/applications/application_list.html:6
 #: src/postulo/templates/applications/application_list.html:70
 #: src/postulo/templates/core/export.html:20
@@ -1401,7 +1402,7 @@ msgstr "Kandideerimised koos ajajoontega"
 
 #: src/postulo/applications/analytics.py:31
 #: src/postulo/applications/models.py:41 src/postulo/applications/tables.py:46
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:665
+#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:685
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
 msgid "Applied"
@@ -1456,7 +1457,7 @@ msgstr "Rakenda märgitud ridadele"
 msgid "Apply: %(title)s"
 msgstr "Kandideeri: %(title)s"
 
-#: src/postulo/jobs/models.py:466
+#: src/postulo/jobs/models.py:486
 #, draft
 msgid "Apprenticeship"
 msgstr "Õpipoisiõpe"
@@ -1493,10 +1494,20 @@ msgstr "Hindamine"
 msgid "Assessment or test"
 msgstr "Hindamine või test"
 
+#: src/postulo/templates/partials/table/head.html:98
+#: src/postulo/templates/partials/table/narrow.html:51
+msgid "at least"
+msgstr ""
+
 #: src/postulo/core/server_forms.py:130
 #, draft
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Vähemalt üht keelt peab pakkuma, muidu ei saa keegi midagi lugeda."
+
+#: src/postulo/templates/partials/table/head.html:104
+#: src/postulo/templates/partials/table/narrow.html:55
+msgid "at most"
+msgstr ""
 
 #: src/postulo/documents/models.py:613
 #, draft
@@ -1724,7 +1735,7 @@ msgstr "Tühistatud"
 msgid "Capture"
 msgstr "Püüa"
 
-#: src/postulo/jobs/models.py:774
+#: src/postulo/jobs/models.py:794
 #, draft
 msgid "capture"
 msgstr "püüdmine"
@@ -1771,7 +1782,7 @@ msgstr "Selle instantsi püüdmisallikad"
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "Püütud %(count)s kuulutust hostilt %(host)s"
 
-#: src/postulo/jobs/models.py:746
+#: src/postulo/jobs/models.py:766
 #, draft
 msgid "captured from"
 msgstr "püütud aadressilt"
@@ -1781,7 +1792,7 @@ msgstr "püütud aadressilt"
 msgid "Captured: %(title)s"
 msgstr "Püütud: %(title)s"
 
-#: src/postulo/jobs/models.py:775
+#: src/postulo/jobs/models.py:795
 #, draft
 msgid "captures"
 msgstr "püüdmised"
@@ -1820,12 +1831,12 @@ msgstr "Karjääriteave"
 msgid "Career sections"
 msgstr "Karjääri jaotised"
 
-#: src/postulo/jobs/models.py:144
+#: src/postulo/jobs/models.py:164
 #, draft
 msgid "careers page"
 msgstr "karjäärileht"
 
-#: src/postulo/jobs/tables.py:75
+#: src/postulo/jobs/tables.py:91
 #: src/postulo/templates/jobs/company_detail.html:88
 #, draft
 msgid "Careers page"
@@ -1988,8 +1999,8 @@ msgstr "Linn ja riik, nagu need peaksid CV-s olema."
 msgid "Classic"
 msgstr "Klassikaline"
 
-#: src/postulo/templates/applications/partials/filters.html:52
-#: src/postulo/templates/applications/partials/filters.html:55
+#: src/postulo/templates/applications/partials/filters.html:53
+#: src/postulo/templates/applications/partials/filters.html:56
 #: src/postulo/templates/jobs/company_list.html:89
 #: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
@@ -2020,17 +2031,17 @@ msgstr "kliendi ID"
 msgid "Client secret"
 msgstr "Kliendi saladus"
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:665
+#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:685
 #, draft
 msgid "Closed"
 msgstr "Suletud"
 
-#: src/postulo/applications/models.py:210 src/postulo/jobs/models.py:606
+#: src/postulo/applications/models.py:210 src/postulo/jobs/models.py:626
 #, draft
 msgid "closed on"
 msgstr "suletud"
 
-#: src/postulo/jobs/models.py:493
+#: src/postulo/jobs/models.py:513
 #, draft
 msgid "Closed or already filled"
 msgstr "Suletud või juba täidetud"
@@ -2046,7 +2057,7 @@ msgstr "Sulgub"
 msgid "Closing date"
 msgstr "Sulgemiskuupäev"
 
-#: src/postulo/jobs/models.py:600
+#: src/postulo/jobs/models.py:620
 #, draft
 msgid "closing date"
 msgstr "sulgemiskuupäev"
@@ -2104,7 +2115,7 @@ msgstr "Tulemas"
 msgid "Companies"
 msgstr "Ettevõtted"
 
-#: src/postulo/jobs/models.py:169 src/postulo/jobs/tables.py:18
+#: src/postulo/jobs/models.py:189 src/postulo/jobs/tables.py:18
 #, draft
 msgid "companies"
 msgstr "ettevõtted"
@@ -2136,9 +2147,9 @@ msgstr "Ettevõtted, kuhu olete kandideerinud"
 msgid "Company"
 msgstr "Ettevõte"
 
-#: src/postulo/jobs/models.py:168 src/postulo/jobs/models.py:304
-#: src/postulo/jobs/models.py:381 src/postulo/jobs/models.py:409
-#: src/postulo/jobs/models.py:563 src/postulo/jobs/tables.py:18
+#: src/postulo/jobs/models.py:188 src/postulo/jobs/models.py:324
+#: src/postulo/jobs/models.py:401 src/postulo/jobs/models.py:429
+#: src/postulo/jobs/models.py:583 src/postulo/jobs/tables.py:18
 #, draft
 msgid "company"
 msgstr "ettevõte"
@@ -2153,12 +2164,12 @@ msgstr "Ettevõte lisatud."
 msgid "Company deleted, along with its postings."
 msgstr "Ettevõte kustutatud koos kuulutustega."
 
-#: src/postulo/jobs/models.py:316
+#: src/postulo/jobs/models.py:336
 #, draft
 msgid "company identifier"
 msgstr "ettevõtte tunnus"
 
-#: src/postulo/jobs/models.py:317
+#: src/postulo/jobs/models.py:337
 #, draft
 msgid "company identifiers"
 msgstr "ettevõtte tunnused"
@@ -2277,7 +2288,7 @@ msgstr "Ehitus"
 msgid "Consulting"
 msgstr "Konsultatsioon"
 
-#: src/postulo/jobs/models.py:438
+#: src/postulo/jobs/models.py:458
 #, draft
 msgid "contact"
 msgstr "kontakt"
@@ -2299,7 +2310,7 @@ msgstr "Kontakt lisatud."
 msgid "Contact block"
 msgstr "Kontaktplokk"
 
-#: src/postulo/jobs/models.py:439
+#: src/postulo/jobs/models.py:459
 #, draft
 msgid "contacts"
 msgstr "kontaktid"
@@ -2314,7 +2325,7 @@ msgstr "Sisaldab"
 msgid "context"
 msgstr "kontekst"
 
-#: src/postulo/jobs/models.py:463
+#: src/postulo/jobs/models.py:483
 #, draft
 msgid "Contract"
 msgstr "Tähtajaline"
@@ -2435,7 +2446,7 @@ msgstr "tõendi link"
 msgid "Currency"
 msgstr "Valuuta"
 
-#: src/postulo/jobs/models.py:589
+#: src/postulo/jobs/models.py:609
 #, draft
 msgid "currency"
 msgstr "valuuta"
@@ -2664,7 +2675,7 @@ msgstr "Otsustas %(who)s kuupäeval %(when)s"
 msgid "Decided by %(who)s."
 msgstr "Otsustas %(who)s."
 
-#: src/postulo/jobs/models.py:621
+#: src/postulo/jobs/models.py:641
 #, draft
 msgid "decided on"
 msgstr "otsustatud"
@@ -2747,8 +2758,8 @@ msgstr "Kustuta konto"
 msgid "Delete your own account from Settings, not from here."
 msgstr "Kustutage oma konto Seadetes, mitte siin."
 
-#: src/postulo/applications/models.py:237 src/postulo/jobs/models.py:386
-#: src/postulo/jobs/models.py:419
+#: src/postulo/applications/models.py:237 src/postulo/jobs/models.py:406
+#: src/postulo/jobs/models.py:439
 #, draft
 msgid "department"
 msgstr "osakond"
@@ -2759,7 +2770,7 @@ msgstr "osakond"
 msgid "Department"
 msgstr "Osakond"
 
-#: src/postulo/jobs/models.py:387
+#: src/postulo/jobs/models.py:407
 #, draft
 msgid "departments"
 msgstr "osakonnad"
@@ -2775,7 +2786,7 @@ msgstr "Sõltub"
 msgid "Description"
 msgstr "Kirjeldus"
 
-#: src/postulo/jobs/models.py:581 src/postulo/resume/models.py:245
+#: src/postulo/jobs/models.py:601 src/postulo/resume/models.py:245
 #, draft
 msgid "description"
 msgstr "kirjeldus"
@@ -2831,8 +2842,8 @@ msgstr ""
 msgid "Discard this capture"
 msgstr "Lükka see püüdmine tagasi"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:486
-#: src/postulo/jobs/models.py:725
+#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:506
+#: src/postulo/jobs/models.py:745
 #, draft
 msgid "Discarded"
 msgstr "Tagasi lükatud"
@@ -3055,7 +3066,7 @@ msgid "Email"
 msgstr "E-post"
 
 #: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:468
-#: src/postulo/jobs/models.py:423 src/postulo/resume/views.py:451
+#: src/postulo/jobs/models.py:443 src/postulo/resume/views.py:451
 #, draft
 msgid "email address"
 msgstr "e-posti aadress"
@@ -3090,7 +3101,7 @@ msgstr "E-kiri saadetud"
 msgid "Employment type"
 msgstr "Töösuhte liik"
 
-#: src/postulo/jobs/models.py:571
+#: src/postulo/jobs/models.py:591
 #, draft
 msgid "employment type"
 msgstr "töösuhte liik"
@@ -3100,7 +3111,7 @@ msgstr "töösuhte liik"
 msgid "Empty"
 msgstr "Tühi"
 
-#: src/postulo/jobs/models.py:780
+#: src/postulo/jobs/models.py:800
 #, draft
 msgid "Empty capture"
 msgstr "Tühi püüdmine"
@@ -3470,13 +3481,13 @@ msgstr "Failid, mis teil juba on"
 msgid "Filled in when the letter is sent with an application."
 msgstr "Täidetakse, kui kiri saadetakse koos kandideerimisega."
 
-#: src/postulo/templates/applications/partials/filters.html:49
+#: src/postulo/templates/applications/partials/filters.html:50
 #: src/postulo/templates/partials/table/head.html:75
 #, draft
 msgid "Filter"
 msgstr "Filtreeri"
 
-#: src/postulo/core/tables.py:111
+#: src/postulo/core/tables.py:116
 #, python-format, draft
 msgid "Filter by %(column)s"
 msgstr "Filtreeri: %(column)s"
@@ -3596,7 +3607,7 @@ msgstr "Unusta luba"
 msgid "Found a logo at %(url)s."
 msgstr "Leiti logo aadressilt %(url)s."
 
-#: src/postulo/jobs/models.py:109
+#: src/postulo/jobs/models.py:129
 #, draft
 msgid "Found on their website"
 msgstr "Leitud nende veebisaidilt"
@@ -3610,7 +3621,7 @@ msgstr "Leitud nende veebisaidilt"
 msgid "Found via"
 msgstr "Leitud kanali kaudu"
 
-#: src/postulo/jobs/models.py:576
+#: src/postulo/jobs/models.py:596
 #, draft
 msgid "found via"
 msgstr "leitud kanali kaudu"
@@ -3621,7 +3632,7 @@ msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr ""
 "Leiti: %(names)s. Täidetakse ainult need väljad, mille oled tühjaks jätnud."
 
-#: src/postulo/jobs/models.py:464
+#: src/postulo/jobs/models.py:484
 #, draft
 msgid "Freelance"
 msgstr "Vabakutseline"
@@ -3633,7 +3644,8 @@ msgstr "Külmuta ja lisa manusena"
 
 #: src/postulo/resume/models.py:68 src/postulo/resume/models.py:99
 #: src/postulo/resume/models.py:153
-#: src/postulo/templates/partials/table/head.html:95
+#: src/postulo/templates/partials/table/head.html:113
+#: src/postulo/templates/partials/table/narrow.html:38
 #, draft
 msgid "from"
 msgstr "alates"
@@ -3646,7 +3658,7 @@ msgstr "alates"
 msgid "From"
 msgstr "Alates"
 
-#: src/postulo/jobs/models.py:715
+#: src/postulo/jobs/models.py:735
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "alates %(low)s"
@@ -3661,7 +3673,7 @@ msgstr "Saatja %(name)s."
 msgid "from address"
 msgstr "saatja aadress"
 
-#: src/postulo/jobs/models.py:108
+#: src/postulo/jobs/models.py:128
 #, draft
 msgid "From an address"
 msgstr "Aadressilt"
@@ -3693,7 +3705,7 @@ msgstr "olekust"
 msgid "Frozen at the moment of sending"
 msgstr "Külmutatud saatmishetkel"
 
-#: src/postulo/jobs/models.py:461
+#: src/postulo/jobs/models.py:481
 #, draft
 msgid "Full time"
 msgstr "Täistööaeg"
@@ -3750,7 +3762,7 @@ msgid "Go back"
 msgstr "Mine tagasi"
 
 #: src/postulo/applications/widgets.py:137
-#: src/postulo/templates/applications/partials/filters.html:47
+#: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/settings/appearance.html:45
 #, draft
 msgid "Gone quiet"
@@ -3983,7 +3995,7 @@ msgstr "Kuidas te sisse logite: teie kasutajanimi, aadressid, parool."
 msgid "However you prefer to group your search."
 msgstr "Kuidas iganes eelistate oma otsingut rühmitada."
 
-#: src/postulo/jobs/models.py:456
+#: src/postulo/jobs/models.py:476
 #, draft
 msgid "Hybrid"
 msgstr "Hübriid"
@@ -3999,7 +4011,7 @@ msgid "id in the store"
 msgstr "id hoidlas"
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
-#: src/postulo/jobs/models.py:307 src/postulo/plugins/models.py:262
+#: src/postulo/jobs/models.py:327 src/postulo/plugins/models.py:262
 #, draft
 msgid "identifier"
 msgstr "tunnus"
@@ -4188,7 +4200,7 @@ msgstr "indeksi aadress"
 msgid "Industries"
 msgstr "Valdkonnad"
 
-#: src/postulo/jobs/models.py:51 src/postulo/jobs/models.py:148
+#: src/postulo/jobs/models.py:51 src/postulo/jobs/models.py:168
 #, draft
 msgid "industries"
 msgstr "valdkonnad"
@@ -4267,7 +4279,7 @@ msgstr "Kindlustus"
 msgid "Internal"
 msgstr "Sisemine"
 
-#: src/postulo/jobs/models.py:465
+#: src/postulo/jobs/models.py:485
 #, draft
 msgid "Internship"
 msgstr "Praktika"
@@ -4445,12 +4457,12 @@ msgstr "Selle fail vastab sellele, mille ametlik hoidla allkirjastas."
 msgid "Job board"
 msgstr "Tööportaal"
 
-#: src/postulo/jobs/models.py:626
+#: src/postulo/jobs/models.py:646
 #, draft
 msgid "job posting"
 msgstr "töökuulutus"
 
-#: src/postulo/jobs/models.py:627
+#: src/postulo/jobs/models.py:647
 #, draft
 msgid "job postings"
 msgstr "töökuulutused"
@@ -4637,7 +4649,7 @@ msgid "Largest page read"
 msgstr "Suurim loetud leht"
 
 #: src/postulo/applications/reports.py:480
-#: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:85
+#: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:116
 #: src/postulo/templates/applications/report.html:230
 #: src/postulo/templates/applications/report_print.html:154
 #, draft
@@ -4869,7 +4881,7 @@ msgstr "Lingid, mille juurde te nad suunasite"
 msgid "listening"
 msgstr "kuulamine"
 
-#: src/postulo/jobs/models.py:761
+#: src/postulo/jobs/models.py:781
 #: src/postulo/templates/core/import_csv_map.html:86
 #, draft
 msgid "listing"
@@ -4901,8 +4913,8 @@ msgid ""
 msgstr ""
 "Kuulutused, kandideerimised ja nende ajajooned, ettevõtted ja inimesed, meeldetuletused, saadetu tekst, kirjad, CV-d, failid ja teie karjääriteave — kõik, kaasa arvatud suletud või tagasi lükatud, sest otsite midagi, mida mäletate."
 
-#: src/postulo/accounts/models.py:271 src/postulo/jobs/models.py:146
-#: src/postulo/jobs/models.py:566 src/postulo/resume/models.py:67
+#: src/postulo/accounts/models.py:271 src/postulo/jobs/models.py:166
+#: src/postulo/jobs/models.py:586 src/postulo/resume/models.py:67
 #: src/postulo/resume/models.py:98
 #, draft
 msgid "location"
@@ -4916,7 +4928,7 @@ msgstr "asukoht"
 msgid "Location"
 msgstr "Asukoht"
 
-#: src/postulo/jobs/models.py:158
+#: src/postulo/jobs/models.py:178
 #, draft
 msgid "logo"
 msgstr "logo"
@@ -4926,12 +4938,12 @@ msgstr "logo"
 msgid "Logo address"
 msgstr "Logo aadress"
 
-#: src/postulo/jobs/models.py:162
+#: src/postulo/jobs/models.py:182
 #, draft
 msgid "logo address"
 msgstr "logo aadress"
 
-#: src/postulo/jobs/models.py:163
+#: src/postulo/jobs/models.py:183
 #, draft
 msgid "logo fetched"
 msgstr "logo toodud"
@@ -5288,9 +5300,9 @@ msgstr "NACE osa"
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
-#: src/postulo/jobs/models.py:41 src/postulo/jobs/models.py:126
-#: src/postulo/jobs/models.py:309 src/postulo/jobs/models.py:383
-#: src/postulo/jobs/models.py:421 src/postulo/plugins/models.py:48
+#: src/postulo/jobs/models.py:41 src/postulo/jobs/models.py:146
+#: src/postulo/jobs/models.py:329 src/postulo/jobs/models.py:403
+#: src/postulo/jobs/models.py:441 src/postulo/plugins/models.py:48
 #: src/postulo/resume/models.py:116 src/postulo/resume/models.py:131
 #: src/postulo/resume/models.py:150 src/postulo/resume/models.py:167
 #, draft
@@ -5331,6 +5343,10 @@ msgid ""
 msgstr ""
 "Aadressi nimetamine piirab kutse selle inimesega. Tühjaks jätmine loob lingi, mida igaüks, kellel see on, saab ühe korra kasutada."
 
+#: src/postulo/templates/partials/table/narrow.html:14
+msgid "Narrow"
+msgstr ""
+
 #: src/postulo/resume/models.py:191
 #, draft
 msgid "Native"
@@ -5346,7 +5362,7 @@ msgstr "Mitte kunagi"
 msgid "never used"
 msgstr "kunagi kasutamata"
 
-#: src/postulo/jobs/models.py:484
+#: src/postulo/jobs/models.py:504
 #, draft
 msgid "New"
 msgstr "Uus"
@@ -5734,7 +5750,7 @@ msgid ""
 msgstr ""
 "Seadistamata. Määrake keskkonnas POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID ja POSTULO_OIDC_CLIENT_SECRET, et pakkuda OpenID Connecti teenusepakkuja sisselogimisnuppu."
 
-#: src/postulo/jobs/models.py:490
+#: src/postulo/jobs/models.py:510
 #, draft
 msgid "Not for me"
 msgstr "Pole mulle"
@@ -5838,19 +5854,19 @@ msgstr "Märkus (valikuline)"
 msgid "noted %(when)s"
 msgstr "märgatud %(when)s"
 
-#: src/postulo/jobs/models.py:619
+#: src/postulo/jobs/models.py:639
 #, draft
 msgid "noted on"
 msgstr "märgatud"
 
-#: src/postulo/core/csv_import.py:53 src/postulo/jobs/tables.py:76
+#: src/postulo/core/csv_import.py:53 src/postulo/jobs/tables.py:98
 #: src/postulo/templates/jobs/company_detail.html:183
 #, draft
 msgid "Notes"
 msgstr "Märkused"
 
-#: src/postulo/documents/models.py:404 src/postulo/jobs/models.py:150
-#: src/postulo/jobs/models.py:435
+#: src/postulo/documents/models.py:404 src/postulo/jobs/models.py:170
+#: src/postulo/jobs/models.py:455
 #, draft
 msgid "notes"
 msgstr "märkused"
@@ -6198,7 +6214,7 @@ msgstr "Ametlik"
 msgid "older than a week"
 msgstr "vanemad kui nädal"
 
-#: src/postulo/applications/models.py:459 src/postulo/jobs/models.py:455
+#: src/postulo/applications/models.py:459 src/postulo/jobs/models.py:475
 #, draft
 msgid "On site"
 msgstr "Kohapeal"
@@ -6472,7 +6488,7 @@ msgstr "Algne kuulutus"
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
 #: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
 #: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
-#: src/postulo/documents/models.py:375 src/postulo/jobs/models.py:494
+#: src/postulo/documents/models.py:375 src/postulo/jobs/models.py:514
 #: src/postulo/resume/models.py:219
 #, draft
 msgid "Other"
@@ -6554,17 +6570,17 @@ msgstr "Lehekülgedeks jaotamine"
 msgid "Panel"
 msgstr "Komisjon"
 
-#: src/postulo/jobs/models.py:751
+#: src/postulo/jobs/models.py:771
 #, draft
 msgid "parsed posting"
 msgstr "parsitud kuulutus"
 
-#: src/postulo/jobs/models.py:139
+#: src/postulo/jobs/models.py:159
 #, draft
 msgid "part of"
 msgstr "kuulub"
 
-#: src/postulo/jobs/tables.py:71
+#: src/postulo/jobs/tables.py:77
 #, draft
 msgid "Part of"
 msgstr "Kuulub"
@@ -6579,7 +6595,7 @@ msgstr "Kuulub <a href=\"%(parent_url)s\" class=\"underline\">%(name)s</a> juurd
 msgid "Part of this company"
 msgstr "Selle ettevõtte osa"
 
-#: src/postulo/jobs/models.py:462
+#: src/postulo/jobs/models.py:482
 #, draft
 msgid "Part time"
 msgstr "Osaline tööaeg"
@@ -6645,29 +6661,29 @@ msgstr "Ainult ootel"
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
 #: src/postulo/core/server_views.py:145 src/postulo/core/server_views.py:231
 #: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:326
-#: src/postulo/core/server_views.py:343 src/postulo/jobs/tables.py:73
+#: src/postulo/core/server_views.py:343 src/postulo/jobs/tables.py:81
 #: src/postulo/templates/jobs/company_detail.html:190
 #: src/postulo/templates/server/people.html:7
 #, draft
 msgid "People"
 msgstr "Inimesed"
 
-#: src/postulo/jobs/models.py:472
+#: src/postulo/jobs/models.py:492
 #, draft
 msgid "Per day"
 msgstr "Päevas"
 
-#: src/postulo/jobs/models.py:473
+#: src/postulo/jobs/models.py:493
 #, draft
 msgid "Per hour"
 msgstr "Tunnis"
 
-#: src/postulo/jobs/models.py:471
+#: src/postulo/jobs/models.py:491
 #, draft
 msgid "Per month"
 msgstr "Kuus"
 
-#: src/postulo/jobs/models.py:470
+#: src/postulo/jobs/models.py:490
 #, draft
 msgid "Per year"
 msgstr "Aastas"
@@ -6872,7 +6888,7 @@ msgid "postal address"
 msgstr "postiaadress"
 
 #: src/postulo/accounts/models.py:266 src/postulo/core/models.py:429
-#: src/postulo/jobs/models.py:431
+#: src/postulo/jobs/models.py:451
 #, draft
 msgid "postal addresses"
 msgstr "postiaadressid"
@@ -6888,7 +6904,7 @@ msgstr "Postiaadressid"
 msgid "postcode"
 msgstr "sihtnumber"
 
-#: src/postulo/jobs/models.py:598
+#: src/postulo/jobs/models.py:618
 #, draft
 msgid "posted on"
 msgstr "avaldatud"
@@ -6924,12 +6940,12 @@ msgstr "Kuulutus uuendatud."
 msgid "Posting URL"
 msgstr "Kuulutuse URL"
 
-#: src/postulo/jobs/models.py:574
+#: src/postulo/jobs/models.py:594
 #, draft
 msgid "posting URL"
 msgstr "kuulutuse URL"
 
-#: src/postulo/jobs/tables.py:52
+#: src/postulo/jobs/tables.py:54
 #: src/postulo/templates/jobs/company_detail.html:112
 #, draft
 msgid "Postings"
@@ -7280,7 +7296,7 @@ msgstr "Loetud Europassi JSON-vorminguna, mida europass.europa.eu ekspordib."
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Loetud Europassi XML-vorminguna, mille tegi CV-redaktor."
 
-#: src/postulo/jobs/models.py:743
+#: src/postulo/jobs/models.py:763
 #, draft
 msgid "read by"
 msgstr "lugeja"
@@ -7541,7 +7557,7 @@ msgid "Reminders that have come due, each with a button to mark it done."
 msgstr ""
 "Tähtaja ületanud meeldetuletused, igaüks nupuga selle tehtuks märkimiseks."
 
-#: src/postulo/jobs/models.py:457
+#: src/postulo/jobs/models.py:477
 #, draft
 msgid "Remote"
 msgstr "Kaugtöö"
@@ -7723,7 +7739,7 @@ msgstr "robots.txt-d praegu eiratakse."
 msgid "Role"
 msgstr "Roll"
 
-#: src/postulo/jobs/models.py:422 src/postulo/resume/models.py:66
+#: src/postulo/jobs/models.py:442 src/postulo/resume/models.py:66
 #, draft
 msgid "role"
 msgstr "roll"
@@ -7777,12 +7793,12 @@ msgstr "Palk (üks arv või vahemik)"
 msgid "Salary from"
 msgstr "Palk alates"
 
-#: src/postulo/jobs/models.py:584
+#: src/postulo/jobs/models.py:604
 #, draft
 msgid "salary from"
 msgstr "palk alates"
 
-#: src/postulo/jobs/models.py:591
+#: src/postulo/jobs/models.py:611
 #, draft
 msgid "salary period"
 msgstr "palgaperiood"
@@ -7792,7 +7808,7 @@ msgstr "palgaperiood"
 msgid "Salary to"
 msgstr "Palk kuni"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:607
 #, draft
 msgid "salary to"
 msgstr "palk kuni"
@@ -7878,7 +7894,7 @@ msgstr "Salvestatud."
 msgid "Say what this address is."
 msgstr "Ütle, mis aadress see on."
 
-#: src/postulo/jobs/models.py:343
+#: src/postulo/jobs/models.py:363
 #, draft
 msgid "Say what this identifier is."
 msgstr "Öelge, mis tunnus see on."
@@ -8143,7 +8159,7 @@ msgstr "Määra parool"
 msgid "Set up"
 msgstr "Seadista"
 
-#: src/postulo/jobs/models.py:609
+#: src/postulo/jobs/models.py:629
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Määrake, kui koht pole enam saadaval."
@@ -8184,7 +8200,7 @@ msgstr "Kiirklahvid"
 msgid "Shortlist"
 msgstr "Eelvalik"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:485
+#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:505
 #, draft
 msgid "Shortlisted"
 msgstr "Eelvalikus"
@@ -8502,12 +8518,12 @@ msgid "Somebody has agreed to this. Test it to be sure it still stands."
 msgstr ""
 "Keegi on sellega nõustunud. Katsetage, et olla kindel, et see veel kehtib."
 
-#: src/postulo/core/tables.py:255
+#: src/postulo/core/tables.py:260
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Järjesta %(column)s järgi, suurim eespool"
 
-#: src/postulo/core/tables.py:257
+#: src/postulo/core/tables.py:262
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Järjesta %(column)s järgi, väikseim eespool"
@@ -8529,7 +8545,7 @@ msgid ""
 msgstr ""
 "Allikas on kuulutuse väli „leitud kanali kaudu“. Täitke see ja see tabel hakkab oma kohta ära teenima."
 
-#: src/postulo/jobs/models.py:744
+#: src/postulo/jobs/models.py:764
 #, draft
 msgid "source version"
 msgstr "allika versioon"
@@ -8586,7 +8602,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, pärast ühendumist"
 
-#: src/postulo/jobs/models.py:613 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:633 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "olek"
@@ -8613,7 +8629,7 @@ msgstr "Olek"
 
 #: src/postulo/applications/models.py:198
 #: src/postulo/applications/models.py:663 src/postulo/documents/models.py:609
-#: src/postulo/jobs/models.py:753
+#: src/postulo/jobs/models.py:773
 #, draft
 msgid "status"
 msgstr "olek"
@@ -8662,7 +8678,7 @@ msgstr "Veel avatud, vestlustes, pakkumised ja mida viimase kuu jooksul saatsid.
 msgid "Stop it working"
 msgstr "Muuda see toimetuks"
 
-#: src/postulo/core/tables.py:252
+#: src/postulo/core/tables.py:257
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Lõpeta %(column)s järgi järjestamine"
@@ -8893,7 +8909,7 @@ msgid "telephone number"
 msgstr "telefoninumber"
 
 #: src/postulo/accounts/models.py:263 src/postulo/core/models.py:217
-#: src/postulo/jobs/models.py:428
+#: src/postulo/jobs/models.py:448
 #, draft
 msgid "telephone numbers"
 msgstr "telefoninumbrid"
@@ -8981,7 +8997,7 @@ msgstr "See aadress suunas liiga mitu korda ümber."
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "See aadress tagastas veebilehe asemel: %(kind)s."
 
-#: src/postulo/jobs/models.py:214
+#: src/postulo/jobs/models.py:234
 #, python-format, draft
 msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
@@ -9003,7 +9019,7 @@ msgstr "See ühendus ei kasuta nõusolekut."
 msgid "That connection no longer exists."
 msgstr "Seda ühendust enam ei ole."
 
-#: src/postulo/jobs/models.py:450
+#: src/postulo/jobs/models.py:470
 #, draft
 msgid "That department belongs to a different company."
 msgstr "See osakond kuulub teisele ettevõttele."
@@ -9231,7 +9247,7 @@ msgstr "Sellele ettepanekule on juba vastatud."
 msgid "That was the last capture waiting."
 msgstr ""
 
-#: src/postulo/jobs/models.py:203
+#: src/postulo/jobs/models.py:223
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "See tekitaks silmuse: %(name)s kuulub juba selle juurde."
@@ -9266,7 +9282,7 @@ msgstr "Aadress vastas %(code)s."
 msgid "The address answered with nothing."
 msgstr "Aadress vastas eimillegagi."
 
-#: src/postulo/jobs/models.py:603
+#: src/postulo/jobs/models.py:623
 #, draft
 msgid "The application deadline, if stated."
 msgstr "Kandideerimise tähtaeg, kui see on märgitud."
@@ -9310,7 +9326,7 @@ msgid ""
 msgstr ""
 "Ettevõte sobitatakse nime järgi ja luuakse, kui see on uus. Kohustuslikud on ainult ettevõte ja ametinimetus; kõik muu saab hiljem täita."
 
-#: src/postulo/jobs/models.py:140
+#: src/postulo/jobs/models.py:160
 #, draft
 msgid "The company this one belongs to, if it belongs to one."
 msgstr "Ettevõte, kelle juurde see kuulub, kui ta kuulub kellegi juurde."
@@ -9453,12 +9469,12 @@ msgid ""
 msgstr ""
 "Kümme viimast ajajoone sissekannet, ükskõik millise kandideerimise kohta."
 
-#: src/postulo/jobs/models.py:762
+#: src/postulo/jobs/models.py:782
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "Kuulutus, milleks see püüdmine pärast ülevaatust sai."
 
-#: src/postulo/jobs/models.py:492
+#: src/postulo/jobs/models.py:512
 #, draft
 msgid "The location"
 msgstr "Asukoht"
@@ -9542,7 +9558,7 @@ msgid ""
 msgstr ""
 "Parooli määrab <code>%(variable)s</code> keskkonnas; muuda seda seal. Siin seda kunagi ei näidata."
 
-#: src/postulo/jobs/models.py:491
+#: src/postulo/jobs/models.py:511
 #, draft
 msgid "The pay"
 msgstr "Tasu"
@@ -9983,7 +9999,7 @@ msgid "timeout in seconds"
 msgstr "ajalõpp sekundites"
 
 #: src/postulo/documents/models.py:386 src/postulo/documents/models.py:477
-#: src/postulo/jobs/models.py:565 src/postulo/resume/models.py:241
+#: src/postulo/jobs/models.py:585 src/postulo/resume/models.py:241
 #, draft
 msgid "title"
 msgstr "pealkiri"
@@ -10003,7 +10019,8 @@ msgstr "TLS esimesest baidist"
 msgid "To"
 msgstr "Kuni"
 
-#: src/postulo/templates/partials/table/head.html:101
+#: src/postulo/templates/partials/table/head.html:119
+#: src/postulo/templates/partials/table/narrow.html:41
 #, draft
 msgid "to"
 msgstr "kuni"
@@ -10111,7 +10128,7 @@ msgstr "Proovige vähem sõnu või teistsugust kirjapilti."
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Lülitage kõigepealt sisse „Kasuta minu Gravatari“."
 
-#: src/postulo/jobs/models.py:724
+#: src/postulo/jobs/models.py:744
 #, draft
 msgid "Turned into an application"
 msgstr "Muudetud kandideerimiseks"
@@ -10191,7 +10208,7 @@ msgstr ""
 msgid "until"
 msgstr "kuni"
 
-#: src/postulo/jobs/models.py:717
+#: src/postulo/jobs/models.py:737
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "kuni %(high)s"
@@ -10229,7 +10246,7 @@ msgstr "Laadi pilt üles"
 msgid "Upload and map the columns"
 msgstr "Laadi üles ja seosta veerud"
 
-#: src/postulo/jobs/models.py:110 src/postulo/plugins/provenance.py:62
+#: src/postulo/jobs/models.py:130 src/postulo/plugins/provenance.py:62
 #: src/postulo/templates/accounts/profile.html:45
 #, draft
 msgid "Uploaded"
@@ -10404,7 +10421,7 @@ msgstr "Videokõne"
 msgid "Waiting after this one: %(count)s."
 msgstr ""
 
-#: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:723
+#: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:743
 #, draft
 msgid "Waiting for review"
 msgstr "Ootab ülevaatust"
@@ -10457,19 +10474,19 @@ msgid "web link"
 msgstr "veebilink"
 
 #: src/postulo/accounts/models.py:269 src/postulo/core/models.py:544
-#: src/postulo/jobs/models.py:434
+#: src/postulo/jobs/models.py:454
 #, draft
 msgid "web links"
 msgstr "veebilingid"
 
 #: src/postulo/core/models.py:526 src/postulo/core/web_links.py:113
-#: src/postulo/jobs/tables.py:74
+#: src/postulo/jobs/tables.py:88
 #: src/postulo/templates/jobs/company_detail.html:84
 #, draft
 msgid "Website"
 msgstr "Veebisait"
 
-#: src/postulo/jobs/models.py:142 src/postulo/resume/views.py:453
+#: src/postulo/jobs/models.py:162 src/postulo/resume/views.py:453
 #, draft
 msgid "website"
 msgstr "veebisait"
@@ -10650,7 +10667,7 @@ msgid ""
 msgstr ""
 "Mida töölaud näitab ja mis järjekorras. Kõik, mis oli Insightsis, on siin vidinana; eemalda see, mida kunagi ei loe, ja pane ülejäänu sinna, kuhu soovid."
 
-#: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:312
+#: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:332
 #, draft
 msgid "What the identifier is, when the scheme is Other."
 msgstr "Mis tunnus see on, kui skeem on Muu."
@@ -10745,7 +10762,7 @@ msgstr "Millal"
 msgid "When accepting should also move the application."
 msgstr "Kui vastuvõtmine peaks kandideerimist ka edasi liigutama."
 
-#: src/postulo/jobs/models.py:619
+#: src/postulo/jobs/models.py:639
 #, draft
 msgid "When it entered your listings."
 msgstr "Millal see teie kuulutuste hulka jõudis."
@@ -10767,7 +10784,7 @@ msgstr "kus"
 msgid "Where plugins may come from"
 msgstr "Kust pistikprogrammid tulla võivad"
 
-#: src/postulo/jobs/models.py:160
+#: src/postulo/jobs/models.py:180
 #, draft
 msgid "where the logo came from"
 msgstr "kust logo tuli"
@@ -10805,12 +10822,12 @@ msgstr "Kust need leiti"
 msgid "Where things stand"
 msgstr "Kuidas asjad seisavad"
 
-#: src/postulo/jobs/models.py:144
+#: src/postulo/jobs/models.py:164
 #, draft
 msgid "Where this company lists its openings."
 msgstr "Kus see ettevõte oma vabu kohti avaldab."
 
-#: src/postulo/jobs/models.py:579
+#: src/postulo/jobs/models.py:599
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Kust te selle leidsite: tööportaal, soovitus, ettevõtte sait."
@@ -10872,7 +10889,7 @@ msgid ""
 msgstr ""
 "Mis keeles on kirja pandud teie kogemus, haridus ja projektid. Teises keeles CV näitab, mida olete tõlkinud, ja ütleb, mida ei saanud."
 
-#: src/postulo/jobs/models.py:749
+#: src/postulo/jobs/models.py:769
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Mis osa Postulost selle lõi: veebiliides või API."
@@ -10907,7 +10924,7 @@ msgstr "kellega kohtute"
 msgid "Why"
 msgstr "Miks"
 
-#: src/postulo/jobs/models.py:616
+#: src/postulo/jobs/models.py:636
 #, draft
 msgid "why it was discarded"
 msgstr "miks see tagasi lükati"
@@ -10973,7 +10990,7 @@ msgstr "töötas %(when)s"
 msgid "Working arrangement"
 msgstr "Töökorraldus"
 
-#: src/postulo/jobs/models.py:568
+#: src/postulo/jobs/models.py:588
 #, draft
 msgid "working arrangement"
 msgstr "töökorraldus"

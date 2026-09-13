@@ -354,3 +354,83 @@ def test_the_registry_knows_both_tables_and_nothing_else():
     assert tables.TABLES["applications"] is ApplicationsTable
     with pytest.raises(ValueError, match="needs a name"):
         tables.register(type("Nameless", (tables.Table,), {}))
+
+
+# ---------------------------------------------------- the whole table narrows (#173)
+
+
+def names(response) -> list[str]:
+    return [c.name for c in response.context["companies"]]
+
+
+def test_the_counts_narrow_by_a_least_and_a_most(client, user, search):
+    """ "Companies I have applied to more than once" is the obvious question."""
+    client.force_login(user)
+    url = reverse("jobs:company_list")
+
+    assert names(client.get(url, {"applications_min": "2"})) == ["Aperture Science"]
+    assert names(client.get(url, {"applications_max": "1"})) == ["Black Mesa"]
+    assert names(client.get(url, {"contacts_min": "1"})) == ["Black Mesa"]
+    assert names(client.get(url, {"postings_min": "1", "postings_max": "5"})) == [
+        "Aperture Science",
+        "Black Mesa",
+    ]
+    assert sorted(names(client.get(url, {"contacts_min": "lots"}))) == sorted(
+        names(client.get(url))
+    ), "not a number, so it narrows nothing"
+
+
+def test_the_dates_narrow_by_the_day_they_fall_on(client, user, search):
+    client.force_login(user)
+    url = reverse("jobs:company_list")
+    today = timezone.localdate().isoformat()
+    tomorrow = (timezone.localdate() + dt.timedelta(days=1)).isoformat()
+
+    assert len(names(client.get(url, {"created_from": today}))) == 2
+    assert len(names(client.get(url, {"created_to": today}))) == 2, "to the 13th includes the 13th"
+    assert names(client.get(url, {"created_from": tomorrow})) == []
+    assert len(names(client.get(url, {"last_activity_to": today}))) == 2
+
+
+def test_the_text_columns_sort_and_an_identifier_sorts_and_narrows(client, user, search):
+    from postulo.jobs.models import CompanyIdentifier
+
+    search["aperture"].website = "https://zeta.example"
+    search["aperture"].save(update_fields=["website"])
+    search["black_mesa"].website = "https://alpha.example"
+    search["black_mesa"].save(update_fields=["website"])
+    CompanyIdentifier.objects.create(
+        owner=user, company=search["black_mesa"], scheme="wikidata", value="Q42"
+    )
+    client.force_login(user)
+    url = reverse("jobs:company_list")
+
+    assert names(client.get(url, {"sort": "website"})) == ["Black Mesa", "Aperture Science"]
+    assert names(client.get(url, {"sort": "-id_wikidata"})) == ["Black Mesa", "Aperture Science"]
+    assert names(client.get(url, {"id_wikidata": "q4"})) == ["Black Mesa"]
+
+    table = CompaniesTable(client.get(url).wsgi_request, {})
+    unsortable = [column.key for column in table.columns if not column.sortable]
+    assert unsortable == ["industry", "notes"], "each with its reason written beside it"
+    assert all(column.filter for column in table.columns), "and every column narrows"
+
+
+def test_the_first_non_empty_answer_under_a_name_wins(client, user, search):
+    """The header row and the phone block both post the same name; the typed one counts."""
+    client.force_login(user)
+    url = reverse("jobs:company_list")
+
+    assert names(client.get(f"{url}?location=&location=mexico")) == ["Black Mesa"]
+    assert names(client.get(f"{url}?location=mexico&location=")) == ["Black Mesa"]
+
+
+def test_a_phone_can_reach_every_filter(client, user, search):
+    client.force_login(user)
+
+    for url in (reverse("jobs:company_list"), reverse("applications:list")):
+        html = client.get(url).content.decode()
+        assert "data-narrow" in html
+        assert 'class="w-full md:hidden"' in html, "folded away where the header row shows"
+    companies = client.get(reverse("jobs:company_list")).content.decode()
+    assert 'id="filter-location-narrow"' in companies
+    assert 'name="applications_min"' in companies and 'name="applications_max"' in companies

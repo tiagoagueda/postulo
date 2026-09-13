@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime as dt
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 from functools import cached_property
 
 from django.db.models import F, Q
@@ -47,8 +48,12 @@ class Column:
     #: Whether the first click sorts descending — right for dates, where newest first is
     #: what people mean.
     newest_first: bool = False
-    #: ``text``, ``choice``, ``date`` or empty for a column that does not narrow.
+    #: ``text``, ``choice``, ``date``, ``number`` or empty for a column that does not
+    #: narrow. A date takes a from and a to; a number takes a least and a most (#173).
     filter: str = ""
+    #: For a ``date`` filter on a column that is a moment rather than a day: narrow by the
+    #: day the moment falls on, so "to the 13th" includes the 13th (#173).
+    datetime: bool = False
     #: Lookups the filter applies. Text matches any of them; choice and date use the first.
     lookups: tuple[str, ...] = ()
     #: The choices a ``choice`` filter offers, as (value, label) pairs.
@@ -258,27 +263,44 @@ class Table:
 
     # ----------------------------------------------------------------- filters
 
+    def given(self, name: str) -> str:
+        """The value of one filter: the first non-empty answer under that name.
+
+        The same input is drawn twice -- in the header row, and in the block a phone can
+        reach, which the header row is hidden on -- and both belong to the form, so both
+        are posted. Whichever was typed in is the answer; the empty twin is not (#173).
+        """
+        return next((value.strip() for value in self.params.getlist(name) if value.strip()), "")
+
     def filter(self, queryset):
         """Narrow by every declared column filter present in the request."""
         for column in self.columns:
             if column.filter == "text":
-                value = self.params.get(column.name, "").strip()
+                value = self.given(column.name)
                 if value:
                     condition = Q()
                     for lookup in column.lookups:
                         condition |= Q(**{f"{lookup}__icontains": value})
                     queryset = queryset.filter(condition)
             elif column.filter == "choice":
-                value = self.params.get(column.name, "").strip()
+                value = self.given(column.name)
                 if value and value in {str(choice) for choice, _label in column.choices}:
                     queryset = queryset.filter(**{column.lookups[0]: value})
             elif column.filter == "date":
-                start = _date(self.params.get(f"{column.name}_from", ""))
-                end = _date(self.params.get(f"{column.name}_to", ""))
+                start = _date(self.given(f"{column.name}_from"))
+                end = _date(self.given(f"{column.name}_to"))
+                lookup = f"{column.lookups[0]}__date" if column.datetime else column.lookups[0]
                 if start:
-                    queryset = queryset.filter(**{f"{column.lookups[0]}__gte": start})
+                    queryset = queryset.filter(**{f"{lookup}__gte": start})
                 if end:
-                    queryset = queryset.filter(**{f"{column.lookups[0]}__lte": end})
+                    queryset = queryset.filter(**{f"{lookup}__lte": end})
+            elif column.filter == "number":
+                least = _number(self.given(f"{column.name}_min"))
+                most = _number(self.given(f"{column.name}_max"))
+                if least is not None:
+                    queryset = queryset.filter(**{f"{column.lookups[0]}__gte": least})
+                if most is not None:
+                    queryset = queryset.filter(**{f"{column.lookups[0]}__lte": most})
         return queryset
 
     def apply(self, queryset):
@@ -291,9 +313,11 @@ class Table:
         for column in self.columns:
             if column.filter == "date":
                 names += [f"{column.name}_from", f"{column.name}_to"]
+            elif column.filter == "number":
+                names += [f"{column.name}_min", f"{column.name}_max"]
             elif column.filter:
                 names.append(column.name)
-        return any(self.params.get(name, "").strip() for name in names)
+        return any(self.given(name) for name in names)
 
     @property
     def clear_url(self) -> str:
@@ -317,10 +341,13 @@ class Table:
                 width=self.width_of(column),
             )
             if column.filter in ("text", "choice"):
-                header.value = self.params.get(column.name, "")
+                header.value = self.given(column.name)
             elif column.filter == "date":
-                header.value_from = self.params.get(f"{column.name}_from", "")
-                header.value_to = self.params.get(f"{column.name}_to", "")
+                header.value_from = self.given(f"{column.name}_from")
+                header.value_to = self.given(f"{column.name}_to")
+            elif column.filter == "number":
+                header.value_from = self.given(f"{column.name}_min")
+                header.value_to = self.given(f"{column.name}_max")
             headers.append(header)
         return headers
 
@@ -392,6 +419,15 @@ def _date(text: str) -> dt.date | None:
         return dt.date.fromisoformat(text.strip())
     except ValueError:
         return None
+
+
+def _number(text: str) -> Decimal | None:
+    """A bound for a number filter, or nothing: what is not a number narrows nothing."""
+    try:
+        value = Decimal(text.strip())
+    except (InvalidOperation, ValueError):
+        return None
+    return value if value.is_finite() else None
 
 
 # ------------------------------------------------------------------- registry

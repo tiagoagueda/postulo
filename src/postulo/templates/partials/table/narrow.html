@@ -1,0 +1,63 @@
+{% load i18n %}
+{% comment %} The header filters, reachable on a phone. Below `md` the filter row in the table
+   head is hidden -- a row of inputs inside a table at 390 pixels is not a control anybody
+   can use -- so the same filters are drawn again here, inside the filter form the page
+   already has, folded under one word. Above `md` this block is hidden and the row is the
+   control; the two never show at once.
+
+   Both copies belong to the form and both are posted, so the table reads the first
+   non-empty answer under a name and the empty twin narrows nothing (`Table.given`). Shared
+   by every table that draws a header, so there is one of these and not one per page (#173).
+{% endcomment %}
+{% if table.has_filter_row %}
+  <details class="w-full md:hidden" data-narrow>
+    <summary class="btn-secondary cursor-pointer list-none">{% translate "Narrow" %}</summary>
+    <div class="mt-3 grid gap-3">
+      {% for header in table.headers %}
+        {% if header.column.filter == 'text' %}
+          <div>
+            <label class="field-label" for="{{ header.input_id }}-narrow">{{ header.label }}</label>
+            <input type="search" id="{{ header.input_id }}-narrow" name="{{ header.column.name }}"
+                   value="{{ header.value }}" class="field-input w-full">
+          </div>
+        {% elif header.column.filter == 'choice' %}
+          <div>
+            <label class="field-label" for="{{ header.input_id }}-narrow">{{ header.label }}</label>
+            <select id="{{ header.input_id }}-narrow" name="{{ header.column.name }}" class="field-input w-full">
+              <option value="">{% translate "Any" %}</option>
+              {% for value, label in header.column.choices %}
+                <option value="{{ value }}" {% if value == header.value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        {% elif header.column.filter == 'date' %}
+          <fieldset>
+            <legend class="field-label">{{ header.label }}</legend>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="date" id="{{ header.input_id }}-narrow-from" name="{{ header.column.name }}_from"
+                     value="{{ header.value_from }}" aria-label="{{ header.filter_label }}: {% translate 'from' %}"
+                     class="field-input w-full">
+              <input type="date" id="{{ header.input_id }}-narrow-to" name="{{ header.column.name }}_to"
+                     value="{{ header.value_to }}" aria-label="{{ header.filter_label }}: {% translate 'to' %}"
+                     class="field-input w-full">
+            </div>
+          </fieldset>
+        {% elif header.column.filter == 'number' %}
+          <fieldset>
+            <legend class="field-label">{{ header.label }}</legend>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="number" id="{{ header.input_id }}-narrow-min" name="{{ header.column.name }}_min"
+                     value="{{ header.value_from }}" inputmode="numeric" min="0"
+                     aria-label="{{ header.filter_label }}: {% translate 'at least' %}" placeholder="{% translate 'at least' %}"
+                     class="field-input w-full">
+              <input type="number" id="{{ header.input_id }}-narrow-max" name="{{ header.column.name }}_max"
+                     value="{{ header.value_to }}" inputmode="numeric" min="0"
+                     aria-label="{{ header.filter_label }}: {% translate 'at most' %}" placeholder="{% translate 'at most' %}"
+                     class="field-input w-full">
+            </div>
+          </fieldset>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </details>
+{% endif %}

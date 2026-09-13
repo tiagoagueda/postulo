@@ -95,13 +95,33 @@ class Industry(OwnedModel):
 
 class CompanyQuerySet(OwnedQuerySet):
     def with_table_data(self) -> CompanyQuerySet:
-        """Annotate the counts and dates the companies table can show and sort by."""
-        return self.annotate(
-            posting_count=Count("postings", distinct=True),
-            application_count=Count("postings__applications", distinct=True),
-            contact_count=Count("contacts", distinct=True),
-            last_activity_at=Max("postings__applications__events__occurred_at"),
-        )
+        """Annotate the counts, dates and identifiers the companies table can show, sort by
+        and narrow on.
+
+        One annotation per identifier scheme, named as the table's column is, so an
+        identifier sorts and filters like a column of the company's own rather than being
+        the one kind of column that could do neither (#173). A subquery per scheme rather
+        than a join: a company with three identifiers is still one row.
+        """
+        from django.db.models import OuterRef, Subquery
+
+        from . import identifiers
+
+        annotations = {
+            "posting_count": Count("postings", distinct=True),
+            "application_count": Count("postings__applications", distinct=True),
+            "contact_count": Count("contacts", distinct=True),
+            "last_activity_at": Max("postings__applications__events__occurred_at"),
+        }
+        for key in identifiers.schemes():
+            if key == identifiers.OTHER:
+                continue
+            annotations[f"id_{key}"] = Subquery(
+                CompanyIdentifier.objects.filter(company=OuterRef("pk"), scheme=key)
+                .order_by("pk")
+                .values("value")[:1]
+            )
+        return self.annotate(**annotations)
 
 
 class LogoSource(models.TextChoices):

@@ -290,6 +290,20 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **The companies table narrows on every column, and from a phone.** What was asked for
+  on this table was filtering and sorting in the table itself, and #135 built editing in
+  place instead. The rest is finished now. The three counts take a least and a most —
+  *companies I have applied to more than once* — which is a new kind of filter shared by
+  every table; *Last activity* and *Added* take the from-and-to pair the applications
+  table already had, narrowing by the day a moment falls on so that *to the 13th* includes
+  the 13th; website and careers page sort and narrow; and the identifier columns, which
+  could do neither, sort and narrow like any other, because each is a column of the query
+  now rather than a lookup per row. Notes and industries stay unsorted, each with its
+  reason written beside it. And below the `md` breakpoint, where the row of inputs in the
+  table head is hidden because a row of inputs inside a table at 390 pixels is not a
+  control, a *Narrow* fold under the search box offers the same filters — on every table,
+  not just this one. (#173)
+
 - **Forty captures, and not forty page loads.** Reviewing what a board's search page
   produced meant opening each capture, deciding, and landing back on the list — a full
   page each — when most of the forty get the same answer in under a second. The review

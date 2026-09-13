@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-13 03:24+0000\n"
+"POT-Creation-Date: 2026-09-13 03:33+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Ελληνικά\n"
@@ -217,7 +217,7 @@ msgid ""
 msgstr ""
 "Το %(label)s κρατά ακόμη %(count)d εγγραφή/ές, και η απεγκατάστασή του θα τις άφηνε σε έναν πίνακα που τίποτα δεν μπορεί να διαβάσει, να εξαγάγει ή να επαναφέρει. Αδειάστε τον πρώτα από τις σελίδες του ίδιου του πρόσθετου, ή απενεργοποιήστε το πρόσθετο αντί γι' αυτό — η απενεργοποίηση κρατά τα πάντα."
 
-#: src/postulo/jobs/models.py:710
+#: src/postulo/jobs/models.py:730
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s έως %(high)s"
@@ -570,7 +570,7 @@ msgstr "Μια σύλληψη αυτής της διεύθυνσης από %(wh
 msgid "A client secret is stored. It is never shown."
 msgstr "Έχει αποθηκευτεί μυστικό πελάτη. Δεν εμφανίζεται ποτέ."
 
-#: src/postulo/jobs/models.py:196
+#: src/postulo/jobs/models.py:216
 #, draft
 msgid "A company cannot be part of itself."
 msgstr "Μια εταιρεία δεν μπορεί να είναι μέρος του εαυτού της."
@@ -1042,7 +1042,7 @@ msgstr "Προσθήκη στις αγγελίες"
 msgid "Add to the timeline"
 msgstr "Προσθήκη στο χρονολόγιο"
 
-#: src/postulo/jobs/tables.py:89
+#: src/postulo/jobs/tables.py:125
 #, draft
 msgid "Added"
 msgstr "Προστέθηκε"
@@ -1087,7 +1087,7 @@ msgid "Address"
 msgstr "Διεύθυνση"
 
 #: src/postulo/core/models.py:413 src/postulo/core/models.py:539
-#: src/postulo/jobs/models.py:742 src/postulo/resume/models.py:242
+#: src/postulo/jobs/models.py:762 src/postulo/resume/models.py:242
 #, draft
 msgid "address"
 msgstr "διεύθυνση"
@@ -1247,6 +1247,7 @@ msgstr "Απάντησε %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
 #: src/postulo/templates/partials/table/head.html:86
+#: src/postulo/templates/partials/table/narrow.html:27
 #, draft
 msgid "Any"
 msgstr "Οποιοδήποτε"
@@ -1303,7 +1304,7 @@ msgstr "Εμφάνιση"
 #: src/postulo/applications/models.py:424
 #: src/postulo/applications/models.py:519
 #: src/postulo/applications/models.py:640 src/postulo/applications/tables.py:15
-#: src/postulo/documents/models.py:490 src/postulo/jobs/models.py:770
+#: src/postulo/documents/models.py:490 src/postulo/jobs/models.py:790
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1342,7 +1343,7 @@ msgid "Application updated."
 msgstr "Η αίτηση ενημερώθηκε."
 
 #: src/postulo/applications/apps.py:9 src/postulo/core/navigation.py:58
-#: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:60
+#: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:64
 #: src/postulo/templates/applications/application_list.html:6
 #: src/postulo/templates/applications/application_list.html:70
 #: src/postulo/templates/core/export.html:20
@@ -1409,7 +1410,7 @@ msgstr "Αιτήσεις, με τα χρονολόγιά τους"
 
 #: src/postulo/applications/analytics.py:31
 #: src/postulo/applications/models.py:41 src/postulo/applications/tables.py:46
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:665
+#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:685
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
 msgid "Applied"
@@ -1464,7 +1465,7 @@ msgstr "Εφαρμογή στις επιλεγμένες γραμμές"
 msgid "Apply: %(title)s"
 msgstr "Υποβολή αίτησης: %(title)s"
 
-#: src/postulo/jobs/models.py:466
+#: src/postulo/jobs/models.py:486
 #, draft
 msgid "Apprenticeship"
 msgstr "Μαθητεία"
@@ -1501,11 +1502,21 @@ msgstr "Αξιολόγηση"
 msgid "Assessment or test"
 msgstr "Αξιολόγηση ή τεστ"
 
+#: src/postulo/templates/partials/table/head.html:98
+#: src/postulo/templates/partials/table/narrow.html:51
+msgid "at least"
+msgstr ""
+
 #: src/postulo/core/server_forms.py:130
 #, draft
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr ""
 "Πρέπει να προσφέρεται τουλάχιστον μία γλώσσα, αλλιώς κανείς δεν μπορεί να διαβάσει τίποτα."
+
+#: src/postulo/templates/partials/table/head.html:104
+#: src/postulo/templates/partials/table/narrow.html:55
+msgid "at most"
+msgstr ""
 
 #: src/postulo/documents/models.py:613
 #, draft
@@ -1733,7 +1744,7 @@ msgstr "Ακυρώθηκε"
 msgid "Capture"
 msgstr "Σύλληψη"
 
-#: src/postulo/jobs/models.py:774
+#: src/postulo/jobs/models.py:794
 #, draft
 msgid "capture"
 msgstr "σύλληψη"
@@ -1780,7 +1791,7 @@ msgstr "Πηγές καταγραφής αυτής της εγκατάσταση
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "Συλλήφθηκαν %(count)s αγγελίες από %(host)s"
 
-#: src/postulo/jobs/models.py:746
+#: src/postulo/jobs/models.py:766
 #, draft
 msgid "captured from"
 msgstr "συλλήφθηκε από"
@@ -1790,7 +1801,7 @@ msgstr "συλλήφθηκε από"
 msgid "Captured: %(title)s"
 msgstr "Συλλήφθηκε: %(title)s"
 
-#: src/postulo/jobs/models.py:775
+#: src/postulo/jobs/models.py:795
 #, draft
 msgid "captures"
 msgstr "συλλήψεις"
@@ -1829,12 +1840,12 @@ msgstr "Ιστορικό σταδιοδρομίας"
 msgid "Career sections"
 msgstr "Ενότητες σταδιοδρομίας"
 
-#: src/postulo/jobs/models.py:144
+#: src/postulo/jobs/models.py:164
 #, draft
 msgid "careers page"
 msgstr "σελίδα καριέρας"
 
-#: src/postulo/jobs/tables.py:75
+#: src/postulo/jobs/tables.py:91
 #: src/postulo/templates/jobs/company_detail.html:88
 #, draft
 msgid "Careers page"
@@ -1997,8 +2008,8 @@ msgstr "Πόλη και χώρα, όπως πρέπει να εμφανίζον�
 msgid "Classic"
 msgstr "Κλασικό"
 
-#: src/postulo/templates/applications/partials/filters.html:52
-#: src/postulo/templates/applications/partials/filters.html:55
+#: src/postulo/templates/applications/partials/filters.html:53
+#: src/postulo/templates/applications/partials/filters.html:56
 #: src/postulo/templates/jobs/company_list.html:89
 #: src/postulo/templates/jobs/industry_list.html:33
 #: src/postulo/templates/server/logs.html:67
@@ -2030,17 +2041,17 @@ msgstr "αναγνωριστικό πελάτη"
 msgid "Client secret"
 msgstr "Μυστικό πελάτη"
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:665
+#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:685
 #, draft
 msgid "Closed"
 msgstr "Κλειστή"
 
-#: src/postulo/applications/models.py:210 src/postulo/jobs/models.py:606
+#: src/postulo/applications/models.py:210 src/postulo/jobs/models.py:626
 #, draft
 msgid "closed on"
 msgstr "έκλεισε στις"
 
-#: src/postulo/jobs/models.py:493
+#: src/postulo/jobs/models.py:513
 #, draft
 msgid "Closed or already filled"
 msgstr "Κλειστή ή ήδη καλυμμένη"
@@ -2056,7 +2067,7 @@ msgstr "Κλείνει"
 msgid "Closing date"
 msgstr "Ημερομηνία λήξης"
 
-#: src/postulo/jobs/models.py:600
+#: src/postulo/jobs/models.py:620
 #, draft
 msgid "closing date"
 msgstr "ημερομηνία λήξης"
@@ -2114,7 +2125,7 @@ msgstr "Επερχόμενα"
 msgid "Companies"
 msgstr "Εταιρείες"
 
-#: src/postulo/jobs/models.py:169 src/postulo/jobs/tables.py:18
+#: src/postulo/jobs/models.py:189 src/postulo/jobs/tables.py:18
 #, draft
 msgid "companies"
 msgstr "εταιρείες"
@@ -2146,9 +2157,9 @@ msgstr "Εταιρείες στις οποίες κάνατε αίτηση"
 msgid "Company"
 msgstr "Εταιρεία"
 
-#: src/postulo/jobs/models.py:168 src/postulo/jobs/models.py:304
-#: src/postulo/jobs/models.py:381 src/postulo/jobs/models.py:409
-#: src/postulo/jobs/models.py:563 src/postulo/jobs/tables.py:18
+#: src/postulo/jobs/models.py:188 src/postulo/jobs/models.py:324
+#: src/postulo/jobs/models.py:401 src/postulo/jobs/models.py:429
+#: src/postulo/jobs/models.py:583 src/postulo/jobs/tables.py:18
 #, draft
 msgid "company"
 msgstr "εταιρεία"
@@ -2163,12 +2174,12 @@ msgstr "Η εταιρεία προστέθηκε."
 msgid "Company deleted, along with its postings."
 msgstr "Η εταιρεία διαγράφηκε, μαζί με τις αγγελίες της."
 
-#: src/postulo/jobs/models.py:316
+#: src/postulo/jobs/models.py:336
 #, draft
 msgid "company identifier"
 msgstr "αναγνωριστικό εταιρείας"
 
-#: src/postulo/jobs/models.py:317
+#: src/postulo/jobs/models.py:337
 #, draft
 msgid "company identifiers"
 msgstr "αναγνωριστικά εταιρείας"
@@ -2285,7 +2296,7 @@ msgstr "Κατασκευές"
 msgid "Consulting"
 msgstr "Συμβουλευτική"
 
-#: src/postulo/jobs/models.py:438
+#: src/postulo/jobs/models.py:458
 #, draft
 msgid "contact"
 msgstr "επαφή"
@@ -2307,7 +2318,7 @@ msgstr "Η επαφή προστέθηκε."
 msgid "Contact block"
 msgstr "Μπλοκ επικοινωνίας"
 
-#: src/postulo/jobs/models.py:439
+#: src/postulo/jobs/models.py:459
 #, draft
 msgid "contacts"
 msgstr "επαφές"
@@ -2322,7 +2333,7 @@ msgstr "Που περιέχει"
 msgid "context"
 msgstr "συμφραζόμενα"
 
-#: src/postulo/jobs/models.py:463
+#: src/postulo/jobs/models.py:483
 #, draft
 msgid "Contract"
 msgstr "Ορισμένου χρόνου"
@@ -2443,7 +2454,7 @@ msgstr "σύνδεσμος πιστοποιητικού"
 msgid "Currency"
 msgstr "Νόμισμα"
 
-#: src/postulo/jobs/models.py:589
+#: src/postulo/jobs/models.py:609
 #, draft
 msgid "currency"
 msgstr "νόμισμα"
@@ -2673,7 +2684,7 @@ msgstr "Αποφασίστηκε από τον/την %(who)s στις %(when)s"
 msgid "Decided by %(who)s."
 msgstr "Αποφασίστηκε από τον/την %(who)s."
 
-#: src/postulo/jobs/models.py:621
+#: src/postulo/jobs/models.py:641
 #, draft
 msgid "decided on"
 msgstr "αποφασίστηκε στις"
@@ -2756,8 +2767,8 @@ msgstr "Διαγραφή του λογαριασμού"
 msgid "Delete your own account from Settings, not from here."
 msgstr "Διαγράψτε τον δικό σας λογαριασμό από τις Ρυθμίσεις, όχι από εδώ."
 
-#: src/postulo/applications/models.py:237 src/postulo/jobs/models.py:386
-#: src/postulo/jobs/models.py:419
+#: src/postulo/applications/models.py:237 src/postulo/jobs/models.py:406
+#: src/postulo/jobs/models.py:439
 #, draft
 msgid "department"
 msgstr "τμήμα"
@@ -2768,7 +2779,7 @@ msgstr "τμήμα"
 msgid "Department"
 msgstr "Τμήμα"
 
-#: src/postulo/jobs/models.py:387
+#: src/postulo/jobs/models.py:407
 #, draft
 msgid "departments"
 msgstr "τμήματα"
@@ -2784,7 +2795,7 @@ msgstr "Εξαρτάται από"
 msgid "Description"
 msgstr "Περιγραφή"
 
-#: src/postulo/jobs/models.py:581 src/postulo/resume/models.py:245
+#: src/postulo/jobs/models.py:601 src/postulo/resume/models.py:245
 #, draft
 msgid "description"
 msgstr "περιγραφή"
@@ -2840,8 +2851,8 @@ msgstr ""
 msgid "Discard this capture"
 msgstr "Απόρριψη αυτής της σύλληψης"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:486
-#: src/postulo/jobs/models.py:725
+#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:506
+#: src/postulo/jobs/models.py:745
 #, draft
 msgid "Discarded"
 msgstr "Απορρίφθηκε"
@@ -3064,7 +3075,7 @@ msgid "Email"
 msgstr "Email"
 
 #: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:468
-#: src/postulo/jobs/models.py:423 src/postulo/resume/views.py:451
+#: src/postulo/jobs/models.py:443 src/postulo/resume/views.py:451
 #, draft
 msgid "email address"
 msgstr "διεύθυνση email"
@@ -3099,7 +3110,7 @@ msgstr "Στάλθηκε email"
 msgid "Employment type"
 msgstr "Τύπος απασχόλησης"
 
-#: src/postulo/jobs/models.py:571
+#: src/postulo/jobs/models.py:591
 #, draft
 msgid "employment type"
 msgstr "τύπος απασχόλησης"
@@ -3109,7 +3120,7 @@ msgstr "τύπος απασχόλησης"
 msgid "Empty"
 msgstr "Κενό"
 
-#: src/postulo/jobs/models.py:780
+#: src/postulo/jobs/models.py:800
 #, draft
 msgid "Empty capture"
 msgstr "Κενή σύλληψη"
@@ -3481,13 +3492,13 @@ msgstr "Αρχεία που έχετε ήδη"
 msgid "Filled in when the letter is sent with an application."
 msgstr "Συμπληρώνεται όταν η επιστολή στέλνεται με μια αίτηση."
 
-#: src/postulo/templates/applications/partials/filters.html:49
+#: src/postulo/templates/applications/partials/filters.html:50
 #: src/postulo/templates/partials/table/head.html:75
 #, draft
 msgid "Filter"
 msgstr "Φιλτράρισμα"
 
-#: src/postulo/core/tables.py:111
+#: src/postulo/core/tables.py:116
 #, python-format, draft
 msgid "Filter by %(column)s"
 msgstr "Φιλτράρισμα κατά %(column)s"
@@ -3608,7 +3619,7 @@ msgstr "Ξέχνα το διακριτικό"
 msgid "Found a logo at %(url)s."
 msgstr "Βρέθηκε λογότυπο στο %(url)s."
 
-#: src/postulo/jobs/models.py:109
+#: src/postulo/jobs/models.py:129
 #, draft
 msgid "Found on their website"
 msgstr "Βρέθηκε στον ιστότοπό τους"
@@ -3622,7 +3633,7 @@ msgstr "Βρέθηκε στον ιστότοπό τους"
 msgid "Found via"
 msgstr "Βρέθηκε μέσω"
 
-#: src/postulo/jobs/models.py:576
+#: src/postulo/jobs/models.py:596
 #, draft
 msgid "found via"
 msgstr "βρέθηκε μέσω"
@@ -3632,7 +3643,7 @@ msgstr "βρέθηκε μέσω"
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Βρέθηκαν: %(names)s. Θα συμπληρωθούν μόνο τα πεδία που αφήσατε κενά."
 
-#: src/postulo/jobs/models.py:464
+#: src/postulo/jobs/models.py:484
 #, draft
 msgid "Freelance"
 msgstr "Ελεύθερος επαγγελματίας"
@@ -3644,7 +3655,8 @@ msgstr "Πάγωμα και επισύναψη"
 
 #: src/postulo/resume/models.py:68 src/postulo/resume/models.py:99
 #: src/postulo/resume/models.py:153
-#: src/postulo/templates/partials/table/head.html:95
+#: src/postulo/templates/partials/table/head.html:113
+#: src/postulo/templates/partials/table/narrow.html:38
 #, draft
 msgid "from"
 msgstr "από"
@@ -3657,7 +3669,7 @@ msgstr "από"
 msgid "From"
 msgstr "Από"
 
-#: src/postulo/jobs/models.py:715
+#: src/postulo/jobs/models.py:735
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "από %(low)s"
@@ -3672,7 +3684,7 @@ msgstr "Από %(name)s."
 msgid "from address"
 msgstr "διεύθυνση αποστολέα"
 
-#: src/postulo/jobs/models.py:108
+#: src/postulo/jobs/models.py:128
 #, draft
 msgid "From an address"
 msgstr "Από διεύθυνση"
@@ -3704,7 +3716,7 @@ msgstr "από κατάσταση"
 msgid "Frozen at the moment of sending"
 msgstr "Παγωμένο τη στιγμή της αποστολής"
 
-#: src/postulo/jobs/models.py:461
+#: src/postulo/jobs/models.py:481
 #, draft
 msgid "Full time"
 msgstr "Πλήρης απασχόληση"
@@ -3761,7 +3773,7 @@ msgid "Go back"
 msgstr "Επιστροφή"
 
 #: src/postulo/applications/widgets.py:137
-#: src/postulo/templates/applications/partials/filters.html:47
+#: src/postulo/templates/applications/partials/filters.html:48
 #: src/postulo/templates/settings/appearance.html:45
 #, draft
 msgid "Gone quiet"
@@ -3996,7 +4008,7 @@ msgstr "Πώς συνδέεστε: το όνομα χρήστη σας, οι δ�
 msgid "However you prefer to group your search."
 msgstr "Όπως προτιμάτε να ομαδοποιείτε την αναζήτησή σας."
 
-#: src/postulo/jobs/models.py:456
+#: src/postulo/jobs/models.py:476
 #, draft
 msgid "Hybrid"
 msgstr "Υβριδικό"
@@ -4012,7 +4024,7 @@ msgid "id in the store"
 msgstr "αναγνωριστικό στην αποθήκη"
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
-#: src/postulo/jobs/models.py:307 src/postulo/plugins/models.py:262
+#: src/postulo/jobs/models.py:327 src/postulo/plugins/models.py:262
 #, draft
 msgid "identifier"
 msgstr "αναγνωριστικό"
@@ -4201,7 +4213,7 @@ msgstr "διεύθυνση ευρετηρίου"
 msgid "Industries"
 msgstr "Κλάδοι"
 
-#: src/postulo/jobs/models.py:51 src/postulo/jobs/models.py:148
+#: src/postulo/jobs/models.py:51 src/postulo/jobs/models.py:168
 #, draft
 msgid "industries"
 msgstr "κλάδοι"
@@ -4280,7 +4292,7 @@ msgstr "Ασφάλειες"
 msgid "Internal"
 msgstr "Εσωτερικό"
 
-#: src/postulo/jobs/models.py:465
+#: src/postulo/jobs/models.py:485
 #, draft
 msgid "Internship"
 msgstr "Πρακτική άσκηση"
@@ -4458,12 +4470,12 @@ msgstr "Το αρχείο του ταιριάζει με αυτό που υπέ�
 msgid "Job board"
 msgstr "Ιστότοπος αγγελιών"
 
-#: src/postulo/jobs/models.py:626
+#: src/postulo/jobs/models.py:646
 #, draft
 msgid "job posting"
 msgstr "αγγελία εργασίας"
 
-#: src/postulo/jobs/models.py:627
+#: src/postulo/jobs/models.py:647
 #, draft
 msgid "job postings"
 msgstr "αγγελίες εργασίας"
@@ -4650,7 +4662,7 @@ msgid "Largest page read"
 msgstr "Μεγαλύτερη σελίδα που διαβάστηκε"
 
 #: src/postulo/applications/reports.py:480
-#: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:85
+#: src/postulo/applications/tables.py:87 src/postulo/jobs/tables.py:116
 #: src/postulo/templates/applications/report.html:230
 #: src/postulo/templates/applications/report_print.html:154
 #, draft
@@ -4882,7 +4894,7 @@ msgstr "Σύνδεσμοι που τους δείξατε"
 msgid "listening"
 msgstr "κατανόηση προφορικού λόγου"
 
-#: src/postulo/jobs/models.py:761
+#: src/postulo/jobs/models.py:781
 #: src/postulo/templates/core/import_csv_map.html:86
 #, draft
 msgid "listing"
@@ -4914,8 +4926,8 @@ msgid ""
 msgstr ""
 "Αγγελίες, αιτήσεις και τα χρονολόγιά τους, εταιρείες και άτομα, υπενθυμίσεις, το κείμενο όσων στείλατε, επιστολές, βιογραφικά, αρχεία και το ιστορικό σταδιοδρομίας σας — όλα, μαζί με ό,τι είναι κλειστό ή απορριφθέν, επειδή ψάχνετε κάτι που θυμάστε."
 
-#: src/postulo/accounts/models.py:271 src/postulo/jobs/models.py:146
-#: src/postulo/jobs/models.py:566 src/postulo/resume/models.py:67
+#: src/postulo/accounts/models.py:271 src/postulo/jobs/models.py:166
+#: src/postulo/jobs/models.py:586 src/postulo/resume/models.py:67
 #: src/postulo/resume/models.py:98
 #, draft
 msgid "location"
@@ -4929,7 +4941,7 @@ msgstr "τοποθεσία"
 msgid "Location"
 msgstr "Τοποθεσία"
 
-#: src/postulo/jobs/models.py:158
+#: src/postulo/jobs/models.py:178
 #, draft
 msgid "logo"
 msgstr "λογότυπο"
@@ -4939,12 +4951,12 @@ msgstr "λογότυπο"
 msgid "Logo address"
 msgstr "Διεύθυνση λογότυπου"
 
-#: src/postulo/jobs/models.py:162
+#: src/postulo/jobs/models.py:182
 #, draft
 msgid "logo address"
 msgstr "διεύθυνση λογότυπου"
 
-#: src/postulo/jobs/models.py:163
+#: src/postulo/jobs/models.py:183
 #, draft
 msgid "logo fetched"
 msgstr "λογότυπο που λήφθηκε"
@@ -5301,9 +5313,9 @@ msgstr "κλάδος NACE"
 #: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
-#: src/postulo/jobs/models.py:41 src/postulo/jobs/models.py:126
-#: src/postulo/jobs/models.py:309 src/postulo/jobs/models.py:383
-#: src/postulo/jobs/models.py:421 src/postulo/plugins/models.py:48
+#: src/postulo/jobs/models.py:41 src/postulo/jobs/models.py:146
+#: src/postulo/jobs/models.py:329 src/postulo/jobs/models.py:403
+#: src/postulo/jobs/models.py:441 src/postulo/plugins/models.py:48
 #: src/postulo/resume/models.py:116 src/postulo/resume/models.py:131
 #: src/postulo/resume/models.py:150 src/postulo/resume/models.py:167
 #, draft
@@ -5344,6 +5356,10 @@ msgid ""
 msgstr ""
 "Η αναγραφή διεύθυνσης περιορίζει την πρόσκληση σε αυτό το άτομο. Αν μείνει κενή, δημιουργείται σύνδεσμος που όποιος τον κατέχει μπορεί να χρησιμοποιήσει μία φορά."
 
+#: src/postulo/templates/partials/table/narrow.html:14
+msgid "Narrow"
+msgstr ""
+
 #: src/postulo/resume/models.py:191
 #, draft
 msgid "Native"
@@ -5359,7 +5375,7 @@ msgstr "Ποτέ"
 msgid "never used"
 msgstr "δεν χρησιμοποιήθηκε ποτέ"
 
-#: src/postulo/jobs/models.py:484
+#: src/postulo/jobs/models.py:504
 #, draft
 msgid "New"
 msgstr "Νέα"
@@ -5749,7 +5765,7 @@ msgid ""
 msgstr ""
 "Δεν έχει ρυθμιστεί. Ορίστε τα POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID και POSTULO_OIDC_CLIENT_SECRET στο περιβάλλον για να προσφέρετε κουμπί σύνδεσης με πάροχο OpenID Connect."
 
-#: src/postulo/jobs/models.py:490
+#: src/postulo/jobs/models.py:510
 #, draft
 msgid "Not for me"
 msgstr "Όχι για μένα"
@@ -5853,19 +5869,19 @@ msgstr "Σημείωση (προαιρετικό)"
 msgid "noted %(when)s"
 msgstr "σημειώθηκε %(when)s"
 
-#: src/postulo/jobs/models.py:619
+#: src/postulo/jobs/models.py:639
 #, draft
 msgid "noted on"
 msgstr "σημειώθηκε στις"
 
-#: src/postulo/core/csv_import.py:53 src/postulo/jobs/tables.py:76
+#: src/postulo/core/csv_import.py:53 src/postulo/jobs/tables.py:98
 #: src/postulo/templates/jobs/company_detail.html:183
 #, draft
 msgid "Notes"
 msgstr "Σημειώσεις"
 
-#: src/postulo/documents/models.py:404 src/postulo/jobs/models.py:150
-#: src/postulo/jobs/models.py:435
+#: src/postulo/documents/models.py:404 src/postulo/jobs/models.py:170
+#: src/postulo/jobs/models.py:455
 #, draft
 msgid "notes"
 msgstr "σημειώσεις"
@@ -6218,7 +6234,7 @@ msgstr "Επίσημο"
 msgid "older than a week"
 msgstr "παλαιότερο από μία εβδομάδα"
 
-#: src/postulo/applications/models.py:459 src/postulo/jobs/models.py:455
+#: src/postulo/applications/models.py:459 src/postulo/jobs/models.py:475
 #, draft
 msgid "On site"
 msgstr "Με φυσική παρουσία"
@@ -6496,7 +6512,7 @@ msgstr "Αρχική αγγελία"
 #: src/postulo/applications/models.py:88 src/postulo/applications/models.py:343
 #: src/postulo/applications/models.py:462 src/postulo/core/models.py:172
 #: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:147
-#: src/postulo/documents/models.py:375 src/postulo/jobs/models.py:494
+#: src/postulo/documents/models.py:375 src/postulo/jobs/models.py:514
 #: src/postulo/resume/models.py:219
 #, draft
 msgid "Other"
@@ -6578,17 +6594,17 @@ msgstr "Σελιδοποίηση"
 msgid "Panel"
 msgstr "Επιτροπή"
 
-#: src/postulo/jobs/models.py:751
+#: src/postulo/jobs/models.py:771
 #, draft
 msgid "parsed posting"
 msgstr "αναλυμένη αγγελία"
 
-#: src/postulo/jobs/models.py:139
+#: src/postulo/jobs/models.py:159
 #, draft
 msgid "part of"
 msgstr "μέρος της"
 
-#: src/postulo/jobs/tables.py:71
+#: src/postulo/jobs/tables.py:77
 #, draft
 msgid "Part of"
 msgstr "Μέρος του"
@@ -6603,7 +6619,7 @@ msgstr "Μέρος της <a href=\"%(parent_url)s\" class=\"underline\">%(name)
 msgid "Part of this company"
 msgstr "Μέρος αυτής της εταιρείας"
 
-#: src/postulo/jobs/models.py:462
+#: src/postulo/jobs/models.py:482
 #, draft
 msgid "Part time"
 msgstr "Μερική απασχόληση"
@@ -6670,29 +6686,29 @@ msgstr "Μόνο εκκρεμείς"
 #: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
 #: src/postulo/core/server_views.py:145 src/postulo/core/server_views.py:231
 #: src/postulo/core/server_views.py:248 src/postulo/core/server_views.py:326
-#: src/postulo/core/server_views.py:343 src/postulo/jobs/tables.py:73
+#: src/postulo/core/server_views.py:343 src/postulo/jobs/tables.py:81
 #: src/postulo/templates/jobs/company_detail.html:190
 #: src/postulo/templates/server/people.html:7
 #, draft
 msgid "People"
 msgstr "Άτομα"
 
-#: src/postulo/jobs/models.py:472
+#: src/postulo/jobs/models.py:492
 #, draft
 msgid "Per day"
 msgstr "Ανά ημέρα"
 
-#: src/postulo/jobs/models.py:473
+#: src/postulo/jobs/models.py:493
 #, draft
 msgid "Per hour"
 msgstr "Ανά ώρα"
 
-#: src/postulo/jobs/models.py:471
+#: src/postulo/jobs/models.py:491
 #, draft
 msgid "Per month"
 msgstr "Ανά μήνα"
 
-#: src/postulo/jobs/models.py:470
+#: src/postulo/jobs/models.py:490
 #, draft
 msgid "Per year"
 msgstr "Ανά έτος"
@@ -6898,7 +6914,7 @@ msgid "postal address"
 msgstr "ταχυδρομική διεύθυνση"
 
 #: src/postulo/accounts/models.py:266 src/postulo/core/models.py:429
-#: src/postulo/jobs/models.py:431
+#: src/postulo/jobs/models.py:451
 #, draft
 msgid "postal addresses"
 msgstr "ταχυδρομικές διευθύνσεις"
@@ -6914,7 +6930,7 @@ msgstr "Ταχυδρομικές διευθύνσεις"
 msgid "postcode"
 msgstr "ταχυδρομικός κώδικας"
 
-#: src/postulo/jobs/models.py:598
+#: src/postulo/jobs/models.py:618
 #, draft
 msgid "posted on"
 msgstr "δημοσιεύθηκε στις"
@@ -6950,12 +6966,12 @@ msgstr "Η αγγελία ενημερώθηκε."
 msgid "Posting URL"
 msgstr "URL αγγελίας"
 
-#: src/postulo/jobs/models.py:574
+#: src/postulo/jobs/models.py:594
 #, draft
 msgid "posting URL"
 msgstr "URL αγγελίας"
 
-#: src/postulo/jobs/tables.py:52
+#: src/postulo/jobs/tables.py:54
 #: src/postulo/templates/jobs/company_detail.html:112
 #, draft
 msgid "Postings"
@@ -7308,7 +7324,7 @@ msgid "Read as Europass XML, the format the CV editor produced."
 msgstr ""
 "Διαβάστηκε ως Europass XML, η μορφή που παρήγαγε ο επεξεργαστής βιογραφικού."
 
-#: src/postulo/jobs/models.py:743
+#: src/postulo/jobs/models.py:763
 #, draft
 msgid "read by"
 msgstr "διαβάστηκε από"
@@ -7570,7 +7586,7 @@ msgid "Reminders that have come due, each with a button to mark it done."
 msgstr ""
 "Υπενθυμίσεις που έληξαν, καθεμιά με ένα κουμπί για να τη σημειώσετε ολοκληρωμένη."
 
-#: src/postulo/jobs/models.py:457
+#: src/postulo/jobs/models.py:477
 #, draft
 msgid "Remote"
 msgstr "Εξ αποστάσεως"
@@ -7754,7 +7770,7 @@ msgstr "Το robots.txt αγνοείται αυτή τη στιγμή."
 msgid "Role"
 msgstr "Ρόλος"
 
-#: src/postulo/jobs/models.py:422 src/postulo/resume/models.py:66
+#: src/postulo/jobs/models.py:442 src/postulo/resume/models.py:66
 #, draft
 msgid "role"
 msgstr "ρόλος"
@@ -7808,12 +7824,12 @@ msgstr "Μισθός (ένα ποσό ή εύρος)"
 msgid "Salary from"
 msgstr "Μισθός από"
 
-#: src/postulo/jobs/models.py:584
+#: src/postulo/jobs/models.py:604
 #, draft
 msgid "salary from"
 msgstr "μισθός από"
 
-#: src/postulo/jobs/models.py:591
+#: src/postulo/jobs/models.py:611
 #, draft
 msgid "salary period"
 msgstr "περίοδος μισθού"
@@ -7823,7 +7839,7 @@ msgstr "περίοδος μισθού"
 msgid "Salary to"
 msgstr "Μισθός έως"
 
-#: src/postulo/jobs/models.py:587
+#: src/postulo/jobs/models.py:607
 #, draft
 msgid "salary to"
 msgstr "μισθός έως"
@@ -7909,7 +7925,7 @@ msgstr "Αποθηκεύτηκε."
 msgid "Say what this address is."
 msgstr "Πείτε τι είναι αυτή η διεύθυνση."
 
-#: src/postulo/jobs/models.py:343
+#: src/postulo/jobs/models.py:363
 #, draft
 msgid "Say what this identifier is."
 msgstr "Πείτε τι είναι αυτό το αναγνωριστικό."
@@ -8174,7 +8190,7 @@ msgstr "Όρισε τον κωδικό"
 msgid "Set up"
 msgstr "Ρύθμιση"
 
-#: src/postulo/jobs/models.py:609
+#: src/postulo/jobs/models.py:629
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Ορίστε όταν η θέση δεν είναι πλέον διαθέσιμη."
@@ -8215,7 +8231,7 @@ msgstr "Συντομεύσεις"
 msgid "Shortlist"
 msgstr "Λίστα επιλογής"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:485
+#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:505
 #, draft
 msgid "Shortlisted"
 msgstr "Στη λίστα επιλογής"
@@ -8534,12 +8550,12 @@ msgid "Somebody has agreed to this. Test it to be sure it still stands."
 msgstr ""
 "Κάποιος έχει συμφωνήσει. Δοκιμάστε το για να βεβαιωθείτε ότι ισχύει ακόμη."
 
-#: src/postulo/core/tables.py:255
+#: src/postulo/core/tables.py:260
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Ταξινόμηση κατά %(column)s, από το υψηλότερο"
 
-#: src/postulo/core/tables.py:257
+#: src/postulo/core/tables.py:262
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Ταξινόμηση κατά %(column)s, από το χαμηλότερο"
@@ -8561,7 +8577,7 @@ msgid ""
 msgstr ""
 "Η πηγή είναι το πεδίο «βρέθηκε μέσω» μιας αγγελίας. Συμπληρώστε το και αυτός ο πίνακας αρχίζει να αξίζει τη θέση του."
 
-#: src/postulo/jobs/models.py:744
+#: src/postulo/jobs/models.py:764
 #, draft
 msgid "source version"
 msgstr "έκδοση πηγής"
@@ -8618,7 +8634,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, μετά τη σύνδεση"
 
-#: src/postulo/jobs/models.py:613 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:633 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "κατάσταση"
@@ -8645,7 +8661,7 @@ msgstr "Κατάσταση"
 
 #: src/postulo/applications/models.py:198
 #: src/postulo/applications/models.py:663 src/postulo/documents/models.py:609
-#: src/postulo/jobs/models.py:753
+#: src/postulo/jobs/models.py:773
 #, draft
 msgid "status"
 msgstr "κατάσταση"
@@ -8695,7 +8711,7 @@ msgstr ""
 msgid "Stop it working"
 msgstr "Πάψε τη λειτουργία του"
 
-#: src/postulo/core/tables.py:252
+#: src/postulo/core/tables.py:257
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Διακοπή ταξινόμησης κατά %(column)s"
@@ -8926,7 +8942,7 @@ msgid "telephone number"
 msgstr "αριθμός τηλεφώνου"
 
 #: src/postulo/accounts/models.py:263 src/postulo/core/models.py:217
-#: src/postulo/jobs/models.py:428
+#: src/postulo/jobs/models.py:448
 #, draft
 msgid "telephone numbers"
 msgstr "αριθμοί τηλεφώνου"
@@ -9014,7 +9030,7 @@ msgstr "Αυτή η διεύθυνση ανακατεύθυνε πάρα πολ�
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Αυτή η διεύθυνση επέστρεψε %(kind)s αντί για ιστοσελίδα."
 
-#: src/postulo/jobs/models.py:214
+#: src/postulo/jobs/models.py:234
 #, python-format, draft
 msgid ""
 "That chain is more than %(limit)s companies deep, which is deeper than any group Postulo can usefully draw."
@@ -9036,7 +9052,7 @@ msgstr "Αυτή η σύνδεση δεν χρησιμοποιεί συγκατ�
 msgid "That connection no longer exists."
 msgstr "Αυτή η σύνδεση δεν υπάρχει πια."
 
-#: src/postulo/jobs/models.py:450
+#: src/postulo/jobs/models.py:470
 #, draft
 msgid "That department belongs to a different company."
 msgstr "Αυτό το τμήμα ανήκει σε άλλη εταιρεία."
@@ -9266,7 +9282,7 @@ msgstr "Σε αυτή την πρόταση έχει ήδη απαντηθεί."
 msgid "That was the last capture waiting."
 msgstr ""
 
-#: src/postulo/jobs/models.py:203
+#: src/postulo/jobs/models.py:223
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Αυτό θα δημιουργούσε βρόχο: η %(name)s ανήκει ήδη σε αυτήν."
@@ -9302,7 +9318,7 @@ msgstr "Η διεύθυνση απάντησε %(code)s."
 msgid "The address answered with nothing."
 msgstr "Η διεύθυνση απάντησε χωρίς τίποτα."
 
-#: src/postulo/jobs/models.py:603
+#: src/postulo/jobs/models.py:623
 #, draft
 msgid "The application deadline, if stated."
 msgstr "Η προθεσμία αίτησης, αν αναφέρεται."
@@ -9347,7 +9363,7 @@ msgid ""
 msgstr ""
 "Η εταιρεία αντιστοιχίζεται κατά όνομα και δημιουργείται αν είναι νέα. Μόνο η εταιρεία και ο τίτλος θέσης είναι υποχρεωτικά· όλα τα άλλα μπορούν να συμπληρωθούν αργότερα."
 
-#: src/postulo/jobs/models.py:140
+#: src/postulo/jobs/models.py:160
 #, draft
 msgid "The company this one belongs to, if it belongs to one."
 msgstr "Η εταιρεία στην οποία ανήκει αυτή, αν ανήκει σε κάποια."
@@ -9492,12 +9508,12 @@ msgid ""
 msgstr ""
 "Τα δέκα τελευταία που κατέγραψε το χρονολόγιο, σε όποια αίτηση κι αν ήταν."
 
-#: src/postulo/jobs/models.py:762
+#: src/postulo/jobs/models.py:782
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "Η αγγελία στην οποία μετατράπηκε αυτή η σύλληψη, μετά τον έλεγχο."
 
-#: src/postulo/jobs/models.py:492
+#: src/postulo/jobs/models.py:512
 #, draft
 msgid "The location"
 msgstr "Η τοποθεσία"
@@ -9582,7 +9598,7 @@ msgid ""
 msgstr ""
 "Ο κωδικός πρόσβασης ορίζεται από το <code>%(variable)s</code> στο περιβάλλον· αλλάξτε τον εκεί. Δεν εμφανίζεται ποτέ εδώ."
 
-#: src/postulo/jobs/models.py:491
+#: src/postulo/jobs/models.py:511
 #, draft
 msgid "The pay"
 msgstr "Οι αποδοχές"
@@ -10028,7 +10044,7 @@ msgid "timeout in seconds"
 msgstr "χρονικό όριο σε δευτερόλεπτα"
 
 #: src/postulo/documents/models.py:386 src/postulo/documents/models.py:477
-#: src/postulo/jobs/models.py:565 src/postulo/resume/models.py:241
+#: src/postulo/jobs/models.py:585 src/postulo/resume/models.py:241
 #, draft
 msgid "title"
 msgstr "τίτλος"
@@ -10048,7 +10064,8 @@ msgstr "TLS από το πρώτο byte"
 msgid "To"
 msgstr "Έως"
 
-#: src/postulo/templates/partials/table/head.html:101
+#: src/postulo/templates/partials/table/head.html:119
+#: src/postulo/templates/partials/table/narrow.html:41
 #, draft
 msgid "to"
 msgstr "έως"
@@ -10156,7 +10173,7 @@ msgstr "Δοκιμάστε λιγότερες λέξεις, ή διαφορετ�
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Ενεργοποιήστε πρώτα το «Χρήση του Gravatar μου»."
 
-#: src/postulo/jobs/models.py:724
+#: src/postulo/jobs/models.py:744
 #, draft
 msgid "Turned into an application"
 msgstr "Μετατράπηκε σε αίτηση"
@@ -10238,7 +10255,7 @@ msgstr ""
 msgid "until"
 msgstr "έως"
 
-#: src/postulo/jobs/models.py:717
+#: src/postulo/jobs/models.py:737
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "έως %(high)s"
@@ -10276,7 +10293,7 @@ msgstr "Ανέβασμα εικόνας"
 msgid "Upload and map the columns"
 msgstr "Ανέβασμα και αντιστοίχιση των στηλών"
 
-#: src/postulo/jobs/models.py:110 src/postulo/plugins/provenance.py:62
+#: src/postulo/jobs/models.py:130 src/postulo/plugins/provenance.py:62
 #: src/postulo/templates/accounts/profile.html:45
 #, draft
 msgid "Uploaded"
@@ -10453,7 +10470,7 @@ msgstr "Βιντεοκλήση"
 msgid "Waiting after this one: %(count)s."
 msgstr ""
 
-#: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:723
+#: src/postulo/applications/models.py:601 src/postulo/jobs/models.py:743
 #, draft
 msgid "Waiting for review"
 msgstr "Αναμένει έλεγχο"
@@ -10506,19 +10523,19 @@ msgid "web link"
 msgstr "σύνδεσμος ιστού"
 
 #: src/postulo/accounts/models.py:269 src/postulo/core/models.py:544
-#: src/postulo/jobs/models.py:434
+#: src/postulo/jobs/models.py:454
 #, draft
 msgid "web links"
 msgstr "σύνδεσμοι ιστού"
 
 #: src/postulo/core/models.py:526 src/postulo/core/web_links.py:113
-#: src/postulo/jobs/tables.py:74
+#: src/postulo/jobs/tables.py:88
 #: src/postulo/templates/jobs/company_detail.html:84
 #, draft
 msgid "Website"
 msgstr "Ιστότοπος"
 
-#: src/postulo/jobs/models.py:142 src/postulo/resume/views.py:453
+#: src/postulo/jobs/models.py:162 src/postulo/resume/views.py:453
 #, draft
 msgid "website"
 msgstr "ιστότοπος"
@@ -10701,7 +10718,7 @@ msgid ""
 msgstr ""
 "Τι δείχνει ο πίνακας, και με ποια σειρά. Ό,τι ήταν στο Insights είναι εδώ ως στοιχείο· αφαιρέστε ό,τι δεν διαβάζετε ποτέ και βάλτε τα υπόλοιπα όπου θέλετε."
 
-#: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:312
+#: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:332
 #, draft
 msgid "What the identifier is, when the scheme is Other."
 msgstr "Τι είναι το αναγνωριστικό, όταν το σχήμα είναι Άλλο."
@@ -10798,7 +10815,7 @@ msgstr "Πότε"
 msgid "When accepting should also move the application."
 msgstr "Όταν η αποδοχή πρέπει και να μετακινήσει την αίτηση."
 
-#: src/postulo/jobs/models.py:619
+#: src/postulo/jobs/models.py:639
 #, draft
 msgid "When it entered your listings."
 msgstr "Πότε μπήκε στις αγγελίες σας."
@@ -10820,7 +10837,7 @@ msgstr "πού"
 msgid "Where plugins may come from"
 msgstr "Από πού μπορούν να έρχονται τα πρόσθετα"
 
-#: src/postulo/jobs/models.py:160
+#: src/postulo/jobs/models.py:180
 #, draft
 msgid "where the logo came from"
 msgstr "από πού ήρθε το λογότυπο"
@@ -10859,12 +10876,12 @@ msgstr "Πού βρέθηκαν"
 msgid "Where things stand"
 msgstr "Πού βρίσκονται τα πράγματα"
 
-#: src/postulo/jobs/models.py:144
+#: src/postulo/jobs/models.py:164
 #, draft
 msgid "Where this company lists its openings."
 msgstr "Πού δημοσιεύει αυτή η εταιρεία τις ανοιχτές θέσεις της."
 
-#: src/postulo/jobs/models.py:579
+#: src/postulo/jobs/models.py:599
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr ""
@@ -10927,7 +10944,7 @@ msgid ""
 msgstr ""
 "Σε ποια γλώσσα είναι γραμμένη η εμπειρία, η εκπαίδευση και τα έργα σας. Ένα βιογραφικό σε άλλη γλώσσα δείχνει τι έχετε μεταφράσει και λέει τι δεν μπόρεσε."
 
-#: src/postulo/jobs/models.py:749
+#: src/postulo/jobs/models.py:769
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Ποιο μέρος του Postulo το παρήγαγε: η διεπαφή ιστού ή το API."
@@ -10962,7 +10979,7 @@ msgstr "ποιον συναντάτε"
 msgid "Why"
 msgstr "Γιατί"
 
-#: src/postulo/jobs/models.py:616
+#: src/postulo/jobs/models.py:636
 #, draft
 msgid "why it was discarded"
 msgstr "γιατί απορρίφθηκε"
@@ -11029,7 +11046,7 @@ msgstr "λειτούργησε %(when)s"
 msgid "Working arrangement"
 msgstr "Μορφή εργασίας"
 
-#: src/postulo/jobs/models.py:568
+#: src/postulo/jobs/models.py:588
 #, draft
 msgid "working arrangement"
 msgstr "μορφή εργασίας"

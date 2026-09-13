@@ -84,6 +84,23 @@
                 <option value="{{ value }}" {% if value == header.value %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
+          {% elif header.column.filter == 'number' %}
+            {% comment %} A least and a most, shaped like the date pair: "companies I have
+               applied to more than once" is the obvious question (#173). {% endcomment %}
+            <div class="flex flex-col gap-1">
+              <input type="number" id="{{ header.input_id }}-min" name="{{ header.column.name }}_min"
+                     value="{{ header.value_from }}" form="{{ form_id }}" inputmode="numeric" min="0"
+                     aria-label="{{ header.filter_label }}: {% translate 'at least' %}" placeholder="{% translate 'at least' %}"
+                     hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
+                     hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+                     class="field-input w-full min-w-20 px-2 py-1 text-xs normal-case tracking-normal">
+              <input type="number" id="{{ header.input_id }}-max" name="{{ header.column.name }}_max"
+                     value="{{ header.value_to }}" form="{{ form_id }}" inputmode="numeric" min="0"
+                     aria-label="{{ header.filter_label }}: {% translate 'at most' %}" placeholder="{% translate 'at most' %}"
+                     hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
+                     hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+                     class="field-input w-full min-w-20 px-2 py-1 text-xs normal-case tracking-normal">
+            </div>
           {% elif header.column.filter == 'date' %}
             <div class="flex flex-col gap-1">
               <input type="date" id="{{ header.input_id }}-from" name="{{ header.column.name }}_from"
