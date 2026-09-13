@@ -198,6 +198,16 @@
                 {% if not plugin.present %}
                   <span class="ms-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200">{% translate "not loaded" %}</span>
                 {% endif %}
+                {% comment %} Said here and not only in a log: a core upgrade is what makes
+                   a plugin stop fitting, and the page is where an administrator looks for
+                   why something stopped working (#186). {% endcomment %}
+                {% if not plugin.compatible %}
+                  <span class="ms-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200" data-needs-postulo>
+                    {% blocktranslate trimmed with wanted=plugin.requires_postulo %}
+                      for Postulo {{ wanted }}
+                    {% endblocktranslate %}
+                  </span>
+                {% endif %}
                 {% comment %} Where it came from, derived rather than declared: an upload
                    is named as a repository's only when its checksum matches what that
                    repository signed. Deliberately not styled as a reassurance -- installing
@@ -376,14 +386,24 @@
                   · <code>{{ listing.catalogue }}</code>
                 </p>
               </div>
-              <form method="post" action="{% url 'server:plugin_action' %}">
-                {% csrf_token %}
-                <input type="hidden" name="name" value="{{ listing.name }}">
-                <input type="hidden" name="action" value="install">
-                <button type="submit" class="btn-secondary px-3 py-1 text-sm">
-                  {% if listing.installed %}{% translate "Reinstall" %}{% else %}{% translate "Install" %}{% endif %}
-                </button>
-              </form>
+              {% if listing.compatible %}
+                <form method="post" action="{% url 'server:plugin_action' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="name" value="{{ listing.name }}">
+                  <input type="hidden" name="action" value="install">
+                  <button type="submit" class="btn-secondary px-3 py-1 text-sm">
+                    {% if listing.installed %}{% translate "Reinstall" %}{% else %}{% translate "Install" %}{% endif %}
+                  </button>
+                </form>
+              {% else %}
+                {% comment %} No button: installing would refuse with this same sentence,
+                   and a control that can only refuse is worse than the sentence. {% endcomment %}
+                <p class="text-xs text-amber-800 dark:text-amber-200" data-needs-postulo>
+                  {% blocktranslate trimmed with wanted=listing.requires_postulo %}
+                    For Postulo {{ wanted }}; this is a different one.
+                  {% endblocktranslate %}
+                </p>
+              {% endif %}
             </li>
           {% endfor %}
         </ul>

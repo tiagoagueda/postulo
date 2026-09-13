@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-13 03:33+0000\n"
+"POT-Creation-Date: 2026-09-13 03:41+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: eesti\n"
@@ -222,7 +222,13 @@ msgstr ""
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s kuni %(high)s"
 
-#: src/postulo/core/server_views.py:1272
+#: src/postulo/plugins/catalogue.py:348
+#, python-format
+msgid ""
+"%(name)s %(version)s is for Postulo %(wanted)s, and this is Postulo %(have)s."
+msgstr ""
+
+#: src/postulo/core/server_views.py:1274
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s on kataloogist paigaldatud."
@@ -233,6 +239,12 @@ msgid ""
 "%(name)s %(version)s is installed. Restart Postulo if it adds pages of its own; anything else is available now."
 msgstr ""
 "%(name)s %(version)s on paigaldatud. Taaskäivitage Postulo, kui see lisab omaenda lehti; kõik muu on kohe saadaval."
+
+#: src/postulo/plugins/catalogue.py:340
+#, python-format
+msgid ""
+"%(name)s %(version)s says which Postulo it is for in a way this cannot read: %(spec)s."
+msgstr ""
 
 #: src/postulo/templates/server/person_delete.html:8
 #, python-format, draft
@@ -246,14 +258,14 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s saab uuesti sisse logida."
 
-#: src/postulo/plugins/installing.py:372
+#: src/postulo/plugins/installing.py:409
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s ei deklareeri ühtegi Postulo sisenemispunkti, nii et selle paigaldamine ei teeks midagi. Plugin registreerub ühes neist: %(groups)s."
 
-#: src/postulo/plugins/installing.py:483
+#: src/postulo/plugins/installing.py:521
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s ei vasta kontrollsummale, millega see avaldati."
@@ -274,12 +286,12 @@ msgstr "%(name)s on kadunud: konto, selle kirjed ja %(files)s faili kettal."
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s ei ole enam administraator."
 
-#: src/postulo/plugins/installing.py:562 src/postulo/plugins/installing.py:633
+#: src/postulo/plugins/installing.py:601 src/postulo/plugins/installing.py:672
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s pole paigaldatud."
 
-#: src/postulo/plugins/installing.py:362
+#: src/postulo/plugins/installing.py:399
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -301,19 +313,19 @@ msgstr "%(name)s on nüüd administraator."
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "%(name)s on nüüd real %(row)s, kohal %(place)s."
 
-#: src/postulo/core/server_views.py:1333
+#: src/postulo/core/server_views.py:1335
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s on eemaldatud. Taaskäivitage Postulo, et olla kindel, et sellest pole midagi laetuks jäänud."
 
-#: src/postulo/core/server_views.py:1305
+#: src/postulo/core/server_views.py:1307
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s on välja lülitatud; selle failid on endiselt siin."
 
-#: src/postulo/core/server_views.py:1307
+#: src/postulo/core/server_views.py:1309
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s on jälle sisse lülitatud."
@@ -325,12 +337,12 @@ msgid ""
 msgstr ""
 "%(name)s on keel, millega uus konto algab, seega ei saa selle pakkumist lõpetada. Muutke esmalt vaikekeelt."
 
-#: src/postulo/plugins/installing.py:558
+#: src/postulo/plugins/installing.py:597
 #, python-format, draft
 msgid "%(name)s ships inside Postulo and cannot be removed."
 msgstr "%(name)s kuulub Postulo koosseisu ja seda ei saa eemaldada."
 
-#: src/postulo/plugins/installing.py:620
+#: src/postulo/plugins/installing.py:659
 #, python-format, draft
 msgid ""
 "%(name)s ships inside Postulo. Switch it off under Server settings → Plugins instead."
@@ -344,7 +356,7 @@ msgid ""
 msgstr ""
 "%(name)s logib sisse nimega <strong>%(current)s</strong>. Uus kasutajanimi peab selles eksemplaris vaba olema; suurtähed seda ei erista."
 
-#: src/postulo/plugins/installing.py:382
+#: src/postulo/plugins/installing.py:419
 #, python-format, draft
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s muudaks seda, millest sõltub Postulo ise. %(problems)s"
@@ -371,7 +383,7 @@ msgstr ""
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:348
+#: src/postulo/plugins/installing.py:354
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: vajab %(wanted)s, ja Postulol on %(have)s."
@@ -467,7 +479,7 @@ msgid_plural "%(total)s highlights"
 msgstr[0] "%(total)s tipphetk"
 msgstr[1] "%(total)s tipphetke"
 
-#: src/postulo/templates/server/plugins.html:254
+#: src/postulo/templates/server/plugins.html:265
 #, python-format, draft
 msgid "%(total)s package came with it"
 msgid_plural "%(total)s packages came with it"
@@ -481,12 +493,12 @@ msgid_plural "%(total)s records"
 msgstr[0] "%(total)s kirje"
 msgstr[1] "%(total)s kirjet"
 
-#: src/postulo/plugins/catalogue.py:250 src/postulo/plugins/catalogue.py:278
+#: src/postulo/plugins/catalogue.py:252 src/postulo/plugins/catalogue.py:280
 #, python-format, draft
 msgid "%(url)s answered %(code)s."
 msgstr "%(url)s vastas %(code)s."
 
-#: src/postulo/plugins/catalogue.py:255
+#: src/postulo/plugins/catalogue.py:257
 #, python-format, draft
 msgid "%(url)s is far larger than a catalogue should be."
 msgstr "%(url)s on palju suurem, kui kataloog olema peaks."
@@ -654,7 +666,7 @@ msgid ""
 msgstr ""
 "Numbrit hoitakse selles paigalduses üks kord. Kui see on siin juba kirjas, ütleb salvestamine seda, selle asemel et see omanikult ära võtta."
 
-#: src/postulo/templates/server/plugins.html:450
+#: src/postulo/templates/server/plugins.html:472
 #, python-format, draft
 msgid ""
 "A package registers a source under the <code>%(group)s</code> entry-point group. A plugin that only registers entry points appears as soon as it is installed; one that adds pages of its own needs a restart. A source that fails to load is logged and left out, and the built-in ones keep working."
@@ -748,7 +760,7 @@ msgstr ""
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Profiil GitHubis, Forgejos, GitLabis või sarnases."
 
-#: src/postulo/templates/server/plugins.html:351
+#: src/postulo/templates/server/plugins.html:362
 #, draft
 msgid ""
 "A Python wheel (<code>.whl</code>) built for any platform. Postulo reads what it says about itself and shows you that before anything is installed."
@@ -1636,7 +1648,7 @@ msgstr "sisu"
 msgid "Bringing a spreadsheet in"
 msgstr "Arvutustabeli sissetoomine"
 
-#: src/postulo/templates/server/plugins.html:442
+#: src/postulo/templates/server/plugins.html:464
 #, draft
 msgid "built in"
 msgstr "sisseehitatud"
@@ -1718,7 +1730,7 @@ msgstr "Tagasikutse URL, mis registreerida teenusepakkuja juures"
 #: src/postulo/templates/resume/item_form.html:27
 #: src/postulo/templates/server/person_delete.html:29
 #: src/postulo/templates/server/person_username.html:23
-#: src/postulo/templates/server/plugins.html:343
+#: src/postulo/templates/server/plugins.html:354
 #, draft
 msgid "Cancel"
 msgstr "Loobu"
@@ -1772,7 +1784,7 @@ msgstr "Püüdmine tagasi lükatud."
 msgid "Capture postings"
 msgstr "Püüa kuulutusi"
 
-#: src/postulo/templates/server/plugins.html:426
+#: src/postulo/templates/server/plugins.html:448
 #, draft
 msgid "Capture sources this instance has"
 msgstr "Selle instantsi püüdmisallikad"
@@ -1847,7 +1859,7 @@ msgstr "Karjäärileht"
 msgid "Carried by the %(label)s transport, version %(version)s."
 msgstr "Veab transport %(label)s, versioon %(version)s."
 
-#: src/postulo/templates/server/plugins.html:364
+#: src/postulo/templates/server/plugins.html:375
 #, draft
 msgid "Catalogues"
 msgstr "Kataloogid"
@@ -1919,7 +1931,7 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Tuleta ettevõttele %(company)s meelde: %(role)s"
 
-#: src/postulo/templates/server/plugins.html:374
+#: src/postulo/templates/server/plugins.html:385
 #, draft
 msgid "Check for updates"
 msgstr "Kontrolli uuendusi"
@@ -1944,7 +1956,7 @@ msgstr "Kontrollitud %(when)s: %(detail)s"
 msgid "checksum"
 msgstr "kontrollsumma"
 
-#: src/postulo/templates/server/plugins.html:336
+#: src/postulo/templates/server/plugins.html:347
 #, draft
 msgid "Checksum"
 msgstr "Kontrollsumma"
@@ -2775,7 +2787,7 @@ msgstr "Osakond"
 msgid "departments"
 msgstr "osakonnad"
 
-#: src/postulo/templates/server/plugins.html:327
+#: src/postulo/templates/server/plugins.html:338
 #, draft
 msgid "Depends on"
 msgstr "Sõltub"
@@ -3412,7 +3424,7 @@ msgstr "Too minu Gravatar uuesti"
 msgid "Fetched again."
 msgstr "Toodud uuesti."
 
-#: src/postulo/templates/server/plugins.html:332
+#: src/postulo/templates/server/plugins.html:343
 #, draft
 msgid ""
 "Fetched from PyPI when this is installed, along with whatever they need in turn. The checksum above covers this wheel only."
@@ -3569,6 +3581,16 @@ msgstr "Kellele"
 #, draft
 msgid "For example, “BSc Computer Science”."
 msgstr "Näiteks „Informaatika bakalaureus“."
+
+#: src/postulo/templates/server/plugins.html:213
+#, python-format
+msgid "for Postulo %(wanted)s"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html:415
+#, python-format
+msgid "For Postulo %(wanted)s; this is a different one."
+msgstr ""
 
 #: src/postulo/documents/models.py:110
 #, draft
@@ -4227,17 +4249,17 @@ msgstr "Valdkond ümber nimetatud."
 msgid "Information technology"
 msgstr "Infotehnoloogia"
 
-#: src/postulo/templates/server/plugins.html:395
+#: src/postulo/templates/server/plugins.html:407
 #, draft
 msgid "Install"
 msgstr "Paigalda"
 
-#: src/postulo/templates/server/plugins.html:313
+#: src/postulo/templates/server/plugins.html:324
 #, draft
 msgid "Install a package"
 msgstr "Paketi paigaldamine"
 
-#: src/postulo/templates/server/plugins.html:342
+#: src/postulo/templates/server/plugins.html:353
 #, draft
 msgid "Install it"
 msgstr "Paigalda see"
@@ -4805,7 +4827,7 @@ msgstr "kirjad"
 msgid "Level"
 msgstr "Tase"
 
-#: src/postulo/templates/server/plugins.html:322
+#: src/postulo/templates/server/plugins.html:333
 #, draft
 msgid "Licence"
 msgstr "Litsents"
@@ -5076,7 +5098,7 @@ msgstr "peamine kontakt"
 msgid "Main contact"
 msgstr "Peamine kontakt"
 
-#: src/postulo/templates/server/plugins.html:323
+#: src/postulo/templates/server/plugins.html:334
 #, draft
 msgid "Maintainer"
 msgstr "Hooldaja"
@@ -5313,7 +5335,7 @@ msgstr "nimi"
 #: src/postulo/templates/partials/web_links.html:33
 #: src/postulo/templates/server/people.html:32
 #: src/postulo/templates/server/people.html:45
-#: src/postulo/templates/server/plugins.html:320
+#: src/postulo/templates/server/plugins.html:331
 #, draft
 msgid "Name"
 msgstr "Nimi"
@@ -5459,24 +5481,24 @@ msgstr "Ei"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Aadressi ega võtit pole, seega sellest ei pakuta midagi."
 
-#: src/postulo/plugins/catalogue.py:223
+#: src/postulo/plugins/catalogue.py:225
 #, python-format, draft
 msgid "No catalogue called “%(name)s” is configured."
 msgstr "Ühtegi kataloogi nimega „%(name)s“ pole seadistatud."
 
-#: src/postulo/plugins/catalogue.py:307
+#: src/postulo/plugins/catalogue.py:309
 #, draft
 msgid "No catalogue is configured on this instance."
 msgstr "Sellel instantsil pole ühtegi kataloogi seadistatud."
 
-#: src/postulo/templates/server/plugins.html:410
+#: src/postulo/templates/server/plugins.html:432
 #, draft
 msgid ""
 "No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
 msgstr ""
 "Ühtegi kataloogi pole seadistatud, nii et pluginad paigaldatakse paketist, mille üles laadite. Kataloog on allkirjastatud nimekiri pluginatest, mida saab nime järgi paigaldada."
 
-#: src/postulo/plugins/catalogue.py:266
+#: src/postulo/plugins/catalogue.py:268
 #, python-format, draft
 msgid "No catalogue lists %(name)s."
 msgstr "Ükski kataloog ei sisalda %(name)s."
@@ -5871,7 +5893,7 @@ msgstr "Märkused"
 msgid "notes"
 msgstr "märkused"
 
-#: src/postulo/templates/server/plugins.html:329
+#: src/postulo/templates/server/plugins.html:340
 #, draft
 msgid "nothing"
 msgstr "mitte midagi"
@@ -5898,7 +5920,7 @@ msgstr ""
 msgid "Nothing here"
 msgstr "Siin pole midagi"
 
-#: src/postulo/plugins/installing.py:405
+#: src/postulo/plugins/installing.py:442
 #, draft
 msgid ""
 "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
@@ -5947,7 +5969,7 @@ msgstr "Midagi ei hoita."
 msgid "Nothing is installed here that you can turn on or off."
 msgstr "Siia pole paigaldatud midagi, mida saaksite sisse või välja lülitada."
 
-#: src/postulo/templates/server/plugins.html:305
+#: src/postulo/templates/server/plugins.html:316
 #, python-format, draft
 msgid ""
 "Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
@@ -6474,7 +6496,7 @@ msgstr "järjekord"
 msgid "organisation"
 msgstr "organisatsioon"
 
-#: src/postulo/templates/server/plugins.html:433
+#: src/postulo/templates/server/plugins.html:455
 #, draft
 msgid "Origin"
 msgstr "Päritolu"
@@ -6541,7 +6563,7 @@ msgstr "Ülevaade"
 msgid "owner"
 msgstr "omanik"
 
-#: src/postulo/templates/server/plugins.html:356
+#: src/postulo/templates/server/plugins.html:367
 #, draft
 msgid "Package"
 msgstr "Pakett"
@@ -7049,7 +7071,7 @@ msgstr "ettevalmistusmärkmed"
 msgid "present"
 msgstr "praegu"
 
-#: src/postulo/templates/server/plugins.html:403
+#: src/postulo/templates/server/plugins.html:425
 #, draft
 msgid ""
 "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
@@ -7177,7 +7199,7 @@ msgstr ""
 msgid "Provider"
 msgstr "Teenusepakkuja"
 
-#: src/postulo/templates/server/plugins.html:325
+#: src/postulo/templates/server/plugins.html:336
 #, draft
 msgid "Provides"
 msgstr "Pakub"
@@ -7321,7 +7343,7 @@ msgstr ""
 "Loe kõike: kandideerimised, kuulutused, ettevõtted, dokumendid, ülevaated"
 
 #: src/postulo/templates/resume/europass_import.html:31
-#: src/postulo/templates/server/plugins.html:359
+#: src/postulo/templates/server/plugins.html:370
 #, draft
 msgid "Read it"
 msgstr "Loe see"
@@ -7505,7 +7527,7 @@ msgstr "registreerimine avatud"
 msgid "Registration open"
 msgstr "Registreerimine avatud"
 
-#: src/postulo/templates/server/plugins.html:395
+#: src/postulo/templates/server/plugins.html:407
 #, draft
 msgid "Reinstall"
 msgstr "Paigalda uuesti"
@@ -7576,7 +7598,7 @@ msgstr "kaugaadress"
 #: src/postulo/templates/partials/postal_addresses.html:79
 #: src/postulo/templates/partials/web_links.html:44
 #: src/postulo/templates/server/plugins.html:151
-#: src/postulo/templates/server/plugins.html:285
+#: src/postulo/templates/server/plugins.html:296
 #, draft
 msgid "Remove"
 msgstr "Eemalda"
@@ -8118,7 +8140,7 @@ msgstr "Serveri seaded"
 msgid "set"
 msgstr "määratud"
 
-#: src/postulo/templates/server/plugins.html:416
+#: src/postulo/templates/server/plugins.html:438
 #, draft
 msgid ""
 "Set <code>POSTULO_PLUGIN_CATALOGUES</code> to <code>name|url|public-key</code> entries, separated by commas. The index must be signed with that key, and every wheel must match the checksum the signed index carries, or nothing is installed."
@@ -8530,9 +8552,9 @@ msgstr "Järjesta %(column)s järgi, väikseim eespool"
 
 #: src/postulo/plugins/kinds.py:26 src/postulo/templates/server/email.html:50
 #: src/postulo/templates/server/plugins.html:71
-#: src/postulo/templates/server/plugins.html:233
-#: src/postulo/templates/server/plugins.html:324
-#: src/postulo/templates/server/plugins.html:431
+#: src/postulo/templates/server/plugins.html:244
+#: src/postulo/templates/server/plugins.html:335
+#: src/postulo/templates/server/plugins.html:453
 #: src/postulo/templates/widgets/sources.html:9
 #, draft
 msgid "Source"
@@ -8756,13 +8778,13 @@ msgid "surname"
 msgstr "perekonnanimi"
 
 #: src/postulo/templates/server/plugins.html:142
-#: src/postulo/templates/server/plugins.html:278
+#: src/postulo/templates/server/plugins.html:289
 #, draft
 msgid "Switch off"
 msgstr "Lülita välja"
 
 #: src/postulo/templates/server/plugins.html:142
-#: src/postulo/templates/server/plugins.html:278
+#: src/postulo/templates/server/plugins.html:289
 #, draft
 msgid "Switch on"
 msgstr "Lülita sisse"
@@ -8772,7 +8794,7 @@ msgstr "Lülita sisse"
 msgid "Switchboard"
 msgstr "Kesknumber"
 
-#: src/postulo/templates/server/plugins.html:289
+#: src/postulo/templates/server/plugins.html:300
 #, draft
 msgid "Switched off for people above, not removed."
 msgstr "Ülalolevate inimeste jaoks välja lülitatud, mitte eemaldatud."
@@ -9113,7 +9135,7 @@ msgstr "See on SVG, mida Postulo veel ei hoia. PNG või JPEG sobib."
 msgid "That is not a status Postulo recognises."
 msgstr "See ei ole olek, mida Postulo tunneb."
 
-#: src/postulo/plugins/installing.py:247
+#: src/postulo/plugins/installing.py:253
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "See pole wheel: Postulo paigaldab .whl-faile."
@@ -9123,7 +9145,7 @@ msgstr "See pole wheel: Postulo paigaldab .whl-faile."
 msgid "That is not a widget Postulo knows about."
 msgstr "See pole vidin, mida Postulo tunneb."
 
-#: src/postulo/plugins/catalogue.py:159
+#: src/postulo/plugins/catalogue.py:161
 #, python-format, draft
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "See ei ole Ed25519 avalik võti: %(error)s"
@@ -9292,22 +9314,22 @@ msgstr "Kandideerimise tähtaeg, kui see on märgitud."
 msgid "The application sends on its own"
 msgstr "Rakendus saadab ise"
 
-#: src/postulo/plugins/catalogue.py:184
+#: src/postulo/plugins/catalogue.py:186
 #, draft
 msgid "The catalogue is not readable JSON."
 msgstr "Kataloog pole loetav JSON."
 
-#: src/postulo/plugins/catalogue.py:176
+#: src/postulo/plugins/catalogue.py:178
 #, draft
 msgid "The catalogue's signature does not match its contents; it was not used."
 msgstr "Kataloogi allkiri ei vasta selle sisule; seda ei kasutatud."
 
-#: src/postulo/plugins/catalogue.py:172
+#: src/postulo/plugins/catalogue.py:174
 #, python-format, draft
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Kataloogi allkiri või võti pole loetav: %(error)s"
 
-#: src/postulo/core/server_views.py:1257
+#: src/postulo/core/server_views.py:1259
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Kataloogid vastasid ega sisalda veel midagi."
@@ -9360,7 +9382,7 @@ msgid ""
 msgstr ""
 "Vaikeväärtus igale kontole. Ühe inimese erandid on tema real jaotises Inimesed. Pistikprogrammi väljalülitamine peatab selle kasutamise ega kustuta midagi."
 
-#: src/postulo/plugins/catalogue.py:289
+#: src/postulo/plugins/catalogue.py:291
 #, draft
 msgid "The download is far larger than a plugin should be."
 msgstr "Allalaadimine on palju suurem, kui plugin olema peaks."
@@ -9417,12 +9439,12 @@ msgstr "Fail on üle 2 MB. Tööotsing pole nii suur."
 msgid "The first: %(title)s"
 msgstr "Esimene: %(title)s"
 
-#: src/postulo/plugins/installing.py:461
+#: src/postulo/plugins/installing.py:498
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "Paigaldajat ei saanud käivitada: %(error)s"
 
-#: src/postulo/plugins/installing.py:465
+#: src/postulo/plugins/installing.py:502
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "Paigaldaja keeldus sellest: %(error)s"
@@ -9708,12 +9730,12 @@ msgstr ""
 msgid "The upper figure cannot be below the lower one."
 msgstr "Ülemine arv ei saa olla alumisest väiksem."
 
-#: src/postulo/plugins/catalogue.py:295
+#: src/postulo/plugins/catalogue.py:297
 #, draft
 msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr "Wheel ei vasta kontrollsummale, mille kataloog selle jaoks avaldas."
 
-#: src/postulo/plugins/installing.py:252
+#: src/postulo/plugins/installing.py:258
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Wheelil pole metaandmeid; see võib olla katki."
@@ -9880,7 +9902,7 @@ msgstr "Seda kutset saab kasutada ainult aadressiga, kuhu see saadeti."
 msgid "This is the most recent period."
 msgstr "See on kõige värskem periood."
 
-#: src/postulo/templates/server/plugins.html:317
+#: src/postulo/templates/server/plugins.html:328
 #, draft
 msgid "This is what you are about to install. Nothing has been installed yet."
 msgstr "Seda te kohe paigaldate. Midagi pole veel paigaldatud."
@@ -10381,7 +10403,7 @@ msgstr "Kinnitatud"
 msgid "version"
 msgstr "versioon"
 
-#: src/postulo/templates/server/plugins.html:432
+#: src/postulo/templates/server/plugins.html:454
 #, draft
 msgid "Version"
 msgstr "Versioon"
@@ -10628,7 +10650,7 @@ msgstr "Mida see tohib teha"
 msgid "what it says"
 msgstr "mida see ütleb"
 
-#: src/postulo/templates/server/plugins.html:321
+#: src/postulo/templates/server/plugins.html:332
 #, draft
 msgid "What it says it is"
 msgstr "Mida see enda kohta ütleb"

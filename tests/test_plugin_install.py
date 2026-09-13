@@ -693,3 +693,78 @@ def test_what_came_with_a_plugin_is_shown_beside_it(
     html = client.get(reverse("server:plugins")).content.decode()
     assert "data-dependencies" in html
     assert "something-useful==2.4" in html
+
+
+# ---------------------------------------------- which Postulo a plugin is for (#186)
+
+
+@pytest.mark.parametrize(
+    ("requirement", "version", "expected"),
+    [
+        ("", "0.3.0", True),
+        (">=0.3,<1.0", "0.3.0", True),
+        (">=0.3,<1.0", "0.9.9", True),
+        (">=0.3,<1.0", "1.0.0", False),
+        (">=0.5", "0.3.0", False),
+        ("~=0.3.0", "0.3.4", True),
+        ("~=0.3.0", "0.4.0", False),
+        (">=0.3", "0.4.0.dev3", True),
+    ],
+)
+def test_a_release_fits_the_postulo_it_names(requirement, version, expected):
+    assert installing.fits(requirement, version) is expected
+
+
+def test_a_requirement_nobody_can_read_is_not_a_fit():
+    with pytest.raises(ValueError):
+        installing.fits("latest please", "0.3.0")
+    assert installing.compatible("latest please") is False, "for a page: not fitting"
+    assert installing.compatible("") is True, "nothing declared fits everything"
+
+
+def test_a_release_for_another_postulo_is_refused_before_the_download(
+    served, settings, plugins_dir, installer
+):
+    """The third check, and it names both versions so it is clear which side moves."""
+    from postulo import __version__
+
+    served["index"] = served["index"].replace(b'">=0.2"', b'">=99"')
+    # A changed index needs signing again; the fixture's key is gone, so sign afresh.
+    key = Ed25519PrivateKey.generate()
+    served["signature"] = base64.b64encode(key.sign(served["index"])).decode()
+    served["public"] = base64.b64encode(key.public_key().public_bytes_raw()).decode()
+    configure(settings, served["public"])
+
+    with pytest.raises(catalogue.CatalogueError) as refused:
+        catalogue.install("postulo-example", by="ana")
+
+    assert ">=99" in str(refused.value) and __version__ in str(refused.value)
+    assert installing.installed("postulo-example") is None, "nothing landed"
+
+
+def test_what_a_release_declared_is_recorded_and_asked_again_on_the_page(
+    served, settings, plugins_dir, installer, client, admin
+):
+    configure(settings, served["public"])
+    entry = catalogue.install("postulo-example", by="ana")
+    assert entry.requires_postulo == ">=0.2"
+
+    rows = {row["name"]: row for row in installing.status()}
+    assert rows["postulo-example"]["compatible"] is True
+
+    # The core moved on and left it behind: what the record says is what the page asks.
+    entry.requires_postulo = "<0.1"
+    installing.write_record([entry])
+    rows = {row["name"]: row for row in installing.status()}
+    assert rows["postulo-example"]["compatible"] is False
+
+    client.force_login(admin)
+    html = client.get(reverse("server:plugins")).content.decode()
+    assert "for Postulo &lt;0.1" in html and "data-needs-postulo" in html
+
+
+def test_an_upload_declares_nothing_and_is_never_marked(tmp_path, plugins_dir, installer):
+    entry = installing.install_wheel(a_wheel(tmp_path), by="ana")
+    assert entry.requires_postulo == ""
+    rows = {row["name"]: row for row in installing.status()}
+    assert rows["postulo-example"]["compatible"] is True

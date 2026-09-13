@@ -1250,6 +1250,8 @@ class PluginActionView(StaffRequiredMixin, View):
                         "maintainer": listing.maintainer,
                         "catalogue": one.name,
                         "installed": installing.installed(listing.name) is not None,
+                        "requires_postulo": release.requires_postulo,
+                        "compatible": installing.compatible(release.requires_postulo),
                     }
                 )
         request.session["plugin_listings"] = listings

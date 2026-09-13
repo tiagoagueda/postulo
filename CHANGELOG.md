@@ -290,6 +290,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A plugin that says which Postulo it is for is held to it.** A catalogue release has
+  always carried `requires_postulo`, and the installer parsed it, stored it, and compared
+  it to nothing: a plugin declaring `>=0.5` installed into 0.3 and the first anybody knew
+  was an ImportError in a log. It is the third fatal check now, before the download, and
+  the refusal names both versions so it is clear which side has to move. What was
+  declared is recorded with the plugin and asked again on every visit to *Server →
+  Plugins*, so a core upgrade that leaves a plugin behind is marked *for Postulo …* there,
+  and a catalogue listing that does not fit shows why instead of an Install button that
+  could only refuse. A plugin that declares nothing keeps installing. And the rule for the
+  project's own plugins is written down: they carry the version of the Postulo they were
+  released beside, and the installer holds them to the major. (#186)
+
 - **The companies table narrows on every column, and from a phone.** What was asked for
   on this table was filtering and sorting in the table itself, and #135 built editing in
   place instead. The rest is finished now. The three counts take a least and a most —

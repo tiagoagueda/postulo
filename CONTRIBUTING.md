@@ -290,7 +290,23 @@ The `release` workflow does the rest, and it is one job: it refuses a tag that d
 with the code or the changelog, builds the sdist and the wheel, and creates the Forgejo
 release with the changelog section as its notes.
 
-### The dev channel
+### Versions of official plugins
+
+A plugin the project publishes -- postulo-mcp, postulo-paperless, the rest under the
+`postulo` organisation -- carries the version of the Postulo it was released beside:
+postulo-mcp 0.3.0 ships with Postulo 0.3.0. Somebody who knows which Postulo they run
+knows which plugin to install, without a compatibility table. The patch is the plugin's
+own: 0.3.4 is the fifth fix to the 0.3 plugin and implies no core release.
+
+What the installer enforces is the **major**, through `requires_postulo` in the catalogue:
+an official plugin declares `>=0.3,<1.0` and keeps installing across core's minors until
+the next major. During 0.x that is loose on purpose -- 0.x is where breaking changes land
+in the minor -- so a plugin a core release actually breaks raises its own floor (`>=0.6`)
+and says so in its changelog. That is the mechanism, not the installer. The two browser
+extensions carry the same number in `package.json`; nothing installs them from a
+catalogue, so nothing enforces it there. `postulo-templates` is not a package and carries
+no version at all, deliberately: a template pack is copied, not installed.
+
 
 Every push to `main` builds an image and publishes it as **`:dev`**, alongside a pinnable
 `:<version>-dev.<short sha>` — `dev-image.yml`. It exists so a change can be run somewhere
