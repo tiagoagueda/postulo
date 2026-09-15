@@ -73,7 +73,7 @@ def test_the_pages_behind_a_sign_in_keep_it_too(live_server, page: Page, applica
 
     for path in (
         "/applications/",
-        "/applications/board/",
+        "/applications/?view=board",
         "/applications/insights/",
         "/applications/report/",
         "/documents/cvs/",

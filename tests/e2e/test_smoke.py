@@ -98,7 +98,7 @@ def test_the_critical_path(live_server, page: Page, applicant) -> None:
     application_url = page.url
 
     # On the board, changing the select moves the card: the change is submitted at once.
-    page.goto(f"{base}/applications/board/")
+    page.goto(f"{base}/applications/?view=board")
     card = page.locator("article", has_text="Senior Django Developer")
     expect(card).to_have_count(1)
     card.get_by_label("Change status").select_option("screening")

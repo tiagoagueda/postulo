@@ -392,7 +392,10 @@ def test_the_board_card_and_the_table_row_show_the_next_interview(client, user, 
     schedule_interview(application, kind=InterviewKind.VIDEO, starts_at=in_days(2))
     client.force_login(user)
     assert (
-        client.get(reverse("applications:board")).content.decode().count("data-next-interview") == 1
+        client.get(reverse("applications:list"), {"view": "board"})
+        .content.decode()
+        .count("data-next-interview")
+        == 1
     )
     assert (
         client.get(reverse("applications:list")).content.decode().count("data-next-interview") == 1

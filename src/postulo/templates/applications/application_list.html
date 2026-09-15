@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {# A grid: this page empties `main_width` and takes the whole screen (#188). #}
 {% block main_width %}{% endblock %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Applications" %}{% endblock %}
 
 {% partialdef count %}
   <p id="applications-count" class="text-sm text-ink-500 dark:text-ink-400"
      aria-live="polite" aria-atomic="true"{% if oob %} hx-swap-oob="true"{% endif %}>
-    {% blocktranslate trimmed count total=paginator.count %}
+    {% blocktranslate trimmed count total=total %}
       {{ total }} application
     {% plural %}
       {{ total }} applications
@@ -19,9 +19,15 @@
   </p>
 {% endpartialdef %}
 
+{% comment %} One page in two shapes (#102): the table and the board are the same applications
+   under the same filters, and the switch beside the Columns control changes the shape of
+   what is below and nothing else. Both shapes live inside the one element the live
+   filters swap, so narrowing the list works the same whichever is showing. {% endcomment %}
 {% partialdef table %}
-  <div id="applications-table">
-    {% if applications %}
+  <div id="applications-table" data-shape="{{ shape }}">
+    {% if shape == 'board' %}
+      {% include "applications/partials/board.html" %}
+    {% elif applications %}
       <div class="card scroll-x p-0">
         <table class="w-full text-start text-sm">
           {% include "partials/table/head.html" with table_id="applications-table" form_id="application-filters" bulk_form_id="applications-bulk" %}
@@ -71,8 +77,24 @@
       {% partial count %}
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
-      {% include "partials/table/columns.html" %}
-      <a href="{% url 'applications:board' %}" class="btn-secondary">{% translate "Board" %}</a>
+      {% comment %} The shape: a pair of buttons that post the choice, so it is remembered
+         with the person's other table preferences and the redirect back keeps every
+         filter, the search and the sort. The one showing is marked, and disabled, since
+         pressing it would change nothing (#102). {% endcomment %}
+      <div class="flex items-center gap-1" role="group" aria-label="{% translate 'Shape' %}" data-shape-switch>
+        {% for key, label in shapes %}
+          <form method="post" action="{% url 'core:table_settings' table.name %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ switch_next }}">
+            <input type="hidden" name="shape" value="{{ key }}">
+            <button type="submit" class="{% if key == shape %}btn-primary{% else %}btn-secondary{% endif %}"
+                    {% if key == shape %}aria-current="true" disabled{% endif %}>{{ label }}</button>
+          </form>
+        {% endfor %}
+      </div>
+      {% if shape != 'board' %}
+        {% include "partials/table/columns.html" %}
+      {% endif %}
       <a href="{% url 'applications:create' %}" class="btn-primary">{% translate "Record an application" %}</a>
     </div>
   </div>

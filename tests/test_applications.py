@@ -255,7 +255,7 @@ def test_the_board_shows_only_live_columns(client, user, application):
     change_status(application, Status.REJECTED)
     client.force_login(user)
 
-    response = client.get(reverse("applications:board"))
+    response = client.get(reverse("applications:list"), {"view": "board"})
     statuses = [column["status"] for column in response.context["columns"]]
 
     assert Status.REJECTED not in statuses

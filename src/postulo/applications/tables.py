@@ -1,5 +1,7 @@
 """The applications table: what it can show, sort by and narrow on."""
 
+from typing import ClassVar
+
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.tables import Column, Table, register
@@ -11,6 +13,9 @@ from .models import Channel, Priority, Status
 class ApplicationsTable(Table):
     name = "applications"
     default_sort = "-created"
+    #: A table or a board of the same rows (#102); the board is drawn by the same view.
+    shapes = ("table", "board")
+    SHAPE_LABELS: ClassVar[dict[str, str]] = {"table": _("Table"), "board": _("Board")}
     extra_params = ("q", "status", "state", "tag", "quiet")
     noun = (_("application"), _("applications"))
     columns = (

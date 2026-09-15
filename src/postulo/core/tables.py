@@ -137,6 +137,10 @@ class Table:
     extra_params: tuple[str, ...] = ()
     #: What a row is called, for the live count: ("application", "applications").
     noun: tuple[str, str] = ("row", "rows")
+    #: The shapes the page can take, the first being the usual one: the applications page
+    #: is a table or a board of the same rows under the same filters (#102). Empty for a
+    #: page that is a table and nothing else.
+    shapes: tuple[str, ...] = ()
 
     def __init__(self, request, settings: dict | None = None):
         self.request = request
@@ -182,6 +186,14 @@ class Table:
     @property
     def is_customised(self) -> bool:
         return bool(self.settings)
+
+    @property
+    def shape(self) -> str:
+        """The shape this person chose, or the usual one; empty for a page with one shape."""
+        if not self.shapes:
+            return ""
+        chosen = self.settings.get("shape")
+        return chosen if chosen in self.shapes else self.shapes[0]
 
     @property
     def chooser(self) -> list[ChooserRow]:
@@ -411,7 +423,13 @@ class Table:
                 # dragged too narrow once is too narrow for ever.
                 widths.pop(key, None)
 
-        return {"columns": columns, "page_size": page_size, "widths": widths}
+        cleaned = {"columns": columns, "page_size": page_size, "widths": widths}
+        # The shape is chosen by its own control, not by the Columns form: carried across
+        # a save of the columns rather than lost with it (#102).
+        shape = (current or {}).get("shape")
+        if shape in cls.shapes:
+            cleaned["shape"] = shape
+        return cleaned
 
 
 def _date(text: str) -> dt.date | None:

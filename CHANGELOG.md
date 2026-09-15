@@ -537,6 +537,21 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Applications and Board are one page in two shapes, and the switch keeps your filters.**
+  Two views answering the same question — which of my applications am I looking at? — were
+  two addresses, two entries in the navigation, and a bare link between them that threw
+  the filters away: narrowing the table to *quiet applications at Acme* and pressing
+  *Board* showed everything. One entry now, one address, and a *Table / Board* switch on
+  the page beside the *Columns* control that changes the shape of what is below it and
+  nothing else. The search, filters and sort survive the switch; the shape you choose is
+  remembered with your other table preferences; `?view=board` asks for a shape without
+  changing it; and `/applications/board/` redirects, carrying whatever it was given. The
+  board still shows only what is still live, and a filter that matches settled
+  applications is said on the board, with a link to the same filter in the table, rather
+  than shown as an empty board. Anybody who had hidden *Board* from the navigation has
+  that preference forgotten, since the entry no longer exists; the board itself is a
+  switch away for everybody. Dragging a card between columns is untouched. (#102)
+
 - **The arrows on *Your career* move an entry past its neighbour, and the order number
   is hidden unless you ask for it.** The arrows nudged a number by one and swapped with
   nothing: pressing *up* on an entry at 0 did nothing, pressing *down* once put it behind

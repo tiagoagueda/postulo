@@ -70,7 +70,7 @@ def test_a_card_dropped_on_a_column_moves_and_is_recorded(live_server, page: Pag
 
     base = live_server.url
     sign_in(page, base)
-    page.goto(f"{base}/applications/board/")
+    page.goto(f"{base}/applications/?view=board")
 
     card = page.locator(f"[data-card='{application.pk}']")
     expect(card).to_have_attribute("data-status", "applied")
@@ -100,7 +100,7 @@ def test_the_status_menu_still_does_the_same_thing(live_server, page: Page, appl
 
     base = live_server.url
     sign_in(page, base)
-    page.goto(f"{base}/applications/board/")
+    page.goto(f"{base}/applications/?view=board")
 
     card = page.locator(f"[data-card='{application.pk}']")
     assert card.locator("select[name='status']").count() == 1
@@ -121,7 +121,7 @@ def test_a_column_accepts_the_drag_before_the_drop(live_server, page: Page, appl
     """
     base = live_server.url
     sign_in(page, base)
-    page.goto(f"{base}/applications/board/")
+    page.goto(f"{base}/applications/?view=board")
 
     card = page.locator(f"[data-card='{application.pk}']").element_handle()
     column = page.locator("[data-board-column='interviewing']").element_handle()

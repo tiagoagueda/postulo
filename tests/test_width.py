@@ -23,7 +23,7 @@ MAIN = re.compile(r'<main\b[^>]*\bclass="([^"]*)"')
 WIDE = [
     "/",
     "/applications/",
-    "/applications/board/",
+    "/applications/?view=board",
     "/applications/interviews/",
     "/applications/reminders/",
     "/applications/suggestions/",

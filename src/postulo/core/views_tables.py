@@ -23,6 +23,14 @@ def table_settings(request: HttpRequest, name: str) -> HttpResponse:
     if "reset" in request.POST:
         tables.save_settings(request.user, name, None)
         messages.success(request, _("Back to the usual columns."))
+    elif "shape" in request.POST:
+        # The shape switch on the applications page (#102): one field, remembered beside
+        # the columns, and back to exactly where the person was -- filters, search and
+        # sort included, since they travel in `next`. Nothing said: the page shows it.
+        shape = request.POST.get("shape", "")
+        if shape in table.shapes:
+            current = tables.settings_for(request.user, name)
+            tables.save_settings(request.user, name, {**current, "shape": shape})
     else:
         current = tables.settings_for(request.user, name)
         tables.save_settings(request.user, name, table.clean_settings(request.POST, current))

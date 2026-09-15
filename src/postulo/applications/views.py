@@ -114,7 +114,20 @@ class ApplicationFilterMixin:
 
 
 class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
-    """The table: sortable, narrowable from its headers, and laid out as the person likes."""
+    """Applications, in one of two shapes: the table, or the board (#102).
+
+    Both answer "which of my applications am I looking at?", so they were always one set
+    of filters; they were two pages with a bare link between them that threw the filters
+    away. One address now, and a switch on the page that changes the shape of what is
+    below it and nothing else. The shape is remembered with the person's other table
+    preferences, or asked for in the address with ``?view=``, which remembers nothing.
+
+    The table is sortable, narrowable from its headers, paginated, and laid out as the
+    person likes. The board arranges the same rows by status, and only open statuses get
+    a column: rejections and withdrawals belong in the table and the figures, not taking
+    up space on a board meant to show what is still live. A filter that matches settled
+    applications is therefore said on the board rather than shown as nothing.
+    """
 
     model = Application
     template_name = "applications/application_list.html"
@@ -126,12 +139,31 @@ class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
             self.request, tables.settings_for(self.request.user, ApplicationsTable.name)
         )
 
-    def get_paginate_by(self, queryset) -> int:
-        return self.table.page_size
+    @cached_property
+    def asked_shape(self) -> str:
+        """The shape the address asks for, or empty: a link into one shape, not a choice."""
+        asked = self.request.GET.get("view", "")
+        return asked if asked in ApplicationsTable.shapes else ""
+
+    @cached_property
+    def shape(self) -> str:
+        return self.asked_shape or self.table.shape
+
+    @property
+    def on_board(self) -> bool:
+        return self.shape == "board"
+
+    def get_paginate_by(self, queryset):
+        # A board is every card at once; the columns are what make it readable.
+        return None if self.on_board else self.table.page_size
 
     def get_queryset(self):
-        queryset = super().get_queryset().with_display_data().with_table_data()
-        return self.table.apply(self.filter_queryset(queryset))
+        queryset = super().get_queryset().with_display_data()
+        if self.on_board:
+            # The cards say how long a quiet application has been quiet, so they need the
+            # last activity too.
+            return self.filter_queryset(queryset.with_activity())
+        return self.table.apply(self.filter_queryset(queryset.with_table_data()))
 
     def get_template_names(self) -> list[str]:
         # An htmx request wants the table alone; the back button's restore wants the page.
@@ -139,15 +171,61 @@ class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
             return [f"{self.template_name}#htmx"]
         return [self.template_name]
 
+    def shape_url(self, shape: str) -> str:
+        """This page, with these filters, in ``shape``."""
+        query = self.request.GET.copy()
+        query["view"] = shape
+        return f"{self.request.path}?{query.urlencode()}"
+
     def get_context_data(self, **kwargs) -> dict:
-        return {
+        context = {
             **super().get_context_data(**kwargs),
             **self.filter_context(),
             "table": self.table,
+            "shape": self.shape,
+            "shape_param": self.asked_shape,
+            "shapes": [
+                (shape, ApplicationsTable.SHAPE_LABELS[shape]) for shape in ApplicationsTable.shapes
+            ],
             "page_sizes": tables.PAGE_SIZES,
             "bulk_tags": Tag.objects.for_user(self.request.user),
             "bulk_statuses": Status.choices,
         }
+        # Where the switch sends the person back to: here, with every filter and the sort,
+        # and without an asked-for shape, so the one just chosen is what shows.
+        back = self.request.GET.copy()
+        back.pop("view", None)
+        context["switch_next"] = (
+            f"{self.request.path}?{back.urlencode()}" if back else self.request.path
+        )
+        if self.on_board:
+            applications = list(context["applications"])
+            # The same predicate as the dashboard, so the badge and the block agree.
+            quiet_ids = set(
+                quiet.quiet_applications(self.request.user).values_list("pk", flat=True)
+            )
+            for application in applications:
+                application.is_quiet = application.pk in quiet_ids
+            context["columns"] = [
+                {
+                    "status": status,
+                    "label": Status(status).label,
+                    "applications": [a for a in applications if a.status == status],
+                }
+                for status in BOARD_STATUSES
+            ]
+            context["total"] = len(applications)
+            # Said only when a filter is narrowing: with none, settled applications are
+            # simply not the board's business and the table is where they live.
+            context["off_board"] = (
+                sum(1 for a in applications if a.status not in BOARD_STATUSES)
+                if self.table.filters_active
+                else 0
+            )
+            context["table_url"] = self.shape_url("table")
+        else:
+            context["total"] = context["paginator"].count
+        return context
 
 
 class ApplicationBulkView(LoginRequiredMixin, View):
@@ -228,38 +306,16 @@ def _as_int(raw) -> int:
         return 0
 
 
-class ApplicationBoardView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
-    """The same applications, arranged by status.
+class ApplicationBoardView(RedirectView):
+    """The board's old address. It is a shape of the Applications page now (#102), and a
+    bookmark or a link from before still lands on the board, with whatever it carried."""
 
-    Only open statuses get a column. Rejections and withdrawals belong in the table and
-    the figures, not taking up space on a board meant to show what is still live.
-    """
+    permanent = False
 
-    model = Application
-    template_name = "applications/application_board.html"
-    context_object_name = "applications"
-
-    def get_queryset(self):
-        # The cards say how long a quiet application has been quiet, so they need the
-        # last activity too.
-        return self.filter_queryset(super().get_queryset().with_display_data().with_activity())
-
-    def get_context_data(self, **kwargs) -> dict:
-        context = {**super().get_context_data(**kwargs), **self.filter_context()}
-        applications = list(context["applications"])
-        # The same predicate as the dashboard, so the badge and the block agree.
-        quiet_ids = set(quiet.quiet_applications(self.request.user).values_list("pk", flat=True))
-        for application in applications:
-            application.is_quiet = application.pk in quiet_ids
-        context["columns"] = [
-            {
-                "status": status,
-                "label": Status(status).label,
-                "applications": [a for a in applications if a.status == status],
-            }
-            for status in BOARD_STATUSES
-        ]
-        return context
+    def get_redirect_url(self, *args, **kwargs) -> str:
+        query = self.request.GET.copy()
+        query["view"] = "board"
+        return f"{reverse('applications:list')}?{query.urlencode()}"
 
 
 class ApplicationDetailView(OwnedObjectMixin, DetailView):

@@ -28,7 +28,7 @@ pytestmark = pytest.mark.e2e
 PAGES = (
     "/",
     "/applications/",
-    "/applications/board/",
+    "/applications/?view=board",
     "/jobs/companies/",
     "/documents/cvs/",
     "/career/",
@@ -77,9 +77,9 @@ def test_the_action_group_moves_to_the_other_end(live_server, page: Page, right_
     """
     base = live_server.url
     sign_in(page, base)
-    page.goto(f"{base}/applications/board/")
+    page.goto(f"{base}/applications/?view=board")
 
-    heading = page.get_by_role("heading", name="Board").bounding_box()
+    heading = page.get_by_role("heading", name="Applications").bounding_box()
     action = page.get_by_role("link", name="Record an application").bounding_box()
 
     assert action["x"] < heading["x"], "the actions should sit at the reading-end edge"
@@ -93,7 +93,7 @@ def test_the_board_starts_at_the_reading_edge(live_server, page: Page, right_to_
     """
     base = live_server.url
     sign_in(page, base)
-    page.goto(f"{base}/applications/board/")
+    page.goto(f"{base}/applications/?view=board")
 
     columns = page.locator("[data-board-column]")
     expect(columns.first).to_be_visible()

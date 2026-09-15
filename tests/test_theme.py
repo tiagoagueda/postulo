@@ -35,7 +35,7 @@ def test_the_switch_is_in_the_header_for_signed_in_people_only(client, user):
 
 def test_posting_a_theme_saves_it_and_goes_back(client, user):
     client.force_login(user)
-    board = reverse("applications:board")
+    board = reverse("applications:list") + "?view=board"
     response = client.post(reverse("accounts:theme"), {"theme": "dark", "next": board})
     assert response.status_code == 302
     assert response.url == board

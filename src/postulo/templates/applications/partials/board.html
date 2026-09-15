@@ -1,0 +1,47 @@
+{% load i18n %}
+{% comment %} The board shape of the Applications page (#102): the same applications, the same
+   filters, arranged by status. Only open statuses get a column -- rejections and
+   withdrawals belong in the table and the figures, not taking up space on a board meant
+   to show what is still live -- so a filter that matches settled applications is said
+   rather than shown as an empty board, with the table a link away carrying the filter.
+{% endcomment %}
+{% if off_board %}
+  <p class="mb-4 text-sm text-ink-600 dark:text-ink-300" role="status" data-off-board="{{ off_board }}">
+    {% blocktranslate count counter=off_board trimmed %}
+      One settled application matches these filters. The board shows only what is still live;
+    {% plural %}
+      {{ counter }} settled applications match these filters. The board shows only what is still live;
+    {% endblocktranslate %}
+    <a href="{{ table_url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "see them in the table" %}</a>.
+  </p>
+{% endif %}
+
+<p class="sr-only" id="board-drag-help">
+  {% blocktranslate trimmed %}
+    Cards can be dragged between columns with a mouse. Every card also carries a status
+    menu, which does the same thing from the keyboard.
+  {% endblocktranslate %}
+</p>
+
+<div class="flex gap-4 scroll-x pb-4" data-board>
+  {% for column in columns %}
+    <section class="w-72 shrink-0">
+      <div class="mb-2 flex items-baseline justify-between px-1">
+        <h2 class="text-sm font-medium">{{ column.label }}</h2>
+        <span class="text-xs text-ink-400 tabular-nums" data-column-count>{{ column.applications|length }}</span>
+      </div>
+      <div class="flex min-h-24 flex-col gap-2 rounded-lg transition-colors"
+           data-board-column="{{ column.status }}"
+           data-column-label="{{ column.label }}">
+        {% for application in column.applications %}
+          {% include "applications/partials/application_card.html" %}
+        {% empty %}
+          <p class="rounded-lg border border-dashed border-ink-200 px-3 py-6 text-center text-xs
+                    text-ink-400 dark:border-ink-800" data-empty>
+            {% translate "Empty" %}
+          </p>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</div>

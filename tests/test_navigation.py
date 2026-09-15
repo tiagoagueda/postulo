@@ -41,18 +41,18 @@ def test_every_item_is_offered_and_shown_by_default(client, user):
 
 def test_a_person_can_leave_items_out(client, user):
     client.force_login(user)
-    keep = [key for key in navigation.HIDEABLE if key not in {"dashboard", "board"}]
+    keep = [key for key in navigation.HIDEABLE if key not in {"dashboard", "companies"}]
     response = appearance(client, navigation=keep)
     assert response.status_code == 200
 
     user.profile.refresh_from_db()
-    assert sorted(user.profile.hidden_nav_items) == ["board", "dashboard"]
+    assert sorted(user.profile.hidden_nav_items) == ["companies", "dashboard"]
 
     html = client.get(reverse("core:home")).content.decode()
-    assert 'data-nav="dashboard"' not in html and 'data-nav="board"' not in html
+    assert 'data-nav="dashboard"' not in html and 'data-nav="companies"' not in html
     assert 'data-nav="applications"' in html
     # Hidden from the row, still perfectly reachable.
-    assert client.get(reverse("applications:board")).status_code == 200
+    assert client.get(reverse("jobs:company_list")).status_code == 200
 
 
 def test_the_settings_page_shows_what_is_on(client, user):

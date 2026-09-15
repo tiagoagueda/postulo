@@ -230,7 +230,7 @@ def test_the_board_badge_and_the_table_filter_use_the_same_predicate(client, use
     sent(user, company, days_ago=3, title="Fresh one")
     client.force_login(user)
 
-    board = client.get(reverse("applications:board"))
+    board = client.get(reverse("applications:list"), {"view": "board"})
     cards = {
         a.pk: a.is_quiet for column in board.context["columns"] for a in column["applications"]
     }

@@ -245,7 +245,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/listings/new/",
         "/applications/",
         "/applications/?company=aperture&sort=applied",
-        "/applications/board/",
+        "/applications/?view=board",
         "/applications/report/",
         "/applications/report/?period=weeks&weeks=8",
         f"/applications/{a.pk}/",
