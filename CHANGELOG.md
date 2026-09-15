@@ -668,6 +668,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The career-order checkbox under *Settings → Appearance* described itself with an id
+  that was not on the page.** Django names the help text in the checkbox's
+  `aria-describedby`; the template drew the help inside the label without the id, so a
+  screen reader was told about an element that did not exist and the sentence explaining
+  the preference could not be reached from the box. The help carries the id now, outside
+  the label so the name says what the box is and the description says why, and the fast
+  suite checks every `aria-describedby` on the settings pages points at something. (#207)
+
 - **A CV's page no longer says “What is on this cv”.** The heading put the kind's label,
   lowercased, into a sentence — which flattened an acronym in English, French and
   Portuguese and misspelt a noun in German, and which could never agree in a language where

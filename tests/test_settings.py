@@ -125,3 +125,19 @@ def test_active_section_follows_allauth_pages_too(rf, user):
     request = rf.get(reverse("core:home"))
     request.resolver_match = resolve(reverse("core:home"))
     assert settings_sections.active_section(request) is None
+
+
+def test_everything_a_control_says_describes_it_is_on_the_page(client, user):
+    """Django puts `aria-describedby` on a widget with help text; a template that draws the
+    help itself has to put the id on it, or a screen reader is told about an element that
+    is not there (#114, #207). The browser walk catches this in five minutes; this catches
+    it in the fast suite, for the settings pages."""
+    import re
+
+    client.force_login(user)
+    for name in ("settings:appearance", "settings:locale", "settings:account"):
+        html = client.get(reverse(name)).content.decode()
+        ids = set(re.findall(r'\sid="([^"]+)"', html))
+        for described in re.findall(r'aria-describedby="([^"]+)"', html):
+            for wanted in described.split():
+                assert wanted in ids, f"{name}: {wanted} is named but not on the page"
