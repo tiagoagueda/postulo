@@ -511,6 +511,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **The tab says which Postulo it is.** A page's title was the page's name alone —
+  *Dashboard*, *Your details* — so two instances side by side, or Postulo beside anything
+  else, were tabs nobody could tell apart, and a screen reader announced a page with no
+  application behind it. The title reads *Postulo > Dashboard* now, with the
+  administrator's instance name first, put on once in the base template so a page added
+  later cannot lose it. Levels are separated by a chevron — *Postulo > Settings > API
+  tokens* — and a middle dot qualifies a name inside one level, *Report · September 2026*,
+  so the two never read as the same thing. (#196)
+
 - **Server settings → Overview ends with how to keep Postulo going, not the health check.**
   The last card held two lines an administrator reads once: the health-check address and
   the Django admin's escape hatch. The address moved up into the *Software* card, where a

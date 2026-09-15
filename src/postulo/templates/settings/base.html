@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n postulo %}
 
-{% block title %}{% if section_title %}{{ section_title }} · {% endif %}{% translate "Settings" %}{% endblock %}
+{% block title %}{% translate "Settings" %}{% if section_title %} &gt; {{ section_title }}{% endif %}{% endblock %}
 
 {# The sidebar lives in `main`, around `content`, so that pages which only know how to #}
 {# fill `content` — allauth's email and password pages among them — land inside it. #}

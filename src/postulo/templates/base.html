@@ -11,7 +11,14 @@
        Configured by attribute, which the policy does allow. {% endcomment %}
     <meta name="htmx-config" content='{"includeIndicatorStyles":false}'>
     <meta name="referrer" content="same-origin">
-    <title>{% block title %}{{ instance_name }}{% endblock %}</title>
+    {% comment %} The instance first, then the page: *Postulo > Dashboard*. A tab, a bookmark,
+       the history and a screen reader's announcement all read this, and a page named alone
+       could not be told from the same page on any other instance (#196). `>` separates
+       levels -- instance, area, page -- and a middle dot qualifies a name inside one level
+       (*Report · September 2026*, *Apply · Test Engineer*), so the two never read as the
+       same thing. A page fills `title` with its own name; the home page empties the whole
+       tail and is the instance's name alone. {% endcomment %}
+    <title>{{ instance_name }}{% block title_tail %} &gt; {% block title %}{% endblock %}{% endblock %}</title>
     {% comment %} Three sizes rather than one: a browser picks the nearest and scaling a
        32-pixel mark up to a 180-pixel home screen looks exactly as bad as it sounds. The
        .ico is for anything that still asks for /favicon.ico without being told to.
