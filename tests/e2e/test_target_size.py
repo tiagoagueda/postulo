@@ -88,6 +88,15 @@ COLLECT = """() => {
   const out = [];
   for (const el of document.querySelectorAll(CLICKABLE)) {
     if (el.disabled) continue;
+    // Inside a closed <details>, and not its summary: Chromium keeps layout boxes for the
+    // hidden content, but nobody can click what the menu is not showing. The test opens
+    // the menus one at a time and measures them then.
+    if (el.closest('details:not([open])') && !el.closest('summary')) continue;
+    // Which open menu it is in, if any: an open panel lies over the page, and while it
+    // is open the page beneath it is not what anybody is aiming at.
+    const menus = [...document.querySelectorAll('details[data-menu]')];
+    const inMenu = el.closest('details[data-menu][open]');
+    const menu = inMenu && !el.closest('summary') ? menus.indexOf(inMenu) : -1;
     const style = getComputedStyle(el);
     if (style.visibility === 'hidden' || style.pointerEvents === 'none') continue;
     // Clipped to nothing: screen-reader-only, and it gets a real box when focused.
@@ -105,6 +114,7 @@ COLLECT = """() => {
       what: el.outerHTML.replace(/\\s+/g, ' ').slice(0, 130),
       x: box.x, y: box.y, w: box.width, h: box.height,
       inline: inASentence(el),
+      menu,
     });
   }
   return out;
@@ -119,6 +129,8 @@ class Target:
     w: float
     h: float
     inline: bool
+    #: The open menu this target is inside, by index, or -1 for the page itself.
+    menu: int = -1
 
     @property
     def undersized(self) -> bool:
@@ -156,9 +168,14 @@ def spaced_apart(target: Target, everything: list[Target]) -> bool:
     return True
 
 
-def too_small(page: Page) -> list[str]:
-    """Every target on the page as it stands that meets neither the size nor an exception."""
+def too_small(page: Page, menu: int = -1) -> list[str]:
+    """Every target on the page as it stands that meets neither the size nor an exception.
+
+    With a ``menu`` open, the targets are that menu's: its panel lies over the page, so
+    the page beneath is neither aimed at nor a neighbour of anything in the panel.
+    """
     targets = [Target(**row) for row in page.evaluate(COLLECT)]
+    targets = [target for target in targets if target.menu == menu]
     failures = []
     for target in targets:
         if not target.undersized or target.inline:
@@ -202,7 +219,7 @@ def test_everything_clickable_is_big_enough_to_hit(live_server, page: Page, furn
             page.evaluate(
                 "i => { document.querySelectorAll('details[data-menu]')[i].open = true }", index
             )
-            for failure in too_small(page):
+            for failure in too_small(page, menu=index):
                 found.setdefault(failure, f"{path} (menu {index + 1})")
             page.evaluate(
                 "i => { document.querySelectorAll('details[data-menu]')[i].open = false }", index

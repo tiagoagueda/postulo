@@ -15,9 +15,14 @@ def theme_switch(choice: str) -> dict:
         choice = "system"
     labels = dict(Theme.choices)
     following = NEXT_THEME[choice]
+    # The row of the account menu says the current theme in a word (#197): the full
+    # sentence, with what pressing does, is the title -- a menu row that wrapped to three
+    # lines was a 76-pixel target, and the closed menu's boxes sat on the page beneath.
+    short = {"system": _("System"), "light": _("Light"), "dark": _("Dark")}
     return {
         "current": choice,
         "next": following,
+        "label": _("Theme: %(theme)s") % {"theme": short[choice]},
         "title": _("Theme: %(current)s. Switch to: %(next)s.")
         % {"current": labels[choice], "next": labels[following]},
     }

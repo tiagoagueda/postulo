@@ -19,6 +19,7 @@ def test_switch_cycles_light_dark_system():
     assert theme_switch("system")["next"] == "light"
     assert theme_switch("nonsense")["current"] == "system"
     assert "Dark" in theme_switch("dark")["title"]
+    assert theme_switch("system")["label"] == "Theme: System", "a word for the menu row"
 
 
 def test_the_switch_is_in_the_header_for_signed_in_people_only(client, user):
