@@ -6,7 +6,7 @@
 {# The sidebar lives in `main`, around `content`, so that pages which only know how to #}
 {# fill `content` — allauth's email and password pages among them — land inside it. #}
 {% block main %}
-  <div class="mx-auto max-w-5xl lg:flex lg:items-start lg:gap-10">
+  <div class="lg:flex lg:items-start lg:gap-10">
     <aside class="mb-6 lg:mb-0 lg:w-56 lg:shrink-0">
       <h1 class="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
         {% translate "Settings" %}
@@ -16,7 +16,10 @@
     <div class="min-w-0 flex-1">
       {# `panel` sits between the sidebar and the page, so a base that wants to put a card #}
       {# round allauth's content has somewhere to do it without taking the sidebar away. #}
-      {% block panel %}{% block content %}{% endblock %}{% endblock %}
+      {% block panel %}{# A frame with a sidebar: it empties `main_width` and takes the whole screen (#198). #}
+{% block main_width %}{% endblock %}
+
+{% block content %}{% endblock %}{% endblock %}
     </div>
   </div>
 {% endblock %}

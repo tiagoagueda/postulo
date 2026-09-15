@@ -33,6 +33,10 @@ WIDE = [
     "/documents/letters/",
     "/documents/sent/",
     "/documents/files/",
+    # A frame with a sidebar is a grid at the top level, whatever the page inside it (#198).
+    "/accounts/profile/",
+    "/settings/appearance/",
+    "/export/",
 ]
 
 #: A form, a detail page, an area with a layout of its own: a wide page is not a wide
@@ -42,9 +46,6 @@ MEASURED = [
     "/jobs/postings/new/",
     "/documents/letters/new/",
     "/career/",
-    "/accounts/profile/",
-    "/settings/appearance/",
-    "/export/",
 ]
 
 

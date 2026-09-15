@@ -511,6 +511,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Your details, Settings and Server settings use the whole screen.** Each is a sidebar
+  beside a page, and each capped the pair well short of a wide monitor — *Your details* at
+  896 pixels inside the 1280 the base template already keeps, the two Settings frames at
+  1024 — with the sidebar taking a good share of what was left, so a form drew in roughly
+  640 pixels on a 2560-pixel screen and the server's people, plugins and logs wrapped the
+  way the tables did before #188. The frames empty the page's measure now, as the tables
+  and the board do: a frame is a grid even when the page inside it is a form. The
+  one-question server forms keep their own narrow column, which is a different thing. (#198)
+
 - **The tab says which Postulo it is.** A page's title was the page's name alone —
   *Dashboard*, *Your details* — so two instances side by side, or Postulo beside anything
   else, were tabs nobody could tell apart, and a screen reader announced a page with no
