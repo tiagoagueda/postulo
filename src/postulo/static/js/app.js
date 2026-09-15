@@ -369,6 +369,27 @@
     }
   });
 
+  // The header floats (#195), and its height is not a constant: the row wraps on a
+  // narrow screen and in a language with longer labels. So it is measured, once and on
+  // every resize, into a custom property on the root that the stylesheet reads wherever
+  // something has to clear it -- the sticky sidebars, the skip link, scroll-padding for
+  // anchors -- and that the section observer below reads for its line. Set through the
+  // CSSOM rather than a style attribute, which the content-security policy would drop.
+  var siteHeader = document.querySelector("[data-site-header]");
+  function measureHeader() {
+    if (siteHeader) {
+      document.documentElement.style.setProperty("--header-height", siteHeader.offsetHeight + "px");
+    }
+  }
+  function headerHeight() {
+    return siteHeader ? siteHeader.offsetHeight : 0;
+  }
+  measureHeader();
+  window.addEventListener("resize", measureHeader);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(measureHeader);
+  }
+
   // "/" jumps to the search box, as on most sites with one, unless the person is
   // already typing somewhere.
   document.addEventListener("keydown", function (event) {
@@ -947,7 +968,9 @@
     var scheduled = false;
     function mark() {
       scheduled = false;
-      var line = window.innerHeight * 0.4;
+      // Two-fifths of the window that is not under the header (#195).
+      var covered = headerHeight();
+      var line = covered + (window.innerHeight - covered) * 0.4;
       var current = sections[0];
       for (var i = 0; i < sections.length; i++) {
         if (sections[i].getBoundingClientRect().top <= line) {

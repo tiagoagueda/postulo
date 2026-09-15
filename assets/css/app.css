@@ -702,8 +702,17 @@ details[data-menu] > summary::-webkit-details-marker {
     @apply sr-only;
   }
   .skip-link:focus {
-    @apply not-sr-only fixed start-4 top-4 z-50 rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white;
+    @apply not-sr-only fixed start-4 z-50 rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white;
+    /* Below the floating header rather than on top of the wordmark (#195). */
+    top: calc(var(--header-height, 3.5rem) + 1rem);
   }
+}
+
+/* The header floats (#195), so anything scrolled to -- the skip link's target, a section
+   an anchor names -- would land under it. One rule on the root clears it for every anchor
+   on every page, by the header's measured height, or 3.5rem where nothing measured it. */
+html {
+  scroll-padding-top: calc(var(--header-height, 3.5rem) + 1rem);
 }
 
 @media (prefers-reduced-motion: reduce) {

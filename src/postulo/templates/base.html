@@ -36,7 +36,16 @@
     {# The first thing Tab reaches: past the header, straight to the page. #}
     <a href="#main" class="skip-link">{% translate "Skip to content" %}</a>
     {% block chrome %}
-      <header class="border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900">
+      {% comment %} The header floats: `sticky top-0`, so the wordmark, the navigation, the
+         search and the account menu are there wherever the page has scrolled to (#195).
+         Its height is not a constant -- the row wraps on a narrow screen and in a language
+         with longer labels -- so `app.js` measures it into `--header-height` on the root,
+         and everything that has to clear it (the sticky sidebars, the skip link, the
+         anchors through `scroll-padding-top`, the section observer's line) reads that one
+         value, with 3.5rem as the answer where scripts do not run. `z-30`: above the page
+         and its sticky sidebars, below the skip link's z-50. {% endcomment %}
+      <header class="sticky top-0 z-30 border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900"
+              data-site-header>
         {% comment %} `relative` so the narrow-screen navigation panel below can pin itself to
            this row's two edges rather than to wherever the Menu button lands in it. {% endcomment %}
         {% comment %} No cap: the masthead spans the screen, so it never sits narrower than a

@@ -34,6 +34,27 @@ def test_the_right_side_holds_the_account_menu_and_the_theme_switch(client, user
     assert reverse("core:export") not in header
 
 
+def test_the_header_floats_and_everything_that_has_to_clear_it_reads_one_height(client, user):
+    """`sticky top-0` on the header, and the offsets that follow it all read the height the
+    script measures, with the same fallback where it does not run (#195)."""
+    from pathlib import Path
+
+    client.force_login(user)
+    html = client.get(reverse("core:home")).content.decode()
+    header = html.split("<header", 1)[1].split(">", 1)[0]
+    assert "sticky" in header and "top-0" in header and "data-site-header" in header
+
+    profile = client.get(reverse("accounts:profile")).content.decode()
+    assert "lg:top-[calc(var(--header-height,3.5rem)+1rem)]" in profile, "the sidebar clears it"
+
+    root = Path(__file__).resolve().parents[1]
+    static = root / "src" / "postulo" / "static"
+    stylesheet = (static / "css" / "app.css").read_text(encoding="utf-8")
+    assert "scroll-padding-top" in stylesheet and "--header-height" in stylesheet
+    script = (static / "js" / "app.js").read_text(encoding="utf-8")
+    assert '"--header-height"' in script
+
+
 def test_sign_out_stays_a_post(client, user):
     client.force_login(user)
     header = header_of(client.get(reverse("core:home")))

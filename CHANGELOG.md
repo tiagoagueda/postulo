@@ -511,6 +511,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **The header stays at the top while the page scrolls.** On any page longer than a
+  screen the wordmark, the navigation, the search and the account menu were gone after the
+  first flick, and getting anywhere else meant scrolling back up. The header floats now.
+  Its height is not a constant — the row wraps on a phone and in a language with longer
+  labels — so the script measures it once and on every resize, and everything that has to
+  clear it reads that one value: the sticky sidebars on *Your career* and *Your details*,
+  the skip link, every anchor through the root's scroll padding, and the line the section
+  navigation reads its position from. Where scripts do not run, the same rules fall back
+  to the header's usual height. (#195)
+
 - **Your details, Settings and Server settings use the whole screen.** Each is a sidebar
   beside a page, and each capped the pair well short of a wide monitor — *Your details* at
   896 pixels inside the 1280 the base template already keeps, the two Settings frames at
