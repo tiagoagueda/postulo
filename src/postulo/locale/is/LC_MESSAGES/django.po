@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: íslenska\n"
@@ -143,6 +143,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "fyrir %(days)s degi"
 msgstr[1] "fyrir %(days)s dögum"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1080,7 +1085,7 @@ msgid ""
 msgstr ""
 "Bætti við %(total)s færslum. Engu var skrifað yfir; það sem tvöfaldaðist er þitt að eyða."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "Bætt á tímalínuna."
@@ -1128,6 +1133,10 @@ msgstr ""
 #, draft
 msgid "Aerospace"
 msgstr "Flug og geimur"
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1247,6 +1256,13 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "óþekkt skráargerð"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1708,7 +1724,10 @@ msgstr "C1 — framhaldsstig"
 msgid "C2 — proficient"
 msgstr "C2 — fullnusta"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "Dagatal"
@@ -1724,6 +1743,10 @@ msgstr "Dagatalsskrá"
 #, draft
 msgid "calendar identifier"
 msgstr "dagatalsauðkenni"
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
+msgstr ""
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2026,7 +2049,7 @@ msgstr "Veldu að minnsta kosti eitt skjal til að skrá."
 msgid "Choose what kind of identifier this is."
 msgstr "Veldu hvers konar auðkenni þetta er."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Veldu fyrst hvaða umsókn þetta varðar."
@@ -2591,6 +2614,10 @@ msgstr "Dagsetningar ritaðar sem"
 msgid "Dates you choose"
 msgstr "Dagsetningar sem þú velur"
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2732,7 +2759,7 @@ msgstr "Hafna"
 msgid "Declined"
 msgstr "Hafnað"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Hafnað. Þetta verður ekki lagt til aftur."
@@ -3025,6 +3052,10 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "Hvert þrep telur umsóknir sem komust þangað einhvern tíma, hvað sem gerðist á eftir."
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
+msgstr ""
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3496,7 +3527,7 @@ msgstr "skrá"
 msgid "File saved."
 msgstr "Skrá vistuð."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -4370,7 +4401,7 @@ msgstr "viðtal"
 msgid "Interview cancelled"
 msgstr "Viðtali aflýst"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "Viðtal skráð."
@@ -4380,7 +4411,7 @@ msgstr "Viðtal skráð."
 msgid "Interview scheduled"
 msgstr "Viðtal ráðgert"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "Viðtal ráðgert."
@@ -4390,10 +4421,14 @@ msgstr "Viðtal ráðgert."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Viðtal á morgun: %(kind)s hjá %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "Viðtal uppfært."
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4416,6 +4451,11 @@ msgstr "viðtöl"
 #, draft
 msgid "Interviews"
 msgstr "Viðtöl"
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4543,7 +4583,7 @@ msgstr "starfsauglýsingar"
 msgid "Job search report"
 msgstr "Skýrsla um atvinnuleit"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4801,6 +4841,7 @@ msgstr "síðast notað"
 msgid "last worked"
 msgstr "virkaði síðast"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5283,6 +5324,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr "Peningar og dagsetningar"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6020,6 +6062,10 @@ msgid ""
 msgstr ""
 "Ekkert í dagbókinni. Þegar þér er boðið eitt, ráðgerðu það af síðu umsóknarinnar."
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6094,6 +6140,10 @@ msgstr ""
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Ekkert er snert á hinni þjónustunni. Þú getur tengst aftur síðar."
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6782,6 +6832,7 @@ msgid "Per year"
 msgstr "Á ári"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "Tímabil"
@@ -7493,12 +7544,12 @@ msgid ""
 msgstr ""
 "Skráð gegn öllu sem sett er upp héðan, svo því verður ekki breytt síðar án þess að gera það uppsetta munaðarlaust."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Skráð sem aflýst."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "Skráð sem haldið."
@@ -7518,7 +7569,7 @@ msgstr "skráð þann"
 msgid "Recorded what you sent."
 msgstr "Skráði hvað þú sendir."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Skráð: enginn mætti."
@@ -7633,6 +7684,10 @@ msgstr "Minna mig á það daginn áður"
 #, draft
 msgid "reminder"
 msgstr "áminning"
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
+msgstr ""
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9247,7 +9302,7 @@ msgstr "Þetta er ekki eining sem Postulo þekkir."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Þetta er ekki Ed25519-dreifilykill: %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Þetta er ekki niðurstaða sem Postulo þekkir."
@@ -9358,7 +9413,7 @@ msgstr "Sú viðbót er ekki lengur uppsett."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Það svar kom ekki frá beiðni sem Postulo sendi."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Þeirri tillögu hefur þegar verið svarað."
@@ -10179,6 +10234,14 @@ msgstr "Til að afhenda auglýsingu (krefst captures-umfangsins):"
 msgid "to status"
 msgstr "í stöðu"
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10644,6 +10707,11 @@ msgstr "vefsíða"
 msgid "Websites"
 msgstr "Vefsíður"
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

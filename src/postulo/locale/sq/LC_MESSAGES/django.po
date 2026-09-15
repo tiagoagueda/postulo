@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: shqip\n"
@@ -143,6 +143,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "%(days)s ditë më parë"
 msgstr[1] "%(days)s ditë më parë"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1080,7 +1085,7 @@ msgid ""
 msgstr ""
 "U shtuan %(total)s zëra. Asgjë nuk u mbishkrua; çdo dublikatë është e juaja për ta fshirë."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "U shtua në vijën kohore."
@@ -1128,6 +1133,10 @@ msgstr ""
 #, draft
 msgid "Aerospace"
 msgstr "Hapësira ajrore"
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1248,6 +1257,13 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "një lloj skedari i panjohur"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1710,7 +1726,10 @@ msgstr "C1 — i avancuar"
 msgid "C2 — proficient"
 msgstr "C2 — i zoti"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "Kalendar"
@@ -1726,6 +1745,10 @@ msgstr "Skedar kalendari"
 #, draft
 msgid "calendar identifier"
 msgstr "identifikues kalendari"
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
+msgstr ""
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2028,7 +2051,7 @@ msgstr "Zgjidhni të paktën një dokument për të regjistruar."
 msgid "Choose what kind of identifier this is."
 msgstr "Zgjidhni çfarë lloj identifikuesi është ky."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Zgjidhni fillimisht për cilin aplikim bëhet fjalë."
@@ -2592,6 +2615,10 @@ msgstr "Datat shkruhen si"
 msgid "Dates you choose"
 msgstr "Data që zgjedh vetë"
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2734,7 +2761,7 @@ msgstr "Refuzo"
 msgid "Declined"
 msgstr "Refuzuar"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Refuzuar. Nuk do të sugjerohet më."
@@ -3027,6 +3054,10 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "Çdo fazë numëron aplikimet që e arritën ndonjëherë, çfarëdo që ndodhi më pas."
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
+msgstr ""
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3498,7 +3529,7 @@ msgstr "skedar"
 msgid "File saved."
 msgstr "Skedari u ruajt."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -4370,7 +4401,7 @@ msgstr "intervistë"
 msgid "Interview cancelled"
 msgstr "Intervista u anulua"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "Intervista u regjistrua."
@@ -4380,7 +4411,7 @@ msgstr "Intervista u regjistrua."
 msgid "Interview scheduled"
 msgstr "Intervista u caktua"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "Intervista u caktua."
@@ -4390,10 +4421,14 @@ msgstr "Intervista u caktua."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Intervistë nesër: %(kind)s te %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "Intervista u përditësua."
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4416,6 +4451,11 @@ msgstr "intervista"
 #, draft
 msgid "Interviews"
 msgstr "Intervista"
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4542,7 +4582,7 @@ msgstr "shpallje pune"
 msgid "Job search report"
 msgstr "Raport për kërkimin e punës"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4799,6 +4839,7 @@ msgstr "përdorur së fundmi"
 msgid "last worked"
 msgstr "funksionoi së fundmi"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5280,6 +5321,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr "Paratë dhe datat"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6015,6 +6057,10 @@ msgid ""
 "Nothing in the diary. When one is offered, schedule it from the application's page."
 msgstr "Asgjë në ditar. Kur t'ju ofrohet një, caktojeni nga faqja e aplikimit."
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6089,6 +6135,10 @@ msgstr ""
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Asgjë te shërbimi tjetër nuk preket. Mund të lidheni sërish më vonë."
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6776,6 +6826,7 @@ msgid "Per year"
 msgstr "Në vit"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "Periudha"
@@ -7485,12 +7536,12 @@ msgid ""
 msgstr ""
 "Regjistrohet kundrejt gjithçkaje të instaluar prej këtu, prandaj nuk mund të ndryshojë më vonë pa i lënë jetimë ato që instaloi."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Regjistruar si e anuluar."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "Regjistruar si e mbajtur."
@@ -7510,7 +7561,7 @@ msgstr "regjistruar më"
 msgid "Recorded what you sent."
 msgstr "U regjistrua çfarë dërguat."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Regjistruar: askush nuk u paraqit."
@@ -7626,6 +7677,10 @@ msgstr "Kujtomë një ditë më parë"
 #, draft
 msgid "reminder"
 msgstr "kujtesë"
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
+msgstr ""
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9240,7 +9295,7 @@ msgstr "Ky nuk është modul që Postulo e njeh."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Ky nuk është çelës publik Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Ky nuk është përfundim që Postulo e njeh."
@@ -9350,7 +9405,7 @@ msgstr "Ajo shtojcë nuk është më e instaluar."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Ajo përgjigje nuk erdhi nga një kërkesë që bëri Postulo."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Atij sugjerimi i është përgjigjur tashmë."
@@ -10170,6 +10225,14 @@ msgstr "Për të dorëzuar një shpallje (kërkon fushëveprimin captures):"
 msgid "to status"
 msgstr "në statusin"
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10637,6 +10700,11 @@ msgstr "faqe interneti"
 msgid "Websites"
 msgstr "Faqe interneti"
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

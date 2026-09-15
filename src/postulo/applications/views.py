@@ -30,7 +30,7 @@ from postulo.core.models import Tag
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 
-from . import ical, quiet, reports, suggestions
+from . import agenda, ical, quiet, reports, suggestions
 from .forms import (
     ApplicationForm,
     ApplicationIntakeForm,
@@ -509,6 +509,18 @@ class ApplicationQuietActionView(OwnedObjectMixin, View):
 
 
 # ------------------------------------------------------------------ interviews
+
+
+class CalendarView(LoginRequiredMixin, View):
+    """The dated things of a search, by day: a month by default, or a week, a day, an
+    agenda (#204). Everything is in the address -- `?month=2026-09`, or `?view=week&on=`
+    -- so a period is bookmarkable and the page needs no script. `agenda` builds it."""
+
+    template_name = "applications/calendar.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        page = agenda.page_for(request.GET, request.user)
+        return render(request, self.template_name, {"page": page})
 
 
 class InterviewListView(OwnedObjectMixin, ListView):

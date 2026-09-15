@@ -290,6 +290,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **A Calendar page beside Reminders.** Everything dated was a list, and the lists were in
+  different places: interviews soonest first on one page, reminders on another, and "what
+  is on this week" meant opening both and reading dates. *Calendar* draws the month —
+  interviews and reminders by day, each a link to its application — with *Week*, *Day* and
+  *Agenda* as the same things in another shape, the agenda being what a phone wants. It is
+  a table the server renders: no script, the period in the address so a month is
+  bookmarkable, *Earlier* and *Later* as links. A cell shows two of its events and counts
+  the rest, and the day opens on all of them. A reminder done and an interview cancelled
+  are drawn struck through rather than dropped. Days are the person's own, in their time
+  zone. What else goes on it — deadlines, listings closing, appointments at the employment
+  office — is decided separately. (#204)
+
 - **The employment service is a kind of company.** France Travail, IEFP, the Bundesagentur
   für Arbeit, SEPE, Jobcentre Plus: the office a job seeker is registered with is dealt with
   throughout a search — an adviser, appointments, the report — and it is not an employer,

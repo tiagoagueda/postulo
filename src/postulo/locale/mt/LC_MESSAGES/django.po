@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Malti\n"
@@ -169,6 +169,11 @@ msgstr[0] "%(days)s jum ilu"
 msgstr[1] "%(days)s ijiem ilu"
 msgstr[2] "%(days)s jum ilu"
 msgstr[3] "%(days)s jum ilu"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1120,7 +1125,7 @@ msgid ""
 msgstr ""
 "Żdiedu %(total)s entrati. Xejn ma nkiteb fuq xejn; dak li jirriżulta doppju hu tiegħek biex tħassru."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "Miżjud mal-kronoloġija."
@@ -1168,6 +1173,10 @@ msgstr ""
 #, draft
 msgid "Aerospace"
 msgstr "Ajruspazju"
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1289,6 +1298,15 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "tip ta' fajl mhux magħruf"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1752,7 +1770,10 @@ msgstr "C1 — avvanzat"
 msgid "C2 — proficient"
 msgstr "C2 — profiċjenti"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "Kalendarju"
@@ -1768,6 +1789,10 @@ msgstr "Fajl tal-kalendarju"
 #, draft
 msgid "calendar identifier"
 msgstr "identifikatur tal-kalendarju"
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
+msgstr ""
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2070,7 +2095,7 @@ msgstr "Agħżel mill-inqas dokument wieħed biex tirreġistra."
 msgid "Choose what kind of identifier this is."
 msgstr "Agħżel liema tip ta' identifikatur hu dan."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "L-ewwel agħżel ma' liema applikazzjoni għandha x'taqsam."
@@ -2635,6 +2660,10 @@ msgstr "Dati miktuba bħala"
 msgid "Dates you choose"
 msgstr "Dati li tagħżel int"
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2777,7 +2806,7 @@ msgstr "Irrifjuta"
 msgid "Declined"
 msgstr "Irrifjutata"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Irrifjutata. Mhux se terġa' tiġi ssuġġerita."
@@ -3070,6 +3099,10 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "Kull stadju jgħodd l-applikazzjonijiet li qatt waslu għalih, jiġri x'jiġri wara."
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
+msgstr ""
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3541,7 +3574,7 @@ msgstr "fajl"
 msgid "File saved."
 msgstr "Fajl issejvjat."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -4415,7 +4448,7 @@ msgstr "intervista"
 msgid "Interview cancelled"
 msgstr "Intervista kkanċellata"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "Intervista rreġistrata."
@@ -4425,7 +4458,7 @@ msgstr "Intervista rreġistrata."
 msgid "Interview scheduled"
 msgstr "Intervista skedata"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "Intervista skedata."
@@ -4435,10 +4468,14 @@ msgstr "Intervista skedata."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Intervista għada: %(kind)s ma' %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "Intervista aġġornata."
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4461,6 +4498,11 @@ msgstr "intervisti"
 #, draft
 msgid "Interviews"
 msgstr "Intervisti"
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4586,7 +4628,7 @@ msgstr "avviżi tax-xogħol"
 msgid "Job search report"
 msgstr "Rapport dwar it-tfittxija għal xogħol"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4844,6 +4886,7 @@ msgstr "l-aħħar użu"
 msgid "last worked"
 msgstr "l-aħħar li ħadem"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5329,6 +5372,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr "Flus u dati"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6066,6 +6110,10 @@ msgid ""
 msgstr ""
 "Xejn fid-djarju. Meta tiġi offruta waħda, skedaha mill-paġna tal-applikazzjoni."
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6141,6 +6189,10 @@ msgstr ""
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "Xejn fuq is-servizz l-ieħor ma jintmess. Tista' terġa' tikkonnettjah aktar tard."
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6852,6 +6904,7 @@ msgid "Per year"
 msgstr "Fis-sena"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "Perjodu"
@@ -7567,12 +7620,12 @@ msgid ""
 msgstr ""
 "Jiġi rreġistrat ma’ kulma jiġi installat minn hawn, għalhekk ma jistax jinbidel wara mingħajr ma jinqata’ dak li installa."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Irreġistrata bħala kkanċellata."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "Irreġistrata bħala saret."
@@ -7592,7 +7645,7 @@ msgstr "irreġistrat fi"
 msgid "Recorded what you sent."
 msgstr "Irreġistrat dak li bgħatt."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Irreġistrat: ħadd ma deher."
@@ -7709,6 +7762,10 @@ msgstr "Fakkarni l-ġurnata ta' qabel"
 #, draft
 msgid "reminder"
 msgstr "tfakkira"
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
+msgstr ""
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9319,7 +9376,7 @@ msgstr "Dak mhuwiex widget li Postulo jaf bih."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Din mhijiex ċavetta pubblika Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Dak mhuwiex riżultat li Postulo jagħraf."
@@ -9429,7 +9486,7 @@ msgstr "Dak il-plugin m'għadux installat."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Dik it-tweġiba ma ġietx minn talba li għamel Postulo."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Dak is-suġġeriment diġà ġie mwieġeb."
@@ -10258,6 +10315,14 @@ msgstr "Biex tgħaddi avviż (jeħtieġ l-ambitu captures):"
 msgid "to status"
 msgstr "għall-istatus"
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10724,6 +10789,11 @@ msgstr "sit"
 msgid "Websites"
 msgstr "Siti"
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

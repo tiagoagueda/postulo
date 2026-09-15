@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -145,6 +145,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "il y a %(days)s jour"
 msgstr[1] "il y a %(days)s jours"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format, draft
+msgid "%(days)s days from %(day)s"
+msgstr "%(days)s jours à partir du %(day)s"
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1092,7 +1097,7 @@ msgid ""
 msgstr ""
 "%(total)s entrées ajoutées. Rien n'a été écrasé ; ce qui fait doublon, c'est à vous de le supprimer."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "Ajouté à la chronologie."
@@ -1140,6 +1145,11 @@ msgstr "conseiller·ère %(adviser)s"
 #, draft
 msgid "Aerospace"
 msgstr "Aérospatiale"
+
+#: src/postulo/applications/agenda.py:282
+#, draft
+msgid "Agenda"
+msgstr "Agenda"
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1260,6 +1270,13 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "un type de fichier inconnu"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format, draft
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] "et %(counter)s de plus"
+msgstr[1] "et %(counter)s de plus"
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1728,7 +1745,10 @@ msgstr "C1 — avancé"
 msgid "C2 — proficient"
 msgstr "C2 — maîtrise"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "Calendrier"
@@ -1744,6 +1764,11 @@ msgstr "Fichier de calendrier"
 #, draft
 msgid "calendar identifier"
 msgstr "identifiant de calendrier"
+
+#: src/postulo/templates/applications/calendar.html:59
+#, draft
+msgid "Calendar views"
+msgstr "Vues du calendrier"
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2046,7 +2071,7 @@ msgstr "Choisissez au moins un document à enregistrer."
 msgid "Choose what kind of identifier this is."
 msgstr "Indiquez de quel type d'identifiant il s'agit."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Choisissez d'abord de quelle candidature il s'agit."
@@ -2612,6 +2637,11 @@ msgstr "Dates écrites au format"
 msgid "Dates you choose"
 msgstr "Des dates que vous choisissez"
 
+#: src/postulo/applications/agenda.py:281
+#, draft
+msgid "Day"
+msgstr "Jour"
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2754,7 +2784,7 @@ msgstr "Refuser"
 msgid "Declined"
 msgstr "Refusée"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Refusée. Elle ne sera plus proposée."
@@ -3049,6 +3079,11 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "Chaque étape compte les candidatures qui l'ont atteinte un jour, quoi qu'il se soit passé ensuite."
+
+#: src/postulo/templates/applications/calendar.html:68
+#, draft
+msgid "Earlier"
+msgstr "Précédent"
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3524,7 +3559,7 @@ msgstr "fichier"
 msgid "File saved."
 msgstr "Fichier enregistré."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 #, draft
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
@@ -4406,7 +4441,7 @@ msgstr "entretien"
 msgid "Interview cancelled"
 msgstr "Entretien annulé"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "Entretien enregistré."
@@ -4416,7 +4451,7 @@ msgstr "Entretien enregistré."
 msgid "Interview scheduled"
 msgstr "Entretien planifié"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "Entretien planifié."
@@ -4426,10 +4461,15 @@ msgstr "Entretien planifié."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Entretien demain : %(kind)s chez %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "Entretien mis à jour."
+
+#: src/postulo/templates/applications/calendar.html:19
+#, draft
+msgid "Interview:"
+msgstr "Entretien :"
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4452,6 +4492,13 @@ msgstr "entretiens"
 #, draft
 msgid "Interviews"
 msgstr "Entretiens"
+
+#: src/postulo/templates/applications/calendar.html:53
+#, draft
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
+"Entretiens et rappels, jour par jour. Planifiez un entretien depuis la page d'une candidature ; un rappel depuis Rappels."
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4578,7 +4625,7 @@ msgstr "annonces"
 msgid "Job search report"
 msgstr "Rapport de recherche d’emploi"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4838,6 +4885,7 @@ msgstr "dernière utilisation"
 msgid "last worked"
 msgstr "dernier fonctionnement"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5321,6 +5369,7 @@ msgstr "Argent"
 msgid "Money and dates"
 msgstr "Argent et dates"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6067,6 +6116,11 @@ msgid ""
 msgstr ""
 "Rien à l'agenda. Quand un entretien est proposé, planifiez-le depuis la page de la candidature."
 
+#: src/postulo/templates/applications/calendar.html:43
+#, draft
+msgid "Nothing in this period."
+msgstr "Rien sur cette période."
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6146,6 +6200,11 @@ msgstr "Rien dessus. Ajoutez quelque chose depuis la liste ci-dessous."
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "Rien n'est modifié sur l'autre service. Vous pourrez le reconnecter plus tard."
+
+#: src/postulo/templates/applications/calendar.html:38
+#, draft
+msgid "Nothing on this day."
+msgstr "Rien ce jour-là."
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6842,6 +6901,7 @@ msgid "Per year"
 msgstr "Par an"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "Période"
@@ -7556,12 +7616,12 @@ msgid ""
 msgstr ""
 "Enregistré sur tout ce qui est installé depuis ce dépôt : il ne peut donc plus changer sans détacher ce qu’il a installé."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Enregistré comme annulé."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "Enregistré comme tenu."
@@ -7581,7 +7641,7 @@ msgstr "enregistré le"
 msgid "Recorded what you sent."
 msgstr "Ce que vous avez envoyé a été enregistré."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Enregistré : personne ne s'est présenté."
@@ -7698,6 +7758,11 @@ msgstr "Me le rappeler la veille"
 #, draft
 msgid "reminder"
 msgstr "rappel"
+
+#: src/postulo/templates/applications/calendar.html:19
+#, draft
+msgid "Reminder:"
+msgstr "Rappel :"
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9327,7 +9392,7 @@ msgstr "Ce n'est pas un widget que Postulo connaît."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Ce n’est pas une clé publique Ed25519 : %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Ce n'est pas un résultat que Postulo reconnaît."
@@ -9437,7 +9502,7 @@ msgstr "Ce plugin n'est plus installé."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Cette réponse ne provient pas d'une requête faite par Postulo."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Cette proposition a déjà reçu une réponse."
@@ -10274,6 +10339,16 @@ msgstr "Pour transmettre une annonce (nécessite la portée captures) :"
 msgid "to status"
 msgstr "vers le statut"
 
+#: src/postulo/templates/applications/calendar.html:69
+#, draft
+msgid "Today"
+msgstr "Aujourd'hui"
+
+#: src/postulo/templates/applications/calendar.html:98
+#, draft
+msgid "today"
+msgstr "aujourd'hui"
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10745,6 +10820,12 @@ msgstr "site web"
 msgid "Websites"
 msgstr "Sites web"
 
+#: src/postulo/applications/agenda.py:280
+#, draft
+msgid "Week"
+msgstr "Semaine"
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: ქართული\n"
@@ -143,6 +143,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "%(days)s დღის წინ"
 msgstr[1] "%(days)s დღის წინ"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1079,7 +1084,7 @@ msgid ""
 msgstr ""
 "დაემატა %(total)s ჩანაწერი. არაფერი გადაიწერა; ყველაფერი, რაც გაორმაგდა, თქვენი წასაშლელია."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "დაემატა ქრონოლოგიაში."
@@ -1127,6 +1132,10 @@ msgstr ""
 #, draft
 msgid "Aerospace"
 msgstr "საჰაერო-კოსმოსური დარგი"
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1247,6 +1256,13 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "უცნობი ფაილის ტიპი"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1710,7 +1726,10 @@ msgstr "C1 — მაღალი"
 msgid "C2 — proficient"
 msgstr "C2 — თავისუფალი"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "კალენდარი"
@@ -1726,6 +1745,10 @@ msgstr "კალენდრის ფაილი"
 #, draft
 msgid "calendar identifier"
 msgstr "კალენდრის იდენტიფიკატორი"
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
+msgstr ""
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2028,7 +2051,7 @@ msgstr "აირჩიეთ სულ მცირე ერთი დოკ�
 msgid "Choose what kind of identifier this is."
 msgstr "აირჩიეთ, რა სახის იდენტიფიკატორია ეს."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "ჯერ აირჩიეთ, რომელ განაცხადს ეხება ეს."
@@ -2594,6 +2617,10 @@ msgstr "თარიღები იწერება როგორც"
 msgid "Dates you choose"
 msgstr "თქვენ მიერ არჩეული თარიღები"
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2736,7 +2763,7 @@ msgstr "უარყოფა"
 msgid "Declined"
 msgstr "უარყოფილია"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "უარყოფილია. აღარ შემოგთავაზდებათ."
@@ -3029,6 +3056,10 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "თითოეული ეტაპი ითვლის განაცხადებს, რომლებმაც ოდესმე მიაღწიეს მას, რაც უნდა მომხდარიყო შემდეგ."
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
+msgstr ""
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3499,7 +3530,7 @@ msgstr "ფაილი"
 msgid "File saved."
 msgstr "ფაილი შენახულია."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -4374,7 +4405,7 @@ msgstr "გასაუბრება"
 msgid "Interview cancelled"
 msgstr "გასაუბრება გაუქმდა"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "გასაუბრება აღირიცხა."
@@ -4384,7 +4415,7 @@ msgstr "გასაუბრება აღირიცხა."
 msgid "Interview scheduled"
 msgstr "გასაუბრება დაინიშნა"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "გასაუბრება დაინიშნა."
@@ -4394,10 +4425,14 @@ msgstr "გასაუბრება დაინიშნა."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "გასაუბრება ხვალ: %(kind)s კომპანიაში %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "გასაუბრება განახლდა."
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4420,6 +4455,11 @@ msgstr "გასაუბრებები"
 #, draft
 msgid "Interviews"
 msgstr "გასაუბრებები"
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4546,7 +4586,7 @@ msgstr "სამსახურის ვაკანსიები"
 msgid "Job search report"
 msgstr "სამსახურის ძებნის ანგარიში"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4804,6 +4844,7 @@ msgstr "ბოლოს გამოიყენა"
 msgid "last worked"
 msgstr "ბოლოს იმუშავა"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5285,6 +5326,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr "ფული და თარიღები"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6023,6 +6065,10 @@ msgid ""
 msgstr ""
 "დღიურში არაფერია. როცა რომელიმეს შემოგთავაზებენ, დანიშნეთ განაცხადის გვერდიდან."
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6097,6 +6143,10 @@ msgstr ""
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "მეორე სერვისზე არაფერს ეხება. მოგვიანებით ხელახლა შეგიძლიათ დაკავშირება."
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6787,6 +6837,7 @@ msgid "Per year"
 msgstr "წელიწადში"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "პერიოდი"
@@ -7502,12 +7553,12 @@ msgid ""
 msgstr ""
 "აღირიცხება აქედან დაყენებულ ყველაფერთან, ამიტომ მოგვიანებით ვერ შეიცვლება ისე, რომ დაყენებული ობლად არ დარჩეს."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "აღრიცხულია როგორც გაუქმებული."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "აღრიცხულია როგორც ჩატარებული."
@@ -7527,7 +7578,7 @@ msgstr "აღრიცხვის თარიღი"
 msgid "Recorded what you sent."
 msgstr "აღირიცხა, რა გაგზავნეთ."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "აღრიცხულია: ვერავინ გამოცხადდა."
@@ -7643,6 +7694,10 @@ msgstr "შემახსენე ერთი დღით ადრე"
 #, draft
 msgid "reminder"
 msgstr "შეხსენება"
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
+msgstr ""
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9254,7 +9309,7 @@ msgstr "ეს არ არის მოდული, რომელსაც 
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "ეს არ არის Ed25519 საჯარო გასაღები: %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "ეს არ არის შედეგი, რომელსაც Postulo ცნობს."
@@ -9364,7 +9419,7 @@ msgstr "ის მოდული აღარ არის დაყენე�
 msgid "That reply did not come from a request Postulo made."
 msgstr "ეს პასუხი არ მოვიდა Postulo-ს გაგზავნილი მოთხოვნიდან."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "იმ შემოთავაზებას უკვე გაეცა პასუხი."
@@ -10184,6 +10239,14 @@ msgstr "ვაკანსიის გადასაცემად (საჭ
 msgid "to status"
 msgstr "სტატუსზე"
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10650,6 +10713,11 @@ msgstr "ვებგვერდი"
 msgid "Websites"
 msgstr "ვებგვერდები"
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{# A grid: this page empties `main_width` and takes the whole screen (#188). #}
+{% block main_width %}{% endblock %}
+{% load i18n postulo %}
+
+{% block title %}{% translate "Calendar" %}{% endblock %}
+
+{% comment %} One event, wherever it is drawn (#204): a link the height of a target, the
+   kind said by colour and by an icon, the time before the title, and a struck line for
+   one that is over -- a reminder done, an interview cancelled -- because the month is a
+   record as well as a plan. {% endcomment %}
+{% partialdef event %}
+  <a href="{{ event.url }}"
+     class="flex min-h-6 items-start gap-1 rounded px-1 py-0.5 text-xs leading-5 hover:underline {% if event.kind == 'interview' %}bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100{% else %}bg-amber-50 text-amber-900 dark:bg-amber-900 dark:text-amber-100{% endif %}{% if event.muted %} line-through opacity-60{% endif %}"
+     data-event="{{ event.kind }}">
+    <span class="shrink-0 tabular-nums">{{ event.local_start|date:"H:i" }}</span>
+    <span class="min-w-0 {% if compact %}truncate{% endif %}">
+      <span class="sr-only">{% if event.kind == 'interview' %}{% translate "Interview:" %}{% else %}{% translate "Reminder:" %}{% endif %}</span>
+      {{ event.title }}{% if not compact and event.detail %} <span class="font-light">· {{ event.detail }}</span>{% endif %}
+    </span>
+  </a>
+{% endpartialdef %}
+
+{% partialdef listed %}
+  {% for day, events in page.listed %}
+    <section class="card mb-4 p-0" aria-labelledby="day-{{ day|date:'Y-m-d' }}">
+      <h2 id="day-{{ day|date:'Y-m-d' }}" class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
+        {{ day|date:"l j F Y" }}
+      </h2>
+      {% if events %}
+        <ul class="space-y-1 px-3 py-3">
+          {% for event in events %}
+            <li>{% partial event %}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="px-4 py-6 text-sm text-ink-500 dark:text-ink-400">{% translate "Nothing on this day." %}</p>
+      {% endif %}
+    </section>
+  {% empty %}
+    <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Nothing in this period." %}
+    </div>
+  {% endfor %}
+{% endpartialdef %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Calendar" %}</h1>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders." %}
+      </p>
+    </div>
+    {% comment %} Four shapes of the same days: month first, and the agenda for a phone,
+       where a month grid is thirty-one cells of nothing. Links, so each is an address. {% endcomment %}
+    <nav class="ms-auto flex flex-wrap items-center gap-1" aria-label="{% translate 'Calendar views' %}">
+      {% for view, label, url, current in page.switcher %}
+        <a href="{{ url }}" class="{% if current %}nav-link-active{% else %}nav-link{% endif %}"
+           {% if current %}aria-current="page"{% endif %}>{{ label }}</a>
+      {% endfor %}
+    </nav>
+  </div>
+
+  <nav class="mb-4 flex flex-wrap items-center gap-2" aria-label="{% translate 'Period' %}">
+    <a href="{{ page.earlier }}" class="btn-ghost">{% translate "Earlier" %}</a>
+    <a href="{{ page.today }}" class="btn-ghost">{% translate "Today" %}</a>
+    <a href="{{ page.later }}" class="btn-ghost">{% translate "Later" %}</a>
+    <h2 class="ms-2 text-lg font-medium">{{ page.title }}</h2>
+  </nav>
+
+  {% if page.view == 'month' %}
+    {% comment %} Seven columns and a row per week, drawn by the server (#204). The day
+       number is a link to that day, big enough to hit; a cell shows two of its events
+       and counts the rest, and the count opens the day. A day outside the month is
+       greyed, and today is marked in words as well as in colour. {% endcomment %}
+    <div class="card scroll-x p-0">
+      <table class="w-full table-fixed text-sm" data-calendar="month">
+        <caption class="sr-only">{{ page.title }}</caption>
+        <thead>
+          <tr class="border-b border-ink-100 dark:border-ink-800">
+            {% for name in page.weekday_names %}
+              <th scope="col" class="px-2 py-2 text-start text-xs font-medium text-ink-500 dark:text-ink-400">{{ name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for week in page.weeks %}
+            <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+              {% for day in week %}
+                <td class="h-28 min-w-28 align-top p-1{% if day.outside %} bg-ink-50 dark:bg-ink-900/40{% endif %}"
+                    {% if day.today %}aria-current="date"{% endif %}>
+                  <a href="{{ day.url }}"
+                     class="mb-1 inline-flex size-7 items-center justify-center rounded-full text-xs tabular-nums {% if day.today %}bg-brand-600 font-semibold text-white{% elif day.outside %}text-ink-400 dark:text-ink-500{% else %}text-ink-700 hover:bg-ink-100 dark:text-ink-300 dark:hover:bg-ink-800{% endif %}">
+                    <span class="sr-only">{{ day.date|date:"j F" }}{% if day.today %}, {% translate "today" %}{% endif %}</span>
+                    <span aria-hidden="true">{{ day.date.day }}</span>
+                  </a>
+                  {% if day.events %}
+                    <ul class="space-y-0.5">
+                      {% for event in day.shown %}
+                        <li>{% with compact=True %}{% partial event %}{% endwith %}</li>
+                      {% endfor %}
+                      {% if day.more %}
+                        <li>
+                          <a href="{{ day.url }}" class="block min-h-6 px-1 text-xs leading-6 text-ink-600 hover:underline dark:text-ink-300">
+                            {% blocktranslate count counter=day.more trimmed %}
+                              and {{ counter }} more
+                            {% plural %}
+                              and {{ counter }} more
+                            {% endblocktranslate %}
+                          </a>
+                        </li>
+                      {% endif %}
+                    </ul>
+                  {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% elif page.view == 'week' %}
+    <div class="grid gap-3 lg:grid-cols-7" data-calendar="week">
+      {% for day in page.days %}
+        <section class="card p-3" aria-labelledby="day-{{ day.date|date:'Y-m-d' }}" {% if day.today %}aria-current="date"{% endif %}>
+          <h3 id="day-{{ day.date|date:'Y-m-d' }}" class="mb-2 text-sm font-medium">
+            <a href="{{ day.url }}" class="inline-flex min-h-6 items-center hover:underline {% if day.today %}text-brand-700 dark:text-brand-300{% endif %}">{{ day.date|date:"D j" }}</a>
+          </h3>
+          {% if day.events %}
+            <ul class="space-y-1">
+              {% for event in day.events %}
+                <li>{% partial event %}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-xs text-ink-400 dark:text-ink-500">—</p>
+          {% endif %}
+        </section>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div data-calendar="{{ page.view }}">
+      {% partial listed %}
+    </div>
+  {% endif %}
+{% endblock %}

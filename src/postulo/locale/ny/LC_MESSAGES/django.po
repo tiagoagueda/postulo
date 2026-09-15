@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-06 21:17+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Chichewa\n"
@@ -139,6 +139,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format
@@ -942,7 +947,7 @@ msgid ""
 "Added %(total)s entries. Nothing was overwritten; anything duplicated is yours to delete."
 msgstr ""
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 msgid "Added to the timeline."
 msgstr ""
 
@@ -981,6 +986,10 @@ msgstr ""
 
 #: src/postulo/jobs/industries.py:84
 msgid "Aerospace"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
 msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
@@ -1080,6 +1089,13 @@ msgstr ""
 #: src/postulo/plugins/fetching.py:242
 msgid "an unknown file type"
 msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1462,7 +1478,10 @@ msgstr ""
 msgid "C2 — proficient"
 msgstr ""
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 msgid "Calendar"
 msgstr ""
 
@@ -1474,6 +1493,10 @@ msgstr ""
 
 #: src/postulo/applications/models.py:548
 msgid "calendar identifier"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
 msgstr ""
 
 #: src/postulo/applications/models.py:339
@@ -1729,7 +1752,7 @@ msgstr ""
 msgid "Choose what kind of identifier this is."
 msgstr ""
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 msgid "Choose which application this is about first."
 msgstr ""
 
@@ -2194,6 +2217,10 @@ msgstr ""
 msgid "Dates you choose"
 msgstr ""
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 msgid "day / month / year (31/12/2026)"
 msgstr ""
@@ -2294,7 +2321,7 @@ msgstr ""
 msgid "Declined"
 msgstr ""
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 msgid "Declined. It will not be suggested again."
 msgstr ""
 
@@ -2534,6 +2561,10 @@ msgstr ""
 #: src/postulo/templates/widgets/funnel.html:26
 msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
 msgstr ""
 
 #: src/postulo/plugins/models.py:55
@@ -2911,7 +2942,7 @@ msgstr ""
 msgid "File saved."
 msgstr ""
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -3623,7 +3654,7 @@ msgstr ""
 msgid "Interview cancelled"
 msgstr ""
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 msgid "Interview recorded."
 msgstr ""
 
@@ -3631,7 +3662,7 @@ msgstr ""
 msgid "Interview scheduled"
 msgstr ""
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 msgid "Interview scheduled."
 msgstr ""
 
@@ -3640,8 +3671,12 @@ msgstr ""
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr ""
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 msgid "Interview updated."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
 msgstr ""
 
 #: src/postulo/applications/analytics.py:34
@@ -3661,6 +3696,11 @@ msgstr ""
 #: src/postulo/templates/widgets/industries.html:12
 #: src/postulo/templates/widgets/sources.html:12
 msgid "Interviews"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
 msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
@@ -3760,7 +3800,7 @@ msgstr ""
 msgid "Job search report"
 msgstr ""
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format
 msgid "Job search report · %(period)s"
@@ -3973,6 +4013,7 @@ msgstr ""
 msgid "last worked"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 msgid "Later"
 msgstr ""
@@ -4360,6 +4401,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr ""
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 msgid "Month"
 msgstr ""
@@ -4969,6 +5011,10 @@ msgid ""
 "Nothing in the diary. When one is offered, schedule it from the application's page."
 msgstr ""
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 msgid ""
 "Nothing installed here reads that file. Postulo reads the XML the Europass CV editor produced and the JSON europass.europa.eu exports."
@@ -5031,6 +5077,10 @@ msgstr ""
 
 #: src/postulo/templates/connections/confirm_delete.html:13
 msgid "Nothing on the other service is touched. You can connect it again later."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
 msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
@@ -5593,6 +5643,7 @@ msgid "Per year"
 msgstr ""
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 msgid "Period"
 msgstr ""
 
@@ -6169,11 +6220,11 @@ msgid ""
 "Recorded against everything installed from here, so it cannot change later without orphaning what it installed."
 msgstr ""
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 msgid "Recorded as cancelled."
 msgstr ""
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 msgid "Recorded as held."
 msgstr ""
 
@@ -6189,7 +6240,7 @@ msgstr ""
 msgid "Recorded what you sent."
 msgstr ""
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 msgid "Recorded: nobody showed up."
 msgstr ""
 
@@ -6280,6 +6331,10 @@ msgstr ""
 #: src/postulo/applications/models.py:439
 #: src/postulo/applications/models.py:556
 msgid "reminder"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
 msgstr ""
 
 #: src/postulo/applications/models.py:440
@@ -7611,7 +7666,7 @@ msgstr ""
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr ""
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 msgid "That is not an outcome Postulo recognises."
 msgstr ""
 
@@ -7701,7 +7756,7 @@ msgstr ""
 msgid "That reply did not come from a request Postulo made."
 msgstr ""
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 msgid "That suggestion has already been answered."
 msgstr ""
 
@@ -8372,6 +8427,14 @@ msgstr ""
 msgid "to status"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 msgid "Today's date"
 msgstr ""
@@ -8752,6 +8815,11 @@ msgstr ""
 msgid "Websites"
 msgstr ""
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

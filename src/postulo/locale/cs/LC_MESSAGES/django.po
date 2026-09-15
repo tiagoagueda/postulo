@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: čeština\n"
@@ -153,6 +153,11 @@ msgid_plural "%(days)s days ago"
 msgstr[0] "před %(days)s dnem"
 msgstr[1] "před %(days)s dny"
 msgstr[2] "před %(days)s dny"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1094,7 +1099,7 @@ msgid ""
 msgstr ""
 "Přidáno %(total)s položek. Nic nebylo přepsáno; co se ukáže jako duplicita, smažete sami."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "Přidáno na časovou osu."
@@ -1142,6 +1147,10 @@ msgstr ""
 #, draft
 msgid "Aerospace"
 msgstr "Letectví a kosmonautika"
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1261,6 +1270,14 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "neznámý typ souboru"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1721,7 +1738,10 @@ msgstr "C1 — pokročilý"
 msgid "C2 — proficient"
 msgstr "C2 — zdatný"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "Kalendář"
@@ -1737,6 +1757,10 @@ msgstr "Soubor kalendáře"
 #, draft
 msgid "calendar identifier"
 msgstr "identifikátor kalendáře"
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
+msgstr ""
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2039,7 +2063,7 @@ msgstr "Vyberte alespoň jeden dokument k zaznamenání."
 msgid "Choose what kind of identifier this is."
 msgstr "Vyberte, o jaký druh identifikátoru jde."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Nejprve zvolte, které přihlášky se to týká."
@@ -2605,6 +2629,10 @@ msgstr "Data zapsaná jako"
 msgid "Dates you choose"
 msgstr "Data, která si zvolíte"
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2746,7 +2774,7 @@ msgstr "Odmítnout"
 msgid "Declined"
 msgstr "Odmítnuto"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Odmítnuto. Už to nebude navrženo."
@@ -3039,6 +3067,10 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "Každá fáze počítá žádosti, které se do ní kdy dostaly, ať se potom stalo cokoli."
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
+msgstr ""
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3508,7 +3540,7 @@ msgstr "soubor"
 msgid "File saved."
 msgstr "Soubor uložen."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -4380,7 +4412,7 @@ msgstr "pohovor"
 msgid "Interview cancelled"
 msgstr "Pohovor zrušen"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "Pohovor zaznamenán."
@@ -4390,7 +4422,7 @@ msgstr "Pohovor zaznamenán."
 msgid "Interview scheduled"
 msgstr "Pohovor naplánován"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "Pohovor naplánován."
@@ -4400,10 +4432,14 @@ msgstr "Pohovor naplánován."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Pohovor zítra: %(kind)s ve firmě %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "Pohovor aktualizován."
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4426,6 +4462,11 @@ msgstr "pohovory"
 #, draft
 msgid "Interviews"
 msgstr "Pohovory"
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4551,7 +4592,7 @@ msgstr "pracovní inzeráty"
 msgid "Job search report"
 msgstr "Zpráva o hledání práce"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4809,6 +4850,7 @@ msgstr "naposledy použito"
 msgid "last worked"
 msgstr "naposledy fungovalo"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5292,6 +5334,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr "Peníze a data"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6028,6 +6071,10 @@ msgid ""
 msgstr ""
 "V diáři nic není. Až vám nějaký nabídnou, naplánujte ho ze stránky žádosti."
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6102,6 +6149,10 @@ msgstr ""
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Na druhé službě se ničeho nedotkneme. Později ji můžete připojit znovu."
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6800,6 +6851,7 @@ msgid "Per year"
 msgstr "Za rok"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "Období"
@@ -7513,12 +7565,12 @@ msgid ""
 msgstr ""
 "Zaznamenává se u všeho, co odsud bylo nainstalováno, takže se později nemůže změnit, aniž by se odpojilo to, co nainstalovalo."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Zaznamenáno jako zrušený."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "Zaznamenáno jako proběhlý."
@@ -7538,7 +7590,7 @@ msgstr "zaznamenáno dne"
 msgid "Recorded what you sent."
 msgstr "Zaznamenáno, co jste odeslali."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Zaznamenáno: nikdo se nedostavil."
@@ -7654,6 +7706,10 @@ msgstr "Připomenout den předem"
 #, draft
 msgid "reminder"
 msgstr "připomínka"
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
+msgstr ""
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9265,7 +9321,7 @@ msgstr "To není prvek, který by Postulo znalo."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "To není veřejný klíč Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "To není výsledek, který Postulo zná."
@@ -9375,7 +9431,7 @@ msgstr "Tento plugin už není nainstalován."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Tato odpověď nepřišla z požadavku, který Postulo poslalo."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Na tento návrh už bylo odpovězeno."
@@ -10194,6 +10250,14 @@ msgstr "Předání inzerátu (vyžaduje rozsah captures):"
 msgid "to status"
 msgstr "na stav"
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10659,6 +10723,11 @@ msgstr "web"
 msgid "Websites"
 msgstr "Weby"
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

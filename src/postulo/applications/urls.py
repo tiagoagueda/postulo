@@ -31,6 +31,7 @@ urlpatterns = [
         name="suggestion_action",
     ),
     path("interviews/", views.InterviewListView.as_view(), name="interview_list"),
+    path("calendar/", views.CalendarView.as_view(), name="calendar"),
     path(
         "interviews/calendar.ics",
         views.InterviewCalendarView.as_view(),

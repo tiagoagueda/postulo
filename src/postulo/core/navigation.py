@@ -74,6 +74,7 @@ ITEMS: tuple[NavItem, ...] = (
     ),
     NavItem("companies", _("Companies"), "jobs:company_list", ("jobs:company_detail",)),
     NavItem("reminders", _("Reminders"), "applications:reminder_list"),
+    NavItem("calendar", _("Calendar"), "applications:calendar"),
 )
 
 BY_KEY = {item.key: item for item in ITEMS}

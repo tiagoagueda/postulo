@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -143,6 +143,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "%(days)s napja"
 msgstr[1] "%(days)s napja"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1080,7 +1085,7 @@ msgid ""
 msgstr ""
 "%(total)s tétel hozzáadva. Semmi nem íródott felül; ami ismétlődik, azt Ön törli."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "Hozzáadva az idővonalhoz."
@@ -1128,6 +1133,10 @@ msgstr ""
 #, draft
 msgid "Aerospace"
 msgstr "Repülés és űripar"
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1247,6 +1256,13 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "ismeretlen fájltípus"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1709,7 +1725,10 @@ msgstr "C1 — haladó"
 msgid "C2 — proficient"
 msgstr "C2 — mesterfok"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "Naptár"
@@ -1725,6 +1744,10 @@ msgstr "Naptárfájl"
 #, draft
 msgid "calendar identifier"
 msgstr "naptárazonosító"
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
+msgstr ""
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2027,7 +2050,7 @@ msgstr "Válassz legalább egy rögzítendő dokumentumot."
 msgid "Choose what kind of identifier this is."
 msgstr "Válaszd ki, milyen fajta azonosító ez."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Először válassza ki, melyik jelentkezésről van szó."
@@ -2594,6 +2617,10 @@ msgstr "Dátumok formátuma"
 msgid "Dates you choose"
 msgstr "Általad választott dátumok"
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2736,7 +2763,7 @@ msgstr "Elutasítás"
 msgid "Declined"
 msgstr "Elutasítva"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Elutasítva. Többé nem lesz javasolva."
@@ -3030,6 +3057,10 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "Minden szakasz azokat a jelentkezéseket számolja, amelyek valaha elérték, bármi történt is utána."
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
+msgstr ""
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3501,7 +3532,7 @@ msgstr "fájl"
 msgid "File saved."
 msgstr "Fájl mentve."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -4375,7 +4406,7 @@ msgstr "interjú"
 msgid "Interview cancelled"
 msgstr "Interjú lemondva"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "Interjú rögzítve."
@@ -4385,7 +4416,7 @@ msgstr "Interjú rögzítve."
 msgid "Interview scheduled"
 msgstr "Interjú kitűzve"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "Interjú kitűzve."
@@ -4395,10 +4426,14 @@ msgstr "Interjú kitűzve."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Interjú holnap: %(kind)s, %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "Interjú frissítve."
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4421,6 +4456,11 @@ msgstr "interjúk"
 #, draft
 msgid "Interviews"
 msgstr "Interjúk"
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4546,7 +4586,7 @@ msgstr "álláshirdetések"
 msgid "Job search report"
 msgstr "Jelentés az álláskeresésről"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4804,6 +4844,7 @@ msgstr "utoljára használva"
 msgid "last worked"
 msgstr "utoljára futott"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5286,6 +5327,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr "Pénz és dátumok"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6027,6 +6069,10 @@ msgid ""
 msgstr ""
 "Semmi sincs a naptárban. Amikor felajánlanak egyet, tűzd ki a jelentkezés oldaláról."
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6102,6 +6148,10 @@ msgstr ""
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "A másik szolgáltatáson semmi sem változik. Később újra kapcsolódhatsz hozzá."
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6792,6 +6842,7 @@ msgid "Per year"
 msgstr "Évente"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "Időszak"
@@ -7507,12 +7558,12 @@ msgid ""
 msgstr ""
 "Feljegyzésre kerül mindenre, amit innen telepítettek, ezért később nem változtatható meg anélkül, hogy leválasztaná, amit telepített."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Lemondottként rögzítve."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "Megtartottként rögzítve."
@@ -7532,7 +7583,7 @@ msgstr "rögzítve ekkor"
 msgid "Recorded what you sent."
 msgstr "Rögzítve, amit küldtél."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Rögzítve: senki sem jelent meg."
@@ -7649,6 +7700,10 @@ msgstr "Emlékeztess az előző napon"
 #, draft
 msgid "reminder"
 msgstr "emlékeztető"
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
+msgstr ""
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9262,7 +9317,7 @@ msgstr "Ez nem olyan elem, amelyet a Postulo ismerne."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Ez nem Ed25519 nyilvános kulcs: %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Ez nem olyan eredmény, amelyet a Postulo ismer."
@@ -9372,7 +9427,7 @@ msgstr "Ez a bővítmény már nincs telepítve."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Az a válasz nem a Postulo által küldött kérésből jött."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Erre a javaslatra már válaszolt."
@@ -10194,6 +10249,14 @@ msgstr "Hirdetés átadásához (a captures hatókör szükséges):"
 msgid "to status"
 msgstr "erre az állapotra"
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10662,6 +10725,11 @@ msgstr "webhely"
 msgid "Websites"
 msgstr "Webhelyek"
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

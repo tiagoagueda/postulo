@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: македонски\n"
@@ -143,6 +143,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "пред %(days)s ден"
 msgstr[1] "пред %(days)s дена"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1078,7 +1083,7 @@ msgid ""
 msgstr ""
 "Додадени се %(total)s ставки. Ништо не е препишано; сè што се дуплирало е ваше да го избришете."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "Додадено на временската линија."
@@ -1126,6 +1131,10 @@ msgstr ""
 #, draft
 msgid "Aerospace"
 msgstr "Воздухопловство"
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1245,6 +1254,13 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "непознат вид датотека"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1705,7 +1721,10 @@ msgstr "C1 — напредно"
 msgid "C2 — proficient"
 msgstr "C2 — врвно"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "Календар"
@@ -1721,6 +1740,10 @@ msgstr "Датотека на календар"
 #, draft
 msgid "calendar identifier"
 msgstr "идентификатор на календар"
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
+msgstr ""
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2023,7 +2046,7 @@ msgstr "Изберете барем еден документ за запишу�
 msgid "Choose what kind of identifier this is."
 msgstr "Изберете каков идентификатор е ова."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Прво изберете на која пријава се однесува ова."
@@ -2587,6 +2610,10 @@ msgstr "Датумите се пишуваат како"
 msgid "Dates you choose"
 msgstr "Датуми што сами ќе ги изберете"
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2729,7 +2756,7 @@ msgstr "Одбиј"
 msgid "Declined"
 msgstr "Одбиено"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Одбиено. Нема повеќе да се предлага."
@@ -3022,6 +3049,10 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "Секоја фаза ги брои пријавите што некогаш ја достигнале, што и да се случило потоа."
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
+msgstr ""
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3492,7 +3523,7 @@ msgstr "датотека"
 msgid "File saved."
 msgstr "Датотеката е зачувана."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -4365,7 +4396,7 @@ msgstr "интервју"
 msgid "Interview cancelled"
 msgstr "Интервјуто е откажано"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "Интервјуто е запишано."
@@ -4375,7 +4406,7 @@ msgstr "Интервјуто е запишано."
 msgid "Interview scheduled"
 msgstr "Интервјуто е закажано"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "Интервјуто е закажано."
@@ -4385,10 +4416,14 @@ msgstr "Интервјуто е закажано."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Интервју утре: %(kind)s во %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "Интервјуто е ажурирано."
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4411,6 +4446,11 @@ msgstr "интервјуа"
 #, draft
 msgid "Interviews"
 msgstr "Интервјуа"
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4539,7 +4579,7 @@ msgstr "огласи за работа"
 msgid "Job search report"
 msgstr "Извештај за барање работа"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4797,6 +4837,7 @@ msgstr "последен пат користено"
 msgid "last worked"
 msgstr "последен пат работеше"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5278,6 +5319,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr "Пари и датуми"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6015,6 +6057,10 @@ msgid ""
 msgstr ""
 "Ништо во дневникот. Кога ќе ви понудат едно, закажете го од страницата на пријавата."
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6090,6 +6136,10 @@ msgstr ""
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "Ништо на другата услуга не се допира. Може повторно да се поврзете подоцна."
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6780,6 +6830,7 @@ msgid "Per year"
 msgstr "Годишно"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "Период"
@@ -7492,12 +7543,12 @@ msgid ""
 msgstr ""
 "Се запишува со сè што е инсталирано оттука, па не може да се промени подоцна без да го остави инсталираното без родител."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Запишано како откажано."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "Запишано како одржано."
@@ -7517,7 +7568,7 @@ msgstr "запишано на"
 msgid "Recorded what you sent."
 msgstr "Запишано е што сте испратиле."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Запишано: никој не се појави."
@@ -7634,6 +7685,10 @@ msgstr "Потсети ме ден порано"
 #, draft
 msgid "reminder"
 msgstr "потсетник"
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
+msgstr ""
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9251,7 +9306,7 @@ msgstr "Тоа не е модул за кој Postulo знае."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Тоа не е Ed25519 јавен клуч: %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Тоа не е исход што Postulo го препознава."
@@ -9361,7 +9416,7 @@ msgstr "Тој додаток повеќе не е инсталиран."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Тој одговор не дојде од барање што го направи Postulo."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "На тој предлог веќе е одговорено."
@@ -10183,6 +10238,14 @@ msgstr "За предавање оглас (бара опсег captures):"
 msgid "to status"
 msgstr "во статус"
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10650,6 +10713,11 @@ msgstr "веб страница"
 msgid "Websites"
 msgstr "Веб страници"
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

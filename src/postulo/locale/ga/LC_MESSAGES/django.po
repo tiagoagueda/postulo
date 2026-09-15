@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -182,6 +182,11 @@ msgstr[1] "%(days)s lá ó shin"
 msgstr[2] "%(days)s lá ó shin"
 msgstr[3] "%(days)s lá ó shin"
 msgstr[4] "%(days)s lá ó shin"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1146,7 +1151,7 @@ msgid ""
 msgstr ""
 "Cuireadh %(total)s iontráil leis. Níor scríobhadh thar aon rud; is leatsa aon rud atá dúbailte a scriosadh."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "Curtha leis an amlíne."
@@ -1194,6 +1199,10 @@ msgstr ""
 #, draft
 msgid "Aerospace"
 msgstr "Aeraspás"
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1317,6 +1326,16 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "cineál comhaid anaithnid"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1780,7 +1799,10 @@ msgstr "C1 — ardleibhéal"
 msgid "C2 — proficient"
 msgstr "C2 — oilte"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "Féilire"
@@ -1796,6 +1818,10 @@ msgstr "Comhad féilire"
 #, draft
 msgid "calendar identifier"
 msgstr "aitheantóir féilire"
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
+msgstr ""
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2098,7 +2124,7 @@ msgstr "Roghnaigh doiciméad amháin ar a laghad le taifeadadh."
 msgid "Choose what kind of identifier this is."
 msgstr "Roghnaigh cén cineál aitheantóra é seo."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Roghnaigh ar dtús cén t-iarratas lena mbaineann sé."
@@ -2664,6 +2690,10 @@ msgstr "Dátaí scríofa mar"
 msgid "Dates you choose"
 msgstr "Dátaí a roghnaíonn tú féin"
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2806,7 +2836,7 @@ msgstr "Diúltaigh"
 msgid "Declined"
 msgstr "Diúltaithe"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Diúltaithe. Ní mholfar arís é."
@@ -3100,6 +3130,10 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "Comhaireann gach céim iarratais a shroich í riamh, cibé rud a tharla ina dhiaidh sin."
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
+msgstr ""
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3571,7 +3605,7 @@ msgstr "comhad"
 msgid "File saved."
 msgstr "Comhad sábháilte."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -4447,7 +4481,7 @@ msgstr "agallamh"
 msgid "Interview cancelled"
 msgstr "Agallamh curtha ar ceal"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "Agallamh taifeadta."
@@ -4457,7 +4491,7 @@ msgstr "Agallamh taifeadta."
 msgid "Interview scheduled"
 msgstr "Agallamh sceidealta"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "Agallamh sceidealta."
@@ -4467,10 +4501,14 @@ msgstr "Agallamh sceidealta."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Agallamh amárach: %(kind)s ag %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "Agallamh nuashonraithe."
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4493,6 +4531,11 @@ msgstr "agallaimh"
 #, draft
 msgid "Interviews"
 msgstr "Agallaimh"
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4619,7 +4662,7 @@ msgstr "fógraí poist"
 msgid "Job search report"
 msgstr "Tuairisc ar chuardach fostaíochta"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4877,6 +4920,7 @@ msgstr "úsáidte go deireanach"
 msgid "last worked"
 msgstr "oibrithe go deireanach"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5365,6 +5409,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr "Airgead agus dátaí"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6105,6 +6150,10 @@ msgid ""
 msgstr ""
 "Níl aon rud sa dialann. Nuair a thairgtear ceann, sceidealaigh é ó leathanach an iarratais."
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6181,6 +6230,10 @@ msgstr ""
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "Ní bhaintear le haon rud ar an tseirbhís eile. Is féidir leat é a nascadh arís níos déanaí."
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6907,6 +6960,7 @@ msgid "Per year"
 msgstr "In aghaidh na bliana"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "Tréimhse"
@@ -7625,12 +7679,12 @@ msgid ""
 msgstr ""
 "Taifeadtar é ar gach rud a shuiteáiltear as seo, mar sin ní féidir é a athrú níos déanaí gan an rud a shuiteáil sé a scaradh."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Taifeadta mar a cuireadh ar ceal."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "Taifeadta mar a bhí ar siúl."
@@ -7650,7 +7704,7 @@ msgstr "taifeadta ar"
 msgid "Recorded what you sent."
 msgstr "Taifeadta a bhfuil seolta agat."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Taifeadta: níor tháinig aon duine."
@@ -7767,6 +7821,10 @@ msgstr "Cuir i gcuimhne dom an lá roimhe"
 #, draft
 msgid "reminder"
 msgstr "meabhrúchán"
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
+msgstr ""
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9383,7 +9441,7 @@ msgstr "Ní giuirléid í sin a aithníonn Postulo."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Ní eochair phoiblí Ed25519 é sin: %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Ní toradh é sin a aithníonn Postulo."
@@ -9494,7 +9552,7 @@ msgstr "Níl an breiseán sin suiteáilte a thuilleadh."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Níor tháinig an freagra sin ó iarratas a rinne Postulo."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Tá freagra tugtha ar an moladh sin cheana."
@@ -10332,6 +10390,14 @@ msgstr "Chun fógra a thabhairt ar láimh (teastaíonn an scóip captures):"
 msgid "to status"
 msgstr "go stádas"
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10800,6 +10866,11 @@ msgstr "suíomh gréasáin"
 msgid "Websites"
 msgstr "Suíomhanna gréasáin"
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108

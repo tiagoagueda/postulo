@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 14:45+0000\n"
+"POT-Creation-Date: 2026-09-15 15:05+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: català\n"
@@ -143,6 +143,11 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] "fa %(days)s dia"
 msgstr[1] "fa %(days)s dies"
+
+#: src/postulo/applications/agenda.py:345
+#, python-format
+msgid "%(days)s days from %(day)s"
+msgstr ""
 
 #: src/postulo/applications/models.py:294
 #, python-format, draft
@@ -1082,7 +1087,7 @@ msgid ""
 msgstr ""
 "S'han afegit %(total)s entrades. No s'ha sobreescrit res; el que s'hagi duplicat és vostre per esborrar-ho."
 
-#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:874
+#: src/postulo/applications/views.py:409 src/postulo/applications/views.py:886
 #, draft
 msgid "Added to the timeline."
 msgstr "Afegit a la cronologia."
@@ -1130,6 +1135,10 @@ msgstr ""
 #, draft
 msgid "Aerospace"
 msgstr "Aeroespacial"
+
+#: src/postulo/applications/agenda.py:282
+msgid "Agenda"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html:98
 #, draft
@@ -1249,6 +1258,13 @@ msgstr ""
 #, draft
 msgid "an unknown file type"
 msgstr "un tipus de fitxer desconegut"
+
+#: src/postulo/templates/applications/calendar.html:109
+#, python-format
+msgid "and %(counter)s more"
+msgid_plural "and %(counter)s more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/applications/quiet.py:113
 #: src/postulo/templates/jobs/partials/company_row.html:55
@@ -1710,7 +1726,10 @@ msgstr "C1 — avançat"
 msgid "C2 — proficient"
 msgstr "C2 — domini"
 
+#: src/postulo/core/navigation.py:77
 #: src/postulo/templates/applications/application_detail.html:275
+#: src/postulo/templates/applications/calendar.html:6
+#: src/postulo/templates/applications/calendar.html:51
 #, draft
 msgid "Calendar"
 msgstr "Calendari"
@@ -1726,6 +1745,10 @@ msgstr "Fitxer de calendari"
 #, draft
 msgid "calendar identifier"
 msgstr "identificador de calendari"
+
+#: src/postulo/templates/applications/calendar.html:59
+msgid "Calendar views"
+msgstr ""
 
 #: src/postulo/applications/models.py:339
 #, draft
@@ -2028,7 +2051,7 @@ msgstr "Trieu com a mínim un document per registrar."
 msgid "Choose what kind of identifier this is."
 msgstr "Trieu quina mena d'identificador és."
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Trieu primer a quina candidatura fa referència."
@@ -2594,6 +2617,10 @@ msgstr "Les dates s'escriuen com"
 msgid "Dates you choose"
 msgstr "Dates que triïs"
 
+#: src/postulo/applications/agenda.py:281
+msgid "Day"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
@@ -2736,7 +2763,7 @@ msgstr "Rebutja"
 msgid "Declined"
 msgstr "Rebutjada"
 
-#: src/postulo/applications/views.py:862
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Rebutjada. No es tornarà a suggerir."
@@ -3029,6 +3056,10 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 "Cada etapa compta les candidatures que hi han arribat alguna vegada, passés el que passés després."
+
+#: src/postulo/templates/applications/calendar.html:68
+msgid "Earlier"
+msgstr ""
 
 #: src/postulo/plugins/models.py:55
 #, draft
@@ -3499,7 +3530,7 @@ msgstr "fitxer"
 msgid "File saved."
 msgstr "Fitxer desat."
 
-#: src/postulo/applications/views.py:811
+#: src/postulo/applications/views.py:823
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -4377,7 +4408,7 @@ msgstr "entrevista"
 msgid "Interview cancelled"
 msgstr "Entrevista cancel·lada"
 
-#: src/postulo/applications/views.py:570
+#: src/postulo/applications/views.py:582
 #, draft
 msgid "Interview recorded."
 msgstr "Entrevista registrada."
@@ -4387,7 +4418,7 @@ msgstr "Entrevista registrada."
 msgid "Interview scheduled"
 msgstr "Entrevista programada"
 
-#: src/postulo/applications/views.py:572
+#: src/postulo/applications/views.py:584
 #, draft
 msgid "Interview scheduled."
 msgstr "Entrevista programada."
@@ -4397,10 +4428,14 @@ msgstr "Entrevista programada."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Entrevista demà: %(kind)s a %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:602
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Interview updated."
 msgstr "Entrevista actualitzada."
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Interview:"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:34
 #: src/postulo/applications/models.py:44
@@ -4423,6 +4458,11 @@ msgstr "entrevistes"
 #, draft
 msgid "Interviews"
 msgstr "Entrevistes"
+
+#: src/postulo/templates/applications/calendar.html:53
+msgid ""
+"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:202
 #: src/postulo/templates/applications/report_print.html:139
@@ -4550,7 +4590,7 @@ msgstr "ofertes de feina"
 msgid "Job search report"
 msgstr "Informe de cerca de feina"
 
-#: src/postulo/applications/views.py:799
+#: src/postulo/applications/views.py:811
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4807,6 +4847,7 @@ msgstr "usat per últim cop"
 msgid "last worked"
 msgstr "va funcionar per últim cop"
 
+#: src/postulo/templates/applications/calendar.html:70
 #: src/postulo/templates/jobs/capture_review.html:133
 #, draft
 msgid "Later"
@@ -5289,6 +5330,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr "Diners i dates"
 
+#: src/postulo/applications/agenda.py:279
 #: src/postulo/templates/applications/report.html:62
 #, draft
 msgid "Month"
@@ -6026,6 +6068,10 @@ msgid ""
 msgstr ""
 "No hi ha res a l'agenda. Quan us n'ofereixin una, programeu-la des de la pàgina de la candidatura."
 
+#: src/postulo/templates/applications/calendar.html:43
+msgid "Nothing in this period."
+msgstr ""
+
 #: src/postulo/resume/views.py:397
 #, draft
 msgid ""
@@ -6103,6 +6149,10 @@ msgstr ""
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "No es toca res de l'altre servei. Us hi podeu tornar a connectar més tard."
+
+#: src/postulo/templates/applications/calendar.html:38
+msgid "Nothing on this day."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html:27
 #, draft
@@ -6790,6 +6840,7 @@ msgid "Per year"
 msgstr "A l'any"
 
 #: src/postulo/applications/forms.py:69
+#: src/postulo/templates/applications/calendar.html:67
 #, draft
 msgid "Period"
 msgstr "Període"
@@ -7501,12 +7552,12 @@ msgid ""
 msgstr ""
 "Es registra amb tot el que s'instal·la des d'aquí, així que no pot canviar més endavant sense deixar orfe el que hagi instal·lat."
 
-#: src/postulo/applications/views.py:623
+#: src/postulo/applications/views.py:635
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Registrada com a cancel·lada."
 
-#: src/postulo/applications/views.py:622
+#: src/postulo/applications/views.py:634
 #, draft
 msgid "Recorded as held."
 msgstr "Registrada com a feta."
@@ -7526,7 +7577,7 @@ msgstr "registrada el"
 msgid "Recorded what you sent."
 msgstr "S'ha registrat què vau enviar."
 
-#: src/postulo/applications/views.py:624
+#: src/postulo/applications/views.py:636
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Registrat: no s'hi va presentar ningú."
@@ -7641,6 +7692,10 @@ msgstr "Recorda-m'ho el dia abans"
 #, draft
 msgid "reminder"
 msgstr "recordatori"
+
+#: src/postulo/templates/applications/calendar.html:19
+msgid "Reminder:"
+msgstr ""
 
 #: src/postulo/applications/models.py:440
 #, draft
@@ -9256,7 +9311,7 @@ msgstr "Això no és un giny que Postulo conegui."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Això no és una clau pública Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:616
+#: src/postulo/applications/views.py:628
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Això no és un desenllaç que Postulo conegui."
@@ -9366,7 +9421,7 @@ msgstr "Aquell connector ja no està instal·lat."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Aquesta resposta no ve d'una petició que hagi fet Postulo."
 
-#: src/postulo/applications/views.py:857
+#: src/postulo/applications/views.py:869
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Aquell suggeriment ja s'ha respost."
@@ -10191,6 +10246,14 @@ msgstr "Per lliurar una oferta (cal l'àmbit captures):"
 msgid "to status"
 msgstr "a l'estat"
 
+#: src/postulo/templates/applications/calendar.html:69
+msgid "Today"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:98
+msgid "today"
+msgstr ""
+
 #: src/postulo/documents/models.py:310
 #, draft
 msgid "Today's date"
@@ -10658,6 +10721,11 @@ msgstr "lloc web"
 msgid "Websites"
 msgstr "Llocs web"
 
+#: src/postulo/applications/agenda.py:280
+msgid "Week"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:315
 #: src/postulo/templates/applications/report.html:155
 #: src/postulo/templates/applications/report.html:181
 #: src/postulo/templates/applications/report_print.html:108
