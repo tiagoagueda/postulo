@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from . import widgets
+from . import arranging, widgets
 
 
 def home(request: HttpRequest):
@@ -17,24 +17,34 @@ def home(request: HttpRequest):
     The dashboard is built from widgets now (#44). What it shows and in what order is the
     person's own arrangement; what each widget computes is the widget's business, and the
     shared work behind several of them happens once.
+
+    With ``?arrange=1`` the same page is in its editing mode (#201): every widget grows the
+    controls to move and remove it, and what is not shown is offered below. A POST here is
+    one of those actions, and redirects back into the mode.
     """
+    if request.method == "POST":
+        return arranging.apply(request)
     if not request.user.is_authenticated:
         return render(request, "core/home.html")
 
-    profile = getattr(request.user, "profile", None)
-    fresh = widgets.new_for(profile)
-    return render(
-        request,
-        "core/dashboard.html",
-        {
-            "page": widgets.build_page(request, profile),
-            # Said here rather than by a widget arriving unannounced: a release or a plugin
-            # has something this account has never been offered, and the arrange page is
-            # where it waits (#123).
-            "new_widgets": fresh,
-            "new_names": ", ".join(widget.called for widget in fresh),
-        },
+    editing = arranging.wanted(request)
+    profile = (
+        arranging.profile_for(request.user) if editing else getattr(request.user, "profile", None)
     )
+    page = widgets.build_page(request, profile)
+    fresh = widgets.new_for(profile)
+    context = {
+        "page": page,
+        # Said here rather than by a widget arriving unannounced: a release or a plugin has
+        # something this account has never been offered, and the mode is where it waits
+        # (#123).
+        "new_widgets": fresh,
+        "new_names": ", ".join(widget.called for widget in fresh),
+        "arranging": editing,
+    }
+    if editing:
+        context.update(arranging.context_for(profile, page))
+    return render(request, "core/dashboard.html", context)
 
 
 def healthz(request: HttpRequest) -> JsonResponse:

@@ -16,7 +16,10 @@ from postulo.core import widgets
 
 pytestmark = pytest.mark.django_db
 
-ARRANGE = "settings:dashboard"
+#: The dashboard arranges itself (#201): actions post to its address, and the mode
+#: that shows the controls is a parameter on it.
+ARRANGE = "core:home"
+ARRANGING = {"arrange": "1"}
 
 
 def arrangement(user) -> list[str]:
@@ -158,8 +161,14 @@ def test_taking_everything_off_leaves_a_page_that_offers_to_put_something_back(c
 # ------------------------------------------------------------------ arranging
 
 
-def test_the_arranging_page_needs_an_account(client):
-    response = client.get(reverse(ARRANGE))
+def test_arranging_needs_an_account(client):
+    """A stranger asking for the mode gets the landing page, as for any address here; a
+    stranger posting an action is sent to sign in, and nothing is written."""
+    response = client.get(reverse(ARRANGE), ARRANGING)
+    assert response.status_code == 200
+    assert "data-widget-list" not in response.content.decode()
+
+    response = client.post(reverse(ARRANGE), {"action": "remove", "key": "counters"})
 
     assert response.status_code == 302
     assert "login" in response["Location"]
@@ -298,9 +307,9 @@ def test_the_arranging_page_lists_what_is_on_and_what_is_off(client, user):
     choose(user, ["counters"])
     client.force_login(user)
 
-    response = client.get(reverse(ARRANGE))
+    response = client.get(reverse(ARRANGE), ARRANGING)
 
-    assert [row["widget"].key for row in response.context["chosen"]] == ["counters"]
+    assert [item.spec.key for item in response.context["page"]] == ["counters"]
     offered = {w.key for _group, items in response.context["available"] for w in items}
     assert "counters" not in offered
     assert "funnel" in offered
@@ -319,7 +328,7 @@ def test_the_arranging_page_names_a_widget_without_a_heading(client, user):
     choose(user, ["suggestions", "counters"])
     client.force_login(user)
 
-    text = spoken(client.get(reverse(ARRANGE)).content.decode())
+    text = spoken(client.get(reverse(ARRANGE), ARRANGING).content.decode())
 
     assert "Take Suggestions from plugins off" in text
     assert "Move Suggestions from plugins down a row" in text
@@ -340,6 +349,77 @@ def test_the_sentence_after_a_move_names_the_widget(client, user):
     assert "Suggestions from plugins is now in row 1, place 1." in spoken(html)
 
 
+# ---------------------------------------------------------------- the mode
+
+
+def test_the_dashboard_arranges_itself(client, user):
+    """Arrange opens a mode on the dashboard's own address; Done is a plain link back; the
+    controls exist only in the mode (#201)."""
+    choose(user, ["counters"])
+    client.force_login(user)
+    home = reverse("core:home")
+
+    plain = client.get(home).content.decode()
+    assert f'href="{home}?arrange=1"' in plain, "Arrange opens the mode"
+    assert "data-widget-list" not in plain and 'value="remove"' not in plain
+    assert "Not shown ·" not in plain
+
+    mode = client.get(home, ARRANGING).content.decode()
+    assert 'data-widget-list data-widget-place="/"' in mode
+    assert 'data-widget-controls="counters"' in mode
+    assert 'data-widget="counters"' in mode, "the widgets stay where they are"
+    offered = mode.split("data-widget-offers")[1]
+    assert 'name="key" value="funnel"' in offered, "what is not shown is offered below the grid"
+    assert f'<a href="{home}" class="btn-primary">Done</a>' in mode
+    assert "Capture a posting" not in mode.split("<main")[-1], "the mode is for arranging"
+
+
+def test_every_action_leads_back_into_the_mode(client, user):
+    choose(user, ["counters", "shortcuts"])
+    client.force_login(user)
+    home = reverse("core:home")
+
+    for data in (
+        {"action": "remove", "key": "shortcuts"},
+        {"action": "add", "key": "shortcuts"},
+        {"action": "dismiss", "key": "funnel"},
+        {"action": "reset"},
+        {"action": "add", "key": "not-a-widget"},
+    ):
+        response = client.post(home, data)
+        assert response["Location"] == f"{home}?arrange=1", data
+    response = client.post(home, {"action": "down", "key": "counters"})
+    assert response["Location"] == f"{home}?arrange=1#widget-counters"
+
+
+def test_the_empty_dashboard_offers_the_mode_and_the_mode_offers_the_widgets(client, user):
+    choose(user, [])
+    client.force_login(user)
+    home = reverse("core:home")
+
+    plain = client.get(home).content.decode()
+    assert "Your dashboard is empty" in plain and f'href="{home}?arrange=1"' in plain
+
+    mode = client.get(home, ARRANGING).content.decode()
+    assert "Add something from the list below" in mode
+    assert 'name="key" value="counters"' in mode.split("data-widget-offers")[1]
+
+
+def test_the_settings_section_is_gone(client, user):
+    """Nothing stored refers to it by name, so nothing but the address went."""
+    from django.urls import NoReverseMatch
+
+    from postulo.core import settings_sections
+
+    with pytest.raises(NoReverseMatch):
+        reverse("settings:dashboard")
+    assert "dashboard" not in [s.slug for s in settings_sections.sections()]
+    client.force_login(user)
+    assert client.get("/settings/dashboard/").status_code == 404
+    settings_page = client.get(reverse("settings:appearance")).content.decode()
+    assert "/settings/dashboard/" not in settings_page
+
+
 def test_nothing_on_the_arranging_page_refuses_to_give_way(client, user):
     """Every group on a row holds words somebody translated -- a widget's name, "Take ...
     off", "Add ..." -- and a group that cannot shrink or wrap around words nobody can predict
@@ -349,7 +429,7 @@ def test_nothing_on_the_arranging_page_refuses_to_give_way(client, user):
     client.force_login(user)
     choose(user, ["counters"])
 
-    html = client.get(reverse(ARRANGE)).content.decode()
+    html = client.get(reverse(ARRANGE), ARRANGING).content.decode()
     # The page's own lists, and not the settings sidebar round them, which is not made of
     # widget names and may keep its width.
     lists = html[html.index("data-widget-list") : html.index("</main>")]

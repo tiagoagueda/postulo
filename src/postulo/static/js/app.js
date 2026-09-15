@@ -1191,7 +1191,9 @@
   /* ------------------------------------------------- dragging a widget into place
    *
    * The dashboard is a grid a person arranges, and this is the gesture that was asked for
-   * (#125). It is the *third* way to arrange it, not the first: the four arrows came first
+   * (#125). Since #201 the grid is arranged on the dashboard itself, in its editing mode:
+   * the cells are the rows (`data-widget-row`) and the grid is the list they are dropped
+   * into. It is the *third* way to arrange it, not the first: the four arrows came first
    * on purpose, because drag and drop does not fire on touch screens and is not reachable
    * from a keyboard, and this file has said so since the board learnt to drag.
    *

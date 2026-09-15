@@ -23,7 +23,10 @@ from postulo.core import widgets
 
 pytestmark = pytest.mark.django_db
 
-ARRANGE = "settings:dashboard"
+#: The dashboard arranges itself (#201): actions post to its address, and the mode
+#: that shows the controls is a parameter on it.
+ARRANGE = "core:home"
+ARRANGING = {"arrange": "1"}
 
 
 def arrange(user, keys: list[str]) -> None:
@@ -186,7 +189,7 @@ def test_a_drop_posts_where_the_arrows_post(client, user):
     """
     client.force_login(user)
 
-    html = client.get(reverse(ARRANGE)).content.decode()
+    html = client.get(reverse(ARRANGE), ARRANGING).content.decode()
 
     assert f'data-widget-place="{reverse(ARRANGE)}"' in html
 
@@ -197,7 +200,7 @@ def test_nothing_is_draggable_without_a_script(client, user):
     """
     client.force_login(user)
 
-    html = client.get(reverse(ARRANGE)).content.decode()
+    html = client.get(reverse(ARRANGE), ARRANGING).content.decode()
 
     assert "draggable" not in html
     assert "data-widget-row" in html, "but the script is told what to make draggable"
@@ -207,7 +210,7 @@ def test_the_arrows_are_still_there(client, user):
     """Dragging is an addition to the control that works everywhere, never a replacement."""
     client.force_login(user)
 
-    html = client.get(reverse(ARRANGE)).content.decode()
+    html = client.get(reverse(ARRANGE), ARRANGING).content.decode()
 
     for way in widgets.DIRECTIONS:
         assert f'value="{way}"' in html

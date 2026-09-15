@@ -279,7 +279,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/accounts/2fa/",
         "/settings/",
         "/settings/appearance/",
-        "/settings/dashboard/",
+        "/?arrange=1",
         "/settings/language/",
         "/settings/account/",
         "/settings/connections/",
@@ -524,7 +524,7 @@ def test_the_dashboard_can_be_arranged_from_the_keyboard(
     page.emulate_media(color_scheme=scheme)
     base = live_server.url
     sign_in(page, base)
-    page.goto(f"{base}/settings/dashboard/")
+    page.goto(f"{base}/?arrange=1")
 
     page.get_by_role("button", name="Take Gone quiet off").click()
     expect(page.get_by_role("button", name="Add Gone quiet")).to_be_visible()

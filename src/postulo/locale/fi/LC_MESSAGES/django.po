@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 13:36+0000\n"
+"POT-Creation-Date: 2026-09-15 14:23+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -307,7 +307,7 @@ msgstr "%(name)s on nyt @%(username)s."
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s on nyt ylläpitäjä."
 
-#: src/postulo/accounts/settings_views.py:255
+#: src/postulo/core/arranging.py:152
 #, python-format, draft
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "%(name)s on nyt rivillä %(row)s, paikalla %(place)s."
@@ -867,7 +867,7 @@ msgstr ""
 msgid "A week, on average"
 msgstr "Viikossa, keskimäärin"
 
-#: src/postulo/templates/settings/dashboard.html:174
+#: src/postulo/templates/core/partials/widget_offers.html:85
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -906,7 +906,7 @@ msgid "accepted by"
 msgstr "hyväksyjä"
 
 #: src/postulo/accounts/settings_views.py:73
-#: src/postulo/core/settings_sections.py:60
+#: src/postulo/core/settings_sections.py:53
 #: src/postulo/templates/settings/account.html:5
 #, draft
 msgid "Account"
@@ -963,8 +963,8 @@ msgstr "Toiminnot käyttäjälle %(name)s"
 msgid "Add"
 msgstr "Lisää"
 
-#: src/postulo/templates/settings/dashboard.html:104
-#: src/postulo/templates/settings/dashboard.html:144
+#: src/postulo/templates/core/partials/widget_offers.html:26
+#: src/postulo/templates/core/partials/widget_offers.html:66
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Lisää %(name)s"
@@ -1302,7 +1302,7 @@ msgstr "API"
 msgid "API token"
 msgstr "API-avain"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1498,15 +1498,23 @@ msgstr "Arkistoitu"
 msgid "Are you sure?"
 msgstr "Oletko varma?"
 
-#: src/postulo/templates/core/dashboard.html:49
+#: src/postulo/templates/core/dashboard.html:72
 #, draft
 msgid "Arrange"
 msgstr "Järjestä"
 
-#: src/postulo/templates/core/dashboard.html:95
+#: src/postulo/templates/core/dashboard.html:169
 #, draft
 msgid "Arrange it"
 msgstr "Järjestä se"
+
+#: src/postulo/templates/core/dashboard.html:6
+msgid "Arrange the dashboard"
+msgstr ""
+
+#: src/postulo/templates/core/dashboard.html:41
+msgid "Arrange your dashboard"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:35
 #: src/postulo/applications/models.py:45
@@ -1607,7 +1615,7 @@ msgstr "Takaisin henkilöihin"
 msgid "Back to the entry"
 msgstr "Takaisin merkintään"
 
-#: src/postulo/templates/settings/dashboard.html:162
+#: src/postulo/templates/core/dashboard.html:66
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Takaisin vakiojärjestykseen"
@@ -1770,7 +1778,7 @@ msgstr "Kaappaa"
 msgid "capture"
 msgstr "kaappaus"
 
-#: src/postulo/templates/core/dashboard.html:51
+#: src/postulo/templates/core/dashboard.html:74
 #: src/postulo/templates/jobs/capture_form.html:4
 #: src/postulo/templates/jobs/capture_form.html:8
 #: src/postulo/templates/jobs/capture_list.html:22
@@ -2295,7 +2303,7 @@ msgstr "yhteyden suojaus"
 msgid "Connection security"
 msgstr "Yhteyden suojaus"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
 #: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
@@ -2529,10 +2537,8 @@ msgstr "Ansioluettelot ja portfoliot"
 msgid "Dark"
 msgstr "Tumma"
 
-#: src/postulo/accounts/settings_views.py:186 src/postulo/core/navigation.py:42
-#: src/postulo/core/settings_sections.py:46
+#: src/postulo/core/navigation.py:42
 #: src/postulo/templates/core/dashboard.html:6
-#: src/postulo/templates/settings/dashboard.html:5
 #, draft
 msgid "Dashboard"
 msgstr "Kojelauta"
@@ -2939,6 +2945,7 @@ msgstr "Asiakirjat, jotka sinulla jo oli. Mitään täällä ei tarjota julkises
 
 #: src/postulo/templates/applications/application_detail.html:339
 #: src/postulo/templates/applications/reminder_list.html:47
+#: src/postulo/templates/core/dashboard.html:70
 #: src/postulo/templates/widgets/due_reminders.html:23
 #, draft
 msgid "Done"
@@ -4659,7 +4666,7 @@ msgid "language"
 msgstr "kieli"
 
 #: src/postulo/accounts/settings_views.py:67
-#: src/postulo/core/settings_sections.py:53
+#: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/settings/locale.html:5
 #, draft
 msgid "Language and time"
@@ -5321,22 +5328,22 @@ msgstr "Siirrä %(column)s alas"
 msgid "Move %(column)s up"
 msgstr "Siirrä %(column)s ylös"
 
-#: src/postulo/templates/settings/partials/move_widget.html:20
+#: src/postulo/templates/core/partials/move_widget.html:20
 #, python-format, draft
 msgid "Move %(name)s down a row"
 msgstr "Siirrä %(name)s rivi alaspäin"
 
-#: src/postulo/templates/settings/partials/move_widget.html:22
+#: src/postulo/templates/core/partials/move_widget.html:22
 #, python-format, draft
 msgid "Move %(name)s one place earlier"
 msgstr "Siirrä %(name)s yhden paikan aiemmaksi"
 
-#: src/postulo/templates/settings/partials/move_widget.html:24
+#: src/postulo/templates/core/partials/move_widget.html:24
 #, python-format, draft
 msgid "Move %(name)s one place later"
 msgstr "Siirrä %(name)s yhden paikan myöhemmäksi"
 
-#: src/postulo/templates/settings/partials/move_widget.html:18
+#: src/postulo/templates/core/partials/move_widget.html:18
 #, python-format, draft
 msgid "Move %(name)s up a row"
 msgstr "Siirrä %(name)s rivi ylöspäin"
@@ -5346,6 +5353,11 @@ msgstr "Siirrä %(name)s rivi ylöspäin"
 #, draft
 msgid "Move down"
 msgstr "Siirrä alas"
+
+#: src/postulo/templates/core/dashboard.html:43
+msgid ""
+"Move each widget with its arrows, take off what you never read, and add from the list below. Press Done when it is right."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:56
 #, draft
@@ -5474,7 +5486,7 @@ msgstr "Uusi kirje"
 msgid "New reminder"
 msgstr "Uusi muistutus"
 
-#: src/postulo/templates/settings/dashboard.html:90
+#: src/postulo/templates/core/partials/widget_offers.html:12
 #, draft
 msgid "New since you last arranged this"
 msgstr "Uutta siitä, kun viimeksi järjestit tämän"
@@ -5794,7 +5806,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Normaali"
 
-#: src/postulo/templates/settings/dashboard.html:113
+#: src/postulo/templates/core/partials/widget_offers.html:35
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Ei %(name)s"
@@ -5886,14 +5898,14 @@ msgstr "Ei asetettu tässä — ympäristö tai oletus pätee"
 msgid "Not set — the environment decides"
 msgstr "Ei asetettu — ympäristö päättää"
 
-#: src/postulo/templates/core/dashboard.html:29
+#: src/postulo/templates/core/dashboard.html:30
 #, python-format, draft
 msgid ""
 "Not shown yet: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">arrange your dashboard</a>."
 msgstr ""
 "Ei vielä näytetä: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">järjestä koontinäyttösi</a>."
 
-#: src/postulo/templates/settings/dashboard.html:129
+#: src/postulo/templates/core/partials/widget_offers.html:51
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Ei näytetä · %(name)s"
@@ -6072,6 +6084,10 @@ msgstr "Mikään sivustolla %(host)s ei käynyt tunnukseksi."
 msgid "Nothing on it yet. Choose some entries below."
 msgstr "Siinä ei ole vielä mitään. Valitse alta muutama merkintä."
 
+#: src/postulo/templates/core/dashboard.html:163
+msgid "Nothing on it. Add something from the list below."
+msgstr ""
+
 #: src/postulo/templates/connections/confirm_delete.html:13
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
@@ -6209,11 +6225,6 @@ msgid ""
 msgstr ""
 "Tällä jaksolla ei lähetetty mitään. Sen raportti kertoo, ja se on tosiasia kuten mikä tahansa muu."
 
-#: src/postulo/templates/settings/dashboard.html:77
-#, draft
-msgid "Nothing. The dashboard will offer to bring something back."
-msgstr "Ei mitään. Koontinäyttö tarjoutuu palauttamaan jotakin."
-
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -6315,11 +6326,6 @@ msgstr "Aikajanalla"
 #, draft
 msgid "On this page"
 msgstr "Tällä sivulla"
-
-#: src/postulo/templates/settings/dashboard.html:15
-#, draft
-msgid "On your dashboard"
-msgstr "Koontinäytölläsi"
 
 #: src/postulo/plugins/models.py:110
 #, draft
@@ -6888,7 +6894,7 @@ msgstr "liitännäisten tietolähde"
 
 #: src/postulo/accounts/settings_views.py:125
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:805
-#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/core/settings_sections.py:88 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
 #, draft
@@ -7447,7 +7453,7 @@ msgstr "Kirjaa"
 #: src/postulo/templates/applications/application_intake.html:8
 #: src/postulo/templates/applications/application_list.html:55
 #: src/postulo/templates/applications/application_list.html:76
-#: src/postulo/templates/core/dashboard.html:54
+#: src/postulo/templates/core/dashboard.html:77
 #, draft
 msgid "Record an application"
 msgstr "Kirjaa hakemus"
@@ -8078,11 +8084,6 @@ msgstr "Näytä hakemukset"
 #, draft
 msgid "See the board"
 msgstr "Näytä taulu"
-
-#: src/postulo/templates/settings/dashboard.html:157
-#, draft
-msgid "See the dashboard"
-msgstr "Katso koontinäyttö"
 
 #: src/postulo/templates/core/import_csv_done.html:34
 #, draft
@@ -8993,7 +8994,7 @@ msgstr "Räätälöi tämä merkintä"
 msgid "tailored for this one"
 msgstr "räätälöity tähän"
 
-#: src/postulo/templates/settings/dashboard.html:66
+#: src/postulo/templates/core/dashboard.html:146
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Poista %(name)s"
@@ -9228,7 +9229,7 @@ msgstr "Tuo ei ole Postulon tuntema tila."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Tuo ei ole wheel: Postulo asentaa .whl-tiedostoja."
 
-#: src/postulo/accounts/settings_views.py:225
+#: src/postulo/core/arranging.py:107
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Tuo ei ole osio, jonka Postulo tuntee."
@@ -9920,7 +9921,7 @@ msgstr "Tämä osoite on jo ilmoituksissasi, alkaen %(when)s."
 msgid "This address is already listed."
 msgstr "Tämä osoite on jo luettelossa."
 
-#: src/postulo/templates/settings/dashboard.html:169
+#: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
@@ -10649,7 +10650,7 @@ msgstr "Viikkoa peräkkäin, tähän asti"
 msgid "Weeks with none"
 msgstr "Viikot ilman yhtäkään"
 
-#: src/postulo/templates/core/dashboard.html:40
+#: src/postulo/templates/core/dashboard.html:47
 #, python-format, draft
 msgid "Welcome back, %(name)s"
 msgstr "Tervetuloa takaisin, %(name)s"
@@ -10790,13 +10791,6 @@ msgstr "Millä kielellä Postulo puhuu sinulle ja kenen kelloa se näyttää."
 #, draft
 msgid "what the check found"
 msgstr "mitä tarkistus löysi"
-
-#: src/postulo/templates/settings/dashboard.html:7
-#, draft
-msgid ""
-"What the dashboard shows, and in what order. Everything that used to be on Insights is here as a widget; take off what you never read and put the rest where you want it."
-msgstr ""
-"Mitä koontinäyttö näyttää ja missä järjestyksessä. Kaikki mikä oli Insightsissa on täällä osiona; poista se mitä et koskaan lue ja aseta loput haluamaasi järjestykseen."
 
 #: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:367
 #, draft
@@ -10976,7 +10970,7 @@ msgstr "Mistä löysit sen: työpaikkasivusto, suositus, yrityksen sivusto."
 msgid "where you live"
 msgstr "missä asut"
 
-#: src/postulo/templates/core/dashboard.html:45
+#: src/postulo/templates/core/dashboard.html:52
 #, draft
 msgid "Where your job search stands today."
 msgstr "Missä työnhakusi on tänään."
@@ -11312,7 +11306,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Olet pannut merkille %(counter)s ilmoitusta; hakenut %(applied)s (%(share)s%%) ja hylännyt %(discarded)s."
 
-#: src/postulo/templates/core/dashboard.html:93
+#: src/postulo/templates/core/dashboard.html:167
 #, draft
 msgid "You have taken everything off it. Put something back whenever you like."
 msgstr "Otit kaiken pois. Palauta jotakin milloin haluat."
@@ -11391,12 +11385,12 @@ msgstr ""
 msgid "Your CVs"
 msgstr "CV:si"
 
-#: src/postulo/templates/core/dashboard.html:91
+#: src/postulo/templates/core/dashboard.html:160
 #, draft
 msgid "Your dashboard is empty"
 msgstr "Koontinäyttösi on tyhjä"
 
-#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:103
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -11436,7 +11430,7 @@ msgstr "Nimikirjaimesi"
 msgid "Your job search in %(period)s"
 msgstr "Työnhakusi jaksolla %(period)s"
 
-#: src/postulo/core/views.py:67
+#: src/postulo/core/views.py:77
 #, draft
 msgid "Your job search, on your server."
 msgstr "Työnhakusi, omalla palvelimellasi."

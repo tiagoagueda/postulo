@@ -32,7 +32,7 @@ PAGES = (
     "/jobs/companies/",
     "/documents/cvs/",
     "/career/",
-    "/settings/dashboard/",
+    "/?arrange=1",
     "/server/plugins/",
 )
 

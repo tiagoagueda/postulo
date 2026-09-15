@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 13:36+0000\n"
+"POT-Creation-Date: 2026-09-15 14:23+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: norsk bokmål\n"
@@ -307,7 +307,7 @@ msgstr "%(name)s er nå @%(username)s."
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s er nå administrator."
 
-#: src/postulo/accounts/settings_views.py:255
+#: src/postulo/core/arranging.py:152
 #, python-format, draft
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "%(name)s står nå på rad %(row)s, plass %(place)s."
@@ -870,7 +870,7 @@ msgstr ""
 msgid "A week, on average"
 msgstr "Per uke, i gjennomsnitt"
 
-#: src/postulo/templates/settings/dashboard.html:174
+#: src/postulo/templates/core/partials/widget_offers.html:85
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -909,7 +909,7 @@ msgid "accepted by"
 msgstr "godtatt av"
 
 #: src/postulo/accounts/settings_views.py:73
-#: src/postulo/core/settings_sections.py:60
+#: src/postulo/core/settings_sections.py:53
 #: src/postulo/templates/settings/account.html:5
 #, draft
 msgid "Account"
@@ -966,8 +966,8 @@ msgstr "Handlinger for %(name)s"
 msgid "Add"
 msgstr "Legg til"
 
-#: src/postulo/templates/settings/dashboard.html:104
-#: src/postulo/templates/settings/dashboard.html:144
+#: src/postulo/templates/core/partials/widget_offers.html:26
+#: src/postulo/templates/core/partials/widget_offers.html:66
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Legg til %(name)s"
@@ -1304,7 +1304,7 @@ msgstr "API"
 msgid "API token"
 msgstr "API-token"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1500,15 +1500,23 @@ msgstr "Arkivert"
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
-#: src/postulo/templates/core/dashboard.html:49
+#: src/postulo/templates/core/dashboard.html:72
 #, draft
 msgid "Arrange"
 msgstr "Ordne"
 
-#: src/postulo/templates/core/dashboard.html:95
+#: src/postulo/templates/core/dashboard.html:169
 #, draft
 msgid "Arrange it"
 msgstr "Ordne den"
+
+#: src/postulo/templates/core/dashboard.html:6
+msgid "Arrange the dashboard"
+msgstr ""
+
+#: src/postulo/templates/core/dashboard.html:41
+msgid "Arrange your dashboard"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:35
 #: src/postulo/applications/models.py:45
@@ -1609,7 +1617,7 @@ msgstr "Tilbake til personer"
 msgid "Back to the entry"
 msgstr "Tilbake til oppføringen"
 
-#: src/postulo/templates/settings/dashboard.html:162
+#: src/postulo/templates/core/dashboard.html:66
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Tilbake til standardoppsettet"
@@ -1772,7 +1780,7 @@ msgstr "Fangst"
 msgid "capture"
 msgstr "fangst"
 
-#: src/postulo/templates/core/dashboard.html:51
+#: src/postulo/templates/core/dashboard.html:74
 #: src/postulo/templates/jobs/capture_form.html:4
 #: src/postulo/templates/jobs/capture_form.html:8
 #: src/postulo/templates/jobs/capture_list.html:22
@@ -2294,7 +2302,7 @@ msgstr "tilkoblingens sikkerhet"
 msgid "Connection security"
 msgstr "Tilkoblingens sikkerhet"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
 #: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
@@ -2528,10 +2536,8 @@ msgstr "Cv-er og porteføljer"
 msgid "Dark"
 msgstr "Mørkt"
 
-#: src/postulo/accounts/settings_views.py:186 src/postulo/core/navigation.py:42
-#: src/postulo/core/settings_sections.py:46
+#: src/postulo/core/navigation.py:42
 #: src/postulo/templates/core/dashboard.html:6
-#: src/postulo/templates/settings/dashboard.html:5
 #, draft
 msgid "Dashboard"
 msgstr "Oversikt"
@@ -2937,6 +2943,7 @@ msgstr "Dokumenter du allerede hadde. Ingenting her serveres offentlig."
 
 #: src/postulo/templates/applications/application_detail.html:339
 #: src/postulo/templates/applications/reminder_list.html:47
+#: src/postulo/templates/core/dashboard.html:70
 #: src/postulo/templates/widgets/due_reminders.html:23
 #, draft
 msgid "Done"
@@ -4658,7 +4665,7 @@ msgid "language"
 msgstr "språk"
 
 #: src/postulo/accounts/settings_views.py:67
-#: src/postulo/core/settings_sections.py:53
+#: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/settings/locale.html:5
 #, draft
 msgid "Language and time"
@@ -5319,22 +5326,22 @@ msgstr "Flytt %(column)s ned"
 msgid "Move %(column)s up"
 msgstr "Flytt %(column)s opp"
 
-#: src/postulo/templates/settings/partials/move_widget.html:20
+#: src/postulo/templates/core/partials/move_widget.html:20
 #, python-format, draft
 msgid "Move %(name)s down a row"
 msgstr "Flytt %(name)s én rad ned"
 
-#: src/postulo/templates/settings/partials/move_widget.html:22
+#: src/postulo/templates/core/partials/move_widget.html:22
 #, python-format, draft
 msgid "Move %(name)s one place earlier"
 msgstr "Flytt %(name)s én plass tidligere"
 
-#: src/postulo/templates/settings/partials/move_widget.html:24
+#: src/postulo/templates/core/partials/move_widget.html:24
 #, python-format, draft
 msgid "Move %(name)s one place later"
 msgstr "Flytt %(name)s én plass senere"
 
-#: src/postulo/templates/settings/partials/move_widget.html:18
+#: src/postulo/templates/core/partials/move_widget.html:18
 #, python-format, draft
 msgid "Move %(name)s up a row"
 msgstr "Flytt %(name)s én rad opp"
@@ -5344,6 +5351,11 @@ msgstr "Flytt %(name)s én rad opp"
 #, draft
 msgid "Move down"
 msgstr "Flytt ned"
+
+#: src/postulo/templates/core/dashboard.html:43
+msgid ""
+"Move each widget with its arrows, take off what you never read, and add from the list below. Press Done when it is right."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:56
 #, draft
@@ -5472,7 +5484,7 @@ msgstr "Nytt brev"
 msgid "New reminder"
 msgstr "Ny påminnelse"
 
-#: src/postulo/templates/settings/dashboard.html:90
+#: src/postulo/templates/core/partials/widget_offers.html:12
 #, draft
 msgid "New since you last arranged this"
 msgstr "Nytt siden sist du ordnet dette"
@@ -5792,7 +5804,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Normal"
 
-#: src/postulo/templates/settings/dashboard.html:113
+#: src/postulo/templates/core/partials/widget_offers.html:35
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Ikke %(name)s"
@@ -5884,14 +5896,14 @@ msgstr "Ikke satt her — miljøet eller standardverdien gjelder"
 msgid "Not set — the environment decides"
 msgstr "Ikke satt — miljøet bestemmer"
 
-#: src/postulo/templates/core/dashboard.html:29
+#: src/postulo/templates/core/dashboard.html:30
 #, python-format, draft
 msgid ""
 "Not shown yet: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">arrange your dashboard</a>."
 msgstr ""
 "Vises ikke ennå: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">ordne oversikten din</a>."
 
-#: src/postulo/templates/settings/dashboard.html:129
+#: src/postulo/templates/core/partials/widget_offers.html:51
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Ikke vist · %(name)s"
@@ -6069,6 +6081,10 @@ msgstr "Ingenting på %(host)s kunne brukes som logo."
 msgid "Nothing on it yet. Choose some entries below."
 msgstr "Ingenting der ennå. Velg noen oppføringer nedenfor."
 
+#: src/postulo/templates/core/dashboard.html:163
+msgid "Nothing on it. Add something from the list below."
+msgstr ""
+
 #: src/postulo/templates/connections/confirm_delete.html:13
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
@@ -6205,11 +6221,6 @@ msgid ""
 msgstr ""
 "Ingenting ble sendt i denne perioden. Det er det rapporten sier, og det er et faktum som ethvert annet."
 
-#: src/postulo/templates/settings/dashboard.html:77
-#, draft
-msgid "Nothing. The dashboard will offer to bring something back."
-msgstr "Ingenting. Oversikten vil tilby å hente noe tilbake."
-
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -6310,11 +6321,6 @@ msgstr "På tidslinjen"
 #, draft
 msgid "On this page"
 msgstr "På denne siden"
-
-#: src/postulo/templates/settings/dashboard.html:15
-#, draft
-msgid "On your dashboard"
-msgstr "På oversikten din"
 
 #: src/postulo/plugins/models.py:110
 #, draft
@@ -6883,7 +6889,7 @@ msgstr "utvidelsesdepot"
 
 #: src/postulo/accounts/settings_views.py:125
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:805
-#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/core/settings_sections.py:88 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
 #, draft
@@ -7441,7 +7447,7 @@ msgstr "Før opp"
 #: src/postulo/templates/applications/application_intake.html:8
 #: src/postulo/templates/applications/application_list.html:55
 #: src/postulo/templates/applications/application_list.html:76
-#: src/postulo/templates/core/dashboard.html:54
+#: src/postulo/templates/core/dashboard.html:77
 #, draft
 msgid "Record an application"
 msgstr "Før opp en søknad"
@@ -8070,11 +8076,6 @@ msgstr "Se søknadene"
 #, draft
 msgid "See the board"
 msgstr "Se tavlen"
-
-#: src/postulo/templates/settings/dashboard.html:157
-#, draft
-msgid "See the dashboard"
-msgstr "Se oversikten"
 
 #: src/postulo/templates/core/import_csv_done.html:34
 #, draft
@@ -8984,7 +8985,7 @@ msgstr "Tilpass denne oppføringen"
 msgid "tailored for this one"
 msgstr "tilpasset for denne"
 
-#: src/postulo/templates/settings/dashboard.html:66
+#: src/postulo/templates/core/dashboard.html:146
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Ta bort %(name)s"
@@ -9221,7 +9222,7 @@ msgstr "Det er ikke en status Postulo kjenner."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Det er ikke et hjul: Postulo installerer .whl-filer."
 
-#: src/postulo/accounts/settings_views.py:225
+#: src/postulo/core/arranging.py:107
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Det er ikke en modul Postulo kjenner til."
@@ -9910,7 +9911,7 @@ msgstr "Denne adressen ligger allerede i utlysningene dine, siden %(when)s."
 msgid "This address is already listed."
 msgstr "Denne adressen står der allerede."
 
-#: src/postulo/templates/settings/dashboard.html:169
+#: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
@@ -10639,7 +10640,7 @@ msgstr "Uker på rad, til nå"
 msgid "Weeks with none"
 msgstr "Uker uten noen"
 
-#: src/postulo/templates/core/dashboard.html:40
+#: src/postulo/templates/core/dashboard.html:47
 #, python-format, draft
 msgid "Welcome back, %(name)s"
 msgstr "Velkommen tilbake, %(name)s"
@@ -10781,13 +10782,6 @@ msgstr "Hvilket språk Postulo snakker til deg, og hvem sin klokke den viser."
 #, draft
 msgid "what the check found"
 msgstr "hva sjekken fant"
-
-#: src/postulo/templates/settings/dashboard.html:7
-#, draft
-msgid ""
-"What the dashboard shows, and in what order. Everything that used to be on Insights is here as a widget; take off what you never read and put the rest where you want it."
-msgstr ""
-"Hva oversikten viser, og i hvilken rekkefølge. Alt som pleide å ligge under Innsikt er her som en modul; ta bort det du aldri leser, og legg resten der du vil ha det."
 
 #: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:367
 #, draft
@@ -10966,7 +10960,7 @@ msgstr ""
 msgid "where you live"
 msgstr "hvor du bor"
 
-#: src/postulo/templates/core/dashboard.html:45
+#: src/postulo/templates/core/dashboard.html:52
 #, draft
 msgid "Where your job search stands today."
 msgstr "Hvor jobbsøket ditt står i dag."
@@ -11304,7 +11298,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Du har lagt merke til %(counter)s utlysninger; søkt på %(applied)s (%(share)s%%) og forkastet %(discarded)s."
 
-#: src/postulo/templates/core/dashboard.html:93
+#: src/postulo/templates/core/dashboard.html:167
 #, draft
 msgid "You have taken everything off it. Put something back whenever you like."
 msgstr "Du har tatt alt av den. Legg noe tilbake når du vil."
@@ -11383,12 +11377,12 @@ msgstr ""
 msgid "Your CVs"
 msgstr "CV-ene dine"
 
-#: src/postulo/templates/core/dashboard.html:91
+#: src/postulo/templates/core/dashboard.html:160
 #, draft
 msgid "Your dashboard is empty"
 msgstr "Oversikten din er tom"
 
-#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:103
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -11428,7 +11422,7 @@ msgstr "Initialene dine"
 msgid "Your job search in %(period)s"
 msgstr "Jobbsøkingen din i %(period)s"
 
-#: src/postulo/core/views.py:67
+#: src/postulo/core/views.py:77
 #, draft
 msgid "Your job search, on your server."
 msgstr "Jobbsøket ditt, på din server."

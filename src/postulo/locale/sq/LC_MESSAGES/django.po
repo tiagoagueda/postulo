@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 13:36+0000\n"
+"POT-Creation-Date: 2026-09-15 14:23+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: shqip\n"
@@ -308,7 +308,7 @@ msgstr "%(name)s tani është @%(username)s."
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s tani është administrator."
 
-#: src/postulo/accounts/settings_views.py:255
+#: src/postulo/core/arranging.py:152
 #, python-format, draft
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "%(name)s tani është në rreshtin %(row)s, vendi %(place)s."
@@ -871,7 +871,7 @@ msgstr ""
 msgid "A week, on average"
 msgstr "Në javë, mesatarisht"
 
-#: src/postulo/templates/settings/dashboard.html:174
+#: src/postulo/templates/core/partials/widget_offers.html:85
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -910,7 +910,7 @@ msgid "accepted by"
 msgstr "pranuar nga"
 
 #: src/postulo/accounts/settings_views.py:73
-#: src/postulo/core/settings_sections.py:60
+#: src/postulo/core/settings_sections.py:53
 #: src/postulo/templates/settings/account.html:5
 #, draft
 msgid "Account"
@@ -967,8 +967,8 @@ msgstr "Veprime për %(name)s"
 msgid "Add"
 msgstr "Shto"
 
-#: src/postulo/templates/settings/dashboard.html:104
-#: src/postulo/templates/settings/dashboard.html:144
+#: src/postulo/templates/core/partials/widget_offers.html:26
+#: src/postulo/templates/core/partials/widget_offers.html:66
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Shto %(name)s"
@@ -1306,7 +1306,7 @@ msgstr "API"
 msgid "API token"
 msgstr "Token API"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1503,15 +1503,23 @@ msgstr "Arkivuar"
 msgid "Are you sure?"
 msgstr "Jeni të sigurt?"
 
-#: src/postulo/templates/core/dashboard.html:49
+#: src/postulo/templates/core/dashboard.html:72
 #, draft
 msgid "Arrange"
 msgstr "Rregullo"
 
-#: src/postulo/templates/core/dashboard.html:95
+#: src/postulo/templates/core/dashboard.html:169
 #, draft
 msgid "Arrange it"
 msgstr "Rregulloje"
+
+#: src/postulo/templates/core/dashboard.html:6
+msgid "Arrange the dashboard"
+msgstr ""
+
+#: src/postulo/templates/core/dashboard.html:41
+msgid "Arrange your dashboard"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:35
 #: src/postulo/applications/models.py:45
@@ -1613,7 +1621,7 @@ msgstr "Kthehu te njerëzit"
 msgid "Back to the entry"
 msgstr "Kthehu te zëri"
 
-#: src/postulo/templates/settings/dashboard.html:162
+#: src/postulo/templates/core/dashboard.html:66
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Kthehu te rregullimi standard"
@@ -1776,7 +1784,7 @@ msgstr "Kapje"
 msgid "capture"
 msgstr "kapje"
 
-#: src/postulo/templates/core/dashboard.html:51
+#: src/postulo/templates/core/dashboard.html:74
 #: src/postulo/templates/jobs/capture_form.html:4
 #: src/postulo/templates/jobs/capture_form.html:8
 #: src/postulo/templates/jobs/capture_list.html:22
@@ -2297,7 +2305,7 @@ msgstr "siguria e lidhjes"
 msgid "Connection security"
 msgstr "Siguria e lidhjes"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
 #: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
@@ -2531,10 +2539,8 @@ msgstr "CV dhe portofole"
 msgid "Dark"
 msgstr "E errët"
 
-#: src/postulo/accounts/settings_views.py:186 src/postulo/core/navigation.py:42
-#: src/postulo/core/settings_sections.py:46
+#: src/postulo/core/navigation.py:42
 #: src/postulo/templates/core/dashboard.html:6
-#: src/postulo/templates/settings/dashboard.html:5
 #, draft
 msgid "Dashboard"
 msgstr "Pamje e përgjithshme"
@@ -2942,6 +2948,7 @@ msgstr "Dokumente që i kishit tashmë. Asgjë këtu nuk shërbehet publikisht."
 
 #: src/postulo/templates/applications/application_detail.html:339
 #: src/postulo/templates/applications/reminder_list.html:47
+#: src/postulo/templates/core/dashboard.html:70
 #: src/postulo/templates/widgets/due_reminders.html:23
 #, draft
 msgid "Done"
@@ -4660,7 +4667,7 @@ msgid "language"
 msgstr "gjuha"
 
 #: src/postulo/accounts/settings_views.py:67
-#: src/postulo/core/settings_sections.py:53
+#: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/settings/locale.html:5
 #, draft
 msgid "Language and time"
@@ -5321,22 +5328,22 @@ msgstr "Zhvendos %(column)s poshtë"
 msgid "Move %(column)s up"
 msgstr "Zhvendos %(column)s lart"
 
-#: src/postulo/templates/settings/partials/move_widget.html:20
+#: src/postulo/templates/core/partials/move_widget.html:20
 #, python-format, draft
 msgid "Move %(name)s down a row"
 msgstr "Zhvendos %(name)s një rresht poshtë"
 
-#: src/postulo/templates/settings/partials/move_widget.html:22
+#: src/postulo/templates/core/partials/move_widget.html:22
 #, python-format, draft
 msgid "Move %(name)s one place earlier"
 msgstr "Zhvendos %(name)s një vend më përpara"
 
-#: src/postulo/templates/settings/partials/move_widget.html:24
+#: src/postulo/templates/core/partials/move_widget.html:24
 #, python-format, draft
 msgid "Move %(name)s one place later"
 msgstr "Zhvendos %(name)s një vend më prapa"
 
-#: src/postulo/templates/settings/partials/move_widget.html:18
+#: src/postulo/templates/core/partials/move_widget.html:18
 #, python-format, draft
 msgid "Move %(name)s up a row"
 msgstr "Zhvendos %(name)s një rresht lart"
@@ -5346,6 +5353,11 @@ msgstr "Zhvendos %(name)s një rresht lart"
 #, draft
 msgid "Move down"
 msgstr "Zhvendos poshtë"
+
+#: src/postulo/templates/core/dashboard.html:43
+msgid ""
+"Move each widget with its arrows, take off what you never read, and add from the list below. Press Done when it is right."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:56
 #, draft
@@ -5474,7 +5486,7 @@ msgstr "Letër e re"
 msgid "New reminder"
 msgstr "Kujtesë e re"
 
-#: src/postulo/templates/settings/dashboard.html:90
+#: src/postulo/templates/core/partials/widget_offers.html:12
 #, draft
 msgid "New since you last arranged this"
 msgstr "E re që nga hera e fundit që e rregulluat këtë"
@@ -5793,7 +5805,7 @@ msgstr "Ende asnjë. Ky zë e shtyp tekstin e tij origjinal në çdo CV."
 msgid "Normal"
 msgstr "Normale"
 
-#: src/postulo/templates/settings/dashboard.html:113
+#: src/postulo/templates/core/partials/widget_offers.html:35
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Jo %(name)s"
@@ -5885,14 +5897,14 @@ msgstr "Nuk është vendosur këtu — vlen mjedisi ose vlera e parazgjedhur"
 msgid "Not set — the environment decides"
 msgstr "E pacaktuar — vendos mjedisi"
 
-#: src/postulo/templates/core/dashboard.html:29
+#: src/postulo/templates/core/dashboard.html:30
 #, python-format, draft
 msgid ""
 "Not shown yet: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">arrange your dashboard</a>."
 msgstr ""
 "Ende i pashfaqur: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">rregulloni panelin tuaj</a>."
 
-#: src/postulo/templates/settings/dashboard.html:129
+#: src/postulo/templates/core/partials/widget_offers.html:51
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Nuk shfaqet · %(name)s"
@@ -6069,6 +6081,10 @@ msgstr "Asgjë te %(host)s nuk mund të përdorej si logo."
 msgid "Nothing on it yet. Choose some entries below."
 msgstr "Ende s’ka asgjë në të. Zgjidh disa zëra më poshtë."
 
+#: src/postulo/templates/core/dashboard.html:163
+msgid "Nothing on it. Add something from the list below."
+msgstr ""
+
 #: src/postulo/templates/connections/confirm_delete.html:13
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
@@ -6205,11 +6221,6 @@ msgid ""
 msgstr ""
 "Në këtë periudhë nuk u dërgua asgjë. Këtë thotë raporti, dhe është një fakt si çdo tjetër."
 
-#: src/postulo/templates/settings/dashboard.html:77
-#, draft
-msgid "Nothing. The dashboard will offer to bring something back."
-msgstr "Asgjë. Pamja e përgjithshme do të ofrojë të kthejë diçka."
-
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -6309,11 +6320,6 @@ msgstr "Në vijën kohore"
 #, draft
 msgid "On this page"
 msgstr "Në këtë faqe"
-
-#: src/postulo/templates/settings/dashboard.html:15
-#, draft
-msgid "On your dashboard"
-msgstr "Në pamjen tuaj të përgjithshme"
 
 #: src/postulo/plugins/models.py:110
 #, draft
@@ -6883,7 +6889,7 @@ msgstr "depo shtojcash"
 
 #: src/postulo/accounts/settings_views.py:125
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:805
-#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/core/settings_sections.py:88 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
 #, draft
@@ -7439,7 +7445,7 @@ msgstr "Regjistro"
 #: src/postulo/templates/applications/application_intake.html:8
 #: src/postulo/templates/applications/application_list.html:55
 #: src/postulo/templates/applications/application_list.html:76
-#: src/postulo/templates/core/dashboard.html:54
+#: src/postulo/templates/core/dashboard.html:77
 #, draft
 msgid "Record an application"
 msgstr "Regjistro një aplikim"
@@ -8071,11 +8077,6 @@ msgstr "Shih aplikimet"
 #, draft
 msgid "See the board"
 msgstr "Shih tabelën"
-
-#: src/postulo/templates/settings/dashboard.html:157
-#, draft
-msgid "See the dashboard"
-msgstr "Shih pamjen e përgjithshme"
 
 #: src/postulo/templates/core/import_csv_done.html:34
 #, draft
@@ -8985,7 +8986,7 @@ msgstr "Përshtat këtë zë"
 msgid "tailored for this one"
 msgstr "përshtatur për këtë"
 
-#: src/postulo/templates/settings/dashboard.html:66
+#: src/postulo/templates/core/dashboard.html:146
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Hiq %(name)s"
@@ -9221,7 +9222,7 @@ msgstr "Ky nuk është status që Postulo e njeh."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Kjo nuk është rrotë: Postulo instalon skedarë .whl."
 
-#: src/postulo/accounts/settings_views.py:225
+#: src/postulo/core/arranging.py:107
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Ky nuk është modul që Postulo e njeh."
@@ -9912,7 +9913,7 @@ msgstr "Kjo adresë është tashmë në shpalljet tuaja, që nga %(when)s."
 msgid "This address is already listed."
 msgstr "Kjo adresë është tashmë në listë."
 
-#: src/postulo/templates/settings/dashboard.html:169
+#: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
@@ -10640,7 +10641,7 @@ msgstr "Javë me radhë, deri tani"
 msgid "Weeks with none"
 msgstr "Javë pa asnjë"
 
-#: src/postulo/templates/core/dashboard.html:40
+#: src/postulo/templates/core/dashboard.html:47
 #, python-format, draft
 msgid "Welcome back, %(name)s"
 msgstr "Mirë se u ktheve, %(name)s"
@@ -10782,13 +10783,6 @@ msgstr "Në cilën gjuhë Postulo flet me ju, dhe orën e kujt tregon."
 #, draft
 msgid "what the check found"
 msgstr "çfarë gjeti kontrolli"
-
-#: src/postulo/templates/settings/dashboard.html:7
-#, draft
-msgid ""
-"What the dashboard shows, and in what order. Everything that used to be on Insights is here as a widget; take off what you never read and put the rest where you want it."
-msgstr ""
-"Çfarë tregon pamja e përgjithshme dhe në ç'renditje. Gjithçka që dikur ishte te Njohuritë është këtu si modul; hiqni atë që nuk e lexoni kurrë dhe vendosini të tjerat ku doni."
 
 #: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:367
 #, draft
@@ -10967,7 +10961,7 @@ msgstr "Ku e hasët: një portal punësimi, një rekomandim, faqja e kompanisë.
 msgid "where you live"
 msgstr "ku jetoni"
 
-#: src/postulo/templates/core/dashboard.html:45
+#: src/postulo/templates/core/dashboard.html:52
 #, draft
 msgid "Where your job search stands today."
 msgstr "Ku qëndron sot kërkimi juaj për punë."
@@ -11306,7 +11300,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Keni vënë re %(counter)s shpallje; keni aplikuar për %(applied)s (%(share)s%%) dhe keni hedhur poshtë %(discarded)s."
 
-#: src/postulo/templates/core/dashboard.html:93
+#: src/postulo/templates/core/dashboard.html:167
 #, draft
 msgid "You have taken everything off it. Put something back whenever you like."
 msgstr "I keni hequr gjithçka. Vendosni diçka sërish kur të doni."
@@ -11385,12 +11379,12 @@ msgstr ""
 msgid "Your CVs"
 msgstr "CV-të tuaja"
 
-#: src/postulo/templates/core/dashboard.html:91
+#: src/postulo/templates/core/dashboard.html:160
 #, draft
 msgid "Your dashboard is empty"
 msgstr "Pamja juaj e përgjithshme është bosh"
 
-#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:103
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -11430,7 +11424,7 @@ msgstr "Inicialet tuaja"
 msgid "Your job search in %(period)s"
 msgstr "Kërkimi yt i punës në %(period)s"
 
-#: src/postulo/core/views.py:67
+#: src/postulo/core/views.py:77
 #, draft
 msgid "Your job search, on your server."
 msgstr "Kërkimi juaj për punë, në serverin tuaj."

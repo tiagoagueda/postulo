@@ -390,6 +390,18 @@ class Rendered:
 
     spec: Widget
     context: dict = field(default_factory=dict)
+    #: While the page is being arranged (#201): which of the four directions would change
+    #: anything, so a button that cannot act says so before it is pressed (#124). Empty on
+    #: the page as read.
+    moves: dict = field(default_factory=dict)
+    #: While the page is being arranged (#201): which of the four directions would change
+    #: anything, so a button that cannot act says so before it is pressed (#124). Empty on
+    #: the page as read.
+    moves: dict = field(default_factory=dict)
+    #: While the page is being arranged (#201): which of the four directions would change
+    #: anything, so a button that cannot act says so before it is pressed (#124). Empty on
+    #: the page as read.
+    moves: dict = field(default_factory=dict)
 
 
 def build_page(request, profile) -> list[Rendered]:

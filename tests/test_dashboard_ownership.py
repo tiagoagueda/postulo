@@ -25,7 +25,10 @@ from postulo.core import widgets
 
 pytestmark = pytest.mark.django_db
 
-ARRANGE = "settings:dashboard"
+#: The dashboard arranges itself (#201): actions post to its address, and the mode
+#: that shows the controls is a parameter on it.
+ARRANGE = "core:home"
+ARRANGING = {"arrange": "1"}
 
 
 @pytest.fixture
@@ -108,7 +111,7 @@ def test_and_it_is_not_lost_either(client, user, a_new_widget):
     client.force_login(user)
 
     dashboard = client.get(reverse("core:home")).content.decode()
-    arrange = client.get(reverse(ARRANGE)).content.decode()
+    arrange = client.get(reverse(ARRANGE), ARRANGING).content.decode()
 
     assert "arrange your dashboard" in dashboard
     assert "New since you last arranged this" in arrange

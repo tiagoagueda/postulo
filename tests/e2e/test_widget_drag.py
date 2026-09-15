@@ -28,8 +28,9 @@ def sign_in(page: Page, base: str) -> None:
 
 
 def open_the_arrange_page(page: Page, live_server) -> None:
+    """The dashboard in its editing mode, which is where arranging happens since #201."""
     sign_in(page, live_server.url)
-    page.goto(f"{live_server.url}/settings/dashboard/")
+    page.goto(f"{live_server.url}/?arrange=1")
 
 
 def drag(page: Page, row, onto) -> None:
@@ -97,7 +98,7 @@ def test_a_drop_is_saved_where_the_arrows_save(page: Page, live_server, applican
     page.wait_for_load_state("networkidle")
     landed = [row.get_attribute("data-widget-row") for row in rows(page).all()]
 
-    page.goto(f"{live_server.url}/settings/dashboard/")
+    page.goto(f"{live_server.url}/?arrange=1")
     assert [row.get_attribute("data-widget-row") for row in rows(page).all()] == landed
 
 

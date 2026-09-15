@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 13:36+0000\n"
+"POT-Creation-Date: 2026-09-15 14:23+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -348,7 +348,7 @@ msgstr "Is @%(username)s é/í %(name)s anois."
 msgid "%(name)s is now an administrator."
 msgstr "Is riarthóir é/í %(name)s anois."
 
-#: src/postulo/accounts/settings_views.py:255
+#: src/postulo/core/arranging.py:152
 #, python-format, draft
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "Tá %(name)s anois i ró %(row)s, áit %(place)s."
@@ -937,7 +937,7 @@ msgstr ""
 msgid "A week, on average"
 msgstr "In aghaidh na seachtaine, ar an meán"
 
-#: src/postulo/templates/settings/dashboard.html:174
+#: src/postulo/templates/core/partials/widget_offers.html:85
 #, draft
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
@@ -976,7 +976,7 @@ msgid "accepted by"
 msgstr "glactha ag"
 
 #: src/postulo/accounts/settings_views.py:73
-#: src/postulo/core/settings_sections.py:60
+#: src/postulo/core/settings_sections.py:53
 #: src/postulo/templates/settings/account.html:5
 #, draft
 msgid "Account"
@@ -1033,8 +1033,8 @@ msgstr "Gníomhartha do %(name)s"
 msgid "Add"
 msgstr "Cuir leis"
 
-#: src/postulo/templates/settings/dashboard.html:104
-#: src/postulo/templates/settings/dashboard.html:144
+#: src/postulo/templates/core/partials/widget_offers.html:26
+#: src/postulo/templates/core/partials/widget_offers.html:66
 #, python-format, draft
 msgid "Add %(name)s"
 msgstr "Cuir %(name)s leis"
@@ -1376,7 +1376,7 @@ msgstr "API"
 msgid "API token"
 msgstr "Comhartha API"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1573,15 +1573,23 @@ msgstr "Cartlannaithe"
 msgid "Are you sure?"
 msgstr "An bhfuil tú cinnte?"
 
-#: src/postulo/templates/core/dashboard.html:49
+#: src/postulo/templates/core/dashboard.html:72
 #, draft
 msgid "Arrange"
 msgstr "Leag amach"
 
-#: src/postulo/templates/core/dashboard.html:95
+#: src/postulo/templates/core/dashboard.html:169
 #, draft
 msgid "Arrange it"
 msgstr "Leag amach í"
+
+#: src/postulo/templates/core/dashboard.html:6
+msgid "Arrange the dashboard"
+msgstr ""
+
+#: src/postulo/templates/core/dashboard.html:41
+msgid "Arrange your dashboard"
+msgstr ""
 
 #: src/postulo/applications/analytics.py:35
 #: src/postulo/applications/models.py:45
@@ -1683,7 +1691,7 @@ msgstr "Ar ais chuig daoine"
 msgid "Back to the entry"
 msgstr "Ar ais chuig an iontráil"
 
-#: src/postulo/templates/settings/dashboard.html:162
+#: src/postulo/templates/core/dashboard.html:66
 #, draft
 msgid "Back to the standard arrangement"
 msgstr "Ar ais go dtí an leagan amach caighdeánach"
@@ -1846,7 +1854,7 @@ msgstr "Gabh"
 msgid "capture"
 msgstr "gabháil"
 
-#: src/postulo/templates/core/dashboard.html:51
+#: src/postulo/templates/core/dashboard.html:74
 #: src/postulo/templates/jobs/capture_form.html:4
 #: src/postulo/templates/jobs/capture_form.html:8
 #: src/postulo/templates/jobs/capture_list.html:22
@@ -2369,7 +2377,7 @@ msgstr "slándáil an cheangail"
 msgid "Connection security"
 msgstr "Slándáil an cheangail"
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
 #: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
@@ -2603,10 +2611,8 @@ msgstr "CVanna agus punanna"
 msgid "Dark"
 msgstr "Dorcha"
 
-#: src/postulo/accounts/settings_views.py:186 src/postulo/core/navigation.py:42
-#: src/postulo/core/settings_sections.py:46
+#: src/postulo/core/navigation.py:42
 #: src/postulo/templates/core/dashboard.html:6
-#: src/postulo/templates/settings/dashboard.html:5
 #, draft
 msgid "Dashboard"
 msgstr "Painéal"
@@ -3014,6 +3020,7 @@ msgstr "Doiciméid a bhí agat cheana. Ní fhreastalaítear aon rud anseo go poi
 
 #: src/postulo/templates/applications/application_detail.html:339
 #: src/postulo/templates/applications/reminder_list.html:47
+#: src/postulo/templates/core/dashboard.html:70
 #: src/postulo/templates/widgets/due_reminders.html:23
 #, draft
 msgid "Done"
@@ -4738,7 +4745,7 @@ msgid "language"
 msgstr "teanga"
 
 #: src/postulo/accounts/settings_views.py:67
-#: src/postulo/core/settings_sections.py:53
+#: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/settings/locale.html:5
 #, draft
 msgid "Language and time"
@@ -5406,22 +5413,22 @@ msgstr "Bog %(column)s síos"
 msgid "Move %(column)s up"
 msgstr "Bog %(column)s suas"
 
-#: src/postulo/templates/settings/partials/move_widget.html:20
+#: src/postulo/templates/core/partials/move_widget.html:20
 #, python-format, draft
 msgid "Move %(name)s down a row"
 msgstr "Bog %(name)s síos ró amháin"
 
-#: src/postulo/templates/settings/partials/move_widget.html:22
+#: src/postulo/templates/core/partials/move_widget.html:22
 #, python-format, draft
 msgid "Move %(name)s one place earlier"
 msgstr "Bog %(name)s áit amháin chun tosaigh"
 
-#: src/postulo/templates/settings/partials/move_widget.html:24
+#: src/postulo/templates/core/partials/move_widget.html:24
 #, python-format, draft
 msgid "Move %(name)s one place later"
 msgstr "Bog %(name)s áit amháin chun deiridh"
 
-#: src/postulo/templates/settings/partials/move_widget.html:18
+#: src/postulo/templates/core/partials/move_widget.html:18
 #, python-format, draft
 msgid "Move %(name)s up a row"
 msgstr "Bog %(name)s suas ró amháin"
@@ -5431,6 +5438,11 @@ msgstr "Bog %(name)s suas ró amháin"
 #, draft
 msgid "Move down"
 msgstr "Bog síos"
+
+#: src/postulo/templates/core/dashboard.html:43
+msgid ""
+"Move each widget with its arrows, take off what you never read, and add from the list below. Press Done when it is right."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:56
 #, draft
@@ -5559,7 +5571,7 @@ msgstr "Litir nua"
 msgid "New reminder"
 msgstr "Meabhrúchán nua"
 
-#: src/postulo/templates/settings/dashboard.html:90
+#: src/postulo/templates/core/partials/widget_offers.html:12
 #, draft
 msgid "New since you last arranged this"
 msgstr "Nua ó rinne tú an leathanach seo a leagan amach"
@@ -5882,7 +5894,7 @@ msgstr ""
 msgid "Normal"
 msgstr "Gnáth"
 
-#: src/postulo/templates/settings/dashboard.html:113
+#: src/postulo/templates/core/partials/widget_offers.html:35
 #, python-format, draft
 msgid "Not %(name)s"
 msgstr "Gan %(name)s"
@@ -5974,14 +5986,14 @@ msgstr "Níor socraíodh anseo — baineann an timpeallacht nó an réamhshocrú
 msgid "Not set — the environment decides"
 msgstr "Gan socrú — is í an timpeallacht a shocraíonn"
 
-#: src/postulo/templates/core/dashboard.html:29
+#: src/postulo/templates/core/dashboard.html:30
 #, python-format, draft
 msgid ""
 "Not shown yet: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">arrange your dashboard</a>."
 msgstr ""
 "Gan taispeáint fós: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">leag amach do phainéal</a>."
 
-#: src/postulo/templates/settings/dashboard.html:129
+#: src/postulo/templates/core/partials/widget_offers.html:51
 #, python-format, draft
 msgid "Not shown · %(name)s"
 msgstr "Gan taispeáint · %(name)s"
@@ -6160,6 +6172,10 @@ msgstr "Ní raibh aon rud ar %(host)s inúsáidte mar lógó."
 msgid "Nothing on it yet. Choose some entries below."
 msgstr "Níl aon rud air fós. Roghnaigh roinnt iontrálacha thíos."
 
+#: src/postulo/templates/core/dashboard.html:163
+msgid "Nothing on it. Add something from the list below."
+msgstr ""
+
 #: src/postulo/templates/connections/confirm_delete.html:13
 #, draft
 msgid "Nothing on the other service is touched. You can connect it again later."
@@ -6297,11 +6313,6 @@ msgid ""
 msgstr ""
 "Níor seoladh aon rud sa tréimhse seo. Sin a deir an tuairisc, agus is fíric é mar aon fhíric eile."
 
-#: src/postulo/templates/settings/dashboard.html:77
-#, draft
-msgid "Nothing. The dashboard will offer to bring something back."
-msgstr "Faic. Tairgfidh an painéal rud éigin a chur ar ais."
-
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
 #: src/postulo/plugins/views.py:33
 #, draft
@@ -6402,11 +6413,6 @@ msgstr "Ar an amlíne"
 #, draft
 msgid "On this page"
 msgstr "Ar an leathanach seo"
-
-#: src/postulo/templates/settings/dashboard.html:15
-#, draft
-msgid "On your dashboard"
-msgstr "Ar do phainéal"
 
 #: src/postulo/plugins/models.py:110
 #, draft
@@ -7014,7 +7020,7 @@ msgstr "stór breiseán"
 
 #: src/postulo/accounts/settings_views.py:125
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:805
-#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/core/settings_sections.py:88 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
 #, draft
@@ -7579,7 +7585,7 @@ msgstr "Taifead"
 #: src/postulo/templates/applications/application_intake.html:8
 #: src/postulo/templates/applications/application_list.html:55
 #: src/postulo/templates/applications/application_list.html:76
-#: src/postulo/templates/core/dashboard.html:54
+#: src/postulo/templates/core/dashboard.html:77
 #, draft
 msgid "Record an application"
 msgstr "Taifead iarratas"
@@ -8211,11 +8217,6 @@ msgstr "Féach na hiarratais"
 #, draft
 msgid "See the board"
 msgstr "Féach an clár"
-
-#: src/postulo/templates/settings/dashboard.html:157
-#, draft
-msgid "See the dashboard"
-msgstr "Féach ar an bpainéal"
 
 #: src/postulo/templates/core/import_csv_done.html:34
 #, draft
@@ -9129,7 +9130,7 @@ msgstr "Cuir an iontráil seo in oiriúint"
 msgid "tailored for this one"
 msgstr "curtha in oiriúint dó seo"
 
-#: src/postulo/templates/settings/dashboard.html:66
+#: src/postulo/templates/core/dashboard.html:146
 #, python-format, draft
 msgid "Take %(name)s off"
 msgstr "Bain %(name)s de"
@@ -9364,7 +9365,7 @@ msgstr "Ní stádas é sin a aithníonn Postulo."
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Ní roth é sin: suiteálann Postulo comhaid .whl."
 
-#: src/postulo/accounts/settings_views.py:225
+#: src/postulo/core/arranging.py:107
 #, draft
 msgid "That is not a widget Postulo knows about."
 msgstr "Ní giuirléid í sin a aithníonn Postulo."
@@ -10073,7 +10074,7 @@ msgstr "Tá an seoladh seo i do chuid fógraí cheana, ó %(when)s."
 msgid "This address is already listed."
 msgstr "Tá an seoladh seo liostaithe cheana."
 
-#: src/postulo/templates/settings/dashboard.html:169
+#: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
@@ -10803,7 +10804,7 @@ msgstr "Seachtainí as a chéile, go dtí seo"
 msgid "Weeks with none"
 msgstr "Seachtainí gan ceann ar bith"
 
-#: src/postulo/templates/core/dashboard.html:40
+#: src/postulo/templates/core/dashboard.html:47
 #, python-format, draft
 msgid "Welcome back, %(name)s"
 msgstr "Fáilte ar ais, %(name)s"
@@ -10946,13 +10947,6 @@ msgstr "Cén teanga a labhraíonn Postulo leat, agus cén clog a thaispeánann s
 #, draft
 msgid "what the check found"
 msgstr "a bhfuair an tseiceáil amach"
-
-#: src/postulo/templates/settings/dashboard.html:7
-#, draft
-msgid ""
-"What the dashboard shows, and in what order. Everything that used to be on Insights is here as a widget; take off what you never read and put the rest where you want it."
-msgstr ""
-"A dtaispeánann an painéal, agus cén t-ord. Gach a raibh in Insights, tá sé anseo mar ghiuirléid; bain díot a bhfuil nach léann tú riamh agus cuir an chuid eile mar is mian leat."
 
 #: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:367
 #, draft
@@ -11132,7 +11126,7 @@ msgstr "Cár tháinig tú air: bord post, moladh, suíomh na cuideachta."
 msgid "where you live"
 msgstr "cá bhfuil tú i do chónaí"
 
-#: src/postulo/templates/core/dashboard.html:45
+#: src/postulo/templates/core/dashboard.html:52
 #, draft
 msgid "Where your job search stands today."
 msgstr "Cá seasann do chuardach poist inniu."
@@ -11479,7 +11473,7 @@ msgstr[3] ""
 msgstr[4] ""
 "Thug tú faoi deara %(counter)s fógra; chuir tú iarratas chuig %(applied)s (%(share)s%%) agus chaith tú %(discarded)s i leataobh."
 
-#: src/postulo/templates/core/dashboard.html:93
+#: src/postulo/templates/core/dashboard.html:167
 #, draft
 msgid "You have taken everything off it. Put something back whenever you like."
 msgstr "Bhain tú gach rud de. Cuir rud éigin ar ais nuair is mian leat."
@@ -11558,12 +11552,12 @@ msgstr ""
 msgid "Your CVs"
 msgstr "Do CVanna"
 
-#: src/postulo/templates/core/dashboard.html:91
+#: src/postulo/templates/core/dashboard.html:160
 #, draft
 msgid "Your dashboard is empty"
 msgstr "Tá do phainéal folamh"
 
-#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:103
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -11603,7 +11597,7 @@ msgstr "Do cheannlitreacha"
 msgid "Your job search in %(period)s"
 msgstr "Do chuardach fostaíochta i %(period)s"
 
-#: src/postulo/core/views.py:67
+#: src/postulo/core/views.py:77
 #, draft
 msgid "Your job search, on your server."
 msgstr "Do chuardach poist, ar do fhreastalaí féin."

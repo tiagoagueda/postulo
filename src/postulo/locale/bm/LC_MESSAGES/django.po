@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 13:36+0000\n"
+"POT-Creation-Date: 2026-09-15 14:23+0000\n"
 "PO-Revision-Date: 2026-09-06 21:17+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Bamanankan\n"
@@ -283,7 +283,7 @@ msgstr ""
 msgid "%(name)s is now an administrator."
 msgstr ""
 
-#: src/postulo/accounts/settings_views.py:255
+#: src/postulo/core/arranging.py:152
 #, python-format
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr ""
@@ -747,7 +747,7 @@ msgstr ""
 msgid "A week, on average"
 msgstr ""
 
-#: src/postulo/templates/settings/dashboard.html:174
+#: src/postulo/templates/core/partials/widget_offers.html:85
 msgid ""
 "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr ""
@@ -778,7 +778,7 @@ msgid "accepted by"
 msgstr ""
 
 #: src/postulo/accounts/settings_views.py:73
-#: src/postulo/core/settings_sections.py:60
+#: src/postulo/core/settings_sections.py:53
 #: src/postulo/templates/settings/account.html:5
 msgid "Account"
 msgstr ""
@@ -829,8 +829,8 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: src/postulo/templates/settings/dashboard.html:104
-#: src/postulo/templates/settings/dashboard.html:144
+#: src/postulo/templates/core/partials/widget_offers.html:26
+#: src/postulo/templates/core/partials/widget_offers.html:66
 #, python-format
 msgid "Add %(name)s"
 msgstr ""
@@ -1109,7 +1109,7 @@ msgstr ""
 msgid "API token"
 msgstr ""
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:102
+#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 msgid "API tokens"
@@ -1272,12 +1272,20 @@ msgstr ""
 msgid "Are you sure?"
 msgstr ""
 
-#: src/postulo/templates/core/dashboard.html:49
+#: src/postulo/templates/core/dashboard.html:72
 msgid "Arrange"
 msgstr ""
 
-#: src/postulo/templates/core/dashboard.html:95
+#: src/postulo/templates/core/dashboard.html:169
 msgid "Arrange it"
+msgstr ""
+
+#: src/postulo/templates/core/dashboard.html:6
+msgid "Arrange the dashboard"
+msgstr ""
+
+#: src/postulo/templates/core/dashboard.html:41
+msgid "Arrange your dashboard"
 msgstr ""
 
 #: src/postulo/applications/analytics.py:35
@@ -1362,7 +1370,7 @@ msgstr ""
 msgid "Back to the entry"
 msgstr ""
 
-#: src/postulo/templates/settings/dashboard.html:162
+#: src/postulo/templates/core/dashboard.html:66
 msgid "Back to the standard arrangement"
 msgstr ""
 
@@ -1499,7 +1507,7 @@ msgstr ""
 msgid "capture"
 msgstr ""
 
-#: src/postulo/templates/core/dashboard.html:51
+#: src/postulo/templates/core/dashboard.html:74
 #: src/postulo/templates/jobs/capture_form.html:4
 #: src/postulo/templates/jobs/capture_form.html:8
 #: src/postulo/templates/jobs/capture_list.html:22
@@ -1933,7 +1941,7 @@ msgstr ""
 msgid "Connection security"
 msgstr ""
 
-#: src/postulo/core/settings_sections.py:81 src/postulo/plugins/views.py:134
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:134
 #: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
 #: src/postulo/plugins/views.py:414
 #: src/postulo/templates/connections/list.html:7
@@ -2124,10 +2132,8 @@ msgstr ""
 msgid "Dark"
 msgstr ""
 
-#: src/postulo/accounts/settings_views.py:186 src/postulo/core/navigation.py:42
-#: src/postulo/core/settings_sections.py:46
+#: src/postulo/core/navigation.py:42
 #: src/postulo/templates/core/dashboard.html:6
-#: src/postulo/templates/settings/dashboard.html:5
 msgid "Dashboard"
 msgstr ""
 
@@ -2446,6 +2452,7 @@ msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:339
 #: src/postulo/templates/applications/reminder_list.html:47
+#: src/postulo/templates/core/dashboard.html:70
 #: src/postulo/templates/widgets/due_reminders.html:23
 msgid "Done"
 msgstr ""
@@ -3838,7 +3845,7 @@ msgid "language"
 msgstr ""
 
 #: src/postulo/accounts/settings_views.py:67
-#: src/postulo/core/settings_sections.py:53
+#: src/postulo/core/settings_sections.py:46
 #: src/postulo/templates/settings/locale.html:5
 msgid "Language and time"
 msgstr ""
@@ -4373,22 +4380,22 @@ msgstr ""
 msgid "Move %(column)s up"
 msgstr ""
 
-#: src/postulo/templates/settings/partials/move_widget.html:20
+#: src/postulo/templates/core/partials/move_widget.html:20
 #, python-format
 msgid "Move %(name)s down a row"
 msgstr ""
 
-#: src/postulo/templates/settings/partials/move_widget.html:22
+#: src/postulo/templates/core/partials/move_widget.html:22
 #, python-format
 msgid "Move %(name)s one place earlier"
 msgstr ""
 
-#: src/postulo/templates/settings/partials/move_widget.html:24
+#: src/postulo/templates/core/partials/move_widget.html:24
 #, python-format
 msgid "Move %(name)s one place later"
 msgstr ""
 
-#: src/postulo/templates/settings/partials/move_widget.html:18
+#: src/postulo/templates/core/partials/move_widget.html:18
 #, python-format
 msgid "Move %(name)s up a row"
 msgstr ""
@@ -4396,6 +4403,11 @@ msgstr ""
 #: src/postulo/templates/documents/cv_detail.html:100
 #: src/postulo/templates/resume/overview.html:128
 msgid "Move down"
+msgstr ""
+
+#: src/postulo/templates/core/dashboard.html:43
+msgid ""
+"Move each widget with its arrows, take off what you never read, and add from the list below. Press Done when it is right."
 msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:56
@@ -4504,7 +4516,7 @@ msgstr ""
 msgid "New reminder"
 msgstr ""
 
-#: src/postulo/templates/settings/dashboard.html:90
+#: src/postulo/templates/core/partials/widget_offers.html:12
 msgid "New since you last arranged this"
 msgstr ""
 
@@ -4762,7 +4774,7 @@ msgstr ""
 msgid "Normal"
 msgstr ""
 
-#: src/postulo/templates/settings/dashboard.html:113
+#: src/postulo/templates/core/partials/widget_offers.html:35
 #, python-format
 msgid "Not %(name)s"
 msgstr ""
@@ -4838,13 +4850,13 @@ msgstr ""
 msgid "Not set — the environment decides"
 msgstr ""
 
-#: src/postulo/templates/core/dashboard.html:29
+#: src/postulo/templates/core/dashboard.html:30
 #, python-format
 msgid ""
 "Not shown yet: %(names)s · <a href=\"%(arrange_url)s\" class=\"font-medium underline\">arrange your dashboard</a>."
 msgstr ""
 
-#: src/postulo/templates/settings/dashboard.html:129
+#: src/postulo/templates/core/partials/widget_offers.html:51
 #, python-format
 msgid "Not shown · %(name)s"
 msgstr ""
@@ -4992,6 +5004,10 @@ msgstr ""
 msgid "Nothing on it yet. Choose some entries below."
 msgstr ""
 
+#: src/postulo/templates/core/dashboard.html:163
+msgid "Nothing on it. Add something from the list below."
+msgstr ""
+
 #: src/postulo/templates/connections/confirm_delete.html:13
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
@@ -5101,10 +5117,6 @@ msgid ""
 "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr ""
 
-#: src/postulo/templates/settings/dashboard.html:77
-msgid "Nothing. The dashboard will offer to bring something back."
-msgstr ""
-
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
 #: src/postulo/plugins/views.py:33
 msgid "Notifications"
@@ -5186,10 +5198,6 @@ msgstr ""
 #: src/postulo/templates/accounts/profile.html:29
 #: src/postulo/templates/resume/overview.html:32
 msgid "On this page"
-msgstr ""
-
-#: src/postulo/templates/settings/dashboard.html:15
-msgid "On your dashboard"
 msgstr ""
 
 #: src/postulo/plugins/models.py:110
@@ -5649,7 +5657,7 @@ msgstr ""
 
 #: src/postulo/accounts/settings_views.py:125
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:805
-#: src/postulo/core/settings_sections.py:95 src/postulo/plugins/apps.py:9
+#: src/postulo/core/settings_sections.py:88 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
 #: src/postulo/templates/settings/plugins.html:5
 msgid "Plugins"
@@ -6098,7 +6106,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_intake.html:8
 #: src/postulo/templates/applications/application_list.html:55
 #: src/postulo/templates/applications/application_list.html:76
-#: src/postulo/templates/core/dashboard.html:54
+#: src/postulo/templates/core/dashboard.html:77
 msgid "Record an application"
 msgstr ""
 
@@ -6616,10 +6624,6 @@ msgstr ""
 
 #: src/postulo/templates/widgets/shortcuts.html:10
 msgid "See the board"
-msgstr ""
-
-#: src/postulo/templates/settings/dashboard.html:157
-msgid "See the dashboard"
 msgstr ""
 
 #: src/postulo/templates/core/import_csv_done.html:34
@@ -7363,7 +7367,7 @@ msgstr ""
 msgid "tailored for this one"
 msgstr ""
 
-#: src/postulo/templates/settings/dashboard.html:66
+#: src/postulo/templates/core/dashboard.html:146
 #, python-format
 msgid "Take %(name)s off"
 msgstr ""
@@ -7559,7 +7563,7 @@ msgstr ""
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr ""
 
-#: src/postulo/accounts/settings_views.py:225
+#: src/postulo/core/arranging.py:107
 msgid "That is not a widget Postulo knows about."
 msgstr ""
 
@@ -8125,7 +8129,7 @@ msgstr ""
 msgid "This address is already listed."
 msgstr ""
 
-#: src/postulo/templates/settings/dashboard.html:169
+#: src/postulo/templates/core/partials/widget_offers.html:80
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
 msgstr ""
@@ -8717,7 +8721,7 @@ msgstr ""
 msgid "Weeks with none"
 msgstr ""
 
-#: src/postulo/templates/core/dashboard.html:40
+#: src/postulo/templates/core/dashboard.html:47
 #, python-format
 msgid "Welcome back, %(name)s"
 msgstr ""
@@ -8834,11 +8838,6 @@ msgstr ""
 
 #: src/postulo/resume/models.py:255
 msgid "what the check found"
-msgstr ""
-
-#: src/postulo/templates/settings/dashboard.html:7
-msgid ""
-"What the dashboard shows, and in what order. Everything that used to be on Insights is here as a widget; take off what you never read and put the rest where you want it."
 msgstr ""
 
 #: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:367
@@ -8979,7 +8978,7 @@ msgstr ""
 msgid "where you live"
 msgstr ""
 
-#: src/postulo/templates/core/dashboard.html:45
+#: src/postulo/templates/core/dashboard.html:52
 msgid "Where your job search stands today."
 msgstr ""
 
@@ -9245,7 +9244,7 @@ msgid_plural ""
 "You have noticed %(counter)s listings; applied to %(applied)s (%(share)s%%) and discarded %(discarded)s."
 msgstr[0] ""
 
-#: src/postulo/templates/core/dashboard.html:93
+#: src/postulo/templates/core/dashboard.html:167
 msgid "You have taken everything off it. Put something back whenever you like."
 msgstr ""
 
@@ -9308,11 +9307,11 @@ msgstr ""
 msgid "Your CVs"
 msgstr ""
 
-#: src/postulo/templates/core/dashboard.html:91
+#: src/postulo/templates/core/dashboard.html:160
 msgid "Your dashboard is empty"
 msgstr ""
 
-#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:110
+#: src/postulo/accounts/views.py:366 src/postulo/core/settings_sections.py:103
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 msgid "Your data"
 msgstr ""
@@ -9346,7 +9345,7 @@ msgstr ""
 msgid "Your job search in %(period)s"
 msgstr ""
 
-#: src/postulo/core/views.py:67
+#: src/postulo/core/views.py:77
 msgid "Your job search, on your server."
 msgstr ""
 

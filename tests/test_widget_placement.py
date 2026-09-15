@@ -29,7 +29,10 @@ from postulo.core import widgets
 
 pytestmark = pytest.mark.django_db
 
-ARRANGE = "settings:dashboard"
+#: The dashboard arranges itself (#201): actions post to its address, and the mode
+#: that shows the controls is a parameter on it.
+ARRANGE = "core:home"
+ARRANGING = {"arrange": "1"}
 
 
 def arrange(user, keys: list[str]) -> None:
@@ -117,15 +120,20 @@ def test_every_direction_is_a_form_that_posts(client, user):
     """
     client.force_login(user)
 
-    html = client.get(reverse(ARRANGE)).content.decode()
+    html = client.get(reverse(ARRANGE), ARRANGING).content.decode()
 
     for way in widgets.DIRECTIONS:
         assert html.count(f'<button type="submit" name="action" value="{way}"') >= 1
-    # Nothing in the arranging list is draggable, and nothing in it needs htmx: the header's
-    # theme switch does, and is not what this page is for.
+    # Nothing on the page is draggable, and none of the arranging forms needs htmx: a
+    # widget's own contents may, and the header's theme switch does, and neither is what
+    # the mode is for.
     body = html.split("<main")[-1]
     assert "draggable" not in body
-    assert "hx-" not in body
+    arranging_forms = [
+        form for form in re.findall(r"<form\b.*?</form>", body, re.S) if 'name="action"' in form
+    ]
+    assert arranging_forms
+    assert not any("hx-" in form for form in arranging_forms)
 
 
 def test_moving_a_widget_through_the_page(client, user):
@@ -152,7 +160,7 @@ def test_focus_follows_the_widget(client, user):
 def test_the_row_the_fragment_lands_on_can_take_focus(client, user):
     client.force_login(user)
 
-    html = client.get(reverse(ARRANGE)).content.decode()
+    html = client.get(reverse(ARRANGE), ARRANGING).content.decode()
 
     assert 'id="widget-counters" tabindex="-1"' in html
 
@@ -176,8 +184,8 @@ def test_a_button_that_cannot_act_is_disabled_rather_than_missing(client, user):
     arrange(user, ["counters", "gone_quiet"])
     client.force_login(user)
 
-    html = client.get(reverse(ARRANGE)).content.decode()
-    first = html.split('id="widget-counters"')[1].split("</li>")[0]
+    html = client.get(reverse(ARRANGE), ARRANGING).content.decode()
+    first = html.split('data-widget-controls="counters"')[1].split('value="remove"')[0]
 
     assert first.count("disabled") >= 2, "up and left cannot act on the first widget"
     assert 'value="down"' in first
@@ -192,7 +200,7 @@ def test_each_arrow_has_a_name(client, user):
     """
     client.force_login(user)
 
-    html = client.get(reverse(ARRANGE)).content.decode()
+    html = client.get(reverse(ARRANGE), ARRANGING).content.decode()
 
     for phrase in ("up a row", "down a row", "one place earlier", "one place later"):
         assert phrase in html

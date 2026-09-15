@@ -1,0 +1,91 @@
+{% load i18n %}
+{% comment %} What is not on the dashboard, offered below the grid while it is being arranged
+   (#201). New widgets first and apart: a release or a plugin added them, and they wait here
+   rather than walking onto a page somebody built. Two buttons on those, because "no" is an
+   answer and has to be recordable -- dismissing one stops it being new without putting it
+   on. Then the rest, under the picker's headings, each with its sentence.
+{% endcomment %}
+<div class="mt-8" data-widget-offers>
+  {% if fresh %}
+    <div class="card mb-6 border-brand-300 p-0 dark:border-brand-700">
+      <h2 class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
+        {% translate "New since you last arranged this" %}
+      </h2>
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for widget in fresh %}
+          <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+            <div class="min-w-0 grow basis-48">
+              <p class="font-medium">{{ widget.called }}</p>
+              <p class="text-sm text-ink-500 dark:text-ink-400">{{ widget.blurb }}</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value="{{ widget.key }}">
+                <button type="submit" name="action" value="add" class="btn-secondary px-3 py-1 text-sm">
+                  {% blocktranslate with name=widget.called trimmed %}
+                    Add {{ name }}
+                  {% endblocktranslate %}
+                </button>
+              </form>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value="{{ widget.key }}">
+                <button type="submit" name="action" value="dismiss" class="btn-ghost px-3 py-1 text-sm">
+                  {% blocktranslate with name=widget.called trimmed %}
+                    Not {{ name }}
+                  {% endblocktranslate %}
+                </button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% for group, items in available %}
+    {% if items %}
+      <div class="card mb-6 p-0">
+        <h2 class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
+          {% blocktranslate with name=group trimmed %}
+            Not shown · {{ name }}
+          {% endblocktranslate %}
+        </h2>
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for widget in items %}
+            <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+              <div class="min-w-0 grow basis-48">
+                <p class="font-medium">{{ widget.called }}</p>
+                <p class="text-sm text-ink-500 dark:text-ink-400">{{ widget.blurb }}</p>
+              </div>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value="{{ widget.key }}">
+                <button type="submit" name="action" value="add" class="btn-secondary px-3 py-1 text-sm">
+                  {% blocktranslate with name=widget.called trimmed %}
+                    Add {{ name }}
+                  {% endblocktranslate %}
+                </button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endfor %}
+
+  <p class="text-sm text-ink-500 dark:text-ink-400">
+    {% if is_standard %}
+      {% blocktranslate trimmed %}
+        This arrangement is yours, and it starts out as the standard one. A widget added in
+        a later release, or brought by a plugin, waits above until you say yes to it.
+      {% endblocktranslate %}
+    {% else %}
+      {% blocktranslate trimmed %}
+        A widget added in a later release, or brought by a plugin, waits above until you say
+        yes to it. Nothing arrives on your dashboard without being asked.
+      {% endblocktranslate %}
+    {% endif %}
+  </p>
+</div>

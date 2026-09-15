@@ -525,6 +525,19 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Arrange puts the dashboard itself into an editing mode, and *Settings → Dashboard* is
+  gone.** Arranging was a list of widget names on another page, with four arrows and a
+  *Take off* beside each, and you switched back to see what a move had done. Pressing
+  *Arrange* now keeps you on the dashboard: every widget stays where it is and grows the
+  same four arrows and *Take off* in a bar above it, the widgets not shown are offered
+  below the grid with their sentences, and *Done* is a plain link back. The mode lives in
+  the address (`/?arrange=1`), so a reload keeps it and the back button leaves it; nothing
+  remembers that you were arranging, because the mode is a moment and not a preference.
+  Every action still works with scripts off — buttons that post, focus following the
+  widget that moved, a sentence saying where it landed — and dragging a widget into place
+  is the same addition it was, on the grid cells now rather than on list rows. What is
+  stored has not changed. (#201)
+
 - **The account menu is the top-right corner, and the theme switch is a row inside it.**
   The last thing at the top right of every page was the sun-moon-monitor button, with the
   account menu one control in from the edge — so the corner a person reaches for their
