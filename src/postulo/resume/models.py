@@ -31,6 +31,12 @@ def split_highlights(text: str) -> list[str]:
 class ResumeItem(OwnedModel):
     """Shared behaviour for anything that can appear on a CV."""
 
+    #: The person's own order for the section, dense and exactly what the overview shows:
+    #: the arrows there swap an entry with its neighbour and renumber (`ordering.move`,
+    #: #203). Hidden on the entry's form unless Settings > Appearance says otherwise.
+    #: The person's own order for the section, dense and exactly what the overview shows:
+    #: the arrows there swap an entry with its neighbour and renumber (`ordering.move`,
+    #: #203). Hidden on the entry's form unless Settings > Appearance says otherwise.
     order = models.PositiveIntegerField(
         _("order"), default=0, help_text=_("Lower numbers appear first.")
     )
@@ -77,7 +83,9 @@ class Experience(ResumeItem):
     class Meta(ResumeItem.Meta):
         verbose_name = _("experience")
         verbose_name_plural = _("experience")
-        ordering = ("-start_date", "order")
+        # The number, not the date, since #203: seeded from the dates once, and the person's
+        # from then on. A new entry still lands where its date puts it (`ordering.place_new`).
+        ordering = ("order", "pk")
 
     def __str__(self) -> str:
         return f"{self.role} — {self.organisation}"
@@ -104,7 +112,7 @@ class Education(ResumeItem):
     class Meta(ResumeItem.Meta):
         verbose_name = _("education")
         verbose_name_plural = _("education")
-        ordering = ("-end_date", "order")
+        ordering = ("order", "pk")  # as Experience: the person's, since #203
 
     def __str__(self) -> str:
         return f"{self.qualification} — {self.institution}"
@@ -173,7 +181,7 @@ class Certification(ResumeItem):
     class Meta(ResumeItem.Meta):
         verbose_name = _("certification")
         verbose_name_plural = _("certifications")
-        ordering = ("-issued_on", "order")
+        ordering = ("order", "pk")  # as Experience: the person's, since #203
 
     def __str__(self) -> str:
         return self.name

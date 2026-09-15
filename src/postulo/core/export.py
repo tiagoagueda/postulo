@@ -39,7 +39,8 @@ from postulo import __version__
 #: and ``source_repo_url`` on a profile and ``linkedin_url`` on a contact with a
 #: ``web_links`` list, each row a kind, an address and whether it is the primary of its
 #: kind (#189). 16 added ``kind`` on a company, which tells the employment service a
-#: person is registered with from an employer (#202).
+#: person is registered with from an employer (#202), and ``show_career_order`` on the
+#: profile (#203).
 FORMAT_VERSION = 16
 
 MANIFEST_NAME = "postulo.json"
@@ -62,6 +63,7 @@ PROFILE_FIELDS = (
     "dashboard_known",
     "quiet_after_days",
     "use_gravatar",
+    "show_career_order",
 )
 #: Which block of the archive a career entry's translations point into, by model name.
 #: The same map the importer reads the other way round, kept here because this is where the

@@ -115,15 +115,19 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-1">
+                      {% comment %} Up swaps with the entry above, down with the one below
+                         (#203). At either end the arrow is disabled rather than absent, so
+                         the pair keeps its shape and the one somebody reaches for is where
+                         it was. {% endcomment %}
                       <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'up' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn-ghost px-2 py-1 text-xs"
-                                aria-label="{% translate 'Move up' %}">↑</button>
+                                aria-label="{% translate 'Move up' %}"{% if forloop.first %} disabled{% endif %}>↑</button>
                       </form>
                       <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'down' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn-ghost px-2 py-1 text-xs"
-                                aria-label="{% translate 'Move down' %}">↓</button>
+                                aria-label="{% translate 'Move down' %}"{% if forloop.last %} disabled{% endif %}>↓</button>
                       </form>
                       <a href="{% url 'resume:item_update' section.spec.slug item.pk %}"
                          class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>

@@ -26,7 +26,7 @@ from postulo.jobs.views import UserFormKwargsMixin
 from postulo.plugins import base, registry
 
 from . import forms as resume_forms
-from . import importing, translating
+from . import importing, ordering, translating
 from .models import (
     Certification,
     Education,
@@ -218,7 +218,11 @@ class ResumeItemCreateView(OwnedObjectMixin, SectionFormMixin, OwnerFormMixin, C
 
     def form_valid(self, form):
         messages.success(self.request, _("Added."))
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        # Placed by its date, or last, unless the person typed a number themselves (#203).
+        if "order" not in form.fields:
+            ordering.place_new(self.object)
+        return response
 
 
 class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
@@ -251,11 +255,12 @@ class ResumeItemDeleteView(OwnedObjectMixin, DeleteView):
 
 
 class ResumeItemMoveView(OwnedObjectMixin, View):
-    """Nudge an entry up or down.
+    """Move an entry past its neighbour, up or down.
 
-    Ordering is a small integer rather than drag-and-drop: dragging needs JavaScript that
-    the Content-Security-Policy would have to be loosened for, and two buttons work
-    without any.
+    Two buttons rather than drag-and-drop: dragging does not fire on a touch screen and is
+    not reachable from a keyboard, and two buttons work everywhere. A swap with the
+    neighbour and a renumbering of the section, not a nudge of the number: the number
+    nudged by one was invisible from the page more often than not (#203).
     """
 
     def get_queryset(self):
@@ -263,8 +268,7 @@ class ResumeItemMoveView(OwnedObjectMixin, View):
 
     def post(self, request: HttpRequest, section: str, pk: int, direction: str) -> HttpResponse:
         item = get_object_or_404(self.get_queryset(), pk=pk)
-        item.order = max(0, item.order + (-1 if direction == "up" else 1))
-        item.save(update_fields=["order", "updated_at"])
+        ordering.move(item, direction)
         return redirect(safe_next(request, reverse("resume:overview")))
 
 

@@ -525,6 +525,22 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **The arrows on *Your career* move an entry past its neighbour, and the order number
+  is hidden unless you ask for it.** The arrows nudged a number by one and swapped with
+  nothing: pressing *up* on an entry at 0 did nothing, pressing *down* once put it behind
+  every other entry at 0 wherever it had been, and in experience, education and
+  certifications — sorted by date first — they changed nothing you could see unless two
+  entries shared a date. The number box on every entry's form was the one control that
+  reliably did anything, and it asked for an integer meaning "lower first". *Up* now swaps
+  with the entry above and *down* with the one below, the section is renumbered so the
+  numbers are exactly what the page shows, and the arrow at either end is greyed out. The
+  three dated sections take the number too, seeded once from their dates so nothing moves
+  on the day of the upgrade; a new dated entry still lands where its date puts it. The
+  number box is gone from the forms, with a sentence saying where the arrows are, and
+  comes back as *Show the order number on each career entry* under *Settings →
+  Appearance* — an accessibility choice, for anybody who cannot use the arrows or would
+  rather type. The preference travels with the export. (#203)
+
 - **Arrange puts the dashboard itself into an editing mode, and *Settings → Dashboard* is
   gone.** Arranging was a list of widget names on another page, with four arrows and a
   *Take off* beside each, and you switched back to see what a move had done. Pressing

@@ -291,6 +291,13 @@ class Profile(models.Model):
     #: main navigation. Everything there is reachable another way, so hiding one takes
     #: nothing away; the row across the top is what runs out of room first.
     hidden_nav_items = models.JSONField(_("hidden navigation items"), default=list, blank=True)
+    #: Whether an entry's form on Your career shows its order number. Off, because the
+    #: arrows on the overview are the control; on for somebody who cannot use them or would
+    #: rather type a number, which is why it lives under Appearance with the other
+    #: accessibility choices (#203).
+    show_career_order = models.BooleanField(
+        _("show the order number on career entries"), default=False
+    )
     #: Plugins this person has switched off for themselves. Stored as what was turned
     #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
     #: later release should be available without anybody having to opt into it.

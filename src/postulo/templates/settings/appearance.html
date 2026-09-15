@@ -52,6 +52,18 @@
         <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">{% translate "days" %}</p>
       </div>
     </div>
+    <div class="card mb-6">
+      <h3 class="mb-1 font-medium">{% translate "Your career" %}</h3>
+      {% comment %} An accessibility choice, beside the others here (#203). {% endcomment %}
+      <label class="flex items-start gap-3 text-sm text-ink-800 dark:text-ink-200">
+        {{ form.show_career_order }}
+        <span>
+          <span class="block">{{ form.show_career_order.label }}</span>
+          <span class="block text-ink-500 dark:text-ink-400">{{ form.show_career_order.help_text }}</span>
+        </span>
+      </label>
+      {% include "partials/field_feedback.html" with field=form.show_career_order errors_only=True %}
+    </div>
     <button type="submit" class="btn-primary">{% translate "Save" %}</button>
   </form>
 {% endblock %}

@@ -400,9 +400,19 @@ class AppearanceForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ("theme", "quiet_after_days")
+        fields = ("theme", "quiet_after_days", "show_career_order")
         widgets = {"theme": forms.RadioSelect}
-        labels = {"quiet_after_days": _("Consider an application quiet after")}
+        labels = {
+            "quiet_after_days": _("Consider an application quiet after"),
+            "show_career_order": _("Show the order number on each career entry"),
+        }
+        help_texts = {
+            "show_career_order": _(
+                "The arrows on Your career move an entry past its neighbour. If you cannot "
+                "use them, or would rather type a number, each entry's form shows its place "
+                "as a number: lower first."
+            ),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

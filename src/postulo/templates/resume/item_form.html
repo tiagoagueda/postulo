@@ -21,6 +21,18 @@
         {% for field in form %}
           {% include "partials/field.html" with field=field %}
         {% endfor %}
+        {% if 'order' not in form.fields %}
+          {% comment %} The order number is hidden unless Settings > Appearance says
+             otherwise (#203): the arrows on the overview are the control, and this says
+             where they are rather than leaving a person to look for the box. {% endcomment %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% url 'resume:overview' as overview_url %}
+            {% blocktranslate trimmed %}
+              Where this entry sits in its section is set with the arrows on
+              <a href="{{ overview_url }}" class="underline">Your career</a>.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
       </div>
       <div class="flex items-center gap-3">
         <button type="submit" class="btn-primary">{% translate "Save" %}</button>

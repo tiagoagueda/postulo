@@ -23,7 +23,29 @@ from .models import (
 DATE_WIDGET = forms.DateInput(attrs={"type": "date"})
 
 
-class ExperienceForm(OwnerScopedModelForm):
+class ResumeItemForm(OwnerScopedModelForm):
+    """An entry's form, with the order number hidden unless the person asked for it.
+
+    The arrows on the overview move an entry past its neighbour (#203), so the number is
+    a second control for the same thing, and a strange one: an integer that means "lower
+    first", asked of somebody editing a job. It is offered back as a preference under
+    Settings > Appearance, for anybody who cannot use the arrows or would rather type,
+    which is an accessibility choice. Every kind of entry lists ``order`` in its fields
+    and this takes it off; `item_form.html` draws whatever is left.
+    """
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, user=user, **kwargs)
+        if "order" in self.fields and not show_order_to(user):
+            del self.fields["order"]
+
+
+def show_order_to(user) -> bool:
+    profile = getattr(user, "profile", None) if user is not None else None
+    return bool(profile and profile.show_career_order)
+
+
+class ExperienceForm(ResumeItemForm):
     class Meta:
         model = Experience
         fields = (
@@ -51,7 +73,7 @@ class ExperienceForm(OwnerScopedModelForm):
         return cleaned
 
 
-class EducationForm(OwnerScopedModelForm):
+class EducationForm(ResumeItemForm):
     class Meta:
         model = Education
         fields = (
@@ -72,7 +94,7 @@ class EducationForm(OwnerScopedModelForm):
         }
 
 
-class ProjectForm(OwnerScopedModelForm):
+class ProjectForm(ResumeItemForm):
     class Meta:
         model = Project
         fields = ("name", "role", "url", "start_date", "end_date", "summary", "highlights", "order")
@@ -84,13 +106,13 @@ class ProjectForm(OwnerScopedModelForm):
         }
 
 
-class SkillGroupForm(OwnerScopedModelForm):
+class SkillGroupForm(ResumeItemForm):
     class Meta:
         model = SkillGroup
         fields = ("name", "order")
 
 
-class SkillForm(OwnerScopedModelForm):
+class SkillForm(ResumeItemForm):
     class Meta:
         model = Skill
         fields = ("name", "group", "order")
@@ -99,20 +121,20 @@ class SkillForm(OwnerScopedModelForm):
         self.fields["group"].queryset = SkillGroup.objects.for_user(self.user)
 
 
-class CertificationForm(OwnerScopedModelForm):
+class CertificationForm(ResumeItemForm):
     class Meta:
         model = Certification
         fields = ("name", "issuer", "issued_on", "expires_on", "credential_url", "order")
         widgets = {"issued_on": DATE_WIDGET, "expires_on": DATE_WIDGET}
 
 
-class LanguageSkillForm(OwnerScopedModelForm):
+class LanguageSkillForm(ResumeItemForm):
     class Meta:
         model = LanguageSkill
         fields = ("name", "proficiency", "order")
 
 
-class LinkForm(OwnerScopedModelForm):
+class LinkForm(ResumeItemForm):
     class Meta:
         model = Link
         fields = ("title", "url", "kind", "description", "order")
