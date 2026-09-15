@@ -1,16 +1,28 @@
 {% load i18n postulo %}
 {# One button, three states: light, dark, then match the operating system. The icon shown #}
 {# is chosen by data-current in CSS, so the script can flip it before the reply arrives. #}
-<form method="post" action="{% url 'accounts:theme' %}" class="shrink-0"
+{# As a row of the account menu (#197) it carries its words as well; alone, the icon and #}
+{# an accessible name. Either way the form is the same, and app.js finds it by attribute. #}
+<form method="post" action="{% url 'accounts:theme' %}" class="{% if not as_menu_item %}shrink-0{% endif %}"
       data-theme-switch data-current="{{ theme_switch.current }}"
       hx-post="{% url 'accounts:theme' %}" hx-target="this" hx-swap="outerHTML">
   {% csrf_token %}
   <input type="hidden" name="theme" value="{{ theme_switch.next }}">
   <input type="hidden" name="next" value="{{ request.get_full_path }}">
-  <button type="submit" class="btn-ghost px-2" title="{{ theme_switch.title }}"
-          aria-label="{{ theme_switch.title }}">
-    {% icon "sun" class="size-5" data_theme_icon="light" %}
-    {% icon "moon" class="size-5" data_theme_icon="dark" %}
-    {% icon "monitor" class="size-5" data_theme_icon="system" %}
-  </button>
+  {% if as_menu_item %}
+    <input type="hidden" name="as_menu_item" value="1">
+    <button type="submit" class="menu-item" title="{{ theme_switch.title }}">
+      {% icon "sun" data_theme_icon="light" %}
+      {% icon "moon" data_theme_icon="dark" %}
+      {% icon "monitor" data_theme_icon="system" %}
+      {{ theme_switch.title }}
+    </button>
+  {% else %}
+    <button type="submit" class="btn-ghost px-2" title="{{ theme_switch.title }}"
+            aria-label="{{ theme_switch.title }}">
+      {% icon "sun" class="size-5" data_theme_icon="light" %}
+      {% icon "moon" class="size-5" data_theme_icon="dark" %}
+      {% icon "monitor" class="size-5" data_theme_icon="system" %}
+    </button>
+  {% endif %}
 </form>

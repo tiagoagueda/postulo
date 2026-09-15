@@ -330,7 +330,13 @@ class ThemeView(LoginRequiredMixin, View):
             return render(
                 request,
                 "core/partials/theme_switch.html",
-                {"theme_switch": theme_switch(choice), "ui_theme": choice},
+                {
+                    "theme_switch": theme_switch(choice),
+                    "ui_theme": choice,
+                    # Drawn back in the shape it was pressed in: a row of the menu, or
+                    # the bare button (#197).
+                    "as_menu_item": request.POST.get("as_menu_item") == "1",
+                },
             )
         return HttpResponseRedirect(safe_next(request, reverse("core:home")))
 

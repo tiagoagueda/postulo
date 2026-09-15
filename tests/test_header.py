@@ -1,4 +1,5 @@
-"""The header: an account menu on the right, and nothing else there but the theme switch."""
+"""The header: an account menu on the right, and nothing else there -- the theme switch is
+a row of that menu since #197."""
 
 import re
 

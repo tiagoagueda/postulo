@@ -124,6 +124,12 @@
                     </a>
                   {% endif %}
                   <div class="my-1 border-t border-ink-200 dark:border-ink-800" role="separator"></div>
+                  {% comment %} The theme switch, as a row of the menu it belongs to: a
+                     preference of the person whose menu this is, and the corner then holds
+                     one control -- the account -- rather than a sun beside it (#197). The
+                     same form, posting the same way; the script finds it by its attribute
+                     wherever it sits. {% endcomment %}
+                  {% include "core/partials/theme_switch.html" with as_menu_item=True %}
                   <form method="post" action="{% url 'account_logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="menu-item">
@@ -132,7 +138,6 @@
                   </form>
                 </div>
               </details>
-              {% include "core/partials/theme_switch.html" %}
             </div>
           {% else %}
             <div class="ms-auto flex flex-wrap items-center gap-2">

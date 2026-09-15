@@ -511,6 +511,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **The account menu is the top-right corner, and the theme switch is a row inside it.**
+  The last thing at the top right of every page was the sun-moon-monitor button, with the
+  account menu one control in from the edge — so the corner a person reaches for their
+  own name, their settings and *Sign out* held a preference toggle instead. The switch
+  lives in the menu now, as a row with its words beside the icon, above *Sign out*; it is
+  the same form posting the same way, applied the moment it is pressed as before, and
+  *Settings → Appearance* remains the explicit version. (#197)
+
 - **The header stays at the top while the page scrolls.** On any page longer than a
   screen the wordmark, the navigation, the search and the account menu were gone after the
   first flick, and getting anywhere else meant scrolling back up. The header floats now.
