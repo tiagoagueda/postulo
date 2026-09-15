@@ -92,10 +92,31 @@ def test_the_overview_says_what_is_running(client, admin):
     html = client.get(reverse("server:overview")).content.decode()
     assert f"<dd data-version>{__version__}</dd>" in html
     assert "sqlite" in html
-    assert reverse("core:healthz") in html
+    assert reverse("core:healthz") in html, "what a monitor should poll, in the Software card"
     assert "none yet" in html, "no backup has been taken"
-    # No admin link, because there is no admin: it is off unless an operator asks (#116).
-    assert "POSTULO_ADMIN_URL" in html and "is not running" in html
+    # The admin's escape hatch is documented in *Configuration*, not on this page (#199).
+    assert "POSTULO_ADMIN_URL" not in html and "Django admin" not in html
+
+
+def test_the_overview_says_how_to_keep_postulo_going_and_nothing_else_does(client, admin, user):
+    """The one place inside the application that mentions support (#199).
+
+    The README and FUNDING.md promise that nothing a person is shown while looking for
+    work asks for money, and name this page -- the administrator's own -- as the one
+    exception. Both halves are checked: the card is here, and the dashboard has none of it.
+    """
+    client.force_login(admin)
+    html = client.get(reverse("server:overview")).content.decode()
+
+    assert "buymeacoffee.com/tiagoagueda" in html
+    assert "support/buy-me-a-coffee-qr.png" in html, "the second-device form beside the link"
+    assert "CONTRIBUTING.md" in html and "docs/TRANSLATING.md" in html
+    assert "never to the people using it to look for work" in html
+
+    client.force_login(user)
+    for name in ("core:home", "settings:index", "accounts:profile"):
+        page = client.get(reverse(name)).content.decode()
+        assert "buymeacoffee" not in page, f"{name} asked for money"
 
 
 # --------------------------------------------------------------------- people

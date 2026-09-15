@@ -1,5 +1,5 @@
 {% extends "server/base.html" %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block content %}
   <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Overview" %}</h2>
@@ -31,6 +31,13 @@
         <div class="flex justify-between gap-4">
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Queued tasks" %}</dt>
           <dd>{% if queued_tasks is not None %}{{ queued_tasks }}{% else %}—{% endif %}</dd>
+        </div>
+        {% comment %} What a monitor should poll. It used to be a card of its own at the
+           bottom of the page, beside the admin's escape hatch (#116, #183); it is a fact
+           about the software, so it lives here (#199). {% endcomment %}
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Health check" %}</dt>
+          <dd><a href="{{ health_url }}" class="text-brand-600 underline dark:text-brand-400"><code>{{ health_url }}</code></a></dd>
         </div>
       </dl>
     </div>
@@ -77,26 +84,64 @@
     </div>
   </div>
 
-  {% comment %} No heading. The other cards on this page are named for what they hold --
-     Software, Data -- and this one held "Also", which says only that there is more, which
-     the reader can already see. Both links say what they are and where they go, so the card
-     carries itself; a heading here would have to be invented to fill the space (#183).
-  {% endcomment %}
-  <div class="card mt-4 text-sm">
-    <ul class="space-y-1">
-      <li><a href="{{ health_url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "Health check" %}</a> <span class="text-ink-500 dark:text-ink-400">— {% translate "what a monitor should poll" %}</span></li>
-      {% comment %} Only when one is mounted. It is off unless an operator set
-         POSTULO_ADMIN_URL, and a link to a 404 is worse than no link (#116). {% endcomment %}
-      {% if admin_url %}
-        <li><a href="{{ admin_url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "Django admin" %}</a> <span class="text-ink-500 dark:text-ink-400">— {% translate "the escape hatch, for anything this area does not cover" %}</span></li>
-      {% else %}
-        <li class="text-ink-500 dark:text-ink-400">
-          {% blocktranslate trimmed %}
-            Django's admin is not running. It is off unless you ask for it: set
-            <code>POSTULO_ADMIN_URL</code> to a path of your choosing to turn it on.
+  {% comment %} How to keep the project going, on the one page in the interface that is
+     addressed to whoever runs the instance rather than to somebody using it to look for
+     work. That distinction is the whole of why this is allowed to exist: the README and
+     FUNDING.md promise that nothing a person is shown while looking for work asks for
+     money, and they name this page as the one place inside the application that mentions
+     support at all. Not a banner, not a prompt: a card where the health check sat, in the
+     same grey, said once (#199).
+
+     A plain link and the QR beside it: on an administrator's own screen the link works,
+     and the QR is the second-device form worth offering next to it (#172). The QR is Buy
+     Me a Coffee's own, unmodified -- see assets/support/NOTICE.txt. {% endcomment %}
+  <div class="card mt-4 text-sm" data-support>
+    <h3 class="mb-2 font-medium">{% translate "Keeping Postulo going" %}</h3>
+    <p class="mb-4 text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Voluntary support is this project's only income: one person writes it, and nothing is
+        owed or unlocked by any of this. It is said once, here, to whoever runs the instance
+        — never to the people using it to look for work, and for many of them money is the
+        wrong thing to give.
+      {% endblocktranslate %}
+    </p>
+    <div class="grid gap-6 md:grid-cols-3">
+      <div class="flex flex-wrap items-start gap-3">
+        <div class="min-w-0 flex-1">
+          <h4 class="font-medium">{% translate "Money" %}</h4>
+          <p class="wrap-anywhere text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed with url="https://www.buymeacoffee.com/tiagoagueda" %}
+              Whatever it is worth to you, once or now and then, at
+              <a href="{{ url }}" class="underline">buymeacoffee.com/tiagoagueda</a>.
+            {% endblocktranslate %}
+          </p>
+        </div>
+        <a href="https://www.buymeacoffee.com/tiagoagueda" rel="noopener noreferrer external" target="_blank" class="shrink-0">
+          <img src="{% static 'support/buy-me-a-coffee-qr.png' %}" width="96" height="96"
+               alt="{% translate 'Buy me a coffee — scan to open buymeacoffee.com/tiagoagueda' %}"
+               class="rounded-md">
+        </a>
+      </div>
+      <div>
+        <h4 class="font-medium">{% translate "Code" %}</h4>
+        <p class="text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed with repo="https://source.tiagoagueda.com/postulo/postulo" guide="https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CONTRIBUTING.md" %}
+            A bug report is worth as much as anything else here. The repository is at
+            <a href="{{ repo }}" class="underline">source.tiagoagueda.com/postulo</a>, and
+            <a href="{{ guide }}" class="underline">CONTRIBUTING</a> says how a change lands.
           {% endblocktranslate %}
-        </li>
-      {% endif %}
-    </ul>
+        </p>
+      </div>
+      <div>
+        <h4 class="font-medium">{% translate "Translation" %}</h4>
+        <p class="text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed with guide="https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/TRANSLATING.md" %}
+            Every language here but English is a machine draft waiting for somebody who
+            speaks it to read it and say so. If one of them is yours,
+            <a href="{{ guide }}" class="underline">Translating</a> says how a review goes.
+          {% endblocktranslate %}
+        </p>
+      </div>
+    </div>
   </div>
 {% endblock %}

@@ -511,6 +511,17 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **Server settings → Overview ends with how to keep Postulo going, not the health check.**
+  The last card held two lines an administrator reads once: the health-check address and
+  the Django admin's escape hatch. The address moved up into the *Software* card, where a
+  fact about the software belongs, and the admin hint lives in the wiki's *Configuration*.
+  In their place, one card on the page addressed to whoever runs the instance: money, at
+  buymeacoffee.com/tiagoagueda with the QR beside the link; code, with the repository and
+  how a change lands; translation, since every language but English is a machine draft
+  waiting for a speaker. The README and FUNDING.md promise reads, exactly, that nothing a
+  person is shown while looking for work asks for money — and names this page as the one
+  place inside the application that mentions support at all. (#199)
+
 - **What Postulo ships is the administrator's to switch, not yours — and is out of the
   way until you ask.** *Settings → Plugins* offered a checkbox on every plugin, the built-in
   ones included, so *Several telephone numbers*, the email notifier and the local store

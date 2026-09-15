@@ -23,9 +23,11 @@ revisited when the numbers get interesting. Concretely, and permanently:
 - No feature that works for a while and then asks for money.
 - No limit on records, documents, storage, accounts or exports that money removes.
 - No feature held back from the open repository and sold separately.
-- **Nothing inside the application will ever ask you for money** — no banner, no prompt, no
-  reminder on the dashboard, no anniversary email. The README, this file and the wiki are
-  the only places the question is put.
+- **Nothing a person is shown while looking for work will ever ask for money** — no banner,
+  no prompt, no reminder on the dashboard, no anniversary email. The README, this file and
+  the wiki are where the question is put, and inside the application only *Server settings
+  → Overview*, the page addressed to whoever runs the instance, mentions it — once, in the
+  same words, with the same "nothing is owed".
 
 The AGPL guarantees this for the code that exists. These paragraphs are the promise about
 the code that has not been written yet, and `CONTRIBUTING.md` says a pull request that

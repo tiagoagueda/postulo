@@ -35,9 +35,12 @@ from people who decided it was worth something.
 <a href="https://www.buymeacoffee.com/tiagoagueda"><img src="assets/support/buy-me-a-coffee-qr.png" alt="Buy me a coffee — scan to open buymeacoffee.com/tiagoagueda" width="165" height="165"></a>
 
 Nothing is owed. Nothing is unlocked by it, now or later — that is what the paragraph above
-promises and it is not negotiable. And **nothing inside Postulo will ever ask you for
-money**: no banner in the interface, no prompt, no reminder on the dashboard. This is the
-only place the question is put, which is why it is put plainly here.
+promises and it is not negotiable. And **nothing a person is shown while using Postulo to
+look for work will ever ask for money**: no banner in the interface, no prompt, no reminder
+on the dashboard. The one place inside the application that mentions support at all is
+*Server settings → Overview*, the page addressed to whoever runs the instance, where it is
+said once and in these words. Otherwise this is where the question is put, which is why it
+is put plainly here.
 
 If money is the wrong thing to give — and for a lot of people looking for work, it is —
 then a bug report, a translation reviewed by somebody who actually speaks the language, or

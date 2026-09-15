@@ -131,7 +131,6 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 "backup_dir": Path(settings.POSTULO_BACKUP_DIR),
                 "newest_backup": _newest_backup(Path(settings.POSTULO_BACKUP_DIR)),
                 "queued_tasks": _queued_tasks(),
-                "admin_url": _admin_url(),
                 "health_url": reverse("core:healthz"),
                 "platform": platform.platform(),
                 "executable": sys.executable,
@@ -516,23 +515,6 @@ class DefaultsView(PolicyView):
         form.save()
         messages.success(request, _("Saved."))
         return redirect("server:defaults")
-
-
-def _admin_url() -> str:
-    """Where Django's admin is, or nothing when it is not mounted.
-
-    Empty is the ordinary case now: the admin is off unless an operator asked for it (#116).
-    Reversing a route that does not exist raises, so this answers rather than letting the
-    Overview page fail because of a link at the bottom of it.
-    """
-    from django.urls import NoReverseMatch
-
-    if not settings.POSTULO_ADMIN_URL:
-        return ""
-    try:
-        return reverse("admin:index")
-    except NoReverseMatch:  # pragma: no cover - mounted but unreversible is not a state
-        return ""
 
 
 def _security_label(value: str) -> str:
