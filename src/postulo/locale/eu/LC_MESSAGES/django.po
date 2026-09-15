@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 15:53+0000\n"
+"POT-Creation-Date: 2026-09-15 19:01+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s enpresak jada %(scheme)s identifikatzailea du: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s aldatu dira."
 
-#: src/postulo/plugins/views.py:371
+#: src/postulo/plugins/views.py:405
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -373,7 +373,7 @@ msgstr ""
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/templates/base.html:67
+#: src/postulo/templates/base.html:69
 #, python-format, draft
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — laburpena"
@@ -926,7 +926,7 @@ msgstr "onartu duena"
 msgid "Account"
 msgstr "Kontua"
 
-#: src/postulo/templates/base.html:119
+#: src/postulo/templates/base.html:121
 #, python-format, draft
 msgid "Account menu, %(name)s"
 msgstr "Kontuaren menua, %(name)s"
@@ -1113,7 +1113,8 @@ msgid "Address"
 msgstr "Helbidea"
 
 #: src/postulo/core/models.py:413 src/postulo/core/models.py:539
-#: src/postulo/jobs/models.py:797 src/postulo/resume/models.py:250
+#: src/postulo/jobs/models.py:797 src/postulo/notifications/models.py:26
+#: src/postulo/resume/models.py:250
 #, draft
 msgid "address"
 msgstr "helbidea"
@@ -1684,7 +1685,7 @@ msgstr "Bioteknologia"
 msgid "Board"
 msgstr "Taula"
 
-#: src/postulo/documents/models.py:319
+#: src/postulo/documents/models.py:319 src/postulo/notifications/models.py:25
 #, draft
 msgid "body"
 msgstr "gorputza"
@@ -1693,6 +1694,14 @@ msgstr "gorputza"
 #, draft
 msgid "Bringing a spreadsheet in"
 msgstr "Kalkulu-orri bat ekartzea"
+
+#: src/postulo/notifications/models.py:30
+msgid "browser notice"
+msgstr ""
+
+#: src/postulo/notifications/models.py:31
+msgid "browser notices"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html:464
 #, draft
@@ -2302,7 +2311,7 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "%(host)s:%(port)s(e)ra konektatuta. Erabiltzaile-izenik ez, beraz ez da saiorik hasi."
 
-#: src/postulo/plugins/views.py:298
+#: src/postulo/plugins/views.py:332
 #, draft
 msgid "Connected. Test it to make sure it works."
 msgstr "Konektatuta. Probatu ondo dabilela ziurtatzeko."
@@ -2313,12 +2322,12 @@ msgstr "Konektatuta. Probatu ondo dabilela ziurtatzeko."
 msgid "connection"
 msgstr "konexioa"
 
-#: src/postulo/plugins/views.py:418
+#: src/postulo/plugins/views.py:452
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Konexioa kendu da, sekretuak barne."
 
-#: src/postulo/plugins/views.py:225
+#: src/postulo/plugins/views.py:259
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Konexioa gorde da. Probatu funtzionatzen duela ziurtatzeko."
@@ -2333,9 +2342,9 @@ msgstr "konexioaren segurtasuna"
 msgid "Connection security"
 msgstr "Konexioaren segurtasuna"
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:414
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:154 src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:448
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2955,7 +2964,7 @@ msgstr "dokumentu-kopia"
 msgid "Document store"
 msgstr "Dokumentu-biltegia"
 
-#: src/postulo/plugins/views.py:35
+#: src/postulo/plugins/views.py:37
 #, draft
 msgid "Document stores"
 msgstr "Dokumentu-biltegiak"
@@ -3231,6 +3240,7 @@ msgstr ""
 "Europassek hizkuntzako bost maila jasotzen ditu eta Postulok bat gordetzen du, beraz baxuena hartzen da. Aldatu gero hori adieraziko zenukeena ez bada."
 
 #: src/postulo/applications/models.py:397
+#: src/postulo/notifications/models.py:23
 #, draft
 msgid "event"
 msgstr "gertaera"
@@ -4555,7 +4565,7 @@ msgid ""
 msgstr ""
 "Ezer ez zerbitzatzea nahiago du erregistro hauek aurkitzen dituen edonori argitaratzea baino. Ezarri POSTULO_LOGS_TOKEN, edo itzali POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:351
+#: src/postulo/plugins/views.py:385
 #, draft
 msgid "It works."
 msgstr "Badabil."
@@ -5188,7 +5198,7 @@ msgstr "Posta-garraioa"
 msgid "mail's last error"
 msgstr "postaren azken errorea"
 
-#: src/postulo/templates/base.html:98 src/postulo/templates/base.html:102
+#: src/postulo/templates/base.html:100 src/postulo/templates/base.html:104
 #, draft
 msgid "Main"
 msgstr "Nagusia"
@@ -5289,7 +5299,7 @@ msgstr ""
 msgid "Member"
 msgstr "Kidea"
 
-#: src/postulo/templates/base.html:94
+#: src/postulo/templates/base.html:96
 #, draft
 msgid "Menu"
 msgstr "Menua"
@@ -6221,7 +6231,7 @@ msgstr "Ez dago ezer konektatzeko"
 msgid "Nothing to decide"
 msgstr "Ez dago ezer erabakitzeko"
 
-#: src/postulo/plugins/views.py:380
+#: src/postulo/plugins/views.py:414
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -6249,7 +6259,7 @@ msgstr "Ez dago ezer zain"
 msgid "Nothing was added."
 msgstr "Ez da ezer gehitu."
 
-#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
+#: src/postulo/plugins/views.py:323 src/postulo/plugins/views.py:340
 #, draft
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "Ez da ezer konektatu. Inork ez du ezer onartu."
@@ -6287,7 +6297,7 @@ msgstr ""
 "Aldi honetan ez zen ezer bidali. Hori dio txostenak, eta beste edozein bezalako egitatea da."
 
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:35
 #, draft
 msgid "Notifications"
 msgstr "Jakinarazpenak"
@@ -7152,7 +7162,7 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulok orri bakar hau jaisten du, eta beste ezer ez."
 
-#: src/postulo/plugins/views.py:251
+#: src/postulo/plugins/views.py:285
 #, draft
 msgid ""
 "Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
@@ -7186,7 +7196,7 @@ msgid ""
 msgstr ""
 "Postulok bere hash-a baino ez du gordetzen eta ezin dizu berriro erakutsi. Galtzen baduzu, beste bat sortuko duzu."
 
-#: src/postulo/templates/base.html:180
+#: src/postulo/templates/base.html:182
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — zure lan-bilaketa, zure zerbitzarian."
@@ -8126,12 +8136,12 @@ msgstr "Aurretiazko hautaketa"
 msgid "Search"
 msgstr "Bilatu"
 
-#: src/postulo/templates/base.html:112
+#: src/postulo/templates/base.html:114
 #, draft
 msgid "Search  /"
 msgstr "Bilatu  /"
 
-#: src/postulo/templates/base.html:110
+#: src/postulo/templates/base.html:112
 #: src/postulo/templates/core/search.html:12
 #, draft
 msgid "Search everything"
@@ -8213,7 +8223,7 @@ msgstr ""
 msgid "Send to stores now"
 msgstr "Bidali biltegietara orain"
 
-#: src/postulo/plugins/views.py:34
+#: src/postulo/plugins/views.py:36
 #, draft
 msgid "Sending as yourself"
 msgstr "Zeure buruaren izenean bidaltzea"
@@ -8282,7 +8292,7 @@ msgstr "Zerbitzaria"
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:133 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:135 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:10
 #, draft
 msgid "Server settings"
@@ -8339,7 +8349,7 @@ msgid "Set when the opening is no longer available."
 msgstr "Ezarri lanpostua eskuragarri ez dagoenean."
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:129 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:131 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:22
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
@@ -8436,13 +8446,17 @@ msgstr ""
 msgid "Show this period"
 msgstr "Erakutsi aldi hau"
 
+#: src/postulo/notifications/models.py:27
+msgid "shown at"
+msgstr ""
+
 #: src/postulo/core/models.py:599
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Goiburuan eta saio-hasierako orrian erakusten da."
 
 #: src/postulo/templates/account/recovery_unusable.html:16
-#: src/postulo/templates/base.html:155 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:157 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
 msgstr "Hasi saioa"
@@ -8474,7 +8488,7 @@ msgid ""
 msgstr ""
 "Hasi saioa hatz-markarekin, zure aurpegiarekin edo gailuaren PINarekin. Ez dago ezer idazteko, ezer idatzita, eta ezer posta batek zuri kentzeko modukorik."
 
-#: src/postulo/templates/base.html:147
+#: src/postulo/templates/base.html:149
 #, draft
 msgid "Sign out"
 msgstr "Amaitu saioa"
@@ -8502,7 +8516,7 @@ msgid ""
 msgstr ""
 "Behin saioa hasita: norbaitek onartzen du hornitzailearen baimen-pantailan, bidaltzen duen postontzi gisa, administratzailerik gabe. Aplikazioak bere kabuz bidaltzen du: Microsoft soilik, eta maizterraren administratzaile batek eman behar du baimena."
 
-#: src/postulo/plugins/views.py:314
+#: src/postulo/plugins/views.py:348
 #, draft
 msgid "Signed in to the mail provider. Test the connection to make sure."
 msgstr "Saioa hasita posta-hornitzailean. Probatu konexioa ziurtatzeko."
@@ -8544,7 +8558,7 @@ msgstr "saio-hasiera bakarra bigarren faktoretzat hartzen da"
 msgid "Single sign-on counts as the second factor"
 msgstr "Saio-hasiera bakarra bigarren faktoretzat hartzen da"
 
-#: src/postulo/templates/base.html:109
+#: src/postulo/templates/base.html:111
 #, draft
 msgid "Site search"
 msgstr "Bilaketa gunean"
@@ -8592,7 +8606,7 @@ msgstr "Trebetasunak"
 msgid "skills"
 msgstr "trebetasunak"
 
-#: src/postulo/templates/base.html:40
+#: src/postulo/templates/base.html:42
 #, draft
 msgid "Skip to content"
 msgstr "Joan edukira"
@@ -8992,7 +9006,7 @@ msgid ""
 msgstr ""
 "Bat itzaltzeak erabilera gelditzen du eta ez du ezer ezabatzen: egin dituzun konexioak dauden-daudenean geratzen dira, eta berriro pizteak aldatu gabe itzultzen ditu."
 
-#: src/postulo/plugins/views.py:401
+#: src/postulo/plugins/views.py:435
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Sinkronizazioak huts egin du: %(error)s"
@@ -9012,12 +9026,12 @@ msgstr "sinkronizazio-estekak"
 msgid "Sync now"
 msgstr "Sinkronizatu orain"
 
-#: src/postulo/plugins/views.py:403
+#: src/postulo/plugins/views.py:437
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Sinkronizatuta: %(summary)s."
 
-#: src/postulo/plugins/kinds.py:29 src/postulo/plugins/views.py:36
+#: src/postulo/plugins/kinds.py:29 src/postulo/plugins/views.py:38
 #, draft
 msgid "Synchronisation"
 msgstr "Sinkronizazioa"
@@ -9135,7 +9149,7 @@ msgstr "Txantiloiak gutun bat eskaera batekin bidaltzean agertzen dira."
 msgid "Test"
 msgstr "Probatu"
 
-#: src/postulo/plugins/views.py:353
+#: src/postulo/plugins/views.py:387
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Probak huts egin du: %(message)s"
@@ -9431,7 +9445,7 @@ msgstr "Orri horrek %(status)s itzuli du."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Irudi hori 5 MB baino gehiagokoa da. Txikiago bat, mesedez."
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:279 src/postulo/plugins/views.py:361
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Plugin hori ez dago jada instalatuta."
@@ -10222,7 +10236,8 @@ msgid "timeout in seconds"
 msgstr "denbora-muga segundotan"
 
 #: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
-#: src/postulo/jobs/models.py:620 src/postulo/resume/models.py:249
+#: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
+#: src/postulo/resume/models.py:249
 #, draft
 msgid "title"
 msgstr "izenburua"
@@ -11525,7 +11540,7 @@ msgstr "Zure epemuga"
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:10
-#: src/postulo/templates/base.html:126
+#: src/postulo/templates/base.html:128
 #: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"

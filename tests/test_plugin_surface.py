@@ -45,6 +45,13 @@ REACHING_PAST: dict[str, dict[str, str]] = {
         "postulo.core": "`site`: the instance's name and from-address, for the message it sends",
         "postulo.notifications.base": "`Notification`, which is what a notifier is handed",
     },
+    "browser": {
+        "postulo.notifications": (
+            "`inbox`: where a notification waits for an open tab when it cannot be pushed. A "
+            "plugin holds no rows, and a notice has to outlive the send that left it, scoped "
+            "to its owner by Postulo rather than by the plugin (#209)"
+        ),
+    },
     "own_mail": {
         "postulo.core": (
             "`mail`: the encryption choices, which are how TLS gets onto a session; and "

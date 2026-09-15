@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 15:53+0000\n"
+"POT-Creation-Date: 2026-09-15 19:01+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: polski\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s ma już identyfikator %(scheme)s: %(value)s."
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s zmieniono."
 
-#: src/postulo/plugins/views.py:371
+#: src/postulo/plugins/views.py:405
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -384,7 +384,7 @@ msgstr "%(name)s zmieniłby to, od czego zależy samo Postulo. %(problems)s"
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/templates/base.html:67
+#: src/postulo/templates/base.html:69
 #, python-format, draft
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — pulpit"
@@ -939,7 +939,7 @@ msgstr "zaakceptowano przez"
 msgid "Account"
 msgstr "Konto"
 
-#: src/postulo/templates/base.html:119
+#: src/postulo/templates/base.html:121
 #, python-format, draft
 msgid "Account menu, %(name)s"
 msgstr "Menu konta, %(name)s"
@@ -1126,7 +1126,8 @@ msgid "Address"
 msgstr "Adres"
 
 #: src/postulo/core/models.py:413 src/postulo/core/models.py:539
-#: src/postulo/jobs/models.py:797 src/postulo/resume/models.py:250
+#: src/postulo/jobs/models.py:797 src/postulo/notifications/models.py:26
+#: src/postulo/resume/models.py:250
 #, draft
 msgid "address"
 msgstr "adres"
@@ -1696,7 +1697,7 @@ msgstr "Biotechnologia"
 msgid "Board"
 msgstr "Tablica"
 
-#: src/postulo/documents/models.py:319
+#: src/postulo/documents/models.py:319 src/postulo/notifications/models.py:25
 #, draft
 msgid "body"
 msgstr "treść"
@@ -1705,6 +1706,14 @@ msgstr "treść"
 #, draft
 msgid "Bringing a spreadsheet in"
 msgstr "Wczytanie arkusza kalkulacyjnego"
+
+#: src/postulo/notifications/models.py:30
+msgid "browser notice"
+msgstr ""
+
+#: src/postulo/notifications/models.py:31
+msgid "browser notices"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html:464
 #, draft
@@ -2314,7 +2323,7 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "Połączono z %(host)s:%(port)s. Brak nazwy użytkownika, więc nic nie zostało zalogowane."
 
-#: src/postulo/plugins/views.py:298
+#: src/postulo/plugins/views.py:332
 #, draft
 msgid "Connected. Test it to make sure it works."
 msgstr "Połączono. Przetestuj, żeby mieć pewność, że działa."
@@ -2325,12 +2334,12 @@ msgstr "Połączono. Przetestuj, żeby mieć pewność, że działa."
 msgid "connection"
 msgstr "połączenie"
 
-#: src/postulo/plugins/views.py:418
+#: src/postulo/plugins/views.py:452
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "Usunięto połączenie razem z sekretami."
 
-#: src/postulo/plugins/views.py:225
+#: src/postulo/plugins/views.py:259
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "Zapisano połączenie. Przetestuj je, żeby upewnić się, że działa."
@@ -2345,9 +2354,9 @@ msgstr "bezpieczeństwo połączenia"
 msgid "Connection security"
 msgstr "Bezpieczeństwo połączenia"
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:414
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:154 src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:448
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2966,7 +2975,7 @@ msgstr "kopia dokumentu"
 msgid "Document store"
 msgstr "Magazyn dokumentów"
 
-#: src/postulo/plugins/views.py:35
+#: src/postulo/plugins/views.py:37
 #, draft
 msgid "Document stores"
 msgstr "Magazyny dokumentów"
@@ -3242,6 +3251,7 @@ msgstr ""
 "Europass zapisuje pięć poziomów dla każdego języka, a Postulo przechowuje jeden, więc brany jest najniższy. Zmień go potem, jeśli nie jest to poziom, który byś podał."
 
 #: src/postulo/applications/models.py:397
+#: src/postulo/notifications/models.py:23
 #, draft
 msgid "event"
 msgstr "zdarzenie"
@@ -4563,7 +4573,7 @@ msgid ""
 msgstr ""
 "Odmawia podania czegokolwiek, zamiast publikować te wpisy każdemu, kto znajdzie adres. Ustaw POSTULO_LOGS_TOKEN albo wyłącz POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:351
+#: src/postulo/plugins/views.py:385
 #, draft
 msgid "It works."
 msgstr "Działa."
@@ -5197,7 +5207,7 @@ msgstr "Transport poczty"
 msgid "mail's last error"
 msgstr "ostatni błąd poczty"
 
-#: src/postulo/templates/base.html:98 src/postulo/templates/base.html:102
+#: src/postulo/templates/base.html:100 src/postulo/templates/base.html:104
 #, draft
 msgid "Main"
 msgstr "Główny"
@@ -5298,7 +5308,7 @@ msgstr ""
 msgid "Member"
 msgstr "Członek"
 
-#: src/postulo/templates/base.html:94
+#: src/postulo/templates/base.html:96
 #, draft
 msgid "Menu"
 msgstr "Menu"
@@ -6230,7 +6240,7 @@ msgstr "Nie ma z czym się połączyć"
 msgid "Nothing to decide"
 msgstr "Nic do rozstrzygnięcia"
 
-#: src/postulo/plugins/views.py:380
+#: src/postulo/plugins/views.py:414
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -6258,7 +6268,7 @@ msgstr "Nic nie czeka"
 msgid "Nothing was added."
 msgstr "Nic nie dodano."
 
-#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
+#: src/postulo/plugins/views.py:323 src/postulo/plugins/views.py:340
 #, draft
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "Nic nie zostało połączone. Nikt się na nic nie zgodził."
@@ -6296,7 +6306,7 @@ msgstr ""
 "W tym okresie nic nie zostało wysłane. Tak mówi raport i jest to fakt jak każdy inny."
 
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:35
 #, draft
 msgid "Notifications"
 msgstr "Powiadomienia"
@@ -7170,7 +7180,7 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo pobiera tę jedną stronę i nic więcej."
 
-#: src/postulo/plugins/views.py:251
+#: src/postulo/plugins/views.py:285
 #, draft
 msgid ""
 "Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
@@ -7204,7 +7214,7 @@ msgid ""
 msgstr ""
 "Postulo przechowuje tylko jego hasz i nie może go pokazać ponownie. Jeśli go zgubisz, utwórz kolejny."
 
-#: src/postulo/templates/base.html:180
+#: src/postulo/templates/base.html:182
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — twoje poszukiwanie pracy, na twoim serwerze."
@@ -8146,12 +8156,12 @@ msgstr "Wstępna selekcja"
 msgid "Search"
 msgstr "Szukaj"
 
-#: src/postulo/templates/base.html:112
+#: src/postulo/templates/base.html:114
 #, draft
 msgid "Search  /"
 msgstr "Szukaj  /"
 
-#: src/postulo/templates/base.html:110
+#: src/postulo/templates/base.html:112
 #: src/postulo/templates/core/search.html:12
 #, draft
 msgid "Search everything"
@@ -8233,7 +8243,7 @@ msgstr ""
 msgid "Send to stores now"
 msgstr "Wyślij do magazynów teraz"
 
-#: src/postulo/plugins/views.py:34
+#: src/postulo/plugins/views.py:36
 #, draft
 msgid "Sending as yourself"
 msgstr "Wysyłanie we własnym imieniu"
@@ -8301,7 +8311,7 @@ msgstr "Serwer"
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:133 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:135 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:10
 #, draft
 msgid "Server settings"
@@ -8359,7 +8369,7 @@ msgid "Set when the opening is no longer available."
 msgstr "Ustaw, gdy oferta nie jest już dostępna."
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:129 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:131 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:22
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
@@ -8456,13 +8466,17 @@ msgstr ""
 msgid "Show this period"
 msgstr "Pokaż ten okres"
 
+#: src/postulo/notifications/models.py:27
+msgid "shown at"
+msgstr ""
+
 #: src/postulo/core/models.py:599
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "Widoczne w nagłówku i na stronie logowania."
 
 #: src/postulo/templates/account/recovery_unusable.html:16
-#: src/postulo/templates/base.html:155 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:157 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
 msgstr "Zaloguj się"
@@ -8494,7 +8508,7 @@ msgid ""
 msgstr ""
 "Zaloguj się odciskiem palca, twarzą lub PIN-em urządzenia. Nic do wpisywania, nic zapisanego i nic, do czego mógłby Cię namówić e-mail."
 
-#: src/postulo/templates/base.html:147
+#: src/postulo/templates/base.html:149
 #, draft
 msgid "Sign out"
 msgstr "Wyloguj się"
@@ -8522,7 +8536,7 @@ msgid ""
 msgstr ""
 "Zalogowano raz: ktoś wyraża zgodę na ekranie dostawcy, jako skrzynka, która wysyła, bez żadnego administratora. Aplikacja wysyła samodzielnie: tylko Microsoft, a administrator dzierżawy musi nadać uprawnienie."
 
-#: src/postulo/plugins/views.py:314
+#: src/postulo/plugins/views.py:348
 #, draft
 msgid "Signed in to the mail provider. Test the connection to make sure."
 msgstr "Zalogowano u dostawcy poczty. Przetestuj połączenie, aby mieć pewność."
@@ -8564,7 +8578,7 @@ msgstr "logowanie jednokrotne liczy się jako drugi składnik"
 msgid "Single sign-on counts as the second factor"
 msgstr "Logowanie jednokrotne liczy się jako drugi składnik"
 
-#: src/postulo/templates/base.html:109
+#: src/postulo/templates/base.html:111
 #, draft
 msgid "Site search"
 msgstr "Wyszukiwanie w witrynie"
@@ -8612,7 +8626,7 @@ msgstr "Umiejętności"
 msgid "skills"
 msgstr "umiejętności"
 
-#: src/postulo/templates/base.html:40
+#: src/postulo/templates/base.html:42
 #, draft
 msgid "Skip to content"
 msgstr "Przejdź do treści"
@@ -9011,7 +9025,7 @@ msgid ""
 msgstr ""
 "Wyłączenie wstrzymuje używanie i niczego nie usuwa: utworzone przez Ciebie połączenia pozostają dokładnie takie, jakie są, a ponowne włączenie przywraca je bez zmian."
 
-#: src/postulo/plugins/views.py:401
+#: src/postulo/plugins/views.py:435
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "Synchronizacja nie powiodła się: %(error)s"
@@ -9031,12 +9045,12 @@ msgstr "powiązania synchronizacji"
 msgid "Sync now"
 msgstr "Synchronizuj teraz"
 
-#: src/postulo/plugins/views.py:403
+#: src/postulo/plugins/views.py:437
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "Zsynchronizowano: %(summary)s."
 
-#: src/postulo/plugins/kinds.py:29 src/postulo/plugins/views.py:36
+#: src/postulo/plugins/kinds.py:29 src/postulo/plugins/views.py:38
 #, draft
 msgid "Synchronisation"
 msgstr "Synchronizacja"
@@ -9154,7 +9168,7 @@ msgstr "Szablony pojawiają się, gdy wysyłasz list z aplikacją."
 msgid "Test"
 msgstr "Testuj"
 
-#: src/postulo/plugins/views.py:353
+#: src/postulo/plugins/views.py:387
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "Test nie powiódł się: %(message)s"
@@ -9449,7 +9463,7 @@ msgstr "Ta strona zwróciła %(status)s."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Ten obrazek ma ponad 5 MB. Poproszę o mniejszy."
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:279 src/postulo/plugins/views.py:361
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "Ta wtyczka nie jest już zainstalowana."
@@ -10241,7 +10255,8 @@ msgid "timeout in seconds"
 msgstr "limit czasu w sekundach"
 
 #: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
-#: src/postulo/jobs/models.py:620 src/postulo/resume/models.py:249
+#: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
+#: src/postulo/resume/models.py:249
 #, draft
 msgid "title"
 msgstr "tytuł"
@@ -11541,7 +11556,7 @@ msgstr "Twój termin"
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:10
-#: src/postulo/templates/base.html:126
+#: src/postulo/templates/base.html:128
 #: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"

@@ -105,6 +105,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.i18n",
                 "postulo.core.context_processors.ui",
+                "postulo.notifications.context_processors.browser_notices",
             ],
         },
     },

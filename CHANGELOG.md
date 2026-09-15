@@ -290,6 +290,29 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **Notifications in the browser, with nothing to set up on the server.** The only notifier
+  Postulo shipped was *Email*, which needs working mail, and everything else meant installing
+  Apprise and learning its URLs. An instance with no mail relay — which is where a self-hoster
+  often starts — could not tell anybody that a reminder had fallen due. The new built-in
+  **Browser** notifier needs a browser that allows it and nothing else: add it under
+  *Settings → Connections* and press *Allow notifications in this browser*.
+
+  It arrives the way the person chooses. **Pushed**, it reaches the browser with no Postulo
+  tab open, through the push service the browser's own maker runs; the message is encrypted
+  for that one browser (RFC 8291, checked against the RFC's worked example byte for byte), so
+  the service carries it without being able to read it. **Only while Postulo is open**, it
+  waits on the instance and the next open tab shows it, and nothing leaves the instance. The
+  second is also the fallback, so a push that fails — or a browser that withdrew its
+  subscription — leaves the notification for a tab rather than losing it, and the connection
+  still says what went wrong.
+
+  No new dependency and no new key to keep: the encryption and the VAPID signature use the
+  `cryptography` Postulo already has, the push goes through the client that enforces where a
+  connection may dial, and the signing key is derived from the material that already encrypts
+  connection secrets, so both change together or not at all. Plugins gain an optional
+  `form_attributes()`, which is how this one hands the connection page its public key without
+  a template that knows it by name. (#209)
+
 - **A Calendar page beside Reminders.** Everything dated was a list, and the lists were in
   different places: interviews soonest first on one page, reminders on another, and "what
   is on this week" meant opening both and reading dates. *Calendar* draws the month —

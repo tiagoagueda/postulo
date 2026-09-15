@@ -1350,4 +1350,194 @@
     readyWidgetDragging();
   }
 
+  /*
+   * The browser notifier (#209), in two halves.
+   *
+   * **Subscribing**, on its connection page. The plugin hands this script the instance's
+   * public key, the worker's address and every sentence it may need to say, as data
+   * attributes on the card; nothing here is written in English. The button is made here rather
+   * than in the template, because without this script it could do nothing, and the field's
+   * own help already says that scripts are needed.
+   *
+   * **Showing**, on every page, for somebody with the notifier switched on. The tab asks for
+   * what is waiting now and then, and shows it -- through the service worker where there is
+   * one, so a click lands the same way a push does.
+   */
+  function base64UrlToBytes(text) {
+    var padded = (text + "===".slice((text.length + 3) % 4)).replace(/-/g, "+").replace(/_/g, "/");
+    var raw = window.atob(padded);
+    var bytes = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) {
+      bytes[i] = raw.charCodeAt(i);
+    }
+    return bytes;
+  }
+
+  function pushCanWork() {
+    return window.isSecureContext && "serviceWorker" in navigator && "PushManager" in window;
+  }
+
+  function readyPushSubscribe(card) {
+    if (card.hasAttribute("data-web-push-ready")) {
+      return;
+    }
+    card.setAttribute("data-web-push-ready", "");
+    var field = card.querySelector("textarea[name=plugin_subscription]");
+    var heading = card.querySelector("h3");
+
+    var status = document.createElement("p");
+    status.className = "mb-4 text-sm";
+    status.setAttribute("role", "status");
+    status.setAttribute("data-web-push-status", "");
+
+    if (!window.isSecureContext || !("Notification" in window)) {
+      status.textContent = card.dataset.webPushUnsupported || "";
+      (heading || card.firstChild).after(status);
+      return;
+    }
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn-secondary mb-2";
+    button.textContent = card.dataset.webPushAllow || "";
+    var holder = document.createElement("div");
+    holder.appendChild(button);
+    holder.appendChild(status);
+    if (heading) {
+      heading.after(holder);
+    } else {
+      card.prepend(holder);
+    }
+
+    function say(words) {
+      status.textContent = words || "";
+    }
+
+    button.addEventListener("click", function () {
+      say(card.dataset.webPushAsking);
+      Notification.requestPermission().then(function (permission) {
+        if (permission !== "granted") {
+          say(card.dataset.webPushDenied);
+          return null;
+        }
+        if (!pushCanWork()) {
+          say(card.dataset.webPushTabOnly);
+          return null;
+        }
+        return navigator.serviceWorker
+          .register(card.dataset.webPushWorker, { scope: "/" })
+          .then(function () {
+            return navigator.serviceWorker.ready;
+          })
+          .then(function (registration) {
+            return registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: base64UrlToBytes(card.dataset.webPushKey || ""),
+            });
+          })
+          .then(function (subscription) {
+            if (field) {
+              field.value = JSON.stringify(subscription);
+            }
+            say(card.dataset.webPushSubscribed);
+          });
+      }).catch(function () {
+        // Allowed, but the push service would not have us: private windows, some browsers
+        // with push switched off. What is left still works while a tab is open.
+        say(card.dataset.webPushTabOnly);
+      });
+    });
+  }
+
+  function readyEveryPushCard() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-web-push-key]"), readyPushSubscribe);
+  }
+
+  document.addEventListener("DOMContentLoaded", readyEveryPushCard);
+  if (document.body) {
+    readyEveryPushCard();
+  }
+
+  // Only somewhere on this site, for the reason the worker gives.
+  function sameSiteAddress(address) {
+    try {
+      var target = new URL(address || "/", window.location.origin);
+      return target.origin === window.location.origin ? target.href : "/";
+    } catch (error) {
+      return "/";
+    }
+  }
+
+  function showNotice(notice) {
+    var options = { body: notice.body || "", tag: notice.tag || undefined, data: { url: notice.url || "/" } };
+    var direct = function () {
+      var shown = new Notification(notice.title || "", options);
+      shown.addEventListener("click", function () {
+        window.focus();
+        window.location.assign(sameSiteAddress(notice.url));
+      });
+    };
+    if (!("serviceWorker" in navigator)) {
+      direct();
+      return;
+    }
+    navigator.serviceWorker.getRegistration("/").then(function (registration) {
+      if (registration) {
+        registration.showNotification(notice.title || "", options);
+      } else {
+        direct();
+      }
+    }).catch(direct);
+  }
+
+  var collectingNotices = false;
+
+  function collectNotices() {
+    var body = document.body;
+    var address = body && body.dataset.browserNotices;
+    if (!address || collectingNotices || !("Notification" in window) || Notification.permission !== "granted") {
+      return;
+    }
+    collectingNotices = true;
+    window
+      .fetch(address, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "X-CSRFToken": body.dataset.browserNoticesToken || "", Accept: "application/json" },
+      })
+      .then(function (response) {
+        return response.ok ? response.json() : { notices: [] };
+      })
+      .then(function (data) {
+        (data.notices || []).forEach(showNotice);
+      })
+      .catch(function () {
+        // Offline, or the instance restarting: the notices wait for the next try.
+      })
+      .then(function () {
+        collectingNotices = false;
+      });
+  }
+
+  function readyNoticeCollection() {
+    if (!document.body || !document.body.dataset.browserNotices || document.body.hasAttribute("data-browser-notices-ready")) {
+      return;
+    }
+    document.body.setAttribute("data-browser-notices-ready", "");
+    collectNotices();
+    // Once a minute. A background tab's timers are slowed to about that anyway, and a reminder
+    // is not so urgent that a second's accuracy is worth a request a second.
+    window.setInterval(collectNotices, 60000);
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible") {
+        collectNotices();
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", readyNoticeCollection);
+  if (document.body) {
+    readyNoticeCollection();
+  }
+
 })();

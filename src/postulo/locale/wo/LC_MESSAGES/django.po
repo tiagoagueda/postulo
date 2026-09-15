@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 15:53+0000\n"
+"POT-Creation-Date: 2026-09-15 19:01+0000\n"
 "PO-Revision-Date: 2026-09-06 21:17+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Wolof\n"
@@ -42,7 +42,7 @@ msgstr ""
 msgid "%(count)d %(noun)s changed."
 msgstr ""
 
-#: src/postulo/plugins/views.py:371
+#: src/postulo/plugins/views.py:405
 #, python-format
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -343,7 +343,7 @@ msgstr ""
 msgid "%(name)s — %(kind)s"
 msgstr ""
 
-#: src/postulo/templates/base.html:67
+#: src/postulo/templates/base.html:69
 #, python-format
 msgid "%(name)s — dashboard"
 msgstr ""
@@ -788,7 +788,7 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-#: src/postulo/templates/base.html:119
+#: src/postulo/templates/base.html:121
 #, python-format
 msgid "Account menu, %(name)s"
 msgstr ""
@@ -947,7 +947,8 @@ msgid "Address"
 msgstr ""
 
 #: src/postulo/core/models.py:413 src/postulo/core/models.py:539
-#: src/postulo/jobs/models.py:797 src/postulo/resume/models.py:250
+#: src/postulo/jobs/models.py:797 src/postulo/notifications/models.py:26
+#: src/postulo/resume/models.py:250
 msgid "address"
 msgstr ""
 
@@ -1418,12 +1419,20 @@ msgstr ""
 msgid "Board"
 msgstr ""
 
-#: src/postulo/documents/models.py:319
+#: src/postulo/documents/models.py:319 src/postulo/notifications/models.py:25
 msgid "body"
 msgstr ""
 
 #: src/postulo/templates/core/export.html:41
 msgid "Bringing a spreadsheet in"
+msgstr ""
+
+#: src/postulo/notifications/models.py:30
+msgid "browser notice"
+msgstr ""
+
+#: src/postulo/notifications/models.py:31
+msgid "browser notices"
 msgstr ""
 
 #: src/postulo/templates/server/plugins.html:464
@@ -1935,7 +1944,7 @@ msgstr ""
 msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 
-#: src/postulo/plugins/views.py:298
+#: src/postulo/plugins/views.py:332
 msgid "Connected. Test it to make sure it works."
 msgstr ""
 
@@ -1944,11 +1953,11 @@ msgstr ""
 msgid "connection"
 msgstr ""
 
-#: src/postulo/plugins/views.py:418
+#: src/postulo/plugins/views.py:452
 msgid "Connection removed, secrets included."
 msgstr ""
 
-#: src/postulo/plugins/views.py:225
+#: src/postulo/plugins/views.py:259
 msgid "Connection saved. Test it to make sure it works."
 msgstr ""
 
@@ -1960,9 +1969,9 @@ msgstr ""
 msgid "Connection security"
 msgstr ""
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:414
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:154 src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:448
 #: src/postulo/templates/connections/list.html:7
 msgid "Connections"
 msgstr ""
@@ -2454,7 +2463,7 @@ msgstr ""
 msgid "Document store"
 msgstr ""
 
-#: src/postulo/plugins/views.py:35
+#: src/postulo/plugins/views.py:37
 msgid "Document stores"
 msgstr ""
 
@@ -2681,6 +2690,7 @@ msgid ""
 msgstr ""
 
 #: src/postulo/applications/models.py:397
+#: src/postulo/notifications/models.py:23
 msgid "event"
 msgstr ""
 
@@ -3748,7 +3758,7 @@ msgid ""
 "It refuses to serve anything rather than publishing these records to whoever finds it. Set POSTULO_LOGS_TOKEN, or turn POSTULO_LOGS_ENDPOINT_ENABLED off."
 msgstr ""
 
-#: src/postulo/plugins/views.py:351
+#: src/postulo/plugins/views.py:385
 msgid "It works."
 msgstr ""
 
@@ -4260,7 +4270,7 @@ msgstr ""
 msgid "mail's last error"
 msgstr ""
 
-#: src/postulo/templates/base.html:98 src/postulo/templates/base.html:102
+#: src/postulo/templates/base.html:100 src/postulo/templates/base.html:104
 msgid "Main"
 msgstr ""
 
@@ -4341,7 +4351,7 @@ msgstr ""
 msgid "Member"
 msgstr ""
 
-#: src/postulo/templates/base.html:94
+#: src/postulo/templates/base.html:96
 msgid "Menu"
 msgstr ""
 
@@ -5110,7 +5120,7 @@ msgstr ""
 msgid "Nothing to decide"
 msgstr ""
 
-#: src/postulo/plugins/views.py:380
+#: src/postulo/plugins/views.py:414
 #, python-format
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -5133,7 +5143,7 @@ msgstr ""
 msgid "Nothing was added."
 msgstr ""
 
-#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
+#: src/postulo/plugins/views.py:323 src/postulo/plugins/views.py:340
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr ""
 
@@ -5164,7 +5174,7 @@ msgid ""
 msgstr ""
 
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:35
 msgid "Notifications"
 msgstr ""
 
@@ -5860,7 +5870,7 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr ""
 
-#: src/postulo/plugins/views.py:251
+#: src/postulo/plugins/views.py:285
 msgid ""
 "Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
 msgstr ""
@@ -5884,7 +5894,7 @@ msgid ""
 "Postulo stores only a hash of it and cannot show it again. Lose it and you make another."
 msgstr ""
 
-#: src/postulo/templates/base.html:180
+#: src/postulo/templates/base.html:182
 msgid "Postulo — your job search, on your server."
 msgstr ""
 
@@ -6655,11 +6665,11 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: src/postulo/templates/base.html:112
+#: src/postulo/templates/base.html:114
 msgid "Search  /"
 msgstr ""
 
-#: src/postulo/templates/base.html:110
+#: src/postulo/templates/base.html:112
 #: src/postulo/templates/core/search.html:12
 msgid "Search everything"
 msgstr ""
@@ -6726,7 +6736,7 @@ msgstr ""
 msgid "Send to stores now"
 msgstr ""
 
-#: src/postulo/plugins/views.py:34
+#: src/postulo/plugins/views.py:36
 msgid "Sending as yourself"
 msgstr ""
 
@@ -6784,7 +6794,7 @@ msgstr ""
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:133 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:135 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:10
 msgid "Server settings"
 msgstr ""
@@ -6831,7 +6841,7 @@ msgid "Set when the opening is no longer available."
 msgstr ""
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:129 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:131 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:22
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
@@ -6914,12 +6924,16 @@ msgstr ""
 msgid "Show this period"
 msgstr ""
 
+#: src/postulo/notifications/models.py:27
+msgid "shown at"
+msgstr ""
+
 #: src/postulo/core/models.py:599
 msgid "Shown in the header and on the sign-in page."
 msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html:16
-#: src/postulo/templates/base.html:155 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:157 src/postulo/templates/core/home.html:20
 msgid "Sign in"
 msgstr ""
 
@@ -6944,7 +6958,7 @@ msgid ""
 "Sign in with a fingerprint, your face or a device PIN. Nothing to type, nothing written down, and nothing an email can talk you out of."
 msgstr ""
 
-#: src/postulo/templates/base.html:147
+#: src/postulo/templates/base.html:149
 msgid "Sign out"
 msgstr ""
 
@@ -6966,7 +6980,7 @@ msgid ""
 "Signed in once: somebody agrees on the provider's consent screen, as the mailbox that sends, and needs no administrator. The application sends on its own: Microsoft only, and needs a tenant administrator to grant the permission."
 msgstr ""
 
-#: src/postulo/plugins/views.py:314
+#: src/postulo/plugins/views.py:348
 msgid "Signed in to the mail provider. Test the connection to make sure."
 msgstr ""
 
@@ -6999,7 +7013,7 @@ msgstr ""
 msgid "Single sign-on counts as the second factor"
 msgstr ""
 
-#: src/postulo/templates/base.html:109
+#: src/postulo/templates/base.html:111
 msgid "Site search"
 msgstr ""
 
@@ -7038,7 +7052,7 @@ msgstr ""
 msgid "skills"
 msgstr ""
 
-#: src/postulo/templates/base.html:40
+#: src/postulo/templates/base.html:42
 msgid "Skip to content"
 msgstr ""
 
@@ -7360,7 +7374,7 @@ msgid ""
 "Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
 msgstr ""
 
-#: src/postulo/plugins/views.py:401
+#: src/postulo/plugins/views.py:435
 #, python-format
 msgid "Sync failed: %(error)s"
 msgstr ""
@@ -7377,12 +7391,12 @@ msgstr ""
 msgid "Sync now"
 msgstr ""
 
-#: src/postulo/plugins/views.py:403
+#: src/postulo/plugins/views.py:437
 #, python-format
 msgid "Synced: %(summary)s."
 msgstr ""
 
-#: src/postulo/plugins/kinds.py:29 src/postulo/plugins/views.py:36
+#: src/postulo/plugins/kinds.py:29 src/postulo/plugins/views.py:38
 msgid "Synchronisation"
 msgstr ""
 
@@ -7480,7 +7494,7 @@ msgstr ""
 msgid "Test"
 msgstr ""
 
-#: src/postulo/plugins/views.py:353
+#: src/postulo/plugins/views.py:387
 #, python-format
 msgid "Test failed: %(message)s"
 msgstr ""
@@ -7724,7 +7738,7 @@ msgstr ""
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr ""
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:279 src/postulo/plugins/views.py:361
 msgid "That plugin is no longer installed."
 msgstr ""
 
@@ -8368,7 +8382,8 @@ msgid "timeout in seconds"
 msgstr ""
 
 #: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
-#: src/postulo/jobs/models.py:620 src/postulo/resume/models.py:249
+#: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
+#: src/postulo/resume/models.py:249
 msgid "title"
 msgstr ""
 
@@ -9418,7 +9433,7 @@ msgstr ""
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:10
-#: src/postulo/templates/base.html:126
+#: src/postulo/templates/base.html:128
 #: src/postulo/templates/widgets/shortcuts.html:34
 msgid "Your details"
 msgstr ""

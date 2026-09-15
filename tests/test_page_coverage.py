@@ -28,6 +28,10 @@ from tests.e2e.test_accessibility import VISITED_URL_NAMES
 EXCUSED: dict[str, str] = {
     "core:healthz": "a JSON status document for monitoring to poll",
     "core:manifest": "the JSON manifest a browser reads when installing the app",
+    "notifications:worker": "the service worker's script, which a browser runs rather than shows",
+    "notifications:waiting": (
+        "a POST an open tab makes for the browser notifications waiting for it, answered in JSON"
+    ),
     "core:logs_endpoint": "one JSON object per line, for a log collector to scrape",
     "core:metrics": "the Prometheus text format, for a scraper rather than a person",
     "core:export_download": "a zip archive arriving as a download",

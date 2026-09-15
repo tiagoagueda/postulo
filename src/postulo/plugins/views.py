@@ -8,12 +8,14 @@ field specifications. *Test* runs the plugin's ``test()`` and keeps the outcome.
 from __future__ import annotations
 
 import logging
+import re
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils.html import format_html_join
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import DeleteView, ListView
@@ -153,6 +155,37 @@ class ConnectionPickView(OwnedObjectMixin, View):
         )
 
 
+#: What a `form_attributes` name may be once `data-` is put in front of it.
+_ATTRIBUTE_NAME = re.compile(r"[a-z][a-z0-9-]{0,40}")
+
+
+def _plugin_attributes(plugin) -> str:
+    """A plugin's ``form_attributes()``, as ``data-`` attributes for its connection card (#209).
+
+    For the one thing a field cannot do: hand the page's script something it needs, such as
+    a public key, without a template that knows the plugin by name. Names that are not plain
+    lowercase words are dropped rather than escaped, and every value is escaped, so a plugin
+    can put an attribute on the card and nothing else.
+    """
+    offered = getattr(plugin, "form_attributes", None)
+    if offered is None:
+        return ""
+    try:
+        attributes = offered() or {}
+    except Exception:
+        logger.exception("Plugin %r failed to give its form attributes", plugin.name)
+        return ""
+    return format_html_join(
+        "",
+        ' data-{}="{}"',
+        (
+            (name, str(value))
+            for name, value in attributes.items()
+            if _ATTRIBUTE_NAME.fullmatch(str(name))
+        ),
+    )
+
+
 class ConnectionFormView(OwnedObjectMixin, View):
     """Create or edit one connection, through the form the plugin describes."""
 
@@ -180,6 +213,7 @@ class ConnectionFormView(OwnedObjectMixin, View):
                 "plugin": plugin,
                 "kind_label": KIND_LABELS.get(plugin.kind, plugin.kind),
                 "section_title": _("Connections"),
+                "plugin_attributes": _plugin_attributes(plugin),
                 **self._consent_context(request, connection, plugin),
             },
         )

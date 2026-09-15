@@ -628,6 +628,11 @@ class ConnectedPlugin(Protocol):
     - ``summary(config) -> str`` is one line for the connections list: which services a
       connection reaches, with every secret part masked. Secrets are never shown back,
       so this is how a person tells two connections to the same plugin apart.
+    - ``form_attributes() -> dict[str, str]`` is put on the connection form's card as
+      ``data-<name>`` attributes, for a plugin whose setup happens in the browser and needs
+      Postulo's script to know something -- the browser notifier's public key (#209). Names
+      are lowercase words joined by hyphens; anything else is dropped, and every value is
+      escaped. Nothing secret belongs here: it is in the page.
     """
 
     name: str

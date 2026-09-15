@@ -9,6 +9,8 @@ from postulo.api.api import api
 
 urlpatterns = [
     path("", include("postulo.core.urls")),
+    # The service worker has to be served from the root to receive pushes for the whole site.
+    path("", include("postulo.notifications.urls")),
     # Postulo's own account pages come first: Django resolves in order, so these
     # take precedence over any allauth route sharing a path.
     path("accounts/", include("postulo.accounts.urls")),

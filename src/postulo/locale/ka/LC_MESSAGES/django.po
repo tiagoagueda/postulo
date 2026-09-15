@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-15 15:53+0000\n"
+"POT-Creation-Date: 2026-09-15 19:01+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: ქართული\n"
@@ -43,7 +43,7 @@ msgstr "%(company)s უკვე აქვს %(scheme)s იდენტიფ�
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s შეიცვალა."
 
-#: src/postulo/plugins/views.py:371
+#: src/postulo/plugins/views.py:405
 #, python-format, draft
 msgid ""
 "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
@@ -372,7 +372,7 @@ msgstr ""
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/templates/base.html:67
+#: src/postulo/templates/base.html:69
 #, python-format, draft
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — მიმოხილვა"
@@ -920,7 +920,7 @@ msgstr "მიიღო"
 msgid "Account"
 msgstr "ანგარიში"
 
-#: src/postulo/templates/base.html:119
+#: src/postulo/templates/base.html:121
 #, python-format, draft
 msgid "Account menu, %(name)s"
 msgstr "ანგარიშის მენიუ, %(name)s"
@@ -1107,7 +1107,8 @@ msgid "Address"
 msgstr "მისამართი"
 
 #: src/postulo/core/models.py:413 src/postulo/core/models.py:539
-#: src/postulo/jobs/models.py:797 src/postulo/resume/models.py:250
+#: src/postulo/jobs/models.py:797 src/postulo/notifications/models.py:26
+#: src/postulo/resume/models.py:250
 #, draft
 msgid "address"
 msgstr "მისამართი"
@@ -1679,7 +1680,7 @@ msgstr "ბიოტექნოლოგია"
 msgid "Board"
 msgstr "დაფა"
 
-#: src/postulo/documents/models.py:319
+#: src/postulo/documents/models.py:319 src/postulo/notifications/models.py:25
 #, draft
 msgid "body"
 msgstr "ტექსტი"
@@ -1688,6 +1689,14 @@ msgstr "ტექსტი"
 #, draft
 msgid "Bringing a spreadsheet in"
 msgstr "ცხრილის შემოტანა"
+
+#: src/postulo/notifications/models.py:30
+msgid "browser notice"
+msgstr ""
+
+#: src/postulo/notifications/models.py:31
+msgid "browser notices"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html:464
 #, draft
@@ -2296,7 +2305,7 @@ msgid "Connected to %(host)s:%(port)s. No username, so nothing was signed in."
 msgstr ""
 "დაკავშირდა %(host)s:%(port)s-თან. მომხმარებლის სახელი არ არის, ამიტომ შესვლა არ მომხდარა."
 
-#: src/postulo/plugins/views.py:298
+#: src/postulo/plugins/views.py:332
 #, draft
 msgid "Connected. Test it to make sure it works."
 msgstr "დაკავშირებულია. შეამოწმეთ, რომ დარწმუნდეთ, რომ მუშაობს."
@@ -2307,12 +2316,12 @@ msgstr "დაკავშირებულია. შეამოწმეთ,
 msgid "connection"
 msgstr "კავშირი"
 
-#: src/postulo/plugins/views.py:418
+#: src/postulo/plugins/views.py:452
 #, draft
 msgid "Connection removed, secrets included."
 msgstr "კავშირი წაიშალა, საიდუმლოებებთან ერთად."
 
-#: src/postulo/plugins/views.py:225
+#: src/postulo/plugins/views.py:259
 #, draft
 msgid "Connection saved. Test it to make sure it works."
 msgstr "კავშირი შენახულია. შეამოწმეთ, რომ დარწმუნდეთ, მუშაობს."
@@ -2327,9 +2336,9 @@ msgstr "კავშირის უსაფრთხოება"
 msgid "Connection security"
 msgstr "კავშირის უსაფრთხოება"
 
-#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:134
-#: src/postulo/plugins/views.py:152 src/postulo/plugins/views.py:182
-#: src/postulo/plugins/views.py:414
+#: src/postulo/core/settings_sections.py:74 src/postulo/plugins/views.py:136
+#: src/postulo/plugins/views.py:154 src/postulo/plugins/views.py:215
+#: src/postulo/plugins/views.py:448
 #: src/postulo/templates/connections/list.html:7
 #, draft
 msgid "Connections"
@@ -2949,7 +2958,7 @@ msgstr "დოკუმენტის ასლი"
 msgid "Document store"
 msgstr "დოკუმენტების საცავი"
 
-#: src/postulo/plugins/views.py:35
+#: src/postulo/plugins/views.py:37
 #, draft
 msgid "Document stores"
 msgstr "დოკუმენტების საცავები"
@@ -3225,6 +3234,7 @@ msgstr ""
 "Europass თითო ენაზე ხუთ დონეს აღრიცხავს, Postulo კი ერთს ინახავს, ამიტომ ყველაზე დაბალი აიღება. მოგვიანებით შეცვალეთ, თუ ეს ის არ არის, რასაც დაასახელებდით."
 
 #: src/postulo/applications/models.py:397
+#: src/postulo/notifications/models.py:23
 #, draft
 msgid "event"
 msgstr "ღონისძიება"
@@ -4548,7 +4558,7 @@ msgid ""
 msgstr ""
 "ის უარს ამბობს რამის გაცემაზე, ვიდრე ეს ჩანაწერები ყველასთვის გამოაქვეყნოს, ვინც მას იპოვის. დააყენეთ POSTULO_LOGS_TOKEN ან გამორთეთ POSTULO_LOGS_ENDPOINT_ENABLED."
 
-#: src/postulo/plugins/views.py:351
+#: src/postulo/plugins/views.py:385
 #, draft
 msgid "It works."
 msgstr "მუშაობს."
@@ -5179,7 +5189,7 @@ msgstr "ფოსტის ტრანსპორტი"
 msgid "mail's last error"
 msgstr "ფოსტის ბოლო შეცდომა"
 
-#: src/postulo/templates/base.html:98 src/postulo/templates/base.html:102
+#: src/postulo/templates/base.html:100 src/postulo/templates/base.html:104
 #, draft
 msgid "Main"
 msgstr "მთავარი"
@@ -5280,7 +5290,7 @@ msgstr ""
 msgid "Member"
 msgstr "წევრი"
 
-#: src/postulo/templates/base.html:94
+#: src/postulo/templates/base.html:96
 #, draft
 msgid "Menu"
 msgstr "მენიუ"
@@ -6211,7 +6221,7 @@ msgstr "დასაკავშირებელი არაფერია"
 msgid "Nothing to decide"
 msgstr "გადასაწყვეტი არაფერია"
 
-#: src/postulo/plugins/views.py:380
+#: src/postulo/plugins/views.py:414
 #, python-format, draft
 msgid ""
 "Nothing to queue: every document of the chosen kinds is already listed for %(label)s."
@@ -6239,7 +6249,7 @@ msgstr "არაფერი ელოდება"
 msgid "Nothing was added."
 msgstr "არაფერი დამატებულა."
 
-#: src/postulo/plugins/views.py:289 src/postulo/plugins/views.py:306
+#: src/postulo/plugins/views.py:323 src/postulo/plugins/views.py:340
 #, draft
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "არაფერი დაკავშირებულა. არავინ არაფერს დათანხმებია."
@@ -6277,7 +6287,7 @@ msgstr ""
 "ამ პერიოდში არაფერი გაგზავნილა. ეს ამბობს ანგარიში, და ეს ისეთივე ფაქტია, როგორც ნებისმიერი სხვა."
 
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
-#: src/postulo/plugins/views.py:33
+#: src/postulo/plugins/views.py:35
 #, draft
 msgid "Notifications"
 msgstr "შეტყობინებები"
@@ -7142,7 +7152,7 @@ msgstr ""
 msgid "Postulo fetches this one page, and nothing else."
 msgstr "Postulo ჩამოტვირთავს ამ ერთ გვერდს და სხვა არაფერს."
 
-#: src/postulo/plugins/views.py:251
+#: src/postulo/plugins/views.py:285
 #, draft
 msgid ""
 "Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
@@ -7175,7 +7185,7 @@ msgid ""
 msgstr ""
 "Postulo მხოლოდ მის ჰეშს ინახავს და ხელახლა ვერ გაჩვენებთ. თუ დაკარგავთ, სხვას შექმნით."
 
-#: src/postulo/templates/base.html:180
+#: src/postulo/templates/base.html:182
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — თქვენი სამსახურის ძიება, თქვენს სერვერზე."
@@ -8118,12 +8128,12 @@ msgstr "წინასწარი შერჩევა"
 msgid "Search"
 msgstr "ძებნა"
 
-#: src/postulo/templates/base.html:112
+#: src/postulo/templates/base.html:114
 #, draft
 msgid "Search  /"
 msgstr "ძებნა  /"
 
-#: src/postulo/templates/base.html:110
+#: src/postulo/templates/base.html:112
 #: src/postulo/templates/core/search.html:12
 #, draft
 msgid "Search everything"
@@ -8205,7 +8215,7 @@ msgstr ""
 msgid "Send to stores now"
 msgstr "საცავებში ახლავე გაგზავნა"
 
-#: src/postulo/plugins/views.py:34
+#: src/postulo/plugins/views.py:36
 #, draft
 msgid "Sending as yourself"
 msgstr "საკუთარი სახელით გაგზავნა"
@@ -8273,7 +8283,7 @@ msgstr "სერვერი"
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:133 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:135 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:10
 #, draft
 msgid "Server settings"
@@ -8330,7 +8340,7 @@ msgid "Set when the opening is no longer available."
 msgstr "მიუთითეთ, როცა ვაკანსია აღარ არის ხელმისაწვდომი."
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:129 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:131 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:22
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
@@ -8427,13 +8437,17 @@ msgstr ""
 msgid "Show this period"
 msgstr "ამ პერიოდის ჩვენება"
 
+#: src/postulo/notifications/models.py:27
+msgid "shown at"
+msgstr ""
+
 #: src/postulo/core/models.py:599
 #, draft
 msgid "Shown in the header and on the sign-in page."
 msgstr "ჩანს თავსართში და შესვლის გვერდზე."
 
 #: src/postulo/templates/account/recovery_unusable.html:16
-#: src/postulo/templates/base.html:155 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:157 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
 msgstr "შესვლა"
@@ -8465,7 +8479,7 @@ msgid ""
 msgstr ""
 "შედით თითის ანაბეჭდით, თქვენი სახით ან მოწყობილობის PIN-ით. აკრეფის არაფერია, არსად არაფერი წერია, და არაფერია ისეთი, რასაც წერილი გამოგტყუებთ."
 
-#: src/postulo/templates/base.html:147
+#: src/postulo/templates/base.html:149
 #, draft
 msgid "Sign out"
 msgstr "გამოსვლა"
@@ -8493,7 +8507,7 @@ msgid ""
 msgstr ""
 "ერთხელ შესული: ვიღაც თანხმდება პროვაიდერის თანხმობის ეკრანზე, როგორც გამგზავნი საფოსტო ყუთი, ყოველგვარი ადმინისტრატორის გარეშე. აპლიკაცია თავად აგზავნის: მხოლოდ Microsoft, და მოიჯარის ადმინისტრატორმა უნდა გასცეს ნებართვა."
 
-#: src/postulo/plugins/views.py:314
+#: src/postulo/plugins/views.py:348
 #, draft
 msgid "Signed in to the mail provider. Test the connection to make sure."
 msgstr "შესულია ფოსტის პროვაიდერთან. დასარწმუნებლად შეამოწმეთ კავშირი."
@@ -8535,7 +8549,7 @@ msgstr "ერთიანი შესვლა მეორე ფაქტო
 msgid "Single sign-on counts as the second factor"
 msgstr "ერთიანი შესვლა მეორე ფაქტორად ითვლება"
 
-#: src/postulo/templates/base.html:109
+#: src/postulo/templates/base.html:111
 #, draft
 msgid "Site search"
 msgstr "ძებნა საიტზე"
@@ -8583,7 +8597,7 @@ msgstr "უნარები"
 msgid "skills"
 msgstr "უნარები"
 
-#: src/postulo/templates/base.html:40
+#: src/postulo/templates/base.html:42
 #, draft
 msgid "Skip to content"
 msgstr "შიგთავსზე გადასვლა"
@@ -8981,7 +8995,7 @@ msgid ""
 msgstr ""
 "ერთის გამორთვა გამოყენებას აჩერებს და არაფერს შლის: ყველა კავშირი, რომელიც შექმენით, ზუსტად ისე რჩება, როგორც არის, ხოლო ხელახლა ჩართვა მათ უცვლელად აბრუნებს."
 
-#: src/postulo/plugins/views.py:401
+#: src/postulo/plugins/views.py:435
 #, python-format, draft
 msgid "Sync failed: %(error)s"
 msgstr "სინქრონიზაცია ვერ მოხერხდა: %(error)s"
@@ -9001,12 +9015,12 @@ msgstr "სინქრონიზაციის ბმულები"
 msgid "Sync now"
 msgstr "ახლავე სინქრონიზაცია"
 
-#: src/postulo/plugins/views.py:403
+#: src/postulo/plugins/views.py:437
 #, python-format, draft
 msgid "Synced: %(summary)s."
 msgstr "დასინქრონდა: %(summary)s."
 
-#: src/postulo/plugins/kinds.py:29 src/postulo/plugins/views.py:36
+#: src/postulo/plugins/kinds.py:29 src/postulo/plugins/views.py:38
 #, draft
 msgid "Synchronisation"
 msgstr "სინქრონიზაცია"
@@ -9124,7 +9138,7 @@ msgstr "შაბლონები ჩნდება, როცა წერ�
 msgid "Test"
 msgstr "შემოწმება"
 
-#: src/postulo/plugins/views.py:353
+#: src/postulo/plugins/views.py:387
 #, python-format, draft
 msgid "Test failed: %(message)s"
 msgstr "შემოწმება ვერ მოხერხდა: %(message)s"
@@ -9417,7 +9431,7 @@ msgstr "იმ გვერდმა %(status)s დააბრუნა."
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "ის სურათი 5 MB-ზე მეტია. უფრო პატარა, გთხოვთ."
 
-#: src/postulo/plugins/views.py:245 src/postulo/plugins/views.py:327
+#: src/postulo/plugins/views.py:279 src/postulo/plugins/views.py:361
 #, draft
 msgid "That plugin is no longer installed."
 msgstr "ის მოდული აღარ არის დაყენებული."
@@ -10206,7 +10220,8 @@ msgid "timeout in seconds"
 msgstr "დროის ამოწურვა წამებში"
 
 #: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
-#: src/postulo/jobs/models.py:620 src/postulo/resume/models.py:249
+#: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
+#: src/postulo/resume/models.py:249
 #, draft
 msgid "title"
 msgstr "სათაური"
@@ -11503,7 +11518,7 @@ msgstr "თქვენი ვადა"
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:10
-#: src/postulo/templates/base.html:126
+#: src/postulo/templates/base.html:128
 #: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"

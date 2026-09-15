@@ -32,7 +32,8 @@
     <script src="{% static 'js/app.js' %}" defer></script>
   </head>
 
-  <body class="min-h-screen">
+  {% comment %} The address an open tab collects waiting browser notifications from, only for somebody with a browser notifier switched on (#209). The token travels with it because a page without a form has no other. {% endcomment %}
+  <body class="min-h-screen"{% if browser_notices %} data-browser-notices="{% url 'notifications:waiting' %}" data-browser-notices-token="{{ csrf_token }}"{% endif %}>
     {# The first thing Tab reaches: past the header, straight to the page. #}
     <a href="#main" class="skip-link">{% translate "Skip to content" %}</a>
     {% block chrome %}
