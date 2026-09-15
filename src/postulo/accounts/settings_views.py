@@ -124,11 +124,22 @@ class PluginsView(SettingsSectionMixin, TemplateView):
     template_name = "settings/plugins.html"
     section_title = _("Plugins")
 
+    def showing_internal(self) -> bool:
+        """Whether the check mark that shows Postulo's own plugins is on (#200).
+
+        A query parameter rather than a preference: the mark is a moment's curiosity about
+        what the instance runs, and a page that remembered it would be a page that shows
+        a dozen locked rows for ever after one look.
+        """
+        source = self.request.POST if self.request.method == "POST" else self.request.GET
+        return source.get("internal") == "1"
+
     def get_context_data(self, **kwargs):
         from postulo.plugins import policy
 
         context = super().get_context_data(**kwargs)
-        context["rows"] = policy.overview(self.request.user)
+        context["showing_internal"] = self.showing_internal()
+        context["rows"] = policy.overview(self.request.user, internal=self.showing_internal())
         return context
 
     def post(self, request, *args, **kwargs):
@@ -136,7 +147,7 @@ class PluginsView(SettingsSectionMixin, TemplateView):
 
         wanted = set(request.POST.getlist("on"))
         changed = 0
-        for row in policy.overview(request.user):
+        for row in policy.overview(request.user, internal=True):
             # Only what is theirs. `set_choice` refuses the rest anyway, which matters:
             # a disabled checkbox submits nothing, so without that refusal a locked-on
             # plugin would read as "switch me off" on every save.
@@ -145,7 +156,8 @@ class PluginsView(SettingsSectionMixin, TemplateView):
             ):
                 changed += 1
         messages.success(request, _("Saved.") if changed else _("Nothing was different."))
-        return redirect("settings:plugins")
+        target = reverse("settings:plugins")
+        return redirect(f"{target}?internal=1" if self.showing_internal() else target)
 
 
 class DashboardView(SettingsSectionMixin, TemplateView):

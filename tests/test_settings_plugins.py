@@ -45,22 +45,34 @@ def row_for(html: str, name: str) -> str | None:
 # --------------------------------------------------------------- what it shows
 
 
-def test_it_lists_what_is_running_for_this_account(client, user):
+def test_it_lists_what_was_installed_and_what_postulo_ships_only_when_asked(
+    client, user, third_party
+):
+    """What Postulo ships is the administrator's to switch, so it is out of the way until
+    the mark is ticked (#200); what was installed on the instance is the person's, and
+    is the page."""
     client.force_login(user)
 
     html = client.get(reverse(URL)).content.decode()
+    assert row_for(html, third_party)
+    assert row_for(html, PLUGIN) is None, "a built-in, and nobody decided it for this person"
+    assert "Show the plugins Postulo ships" in html
 
-    assert row_for(html, PLUGIN), "a source needs no connection and appears nowhere else"
+    html = client.get(reverse(URL) + "?internal=1").content.decode()
+    row = row_for(html, PLUGIN)
+    assert row and "data-shipped" in row
+    assert 'type="checkbox"' not in row, "no switch at all, rather than a disabled one"
+    assert "Shipped inside Postulo" in row
 
 
-def test_a_source_appears_even_though_it_has_no_connection(client, user):
+def test_a_source_appears_even_though_it_has_no_connection(client, user, third_party):
     """The gap this page fills. A parser that reads a posting off a page needs nothing from
     anybody, so the connections list has never had a reason to mention it."""
     client.force_login(user)
 
     html = client.get(reverse(URL)).content.decode()
 
-    assert row_for(html, "page-metadata")
+    assert row_for(html, third_party)
 
 
 def test_it_says_it_is_per_account_and_not_per_session(client, user):
@@ -79,29 +91,39 @@ def test_it_says_it_is_per_account_and_not_per_session(client, user):
 # --------------------------------------------------------- what is theirs
 
 
-def test_a_person_can_switch_one_off_and_back(client, user):
+def test_a_person_can_switch_one_off_and_back(client, user, third_party):
     client.force_login(user)
 
     # The view saved through its own `request.user.profile`; this one is a different
     # instance and still holds what it read at the start.
-    client.post(reverse(URL), {"on": ["page-metadata"]})
+    client.post(reverse(URL), {"on": []})
     user.profile.refresh_from_db()
-    assert not policy.decide(PLUGIN, user).on
+    assert not policy.decide(third_party, user).on
 
-    client.post(reverse(URL), {"on": [PLUGIN, "page-metadata"]})
+    client.post(reverse(URL), {"on": [third_party]})
     user.profile.refresh_from_db()
-    assert policy.decide(PLUGIN, user).on
+    assert policy.decide(third_party, user).on
 
 
-def test_a_row_that_is_theirs_offers_a_control(client, user):
+def test_the_mark_survives_saving(client, user, third_party):
+    """Ticked, saved, and still ticked: the redirect carries it."""
+    client.force_login(user)
+
+    response = client.post(reverse(URL), {"on": [third_party], "internal": "1"})
+
+    assert response.url == reverse(URL) + "?internal=1"
+    assert client.post(reverse(URL), {"on": [third_party]}).url == reverse(URL)
+
+
+def test_a_row_that_is_theirs_offers_a_control(client, user, third_party):
     client.force_login(user)
 
     html = client.get(reverse(URL)).content.decode()
 
-    assert "disabled" not in row_for(html, PLUGIN)
+    assert "disabled" not in row_for(html, third_party)
 
 
-def test_the_checkbox_carries_the_class_that_colours_it(client, user):
+def test_the_checkbox_carries_the_class_that_colours_it(client, user, third_party):
     """Green around a ticked box and red around an unticked one, down the whole list.
 
     The colour is redundant by design: the checkbox already says which way it is set, to a
@@ -111,7 +133,7 @@ def test_the_checkbox_carries_the_class_that_colours_it(client, user):
     """
     client.force_login(user)
 
-    row = row_for(client.get(reverse(URL)).content.decode(), PLUGIN)
+    row = row_for(client.get(reverse(URL)).content.decode(), third_party)
 
     assert "state-glow" in row
 
@@ -121,15 +143,26 @@ def test_the_checkbox_carries_the_class_that_colours_it(client, user):
 
 @pytest.mark.parametrize("state", [PluginPolicy.State.FORCED_ON, PluginPolicy.State.FORCED_OFF])
 def test_a_decided_row_is_shown_locked_rather_than_hidden(client, user, admin, state):
-    """Hiding it would be the quiet version of the very thing this page is against."""
+    """Hiding it would be the quiet version of the very thing this page is against -- and
+    that holds for a built-in too, which the mark otherwise keeps off the page (#200)."""
     PluginPolicy.objects.create(plugin=PLUGIN, person=user, state=state, decided_by=admin)
     client.force_login(user)
 
     row = row_for(client.get(reverse(URL)).content.decode(), PLUGIN)
 
-    assert row, "a plugin decided for you must still be visible"
-    assert "disabled" in row
+    assert row, "a plugin decided for you must still be visible, mark or no mark"
+    assert 'type="checkbox"' not in row, "a built-in carries no switch"
     assert "An administrator decided this" in row
+
+
+@pytest.mark.parametrize("state", [PluginPolicy.State.FORCED_ON, PluginPolicy.State.FORCED_OFF])
+def test_a_decided_installed_row_is_shown_disabled(client, user, admin, state, third_party):
+    PluginPolicy.objects.create(plugin=third_party, person=user, state=state, decided_by=admin)
+    client.force_login(user)
+
+    row = row_for(client.get(reverse(URL)).content.decode(), third_party)
+
+    assert row and "disabled" in row and "An administrator decided this" in row
 
 
 def test_the_person_is_told_who_decided(client, user, admin):
@@ -157,7 +190,7 @@ def test_unavailable_is_not_shown_at_all(client, user, admin):
     assert row_for(client.get(reverse(URL)).content.decode(), PLUGIN) is None
 
 
-def test_posting_cannot_take_back_a_decision_made_for_them(client, user, admin):
+def test_posting_cannot_take_back_a_decision_made_for_them(client, user, admin, third_party):
     """A disabled checkbox submits nothing, so a locked-on plugin would read as "switch me
     off" on every save if the view acted on absence alone."""
     PluginPolicy.objects.create(
@@ -172,7 +205,7 @@ def test_posting_cannot_take_back_a_decision_made_for_them(client, user, admin):
     # Posting nothing does mean "switch off everything I control" — and this plugin is not
     # one of those, so it must not appear among the person's own choices either.
     assert PLUGIN not in user.profile.plugins_off
-    assert "page-metadata" in user.profile.plugins_off, "the rows that are theirs still saved"
+    assert third_party in user.profile.plugins_off, "the rows that are theirs still saved"
 
 
 def test_saving_the_page_does_not_disturb_a_locked_row(client, user, admin):
@@ -192,20 +225,20 @@ def test_saving_the_page_does_not_disturb_a_locked_row(client, user, admin):
 # ------------------------------------------------------------------ boundaries
 
 
-def test_one_persons_page_never_shows_anothers_state(client, user, admin):
+def test_one_persons_page_never_shows_anothers_state(client, user, admin, third_party):
     """Owner scoping, on a page that reads from two places at once."""
     other = User.objects.create_user(
         email="other@example.org", password=PASSWORD, username="other-one"
     )
     PluginPolicy.objects.create(
-        plugin=PLUGIN, person=other, state=PluginPolicy.State.FORCED_OFF, decided_by=admin
+        plugin=third_party, person=other, state=PluginPolicy.State.FORCED_OFF, decided_by=admin
     )
     client.force_login(user)
 
-    row = row_for(client.get(reverse(URL)).content.decode(), PLUGIN)
+    row = row_for(client.get(reverse(URL)).content.decode(), third_party)
 
     assert "disabled" not in row, "another account's exception leaked onto this page"
-    assert policy.decide(PLUGIN, user).theirs
+    assert policy.decide(third_party, user).theirs
 
 
 def test_it_is_not_reachable_signed_out(client):

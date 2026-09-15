@@ -55,3 +55,39 @@ def _no_inherited_environment(monkeypatch):
     """
     for variable in site.env_variables():
         monkeypatch.delenv(variable, raising=False)
+
+
+class InstalledSource:
+    """A capture source installed on the instance rather than shipped inside it.
+
+    Since #200 that difference decides whose switch a plugin is: what Postulo ships is the
+    administrator's, what was installed is the person's. The registry's third-party loader
+    is what says a plugin was installed, so this stands in for one.
+    """
+
+    name = "example-source"
+    version = "1.0"
+    kind = "source"
+
+    def can_handle(self, url: str) -> bool:
+        return False
+
+    def parse(self, url: str, html: str):
+        return None
+
+
+@pytest.fixture
+def third_party(monkeypatch):
+    """The name of a source installed on the instance, registered for the test."""
+    from postulo.plugins import registry
+
+    monkeypatch.setattr(
+        registry,
+        "_load_third_party",
+        lambda kind: [InstalledSource()] if kind == "source" else [],
+    )
+    registry.plugins("source", refresh=True)
+    try:
+        yield InstalledSource.name
+    finally:
+        registry._cache.pop("source", None)

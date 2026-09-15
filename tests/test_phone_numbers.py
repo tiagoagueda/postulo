@@ -34,8 +34,12 @@ def add(holder, owner, value, *, kind="", primary=False):
 
 
 def switch_off(person):
-    person.profile.plugins_off = [PHONE_NUMBERS]
-    person.profile.save(update_fields=["plugins_off"])
+    """An administrator's decision: a built-in is theirs to switch, not the person's (#200)."""
+    from postulo.plugins.models import PluginPolicy
+
+    PluginPolicy.objects.create(
+        plugin=PHONE_NUMBERS, person=person, state=PluginPolicy.State.FORCED_OFF
+    )
 
 
 # ------------------------------------------------------------------ the invariant
@@ -168,9 +172,10 @@ def test_switching_it_back_on_finds_them_unchanged(contact, user):
     add(contact, user, "+351912345678", primary=True)
     add(contact, user, "+351211111111", kind=PhoneNumber.Kind.SWITCHBOARD)
 
+    from postulo.plugins.models import PluginPolicy
+
     switch_off(user)
-    user.profile.plugins_off = []
-    user.profile.save(update_fields=["plugins_off"])
+    PluginPolicy.objects.filter(person=user).delete()
 
     rows = phone_numbers.numbers_for(contact, user)
     assert [(row.number, row.kind) for row in rows] == [

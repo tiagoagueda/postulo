@@ -20,10 +20,12 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def single(user):
     """A person who has switched *Several telephone numbers* off for themselves."""
+    from postulo.plugins.models import PluginPolicy
     from postulo.plugins.phone_numbers import PHONE_NUMBERS
 
-    user.profile.plugins_off = [PHONE_NUMBERS]
-    user.profile.save(update_fields=["plugins_off"])
+    PluginPolicy.objects.create(
+        plugin=PHONE_NUMBERS, person=user, state=PluginPolicy.State.FORCED_OFF
+    )
     return user
 
 

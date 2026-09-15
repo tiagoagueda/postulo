@@ -511,6 +511,17 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- **What Postulo ships is the administrator's to switch, not yours — and is out of the
+  way until you ask.** *Settings → Plugins* offered a checkbox on every plugin, the built-in
+  ones included, so *Several telephone numbers*, the email notifier and the local store
+  were switches a person could untick for themselves. They no longer are. A plugin shipped
+  inside Postulo is decided by an administrator, for one person or for everybody, and the
+  page lists only what was installed on the instance unless *Show the plugins Postulo
+  ships* is ticked — and then shows them without a switch. The one thing that always shows
+  is a built-in an administrator decided for your account: a decision held over an account
+  never hides behind a check mark. **Breaking**: a choice you had made against a built-in
+  plugin no longer counts, and the upgrade forgets it. (#200)
+
 - **The support link is a QR code now, because a button can only be pressed by whoever is
   already holding the device.** A README is read on a laptop, shown over a shoulder,
   projected in a talk, pasted into a screenshot. In every one of those the *Buy me a coffee*

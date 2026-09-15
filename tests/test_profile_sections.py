@@ -63,8 +63,11 @@ def test_every_entry_points_at_a_part_of_the_page(client, user):
 
 
 def test_a_part_a_feature_switched_off_has_no_entry(client, user):
-    user.profile.plugins_off = [PHONE_NUMBERS]
-    user.profile.save(update_fields=["plugins_off"])
+    from postulo.plugins.models import PluginPolicy
+
+    PluginPolicy.objects.create(
+        plugin=PHONE_NUMBERS, person=user, state=PluginPolicy.State.FORCED_OFF
+    )
     client.force_login(user)
 
     html = client.get(reverse("accounts:profile")).content.decode()

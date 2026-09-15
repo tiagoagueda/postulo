@@ -10,12 +10,33 @@
     {% endblocktranslate %}
   </p>
 
+  {% comment %} What Postulo ships is an administrator's to switch, for you or for
+     everybody, and is left off this page unless asked for: a dozen locked rows drowned the
+     ones that are yours. The one exception is a built-in an administrator decided for your
+     account -- that row stays whatever the mark says, because a decision held over your
+     account must never hide behind a check mark (#200, #96). The mark is a GET, so the
+     page it shows can be bookmarked and it is forgotten the moment you leave; the box
+     submits itself where scripts run and the button beside it does the job where they do
+     not. {% endcomment %}
+  <form method="get" class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm" data-internal-mark>
+    <label class="tap-target inline-flex items-center gap-2">
+      <input type="checkbox" name="internal" value="1" data-autosubmit
+             {% if showing_internal %}checked{% endif %}>
+      <span>{% translate "Show the plugins Postulo ships" %}</span>
+    </label>
+    <noscript><button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Apply" %}</button></noscript>
+    <span class="text-xs text-ink-500 dark:text-ink-400">
+      {% translate "Those are switched by an administrator, for you or for everybody — never here." %}
+    </span>
+  </form>
+
   {% comment %} A form and a Save button, so this works with no JavaScript at all.
 
      A row that is not yours to change is shown disabled with the reason beside it rather
      than hidden. Hiding it would be the quiet version of the very thing this page exists
      to prevent: an administrator may decide a plugin for your account, and you are
-     entitled to see that they did and who they were.
+     entitled to see that they did and who they were. A row Postulo ships has no box at
+     all rather than a disabled one: a control that can never be used is not a control.
 
      A disabled checkbox submits nothing, which is why the view only acts on rows it has
      already established are yours.
@@ -23,27 +44,39 @@
   {% if rows %}
     <form method="post" class="card p-0">
       {% csrf_token %}
+      {% if showing_internal %}<input type="hidden" name="internal" value="1">{% endif %}
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         {% for row in rows %}
-          <li class="flex items-start gap-3 px-4 py-3" data-plugin="{{ row.name }}">
+          <li class="flex items-start gap-3 px-4 py-3" data-plugin="{{ row.name }}"{% if row.internal %} data-shipped{% endif %}>
             {% comment %} `state-glow`: green around a box that is ticked, red around one
                that is not, so a dozen rows can be read down at a glance rather than one at a
                time. It says nothing the checkbox does not already say to a screen reader.
             {% endcomment %}
-            <input type="checkbox" name="on" value="{{ row.name }}" id="plugin-{{ row.name }}"
-                   class="state-glow mt-1"
-                   {% if row.on %}checked{% endif %}
-                   {% if not row.theirs %}disabled aria-describedby="why-{{ row.name }}"{% endif %}>
+            {% if row.internal %}
+              <span class="mt-1 inline-block size-3.5 shrink-0" aria-hidden="true"></span>
+            {% else %}
+              <input type="checkbox" name="on" value="{{ row.name }}" id="plugin-{{ row.name }}"
+                     class="state-glow mt-1"
+                     {% if row.on %}checked{% endif %}
+                     {% if not row.theirs %}disabled aria-describedby="why-{{ row.name }}"{% endif %}>
+            {% endif %}
             <div class="min-w-0 flex-1">
               {% comment %} The checkbox is 13×13 and the browser decides that, so the label
                  that switches it is the target. At 19 pixels high it passed SC 2.5.8 only on the
                  spacing exception -- these rows are tall and nothing else is near. That is a thin
                  thing to rest on: one more control in the row and it stops being true. `tap-target`
                  makes it pass on its size instead (#115). {% endcomment %}
+              {% if row.internal %}
+                <p class="font-medium text-ink-500 dark:text-ink-400">
+                  {{ row.label }}
+                  <span class="ms-1 text-xs font-normal">{% if row.on %}{% translate "on" %}{% else %}{% translate "off" %}{% endif %}</span>
+                </p>
+              {% else %}
               <label for="plugin-{{ row.name }}"
                      class="tap-target font-medium {% if not row.theirs %}text-ink-500 dark:text-ink-400{% endif %}">
                 {{ row.label }}
               </label>
+              {% endif %}
               <span class="ms-1 inline-flex flex-wrap items-center gap-1">
                 {% include "partials/plugin_tags.html" with kind_label=row.kind_label kind_tone=row.kind_tone provenance=row.provenance provenance_label=row.provenance_label provenance_explanation=row.provenance_explanation %}
               </span>
@@ -68,7 +101,7 @@
     </form>
   {% else %}
     <div class="card text-sm text-ink-500 dark:text-ink-400">
-      {% translate "Nothing is installed here that you can turn on or off." %}
+      {% translate "Nothing installed on this instance is yours to turn on or off. What Postulo itself ships is behind the mark above." %}
     </div>
   {% endif %}
 

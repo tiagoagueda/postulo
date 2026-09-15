@@ -39,8 +39,15 @@ def admin(db):
 # ------------------------------------------------------------- the four states
 
 
-def test_nothing_decided_means_available_and_theirs(user):
+def test_nothing_decided_means_on_and_an_administrators_for_what_postulo_ships(user):
+    """A built-in is never the person's to switch (#200)."""
     decision = policy.decide(PLUGIN, user)
+    assert decision.on and decision.offered and not decision.theirs
+    assert decision.decided_by == "shipped"
+
+
+def test_nothing_decided_means_available_and_theirs_for_what_was_installed(user, third_party):
+    decision = policy.decide(third_party, user)
     assert decision.on and decision.offered and decision.theirs
     assert decision.decided_by == "default"
 
@@ -106,16 +113,43 @@ def test_switched_off_for_the_instance_beats_everything(user, tmp_path, settings
 # ------------------------------------------------------- the person's own choice
 
 
-def test_a_person_may_switch_an_available_plugin_off(user):
-    assert policy.set_choice(user, PLUGIN, on=False)
+def test_a_person_may_switch_an_available_plugin_off(user, third_party):
+    assert policy.set_choice(user, third_party, on=False)
 
-    decision = policy.decide(PLUGIN, user)
+    decision = policy.decide(third_party, user)
     assert not decision.on
     assert decision.theirs, "still theirs to change back"
     assert decision.decided_by == "person"
 
-    assert policy.set_choice(user, PLUGIN, on=True)
-    assert policy.decide(PLUGIN, user).on
+    assert policy.set_choice(user, third_party, on=True)
+    assert policy.decide(third_party, user).on
+
+
+def test_a_person_may_not_switch_off_what_postulo_ships(user):
+    """The switch is refused, and a name left in the list from before #200 is not read."""
+    assert not policy.set_choice(user, PLUGIN, on=False)
+    assert user.profile.plugins_off == []
+
+    user.profile.plugins_off = [PLUGIN]
+    user.profile.save(update_fields=["plugins_off"])
+    assert policy.decide(PLUGIN, user).on, "the list is not consulted for a built-in"
+
+
+def test_the_upgrade_forgets_choices_made_against_what_postulo_ships(user, third_party):
+    from importlib import import_module
+
+    from django.apps import apps
+
+    forget = import_module(
+        "postulo.accounts.migrations.0017_forget_choices_about_shipped_plugins"
+    ).forget
+    user.profile.plugins_off = [PLUGIN, third_party]
+    user.profile.save(update_fields=["plugins_off"])
+
+    forget(apps, None)
+
+    user.profile.refresh_from_db()
+    assert user.profile.plugins_off == [third_party], "only the built-in is forgotten"
 
 
 @pytest.mark.parametrize(
@@ -132,19 +166,19 @@ def test_a_person_cannot_take_back_a_decision_that_was_made_for_them(user, state
     assert user.profile.plugins_off == []
 
 
-def test_a_choice_survives_being_overruled_and_returns(user):
+def test_a_choice_survives_being_overruled_and_returns(user, third_party):
     """Nothing is destroyed on the way. An administrator's decision hides the person's
     choice; removing the decision gives it back exactly as it was."""
-    policy.set_choice(user, PLUGIN, on=False)
+    policy.set_choice(user, third_party, on=False)
     row = PluginPolicy.objects.create(
-        plugin=PLUGIN, person=user, state=PluginPolicy.State.FORCED_ON
+        plugin=third_party, person=user, state=PluginPolicy.State.FORCED_ON
     )
-    assert policy.decide(PLUGIN, user).on
+    assert policy.decide(third_party, user).on
 
     row.delete()
 
-    assert not policy.decide(PLUGIN, user).on, "their own choice came back"
-    assert user.profile.plugins_off == [PLUGIN]
+    assert not policy.decide(third_party, user).on, "their own choice came back"
+    assert user.profile.plugins_off == [third_party]
 
 
 # ----------------------------------------------------------- what it governs
@@ -212,7 +246,7 @@ def test_setting_it_back_to_available_removes_the_row(client, admin, user):
     client.post(reverse("server:person_plugins", args=[user.pk]), {f"state:{PLUGIN}": "available"})
 
     assert not PluginPolicy.objects.filter(plugin=PLUGIN, person=user).exists()
-    assert policy.decide(PLUGIN, user).theirs
+    assert policy.decide(PLUGIN, user).decided_by == "shipped", "back to nobody's decision"
 
 
 def test_the_page_says_who_decided_and_when(client, admin, user):

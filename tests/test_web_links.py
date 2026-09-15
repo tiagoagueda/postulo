@@ -45,8 +45,13 @@ def add(holder, owner, url, *, kind=SOCIAL, label="", primary=False):
 
 
 def switch_off(person, *plugins):
-    person.profile.plugins_off = list(plugins or EVERY_SWITCH)
-    person.profile.save(update_fields=["plugins_off"])
+    """An administrator's decision, one row per kind: a built-in is theirs to switch (#200)."""
+    from postulo.plugins.models import PluginPolicy
+
+    for plugin in plugins or EVERY_SWITCH:
+        PluginPolicy.objects.create(
+            plugin=plugin, person=person, state=PluginPolicy.State.FORCED_OFF
+        )
 
 
 def rows(prefix, *entries, primary=None):
@@ -177,9 +182,10 @@ def test_switching_it_back_on_finds_them_unchanged(contact, user):
     add(contact, user, "https://cave.example", kind=WEBSITE, primary=True)
     add(contact, user, "https://blog.cave.example", kind=WEBSITE, label="Blog")
 
+    from postulo.plugins.models import PluginPolicy
+
     switch_off(user)
-    user.profile.plugins_off = []
-    user.profile.save(update_fields=["plugins_off"])
+    PluginPolicy.objects.filter(person=user).delete()
 
     rows_after = web_links.links_for(contact, user)
     assert [(row.url, row.label) for row in rows_after] == [

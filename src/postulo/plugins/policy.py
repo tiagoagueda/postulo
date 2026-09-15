@@ -12,7 +12,11 @@ for.
 2. *An administrator's decision about this person.*
 3. *An administrator's decision about everybody.*
 4. *The person's own choice*, which applies wherever an administrator has not taken it
-   away.
+   away -- **and only to a plugin installed on the instance.** A plugin shipped inside
+   Postulo is the administrator's to switch, for one person or for everybody, and never
+   the person's (#200): what Postulo itself does is a decision about the instance, taken
+   by whoever runs it, and a page of a dozen built-in switches was a page of things
+   nobody meant to be a choice.
 
 **Forcing a plugin on does not make it run.** A notifier, store or sync needs a
 ``Connection`` holding credentials only the person can supply, so *on* means "this is
@@ -61,7 +65,9 @@ class Decision:
     offered: bool
     #: Whether they may change it.
     theirs: bool
-    #: ``instance``, ``administrator``, ``person`` or ``default`` — for #96 to show.
+    #: ``instance``, ``administrator``, ``shipped``, ``person`` or ``default`` — for #96
+    #: to show. ``shipped`` is a built-in nobody decided: on, and an administrator's to
+    #: switch (#200).
     decided_by: str
     #: The administrator who decided, where one did and is still an account. A person is
     #: entitled to know *who*, not merely that somebody did.
@@ -75,6 +81,9 @@ class Decision:
         return {
             "instance": _("Switched off for this whole instance."),
             "administrator": _("An administrator decided this for your account."),
+            "shipped": _(
+                "Shipped inside Postulo. An administrator switches it, for you or for everybody."
+            ),
             "person": _("You chose this."),
             "default": _("Available; you have not changed it."),
             "infrastructure": _("How this instance works, rather than a choice anybody holds."),
@@ -88,6 +97,18 @@ def _switched_off_for_the_instance(name: str) -> bool:
         return canonicalise(name) in disabled_names()
     except Exception:  # pragma: no cover - a broken record must not decide anything
         return False
+
+
+def shipped_inside(plugin_name: str) -> bool:
+    """Whether this plugin ships inside Postulo, which makes it the administrator's.
+
+    The same question `installing.is_internal` answers for the plugins page: a built-in
+    registered by an app's `ready()`, as against one installed on the volume or loaded
+    from an entry point. Asked by name because that is what a policy row holds.
+    """
+    from .installing import is_internal
+
+    return is_internal(plugin_name)
 
 
 def is_ungoverned(plugin_name: str) -> bool:
@@ -140,6 +161,12 @@ def decide(plugin_name: str, person) -> Decision:
             on=False, offered=True, theirs=False, decided_by="administrator", who=row.decided_by
         )
 
+    if shipped_inside(plugin_name):
+        # Postulo's own: on unless an administrator said otherwise above, and never the
+        # person's to switch. A name the person's list still holds from before #200 is
+        # not read, and the migration that came with it emptied those out.
+        return Decision(on=True, offered=True, theirs=False, decided_by="shipped")
+
     chosen_off = plugin_name in _their_choices(person)
     return Decision(
         on=not chosen_off,
@@ -181,7 +208,7 @@ def set_choice(person, plugin_name: str, *, on: bool) -> bool:
     return True
 
 
-def overview(person) -> list[dict]:
+def overview(person, *, internal: bool = False) -> list[dict]:
     """Every plugin this person can see, what it is doing, and who said so.
 
     The page this feeds (#96) exists for one row of it: the one an administrator decided.
@@ -191,6 +218,12 @@ def overview(person) -> list[dict]:
     Plugins that are *unavailable* are left out — that is what unavailable means. A plugin
     forced off is included, because being told it was switched off for you is the whole
     difference between the two states.
+
+    **What Postulo ships is left out unless asked for** (`internal=True`), because it is
+    not the person's to switch and a dozen locked rows drowned the ones that are (#200).
+    The exception is exactly the row the page exists for: a built-in an administrator has
+    decided for this person, or for everybody, stays on the page whatever was asked, so a
+    decision held over an account never hides behind a check mark.
     """
     from . import base, installing, kinds
     from .registry import plugins
@@ -206,10 +239,14 @@ def overview(person) -> list[dict]:
             decision = decide(plugin.name, person)
             if not decision.offered:
                 continue
+            shipped = shipped_inside(plugin.name)
+            if shipped and not internal and decision.decided_by != "administrator":
+                continue
             mark = marks.get(plugin.name, {})
             rows.append(
                 {
                     "name": plugin.name,
+                    "internal": shipped,
                     "label": base.label_of(plugin),
                     "description": base.description_of(plugin),
                     "kind": kind,
