@@ -10,6 +10,7 @@ from pathlib import Path
 import environ
 
 from postulo.accounts.validators import USERNAME_BLACKLIST
+from postulo.config import sqlite
 from postulo.core import languages, proxy
 
 # src/postulo/config/settings/base.py -> src/postulo
@@ -118,6 +119,12 @@ DATABASES = {
     ),
 }
 DATABASES["default"].setdefault("ATOMIC_REQUESTS", True)
+
+# Several workers share one SQLite file, and its defaults fail the moment two of them
+# write at once: an immediate transaction, a write-ahead log and a longer wait make them
+# take turns instead. `config/sqlite.py` says why, and leaves an in-memory database and
+# anything the operator set alone (#206).
+sqlite.apply_options(DATABASES["default"])
 
 # SQLite creates the database file, but not the directory holding it, so a fresh
 # install fails on its very first command with "unable to open database file". The

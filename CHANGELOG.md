@@ -668,6 +668,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Adding a company answered a 500 when the form was sent twice, though the company was
+  saved.** A double click on *Save* posted the form twice in one second; the first saved
+  and redirected, the second hit SQLite's *database is locked* and the browser showed the
+  500 — which invites a retry, and a retry makes a duplicate. Three causes, three fixes.
+  SQLite's default transaction takes no lock until it writes and refuses at once when it
+  cannot upgrade: a file database now opens with immediate transactions, a write-ahead
+  log and a twenty-second wait, so two writers take turns. Nothing stopped a form being
+  sent twice: every form that posts is let through once, its button greyed until the
+  page changes, and the back button gets a form that works again; with scripts blocked
+  nothing changes. Backups already use SQLite's own backup API, so a copy under the
+  write-ahead log is consistent. (#206)
+
 - **The career-order checkbox under *Settings → Appearance* described itself with an id
   that was not on the page.** Django names the help text in the checkbox's
   `aria-describedby`; the template drew the help inside the label without the id, so a

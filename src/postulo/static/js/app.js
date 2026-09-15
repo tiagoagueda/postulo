@@ -191,6 +191,56 @@
     }
   }
 
+  /* ------------------------------------------------------ a form is sent once
+   *
+   * A double click on Save, or Enter and then a click, posted a company form twice in
+   * one second; the second request answered a 500 for a company the first had saved, and
+   * the browser showed the 500 (#206). The first submit marks the form and its button;
+   * a second submit of a marked form is stopped here. The button is not `disabled`,
+   * because a button disabled during its own submit event drops out of the form data --
+   * and the dashboard's arrows are buttons whose name and value *are* the request. Forms
+   * htmx sends are its own business, and it swaps them away. `pageshow` clears the mark,
+   * so the back button gets a form that works again; with this script blocked the form
+   * is what it always was.
+   */
+  function submitButtons(form) {
+    return Array.prototype.slice.call(
+      form.querySelectorAll("button:not([type]), button[type=submit], input[type=submit]")
+    );
+  }
+
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+    if (!form || form.tagName !== "FORM" || event.defaultPrevented) {
+      return;
+    }
+    if ((form.getAttribute("method") || "get").toLowerCase() !== "post") {
+      return;
+    }
+    if (form.hasAttribute("hx-post") || form.hasAttribute("hx-get") || form.hasAttribute("data-theme-switch")) {
+      return;
+    }
+    if (form.dataset.submitted) {
+      event.preventDefault();
+      return;
+    }
+    form.dataset.submitted = "1";
+    submitButtons(form).forEach(function (button) {
+      button.setAttribute("aria-disabled", "true");
+      button.classList.add("opacity-60", "pointer-events-none");
+    });
+  });
+
+  window.addEventListener("pageshow", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("form[data-submitted]"), function (form) {
+      delete form.dataset.submitted;
+      submitButtons(form).forEach(function (button) {
+        button.removeAttribute("aria-disabled");
+        button.classList.remove("opacity-60", "pointer-events-none");
+      });
+    });
+  });
+
   document.addEventListener("submit", function (event) {
     var form = event.target.closest("[data-theme-switch]");
     if (!form) {
