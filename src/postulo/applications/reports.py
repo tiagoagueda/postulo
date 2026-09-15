@@ -34,10 +34,13 @@ from itertools import pairwise
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.jobs.models import Company, CompanyKind
+
 from .analytics import RESPONSE_STATUSES
 from .models import (
     Application,
     ApplicationEvent,
+    Channel,
     Interview,
     InterviewOutcome,
     Status,
@@ -362,6 +365,15 @@ class Report:
     drafts: int = 0
     produced_at: dt.datetime | None = None
     person: str = ""
+    #: The public employment service this person has recorded, if any, and their adviser
+    #: there: whom the report is for, on the page and on the document (#202). Empty means
+    #: the report is addressed to nobody in particular, as it always was.
+    office: str = ""
+    adviser: str = ""
+    #: Applications in the period made through the office's own listings -- the number
+    #: the office asks first. Counted whether or not there is an office, so it is a fact of
+    #: the period either way, and shown when there is one.
+    through_service: int = 0
 
     @property
     def total(self) -> int:
@@ -453,8 +465,25 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
         for name, count in sorted(by_source.items(), key=lambda pair: (-pair[1], pair[0]))
     ]
 
+    report.through_service = sum(
+        1 for application in inside if application.channel == Channel.EMPLOYMENT_SERVICE
+    )
+    office = (
+        Company.objects.for_user(user)
+        .filter(kind=CompanyKind.EMPLOYMENT_SERVICE)
+        .order_by("pk")
+        .first()
+    )
+    if office is not None:
+        report.office = office.name
+        adviser = office.contacts.order_by("pk").first()
+        report.adviser = adviser.name if adviser else ""
+
     by_industry: dict[str, int] = {}
     for application in inside:
+        # The office is not an employer, so its industries are nobody's effort (#202).
+        if application.posting.company.kind != CompanyKind.EMPLOYER:
+            continue
         names = [i.name for i in application.posting.company.industries.all()] or [unrecorded]
         for name in names:
             by_industry[name] = by_industry.get(name, 0) + 1

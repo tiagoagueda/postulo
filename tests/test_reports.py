@@ -397,6 +397,61 @@ def test_a_company_in_three_fields_counts_in_all_three(user):
     assert set(names) == {"Software", "Finance"}
 
 
+def test_the_employment_service_is_not_an_employer_in_the_tallies(user):
+    """An application recorded under the office -- a workshop, a placement, an offer of
+    its own -- is still an application sent, and the office's industries are nobody's
+    effort (#202)."""
+    from postulo.jobs.models import CompanyKind, Industry
+
+    application = sent(user, on=dt.date(2026, 3, 2))
+    industry, _made = Industry.objects.get_or_create(owner=user, name="Software")
+    application.posting.company.industries.add(industry)
+    office = sent(user, on=dt.date(2026, 3, 3), company="France Travail", role="Workshop")
+    office.posting.company.kind = CompanyKind.EMPLOYMENT_SERVICE
+    office.posting.company.save()
+    public, _made = Industry.objects.get_or_create(owner=user, name="Public administration")
+    office.posting.company.industries.add(public)
+
+    report = reports.build(user, march(), today=dt.date(2026, 3, 31))
+
+    assert report.total == 2, "sent is sent"
+    assert [row.name for row in report.industries] == ["Software"]
+
+
+def test_the_report_is_addressed_to_the_office_when_there_is_one(client, user):
+    """For France Travail, adviser so-and-so, and how many came through its listings; with
+    no office recorded, none of it (#202)."""
+    from django.template.loader import render_to_string
+
+    from postulo.applications.models import Channel
+    from postulo.jobs.models import Company, CompanyKind, Contact
+
+    first = sent(user, on=dt.date(2026, 3, 2))
+    first.channel = Channel.EMPLOYMENT_SERVICE
+    first.save()
+    sent(user, on=dt.date(2026, 3, 3), company="Black Mesa")
+
+    report = reports.build(user, march(), today=dt.date(2026, 3, 31))
+    assert report.office == "" and report.adviser == ""
+    assert report.through_service == 1, "a fact of the period whether or not there is an office"
+    client.force_login(user)
+    page = client.get(reverse(PAGE), {"month": "2026-03"}).content.decode()
+    assert "Through the employment service" not in page
+
+    office = Company.objects.create(
+        owner=user, name="France Travail", kind=CompanyKind.EMPLOYMENT_SERVICE
+    )
+    Contact.objects.create(owner=user, company=office, name="Camille Durand", role="Adviser")
+
+    report = reports.build(user, march(), today=dt.date(2026, 3, 31))
+    assert report.office == "France Travail" and report.adviser == "Camille Durand"
+    page = client.get(reverse(PAGE), {"month": "2026-03"}).content.decode()
+    assert "For France Travail" in page and "Camille Durand" in page
+    assert "Through the employment service" in page
+    document = render_to_string("applications/report_print.html", {"report": report})
+    assert "For France Travail" in document and "Camille Durand" in document
+
+
 # ------------------------------------------------------------------- the page
 
 

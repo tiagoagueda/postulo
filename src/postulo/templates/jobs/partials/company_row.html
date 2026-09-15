@@ -21,8 +21,13 @@
           {% url 'jobs:company_cell' company.pk 'name' as cell_url %}
           {% url 'jobs:company_update' company.pk as form_url %}
           {% include "partials/table/cell.html" with object=company value=company.name editing=False message="" cell_url=cell_url form_url=form_url %}
+          {% if company.is_employment_service %}
+            <span class="chip py-0 text-xs"><span class="chip-text">{{ company.get_kind_display }}</span></span>
+          {% endif %}
         </span>
       </td>
+    {% elif column.key == 'kind' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.get_kind_display }}</td>
     {% elif column.key == 'location' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.location|default:"—" }}</td>
     {% elif column.key == 'industry' %}

@@ -171,6 +171,37 @@ def test_the_round_trip_preserves_what_matters(populated, other_user):
     assert [tag.name for tag in application.tags.all()] == ["Dream job"]
 
 
+def test_the_kind_of_a_company_travels_and_an_older_archive_is_employers(populated, other_user):
+    """Format 16 writes the kind (#202); an archive from before it named none, and every
+    company in it was recorded as an employer, which is what it stays."""
+    from postulo.jobs.models import CompanyKind
+
+    Company.objects.create(
+        owner=populated, name="France Travail", kind=CompanyKind.EMPLOYMENT_SERVICE
+    )
+    _archive, document = read_archive(populated)
+    assert document["postulo"]["format"] == 16
+    kinds = {row["name"]: row["kind"] for row in document["companies"]}
+    assert kinds == {"Black Mesa": "employer", "France Travail": "employment_service"}
+
+    importer.load(other_user, zipfile.ZipFile(export_module.write_archive(populated)))
+    restored = {c.name: c.kind for c in Company.objects.for_user(other_user)}
+    assert restored == {"Black Mesa": "employer", "France Travail": "employment_service"}
+
+    # The same archive, written the way format 15 wrote it: no kind anywhere, and one
+    # that is not a kind, which a stranger's file could say.
+    document["postulo"]["format"] = 15
+    document["companies"][0].pop("kind")
+    document["companies"][1]["kind"] = "planet"
+    Company.objects.for_user(other_user).delete()
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("postulo.json", json.dumps(document, default=str))
+    buffer.seek(0)
+    importer.load(other_user, zipfile.ZipFile(buffer), force=True)
+    assert {c.kind for c in Company.objects.for_user(other_user)} == {"employer"}
+
+
 def test_the_timeline_survives_the_round_trip(populated, other_user):
     """A copy without the history would be a list, not a record."""
     archive, _document = read_archive(populated)

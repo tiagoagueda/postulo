@@ -17,8 +17,8 @@ class IdentifierInline(admin.TabularInline):
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ("name", "owner", "location", "industry_names")
-    list_filter = ("owner",)
+    list_display = ("name", "kind", "owner", "location", "industry_names")
+    list_filter = ("owner", "kind")
     search_fields = ("name", "location", "industries__name")
     filter_horizontal = ("industries",)
     inlines = (IdentifierInline, ContactInline)

@@ -14,6 +14,14 @@
       <p class="text-sm text-ink-500 dark:text-ink-400">
         {% translate "What was sent, how regularly, and what came back. Nothing outside the period is counted." %}
       </p>
+      {% if report.office %}
+        {% comment %} Addressed to the office the person is registered with, when they have
+           recorded one, and to their adviser there when they have (#202). {% endcomment %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% blocktranslate with office=report.office %}For {{ office }}{% endblocktranslate %}{% if report.adviser %}
+            · {% blocktranslate with adviser=report.adviser %}adviser {{ adviser }}{% endblocktranslate %}{% endif %}
+        </p>
+      {% endif %}
     </div>
     <div class="flex flex-wrap items-center gap-2">
       <a href="{% url 'applications:report_csv' %}?{{ request.GET.urlencode }}" class="btn-ghost">
@@ -126,6 +134,12 @@
         <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Weeks in a row, up to now" %}</dt>
         <dd class="text-2xl font-semibold tabular-nums">{{ report.cadence.current_run }}</dd>
       </div>
+      {% if report.office %}
+        <div>
+          <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Through the employment service" %}</dt>
+          <dd class="text-2xl font-semibold tabular-nums">{{ report.through_service }}</dd>
+        </div>
+      {% endif %}
     </dl>
 
     <ul class="space-y-3">

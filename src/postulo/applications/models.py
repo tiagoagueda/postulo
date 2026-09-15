@@ -81,6 +81,10 @@ BOARD_STATUSES = (
 class Channel(models.TextChoices):
     COMPANY_SITE = "company_site", _("Company website")
     JOB_BOARD = "job_board", _("Job board")
+    #: The listings of the public employment service the person is registered with, so
+    #: the report can say how many came from the office's own board -- which is the
+    #: number the office asks first (#202).
+    EMPLOYMENT_SERVICE = "employment_service", _("Employment service")
     EMAIL = "email", _("Email")
     REFERRAL = "referral", _("Referral")
     RECRUITER = "recruiter", _("Recruiter")

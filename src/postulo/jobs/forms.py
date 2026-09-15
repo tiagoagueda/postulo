@@ -13,8 +13,16 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core import phone_field, phone_numbers, phones, web_links
 
-from . import identifiers, industries, logos, structure
-from .models import Company, CompanyIdentifier, Contact, Department, Industry, JobPosting
+from . import employment_services, identifiers, industries, logos, structure
+from .models import (
+    Company,
+    CompanyIdentifier,
+    CompanyKind,
+    Contact,
+    Department,
+    Industry,
+    JobPosting,
+)
 
 
 class OwnerScopedModelForm(forms.ModelForm):
@@ -30,8 +38,23 @@ class OwnerScopedModelForm(forms.ModelForm):
 
 
 class CompanyForm(OwnerScopedModelForm):
-    """A company, and the industries it operates in: pick from your own, or type new ones."""
+    """A company, and the industries it operates in: pick from your own, or type new ones.
 
+    Or the employment service the person is registered with (#202): a kind, and beside it
+    the services Postulo knows by country, so that adding France Travail is a choice
+    rather than a typing exercise. Picking one fills the name and the website where the
+    person left them blank; what they typed wins.
+    """
+
+    known_service = forms.ChoiceField(
+        label=_("A known service"),
+        required=False,
+        help_text=_(
+            "Pick the public employment service you are registered with and leave the "
+            "name blank; Postulo fills in the name and the website. Anything you type "
+            "here is kept instead."
+        ),
+    )
     industries = forms.ModelMultipleChoiceField(
         label=_("Industries"),
         queryset=Industry.objects.none(),
@@ -64,6 +87,8 @@ class CompanyForm(OwnerScopedModelForm):
 
     field_order = (
         "name",
+        "kind",
+        "known_service",
         "website",
         "careers_url",
         "location",
@@ -79,6 +104,7 @@ class CompanyForm(OwnerScopedModelForm):
         model = Company
         fields = (
             "name",
+            "kind",
             "parent",
             "website",
             "careers_url",
@@ -112,6 +138,20 @@ class CompanyForm(OwnerScopedModelForm):
                 companies = companies.exclude(pk__in=excluded)
             self.fields["parent"].queryset = companies
             self.fields["parent"].empty_label = _("Not part of another company")
+
+        if "kind" in self.fields:
+            # Not required, so that a form posted without it -- an older client, a script,
+            # a test that predates kinds -- records an employer, which is the default.
+            self.fields["kind"].required = False
+
+        if "known_service" in self.fields:
+            self.fields["known_service"].choices = [
+                ("", _("Not one of these")),
+                *employment_services.grouped(),
+            ]
+            # The name may be left blank when a known service is picked, since the
+            # service has one; `clean` puts it back to required otherwise.
+            self.fields["name"].required = False
 
         if "industries" in self.fields:
             self.fields["industries"].queryset = Industry.objects.for_user(self.user)
@@ -181,6 +221,34 @@ class CompanyForm(OwnerScopedModelForm):
         names = Industry.split(self.cleaned_data.get("new_industries", ""))
         if names:
             company.industries.add(*Industry.named(company.owner, names))
+
+    def clean(self) -> dict:
+        """A known service picked means an employment service, named and addressed as the
+        registry has it wherever the person wrote nothing; otherwise the name is required,
+        exactly as it always was (#202)."""
+        data = super().clean()
+        if "kind" in self.fields and not data.get("kind"):
+            data["kind"] = CompanyKind.EMPLOYER
+        if "known_service" not in self.fields:
+            return data
+        service = employment_services.by_key(data.get("known_service", ""))
+        name = (data.get("name") or "").strip()
+        if service is not None:
+            data["kind"] = CompanyKind.EMPLOYMENT_SERVICE
+            if not name:
+                data["name"] = service.name
+                # The registry's name may clash with one the person already has, and
+                # `clean_name` ran on a blank; the same refusal, in the same words.
+                clash = Company.objects.for_user(self.user).filter(name__iexact=service.name)
+                if self.instance.pk:
+                    clash = clash.exclude(pk=self.instance.pk)
+                if clash.exists():
+                    self.add_error("name", _("You already have a company with that name."))
+            if not data.get("website"):
+                data["website"] = service.website
+        elif not name and "name" not in self.errors:
+            self.add_error("name", self.fields["name"].error_messages["required"])
+        return data
 
     def clean_name(self) -> str:
         """Refuse a duplicate before the database constraint does.

@@ -290,6 +290,20 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- **The employment service is a kind of company.** France Travail, IEFP, the Bundesagentur
+  für Arbeit, SEPE, Jobcentre Plus: the office a job seeker is registered with is dealt with
+  throughout a search — an adviser, appointments, the report — and it is not an employer,
+  yet the only way to record it was as one, where it was then counted as one. A company
+  has a *kind* now, *employer* or *employment service*, and the company form offers the
+  services Postulo knows by country: pick yours and leave the name blank, and the name and
+  website are filled in; what you type wins. The office is left out of the report's
+  tallies by industry, the report is addressed to it — *For France Travail, adviser
+  so-and-so* — on the page and on the PDF, and *Employment service* is a new answer to
+  *applied through*, counted separately on the report because that is the number the
+  office asks first. The companies page marks the office beside its name and can narrow
+  by kind. The export carries the kind (format 16); an older archive restores as
+  employers, which is what every company recorded before there were kinds is. (#202)
+
 - **A report you download is filed, and an email is not a kind.** The two document kinds
   #133 deferred are decided. A job-search report was already composed, rendered and dated;
   pressing *Download PDF* now also files it under Sent documents as a *report* — the text

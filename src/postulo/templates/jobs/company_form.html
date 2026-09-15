@@ -13,6 +13,11 @@
       {% endif %}
       <div class="card mb-6">
         {% include "partials/field.html" with field=form.name %}
+        {% comment %} Employer, or the public employment service this person is registered
+           with; and the services Postulo knows by country, so that one is picked rather
+           than typed. The name may stay blank when one is picked (#202). {% endcomment %}
+        {% include "partials/field.html" with field=form.kind %}
+        {% include "partials/field.html" with field=form.known_service %}
         {% include "partials/field.html" with field=form.website %}
         {% include "partials/field.html" with field=form.careers_url %}
         {% include "partials/field.html" with field=form.location %}

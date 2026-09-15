@@ -34,6 +34,8 @@ class IdentifierIn(Schema):
 class CompanyOut(Schema):
     id: int
     name: str
+    #: ``employer``, or ``employment_service`` for the office the person is registered with.
+    kind: str = "employer"
     website: str = ""
     careers_url: str = ""
     location: str = ""
@@ -82,6 +84,10 @@ class CompanyDetailOut(CompanyOut):
 
 class CompanyIn(Schema):
     name: str = Field(max_length=200)
+    kind: str = Field(
+        default="",
+        description="employer (the default) or employment_service; anything else is ignored.",
+    )
     website: str = Field(default="", max_length=200)
     careers_url: str = Field(default="", max_length=200)
     location: str = Field(default="", max_length=200)
@@ -511,6 +517,7 @@ def company_out(company, *, detail: bool = False) -> dict:
     data = {
         "id": company.pk,
         "name": company.name,
+        "kind": company.kind,
         "website": company.website,
         "careers_url": company.careers_url,
         "location": company.location,

@@ -7,7 +7,7 @@ from ninja.pagination import paginate
 
 from postulo.applications.services import get_or_create_company
 from postulo.jobs import identifiers
-from postulo.jobs.models import Company, Contact, Industry
+from postulo.jobs.models import Company, CompanyKind, Contact, Industry
 
 from ..auth import scope
 from ..schemas import (
@@ -52,6 +52,8 @@ def add_company(request, payload: CompanyIn):
         value = getattr(payload, field)
         if value:
             setattr(company, field, value)
+    if payload.kind in CompanyKind.values:
+        company.kind = payload.kind
     company.save()
     if payload.industries:
         company.industries.add(*Industry.named(request.auth.owner, payload.industries))

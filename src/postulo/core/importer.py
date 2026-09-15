@@ -313,7 +313,15 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         UploadedDocument,
     )
     from postulo.jobs import identifiers
-    from postulo.jobs.models import Capture, Company, Contact, Department, Industry, JobPosting
+    from postulo.jobs.models import (
+        Capture,
+        Company,
+        CompanyKind,
+        Contact,
+        Department,
+        Industry,
+        JobPosting,
+    )
     from postulo.jobs.services import set_identifiers
     from postulo.resume import models as resume
 
@@ -493,6 +501,10 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         # what actually get duplicated when an import is forced. An identifier both
         # sides carry is a stronger match than the spelling.
         name = company_entry.pop("name", "")
+        # Format 16 writes the kind. An archive without it, or with a kind this Postulo
+        # does not know, is employers all the way down, which is what it was (#202).
+        if company_entry.get("kind") not in CompanyKind.values:
+            company_entry.pop("kind", None)
         company = None
         for entry in identifier_entries:
             if entry.get("scheme") != identifiers.OTHER:

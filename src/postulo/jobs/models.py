@@ -94,6 +94,15 @@ class Industry(OwnedModel):
 
 
 class CompanyQuerySet(OwnedQuerySet):
+    def employers(self) -> CompanyQuerySet:
+        """The companies that are employers: everything but the employment service (#202).
+
+        The office a person is registered with is recorded as a company because it has
+        contacts, addresses and postings like one, and it is not an employer; wherever
+        employers are counted or offered, this is the set.
+        """
+        return self.filter(kind=CompanyKind.EMPLOYER)
+
     def with_table_data(self) -> CompanyQuerySet:
         """Annotate the counts, dates and identifiers the companies table can show, sort by
         and narrow on.
@@ -135,8 +144,25 @@ def logo_upload_to(instance, filename: str) -> str:
     return f"logos/{instance.owner_id}/{filename}"
 
 
+class CompanyKind(models.TextChoices):
+    """What a company is to the person recording it (#202).
+
+    An *employer* is what every company was until there were kinds, and what every
+    existing row is. An *employment service* is the public office a job seeker is
+    registered with -- France Travail, IEFP, the Bundesagentur für Arbeit, Jobcentre Plus
+    -- dealt with throughout a search and never applied to. A recruitment agency is not a
+    third kind: an agency's listings are applied to, and *recruiter* is already the
+    channel an application through one records.
+    """
+
+    EMPLOYER = "employer", _("Employer")
+    EMPLOYMENT_SERVICE = "employment_service", _("Employment service")
+
+
 class Company(OwnedModel):
-    """An employer, as recorded by one applicant.
+    """An employer, as recorded by one applicant -- or the employment service they are
+    registered with, which has contacts, addresses and postings like an employer and is
+    counted as one nowhere (#202).
 
     Companies are owner-scoped rather than shared. Two people using the same instance
     each keep their own notes on the same employer, and neither can see the other's
@@ -144,6 +170,11 @@ class Company(OwnedModel):
     """
 
     name = models.CharField(_("name"), max_length=200)
+    #: A column with a default, so the migration invents nothing: every company recorded
+    #: before there were kinds is an employer, which is what it was recorded as.
+    kind = models.CharField(
+        _("kind"), max_length=20, choices=CompanyKind, default=CompanyKind.EMPLOYER
+    )
     #: The company this one belongs to, if any. A tree rather than a graph — at most one
     #: parent — because that is what an ownership structure is and it keeps every question
     #: answerable in a walk rather than a search. Nothing is inherited: a subsidiary does
@@ -197,6 +228,10 @@ class Company(OwnedModel):
 
     def get_absolute_url(self) -> str:
         return reverse("jobs:company_detail", args=[self.pk])
+
+    @property
+    def is_employment_service(self) -> bool:
+        return self.kind == CompanyKind.EMPLOYMENT_SERVICE
 
     #: How deep an ownership chain may go. Real ones are two or three; the cap exists so a
     #: mistake cannot produce a thousand-deep chain that every page then walks.

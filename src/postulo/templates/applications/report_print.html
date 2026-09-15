@@ -68,6 +68,10 @@
     <div>{% blocktranslate with period=report.period.label %}Period: {{ period }}{% endblocktranslate %}
       ({{ report.period.start|date:"DATE_FORMAT" }} – {{ report.period.end|date:"DATE_FORMAT" }})</div>
     <div>{% blocktranslate with produced=report.produced_at|date:"DATETIME_FORMAT" %}Produced on {{ produced }}{% endblocktranslate %}</div>
+    {% if report.office %}
+      <div>{% blocktranslate with office=report.office %}For {{ office }}{% endblocktranslate %}{% if report.adviser %}
+        · {% blocktranslate with adviser=report.adviser %}adviser {{ adviser }}{% endblocktranslate %}{% endif %}</div>
+    {% endif %}
   </div>
 
   <h2>{% translate "How regularly" %}</h2>
@@ -88,6 +92,12 @@
       <div class="value">{{ report.cadence.empty_weeks }}</div>
       <div class="name">{% translate "Weeks with none" %}</div>
     </div>
+    {% if report.office %}
+      <div class="figure">
+        <div class="value">{{ report.through_service }}</div>
+        <div class="name">{% translate "Through the employment service" %}</div>
+      </div>
+    {% endif %}
   </div>
 
   <table class="weeks">

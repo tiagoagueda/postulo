@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core.tables import Column, Table, register
 
 from . import identifiers
+from .models import CompanyKind
 
 
 @register
@@ -75,6 +76,17 @@ class CompaniesTable(Table):
         # row would be ten joins per page for a fact the row above already states (#138).
         Column(
             "parent", _("Part of"), sort=("parent__name",), filter="text", lookups=("parent__name",)
+        ),
+        # Employer or employment service (#202). Off by default -- most people have one
+        # office and many employers, and the name cell says which is which -- and here so
+        # the table can be narrowed to either.
+        Column(
+            "kind",
+            _("Kind"),
+            sort=("kind",),
+            filter="choice",
+            lookups=("kind",),
+            choices=tuple(CompanyKind.choices),
         ),
         Column(
             "contacts",

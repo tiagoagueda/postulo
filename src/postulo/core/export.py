@@ -38,8 +38,9 @@ from postulo import __version__
 #: is what tells a portfolio from a CV (#133). 15 replaced ``website``, ``linkedin_url``
 #: and ``source_repo_url`` on a profile and ``linkedin_url`` on a contact with a
 #: ``web_links`` list, each row a kind, an address and whether it is the primary of its
-#: kind (#189).
-FORMAT_VERSION = 15
+#: kind (#189). 16 added ``kind`` on a company, which tells the employment service a
+#: person is registered with from an employer (#202).
+FORMAT_VERSION = 16
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -79,6 +80,7 @@ TAG_FIELDS = ("id", "name", "slug", "colour")
 COMPANY_FIELDS = (
     "id",
     "name",
+    "kind",
     "website",
     "careers_url",
     "location",
