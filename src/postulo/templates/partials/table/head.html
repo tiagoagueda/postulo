@@ -17,7 +17,8 @@
               dark:border-ink-800 dark:text-ink-400"
        data-col-settings="{% url 'core:table_settings' table.name %}"
        data-col-here="{{ request.get_full_path }}"
-       data-col-wider="{% translate 'Widen {column}' %}"
+       data-col-resize="{% translate 'Width of {column}' %}"
+       data-col-said="{% translate '{column}: {width} pixels' %}"
        data-col-reset="{% translate 'Let {column} size itself' %}">
   <tr>
     {% comment %} The selection column, present only where a bulk form exists. The header
@@ -40,7 +41,11 @@
           {% comment %} `tap-target` rather than the bare `inline-flex` this used to have:
              the label is 12-pixel type on a 16-pixel line, and the filter control below it
              is close enough that the spacing exception does not save it (#115). {% endcomment %}
-          <a href="{% querystring sort=header.next_sort page=None %}"
+          {% comment %} The id is not decoration: htmx puts focus back after a swap only for an
+             element that has one, and this link swaps itself away. Without it the next Tab
+             after sorting started again at the skip link (#227). {% endcomment %}
+          <a id="sort-{{ header.key }}"
+             href="{% querystring sort=header.next_sort page=None %}"
              hx-get="{% querystring sort=header.next_sort page=None %}"
              hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
              class="tap-target gap-1 hover:text-ink-900 dark:hover:text-ink-100 {% if header.state %}text-ink-900 dark:text-ink-100{% endif %}">

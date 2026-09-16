@@ -3,7 +3,7 @@
 
 {% block content %}
   <div class="max-w-2xl">
-    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Delete my account" %}</h2>
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Delete my account" %}</h1>
     <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
       {% translate "Everything goes, at once, and nobody can bring it back. Take your export first." %}
     </p>
@@ -15,7 +15,7 @@
     {% endif %}
 
     <div class="card mb-6">
-      <h3 class="mb-3 font-medium">{% translate "What will be deleted" %}</h3>
+      <h2 class="mb-3 font-medium">{% translate "What will be deleted" %}</h2>
       <dl class="grid grid-cols-2 gap-3 text-sm">
         <div class="flex justify-between"><dt>{% translate "Companies and contacts" %}</dt><dd class="tabular-nums">{{ counts.companies|default:0 }}</dd></div>
         <div class="flex justify-between"><dt>{% translate "Applications, with their timelines" %}</dt><dd class="tabular-nums">{{ counts.applications|default:0 }}</dd></div>
@@ -32,7 +32,7 @@
     </div>
 
     <div class="card mb-6">
-      <h3 class="mb-2 font-medium">{% translate "First, take everything with you" %}</h3>
+      <h2 class="mb-2 font-medium">{% translate "First, take everything with you" %}</h2>
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
         {% translate "One zip with every record and every file, which imports into a fresh account on any Postulo." %}
       </p>
@@ -44,7 +44,7 @@
 
     <form method="post" novalidate class="card border-red-300 dark:border-red-900" data-delete-account>
       {% csrf_token %}
-      <h3 class="mb-2 font-medium text-red-700 dark:text-red-400">{% translate "Then delete" %}</h3>
+      <h2 class="mb-2 font-medium text-red-700 dark:text-red-400">{% translate "Then delete" %}</h2>
       <label class="field-label" for="id_confirm_email">
         {% blocktranslate trimmed with email=user.email %}
           Type your address, {{ email }}, to confirm
@@ -53,7 +53,7 @@
       <input type="email" id="id_confirm_email" name="confirm_email" class="field-input mb-2"
              autocomplete="off" {% if last_administrator %}disabled{% endif %}>
       {% if error %}<p class="field-error mb-2">{{ error }}</p>{% endif %}
-      <button type="submit" class="btn bg-red-600 text-white hover:bg-red-700" {% if last_administrator %}disabled{% endif %}>
+      <button type="submit" class="btn-danger" {% if last_administrator %}disabled{% endif %}>
         {% translate "Delete my account and everything in it" %}
       </button>
     </form>

@@ -14,7 +14,7 @@ from postulo.applications.models import Application
 from postulo.applications.services import record_event
 from postulo.core import languages
 from postulo.core.files import serve_private_file
-from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
+from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.resume import translating
@@ -100,7 +100,7 @@ class CVUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
     template_name = "documents/cv_form.html"
 
 
-class CVDeleteView(OwnedObjectMixin, DeleteView):
+class CVDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = CV
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("documents:cv_list")
@@ -146,7 +146,7 @@ class CVItemUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         return self.object.cv.get_absolute_url()
 
 
-class CVItemDeleteView(OwnedObjectMixin, DeleteView):
+class CVItemDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = CVItem
     template_name = "partials/confirm_delete.html"
 
@@ -255,7 +255,7 @@ class CoverLetterUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
     template_name = "documents/letter_form.html"
 
 
-class CoverLetterDeleteView(OwnedObjectMixin, DeleteView):
+class CoverLetterDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = CoverLetter
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("documents:letter_list")
@@ -322,7 +322,7 @@ class UploadUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
     success_url = reverse_lazy("documents:upload_list")
 
 
-class UploadDeleteView(OwnedObjectMixin, DeleteView):
+class UploadDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = UploadedDocument
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("documents:upload_list")

@@ -1,6 +1,6 @@
 {% load allauth %}
 {% comment %} djlint:off {% endcomment %}
-{% if 'link' in attrs.tags %}{% firstof 'btn-ghost' as css %}{% elif 'outline' in attrs.tags or 'secondary' in attrs.tags or 'cancel' in attrs.tags %}{% firstof 'btn-secondary' as css %}{% elif 'danger' in attrs.tags or 'delete' in attrs.tags %}{% firstof 'btn bg-red-600 text-white hover:bg-red-700' as css %}{% else %}{% firstof 'btn-primary' as css %}{% endif %}
+{% if 'link' in attrs.tags %}{% firstof 'btn-ghost' as css %}{% elif 'outline' in attrs.tags or 'secondary' in attrs.tags or 'cancel' in attrs.tags %}{% firstof 'btn-secondary' as css %}{% elif 'danger' in attrs.tags or 'delete' in attrs.tags %}{% firstof 'btn-danger' as css %}{% else %}{% firstof 'btn-primary' as css %}{% endif %}
 <{% if attrs.href %}a href="{{ attrs.href }}"{% else %}button{% endif %}
    class="{{ css }}"
    {% if attrs.form %}form="{{ attrs.form }}"{% endif %}

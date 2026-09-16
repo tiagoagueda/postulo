@@ -773,6 +773,63 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Keyboard and focus failings that every accessibility check passed.** Seven of them, found
+  by using Postulo rather than by scanning it. axe reads a document: it cannot press Tab and
+  say where focus landed, it cannot tell that one letter fires an action nobody can switch
+  off, and it cannot look at a high-contrast theme. Every page passed while all of this was
+  true.
+
+  **Focus stopped being dropped.** Sorting a table, turning a page and switching theme are
+  htmx swaps, and htmx puts focus back after a swap only for an element that carries an `id`.
+  None of those three had one, so Enter on a column header sent focus to the body and the next
+  Tab started again at *Skip to content* — which is the whole page to walk back through, on
+  every sort and every page turn.
+
+  **A single key can now be switched off.** "d" discarded a capture, "j" skipped it and "/"
+  took the search box, wherever you were and with no way to stop them. Somebody dictating to
+  their computer says every letter of every sentence, and "d" was a listing gone without a
+  question. There is a switch under *Settings → Appearance*, on to begin with because the
+  review screen is worked through forty times in a row and the keys are why that is bearable.
+  Shortcuts that need Ctrl are not single keys and are untouched, and a keystroke that is part
+  of a character an input method is still composing now belongs to the character.
+
+  **A field shows where focus is in a high-contrast theme.** `outline-none` on every input,
+  select, textarea and table filter compiled to `outline-style: none`, which beat the rule
+  that draws the focus ring and left a border colour and a shadow — the two things forced
+  colours throws away. So focus was invisible on every form in Postulo for anybody using one,
+  and nothing Postulo runs asks that question.
+
+  **A card on the board says which application it is.** Thirty menus all called *Change
+  status* are thirty controls nobody can tell apart; each is named by its role and employer
+  now. The menu also stopped saving on the way past: arrowing down a closed list in Chromium
+  on Windows fires a change at every status it goes by, and each of those was a status change,
+  a timeline entry, and a job search that did not happen. A choice made with the keyboard is
+  saved on Enter or when the menu is left; a choice made with the pointer saves at once, as it
+  always did, so advancing a card is still one click. The help explaining the board hung off
+  the card, which nothing can focus, so it had never been read to anybody — it hangs off the
+  menu it is about. And the cards are made draggable by the script rather than by the
+  template, which is the rule the dashboard already followed: with scripts off, nothing offers
+  a gesture that cannot happen.
+
+  **The heading on a settings page is the page.** *Settings* was the `h1` on about twenty
+  pages and each page's own name was an `h2` level with its sections, so jumping to the first
+  heading said "Settings" wherever you were. The sidebar's label is a label now, the page's
+  name is its heading, and its sections sit under it.
+
+  **The column resize handle tells the truth.** It was called *Widen Name* although the same
+  control narrows it with ArrowLeft, an arrow press said nothing at all, and what it did say
+  it said through a `<caption>` — which *is* a table's accessible name, so announcing a width
+  renamed the table to it. It is a splitter with a neutral name and a width it reports, it
+  says what it did from a region outside the table, and a drag the browser takes away no
+  longer leaves it resizing a column nobody is holding.
+
+  **One red button, and *Cancel* goes somewhere.** Four spellings of "this is the dangerous
+  one" across twenty-odd templates are `.btn-danger` and `.btn-danger-ghost`, so the answer to
+  "is this the destructive one" is in one place rather than in whichever template you happen
+  to be reading. And *Cancel* on a confirmation page goes where the view says instead of
+  following the browser's `Referer`, which is absent from a bookmark and from a fresh tab and
+  left the dashboard as the fallback — the one place somebody halfway through deleting
+  something did not mean to be. (#227)
 - **The API's catch-up cursor could not actually be walked.** #230 gave every list an
   `updated_since` cursor — ask what changed since a moment, take the `updated_at` of the
   last row you read, ask again from there — and two things stopped it working. The moment it

@@ -90,7 +90,7 @@
                   </form>
                   <form method="post" action="{% url 'applications:suggestion_action' suggestion.pk 'decline' %}" class="mt-1 text-end">
                     {% csrf_token %}
-                    <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">{% translate "Decline" %}</button>
+                    <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">{% translate "Decline" %}</button>
                   </form>
                 {% elif suggestion.event %}
                   <a href="{{ suggestion.application.get_absolute_url }}" class="text-sm text-brand-600 underline dark:text-brand-400">

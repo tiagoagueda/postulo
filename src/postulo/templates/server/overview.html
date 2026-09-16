@@ -2,7 +2,7 @@
 {% load i18n static %}
 
 {% block content %}
-  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Overview" %}</h2>
+  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Overview" %}</h1>
   <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
     {% translate "What this instance is running, and where its data is." %}
   </p>
@@ -19,7 +19,7 @@
   {% endcomment %}
   <div class="grid gap-4 sm:grid-cols-2 [&>*]:min-w-0">
     <div class="card">
-      <h3 class="mb-3 font-medium">{% translate "Software" %}</h3>
+      <h2 class="mb-3 font-medium">{% translate "Software" %}</h2>
       <dl class="space-y-2 text-sm">
         <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">Postulo</dt><dd data-version>{{ version }}</dd></div>
         <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">Python</dt><dd>{{ python_version }}</dd></div>
@@ -43,7 +43,7 @@
     </div>
 
     <div class="card">
-      <h3 class="mb-3 font-medium">{% translate "Data" %}</h3>
+      <h2 class="mb-3 font-medium">{% translate "Data" %}</h2>
       <dl class="space-y-2 text-sm">
         <div class="flex justify-between gap-4">
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Database" %}</dt>
@@ -96,7 +96,7 @@
      and the QR is the second-device form worth offering next to it (#172). The QR is Buy
      Me a Coffee's own, unmodified -- see assets/support/NOTICE.txt. {% endcomment %}
   <div class="card mt-4 text-sm" data-support>
-    <h3 class="mb-2 font-medium">{% translate "Keeping Postulo going" %}</h3>
+    <h2 class="mb-2 font-medium">{% translate "Keeping Postulo going" %}</h2>
     <p class="mb-4 text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed %}
         Voluntary support is this project's only income: one person writes it, and nothing is
@@ -108,7 +108,7 @@
     <div class="grid gap-6 md:grid-cols-3">
       <div class="flex flex-wrap items-start gap-3">
         <div class="min-w-0 flex-1">
-          <h4 class="font-medium">{% translate "Money" %}</h4>
+          <h3 class="font-medium">{% translate "Money" %}</h3>
           <p class="wrap-anywhere text-ink-500 dark:text-ink-400">
             {% blocktranslate trimmed with url="https://www.buymeacoffee.com/tiagoagueda" %}
               Whatever it is worth to you, once or now and then, at
@@ -123,7 +123,7 @@
         </a>
       </div>
       <div>
-        <h4 class="font-medium">{% translate "Code" %}</h4>
+        <h3 class="font-medium">{% translate "Code" %}</h3>
         <p class="wrap-anywhere text-ink-500 dark:text-ink-400">
           {% blocktranslate trimmed with repo="https://source.tiagoagueda.com/postulo/postulo" guide="https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CONTRIBUTING.md" %}
             A bug report is worth as much as anything else here. The repository is at
@@ -133,7 +133,7 @@
         </p>
       </div>
       <div>
-        <h4 class="font-medium">{% translate "Translation" %}</h4>
+        <h3 class="font-medium">{% translate "Translation" %}</h3>
         <p class="wrap-anywhere text-ink-500 dark:text-ink-400">
           {% blocktranslate trimmed with guide="https://source.tiagoagueda.com/postulo/postulo/src/branch/main/docs/TRANSLATING.md" %}
             Every language here but English is a machine draft waiting for somebody who

@@ -25,7 +25,7 @@ from django.views.generic import (
 )
 
 from postulo.core import tables
-from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
+from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.models import Tag
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
@@ -409,7 +409,7 @@ class ApplicationUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         return response
 
 
-class ApplicationDeleteView(OwnedObjectMixin, DeleteView):
+class ApplicationDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = Application
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("applications:list")
@@ -774,7 +774,7 @@ class TagUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
     success_url = reverse_lazy("applications:tag_list")
 
 
-class TagDeleteView(OwnedObjectMixin, DeleteView):
+class TagDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = Tag
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("applications:tag_list")

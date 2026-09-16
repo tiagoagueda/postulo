@@ -25,6 +25,32 @@ class OwnerFormMixin:
         return super().form_valid(form)
 
 
+class ConfirmDeleteMixin:
+    """Where *Cancel* goes on a confirmation page, decided by the view.
+
+    It used to be ``HTTP_REFERER``. That is a request header, not a fact about the page: it
+    is absent for anybody who arrived from a bookmark, from a new tab, or with a browser
+    that sends none, and the template's fallback was ``/`` — so somebody who changed their
+    mind about deleting a company could be put on the dashboard instead of back where they
+    were. It is also the one value on the page nobody chose (#227).
+
+    The object's own page is where cancelling belongs, because it is the page the button was
+    pressed on. Where the object has no page of its own — a CV entry, a career entry — the
+    view already names where deleting leads, and that is the next best answer.
+    """
+
+    def get_cancel_url(self) -> str:
+        obj = getattr(self, "object", None)
+        if obj is not None and hasattr(obj, "get_absolute_url"):
+            return obj.get_absolute_url()
+        return self.get_success_url()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.setdefault("cancel_url", self.get_cancel_url())
+        return context
+
+
 class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     """Restrict a view to staff members.
 

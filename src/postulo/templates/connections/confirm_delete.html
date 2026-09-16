@@ -3,7 +3,7 @@
 
 {% block content %}
   <div class="card max-w-md">
-    <h2 class="mb-2 text-xl font-semibold">{% translate "Remove this connection?" %}</h2>
+    <h1 class="mb-2 text-xl font-semibold">{% translate "Remove this connection?" %}</h1>
     <p class="mb-2 text-sm text-ink-600 dark:text-ink-300">
       {% blocktranslate trimmed with name=object.label %}
         “{{ name }}” will be removed, and the secrets stored for it deleted.
@@ -15,7 +15,7 @@
     <form method="post">
       {% csrf_token %}
       <div class="flex items-center gap-3">
-        <button type="submit" class="btn bg-red-600 text-white hover:bg-red-700">{% translate "Remove" %}</button>
+        <button type="submit" class="btn-danger">{% translate "Remove" %}</button>
         <a href="{% url 'connections:list' %}" class="btn-ghost">{% translate "Cancel" %}</a>
       </div>
     </form>

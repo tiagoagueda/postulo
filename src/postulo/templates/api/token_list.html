@@ -5,7 +5,7 @@
 
 {% block content %}
   <div>
-    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "API tokens" %}</h2>
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "API tokens" %}</h1>
     <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed %}
         A token lets a tool outside Postulo act for you — a browser extension handing over a
@@ -26,7 +26,7 @@
     {% endif %}
 
     <div class="card mb-8">
-      <h3 class="mb-4 font-medium">{% translate "New token" %}</h3>
+      <h2 class="mb-4 font-medium">{% translate "New token" %}</h2>
       <form method="post" action="{% url 'api:token_create' %}" novalidate>
         {% csrf_token %}
         {% include "partials/field.html" with field=form.name %}
@@ -81,7 +81,7 @@
               {% if token.is_active %}
                 <form method="post" action="{% url 'api:token_revoke' token.pk %}">
                   {% csrf_token %}
-                  <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">
+                  <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">
                     {% translate "Revoke" %}
                   </button>
                 </form>
@@ -93,7 +93,7 @@
     {% endif %}
 
     <div class="card">
-      <h3 class="mb-3 font-medium">{% translate "Using a token" %}</h3>
+      <h2 class="mb-3 font-medium">{% translate "Using a token" %}</h2>
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
         {% translate "Send it as a bearer token. To check that one works, and see its scopes:" %}
       </p>

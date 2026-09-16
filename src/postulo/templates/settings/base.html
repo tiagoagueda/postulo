@@ -8,9 +8,14 @@
 {% block main %}
   <div class="lg:flex lg:items-start lg:gap-10">
     <aside class="mb-6 lg:mb-0 lg:w-56 lg:shrink-0">
-      <h1 class="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
+      {% comment %} A label over the sidebar, not the page's heading. It was an `h1`, which
+         made about twenty pages announce "Settings" to anybody jumping to the first
+         heading, and pushed each page's own title down to an `h2` level with its sections
+         (#227). The list below is already named for a screen reader by the `aria-label`
+         the sidebar carries, so nothing is lost by this being a paragraph. {% endcomment %}
+      <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
         {% translate "Settings" %}
-      </h1>
+      </p>
       {% settings_sidebar %}
     </aside>
     <div class="min-w-0 flex-1">

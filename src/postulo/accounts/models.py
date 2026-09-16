@@ -298,6 +298,15 @@ class Profile(models.Model):
     show_career_order = models.BooleanField(
         _("show the order number on career entries"), default=False
     )
+    #: Whether a single printable character on its own does anything: "d" and "j" on the
+    #: capture review, "/" for the search box. WCAG 2.1.4 is level A and says a shortcut
+    #: made of one character must be switchable off, because somebody dictating into a page
+    #: presses every key in the sentence -- and "d" discarded a listing outright (#227).
+    #:
+    #: On by default: the review screen is worked through forty times in a row and the keys
+    #: are why that is bearable. The criterion asks for a way out, not for the default.
+    #: Shortcuts with a modifier, Ctrl+Enter among them, are outside this and always work.
+    keyboard_shortcuts = models.BooleanField(_("single-key shortcuts"), default=True)
     #: Plugins this person has switched off for themselves. Stored as what was turned
     #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
     #: later release should be available without anybody having to opt into it.

@@ -37,11 +37,15 @@ def ui(request: HttpRequest) -> dict:
     theme = ""
     choice = "system"
     profile = None
+    # On unless somebody has said otherwise, which is also the answer where nobody is signed
+    # in: there is no profile to ask, and the pages a stranger sees have no shortcuts (#227).
+    shortcuts = True
     user = getattr(request, "user", None)
     if user is not None and user.is_authenticated:
         profile = getattr(user, "profile", None)
         if profile:
             choice = profile.theme
+            shortcuts = profile.keyboard_shortcuts
         # "system" means stamp nothing and let the operating system preference apply.
         if choice in {"light", "dark"}:
             theme = choice
@@ -54,6 +58,9 @@ def ui(request: HttpRequest) -> dict:
         # gets a direction (#43 goes well past the set Django ships with).
         "text_direction": languages.direction(get_language() or ""),
         "theme_switch": theme_switch(choice),
+        # Read by `app.js` off <body>, and by the pages that document a key so that they do
+        # not promise one that is switched off.
+        "keyboard_shortcuts": shortcuts,
         "nav_items": navigation.visible_items(profile),
         "dashboard_hidden": navigation.dashboard_hidden(profile),
         "registration_open": site.signup_open_now(),

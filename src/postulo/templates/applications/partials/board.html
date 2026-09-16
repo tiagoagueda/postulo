@@ -16,10 +16,15 @@
   </p>
 {% endif %}
 
-<p class="sr-only" id="board-drag-help">
+{% comment %} This used to be named by an `aria-describedby` on each card's `<article>`, which
+   nothing can focus, so it was never announced. It hangs off the status menu now -- the
+   control it is about -- and says what that control does, including the part that is not
+   obvious: a choice made with the keyboard is not saved until it is finished (#227). {% endcomment %}
+<p class="sr-only" id="board-move-help">
   {% blocktranslate trimmed %}
-    Cards can be dragged between columns with a mouse. Every card also carries a status
-    menu, which does the same thing from the keyboard.
+    Choose a status to move this card to another column. From the keyboard the move is made
+    when you press Enter or leave the menu, so passing over a status on the way does not
+    record it. Cards can also be dragged between columns with a mouse.
   {% endblocktranslate %}
 </p>
 

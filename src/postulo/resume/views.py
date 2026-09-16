@@ -20,7 +20,7 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
 
 from postulo.core import languages
-from postulo.core.mixins import OwnedObjectMixin, OwnerFormMixin
+from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.plugins import base, registry
@@ -242,7 +242,7 @@ class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
         return super().form_valid(form)
 
 
-class ResumeItemDeleteView(OwnedObjectMixin, DeleteView):
+class ResumeItemDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("resume:overview")
 

@@ -38,10 +38,14 @@
       <form method="post">
         {% csrf_token %}
         <div class="flex items-center gap-3">
-          <button type="submit" class="btn bg-red-600 text-white hover:bg-red-700">
+          <button type="submit" class="btn-danger">
             {% translate "Delete" %}
           </button>
-          <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn-ghost">
+          {% comment %} Where the view says, not where the browser says it came from: a
+             `Referer` is absent from a bookmark and from a fresh tab, and the fallback
+             underneath it was the front page -- the one place somebody halfway through
+             deleting something did not mean to be (#227). {% endcomment %}
+          <a href="{{ cancel_url|default:'/' }}" class="btn-ghost">
             {% translate "Cancel" %}
           </a>
         </div>

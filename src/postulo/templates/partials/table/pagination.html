@@ -1,8 +1,12 @@
 {% load i18n %}
+{% comment %} Both links carry an id because htmx puts focus back after a swap only for an
+   element that has one, and these two swap themselves away. Without them the Tab after
+   paging started again at the skip link, so somebody working through a long list by
+   keyboard began the page from the top every time (#227). {% endcomment %}
 {% if is_paginated %}
   <nav class="mt-4 flex items-center gap-2 text-sm" aria-label="{% translate 'Pagination' %}">
     {% if page_obj.has_previous %}
-      <a href="{% querystring page=page_obj.previous_page_number %}"
+      <a id="page-prev" href="{% querystring page=page_obj.previous_page_number %}"
          hx-get="{% querystring page=page_obj.previous_page_number %}"
          hx-target="#{{ table_id }}" hx-swap="outerHTML show:top" hx-push-url="true"
          class="btn-secondary">{% translate "Previous" %}</a>
@@ -13,7 +17,7 @@
       {% endblocktranslate %}
     </span>
     {% if page_obj.has_next %}
-      <a href="{% querystring page=page_obj.next_page_number %}"
+      <a id="page-next" href="{% querystring page=page_obj.next_page_number %}"
          hx-get="{% querystring page=page_obj.next_page_number %}"
          hx-target="#{{ table_id }}" hx-swap="outerHTML show:top" hx-push-url="true"
          class="btn-secondary">{% translate "Next" %}</a>

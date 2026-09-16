@@ -400,17 +400,24 @@ class AppearanceForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ("theme", "quiet_after_days", "show_career_order")
+        fields = ("theme", "quiet_after_days", "show_career_order", "keyboard_shortcuts")
         widgets = {"theme": forms.RadioSelect}
         labels = {
             "quiet_after_days": _("Consider an application quiet after"),
             "show_career_order": _("Show the order number on each career entry"),
+            "keyboard_shortcuts": _("Let a single key do something"),
         }
         help_texts = {
             "show_career_order": _(
                 "The arrows on Your career move an entry past its neighbour. If you cannot "
                 "use them, or would rather type a number, each entry's form shows its place "
                 "as a number: lower first."
+            ),
+            "keyboard_shortcuts": _(
+                "On the capture review, “d” discards and moves on and “j” skips; "
+                "“/” jumps to the search box anywhere. Turn this off if you dictate to your "
+                "computer, or if a key pressed by accident does more than you meant. "
+                "Shortcuts that need Ctrl go on working either way."
             ),
         }
 

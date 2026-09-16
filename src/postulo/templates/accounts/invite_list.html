@@ -6,7 +6,7 @@
 {% block content %}
   <div class="mb-6 flex flex-wrap items-center gap-4">
     <div class="grow basis-48">
-      <h2 class="text-2xl font-semibold tracking-tight">{% translate "Invitations" %}</h2>
+      <h1 class="text-2xl font-semibold tracking-tight">{% translate "Invitations" %}</h1>
       <p class="text-sm text-ink-500 dark:text-ink-400">
         {% translate "Each invitation may be used once, and expires on its own." %}
       </p>
@@ -54,7 +54,7 @@
                 {% if not invite.is_accepted %}
                   <form method="post" action="{% url 'accounts:invite_revoke' invite.pk %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn-ghost text-red-600 dark:text-red-400">
+                    <button type="submit" class="btn-danger-ghost">
                       {% translate "Revoke" %}
                     </button>
                   </form>

@@ -19,6 +19,7 @@ from postulo.core import tables
 from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import (
+    ConfirmDeleteMixin,
     OwnedObjectMixin,
     OwnerFormMixin,
     PhoneNumbersMixin,
@@ -370,7 +371,7 @@ class CompanyLogoActionView(OwnedObjectMixin, View):
         return redirect(safe_next(request, company.get_absolute_url()))
 
 
-class CompanyDeleteView(OwnedObjectMixin, DeleteView):
+class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = Company
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("jobs:company_list")
@@ -469,7 +470,7 @@ class IndustryUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         return response
 
 
-class IndustryDeleteView(OwnedObjectMixin, DeleteView):
+class IndustryDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = Industry
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("jobs:industry_list")
@@ -546,7 +547,7 @@ class ContactUpdateView(
         return response
 
 
-class ContactDeleteView(OwnedObjectMixin, DeleteView):
+class ContactDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = Contact
     template_name = "partials/confirm_delete.html"
 
@@ -599,7 +600,7 @@ class PostingCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, C
         return initial
 
 
-class PostingDeleteView(OwnedObjectMixin, DeleteView):
+class PostingDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = JobPosting
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("jobs:company_list")

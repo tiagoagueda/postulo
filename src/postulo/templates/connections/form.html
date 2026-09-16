@@ -2,9 +2,9 @@
 {% load i18n %}
 
 {% block content %}
-  <h2 class="mb-1 text-2xl font-semibold tracking-tight">
+  <h1 class="mb-1 text-2xl font-semibold tracking-tight">
     {% if connection %}{{ connection.label }}{% else %}{% blocktranslate with plugin=plugin.label trimmed %}Connect {{ plugin }}{% endblocktranslate %}{% endif %}
-  </h2>
+  </h1>
   <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
     {{ kind_label }} · <bdi>{{ plugin.label }}</bdi> <code class="text-xs">{{ plugin.version }}</code>
   </p>
@@ -24,7 +24,7 @@
     </div>
 
     <div class="card mb-6"{{ plugin_attributes }}>
-      <h3 class="mb-4 font-medium">{% blocktranslate with plugin=plugin.label trimmed %}What {{ plugin }} needs{% endblocktranslate %}</h3>
+      <h2 class="mb-4 font-medium">{% blocktranslate with plugin=plugin.label trimmed %}What {{ plugin }} needs{% endblocktranslate %}</h2>
       {% for field in form.plugin_fields %}
         {% if field.field.widget.input_type == "checkbox" %}
           <div class="mb-4">
@@ -52,11 +52,11 @@
      there is a connection for the provider to send the person back to. {% endcomment %}
   {% if consent %}
     <div class="card mt-6" data-consent>
-      <h3 class="mb-1 font-medium">
+      <h2 class="mb-1 font-medium">
         {% blocktranslate with provider=consent.provider|default:plugin.label trimmed %}
           Agreeing with {{ provider }}
         {% endblocktranslate %}
-      </h3>
+      </h2>
       <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
         {% blocktranslate trimmed %}
           This one does not take a password. You agree at the provider's own site, and it
@@ -94,7 +94,7 @@
               {% translate "Somebody has agreed to this. Test it to be sure it still stands." %}
             </p>
             <button type="submit" class="btn-secondary">{% translate "Agree again" %}</button>
-            <button type="submit" name="forget" value="1" class="btn-ghost text-red-600 dark:text-red-400">
+            <button type="submit" name="forget" value="1" class="btn-danger-ghost">
               {% translate "Forget the token" %}
             </button>
           {% else %}

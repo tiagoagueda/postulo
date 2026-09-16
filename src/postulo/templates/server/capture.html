@@ -2,13 +2,13 @@
 {% load i18n %}
 
 {% block content %}
-  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Capture" %}</h2>
+  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Capture" %}</h1>
   <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
     {% translate "How this instance fetches a posting somebody pasted." %}
   </p>
 
   <div class="card mb-4">
-    <h3 class="mb-3 font-medium">{% translate "Limits" %}</h3>
+    <h2 class="mb-3 font-medium">{% translate "Limits" %}</h2>
     <dl class="space-y-2 text-sm">
       <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Largest page read" %}</dt><dd>{{ limits.max_bytes|filesizeformat }}</dd></div>
       <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Timeout" %}</dt><dd>{{ limits.timeout_seconds }} s</dd></div>

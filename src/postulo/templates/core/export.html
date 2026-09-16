@@ -5,7 +5,7 @@
 
 {% block content %}
   <div class="max-w-2xl">
-    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Export everything" %}</h2>
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Export everything" %}</h1>
     <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed %}
         Data you cannot walk away with is not really yours. This is one zip holding every
@@ -62,7 +62,7 @@
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
         {% translate "You can delete your account yourself: every record, every file on the disk, tokens, connections, and the account. The export above is the safety net; take it first." %}
       </p>
-      <a href="{% url 'accounts:delete' %}" class="btn-ghost text-red-600 dark:text-red-400">{% translate "Delete my account" %}</a>
+      <a href="{% url 'accounts:delete' %}" class="btn-danger-ghost">{% translate "Delete my account" %}</a>
     </div>
   </div>
 {% endblock %}

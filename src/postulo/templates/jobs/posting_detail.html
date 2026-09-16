@@ -39,7 +39,7 @@
               <option value="{{ value }}">{{ label }}</option>
             {% endfor %}
           </select>
-          <button type="submit" class="btn-ghost text-red-600 dark:text-red-400">{% translate "Discard" %}</button>
+          <button type="submit" class="btn-danger-ghost">{% translate "Discard" %}</button>
         </form>
         <a href="{% url 'listings:apply' posting.pk %}" class="btn-primary">{% translate "Apply" %}</a>
       {% elif posting.derived_state == "discarded" %}
@@ -51,7 +51,7 @@
       {% endif %}
       <a href="{% url 'jobs:posting_update' posting.pk %}" class="btn-secondary">{% translate "Edit" %}</a>
       <a href="{% url 'jobs:posting_delete' posting.pk %}"
-         class="btn-ghost text-red-600 dark:text-red-400">{% translate "Delete" %}</a>
+         class="btn-danger-ghost">{% translate "Delete" %}</a>
     </div>
   </div>
 

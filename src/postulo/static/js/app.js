@@ -9,12 +9,83 @@
 (function () {
   "use strict";
 
-  // Selects marked data-autosubmit save as soon as they change. Used by the board,
-  // where making someone press a button to move a card guarantees stale statuses.
+  /* ------------------------------------------- a control that saves when it is finished
+   *
+   * Controls marked `data-autosubmit` save as soon as they change. Used by the board, where
+   * making somebody press a button to move a card guarantees stale statuses, and by the
+   * plugins page's switch.
+   *
+   * **A select waits until the choosing has stopped.** In Chromium on Windows, arrowing
+   * through a *closed* select fires `change` at every step it passes, so moving four
+   * statuses down the list wrote four status changes and four timeline entries for
+   * statuses nobody chose -- a change of context on every keystroke, and a record of a job
+   * search that was not true (#227). So a choice made with the keyboard is committed on
+   * Enter, on Tab, or when focus leaves; a choice made with the pointer is already
+   * finished when `change` arrives and saves at once, which is what keeps the board one
+   * click. The description on the board's menus says so, because a person cannot be
+   * expected to guess it.
+   *
+   * A checkbox is not a select: its `change` is always the whole of the decision, so it is
+   * left alone.
+   */
+  function autosubmitState(control) {
+    // A checkbox's `value` is the word it posts, the same before and after it is ticked;
+    // what changed is `checked`. Comparing the wrong one made the switch never save.
+    if (control.type === "checkbox" || control.type === "radio") {
+      return control.checked ? "on" : "off";
+    }
+    return control.value;
+  }
+
+  function commitAutosubmit(control) {
+    var before = control.dataset.autosubmitFrom;
+    delete control.dataset.autosubmitChoosing;
+    if (!control.form || (before !== undefined && autosubmitState(control) === before)) {
+      return false;
+    }
+    control.dataset.autosubmitFrom = autosubmitState(control);
+    control.form.requestSubmit();
+    return true;
+  }
+
+  function autosubmitControl(node) {
+    return node && node.closest ? node.closest("[data-autosubmit]") : null;
+  }
+
+  document.addEventListener("focusin", function (event) {
+    var control = autosubmitControl(event.target);
+    if (control) {
+      control.dataset.autosubmitFrom = autosubmitState(control);
+      delete control.dataset.autosubmitChoosing;
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    var control = autosubmitControl(event.target);
+    if (!control || control.tagName !== "SELECT" || event.isComposing) {
+      return;
+    }
+    if (event.key === "Enter") {
+      if (commitAutosubmit(control)) {
+        event.preventDefault();
+      }
+    } else if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key !== "Tab") {
+      // Still choosing: an arrow, or a letter jumping down the list.
+      control.dataset.autosubmitChoosing = "1";
+    }
+  });
+
   document.addEventListener("change", function (event) {
-    var control = event.target.closest("[data-autosubmit]");
-    if (control && control.form) {
-      control.form.requestSubmit();
+    var control = autosubmitControl(event.target);
+    if (control && !control.dataset.autosubmitChoosing) {
+      commitAutosubmit(control);
+    }
+  });
+
+  document.addEventListener("focusout", function (event) {
+    var control = autosubmitControl(event.target);
+    if (control && control.dataset.autosubmitChoosing) {
+      commitAutosubmit(control);
     }
   });
 
@@ -64,7 +135,28 @@
   // The menu stays. Drag and drop does not fire on touch screens and is not reachable
   // from a keyboard, so it is an addition to the control that works everywhere, never a
   // replacement for it.
+  //
+  // `draggable` is set here rather than in the template, the same rule the dashboard's rows
+  // are held to further down this file. The board's template had been setting it since the
+  // board was written, so with this script blocked every card carried a grab cursor and an
+  // affordance that did nothing (#227).
   var dragging = null;
+
+  function readyBoardCards() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-board-column] [data-card]"),
+      function (card) {
+        card.draggable = true;
+        card.classList.add("cursor-grab");
+      }
+    );
+  }
+
+  document.addEventListener("DOMContentLoaded", readyBoardCards);
+  document.addEventListener("htmx:afterSwap", readyBoardCards);
+  if (document.body) {
+    readyBoardCards();
+  }
 
   function columnOf(node) {
     return node && node.closest ? node.closest("[data-board-column]") : null;
@@ -386,6 +478,39 @@
     closeMenus(event.target.closest("details[data-menu]"));
   });
 
+  /* ------------------------------------------------------ single-key shortcuts, and off
+   *
+   * "d", "j" and "/" are single-character shortcuts, and WCAG 2.1.4 is level A: a shortcut
+   * that is one printable character and nothing else must be switchable off, remappable, or
+   * live only while its own control has focus. These were none of the three. "d" discarded a
+   * capture outright, and somebody using speech recognition dictates into a page rather than
+   * into a field -- a stray "discard" in a sentence took the listing away (#227).
+   *
+   * So there is a switch, under Settings → Appearance, on by default because the review
+   * screen is worked through forty times in a row and the keys are why that is bearable.
+   * The server writes the answer onto <body>, which is read here. Ctrl+Enter keeps working
+   * either way: a shortcut with a modifier is outside what the criterion is about.
+   *
+   * `isComposing` as well: while an input method is open, every keystroke is part of a
+   * character being built and belongs to the composition, not to this page.
+   */
+  function singleKeysAllowed() {
+    return document.body && document.body.dataset.shortcuts !== "off";
+  }
+
+  function keyboardIsBusy(event) {
+    var active = document.activeElement;
+    return (
+      event.isComposing ||
+      event.keyCode === 229 ||
+      (active &&
+        (active.tagName === "INPUT" ||
+          active.tagName === "TEXTAREA" ||
+          active.tagName === "SELECT" ||
+          active.isContentEditable))
+    );
+  }
+
   // The capture review page is the one screen somebody works through forty times in a
   // row, so it has keys: "d" discards and moves on, "j" skips to the next, Ctrl+Enter
   // saves and moves on -- never while typing in a field, and only where the page marks
@@ -396,17 +521,16 @@
     if (!page) {
       return;
     }
-    var active = document.activeElement;
-    var typing =
-      active &&
-      (active.tagName === "INPUT" ||
-        active.tagName === "TEXTAREA" ||
-        active.tagName === "SELECT" ||
-        active.isContentEditable);
     var target = null;
-    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey) && !event.isComposing) {
       target = page.querySelector("[data-key-save-next]");
-    } else if (!typing && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    } else if (
+      singleKeysAllowed() &&
+      !keyboardIsBusy(event) &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey
+    ) {
       if (event.key === "d") {
         target = page.querySelector("[data-key-discard-next]");
       } else if (event.key === "j") {
@@ -441,19 +565,12 @@
   }
 
   // "/" jumps to the search box, as on most sites with one, unless the person is
-  // already typing somewhere.
+  // already typing somewhere -- or has switched single-key shortcuts off.
   document.addEventListener("keydown", function (event) {
     if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey) {
       return;
     }
-    var active = document.activeElement;
-    if (
-      active &&
-      (active.tagName === "INPUT" ||
-        active.tagName === "TEXTAREA" ||
-        active.tagName === "SELECT" ||
-        active.isContentEditable)
-    ) {
+    if (!singleKeysAllowed() || keyboardIsBusy(event)) {
       return;
     }
     var box = document.querySelector("[data-search-shortcut]");
@@ -1081,6 +1198,8 @@
    * the policy already allows is not an inline style and is not refused.
    */
   var RESIZE_STEP = 16;
+  var RESIZE_MIN = 64;
+  var RESIZE_MAX = 900;
 
   function tokenFor(head) {
     var field = document.querySelector("input[name=csrfmiddlewaretoken]");
@@ -1122,7 +1241,7 @@
       saveWidth(head, cell.dataset.col, 0);
       return;
     }
-    var wanted = Math.max(64, Math.min(900, Math.round(pixels)));
+    var wanted = Math.max(RESIZE_MIN, Math.min(RESIZE_MAX, Math.round(pixels)));
     cell.style.width = wanted + "px";
     return wanted;
   }
@@ -1131,19 +1250,55 @@
     if (cell.querySelector("[data-col-handle]")) {
       return;
     }
+    /* A splitter, in the ARIA sense: `role="separator"` with a value, a floor and a
+     * ceiling. It was a button called "Widen Name", which was a lie half the time -- the
+     * same control narrows the column with ArrowLeft -- and a press said nothing at all,
+     * so from a screen reader the whole gesture was silent. A separator reports
+     * `aria-valuenow`, which is announced as it moves, and its name can then be neutral
+     * about which way it goes (#227).
+     *
+     * Still a `<button>` element underneath, so it is focusable, has a target size and
+     * behaves the same with a pointer; the role is what it *is*, which is not a button. */
     var handle = document.createElement("button");
     handle.type = "button";
     handle.dataset.colHandle = "";
     handle.className = "col-handle";
+    handle.setAttribute("role", "separator");
+    handle.setAttribute("aria-orientation", "vertical");
+    handle.setAttribute("aria-valuemin", String(RESIZE_MIN));
+    handle.setAttribute("aria-valuemax", String(RESIZE_MAX));
     handle.setAttribute(
       "aria-label",
-      (head.dataset.colWider || "Widen {column}").replace("{column}", cell.dataset.colLabel || "")
+      (head.dataset.colResize || "Width of {column}").replace(
+        "{column}",
+        cell.dataset.colLabel || ""
+      )
     );
     handle.title = handle.getAttribute("aria-label");
+
+    /* A focusable separator without an `aria-valuenow` is an incomplete widget, so this is
+     * never taken off -- not even when the column goes back to sizing itself, where the
+     * honest answer is the width it settled at. Clamped to the pair of bounds beside it,
+     * because a column that sizes itself wider than the ceiling would otherwise report a
+     * value outside its own range. */
+    function tellTheWidth() {
+      var now = Math.max(RESIZE_MIN, Math.min(RESIZE_MAX, widthNow(cell)));
+      handle.setAttribute("aria-valuenow", String(now));
+    }
+
+    tellTheWidth();
 
     var dragging = false;
     var startX = 0;
     var startWidth = 0;
+
+    function stopDragging(event) {
+      dragging = false;
+      if (handle.hasPointerCapture && handle.hasPointerCapture(event.pointerId)) {
+        handle.releasePointerCapture(event.pointerId);
+      }
+      tellTheWidth();
+    }
 
     handle.addEventListener("pointerdown", function (event) {
       dragging = true;
@@ -1160,13 +1315,25 @@
       var backwards = getComputedStyle(cell).direction === "rtl";
       var moved = (event.clientX - startX) * (backwards ? -1 : 1);
       setWidth(head, cell, startWidth + moved);
+      tellTheWidth();
     });
     handle.addEventListener("pointerup", function (event) {
       if (!dragging) {
         return;
       }
-      dragging = false;
-      handle.releasePointerCapture(event.pointerId);
+      stopDragging(event);
+      saveWidth(head, cell.dataset.col, widthNow(cell));
+    });
+    /* A drag the browser took away: a touch became a scroll, a window lost the pointer, the
+     * device was unplugged. Without this the handle stayed in `dragging` for ever, so the
+     * next pointer move over the table went on dragging a column nobody was holding, and the
+     * width that had been reached was never saved (#227). The column keeps where it got to,
+     * which is what is on the screen, and that is what is written down. */
+    handle.addEventListener("pointercancel", function (event) {
+      if (!dragging) {
+        return;
+      }
+      stopDragging(event);
       saveWidth(head, cell.dataset.col, widthNow(cell));
     });
     handle.addEventListener("keydown", function (event) {
@@ -1179,6 +1346,7 @@
       } else if (event.key === "Home") {
         event.preventDefault();
         setWidth(head, cell, 0);
+        tellTheWidth();
         say(head, (head.dataset.colReset || "").replace("{column}", cell.dataset.colLabel || ""));
         return;
       }
@@ -1187,6 +1355,13 @@
       }
       event.preventDefault();
       var wanted = setWidth(head, cell, widthNow(cell) + step);
+      tellTheWidth();
+      say(
+        head,
+        (head.dataset.colSaid || "{column}: {width} pixels")
+          .replace("{column}", cell.dataset.colLabel || "")
+          .replace("{width}", String(wanted))
+      );
       saveWidth(head, cell.dataset.col, wanted);
     });
 
@@ -1196,17 +1371,25 @@
     cell.appendChild(handle);
   }
 
+  /* What a resize says, from *outside* the table.
+   *
+   * It used to be a `<caption>` put inside the table, and a caption is the table's
+   * accessible name: announcing "Name: 240 pixels" renamed the table to that, for as long as
+   * the words stayed there. A table called *Companies* became a table called by the last
+   * thing somebody did to a column, which is a worse outcome than saying nothing (#227). The
+   * region is a sibling of the table instead, where it can say whatever it likes. */
   function say(head, words) {
-    var live = head.querySelector("[data-col-live]");
+    var table = head.closest("table");
+    if (!table) {
+      return;
+    }
+    var live = table.parentNode && table.parentNode.querySelector(":scope > [data-col-live]");
     if (!live) {
-      live = document.createElement("caption");
+      live = document.createElement("div");
       live.className = "sr-only";
       live.dataset.colLive = "";
       live.setAttribute("role", "status");
-      var table = head.closest("table");
-      if (table) {
-        table.insertBefore(live, table.firstChild);
-      }
+      table.parentNode.insertBefore(live, table.nextSibling);
     }
     if (words) {
       live.textContent = words;

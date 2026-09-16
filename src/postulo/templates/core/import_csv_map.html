@@ -3,7 +3,7 @@
 
 {% block content %}
   <div class="max-w-4xl">
-    <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Which column is which?" %}</h2>
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Which column is which?" %}</h1>
     <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed with name=sheet.filename rows=sheet.row_count %}
         <strong>{{ name }}</strong>: {{ rows }} rows. The guesses below come from the header names; correct any of them, then check the preview before importing.
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <h3 class="mb-2 font-medium">{% translate "How the first rows will be read" %}</h3>
+      <h2 class="mb-2 font-medium">{% translate "How the first rows will be read" %}</h2>
       <div class="card mb-4 scroll-x p-0">
         <table class="w-full text-start text-sm">
           <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">

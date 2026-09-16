@@ -1,6 +1,14 @@
 {% load i18n postulo %}
-<article class="card p-3" draggable="true" data-card="{{ application.pk }}"
-         data-status="{{ application.status }}" aria-describedby="board-drag-help">
+{% comment %} `draggable` is not set here. It is set by `app.js`, so that with the script
+   blocked nothing looks draggable -- the rule this file was breaking, written down in
+   `app.js` beside the dashboard's rows and stated there since the board learnt to drag.
+   An affordance that does nothing is worse than none (#227).
+
+   The `aria-describedby` is not here either: it was on this `<article>`, which nothing can
+   focus, so the help it names was never announced to anybody. It hangs off the status menu
+   below, which is the control it describes and the thing the keyboard lands on. {% endcomment %}
+<article class="card p-3" data-card="{{ application.pk }}"
+         data-status="{{ application.status }}">
   <a href="{{ application.get_absolute_url }}" class="block font-medium hover:underline">
     {{ application.posting.title }}
   </a>
@@ -49,11 +57,15 @@
     {% endif %}
 
     {# Advancing a card is one click, because the alternative is not updating it at all. #}
+    {% comment %} Named by its application, not "Change status" thirty times over: a board
+       is a page of these, and a list of controls that all say the same thing is a list
+       nobody can choose from (#227). {% endcomment %}
     <form method="post" action="{% url 'applications:status' application.pk %}" class="shrink-0">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
       <select name="status" class="field-input w-32 px-2 py-1 text-xs" data-autosubmit
-              aria-label="{% translate 'Change status' %}">
+              aria-describedby="board-move-help"
+              aria-label="{% blocktranslate trimmed with title=application.posting.title company=application.posting.company.name %}Status of {{ title }} at {{ company }}{% endblocktranslate %}">
         {% for value, label in statuses %}
           <option value="{{ value }}" {% if value == application.status %}selected{% endif %}>{{ label }}</option>
         {% endfor %}

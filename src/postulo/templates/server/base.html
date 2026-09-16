@@ -6,9 +6,11 @@
 {% block main %}
   <div class="lg:flex lg:items-start lg:gap-10">
     <aside class="mb-6 lg:mb-0 lg:w-56 lg:shrink-0">
-      <h1 class="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
+      {% comment %} A label over the sidebar, not the page's heading -- see the note in
+         `settings/base.html` (#227). {% endcomment %}
+      <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">
         {% translate "Server settings" %}
-      </h1>
+      </p>
       {% server_sidebar %}
     </aside>
     <div class="min-w-0 flex-1">

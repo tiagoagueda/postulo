@@ -2,7 +2,7 @@
 {% load i18n postulo %}
 
 {% block content %}
-  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Email" %}</h2>
+  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Email" %}</h1>
   <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
     {% translate "How this instance sends mail: verification links, password resets, reminders. Set it here, or in the environment, and prove it either way." %}
   </p>
@@ -11,7 +11,7 @@
      questions -- "what is happening" against "what would I like to happen" -- and an
      administrator arriving because mail is not working wants the first one. {% endcomment %}
   <div class="card mb-4">
-    <h3 class="mb-3 font-medium">{% translate "In force now" %}</h3>
+    <h2 class="mb-3 font-medium">{% translate "In force now" %}</h2>
     <dl class="space-y-2 text-sm">
       <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Backend" %}</dt><dd class="min-w-0 text-end"><code>{{ mailer.backend }}</code></dd></div>
       {% if mailer.is_smtp %}
@@ -134,7 +134,7 @@
   <form method="post" novalidate>
     {% csrf_token %}
     <div class="card mb-4">
-      <h3 class="mb-3 font-medium">{% translate "Settings" %}</h3>
+      <h2 class="mb-3 font-medium">{% translate "Settings" %}</h2>
       {% for field in form %}
         {% if field.name not in oauth_fields %}
         {% with variable=pinned|get_item:field.name %}
@@ -172,7 +172,7 @@
          stops accepting passwords for sending mail by default at the end of December 2026,
          and for anybody whose provider has gone the same way (#151). {% endcomment %}
       <div class="card mb-4" data-oauth>
-        <h3 class="mb-1 font-medium">{% translate "Signing in with a token" %}</h3>
+        <h2 class="mb-1 font-medium">{% translate "Signing in with a token" %}</h2>
         <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
           {% translate "Only for a provider that no longer accepts a password. Your own mail server needs none of this." %}
         </p>
@@ -225,7 +225,7 @@
        client ID nobody has saved is one the callback could not find again. {% endcomment %}
     <form method="post" action="{% url 'server:email_consent' %}" class="card mb-4" data-mail-consent>
       {% csrf_token %}
-      <h3 class="mb-1 font-medium">{% translate "The mailbox this instance sends from" %}</h3>
+      <h2 class="mb-1 font-medium">{% translate "The mailbox this instance sends from" %}</h2>
       {% if has_consent %}
         <p class="mb-3 text-sm">
           {% translate "Signed in. The provider can withdraw this at any time — if a password is changed, or the account is not used for months — and mail then stops. The page above says so the moment a send fails." %}
@@ -246,7 +246,7 @@
   <form method="post" action="{% url 'server:email_test' %}" novalidate>
     {% csrf_token %}
     <div class="card mb-4">
-      <h3 class="mb-3 font-medium">{% translate "Send a real message" %}</h3>
+      <h2 class="mb-3 font-medium">{% translate "Send a real message" %}</h2>
       <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
         {% translate "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something." %}
       </p>

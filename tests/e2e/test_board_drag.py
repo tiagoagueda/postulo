@@ -109,7 +109,7 @@ def test_the_status_menu_still_does_the_same_thing(live_server, page: Page, appl
 
     application.refresh_from_db()
     assert application.status == Status.OFFER
-    assert page.locator("#board-drag-help").count() == 1, "and the cards say so to a reader"
+    assert page.locator("#board-move-help").count() == 1, "and the menus say so to a reader"
 
 
 def test_a_column_accepts_the_drag_before_the_drop(live_server, page: Page, application):

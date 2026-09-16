@@ -2,7 +2,7 @@
 {% load i18n postulo %}
 
 {% block content %}
-  <h2 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Plugins" %}</h2>
+  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Plugins" %}</h1>
   <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
     {% translate "What this instance can read a posting with, be notified through, keep documents in, and synchronise with. Postulo's own implementations ship in the box; others are packages you install here." %}
   </p>
@@ -35,7 +35,7 @@
   {# ------------------------------------------------------------ installed #}
   {# --------------------------------------------------------- what is on #}
 
-  <h3 class="mb-3 font-medium">{% translate "What each plugin does, for everybody" %}</h3>
+  <h2 class="mb-3 font-medium">{% translate "What each plugin does, for everybody" %}</h2>
   <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
     {% blocktranslate trimmed %}
       The default for every account. One person's exceptions are on their row under People.
@@ -98,7 +98,7 @@
 
   {# ---------------------------------------------------------- repositories #}
 
-  <h3 class="mb-3 font-medium">{% translate "Where plugins may come from" %}</h3>
+  <h2 class="mb-3 font-medium">{% translate "Where plugins may come from" %}</h2>
   <div class="card mb-8 p-0">
     <ul class="divide-y divide-ink-100 dark:divide-ink-800">
       {% for repository in repositories %}
@@ -144,7 +144,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ repository.name }}">
                   <input type="hidden" name="action" value="remove">
-                  <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">{% translate "Remove" %}</button>
+                  <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">{% translate "Remove" %}</button>
                 </form>
               {% endif %}
             </div>
@@ -179,7 +179,7 @@
     </form>
   </details>
 
-  <h3 class="mb-3 font-medium">{% translate "Installed on this instance" %}</h3>
+  <h2 class="mb-3 font-medium">{% translate "Installed on this instance" %}</h2>
   {% if installed %}
     <div class="card mb-8 p-0">
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -282,7 +282,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ plugin.name }}">
                   <input type="hidden" name="action" value="remove">
-                  <button type="submit" class="btn-ghost px-2 py-1 text-xs text-red-600 dark:text-red-400">{% translate "Remove" %}</button>
+                  <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">{% translate "Remove" %}</button>
                 </form>
               {% else %}
                 <p class="text-xs text-ink-500 dark:text-ink-400">
@@ -309,7 +309,7 @@
   {% endif %}
 
   {# --------------------------------------------------------------- upload #}
-  <h3 class="mb-3 font-medium">{% translate "Install a package" %}</h3>
+  <h2 class="mb-3 font-medium">{% translate "Install a package" %}</h2>
   {% if pending %}
     <div class="card mb-8">
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
@@ -360,7 +360,7 @@
   {% endif %}
 
   {# ------------------------------------------------------------ catalogue #}
-  <h3 class="mb-3 font-medium">{% translate "Catalogues" %}</h3>
+  <h2 class="mb-3 font-medium">{% translate "Catalogues" %}</h2>
   {% if catalogues_configured %}
     <div class="card mb-8 p-0">
       <div class="flex flex-wrap items-center gap-3 border-b border-ink-100 px-4 py-3 dark:border-ink-800">
@@ -432,7 +432,7 @@
   {% endif %}
 
   {# -------------------------------------------------------------- sources #}
-  <h3 class="mb-3 font-medium">{% translate "Capture sources this instance has" %}</h3>
+  <h2 class="mb-3 font-medium">{% translate "Capture sources this instance has" %}</h2>
   <div class="card scroll-x p-0">
     <table class="w-full text-start text-sm">
       <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
