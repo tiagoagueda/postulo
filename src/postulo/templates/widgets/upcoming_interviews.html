@@ -10,9 +10,12 @@
     <ul class="divide-y divide-ink-100 dark:divide-ink-800">
       {% for interview in upcoming_interviews %}
         <li class="flex items-start gap-3 px-4 py-3">
-          <div class="w-20 shrink-0 text-sm tabular-nums">
-            <p class="font-medium">{{ interview.starts_at|date:"D j M" }}</p>
-            <p class="text-xs text-ink-500 dark:text-ink-400">{{ interview.starts_at|date:"H:i" }}</p>
+          {% comment %} Wide enough for a month with its name spelled out, because that is
+             what MONTH_DAY_FORMAT is in most languages -- "16. September", "szeptember
+             16." -- and five rems only ever held "16 Sep" (#225). {% endcomment %}
+          <div class="w-32 shrink-0 text-sm tabular-nums">
+            <p class="font-medium">{{ interview.starts_at|date:"D" }} {{ interview.starts_at|date:"MONTH_DAY_FORMAT" }}</p>
+            <p class="text-xs text-ink-500 dark:text-ink-400">{{ interview.starts_at|date:"TIME_FORMAT" }}</p>
           </div>
           <div class="min-w-0 flex-1">
             <a href="{{ interview.application.get_absolute_url }}#interview-{{ interview.pk }}"

@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n postulo %}
 {% comment %} The bulk action bar (#134).
 
    A form before it is anything else: checkboxes sharing a name and a submit button are a
@@ -16,13 +16,17 @@
   {% csrf_token %}
   <input type="hidden" name="next" value="{{ request.get_full_path }}">
   {% comment %} The count is said out loud, because a selection that exists only as a
-     column of ticks is not a selection for somebody using a screen reader. The two
-     sentences are attributes rather than script strings so they are translated like
-     everything else (#134). {% endcomment %}
+     column of ticks is not a selection for somebody using a screen reader. The sentences
+     are an attribute rather than script strings so they are translated like everything
+     else (#134).
+
+     Every sentence, not two of them. The script used to hold "one" and "many" and pick
+     between them with `n === 1`, which is the English rule and not the Polish, Ukrainian,
+     Irish or Welsh one (#225). A page holds a known number of rows, so the whole answer
+     fits in the attribute and the script only has to count. {% endcomment %}
   <p class="w-full text-sm text-ink-500 dark:text-ink-400" data-bulk-count
      aria-live="polite" aria-atomic="true"
-     data-bulk-one="{% translate 'One row ticked.' %}"
-     data-bulk-many="{% blocktranslate with count='{count}' %}{{ count }} rows ticked.{% endblocktranslate %}">
+     data-bulk-counts="{% ticked_counts page_obj %}">
     {% translate "Tick rows to act on several at once." %}
   </p>
   {% include bulk_fields %}

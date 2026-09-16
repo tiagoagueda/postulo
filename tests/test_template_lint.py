@@ -229,3 +229,112 @@ def test_the_label_detector_knows_the_difference():
     assert lowercased_labels("{{ copy.get_status_display|lower }}") == [1]
     assert lowercased_labels("x\n{% blocktranslate with kind=cv.get_kind_display | lower %}") == [2]
     assert lowercased_labels("{{ copy.get_status_display }}\n{{ code|lower }}") == []
+
+
+# ------------------------------------------------ a date written by hand
+
+#: The format names Django defines for every locale it ships and falls back to from
+#: settings for the rest, so one of these always resolves to a real format string. An
+#: invented name does not: ``get_format`` hands an unrecognised name straight back, and the
+#: page then prints the word SOME_FORMAT to whoever reads in the language that forgot it.
+NAMED_FORMATS = frozenset(
+    {
+        "DATE_FORMAT",
+        "DATETIME_FORMAT",
+        "SHORT_DATE_FORMAT",
+        "SHORT_DATETIME_FORMAT",
+        "TIME_FORMAT",
+        "YEAR_MONTH_FORMAT",
+        "MONTH_DAY_FORMAT",
+    }
+)
+
+#: Single format characters that mean the same thing in every language, so asking for one
+#: settles nothing on the reader's behalf. A year is a number, a day of the month is a
+#: number, and a weekday's name is one word that Django translates itself -- none of them
+#: has an order to get wrong or a clock to assume. Anything with two of them in it does.
+ATOMS = frozenset({"Y", "j", "D", "l"})
+
+#: Literal formats kept on purpose, with the reason. These are not read by anybody: they
+#: are the wire format an ``<input type="date">`` parses and the DOM ids built to match.
+DATES_ON_PURPOSE: dict[str, str] = {
+    "Y-m-d": 'ISO 8601 for an <input type="date"> value and the ids that pair with it',
+}
+
+#: ``{{ value|date:"..." }}`` and ``{{ value|time:"..." }}``, either kind of quote.
+TEMPLATE_DATE = re.compile(r"\|\s*(?:date|time):(?P<quote>[\"'])(?P<format>.*?)(?P=quote)")
+
+#: ``formats.date_format(moment, "...")`` and its time and number siblings.
+PYTHON_DATE = re.compile(
+    r"\b(?:date_format|time_format)\([^()]*?,\s*(?P<quote>[\"'])(?P<format>.*?)(?P=quote)"
+)
+
+
+def spelled_out_dates(text: str, pattern: re.Pattern[str]) -> list[tuple[int, str]]:
+    """Line number and format for every date format written out rather than named."""
+    found = []
+    for match in pattern.finditer(text):
+        spelling = match.group("format")
+        if spelling in NAMED_FORMATS or spelling in ATOMS or spelling in DATES_ON_PURPOSE:
+            continue
+        found.append((text.count("\n", 0, match.start()) + 1, spelling))
+    return found
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_writes_a_date_format_out(path: Path):
+    """``|date:"j M Y"`` is a British sentence about a date, in every language at once.
+
+    It fixes day before month before year and the hour at 14 rather than 2 p.m., which is
+    wrong for Hungarian and Lithuanian today and for most of Asia at 0.4.0 (#225). There
+    were seventy-three of them. The named formats resolve against the reader's language, so
+    the template says *which* date it means and the locale says how to write it.
+    """
+    found = spelled_out_dates(path.read_text(encoding="utf-8"), TEMPLATE_DATE)
+    assert not found, (
+        f"{path.name}: a date format spelled out at "
+        + ", ".join(f"line {line} ({spelling!r})" for line, spelling in found)
+        + ". Ask for one of "
+        + ", ".join(sorted(NAMED_FORMATS))
+        + " instead, and compose it with a second filter where you need a weekday as well."
+    )
+
+
+PYTHON_SOURCES = sorted(
+    (Path(__file__).resolve().parents[1] / "src" / "postulo").rglob("*.py"),
+)
+
+
+@pytest.mark.parametrize(
+    "path", PYTHON_SOURCES, ids=lambda p: str(p.relative_to(PYTHON_SOURCES[0].parents[3]))
+)
+def test_no_view_writes_one_out_either(path: Path):
+    """The same rule where the string is built in Python: a calendar heading, a letter's date.
+
+    ``django.utils.formats.date_format`` takes the same names, so this is the same fix in
+    the same words, and leaving Python out of the lint is how the rule comes back.
+    """
+    found = spelled_out_dates(path.read_text(encoding="utf-8"), PYTHON_DATE)
+    assert not found, (
+        f"{path.name}: a date format spelled out at "
+        + ", ".join(f"line {line} ({spelling!r})" for line, spelling in found)
+        + f". Ask for one of {', '.join(sorted(NAMED_FORMATS))} instead."
+    )
+
+
+def test_the_date_detector_knows_the_difference():
+    assert spelled_out_dates('{{ x|date:"DATE_FORMAT" }}', TEMPLATE_DATE) == []
+    assert spelled_out_dates("{{ x|date:'Y-m-d' }}", TEMPLATE_DATE) == [], "a machine-read date"
+    assert spelled_out_dates('{{ x|date:"Y" }}{{ x|date:"D" }}', TEMPLATE_DATE) == []
+    assert spelled_out_dates('{{ x|date:"j M Y" }}', TEMPLATE_DATE) == [(1, "j M Y")]
+    assert spelled_out_dates('{{ x|date:"H:i" }}', TEMPLATE_DATE) == [(1, "H:i")]
+    assert spelled_out_dates('{{ x | date:"j F" }}', TEMPLATE_DATE) == [(1, "j F")], "spaced"
+    assert spelled_out_dates('date_format(day, "DATE_FORMAT")', PYTHON_DATE) == []
+    assert spelled_out_dates('date_format(day, "l j F Y")', PYTHON_DATE) == [(1, "l j F Y")]
+    assert spelled_out_dates('formats.time_format(x, "H:i")', PYTHON_DATE) == [(1, "H:i")]
+    # An invented name would sail past a check that only looked for format characters.
+    assert spelled_out_dates('{{ x|date:"SHORT_MONTH_DATE_FORMAT" }}', TEMPLATE_DATE) == [
+        (1, "SHORT_MONTH_DATE_FORMAT")
+    ]

@@ -1,6 +1,7 @@
 """Small template helpers used across the interface."""
 
 import functools
+import json
 import posixpath
 import re
 import zlib
@@ -10,8 +11,10 @@ from django import template
 from django.forms import BoundField, Select, TextInput
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.formats import number_format
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext, ngettext
 from django.utils.translation import gettext_lazy as _
 
 register = template.Library()
@@ -473,3 +476,41 @@ def render_widget(context, rendered):
         {**rendered.context, "widget": rendered.spec},
         request=context.get("request"),
     )
+
+
+@register.filter
+def percent(value) -> str:
+    """A share written as the reader's language writes one.
+
+    English puts the sign against the number, French puts a space before it and Turkish
+    puts it in front -- %42. Hard-coding ``{{ share }}%`` in the template settles that
+    question for every language at once, and settles it wrongly for two of them (#225), so
+    the whole thing is one string the catalogue can rearrange. The number arrives already
+    formatted, usually by ``floatformat``, which localises the decimal mark itself.
+    """
+    return gettext("%(share)s%%") % {"share": value}
+
+
+@register.simple_tag
+def ticked_counts(rows) -> str:
+    """Every sentence the bulk bar can need, as JSON, indexed by how many rows are ticked.
+
+    The bar counts ticks in the browser, and the browser has no plural rules: it used to
+    choose between one string and another with ``n === 1``, which is right for English and
+    wrong for Polish, Ukrainian, Irish, Welsh and nine more (#225). Nothing portable fixes
+    that in JavaScript, but nothing has to. A page holds a bounded number of rows, so the
+    server can write out the answer for each count in advance and let the script index it.
+
+    Index 0 is empty: no ticks is a different sentence, and the bar keeps its own.
+    """
+    try:
+        upper = len(rows)
+    except TypeError:
+        upper = int(rows or 0)
+    counts = [""]
+    for number in range(1, max(upper, 0) + 1):
+        counts.append(
+            ngettext("One row ticked.", "%(count)s rows ticked.", number)
+            % {"count": number_format(number)}
+        )
+    return json.dumps(counts, ensure_ascii=False)

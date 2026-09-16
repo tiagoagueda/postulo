@@ -24,8 +24,8 @@
               <div class="flex flex-wrap items-baseline justify-between gap-2">
                 <p class="font-medium">{{ item.role }} — {{ item.organisation }}</p>
                 <p class="text-xs text-ink-500 tabular-nums dark:text-ink-400">
-                  {{ item.start_date|date:"M Y" }} –
-                  {% if item.end_date %}{{ item.end_date|date:"M Y" }}{% else %}{% translate "present" %}{% endif %}
+                  {{ item.start_date|date:"YEAR_MONTH_FORMAT" }} –
+                  {% if item.end_date %}{{ item.end_date|date:"YEAR_MONTH_FORMAT" }}{% else %}{% translate "present" %}{% endif %}
                 </p>
               </div>
               {% if item.summary %}<p class="mt-1 text-sm">{{ item.summary }}</p>{% endif %}

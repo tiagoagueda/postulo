@@ -292,7 +292,7 @@ def letter_values(letter: CoverLetter, application=None) -> dict[str, str]:
         # Through Django's formatter rather than `strftime`, which names the month from the
         # C locale and so wrote an English month into every letter whatever language the
         # letter was in (#223). Called inside the override, so it follows the letter.
-        "date": formats.date_format(timezone.localdate(), "j F Y"),
+        "date": formats.date_format(timezone.localdate(), "DATE_FORMAT"),
         "company": "",
         "role": "",
         "location": "",

@@ -22,6 +22,7 @@ from dataclasses import dataclass, field
 
 from django.db.models import Q
 from django.urls import reverse
+from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
 #: How many hits a group shows on the page before "more".
@@ -79,8 +80,13 @@ def excerpt(text: str, query: str, radius: int = EXCERPT_RADIUS) -> str:
 
 
 def _day(moment) -> str:
-    """``12 May 2026``, without a leading zero and without platform-specific strftime flags."""
-    return f"{moment.day} {moment:%b %Y}"
+    """The date, written the way the reader's language writes one.
+
+    It used to be ``f"{moment.day} {moment:%b %Y}"``, which takes the month's name from the
+    C locale: an English month in the middle of a French search result, and a day-month-year
+    order for a language that puts the year first (#225).
+    """
+    return formats.date_format(moment, "DATE_FORMAT")
 
 
 def contains(query: str, *fields: str) -> Q:

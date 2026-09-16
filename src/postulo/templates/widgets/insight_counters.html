@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n postulo %}
 {% if insights.applied %}
   {% if insights.sample_is_small %}
     <div class="alert-info mb-4">
@@ -18,7 +18,7 @@
     </div>
     <div class="card">
       <p class="text-3xl font-semibold tabular-nums">
-        {% if insights.response_rate is not None %}{{ insights.response_rate|floatformat:0 }}%{% else %}—{% endif %}
+        {% if insights.response_rate is not None %}{{ insights.response_rate|floatformat:0|percent }}{% else %}—{% endif %}
       </p>
       <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Got any reply" %}</p>
     </div>

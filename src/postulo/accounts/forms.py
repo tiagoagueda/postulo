@@ -450,6 +450,22 @@ class AppearanceForm(forms.ModelForm):
             profile.save()
         return profile
 
+    @property
+    def quiet_days(self) -> int:
+        """Whatever is in the box, as a number the template can pluralise against.
+
+        The unit beside the field has to agree with it -- "1 day", "2 days", and in Polish
+        a third form again (#225) -- and ``{% blocktranslate count %}`` refuses anything
+        that is not a number. A bound form hands back the raw string somebody typed, which
+        may be "" or "abc", so the default stands in: the unit is a label, and a label that
+        raises while the page is showing a validation error is worse than one that agrees
+        with the number the field will fall back to anyway.
+        """
+        try:
+            return int(self["quiet_after_days"].value())
+        except (TypeError, ValueError):
+            return Profile._meta.get_field("quiet_after_days").default
+
     def clean_quiet_after_days(self) -> int:
         value = self.cleaned_data.get("quiet_after_days")
         if value is None:

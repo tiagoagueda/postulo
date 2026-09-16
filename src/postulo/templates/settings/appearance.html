@@ -49,7 +49,12 @@
         <div class="w-32">
           {% include "partials/field.html" with field=form.quiet_after_days %}
         </div>
-        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">{% translate "days" %}</p>
+        {% comment %} The unit agrees with the number in the box beside it. "days" on its own
+           has no singular to offer at 1 and no second plural to offer at 2 for the
+           languages that have one (#225). {% endcomment %}
+        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+          {% blocktranslate count counter=form.quiet_days trimmed %}day{% plural %}days{% endblocktranslate %}
+        </p>
       </div>
     </div>
     <div class="card mb-6">

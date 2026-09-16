@@ -178,7 +178,19 @@ root tells an assistant how this project works; keep it current when the rules c
 - **British English** in code, comments, documentation, and interface text: *organise*,
   *colour*, *licence* (noun), *behaviour*.
 - **Wrap every user-facing string** in `gettext` / `gettext_lazy`, or `{% translate %}`
-  in templates. Untranslatable strings are treated as bugs.
+  in templates. Untranslatable strings are treated as bugs. Wrap the *whole sentence*:
+  a verb translated on its own and a date printed beside it is half a clause, and no
+  language promises to keep the two in that order. Put the link inside the
+  `{% blocktranslate %}` with its address as a variable, and pluralise a unit with
+  `{% blocktranslate count %}` rather than writing "days" after a number field.
+- **Never write a date format out.** `|date:"j M Y"` fixes day before month before year and
+  the hour at 14 rather than 2 p.m. for every language at once. Ask for one of Django's
+  names — `DATE_FORMAT`, `DATETIME_FORMAT`, `SHORT_DATE_FORMAT`, `SHORT_DATETIME_FORMAT`,
+  `TIME_FORMAT`, `YEAR_MONTH_FORMAT`, `MONTH_DAY_FORMAT` — in the filter or in
+  `django.utils.formats.date_format`, and compose two of them where you need a weekday as
+  well. Do not invent a name: `get_format` returns an unknown name to the page as it is, so
+  a name one locale has not defined is printed to whoever reads in that language.
+  `tests/test_template_lint.py` fails on a format written out in a template or a view.
 - **Never name a side of the page.** Use the logical utilities — `ms`/`me`, `ps`/`pe`,
   `start`/`end`, `text-start`/`text-end`, `border-s`/`border-e` — not `ml`, `pl`,
   `text-left` or `left-0`. They mean the same thing under `ltr` and the right thing under

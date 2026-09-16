@@ -35,7 +35,7 @@
                 {% if row.connection.last_error %}
                   · <span class="text-red-600 dark:text-red-400"><bdi>{{ row.connection.last_error|truncatechars:80 }}</bdi></span>
                 {% elif row.connection.last_ok_at %}
-                  · {% blocktranslate with when=row.connection.last_ok_at|date:"j M Y, H:i" trimmed %}worked {{ when }}{% endblocktranslate %}
+                  · {% blocktranslate with when=row.connection.last_ok_at|date:"DATETIME_FORMAT" trimmed %}worked {{ when }}{% endblocktranslate %}
                 {% else %}
                   · {% translate "not tested yet" %}
                 {% endif %}
@@ -45,7 +45,7 @@
               {% endif %}
               {% if row.is_sync and row.connection.last_summary %}
                 <p class="truncate text-xs text-ink-500 dark:text-ink-400">
-                  {% blocktranslate with when=row.connection.synced_at|date:"j M Y, H:i" report=row.connection.last_summary trimmed %}Last run {{ when }}: {{ report }}{% endblocktranslate %}
+                  {% blocktranslate with when=row.connection.synced_at|date:"DATETIME_FORMAT" report=row.connection.last_summary trimmed %}Last run {{ when }}: {{ report }}{% endblocktranslate %}
                 </p>
               {% endif %}
             </div>

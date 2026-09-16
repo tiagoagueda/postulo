@@ -536,6 +536,7 @@
     display.dataset.words = JSON.stringify([0, 1, 2, 3, 4].map(function (score) {
       return template.getAttribute("data-word-" + score) || "";
     }));
+    display.dataset.adviceLanguage = template.getAttribute("data-advice-language") || "";
     input.insertAdjacentElement("afterend", display);
     return display;
   }
@@ -598,9 +599,24 @@
         segment.className.replace(/\bbg-\S+/g, "").trim() +
         (lit ? " " + METER_TONES[result.score] : " bg-ink-200 dark:bg-ink-700");
     });
-    word.textContent = words[result.score] || "";
+    // Only written when it changes. The word sits in a live region, and a region that is
+    // rewritten on every keystroke is read out on every keystroke, even when it still says
+    // the same thing (#225).
+    var saying = words[result.score] || "";
+    if (word.textContent !== saying) {
+      word.textContent = saying;
+    }
+    // zxcvbn's advice is the vendored language pack's, and only the English pack is
+    // vendored. Appending an English sentence to a translated word gives a French reader
+    // "Fort · Add another word or two", so the advice is shown when the pack and the page
+    // agree on the language and left out when they do not -- and the day a second pack is
+    // vendored, `data-advice-language` is what turns it back on. It sits outside the live
+    // region either way: what gets announced is the word.
+    var pack = (display.dataset.adviceLanguage || "").toLowerCase();
+    var reading = (document.documentElement.lang || "").toLowerCase().split("-")[0];
     var advice = result.feedback.warning || (result.feedback.suggestions || [])[0] || "";
-    suggestion.textContent = advice && result.score < 3 ? " · " + advice : "";
+    var wanted = pack && pack === reading && advice && result.score < 3;
+    suggestion.textContent = wanted ? " · " + advice : "";
   });
 
   // The account menu is a <details> element, which opens and closes itself and is
@@ -749,8 +765,22 @@
       label.textContent = label.dataset.bulkNone || label.textContent;
       return;
     }
-    var template = ticked === 1 ? label.dataset.bulkOne : label.dataset.bulkMany;
-    label.textContent = (template || "{count} selected").replace("{count}", ticked);
+    // The page wrote out the sentence for every count it can reach, in the reader's
+    // language and with that language's plural rules already applied, so this indexes
+    // rather than chooses. `n === 1` here would be the English rule imposed on sixty-eight
+    // languages, thirteen of which disagree with it (#225).
+    var sentences = [];
+    try {
+      sentences = JSON.parse(label.dataset.bulkCounts || "[]");
+    } catch (error) {
+      sentences = [];
+    }
+    // Nothing to say and nothing said: without the attribute the bar keeps the sentence
+    // the page rendered, which is the same thing it does without any script at all.
+    var saying = sentences[ticked] || sentences[sentences.length - 1];
+    if (saying) {
+      label.textContent = saying;
+    }
   }
 
   function addSelectAll(form) {

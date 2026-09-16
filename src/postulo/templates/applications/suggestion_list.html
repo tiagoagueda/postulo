@@ -44,7 +44,7 @@
                   {% if suggestion.suggested_status %}
                     · {% blocktranslate with status=suggestion.get_suggested_status_display trimmed %}would move it to {{ status }}{% endblocktranslate %}
                   {% endif %}
-                  · {{ suggestion.occurred_at|date:"j M Y, H:i" }}
+                  · {{ suggestion.occurred_at|date:"DATETIME_FORMAT" }}
                   · <code>{{ suggestion.source }}</code>
                 </p>
                 {% if suggestion.application %}

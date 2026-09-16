@@ -98,7 +98,7 @@ class Period:
     @property
     def label(self) -> str:
         if self.kind == "month":
-            return formats.date_format(self.start, "F Y")
+            return formats.date_format(self.start, "YEAR_MONTH_FORMAT")
         if self.kind == "quarter":
             return _("Q%(quarter)s %(year)s") % {
                 "quarter": (self.start.month - 1) // 3 + 1,
@@ -248,7 +248,7 @@ class Week:
 
     @property
     def label(self) -> str:
-        return formats.date_format(self.start, "j M")
+        return formats.date_format(self.start, "MONTH_DAY_FORMAT")
 
 
 @dataclass

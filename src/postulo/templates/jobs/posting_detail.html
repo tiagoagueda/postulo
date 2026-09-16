@@ -85,7 +85,7 @@
           {% if posting.closes_at %}
             <div>
               <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Closes" %}</dt>
-              <dd>{{ posting.closes_at|date:"j F Y" }}</dd>
+              <dd>{{ posting.closes_at|date:"DATE_FORMAT" }}</dd>
             </div>
           {% endif %}
         </dl>
@@ -107,7 +107,7 @@
                   {{ application.get_status_display }}
                 </a>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
-                  {{ application.applied_at|date:"j M Y"|default:"—" }}
+                  {{ application.applied_at|date:"DATE_FORMAT"|default:"—" }}
                 </p>
               </li>
             {% endfor %}

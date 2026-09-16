@@ -43,7 +43,7 @@
             <td class="px-4 py-3" role="cell" data-label="{% translate 'Name' %}">{{ person.get_full_name|default:"—" }}</td>
             <td class="px-4 py-3 break-all" role="cell" data-label="{% translate 'Email' %}">{{ person.email }}</td>
             <td class="px-4 py-3 text-ink-500 dark:text-ink-400" role="cell" data-label="{% translate 'Last sign-in' %}">
-              {{ person.last_login|date:"j M Y"|default:"—" }}
+              {{ person.last_login|date:"DATE_FORMAT"|default:"—" }}
             </td>
             <td class="px-4 py-3" role="cell" data-label="{% translate 'Role' %}">
               {% if not person.is_active %}

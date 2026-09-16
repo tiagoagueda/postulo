@@ -428,6 +428,36 @@ TIME_ZONE = env("POSTULO_TIME_ZONE", default="Europe/Paris")
 USE_I18N = True
 USE_TZ = True
 
+# How a date is written is the language's business, not the template's (#225). Templates ask
+# for a format by name -- DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT,
+# MONTH_DAY_FORMAT -- and `get_format` answers with whatever the reader's language defines,
+# so Hungarian gets 2026. szeptember 16. and Lithuanian gets 2026 m. rugsejo 16 d. instead of
+# the day-month-year order every template used to spell out by hand.
+#
+# Only Django's own names are used. `get_format` hands an unknown name straight back, so a
+# name Postulo invented and one locale forgot would print the literal word SOME_FORMAT on the
+# page for whoever reads in that language; the stock names cannot do that, because the
+# fallback below always answers.
+#
+# Thirty of the languages Postulo offers have no format module in Django -- most of the
+# African set among them -- and those fall through to these settings. Django's defaults here
+# are American (N j, Y), which nobody reading Postulo in Wolof asked for either, so the
+# fallback is the British English the interface was written in: it is what those readers see
+# today, and it stays what they see.
+DATE_FORMAT = "j M Y"
+DATETIME_FORMAT = "j M Y, H:i"
+TIME_FORMAT = "H:i"
+YEAR_MONTH_FORMAT = "F Y"
+MONTH_DAY_FORMAT = "j F"
+SHORT_DATE_FORMAT = "d/m/Y"
+SHORT_DATETIME_FORMAT = "d/m/Y H:i"
+
+# One locale is corrected rather than accepted: Django's en_GB writes a time as "2.30 p.m."
+# and Postulo has always shown 14:30. See postulo/config/formats/en_GB/formats.py. A module
+# found here is consulted before Django's own and only for the locale it is named after, so
+# this changes British English and leaves the other sixty-eight alone.
+FORMAT_MODULE_PATH = ["postulo.config.formats"]
+
 # ---------------------------------------------------------------- static & media
 
 STATIC_URL = "static/"

@@ -76,7 +76,7 @@
                         </p>
                         {% if item.checked_at %}
                           <p class="text-xs {% if item.is_broken %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
-                            {% blocktranslate with when=item.checked_at|date:"j M Y" detail=item.check_detail trimmed %}
+                            {% blocktranslate with when=item.checked_at|date:"DATE_FORMAT" detail=item.check_detail trimmed %}
                               Checked {{ when }}: {{ detail }}
                             {% endblocktranslate %}
                           </p>

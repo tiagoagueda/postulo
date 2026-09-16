@@ -262,7 +262,7 @@ STATUS_AFTER_INTERVIEW = {
 
 def _when(moment) -> str:
     """A date and time the way the timeline prints them, in the active time zone."""
-    return formats.date_format(timezone.localtime(moment), "j M Y, H:i")
+    return formats.date_format(timezone.localtime(moment), "DATETIME_FORMAT")
 
 
 def _interview_reminder_summary(interview: Interview) -> str:
@@ -278,7 +278,7 @@ def _interview_reminder_summary(interview: Interview) -> str:
         % {
             "kind": interview.get_kind_display(),
             "company": interview.application.posting.company.name,
-            "time": formats.date_format(timezone.localtime(interview.starts_at), "H:i"),
+            "time": formats.date_format(timezone.localtime(interview.starts_at), "TIME_FORMAT"),
         }
     )
 

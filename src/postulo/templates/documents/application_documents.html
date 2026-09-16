@@ -26,7 +26,7 @@
               <div class="min-w-0 flex-1">
                 <p class="font-medium">{{ document.title }}</p>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
-                  {{ document.rendered_at|date:"j M Y, H:i" }} · {{ document.checksum|slice:":12" }}
+                  {{ document.rendered_at|date:"DATETIME_FORMAT" }} · {{ document.checksum|slice:":12" }}
                 </p>
                 {% url 'documents:rendered_archive' document.pk as send_url %}
                 {% include "documents/partials/copies.html" with document=document send_url=send_url %}

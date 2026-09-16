@@ -42,7 +42,7 @@
       <div class="alert-warning mb-6" role="status" data-known>
         {% for listing in known.listings %}
           <p>
-            {% blocktranslate trimmed with when=listing.created_at|date:"j M Y" %}
+            {% blocktranslate trimmed with when=listing.created_at|date:"DATE_FORMAT" %}
               This address is already in your listings, since {{ when }}.
             {% endblocktranslate %}
             <a href="{{ listing.get_absolute_url }}" class="underline">{{ listing.title }} — {{ listing.company.name }}</a>
@@ -50,7 +50,7 @@
         {% endfor %}
         {% for other in known.captures %}
           <p>
-            {% blocktranslate trimmed with when=other.created_at|date:"j M Y" %}
+            {% blocktranslate trimmed with when=other.created_at|date:"DATE_FORMAT" %}
               A capture of this address from {{ when }} is still waiting for review.
             {% endblocktranslate %}
             <a href="{{ other.get_absolute_url }}" class="underline">{% translate "Open it" %}</a>

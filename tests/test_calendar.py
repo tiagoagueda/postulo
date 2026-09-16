@@ -155,7 +155,10 @@ def test_a_cell_holds_two_and_counts_the_rest_and_the_day_opens_on_them(client, 
 
     day = client.get(reverse(CALENDAR), {"view": "day", "on": "2026-09-08"}).content.decode()
     assert day.count("data-event=") == 4
-    assert "Tuesday 8 September 2026" in day
+    # The heading is the weekday and then DATE_FORMAT, which British English writes with
+    # the month abbreviated; it used to spell the month out and to do so in every
+    # language at once (#225).
+    assert "Tuesday 8 Sep 2026" in day
 
 
 def test_week_day_and_agenda_are_the_same_events_in_another_shape(client, user, application):

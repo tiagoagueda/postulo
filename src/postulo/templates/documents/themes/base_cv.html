@@ -106,9 +106,9 @@
                   {% endif %}
                 </div>
                 <p class="dates">
-                  {% if entry.item.start_date %}{{ entry.item.start_date|date:"M Y" }}{% endif %}
+                  {% if entry.item.start_date %}{{ entry.item.start_date|date:"YEAR_MONTH_FORMAT" }}{% endif %}
                   {% if entry.item.start_date and entry.item.end_date %} – {% endif %}
-                  {% if entry.item.end_date %}{{ entry.item.end_date|date:"M Y" }}
+                  {% if entry.item.end_date %}{{ entry.item.end_date|date:"YEAR_MONTH_FORMAT" }}
                   {% elif entry.item.start_date %} – {% translate "present" %}{% endif %}
                 </p>
               </div>

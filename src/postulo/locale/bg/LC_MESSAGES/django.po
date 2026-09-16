@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 14:41+0000\n"
+"POT-Creation-Date: 2026-09-16 14:46+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -64,11 +64,6 @@ msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "%(count)s кандидатура е замлъкнала"
 msgstr[1] "%(count)s кандидатури са замлъкнали"
 
-#: src/postulo/templates/partials/table/bulk.html:26
-#, python-format, draft
-msgid "%(count)s rows ticked."
-msgstr "%(count)s отметнати реда."
-
 #: src/postulo/templates/server/people.html:106
 #, python-format, draft
 msgid ""
@@ -115,7 +110,7 @@ msgid_plural "%(counter)s files, %(size)s"
 msgstr[0] "%(counter)s файл, %(size)s"
 msgstr[1] "%(counter)s файла, %(size)s"
 
-#: src/postulo/templates/widgets/upcoming_interviews.html:38
+#: src/postulo/templates/widgets/upcoming_interviews.html:42
 #, python-format, draft
 msgid "%(counter)s interview has passed without an outcome. How did it go?"
 msgid_plural "%(counter)s interviews have passed without an outcome. How did they go?"
@@ -445,6 +440,11 @@ msgstr ""
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d копия са изпратени."
+
+#: src/postulo/core/templatetags/postulo.py:491
+#, python-format
+msgid "%(share)s%%"
+msgstr ""
 
 #: src/postulo/documents/themes.py:193
 #, python-format, draft
@@ -1406,7 +1406,7 @@ msgid "Application updated."
 msgstr "Кандидатурата е обновена."
 
 #: src/postulo/applications/apps.py:9 src/postulo/core/navigation.py:58
-#: src/postulo/core/search.py:384 src/postulo/jobs/tables.py:65
+#: src/postulo/core/search.py:390 src/postulo/jobs/tables.py:65
 #: src/postulo/templates/applications/application_list.html:6
 #: src/postulo/templates/applications/application_list.html:77
 #: src/postulo/templates/core/export.html:20
@@ -1526,7 +1526,7 @@ msgstr "кандидатствано чрез"
 msgid "Apply"
 msgstr "Кандидатстване"
 
-#: src/postulo/templates/partials/table/bulk.html:30
+#: src/postulo/templates/partials/table/bulk.html:34
 #, draft
 msgid "Apply to the ticked rows"
 msgstr "Приложи към отметнатите редове"
@@ -1926,7 +1926,7 @@ msgstr "Отхвърлени прихващания: %(count)s."
 msgid "Career preview"
 msgstr "Преглед на кариерата"
 
-#: src/postulo/core/search.py:393
+#: src/postulo/core/search.py:399
 #, draft
 msgid "Career record"
 msgstr "Кариерна история"
@@ -2064,7 +2064,7 @@ msgstr "Изберете нова парола"
 msgid "Choose a package first."
 msgstr "Първо изберете пакет."
 
-#: src/postulo/templates/applications/partials/board.html:25
+#: src/postulo/templates/applications/partials/board.html:33
 msgid ""
 "Choose a status to move this card to another column. From the keyboard the move is made when you press Enter or leave the menu, so passing over a status on the way does not record it. Cards can also be dragged between columns with a mouse."
 msgstr ""
@@ -2084,7 +2084,7 @@ msgstr "Избор на друг файл"
 msgid "Choose at least one document to record."
 msgstr "Изберете поне един документ за записване."
 
-#: src/postulo/accounts/forms.py:481 src/postulo/jobs/forms.py:292
+#: src/postulo/accounts/forms.py:497 src/postulo/jobs/forms.py:292
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Изберете какъв вид идентификатор е това."
@@ -2217,7 +2217,7 @@ msgstr "Колоните са запазени."
 msgid "Coming up"
 msgstr "Предстоящи"
 
-#: src/postulo/core/navigation.py:74 src/postulo/core/search.py:386
+#: src/postulo/core/navigation.py:74 src/postulo/core/search.py:392
 #: src/postulo/templates/core/export.html:19
 #: src/postulo/templates/jobs/company_list.html:6
 #: src/postulo/templates/jobs/company_list.html:64
@@ -2528,10 +2528,10 @@ msgstr "Създаване на акаунт"
 msgid "Create invitation"
 msgstr "Създаване на покана"
 
-#: src/postulo/templates/api/token_list.html:70
-#, draft
-msgid "created"
-msgstr "създадена"
+#: src/postulo/templates/api/token_list.html:76
+#, python-format
+msgid "Created %(date)s"
+msgstr ""
 
 #: src/postulo/accounts/models.py:355 src/postulo/accounts/models.py:426
 #: src/postulo/accounts/models.py:500 src/postulo/core/models.py:34
@@ -2585,7 +2585,7 @@ msgstr "Записи в CV"
 msgid "CV entry"
 msgstr "Запис в CV"
 
-#: src/postulo/core/search.py:391 src/postulo/documents/models.py:136
+#: src/postulo/core/search.py:397 src/postulo/documents/models.py:136
 #: src/postulo/templates/accounts/delete_account.html:23
 #: src/postulo/templates/core/export.html:21
 #, draft
@@ -2661,15 +2661,16 @@ msgstr "Дати по ваш избор"
 msgid "Day"
 msgstr "Ден"
 
+#: src/postulo/templates/settings/appearance.html:58
+msgid "day"
+msgid_plural "days"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/core/import_csv_map.html:46
 #, draft
 msgid "day / month / year (31/12/2026)"
 msgstr "ден / месец / година (31/12/2026)"
-
-#: src/postulo/templates/settings/appearance.html:53
-#, draft
-msgid "days"
-msgstr "дни"
 
 #: src/postulo/applications/widgets.py:226
 #, draft
@@ -3183,7 +3184,7 @@ msgstr "имейл адрес"
 msgid "Email address"
 msgstr "Имейл адрес"
 
-#: src/postulo/accounts/forms.py:659
+#: src/postulo/accounts/forms.py:675
 #, draft
 msgid "Email address (optional)"
 msgstr "Имейл адрес (незадължително)"
@@ -3223,7 +3224,7 @@ msgstr "Вид заетост"
 msgid "employment type"
 msgstr "вид заетост"
 
-#: src/postulo/templates/applications/partials/board.html:47
+#: src/postulo/templates/applications/partials/board.html:55
 #, draft
 msgid "Empty"
 msgstr "Празно"
@@ -3394,7 +3395,7 @@ msgid ""
 msgstr ""
 "Предлага се всичко, докато не го стесните. Отметнете всички и така си остава, за да се появи от само себе си език, добавен в по-късна версия."
 
-#: src/postulo/templates/api/token_list.html:111
+#: src/postulo/templates/api/token_list.html:121
 #, python-format, draft
 msgid ""
 "Everything the API offers is described at <code>%(url)s</code>, in OpenAPI."
@@ -3449,10 +3450,10 @@ msgstr "опит"
 msgid "Expired"
 msgstr "Изтекла"
 
-#: src/postulo/templates/api/token_list.html:72
-#, draft
-msgid "expired"
-msgstr "изтекла"
+#: src/postulo/templates/api/token_list.html:79
+#, python-format
+msgid "Expired %(date)s"
+msgstr ""
 
 #: src/postulo/api/forms.py:32
 #: src/postulo/templates/accounts/invite_list.html:27
@@ -3460,10 +3461,15 @@ msgstr "изтекла"
 msgid "Expires"
 msgstr "Изтича"
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68
 #, draft
 msgid "expires"
 msgstr "изтича"
+
+#: src/postulo/templates/api/token_list.html:81
+#, python-format
+msgid "Expires %(date)s"
+msgstr ""
 
 #: src/postulo/accounts/models.py:427 src/postulo/accounts/models.py:501
 #, draft
@@ -3508,7 +3514,7 @@ msgstr "Неуспешно"
 msgid "Failed without saying why."
 msgstr "Провали се, без да каже защо."
 
-#: src/postulo/templates/account/partials/password_meter.html:14
+#: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
 msgid "Fair"
 msgstr "Изложение"
@@ -3587,7 +3593,7 @@ msgid ""
 msgstr ""
 "Заведено под Изпратени документи, с днешна дата, за да се запази това, което сте предали."
 
-#: src/postulo/core/search.py:392
+#: src/postulo/core/search.py:398
 #: src/postulo/templates/documents/upload_list.html:6
 #: src/postulo/templates/documents/upload_list.html:11
 #, draft
@@ -3936,7 +3942,7 @@ msgstr "Замлъкнала"
 msgid "Gone quiet at:"
 msgstr "Замлъкнала от:"
 
-#: src/postulo/templates/account/partials/password_meter.html:15
+#: src/postulo/templates/account/partials/password_meter.html:23
 #, draft
 msgid "Good"
 msgstr "Добра"
@@ -4330,12 +4336,12 @@ msgstr "В сила сега"
 msgid "In force now: %(language)s, %(zone)s."
 msgstr "В сила сега: %(language)s, %(zone)s."
 
-#: src/postulo/core/search.py:330
+#: src/postulo/core/search.py:336
 #, python-format, draft
 msgid "in the %(kind)s rendered on %(when)s"
 msgstr "в %(kind)s, генерирано на %(when)s"
 
-#: src/postulo/core/search.py:320
+#: src/postulo/core/search.py:326
 #, python-format, draft
 msgid "in the %(kind)s you sent to %(company)s on %(when)s"
 msgstr "в %(kind)s, което изпратихте на %(company)s на %(when)s"
@@ -4731,7 +4737,7 @@ msgstr ""
 msgid "key"
 msgstr ""
 
-#: src/postulo/templates/settings/appearance.html:78
+#: src/postulo/templates/settings/appearance.html:84
 msgid "Keyboard shortcuts"
 msgstr ""
 
@@ -4794,7 +4800,7 @@ msgstr "Видове писма"
 msgid "label"
 msgstr "етикет"
 
-#: src/postulo/accounts/forms.py:621 src/postulo/resume/forms.py:208
+#: src/postulo/accounts/forms.py:637 src/postulo/resume/forms.py:208
 #: src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
@@ -4930,10 +4936,15 @@ msgstr "Последен вход"
 msgid "last synced"
 msgstr "последно синхронизирано"
 
-#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69
 #, draft
 msgid "last used"
 msgstr "последно използван"
+
+#: src/postulo/templates/api/token_list.html:85
+#, python-format
+msgid "Last used %(when)s"
+msgstr ""
 
 #: src/postulo/plugins/models.py:181
 #, draft
@@ -5015,7 +5026,7 @@ msgstr "Писмо"
 msgid "letter"
 msgstr "писмо"
 
-#: src/postulo/core/search.py:390
+#: src/postulo/core/search.py:396
 #: src/postulo/templates/accounts/delete_account.html:24
 #: src/postulo/templates/core/export.html:22
 #: src/postulo/templates/documents/letter_list.html:6
@@ -5121,7 +5132,7 @@ msgstr "обява"
 msgid "Listing filters"
 msgstr "Филтри за обяви"
 
-#: src/postulo/core/navigation.py:45 src/postulo/core/search.py:385
+#: src/postulo/core/navigation.py:45 src/postulo/core/search.py:391
 #: src/postulo/templates/core/import_csv_done.html:15
 #: src/postulo/templates/jobs/listing_list.html:6
 #: src/postulo/templates/jobs/listing_list.html:11
@@ -5600,10 +5611,9 @@ msgstr "Роден"
 msgid "Never"
 msgstr "Никога"
 
-#: src/postulo/templates/api/token_list.html:77
-#, draft
-msgid "never used"
-msgstr "никога не използван"
+#: src/postulo/templates/api/token_list.html:87
+msgid "Never used"
+msgstr ""
 
 #: src/postulo/jobs/models.py:578
 #, draft
@@ -5789,7 +5799,7 @@ msgid ""
 msgstr ""
 "Никоя инсталирана добавка не се нуждае от връзка. Известители, хранилища за документи и добавки за синхронизация се появяват тук, щом операторът инсталира такава."
 
-#: src/postulo/templates/widgets/upcoming_interviews.html:32
+#: src/postulo/templates/widgets/upcoming_interviews.html:36
 #, draft
 msgid "No interviews in the diary."
 msgstr "Няма интервюта в дневника."
@@ -6104,7 +6114,7 @@ msgstr "бележка"
 msgid "Note"
 msgstr "Бележка"
 
-#: src/postulo/accounts/forms.py:660
+#: src/postulo/accounts/forms.py:676
 #: src/postulo/templates/applications/application_detail.html:65
 #, draft
 msgid "Note (optional)"
@@ -6640,10 +6650,12 @@ msgstr[0] ""
 msgstr[1] ""
 "%(total)s ключа за достъп в този профил. Вписват ви с пръстов отпечатък, лице или ПИН и няма парола, която да изтече."
 
-#: src/postulo/templates/partials/table/bulk.html:25
-#, draft
+#: src/postulo/core/templatetags/postulo.py:513
+#, python-format, draft
 msgid "One row ticked."
-msgstr "Един отметнат ред."
+msgid_plural "%(count)s rows ticked."
+msgstr[0] "Един отметнат ред."
+msgstr[1] ""
 
 #: src/postulo/templates/server/email.html:130
 #, python-format, draft
@@ -6656,16 +6668,14 @@ msgstr[0] ""
 msgstr[1] ""
 "%(counter)s от настройките по-долу са съхранени тук и средата ги замества. Премахнете тези променливи и съхранените стойности поемат, без някой да е редактирал нищо."
 
-#: src/postulo/templates/applications/partials/board.html:10
-#, python-format, draft
+#: src/postulo/templates/applications/partials/board.html:16
+#, python-format
 msgid ""
-"One settled application matches these filters. The board shows only what is still live;"
+"One settled application matches these filters. The board shows only what is still live; <a href=\"%(url)s\" class=\"text-brand-600 underline dark:text-brand-400\">see them in the table</a>."
 msgid_plural ""
-"%(counter)s settled applications match these filters. The board shows only what is still live;"
+"%(counter)s settled applications match these filters. The board shows only what is still live; <a href=\"%(url)s\" class=\"text-brand-600 underline dark:text-brand-400\">see them in the table</a>."
 msgstr[0] ""
-"Една приключена кандидатура отговаря на тези филтри. Таблото показва само това, което е още живо;"
 msgstr[1] ""
-"%(counter)s приключени кандидатури отговарят на тези филтри. Таблото показва само това, което е още живо;"
 
 #: src/postulo/templates/applications/interview_form.html:18
 #, draft
@@ -6965,7 +6975,7 @@ msgstr "Чакаща"
 msgid "Pending only"
 msgstr "Само чакащите"
 
-#: src/postulo/core/search.py:387 src/postulo/core/server_sections.py:15
+#: src/postulo/core/search.py:393 src/postulo/core/server_sections.py:15
 #: src/postulo/core/server_views.py:144 src/postulo/core/server_views.py:230
 #: src/postulo/core/server_views.py:247 src/postulo/core/server_views.py:325
 #: src/postulo/core/server_views.py:342 src/postulo/jobs/tables.py:93
@@ -7878,7 +7888,7 @@ msgstr "Напомняне:"
 msgid "reminders"
 msgstr "напомняния"
 
-#: src/postulo/core/navigation.py:75 src/postulo/core/search.py:388
+#: src/postulo/core/navigation.py:75 src/postulo/core/search.py:394
 #: src/postulo/templates/applications/application_detail.html:320
 #: src/postulo/templates/applications/reminder_list.html:6
 #: src/postulo/templates/applications/reminder_list.html:10
@@ -8037,16 +8047,17 @@ msgid "reviewed on"
 msgstr "прегледано на"
 
 #: src/postulo/templates/accounts/invite_list.html:58
-#: src/postulo/templates/api/token_list.html:86
+#: src/postulo/templates/api/token_list.html:96
 #, draft
 msgid "Revoke"
 msgstr "Оттегляне"
 
-#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70
 #, draft
 msgid "revoked"
 msgstr "оттеглен"
 
+#: src/postulo/templates/api/token_list.html:89
 #: src/postulo/templates/server/person_recovery.html:76
 #, draft
 msgid "Revoked"
@@ -8183,7 +8194,7 @@ msgstr "заплата до"
 #: src/postulo/templates/server/person_username.html:22
 #: src/postulo/templates/server/plugins.html:98
 #: src/postulo/templates/server/signin.html:87
-#: src/postulo/templates/settings/appearance.html:86
+#: src/postulo/templates/settings/appearance.html:92
 #: src/postulo/templates/settings/locale.html:106
 #: src/postulo/templates/settings/plugins.html:103
 #, draft
@@ -8333,11 +8344,6 @@ msgstr "Вижте таблото"
 msgid "See the listings"
 msgstr "Вижте обявите"
 
-#: src/postulo/templates/applications/partials/board.html:15
-#, draft
-msgid "see them in the table"
-msgstr "вижте ги в таблицата"
-
 #: src/postulo/templates/applications/partials/application_row.html:11
 #: src/postulo/templates/jobs/partials/company_row.html:11
 #, python-format, draft
@@ -8374,7 +8380,7 @@ msgstr "Изпращане на тестово съобщение до"
 msgid "Send everything"
 msgstr "Изпращане на всичко"
 
-#: src/postulo/templates/api/token_list.html:99
+#: src/postulo/templates/api/token_list.html:109
 #, draft
 msgid "Send it as a bearer token. To check that one works, and see its scopes:"
 msgstr ""
@@ -8525,7 +8531,7 @@ msgstr "Задайте, когато позицията вече не е нал�
 msgid "Settings"
 msgstr "Настройки"
 
-#: src/postulo/core/templatetags/postulo.py:379
+#: src/postulo/core/templatetags/postulo.py:382
 #, draft
 msgid "Settings sections"
 msgstr "Раздели с настройки"
@@ -9086,7 +9092,7 @@ msgstr "хранилище"
 msgid "Stored; leave blank to keep the current value."
 msgstr "Съхранено; оставете празно, за да запазите текущата стойност."
 
-#: src/postulo/templates/account/partials/password_meter.html:16
+#: src/postulo/templates/account/partials/password_meter.html:24
 #, draft
 msgid "Strong"
 msgstr "Силна"
@@ -9368,7 +9374,7 @@ msgstr "тайни за съобщения"
 msgid "text transport"
 msgstr "транспорт за съобщения"
 
-#: src/postulo/core/search.py:389
+#: src/postulo/core/search.py:395
 #, draft
 msgid "Text you sent"
 msgstr "Текст, който сте изпратили"
@@ -10281,7 +10287,7 @@ msgstr "Този запис отпечатва оригиналния си те�
 msgid "This Idempotency-Key was already used for a different capture."
 msgstr ""
 
-#: src/postulo/accounts/forms.py:506 src/postulo/jobs/forms.py:319
+#: src/postulo/accounts/forms.py:522 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 #, draft
 msgid "This identifier is already listed."
@@ -10355,7 +10361,7 @@ msgid ""
 msgstr ""
 "Това е вашият собствен акаунт. Връзка, която правите за себе си, не е път за връщане — трябваше да влезете, за да я направите. Ако сте единственият администратор тук, вас ви пази ключ за достъп или втори администратор."
 
-#: src/postulo/accounts/forms.py:503 src/postulo/jobs/forms.py:314
+#: src/postulo/accounts/forms.py:519 src/postulo/jobs/forms.py:314
 #: src/postulo/jobs/models.py:390
 #, draft
 msgid "This kind of identifier is already listed."
@@ -10420,7 +10426,7 @@ msgstr "Чрез службата по заетостта"
 msgid "Tick %(title)s"
 msgstr "Отмятане на %(title)s"
 
-#: src/postulo/templates/partials/table/bulk.html:27
+#: src/postulo/templates/partials/table/bulk.html:31
 #, draft
 msgid "Tick rows to act on several at once."
 msgstr "Отметнете редове, за да действате върху няколко наведнъж."
@@ -10432,7 +10438,7 @@ msgid ""
 msgstr ""
 "Отметнато, обявата става кандидатура веднага. Иначе чака в обявите ви, докато решите."
 
-#: src/postulo/templates/partials/table/bulk.html:32
+#: src/postulo/templates/partials/table/bulk.html:36
 #, draft
 msgid ""
 "Ticks last as long as the page. Changing a filter loads a fresh one and clears them."
@@ -10444,7 +10450,7 @@ msgstr ""
 msgid "tier"
 msgstr "ниво"
 
-#: src/postulo/accounts/forms.py:627
+#: src/postulo/accounts/forms.py:643
 #, draft
 msgid "Time zone"
 msgstr "Часова зона"
@@ -10507,7 +10513,7 @@ msgstr "до"
 msgid "To decide"
 msgstr "За решаване"
 
-#: src/postulo/templates/api/token_list.html:104
+#: src/postulo/templates/api/token_list.html:114
 #, draft
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "За предаване на обява (изисква обхвата captures):"
@@ -10645,7 +10651,7 @@ msgstr "Въведете поне два знака."
 msgid "Type it in instead"
 msgstr "Вместо това го въведете"
 
-#: src/postulo/accounts/forms.py:483 src/postulo/jobs/forms.py:294
+#: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:294
 #, draft
 msgid "Type the identifier."
 msgstr "Въведете идентификатора."
@@ -10825,7 +10831,7 @@ msgstr ""
 msgid "user"
 msgstr "потребител"
 
-#: src/postulo/accounts/forms.py:637 src/postulo/templates/server/email.html:20
+#: src/postulo/accounts/forms.py:653 src/postulo/templates/server/email.html:20
 #: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
@@ -10853,7 +10859,7 @@ msgid ""
 msgstr ""
 "Използва запазените настройки и изпраща до истинска пощенска кутия. Проверете първо връзката, ако току-що сте променили нещо."
 
-#: src/postulo/templates/api/token_list.html:97
+#: src/postulo/templates/api/token_list.html:107
 #, draft
 msgid "Using a token"
 msgstr "Използване на токен"
@@ -10894,7 +10900,7 @@ msgstr "етикет на версия"
 msgid "Versions you have sent"
 msgstr "Версии, които сте изпратили"
 
-#: src/postulo/templates/account/partials/password_meter.html:12
+#: src/postulo/templates/account/partials/password_meter.html:20
 #, draft
 msgid "Very weak"
 msgstr "Много слаба"
@@ -10961,7 +10967,7 @@ msgstr "беше „%(text)s“"
 msgid "way back into the account"
 msgstr "път обратно към акаунта"
 
-#: src/postulo/templates/account/partials/password_meter.html:13
+#: src/postulo/templates/account/partials/password_meter.html:21
 #, draft
 msgid "Weak"
 msgstr "Слаба"
@@ -11234,7 +11240,7 @@ msgstr "Какво ще бъде изтрито"
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Какво сте забелязали и още не сте решили, и какво затваря тази седмица."
 
-#: src/postulo/accounts/forms.py:639
+#: src/postulo/accounts/forms.py:655
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -11750,7 +11756,7 @@ msgstr ""
 #: src/postulo/templates/documents/cv_list.html:57
 #: src/postulo/templates/resume/overview.html:4
 #: src/postulo/templates/resume/overview.html:9
-#: src/postulo/templates/settings/appearance.html:57
+#: src/postulo/templates/settings/appearance.html:63
 #, draft
 msgid "Your career"
 msgstr "Вашата кариера"

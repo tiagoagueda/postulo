@@ -773,6 +773,58 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The interface stopped deciding in English what it would say in sixty-eight other
+  languages.** Four habits, each invisible to anybody reading Postulo in English, which is
+  why each had lasted. The bulk bar counted ticks in the browser and chose between "One row
+  ticked." and "%(count)s rows ticked." with `n === 1`; that is the English rule and thirteen
+  of the languages offered disagree with it, Polish needing a third form for 5 and up and
+  Ukrainian putting 21 back in the first. Nothing portable fixes that in JavaScript, and
+  nothing has to: a page holds a known number of rows, so the server now writes out the
+  sentence for every count the bar can reach and the script indexes it.
+
+  The password meter appended zxcvbn's own advice to the translated strength word, and only
+  the English zxcvbn pack is vendored, so a French reader was told "Fort · Add another word
+  or two" — inside a polite live region, on every keystroke. The advice is now shown where
+  the pack and the page agree on the language and left out where they do not; the day
+  `language-fr.js` is vendored, naming it on the template turns it back on. The live region
+  is the strength word alone, and the word is written only when it changes, so typing a
+  password no longer interrupts a screen reader five times a second.
+
+  Seventy-three date formats were spelled out in templates and views — `j M Y`, `j M Y, H:i`,
+  `M Y` — which fixes day before month before year and the hour at 14 rather than 2 p.m. for
+  every language at once. That is already wrong for Hungarian, which writes the year first,
+  and for Lithuanian, which marks it; it would be wrong for most of what #71 adds. They ask
+  for Django's own names now, which resolve against the reader's language. Only Django's
+  names: `get_format` hands an unrecognised name back to the page, so an invented format that
+  one locale has not defined prints the literal word `SOME_FORMAT` to whoever reads in it,
+  and there is a test over `languages.LANGUAGES` that every name answers in every language
+  offered. Thirty of those languages have no format module in Django at all and used to land
+  on its American default; they now fall back to the British English the interface is written
+  in, which is what they were already seeing. British English keeps its 24-hour clock through
+  a format module of its own, because Django's `en_GB` says "2.30 p.m." and no template
+  Postulo has shipped ever did. A `test_template_lint.py` rule fails on a format written out
+  in a template or a view, so these do not come back one page at a time; a bare `Y` and the
+  `Y-m-d` an `<input type="date">` parses stay written out, with the reason beside them in
+  the lint. Percentages were
+  fixed as `{{ share }}%`, which is neither the French "42 %" nor the Turkish "%42", and are
+  now one string the catalogue can rearrange.
+
+  And four sentences were being assembled from pieces. An API token said "created" and then a
+  date, "expires" and then a date; a translator was handed half a clause and no promise about
+  which side the date would end up on. The board's explanation ended at a semicolon, with
+  "see them in the table" translated on its own and the full stop written in the template, so
+  the link could not be moved and the sentence could not be ended anywhere else. The quiet
+  threshold had a bare "days" after a number field, with no singular for 1 and nowhere to put
+  a second plural. Each is now a whole sentence with the date, the address or the count as a
+  placeholder.
+
+  An English reader sees three differences, all of them Django's `en_GB` rather than
+  Postulo's: a calendar heading and the three detail-page dates that spelled the month out
+  now abbreviate it, the compact `16 Sep` in rows and CV columns now spells it out, and the
+  comma between a date and a time in six places is a space. The dashboard's next-interview
+  column was widened to hold a month with its name in it, which is what most languages were
+  always going to need. (#225)
+
 - **Paging to the last page no longer costs you your place.** The sort and pagination
   controls were given ids so that htmx could put focus back after a swap, which works for a
   control that survives the swap and not for one that removes itself: pressing *Next* onto

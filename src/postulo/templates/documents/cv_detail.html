@@ -126,7 +126,7 @@
             {% for render in renders %}
               <li class="flex items-center gap-3 px-4 py-3">
                 <div class="min-w-0 flex-1">
-                  <p class="text-sm">{{ render.rendered_at|date:"j M Y, H:i" }}</p>
+                  <p class="text-sm">{{ render.rendered_at|date:"DATETIME_FORMAT" }}</p>
                   {% if render.application %}
                     <p class="text-xs text-ink-500 dark:text-ink-400">
                       <a href="{{ render.application.get_absolute_url }}" class="hover:underline">

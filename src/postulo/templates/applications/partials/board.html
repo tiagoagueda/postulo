@@ -7,12 +7,19 @@
 {% endcomment %}
 {% if off_board %}
   <p class="mb-4 text-sm text-ink-600 dark:text-ink-300" role="status" data-off-board="{{ off_board }}">
-    {% blocktranslate count counter=off_board trimmed %}
+    {% comment %} One sentence, link and full stop inside it. It used to end at the semicolon,
+       with "see them in the table" translated separately and the full stop written in the
+       template, so a translator got half a sentence and a loose clause and no way to put
+       the link anywhere else in it (#225). The address is a variable; the anchor is not.
+       {% endcomment %}
+    {% blocktranslate count counter=off_board with url=table_url trimmed %}
       One settled application matches these filters. The board shows only what is still live;
+      <a href="{{ url }}" class="text-brand-600 underline dark:text-brand-400">see them in the table</a>.
     {% plural %}
-      {{ counter }} settled applications match these filters. The board shows only what is still live;
+      {{ counter }} settled applications match these filters. The board shows only what is still
+      live; <a href="{{ url }}" class="text-brand-600 underline dark:text-brand-400">see them in
+      the table</a>.
     {% endblocktranslate %}
-    <a href="{{ table_url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "see them in the table" %}</a>.
   </p>
 {% endif %}
 

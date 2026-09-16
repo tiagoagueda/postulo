@@ -94,11 +94,11 @@
       </td>
     {% elif column.key == 'last_activity' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
-        {{ company.last_activity_at|date:"j M Y"|default:"—" }}
+        {{ company.last_activity_at|date:"DATE_FORMAT"|default:"—" }}
       </td>
     {% elif column.key == 'created' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
-        {{ company.created_at|date:"j M Y" }}
+        {{ company.created_at|date:"DATE_FORMAT" }}
       </td>
     {% elif column.key|slice:":3" == 'id_' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">

@@ -13,7 +13,7 @@
   <a href="{{ event.url }}"
      class="flex min-h-6 items-start gap-1 rounded px-1 py-0.5 text-xs leading-5 hover:underline {% if event.kind == 'interview' %}bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100{% else %}bg-amber-50 text-amber-900 dark:bg-amber-900 dark:text-amber-100{% endif %}{% if event.muted %} line-through opacity-60{% endif %}"
      data-event="{{ event.kind }}">
-    <span class="shrink-0 tabular-nums">{{ event.local_start|date:"H:i" }}</span>
+    <span class="shrink-0 tabular-nums">{{ event.local_start|date:"TIME_FORMAT" }}</span>
     <span class="min-w-0 {% if compact %}truncate{% endif %}">
       <span class="sr-only">{% if event.kind == 'interview' %}{% translate "Interview:" %}{% else %}{% translate "Reminder:" %}{% endif %}</span>
       {{ event.title }}{% if not compact and event.detail %} <span class="font-light">· {{ event.detail }}</span>{% endif %}
@@ -25,7 +25,7 @@
   {% for day, events in page.listed %}
     <section class="card mb-4 p-0" aria-labelledby="day-{{ day|date:'Y-m-d' }}">
       <h2 id="day-{{ day|date:'Y-m-d' }}" class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
-        {{ day|date:"l j F Y" }}
+        {{ day|date:"l" }} {{ day|date:"DATE_FORMAT" }}
       </h2>
       {% if events %}
         <ul class="space-y-1 px-3 py-3">
@@ -92,7 +92,7 @@
                     {% if day.today %}aria-current="date"{% endif %}>
                   <a href="{{ day.url }}"
                      class="mb-1 inline-flex size-7 items-center justify-center rounded-full text-xs tabular-nums {% if day.today %}bg-brand-600 font-semibold text-white{% elif day.outside %}text-ink-400 dark:text-ink-500{% else %}text-ink-700 hover:bg-ink-100 dark:text-ink-300 dark:hover:bg-ink-800{% endif %}">
-                    <span class="sr-only">{{ day.date|date:"j F" }}{% if day.today %}, {% translate "today" %}{% endif %}</span>
+                    <span class="sr-only">{{ day.date|date:"MONTH_DAY_FORMAT" }}{% if day.today %}, {% translate "today" %}{% endif %}</span>
                     <span aria-hidden="true">{{ day.date.day }}</span>
                   </a>
                   {% if day.events %}
@@ -125,7 +125,7 @@
       {% for day in page.days %}
         <section class="card p-3" aria-labelledby="day-{{ day.date|date:'Y-m-d' }}" {% if day.today %}aria-current="date"{% endif %}>
           <h3 id="day-{{ day.date|date:'Y-m-d' }}" class="mb-2 text-sm font-medium">
-            <a href="{{ day.url }}" class="inline-flex min-h-6 items-center hover:underline {% if day.today %}text-brand-700 dark:text-brand-300{% endif %}">{{ day.date|date:"D j" }}</a>
+            <a href="{{ day.url }}" class="inline-flex min-h-6 items-center hover:underline {% if day.today %}text-brand-700 dark:text-brand-300{% endif %}">{{ day.date|date:"D" }} {{ day.date|date:"j" }}</a>
           </h3>
           {% if day.events %}
             <ul class="space-y-1">

@@ -67,7 +67,7 @@
             </label>
             {% if profile.use_gravatar and profile.gravatar_checked_at and not profile.gravatar_image %}
               <p class="mt-2 text-xs text-ink-500 dark:text-ink-400" data-no-gravatar>
-                {% blocktranslate trimmed with when=profile.gravatar_checked_at|date:"j M Y, H:i" %}
+                {% blocktranslate trimmed with when=profile.gravatar_checked_at|date:"DATETIME_FORMAT" %}
                   Gravatar had no picture for your address when last asked, on {{ when }}.
                 {% endblocktranslate %}
               </p>

@@ -39,7 +39,7 @@
   {% if application.next_interview_at %}
     <p class="mt-2 flex items-center gap-1 text-xs text-brand-700 dark:text-brand-400" data-next-interview>
       {% icon "calendar" class="size-3.5" %}
-      {{ application.next_interview_at|date:"D j M, H:i" }}
+      {{ application.next_interview_at|date:"D" }} {{ application.next_interview_at|date:"MONTH_DAY_FORMAT" }} {{ application.next_interview_at|date:"TIME_FORMAT" }}
     </p>
   {% endif %}
 

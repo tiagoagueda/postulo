@@ -90,7 +90,7 @@
                            {% if event.kind == 'status_change' %}bg-brand-500{% else %}bg-ink-300 dark:bg-ink-600{% endif %}"></span>
               <div class="flex flex-wrap items-baseline gap-2">
                 <p class="font-medium">{{ event.summary|default:event.get_kind_display }}</p>
-                <span class="text-xs text-ink-400">{{ event.occurred_at|date:"j M Y, H:i" }}</span>
+                <span class="text-xs text-ink-400">{{ event.occurred_at|date:"DATETIME_FORMAT" }}</span>
                 {% if event.actor %}
                   <span class="text-xs text-ink-400" data-actor>
                     {% blocktranslate with actor=event.actor trimmed %}via {{ actor }}{% endblocktranslate %}
@@ -149,13 +149,13 @@
           {% if application.applied_at %}
             <div>
               <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Applied on" %}</dt>
-              <dd>{{ application.applied_at|date:"j F Y" }}</dd>
+              <dd>{{ application.applied_at|date:"DATE_FORMAT" }}</dd>
             </div>
           {% endif %}
           {% if application.deadline %}
             <div>
               <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Your deadline" %}</dt>
-              <dd>{{ application.deadline|date:"j F Y" }}</dd>
+              <dd>{{ application.deadline|date:"DATE_FORMAT" }}</dd>
             </div>
           {% endif %}
           {% if structure_on and application.department %}
@@ -209,7 +209,7 @@
                   <div class="min-w-0 flex-1">
                     <p class="truncate text-sm">{{ document.title }}</p>
                     <p class="text-xs text-ink-500 dark:text-ink-400">
-                      {{ document.rendered_at|date:"j M Y" }}
+                      {{ document.rendered_at|date:"DATE_FORMAT" }}
                     </p>
                   </div>
                   <a href="{% url 'documents:rendered_download' document.pk %}"
@@ -245,7 +245,7 @@
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-medium">{{ interview.get_kind_display }}</p>
                     <p class="text-xs {% if interview.awaits_outcome %}text-amber-700 dark:text-amber-400{% else %}text-ink-500 dark:text-ink-400{% endif %} tabular-nums">
-                      {{ interview.starts_at|date:"D j M Y, H:i" }}–{{ interview.ends_at|date:"H:i" }}
+                      {{ interview.starts_at|date:"D" }} {{ interview.starts_at|date:"DATETIME_FORMAT" }}–{{ interview.ends_at|date:"TIME_FORMAT" }}
                     </p>
                     {% if interview.location %}
                       <p class="truncate text-xs text-ink-500 dark:text-ink-400">
@@ -300,7 +300,7 @@
             <ul class="mt-2 space-y-2">
               {% for interview in settled_interviews %}
                 <li id="interview-{{ interview.pk }}" class="flex items-baseline gap-2 text-xs">
-                  <span class="tabular-nums text-ink-500 dark:text-ink-400">{{ interview.starts_at|date:"j M Y" }}</span>
+                  <span class="tabular-nums text-ink-500 dark:text-ink-400">{{ interview.starts_at|date:"DATE_FORMAT" }}</span>
                   <span>{{ interview.get_kind_display }}</span>
                   <span class="rounded bg-ink-100 px-1.5 py-0.5 text-ink-600 dark:bg-ink-800 dark:text-ink-300">
                     {{ interview.get_outcome_display }}
@@ -327,7 +327,7 @@
                 <div class="min-w-0 flex-1">
                   <p class="text-sm">{{ reminder.summary }}</p>
                   <p class="text-xs {% if reminder.is_overdue %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
-                    {{ reminder.due_at|date:"j M Y, H:i" }}
+                    {{ reminder.due_at|date:"DATETIME_FORMAT" }}
                   </p>
                 </div>
                 <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}">

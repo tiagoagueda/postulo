@@ -190,7 +190,12 @@ help rather than fight that.
 - Use the register your language's convention for professional software expects. French
   uses *vous*, German *Sie*, Spanish *usted*-free impersonal forms where natural.
 - Dates, numbers and the first day of the week come from Django's format definitions for
-  the language, not from the catalogue.
+  the language, not from the catalogue. Nothing in here decides whether the year comes
+  first or whether an interview is at 14:00 or at 2 p.m.; if a date reads wrongly in your
+  language, that is a bug in Postulo and not a string for you to fix.
+- The per cent sign *is* yours. `%(share)s%%` is one string so that French can write
+  `%(share)s %%` with the space it needs and Turkish can write `%%%(share)s` with the sign
+  in front. The `%%` is a literal per cent sign; keep it doubled.
 
 ## Adding a new language
 

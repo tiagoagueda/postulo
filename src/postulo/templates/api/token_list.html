@@ -66,16 +66,25 @@
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   <code>{{ token.prefix }}…</code>
                   · {{ token.scopes|join:", " }}
-                  · {% translate "created" %} {{ token.created_at|date:"j M Y" }}
+                  {% comment %} Whole sentences, not a word and a date beside each other. A
+                     verb and its date read as one clause and no language promises to keep
+                     them in that order or to leave the verb unchanged in front of a date
+                     (#225); handing the translator "created" on its own asks them to
+                     guess what follows it. {% endcomment %}
+                  · {% blocktranslate with date=token.created_at|date:"DATE_FORMAT" %}Created {{ date }}{% endblocktranslate %}
                   {% if token.expires_at %}
-                    · {% if token.is_expired %}{% translate "expired" %}{% else %}{% translate "expires" %}{% endif %} {{ token.expires_at|date:"j M Y" }}
+                    {% if token.is_expired %}
+                      · {% blocktranslate with date=token.expires_at|date:"DATE_FORMAT" %}Expired {{ date }}{% endblocktranslate %}
+                    {% else %}
+                      · {% blocktranslate with date=token.expires_at|date:"DATE_FORMAT" %}Expires {{ date }}{% endblocktranslate %}
+                    {% endif %}
                   {% endif %}
                   {% if token.last_used_at %}
-                    · {% translate "last used" %} {{ token.last_used_at|date:"j M Y, H:i" }}
+                    · {% blocktranslate with when=token.last_used_at|date:"DATETIME_FORMAT" %}Last used {{ when }}{% endblocktranslate %}
                   {% else %}
-                    · {% translate "never used" %}
+                    · {% translate "Never used" %}
                   {% endif %}
-                  {% if token.revoked_at %} · {% translate "revoked" %}{% endif %}
+                  {% if token.revoked_at %} · {% translate "Revoked" %}{% endif %}
                 </p>
               </div>
               {% if token.is_active %}

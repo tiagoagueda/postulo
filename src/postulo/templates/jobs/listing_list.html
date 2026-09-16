@@ -48,7 +48,7 @@
             <div class="min-w-0 flex-1">
               <p class="truncate font-medium">{{ capture }}</p>
               <p class="truncate text-xs text-ink-500 dark:text-ink-400">
-                <bdi>{{ capture.data.company_name|default:"—" }}</bdi> · {{ capture.created_at|date:"j M Y, H:i" }}
+                <bdi>{{ capture.data.company_name|default:"—" }}</bdi> · {{ capture.created_at|date:"DATETIME_FORMAT" }}
               </p>
             </div>
             <a href="{% url 'jobs:capture_review' capture.pk %}" class="btn-secondary shrink-0">
@@ -97,7 +97,7 @@
               <td class="px-4 py-3">
                 <a href="{{ listing.get_absolute_url }}" class="font-medium hover:underline">{{ listing.title }}</a>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
-                  {% blocktranslate with when=listing.noted_at|date:"j M" trimmed %}noted {{ when }}{% endblocktranslate %}
+                  {% blocktranslate with when=listing.noted_at|date:"MONTH_DAY_FORMAT" trimmed %}noted {{ when }}{% endblocktranslate %}
                   {% if listing.source %} · <bdi>{{ listing.source }}</bdi>{% endif %}
                 </p>
               </td>
@@ -106,7 +106,7 @@
               </td>
               <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ listing.location|default:"—" }}</td>
               <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
-                {% if listing.closes_at %}{{ listing.closes_at|date:"j M Y" }}{% else %}—{% endif %}
+                {% if listing.closes_at %}{{ listing.closes_at|date:"DATE_FORMAT" }}{% else %}—{% endif %}
               </td>
               <td class="px-4 py-3">
                 <span class="rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-700 dark:bg-ink-800 dark:text-ink-200">

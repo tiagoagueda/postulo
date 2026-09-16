@@ -42,17 +42,17 @@
         {% if application.next_interview_at and 'next_interview' not in table.visible_keys %}
           <p class="mt-1 flex items-center gap-1 text-xs text-brand-700 dark:text-brand-400" data-next-interview>
             {% icon "calendar" class="size-3.5" %}
-            {{ application.next_interview_at|date:"j M, H:i" }}
+            {{ application.next_interview_at|date:"MONTH_DAY_FORMAT" }} {{ application.next_interview_at|date:"TIME_FORMAT" }}
           </p>
         {% endif %}
       </td>
     {% elif column.key == 'applied' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
-        {{ application.applied_at|date:"j M Y"|default:"—" }}
+        {{ application.applied_at|date:"DATE_FORMAT"|default:"—" }}
       </td>
     {% elif column.key == 'deadline' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
-        {{ application.deadline|date:"j M Y"|default:"—" }}
+        {{ application.deadline|date:"DATE_FORMAT"|default:"—" }}
       </td>
     {% elif column.key == 'priority' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ application.get_priority_display }}</td>
@@ -76,20 +76,20 @@
       </td>
     {% elif column.key == 'last_activity' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
-        {{ application.last_activity_at|date:"j M Y"|default:"—" }}
+        {{ application.last_activity_at|date:"DATE_FORMAT"|default:"—" }}
       </td>
     {% elif column.key == 'next_reminder' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
-        {{ application.next_reminder_at|date:"j M Y, H:i"|default:"—" }}
+        {{ application.next_reminder_at|date:"DATETIME_FORMAT"|default:"—" }}
       </td>
     {% elif column.key == 'next_interview' %}
       <td class="px-4 py-3 tabular-nums {% if application.next_interview_at %}text-brand-700 dark:text-brand-400{% else %}text-ink-500 dark:text-ink-400{% endif %}"
           {% if application.next_interview_at %}data-next-interview{% endif %}>
-        {{ application.next_interview_at|date:"D j M, H:i"|default:"—" }}
+        {% if application.next_interview_at %}{{ application.next_interview_at|date:"D" }} {{ application.next_interview_at|date:"MONTH_DAY_FORMAT" }} {{ application.next_interview_at|date:"TIME_FORMAT" }}{% else %}—{% endif %}
       </td>
     {% elif column.key == 'created' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
-        {{ application.created_at|date:"j M Y" }}
+        {{ application.created_at|date:"DATE_FORMAT" }}
       </td>
     {% endif %}
   {% endfor %}

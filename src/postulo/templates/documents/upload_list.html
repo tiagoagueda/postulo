@@ -32,7 +32,7 @@
               <p class="font-medium">{{ document.title }}</p>
               <p class="text-xs text-ink-500 dark:text-ink-400">
                 {{ document.get_kind_display }} · {% translate "version" %} {{ document.version }}
-                · {{ document.created_at|date:"j M Y" }}
+                · {{ document.created_at|date:"DATE_FORMAT" }}
                 {% if not document.is_current %} · {% translate "superseded" %}{% endif %}
               </p>
               {% url 'documents:upload_archive' document.pk as send_url %}

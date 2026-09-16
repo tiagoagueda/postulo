@@ -32,7 +32,7 @@
                 {{ reminder.summary }}
               </p>
               <p class="text-xs {% if reminder.is_overdue %}font-medium text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
-                {{ reminder.due_at|date:"j M Y, H:i" }}
+                {{ reminder.due_at|date:"DATETIME_FORMAT" }}
                 {% if reminder.application %}
                   ·
                   <a href="{{ reminder.application.get_absolute_url }}" class="hover:underline">
