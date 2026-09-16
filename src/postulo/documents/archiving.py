@@ -18,6 +18,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from postulo.plugins.base import ConnectionUnusable
 from postulo.plugins.models import Connection
 from postulo.plugins.secrets import SecretsUnreadable
 
@@ -124,6 +125,17 @@ def send_copy(copy: DocumentCopy) -> bool:
             )
     except SecretsUnreadable as error:
         return fail(str(error))
+    except ConnectionUnusable as dead:
+        # Not a failure to retry: the store says the other side has ended this connection,
+        # and dialling it again would fail the same way for every document there is. The
+        # notifier has done this since #216; a store saying it and being retried anyway is
+        # what #243 was about. Switched off with the reason in the plugin's own words, and
+        # the copy left where `pending_copies` will find it again if it is switched back on.
+        logger.warning(
+            "Store %r says connection %s is finished: %s", connection.plugin, connection.pk, dead
+        )
+        connection.retire(str(dead), keep_secrets=dead.keep_secrets)
+        return fail(str(dead))
     except Exception as error:
         logger.exception("Store %r failed for copy %s", connection.plugin, copy.pk)
         return fail(f"{type(error).__name__}: {error}")
@@ -152,6 +164,12 @@ def pending_copies(now=None):
         DocumentCopy.objects.filter(status__in=(CopyStatus.PENDING, CopyStatus.FAILED))
         .filter(attempts__lt=MAX_ATTEMPTS)
         .filter(next_attempt_at__lte=now)
+        # A connection that is switched off is not dialled, and its copies wait rather than
+        # spending their attempts on a "the connection is switched off" they would record
+        # once a document until there were none left (#243). Switching it on resumes them,
+        # which is what retiring a connection promises. A copy whose connection row is gone
+        # is still picked up: it has nothing to wait for, and is told so.
+        .exclude(connection__enabled=False)
         # No join to follow: a generic link is two columns. `document` is fetched per row
         # where a caller needs it, and the batch above is what a list page uses (#130).
         .select_related("connection", "owner")

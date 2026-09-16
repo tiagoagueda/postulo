@@ -66,6 +66,7 @@ class ShelfStore:
     label = "Shelf"
     received: ClassVar[list[tuple[str, bytes, DocumentMetadata, dict]]] = []
     fail_with: ClassVar[str | None] = None
+    finished_with: ClassVar[str | None] = None
     decline_kinds: ClassVar[set[str]] = set()
 
     def config_fields(self):
@@ -79,6 +80,10 @@ class ShelfStore:
         return TestResult(True, "shelved")
 
     def put(self, document, file, metadata, config, user):
+        if ShelfStore.finished_with:
+            from postulo.plugins.api import ConnectionUnusable
+
+            raise ConnectionUnusable(ShelfStore.finished_with)
         if ShelfStore.fail_with:
             raise RuntimeError(ShelfStore.fail_with)
         if metadata.kind in ShelfStore.decline_kinds:
@@ -94,6 +99,7 @@ class ShelfStore:
 def shelf():
     ShelfStore.received = []
     ShelfStore.fail_with = None
+    ShelfStore.finished_with = None
     ShelfStore.decline_kinds = set()
     registry.register_builtin("store", ShelfStore)
     yield ShelfStore
@@ -283,6 +289,52 @@ def test_a_failure_is_retried_with_a_growing_wait_and_then_left_to_the_person(us
     assert send_now(upload) == (1, 0)
     copy.refresh_from_db()
     assert copy.status == CopyStatus.SENT and copy.last_error == ""
+
+
+def test_a_store_that_says_the_connection_is_finished_is_not_dialled_again(user):
+    """What the notifier has done since #216, and the store did not until #243."""
+    connection = a_store(user)
+    upload = an_upload(user)
+    ShelfStore.finished_with = "The share is gone."
+    copy = upload.copies.get()
+
+    assert send_pending() == (0, 1)
+
+    connection.refresh_from_db()
+    assert not connection.enabled, "switched off rather than retried for ever"
+    assert connection.last_error == "The share is gone.", "the plugin's words, not a class name"
+    copy.refresh_from_db()
+    assert copy.status == CopyStatus.FAILED and copy.last_error == "The share is gone."
+
+    # Nothing is dialled while it is off: a new document is not even queued for it, and the
+    # copy that found out waits instead of spending the rest of its attempts.
+    another = an_upload(user, "Reference")
+    assert not another.copies.exists(), "a switched-off connection is not queued for"
+    DocumentCopy.objects.filter(pk=copy.pk).update(next_attempt_at=timezone.now())
+    assert send_pending() == (0, 0), "nothing is dialled while it is switched off"
+    copy.refresh_from_db()
+    assert copy.attempts == 1, "waiting, not spending its attempts"
+
+    # Switching it back on is one press, and the copy resumes where it left off.
+    ShelfStore.finished_with = None
+    connection.enabled = True
+    connection.save(update_fields=["enabled"])
+
+    assert send_pending() == (1, 0), "the waiting copy resumes"
+    copy.refresh_from_db()
+    assert copy.status == CopyStatus.SENT and copy.last_error == ""
+
+
+def test_a_copy_whose_connection_row_is_gone_is_still_told_so(user):
+    """The `exclude` added in #243 must not swallow a copy that has nothing to wait for."""
+    a_store(user)
+    upload = an_upload(user)
+    copy = upload.copies.get()
+    DocumentCopy.objects.filter(pk=copy.pk).update(connection=None)
+
+    assert send_pending() == (0, 1)
+    copy.refresh_from_db()
+    assert copy.status == CopyStatus.FAILED and copy.last_error
 
 
 def test_a_store_may_decline_a_kind(user):

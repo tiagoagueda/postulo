@@ -773,6 +773,22 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **A store that says it is finished is now believed, instead of being dialled for ever.**
+  #216 gave a plugin a way to say that the other side has ended a connection, and notifiers
+  honoured it: a browser that withdrew its subscription stopped being pushed to. Stores did
+  not. A Paperless whose token had been revoked, or a share that no longer existed, answered
+  the same way for every document there was, and each answer was filed as an ordinary failure
+  to try again later — so the retries went on, once per document, until somebody noticed the
+  row of *failed* badges and worked out what they had in common.
+
+  A store saying it is finished now switches the connection off with the reason in the
+  plugin's own words rather than a class name, exactly as a notifier does. Copies waiting for
+  a connection that is switched off are left waiting rather than being sent to record that it
+  is switched off: they would have spent every attempt they had on that sentence, and there
+  would have been nothing left when it was fixed. Switching it back on is one press, and they
+  go. A copy whose connection is not merely off but gone is still told so, because it has
+  nothing to wait for. (#243)
+
 - **An identifier is the same identifier whatever case it is typed in.** Every named scheme
   folds its own values as you type them — Wikidata to `Q95`, LinkedIn to lowercase — so a
   search usually found what it should. Two things it did not. A row written before its scheme
