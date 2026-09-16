@@ -101,7 +101,9 @@ def test_the_critical_path(live_server, page: Page, applicant) -> None:
     page.goto(f"{base}/applications/?view=board")
     card = page.locator("article", has_text="Senior Django Developer")
     expect(card).to_have_count(1)
-    card.get_by_label("Change status").select_option("screening")
+    # Named for the application it belongs to since #227, because thirty identical "Change
+    # status" menus told a screen-reader user nothing about which card they were on.
+    card.get_by_label(re.compile("^Status of ")).select_option("screening")
     screening_heading = page.get_by_role("heading", name="Screening", exact=True)
     screening = page.locator("section", has=screening_heading)
     expect(screening.locator("article", has_text="Senior Django Developer")).to_have_count(1)

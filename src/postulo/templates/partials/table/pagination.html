@@ -2,11 +2,16 @@
 {% comment %} Both links carry an id because htmx puts focus back after a swap only for an
    element that has one, and these two swap themselves away. Without them the Tab after
    paging started again at the skip link, so somebody working through a long list by
-   keyboard began the page from the top every time (#227). {% endcomment %}
+   keyboard began the page from the top every time (#227).
+
+   They also name a focus group, because an id is only half an answer: the last page has no
+   *Next* at all, so there is no element left for htmx to put focus back on. The script
+   moves focus to whatever is left of the group instead, which here is *Previous*. {% endcomment %}
 {% if is_paginated %}
   <nav class="mt-4 flex items-center gap-2 text-sm" aria-label="{% translate 'Pagination' %}">
     {% if page_obj.has_previous %}
-      <a id="page-prev" href="{% querystring page=page_obj.previous_page_number %}"
+      <a id="page-prev" data-focus-group="pagination"
+         href="{% querystring page=page_obj.previous_page_number %}"
          hx-get="{% querystring page=page_obj.previous_page_number %}"
          hx-target="#{{ table_id }}" hx-swap="outerHTML show:top" hx-push-url="true"
          class="btn-secondary">{% translate "Previous" %}</a>
@@ -17,7 +22,8 @@
       {% endblocktranslate %}
     </span>
     {% if page_obj.has_next %}
-      <a id="page-next" href="{% querystring page=page_obj.next_page_number %}"
+      <a id="page-next" data-focus-group="pagination"
+         href="{% querystring page=page_obj.next_page_number %}"
          hx-get="{% querystring page=page_obj.next_page_number %}"
          hx-target="#{{ table_id }}" hx-swap="outerHTML show:top" hx-push-url="true"
          class="btn-secondary">{% translate "Next" %}</a>

@@ -1243,6 +1243,47 @@
     }
   });
 
+  /* --------------------------------------------- focus when a control swaps itself away
+   *
+   * htmx puts focus back after a swap by looking up the id the focused element had. That
+   * covers a control which survives the swap, which is what the ids added in #227 are for,
+   * and it can do nothing about one which does not survive it: paging to the last page
+   * takes *Next* off the page, so the id htmx is holding names an element that no longer
+   * exists and focus falls back to the body. Somebody paging a long list by keyboard
+   * reached the end and started again from the skip link -- the very thing #227 set out to
+   * stop, one press further on than its own test looked.
+   *
+   * So a control that can be swapped away says which group it belongs to, and if it is
+   * gone when the dust settles, focus goes to whatever is left of that group. It is the
+   * same rule the dashboard's arrows follow by keeping a disabled button rather than
+   * removing it: the cluster keeps its shape, and the hand goes back to where it was.
+   */
+
+  var focusedBeforeSwap = null;
+
+  document.addEventListener("htmx:beforeRequest", function () {
+    var active = document.activeElement;
+    focusedBeforeSwap =
+      active && active.id
+        ? { id: active.id, group: active.getAttribute("data-focus-group") || "" }
+        : null;
+  });
+
+  document.addEventListener("htmx:afterSettle", function () {
+    var was = focusedBeforeSwap;
+    focusedBeforeSwap = null;
+    if (!was || !was.group) {
+      return;
+    }
+    if (document.getElementById(was.id)) {
+      return; // It survived, and htmx has already put focus back on it.
+    }
+    var survivor = document.querySelector('[data-focus-group="' + was.group + '"]');
+    if (survivor && survivor.focus) {
+      survivor.focus();
+    }
+  });
+
   /* ------------------------------------------------------- a page's own sections
    *
    * The career page is seven sections down one scroll, and its sidebar lists them as

@@ -41,19 +41,37 @@ def focused_id(page: Page) -> str:
     return page.evaluate("() => document.activeElement && document.activeElement.id")
 
 
+def wait_for_focus(page: Page, *wanted: str) -> None:
+    """Wait until focus has landed on one of ``wanted``, and say so if it never does.
+
+    A response arriving is not a swap finishing: htmx puts focus back while it settles,
+    which is after the request this test waited for. Asserting straight away asks the
+    question before the answer exists.
+    """
+    page.wait_for_function(
+        "names => names.includes(document.activeElement && document.activeElement.id)",
+        arg=list(wanted),
+    )
+
+
 def test_focus_stays_on_the_column_after_sorting(page: Page, live_server, companies):
     """htmx puts focus back only for an element with an `id`. Without one the next Tab
     started again at the skip link, so sorting a table by keyboard cost you your place."""
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/jobs/companies/")
 
+    heading = page.locator('th[data-col="name"]')
+    was = heading.get_attribute("aria-sort")
     link = page.locator("#sort-name")
     link.focus()
     with page.expect_response(lambda r: "sort=" in r.url):
         link.press("Enter")
 
-    expect(page.locator('th[data-col="name"]')).to_have_attribute("aria-sort", "ascending")
-    assert focused_id(page) == "sort-name"
+    # That the order *changed*, not which way it went: the companies table already arrives
+    # sorted by name, so one press makes it descending, and pinning a direction here would
+    # be pinning today's default ordering to a test about focus.
+    expect(heading).not_to_have_attribute("aria-sort", was or "")
+    wait_for_focus(page, "sort-name")
 
 
 def test_focus_stays_on_next_after_paging(page: Page, live_server, companies):
@@ -65,9 +83,10 @@ def test_focus_stays_on_next_after_paging(page: Page, live_server, companies):
     with page.expect_response(lambda r: "page=2" in r.url):
         button.press("Enter")
 
-    assert focused_id(page) == "page-prev" or focused_id(page) == "page-next", (
-        "whichever of the pair the new page draws, focus is still in the pagination"
-    )
+    # Sixty companies is two pages, so *Next* takes itself off the page by being pressed and
+    # there is no id left for htmx to restore. Focus belongs in the pagination all the same,
+    # and it is the script added for that which puts it on whichever of the pair survives.
+    wait_for_focus(page, "page-prev", "page-next")
 
 
 def test_focus_stays_on_the_theme_switch(page: Page, live_server, applicant):

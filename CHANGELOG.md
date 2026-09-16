@@ -773,6 +773,15 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Paging to the last page no longer costs you your place.** The sort and pagination
+  controls were given ids so that htmx could put focus back after a swap, which works for a
+  control that survives the swap and not for one that removes itself: pressing *Next* onto
+  the last page takes *Next* off the page, so there was no longer anything for focus to
+  return to and it fell back to the top. Somebody working through a long list by keyboard
+  reached the end and started again at the skip link. A control that can be swapped away now
+  says which group it belongs to, and focus goes to whatever is left of that group — here,
+  *Previous*. (#227)
+
 - **The page script stopped failing in silence.** Four things went wrong without saying so,
   and what they had in common is that the page went on looking correct afterwards. A filter,
   a sort or a page link is an htmx request that replaces a table, and htmx does not swap a

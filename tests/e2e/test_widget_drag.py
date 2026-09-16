@@ -109,7 +109,11 @@ def test_a_drop_says_where_it_landed(page: Page, live_server, applicant):
     drag(page, rows(page).first.element_handle(), rows(page).nth(2).element_handle())
     page.wait_for_load_state("networkidle")
 
-    expect(page.locator('[role="status"], [role="alert"]').first).to_contain_text("row")
+    # Not the page-wide alert #226 added for a failed request: it is a `role="alert"` that
+    # is on every page and empty until something goes wrong, so it comes first in the
+    # document and would answer for the message this test is about.
+    said = page.locator('[role="status"], [role="alert"]:not([data-htmx-alert])')
+    expect(said.first).to_contain_text("row")
 
 
 def test_the_arrows_are_still_there_afterwards(page: Page, live_server, applicant):
