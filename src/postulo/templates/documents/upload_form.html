@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Upload a file" %}{% endblock %}
 
@@ -12,6 +12,22 @@
         <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
       {% endif %}
       <div class="card mb-6">
+        {% comment %} Editing names the file and does not offer to replace it (#217). The
+           bytes are what an application says it sent, and a store was told about them once;
+           swapping them would make both untrue. The name, never the storage path, which is
+           Postulo's business rather than the person's (#191). {% endcomment %}
+        {% if form.instance.pk and form.instance.file %}
+          <div class="mb-4">
+            <p class="field-label">{% translate "File" %}</p>
+            <p class="text-sm" data-upload-file><bdi>{{ form.instance.file|file_name }}</bdi></p>
+            <p class="field-help">
+              {% blocktranslate trimmed %}
+                The file itself cannot be changed. Upload the new one and mark it as
+                superseding this, so what you sent still means the file you sent.
+              {% endblocktranslate %}
+            </p>
+          </div>
+        {% endif %}
         {% for field in form %}
           {% include "partials/field.html" with field=field %}
         {% endfor %}

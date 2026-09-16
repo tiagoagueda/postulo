@@ -12,8 +12,27 @@
           “{{ name }}” will be deleted permanently.
         {% endblocktranslate %}
       </p>
+      {% comment %} Counted, not implied (#217). "Anything belonging to it goes too" was true
+         and unhelpful: deleting one company could take a year of applications, their
+         timelines and the PDFs an employer received, and nothing said so until it had
+         happened. A view that knows what goes lists it here; one that does not falls back to
+         the sentence it always showed. {% endcomment %}
+      {% if consequences %}
+        <p class="mb-2 text-sm text-ink-600 dark:text-ink-300">{% translate "This also deletes:" %}</p>
+        <ul class="mb-4 list-disc space-y-1 ps-5 text-sm text-ink-600 dark:text-ink-300"
+            data-consequences>
+          {% for line in consequences %}<li>{{ line }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+      {% if kept %}
+        <p class="mb-4 text-sm text-ink-600 dark:text-ink-300" data-kept>{{ kept }}</p>
+      {% endif %}
       <p class="mb-6 text-xs text-ink-500 dark:text-ink-400">
-        {% translate "Anything belonging to it goes too, and this cannot be undone." %}
+        {% if consequences %}
+          {% translate "This cannot be undone." %}
+        {% else %}
+          {% translate "Anything belonging to it goes too, and this cannot be undone." %}
+        {% endif %}
       </p>
 
       <form method="post">

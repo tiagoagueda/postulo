@@ -757,6 +757,29 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Deleting one thing no longer quietly deletes the record of what you sent, and a deleted
+  file is now actually deleted.** Three ways the promise that "the record of what you sent
+  has to stay true" was not kept.
+
+  A company cascaded into its postings, those into applications, and applications into the
+  frozen PDFs an employer had received — so tidying up one employer could take a year of
+  evidence with it, behind a confirmation that said only "anything belonging to it goes too".
+  A sent document now survives the application it went with, and still names the role and
+  employer it was sent to, because that is stored as text beside the link. The confirmation
+  page counts what will go before it goes, and says what is kept.
+
+  Editing an uploaded file replaced the bytes in place, while applications went on saying
+  they had sent it and external stores kept the copy they had already filed. The file is
+  fixed once it arrives; a different file is a new upload that supersedes the old one, which
+  is what the *Supersedes* field was always for. Uploads are checksummed now as renders have
+  been, so a store can tell one from another.
+
+  And deleting a document left its file on disk for ever — only deleting a whole account
+  removed anything — so "deleted" meant "hidden" for files holding a home address and a
+  full career, which were then copied into every backup. Deleting a document now deletes its
+  file once the change is committed and nothing else points at it, and `manage.py prune_media`
+  lists what earlier deletions left behind, removing it only when asked. (#217)
+
 - **Choosing PostgreSQL got you an instance that would not start, and no scheduler if it
   had.** `docker/compose.postgres.yml` has offered the second engine since it was added, and
   *Installing Postulo* has recommended it to anybody already running one — while the

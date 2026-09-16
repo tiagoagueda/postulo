@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 06:53+0000\n"
+"POT-Creation-Date: 2026-09-16 07:16+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -42,6 +42,13 @@ msgstr "Yrityksellä %(company)s on jo %(scheme)s-tunniste: %(value)s."
 #, python-format, draft
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s muutettu."
+
+#: src/postulo/jobs/views.py:618
+#, python-format
+msgid "%(count)d application, with its timeline"
+msgid_plural "%(count)d applications, with their timelines"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/views.py:405
 #, python-format, draft
@@ -365,8 +372,8 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s muuttaisi sitä, mistä Postulo itse riippuu. %(problems)s"
 
-#: src/postulo/documents/rendering.py:287
-#: src/postulo/documents/rendering.py:345
+#: src/postulo/documents/rendering.py:303
+#: src/postulo/documents/rendering.py:362
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
@@ -408,6 +415,7 @@ msgid ""
 msgstr ""
 "%(provider)s ei anna sovelluksen lähettää itsenäisesti. Valitse ”Kirjauduttu kerran”."
 
+#: src/postulo/documents/rendering.py:289
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
@@ -428,13 +436,13 @@ msgstr "%(role)s: ei aloituspäivää, joten sitä ei lisätty."
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s ei yksilöi tämänlaista asiaa."
 
-#: src/postulo/documents/views.py:391
+#: src/postulo/documents/views.py:415
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d kopiota lähetetty, %(failed)d epäonnistui; jokainen asiakirja kertoo, mitkä."
 
-#: src/postulo/documents/views.py:397
+#: src/postulo/documents/views.py:421
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d kopiota lähetetty."
@@ -1081,7 +1089,7 @@ msgid ""
 msgstr ""
 "Lisättiin %(total)s merkintää. Mitään ei korvattu; kaksoiskappaleet saat itse poistaa."
 
-#: src/postulo/applications/views.py:465 src/postulo/applications/views.py:942
+#: src/postulo/applications/views.py:499 src/postulo/applications/views.py:976
 #, draft
 msgid "Added to the timeline."
 msgstr "Lisätty aikajanalle."
@@ -1292,7 +1300,7 @@ msgid "Any of them signs you in. The primary one receives Postulo's mail."
 msgstr ""
 "Mikä tahansa niistä kirjaa sinut sisään. Ensisijainen vastaanottaa Postulon postin."
 
-#: src/postulo/templates/partials/confirm_delete.html:16
+#: src/postulo/templates/partials/confirm_delete.html:35
 #, draft
 msgid "Anything belonging to it goes too, and this cannot be undone."
 msgstr "Kaikki siihen kuuluva katoaa myös, eikä tätä voi perua."
@@ -1338,7 +1346,7 @@ msgstr "Ulkoasu"
 #: src/postulo/applications/models.py:428
 #: src/postulo/applications/models.py:523
 #: src/postulo/applications/models.py:644 src/postulo/applications/tables.py:20
-#: src/postulo/documents/models.py:492 src/postulo/jobs/models.py:825
+#: src/postulo/documents/models.py:533 src/postulo/jobs/models.py:825
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1356,7 +1364,7 @@ msgstr "Hakemus"
 msgid "Application created"
 msgstr "Hakemus luotu"
 
-#: src/postulo/applications/views.py:418
+#: src/postulo/applications/views.py:452
 #, draft
 msgid "Application deleted."
 msgstr "Hakemus poistettu."
@@ -1505,7 +1513,7 @@ msgstr "Hae: %(title)s"
 msgid "Apprenticeship"
 msgstr "Oppisopimus"
 
-#: src/postulo/documents/models.py:573
+#: src/postulo/documents/models.py:621
 #, draft
 msgid "Archived"
 msgstr "Arkistoitu"
@@ -1560,7 +1568,7 @@ msgstr "Ainakin yhtä kieltä on tarjottava, tai kukaan ei voi lukea mitään."
 msgid "at most"
 msgstr ""
 
-#: src/postulo/documents/models.py:615
+#: src/postulo/documents/models.py:663
 #, draft
 msgid "attempts"
 msgstr "yritykset"
@@ -1773,14 +1781,14 @@ msgstr "Paluu-URL rekisteröitäväksi tarjoajalle"
 #: src/postulo/templates/documents/cv_item_form.html:25
 #: src/postulo/templates/documents/letter_form.html:29
 #: src/postulo/templates/documents/send.html:32
-#: src/postulo/templates/documents/upload_form.html:21
+#: src/postulo/templates/documents/upload_form.html:38
 #: src/postulo/templates/jobs/company_form.html:112
 #: src/postulo/templates/jobs/contact_form.html:42
 #: src/postulo/templates/jobs/industry_form.html:21
 #: src/postulo/templates/jobs/listing_apply.html:44
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
-#: src/postulo/templates/partials/confirm_delete.html:26
+#: src/postulo/templates/partials/confirm_delete.html:46
 #: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:40
 #: src/postulo/templates/server/person_delete.html:29
@@ -1981,7 +1989,7 @@ msgid ""
 msgstr ""
 "Täällä tehdyt muutokset lähetetään seuraavalla ajolla; toinen puoli luetaan silloin myös."
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:587
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Kysy yritykseltä %(company)s tehtävästä %(role)s"
@@ -2006,7 +2014,7 @@ msgstr "Tarkista kaikki"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Tarkistettu %(when)s: %(detail)s"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:416 src/postulo/documents/models.py:570
 #, draft
 msgid "checksum"
 msgstr "tarkistussumma"
@@ -2041,7 +2049,7 @@ msgstr "Valitse ensin identiteetintarjoaja ja tallenna se."
 msgid "Choose another file"
 msgstr "Valitse toinen tiedosto"
 
-#: src/postulo/documents/forms.py:287
+#: src/postulo/documents/forms.py:294
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Valitse vähintään yksi kirjattava asiakirja."
@@ -2051,7 +2059,7 @@ msgstr "Valitse vähintään yksi kirjattava asiakirja."
 msgid "Choose what kind of identifier this is."
 msgstr "Valitse, millainen tunniste tämä on."
 
-#: src/postulo/applications/views.py:938
+#: src/postulo/applications/views.py:972
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Valitse ensin, mitä hakemusta tämä koskee."
@@ -2231,7 +2239,7 @@ msgstr "yritys"
 msgid "Company added."
 msgstr "Yritys lisätty."
 
-#: src/postulo/jobs/views.py:379
+#: src/postulo/jobs/views.py:413
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Yritys poistettu ilmoituksineen."
@@ -2306,7 +2314,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Yhdistetty. Testaa varmistaaksesi, että se toimii."
 
-#: src/postulo/documents/models.py:594 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:642 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:271
 #, draft
 msgid "connection"
@@ -2371,7 +2379,7 @@ msgstr "yhteyshenkilö"
 msgid "Contact"
 msgstr "Yhteyshenkilö"
 
-#: src/postulo/jobs/views.py:485
+#: src/postulo/jobs/views.py:519
 #, draft
 msgid "Contact added."
 msgstr "Yhteyshenkilö lisätty."
@@ -2528,7 +2536,7 @@ msgstr "valuutta"
 msgid "Custom"
 msgstr "Oma"
 
-#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:138
+#: src/postulo/documents/forms.py:260 src/postulo/documents/kinds.py:138
 #: src/postulo/documents/models.py:97 src/postulo/documents/models.py:135
 #: src/postulo/documents/models.py:192 src/postulo/documents/models.py:369
 #: src/postulo/documents/themes.py:71
@@ -2764,7 +2772,7 @@ msgstr "Hylkää"
 msgid "Declined"
 msgstr "Hylätty"
 
-#: src/postulo/applications/views.py:930
+#: src/postulo/applications/views.py:964
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Hylätty. Sitä ei ehdoteta uudelleen."
@@ -2799,7 +2807,7 @@ msgstr "Puolustus"
 #: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
-#: src/postulo/templates/partials/confirm_delete.html:23
+#: src/postulo/templates/partials/confirm_delete.html:43
 #: src/postulo/templates/resume/overview.html:139
 #, draft
 msgid "Delete"
@@ -2938,12 +2946,12 @@ msgstr "Tee tämä"
 msgid "Document"
 msgstr "Asiakirja"
 
-#: src/postulo/documents/models.py:625
+#: src/postulo/documents/models.py:673
 #, draft
 msgid "document copies"
 msgstr "asiakirjakopiot"
 
-#: src/postulo/documents/models.py:624
+#: src/postulo/documents/models.py:672
 #, draft
 msgid "document copy"
 msgstr "asiakirjakopio"
@@ -2966,7 +2974,7 @@ msgstr "Asiakirjavarastot"
 msgid "Documents"
 msgstr "Asiakirjat"
 
-#: src/postulo/documents/views.py:480
+#: src/postulo/documents/views.py:504
 #, draft
 msgid "Documents sent"
 msgstr "Lähetetyt asiakirjat"
@@ -3312,7 +3320,7 @@ msgid ""
 msgstr ""
 "Jokainen tehtävä, jossa olet ollut. Kirjoita kohokohdat kerran; räätälöi ne myöhemmin CV-kohtaisesti."
 
-#: src/postulo/documents/views.py:400
+#: src/postulo/documents/views.py:424
 #, draft
 msgid "Every store already has this document."
 msgstr "Jokaisessa säilössä on jo tämä asiakirja."
@@ -3455,7 +3463,7 @@ msgstr "Vie PDF"
 msgid "Exported on its own"
 msgstr "Viety erikseen"
 
-#: src/postulo/documents/models.py:574
+#: src/postulo/documents/models.py:622
 #, draft
 msgid "Failed"
 msgstr "Epäonnistui"
@@ -3522,17 +3530,21 @@ msgstr "opintoala"
 msgid "Figures appear once you have applied for something."
 msgstr "Luvut ilmestyvät, kun olet hakenut jotakin."
 
-#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:484
+#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:519
 #, draft
 msgid "file"
 msgstr "tiedosto"
+
+#: src/postulo/templates/documents/upload_form.html:22
+msgid "File"
+msgstr ""
 
 #: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Tiedosto tallennettu."
 
-#: src/postulo/applications/views.py:879
+#: src/postulo/applications/views.py:913
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -3560,7 +3572,7 @@ msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
 "Tiedostot, jotka sinulla jo oli, erotuksena Postulon muodostamista asiakirjoista."
 
-#: src/postulo/documents/forms.py:258
+#: src/postulo/documents/forms.py:265
 #, draft
 msgid "Files you have already"
 msgstr "Tiedostot, jotka sinulla jo on"
@@ -3633,12 +3645,12 @@ msgstr "Seuraa profiiliasi"
 msgid "Follow-up note"
 msgstr "Muistio haastattelun jälkeen"
 
-#: src/postulo/applications/views.py:547
+#: src/postulo/applications/views.py:581
 #, draft
 msgid "Follow-up recorded."
 msgstr "Yhteydenotto kirjattu."
 
-#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:544
+#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:578
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -4111,7 +4123,7 @@ msgstr "Hybridi"
 msgid "I have already applied to this one"
 msgstr "Olen jo hakenut tätä"
 
-#: src/postulo/documents/models.py:613
+#: src/postulo/documents/models.py:661
 #, draft
 msgid "id in the store"
 msgstr "tunniste säilössä"
@@ -4323,7 +4335,7 @@ msgstr "toimiala"
 msgid "Industry"
 msgstr "Toimiala"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Industry renamed."
 msgstr "Toimiala nimetty uudelleen."
@@ -4405,7 +4417,7 @@ msgstr "haastattelu"
 msgid "Interview cancelled"
 msgstr "Haastattelu peruttu"
 
-#: src/postulo/applications/views.py:638
+#: src/postulo/applications/views.py:672
 #, draft
 msgid "Interview recorded."
 msgstr "Haastattelu kirjattu."
@@ -4415,7 +4427,7 @@ msgstr "Haastattelu kirjattu."
 msgid "Interview scheduled"
 msgstr "Haastattelu sovittu"
 
-#: src/postulo/applications/views.py:640
+#: src/postulo/applications/views.py:674
 #, draft
 msgid "Interview scheduled."
 msgstr "Haastattelu sovittu."
@@ -4425,7 +4437,7 @@ msgstr "Haastattelu sovittu."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Haastattelu huomenna: %(kind)s, %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:670
+#: src/postulo/applications/views.py:704
 #, draft
 msgid "Interview updated."
 msgstr "Haastattelu päivitetty."
@@ -4532,6 +4544,15 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Se ei voi päättyä ennen kuin se alkaa."
 
+#: src/postulo/documents/views.py:343
+#, python-format
+msgid ""
+"It is recorded as sent with %(count)d application, which will no longer say it was sent."
+msgid_plural ""
+"It is recorded as sent with %(count)d applications, which will no longer say it was sent."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/account/recovery_unusable.html:11
 #, draft
 msgid ""
@@ -4587,7 +4608,7 @@ msgstr "työpaikkailmoitukset"
 msgid "Job search report"
 msgstr "Raportti työnhausta"
 
-#: src/postulo/applications/views.py:867
+#: src/postulo/applications/views.py:901
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4657,7 +4678,7 @@ msgstr ""
 #: src/postulo/applications/models.py:650 src/postulo/core/models.py:178
 #: src/postulo/core/models.py:403 src/postulo/core/models.py:532
 #: src/postulo/documents/models.py:113 src/postulo/documents/models.py:315
-#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:482
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:517
 #: src/postulo/jobs/models.py:176 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:251
 #, draft
@@ -4674,7 +4695,7 @@ msgstr "tyyppi"
 msgid "Kind"
 msgstr "Tyyppi"
 
-#: src/postulo/documents/models.py:604
+#: src/postulo/documents/models.py:652
 #, draft
 msgid "kind of document"
 msgstr "asiakirjan tyyppi"
@@ -4684,7 +4705,7 @@ msgstr "asiakirjan tyyppi"
 msgid "kind of entry"
 msgstr "merkinnän tyyppi"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:564
 #, draft
 msgid "kind of source"
 msgstr "lähteen tyyppi"
@@ -4694,7 +4715,7 @@ msgstr "lähteen tyyppi"
 msgid "Kinds of letter"
 msgstr "Kirjeiden lajit"
 
-#: src/postulo/documents/models.py:597 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:645 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "nimi"
@@ -4778,7 +4799,7 @@ msgstr "Suurin luettu sivu"
 msgid "Last activity"
 msgstr "Viimeisin toiminta"
 
-#: src/postulo/documents/models.py:619
+#: src/postulo/documents/models.py:667
 #, draft
 msgid "last attempt"
 msgstr "viimeisin yritys"
@@ -4793,7 +4814,7 @@ msgstr "viimeisin tarkistus"
 msgid "last checked"
 msgstr "viimeksi tarkistettu"
 
-#: src/postulo/documents/models.py:621 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:669 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "viimeisin virhe"
@@ -4899,7 +4920,7 @@ msgstr "Anna tämän avaimen kirjata minut sisään yksinään"
 msgid "Let {column} size itself"
 msgstr "Anna sarakkeen {column} mitoittaa itsensä"
 
-#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
+#: src/postulo/documents/forms.py:262 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Kirje"
@@ -4954,7 +4975,7 @@ msgstr "linkki"
 msgid "Link"
 msgstr "Linkki"
 
-#: src/postulo/documents/models.py:614
+#: src/postulo/documents/models.py:662
 #, draft
 msgid "link in the store"
 msgstr "linkki säilössä"
@@ -4993,7 +5014,7 @@ msgid ""
 msgstr ""
 "Linkit paikkoihin, joihin työnhaku palaa: taulu, ansioluettelot, yritykset."
 
-#: src/postulo/documents/forms.py:264
+#: src/postulo/documents/forms.py:271
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -5237,7 +5258,7 @@ msgstr "Valmistus"
 msgid "Map a column to Company and one to Role first."
 msgstr "Yhdistä ensin yksi sarake Yritykseen ja yksi Tehtävään."
 
-#: src/postulo/applications/views.py:520
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Marked as done."
 msgstr "Merkitty tehdyksi."
@@ -5295,7 +5316,7 @@ msgstr "Valikko"
 msgid "Merge into"
 msgstr "Yhdistä toimialaan"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Merged."
 msgstr "Yhdistetty."
@@ -5567,7 +5588,7 @@ msgstr "Uusin varmuuskopio"
 msgid "Next"
 msgstr "Seuraava"
 
-#: src/postulo/documents/models.py:617
+#: src/postulo/documents/models.py:665
 #, draft
 msgid "next attempt"
 msgstr "seuraava yritys"
@@ -5635,7 +5656,7 @@ msgstr "Ei yhteyttä: %(why)s"
 msgid "No connections yet"
 msgstr "Ei vielä yhteyksiä"
 
-#: src/postulo/documents/views.py:382
+#: src/postulo/documents/views.py:406
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5860,7 +5881,7 @@ msgstr "Normaali"
 msgid "Not %(name)s"
 msgstr "Ei %(name)s"
 
-#: src/postulo/documents/models.py:575
+#: src/postulo/documents/models.py:623
 #, draft
 msgid "Not accepted"
 msgstr "Ei hyväksytty"
@@ -7089,7 +7110,7 @@ msgstr "Ilmoituksen osoite"
 msgid "Posting details"
 msgstr "Ilmoituksen tiedot"
 
-#: src/postulo/jobs/views.py:548
+#: src/postulo/jobs/views.py:582
 #, draft
 msgid "Posting updated."
 msgstr "Ilmoitus päivitetty."
@@ -7555,12 +7576,12 @@ msgid ""
 msgstr ""
 "Merkitään kaikkeen, mikä täältä asennetaan, joten se ei voi myöhemmin muuttua irrottamatta asentamaansa."
 
-#: src/postulo/applications/views.py:691
+#: src/postulo/applications/views.py:725
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Kirjattu perutuksi."
 
-#: src/postulo/applications/views.py:690
+#: src/postulo/applications/views.py:724
 #, draft
 msgid "Recorded as held."
 msgstr "Kirjattu pidetyksi."
@@ -7575,12 +7596,12 @@ msgstr "kirjaaja"
 msgid "recorded on"
 msgstr "kirjattu"
 
-#: src/postulo/documents/views.py:483
+#: src/postulo/documents/views.py:507
 #, draft
 msgid "Recorded what you sent."
 msgstr "Lähettämäsi kirjattu."
 
-#: src/postulo/applications/views.py:692
+#: src/postulo/applications/views.py:726
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Kirjattu: kukaan ei saapunut."
@@ -7774,12 +7795,12 @@ msgstr "Poista {label}"
 msgid "removed on the other side"
 msgstr "poistettu toisella puolella"
 
-#: src/postulo/documents/models.py:523
+#: src/postulo/documents/models.py:571
 #, draft
 msgid "rendered on"
 msgstr "muodostettu"
 
-#: src/postulo/documents/models.py:415
+#: src/postulo/documents/models.py:425
 #, draft
 msgid "replaces"
 msgstr "korvaa"
@@ -7990,7 +8011,7 @@ msgstr "palkka enintään"
 #: src/postulo/templates/documents/cv_form.html:20
 #: src/postulo/templates/documents/cv_item_form.html:24
 #: src/postulo/templates/documents/letter_form.html:28
-#: src/postulo/templates/documents/upload_form.html:20
+#: src/postulo/templates/documents/upload_form.html:37
 #: src/postulo/templates/jobs/company_form.html:111
 #: src/postulo/templates/jobs/contact_form.html:41
 #: src/postulo/templates/jobs/industry_form.html:20
@@ -8223,12 +8244,12 @@ msgstr "Lähetys epäonnistui: %(error)s"
 msgid "Sent"
 msgstr "Lähetetty"
 
-#: src/postulo/documents/models.py:548
+#: src/postulo/documents/models.py:596
 #, draft
 msgid "sent document"
 msgstr "lähetetty asiakirja"
 
-#: src/postulo/documents/models.py:549
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "sent documents"
 msgstr "lähetetyt asiakirjat"
@@ -8241,10 +8262,14 @@ msgstr "lähetetyt asiakirjat"
 msgid "Sent documents"
 msgstr "Lähetetyt asiakirjat"
 
-#: src/postulo/documents/models.py:620
+#: src/postulo/documents/models.py:668
 #, draft
 msgid "sent on"
 msgstr "lähetetty"
+
+#: src/postulo/documents/models.py:541
+msgid "sent to"
+msgstr ""
 
 #: src/postulo/core/server_views.py:784
 #, python-format, draft
@@ -8623,7 +8648,7 @@ msgstr "SMTP-palvelin"
 msgid "Snooze"
 msgstr "Torkku"
 
-#: src/postulo/applications/views.py:561
+#: src/postulo/applications/views.py:595
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Torkutettu kahdeksi viikoksi."
@@ -8820,7 +8845,7 @@ msgid "Status"
 msgstr "Tila"
 
 #: src/postulo/applications/models.py:202
-#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:611
+#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:659
 #: src/postulo/jobs/models.py:808
 #, draft
 msgid "status"
@@ -8836,7 +8861,7 @@ msgstr "Tilan muutos"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Tila taulukossa: %(text)s"
 
-#: src/postulo/applications/views.py:436
+#: src/postulo/applications/views.py:470
 #, draft
 msgid "Status updated."
 msgstr "Tila päivitetty."
@@ -8875,7 +8900,7 @@ msgstr "Tee siitä toimimaton"
 msgid "Stop sorting by %(column)s"
 msgstr "Lopeta järjestäminen %(column)s mukaan"
 
-#: src/postulo/documents/models.py:596
+#: src/postulo/documents/models.py:644
 #, draft
 msgid "store"
 msgstr "säilö"
@@ -8937,7 +8962,7 @@ msgstr "yhteenveto"
 msgid "superseded"
 msgstr "korvattu"
 
-#: src/postulo/documents/forms.py:228
+#: src/postulo/documents/forms.py:235
 #, draft
 msgid "Supersedes"
 msgstr "Korvaa"
@@ -9146,7 +9171,7 @@ msgstr "Testaa yhteys"
 msgid "text"
 msgstr "teksti"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:569
 #, draft
 msgid "text as sent"
 msgstr "teksti lähetetyssä muodossa"
@@ -9231,7 +9256,7 @@ msgstr "Tuo ei näytä %(scheme)s-tunnisteelta (esimerkiksi %(example)s)."
 msgid "That does not look like a complete web address."
 msgstr "Tuo ei näytä täydelliseltä verkko-osoitteelta."
 
-#: src/postulo/applications/views.py:467
+#: src/postulo/applications/views.py:501
 #, draft
 msgid "That entry could not be saved."
 msgstr "Tuota merkintää ei voitu tallentaa."
@@ -9258,7 +9283,7 @@ msgstr "Tiedosto on tyhjä."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Tiedosto on suurempi kuin %(limit)s Mt, joten sitä ei luettu."
 
-#: src/postulo/documents/forms.py:234
+#: src/postulo/documents/forms.py:241
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Tuo tiedosto on suurempi kuin %(limit)s Mt."
@@ -9304,7 +9329,7 @@ msgstr "Tuo on paljon palautuslinkkejä. Yritä pian uudelleen."
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Tuo on SVG, jota Postulo ei vielä säilytä. PNG tai JPEG käy."
 
-#: src/postulo/applications/views.py:438
+#: src/postulo/applications/views.py:472
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Tuo ei ole Postulon tuntema tila."
@@ -9324,12 +9349,12 @@ msgstr "Tuo ei ole osio, jonka Postulo tuntee."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Tämä ei ole Ed25519-julkinen avain: %(error)s"
 
-#: src/postulo/applications/views.py:684
+#: src/postulo/applications/views.py:718
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Tuo ei ole Postulon tuntema tulos."
 
-#: src/postulo/applications/views.py:563
+#: src/postulo/applications/views.py:597
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Tuota Postulo ei voi sille tehdä."
@@ -9434,7 +9459,7 @@ msgstr "Tuota liitännäistä ei ole enää asennettu."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Tuo vastaus ei tullut Postulon tekemästä pyynnöstä."
 
-#: src/postulo/applications/views.py:925
+#: src/postulo/applications/views.py:959
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Tähän ehdotukseen on jo vastattu."
@@ -9447,6 +9472,15 @@ msgstr ""
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Siitä tulisi silmukka: %(name)s on jo osa tätä."
+
+#: src/postulo/applications/views.py:444 src/postulo/jobs/views.py:405
+#: src/postulo/jobs/views.py:627
+#, python-format
+msgid "The %(count)d document you sent is kept, and still says where it went."
+msgid_plural ""
+"The %(count)d documents you sent are kept, and still say where they went."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/documents/pdf.py:175
 #, python-format, draft
@@ -9543,7 +9577,7 @@ msgstr "Yritys, johon haet"
 msgid "The connection is gone or switched off."
 msgstr "Yhteys on poissa tai pois päältä."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:411
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "Kopiota ei voitu lähettää; asiakirja kertoo miksi."
@@ -9567,7 +9601,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "Lataus on paljon suurempi kuin lisäosan pitäisi olla."
 
-#: src/postulo/documents/models.py:416
+#: src/postulo/documents/models.py:426
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Aiempi versio, jonka tämä korvaa. Vanha tiedosto säilytetään."
@@ -9608,6 +9642,11 @@ msgstr "Tiedosto on tyhjä."
 #, draft
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Tiedosto on yli 2 Mt. Työnhaku ei ole niin suuri."
+
+#: src/postulo/templates/documents/upload_form.html:25
+msgid ""
+"The file itself cannot be changed. Upload the new one and mark it as superseding this, so what you sent still means the file you sent."
+msgstr ""
 
 #: src/postulo/api/api.py:319
 #, python-format, draft
@@ -10011,12 +10050,20 @@ msgstr "Tämä osoite on jo ilmoituksissasi, alkaen %(when)s."
 msgid "This address is already listed."
 msgstr "Tämä osoite on jo luettelossa."
 
+#: src/postulo/templates/partials/confirm_delete.html:22
+msgid "This also deletes:"
+msgstr ""
+
 #: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
 msgstr ""
 "Tämä järjestys on sinun, ja se alkaa vakiojärjestyksenä. Myöhemmässä julkaisussa lisätty tai lisäosan mukana tullut osio odottaa yllä, kunnes sanot kyllä."
+
+#: src/postulo/templates/partials/confirm_delete.html:33
+msgid "This cannot be undone."
+msgstr ""
 
 #: src/postulo/jobs/logos.py:287
 #, draft
@@ -10214,7 +10261,7 @@ msgstr "Aikakatkaisu"
 msgid "timeout in seconds"
 msgstr "aikakatkaisu sekunteina"
 
-#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
+#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:514
 #: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
 #: src/postulo/resume/models.py:249
 #, draft
@@ -10482,12 +10529,12 @@ msgstr "Lataa ja yhdistä sarakkeet"
 msgid "Uploaded"
 msgstr "Ladattu"
 
-#: src/postulo/documents/models.py:440
+#: src/postulo/documents/models.py:475
 #, draft
 msgid "uploaded document"
 msgstr "ladattu asiakirja"
 
-#: src/postulo/documents/models.py:441
+#: src/postulo/documents/models.py:476
 #, draft
 msgid "uploaded documents"
 msgstr "ladatut asiakirjat"
@@ -10606,7 +10653,7 @@ msgstr "vahvistettu"
 msgid "Verified"
 msgstr "Vahvistettu"
 
-#: src/postulo/documents/models.py:408
+#: src/postulo/documents/models.py:418
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "version"
@@ -10672,7 +10719,7 @@ msgstr "Odottaa vastausta"
 msgid "Waiting only"
 msgstr "Vain odottavat"
 
-#: src/postulo/documents/models.py:572
+#: src/postulo/documents/models.py:620
 #, draft
 msgid "Waiting to be sent"
 msgstr "Odottaa lähetystä"

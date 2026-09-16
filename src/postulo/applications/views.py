@@ -414,6 +414,40 @@ class ApplicationDeleteView(OwnedObjectMixin, DeleteView):
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("applications:list")
 
+    def get_context_data(self, **kwargs):
+        """Say what goes with it, counted (#217).
+
+        The timeline is the record of what happened, and it goes. What was *sent* does not:
+        those PDFs are kept and still name the role and employer, which is the whole reason
+        `RenderedDocument.application` is `SET_NULL`.
+        """
+        from django.utils.translation import ngettext
+
+        context = super().get_context_data(**kwargs)
+        application = self.object
+        counts = (
+            (
+                application.events.count(),
+                "%(count)d entry on its timeline",
+                "%(count)d entries on its timeline",
+            ),
+            (application.interviews.count(), "%(count)d interview", "%(count)d interviews"),
+            (application.reminders.count(), "%(count)d reminder", "%(count)d reminders"),
+        )
+        context["consequences"] = [
+            ngettext(one, many, number) % {"count": number}
+            for number, one, many in counts
+            if number
+        ]
+        sent = application.rendered_documents.count()
+        if sent:
+            context["kept"] = ngettext(
+                "The %(count)d document you sent is kept, and still says where it went.",
+                "The %(count)d documents you sent are kept, and still say where they went.",
+                sent,
+            ) % {"count": sent}
+        return context
+
     def form_valid(self, form):
         messages.success(self.request, _("Application deleted."))
         return super().form_valid(form)

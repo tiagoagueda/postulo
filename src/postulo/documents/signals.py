@@ -12,10 +12,15 @@ should behave the same. Only creation counts; an edit to a title does not resend
 
 from __future__ import annotations
 
+import logging
+
+from django.db import transaction
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from .models import CV, CoverLetter, RenderedDocument, UploadedDocument
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=RenderedDocument, dispatch_uid="documents.copy_render")
@@ -26,6 +31,40 @@ def schedule_copies_on_creation(sender, instance, created, raw=False, **kwargs) 
     from .archiving import schedule_copies
 
     schedule_copies(instance)
+
+
+@receiver(post_delete, sender=RenderedDocument, dispatch_uid="documents.remove_render_file")
+@receiver(post_delete, sender=UploadedDocument, dispatch_uid="documents.remove_upload_file")
+def remove_the_file_from_disk(sender, instance, **kwargs) -> None:
+    """Deleting a document deletes its file (#217).
+
+    Until now only deleting a whole account removed anything: every other delete left the
+    bytes on disk with no row pointing at them, so "deleted" meant "hidden", for files that
+    hold a home address and a whole career. They were then copied into every backup, and
+    nothing would ever have removed them.
+
+    After the transaction commits, so a rolled-back delete does not take the file with it, and
+    only when no other row uses that name — a version chain shares nothing today, but a future
+    copy-on-write would, and an orphaned row with a live file is a far better failure than a
+    live row with no file.
+    """
+    name = getattr(instance.file, "name", "")
+    if not name:
+        return
+
+    def remove() -> None:
+        from .models import RenderedDocument as Render
+        from .models import UploadedDocument as Upload
+
+        still_used = any(model.objects.filter(file=name).exists() for model in (Render, Upload))
+        if still_used:
+            return
+        try:
+            instance.file.storage.delete(name)
+        except OSError:  # pragma: no cover - a file already gone is the outcome we wanted
+            logger.warning("Could not remove %s from storage", name, exc_info=True)
+
+    transaction.on_commit(remove)
 
 
 @receiver(post_delete, sender=CV, dispatch_uid="documents.forget_cv_source")

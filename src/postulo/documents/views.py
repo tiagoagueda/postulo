@@ -327,6 +327,30 @@ class UploadDeleteView(OwnedObjectMixin, DeleteView):
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("documents:upload_list")
 
+    def get_context_data(self, **kwargs):
+        """Warn when applications say this file was sent with them (#217).
+
+        Deleting it removes it from those applications without a word, which makes the record
+        of what was sent quietly untrue. The file goes from disk as well now, so this is the
+        last chance to say so.
+        """
+        from django.utils.translation import ngettext
+
+        context = super().get_context_data(**kwargs)
+        number = self.object.applications.count()
+        if number:
+            context["consequences"] = [
+                ngettext(
+                    "It is recorded as sent with %(count)d application, which will no longer "
+                    "say it was sent.",
+                    "It is recorded as sent with %(count)d applications, which will no longer "
+                    "say it was sent.",
+                    number,
+                )
+                % {"count": number}
+            ]
+        return context
+
 
 class UploadDownloadView(OwnedObjectMixin, View):
     """Hand over an uploaded file, once ownership is established.

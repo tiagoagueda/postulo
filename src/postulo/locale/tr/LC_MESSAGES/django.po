@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 06:53+0000\n"
+"POT-Creation-Date: 2026-09-16 07:16+0000\n"
 "PO-Revision-Date: 2026-09-08 12:24+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Türkçe\n"
@@ -42,6 +42,13 @@ msgstr "%(company)s zaten bir %(scheme)s tanımlayıcısına sahip: %(value)s."
 #, python-format, draft
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s değişti."
+
+#: src/postulo/jobs/views.py:618
+#, python-format
+msgid "%(count)d application, with its timeline"
+msgid_plural "%(count)d applications, with their timelines"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/views.py:405
 #, python-format, draft
@@ -365,8 +372,8 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s, Postulo'nun kendi bağımlılıklarını değiştirirdi. %(problems)s"
 
-#: src/postulo/documents/rendering.py:287
-#: src/postulo/documents/rendering.py:345
+#: src/postulo/documents/rendering.py:303
+#: src/postulo/documents/rendering.py:362
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
@@ -408,6 +415,7 @@ msgid ""
 msgstr ""
 "%(provider)s bir uygulamanın kendi başına göndermesine izin vermiyor. “Bir kez oturum açıldı” seçeneğini seçin."
 
+#: src/postulo/documents/rendering.py:289
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
@@ -428,13 +436,13 @@ msgstr "%(role)s: başlangıç tarihi yok, bu yüzden eklenmedi."
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s bu tür bir şeyi tanımlamaz."
 
-#: src/postulo/documents/views.py:391
+#: src/postulo/documents/views.py:415
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d kopya gönderildi, %(failed)d tanesi başarısız; hangisinin ne olduğunu her belge söylüyor."
 
-#: src/postulo/documents/views.py:397
+#: src/postulo/documents/views.py:421
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d kopya gönderildi."
@@ -1085,7 +1093,7 @@ msgid ""
 msgstr ""
 "%(total)s girdi eklendi. Hiçbir şeyin üzerine yazılmadı; yinelenen ne varsa silmek size kalmış."
 
-#: src/postulo/applications/views.py:465 src/postulo/applications/views.py:942
+#: src/postulo/applications/views.py:499 src/postulo/applications/views.py:976
 #, draft
 msgid "Added to the timeline."
 msgstr "Zaman çizelgesine eklendi."
@@ -1295,7 +1303,7 @@ msgstr "Herhangi"
 msgid "Any of them signs you in. The primary one receives Postulo's mail."
 msgstr "Hepsi girişinizi sağlar. Postulo'nun postasını birincil olan alır."
 
-#: src/postulo/templates/partials/confirm_delete.html:16
+#: src/postulo/templates/partials/confirm_delete.html:35
 #, draft
 msgid "Anything belonging to it goes too, and this cannot be undone."
 msgstr "Ona ait olan her şey de gider ve bu geri alınamaz."
@@ -1341,7 +1349,7 @@ msgstr "Görünüm"
 #: src/postulo/applications/models.py:428
 #: src/postulo/applications/models.py:523
 #: src/postulo/applications/models.py:644 src/postulo/applications/tables.py:20
-#: src/postulo/documents/models.py:492 src/postulo/jobs/models.py:825
+#: src/postulo/documents/models.py:533 src/postulo/jobs/models.py:825
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1359,7 +1367,7 @@ msgstr "Başvuru"
 msgid "Application created"
 msgstr "Başvuru oluşturuldu"
 
-#: src/postulo/applications/views.py:418
+#: src/postulo/applications/views.py:452
 #, draft
 msgid "Application deleted."
 msgstr "Başvuru silindi."
@@ -1509,7 +1517,7 @@ msgstr "Başvur: %(title)s"
 msgid "Apprenticeship"
 msgstr "Çıraklık"
 
-#: src/postulo/documents/models.py:573
+#: src/postulo/documents/models.py:621
 #, draft
 msgid "Archived"
 msgstr "Arşivlendi"
@@ -1564,7 +1572,7 @@ msgstr "En az bir dil sunulmalı, yoksa kimse hiçbir şey okuyamaz."
 msgid "at most"
 msgstr ""
 
-#: src/postulo/documents/models.py:615
+#: src/postulo/documents/models.py:663
 #, draft
 msgid "attempts"
 msgstr "denemeler"
@@ -1777,14 +1785,14 @@ msgstr "Ona kaydedilecek geri dönüş adresi"
 #: src/postulo/templates/documents/cv_item_form.html:25
 #: src/postulo/templates/documents/letter_form.html:29
 #: src/postulo/templates/documents/send.html:32
-#: src/postulo/templates/documents/upload_form.html:21
+#: src/postulo/templates/documents/upload_form.html:38
 #: src/postulo/templates/jobs/company_form.html:112
 #: src/postulo/templates/jobs/contact_form.html:42
 #: src/postulo/templates/jobs/industry_form.html:21
 #: src/postulo/templates/jobs/listing_apply.html:44
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
-#: src/postulo/templates/partials/confirm_delete.html:26
+#: src/postulo/templates/partials/confirm_delete.html:46
 #: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:40
 #: src/postulo/templates/server/person_delete.html:29
@@ -1984,7 +1992,7 @@ msgid ""
 msgstr ""
 "Burada yapılan değişiklikler bir sonraki turda gönderilir; karşı taraf da o zaman okunur."
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:587
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "%(company)s şirketine %(role)s için hatırlat"
@@ -2009,7 +2017,7 @@ msgstr "Hepsini denetle"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "%(when)s denetlendi: %(detail)s"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:416 src/postulo/documents/models.py:570
 #, draft
 msgid "checksum"
 msgstr "sağlama toplamı"
@@ -2044,7 +2052,7 @@ msgstr "Önce bir kimlik sağlayıcı seçip kaydedin."
 msgid "Choose another file"
 msgstr "Başka bir dosya seç"
 
-#: src/postulo/documents/forms.py:287
+#: src/postulo/documents/forms.py:294
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Kaydedilecek en az bir belge seçin."
@@ -2054,7 +2062,7 @@ msgstr "Kaydedilecek en az bir belge seçin."
 msgid "Choose what kind of identifier this is."
 msgstr "Bunun ne tür bir tanımlayıcı olduğunu seçin."
 
-#: src/postulo/applications/views.py:938
+#: src/postulo/applications/views.py:972
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Önce bunun hangi başvuruyla ilgili olduğunu seçin."
@@ -2233,7 +2241,7 @@ msgstr "şirket"
 msgid "Company added."
 msgstr "Şirket eklendi."
 
-#: src/postulo/jobs/views.py:379
+#: src/postulo/jobs/views.py:413
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Şirket, ilanlarıyla birlikte silindi."
@@ -2307,7 +2315,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Bağlandı. Çalıştığından emin olmak için test edin."
 
-#: src/postulo/documents/models.py:594 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:642 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:271
 #, draft
 msgid "connection"
@@ -2372,7 +2380,7 @@ msgstr "kişi"
 msgid "Contact"
 msgstr "Kişi"
 
-#: src/postulo/jobs/views.py:485
+#: src/postulo/jobs/views.py:519
 #, draft
 msgid "Contact added."
 msgstr "Kişi eklendi."
@@ -2529,7 +2537,7 @@ msgstr "para birimi"
 msgid "Custom"
 msgstr "Özel"
 
-#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:138
+#: src/postulo/documents/forms.py:260 src/postulo/documents/kinds.py:138
 #: src/postulo/documents/models.py:97 src/postulo/documents/models.py:135
 #: src/postulo/documents/models.py:192 src/postulo/documents/models.py:369
 #: src/postulo/documents/themes.py:71
@@ -2766,7 +2774,7 @@ msgstr "Geri çevir"
 msgid "Declined"
 msgstr "Geri çevrildi"
 
-#: src/postulo/applications/views.py:930
+#: src/postulo/applications/views.py:964
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Geri çevrildi. Bir daha önerilmeyecek."
@@ -2801,7 +2809,7 @@ msgstr "Savunma"
 #: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
-#: src/postulo/templates/partials/confirm_delete.html:23
+#: src/postulo/templates/partials/confirm_delete.html:43
 #: src/postulo/templates/resume/overview.html:139
 #, draft
 msgid "Delete"
@@ -2940,12 +2948,12 @@ msgstr "Şunu yap"
 msgid "Document"
 msgstr "Belge"
 
-#: src/postulo/documents/models.py:625
+#: src/postulo/documents/models.py:673
 #, draft
 msgid "document copies"
 msgstr "belge kopyaları"
 
-#: src/postulo/documents/models.py:624
+#: src/postulo/documents/models.py:672
 #, draft
 msgid "document copy"
 msgstr "belge kopyası"
@@ -2968,7 +2976,7 @@ msgstr "Belge depoları"
 msgid "Documents"
 msgstr "Belgeler"
 
-#: src/postulo/documents/views.py:480
+#: src/postulo/documents/views.py:504
 #, draft
 msgid "Documents sent"
 msgstr "Gönderilen belgeler"
@@ -3315,7 +3323,7 @@ msgid ""
 msgstr ""
 "Bulunduğunuz her pozisyon. Öne çıkanları bir kez yazın; CV başına sonra uyarlarsınız."
 
-#: src/postulo/documents/views.py:400
+#: src/postulo/documents/views.py:424
 #, draft
 msgid "Every store already has this document."
 msgstr "Her depoda bu belge zaten var."
@@ -3458,7 +3466,7 @@ msgstr "PDF dışa aktar"
 msgid "Exported on its own"
 msgstr "Ayrı olarak dışa aktarıldı"
 
-#: src/postulo/documents/models.py:574
+#: src/postulo/documents/models.py:622
 #, draft
 msgid "Failed"
 msgstr "Başarısız"
@@ -3525,17 +3533,21 @@ msgstr "çalışma alanı"
 msgid "Figures appear once you have applied for something."
 msgstr "Bir şeye başvurduğunuzda rakamlar belirir."
 
-#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:484
+#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:519
 #, draft
 msgid "file"
 msgstr "dosya"
+
+#: src/postulo/templates/documents/upload_form.html:22
+msgid "File"
+msgstr ""
 
 #: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Dosya kaydedildi."
 
-#: src/postulo/applications/views.py:879
+#: src/postulo/applications/views.py:913
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -3562,7 +3574,7 @@ msgstr "Zaten sahip olduğunuz dosyalar"
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr "Postulo'nun ürettiği belgelerin aksine, zaten sahip olduğunuz dosyalar."
 
-#: src/postulo/documents/forms.py:258
+#: src/postulo/documents/forms.py:265
 #, draft
 msgid "Files you have already"
 msgstr "Hâlihazırda sahip olduğunuz dosyalar"
@@ -3635,12 +3647,12 @@ msgstr "Profilinizi izle"
 msgid "Follow-up note"
 msgstr "Hatırlatma notu"
 
-#: src/postulo/applications/views.py:547
+#: src/postulo/applications/views.py:581
 #, draft
 msgid "Follow-up recorded."
 msgstr "Hatırlatma kaydedildi."
 
-#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:544
+#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:578
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -4114,7 +4126,7 @@ msgstr "Karma"
 msgid "I have already applied to this one"
 msgstr "Buna zaten başvurdum"
 
-#: src/postulo/documents/models.py:613
+#: src/postulo/documents/models.py:661
 #, draft
 msgid "id in the store"
 msgstr "depodaki kimlik"
@@ -4326,7 +4338,7 @@ msgstr "sektör"
 msgid "Industry"
 msgstr "Sektör"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Industry renamed."
 msgstr "Sektör yeniden adlandırıldı."
@@ -4408,7 +4420,7 @@ msgstr "görüşme"
 msgid "Interview cancelled"
 msgstr "Görüşme iptal edildi"
 
-#: src/postulo/applications/views.py:638
+#: src/postulo/applications/views.py:672
 #, draft
 msgid "Interview recorded."
 msgstr "Görüşme kaydedildi."
@@ -4418,7 +4430,7 @@ msgstr "Görüşme kaydedildi."
 msgid "Interview scheduled"
 msgstr "Görüşme planlandı"
 
-#: src/postulo/applications/views.py:640
+#: src/postulo/applications/views.py:674
 #, draft
 msgid "Interview scheduled."
 msgstr "Görüşme planlandı."
@@ -4428,7 +4440,7 @@ msgstr "Görüşme planlandı."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Yarın görüşme: %(company)s şirketinde %(kind)s, %(time)s"
 
-#: src/postulo/applications/views.py:670
+#: src/postulo/applications/views.py:704
 #, draft
 msgid "Interview updated."
 msgstr "Görüşme güncellendi."
@@ -4535,6 +4547,15 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Başlamadan bitemez."
 
+#: src/postulo/documents/views.py:343
+#, python-format
+msgid ""
+"It is recorded as sent with %(count)d application, which will no longer say it was sent."
+msgid_plural ""
+"It is recorded as sent with %(count)d applications, which will no longer say it was sent."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/account/recovery_unusable.html:11
 #, draft
 msgid ""
@@ -4589,7 +4610,7 @@ msgstr "iş ilanları"
 msgid "Job search report"
 msgstr "İş arama raporu"
 
-#: src/postulo/applications/views.py:867
+#: src/postulo/applications/views.py:901
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4659,7 +4680,7 @@ msgstr ""
 #: src/postulo/applications/models.py:650 src/postulo/core/models.py:178
 #: src/postulo/core/models.py:403 src/postulo/core/models.py:532
 #: src/postulo/documents/models.py:113 src/postulo/documents/models.py:315
-#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:482
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:517
 #: src/postulo/jobs/models.py:176 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:251
 #, draft
@@ -4676,7 +4697,7 @@ msgstr "tür"
 msgid "Kind"
 msgstr "Tür"
 
-#: src/postulo/documents/models.py:604
+#: src/postulo/documents/models.py:652
 #, draft
 msgid "kind of document"
 msgstr "belge türü"
@@ -4686,7 +4707,7 @@ msgstr "belge türü"
 msgid "kind of entry"
 msgstr "kayıt türü"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:564
 #, draft
 msgid "kind of source"
 msgstr "kaynak türü"
@@ -4696,7 +4717,7 @@ msgstr "kaynak türü"
 msgid "Kinds of letter"
 msgstr "Mektup türleri"
 
-#: src/postulo/documents/models.py:597 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:645 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "görünen ad"
@@ -4780,7 +4801,7 @@ msgstr "Okunan en büyük sayfa"
 msgid "Last activity"
 msgstr "Son etkinlik"
 
-#: src/postulo/documents/models.py:619
+#: src/postulo/documents/models.py:667
 #, draft
 msgid "last attempt"
 msgstr "son deneme"
@@ -4795,7 +4816,7 @@ msgstr "son denetim"
 msgid "last checked"
 msgstr "son denetlenme"
 
-#: src/postulo/documents/models.py:621 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:669 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "son hata"
@@ -4900,7 +4921,7 @@ msgstr "Bu geçiş anahtarı tek başına girişimi yapsın"
 msgid "Let {column} size itself"
 msgstr "{column} sütunu genişliğini kendisi belirlesin"
 
-#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
+#: src/postulo/documents/forms.py:262 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Mektup"
@@ -4955,7 +4976,7 @@ msgstr "bağlantı"
 msgid "Link"
 msgstr "Bağlantı"
 
-#: src/postulo/documents/models.py:614
+#: src/postulo/documents/models.py:662
 #, draft
 msgid "link in the store"
 msgstr "depodaki bağlantı"
@@ -4994,7 +5015,7 @@ msgid ""
 msgstr ""
 "Bir iş aramasının geri döndüğü yerlere bağlantılar: pano, CV'ler, şirketler."
 
-#: src/postulo/documents/forms.py:264
+#: src/postulo/documents/forms.py:271
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -5238,7 +5259,7 @@ msgstr "Üretim"
 msgid "Map a column to Company and one to Role first."
 msgstr "Önce bir sütunu Şirket'e, birini de Pozisyon'a eşleyin."
 
-#: src/postulo/applications/views.py:520
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Marked as done."
 msgstr "Tamamlandı olarak işaretlendi."
@@ -5296,7 +5317,7 @@ msgstr "Menü"
 msgid "Merge into"
 msgstr "Şununla birleştir"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Merged."
 msgstr "Birleştirildi."
@@ -5568,7 +5589,7 @@ msgstr "En yeni yedek"
 msgid "Next"
 msgstr "İleri"
 
-#: src/postulo/documents/models.py:617
+#: src/postulo/documents/models.py:665
 #, draft
 msgid "next attempt"
 msgstr "sonraki deneme"
@@ -5636,7 +5657,7 @@ msgstr "Bağlantı yok: %(why)s"
 msgid "No connections yet"
 msgstr "Henüz bağlantı yok"
 
-#: src/postulo/documents/views.py:382
+#: src/postulo/documents/views.py:406
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5860,7 +5881,7 @@ msgstr "Normal"
 msgid "Not %(name)s"
 msgstr "%(name)s değil"
 
-#: src/postulo/documents/models.py:575
+#: src/postulo/documents/models.py:623
 #, draft
 msgid "Not accepted"
 msgstr "Kabul edilmedi"
@@ -7090,7 +7111,7 @@ msgstr "İlan adresi"
 msgid "Posting details"
 msgstr "İlan ayrıntıları"
 
-#: src/postulo/jobs/views.py:548
+#: src/postulo/jobs/views.py:582
 #, draft
 msgid "Posting updated."
 msgstr "İlan güncellendi."
@@ -7556,12 +7577,12 @@ msgid ""
 msgstr ""
 "Buradan kurulan her şeye karşı kaydedilir, bu yüzden kurduklarını öksüz bırakmadan sonradan değiştirilemez."
 
-#: src/postulo/applications/views.py:691
+#: src/postulo/applications/views.py:725
 #, draft
 msgid "Recorded as cancelled."
 msgstr "İptal edildi olarak kaydedildi."
 
-#: src/postulo/applications/views.py:690
+#: src/postulo/applications/views.py:724
 #, draft
 msgid "Recorded as held."
 msgstr "Yapıldı olarak kaydedildi."
@@ -7576,12 +7597,12 @@ msgstr "kaydeden"
 msgid "recorded on"
 msgstr "kaydedilme tarihi"
 
-#: src/postulo/documents/views.py:483
+#: src/postulo/documents/views.py:507
 #, draft
 msgid "Recorded what you sent."
 msgstr "Ne gönderdiğiniz kaydedildi."
 
-#: src/postulo/applications/views.py:692
+#: src/postulo/applications/views.py:726
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Kaydedildi: kimse gelmedi."
@@ -7773,12 +7794,12 @@ msgstr "{label} etiketini kaldır"
 msgid "removed on the other side"
 msgstr "karşı tarafta kaldırıldı"
 
-#: src/postulo/documents/models.py:523
+#: src/postulo/documents/models.py:571
 #, draft
 msgid "rendered on"
 msgstr "işlenme tarihi"
 
-#: src/postulo/documents/models.py:415
+#: src/postulo/documents/models.py:425
 #, draft
 msgid "replaces"
 msgstr "şunun yerine geçer"
@@ -7991,7 +8012,7 @@ msgstr "maaş üst sınırı"
 #: src/postulo/templates/documents/cv_form.html:20
 #: src/postulo/templates/documents/cv_item_form.html:24
 #: src/postulo/templates/documents/letter_form.html:28
-#: src/postulo/templates/documents/upload_form.html:20
+#: src/postulo/templates/documents/upload_form.html:37
 #: src/postulo/templates/jobs/company_form.html:111
 #: src/postulo/templates/jobs/contact_form.html:41
 #: src/postulo/templates/jobs/industry_form.html:20
@@ -8224,12 +8245,12 @@ msgstr "Gönderim başarısız: %(error)s"
 msgid "Sent"
 msgstr "Gönderildi"
 
-#: src/postulo/documents/models.py:548
+#: src/postulo/documents/models.py:596
 #, draft
 msgid "sent document"
 msgstr "gönderilen belge"
 
-#: src/postulo/documents/models.py:549
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "sent documents"
 msgstr "gönderilen belgeler"
@@ -8242,10 +8263,14 @@ msgstr "gönderilen belgeler"
 msgid "Sent documents"
 msgstr "Gönderilen belgeler"
 
-#: src/postulo/documents/models.py:620
+#: src/postulo/documents/models.py:668
 #, draft
 msgid "sent on"
 msgstr "gönderilme tarihi"
+
+#: src/postulo/documents/models.py:541
+msgid "sent to"
+msgstr ""
 
 #: src/postulo/core/server_views.py:784
 #, python-format, draft
@@ -8624,7 +8649,7 @@ msgstr "SMTP sunucusu"
 msgid "Snooze"
 msgstr "Ertele"
 
-#: src/postulo/applications/views.py:561
+#: src/postulo/applications/views.py:595
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "İki hafta ertelendi."
@@ -8820,7 +8845,7 @@ msgid "Status"
 msgstr "Durum"
 
 #: src/postulo/applications/models.py:202
-#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:611
+#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:659
 #: src/postulo/jobs/models.py:808
 #, draft
 msgid "status"
@@ -8836,7 +8861,7 @@ msgstr "Durum değişikliği"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Hesap tablosundaki durum: %(text)s"
 
-#: src/postulo/applications/views.py:436
+#: src/postulo/applications/views.py:470
 #, draft
 msgid "Status updated."
 msgstr "Durum güncellendi."
@@ -8876,7 +8901,7 @@ msgstr "Çalışmaz hale getir"
 msgid "Stop sorting by %(column)s"
 msgstr "%(column)s ölçütüne göre sıralamayı bırak"
 
-#: src/postulo/documents/models.py:596
+#: src/postulo/documents/models.py:644
 #, draft
 msgid "store"
 msgstr "depo"
@@ -8938,7 +8963,7 @@ msgstr "özet"
 msgid "superseded"
 msgstr "yerine geçildi"
 
-#: src/postulo/documents/forms.py:228
+#: src/postulo/documents/forms.py:235
 #, draft
 msgid "Supersedes"
 msgstr "Eskisinin yerine geçer"
@@ -9147,7 +9172,7 @@ msgstr "Bağlantıyı sına"
 msgid "text"
 msgstr "metin"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:569
 #, draft
 msgid "text as sent"
 msgstr "gönderildiği hâliyle metin"
@@ -9232,7 +9257,7 @@ msgstr "Bu bir %(scheme)s tanımlayıcısına benzemiyor (örneğin %(example)s)
 msgid "That does not look like a complete web address."
 msgstr "Bu tam bir web adresine benzemiyor."
 
-#: src/postulo/applications/views.py:467
+#: src/postulo/applications/views.py:501
 #, draft
 msgid "That entry could not be saved."
 msgstr "O girdi kaydedilemedi."
@@ -9259,7 +9284,7 @@ msgstr "O dosya boş."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "O dosya %(limit)s MB'tan büyük, bu yüzden okunmadı."
 
-#: src/postulo/documents/forms.py:234
+#: src/postulo/documents/forms.py:241
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "O dosya %(limit)s MB'tan büyük."
@@ -9305,7 +9330,7 @@ msgstr "Bu çok fazla kurtarma bağlantısı. Birazdan tekrar deneyin."
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Bu bir SVG; Postulo henüz SVG saklamıyor. PNG ya da JPEG olur."
 
-#: src/postulo/applications/views.py:438
+#: src/postulo/applications/views.py:472
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Bu, Postulo'nun tanıdığı bir durum değil."
@@ -9325,12 +9350,12 @@ msgstr "Bu, Postulo'nun bildiği bir bileşen değil."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Bu bir Ed25519 açık anahtarı değil: %(error)s"
 
-#: src/postulo/applications/views.py:684
+#: src/postulo/applications/views.py:718
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Bu, Postulo'nun tanıdığı bir sonuç değil."
 
-#: src/postulo/applications/views.py:563
+#: src/postulo/applications/views.py:597
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Postulo bu konuda böyle bir şey yapamaz."
@@ -9435,7 +9460,7 @@ msgstr "O eklenti artık kurulu değil."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Bu yanıt Postulo'nun yaptığı bir istekten gelmedi."
 
-#: src/postulo/applications/views.py:925
+#: src/postulo/applications/views.py:959
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "O öneri zaten yanıtlanmış."
@@ -9448,6 +9473,15 @@ msgstr ""
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Bu bir döngü oluştururdu: %(name)s zaten bunun parçası."
+
+#: src/postulo/applications/views.py:444 src/postulo/jobs/views.py:405
+#: src/postulo/jobs/views.py:627
+#, python-format
+msgid "The %(count)d document you sent is kept, and still says where it went."
+msgid_plural ""
+"The %(count)d documents you sent are kept, and still say where they went."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/documents/pdf.py:175
 #, python-format, draft
@@ -9543,7 +9577,7 @@ msgstr "Başvurduğunuz şirket"
 msgid "The connection is gone or switched off."
 msgstr "Bağlantı yok ya da kapatılmış."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:411
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "Kopya gönderilemedi; nedenini belge söylüyor."
@@ -9567,7 +9601,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "İndirilen, bir eklentinin olması gerekenden çok daha büyük."
 
-#: src/postulo/documents/models.py:416
+#: src/postulo/documents/models.py:426
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Bunun yerine geçtiği önceki sürüm. Eski dosya saklanır."
@@ -9608,6 +9642,11 @@ msgstr "Dosya boş."
 #, draft
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Dosya 2 MB'tan büyük. Bir iş araması o kadar büyük olmaz."
+
+#: src/postulo/templates/documents/upload_form.html:25
+msgid ""
+"The file itself cannot be changed. Upload the new one and mark it as superseding this, so what you sent still means the file you sent."
+msgstr ""
 
 #: src/postulo/api/api.py:319
 #, python-format, draft
@@ -10007,12 +10046,20 @@ msgstr "Bu adres %(when)s tarihinden beri zaten ilanlarınızda."
 msgid "This address is already listed."
 msgstr "Bu adres zaten listede."
 
+#: src/postulo/templates/partials/confirm_delete.html:22
+msgid "This also deletes:"
+msgstr ""
+
 #: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
 msgstr ""
 "Bu düzen sizindir ve standart düzen olarak başlar. Sonraki bir sürümde eklenen ya da bir eklentiyle gelen bir bileşen, evet diyene kadar yukarıda bekler."
+
+#: src/postulo/templates/partials/confirm_delete.html:33
+msgid "This cannot be undone."
+msgstr ""
 
 #: src/postulo/jobs/logos.py:287
 #, draft
@@ -10208,7 +10255,7 @@ msgstr "Zaman aşımı"
 msgid "timeout in seconds"
 msgstr "saniye cinsinden zaman aşımı"
 
-#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
+#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:514
 #: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
 #: src/postulo/resume/models.py:249
 #, draft
@@ -10477,12 +10524,12 @@ msgstr "Yükleyin ve sütunları eşleyin"
 msgid "Uploaded"
 msgstr "Yüklendi"
 
-#: src/postulo/documents/models.py:440
+#: src/postulo/documents/models.py:475
 #, draft
 msgid "uploaded document"
 msgstr "yüklenen belge"
 
-#: src/postulo/documents/models.py:441
+#: src/postulo/documents/models.py:476
 #, draft
 msgid "uploaded documents"
 msgstr "yüklenen belgeler"
@@ -10601,7 +10648,7 @@ msgstr "doğrulandı"
 msgid "Verified"
 msgstr "Doğrulandı"
 
-#: src/postulo/documents/models.py:408
+#: src/postulo/documents/models.py:418
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "version"
@@ -10667,7 +10714,7 @@ msgstr "Yanıt bekleniyor"
 msgid "Waiting only"
 msgstr "Yalnızca yanıt bekleyenler"
 
-#: src/postulo/documents/models.py:572
+#: src/postulo/documents/models.py:620
 #, draft
 msgid "Waiting to be sent"
 msgstr "Gönderilmeyi bekliyor"

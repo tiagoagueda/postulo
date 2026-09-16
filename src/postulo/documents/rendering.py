@@ -276,6 +276,22 @@ def _keep(document: RenderedDocument, filename: str, content: bytes) -> None:
     )
 
 
+def sent_to(application) -> str:
+    """Where a snapshot went, in words, so it still says so if the application is deleted.
+
+    The posting as it stood on the day it was sent. `RenderedDocument.application` is
+    `SET_NULL` since #217, and a PDF with a blank where the employer's name should be is a
+    record of nothing.
+    """
+    if application is None:
+        return ""
+    posting = application.posting
+    return gettext("%(role)s at %(company)s") % {
+        "role": posting.title,
+        "company": posting.company.name,
+    }
+
+
 def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
     """Freeze a CV as a PDF, exactly as it stands now.
 
@@ -297,6 +313,7 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
         kind=cv.document_kind,
         source=cv,
         application=application,
+        sent_to=sent_to(application),
         source_text=html,
         checksum=RenderedDocument.checksum_for(content),
     )
@@ -353,6 +370,7 @@ def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> R
         kind=letter.document_kind,
         source=letter,
         application=application,
+        sent_to=sent_to(application),
         source_text=letter_text(letter, application),
         checksum=RenderedDocument.checksum_for(content),
     )

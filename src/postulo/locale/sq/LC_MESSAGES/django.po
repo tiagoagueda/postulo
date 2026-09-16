@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 06:53+0000\n"
+"POT-Creation-Date: 2026-09-16 07:16+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: shqip\n"
@@ -42,6 +42,13 @@ msgstr "%(company)s ka tashmë një identifikues %(scheme)s: %(value)s."
 #, python-format, draft
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s ndryshuan."
+
+#: src/postulo/jobs/views.py:618
+#, python-format
+msgid "%(count)d application, with its timeline"
+msgid_plural "%(count)d applications, with their timelines"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/views.py:405
 #, python-format, draft
@@ -366,8 +373,8 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s do të ndryshonte atë nga çka varet vetë Postulo. %(problems)s"
 
-#: src/postulo/documents/rendering.py:287
-#: src/postulo/documents/rendering.py:345
+#: src/postulo/documents/rendering.py:303
+#: src/postulo/documents/rendering.py:362
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
@@ -409,6 +416,7 @@ msgid ""
 msgstr ""
 "%(provider)s nuk lejon që një aplikacion të dërgojë vetë. Zgjidh “Hyrë një herë”."
 
+#: src/postulo/documents/rendering.py:289
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
@@ -429,13 +437,13 @@ msgstr "%(role)s: pa datë fillimi, prandaj nuk u shtua."
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s nuk identifikon këtë lloj gjëje."
 
-#: src/postulo/documents/views.py:391
+#: src/postulo/documents/views.py:415
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d kopje u dërguan, %(failed)d dështuan; secili dokument thotë cili."
 
-#: src/postulo/documents/views.py:397
+#: src/postulo/documents/views.py:421
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d kopje u dërguan."
@@ -1085,7 +1093,7 @@ msgid ""
 msgstr ""
 "U shtuan %(total)s zëra. Asgjë nuk u mbishkrua; çdo dublikatë është e juaja për ta fshirë."
 
-#: src/postulo/applications/views.py:465 src/postulo/applications/views.py:942
+#: src/postulo/applications/views.py:499 src/postulo/applications/views.py:976
 #, draft
 msgid "Added to the timeline."
 msgstr "U shtua në vijën kohore."
@@ -1296,7 +1304,7 @@ msgstr "Çdo"
 msgid "Any of them signs you in. The primary one receives Postulo's mail."
 msgstr "Secila prej tyre ju fut brenda. Kryesorja merr postën e Postulo-s."
 
-#: src/postulo/templates/partials/confirm_delete.html:16
+#: src/postulo/templates/partials/confirm_delete.html:35
 #, draft
 msgid "Anything belonging to it goes too, and this cannot be undone."
 msgstr "Gjithçka që i përket zhduket gjithashtu, dhe kjo nuk mund të zhbëhet."
@@ -1342,7 +1350,7 @@ msgstr "Pamja"
 #: src/postulo/applications/models.py:428
 #: src/postulo/applications/models.py:523
 #: src/postulo/applications/models.py:644 src/postulo/applications/tables.py:20
-#: src/postulo/documents/models.py:492 src/postulo/jobs/models.py:825
+#: src/postulo/documents/models.py:533 src/postulo/jobs/models.py:825
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1360,7 +1368,7 @@ msgstr "Aplikim"
 msgid "Application created"
 msgstr "Aplikimi u krijua"
 
-#: src/postulo/applications/views.py:418
+#: src/postulo/applications/views.py:452
 #, draft
 msgid "Application deleted."
 msgstr "Aplikimi u fshi."
@@ -1510,7 +1518,7 @@ msgstr "Apliko: %(title)s"
 msgid "Apprenticeship"
 msgstr "Praktikë profesionale"
 
-#: src/postulo/documents/models.py:573
+#: src/postulo/documents/models.py:621
 #, draft
 msgid "Archived"
 msgstr "Arkivuar"
@@ -1566,7 +1574,7 @@ msgstr ""
 msgid "at most"
 msgstr ""
 
-#: src/postulo/documents/models.py:615
+#: src/postulo/documents/models.py:663
 #, draft
 msgid "attempts"
 msgstr "përpjekje"
@@ -1779,14 +1787,14 @@ msgstr "Adresë kthimi për t'u regjistruar tek ai"
 #: src/postulo/templates/documents/cv_item_form.html:25
 #: src/postulo/templates/documents/letter_form.html:29
 #: src/postulo/templates/documents/send.html:32
-#: src/postulo/templates/documents/upload_form.html:21
+#: src/postulo/templates/documents/upload_form.html:38
 #: src/postulo/templates/jobs/company_form.html:112
 #: src/postulo/templates/jobs/contact_form.html:42
 #: src/postulo/templates/jobs/industry_form.html:21
 #: src/postulo/templates/jobs/listing_apply.html:44
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
-#: src/postulo/templates/partials/confirm_delete.html:26
+#: src/postulo/templates/partials/confirm_delete.html:46
 #: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:40
 #: src/postulo/templates/server/person_delete.html:29
@@ -1987,7 +1995,7 @@ msgid ""
 msgstr ""
 "Ndryshimet e bëra këtu dërgohen në kalimin e ardhshëm; ana tjetër lexohet po atëherë."
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:587
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Kujto %(company)s për %(role)s"
@@ -2012,7 +2020,7 @@ msgstr "Kontrollo të gjitha"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Kontrolluar %(when)s: %(detail)s"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:416 src/postulo/documents/models.py:570
 #, draft
 msgid "checksum"
 msgstr "shumë kontrolli"
@@ -2047,7 +2055,7 @@ msgstr "Zgjidh së pari një ofrues identiteti dhe ruaje."
 msgid "Choose another file"
 msgstr "Zgjidh një skedar tjetër"
 
-#: src/postulo/documents/forms.py:287
+#: src/postulo/documents/forms.py:294
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Zgjidhni të paktën një dokument për të regjistruar."
@@ -2057,7 +2065,7 @@ msgstr "Zgjidhni të paktën një dokument për të regjistruar."
 msgid "Choose what kind of identifier this is."
 msgstr "Zgjidhni çfarë lloj identifikuesi është ky."
 
-#: src/postulo/applications/views.py:938
+#: src/postulo/applications/views.py:972
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Zgjidhni fillimisht për cilin aplikim bëhet fjalë."
@@ -2236,7 +2244,7 @@ msgstr "kompani"
 msgid "Company added."
 msgstr "Kompania u shtua."
 
-#: src/postulo/jobs/views.py:379
+#: src/postulo/jobs/views.py:413
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Kompania u fshi, bashkë me shpalljet e saj."
@@ -2308,7 +2316,7 @@ msgstr "U lidh me %(host)s:%(port)s. Pa emër përdoruesi, prandaj nuk u hy."
 msgid "Connected. Test it to make sure it works."
 msgstr "E lidhur. Testojeni për t'u siguruar se funksionon."
 
-#: src/postulo/documents/models.py:594 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:642 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:271
 #, draft
 msgid "connection"
@@ -2373,7 +2381,7 @@ msgstr "kontakt"
 msgid "Contact"
 msgstr "Kontakt"
 
-#: src/postulo/jobs/views.py:485
+#: src/postulo/jobs/views.py:519
 #, draft
 msgid "Contact added."
 msgstr "Kontakti u shtua."
@@ -2530,7 +2538,7 @@ msgstr "monedha"
 msgid "Custom"
 msgstr "Vetjake"
 
-#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:138
+#: src/postulo/documents/forms.py:260 src/postulo/documents/kinds.py:138
 #: src/postulo/documents/models.py:97 src/postulo/documents/models.py:135
 #: src/postulo/documents/models.py:192 src/postulo/documents/models.py:369
 #: src/postulo/documents/themes.py:71
@@ -2767,7 +2775,7 @@ msgstr "Refuzo"
 msgid "Declined"
 msgstr "Refuzuar"
 
-#: src/postulo/applications/views.py:930
+#: src/postulo/applications/views.py:964
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Refuzuar. Nuk do të sugjerohet më."
@@ -2802,7 +2810,7 @@ msgstr "Mbrojtje"
 #: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
-#: src/postulo/templates/partials/confirm_delete.html:23
+#: src/postulo/templates/partials/confirm_delete.html:43
 #: src/postulo/templates/resume/overview.html:139
 #, draft
 msgid "Delete"
@@ -2941,12 +2949,12 @@ msgstr "Bëj këtë"
 msgid "Document"
 msgstr "Dokument"
 
-#: src/postulo/documents/models.py:625
+#: src/postulo/documents/models.py:673
 #, draft
 msgid "document copies"
 msgstr "kopje dokumenti"
 
-#: src/postulo/documents/models.py:624
+#: src/postulo/documents/models.py:672
 #, draft
 msgid "document copy"
 msgstr "kopje dokumenti"
@@ -2969,7 +2977,7 @@ msgstr "Depo dokumentesh"
 msgid "Documents"
 msgstr "Dokumente"
 
-#: src/postulo/documents/views.py:480
+#: src/postulo/documents/views.py:504
 #, draft
 msgid "Documents sent"
 msgstr "Dokumente të dërguara"
@@ -3316,7 +3324,7 @@ msgid ""
 msgstr ""
 "Çdo pozicion që keni mbajtur. Shkruani pikat kryesore një herë; përshtatini për çdo CV më vonë."
 
-#: src/postulo/documents/views.py:400
+#: src/postulo/documents/views.py:424
 #, draft
 msgid "Every store already has this document."
 msgstr "Çdo depo e ka tashmë këtë dokument."
@@ -3459,7 +3467,7 @@ msgstr "Eksporto PDF"
 msgid "Exported on its own"
 msgstr "Eksportuar veçmas"
 
-#: src/postulo/documents/models.py:574
+#: src/postulo/documents/models.py:622
 #, draft
 msgid "Failed"
 msgstr "Dështoi"
@@ -3526,17 +3534,21 @@ msgstr "fusha e studimit"
 msgid "Figures appear once you have applied for something."
 msgstr "Shifrat shfaqen sapo të keni aplikuar për diçka."
 
-#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:484
+#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:519
 #, draft
 msgid "file"
 msgstr "skedar"
+
+#: src/postulo/templates/documents/upload_form.html:22
+msgid "File"
+msgstr ""
 
 #: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Skedari u ruajt."
 
-#: src/postulo/applications/views.py:879
+#: src/postulo/applications/views.py:913
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -3563,7 +3575,7 @@ msgstr "Skedarë që i kishit tashmë"
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr "Skedarë që i kishit tashmë, ndryshe nga dokumentet që i prodhoi Postulo."
 
-#: src/postulo/documents/forms.py:258
+#: src/postulo/documents/forms.py:265
 #, draft
 msgid "Files you have already"
 msgstr "Skedarë që i keni tashmë"
@@ -3636,12 +3648,12 @@ msgstr "Ndiq profilin tuaj"
 msgid "Follow-up note"
 msgstr "Shënim ndjekjeje"
 
-#: src/postulo/applications/views.py:547
+#: src/postulo/applications/views.py:581
 #, draft
 msgid "Follow-up recorded."
 msgstr "Ndjekja u regjistrua."
 
-#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:544
+#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:578
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -4113,7 +4125,7 @@ msgstr "Hibrid"
 msgid "I have already applied to this one"
 msgstr "Kam aplikuar tashmë për këtë"
 
-#: src/postulo/documents/models.py:613
+#: src/postulo/documents/models.py:661
 #, draft
 msgid "id in the store"
 msgstr "identifikues në depo"
@@ -4325,7 +4337,7 @@ msgstr "industri"
 msgid "Industry"
 msgstr "Industri"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Industry renamed."
 msgstr "Industria u riemërua."
@@ -4408,7 +4420,7 @@ msgstr "intervistë"
 msgid "Interview cancelled"
 msgstr "Intervista u anulua"
 
-#: src/postulo/applications/views.py:638
+#: src/postulo/applications/views.py:672
 #, draft
 msgid "Interview recorded."
 msgstr "Intervista u regjistrua."
@@ -4418,7 +4430,7 @@ msgstr "Intervista u regjistrua."
 msgid "Interview scheduled"
 msgstr "Intervista u caktua"
 
-#: src/postulo/applications/views.py:640
+#: src/postulo/applications/views.py:674
 #, draft
 msgid "Interview scheduled."
 msgstr "Intervista u caktua."
@@ -4428,7 +4440,7 @@ msgstr "Intervista u caktua."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Intervistë nesër: %(kind)s te %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:670
+#: src/postulo/applications/views.py:704
 #, draft
 msgid "Interview updated."
 msgstr "Intervista u përditësua."
@@ -4535,6 +4547,15 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Nuk mund të përfundojë përpara se të fillojë."
 
+#: src/postulo/documents/views.py:343
+#, python-format
+msgid ""
+"It is recorded as sent with %(count)d application, which will no longer say it was sent."
+msgid_plural ""
+"It is recorded as sent with %(count)d applications, which will no longer say it was sent."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/account/recovery_unusable.html:11
 #, draft
 msgid ""
@@ -4589,7 +4610,7 @@ msgstr "shpallje pune"
 msgid "Job search report"
 msgstr "Raport për kërkimin e punës"
 
-#: src/postulo/applications/views.py:867
+#: src/postulo/applications/views.py:901
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4658,7 +4679,7 @@ msgstr ""
 #: src/postulo/applications/models.py:650 src/postulo/core/models.py:178
 #: src/postulo/core/models.py:403 src/postulo/core/models.py:532
 #: src/postulo/documents/models.py:113 src/postulo/documents/models.py:315
-#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:482
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:517
 #: src/postulo/jobs/models.py:176 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:251
 #, draft
@@ -4675,7 +4696,7 @@ msgstr "lloj"
 msgid "Kind"
 msgstr "Lloji"
 
-#: src/postulo/documents/models.py:604
+#: src/postulo/documents/models.py:652
 #, draft
 msgid "kind of document"
 msgstr "lloji i dokumentit"
@@ -4685,7 +4706,7 @@ msgstr "lloji i dokumentit"
 msgid "kind of entry"
 msgstr "lloji i zërit"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:564
 #, draft
 msgid "kind of source"
 msgstr "lloji i burimit"
@@ -4695,7 +4716,7 @@ msgstr "lloji i burimit"
 msgid "Kinds of letter"
 msgstr "Llojet e letrave"
 
-#: src/postulo/documents/models.py:597 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:645 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "emri i shfaqur"
@@ -4779,7 +4800,7 @@ msgstr "Faqja më e madhe e lexuar"
 msgid "Last activity"
 msgstr "Aktiviteti i fundit"
 
-#: src/postulo/documents/models.py:619
+#: src/postulo/documents/models.py:667
 #, draft
 msgid "last attempt"
 msgstr "përpjekja e fundit"
@@ -4794,7 +4815,7 @@ msgstr "kontrolli i fundit"
 msgid "last checked"
 msgstr "kontrolluar së fundmi"
 
-#: src/postulo/documents/models.py:621 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:669 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "gabimi i fundit"
@@ -4900,7 +4921,7 @@ msgstr "Lejo që ky çelës kalimi të më fusë vetë"
 msgid "Let {column} size itself"
 msgstr "Lëre {column} të përcaktojë vetë gjerësinë"
 
-#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
+#: src/postulo/documents/forms.py:262 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Letër"
@@ -4955,7 +4976,7 @@ msgstr "lidhje"
 msgid "Link"
 msgstr "Lidhje"
 
-#: src/postulo/documents/models.py:614
+#: src/postulo/documents/models.py:662
 #, draft
 msgid "link in the store"
 msgstr "lidhje në depo"
@@ -4993,7 +5014,7 @@ msgid ""
 msgstr ""
 "Lidhje drejt vendeve ku kthehet një kërkim pune: tabela, CV-të, kompanitë."
 
-#: src/postulo/documents/forms.py:264
+#: src/postulo/documents/forms.py:271
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -5237,7 +5258,7 @@ msgstr "Prodhim"
 msgid "Map a column to Company and one to Role first."
 msgstr "Së pari lidhni një kolonë me Kompaninë dhe një me Pozicionin."
 
-#: src/postulo/applications/views.py:520
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Marked as done."
 msgstr "Shënuar si e kryer."
@@ -5295,7 +5316,7 @@ msgstr "Menyja"
 msgid "Merge into"
 msgstr "Bashko në"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Merged."
 msgstr "U bashkua."
@@ -5567,7 +5588,7 @@ msgstr "Kopja rezervë më e re"
 msgid "Next"
 msgstr "Tjetra"
 
-#: src/postulo/documents/models.py:617
+#: src/postulo/documents/models.py:665
 #, draft
 msgid "next attempt"
 msgstr "përpjekja tjetër"
@@ -5635,7 +5656,7 @@ msgstr "Pa lidhje: %(why)s"
 msgid "No connections yet"
 msgstr "Ende asnjë lidhje"
 
-#: src/postulo/documents/views.py:382
+#: src/postulo/documents/views.py:406
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5859,7 +5880,7 @@ msgstr "Normale"
 msgid "Not %(name)s"
 msgstr "Jo %(name)s"
 
-#: src/postulo/documents/models.py:575
+#: src/postulo/documents/models.py:623
 #, draft
 msgid "Not accepted"
 msgstr "Nuk u pranua"
@@ -7084,7 +7105,7 @@ msgstr "Adresa e shpalljes"
 msgid "Posting details"
 msgstr "Hollësi të shpalljes"
 
-#: src/postulo/jobs/views.py:548
+#: src/postulo/jobs/views.py:582
 #, draft
 msgid "Posting updated."
 msgstr "Shpallja u përditësua."
@@ -7546,12 +7567,12 @@ msgid ""
 msgstr ""
 "Regjistrohet kundrejt gjithçkaje të instaluar prej këtu, prandaj nuk mund të ndryshojë më vonë pa i lënë jetimë ato që instaloi."
 
-#: src/postulo/applications/views.py:691
+#: src/postulo/applications/views.py:725
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Regjistruar si e anuluar."
 
-#: src/postulo/applications/views.py:690
+#: src/postulo/applications/views.py:724
 #, draft
 msgid "Recorded as held."
 msgstr "Regjistruar si e mbajtur."
@@ -7566,12 +7587,12 @@ msgstr "regjistruar nga"
 msgid "recorded on"
 msgstr "regjistruar më"
 
-#: src/postulo/documents/views.py:483
+#: src/postulo/documents/views.py:507
 #, draft
 msgid "Recorded what you sent."
 msgstr "U regjistrua çfarë dërguat."
 
-#: src/postulo/applications/views.py:692
+#: src/postulo/applications/views.py:726
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Regjistruar: askush nuk u paraqit."
@@ -7765,12 +7786,12 @@ msgstr "Hiq {label}"
 msgid "removed on the other side"
 msgstr "hequr në anën tjetër"
 
-#: src/postulo/documents/models.py:523
+#: src/postulo/documents/models.py:571
 #, draft
 msgid "rendered on"
 msgstr "krijuar më"
 
-#: src/postulo/documents/models.py:415
+#: src/postulo/documents/models.py:425
 #, draft
 msgid "replaces"
 msgstr "zëvendëson"
@@ -7983,7 +8004,7 @@ msgstr "paga deri"
 #: src/postulo/templates/documents/cv_form.html:20
 #: src/postulo/templates/documents/cv_item_form.html:24
 #: src/postulo/templates/documents/letter_form.html:28
-#: src/postulo/templates/documents/upload_form.html:20
+#: src/postulo/templates/documents/upload_form.html:37
 #: src/postulo/templates/jobs/company_form.html:111
 #: src/postulo/templates/jobs/contact_form.html:41
 #: src/postulo/templates/jobs/industry_form.html:20
@@ -8216,12 +8237,12 @@ msgstr "Dërgimi dështoi: %(error)s"
 msgid "Sent"
 msgstr "Dërguar"
 
-#: src/postulo/documents/models.py:548
+#: src/postulo/documents/models.py:596
 #, draft
 msgid "sent document"
 msgstr "dokument i dërguar"
 
-#: src/postulo/documents/models.py:549
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "sent documents"
 msgstr "dokumente të dërguara"
@@ -8234,10 +8255,14 @@ msgstr "dokumente të dërguara"
 msgid "Sent documents"
 msgstr "Dokumente të dërguara"
 
-#: src/postulo/documents/models.py:620
+#: src/postulo/documents/models.py:668
 #, draft
 msgid "sent on"
 msgstr "dërguar më"
+
+#: src/postulo/documents/models.py:541
+msgid "sent to"
+msgstr ""
 
 #: src/postulo/core/server_views.py:784
 #, python-format, draft
@@ -8615,7 +8640,7 @@ msgstr "Server SMTP"
 msgid "Snooze"
 msgstr "Shtyj"
 
-#: src/postulo/applications/views.py:561
+#: src/postulo/applications/views.py:595
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "U shty për dy javë."
@@ -8812,7 +8837,7 @@ msgid "Status"
 msgstr "Statusi"
 
 #: src/postulo/applications/models.py:202
-#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:611
+#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:659
 #: src/postulo/jobs/models.py:808
 #, draft
 msgid "status"
@@ -8828,7 +8853,7 @@ msgstr "Ndryshim statusi"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Statusi në fletëllogaritëse: %(text)s"
 
-#: src/postulo/applications/views.py:436
+#: src/postulo/applications/views.py:470
 #, draft
 msgid "Status updated."
 msgstr "Statusi u përditësua."
@@ -8867,7 +8892,7 @@ msgstr "Bëje jofunksionale"
 msgid "Stop sorting by %(column)s"
 msgstr "Ndalo renditjen sipas %(column)s"
 
-#: src/postulo/documents/models.py:596
+#: src/postulo/documents/models.py:644
 #, draft
 msgid "store"
 msgstr "depo"
@@ -8929,7 +8954,7 @@ msgstr "përmbledhje"
 msgid "superseded"
 msgstr "zëvendësuar"
 
-#: src/postulo/documents/forms.py:228
+#: src/postulo/documents/forms.py:235
 #, draft
 msgid "Supersedes"
 msgstr "Zëvendëson"
@@ -9138,7 +9163,7 @@ msgstr "Testo lidhjen"
 msgid "text"
 msgstr "tekst"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:569
 #, draft
 msgid "text as sent"
 msgstr "teksti siç u dërgua"
@@ -9223,7 +9248,7 @@ msgstr "Kjo nuk duket si një identifikues %(scheme)s (për shembull %(example)s
 msgid "That does not look like a complete web address."
 msgstr "Kjo nuk duket si një adresë e plotë uebi."
 
-#: src/postulo/applications/views.py:467
+#: src/postulo/applications/views.py:501
 #, draft
 msgid "That entry could not be saved."
 msgstr "Ai zë nuk mundi të ruhej."
@@ -9250,7 +9275,7 @@ msgstr "Ai skedar është bosh."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Ai skedar është më i madh se %(limit)s MB, prandaj nuk u lexua."
 
-#: src/postulo/documents/forms.py:234
+#: src/postulo/documents/forms.py:241
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Ai skedar është më i madh se %(limit)s MB."
@@ -9297,7 +9322,7 @@ msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr ""
 "Kjo është një SVG, të cilën Postulo ende nuk e ruan. Një PNG ose JPEG bën punë."
 
-#: src/postulo/applications/views.py:438
+#: src/postulo/applications/views.py:472
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Ky nuk është status që Postulo e njeh."
@@ -9317,12 +9342,12 @@ msgstr "Ky nuk është modul që Postulo e njeh."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Ky nuk është çelës publik Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:684
+#: src/postulo/applications/views.py:718
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Ky nuk është përfundim që Postulo e njeh."
 
-#: src/postulo/applications/views.py:563
+#: src/postulo/applications/views.py:597
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Kjo nuk është diçka që Postulo mund të bëjë për të."
@@ -9427,7 +9452,7 @@ msgstr "Ajo shtojcë nuk është më e instaluar."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Ajo përgjigje nuk erdhi nga një kërkesë që bëri Postulo."
 
-#: src/postulo/applications/views.py:925
+#: src/postulo/applications/views.py:959
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Atij sugjerimi i është përgjigjur tashmë."
@@ -9440,6 +9465,15 @@ msgstr ""
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Kjo do të krijonte një lak: %(name)s është tashmë pjesë e kësaj."
+
+#: src/postulo/applications/views.py:444 src/postulo/jobs/views.py:405
+#: src/postulo/jobs/views.py:627
+#, python-format
+msgid "The %(count)d document you sent is kept, and still says where it went."
+msgid_plural ""
+"The %(count)d documents you sent are kept, and still say where they went."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/documents/pdf.py:175
 #, python-format, draft
@@ -9536,7 +9570,7 @@ msgstr "Kompania ku po aplikoni"
 msgid "The connection is gone or switched off."
 msgstr "Lidhja është zhdukur ose është e fikur."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:411
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "Kopja nuk mundi të dërgohej; dokumenti thotë pse."
@@ -9560,7 +9594,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "Shkarkimi është shumë më i madh se sa duhet të jetë një shtojcë."
 
-#: src/postulo/documents/models.py:416
+#: src/postulo/documents/models.py:426
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Versioni i mëparshëm që ky zëvendëson. Skedari i vjetër ruhet."
@@ -9601,6 +9635,11 @@ msgstr "Skedari është bosh."
 #, draft
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Skedari është mbi 2 MB. Një kërkim pune nuk është aq i madh."
+
+#: src/postulo/templates/documents/upload_form.html:25
+msgid ""
+"The file itself cannot be changed. Upload the new one and mark it as superseding this, so what you sent still means the file you sent."
+msgstr ""
 
 #: src/postulo/api/api.py:319
 #, python-format, draft
@@ -10003,12 +10042,20 @@ msgstr "Kjo adresë është tashmë në shpalljet tuaja, që nga %(when)s."
 msgid "This address is already listed."
 msgstr "Kjo adresë është tashmë në listë."
 
+#: src/postulo/templates/partials/confirm_delete.html:22
+msgid "This also deletes:"
+msgstr ""
+
 #: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
 msgstr ""
 "Kjo renditje është e juaja dhe fillon si ajo standarde. Një widget i shtuar në një version të mëvonshëm, ose i sjellë nga një shtojcë, pret më lart derisa të thoni po."
+
+#: src/postulo/templates/partials/confirm_delete.html:33
+msgid "This cannot be undone."
+msgstr ""
 
 #: src/postulo/jobs/logos.py:287
 #, draft
@@ -10205,7 +10252,7 @@ msgstr "Skadim kohe"
 msgid "timeout in seconds"
 msgstr "skadim kohe në sekonda"
 
-#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
+#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:514
 #: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
 #: src/postulo/resume/models.py:249
 #, draft
@@ -10473,12 +10520,12 @@ msgstr "Ngarkoni dhe lidhni kolonat"
 msgid "Uploaded"
 msgstr "Ngarkuar"
 
-#: src/postulo/documents/models.py:440
+#: src/postulo/documents/models.py:475
 #, draft
 msgid "uploaded document"
 msgstr "dokument i ngarkuar"
 
-#: src/postulo/documents/models.py:441
+#: src/postulo/documents/models.py:476
 #, draft
 msgid "uploaded documents"
 msgstr "dokumente të ngarkuara"
@@ -10597,7 +10644,7 @@ msgstr "i verifikuar"
 msgid "Verified"
 msgstr "I verifikuar"
 
-#: src/postulo/documents/models.py:408
+#: src/postulo/documents/models.py:418
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "version"
@@ -10663,7 +10710,7 @@ msgstr "Në pritje të një përgjigjeje"
 msgid "Waiting only"
 msgstr "Vetëm në pritje përgjigjeje"
 
-#: src/postulo/documents/models.py:572
+#: src/postulo/documents/models.py:620
 #, draft
 msgid "Waiting to be sent"
 msgstr "Në pritje për t'u dërguar"

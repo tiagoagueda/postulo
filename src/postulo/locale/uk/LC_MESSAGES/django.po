@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 06:53+0000\n"
+"POT-Creation-Date: 2026-09-16 07:16+0000\n"
 "PO-Revision-Date: 2026-09-08 10:23+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: українська\n"
@@ -42,6 +42,14 @@ msgstr "%(company)s вже має ідентифікатор %(scheme)s: %(value
 #, python-format, draft
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s змінено."
+
+#: src/postulo/jobs/views.py:618
+#, python-format
+msgid "%(count)d application, with its timeline"
+msgid_plural "%(count)d applications, with their timelines"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/plugins/views.py:405
 #, python-format, draft
@@ -379,8 +387,8 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s змінив би те, від чого залежить сам Postulo. %(problems)s"
 
-#: src/postulo/documents/rendering.py:287
-#: src/postulo/documents/rendering.py:345
+#: src/postulo/documents/rendering.py:303
+#: src/postulo/documents/rendering.py:362
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
@@ -422,6 +430,7 @@ msgid ""
 msgstr ""
 "%(provider)s не дозволяє застосунку надсилати самостійно. Виберіть «Вхід виконано один раз»."
 
+#: src/postulo/documents/rendering.py:289
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
@@ -442,13 +451,13 @@ msgstr "%(role)s: немає дати початку, тож його не до�
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s не ідентифікує таку річ."
 
-#: src/postulo/documents/views.py:391
+#: src/postulo/documents/views.py:415
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d копій надіслано, %(failed)d не вдалося; кожен документ каже, що саме."
 
-#: src/postulo/documents/views.py:397
+#: src/postulo/documents/views.py:421
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d копій надіслано."
@@ -1103,7 +1112,7 @@ msgid ""
 msgstr ""
 "Додано %(total)s записів. Нічого не перезаписано; усе, що продублювалося, ви можете видалити самі."
 
-#: src/postulo/applications/views.py:465 src/postulo/applications/views.py:942
+#: src/postulo/applications/views.py:499 src/postulo/applications/views.py:976
 #, draft
 msgid "Added to the timeline."
 msgstr "Додано до стрічки."
@@ -1315,7 +1324,7 @@ msgstr "Будь-який"
 msgid "Any of them signs you in. The primary one receives Postulo's mail."
 msgstr "Будь-яка з них дає вам вхід. Основна отримує пошту від Postulo."
 
-#: src/postulo/templates/partials/confirm_delete.html:16
+#: src/postulo/templates/partials/confirm_delete.html:35
 #, draft
 msgid "Anything belonging to it goes too, and this cannot be undone."
 msgstr "Усе, що йому належить, зникне теж, і скасувати це не можна."
@@ -1361,7 +1370,7 @@ msgstr "Вигляд"
 #: src/postulo/applications/models.py:428
 #: src/postulo/applications/models.py:523
 #: src/postulo/applications/models.py:644 src/postulo/applications/tables.py:20
-#: src/postulo/documents/models.py:492 src/postulo/jobs/models.py:825
+#: src/postulo/documents/models.py:533 src/postulo/jobs/models.py:825
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1379,7 +1388,7 @@ msgstr "Заявка"
 msgid "Application created"
 msgstr "Заявку створено"
 
-#: src/postulo/applications/views.py:418
+#: src/postulo/applications/views.py:452
 #, draft
 msgid "Application deleted."
 msgstr "Заявку видалено."
@@ -1528,7 +1537,7 @@ msgstr "Подати: %(title)s"
 msgid "Apprenticeship"
 msgstr "Учнівство"
 
-#: src/postulo/documents/models.py:573
+#: src/postulo/documents/models.py:621
 #, draft
 msgid "Archived"
 msgstr "В архіві"
@@ -1583,7 +1592,7 @@ msgstr "Має пропонуватися принаймні одна мова, 
 msgid "at most"
 msgstr ""
 
-#: src/postulo/documents/models.py:615
+#: src/postulo/documents/models.py:663
 #, draft
 msgid "attempts"
 msgstr "спроби"
@@ -1796,14 +1805,14 @@ msgstr "Зворотний виклик для реєстрації"
 #: src/postulo/templates/documents/cv_item_form.html:25
 #: src/postulo/templates/documents/letter_form.html:29
 #: src/postulo/templates/documents/send.html:32
-#: src/postulo/templates/documents/upload_form.html:21
+#: src/postulo/templates/documents/upload_form.html:38
 #: src/postulo/templates/jobs/company_form.html:112
 #: src/postulo/templates/jobs/contact_form.html:42
 #: src/postulo/templates/jobs/industry_form.html:21
 #: src/postulo/templates/jobs/listing_apply.html:44
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
-#: src/postulo/templates/partials/confirm_delete.html:26
+#: src/postulo/templates/partials/confirm_delete.html:46
 #: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:40
 #: src/postulo/templates/server/person_delete.html:29
@@ -2004,7 +2013,7 @@ msgid ""
 msgstr ""
 "Зроблені тут зміни надсилаються під час наступного запуску; інший бік тоді ж і читається."
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:587
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Нагадати %(company)s про %(role)s"
@@ -2029,7 +2038,7 @@ msgstr "Перевірити всі"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Перевірено %(when)s: %(detail)s"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:416 src/postulo/documents/models.py:570
 #, draft
 msgid "checksum"
 msgstr "контрольна сума"
@@ -2064,7 +2073,7 @@ msgstr "Спершу виберіть постачальника ідентич�
 msgid "Choose another file"
 msgstr "Обрати інший файл"
 
-#: src/postulo/documents/forms.py:287
+#: src/postulo/documents/forms.py:294
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Оберіть хоча б один документ для запису."
@@ -2074,7 +2083,7 @@ msgstr "Оберіть хоча б один документ для запису
 msgid "Choose what kind of identifier this is."
 msgstr "Оберіть, що це за ідентифікатор."
 
-#: src/postulo/applications/views.py:938
+#: src/postulo/applications/views.py:972
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Спершу оберіть, якої заявки це стосується."
@@ -2253,7 +2262,7 @@ msgstr "компанія"
 msgid "Company added."
 msgstr "Компанію додано."
 
-#: src/postulo/jobs/views.py:379
+#: src/postulo/jobs/views.py:413
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Компанію видалено разом із її вакансіями."
@@ -2327,7 +2336,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Під'єднано. Перевірте, щоб бути певними, що це працює."
 
-#: src/postulo/documents/models.py:594 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:642 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:271
 #, draft
 msgid "connection"
@@ -2392,7 +2401,7 @@ msgstr "контакт"
 msgid "Contact"
 msgstr "Контакт"
 
-#: src/postulo/jobs/views.py:485
+#: src/postulo/jobs/views.py:519
 #, draft
 msgid "Contact added."
 msgstr "Контакт додано."
@@ -2549,7 +2558,7 @@ msgstr "валюта"
 msgid "Custom"
 msgstr "Власний"
 
-#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:138
+#: src/postulo/documents/forms.py:260 src/postulo/documents/kinds.py:138
 #: src/postulo/documents/models.py:97 src/postulo/documents/models.py:135
 #: src/postulo/documents/models.py:192 src/postulo/documents/models.py:369
 #: src/postulo/documents/themes.py:71
@@ -2786,7 +2795,7 @@ msgstr "Відхилити"
 msgid "Declined"
 msgstr "Відхилено"
 
-#: src/postulo/applications/views.py:930
+#: src/postulo/applications/views.py:964
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Відхилено. Це більше не пропонуватиметься."
@@ -2821,7 +2830,7 @@ msgstr "Оборона"
 #: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
-#: src/postulo/templates/partials/confirm_delete.html:23
+#: src/postulo/templates/partials/confirm_delete.html:43
 #: src/postulo/templates/resume/overview.html:139
 #, draft
 msgid "Delete"
@@ -2960,12 +2969,12 @@ msgstr "Зроби це"
 msgid "Document"
 msgstr "Документ"
 
-#: src/postulo/documents/models.py:625
+#: src/postulo/documents/models.py:673
 #, draft
 msgid "document copies"
 msgstr "копії документа"
 
-#: src/postulo/documents/models.py:624
+#: src/postulo/documents/models.py:672
 #, draft
 msgid "document copy"
 msgstr "копія документа"
@@ -2988,7 +2997,7 @@ msgstr "Сховища документів"
 msgid "Documents"
 msgstr "Документи"
 
-#: src/postulo/documents/views.py:480
+#: src/postulo/documents/views.py:504
 #, draft
 msgid "Documents sent"
 msgstr "Надіслані документи"
@@ -3333,7 +3342,7 @@ msgid ""
 msgstr ""
 "Кожна посада, яку ви обіймали. Напишіть головне один раз; підлаштуєте під кожне резюме потім."
 
-#: src/postulo/documents/views.py:400
+#: src/postulo/documents/views.py:424
 #, draft
 msgid "Every store already has this document."
 msgstr "Кожне сховище вже має цей документ."
@@ -3475,7 +3484,7 @@ msgstr "Експортувати PDF"
 msgid "Exported on its own"
 msgstr "Експортовано окремо"
 
-#: src/postulo/documents/models.py:574
+#: src/postulo/documents/models.py:622
 #, draft
 msgid "Failed"
 msgstr "Не вдалося"
@@ -3542,17 +3551,21 @@ msgstr "галузь навчання"
 msgid "Figures appear once you have applied for something."
 msgstr "Цифри з’являться, щойно ви кудись подастеся."
 
-#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:484
+#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:519
 #, draft
 msgid "file"
 msgstr "файл"
+
+#: src/postulo/templates/documents/upload_form.html:22
+msgid "File"
+msgstr ""
 
 #: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Файл збережено."
 
-#: src/postulo/applications/views.py:879
+#: src/postulo/applications/views.py:913
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -3579,7 +3592,7 @@ msgstr "Файли, які ви вже мали"
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr "Файли, які ви вже мали, на відміну від документів, які створив Postulo."
 
-#: src/postulo/documents/forms.py:258
+#: src/postulo/documents/forms.py:265
 #, draft
 msgid "Files you have already"
 msgstr "Файли, які ви вже маєте"
@@ -3652,12 +3665,12 @@ msgstr "Слідкувати за вашим профілем"
 msgid "Follow-up note"
 msgstr "Нагадування"
 
-#: src/postulo/applications/views.py:547
+#: src/postulo/applications/views.py:581
 #, draft
 msgid "Follow-up recorded."
 msgstr "Нагадування записано."
 
-#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:544
+#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:578
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -4131,7 +4144,7 @@ msgstr "Гібридний"
 msgid "I have already applied to this one"
 msgstr "Я вже сюди подавався"
 
-#: src/postulo/documents/models.py:613
+#: src/postulo/documents/models.py:661
 #, draft
 msgid "id in the store"
 msgstr "ідентифікатор у сховищі"
@@ -4343,7 +4356,7 @@ msgstr "галузь"
 msgid "Industry"
 msgstr "Галузь"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Industry renamed."
 msgstr "Галузь перейменовано."
@@ -4425,7 +4438,7 @@ msgstr "співбесіда"
 msgid "Interview cancelled"
 msgstr "Співбесіду скасовано"
 
-#: src/postulo/applications/views.py:638
+#: src/postulo/applications/views.py:672
 #, draft
 msgid "Interview recorded."
 msgstr "Співбесіду записано."
@@ -4435,7 +4448,7 @@ msgstr "Співбесіду записано."
 msgid "Interview scheduled"
 msgstr "Співбесіду заплановано"
 
-#: src/postulo/applications/views.py:640
+#: src/postulo/applications/views.py:674
 #, draft
 msgid "Interview scheduled."
 msgstr "Співбесіду заплановано."
@@ -4445,7 +4458,7 @@ msgstr "Співбесіду заплановано."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Співбесіда завтра: %(kind)s у %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:670
+#: src/postulo/applications/views.py:704
 #, draft
 msgid "Interview updated."
 msgstr "Співбесіду оновлено."
@@ -4552,6 +4565,16 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Це не може завершитися раніше, ніж почалося."
 
+#: src/postulo/documents/views.py:343
+#, python-format
+msgid ""
+"It is recorded as sent with %(count)d application, which will no longer say it was sent."
+msgid_plural ""
+"It is recorded as sent with %(count)d applications, which will no longer say it was sent."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/templates/account/recovery_unusable.html:11
 #, draft
 msgid ""
@@ -4606,7 +4629,7 @@ msgstr "вакансії"
 msgid "Job search report"
 msgstr "Звіт про пошук роботи"
 
-#: src/postulo/applications/views.py:867
+#: src/postulo/applications/views.py:901
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4675,7 +4698,7 @@ msgstr ""
 #: src/postulo/applications/models.py:650 src/postulo/core/models.py:178
 #: src/postulo/core/models.py:403 src/postulo/core/models.py:532
 #: src/postulo/documents/models.py:113 src/postulo/documents/models.py:315
-#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:482
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:517
 #: src/postulo/jobs/models.py:176 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:251
 #, draft
@@ -4692,7 +4715,7 @@ msgstr "вид"
 msgid "Kind"
 msgstr "Вид"
 
-#: src/postulo/documents/models.py:604
+#: src/postulo/documents/models.py:652
 #, draft
 msgid "kind of document"
 msgstr "тип документа"
@@ -4702,7 +4725,7 @@ msgstr "тип документа"
 msgid "kind of entry"
 msgstr "тип запису"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:564
 #, draft
 msgid "kind of source"
 msgstr "тип джерела"
@@ -4712,7 +4735,7 @@ msgstr "тип джерела"
 msgid "Kinds of letter"
 msgstr "Види листів"
 
-#: src/postulo/documents/models.py:597 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:645 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "підпис"
@@ -4796,7 +4819,7 @@ msgstr "Найбільша прочитана сторінка"
 msgid "Last activity"
 msgstr "Остання активність"
 
-#: src/postulo/documents/models.py:619
+#: src/postulo/documents/models.py:667
 #, draft
 msgid "last attempt"
 msgstr "остання спроба"
@@ -4811,7 +4834,7 @@ msgstr "остання перевірка"
 msgid "last checked"
 msgstr "востаннє перевірено"
 
-#: src/postulo/documents/models.py:621 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:669 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "остання помилка"
@@ -4916,7 +4939,7 @@ msgstr "Дозволити цьому ключу доступу входити �
 msgid "Let {column} size itself"
 msgstr "Нехай стовпець {column} сам добере ширину"
 
-#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
+#: src/postulo/documents/forms.py:262 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Лист"
@@ -4971,7 +4994,7 @@ msgstr "посилання"
 msgid "Link"
 msgstr "Посилання"
 
-#: src/postulo/documents/models.py:614
+#: src/postulo/documents/models.py:662
 #, draft
 msgid "link in the store"
 msgstr "посилання у сховищі"
@@ -5010,7 +5033,7 @@ msgid ""
 msgstr ""
 "Посилання на місця, куди пошук роботи повертається: дошка, резюме, компанії."
 
-#: src/postulo/documents/forms.py:264
+#: src/postulo/documents/forms.py:271
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -5256,7 +5279,7 @@ msgstr "Виробництво"
 msgid "Map a column to Company and one to Role first."
 msgstr "Спершу зіставте один стовпець із «Компанія», а інший — із «Посада»."
 
-#: src/postulo/applications/views.py:520
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Marked as done."
 msgstr "Позначено як виконане."
@@ -5314,7 +5337,7 @@ msgstr "Меню"
 msgid "Merge into"
 msgstr "Об’єднати з"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Merged."
 msgstr "Об’єднано."
@@ -5586,7 +5609,7 @@ msgstr "Найновіша резервна копія"
 msgid "Next"
 msgstr "Далі"
 
-#: src/postulo/documents/models.py:617
+#: src/postulo/documents/models.py:665
 #, draft
 msgid "next attempt"
 msgstr "наступна спроба"
@@ -5654,7 +5677,7 @@ msgstr "Немає з’єднання: %(why)s"
 msgid "No connections yet"
 msgstr "З’єднань поки немає"
 
-#: src/postulo/documents/views.py:382
+#: src/postulo/documents/views.py:406
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5878,7 +5901,7 @@ msgstr "Звичайний"
 msgid "Not %(name)s"
 msgstr "Не %(name)s"
 
-#: src/postulo/documents/models.py:575
+#: src/postulo/documents/models.py:623
 #, draft
 msgid "Not accepted"
 msgstr "Не прийнято"
@@ -7118,7 +7141,7 @@ msgstr "Адреса вакансії"
 msgid "Posting details"
 msgstr "Подробиці вакансії"
 
-#: src/postulo/jobs/views.py:548
+#: src/postulo/jobs/views.py:582
 #, draft
 msgid "Posting updated."
 msgstr "Вакансію оновлено."
@@ -7584,12 +7607,12 @@ msgid ""
 msgstr ""
 "Записується для всього, встановленого звідси, тож пізніше його не змінити, не осиротивши встановленого."
 
-#: src/postulo/applications/views.py:691
+#: src/postulo/applications/views.py:725
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Записано як скасоване."
 
-#: src/postulo/applications/views.py:690
+#: src/postulo/applications/views.py:724
 #, draft
 msgid "Recorded as held."
 msgstr "Записано як проведене."
@@ -7604,12 +7627,12 @@ msgstr "записав"
 msgid "recorded on"
 msgstr "записано"
 
-#: src/postulo/documents/views.py:483
+#: src/postulo/documents/views.py:507
 #, draft
 msgid "Recorded what you sent."
 msgstr "Записано, що ви надіслали."
 
-#: src/postulo/applications/views.py:692
+#: src/postulo/applications/views.py:726
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Записано: ніхто не прийшов."
@@ -7803,12 +7826,12 @@ msgstr "Вилучити {label}"
 msgid "removed on the other side"
 msgstr "вилучено на іншому боці"
 
-#: src/postulo/documents/models.py:523
+#: src/postulo/documents/models.py:571
 #, draft
 msgid "rendered on"
 msgstr "відтворено"
 
-#: src/postulo/documents/models.py:415
+#: src/postulo/documents/models.py:425
 #, draft
 msgid "replaces"
 msgstr "замінює"
@@ -8021,7 +8044,7 @@ msgstr "зарплата до"
 #: src/postulo/templates/documents/cv_form.html:20
 #: src/postulo/templates/documents/cv_item_form.html:24
 #: src/postulo/templates/documents/letter_form.html:28
-#: src/postulo/templates/documents/upload_form.html:20
+#: src/postulo/templates/documents/upload_form.html:37
 #: src/postulo/templates/jobs/company_form.html:111
 #: src/postulo/templates/jobs/contact_form.html:41
 #: src/postulo/templates/jobs/industry_form.html:20
@@ -8254,12 +8277,12 @@ msgstr "Не вдалося надіслати: %(error)s"
 msgid "Sent"
 msgstr "Надіслано"
 
-#: src/postulo/documents/models.py:548
+#: src/postulo/documents/models.py:596
 #, draft
 msgid "sent document"
 msgstr "надісланий документ"
 
-#: src/postulo/documents/models.py:549
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "sent documents"
 msgstr "надіслані документи"
@@ -8272,10 +8295,14 @@ msgstr "надіслані документи"
 msgid "Sent documents"
 msgstr "Надіслані документи"
 
-#: src/postulo/documents/models.py:620
+#: src/postulo/documents/models.py:668
 #, draft
 msgid "sent on"
 msgstr "надіслано"
+
+#: src/postulo/documents/models.py:541
+msgid "sent to"
+msgstr ""
 
 #: src/postulo/core/server_views.py:784
 #, python-format, draft
@@ -8654,7 +8681,7 @@ msgstr "Сервер SMTP"
 msgid "Snooze"
 msgstr "Відкласти"
 
-#: src/postulo/applications/views.py:561
+#: src/postulo/applications/views.py:595
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Відкладено на два тижні."
@@ -8850,7 +8877,7 @@ msgid "Status"
 msgstr "Статус"
 
 #: src/postulo/applications/models.py:202
-#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:611
+#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:659
 #: src/postulo/jobs/models.py:808
 #, draft
 msgid "status"
@@ -8866,7 +8893,7 @@ msgstr "Зміна статусу"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Статус у таблиці: %(text)s"
 
-#: src/postulo/applications/views.py:436
+#: src/postulo/applications/views.py:470
 #, draft
 msgid "Status updated."
 msgstr "Статус оновлено."
@@ -8906,7 +8933,7 @@ msgstr "Зробити його нечинним"
 msgid "Stop sorting by %(column)s"
 msgstr "Припинити впорядкування за %(column)s"
 
-#: src/postulo/documents/models.py:596
+#: src/postulo/documents/models.py:644
 #, draft
 msgid "store"
 msgstr "сховище"
@@ -8968,7 +8995,7 @@ msgstr "підсумок"
 msgid "superseded"
 msgstr "замінено"
 
-#: src/postulo/documents/forms.py:228
+#: src/postulo/documents/forms.py:235
 #, draft
 msgid "Supersedes"
 msgstr "Замінює"
@@ -9177,7 +9204,7 @@ msgstr "Перевірити з’єднання"
 msgid "text"
 msgstr "текст"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:569
 #, draft
 msgid "text as sent"
 msgstr "текст, як його надіслано"
@@ -9262,7 +9289,7 @@ msgstr "Це не схоже на ідентифікатор %(scheme)s (нап�
 msgid "That does not look like a complete web address."
 msgstr "Це не схоже на повну вебадресу."
 
-#: src/postulo/applications/views.py:467
+#: src/postulo/applications/views.py:501
 #, draft
 msgid "That entry could not be saved."
 msgstr "Той запис не вдалося зберегти."
@@ -9289,7 +9316,7 @@ msgstr "Той файл порожній."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Той файл більший за %(limit)s МБ, тож його не прочитано."
 
-#: src/postulo/documents/forms.py:234
+#: src/postulo/documents/forms.py:241
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Той файл більший за %(limit)s МБ."
@@ -9335,7 +9362,7 @@ msgstr "Це багато посилань для відновлення. Спр
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "Це SVG, який Postulo поки не зберігає. Підійде PNG або JPEG."
 
-#: src/postulo/applications/views.py:438
+#: src/postulo/applications/views.py:472
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Такого статусу Postulo не знає."
@@ -9355,12 +9382,12 @@ msgstr "Такого віджета Postulo не знає."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Це не відкритий ключ Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:684
+#: src/postulo/applications/views.py:718
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Такого результату Postulo не знає."
 
-#: src/postulo/applications/views.py:563
+#: src/postulo/applications/views.py:597
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Із цим Postulo нічого такого зробити не може."
@@ -9465,7 +9492,7 @@ msgstr "Той додаток більше не встановлено."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Ця відповідь не надійшла із запиту, який зробив Postulo."
 
-#: src/postulo/applications/views.py:925
+#: src/postulo/applications/views.py:959
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "На ту пропозицію вже відповіли."
@@ -9478,6 +9505,16 @@ msgstr ""
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Це утворило б петлю: %(name)s уже є частиною цієї."
+
+#: src/postulo/applications/views.py:444 src/postulo/jobs/views.py:405
+#: src/postulo/jobs/views.py:627
+#, python-format
+msgid "The %(count)d document you sent is kept, and still says where it went."
+msgid_plural ""
+"The %(count)d documents you sent are kept, and still say where they went."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/documents/pdf.py:175
 #, python-format, draft
@@ -9573,7 +9610,7 @@ msgstr "Компанія, до якої ви подаєтеся"
 msgid "The connection is gone or switched off."
 msgstr "З’єднання зникло або вимкнене."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:411
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "Копію не вдалося надіслати; чому — сказано в документі."
@@ -9597,7 +9634,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "Завантажене набагато більше, ніж має бути додаток."
 
-#: src/postulo/documents/models.py:416
+#: src/postulo/documents/models.py:426
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Попередня версія, яку це замінює. Старий файл зберігається."
@@ -9638,6 +9675,11 @@ msgstr "Файл порожній."
 #, draft
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Файл більший за 2 МБ. Пошук роботи таким не буває."
+
+#: src/postulo/templates/documents/upload_form.html:25
+msgid ""
+"The file itself cannot be changed. Upload the new one and mark it as superseding this, so what you sent still means the file you sent."
+msgstr ""
 
 #: src/postulo/api/api.py:319
 #, python-format, draft
@@ -10044,12 +10086,20 @@ msgstr "Ця адреса вже є у ваших вакансіях, від %(w
 msgid "This address is already listed."
 msgstr "Ця адреса вже у списку."
 
+#: src/postulo/templates/partials/confirm_delete.html:22
+msgid "This also deletes:"
+msgstr ""
+
 #: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
 msgstr ""
 "Це впорядкування ваше і починається як стандартне. Віджет, доданий у пізнішому випуску або принесений розширенням, чекає вище, доки ви не скажете так."
+
+#: src/postulo/templates/partials/confirm_delete.html:33
+msgid "This cannot be undone."
+msgstr ""
 
 #: src/postulo/jobs/logos.py:287
 #, draft
@@ -10247,7 +10297,7 @@ msgstr "Час очікування"
 msgid "timeout in seconds"
 msgstr "час очікування в секундах"
 
-#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
+#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:514
 #: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
 #: src/postulo/resume/models.py:249
 #, draft
@@ -10514,12 +10564,12 @@ msgstr "Вивантажте й зіставте стовпці"
 msgid "Uploaded"
 msgstr "Вивантажено"
 
-#: src/postulo/documents/models.py:440
+#: src/postulo/documents/models.py:475
 #, draft
 msgid "uploaded document"
 msgstr "вивантажений документ"
 
-#: src/postulo/documents/models.py:441
+#: src/postulo/documents/models.py:476
 #, draft
 msgid "uploaded documents"
 msgstr "вивантажені документи"
@@ -10637,7 +10687,7 @@ msgstr "підтверджено"
 msgid "Verified"
 msgstr "Підтверджено"
 
-#: src/postulo/documents/models.py:408
+#: src/postulo/documents/models.py:418
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "version"
@@ -10703,7 +10753,7 @@ msgstr "Чекає на відповідь"
 msgid "Waiting only"
 msgstr "Лише ті, що чекають"
 
-#: src/postulo/documents/models.py:572
+#: src/postulo/documents/models.py:620
 #, draft
 msgid "Waiting to be sent"
 msgstr "Чекає на надсилання"

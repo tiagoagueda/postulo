@@ -224,6 +224,13 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         queryset = UploadedDocument.objects.for_user(self.user)
         if self.instance.pk:
             queryset = queryset.exclude(pk=self.instance.pk)
+            # **The file itself cannot be edited** (#217). An application records which upload
+            # it sent, so swapping the bytes under it would make the record say a file was
+            # sent that never was — and an external store, which is told about a document once
+            # when it is created, would keep the old copy and call it archived. A different
+            # file is a new upload that `replaces` this one, which keeps both and says which
+            # came after.
+            self.fields.pop("file", None)
         self.fields["replaces"].queryset = queryset
         self.fields["replaces"].label = _("Supersedes")
 

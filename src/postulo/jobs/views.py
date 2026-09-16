@@ -375,6 +375,40 @@ class CompanyDeleteView(OwnedObjectMixin, DeleteView):
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("jobs:company_list")
 
+    def get_context_data(self, **kwargs):
+        """Count what goes with the company (#217).
+
+        A company cascades into its postings and those into applications, their timelines,
+        interviews and reminders — a year of a job search, behind one button that used to say
+        only "anything belonging to it goes too".
+        """
+        from django.utils.translation import ngettext
+
+        from postulo.applications.models import Application
+        from postulo.documents.models import RenderedDocument
+
+        context = super().get_context_data(**kwargs)
+        company = self.object
+        applications = Application.objects.filter(posting__company=company)
+        counts = (
+            (company.postings.count(), "%(count)d posting", "%(count)d postings"),
+            (applications.count(), "%(count)d application", "%(count)d applications"),
+            (company.contacts.count(), "%(count)d contact", "%(count)d contacts"),
+        )
+        context["consequences"] = [
+            ngettext(one, many, number) % {"count": number}
+            for number, one, many in counts
+            if number
+        ]
+        sent = RenderedDocument.objects.filter(application__in=applications).count()
+        if sent:
+            context["kept"] = ngettext(
+                "The %(count)d document you sent is kept, and still says where it went.",
+                "The %(count)d documents you sent are kept, and still say where they went.",
+                sent,
+            ) % {"count": sent}
+        return context
+
     def form_valid(self, form):
         messages.success(self.request, _("Company deleted, along with its postings."))
         return super().form_valid(form)
@@ -569,3 +603,30 @@ class PostingDeleteView(OwnedObjectMixin, DeleteView):
     model = JobPosting
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("jobs:company_list")
+
+    def get_context_data(self, **kwargs):
+        """A listing takes its applications with it; say how many before it does (#217)."""
+        from django.utils.translation import ngettext
+
+        from postulo.documents.models import RenderedDocument
+
+        context = super().get_context_data(**kwargs)
+        applications = self.object.applications.all()
+        number = applications.count()
+        if number:
+            context["consequences"] = [
+                ngettext(
+                    "%(count)d application, with its timeline",
+                    "%(count)d applications, with their timelines",
+                    number,
+                )
+                % {"count": number}
+            ]
+        sent = RenderedDocument.objects.filter(application__in=applications).count()
+        if sent:
+            context["kept"] = ngettext(
+                "The %(count)d document you sent is kept, and still says where it went.",
+                "The %(count)d documents you sent are kept, and still say where they went.",
+                sent,
+            ) % {"count": sent}
+        return context

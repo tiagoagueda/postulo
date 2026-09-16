@@ -405,6 +405,16 @@ class UploadedDocument(OwnedModel):
     )
     notes = models.TextField(_("notes"), blank=True)
 
+    #: The file's SHA-256, written once when it arrives.
+    #:
+    #: A render has had one since #133, and an upload had none, which left two holes. A store
+    #: was handed an empty checksum and so could not tell a copy it already held from a new
+    #: one; and nothing could tell whether the bytes an application says it sent are still the
+    #: bytes on disk. The file cannot be swapped on an edit any more (#217), so this is
+    #: written at creation and never changes: a different file is a different version, through
+    #: `replaces`.
+    checksum = models.CharField(_("checksum"), max_length=64, blank=True, editable=False)
+
     version = models.PositiveIntegerField(_("version"), default=1)
     replaces = models.ForeignKey(
         "self",
@@ -430,6 +440,31 @@ class UploadedDocument(OwnedModel):
     #: kinds" has to mean if it is to survive a fourth (#133).
     archive_origin = "upload"
     download_url_name = "documents:upload_download"
+
+    def save(self, *args, **kwargs):
+        """Write the checksum the first time the bytes are here, and never again.
+
+        Read in chunks rather than whole: an upload is capped, but a model that reads a file
+        into memory to save a row is a habit that outlives the cap.
+        """
+        if self.file and not self.checksum:
+            digest = hashlib.sha256()
+            # Leave the file as it was found. Hashing opens it, and a handle left open is a
+            # file Windows will not let anything delete afterwards -- which is exactly what
+            # the delete this issue adds has to be able to do.
+            was_closed = self.file.closed
+            try:
+                for chunk in self.file.chunks():
+                    digest.update(chunk)
+            finally:
+                if was_closed:
+                    self.file.close()
+                else:
+                    self.file.seek(0)
+            self.checksum = digest.hexdigest()
+            if "update_fields" in kwargs and kwargs["update_fields"] is not None:
+                kwargs["update_fields"] = [*kwargs["update_fields"], "checksum"]
+        super().save(*args, **kwargs)
 
     @property
     def archived_at(self):
@@ -483,14 +518,27 @@ class RenderedDocument(OwnedModel):
     )
     file = models.FileField(_("file"), upload_to=upload_to_documents)
 
+    #: **`SET_NULL`, not a cascade** (#217). This model exists so that what an employer
+    #: received survives everything else being tidied up, and a cascade here undid that from
+    #: the other end: deleting an application -- or a listing, or a company, each of which
+    #: cascades into applications -- silently took the frozen PDFs with it. Deleting the
+    #: *source* was already handled that way (`signals.py`); this is the same rule for the
+    #: other link. What is left behind still says where it went, because `sent_to` is text.
     application = models.ForeignKey(
         "applications.Application",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="rendered_documents",
         verbose_name=_("application"),
     )
+    #: The role and employer this was sent to, written when the snapshot is taken.
+    #:
+    #: Text rather than a link, and kept even while the link is there: an application that is
+    #: later deleted would otherwise leave a PDF nobody can place. "Research Engineer at Black
+    #: Mesa" is what somebody needs to recognise it, and it cannot go stale in a way that
+    #: matters -- it is what the posting said on the day it was sent.
+    sent_to = models.CharField(_("sent to"), max_length=250, blank=True, editable=False)
     #: What produced this PDF: a CV, a cover letter, or whatever kind arrives next.
     #:
     #: A generic link, for the reason `CVItem` already gives one model over: two nullable

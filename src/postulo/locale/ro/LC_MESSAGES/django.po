@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 06:53+0000\n"
+"POT-Creation-Date: 2026-09-16 07:16+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: română\n"
@@ -42,6 +42,14 @@ msgstr "%(company)s are deja un identificator %(scheme)s: %(value)s."
 #, python-format, draft
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s modificate."
+
+#: src/postulo/jobs/views.py:618
+#, python-format
+msgid "%(count)d application, with its timeline"
+msgid_plural "%(count)d applications, with their timelines"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/plugins/views.py:405
 #, python-format, draft
@@ -380,8 +388,8 @@ msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr ""
 "%(name)s ar schimba lucrurile de care depinde însuși Postulo. %(problems)s"
 
-#: src/postulo/documents/rendering.py:287
-#: src/postulo/documents/rendering.py:345
+#: src/postulo/documents/rendering.py:303
+#: src/postulo/documents/rendering.py:362
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
@@ -423,6 +431,7 @@ msgid ""
 msgstr ""
 "%(provider)s nu permite unei aplicații să trimită singură. Alege „Autentificat o singură dată”."
 
+#: src/postulo/documents/rendering.py:289
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
@@ -443,12 +452,12 @@ msgstr "%(role)s: fără dată de început, așa că nu a fost adăugat."
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s nu identifică acest tip de lucru."
 
-#: src/postulo/documents/views.py:391
+#: src/postulo/documents/views.py:415
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr "%(sent)d copii trimise, %(failed)d eșuate; fiecare document spune care."
 
-#: src/postulo/documents/views.py:397
+#: src/postulo/documents/views.py:421
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d copii trimise."
@@ -1107,7 +1116,7 @@ msgid ""
 msgstr ""
 "S-au adăugat %(total)s intrări. Nimic nu a fost suprascris; ce se dovedește dublat rămâne al dumneavoastră de șters."
 
-#: src/postulo/applications/views.py:465 src/postulo/applications/views.py:942
+#: src/postulo/applications/views.py:499 src/postulo/applications/views.py:976
 #, draft
 msgid "Added to the timeline."
 msgstr "Adăugat pe cronologie."
@@ -1321,7 +1330,7 @@ msgid "Any of them signs you in. The primary one receives Postulo's mail."
 msgstr ""
 "Oricare dintre ele te autentifică. Cea principală primește corespondența Postulo."
 
-#: src/postulo/templates/partials/confirm_delete.html:16
+#: src/postulo/templates/partials/confirm_delete.html:35
 #, draft
 msgid "Anything belonging to it goes too, and this cannot be undone."
 msgstr ""
@@ -1368,7 +1377,7 @@ msgstr "Aspect"
 #: src/postulo/applications/models.py:428
 #: src/postulo/applications/models.py:523
 #: src/postulo/applications/models.py:644 src/postulo/applications/tables.py:20
-#: src/postulo/documents/models.py:492 src/postulo/jobs/models.py:825
+#: src/postulo/documents/models.py:533 src/postulo/jobs/models.py:825
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1386,7 +1395,7 @@ msgstr "Candidatură"
 msgid "Application created"
 msgstr "Candidatură creată"
 
-#: src/postulo/applications/views.py:418
+#: src/postulo/applications/views.py:452
 #, draft
 msgid "Application deleted."
 msgstr "Candidatură ștearsă."
@@ -1536,7 +1545,7 @@ msgstr "Candidează: %(title)s"
 msgid "Apprenticeship"
 msgstr "Ucenicie"
 
-#: src/postulo/documents/models.py:573
+#: src/postulo/documents/models.py:621
 #, draft
 msgid "Archived"
 msgstr "Arhivat"
@@ -1591,7 +1600,7 @@ msgstr "Cel puțin o limbă trebuie oferită, altfel nimeni nu poate citi nimic.
 msgid "at most"
 msgstr ""
 
-#: src/postulo/documents/models.py:615
+#: src/postulo/documents/models.py:663
 #, draft
 msgid "attempts"
 msgstr "încercări"
@@ -1804,14 +1813,14 @@ msgstr "URL de callback de înregistrat la furnizor"
 #: src/postulo/templates/documents/cv_item_form.html:25
 #: src/postulo/templates/documents/letter_form.html:29
 #: src/postulo/templates/documents/send.html:32
-#: src/postulo/templates/documents/upload_form.html:21
+#: src/postulo/templates/documents/upload_form.html:38
 #: src/postulo/templates/jobs/company_form.html:112
 #: src/postulo/templates/jobs/contact_form.html:42
 #: src/postulo/templates/jobs/industry_form.html:21
 #: src/postulo/templates/jobs/listing_apply.html:44
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
-#: src/postulo/templates/partials/confirm_delete.html:26
+#: src/postulo/templates/partials/confirm_delete.html:46
 #: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:40
 #: src/postulo/templates/server/person_delete.html:29
@@ -2012,7 +2021,7 @@ msgid ""
 msgstr ""
 "Modificările făcute aici sunt trimise la următoarea rulare; cealaltă parte este citită tot atunci."
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:587
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Revino la %(company)s despre %(role)s"
@@ -2037,7 +2046,7 @@ msgstr "Verifică-le pe toate"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Verificată la %(when)s: %(detail)s"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:416 src/postulo/documents/models.py:570
 #, draft
 msgid "checksum"
 msgstr "sumă de control"
@@ -2072,7 +2081,7 @@ msgstr "Alege mai întâi un furnizor de identitate și salvează-l."
 msgid "Choose another file"
 msgstr "Alege alt fișier"
 
-#: src/postulo/documents/forms.py:287
+#: src/postulo/documents/forms.py:294
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Alege cel puțin un document de înregistrat."
@@ -2082,7 +2091,7 @@ msgstr "Alege cel puțin un document de înregistrat."
 msgid "Choose what kind of identifier this is."
 msgstr "Alege ce fel de identificator este."
 
-#: src/postulo/applications/views.py:938
+#: src/postulo/applications/views.py:972
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Alegeți mai întâi la ce candidatură se referă."
@@ -2261,7 +2270,7 @@ msgstr "companie"
 msgid "Company added."
 msgstr "Companie adăugată."
 
-#: src/postulo/jobs/views.py:379
+#: src/postulo/jobs/views.py:413
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Companie ștearsă, împreună cu anunțurile ei."
@@ -2334,7 +2343,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Conectat. Testați ca să vă asigurați că funcționează."
 
-#: src/postulo/documents/models.py:594 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:642 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:271
 #, draft
 msgid "connection"
@@ -2399,7 +2408,7 @@ msgstr "contact"
 msgid "Contact"
 msgstr "Contact"
 
-#: src/postulo/jobs/views.py:485
+#: src/postulo/jobs/views.py:519
 #, draft
 msgid "Contact added."
 msgstr "Contact adăugat."
@@ -2556,7 +2565,7 @@ msgstr "monedă"
 msgid "Custom"
 msgstr "Personalizat"
 
-#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:138
+#: src/postulo/documents/forms.py:260 src/postulo/documents/kinds.py:138
 #: src/postulo/documents/models.py:97 src/postulo/documents/models.py:135
 #: src/postulo/documents/models.py:192 src/postulo/documents/models.py:369
 #: src/postulo/documents/themes.py:71
@@ -2793,7 +2802,7 @@ msgstr "Refuză"
 msgid "Declined"
 msgstr "Refuzată"
 
-#: src/postulo/applications/views.py:930
+#: src/postulo/applications/views.py:964
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Refuzată. Nu va mai fi sugerată."
@@ -2828,7 +2837,7 @@ msgstr "Apărare"
 #: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
-#: src/postulo/templates/partials/confirm_delete.html:23
+#: src/postulo/templates/partials/confirm_delete.html:43
 #: src/postulo/templates/resume/overview.html:139
 #, draft
 msgid "Delete"
@@ -2967,12 +2976,12 @@ msgstr "Fă asta"
 msgid "Document"
 msgstr "Document"
 
-#: src/postulo/documents/models.py:625
+#: src/postulo/documents/models.py:673
 #, draft
 msgid "document copies"
 msgstr "copii de documente"
 
-#: src/postulo/documents/models.py:624
+#: src/postulo/documents/models.py:672
 #, draft
 msgid "document copy"
 msgstr "copie de document"
@@ -2995,7 +3004,7 @@ msgstr "Depozite de documente"
 msgid "Documents"
 msgstr "Documente"
 
-#: src/postulo/documents/views.py:480
+#: src/postulo/documents/views.py:504
 #, draft
 msgid "Documents sent"
 msgstr "Documente trimise"
@@ -3343,7 +3352,7 @@ msgid ""
 msgstr ""
 "Fiecare post pe care l-ai ocupat. Scrie reperele o dată; adaptează-le pe fiecare CV mai târziu."
 
-#: src/postulo/documents/views.py:400
+#: src/postulo/documents/views.py:424
 #, draft
 msgid "Every store already has this document."
 msgstr "Fiecare depozit are deja acest document."
@@ -3485,7 +3494,7 @@ msgstr "Exportă PDF"
 msgid "Exported on its own"
 msgstr "Exportat separat"
 
-#: src/postulo/documents/models.py:574
+#: src/postulo/documents/models.py:622
 #, draft
 msgid "Failed"
 msgstr "Eșuat"
@@ -3552,17 +3561,21 @@ msgstr "domeniu de studiu"
 msgid "Figures appear once you have applied for something."
 msgstr "Cifrele apar după ce ai candidat undeva."
 
-#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:484
+#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:519
 #, draft
 msgid "file"
 msgstr "fișier"
+
+#: src/postulo/templates/documents/upload_form.html:22
+msgid "File"
+msgstr ""
 
 #: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Fișier salvat."
 
-#: src/postulo/applications/views.py:879
+#: src/postulo/applications/views.py:913
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -3590,7 +3603,7 @@ msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
 "Fișiere pe care le aveai deja, spre deosebire de documentele generate de Postulo."
 
-#: src/postulo/documents/forms.py:258
+#: src/postulo/documents/forms.py:265
 #, draft
 msgid "Files you have already"
 msgstr "Fișiere pe care le ai deja"
@@ -3663,12 +3676,12 @@ msgstr "Urmează profilul tău"
 msgid "Follow-up note"
 msgstr "Notă după interviu"
 
-#: src/postulo/applications/views.py:547
+#: src/postulo/applications/views.py:581
 #, draft
 msgid "Follow-up recorded."
 msgstr "Revenire înregistrată."
 
-#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:544
+#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:578
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -4143,7 +4156,7 @@ msgstr "Hibrid"
 msgid "I have already applied to this one"
 msgstr "Am candidat deja la acesta"
 
-#: src/postulo/documents/models.py:613
+#: src/postulo/documents/models.py:661
 #, draft
 msgid "id in the store"
 msgstr "id în depozit"
@@ -4355,7 +4368,7 @@ msgstr "domeniu"
 msgid "Industry"
 msgstr "Domeniu"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Industry renamed."
 msgstr "Domeniu redenumit."
@@ -4437,7 +4450,7 @@ msgstr "interviu"
 msgid "Interview cancelled"
 msgstr "Interviu anulat"
 
-#: src/postulo/applications/views.py:638
+#: src/postulo/applications/views.py:672
 #, draft
 msgid "Interview recorded."
 msgstr "Interviu înregistrat."
@@ -4447,7 +4460,7 @@ msgstr "Interviu înregistrat."
 msgid "Interview scheduled"
 msgstr "Interviu programat"
 
-#: src/postulo/applications/views.py:640
+#: src/postulo/applications/views.py:674
 #, draft
 msgid "Interview scheduled."
 msgstr "Interviu programat."
@@ -4457,7 +4470,7 @@ msgstr "Interviu programat."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Interviu mâine: %(kind)s la %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:670
+#: src/postulo/applications/views.py:704
 #, draft
 msgid "Interview updated."
 msgstr "Interviu actualizat."
@@ -4564,6 +4577,16 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Nu se poate încheia înainte să înceapă."
 
+#: src/postulo/documents/views.py:343
+#, python-format
+msgid ""
+"It is recorded as sent with %(count)d application, which will no longer say it was sent."
+msgid_plural ""
+"It is recorded as sent with %(count)d applications, which will no longer say it was sent."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/templates/account/recovery_unusable.html:11
 #, draft
 msgid ""
@@ -4620,7 +4643,7 @@ msgstr "anunțuri de angajare"
 msgid "Job search report"
 msgstr "Raport privind căutarea unui loc de muncă"
 
-#: src/postulo/applications/views.py:867
+#: src/postulo/applications/views.py:901
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4690,7 +4713,7 @@ msgstr ""
 #: src/postulo/applications/models.py:650 src/postulo/core/models.py:178
 #: src/postulo/core/models.py:403 src/postulo/core/models.py:532
 #: src/postulo/documents/models.py:113 src/postulo/documents/models.py:315
-#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:482
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:517
 #: src/postulo/jobs/models.py:176 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:251
 #, draft
@@ -4707,7 +4730,7 @@ msgstr "tip"
 msgid "Kind"
 msgstr "Tip"
 
-#: src/postulo/documents/models.py:604
+#: src/postulo/documents/models.py:652
 #, draft
 msgid "kind of document"
 msgstr "tip de document"
@@ -4717,7 +4740,7 @@ msgstr "tip de document"
 msgid "kind of entry"
 msgstr "tip de intrare"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:564
 #, draft
 msgid "kind of source"
 msgstr "tip de sursă"
@@ -4727,7 +4750,7 @@ msgstr "tip de sursă"
 msgid "Kinds of letter"
 msgstr "Tipuri de scrisori"
 
-#: src/postulo/documents/models.py:597 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:645 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "etichetă"
@@ -4811,7 +4834,7 @@ msgstr "Cea mai mare pagină citită"
 msgid "Last activity"
 msgstr "Ultima activitate"
 
-#: src/postulo/documents/models.py:619
+#: src/postulo/documents/models.py:667
 #, draft
 msgid "last attempt"
 msgstr "ultima încercare"
@@ -4826,7 +4849,7 @@ msgstr "ultima verificare"
 msgid "last checked"
 msgstr "verificată ultima dată"
 
-#: src/postulo/documents/models.py:621 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:669 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "ultima eroare"
@@ -4932,7 +4955,7 @@ msgstr "Permiteți acestei chei de acces să mă autentifice singură"
 msgid "Let {column} size itself"
 msgstr "Lasă coloana {column} să-și aleagă lățimea"
 
-#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
+#: src/postulo/documents/forms.py:262 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Scrisoare"
@@ -4987,7 +5010,7 @@ msgstr "link"
 msgid "Link"
 msgstr "Link"
 
-#: src/postulo/documents/models.py:614
+#: src/postulo/documents/models.py:662
 #, draft
 msgid "link in the store"
 msgstr "legătură în depozit"
@@ -5025,7 +5048,7 @@ msgid ""
 msgstr ""
 "Legături către locurile la care se revine în căutare: tabla, CV-urile, companiile."
 
-#: src/postulo/documents/forms.py:264
+#: src/postulo/documents/forms.py:271
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -5271,7 +5294,7 @@ msgstr "Producție"
 msgid "Map a column to Company and one to Role first."
 msgstr "Asociază mai întâi o coloană cu Compania și una cu Postul."
 
-#: src/postulo/applications/views.py:520
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Marked as done."
 msgstr "Marcat ca făcut."
@@ -5329,7 +5352,7 @@ msgstr "Meniu"
 msgid "Merge into"
 msgstr "Contopește în"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Merged."
 msgstr "Contopit."
@@ -5601,7 +5624,7 @@ msgstr "Cea mai recentă copie de siguranță"
 msgid "Next"
 msgstr "Următor"
 
-#: src/postulo/documents/models.py:617
+#: src/postulo/documents/models.py:665
 #, draft
 msgid "next attempt"
 msgstr "următoarea încercare"
@@ -5670,7 +5693,7 @@ msgstr "Nicio conexiune: %(why)s"
 msgid "No connections yet"
 msgstr "Nicio conexiune încă"
 
-#: src/postulo/documents/views.py:382
+#: src/postulo/documents/views.py:406
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5895,7 +5918,7 @@ msgstr "Normală"
 msgid "Not %(name)s"
 msgstr "Fără %(name)s"
 
-#: src/postulo/documents/models.py:575
+#: src/postulo/documents/models.py:623
 #, draft
 msgid "Not accepted"
 msgstr "Neacceptat"
@@ -7139,7 +7162,7 @@ msgstr "Adresa anunțului"
 msgid "Posting details"
 msgstr "Detaliile anunțului"
 
-#: src/postulo/jobs/views.py:548
+#: src/postulo/jobs/views.py:582
 #, draft
 msgid "Posting updated."
 msgstr "Anunț actualizat."
@@ -7607,12 +7630,12 @@ msgid ""
 msgstr ""
 "Se consemnează la tot ce se instalează de aici, deci nu se poate schimba ulterior fără a desprinde ce a instalat."
 
-#: src/postulo/applications/views.py:691
+#: src/postulo/applications/views.py:725
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Înregistrat ca anulat."
 
-#: src/postulo/applications/views.py:690
+#: src/postulo/applications/views.py:724
 #, draft
 msgid "Recorded as held."
 msgstr "Înregistrat ca susținut."
@@ -7627,12 +7650,12 @@ msgstr "înregistrat de"
 msgid "recorded on"
 msgstr "înregistrat la"
 
-#: src/postulo/documents/views.py:483
+#: src/postulo/documents/views.py:507
 #, draft
 msgid "Recorded what you sent."
 msgstr "S-a înregistrat ce ai trimis."
 
-#: src/postulo/applications/views.py:692
+#: src/postulo/applications/views.py:726
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Înregistrat: nimeni nu s-a prezentat."
@@ -7825,12 +7848,12 @@ msgstr "Elimină {label}"
 msgid "removed on the other side"
 msgstr "eliminat pe cealaltă parte"
 
-#: src/postulo/documents/models.py:523
+#: src/postulo/documents/models.py:571
 #, draft
 msgid "rendered on"
 msgstr "generat la"
 
-#: src/postulo/documents/models.py:415
+#: src/postulo/documents/models.py:425
 #, draft
 msgid "replaces"
 msgstr "înlocuiește"
@@ -8042,7 +8065,7 @@ msgstr "salariu până la"
 #: src/postulo/templates/documents/cv_form.html:20
 #: src/postulo/templates/documents/cv_item_form.html:24
 #: src/postulo/templates/documents/letter_form.html:28
-#: src/postulo/templates/documents/upload_form.html:20
+#: src/postulo/templates/documents/upload_form.html:37
 #: src/postulo/templates/jobs/company_form.html:111
 #: src/postulo/templates/jobs/contact_form.html:41
 #: src/postulo/templates/jobs/industry_form.html:20
@@ -8275,12 +8298,12 @@ msgstr "Trimiterea a eșuat: %(error)s"
 msgid "Sent"
 msgstr "Trimis"
 
-#: src/postulo/documents/models.py:548
+#: src/postulo/documents/models.py:596
 #, draft
 msgid "sent document"
 msgstr "document trimis"
 
-#: src/postulo/documents/models.py:549
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "sent documents"
 msgstr "documente trimise"
@@ -8293,10 +8316,14 @@ msgstr "documente trimise"
 msgid "Sent documents"
 msgstr "Documente trimise"
 
-#: src/postulo/documents/models.py:620
+#: src/postulo/documents/models.py:668
 #, draft
 msgid "sent on"
 msgstr "trimis la"
+
+#: src/postulo/documents/models.py:541
+msgid "sent to"
+msgstr ""
 
 #: src/postulo/core/server_views.py:784
 #, python-format, draft
@@ -8676,7 +8703,7 @@ msgstr "Server SMTP"
 msgid "Snooze"
 msgstr "Amână"
 
-#: src/postulo/applications/views.py:561
+#: src/postulo/applications/views.py:595
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Amânat cu două săptămâni."
@@ -8873,7 +8900,7 @@ msgid "Status"
 msgstr "Stare"
 
 #: src/postulo/applications/models.py:202
-#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:611
+#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:659
 #: src/postulo/jobs/models.py:808
 #, draft
 msgid "status"
@@ -8889,7 +8916,7 @@ msgstr "Schimbare de stare"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Starea din foaia de calcul: %(text)s"
 
-#: src/postulo/applications/views.py:436
+#: src/postulo/applications/views.py:470
 #, draft
 msgid "Status updated."
 msgstr "Stare actualizată."
@@ -8928,7 +8955,7 @@ msgstr "Scoate-l din uz"
 msgid "Stop sorting by %(column)s"
 msgstr "Nu mai sorta după %(column)s"
 
-#: src/postulo/documents/models.py:596
+#: src/postulo/documents/models.py:644
 #, draft
 msgid "store"
 msgstr "depozit"
@@ -8990,7 +9017,7 @@ msgstr "rezumat"
 msgid "superseded"
 msgstr "înlocuit"
 
-#: src/postulo/documents/forms.py:228
+#: src/postulo/documents/forms.py:235
 #, draft
 msgid "Supersedes"
 msgstr "Înlocuiește"
@@ -9199,7 +9226,7 @@ msgstr "Testați conexiunea"
 msgid "text"
 msgstr "text"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:569
 #, draft
 msgid "text as sent"
 msgstr "text așa cum a fost trimis"
@@ -9284,7 +9311,7 @@ msgstr "Asta nu arată ca un identificator %(scheme)s (de exemplu %(example)s)."
 msgid "That does not look like a complete web address."
 msgstr "Asta nu arată ca o adresă web completă."
 
-#: src/postulo/applications/views.py:467
+#: src/postulo/applications/views.py:501
 #, draft
 msgid "That entry could not be saved."
 msgstr "Intrarea aceea nu a putut fi salvată."
@@ -9311,7 +9338,7 @@ msgstr "Fișierul este gol."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Fișierul depășește %(limit)s MB, așa că nu a fost citit."
 
-#: src/postulo/documents/forms.py:234
+#: src/postulo/documents/forms.py:241
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Fișierul acela este mai mare de %(limit)s MB."
@@ -9358,7 +9385,7 @@ msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr ""
 "Acela este un SVG, pe care Postulo încă nu îl păstrează. Merge un PNG sau un JPEG."
 
-#: src/postulo/applications/views.py:438
+#: src/postulo/applications/views.py:472
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Aceea nu este o stare pe care Postulo o recunoaște."
@@ -9378,12 +9405,12 @@ msgstr "Acesta nu este un widget pe care Postulo să îl cunoască."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Aceasta nu este o cheie publică Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:684
+#: src/postulo/applications/views.py:718
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Acela nu este un rezultat pe care Postulo îl recunoaște."
 
-#: src/postulo/applications/views.py:563
+#: src/postulo/applications/views.py:597
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Asta nu este ceva ce Postulo poate face în privința ei."
@@ -9488,7 +9515,7 @@ msgstr "Pluginul acela nu mai este instalat."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Acel răspuns nu a venit dintr-o cerere făcută de Postulo."
 
-#: src/postulo/applications/views.py:925
+#: src/postulo/applications/views.py:959
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "La acea sugestie s-a răspuns deja."
@@ -9501,6 +9528,16 @@ msgstr ""
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Asta ar face o buclă: %(name)s face deja parte din aceasta."
+
+#: src/postulo/applications/views.py:444 src/postulo/jobs/views.py:405
+#: src/postulo/jobs/views.py:627
+#, python-format
+msgid "The %(count)d document you sent is kept, and still says where it went."
+msgid_plural ""
+"The %(count)d documents you sent are kept, and still say where they went."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/documents/pdf.py:175
 #, python-format, draft
@@ -9596,7 +9633,7 @@ msgstr "Compania la care candidezi"
 msgid "The connection is gone or switched off."
 msgstr "Conexiunea a dispărut sau este oprită."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:411
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "Copia nu a putut fi trimisă; documentul spune de ce."
@@ -9620,7 +9657,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "Descărcarea este mult mai mare decât ar trebui să fie un modul."
 
-#: src/postulo/documents/models.py:416
+#: src/postulo/documents/models.py:426
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr ""
@@ -9662,6 +9699,11 @@ msgstr "Fișierul este gol."
 #, draft
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Fișierul depășește 2 MB. O căutare de job nu este atât de mare."
+
+#: src/postulo/templates/documents/upload_form.html:25
+msgid ""
+"The file itself cannot be changed. Upload the new one and mark it as superseding this, so what you sent still means the file you sent."
+msgstr ""
 
 #: src/postulo/api/api.py:319
 #, python-format, draft
@@ -10070,12 +10112,20 @@ msgstr "Această adresă este deja în anunțurile tale, din %(when)s."
 msgid "This address is already listed."
 msgstr "Această adresă este deja în listă."
 
+#: src/postulo/templates/partials/confirm_delete.html:22
+msgid "This also deletes:"
+msgstr ""
+
 #: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
 msgstr ""
 "Această aranjare vă aparține și începe ca cea standard. Un widget adăugat într-o versiune ulterioară sau adus de o extensie așteaptă mai sus până când spuneți da."
+
+#: src/postulo/templates/partials/confirm_delete.html:33
+msgid "This cannot be undone."
+msgstr ""
 
 #: src/postulo/jobs/logos.py:287
 #, draft
@@ -10274,7 +10324,7 @@ msgstr "Expirare"
 msgid "timeout in seconds"
 msgstr "expirare în secunde"
 
-#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
+#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:514
 #: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
 #: src/postulo/resume/models.py:249
 #, draft
@@ -10543,12 +10593,12 @@ msgstr "Încarcă și asociază coloanele"
 msgid "Uploaded"
 msgstr "Încărcat"
 
-#: src/postulo/documents/models.py:440
+#: src/postulo/documents/models.py:475
 #, draft
 msgid "uploaded document"
 msgstr "document încărcat"
 
-#: src/postulo/documents/models.py:441
+#: src/postulo/documents/models.py:476
 #, draft
 msgid "uploaded documents"
 msgstr "documente încărcate"
@@ -10667,7 +10717,7 @@ msgstr "verificat"
 msgid "Verified"
 msgstr "Verificat"
 
-#: src/postulo/documents/models.py:408
+#: src/postulo/documents/models.py:418
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "version"
@@ -10733,7 +10783,7 @@ msgstr "În așteptarea unui răspuns"
 msgid "Waiting only"
 msgstr "Doar cele în așteptare"
 
-#: src/postulo/documents/models.py:572
+#: src/postulo/documents/models.py:620
 #, draft
 msgid "Waiting to be sent"
 msgstr "În așteptarea trimiterii"

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 06:53+0000\n"
+"POT-Creation-Date: 2026-09-16 07:16+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenčina\n"
@@ -41,6 +41,14 @@ msgstr "%(company)s už má identifikátor %(scheme)s: %(value)s."
 #, python-format, draft
 msgid "%(count)d %(noun)s changed."
 msgstr "%(count)d %(noun)s zmenené."
+
+#: src/postulo/jobs/views.py:618
+#, python-format
+msgid "%(count)d application, with its timeline"
+msgid_plural "%(count)d applications, with their timelines"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/plugins/views.py:405
 #, python-format, draft
@@ -377,8 +385,8 @@ msgstr ""
 msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
 msgstr "%(name)s by zmenil to, od čoho závisí samotné Postulo. %(problems)s"
 
-#: src/postulo/documents/rendering.py:287
-#: src/postulo/documents/rendering.py:345
+#: src/postulo/documents/rendering.py:303
+#: src/postulo/documents/rendering.py:362
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
@@ -420,6 +428,7 @@ msgid ""
 msgstr ""
 "%(provider)s nedovolí aplikácii odosielať samostatne. Zvoľte „Raz prihlásené“."
 
+#: src/postulo/documents/rendering.py:289
 #: src/postulo/notifications/management/commands/send_due_reminders.py:44
 #, python-format, draft
 msgid "%(role)s at %(company)s"
@@ -440,13 +449,13 @@ msgstr "%(role)s: chýba dátum začiatku, preto nebolo pridané."
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s tento druh veci neidentifikuje."
 
-#: src/postulo/documents/views.py:391
+#: src/postulo/documents/views.py:415
 #, python-format, draft
 msgid "%(sent)d copies sent, %(failed)d failed; each document says which."
 msgstr ""
 "%(sent)d kópií odoslaných, %(failed)d zlyhalo; každý dokument hovorí ktoré."
 
-#: src/postulo/documents/views.py:397
+#: src/postulo/documents/views.py:421
 #, python-format, draft
 msgid "%(sent)d copies sent."
 msgstr "%(sent)d kópií odoslaných."
@@ -1102,7 +1111,7 @@ msgid ""
 msgstr ""
 "Pridaných %(total)s položiek. Nič nebolo prepísané; čo sa ukáže ako duplicita, zmažete sami."
 
-#: src/postulo/applications/views.py:465 src/postulo/applications/views.py:942
+#: src/postulo/applications/views.py:499 src/postulo/applications/views.py:976
 #, draft
 msgid "Added to the timeline."
 msgstr "Pridané na časovú os."
@@ -1313,7 +1322,7 @@ msgstr "Akýkoľvek"
 msgid "Any of them signs you in. The primary one receives Postulo's mail."
 msgstr "Ktorákoľvek z nich vás prihlási. Hlavná prijíma poštu Postula."
 
-#: src/postulo/templates/partials/confirm_delete.html:16
+#: src/postulo/templates/partials/confirm_delete.html:35
 #, draft
 msgid "Anything belonging to it goes too, and this cannot be undone."
 msgstr "Všetko, čo k tomu patrí, zmizne tiež, a nedá sa to vrátiť."
@@ -1359,7 +1368,7 @@ msgstr "Vzhľad"
 #: src/postulo/applications/models.py:428
 #: src/postulo/applications/models.py:523
 #: src/postulo/applications/models.py:644 src/postulo/applications/tables.py:20
-#: src/postulo/documents/models.py:492 src/postulo/jobs/models.py:825
+#: src/postulo/documents/models.py:533 src/postulo/jobs/models.py:825
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
 msgid "application"
@@ -1377,7 +1386,7 @@ msgstr "Žiadosť"
 msgid "Application created"
 msgstr "Žiadosť vytvorená"
 
-#: src/postulo/applications/views.py:418
+#: src/postulo/applications/views.py:452
 #, draft
 msgid "Application deleted."
 msgstr "Žiadosť vymazaná."
@@ -1526,7 +1535,7 @@ msgstr "Uchádzať sa: %(title)s"
 msgid "Apprenticeship"
 msgstr "Učňovský pomer"
 
-#: src/postulo/documents/models.py:573
+#: src/postulo/documents/models.py:621
 #, draft
 msgid "Archived"
 msgstr "Archivované"
@@ -1581,7 +1590,7 @@ msgstr "Musí sa ponúkať aspoň jeden jazyk, inak si nikto nič neprečíta."
 msgid "at most"
 msgstr ""
 
-#: src/postulo/documents/models.py:615
+#: src/postulo/documents/models.py:663
 #, draft
 msgid "attempts"
 msgstr "pokusy"
@@ -1794,14 +1803,14 @@ msgstr "Spätná adresa na registráciu u poskytovateľa"
 #: src/postulo/templates/documents/cv_item_form.html:25
 #: src/postulo/templates/documents/letter_form.html:29
 #: src/postulo/templates/documents/send.html:32
-#: src/postulo/templates/documents/upload_form.html:21
+#: src/postulo/templates/documents/upload_form.html:38
 #: src/postulo/templates/jobs/company_form.html:112
 #: src/postulo/templates/jobs/contact_form.html:42
 #: src/postulo/templates/jobs/industry_form.html:21
 #: src/postulo/templates/jobs/listing_apply.html:44
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
-#: src/postulo/templates/partials/confirm_delete.html:26
+#: src/postulo/templates/partials/confirm_delete.html:46
 #: src/postulo/templates/partials/table/cell.html:35
 #: src/postulo/templates/resume/item_form.html:40
 #: src/postulo/templates/server/person_delete.html:29
@@ -2002,7 +2011,7 @@ msgid ""
 msgstr ""
 "Zmeny urobené tu sa odošlú pri ďalšom behu; vtedy sa prečíta aj druhá strana."
 
-#: src/postulo/applications/views.py:553
+#: src/postulo/applications/views.py:587
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Pripomenúť sa vo firme %(company)s ohľadom %(role)s"
@@ -2027,7 +2036,7 @@ msgstr "Overiť všetky"
 msgid "Checked %(when)s: %(detail)s"
 msgstr "Overené %(when)s: %(detail)s"
 
-#: src/postulo/documents/models.py:522
+#: src/postulo/documents/models.py:416 src/postulo/documents/models.py:570
 #, draft
 msgid "checksum"
 msgstr "kontrolný súčet"
@@ -2062,7 +2071,7 @@ msgstr "Najprv zvoľte poskytovateľa identity a uložte ho."
 msgid "Choose another file"
 msgstr "Vybrať iný súbor"
 
-#: src/postulo/documents/forms.py:287
+#: src/postulo/documents/forms.py:294
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Vyberte aspoň jeden dokument na zaznamenanie."
@@ -2072,7 +2081,7 @@ msgstr "Vyberte aspoň jeden dokument na zaznamenanie."
 msgid "Choose what kind of identifier this is."
 msgstr "Vyberte, o aký druh identifikátora ide."
 
-#: src/postulo/applications/views.py:938
+#: src/postulo/applications/views.py:972
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Najprv zvoľte, ktorej prihlášky sa to týka."
@@ -2251,7 +2260,7 @@ msgstr "firma"
 msgid "Company added."
 msgstr "Firma pridaná."
 
-#: src/postulo/jobs/views.py:379
+#: src/postulo/jobs/views.py:413
 #, draft
 msgid "Company deleted, along with its postings."
 msgstr "Firma vymazaná aj s jej inzerátmi."
@@ -2324,7 +2333,7 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Pripojené. Otestujte to, aby ste mali istotu, že to funguje."
 
-#: src/postulo/documents/models.py:594 src/postulo/plugins/models.py:190
+#: src/postulo/documents/models.py:642 src/postulo/plugins/models.py:190
 #: src/postulo/plugins/models.py:271
 #, draft
 msgid "connection"
@@ -2389,7 +2398,7 @@ msgstr "kontakt"
 msgid "Contact"
 msgstr "Kontakt"
 
-#: src/postulo/jobs/views.py:485
+#: src/postulo/jobs/views.py:519
 #, draft
 msgid "Contact added."
 msgstr "Kontakt pridaný."
@@ -2546,7 +2555,7 @@ msgstr "mena"
 msgid "Custom"
 msgstr "Vlastný"
 
-#: src/postulo/documents/forms.py:253 src/postulo/documents/kinds.py:138
+#: src/postulo/documents/forms.py:260 src/postulo/documents/kinds.py:138
 #: src/postulo/documents/models.py:97 src/postulo/documents/models.py:135
 #: src/postulo/documents/models.py:192 src/postulo/documents/models.py:369
 #: src/postulo/documents/themes.py:71
@@ -2782,7 +2791,7 @@ msgstr "Odmietnuť"
 msgid "Declined"
 msgstr "Odmietnuté"
 
-#: src/postulo/applications/views.py:930
+#: src/postulo/applications/views.py:964
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Odmietnuté. Už to nebude navrhnuté."
@@ -2817,7 +2826,7 @@ msgstr "Obrana"
 #: src/postulo/templates/jobs/industry_list.html:67
 #: src/postulo/templates/jobs/posting_detail.html:54
 #: src/postulo/templates/partials/confirm_delete.html:4
-#: src/postulo/templates/partials/confirm_delete.html:23
+#: src/postulo/templates/partials/confirm_delete.html:43
 #: src/postulo/templates/resume/overview.html:139
 #, draft
 msgid "Delete"
@@ -2956,12 +2965,12 @@ msgstr "Urob toto"
 msgid "Document"
 msgstr "Dokument"
 
-#: src/postulo/documents/models.py:625
+#: src/postulo/documents/models.py:673
 #, draft
 msgid "document copies"
 msgstr "kópie dokumentov"
 
-#: src/postulo/documents/models.py:624
+#: src/postulo/documents/models.py:672
 #, draft
 msgid "document copy"
 msgstr "kópia dokumentu"
@@ -2984,7 +2993,7 @@ msgstr "Úložiská dokumentov"
 msgid "Documents"
 msgstr "Dokumenty"
 
-#: src/postulo/documents/views.py:480
+#: src/postulo/documents/views.py:504
 #, draft
 msgid "Documents sent"
 msgstr "Odoslané dokumenty"
@@ -3329,7 +3338,7 @@ msgid ""
 msgstr ""
 "Každá pozícia, ktorú ste zastávali. Napíšte úspechy raz; prispôsobte ich pre každé CV neskôr."
 
-#: src/postulo/documents/views.py:400
+#: src/postulo/documents/views.py:424
 #, draft
 msgid "Every store already has this document."
 msgstr "Každé úložisko už tento dokument má."
@@ -3471,7 +3480,7 @@ msgstr "Exportovať PDF"
 msgid "Exported on its own"
 msgstr "Exportované samostatne"
 
-#: src/postulo/documents/models.py:574
+#: src/postulo/documents/models.py:622
 #, draft
 msgid "Failed"
 msgstr "Zlyhalo"
@@ -3538,17 +3547,21 @@ msgstr "odbor štúdia"
 msgid "Figures appear once you have applied for something."
 msgstr "Čísla sa objavia, keď sa niekam prihlásite."
 
-#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:484
+#: src/postulo/documents/models.py:398 src/postulo/documents/models.py:519
 #, draft
 msgid "file"
 msgstr "súbor"
+
+#: src/postulo/templates/documents/upload_form.html:22
+msgid "File"
+msgstr ""
 
 #: src/postulo/documents/views.py:314
 #, draft
 msgid "File saved."
 msgstr "Súbor uložený."
 
-#: src/postulo/applications/views.py:879
+#: src/postulo/applications/views.py:913
 msgid ""
 "Filed under Sent documents, dated today, so what you handed over is kept."
 msgstr ""
@@ -3576,7 +3589,7 @@ msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
 "Súbory, ktoré ste už mali, na rozdiel od dokumentov vykreslených Postulom."
 
-#: src/postulo/documents/forms.py:258
+#: src/postulo/documents/forms.py:265
 #, draft
 msgid "Files you have already"
 msgstr "Súbory, ktoré už máte"
@@ -3649,12 +3662,12 @@ msgstr "Podľa profilu"
 msgid "Follow-up note"
 msgstr "Poznámka po pohovore"
 
-#: src/postulo/applications/views.py:547
+#: src/postulo/applications/views.py:581
 #, draft
 msgid "Follow-up recorded."
 msgstr "Pripomenutie zaznamenané."
 
-#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:544
+#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:578
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -4126,7 +4139,7 @@ msgstr "Hybridný"
 msgid "I have already applied to this one"
 msgstr "Sem som sa už hlásil(a)"
 
-#: src/postulo/documents/models.py:613
+#: src/postulo/documents/models.py:661
 #, draft
 msgid "id in the store"
 msgstr "id v úložisku"
@@ -4338,7 +4351,7 @@ msgstr "odvetvie"
 msgid "Industry"
 msgstr "Odvetvie"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Industry renamed."
 msgstr "Odvetvie premenované."
@@ -4420,7 +4433,7 @@ msgstr "pohovor"
 msgid "Interview cancelled"
 msgstr "Pohovor zrušený"
 
-#: src/postulo/applications/views.py:638
+#: src/postulo/applications/views.py:672
 #, draft
 msgid "Interview recorded."
 msgstr "Pohovor zaznamenaný."
@@ -4430,7 +4443,7 @@ msgstr "Pohovor zaznamenaný."
 msgid "Interview scheduled"
 msgstr "Pohovor naplánovaný"
 
-#: src/postulo/applications/views.py:640
+#: src/postulo/applications/views.py:674
 #, draft
 msgid "Interview scheduled."
 msgstr "Pohovor naplánovaný."
@@ -4440,7 +4453,7 @@ msgstr "Pohovor naplánovaný."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Pohovor zajtra: %(kind)s vo firme %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:670
+#: src/postulo/applications/views.py:704
 #, draft
 msgid "Interview updated."
 msgstr "Pohovor aktualizovaný."
@@ -4546,6 +4559,16 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Nemôže skončiť skôr, než začne."
 
+#: src/postulo/documents/views.py:343
+#, python-format
+msgid ""
+"It is recorded as sent with %(count)d application, which will no longer say it was sent."
+msgid_plural ""
+"It is recorded as sent with %(count)d applications, which will no longer say it was sent."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/templates/account/recovery_unusable.html:11
 #, draft
 msgid ""
@@ -4600,7 +4623,7 @@ msgstr "pracovné inzeráty"
 msgid "Job search report"
 msgstr "Správa o hľadaní práce"
 
-#: src/postulo/applications/views.py:867
+#: src/postulo/applications/views.py:901
 #: src/postulo/templates/applications/report_print.html:23
 #, python-format, draft
 msgid "Job search report · %(period)s"
@@ -4670,7 +4693,7 @@ msgstr ""
 #: src/postulo/applications/models.py:650 src/postulo/core/models.py:178
 #: src/postulo/core/models.py:403 src/postulo/core/models.py:532
 #: src/postulo/documents/models.py:113 src/postulo/documents/models.py:315
-#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:482
+#: src/postulo/documents/models.py:395 src/postulo/documents/models.py:517
 #: src/postulo/jobs/models.py:176 src/postulo/plugins/models.py:169
 #: src/postulo/resume/models.py:251
 #, draft
@@ -4687,7 +4710,7 @@ msgstr "druh"
 msgid "Kind"
 msgstr "Druh"
 
-#: src/postulo/documents/models.py:604
+#: src/postulo/documents/models.py:652
 #, draft
 msgid "kind of document"
 msgstr "druh dokumentu"
@@ -4697,7 +4720,7 @@ msgstr "druh dokumentu"
 msgid "kind of entry"
 msgstr "druh záznamu"
 
-#: src/postulo/documents/models.py:516
+#: src/postulo/documents/models.py:564
 #, draft
 msgid "kind of source"
 msgstr "druh zdroja"
@@ -4707,7 +4730,7 @@ msgstr "druh zdroja"
 msgid "Kinds of letter"
 msgstr "Druhy listov"
 
-#: src/postulo/documents/models.py:597 src/postulo/plugins/models.py:173
+#: src/postulo/documents/models.py:645 src/postulo/plugins/models.py:173
 #, draft
 msgid "label"
 msgstr "označenie"
@@ -4791,7 +4814,7 @@ msgstr "Najväčšia prečítaná stránka"
 msgid "Last activity"
 msgstr "Posledná aktivita"
 
-#: src/postulo/documents/models.py:619
+#: src/postulo/documents/models.py:667
 #, draft
 msgid "last attempt"
 msgstr "posledný pokus"
@@ -4806,7 +4829,7 @@ msgstr "posledná kontrola"
 msgid "last checked"
 msgstr "naposledy skontrolované"
 
-#: src/postulo/documents/models.py:621 src/postulo/plugins/models.py:182
+#: src/postulo/documents/models.py:669 src/postulo/plugins/models.py:182
 #, draft
 msgid "last error"
 msgstr "posledná chyba"
@@ -4912,7 +4935,7 @@ msgstr "Nechať tento prístupový kľúč prihlásiť ma samostatne"
 msgid "Let {column} size itself"
 msgstr "Nechať stĺpec {column} nastaviť si šírku sám"
 
-#: src/postulo/documents/forms.py:255 src/postulo/documents/themes.py:73
+#: src/postulo/documents/forms.py:262 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "List"
@@ -4967,7 +4990,7 @@ msgstr "odkaz"
 msgid "Link"
 msgstr "Odkaz"
 
-#: src/postulo/documents/models.py:614
+#: src/postulo/documents/models.py:662
 #, draft
 msgid "link in the store"
 msgstr "odkaz v úložisku"
@@ -5006,7 +5029,7 @@ msgid ""
 msgstr ""
 "Odkazy na miesta, kam sa hľadanie práce vracia: tabuľa, životopisy, firmy."
 
-#: src/postulo/documents/forms.py:264
+#: src/postulo/documents/forms.py:271
 #: src/postulo/templates/documents/application_documents.html:47
 #, draft
 msgid "Links you pointed them at"
@@ -5252,7 +5275,7 @@ msgstr "Výroba"
 msgid "Map a column to Company and one to Role first."
 msgstr "Najprv priraďte jeden stĺpec Firme a jeden Pozícii."
 
-#: src/postulo/applications/views.py:520
+#: src/postulo/applications/views.py:554
 #, draft
 msgid "Marked as done."
 msgstr "Označené ako hotové."
@@ -5310,7 +5333,7 @@ msgstr "Ponuka"
 msgid "Merge into"
 msgstr "Zlúčiť do"
 
-#: src/postulo/jobs/views.py:434
+#: src/postulo/jobs/views.py:468
 #, draft
 msgid "Merged."
 msgstr "Zlúčené."
@@ -5582,7 +5605,7 @@ msgstr "Najnovšia záloha"
 msgid "Next"
 msgstr "Ďalej"
 
-#: src/postulo/documents/models.py:617
+#: src/postulo/documents/models.py:665
 #, draft
 msgid "next attempt"
 msgstr "ďalší pokus"
@@ -5650,7 +5673,7 @@ msgstr "Žiadne pripojenie: %(why)s"
 msgid "No connections yet"
 msgstr "Zatiaľ žiadne pripojenia"
 
-#: src/postulo/documents/views.py:382
+#: src/postulo/documents/views.py:406
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -5875,7 +5898,7 @@ msgstr "Normálna"
 msgid "Not %(name)s"
 msgstr "Nie %(name)s"
 
-#: src/postulo/documents/models.py:575
+#: src/postulo/documents/models.py:623
 #, draft
 msgid "Not accepted"
 msgstr "Neprijaté"
@@ -7113,7 +7136,7 @@ msgstr "Adresa inzerátu"
 msgid "Posting details"
 msgstr "Podrobnosti inzerátu"
 
-#: src/postulo/jobs/views.py:548
+#: src/postulo/jobs/views.py:582
 #, draft
 msgid "Posting updated."
 msgstr "Inzerát aktualizovaný."
@@ -7578,12 +7601,12 @@ msgid ""
 msgstr ""
 "Zaznamenáva sa pri všetkom, čo sa odtiaľto nainštalovalo, takže sa neskôr nemôže zmeniť bez odpojenia toho, čo nainštalovalo."
 
-#: src/postulo/applications/views.py:691
+#: src/postulo/applications/views.py:725
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Zaznamenané ako zrušený."
 
-#: src/postulo/applications/views.py:690
+#: src/postulo/applications/views.py:724
 #, draft
 msgid "Recorded as held."
 msgstr "Zaznamenané ako prebehnutý."
@@ -7598,12 +7621,12 @@ msgstr "zaznamenal(a)"
 msgid "recorded on"
 msgstr "zaznamenané dňa"
 
-#: src/postulo/documents/views.py:483
+#: src/postulo/documents/views.py:507
 #, draft
 msgid "Recorded what you sent."
 msgstr "Zaznamenané, čo ste odoslali."
 
-#: src/postulo/applications/views.py:692
+#: src/postulo/applications/views.py:726
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Zaznamenané: nikto sa nedostavil."
@@ -7796,12 +7819,12 @@ msgstr "Odstrániť {label}"
 msgid "removed on the other side"
 msgstr "odstránené na druhej strane"
 
-#: src/postulo/documents/models.py:523
+#: src/postulo/documents/models.py:571
 #, draft
 msgid "rendered on"
 msgstr "vykreslené dňa"
 
-#: src/postulo/documents/models.py:415
+#: src/postulo/documents/models.py:425
 #, draft
 msgid "replaces"
 msgstr "nahrádza"
@@ -8013,7 +8036,7 @@ msgstr "plat do"
 #: src/postulo/templates/documents/cv_form.html:20
 #: src/postulo/templates/documents/cv_item_form.html:24
 #: src/postulo/templates/documents/letter_form.html:28
-#: src/postulo/templates/documents/upload_form.html:20
+#: src/postulo/templates/documents/upload_form.html:37
 #: src/postulo/templates/jobs/company_form.html:111
 #: src/postulo/templates/jobs/contact_form.html:41
 #: src/postulo/templates/jobs/industry_form.html:20
@@ -8246,12 +8269,12 @@ msgstr "Odoslanie zlyhalo: %(error)s"
 msgid "Sent"
 msgstr "Odoslané"
 
-#: src/postulo/documents/models.py:548
+#: src/postulo/documents/models.py:596
 #, draft
 msgid "sent document"
 msgstr "odoslaný dokument"
 
-#: src/postulo/documents/models.py:549
+#: src/postulo/documents/models.py:597
 #, draft
 msgid "sent documents"
 msgstr "odoslané dokumenty"
@@ -8264,10 +8287,14 @@ msgstr "odoslané dokumenty"
 msgid "Sent documents"
 msgstr "Odoslané dokumenty"
 
-#: src/postulo/documents/models.py:620
+#: src/postulo/documents/models.py:668
 #, draft
 msgid "sent on"
 msgstr "odoslané"
+
+#: src/postulo/documents/models.py:541
+msgid "sent to"
+msgstr ""
 
 #: src/postulo/core/server_views.py:784
 #, python-format, draft
@@ -8645,7 +8672,7 @@ msgstr "Server SMTP"
 msgid "Snooze"
 msgstr "Odložiť"
 
-#: src/postulo/applications/views.py:561
+#: src/postulo/applications/views.py:595
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Odložené o dva týždne."
@@ -8842,7 +8869,7 @@ msgid "Status"
 msgstr "Stav"
 
 #: src/postulo/applications/models.py:202
-#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:611
+#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:659
 #: src/postulo/jobs/models.py:808
 #, draft
 msgid "status"
@@ -8858,7 +8885,7 @@ msgstr "Zmena stavu"
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Stav v tabuľke: %(text)s"
 
-#: src/postulo/applications/views.py:436
+#: src/postulo/applications/views.py:470
 #, draft
 msgid "Status updated."
 msgstr "Stav aktualizovaný."
@@ -8897,7 +8924,7 @@ msgstr "Zneplatniť ho"
 msgid "Stop sorting by %(column)s"
 msgstr "Prestať zoraďovať podľa %(column)s"
 
-#: src/postulo/documents/models.py:596
+#: src/postulo/documents/models.py:644
 #, draft
 msgid "store"
 msgstr "úložisko"
@@ -8959,7 +8986,7 @@ msgstr "zhrnutie"
 msgid "superseded"
 msgstr "nahradené"
 
-#: src/postulo/documents/forms.py:228
+#: src/postulo/documents/forms.py:235
 #, draft
 msgid "Supersedes"
 msgstr "Nahrádza"
@@ -9168,7 +9195,7 @@ msgstr "Otestovať pripojenie"
 msgid "text"
 msgstr "text"
 
-#: src/postulo/documents/models.py:521
+#: src/postulo/documents/models.py:569
 #, draft
 msgid "text as sent"
 msgstr "text, ako bol odoslaný"
@@ -9253,7 +9280,7 @@ msgstr "To nevyzerá ako identifikátor %(scheme)s (napríklad %(example)s)."
 msgid "That does not look like a complete web address."
 msgstr "To nevyzerá ako úplná webová adresa."
 
-#: src/postulo/applications/views.py:467
+#: src/postulo/applications/views.py:501
 #, draft
 msgid "That entry could not be saved."
 msgstr "Túto položku sa nepodarilo uložiť."
@@ -9280,7 +9307,7 @@ msgstr "Tento súbor je prázdny."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Tento súbor je väčší než %(limit)s MB, preto nebol prečítaný."
 
-#: src/postulo/documents/forms.py:234
+#: src/postulo/documents/forms.py:241
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Tento súbor je väčší než %(limit)s MB."
@@ -9326,7 +9353,7 @@ msgstr "To je veľa odkazov na obnovu. Skúste to čoskoro znova."
 msgid "That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."
 msgstr "To je SVG, ktoré Postulo zatiaľ neuchováva. PNG alebo JPEG postačí."
 
-#: src/postulo/applications/views.py:438
+#: src/postulo/applications/views.py:472
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "To nie je stav, ktorý Postulo pozná."
@@ -9346,12 +9373,12 @@ msgstr "To nie je prvok, ktorý by Postulo poznalo."
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Toto nie je verejný kľúč Ed25519: %(error)s"
 
-#: src/postulo/applications/views.py:684
+#: src/postulo/applications/views.py:718
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "To nie je výsledok, ktorý Postulo pozná."
 
-#: src/postulo/applications/views.py:563
+#: src/postulo/applications/views.py:597
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "To s tým Postulo urobiť nemôže."
@@ -9456,7 +9483,7 @@ msgstr "Tento plugin už nie je nainštalovaný."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Táto odpoveď neprišla z požiadavky, ktorú poslalo Postulo."
 
-#: src/postulo/applications/views.py:925
+#: src/postulo/applications/views.py:959
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Na tento návrh už bolo odpovedané."
@@ -9469,6 +9496,16 @@ msgstr ""
 #, python-format, draft
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Tým by vznikla slučka: %(name)s už je súčasťou tejto."
+
+#: src/postulo/applications/views.py:444 src/postulo/jobs/views.py:405
+#: src/postulo/jobs/views.py:627
+#, python-format
+msgid "The %(count)d document you sent is kept, and still says where it went."
+msgid_plural ""
+"The %(count)d documents you sent are kept, and still say where they went."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/documents/pdf.py:175
 #, python-format, draft
@@ -9564,7 +9601,7 @@ msgstr "Firma, kam sa hlásite"
 msgid "The connection is gone or switched off."
 msgstr "Pripojenie zmizlo alebo je vypnuté."
 
-#: src/postulo/documents/views.py:387
+#: src/postulo/documents/views.py:411
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "Kópiu sa nepodarilo odoslať; dokument hovorí prečo."
@@ -9588,7 +9625,7 @@ msgstr ""
 msgid "The download is far larger than a plugin should be."
 msgstr "Sťahovaný súbor je oveľa väčší, než by zásuvný modul mal byť."
 
-#: src/postulo/documents/models.py:416
+#: src/postulo/documents/models.py:426
 #, draft
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Skoršia verzia, ktorú táto nahrádza. Starý súbor sa zachová."
@@ -9629,6 +9666,11 @@ msgstr "Súbor je prázdny."
 #, draft
 msgid "The file is over 2 MB. A job search is not that big."
 msgstr "Súbor má vyše 2 MB. Hľadanie práce nie je také veľké."
+
+#: src/postulo/templates/documents/upload_form.html:25
+msgid ""
+"The file itself cannot be changed. Upload the new one and mark it as superseding this, so what you sent still means the file you sent."
+msgstr ""
 
 #: src/postulo/api/api.py:319
 #, python-format, draft
@@ -10034,12 +10076,20 @@ msgstr "Táto adresa už je vo vašich ponukách, od %(when)s."
 msgid "This address is already listed."
 msgstr "Táto adresa už je v zozname."
 
+#: src/postulo/templates/partials/confirm_delete.html:22
+msgid "This also deletes:"
+msgstr ""
+
 #: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
 "This arrangement is yours, and it starts out as the standard one. A widget added in a later release, or brought by a plugin, waits above until you say yes to it."
 msgstr ""
 "Toto usporiadanie je vaše a začína ako štandardné. Widget pridaný v neskoršom vydaní alebo prinesený zásuvným modulom čaká vyššie, kým nepoviete áno."
+
+#: src/postulo/templates/partials/confirm_delete.html:33
+msgid "This cannot be undone."
+msgstr ""
 
 #: src/postulo/jobs/logos.py:287
 #, draft
@@ -10235,7 +10285,7 @@ msgstr "Časový limit"
 msgid "timeout in seconds"
 msgstr "časový limit v sekundách"
 
-#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:479
+#: src/postulo/documents/models.py:388 src/postulo/documents/models.py:514
 #: src/postulo/jobs/models.py:620 src/postulo/notifications/models.py:24
 #: src/postulo/resume/models.py:249
 #, draft
@@ -10503,12 +10553,12 @@ msgstr "Nahrať a priradiť stĺpce"
 msgid "Uploaded"
 msgstr "Nahrané"
 
-#: src/postulo/documents/models.py:440
+#: src/postulo/documents/models.py:475
 #, draft
 msgid "uploaded document"
 msgstr "nahraný dokument"
 
-#: src/postulo/documents/models.py:441
+#: src/postulo/documents/models.py:476
 #, draft
 msgid "uploaded documents"
 msgstr "nahrané dokumenty"
@@ -10626,7 +10676,7 @@ msgstr "overené"
 msgid "Verified"
 msgstr "Overené"
 
-#: src/postulo/documents/models.py:408
+#: src/postulo/documents/models.py:418
 #: src/postulo/templates/documents/upload_list.html:35
 #, draft
 msgid "version"
@@ -10692,7 +10742,7 @@ msgstr "Čaká na odpoveď"
 msgid "Waiting only"
 msgstr "Len čakajúce"
 
-#: src/postulo/documents/models.py:572
+#: src/postulo/documents/models.py:620
 #, draft
 msgid "Waiting to be sent"
 msgstr "Čaká na odoslanie"
