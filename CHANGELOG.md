@@ -773,6 +773,39 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **A backup now holds what a restore needs, and a restore in a container is something you
+  can do safely.** The archive was the database and the media, and that is not the whole of
+  an instance. The plugins live on the data volume — the record of what is installed and the
+  packages themselves — and were in no archive at all, so a restore onto a fresh instance
+  brought back connections belonging to plugins that were not there, and said nothing about
+  it. They go in now, whole; `--no-plugins` leaves them out for anyone who keeps that
+  directory another way.
+
+  The key the connection secrets are encrypted under cannot travel in the archive, and must
+  not: it is what protects the part of the archive that is protected at all. So the manifest
+  carries a one-way mark of it instead, and `restore` compares. An instance rebuilt with a
+  new secret key and no `POSTULO_FIELD_KEY` is now told at the restore that the passwords and
+  tokens in the connections it just put back cannot be read, and how many there are — rather
+  than finding out weeks later, one failing connection at a time. The wiki's backup page said
+  that losing the secret key "will not lose your data, but it will log everyone out", which
+  was only the first half of it; the configuration page had been saying the rest for a while.
+
+  And restoring overwrites the database that is there, through SQLite's backup API or
+  `pg_restore --clean`, which is safe only when nothing else has it open. In the container
+  the documented route was `exec` into the running web container, with gunicorn and the
+  scheduler reading through it. The wiki now gives the route that works — stop the services,
+  then `docker compose run --rm -e POSTULO_SKIP_MIGRATE=1` — and `restore` refuses when it
+  can see anything else connected, unless `--force`. It sees every connection on PostgreSQL,
+  and on SQLite the files WAL leaves beside the database for as long as one is open, which
+  catches the scheduler and misses a web server that has been idle a while; a check is a
+  second pair of eyes and stopping the services is what makes it safe, which the page says.
+  The instructions for restoring by hand were missing the step that matters most under WAL:
+  delete the stale `-wal` and `-shm` beside the file you have just put back, or SQLite
+  replays a log written against a different database.
+
+  Archives taken by earlier versions still restore. The format is 2, and anything from 1
+  upwards is read, because the archive somebody restores from is by definition older than
+  the Postulo reading it. (#234)
 - **The scheduler no longer sends things twice, no longer dies on one bad item, and now says
   whether it is still going round.** It is one command in a loop, which is the right size for
   a single instance and left four things to chance.

@@ -1,14 +1,26 @@
-"""Instance backup and restore: the database and the media directory in one archive.
+"""Instance backup and restore: the database, the media and the plugins in one archive.
 
 The per-person export (:mod:`postulo.core.export`) is the portable copy — readable JSON,
 useful in ten years. This is the operator's copy: everything on the instance, taken
 consistently while it runs, and put back the same way. One `.tar.gz` holding a manifest,
-the database, and the media directory file by file.
+the database, the media directory file by file, and the plugins directory beside it.
 
 The database is copied through the engine's own mechanism — SQLite's online backup API,
 which is consistent while the application is being used, or ``pg_dump`` — never by copying
 a file that is being written to. Media is streamed into the archive rather than read into
 memory, because a directory of PDFs is small and a directory of videos is not.
+
+**The plugins directory is part of the instance.** It holds the record of what is
+installed and the packages themselves, on the data volume rather than in the environment,
+and a restore without it leaves connection rows belonging to plugins that are not there.
+It is small — pure-Python wheels — so it goes in whole rather than as a list to be fetched
+again from a catalogue that may no longer carry the version this instance ran.
+
+**The key the connection secrets are under is not in the archive, and must not be.** What
+the manifest carries is a one-way mark of it, so that a restore can say the one thing that
+matters: whether the secrets it just put back can still be read here. They cannot be, if
+the instance was rebuilt with a new ``SECRET_KEY`` and no ``POSTULO_FIELD_KEY`` — and
+finding that out from a connection failing weeks later is the failure this prevents.
 
 A backup that was never opened is a hope, so every archive is verified after it is
 written: the manifest is read back and the database's checksum compared.
@@ -35,11 +47,15 @@ from django.db import connection
 from django.utils import timezone
 
 from postulo import __version__
+from postulo.config import sqlite as sqlite_options
 
-#: Bumped when the archive's shape changes.
-BACKUP_FORMAT = 1
+#: Bumped when the archive's shape changes. Anything up to this is read: format 2 only
+#: adds members and manifest keys, so a format 1 archive taken before plugins and the key
+#: fingerprint existed still restores, without them.
+BACKUP_FORMAT = 2
 MANIFEST = "manifest.json"
 MEDIA_PREFIX = "media"
+PLUGINS_PREFIX = "plugins"
 
 
 class BackupError(Exception):
@@ -53,6 +69,9 @@ class BackupReport:
     counts: dict[str, int] = field(default_factory=dict)
     media_files: int = 0
     media_bytes: int = 0
+    plugin_files: int = 0
+    plugin_bytes: int = 0
+    plugins: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -60,6 +79,15 @@ class RestoreReport:
     counts: dict[str, int] = field(default_factory=dict)
     media_files: int = 0
     media_skipped: int = 0
+    plugin_files: int = 0
+    plugins_skipped: int = 0
+    plugins: list[str] = field(default_factory=list)
+    #: Whether the secrets just restored are readable under this instance's key. ``None``
+    #: when the archive predates the fingerprint and there is nothing to compare.
+    key_matches: bool | None = None
+    #: How many connections in the restored database actually hold an encrypted secret,
+    #: so that a mismatch can be reported as a number of broken things and not a worry.
+    connections_with_secrets: int = 0
 
 
 def database_vendor() -> str:
@@ -98,6 +126,61 @@ def _counts() -> dict[str, int]:
         "uploads": UploadedDocument.objects.count(),
         "rendered": RenderedDocument.objects.count(),
     }
+
+
+def _connections_with_secrets() -> int:
+    from postulo.plugins.models import Connection
+
+    return Connection.objects.exclude(secrets_encrypted="").count()
+
+
+def busy_reason() -> str | None:
+    """What else is using the database right now, in words, or ``None`` if nothing is.
+
+    A restore does not write a new database and swap it in: it overwrites the one that is
+    there, through SQLite's backup API or ``pg_restore --clean``. A gunicorn worker or the
+    scheduler reading through that is reading a database that is changing underneath it,
+    and the answers it gives are nobody's.
+
+    What can be seen differs by engine, and neither engine sees everything:
+
+    * **PostgreSQL** lists every backend connected to the database, so both the web
+      service and the scheduler show up whether or not they are doing anything.
+    * **SQLite** in WAL mode keeps ``-wal`` and ``-shm`` beside the file for exactly as
+      long as a connection is open, and removes them when the last one closes. So this
+      closes Postulo's own connection and looks: if ``-shm`` is still there, somebody else
+      has the database open. The scheduler's loop holds a connection between passes and is
+      caught; a gunicorn that has served nothing for a while has closed its own and is
+      not. A ``-shm`` left behind by a process that was killed reads as busy, which is the
+      safe way round to be wrong.
+
+    Which is why the documented procedure stops the services rather than trusting this:
+    the check is a second pair of eyes, not the lock.
+    """
+    vendor = database_vendor()
+    if vendor == "postgresql":
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT count(*) FROM pg_stat_activity "
+                "WHERE datname = current_database() AND pid <> pg_backend_pid()"
+            )
+            others = cursor.fetchone()[0]
+        if others:
+            word = "connection" if others == 1 else "connections"
+            return f"{others} other {word} to this database {'is' if others == 1 else 'are'} open"
+        return None
+    if vendor == "sqlite":
+        database = settings.DATABASES["default"]
+        if not sqlite_options.is_file(database):
+            return None
+        path = Path(str(database["NAME"]))
+        # Our own connection keeps the sidecars alive, so it has to go first. Django opens
+        # a new one on the next query.
+        connection.close()
+        if path.with_name(f"{path.name}-shm").exists():
+            return f"another process has {path.name} open"
+        return None
+    return None
 
 
 def _postgres_env() -> tuple[dict[str, str], str]:
@@ -207,7 +290,18 @@ def resolve_target(target: Path | str | None) -> Path:
     return path
 
 
-def _media_stats(root: Path) -> tuple[int, int]:
+def _plain_files_only(info: tarfile.TarInfo) -> tarfile.TarInfo | None:
+    """Leave out anything that is neither a plain file nor a directory.
+
+    A restore refuses such a member, because a symlink in an archive is a way of writing
+    outside the directory it claims to belong to. An installer that left one in the plugins
+    directory would otherwise produce an archive this same Postulo will not put back, which
+    is the worst moment to find out.
+    """
+    return info if info.isfile() or info.isdir() else None
+
+
+def _tree_stats(root: Path) -> tuple[int, int]:
     files = 0
     size = 0
     for entry in root.rglob("*"):
@@ -217,12 +311,35 @@ def _media_stats(root: Path) -> tuple[int, int]:
     return files, size
 
 
-def write_backup(target: Path | str | None = None, *, include_media: bool = True) -> BackupReport:
+def _installed_plugins() -> list[str]:
+    """``name==version`` for every plugin the record lists, for the manifest to carry.
+
+    Read even when the directory itself is left out, because knowing what was installed is
+    what lets a restore onto a fresh instance say why a connection has nothing behind it.
+    """
+    from postulo.plugins.installing import read_record
+
+    return [f"{entry.name}=={entry.version}" for entry in read_record()]
+
+
+def write_backup(
+    target: Path | str | None = None,
+    *,
+    include_media: bool = True,
+    include_plugins: bool = True,
+) -> BackupReport:
     """Take a backup, verify it, and say what it holds."""
+    from postulo.plugins import secrets
+
     path = resolve_target(target)
     media_root = Path(settings.MEDIA_ROOT)
     with_media = include_media and media_root.is_dir()
-    media_files, media_bytes = _media_stats(media_root) if with_media else (0, 0)
+    media_files, media_bytes = _tree_stats(media_root) if with_media else (0, 0)
+
+    plugins_root = Path(settings.POSTULO_PLUGINS_DIR)
+    with_plugins = include_plugins and plugins_root.is_dir()
+    plugin_files, plugin_bytes = _tree_stats(plugins_root) if with_plugins else (0, 0)
+    plugins = _installed_plugins()
 
     with tempfile.TemporaryDirectory(prefix="postulo-backup-") as scratch:
         dump = Path(scratch) / "database"
@@ -240,6 +357,19 @@ def write_backup(target: Path | str | None = None, *, include_media: bool = True
                 "bytes": dump.stat().st_size,
             },
             "media": {"included": with_media, "files": media_files, "bytes": media_bytes},
+            "plugins": {
+                "included": with_plugins,
+                "files": plugin_files,
+                "bytes": plugin_bytes,
+                "installed": plugins,
+            },
+            # The mark of the key, never the key: an archive is a copy of the database and
+            # this is what says whether the secrets in it are still readable.
+            "secrets": {
+                "field_key_sha256": secrets.fingerprint(),
+                "field_key_source": secrets.key_source(),
+                "connections": _connections_with_secrets(),
+            },
             "counts": _counts(),
         }
         manifest_bytes = json.dumps(manifest, indent=2).encode("utf-8")
@@ -251,7 +381,13 @@ def write_backup(target: Path | str | None = None, *, include_media: bool = True
             archive.addfile(info, io.BytesIO(manifest_bytes))
             archive.add(dump, arcname=member)
             if with_media:
-                archive.add(media_root, arcname=MEDIA_PREFIX, recursive=True)
+                archive.add(
+                    media_root, arcname=MEDIA_PREFIX, recursive=True, filter=_plain_files_only
+                )
+            if with_plugins:
+                archive.add(
+                    plugins_root, arcname=PLUGINS_PREFIX, recursive=True, filter=_plain_files_only
+                )
 
     verify_backup(path)
     return BackupReport(
@@ -260,6 +396,9 @@ def write_backup(target: Path | str | None = None, *, include_media: bool = True
         counts=manifest["counts"],
         media_files=media_files,
         media_bytes=media_bytes,
+        plugin_files=plugin_files,
+        plugin_bytes=plugin_bytes,
+        plugins=plugins,
     )
 
 
@@ -276,9 +415,14 @@ def read_manifest(archive: tarfile.TarFile) -> dict:
     except ValueError as exc:
         raise BackupError("Not a Postulo backup: the manifest is not valid JSON.") from exc
     fmt = (manifest.get("postulo") or {}).get("backup_format")
-    if fmt != BACKUP_FORMAT:
+    # Anything up to the current format, because every change so far has added members and
+    # manifest keys rather than moved them: an archive older than this Postulo is exactly
+    # the archive somebody restores from, and refusing it on the version line would be the
+    # one refusal that arrives when it is too late to take another.
+    if not isinstance(fmt, int) or isinstance(fmt, bool) or not 1 <= fmt <= BACKUP_FORMAT:
         raise BackupError(
-            f"This archive is backup format {fmt!r}; this version of Postulo reads {BACKUP_FORMAT}."
+            f"This archive is backup format {fmt!r}; this version of Postulo reads "
+            f"1 to {BACKUP_FORMAT}."
         )
     return manifest
 
@@ -313,22 +457,32 @@ def verify_backup(path: Path | str) -> dict:
     return manifest
 
 
-def _safe_media_path(name: str) -> PurePosixPath:
-    """The path under the media root a member may be written to, or an error."""
+def _safe_member_path(name: str, prefix: str) -> PurePosixPath:
+    """The path under ``prefix``'s root a member may be written to, or an error."""
     relative = PurePosixPath(name)
     parts = relative.parts
-    if not parts or parts[0] != MEDIA_PREFIX:
-        raise BackupError(f"Unexpected member outside media/: {name!r}")
+    if not parts or parts[0] != prefix:
+        raise BackupError(f"Unexpected member outside {prefix}/: {name!r}")
     rest = parts[1:]
     if not rest:
-        raise BackupError("bare media/")
+        raise BackupError(f"bare {prefix}/")
     if relative.is_absolute() or any(part in ("..", "") for part in rest):
-        raise BackupError(f"Refusing a member that escapes the media directory: {name!r}")
+        raise BackupError(f"Refusing a member that escapes the {prefix} directory: {name!r}")
     return PurePosixPath(*rest)
 
 
+def _prefix_of(name: str) -> str | None:
+    """Which directory a member belongs to, or ``None`` if it belongs to neither."""
+    first = PurePosixPath(name).parts[:1]
+    if first and first[0] in (MEDIA_PREFIX, PLUGINS_PREFIX):
+        return first[0]
+    return None
+
+
 def restore_backup(path: Path | str, *, force: bool = False) -> RestoreReport:
-    """Put an archive back: database, then media, then migrations."""
+    """Put an archive back: database, then media and plugins, then migrations."""
+    from postulo.plugins import secrets
+
     path = Path(path)
     manifest = verify_backup(path)
     engine = manifest["database"]["engine"]
@@ -336,14 +490,27 @@ def restore_backup(path: Path | str, *, force: bool = False) -> RestoreReport:
         raise BackupError(
             f"This archive came from a {engine} database; this instance runs {database_vendor()}."
         )
+    # Asked before anything else touches the database, because on SQLite the question is
+    # answered by closing every connection and seeing whether the sidecars go with them.
+    if not force and (reason := busy_reason()):
+        raise BackupError(
+            f"Something else is using the database: {reason}. A restore overwrites it "
+            "underneath whatever is reading it. Stop the web service and the scheduler "
+            "first — in the container, `docker compose stop postulo scheduler`, then "
+            "`docker compose run --rm -e POSTULO_SKIP_MIGRATE=1 postulo python manage.py "
+            "restore ...` — or pass --force if you are certain nothing else is connected."
+        )
     if get_user_model().objects.exists() and not force:
         raise BackupError(
             "This instance is not empty. Restoring would replace everything on it; "
             "pass --force if that is what you mean."
         )
 
-    media_root = Path(settings.MEDIA_ROOT)
-    report = RestoreReport()
+    roots = {
+        MEDIA_PREFIX: Path(settings.MEDIA_ROOT),
+        PLUGINS_PREFIX: Path(settings.POSTULO_PLUGINS_DIR),
+    }
+    report = RestoreReport(plugins=list((manifest.get("plugins") or {}).get("installed") or []))
     with (
         tarfile.open(path, "r:gz") as archive,
         tempfile.TemporaryDirectory(prefix="postulo-restore-") as scratch,
@@ -356,26 +523,32 @@ def restore_backup(path: Path | str, *, force: bool = False) -> RestoreReport:
         with dump.open("wb") as out:
             shutil.copyfileobj(handle, out)
 
-        # Every media member is checked before anything is written, so a hostile archive
-        # writes nothing at all rather than half of something.
-        media_members = []
+        # Every member is checked before anything is written, so a hostile archive writes
+        # nothing at all rather than half of something.
+        files = []
         for entry in archive.getmembers():
             if entry.name == MANIFEST or entry.name == member:
                 continue
+            prefix = _prefix_of(entry.name)
+            if prefix is None:
+                raise BackupError(f"Unexpected member outside media/ and plugins/: {entry.name!r}")
             if entry.isdir():
-                if entry.name != MEDIA_PREFIX:
-                    _safe_media_path(entry.name)
+                if entry.name != prefix:
+                    _safe_member_path(entry.name, prefix)
                 continue
             if not entry.isfile():
                 raise BackupError(f"Refusing a member that is not a plain file: {entry.name!r}")
-            media_members.append((entry, _safe_media_path(entry.name)))
+            files.append((entry, prefix, _safe_member_path(entry.name, prefix)))
 
         load_database(dump, member)
 
-        for entry, relative in media_members:
-            destination = media_root / Path(*relative.parts)
+        for entry, prefix, relative in files:
+            destination = roots[prefix] / Path(*relative.parts)
             if destination.exists() and not force:
-                report.media_skipped += 1
+                if prefix == MEDIA_PREFIX:
+                    report.media_skipped += 1
+                else:
+                    report.plugins_skipped += 1
                 continue
             destination.parent.mkdir(parents=True, exist_ok=True)
             source = archive.extractfile(entry)
@@ -383,11 +556,18 @@ def restore_backup(path: Path | str, *, force: bool = False) -> RestoreReport:
                 continue
             with destination.open("wb") as out:
                 shutil.copyfileobj(source, out)
-            report.media_files += 1
+            if prefix == MEDIA_PREFIX:
+                report.media_files += 1
+            else:
+                report.plugin_files += 1
 
     # An older backup lands on a newer Postulo: bring it forward.
     call_command("migrate", interactive=False, verbosity=0)
     report.counts = _counts()
+    report.connections_with_secrets = _connections_with_secrets()
+    recorded = (manifest.get("secrets") or {}).get("field_key_sha256")
+    if recorded:
+        report.key_matches = recorded == secrets.fingerprint()
     return report
 
 
