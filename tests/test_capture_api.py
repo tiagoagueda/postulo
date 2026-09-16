@@ -272,9 +272,14 @@ RESULTS = (
 def announced(monkeypatch):
     """Every notification the API sends, in order."""
     sent = []
-    monkeypatch.setattr(
-        "postulo.api.api.notify", lambda owner, notification: sent.append(notification)
-    )
+
+    def recording(owner, notification):
+        # `notify` takes a notification or a function that builds one, and the API passes
+        # the latter so the words are made in the owner's language (#223). A double that
+        # only understands the first records a function and asserts against its repr.
+        sent.append(notification() if callable(notification) else notification)
+
+    monkeypatch.setattr("postulo.api.api.notify", recording)
     return sent
 
 

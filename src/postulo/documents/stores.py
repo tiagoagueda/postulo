@@ -47,6 +47,24 @@ def download_path(document) -> str:
 # ---------------------------------------------------------------------- metadata
 
 
+def _language_of(document, profile) -> str:
+    """What language a stored document is in: its own, else its owner's, else nothing.
+
+    An upload has no language of its own — nobody has told Postulo what is inside it — so
+    it keeps falling back to the person, which is the best available answer for a file
+    they chose themselves.
+    """
+    from .rendering import document_language
+
+    own = (getattr(document, "language", "") or "").strip()
+    if own:
+        return own
+    source = getattr(document, "source", None)
+    if source is not None:
+        return document_language(source)
+    return getattr(profile, "language", "") or ""
+
+
 def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
     """Describe a render or an upload for a store."""
     from postulo.notifications.base import absolute_url
@@ -85,7 +103,10 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
         role=role,
         application_url=application_url,
         sent_on=when.date() if origin == "render" and application is not None else None,
-        language=getattr(profile, "language", "") or "",
+        # The document's language, not the owner's (#223). A French CV filed in Paperless
+        # under the language its owner happens to read Postulo in is filed wrongly, and
+        # the whole point of sending it there is to find it again.
+        language=_language_of(document, profile),
         tags=("postulo", document.kind),
     )
 

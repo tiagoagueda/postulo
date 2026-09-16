@@ -65,6 +65,9 @@ def test_a_reminder_is_stamped_before_it_is_announced(user, monkeypatch):
         seen.append(Reminder.objects.get(pk=reminder.pk).notified_at)
         return 1
 
+    # `notify` may be handed a function that builds the notification (#223); these doubles
+    # stand in for it and so have to accept the same thing.
+
     monkeypatch.setattr(
         "postulo.notifications.management.commands.send_due_reminders.notify", watching
     )
@@ -83,7 +86,9 @@ def test_a_reminder_already_claimed_elsewhere_is_not_announced_again(user, monke
     sent = []
     monkeypatch.setattr(
         "postulo.notifications.management.commands.send_due_reminders.notify",
-        lambda owner, notification: sent.append(notification) or 1,
+        lambda owner, notification: (
+            sent.append(notification() if callable(notification) else notification) or 1
+        ),
     )
 
     assert announce_due_reminders() == (0, 0)
@@ -99,7 +104,8 @@ def test_one_reminder_that_raises_does_not_end_the_pass(user, monkeypatch):
     )
 
     def sometimes(owner, notification):
-        if notification.title == "Breaks":
+        message = notification() if callable(notification) else notification
+        if message.title == "Breaks":
             raise RuntimeError("the notifier exploded")
         return 1
 
@@ -118,6 +124,9 @@ def test_quiet_applications_are_claimed_before_the_message_goes(user, monkeypatc
     seen = []
 
     def watching(owner, notification):
+        # Resolved here, as `notify` resolves it, so the stamps are read at the moment the
+        # message is actually built.
+        notification() if callable(notification) else notification
         seen.append(list(Application.objects.values_list("quiet_announced_at", flat=True)))
         return 1
 

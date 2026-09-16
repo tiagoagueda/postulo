@@ -102,7 +102,9 @@ def announce_quiet_applications(at=None) -> tuple[int, int]:
         stamped += len(claimed)
         owner = claimed[0].owner
         try:
-            delivered += notify(owner, _announcement(claimed, now))
+            # Worded when it is sent rather than before, so the count, the days and the
+            # "and N more" come out in the language the person reads (#223).
+            delivered += notify(owner, lambda claimed=claimed: _announcement(claimed, now))
         except Exception:
             logger.exception("Could not announce quiet applications for owner %s", owner_id)
     return stamped, delivered

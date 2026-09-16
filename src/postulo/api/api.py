@@ -371,10 +371,15 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
     # silence about all of them.
     review_url = request.build_absolute_uri(reverse("jobs:capture_review", args=[capture.pk]))
     where = " · ".join(part for part in (data.company_name, data.location) if part)
+    # Worded inside `notify`, in the language the owner reads. A capture arrives through a
+    # token rather than a session, so there is no signed-in person for the middleware to
+    # follow and the request carries whatever `Accept-Language` the extension sent — which
+    # is the language of the browser that found the posting, not a choice anybody made
+    # about Postulo (#223).
     if batch is None:
         notify(
             owner,
-            Notification(
+            lambda: Notification(
                 event="capture_received",
                 title=str(_("Captured: %(title)s") % {"title": data.title}),
                 body=where,
@@ -384,7 +389,7 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
     elif batch.position == 1:
         notify(
             owner,
-            Notification(
+            lambda: Notification(
                 event="capture_received",
                 title=str(
                     _("Captured %(count)s postings from %(host)s")

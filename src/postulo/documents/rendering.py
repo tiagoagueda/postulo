@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
-from django.utils import timezone
+from django.utils import formats, timezone, translation
 from django.utils.text import slugify
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -36,6 +36,33 @@ SECTION_LABELS = {
     "certification": _("Certifications"),
     "languageskill": _("Languages"),
 }
+
+
+def document_holder(document) -> str:
+    """Whose document this is, in their own words, or empty if nothing says.
+
+    The name on the document rather than the name of the file it was filed under. Used for
+    the title a PDF viewer announces and the name it is downloaded with (#223).
+    """
+    owner = getattr(document, "owner", None)
+    if owner is None:
+        return ""
+    return (owner.get_full_name() or getattr(owner, "display_name", "") or "").strip()
+
+
+def document_title(document) -> str:
+    """What a PDF viewer shows and a screen reader announces for this document.
+
+    The holder's name and what the document is — "Alex Morgan — CV" — rather than the
+    variant's name, which is the person's own filing and is marked in the model as being
+    for them and not for the employer (#223). Called inside the language override, so the
+    word for the kind is in the document's language.
+    """
+    holder = document_holder(document)
+    kind = str(getattr(document, "get_kind_display", lambda: "")()) or ""
+    if holder and kind:
+        return gettext("%(name)s — %(kind)s") % {"name": holder, "kind": kind}
+    return holder or kind or getattr(document, "name", "")
 
 
 def document_language(document) -> str:
@@ -207,17 +234,25 @@ def render_cv_html(cv: CV) -> str:
 
     The kind decides which theme vocabulary sets it: a portfolio leads with the work and a
     CV with the career, and that is a difference in structure rather than in styling (#133).
+
+    Rendered in the document's own language (#223). #131 translated what the person wrote
+    and left the page around it in whatever language they happened to be reading Postulo
+    in, so a French CV exported by somebody browsing in English came out headed
+    "Experience" over "Mar 2021 – present" — a document that is half one language and half
+    another, sent to an employer who reads one of them.
     """
-    return render_to_string(
-        themes.template_for(cv.theme, cv.theme_kind),
-        {
-            "cv": cv,
-            "sections": build_sections(cv),
-            "contact": contact_details(cv.owner) if cv.show_contact_details else None,
-            "document_language": document_language(cv),
-            "document_direction": document_direction(cv),
-        },
-    )
+    with translation.override(document_language(cv)):
+        return render_to_string(
+            themes.template_for(cv.theme, cv.theme_kind),
+            {
+                "cv": cv,
+                "sections": build_sections(cv),
+                "contact": contact_details(cv.owner) if cv.show_contact_details else None,
+                "document_language": document_language(cv),
+                "document_direction": document_direction(cv),
+                "document_title": document_title(cv),
+            },
+        )
 
 
 def fill_placeholders(text: str, values: dict[str, str], *, mark_empty: bool = False) -> str:
@@ -253,7 +288,10 @@ def letter_values(letter: CoverLetter, application=None) -> dict[str, str]:
     owner = letter.owner
     values = {
         "name": owner.get_full_name() or owner.display_name,
-        "date": timezone.localdate().strftime("%-d %B %Y" if _supports_dash_day() else "%d %B %Y"),
+        # Through Django's formatter rather than `strftime`, which names the month from the
+        # C locale and so wrote an English month into every letter whatever language the
+        # letter was in (#223). Called inside the override, so it follows the letter.
+        "date": formats.date_format(timezone.localdate(), "j F Y"),
         "company": "",
         "role": "",
         "location": "",
@@ -285,37 +323,39 @@ def unfilled_placeholders(letter: CoverLetter, application=None) -> list[str]:
     return found
 
 
-def _supports_dash_day() -> bool:
-    """Whether strftime here understands %-d. It does not on Windows."""
-    try:
-        timezone.localdate().strftime("%-d")
-    except ValueError:
-        return False
-    return True
-
-
 def render_letter_html(letter: CoverLetter, application=None, *, mark_empty: bool = False) -> str:
-    """Render a cover letter, with its placeholders filled in."""
-    values = letter_values(letter, application)
-    return render_to_string(
-        themes.template_for(letter.theme, themes.Kind.LETTER),
-        {
-            "letter": letter,
-            "subject": fill_placeholders(letter.subject, values, mark_empty=mark_empty),
-            "body": fill_placeholders(letter.body, values, mark_empty=mark_empty),
-            "contact": contact_details(letter.owner),
-            "application": application,
-            "document_language": document_language(letter),
-            "document_direction": document_direction(letter),
-        },
-    )
+    """Render a cover letter, with its placeholders filled in.
+
+    In the letter's own language, and so is the date it carries (#223). A letter whose
+    `{{ date }}` was written in one language under a heading printed in another was the
+    plainest version of this: two dates, two languages, one page.
+    """
+    with translation.override(document_language(letter)):
+        values = letter_values(letter, application)
+        return render_to_string(
+            themes.template_for(letter.theme, themes.Kind.LETTER),
+            {
+                "letter": letter,
+                "subject": fill_placeholders(letter.subject, values, mark_empty=mark_empty),
+                "body": fill_placeholders(letter.body, values, mark_empty=mark_empty),
+                "contact": contact_details(letter.owner),
+                "application": application,
+                "document_language": document_language(letter),
+                "document_direction": document_direction(letter),
+                "document_title": document_title(letter),
+            },
+        )
 
 
 def letter_text(letter: CoverLetter, application=None, *, mark_empty: bool = False) -> str:
-    """The letter as plain text, for storing beside the PDF and for showing before it goes."""
-    values = letter_values(letter, application)
-    subject = fill_placeholders(letter.subject, values, mark_empty=mark_empty)
-    body = fill_placeholders(letter.body, values, mark_empty=mark_empty)
+    """The letter as plain text, for storing beside the PDF and for showing before it goes.
+
+    The same words as the PDF, so it is filled in the letter's language too (#223).
+    """
+    with translation.override(document_language(letter)):
+        values = letter_values(letter, application)
+        subject = fill_placeholders(letter.subject, values, mark_empty=mark_empty)
+        body = fill_placeholders(letter.body, values, mark_empty=mark_empty)
     return f"{subject}\n\n{body}".strip()
 
 
@@ -361,10 +401,12 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
     """
     html = render_cv_html(cv)
     content = html_to_pdf(html, backend=backend)
-    title = gettext("%(name)s — %(kind)s") % {
-        "name": cv.name,
-        "kind": str(cv.get_kind_display()),
-    }
+    # Named for whoever opens it, not for the shelf it was filed on (#223). The variant's
+    # name is the person's own filing — "Backend, English" — and the model's help text says
+    # so; it was going into the PDF's `/Title`, which a viewer shows in its title bar and a
+    # screen reader announces, and into the file name attached to portals and emails.
+    with translation.override(document_language(cv)):
+        title = document_title(cv)
 
     document = RenderedDocument(
         owner=cv.owner,
@@ -378,7 +420,7 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
         source_text=html,
         checksum=RenderedDocument.checksum_for(content),
     )
-    _keep(document, f"{slugify(cv.name) or 'cv'}.pdf", content)
+    _keep(document, f"{slugify(title) or 'cv'}.pdf", content)
     document.save()
     return document
 
@@ -420,10 +462,9 @@ def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> R
     """Freeze a cover letter as a PDF, with its placeholders already resolved."""
     html = render_letter_html(letter, application)
     content = html_to_pdf(html, backend=backend)
-    title = gettext("%(name)s — %(kind)s") % {
-        "name": letter.name,
-        "kind": str(letter.get_kind_display()).lower(),
-    }
+    # The recipient's name, not the person's own filing name for this draft (#223).
+    with translation.override(document_language(letter)):
+        title = document_title(letter)
 
     document = RenderedDocument(
         owner=letter.owner,
@@ -435,6 +476,6 @@ def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> R
         source_text=letter_text(letter, application),
         checksum=RenderedDocument.checksum_for(content),
     )
-    _keep(document, f"{slugify(letter.name) or 'cover-letter'}.pdf", content)
+    _keep(document, f"{slugify(title) or 'cover-letter'}.pdf", content)
     document.save()
     return document

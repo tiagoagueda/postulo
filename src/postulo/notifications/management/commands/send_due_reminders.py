@@ -60,21 +60,28 @@ def announce_due_reminders() -> tuple[int, int]:
             continue
         stamped += 1
         application = reminder.application
-        if application is not None:
-            posting = application.posting
-            body = _("%(role)s at %(company)s") % {
-                "role": posting.title,
-                "company": posting.company.name,
-            }
-            url = absolute_url(application.get_absolute_url())
-        else:
-            body = ""
-            url = absolute_url(reverse("applications:reminder_list"))
+
+        def announcement(reminder=reminder, application=application) -> Notification:
+            """Built when it is sent, so its words are in the recipient's language (#223).
+
+            Called by `notify` inside the override. The title is the person's own summary
+            and needs no translating; the line under it names the role and the employer,
+            and that sentence is ours.
+            """
+            if application is not None:
+                posting = application.posting
+                body = _("%(role)s at %(company)s") % {
+                    "role": posting.title,
+                    "company": posting.company.name,
+                }
+                url = absolute_url(application.get_absolute_url())
+            else:
+                body = ""
+                url = absolute_url(reverse("applications:reminder_list"))
+            return Notification(event="reminder_due", title=reminder.summary, body=body, url=url)
+
         try:
-            delivered += notify(
-                reminder.owner,
-                Notification(event="reminder_due", title=reminder.summary, body=body, url=url),
-            )
+            delivered += notify(reminder.owner, announcement)
         except Exception:
             # One reminder whose application lost its company, or one notifier raising
             # something nobody anticipated, used to end the pass -- and everything after it

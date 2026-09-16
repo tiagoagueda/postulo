@@ -773,6 +773,36 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **A document now speaks its own language, and a message speaks the reader's.** Nothing
+  anywhere switched translation away from the language of the request, which is the wrong
+  answer in exactly the two places it matters.
+
+  A CV or a letter declares a language. The words the person wrote were translated by #131;
+  the page around them was not, so a French CV exported by somebody reading Postulo in
+  English came back headed *Experience* over *Mar 2021 – present*, and a letter could carry
+  two dates in two languages — one from the template, one from the `{{ date }}` placeholder,
+  which was built by `strftime` and so was always English whatever anybody had chosen. Both
+  are now rendered in the document's own language, falling back to its owner's and then to
+  the instance default, and the date is written the way that language writes dates.
+
+  A copy sent to an external store was labelled with the owner's interface language rather
+  than the document's, so a French CV arrived in Paperless filed as English — and finding it
+  again is the whole reason it was sent there. A render is now filed under its own language;
+  an upload, which has no language of its own, still follows the person who uploaded it.
+
+  The title a PDF viewer shows in its title bar, and that a screen reader announces, was the
+  variant's name — *Backend, English* — which is the person's private filing and is marked in
+  Postulo as being for them and not for the employer. It is the holder's name and what the
+  document is now, and so is the file name that gets attached to portals and emails.
+
+  And a notification is worded in the language of whoever receives it. A reminder announced
+  by the scheduler had no request to take a language from, so it came out in the instance
+  default however the person had set Postulo up; one announced by a capture arriving through
+  the API followed the `Accept-Language` of whatever tool sent it. Since a notification
+  carries words that are already written, switching language as it was sent would have been
+  too late — the message is built inside the override now, and the sentence a person reads at
+  three in the morning is in their own language. (#223)
+
 - **The PDFs Postulo writes are documents now, rather than pictures of documents.** Nothing
   they contained had any structure: a screen reader had no headings to move between, whatever
   an employer's applicant tracking system read the file back with got the words in the order

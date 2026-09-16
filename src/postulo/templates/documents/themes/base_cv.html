@@ -18,7 +18,12 @@
 <html lang="{{ document_language }}" dir="{{ document_direction|default:'ltr' }}">
   <head>
     <meta charset="utf-8">
-    <title>{{ cv.name }}</title>
+{% comment %}
+  The title a PDF viewer shows in its title bar and a screen reader announces, so it
+  names the person rather than the shelf: the variant's own name is somebody's private
+  filing -- "Backend, English" -- and the model's help text says as much (#223).
+{% endcomment %}
+    <title>{{ document_title }}</title>
     {% comment %} Only where the contact block is shown. Somebody who left their name off a
        CV on purpose did not mean "except in the file's properties". {% endcomment %}
     {% if contact %}<meta name="author" content="{{ contact.name }}">{% endif %}

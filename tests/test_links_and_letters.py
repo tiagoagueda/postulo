@@ -303,7 +303,10 @@ def test_a_render_is_filed_under_the_kind_of_letter_it_came_from(user, applicati
     )
     document = snapshot_letter(motivation, application=application, backend=FakeBackend())
     assert document.kind == DocumentKind.MOTIVATION_LETTER
-    assert "motivation letter" in document.title
+    # The title names the holder and the kind since #223 — "Alex Morgan — Motivation
+    # letter" — so the kind is capitalised here as it is on a CV. What this test is about
+    # is that the kind the letter came from reaches the filed document, which it does.
+    assert "motivation letter" in document.title.lower()
 
     cover = CoverLetter.objects.create(owner=user, name="Short", body="Dear …")
     assert snapshot_letter(cover, backend=FakeBackend()).kind == DocumentKind.COVER_LETTER
