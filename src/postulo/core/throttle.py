@@ -123,7 +123,12 @@ def rate_for(name: str) -> Rate:
 
 
 def capture(user) -> None:
-    """The tightest of the three: this one makes the server talk to somebody else's."""
+    """The tightest of the three: this one makes the server talk to somebody else's.
+
+    Spent on both surfaces that can cause that fetch -- the web form and the capture API --
+    against the one account's allowance, because the thing being bounded is the act and not
+    the door it came through (#194).
+    """
     consume("capture", user, rate_for("POSTULO_CAPTURE_RATE"))
 
 

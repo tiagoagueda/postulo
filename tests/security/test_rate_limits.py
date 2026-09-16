@@ -14,6 +14,7 @@ mechanism.
 
 from __future__ import annotations
 
+import json
 import time
 
 import pytest
@@ -22,6 +23,7 @@ from django.test import override_settings
 from django.urls import reverse
 
 from postulo.core import throttle
+from postulo.plugins.fetching import FetchedPage
 
 pytestmark = pytest.mark.django_db
 
@@ -226,6 +228,126 @@ def test_a_refused_token_is_not_a_wrong_token(client, person):
     client.get("/api/v1/me", headers=headers)
 
     assert client.get("/api/v1/me", headers=headers).status_code == 429
+
+
+# ------------------------------------------------------------------ the capture API
+
+#: Enough JSON-LD to be read as a posting, so a capture that is allowed through answers 201
+#: and the refusals below are unmistakably the limit rather than an unreadable page.
+A_POSTING = (
+    '<html><head><script type="application/ld+json">'
+    '{"@context": "https://schema.org/", "@type": "JobPosting", "title": "Research Engineer",'
+    ' "hiringOrganization": {"name": "Black Mesa"}, "description": "<p>Science.</p>"}'
+    "</script></head></html>"
+)
+
+
+@pytest.fixture
+def never_fetches(monkeypatch):
+    """Fetching, without anything leaving the machine — and a count of how often."""
+    calls = []
+
+    def fetched(url):
+        calls.append(url)
+        return FetchedPage(url=url, html=A_POSTING)
+
+    monkeypatch.setattr("postulo.api.api.fetch_page", fetched)
+    return calls
+
+
+def api_capture(client, raw, *, html=None, url="https://example.org/jobs/1"):
+    payload = {"url": url} if html is None else {"url": url, "html": html}
+    return client.post(
+        "/api/v1/captures",
+        data=json.dumps(payload),
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {raw}"},
+    )
+
+
+@override_settings(POSTULO_CAPTURE_RATE="2/h", POSTULO_API_RATE="600/h")
+def test_the_api_spends_the_capture_allowance_when_it_fetches(client, person, never_fetches):
+    """The limit is about the outbound fetch, not about which door asked for it (#194).
+
+    It was applied only on the form, so the same fetch was available here at the API rate —
+    twenty times as fast, and against a token rather than against the person holding it.
+    """
+    raw = token_for(person, scopes=("captures",))
+
+    for _ in range(2):
+        assert api_capture(client, raw).status_code == 201
+
+    refused = api_capture(client, raw)
+
+    assert refused.status_code == 429
+    assert "Too many" in refused.json()["detail"]
+    # A program is what gets refused here, so it is told when to come back, not only that
+    # it was too quick.
+    assert int(refused["Retry-After"]) > 0
+    assert len(never_fetches) == 2, "the refused capture must not have dialled anybody"
+
+
+@override_settings(POSTULO_CAPTURE_RATE="1/h", POSTULO_API_RATE="600/h")
+def test_a_capture_that_brings_its_page_is_not_counted(client, person, never_fetches):
+    """Forty from one results page is the extension working, not an instance being ridden.
+
+    Nothing goes out when the caller sends the page it is already looking at (#177), so
+    there is no outbound fetch to bound and the API rate is what these answer to. This is
+    the one place the API is deliberately looser than the form, which counts a pasted page
+    because a form submits one at a time.
+    """
+    raw = token_for(person, scopes=("captures",))
+
+    for index in range(40):
+        response = api_capture(client, raw, html=A_POSTING, url=f"https://example.org/jobs/{index}")
+        assert response.status_code == 201, response.content
+
+    assert never_fetches == []
+
+
+@override_settings(POSTULO_CAPTURE_RATE="1/h", POSTULO_API_RATE="600/h")
+def test_a_preview_fetches_and_so_is_counted(client, person, never_fetches):
+    raw = token_for(person, scopes=("captures",))
+    headers = {"Authorization": f"Bearer {raw}"}
+    body = json.dumps({"url": "https://example.org/jobs/1"})
+    first = client.post(
+        "/api/v1/captures/preview", data=body, content_type="application/json", headers=headers
+    )
+    assert first.status_code == 200
+
+    refused = client.post(
+        "/api/v1/captures/preview", data=body, content_type="application/json", headers=headers
+    )
+
+    assert refused.status_code == 429
+
+
+@override_settings(POSTULO_CAPTURE_RATE="1/h", POSTULO_API_RATE="600/h")
+def test_the_form_and_the_api_share_one_account_allowance(client, person, never_fetches):
+    """A second token is not a second allowance: the account is the thing being limited."""
+    client.force_login(person)
+    capture_once(client)
+
+    raw = token_for(person, scopes=("captures",))
+
+    assert api_capture(client, raw).status_code == 429
+
+
+@override_settings(POSTULO_CAPTURE_RATE="1/h", POSTULO_API_RATE="600/h")
+def test_two_accounts_do_not_share_the_api_capture_allowance(client, person, other, never_fetches):
+    mine, theirs = token_for(person, scopes=("captures",)), token_for(other, scopes=("captures",))
+    assert api_capture(client, mine).status_code == 201
+    assert api_capture(client, mine).status_code == 429
+
+    assert api_capture(client, theirs).status_code == 201
+
+
+@override_settings(POSTULO_CAPTURE_RATE="", POSTULO_API_RATE="600/h")
+def test_an_operator_can_switch_the_api_capture_limit_off_too(client, person, never_fetches):
+    raw = token_for(person, scopes=("captures",))
+
+    for _ in range(6):
+        assert api_capture(client, raw).status_code == 201
 
 
 # ---------------------------------------------------- the endpoints a token guards

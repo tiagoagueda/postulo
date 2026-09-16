@@ -30,6 +30,7 @@ from ninja.errors import HttpError, ValidationError
 from pydantic import AfterValidator, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
 
+from postulo.core import throttle
 from postulo.core.addresses import page_address
 from postulo.jobs.known import known
 from postulo.jobs.models import Capture, CaptureStatus
@@ -65,6 +66,20 @@ api = NinjaAPI(
         "through the same services as the forms; `documents:read` downloads files."
     ),
 )
+
+
+@api.exception_handler(throttle.TooOften)
+def _too_often(request, exc: throttle.TooOften):
+    """A spent allowance, said the way a client can act on: 429, `detail`, `Retry-After`.
+
+    A header rather than only a sentence, because the caller refused here is a program --
+    a browser extension sending a results page, a script importing a hundred postings --
+    and the useful answer to "not yet" is *when*. `TooOften` already knows how long is
+    left of the window.
+    """
+    response = api.create_response(request, {"detail": str(exc)}, status=429)
+    response["Retry-After"] = str(exc.retry_after)
+    return response
 
 
 #: The address of a page that was read. Only the scheme is held to, for the reason
@@ -252,7 +267,7 @@ def create_capture(request, payload: CaptureIn):
     token: ApiToken = request.auth
     owner = token.owner
 
-    url, data, source = _read(payload)
+    url, data, source = _read(payload, owner)
     if payload.data is not None:
         corrections = payload.data.model_dump(exclude_unset=True)
         try:
@@ -337,12 +352,29 @@ def preview_capture(request, payload: PageIn):
     correct it first: a browser extension's popup. Nothing is created and nobody is
     notified; the same page sent to ``POST /captures`` afterwards is read again.
     """
-    url, data, source = _read(payload)
+    url, data, source = _read(payload, request.auth.owner)
     return {"url": url, "source": source.name, "data": data}
 
 
-def _read(payload: PageIn):
-    """The page's address, what it was read as, and the source that read it; or a 422."""
+def _read(payload: PageIn, owner):
+    """The page's address, what it was read as, and the source that read it; or a 422.
+
+    The capture limit is spent here, on the branch that fetches, so that it bounds the *act*
+    of making this server dial an address somebody else chose rather than the door that act
+    came through. It was applied only on the web form, leaving the same outbound fetch
+    available through this API at the API rate -- twenty times as fast, and to a token rather
+    than to the person holding it (#194). It is the account's allowance, shared with the form:
+    an account is the thing being limited, and a second token is not a second allowance.
+
+    A capture that brings its own ``html`` fetches nothing and is not counted, which is the
+    difference from the form. The form counts those because the parse is still work somebody
+    asked for, and a form submits one at a time; here they are how the browser extension sends
+    a results page -- forty in one gesture (#177) -- and the API rate is what bounds them.
+    """
+    if not payload.html:
+        # Raised, not caught: `_too_often` above turns it into the 429 with its `Retry-After`.
+        throttle.capture(owner)
+
     try:
         if payload.html:
             url, html = payload.url, payload.html

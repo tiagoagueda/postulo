@@ -8,6 +8,22 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **The capture limit now bounds captures, not the form.** `POSTULO_CAPTURE_RATE` is the
+  tightest limit Postulo ships — 30 an hour — because capture is the one thing that makes
+  your server issue an outbound request to an address somebody else chose. It was applied
+  only on the web form. The capture API makes the same fetch and was bounded by nothing but
+  `POSTULO_API_RATE`, so the thing the tight limit exists for was available at twenty times
+  the rate, and a token handed to something that misbehaves held the whole of that allowance
+  on its own. The limit is now spent wherever the fetch happens, against the owner's account,
+  so the form and the API share one ceiling and a second token is not a second allowance.
+
+  A capture that arrives with its own `html` fetches nothing and is not counted: that is how
+  a browser extension hands over a posting only a signed-in reader can see, and how forty
+  from one results page arrive in one gesture. Those answer to the API rate, as they did. A
+  capture refused here is a `429` carrying in `detail` the same sentence the form shows, and
+  now a `Retry-After` header as well — what an API refuses is a program, and the useful answer
+  to *not yet* is *when*. (#194)
+
 - **Nothing captured from a stranger's page can act once it leaves Postulo.** Three exports
   carried text somebody else wrote into a place that reads text as instructions. The report
   CSV exists to be handed to an employment office and opened in a spreadsheet, where a
