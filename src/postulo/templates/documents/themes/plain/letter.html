@@ -8,14 +8,16 @@
       }
 
       @page { size: A4; margin: 22mm; }
-      body { margin: 0; color: #16181d; }
+      /* A long address in a letterhead breaks rather than running off the page (#235). */
+      body { margin: 0; color: #16181d; overflow-wrap: anywhere; }
       p { margin: 0; }
       .sender { margin-bottom: 24px; }
       .name { font-weight: 600; font-size: 13pt; }
       .details { color: #4a4f5a; font-size: 9pt; margin-top: 3px; }
-      .details span:not(:last-child)::after { content: " · "; }
       .recipient { margin-bottom: 18px; }
       .date { margin-bottom: 18px; color: #4a4f5a; }
-      .subject { font-weight: 600; margin-bottom: 16px; }
+      /* The subject is an `<h1>` so that the PDF has something to navigate to; it is still
+         set as a line of the letter rather than as a title. */
+      .subject { font-size: inherit; font-weight: 600; margin: 0 0 16px; }
       .body p { margin-bottom: 11px; }
 {% endblock %}

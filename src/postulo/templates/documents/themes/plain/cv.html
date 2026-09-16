@@ -9,21 +9,26 @@
 
       @page { size: A4; margin: 18mm; }
       * { box-sizing: border-box; }
-      body { margin: 0; color: #16181d; }
+      /* A 120-character address has nowhere to wrap, so without this it ran off the page
+         edge and out of the PDF entirely. `anywhere` rather than `break-word` because only
+         `anywhere` shrinks the minimum width a flex item claims, which is what holds the
+         column beside the dates open (#235). */
+      body { margin: 0; color: #16181d; overflow-wrap: anywhere; }
       h1 { margin: 0 0 2px; font-size: 20pt; letter-spacing: -0.01em; }
       h2 { margin: 0 0 8px; }
+      h3 { margin: 0; font-size: inherit; font-weight: 600; }
       p { margin: 0; }
       ul { margin: 6px 0 0; padding-inline-start: 16px; }
       li { margin-bottom: 2px; }
       .headline { color: #4a4f5a; }
       .details { margin-top: 6px; color: #4a4f5a; font-size: 8.5pt; }
-      .details span:not(:last-child)::after { content: " · "; }
       .summary { margin: 14px 0; }
       .block { margin-top: 16px; }
       /* Never orphan a heading or split a single job across a page break. */
       .block h2 { break-after: avoid; }
       .entry { margin-bottom: 12px; break-inside: avoid; }
       .entry-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+      .entry-head > div { min-width: 0; }
       .role { font-weight: 600; }
       .org { color: #4a4f5a; }
       .dates { color: #6b7280; white-space: nowrap; font-variant-numeric: tabular-nums; }

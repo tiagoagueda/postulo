@@ -318,6 +318,7 @@ def test_what_is_held_between_the_two_steps_is_the_record_and_not_the_file(clien
     held = client.session["europass_import_data"]
     assert set(held) == {
         "person",
+        "locale",
         "experience",
         "education",
         "languages",
@@ -570,3 +571,113 @@ def test_what_could_not_be_written_is_said_after_the_import(client, user):
     response = client.post(url, {"action": "confirm"}, follow=True)
 
     assert b"no start date, so it was not added" in response.content
+
+
+# ------------------------------------------ what the file says, and what it does not (#235)
+
+
+NO_LEVELS = b"""<?xml version="1.0"?>
+<SkillsPassport xmlns="http://europass.cedefop.europa.eu/Europass" locale="pt-PT">
+  <LearnerInfo>
+    <Skills>
+      <Linguistic>
+        <ForeignLanguage><Description><Label>Deutsch</Label></Description></ForeignLanguage>
+      </Linguistic>
+      <JobRelated><Description><Label>Gestao de projeto</Label></Description></JobRelated>
+    </Skills>
+  </LearnerInfo>
+</SkillsPassport>
+"""
+
+
+def test_a_language_with_no_level_in_the_file_claims_none(user):
+    """`or "b1"` put a claim on somebody's CV that they had never made."""
+    record = europass.read(NO_LEVELS)
+    assert record.languages[0]["proficiency"] == ""
+
+    importing.apply(user, record)
+
+    assert LanguageSkill.objects.get(owner=user, name="Deutsch").proficiency == ""
+
+
+def test_a_level_that_was_never_stated_prints_nothing_at_all(user):
+    """ "Not stated" on a CV is worse than silence, and a dangling dash is worse than either."""
+    from django.contrib.contenttypes.models import ContentType
+
+    from postulo.documents.models import CV, CVItem
+    from postulo.documents.rendering import render_cv_html
+
+    importing.apply(user, europass.read(NO_LEVELS))
+    language = LanguageSkill.objects.get(owner=user, name="Deutsch")
+    cv = CV.objects.create(owner=user, name="Backend")
+    CVItem.objects.create(
+        owner=user,
+        cv=cv,
+        content_type=ContentType.objects.get_for_model(LanguageSkill),
+        object_id=language.pk,
+        order=0,
+    )
+
+    html = render_cv_html(cv)
+
+    assert "Deutsch" in html
+    assert "Deutsch —" not in html
+
+
+def test_the_language_of_the_record_comes_from_the_file(user):
+    """Every export says which language it is in, and until now nothing here read it."""
+    importing.apply(user, europass.read(NO_LEVELS))
+
+    user.profile.refresh_from_db()
+    assert user.profile.record_language == "pt-pt"
+
+
+def test_a_language_of_the_record_already_chosen_is_left_alone(user):
+    """An import fills blanks, and somebody's own answer about themselves is not a blank."""
+    user.profile.record_language = "fr"
+    user.profile.save(update_fields=["record_language"])
+
+    importing.apply(user, europass.read(NO_LEVELS))
+
+    user.profile.refresh_from_db()
+    assert user.profile.record_language == "fr"
+
+
+@pytest.mark.parametrize("value", [b"", b"not a language at all", b"../../etc/passwd"])
+def test_a_locale_that_is_not_a_language_tag_is_dropped(value):
+    """It is a file from somewhere else, and this one ends up in a column."""
+    data = NO_LEVELS.replace(b'locale="pt-PT"', b'locale="' + value + b'"')
+
+    assert europass.read(data).locale == ""
+
+
+def test_the_json_carries_its_locale_too():
+    assert europass.read(JSON_FIXTURE.read_bytes()).locale == "en"
+
+
+def test_a_skill_heading_is_written_in_the_language_being_read():
+    """ "Job-related" is a heading on somebody's CV, and a Portuguese record had it in English.
+
+    The .mo files are built at packaging time and the suite runs without them, so the two
+    properties that make the translation work are what is checked here rather than the
+    Portuguese words: each label is lazy, so it is resolved in the language the file is being
+    read in rather than the one the server started in, and what reaches the record is a plain
+    string, because the session holding it between the review page and the confirmation is
+    JSON and a lazy string is not JSON.
+    """
+    from django.utils.functional import Promise
+
+    assert all(isinstance(label, Promise) for _heading, label in europass.SKILL_HEADINGS)
+
+    record = europass.read(NO_LEVELS)
+
+    assert type(record.skill_groups[0]["name"]) is str
+
+
+def test_the_review_page_says_that_no_level_will_be_claimed(client, user):
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+
+    client.post(url, {"file": upload("cv.xml", NO_LEVELS)})
+
+    assert "no level in the file" in client.get(url).content.decode()

@@ -773,6 +773,63 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The PDFs Postulo writes are documents now, rather than pictures of documents.** Nothing
+  they contained had any structure: a screen reader had no headings to move between, whatever
+  an employer's applicant tracking system read the file back with got the words in the order
+  they happened to be drawn in, and the language every document has declared since #67 reached
+  a reader through a tag tree that was never written. Both renderers are asked for one now —
+  WeasyPrint for `pdf/ua-1`, Chromium for `tagged` and `outline` — and the markup gives them
+  something to build it from: a job title is a heading under its section's heading instead of
+  a bold paragraph, a letter's subject is the letter's one heading, and the file carries its
+  author, which WeasyPrint reads out of the document rather than taking as an argument. A CV
+  whose contact block is deliberately switched off still names nobody, in the file's properties
+  as on the page.
+
+  Deliberately not PDF/A, which is tagged as well and archival besides. PDF/A is a promise that
+  the file will still render identically in fifty years, and it is kept by embedding an ICC
+  output intent and every font the document uses. Postulo cannot make that promise about a
+  theme a plugin ships (#132), and a conformance claim that cannot be honoured is worse than
+  one that was never made.
+
+  A long address used to run off the edge of the page and out of the file with it: a
+  hundred-and-twenty-character link has nowhere to wrap, and the column it sat in was sized by
+  its own content, so it pushed itself past the margin. Every theme breaks one now. The contact
+  line's separators were a CSS `::after`, and generated content is painted onto the page and
+  never written into its text — so whatever read the PDF back got the telephone number run into
+  the email address with nothing between them. They are real characters in the markup now, and
+  a theme picks which character by overriding a block instead of redeclaring a rule.
+
+  **The arrows on a CV** still had the bug #203 fixed on the career page. They nudged the order
+  number by one, so *up* at the top did nothing at all, one *down* could jump past every entry
+  that shared a number, and two entries two numbers apart needed two presses, the first of them
+  invisible. They swap with the neighbour the page drew and renumber the CV densely afterwards,
+  which is the same thing the career page does and the same code doing it; at either end the
+  arrow is greyed out rather than removed, so the pair keeps its shape. An entry added to a CV
+  takes the number after the last one instead of the count, which after a removal was a number
+  something already on the page had, and the new entry landed in the middle of it.
+
+  **A cover letter can be read the way the employer will read it.** The preview was reachable
+  only without an application — the one version of a letter nobody ever sends, because every
+  placeholder in it is empty — so the letter's page now offers the applications to read it
+  against. A placeholder Postulo knows and has nothing to fill is drawn as a marker in the
+  preview rather than as nothing, which is the difference between seeing a gap and reading
+  "Dear ,". *Send* puts the filled letter in front of you before freezing it where there is a
+  gap, and only where there is one: a step everybody has to press through is read once and
+  clicked past for ever after. `?application=abc` used to reach the database as a primary key
+  and come back as a 500; it means what it says now, which is no application. And there is a
+  `{{ contact }}` placeholder, because the follow-up starter has asked for a name in square
+  brackets since it was written and the application already knew whose.
+
+  **The Europass import stops inventing things.** A file that states no CEFR level for a
+  language had one invented for it — B1 — and printed on a CV; a level is a claim about
+  yourself that somebody will test in an interview, so a language may now say that its level
+  was never stated, and says nothing at all when it does. Every export names the language it
+  was written in and nothing here read it, so a career typed in Portuguese arrived with a blank
+  record language and the fallback warnings from #131 then fired on every entry of a CV that
+  needed no translation whatsoever. And the skill headings an import writes — "Digital",
+  "Job-related" — were fixed English words even on a Portuguese record; they are translated
+  now, out of the europass plugin's own catalogues, because core never translates a plugin's
+  strings. (#235)
 - **Keyboard and focus failings that every accessibility check passed.** Seven of them, found
   by using Postulo rather than by scanning it. axe reads a document: it cannot press Tab and
   say where focus landed, it cannot tell that one letter fires an action nobody can switch

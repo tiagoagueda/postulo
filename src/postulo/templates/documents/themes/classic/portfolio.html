@@ -1,5 +1,9 @@
 {% extends "documents/themes/base_portfolio.html" %}
 
+{% comment %} A pipe, as this theme's contact line has always drawn -- a real character in
+   the markup now rather than a CSS `::after` nothing reads back (#235). {% endcomment %}
+{% block detail_separator %} | {% endblock %}
+
 {% block page_styles %}
       body {
         font-family: "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
@@ -9,7 +13,9 @@
 
       @page { size: A4; margin: 18mm; }
       * { box-sizing: border-box; }
-      body { margin: 0; color: #16181d; }
+      /* A long address breaks rather than running off the page edge (#235). */
+      body { margin: 0; color: #16181d; overflow-wrap: anywhere; }
+      h3 { margin: 0; font-size: inherit; font-weight: 600; }
       p { margin: 0; }
       ul { margin: 6px 0 0; padding-inline-start: 16px; }
       li { margin-bottom: 3px; }
@@ -19,7 +25,6 @@
       .block { margin-top: 16px; }
       .block h2 { break-after: avoid; }
       .contact { text-align: center; border-bottom: 2px solid #16181d; padding-bottom: 10px; }
-      .contact .details span:not(:last-child)::after { content: " | "; }
       h1 { margin: 0 0 2px; font-size: 22pt; font-variant: small-caps; letter-spacing: 0.02em; }
       h2 {
         font-size: 11pt;
@@ -32,6 +37,7 @@
       /* The work is the argument, so a piece gets room and never splits across a page. */
       .piece { margin-bottom: 14px; break-inside: avoid; }
       .piece-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+      .piece-head .piece-name { min-width: 0; }
       .piece-name { font-weight: 600; font-size: 12pt; }
       .org { color: #4a4f5a; }
       .dates { color: #6b7280; white-space: nowrap; font-variant-numeric: tabular-nums; }

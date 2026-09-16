@@ -514,3 +514,398 @@ def test_a_snapshot_is_delivered_only_to_its_owner(client, user, other_user, cv,
 
     client.force_login(other_user)
     assert client.get(reverse("documents:rendered_download", args=[document.pk])).status_code == 404
+
+
+# ------------------------------------------------- what the renderers are asked for (#235)
+
+
+class RecordingDocument:
+    """A WeasyPrint document that draws nothing and remembers what it was asked for."""
+
+    def __init__(self, asked: dict) -> None:
+        self.asked = asked
+
+    def write_pdf(self, **options):
+        self.asked.update(options)
+        return b"%PDF-1.7 recorded"
+
+
+def test_weasyprint_is_asked_for_a_tagged_pdf(monkeypatch):
+    """Asserted through a stand-in, because WeasyPrint needs Pango and Windows has none.
+
+    `tests/test_pdf_render.py` checks that these options really do produce a tag tree, and
+    runs only where Pango is installed. This checks that they are asked for at all, and runs
+    everywhere -- including on the machine most of Postulo is written on.
+    """
+    asked: dict = {}
+    monkeypatch.setattr(WeasyPrintBackend, "document", lambda self, html: RecordingDocument(asked))
+
+    assert WeasyPrintBackend().render("<html lang='en'></html>") == b"%PDF-1.7 recorded"
+    assert asked == {"pdf_variant": "pdf/ua-1"}
+
+
+def test_the_variant_is_a_tagged_one_rather_than_an_archival_one():
+    """PDF/A needs an output intent and embedded fonts, which a plugin's theme cannot promise."""
+    from postulo.documents import pdf
+
+    assert pdf.WEASYPRINT_PDF_OPTIONS["pdf_variant"].startswith("pdf/ua")
+
+
+def test_neither_argument_that_built_its_own_fetcher_is_passed():
+    """CVE-2026-55073, which #163 closed: `stylesheets` and `xmp_metadata` ignored the fetcher."""
+    from postulo.documents import pdf
+
+    assert not {"stylesheets", "xmp_metadata"} & set(pdf.WEASYPRINT_PDF_OPTIONS)
+
+
+def test_chromium_is_asked_for_a_tag_tree_and_an_outline(monkeypatch):
+    """The fallback has to produce the same document, and spells the request differently."""
+    import playwright.sync_api
+
+    from postulo.documents import pdf
+
+    asked: dict = {}
+
+    class Page:
+        def route(self, *args, **kwargs):
+            pass
+
+        def set_content(self, *args, **kwargs):
+            pass
+
+        def pdf(self, **options):
+            asked.update(options)
+            return b"%PDF-1.7 chromium"
+
+    class Browser:
+        def new_page(self):
+            return Page()
+
+        def close(self):
+            pass
+
+    class Chromium:
+        def launch(self):
+            return Browser()
+
+    class Playwright:
+        chromium = Chromium()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    monkeypatch.setattr(playwright.sync_api, "sync_playwright", Playwright)
+
+    assert pdf.ChromiumBackend().render("<html></html>") == b"%PDF-1.7 chromium"
+    assert asked["tagged"] is True
+    assert asked["outline"] is True
+
+
+# ---------------------------------------------- structure and metadata in the markup (#235)
+
+
+def test_a_cv_names_its_author(cv, user):
+    """WeasyPrint reads the author out of the document, so the markup is the only place."""
+    html = render_cv_html(cv)
+
+    assert '<meta name="author"' in html
+    assert user.display_name in html
+
+
+def test_a_cv_with_its_contact_block_off_names_nobody(cv):
+    """Turning the contact block off did not mean "except in the file's properties"."""
+    cv.show_contact_details = False
+    cv.save()
+
+    assert '<meta name="author"' not in render_cv_html(cv)
+
+
+def test_an_entry_title_is_a_heading(cv):
+    """A job title inside a `<p>` is nothing a screen reader or an ATS can navigate to."""
+    html = render_cv_html(cv)
+
+    assert "<h3" in html
+    assert '<p class="role">' not in html
+
+
+def test_a_letters_subject_is_a_heading(letter):
+    html = render_letter_html(letter)
+
+    assert "<h1" in html
+    assert '<p class="subject">' not in html
+
+
+def test_the_contact_details_carry_their_own_separator(cv, user):
+    """A CSS `::after` is generated content, and generated content is not a PDF's text.
+
+    Something reading the file back -- an applicant tracking system, `pdftotext`, a screen
+    reader -- got the telephone number run into the email address with nothing between them,
+    because the dot was drawn and never written.
+    """
+    user.profile.location = "Lisbon"
+    user.profile.save(update_fields=["location"])
+
+    html = render_cv_html(cv)
+
+    assert f"<span>{user.email}</span>" in html
+    assert "<span>Lisbon</span>" in html
+    assert "·" in html, "a real character, in the markup"
+    assert "::after" not in html
+
+
+def test_every_theme_lets_a_long_word_break():
+    """A 120-character address in a fixed column runs off the page and out of the file."""
+    from pathlib import Path
+
+    themes = sorted(Path("src/postulo/templates/documents/themes").glob("*/*.html"))
+    assert themes, "the themes moved"
+    for path in themes:
+        assert "overflow-wrap: anywhere" in path.read_text(encoding="utf-8"), path
+
+
+# --------------------------------------------------------- the arrows on a CV (#203, #235)
+
+
+def order_of(cv) -> list[int]:
+    return [item.pk for item in cv.items.order_by("order", "pk")]
+
+
+@pytest.fixture
+def three_on_a_cv(db, user, cv):
+    """Two more entries beside the fixture's, all three sharing a number to begin with."""
+    for name in ("French", "German"):
+        language = LanguageSkill.objects.create(owner=user, name=name, proficiency="b2")
+        CVItem.objects.create(
+            owner=user,
+            cv=cv,
+            content_type=ContentType.objects.get_for_model(LanguageSkill),
+            object_id=language.pk,
+            order=0,
+        )
+    return cv
+
+
+def test_moving_an_entry_down_passes_exactly_one_neighbour(client, user, three_on_a_cv):
+    first, second, third = order_of(three_on_a_cv)
+    client.force_login(user)
+
+    client.post(reverse("documents:cv_item_move", args=[first, "down"]))
+
+    assert order_of(three_on_a_cv) == [second, first, third]
+
+
+def test_entries_sharing_a_number_still_move_visibly(client, user, three_on_a_cv):
+    """Every entry here starts at 0. Nudging the number by one moved nothing a person saw."""
+    first, second, third = order_of(three_on_a_cv)
+    client.force_login(user)
+
+    client.post(reverse("documents:cv_item_move", args=[third, "up"]))
+
+    assert order_of(three_on_a_cv) == [first, third, second]
+    assert sorted(item.order for item in three_on_a_cv.items.all()) == [0, 1, 2]
+
+
+def test_up_at_the_top_and_down_at_the_bottom_change_nothing(client, user, three_on_a_cv):
+    before = order_of(three_on_a_cv)
+    client.force_login(user)
+
+    client.post(reverse("documents:cv_item_move", args=[before[0], "up"]))
+    client.post(reverse("documents:cv_item_move", args=[before[-1], "down"]))
+
+    assert order_of(three_on_a_cv) == before
+
+
+def test_the_arrows_are_greyed_out_at_either_end(client, user, three_on_a_cv):
+    """The pair keeps its shape, so the one somebody reaches for is where it was (#203)."""
+    client.force_login(user)
+
+    page = client.get(three_on_a_cv.get_absolute_url()).content.decode()
+
+    assert page.count("disabled") == 2, "one at each end of the list, and nowhere else"
+
+
+def test_one_cvs_entries_are_not_anothers_neighbours(client, user, cv):
+    """`ordering.siblings` would have answered with every CVItem this person owns."""
+    second = CV.objects.create(owner=user, name="Frontend")
+    language = LanguageSkill.objects.create(owner=user, name="French", proficiency="b2")
+    elsewhere = CVItem.objects.create(
+        owner=user,
+        cv=second,
+        content_type=ContentType.objects.get_for_model(LanguageSkill),
+        object_id=language.pk,
+        order=0,
+    )
+    only = cv.items.get()
+    client.force_login(user)
+
+    client.post(reverse("documents:cv_item_move", args=[only.pk, "down"]))
+
+    elsewhere.refresh_from_db()
+    only.refresh_from_db()
+    assert only.order == 0, "it is alone on its own CV, so there is nowhere to go"
+    assert elsewhere.order == 0, "and the other CV was not touched"
+
+
+def test_an_entry_added_after_a_removal_lands_at_the_end(client, user, cv, experience):
+    """`count + added` produced a number something on the CV already had."""
+    from postulo.resume.models import Project
+
+    kept = LanguageSkill.objects.create(owner=user, name="French", proficiency="b2")
+    CVItem.objects.create(
+        owner=user,
+        cv=cv,
+        content_type=ContentType.objects.get_for_model(LanguageSkill),
+        object_id=kept.pk,
+        order=1,
+    )
+    cv.items.filter(content_type=ContentType.objects.get_for_model(Experience)).delete()
+    project = Project.objects.create(owner=user, name="Something new")
+    client.force_login(user)
+
+    client.post(reverse("documents:cv_add_items", args=[cv.pk]), {"add_project": [str(project.pk)]})
+
+    added = cv.items.get(content_type=ContentType.objects.get_for_model(Project))
+    assert order_of(cv)[-1] == added.pk
+    assert sorted(item.order for item in cv.items.all()) == [0, 1]
+
+
+# ------------------------------------------------------------ the letter preview (#235)
+
+
+def test_a_query_parameter_that_is_not_a_number_is_not_an_error(client, user, letter):
+    """`?application=abc` reached `filter(pk=...)` and came back out as a 500."""
+    client.force_login(user)
+
+    response = client.get(
+        reverse("documents:letter_preview", args=[letter.pk]), {"application": "abc"}
+    )
+
+    assert response.status_code == 200
+
+
+def test_the_preview_reads_for_the_application_it_is_given(client, user, letter, application):
+    client.force_login(user)
+
+    page = client.get(
+        reverse("documents:letter_preview", args=[letter.pk]), {"application": application.pk}
+    ).content.decode()
+
+    assert "Black Mesa" in page
+
+
+def test_another_persons_application_fills_in_nothing(client, other_user, application, db):
+    theirs = CoverLetter.objects.create(owner=other_user, name="Theirs", body="Dear {{ company }},")
+    client.force_login(other_user)
+
+    page = client.get(
+        reverse("documents:letter_preview", args=[theirs.pk]), {"application": application.pk}
+    ).content.decode()
+
+    assert "Black Mesa" not in page
+
+
+def test_a_placeholder_with_nothing_behind_it_is_marked_in_the_preview(client, user, letter):
+    """ "Dear ," is a sentence with a word missing; a marker is a gap somebody can see."""
+    client.force_login(user)
+
+    page = client.get(reverse("documents:letter_preview", args=[letter.pk])).content.decode()
+
+    assert "[ company ]" in page
+    assert "Dear ," not in page
+
+
+def test_a_marker_never_reaches_a_document_that_goes_out(letter, fake_backend):
+    """A preview is for reading. What is frozen is the letter, gaps and all."""
+    document = snapshot_letter(letter, backend=fake_backend)
+
+    assert "[ company ]" not in document.source_text
+    assert "[ company ]" not in fake_backend.rendered[0]
+
+
+def test_the_letter_page_offers_an_application_to_read_it_against(
+    client, user, letter, application
+):
+    """The preview was reachable only without an application -- the one version nobody sends."""
+    client.force_login(user)
+
+    page = client.get(letter.get_absolute_url()).content.decode()
+
+    assert "Research Engineer" in page
+    assert f'value="{application.pk}"' in page
+
+
+def test_the_contact_placeholder_is_the_person_on_the_application(db, user, application):
+    """The follow-up starter has asked for "[name]" since it was written."""
+    from postulo.jobs.models import Contact
+
+    application.contact = Contact.objects.create(
+        owner=user, company=application.posting.company, name="Dr Kleiner"
+    )
+    application.save(update_fields=["contact"])
+    letter = CoverLetter.objects.create(owner=user, name="Follow-up", body="Dear {{ contact }},")
+
+    assert "Dear Dr Kleiner," in render_letter_html(letter, application)
+
+
+def test_a_letter_with_a_gap_is_shown_before_it_is_frozen(client, user, letter, application):
+    """Freezing showed nobody the text being frozen, so a gap was found in the PDF afterwards."""
+    application.posting.location = ""
+    application.posting.save(update_fields=["location"])
+    letter.body = "Dear {{ company }}, about {{ role }} in {{ location }}."
+    letter.save(update_fields=["body"])
+    client.force_login(user)
+
+    response = client.post(
+        reverse("documents:send", args=[application.pk]), {"cover_letter": str(letter.pk)}
+    )
+    page = response.content.decode()
+
+    assert response.status_code == 200, "nothing was frozen yet"
+    assert "[ location ]" in page
+    assert not RenderedDocument.objects.filter(owner=user).exists()
+
+
+def test_pressing_through_the_warning_freezes_it_gaps_and_all(
+    client, user, letter, application, monkeypatch
+):
+    """The warning is a warning, not a refusal: a gap is sometimes what somebody means."""
+    from postulo.documents import rendering as rendering_module
+
+    application.posting.location = ""
+    application.posting.save(update_fields=["location"])
+    letter.body = "Dear {{ company }}, about {{ role }} in {{ location }}."
+    letter.save(update_fields=["body"])
+    monkeypatch.setattr(rendering_module, "html_to_pdf", lambda html, backend=None: b"%PDF-1.7")
+    client.force_login(user)
+
+    response = client.post(
+        reverse("documents:send", args=[application.pk]),
+        {"cover_letter": str(letter.pk), "confirmed": "1"},
+    )
+
+    assert response.status_code == 302
+    document = RenderedDocument.objects.get(owner=user)
+    assert "[ location ]" not in document.source_text, "the marker is for reading, not for sending"
+
+
+def test_a_letter_with_nothing_missing_is_frozen_without_an_extra_press(
+    client, user, letter, application, monkeypatch
+):
+    """An extra step everybody has to press through is read once and clicked past for ever."""
+    from postulo.documents import rendering as rendering_module
+
+    letter.subject = "About {{ role }}"
+    letter.body = "Dear {{ company }}, I am writing about {{ role }}."
+    letter.save(update_fields=["subject", "body"])
+    monkeypatch.setattr(rendering_module, "html_to_pdf", lambda html, backend=None: b"%PDF-1.7")
+    client.force_login(user)
+
+    response = client.post(
+        reverse("documents:send", args=[application.pk]), {"cover_letter": str(letter.pk)}
+    )
+
+    assert response.status_code == 302
+    assert RenderedDocument.objects.filter(owner=user).count() == 1

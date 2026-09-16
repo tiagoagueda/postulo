@@ -35,7 +35,12 @@ DIRECTIONS = ("up", "down")
 
 
 def siblings(item) -> list:
-    """Every entry in the same section of the same person's record, as the page draws them."""
+    """Every entry in the same section of the same person's record, as the page draws them.
+
+    The default answer, and the right one for a career section. It is not the only shape a
+    row of arrows has: a CV's entries are one list per CV rather than one per model, so the
+    caller there hands the neighbours in itself through ``among`` (#235).
+    """
     return list(type(item).objects.for_user(item.owner).order_by("order", "pk"))
 
 
@@ -47,11 +52,15 @@ def renumber(items: list) -> None:
             entry.save(update_fields=["order", "updated_at"])
 
 
-def move(item, direction: str) -> bool:
-    """Swap the entry with its neighbour above or below. ``False`` when there is none."""
+def move(item, direction: str, *, among=None) -> bool:
+    """Swap the entry with its neighbour above or below. ``False`` when there is none.
+
+    ``among`` is the list the page drew, for a row of arrows whose neighbours are not simply
+    every entry of that model: on a CV it is that CV's entries, in the order shown.
+    """
     if direction not in DIRECTIONS:
         return False
-    items = siblings(item)
+    items = list(among) if among is not None else siblings(item)
     index = next((i for i, entry in enumerate(items) if entry.pk == item.pk), None)
     if index is None:
         return False

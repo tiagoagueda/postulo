@@ -85,15 +85,20 @@
                   </p>
                 </div>
                 <div class="flex flex-wrap items-center gap-1">
+                  {% comment %} Up swaps with the entry above and down with the one below, the
+                     same fix the career page got in #203 and this row was left out of. At
+                     either end the arrow is disabled rather than absent, so the pair keeps
+                     its shape and the one somebody reaches for is where it was (#235).
+                  {% endcomment %}
                   <form method="post" action="{% url 'documents:cv_item_move' item.pk 'up' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn-ghost px-2 py-1 text-xs"
-                            aria-label="{% translate 'Move up' %}">↑</button>
+                            aria-label="{% translate 'Move up' %}"{% if forloop.first %} disabled{% endif %}>↑</button>
                   </form>
                   <form method="post" action="{% url 'documents:cv_item_move' item.pk 'down' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn-ghost px-2 py-1 text-xs"
-                            aria-label="{% translate 'Move down' %}">↓</button>
+                            aria-label="{% translate 'Move down' %}"{% if forloop.last %} disabled{% endif %}>↓</button>
                   </form>
                   <a href="{% url 'documents:cv_item_update' item.pk %}"
                      class="btn-ghost px-2 py-1 text-xs">{% translate "Tailor" %}</a>

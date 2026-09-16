@@ -188,8 +188,15 @@ class Certification(ResumeItem):
 
 
 class Proficiency(models.TextChoices):
-    """The Common European Framework levels, plus the two ends people actually write."""
+    """The Common European Framework levels, plus the two ends people actually write.
 
+    And one more: **not stated**. A level is a claim about yourself that somebody will test
+    in an interview, so there has to be a way of not making one -- a Europass file with no
+    CEFR level in it used to import as B1, which is a claim Postulo invented on the person's
+    behalf and put on their CV (#235). An unset level prints nothing at all.
+    """
+
+    UNSET = "", _("Not stated")
     A1 = "a1", _("A1 — beginner")
     A2 = "a2", _("A2 — elementary")
     B1 = "b1", _("B1 — intermediate")
@@ -204,7 +211,14 @@ class LanguageSkill(ResumeItem):
 
     name = models.CharField(_("language"), max_length=100)
     proficiency = models.CharField(
-        _("proficiency"), max_length=10, choices=Proficiency, default=Proficiency.B2
+        _("proficiency"),
+        max_length=10,
+        choices=Proficiency,
+        default=Proficiency.B2,
+        # Blank is a real answer here, so the form must accept it. The default is untouched:
+        # somebody adding a language by hand is saying something about themselves, and B2 is
+        # still the likeliest thing they mean to say.
+        blank=True,
     )
 
     class Meta(ResumeItem.Meta):

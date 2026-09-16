@@ -42,6 +42,32 @@ CHROMIUM_HINT = _(
     "Install it with: uv sync --extra chromium, then: uv run playwright install chromium"
 )
 
+#: What WeasyPrint is asked to write, kept out here so that what a document asks for can be
+#: read -- and asserted -- on a machine where WeasyPrint itself will not import (#235).
+#:
+#: ``pdf/ua-1`` is PDF/UA-1, and in WeasyPrint it means exactly two things: PDF 1.7, and a
+#: **tag tree**. Without one a PDF is a picture of a document -- a screen reader has no
+#: headings to jump between, and an applicant tracking system reading the file back gets the
+#: words in whatever order they were drawn in. The `lang` every document has declared since
+#: #67 reaches a reader through that tree and through nothing else, so until this it was a
+#: promise made to nobody.
+#:
+#: **Not PDF/A**, though `pdf/a-3a` is tagged as well and archival besides. PDF/A is a
+#: promise that the file will still render identically in fifty years, and it is kept by
+#: embedding an ICC output intent and every font the document uses. Postulo cannot make that
+#: promise about a theme a plugin ships (#132): the theme names fonts, the fonts are
+#: whatever the server happens to have, and a variant that cannot be honoured is worse than
+#: one that was never claimed. PDF/UA claims only what this markup can actually deliver.
+#:
+#: Note what is *not* here: `stylesheets` and `xmp_metadata`, the two `write_pdf` arguments
+#: that built their own fetcher until WeasyPrint 70 (CVE-2026-55073). A variant writes its
+#: own XMP from the document already in hand and fetches nothing, so #163 still holds.
+WEASYPRINT_PDF_OPTIONS = {"pdf_variant": "pdf/ua-1"}
+
+#: The same two things asked of Chromium, which spells them differently. ``outline`` is the
+#: bookmark tree, which WeasyPrint writes from the headings without being asked.
+CHROMIUM_PDF_OPTIONS = {"tagged": True, "outline": True}
+
 
 class PDFBackendUnavailable(RuntimeError):
     """Raised when no PDF backend is usable, or the named one is not."""
@@ -86,10 +112,10 @@ class WeasyPrintBackend:
         return _is_importable("weasyprint")
 
     def render(self, html: str) -> bytes:
-        # Nothing but the document goes to `write_pdf`. Its `stylesheets` and `xmp_metadata`
-        # arguments were the two that ignored the document's fetcher and built one of their
-        # own until WeasyPrint 70 (CVE-2026-55073); Postulo passes neither (#163).
-        return self.document(html).write_pdf()
+        # Nothing but the document and the variant goes to `write_pdf`. Its `stylesheets` and
+        # `xmp_metadata` arguments were the two that ignored the document's fetcher and built
+        # one of their own until WeasyPrint 70 (CVE-2026-55073); Postulo passes neither (#163).
+        return self.document(html).write_pdf(**WEASYPRINT_PDF_OPTIONS)
 
     def document(self, html: str):
         """The WeasyPrint document `render` writes, holding the only fetcher it may use."""
@@ -146,6 +172,7 @@ class ChromiumBackend:
                         "left": PAGE_MARGIN,
                         "right": PAGE_MARGIN,
                     },
+                    **CHROMIUM_PDF_OPTIONS,
                 )
             finally:
                 browser.close()

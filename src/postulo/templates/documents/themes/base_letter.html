@@ -8,15 +8,17 @@
   <head>
     <meta charset="utf-8">
     <title>{{ letter.name }}</title>
+    {% comment %} The author, which WeasyPrint reads out of the document and puts in the
+       file's properties. A letter always carries its sender, so there is no choice to
+       respect here as there is on a CV (#235). {% endcomment %}
+    <meta name="author" content="{{ contact.name }}">
     <style>{% block page_styles %}{% endblock %}</style>
   </head>
   <body>
     <header class="sender">
       <p class="name">{{ contact.name }}</p>
       <p class="details">
-        {% if contact.email %}<span>{{ contact.email }}</span>{% endif %}
-        {% if contact.phone %}<span>{{ contact.phone }}</span>{% endif %}
-        {% if contact.location %}<span>{{ contact.location }}</span>{% endif %}
+        {% for part in contact.brief_details %}{% if not forloop.first %}<span class="sep">{% block detail_separator %} · {% endblock %}</span>{% endif %}<span>{{ part }}</span>{% endfor %}
       </p>
     </header>
 
@@ -26,7 +28,9 @@
 
     <p class="date">{% now "j F Y" %}</p>
 
-    {% if subject %}<p class="subject">{{ subject }}</p>{% endif %}
+    {% comment %} The subject is the letter's one heading, so it is one: without it the PDF
+       has a tag tree with nothing in it to navigate to (#235). {% endcomment %}
+    {% if subject %}<h1 class="subject">{{ subject }}</h1>{% endif %}
 
     <div class="body">{{ body|linebreaks }}</div>
   </body>

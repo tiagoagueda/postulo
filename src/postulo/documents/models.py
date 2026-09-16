@@ -306,6 +306,9 @@ class CoverLetter(OwnedModel):
         "company": _("The company you are applying to"),
         "role": _("The job title"),
         "location": _("Where the role is based"),
+        # The application's main contact. The follow-up starter has asked for a name in
+        # square brackets since it was written, and the application already knew it (#235).
+        "contact": _("The person you are writing to, if the application names one"),
         "name": _("Your own name"),
         "date": _("Today's date"),
     }

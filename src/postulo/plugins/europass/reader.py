@@ -79,15 +79,26 @@ CEFR = {"A1": "a1", "A2": "a2", "B1": "b1", "B2": "b2", "C1": "c1", "C2": "c2"}
 CEFR_PARTS = ("Listening", "Reading", "SpokenInteraction", "SpokenProduction", "Writing")
 
 #: The Europass headings for free-prose skills, and what Postulo calls each group.
+#:
+#: The heading on the left is the tag, which Europass writes in English whatever language
+#: the file is in. The name on the right is a **heading on somebody's CV**, so it is
+#: translated: a Portuguese record used to arrive with a section called "Job-related" in it,
+#: which is not a word its owner would have written (#235). Europass ships its own
+#: catalogues, because core never translates a plugin's strings.
 SKILL_HEADINGS = (
-    ("Computer", "Digital"),
-    ("Organisational", "Organisational"),
-    ("Communication", "Communication"),
-    ("JobRelated", "Job-related"),
-    ("Other", "Other"),
+    ("Computer", _("Digital")),
+    ("Organisational", _("Organisational")),
+    ("Communication", _("Communication")),
+    ("JobRelated", _("Job-related")),
+    ("Other", _("Other")),
 )
 
 _ORDER = list(CEFR.values())
+
+#: What a `locale` has to look like before it is believed: a language, optionally a script
+#: or a region. A file from somewhere else can put anything in that attribute, and this one
+#: ends up in a column and in a language negotiation, so it is matched rather than trusted.
+LOCALE_PATTERN = re.compile(r"^[A-Za-z]{2,3}(?:[-_][A-Za-z0-9]{2,8}){0,2}$")
 
 
 class EuropassError(ImportRefused):
@@ -179,6 +190,21 @@ def _orcid_from(addresses: list[str]) -> str:
         except ValidationError:
             continue
     return ""
+
+
+def _locale(value) -> str:
+    """The language a file says it is in, normalised the way Postulo writes one.
+
+    Europass puts it on the wrapper -- ``locale="pt"`` on the XML, ``"Locale": "pt"`` in the
+    JSON -- and it is the only statement anywhere in the file about what language the career
+    itself is written in. Anything that is not a language tag is dropped rather than stored.
+    """
+    text = str(value or "").strip().replace("_", "-")
+    if not LOCALE_PATTERN.match(text):
+        return ""
+    # Lower case throughout, which is how Django writes a language code and therefore what
+    # `record_language` holds and what `translating.normalise` compares.
+    return text.lower()
 
 
 def _project_from(title: str, description: str) -> dict | None:
@@ -299,7 +325,9 @@ def read_xml(data: bytes) -> Record:
             _("That does not look like a Europass file: it has no LearnerInfo section.")
         )
 
-    record = Record(source="xml")
+    # On the wrapper, not on LearnerInfo -- and a file handed over as a bare LearnerInfo has
+    # no wrapper to carry it, which is a blank rather than a guess.
+    record = Record(source="xml", locale=_locale(root.get("locale")))
     _read_person(learner, record)
     _read_experience(learner, record)
     _read_education(learner, record)
@@ -446,7 +474,9 @@ def _read_skills(learner, record: Record) -> None:
         )
         lines = _split_skills(prose)
         if lines:
-            record.skill_groups.append({"name": label, "skills": lines[:40]})
+            # `str()` now rather than a lazy string: what is read is held in the session
+            # between the review page and the confirmation, and a session is JSON.
+            record.skill_groups.append({"name": str(label), "skills": lines[:40]})
 
 
 def _read_achievements(learner, record: Record) -> None:
@@ -583,7 +613,10 @@ def read_json(data: bytes) -> Record:
             _("That does not look like a Europass file: it has no LearnerInfo section.")
         )
 
-    record = Record(source="json")
+    record = Record(
+        source="json",
+        locale=_locale(_dig(document, "SkillsPassport", "Locale") or _dig(document, "Locale")),
+    )
     _read_json_person(learner, record)
     _read_json_experience(learner, record)
     _read_json_education(learner, record)
@@ -713,7 +746,7 @@ def _read_json_skills(learner: dict, record: Record) -> None:
             continue
         lines = _split_skills(_json_text(block, "Description", keep_lines=True))
         if lines:
-            record.skill_groups.append({"name": label, "skills": lines[:40]})
+            record.skill_groups.append({"name": str(label), "skills": lines[:40]})
 
 
 def _read_json_achievements(learner: dict, record: Record) -> None:

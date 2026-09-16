@@ -1,5 +1,10 @@
 {% extends "documents/themes/base_cv.html" %}
 
+{% comment %} A pipe rather than a dot, as this theme's contact line has always drawn. It
+   is a real character in the markup now instead of a CSS `::after`, so it is a block a
+   theme overrides rather than a rule it redeclares (#235). {% endcomment %}
+{% block detail_separator %} | {% endblock %}
+
 {% block page_styles %}
       body {
         font-family: "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
@@ -9,27 +14,29 @@
 
       @page { size: A4; margin: 18mm; }
       * { box-sizing: border-box; }
-      body { margin: 0; color: #16181d; }
+      /* A long address breaks rather than running off the page, and `anywhere` is the one
+         that also shrinks what a flex item claims beside the dates (#235). */
+      body { margin: 0; color: #16181d; overflow-wrap: anywhere; }
       h1 { margin: 0 0 2px; font-size: 20pt; letter-spacing: -0.01em; }
       h2 { margin: 0 0 8px; }
+      h3 { margin: 0; font-size: inherit; font-weight: 600; }
       p { margin: 0; }
       ul { margin: 6px 0 0; padding-inline-start: 16px; }
       li { margin-bottom: 2px; }
       .headline { color: #4a4f5a; }
       .details { margin-top: 6px; color: #4a4f5a; font-size: 8.5pt; }
-      .details span:not(:last-child)::after { content: " · "; }
       .summary { margin: 14px 0; }
       .block { margin-top: 16px; }
       /* Never orphan a heading or split a single job across a page break. */
       .block h2 { break-after: avoid; }
       .entry { margin-bottom: 12px; break-inside: avoid; }
       .entry-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+      .entry-head > div { min-width: 0; }
       .role { font-weight: 600; }
       .org { color: #4a4f5a; }
       .dates { color: #6b7280; white-space: nowrap; font-variant-numeric: tabular-nums; }
       .summary-line { margin-top: 4px; }
       .contact { text-align: center; border-bottom: 2px solid #16181d; padding-bottom: 10px; }
-      .contact .details span:not(:last-child)::after { content: " | "; }
       h1 { font-size: 22pt; font-variant: small-caps; letter-spacing: 0.02em; }
       h2 {
         font-size: 11pt;

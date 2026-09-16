@@ -9,14 +9,16 @@
 
       @page { size: A4; margin: 18mm; }
       * { box-sizing: border-box; }
-      body { margin: 0; color: #16181d; }
+      /* `.where` has broken long addresses since this theme was written; this is the same
+         guarantee for every other line on the page, the flex rows included (#235). */
+      body { margin: 0; color: #16181d; overflow-wrap: anywhere; }
       h1 { margin: 0 0 2px; font-size: 20pt; letter-spacing: -0.01em; }
+      h3 { margin: 0; font-size: inherit; font-weight: 600; }
       p { margin: 0; }
       ul { margin: 6px 0 0; padding-inline-start: 16px; }
       li { margin-bottom: 3px; }
       .headline { color: #4a4f5a; }
       .details { margin-top: 6px; color: #4a4f5a; font-size: 8.5pt; }
-      .details span:not(:last-child)::after { content: " · "; }
       .summary { margin: 14px 0; }
       .block { margin-top: 16px; }
       .block h2 { break-after: avoid; }
@@ -32,6 +34,7 @@
       /* The work is the argument, so a piece gets room and never splits across a page. */
       .piece { margin-bottom: 14px; break-inside: avoid; }
       .piece-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+      .piece-head .piece-name { min-width: 0; }
       .piece-name { font-weight: 600; font-size: 11.5pt; }
       .org { color: #4a4f5a; }
       .dates { color: #6b7280; white-space: nowrap; font-variant-numeric: tabular-nums; }

@@ -39,6 +39,12 @@ class Record:
     projects: list[dict] = field(default_factory=list)
     #: Which of the two formats this came out of: ``"xml"`` or ``"json"``.
     source: str = ""
+    #: The language the file says it was written in, as it wrote it. Every Europass export
+    #: carries one and Postulo read none of them, so a career typed in Portuguese arrived
+    #: with `record_language` blank -- which means "the same as the interface", and the
+    #: fallback warnings from #131 then fired on every entry of a CV that needed no
+    #: translation at all (#235).
+    locale: str = ""
     #: What was in the file and could not be read, in words, to be shown before importing.
     skipped: list[str] = field(default_factory=list)
 
@@ -113,13 +119,20 @@ def apply(owner, record: Record) -> Report:
     report = Report()
 
     profile = getattr(owner, "profile", None)
-    if profile is not None and record.person:
+    # The locale is worth writing even where a file carries no personal details at all: it
+    # is about the career record, not about the person (#235).
+    if profile is not None and (record.person or record.locale.strip()):
         changed = []
         for field_name in ("headline", "location"):
             value = record.person.get(field_name)
             if value and not getattr(profile, field_name, ""):
                 setattr(profile, field_name, value[:200])
                 changed.append(field_name)
+        # What language the career itself is written in, which the file has always said and
+        # nothing here read. Same rule as every other field: only where it is blank (#235).
+        if record.locale.strip() and not profile.record_language:
+            profile.record_language = record.locale.strip()[:10]
+            changed.append("record_language")
         # The website is a row of its own now (#189), filled on the same terms as the
         # number below: only where there is nothing, so an import never overwrites what
         # somebody typed.
@@ -208,10 +221,14 @@ def apply(owner, record: Record) -> Report:
         report.added["education"] = report.added.get("education", 0) + 1
 
     for entry in record.languages:
+        # A level the file did not state is left unset rather than guessed at. `or "b1"`
+        # meant that anybody whose Europass CV listed a language without CEFR levels -- which
+        # is most of them, because the editor never made the five boxes compulsory -- ended
+        # up claiming B1 in it, on a CV, without ever having said so (#235).
         LanguageSkill.objects.create(
             owner=owner,
             name=entry["name"][:100],
-            proficiency=entry["proficiency"] or "b1",
+            proficiency=entry["proficiency"],
         )
         report.added["languages"] = report.added.get("languages", 0) + 1
 

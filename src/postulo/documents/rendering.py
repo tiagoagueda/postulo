@@ -19,6 +19,13 @@ from .pdf import html_to_pdf
 #: Only these placeholders are substituted, and only these.
 PLACEHOLDER_PATTERN = re.compile(r"\{\{\s*(\w+)\s*\}\}")
 
+#: How a placeholder with nothing to put in it is drawn in a *preview*, and never in a
+#: document that goes out. A known placeholder whose value is empty used to become an empty
+#: string in both, so "Dear {{ company }}," previewed as "Dear ," and a posting with no
+#: location sent a gap somebody only found afterwards. The name is kept inside the marker so
+#: that what is missing is the thing named (#235).
+MISSING_PLACEHOLDER = "[ %s ]"
+
 #: Headings for each kind of CV entry, in the order they appear if nothing says otherwise.
 SECTION_LABELS = {
     "experience": _("Experience"),
@@ -156,7 +163,8 @@ def contact_details(owner) -> dict:
         row = links.get(kind)
         return row.url if row else ""
 
-    return {
+    identifiers = list(profile.identifiers.all()) if profile is not None else []
+    details = {
         "name": owner.get_full_name() or owner.display_name,
         "email": owner.email,
         "headline": getattr(profile, "headline", ""),
@@ -166,8 +174,32 @@ def contact_details(owner) -> dict:
         "linkedin_url": link(web_links.Kind.SOCIAL),
         "source_repo_url": link(web_links.Kind.REPOSITORY),
         # Beside the website and the LinkedIn address, which is where a reader looks.
-        "identifiers": list(profile.identifiers.all()) if profile is not None else [],
+        "identifiers": identifiers,
     }
+    # The same details again as an ordered list, so a theme can put a *real character*
+    # between them. They were separated by a CSS `::after`, and generated content is not in
+    # the text a PDF hands back: an applicant tracking system, `pdftotext` or a screen
+    # reader got the telephone number run into the email address with nothing between them
+    # (#235). Every key above is still here and still means what it did, because a theme a
+    # plugin ships reads those by name (#189).
+    details["details"] = [
+        part
+        for part in (
+            details["email"],
+            details["phone"],
+            *(f"{row.display_label} {row.value}" for row in identifiers),
+            details["location"],
+            details["website"],
+            details["linkedin_url"],
+            details["source_repo_url"],
+        )
+        if part
+    ]
+    # A letter's sender block, which has always shown the three a letterhead has room for.
+    details["brief_details"] = [
+        part for part in (details["email"], details["phone"], details["location"]) if part
+    ]
+    return details
 
 
 def render_cv_html(cv: CV) -> str:
@@ -188,7 +220,7 @@ def render_cv_html(cv: CV) -> str:
     )
 
 
-def fill_placeholders(text: str, values: dict[str, str]) -> str:
+def fill_placeholders(text: str, values: dict[str, str], *, mark_empty: bool = False) -> str:
     """Substitute ``{{ name }}`` placeholders from ``values``.
 
     Deliberately *not* Django's template engine. A cover letter is text a person wrote,
@@ -198,11 +230,20 @@ def fill_placeholders(text: str, values: dict[str, str]) -> str:
 
     Unknown placeholders are left alone rather than blanked, so a typo is visible in the
     draft instead of silently deleting a word.
+
+    ``mark_empty`` is for a preview: a placeholder Postulo knows but has nothing to fill it
+    with is drawn as a marker rather than as the nothing it will become, so that the gap is
+    something a person can see before it goes out (#235).
     """
 
     def replace(match: re.Match) -> str:
         key = match.group(1)
-        return values.get(key, match.group(0))
+        if key not in values:
+            return match.group(0)
+        value = values[key]
+        if not value and mark_empty:
+            return MISSING_PLACEHOLDER % key
+        return value
 
     return PLACEHOLDER_PATTERN.sub(replace, text or "")
 
@@ -216,12 +257,32 @@ def letter_values(letter: CoverLetter, application=None) -> dict[str, str]:
         "company": "",
         "role": "",
         "location": "",
+        # Who the letter is addressed to. The follow-up starter has asked for "[name]" in
+        # square brackets since it was written, which is a placeholder Postulo could fill
+        # and did not offer -- the application already knows who you spoke to (#235).
+        "contact": "",
     }
     if application is not None:
         values["company"] = application.posting.company.name
         values["role"] = application.posting.title
         values["location"] = application.posting.location
+        values["contact"] = application.contact.name if application.contact_id else ""
     return values
+
+
+def unfilled_placeholders(letter: CoverLetter, application=None) -> list[str]:
+    """The placeholders this letter uses that there is nothing to fill in, in order.
+
+    What a warning before freezing is made of. A placeholder nothing recognises is not in
+    here: that is a typo, it survives into the document as the literal text somebody typed,
+    and it is visible in the draft already.
+    """
+    values = letter_values(letter, application)
+    found: list[str] = []
+    for key in PLACEHOLDER_PATTERN.findall(f"{letter.subject}\n{letter.body or ''}"):
+        if key in values and not values[key] and key not in found:
+            found.append(key)
+    return found
 
 
 def _supports_dash_day() -> bool:
@@ -233,15 +294,15 @@ def _supports_dash_day() -> bool:
     return True
 
 
-def render_letter_html(letter: CoverLetter, application=None) -> str:
+def render_letter_html(letter: CoverLetter, application=None, *, mark_empty: bool = False) -> str:
     """Render a cover letter, with its placeholders filled in."""
     values = letter_values(letter, application)
     return render_to_string(
         themes.template_for(letter.theme, themes.Kind.LETTER),
         {
             "letter": letter,
-            "subject": fill_placeholders(letter.subject, values),
-            "body": fill_placeholders(letter.body, values),
+            "subject": fill_placeholders(letter.subject, values, mark_empty=mark_empty),
+            "body": fill_placeholders(letter.body, values, mark_empty=mark_empty),
             "contact": contact_details(letter.owner),
             "application": application,
             "document_language": document_language(letter),
@@ -250,11 +311,11 @@ def render_letter_html(letter: CoverLetter, application=None) -> str:
     )
 
 
-def letter_text(letter: CoverLetter, application=None) -> str:
-    """The letter as plain text, for storing beside the PDF."""
+def letter_text(letter: CoverLetter, application=None, *, mark_empty: bool = False) -> str:
+    """The letter as plain text, for storing beside the PDF and for showing before it goes."""
     values = letter_values(letter, application)
-    subject = fill_placeholders(letter.subject, values)
-    body = fill_placeholders(letter.body, values)
+    subject = fill_placeholders(letter.subject, values, mark_empty=mark_empty)
+    body = fill_placeholders(letter.body, values, mark_empty=mark_empty)
     return f"{subject}\n\n{body}".strip()
 
 

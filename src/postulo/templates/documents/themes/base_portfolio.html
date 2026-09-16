@@ -17,6 +17,7 @@
   <head>
     <meta charset="utf-8">
     <title>{{ cv.name }}</title>
+    {% if contact %}<meta name="author" content="{{ contact.name }}">{% endif %}
     <style>{% block page_styles %}{% endblock %}</style>
   </head>
   <body>
@@ -28,15 +29,7 @@
           <p class="headline">{{ cv.headline|default:contact.headline }}</p>
         {% endif %}
         <p class="details">
-          {% if contact.email %}<span>{{ contact.email }}</span>{% endif %}
-          {% if contact.phone %}<span>{{ contact.phone }}</span>{% endif %}
-          {% for identifier in contact.identifiers %}
-            <span>{{ identifier.display_label }} {{ identifier.value }}</span>
-          {% endfor %}
-          {% if contact.location %}<span>{{ contact.location }}</span>{% endif %}
-          {% if contact.website %}<span>{{ contact.website }}</span>{% endif %}
-          {% if contact.linkedin_url %}<span>{{ contact.linkedin_url }}</span>{% endif %}
-          {% if contact.source_repo_url %}<span>{{ contact.source_repo_url }}</span>{% endif %}
+          {% for part in contact.details %}{% if not forloop.first %}<span class="sep">{% block detail_separator %} · {% endblock %}</span>{% endif %}<span>{{ part }}</span>{% endfor %}
         </p>
       </header>
     {% elif cv.headline %}
@@ -58,7 +51,9 @@
           {% for entry in section.items %}
             <article class="piece">
               <div class="piece-head">
-                <p class="piece-name"><bdi>{{ entry.item.name }}</bdi></p>
+                {% comment %} A heading, not a bold paragraph: it is what a reader navigates
+                   the file by, and what the PDF's outline is made of (#235). {% endcomment %}
+                <h3 class="piece-name"><bdi>{{ entry.item.name }}</bdi></h3>
                 <p class="dates">
                   {% if entry.item.start_date %}{{ entry.item.start_date|date:"M Y" }}{% endif %}
                   {% if entry.item.start_date and entry.item.end_date %} – {% endif %}
@@ -98,9 +93,11 @@
           </ul>
 
         {% elif section.kind == 'languageskill' %}
+          {% comment %} A level that was never stated prints nothing rather than a dangling
+             dash: claiming one is the person's to do, not the importer's (#235). {% endcomment %}
           <ul class="languages">
             {% for entry in section.items %}
-              <li>{{ entry.item.name }} — {{ entry.item.get_proficiency_display }}</li>
+              <li>{{ entry.item.name }}{% if entry.item.proficiency %} — {{ entry.item.get_proficiency_display }}{% endif %}</li>
             {% endfor %}
           </ul>
 

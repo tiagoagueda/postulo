@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from django.contrib import messages
+from django.db import models
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -17,8 +18,9 @@ from postulo.core.files import serve_private_file
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
-from postulo.resume import translating
+from postulo.resume import ordering, translating
 
+from . import rendering
 from .forms import (
     AddCVItemsForm,
     CoverLetterForm,
@@ -36,6 +38,14 @@ from .rendering import (
     snapshot_cv,
     snapshot_letter,
 )
+
+
+def _as_pk(value) -> int | None:
+    """A primary key out of something typed into a URL, or nothing at all."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 class PDFErrorMixin:
@@ -119,16 +129,22 @@ class CVAddItemsView(OwnedObjectMixin, View):
             messages.error(request, _("Nothing was added."))
             return redirect(cv.get_absolute_url())
 
-        highest = cv.items.count()
+        # The number after the last one, not the *count*: removing an entry leaves the
+        # numbers above it where they were, so counting produced a number something on the
+        # CV already had and the new entry landed in the middle of the page (#235). The
+        # whole list is renumbered densely afterwards, so what is stored is what is shown.
+        highest = cv.items.aggregate(models.Max("order"))["order__max"]
+        start = 0 if highest is None else highest + 1
         added = 0
         for content_type, object_id in form.selected():
             CVItem.objects.get_or_create(
                 cv=cv,
                 content_type=content_type,
                 object_id=object_id,
-                defaults={"owner": request.user, "order": highest + added},
+                defaults={"owner": request.user, "order": start + added},
             )
             added += 1
+        ordering.renumber(list(cv.items.order_by("order", "pk")))
 
         messages.success(
             request,
@@ -155,13 +171,25 @@ class CVItemDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
 
 
 class CVItemMoveView(OwnedObjectMixin, View):
+    """Move an entry past its neighbour on this CV, up or down.
+
+    The same fix as #203, which this row of arrows was left out of: nudging the number by one
+    left *up* at the top doing nothing, let one *down* jump past every entry that shared a
+    number, and needed two presses -- the first of them invisible -- to pass an entry two
+    numbers away. A swap with the neighbour the page actually drew, and a dense renumbering
+    afterwards, is what makes a press do exactly what it looks like it does (#235).
+
+    The neighbours are *this CV's* entries, hidden ones included, because that is the list
+    on the page; `ordering.siblings` would have answered with every `CVItem` the person owns
+    across every CV.
+    """
+
     def get_queryset(self):
         return CVItem.objects.for_user(self.request.user)
 
     def post(self, request: HttpRequest, pk: int, direction: str) -> HttpResponse:
         item = get_object_or_404(self.get_queryset(), pk=pk)
-        item.order = max(0, item.order + (-1 if direction == "up" else 1))
-        item.save(update_fields=["order", "updated_at"])
+        ordering.move(item, direction, among=item.cv.items.order_by("order", "pk"))
         return redirect(item.cv.get_absolute_url())
 
 
@@ -227,6 +255,14 @@ class CoverLetterDetailView(OwnedObjectMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["placeholders"] = CoverLetter.PLACEHOLDERS
         context["renders"] = self.object.renders.all()[:10]
+        # The preview was reachable only without an application, which is the one version of
+        # a letter nobody sends: every placeholder was blank in it. Choosing one here is how
+        # you read the letter the way the employer will (#235).
+        context["applications"] = (
+            Application.objects.for_user(self.request.user)
+            .select_related("posting", "posting__company")
+            .order_by("-created_at")[:50]
+        )
         return context
 
 
@@ -262,7 +298,12 @@ class CoverLetterDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
 
 
 class CoverLetterPreviewView(OwnedObjectMixin, View):
-    """Preview a letter, optionally as it would read for one application."""
+    """Preview a letter, optionally as it would read for one application.
+
+    The placeholders are marked here and nowhere else: this is the page somebody reads
+    *before* deciding, so a gap should look like a gap rather than like a sentence with a
+    word missing (#235).
+    """
 
     def get_queryset(self):
         return CoverLetter.objects.for_user(self.request.user)
@@ -270,12 +311,18 @@ class CoverLetterPreviewView(OwnedObjectMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         letter = get_object_or_404(self.get_queryset(), pk=pk)
         application = None
-        application_id = request.GET.get("application")
-        if application_id:
+        # A query parameter is typed by whoever sends the link. `abc` reached `filter(pk=…)`
+        # and came back out as a 500; what it means is "no application", which is what the
+        # page already draws when none is chosen (#235).
+        application_id = _as_pk(request.GET.get("application"))
+        if application_id is not None:
             application = (
-                Application.objects.for_user(request.user).filter(pk=application_id).first()
+                Application.objects.for_user(request.user)
+                .select_related("posting", "posting__company", "contact")
+                .filter(pk=application_id)
+                .first()
             )
-        return HttpResponse(render_letter_html(letter, application))
+        return HttpResponse(render_letter_html(letter, application, mark_empty=True))
 
 
 # ----------------------------------------------------------------------- uploads
@@ -473,6 +520,26 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
         form = SendDocumentsForm(request.POST, user=request.user)
         if not form.is_valid():
             return render(request, self.template_name, {"application": application, "form": form})
+
+        # Freezing a letter used to show nobody the text being frozen, so a placeholder with
+        # nothing behind it -- a posting with no location, a name never filled in -- became a
+        # gap in a PDF an employer already had. Where there is one, the filled letter is put
+        # in front of the person first, with the gaps marked, and the button says so. Where
+        # there is not, nothing changes: an extra step everybody has to press through would
+        # be read once and clicked past for ever after (#235).
+        letter = form.cleaned_data["cover_letter"]
+        gaps = rendering.unfilled_placeholders(letter, application) if letter else []
+        if gaps and not request.POST.get("confirmed"):
+            return render(
+                request,
+                self.template_name,
+                {
+                    "application": application,
+                    "form": form,
+                    "gaps": gaps,
+                    "letter_preview": rendering.letter_text(letter, application, mark_empty=True),
+                },
+            )
 
         created: list[str] = []
         try:

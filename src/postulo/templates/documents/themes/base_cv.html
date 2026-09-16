@@ -3,11 +3,25 @@
   The structure every CV theme shares. A theme supplies only the stylesheet, which is
   inlined: the renderer must never fetch anything, so that producing a PDF cannot touch
   the network or the filesystem.
+
+  **The structure is the document's.** WeasyPrint writes a PDF tag tree from these
+  elements, and Chromium writes one from the same markup, so a heading here is a heading a
+  screen reader can jump to and an outline entry in the file; a `<p>` that only looks like
+  a heading is neither. That is why a job title is an `<h3>` under its section's `<h2>`
+  rather than a bold paragraph, and why the contact details carry a real separator
+  character instead of a CSS `::after` -- generated content is drawn and never written, so
+  it is not in the text an applicant tracking system reads back (#235).
+
+  The title and the author go to the file's properties: WeasyPrint reads them out of the
+  document, so this is the only place they can be said.
 {% endcomment %}
 <html lang="{{ document_language }}" dir="{{ document_direction|default:'ltr' }}">
   <head>
     <meta charset="utf-8">
     <title>{{ cv.name }}</title>
+    {% comment %} Only where the contact block is shown. Somebody who left their name off a
+       CV on purpose did not mean "except in the file's properties". {% endcomment %}
+    {% if contact %}<meta name="author" content="{{ contact.name }}">{% endif %}
     <style>{% block page_styles %}{% endblock %}</style>
   </head>
   <body>
@@ -19,15 +33,7 @@
           <p class="headline">{{ cv.headline|default:contact.headline }}</p>
         {% endif %}
         <p class="details">
-          {% if contact.email %}<span>{{ contact.email }}</span>{% endif %}
-          {% if contact.phone %}<span>{{ contact.phone }}</span>{% endif %}
-          {% for identifier in contact.identifiers %}
-            <span>{{ identifier.display_label }} {{ identifier.value }}</span>
-          {% endfor %}
-          {% if contact.location %}<span>{{ contact.location }}</span>{% endif %}
-          {% if contact.website %}<span>{{ contact.website }}</span>{% endif %}
-          {% if contact.linkedin_url %}<span>{{ contact.linkedin_url }}</span>{% endif %}
-          {% if contact.source_repo_url %}<span>{{ contact.source_repo_url }}</span>{% endif %}
+          {% for part in contact.details %}{% if not forloop.first %}<span class="sep">{% block detail_separator %} · {% endblock %}</span>{% endif %}<span>{{ part }}</span>{% endfor %}
         </p>
       </header>
     {% elif cv.headline %}
@@ -50,9 +56,12 @@
           </ul>
 
         {% elif section.kind == 'languageskill' %}
+          {% comment %} A language whose level was never stated prints its name and nothing
+             else. "Not stated" on a CV is worse than silence, and a dangling dash is worse
+             than either (#235). {% endcomment %}
           <ul class="languages">
             {% for entry in section.items %}
-              <li>{{ entry.item.name }} — {{ entry.item.get_proficiency_display }}</li>
+              <li>{{ entry.item.name }}{% if entry.item.proficiency %} — {{ entry.item.get_proficiency_display }}{% endif %}</li>
             {% endfor %}
           </ul>
 
@@ -81,13 +90,13 @@
               <div class="entry-head">
                 <div>
                   {% if section.kind == 'experience' %}
-                    <p class="role">{{ entry.item.role }}</p>
+                    <h3 class="role">{{ entry.item.role }}</h3>
                     <p class="org"><bdi>{{ entry.item.organisation }}</bdi>{% if entry.item.location %} · <bdi>{{ entry.item.location }}</bdi>{% endif %}</p>
                   {% elif section.kind == 'education' %}
-                    <p class="role">{{ entry.item.qualification }}</p>
+                    <h3 class="role">{{ entry.item.qualification }}</h3>
                     <p class="org"><bdi>{{ entry.item.institution }}</bdi>{% if entry.item.location %} · <bdi>{{ entry.item.location }}</bdi>{% endif %}</p>
                   {% else %}
-                    <p class="role">{{ entry.item.name }}</p>
+                    <h3 class="role">{{ entry.item.name }}</h3>
                     {% if entry.item.role %}<p class="org">{{ entry.item.role }}</p>{% endif %}
                   {% endif %}
                 </div>

@@ -488,6 +488,10 @@ def _for_display(held: dict) -> dict:
         {
             "name": row["name"],
             "proficiency": _proficiency_label(row.get("proficiency")),
+            # Said out loud on the review page rather than quietly filled in with B1. A file
+            # that states no CEFR level is the ordinary case, and the honest answer to "how
+            # good is your German" is the one the person gives afterwards (#235).
+            "unset": not row.get("proficiency"),
             "levels": [
                 {"part": LEVEL_LABELS.get(part, part), "level": level}
                 for part, level in (row.get("levels") or {}).items()
@@ -495,6 +499,9 @@ def _for_display(held: dict) -> dict:
         }
         for row in held.get("languages", [])
     ]
+    shown["locale"] = languages.NATIVE_NAMES.get(
+        translating.normalise(held.get("locale", "")), held.get("locale", "")
+    )
     return shown
 
 
@@ -510,6 +517,7 @@ def _summarise(record: importing.Record) -> dict:
     return {
         "counts": record.counts(),
         "source": record.source,
+        "locale": record.locale,
         "skipped": record.skipped,
         "person": record.person,
         "experience": [
@@ -532,6 +540,7 @@ def _to_session(record: importing.Record) -> dict:
     """The record as something a session can hold: dates become strings."""
     return {
         "person": record.person,
+        "locale": record.locale,
         "experience": [
             {
                 **row,
@@ -557,6 +566,7 @@ def _to_session(record: importing.Record) -> dict:
 def _from_session(raw: dict) -> importing.Record:
     return importing.Record(
         person=raw.get("person", {}),
+        locale=raw.get("locale", ""),
         experience=[
             {
                 **row,
