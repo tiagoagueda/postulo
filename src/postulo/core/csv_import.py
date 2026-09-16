@@ -612,14 +612,154 @@ def parse_money(text: str) -> Decimal | None:
         return None
 
 
+#: What the symbols mean. A symbol names more than one currency in the world -- a dollar
+#: sign is twenty-odd of them -- so each maps to the one a spreadsheet almost always means,
+#: and anybody whose dollars are not American writes the code instead, which is read below.
+CURRENCY_SYMBOLS = {
+    "€": "EUR",
+    "$": "USD",
+    "£": "GBP",
+    "¥": "JPY",
+    "₹": "INR",
+    "₩": "KRW",
+    "₽": "RUB",
+    "₺": "TRY",
+    "₪": "ILS",
+    "₿": "BTC",
+    "R$": "BRL",
+    "kr": "SEK",
+    "zł": "PLN",
+    "Kč": "CZK",
+    "Ft": "HUF",
+}
+
+#: Codes recognised without a symbol. Not all of ISO 4217: a three-letter word in a salary
+#: column is more often an abbreviation than a currency, and guessing wrong writes somebody
+#: else's money into the record. These are the ones a job advert actually carries.
+CURRENCY_CODES = frozenset(
+    """EUR USD GBP CHF SEK NOK DKK PLN CZK HUF RON BGN HRK ISK JPY CNY INR AUD CAD NZD
+    SGD HKD ZAR BRL MXN ARS CLP COP TRY ILS AED SAR KRW THB MYR IDR PHP VND UAH RSD
+    MAD TND EGP NGN KES GHS""".split()
+)
+
+#: How a period is written, in the languages Postulo is used in. Longest first, because
+#: "/month" has to be tried before "/mo" and "per annum" before "pa".
+PERIOD_WORDS = (
+    ("hour", ("/hour", "/hr", "/h", "per hour", "an hour", "hourly", "à l'heure", "por hora")),
+    ("day", ("/day", "/d", "per day", "a day", "daily", "par jour", "por dia", "ao dia")),
+    (
+        "month",
+        ("/month", "/mth", "/mo", "/m", "per month", "a month", "monthly", "par mois", "por mês"),
+    ),
+    (
+        "year",
+        (
+            "/year",
+            "/yr",
+            "/y",
+            "per year",
+            "a year",
+            "yearly",
+            "annually",
+            "per annum",
+            "p.a.",
+            "pa",
+            "par an",
+            "por ano",
+        ),
+    ),
+)
+
+
+#: What a salary is in when the sheet does not say. Offered on the mapping page, because a
+#: spreadsheet of one person's applications is nearly always in one currency and the cells
+#: rarely repeat it.
+DEFAULT_CURRENCY = "EUR"
+
+#: The list the mapping page offers. Anything else can be typed into the listing afterwards;
+#: a select box of every code in the world would be a worse question than a short list.
+OFFERED_CURRENCIES = (
+    "EUR",
+    "GBP",
+    "USD",
+    "CHF",
+    "SEK",
+    "NOK",
+    "DKK",
+    "PLN",
+    "CZK",
+    "RON",
+    "BRL",
+    "CAD",
+    "AUD",
+    "INR",
+    "JPY",
+    "ZAR",
+)
+
+
+def clean_currency(text: str) -> str:
+    """A code from the mapping page, or the default when it is not one we offered."""
+    code = (text or "").strip().upper()
+    return code if code in CURRENCY_CODES else DEFAULT_CURRENCY
+
+
+def parse_currency(text: str, default: str = "") -> str:
+    """The currency a salary is written in, as an ISO 4217 code, or ``default``.
+
+    The importer used to write EUR onto every salary it read while stripping the `$` and
+    the `£` that said otherwise, so a spreadsheet of London salaries came in as euros and
+    nothing on the screen said so (#224).
+    """
+    raw = (text or "").strip()
+    if not raw:
+        return default
+    for code in re.findall(r"\b[A-Za-z]{3}\b", raw):
+        if code.upper() in CURRENCY_CODES:
+            return code.upper()
+    for symbol, code in CURRENCY_SYMBOLS.items():
+        if symbol in raw or symbol.lower() in raw.lower():
+            return code
+    return default
+
+
+def parse_period(text: str, default: str = "") -> str:
+    """Per hour, day, month or year, read from how the figure is written."""
+    raw = " ".join((text or "").lower().split())
+    if not raw:
+        return default
+    for period, spellings in PERIOD_WORDS:
+        for spelling in spellings:
+            if spelling.startswith("/"):
+                if spelling in raw.replace(" ", ""):
+                    return period
+            elif re.search(rf"(?<![a-z]){re.escape(spelling)}(?![a-z])", raw):
+                return period
+    return default
+
+
 def parse_salary_range(text: str) -> tuple[Decimal | None, Decimal | None]:
-    parts = re.split(r"\s*(?:-|–|—|to|à|a|/)\s*", (text or "").strip(), maxsplit=1)
+    """Two figures from one cell.
+
+    Two things were wrong. The separators included a bare ``a`` matched anywhere, so
+    "Salary" split in the middle of a word; it is a word now. And ``k`` was read per side,
+    so "50-60k" arrived as fifty against sixty thousand -- a range a thousandfold wrong,
+    written into the record with nothing to show it had been misread. A ``k`` on the second
+    figure and none on the first means both, which is how people write it (#224).
+    """
+    parts = re.split(r"\s*(?:-|–|—|\bto\b|\bà\b|\ba\b|/)\s*", (text or "").strip(), maxsplit=1)
     if len(parts) == 2:
         low, high = parse_money(parts[0]), parse_money(parts[1])
         if low is not None and high is not None:
+            if _has_thousands(parts[1]) and not _has_thousands(parts[0]) and low < high:
+                low *= 1000
             return (low, high) if low <= high else (high, low)
     single = parse_money(text)
     return single, single
+
+
+def _has_thousands(text: str) -> bool:
+    return bool(re.search(r"\d\s*k\b", (text or "").lower()))
 
 
 def map_status(text: str) -> tuple[str, bool]:
@@ -665,6 +805,8 @@ class ParsedRow:
     deadline: dt.date | None = None
     salary_min: Decimal | None = None
     salary_max: Decimal | None = None
+    salary_currency: str = ""
+    salary_period: str = ""
     channel: str = ""
     source: str = ""
     tags: list[str] = field(default_factory=list)
@@ -693,10 +835,14 @@ class ParsedRow:
         return "application" if self.applied_at else "listing"
 
 
-def parse_rows(sheet: Sheet, mapping: list[str], *, day_first: bool = True) -> list[ParsedRow]:
+def parse_rows(
+    sheet: Sheet, mapping: list[str], *, day_first: bool = True, currency: str = "EUR"
+) -> list[ParsedRow]:
+    """Every row, read. ``currency`` is what a salary is in when the cell does not say."""
     parsed: list[ParsedRow] = []
     for number, cells in enumerate(sheet.rows, start=2):
-        row = ParsedRow(number=number)
+        # The sheet's own default, which a cell saying "$" or "GBP" then overrides.
+        row = ParsedRow(number=number, salary_currency=currency)
         for index, key in enumerate(mapping):
             value = cells[index] if index < len(cells) else ""
             if key == "ignore" or not value:
@@ -724,10 +870,16 @@ def parse_rows(sheet: Sheet, mapping: list[str], *, day_first: bool = True) -> l
                 row.deadline = parse_date(value, day_first=day_first)
             elif key == "salary_min":
                 row.salary_min = parse_money(value)
+                row.salary_currency = parse_currency(value, row.salary_currency)
+                row.salary_period = parse_period(value, row.salary_period)
             elif key == "salary_max":
                 row.salary_max = parse_money(value)
+                row.salary_currency = parse_currency(value, row.salary_currency)
+                row.salary_period = parse_period(value, row.salary_period)
             elif key == "salary":
                 row.salary_min, row.salary_max = parse_salary_range(value)
+                row.salary_currency = parse_currency(value, row.salary_currency)
+                row.salary_period = parse_period(value, row.salary_period)
             elif key == "channel":
                 row.channel = map_channel(value)
             elif key == "source":
@@ -773,7 +925,9 @@ class CsvReport:
         return lines
 
 
-def perform(user, sheet: Sheet, mapping: list[str], *, day_first: bool = True) -> CsvReport:
+def perform(
+    user, sheet: Sheet, mapping: list[str], *, day_first: bool = True, currency: str = "EUR"
+) -> CsvReport:
     """Import the sheet in one transaction. Duplicates are reported, never created."""
     from postulo.applications.models import Application, EventKind
     from postulo.applications.services import (
@@ -784,13 +938,13 @@ def perform(user, sheet: Sheet, mapping: list[str], *, day_first: bool = True) -
         record_event,
     )
     from postulo.core.models import Tag
-    from postulo.jobs.models import Company, JobPosting
+    from postulo.jobs.models import Company, JobPosting, SalaryPeriod
 
     report = CsvReport(filename=sheet.filename, rows=sheet.row_count)
     provenance = str(_("Imported from %(file)s") % {"file": sheet.filename})
 
     with transaction.atomic():
-        for row in parse_rows(sheet, mapping, day_first=day_first):
+        for row in parse_rows(sheet, mapping, day_first=day_first, currency=currency):
             if row.problems:
                 report.skipped.append(f"row {row.number}: {', '.join(row.problems)}")
                 continue
@@ -826,7 +980,12 @@ def perform(user, sheet: Sheet, mapping: list[str], *, day_first: bool = True) -
                 "description": row.description,
                 "salary_min": row.salary_min,
                 "salary_max": row.salary_max,
-                "salary_currency": "EUR" if row.salary_min or row.salary_max else "",
+                "salary_currency": row.salary_currency
+                if (row.salary_min or row.salary_max)
+                else "",
+                "salary_period": row.salary_period or SalaryPeriod.YEAR
+                if (row.salary_min or row.salary_max)
+                else "",
                 "closes_at": None,
             }
             notes = "\n".join(row.notes)

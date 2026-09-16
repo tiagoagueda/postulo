@@ -19,14 +19,14 @@ import uuid
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, F, OuterRef, Subquery
+from django.db.models import Case, DecimalField, Exists, F, OuterRef, Subquery, Value, When
 from django.db.models.functions import Coalesce, Now
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel, Tag
-from postulo.jobs.models import Contact, JobPosting
+from postulo.jobs.models import Contact, JobPosting, SalaryPeriod
 
 
 class Status(models.TextChoices):
@@ -131,17 +131,42 @@ class ApplicationQuerySet(models.QuerySet):
             .with_next_interview()
         )
 
+    def with_salary_order(self) -> ApplicationQuerySet:
+        """Annotate a yearly figure to sort salaries by, within a currency (#224).
+
+        Sorting on the raw number put an hourly rate below every annual one and mixed
+        currencies together, so the column ordered by nothing anybody would recognise. The
+        figures are brought to a year here; the *currency* is sorted on first, because
+        turning one into another needs a rate, a rate needs the network, and a wrong rate
+        would be a number Postulo invented and then showed as a fact.
+
+        The hours and days are the conventional full-time year -- 1,680 hours, 220 days --
+        not anybody's actual contract. It is for ordering a column, not for pay.
+        """
+        yearly = Case(
+            When(posting__salary_period=SalaryPeriod.HOUR, then=Value(1680)),
+            When(posting__salary_period=SalaryPeriod.DAY, then=Value(220)),
+            When(posting__salary_period=SalaryPeriod.MONTH, then=Value(12)),
+            default=Value(1),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+        return self.annotate(
+            salary_year_max=F("posting__salary_max") * yearly,
+            salary_year_min=F("posting__salary_min") * yearly,
+        )
+
     def with_table_data(self) -> ApplicationQuerySet:
         """Annotate what the optional table columns show: the last activity and the next reminder.
 
         Subqueries rather than joins, for the same reason as the interview: they compose.
         """
+        queryset = self.with_salary_order()
         next_reminder = (
             Reminder.objects.filter(application=OuterRef("pk"), done_at__isnull=True)
             .order_by("due_at")
             .values("due_at")[:1]
         )
-        return self.with_activity().annotate(next_reminder_at=Subquery(next_reminder))
+        return queryset.with_activity().annotate(next_reminder_at=Subquery(next_reminder))
 
     def with_activity(self, at=None) -> ApplicationQuerySet:
         """Annotate ``last_activity_at`` and ``has_future_reminder``, once.
@@ -167,7 +192,17 @@ class ApplicationQuerySet(models.QuerySet):
             )
             queryset = queryset.annotate(has_future_reminder=Exists(ahead))
         if "next_interview_at" not in present:
-            queryset = queryset.with_next_interview()
+            queryset = queryset.with_next_interview(at=at)
+        if "has_unsettled_interview" not in present:
+            # Any interview still marked *scheduled*, whether or not its time has passed.
+            # `next_interview_at` deliberately stops at the ones still ahead, because it is
+            # what the "next interview" column shows -- but an interview that happened
+            # yesterday and has not been given an outcome is an application waiting on
+            # somebody, which is the opposite of one gone quiet (#224).
+            waiting = Interview.objects.filter(
+                application=OuterRef("pk"), outcome=InterviewOutcome.SCHEDULED
+            )
+            queryset = queryset.annotate(has_unsettled_interview=Exists(waiting))
         return queryset
 
     def quiet(self, after_days: int, at=None) -> ApplicationQuerySet:
@@ -181,20 +216,22 @@ class ApplicationQuerySet(models.QuerySet):
         return (
             self.with_activity(at=now)
             .filter(status__in=list(QUIET_STATUSES), last_activity_at__lt=cutoff)
-            .filter(has_future_reminder=False, next_interview_at__isnull=True)
+            .filter(has_future_reminder=False, has_unsettled_interview=False)
         )
 
-    def with_next_interview(self) -> ApplicationQuerySet:
+    def with_next_interview(self, at=None) -> ApplicationQuerySet:
         """Annotate ``next_interview_at``: the start of the soonest interview still ahead.
 
         A subquery rather than a join with ``Min``, so it composes with any other
-        annotation without multiplying rows.
+        annotation without multiplying rows. ``at`` is the moment "ahead" is measured from,
+        so that a caller reasoning about another one -- and a test -- gets a straight answer
+        instead of the database's clock.
         """
         upcoming = (
             Interview.objects.filter(
                 application=OuterRef("pk"),
                 outcome=InterviewOutcome.SCHEDULED,
-                ends_at__gte=Now(),
+                ends_at__gte=at or Now(),
             )
             .order_by("starts_at")
             .values("starts_at")[:1]

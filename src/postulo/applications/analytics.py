@@ -24,7 +24,15 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.models import JobPosting, ListingState
 
-from .models import Application, ApplicationEvent, EventKind, Interview, InterviewOutcome, Status
+from .models import (
+    QUIET_STATUSES,
+    Application,
+    ApplicationEvent,
+    EventKind,
+    Interview,
+    InterviewOutcome,
+    Status,
+)
 
 #: The stages a funnel counts, in order. Each is "reached this, ever".
 FUNNEL_STAGES: tuple[tuple[str, str], ...] = (
@@ -176,6 +184,38 @@ def _first_reply_days(applications) -> dict[int, int]:
     return days
 
 
+def interviews_held(user, *, start=None, end=None) -> int:
+    """How many interviews were actually attended, from the diary and the timeline together.
+
+    Two records can hold the same interview. Settling one in the diary marks it *held* and
+    writes an *interview* entry dated when it happened; typing one straight onto the timeline
+    writes only the entry. Counting either source alone gets a different answer, which is
+    precisely what went wrong: Insights read the timeline and the report read the diary, so
+    somebody who wrote their interviews down as they happened was shown a number by Postulo
+    and a nought on the document an employment office reads (#224).
+
+    So both are counted and the overlap is removed. An entry is the same interview as a diary
+    one when it belongs to the same application and is dated to the same moment, which is
+    exactly what settling writes -- it takes `occurred_at` from the interview's own start.
+    Scheduling writes an *interview scheduled* entry, a different kind, not counted here.
+    """
+    diary = Interview.objects.for_user(user).filter(outcome=InterviewOutcome.DONE)
+    entries = ApplicationEvent.objects.for_user(user).filter(kind=EventKind.INTERVIEW)
+    if start is not None:
+        diary = diary.filter(starts_at__date__gte=start)
+        entries = entries.filter(occurred_at__date__gte=start)
+    if end is not None:
+        diary = diary.filter(starts_at__date__lte=end)
+        entries = entries.filter(occurred_at__date__lte=end)
+
+    held = diary.count()
+    twins = set(diary.values_list("application_id", "starts_at"))
+    typed = sum(
+        1 for pair in entries.values_list("application_id", "occurred_at") if pair not in twins
+    )
+    return held + typed
+
+
 def _first_interview_days(applications) -> dict[int, int]:
     """Days from applying to the first interview, per application.
 
@@ -251,12 +291,17 @@ def build(user) -> Insights:
         insights.slowest_reply_days = values[-1]
 
     now = timezone.now()
+    # Still open, as well as still unanswered. Only *ghosted* was excluded, so an
+    # application somebody withdrew -- or one they marked rejected without a reply
+    # arriving -- counted as waiting for a reply for the rest of time, and the Outcomes
+    # widget showed a number that could only ever grow (#224). Withdrawing is the person
+    # saying they have stopped waiting, which is exactly the thing this counts.
     insights.still_waiting = sum(
         1
         for a in ever_applied
         if a.pk not in reply_days
         and a.applied_at is not None
-        and a.status != Status.GHOSTED
+        and a.status in QUIET_STATUSES
         and (now - a.applied_at).days >= 0
     )
 
@@ -266,7 +311,7 @@ def build(user) -> Insights:
     if interview_days:
         insights.median_days_to_interview = statistics.median(sorted(interview_days.values()))
     diary = Interview.objects.for_user(user)
-    insights.interviews_held = diary.filter(outcome=InterviewOutcome.DONE).count()
+    insights.interviews_held = interviews_held(user)
     insights.interviews_ahead = diary.upcoming().count()
     kinds = (
         diary.filter(outcome=InterviewOutcome.DONE)

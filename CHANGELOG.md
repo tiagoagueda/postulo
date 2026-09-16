@@ -773,6 +773,44 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Insights, the report and the salary column counted the wrong things.** Five figures that
+  people read and believe, each of them measuring something slightly different from what it
+  said.
+
+  An application went quiet the morning after an interview. *Quiet* means nothing has
+  happened and nothing is planned, and an interview stopped counting as planned the moment it
+  ended — so an interview booked three weeks ahead, attended, and not yet written up left an
+  application that had been silent for twenty-one days, and the notifier said so. An
+  interview still waiting for its outcome now means the application is waiting, whether its
+  time has passed or not.
+
+  Withdrawn applications counted as waiting on a reply for ever. Only *ghosted* was excluded,
+  so the Outcomes widget carried a number that could only grow, and withdrawing — which is
+  the person saying they have stopped waiting — did nothing to it.
+
+  The report and Insights disagreed about interviews. Insights read them from the timeline;
+  the report counted only interviews settled through the diary, so somebody who wrote their
+  interviews down as they happened was shown a number by Postulo and a nought on the document
+  an employment office reads. Both now use one counter, and an interview typed onto the
+  timeline counts as much as one settled from the diary, which is what the handbook always
+  promised.
+
+  Moving an interview left its reminder saying the old time. The reminder arrived at the
+  right moment naming the wrong one, which is worse than not arriving; the words are now
+  rebuilt from the interview whenever it moves.
+
+  And salaries. The spreadsheet importer wrote EUR onto everything while stripping the `$`
+  and `£` that said otherwise; `50-60k` came in as fifty against sixty thousand, because the
+  `k` was read for one side only; the range separator matched a bare `a` anywhere, so
+  "Salary" split in the middle of a word; and the period was never read, so `15 €/h` was
+  stored as fifteen euros a year. All four are fixed, the mapping page now offers the
+  currency a sheet is in for cells that do not say, and a cell that does say wins. A salary
+  on screen names its period — thirty to forty with nothing after it read as a year's pay —
+  and the salary column sorts by currency first and then by the figure brought to a year,
+  instead of putting every hourly rate below every annual one and mixing dollars in with
+  euros. Currencies are three letters, upper-cased as they are typed and refused when they
+  are not a code at all. (#224)
+
 - **Every page of the API was built by reading everything first, retrying a capture made a
   second capture, and the schema answered anybody who asked.** Five faults in the one
   surface the browser extensions and `postulo-mcp` are built on, found in the September

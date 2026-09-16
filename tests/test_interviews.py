@@ -574,7 +574,10 @@ def test_insights_measure_the_days_to_a_first_interview(user, company, applicati
     insights = analytics.build(user)
     assert insights.interviewed == 2
     assert insights.median_days_to_interview == 7.0, "(4 + 10) / 2: the first interview each"
-    assert insights.interviews_held == 2
+    # Three interviews happened: the two held from the diary, and the one typed in by hand,
+    # which is what this test's own first line says should count as much (#224). It read 2
+    # while the figure came from the diary alone.
+    assert insights.interviews_held == 3
     assert insights.interviews_ahead == 1
     assert insights.interview_kinds == [("Phone screen", 1), ("Video call", 1)]
 

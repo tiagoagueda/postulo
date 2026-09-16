@@ -36,13 +36,11 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.models import Company, CompanyKind
 
-from .analytics import RESPONSE_STATUSES
+from .analytics import RESPONSE_STATUSES, interviews_held
 from .models import (
     Application,
     ApplicationEvent,
     Channel,
-    Interview,
-    InterviewOutcome,
     Status,
 )
 
@@ -447,10 +445,10 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
 
     report.happened = Happened(
         replies=_first_reaching(user, RESPONSE_STATUSES, period),
-        interviews=Interview.objects.for_user(user)
-        .filter(outcome=InterviewOutcome.DONE)
-        .filter(starts_at__date__gte=period.start, starts_at__date__lte=period.end)
-        .count(),
+        # From the log, the same counter Insights uses, so the two cannot disagree about
+        # what an interview is -- and an interview typed onto the timeline reaches the
+        # document an employment office reads, which before this it did not (#224).
+        interviews=interviews_held(user, start=period.start, end=period.end),
         offers=_first_reaching(user, {Status.OFFER}, period),
         rejections=_first_reaching(user, {Status.REJECTED}, period),
     )

@@ -82,7 +82,8 @@ class ApplicationsTable(Table):
         Column(
             "salary",
             _("Salary"),
-            sort=("posting__salary_max", "posting__salary_min"),
+            # Currency first, then the figure brought to a year: see `with_salary_order`.
+            sort=("posting__salary_currency", "salary_year_max", "salary_year_min"),
             newest_first=True,
             numeric=True,
         ),

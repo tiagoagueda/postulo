@@ -265,6 +265,24 @@ def _when(moment) -> str:
     return formats.date_format(timezone.localtime(moment), "j M Y, H:i")
 
 
+def _interview_reminder_summary(interview: Interview) -> str:
+    """What the reminder for an interview says. Built from the interview, every time.
+
+    It names the time, so it has to be rebuilt whenever the interview moves. It was worded
+    once at booking and never again, and `reschedule_interview` moved only `due_at` -- so an
+    interview put back by two hours produced a reminder that arrived at the right moment
+    naming the wrong one, which is worse than not arriving (#224).
+    """
+    return str(
+        _("Interview tomorrow: %(kind)s at %(company)s, %(time)s")
+        % {
+            "kind": interview.get_kind_display(),
+            "company": interview.application.posting.company.name,
+            "time": formats.date_format(timezone.localtime(interview.starts_at), "H:i"),
+        }
+    )
+
+
 @transaction.atomic
 def schedule_interview(
     application: Application,
@@ -318,14 +336,7 @@ def schedule_interview(
         interview.reminder = Reminder.objects.create(
             owner=application.owner,
             application=application,
-            summary=str(
-                _("Interview tomorrow: %(kind)s at %(company)s, %(time)s")
-                % {
-                    "kind": interview.get_kind_display(),
-                    "company": application.posting.company.name,
-                    "time": formats.date_format(timezone.localtime(starts_at), "H:i"),
-                }
-            ),
+            summary=_interview_reminder_summary(interview),
             due_at=due,
         )
         interview.save(update_fields=["reminder", "updated_at"])
@@ -359,9 +370,11 @@ def reschedule_interview(interview: Interview, *, starts_at, ends_at, actor: str
     if reminder is not None and not reminder.is_done:
         due = starts_at - INTERVIEW_REMINDER_LEAD
         if due > timezone.now():
-            # Announced again at the new time, even if the old one had already been.
+            # Announced again at the new time, even if the old one had already been -- and
+            # worded again, because the words name the time (#224).
             reminder.due_at, reminder.notified_at = due, None
-            reminder.save(update_fields=["due_at", "notified_at", "updated_at"])
+            reminder.summary = _interview_reminder_summary(interview)
+            reminder.save(update_fields=["due_at", "notified_at", "summary", "updated_at"])
         else:
             reminder.complete()
     return interview

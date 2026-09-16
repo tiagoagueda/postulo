@@ -544,6 +544,22 @@ class EmploymentType(models.TextChoices):
     APPRENTICESHIP = "apprenticeship", _("Apprenticeship")
 
 
+def currency_code(value: str) -> None:
+    """Three letters, upper case. Not a list of every code there is.
+
+    The field took any three characters, so a mistyped cell became the currency a salary
+    was stored in and nothing said otherwise (#224). Checking the *shape* rather than
+    membership of ISO 4217 is deliberate: the list changes, a self-hosted instance cannot
+    be asked to upgrade for a new one, and a code that is well formed but not current is a
+    far smaller problem than a refusal to record what somebody was actually offered.
+    """
+    if value and not re.fullmatch(r"[A-Z]{3}", value):
+        raise ValidationError(
+            _("%(value)s is not a currency code. Use three letters, like EUR."),
+            params={"value": value},
+        )
+
+
 class SalaryPeriod(models.TextChoices):
     YEAR = "year", _("Per year")
     MONTH = "month", _("Per month")
@@ -664,7 +680,14 @@ class JobPosting(OwnedModel):
     salary_max = models.DecimalField(
         _("salary to"), max_digits=12, decimal_places=2, null=True, blank=True
     )
-    salary_currency = models.CharField(_("currency"), max_length=3, blank=True, default="EUR")
+    salary_currency = models.CharField(
+        _("currency"),
+        max_length=3,
+        blank=True,
+        default="EUR",
+        validators=[currency_code],
+        help_text=_("A three-letter ISO 4217 code, such as EUR, GBP or USD."),
+    )
     salary_period = models.CharField(
         _("salary period"),
         max_length=10,
@@ -708,6 +731,12 @@ class JobPosting(OwnedModel):
 
     def __str__(self) -> str:
         return f"{self.title} — {self.company.name}"
+
+    def save(self, *args, **kwargs):
+        # Upper-cased rather than refused: "eur" is the code, typed the way people type.
+        # The validator then has only one shape to judge (#224).
+        self.salary_currency = (self.salary_currency or "").strip().upper()
+        return super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("jobs:posting_detail", args=[self.pk])
@@ -794,7 +823,12 @@ class JobPosting(OwnedModel):
         else:
             figure = _("up to %(high)s") % {"high": amount(self.salary_max)}
 
-        return f"{figure} {self.salary_currency}".strip()
+        shown = f"{figure} {self.salary_currency}".strip()
+        # The period belongs in the sentence: 30 and 40 with no period reads as a year's
+        # pay, and an hourly rate shown that way is wrong by a factor of about two thousand
+        # (#224). A yearly figure says so too, because saying nothing is what caused this.
+        period = self.get_salary_period_display() if self.salary_period else ""
+        return f"{shown} {period}".strip() if period else shown
 
 
 class CaptureStatus(models.TextChoices):

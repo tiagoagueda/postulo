@@ -46,9 +46,11 @@ def import_csv(request: HttpRequest):
             sheet.headers,
         )
         day_first = request.POST.get("date_order", "day_first") == "day_first"
+        currency = csv_import.clean_currency(request.POST.get("currency", ""))
     else:
         mapping = csv_import.guess_mapping(sheet.headers)
         day_first = True
+        currency = csv_import.DEFAULT_CURRENCY
 
     if request.method == "POST" and request.POST.get("action") == "import":
         if not any(key == "company" for key in mapping) or not any(
@@ -56,11 +58,13 @@ def import_csv(request: HttpRequest):
         ):
             messages.error(request, _("Map a column to Company and one to Role first."))
         else:
-            report = csv_import.perform(request.user, sheet, mapping, day_first=day_first)
+            report = csv_import.perform(
+                request.user, sheet, mapping, day_first=day_first, currency=currency
+            )
             csv_import.forget(request.session)
             return render(request, "core/import_csv_done.html", {**SECTION, "report": report})
 
-    parsed = csv_import.parse_rows(sheet, mapping, day_first=day_first)
+    parsed = csv_import.parse_rows(sheet, mapping, day_first=day_first, currency=currency)
     return render(
         request,
         "core/import_csv_map.html",
@@ -70,6 +74,8 @@ def import_csv(request: HttpRequest):
             "columns": list(zip(range(len(sheet.headers)), sheet.headers, mapping, strict=True)),
             "fields": csv_import.FIELDS,
             "day_first": day_first,
+            "currency": currency,
+            "currencies": csv_import.OFFERED_CURRENCIES,
             "preview": parsed[: csv_import.PREVIEW_ROWS],
             "would_import": sum(1 for row in parsed if row.becomes == "application"),
             "would_list": sum(1 for row in parsed if row.becomes == "listing"),

@@ -49,6 +49,18 @@
             <input type="radio" name="date_order" value="month_first" {% if not day_first %}checked{% endif %}> {% translate "month / day / year (12/31/2026)" %}
           </label>
         </fieldset>
+        <fieldset class="mt-4 flex flex-wrap items-center gap-4 text-sm">
+          <legend class="field-label">{% translate "Salaries are in" %}</legend>
+          <label class="flex items-center gap-2">
+            <span class="sr-only">{% translate "Currency" %}</span>
+            <select name="currency" class="field-input w-auto">
+              {% for code in currencies %}
+                <option value="{{ code }}" {% if code == currency %}selected{% endif %}>{{ code }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <p class="text-ink-500 dark:text-ink-400">{% translate "Used where a cell does not say. A cell with a symbol or a code wins." %}</p>
+        </fieldset>
         <div class="mt-4 flex items-center gap-3">
           <button type="submit" name="action" value="preview" class="btn-secondary">{% translate "Update the preview" %}</button>
         </div>
