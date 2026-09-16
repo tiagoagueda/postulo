@@ -49,7 +49,13 @@ def test_the_back_button_gets_a_form_that_works_again(live_server, page: Page, f
     save.click()
     page.wait_for_url(f"{base}/jobs/companies/**")
 
+    # Waited for, not merely asked for. Back is a real page load since #226 turned off
+    # htmx's history cache, so asserting straight away asks about a page that is still
+    # arriving -- and leaves the request in flight while the test server is torn down
+    # underneath it, which surfaces as a database connection finalised mid-query.
     page.go_back()
+    page.wait_for_url(f"{base}/jobs/companies/new/")
+    page.wait_for_load_state("networkidle")
     save = page.get_by_role("button", name="Save", exact=True)
     expect(save).not_to_have_attribute("aria-disabled", "true")
     expect(page.locator("form[data-submitted]")).to_have_count(0)
