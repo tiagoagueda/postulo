@@ -773,6 +773,30 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **An identifier is the same identifier whatever case it is typed in.** Every named scheme
+  folds its own values as you type them — Wikidata to `Q95`, LinkedIn to lowercase — so a
+  search usually found what it should. Two things it did not. A row written before its scheme
+  gained that folding kept the spelling it arrived with, and an early import that stored `q95`
+  was then invisible to everything that looked for `Q95`: the company was not found, and the
+  posting was filed under a second record of the same employer. And the rule that one
+  identifier names one company was enforced on the exact characters, so the same company could
+  be entered twice, once in each case, with nothing to say they were one.
+
+  The comparison is now case-blind everywhere it happens — the lookup, the form, the
+  importers, and the uniqueness the database itself keeps — while the stored value is left
+  alone. That last part is deliberate: a scheme that folds is still the thing that decides
+  what its values look like, and `other`, which is where a staff number lives, folds nothing,
+  because `AB-12` should read `AB-12` and not `ab-12`. An accent is still a different
+  character, not a different case.
+
+  A migration puts existing values through the current rules, and where that leaves one
+  account holding the same identifier twice it removes the later identifier and names both
+  companies on the console — the companies themselves are left exactly as they are, because
+  whether two records are one employer is not something a migration gets to decide. Saying no
+  now also sounds like a person: where the database used to answer "Constraint
+  “unique_other_identifier_per_company” is violated", the form says the identifier is already
+  listed. (#211)
+
 - **Applications you recorded after the fact counted nowhere, and nothing let you say when
   you applied.** The date an application was sent was written only when it passed through the
   literal *Applied*. Anybody recording a reply they already had — straight to *Interviewing*,

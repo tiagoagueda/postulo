@@ -313,13 +313,15 @@ class BaseCompanyIdentifierFormSet(forms.BaseInlineFormSet):
                 if scheme in seen_schemes:
                     form.add_error("scheme", _("This kind of identifier is already listed."))
                 seen_schemes.add(scheme)
-            if (scheme, value) in seen_values:
+            # Case-blind, like the constraint underneath it (#211): "AB-12" and "ab-12" are
+            # one identifier, and the form has to say so before the database refuses it.
+            if (scheme, value.casefold()) in seen_values:
                 form.add_error("value", _("This identifier is already listed."))
-            seen_values.add((scheme, value))
+            seen_values.add((scheme, value.casefold()))
             if scheme != identifiers.OTHER and self.owner is not None:
                 clash = (
                     CompanyIdentifier.objects.for_user(self.owner)
-                    .filter(scheme=scheme, value=value)
+                    .filter(scheme=scheme, value__iexact=value)
                     .exclude(company=self.instance if self.instance.pk else None)
                     .select_related("company")
                     .first()

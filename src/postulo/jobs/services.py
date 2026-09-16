@@ -34,9 +34,10 @@ def set_identifiers(
         if scheme == identifiers.OTHER and not label:
             errors.append(_("An 'other' identifier needs a name."))
             continue
-        if (scheme, value) in seen:
+        # Case-blind, as the constraint and the form are (#211).
+        if (scheme, value.casefold()) in seen:
             continue
-        seen.add((scheme, value))
+        seen.add((scheme, value.casefold()))
         cleaned.append((scheme, value, label))
 
     schemes = [scheme for scheme, _v, _l in cleaned if scheme != identifiers.OTHER]
@@ -48,7 +49,7 @@ def set_identifiers(
             continue
         clash = (
             CompanyIdentifier.objects.for_user(company.owner)
-            .filter(scheme=scheme, value=value)
+            .filter(scheme=scheme, value__iexact=value)
             .exclude(company=company)
             .select_related("company")
             .first()
@@ -59,7 +60,7 @@ def set_identifiers(
                 % {"company": clash.company.name, "scheme": clash.scheme_label, "value": value}
             )
         if not replace:
-            held = company.identifiers.filter(scheme=scheme).exclude(value=value).first()
+            held = company.identifiers.filter(scheme=scheme).exclude(value__iexact=value).first()
             if held is not None:
                 errors.append(
                     _("%(company)s already has a %(scheme)s identifier: %(value)s.")
@@ -69,19 +70,25 @@ def set_identifiers(
         raise ValidationError(errors)
 
     if replace:
-        keep = {(scheme, value) for scheme, value, _label in cleaned}
+        keep = {(scheme, value.casefold()) for scheme, value, _label in cleaned}
         for existing in company.identifiers.all():
-            if (existing.scheme, existing.value) not in keep:
+            if (existing.scheme, existing.value.casefold()) not in keep:
                 existing.delete()
     result = []
     for scheme, value, label in cleaned:
-        identifier, _created = CompanyIdentifier.objects.get_or_create(
-            owner=company.owner,
-            company=company,
-            scheme=scheme,
-            value=value,
-            defaults={"label": label},
-        )
+        # Asked for the way the constraint underneath asks (#211): a company carrying `q95`
+        # and told to carry `Q95` already carries it, and matching on the exact characters
+        # would have gone on to create a second row and meet the database instead of a
+        # person. The row keeps the spelling it has — the migration folds the old ones, and
+        # `other` is not ours to rewrite.
+        held = company.identifiers.filter(scheme=scheme, value__iexact=value)
+        if scheme == identifiers.OTHER:
+            held = held.filter(label__iexact=label)
+        identifier = held.first()
+        if identifier is None:
+            identifier = CompanyIdentifier.objects.create(
+                owner=company.owner, company=company, scheme=scheme, value=value, label=label
+            )
         if identifier.label != label:
             identifier.label = label
             identifier.save(update_fields=["label", "updated_at"])

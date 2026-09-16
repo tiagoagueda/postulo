@@ -15,6 +15,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Max
+from django.db.models.functions import Lower
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import number_format
@@ -333,6 +334,11 @@ class Company(OwnedModel):
 
         The value is normalised first, so a pasted URL finds what a typed id recorded.
         A malformed value simply matches nothing; it is not this method's job to complain.
+
+        Matched without regard to case (#211), which is what finds a row written before the
+        scheme folded its values -- a lowercase `q95` from an early import is the same
+        Wikidata item as `Q95`, and a lookup that missed it would quietly make a second
+        company for the same employer.
         """
         try:
             value = identifiers.clean(scheme, raw)
@@ -340,7 +346,7 @@ class Company(OwnedModel):
             return None
         found = (
             CompanyIdentifier.objects.for_user(owner)
-            .filter(scheme=scheme, value=value)
+            .filter(scheme=scheme, value__iexact=value)
             .select_related("company")
             .first()
         )
@@ -372,19 +378,36 @@ class CompanyIdentifier(OwnedModel):
         verbose_name_plural = _("company identifiers")
         ordering = ("scheme", "value")
         constraints = [
+            # The messages are the ones the formset uses, because a constraint checked during
+            # `full_clean` lands on the form and is read by whoever is typing (#211). Without
+            # them Django says "Constraint “...” is violated", which names our table, not their
+            # mistake. The scheme/owner constraint below has none: it names `owner`, which is
+            # never a form field, so Django skips it there and only the database ever sees it.
             models.UniqueConstraint(
                 fields=("company", "scheme"),
                 condition=~models.Q(scheme=identifiers.OTHER),
                 name="one_identifier_per_scheme_per_company",
+                violation_error_message=_("This kind of identifier is already listed."),
             ),
+            # **Compared without regard to case** (#211). Every named scheme folds its own
+            # value -- Wikidata to upper, LinkedIn to lower -- so for those this changes
+            # nothing except for rows written before the folding existed. `other` folds
+            # nothing, because a staff number typed `AB-12` should read `AB-12`; that makes
+            # the *comparison* the place to be case-blind rather than the stored value.
             models.UniqueConstraint(
-                fields=("owner", "scheme", "value"),
+                Lower("value"),
+                "owner",
+                "scheme",
                 condition=~models.Q(scheme=identifiers.OTHER),
                 name="one_company_per_identifier_per_owner",
             ),
             models.UniqueConstraint(
-                fields=("company", "scheme", "label", "value"),
+                "company",
+                "scheme",
+                Lower("label"),
+                Lower("value"),
                 name="unique_other_identifier_per_company",
+                violation_error_message=_("This identifier is already listed."),
             ),
         ]
 
