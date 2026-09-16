@@ -116,17 +116,6 @@ jobs:
             echo '</details>'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # A signed list of what is in the image is more use to somebody self-hosting Postulo
-      # than this run's verdict: it lets them scan the release later, against a database
-      # that does not exist yet.
-      - name: Keep the bill of materials
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom-${{ inputs.tag }}
-          path: .scan/sbom.cdx.json
-          if-no-files-found: warn
-
       - name: Build for amd64 and arm64 and push
         env:
           TAGS: ${{ steps.tags.outputs.tags }}
@@ -135,3 +124,23 @@ jobs:
           tags=""
           for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
           docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
+
+      # A signed list of what is in the image is more use to somebody self-hosting Postulo
+      # than this run's verdict: it lets them scan the release later, against a database
+      # that does not exist yet.
+      #
+      # Last, and allowed to fail. This Forgejo answers the artifact API as a GitHub
+      # Enterprise Server that does not implement v2 of it, so `upload-artifact@v4` ends
+      # the step with "not currently supported on GHES" -- and this step used to sit before
+      # the push with `if: always()`, so v0.3.0 was tagged and released with no container
+      # image at all: the release was published, the scan ran clean, and the one artefact
+      # most people actually install was never built. A bill of materials is worth having
+      # and is not worth the image (#251).
+      - name: Keep the bill of materials
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ inputs.tag }}
+          path: .scan/sbom.cdx.json
+          if-no-files-found: warn
