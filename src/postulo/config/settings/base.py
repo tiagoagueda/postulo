@@ -88,6 +88,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
+    # After it, so `request.htmx` is there to read, and outside everything that answers a
+    # request, so the sign-in redirect is seen whichever of them wrote it (#226).
+    "postulo.core.middleware.HtmxLoginRedirectMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     # Last, because it needs request.user and overrides LocaleMiddleware.
     "postulo.core.middleware.UserPreferencesMiddleware",

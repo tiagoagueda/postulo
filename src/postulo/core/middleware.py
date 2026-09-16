@@ -1,10 +1,92 @@
-"""Request-scoped preferences for the signed-in person."""
+"""Request-scoped preferences for the signed-in person, and the answer htmx understands."""
 
 from __future__ import annotations
 
 import zoneinfo
+from urllib.parse import urlsplit
 
+from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import resolve_url
+from django.urls import NoReverseMatch, reverse
 from django.utils import timezone, translation
+
+#: Statuses that are a redirect and carry a ``Location``. 307 and 308 are here for
+#: completeness; nothing in Postulo answers with either.
+REDIRECTS = frozenset({301, 302, 303, 307, 308})
+
+
+class HtmxLoginRedirectMiddleware:
+    """Send an htmx request that has outlived its session to the sign-in page.
+
+    A browser's ``XMLHttpRequest`` follows a redirect without telling the script it
+    happened, so htmx never sees the 302 that says *sign in first*: it sees the 200 the
+    sign-in page answers with and does what it was told to do with a 200, which is to swap
+    it into the target. Leave a filtered table open over lunch, touch a filter, and the
+    whole sign-in page -- masthead, footer and a form asking for a password -- appeared
+    inside ``#applications-table``, on a page that still looked signed in (#226).
+
+    ``HX-Redirect`` is the header htmx reads before it looks at anything else, so the
+    redirect is turned into one and the browser goes to the sign-in page as a page. The
+    address is passed through whole, ``?next=`` and all, so signing in comes back to the
+    table that was being filtered.
+
+    **Only the sign-in page.** Every other redirect an htmx request meets is one a view
+    meant, and swapping what it leads to is what those views are written to expect; turning
+    all of them into full page loads would undo the swapping this application is built on.
+    So this recognises one destination and leaves the rest alone.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if getattr(request, "htmx", None) and response.status_code in REDIRECTS:
+            location = response.headers.get("Location", "")
+            # Relative only. What htmx does with this header is set `location.href`, so an
+            # address naming a host would be this middleware handing a browser to somewhere
+            # else because a path matched. Django's sign-in redirect has never been
+            # anything but relative, which is what makes the rule free.
+            parts = urlsplit(location)
+            if location and not parts.netloc and not parts.scheme:
+                if parts.path in self._sign_in_paths():
+                    return self._tell_htmx(response, location)
+        return response
+
+    @staticmethod
+    def _tell_htmx(response: HttpResponse, location: str) -> HttpResponse:
+        """A 204 carrying the address, keeping everything else the redirect had.
+
+        Cookies and headers are copied rather than dropped: a session cycled or a message
+        stored on the way out belongs to this reply as much as the ``Location`` did.
+        """
+        answer = HttpResponse(status=204)
+        for header, value in response.headers.items():
+            if header.lower() not in {"location", "content-type", "content-length"}:
+                answer.headers[header] = value
+        answer.cookies = response.cookies
+        answer.headers["HX-Redirect"] = location
+        return answer
+
+    @staticmethod
+    def _sign_in_paths() -> set[str]:
+        """Where *sign in first* points, by both names it is reached under.
+
+        ``LOGIN_URL`` is what Django's own ``LoginRequiredMixin`` resolves, and
+        ``account_login`` is what allauth reverses; they are the same page today and
+        nothing guarantees they stay one setting apart.
+        """
+        paths = set()
+        try:
+            paths.add(urlsplit(resolve_url(settings.LOGIN_URL)).path)
+        except NoReverseMatch:  # pragma: no cover - a misconfigured LOGIN_URL
+            pass
+        try:
+            paths.add(reverse("account_login"))
+        except NoReverseMatch:  # pragma: no cover - allauth is always mounted
+            pass
+        return paths
 
 
 class UserPreferencesMiddleware:

@@ -36,7 +36,9 @@
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
         {% translate "One zip with every record and every file, which imports into a fresh account on any Postulo." %}
       </p>
-      <form method="post" action="{% url 'core:export_download' %}">
+      {# `data-download`: the answer is a file, so the button is released again rather #}
+      {# than left disabled -- on the page that asks you to take a copy first (#226). #}
+      <form method="post" action="{% url 'core:export_download' %}" data-download>
         {% csrf_token %}
         <button type="submit" class="btn-secondary">{% translate "Download the archive" %}</button>
       </form>

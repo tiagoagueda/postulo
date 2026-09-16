@@ -31,7 +31,10 @@
       </p>
     </div>
 
-    <form method="post" action="{% url 'core:export_download' %}">
+    {% comment %} `data-download`: the answer to this is a file, so the page it was pressed
+       on is the page it stays on, and the submit guard has to let go of the button again
+       rather than wait for a navigation that never happens (#226). {% endcomment %}
+    <form method="post" action="{% url 'core:export_download' %}" data-download>
       {% csrf_token %}
       <button type="submit" class="btn-primary">{% translate "Download the archive" %}</button>
       <span class="ms-3 text-xs text-ink-500 dark:text-ink-400">{{ filename }}</span>

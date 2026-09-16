@@ -30,7 +30,8 @@
       {% comment %} A form rather than a link: the press files the report under Sent
          documents as well as handing it over, and a GET must never leave a record behind
          (#162). {% endcomment %}
-      <form method="post" action="{% url 'applications:report_pdf' %}?{{ request.GET.urlencode }}" class="inline">
+      <form method="post" action="{% url 'applications:report_pdf' %}?{{ request.GET.urlencode }}"
+            class="inline" data-download>
         {% csrf_token %}
         <button type="submit" class="btn-primary">{% translate "Download PDF" %}</button>
       </form>

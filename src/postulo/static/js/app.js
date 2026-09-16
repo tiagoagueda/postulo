@@ -9,6 +9,130 @@
 (function () {
   "use strict";
 
+  /* ------------------------------------------------------- making a page ready, once
+   *
+   * Half of this file adds something to markup the server drew: a handle on a column
+   * header, a *Select all* beside a bulk bar, chips over a checkbox group, `draggable` on a
+   * card. Each of those has to run when the page arrives *and* after every htmx swap, and
+   * each wrote that out for itself -- three registrations apiece, spelled slightly
+   * differently every time. The ones written last forgot the swap: `readyWidgetDragging`
+   * and the notifier card were never run again after htmx replaced anything, so a widget
+   * row that came back in a swap could not be dragged (#226).
+   *
+   * `onContentReady` is that rule in one place. What is handed to it runs now, and again
+   * after every swap; each of these functions checks for what it added before adding it,
+   * which is what makes "run it again" the whole of the answer. The script is deferred, so
+   * the document is parsed before any of this executes and there is no load event left to
+   * wait for.
+   *
+   * There is deliberately no `htmx:historyRestore` here. Since #226 the back button reloads
+   * the page from the server rather than putting back a copy of it, so a restored page is a
+   * page load and arrives through the front door with everything else.
+   */
+  function onContentReady(ready) {
+    if (document.body) {
+      ready();
+    } else {
+      document.addEventListener("DOMContentLoaded", ready);
+    }
+    document.addEventListener("htmx:afterSwap", ready);
+  }
+
+  // Every form on a page carries the same token, so which one is found does not matter;
+  // a page with no form at all has none to find, and the caller's request is refused,
+  // which is the correct end for a request that cannot prove where it came from.
+  function csrfToken() {
+    var field = document.querySelector("input[name=csrfmiddlewaretoken]");
+    return field ? field.value : "";
+  }
+
+  /* --------------------------------------- a request that fails, and one still running
+   *
+   * Nothing listened for `htmx:responseError` or `htmx:sendError`, and no template has ever
+   * named an `hx-indicator`. Every live filter, sort and page link in this application
+   * replaces a table, and htmx does not swap a 4xx or a 5xx -- so a filter that answered 500,
+   * and a filter sent from a train with no signal, both left the previous rows sitting there
+   * and said nothing whatsoever. The filter looked broken, or worse, looked as though it had
+   * honestly found those rows (#226).
+   *
+   * **The words come from the page, not from here.** `base.html` renders one `role="alert"`
+   * region carrying both sentences as data attributes, so they are translated with
+   * everything else; this file contains no English a person will ever read.
+   *
+   * **`aria-busy` on the part being replaced.** htmx marks the element that *asked* with
+   * `.htmx-request`, which is the sort link or the filter box -- but what somebody is waiting
+   * for is the table. Setting it here rather than in the markup gives every swap in the
+   * application the same treatment without a template having to remember, and it is a
+   * screen reader's answer as much as the stylesheet's.
+   *
+   * The message is cleared by the next request that works, rather than by a timer or a
+   * button. A failure that cleans itself up after five seconds is one somebody looking at
+   * their keyboard never sees; the next successful swap is the moment it stopped being true.
+   */
+  function alertRegion() {
+    return document.querySelector("[data-htmx-alert]");
+  }
+
+  function sayFailure(words) {
+    var region = alertRegion();
+    if (region) {
+      region.textContent = words || "";
+    }
+  }
+
+  function failureWords(name) {
+    var region = alertRegion();
+    return (region && region.dataset[name]) || "";
+  }
+
+  // The element being replaced, which is what `aria-busy` belongs on. htmx puts it on the
+  // event's detail; `elt` -- the element that asked -- is the fallback for an event raised
+  // before a target was worked out.
+  function swapTarget(event) {
+    var detail = event.detail || {};
+    var node = detail.target || detail.elt || null;
+    return node && node.nodeType === 1 && node.setAttribute ? node : null;
+  }
+
+  document.addEventListener("htmx:beforeRequest", function (event) {
+    var target = swapTarget(event);
+    if (target) {
+      target.setAttribute("aria-busy", "true");
+    }
+  });
+
+  /* Four events rather than one: `htmx:afterRequest` is not raised when the request never
+   * reached the server, and a target left `aria-busy` for ever is a table announced as
+   * loading long after everybody has given up on it. */
+  ["htmx:afterRequest", "htmx:responseError", "htmx:sendError", "htmx:timeout"].forEach(
+    function (name) {
+      document.addEventListener(name, function (event) {
+        var target = swapTarget(event);
+        if (target) {
+          target.removeAttribute("aria-busy");
+        }
+      });
+    }
+  );
+
+  document.addEventListener("htmx:responseError", function (event) {
+    var xhr = (event.detail || {}).xhr;
+    sayFailure(failureWords("alertFailed").replace("{status}", String((xhr && xhr.status) || 0)));
+  });
+
+  function saySilence() {
+    sayFailure(failureWords("alertOffline"));
+  }
+
+  document.addEventListener("htmx:sendError", saySilence);
+  document.addEventListener("htmx:timeout", saySilence);
+
+  document.addEventListener("htmx:afterRequest", function (event) {
+    if ((event.detail || {}).successful) {
+      sayFailure("");
+    }
+  });
+
   /* ------------------------------------------- a control that saves when it is finished
    *
    * Controls marked `data-autosubmit` save as soon as they change. Used by the board, where
@@ -152,11 +276,7 @@
     );
   }
 
-  document.addEventListener("DOMContentLoaded", readyBoardCards);
-  document.addEventListener("htmx:afterSwap", readyBoardCards);
-  if (document.body) {
-    readyBoardCards();
-  }
+  onContentReady(readyBoardCards);
 
   function columnOf(node) {
     return node && node.closest ? node.closest("[data-board-column]") : null;
@@ -294,11 +414,32 @@
    * htmx sends are its own business, and it swaps them away. `pageshow` clears the mark,
    * so the back button gets a form that works again; with this script blocked the form
    * is what it always was.
+   *
+   * **A form whose answer is a file never leaves the page**, so `pageshow` never comes and
+   * the mark stayed on for the rest of the visit. *Download the archive*, *Export PDF* and
+   * *Download PDF* were one-shot buttons: press one, take the file, and the button was
+   * greyed out and `aria-disabled` until somebody thought to reload -- including the one on
+   * the page that asks you to take a copy of everything before deleting your account
+   * (#226). A form marked
+   * `data-download` says that this is what it is, and its mark is lifted again a few
+   * seconds later. It is a delay and not an exemption on purpose: the accident being
+   * guarded against is a double click, which happens inside a second, and the second
+   * export somebody asks for a minute later is not an accident.
    */
+  var DOWNLOAD_RELEASE = 3000;
+
   function submitButtons(form) {
     return Array.prototype.slice.call(
       form.querySelectorAll("button:not([type]), button[type=submit], input[type=submit]")
     );
+  }
+
+  function releaseForm(form) {
+    delete form.dataset.submitted;
+    submitButtons(form).forEach(function (button) {
+      button.removeAttribute("aria-disabled");
+      button.classList.remove("opacity-60", "pointer-events-none");
+    });
   }
 
   document.addEventListener("submit", function (event) {
@@ -321,16 +462,15 @@
       button.setAttribute("aria-disabled", "true");
       button.classList.add("opacity-60", "pointer-events-none");
     });
+    if (form.hasAttribute("data-download")) {
+      window.setTimeout(function () {
+        releaseForm(form);
+      }, DOWNLOAD_RELEASE);
+    }
   });
 
   window.addEventListener("pageshow", function () {
-    Array.prototype.forEach.call(document.querySelectorAll("form[data-submitted]"), function (form) {
-      delete form.dataset.submitted;
-      submitButtons(form).forEach(function (button) {
-        button.removeAttribute("aria-disabled");
-        button.classList.remove("opacity-60", "pointer-events-none");
-      });
-    });
+    Array.prototype.forEach.call(document.querySelectorAll("form[data-submitted]"), releaseForm);
   });
 
   document.addEventListener("submit", function (event) {
@@ -666,11 +806,10 @@
     }
   });
 
-  document.addEventListener("DOMContentLoaded", readyBulkForms);
   // The table is swapped by htmx when a filter changes, which also replaces the bar and
   // brings fresh, unticked boxes with it -- which is exactly the rule: a changed query
   // clears the selection.
-  document.body.addEventListener("htmx:afterSwap", readyBulkForms);
+  onContentReady(readyBulkForms);
 
   document.addEventListener("keydown", function (event) {
     if (event.key !== "Escape") {
@@ -1048,9 +1187,7 @@
     Array.prototype.forEach.call(document.querySelectorAll("[data-labels]"), readyLabels);
   }
 
-  document.addEventListener("DOMContentLoaded", readyEveryLabelBox);
-  document.body && readyEveryLabelBox();
-  document.addEventListener("htmx:afterSwap", readyEveryLabelBox);
+  onContentReady(readyEveryLabelBox);
 
   /* --------------------------------------------------------------- editing a cell
    *
@@ -1201,11 +1338,6 @@
   var RESIZE_MIN = 64;
   var RESIZE_MAX = 900;
 
-  function tokenFor(head) {
-    var field = document.querySelector("input[name=csrfmiddlewaretoken]");
-    return field ? field.value : "";
-  }
-
   function saveWidth(head, key, pixels) {
     var body = new URLSearchParams();
     body.set("width", key);
@@ -1221,7 +1353,7 @@
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRFToken": tokenFor(head),
+        "X-CSRFToken": csrfToken(),
         "X-Requested-With": "XMLHttpRequest",
       },
       body: body.toString(),
@@ -1415,11 +1547,7 @@
     );
   }
 
-  document.addEventListener("DOMContentLoaded", readyColumnWidths);
-  document.addEventListener("htmx:afterSwap", readyColumnWidths);
-  if (document.body) {
-    readyColumnWidths();
-  }
+  onContentReady(readyColumnWidths);
 
   /* ------------------------------------------------- dragging a widget into place
    *
@@ -1448,7 +1576,7 @@
     form.action = list.dataset.widgetPlace || "";
     form.hidden = true;
     [
-      ["csrfmiddlewaretoken", (document.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || ""],
+      ["csrfmiddlewaretoken", csrfToken()],
       ["key", key],
       ["to", String(index)],
       ["action", "place"],
@@ -1528,10 +1656,7 @@
     );
   }
 
-  document.addEventListener("DOMContentLoaded", readyWidgetDragging);
-  if (document.body) {
-    readyWidgetDragging();
-  }
+  onContentReady(readyWidgetDragging);
 
   /*
    * The browser notifier (#209), in two halves.
@@ -1636,10 +1761,7 @@
     Array.prototype.forEach.call(document.querySelectorAll("[data-web-push-key]"), readyPushSubscribe);
   }
 
-  document.addEventListener("DOMContentLoaded", readyEveryPushCard);
-  if (document.body) {
-    readyEveryPushCard();
-  }
+  onContentReady(readyEveryPushCard);
 
   // Only somewhere on this site, for the reason the worker gives.
   function sameSiteAddress(address) {
@@ -1718,9 +1840,6 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", readyNoticeCollection);
-  if (document.body) {
-    readyNoticeCollection();
-  }
+  onContentReady(readyNoticeCollection);
 
 })();

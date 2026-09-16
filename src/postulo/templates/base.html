@@ -9,7 +9,23 @@
        already defines .htmx-indicator and the .htmx-request pair, precisely because inline
        styles are not available here, so what htmx adds is redundant as well as blocked.
        Configured by attribute, which the policy does allow. {% endcomment %}
-    <meta name="htmx-config" content='{"includeIndicatorStyles":false}'>
+    {% comment %} `historyCacheSize: 0` with `refreshOnHistoryMiss`, which together mean the
+       back button gets a page from the server rather than a photograph of one taken out of
+       `sessionStorage` (#226). htmx keeps the body of every page it pushed a URL for, and a
+       table swap pushes one on every filter, every sort and every page turn. Restoring that
+       copy put back the column-resize handles, the *Select all* button and the label chips
+       with none of their listeners attached, and the functions that would have attached them
+       then skipped the markers already sitting in the markup -- so Back handed back a page
+       whose controls looked exactly like themselves and did nothing at all.
+
+       It also left the applications, the companies and the people somebody had been reading
+       in `sessionStorage`, which signing out in the same tab does not touch. A copy of
+       personal data that outlives the session is not worth saving a page load for, least of
+       all here. Zero makes htmx delete that store the first time it would have written to
+       it, so an instance that has been running since before this clears what is already
+       there rather than leaving it. {% endcomment %}
+    <meta name="htmx-config"
+          content='{"includeIndicatorStyles":false,"historyCacheSize":0,"refreshOnHistoryMiss":true}'>
     <meta name="referrer" content="same-origin">
     {% comment %} The instance first, then the page: *Postulo > Dashboard*. A tab, a bookmark,
        the history and a screen reader's announcement all read this, and a page named alone
@@ -41,6 +57,23 @@
   <body class="min-h-screen"{% if not keyboard_shortcuts %} data-shortcuts="off"{% endif %}{% if browser_notices %} data-browser-notices="{% url 'notifications:waiting' %}" data-browser-notices-token="{{ csrf_token }}"{% endif %}>
     {# The first thing Tab reaches: past the header, straight to the page. #}
     <a href="#main" class="skip-link">{% translate "Skip to content" %}</a>
+    {% comment %} What a failed htmx request says (#226). Every live filter, sort and page
+       link on this application replaces a table, and a request that answers 500 or never
+       leaves the machine swaps nothing -- so the table went on showing the previous answer
+       and the filter simply looked broken. There was no listener for either failure and no
+       place to put one.
+
+       One region for the whole application, empty until it has something to say, because a
+       live region announces a *change* to text it was already watching; created at the
+       moment of the failure it is a race the screen reader loses. The words are here rather
+       than in `app.js` so that they are translated like everything else -- the script holds
+       no English at all, which is the same rule the notifier card and the password meter
+       follow. It says the status because "it did not work" and "it did not work, 503" are
+       different problems, and it says that nothing changed because that is the part a
+       person cannot see for themselves. {% endcomment %}
+    <div class="page-alert" role="alert" data-htmx-alert
+         data-alert-failed="{% translate 'That did not work — the server answered {status}. Nothing on this page has changed.' %}"
+         data-alert-offline="{% translate 'Postulo could not be reached. Nothing on this page has changed.' %}"></div>
     {% block chrome %}
       {% comment %} The header floats: `sticky top-0`, so the wordmark, the navigation, the
          search and the account menu are there wherever the page has scrolled to (#195).

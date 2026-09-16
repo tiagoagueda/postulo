@@ -3325,6 +3325,63 @@ details[data-menu] > summary::-webkit-details-marker {
   visibility: visible;
   opacity: 100%;
 }
+[aria-busy="true"] {
+  opacity: 60%;
+  transition-property: opacity;
+  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+  transition-duration: var(--tw-duration, var(--default-transition-duration));
+  cursor: progress;
+}
+.page-alert {
+  position: fixed;
+  inset-inline: calc(var(--spacing) * 4);
+  bottom: calc(var(--spacing) * 4);
+  z-index: 50;
+  margin-inline: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--spacing) * 3);
+  border-radius: var(--radius-lg);
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  padding-inline: calc(var(--spacing) * 4);
+  padding-block: calc(var(--spacing) * 3);
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+  max-width: var(--container-2xl);
+  border-color: var(--color-red-200);
+  background-color: var(--color-red-50);
+  color: var(--color-red-900);
+  --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    border-color: var(--color-red-800);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      border-color: var(--color-red-800);
+    }
+  }
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    background-color: var(--color-red-950);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      background-color: var(--color-red-950);
+    }
+  }
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    color: var(--color-red-100);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      color: var(--color-red-100);
+    }
+  }
+}
+.page-alert:empty {
+  display: none;
+}
 @layer components {
   .skip-link {
     position: absolute;

@@ -723,6 +723,44 @@ details[data-menu] > summary::-webkit-details-marker {
   @apply visible opacity-100;
 }
 
+/* The part of the page a request is replacing, for as long as it is being replaced (#226).
+ *
+ * htmx marks the element that *asked* with `.htmx-request`, and no template in Postulo has
+ * ever named an `hx-indicator`, so a filter that took two seconds looked exactly like a
+ * filter that had finished and found nothing. `aria-busy` is the answer to both halves of
+ * that: it is what a screen reader is told, and it is the hook this rule hangs on, so
+ * nothing has to be added to the markup of every table to get either.
+ *
+ * Opacity and a cursor, and no movement at all. What is under it is the previous answer,
+ * still true until the new one lands; a spinner over it would be a page pretending to work
+ * harder than it is, and something moving on every keystroke of a filter is worse than
+ * nothing for anybody who asked their system for less of it. */
+[aria-busy="true"] {
+  @apply opacity-60 transition-opacity;
+  cursor: progress;
+}
+
+/* What a failed request says, since a swap that never arrives changes nothing on the screen
+   and therefore says nothing at all (#226).
+ *
+ * The region lives in the document from the first paint and is empty until there is
+ * something to report. That is the whole reason for `:empty` rather than `hidden`: a live
+ * region the browser has known about since the page loaded announces a change to its text,
+ * while one inserted at the moment of the failure is a race with the screen reader, and the
+ * race is lost often enough to be worthless.
+ *
+ * Fixed to the bottom, because the thing that failed may be anywhere down a long table and
+ * the message has to be where somebody is looking either way. `inset-x-4` with `mx-auto`
+ * gives it the gutter on a phone and a readable measure on a monitor. */
+.page-alert {
+  @apply alert fixed inset-x-4 bottom-4 z-50 mx-auto max-w-2xl border-red-200 bg-red-50
+    text-red-900 shadow-lg dark:border-red-800 dark:bg-red-950 dark:text-red-100;
+}
+
+.page-alert:empty {
+  display: none;
+}
+
 /* Accessibility: the skip link is visible only when it has focus, and nothing moves for
    someone who asked their system for less motion. */
 @layer components {

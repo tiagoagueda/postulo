@@ -773,6 +773,55 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The page script stopped failing in silence.** Four things went wrong without saying so,
+  and what they had in common is that the page went on looking correct afterwards. A filter,
+  a sort or a page link is an htmx request that replaces a table, and htmx does not swap a
+  500 — so a request the server refused, and a request sent from a train with no signal, both
+  left the previous rows sitting where they were. Nothing listened for either failure and no
+  template had ever named an indicator, so the honest reading of the screen was that the
+  filter had found those rows. There is one `role="alert"` region on every page now, empty
+  until there is something to report, filled by a handler delegated from the document; it
+  says which status came back, because 503 and 500 are different problems, and it says that
+  nothing on the page changed, because that is the part nobody can see for themselves. The
+  part being replaced carries `aria-busy` while its request is in flight — the element htmx
+  marks is the sort link, and what a person is waiting for is the table.
+
+  **A session that had expired filled the table with the sign-in page.** An `XMLHttpRequest`
+  follows a redirect without telling the script it happened, so htmx never saw the 302 that
+  means *sign in first*: it saw the 200 the sign-in page answered with and did what it does
+  with a 200. Leave a filtered list open over lunch, touch a filter, and a masthead, a footer
+  and a password field appeared inside the table, on a page that still looked signed in. A
+  redirect to the sign-in page answering an htmx request is now `HX-Redirect`, which sends
+  the browser there as a page and keeps the `?next=`, so signing in comes back to the list
+  that was open. Only that one destination: every other redirect a view makes is one it
+  meant, and the swap that follows is what it was written to expect.
+
+  **The back button gave back controls that no longer worked.** A table swap pushes an
+  address, and htmx kept a copy of each of those pages in `sessionStorage`. Restoring one put
+  the column-resize handles, the *Select all* button and the label chips back into the markup
+  with none of their listeners, and the functions that would have attached them then skipped
+  them because the markers were already there — so Back produced a page whose controls looked
+  exactly like themselves and did nothing at all. It also left applications, companies and
+  people in `sessionStorage`, where signing out in the same tab does not touch them. htmx
+  keeps no copy now and Back asks the server, which costs a page load and is worth it twice
+  over; the views have answered a restore with a whole page since they were written. An
+  instance upgrading to this clears what is already in that store the first time a page is
+  saved.
+
+  **And the export buttons locked after the first press.** The guard that stops a double
+  click marks a form and lets go again on `pageshow` — but a form whose answer is a file
+  never leaves the page, so `pageshow` never came. *Download the archive*, *Export PDF* and
+  *Download PDF* were one-shot buttons for the rest of the visit, including the one on the
+  page that asks you to take a copy of everything before deleting your account. Those forms
+  say what they are, and the guard lets go of them a few seconds later. A delay rather than
+  an exemption: the accident it exists for is a double click, which happens inside a second,
+  and a second export a minute later is not an accident.
+
+  Underneath, the six functions that add something to swapped-in markup share one helper
+  instead of writing their own three registrations each — the two written last had forgotten
+  the swap, so a dashboard widget that came back in one could not be dragged. The count on
+  the server log page is no longer a live region, since that page filters with a whole page
+  load and had never had a change to announce. (#226)
 - **One slow request no longer stops the whole instance.** Every request was a transaction,
   and on SQLite Postulo opens transactions *immediate* — the write lock is taken before the
   view runs and given back with the response. For a page that is milliseconds, and it is the

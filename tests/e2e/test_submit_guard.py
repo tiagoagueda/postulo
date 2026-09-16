@@ -53,3 +53,30 @@ def test_the_back_button_gets_a_form_that_works_again(live_server, page: Page, f
     save = page.get_by_role("button", name="Save", exact=True)
     expect(save).not_to_have_attribute("aria-disabled", "true")
     expect(page.locator("form[data-submitted]")).to_have_count(0)
+
+
+def test_the_export_can_be_taken_twice(live_server, page: Page, furnished):  # noqa: F811
+    """A form whose answer is a file never navigates, so `pageshow` never comes (#226).
+
+    The archive is downloaded rather than opened, the page stays exactly where it was, and
+    the mark the guard left stayed with it -- so *Download the archive* was greyed out and
+    `aria-disabled` for the rest of the visit, on a page whose entire purpose is taking a
+    copy of your own data away with you. Pressed once, waited for, pressed again: two files,
+    and the second press is a press rather than a reload.
+    """
+    base = live_server.url
+    sign_in(page, base)
+    page.goto(f"{base}/export/")
+
+    archive = page.get_by_role("button", name="Download the archive")
+    with page.expect_download() as first:
+        archive.click()
+    assert first.value.suggested_filename.endswith(".zip")
+
+    # Released a few seconds later rather than never: what is being guarded against is a
+    # double click, and this is well past one.
+    expect(archive).not_to_have_attribute("aria-disabled", "true", timeout=15000)
+
+    with page.expect_download() as second:
+        archive.click()
+    assert second.value.suggested_filename.endswith(".zip")
