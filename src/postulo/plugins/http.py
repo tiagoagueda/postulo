@@ -44,8 +44,56 @@ def check_destination(url: str) -> None:
         ) from exc
 
 
+def _refused(exc: UnsafeURL) -> DestinationRefused:
+    """The connection policy's wording for an address the public check turned down."""
+    return DestinationRefused(
+        f"{exc} Connections may only reach private or local addresses when the operator "
+        "sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
+    )
+
+
 def _guard(request: httpx.Request) -> None:
-    check_destination(str(request.url))
+    """Approve the destination, and then connect to the address that was approved.
+
+    Checking and connecting have to be one act, which is rule 5 of `docs/THREAT-MODEL.md`.
+    `check_destination` resolved the name and threw the answer away, and httpx then resolved
+    it again to open the socket: a name with a one-second lifetime is free to answer publicly
+    for the check and with `127.0.0.1` or a metadata address a moment later, and the check
+    would have passed on an address nothing ever contacted.
+
+    Where the operator has allowed private destinations there is nothing left to enforce --
+    every address passes -- so the name is left for httpx to resolve as it always did. That
+    keeps self-hosted setups working the way they do today, including the ones whose names
+    resolve differently inside a Compose network.
+    """
+    if private_destinations_allowed():
+        return
+    original = request.headers.get("Host")
+    try:
+        addresses = public_addresses_for(str(request.url))
+    except UnsafeURL as exc:
+        raise _refused(exc) from exc
+    _pin(request, addresses[0])
+    if original:
+        request.headers["Host"] = original
+
+
+def approve_host(host: str) -> str:
+    """The address to dial for a plugin that speaks something other than HTTP.
+
+    A mailbox, a message queue, anything with a socket of its own: resolve the name, hold
+    every address it answers with to the instance's policy, and hand back the one to connect
+    to. Keep the *name* for TLS — the certificate is proved against what somebody typed, and
+    a certificate checked against a number never matches.
+
+    Raises :class:`DestinationRefused`, whose message is for the person who typed the host.
+    """
+    from postulo.core import destinations
+
+    try:
+        return str(destinations.approve(host, allow_private=private_destinations_allowed()))
+    except (destinations.Refused, destinations.Unresolvable) as error:
+        raise DestinationRefused(str(error)) from error
 
 
 def _pin(request: httpx.Request, address) -> None:

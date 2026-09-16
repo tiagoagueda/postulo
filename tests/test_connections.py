@@ -367,7 +367,9 @@ def test_the_client_checks_every_request_it_makes(settings, monkeypatch):
     import httpx
 
     def handler(request):
-        if request.url.host == "public.example.org":
+        # By the Host header, not the URL's host: the client now connects to the address it
+        # approved and carries the name in the header (#215), so the URL holds a number.
+        if request.headers.get("Host") == "public.example.org":
             return httpx.Response(302, headers={"Location": "http://127.0.0.1/admin"})
         return httpx.Response(200, text="ok")
 

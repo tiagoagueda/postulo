@@ -158,7 +158,13 @@ def robots_allow(url: str, *, client: httpx.Client | None = None) -> bool:
     robots_url = urlunparse((parts.scheme, parts.netloc, "/robots.txt", "", "", ""))
 
     owned_client = client is None
-    client = client or httpx.Client(timeout=ROBOTS_TIMEOUT_SECONDS, follow_redirects=True)
+    if client is None:
+        # Guarded, not bare. Every caller today passes the client `fetch_page` opened, but
+        # this function is public in a plugin-facing module, and one that reached robots.txt
+        # on an address nothing had approved would be a way round the whole policy (#215).
+        from . import http
+
+        client = http.public_only_client(timeout=ROBOTS_TIMEOUT_SECONDS)
     try:
         response = client.get(robots_url, headers={"User-Agent": USER_AGENT})
         if response.status_code != 200:

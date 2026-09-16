@@ -97,14 +97,20 @@ def process(data: bytes) -> ContentFile:
 
 
 def download(url: str) -> bytes:
-    """One guarded request for one image. Raises :class:`UnusableLogo` with the reason."""
+    """One guarded request for one image. Raises :class:`UnusableLogo` with the reason.
+
+    The *public-only* client, not the connection one: a company's logo lives on the open web
+    by definition, so the operator's decision to let **connections** reach a Paperless on the
+    LAN says nothing about this. It is the same argument `resume/links.py` makes about a
+    portfolio address, and it is what stops a hostile site redirecting this fetch onto the
+    network the server sits in (#215). The client checks every hop and connects to the
+    address it checked, so there is no separate check to make first.
+    """
     try:
-        fetching.validate_public_url(url)
-    except fetching.UnsafeURL as error:
-        raise UnusableLogo(str(error)) from error
-    try:
-        with http.client(timeout=TIMEOUT) as client:
+        with http.public_only_client(timeout=TIMEOUT) as client:
             response = client.get(url)
+    except http.DestinationRefused as error:
+        raise UnusableLogo(str(error)) from error
     except Exception as error:
         raise UnusableLogo(
             str(_("Could not be fetched: %(error)s"))

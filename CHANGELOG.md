@@ -8,6 +8,30 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **Every outbound request now connects to the address it checked, and a logo is fetched from
+  the open web only.** The threat model has said since #112 that Postulo resolves a name,
+  approves every address it answers with, and connects to one of *those* — one act, because
+  two lookups leave a gap that a DNS record with a one-second lifetime can answer differently.
+  Capture worked that way; the client every connected plugin uses did not. It checked, threw
+  the answer away, and let httpx resolve the name again to open the socket.
+
+  Fetching a company's logo was worse, because it used that client rather than the public-only
+  one. On an instance where the operator had allowed private destinations — which is what
+  self-hosters do to reach a Paperless on the LAN — a company website could answer the logo
+  fetch with a redirect to `http://192.168.1.50/…`, and the picture it returned was stored and
+  shown. A logo is public by definition, the same way a portfolio address is, so the operator's
+  decision about *connections* was never an answer for it.
+
+  `robots_allow` also opened a bare client when nobody passed it one. Nothing in Postulo calls
+  it that way, but it is public in a plugin-facing module, and a way round the policy is worth
+  closing before somebody finds it.
+
+  Plugins that do not speak HTTP now have the same guard: `postulo.plugins.api.approve_host`
+  resolves a name, holds every address to the instance's policy and hands back the one to dial,
+  while TLS still proves the certificate against the name that was typed. `check_destination`
+  and `DestinationRefused` are on the surface beside it, so a mailbox or a queue can be dialled
+  as carefully as an HTTP request. (#215)
+
 - **WeasyPrint 70, for CVE-2026-55073, and renderers that fetch nothing a document does not
   carry.** The advisory, published on 9 September, is two `write_pdf` arguments —
   `stylesheets` and `xmp_metadata` — that ignored the document's URL fetcher and read local

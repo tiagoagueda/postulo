@@ -47,7 +47,10 @@ def web(monkeypatch):
         kwargs.setdefault("timeout", 10)
         return httpx.Client(transport=httpx.MockTransport(handler), **kwargs)
 
+    # Both: a logo is fetched with the public-only client (#215), and `fetch_page` — which
+    # `find_on_website` uses to read the company's own page — opens one too.
     monkeypatch.setattr(logos.http, "client", client)
+    monkeypatch.setattr(logos.http, "public_only_client", client)
     monkeypatch.setattr(logos.fetching, "validate_public_url", lambda url: url)
     return state
 
@@ -114,14 +117,24 @@ def test_something_far_too_large_is_refused_before_it_is_decoded(web):
         logos.download("https://cdn.example/big.png")
 
 
-def test_a_private_address_is_never_fetched(monkeypatch, company):
-    def refuse(url):
-        raise logos.fetching.UnsafeURL("that address is not public.")
+def test_a_private_address_is_never_fetched(company):
+    """Nothing is stubbed here on purpose (#215).
 
-    monkeypatch.setattr(logos.fetching, "validate_public_url", refuse)
-    with pytest.raises(logos.UnusableLogo, match="not public"):
+    The guarded client refuses the address itself — an address literal resolves to itself, so
+    this never leaves the machine — and it refuses it whatever the operator decided about
+    *connections*, because a logo is public by definition.
+    """
+    with pytest.raises(logos.UnusableLogo, match="private or local network"):
         logos.from_url(company, "http://192.168.1.20/logo.png")
     company.refresh_from_db()
+    assert not company.logo
+
+
+def test_a_logo_is_public_even_where_connections_may_reach_the_network(company, settings):
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = True
+
+    with pytest.raises(logos.UnusableLogo, match="private or local network"):
+        logos.from_url(company, "http://192.168.1.20/logo.png")
     assert not company.logo
 
 

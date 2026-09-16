@@ -48,7 +48,7 @@ if TYPE_CHECKING:  # pragma: no cover - the five names `__getattr__` resolves at
     from postulo.documents.themes import Theme
 
     from .consent import ACCESS_TOKEN, access_token
-    from .http import client
+    from .http import DestinationRefused, approve_host, check_destination, client
 
 from .base import (
     # ------------------------------------------ what a transport carries, and how
@@ -96,6 +96,7 @@ __all__ = [
     "TEXT",
     "ConnectedPlugin",
     "Consent",
+    "DestinationRefused",
     "DocumentMetadata",
     "ExternalRef",
     "FeaturePlugin",
@@ -117,6 +118,8 @@ __all__ = [
     "ThemeKind",
     "TransportPlugin",
     "access_token",
+    "approve_host",
+    "check_destination",
     "client",
     "declares",
     "description_of",
@@ -156,6 +159,15 @@ def __getattr__(name: str):
         from .http import client
 
         return client
+    if name in ("approve_host", "check_destination", "DestinationRefused"):
+        # The same rule for a plugin that does not speak HTTP: `approve_host` resolves a name,
+        # holds every address it answers with to the instance's policy, and hands back the one
+        # to dial, so a mailbox or a queue connects where an HTTP client would have been
+        # allowed to. `check_destination` answers the question without connecting, and
+        # `DestinationRefused` is what both raise (#215).
+        from . import http
+
+        return getattr(http, name)
     if name in ("Theme", "ThemeKind"):
         # How a plugin sets a document: one `Theme` per way of setting it, declaring which
         # kinds it can set by having a template for each. The templates live in a
