@@ -519,6 +519,17 @@ def test_the_csv_is_the_evidence_list(user):
     assert "2026-03-04" in lines[1]
 
 
+def test_a_cell_a_spreadsheet_would_run_is_written_as_text(user):
+    """The file is opened in a spreadsheet by somebody who did not choose what is in it."""
+    sent(user, on=dt.date(2026, 3, 4), role='=HYPERLINK("https://evil.example","Open")')
+
+    text = reports.as_csv(reports.build(user, march(), today=dt.date(2026, 3, 31)))
+
+    row = text.strip().split("\n")[1]
+    assert "'=HYPERLINK" in row, "kept, and marked as text"
+    assert ",=HYPERLINK" not in row and not row.startswith("=")
+
+
 def test_the_csv_downloads_with_the_period_in_its_name(client, user):
     client.force_login(user)
 

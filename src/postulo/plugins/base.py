@@ -23,6 +23,8 @@ from typing import Protocol, runtime_checkable
 from django.utils.translation import gettext as _
 from pydantic import BaseModel, Field, field_validator
 
+from postulo.core.addresses import page_address
+
 #: Nothing longer than this is kept from a page. Job adverts are not novels, and an
 #: unbounded field is an invitation to store somebody's entire single-page application.
 MAX_DESCRIPTION_CHARS = 40_000
@@ -66,6 +68,17 @@ class JobPostingData(BaseModel):
         if not value.strip():
             raise ValueError("A posting needs a title.")
         return value
+
+    @field_validator("url")
+    @classmethod
+    def url_must_be_a_page(cls, value: str) -> str:
+        """A posting's address is shown as a link, so it has to be one.
+
+        A source reads a stranger's markup, and a plugin is third-party code; neither is a
+        reason to put `javascript:` into a field the review screen and the listing page
+        both render as an ``href`` (#218).
+        """
+        return page_address(value)
 
     @field_validator("description")
     @classmethod

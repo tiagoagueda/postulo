@@ -32,20 +32,39 @@ STATUS_OF = {
 }
 
 
+#: Everything below a space, and DEL. A calendar file is a list of lines, so a control
+#: character in a value somebody typed is not a curiosity: a carriage return ends the
+#: property there and whatever follows is read as a property of its own, in every calendar
+#: that subscribes to the feed. Nothing in this set carries meaning worth keeping in an
+#: interview's note, a place or a person's name, so it all goes (#218).
+CONTROLS = frozenset(chr(code) for code in range(0x20)) | {"\x7f"}
+
+
+def without_controls(text: str) -> str:
+    """``text`` with nothing in it that could end a line or start a property."""
+    return "".join(ch for ch in text if ch not in CONTROLS)
+
+
 def escape(text: str) -> str:
     """Text as a property value: backslashes, semicolons, commas and newlines escaped."""
-    return (
-        text.replace("\\", "\\\\")
-        .replace(";", "\\;")
-        .replace(",", "\\,")
-        .replace("\r\n", "\\n")
-        .replace("\n", "\\n")
+    # A lone carriage return is a line break as much as a CRLF pair is, and old Mac text
+    # still arrives with one. Folding it in first means the escaping below cannot leave a
+    # real one behind to end the line early.
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    return without_controls(
+        text.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
     )
 
 
 def parameter(text: str) -> str:
-    """Text as a parameter value, quoted when it holds anything the grammar reserves."""
-    text = text.replace('"', "")
+    """Text as a parameter value, quoted when it holds anything the grammar reserves.
+
+    The quotation mark is dropped rather than escaped because RFC 5545 gives no way to
+    write one inside a quoted string. The control characters go for the reason `CONTROLS`
+    states: this value lands mid-line in ``ATTENDEE;CN=``, where a line break would let a
+    contact's name add properties to somebody else's calendar.
+    """
+    text = without_controls(text.replace('"', ""))
     if any(ch in text for ch in ",;:"):
         return f'"{text}"'
     return text
@@ -115,8 +134,11 @@ def event_lines(interview: Interview, *, url: str = "") -> list[str]:
         lines.append(f"URL:{url}")
     for person in people:
         if person.email:
+            # The address goes through the same sieve as the name: it is typed by a person
+            # or sent by an API client, and it sits on the same line.
+            address = without_controls(person.email)
             lines.append(
-                f"ATTENDEE;CN={parameter(person.name)};ROLE=REQ-PARTICIPANT:mailto:{person.email}"
+                f"ATTENDEE;CN={parameter(person.name)};ROLE=REQ-PARTICIPANT:mailto:{address}"
             )
     lines.append("END:VEVENT")
     return lines

@@ -20,15 +20,17 @@ from __future__ import annotations
 
 import datetime as dt
 from decimal import Decimal
+from typing import Annotated
 from urllib.parse import urlsplit
 
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI, Schema, Status
 from ninja.errors import HttpError, ValidationError
-from pydantic import ConfigDict, Field
+from pydantic import AfterValidator, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
 
+from postulo.core.addresses import page_address
 from postulo.jobs.known import known
 from postulo.jobs.models import Capture, CaptureStatus
 from postulo.notifications.base import Notification
@@ -65,6 +67,11 @@ api = NinjaAPI(
 )
 
 
+#: The address of a page that was read. Only the scheme is held to, for the reason
+#: `postulo.core.addresses.page_address` gives.
+PageAddress = Annotated[str, AfterValidator(page_address)]
+
+
 class CorrectionsIn(Schema):
     """The fields a person changed after seeing what was read. Every one is optional."""
 
@@ -89,7 +96,10 @@ class CorrectionsIn(Schema):
 class PageIn(Schema):
     """A page somebody wants Postulo to read."""
 
-    url: str = Field(max_length=500)
+    #: Kept as ``Capture.url`` and drawn as a link on the review screen. A caller that
+    #: sends its own ``html`` is never fetched, so this is the only thing standing between
+    #: a `javascript:` address and that link (#218).
+    url: PageAddress = Field(max_length=500)
     html: str | None = Field(
         default=None,
         description=(

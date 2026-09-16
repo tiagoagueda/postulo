@@ -202,6 +202,24 @@ def test_the_schema_forbids_fields_it_does_not_know():
         JobPostingData(title="A role", salary_note="secretly enormous")
 
 
+def test_the_address_is_held_to_its_scheme_and_to_nothing_else():
+    """The scheme is the danger; the shape of a hostname is not (#218).
+
+    A posting's address is drawn as a link, so `javascript:` in one runs as whoever opened
+    the page. What follows the scheme is left alone on purpose: an internal board on a host
+    with no dot in its name is a real place to capture from, and refusing the whole capture
+    over that would lose more than it saves -- the review screen is still between it and
+    anything saved.
+    """
+    with pytest.raises(ValueError, match="http"):
+        JobPostingData(title="A role", url="javascript:alert(1)")
+    with pytest.raises(ValueError, match="http"):
+        JobPostingData(title="A role", url="data:text/html,<script>alert(1)</script>")
+
+    assert JobPostingData(title="A role", url="").url == "", "a source that found none"
+    assert JobPostingData(title="A role", url="https://jobs/42").url == "https://jobs/42"
+
+
 # ------------------------------------------------------------- fetching safely
 
 

@@ -27,6 +27,8 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from . import spreadsheets
+
 #: Files above this are refused: a spreadsheet of one job search is kilobytes.
 MAX_BYTES = 2 * 1024 * 1024
 MAX_ROWS = 5000
@@ -893,10 +895,13 @@ TEMPLATE_EXAMPLE = (
 
 
 def template_csv() -> str:
+    # Neither row holds anything a spreadsheet would run today, and both go through the
+    # one rule anyway: the file Postulo hands out is not the place to make an exception
+    # that the next line added here would inherit (#218).
     out = io.StringIO()
     writer = csv.writer(out, lineterminator="\n")
-    writer.writerow(TEMPLATE_HEADERS)
-    writer.writerow(TEMPLATE_EXAMPLE)
+    writer.writerow(spreadsheets.row(TEMPLATE_HEADERS))
+    writer.writerow(spreadsheets.row(TEMPLATE_EXAMPLE))
     return out.getvalue()
 
 

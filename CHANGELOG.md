@@ -8,6 +8,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **Nothing captured from a stranger's page can act once it leaves Postulo.** Three exports
+  carried text somebody else wrote into a place that reads text as instructions. The report
+  CSV exists to be handed to an employment office and opened in a spreadsheet, where a
+  captured job title beginning `=` is a formula that runs on the clerk's machine; every CSV
+  Postulo writes now passes each cell through one rule that says *this is text*. The
+  calendar feeds put a contact's name in an `ATTENDEE` line, where a carriage return ended
+  the line and let whatever followed be read as a property of its own — in every calendar
+  subscribed to the feed, not only in the person's own. And addresses arriving through the
+  API were stored unchecked and later drawn as links, so a `javascript:` company website
+  ran as whoever opened the page; the API now refuses what the forms have always refused,
+  naming the field rather than failing. (#218)
+
 - **A browser notification is pushed to the open web only, says nothing the push service
   replied, and stops once a browser has withdrawn it.** The notifier added in #209 used the
   client meant for connections somebody set up, so on an instance that allows private

@@ -514,20 +514,27 @@ def as_csv(report: Report) -> str:
     import csv
     import io
 
+    from postulo.core import spreadsheets
+
     out = io.StringIO()
     writer = csv.writer(out, lineterminator="\n")
-    writer.writerow([str(header) for header in CSV_HEADERS])
+    writer.writerow(spreadsheets.row(str(header) for header in CSV_HEADERS))
     for row in report.evidence:
+        # Through `spreadsheets.row`, because the company and the role can have been read
+        # off a stranger's page and this file is opened in a spreadsheet by somebody who
+        # did not choose what is in it (#218).
         writer.writerow(
-            [
-                row.applied_on.isoformat(),
-                row.company,
-                row.role,
-                row.source,
-                row.url,
-                row.status,
-                row.last_activity_on.isoformat() if row.last_activity_on else "",
-            ]
+            spreadsheets.row(
+                [
+                    row.applied_on.isoformat(),
+                    row.company,
+                    row.role,
+                    row.source,
+                    row.url,
+                    row.status,
+                    row.last_activity_on.isoformat() if row.last_activity_on else "",
+                ]
+            )
         )
     return out.getvalue()
 

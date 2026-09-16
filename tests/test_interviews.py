@@ -475,6 +475,20 @@ def test_folding_never_splits_a_character():
     assert "".join(piece[1:] if index else piece for index, piece in enumerate(pieces)) == line
 
 
+def test_a_property_value_keeps_no_way_of_ending_its_own_line():
+    """Every kind of line break becomes the escape for one, and nothing else survives."""
+    assert ical.escape("one\r\ntwo\rthree\nfour") == "one\\ntwo\\nthree\\nfour"
+    assert ical.escape("Bring ID\x00\x07, and a pen") == "Bring ID\\, and a pen"
+    assert "\r" not in ical.escape("a\rb") and "\n" not in ical.escape("a\rb")
+
+
+def test_a_parameter_value_cannot_start_a_property_of_its_own():
+    """``CN=`` sits mid-line, so a break in a name would be a break in the file."""
+    assert ical.parameter("Cave\r\nBEGIN:VALARM") == '"CaveBEGIN:VALARM"'
+    assert ical.parameter('Cave "Jack" Johnson') == "Cave Jack Johnson"
+    assert ical.parameter("Johnson, Cave") == '"Johnson, Cave"', "still quoted when it needs to be"
+
+
 # ---------------------------------------------------------------- export, import
 
 

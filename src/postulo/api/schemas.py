@@ -9,9 +9,19 @@ from __future__ import annotations
 
 import datetime as dt
 from decimal import Decimal
+from typing import Annotated
 
 from django.urls import reverse
 from ninja import Field, Schema
+from pydantic import AfterValidator
+
+from postulo.core.addresses import web_address
+
+#: An address that is going to be stored and later drawn as a link. The routers set these
+#: with ``setattr`` rather than through a form, so this annotation is where the check the
+#: form would have made happens instead -- and a `javascript:` address is refused with a
+#: 422 naming the field rather than kept for a template to render (#218).
+WebAddress = Annotated[str, AfterValidator(web_address)]
 
 # ------------------------------------------------------------------ companies
 
@@ -88,8 +98,8 @@ class CompanyIn(Schema):
         default="",
         description="employer (the default) or employment_service; anything else is ignored.",
     )
-    website: str = Field(default="", max_length=200)
-    careers_url: str = Field(default="", max_length=200)
+    website: WebAddress = Field(default="", max_length=200)
+    careers_url: WebAddress = Field(default="", max_length=200)
     location: str = Field(default="", max_length=200)
     industries: list[str] = Field(
         default_factory=list, description="Names; unknown ones join the owner's vocabulary."
@@ -103,8 +113,8 @@ class CompanyIn(Schema):
 
 class CompanyPatch(Schema):
     name: str | None = Field(default=None, max_length=200)
-    website: str | None = Field(default=None, max_length=200)
-    careers_url: str | None = Field(default=None, max_length=200)
+    website: WebAddress | None = Field(default=None, max_length=200)
+    careers_url: WebAddress | None = Field(default=None, max_length=200)
     location: str | None = Field(default=None, max_length=200)
     industries: list[str] | None = Field(default=None, description="Replaces the whole list")
     identifiers: list[IdentifierIn] | None = Field(
@@ -118,8 +128,9 @@ class ContactIn(Schema):
     role: str = Field(default="", max_length=200)
     email: str = Field(default="", max_length=254)
     phone: str = Field(default="", max_length=40)
-    #: Saved as the contact's primary social profile (#189).
-    linkedin_url: str = Field(default="", max_length=500)
+    #: Saved as the contact's primary social profile (#189), and drawn as a link on the
+    #: company's page, so it is checked like every other address that is (#218).
+    linkedin_url: WebAddress = Field(default="", max_length=500)
     notes: str = ""
 
 
@@ -169,7 +180,7 @@ class ListingIn(Schema):
         description="The employer's Wikidata id, when known: a stronger match than the name.",
     )
     title: str = Field(max_length=250)
-    url: str = Field(default="", max_length=500)
+    url: WebAddress = Field(default="", max_length=500)
     location: str = Field(default="", max_length=200)
     remote_type: str = Field(default="", max_length=20)
     employment_type: str = Field(default="", max_length=20)
