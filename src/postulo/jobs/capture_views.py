@@ -201,8 +201,16 @@ def review_form_class():
             label=_("I have already applied to this one"),
             required=False,
             help_text=_(
-                "Ticked, the listing becomes an application straight away, marked as "
-                "applied today. Otherwise it waits in your listings for you to decide."
+                "Ticked, the listing becomes an application straight away. Otherwise it "
+                "waits in your listings for you to decide."
+            ),
+        )
+        applied_on = forms.DateField(
+            label=_("Applied on"),
+            required=False,
+            widget=forms.DateInput(attrs={"type": "date"}),
+            help_text=_(
+                "Left empty it is today. Capturing a posting you applied to last week is common."
             ),
         )
 
@@ -310,6 +318,8 @@ class CaptureReviewView(OwnedObjectMixin, View):
         capture.posting = listing
 
         if form.cleaned_data.get("already_applied"):
+            from postulo.applications.services import moment_for
+
             application = apply_to_listing(
                 listing,
                 {
@@ -318,6 +328,7 @@ class CaptureReviewView(OwnedObjectMixin, View):
                     "priority": Priority.NORMAL,
                     "deadline": None,
                 },
+                applied_at=moment_for(form.cleaned_data.get("applied_on")),
             )
             capture.application = application
             capture.save(update_fields=["status", "posting", "application", "updated_at"])

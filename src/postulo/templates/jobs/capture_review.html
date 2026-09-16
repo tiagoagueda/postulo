@@ -116,6 +116,11 @@
                   id="{{ form.already_applied.auto_id }}_helptext">{{ form.already_applied.help_text }}</span>
           </span>
         </label>
+        {% comment %} And when, because a posting captured today was often applied to last
+           week; left empty it is today, as it always was (#222). {% endcomment %}
+        <div class="mt-4">
+          {% include "partials/field.html" with field=form.applied_on %}
+        </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">

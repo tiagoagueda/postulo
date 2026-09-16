@@ -757,6 +757,27 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Applications you recorded after the fact counted nowhere, and nothing let you say when
+  you applied.** The date an application was sent was written only when it passed through the
+  literal *Applied*. Anybody recording a reply they already had — straight to *Interviewing*,
+  or to *Rejected* — got an application with no date, and every figure measured from that date
+  then ignored it: the number sent, reply and interview times, sources, industries, the
+  by-month figures, "sent recently", the API's `since` filter, and the evidence list in the
+  report an employment office reads. The funnel counted it all the same, so a stage could show
+  more than 100% of *Applied*.
+
+  Reaching any status that means it went out now records the date, *Withdrawn* excepted: a
+  draft abandoned before it was ever sent is not an application, while withdrawing something
+  already sent keeps the date it has. A migration fills in the past from the timeline, which
+  has always known — the first status change into a sent status is when it went out.
+
+  And every door now takes the date: intake, *Apply*, capture review (a posting captured today
+  was often applied to last week) and the API's `applied_on`. Left empty it is today, as
+  before. The spreadsheet import stops guessing from the date alone — a row that says
+  *Rejected* with no date column keeps its status, its channel, its tags and its deadline
+  instead of becoming an untouched listing, and records that the date is unknown rather than
+  inventing today; a row that says *draft* stays a listing even when it carries a date. (#222)
+
 - **Deleting one thing no longer quietly deletes the record of what you sent, and a deleted
   file is now actually deleted.** Three ways the promise that "the record of what you sent
   has to stay true" was not kept.

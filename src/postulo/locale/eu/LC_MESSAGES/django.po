@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 07:16+0000\n"
+"POT-Creation-Date: 2026-09-16 07:33+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -156,7 +156,7 @@ msgstr[1] "Duela %(days)s egun"
 msgid "%(days)s days from %(day)s"
 msgstr ""
 
-#: src/postulo/applications/models.py:294
+#: src/postulo/applications/models.py:307
 #, python-format, draft
 msgid ""
 "%(department)s is at %(company)s, which is not part of the same employer as this posting."
@@ -190,22 +190,22 @@ msgstr "%(kilobytes)s diskoan"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s sortu da. Aukeratu orain zer joango den bertan."
 
-#: src/postulo/applications/services.py:356
+#: src/postulo/applications/services.py:393
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s egin da"
 
-#: src/postulo/applications/services.py:311
+#: src/postulo/applications/services.py:348
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s %(old)s egunetik %(new)s egunera aldatu da"
 
-#: src/postulo/applications/services.py:367
+#: src/postulo/applications/services.py:404
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(when)s eguneko %(kind)s bertan behera utzi da"
 
-#: src/postulo/applications/services.py:271
+#: src/postulo/applications/services.py:308
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s %(when)s egunerako antolatu da"
@@ -391,7 +391,7 @@ msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr ""
 "%(ok)d(e)k erantzun dute, %(broken)d(e)k ez; erantzun ez dutenek zergatik dioten."
 
-#: src/postulo/applications/services.py:114
+#: src/postulo/applications/services.py:140
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -808,7 +808,7 @@ msgstr "Egunkari isila da nahi duzuna."
 msgid "A reminder falls due"
 msgstr "Oroigarri bat betetzen da"
 
-#: src/postulo/applications/forms.py:298
+#: src/postulo/applications/forms.py:313
 #, draft
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr ""
@@ -911,7 +911,7 @@ msgstr "A2 — oinarrizkoa"
 msgid "Accept"
 msgstr "Onartu"
 
-#: src/postulo/applications/models.py:47 src/postulo/applications/models.py:606
+#: src/postulo/applications/models.py:47 src/postulo/applications/models.py:619
 #: src/postulo/templates/accounts/invite_list.html:38
 #, draft
 msgid "Accepted"
@@ -1222,7 +1222,7 @@ msgstr "%(names)s hizkuntzan ere bai"
 msgid "An 'other' identifier needs a name."
 msgstr "«Bestelakoa» identifikatzaileak izen bat behar du."
 
-#: src/postulo/applications/models.py:534
+#: src/postulo/applications/models.py:547
 #, draft
 msgid "An address, or the link to the call."
 msgstr "Helbide bat, edo deirako esteka."
@@ -1351,11 +1351,11 @@ msgstr "API tokenak"
 msgid "Appearance"
 msgstr "Itxura"
 
-#: src/postulo/applications/models.py:268
-#: src/postulo/applications/models.py:378
-#: src/postulo/applications/models.py:428
-#: src/postulo/applications/models.py:523
-#: src/postulo/applications/models.py:644 src/postulo/applications/tables.py:20
+#: src/postulo/applications/models.py:281
+#: src/postulo/applications/models.py:391
+#: src/postulo/applications/models.py:441
+#: src/postulo/applications/models.py:536
+#: src/postulo/applications/models.py:657 src/postulo/applications/tables.py:20
 #: src/postulo/documents/models.py:533 src/postulo/jobs/models.py:825
 #: src/postulo/templates/core/import_csv_map.html:84
 #, draft
@@ -1369,7 +1369,7 @@ msgstr "eskaera"
 msgid "Application"
 msgstr "Eskaera"
 
-#: src/postulo/applications/services.py:152
+#: src/postulo/applications/services.py:183
 #, draft
 msgid "Application created"
 msgstr "Eskaera sortu da"
@@ -1379,7 +1379,7 @@ msgstr "Eskaera sortu da"
 msgid "Application deleted."
 msgstr "Eskaera ezabatu da."
 
-#: src/postulo/jobs/capture_views.py:324
+#: src/postulo/jobs/capture_views.py:335
 #, draft
 msgid "Application recorded from the capture."
 msgstr "Eskaera harrapaketatik jaso da."
@@ -1405,7 +1405,7 @@ msgstr "Eskaera eguneratu da."
 msgid "Applications"
 msgstr "Eskaerak"
 
-#: src/postulo/applications/models.py:269 src/postulo/applications/tables.py:20
+#: src/postulo/applications/models.py:282 src/postulo/applications/tables.py:20
 #, draft
 msgid "applications"
 msgstr "eskaerak"
@@ -1473,18 +1473,24 @@ msgstr "Eskatuta"
 msgid "Applied in the last 30 days"
 msgstr "Azken 30 egunetan eskatuta"
 
-#: src/postulo/applications/models.py:208
-#, draft
-msgid "applied on"
-msgstr "eskaera-data"
-
+#: src/postulo/applications/forms.py:123
 #: src/postulo/applications/reports.py:503
+#: src/postulo/jobs/capture_views.py:209
 #: src/postulo/templates/applications/application_detail.html:154
 #: src/postulo/templates/applications/report.html:245
 #: src/postulo/templates/applications/report_print.html:159
 #, draft
 msgid "Applied on"
 msgstr "Eskaera-data"
+
+#: src/postulo/applications/models.py:221
+#, draft
+msgid "applied on"
+msgstr "eskaera-data"
+
+#: src/postulo/core/csv_import.py:875
+msgid "Applied on an unknown date"
+msgstr ""
 
 #: src/postulo/applications/forms.py:117 src/postulo/applications/tables.py:76
 #: src/postulo/core/csv_import.py:51
@@ -1493,7 +1499,7 @@ msgstr "Eskaera-data"
 msgid "Applied through"
 msgstr "Honen bidez eskatuta"
 
-#: src/postulo/applications/models.py:204
+#: src/postulo/applications/models.py:217
 #, draft
 msgid "applied through"
 msgstr "eskaera-bidea"
@@ -1557,8 +1563,8 @@ msgstr ""
 msgid "Assessment"
 msgstr "Ebaluazioa"
 
-#: src/postulo/applications/models.py:343
-#: src/postulo/applications/models.py:465
+#: src/postulo/applications/models.py:356
+#: src/postulo/applications/models.py:478
 #, draft
 msgid "Assessment or test"
 msgstr "Ebaluazioa edo proba"
@@ -1760,7 +1766,7 @@ msgstr "Egutegia"
 msgid "Calendar file"
 msgstr "Egutegi-fitxategia"
 
-#: src/postulo/applications/models.py:548
+#: src/postulo/applications/models.py:561
 #, draft
 msgid "calendar identifier"
 msgstr "egutegi-identifikatzailea"
@@ -1769,7 +1775,7 @@ msgstr "egutegi-identifikatzailea"
 msgid "Calendar views"
 msgstr ""
 
-#: src/postulo/applications/models.py:339
+#: src/postulo/applications/models.py:352
 #, draft
 msgid "Call"
 msgstr "Deia"
@@ -1782,7 +1788,7 @@ msgstr "Bere baitan erregistratzeko itzulera-helbidea"
 #: src/postulo/templates/accounts/invite_form.html:24
 #: src/postulo/templates/accounts/profile.html:188
 #: src/postulo/templates/applications/application_form.html:30
-#: src/postulo/templates/applications/application_intake.html:73
+#: src/postulo/templates/applications/application_intake.html:75
 #: src/postulo/templates/applications/interview_form.html:70
 #: src/postulo/templates/applications/reminder_form.html:18
 #: src/postulo/templates/applications/tag_form.html:18
@@ -1796,7 +1802,7 @@ msgstr "Bere baitan erregistratzeko itzulera-helbidea"
 #: src/postulo/templates/jobs/company_form.html:112
 #: src/postulo/templates/jobs/contact_form.html:42
 #: src/postulo/templates/jobs/industry_form.html:21
-#: src/postulo/templates/jobs/listing_apply.html:44
+#: src/postulo/templates/jobs/listing_apply.html:46
 #: src/postulo/templates/jobs/listing_form.html:54
 #: src/postulo/templates/jobs/posting_form.html:21
 #: src/postulo/templates/partials/confirm_delete.html:46
@@ -1809,7 +1815,7 @@ msgstr "Bere baitan erregistratzeko itzulera-helbidea"
 msgid "Cancel"
 msgstr "Utzi"
 
-#: src/postulo/applications/models.py:472
+#: src/postulo/applications/models.py:485
 #: src/postulo/templates/applications/partials/interview_outcome.html:11
 #, draft
 msgid "Cancelled"
@@ -1848,7 +1854,7 @@ msgid ""
 msgstr ""
 "Harrapatu iragarki bat bere helbidetik, edo gehitu bat eskuz, eta hemen itxarongo dizu."
 
-#: src/postulo/jobs/capture_views.py:344
+#: src/postulo/jobs/capture_views.py:355
 #, draft
 msgid "Capture discarded."
 msgstr "Harrapaketa baztertu da."
@@ -1890,7 +1896,7 @@ msgstr "harrapaketak"
 msgid "Captures"
 msgstr "Harrapaketak"
 
-#: src/postulo/jobs/capture_views.py:370
+#: src/postulo/jobs/capture_views.py:381
 #, python-format
 msgid "Captures discarded: %(count)s."
 msgstr ""
@@ -2123,7 +2129,7 @@ msgstr "Bezero-sekretua"
 msgid "Closed"
 msgstr "Itxita"
 
-#: src/postulo/applications/models.py:214 src/postulo/jobs/models.py:661
+#: src/postulo/applications/models.py:227 src/postulo/jobs/models.py:661
 #, draft
 msgid "closed on"
 msgstr "itxiera-data"
@@ -2270,7 +2276,7 @@ msgstr "enpresaren identifikatzaileak"
 msgid "Company updated."
 msgstr "Enpresa eguneratu da."
 
-#: src/postulo/applications/models.py:82
+#: src/postulo/applications/models.py:95
 #, draft
 msgid "Company website"
 msgstr "Enpresaren webgunea"
@@ -2410,7 +2416,7 @@ msgstr "kontaktuak"
 msgid "Containing"
 msgstr "Hau duena"
 
-#: src/postulo/applications/models.py:664
+#: src/postulo/applications/models.py:677
 #, draft
 msgid "context"
 msgstr "testuingurua"
@@ -2617,7 +2623,7 @@ msgstr "Datu-basea"
 msgid "Date applied"
 msgstr "Eskaera-data"
 
-#: src/postulo/applications/models.py:662
+#: src/postulo/applications/models.py:675
 #, draft
 msgid "dates offered"
 msgstr "eskainitako datak"
@@ -2675,7 +2681,7 @@ msgstr "Desaktibatu"
 msgid "Deactivated"
 msgstr "Desaktibatuta"
 
-#: src/postulo/applications/models.py:213
+#: src/postulo/applications/models.py:226
 #, draft
 msgid "deadline"
 msgstr "epemuga"
@@ -2778,7 +2784,7 @@ msgstr "erabaki-data"
 msgid "Decline"
 msgstr "Baztertu"
 
-#: src/postulo/applications/models.py:607
+#: src/postulo/applications/models.py:620
 #, draft
 msgid "Declined"
 msgstr "Baztertuta"
@@ -2851,7 +2857,7 @@ msgstr "Ezabatu kontua"
 msgid "Delete your own account from Settings, not from here."
 msgstr "Zure kontua Ezarpenetan ezabatu, ez hemendik."
 
-#: src/postulo/applications/models.py:241 src/postulo/jobs/models.py:441
+#: src/postulo/applications/models.py:254 src/postulo/jobs/models.py:441
 #: src/postulo/jobs/models.py:474
 #, draft
 msgid "department"
@@ -2889,12 +2895,12 @@ msgstr "deskribapena"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Diseinua (Behance, Dribbble…)"
 
-#: src/postulo/applications/models.py:652
+#: src/postulo/applications/models.py:665
 #, draft
 msgid "detail"
 msgstr "xehetasuna"
 
-#: src/postulo/applications/models.py:383
+#: src/postulo/applications/models.py:396
 #, draft
 msgid "details"
 msgstr "xehetasunak"
@@ -2922,7 +2928,7 @@ msgstr "direktorioaren (maizterraren) IDa"
 msgid "Discard"
 msgstr "Baztertu"
 
-#: src/postulo/templates/jobs/capture_review.html:147
+#: src/postulo/templates/jobs/capture_review.html:153
 msgid "Discard and next"
 msgstr ""
 
@@ -2930,7 +2936,7 @@ msgstr ""
 msgid "Discard the ticked ones"
 msgstr ""
 
-#: src/postulo/templates/jobs/capture_review.html:142
+#: src/postulo/templates/jobs/capture_review.html:148
 #, draft
 msgid "Discard this capture"
 msgstr "Baztertu harrapaketa hau"
@@ -3003,7 +3009,7 @@ msgstr "Jada zenituen dokumentuak. Hemengo ezer ez da publikoki zerbitzatzen."
 msgid "Done"
 msgstr "Eginda"
 
-#: src/postulo/applications/models.py:432
+#: src/postulo/applications/models.py:445
 #, draft
 msgid "done on"
 msgstr "egite-data"
@@ -3142,8 +3148,8 @@ msgid ""
 msgstr ""
 "Edozein Europass formatu: europass.europa.eu(k) gaur esportatzen duen JSONa, edo CV editore zaharrak sortzen zuen XMLa eta zure diskoko esportazio zaharrago bat oraindik dena. Postulok berak asmatzen du zein den, zer duen erakusten dizu, eta ez du ezer idazten esan arte."
 
-#: src/postulo/applications/models.py:88 src/postulo/core/server_sections.py:32
-#: src/postulo/core/server_views.py:576
+#: src/postulo/applications/models.py:101
+#: src/postulo/core/server_sections.py:32 src/postulo/core/server_views.py:576
 #: src/postulo/templates/server/email.html:5
 #: src/postulo/templates/server/people.html:33
 #: src/postulo/templates/server/people.html:46
@@ -3172,12 +3178,12 @@ msgstr "Posta-helbidea (aukerakoa)"
 msgid "Email addresses"
 msgstr "Posta-helbideak"
 
-#: src/postulo/applications/models.py:338
+#: src/postulo/applications/models.py:351
 #, draft
 msgid "Email received"
 msgstr "Posta jaso da"
 
-#: src/postulo/applications/models.py:337
+#: src/postulo/applications/models.py:350
 #, draft
 msgid "Email sent"
 msgstr "Posta bidali da"
@@ -3186,7 +3192,7 @@ msgstr "Posta bidali da"
 msgid "Employer"
 msgstr ""
 
-#: src/postulo/applications/models.py:87 src/postulo/jobs/models.py:159
+#: src/postulo/applications/models.py:100 src/postulo/jobs/models.py:159
 msgid "Employment service"
 msgstr ""
 
@@ -3215,7 +3221,7 @@ msgstr "Harrapaketa hutsa"
 msgid "Empty for the instance default; an account for an exception to it."
 msgstr "Hutsik instalazioaren balio lehenetsirako; kontu bat hortik salbuesteko."
 
-#: src/postulo/applications/models.py:645
+#: src/postulo/applications/models.py:658
 #, draft
 msgid "Empty when the source could not tell which application it is about."
 msgstr "Hutsik iturriak ezin izan duenean esan zein eskaerari dagokion."
@@ -3225,7 +3231,7 @@ msgstr "Hutsik iturriak ezin izan duenean esan zein eskaerari dagokion."
 msgid "enabled"
 msgstr "gaituta"
 
-#: src/postulo/applications/models.py:529
+#: src/postulo/applications/models.py:542
 #, draft
 msgid "ends"
 msgstr "amaitzen da"
@@ -3247,18 +3253,18 @@ msgid ""
 msgstr ""
 "Europassek hizkuntzako bost maila jasotzen ditu eta Postulok bat gordetzen du, beraz baxuena hartzen da. Aldatu gero hori adieraziko zenukeena ez bada."
 
-#: src/postulo/applications/models.py:397
+#: src/postulo/applications/models.py:410
 #: src/postulo/notifications/models.py:23
 #, draft
 msgid "event"
 msgstr "gertaera"
 
-#: src/postulo/applications/models.py:91
+#: src/postulo/applications/models.py:104
 #, draft
 msgid "Event or fair"
 msgstr "Gertaera edo azoka"
 
-#: src/postulo/applications/models.py:398
+#: src/postulo/applications/models.py:411
 #, draft
 msgid "events"
 msgstr "gertaerak"
@@ -3568,7 +3574,7 @@ msgstr ""
 msgid "Files"
 msgstr "Fitxategiak"
 
-#: src/postulo/applications/models.py:258
+#: src/postulo/applications/models.py:271
 #, draft
 msgid "files sent"
 msgstr "bidalitako fitxategiak"
@@ -3578,7 +3584,7 @@ msgstr "bidalitako fitxategiak"
 msgid "Files you already had"
 msgstr "Jada zenituen fitxategiak"
 
-#: src/postulo/applications/models.py:259
+#: src/postulo/applications/models.py:272
 #, draft
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr "Jada zenituen fitxategiak, Postulok sortutako dokumentuen aldean."
@@ -3661,7 +3667,7 @@ msgstr "Jarraipen-oharra"
 msgid "Follow-up recorded."
 msgstr "Jarraipena jaso da."
 
-#: src/postulo/applications/models.py:346 src/postulo/applications/views.py:578
+#: src/postulo/applications/models.py:359 src/postulo/applications/views.py:578
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -3822,7 +3828,7 @@ msgstr "Gravatarretik"
 msgid "From level"
 msgstr "Maila honetatik"
 
-#: src/postulo/applications/models.py:385
+#: src/postulo/applications/models.py:398
 #, draft
 msgid "from status"
 msgstr "egoera honetatik"
@@ -3959,12 +3965,12 @@ msgid ""
 msgstr ""
 "Elkartu antzeko trebetasunak izenburu baten pean, adibidez «Hizkuntzak» edo «Azpiegitura»."
 
-#: src/postulo/applications/models.py:653
+#: src/postulo/applications/models.py:666
 #, draft
 msgid "happened"
 msgstr "gertatu zen"
 
-#: src/postulo/applications/models.py:381
+#: src/postulo/applications/models.py:394
 #, draft
 msgid "happened on"
 msgstr "gertaera-data"
@@ -3985,7 +3991,7 @@ msgstr "Osasuna"
 msgid "Health check"
 msgstr "Osasun-egiaztapena"
 
-#: src/postulo/applications/models.py:471
+#: src/postulo/applications/models.py:484
 #: src/postulo/templates/applications/partials/interview_outcome.html:8
 #, draft
 msgid "Held"
@@ -4001,7 +4007,7 @@ msgstr "ezkutua"
 msgid "hidden navigation items"
 msgstr "ezkutuko nabigazio-elementuak"
 
-#: src/postulo/applications/models.py:98
+#: src/postulo/applications/models.py:111
 #, draft
 msgid "High"
 msgstr "Altua"
@@ -4153,7 +4159,7 @@ msgstr "identifikatzailea"
 msgid "Identifier"
 msgstr "Identifikatzailea"
 
-#: src/postulo/applications/models.py:648
+#: src/postulo/applications/models.py:661
 #, draft
 msgid "identifier at the source"
 msgstr "identifikatzailea iturrian"
@@ -4248,7 +4254,7 @@ msgstr "Data garrantzitsuak"
 msgid "Imported"
 msgstr "Inportatuta"
 
-#: src/postulo/core/csv_import.py:776
+#: src/postulo/core/csv_import.py:790
 #, python-format, draft
 msgid "Imported from %(file)s"
 msgstr "%(file)s fitxategitik inportatua"
@@ -4416,17 +4422,17 @@ msgstr "Barnekoa"
 msgid "Internship"
 msgstr "Praktikak"
 
-#: src/postulo/applications/models.py:340
+#: src/postulo/applications/models.py:353
 #, draft
 msgid "Interview"
 msgstr "Elkarrizketa"
 
-#: src/postulo/applications/models.py:562
+#: src/postulo/applications/models.py:575
 #, draft
 msgid "interview"
 msgstr "elkarrizketa"
 
-#: src/postulo/applications/models.py:342
+#: src/postulo/applications/models.py:355
 #, draft
 msgid "Interview cancelled"
 msgstr "Elkarrizketa bertan behera utzi da"
@@ -4436,7 +4442,7 @@ msgstr "Elkarrizketa bertan behera utzi da"
 msgid "Interview recorded."
 msgstr "Elkarrizketa jaso da."
 
-#: src/postulo/applications/models.py:341
+#: src/postulo/applications/models.py:354
 #, draft
 msgid "Interview scheduled"
 msgstr "Elkarrizketa antolatu da"
@@ -4446,7 +4452,7 @@ msgstr "Elkarrizketa antolatu da"
 msgid "Interview scheduled."
 msgstr "Elkarrizketa antolatu da."
 
-#: src/postulo/applications/services.py:285
+#: src/postulo/applications/services.py:322
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Bihar elkarrizketa: %(kind)s %(company)s enpresan, %(time)s"
@@ -4466,7 +4472,7 @@ msgstr ""
 msgid "Interviewing"
 msgstr "Elkarrizketetan"
 
-#: src/postulo/applications/models.py:563
+#: src/postulo/applications/models.py:576
 #, draft
 msgid "interviews"
 msgstr "elkarrizketak"
@@ -4553,7 +4559,7 @@ msgid ""
 msgstr ""
 "Instalazio honetako guztia irakur eta alda dezake, bertako pertsona bakoitzarentzat. Instalatu irakurri duzuna edo fidatzeko arrazoirik duzuna baino ez. Ezer ez da inoiz automatikoki eguneratzen: eguneratzea kode-aldaketa bat da, eta administratzaile batek egiten du klik."
 
-#: src/postulo/applications/forms.py:339
+#: src/postulo/applications/forms.py:354
 #, draft
 msgid "It cannot end before it starts."
 msgstr "Ezin da hasi baino lehen amaitu."
@@ -4602,7 +4608,7 @@ msgstr ""
 msgid "Its file matches what the official repository signed."
 msgstr "Bere fitxategia biltegi ofizialak sinatutakoarekin bat dator."
 
-#: src/postulo/applications/models.py:83
+#: src/postulo/applications/models.py:96
 #, draft
 msgid "Job board"
 msgstr "Lan-atari bat"
@@ -4682,14 +4688,14 @@ msgid ""
 msgstr ""
 "Nazioarteko formatuan gordetzen da, beste herrialde batetik ere dei dezazun. Jada + ikurrarekin hasten den zenbakia dagoen bezala hartzen da."
 
-#: src/postulo/templates/jobs/capture_review.html:153
+#: src/postulo/templates/jobs/capture_review.html:159
 msgid ""
 "Keys: <kbd>d</kbd> discards and moves on, <kbd>j</kbd> skips to the next, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr ""
 
-#: src/postulo/applications/models.py:380
-#: src/postulo/applications/models.py:526
-#: src/postulo/applications/models.py:650 src/postulo/core/models.py:178
+#: src/postulo/applications/models.py:393
+#: src/postulo/applications/models.py:539
+#: src/postulo/applications/models.py:663 src/postulo/core/models.py:178
 #: src/postulo/core/models.py:403 src/postulo/core/models.py:532
 #: src/postulo/documents/models.py:113 src/postulo/documents/models.py:315
 #: src/postulo/documents/models.py:395 src/postulo/documents/models.py:517
@@ -4881,7 +4887,7 @@ msgid "last worked"
 msgstr "azkenekoz ibili zen"
 
 #: src/postulo/templates/applications/calendar.html:70
-#: src/postulo/templates/jobs/capture_review.html:133
+#: src/postulo/templates/jobs/capture_review.html:139
 #, draft
 msgid "Later"
 msgstr "Geroago"
@@ -4907,7 +4913,7 @@ msgstr "Utzi hutsik hau zure oraingo lanpostua bada."
 msgid "Leaving"
 msgstr "Uzten du"
 
-#: src/postulo/applications/forms.py:320
+#: src/postulo/applications/forms.py:335
 #, draft
 msgid "Left blank, it lasts an hour."
 msgstr "Hutsik utziz gero, ordubete irauten du."
@@ -4918,6 +4924,11 @@ msgid ""
 "Left blank, the name is the address's host. Postulo never opens a link on its own — not to check it, not for a picture."
 msgstr ""
 "Hutsik utziz gero, izena helbidearen ostalaria da. Postulok ez du inoiz estekarik bere kabuz irekitzen — ez egiaztatzeko, ez irudi baterako."
+
+#: src/postulo/jobs/capture_views.py:212
+msgid ""
+"Left empty it is today. Capturing a posting you applied to last week is common."
+msgstr ""
 
 #: src/postulo/jobs/industries.py:94
 #, draft
@@ -5016,7 +5027,7 @@ msgstr "estekak"
 msgid "Links issued for this account"
 msgstr "Kontu honetarako emandako estekak"
 
-#: src/postulo/applications/models.py:251
+#: src/postulo/applications/models.py:264
 #, draft
 msgid "links sent"
 msgstr "bidalitako estekak"
@@ -5129,7 +5140,7 @@ msgstr "Etenaldirik luzeena, egunetan"
 msgid "Loosen one of them, or start again."
 msgstr "Lasaitu horietako bat, edo hasi berriro."
 
-#: src/postulo/applications/models.py:96
+#: src/postulo/applications/models.py:109
 #, draft
 msgid "Low"
 msgstr "Baxua"
@@ -5224,7 +5235,7 @@ msgstr "postaren azken errorea"
 msgid "Main"
 msgstr "Nagusia"
 
-#: src/postulo/applications/models.py:222
+#: src/postulo/applications/models.py:235
 #, draft
 msgid "main contact"
 msgstr "kontaktu nagusia"
@@ -5580,7 +5591,7 @@ msgstr "Berria azkeneko aldiz antolatu zenuenetik"
 msgid "New tag"
 msgstr "Etiketa berria"
 
-#: src/postulo/applications/forms.py:129 src/postulo/applications/forms.py:178
+#: src/postulo/applications/forms.py:139 src/postulo/applications/forms.py:193
 #, draft
 msgid "New tags"
 msgstr "Etiketa berriak"
@@ -5656,7 +5667,7 @@ msgid ""
 msgstr ""
 "Oraindik enpresarik ez. Zuretzat sortzen dira eskaera bat jasotzen duzunean."
 
-#: src/postulo/core/csv_import.py:728
+#: src/postulo/core/csv_import.py:742
 #, draft
 msgid "no company"
 msgstr "enpresarik ez"
@@ -5757,7 +5768,7 @@ msgstr "Ez dago iragarkirik erregistratuta talde honetako inon."
 msgid "No postings recorded for this company."
 msgstr "Ez dago iragarkirik jasota enpresa honetarako."
 
-#: src/postulo/core/csv_import.py:730
+#: src/postulo/core/csv_import.py:744
 #, draft
 msgid "no role"
 msgstr "lanposturik ez"
@@ -5834,7 +5845,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Oraindik ez dago inor jasota hemen."
 
-#: src/postulo/applications/services.py:377
+#: src/postulo/applications/services.py:414
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Inor ez zen agertu %(kind)s ekitaldira"
@@ -5886,7 +5897,7 @@ msgid "None yet. This entry prints its original text on every CV."
 msgstr ""
 "Bat ere ez oraindik. Sarrera honek jatorrizko testua inprimatzen du CV guztietan."
 
-#: src/postulo/applications/models.py:97
+#: src/postulo/applications/models.py:110
 #, draft
 msgid "Normal"
 msgstr "Arrunta"
@@ -6011,7 +6022,7 @@ msgstr ""
 msgid "note"
 msgstr "oharra"
 
-#: src/postulo/applications/forms.py:240 src/postulo/applications/models.py:336
+#: src/postulo/applications/forms.py:255 src/postulo/applications/models.py:349
 #, draft
 msgid "Note"
 msgstr "Oharra"
@@ -6301,7 +6312,7 @@ msgstr "Ez da ezer instalatu."
 msgid "Nothing was selected, so nothing changed."
 msgstr "Ez zen ezer hautatu, beraz ez da ezer aldatu."
 
-#: src/postulo/jobs/capture_views.py:372
+#: src/postulo/jobs/capture_views.py:383
 msgid "Nothing was selected."
 msgstr ""
 
@@ -6323,7 +6334,7 @@ msgstr ""
 msgid "Notifications"
 msgstr "Jakinarazpenak"
 
-#: src/postulo/applications/models.py:434
+#: src/postulo/applications/models.py:447
 #, draft
 msgid "notified on"
 msgstr "jakinarazpen-data"
@@ -6364,7 +6375,7 @@ msgstr ""
 msgid "Offer"
 msgstr "Eskaintza"
 
-#: src/postulo/applications/models.py:344
+#: src/postulo/applications/models.py:357
 #, draft
 msgid "Offer received"
 msgstr "Eskaintza jaso da"
@@ -6403,7 +6414,7 @@ msgstr "astebete baino zaharragoa"
 msgid "on"
 msgstr ""
 
-#: src/postulo/applications/models.py:463 src/postulo/jobs/models.py:510
+#: src/postulo/applications/models.py:476 src/postulo/jobs/models.py:510
 #, draft
 msgid "On site"
 msgstr "Bertan"
@@ -6675,8 +6686,9 @@ msgstr "Jatorria"
 msgid "Original posting"
 msgstr "Jatorrizko iragarkia"
 
-#: src/postulo/applications/models.py:92 src/postulo/applications/models.py:347
-#: src/postulo/applications/models.py:466 src/postulo/core/models.py:172
+#: src/postulo/applications/models.py:105
+#: src/postulo/applications/models.py:360
+#: src/postulo/applications/models.py:479 src/postulo/core/models.py:172
 #: src/postulo/core/models.py:397 src/postulo/documents/kinds.py:163
 #: src/postulo/documents/models.py:377 src/postulo/jobs/models.py:549
 #: src/postulo/resume/models.py:227
@@ -6700,7 +6712,7 @@ msgstr "Beste hizkuntzak"
 msgid "Other periods"
 msgstr "Beste aldi batzuk"
 
-#: src/postulo/applications/models.py:541
+#: src/postulo/applications/models.py:554
 #, draft
 msgid "outcome"
 msgstr "emaitza"
@@ -6755,7 +6767,7 @@ msgstr "Orriaren iturburua"
 msgid "Pagination"
 msgstr "Orrikatzea"
 
-#: src/postulo/applications/models.py:464
+#: src/postulo/applications/models.py:477
 #, draft
 msgid "Panel"
 msgstr "Panela"
@@ -6823,7 +6835,7 @@ msgid ""
 msgstr ""
 "Itsatsi lan-iragarki baten helbidea. Postulok orri hori jaisten du, ahal duena irakurtzen du, eta emaitza erakusten dizu zuzentzeko ezer gorde aurretik."
 
-#: src/postulo/templates/applications/application_intake.html:66
+#: src/postulo/templates/applications/application_intake.html:68
 #, draft
 msgid "Paste the text. Postings vanish from the web; your copy will not."
 msgstr "Itsatsi testua. Iragarkiak sarean desagertzen dira; zure kopia ez."
@@ -6931,7 +6943,7 @@ msgstr "Telefonoa"
 msgid "phone"
 msgstr "telefonoa"
 
-#: src/postulo/applications/models.py:461
+#: src/postulo/applications/models.py:474
 #, draft
 msgid "Phone screen"
 msgstr "Telefono bidezko elkarrizketa"
@@ -7063,7 +7075,7 @@ msgstr ""
 msgid "Portfolio"
 msgstr "Portfolioa"
 
-#: src/postulo/applications/models.py:252
+#: src/postulo/applications/models.py:265
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Nora bideratu zenituen portfolioak, profilak eta bideoak."
@@ -7105,7 +7117,7 @@ msgstr "posta-kodea"
 msgid "posted on"
 msgstr "argitaratze-data"
 
-#: src/postulo/applications/models.py:199
+#: src/postulo/applications/models.py:212
 #, draft
 msgid "posting"
 msgstr "iragarkia"
@@ -7234,7 +7246,7 @@ msgstr ""
 msgid "prefix"
 msgstr "aurrizkia"
 
-#: src/postulo/applications/models.py:539
+#: src/postulo/applications/models.py:552
 #, draft
 msgid "preparation notes"
 msgstr "prestaketa-oharrak"
@@ -7291,7 +7303,7 @@ msgstr "Nagusia"
 msgid "Priority"
 msgstr "Lehentasuna"
 
-#: src/postulo/applications/models.py:205
+#: src/postulo/applications/models.py:218
 #, draft
 msgid "priority"
 msgstr "lehentasuna"
@@ -7442,7 +7454,7 @@ msgstr "Isila"
 msgid "quiet after"
 msgstr "isila honen ondoren"
 
-#: src/postulo/applications/models.py:263
+#: src/postulo/applications/models.py:276
 #, draft
 msgid "quiet announced on"
 msgstr "isiltasuna noiz jakinarazi zen"
@@ -7562,7 +7574,7 @@ msgstr "Jaso eskaera bat"
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr "Jaso eta aldatu: eskaerak, iragarkiak, oharrak, oroigarriak, gutunak"
 
-#: src/postulo/templates/jobs/listing_apply.html:43
+#: src/postulo/templates/jobs/listing_apply.html:45
 #, draft
 msgid "Record the application"
 msgstr "Jaso eskaera"
@@ -7602,12 +7614,12 @@ msgstr "Bertan behera utzitzat jaso da."
 msgid "Recorded as held."
 msgstr "Egindakotzat jaso da."
 
-#: src/postulo/applications/models.py:390
+#: src/postulo/applications/models.py:403
 #, draft
 msgid "recorded by"
 msgstr "nork jasoa"
 
-#: src/postulo/applications/models.py:392
+#: src/postulo/applications/models.py:405
 #, draft
 msgid "recorded on"
 msgstr "jasotze-data"
@@ -7638,7 +7650,7 @@ msgstr "Berreskuratze-esteka"
 msgid "recovery links"
 msgstr "berreskuratze-estekak"
 
-#: src/postulo/applications/models.py:90
+#: src/postulo/applications/models.py:103
 #, draft
 msgid "Recruiter"
 msgstr "Kontratatzailea"
@@ -7653,7 +7665,7 @@ msgstr "Jarraitutako birbideratzeak"
 msgid "Reference"
 msgstr "Erreferentzia"
 
-#: src/postulo/applications/models.py:89
+#: src/postulo/applications/models.py:102
 #, draft
 msgid "Referral"
 msgstr "Gomendioz"
@@ -7712,7 +7724,7 @@ msgstr "Instalatu berriro"
 msgid "Rejected"
 msgstr "Baztertua"
 
-#: src/postulo/applications/models.py:345
+#: src/postulo/applications/models.py:358
 #, draft
 msgid "Rejection received"
 msgstr "Ezezkoa jaso da"
@@ -7723,13 +7735,13 @@ msgstr "Ezezkoa jaso da"
 msgid "Rejections"
 msgstr "Ezezkoak"
 
-#: src/postulo/applications/forms.py:295
+#: src/postulo/applications/forms.py:310
 #, draft
 msgid "Remind me the day before"
 msgstr "Gogorarazi bezperan"
 
-#: src/postulo/applications/models.py:439
-#: src/postulo/applications/models.py:556
+#: src/postulo/applications/models.py:452
+#: src/postulo/applications/models.py:569
 #, draft
 msgid "reminder"
 msgstr "oroigarria"
@@ -7738,7 +7750,7 @@ msgstr "oroigarria"
 msgid "Reminder:"
 msgstr ""
 
-#: src/postulo/applications/models.py:440
+#: src/postulo/applications/models.py:453
 #, draft
 msgid "reminders"
 msgstr "oroigarriak"
@@ -7896,7 +7908,7 @@ msgstr "Berrikusi harrapaketa"
 msgid "Reviewed by a speaker"
 msgstr "Hiztun batek berrikusia"
 
-#: src/postulo/applications/models.py:677
+#: src/postulo/applications/models.py:690
 #, draft
 msgid "reviewed on"
 msgstr "berrikuspen-data"
@@ -8020,7 +8032,7 @@ msgstr "soldata honetara"
 
 #: src/postulo/templates/accounts/profile.html:187
 #: src/postulo/templates/applications/application_form.html:29
-#: src/postulo/templates/applications/application_intake.html:72
+#: src/postulo/templates/applications/application_intake.html:74
 #: src/postulo/templates/applications/interview_form.html:68
 #: src/postulo/templates/applications/reminder_form.html:17
 #: src/postulo/templates/applications/tag_form.html:17
@@ -8051,7 +8063,7 @@ msgstr "soldata honetara"
 msgid "Save"
 msgstr "Gorde"
 
-#: src/postulo/templates/jobs/capture_review.html:130
+#: src/postulo/templates/jobs/capture_review.html:136
 msgid "Save and next"
 msgstr ""
 
@@ -8070,7 +8082,7 @@ msgstr "Gorde hau lehenik, eta itzuli gero onartzeko."
 msgid "Save to add another identifier."
 msgstr "Gorde beste identifikatzaile bat gehitzeko."
 
-#: src/postulo/templates/jobs/capture_review.html:126
+#: src/postulo/templates/jobs/capture_review.html:132
 #, draft
 msgid "Save to listings"
 msgstr "Gorde iragarkietan"
@@ -8080,7 +8092,7 @@ msgstr "Gorde iragarkietan"
 msgid "Saved in %(language)s."
 msgstr "%(language)s hizkuntzan gordeta."
 
-#: src/postulo/jobs/capture_views.py:330
+#: src/postulo/jobs/capture_views.py:341
 #, draft
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Zure iragarkietan gorde da. Prest zaudenean erabakiko duzu."
@@ -8121,7 +8133,7 @@ msgstr "Antolatu"
 msgid "Schedule an interview"
 msgstr "Antolatu elkarrizketa bat"
 
-#: src/postulo/applications/models.py:470
+#: src/postulo/applications/models.py:483
 #, draft
 msgid "Scheduled"
 msgstr "Antolatuta"
@@ -8303,7 +8315,7 @@ msgstr "Honekin bidalia"
 msgid "Separate several with commas. Anything new joins your list."
 msgstr "Bereizi hainbat komaz. Berri den guztia zure zerrendan sartzen da."
 
-#: src/postulo/applications/forms.py:131 src/postulo/applications/forms.py:180
+#: src/postulo/applications/forms.py:141 src/postulo/applications/forms.py:195
 #, draft
 msgid "Separate them with commas. A tag you have already keeps its colour."
 msgstr ""
@@ -8335,7 +8347,7 @@ msgid ""
 msgstr ""
 "Ezarri <code>POSTULO_PLUGIN_CATALOGUES</code> <code>izena|url|gako-publikoa</code> erako sarrerekin, komaz bereizita. Indizeak gako horrekin sinatuta egon behar du, eta gurpil bakoitzak indize sinatuak daraman kontrol-baturarekin bat etorri behar du, edo ez da ezer instalatzen."
 
-#: src/postulo/applications/models.py:211
+#: src/postulo/applications/models.py:224
 #, draft
 msgid "Set automatically the first time the status becomes “Applied”."
 msgstr "Automatikoki ezartzen da egoera lehen aldiz «Eskatuta» bihurtzen denean."
@@ -8636,7 +8648,7 @@ msgstr "trebetasunak"
 msgid "Skip to content"
 msgstr "Joan edukira"
 
-#: src/postulo/templates/jobs/capture_review.html:149
+#: src/postulo/templates/jobs/capture_review.html:155
 msgid "Skip to the next"
 msgstr ""
 
@@ -8819,7 +8831,7 @@ msgstr "Hasi hemendik:"
 msgid "Starting clean instead?"
 msgstr "Hutsetik hasi nahi duzu?"
 
-#: src/postulo/applications/models.py:528
+#: src/postulo/applications/models.py:541
 #, draft
 msgid "starts"
 msgstr "hasten da"
@@ -8847,7 +8859,7 @@ msgstr "egoera"
 msgid "State"
 msgstr "Egoera"
 
-#: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:238
+#: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
 #: src/postulo/templates/accounts/invite_list.html:26
@@ -8861,19 +8873,19 @@ msgstr "Egoera"
 msgid "Status"
 msgstr "Egoera"
 
-#: src/postulo/applications/models.py:202
-#: src/postulo/applications/models.py:667 src/postulo/documents/models.py:659
+#: src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
 #: src/postulo/jobs/models.py:808
 #, draft
 msgid "status"
 msgstr "egoera"
 
-#: src/postulo/applications/models.py:335
+#: src/postulo/applications/models.py:348
 #, draft
 msgid "Status change"
 msgstr "Egoera-aldaketa"
 
-#: src/postulo/core/csv_import.py:733
+#: src/postulo/core/csv_import.py:747
 #, python-format, draft
 msgid "Status in the spreadsheet: %(text)s"
 msgstr "Egoera kalkulu-orrian: %(text)s"
@@ -8938,22 +8950,22 @@ msgstr "Sendoa"
 msgid "subject"
 msgstr "gaia"
 
-#: src/postulo/applications/models.py:647
+#: src/postulo/applications/models.py:660
 #, draft
 msgid "suggested by"
 msgstr "nork iradokia"
 
-#: src/postulo/applications/models.py:655
+#: src/postulo/applications/models.py:668
 #, draft
 msgid "suggested status"
 msgstr "iradokitako egoera"
 
-#: src/postulo/applications/models.py:682
+#: src/postulo/applications/models.py:695
 #, draft
 msgid "suggestion"
 msgstr "iradokizuna"
 
-#: src/postulo/applications/models.py:683
+#: src/postulo/applications/models.py:696
 #, draft
 msgid "suggestions"
 msgstr "iradokizunak"
@@ -8969,7 +8981,7 @@ msgstr "Iradokizunak"
 msgid "Suggestions from plugins"
 msgstr "Pluginen iradokizunak"
 
-#: src/postulo/applications/models.py:382 src/postulo/documents/models.py:117
+#: src/postulo/applications/models.py:395 src/postulo/documents/models.py:117
 #: src/postulo/resume/models.py:78 src/postulo/resume/models.py:163
 #, draft
 msgid "summary"
@@ -9093,7 +9105,7 @@ msgstr "Etiketa"
 msgid "tagline"
 msgstr "leloa"
 
-#: src/postulo/applications/forms.py:126 src/postulo/applications/tables.py:89
+#: src/postulo/applications/forms.py:136 src/postulo/applications/tables.py:89
 #: src/postulo/core/csv_import.py:53
 #: src/postulo/templates/applications/tag_list.html:4
 #: src/postulo/templates/applications/tag_list.html:10
@@ -9101,7 +9113,7 @@ msgstr "leloa"
 msgid "Tags"
 msgstr "Etiketak"
 
-#: src/postulo/applications/models.py:245 src/postulo/core/models.py:95
+#: src/postulo/applications/models.py:258 src/postulo/core/models.py:95
 #, draft
 msgid "tags"
 msgstr "etiketak"
@@ -9627,7 +9639,7 @@ msgstr "Deskarga plugin batek izan behar lukeena baino askoz handiagoa da."
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Honek ordezkatzen duen aurreko bertsioa. Fitxategi zaharra gordetzen da."
 
-#: src/postulo/applications/forms.py:232
+#: src/postulo/applications/forms.py:247
 #, draft
 msgid "The employer as a whole"
 msgstr "Enplegatzailea bere osotasunean"
@@ -9837,7 +9849,7 @@ msgstr "Iragarkia"
 msgid "the posting"
 msgstr "iragarkia"
 
-#: src/postulo/templates/applications/application_intake.html:64
+#: src/postulo/templates/applications/application_intake.html:66
 #: src/postulo/templates/jobs/capture_review.html:105
 #: src/postulo/templates/jobs/listing_form.html:48
 #, draft
@@ -9935,6 +9947,11 @@ msgstr "Guneak Postulo baztertzen du, edo iragarkiak saioa hastea eskatzen du"
 #, draft
 msgid "The site's robots.txt is honoured."
 msgstr "Gunearen robots.txt errespetatzen da."
+
+#: src/postulo/core/csv_import.py:877
+msgid ""
+"The spreadsheet gave a status but no date, so this application is not counted in figures measured from the date it was sent. Set it on the application to include it."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py:220
 #, draft
@@ -10056,7 +10073,7 @@ msgstr ""
 msgid "These records can name people and their applications."
 msgstr "Erregistro hauek pertsonak eta haien eskaerak izenda ditzakete."
 
-#: src/postulo/applications/models.py:473
+#: src/postulo/applications/models.py:486
 #, draft
 msgid "They did not show up"
 msgstr "Ez ziren agertu"
@@ -10234,11 +10251,9 @@ msgid "Tick rows to act on several at once."
 msgstr "Markatu errenkadak askorekin batera jarduteko."
 
 #: src/postulo/jobs/capture_views.py:203
-#, draft
 msgid ""
-"Ticked, the listing becomes an application straight away, marked as applied today. Otherwise it waits in your listings for you to decide."
+"Ticked, the listing becomes an application straight away. Otherwise it waits in your listings for you to decide."
 msgstr ""
-"Markatuta, iragarkia berehala eskaera bihurtzen da, gaur eskatutzat markatuta. Bestela zure iragarkietan itxarongo du erabaki arte."
 
 #: src/postulo/templates/partials/table/bulk.html:32
 #, draft
@@ -10267,7 +10282,7 @@ msgstr "ordu-eremua"
 msgid "Time zone for new accounts"
 msgstr "Kontu berrien ordu-eremua"
 
-#: src/postulo/applications/models.py:675
+#: src/postulo/applications/models.py:688
 #, draft
 msgid "timeline entry"
 msgstr "denbora-lerroko sarrera"
@@ -10320,7 +10335,7 @@ msgstr "Erabakitzeko"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Iragarki bat emateko (captures esparrua behar da):"
 
-#: src/postulo/applications/models.py:386
+#: src/postulo/applications/models.py:399
 #, draft
 msgid "to status"
 msgstr "egoerara"
@@ -10710,7 +10725,7 @@ msgstr "%(actor)s bidez"
 msgid "Video"
 msgstr "Bideoa"
 
-#: src/postulo/applications/models.py:462
+#: src/postulo/applications/models.py:475
 #, draft
 msgid "Video call"
 msgstr "Bideo-deia"
@@ -10725,7 +10740,7 @@ msgstr ""
 msgid "Waiting after this one: %(count)s."
 msgstr ""
 
-#: src/postulo/applications/models.py:605 src/postulo/jobs/models.py:778
+#: src/postulo/applications/models.py:618 src/postulo/jobs/models.py:778
 #, draft
 msgid "Waiting for review"
 msgstr "Berrikuspenaren zain"
@@ -10928,7 +10943,7 @@ msgstr ""
 msgid "What it may do"
 msgstr "Zer egin dezakeen"
 
-#: src/postulo/applications/models.py:651
+#: src/postulo/applications/models.py:664
 #, draft
 msgid "what it says"
 msgstr "zer dioen"
@@ -11011,7 +11026,7 @@ msgstr "Zer exekutatzen ari den instalazio hau, eta non dauden bere datuak."
 msgid "What to call it"
 msgstr "Nola deitu"
 
-#: src/postulo/applications/models.py:430
+#: src/postulo/applications/models.py:443
 #, draft
 msgid "what to do"
 msgstr "zer egin"
@@ -11053,7 +11068,7 @@ msgid ""
 "Whatever it is worth to you, once or now and then, at <a href=\"%(url)s\" class=\"underline\">buymeacoffee.com/tiagoagueda</a>."
 msgstr ""
 
-#: src/postulo/applications/models.py:431
+#: src/postulo/applications/models.py:444
 #, draft
 msgid "when"
 msgstr "noiz"
@@ -11064,7 +11079,7 @@ msgstr "noiz"
 msgid "When"
 msgstr "Noiz"
 
-#: src/postulo/applications/models.py:659
+#: src/postulo/applications/models.py:672
 #, draft
 msgid "When accepting should also move the application."
 msgstr "Onartzeak eskaera ere mugitu behar duenean."
@@ -11074,6 +11089,11 @@ msgstr "Onartzeak eskaera ere mugitu behar duenean."
 msgid "When it entered your listings."
 msgstr "Noiz sartu zen zure iragarkietan."
 
+#: src/postulo/applications/forms.py:126
+msgid ""
+"When you actually sent it. Left empty it is today, which is wrong for a search already under way — and reply times, the months and the report are measured from this date."
+msgstr ""
+
 #: src/postulo/templates/server/email.html:215
 #, draft
 msgid ""
@@ -11081,7 +11101,7 @@ msgid ""
 msgstr ""
 "Instantzia hau hornitzailean erregistratzean, eman helbide hau jendea itzultzeko:"
 
-#: src/postulo/applications/models.py:531
+#: src/postulo/applications/models.py:544
 #, draft
 msgid "where"
 msgstr "non"
@@ -11208,7 +11228,7 @@ msgstr ""
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Postuloren zein zatik sortu duen hau: web interfazeak edo APIak."
 
-#: src/postulo/applications/models.py:242
+#: src/postulo/applications/models.py:255
 #, draft
 msgid "Which part of the employer this was for, if you know."
 msgstr "Enplegatzailearen zein zatirentzat zen, baldin badakizu."
@@ -11228,7 +11248,7 @@ msgstr "Zein pluginentzat izan behar du konexio honek?"
 msgid "Who may create an account here."
 msgstr "Nork sor dezakeen kontu bat hemen."
 
-#: src/postulo/applications/models.py:537
+#: src/postulo/applications/models.py:550
 #, draft
 msgid "who you are meeting"
 msgstr "norekin biltzen zaren"
@@ -11398,7 +11418,7 @@ msgstr "Izen horretako enpresa bat jada baduzu."
 msgid "You already have a CV or portfolio with that name."
 msgstr "Izen horretako CV edo portfolio bat baduzu jada."
 
-#: src/postulo/applications/forms.py:356
+#: src/postulo/applications/forms.py:371
 #, draft
 msgid "You already have a tag with that name."
 msgstr "Izen horretako etiketa bat jada baduzu."
@@ -11579,7 +11599,7 @@ msgstr "Zure laburpena hutsik dago"
 msgid "Your data"
 msgstr "Zure datuak"
 
-#: src/postulo/applications/forms.py:123
+#: src/postulo/applications/forms.py:133
 #: src/postulo/templates/applications/application_detail.html:160
 #, draft
 msgid "Your deadline"

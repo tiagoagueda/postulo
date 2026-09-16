@@ -674,8 +674,22 @@ class ParsedRow:
 
     @property
     def becomes(self) -> str:
+        """What this row turns into: the **status** decides, not whether a date was given.
+
+        It used to be the date alone, so a row saying *Rejected* with no date column became a
+        listing in *To decide* — losing the status, the channel, the tags and the deadline —
+        while a row saying *draft* with a date became an application. The status is what the
+        person wrote down; a missing date is a missing date, and is recorded as unknown (#222).
+        """
         if self.problems:
             return "skipped"
+        if self.status == "draft":
+            # Said plainly: not sent. A date beside it is when it was written, not when it
+            # went out, and it used to become an application marked *Applied*.
+            return "listing"
+        if self.status:
+            return "application"
+        # No status column at all: the date is the only evidence either way.
         return "application" if self.applied_at else "listing"
 
 
@@ -817,7 +831,7 @@ def perform(user, sheet: Sheet, mapping: list[str], *, day_first: bool = True) -
             }
             notes = "\n".join(row.notes)
 
-            if row.applied_at is None:
+            if row.becomes == "listing":
                 listing = create_listing(user, company=company, posting_data=posting_data)
                 if notes:
                     listing.description = (listing.description + "\n\n" + notes).strip()
@@ -825,8 +839,16 @@ def perform(user, sheet: Sheet, mapping: list[str], *, day_first: bool = True) -
                 report.listings += 1
                 continue
 
-            applied_moment = timezone.make_aware(
-                dt.datetime.combine(row.applied_at, dt.time(12, 0)), timezone.get_current_timezone()
+            # A row that says what happened but not when: keep the status, the channel, the
+            # tags and the deadline, and leave the date unknown rather than inventing today
+            # (#222). `mark_applied=False` is what stops the status change stamping one.
+            applied_moment = (
+                timezone.make_aware(
+                    dt.datetime.combine(row.applied_at, dt.time(12, 0)),
+                    timezone.get_current_timezone(),
+                )
+                if row.applied_at
+                else None
             )
             application = create_application(
                 user,
@@ -840,9 +862,26 @@ def perform(user, sheet: Sheet, mapping: list[str], *, day_first: bool = True) -
                 },
                 actor=provenance,
             )
-            change_status(application, "applied", occurred_at=applied_moment, actor=provenance)
-            if row.status not in ("applied", "draft"):
-                change_status(application, row.status, occurred_at=applied_moment, actor=provenance)
+            wanted = row.status or "applied"
+            if applied_moment is not None:
+                change_status(application, "applied", occurred_at=applied_moment, actor=provenance)
+                if wanted != "applied":
+                    change_status(application, wanted, occurred_at=applied_moment, actor=provenance)
+            else:
+                change_status(application, wanted, actor=provenance, mark_applied=False)
+                record_event(
+                    application,
+                    kind=EventKind.OTHER,
+                    summary=str(_("Applied on an unknown date")),
+                    body=str(
+                        _(
+                            "The spreadsheet gave a status but no date, so this application "
+                            "is not counted in figures measured from the date it was sent. "
+                            "Set it on the application to include it."
+                        )
+                    ),
+                    actor=provenance,
+                )
             record_event(
                 application,
                 kind=EventKind.OTHER,

@@ -51,6 +51,8 @@
         <h2 class="mb-4 font-medium">{% translate "Your application" %}</h2>
         <div class="grid gap-x-4 sm:grid-cols-3">
           {% include "partials/field.html" with field=form.status %}
+          {# When it was actually sent: recording a search already under way is the common case (#222). #}
+          {% include "partials/field.html" with field=form.applied_on %}
           {% include "partials/field.html" with field=form.channel %}
           {% include "partials/field.html" with field=form.priority %}
         </div>

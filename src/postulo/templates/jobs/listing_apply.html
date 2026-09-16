@@ -30,6 +30,8 @@
       <div class="card mb-6">
         <div class="grid gap-x-4 sm:grid-cols-3">
           {% include "partials/field.html" with field=form.status %}
+          {# When it was actually sent, which is not always today (#222). #}
+          {% include "partials/field.html" with field=form.applied_on %}
           {% include "partials/field.html" with field=form.channel %}
           {% include "partials/field.html" with field=form.priority %}
         </div>

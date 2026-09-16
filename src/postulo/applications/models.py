@@ -66,6 +66,19 @@ OPEN_STATUSES = frozenset(
 #: Statuses an application can go quiet in: open, and actually sent.
 QUIET_STATUSES = frozenset(OPEN_STATUSES - {Status.DRAFT})
 
+#: Statuses that mean the application was actually sent (#222).
+#:
+#: `applied_at` used to be written only on the literal *Applied*, so anybody who recorded a
+#: reply they already had — straight to *Interviewing*, or to *Rejected* — had an application
+#: that counted nowhere: not in the sent figure, the reply times, the sources, the months, or
+#: the report an employment office reads. Reaching any of these says it went out, whatever it
+#: was called by the time it was written down.
+#:
+#: *Withdrawn* is the one that does not: a draft abandoned before it was ever sent ends there,
+#: and stamping it would invent an application. Withdrawing something already sent keeps the
+#: date it already has.
+SENT_STATUSES = frozenset(set(Status.values) - {Status.DRAFT, Status.WITHDRAWN})
+
 #: The order columns appear on the board, left to right.
 BOARD_STATUSES = (
     Status.DRAFT,

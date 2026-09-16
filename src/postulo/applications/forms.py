@@ -119,6 +119,16 @@ class ApplicationDetailsForm(UserAwareForm):
     priority = forms.TypedChoiceField(
         label=_("Priority"), choices=Priority.choices, coerce=int, initial=Priority.NORMAL
     )
+    applied_on = forms.DateField(
+        label=_("Applied on"),
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text=_(
+            "When you actually sent it. Left empty it is today, which is wrong for a search "
+            "already under way — and reply times, the months and the report are measured "
+            "from this date."
+        ),
+    )
     deadline = forms.DateField(
         label=_("Your deadline"), required=False, widget=forms.DateInput(attrs={"type": "date"})
     )
@@ -148,11 +158,16 @@ class ApplicationDetailsForm(UserAwareForm):
 
     @property
     def application_data(self) -> dict:
+        from .services import moment_for
+
         return {
             "status": self.cleaned_data["status"],
             "channel": self.cleaned_data.get("channel") or "",
             "priority": self.cleaned_data.get("priority") or Priority.NORMAL,
             "deadline": self.cleaned_data.get("deadline"),
+            # Carried through `apply_to_listing`, which takes it out again and hands it to the
+            # status change, so the date, the stamp and the timeline entry all agree (#222).
+            "applied_at": moment_for(self.cleaned_data.get("applied_on")),
         }
 
 

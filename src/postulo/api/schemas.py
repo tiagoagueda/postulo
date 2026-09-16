@@ -215,14 +215,24 @@ class ApplicationDetailsIn(Schema):
     channel: str = ""
     priority: int = 2
     deadline: dt.date | None = None
+    applied_on: dt.date | None = Field(
+        default=None,
+        description=(
+            "When it was actually sent. Omitted, it is today — which is wrong for a search "
+            "already under way, and every figure measured from this date with it (#222)."
+        ),
+    )
     tags: list[str] = Field(default_factory=list, description="Tag names; unknown ones are made.")
 
     def application_data(self) -> dict:
+        from postulo.applications.services import moment_for
+
         return {
             "status": self.status,
             "channel": self.channel,
             "priority": self.priority,
             "deadline": self.deadline,
+            "applied_at": moment_for(self.applied_on),
         }
 
 

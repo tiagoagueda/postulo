@@ -20,6 +20,7 @@ from postulo.jobs.models import Company, JobPosting
 from .models import (
     BOARD_STATUSES,
     OPEN_STATUSES,
+    SENT_STATUSES,
     SETTLED_OUTCOMES,
     Application,
     ApplicationEvent,
@@ -60,6 +61,23 @@ def record_event(
     )
 
 
+def moment_for(day):
+    """A date somebody typed, as the instant to record it at (#222).
+
+    Midday in the instance's time zone, not midnight: a date written down as midnight is the
+    date before it for anybody an hour west, and "I applied on the 3rd" should not become the
+    2nd because of where the server is. A datetime is already an instant and is left alone;
+    ``None`` means nobody said, and the caller decides what that means.
+    """
+    if day is None:
+        return None
+    if isinstance(day, dt.datetime):
+        return day
+    return timezone.make_aware(
+        dt.datetime.combine(day, dt.time(12, 0)), timezone.get_current_timezone()
+    )
+
+
 @transaction.atomic
 def change_status(
     application: Application,
@@ -68,6 +86,7 @@ def change_status(
     note: str = "",
     occurred_at=None,
     actor: str = "",
+    mark_applied: bool = True,
 ) -> ApplicationEvent | None:
     """Move an application to ``new_status`` and record why.
 
@@ -78,9 +97,16 @@ def change_status(
     on every read would be needless work:
 
     ``applied_at``
-        Set the first time the application reaches "applied", and never moved
-        afterwards. It is the date you actually applied, which is what response times
-        are measured from.
+        Set the first time the application reaches a status that means it was **sent** --
+        any of `SENT_STATUSES`, not only the literal *Applied* -- and never moved
+        afterwards. It is the date you actually applied, which is what response times are
+        measured from, so recording a reply you already had (straight to *Interviewing*, or
+        to *Rejected*) has to stamp it too, or the application counts nowhere (#222).
+
+        ``occurred_at`` is the date, which is how a person says when they applied rather
+        than having today assumed for them. ``mark_applied=False`` is for the one caller
+        that knows the status but not the date -- a spreadsheet row with no date column --
+        and would rather leave it unknown than invent today.
 
     ``closed_at``
         Set when the outcome is settled, and cleared if the application reopens — which
@@ -93,7 +119,7 @@ def change_status(
     application.status = new_status
     changed = ["status", "updated_at"]
 
-    if new_status == Status.APPLIED and application.applied_at is None:
+    if mark_applied and new_status in SENT_STATUSES and application.applied_at is None:
         application.applied_at = occurred_at or timezone.now()
         changed.append("applied_at")
 
@@ -133,14 +159,19 @@ def create_listing(owner, *, company: Company, posting_data: dict) -> JobPosting
 
 @transaction.atomic
 def apply_to_listing(
-    posting: JobPosting, application_data: dict, *, actor: str = ""
+    posting: JobPosting, application_data: dict, *, actor: str = "", applied_at=None
 ) -> Application:
     """The decision: an application for a listing.
 
     The listing's derived state becomes *applied* by the mere existence of the
     application; only the moment of decision is written down.
+
+    ``applied_at`` is when it was actually sent, which is not always today: recording a
+    search already under way is the common case, and the wiki says so (#222). It is carried
+    into the status change, so the timeline entry and the date agree.
     """
     application_data = dict(application_data)
+    applied_at = application_data.pop("applied_at", None) or applied_at
     status = application_data.pop("status", Status.DRAFT)
     application = Application.objects.create(
         owner=posting.owner, posting=posting, status=Status.DRAFT, **application_data
@@ -154,7 +185,7 @@ def apply_to_listing(
         actor=actor,
     )
     if status != Status.DRAFT:
-        change_status(application, status, actor=actor)
+        change_status(application, status, occurred_at=applied_at, actor=actor)
 
     if posting.decided_at is None:
         posting.decided_at = timezone.now()
@@ -164,7 +195,13 @@ def apply_to_listing(
 
 @transaction.atomic
 def create_application(
-    owner, *, company: Company, posting_data: dict, application_data: dict, actor: str = ""
+    owner,
+    *,
+    company: Company,
+    posting_data: dict,
+    application_data: dict,
+    actor: str = "",
+    applied_at=None,
 ):
     """Record a listing and an application for it in one step.
 
@@ -173,7 +210,7 @@ def create_application(
     it is exactly those two steps, so the data is the same whichever door was used.
     """
     posting = create_listing(owner, company=company, posting_data=posting_data)
-    return apply_to_listing(posting, application_data, actor=actor)
+    return apply_to_listing(posting, application_data, actor=actor, applied_at=applied_at)
 
 
 def get_or_create_company(owner, name: str, *, wikidata: str = "") -> Company:
