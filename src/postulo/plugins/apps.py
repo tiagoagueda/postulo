@@ -16,7 +16,12 @@ class PluginsConfig(AppConfig):
         """
         from .identifiers import Identifiers
         from .installing import activate
-        from .registry import register_builtin, register_builtin_locales, register_builtin_themes
+        from .registry import (
+            load_everything,
+            register_builtin,
+            register_builtin_locales,
+            register_builtin_themes,
+        )
 
         activate()
         # The registry of identifier schemes, registered before the catalogues are swept so
@@ -24,3 +29,6 @@ class PluginsConfig(AppConfig):
         register_builtin("identifier", Identifiers)
         register_builtin_locales()
         register_builtin_themes()
+        # And now import what is installed, so a plugin that will not load says so in the
+        # start-up log rather than inside somebody's request (#228).
+        load_everything()

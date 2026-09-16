@@ -773,6 +773,61 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **A plugin reaches every process now, whatever kind it is, and comes back from a restore as
+  it went in.** Four things about installing, switching off and restoring a plugin contradicted
+  what *Writing a plugin* and the Plugins page promise, and the audit found them together
+  because they are one story told four times.
+
+  **The installer knew four kinds out of eight.** The entry-point groups that make a package a
+  plugin were typed out when there were four of them — sources, notifiers, stores, syncs — and
+  never grew with the registry. A wheel declaring `postulo.transports`, `postulo.outboxes`,
+  `postulo.features` or `postulo.importers` was refused for declaring no Postulo entry point,
+  about an entry point Postulo's own documentation had told its author to write; and those same
+  four were the only kinds rebuilt after an install, so one that did get in was invisible until
+  something else happened to refresh it. Both places ask the registry now, so there is one list
+  and it cannot go out of step with itself.
+
+  **A change reached only the process that made it.** The image serves from three web workers
+  and schedules from a container of its own, each with its own idea of what is installed, and an
+  install, a removal or a switching off rebuilt that idea only where the request happened to
+  land. A plugin an administrator had just switched off went on running in the other three —
+  with whatever credentials somebody had given it — and a notifier just installed was "not
+  installed" to the scheduler that was meant to send with it. The record on the data volume is
+  the one thing all of them can see, so every write moves its stamp and every process rebuilds
+  from it the next time it looks a plugin up: at the moment the answer is used rather than on
+  somebody's timer. Nothing here writes, which is why it sits beside #221 rather than undoing
+  it — that kept the scheduler out of the boot-time sync because two containers were writing the
+  record at once, and this is the reading half of the same problem. A first install is also what
+  creates the directory, so catching up puts it on the import path of a process that started
+  before it existed.
+
+  **A restore put back something else.** `plugins sync` reinstalls after an upgrade from what
+  the record says, and it dropped two of the fields it was reading. A plugin the administrator
+  had switched off came back switched on, which is not a decision an upgrade gets to make; and
+  the marker saying which Postulo the plugin is for — which only a catalogue can state, never
+  the wheel — was cleared, so a plugin that no longer fits this Postulo looked on the page as
+  though nobody had ever asked. The fetch then downloaded whatever the catalogue was offering
+  that day and checked it against the checksum of the version that had been installed, so a
+  restore failed the moment the catalogue moved on, and would have upgraded the plugin behind
+  the administrator's back if it had not. It asks for the recorded version.
+
+  **And somebody else's import happened inside somebody's page.** A plugin was loaded lazily, in
+  whichever request first needed one of its kind, guarded by `except Exception` — which is no
+  guard at all against `SystemExit`, the thing a module raises when it dislikes its
+  configuration, so a broken plugin ended a worker mid-request instead of ending itself. Every
+  group is loaded at start-up now, where the log is and where an administrator is looking, and
+  the guard catches everything except Ctrl-C. A plugin the registry then turns away for not
+  providing the interface it claims no longer keeps what it registered on the way past: its
+  templates had already reached the renderer and its catalogue the translator, which are the two
+  things a plugin can do to every page on the instance, and both now happen after the checks.
+
+  What the page, the command and *Contributing* say about this is true as well. A plugin is in
+  use everywhere the moment it is installed, and a restart adds nothing — because a plugin with
+  pages or tables of its own cannot be installed from a wheel at all. `INSTALLED_APPS` is fixed
+  when the process starts, nothing mounts a plugin's URLs, and `migrate` has run long before
+  anything looks at a plugin, so such a plugin has to be built into the image. *Contributing*
+  says that now, where it used to say "be in `INSTALLED_APPS`" as though an installed package
+  could put itself there. (#228)
 - **A document now speaks its own language, and a message speaks the reader's.** Nothing
   anywhere switched translation away from the language of the request, which is the wrong
   answer in exactly the two places it matters.

@@ -555,10 +555,18 @@ it in their archive gets its models *named* in that archive under `not_carried`,
 archive that is quietly incomplete is discovered when somebody restores it, and one that says
 which part is missing is discovered while they still have the original. Write the method.
 
-**Ship your own migrations, and be in `INSTALLED_APPS`.** Django needs the app loaded to see
-the model at all. Because the package cannot be uninstalled while its table holds anything, the
-table is always empty when the app goes — so its migrations reverse cleanly and there is never
-a migration referring to a module that no longer imports.
+**A plugin that owns a table, or pages, has to be built into the image.** Django needs the app
+in `INSTALLED_APPS` to see the model at all, and `INSTALLED_APPS` is fixed when the process
+starts: there is no entry-point group that adds to it, nothing mounts a plugin's URLs, and
+`migrate` has already run by the time anything looks at a plugin. So a package installed from a
+wheel or a catalogue brings entry points and nothing else — a source, an importer, a notifier,
+an outbox, a store, a sync, a transport, a feature — and one with its own tables or its own
+pages belongs in `src/postulo/`, with its app in `INSTALLED_APPS` and its migrations beside it.
+It is still a plugin in every other sense; it is just one that ships inside.
+
+**Ship your own migrations.** Because the package cannot be uninstalled while its table holds
+anything, the table is always empty when the app goes — so its migrations reverse cleanly and
+there is never a migration referring to a module that no longer imports.
 
 **Emptying the table is your job to offer.** The refusal tells somebody to empty it from the
 plugin's own pages; those pages are yours, and while the plugin is installed is exactly when

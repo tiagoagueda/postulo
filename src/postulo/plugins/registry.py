@@ -28,6 +28,7 @@ site knows more about it than a general parser does, so it gets first refusal.
 from __future__ import annotations
 
 import logging
+from importlib import metadata
 from importlib.metadata import entry_points
 
 from .base import (
@@ -76,6 +77,8 @@ GROUPS = {
 
 _cache: dict[str, list] = {}
 _builtin: dict[str, list[type]] = {"source": list(BUILTIN_SOURCES)}
+#: The record as it was when the cache was filled. ``None`` means "never looked".
+_stamp: str | None = None
 
 
 def _protocol_for(kind: str):
@@ -189,14 +192,17 @@ def _load_third_party(kind: str) -> list:
             continue
         try:
             plugin = entry_point.load()()
-        except Exception:
+        except KeyboardInterrupt:  # pragma: no cover - somebody pressing Ctrl-C
+            raise
+        except BaseException:
+            # Loading a plugin imports somebody else's module, and an import is allowed to
+            # do anything. `except Exception` let the two that are not exceptions through:
+            # a `SystemExit` from a module that calls `sys.exit` when it dislikes its
+            # configuration, and a `MemoryError`. Either one ended a worker rather than a
+            # plugin, which is the failure this function exists to prevent (#228).
+            # Ctrl-C is the one that must still travel.
             logger.exception("Plugin %r (%s) could not be loaded", entry_point.name, kind)
             continue
-
-        # Every plugin holds its own translations: a locale/ next to its package.
-        register_plugin_locale(entry_point.module)
-        # And, if it sets documents, the templates that set them (#132).
-        register_plugin_themes(plugin, entry_point.module)
 
         if not isinstance(plugin, protocol):
             logger.error(
@@ -215,20 +221,86 @@ def _load_third_party(kind: str) -> list:
             )
             continue
 
+        # After the checks, not before them. A plugin that is ignored for providing
+        # nothing Postulo can call had already put its templates in front of the renderer
+        # and its catalogue in front of the translator, so a package rejected for being
+        # the wrong shape kept the two powers that reach every page (#228).
+        # Every plugin holds its own translations: a locale/ next to its package.
+        register_plugin_locale(entry_point.module)
+        # And, if it sets documents, the templates that set them (#132).
+        register_plugin_themes(plugin, entry_point.module)
+
         plugins.append(plugin)
     return plugins
+
+
+def catch_up() -> bool:
+    """Notice a plugin *another* process installed, switched off or removed.
+
+    The cache is per process, and Postulo is several: three web workers and a scheduler in
+    the image, more behind a load balancer. Until #228 an install, a removal or a switching
+    off was rebuilt only in the worker that served the request, so a plugin an administrator
+    had switched off went on running -- with somebody's credentials -- in every other
+    worker and in the scheduler, and a notifier just installed was "not installed" to the
+    scheduler that was supposed to send with it.
+
+    The record on the volume is the one thing every process can see, so its stamp is what
+    they agree on: cheap enough to ask on every lookup, so a change is noticed where the
+    answer is *used* rather than on somebody's timer. ``activate`` runs again because a
+    first install creates the directory, and a process that started before it existed has
+    it on no import path.
+
+    This is the other half of #221. That stopped two containers *writing* the record at the
+    same time, by keeping the scheduler out of the boot-time sync; this makes every process
+    *read* what one of them wrote. Nothing here writes, so the scheduler can stay out of it
+    and still be right.
+    """
+    global _stamp
+
+    from .installing import activate, record_stamp
+
+    now = record_stamp()
+    if now == _stamp:
+        return False
+    _stamp = now
+    _cache.clear()
+    activate()
+    # The files under the directory changed, so what the import machinery remembers about
+    # what is installed there is out of date with them.
+    metadata.MetadataPathFinder.invalidate_caches()
+    return True
 
 
 def plugins(kind: str, *, refresh: bool = False) -> list:
     """Every usable plugin of ``kind``, third-party first, then the built-ins."""
     if kind not in GROUPS:
         raise ValueError(f"Unknown plugin kind {kind!r}; one of {sorted(GROUPS)}.")
+    catch_up()
     if kind not in _cache or refresh:
         _cache[kind] = [
             *_load_third_party(kind),
             *(plugin_class() for plugin_class in _builtin.get(kind, [])),
         ]
     return list(_cache[kind])
+
+
+def load_everything() -> None:
+    """Import every installed plugin now, at start-up, rather than during a request.
+
+    Third-party code used to be imported lazily, inside whichever request first asked for a
+    plugin of that kind. That put somebody else's import -- which may exit, hang on a
+    socket, or take a minute -- inside a person's page load, and it meant a plugin that
+    cannot load was discovered by whoever was unlucky rather than by the log at boot (#228).
+
+    A failure here is still a failure of that plugin alone: `_load_third_party` logs it and
+    leaves it out. Nothing is raised, because a broken plugin must not stop an instance
+    starting -- an administrator who cannot start Postulo cannot remove the plugin either.
+    """
+    for kind in GROUPS:
+        try:
+            plugins(kind, refresh=True)
+        except Exception:  # pragma: no cover - a kind that cannot even be enumerated
+            logger.exception("The %s plugins could not be loaded at start-up", kind)
 
 
 def find_plugin(kind: str, name: str):

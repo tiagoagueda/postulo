@@ -30,6 +30,14 @@ installation; and the record keeps every package that actually arrived, so an
 administrator can see what is in their instance without a shell. Trusting a plugin means
 trusting its dependency list, and the page says as much before anything is fetched.
 
+**The record is also how the processes agree.** Postulo runs as several processes -- three
+web workers and a scheduler in the image -- each with its own idea of what is installed.
+An install, a removal or a switching off used to be rebuilt only in the one that did it, so
+a plugin an administrator had just switched off went on running everywhere else. The record
+sits on the shared volume and is the one thing all of them can see, so each write moves its
+stamp (`record_stamp`) and every process rebuilds from it the next time it looks a plugin
+up (`registry.catch_up`). Only the process making the change writes; the rest read.
+
 Installing a plugin is running somebody else's code inside Postulo, with everything
 Postulo can do. Nothing here pretends otherwise; the page that calls it says so plainly,
 only administrators reach it, and a plugin can be switched off without being removed.
@@ -42,6 +50,7 @@ import hashlib
 import importlib.util
 import json
 import logging
+import os
 import re
 import shutil
 import site
@@ -54,6 +63,7 @@ from importlib import metadata
 from pathlib import Path
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
@@ -62,10 +72,26 @@ logger = logging.getLogger(__name__)
 RECORD_NAME = "plugins.json"
 #: Only wheels, and only pure-Python ones.
 PURE_PYTHON = "py3-none-any"
-#: Entry-point groups that make a package a Postulo plugin.
-PLUGIN_GROUPS = ("postulo.sources", "postulo.notifiers", "postulo.stores", "postulo.syncs")
 #: How long an install may take before it is called a failure.
 INSTALL_TIMEOUT = 300
+
+
+def plugin_groups() -> tuple[str, ...]:
+    """Every entry-point group that makes a package a Postulo plugin.
+
+    Asked of the registry rather than listed here. This used to be four names typed out by
+    hand, written when there were four kinds, and it went out of date the moment there were
+    more: a transport, an outbox, a feature or an importer declares a group the list did
+    not know about, so the installer read the wheel's entry points as nobody's and refused
+    it for "declaring no Postulo entry point" -- about a package whose entry point
+    Postulo's own documentation had told its author to declare (#228).
+
+    A kind whose group is empty registers nothing from outside this process, which is the
+    same rule `registry._load_third_party` applies at the other end. One list, one answer.
+    """
+    from .registry import GROUPS
+
+    return tuple(dict.fromkeys(group for group in GROUPS.values() if group))
 
 
 class InstallError(Exception):
@@ -183,9 +209,35 @@ def write_record(entries: list[Installed]) -> None:
         "version": 1,
         "plugins": [asdict(entry) for entry in sorted(entries, key=lambda e: e.name)],
     }
-    record_path().write_text(
-        json.dumps(payload, indent=2, sort_keys=False) + "\n", encoding="utf-8"
-    )
+    before = record_stamp()
+    path = record_path()
+    path.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+    if record_stamp() == before:
+        # Every other process decides whether to reload from this stamp, so a write that
+        # does not move it is a change nobody else ever sees. Two writes land in the same
+        # stamp only where the filesystem keeps coarse timestamps *and* the record came out
+        # the same length -- switching a plugin off and on again within the same second is
+        # exactly that -- so the timestamp is pushed into the next tick rather than left
+        # ambiguous. Nothing reads this time as a time; it only has to differ.
+        status = path.stat()
+        os.utime(path, ns=(status.st_atime_ns, status.st_mtime_ns + 1_000_000_000))
+
+
+def record_stamp() -> str:
+    """What the record looks like from outside, as "has it changed?" and nothing more.
+
+    The modification time and the length, not the contents: this is asked on every plugin
+    lookup in every process, and a `stat` is one cheap syscall where reading and parsing the
+    file is several. ``write_record`` guarantees the pair moves whenever the record does.
+
+    Empty when there is no record, or when the settings are not usable yet, which are both
+    "nothing installed" as far as a caller is concerned.
+    """
+    try:
+        status = record_path().stat()
+    except (OSError, ImproperlyConfigured):
+        return ""
+    return f"{status.st_mtime_ns}:{status.st_size}"
 
 
 def installed(name: str) -> Installed | None:
@@ -298,12 +350,13 @@ def _one(names: list[str], pattern: str) -> str | None:
 def _plugin_entry_points(text: str) -> list[str]:
     """``group:name`` for every Postulo entry point the package declares."""
     found: list[str] = []
+    groups = plugin_groups()
     group = ""
     for line in text.splitlines():
         line = line.strip()
         if line.startswith("[") and line.endswith("]"):
             group = line[1:-1].strip()
-        elif line and "=" in line and group in PLUGIN_GROUPS:
+        elif line and "=" in line and group in groups:
             found.append(f"{group}:{line.split('=', 1)[0].strip()}")
     return found
 
@@ -411,7 +464,7 @@ def check(info: PackageInfo) -> None:
                     "nothing. A plugin registers under one of: %(groups)s."
                 )
             )
-            % {"name": info.name, "groups": ", ".join(PLUGIN_GROUPS)}
+            % {"name": info.name, "groups": ", ".join(plugin_groups())}
         )
     problems = conflicts_with_core(info)
     if problems:
@@ -513,8 +566,15 @@ def install_wheel(
     by: str = "",
     expected_sha256: str = "",
     requires_postulo: str = "",
+    disabled: bool = False,
+    installed_at: str = "",
 ) -> Installed:
-    """Check a wheel, install it into the plugins directory, and record it."""
+    """Check a wheel, install it into the plugins directory, and record it.
+
+    ``disabled`` and ``installed_at`` are for a restore rather than for an install: `sync`
+    puts a plugin back after an upgrade and has to put back the state it was in, not a
+    fresh one. An install leaves both alone, which is enabled and now.
+    """
     info = read_wheel(wheel)
     if expected_sha256 and info.sha256 != expected_sha256:
         raise InstallError(
@@ -548,10 +608,10 @@ def install_wheel(
         origin=origin,
         source=source or info.filename,
         sha256=info.sha256,
-        installed_at=dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
+        installed_at=installed_at or dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
         installed_by=by,
         entry_points=info.entry_points,
-        disabled=False,
+        disabled=disabled,
         dependencies=arrived,
         summary=info.summary,
         licence=info.licence,
@@ -668,6 +728,9 @@ def set_disabled(name: str, disabled: bool) -> Installed:
         if canonicalise(entry.name) == canonicalise(name):
             entry.disabled = disabled
             write_record(record)
+            # Every other process notices from the record's stamp; this one wrote the
+            # record, so its own stamp already matches and nothing would tell it (#228).
+            _forget_metadata_cache()
             return entry
     raise InstallError(str(_("%(name)s is not installed.")) % {"name": name})
 
@@ -735,17 +798,30 @@ def sync(*, fetch=None) -> tuple[list[str], list[str]]:
             try:
                 wheel = fetch(entry)
             except Exception:
+                # The caller is told the plugin is lost; the log is the only place the
+                # reason can go, and "the catalogue no longer lists that version" is
+                # exactly the reason somebody will want.
+                logger.exception("%s could not be fetched to restore it", entry.name)
                 wheel = None
         if wheel is None:
             lost.append(entry.name)
             continue
         try:
+            # Every field the record kept, because this is a restore: a plugin the
+            # administrator had switched off must come back switched off -- it was
+            # switched off for a reason, and an upgrade is not somebody changing their
+            # mind -- and the compatibility marker the catalogue declared is not
+            # something the wheel can say, so dropping it made a plugin that no longer
+            # fits this Postulo look as though it had never been asked (#228).
             install_wheel(
                 wheel,
                 origin=entry.origin,
                 source=entry.source,
                 by=entry.installed_by,
                 expected_sha256=entry.sha256,
+                requires_postulo=entry.requires_postulo,
+                disabled=entry.disabled,
+                installed_at=entry.installed_at,
             )
             restored.append(entry.name)
         except InstallError:
@@ -771,11 +847,18 @@ def _is_present(name: str) -> bool:
 
 
 def _forget_metadata_cache() -> None:
-    """Make the next look at entry points see what was just installed or removed."""
+    """Make the next look at entry points see what was just installed or removed.
+
+    Every kind, asked of the registry. Four of them were named here by hand, so installing
+    a transport or a feature left the process that installed it holding a list from before
+    the install -- and the plugin the administrator had just watched arrive was not there
+    until something else happened to refresh it (#228).
+    """
+    from .registry import GROUPS
     from .registry import plugins as registry_plugins
 
     metadata.MetadataPathFinder.invalidate_caches()
-    for kind in ("source", "notifier", "store", "sync"):
+    for kind in GROUPS:
         try:
             registry_plugins(kind, refresh=True)
         except Exception:  # pragma: no cover - the registry logs the plugin that broke

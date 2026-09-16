@@ -1202,8 +1202,9 @@ class PluginActionView(StaffRequiredMixin, View):
         messages.success(
             request,
             _(
-                "%(name)s %(version)s is installed. Restart Postulo if it adds pages of "
-                "its own; anything else is available now."
+                "%(name)s %(version)s is installed, and every part of this instance is "
+                "using it already. A restart would add nothing: a plugin with pages or "
+                "tables of its own has to be built into the image."
             )
             % {"name": entry.name, "version": entry.version},
         )
@@ -1269,8 +1270,6 @@ class PluginActionView(StaffRequiredMixin, View):
     def _switch(self, request: HttpRequest, disabled: bool) -> HttpResponse:
         from postulo.notifications import transport
         from postulo.plugins.installing import InstallError, set_disabled
-        from postulo.plugins.registry import GROUPS
-        from postulo.plugins.registry import plugins as registry_plugins
 
         name = request.POST.get("name", "")
         # Switching off a package that carries the mail is switching off the mail (#104).
@@ -1282,8 +1281,8 @@ class PluginActionView(StaffRequiredMixin, View):
         except InstallError as error:
             messages.error(request, str(error))
             return redirect("server:plugins")
-        for kind in GROUPS:
-            registry_plugins(kind, refresh=True)
+        # Rebuilding this worker's lists is `set_disabled`'s job now, and so is the record
+        # stamp that tells every other worker and the scheduler to do the same (#228).
         messages.success(
             request,
             _("%(name)s is switched off; its files are still here.") % {"name": entry.name}

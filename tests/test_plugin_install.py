@@ -271,6 +271,256 @@ def test_the_registry_leaves_out_what_is_switched_off(
     assert "example" not in [source.name for source in registry.available_sources(refresh=True)]
 
 
+# ---------------------------------------------------- every kind of plugin
+
+
+@pytest.mark.parametrize(
+    "group",
+    [
+        "postulo.sources",
+        "postulo.importers",
+        "postulo.transports",
+        "postulo.features",
+        "postulo.notifiers",
+        "postulo.outboxes",
+        "postulo.stores",
+        "postulo.syncs",
+    ],
+)
+def test_a_wheel_of_any_kind_postulo_knows_is_installed(tmp_path, plugins_dir, installer, group):
+    """Not only the four kinds that existed when the installer was written (#228).
+
+    A transport, an outbox, a feature and an importer each declare a group of their own, and
+    each of them was refused for "declaring no Postulo entry point" -- about a wheel whose
+    entry point *Postulo's own documentation* had told its author to write.
+    """
+    where = tmp_path / group.rsplit(".", 1)[1]
+    where.mkdir()
+    wheel = a_wheel(where, entry_points=(f"[{group}]\nexample = postulo_example:Source\n",))
+
+    info = installing.read_wheel(wheel)
+    assert info.entry_points == [f"{group}:example"]
+    installing.check(info)  # says nothing, which is the point
+
+    entry = installing.install_wheel(wheel)
+    assert entry.entry_points == [f"{group}:example"]
+
+
+def test_the_installer_takes_exactly_the_groups_the_registry_reads():
+    """One list. The two going out of step is what #228 was."""
+    from postulo.plugins import registry
+
+    assert set(installing.plugin_groups()) == {group for group in registry.GROUPS.values() if group}
+    assert "" not in installing.plugin_groups(), "a kind with no group registers nothing"
+
+
+def test_a_package_that_declares_only_somebody_elses_entry_point_is_still_refused(
+    tmp_path, plugins_dir
+):
+    wheel = a_wheel(tmp_path, entry_points=("[pytest11]\nexample = postulo_example:Source\n",))
+    with pytest.raises(InstallError, match="no Postulo entry point"):
+        installing.check(installing.read_wheel(wheel))
+
+
+# ------------------------------------------ the other processes catch up
+
+
+def _installed_names(kind: str = "source") -> list[str]:
+    from postulo.plugins import registry
+
+    return [plugin.name for plugin in registry.plugins(kind)]
+
+
+def _switch_off_from_outside(directory: Path, name: str, *, disabled: bool = True) -> None:
+    """Write the record as another process would: the file changes, and that is all."""
+    path = directory / installing.RECORD_NAME
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    for entry in payload["plugins"]:
+        if entry["name"] == name:
+            entry["disabled"] = disabled
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+@pytest.fixture
+def one_third_party_source(monkeypatch):
+    """An entry point that is really there, as the import machinery would report it."""
+    from postulo.plugins import registry
+
+    class Fake:
+        name = "example"
+        dist = type("D", (), {"name": "postulo-example"})()
+        module = "postulo_example"
+
+        def load(self):
+            class Source:
+                name = "example"
+                version = "1.0"
+
+                def can_handle(self, url):
+                    return False
+
+                def parse(self, url, html):
+                    return None
+
+            return Source
+
+    monkeypatch.setattr(
+        registry, "entry_points", lambda group: [Fake()] if group == "postulo.sources" else []
+    )
+    monkeypatch.setattr(registry, "register_plugin_locale", lambda module: None)
+    return Fake
+
+
+def test_a_plugin_switched_off_elsewhere_stops_loading_here(
+    tmp_path, plugins_dir, installer, one_third_party_source
+):
+    """The record changes, nothing in this process is told, and it finds out anyway (#228).
+
+    The web serves from three workers and the scheduler is a container of its own. Until
+    this, switching a plugin off rebuilt the lists in whichever worker answered the form,
+    and the others went on loading it -- with somebody's credentials in it.
+
+    The record is written here the way another process would write it: the file on the
+    volume changes and nothing in this process is called.
+    """
+    from postulo.plugins import registry
+
+    installing.install_wheel(a_wheel(tmp_path))
+    assert "example" in _installed_names()
+
+    _switch_off_from_outside(plugins_dir, "postulo-example")
+    assert "example" not in _installed_names(), "no refresh was asked for, and none was needed"
+
+    _switch_off_from_outside(plugins_dir, "postulo-example", disabled=False)
+    assert "example" in _installed_names(), "and back again"
+    assert registry._stamp == installing.record_stamp()
+
+
+def test_a_record_that_has_not_moved_is_not_read_twice(
+    tmp_path, plugins_dir, installer, one_third_party_source, monkeypatch
+):
+    """The check happens on every lookup, so it has to be a `stat` and nothing more."""
+    from postulo.plugins import registry
+
+    installing.install_wheel(a_wheel(tmp_path))
+    _installed_names()
+
+    loads: list[str] = []
+    real = registry._load_third_party
+    monkeypatch.setattr(
+        registry, "_load_third_party", lambda kind: (loads.append(kind), real(kind))[1]
+    )
+    _installed_names()
+    _installed_names()
+    assert loads == [], "nothing changed, so nothing was rebuilt"
+
+
+def test_an_install_reaches_the_import_path_of_a_process_that_never_had_one(
+    tmp_path, plugins_dir, installer, one_third_party_source
+):
+    """A first install creates the directory, and `activate` used to run only at start-up.
+
+    Every process that started before that first install has nothing of it on its import
+    path, so the plugin was not merely stale there -- it was unimportable (#228).
+    """
+    from postulo.plugins import registry
+
+    installing.install_wheel(a_wheel(tmp_path))
+    while str(plugins_dir) in sys.path:
+        sys.path.remove(str(plugins_dir))
+    registry._stamp = "as it was before any of this existed"
+
+    assert "example" in _installed_names()
+    assert str(plugins_dir) in sys.path
+
+
+def test_the_record_stamp_moves_even_when_two_writes_say_the_same_thing(plugins_dir):
+    """Every other process decides from this stamp, so a write that does not move it is a
+    change nobody sees. Switching a plugin off and on again writes the same length twice.
+    """
+    entry = installing.Installed(name="postulo-example", version="1.0")
+    installing.write_record([entry])
+    first = installing.record_stamp()
+    installing.write_record([entry])
+    assert installing.record_stamp() != first
+    assert [item.name for item in installing.read_record()] == ["postulo-example"]
+
+
+# ------------------------------------- what the registry refuses to register
+
+
+def test_a_plugin_the_registry_rejects_registers_nothing_either(monkeypatch):
+    """Templates and catalogues are registered after the checks, not before them (#228).
+
+    A package that provides nothing Postulo can call was ignored -- and had already put its
+    templates in front of the renderer and its catalogue in front of the translator, which
+    are the two things a plugin can do to every page on the instance.
+    """
+    from postulo.plugins import registry
+
+    class Fake:
+        name = "shapeless"
+        dist = type("D", (), {"name": "postulo-shapeless"})()
+        module = "postulo_shapeless"
+
+        def load(self):
+            class NotANotifier:
+                name = "shapeless"
+                kind = "notifier"
+
+            return NotANotifier
+
+    registered: list = []
+    monkeypatch.setattr(
+        registry, "entry_points", lambda group: [Fake()] if group == "postulo.notifiers" else []
+    )
+    monkeypatch.setattr(
+        registry, "register_plugin_locale", lambda module: registered.append(module)
+    )
+    monkeypatch.setattr(
+        registry, "register_plugin_themes", lambda plugin, module=None: registered.append(module)
+    )
+
+    loaded = [plugin.name for plugin in registry.plugins("notifier", refresh=True)]
+    assert "shapeless" not in loaded
+    assert registered == [], "nothing of it was registered on the way past"
+
+
+def test_a_plugin_that_exits_at_import_takes_nothing_with_it(monkeypatch):
+    """`except Exception` let through the two that are not exceptions (#228).
+
+    A module that calls `sys.exit` because it dislikes its configuration raises
+    `SystemExit`, which is a `BaseException`. Inside a request that ended the worker rather
+    than the plugin -- and this loader exists precisely so that a plugin fails alone.
+    """
+    from postulo.plugins import registry
+
+    class Fake:
+        name = "exploding"
+        dist = type("D", (), {"name": "postulo-exploding"})()
+        module = "postulo_exploding"
+
+        def load(self):
+            raise SystemExit("this plugin dislikes its configuration")
+
+    monkeypatch.setattr(
+        registry, "entry_points", lambda group: [Fake()] if group == "postulo.sources" else []
+    )
+    names = [source.name for source in registry.available_sources(refresh=True)]
+    assert "exploding" not in names
+    assert names, "and the built-in sources are still there"
+
+
+def test_every_group_is_loaded_at_start_up_rather_than_in_a_request(monkeypatch):
+    """Somebody else's import belongs at boot, where the log is, and not in a page load."""
+    from postulo.plugins import registry
+
+    asked: list[str] = []
+    monkeypatch.setattr(registry, "entry_points", lambda group: asked.append(group) or [])
+    registry.load_everything()
+    assert set(asked) == set(installing.plugin_groups())
+
+
 # ------------------------------------------------------------- removing
 
 
@@ -308,6 +558,68 @@ def test_sync_reinstalls_what_the_record_lists_and_the_volume_lost(
 
     restored, lost = installing.sync(fetch=lambda entry: wheel)
     assert restored == [] and lost == [], "nothing to do the second time"
+
+
+def test_sync_puts_back_the_state_the_record_kept(tmp_path, plugins_dir, installer):
+    """A restore is not a fresh install, and used to be exactly that (#228).
+
+    A plugin an administrator had switched off came back switched on -- by an upgrade, which
+    is not somebody changing their mind -- and the compatibility marker, which only the
+    catalogue can say and the wheel never can, was cleared, so a plugin that no longer fits
+    this Postulo looked on the page as though nobody had ever asked.
+    """
+    wheel = a_wheel(tmp_path)
+    installing.install_wheel(
+        wheel,
+        origin="catalogue:official",
+        source="https://plugins.example.org/postulo_example-1.0-py3-none-any.whl",
+        by="ana",
+        requires_postulo=">=0.2",
+    )
+    installing.set_disabled("postulo-example", True)
+    before = installing.installed("postulo-example")
+
+    # The upgrade: a new image, the record intact, the files gone.
+    for path in plugins_dir.iterdir():
+        if path.name != installing.RECORD_NAME:
+            shutil.rmtree(path) if path.is_dir() else path.unlink()
+
+    restored, lost = installing.sync(fetch=lambda entry: wheel)
+    assert restored == ["postulo-example"] and lost == []
+
+    after = installing.installed("postulo-example")
+    assert after.disabled is True, "it was switched off, and it stays switched off"
+    assert after.requires_postulo == ">=0.2"
+    assert after.origin == "catalogue:official" and after.installed_by == "ana"
+    assert after.installed_at == before.installed_at, "nobody installed it again"
+    assert installing.disabled_names() == {"postulo-example"}, "and the registry is told so"
+
+
+def test_a_restore_asks_the_catalogue_for_the_version_the_record_kept():
+    """The fetch took `latest` and then checked it against the recorded checksum, so a
+    restore failed the moment the catalogue published anything newer -- and would have
+    upgraded the plugin behind the administrator's back if it had not (#228).
+    """
+    older = catalogue.Release(version="1.0", url="https://plugins.example.org/old.whl", sha256="a")
+    newer = catalogue.Release(version="2.0", url="https://plugins.example.org/new.whl", sha256="b")
+    listing = catalogue.Listing(
+        name="postulo-example", releases=(newer, older), catalogue="official"
+    )
+    official = catalogue.Catalogue(
+        name="official",
+        url="https://plugins.example.org/index.json",
+        public_key="k",
+        listings=[listing],
+    )
+
+    _listing, release = catalogue.find([official], "postulo-example")
+    assert release.version == "2.0", "installing by name still takes the newest"
+
+    _listing, release = catalogue.find([official], "Postulo_Example", "1.0")
+    assert release.version == "1.0" and release.sha256 == "a"
+
+    with pytest.raises(catalogue.CatalogueError, match=r"postulo-example 3\.0"):
+        catalogue.find([official], "postulo-example", "3.0")
 
 
 def test_sync_says_what_it_could_not_bring_back(tmp_path, plugins_dir, installer):

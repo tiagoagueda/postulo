@@ -458,8 +458,9 @@
   <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
     {% blocktranslate with group=entry_point_group trimmed %}
       A package registers a source under the <code>{{ group }}</code> entry-point group.
-      A plugin that only registers entry points appears as soon as it is installed; one
-      that adds pages of its own needs a restart. A source that fails to load is logged and
+      A plugin appears as soon as it is installed, in every part of this instance and
+      without a restart. Entry points are all it can bring: a plugin with pages or tables
+      of its own has to be built into the image. A source that fails to load is logged and
       left out, and the built-in ones keep working.
     {% endblocktranslate %}
   </p>

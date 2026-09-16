@@ -259,12 +259,31 @@ def _get(client: httpx.Client, url: str, cap: int) -> bytes:
     return content
 
 
-def find(catalogues: list[Catalogue], plugin: str) -> tuple[Listing, Release]:
+def find(catalogues: list[Catalogue], plugin: str, version: str = "") -> tuple[Listing, Release]:
+    """The listing for a plugin and the release to install: the newest, or a named one.
+
+    ``version`` is what a restore asks for. `plugins sync` puts back what the record says
+    is installed, and taking `latest` for that reinstalled whatever the catalogue happened
+    to be offering that day -- then checked it against the checksum of the version that had
+    been installed, so the restore failed the moment the catalogue moved on, and would have
+    silently upgraded the plugin if it had not (#228). An upgrade is a decision somebody
+    makes; a restore is not the moment to make it for them.
+    """
     canonical = canonicalise(plugin)
     for catalogue in catalogues:
         for listing in catalogue.listings:
-            if canonicalise(listing.name) == canonical and listing.latest:
+            if canonicalise(listing.name) != canonical:
+                continue
+            if not version and listing.latest:
                 return listing, listing.latest
+            for release in listing.releases:
+                if release.version == version:
+                    return listing, release
+    if version:
+        raise CatalogueError(
+            str(_("No catalogue lists %(name)s %(version)s."))
+            % {"name": plugin, "version": version}
+        )
     raise CatalogueError(str(_("No catalogue lists %(name)s.")) % {"name": plugin})
 
 

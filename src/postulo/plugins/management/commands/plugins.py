@@ -85,7 +85,10 @@ class Command(BaseCommand):
         self.stdout.write(f"Installed {entry.name} {entry.version} from {entry.origin}.")
         for point in entry.entry_points:
             self.stdout.write(f"    {point}")
-        self.stdout.write("Restart Postulo if the plugin adds pages of its own.")
+        self.stdout.write(
+            "It is in use everywhere already; a plugin with pages or tables of its own "
+            "has to be built into the image, and no restart changes that."
+        )
 
     # ---------------------------------------------------------------- remove
 
@@ -118,7 +121,9 @@ class Command(BaseCommand):
             if not entry.is_from_catalogue or not entry.source.startswith("http"):
                 return None
             catalogues, _problems = catalogue.fetch_all()
-            _listing, release = catalogue.find(catalogues, entry.name)
+            # The version the record says is installed, not whatever is newest now: this
+            # is putting back what an upgrade of Postulo took away (#228).
+            _listing, release = catalogue.find(catalogues, entry.name, entry.version)
             scratch = Path(tempfile.mkdtemp(prefix="postulo-plugin-"))
             return catalogue.download(release, scratch)
 
