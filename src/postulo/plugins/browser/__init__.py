@@ -26,7 +26,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
 
-from postulo.plugins.api import FieldSpec, TestResult, declares, shipped
+from postulo.plugins.api import ConnectionUnusable, FieldSpec, TestResult, declares, shipped
 
 from . import webpush
 
@@ -166,9 +166,24 @@ class BrowserNotifier:
                     notification.title, notification.body, notification.url, notification.event
                 ),
             )
+        except webpush.PushFailed as error:
+            # Not lost: the next open tab shows it.
+            inbox.leave(user, notification)
+            if error.gone:
+                # The browser has withdrawn this subscription, so every later push would fail
+                # the same way. Say so once, and let Postulo switch the connection off and
+                # forget the dead subscription (#216).
+                raise ConnectionUnusable(
+                    str(
+                        _(
+                            "This browser withdrew its subscription, so it was switched off. "
+                            "Open this connection in that browser and allow notifications "
+                            "again."
+                        )
+                    )
+                ) from error
+            raise
         except Exception:
-            # Not lost: the next open tab shows it. Still raised, so the connection says the
-            # push failed and the person can see why.
             inbox.leave(user, notification)
             raise
 

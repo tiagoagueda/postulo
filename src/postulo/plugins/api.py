@@ -48,7 +48,13 @@ if TYPE_CHECKING:  # pragma: no cover - the five names `__getattr__` resolves at
     from postulo.documents.themes import Theme
 
     from .consent import ACCESS_TOKEN, access_token
-    from .http import DestinationRefused, approve_host, check_destination, client
+    from .http import (
+        DestinationRefused,
+        approve_host,
+        check_destination,
+        client,
+        public_only_client,
+    )
 
 from .base import (
     # ------------------------------------------ what a transport carries, and how
@@ -58,6 +64,8 @@ from .base import (
     TEXT,
     # ------------------------------------------------- the protocols to satisfy
     ConnectedPlugin,
+    # ------------------------------- what a plugin raises when the other side has finished
+    ConnectionUnusable,
     # -------------------------------------------------- what a plugin declares
     Consent,
     # ------------------------------------------- what a store is handed, and gives back
@@ -95,6 +103,7 @@ __all__ = [
     "MEDIUMS",
     "TEXT",
     "ConnectedPlugin",
+    "ConnectionUnusable",
     "Consent",
     "DestinationRefused",
     "DocumentMetadata",
@@ -126,6 +135,7 @@ __all__ = [
     "label_of",
     "manifest_of",
     "medium_of",
+    "public_only_client",
     "refuse_unreadable",
     "safe_next",
     "shipped",
@@ -159,6 +169,13 @@ def __getattr__(name: str):
         from .http import client
 
         return client
+    if name == "public_only_client":
+        # For what is public by definition -- a posting, a portfolio, a logo, a browser's push
+        # service. The operator's decision about *connections* is not an answer for those, so
+        # this one refuses a private address however that switch is set (#215, #216).
+        from .http import public_only_client
+
+        return public_only_client
     if name in ("approve_host", "check_destination", "DestinationRefused"):
         # The same rule for a plugin that does not speak HTTP: `approve_host` resolves a name,
         # holds every address it answers with to the instance's policy, and hands back the one

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 
+from postulo.plugins.base import ConnectionUnusable
 from postulo.plugins.models import Connection
 
 from .base import Notification, wants
@@ -32,6 +33,18 @@ def notify(user, notification: Notification) -> int:
             continue
         try:
             plugin.send(notification, connection.full_config, user)
+        except ConnectionUnusable as dead:
+            # Not a failure to retry: the other side has ended this connection, and trying
+            # again would fail the same way every time anything happened (#216). Switch it
+            # off with the reason, and forget a credential that is known not to work.
+            logger.warning(
+                "Notifier %r says connection %s is finished: %s",
+                connection.plugin,
+                connection.pk,
+                dead,
+            )
+            connection.retire(str(dead), keep_secrets=dead.keep_secrets)
+            continue
         except Exception as error:
             logger.exception(
                 "Notifier %r failed for connection %s", connection.plugin, connection.pk

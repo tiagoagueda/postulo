@@ -8,6 +8,21 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- **A browser notification is pushed to the open web only, says nothing the push service
+  replied, and stops once a browser has withdrawn it.** The notifier added in #209 used the
+  client meant for connections somebody set up, so on an instance that allows private
+  destinations the endpoint — which comes from a browser, not from anybody typing it — could
+  have been an address on the operator's own network, and 200 characters of whatever answered
+  were then shown on the connection and kept in its error. A push service belongs to the
+  browser's maker and is public by definition, so it is fetched with the public-only client
+  now, and a failure reports its status and nothing else.
+
+  A subscription a browser has withdrawn (404 or 410) used to be retried on every event,
+  failing every time. Plugins can now say that the other side has finished with a connection,
+  with `postulo.plugins.api.ConnectionUnusable`: Postulo switches it off, shows the reason,
+  and forgets the credential that is known not to work. Nothing else about the connection is
+  touched, so allowing notifications again in that browser is one press. (#216)
+
 - **Every outbound request now connects to the address it checked, and a logo is fetched from
   the open web only.** The threat model has said since #112 that Postulo resolves a name,
   approves every address it answers with, and connects to one of *those* — one act, because

@@ -210,10 +210,16 @@ def parse_subscription(raw) -> Subscription | None:
 
 
 def _client():
-    """The guarded client, not following redirects: a push service that redirects is wrong."""
-    from postulo.plugins.api import client
+    """The guarded client, not following redirects: a push service that redirects is wrong.
 
-    return client(follow_redirects=False)
+    The **public-only** one. A push service is on the open web by definition -- it belongs to
+    the browser's maker -- so the operator's decision to let *connections* reach a private
+    address says nothing about it, and the endpoint here came from a browser rather than from
+    somebody typing it (#216).
+    """
+    from postulo.plugins.api import public_only_client
+
+    return public_only_client(follow_redirects=False)
 
 
 def push(subscription: Subscription, payload: dict, *, ttl: int = TIME_TO_LIVE) -> int:
@@ -239,8 +245,11 @@ def push(subscription: Subscription, payload: dict, *, ttl: int = TIME_TO_LIVE) 
             gone=True,
         )
     if response.status_code >= 300:
+        # The status and nothing else. What a push service says in its body is its own, and
+        # this string is shown on the connection and stored in `last_error`; a reply read off
+        # some other machine does not belong in either (#216).
         raise PushFailed(
-            f"The push service answered {response.status_code}: {response.text[:200]}",
+            f"The push service answered {response.status_code}.",
             status=response.status_code,
         )
     return response.status_code

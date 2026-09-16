@@ -229,6 +229,22 @@ class Connection(OwnedModel):
     def is_installed(self) -> bool:
         return self.plugin_instance is not None
 
+    def retire(self, reason: str, *, keep_secrets: bool = False) -> None:
+        """Switch this connection off because the other side has ended it (#216).
+
+        Nothing is deleted. The row, its label and its event switches stay where they are, so
+        switching it back on is one press once whatever broke is fixed. The secrets go unless
+        the plugin asked to keep them: a push subscription a browser withdrew, or a token a
+        provider revoked, is not a credential worth keeping to try again with.
+        """
+        self.enabled = False
+        self.last_error = reason
+        fields = ["enabled", "last_error", "updated_at"]
+        if not keep_secrets and self.secrets_encrypted:
+            self.secrets = {}
+            fields.append("secrets_encrypted")
+        self.save(update_fields=fields)
+
     def record_test(self, ok: bool, message: str = "") -> None:
         from django.utils import timezone
 

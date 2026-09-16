@@ -485,6 +485,29 @@ class TestResult:
     message: str = ""
 
 
+class ConnectionUnusable(Exception):
+    """This connection cannot work again until the person does something about it.
+
+    Not "the send failed" -- that is an ordinary exception, recorded on the connection, tried
+    again next time. This is the other kind: a browser that withdrew its push subscription, a
+    token the provider revoked, an account that no longer exists. Trying again changes
+    nothing, and a plugin that goes on trying turns one dead connection into a failure every
+    time anything happens (#216).
+
+    Postulo switches the connection off, records ``message`` where the person will read it,
+    and -- unless ``keep_secrets`` -- forgets the stored secrets, so setting it up again
+    starts from nothing rather than from a credential that is known not to work. Nothing else
+    is deleted: the connection, its label and its event switches stay exactly where they are,
+    and switching it back on is one press once the underlying thing is fixed.
+
+    ``message`` is shown to the person, so write it for them and in their language.
+    """
+
+    def __init__(self, message: str, *, keep_secrets: bool = False) -> None:
+        super().__init__(message)
+        self.keep_secrets = keep_secrets
+
+
 #: What a transport carries. Two mediums, one kind, and that is a decision rather than an
 #: accident (#143).
 #:

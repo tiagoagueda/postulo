@@ -10,6 +10,7 @@ rules as any other, and a page only asks for notices when there is a notifier to
 from __future__ import annotations
 
 import base64
+import ipaddress
 import json
 
 import httpx
@@ -76,20 +77,32 @@ def browser_connection(user, *, subscription: dict | None = None, delivery="push
 
 
 @pytest.fixture
-def push_service(monkeypatch, settings):
-    """A push service that records what it was sent and answers with ``status``."""
-    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = True  # no DNS for push.example.net in a test
+def push_service(monkeypatch):
+    """A push service that records what it was sent and answers with ``status``.
+
+    The resolver is stubbed rather than the policy loosened: a push endpoint is public by
+    definition, so these tests must keep passing with `POSTULO_CONNECTIONS_ALLOW_PRIVATE`
+    either way (#216). The guard itself stays in the path, pinning included.
+    """
     received: list[httpx.Request] = []
-    answer = {"status": 201}
+    answer = {"status": 201, "body": b""}
+
+    monkeypatch.setattr(
+        http,
+        "public_addresses_for",
+        lambda url: [ipaddress.ip_address("93.184.216.34")],
+    )
 
     def handler(request: httpx.Request) -> httpx.Response:
         received.append(request)
-        return httpx.Response(answer["status"])
+        return httpx.Response(answer["status"], content=answer["body"])
 
     monkeypatch.setattr(
         webpush,
         "_client",
-        lambda: http.client(transport=httpx.MockTransport(handler), follow_redirects=False),
+        lambda: http.public_only_client(
+            transport=httpx.MockTransport(handler), follow_redirects=False
+        ),
     )
     return received, answer
 
@@ -197,7 +210,10 @@ def test_a_push_reaches_the_service_encrypted_for_that_browser(user, push_servic
 
     assert delivered == 1
     (request,) = received
-    assert str(request.url) == ENDPOINT
+    # Pinned to the address the guard approved, with the push service's own name in the
+    # header and proved by TLS (#215).
+    assert request.url.path == "/send/abc123"
+    assert request.headers["Host"] == "push.example.net"
     assert request.headers["Content-Encoding"] == "aes128gcm"
     assert request.headers["TTL"] == str(webpush.TIME_TO_LIVE)
     assert request.headers["Authorization"].startswith("vapid t=")
@@ -221,8 +237,9 @@ def test_a_push_reaches_the_service_encrypted_for_that_browser(user, push_servic
     assert not BrowserNotice.objects.exists(), "pushed, so nothing waits for a tab as well"
 
 
-def test_a_withdrawn_subscription_leaves_the_notice_for_a_tab_and_says_so(user, push_service):
-    _received, answer = push_service
+def test_a_withdrawn_subscription_retires_the_connection_and_keeps_the_notice(user, push_service):
+    """410 means the browser has ended it: switch it off rather than fail forever (#216)."""
+    received, answer = push_service
     answer["status"] = 410
     _, subscription = a_browser()
     connection = browser_connection(user, subscription=subscription)
@@ -232,14 +249,44 @@ def test_a_withdrawn_subscription_leaves_the_notice_for_a_tab_and_says_so(user, 
     assert delivered == 0
     assert BrowserNotice.objects.for_user(user).get().title == "Chase Aperture", "not lost"
     connection.refresh_from_db()
-    assert "withdrawn" in connection.last_error
+    assert connection.enabled is False, "a dead subscription is not retried every time"
+    assert connection.secrets == {}, "the subscription that will never work again is forgotten"
+    assert "allow notifications again" in connection.last_error
+    assert connection.label == "Laptop", "nothing else about it is touched"
 
+    # And nothing is sent to it afterwards.
+    received.clear()
+    assert notify(user, Notification(event="reminder_due", title="Later")) == 0
+    assert received == []
+
+    # Pressing Test says the same thing, in the same words.
     result = BrowserNotifier().test({"subscription": json.dumps(subscription)})
     assert result.ok is False and "allow notifications again" in result.message
 
 
-def test_a_push_address_is_dialled_under_the_instances_rules(user, settings):
-    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+def test_a_failing_push_says_the_status_and_not_what_the_service_replied(user, push_service):
+    _received, answer = push_service
+    answer["status"] = 503
+    answer["body"] = b"upstream said: secret-internal-detail"
+    _, subscription = a_browser()
+    connection = browser_connection(user, subscription=subscription)
+
+    assert notify(user, Notification(event="reminder_due", title="Chase")) == 0
+
+    connection.refresh_from_db()
+    assert "503" in connection.last_error
+    assert "secret-internal-detail" not in connection.last_error
+    assert connection.enabled is True, "a 503 is worth trying again"
+
+
+@pytest.mark.parametrize("private_allowed", [False, True])
+def test_a_push_never_reaches_a_private_address(user, settings, private_allowed):
+    """Even where the operator allows connections to private addresses (#216).
+
+    The endpoint comes from a browser rather than from somebody typing it, and a push service
+    is on the open web by definition, so this is not the operator's decision to make.
+    """
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = private_allowed
     _, subscription = a_browser()
     subscription["endpoint"] = "https://127.0.0.1:8443/push"
 
