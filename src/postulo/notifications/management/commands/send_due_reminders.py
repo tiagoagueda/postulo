@@ -12,22 +12,37 @@ the sync connections whose interval has come round.
 
 from __future__ import annotations
 
+import logging
 import time
 
 from django.core.management.base import BaseCommand
+from django.db import close_old_connections
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from postulo.applications.models import Reminder
+from postulo.core import scheduler
 from postulo.notifications.base import Notification, absolute_url
 from postulo.notifications.service import notify
+
+logger = logging.getLogger(__name__)
 
 
 def announce_due_reminders() -> tuple[int, int]:
     """Announce every outstanding reminder that is due and not yet announced.
 
     Returns (reminders stamped, deliveries made).
+
+    The stamp is written *before* the message goes, and only if writing it changed a row
+    (#221). Two schedulers -- cron and ``--loop`` together, which the Compose file makes easy
+    to end up with -- then announce a reminder once between them rather than once each,
+    because only one of them can be the process whose ``UPDATE`` matched. It settles the
+    other way round from what it looks like: a message that is lost because the process died
+    in the half-second after the stamp is a message nobody gets, and a message sent twice is
+    a person's telephone going off twice at three in the morning for something they have
+    already read. The stamp was always the record of "this one has been dealt with", and
+    this only stops it being written after the fact.
     """
     now = timezone.now()
     due = (
@@ -38,6 +53,12 @@ def announce_due_reminders() -> tuple[int, int]:
     stamped = 0
     delivered = 0
     for reminder in due:
+        claimed = Reminder.objects.filter(pk=reminder.pk, notified_at__isnull=True).update(
+            notified_at=now, updated_at=now
+        )
+        if not claimed:
+            continue
+        stamped += 1
         application = reminder.application
         if application is not None:
             posting = application.posting
@@ -49,13 +70,16 @@ def announce_due_reminders() -> tuple[int, int]:
         else:
             body = ""
             url = absolute_url(reverse("applications:reminder_list"))
-        delivered += notify(
-            reminder.owner,
-            Notification(event="reminder_due", title=reminder.summary, body=body, url=url),
-        )
-        reminder.notified_at = now
-        reminder.save(update_fields=["notified_at", "updated_at"])
-        stamped += 1
+        try:
+            delivered += notify(
+                reminder.owner,
+                Notification(event="reminder_due", title=reminder.summary, body=body, url=url),
+            )
+        except Exception:
+            # One reminder whose application lost its company, or one notifier raising
+            # something nobody anticipated, used to end the pass -- and everything after it
+            # in the queue waited for the restart (#221).
+            logger.exception("Could not announce reminder %s", reminder.pk)
     return stamped, delivered
 
 
@@ -73,30 +97,70 @@ class Command(BaseCommand):
             default=300,
             help="Seconds between passes when looping (default 300).",
         )
+        parser.add_argument(
+            "--sync-budget",
+            type=int,
+            default=120,
+            help=(
+                "Seconds a pass may spend on sync connections before leaving the rest to the "
+                "next one (default 120). 0 means no limit."
+            ),
+        )
 
     def handle(self, *args, **options) -> None:
+        every = max(options["every"], 10)
+        # A single run says so when it found nothing, because somebody is watching it. A loop
+        # does not, because nobody is, and a line every five minutes for ever is a log file
+        # in which the interesting lines cannot be found.
+        self.quiet_pass = not options["loop"]
+        while True:
+            try:
+                self.one_pass(every, budget=options["sync_budget"])
+            except Exception:
+                # A pass that ends badly is one pass. Before this, a dropped PostgreSQL
+                # connection or a SQLite lock timeout ended the *process*, and the container
+                # restarted through the whole entrypoint to try the same thing again (#221).
+                logger.exception("A scheduler pass ended badly")
+                if not options["loop"]:
+                    raise
+            finally:
+                # The connection this pass used may have been closed under it while it
+                # slept -- a database restart, or PostgreSQL's own idle timeout. Django
+                # does this between requests and there are no requests here.
+                close_old_connections()
+            if not options["loop"]:
+                return
+            time.sleep(every)
+
+    def one_pass(self, every: int, *, budget: int) -> None:
+        """Everything the clock has made due, once."""
         from postulo.applications.quiet import announce_quiet_applications
         from postulo.documents.archiving import send_pending
         from postulo.plugins.syncing import run_syncs
 
-        while True:
+        # Held for a little longer than the gap between passes: a pass that takes longer than
+        # that is one whose work the next pass may as well pick up.
+        with scheduler.only_one_pass(every * 2) as mine:
+            if not mine:
+                self.stdout.write("Another scheduler is mid-pass; leaving this one to it.")
+                return
             stamped, delivered = announce_due_reminders()
             quiet, told = announce_quiet_applications()
             copies_sent, copies_failed = send_pending()
-            syncs_ran, syncs_failed = run_syncs()
-            when = f"{timezone.now():%Y-%m-%d %H:%M}"
-            if stamped:
-                self.stdout.write(f"{when} {stamped} reminders due, {delivered} deliveries")
-            if quiet:
-                self.stdout.write(f"{when} {quiet} applications gone quiet, {told} deliveries")
-            if copies_sent or copies_failed:
-                self.stdout.write(
-                    f"{when} {copies_sent} document copies sent, {copies_failed} failed"
-                )
-            if syncs_ran:
-                self.stdout.write(f"{when} {syncs_ran} syncs ran, {syncs_failed} failed")
-            if not options["loop"]:
-                if not any((stamped, quiet, copies_sent, copies_failed, syncs_ran)):
-                    self.stdout.write("Nothing due.")
-                return
-            time.sleep(max(options["every"], 10))
+            syncs_ran, syncs_failed = run_syncs(budget=budget)
+
+        when = f"{timezone.now():%Y-%m-%d %H:%M}"
+        if stamped:
+            self.stdout.write(f"{when} {stamped} reminders due, {delivered} deliveries")
+        if quiet:
+            self.stdout.write(f"{when} {quiet} applications gone quiet, {told} deliveries")
+        if copies_sent or copies_failed:
+            self.stdout.write(f"{when} {copies_sent} document copies sent, {copies_failed} failed")
+        if syncs_ran:
+            self.stdout.write(f"{when} {syncs_ran} syncs ran, {syncs_failed} failed")
+        if self.quiet_pass and not any((stamped, quiet, copies_sent, copies_failed, syncs_ran)):
+            self.stdout.write("Nothing due.")
+
+        # Last, and only on a pass that finished: the heartbeat is the answer to "is it
+        # still going round", and a pass that died halfway did not go round.
+        scheduler.beat()

@@ -151,6 +151,42 @@ def test_the_scheduler_runs_what_is_due_and_records_the_report(user):
     assert connection.last_summary == "nothing to do · all quiet"
 
 
+def test_a_slow_sync_does_not_hold_up_everything_behind_it(user, monkeypatch):
+    """The budget decides whether to *begin* another, which is the only safe place to stop."""
+    for label in ("One", "Two", "Three"):
+        a_sync(user, label)
+    clock = iter([0.0, 0.0, 99.0, 99.0])
+    monkeypatch.setattr("postulo.plugins.syncing.time.monotonic", lambda: next(clock))
+
+    assert syncing.run_syncs(budget=60) == (1, 0), "one ran, the rest wait for the next pass"
+    assert len(MirrorSync.runs) == 1
+
+
+def test_with_no_budget_every_due_sync_runs(user):
+    for label in ("One", "Two", "Three"):
+        a_sync(user, label)
+
+    assert syncing.run_syncs() == (3, 0)
+
+
+def test_a_sync_that_raises_outright_is_one_sync_and_not_the_whole_pass(user, monkeypatch):
+    a_sync(user, "Breaks")
+    a_sync(user, "Fine")
+    calls = {"n": 0}
+    real = syncing.sync_connection
+
+    def sometimes(connection):
+        calls["n"] += 1
+        if connection.label == "Breaks":
+            raise RuntimeError("not even a report")
+        return real(connection)
+
+    monkeypatch.setattr("postulo.plugins.syncing.sync_connection", sometimes)
+
+    assert syncing.run_syncs() == (2, 1)
+    assert calls["n"] == 2, "the second one still had its turn"
+
+
 def test_a_failing_sync_is_recorded_and_tried_again_on_the_next_interval(user):
     connection = a_sync(user)
     MirrorSync.fail_with = "the phone is off"

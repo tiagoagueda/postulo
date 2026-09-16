@@ -33,6 +33,9 @@ MAX_ATTEMPTS = 6
 FIRST_RETRY = dt.timedelta(minutes=5)
 #: How many copies one scheduler pass sends at most, so a backlog cannot starve reminders.
 BATCH = 50
+#: How long a claimed copy is held while it is being sent. Long enough for a slow store to
+#: finish, short enough that a process killed mid-send is not a copy nobody ever sends.
+SENDING_LEASE = dt.timedelta(minutes=15)
 
 
 def _lookup(document) -> dict:
@@ -177,10 +180,31 @@ def pending_copies(now=None):
     )
 
 
+def claim(copy, now=None) -> bool:
+    """Take this copy for sending, or say that somebody else already has (#221).
+
+    Nothing claimed these rows, so two passes -- cron and ``--loop`` together, or a pass
+    overlapping the *Send now* somebody just pressed -- could both read the same copy as due
+    and both ``put`` it, while the wiki said that nothing is ever sent twice. The claim is a
+    conditional update against the value that was read: whoever changes the row has it, and
+    the other finds nothing to change. It moves the next attempt forward rather than marking
+    the row *sending*, so that a process killed mid-send leaves a copy that comes back by
+    itself a quarter of an hour later, instead of one stuck in a state nobody clears.
+    """
+    now = now or timezone.now()
+    return bool(
+        DocumentCopy.objects.filter(pk=copy.pk, next_attempt_at=copy.next_attempt_at).update(
+            next_attempt_at=now + SENDING_LEASE
+        )
+    )
+
+
 def send_pending(*, limit: int = BATCH) -> tuple[int, int]:
     """Send what is due. Returns (sent, failed). Called by the scheduler on every pass."""
     sent = failed = 0
     for copy in list(pending_copies()[:limit]):
+        if not claim(copy):
+            continue
         if send_copy(copy):
             sent += 1
         else:
@@ -199,6 +223,8 @@ def send_now(document) -> tuple[int, int]:
     copies = DocumentCopy.objects.filter(**_lookup(document)).exclude(status=CopyStatus.SENT)
     sent = failed = 0
     for copy in copies.select_related("connection"):
+        if not claim(copy):
+            continue
         copy.attempts = 0
         if send_copy(copy):
             sent += 1

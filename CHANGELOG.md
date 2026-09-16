@@ -773,6 +773,47 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The scheduler no longer sends things twice, no longer dies on one bad item, and now says
+  whether it is still going round.** It is one command in a loop, which is the right size for
+  a single instance and left four things to chance.
+
+  Nothing claimed the work before doing it. A reminder was announced and *then* stamped, so a
+  restart in between — or the perfectly ordinary mistake of running cron and `--loop` at once,
+  which the Compose file makes easy — announced it again. Store copies were worse: two passes,
+  or a pass overlapping the *Send now* somebody had just pressed, could both send the same
+  document to the same store, though the handbook said that never happened. Everything is now
+  claimed first with a conditional update, so whoever changes the row has the work and the
+  other finds nothing to change. For a reminder that means the stamp is written before the
+  message goes: a message lost to a crash in that half-second is one nobody gets, while the
+  alternative is somebody's telephone going off twice at three in the morning.
+
+  One bad item ended the process. A reminder whose posting had lost its company, a notifier
+  raising something nobody anticipated, a dropped connection — any of them killed the loop,
+  and the container restarted through the entire entrypoint to try the same thing again.
+  Failures are now caught per item and per pass, and the database connection is refreshed
+  each time round, which is what Django does between requests and there are no requests here.
+
+  Syncs ran inline with no limit, so one slow calendar server held up every reminder behind
+  it. A pass now spends at most two minutes starting new ones — `--sync-budget`, `0` for no
+  limit — and leaves the rest to the next pass. A sync already started is never cut off.
+
+  And nothing anywhere recorded that a pass had happened, so an instance whose scheduler had
+  stopped looked exactly like one where nothing was due. Each finished pass now writes its
+  time to a file on the data volume, which the `scheduler` container's own healthcheck reads —
+  it had been inheriting the image's healthcheck, which curls a web port it does not serve,
+  so it was permanently unhealthy and told nobody anything. `/metrics` reports the same
+  heartbeat as `postulo_scheduler_last_pass_timestamp_seconds`, alongside a new
+  `postulo_overdue{kind="reminders"}` for reminders that fell due a quarter of an hour ago
+  and have still not been announced, and `postulo_failures{kind="syncs"}`. The handbook has
+  alerting rules for all three. `postulo_pending{kind="reminders"}` counted every reminder
+  anybody had ever set and not finished, which grew because the instance was being used and
+  so could not be alerted on; it now counts the ones that have fallen due.
+
+  In Compose, the scheduler also waits for the web container to be *healthy* rather than
+  merely started — it skips migrations on purpose, so starting against a half-migrated
+  schema is the one thing it cannot recover from — and no longer restores the plugin record
+  at the same moment the web container is doing it. (#221)
+
 - **A store that says it is finished is now believed, instead of being dialled for ever.**
   #216 gave a plugin a way to say that the other side has ended a connection, and notifiers
   honoured it: a browser that withdrew its subscription stopped being pushed to. Stores did

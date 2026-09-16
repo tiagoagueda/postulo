@@ -337,6 +337,28 @@ def test_a_copy_whose_connection_row_is_gone_is_still_told_so(user):
     assert copy.status == CopyStatus.FAILED and copy.last_error
 
 
+def test_one_copy_is_sent_once_however_many_passes_are_running(user):
+    """Two schedulers, or a pass overlapping *Send now*, used to both `put` the same copy."""
+    a_store(user)
+    upload = an_upload(user)
+    copy = upload.copies.get()
+
+    assert archiving.claim(copy) is True
+    assert archiving.claim(copy) is False, "the second pass finds nothing to claim"
+
+    # And the claim takes it out of the due set until the lease runs out.
+    assert list(archiving.pending_copies()) == []
+    assert send_pending() == (0, 0)
+    assert ShelfStore.received == [], "not sent twice"
+
+    # A process killed mid-send leaves it to come back by itself, rather than stuck.
+    DocumentCopy.objects.filter(pk=copy.pk).update(
+        next_attempt_at=timezone.now() - dt.timedelta(minutes=1)
+    )
+    assert send_pending() == (1, 0)
+    assert len(ShelfStore.received) == 1
+
+
 def test_a_store_may_decline_a_kind(user):
     a_store(user)
     ShelfStore.decline_kinds = {"certificate"}

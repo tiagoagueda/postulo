@@ -447,6 +447,13 @@ POSTULO_PLUGINS_DIR = env.path("POSTULO_PLUGINS_DIR", default=REPO_DIR / "data" 
 # here before anything is fetched from it.
 POSTULO_PLUGIN_CATALOGUES = env("POSTULO_PLUGIN_CATALOGUES", default="")
 
+# Where the scheduler records the end of each pass. On the data volume because two
+# different containers read it: the scheduler's own healthcheck, which has no port to curl
+# and no database credentials, and the metrics endpoint, which runs in the web one (#221).
+POSTULO_SCHEDULER_HEARTBEAT = env.path(
+    "POSTULO_SCHEDULER_HEARTBEAT", default=REPO_DIR / "data" / "scheduler-heartbeat"
+)
+
 # Where `manage.py backup` writes when given no target. Beside the data it copies, so a
 # single volume holds both; move it elsewhere if that volume is the thing being backed up.
 POSTULO_BACKUP_DIR = env.path("POSTULO_BACKUP_DIR", default=REPO_DIR / "data" / "backups")

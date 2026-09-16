@@ -15,6 +15,7 @@ reads and writes those through the connection; nothing else in Postulo knows the
 from __future__ import annotations
 
 import logging
+import time
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -106,11 +107,30 @@ def due_connections(now=None):
     ]
 
 
-def run_syncs() -> tuple[int, int]:
-    """Run every sync connection that is due. Returns (ran, failed)."""
+def run_syncs(*, budget: int = 0) -> tuple[int, int]:
+    """Run every sync connection that is due. Returns (ran, failed).
+
+    With a ``budget`` in seconds, connections are started until that much time has gone and
+    the rest are left to the next pass. They run inline, one after another, so before this a
+    single calendar server that answered slowly held up every reminder behind it -- and the
+    slower it was, the longer the queue it was holding (#221). A connection already started
+    is never cut off: the budget decides whether to begin another, which is the only point
+    at which stopping is safe.
+    """
+    started = time.monotonic()
     ran = failed = 0
     for connection in due_connections():
-        report = sync_connection(connection)
+        if budget and time.monotonic() - started >= budget:
+            logger.info("Sync budget of %ss spent; the rest wait for the next pass", budget)
+            break
+        try:
+            report = sync_connection(connection)
+        except Exception:
+            # One sync that raises is one sync. It used to be the whole pass.
+            logger.exception("Sync connection %s ended badly", connection.pk)
+            ran += 1
+            failed += 1
+            continue
         ran += 1
         if report.error:
             failed += 1

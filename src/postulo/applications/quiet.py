@@ -15,6 +15,7 @@ here, so the dashboard, the board, the table, the figures and the notifier all a
 from __future__ import annotations
 
 import datetime as dt
+import logging
 from collections import defaultdict
 
 from django.urls import reverse
@@ -26,6 +27,8 @@ from postulo.notifications.base import Notification, absolute_url
 from postulo.notifications.service import notify
 
 from .models import Application
+
+logger = logging.getLogger(__name__)
 
 #: Days without activity after which an open application counts as quiet, unless the
 #: person has chosen otherwise under Settings.
@@ -83,12 +86,25 @@ def announce_quiet_applications(at=None) -> tuple[int, int]:
         ]
         if not fresh:
             continue
-        owner = fresh[0].owner
-        delivered += notify(owner, _announcement(fresh, now))
-        for row in fresh:
-            row.quiet_announced_at = now
-            row.save(update_fields=["quiet_announced_at", "updated_at"])
-            stamped += 1
+        # Claimed before the message goes, and only the rows this process actually claimed
+        # are named in it (#221). The stamp is compared with the value that was read, so a
+        # second scheduler -- or this one restarted mid-pass -- finds nothing to claim and
+        # stays silent, instead of sending the same list again.
+        claimed = [
+            row
+            for row in fresh
+            if Application.objects.filter(
+                pk=row.pk, quiet_announced_at=row.quiet_announced_at
+            ).update(quiet_announced_at=now, updated_at=now)
+        ]
+        if not claimed:
+            continue
+        stamped += len(claimed)
+        owner = claimed[0].owner
+        try:
+            delivered += notify(owner, _announcement(claimed, now))
+        except Exception:
+            logger.exception("Could not announce quiet applications for owner %s", owner_id)
     return stamped, delivered
 
 

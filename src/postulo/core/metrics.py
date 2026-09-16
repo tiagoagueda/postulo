@@ -27,14 +27,22 @@ whichever worker replies.
 
 from __future__ import annotations
 
+import datetime as dt
 import platform
 from dataclasses import dataclass, field
 
 import django
 from django.conf import settings
 from django.db import connection
+from django.utils import timezone
 
 from postulo import __version__
+from postulo.core import scheduler
+
+#: How late a reminder has to be before it counts as overdue rather than merely due. Long
+#: enough that a scheduler running every five minutes never reports one in the ordinary way
+#: of things, so anything here means the scheduler is not running or is not getting through.
+OVERDUE_AFTER = dt.timedelta(minutes=15)
 
 
 @dataclass
@@ -101,7 +109,9 @@ def collect() -> list[Metric]:
     from postulo.documents.models import CopyStatus, DocumentCopy, RenderedDocument
     from postulo.jobs.models import Capture, CaptureStatus, Company, JobPosting
     from postulo.plugins import installing
+    from postulo.plugins.models import Connection
 
+    now = timezone.now()
     metrics: list[Metric] = [
         Metric(
             "postulo_info",
@@ -178,7 +188,49 @@ def collect() -> list[Metric]:
                     {"kind": "suggestions"},
                     Suggestion.objects.filter(status=SuggestionStatus.PENDING).count(),
                 ),
-                ({"kind": "reminders"}, Reminder.objects.filter(done_at__isnull=True).count()),
+                # Due, not every reminder anybody has ever set. What was counted here was
+                # a person's whole to-do list for the months ahead, which grows because the
+                # instance is being used and never comes down -- so it could not be alerted
+                # on, and an operator watching it learnt nothing (#221).
+                (
+                    {"kind": "reminders"},
+                    Reminder.objects.filter(done_at__isnull=True, due_at__lte=now).count(),
+                ),
+            ],
+        )
+    )
+
+    # ---- is the scheduler still going round, and is anything past being late?
+    last_pass = scheduler.last_pass()
+    metrics.append(
+        Metric(
+            "postulo_scheduler_last_pass_timestamp_seconds",
+            "gauge",
+            (
+                "When the scheduler last finished a pass, as a Unix time. 0 when it has "
+                "never finished one here -- which is also what an instance running no "
+                "scheduler at all reports."
+            ),
+            [({}, last_pass.timestamp() if last_pass else 0)],
+        )
+    )
+    metrics.append(
+        Metric(
+            "postulo_overdue",
+            "gauge",
+            (
+                "Work that is not merely waiting but late: due, and still not done long "
+                "enough ago that something is wrong."
+            ),
+            [
+                (
+                    {"kind": "reminders"},
+                    Reminder.objects.filter(
+                        done_at__isnull=True,
+                        notified_at__isnull=True,
+                        due_at__lte=now - OVERDUE_AFTER,
+                    ).count(),
+                ),
             ],
         )
     )
@@ -193,6 +245,15 @@ def collect() -> list[Metric]:
                 (
                     {"kind": "document_copies"},
                     DocumentCopy.objects.filter(status=CopyStatus.FAILED).count(),
+                ),
+                # A sync connection that is switched on and whose last word was an error.
+                # Nothing exported this, so a calendar that had been failing every pass for
+                # a week looked exactly like one that had never run (#221).
+                (
+                    {"kind": "syncs"},
+                    Connection.objects.filter(kind="sync", enabled=True)
+                    .exclude(last_error="")
+                    .count(),
                 ),
             ],
         )

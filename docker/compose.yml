@@ -52,11 +52,29 @@ services:
     environment:
       POSTULO_DATABASE_URL: sqlite:////app/data/postulo.sqlite3
       POSTULO_SKIP_MIGRATE: "1"
+      # The web container restores the installed plugins on startup. Both doing it at the
+      # same moment means two processes writing one record, so the scheduler leaves it to
+      # the container that waited for it (#221).
+      POSTULO_SKIP_PLUGIN_SYNC: "1"
     volumes:
       - postulo-data:/app/data
     command: ["python", "manage.py", "send_due_reminders", "--loop", "--every", "300"]
+    # The image's own healthcheck curls the web port, which this container does not serve,
+    # so without this it is permanently unhealthy and the one thing a healthcheck is for --
+    # noticing that it has stopped -- never happened. The scheduler writes the time of each
+    # finished pass to this file; a file older than three passes means it is not going round.
+    healthcheck:
+      test: ["CMD-SHELL", "find /app/data/scheduler-heartbeat -mmin -15 | grep -q ."]
+      interval: 60s
+      timeout: 5s
+      start_period: 120s
+      retries: 3
     depends_on:
-      - postulo
+      # Not merely "started": this container skips migrations on purpose, so starting it
+      # against a schema the web container has not finished migrating runs new code on an
+      # old database.
+      postulo:
+        condition: service_healthy
 
 volumes:
   postulo-data:
