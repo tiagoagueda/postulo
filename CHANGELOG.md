@@ -6,6 +6,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-09-16
+
 ### 🔒 Security
 
 - **The capture limit now bounds captures, not the form.** `POSTULO_CAPTURE_RATE` is the
@@ -624,983 +626,6 @@ All notable changes to Postulo are recorded here. The format follows
   an image that already carries the tools, `docker_host: automount`, and a *second* runner
   scoped to one repository, because `container.docker_host` is per runner instance and
   cannot be scoped to a label. (#190)
-
-### 🔧 Changed
-
-- **Applications and Board are one page in two shapes, and the switch keeps your filters.**
-  Two views answering the same question — which of my applications am I looking at? — were
-  two addresses, two entries in the navigation, and a bare link between them that threw
-  the filters away: narrowing the table to *quiet applications at Acme* and pressing
-  *Board* showed everything. One entry now, one address, and a *Table / Board* switch on
-  the page beside the *Columns* control that changes the shape of what is below it and
-  nothing else. The search, filters and sort survive the switch; the shape you choose is
-  remembered with your other table preferences; `?view=board` asks for a shape without
-  changing it; and `/applications/board/` redirects, carrying whatever it was given. The
-  board still shows only what is still live, and a filter that matches settled
-  applications is said on the board, with a link to the same filter in the table, rather
-  than shown as an empty board. Anybody who had hidden *Board* from the navigation has
-  that preference forgotten, since the entry no longer exists; the board itself is a
-  switch away for everybody. Dragging a card between columns is untouched. (#102)
-
-- **The arrows on *Your career* move an entry past its neighbour, and the order number
-  is hidden unless you ask for it.** The arrows nudged a number by one and swapped with
-  nothing: pressing *up* on an entry at 0 did nothing, pressing *down* once put it behind
-  every other entry at 0 wherever it had been, and in experience, education and
-  certifications — sorted by date first — they changed nothing you could see unless two
-  entries shared a date. The number box on every entry's form was the one control that
-  reliably did anything, and it asked for an integer meaning "lower first". *Up* now swaps
-  with the entry above and *down* with the one below, the section is renumbered so the
-  numbers are exactly what the page shows, and the arrow at either end is greyed out. The
-  three dated sections take the number too, seeded once from their dates so nothing moves
-  on the day of the upgrade; a new dated entry still lands where its date puts it. The
-  number box is gone from the forms, with a sentence saying where the arrows are, and
-  comes back as *Show the order number on each career entry* under *Settings →
-  Appearance* — an accessibility choice, for anybody who cannot use the arrows or would
-  rather type. The preference travels with the export. (#203)
-
-- **Arrange puts the dashboard itself into an editing mode, and *Settings → Dashboard* is
-  gone.** Arranging was a list of widget names on another page, with four arrows and a
-  *Take off* beside each, and you switched back to see what a move had done. Pressing
-  *Arrange* now keeps you on the dashboard: every widget stays where it is and grows the
-  same four arrows and *Take off* in a bar above it, the widgets not shown are offered
-  below the grid with their sentences, and *Done* is a plain link back. The mode lives in
-  the address (`/?arrange=1`), so a reload keeps it and the back button leaves it; nothing
-  remembers that you were arranging, because the mode is a moment and not a preference.
-  Every action still works with scripts off — buttons that post, focus following the
-  widget that moved, a sentence saying where it landed — and dragging a widget into place
-  is the same addition it was, on the grid cells now rather than on list rows. What is
-  stored has not changed. (#201)
-
-- **The account menu is the top-right corner, and the theme switch is a row inside it.**
-  The last thing at the top right of every page was the sun-moon-monitor button, with the
-  account menu one control in from the edge — so the corner a person reaches for their
-  own name, their settings and *Sign out* held a preference toggle instead. The switch
-  lives in the menu now, as a row with its words beside the icon, above *Sign out*; it is
-  the same form posting the same way, applied the moment it is pressed as before, and
-  *Settings → Appearance* remains the explicit version. (#197)
-
-- **The header stays at the top while the page scrolls.** On any page longer than a
-  screen the wordmark, the navigation, the search and the account menu were gone after the
-  first flick, and getting anywhere else meant scrolling back up. The header floats now.
-  Its height is not a constant — the row wraps on a phone and in a language with longer
-  labels — so the script measures it once and on every resize, and everything that has to
-  clear it reads that one value: the sticky sidebars on *Your career* and *Your details*,
-  the skip link, every anchor through the root's scroll padding, and the line the section
-  navigation reads its position from. Where scripts do not run, the same rules fall back
-  to the header's usual height. (#195)
-
-- **Your details, Settings and Server settings use the whole screen.** Each is a sidebar
-  beside a page, and each capped the pair well short of a wide monitor — *Your details* at
-  896 pixels inside the 1280 the base template already keeps, the two Settings frames at
-  1024 — with the sidebar taking a good share of what was left, so a form drew in roughly
-  640 pixels on a 2560-pixel screen and the server's people, plugins and logs wrapped the
-  way the tables did before #188. The frames empty the page's measure now, as the tables
-  and the board do: a frame is a grid even when the page inside it is a form. The
-  one-question server forms keep their own narrow column, which is a different thing. (#198)
-
-- **The tab says which Postulo it is.** A page's title was the page's name alone —
-  *Dashboard*, *Your details* — so two instances side by side, or Postulo beside anything
-  else, were tabs nobody could tell apart, and a screen reader announced a page with no
-  application behind it. The title reads *Postulo > Dashboard* now, with the
-  administrator's instance name first, put on once in the base template so a page added
-  later cannot lose it. Levels are separated by a chevron — *Postulo > Settings > API
-  tokens* — and a middle dot qualifies a name inside one level, *Report · September 2026*,
-  so the two never read as the same thing. (#196)
-
-- **Server settings → Overview ends with how to keep Postulo going, not the health check.**
-  The last card held two lines an administrator reads once: the health-check address and
-  the Django admin's escape hatch. The address moved up into the *Software* card, where a
-  fact about the software belongs, and the admin hint lives in the wiki's *Configuration*.
-  In their place, one card on the page addressed to whoever runs the instance: money, at
-  buymeacoffee.com/tiagoagueda with the QR beside the link; code, with the repository and
-  how a change lands; translation, since every language but English is a machine draft
-  waiting for a speaker. The README and FUNDING.md promise reads, exactly, that nothing a
-  person is shown while looking for work asks for money — and names this page as the one
-  place inside the application that mentions support at all. (#199)
-
-- **What Postulo ships is the administrator's to switch, not yours — and is out of the
-  way until you ask.** *Settings → Plugins* offered a checkbox on every plugin, the built-in
-  ones included, so *Several telephone numbers*, the email notifier and the local store
-  were switches a person could untick for themselves. They no longer are. A plugin shipped
-  inside Postulo is decided by an administrator, for one person or for everybody, and the
-  page lists only what was installed on the instance unless *Show the plugins Postulo
-  ships* is ticked — and then shows them without a switch. The one thing that always shows
-  is a built-in an administrator decided for your account: a decision held over an account
-  never hides behind a check mark. **Breaking**: a choice you had made against a built-in
-  plugin no longer counts, and the upgrade forgets it. (#200)
-
-- **The support link is a QR code now, because a button can only be pressed by whoever is
-  already holding the device.** A README is read on a laptop, shown over a shoulder,
-  projected in a talk, pasted into a screenshot. In every one of those the *Buy me a coffee*
-  button was visible and unusable. The code is the same link in a form a second device can
-  pick up, and it replaces the button in the README, in `FUNDING.md` and on the wiki's home
-  page. The wiki sidebar keeps its text link: a sidebar has no room for a code.
-
-  **It was read back rather than trusted.** The code has little margin — stylised round
-  modules with the cup over the centre — and scaling it is not a matter of picking a round
-  number: a strict decoder reads the 3000px original at 300, 330, 375 and 440 pixels and
-  fails at 360, 400, 500 and every size above. 330 is shipped because it decoded under every
-  resampling tried, and `assets/support/NOTICE.txt` records that, along with what was done
-  to the file and what it resolves to. A phone is far more forgiving than a strict decoder;
-  anything that regenerates or resizes this file should still read it back first.
-
-  `TRADEMARKS.md` covers the code as well as the banner now. The banner file stays in the
-  tree, unshown, because links to it exist outside this repository. Nothing about the
-  promise changes: this is still the only place Postulo asks, and **nothing inside the
-  application ever will**. (#172)
-
-- **A plugin's kind and where it came from no longer wear the same badge, and the kind is a
-  word in your language.** Both pages that list plugins drew two different facts as
-  identical grey pills side by side, so nothing said that *importer* and *official* answer
-  different questions — and the kind was the raw slug, so a French reader was shown "source"
-  and "feature" in English. The person's own *Settings → Plugins* did not show where a plugin
-  came from at all, which is the page where it matters most.
-
-  The kind now takes colour, because it is a category from a small fixed set and colour is
-  what makes eight of them scannable in a list. **Where it came from stays grey**, and that
-  is not a default: `server/plugins.html` has said since #94 that provenance is *"deliberately
-  not styled as a reassurance — installing a plugin runs somebody else's code whatever this
-  says"*, and a green *Official* badge would undo that sentence. Both pages now draw both
-  tags through one partial, so they cannot drift apart again, and the origin appears on the
-  settings page for the first time.
-
-  Colour is never the only carrier: every tag says its own word, each tone reaches 4.5:1
-  against its own ground in both themes, and the palette repeats across the eight kinds on
-  purpose — eight hues told apart at a glance is more than a palette honestly gives, so kinds
-  rarely seen together share one and lean on the word. A kind this version does not know
-  shows its slug in the neutral tone rather than nothing, because a third-party plugin may
-  declare one added after this release. (#184)
-
-### 🐛 Fixed
-
-- **The interface stopped deciding in English what it would say in sixty-eight other
-  languages.** Four habits, each invisible to anybody reading Postulo in English, which is
-  why each had lasted. The bulk bar counted ticks in the browser and chose between "One row
-  ticked." and "%(count)s rows ticked." with `n === 1`; that is the English rule and thirteen
-  of the languages offered disagree with it, Polish needing a third form for 5 and up and
-  Ukrainian putting 21 back in the first. Nothing portable fixes that in JavaScript, and
-  nothing has to: a page holds a known number of rows, so the server now writes out the
-  sentence for every count the bar can reach and the script indexes it.
-
-  The password meter appended zxcvbn's own advice to the translated strength word, and only
-  the English zxcvbn pack is vendored, so a French reader was told "Fort · Add another word
-  or two" — inside a polite live region, on every keystroke. The advice is now shown where
-  the pack and the page agree on the language and left out where they do not; the day
-  `language-fr.js` is vendored, naming it on the template turns it back on. The live region
-  is the strength word alone, and the word is written only when it changes, so typing a
-  password no longer interrupts a screen reader five times a second.
-
-  Seventy-three date formats were spelled out in templates and views — `j M Y`, `j M Y, H:i`,
-  `M Y` — which fixes day before month before year and the hour at 14 rather than 2 p.m. for
-  every language at once. That is already wrong for Hungarian, which writes the year first,
-  and for Lithuanian, which marks it; it would be wrong for most of what #71 adds. They ask
-  for Django's own names now, which resolve against the reader's language. Only Django's
-  names: `get_format` hands an unrecognised name back to the page, so an invented format that
-  one locale has not defined prints the literal word `SOME_FORMAT` to whoever reads in it,
-  and there is a test over `languages.LANGUAGES` that every name answers in every language
-  offered. Thirty of those languages have no format module in Django at all and used to land
-  on its American default; they now fall back to the British English the interface is written
-  in, which is what they were already seeing. British English keeps its 24-hour clock through
-  a format module of its own, because Django's `en_GB` says "2.30 p.m." and no template
-  Postulo has shipped ever did. A `test_template_lint.py` rule fails on a format written out
-  in a template or a view, so these do not come back one page at a time; a bare `Y` and the
-  `Y-m-d` an `<input type="date">` parses stay written out, with the reason beside them in
-  the lint. Percentages were
-  fixed as `{{ share }}%`, which is neither the French "42 %" nor the Turkish "%42", and are
-  now one string the catalogue can rearrange.
-
-  And four sentences were being assembled from pieces. An API token said "created" and then a
-  date, "expires" and then a date; a translator was handed half a clause and no promise about
-  which side the date would end up on. The board's explanation ended at a semicolon, with
-  "see them in the table" translated on its own and the full stop written in the template, so
-  the link could not be moved and the sentence could not be ended anywhere else. The quiet
-  threshold had a bare "days" after a number field, with no singular for 1 and nowhere to put
-  a second plural. Each is now a whole sentence with the date, the address or the count as a
-  placeholder.
-
-  An English reader sees three differences, all of them Django's `en_GB` rather than
-  Postulo's: a calendar heading and the three detail-page dates that spelled the month out
-  now abbreviate it, the compact `16 Sep` in rows and CV columns now spells it out, and the
-  comma between a date and a time in six places is a space. The dashboard's next-interview
-  column was widened to hold a month with its name in it, which is what most languages were
-  always going to need. (#225)
-
-- **Paging to the last page no longer costs you your place.** The sort and pagination
-  controls were given ids so that htmx could put focus back after a swap, which works for a
-  control that survives the swap and not for one that removes itself: pressing *Next* onto
-  the last page takes *Next* off the page, so there was no longer anything for focus to
-  return to and it fell back to the top. Somebody working through a long list by keyboard
-  reached the end and started again at the skip link. A control that can be swapped away now
-  says which group it belongs to, and focus goes to whatever is left of that group — here,
-  *Previous*. (#227)
-
-- **The page script stopped failing in silence.** Four things went wrong without saying so,
-  and what they had in common is that the page went on looking correct afterwards. A filter,
-  a sort or a page link is an htmx request that replaces a table, and htmx does not swap a
-  500 — so a request the server refused, and a request sent from a train with no signal, both
-  left the previous rows sitting where they were. Nothing listened for either failure and no
-  template had ever named an indicator, so the honest reading of the screen was that the
-  filter had found those rows. There is one `role="alert"` region on every page now, empty
-  until there is something to report, filled by a handler delegated from the document; it
-  says which status came back, because 503 and 500 are different problems, and it says that
-  nothing on the page changed, because that is the part nobody can see for themselves. The
-  part being replaced carries `aria-busy` while its request is in flight — the element htmx
-  marks is the sort link, and what a person is waiting for is the table.
-
-  **A session that had expired filled the table with the sign-in page.** An `XMLHttpRequest`
-  follows a redirect without telling the script it happened, so htmx never saw the 302 that
-  means *sign in first*: it saw the 200 the sign-in page answered with and did what it does
-  with a 200. Leave a filtered list open over lunch, touch a filter, and a masthead, a footer
-  and a password field appeared inside the table, on a page that still looked signed in. A
-  redirect to the sign-in page answering an htmx request is now `HX-Redirect`, which sends
-  the browser there as a page and keeps the `?next=`, so signing in comes back to the list
-  that was open. Only that one destination: every other redirect a view makes is one it
-  meant, and the swap that follows is what it was written to expect.
-
-  **The back button gave back controls that no longer worked.** A table swap pushes an
-  address, and htmx kept a copy of each of those pages in `sessionStorage`. Restoring one put
-  the column-resize handles, the *Select all* button and the label chips back into the markup
-  with none of their listeners, and the functions that would have attached them then skipped
-  them because the markers were already there — so Back produced a page whose controls looked
-  exactly like themselves and did nothing at all. It also left applications, companies and
-  people in `sessionStorage`, where signing out in the same tab does not touch them. htmx
-  keeps no copy now and Back asks the server, which costs a page load and is worth it twice
-  over; the views have answered a restore with a whole page since they were written. An
-  instance upgrading to this clears what is already in that store the first time a page is
-  saved.
-
-  **And the export buttons locked after the first press.** The guard that stops a double
-  click marks a form and lets go again on `pageshow` — but a form whose answer is a file
-  never leaves the page, so `pageshow` never came. *Download the archive*, *Export PDF* and
-  *Download PDF* were one-shot buttons for the rest of the visit, including the one on the
-  page that asks you to take a copy of everything before deleting your account. Those forms
-  say what they are, and the guard lets go of them a few seconds later. A delay rather than
-  an exemption: the accident it exists for is a double click, which happens inside a second,
-  and a second export a minute later is not an accident.
-
-  Underneath, the six functions that add something to swapped-in markup share one helper
-  instead of writing their own three registrations each — the two written last had forgotten
-  the swap, so a dashboard widget that came back in one could not be dragged. The count on
-  the server log page is no longer a live region, since that page filters with a whole page
-  load and had never had a change to announce. (#226)
-- **One slow request no longer stops the whole instance.** Every request was a transaction,
-  and on SQLite Postulo opens transactions *immediate* — the write lock is taken before the
-  view runs and given back with the response. For a page that is milliseconds, and it is the
-  price of two requests never colliding. But a capture waits up to ten seconds for somebody
-  else's web server and five more for their `robots.txt`; a CV can be a whole Chromium; an
-  export reads every record and every file an account owns. Each of those held the write lock
-  for every second of it, and the three gunicorn workers, the scheduler and the task worker
-  queued behind. Anything still waiting after twenty seconds failed with *database is locked*,
-  which is how one capture from a slow job board became somebody else's error page.
-
-  Those views have left the request's transaction and wrap their own writes instead — the
-  capture row, the logo, the snapshot and what saving it schedules, and what an application
-  is told was sent with it. The rate limit is deliberately outside: an allowance spent making
-  the server fetch a page has been spent, and rolling it back with a failed request is how a
-  limit becomes no limit. The export is the one read worth protecting, so the archive's
-  manifest is still read inside a transaction while the files, which never had that
-  guarantee, are copied outside it. This is view by view rather than, say, all GETs at once,
-  because leaving a transaction is a decision about what has to succeed or fail together and
-  there is no answer to that which is true of every view of a given method.
-
-  **The two pages that say what an export contains built the whole export to find out.**
-  Every record the account owns, read, nested and turned into JSON, so that eight numbers
-  could be printed — on the page offering the download, and on the page asking whether you
-  really mean to delete your account, which is the one page in Postulo meant to be read
-  slowly. They count now.
-
-  **Pressing *Send* with a CV and a letter starts one Chromium rather than two.** Launching
-  the browser is most of what rendering costs on that backend, and it was launched and torn
-  down once per document. A report downloaded twice is also drawn once: that PDF is handed
-  over and filed nowhere, so the bytes are kept against the SHA-256 of the HTML they came
-  from, for a few documents, in the worker that drew them. Never for a snapshot — what an
-  employer received is drawn afresh, because a record that is a copy of something else is not
-  a record.
-
-  **And the container gives a worker two minutes rather than gunicorn's thirty seconds.**
-  Thirty is a budget for a page and not for drawing a PDF on a Raspberry Pi, where the worker
-  was killed part way through with no answer and nothing in the log but a silent restart.
-  `GUNICORN_CMD_ARGS` is the one lever over any of this, it is documented, and the image's
-  command deliberately repeats none of what it sets. (#220)
-- **A plugin reaches every process now, whatever kind it is, and comes back from a restore as
-  it went in.** Four things about installing, switching off and restoring a plugin contradicted
-  what *Writing a plugin* and the Plugins page promise, and the audit found them together
-  because they are one story told four times.
-
-  **The installer knew four kinds out of eight.** The entry-point groups that make a package a
-  plugin were typed out when there were four of them — sources, notifiers, stores, syncs — and
-  never grew with the registry. A wheel declaring `postulo.transports`, `postulo.outboxes`,
-  `postulo.features` or `postulo.importers` was refused for declaring no Postulo entry point,
-  about an entry point Postulo's own documentation had told its author to write; and those same
-  four were the only kinds rebuilt after an install, so one that did get in was invisible until
-  something else happened to refresh it. Both places ask the registry now, so there is one list
-  and it cannot go out of step with itself.
-
-  **A change reached only the process that made it.** The image serves from three web workers
-  and schedules from a container of its own, each with its own idea of what is installed, and an
-  install, a removal or a switching off rebuilt that idea only where the request happened to
-  land. A plugin an administrator had just switched off went on running in the other three —
-  with whatever credentials somebody had given it — and a notifier just installed was "not
-  installed" to the scheduler that was meant to send with it. The record on the data volume is
-  the one thing all of them can see, so every write moves its stamp and every process rebuilds
-  from it the next time it looks a plugin up: at the moment the answer is used rather than on
-  somebody's timer. Nothing here writes, which is why it sits beside #221 rather than undoing
-  it — that kept the scheduler out of the boot-time sync because two containers were writing the
-  record at once, and this is the reading half of the same problem. A first install is also what
-  creates the directory, so catching up puts it on the import path of a process that started
-  before it existed.
-
-  **A restore put back something else.** `plugins sync` reinstalls after an upgrade from what
-  the record says, and it dropped two of the fields it was reading. A plugin the administrator
-  had switched off came back switched on, which is not a decision an upgrade gets to make; and
-  the marker saying which Postulo the plugin is for — which only a catalogue can state, never
-  the wheel — was cleared, so a plugin that no longer fits this Postulo looked on the page as
-  though nobody had ever asked. The fetch then downloaded whatever the catalogue was offering
-  that day and checked it against the checksum of the version that had been installed, so a
-  restore failed the moment the catalogue moved on, and would have upgraded the plugin behind
-  the administrator's back if it had not. It asks for the recorded version.
-
-  **And somebody else's import happened inside somebody's page.** A plugin was loaded lazily, in
-  whichever request first needed one of its kind, guarded by `except Exception` — which is no
-  guard at all against `SystemExit`, the thing a module raises when it dislikes its
-  configuration, so a broken plugin ended a worker mid-request instead of ending itself. Every
-  group is loaded at start-up now, where the log is and where an administrator is looking, and
-  the guard catches everything except Ctrl-C. A plugin the registry then turns away for not
-  providing the interface it claims no longer keeps what it registered on the way past: its
-  templates had already reached the renderer and its catalogue the translator, which are the two
-  things a plugin can do to every page on the instance, and both now happen after the checks.
-
-  What the page, the command and *Contributing* say about this is true as well. A plugin is in
-  use everywhere the moment it is installed, and a restart adds nothing — because a plugin with
-  pages or tables of its own cannot be installed from a wheel at all. `INSTALLED_APPS` is fixed
-  when the process starts, nothing mounts a plugin's URLs, and `migrate` has run long before
-  anything looks at a plugin, so such a plugin has to be built into the image. *Contributing*
-  says that now, where it used to say "be in `INSTALLED_APPS`" as though an installed package
-  could put itself there. (#228)
-- **A document now speaks its own language, and a message speaks the reader's.** Nothing
-  anywhere switched translation away from the language of the request, which is the wrong
-  answer in exactly the two places it matters.
-
-  A CV or a letter declares a language. The words the person wrote were translated by #131;
-  the page around them was not, so a French CV exported by somebody reading Postulo in
-  English came back headed *Experience* over *Mar 2021 – present*, and a letter could carry
-  two dates in two languages — one from the template, one from the `{{ date }}` placeholder,
-  which was built by `strftime` and so was always English whatever anybody had chosen. Both
-  are now rendered in the document's own language, falling back to its owner's and then to
-  the instance default, and the date is written the way that language writes dates.
-
-  A copy sent to an external store was labelled with the owner's interface language rather
-  than the document's, so a French CV arrived in Paperless filed as English — and finding it
-  again is the whole reason it was sent there. A render is now filed under its own language;
-  an upload, which has no language of its own, still follows the person who uploaded it.
-
-  The title a PDF viewer shows in its title bar, and that a screen reader announces, was the
-  variant's name — *Backend, English* — which is the person's private filing and is marked in
-  Postulo as being for them and not for the employer. It is the holder's name and what the
-  document is now, and so is the file name that gets attached to portals and emails.
-
-  And a notification is worded in the language of whoever receives it. A reminder announced
-  by the scheduler had no request to take a language from, so it came out in the instance
-  default however the person had set Postulo up; one announced by a capture arriving through
-  the API followed the `Accept-Language` of whatever tool sent it. Since a notification
-  carries words that are already written, switching language as it was sent would have been
-  too late — the message is built inside the override now, and the sentence a person reads at
-  three in the morning is in their own language. (#223)
-
-- **The PDFs Postulo writes are documents now, rather than pictures of documents.** Nothing
-  they contained had any structure: a screen reader had no headings to move between, whatever
-  an employer's applicant tracking system read the file back with got the words in the order
-  they happened to be drawn in, and the language every document has declared since #67 reached
-  a reader through a tag tree that was never written. Both renderers are asked for one now —
-  WeasyPrint for `pdf/ua-1`, Chromium for `tagged` and `outline` — and the markup gives them
-  something to build it from: a job title is a heading under its section's heading instead of
-  a bold paragraph, a letter's subject is the letter's one heading, and the file carries its
-  author, which WeasyPrint reads out of the document rather than taking as an argument. A CV
-  whose contact block is deliberately switched off still names nobody, in the file's properties
-  as on the page.
-
-  Deliberately not PDF/A, which is tagged as well and archival besides. PDF/A is a promise that
-  the file will still render identically in fifty years, and it is kept by embedding an ICC
-  output intent and every font the document uses. Postulo cannot make that promise about a
-  theme a plugin ships (#132), and a conformance claim that cannot be honoured is worse than
-  one that was never made.
-
-  A long address used to run off the edge of the page and out of the file with it: a
-  hundred-and-twenty-character link has nowhere to wrap, and the column it sat in was sized by
-  its own content, so it pushed itself past the margin. Every theme breaks one now. The contact
-  line's separators were a CSS `::after`, and generated content is painted onto the page and
-  never written into its text — so whatever read the PDF back got the telephone number run into
-  the email address with nothing between them. They are real characters in the markup now, and
-  a theme picks which character by overriding a block instead of redeclaring a rule.
-
-  **The arrows on a CV** still had the bug #203 fixed on the career page. They nudged the order
-  number by one, so *up* at the top did nothing at all, one *down* could jump past every entry
-  that shared a number, and two entries two numbers apart needed two presses, the first of them
-  invisible. They swap with the neighbour the page drew and renumber the CV densely afterwards,
-  which is the same thing the career page does and the same code doing it; at either end the
-  arrow is greyed out rather than removed, so the pair keeps its shape. An entry added to a CV
-  takes the number after the last one instead of the count, which after a removal was a number
-  something already on the page had, and the new entry landed in the middle of it.
-
-  **A cover letter can be read the way the employer will read it.** The preview was reachable
-  only without an application — the one version of a letter nobody ever sends, because every
-  placeholder in it is empty — so the letter's page now offers the applications to read it
-  against. A placeholder Postulo knows and has nothing to fill is drawn as a marker in the
-  preview rather than as nothing, which is the difference between seeing a gap and reading
-  "Dear ,". *Send* puts the filled letter in front of you before freezing it where there is a
-  gap, and only where there is one: a step everybody has to press through is read once and
-  clicked past for ever after. `?application=abc` used to reach the database as a primary key
-  and come back as a 500; it means what it says now, which is no application. And there is a
-  `{{ contact }}` placeholder, because the follow-up starter has asked for a name in square
-  brackets since it was written and the application already knew whose.
-
-  **The Europass import stops inventing things.** A file that states no CEFR level for a
-  language had one invented for it — B1 — and printed on a CV; a level is a claim about
-  yourself that somebody will test in an interview, so a language may now say that its level
-  was never stated, and says nothing at all when it does. Every export names the language it
-  was written in and nothing here read it, so a career typed in Portuguese arrived with a blank
-  record language and the fallback warnings from #131 then fired on every entry of a CV that
-  needed no translation whatsoever. And the skill headings an import writes — "Digital",
-  "Job-related" — were fixed English words even on a Portuguese record; they are translated
-  now, out of the europass plugin's own catalogues, because core never translates a plugin's
-  strings. (#235)
-- **Keyboard and focus failings that every accessibility check passed.** Seven of them, found
-  by using Postulo rather than by scanning it. axe reads a document: it cannot press Tab and
-  say where focus landed, it cannot tell that one letter fires an action nobody can switch
-  off, and it cannot look at a high-contrast theme. Every page passed while all of this was
-  true.
-
-  **Focus stopped being dropped.** Sorting a table, turning a page and switching theme are
-  htmx swaps, and htmx puts focus back after a swap only for an element that carries an `id`.
-  None of those three had one, so Enter on a column header sent focus to the body and the next
-  Tab started again at *Skip to content* — which is the whole page to walk back through, on
-  every sort and every page turn.
-
-  **A single key can now be switched off.** "d" discarded a capture, "j" skipped it and "/"
-  took the search box, wherever you were and with no way to stop them. Somebody dictating to
-  their computer says every letter of every sentence, and "d" was a listing gone without a
-  question. There is a switch under *Settings → Appearance*, on to begin with because the
-  review screen is worked through forty times in a row and the keys are why that is bearable.
-  Shortcuts that need Ctrl are not single keys and are untouched, and a keystroke that is part
-  of a character an input method is still composing now belongs to the character.
-
-  **A field shows where focus is in a high-contrast theme.** `outline-none` on every input,
-  select, textarea and table filter compiled to `outline-style: none`, which beat the rule
-  that draws the focus ring and left a border colour and a shadow — the two things forced
-  colours throws away. So focus was invisible on every form in Postulo for anybody using one,
-  and nothing Postulo runs asks that question.
-
-  **A card on the board says which application it is.** Thirty menus all called *Change
-  status* are thirty controls nobody can tell apart; each is named by its role and employer
-  now. The menu also stopped saving on the way past: arrowing down a closed list in Chromium
-  on Windows fires a change at every status it goes by, and each of those was a status change,
-  a timeline entry, and a job search that did not happen. A choice made with the keyboard is
-  saved on Enter or when the menu is left; a choice made with the pointer saves at once, as it
-  always did, so advancing a card is still one click. The help explaining the board hung off
-  the card, which nothing can focus, so it had never been read to anybody — it hangs off the
-  menu it is about. And the cards are made draggable by the script rather than by the
-  template, which is the rule the dashboard already followed: with scripts off, nothing offers
-  a gesture that cannot happen.
-
-  **The heading on a settings page is the page.** *Settings* was the `h1` on about twenty
-  pages and each page's own name was an `h2` level with its sections, so jumping to the first
-  heading said "Settings" wherever you were. The sidebar's label is a label now, the page's
-  name is its heading, and its sections sit under it.
-
-  **The column resize handle tells the truth.** It was called *Widen Name* although the same
-  control narrows it with ArrowLeft, an arrow press said nothing at all, and what it did say
-  it said through a `<caption>` — which *is* a table's accessible name, so announcing a width
-  renamed the table to it. It is a splitter with a neutral name and a width it reports, it
-  says what it did from a region outside the table, and a drag the browser takes away no
-  longer leaves it resizing a column nobody is holding.
-
-  **One red button, and *Cancel* goes somewhere.** Four spellings of "this is the dangerous
-  one" across twenty-odd templates are `.btn-danger` and `.btn-danger-ghost`, so the answer to
-  "is this the destructive one" is in one place rather than in whichever template you happen
-  to be reading. And *Cancel* on a confirmation page goes where the view says instead of
-  following the browser's `Referer`, which is absent from a bookmark and from a fresh tab and
-  left the dashboard as the fallback — the one place somebody halfway through deleting
-  something did not mean to be. (#227)
-- **The API's catch-up cursor could not actually be walked.** #230 gave every list an
-  `updated_since` cursor — ask what changed since a moment, take the `updated_at` of the
-  last row you read, ask again from there — and two things stopped it working. The moment it
-  handed out was rounded to the millisecond while the value it compared against was stored to
-  the microsecond, so the timestamp a caller read back named an instant *before* the row it
-  came from, and that row arrived again on the next page. And a moment alone cannot get past
-  a run of rows saved in the same one, which is what an import or a bulk edit writes: where
-  the run was longer than the page, every page after it was rows the caller already had.
-  Together they meant a client either looped or, if it stopped when a page brought nothing
-  new, silently never read the rest of the account.
-
-  Moments now go out whole, so a value the API gives is a value it takes back, and the cursor
-  has a second half: `after_id`, the id of the last row read, which turns it from a moment
-  into a position in the order the list is already sorted by. Sent without it, a list answers
-  exactly as before. The merged `/documents` list takes no `after_id` and says why: its ids
-  come from two tables, and one id used against both would silently drop files. (#245)
-
-- **Insights, the report and the salary column counted the wrong things.** Five figures that
-  people read and believe, each of them measuring something slightly different from what it
-  said.
-
-  An application went quiet the morning after an interview. *Quiet* means nothing has
-  happened and nothing is planned, and an interview stopped counting as planned the moment it
-  ended — so an interview booked three weeks ahead, attended, and not yet written up left an
-  application that had been silent for twenty-one days, and the notifier said so. An
-  interview still waiting for its outcome now means the application is waiting, whether its
-  time has passed or not.
-
-  Withdrawn applications counted as waiting on a reply for ever. Only *ghosted* was excluded,
-  so the Outcomes widget carried a number that could only grow, and withdrawing — which is
-  the person saying they have stopped waiting — did nothing to it.
-
-  The report and Insights disagreed about interviews. Insights read them from the timeline;
-  the report counted only interviews settled through the diary, so somebody who wrote their
-  interviews down as they happened was shown a number by Postulo and a nought on the document
-  an employment office reads. Both now use one counter, and an interview typed onto the
-  timeline counts as much as one settled from the diary, which is what the handbook always
-  promised.
-
-  Moving an interview left its reminder saying the old time. The reminder arrived at the
-  right moment naming the wrong one, which is worse than not arriving; the words are now
-  rebuilt from the interview whenever it moves.
-
-  And salaries. The spreadsheet importer wrote EUR onto everything while stripping the `$`
-  and `£` that said otherwise; `50-60k` came in as fifty against sixty thousand, because the
-  `k` was read for one side only; the range separator matched a bare `a` anywhere, so
-  "Salary" split in the middle of a word; and the period was never read, so `15 €/h` was
-  stored as fifteen euros a year. All four are fixed, the mapping page now offers the
-  currency a sheet is in for cells that do not say, and a cell that does say wins. A salary
-  on screen names its period — thirty to forty with nothing after it read as a year's pay —
-  and the salary column sorts by currency first and then by the figure brought to a year,
-  instead of putting every hourly rate below every annual one and mixing dollars in with
-  euros. Currencies are three letters, upper-cased as they are typed and refused when they
-  are not a code at all. (#224)
-
-- **Every page of the API was built by reading everything first, retrying a capture made a
-  second capture, and the schema answered anybody who asked.** Five faults in the one
-  surface the browser extensions and `postulo-mcp` are built on, found in the September
-  audit.
-
-  Each list shaped every row it could see and then let django-ninja cut a page out of what
-  came back. Asking for a hundred applications on a thousand-application account ran the
-  subqueries, walked the tag prefetch and built an absolute address for all thousand, and
-  an agent paging through the lot paid that on every page — so reading a search end to end
-  cost the square of its size. A list now hands over the query itself and only the rows
-  that survive the cut are shaped. The count is still of the whole list.
-
-  `GET /captures` was not paginated at all, though *The capture API* has said since it was
-  written that lists take `limit` and `offset` and come back as `{"items", "count"}`. It
-  returned the first fifty rows in whatever order the database offered them, so a review
-  queue nobody had kept up with simply stopped at fifty with nothing to say so. It is a
-  page like the others now, newest first, which changes its shape: a client reading the
-  bare array has to read `items` instead. A test now reads the API's own schema and fails
-  on any list that hands back everything at once — the check that was missing, since the
-  test reading the wiki page checks paths and scopes and never shapes.
-
-  Capturing was not idempotent, while the code's own comment took retrying for granted. A
-  client that sends a posting and never sees the `201` cannot tell a lost reply from a
-  lost request, and the safe thing for it to do — send it again — left two captures of one
-  posting to decline and two notifications about it. A capture may now carry an
-  `Idempotency-Key` of the client's own invention: the first answer given under that key
-  is the answer it keeps getting, for a day, with nothing fetched and nobody told twice.
-  `/captures/known` stays what it always was, advice asked for beforehand, which does
-  nothing about the answer that went missing afterwards.
-
-  `/api/v1/openapi.json` answered without a token. The documentation page has always been
-  off, but django-ninja guards the schema only when it is given something to guard it
-  with, so the description of every call — and the plain fact that this address is a
-  Postulo — was there for anyone who asked, against the threat model's promise that the
-  API answers 401 to everything without a live token. It now wants a live token, of any
-  scope, or a person signed in to the instance.
-
-  And there was no way to ask what had changed. Lists could be narrowed by the date
-  something was applied for and by nothing else, so anything holding a copy of a search —
-  an agent, an extension — had to read all of it again and compare. Every list now takes
-  `updated_since` and answers with what changed at or after that moment, oldest change
-  first, and every row carries the `updated_at` to ask with the next time. A deletion is
-  not in it, because a row that is gone cannot be listed; the outbound webhooks that would
-  say so are their own feature (#240). (#230)
-- **A backup now holds what a restore needs, and a restore in a container is something you
-  can do safely.** The archive was the database and the media, and that is not the whole of
-  an instance. The plugins live on the data volume — the record of what is installed and the
-  packages themselves — and were in no archive at all, so a restore onto a fresh instance
-  brought back connections belonging to plugins that were not there, and said nothing about
-  it. They go in now, whole; `--no-plugins` leaves them out for anyone who keeps that
-  directory another way.
-
-  The key the connection secrets are encrypted under cannot travel in the archive, and must
-  not: it is what protects the part of the archive that is protected at all. So the manifest
-  carries a one-way mark of it instead, and `restore` compares. An instance rebuilt with a
-  new secret key and no `POSTULO_FIELD_KEY` is now told at the restore that the passwords and
-  tokens in the connections it just put back cannot be read, and how many there are — rather
-  than finding out weeks later, one failing connection at a time. The wiki's backup page said
-  that losing the secret key "will not lose your data, but it will log everyone out", which
-  was only the first half of it; the configuration page had been saying the rest for a while.
-
-  And restoring overwrites the database that is there, through SQLite's backup API or
-  `pg_restore --clean`, which is safe only when nothing else has it open. In the container
-  the documented route was `exec` into the running web container, with gunicorn and the
-  scheduler reading through it. The wiki now gives the route that works — stop the services,
-  then `docker compose run --rm -e POSTULO_SKIP_MIGRATE=1` — and `restore` refuses when it
-  can see anything else connected, unless `--force`. It sees every connection on PostgreSQL,
-  and on SQLite the files WAL leaves beside the database for as long as one is open, which
-  catches the scheduler and misses a web server that has been idle a while; a check is a
-  second pair of eyes and stopping the services is what makes it safe, which the page says.
-  The instructions for restoring by hand were missing the step that matters most under WAL:
-  delete the stale `-wal` and `-shm` beside the file you have just put back, or SQLite
-  replays a log written against a different database.
-
-  Archives taken by earlier versions still restore. The format is 2, and anything from 1
-  upwards is read, because the archive somebody restores from is by definition older than
-  the Postulo reading it. (#234)
-- **The scheduler no longer sends things twice, no longer dies on one bad item, and now says
-  whether it is still going round.** It is one command in a loop, which is the right size for
-  a single instance and left four things to chance.
-
-  Nothing claimed the work before doing it. A reminder was announced and *then* stamped, so a
-  restart in between — or the perfectly ordinary mistake of running cron and `--loop` at once,
-  which the Compose file makes easy — announced it again. Store copies were worse: two passes,
-  or a pass overlapping the *Send now* somebody had just pressed, could both send the same
-  document to the same store, though the handbook said that never happened. Everything is now
-  claimed first with a conditional update, so whoever changes the row has the work and the
-  other finds nothing to change. For a reminder that means the stamp is written before the
-  message goes: a message lost to a crash in that half-second is one nobody gets, while the
-  alternative is somebody's telephone going off twice at three in the morning.
-
-  One bad item ended the process. A reminder whose posting had lost its company, a notifier
-  raising something nobody anticipated, a dropped connection — any of them killed the loop,
-  and the container restarted through the entire entrypoint to try the same thing again.
-  Failures are now caught per item and per pass, and the database connection is refreshed
-  each time round, which is what Django does between requests and there are no requests here.
-
-  Syncs ran inline with no limit, so one slow calendar server held up every reminder behind
-  it. A pass now spends at most two minutes starting new ones — `--sync-budget`, `0` for no
-  limit — and leaves the rest to the next pass. A sync already started is never cut off.
-
-  And nothing anywhere recorded that a pass had happened, so an instance whose scheduler had
-  stopped looked exactly like one where nothing was due. Each finished pass now writes its
-  time to a file on the data volume, which the `scheduler` container's own healthcheck reads —
-  it had been inheriting the image's healthcheck, which curls a web port it does not serve,
-  so it was permanently unhealthy and told nobody anything. `/metrics` reports the same
-  heartbeat as `postulo_scheduler_last_pass_timestamp_seconds`, alongside a new
-  `postulo_overdue{kind="reminders"}` for reminders that fell due a quarter of an hour ago
-  and have still not been announced, and `postulo_failures{kind="syncs"}`. The handbook has
-  alerting rules for all three. `postulo_pending{kind="reminders"}` counted every reminder
-  anybody had ever set and not finished, which grew because the instance was being used and
-  so could not be alerted on; it now counts the ones that have fallen due.
-
-  In Compose, the scheduler also waits for the web container to be *healthy* rather than
-  merely started — it skips migrations on purpose, so starting against a half-migrated
-  schema is the one thing it cannot recover from — and no longer restores the plugin record
-  at the same moment the web container is doing it. (#221)
-
-- **A store that says it is finished is now believed, instead of being dialled for ever.**
-  #216 gave a plugin a way to say that the other side has ended a connection, and notifiers
-  honoured it: a browser that withdrew its subscription stopped being pushed to. Stores did
-  not. A Paperless whose token had been revoked, or a share that no longer existed, answered
-  the same way for every document there was, and each answer was filed as an ordinary failure
-  to try again later — so the retries went on, once per document, until somebody noticed the
-  row of *failed* badges and worked out what they had in common.
-
-  A store saying it is finished now switches the connection off with the reason in the
-  plugin's own words rather than a class name, exactly as a notifier does. Copies waiting for
-  a connection that is switched off are left waiting rather than being sent to record that it
-  is switched off: they would have spent every attempt they had on that sentence, and there
-  would have been nothing left when it was fixed. Switching it back on is one press, and they
-  go. A copy whose connection is not merely off but gone is still told so, because it has
-  nothing to wait for. (#243)
-
-- **An identifier is the same identifier whatever case it is typed in.** Every named scheme
-  folds its own values as you type them — Wikidata to `Q95`, LinkedIn to lowercase — so a
-  search usually found what it should. Two things it did not. A row written before its scheme
-  gained that folding kept the spelling it arrived with, and an early import that stored `q95`
-  was then invisible to everything that looked for `Q95`: the company was not found, and the
-  posting was filed under a second record of the same employer. And the rule that one
-  identifier names one company was enforced on the exact characters, so the same company could
-  be entered twice, once in each case, with nothing to say they were one.
-
-  The comparison is now case-blind everywhere it happens — the lookup, the form, the
-  importers, and the uniqueness the database itself keeps — while the stored value is left
-  alone. That last part is deliberate: a scheme that folds is still the thing that decides
-  what its values look like, and `other`, which is where a staff number lives, folds nothing,
-  because `AB-12` should read `AB-12` and not `ab-12`. An accent is still a different
-  character, not a different case.
-
-  A migration puts existing values through the current rules, and where that leaves one
-  account holding the same identifier twice it removes the later identifier and names both
-  companies on the console — the companies themselves are left exactly as they are, because
-  whether two records are one employer is not something a migration gets to decide. Saying no
-  now also sounds like a person: where the database used to answer "Constraint
-  “unique_other_identifier_per_company” is violated", the form says the identifier is already
-  listed. (#211)
-
-- **Applications you recorded after the fact counted nowhere, and nothing let you say when
-  you applied.** The date an application was sent was written only when it passed through the
-  literal *Applied*. Anybody recording a reply they already had — straight to *Interviewing*,
-  or to *Rejected* — got an application with no date, and every figure measured from that date
-  then ignored it: the number sent, reply and interview times, sources, industries, the
-  by-month figures, "sent recently", the API's `since` filter, and the evidence list in the
-  report an employment office reads. The funnel counted it all the same, so a stage could show
-  more than 100% of *Applied*.
-
-  Reaching any status that means it went out now records the date, *Withdrawn* excepted: a
-  draft abandoned before it was ever sent is not an application, while withdrawing something
-  already sent keeps the date it has. A migration fills in the past from the timeline, which
-  has always known — the first status change into a sent status is when it went out.
-
-  And every door now takes the date: intake, *Apply*, capture review (a posting captured today
-  was often applied to last week) and the API's `applied_on`. Left empty it is today, as
-  before. The spreadsheet import stops guessing from the date alone — a row that says
-  *Rejected* with no date column keeps its status, its channel, its tags and its deadline
-  instead of becoming an untouched listing, and records that the date is unknown rather than
-  inventing today; a row that says *draft* stays a listing even when it carries a date. (#222)
-
-- **Deleting one thing no longer quietly deletes the record of what you sent, and a deleted
-  file is now actually deleted.** Three ways the promise that "the record of what you sent
-  has to stay true" was not kept.
-
-  A company cascaded into its postings, those into applications, and applications into the
-  frozen PDFs an employer had received — so tidying up one employer could take a year of
-  evidence with it, behind a confirmation that said only "anything belonging to it goes too".
-  A sent document now survives the application it went with, and still names the role and
-  employer it was sent to, because that is stored as text beside the link. The confirmation
-  page counts what will go before it goes, and says what is kept.
-
-  Editing an uploaded file replaced the bytes in place, while applications went on saying
-  they had sent it and external stores kept the copy they had already filed. The file is
-  fixed once it arrives; a different file is a new upload that supersedes the old one, which
-  is what the *Supersedes* field was always for. Uploads are checksummed now as renders have
-  been, so a store can tell one from another.
-
-  And deleting a document left its file on disk for ever — only deleting a whole account
-  removed anything — so "deleted" meant "hidden" for files holding a home address and a
-  full career, which were then copied into every backup. Deleting a document now deletes its
-  file once the change is committed and nothing else points at it, and `manage.py prune_media`
-  lists what earlier deletions left behind, removing it only when asked. (#217)
-
-- **Choosing PostgreSQL got you an instance that would not start, and no scheduler if it
-  had.** `docker/compose.postgres.yml` has offered the second engine since it was added, and
-  *Installing Postulo* has recommended it to anybody already running one — while the
-  published image had neither the driver nor the client tools to honour the offer. The
-  container stopped on its first `migrate`, because `psycopg` lives in an extra the build
-  never asked for; had it started, `manage.py backup` would have stopped on “pg_dump is not
-  on the PATH”, because `core/backup.py` dumps a PostgreSQL through the tool rather than by
-  copying a file that is being written to; and reminders, gone-quiet notices, store copies
-  and syncs would never have run at all, because that compose file had no scheduler and
-  nothing fails when a loop nobody started does not loop.
-
-  All of which survived a release for one reason: nothing had ever pointed a test at a
-  PostgreSQL. The suite runs on in-memory SQLite, and the PostgreSQL half of the backup code
-  was covered by a stand-in for `subprocess.run` — so the engine was documented, offered,
-  and entirely unexecuted. CI now runs the database-facing tests against a real
-  `postgres:17` and takes an actual backup of a seeded instance and puts it back, through
-  pg_dump and pg_restore, so the next thing to break on this path breaks in a job rather
-  than on somebody's server. Which found its first thing immediately: the suite's throwaway
-  model had no migration, so it was built in `migrate`'s syncdb phase with a foreign key to
-  an accounts table that did not exist yet — recorded and checked later by SQLite, refused
-  outright by PostgreSQL.
-
-  The client tools come from PostgreSQL's own repository, pinned to the major the compose
-  file starts: pg_dump refuses a server newer than itself and Debian's is two majors behind,
-  which would have made this “backups work” until the first time anybody looked. (#219)
-
-- **Adding a company answered a 500 when the form was sent twice, though the company was
-  saved.** A double click on *Save* posted the form twice in one second; the first saved
-  and redirected, the second hit SQLite's *database is locked* and the browser showed the
-  500 — which invites a retry, and a retry makes a duplicate. Three causes, three fixes.
-  SQLite's default transaction takes no lock until it writes and refuses at once when it
-  cannot upgrade: a file database now opens with immediate transactions, a write-ahead
-  log and a twenty-second wait, so two writers take turns. Nothing stopped a form being
-  sent twice: every form that posts is let through once, its button greyed until the
-  page changes, and the back button gets a form that works again; with scripts blocked
-  nothing changes. Backups already use SQLite's own backup API, so a copy under the
-  write-ahead log is consistent. (#206)
-
-- **The career-order checkbox under *Settings → Appearance* described itself with an id
-  that was not on the page.** Django names the help text in the checkbox's
-  `aria-describedby`; the template drew the help inside the label without the id, so a
-  screen reader was told about an element that did not exist and the sentence explaining
-  the preference could not be reached from the box. The help carries the id now, outside
-  the label so the name says what the box is and the description says why, and the fast
-  suite checks every `aria-describedby` on the settings pages points at something. (#207)
-
-- **A CV's page no longer says “What is on this cv”.** The heading put the kind's label,
-  lowercased, into a sentence — which flattened an acronym in English, French and
-  Portuguese and misspelt a noun in German, and which could never agree in a language where
-  the two kinds take different articles. It is two sentences now, chosen by kind: *What is
-  on this CV* and *What is on this portfolio*. The same `|lower` was applied to a salary's
-  period (*Pro Jahr* → *pro jahr*) and to a copy's status after a store's name; both now
-  show the label as the catalogue wrote it. Filled in English, French and Portuguese; the
-  other catalogues get the two new strings at the release sweep. (#168)
-
-- **The suggestions page fits on a phone once there is a suggestion on it.** The accept form
-  for a suggestion not yet matched to an application carries a select as wide as the longest
-  application title, in a group that could not shrink — 45 pixels past the edge of a
-  320-pixel screen in English, 60 in Greek, 70 in German, on exactly the page a mail or
-  calendar plugin's first suggestion lands on. The group wraps under the words now and the
-  select gives way. The walk had never reached that state: its fixture had no suggestion, so
-  the page was only ever checked empty. It has a pending, unmatched one now, filed the way a
-  plugin files one, so axe and the reflow check read the page with something on it — the
-  last of what #167 found and left undone. (#167)
-
-- **Escape closes a cell editor however quickly it is pressed.** The editor arrives by a
-  swap, and htmx wires what it swapped in — the Cancel button Escape clicks — only when the
-  swap settles, 20 ms later by default, while the caret is put in the input the moment it
-  lands. For those 20 ms Escape reached a button nothing was listening to, and did nothing.
-  No hand is that quick; the browser suite was, one run in three, and the flake it reported
-  was this. The handler now has htmx process the editor before clicking, a no-op once the
-  settle has done it, and a test widens the window to two seconds and presses inside it.
-  (#161)
-
-- **The image scan can now be told from its own failure.** `scripts/scan-image.sh` has three
-  outcomes instead of one red step: exit 0 for nothing fixable, 1 for fixable findings, and
-  2 when the scan did not complete — a scanner that failed to run, a bill of materials that
-  came back empty — which says nothing about the image and now says so, on stderr and in
-  `.scan/verdict.txt`, which both image workflows put at the top of their run summary. Trivy
-  runs once for the gate rather than twice, with an exit code of its own for findings; Grype
-  exits 1 for everything, so its verdict is read from whether a report came out. A verdict
-  left by an earlier run is removed before anything starts, and the dev image's summary no
-  longer offers a `docker pull` for an image that was never pushed. The root cause — reports
-  written through a bind mount the daemon resolved against the host — went with #190, and a
-  test now keeps every report on a redirect. `.scan/` is ignored, so a scan run by hand
-  leaves no untracked files behind. (#192)
-
-- **An uploaded file downloads under its own extension.** Every download was called
-  `<title>.pdf`, whatever had been uploaded, so a `.docx` or a `.txt` arrived as a file no
-  PDF viewer would open — served as `application/pdf` too, since the type is guessed from
-  the name. The name is the title with the upload's own extension now, on the page and over
-  the API alike; a snapshot of what was sent is still `<title>.pdf`, because that is always
-  what it is. (#193)
-
-- **A file's edit form no longer shows where Postulo keeps it.** Editing an uploaded file
-  said *Currently: documents/1/2026/09/reference.txt* — the storage path, carrying the
-  account id and the month of the upload, inside a link to `/media/` that nothing serves. It
-  says *Currently: reference.txt* now. The path was Postulo's filing system thinking aloud:
-  not the person's to care about, a second answer beside the *Title* field above it, and on
-  a shared screen an account id. Django's file widget template is overridden once, for every
-  file field, so no form has to remember. (#191)
-
-- **The accessibility walk claimed thirty-five pages it never opened, and six of the pages
-  it had never opened were broken.** `tests/test_page_coverage.py` insisted every URL
-  pattern was either visited by the browser suite or excused in writing — but "visited"
-  meant "named in a hand-written tuple beside the walk", and nothing held the tuple to the
-  walk. It claimed 104 names and the walk reached 69. Every CV page and every letter page
-  past the list was counted as checked and had never been looked at.
-
-  **The claim is derived from the walk now**, by resolving the paths it actually visits, so
-  it cannot get ahead of it again. That turned the coverage test's output into an honest
-  list of thirty-four, and the walk was given what those pages need to exist: a CV with an
-  entry, a letter, an upload, a tag, a contact, an industry, a posting, a capture waiting
-  for review and a connection. Two routes answer POST only and are excused by name rather
-  than pretended at; `settings:index` stopped being excused as *"redirects to the appearance
-  page"*, because the walk visits `/settings/` itself and the excuse had become false.
-
-  **What the fuller walk then found**, none of which anything had ever measured:
-
-  - A CV's own page ran off a 320-pixel screen in Greek and German. Its entries are the row
-    #165 fixed on the career page, and this page had kept the old one: words beside a
-    `shrink-0` group of ↑, ↓, *Tailor* and *Remove*. The grid's column is sized by its
-    content, so the overflow took the *Add entries* card with it.
-  - The uploads list squeezed a title into 58 pixels in English and 13 in Greek, behind
-    *Download / Edit / Delete*.
-  - The connections list did the same, with `flex-1` — which is `flex: 1 1 0%`, so the words
-    claimed no width of their own before anything wrapped.
-  - The upload **edit** form scrolled sideways in every language, by exactly the same amount,
-    because Django renders a bound file field as `Currently: documents/1/2026/09/reference.txt`
-    — a path, with no spaces in it, 252 unbreakable pixels against the 238 a phone leaves.
-    The *new* form passed all along, which is why nothing had caught it.
-  - A checkbox on the applications filter was 20 pixels tall, against the 24 WCAG 2.2
-    SC 2.5.8 asks for.
-  - The capture review page pointed `aria-describedby` at a help-text element that was not
-    there — worse than no description, because a screen reader is told there is one.
-
-  All six are fixed. The preview pages are the one exemption, in writing and narrowly: a
-  preview returns *"the CV as HTML, exactly as the PDF renderer will see it"*, so axe is
-  reading a print document and asking it for `<main>`. Satisfying that would change every
-  PDF Postulo produces to answer a question nobody asks of a printed page. They stay in the
-  walk, so reflow and target size still read them; only axe looks away. (#167)
-
-- **Dragging worked in Chromium and did nothing in Firefox, and the tests agreed with
-  Chromium.** Neither drag cancelled `dragenter`. The specification makes an element a drop
-  target only once *both* `dragenter` and `dragover` are cancelled; Chromium forgives the
-  omission and Firefox does not, so arranging the dashboard by dragging a widget (#125) and
-  moving a card between board columns both sprang back with nothing posted and nothing
-  logged, for anybody using Firefox.
-
-  **Both drags had it**, because both were written the same way — the board's cards and the
-  dashboard's rows — so both are fixed here rather than one being left with a known copy of
-  the fault in the same file.
-
-  The tests could not have caught it. They dispatch four synthetic `DragEvent`s including
-  the drop itself, so they exercise the handlers and pass whether or not a browser would
-  ever have delivered that drop; and the browser suite runs `--browser chromium`, the one
-  browser that forgives this. Both helpers now send `dragenter` as a browser would, and each
-  file gains a test that asks the handlers the question the browser asks — *was this event
-  cancelled?* — which fails without the fix in Chromium, so it needs no second browser to
-  keep watch. (#174)
-
-- **A chip with no remove button had almost no padding at its end.** On *Documents → CVs*
-  the kind tag sat hard against its own right edge, twelve pixels of space on one side and
-  two on the other. `.chip` was shaped around a button it did not have: the two pixels are
-  where `.chip-remove` goes, and the button supplies the visual space, so a chip holding only
-  a word got the gap and nothing to fill it. Two of the three places that draw one have no
-  button — a CV's kind and a company's industries — and the company row had already patched
-  it by hand with `pe-3`, which is the sort of workaround that says the class is wrong rather
-  than the caller.
-
-  So the class changed rather than the third caller: a chip pads both ends, and the remove
-  button pulls its own end back with `-me-2.5`. A chip with a button looks exactly as it did;
-  one without is no longer short of an end; and the fourth caller will be right without
-  knowing any of this. The company row's `pe-3` is gone.
-
-  The test that guarded this pinned `ps-3` and `pe-0.5`, which is to say it pinned the
-  asymmetry rather than the intent — its own docstring says the intent is that the × sits at
-  the end edge and not the right. It now asserts that, and that a chip pads both ends. (#185)
-
-### 🔧 Changed
-
-- **Grids use the whole screen; everything else keeps its measure.** Every page sat in a
-  1280-pixel column — `max-w-7xl` on `<main>` — so on a wide monitor a table with ten chosen
-  columns scrolled inside a box with grey on both sides, two nested scrolls to read one row.
-  `<main>` takes its width from the page now: the tables, the board, the dashboard and the
-  lists empty the cap and take the screen; forms, detail pages and prose keep the measure
-  they had, because a wide page is not a wide paragraph. The one criterion about line length,
-  SC 1.4.8, is level AAA, and its eighty-character measure is what the forms' `max-w-2xl`
-  already is. The header and footer span the width, so a masthead never sits narrower than
-  the table under it. Below 1280 pixels nothing changes. (#188)
-
-- **Server overview: the card at the bottom has lost its heading.** It said *Also*, which
-  names nothing — the other headings on that page are *Overview*, *Software* and *Data*, each
-  saying what is under it, and this one said only that there was more, which the reader can
-  already see. It is the heading somebody writes when a card has collected what did not fit
-  elsewhere, and that is what the card is: a link to the health check, and a link to Django's
-  admin or a note saying it is off. Both say what they are and where they go, so the card
-  carries itself. (#183)
-
-- **Twenty-four languages are no longer translated before anybody has read the English
-  once.** `test_every_european_union_language_stays_complete` held the twenty-four European
-  Union catalogues at 100% on every commit, which made adding one user-facing string cost
-  twenty-four translations — made by the same hand that wrote the English a minute earlier,
-  on wording that had not settled, for no reader. The promise was always about a *published
-  version*: what somebody installs should not have a gap in a language Postulo offers them.
-  It was never about a branch halfway through a feature.
-
-  There is now a `release` marker — *a promise that must hold in a published version, not in
-  every commit* — deselected by default exactly as `e2e` already is, and
-  `uv run pytest -m release` is **step 1 of *Making a release***, before the changelog is
-  moved or anything is tagged. The same twenty-four must be complete, checked by the same
-  assertions; the check is simply first and deliberate rather than implicit in a suite that
-  had already run. Ordinary work translates English, French and European Portuguese, which is
-  enough to see a change in three languages and catch what only shows up in one — the long
-  German string that broke a row in #165 was found that way.
-
-  Nothing else is marked. Plural rules, placeholder consistency, catalogue currency, the
-  "a started catalogue actually translates" gate and the render-in-every-language walk still
-  run on every commit, because those catch mistakes rather than measure completeness. The
-  risk is stated plainly in the issue: somebody can now commit a string only three languages
-  have, and that is only safe while the release step stays a hard gate. (#182)
-
-### ✨ Added
 
 - **The sources read the posting the page is showing, in whichever way the board wrote it.**
   Four faults, all found by reading real adverts rather than hand-written objects, and none
@@ -2742,208 +1767,6 @@ All notable changes to Postulo are recorded here. The format follows
   is a test for each of those, and a migration that turns whatever an instance already had in
   its environment into rows, so nobody loses a catalogue. (#93)
 
-### 🐛 Fixed
-
-- **The report page was missing two of its own classes, and the stylesheet was being fed by
-  prose.** The report arrived without a stylesheet rebuild, so its *Show this period* button
-  sat out of line and its two tallies stacked on a wide screen, because `mt-5` and
-  `lg:grid-cols-2` compiled to nothing. Only CI noticed, after the push; the ordinary suite
-  now rebuilds the stylesheet and compares wherever the Tailwind CLI is installed, and the
-  build is on the checklist.
-
-  Chasing a third, phantom class turned up the real problem: **what compiled depended on
-  more than the interface.** Tailwind's automatic detection scanned the whole repository, so a
-  word in a test's docstring, the wiki or the changelog could put a class in the stylesheet
-  every page loads — the template lint's own list of forbidden physical utilities was
-  compiling them. The compiled file sat inside the scanned tree, so a build written anywhere
-  but over it read the previous build as a source. And the templates that become PDFs, which
-  never load this stylesheet, had the words in their inline CSS read as classes. The scan is
-  now the interface and nothing else, and twenty-four utilities nothing used — among them
-  every physical one — have gone. (#164)
-
-- **The image builds again.** Giving the Python build a stage of its own (#157) put the
-  dependencies first, so that a change to the application would not re-resolve them, and
-  left the one `uv sync` above the line that copies the source — and `uv sync` installs the
-  project as well. Every image build since failed with *Expected a Python module at*
-  `src/postulo/__init__.py`, and nobody knew, because nothing in CI builds an image (#81):
-  the test instance's deploy was the first build since. The dependencies are synced before
-  the source with `--no-install-project`, Postulo after it, and a test reads the Dockerfile's
-  stages to hold that order. (#166)
-
-- **Pages that ran off a phone's screen in a longer language, and words squeezed out of their
-  own space.** The arrange page's *Take … off* buttons carry a translated widget name, and
-  sat in a group that was not allowed to give way: in Greek it pushed the page 64 pixels past
-  the edge of a phone, in German 31 — and in English 8, on CI's fonts, which is how it was
-  found. The interview list's outcome buttons did the same by 143 pixels in Greek, the account
-  page's buttons in Dutch, French and German, and four list headings in Dutch. Those groups now
-  wrap, and the words beside them claim twelve rem before anything may sit next to them, so on
-  a phone the buttons go underneath.
-
-  Where the buttons *did* fit, the same layout failed quietly, with nothing to scroll: the
-  words were left whatever was over. The arrange page had a column one word wide, a career
-  entry had fourteen pixels in Greek, and each built-in plugin's description had six in
-  English, with the longest word written across whatever was beside it. The browser suite now
-  walks every page in Greek and German as well as English, and fails on words that run out of
-  their own box as well as on a page that scrolls.
-
-  Walking in Greek found two more. The recovery page's table had a hidden *Actions* label that
-  escaped its scroll box and dragged the page sideways, because the report and that page had
-  been given a bare `overflow-x-auto` rather than the positioned `scroll-x` #113 made for
-  exactly this; the template lint now refuses the bare one. And a heading may break a word too
-  long for a phone — *Wiederherstellungslink* is wider than one — rather than run off its edge.
-
-  The *Suggestions* widget, which draws its own heading, had no name anywhere else: the arrange
-  page showed its key, its button read "Take  off", and its four arrows told a screen reader
-  "Move  up a row". Every widget now has a name in words, and registering one without it is
-  refused. (#165)
-
-- **The CV page and the letter page open again.** Making a rendered document point at
-  whatever produced it took `related_name="renders"` with the two columns it replaced, and
-  both detail pages ask for exactly that — so anyone opening one got a server error instead
-  of their CV. Nothing caught it, because the suite tested what the new link *stores* and
-  never opened the page that reads it back.
-
-  The reverse is a query rather than a `GenericRelation`, and that is not a detail. A
-  relation would give the name back and a cascade with it, and the cascade is the one thing
-  that must not happen here: deleting a CV has to leave the PDF an employer received exactly
-  where it is, which was the whole reason `RenderedDocument` exists. (#130)
-
-### 🐛 Fixed
-
-- **A test could be handed a translated string because of which test ran before it.**
-  `LocaleMiddleware` activates a language per request and nothing deactivated it afterwards,
-  so a test that signed in as somebody reading Postulo in Portuguese left Portuguese active
-  for every test that followed. It showed up as a test asserting an English message and
-  getting a Portuguese one — passing alone, failing in company, and failing differently
-  depending on the order, which is the worst shape a failure can have. Every test now starts
-  in the instance's own language. Found while adding the portfolio tests, which is to say by
-  accident. (#133)
-
-- **A team nobody had been recorded at did not survive an export.** A department travelled
-  only as a name beside a contact, so a team with no contact simply vanished from the
-  archive — and *a team you applied to before you knew anybody there* is exactly the ordinary
-  case the model was written for. Departments are now records of their own in the file. Found
-  by the new attachment failing to restore, which is the argument for the round-trip test
-  being a round trip. (#138)
-
-- **A stored column width did nothing on a real deployment.** It shipped as a `style`
-  attribute on the header cell, and the policy Postulo serves is `style-src 'self'`, which
-  refuses one as firmly as it refuses an inline script — so the browser dropped it, the
-  column sized itself, and the preference appeared not to save. Development never saw it
-  because the strict policy is production's: the browser test that covers widths runs under
-  the development settings, and the test that runs under the real policy visited no page
-  with a stored width. Both were true and neither could catch it, which is the gap that has
-  been closed alongside the width. The script that owns the handle applies it through the
-  DOM now, which the policy does not govern, and which is the coherent place for it — a
-  width is a pointer gesture, so it belongs to the script that provides the gesture. (#136)
-
-### 🔧 Changed
-
-- **Every API Postulo has is in the wiki, and a test says when one is not.** *The API* named
-  every call but kept the scope of each in prose, and the three addresses that answer machines
-  about the instance — `/healthz`, `/metrics`, `/logs` — were rows in *Configuration* that
-  never said what they return. They have *Health, metrics and logs* now, down to each metric.
-  The plugin guide was the core repository's `docs/PLUGINS.md`, not the wiki, and it never
-  named the interface each kind of plugin satisfies; it is *Writing a plugin* in the wiki, with
-  every kind, its entry-point group and its interface, and every name `postulo.plugins.api`
-  promises. `docs/PLUGINS.md` stays as a pointer, because every plugin's metadata links to
-  it. `tests/test_wiki_surface.py` reads the wiki beside the checkout against the code, both
-  ways, so a call, a metric or a promised name without its line fails. (#170)
-
-- **The wiki is written where it is read.** Its pages lived in this repository's `wiki/` and
-  reached the Forgejo wiki only when somebody ran `scripts/publish-wiki.sh`. By the time
-  anybody looked, four pages — *Accessibility*, *Hardening*, *Listings*, *Reports* — had
-  never arrived, the other seventeen were five days old, and the images had never been
-  copied at all, so the wiki's front page had shown its logo broken since the day it was
-  added. The pages now live only in the `postulo.wiki` repository, the script and the copy
-  are gone, and `CONTRIBUTING.md` says how a page is written there. (#169)
-
-- **The dashboard is a grid of four columns, and a widget can be dragged into place.**
-  The last of three: #123 settled where an arrangement is stored, #124 settled how a widget
-  is moved by somebody not using a mouse, and this is the grid itself and the gesture.
-
-  **Four columns rather than five**, because four is the count in which the three widths
-  every widget already declares — a quarter, a half, a whole row — mean what they say. Five
-  has no half; a half-width widget in five columns is two columns or three, and every widget
-  would have had to be re-measured against a grid that divides by nothing.
-
-  **A widget has a width and a place in the order; the row falls out of the two.** That is
-  the whole model, and the reason it is worth stating is what it makes impossible: there is
-  no way to leave a hole in the middle of the page, no way to put two widgets in one cell,
-  and so no validating, no repairing, and no answer needed for what happens when a plugin is
-  uninstalled and its widget goes — the rest close up. A coordinate model would have needed
-  all three.
-
-  Dragging is added on top of the four arrows and does not replace them, which is the rule
-  this project has followed since the board learnt to drag: drag and drop fires on neither a
-  touch screen nor a keyboard. A drop posts to the same address the arrows post to and gets
-  the same sentence back saying which row and place it landed in, so a page arranged by
-  dragging and a page arranged by pressing arrows are the same page, saved the same way.
-  Nothing is draggable until the script makes it so, because an affordance that does nothing
-  is worse than none.
-
-  Widths stayed out of the person's hands on purpose. A width is the widget's own statement
-  about how much room it needs to be legible — a six-stage funnel is unreadable in a quarter
-  of a row — and what is being arranged is the order. A narrow screen gets one column, read
-  downwards; #73 is where the phone gets its own attention and this does not assume it
-  solved.
-
-  The "internal widgets plugin" the issue asked for is the registry that already exists,
-  named as one. Making a widget a plugin *kind* would put seventeen rows in *Server settings
-  → Plugins* for an administrator to switch off, and would need an entry-point contract
-  before anybody outside has asked for one; the part of that contract that actually matters
-  — a key that cannot collide with another provider's — shipped with #123. (#125)
-
-- **A column header clicks back to no sort at all, and a column can be dragged wider.**
-  Two of the four features Dispatcharr's channel table had and Postulo's did not; the other
-  two arrived with their prerequisites — selection with bulk actions, and editing in the
-  cell — which is why these two were left until last rather than done first.
-
-  Sorting was two-state and never returned to the table's own order, so there was no way to
-  undo a sort except by editing the address. It cycles through three now. A column that *is*
-  the table's default sort keeps two, because there is nothing to go back to and a third
-  click that changes nothing is worse than two honest states. And since the third state
-  takes the arrow away, every header now says in words what clicking it would do.
-
-  **A width is a preference, so it lives where preferences live.** Beside which columns show
-  and how many rows a page holds, on the profile, following the person to every device
-  rather than cluttering every link — which is the line this project already drew between a
-  question and a preference, and the one thing from that table that was deliberately *not*
-  adopted: theirs keeps the query in session storage and the sort in memory, so a reload
-  loses the sort and a filtered view cannot be sent to anybody.
-
-  The handle is the one place a script is unavoidable, since a width is a pointer gesture.
-  It is still an addition rather than a replacement: without a script no handle exists at
-  all and the columns size themselves exactly as before. And it is not pointer-only — the
-  handle is a button, the arrow keys widen and narrow it, and *Home* lets the column size
-  itself again, because a column dragged too narrow once must not be too narrow for ever.
-
-  Row reordering was not taken and is not meant to be: a channel list has an order somebody
-  chose, a company list has an order somebody *sorted*, and dragging a row in a sorted table
-  means either abandoning the sort or lying about it. (#136)
-
-- **The two halves of choosing a company's sector meet, and the consequences are handled.**
-  The list is NACE Rev. 2.1 and the picker is chips; what was left was everything that
-  follows from a vocabulary that can now be long.
-
-  The companies table draws industries as labels rather than a comma-separated run, showing
-  four and counting the rest — a bank that is also an insurer and a software house is three,
-  a conglomerate is more, and the cell is already narrow. Filtering stays a box you type in
-  rather than a menu, which is the same control at thirty-two names and at three hundred and
-  the only one that stays usable at both.
-
-  **Companies → Industries** gains a search that matches a name or a NACE code, shows each
-  code beside the person's own word for it, and says *Edit or merge* rather than *Edit*,
-  because merging is exactly the tool somebody needs after picking from a standard list
-  beside their own words. Only what has actually been given to a company appears there — the
-  classification is a list of suggestions, not a list of rows, which is what made it safe to
-  make the suggestions long.
-
-  Nothing renames a word somebody wrote themselves, and a company in three fields still
-  counts in three. (#141)
-
-### ✨ Added
-
 - **A company's name can be changed where it sits, and a refusal has somewhere to go.**
   Every edit in Postulo was a page — fine for a company nobody looks at twice, tiring for a
   list of forty where the thing wanted is one word in one cell.
@@ -2974,88 +1797,6 @@ All notable changes to Postulo are recorded here. The format follows
   timestamp and a save whose stamp has moved is refused with what the row says now. Focus
   follows the edit and comes back to the value afterwards; Escape abandons; and with no
   script the cell is a link to the form, which is exactly what it was before. (#135)
-
-### 🔧 Changed
-
-- **Industries and tags are chosen as labels now, not as tick boxes.** Industries were a row
-  of checkboxes; tags were Django's default scrolling box you ctrl-click. Neither was a
-  label, and nothing in Postulo drew a chip — so this is a new control rather than a
-  restyling of an old one, and it is written once and used in both places.
-
-  **Layered, never substituted.** The checkboxes, the multiple select and the box for a name
-  that does not exist yet are all still in the page, still submitting; the chips are drawn
-  over the top and those are hidden. With the script blocked the forms are exactly what they
-  were, which is the rule the board's dragging already follows.
-
-  **A name that is new looks new before anything is saved** — outlined rather than filled —
-  because otherwise people create *Fintech*, *FinTech* and *fintech* and find out afterwards
-  that the slug collapsed them. Tags gained the same "add one that does not exist yet" that
-  industries always had, matched by slug, and a tag made this way keeps no colour: colours
-  are chosen on the tags page, where there is room to see them beside each other.
-
-  **The keyboard vocabulary is a decision, and one of its conventions is deliberately not
-  followed.** Enter commits what was typed rather than submitting the form; Escape abandons
-  it; the arrows walk between labels, mapped through the reading direction; every remove
-  button carries the name inside it, so eight of them are eight different announcements
-  rather than eight identical ones; and adding or removing one says so in a live region.
-  **Backspace does not delete the last label** — it is the convention, and it is also a way
-  to delete something by pressing the key you press to correct a typo, in a control whose
-  values are somebody's own words.
-
-  The remove button is 24 by 24 with room around it, which SC 2.5.8 has caught this project
-  over twice already, and the × sits at the end edge rather than the right. (#139)
-
-- **A widget can be placed in two dimensions without a mouse.** *Move up* and *move down*
-  are a complete vocabulary for a list and not for a grid, and `app.js` states the rule that
-  makes this a prerequisite rather than a refinement: drag and drop does not fire on touch
-  screens and is not reachable from a keyboard, so it is an addition to the control that
-  works everywhere, never a replacement for it. The grid cannot ship until the control
-  exists.
-
-  **The dashboard is a flow rather than a matrix, and that chose the mechanism.** Widgets
-  have widths and fill rows in order, so there is no cell to name — which rules out a
-  row-and-column picker, and rules out a "move this one, then choose a destination" mode
-  that would need two interactions and state between them to work with scripts off. What is
-  left is four directions over the order: *left* and *right* move one place, *up* and *down*
-  move a whole row. On a narrow screen there is one column and the two axes are the same
-  move, which is what *up* means when there is only one column.
-
-  Every one of them is still a form that posts. An arrow that cannot act is disabled rather
-  than absent, so the cluster keeps its shape and the arrow somebody reaches for is where it
-  was last time; the redirect carries a fragment so focus lands on the widget that moved;
-  and a message says which row and place it landed in, because a move that happens in
-  silence is a move somebody using a screen reader has to go looking for. Two new arrows
-  joined the icon set, and the stylesheet already mirrors that pair for right-to-left. (#124)
-
-- **Every account owns its dashboard arrangement from the day the account exists.** Nothing
-  was ever shared between accounts — two people who had never arranged anything were looking
-  at the same *list of keys*, each computed against their own records — but the arrangement
-  itself belonged to nobody until somebody touched the setting. It is stored now, from the
-  moment the profile is, which is what a grid needs before a widget can be dragged into
-  anything.
-
-  **The null that meant *never arranged* was load-bearing, and what it carried is now
-  written down.** It made a widget added in a later release appear for anybody who had never
-  arranged their dashboard. With every account holding a list, nobody is ever "never
-  arranged" — so the rule moves to a seen set: every key an account has already decided
-  about, and a key in neither list is new *to that account*. That is the one of the three
-  candidates that also works when the new widget arrived with a plugin installed on a
-  Tuesday rather than with a release, which a generation marker could not.
-
-  **The trade is made knowingly.** A new widget no longer walks onto a page by itself; it
-  waits on the arrange page under *New*, with the dashboard naming what is waiting, and
-  saying no is an answer that is remembered. Strictly that is one fewer thing happening
-  without being asked — the old behaviour changed somebody's page during an upgrade.
-
-  **And the key namespace is decided while it is free**: a bare key is Postulo's, anybody
-  else's is `provider:key`, and registering the wrong shape is an error at start-up. A key
-  lands inside every stored arrangement, so a collision found after people have arranged
-  their dashboards is a data migration of every one of them. The arrangement travels in the
-  archive now too (format 12), and the seen set with it — without that, a restore would
-  announce every widget in Postulo as new to somebody who has been reading their own
-  dashboard for a year. (#123)
-
-### ✨ Added
 
 - **The list of areas of activity is a classification now, not thirty-two names somebody
   wrote down.** The old list had *Gaming* and *E-commerce* and no *Mining*, no *Water
@@ -3169,6 +1910,372 @@ All notable changes to Postulo are recorded here. The format follows
   else. The archive carries the translations (format 11) and brings them back. (#131)
 
 ### 🔧 Changed
+
+- **Applications and Board are one page in two shapes, and the switch keeps your filters.**
+  Two views answering the same question — which of my applications am I looking at? — were
+  two addresses, two entries in the navigation, and a bare link between them that threw
+  the filters away: narrowing the table to *quiet applications at Acme* and pressing
+  *Board* showed everything. One entry now, one address, and a *Table / Board* switch on
+  the page beside the *Columns* control that changes the shape of what is below it and
+  nothing else. The search, filters and sort survive the switch; the shape you choose is
+  remembered with your other table preferences; `?view=board` asks for a shape without
+  changing it; and `/applications/board/` redirects, carrying whatever it was given. The
+  board still shows only what is still live, and a filter that matches settled
+  applications is said on the board, with a link to the same filter in the table, rather
+  than shown as an empty board. Anybody who had hidden *Board* from the navigation has
+  that preference forgotten, since the entry no longer exists; the board itself is a
+  switch away for everybody. Dragging a card between columns is untouched. (#102)
+
+- **The arrows on *Your career* move an entry past its neighbour, and the order number
+  is hidden unless you ask for it.** The arrows nudged a number by one and swapped with
+  nothing: pressing *up* on an entry at 0 did nothing, pressing *down* once put it behind
+  every other entry at 0 wherever it had been, and in experience, education and
+  certifications — sorted by date first — they changed nothing you could see unless two
+  entries shared a date. The number box on every entry's form was the one control that
+  reliably did anything, and it asked for an integer meaning "lower first". *Up* now swaps
+  with the entry above and *down* with the one below, the section is renumbered so the
+  numbers are exactly what the page shows, and the arrow at either end is greyed out. The
+  three dated sections take the number too, seeded once from their dates so nothing moves
+  on the day of the upgrade; a new dated entry still lands where its date puts it. The
+  number box is gone from the forms, with a sentence saying where the arrows are, and
+  comes back as *Show the order number on each career entry* under *Settings →
+  Appearance* — an accessibility choice, for anybody who cannot use the arrows or would
+  rather type. The preference travels with the export. (#203)
+
+- **Arrange puts the dashboard itself into an editing mode, and *Settings → Dashboard* is
+  gone.** Arranging was a list of widget names on another page, with four arrows and a
+  *Take off* beside each, and you switched back to see what a move had done. Pressing
+  *Arrange* now keeps you on the dashboard: every widget stays where it is and grows the
+  same four arrows and *Take off* in a bar above it, the widgets not shown are offered
+  below the grid with their sentences, and *Done* is a plain link back. The mode lives in
+  the address (`/?arrange=1`), so a reload keeps it and the back button leaves it; nothing
+  remembers that you were arranging, because the mode is a moment and not a preference.
+  Every action still works with scripts off — buttons that post, focus following the
+  widget that moved, a sentence saying where it landed — and dragging a widget into place
+  is the same addition it was, on the grid cells now rather than on list rows. What is
+  stored has not changed. (#201)
+
+- **The account menu is the top-right corner, and the theme switch is a row inside it.**
+  The last thing at the top right of every page was the sun-moon-monitor button, with the
+  account menu one control in from the edge — so the corner a person reaches for their
+  own name, their settings and *Sign out* held a preference toggle instead. The switch
+  lives in the menu now, as a row with its words beside the icon, above *Sign out*; it is
+  the same form posting the same way, applied the moment it is pressed as before, and
+  *Settings → Appearance* remains the explicit version. (#197)
+
+- **The header stays at the top while the page scrolls.** On any page longer than a
+  screen the wordmark, the navigation, the search and the account menu were gone after the
+  first flick, and getting anywhere else meant scrolling back up. The header floats now.
+  Its height is not a constant — the row wraps on a phone and in a language with longer
+  labels — so the script measures it once and on every resize, and everything that has to
+  clear it reads that one value: the sticky sidebars on *Your career* and *Your details*,
+  the skip link, every anchor through the root's scroll padding, and the line the section
+  navigation reads its position from. Where scripts do not run, the same rules fall back
+  to the header's usual height. (#195)
+
+- **Your details, Settings and Server settings use the whole screen.** Each is a sidebar
+  beside a page, and each capped the pair well short of a wide monitor — *Your details* at
+  896 pixels inside the 1280 the base template already keeps, the two Settings frames at
+  1024 — with the sidebar taking a good share of what was left, so a form drew in roughly
+  640 pixels on a 2560-pixel screen and the server's people, plugins and logs wrapped the
+  way the tables did before #188. The frames empty the page's measure now, as the tables
+  and the board do: a frame is a grid even when the page inside it is a form. The
+  one-question server forms keep their own narrow column, which is a different thing. (#198)
+
+- **The tab says which Postulo it is.** A page's title was the page's name alone —
+  *Dashboard*, *Your details* — so two instances side by side, or Postulo beside anything
+  else, were tabs nobody could tell apart, and a screen reader announced a page with no
+  application behind it. The title reads *Postulo > Dashboard* now, with the
+  administrator's instance name first, put on once in the base template so a page added
+  later cannot lose it. Levels are separated by a chevron — *Postulo > Settings > API
+  tokens* — and a middle dot qualifies a name inside one level, *Report · September 2026*,
+  so the two never read as the same thing. (#196)
+
+- **Server settings → Overview ends with how to keep Postulo going, not the health check.**
+  The last card held two lines an administrator reads once: the health-check address and
+  the Django admin's escape hatch. The address moved up into the *Software* card, where a
+  fact about the software belongs, and the admin hint lives in the wiki's *Configuration*.
+  In their place, one card on the page addressed to whoever runs the instance: money, at
+  buymeacoffee.com/tiagoagueda with the QR beside the link; code, with the repository and
+  how a change lands; translation, since every language but English is a machine draft
+  waiting for a speaker. The README and FUNDING.md promise reads, exactly, that nothing a
+  person is shown while looking for work asks for money — and names this page as the one
+  place inside the application that mentions support at all. (#199)
+
+- **What Postulo ships is the administrator's to switch, not yours — and is out of the
+  way until you ask.** *Settings → Plugins* offered a checkbox on every plugin, the built-in
+  ones included, so *Several telephone numbers*, the email notifier and the local store
+  were switches a person could untick for themselves. They no longer are. A plugin shipped
+  inside Postulo is decided by an administrator, for one person or for everybody, and the
+  page lists only what was installed on the instance unless *Show the plugins Postulo
+  ships* is ticked — and then shows them without a switch. The one thing that always shows
+  is a built-in an administrator decided for your account: a decision held over an account
+  never hides behind a check mark. **Breaking**: a choice you had made against a built-in
+  plugin no longer counts, and the upgrade forgets it. (#200)
+
+- **The support link is a QR code now, because a button can only be pressed by whoever is
+  already holding the device.** A README is read on a laptop, shown over a shoulder,
+  projected in a talk, pasted into a screenshot. In every one of those the *Buy me a coffee*
+  button was visible and unusable. The code is the same link in a form a second device can
+  pick up, and it replaces the button in the README, in `FUNDING.md` and on the wiki's home
+  page. The wiki sidebar keeps its text link: a sidebar has no room for a code.
+
+  **It was read back rather than trusted.** The code has little margin — stylised round
+  modules with the cup over the centre — and scaling it is not a matter of picking a round
+  number: a strict decoder reads the 3000px original at 300, 330, 375 and 440 pixels and
+  fails at 360, 400, 500 and every size above. 330 is shipped because it decoded under every
+  resampling tried, and `assets/support/NOTICE.txt` records that, along with what was done
+  to the file and what it resolves to. A phone is far more forgiving than a strict decoder;
+  anything that regenerates or resizes this file should still read it back first.
+
+  `TRADEMARKS.md` covers the code as well as the banner now. The banner file stays in the
+  tree, unshown, because links to it exist outside this repository. Nothing about the
+  promise changes: this is still the only place Postulo asks, and **nothing inside the
+  application ever will**. (#172)
+
+- **A plugin's kind and where it came from no longer wear the same badge, and the kind is a
+  word in your language.** Both pages that list plugins drew two different facts as
+  identical grey pills side by side, so nothing said that *importer* and *official* answer
+  different questions — and the kind was the raw slug, so a French reader was shown "source"
+  and "feature" in English. The person's own *Settings → Plugins* did not show where a plugin
+  came from at all, which is the page where it matters most.
+
+  The kind now takes colour, because it is a category from a small fixed set and colour is
+  what makes eight of them scannable in a list. **Where it came from stays grey**, and that
+  is not a default: `server/plugins.html` has said since #94 that provenance is *"deliberately
+  not styled as a reassurance — installing a plugin runs somebody else's code whatever this
+  says"*, and a green *Official* badge would undo that sentence. Both pages now draw both
+  tags through one partial, so they cannot drift apart again, and the origin appears on the
+  settings page for the first time.
+
+  Colour is never the only carrier: every tag says its own word, each tone reaches 4.5:1
+  against its own ground in both themes, and the palette repeats across the eight kinds on
+  purpose — eight hues told apart at a glance is more than a palette honestly gives, so kinds
+  rarely seen together share one and lean on the word. A kind this version does not know
+  shows its slug in the neutral tone rather than nothing, because a third-party plugin may
+  declare one added after this release. (#184)
+
+- **Grids use the whole screen; everything else keeps its measure.** Every page sat in a
+  1280-pixel column — `max-w-7xl` on `<main>` — so on a wide monitor a table with ten chosen
+  columns scrolled inside a box with grey on both sides, two nested scrolls to read one row.
+  `<main>` takes its width from the page now: the tables, the board, the dashboard and the
+  lists empty the cap and take the screen; forms, detail pages and prose keep the measure
+  they had, because a wide page is not a wide paragraph. The one criterion about line length,
+  SC 1.4.8, is level AAA, and its eighty-character measure is what the forms' `max-w-2xl`
+  already is. The header and footer span the width, so a masthead never sits narrower than
+  the table under it. Below 1280 pixels nothing changes. (#188)
+
+- **Server overview: the card at the bottom has lost its heading.** It said *Also*, which
+  names nothing — the other headings on that page are *Overview*, *Software* and *Data*, each
+  saying what is under it, and this one said only that there was more, which the reader can
+  already see. It is the heading somebody writes when a card has collected what did not fit
+  elsewhere, and that is what the card is: a link to the health check, and a link to Django's
+  admin or a note saying it is off. Both say what they are and where they go, so the card
+  carries itself. (#183)
+
+- **Twenty-four languages are no longer translated before anybody has read the English
+  once.** `test_every_european_union_language_stays_complete` held the twenty-four European
+  Union catalogues at 100% on every commit, which made adding one user-facing string cost
+  twenty-four translations — made by the same hand that wrote the English a minute earlier,
+  on wording that had not settled, for no reader. The promise was always about a *published
+  version*: what somebody installs should not have a gap in a language Postulo offers them.
+  It was never about a branch halfway through a feature.
+
+  There is now a `release` marker — *a promise that must hold in a published version, not in
+  every commit* — deselected by default exactly as `e2e` already is, and
+  `uv run pytest -m release` is **step 1 of *Making a release***, before the changelog is
+  moved or anything is tagged. The same twenty-four must be complete, checked by the same
+  assertions; the check is simply first and deliberate rather than implicit in a suite that
+  had already run. Ordinary work translates English, French and European Portuguese, which is
+  enough to see a change in three languages and catch what only shows up in one — the long
+  German string that broke a row in #165 was found that way.
+
+  Nothing else is marked. Plural rules, placeholder consistency, catalogue currency, the
+  "a started catalogue actually translates" gate and the render-in-every-language walk still
+  run on every commit, because those catch mistakes rather than measure completeness. The
+  risk is stated plainly in the issue: somebody can now commit a string only three languages
+  have, and that is only safe while the release step stays a hard gate. (#182)
+
+- **Every API Postulo has is in the wiki, and a test says when one is not.** *The API* named
+  every call but kept the scope of each in prose, and the three addresses that answer machines
+  about the instance — `/healthz`, `/metrics`, `/logs` — were rows in *Configuration* that
+  never said what they return. They have *Health, metrics and logs* now, down to each metric.
+  The plugin guide was the core repository's `docs/PLUGINS.md`, not the wiki, and it never
+  named the interface each kind of plugin satisfies; it is *Writing a plugin* in the wiki, with
+  every kind, its entry-point group and its interface, and every name `postulo.plugins.api`
+  promises. `docs/PLUGINS.md` stays as a pointer, because every plugin's metadata links to
+  it. `tests/test_wiki_surface.py` reads the wiki beside the checkout against the code, both
+  ways, so a call, a metric or a promised name without its line fails. (#170)
+
+- **The wiki is written where it is read.** Its pages lived in this repository's `wiki/` and
+  reached the Forgejo wiki only when somebody ran `scripts/publish-wiki.sh`. By the time
+  anybody looked, four pages — *Accessibility*, *Hardening*, *Listings*, *Reports* — had
+  never arrived, the other seventeen were five days old, and the images had never been
+  copied at all, so the wiki's front page had shown its logo broken since the day it was
+  added. The pages now live only in the `postulo.wiki` repository, the script and the copy
+  are gone, and `CONTRIBUTING.md` says how a page is written there. (#169)
+
+- **The dashboard is a grid of four columns, and a widget can be dragged into place.**
+  The last of three: #123 settled where an arrangement is stored, #124 settled how a widget
+  is moved by somebody not using a mouse, and this is the grid itself and the gesture.
+
+  **Four columns rather than five**, because four is the count in which the three widths
+  every widget already declares — a quarter, a half, a whole row — mean what they say. Five
+  has no half; a half-width widget in five columns is two columns or three, and every widget
+  would have had to be re-measured against a grid that divides by nothing.
+
+  **A widget has a width and a place in the order; the row falls out of the two.** That is
+  the whole model, and the reason it is worth stating is what it makes impossible: there is
+  no way to leave a hole in the middle of the page, no way to put two widgets in one cell,
+  and so no validating, no repairing, and no answer needed for what happens when a plugin is
+  uninstalled and its widget goes — the rest close up. A coordinate model would have needed
+  all three.
+
+  Dragging is added on top of the four arrows and does not replace them, which is the rule
+  this project has followed since the board learnt to drag: drag and drop fires on neither a
+  touch screen nor a keyboard. A drop posts to the same address the arrows post to and gets
+  the same sentence back saying which row and place it landed in, so a page arranged by
+  dragging and a page arranged by pressing arrows are the same page, saved the same way.
+  Nothing is draggable until the script makes it so, because an affordance that does nothing
+  is worse than none.
+
+  Widths stayed out of the person's hands on purpose. A width is the widget's own statement
+  about how much room it needs to be legible — a six-stage funnel is unreadable in a quarter
+  of a row — and what is being arranged is the order. A narrow screen gets one column, read
+  downwards; #73 is where the phone gets its own attention and this does not assume it
+  solved.
+
+  The "internal widgets plugin" the issue asked for is the registry that already exists,
+  named as one. Making a widget a plugin *kind* would put seventeen rows in *Server settings
+  → Plugins* for an administrator to switch off, and would need an entry-point contract
+  before anybody outside has asked for one; the part of that contract that actually matters
+  — a key that cannot collide with another provider's — shipped with #123. (#125)
+
+- **A column header clicks back to no sort at all, and a column can be dragged wider.**
+  Two of the four features Dispatcharr's channel table had and Postulo's did not; the other
+  two arrived with their prerequisites — selection with bulk actions, and editing in the
+  cell — which is why these two were left until last rather than done first.
+
+  Sorting was two-state and never returned to the table's own order, so there was no way to
+  undo a sort except by editing the address. It cycles through three now. A column that *is*
+  the table's default sort keeps two, because there is nothing to go back to and a third
+  click that changes nothing is worse than two honest states. And since the third state
+  takes the arrow away, every header now says in words what clicking it would do.
+
+  **A width is a preference, so it lives where preferences live.** Beside which columns show
+  and how many rows a page holds, on the profile, following the person to every device
+  rather than cluttering every link — which is the line this project already drew between a
+  question and a preference, and the one thing from that table that was deliberately *not*
+  adopted: theirs keeps the query in session storage and the sort in memory, so a reload
+  loses the sort and a filtered view cannot be sent to anybody.
+
+  The handle is the one place a script is unavoidable, since a width is a pointer gesture.
+  It is still an addition rather than a replacement: without a script no handle exists at
+  all and the columns size themselves exactly as before. And it is not pointer-only — the
+  handle is a button, the arrow keys widen and narrow it, and *Home* lets the column size
+  itself again, because a column dragged too narrow once must not be too narrow for ever.
+
+  Row reordering was not taken and is not meant to be: a channel list has an order somebody
+  chose, a company list has an order somebody *sorted*, and dragging a row in a sorted table
+  means either abandoning the sort or lying about it. (#136)
+
+- **The two halves of choosing a company's sector meet, and the consequences are handled.**
+  The list is NACE Rev. 2.1 and the picker is chips; what was left was everything that
+  follows from a vocabulary that can now be long.
+
+  The companies table draws industries as labels rather than a comma-separated run, showing
+  four and counting the rest — a bank that is also an insurer and a software house is three,
+  a conglomerate is more, and the cell is already narrow. Filtering stays a box you type in
+  rather than a menu, which is the same control at thirty-two names and at three hundred and
+  the only one that stays usable at both.
+
+  **Companies → Industries** gains a search that matches a name or a NACE code, shows each
+  code beside the person's own word for it, and says *Edit or merge* rather than *Edit*,
+  because merging is exactly the tool somebody needs after picking from a standard list
+  beside their own words. Only what has actually been given to a company appears there — the
+  classification is a list of suggestions, not a list of rows, which is what made it safe to
+  make the suggestions long.
+
+  Nothing renames a word somebody wrote themselves, and a company in three fields still
+  counts in three. (#141)
+
+- **Industries and tags are chosen as labels now, not as tick boxes.** Industries were a row
+  of checkboxes; tags were Django's default scrolling box you ctrl-click. Neither was a
+  label, and nothing in Postulo drew a chip — so this is a new control rather than a
+  restyling of an old one, and it is written once and used in both places.
+
+  **Layered, never substituted.** The checkboxes, the multiple select and the box for a name
+  that does not exist yet are all still in the page, still submitting; the chips are drawn
+  over the top and those are hidden. With the script blocked the forms are exactly what they
+  were, which is the rule the board's dragging already follows.
+
+  **A name that is new looks new before anything is saved** — outlined rather than filled —
+  because otherwise people create *Fintech*, *FinTech* and *fintech* and find out afterwards
+  that the slug collapsed them. Tags gained the same "add one that does not exist yet" that
+  industries always had, matched by slug, and a tag made this way keeps no colour: colours
+  are chosen on the tags page, where there is room to see them beside each other.
+
+  **The keyboard vocabulary is a decision, and one of its conventions is deliberately not
+  followed.** Enter commits what was typed rather than submitting the form; Escape abandons
+  it; the arrows walk between labels, mapped through the reading direction; every remove
+  button carries the name inside it, so eight of them are eight different announcements
+  rather than eight identical ones; and adding or removing one says so in a live region.
+  **Backspace does not delete the last label** — it is the convention, and it is also a way
+  to delete something by pressing the key you press to correct a typo, in a control whose
+  values are somebody's own words.
+
+  The remove button is 24 by 24 with room around it, which SC 2.5.8 has caught this project
+  over twice already, and the × sits at the end edge rather than the right. (#139)
+
+- **A widget can be placed in two dimensions without a mouse.** *Move up* and *move down*
+  are a complete vocabulary for a list and not for a grid, and `app.js` states the rule that
+  makes this a prerequisite rather than a refinement: drag and drop does not fire on touch
+  screens and is not reachable from a keyboard, so it is an addition to the control that
+  works everywhere, never a replacement for it. The grid cannot ship until the control
+  exists.
+
+  **The dashboard is a flow rather than a matrix, and that chose the mechanism.** Widgets
+  have widths and fill rows in order, so there is no cell to name — which rules out a
+  row-and-column picker, and rules out a "move this one, then choose a destination" mode
+  that would need two interactions and state between them to work with scripts off. What is
+  left is four directions over the order: *left* and *right* move one place, *up* and *down*
+  move a whole row. On a narrow screen there is one column and the two axes are the same
+  move, which is what *up* means when there is only one column.
+
+  Every one of them is still a form that posts. An arrow that cannot act is disabled rather
+  than absent, so the cluster keeps its shape and the arrow somebody reaches for is where it
+  was last time; the redirect carries a fragment so focus lands on the widget that moved;
+  and a message says which row and place it landed in, because a move that happens in
+  silence is a move somebody using a screen reader has to go looking for. Two new arrows
+  joined the icon set, and the stylesheet already mirrors that pair for right-to-left. (#124)
+
+- **Every account owns its dashboard arrangement from the day the account exists.** Nothing
+  was ever shared between accounts — two people who had never arranged anything were looking
+  at the same *list of keys*, each computed against their own records — but the arrangement
+  itself belonged to nobody until somebody touched the setting. It is stored now, from the
+  moment the profile is, which is what a grid needs before a widget can be dragged into
+  anything.
+
+  **The null that meant *never arranged* was load-bearing, and what it carried is now
+  written down.** It made a widget added in a later release appear for anybody who had never
+  arranged their dashboard. With every account holding a list, nobody is ever "never
+  arranged" — so the rule moves to a seen set: every key an account has already decided
+  about, and a key in neither list is new *to that account*. That is the one of the three
+  candidates that also works when the new widget arrived with a plugin installed on a
+  Tuesday rather than with a release, which a generation marker could not.
+
+  **The trade is made knowingly.** A new widget no longer walks onto a page by itself; it
+  waits on the arrange page under *New*, with the dashboard naming what is waiting, and
+  saying no is an answer that is remembered. Strictly that is one fewer thing happening
+  without being asked — the old behaviour changed somebody's page during an upgrade.
+
+  **And the key namespace is decided while it is free**: a bare key is Postulo's, anybody
+  else's is `provider:key`, and registering the wrong shape is an error at start-up. A key
+  lands inside every stored arrangement, so a collision found after people have arranged
+  their dashboards is a data migration of every one of them. The arrangement travels in the
+  archive now too (format 12), and the seen set with it — without that, a restore would
+  announce every widget in Postulo as new to somebody who has been reading their own
+  dashboard for a year. (#123)
 
 - **A theme says which kinds of document it sets, and nothing offers a pairing it cannot
   produce.** A theme used to be two things at once: two choices frozen into the model, and a
@@ -3399,6 +2506,888 @@ All notable changes to Postulo are recorded here. The format follows
   complete, documented and one button, not the number of links pointing at it. (#86)
 
 ### 🐛 Fixed
+
+- **The interface stopped deciding in English what it would say in sixty-eight other
+  languages.** Four habits, each invisible to anybody reading Postulo in English, which is
+  why each had lasted. The bulk bar counted ticks in the browser and chose between "One row
+  ticked." and "%(count)s rows ticked." with `n === 1`; that is the English rule and thirteen
+  of the languages offered disagree with it, Polish needing a third form for 5 and up and
+  Ukrainian putting 21 back in the first. Nothing portable fixes that in JavaScript, and
+  nothing has to: a page holds a known number of rows, so the server now writes out the
+  sentence for every count the bar can reach and the script indexes it.
+
+  The password meter appended zxcvbn's own advice to the translated strength word, and only
+  the English zxcvbn pack is vendored, so a French reader was told "Fort · Add another word
+  or two" — inside a polite live region, on every keystroke. The advice is now shown where
+  the pack and the page agree on the language and left out where they do not; the day
+  `language-fr.js` is vendored, naming it on the template turns it back on. The live region
+  is the strength word alone, and the word is written only when it changes, so typing a
+  password no longer interrupts a screen reader five times a second.
+
+  Seventy-three date formats were spelled out in templates and views — `j M Y`, `j M Y, H:i`,
+  `M Y` — which fixes day before month before year and the hour at 14 rather than 2 p.m. for
+  every language at once. That is already wrong for Hungarian, which writes the year first,
+  and for Lithuanian, which marks it; it would be wrong for most of what #71 adds. They ask
+  for Django's own names now, which resolve against the reader's language. Only Django's
+  names: `get_format` hands an unrecognised name back to the page, so an invented format that
+  one locale has not defined prints the literal word `SOME_FORMAT` to whoever reads in it,
+  and there is a test over `languages.LANGUAGES` that every name answers in every language
+  offered. Thirty of those languages have no format module in Django at all and used to land
+  on its American default; they now fall back to the British English the interface is written
+  in, which is what they were already seeing. British English keeps its 24-hour clock through
+  a format module of its own, because Django's `en_GB` says "2.30 p.m." and no template
+  Postulo has shipped ever did. A `test_template_lint.py` rule fails on a format written out
+  in a template or a view, so these do not come back one page at a time; a bare `Y` and the
+  `Y-m-d` an `<input type="date">` parses stay written out, with the reason beside them in
+  the lint. Percentages were
+  fixed as `{{ share }}%`, which is neither the French "42 %" nor the Turkish "%42", and are
+  now one string the catalogue can rearrange.
+
+  And four sentences were being assembled from pieces. An API token said "created" and then a
+  date, "expires" and then a date; a translator was handed half a clause and no promise about
+  which side the date would end up on. The board's explanation ended at a semicolon, with
+  "see them in the table" translated on its own and the full stop written in the template, so
+  the link could not be moved and the sentence could not be ended anywhere else. The quiet
+  threshold had a bare "days" after a number field, with no singular for 1 and nowhere to put
+  a second plural. Each is now a whole sentence with the date, the address or the count as a
+  placeholder.
+
+  An English reader sees three differences, all of them Django's `en_GB` rather than
+  Postulo's: a calendar heading and the three detail-page dates that spelled the month out
+  now abbreviate it, the compact `16 Sep` in rows and CV columns now spells it out, and the
+  comma between a date and a time in six places is a space. The dashboard's next-interview
+  column was widened to hold a month with its name in it, which is what most languages were
+  always going to need. (#225)
+
+- **Paging to the last page no longer costs you your place.** The sort and pagination
+  controls were given ids so that htmx could put focus back after a swap, which works for a
+  control that survives the swap and not for one that removes itself: pressing *Next* onto
+  the last page takes *Next* off the page, so there was no longer anything for focus to
+  return to and it fell back to the top. Somebody working through a long list by keyboard
+  reached the end and started again at the skip link. A control that can be swapped away now
+  says which group it belongs to, and focus goes to whatever is left of that group — here,
+  *Previous*. (#227)
+
+- **The page script stopped failing in silence.** Four things went wrong without saying so,
+  and what they had in common is that the page went on looking correct afterwards. A filter,
+  a sort or a page link is an htmx request that replaces a table, and htmx does not swap a
+  500 — so a request the server refused, and a request sent from a train with no signal, both
+  left the previous rows sitting where they were. Nothing listened for either failure and no
+  template had ever named an indicator, so the honest reading of the screen was that the
+  filter had found those rows. There is one `role="alert"` region on every page now, empty
+  until there is something to report, filled by a handler delegated from the document; it
+  says which status came back, because 503 and 500 are different problems, and it says that
+  nothing on the page changed, because that is the part nobody can see for themselves. The
+  part being replaced carries `aria-busy` while its request is in flight — the element htmx
+  marks is the sort link, and what a person is waiting for is the table.
+
+  **A session that had expired filled the table with the sign-in page.** An `XMLHttpRequest`
+  follows a redirect without telling the script it happened, so htmx never saw the 302 that
+  means *sign in first*: it saw the 200 the sign-in page answered with and did what it does
+  with a 200. Leave a filtered list open over lunch, touch a filter, and a masthead, a footer
+  and a password field appeared inside the table, on a page that still looked signed in. A
+  redirect to the sign-in page answering an htmx request is now `HX-Redirect`, which sends
+  the browser there as a page and keeps the `?next=`, so signing in comes back to the list
+  that was open. Only that one destination: every other redirect a view makes is one it
+  meant, and the swap that follows is what it was written to expect.
+
+  **The back button gave back controls that no longer worked.** A table swap pushes an
+  address, and htmx kept a copy of each of those pages in `sessionStorage`. Restoring one put
+  the column-resize handles, the *Select all* button and the label chips back into the markup
+  with none of their listeners, and the functions that would have attached them then skipped
+  them because the markers were already there — so Back produced a page whose controls looked
+  exactly like themselves and did nothing at all. It also left applications, companies and
+  people in `sessionStorage`, where signing out in the same tab does not touch them. htmx
+  keeps no copy now and Back asks the server, which costs a page load and is worth it twice
+  over; the views have answered a restore with a whole page since they were written. An
+  instance upgrading to this clears what is already in that store the first time a page is
+  saved.
+
+  **And the export buttons locked after the first press.** The guard that stops a double
+  click marks a form and lets go again on `pageshow` — but a form whose answer is a file
+  never leaves the page, so `pageshow` never came. *Download the archive*, *Export PDF* and
+  *Download PDF* were one-shot buttons for the rest of the visit, including the one on the
+  page that asks you to take a copy of everything before deleting your account. Those forms
+  say what they are, and the guard lets go of them a few seconds later. A delay rather than
+  an exemption: the accident it exists for is a double click, which happens inside a second,
+  and a second export a minute later is not an accident.
+
+  Underneath, the six functions that add something to swapped-in markup share one helper
+  instead of writing their own three registrations each — the two written last had forgotten
+  the swap, so a dashboard widget that came back in one could not be dragged. The count on
+  the server log page is no longer a live region, since that page filters with a whole page
+  load and had never had a change to announce. (#226)
+
+- **One slow request no longer stops the whole instance.** Every request was a transaction,
+  and on SQLite Postulo opens transactions *immediate* — the write lock is taken before the
+  view runs and given back with the response. For a page that is milliseconds, and it is the
+  price of two requests never colliding. But a capture waits up to ten seconds for somebody
+  else's web server and five more for their `robots.txt`; a CV can be a whole Chromium; an
+  export reads every record and every file an account owns. Each of those held the write lock
+  for every second of it, and the three gunicorn workers, the scheduler and the task worker
+  queued behind. Anything still waiting after twenty seconds failed with *database is locked*,
+  which is how one capture from a slow job board became somebody else's error page.
+
+  Those views have left the request's transaction and wrap their own writes instead — the
+  capture row, the logo, the snapshot and what saving it schedules, and what an application
+  is told was sent with it. The rate limit is deliberately outside: an allowance spent making
+  the server fetch a page has been spent, and rolling it back with a failed request is how a
+  limit becomes no limit. The export is the one read worth protecting, so the archive's
+  manifest is still read inside a transaction while the files, which never had that
+  guarantee, are copied outside it. This is view by view rather than, say, all GETs at once,
+  because leaving a transaction is a decision about what has to succeed or fail together and
+  there is no answer to that which is true of every view of a given method.
+
+  **The two pages that say what an export contains built the whole export to find out.**
+  Every record the account owns, read, nested and turned into JSON, so that eight numbers
+  could be printed — on the page offering the download, and on the page asking whether you
+  really mean to delete your account, which is the one page in Postulo meant to be read
+  slowly. They count now.
+
+  **Pressing *Send* with a CV and a letter starts one Chromium rather than two.** Launching
+  the browser is most of what rendering costs on that backend, and it was launched and torn
+  down once per document. A report downloaded twice is also drawn once: that PDF is handed
+  over and filed nowhere, so the bytes are kept against the SHA-256 of the HTML they came
+  from, for a few documents, in the worker that drew them. Never for a snapshot — what an
+  employer received is drawn afresh, because a record that is a copy of something else is not
+  a record.
+
+  **And the container gives a worker two minutes rather than gunicorn's thirty seconds.**
+  Thirty is a budget for a page and not for drawing a PDF on a Raspberry Pi, where the worker
+  was killed part way through with no answer and nothing in the log but a silent restart.
+  `GUNICORN_CMD_ARGS` is the one lever over any of this, it is documented, and the image's
+  command deliberately repeats none of what it sets. (#220)
+
+- **A plugin reaches every process now, whatever kind it is, and comes back from a restore as
+  it went in.** Four things about installing, switching off and restoring a plugin contradicted
+  what *Writing a plugin* and the Plugins page promise, and the audit found them together
+  because they are one story told four times.
+
+  **The installer knew four kinds out of eight.** The entry-point groups that make a package a
+  plugin were typed out when there were four of them — sources, notifiers, stores, syncs — and
+  never grew with the registry. A wheel declaring `postulo.transports`, `postulo.outboxes`,
+  `postulo.features` or `postulo.importers` was refused for declaring no Postulo entry point,
+  about an entry point Postulo's own documentation had told its author to write; and those same
+  four were the only kinds rebuilt after an install, so one that did get in was invisible until
+  something else happened to refresh it. Both places ask the registry now, so there is one list
+  and it cannot go out of step with itself.
+
+  **A change reached only the process that made it.** The image serves from three web workers
+  and schedules from a container of its own, each with its own idea of what is installed, and an
+  install, a removal or a switching off rebuilt that idea only where the request happened to
+  land. A plugin an administrator had just switched off went on running in the other three —
+  with whatever credentials somebody had given it — and a notifier just installed was "not
+  installed" to the scheduler that was meant to send with it. The record on the data volume is
+  the one thing all of them can see, so every write moves its stamp and every process rebuilds
+  from it the next time it looks a plugin up: at the moment the answer is used rather than on
+  somebody's timer. Nothing here writes, which is why it sits beside #221 rather than undoing
+  it — that kept the scheduler out of the boot-time sync because two containers were writing the
+  record at once, and this is the reading half of the same problem. A first install is also what
+  creates the directory, so catching up puts it on the import path of a process that started
+  before it existed.
+
+  **A restore put back something else.** `plugins sync` reinstalls after an upgrade from what
+  the record says, and it dropped two of the fields it was reading. A plugin the administrator
+  had switched off came back switched on, which is not a decision an upgrade gets to make; and
+  the marker saying which Postulo the plugin is for — which only a catalogue can state, never
+  the wheel — was cleared, so a plugin that no longer fits this Postulo looked on the page as
+  though nobody had ever asked. The fetch then downloaded whatever the catalogue was offering
+  that day and checked it against the checksum of the version that had been installed, so a
+  restore failed the moment the catalogue moved on, and would have upgraded the plugin behind
+  the administrator's back if it had not. It asks for the recorded version.
+
+  **And somebody else's import happened inside somebody's page.** A plugin was loaded lazily, in
+  whichever request first needed one of its kind, guarded by `except Exception` — which is no
+  guard at all against `SystemExit`, the thing a module raises when it dislikes its
+  configuration, so a broken plugin ended a worker mid-request instead of ending itself. Every
+  group is loaded at start-up now, where the log is and where an administrator is looking, and
+  the guard catches everything except Ctrl-C. A plugin the registry then turns away for not
+  providing the interface it claims no longer keeps what it registered on the way past: its
+  templates had already reached the renderer and its catalogue the translator, which are the two
+  things a plugin can do to every page on the instance, and both now happen after the checks.
+
+  What the page, the command and *Contributing* say about this is true as well. A plugin is in
+  use everywhere the moment it is installed, and a restart adds nothing — because a plugin with
+  pages or tables of its own cannot be installed from a wheel at all. `INSTALLED_APPS` is fixed
+  when the process starts, nothing mounts a plugin's URLs, and `migrate` has run long before
+  anything looks at a plugin, so such a plugin has to be built into the image. *Contributing*
+  says that now, where it used to say "be in `INSTALLED_APPS`" as though an installed package
+  could put itself there. (#228)
+
+- **A document now speaks its own language, and a message speaks the reader's.** Nothing
+  anywhere switched translation away from the language of the request, which is the wrong
+  answer in exactly the two places it matters.
+
+  A CV or a letter declares a language. The words the person wrote were translated by #131;
+  the page around them was not, so a French CV exported by somebody reading Postulo in
+  English came back headed *Experience* over *Mar 2021 – present*, and a letter could carry
+  two dates in two languages — one from the template, one from the `{{ date }}` placeholder,
+  which was built by `strftime` and so was always English whatever anybody had chosen. Both
+  are now rendered in the document's own language, falling back to its owner's and then to
+  the instance default, and the date is written the way that language writes dates.
+
+  A copy sent to an external store was labelled with the owner's interface language rather
+  than the document's, so a French CV arrived in Paperless filed as English — and finding it
+  again is the whole reason it was sent there. A render is now filed under its own language;
+  an upload, which has no language of its own, still follows the person who uploaded it.
+
+  The title a PDF viewer shows in its title bar, and that a screen reader announces, was the
+  variant's name — *Backend, English* — which is the person's private filing and is marked in
+  Postulo as being for them and not for the employer. It is the holder's name and what the
+  document is now, and so is the file name that gets attached to portals and emails.
+
+  And a notification is worded in the language of whoever receives it. A reminder announced
+  by the scheduler had no request to take a language from, so it came out in the instance
+  default however the person had set Postulo up; one announced by a capture arriving through
+  the API followed the `Accept-Language` of whatever tool sent it. Since a notification
+  carries words that are already written, switching language as it was sent would have been
+  too late — the message is built inside the override now, and the sentence a person reads at
+  three in the morning is in their own language. (#223)
+
+- **The PDFs Postulo writes are documents now, rather than pictures of documents.** Nothing
+  they contained had any structure: a screen reader had no headings to move between, whatever
+  an employer's applicant tracking system read the file back with got the words in the order
+  they happened to be drawn in, and the language every document has declared since #67 reached
+  a reader through a tag tree that was never written. Both renderers are asked for one now —
+  WeasyPrint for `pdf/ua-1`, Chromium for `tagged` and `outline` — and the markup gives them
+  something to build it from: a job title is a heading under its section's heading instead of
+  a bold paragraph, a letter's subject is the letter's one heading, and the file carries its
+  author, which WeasyPrint reads out of the document rather than taking as an argument. A CV
+  whose contact block is deliberately switched off still names nobody, in the file's properties
+  as on the page.
+
+  Deliberately not PDF/A, which is tagged as well and archival besides. PDF/A is a promise that
+  the file will still render identically in fifty years, and it is kept by embedding an ICC
+  output intent and every font the document uses. Postulo cannot make that promise about a
+  theme a plugin ships (#132), and a conformance claim that cannot be honoured is worse than
+  one that was never made.
+
+  A long address used to run off the edge of the page and out of the file with it: a
+  hundred-and-twenty-character link has nowhere to wrap, and the column it sat in was sized by
+  its own content, so it pushed itself past the margin. Every theme breaks one now. The contact
+  line's separators were a CSS `::after`, and generated content is painted onto the page and
+  never written into its text — so whatever read the PDF back got the telephone number run into
+  the email address with nothing between them. They are real characters in the markup now, and
+  a theme picks which character by overriding a block instead of redeclaring a rule.
+
+  **The arrows on a CV** still had the bug #203 fixed on the career page. They nudged the order
+  number by one, so *up* at the top did nothing at all, one *down* could jump past every entry
+  that shared a number, and two entries two numbers apart needed two presses, the first of them
+  invisible. They swap with the neighbour the page drew and renumber the CV densely afterwards,
+  which is the same thing the career page does and the same code doing it; at either end the
+  arrow is greyed out rather than removed, so the pair keeps its shape. An entry added to a CV
+  takes the number after the last one instead of the count, which after a removal was a number
+  something already on the page had, and the new entry landed in the middle of it.
+
+  **A cover letter can be read the way the employer will read it.** The preview was reachable
+  only without an application — the one version of a letter nobody ever sends, because every
+  placeholder in it is empty — so the letter's page now offers the applications to read it
+  against. A placeholder Postulo knows and has nothing to fill is drawn as a marker in the
+  preview rather than as nothing, which is the difference between seeing a gap and reading
+  "Dear ,". *Send* puts the filled letter in front of you before freezing it where there is a
+  gap, and only where there is one: a step everybody has to press through is read once and
+  clicked past for ever after. `?application=abc` used to reach the database as a primary key
+  and come back as a 500; it means what it says now, which is no application. And there is a
+  `{{ contact }}` placeholder, because the follow-up starter has asked for a name in square
+  brackets since it was written and the application already knew whose.
+
+  **The Europass import stops inventing things.** A file that states no CEFR level for a
+  language had one invented for it — B1 — and printed on a CV; a level is a claim about
+  yourself that somebody will test in an interview, so a language may now say that its level
+  was never stated, and says nothing at all when it does. Every export names the language it
+  was written in and nothing here read it, so a career typed in Portuguese arrived with a blank
+  record language and the fallback warnings from #131 then fired on every entry of a CV that
+  needed no translation whatsoever. And the skill headings an import writes — "Digital",
+  "Job-related" — were fixed English words even on a Portuguese record; they are translated
+  now, out of the europass plugin's own catalogues, because core never translates a plugin's
+  strings. (#235)
+
+- **Keyboard and focus failings that every accessibility check passed.** Seven of them, found
+  by using Postulo rather than by scanning it. axe reads a document: it cannot press Tab and
+  say where focus landed, it cannot tell that one letter fires an action nobody can switch
+  off, and it cannot look at a high-contrast theme. Every page passed while all of this was
+  true.
+
+  **Focus stopped being dropped.** Sorting a table, turning a page and switching theme are
+  htmx swaps, and htmx puts focus back after a swap only for an element that carries an `id`.
+  None of those three had one, so Enter on a column header sent focus to the body and the next
+  Tab started again at *Skip to content* — which is the whole page to walk back through, on
+  every sort and every page turn.
+
+  **A single key can now be switched off.** "d" discarded a capture, "j" skipped it and "/"
+  took the search box, wherever you were and with no way to stop them. Somebody dictating to
+  their computer says every letter of every sentence, and "d" was a listing gone without a
+  question. There is a switch under *Settings → Appearance*, on to begin with because the
+  review screen is worked through forty times in a row and the keys are why that is bearable.
+  Shortcuts that need Ctrl are not single keys and are untouched, and a keystroke that is part
+  of a character an input method is still composing now belongs to the character.
+
+  **A field shows where focus is in a high-contrast theme.** `outline-none` on every input,
+  select, textarea and table filter compiled to `outline-style: none`, which beat the rule
+  that draws the focus ring and left a border colour and a shadow — the two things forced
+  colours throws away. So focus was invisible on every form in Postulo for anybody using one,
+  and nothing Postulo runs asks that question.
+
+  **A card on the board says which application it is.** Thirty menus all called *Change
+  status* are thirty controls nobody can tell apart; each is named by its role and employer
+  now. The menu also stopped saving on the way past: arrowing down a closed list in Chromium
+  on Windows fires a change at every status it goes by, and each of those was a status change,
+  a timeline entry, and a job search that did not happen. A choice made with the keyboard is
+  saved on Enter or when the menu is left; a choice made with the pointer saves at once, as it
+  always did, so advancing a card is still one click. The help explaining the board hung off
+  the card, which nothing can focus, so it had never been read to anybody — it hangs off the
+  menu it is about. And the cards are made draggable by the script rather than by the
+  template, which is the rule the dashboard already followed: with scripts off, nothing offers
+  a gesture that cannot happen.
+
+  **The heading on a settings page is the page.** *Settings* was the `h1` on about twenty
+  pages and each page's own name was an `h2` level with its sections, so jumping to the first
+  heading said "Settings" wherever you were. The sidebar's label is a label now, the page's
+  name is its heading, and its sections sit under it.
+
+  **The column resize handle tells the truth.** It was called *Widen Name* although the same
+  control narrows it with ArrowLeft, an arrow press said nothing at all, and what it did say
+  it said through a `<caption>` — which *is* a table's accessible name, so announcing a width
+  renamed the table to it. It is a splitter with a neutral name and a width it reports, it
+  says what it did from a region outside the table, and a drag the browser takes away no
+  longer leaves it resizing a column nobody is holding.
+
+  **One red button, and *Cancel* goes somewhere.** Four spellings of "this is the dangerous
+  one" across twenty-odd templates are `.btn-danger` and `.btn-danger-ghost`, so the answer to
+  "is this the destructive one" is in one place rather than in whichever template you happen
+  to be reading. And *Cancel* on a confirmation page goes where the view says instead of
+  following the browser's `Referer`, which is absent from a bookmark and from a fresh tab and
+  left the dashboard as the fallback — the one place somebody halfway through deleting
+  something did not mean to be. (#227)
+
+- **The API's catch-up cursor could not actually be walked.** #230 gave every list an
+  `updated_since` cursor — ask what changed since a moment, take the `updated_at` of the
+  last row you read, ask again from there — and two things stopped it working. The moment it
+  handed out was rounded to the millisecond while the value it compared against was stored to
+  the microsecond, so the timestamp a caller read back named an instant *before* the row it
+  came from, and that row arrived again on the next page. And a moment alone cannot get past
+  a run of rows saved in the same one, which is what an import or a bulk edit writes: where
+  the run was longer than the page, every page after it was rows the caller already had.
+  Together they meant a client either looped or, if it stopped when a page brought nothing
+  new, silently never read the rest of the account.
+
+  Moments now go out whole, so a value the API gives is a value it takes back, and the cursor
+  has a second half: `after_id`, the id of the last row read, which turns it from a moment
+  into a position in the order the list is already sorted by. Sent without it, a list answers
+  exactly as before. The merged `/documents` list takes no `after_id` and says why: its ids
+  come from two tables, and one id used against both would silently drop files. (#245)
+
+- **Insights, the report and the salary column counted the wrong things.** Five figures that
+  people read and believe, each of them measuring something slightly different from what it
+  said.
+
+  An application went quiet the morning after an interview. *Quiet* means nothing has
+  happened and nothing is planned, and an interview stopped counting as planned the moment it
+  ended — so an interview booked three weeks ahead, attended, and not yet written up left an
+  application that had been silent for twenty-one days, and the notifier said so. An
+  interview still waiting for its outcome now means the application is waiting, whether its
+  time has passed or not.
+
+  Withdrawn applications counted as waiting on a reply for ever. Only *ghosted* was excluded,
+  so the Outcomes widget carried a number that could only grow, and withdrawing — which is
+  the person saying they have stopped waiting — did nothing to it.
+
+  The report and Insights disagreed about interviews. Insights read them from the timeline;
+  the report counted only interviews settled through the diary, so somebody who wrote their
+  interviews down as they happened was shown a number by Postulo and a nought on the document
+  an employment office reads. Both now use one counter, and an interview typed onto the
+  timeline counts as much as one settled from the diary, which is what the handbook always
+  promised.
+
+  Moving an interview left its reminder saying the old time. The reminder arrived at the
+  right moment naming the wrong one, which is worse than not arriving; the words are now
+  rebuilt from the interview whenever it moves.
+
+  And salaries. The spreadsheet importer wrote EUR onto everything while stripping the `$`
+  and `£` that said otherwise; `50-60k` came in as fifty against sixty thousand, because the
+  `k` was read for one side only; the range separator matched a bare `a` anywhere, so
+  "Salary" split in the middle of a word; and the period was never read, so `15 €/h` was
+  stored as fifteen euros a year. All four are fixed, the mapping page now offers the
+  currency a sheet is in for cells that do not say, and a cell that does say wins. A salary
+  on screen names its period — thirty to forty with nothing after it read as a year's pay —
+  and the salary column sorts by currency first and then by the figure brought to a year,
+  instead of putting every hourly rate below every annual one and mixing dollars in with
+  euros. Currencies are three letters, upper-cased as they are typed and refused when they
+  are not a code at all. (#224)
+
+- **Every page of the API was built by reading everything first, retrying a capture made a
+  second capture, and the schema answered anybody who asked.** Five faults in the one
+  surface the browser extensions and `postulo-mcp` are built on, found in the September
+  audit.
+
+  Each list shaped every row it could see and then let django-ninja cut a page out of what
+  came back. Asking for a hundred applications on a thousand-application account ran the
+  subqueries, walked the tag prefetch and built an absolute address for all thousand, and
+  an agent paging through the lot paid that on every page — so reading a search end to end
+  cost the square of its size. A list now hands over the query itself and only the rows
+  that survive the cut are shaped. The count is still of the whole list.
+
+  `GET /captures` was not paginated at all, though *The capture API* has said since it was
+  written that lists take `limit` and `offset` and come back as `{"items", "count"}`. It
+  returned the first fifty rows in whatever order the database offered them, so a review
+  queue nobody had kept up with simply stopped at fifty with nothing to say so. It is a
+  page like the others now, newest first, which changes its shape: a client reading the
+  bare array has to read `items` instead. A test now reads the API's own schema and fails
+  on any list that hands back everything at once — the check that was missing, since the
+  test reading the wiki page checks paths and scopes and never shapes.
+
+  Capturing was not idempotent, while the code's own comment took retrying for granted. A
+  client that sends a posting and never sees the `201` cannot tell a lost reply from a
+  lost request, and the safe thing for it to do — send it again — left two captures of one
+  posting to decline and two notifications about it. A capture may now carry an
+  `Idempotency-Key` of the client's own invention: the first answer given under that key
+  is the answer it keeps getting, for a day, with nothing fetched and nobody told twice.
+  `/captures/known` stays what it always was, advice asked for beforehand, which does
+  nothing about the answer that went missing afterwards.
+
+  `/api/v1/openapi.json` answered without a token. The documentation page has always been
+  off, but django-ninja guards the schema only when it is given something to guard it
+  with, so the description of every call — and the plain fact that this address is a
+  Postulo — was there for anyone who asked, against the threat model's promise that the
+  API answers 401 to everything without a live token. It now wants a live token, of any
+  scope, or a person signed in to the instance.
+
+  And there was no way to ask what had changed. Lists could be narrowed by the date
+  something was applied for and by nothing else, so anything holding a copy of a search —
+  an agent, an extension — had to read all of it again and compare. Every list now takes
+  `updated_since` and answers with what changed at or after that moment, oldest change
+  first, and every row carries the `updated_at` to ask with the next time. A deletion is
+  not in it, because a row that is gone cannot be listed; the outbound webhooks that would
+  say so are their own feature (#240). (#230)
+
+- **A backup now holds what a restore needs, and a restore in a container is something you
+  can do safely.** The archive was the database and the media, and that is not the whole of
+  an instance. The plugins live on the data volume — the record of what is installed and the
+  packages themselves — and were in no archive at all, so a restore onto a fresh instance
+  brought back connections belonging to plugins that were not there, and said nothing about
+  it. They go in now, whole; `--no-plugins` leaves them out for anyone who keeps that
+  directory another way.
+
+  The key the connection secrets are encrypted under cannot travel in the archive, and must
+  not: it is what protects the part of the archive that is protected at all. So the manifest
+  carries a one-way mark of it instead, and `restore` compares. An instance rebuilt with a
+  new secret key and no `POSTULO_FIELD_KEY` is now told at the restore that the passwords and
+  tokens in the connections it just put back cannot be read, and how many there are — rather
+  than finding out weeks later, one failing connection at a time. The wiki's backup page said
+  that losing the secret key "will not lose your data, but it will log everyone out", which
+  was only the first half of it; the configuration page had been saying the rest for a while.
+
+  And restoring overwrites the database that is there, through SQLite's backup API or
+  `pg_restore --clean`, which is safe only when nothing else has it open. In the container
+  the documented route was `exec` into the running web container, with gunicorn and the
+  scheduler reading through it. The wiki now gives the route that works — stop the services,
+  then `docker compose run --rm -e POSTULO_SKIP_MIGRATE=1` — and `restore` refuses when it
+  can see anything else connected, unless `--force`. It sees every connection on PostgreSQL,
+  and on SQLite the files WAL leaves beside the database for as long as one is open, which
+  catches the scheduler and misses a web server that has been idle a while; a check is a
+  second pair of eyes and stopping the services is what makes it safe, which the page says.
+  The instructions for restoring by hand were missing the step that matters most under WAL:
+  delete the stale `-wal` and `-shm` beside the file you have just put back, or SQLite
+  replays a log written against a different database.
+
+  Archives taken by earlier versions still restore. The format is 2, and anything from 1
+  upwards is read, because the archive somebody restores from is by definition older than
+  the Postulo reading it. (#234)
+
+- **The scheduler no longer sends things twice, no longer dies on one bad item, and now says
+  whether it is still going round.** It is one command in a loop, which is the right size for
+  a single instance and left four things to chance.
+
+  Nothing claimed the work before doing it. A reminder was announced and *then* stamped, so a
+  restart in between — or the perfectly ordinary mistake of running cron and `--loop` at once,
+  which the Compose file makes easy — announced it again. Store copies were worse: two passes,
+  or a pass overlapping the *Send now* somebody had just pressed, could both send the same
+  document to the same store, though the handbook said that never happened. Everything is now
+  claimed first with a conditional update, so whoever changes the row has the work and the
+  other finds nothing to change. For a reminder that means the stamp is written before the
+  message goes: a message lost to a crash in that half-second is one nobody gets, while the
+  alternative is somebody's telephone going off twice at three in the morning.
+
+  One bad item ended the process. A reminder whose posting had lost its company, a notifier
+  raising something nobody anticipated, a dropped connection — any of them killed the loop,
+  and the container restarted through the entire entrypoint to try the same thing again.
+  Failures are now caught per item and per pass, and the database connection is refreshed
+  each time round, which is what Django does between requests and there are no requests here.
+
+  Syncs ran inline with no limit, so one slow calendar server held up every reminder behind
+  it. A pass now spends at most two minutes starting new ones — `--sync-budget`, `0` for no
+  limit — and leaves the rest to the next pass. A sync already started is never cut off.
+
+  And nothing anywhere recorded that a pass had happened, so an instance whose scheduler had
+  stopped looked exactly like one where nothing was due. Each finished pass now writes its
+  time to a file on the data volume, which the `scheduler` container's own healthcheck reads —
+  it had been inheriting the image's healthcheck, which curls a web port it does not serve,
+  so it was permanently unhealthy and told nobody anything. `/metrics` reports the same
+  heartbeat as `postulo_scheduler_last_pass_timestamp_seconds`, alongside a new
+  `postulo_overdue{kind="reminders"}` for reminders that fell due a quarter of an hour ago
+  and have still not been announced, and `postulo_failures{kind="syncs"}`. The handbook has
+  alerting rules for all three. `postulo_pending{kind="reminders"}` counted every reminder
+  anybody had ever set and not finished, which grew because the instance was being used and
+  so could not be alerted on; it now counts the ones that have fallen due.
+
+  In Compose, the scheduler also waits for the web container to be *healthy* rather than
+  merely started — it skips migrations on purpose, so starting against a half-migrated
+  schema is the one thing it cannot recover from — and no longer restores the plugin record
+  at the same moment the web container is doing it. (#221)
+
+- **A store that says it is finished is now believed, instead of being dialled for ever.**
+  #216 gave a plugin a way to say that the other side has ended a connection, and notifiers
+  honoured it: a browser that withdrew its subscription stopped being pushed to. Stores did
+  not. A Paperless whose token had been revoked, or a share that no longer existed, answered
+  the same way for every document there was, and each answer was filed as an ordinary failure
+  to try again later — so the retries went on, once per document, until somebody noticed the
+  row of *failed* badges and worked out what they had in common.
+
+  A store saying it is finished now switches the connection off with the reason in the
+  plugin's own words rather than a class name, exactly as a notifier does. Copies waiting for
+  a connection that is switched off are left waiting rather than being sent to record that it
+  is switched off: they would have spent every attempt they had on that sentence, and there
+  would have been nothing left when it was fixed. Switching it back on is one press, and they
+  go. A copy whose connection is not merely off but gone is still told so, because it has
+  nothing to wait for. (#243)
+
+- **An identifier is the same identifier whatever case it is typed in.** Every named scheme
+  folds its own values as you type them — Wikidata to `Q95`, LinkedIn to lowercase — so a
+  search usually found what it should. Two things it did not. A row written before its scheme
+  gained that folding kept the spelling it arrived with, and an early import that stored `q95`
+  was then invisible to everything that looked for `Q95`: the company was not found, and the
+  posting was filed under a second record of the same employer. And the rule that one
+  identifier names one company was enforced on the exact characters, so the same company could
+  be entered twice, once in each case, with nothing to say they were one.
+
+  The comparison is now case-blind everywhere it happens — the lookup, the form, the
+  importers, and the uniqueness the database itself keeps — while the stored value is left
+  alone. That last part is deliberate: a scheme that folds is still the thing that decides
+  what its values look like, and `other`, which is where a staff number lives, folds nothing,
+  because `AB-12` should read `AB-12` and not `ab-12`. An accent is still a different
+  character, not a different case.
+
+  A migration puts existing values through the current rules, and where that leaves one
+  account holding the same identifier twice it removes the later identifier and names both
+  companies on the console — the companies themselves are left exactly as they are, because
+  whether two records are one employer is not something a migration gets to decide. Saying no
+  now also sounds like a person: where the database used to answer "Constraint
+  “unique_other_identifier_per_company” is violated", the form says the identifier is already
+  listed. (#211)
+
+- **Applications you recorded after the fact counted nowhere, and nothing let you say when
+  you applied.** The date an application was sent was written only when it passed through the
+  literal *Applied*. Anybody recording a reply they already had — straight to *Interviewing*,
+  or to *Rejected* — got an application with no date, and every figure measured from that date
+  then ignored it: the number sent, reply and interview times, sources, industries, the
+  by-month figures, "sent recently", the API's `since` filter, and the evidence list in the
+  report an employment office reads. The funnel counted it all the same, so a stage could show
+  more than 100% of *Applied*.
+
+  Reaching any status that means it went out now records the date, *Withdrawn* excepted: a
+  draft abandoned before it was ever sent is not an application, while withdrawing something
+  already sent keeps the date it has. A migration fills in the past from the timeline, which
+  has always known — the first status change into a sent status is when it went out.
+
+  And every door now takes the date: intake, *Apply*, capture review (a posting captured today
+  was often applied to last week) and the API's `applied_on`. Left empty it is today, as
+  before. The spreadsheet import stops guessing from the date alone — a row that says
+  *Rejected* with no date column keeps its status, its channel, its tags and its deadline
+  instead of becoming an untouched listing, and records that the date is unknown rather than
+  inventing today; a row that says *draft* stays a listing even when it carries a date. (#222)
+
+- **Deleting one thing no longer quietly deletes the record of what you sent, and a deleted
+  file is now actually deleted.** Three ways the promise that "the record of what you sent
+  has to stay true" was not kept.
+
+  A company cascaded into its postings, those into applications, and applications into the
+  frozen PDFs an employer had received — so tidying up one employer could take a year of
+  evidence with it, behind a confirmation that said only "anything belonging to it goes too".
+  A sent document now survives the application it went with, and still names the role and
+  employer it was sent to, because that is stored as text beside the link. The confirmation
+  page counts what will go before it goes, and says what is kept.
+
+  Editing an uploaded file replaced the bytes in place, while applications went on saying
+  they had sent it and external stores kept the copy they had already filed. The file is
+  fixed once it arrives; a different file is a new upload that supersedes the old one, which
+  is what the *Supersedes* field was always for. Uploads are checksummed now as renders have
+  been, so a store can tell one from another.
+
+  And deleting a document left its file on disk for ever — only deleting a whole account
+  removed anything — so "deleted" meant "hidden" for files holding a home address and a
+  full career, which were then copied into every backup. Deleting a document now deletes its
+  file once the change is committed and nothing else points at it, and `manage.py prune_media`
+  lists what earlier deletions left behind, removing it only when asked. (#217)
+
+- **Choosing PostgreSQL got you an instance that would not start, and no scheduler if it
+  had.** `docker/compose.postgres.yml` has offered the second engine since it was added, and
+  *Installing Postulo* has recommended it to anybody already running one — while the
+  published image had neither the driver nor the client tools to honour the offer. The
+  container stopped on its first `migrate`, because `psycopg` lives in an extra the build
+  never asked for; had it started, `manage.py backup` would have stopped on “pg_dump is not
+  on the PATH”, because `core/backup.py` dumps a PostgreSQL through the tool rather than by
+  copying a file that is being written to; and reminders, gone-quiet notices, store copies
+  and syncs would never have run at all, because that compose file had no scheduler and
+  nothing fails when a loop nobody started does not loop.
+
+  All of which survived a release for one reason: nothing had ever pointed a test at a
+  PostgreSQL. The suite runs on in-memory SQLite, and the PostgreSQL half of the backup code
+  was covered by a stand-in for `subprocess.run` — so the engine was documented, offered,
+  and entirely unexecuted. CI now runs the database-facing tests against a real
+  `postgres:17` and takes an actual backup of a seeded instance and puts it back, through
+  pg_dump and pg_restore, so the next thing to break on this path breaks in a job rather
+  than on somebody's server. Which found its first thing immediately: the suite's throwaway
+  model had no migration, so it was built in `migrate`'s syncdb phase with a foreign key to
+  an accounts table that did not exist yet — recorded and checked later by SQLite, refused
+  outright by PostgreSQL.
+
+  The client tools come from PostgreSQL's own repository, pinned to the major the compose
+  file starts: pg_dump refuses a server newer than itself and Debian's is two majors behind,
+  which would have made this “backups work” until the first time anybody looked. (#219)
+
+- **Adding a company answered a 500 when the form was sent twice, though the company was
+  saved.** A double click on *Save* posted the form twice in one second; the first saved
+  and redirected, the second hit SQLite's *database is locked* and the browser showed the
+  500 — which invites a retry, and a retry makes a duplicate. Three causes, three fixes.
+  SQLite's default transaction takes no lock until it writes and refuses at once when it
+  cannot upgrade: a file database now opens with immediate transactions, a write-ahead
+  log and a twenty-second wait, so two writers take turns. Nothing stopped a form being
+  sent twice: every form that posts is let through once, its button greyed until the
+  page changes, and the back button gets a form that works again; with scripts blocked
+  nothing changes. Backups already use SQLite's own backup API, so a copy under the
+  write-ahead log is consistent. (#206)
+
+- **The career-order checkbox under *Settings → Appearance* described itself with an id
+  that was not on the page.** Django names the help text in the checkbox's
+  `aria-describedby`; the template drew the help inside the label without the id, so a
+  screen reader was told about an element that did not exist and the sentence explaining
+  the preference could not be reached from the box. The help carries the id now, outside
+  the label so the name says what the box is and the description says why, and the fast
+  suite checks every `aria-describedby` on the settings pages points at something. (#207)
+
+- **A CV's page no longer says “What is on this cv”.** The heading put the kind's label,
+  lowercased, into a sentence — which flattened an acronym in English, French and
+  Portuguese and misspelt a noun in German, and which could never agree in a language where
+  the two kinds take different articles. It is two sentences now, chosen by kind: *What is
+  on this CV* and *What is on this portfolio*. The same `|lower` was applied to a salary's
+  period (*Pro Jahr* → *pro jahr*) and to a copy's status after a store's name; both now
+  show the label as the catalogue wrote it. Filled in English, French and Portuguese; the
+  other catalogues get the two new strings at the release sweep. (#168)
+
+- **The suggestions page fits on a phone once there is a suggestion on it.** The accept form
+  for a suggestion not yet matched to an application carries a select as wide as the longest
+  application title, in a group that could not shrink — 45 pixels past the edge of a
+  320-pixel screen in English, 60 in Greek, 70 in German, on exactly the page a mail or
+  calendar plugin's first suggestion lands on. The group wraps under the words now and the
+  select gives way. The walk had never reached that state: its fixture had no suggestion, so
+  the page was only ever checked empty. It has a pending, unmatched one now, filed the way a
+  plugin files one, so axe and the reflow check read the page with something on it — the
+  last of what #167 found and left undone. (#167)
+
+- **Escape closes a cell editor however quickly it is pressed.** The editor arrives by a
+  swap, and htmx wires what it swapped in — the Cancel button Escape clicks — only when the
+  swap settles, 20 ms later by default, while the caret is put in the input the moment it
+  lands. For those 20 ms Escape reached a button nothing was listening to, and did nothing.
+  No hand is that quick; the browser suite was, one run in three, and the flake it reported
+  was this. The handler now has htmx process the editor before clicking, a no-op once the
+  settle has done it, and a test widens the window to two seconds and presses inside it.
+  (#161)
+
+- **The image scan can now be told from its own failure.** `scripts/scan-image.sh` has three
+  outcomes instead of one red step: exit 0 for nothing fixable, 1 for fixable findings, and
+  2 when the scan did not complete — a scanner that failed to run, a bill of materials that
+  came back empty — which says nothing about the image and now says so, on stderr and in
+  `.scan/verdict.txt`, which both image workflows put at the top of their run summary. Trivy
+  runs once for the gate rather than twice, with an exit code of its own for findings; Grype
+  exits 1 for everything, so its verdict is read from whether a report came out. A verdict
+  left by an earlier run is removed before anything starts, and the dev image's summary no
+  longer offers a `docker pull` for an image that was never pushed. The root cause — reports
+  written through a bind mount the daemon resolved against the host — went with #190, and a
+  test now keeps every report on a redirect. `.scan/` is ignored, so a scan run by hand
+  leaves no untracked files behind. (#192)
+
+- **An uploaded file downloads under its own extension.** Every download was called
+  `<title>.pdf`, whatever had been uploaded, so a `.docx` or a `.txt` arrived as a file no
+  PDF viewer would open — served as `application/pdf` too, since the type is guessed from
+  the name. The name is the title with the upload's own extension now, on the page and over
+  the API alike; a snapshot of what was sent is still `<title>.pdf`, because that is always
+  what it is. (#193)
+
+- **A file's edit form no longer shows where Postulo keeps it.** Editing an uploaded file
+  said *Currently: documents/1/2026/09/reference.txt* — the storage path, carrying the
+  account id and the month of the upload, inside a link to `/media/` that nothing serves. It
+  says *Currently: reference.txt* now. The path was Postulo's filing system thinking aloud:
+  not the person's to care about, a second answer beside the *Title* field above it, and on
+  a shared screen an account id. Django's file widget template is overridden once, for every
+  file field, so no form has to remember. (#191)
+
+- **The accessibility walk claimed thirty-five pages it never opened, and six of the pages
+  it had never opened were broken.** `tests/test_page_coverage.py` insisted every URL
+  pattern was either visited by the browser suite or excused in writing — but "visited"
+  meant "named in a hand-written tuple beside the walk", and nothing held the tuple to the
+  walk. It claimed 104 names and the walk reached 69. Every CV page and every letter page
+  past the list was counted as checked and had never been looked at.
+
+  **The claim is derived from the walk now**, by resolving the paths it actually visits, so
+  it cannot get ahead of it again. That turned the coverage test's output into an honest
+  list of thirty-four, and the walk was given what those pages need to exist: a CV with an
+  entry, a letter, an upload, a tag, a contact, an industry, a posting, a capture waiting
+  for review and a connection. Two routes answer POST only and are excused by name rather
+  than pretended at; `settings:index` stopped being excused as *"redirects to the appearance
+  page"*, because the walk visits `/settings/` itself and the excuse had become false.
+
+  **What the fuller walk then found**, none of which anything had ever measured:
+
+  - A CV's own page ran off a 320-pixel screen in Greek and German. Its entries are the row
+    #165 fixed on the career page, and this page had kept the old one: words beside a
+    `shrink-0` group of ↑, ↓, *Tailor* and *Remove*. The grid's column is sized by its
+    content, so the overflow took the *Add entries* card with it.
+  - The uploads list squeezed a title into 58 pixels in English and 13 in Greek, behind
+    *Download / Edit / Delete*.
+  - The connections list did the same, with `flex-1` — which is `flex: 1 1 0%`, so the words
+    claimed no width of their own before anything wrapped.
+  - The upload **edit** form scrolled sideways in every language, by exactly the same amount,
+    because Django renders a bound file field as `Currently: documents/1/2026/09/reference.txt`
+    — a path, with no spaces in it, 252 unbreakable pixels against the 238 a phone leaves.
+    The *new* form passed all along, which is why nothing had caught it.
+  - A checkbox on the applications filter was 20 pixels tall, against the 24 WCAG 2.2
+    SC 2.5.8 asks for.
+  - The capture review page pointed `aria-describedby` at a help-text element that was not
+    there — worse than no description, because a screen reader is told there is one.
+
+  All six are fixed. The preview pages are the one exemption, in writing and narrowly: a
+  preview returns *"the CV as HTML, exactly as the PDF renderer will see it"*, so axe is
+  reading a print document and asking it for `<main>`. Satisfying that would change every
+  PDF Postulo produces to answer a question nobody asks of a printed page. They stay in the
+  walk, so reflow and target size still read them; only axe looks away. (#167)
+
+- **Dragging worked in Chromium and did nothing in Firefox, and the tests agreed with
+  Chromium.** Neither drag cancelled `dragenter`. The specification makes an element a drop
+  target only once *both* `dragenter` and `dragover` are cancelled; Chromium forgives the
+  omission and Firefox does not, so arranging the dashboard by dragging a widget (#125) and
+  moving a card between board columns both sprang back with nothing posted and nothing
+  logged, for anybody using Firefox.
+
+  **Both drags had it**, because both were written the same way — the board's cards and the
+  dashboard's rows — so both are fixed here rather than one being left with a known copy of
+  the fault in the same file.
+
+  The tests could not have caught it. They dispatch four synthetic `DragEvent`s including
+  the drop itself, so they exercise the handlers and pass whether or not a browser would
+  ever have delivered that drop; and the browser suite runs `--browser chromium`, the one
+  browser that forgives this. Both helpers now send `dragenter` as a browser would, and each
+  file gains a test that asks the handlers the question the browser asks — *was this event
+  cancelled?* — which fails without the fix in Chromium, so it needs no second browser to
+  keep watch. (#174)
+
+- **A chip with no remove button had almost no padding at its end.** On *Documents → CVs*
+  the kind tag sat hard against its own right edge, twelve pixels of space on one side and
+  two on the other. `.chip` was shaped around a button it did not have: the two pixels are
+  where `.chip-remove` goes, and the button supplies the visual space, so a chip holding only
+  a word got the gap and nothing to fill it. Two of the three places that draw one have no
+  button — a CV's kind and a company's industries — and the company row had already patched
+  it by hand with `pe-3`, which is the sort of workaround that says the class is wrong rather
+  than the caller.
+
+  So the class changed rather than the third caller: a chip pads both ends, and the remove
+  button pulls its own end back with `-me-2.5`. A chip with a button looks exactly as it did;
+  one without is no longer short of an end; and the fourth caller will be right without
+  knowing any of this. The company row's `pe-3` is gone.
+
+  The test that guarded this pinned `ps-3` and `pe-0.5`, which is to say it pinned the
+  asymmetry rather than the intent — its own docstring says the intent is that the × sits at
+  the end edge and not the right. It now asserts that, and that a chip pads both ends. (#185)
+
+- **The report page was missing two of its own classes, and the stylesheet was being fed by
+  prose.** The report arrived without a stylesheet rebuild, so its *Show this period* button
+  sat out of line and its two tallies stacked on a wide screen, because `mt-5` and
+  `lg:grid-cols-2` compiled to nothing. Only CI noticed, after the push; the ordinary suite
+  now rebuilds the stylesheet and compares wherever the Tailwind CLI is installed, and the
+  build is on the checklist.
+
+  Chasing a third, phantom class turned up the real problem: **what compiled depended on
+  more than the interface.** Tailwind's automatic detection scanned the whole repository, so a
+  word in a test's docstring, the wiki or the changelog could put a class in the stylesheet
+  every page loads — the template lint's own list of forbidden physical utilities was
+  compiling them. The compiled file sat inside the scanned tree, so a build written anywhere
+  but over it read the previous build as a source. And the templates that become PDFs, which
+  never load this stylesheet, had the words in their inline CSS read as classes. The scan is
+  now the interface and nothing else, and twenty-four utilities nothing used — among them
+  every physical one — have gone. (#164)
+
+- **The image builds again.** Giving the Python build a stage of its own (#157) put the
+  dependencies first, so that a change to the application would not re-resolve them, and
+  left the one `uv sync` above the line that copies the source — and `uv sync` installs the
+  project as well. Every image build since failed with *Expected a Python module at*
+  `src/postulo/__init__.py`, and nobody knew, because nothing in CI builds an image (#81):
+  the test instance's deploy was the first build since. The dependencies are synced before
+  the source with `--no-install-project`, Postulo after it, and a test reads the Dockerfile's
+  stages to hold that order. (#166)
+
+- **Pages that ran off a phone's screen in a longer language, and words squeezed out of their
+  own space.** The arrange page's *Take … off* buttons carry a translated widget name, and
+  sat in a group that was not allowed to give way: in Greek it pushed the page 64 pixels past
+  the edge of a phone, in German 31 — and in English 8, on CI's fonts, which is how it was
+  found. The interview list's outcome buttons did the same by 143 pixels in Greek, the account
+  page's buttons in Dutch, French and German, and four list headings in Dutch. Those groups now
+  wrap, and the words beside them claim twelve rem before anything may sit next to them, so on
+  a phone the buttons go underneath.
+
+  Where the buttons *did* fit, the same layout failed quietly, with nothing to scroll: the
+  words were left whatever was over. The arrange page had a column one word wide, a career
+  entry had fourteen pixels in Greek, and each built-in plugin's description had six in
+  English, with the longest word written across whatever was beside it. The browser suite now
+  walks every page in Greek and German as well as English, and fails on words that run out of
+  their own box as well as on a page that scrolls.
+
+  Walking in Greek found two more. The recovery page's table had a hidden *Actions* label that
+  escaped its scroll box and dragged the page sideways, because the report and that page had
+  been given a bare `overflow-x-auto` rather than the positioned `scroll-x` #113 made for
+  exactly this; the template lint now refuses the bare one. And a heading may break a word too
+  long for a phone — *Wiederherstellungslink* is wider than one — rather than run off its edge.
+
+  The *Suggestions* widget, which draws its own heading, had no name anywhere else: the arrange
+  page showed its key, its button read "Take  off", and its four arrows told a screen reader
+  "Move  up a row". Every widget now has a name in words, and registering one without it is
+  refused. (#165)
+
+- **The CV page and the letter page open again.** Making a rendered document point at
+  whatever produced it took `related_name="renders"` with the two columns it replaced, and
+  both detail pages ask for exactly that — so anyone opening one got a server error instead
+  of their CV. Nothing caught it, because the suite tested what the new link *stores* and
+  never opened the page that reads it back.
+
+  The reverse is a query rather than a `GenericRelation`, and that is not a detail. A
+  relation would give the name back and a cascade with it, and the cascade is the one thing
+  that must not happen here: deleting a CV has to leave the PDF an employer received exactly
+  where it is, which was the whole reason `RenderedDocument` exists. (#130)
+
+- **A test could be handed a translated string because of which test ran before it.**
+  `LocaleMiddleware` activates a language per request and nothing deactivated it afterwards,
+  so a test that signed in as somebody reading Postulo in Portuguese left Portuguese active
+  for every test that followed. It showed up as a test asserting an English message and
+  getting a Portuguese one — passing alone, failing in company, and failing differently
+  depending on the order, which is the worst shape a failure can have. Every test now starts
+  in the instance's own language. Found while adding the portfolio tests, which is to say by
+  accident. (#133)
+
+- **A team nobody had been recorded at did not survive an export.** A department travelled
+  only as a name beside a contact, so a team with no contact simply vanished from the
+  archive — and *a team you applied to before you knew anybody there* is exactly the ordinary
+  case the model was written for. Departments are now records of their own in the file. Found
+  by the new attachment failing to restore, which is the argument for the round-trip test
+  being a round trip. (#138)
+
+- **A stored column width did nothing on a real deployment.** It shipped as a `style`
+  attribute on the header cell, and the policy Postulo serves is `style-src 'self'`, which
+  refuses one as firmly as it refuses an inline script — so the browser dropped it, the
+  column sized itself, and the preference appeared not to save. Development never saw it
+  because the strict policy is production's: the browser test that covers widths runs under
+  the development settings, and the test that runs under the real policy visited no page
+  with a stored width. Both were true and neither could catch it, which is the gap that has
+  been closed alongside the width. The script that owns the handle applies it through the
+  DOM now, which the policy does not govern, and which is the coherent place for it — a
+  width is a pointer gesture, so it belongs to the script that provides the gesture. (#136)
 
 - **Three plugin descriptions were never translatable, and nobody could have noticed.**
   `scripts/messages.py` reads the source rather than importing it, so it knows a translation
