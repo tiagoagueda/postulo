@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 11:12+0000\n"
+"POT-Creation-Date: 2026-09-16 11:49+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: íslenska\n"
@@ -584,7 +584,7 @@ msgid ""
 msgstr ""
 "Villuskýrsla er jafn mikils virði og allt annað hér. Geymslan er á <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a>, og <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> segir hvernig breyting kemst inn."
 
-#: src/postulo/api/api.py:291
+#: src/postulo/api/api.py:321
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "Grip getur ekki komið á eftir því síðasta í lotu sinni."
@@ -1284,6 +1284,14 @@ msgstr[1] "og %(counter)s til viðbótar"
 msgid "and %(more)s more"
 msgstr "og %(more)s til viðbótar"
 
+#: src/postulo/api/idempotency.py:35
+msgid "Another request is using this Idempotency-Key; try again in a moment."
+msgstr ""
+
+#: src/postulo/api/models.py:176
+msgid "answer"
+msgstr ""
+
 #: src/postulo/resume/models.py:232
 #, draft
 msgid "Answered"
@@ -1330,12 +1338,12 @@ msgstr "Hvar sem er"
 msgid "API"
 msgstr "API"
 
-#: src/postulo/api/models.py:73
+#: src/postulo/api/models.py:75
 #, draft
 msgid "API token"
 msgstr "API-teikn"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:76 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1866,7 +1874,7 @@ msgstr ""
 msgid "Capture discarded."
 msgstr "Grípu hent."
 
-#: src/postulo/api/models.py:22
+#: src/postulo/api/models.py:24
 #, draft
 msgid "Capture postings"
 msgstr "Grípa auglýsingar"
@@ -1876,7 +1884,7 @@ msgstr "Grípa auglýsingar"
 msgid "Capture sources this instance has"
 msgstr "Grípugjafar sem þetta uppsett hefur"
 
-#: src/postulo/api/api.py:331
+#: src/postulo/api/api.py:361
 #, python-format, draft
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "Greip %(count)s auglýsingar frá %(host)s"
@@ -1886,7 +1894,7 @@ msgstr "Greip %(count)s auglýsingar frá %(host)s"
 msgid "captured from"
 msgstr "gripið frá"
 
-#: src/postulo/api/api.py:320
+#: src/postulo/api/api.py:350
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Gripið: %(title)s"
@@ -3047,7 +3055,7 @@ msgstr "Sækja PDF"
 msgid "Download the archive"
 msgstr "Sækja safnið"
 
-#: src/postulo/api/models.py:25
+#: src/postulo/api/models.py:27
 #, draft
 msgid "Download the files themselves"
 msgstr "Sækja skrárnar sjálfar"
@@ -3455,7 +3463,7 @@ msgstr "útrunnið"
 msgid "Expires"
 msgstr "Rennur út"
 
-#: src/postulo/api/models.py:66 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
 #, draft
 msgid "expires"
 msgstr "rennur út"
@@ -3639,6 +3647,10 @@ msgstr "Finna merki"
 #, draft
 msgid "Find one"
 msgstr "Finna eina"
+
+#: src/postulo/api/models.py:174
+msgid "fingerprint"
+msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -4161,6 +4173,14 @@ msgstr "Ég hef þegar sótt um þessa"
 #, draft
 msgid "id in the store"
 msgstr "auðkenni í geymslunni"
+
+#: src/postulo/api/models.py:179
+msgid "idempotent request"
+msgstr ""
+
+#: src/postulo/api/models.py:180
+msgid "idempotent requests"
+msgstr ""
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
 #: src/postulo/jobs/models.py:368 src/postulo/plugins/models.py:278
@@ -4708,6 +4728,10 @@ msgid ""
 msgstr ""
 "Geymt á alþjóðlegu formi, svo þú getir hringt í það frá öðru landi líka. Númer sem byrjar þegar á + er tekið eins og það er."
 
+#: src/postulo/api/models.py:173
+msgid "key"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html:159
 #, draft
 msgid ""
@@ -4898,7 +4922,7 @@ msgstr "Síðasta innskráning"
 msgid "last synced"
 msgstr "síðast samstillt"
 
-#: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
 #, draft
 msgid "last used"
 msgstr "síðast notað"
@@ -5503,7 +5527,7 @@ msgstr "Færa upp"
 msgid "NACE division"
 msgstr "NACE-deild"
 
-#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
+#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:63
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
 #: src/postulo/jobs/models.py:42 src/postulo/jobs/models.py:173
@@ -6259,7 +6283,7 @@ msgstr "Ekkert skráð enn."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Ekkert sem líkist starfsauglýsingu fannst á þeirri síðu."
 
-#: src/postulo/api/api.py:389
+#: src/postulo/api/api.py:423
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Ekkert sem líkist starfsauglýsingu fannst þar."
@@ -7279,7 +7303,7 @@ msgid ""
 msgstr ""
 "POSTULO_LOG_DIR er tómt, svo færslur fara í stjórnborðið og hvergi annað. Settu það á möppu á gagnadiskinum til að lesa þær hér; sjá Uppsetningu á wiki-síðunum."
 
-#: src/postulo/api/models.py:63
+#: src/postulo/api/models.py:65
 #, draft
 msgid "prefix"
 msgstr "forskeyti"
@@ -7561,7 +7585,7 @@ msgstr ""
 msgid "read by a speaker"
 msgstr "lesið af málhafa"
 
-#: src/postulo/api/models.py:23
+#: src/postulo/api/models.py:25
 #, draft
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr "Lesa allt: umsóknir, auglýsingar, fyrirtæki, skjöl, innsýn"
@@ -7606,7 +7630,7 @@ msgstr "Skrá"
 msgid "Record an application"
 msgstr "Skrá umsókn"
 
-#: src/postulo/api/models.py:24
+#: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr "Skrá og breyta: umsóknum, auglýsingum, minnispunktum, áminningum, bréfum"
@@ -7957,7 +7981,7 @@ msgstr "yfirlesið þann"
 msgid "Revoke"
 msgstr "Afturkalla"
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
 #, draft
 msgid "revoked"
 msgstr "afturkallað"
@@ -8188,7 +8212,7 @@ msgstr "Aðeins ráðgert"
 msgid "scheme"
 msgstr "gerð"
 
-#: src/postulo/api/models.py:65
+#: src/postulo/api/models.py:67
 #, draft
 msgid "scopes"
 msgstr "umfang"
@@ -8909,6 +8933,13 @@ msgstr "staða"
 msgid "State"
 msgstr "Staða"
 
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
+#: src/postulo/jobs/models.py:831
+#, draft
+msgid "status"
+msgstr "staða"
+
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
@@ -8922,13 +8953,6 @@ msgstr "Staða"
 #, draft
 msgid "Status"
 msgstr "Staða"
-
-#: src/postulo/applications/models.py:215
-#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
-#: src/postulo/jobs/models.py:831
-#, draft
-msgid "status"
-msgstr "staða"
 
 #: src/postulo/applications/models.py:348
 #, draft
@@ -9735,7 +9759,7 @@ msgid ""
 msgstr ""
 "Skránni sjálfri er ekki hægt að breyta. Sendu inn nýja skrá og merktu hana sem arftaka þessarar, svo það sem þú sendir vísi áfram í skrána sem þú sendir."
 
-#: src/postulo/api/api.py:334
+#: src/postulo/api/api.py:364
 #, python-format, draft
 msgid "The first: %(title)s"
 msgstr "Sú fyrsta: %(title)s"
@@ -10171,6 +10195,10 @@ msgstr "Engin vefsíða er skráð fyrir þetta fyrirtæki."
 msgid "This entry prints its original text on every CV."
 msgstr "Þessi færsla prentar upprunalegan texta sinn á hverri ferilskrá."
 
+#: src/postulo/api/idempotency.py:36
+msgid "This Idempotency-Key was already used for a different capture."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 #, draft
@@ -10430,7 +10458,7 @@ msgstr "teikn"
 msgid "Token created. Copy it now; it is not shown again."
 msgstr "Teikn stofnað. Afritaðu það núna; það er ekki sýnt aftur."
 
-#: src/postulo/api/models.py:64
+#: src/postulo/api/models.py:66
 #, draft
 msgid "token hash"
 msgstr "tætigildi teikns"
@@ -10681,7 +10709,7 @@ msgstr "nota Gravatarinn minn"
 msgid "Use the instance default"
 msgstr "Nota sjálfgildi uppsetsins"
 
-#: src/postulo/api/routers/applications.py:126
+#: src/postulo/api/routers/applications.py:128
 #, draft
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
@@ -11268,7 +11296,7 @@ msgstr "Hvaða umsókn?"
 msgid "Which column is which?"
 msgstr "Hvaða dálkur er hvað?"
 
-#: src/postulo/api/forms.py:24 src/postulo/api/models.py:61
+#: src/postulo/api/forms.py:24 src/postulo/api/models.py:63
 #, draft
 msgid "Which device or tool this is for."
 msgstr "Hvaða tæki eða tól þetta er fyrir."

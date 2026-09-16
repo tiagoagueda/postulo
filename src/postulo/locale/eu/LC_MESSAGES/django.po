@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 11:12+0000\n"
+"POT-Creation-Date: 2026-09-16 11:49+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -586,7 +586,7 @@ msgid ""
 msgstr ""
 "Akats baten berri ematea beste edozer bezain baliotsua da hemen. Biltegia <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a> helbidean dago, eta <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> agiriak azaltzen du nola sartzen den aldaketa bat."
 
-#: src/postulo/api/api.py:291
+#: src/postulo/api/api.py:321
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "Harrapaketa bat ezin da bere sortako azkenaren ondoren etorri."
@@ -1290,6 +1290,14 @@ msgstr[1] "eta %(counter)s gehiago"
 msgid "and %(more)s more"
 msgstr "eta %(more)s gehiago"
 
+#: src/postulo/api/idempotency.py:35
+msgid "Another request is using this Idempotency-Key; try again in a moment."
+msgstr ""
+
+#: src/postulo/api/models.py:176
+msgid "answer"
+msgstr ""
+
 #: src/postulo/resume/models.py:232
 #, draft
 msgid "Answered"
@@ -1337,12 +1345,12 @@ msgstr "Edonon"
 msgid "API"
 msgstr "API"
 
-#: src/postulo/api/models.py:73
+#: src/postulo/api/models.py:75
 #, draft
 msgid "API token"
 msgstr "API tokena"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:76 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1873,7 +1881,7 @@ msgstr ""
 msgid "Capture discarded."
 msgstr "Harrapaketa baztertu da."
 
-#: src/postulo/api/models.py:22
+#: src/postulo/api/models.py:24
 #, draft
 msgid "Capture postings"
 msgstr "Harrapatu iragarkiak"
@@ -1883,7 +1891,7 @@ msgstr "Harrapatu iragarkiak"
 msgid "Capture sources this instance has"
 msgstr "Instalazio honek dituen harrapaketa-iturriak"
 
-#: src/postulo/api/api.py:331
+#: src/postulo/api/api.py:361
 #, python-format, draft
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "%(count)s iragarki harrapatu dira %(host)s gunetik"
@@ -1893,7 +1901,7 @@ msgstr "%(count)s iragarki harrapatu dira %(host)s gunetik"
 msgid "captured from"
 msgstr "nondik harrapatua"
 
-#: src/postulo/api/api.py:320
+#: src/postulo/api/api.py:350
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Harrapatuta: %(title)s"
@@ -3057,7 +3065,7 @@ msgstr "Deskargatu PDF"
 msgid "Download the archive"
 msgstr "Deskargatu artxiboa"
 
-#: src/postulo/api/models.py:25
+#: src/postulo/api/models.py:27
 #, draft
 msgid "Download the files themselves"
 msgstr "Deskargatu fitxategiak berak"
@@ -3465,7 +3473,7 @@ msgstr "iraungita"
 msgid "Expires"
 msgstr "Iraungitzen da"
 
-#: src/postulo/api/models.py:66 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
 #, draft
 msgid "expires"
 msgstr "iraungitzen da"
@@ -3649,6 +3657,10 @@ msgstr "Bilatu logotipoa"
 #, draft
 msgid "Find one"
 msgstr "Bat aurkitu"
+
+#: src/postulo/api/models.py:174
+msgid "fingerprint"
+msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -4171,6 +4183,14 @@ msgstr "Honi jada eskaera egin diot"
 #, draft
 msgid "id in the store"
 msgstr "identifikatzailea biltegian"
+
+#: src/postulo/api/models.py:179
+msgid "idempotent request"
+msgstr ""
+
+#: src/postulo/api/models.py:180
+msgid "idempotent requests"
+msgstr ""
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
 #: src/postulo/jobs/models.py:368 src/postulo/plugins/models.py:278
@@ -4719,6 +4739,10 @@ msgid ""
 msgstr ""
 "Nazioarteko formatuan gordetzen da, beste herrialde batetik ere dei dezazun. Jada + ikurrarekin hasten den zenbakia dagoen bezala hartzen da."
 
+#: src/postulo/api/models.py:173
+msgid "key"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html:159
 #, draft
 msgid ""
@@ -4909,7 +4933,7 @@ msgstr "Azken saio-hasiera"
 msgid "last synced"
 msgstr "azkenekoz sinkronizatua"
 
-#: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
 #, draft
 msgid "last used"
 msgstr "azkenekoz erabilia"
@@ -5514,7 +5538,7 @@ msgstr "Mugitu gora"
 msgid "NACE division"
 msgstr "NACE dibisioa"
 
-#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
+#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:63
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
 #: src/postulo/jobs/models.py:42 src/postulo/jobs/models.py:173
@@ -6273,7 +6297,7 @@ msgstr "Oraindik ez da ezer jaso."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Orri horretan ez da lan-iragarki baten antzeko ezer aurkitu."
 
-#: src/postulo/api/api.py:389
+#: src/postulo/api/api.py:423
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Han ez da lan-iragarki baten antzeko ezer aurkitu."
@@ -7296,7 +7320,7 @@ msgid ""
 msgstr ""
 "POSTULO_LOG_DIR hutsik dago, beraz erregistroak kontsolara doaz eta beste inora ez. Ezarri datu-bolumeneko direktorio batera hemen irakurtzeko; ikusi Konfigurazioa wikian."
 
-#: src/postulo/api/models.py:63
+#: src/postulo/api/models.py:65
 #, draft
 msgid "prefix"
 msgstr "aurrizkia"
@@ -7579,7 +7603,7 @@ msgstr ""
 msgid "read by a speaker"
 msgstr "hiztun batek irakurria"
 
-#: src/postulo/api/models.py:23
+#: src/postulo/api/models.py:25
 #, draft
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr "Dena irakurri: eskaerak, iragarkiak, enpresak, dokumentuak, datuak"
@@ -7624,7 +7648,7 @@ msgstr "Jaso"
 msgid "Record an application"
 msgstr "Jaso eskaera bat"
 
-#: src/postulo/api/models.py:24
+#: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr "Jaso eta aldatu: eskaerak, iragarkiak, oharrak, oroigarriak, gutunak"
@@ -7976,7 +8000,7 @@ msgstr "berrikuspen-data"
 msgid "Revoke"
 msgstr "Baliogabetu"
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
 #, draft
 msgid "revoked"
 msgstr "baliogabetua"
@@ -8206,7 +8230,7 @@ msgstr "Antolatutakoak baino ez"
 msgid "scheme"
 msgstr "eskema"
 
-#: src/postulo/api/models.py:65
+#: src/postulo/api/models.py:67
 #, draft
 msgid "scopes"
 msgstr "esparruak"
@@ -8927,6 +8951,13 @@ msgstr "egoera"
 msgid "State"
 msgstr "Egoera"
 
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
+#: src/postulo/jobs/models.py:831
+#, draft
+msgid "status"
+msgstr "egoera"
+
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
@@ -8940,13 +8971,6 @@ msgstr "Egoera"
 #, draft
 msgid "Status"
 msgstr "Egoera"
-
-#: src/postulo/applications/models.py:215
-#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
-#: src/postulo/jobs/models.py:831
-#, draft
-msgid "status"
-msgstr "egoera"
 
 #: src/postulo/applications/models.py:348
 #, draft
@@ -9757,7 +9781,7 @@ msgid ""
 msgstr ""
 "Fitxategia bera ezin da aldatu. Igo berria eta markatu hau ordezkatzen duela, bidali zenuenak bidali zenuen fitxategia esan nahi jarrai dezan."
 
-#: src/postulo/api/api.py:334
+#: src/postulo/api/api.py:364
 #, python-format, draft
 msgid "The first: %(title)s"
 msgstr "Lehena: %(title)s"
@@ -10195,6 +10219,10 @@ msgstr "Enpresa honentzat ez dago webgunerik jasota."
 msgid "This entry prints its original text on every CV."
 msgstr "Sarrera honek jatorrizko testua inprimatzen du CV guztietan."
 
+#: src/postulo/api/idempotency.py:36
+msgid "This Idempotency-Key was already used for a different capture."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 #, draft
@@ -10453,7 +10481,7 @@ msgstr "tokena"
 msgid "Token created. Copy it now; it is not shown again."
 msgstr "Tokena sortu da. Kopiatu orain; ez da berriro erakutsiko."
 
-#: src/postulo/api/models.py:64
+#: src/postulo/api/models.py:66
 #, draft
 msgid "token hash"
 msgstr "tokenaren hash-a"
@@ -10704,7 +10732,7 @@ msgstr "erabili nire Gravatarra"
 msgid "Use the instance default"
 msgstr "Erabili instalazioaren balio lehenetsia"
 
-#: src/postulo/api/routers/applications.py:126
+#: src/postulo/api/routers/applications.py:128
 #, draft
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
@@ -11296,7 +11324,7 @@ msgstr "Zein eskaera?"
 msgid "Which column is which?"
 msgstr "Zein zutabe da zein?"
 
-#: src/postulo/api/forms.py:24 src/postulo/api/models.py:61
+#: src/postulo/api/forms.py:24 src/postulo/api/models.py:63
 #, draft
 msgid "Which device or tool this is for."
 msgstr "Zein gailu edo tresnatarako den hau."

@@ -1,5 +1,7 @@
 """Listings: the stage before applications, readable and decidable through the API."""
 
+import datetime as dt
+
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
@@ -10,6 +12,7 @@ from postulo.applications.services import apply_to_listing, create_listing, get_
 from postulo.jobs.models import LISTING_FILTERS, DiscardReason, JobPosting
 
 from ..auth import actor_of, scope
+from ..paging import UPDATED_SINCE, Page, changed_since
 from ..schemas import (
     ApplicationDetailOut,
     ApplicationDetailsIn,
@@ -35,7 +38,7 @@ def _queryset(request):
 
 
 @router.get("", response=list[ListingOut], summary="List listings")
-@paginate
+@paginate(Page, row=listing_out)
 def list_listings(
     request,
     state: str = Query(
@@ -43,6 +46,7 @@ def list_listings(
         description="undecided (default), new, shortlisted, discarded, applied, closed or all",
     ),
     company: int | None = Query(None),
+    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
 ):
     listings = _queryset(request)
     if state == "undecided":
@@ -53,7 +57,7 @@ def list_listings(
         raise HttpError(422, f"'state' must be undecided, all or one of {list(LISTING_FILTERS)}.")
     if company:
         listings = listings.filter(company_id=company)
-    return [listing_out(request, p) for p in listings.order_by("-noted_at", "-pk")]
+    return changed_since(listings.order_by("-noted_at", "-pk"), updated_since)
 
 
 @router.post("", response={201: ListingDetailOut}, auth=scope("write"), summary="Add a listing")

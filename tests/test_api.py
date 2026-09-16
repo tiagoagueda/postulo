@@ -339,8 +339,8 @@ def test_companies_contacts_reminders_and_letters_write(client, user, search):
 # ------------------------------------------------------------------ the schema
 
 
-def test_the_openapi_description_is_served_without_a_docs_page(client, db):
-    schema = client.get("/api/v1/openapi.json").json()
+def test_the_openapi_description_is_served_without_a_docs_page(client, user):
+    schema = client.get("/api/v1/openapi.json", **issue(user, "captures")).json()
     assert schema["info"]["title"] == "Postulo API"
     paths = schema["paths"]
     for path in (
@@ -351,6 +351,38 @@ def test_the_openapi_description_is_served_without_a_docs_page(client, db):
     ):
         assert path in paths, path
     assert client.get("/api/v1/docs").status_code == 404
+
+
+def test_the_schema_answers_a_token_or_a_person_and_nobody_else(client, user):
+    """It answered anybody, against the promise that the API answers 401 without one (#230).
+
+    Any live token will do, whatever its scopes: the schema describes calls a token may not
+    make, and refusing to say what a call is called is not what the scopes are for.
+    """
+    anonymous = client.get("/api/v1/openapi.json")
+    assert anonymous.status_code == 401
+    assert anonymous.json() == {"detail": "Unauthorized"}, "the same refusal as everything else"
+    assert (
+        client.get("/api/v1/openapi.json", HTTP_AUTHORIZATION="Bearer nonsense").status_code == 401
+    )
+
+    expired = issue(user, "read", expires_at=timezone.now() - dt.timedelta(minutes=1))
+    assert client.get("/api/v1/openapi.json", **expired).status_code == 401
+
+    assert client.get("/api/v1/openapi.json", **issue(user, "read")).status_code == 200
+
+    client.force_login(user)
+    assert client.get("/api/v1/openapi.json").status_code == 200, "a signed-in person may read it"
+
+
+def test_reading_the_schema_is_not_using_the_api(client, user):
+    """It spends no allowance and marks no token as used: asking what there is is not a call."""
+    record, raw = ApiToken.issue(user, "Agent", scopes=("read",))
+
+    assert client.get("/api/v1/openapi.json", HTTP_AUTHORIZATION=f"Bearer {raw}").status_code == 200
+
+    record.refresh_from_db()
+    assert record.last_used_at is None
 
 
 def test_tokens_are_made_with_scopes_and_expiry_from_settings(client, user):

@@ -8,9 +8,11 @@ again without disturbing anything else.
 
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import secrets
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -131,3 +133,61 @@ class ApiToken(OwnedModel):
         if self.last_used_at is None or (now - self.last_used_at).total_seconds() > 300:
             self.last_used_at = now
             self.save(update_fields=["last_used_at"])
+
+
+#: How long a key is honoured. A retry happens in seconds; a day covers a laptop that was
+#: shut before the answer came back, and is short enough that nothing here is a record.
+IDEMPOTENCY_WINDOW = dt.timedelta(hours=24)
+
+#: A key still being answered — the row exists to claim the key, not to hold an answer yet.
+IN_FLIGHT = 0
+
+
+class AnswerEncoder(DjangoJSONEncoder):
+    """Writes a moment out whole.
+
+    ``DjangoJSONEncoder`` rounds a datetime to the millisecond, which would make a replayed
+    answer differ from the first one in its last three digits — a promise that the same
+    request gets the same answer should not be kept to three decimal places.
+    """
+
+    def default(self, o):
+        if isinstance(o, dt.datetime):
+            return o.isoformat()
+        return super().default(o)
+
+
+class IdempotentRequest(OwnedModel):
+    """The answer a request already had, kept so that sending it again cannot repeat it.
+
+    A capture is the one thing here a client is expected to retry: a browser extension
+    sends forty from one results page and each is its own request, so a lost reply is a
+    matter of when and not whether. Retrying used to make a second capture and a second
+    notification for the same posting (#230); a request carrying an ``Idempotency-Key``
+    now gets the first answer back instead, unchanged.
+
+    The body is fingerprinted alongside, because a key that is reused for a different
+    posting is a client bug, and answering it with somebody else's capture would hide it.
+    """
+
+    key = models.CharField(_("key"), max_length=200, editable=False)
+    fingerprint = models.CharField(_("fingerprint"), max_length=64, editable=False)
+    status_code = models.PositiveSmallIntegerField(_("status"), default=IN_FLIGHT)
+    body = models.JSONField(_("answer"), default=dict, blank=True, encoder=AnswerEncoder)
+
+    class Meta:
+        verbose_name = _("idempotent request")
+        verbose_name_plural = _("idempotent requests")
+        ordering = ("-created_at",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=("owner", "key"), name="unique_idempotency_key_per_owner"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.key} ({self.status_code or 'in flight'})"
+
+    @property
+    def is_answered(self) -> bool:
+        return self.status_code != IN_FLIGHT

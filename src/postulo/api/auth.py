@@ -8,6 +8,7 @@ names the scope, because the person who made the token needs to know which box t
 
 from __future__ import annotations
 
+from django.http import JsonResponse
 from ninja.errors import HttpError
 from ninja.security import HttpBearer
 
@@ -76,6 +77,35 @@ class ScopedAuth(HttpBearer):
 
 def scope(name: str) -> ScopedAuth:
     return ScopedAuth(name)
+
+
+def for_readers_of_the_api(view):
+    """Let the schema through to a live token or a signed-in person, and nobody else.
+
+    ``docs_url`` has always been off, but django-ninja guards the schema view only when it
+    is given a decorator to guard it with, so ``openapi.json`` answered anyone who asked —
+    against the threat model's promise that the API answers 401 to everything without a
+    live token, and enough on its own to tell a Postulo from anything else at that address
+    (#230). A signed-in person is let through as well as a token: they can make themselves
+    a token in two presses, and opening the schema in a browser is how somebody finds out
+    what there is to build against.
+
+    It is not an ``HttpBearer``, because this is a plain Django view rather than an
+    operation, and it spends no allowance and records no use: asking what the API looks
+    like is not using it.
+    """
+
+    def guarded(request, *args, **kwargs):
+        if getattr(request.user, "is_authenticated", False):
+            return view(request, *args, **kwargs)
+        scheme, _space, raw = request.headers.get("Authorization", "").partition(" ")
+        if scheme.lower() == "bearer" and lookup(raw.strip()) is not None:
+            return view(request, *args, **kwargs)
+        # Word for word what every other refusal without a token says, for the same reason:
+        # confirming that a token exists is itself something not to confirm.
+        return JsonResponse({"detail": "Unauthorized"}, status=401)
+
+    return guarded
 
 
 def actor_of(request) -> str:

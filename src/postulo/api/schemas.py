@@ -3,6 +3,9 @@
 Output schemas are built from model instances by hand rather than through ModelSchema, so
 the API's surface is exactly what is written here and a new model field never leaks into
 it by accident. Inputs are validated by pydantic the same way the plugin contract is.
+
+Every row a list can return carries ``updated_at``: it is what the next ``updated_since``
+is asked with, and a cursor a client cannot read is no cursor at all (#230).
 """
 
 from __future__ import annotations
@@ -53,6 +56,7 @@ class CompanyOut(Schema):
     identifiers: list[IdentifierOut] = Field(default_factory=list)
     notes: str = ""
     created_at: dt.datetime
+    updated_at: dt.datetime
 
 
 class PhoneNumberOut(Schema):
@@ -164,6 +168,7 @@ class ListingOut(Schema):
     decided_at: dt.datetime | None = None
     application_ids: list[int]
     web_url: str
+    updated_at: dt.datetime
 
 
 class ListingDetailOut(ListingOut):
@@ -258,6 +263,7 @@ class ReminderOut(Schema):
     due_at: dt.datetime
     done_at: dt.datetime | None = None
     notified_at: dt.datetime | None = None
+    updated_at: dt.datetime
 
 
 class ListingRef(Schema):
@@ -280,6 +286,7 @@ class InterviewOut(Schema):
     reminder_id: int | None = None
     web_url: str
     calendar_url: str
+    updated_at: dt.datetime
 
 
 class InterviewIn(Schema):
@@ -322,6 +329,7 @@ class ApplicationOut(Schema):
     tags: list[str]
     next_interview_at: dt.datetime | None = None
     created_at: dt.datetime
+    updated_at: dt.datetime
     web_url: str
 
 
@@ -361,6 +369,7 @@ class CVOut(Schema):
     theme: str
     language: str = ""
     item_count: int
+    updated_at: dt.datetime
 
 
 class CVItemOut(Schema):
@@ -380,6 +389,7 @@ class LetterOut(Schema):
     is_template: bool
     theme: str
     created_at: dt.datetime
+    updated_at: dt.datetime
 
 
 class LetterDetailOut(LetterOut):
@@ -400,6 +410,7 @@ class DocumentOut(Schema):
     title: str
     application_id: int | None = None
     created_at: dt.datetime
+    updated_at: dt.datetime
     download_url: str
 
 
@@ -456,6 +467,7 @@ def listing_out(request, posting, *, detail: bool = False) -> dict:
         "decided_at": posting.decided_at,
         "application_ids": [a.pk for a in posting.applications.all()],
         "web_url": request.build_absolute_uri(posting.get_absolute_url()),
+        "updated_at": posting.updated_at,
     }
     if detail:
         data["description"] = posting.description
@@ -481,6 +493,7 @@ def application_out(request, application, *, detail: bool = False) -> dict:
         "tags": [tag.name for tag in application.tags.all()],
         "next_interview_at": getattr(application, "next_interview_at", None),
         "created_at": application.created_at,
+        "updated_at": application.updated_at,
         "web_url": request.build_absolute_uri(application.get_absolute_url()),
     }
     if detail:
@@ -520,6 +533,7 @@ def interview_out(request, interview) -> dict:
         "calendar_url": request.build_absolute_uri(
             reverse("postulo-api:interview_calendar", kwargs={"pk": interview.pk})
         ),
+        "updated_at": interview.updated_at,
     }
 
 
@@ -531,6 +545,7 @@ def reminder_out(reminder) -> dict:
         "due_at": reminder.due_at,
         "done_at": reminder.done_at,
         "notified_at": reminder.notified_at,
+        "updated_at": reminder.updated_at,
     }
 
 
@@ -549,6 +564,7 @@ def company_out(company, *, detail: bool = False) -> dict:
         ],
         "notes": company.notes,
         "created_at": company.created_at,
+        "updated_at": company.updated_at,
     }
     if detail:
         data["contacts"] = [contact_out(c) for c in company.contacts.all()]
@@ -603,6 +619,7 @@ def document_out(request, document, *, source: str) -> dict:
         "title": document.title,
         "application_id": getattr(document, "application_id", None),
         "created_at": document.created_at,
+        "updated_at": document.updated_at,
         "download_url": request.build_absolute_uri(
             reverse(name, kwargs={"source": source, "pk": document.pk})
         ),

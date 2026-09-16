@@ -1,5 +1,7 @@
 """Reminders: the nudges a person set for themselves."""
 
+import datetime as dt
+
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
@@ -7,6 +9,7 @@ from ninja.pagination import paginate
 from postulo.applications.models import Application, Reminder
 
 from ..auth import scope
+from ..paging import UPDATED_SINCE, Page, changed_since
 from ..schemas import ReminderIn, ReminderOut, reminder_out
 from .common import owned, owned_or_404
 
@@ -14,18 +17,19 @@ router = Router(tags=["reminders"], auth=scope("read"))
 
 
 @router.get("", response=list[ReminderOut], summary="List reminders")
-@paginate
+@paginate(Page, row=lambda request, reminder: reminder_out(reminder))
 def list_reminders(
     request,
     due: bool = Query(False, description="Only outstanding reminders whose time has come"),
     outstanding: bool = Query(False, description="Only reminders not yet done"),
+    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
 ):
     reminders = owned(request, Reminder.objects).order_by("due_at")
     if due:
         reminders = reminders.due()
     elif outstanding:
         reminders = reminders.outstanding()
-    return [reminder_out(r) for r in reminders]
+    return changed_since(reminders, updated_since)
 
 
 @router.post("", response={201: ReminderOut}, auth=scope("write"), summary="Add a reminder")

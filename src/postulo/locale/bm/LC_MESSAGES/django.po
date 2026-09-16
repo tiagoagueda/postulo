@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 11:12+0000\n"
+"POT-Creation-Date: 2026-09-16 11:49+0000\n"
 "PO-Revision-Date: 2026-09-06 21:17+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Bamanankan\n"
@@ -524,7 +524,7 @@ msgid ""
 "A bug report is worth as much as anything else here. The repository is at <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a>, and <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> says how a change lands."
 msgstr ""
 
-#: src/postulo/api/api.py:291
+#: src/postulo/api/api.py:321
 msgid "A capture cannot come after the last of its batch."
 msgstr ""
 
@@ -1090,6 +1090,14 @@ msgstr[0] ""
 msgid "and %(more)s more"
 msgstr ""
 
+#: src/postulo/api/idempotency.py:35
+msgid "Another request is using this Idempotency-Key; try again in a moment."
+msgstr ""
+
+#: src/postulo/api/models.py:176
+msgid "answer"
+msgstr ""
+
 #: src/postulo/resume/models.py:232
 msgid "Answered"
 msgstr ""
@@ -1128,11 +1136,11 @@ msgstr ""
 msgid "API"
 msgstr ""
 
-#: src/postulo/api/models.py:73
+#: src/postulo/api/models.py:75
 msgid "API token"
 msgstr ""
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:76 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 msgid "API tokens"
@@ -1570,7 +1578,7 @@ msgstr ""
 msgid "Capture discarded."
 msgstr ""
 
-#: src/postulo/api/models.py:22
+#: src/postulo/api/models.py:24
 msgid "Capture postings"
 msgstr ""
 
@@ -1578,7 +1586,7 @@ msgstr ""
 msgid "Capture sources this instance has"
 msgstr ""
 
-#: src/postulo/api/api.py:331
+#: src/postulo/api/api.py:361
 #, python-format
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
@@ -1587,7 +1595,7 @@ msgstr ""
 msgid "captured from"
 msgstr ""
 
-#: src/postulo/api/api.py:320
+#: src/postulo/api/api.py:350
 #, python-format
 msgid "Captured: %(title)s"
 msgstr ""
@@ -2527,7 +2535,7 @@ msgstr ""
 msgid "Download the archive"
 msgstr ""
 
-#: src/postulo/api/models.py:25
+#: src/postulo/api/models.py:27
 msgid "Download the files themselves"
 msgstr ""
 
@@ -2850,7 +2858,7 @@ msgstr ""
 msgid "Expires"
 msgstr ""
 
-#: src/postulo/api/models.py:66 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
 msgid "expires"
 msgstr ""
 
@@ -2996,6 +3004,10 @@ msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html:26
 msgid "Find one"
+msgstr ""
+
+#: src/postulo/api/models.py:174
+msgid "fingerprint"
 msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
@@ -3419,6 +3431,14 @@ msgstr ""
 
 #: src/postulo/documents/models.py:661
 msgid "id in the store"
+msgstr ""
+
+#: src/postulo/api/models.py:179
+msgid "idempotent request"
+msgstr ""
+
+#: src/postulo/api/models.py:180
+msgid "idempotent requests"
 msgstr ""
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
@@ -3859,6 +3879,10 @@ msgid ""
 "Kept in the international form, so you can still ring it from another country. A number that already starts with + is taken as it is."
 msgstr ""
 
+#: src/postulo/api/models.py:173
+msgid "key"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html:159
 msgid ""
 "Keys: <kbd>d</kbd> discards and moves on, <kbd>j</kbd> skips to the next, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves and moves on — while nothing is being typed."
@@ -4016,7 +4040,7 @@ msgstr ""
 msgid "last synced"
 msgstr ""
 
-#: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
 msgid "last used"
 msgstr ""
 
@@ -4506,7 +4530,7 @@ msgstr ""
 msgid "NACE division"
 msgstr ""
 
-#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
+#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:63
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
 #: src/postulo/jobs/models.py:42 src/postulo/jobs/models.py:173
@@ -5121,7 +5145,7 @@ msgstr ""
 msgid "Nothing resembling a job posting was found on that page."
 msgstr ""
 
-#: src/postulo/api/api.py:389
+#: src/postulo/api/api.py:423
 msgid "Nothing resembling a job posting was found there."
 msgstr ""
 
@@ -5934,7 +5958,7 @@ msgid ""
 "POSTULO_LOG_DIR is empty, so records go to the console and nowhere else. Set it to a directory on the data volume to read them here; see Configuration in the wiki."
 msgstr ""
 
-#: src/postulo/api/models.py:63
+#: src/postulo/api/models.py:65
 msgid "prefix"
 msgstr ""
 
@@ -6164,7 +6188,7 @@ msgstr ""
 msgid "read by a speaker"
 msgstr ""
 
-#: src/postulo/api/models.py:23
+#: src/postulo/api/models.py:25
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr ""
 
@@ -6201,7 +6225,7 @@ msgstr ""
 msgid "Record an application"
 msgstr ""
 
-#: src/postulo/api/models.py:24
+#: src/postulo/api/models.py:26
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr ""
 
@@ -6485,7 +6509,7 @@ msgstr ""
 msgid "Revoke"
 msgstr ""
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
 msgid "revoked"
 msgstr ""
 
@@ -6678,7 +6702,7 @@ msgstr ""
 msgid "scheme"
 msgstr ""
 
-#: src/postulo/api/models.py:65
+#: src/postulo/api/models.py:67
 msgid "scopes"
 msgstr ""
 
@@ -7258,6 +7282,12 @@ msgstr ""
 msgid "State"
 msgstr ""
 
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
+#: src/postulo/jobs/models.py:831
+msgid "status"
+msgstr ""
+
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
@@ -7269,12 +7299,6 @@ msgstr ""
 #: src/postulo/templates/applications/report_print.html:163
 #: src/postulo/templates/core/import_csv_map.html:66
 msgid "Status"
-msgstr ""
-
-#: src/postulo/applications/models.py:215
-#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
-#: src/postulo/jobs/models.py:831
-msgid "status"
 msgstr ""
 
 #: src/postulo/applications/models.py:348
@@ -7940,7 +7964,7 @@ msgid ""
 "The file itself cannot be changed. Upload the new one and mark it as superseding this, so what you sent still means the file you sent."
 msgstr ""
 
-#: src/postulo/api/api.py:334
+#: src/postulo/api/api.py:364
 #, python-format
 msgid "The first: %(title)s"
 msgstr ""
@@ -8292,6 +8316,10 @@ msgstr ""
 msgid "This entry prints its original text on every CV."
 msgstr ""
 
+#: src/postulo/api/idempotency.py:36
+msgid "This Idempotency-Key was already used for a different capture."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 msgid "This identifier is already listed."
@@ -8499,7 +8527,7 @@ msgstr ""
 msgid "Token created. Copy it now; it is not shown again."
 msgstr ""
 
-#: src/postulo/api/models.py:64
+#: src/postulo/api/models.py:66
 msgid "token hash"
 msgstr ""
 
@@ -8703,7 +8731,7 @@ msgstr ""
 msgid "Use the instance default"
 msgstr ""
 
-#: src/postulo/api/routers/applications.py:126
+#: src/postulo/api/routers/applications.py:128
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
 msgstr ""
@@ -9176,7 +9204,7 @@ msgstr ""
 msgid "Which column is which?"
 msgstr ""
 
-#: src/postulo/api/forms.py:24 src/postulo/api/models.py:61
+#: src/postulo/api/forms.py:24 src/postulo/api/models.py:63
 msgid "Which device or tool this is for."
 msgstr ""
 

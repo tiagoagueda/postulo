@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 11:12+0000\n"
+"POT-Creation-Date: 2026-09-16 11:49+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: shqip\n"
@@ -584,7 +584,7 @@ msgid ""
 msgstr ""
 "Një raportim gabimi vlen po aq sa çdo gjë tjetër këtu. Depoja gjendet te <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a>, dhe <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> shpjegon si hyn një ndryshim."
 
-#: src/postulo/api/api.py:291
+#: src/postulo/api/api.py:321
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "Një kapje nuk mund të vijë pas së fundit të grupit të saj."
@@ -1285,6 +1285,14 @@ msgstr[1] "dhe %(counter)s të tjera"
 msgid "and %(more)s more"
 msgstr "dhe %(more)s të tjera"
 
+#: src/postulo/api/idempotency.py:35
+msgid "Another request is using this Idempotency-Key; try again in a moment."
+msgstr ""
+
+#: src/postulo/api/models.py:176
+msgid "answer"
+msgstr ""
+
 #: src/postulo/resume/models.py:232
 #, draft
 msgid "Answered"
@@ -1331,12 +1339,12 @@ msgstr "Kudo"
 msgid "API"
 msgstr "API"
 
-#: src/postulo/api/models.py:73
+#: src/postulo/api/models.py:75
 #, draft
 msgid "API token"
 msgstr "Token API"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:76 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1868,7 +1876,7 @@ msgstr ""
 msgid "Capture discarded."
 msgstr "Kapja u hodh poshtë."
 
-#: src/postulo/api/models.py:22
+#: src/postulo/api/models.py:24
 #, draft
 msgid "Capture postings"
 msgstr "Kap shpallje"
@@ -1878,7 +1886,7 @@ msgstr "Kap shpallje"
 msgid "Capture sources this instance has"
 msgstr "Burimet e kapjes që ka ky instalim"
 
-#: src/postulo/api/api.py:331
+#: src/postulo/api/api.py:361
 #, python-format, draft
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "U kapën %(count)s shpallje nga %(host)s"
@@ -1888,7 +1896,7 @@ msgstr "U kapën %(count)s shpallje nga %(host)s"
 msgid "captured from"
 msgstr "kapur nga"
 
-#: src/postulo/api/api.py:320
+#: src/postulo/api/api.py:350
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "U kap: %(title)s"
@@ -3049,7 +3057,7 @@ msgstr "Shkarko PDF"
 msgid "Download the archive"
 msgstr "Shkarko arkivin"
 
-#: src/postulo/api/models.py:25
+#: src/postulo/api/models.py:27
 #, draft
 msgid "Download the files themselves"
 msgstr "Shkarko vetë skedarët"
@@ -3457,7 +3465,7 @@ msgstr "skaduar"
 msgid "Expires"
 msgstr "Skadon"
 
-#: src/postulo/api/models.py:66 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
 #, draft
 msgid "expires"
 msgstr "skadon"
@@ -3641,6 +3649,10 @@ msgstr "Gjej logon"
 #, draft
 msgid "Find one"
 msgstr "Gjeni një"
+
+#: src/postulo/api/models.py:174
+msgid "fingerprint"
+msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -4160,6 +4172,14 @@ msgstr "Kam aplikuar tashmë për këtë"
 #, draft
 msgid "id in the store"
 msgstr "identifikues në depo"
+
+#: src/postulo/api/models.py:179
+msgid "idempotent request"
+msgstr ""
+
+#: src/postulo/api/models.py:180
+msgid "idempotent requests"
+msgstr ""
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
 #: src/postulo/jobs/models.py:368 src/postulo/plugins/models.py:278
@@ -4706,6 +4726,10 @@ msgid ""
 msgstr ""
 "Ruhet në formën ndërkombëtare, që të mund ta thërrisni edhe nga një shtet tjetër. Një numër që fillon tashmë me + merret ashtu siç është."
 
+#: src/postulo/api/models.py:173
+msgid "key"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html:159
 #, draft
 msgid ""
@@ -4896,7 +4920,7 @@ msgstr "Hyrja e fundit"
 msgid "last synced"
 msgstr "sinkronizuar së fundmi"
 
-#: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
 #, draft
 msgid "last used"
 msgstr "përdorur së fundmi"
@@ -5500,7 +5524,7 @@ msgstr "Zhvendos lart"
 msgid "NACE division"
 msgstr "divizion NACE"
 
-#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
+#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:63
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
 #: src/postulo/jobs/models.py:42 src/postulo/jobs/models.py:173
@@ -6254,7 +6278,7 @@ msgstr "Ende asgjë e regjistruar."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Në atë faqe nuk u gjet asgjë që t'i ngjante një shpalljeje pune."
 
-#: src/postulo/api/api.py:389
+#: src/postulo/api/api.py:423
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Atje nuk u gjet asgjë që t'i ngjante një shpalljeje pune."
@@ -7271,7 +7295,7 @@ msgid ""
 msgstr ""
 "POSTULO_LOG_DIR është bosh, prandaj regjistrimet shkojnë në konsolë dhe askund tjetër. Vendoseni te një drejtori në vëllimin e të dhënave për t'i lexuar këtu; shihni Konfigurimin në wiki."
 
-#: src/postulo/api/models.py:63
+#: src/postulo/api/models.py:65
 #, draft
 msgid "prefix"
 msgstr "parashtesë"
@@ -7553,7 +7577,7 @@ msgstr ""
 msgid "read by a speaker"
 msgstr "lexuar nga një folës"
 
-#: src/postulo/api/models.py:23
+#: src/postulo/api/models.py:25
 #, draft
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr "Lexo gjithçka: aplikimet, shpalljet, kompanitë, dokumentet, njohuritë"
@@ -7598,7 +7622,7 @@ msgstr "Regjistro"
 msgid "Record an application"
 msgstr "Regjistro një aplikim"
 
-#: src/postulo/api/models.py:24
+#: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr "Regjistro dhe ndrysho: aplikimet, shpalljet, shënimet, kujtesat, letrat"
@@ -7951,7 +7975,7 @@ msgstr "shqyrtuar më"
 msgid "Revoke"
 msgstr "Revoko"
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
 #, draft
 msgid "revoked"
 msgstr "revokuar"
@@ -8181,7 +8205,7 @@ msgstr "Vetëm të caktuarat"
 msgid "scheme"
 msgstr "skemë"
 
-#: src/postulo/api/models.py:65
+#: src/postulo/api/models.py:67
 #, draft
 msgid "scopes"
 msgstr "fushëveprime"
@@ -8901,6 +8925,13 @@ msgstr "gjendje"
 msgid "State"
 msgstr "Gjendja"
 
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
+#: src/postulo/jobs/models.py:831
+#, draft
+msgid "status"
+msgstr "status"
+
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
@@ -8914,13 +8945,6 @@ msgstr "Gjendja"
 #, draft
 msgid "Status"
 msgstr "Statusi"
-
-#: src/postulo/applications/models.py:215
-#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
-#: src/postulo/jobs/models.py:831
-#, draft
-msgid "status"
-msgstr "status"
 
 #: src/postulo/applications/models.py:348
 #, draft
@@ -9726,7 +9750,7 @@ msgid ""
 msgstr ""
 "Vetë skedari nuk mund të ndryshohet. Ngarkoni të riun dhe shënojeni si zëvendësim të këtij, që ajo çka dërguat të nënkuptojë ende skedarin që dërguat."
 
-#: src/postulo/api/api.py:334
+#: src/postulo/api/api.py:364
 #, python-format, draft
 msgid "The first: %(title)s"
 msgstr "E para: %(title)s"
@@ -10162,6 +10186,10 @@ msgstr "Për këtë kompani nuk është regjistruar asnjë faqe interneti."
 msgid "This entry prints its original text on every CV."
 msgstr "Ky zë e shtyp tekstin e tij origjinal në çdo CV."
 
+#: src/postulo/api/idempotency.py:36
+msgid "This Idempotency-Key was already used for a different capture."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 #, draft
@@ -10419,7 +10447,7 @@ msgstr "token"
 msgid "Token created. Copy it now; it is not shown again."
 msgstr "Tokeni u krijua. Kopjojeni tani; nuk shfaqet më."
 
-#: src/postulo/api/models.py:64
+#: src/postulo/api/models.py:66
 #, draft
 msgid "token hash"
 msgstr "hash i tokenit"
@@ -10671,7 +10699,7 @@ msgstr "përdor Gravatar-in tim"
 msgid "Use the instance default"
 msgstr "Përdor të parazgjedhurën e instalimit"
 
-#: src/postulo/api/routers/applications.py:126
+#: src/postulo/api/routers/applications.py:128
 #, draft
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
@@ -11260,7 +11288,7 @@ msgstr "Cili aplikim?"
 msgid "Which column is which?"
 msgstr "Cila kolonë është cila?"
 
-#: src/postulo/api/forms.py:24 src/postulo/api/models.py:61
+#: src/postulo/api/forms.py:24 src/postulo/api/models.py:63
 #, draft
 msgid "Which device or tool this is for."
 msgstr "Për cilën pajisje ose cilin mjet është kjo."

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 11:12+0000\n"
+"POT-Creation-Date: 2026-09-16 11:49+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -585,7 +585,7 @@ msgid ""
 msgstr ""
 "Egy hibajelentés annyit ér, mint bármi más itt. A tároló a <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a> címen van, a <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> pedig leírja, hogyan kerül be egy változtatás."
 
-#: src/postulo/api/api.py:291
+#: src/postulo/api/api.py:321
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "Egy rögzítés nem jöhet a kötege utolsója után."
@@ -1284,6 +1284,14 @@ msgstr[1] "és még %(counter)s"
 msgid "and %(more)s more"
 msgstr "és még %(more)s"
 
+#: src/postulo/api/idempotency.py:35
+msgid "Another request is using this Idempotency-Key; try again in a moment."
+msgstr ""
+
+#: src/postulo/api/models.py:176
+msgid "answer"
+msgstr ""
+
 #: src/postulo/resume/models.py:232
 #, draft
 msgid "Answered"
@@ -1330,12 +1338,12 @@ msgstr "Bárhonnan"
 msgid "API"
 msgstr "API"
 
-#: src/postulo/api/models.py:73
+#: src/postulo/api/models.py:75
 #, draft
 msgid "API token"
 msgstr "API-token"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:76 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1868,7 +1876,7 @@ msgstr ""
 msgid "Capture discarded."
 msgstr "Rögzítés elvetve."
 
-#: src/postulo/api/models.py:22
+#: src/postulo/api/models.py:24
 #, draft
 msgid "Capture postings"
 msgstr "Hirdetések rögzítése"
@@ -1878,7 +1886,7 @@ msgstr "Hirdetések rögzítése"
 msgid "Capture sources this instance has"
 msgstr "Ennek a példánynak a rögzítési forrásai"
 
-#: src/postulo/api/api.py:331
+#: src/postulo/api/api.py:361
 #, python-format, draft
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "%(count)s hirdetés rögzítve innen: %(host)s"
@@ -1888,7 +1896,7 @@ msgstr "%(count)s hirdetés rögzítve innen: %(host)s"
 msgid "captured from"
 msgstr "rögzítve innen"
 
-#: src/postulo/api/api.py:320
+#: src/postulo/api/api.py:350
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Rögzítve: %(title)s"
@@ -3053,7 +3061,7 @@ msgstr "PDF letöltése"
 msgid "Download the archive"
 msgstr "Az archívum letöltése"
 
-#: src/postulo/api/models.py:25
+#: src/postulo/api/models.py:27
 #, draft
 msgid "Download the files themselves"
 msgstr "Maguk a fájlok letöltése"
@@ -3461,7 +3469,7 @@ msgstr "lejárt"
 msgid "Expires"
 msgstr "Lejár"
 
-#: src/postulo/api/models.py:66 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
 #, draft
 msgid "expires"
 msgstr "lejár"
@@ -3646,6 +3654,10 @@ msgstr "Logó keresése"
 #, draft
 msgid "Find one"
 msgstr "Keressen egyet"
+
+#: src/postulo/api/models.py:174
+msgid "fingerprint"
+msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -4166,6 +4178,14 @@ msgstr "Ide már jelentkeztem"
 #, draft
 msgid "id in the store"
 msgstr "azonosító a tárolóban"
+
+#: src/postulo/api/models.py:179
+msgid "idempotent request"
+msgstr ""
+
+#: src/postulo/api/models.py:180
+msgid "idempotent requests"
+msgstr ""
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
 #: src/postulo/jobs/models.py:368 src/postulo/plugins/models.py:278
@@ -4712,6 +4732,10 @@ msgid ""
 msgstr ""
 "Nemzetközi formában tárolva, hogy más országból is fel tudja hívni. A már +-szal kezdődő számot úgy vesszük, ahogy van."
 
+#: src/postulo/api/models.py:173
+msgid "key"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html:159
 #, draft
 msgid ""
@@ -4902,7 +4926,7 @@ msgstr "Utolsó bejelentkezés"
 msgid "last synced"
 msgstr "utoljára szinkronizálva"
 
-#: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
 #, draft
 msgid "last used"
 msgstr "utoljára használva"
@@ -5507,7 +5531,7 @@ msgstr "Feljebb"
 msgid "NACE division"
 msgstr "NACE-ágazat"
 
-#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
+#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:63
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
 #: src/postulo/jobs/models.py:42 src/postulo/jobs/models.py:173
@@ -6268,7 +6292,7 @@ msgstr "Még semmi sincs rögzítve."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Azon az oldalon semmi álláshirdetésre emlékeztető nem található."
 
-#: src/postulo/api/api.py:389
+#: src/postulo/api/api.py:423
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Ott semmi álláshirdetésre emlékeztető nem található."
@@ -7289,7 +7313,7 @@ msgid ""
 msgstr ""
 "A POSTULO_LOG_DIR üres, így a bejegyzések csak a konzolra kerülnek. Állítsa be egy könyvtárra az adatköteten, hogy itt olvashassa őket; lásd a Konfigurációt a wikin."
 
-#: src/postulo/api/models.py:63
+#: src/postulo/api/models.py:65
 #, draft
 msgid "prefix"
 msgstr "előtag"
@@ -7573,7 +7597,7 @@ msgstr ""
 msgid "read by a speaker"
 msgstr "beszélő olvasta"
 
-#: src/postulo/api/models.py:23
+#: src/postulo/api/models.py:25
 #, draft
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr ""
@@ -7619,7 +7643,7 @@ msgstr "Rögzítés"
 msgid "Record an application"
 msgstr "Jelentkezés rögzítése"
 
-#: src/postulo/api/models.py:24
+#: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr ""
@@ -7972,7 +7996,7 @@ msgstr "elbírálva"
 msgid "Revoke"
 msgstr "Visszavonás"
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
 #, draft
 msgid "revoked"
 msgstr "visszavonva"
@@ -8202,7 +8226,7 @@ msgstr "Csak a kitűzöttek"
 msgid "scheme"
 msgstr "séma"
 
-#: src/postulo/api/models.py:65
+#: src/postulo/api/models.py:67
 #, draft
 msgid "scopes"
 msgstr "hatókörök"
@@ -8922,6 +8946,13 @@ msgstr "állapot"
 msgid "State"
 msgstr "Állapot"
 
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
+#: src/postulo/jobs/models.py:831
+#, draft
+msgid "status"
+msgstr "állapot"
+
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
@@ -8935,13 +8966,6 @@ msgstr "Állapot"
 #, draft
 msgid "Status"
 msgstr "Állapot"
-
-#: src/postulo/applications/models.py:215
-#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
-#: src/postulo/jobs/models.py:831
-#, draft
-msgid "status"
-msgstr "állapot"
 
 #: src/postulo/applications/models.py:348
 #, draft
@@ -9749,7 +9773,7 @@ msgid ""
 msgstr ""
 "Magát a fájlt nem lehet megváltoztatni. Töltsd fel az újat, és jelöld meg úgy, hogy ezt váltja fel, így az, amit elküldtél, továbbra is az elküldött fájlt jelenti."
 
-#: src/postulo/api/api.py:334
+#: src/postulo/api/api.py:364
 #, python-format, draft
 msgid "The first: %(title)s"
 msgstr "Az első: %(title)s"
@@ -10187,6 +10211,10 @@ msgstr "Ehhez a céghez nincs honlap rögzítve."
 msgid "This entry prints its original text on every CV."
 msgstr "Ez a bejegyzés minden önéletrajzon az eredeti szövegét nyomtatja."
 
+#: src/postulo/api/idempotency.py:36
+msgid "This Idempotency-Key was already used for a different capture."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 #, draft
@@ -10444,7 +10472,7 @@ msgstr "token"
 msgid "Token created. Copy it now; it is not shown again."
 msgstr "Token létrehozva. Másold ki most; nem jelenik meg többé."
 
-#: src/postulo/api/models.py:64
+#: src/postulo/api/models.py:66
 #, draft
 msgid "token hash"
 msgstr "token hash"
@@ -10697,7 +10725,7 @@ msgstr "Gravatarom használata"
 msgid "Use the instance default"
 msgstr "A példány alapértelmezésének használata"
 
-#: src/postulo/api/routers/applications.py:126
+#: src/postulo/api/routers/applications.py:128
 #, draft
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
@@ -11284,7 +11312,7 @@ msgstr "Melyik jelentkezés?"
 msgid "Which column is which?"
 msgstr "Melyik oszlop micsoda?"
 
-#: src/postulo/api/forms.py:24 src/postulo/api/models.py:61
+#: src/postulo/api/forms.py:24 src/postulo/api/models.py:63
 #, draft
 msgid "Which device or tool this is for."
 msgstr "Melyik eszközhöz vagy programhoz való."

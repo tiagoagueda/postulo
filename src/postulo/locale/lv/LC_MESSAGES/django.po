@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 11:12+0000\n"
+"POT-Creation-Date: 2026-09-16 11:49+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: latviešu\n"
@@ -600,7 +600,7 @@ msgid ""
 msgstr ""
 "Kļūdas ziņojums šeit ir tikpat vērts kā jebkas cits. Repozitorijs ir <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a>, un <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> stāsta, kā izmaiņas nonāk projektā."
 
-#: src/postulo/api/api.py:291
+#: src/postulo/api/api.py:321
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "Tvērums nevar nākt pēc savas partijas pēdējā."
@@ -1302,6 +1302,14 @@ msgstr[2] "un vēl %(counter)s"
 msgid "and %(more)s more"
 msgstr "un vēl %(more)s"
 
+#: src/postulo/api/idempotency.py:35
+msgid "Another request is using this Idempotency-Key; try again in a moment."
+msgstr ""
+
+#: src/postulo/api/models.py:176
+msgid "answer"
+msgstr ""
+
 #: src/postulo/resume/models.py:232
 #, draft
 msgid "Answered"
@@ -1348,12 +1356,12 @@ msgstr "No jebkurienes"
 msgid "API"
 msgstr "API"
 
-#: src/postulo/api/models.py:73
+#: src/postulo/api/models.py:75
 #, draft
 msgid "API token"
 msgstr "API žetons"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:76 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1884,7 +1892,7 @@ msgstr ""
 msgid "Capture discarded."
 msgstr "Tvērums noraidīts."
 
-#: src/postulo/api/models.py:22
+#: src/postulo/api/models.py:24
 #, draft
 msgid "Capture postings"
 msgstr "Tvert sludinājumus"
@@ -1894,7 +1902,7 @@ msgstr "Tvert sludinājumus"
 msgid "Capture sources this instance has"
 msgstr "Šīs instances tveršanas avoti"
 
-#: src/postulo/api/api.py:331
+#: src/postulo/api/api.py:361
 #, python-format, draft
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "Tverti %(count)s sludinājumi no %(host)s"
@@ -1904,7 +1912,7 @@ msgstr "Tverti %(count)s sludinājumi no %(host)s"
 msgid "captured from"
 msgstr "tverts no"
 
-#: src/postulo/api/api.py:320
+#: src/postulo/api/api.py:350
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Tverts: %(title)s"
@@ -3066,7 +3074,7 @@ msgstr "Lejupielādēt PDF"
 msgid "Download the archive"
 msgstr "Lejupielādēt arhīvu"
 
-#: src/postulo/api/models.py:25
+#: src/postulo/api/models.py:27
 #, draft
 msgid "Download the files themselves"
 msgstr "Lejupielādēt pašus failus"
@@ -3471,7 +3479,7 @@ msgstr "beidzies"
 msgid "Expires"
 msgstr "Beidzas"
 
-#: src/postulo/api/models.py:66 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
 #, draft
 msgid "expires"
 msgstr "beidzas"
@@ -3655,6 +3663,10 @@ msgstr "Atrast logotipu"
 #, draft
 msgid "Find one"
 msgstr "Atrast kādu"
+
+#: src/postulo/api/models.py:174
+msgid "fingerprint"
+msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -4173,6 +4185,14 @@ msgstr "Es jau pieteicos šim"
 #, draft
 msgid "id in the store"
 msgstr "id krātuvē"
+
+#: src/postulo/api/models.py:179
+msgid "idempotent request"
+msgstr ""
+
+#: src/postulo/api/models.py:180
+msgid "idempotent requests"
+msgstr ""
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
 #: src/postulo/jobs/models.py:368 src/postulo/plugins/models.py:278
@@ -4720,6 +4740,10 @@ msgid ""
 msgstr ""
 "Glabāts starptautiskā formā, lai varētu piezvanīt arī no citas valsts. Numurs, kas jau sākas ar +, tiek ņemts tāds, kāds ir."
 
+#: src/postulo/api/models.py:173
+msgid "key"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html:159
 #, draft
 msgid ""
@@ -4910,7 +4934,7 @@ msgstr "Pēdējā pieteikšanās"
 msgid "last synced"
 msgstr "pēdējo reizi sinhronizēts"
 
-#: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
 #, draft
 msgid "last used"
 msgstr "pēdējoreiz lietots"
@@ -5517,7 +5541,7 @@ msgstr "Uz augšu"
 msgid "NACE division"
 msgstr "NACE nodaļa"
 
-#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
+#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:63
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
 #: src/postulo/jobs/models.py:42 src/postulo/jobs/models.py:173
@@ -6273,7 +6297,7 @@ msgstr "Vēl nekas nav ierakstīts."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Tajā lapā netika atrasts nekas, kas līdzinātos darba sludinājumam."
 
-#: src/postulo/api/api.py:389
+#: src/postulo/api/api.py:423
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Tur netika atrasts nekas, kas līdzinātos darba sludinājumam."
@@ -7306,7 +7330,7 @@ msgid ""
 msgstr ""
 "POSTULO_LOG_DIR ir tukšs, tāpēc ieraksti nonāk tikai konsolē. Iestatiet to uz direktoriju datu sējumā, lai tos lasītu šeit; skatiet Konfigurāciju vikī."
 
-#: src/postulo/api/models.py:63
+#: src/postulo/api/models.py:65
 #, draft
 msgid "prefix"
 msgstr "prefikss"
@@ -7590,7 +7614,7 @@ msgstr ""
 msgid "read by a speaker"
 msgstr "izlasījis runātājs"
 
-#: src/postulo/api/models.py:23
+#: src/postulo/api/models.py:25
 #, draft
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr "Lasīt visu: pieteikumi, sludinājumi, uzņēmumi, dokumenti, ieskati"
@@ -7635,7 +7659,7 @@ msgstr "Ierakstīt"
 msgid "Record an application"
 msgstr "Ierakstīt pieteikumu"
 
-#: src/postulo/api/models.py:24
+#: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr ""
@@ -7987,7 +8011,7 @@ msgstr "pārskatīts"
 msgid "Revoke"
 msgstr "Atsaukt"
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
 #, draft
 msgid "revoked"
 msgstr "atsaukts"
@@ -8217,7 +8241,7 @@ msgstr "Tikai ieplānotās"
 msgid "scheme"
 msgstr "shēma"
 
-#: src/postulo/api/models.py:65
+#: src/postulo/api/models.py:67
 #, draft
 msgid "scopes"
 msgstr "tvērumi"
@@ -8937,6 +8961,13 @@ msgstr "stāvoklis"
 msgid "State"
 msgstr "Stāvoklis"
 
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
+#: src/postulo/jobs/models.py:831
+#, draft
+msgid "status"
+msgstr "statuss"
+
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
@@ -8950,13 +8981,6 @@ msgstr "Stāvoklis"
 #, draft
 msgid "Status"
 msgstr "Statuss"
-
-#: src/postulo/applications/models.py:215
-#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
-#: src/postulo/jobs/models.py:831
-#, draft
-msgid "status"
-msgstr "statuss"
 
 #: src/postulo/applications/models.py:348
 #, draft
@@ -9764,7 +9788,7 @@ msgid ""
 msgstr ""
 "Pašu failu nevar mainīt. Augšupielādējiet jauno un atzīmējiet, ka tas aizstāj šo, lai tas, ko nosūtījāt, joprojām nozīmētu to failu, kuru nosūtījāt."
 
-#: src/postulo/api/api.py:334
+#: src/postulo/api/api.py:364
 #, python-format, draft
 msgid "The first: %(title)s"
 msgstr "Pirmais: %(title)s"
@@ -10202,6 +10226,10 @@ msgstr "Šim uzņēmumam nav norādīta vietne."
 msgid "This entry prints its original text on every CV."
 msgstr "Šis ieraksts drukā savu sākotnējo tekstu katrā CV."
 
+#: src/postulo/api/idempotency.py:36
+msgid "This Idempotency-Key was already used for a different capture."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 #, draft
@@ -10458,7 +10486,7 @@ msgstr "žetons"
 msgid "Token created. Copy it now; it is not shown again."
 msgstr "Žetons izveidots. Nokopējiet to tagad; tas netiks rādīts vēlreiz."
 
-#: src/postulo/api/models.py:64
+#: src/postulo/api/models.py:66
 #, draft
 msgid "token hash"
 msgstr "žetona jaucējkods"
@@ -10711,7 +10739,7 @@ msgstr "lietot manu Gravatar"
 msgid "Use the instance default"
 msgstr "Lietot instances noklusējumu"
 
-#: src/postulo/api/routers/applications.py:126
+#: src/postulo/api/routers/applications.py:128
 #, draft
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
@@ -11296,7 +11324,7 @@ msgstr "Kurš pieteikums?"
 msgid "Which column is which?"
 msgstr "Kura kolonna ir kas?"
 
-#: src/postulo/api/forms.py:24 src/postulo/api/models.py:61
+#: src/postulo/api/forms.py:24 src/postulo/api/models.py:63
 #, draft
 msgid "Which device or tool this is for."
 msgstr "Kurai ierīcei vai rīkam tas paredzēts."

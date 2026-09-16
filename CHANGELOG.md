@@ -773,6 +773,50 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Every page of the API was built by reading everything first, retrying a capture made a
+  second capture, and the schema answered anybody who asked.** Five faults in the one
+  surface the browser extensions and `postulo-mcp` are built on, found in the September
+  audit.
+
+  Each list shaped every row it could see and then let django-ninja cut a page out of what
+  came back. Asking for a hundred applications on a thousand-application account ran the
+  subqueries, walked the tag prefetch and built an absolute address for all thousand, and
+  an agent paging through the lot paid that on every page — so reading a search end to end
+  cost the square of its size. A list now hands over the query itself and only the rows
+  that survive the cut are shaped. The count is still of the whole list.
+
+  `GET /captures` was not paginated at all, though *The capture API* has said since it was
+  written that lists take `limit` and `offset` and come back as `{"items", "count"}`. It
+  returned the first fifty rows in whatever order the database offered them, so a review
+  queue nobody had kept up with simply stopped at fifty with nothing to say so. It is a
+  page like the others now, newest first, which changes its shape: a client reading the
+  bare array has to read `items` instead. A test now reads the API's own schema and fails
+  on any list that hands back everything at once — the check that was missing, since the
+  test reading the wiki page checks paths and scopes and never shapes.
+
+  Capturing was not idempotent, while the code's own comment took retrying for granted. A
+  client that sends a posting and never sees the `201` cannot tell a lost reply from a
+  lost request, and the safe thing for it to do — send it again — left two captures of one
+  posting to decline and two notifications about it. A capture may now carry an
+  `Idempotency-Key` of the client's own invention: the first answer given under that key
+  is the answer it keeps getting, for a day, with nothing fetched and nobody told twice.
+  `/captures/known` stays what it always was, advice asked for beforehand, which does
+  nothing about the answer that went missing afterwards.
+
+  `/api/v1/openapi.json` answered without a token. The documentation page has always been
+  off, but django-ninja guards the schema only when it is given something to guard it
+  with, so the description of every call — and the plain fact that this address is a
+  Postulo — was there for anyone who asked, against the threat model's promise that the
+  API answers 401 to everything without a live token. It now wants a live token, of any
+  scope, or a person signed in to the instance.
+
+  And there was no way to ask what had changed. Lists could be narrowed by the date
+  something was applied for and by nothing else, so anything holding a copy of a search —
+  an agent, an extension — had to read all of it again and compare. Every list now takes
+  `updated_since` and answers with what changed at or after that moment, oldest change
+  first, and every row carries the `updated_at` to ask with the next time. A deletion is
+  not in it, because a row that is gone cannot be listed; the outbound webhooks that would
+  say so are their own feature (#240). (#230)
 - **A backup now holds what a restore needs, and a restore in a container is something you
   can do safely.** The archive was the database and the media, and that is not the whole of
   an instance. The plugins live on the data volume — the record of what is installed and the

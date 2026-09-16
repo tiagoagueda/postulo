@@ -22,6 +22,7 @@ from postulo.applications.services import (
 from postulo.jobs.models import Contact
 
 from ..auth import actor_of, scope
+from ..paging import UPDATED_SINCE, Page, changed_since
 from ..schemas import InterviewIn, InterviewOut, InterviewOutcomeIn, InterviewPatch, interview_out
 from .common import choice_or_422, owned, owned_or_404
 
@@ -33,7 +34,7 @@ def _queryset(request):
 
 
 @router.get("", response=list[InterviewOut], summary="List interviews")
-@paginate
+@paginate(Page, row=interview_out)
 def list_interviews(
     request,
     state: str = Query(
@@ -42,6 +43,7 @@ def list_interviews(
     ),
     application: int | None = Query(None, description="Only this application's"),
     since: dt.datetime | None = Query(None, description="Starting on or after this moment"),
+    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
 ):
     interviews = _queryset(request)
     if state == "upcoming":
@@ -58,7 +60,7 @@ def list_interviews(
         interviews = interviews.filter(application_id=application)
     if since:
         interviews = interviews.filter(starts_at__gte=since)
-    return [interview_out(request, i) for i in interviews]
+    return changed_since(interviews, updated_since)
 
 
 @router.get("/calendar.ics", summary="Everything still ahead, as an iCalendar file")

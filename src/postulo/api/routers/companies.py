@@ -1,5 +1,7 @@
 """Companies and the people at them."""
 
+import datetime as dt
+
 from django.db.models import Q
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
@@ -10,6 +12,7 @@ from postulo.jobs import identifiers
 from postulo.jobs.models import Company, CompanyKind, Contact, Industry
 
 from ..auth import scope
+from ..paging import UPDATED_SINCE, Page, changed_since
 from ..schemas import (
     CompanyDetailOut,
     CompanyIn,
@@ -26,8 +29,12 @@ router = Router(tags=["companies"], auth=scope("read"))
 
 
 @router.get("", response=list[CompanyOut], summary="List companies")
-@paginate
-def list_companies(request, q: str | None = Query(None, description="Name, location or industry")):
+@paginate(Page, row=lambda request, company: company_out(company))
+def list_companies(
+    request,
+    q: str | None = Query(None, description="Name, location or industry"),
+    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+):
     companies = (
         owned(request, Company.objects)
         .prefetch_related("industries", "identifiers")
@@ -40,7 +47,7 @@ def list_companies(request, q: str | None = Query(None, description="Name, locat
             | Q(industries__name__icontains=q)
             | Q(identifiers__value__icontains=q)
         ).distinct()
-    return [company_out(c) for c in companies]
+    return changed_since(companies, updated_since)
 
 
 @router.post("", response={201: CompanyDetailOut}, auth=scope("write"), summary="Add a company")

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 11:12+0000\n"
+"POT-Creation-Date: 2026-09-16 11:49+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: dansk\n"
@@ -584,7 +584,7 @@ msgid ""
 msgstr ""
 "En fejlrapport er lige så meget værd som alt andet her. Repositoriet ligger på <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a>, og <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> beskriver, hvordan en ændring lander."
 
-#: src/postulo/api/api.py:291
+#: src/postulo/api/api.py:321
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "En indfangning kan ikke komme efter den sidste i sit parti."
@@ -1283,6 +1283,14 @@ msgstr[1] "og %(counter)s flere"
 msgid "and %(more)s more"
 msgstr "og %(more)s mere"
 
+#: src/postulo/api/idempotency.py:35
+msgid "Another request is using this Idempotency-Key; try again in a moment."
+msgstr ""
+
+#: src/postulo/api/models.py:176
+msgid "answer"
+msgstr ""
+
 #: src/postulo/resume/models.py:232
 #, draft
 msgid "Answered"
@@ -1329,12 +1337,12 @@ msgstr "Alle steder"
 msgid "API"
 msgstr "API"
 
-#: src/postulo/api/models.py:73
+#: src/postulo/api/models.py:75
 #, draft
 msgid "API token"
 msgstr "API-token"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:76 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1865,7 +1873,7 @@ msgstr ""
 msgid "Capture discarded."
 msgstr "Indfangning kasseret."
 
-#: src/postulo/api/models.py:22
+#: src/postulo/api/models.py:24
 #, draft
 msgid "Capture postings"
 msgstr "Indfang opslag"
@@ -1875,7 +1883,7 @@ msgstr "Indfang opslag"
 msgid "Capture sources this instance has"
 msgstr "Denne instans' opsamlingskilder"
 
-#: src/postulo/api/api.py:331
+#: src/postulo/api/api.py:361
 #, python-format, draft
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "Indfangede %(count)s opslag fra %(host)s"
@@ -1885,7 +1893,7 @@ msgstr "Indfangede %(count)s opslag fra %(host)s"
 msgid "captured from"
 msgstr "indfanget fra"
 
-#: src/postulo/api/api.py:320
+#: src/postulo/api/api.py:350
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Indfanget: %(title)s"
@@ -3045,7 +3053,7 @@ msgstr "Hent PDF"
 msgid "Download the archive"
 msgstr "Download arkivet"
 
-#: src/postulo/api/models.py:25
+#: src/postulo/api/models.py:27
 #, draft
 msgid "Download the files themselves"
 msgstr "Download selve filerne"
@@ -3452,7 +3460,7 @@ msgstr "udløbet"
 msgid "Expires"
 msgstr "Udløber"
 
-#: src/postulo/api/models.py:66 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
 #, draft
 msgid "expires"
 msgstr "udløber"
@@ -3637,6 +3645,10 @@ msgstr "Find logo"
 #, draft
 msgid "Find one"
 msgstr "Find en"
+
+#: src/postulo/api/models.py:174
+msgid "fingerprint"
+msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -4159,6 +4171,14 @@ msgstr "Jeg har allerede søgt denne"
 #, draft
 msgid "id in the store"
 msgstr "id i lageret"
+
+#: src/postulo/api/models.py:179
+msgid "idempotent request"
+msgstr ""
+
+#: src/postulo/api/models.py:180
+msgid "idempotent requests"
+msgstr ""
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
 #: src/postulo/jobs/models.py:368 src/postulo/plugins/models.py:278
@@ -4706,6 +4726,10 @@ msgid ""
 msgstr ""
 "Gemmes i international form, så du stadig kan ringe fra et andet land. Et nummer, der allerede starter med +, tages som det er."
 
+#: src/postulo/api/models.py:173
+msgid "key"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html:159
 #, draft
 msgid ""
@@ -4896,7 +4920,7 @@ msgstr "Seneste login"
 msgid "last synced"
 msgstr "senest synkroniseret"
 
-#: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
 #, draft
 msgid "last used"
 msgstr "sidst brugt"
@@ -5500,7 +5524,7 @@ msgstr "Flyt op"
 msgid "NACE division"
 msgstr "NACE-hovedgruppe"
 
-#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
+#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:63
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
 #: src/postulo/jobs/models.py:42 src/postulo/jobs/models.py:173
@@ -6256,7 +6280,7 @@ msgstr "Intet registreret endnu."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Intet, der ligner et jobopslag, blev fundet på den side."
 
-#: src/postulo/api/api.py:389
+#: src/postulo/api/api.py:423
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Intet, der ligner et jobopslag, blev fundet der."
@@ -7275,7 +7299,7 @@ msgid ""
 msgstr ""
 "POSTULO_LOG_DIR er tom, så poster går til konsollen og ingen andre steder. Sæt den til en mappe på datavolumenet for at læse dem her; se Konfiguration i wikien."
 
-#: src/postulo/api/models.py:63
+#: src/postulo/api/models.py:65
 #, draft
 msgid "prefix"
 msgstr "præfiks"
@@ -7557,7 +7581,7 @@ msgstr ""
 msgid "read by a speaker"
 msgstr "læst af en taler"
 
-#: src/postulo/api/models.py:23
+#: src/postulo/api/models.py:25
 #, draft
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr "Læs alt: ansøgninger, opslag, virksomheder, dokumenter, indsigt"
@@ -7602,7 +7626,7 @@ msgstr "Registrér"
 msgid "Record an application"
 msgstr "Registrér en ansøgning"
 
-#: src/postulo/api/models.py:24
+#: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr "Registrér og ændr: ansøgninger, opslag, noter, påmindelser, breve"
@@ -7952,7 +7976,7 @@ msgstr "gennemset den"
 msgid "Revoke"
 msgstr "Tilbagekald"
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
 #, draft
 msgid "revoked"
 msgstr "tilbagekaldt"
@@ -8182,7 +8206,7 @@ msgstr "Kun planlagte"
 msgid "scheme"
 msgstr "skema"
 
-#: src/postulo/api/models.py:65
+#: src/postulo/api/models.py:67
 #, draft
 msgid "scopes"
 msgstr "rettigheder"
@@ -8902,6 +8926,13 @@ msgstr "tilstand"
 msgid "State"
 msgstr "Tilstand"
 
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
+#: src/postulo/jobs/models.py:831
+#, draft
+msgid "status"
+msgstr "status"
+
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
@@ -8915,13 +8946,6 @@ msgstr "Tilstand"
 #, draft
 msgid "Status"
 msgstr "Status"
-
-#: src/postulo/applications/models.py:215
-#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
-#: src/postulo/jobs/models.py:831
-#, draft
-msgid "status"
-msgstr "status"
 
 #: src/postulo/applications/models.py:348
 #, draft
@@ -9728,7 +9752,7 @@ msgid ""
 msgstr ""
 "Selve filen kan ikke ændres. Upload den nye, og markér den som afløser for denne, så det, du sendte, stadig betyder den fil, du sendte."
 
-#: src/postulo/api/api.py:334
+#: src/postulo/api/api.py:364
 #, python-format, draft
 msgid "The first: %(title)s"
 msgstr "Det første: %(title)s"
@@ -10163,6 +10187,10 @@ msgstr "Denne virksomhed har intet websted registreret."
 msgid "This entry prints its original text on every CV."
 msgstr "Denne post udskriver sin oprindelige tekst på hvert CV."
 
+#: src/postulo/api/idempotency.py:36
+msgid "This Idempotency-Key was already used for a different capture."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 #, draft
@@ -10419,7 +10447,7 @@ msgstr "token"
 msgid "Token created. Copy it now; it is not shown again."
 msgstr "Token oprettet. Kopiér det nu; det vises ikke igen."
 
-#: src/postulo/api/models.py:64
+#: src/postulo/api/models.py:66
 #, draft
 msgid "token hash"
 msgstr "token-hash"
@@ -10670,7 +10698,7 @@ msgstr "brug min Gravatar"
 msgid "Use the instance default"
 msgstr "Brug instansens standard"
 
-#: src/postulo/api/routers/applications.py:126
+#: src/postulo/api/routers/applications.py:128
 #, draft
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
@@ -11258,7 +11286,7 @@ msgstr "Hvilken ansøgning?"
 msgid "Which column is which?"
 msgstr "Hvilken kolonne er hvad?"
 
-#: src/postulo/api/forms.py:24 src/postulo/api/models.py:61
+#: src/postulo/api/forms.py:24 src/postulo/api/models.py:63
 #, draft
 msgid "Which device or tool this is for."
 msgstr "Hvilken enhed eller hvilket værktøj det er til."

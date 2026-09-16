@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 11:12+0000\n"
+"POT-Creation-Date: 2026-09-16 11:49+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -646,7 +646,7 @@ msgid ""
 msgstr ""
 "Is fiú tuairisc fabht an oiread le haon rud eile anseo. Tá an stór ag <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a>, agus míníonn <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> conas a thagann athrú isteach."
 
-#: src/postulo/api/api.py:291
+#: src/postulo/api/api.py:321
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "Ní féidir le gabháil teacht i ndiaidh an chinn dheireanaigh dá baisc."
@@ -1360,6 +1360,14 @@ msgstr[4] "agus %(counter)s eile"
 msgid "and %(more)s more"
 msgstr "agus %(more)s eile"
 
+#: src/postulo/api/idempotency.py:35
+msgid "Another request is using this Idempotency-Key; try again in a moment."
+msgstr ""
+
+#: src/postulo/api/models.py:176
+msgid "answer"
+msgstr ""
+
 #: src/postulo/resume/models.py:232
 #, draft
 msgid "Answered"
@@ -1407,12 +1415,12 @@ msgstr "Ó áit ar bith"
 msgid "API"
 msgstr "API"
 
-#: src/postulo/api/models.py:73
+#: src/postulo/api/models.py:75
 #, draft
 msgid "API token"
 msgstr "Comhartha API"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:76 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1944,7 +1952,7 @@ msgstr ""
 msgid "Capture discarded."
 msgstr "Gabháil caite i leataobh."
 
-#: src/postulo/api/models.py:22
+#: src/postulo/api/models.py:24
 #, draft
 msgid "Capture postings"
 msgstr "Gabh fógraí"
@@ -1954,7 +1962,7 @@ msgstr "Gabh fógraí"
 msgid "Capture sources this instance has"
 msgstr "Foinsí gabhála an ásc seo"
 
-#: src/postulo/api/api.py:331
+#: src/postulo/api/api.py:361
 #, python-format, draft
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "Gabhadh %(count)s fógra ó %(host)s"
@@ -1964,7 +1972,7 @@ msgstr "Gabhadh %(count)s fógra ó %(host)s"
 msgid "captured from"
 msgstr "gafa ó"
 
-#: src/postulo/api/api.py:320
+#: src/postulo/api/api.py:350
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Gafa: %(title)s"
@@ -3127,7 +3135,7 @@ msgstr "Íoslódáil PDF"
 msgid "Download the archive"
 msgstr "Íoslódáil an chartlann"
 
-#: src/postulo/api/models.py:25
+#: src/postulo/api/models.py:27
 #, draft
 msgid "Download the files themselves"
 msgstr "Íoslódáil na comhaid féin"
@@ -3536,7 +3544,7 @@ msgstr "imithe in éag"
 msgid "Expires"
 msgstr "Téann in éag"
 
-#: src/postulo/api/models.py:66 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
 #, draft
 msgid "expires"
 msgstr "téann in éag"
@@ -3720,6 +3728,10 @@ msgstr "Aimsigh lógó"
 #, draft
 msgid "Find one"
 msgstr "Ceann a aimsiú"
+
+#: src/postulo/api/models.py:174
+msgid "fingerprint"
+msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -4243,6 +4255,14 @@ msgstr "Chuir mé iarratas chuig an gceann seo cheana"
 #, draft
 msgid "id in the store"
 msgstr "aitheantas sa stór"
+
+#: src/postulo/api/models.py:179
+msgid "idempotent request"
+msgstr ""
+
+#: src/postulo/api/models.py:180
+msgid "idempotent requests"
+msgstr ""
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
 #: src/postulo/jobs/models.py:368 src/postulo/plugins/models.py:278
@@ -4796,6 +4816,10 @@ msgid ""
 msgstr ""
 "Coinnithe san fhoirm idirnáisiúnta, ionas gur féidir leat glaoch ó thír eile fós. Uimhir a thosaíonn le + cheana féin, glactar léi mar atá."
 
+#: src/postulo/api/models.py:173
+msgid "key"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html:159
 #, draft
 msgid ""
@@ -4986,7 +5010,7 @@ msgstr "Síniú isteach deireanach"
 msgid "last synced"
 msgstr "sioncronaithe go deireanach"
 
-#: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
 #, draft
 msgid "last used"
 msgstr "úsáidte go deireanach"
@@ -5597,7 +5621,7 @@ msgstr "Bog suas"
 msgid "NACE division"
 msgstr "rannán NACE"
 
-#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
+#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:63
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
 #: src/postulo/jobs/models.py:42 src/postulo/jobs/models.py:173
@@ -6359,7 +6383,7 @@ msgstr "Níl aon rud taifeadta fós."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Níor aimsíodh aon rud cosúil le fógra poist ar an leathanach sin."
 
-#: src/postulo/api/api.py:389
+#: src/postulo/api/api.py:423
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Níor aimsíodh aon rud cosúil le fógra poist ansin."
@@ -7424,7 +7448,7 @@ msgid ""
 msgstr ""
 "Tá POSTULO_LOG_DIR folamh, mar sin téann taifid chuig an gconsól agus áit ar bith eile. Socraigh é chuig comhadlann ar an toirt sonraí chun iad a léamh anseo; féach Cumraíocht ar an vicí."
 
-#: src/postulo/api/models.py:63
+#: src/postulo/api/models.py:65
 #, draft
 msgid "prefix"
 msgstr "réimír"
@@ -7712,7 +7736,7 @@ msgstr ""
 msgid "read by a speaker"
 msgstr "léite ag cainteoir"
 
-#: src/postulo/api/models.py:23
+#: src/postulo/api/models.py:25
 #, draft
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr "Léigh gach rud: iarratais, fógraí, cuideachtaí, doiciméid, léargais"
@@ -7757,7 +7781,7 @@ msgstr "Taifead"
 msgid "Record an application"
 msgstr "Taifead iarratas"
 
-#: src/postulo/api/models.py:24
+#: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr "Taifead agus athraigh: iarratais, fógraí, nótaí, meabhrúcháin, litreacha"
@@ -8110,7 +8134,7 @@ msgstr "athbhreithnithe ar"
 msgid "Revoke"
 msgstr "Cúlghair"
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
 #, draft
 msgid "revoked"
 msgstr "cúlghairthe"
@@ -8340,7 +8364,7 @@ msgstr "Sceidealta amháin"
 msgid "scheme"
 msgstr "scéim"
 
-#: src/postulo/api/models.py:65
+#: src/postulo/api/models.py:67
 #, draft
 msgid "scopes"
 msgstr "scóipeanna"
@@ -9064,6 +9088,13 @@ msgstr "staid"
 msgid "State"
 msgstr "Staid"
 
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
+#: src/postulo/jobs/models.py:831
+#, draft
+msgid "status"
+msgstr "stádas"
+
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
@@ -9077,13 +9108,6 @@ msgstr "Staid"
 #, draft
 msgid "Status"
 msgstr "Stádas"
-
-#: src/postulo/applications/models.py:215
-#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
-#: src/postulo/jobs/models.py:831
-#, draft
-msgid "status"
-msgstr "stádas"
 
 #: src/postulo/applications/models.py:348
 #, draft
@@ -9898,7 +9922,7 @@ msgid ""
 msgstr ""
 "Ní féidir an comhad féin a athrú. Uaslódáil an ceann nua agus marcáil é mar cheann a thagann in ionad an chinn seo, ionas go gciallaíonn a sheol tú an comhad a sheol tú i gcónaí."
 
-#: src/postulo/api/api.py:334
+#: src/postulo/api/api.py:364
 #, python-format, draft
 msgid "The first: %(title)s"
 msgstr "An chéad cheann: %(title)s"
@@ -10350,6 +10374,10 @@ msgstr "Níl aon suíomh gréasáin taifeadta don chuideachta seo."
 msgid "This entry prints its original text on every CV."
 msgstr "Priontálann an iontráil seo a téacs bunaidh ar gach CV."
 
+#: src/postulo/api/idempotency.py:36
+msgid "This Idempotency-Key was already used for a different capture."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 #, draft
@@ -10608,7 +10636,7 @@ msgstr "comhartha"
 msgid "Token created. Copy it now; it is not shown again."
 msgstr "Comhartha cruthaithe. Cóipeáil anois é; ní thaispeántar arís é."
 
-#: src/postulo/api/models.py:64
+#: src/postulo/api/models.py:66
 #, draft
 msgid "token hash"
 msgstr "haiseáil comhartha"
@@ -10861,7 +10889,7 @@ msgstr "úsáid mo Gravatar"
 msgid "Use the instance default"
 msgstr "Úsáid réamhshocrú an áisc"
 
-#: src/postulo/api/routers/applications.py:126
+#: src/postulo/api/routers/applications.py:128
 #, draft
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
@@ -11452,7 +11480,7 @@ msgstr "Cén t-iarratas?"
 msgid "Which column is which?"
 msgstr "Cén colún atá i gceist?"
 
-#: src/postulo/api/forms.py:24 src/postulo/api/models.py:61
+#: src/postulo/api/forms.py:24 src/postulo/api/models.py:63
 #, draft
 msgid "Which device or tool this is for."
 msgstr "Cén gléas nó uirlis dó seo."

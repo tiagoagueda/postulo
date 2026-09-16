@@ -4,12 +4,16 @@ The API is the surface a browser extension will eventually use, so what it refus
 matters more than what it accepts.
 """
 
+import datetime as dt
 import json
 from decimal import Decimal
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
+from postulo.api import idempotency
+from postulo.api.api import CaptureIn
 from postulo.api.models import ApiToken
 from postulo.applications.models import Application
 from postulo.jobs.models import Capture, CaptureStatus
@@ -37,12 +41,15 @@ def bearer(token):
     return {"HTTP_AUTHORIZATION": f"Bearer {token}"}
 
 
-def post_capture(client, bearer, **payload):
+def post_capture(client, bearer, *, key=None, **payload):
+    headers = dict(bearer)
+    if key is not None:
+        headers["HTTP_IDEMPOTENCY_KEY"] = key
     return client.post(
         "/api/v1/captures",
         data=json.dumps(payload),
         content_type="application/json",
-        **bearer,
+        **headers,
     )
 
 
@@ -321,7 +328,121 @@ def test_listing_shows_only_your_own_pending_captures(client, bearer, user, othe
 
     body = client.get("/api/v1/captures", **bearer).json()
 
-    assert [item["title"] for item in body] == ["Research Engineer"]
+    assert [item["title"] for item in body["items"]] == ["Research Engineer"]
+
+
+# -------------------------------------------------- sending the same one twice (#230)
+
+
+def test_the_same_key_gets_the_same_answer_and_not_a_second_capture(
+    client, bearer, user, announced
+):
+    """The lost `201`: the client cannot tell, so it sends again, and used to pay twice."""
+    first = post_capture(
+        client, bearer, url="https://example.org/j/7", html=PAGE, key="the-same-posting"
+    )
+    second = post_capture(
+        client, bearer, url="https://example.org/j/7", html=PAGE, key="the-same-posting"
+    )
+
+    assert first.status_code == second.status_code == 201
+    assert first.json() == second.json(), "the same answer, to the last digit of the moment"
+    assert Capture.objects.for_user(user).count() == 1
+    assert len(announced) == 1, "and nobody is told about it twice"
+
+
+def test_without_a_key_nothing_changes(client, bearer, user):
+    """A client that does not ask for this gets what it always got, duplicate and all."""
+    post_capture(client, bearer, url="https://example.org/j/7", html=PAGE)
+    post_capture(client, bearer, url="https://example.org/j/7", html=PAGE)
+
+    assert Capture.objects.for_user(user).count() == 2
+
+
+def test_a_key_reused_for_a_different_posting_is_refused(client, bearer, user):
+    """Answering it with the first capture would hide the client's bug rather than show it."""
+    post_capture(client, bearer, url="https://example.org/j/7", html=PAGE, key="reused")
+
+    response = post_capture(client, bearer, url="https://example.org/j/8", html=PAGE, key="reused")
+
+    assert response.status_code == 422
+    assert "Idempotency-Key" in response.json()["detail"]
+    assert Capture.objects.for_user(user).count() == 1
+
+
+def test_a_refused_capture_leaves_its_key_free(client, bearer, user):
+    """A capture that failed is exactly the one worth sending again."""
+    refused = post_capture(
+        client, bearer, url="https://example.org/", html="<html></html>", key="try-again"
+    )
+    assert refused.status_code == 422
+
+    accepted = post_capture(
+        client, bearer, url="https://example.org/j/7", html=PAGE, key="try-again"
+    )
+
+    assert accepted.status_code == 201
+    assert Capture.objects.for_user(user).count() == 1
+
+
+def test_a_key_is_one_account_s_and_not_another_s(client, user, other_user):
+    _record, mine = ApiToken.issue(user, "Mine")
+    _record, theirs = ApiToken.issue(other_user, "Theirs")
+
+    for raw in (mine, theirs):
+        response = post_capture(
+            client,
+            {"HTTP_AUTHORIZATION": f"Bearer {raw}"},
+            url="https://example.org/j/7",
+            html=PAGE,
+            key="shared-spelling",
+        )
+        assert response.status_code == 201
+
+    assert Capture.objects.for_user(user).count() == 1
+    assert Capture.objects.for_user(other_user).count() == 1
+
+
+def test_a_key_is_forgotten_after_a_day(client, bearer, user):
+    """Long enough for a laptop shut before the answer came; short enough to be no record."""
+    from postulo.api.models import IdempotentRequest
+
+    post_capture(client, bearer, url="https://example.org/j/7", html=PAGE, key="yesterday")
+    IdempotentRequest.objects.update(created_at=timezone.now() - dt.timedelta(hours=25))
+
+    response = post_capture(
+        client, bearer, url="https://example.org/j/7", html=PAGE, key="yesterday"
+    )
+
+    assert response.status_code == 201
+    assert Capture.objects.for_user(user).count() == 2, "a new capture, not a replay"
+    assert IdempotentRequest.objects.count() == 1, "and the stale row is swept up"
+
+
+def test_a_key_still_being_answered_is_not_answered_twice(client, bearer, user):
+    """Two requests racing: the second is told to wait rather than quietly making a twin."""
+    from postulo.api.models import IdempotentRequest
+
+    IdempotentRequest.objects.create(
+        owner=user,
+        key="in-flight",
+        fingerprint=idempotency.fingerprint(CaptureIn(url="https://example.org/j/7", html=PAGE)),
+    )
+
+    response = post_capture(
+        client, bearer, url="https://example.org/j/7", html=PAGE, key="in-flight"
+    )
+
+    assert response.status_code == 409
+    assert not Capture.objects.for_user(user).exists()
+
+
+def test_the_key_is_part_of_the_schema_a_client_reads(client, user):
+    from postulo.api.api import api
+
+    operation = api.get_openapi_schema()["paths"]["/api/v1/captures"]["post"]
+
+    assert "Idempotency-Key" in {p["name"] for p in operation["parameters"]}
 
 
 # ----------------------------------------------------------------- the review

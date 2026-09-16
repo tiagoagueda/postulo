@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-16 11:12+0000\n"
+"POT-Creation-Date: 2026-09-16 11:49+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: čeština\n"
@@ -599,7 +599,7 @@ msgid ""
 msgstr ""
 "Hlášení chyby má zde stejnou cenu jako cokoli jiného. Repozitář je na <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a> a <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> popisuje, jak se změna dostane dovnitř."
 
-#: src/postulo/api/api.py:291
+#: src/postulo/api/api.py:321
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "Zachycení nemůže přijít po posledním ze své dávky."
@@ -1300,6 +1300,14 @@ msgstr[2] "a %(counter)s dalších"
 msgid "and %(more)s more"
 msgstr "a %(more)s dalších"
 
+#: src/postulo/api/idempotency.py:35
+msgid "Another request is using this Idempotency-Key; try again in a moment."
+msgstr ""
+
+#: src/postulo/api/models.py:176
+msgid "answer"
+msgstr ""
+
 #: src/postulo/resume/models.py:232
 #, draft
 msgid "Answered"
@@ -1346,12 +1354,12 @@ msgstr "Odkudkoli"
 msgid "API"
 msgstr "API"
 
-#: src/postulo/api/models.py:73
+#: src/postulo/api/models.py:75
 #, draft
 msgid "API token"
 msgstr "API token"
 
-#: src/postulo/api/models.py:74 src/postulo/core/settings_sections.py:95
+#: src/postulo/api/models.py:76 src/postulo/core/settings_sections.py:95
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/api/token_list.html:8
 #, draft
@@ -1881,7 +1889,7 @@ msgstr ""
 msgid "Capture discarded."
 msgstr "Zachycení zahozeno."
 
-#: src/postulo/api/models.py:22
+#: src/postulo/api/models.py:24
 #, draft
 msgid "Capture postings"
 msgstr "Zachytávat inzeráty"
@@ -1891,7 +1899,7 @@ msgstr "Zachytávat inzeráty"
 msgid "Capture sources this instance has"
 msgstr "Zdroje zachytávání této instance"
 
-#: src/postulo/api/api.py:331
+#: src/postulo/api/api.py:361
 #, python-format, draft
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "Zachyceno %(count)s inzerátů z %(host)s"
@@ -1901,7 +1909,7 @@ msgstr "Zachyceno %(count)s inzerátů z %(host)s"
 msgid "captured from"
 msgstr "zachyceno z"
 
-#: src/postulo/api/api.py:320
+#: src/postulo/api/api.py:350
 #, python-format, draft
 msgid "Captured: %(title)s"
 msgstr "Zachyceno: %(title)s"
@@ -3063,7 +3071,7 @@ msgstr "Stáhnout PDF"
 msgid "Download the archive"
 msgstr "Stáhnout archiv"
 
-#: src/postulo/api/models.py:25
+#: src/postulo/api/models.py:27
 #, draft
 msgid "Download the files themselves"
 msgstr "Stáhnout samotné soubory"
@@ -3469,7 +3477,7 @@ msgstr "vypršelo"
 msgid "Expires"
 msgstr "Vyprší"
 
-#: src/postulo/api/models.py:66 src/postulo/templates/api/token_list.html:72
+#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:72
 #, draft
 msgid "expires"
 msgstr "vyprší"
@@ -3654,6 +3662,10 @@ msgstr "Najít logo"
 #, draft
 msgid "Find one"
 msgstr "Najít nějaký"
+
+#: src/postulo/api/models.py:174
+msgid "fingerprint"
+msgstr ""
 
 #: src/postulo/accounts/forms.py:94 src/postulo/accounts/forms.py:229
 #: src/postulo/accounts/forms.py:253
@@ -4173,6 +4185,14 @@ msgstr "Sem už jsem se hlásil(a)"
 #, draft
 msgid "id in the store"
 msgstr "id v úložišti"
+
+#: src/postulo/api/models.py:179
+msgid "idempotent request"
+msgstr ""
+
+#: src/postulo/api/models.py:180
+msgid "idempotent requests"
+msgstr ""
 
 #: src/postulo/accounts/models.py:172 src/postulo/accounts/models.py:181
 #: src/postulo/jobs/models.py:368 src/postulo/plugins/models.py:278
@@ -4720,6 +4740,10 @@ msgid ""
 msgstr ""
 "Uchováváno v mezinárodním tvaru, abyste mohli volat i z jiné země. Číslo, které už začíná na +, se bere tak, jak je."
 
+#: src/postulo/api/models.py:173
+msgid "key"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html:159
 #, draft
 msgid ""
@@ -4910,7 +4934,7 @@ msgstr "Poslední přihlášení"
 msgid "last synced"
 msgstr "naposledy synchronizováno"
 
-#: src/postulo/api/models.py:67 src/postulo/templates/api/token_list.html:75
+#: src/postulo/api/models.py:69 src/postulo/templates/api/token_list.html:75
 #, draft
 msgid "last used"
 msgstr "naposledy použito"
@@ -5516,7 +5540,7 @@ msgstr "Nahoru"
 msgid "NACE division"
 msgstr "oddíl NACE"
 
-#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:61
+#: src/postulo/accounts/models.py:174 src/postulo/api/models.py:63
 #: src/postulo/core/models.py:84 src/postulo/core/models.py:534
 #: src/postulo/documents/models.py:110 src/postulo/documents/models.py:313
 #: src/postulo/jobs/models.py:42 src/postulo/jobs/models.py:173
@@ -6271,7 +6295,7 @@ msgstr "Zatím nic zaznamenáno."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Na té stránce nebylo nalezeno nic, co by připomínalo pracovní inzerát."
 
-#: src/postulo/api/api.py:389
+#: src/postulo/api/api.py:423
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Tam nebylo nalezeno nic, co by připomínalo pracovní inzerát."
@@ -7303,7 +7327,7 @@ msgid ""
 msgstr ""
 "POSTULO_LOG_DIR je prázdné, takže záznamy jdou jen do konzole. Nastavte je na adresář na datovém svazku, abyste je četli zde; viz Konfigurace na wiki."
 
-#: src/postulo/api/models.py:63
+#: src/postulo/api/models.py:65
 #, draft
 msgid "prefix"
 msgstr "předpona"
@@ -7587,7 +7611,7 @@ msgstr ""
 msgid "read by a speaker"
 msgstr "přečteno mluvčím"
 
-#: src/postulo/api/models.py:23
+#: src/postulo/api/models.py:25
 #, draft
 msgid "Read everything: applications, listings, companies, documents, insights"
 msgstr "Číst vše: žádosti, nabídky, firmy, dokumenty, přehledy"
@@ -7632,7 +7656,7 @@ msgstr "Zaznamenat"
 msgid "Record an application"
 msgstr "Zaznamenat žádost"
 
-#: src/postulo/api/models.py:24
+#: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
 msgstr "Zaznamenávat a měnit: žádosti, nabídky, poznámky, připomínky, dopisy"
@@ -7983,7 +8007,7 @@ msgstr "zkontrolováno"
 msgid "Revoke"
 msgstr "Zneplatnit"
 
-#: src/postulo/api/models.py:68 src/postulo/templates/api/token_list.html:79
+#: src/postulo/api/models.py:70 src/postulo/templates/api/token_list.html:79
 #, draft
 msgid "revoked"
 msgstr "zneplatněno"
@@ -8213,7 +8237,7 @@ msgstr "Jen naplánované"
 msgid "scheme"
 msgstr "schéma"
 
-#: src/postulo/api/models.py:65
+#: src/postulo/api/models.py:67
 #, draft
 msgid "scopes"
 msgstr "rozsahy"
@@ -8932,6 +8956,13 @@ msgstr "stav"
 msgid "State"
 msgstr "Stav"
 
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:215
+#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
+#: src/postulo/jobs/models.py:831
+#, draft
+msgid "status"
+msgstr "stav"
+
 #: src/postulo/applications/forms.py:115 src/postulo/applications/forms.py:253
 #: src/postulo/applications/reports.py:508
 #: src/postulo/applications/tables.py:48 src/postulo/core/csv_import.py:45
@@ -8945,13 +8976,6 @@ msgstr "Stav"
 #, draft
 msgid "Status"
 msgstr "Stav"
-
-#: src/postulo/applications/models.py:215
-#: src/postulo/applications/models.py:680 src/postulo/documents/models.py:659
-#: src/postulo/jobs/models.py:831
-#, draft
-msgid "status"
-msgstr "stav"
 
 #: src/postulo/applications/models.py:348
 #, draft
@@ -9756,7 +9780,7 @@ msgid ""
 msgstr ""
 "Samotný soubor nelze změnit. Nahrajte nový a označte jej jako náhradu tohoto, aby to, co jste odeslali, stále znamenalo soubor, který jste odeslali."
 
-#: src/postulo/api/api.py:334
+#: src/postulo/api/api.py:364
 #, python-format, draft
 msgid "The first: %(title)s"
 msgstr "První: %(title)s"
@@ -10194,6 +10218,10 @@ msgstr "Tato společnost nemá zaznamenaný web."
 msgid "This entry prints its original text on every CV."
 msgstr "Tento záznam tiskne svůj původní text v každém životopise."
 
+#: src/postulo/api/idempotency.py:36
+msgid "This Idempotency-Key was already used for a different capture."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:499 src/postulo/jobs/forms.py:319
 #: src/postulo/jobs/models.py:410
 #, draft
@@ -10450,7 +10478,7 @@ msgstr "token"
 msgid "Token created. Copy it now; it is not shown again."
 msgstr "Token vytvořen. Zkopírujte ho teď; znovu se nezobrazí."
 
-#: src/postulo/api/models.py:64
+#: src/postulo/api/models.py:66
 #, draft
 msgid "token hash"
 msgstr "hash tokenu"
@@ -10700,7 +10728,7 @@ msgstr "používat můj Gravatar"
 msgid "Use the instance default"
 msgstr "Použít výchozí hodnotu instance"
 
-#: src/postulo/api/routers/applications.py:126
+#: src/postulo/api/routers/applications.py:128
 #, draft
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
@@ -11284,7 +11312,7 @@ msgstr "Která přihláška?"
 msgid "Which column is which?"
 msgstr "Který sloupec je co?"
 
-#: src/postulo/api/forms.py:24 src/postulo/api/models.py:61
+#: src/postulo/api/forms.py:24 src/postulo/api/models.py:63
 #, draft
 msgid "Which device or tool this is for."
 msgstr "Pro jaké zařízení nebo nástroj to je."

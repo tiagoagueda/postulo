@@ -11,13 +11,15 @@ Every read is owner-scoped exactly as the views are. Every write goes through th
 services as the forms, so the event log stays the single truth, and each entry written
 this way names the token that wrote it.
 
-The OpenAPI description is served at ``openapi.json`` under the API root. There is no
-documentation page rendered here: its assets would have to come from a CDN the content
-security policy forbids, and the schema is what a client consumes anyway.
+The OpenAPI description is served at ``openapi.json`` under the API root, to a live token
+or a signed-in person and to nobody else (#230). There is no documentation page rendered
+here: its assets would have to come from a CDN the content security policy forbids, and the
+schema is what a client consumes anyway.
 """
 
-from __future__ import annotations
-
+# No ``from __future__ import annotations`` here, as in every router: django-ninja builds
+# the model for a call's query parameters in its own module, where a postponed annotation
+# naming anything but a builtin cannot be resolved.
 import datetime as dt
 from decimal import Decimal
 from typing import Annotated
@@ -25,8 +27,9 @@ from urllib.parse import urlsplit
 
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from ninja import NinjaAPI, Schema, Status
+from ninja import Header, NinjaAPI, Query, Schema, Status
 from ninja.errors import HttpError, ValidationError
+from ninja.pagination import paginate
 from pydantic import AfterValidator, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
 
@@ -40,8 +43,10 @@ from postulo.plugins.base import CaptureError, JobPostingData
 from postulo.plugins.fetching import fetch_page
 from postulo.plugins.registry import parse_page
 
-from .auth import TokenAuth, scope
+from . import idempotency
+from .auth import TokenAuth, for_readers_of_the_api, scope
 from .models import ApiToken
+from .paging import UPDATED_SINCE, Page, changed_since
 from .routers import (
     applications,
     companies,
@@ -60,6 +65,7 @@ api = NinjaAPI(
     auth=TokenAuth(),
     urls_namespace="postulo-api",
     docs_url=None,
+    docs_decorator=for_readers_of_the_api,
     description=(
         "Scoped bearer tokens, made under Settings → API tokens. `captures` hands over a "
         "posting; `read` reads everything the owner has; `write` records and changes "
@@ -214,6 +220,7 @@ class CaptureOut(Schema):
     source: str
     status: str
     created_at: dt.datetime
+    updated_at: dt.datetime
     review_url: str
 
 
@@ -228,6 +235,7 @@ def _as_output(request, capture: Capture) -> dict:
         "source": capture.source_name,
         "status": capture.status,
         "created_at": capture.created_at,
+        "updated_at": capture.updated_at,
         "review_url": request.build_absolute_uri(reverse("jobs:capture_review", args=[capture.pk])),
     }
 
@@ -256,7 +264,19 @@ def whoami(request):
     tags=["captures"],
     summary="Capture a posting",
 )
-def create_capture(request, payload: CaptureIn):
+def create_capture(
+    request,
+    payload: CaptureIn,
+    idempotency_key: str | None = Header(
+        None,
+        alias="Idempotency-Key",
+        description=(
+            "Any string of your own, one per posting. Send the same request again under the "
+            "same key — after a lost reply, say — and you get the first answer back rather "
+            "than a second capture. Honoured for 24 hours."
+        ),
+    ),
+):
     """Read a posting and store it for review.
 
     Nothing is created beyond the capture itself. The owner still has to look at it and
@@ -267,6 +287,16 @@ def create_capture(request, payload: CaptureIn):
     token: ApiToken = request.auth
     owner = token.owner
 
+    with idempotency.once(owner, idempotency_key, payload) as answer:
+        if answer.held is not None:
+            # The same answer the first attempt got: nothing fetched, nothing made, nobody
+            # told again. A retry after a lost reply is not a second posting (#230).
+            return Status(answer.held_status, answer.held)
+        return Status(201, _capture(request, owner, payload, answer))
+
+
+def _capture(request, owner, payload: CaptureIn, answer) -> dict:
+    """Read the page, keep the capture, tell the owner — the body of the call above."""
     url, data, source = _read(payload, owner)
     if payload.data is not None:
         corrections = payload.data.model_dump(exclude_unset=True)
@@ -335,7 +365,11 @@ def create_capture(request, payload: CaptureIn):
                 url=request.build_absolute_uri(reverse("jobs:capture_list")),
             ),
         )
-    return Status(201, _as_output(request, capture))
+    body = _as_output(request, capture)
+    # Kept before the answer goes out, so that a client which retries because it never saw
+    # the answer is retrying against something already written down.
+    answer.keep(201, body)
+    return body
 
 
 @api.post(
@@ -398,10 +432,25 @@ def _read(payload: PageIn, owner):
     tags=["captures"],
     summary="List captures awaiting review",
 )
-def list_captures(request):
+@paginate(Page, row=_as_output)
+def list_captures(
+    request,
+    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+):
+    """What is still waiting to be reviewed, newest first.
+
+    It used to be the first fifty rows in whatever order the database felt like handing
+    them over, while the wiki promised every list took ``limit`` and ``offset`` and came
+    back as ``{"items", "count"}``. A queue nobody has kept up with runs past fifty, and
+    nothing said so (#230).
+    """
     token: ApiToken = request.auth
-    captures = Capture.objects.for_user(token.owner).filter(status=CaptureStatus.PENDING)[:50]
-    return [_as_output(request, capture) for capture in captures]
+    captures = (
+        Capture.objects.for_user(token.owner)
+        .filter(status=CaptureStatus.PENDING)
+        .order_by("-created_at", "-pk")
+    )
+    return changed_since(captures, updated_since)
 
 
 @api.post(
