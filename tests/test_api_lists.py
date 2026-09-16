@@ -210,22 +210,29 @@ def test_a_list_can_be_asked_only_for_what_changed(client, user, applications):
 
 
 def test_catching_up_reads_forward_so_a_cursor_can_advance(client, user, applications):
-    """Oldest change first: a client takes the last `updated_at` it saw and asks again."""
+    """Oldest change first: a client takes the last row it saw and asks again from there.
+
+    Both halves of it, `updated_at` *and* `id` (#245). A timestamp alone cannot get past a
+    run of rows saved in the same moment, which is what a loop like the fixture's makes on
+    a machine quick enough -- and what an import or a bulk edit makes on any machine.
+    """
     bearer = issue(user, "read")
     start = (timezone.now() - dt.timedelta(minutes=5)).isoformat()
     for application in applications[:6]:
         application.save(update_fields=["updated_at"])
 
     seen = []
-    at = start
+    at, last = start, None
     for _page in range(10):
         asked = f"/api/v1/applications?updated_since={cursor(at)}&limit=4"
+        if last is not None:
+            asked += f"&after_id={last}"
         body = client.get(asked, **bearer).json()
         fresh = [a for a in body["items"] if a["id"] not in seen]
         if not fresh:
             break
         seen += [a["id"] for a in fresh]
-        at = fresh[-1]["updated_at"]
+        at, last = fresh[-1]["updated_at"], fresh[-1]["id"]
 
     assert len(seen) == 12, "walking the cursor forward reaches all of them"
     whole = client.get(
@@ -281,3 +288,41 @@ def test_a_capture_list_can_be_caught_up_on_too(client, user):
 
     assert [c["title"] for c in body["items"]] == ["One"]
     assert body["items"][0]["updated_at"]
+
+
+def test_a_run_of_rows_saved_in_one_moment_can_still_be_walked(client, user, applications):
+    """The fault #245 is about, made on purpose rather than waited for.
+
+    Every row is given one identical `updated_at`, so the whole account is a single tie
+    group far larger than the page. With a timestamp alone the second page is the first
+    page again, for ever.
+    """
+    bearer = issue(user, "read")
+    moment_they_all_share = timezone.now() - dt.timedelta(minutes=1)
+    Application.objects.filter(owner=user).update(updated_at=moment_they_all_share)
+    start = (moment_they_all_share - dt.timedelta(minutes=1)).isoformat()
+
+    seen = []
+    at, last = start, None
+    for _page in range(20):
+        asked = f"/api/v1/applications?updated_since={cursor(at)}&limit=4"
+        if last is not None:
+            asked += f"&after_id={last}"
+        items = client.get(asked, **bearer).json()["items"]
+        if not items:
+            break
+        seen += [a["id"] for a in items]
+        at, last = items[-1]["updated_at"], items[-1]["id"]
+
+    assert seen == sorted(seen), "in one order, each row once"
+    assert len(seen) == 12, "a tie group bigger than the page is still walked to the end"
+
+
+def test_without_the_id_the_cursor_answers_as_it_always_did(client, user, applications):
+    """`after_id` is optional, so a caller written before it keeps working."""
+    bearer = issue(user, "read")
+    start = (timezone.now() - dt.timedelta(minutes=5)).isoformat()
+
+    body = client.get(f"/api/v1/applications?updated_since={cursor(start)}&limit=100", **bearer)
+
+    assert body.json()["count"] == 12

@@ -12,7 +12,7 @@ from postulo.jobs import identifiers
 from postulo.jobs.models import Company, CompanyKind, Contact, Industry
 
 from ..auth import scope
-from ..paging import UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
 from ..schemas import (
     CompanyDetailOut,
     CompanyIn,
@@ -34,6 +34,7 @@ def list_companies(
     request,
     q: str | None = Query(None, description="Name, location or industry"),
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    after_id: int | None = Query(None, description=AFTER_ID),
 ):
     companies = (
         owned(request, Company.objects)
@@ -47,7 +48,7 @@ def list_companies(
             | Q(industries__name__icontains=q)
             | Q(identifiers__value__icontains=q)
         ).distinct()
-    return changed_since(companies, updated_since)
+    return changed_since(companies, updated_since, after_id)
 
 
 @router.post("", response={201: CompanyDetailOut}, auth=scope("write"), summary="Add a company")

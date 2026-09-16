@@ -773,6 +773,23 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **The API's catch-up cursor could not actually be walked.** #230 gave every list an
+  `updated_since` cursor — ask what changed since a moment, take the `updated_at` of the
+  last row you read, ask again from there — and two things stopped it working. The moment it
+  handed out was rounded to the millisecond while the value it compared against was stored to
+  the microsecond, so the timestamp a caller read back named an instant *before* the row it
+  came from, and that row arrived again on the next page. And a moment alone cannot get past
+  a run of rows saved in the same one, which is what an import or a bulk edit writes: where
+  the run was longer than the page, every page after it was rows the caller already had.
+  Together they meant a client either looped or, if it stopped when a page brought nothing
+  new, silently never read the rest of the account.
+
+  Moments now go out whole, so a value the API gives is a value it takes back, and the cursor
+  has a second half: `after_id`, the id of the last row read, which turns it from a moment
+  into a position in the order the list is already sorted by. Sent without it, a list answers
+  exactly as before. The merged `/documents` list takes no `after_id` and says why: its ids
+  come from two tables, and one id used against both would silently drop files. (#245)
+
 - **Insights, the report and the salary column counted the wrong things.** Five figures that
   people read and believe, each of them measuring something slightly different from what it
   said.

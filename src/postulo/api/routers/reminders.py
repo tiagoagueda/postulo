@@ -9,7 +9,7 @@ from ninja.pagination import paginate
 from postulo.applications.models import Application, Reminder
 
 from ..auth import scope
-from ..paging import UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
 from ..schemas import ReminderIn, ReminderOut, reminder_out
 from .common import owned, owned_or_404
 
@@ -23,13 +23,14 @@ def list_reminders(
     due: bool = Query(False, description="Only outstanding reminders whose time has come"),
     outstanding: bool = Query(False, description="Only reminders not yet done"),
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    after_id: int | None = Query(None, description=AFTER_ID),
 ):
     reminders = owned(request, Reminder.objects).order_by("due_at")
     if due:
         reminders = reminders.due()
     elif outstanding:
         reminders = reminders.outstanding()
-    return changed_since(reminders, updated_since)
+    return changed_since(reminders, updated_since, after_id)
 
 
 @router.post("", response={201: ReminderOut}, auth=scope("write"), summary="Add a reminder")

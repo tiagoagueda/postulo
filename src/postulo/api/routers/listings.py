@@ -12,7 +12,7 @@ from postulo.applications.services import apply_to_listing, create_listing, get_
 from postulo.jobs.models import LISTING_FILTERS, DiscardReason, JobPosting
 
 from ..auth import actor_of, scope
-from ..paging import UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
 from ..schemas import (
     ApplicationDetailOut,
     ApplicationDetailsIn,
@@ -47,6 +47,7 @@ def list_listings(
     ),
     company: int | None = Query(None),
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    after_id: int | None = Query(None, description=AFTER_ID),
 ):
     listings = _queryset(request)
     if state == "undecided":
@@ -57,7 +58,7 @@ def list_listings(
         raise HttpError(422, f"'state' must be undecided, all or one of {list(LISTING_FILTERS)}.")
     if company:
         listings = listings.filter(company_id=company)
-    return changed_since(listings.order_by("-noted_at", "-pk"), updated_since)
+    return changed_since(listings.order_by("-noted_at", "-pk"), updated_since, after_id)
 
 
 @router.post("", response={201: ListingDetailOut}, auth=scope("write"), summary="Add a listing")

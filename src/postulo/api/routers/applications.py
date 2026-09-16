@@ -17,7 +17,7 @@ from postulo.applications.services import (
 )
 
 from ..auth import actor_of, scope
-from ..paging import UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
 from ..schemas import (
     ApplicationDetailOut,
     ApplicationIn,
@@ -44,6 +44,7 @@ def list_applications(
         False, description="Only applications that have gone quiet by the owner's threshold"
     ),
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    after_id: int | None = Query(None, description=AFTER_ID),
 ):
     applications = owned(request, Application.objects).with_display_data().order_by("-created_at")
     if quiet:
@@ -56,7 +57,7 @@ def list_applications(
         applications = applications.filter(applied_at__date__gte=since)
     if open_only:
         applications = applications.open()
-    return changed_since(applications, updated_since)
+    return changed_since(applications, updated_since, after_id)
 
 
 @router.post(

@@ -30,6 +30,8 @@ from django.utils.translation import gettext_lazy as _
 from ninja import Header, NinjaAPI, Query, Schema, Status
 from ninja.errors import HttpError, ValidationError
 from ninja.pagination import paginate
+from ninja.renderers import JSONRenderer
+from ninja.responses import NinjaJSONEncoder
 from pydantic import AfterValidator, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
 
@@ -59,7 +61,34 @@ from .routers import (
 )
 from .schemas import TokenOut
 
+
+class WholeMoments(NinjaJSONEncoder):
+    """Writes a moment out whole, to the microsecond.
+
+    Django's encoder — which ninja's extends — rounds a datetime to the millisecond. For
+    most fields that is nobody's problem, and for `updated_at` it is fatal: the cursor a
+    caller catches up with is a moment this API hands out and then compares against the
+    stored value, so handing out `.122` for a row stored at `.122160` names an instant
+    *before* the row it came from. Asked again from there, the row comes back, and so does
+    every row tied with it — the walk never advances (#245).
+
+    A value this API gives out has to be a value it will take back. `AnswerEncoder` in
+    `models.py` already says the same thing about replayed answers; this says it about
+    every moment on every row.
+    """
+
+    def default(self, o):
+        if isinstance(o, dt.datetime):
+            return o.isoformat()
+        return super().default(o)
+
+
+class Renderer(JSONRenderer):
+    encoder_class = WholeMoments
+
+
 api = NinjaAPI(
+    renderer=Renderer(),
     title="Postulo API",
     version="1",
     auth=TokenAuth(),

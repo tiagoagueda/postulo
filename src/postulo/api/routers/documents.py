@@ -10,7 +10,7 @@ from postulo.core.files import serve_private_file
 from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
 
 from ..auth import scope
-from ..paging import UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
 from ..schemas import (
     CVDetailOut,
     CVOut,
@@ -68,8 +68,9 @@ def _letter_out(letter: CoverLetter, *, detail: bool = False) -> dict:
 def list_cvs(
     request,
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    after_id: int | None = Query(None, description=AFTER_ID),
 ):
-    return changed_since(owned(request, CV.objects).order_by("name"), updated_since)
+    return changed_since(owned(request, CV.objects).order_by("name"), updated_since, after_id)
 
 
 @router.get("/cvs/{int:pk}", response=CVDetailOut, summary="One CV, with what it includes")
@@ -82,8 +83,11 @@ def get_cv(request, pk: int):
 def list_letters(
     request,
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    after_id: int | None = Query(None, description=AFTER_ID),
 ):
-    return changed_since(owned(request, CoverLetter.objects).order_by("name"), updated_since)
+    return changed_since(
+        owned(request, CoverLetter.objects).order_by("name"), updated_since, after_id
+    )
 
 
 @router.get("/letters/{int:pk}", response=LetterDetailOut, summary="One letter, with its text")
@@ -112,6 +116,12 @@ def list_documents(
     tables with separate columns, so they are read and then ordered together in Python.
     Only the rows on the page are shaped, though, which is where the cost was — an
     absolute download address built for every file somebody has ever had (#230).
+
+    It is also the one list that takes no `after_id` (#245). The ids come from two tables,
+    so upload 5 and render 5 are different files, and one id used against both would drop
+    whichever rows happened to number below it in the table the caller was not walking —
+    losing files silently, which is worse than the tie it would fix. A cursor here has to
+    name the table as well as the id, and that is a shape of its own.
     """
     if source not in (None, "upload", "rendered"):
         raise HttpError(422, "'source' must be upload or rendered.")
