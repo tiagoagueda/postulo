@@ -102,6 +102,121 @@ jobs:
           POSTULO_ALLOWED_HOSTS: postulo.example.org
           POSTULO_STATIC_ROOT: /tmp/postulo-static
 
+  postgres:
+    # The other engine Postulo offers, against a real server (#219).
+    #
+    # The job above runs on in-memory SQLite, which is what makes it fast, and it meant
+    # that `docker/compose.postgres.yml` and the *Installing Postulo* page had been
+    # offering PostgreSQL since `7675bf10d` without a single line of it ever executing.
+    # The image had no driver and no pg_dump; `core/backup.py`'s PostgreSQL half was
+    # covered only by a monkeypatched `subprocess.run`. None of that is the kind of
+    # mistake reading finds -- it is the kind a server finds in ten seconds.
+    #
+    # A subset rather than the whole suite: the pages, the permissions and the
+    # translations do not change with the engine, and the matrix above already runs them
+    # three times. What does change is whether the driver imports, whether the migrations
+    # apply, and whether the backup path -- which shells out to pg_dump and pg_restore
+    # instead of copying a file -- actually works. That is what this runs, and then it
+    # takes a real backup of a seeded instance and puts it back.
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-bookworm
+    services:
+      db:
+        # The same major as `docker/compose.postgres.yml` starts, and the reason the
+        # client below is installed by major as well: pg_dump refuses a server newer
+        # than itself, so testing against 15 would prove nothing about the deployment.
+        image: postgres:17
+        env:
+          POSTGRES_DB: postulo
+          POSTGRES_USER: postulo
+          # This server exists for the length of one job, holds fictional data, and is
+          # reachable only from the container beside it.
+          POSTGRES_PASSWORD: ci-only-not-a-secret
+        options: >-
+          --health-cmd "pg_isready -U postulo -d postulo"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The token is not needed after the checkout; leaving it in .git/config
+          # would hand it to every later step and any artifact that packs the tree.
+          persist-credentials: false
+
+      - name: Install WeasyPrint's system libraries
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Install the PostgreSQL client tools
+        # From PostgreSQL's own repository and by major version, exactly as
+        # `docker/Dockerfile` does it: Debian bookworm ships client 15, and pg_dump
+        # against a 17 server aborts on the version mismatch. If this step and the image
+        # ever disagree, CI is testing something nobody runs.
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates curl
+          install -d /usr/share/postgresql-common/pgdg
+          curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+          apt-get update
+          apt-get install -y --no-install-recommends postgresql-client-17
+          rm -rf /var/lib/apt/lists/*
+          pg_dump --version
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install dependencies
+        # --extra postgres, which is where psycopg lives and what the image was missing.
+        run: uv sync --locked --python 3.14 --extra postgres
+
+      - name: Compile the translations
+        run: uv run python scripts/messages.py compile
+
+      - name: Run the database-facing tests against PostgreSQL
+        # POSTULO_TEST_DATABASE_URL is the only thing that moves the suite off in-memory
+        # SQLite; everything else about the test settings stays as it is.
+        run: uv run pytest tests/test_smoke.py tests/test_ownership.py tests/test_backup.py
+        env:
+          POSTULO_TEST_DATABASE_URL: postgres://postulo:ci-only-not-a-secret@db:5432/postulo
+
+      - name: Take a backup and put it back, for real
+        # Production settings, the shape an operator actually runs, and no monkeypatching
+        # anywhere: migrate applies through psycopg, seed_demo writes a believable search,
+        # backup shells out to pg_dump, a second account is added so that the restore has
+        # something to undo, and restore --force runs pg_restore and has to leave exactly
+        # the one account the archive held.
+        run: |
+          mkdir -p /tmp/postulo-media /tmp/postulo-backups /tmp/postulo-static
+          uv run manage.py migrate --noinput
+          uv run manage.py seed_demo demo@example.org --no-pdf --password ci-only-not-a-secret-either
+          uv run manage.py backup /tmp/postulo-roundtrip.tar.gz
+          uv run manage.py seed_demo rival@example.org --no-pdf --password ci-only-not-a-secret-either
+          uv run manage.py restore /tmp/postulo-roundtrip.tar.gz --force
+          uv run manage.py shell -c "
+          from django.contrib.auth import get_user_model
+          from postulo.applications.models import Application
+          emails = sorted(get_user_model().objects.values_list('email', flat=True))
+          assert emails == ['demo@example.org'], emails
+          assert Application.objects.exists(), 'the restore brought back an empty instance'
+          "
+        env:
+          DJANGO_SETTINGS_MODULE: postulo.config.settings.prod
+          POSTULO_DATABASE_URL: postgres://postulo:ci-only-not-a-secret@db:5432/postulo
+          # Long enough to satisfy security.W009; not a real secret.
+          POSTULO_SECRET_KEY: ci-only-placeholder-nS7pQ2xV9wR4tY6uI8oA3sD5fG1hJ0kL2zX4cV6b
+          POSTULO_ALLOWED_HOSTS: postulo.example.org
+          POSTULO_MEDIA_ROOT: /tmp/postulo-media
+          POSTULO_BACKUP_DIR: /tmp/postulo-backups
+          POSTULO_STATIC_ROOT: /tmp/postulo-static
+
   security:
     # Postulo holds people's CVs and employment histories, and one of its stated
     # commitments is to keep them as secure as it knows how. Part of that is noticing a

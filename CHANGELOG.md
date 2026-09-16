@@ -730,6 +730,29 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **Choosing PostgreSQL got you an instance that would not start, and no scheduler if it
+  had.** `docker/compose.postgres.yml` has offered the second engine since it was added, and
+  *Installing Postulo* has recommended it to anybody already running one — while the
+  published image had neither the driver nor the client tools to honour the offer. The
+  container stopped on its first `migrate`, because `psycopg` lives in an extra the build
+  never asked for; had it started, `manage.py backup` would have stopped on “pg_dump is not
+  on the PATH”, because `core/backup.py` dumps a PostgreSQL through the tool rather than by
+  copying a file that is being written to; and reminders, gone-quiet notices, store copies
+  and syncs would never have run at all, because that compose file had no scheduler and
+  nothing fails when a loop nobody started does not loop.
+
+  All of which survived a release for one reason: nothing had ever pointed a test at a
+  PostgreSQL. The suite runs on in-memory SQLite, and the PostgreSQL half of the backup code
+  was covered by a stand-in for `subprocess.run` — so the engine was documented, offered,
+  and entirely unexecuted. CI now runs the database-facing tests against a real
+  `postgres:17` and takes an actual backup of a seeded instance and puts it back, through
+  pg_dump and pg_restore, so the next thing to break on this path breaks in a job rather
+  than on somebody's server.
+
+  The client tools come from PostgreSQL's own repository, pinned to the major the compose
+  file starts: pg_dump refuses a server newer than itself and Debian's is two majors behind,
+  which would have made this “backups work” until the first time anybody looked. (#219)
+
 - **Adding a company answered a 500 when the form was sent twice, though the company was
   saved.** A double click on *Save* posted the form twice in one second; the first saved
   and redirected, the second hit SQLite's *database is locked* and the browser showed the

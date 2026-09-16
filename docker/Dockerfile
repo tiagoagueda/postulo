@@ -76,12 +76,19 @@ COPY pyproject.toml uv.lock README.md ./
 # #157 until the test instance's deploy built an image for the first time since (#166). The
 # second sync, once the source is here, installs Postulo itself and nothing else, so a change
 # to the application still does not re-resolve a single dependency.
-RUN uv sync --locked --no-default-groups --extra server --no-cache --no-install-project
+#
+# `--extra postgres` beside `--extra server`, because `docker/compose.postgres.yml` offers
+# this image a PostgreSQL to run against and the driver lives in that extra. Without it the
+# entrypoint's `migrate` stopped on an unimportable backend the moment anybody took the
+# offer up, which nobody in this repository ever had (#219). 3 MB of psycopg binary is a
+# small price for the second engine the project documents actually working; the alternative
+# — a separate tag for it — is two images to build, scan and publish.
+RUN uv sync --locked --no-default-groups --extra server --extra postgres --no-cache --no-install-project
 
 COPY src ./src
 COPY scripts/messages.py ./scripts/messages.py
 
-RUN uv sync --locked --no-default-groups --extra server --no-cache
+RUN uv sync --locked --no-default-groups --extra server --extra postgres --no-cache
 
 # The translation catalogues are committed as .po text; Django reads the compiled .mo,
 # which this writes in plain Python — no gettext in the image. Every set of them, since a
@@ -101,13 +108,18 @@ RUN python scripts/messages.py compile \
 # and this stage does not ship, so it is simply left behind rather than purged. The core's
 # lock is a constraint, so a plugin can never change the version of a package Postulo
 # itself pins.
+#
+# The export names the same extras as the syncs above. It is a constraint file, so anything
+# it leaves out is simply unconstrained: with `postgres` missing, a plugin that happened to
+# depend on psycopg could pull in a different version from the one the environment already
+# had, which is exactly what a constraint file exists to prevent (#219).
 ARG POSTULO_EXTRA_PACKAGES=""
 RUN if [ -n "$POSTULO_EXTRA_PACKAGES" ]; then \
         apt-get update \
         && apt-get upgrade -y \
         && apt-get install -y --no-install-recommends git \
-        && uv export --locked --no-dev --extra server --no-hashes --no-emit-project \
-            --output-file /tmp/constraints.txt \
+        && uv export --locked --no-dev --extra server --extra postgres --no-hashes \
+            --no-emit-project --output-file /tmp/constraints.txt \
         && uv pip install --no-cache --constraint /tmp/constraints.txt $POSTULO_EXTRA_PACKAGES \
         && rm -rf /var/lib/apt/lists/*; \
     fi
@@ -169,12 +181,35 @@ ENV PYTHONUNBUFFERED=1 \
 #
 # `libharfbuzz-subset0` because WeasyPrint 70 warns at import without it and says a later
 # version will require it (#163).
+#
+# `postgresql-client-17` is `manage.py backup` and `manage.py restore` on the engine
+# `docker/compose.postgres.yml` offers: those commands shell out to pg_dump and pg_restore
+# rather than copying a file that is being written to, and stopped with "pg_dump is not on
+# the PATH" in every image published so far (#219). **From PostgreSQL's own repository, and
+# by major version**, which is the whole of why this is six lines instead of one word:
+# Debian bookworm ships client 15, pg_dump refuses a server newer than itself, and
+# `postgres:17` is what the compose file starts — so plain `postgresql-client` would have
+# installed a tool that fails on the only server it would ever be pointed at. The armoured
+# key goes in beside the source and `signed-by` names it, so apt trusts that repository for
+# nothing else and no keyring tooling is needed. tests/test_image_build.py reads the major
+# out of the compose file, so the two cannot drift apart.
+#
+# One layer, with the second index refresh inside it: the new repository has to be read
+# before its package can be installed, and a `RUN` of its own would be served from cache
+# exactly when the source line above it had changed.
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 \
         fonts-dejavu-core fonts-noto-core \
-        curl \
+        ca-certificates curl \
+    && install -d /usr/share/postgresql-common/pgdg \
+    && curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+        https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" \
+        > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client-17 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

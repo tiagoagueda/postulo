@@ -35,6 +35,38 @@ services:
       db:
         condition: service_healthy
 
+  # Notices reminders falling due and tells their owners through their notifiers. Only
+  # needed once somebody has set up a notification connection; start it with
+  #   docker compose -f docker/compose.postgres.yml --profile scheduler up -d
+  # Alternatively run `manage.py send_due_reminders` from the host's cron every few minutes.
+  #
+  # The SQLite file had one of these from the start and this file did not, so reminders,
+  # gone-quiet notices, store copies and syncs simply never ran on a PostgreSQL install --
+  # silently, because nothing fails when a loop that was never started does not run (#219).
+  scheduler:
+    profiles: ["scheduler"]
+    # The published image, pinned to a minor: `docker compose pull` takes the next patch
+    # and never a surprise. `build:` above still works for anyone building from source;
+    # it tags the result with the same name.
+    image: source.tiagoagueda.com/postulo/postulo:0.2
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      POSTULO_DATABASE_URL: postgres://postulo:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/postulo
+      POSTULO_SKIP_MIGRATE: "1"
+    volumes:
+      # Media, because a notice may render a document; the records are in the database.
+      - postulo-data:/app/data
+    command: ["python", "manage.py", "send_due_reminders", "--loop", "--every", "300"]
+    depends_on:
+      # The database has to be accepting connections, and the web container is what runs
+      # the migrations this one skips.
+      db:
+        condition: service_healthy
+      postulo:
+        condition: service_started
+
   db:
     image: postgres:17-alpine
     restart: unless-stopped

@@ -15,6 +15,7 @@ from postulo.core import backup as backup_module
 from postulo.core.backup import (
     BACKUP_FORMAT,
     BackupError,
+    database_vendor,
     restore_backup,
     verify_backup,
     write_backup,
@@ -22,11 +23,20 @@ from postulo.core.backup import (
 from postulo.jobs.models import Company, JobPosting
 
 # Transactional throughout: SQLite's backup API cannot work through the transaction the
-# ordinary test wrapper holds open, and a command runs in autocommit anyway.
+# ordinary test wrapper holds open, pg_dump connects for itself and would not see it
+# either, and a command runs in autocommit anyway.
 pytestmark = pytest.mark.django_db(transaction=True)
 
 User = get_user_model()
 PASSWORD = "a-fairly-long-password-42"
+
+#: What the archive's database member is called on the engine this run is using. The whole
+#: file used to say "sqlite" out loud, because that is the only engine the suite had ever
+#: been pointed at -- so the PostgreSQL half of `core/backup.py` was covered by nothing but
+#: a monkeypatched `subprocess.run`, and shipped in an image with no pg_dump in it (#219).
+#: Set POSTULO_TEST_DATABASE_URL to run all of this against a real PostgreSQL; CI does.
+MEMBER = {"sqlite": "database.sqlite3", "postgresql": "database.dump"}
+THE_OTHER_ENGINE = {"sqlite": "postgresql", "postgresql": "sqlite"}
 
 
 @pytest.fixture(autouse=True)
@@ -68,7 +78,7 @@ def test_a_backup_holds_the_manifest_the_database_and_the_media(tmp_path, settin
     assert report.path == tmp_path / "instance.tar.gz"
     names = members_of(report.path)
     assert "manifest.json" in names
-    assert "database.sqlite3" in names
+    assert MEMBER[database_vendor()] in names
     assert "media/documents/cv.pdf" in names
     assert report.counts == {
         "users": 1,
@@ -82,7 +92,7 @@ def test_a_backup_holds_the_manifest_the_database_and_the_media(tmp_path, settin
 
     manifest = verify_backup(report.path)
     assert manifest["postulo"]["backup_format"] == BACKUP_FORMAT
-    assert manifest["database"]["engine"] == "sqlite"
+    assert manifest["database"]["engine"] == database_vendor()
     assert manifest["media"] == {"included": True, "files": 1, "bytes": 13}
 
 
@@ -211,9 +221,15 @@ def test_a_hostile_archive_writes_nothing(tmp_path, settings):
 
 
 def test_an_archive_from_the_other_engine_is_refused(tmp_path, monkeypatch):
+    """Whichever engine this run is on, the archive from the other one has to be refused.
+
+    Restoring a PostgreSQL dump into SQLite, or the reverse, cannot half-work: it either
+    does nothing or leaves the instance in a state nobody can reason about.
+    """
+    here = database_vendor()
     archive = write_backup(tmp_path / "instance.tar.gz").path
-    monkeypatch.setattr(backup_module, "database_vendor", lambda: "postgresql")
-    with pytest.raises(BackupError, match="came from a sqlite database"):
+    monkeypatch.setattr(backup_module, "database_vendor", lambda: THE_OTHER_ENGINE[here])
+    with pytest.raises(BackupError, match=f"came from a {here} database"):
         restore_backup(archive)
 
 

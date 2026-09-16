@@ -17,6 +17,7 @@ from postulo.config.settings import keys
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCKERFILE = ROOT / "docker" / "Dockerfile"
+COMPOSE_POSTGRES = ROOT / "docker" / "compose.postgres.yml"
 WORKFLOWS = sorted((ROOT / ".forgejo" / "workflows").glob("*.yml"))
 
 #: A literal value assigned to one of the key variables. A `$(...)` substitution is not a
@@ -113,6 +114,91 @@ def test_the_sync_keeps_no_download_cache():
     """
     for line in sync_lines():
         assert "--no-cache" in line, line
+
+
+def test_the_image_carries_the_driver_for_the_engine_it_is_offered():
+    """#219: `compose.postgres.yml` handed this image a PostgreSQL it could not speak to.
+
+    `psycopg` lives in the `postgres` extra, the syncs asked only for `server`, and the
+    entrypoint's `migrate` therefore stopped on an unimportable backend the first time
+    anybody took the compose file's offer up. Nothing in this repository ever had, which is
+    why it survived from `7675bf10d` to the audit.
+    """
+    for line in sync_lines():
+        assert "--extra postgres" in line, f"no PostgreSQL driver: {line}"
+
+
+def test_the_plugin_constraints_name_the_same_extras_as_the_environment():
+    """A constraint file only constrains what it mentions.
+
+    `uv export` writes the constraints that `POSTULO_EXTRA_PACKAGES` is installed against,
+    so an extra missing from it is a package a plugin may silently move to another version
+    -- which is the one thing a constraint file is there to stop.
+    """
+    folded = DOCKERFILE.read_text(encoding="utf-8").replace("\\\n", " ")
+    exports = [line for line in folded.splitlines() if "uv export" in line]
+    assert exports, "expected the plugin install to be constrained by an export of the lock"
+
+    wanted = set(re.findall(r"--extra (\w+)", " ".join(sync_lines())))
+    for line in exports:
+        assert wanted <= set(re.findall(r"--extra (\w+)", line)), (
+            f"constrains fewer extras than the environment has: {line}"
+        )
+
+
+def postgres_major() -> str:
+    """The PostgreSQL the compose file starts, read from the compose file.
+
+    Written down in one place on purpose: pg_dump refuses a server newer than itself, so a
+    client package chosen by hand is a backup that works until somebody bumps the server.
+    """
+    import yaml
+
+    compose = yaml.safe_load(COMPOSE_POSTGRES.read_text(encoding="utf-8"))
+    image = compose["services"]["db"]["image"]
+    return image.split(":", 1)[1].split("-", 1)[0]
+
+
+def test_the_compose_reader_finds_what_it_is_looking_for():
+    """A test that reads a file has to be shown failing, or it passes on an empty match."""
+    assert postgres_major().isdigit(), postgres_major()
+
+
+def test_the_runtime_can_take_a_backup_of_that_engine():
+    """#219: `manage.py backup` stopped with "pg_dump is not on the PATH" in every image.
+
+    `core/backup.py` copies a PostgreSQL through pg_dump rather than by copying a file that
+    is being written to, so the client tools are not optional on this path -- they are the
+    path. By major version, and matched to the compose file: Debian ships client 15, and
+    pg_dump refuses a server newer than itself, so the obvious `postgresql-client` would
+    have installed a tool guaranteed to fail against the server beside it.
+    """
+    runtime = stages()["runtime"]
+
+    assert f"postgresql-client-{postgres_major()}" in runtime, (
+        f"the image cannot dump the postgres:{postgres_major()} the compose file starts"
+    )
+    assert "apt.postgresql.org" in runtime, "Debian's own client is too old for that server"
+
+
+def test_the_postgresql_compose_file_runs_the_scheduler_too():
+    """Reminders, gone-quiet notices, store copies and syncs are one looping command.
+
+    The SQLite compose file has carried it from the start and this one did not, so on a
+    PostgreSQL install none of them ever ran -- and nothing failed, because a loop that was
+    never started raises nothing (#219).
+    """
+    import yaml
+
+    compose = yaml.safe_load(COMPOSE_POSTGRES.read_text(encoding="utf-8"))
+    scheduler = compose["services"]["scheduler"]
+
+    assert "send_due_reminders" in scheduler["command"]
+    assert scheduler["profiles"] == ["scheduler"], "started by asking for it, as with SQLite"
+    assert "db" in scheduler["depends_on"], "it cannot run before the database accepts it"
+    assert scheduler["environment"]["POSTULO_SKIP_MIGRATE"] == "1", (
+        "two containers migrating the same database at once is a race, not a safety net"
+    )
 
 
 def test_every_group_in_the_project_is_covered_by_that_flag():
