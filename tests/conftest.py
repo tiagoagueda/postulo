@@ -57,6 +57,23 @@ def _no_inherited_environment(monkeypatch):
         monkeypatch.delenv(variable, raising=False)
 
 
+@pytest.fixture(autouse=True)
+def _no_inherited_drafts():
+    """No test is handed a PDF another test drew (#220).
+
+    `documents.pdf` keeps the last few *draft* renders in the process, keyed by the SHA-256
+    of their HTML, so that reloading a report download does not redraw it. A worker is one
+    process and so is the suite: without this, a test that stands in for the renderer and a
+    test that expects a real one would answer each other across a whole file, depending on
+    the order they ran in.
+    """
+    from postulo.documents import pdf
+
+    pdf.forget_drafts()
+    yield
+    pdf.forget_drafts()
+
+
 class InstalledSource:
     """A capture source installed on the instance rather than shipped inside it.
 

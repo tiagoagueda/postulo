@@ -19,6 +19,7 @@ import zipfile
 from io import BytesIO
 from typing import Any
 
+from django.db import transaction
 from django.utils import timezone
 
 from postulo import __version__
@@ -300,6 +301,35 @@ def _plugin_data(user) -> dict:
         return data.export_sections(user)
     except Exception:  # pragma: no cover - an archive is worth more than a tidy section
         return {"carried": {}, "not_carried": ["unknown"]}
+
+
+def counts(user) -> dict[str, int]:
+    """How many of each kind of record an export would carry, without building one.
+
+    The two pages that say what is in an archive — *Export everything*, and the one that
+    asks whether you really mean to delete your account — used to answer by assembling the
+    whole document and measuring its lists: every record the account owns, read, nested and
+    turned into JSON, so that eight numbers could be printed. On SQLite that was done while
+    holding the write lock, which is #220 in a single page.
+
+    Eight `COUNT(*)` queries instead. They agree with the document's own counts because
+    everything here is filtered by owner exactly as the document's queries are, and
+    `tests/test_export.py` holds the two together.
+    """
+    from postulo.applications.models import Application, Interview
+    from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
+    from postulo.jobs.models import Capture, Company
+
+    return {
+        "companies": Company.objects.for_user(user).count(),
+        "applications": Application.objects.for_user(user).count(),
+        "interviews": Interview.objects.for_user(user).count(),
+        "cvs": CV.objects.for_user(user).count(),
+        "cover_letters": CoverLetter.objects.for_user(user).count(),
+        "uploads": UploadedDocument.objects.for_user(user).count(),
+        "sent_documents": RenderedDocument.objects.for_user(user).count(),
+        "captures": Capture.objects.for_user(user).count(),
+    }
 
 
 def build_document(user) -> dict:
@@ -628,10 +658,17 @@ def write_archive(user, target=None) -> BytesIO:
     Returns an in-memory buffer when no target is given. An export is one person's job
     search: measured in megabytes, not gigabytes, so holding it in memory is reasonable
     and streaming would be more machinery than the size justifies.
+
+    The manifest is read inside one transaction and the files outside it. The view no longer
+    runs in a transaction of its own (#220), and an archive whose JSON names an application
+    the same archive's other half has never heard of would be worse than a slow one — so the
+    reading of records keeps the consistency `ATOMIC_REQUESTS` used to give it. Copying the
+    files is the long part and never had it: those bytes are on disk, not in the database.
     """
     from django.core.files.storage import default_storage
 
-    document = build_document(user)
+    with transaction.atomic():
+        document = build_document(user)
     buffer = target if target is not None else BytesIO()
 
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:

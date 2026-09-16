@@ -287,6 +287,25 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD curl -fsS http://127.0.0.1:8000/healthz || exit 1
 
+# How gunicorn itself is tuned, and the one lever an operator has over it (#220).
+#
+# `--timeout 120` rather than gunicorn's default of 30. Thirty seconds is a generous budget
+# for a page and not one for drawing a PDF: a CV rendered by Chromium on a Raspberry Pi can
+# take longer, and the worker was killed part way through with no answer and nothing in the
+# log but a silent restart. Two minutes is long enough for the slow things Postulo genuinely
+# does and short enough that a worker stuck on a network read is still recycled.
+#
+# `--max-requests 500 --max-requests-jitter 50` retires each worker after roughly five
+# hundred requests. Not because anything is known to leak, but because a long-lived Python
+# process serving one person's instance for months has no reason to be long-lived, and the
+# jitter keeps the three from retiring together and leaving nobody to answer.
+#
+# Set here rather than in the CMD below so that an operator has one lever: setting
+# GUNICORN_CMD_ARGS in the environment -- `environment:` in compose, `-e` on `docker run` --
+# replaces this whole string, and the flags in the CMD are not repeated in it, so nothing
+# argues with anything. gunicorn reads it as if it had been typed on the command line.
+ENV GUNICORN_CMD_ARGS="--timeout 120 --max-requests 500 --max-requests-jitter 50"
+
 ENTRYPOINT ["postulo-entrypoint"]
 CMD ["gunicorn", "postulo.config.wsgi:application", \
      "--bind", "0.0.0.0:8000", \

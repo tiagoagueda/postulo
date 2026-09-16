@@ -7,11 +7,13 @@ from functools import cached_property
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -854,11 +856,18 @@ class ReportCSVView(LoginRequiredMixin, View):
         return response
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class ReportPDFView(LoginRequiredMixin, View):
     """The report as a document to hand over.
 
     It carries the name, the period and the day it was produced, because a document with no
     date is not evidence of anything.
+
+    **Outside a transaction of its own (#220).** Building the report reads the whole record
+    and then a renderer draws it, and under `ATOMIC_REQUESTS` on SQLite that held the write
+    lock for every second of it — on a GET that writes nothing at all. The GET still writes
+    nothing; the POST's one write is the snapshot row, in the short transaction `rendering`
+    puts around it.
 
     **Pressing the button files it; opening the address does not.** The button on the page
     posts, and the PDF it hands back is also filed under Sent documents as a *report* -- a
@@ -880,11 +889,13 @@ class ReportPDFView(LoginRequiredMixin, View):
         )
 
     def get(self, request: HttpRequest) -> HttpResponse:
-        from postulo.documents.pdf import PDFBackendUnavailable, html_to_pdf
+        from postulo.documents.pdf import PDFBackendUnavailable, draft_pdf
 
         report, html = self._html(request)
         try:
-            pdf = html_to_pdf(html)
+            # A draft: handed over and filed nowhere, so the same report asked for twice is
+            # the same bytes drawn twice, and the second may have the first's (#220).
+            pdf = draft_pdf(html)
         except PDFBackendUnavailable as unavailable:
             return self._back_to_the_page(request, report, unavailable)
         response = HttpResponse(pdf, content_type="application/pdf")

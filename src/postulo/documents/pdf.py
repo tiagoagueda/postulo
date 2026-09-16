@@ -16,12 +16,20 @@ is why a second backend exists:
 Neither is required to *use* Postulo. Tracking applications and writing letters work
 perfectly well with no renderer at all, so a backend that cannot be used produces a clear
 message rather than an error at start-up.
+
+**A run of documents is one renderer.** ``session`` holds whatever a backend is expensive to
+start, so that pressing *Send* with a CV and a letter starts one Chromium rather than two --
+it was a browser per document, launched and torn down inside the request, and launching
+Chromium is most of what rendering a two-page letter costs (#220).
 """
 
 from __future__ import annotations
 
+import contextlib
 import functools
+import hashlib
 import importlib
+from collections import OrderedDict
 from typing import Protocol
 
 from django.conf import settings
@@ -30,6 +38,16 @@ from django.utils.translation import gettext_lazy as _
 #: A4 with margins wide enough that nothing is lost to a printer's unprintable edge.
 PAGE_FORMAT = "A4"
 PAGE_MARGIN = "18mm"
+
+#: How many *draft* renders one worker keeps, and how large one may be to be worth keeping.
+#: A draft is a PDF nothing files — the report a GET hands back — so the same address asked
+#: for twice is the same bytes drawn twice, and a browser reloading a download does exactly
+#: that. Held in the process rather than in Django's cache deliberately: the default cache is
+#: a table in the database, and writing half a megabyte into it on a GET would put back on
+#: that path the very write this was taken off (#220). A worker restart forgets the lot, which
+#: costs one render and is the right trade for something nothing depends on.
+DRAFT_CACHE_ENTRIES = 4
+DRAFT_CACHE_MAX_BYTES = 4 * 1024 * 1024
 
 WEASYPRINT_HINT = _(
     "WeasyPrint is installed with Postulo, but it needs Pango and its system libraries. "
@@ -101,6 +119,8 @@ class PDFBackend(Protocol):
 
     def render(self, html: str) -> bytes: ...
 
+    def session(self) -> contextlib.AbstractContextManager[PDFBackend]: ...
+
 
 class WeasyPrintBackend:
     """Render with WeasyPrint. The default, and preferred wherever it will run."""
@@ -110,6 +130,11 @@ class WeasyPrintBackend:
 
     def is_available(self) -> bool:
         return _is_importable("weasyprint")
+
+    @contextlib.contextmanager
+    def session(self):
+        """Nothing to hold open: WeasyPrint is a library, and a second call costs a second call."""
+        yield self
 
     def render(self, html: str) -> bytes:
         # Nothing but the document and the variant goes to `write_pdf`. Its `stylesheets` and
@@ -141,41 +166,66 @@ class WeasyPrintBackend:
 
 
 class ChromiumBackend:
-    """Render with headless Chromium through Playwright. The fallback."""
+    """Render with headless Chromium through Playwright. The fallback.
+
+    Launching the browser is most of the cost, so ``session`` launches one and hands back a
+    backend that draws every document in it. A backend nobody asked for a session still works
+    on its own: it opens one for the single document and closes it again, which is what every
+    caller got before there was a choice (#220).
+    """
 
     name = "chromium"
     install_hint = CHROMIUM_HINT
 
+    def __init__(self, browser=None) -> None:
+        #: A browser a session holds open, or ``None`` for a backend that starts its own.
+        self._browser = browser
+
     def is_available(self) -> bool:
         return _is_importable("playwright")
 
-    def render(self, html: str) -> bytes:
+    @contextlib.contextmanager
+    def session(self):
         from playwright.sync_api import sync_playwright
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch()
             try:
-                page = browser.new_page()
-                # The document is self-contained: themes inline their CSS, so there is
-                # nothing to fetch. Every request the page makes is refused anyway rather
-                # than trusted not to happen -- the counterpart of WeasyPrint's fetcher. A
-                # `data:` address is not a request, so what a document embeds still draws
-                # (#163).
-                page.route("**/*", lambda route: route.abort())
-                page.set_content(html, wait_until="load")
-                return page.pdf(
-                    format=PAGE_FORMAT,
-                    print_background=True,
-                    margin={
-                        "top": PAGE_MARGIN,
-                        "bottom": PAGE_MARGIN,
-                        "left": PAGE_MARGIN,
-                        "right": PAGE_MARGIN,
-                    },
-                    **CHROMIUM_PDF_OPTIONS,
-                )
+                yield ChromiumBackend(browser)
             finally:
                 browser.close()
+
+    def render(self, html: str) -> bytes:
+        if self._browser is not None:
+            return self._draw(self._browser, html)
+        with self.session() as backend:
+            return backend.render(html)
+
+    @staticmethod
+    def _draw(browser, html: str) -> bytes:
+        page = browser.new_page()
+        try:
+            # The document is self-contained: themes inline their CSS, so there is nothing
+            # to fetch. Every request the page makes is refused anyway rather than trusted
+            # not to happen -- the counterpart of WeasyPrint's fetcher. A `data:` address is
+            # not a request, so what a document embeds still draws (#163).
+            page.route("**/*", lambda route: route.abort())
+            page.set_content(html, wait_until="load")
+            return page.pdf(
+                format=PAGE_FORMAT,
+                print_background=True,
+                margin={
+                    "top": PAGE_MARGIN,
+                    "bottom": PAGE_MARGIN,
+                    "left": PAGE_MARGIN,
+                    "right": PAGE_MARGIN,
+                },
+                **CHROMIUM_PDF_OPTIONS,
+            )
+        finally:
+            # One page per document rather than one browser: a page left open holds the
+            # document it drew in the browser's memory for as long as the session lasts.
+            page.close()
 
 
 #: Tried in this order when the backend is "auto". WeasyPrint comes first because it is
@@ -225,6 +275,62 @@ def get_pdf_backend(name: str | None = None) -> PDFBackend:
             % {"weasyprint": WEASYPRINT_HINT, "chromium": CHROMIUM_HINT}
         )
     )
+
+
+@contextlib.contextmanager
+def pdf_session(backend: PDFBackend | None = None):
+    """One renderer for a run of documents, closed when the run ends.
+
+    Opened before the first document rather than around each, so that a backend which is
+    unusable says so once, before anything has been written down — and so that freezing a CV
+    and a letter together is one Chromium instead of two (#220).
+
+    A backend with no ``session`` is used as it is. Nothing in Postulo is one, but the
+    backend interface is a protocol rather than a base class, and something written against
+    the interface as it stood — a plugin's renderer, a test's stand-in — is still a renderer.
+    """
+    chosen = backend or get_pdf_backend()
+    opener = getattr(chosen, "session", None)
+    if opener is None:
+        yield chosen
+        return
+    with opener() as ready:
+        yield ready
+
+
+#: The drafts this worker has drawn, oldest first.
+_drafts: OrderedDict[str, bytes] = OrderedDict()
+
+
+def forget_drafts() -> None:
+    """Drop what this worker is holding, so nothing carries between one thing and the next."""
+    _drafts.clear()
+
+
+def draft_pdf(html: str, *, backend: PDFBackend | None = None) -> bytes:
+    """Render a document that is handed over and filed nowhere, keeping it in case of a twin.
+
+    The key is the SHA-256 of the HTML, so a hit means the input was identical byte for byte
+    and the answer therefore is too. That is the whole of the safety argument: two people
+    cannot share an entry without having asked for the same document, and a report carrying
+    a name and a date is not a document two people ask for.
+
+    Never used for a snapshot. What an employer received is drawn afresh and kept as a file,
+    and handing one render's bytes to a second document would make the record a copy of
+    something else.
+    """
+    key = hashlib.sha256(html.encode("utf-8")).hexdigest()
+    held = _drafts.get(key)
+    if held is not None:
+        _drafts.move_to_end(key)
+        return held
+
+    content = html_to_pdf(html, backend=backend)
+    if len(content) <= DRAFT_CACHE_MAX_BYTES:
+        _drafts[key] = content
+        while len(_drafts) > DRAFT_CACHE_ENTRIES:
+            _drafts.popitem(last=False)
+    return content
 
 
 def html_to_pdf(html: str, *, backend: PDFBackend | None = None) -> bytes:

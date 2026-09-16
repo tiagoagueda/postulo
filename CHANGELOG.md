@@ -773,6 +773,45 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- **One slow request no longer stops the whole instance.** Every request was a transaction,
+  and on SQLite Postulo opens transactions *immediate* — the write lock is taken before the
+  view runs and given back with the response. For a page that is milliseconds, and it is the
+  price of two requests never colliding. But a capture waits up to ten seconds for somebody
+  else's web server and five more for their `robots.txt`; a CV can be a whole Chromium; an
+  export reads every record and every file an account owns. Each of those held the write lock
+  for every second of it, and the three gunicorn workers, the scheduler and the task worker
+  queued behind. Anything still waiting after twenty seconds failed with *database is locked*,
+  which is how one capture from a slow job board became somebody else's error page.
+
+  Those views have left the request's transaction and wrap their own writes instead — the
+  capture row, the logo, the snapshot and what saving it schedules, and what an application
+  is told was sent with it. The rate limit is deliberately outside: an allowance spent making
+  the server fetch a page has been spent, and rolling it back with a failed request is how a
+  limit becomes no limit. The export is the one read worth protecting, so the archive's
+  manifest is still read inside a transaction while the files, which never had that
+  guarantee, are copied outside it. This is view by view rather than, say, all GETs at once,
+  because leaving a transaction is a decision about what has to succeed or fail together and
+  there is no answer to that which is true of every view of a given method.
+
+  **The two pages that say what an export contains built the whole export to find out.**
+  Every record the account owns, read, nested and turned into JSON, so that eight numbers
+  could be printed — on the page offering the download, and on the page asking whether you
+  really mean to delete your account, which is the one page in Postulo meant to be read
+  slowly. They count now.
+
+  **Pressing *Send* with a CV and a letter starts one Chromium rather than two.** Launching
+  the browser is most of what rendering costs on that backend, and it was launched and torn
+  down once per document. A report downloaded twice is also drawn once: that PDF is handed
+  over and filed nowhere, so the bytes are kept against the SHA-256 of the HTML they came
+  from, for a few documents, in the worker that drew them. Never for a snapshot — what an
+  employer received is drawn afresh, because a record that is a copy of something else is not
+  a record.
+
+  **And the container gives a worker two minutes rather than gunicorn's thirty seconds.**
+  Thirty is a budget for a page and not for drawing a PDF on a Raspberry Pi, where the worker
+  was killed part way through with no answer and nothing in the log but a silent restart.
+  `GUNICORN_CMD_ARGS` is the one lever over any of this, it is documented, and the image's
+  command deliberately repeats none of what it sets. (#220)
 - **A plugin reaches every process now, whatever kind it is, and comes back from a restore as
   it went in.** Four things about installing, switching off and restoring a plugin contradicted
   what *Writing a plugin* and the Plugins page promise, and the audit found them together

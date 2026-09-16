@@ -448,3 +448,55 @@ def test_a_release_carries_a_bill_of_materials():
     assert "cyclonedx" in SCAN_SCRIPT.read_text(encoding="utf-8")
     kept = [step for step in image_steps() if "sbom" in str(step.get("with", {})).lower()]
     assert kept, "the SBOM has to leave the runner"
+
+
+# ---------------------------------------------------- how gunicorn is told to run (#220)
+
+
+def gunicorn_defaults() -> str:
+    """The `GUNICORN_CMD_ARGS` the image ships, as written."""
+    match = re.search(
+        r'^ENV GUNICORN_CMD_ARGS="(?P<args>[^"]*)"',
+        DOCKERFILE.read_text(encoding="utf-8"),
+        re.M,
+    )
+    return match["args"] if match else ""
+
+
+def test_a_worker_is_given_longer_than_gunicorns_default_to_answer():
+    """Thirty seconds is a budget for a page, not for drawing a PDF (#220).
+
+    A CV rendered by Chromium on a small machine can take longer, and the worker was then
+    killed part way through: no answer, and nothing in the log but a silent restart.
+    """
+    defaults = gunicorn_defaults()
+
+    assert "--timeout" in defaults, "gunicorn's default of 30 seconds kills a render"
+    seconds = int(defaults.split("--timeout")[1].split()[0])
+    assert seconds >= 120
+
+
+def test_workers_are_retired_and_not_all_at_once():
+    """A jitter, so the three do not retire together and leave nobody to answer."""
+    defaults = gunicorn_defaults()
+
+    assert "--max-requests" in defaults
+    assert "--max-requests-jitter" in defaults
+
+
+def test_the_command_does_not_argue_with_the_environment_variable():
+    """One lever: setting GUNICORN_CMD_ARGS replaces this and nothing contradicts it.
+
+    A flag in both places would mean an operator's value competing with the image's,
+    with the winner depending on which of the two gunicorn reads last.
+    """
+    dockerfile = DOCKERFILE.read_text(encoding="utf-8")
+    command = dockerfile[dockerfile.index("CMD [") :]
+
+    for flag in ("--timeout", "--max-requests", "--max-requests-jitter"):
+        assert flag not in command, f"{flag} is in the CMD as well as in GUNICORN_CMD_ARGS"
+
+
+def test_the_gunicorn_reader_finds_what_it_is_looking_for():
+    """A test that reads a file has to be shown failing, or it passes on an empty match."""
+    assert "--timeout" in gunicorn_defaults()

@@ -31,6 +31,7 @@ from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit
 
 from django.core.files.base import ContentFile
+from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from PIL import Image, ImageOps, UnidentifiedImageError
@@ -140,11 +141,22 @@ def download(url: str) -> bytes:
 # ------------------------------------------------------------------ storing
 
 
+#: What a logo sets on the company, whether one was found or the last one was thrown away.
+#: Written as one list because the two are the same act in opposite directions, and a field
+#: on one and not the other is how a cleared logo keeps saying where it came from.
+LOGO_FIELDS = ["logo", "logo_source", "logo_source_url", "logo_fetched_at", "updated_at"]
+
+
 def store(company, content: ContentFile, *, source: str, url: str = "") -> None:
     """Put the image on the company, replacing whatever was there.
 
     The most recent action wins — a URL, the website, an upload — so there is no
     precedence rule for anybody to learn.
+
+    The database write is here rather than around the view, because the view fetches: the
+    page, then up to six images, none of it quick and none of it the instance's business to
+    hold the write lock for (#220). The picture is decoded before this is entered, so what
+    the transaction covers is one `UPDATE`.
     """
     if company.logo:
         company.logo.delete(save=False)
@@ -152,9 +164,8 @@ def store(company, content: ContentFile, *, source: str, url: str = "") -> None:
     company.logo_source = source
     company.logo_source_url = url[:500]
     company.logo_fetched_at = timezone.now()
-    company.save(
-        update_fields=["logo", "logo_source", "logo_source_url", "logo_fetched_at", "updated_at"]
-    )
+    with transaction.atomic():
+        company.save(update_fields=LOGO_FIELDS)
 
 
 def clear(company) -> None:
@@ -163,9 +174,8 @@ def clear(company) -> None:
     company.logo_source = ""
     company.logo_source_url = ""
     company.logo_fetched_at = None
-    company.save(
-        update_fields=["logo", "logo_source", "logo_source_url", "logo_fetched_at", "updated_at"]
-    )
+    with transaction.atomic():
+        company.save(update_fields=LOGO_FIELDS)
 
 
 def from_url(company, url: str) -> None:

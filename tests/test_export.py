@@ -362,3 +362,47 @@ def test_events_are_not_lost_when_an_application_moved_several_times(populated, 
     importer.load(other_user, archive)
 
     assert ApplicationEvent.objects.for_user(other_user).count() == before
+
+
+# --------------------------------------------- what a page says is in it (#220)
+
+
+def test_the_counts_agree_with_the_document_they_used_to_be_measured_from(populated):
+    """The two answers have to be the same answer, or one page is lying about the other.
+
+    Both pages that say what an export holds used to build the whole document and measure
+    its lists: every record the account owns, read and nested, so that eight numbers could
+    be printed -- and on SQLite that was done holding the write lock (#220). They count now,
+    and this is what holds the counting to what the archive actually carries.
+    """
+    _archive, document = read_archive(populated)
+
+    assert export_module.counts(populated) == document["counts"]
+
+
+def test_the_counts_are_counted_rather_than_assembled(populated):
+    """Eight `COUNT(*)` queries, and not one that reads a row."""
+    from django.db import connection
+
+    def only_counts(execute, sql, params, many, context):
+        assert "COUNT(*)" in sql.upper(), f"not a count: {sql}"
+        return execute(sql, params, many, context)
+
+    with connection.execute_wrapper(only_counts):
+        export_module.counts(populated)
+
+
+def test_the_export_page_does_not_build_the_archive_to_show_the_numbers(client, populated):
+    """The page a person opens before deciding should not do the expensive thing first."""
+    from unittest import mock
+
+    client.force_login(populated)
+
+    def refuse(user):
+        raise AssertionError("the overview built the whole document to print six numbers")
+
+    with mock.patch.object(export_module, "build_document", refuse):
+        response = client.get(reverse("core:export"))
+
+    assert response.status_code == 200
+    assert b"Download the archive" in response.content

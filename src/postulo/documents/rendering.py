@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass, field
 
 from django.core.files.base import ContentFile
+from django.db import transaction
 from django.template.loader import render_to_string
 from django.utils import formats, timezone, translation
 from django.utils.text import slugify
@@ -377,6 +378,24 @@ def _keep(document: RenderedDocument, filename: str, content: bytes) -> None:
     )
 
 
+def _file_and_save(document: RenderedDocument, filename: str, content: bytes) -> None:
+    """Put the bytes on disk and the record in the database, the record in one transaction.
+
+    The views that reach here no longer run inside a transaction of their own: rendering a
+    PDF takes seconds, and on SQLite a request's transaction holds the write lock for every
+    one of them, so the whole instance waited on one person's CV (#220). What has to be
+    atomic is the row and what its saving sets off — `schedule_copies` writes a pending copy
+    for every store the owner has connected — and that is these two statements and nothing
+    slow between them.
+
+    The file is written first and outside, as it always was. A row that fails to save leaves
+    bytes nobody points at, which is the same orphan a rolled-back request left before.
+    """
+    _keep(document, filename, content)
+    with transaction.atomic():
+        document.save()
+
+
 def sent_to(application) -> str:
     """Where a snapshot went, in words, so it still says so if the application is deleted.
 
@@ -420,8 +439,7 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
         source_text=html,
         checksum=RenderedDocument.checksum_for(content),
     )
-    _keep(document, f"{slugify(title) or 'cv'}.pdf", content)
-    document.save()
+    _file_and_save(document, f"{slugify(title) or 'cv'}.pdf", content)
     return document
 
 
@@ -453,8 +471,7 @@ def snapshot_report(owner, *, title: str, html: str, filename: str, backend=None
         source_text=html,
         checksum=RenderedDocument.checksum_for(content),
     )
-    _keep(document, filename, content)
-    document.save()
+    _file_and_save(document, filename, content)
     return document
 
 
@@ -476,6 +493,5 @@ def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> R
         source_text=letter_text(letter, application),
         checksum=RenderedDocument.checksum_for(content),
     )
-    _keep(document, f"{slugify(title) or 'cover-letter'}.pdf", content)
-    document.save()
+    _file_and_save(document, f"{slugify(title) or 'cover-letter'}.pdf", content)
     return document

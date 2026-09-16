@@ -357,14 +357,20 @@ class DeleteAccountView(LoginRequiredMixin, View):
         return super().dispatch(request, *args, **kwargs)
 
     def render(self, request: HttpRequest, error: str = "") -> HttpResponse:
-        from postulo.core.export import build_document
+        """The page, with what is about to be destroyed counted rather than assembled.
+
+        The eight numbers this shows came from building the whole export document and
+        measuring its lists — every record the account owns, read and nested, to print eight
+        integers, and on the page whose whole job is to be read carefully (#220).
+        """
+        from postulo.core.export import counts
 
         return render(
             request,
             self.template_name,
             {
                 "section_title": _("Your data"),
-                "counts": build_document(request.user).get("counts", {}),
+                "counts": counts(request.user),
                 "last_administrator": deletion.is_last_administrator(request.user),
                 "error": error,
             },

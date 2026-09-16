@@ -13,10 +13,12 @@ import functools
 
 from django import forms
 from django.contrib import messages
+from django.db import transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
@@ -59,8 +61,23 @@ class CaptureURLForm(forms.Form):
     )
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CaptureCreateView(OwnedObjectMixin, View):
-    """Fetch a page, read it, and send the result to review."""
+    """Fetch a page, read it, and send the result to review.
+
+    **Outside a transaction of its own (#220).** This is the one surface that makes the
+    server dial an address somebody else chose, and `fetching` waits up to ten seconds for
+    the page and five more for `robots.txt`. Under `ATOMIC_REQUESTS` on SQLite the write lock
+    was taken before any of that began and held until the answer came back, so one capture
+    from a slow job board stalled every other worker — and anything that waited past the
+    twenty-second busy timeout failed with *database is locked*.
+
+    Two things write here. The capture is created in a transaction of a single statement,
+    below. The rate limit counts against the cache, which by default is a table in this same
+    database; it is deliberately left outside, because an allowance spent making the server
+    fetch a page has been spent whatever the request does next, and rolling it back with a
+    failed request is how a limit becomes no limit at all.
+    """
 
     template_name = "jobs/capture_form.html"
 
@@ -127,14 +144,15 @@ class CaptureCreateView(OwnedObjectMixin, View):
             return self._render(request, form)
 
         data, source = result
-        capture = Capture.objects.create(
-            owner=request.user,
-            url=page_url[:500],
-            source_name=source.name,
-            source_version=getattr(source, "version", ""),
-            origin="web",
-            data=data.model_dump(mode="json"),
-        )
+        with transaction.atomic():
+            capture = Capture.objects.create(
+                owner=request.user,
+                url=page_url[:500],
+                source_name=source.name,
+                source_version=getattr(source, "version", ""),
+                origin="web",
+                data=data.model_dump(mode="json"),
+            )
         return redirect("jobs:capture_review", pk=capture.pk)
 
 

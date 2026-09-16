@@ -11,6 +11,7 @@ from django.db.models import Count, Q
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -343,8 +344,16 @@ class CompanyLogoView(OwnedObjectMixin, View):
         return response
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CompanyLogoActionView(OwnedObjectMixin, View):
-    """*Find logo* and *Refresh*: one request each, when a person presses the button."""
+    """*Find logo* and *Refresh*: one request each, when a person presses the button.
+
+    **Outside a transaction of its own (#220).** *Find logo* reads the company's site and
+    then tries up to six images from it, one network round trip each, and under
+    `ATOMIC_REQUESTS` on SQLite every one of those seconds was a second nothing else could
+    write. What has to be atomic is putting the picture on the company, and `logos.store`
+    and `logos.clear` each do that in a transaction of one statement.
+    """
 
     def get_queryset(self):
         return Company.objects.for_user(self.request.user)

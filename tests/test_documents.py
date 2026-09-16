@@ -558,13 +558,17 @@ def test_neither_argument_that_built_its_own_fetcher_is_passed():
     assert not {"stylesheets", "xmp_metadata"} & set(pdf.WEASYPRINT_PDF_OPTIONS)
 
 
-def test_chromium_is_asked_for_a_tag_tree_and_an_outline(monkeypatch):
-    """The fallback has to produce the same document, and spells the request differently."""
+def fake_playwright(monkeypatch) -> dict:
+    """Stand in for Playwright, and count what it was asked to start.
+
+    Returns the record: what `page.pdf` was asked for, how many browsers were launched and
+    how many of them were closed, and the same for pages. Counting the launches is the point
+    of #220 -- starting Chromium is most of what rendering costs, and the bug was that a
+    *Send* of two documents started it twice.
+    """
     import playwright.sync_api
 
-    from postulo.documents import pdf
-
-    asked: dict = {}
+    record: dict = {"asked": {}, "launched": 0, "browsers_closed": 0, "pages": 0, "pages_closed": 0}
 
     class Page:
         def route(self, *args, **kwargs):
@@ -574,18 +578,23 @@ def test_chromium_is_asked_for_a_tag_tree_and_an_outline(monkeypatch):
             pass
 
         def pdf(self, **options):
-            asked.update(options)
+            record["asked"].update(options)
             return b"%PDF-1.7 chromium"
+
+        def close(self):
+            record["pages_closed"] += 1
 
     class Browser:
         def new_page(self):
+            record["pages"] += 1
             return Page()
 
         def close(self):
-            pass
+            record["browsers_closed"] += 1
 
     class Chromium:
         def launch(self):
+            record["launched"] += 1
             return Browser()
 
     class Playwright:
@@ -598,10 +607,55 @@ def test_chromium_is_asked_for_a_tag_tree_and_an_outline(monkeypatch):
             return False
 
     monkeypatch.setattr(playwright.sync_api, "sync_playwright", Playwright)
+    return record
+
+
+def test_chromium_is_asked_for_a_tag_tree_and_an_outline(monkeypatch):
+    """The fallback has to produce the same document, and spells the request differently."""
+    from postulo.documents import pdf
+
+    record = fake_playwright(monkeypatch)
 
     assert pdf.ChromiumBackend().render("<html></html>") == b"%PDF-1.7 chromium"
-    assert asked["tagged"] is True
-    assert asked["outline"] is True
+    assert record["asked"]["tagged"] is True
+    assert record["asked"]["outline"] is True
+
+
+def test_a_run_of_documents_starts_one_chromium(monkeypatch):
+    """#220: it was a browser per document, launched and torn down inside the request."""
+    from postulo.documents import pdf
+
+    record = fake_playwright(monkeypatch)
+
+    with pdf.pdf_session(pdf.ChromiumBackend()) as backend:
+        backend.render("<html>one</html>")
+        backend.render("<html>two</html>")
+
+    assert record["launched"] == 1, "two documents, one browser"
+    assert record["pages"] == 2, "a page each, so neither holds the other's document"
+    assert record["pages_closed"] == 2
+    assert record["browsers_closed"] == 1, "and it is closed when the run ends"
+
+
+def test_a_backend_asked_for_one_document_still_starts_and_stops_its_own(monkeypatch):
+    """Nothing has to know about sessions to render: `render` on its own works as it did."""
+    from postulo.documents import pdf
+
+    record = fake_playwright(monkeypatch)
+
+    pdf.ChromiumBackend().render("<html></html>")
+
+    assert record["launched"] == 1
+    assert record["browsers_closed"] == 1
+
+
+def test_a_backend_written_without_a_session_is_still_a_renderer(fake_backend):
+    """The interface is a protocol, and a plugin's renderer predates `session` (#220)."""
+    from postulo.documents import pdf
+
+    assert not hasattr(fake_backend, "session")
+    with pdf.pdf_session(fake_backend) as backend:
+        assert backend is fake_backend
 
 
 # ---------------------------------------------- structure and metadata in the markup (#235)
@@ -869,16 +923,14 @@ def test_a_letter_with_a_gap_is_shown_before_it_is_frozen(client, user, letter, 
 
 
 def test_pressing_through_the_warning_freezes_it_gaps_and_all(
-    client, user, letter, application, monkeypatch
+    client, user, letter, application, fake_backend, monkeypatch
 ):
     """The warning is a warning, not a refusal: a gap is sometimes what somebody means."""
-    from postulo.documents import rendering as rendering_module
-
     application.posting.location = ""
     application.posting.save(update_fields=["location"])
     letter.body = "Dear {{ company }}, about {{ role }} in {{ location }}."
     letter.save(update_fields=["body"])
-    monkeypatch.setattr(rendering_module, "html_to_pdf", lambda html, backend=None: b"%PDF-1.7")
+    monkeypatch.setattr("postulo.documents.pdf.get_pdf_backend", lambda name=None: fake_backend)
     client.force_login(user)
 
     response = client.post(
@@ -892,15 +944,13 @@ def test_pressing_through_the_warning_freezes_it_gaps_and_all(
 
 
 def test_a_letter_with_nothing_missing_is_frozen_without_an_extra_press(
-    client, user, letter, application, monkeypatch
+    client, user, letter, application, fake_backend, monkeypatch
 ):
     """An extra step everybody has to press through is read once and clicked past for ever."""
-    from postulo.documents import rendering as rendering_module
-
     letter.subject = "About {{ role }}"
     letter.body = "Dear {{ company }}, I am writing about {{ role }}."
     letter.save(update_fields=["subject", "body"])
-    monkeypatch.setattr(rendering_module, "html_to_pdf", lambda html, backend=None: b"%PDF-1.7")
+    monkeypatch.setattr("postulo.documents.pdf.get_pdf_backend", lambda name=None: fake_backend)
     client.force_login(user)
 
     response = client.post(

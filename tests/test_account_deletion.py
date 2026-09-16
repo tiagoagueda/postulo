@@ -270,3 +270,27 @@ def test_the_command_deletes_after_confirmation_and_refuses_the_last_administrat
         call_command("delete_account", "admin-one", "--yes")
     with pytest.raises(CommandError, match="No account"):
         call_command("delete_account", "nobody", "--yes")
+
+
+def test_the_page_counts_what_goes_rather_than_building_an_export_of_it(client, person):
+    """#220: it printed eight numbers by assembling the whole export document first.
+
+    Every record the account owns, read, nested and turned into JSON — on SQLite, holding
+    the write lock while it happened — so that a page could say how many companies there
+    were. The page a person is meant to read carefully was the slowest in Postulo.
+    """
+    from unittest import mock
+
+    from postulo.core import export as export_module
+
+    fill(person)
+    sign_in_properly(client, person)
+
+    def refuse(user):
+        raise AssertionError("the page built the whole export to count it")
+
+    with mock.patch.object(export_module, "build_document", refuse):
+        response = client.get(reverse("accounts:delete"))
+
+    assert response.status_code == 200
+    assert "data-delete-account" in response.content.decode()

@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from django.contrib import messages
-from django.db import models
+from django.db import models, transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -30,7 +31,7 @@ from .forms import (
     UploadedDocumentForm,
 )
 from .models import CV, CoverLetter, CVItem, LetterKind, RenderedDocument, UploadedDocument
-from .pdf import PDFBackendUnavailable
+from .pdf import PDFBackendUnavailable, pdf_session
 from .rendering import (
     document_language,
     render_cv_html,
@@ -204,8 +205,16 @@ class CVPreviewView(OwnedObjectMixin, View):
         return HttpResponse(render_cv_html(cv))
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CVExportView(OwnedObjectMixin, PDFErrorMixin, View):
-    """Render a CV to PDF and keep the result as a snapshot."""
+    """Render a CV to PDF and keep the result as a snapshot.
+
+    **Outside a transaction of its own (#220).** Rendering is seconds of WeasyPrint or a
+    whole Chromium, and on SQLite a request's transaction takes the write lock before the
+    view body runs and keeps it until the response — so one CV on a small machine stalled
+    every other worker, the scheduler and `db_worker` with it. The only write here is the
+    snapshot row, and `rendering` wraps that in a transaction lasting a statement.
+    """
 
     def get_queryset(self):
         return CV.objects.for_user(self.request.user)
@@ -491,12 +500,21 @@ class RenderedListView(CopiesContextMixin, OwnedObjectMixin, ListView):
 # ------------------------------------------------- sending documents with an application
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
     """Freeze the documents being sent with an application.
 
     This is the moment the snapshot exists for. Everything chosen here is rendered as it
     stands now and attached to the application, so the record survives every later edit
     to the CV it came from.
+
+    **The slowest button in Postulo, and it no longer holds the database while it runs
+    (#220).** Two documents meant two renders inside one request-long transaction — two
+    Chromium launches, on the backend where that is what rendering means. One renderer draws
+    both now, and the writes are short transactions of their own: each snapshot saves its row
+    as it is made, and what the application is told about all of them is one block at the end.
+    A render that fails half way therefore keeps the document it managed to file, which is a
+    document that genuinely exists, instead of throwing it away with the seconds spent on it.
     """
 
     template_name = "documents/send.html"
@@ -541,38 +559,57 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
                 },
             )
 
-        created: list[str] = []
         try:
-            if form.cleaned_data["cv"]:
-                document = snapshot_cv(form.cleaned_data["cv"], application=application)
-                created.append(document.title)
-            if form.cleaned_data["cover_letter"]:
-                document = snapshot_letter(
-                    form.cleaned_data["cover_letter"], application=application
-                )
-                created.append(document.title)
+            created = self.freeze(form, application)
         except PDFBackendUnavailable as error:
             self.handle_pdf_error(request, error)
             return render(request, self.template_name, {"application": application, "form": form})
 
         uploads = form.cleaned_data["uploads"]
-        if uploads:
-            application.sent_uploads.add(*uploads)
-            created.extend(str(upload) for upload in uploads)
-
         links = form.cleaned_data["links"]
-        if links:
-            application.sent_links.add(*links)
-            created.extend(f"{link.title} — {link.url}" for link in links)
+        created.extend(str(upload) for upload in uploads)
+        created.extend(f"{link.title} — {link.url}" for link in links)
 
+        # Everything the application is told, in one transaction. The two lists and the
+        # timeline entry naming what went with them are one act: a timeline saying documents
+        # were sent, beside an application nothing is attached to, is a record of nothing.
+        # Nothing slow is inside it — the rendering is done, and already filed.
         if created:
-            record_event(
-                application,
-                summary=str(_("Documents sent")),
-                body="\n".join(created),
-            )
+            with transaction.atomic():
+                if uploads:
+                    application.sent_uploads.add(*uploads)
+                if links:
+                    application.sent_links.add(*links)
+                record_event(
+                    application,
+                    summary=str(_("Documents sent")),
+                    body="\n".join(created),
+                )
             messages.success(request, _("Recorded what you sent."))
         return redirect(application.get_absolute_url())
+
+    def freeze(self, form: SendDocumentsForm, application: Application) -> list[str]:
+        """Render whatever was chosen, from one renderer, and name what was made.
+
+        The renderer is opened once, and only when there is something to draw: a *Send* of
+        uploads and links alone should not start a browser. Opening it also settles whether
+        there is a usable backend before the first document is written down, so a missing
+        renderer is still one message and nothing half-done.
+        """
+        cv = form.cleaned_data["cv"]
+        letter = form.cleaned_data["cover_letter"]
+        if not cv and not letter:
+            return []
+
+        created: list[str] = []
+        with pdf_session() as backend:
+            if cv:
+                created.append(snapshot_cv(cv, application=application, backend=backend).title)
+            if letter:
+                created.append(
+                    snapshot_letter(letter, application=application, backend=backend).title
+                )
+        return created
 
 
 class ApplicationDocumentsView(OwnedObjectMixin, DetailView):
