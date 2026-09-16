@@ -774,7 +774,10 @@ All notable changes to Postulo are recorded here. The format follows
   and entirely unexecuted. CI now runs the database-facing tests against a real
   `postgres:17` and takes an actual backup of a seeded instance and puts it back, through
   pg_dump and pg_restore, so the next thing to break on this path breaks in a job rather
-  than on somebody's server.
+  than on somebody's server. Which found its first thing immediately: the suite's throwaway
+  model had no migration, so it was built in `migrate`'s syncdb phase with a foreign key to
+  an accounts table that did not exist yet — recorded and checked later by SQLite, refused
+  outright by PostgreSQL.
 
   The client tools come from PostgreSQL's own repository, pinned to the major the compose
   file starts: pg_dump refuses a server newer than itself and Debian's is two majors behind,
