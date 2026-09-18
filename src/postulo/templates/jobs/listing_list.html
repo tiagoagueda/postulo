@@ -14,8 +14,8 @@
       </p>
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
-      <a href="{% url 'jobs:capture_create' %}" class="btn-secondary">{% translate "Capture a posting" %}</a>
-      <a href="{% url 'listings:create' %}" class="btn-primary">{% translate "Add a listing" %}</a>
+      <a href="{% url 'jobs:capture_create' %}" class="btn" data-variant="outline">{% translate "Capture a posting" %}</a>
+      <a href="{% url 'listings:create' %}" class="btn">{% translate "Add a listing" %}</a>
     </div>
   </div>
 
@@ -34,7 +34,7 @@
       <form method="post" action="{% url 'jobs:capture_discard_selected' %}" id="capture-bulk"
             class="mb-2 flex flex-wrap items-center gap-3 text-sm">
         {% csrf_token %}
-        <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">
+        <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs">
           {% translate "Discard the ticked ones" %}
         </button>
       </form>
@@ -51,12 +51,12 @@
                 <bdi>{{ capture.data.company_name|default:"—" }}</bdi> · {{ capture.created_at|date:"DATETIME_FORMAT" }}
               </p>
             </div>
-            <a href="{% url 'jobs:capture_review' capture.pk %}" class="btn-secondary shrink-0">
+            <a href="{% url 'jobs:capture_review' capture.pk %}" class="btn shrink-0" data-variant="outline">
               {% translate "Review" %}
             </a>
             <form method="post" action="{% url 'jobs:capture_discard' capture.pk %}">
               {% csrf_token %}
-              <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">
+              <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs">
                 {% translate "Discard" %}
               </button>
             </form>
@@ -120,29 +120,29 @@
                       <form method="post" action="{% url 'listings:shortlist' listing.pk %}">
                         {% csrf_token %}
                         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                        <button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Shortlist" %}</button>
+                        <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Shortlist" %}</button>
                       </form>
                     {% endif %}
                     <form method="post" action="{% url 'listings:discard' listing.pk %}">
                       {% csrf_token %}
                       <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                      <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">
+                      <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs">
                         {% translate "Discard" %}
                       </button>
                     </form>
-                    <a href="{% url 'listings:apply' listing.pk %}" class="btn-primary px-3 py-1 text-xs">
+                    <a href="{% url 'listings:apply' listing.pk %}" class="btn" data-size="xs">
                       {% translate "Apply" %}
                     </a>
                   {% elif listing.derived_state == "discarded" %}
                     <form method="post" action="{% url 'listings:restore' listing.pk %}">
                       {% csrf_token %}
                       <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                      <button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Restore" %}</button>
+                      <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Restore" %}</button>
                     </form>
                   {% elif listing.derived_state == "applied" %}
                     {% with application=listing.applications.all|first %}
                       {% if application %}
-                        <a href="{{ application.get_absolute_url }}" class="btn-ghost px-2 py-1 text-xs">
+                        <a href="{{ application.get_absolute_url }}" class="btn" data-variant="ghost" data-size="xs">
                           {% translate "Application" %}
                         </a>
                       {% endif %}
@@ -159,7 +159,7 @@
       <nav class="mt-4 flex items-center gap-2 text-sm" aria-label="{% translate 'Pagination' %}">
         {% if page_obj.has_previous %}
           <a href="?state={{ current_filter }}&page={{ page_obj.previous_page_number }}"
-             class="btn-secondary">{% translate "Previous" %}</a>
+             class="btn" data-variant="outline">{% translate "Previous" %}</a>
         {% endif %}
         <span class="text-ink-500 dark:text-ink-400">
           {% blocktranslate trimmed with current=page_obj.number total=paginator.num_pages %}
@@ -168,7 +168,7 @@
         </span>
         {% if page_obj.has_next %}
           <a href="?state={{ current_filter }}&page={{ page_obj.next_page_number }}"
-             class="btn-secondary">{% translate "Next" %}</a>
+             class="btn" data-variant="outline">{% translate "Next" %}</a>
         {% endif %}
       </nav>
     {% endif %}
@@ -179,7 +179,7 @@
         <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
           {% translate "Capture a posting from its address, or add one by hand, and it waits here for you." %}
         </p>
-        <a href="{% url 'listings:create' %}" class="btn-primary">{% translate "Add a listing" %}</a>
+        <a href="{% url 'listings:create' %}" class="btn">{% translate "Add a listing" %}</a>
       {% else %}
         <p class="font-medium">{% translate "Nothing here" %}</p>
       {% endif %}

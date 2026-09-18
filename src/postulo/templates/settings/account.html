@@ -11,7 +11,7 @@
     {% csrf_token %}
     <div class="card mb-6">
       <c-field :field="form.username" />
-      <button type="submit" class="btn-secondary">{% translate "Change username" %}</button>
+      <button type="submit" class="btn" data-variant="outline">{% translate "Change username" %}</button>
     </div>
   </form>
 
@@ -44,7 +44,7 @@
          has more than one address: taking the page away from them would take away the
          way back in on the day a work address stops working (#145). {% endcomment %}
       {% if several_addresses %}
-        <a href="{{ email_url }}" class="btn-secondary">{% translate "Manage" %}</a>
+        <a href="{{ email_url }}" class="btn" data-variant="outline">{% translate "Manage" %}</a>
       {% endif %}
     </div>
     <ul class="divide-y divide-ink-200 text-sm dark:divide-ink-800">
@@ -74,7 +74,7 @@
           {% translate "You will be asked for the current one first." %}
         </p>
       </div>
-      <a href="{{ password_url }}" class="btn-secondary">{% translate "Change password" %}</a>
+      <a href="{{ password_url }}" class="btn" data-variant="outline">{% translate "Change password" %}</a>
     </div>
   </div>
 
@@ -101,7 +101,7 @@
       </div>
       {% if passkeys.usable %}
         <a href="{% if passkeys.count %}{{ passkeys_url }}{% else %}{{ add_passkey_url }}{% endif %}"
-           class="btn-secondary">
+           class="btn" data-variant="outline">
           {% if passkeys.count %}{% translate "Manage" %}{% else %}{% translate "Add one" %}{% endif %}
         </a>
       {% endif %}
@@ -151,7 +151,7 @@
           {% endif %}
         </p>
       </div>
-      <a href="{{ mfa_url }}" class="btn-secondary">
+      <a href="{{ mfa_url }}" class="btn" data-variant="outline">
         {% if mfa_enabled %}{% translate "Manage" %}{% else %}{% translate "Set up" %}{% endif %}
       </a>
     </div>
@@ -193,7 +193,7 @@
             {% endblocktranslate %}
           </p>
         </div>
-        <a href="{{ connections_url }}" class="btn-secondary">{% translate "Manage" %}</a>
+        <a href="{{ connections_url }}" class="btn" data-variant="outline">{% translate "Manage" %}</a>
       </div>
     </div>
   {% endif %}

@@ -209,11 +209,11 @@
     {% endif %}
 
     <div class="mb-8 flex flex-wrap items-center gap-2">
-      <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+      <button type="submit" class="btn">{% translate "Save" %}</button>
       {% comment %} Same form, different action: the connection test takes what is on screen
          rather than what is stored, so a configuration can be tried before it replaces one
          that works. A failure does not stop the Save beside it. {% endcomment %}
-      <button type="submit" class="btn-secondary" formaction="{% url 'server:email_connection_test' %}">
+      <button type="submit" class="btn" data-variant="outline" formaction="{% url 'server:email_connection_test' %}">
         {% translate "Test the connection" %}
       </button>
     </div>
@@ -231,14 +231,14 @@
           {% translate "Signed in. The provider can withdraw this at any time — if a password is changed, or the account is not used for months — and mail then stops. The page above says so the moment a send fails." %}
         </p>
         <div class="flex flex-wrap gap-2">
-          <button type="submit" class="btn-secondary">{% translate "Sign in again" %}</button>
-          <button type="submit" name="forget" value="1" class="btn-ghost">{% translate "Forget the grant" %}</button>
+          <button type="submit" class="btn" data-variant="outline">{% translate "Sign in again" %}</button>
+          <button type="submit" name="forget" value="1" class="btn" data-variant="ghost">{% translate "Forget the grant" %}</button>
         </div>
       {% else %}
         <p class="mb-3 text-sm">
           {% translate "Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from." %}
         </p>
-        <button type="submit" class="btn-primary">{% translate "Sign in to the provider" %}</button>
+        <button type="submit" class="btn">{% translate "Sign in to the provider" %}</button>
       {% endif %}
     </form>
   {% endif %}
@@ -252,6 +252,6 @@
       </p>
       <c-field :field="test_form.to" />
     </div>
-    <button type="submit" class="btn-primary">{% translate "Send a test message" %}</button>
+    <button type="submit" class="btn">{% translate "Send a test message" %}</button>
   </form>
 {% endblock %}

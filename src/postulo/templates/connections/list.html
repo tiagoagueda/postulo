@@ -10,7 +10,7 @@
       </p>
     </div>
     {% if plugins_available %}
-      <a href="{% url 'connections:pick' %}" class="btn-primary ms-auto">{% translate "Add a connection" %}</a>
+      <a href="{% url 'connections:pick' %}" class="btn ms-auto">{% translate "Add a connection" %}</a>
     {% endif %}
   </div>
 
@@ -53,24 +53,24 @@
               {% if row.plugin %}
                 <form method="post" action="{% url 'connections:test' row.connection.pk %}">
                   {% csrf_token %}
-                  <button type="submit" class="btn-secondary px-3 py-1 text-xs">{% translate "Test" %}</button>
+                  <button type="submit" class="btn" data-variant="outline" data-size="xs">{% translate "Test" %}</button>
                 </form>
                 {% if row.is_sync %}
                   <form method="post" action="{% url 'connections:sync_now' row.connection.pk %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Sync now" %}</button>
+                    <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Sync now" %}</button>
                   </form>
                 {% endif %}
                 {% if row.is_store %}
                   <form method="post" action="{% url 'connections:backfill' row.connection.pk %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                    <button type="submit" class="btn" data-variant="ghost" data-size="xs"
                             title="{% translate 'Queue every document you already have for this store.' %}">{% translate "Send everything" %}</button>
                   </form>
                 {% endif %}
-                <a href="{% url 'connections:edit' row.connection.pk %}" class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
+                <a href="{% url 'connections:edit' row.connection.pk %}" class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}</a>
               {% endif %}
-              <a href="{% url 'connections:delete' row.connection.pk %}" class="btn-danger-ghost px-2 py-1 text-xs">{% translate "Remove" %}</a>
+              <a href="{% url 'connections:delete' row.connection.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">{% translate "Remove" %}</a>
             </div>
           </li>
         {% endfor %}
@@ -87,7 +87,7 @@
             {{ counter }} installed plugins can be connected.
           {% endblocktranslate %}
         </p>
-        <a href="{% url 'connections:pick' %}" class="btn-primary">{% translate "Add a connection" %}</a>
+        <a href="{% url 'connections:pick' %}" class="btn">{% translate "Add a connection" %}</a>
       {% else %}
         <p class="mb-1 font-medium">{% translate "Nothing to connect to" %}</p>
         <p class="text-sm text-ink-500 dark:text-ink-400">

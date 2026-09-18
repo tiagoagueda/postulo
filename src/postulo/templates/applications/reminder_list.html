@@ -10,13 +10,13 @@
     <h1 class="text-2xl font-semibold tracking-tight">{% translate "Reminders" %}</h1>
     <div class="ms-auto flex flex-wrap items-center gap-2">
       {% if showing_all %}
-        <a href="{% url 'applications:reminder_list' %}" class="btn-secondary">
+        <a href="{% url 'applications:reminder_list' %}" class="btn" data-variant="outline">
           {% translate "Outstanding only" %}
         </a>
       {% else %}
-        <a href="?show=all" class="btn-secondary">{% translate "Show done too" %}</a>
+        <a href="?show=all" class="btn" data-variant="outline">{% translate "Show done too" %}</a>
       {% endif %}
-      <a href="{% url 'applications:reminder_create' %}" class="btn-primary">
+      <a href="{% url 'applications:reminder_create' %}" class="btn">
         {% translate "New reminder" %}
       </a>
     </div>
@@ -44,7 +44,7 @@
             {% if not reminder.is_done %}
               <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}">
                 {% csrf_token %}
-                <button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Done" %}</button>
+                <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Done" %}</button>
               </form>
             {% endif %}
           </li>

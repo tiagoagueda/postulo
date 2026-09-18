@@ -36,14 +36,14 @@
             <form method="post" action="{% url 'applications:quiet_action' application.pk %}">
               {% csrf_token %}
               <input type="hidden" name="next" value="{% url 'core:home' %}">
-              <button type="submit" name="action" value="follow_up" class="btn-ghost px-2 py-1 text-xs">
+              <button type="submit" name="action" value="follow_up" class="btn" data-variant="ghost" data-size="xs">
                 {% translate "Followed up" %}
               </button>
             </form>
             <form method="post" action="{% url 'applications:quiet_action' application.pk %}">
               {% csrf_token %}
               <input type="hidden" name="next" value="{% url 'core:home' %}">
-              <button type="submit" name="action" value="snooze" class="btn-ghost px-2 py-1 text-xs">
+              <button type="submit" name="action" value="snooze" class="btn" data-variant="ghost" data-size="xs">
                 {% translate "Snooze" %}
               </button>
             </form>
@@ -51,7 +51,7 @@
               {% csrf_token %}
               <input type="hidden" name="next" value="{% url 'core:home' %}">
               <input type="hidden" name="status" value="ghosted">
-              <button type="submit" class="btn-ghost px-2 py-1 text-xs text-ink-500">
+              <button type="submit" class="btn text-ink-500" data-variant="ghost" data-size="xs">
                 {% translate "Ghosted" %}
               </button>
             </form>

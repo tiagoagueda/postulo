@@ -18,9 +18,9 @@
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
       {% if showing_all %}
-        <a href="{% url 'applications:suggestion_list' %}" class="btn-secondary">{% translate "Waiting only" %}</a>
+        <a href="{% url 'applications:suggestion_list' %}" class="btn" data-variant="outline">{% translate "Waiting only" %}</a>
       {% else %}
-        <a href="?show=all" class="btn-secondary">{% translate "Show all" %}</a>
+        <a href="?show=all" class="btn" data-variant="outline">{% translate "Show all" %}</a>
       {% endif %}
     </div>
   </div>
@@ -86,11 +86,11 @@
                         {% endfor %}
                       </select>
                     {% endif %}
-                    <button type="submit" class="btn-primary px-3 py-1 text-sm">{% translate "Accept" %}</button>
+                    <button type="submit" class="btn" data-size="sm">{% translate "Accept" %}</button>
                   </form>
                   <form method="post" action="{% url 'applications:suggestion_action' suggestion.pk 'decline' %}" class="mt-1 text-end">
                     {% csrf_token %}
-                    <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">{% translate "Decline" %}</button>
+                    <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs">{% translate "Decline" %}</button>
                   </form>
                 {% elif suggestion.event %}
                   <a href="{{ suggestion.application.get_absolute_url }}" class="text-sm text-brand-600 underline dark:text-brand-400">
@@ -109,7 +109,7 @@
     {% if is_paginated %}
       <nav class="mt-4 flex items-center gap-2 text-sm" aria-label="{% translate 'Pagination' %}">
         {% if page_obj.has_previous %}
-          <a href="?{% if showing_all %}show=all&amp;{% endif %}page={{ page_obj.previous_page_number }}" class="btn-secondary">{% translate "Previous" %}</a>
+          <a href="?{% if showing_all %}show=all&amp;{% endif %}page={{ page_obj.previous_page_number }}" class="btn" data-variant="outline">{% translate "Previous" %}</a>
         {% endif %}
         <span class="text-ink-500 dark:text-ink-400">
           {% blocktranslate trimmed with current=page_obj.number total=paginator.num_pages %}
@@ -117,7 +117,7 @@
           {% endblocktranslate %}
         </span>
         {% if page_obj.has_next %}
-          <a href="?{% if showing_all %}show=all&amp;{% endif %}page={{ page_obj.next_page_number }}" class="btn-secondary">{% translate "Next" %}</a>
+          <a href="?{% if showing_all %}show=all&amp;{% endif %}page={{ page_obj.next_page_number }}" class="btn" data-variant="outline">{% translate "Next" %}</a>
         {% endif %}
       </nav>
     {% endif %}

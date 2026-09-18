@@ -44,20 +44,20 @@
       {% endif %}
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
-      <a href="{% url 'jobs:company_update' company.pk %}" class="btn-secondary">{% translate "Edit" %}</a>
+      <a href="{% url 'jobs:company_update' company.pk %}" class="btn" data-variant="outline">{% translate "Edit" %}</a>
       {% if company.website and not company.logo %}
         <form method="post" action="{% url 'jobs:company_logo_action' company.pk 'website' %}">
           {% csrf_token %}
-          <button type="submit" class="btn-ghost text-sm">{% translate "Find logo" %}</button>
+          <button type="submit" class="btn" data-variant="ghost">{% translate "Find logo" %}</button>
         </form>
       {% elif company.logo and company.logo_source_url %}
         <form method="post" action="{% url 'jobs:company_logo_action' company.pk 'refresh' %}">
           {% csrf_token %}
-          <button type="submit" class="btn-ghost text-sm">{% translate "Refresh logo" %}</button>
+          <button type="submit" class="btn" data-variant="ghost">{% translate "Refresh logo" %}</button>
         </form>
       {% endif %}
       <a href="{% url 'jobs:company_delete' company.pk %}"
-         class="btn-danger-ghost">{% translate "Delete" %}</a>
+         class="btn" data-variant="destructive-ghost">{% translate "Delete" %}</a>
     </div>
   </div>
 
@@ -230,7 +230,7 @@
                     {% endfor %}
                   </div>
                   <a href="{% url 'jobs:contact_update' contact.pk %}"
-                     class="btn-ghost px-2 py-1 text-xs">{% translate "Edit" %}</a>
+                     class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}</a>
                 </div>
               </li>
             {% endfor %}

@@ -40,7 +40,7 @@
       {# than left disabled -- on the page that asks you to take a copy first (#226). #}
       <form method="post" action="{% url 'core:export_download' %}" data-download>
         {% csrf_token %}
-        <button type="submit" class="btn-secondary">{% translate "Download the archive" %}</button>
+        <button type="submit" class="btn" data-variant="outline">{% translate "Download the archive" %}</button>
       </form>
     </div>
 
@@ -55,7 +55,7 @@
       <input type="email" id="id_confirm_email" name="confirm_email" class="field-input mb-2"
              autocomplete="off" {% if last_administrator %}disabled{% endif %}>
       {% if error %}<p class="field-error mb-2">{{ error }}</p>{% endif %}
-      <button type="submit" class="btn-danger" {% if last_administrator %}disabled{% endif %}>
+      <button type="submit" class="btn" data-variant="destructive" {% if last_administrator %}disabled{% endif %}>
         {% translate "Delete my account and everything in it" %}
       </button>
     </form>

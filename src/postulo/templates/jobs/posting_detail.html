@@ -28,7 +28,7 @@
           <form method="post" action="{% url 'listings:shortlist' posting.pk %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button type="submit" class="btn-secondary">{% translate "Shortlist" %}</button>
+            <button type="submit" class="btn" data-variant="outline">{% translate "Shortlist" %}</button>
           </form>
         {% endif %}
         <form method="post" action="{% url 'listings:discard' posting.pk %}" class="flex items-center gap-1">
@@ -39,19 +39,19 @@
               <option value="{{ value }}">{{ label }}</option>
             {% endfor %}
           </select>
-          <button type="submit" class="btn-danger-ghost">{% translate "Discard" %}</button>
+          <button type="submit" class="btn" data-variant="destructive-ghost">{% translate "Discard" %}</button>
         </form>
-        <a href="{% url 'listings:apply' posting.pk %}" class="btn-primary">{% translate "Apply" %}</a>
+        <a href="{% url 'listings:apply' posting.pk %}" class="btn">{% translate "Apply" %}</a>
       {% elif posting.derived_state == "discarded" %}
         <form method="post" action="{% url 'listings:restore' posting.pk %}">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.get_full_path }}">
-          <button type="submit" class="btn-secondary">{% translate "Restore" %}</button>
+          <button type="submit" class="btn" data-variant="outline">{% translate "Restore" %}</button>
         </form>
       {% endif %}
-      <a href="{% url 'jobs:posting_update' posting.pk %}" class="btn-secondary">{% translate "Edit" %}</a>
+      <a href="{% url 'jobs:posting_update' posting.pk %}" class="btn" data-variant="outline">{% translate "Edit" %}</a>
       <a href="{% url 'jobs:posting_delete' posting.pk %}"
-         class="btn-danger-ghost">{% translate "Delete" %}</a>
+         class="btn" data-variant="destructive-ghost">{% translate "Delete" %}</a>
     </div>
   </div>
 

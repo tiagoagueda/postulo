@@ -15,11 +15,11 @@
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
       {% if showing_all %}
-        <a href="{% url 'jobs:capture_list' %}" class="btn-secondary">{% translate "Pending only" %}</a>
+        <a href="{% url 'jobs:capture_list' %}" class="btn" data-variant="outline">{% translate "Pending only" %}</a>
       {% else %}
-        <a href="?show=all" class="btn-secondary">{% translate "Show all" %}</a>
+        <a href="?show=all" class="btn" data-variant="outline">{% translate "Show all" %}</a>
       {% endif %}
-      <a href="{% url 'jobs:capture_create' %}" class="btn-primary">{% translate "Capture a posting" %}</a>
+      <a href="{% url 'jobs:capture_create' %}" class="btn">{% translate "Capture a posting" %}</a>
     </div>
   </div>
 
@@ -38,12 +38,12 @@
             </div>
 
             {% if capture.is_pending %}
-              <a href="{% url 'jobs:capture_review' capture.pk %}" class="btn-secondary shrink-0">
+              <a href="{% url 'jobs:capture_review' capture.pk %}" class="btn shrink-0" data-variant="outline">
                 {% translate "Review" %}
               </a>
               <form method="post" action="{% url 'jobs:capture_discard' capture.pk %}">
                 {% csrf_token %}
-                <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">
+                <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs">
                   {% translate "Discard" %}
                 </button>
               </form>
@@ -65,7 +65,7 @@
       <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
         {% translate "Capture a posting from its address and it will appear here." %}
       </p>
-      <a href="{% url 'jobs:capture_create' %}" class="btn-primary">{% translate "Capture a posting" %}</a>
+      <a href="{% url 'jobs:capture_create' %}" class="btn">{% translate "Capture a posting" %}</a>
     </div>
   {% endif %}
 {% endblock %}

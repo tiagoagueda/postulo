@@ -181,15 +181,15 @@
       </fieldset>
 
       <div class="flex items-center gap-3">
-        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
-        <a href="{% url 'core:home' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+        <button type="submit" class="btn">{% translate "Save" %}</button>
+        <a href="{% url 'core:home' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
       </div>
     </form>
 
     {% if profile.use_gravatar %}
       <form method="post" action="{% url 'accounts:avatar_refresh' %}" class="mt-4">
         {% csrf_token %}
-        <button type="submit" class="btn-ghost text-sm">{% translate "Fetch my Gravatar again" %}</button>
+        <button type="submit" class="btn" data-variant="ghost">{% translate "Fetch my Gravatar again" %}</button>
         <span class="text-xs text-ink-500 dark:text-ink-400">
           {% translate "Also happens by itself when your primary address changes." %}
         </span>

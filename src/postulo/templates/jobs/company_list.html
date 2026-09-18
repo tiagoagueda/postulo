@@ -43,7 +43,7 @@
         <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
           {% translate "Loosen one of them, or start again." %}
         </p>
-        <a href="{{ table.clear_url }}" class="btn-secondary">{% translate "Clear filters" %}</a>
+        <a href="{{ table.clear_url }}" class="btn" data-variant="outline">{% translate "Clear filters" %}</a>
       </div>
     {% else %}
       <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
@@ -68,8 +68,8 @@
        that will not wrap makes the page scroll sideways instead (#113). {% endcomment %}
     <div class="ms-auto flex flex-wrap items-center gap-2">
       {% include "partials/table/columns.html" %}
-      <a href="{% url 'jobs:industry_list' %}" class="btn-secondary">{% translate "Industries" %}</a>
-      <a href="{% url 'jobs:company_create' %}" class="btn-primary">
+      <a href="{% url 'jobs:industry_list' %}" class="btn" data-variant="outline">{% translate "Industries" %}</a>
+      <a href="{% url 'jobs:company_create' %}" class="btn">
         {% translate "Add a company" %}
       </a>
     </div>
@@ -83,9 +83,9 @@
       <input type="search" id="company-q" name="q" value="{{ search }}"
              placeholder="{% translate 'Name, location or industry' %}" class="field-input w-72">
     </div>
-    <button type="submit" class="btn-secondary">{% translate "Apply" %}</button>
+    <button type="submit" class="btn" data-variant="outline">{% translate "Apply" %}</button>
     {% if table.filters_active %}
-      <a href="{{ table.clear_url }}" class="btn-ghost">{% translate "Clear" %}</a>
+      <a href="{{ table.clear_url }}" class="btn" data-variant="ghost">{% translate "Clear" %}</a>
     {% endif %}
     {% include "partials/table/narrow.html" %}
   </form>

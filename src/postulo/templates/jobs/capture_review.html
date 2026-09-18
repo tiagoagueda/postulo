@@ -124,31 +124,31 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <button type="submit" class="btn-primary" {% if not next_url %}data-key-save-next{% endif %}>
+        <button type="submit" class="btn" {% if not next_url %}data-key-save-next{% endif %}>
           {% translate "Save to listings" %}
         </button>
         {% if next_url %}
-          <button type="submit" name="next" value="1" class="btn-secondary" data-key-save-next>
+          <button type="submit" name="next" value="1" class="btn" data-variant="outline" data-key-save-next>
             {% translate "Save and next" %}
           </button>
         {% endif %}
-        <a href="{% url 'listings:list' %}" class="btn-ghost">{% translate "Later" %}</a>
+        <a href="{% url 'listings:list' %}" class="btn" data-variant="ghost">{% translate "Later" %}</a>
       </div>
     </form>
 
     <form method="post" action="{% url 'jobs:capture_discard' capture.pk %}"
           class="mt-6 flex flex-wrap items-center gap-3">
       {% csrf_token %}
-      <button type="submit" class="btn-danger-ghost text-sm"
+      <button type="submit" class="btn" data-variant="destructive-ghost"
               {% if not next_url %}data-key-discard-next{% endif %}>
         {% translate "Discard this capture" %}
       </button>
       {% if next_url %}
         <button type="submit" name="next" value="1" data-key-discard-next
-                class="btn-danger-ghost text-sm">
+                class="btn" data-variant="destructive-ghost">
           {% translate "Discard and next" %}
         </button>
-        <a href="{{ next_url }}" class="btn-ghost text-sm" data-key-next>{% translate "Skip to the next" %}</a>
+        <a href="{{ next_url }}" class="btn" data-variant="ghost" data-key-next>{% translate "Skip to the next" %}</a>
       {% endif %}
     </form>
     {% comment %} The page says what the keys are, so it has to say the truth about them:

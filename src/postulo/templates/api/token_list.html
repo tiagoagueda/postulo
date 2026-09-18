@@ -52,7 +52,7 @@
         <div class="grid gap-x-4 sm:grid-cols-2">
           <c-field :field="form.expires" />
         </div>
-        <button type="submit" class="btn-primary">{% translate "Create" %}</button>
+        <button type="submit" class="btn">{% translate "Create" %}</button>
       </form>
     </div>
 
@@ -90,7 +90,7 @@
               {% if token.is_active %}
                 <form method="post" action="{% url 'api:token_revoke' token.pk %}">
                   {% csrf_token %}
-                  <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">
+                  <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs">
                     {% translate "Revoke" %}
                   </button>
                 </form>

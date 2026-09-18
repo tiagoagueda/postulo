@@ -101,11 +101,19 @@ def test_no_template_names_a_side_of_the_page(path: Path):
     )
 
 
-def test_the_stylesheet_names_no_side_either():
-    """The source stylesheet, which `@apply`s the same utilities the templates use."""
-    source = Path(__file__).resolve().parents[1] / "assets" / "css" / "app.css"
+STYLESHEETS = sorted((Path(__file__).resolve().parents[1] / "assets" / "css").glob("*.css"))
+
+
+@pytest.mark.parametrize("source", STYLESHEETS, ids=lambda p: p.name)
+def test_the_stylesheet_names_no_side_either(source: Path):
+    """The source stylesheets, which `@apply` the same utilities the templates use -- the
+    project's own and the style pack that paints Basecoat's components (#262)."""
     found = physical_sides(source.read_text(encoding="utf-8"))
-    assert not found, f"assets/css/app.css: {found}"
+    assert not found, f"assets/css/{source.name}: {found}"
+
+
+def test_the_style_pack_is_among_the_stylesheets_checked():
+    assert [p.name for p in STYLESHEETS] == ["app.css", "basecoat.css"]
 
 
 def test_the_side_detector_knows_the_difference():
@@ -120,6 +128,34 @@ def test_the_side_detector_knows_the_difference():
         "pl-6",
         "text-right",
     ]
+
+
+# ------------------------------------------------------ a button by its old name
+
+#: The five classes the templates used before the button became Basecoat's `btn` with a
+#: `data-variant` and a `data-size` (#262). Gone from the stylesheet, so a template that
+#: still says one draws an unstyled button; this says so before a page does.
+RETIRED_BUTTON = re.compile(
+    r"(?<![-\w])btn-(?:primary|secondary|ghost|danger|danger-ghost)(?![-\w])"
+)
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_names_a_retired_button_class(path: Path):
+    text = path.read_text(encoding="utf-8")
+    found = [text.count("\n", 0, m.start()) + 1 for m in RETIRED_BUTTON.finditer(text)]
+    assert not found, (
+        f"{path.name}: a retired button class at line(s) {found}. Write "
+        '`class="btn" data-variant="outline|ghost|destructive|destructive-ghost"` and a '
+        "`data-size` of sm, xs, icon, icon-sm or icon-xs where the padding used to say it."
+    )
+
+
+def test_the_script_names_no_retired_button_class_either():
+    script = Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "js" / "app.js"
+    assert not RETIRED_BUTTON.search(script.read_text(encoding="utf-8"))
 
 
 # ----------------------------------------------------- a box that scrolls on purpose

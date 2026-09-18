@@ -22,7 +22,7 @@
               <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="key" value="{{ widget.key }}">
-                <button type="submit" name="action" value="add" class="btn-secondary px-3 py-1 text-sm">
+                <button type="submit" name="action" value="add" class="btn" data-variant="outline" data-size="sm">
                   {% blocktranslate with name=widget.called trimmed %}
                     Add {{ name }}
                   {% endblocktranslate %}
@@ -31,7 +31,7 @@
               <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="key" value="{{ widget.key }}">
-                <button type="submit" name="action" value="dismiss" class="btn-ghost px-3 py-1 text-sm">
+                <button type="submit" name="action" value="dismiss" class="btn" data-variant="ghost" data-size="sm">
                   {% blocktranslate with name=widget.called trimmed %}
                     Not {{ name }}
                   {% endblocktranslate %}
@@ -62,7 +62,7 @@
               <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="key" value="{{ widget.key }}">
-                <button type="submit" name="action" value="add" class="btn-secondary px-3 py-1 text-sm">
+                <button type="submit" name="action" value="add" class="btn" data-variant="outline" data-size="sm">
                   {% blocktranslate with name=widget.called trimmed %}
                     Add {{ name }}
                   {% endblocktranslate %}

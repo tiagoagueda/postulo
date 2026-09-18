@@ -1,8 +1,8 @@
 {% load allauth %}
 {% comment %} djlint:off {% endcomment %}
-{% if 'link' in attrs.tags %}{% firstof 'btn-ghost' as css %}{% elif 'outline' in attrs.tags or 'secondary' in attrs.tags or 'cancel' in attrs.tags %}{% firstof 'btn-secondary' as css %}{% elif 'danger' in attrs.tags or 'delete' in attrs.tags %}{% firstof 'btn-danger' as css %}{% else %}{% firstof 'btn-primary' as css %}{% endif %}
+{% if 'link' in attrs.tags %}{% firstof 'ghost' as variant %}{% elif 'outline' in attrs.tags or 'secondary' in attrs.tags or 'cancel' in attrs.tags %}{% firstof 'outline' as variant %}{% elif 'danger' in attrs.tags or 'delete' in attrs.tags %}{% firstof 'destructive' as variant %}{% else %}{% firstof 'primary' as variant %}{% endif %}
 <{% if attrs.href %}a href="{{ attrs.href }}"{% else %}button{% endif %}
-   class="{{ css }}"
+   class="btn" data-variant="{{ variant }}"
    {% if attrs.form %}form="{{ attrs.form }}"{% endif %}
    {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
    {% if attrs.name %}name="{{ attrs.name }}"{% endif %}

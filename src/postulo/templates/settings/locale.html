@@ -30,7 +30,7 @@
 
       {% with now=form.language_now %}
         <details class="relative" data-menu data-language-picker>
-          <summary class="btn-secondary flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-start">
+          <summary class="btn flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-start" data-variant="outline">
             {% flag now.country %}
             {% if now.code %}
               <span lang="{{ now.code }}">{{ now.name }}</span>
@@ -100,6 +100,6 @@
     <div class="card mb-6">
       <c-field :field="form.time_zone" />
     </div>
-    <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+    <button type="submit" class="btn">{% translate "Save" %}</button>
   </form>
 {% endblock %}

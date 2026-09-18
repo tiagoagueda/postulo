@@ -13,7 +13,7 @@
     </p>
     {% if blocked %}
       <div class="alert-warning mb-6" role="status">{{ blocked }}</div>
-      <a href="{% url 'server:people' %}" class="btn-ghost">{% translate "Back to People" %}</a>
+      <a href="{% url 'server:people' %}" class="btn" data-variant="ghost">{% translate "Back to People" %}</a>
     {% else %}
       <form method="post" class="card border-red-300 dark:border-red-900">
         {% csrf_token %}
@@ -25,8 +25,8 @@
         <input type="text" id="id_confirm_username" name="confirm_username" class="field-input mb-2" autocomplete="off">
         {% if error %}<p class="field-error mb-2">{{ error }}</p>{% endif %}
         <div class="flex items-center gap-3">
-          <button type="submit" class="btn-danger">{% translate "Delete the account" %}</button>
-          <a href="{% url 'server:people' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+          <button type="submit" class="btn" data-variant="destructive">{% translate "Delete the account" %}</button>
+          <a href="{% url 'server:people' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
         </div>
       </form>
     {% endif %}

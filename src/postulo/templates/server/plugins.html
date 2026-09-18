@@ -91,7 +91,7 @@
     </ul>
     {% if policy_rows %}
       <div class="border-t border-ink-100 px-4 py-3 dark:border-ink-800">
-        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+        <button type="submit" class="btn">{% translate "Save" %}</button>
       </div>
     {% endif %}
   </form>
@@ -134,7 +134,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ repository.name }}">
                   <input type="hidden" name="action" value="{% if repository.enabled %}disable{% else %}enable{% endif %}">
-                  <button type="submit" class="btn-secondary px-3 py-1 text-xs">
+                  <button type="submit" class="btn" data-variant="outline" data-size="xs">
                     {% if repository.enabled %}{% translate "Switch off" %}{% else %}{% translate "Switch on" %}{% endif %}
                   </button>
                 </form>
@@ -144,7 +144,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ repository.name }}">
                   <input type="hidden" name="action" value="remove">
-                  <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">{% translate "Remove" %}</button>
+                  <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs">{% translate "Remove" %}</button>
                 </form>
               {% endif %}
             </div>
@@ -175,7 +175,7 @@
       <c-field :field="repository_form.url" />
       <c-field :field="repository_form.public_key" />
       <c-field :field="repository_form.enabled" />
-      <div><button type="submit" class="btn-primary">{% translate "Add" %}</button></div>
+      <div><button type="submit" class="btn">{% translate "Add" %}</button></div>
     </form>
   </details>
 
@@ -274,7 +274,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ plugin.name }}">
                   <input type="hidden" name="action" value="{% if plugin.disabled %}enable{% else %}disable{% endif %}">
-                  <button type="submit" class="btn-secondary px-3 py-1 text-xs">
+                  <button type="submit" class="btn" data-variant="outline" data-size="xs">
                     {% if plugin.disabled %}{% translate "Switch on" %}{% else %}{% translate "Switch off" %}{% endif %}
                   </button>
                 </form>
@@ -282,7 +282,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ plugin.name }}">
                   <input type="hidden" name="action" value="remove">
-                  <button type="submit" class="btn-danger-ghost px-2 py-1 text-xs">{% translate "Remove" %}</button>
+                  <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs">{% translate "Remove" %}</button>
                 </form>
               {% else %}
                 <p class="text-xs text-ink-500 dark:text-ink-400">
@@ -338,8 +338,8 @@
         {% csrf_token %}
         <input type="hidden" name="action" value="confirm">
         <input type="hidden" name="token" value="{{ pending.token }}">
-        <button type="submit" class="btn-primary">{% translate "Install it" %}</button>
-        <button type="submit" name="action" value="cancel" class="btn-ghost">{% translate "Cancel" %}</button>
+        <button type="submit" class="btn">{% translate "Install it" %}</button>
+        <button type="submit" name="action" value="cancel" class="btn" data-variant="ghost">{% translate "Cancel" %}</button>
       </form>
     </div>
   {% else %}
@@ -355,7 +355,7 @@
       <label class="mb-3 block text-sm font-medium" for="package">{% translate "Package" %}</label>
       <input type="file" name="package" id="package" accept=".whl" required
              class="field-input mb-4 block w-full">
-      <button type="submit" class="btn-primary">{% translate "Read it" %}</button>
+      <button type="submit" class="btn">{% translate "Read it" %}</button>
     </form>
   {% endif %}
 
@@ -370,7 +370,7 @@
         <form method="post" action="{% url 'server:plugin_action' %}">
           {% csrf_token %}
           <input type="hidden" name="action" value="refresh">
-          <button type="submit" class="btn-secondary px-3 py-1 text-sm">{% translate "Check for updates" %}</button>
+          <button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Check for updates" %}</button>
         </form>
       </div>
       {% if listings %}
@@ -391,7 +391,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ listing.name }}">
                   <input type="hidden" name="action" value="install">
-                  <button type="submit" class="btn-secondary px-3 py-1 text-sm">
+                  <button type="submit" class="btn" data-variant="outline" data-size="sm">
                     {% if listing.installed %}{% translate "Reinstall" %}{% else %}{% translate "Install" %}{% endif %}
                   </button>
                 </form>

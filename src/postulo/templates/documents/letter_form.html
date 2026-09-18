@@ -8,7 +8,7 @@
     <nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="{% translate 'Start from a kind' %}">
       <span class="py-1 text-ink-500 dark:text-ink-400">{% translate "Start from:" %}</span>
       {% for value, label in kinds %}
-        <a href="?kind={{ value }}" class="btn-ghost px-3 py-1">{{ label }}</a>
+        <a href="?kind={{ value }}" class="btn" data-variant="ghost" data-size="sm">{{ label }}</a>
       {% endfor %}
     </nav>
   {% endif %}
@@ -25,8 +25,8 @@
         {% endfor %}
       </div>
       <div class="flex items-center gap-3">
-        <button type="submit" class="btn-primary">{% translate "Save" %}</button>
-        <a href="{% url 'documents:letter_list' %}" class="btn-ghost">{% translate "Cancel" %}</a>
+        <button type="submit" class="btn">{% translate "Save" %}</button>
+        <a href="{% url 'documents:letter_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
       </div>
     </form>
   </div>

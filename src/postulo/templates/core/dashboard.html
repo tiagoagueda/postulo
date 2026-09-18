@@ -60,18 +60,18 @@
         {% if not is_standard %}
           <form method="post">
             {% csrf_token %}
-            <button type="submit" name="action" value="reset" class="btn-ghost">
+            <button type="submit" name="action" value="reset" class="btn" data-variant="ghost">
               {% translate "Back to the standard arrangement" %}
             </button>
           </form>
         {% endif %}
-        <a href="{% url 'core:home' %}" class="btn-primary">{% translate "Done" %}</a>
+        <a href="{% url 'core:home' %}" class="btn">{% translate "Done" %}</a>
       {% else %}
-        <a href="{% url 'core:home' %}?arrange=1" class="btn-ghost">{% translate "Arrange" %}</a>
-        <a href="{% url 'jobs:capture_create' %}" class="btn-secondary">
+        <a href="{% url 'core:home' %}?arrange=1" class="btn" data-variant="ghost">{% translate "Arrange" %}</a>
+        <a href="{% url 'jobs:capture_create' %}" class="btn" data-variant="outline">
           {% translate "Capture a posting" %}
         </a>
-        <a href="{% url 'applications:create' %}" class="btn-primary">
+        <a href="{% url 'applications:create' %}" class="btn">
           {% translate "Record an application" %}
         </a>
       {% endif %}
@@ -138,7 +138,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="key" value="{{ item.spec.key }}">
                   <button type="submit" name="action" value="remove"
-                          class="btn-danger-ghost px-2 py-1 text-xs">
+                          class="btn" data-variant="destructive-ghost" data-size="xs">
                     {% blocktranslate with name=item.spec.called trimmed %}
                       Take {{ name }} off
                     {% endblocktranslate %}
@@ -162,7 +162,7 @@
         <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
           {% translate "You have taken everything off it. Put something back whenever you like." %}
         </p>
-        <a href="{% url 'core:home' %}?arrange=1" class="btn-primary">{% translate "Arrange it" %}</a>
+        <a href="{% url 'core:home' %}?arrange=1" class="btn">{% translate "Arrange it" %}</a>
       {% endif %}
     </div>
   {% endif %}

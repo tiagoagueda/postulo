@@ -42,7 +42,7 @@
                   <bdi>{{ name }}</bdi>
                   <span class="text-sm text-ink-500 dark:text-ink-400">{{ fields|join:", " }}</span>
                 </span>
-                <a class="btn-ghost px-2 py-1 text-xs"
+                <a class="btn" data-variant="ghost" data-size="xs"
                    href="?language={{ code }}">{% translate "Edit" %}</a>
               </li>
             {% endfor %}
@@ -55,7 +55,7 @@
 
         <form method="get" class="flex flex-wrap items-end gap-3">
           <c-field :field="add_form.language" />
-          <button type="submit" class="btn-secondary mb-4">{% translate "Add a language" %}</button>
+          <button type="submit" class="btn mb-4" data-variant="outline">{% translate "Add a language" %}</button>
         </form>
       </div>
     {% endif %}
@@ -81,14 +81,14 @@
           {% endfor %}
         </div>
         <div class="flex items-center gap-3">
-          <button type="submit" class="btn-primary">{% translate "Save" %}</button>
+          <button type="submit" class="btn">{% translate "Save" %}</button>
           <a href="{% url 'resume:item_update' section.slug entry.pk %}"
-             class="btn-ghost">{% translate "Back to the entry" %}</a>
+             class="btn" data-variant="ghost">{% translate "Back to the entry" %}</a>
         </div>
       </form>
     {% else %}
       <a href="{% url 'resume:item_update' section.slug entry.pk %}"
-         class="btn-ghost">{% translate "Back to the entry" %}</a>
+         class="btn" data-variant="ghost">{% translate "Back to the entry" %}</a>
     {% endif %}
   </div>
 {% endblock %}

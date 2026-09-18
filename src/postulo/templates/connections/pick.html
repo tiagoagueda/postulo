@@ -16,7 +16,7 @@
               <p class="font-medium">{{ entry.plugin.label }}</p>
               <p class="text-xs text-ink-500 dark:text-ink-400">{{ entry.kind_label }} · <code>{{ entry.plugin.name }}</code> {{ entry.plugin.version }}</p>
             </div>
-            <a href="{% url 'connections:create' entry.plugin.kind entry.plugin.name %}" class="btn-secondary shrink-0">
+            <a href="{% url 'connections:create' entry.plugin.kind entry.plugin.name %}" class="btn shrink-0" data-variant="outline">
               {% translate "Connect" %}
             </a>
           </li>
@@ -28,5 +28,5 @@
       {% translate "No installed plugin needs a connection." %}
     </div>
   {% endif %}
-  <p class="mt-4"><a href="{% url 'connections:list' %}" class="btn-ghost">{% translate "Back" %}</a></p>
+  <p class="mt-4"><a href="{% url 'connections:list' %}" class="btn" data-variant="ghost">{% translate "Back" %}</a></p>
 {% endblock %}

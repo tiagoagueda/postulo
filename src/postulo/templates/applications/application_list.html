@@ -49,7 +49,7 @@
         <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
           {% translate "Loosen one of them, or start again." %}
         </p>
-        <a href="{{ table.clear_url }}" class="btn-secondary">{% translate "Clear filters" %}</a>
+        <a href="{{ table.clear_url }}" class="btn" data-variant="outline">{% translate "Clear filters" %}</a>
       </div>
     {% else %}
       <div class="card py-12 text-center">
@@ -57,7 +57,7 @@
         <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
           {% translate "Record the first application and the rest will follow." %}
         </p>
-        <a href="{% url 'applications:create' %}" class="btn-primary">
+        <a href="{% url 'applications:create' %}" class="btn">
           {% translate "Record an application" %}
         </a>
       </div>
@@ -87,7 +87,7 @@
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ switch_next }}">
             <input type="hidden" name="shape" value="{{ key }}">
-            <button type="submit" class="{% if key == shape %}btn-primary{% else %}btn-secondary{% endif %}"
+            <button type="submit" class="btn" data-variant="{% if key == shape %}primary{% else %}outline{% endif %}"
                     {% if key == shape %}aria-current="true" disabled{% endif %}>{{ label }}</button>
           </form>
         {% endfor %}
@@ -95,7 +95,7 @@
       {% if shape != 'board' %}
         {% include "partials/table/columns.html" %}
       {% endif %}
-      <a href="{% url 'applications:create' %}" class="btn-primary">{% translate "Record an application" %}</a>
+      <a href="{% url 'applications:create' %}" class="btn">{% translate "Record an application" %}</a>
     </div>
   </div>
 

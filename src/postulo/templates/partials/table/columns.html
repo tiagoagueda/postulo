@@ -3,7 +3,7 @@
    A <details> element, so it opens and closes without scripts; the up and down buttons
    are submits, so reordering needs none either. {% endcomment %}
 <details class="relative" data-menu>
-  <summary class="btn-secondary cursor-pointer list-none">
+  <summary class="btn cursor-pointer list-none" data-variant="outline">
     {% icon "settings" %} {% translate "Columns" %}
   </summary>
   <form method="post" action="{% url 'core:table_settings' table.name %}"
@@ -22,12 +22,12 @@
              as the same target (#115). {% endcomment %}
           <label for="column-{{ table.name }}-{{ row.column.key }}"
                  class="tap-target w-full flex-1">{{ row.column.label }}</label>
-          <button type="submit" name="move" value="up:{{ row.column.key }}" class="btn-ghost tap-target justify-center p-1"
+          <button type="submit" name="move" value="up:{{ row.column.key }}" class="btn" data-variant="ghost" data-size="icon-xs"
                   {% if row.first %}disabled{% endif %}
                   aria-label="{% blocktranslate with column=row.column.label %}Move {{ column }} up{% endblocktranslate %}">
             {% icon "chevron-up" class="size-3.5" %}
           </button>
-          <button type="submit" name="move" value="down:{{ row.column.key }}" class="btn-ghost tap-target justify-center p-1"
+          <button type="submit" name="move" value="down:{{ row.column.key }}" class="btn" data-variant="ghost" data-size="icon-xs"
                   {% if row.last %}disabled{% endif %}
                   aria-label="{% blocktranslate with column=row.column.label %}Move {{ column }} down{% endblocktranslate %}">
             {% icon "chevron-down" class="size-3.5" %}
@@ -44,9 +44,9 @@
       </select>
     </div>
     <div class="flex items-center gap-2">
-      <button type="submit" class="btn-primary px-3 py-1 text-xs">{% translate "Apply" %}</button>
+      <button type="submit" class="btn" data-size="xs">{% translate "Apply" %}</button>
       {% if table.is_customised %}
-        <button type="submit" name="reset" value="1" class="btn-ghost px-3 py-1 text-xs">
+        <button type="submit" name="reset" value="1" class="btn" data-variant="ghost" data-size="xs">
           {% translate "Reset" %}
         </button>
       {% endif %}

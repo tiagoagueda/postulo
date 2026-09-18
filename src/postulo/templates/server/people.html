@@ -9,7 +9,7 @@
         {% translate "Every account on this instance. Administrators see accounts, never anyone's applications or documents." %}
       </p>
     </div>
-    <a href="{% url 'accounts:invite_list' %}" class="btn-primary ms-auto">{% translate "Invitations" %}</a>
+    <a href="{% url 'accounts:invite_list' %}" class="btn ms-auto">{% translate "Invitations" %}</a>
   </div>
 
   {% comment %} `table-cards` makes each row a card below the md breakpoint, where five
@@ -57,7 +57,7 @@
             <td class="px-4 py-3" role="cell" data-actions>
               <div class="flex justify-end">
                 <details class="relative" data-menu>
-                  <summary class="btn-ghost cursor-pointer px-2 py-1"
+                  <summary class="btn cursor-pointer" data-variant="ghost" data-size="xs"
                            aria-label="{% blocktranslate trimmed with name=person.username %}Actions for {{ name }}{% endblocktranslate %}">
                     {% icon "ellipsis-vertical" %}
                   </summary>

@@ -38,14 +38,14 @@
       <form method="post">
         {% csrf_token %}
         <div class="flex items-center gap-3">
-          <button type="submit" class="btn-danger">
+          <button type="submit" class="btn" data-variant="destructive">
             {% translate "Delete" %}
           </button>
           {% comment %} Where the view says, not where the browser says it came from: a
              `Referer` is absent from a bookmark and from a fresh tab, and the fallback
              underneath it was the front page -- the one place somebody halfway through
              deleting something did not mean to be (#227). {% endcomment %}
-          <a href="{{ cancel_url|default:'/' }}" class="btn-ghost">
+          <a href="{{ cancel_url|default:'/' }}" class="btn" data-variant="ghost">
             {% translate "Cancel" %}
           </a>
         </div>

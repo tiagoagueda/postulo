@@ -122,6 +122,27 @@ def test_a_field_shows_its_focus_in_forced_colours(page: Page, live_server, appl
     assert outline["width"] not in ("", "0px"), "and it has a width to be seen by"
 
 
+def test_a_button_shows_its_focus_in_forced_colours(page: Page, live_server, applicant):
+    """Basecoat's `.btn` sets `outline-none` and shows focus with a ring and a border colour,
+    both of which a high-contrast theme throws away. The style pack puts an outline back and
+    says `solid` out loud, because `outline-none` also leaves Tailwind's outline-style
+    variable at `none`, and `outline-2` alone reads it back and draws nothing (#262)."""
+    sign_in(page, live_server.url)
+    page.emulate_media(forced_colors="active")
+    page.goto(f"{live_server.url}/jobs/companies/new/")
+
+    page.locator("button.btn[type=submit]").first.focus()
+    outline = page.evaluate(
+        """() => {
+            const style = getComputedStyle(document.activeElement);
+            return {style: style.outlineStyle, width: style.outlineWidth};
+        }"""
+    )
+
+    assert outline["style"] == "solid", outline
+    assert outline["width"] not in ("", "0px"), "and it has a width to be seen by"
+
+
 def test_a_single_key_does_nothing_once_it_is_switched_off(page: Page, live_server, applicant):
     """WCAG 2.1.4, level A. The switch is under Settings → Appearance."""
     sign_in(page, live_server.url)

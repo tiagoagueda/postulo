@@ -356,16 +356,20 @@ def test_a_drag_the_browser_takes_away_is_handled():
 
 
 def test_there_is_one_way_to_draw_a_destructive_button():
+    """Two shapes, `destructive` and `destructive-ghost`, painted once in the style pack
+    (#262) and never composed by hand from a red and a white in a template."""
     templates = ROOT / "src" / "postulo" / "templates"
     offenders = [
         path.relative_to(ROOT).as_posix()
         for path in templates.rglob("*.html")
         if "bg-red-600 text-white" in path.read_text(encoding="utf-8")
-        or "btn-ghost text-red-600" in path.read_text(encoding="utf-8")
+        or "btn text-red-600" in path.read_text(encoding="utf-8")
     ]
 
     assert offenders == [], "these hand-roll a danger button instead of using the component"
-    assert ".btn-danger {" in SOURCE_CSS and ".btn-danger-ghost {" in SOURCE_CSS
+    style_pack = (ROOT / "assets" / "css" / "basecoat.css").read_text(encoding="utf-8")
+    assert '.btn[data-variant="destructive"] {' in style_pack
+    assert '.btn[data-variant="destructive-ghost"] {' in style_pack
 
 
 def test_cancel_goes_where_the_view_says_not_where_the_browser_came_from(client, user):

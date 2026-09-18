@@ -19,13 +19,13 @@
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
       {% if showing_all %}
-        <a href="{% url 'applications:interview_list' %}" class="btn-secondary">
+        <a href="{% url 'applications:interview_list' %}" class="btn" data-variant="outline">
           {% translate "Scheduled only" %}
         </a>
       {% else %}
-        <a href="?show=all" class="btn-secondary">{% translate "Show past too" %}</a>
+        <a href="?show=all" class="btn" data-variant="outline">{% translate "Show past too" %}</a>
       {% endif %}
-      <a href="{% url 'applications:interview_calendar' %}" class="btn-secondary">
+      <a href="{% url 'applications:interview_calendar' %}" class="btn" data-variant="outline">
         {% icon "calendar" %} {% translate "Calendar file" %}
       </a>
     </div>
@@ -82,7 +82,7 @@
             <div class="flex flex-wrap items-center gap-1">
               {% if interview.is_scheduled %}
                 {% include "applications/partials/interview_outcome.html" with next=request.get_full_path %}
-                <a href="{% url 'applications:interview_update' interview.pk %}" class="btn-ghost px-2 py-1 text-xs">
+                <a href="{% url 'applications:interview_update' interview.pk %}" class="btn" data-variant="ghost" data-size="xs">
                   {% translate "Edit" %}
                 </a>
               {% else %}
@@ -90,7 +90,7 @@
                   {{ interview.get_outcome_display }}
                 </span>
               {% endif %}
-              <a href="{% url 'applications:interview_ics' interview.pk %}" class="btn-ghost px-2 py-1 text-xs"
+              <a href="{% url 'applications:interview_ics' interview.pk %}" class="btn" data-variant="ghost" data-size="xs"
                  title="{% translate 'Calendar file' %}">
                 {% icon "calendar" _("Calendar file") %}
               </a>

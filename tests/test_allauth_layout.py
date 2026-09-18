@@ -107,4 +107,4 @@ def test_every_field_carries_the_shared_input_style(client):
     html = body(client, "/accounts/login/")
     assert html.count("field-input") >= 2, "the login and password fields both"
     assert "field-label" in html
-    assert "btn-primary" in html, "and the button that submits them"
+    assert 'class="btn"' in html, "and the button that submits them"

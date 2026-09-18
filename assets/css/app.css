@@ -279,22 +279,12 @@
 /* --------------------------------------------------------- component layer */
 
 /*
- * These three are declared as utilities rather than component classes because other
- * classes compose them with @apply, which in Tailwind v4 only accepts utilities.
- *
- * `btn-legacy` was `btn` until Basecoat arrived (#262). The name `btn` is Basecoat's now --
- * `components/button.css` defines it and `basecoat.css` paints it -- and a utility of the
- * same name would have been compiled into the utilities layer the first time a template
- * wrote `class="btn"`, on top of Basecoat's rule, with the cascade picking the padding. The
- * five `btn-*` classes below still compose this one and draw exactly what they did; they
- * and it go together, once the templates say `class="btn" data-variant="…"` instead.
+ * These are declared as utilities rather than component classes because other classes
+ * compose them with @apply, which in Tailwind v4 only accepts utilities. The button is not
+ * among them any more: `btn` is Basecoat's, structured by `components/button.css` and
+ * painted in `basecoat.css`, and a template asks for it with `class="btn"` and a
+ * `data-variant` (#262).
  */
-@utility btn-legacy {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2
-    text-sm font-medium transition-colors
-    disabled:cursor-not-allowed disabled:opacity-50;
-}
-
 @utility nav-link {
   @apply rounded-lg px-3 py-2 text-sm font-medium text-ink-600
     hover:bg-ink-100 hover:text-ink-900
@@ -331,38 +321,8 @@
 }
 
 @layer components {
-  .btn-primary {
-    @apply btn-legacy bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
-  }
-
-  .btn-secondary {
-    @apply btn-legacy border border-ink-300 bg-white text-ink-800 hover:bg-ink-100
-      dark:border-ink-700 dark:bg-ink-900 dark:text-ink-100 dark:hover:bg-ink-800;
-  }
-
-  .btn-ghost {
-    @apply btn-legacy text-ink-600 hover:bg-ink-100 hover:text-ink-900
-      dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-ink-100;
-  }
-
-  /* Two shapes for an action that takes something away, because there were four (#227).
-   *
-   * `.btn-danger` is the one that does it -- the button at the end of a confirmation page,
-   * the one somebody has already been asked about. `.btn-danger-ghost` is the one that
-   * *offers* it, sitting in a row of ordinary actions on a card or a table row, where a
-   * filled red button would shout over everything beside it.
-   *
-   * Both were written out by hand in more than twenty templates, in four spellings that had
-   * drifted apart, so "is this the dangerous one" was answered by whichever template you
-   * happened to be reading. A component is the answer in one place. */
-  .btn-danger {
-    @apply btn-legacy bg-red-600 text-white hover:bg-red-700 active:bg-red-800;
-  }
-
-  .btn-danger-ghost {
-    @apply btn-legacy text-red-600 hover:bg-red-50 hover:text-red-700
-      dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300;
-  }
+  /* The buttons are in basecoat.css: Basecoat's `.btn`, painted there in this palette, with
+     the two destructive shapes #227 settled on under `data-variant` (#262). */
 
   /* A chosen label, and the button that takes it off again (#139).
    *

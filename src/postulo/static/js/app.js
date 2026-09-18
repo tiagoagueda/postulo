@@ -789,7 +789,8 @@
     }
     var button = document.createElement("button");
     button.type = "button";
-    button.className = "btn-ghost text-sm";
+    button.className = "btn";
+    button.dataset.variant = "ghost";
     button.dataset.bulkAll = "";
     button.textContent = form.dataset.bulkAllLabel || "Select all on this page";
     button.addEventListener("click", function () {
@@ -1777,7 +1778,8 @@
 
     var button = document.createElement("button");
     button.type = "button";
-    button.className = "btn-secondary mb-2";
+    button.className = "btn mb-2";
+    button.dataset.variant = "outline";
     button.textContent = card.dataset.webPushAllow || "";
     var holder = document.createElement("div");
     holder.appendChild(button);

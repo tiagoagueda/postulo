@@ -370,7 +370,7 @@ def test_the_dashboard_arranges_itself(client, user):
     assert 'data-widget="counters"' in mode, "the widgets stay where they are"
     offered = mode.split("data-widget-offers")[1]
     assert 'name="key" value="funnel"' in offered, "what is not shown is offered below the grid"
-    assert f'<a href="{home}" class="btn-primary">Done</a>' in mode
+    assert f'<a href="{home}" class="btn">Done</a>' in mode
     assert "Capture a posting" not in mode.split("<main")[-1], "the mode is for arranging"
 
 

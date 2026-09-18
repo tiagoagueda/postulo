@@ -24,7 +24,7 @@
       {% endif %}
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      <a href="{% url 'applications:report_csv' %}?{{ request.GET.urlencode }}" class="btn-ghost">
+      <a href="{% url 'applications:report_csv' %}?{{ request.GET.urlencode }}" class="btn" data-variant="ghost">
         {% translate "Download CSV" %}
       </a>
       {% comment %} A form rather than a link: the press files the report under Sent
@@ -33,7 +33,7 @@
       <form method="post" action="{% url 'applications:report_pdf' %}?{{ request.GET.urlencode }}"
             class="inline" data-download>
         {% csrf_token %}
-        <button type="submit" class="btn-primary">{% translate "Download PDF" %}</button>
+        <button type="submit" class="btn">{% translate "Download PDF" %}</button>
       </form>
     </div>
   </div>
@@ -81,18 +81,18 @@
             {% endfor %}
           </select>
         </div>
-        <button type="submit" class="btn-primary mt-5">{% translate "Show this period" %}</button>
+        <button type="submit" class="btn mt-5">{% translate "Show this period" %}</button>
       </div>
     </fieldset>
   </form>
 
   <nav class="mb-6 flex flex-wrap items-center gap-3 text-sm" aria-label="{% translate 'Other periods' %}">
     {% if earlier %}
-      <a href="?{{ earlier }}" class="btn-ghost">{% translate "The one before" %}</a>
+      <a href="?{{ earlier }}" class="btn" data-variant="ghost">{% translate "The one before" %}</a>
     {% endif %}
     <span class="font-medium">{{ period.label }}</span>
     {% if later %}
-      <a href="?{{ later }}" class="btn-ghost">{% translate "The one after" %}</a>
+      <a href="?{{ later }}" class="btn" data-variant="ghost">{% translate "The one after" %}</a>
     {% else %}
       {% comment %} No link into the future. A report about next month is a blank page
          pretending to be a document. {% endcomment %}

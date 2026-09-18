@@ -12,7 +12,7 @@
           {% translate "The fields your companies operate in, in your own words. A company may be in several." %}
         </p>
       </div>
-      <a href="{% url 'jobs:industry_create' %}" class="btn-primary ms-auto">
+      <a href="{% url 'jobs:industry_create' %}" class="btn ms-auto">
         {% translate "New industry" %}
       </a>
     </div>
@@ -27,9 +27,9 @@
                  class="field-input" autocomplete="off"
                  placeholder="{% translate 'By name, or by NACE code' %}">
         </div>
-        <button type="submit" class="btn-secondary mb-0">{% translate "Search" %}</button>
+        <button type="submit" class="btn mb-0" data-variant="outline">{% translate "Search" %}</button>
         {% if q %}
-          <a href="{% url 'jobs:industry_list' %}" class="btn-ghost mb-0">{% translate "Clear" %}</a>
+          <a href="{% url 'jobs:industry_list' %}" class="btn mb-0" data-variant="ghost">{% translate "Clear" %}</a>
         {% endif %}
       </form>
     {% endif %}
@@ -57,11 +57,11 @@
                   {{ counter }} companies
                 {% endblocktranslate %}
               </span>
-              <a href="{% url 'jobs:industry_update' industry.pk %}" class="btn-ghost px-2 py-1 text-xs">
+              <a href="{% url 'jobs:industry_update' industry.pk %}" class="btn" data-variant="ghost" data-size="xs">
                 {% translate "Edit or merge" %}
               </a>
               <a href="{% url 'jobs:industry_delete' industry.pk %}"
-                 class="btn-danger-ghost px-2 py-1 text-xs">
+                 class="btn" data-variant="destructive-ghost" data-size="xs">
                 {% translate "Delete" %}
               </a>
             </li>

@@ -64,10 +64,10 @@
         <div class="alert-error mb-6">{{ form.non_field_errors }}</div>
       {% endif %}
       <div class="flex items-center gap-3">
-        <button type="submit" class="btn-primary">
+        <button type="submit" class="btn">
           {% if form.instance.pk %}{% translate "Save" %}{% else %}{% translate "Schedule" %}{% endif %}
         </button>
-        <a href="{{ application.get_absolute_url }}" class="btn-ghost">{% translate "Cancel" %}</a>
+        <a href="{{ application.get_absolute_url }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
       </div>
     </form>
   </div>

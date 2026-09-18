@@ -12,7 +12,7 @@
           {% translate "However you prefer to group your search." %}
         </p>
       </div>
-      <a href="{% url 'applications:tag_create' %}" class="btn-primary ms-auto">
+      <a href="{% url 'applications:tag_create' %}" class="btn ms-auto">
         {% translate "New tag" %}
       </a>
     </div>
@@ -24,11 +24,11 @@
             <li class="flex items-center gap-3 px-4 py-3">
               <span class="flex-1">{{ tag.name }}</span>
               <span class="text-xs text-ink-400">{{ tag.applications.count }}</span>
-              <a href="{% url 'applications:tag_update' tag.pk %}" class="btn-ghost px-2 py-1 text-xs">
+              <a href="{% url 'applications:tag_update' tag.pk %}" class="btn" data-variant="ghost" data-size="xs">
                 {% translate "Edit" %}
               </a>
               <a href="{% url 'applications:tag_delete' tag.pk %}"
-                 class="btn-danger-ghost px-2 py-1 text-xs">
+                 class="btn" data-variant="destructive-ghost" data-size="xs">
                 {% translate "Delete" %}
               </a>
             </li>

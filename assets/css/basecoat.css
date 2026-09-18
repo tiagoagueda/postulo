@@ -18,8 +18,8 @@
 /* ------------------------------------------------------------------- button */
 
 /*
- * The same button the five `btn-*` classes in app.css have drawn since the start, keyed on
- * the `data-variant` and `data-size` attributes Basecoat's markup uses, so a template
+ * The button the five `btn-*` classes drew until the templates moved here, keyed on the
+ * `data-variant` and `data-size` attributes Basecoat's markup uses, so a template
  * written from Basecoat's documentation comes out in Postulo's colours. The names are
  * Basecoat's where it has one -- `outline` is the bordered white button that was called
  * secondary here, `ghost` is ghost -- and `destructive` keeps the meaning this project gave
@@ -31,9 +31,12 @@
  * Basecoat's `secondary` (a filled grey) and `link` are not painted: nothing here uses
  * them. Add them the day something does.
  *
- * Two of the structural choices are undone on purpose. `whitespace-nowrap` would let a long
- * label -- and every label is long in some language -- run off a 320-pixel screen rather
- * than wrap, against Reflow (#113). And `outline-none` takes the focus ring off: Basecoat
+ * Three of the structural choices are undone on purpose. `whitespace-nowrap` would let a
+ * long label -- and every label is long in some language -- run off a 320-pixel screen
+ * rather than wrap, and `shrink-0` would let the button itself do the same: a Cancel beside
+ * a Save is "Abbrechen" in German and "Επιστροφή στην καταχώριση" in Greek, and a button
+ * that may not give up width pushes the pair off the screen, which is what the browser
+ * suite found at 320 in both languages (#113). And `outline-none` takes the focus ring off: Basecoat
  * shows focus with a box-shadow ring and a border colour, and forced colours discard both
  * (#227), so the outline the rest of the interface uses goes back on -- with its style
  * said out loud, because `outline-none` leaves Tailwind's outline-style variable at `none`
@@ -42,7 +45,8 @@
  */
 @layer components {
   .btn {
-    @apply gap-2 rounded-lg px-4 py-2 text-sm font-medium whitespace-normal transition-colors;
+    @apply shrink gap-2 rounded-lg px-4 py-2 text-sm font-medium whitespace-normal
+      transition-colors;
   }
 
   .btn:focus-visible {

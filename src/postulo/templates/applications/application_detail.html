@@ -34,10 +34,10 @@
       </div>
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
-      <a href="{% url 'applications:update' application.pk %}" class="btn-secondary">
+      <a href="{% url 'applications:update' application.pk %}" class="btn" data-variant="outline">
         {% translate "Edit" %}
       </a>
-      <a href="{% url 'applications:delete' application.pk %}" class="btn-danger-ghost">
+      <a href="{% url 'applications:delete' application.pk %}" class="btn" data-variant="destructive-ghost">
         {% translate "Delete" %}
       </a>
     </div>
@@ -63,7 +63,7 @@
             <label class="field-label" for="id_note">{% translate "Note (optional)" %}</label>
             {{ status_form.note }}
           </div>
-          <button type="submit" class="btn-primary">{% translate "Record" %}</button>
+          <button type="submit" class="btn">{% translate "Record" %}</button>
         </form>
       </div>
 
@@ -77,7 +77,7 @@
           </div>
           <c-field :field="event_form.summary" />
           <c-field :field="event_form.body" />
-          <button type="submit" class="btn-secondary">{% translate "Add entry" %}</button>
+          <button type="submit" class="btn" data-variant="outline">{% translate "Add entry" %}</button>
         </form>
       </div>
 
@@ -213,7 +213,7 @@
                     </p>
                   </div>
                   <a href="{% url 'documents:rendered_download' document.pk %}"
-                     class="btn-ghost px-2 py-1 text-xs">{% translate "Get" %}</a>
+                     class="btn" data-variant="ghost" data-size="xs">{% translate "Get" %}</a>
                 </li>
               {% endfor %}
             </ul>
@@ -268,10 +268,10 @@
                     {% endif %}
                   </div>
                   <div class="flex shrink-0 flex-col items-end gap-1">
-                    <a href="{% url 'applications:interview_ics' interview.pk %}" class="btn-ghost px-2 py-1 text-xs">
+                    <a href="{% url 'applications:interview_ics' interview.pk %}" class="btn" data-variant="ghost" data-size="xs">
                       {% translate "Calendar" %}
                     </a>
-                    <a href="{% url 'applications:interview_update' interview.pk %}" class="btn-ghost px-2 py-1 text-xs">
+                    <a href="{% url 'applications:interview_update' interview.pk %}" class="btn" data-variant="ghost" data-size="xs">
                       {% translate "Edit" %}
                     </a>
                   </div>
@@ -333,7 +333,7 @@
                 <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}">
                   {% csrf_token %}
                   <input type="hidden" name="next" value="{{ application.get_absolute_url }}">
-                  <button type="submit" class="btn-ghost px-2 py-1 text-xs">{% translate "Done" %}</button>
+                  <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Done" %}</button>
                 </form>
               </li>
             {% endfor %}

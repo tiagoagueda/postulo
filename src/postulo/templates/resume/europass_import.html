@@ -28,7 +28,7 @@
         <input type="file" name="file" id="file" required
                accept=".xml,.json,text/xml,application/xml,application/json"
                class="field-input mb-4 block w-full">
-        <button type="submit" class="btn-primary">{% translate "Read it" %}</button>
+        <button type="submit" class="btn">{% translate "Read it" %}</button>
       </form>
 
       <div class="alert-info text-sm" role="note">
@@ -156,10 +156,10 @@
 
       <form method="post" class="flex items-center gap-3">
         {% csrf_token %}
-        <button type="submit" name="action" value="confirm" class="btn-primary">
+        <button type="submit" name="action" value="confirm" class="btn">
           {% translate "Add all of this" %}
         </button>
-        <button type="submit" name="action" value="forget" class="btn-ghost">
+        <button type="submit" name="action" value="forget" class="btn" data-variant="ghost">
           {% translate "Start again" %}
         </button>
       </form>

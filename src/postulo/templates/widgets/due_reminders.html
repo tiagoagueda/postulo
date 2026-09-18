@@ -19,7 +19,7 @@
           <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{% url 'core:home' %}">
-            <button type="submit" class="btn-ghost px-2 py-1 text-xs">
+            <button type="submit" class="btn" data-variant="ghost" data-size="xs">
               {% translate "Done" %}
             </button>
           </form>

@@ -14,16 +14,16 @@
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
       <a href="{% url 'documents:cv_preview' cv.pk %}" target="_blank" rel="noopener"
-         class="btn-secondary">{% translate "Preview" %}</a>
+         class="btn" data-variant="outline">{% translate "Preview" %}</a>
       {# `data-download`: the answer is a PDF, so the button is released again rather than #}
       {# left disabled for the rest of the visit (#226). #}
       <form method="post" action="{% url 'documents:cv_export' cv.pk %}" data-download>
         {% csrf_token %}
-        <button type="submit" class="btn-primary">{% translate "Export PDF" %}</button>
+        <button type="submit" class="btn">{% translate "Export PDF" %}</button>
       </form>
-      <a href="{% url 'documents:cv_update' cv.pk %}" class="btn-secondary">{% translate "Settings" %}</a>
+      <a href="{% url 'documents:cv_update' cv.pk %}" class="btn" data-variant="outline">{% translate "Settings" %}</a>
       <a href="{% url 'documents:cv_delete' cv.pk %}"
-         class="btn-danger-ghost">{% translate "Delete" %}</a>
+         class="btn" data-variant="destructive-ghost">{% translate "Delete" %}</a>
     </div>
   </div>
 
@@ -94,18 +94,18 @@
                   {% endcomment %}
                   <form method="post" action="{% url 'documents:cv_item_move' item.pk 'up' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                    <button type="submit" class="btn" data-variant="ghost" data-size="xs"
                             aria-label="{% translate 'Move up' %}"{% if forloop.first %} disabled{% endif %}>↑</button>
                   </form>
                   <form method="post" action="{% url 'documents:cv_item_move' item.pk 'down' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn-ghost px-2 py-1 text-xs"
+                    <button type="submit" class="btn" data-variant="ghost" data-size="xs"
                             aria-label="{% translate 'Move down' %}"{% if forloop.last %} disabled{% endif %}>↓</button>
                   </form>
                   <a href="{% url 'documents:cv_item_update' item.pk %}"
-                     class="btn-ghost px-2 py-1 text-xs">{% translate "Tailor" %}</a>
+                     class="btn" data-variant="ghost" data-size="xs">{% translate "Tailor" %}</a>
                   <a href="{% url 'documents:cv_item_delete' item.pk %}"
-                     class="btn-danger-ghost px-2 py-1 text-xs">
+                     class="btn" data-variant="destructive-ghost" data-size="xs">
                     {% translate "Remove" %}
                   </a>
                 </div>
@@ -136,7 +136,7 @@
                   {% endif %}
                 </div>
                 <a href="{% url 'documents:rendered_download' render.pk %}"
-                   class="btn-ghost px-2 py-1 text-xs">{% translate "Download" %}</a>
+                   class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}</a>
               </li>
             {% endfor %}
           </ul>
@@ -164,7 +164,7 @@
                 </fieldset>
               {% endfor %}
             </div>
-            <button type="submit" class="btn-primary mt-4 w-full">{% translate "Add these" %}</button>
+            <button type="submit" class="btn mt-4 w-full">{% translate "Add these" %}</button>
           </form>
         {% else %}
           <p class="text-sm text-ink-500 dark:text-ink-400">
