@@ -20,6 +20,11 @@
 # is not a scan the project runs. So the native-architecture image is built and scanned
 # first, and the multi-architecture push happens only if that passes -- a gate after the
 # push would be a report about something already published.
+#
+# **And it is where a release is finished** (#251). The release workflow cannot know
+# whether this one ever ran, so once the push is done this job asks the registry for the
+# three tags the way `docker pull` would, and then attaches the image's bill of materials
+# to the release, beside the sdist and the wheel -- the one place this server keeps a file.
 name: Image
 
 on:
@@ -36,7 +41,9 @@ jobs:
   image:
     runs-on: docker
     permissions:
-      contents: read
+      # `contents: write` is for one thing: attaching the bill of materials to the release
+      # once the image is known to be in the registry. The checkout does not keep the token.
+      contents: write
       packages: write
     steps:
       - uses: actions/checkout@v4
@@ -117,6 +124,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build for amd64 and arm64 and push
+        id: push
         env:
           TAGS: ${{ steps.tags.outputs.tags }}
         run: |
@@ -125,22 +133,59 @@ jobs:
           for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
           docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
 
-      # A signed list of what is in the image is more use to somebody self-hosting Postulo
-      # than this run's verdict: it lets them scan the release later, against a database
-      # that does not exist yet.
-      #
-      # Last, and allowed to fail. This Forgejo answers the artifact API as a GitHub
-      # Enterprise Server that does not implement v2 of it, so `upload-artifact@v4` ends
-      # the step with "not currently supported on GHES" -- and this step used to sit before
-      # the push with `if: always()`, so v0.3.0 was tagged and released with no container
-      # image at all: the release was published, the scan ran clean, and the one artefact
-      # most people actually install was never built. A bill of materials is worth having
-      # and is not worth the image (#251).
-      - name: Keep the bill of materials
-        if: always()
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom-${{ inputs.tag }}
-          path: .scan/sbom.cdx.json
-          if-no-files-found: warn
+      # The registry, asked the way `docker pull` asks it: each of the three tags must be
+      # there, carry both architectures, and be one image. A green release says nothing
+      # about the image -- the two workflows are separate by design (#81) -- and v0.3.0 was
+      # tagged, published and pulled by nobody for a day before anyone found the image had
+      # never been pushed. The same command a person runs afterwards, with the credential
+      # the push used, so a private registry is checked as itself (#251).
+      - name: Make sure the registry serves what was just pushed
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
+          FORGEJO_USER: ${{ secrets.REGISTRY_USER }}
+          FORGEJO_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          registry="${REGISTRY_HOST:-${GITHUB_SERVER_URL#http*://}}"
+          repository="$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          python3 scripts/release_tools.py verify-image "$RELEASE_TAG" --registry "$registry" --image "$repository"
+
+      # A bill of materials is more use to somebody self-hosting Postulo than this run's
+      # verdict: it lets them scan the release later, against a database that does not
+      # exist yet. It goes on the release, beside the sdist and the wheel, because that is
+      # the one place this server keeps a file: the artifact API refuses `upload-artifact@v4`
+      # as "not supported on GHES", and that refusal, sitting before the push, is what left
+      # v0.3.0 tagged and released with no container image at all (#251). After the push
+      # and the check, so a bill of materials that cannot be stored fails this run without
+      # unpublishing anything -- the image is worth more than the list of what is in it.
+      - name: Attach the bill of materials to the release
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          FORGEJO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORGEJO_URL: ${{ github.server_url }}
+          FORGEJO_REPOSITORY: ${{ github.repository }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          cp .scan/sbom.cdx.json "postulo-${version}-image-sbom.cdx.json"
+          python3 scripts/release_tools.py attach "$RELEASE_TAG" "postulo-${version}-image-sbom.cdx.json"
+
+      # Keyed to the push step rather than to the job: a failure after the push -- the check,
+      # the attachment -- is a published image all the same, and the summary has to say so.
+      - name: Say what was published
+        if: always() && steps.push.outcome == 'success'
+        env:
+          TAGS: ${{ steps.tags.outputs.tags }}
+        run: |
+          {
+            echo '## Image'
+            echo
+            echo '```'
+            for tag in $(echo "$TAGS" | tr ',' ' '); do echo "docker pull $tag"; done
+            echo '```'
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Say that nothing was published
+        if: always() && steps.push.outcome != 'success'
+        run: |
+          echo 'No image was published: the push step did not run, or did not succeed.' >> "$GITHUB_STEP_SUMMARY"

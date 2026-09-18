@@ -297,6 +297,14 @@ End the entry with the issue it closes, in brackets: `(#42)`.
 3. Set the same version in `pyproject.toml` and in `src/postulo/__init__.py`.
 4. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree.
 5. Commit, then tag and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+6. Once the release exists, start *Actions → Image* for the tag, from the tag. It builds
+   and scans the image, pushes `X.Y.Z`, `X.Y` and `latest`, asks the registry for all
+   three the way `docker pull` would, and attaches the image's bill of materials to the
+   release as `postulo-X.Y.Z-image-sbom.cdx.json`. A red run *after* the push is a
+   published image with something after it undone; the run summary says which.
+7. Afterwards, from anywhere:
+   `python scripts/release_tools.py verify-image vX.Y.Z --registry <host> --image postulo/postulo`
+   is the same check, for whoever would rather know than trust (#251).
 
 The `release` workflow does the rest, and it is one job: it refuses a tag that disagrees
 with the code or the changelog, builds the sdist and the wheel, and creates the Forgejo
@@ -368,9 +376,13 @@ time. Two things about how it is set up are deliberate:
 
 The unfixable half is reported rather than hidden, along with the secret and misconfiguration
 scans — a scan that records only its failures throws away the half saying the image is in the
-state you think it is. Each run keeps a CycloneDX bill of materials, which is more use to
-somebody self-hosting Postulo than this run's verdict: it lets them scan the release later,
-against a database that does not exist yet.
+state you think it is. A release run attaches the image's CycloneDX bill of materials to
+the release, `postulo-X.Y.Z-image-sbom.cdx.json`, which is more use to somebody self-hosting
+Postulo than this run's verdict: it lets them scan the release later, against a database
+that does not exist yet. On the release rather than as a run artifact, because this Forgejo
+refuses `upload-artifact@v4` -- "not currently supported on GHES" -- and v3's artifacts
+expire; the refusal, sitting before the push, is how v0.3.0 came to be released with no
+image at all (#251). `tests/test_image_build.py` keeps v4 out of every workflow.
 
 Both scanners download a vulnerability database, so the step needs the network.
 

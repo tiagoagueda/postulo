@@ -8,6 +8,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The image workflow asks the registry for the three tags it pushed and attaches the bill of
+  materials to the release, instead of an artifact upload this server refuses. (#251)
 - Nine catalogues wrote *one* in the plural form that also counts twenty-one; they carry the
   number now, Slovene's dual and Irish's five forms are real, Maltese counts eleven to
   nineteen in the singular, and a handful of wording and register splits are settled. (#250)

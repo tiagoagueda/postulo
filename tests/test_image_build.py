@@ -444,10 +444,59 @@ def test_the_scan_runs_both_tools():
 def test_a_release_carries_a_bill_of_materials():
     """More use to somebody self-hosting Postulo than this run's verdict on this image:
     it lets them scan the release later, against a database that does not exist yet.
+
+    On the release, beside the sdist and the wheel, rather than in an artifact: this server
+    refuses `upload-artifact@v4` outright, and that refusal is what cost v0.3.0 its image
+    (#251).
     """
     assert "cyclonedx" in SCAN_SCRIPT.read_text(encoding="utf-8")
-    kept = [step for step in image_steps() if "sbom" in str(step.get("with", {})).lower()]
-    assert kept, "the SBOM has to leave the runner"
+    attaching = [
+        step
+        for step in image_steps()
+        if "sbom" in step.get("run", "") and "release_tools.py attach" in step.get("run", "")
+    ]
+    assert attaching, "the SBOM has to leave the runner, onto the release"
+    uploading = [step for step in image_steps() if "upload-artifact" in step.get("uses", "")]
+    assert not uploading, "no artifact upload: v4 is refused here, and v3's expire"
+
+
+def test_the_registry_is_asked_after_the_push_and_before_the_bill_of_materials():
+    """A green release says nothing about the image (#81); v0.3.0 had none for a day. The
+    check comes after the push, because it is the push it checks, and the bill of materials
+    goes on once the image is known to be there (#251).
+    """
+    steps = image_steps()
+    names = [step.get("name", step.get("uses", "")) for step in steps]
+    pushing = next(i for i, name in enumerate(names) if "push" in name)
+    checking = next(i for i, step in enumerate(steps) if "verify-image" in step.get("run", ""))
+    attaching = next(
+        i for i, step in enumerate(steps) if "release_tools.py attach" in step.get("run", "")
+    )
+
+    assert pushing < checking < attaching, names
+
+
+@pytest.mark.parametrize("path", WORKFLOWS, ids=lambda p: p.name)
+def test_no_workflow_uses_the_artifact_actions_this_server_refuses(path: Path):
+    """This Forgejo answers the artifact API as a GitHub Enterprise Server without v2 of it,
+    so `upload-artifact@v4` ends every time with "not currently supported on GHES". v3
+    works -- three jobs' logs say so -- and v4 is what left v0.3.0 without an image (#251).
+    """
+    import yaml
+
+    workflow = yaml.safe_load(path.read_text(encoding="utf-8"))
+    used = [
+        step.get("uses", "")
+        for job in workflow.get("jobs", {}).values()
+        for step in job.get("steps", [])
+    ]
+    refused = [
+        use
+        for use in used
+        if use.startswith(("actions/upload-artifact@v4", "actions/download-artifact@v4"))
+    ]
+
+    assert not refused, f"{path.name}: {refused}"
 
 
 # ---------------------------------------------------- how gunicorn is told to run (#220)
