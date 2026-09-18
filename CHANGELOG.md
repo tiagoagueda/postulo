@@ -16,6 +16,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The report, *Tags*, *Industries*, an application's documents and the import mapping take
+  the screen as every other list does, and a sweep over every page catches the next table
+  left in the 1280-pixel column. (#273)
 - The image workflow asks the registry for the three tags it pushed and attaches the bill of
   materials to the release, instead of an artifact upload this server refuses. (#251)
 - Nine catalogues wrote *one* in the plural form that also counts twenty-one; they carry the

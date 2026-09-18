@@ -1,10 +1,12 @@
 {% extends "settings/base.html" %}
 {% load i18n %}
 
+{% comment %} Two tables, one of them a spreadsheet's own columns: the page takes the width
+   the settings frame gives it, and only the two paragraphs keep a measure (#273). {% endcomment %}
 {% block content %}
-  <div class="max-w-4xl">
+  <div>
     <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Which column is which?" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <p class="mb-6 max-w-3xl text-sm text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed with name=sheet.filename rows=sheet.row_count %}
         <strong>{{ name }}</strong>: {{ rows }} rows. The guesses below come from the header names; correct any of them, then check the preview before importing.
       {% endblocktranslate %}
@@ -103,7 +105,7 @@
           </tbody>
         </table>
       </div>
-      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400" data-summary>
+      <p class="mb-4 max-w-3xl text-sm text-ink-500 dark:text-ink-400" data-summary>
         {% blocktranslate trimmed with applications=would_import listings=would_list skipped=would_skip %}
           Across the whole file: {{ applications }} applications, {{ listings }} listings, {{ skipped }} rows skipped for want of a company or a role. Rows already recorded are found and skipped as they are imported.
         {% endblocktranslate %}
