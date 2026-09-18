@@ -203,6 +203,16 @@ root tells an assistant how this project works; keep it current when the rules c
   page. A component can see the caller's whole context; read only what the tag was given,
   so the line at the top stays the truth about it. Isolation is off on purpose: switched
   on, it runs every context processor again for each component on the page.
+- **Components look the way [Basecoat](https://basecoatui.com/) draws them** (#262): a
+  button is `class="btn" data-variant="outline" data-size="sm"`, with the variants and
+  sizes `assets/css/basecoat.css` paints. That file is Postulo's style pack -- Basecoat's
+  structural files are imported one at a time in `assets/css/app.css` and painted there in
+  Postulo's palette; the bundle, the base tokens and the eight style packs are not
+  imported, because each would repaint this project's cards and alerts and change the
+  `dark` variant. `tests/test_stylesheet.py` refuses an import whose classes `app.css`
+  already defines, so a collision is a decision made in the source and never left to the
+  cascade. A Basecoat component that needs its script still has to work with scripts off
+  before it is adopted; the ones that cannot are written down in #262.
 - **Every user-owned model** inherits the shared owned-model base and is filtered by
   owner in every query. Cross-account data leaks are the one bug class we test for
   explicitly, so new models need a test proving isolation.

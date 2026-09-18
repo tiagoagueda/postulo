@@ -6,6 +6,24 @@
  */
 @import "tailwindcss" source(none);
 
+/*
+ * Basecoat (#262), one component at a time and structure only. `basecoat-css` is shadcn/ui
+ * rebuilt as plain Tailwind and vanilla script, and each of its components is a structural
+ * file -- the box, the states, the accessibility selectors -- with the look supplied by a
+ * style pack. The packs are not imported: each is one file painting every component at
+ * once, in greyscale tokens of its own, with a dark theme keyed to an `html.dark` class this
+ * project does not set. Nor is `basecoat-css/base`, which redefines the `dark` variant,
+ * swaps the font for Geist, changes every corner radius, colours every border and makes the
+ * whole page `overscroll-none` from a base layer. What is imported is the structure of each
+ * component this project has adopted, and `basecoat.css` beside this file is the style pack
+ * that paints it in the palette below. The bundle, `@import "basecoat-css"`, would bring a
+ * `.card` and an `.alert` under the names this file already owns, and the cascade would
+ * decide which one a page got; `tests/test_stylesheet.py` refuses any import whose classes
+ * this file also defines, so that decision is always made here and never by accident.
+ */
+@import "basecoat-css/components/button.css";
+@import "./basecoat.css";
+
 /* Templates and Python live outside this directory, so point Tailwind at them. */
 @source "../../src/postulo";
 
@@ -73,6 +91,32 @@
   --color-brand-700: oklch(0.47 0.17 275);
   --color-brand-800: oklch(0.39 0.14 275);
   --color-brand-900: oklch(0.32 0.11 275);
+
+  /*
+   * Basecoat's names for the colours a component is painted with (#262). Semantic, so a
+   * rule copied from its documentation -- `bg-primary`, `text-muted-foreground`,
+   * `border-input` -- compiles here and comes out in the palette above. These are the light
+   * values; the dark ones are set in the base layer below, beside the two muted greys,
+   * under the same `dark` variant every other rule uses.
+   */
+  --color-background: var(--color-ink-50);
+  --color-foreground: var(--color-ink-900);
+  --color-card: var(--color-white);
+  --color-card-foreground: var(--color-ink-900);
+  --color-popover: var(--color-white);
+  --color-popover-foreground: var(--color-ink-900);
+  --color-primary: var(--color-brand-600);
+  --color-primary-foreground: var(--color-white);
+  --color-secondary: var(--color-ink-100);
+  --color-secondary-foreground: var(--color-ink-900);
+  --color-muted: var(--color-ink-100);
+  --color-muted-foreground: var(--color-ink-500);
+  --color-accent: var(--color-ink-100);
+  --color-accent-foreground: var(--color-ink-900);
+  --color-destructive: var(--color-red-600);
+  --color-border: var(--color-ink-200);
+  --color-input: var(--color-ink-300);
+  --color-ring: var(--color-brand-500);
 }
 
 /* --------------------------------------------------------------- base layer */
@@ -88,6 +132,25 @@
     @variant dark {
       --color-ink-400: oklch(0.68 0.012 250);
       --color-ink-500: oklch(0.6 0.015 250);
+
+      /* Basecoat's tokens, in the dark: the values the `dark:` utilities beside each
+         component have always used, so a component painted through a token and one painted
+         through `dark:bg-ink-900` come out the same (#262). */
+      --color-background: var(--color-ink-950);
+      --color-foreground: var(--color-ink-100);
+      --color-card: var(--color-ink-900);
+      --color-card-foreground: var(--color-ink-100);
+      --color-popover: var(--color-ink-900);
+      --color-popover-foreground: var(--color-ink-100);
+      --color-secondary: var(--color-ink-800);
+      --color-secondary-foreground: var(--color-ink-100);
+      --color-muted: var(--color-ink-800);
+      --color-muted-foreground: var(--color-ink-400);
+      --color-accent: var(--color-ink-800);
+      --color-accent-foreground: var(--color-ink-50);
+      --color-destructive: var(--color-red-400);
+      --color-border: var(--color-ink-800);
+      --color-input: var(--color-ink-700);
     }
   }
 
@@ -218,8 +281,15 @@
 /*
  * These three are declared as utilities rather than component classes because other
  * classes compose them with @apply, which in Tailwind v4 only accepts utilities.
+ *
+ * `btn-legacy` was `btn` until Basecoat arrived (#262). The name `btn` is Basecoat's now --
+ * `components/button.css` defines it and `basecoat.css` paints it -- and a utility of the
+ * same name would have been compiled into the utilities layer the first time a template
+ * wrote `class="btn"`, on top of Basecoat's rule, with the cascade picking the padding. The
+ * five `btn-*` classes below still compose this one and draw exactly what they did; they
+ * and it go together, once the templates say `class="btn" data-variant="…"` instead.
  */
-@utility btn {
+@utility btn-legacy {
   @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2
     text-sm font-medium transition-colors
     disabled:cursor-not-allowed disabled:opacity-50;
@@ -262,16 +332,16 @@
 
 @layer components {
   .btn-primary {
-    @apply btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
+    @apply btn-legacy bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
   }
 
   .btn-secondary {
-    @apply btn border border-ink-300 bg-white text-ink-800 hover:bg-ink-100
+    @apply btn-legacy border border-ink-300 bg-white text-ink-800 hover:bg-ink-100
       dark:border-ink-700 dark:bg-ink-900 dark:text-ink-100 dark:hover:bg-ink-800;
   }
 
   .btn-ghost {
-    @apply btn text-ink-600 hover:bg-ink-100 hover:text-ink-900
+    @apply btn-legacy text-ink-600 hover:bg-ink-100 hover:text-ink-900
       dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-ink-100;
   }
 
@@ -286,11 +356,11 @@
    * drifted apart, so "is this the dangerous one" was answered by whichever template you
    * happened to be reading. A component is the answer in one place. */
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 active:bg-red-800;
+    @apply btn-legacy bg-red-600 text-white hover:bg-red-700 active:bg-red-800;
   }
 
   .btn-danger-ghost {
-    @apply btn text-red-600 hover:bg-red-50 hover:text-red-700
+    @apply btn-legacy text-red-600 hover:bg-red-50 hover:text-red-700
       dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300;
   }
 
@@ -807,7 +877,8 @@ html {
  * selector matches `.field-input:focus` on specificity and comes later, which is what takes
  * the `outline-style: none` off again.
  *
- * Unlayered and last on purpose: a layered rule loses to `.field-input` whatever it says. */
+ * Unlayered and last on purpose: a layered rule loses to `.field-input` whatever it says.
+ * Basecoat's button gets the same treatment in `basecoat.css`, for the same reason. */
 @media (forced-colors: active) {
   .field-input:focus-visible,
   input:focus-visible,

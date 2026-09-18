@@ -1,0 +1,112 @@
+/*
+ * Postulo's style pack for Basecoat (#262).
+ *
+ * Basecoat separates a component's structure from its look. `basecoat-css/components/*.css`
+ * gives `.btn` its box, its disabled state and a shrink-proof icon and says nothing about
+ * colour; a style pack -- Vega, Nova, six more -- paints it. None of the eight is imported
+ * here: each is one file carrying every component's visuals at once, keyed to greyscale
+ * tokens of its own and a dark theme on an `html.dark` class this project does not set, and
+ * importing one would repaint this project's cards and alerts as a side effect. So this file
+ * is the style pack. It paints the classes Basecoat defines, in the palette `app.css`
+ * declares, and it defines nothing of its own: `tests/test_stylesheet.py` holds it to that,
+ * and holds `app.css` to the other half -- never a name Basecoat owns.
+ *
+ * Every component Basecoat structures is painted here the day it is adopted, and not
+ * before; a rule for a component nothing uses is a rule every page downloads for nothing.
+ */
+
+/* ------------------------------------------------------------------- button */
+
+/*
+ * The same button the five `btn-*` classes in app.css have drawn since the start, keyed on
+ * the `data-variant` and `data-size` attributes Basecoat's markup uses, so a template
+ * written from Basecoat's documentation comes out in Postulo's colours. The names are
+ * Basecoat's where it has one -- `outline` is the bordered white button that was called
+ * secondary here, `ghost` is ghost -- and `destructive` keeps the meaning this project gave
+ * it in #227: the filled red button at the end of a confirmation page, the one somebody has
+ * already been asked about. Basecoat paints its destructive button tinted, which is the
+ * shape this project uses to *offer* a deletion in a row of ordinary actions, and that one
+ * is `destructive-ghost`. Two shapes because there are two jobs; the name says which.
+ *
+ * Basecoat's `secondary` (a filled grey) and `link` are not painted: nothing here uses
+ * them. Add them the day something does.
+ *
+ * Two of the structural choices are undone on purpose. `whitespace-nowrap` would let a long
+ * label -- and every label is long in some language -- run off a 320-pixel screen rather
+ * than wrap, against Reflow (#113). And `outline-none` takes the focus ring off: Basecoat
+ * shows focus with a box-shadow ring and a border colour, and forced colours discard both
+ * (#227), so the outline the rest of the interface uses goes back on -- with its style
+ * said out loud, because `outline-none` leaves Tailwind's outline-style variable at `none`
+ * and `outline-2` alone would read it back and draw nothing. `transition-colors` rather
+ * than `transition-all`, which would animate the padding of a button changing size.
+ */
+@layer components {
+  .btn {
+    @apply gap-2 rounded-lg px-4 py-2 text-sm font-medium whitespace-normal transition-colors;
+  }
+
+  .btn:focus-visible {
+    @apply outline-solid outline-2 outline-offset-2 outline-brand-500;
+  }
+
+  .btn:not([data-variant]),
+  .btn[data-variant="primary"] {
+    @apply bg-primary text-primary-foreground hover:bg-brand-700 active:bg-brand-800;
+  }
+
+  .btn[data-variant="outline"] {
+    @apply border border-input bg-card text-ink-800 hover:bg-muted
+      dark:text-ink-100;
+  }
+
+  .btn[data-variant="ghost"] {
+    @apply text-ink-600 hover:bg-muted hover:text-ink-900
+      dark:text-ink-400 dark:hover:text-ink-100;
+  }
+
+  .btn[data-variant="destructive"] {
+    @apply bg-red-600 text-white hover:bg-red-700 active:bg-red-800;
+  }
+
+  .btn[data-variant="destructive-ghost"] {
+    @apply text-red-600 hover:bg-red-50 hover:text-red-700
+      dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300;
+  }
+
+  /*
+   * Sizes, as Basecoat names them, at the dimensions the templates had been composing by
+   * hand from padding utilities: `sm` is `px-3 py-1`, `xs` is `px-2 py-1 text-xs`, which
+   * is a 24-pixel row and the floor SC 2.5.8 sets (#115). The icon sizes are squares for a
+   * button that is an icon with an accessible name; `icon-xs` is the 24-pixel target the
+   * column chooser's arrows were two pixels short of.
+   */
+  .btn[data-size="sm"] {
+    @apply px-3 py-1;
+  }
+
+  .btn[data-size="xs"] {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .btn[data-size="icon"] {
+    @apply size-9 p-0;
+  }
+
+  .btn[data-size="icon-sm"] {
+    @apply size-8 p-0;
+  }
+
+  .btn[data-size="icon-xs"] {
+    @apply size-6 p-0;
+  }
+}
+
+/* Forced colours: focus on a button in the system's own colours, as on a field (#227).
+   Unlayered, so it beats the layered rules above whatever they say, and `Highlight` rather
+   than a colour the theme discards. */
+@media (forced-colors: active) {
+  .btn:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}

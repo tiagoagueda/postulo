@@ -123,6 +123,11 @@
     --color-brand-700: oklch(0.47 0.17 275);
     --color-brand-800: oklch(0.39 0.14 275);
     --color-brand-900: oklch(0.32 0.11 275);
+    --color-card: var(--color-white);
+    --color-primary: var(--color-brand-600);
+    --color-primary-foreground: var(--color-white);
+    --color-muted: var(--color-ink-100);
+    --color-input: var(--color-ink-300);
   }
 }
 @layer base {
@@ -1933,15 +1938,256 @@
     min-width: 0px;
   }
 }
+@layer components {
+  .btn {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    transition-property: all;
+    --tw-outline-style: none;
+    outline-style: none;
+    -webkit-user-select: none;
+    user-select: none;
+    &:disabled {
+      pointer-events: none;
+    }
+    &:disabled {
+      opacity: 50%;
+    }
+    & svg {
+      pointer-events: none;
+    }
+    & svg {
+      flex-shrink: 0;
+    }
+    gap: calc(var(--spacing) * 2);
+    border-radius: var(--radius-lg);
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 2);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    white-space: normal;
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .btn:focus-visible {
+    outline-style: var(--tw-outline-style);
+    outline-width: 2px;
+    outline-offset: 2px;
+    outline-color: var(--color-brand-500);
+    --tw-outline-style: solid;
+    outline-style: solid;
+  }
+  .btn:not([data-variant]), .btn[data-variant="primary"] {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-brand-700);
+      }
+    }
+    &:active {
+      background-color: var(--color-brand-800);
+    }
+  }
+  .btn[data-variant="outline"] {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-input);
+    background-color: var(--color-card);
+    color: var(--color-ink-800);
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-muted);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-100);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-100);
+      }
+    }
+  }
+  .btn[data-variant="ghost"] {
+    color: var(--color-ink-600);
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-muted);
+      }
+    }
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-ink-900);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-400);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      &:hover {
+        @media (hover: hover) {
+          color: var(--color-ink-100);
+        }
+      }
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        &:hover {
+          @media (hover: hover) {
+            color: var(--color-ink-100);
+          }
+        }
+      }
+    }
+  }
+  .btn[data-variant="destructive"] {
+    background-color: var(--color-red-600);
+    color: var(--color-white);
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-red-700);
+      }
+    }
+    &:active {
+      background-color: var(--color-red-800);
+    }
+  }
+  .btn[data-variant="destructive-ghost"] {
+    color: var(--color-red-600);
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-red-50);
+      }
+    }
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-red-700);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-red-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-red-400);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      &:hover {
+        @media (hover: hover) {
+          background-color: var(--color-red-950);
+        }
+      }
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        &:hover {
+          @media (hover: hover) {
+            background-color: var(--color-red-950);
+          }
+        }
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      &:hover {
+        @media (hover: hover) {
+          color: var(--color-red-300);
+        }
+      }
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        &:hover {
+          @media (hover: hover) {
+            color: var(--color-red-300);
+          }
+        }
+      }
+    }
+  }
+  .btn[data-size="sm"] {
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: var(--spacing);
+  }
+  .btn[data-size="xs"] {
+    padding-inline: calc(var(--spacing) * 2);
+    padding-block: var(--spacing);
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  .btn[data-size="icon"] {
+    width: calc(var(--spacing) * 9);
+    height: calc(var(--spacing) * 9);
+    padding: 0px;
+  }
+  .btn[data-size="icon-sm"] {
+    width: calc(var(--spacing) * 8);
+    height: calc(var(--spacing) * 8);
+    padding: 0px;
+  }
+  .btn[data-size="icon-xs"] {
+    width: calc(var(--spacing) * 6);
+    height: calc(var(--spacing) * 6);
+    padding: 0px;
+  }
+}
+@media (forced-colors: active) {
+  .btn:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
 @layer base {
   :root:where([data-theme="dark"], [data-theme="dark"] *) {
     --color-ink-400: oklch(0.68 0.012 250);
     --color-ink-500: oklch(0.6 0.015 250);
+    --color-background: var(--color-ink-950);
+    --color-foreground: var(--color-ink-100);
+    --color-card: var(--color-ink-900);
+    --color-card-foreground: var(--color-ink-100);
+    --color-popover: var(--color-ink-900);
+    --color-popover-foreground: var(--color-ink-100);
+    --color-secondary: var(--color-ink-800);
+    --color-secondary-foreground: var(--color-ink-100);
+    --color-muted: var(--color-ink-800);
+    --color-muted-foreground: var(--color-ink-400);
+    --color-accent: var(--color-ink-800);
+    --color-accent-foreground: var(--color-ink-50);
+    --color-destructive: var(--color-red-400);
+    --color-border: var(--color-ink-800);
+    --color-input: var(--color-ink-700);
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
       --color-ink-400: oklch(0.68 0.012 250);
       --color-ink-500: oklch(0.6 0.015 250);
+      --color-background: var(--color-ink-950);
+      --color-foreground: var(--color-ink-100);
+      --color-card: var(--color-ink-900);
+      --color-card-foreground: var(--color-ink-100);
+      --color-popover: var(--color-ink-900);
+      --color-popover-foreground: var(--color-ink-100);
+      --color-secondary: var(--color-ink-800);
+      --color-secondary-foreground: var(--color-ink-100);
+      --color-muted: var(--color-ink-800);
+      --color-muted-foreground: var(--color-ink-400);
+      --color-accent: var(--color-ink-800);
+      --color-accent-foreground: var(--color-ink-50);
+      --color-destructive: var(--color-red-400);
+      --color-border: var(--color-ink-800);
+      --color-input: var(--color-ink-700);
     }
   }
   html {

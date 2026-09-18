@@ -8,6 +8,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The component layer draws on Basecoat: each component's structural file is imported as it
+  is adopted and painted in Postulo's own palette, and its names replace ours where the two
+  overlap, starting with the button. (#262)
 - Markup shared between pages is a component (django-cotton) rather than an include with a
   `with` chain; the form field, its feedback and the table header are the first three. (#263)
 

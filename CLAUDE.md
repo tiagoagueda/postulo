@@ -33,6 +33,12 @@ Four commitments are stated in the README and are not negotiable in code:
   called as `<c-field :field="form.name" />`, with a `<c-vars>` line at the top declaring
   what it takes. `{% include %}` is for a fragment of one page. A component can see the
   caller's whole context; read only what the tag was given, so the contract stays true.
+- The component vocabulary is [Basecoat](https://basecoatui.com/)'s: a button is
+  `class="btn" data-variant="ghost" data-size="xs"`. A component's structural file is
+  imported in `assets/css/app.css` the day it is adopted and painted in
+  `assets/css/basecoat.css`; never the bundle, the base tokens or a style pack, and never
+  a class name on both sides of the import (`tests/test_stylesheet.py`). Everything it
+  ships must still work with scripts off and pass axe in both themes.
 - Every `next` redirect goes through `safe_next()`.
 - Never name a side of the page: logical utilities (`ms`/`me`, `ps`/`pe`, `start`/`end`,
   `text-start`/`text-end`) only, and `<bdi>` around typed text that sits inline beside
