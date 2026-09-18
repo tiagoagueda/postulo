@@ -29,15 +29,15 @@
 
       <div class="card mb-6">
         <div class="grid gap-x-4 sm:grid-cols-3">
-          {% include "partials/field.html" with field=form.status %}
+          <c-field :field="form.status" />
           {# When it was actually sent, which is not always today (#222). #}
-          {% include "partials/field.html" with field=form.applied_on %}
-          {% include "partials/field.html" with field=form.channel %}
-          {% include "partials/field.html" with field=form.priority %}
+          <c-field :field="form.applied_on" />
+          <c-field :field="form.channel" />
+          <c-field :field="form.priority" />
         </div>
         <div class="grid gap-x-4 sm:grid-cols-2">
-          {% include "partials/field.html" with field=form.deadline %}
-          {% include "partials/field.html" with field=form.tags %}
+          <c-field :field="form.deadline" />
+          <c-field :field="form.tags" />
         </div>
       </div>
 

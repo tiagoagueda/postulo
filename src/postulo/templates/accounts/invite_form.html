@@ -16,8 +16,8 @@
     <form method="post" novalidate>
       {% csrf_token %}
       <div class="card mb-6">
-        {% include "partials/field.html" with field=form.email %}
-        {% include "partials/field.html" with field=form.note %}
+        <c-field :field="form.email" />
+        <c-field :field="form.note" />
       </div>
       <div class="flex items-center gap-3">
         <button type="submit" class="btn-primary">{% translate "Create invitation" %}</button>

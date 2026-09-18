@@ -54,7 +54,7 @@
         {% endif %}
 
         <form method="get" class="flex flex-wrap items-end gap-3">
-          {% include "partials/field.html" with field=add_form.language %}
+          <c-field :field="add_form.language" />
           <button type="submit" class="btn-secondary mb-4">{% translate "Add a language" %}</button>
         </form>
       </div>
@@ -76,7 +76,7 @@
                   <bdi>{{ original|truncatechars:180 }}</bdi>
                 </p>
               {% endif %}
-              {% include "partials/field.html" with field=field %}
+              <c-field :field="field" />
             </div>
           {% endfor %}
         </div>

@@ -46,7 +46,7 @@
             </div>
           </div>
           {% for field in row.visible_fields %}
-            {% include "partials/field_feedback.html" with field=field %}
+            <c-field-feedback :field="field" />
           {% endfor %}
           {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
         </li>

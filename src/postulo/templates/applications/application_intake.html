@@ -22,42 +22,42 @@
       <div class="card mb-4">
         <h2 class="mb-4 font-medium">{% translate "The role" %}</h2>
         <div class="grid gap-x-4 sm:grid-cols-2">
-          {% include "partials/field.html" with field=form.company_name %}
-          {% include "partials/field.html" with field=form.title %}
+          <c-field :field="form.company_name" />
+          <c-field :field="form.title" />
         </div>
-        {% include "partials/field.html" with field=form.url %}
+        <c-field :field="form.url" />
         <div class="grid gap-x-4 sm:grid-cols-3">
-          {% include "partials/field.html" with field=form.location %}
-          {% include "partials/field.html" with field=form.remote_type %}
-          {% include "partials/field.html" with field=form.employment_type %}
+          <c-field :field="form.location" />
+          <c-field :field="form.remote_type" />
+          <c-field :field="form.employment_type" />
         </div>
       </div>
 
       <div class="card mb-4">
         <h2 class="mb-4 font-medium">{% translate "Money and dates" %}</h2>
         <div class="grid gap-x-4 sm:grid-cols-4">
-          {% include "partials/field.html" with field=form.salary_min %}
-          {% include "partials/field.html" with field=form.salary_max %}
-          {% include "partials/field.html" with field=form.salary_currency %}
-          {% include "partials/field.html" with field=form.salary_period %}
+          <c-field :field="form.salary_min" />
+          <c-field :field="form.salary_max" />
+          <c-field :field="form.salary_currency" />
+          <c-field :field="form.salary_period" />
         </div>
         <div class="grid gap-x-4 sm:grid-cols-2">
-          {% include "partials/field.html" with field=form.closes_at %}
-          {% include "partials/field.html" with field=form.deadline %}
+          <c-field :field="form.closes_at" />
+          <c-field :field="form.deadline" />
         </div>
       </div>
 
       <div class="card mb-4">
         <h2 class="mb-4 font-medium">{% translate "Your application" %}</h2>
         <div class="grid gap-x-4 sm:grid-cols-3">
-          {% include "partials/field.html" with field=form.status %}
+          <c-field :field="form.status" />
           {# When it was actually sent: recording a search already under way is the common case (#222). #}
-          {% include "partials/field.html" with field=form.applied_on %}
-          {% include "partials/field.html" with field=form.channel %}
-          {% include "partials/field.html" with field=form.priority %}
+          <c-field :field="form.applied_on" />
+          <c-field :field="form.channel" />
+          <c-field :field="form.priority" />
         </div>
         <div class="grid gap-x-4 sm:grid-cols-2">
-          {% include "partials/field.html" with field=form.source %}
+          <c-field :field="form.source" />
           {% include "partials/tags_field.html" with form=form %}
         </div>
       </div>
@@ -67,7 +67,7 @@
         <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
           {% translate "Paste the text. Postings vanish from the web; your copy will not." %}
         </p>
-        {% include "partials/field.html" with field=form.description %}
+        <c-field :field="form.description" />
       </div>
 
       <div class="flex items-center gap-3">

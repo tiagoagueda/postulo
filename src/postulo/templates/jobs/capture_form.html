@@ -42,7 +42,7 @@
       {% csrf_token %}
       {% if known %}<input type="hidden" name="anyway" value="1">{% endif %}
       <div class="card mb-4">
-        {% include "partials/field.html" with field=form.url %}
+        <c-field :field="form.url" />
       </div>
 
       <details class="card mb-6" {% if form.html.value %}open{% endif %}>
@@ -56,7 +56,7 @@
             paste it here. Postulo will read what you paste and fetch nothing.
           {% endblocktranslate %}
         </p>
-        {% include "partials/field.html" with field=form.html %}
+        <c-field :field="form.html" />
       </details>
       <div class="flex items-center gap-3">
         <button type="submit" class="btn-primary">{% translate "Read the page" %}</button>

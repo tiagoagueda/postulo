@@ -1,4 +1,11 @@
 {% load i18n postulo %}
+<c-vars table table_id form_id bulk_form_id="" />
+{% comment %} `<c-table.head :table="table" table_id="…" form_id="…" bulk_form_id="…" />` (#263).
+   The table it draws, the id of the element the swaps replace, the filter form every input
+   is associated with, and -- only where a bulk form exists -- the id that puts a selection
+   column first. A component rather than an include, so the four things it needs are declared
+   here at the top instead of being whatever the page happened to have in its context.
+{% endcomment %}
 {% comment %} The header of a configurable table: sort links, and beneath them the filter inputs.
    Every input is associated with the filter form (`form=`) so the plain Apply button
    works without scripts, and carries htmx attributes so typing narrows the table live.

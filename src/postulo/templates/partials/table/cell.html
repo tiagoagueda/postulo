@@ -33,7 +33,7 @@
       {% comment %} The same partial every other field uses, and it already carries
          `role="alert"` for exactly this: an error inserted into a live page by a swap. A
          second announcement here would be the same sentence twice. {% endcomment %}
-      {% include "partials/field_feedback.html" with field=field %}
+      <c-field-feedback :field="field" />
       <span class="mt-1 flex items-center gap-2">
         <button type="submit" class="btn-primary px-2 py-1 text-xs">{% translate "Save" %}</button>
         <button type="button" class="btn-ghost px-2 py-1 text-xs"

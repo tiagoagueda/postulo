@@ -46,7 +46,7 @@ Every version below was verified against PyPI and installed successfully on Pyth
 | Runtime | Python 3.12 to 3.14, managed by `uv` | 3.14 pinned locally via `.python-version`; CI covers all three |
 | Framework | **Django 6.1** | 5.2 does not support Python 3.14. Brings built-in CSP, template partials, the Tasks API and `MAILERS` |
 | Database | SQLite by default, PostgreSQL via `POSTULO_DATABASE_URL` | Self-hosting sanity: one file to back up. PostgreSQL for those who want it |
-| Interface | Django templates, htmx 2, Tailwind v4 | Server-rendered. No SPA, and no API-first tax on an application of this scale. Alpine.js was dropped — see below |
+| Interface | Django templates, htmx 2, Tailwind v4; django-cotton for components since 0.4.0 | Server-rendered. No SPA, and no API-first tax on an application of this scale. Alpine.js was dropped — see below. Cotton is server-side only and turns an include with a `with` chain into a tag with declared parameters (#263) |
 | Authentication | django-allauth, email as identifier | Invite-only by default via `POSTULO_REGISTRATION_OPEN` |
 | API | **django-ninja** | Pydantic schemas serve double duty as the plugin data contract. Verified working on Python 3.14 with Django 6.1 during M0 |
 | PDF | **WeasyPrint** by default, installed with Postulo; Playwright Chromium as a fallback | WeasyPrint needs Pango, which is trivial on Linux and awkward on Windows. `POSTULO_PDF_BACKEND` overrides the auto-detection |

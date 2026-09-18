@@ -6,6 +6,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🔧 Changed
+
+- Markup shared between pages is a component (django-cotton) rather than an include with a
+  `with` chain; the form field, its feedback and the table header are the first three. (#263)
+
 ### 🐛 Fixed
 
 - The image workflow asks the registry for the three tags it pushed and attaches the bill of

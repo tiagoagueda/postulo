@@ -20,7 +20,7 @@
             </label>
           {% endfor %}
         </div>
-        {% include "partials/field_feedback.html" with field=form.theme %}
+        <c-field-feedback :field="form.theme" />
       </fieldset>
     </div>
     <div class="card mb-6">
@@ -37,7 +37,7 @@
             </label>
           {% endfor %}
         </div>
-        {% include "partials/field_feedback.html" with field=form.navigation errors_only=True %}
+        <c-field-feedback :field="form.navigation" errors-only />
       </fieldset>
     </div>
     <div class="card mb-6">
@@ -47,7 +47,7 @@
       </p>
       <div class="flex items-end gap-3">
         <div class="w-32">
-          {% include "partials/field.html" with field=form.quiet_after_days %}
+          <c-field :field="form.quiet_after_days" />
         </div>
         {% comment %} The unit agrees with the number in the box beside it. "days" on its own
            has no singular to offer at 1 and no second plural to offer at 2 for the
@@ -68,7 +68,7 @@
         <span>{{ form.show_career_order.label }}</span>
       </label>
       <p class="field-help" id="{{ form.show_career_order.auto_id }}_helptext">{{ form.show_career_order.help_text }}</p>
-      {% include "partials/field_feedback.html" with field=form.show_career_order errors_only=True %}
+      <c-field-feedback :field="form.show_career_order" errors-only />
     </div>
     <div class="card mb-6">
       {% comment %} The way out of the single-key shortcuts, which WCAG 2.1.4 asks for at
@@ -82,7 +82,7 @@
         <span>{{ form.keyboard_shortcuts.label }}</span>
       </label>
       <p class="field-help" id="{{ form.keyboard_shortcuts.auto_id }}_helptext">{{ form.keyboard_shortcuts.help_text }}</p>
-      {% include "partials/field_feedback.html" with field=form.keyboard_shortcuts errors_only=True %}
+      <c-field-feedback :field="form.keyboard_shortcuts" errors-only />
     </div>
     <button type="submit" class="btn-primary">{% translate "Save" %}</button>
   </form>

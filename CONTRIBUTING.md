@@ -197,6 +197,12 @@ root tells an assistant how this project works; keep it current when the rules c
   `rtl`; `tests/test_template_lint.py` fails on a physical one. Wrap text a person typed
   in `<bdi>` where it sits inline beside other text, so a Latin name inside an Arabic line
   does not throw the punctuation to the wrong end.
+- **Markup used on more than one page is a component**, in `templates/cotton/`, written
+  as `<c-field :field="form.name" />` and declaring what it takes in a `<c-vars>` line at
+  the top of the file (django-cotton, #263). `{% include %}` is for a fragment of one
+  page. A component can see the caller's whole context; read only what the tag was given,
+  so the line at the top stays the truth about it. Isolation is off on purpose: switched
+  on, it runs every context processor again for each component on the page.
 - **Every user-owned model** inherits the shared owned-model base and is filtered by
   owner in every query. Cross-account data leaks are the one bug class we test for
   explicitly, so new models need a test proving isolation.

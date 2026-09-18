@@ -39,7 +39,7 @@
     <form method="post" novalidate>
       {% csrf_token %}
       <div class="card mb-6">
-        {% include "partials/field.html" with field=form.capture_ignore_robots %}
+        <c-field :field="form.capture_ignore_robots" />
       </div>
       <button type="submit" class="btn-primary">{% translate "Save" %}</button>
     </form>

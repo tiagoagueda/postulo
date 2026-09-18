@@ -16,7 +16,7 @@
     {% endif %}
 
     <div class="card mb-4">
-      {% include "partials/field.html" with field=form.label %}
+      <c-field :field="form.label" />
       <label class="flex items-center gap-3 text-sm">
         {{ form.enabled }}
         <span>{{ form.enabled.label }}</span>
@@ -32,10 +32,10 @@
               {{ field }}
               <span>{{ field.label }}</span>
             </label>
-            {% include "partials/field_feedback.html" with field=field %}
+            <c-field-feedback :field="field" />
           </div>
         {% else %}
-          {% include "partials/field.html" with field=field %}
+          <c-field :field="field" />
         {% endif %}
       {% endfor %}
     </div>

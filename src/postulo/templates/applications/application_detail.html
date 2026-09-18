@@ -72,11 +72,11 @@
         <form method="post" action="{% url 'applications:event_create' application.pk %}">
           {% csrf_token %}
           <div class="grid gap-x-4 sm:grid-cols-2">
-            {% include "partials/field.html" with field=event_form.kind %}
-            {% include "partials/field.html" with field=event_form.occurred_at %}
+            <c-field :field="event_form.kind" />
+            <c-field :field="event_form.occurred_at" />
           </div>
-          {% include "partials/field.html" with field=event_form.summary %}
-          {% include "partials/field.html" with field=event_form.body %}
+          <c-field :field="event_form.summary" />
+          <c-field :field="event_form.body" />
           <button type="submit" class="btn-secondary">{% translate "Add entry" %}</button>
         </form>
       </div>

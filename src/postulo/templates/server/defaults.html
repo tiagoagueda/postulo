@@ -11,13 +11,13 @@
     {% csrf_token %}
     <div class="card mb-4">
       <h2 class="mb-3 font-medium">{% translate "This instance" %}</h2>
-      {% include "partials/field.html" with field=form.instance_name %}
-      {% include "partials/field.html" with field=form.tagline %}
+      <c-field :field="form.instance_name" />
+      <c-field :field="form.tagline" />
     </div>
 
     <div class="card mb-6">
       <h2 class="mb-3 font-medium">{% translate "New accounts" %}</h2>
-      {% include "partials/field.html" with field=form.default_language %}
+      <c-field :field="form.default_language" />
       {% if pinned.default_time_zone %}
         <div class="alert-info mb-4 text-sm" data-pinned="default_time_zone">
           {% blocktranslate with variable=pinned.default_time_zone zone=effective_time_zone trimmed %}
@@ -26,7 +26,7 @@
           {% endblocktranslate %}
         </div>
       {% else %}
-        {% include "partials/field.html" with field=form.default_time_zone %}
+        <c-field :field="form.default_time_zone" />
       {% endif %}
       <p class="text-xs text-ink-500 dark:text-ink-400">
         {% blocktranslate with zone=effective_time_zone language=effective_language trimmed %}
@@ -57,7 +57,7 @@
         {% translate "All of them are offered, and a language added in a later release will be too." %}
       </p>
     {% endif %}
-    {% include "partials/field_feedback.html" with field=languages_form.offered_languages %}
+    <c-field-feedback :field="languages_form.offered_languages" />
     <div class="grid gap-1 sm:grid-cols-2">
       {% for option in languages_form.offered_languages %}
         <label class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm

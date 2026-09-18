@@ -141,7 +141,7 @@
           {% if variable %}
             {% pinned_field field variable %}
           {% else %}
-            {% include "partials/field.html" with field=field %}
+            <c-field :field="field" />
           {% endif %}
         {% endwith %}
         {% endif %}
@@ -182,7 +182,7 @@
               {% if variable %}
                 {% pinned_field field variable %}
               {% else %}
-                {% include "partials/field.html" with field=field %}
+                <c-field :field="field" />
               {% endif %}
             {% endwith %}
           {% endif %}
@@ -250,7 +250,7 @@
       <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
         {% translate "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something." %}
       </p>
-      {% include "partials/field.html" with field=test_form.to %}
+      <c-field :field="test_form.to" />
     </div>
     <button type="submit" class="btn-primary">{% translate "Send a test message" %}</button>
   </form>

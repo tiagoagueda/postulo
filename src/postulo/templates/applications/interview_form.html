@@ -22,12 +22,12 @@
     <form method="post" novalidate>
       {% csrf_token %}
       <div class="card mb-6">
-        {% include "partials/field.html" with field=form.kind %}
+        <c-field :field="form.kind" />
         <div class="grid gap-x-4 sm:grid-cols-2">
-          {% include "partials/field.html" with field=form.starts_at %}
-          {% include "partials/field.html" with field=form.ends_at %}
+          <c-field :field="form.starts_at" />
+          <c-field :field="form.ends_at" />
         </div>
-        {% include "partials/field.html" with field=form.location %}
+        <c-field :field="form.location" />
         {% if form.contacts.field.queryset %}
           <fieldset class="mb-4" {% if form.contacts.aria_describedby %}aria-describedby="{{ form.contacts.aria_describedby }}"{% endif %}>
             <legend class="field-label">{{ form.contacts.label }}</legend>
@@ -38,7 +38,7 @@
                 </label>
               {% endfor %}
             </div>
-            {% include "partials/field_feedback.html" with field=form.contacts %}
+            <c-field-feedback :field="form.contacts" />
           </fieldset>
         {% else %}
           <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
@@ -49,7 +49,7 @@
             {% endblocktranslate %}
           </p>
         {% endif %}
-        {% include "partials/field.html" with field=form.notes %}
+        <c-field :field="form.notes" />
         {% if form.remind %}
           <label class="flex items-start gap-2 text-sm">
             {{ form.remind }}

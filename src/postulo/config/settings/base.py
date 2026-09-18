@@ -53,6 +53,11 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.openid_connect",
     "django_htmx",
+    # Components in templates/cotton/, written as `<c-name>` tags (#263). Its app config
+    # rewrites TEMPLATES on start-up: APP_DIRS becomes an explicit loader list with its own
+    # compiler first, wrapped in Django's cached loader. The compiled form lives in memory
+    # and nothing is written to disk, so the container needs nothing writable for it.
+    "django_cotton",
     "django_tasks_db",
     # postulo
     "postulo.core",

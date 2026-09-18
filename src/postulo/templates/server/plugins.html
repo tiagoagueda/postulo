@@ -171,10 +171,10 @@
     <form method="post" action="{% url 'server:plugin_repository' %}" class="grid gap-4">
       {% csrf_token %}
       <input type="hidden" name="action" value="add">
-      {% include "partials/field.html" with field=repository_form.name %}
-      {% include "partials/field.html" with field=repository_form.url %}
-      {% include "partials/field.html" with field=repository_form.public_key %}
-      {% include "partials/field.html" with field=repository_form.enabled %}
+      <c-field :field="repository_form.name" />
+      <c-field :field="repository_form.url" />
+      <c-field :field="repository_form.public_key" />
+      <c-field :field="repository_form.enabled" />
       <div><button type="submit" class="btn-primary">{% translate "Add" %}</button></div>
     </form>
   </details>

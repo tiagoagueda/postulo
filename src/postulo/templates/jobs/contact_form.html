@@ -13,7 +13,7 @@
       {% endif %}
       <div class="card mb-6">
         {% for field in form %}
-          {% include "partials/field.html" with field=field %}
+          <c-field :field="field" />
         {% endfor %}
         {% if numbers_kept_back %}
           <p class="text-sm text-ink-500 dark:text-ink-400">

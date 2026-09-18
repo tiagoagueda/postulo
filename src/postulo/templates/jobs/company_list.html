@@ -24,7 +24,7 @@
     {% if companies %}
       <div class="card scroll-x p-0">
         <table class="w-full text-start text-sm">
-          {% include "partials/table/head.html" with table_id="companies-table" form_id="company-filters" bulk_form_id="companies-bulk" %}
+          <c-table.head :table="table" table_id="companies-table" form_id="company-filters" bulk_form_id="companies-bulk" />
           <tbody>
             {% for company in companies %}
               {% include "jobs/partials/company_row.html" with columns=table.visible bulk_form_id="companies-bulk" %}

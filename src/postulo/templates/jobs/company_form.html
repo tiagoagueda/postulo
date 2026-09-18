@@ -12,15 +12,15 @@
         <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
       {% endif %}
       <div class="card mb-6">
-        {% include "partials/field.html" with field=form.name %}
+        <c-field :field="form.name" />
         {% comment %} Employer, or the public employment service this person is registered
            with; and the services Postulo knows by country, so that one is picked rather
            than typed. The name may stay blank when one is picked (#202). {% endcomment %}
-        {% include "partials/field.html" with field=form.kind %}
-        {% include "partials/field.html" with field=form.known_service %}
-        {% include "partials/field.html" with field=form.website %}
-        {% include "partials/field.html" with field=form.careers_url %}
-        {% include "partials/field.html" with field=form.location %}
+        <c-field :field="form.kind" />
+        <c-field :field="form.known_service" />
+        <c-field :field="form.website" />
+        <c-field :field="form.careers_url" />
+        <c-field :field="form.location" />
 
         <fieldset class="mb-4" data-industries {% if form.industries.aria_describedby %}aria-describedby="{{ form.industries.aria_describedby }}"{% endif %}
                   {% include "partials/label_attrs.html" with field=form.industries new_field=form.new_industries %}>
@@ -39,7 +39,7 @@
                 {% translate "Your list is empty. Type the first ones below; the suggestions are only a start." %}
               </p>
             {% endif %}
-            {% include "partials/field_feedback.html" with field=form.industries %}
+            <c-field-feedback :field="form.industries" />
           </div>
           <div data-labels-newbox>
             <label class="field-label" for="{{ form.new_industries.id_for_label }}">{{ form.new_industries.label }}</label>
@@ -47,11 +47,11 @@
             <datalist id="industry-suggestions">
               {% for name in form.suggestions %}<option value="{{ name }}">{% endfor %}
             </datalist>
-            {% include "partials/field_feedback.html" with field=form.new_industries %}
+            <c-field-feedback :field="form.new_industries" />
           </div>
         </fieldset>
 
-        {% include "partials/field.html" with field=form.notes %}
+        <c-field :field="form.notes" />
       </div>
 
       <fieldset class="card mb-6" data-identifiers>
@@ -89,7 +89,7 @@
                 {% endif %}
               </div>
               {% for field in row.visible_fields %}
-                {% include "partials/field_feedback.html" with field=field %}
+                <c-field-feedback :field="field" />
               {% endfor %}
               {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
             </li>

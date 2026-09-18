@@ -10,7 +10,7 @@
   <form method="post" novalidate>
     {% csrf_token %}
     <div class="card mb-6">
-      {% include "partials/field.html" with field=form.username %}
+      <c-field :field="form.username" />
       <button type="submit" class="btn-secondary">{% translate "Change username" %}</button>
     </div>
   </form>

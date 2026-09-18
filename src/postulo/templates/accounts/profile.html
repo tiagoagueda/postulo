@@ -52,7 +52,7 @@
             </p>
           </div>
           <div class="min-w-64 flex-1">
-            {% include "partials/field.html" with field=form.picture %}
+            <c-field :field="form.picture" />
             {% if form.remove_picture %}
               <label class="mb-4 flex items-center gap-2 text-sm">
                 {{ form.remove_picture }} {{ form.remove_picture.label }}
@@ -79,17 +79,17 @@
       <div class="card mb-4" id="section-name">
         <h2 class="mb-4 font-medium">{% translate "Your name" %}</h2>
         <div class="grid gap-x-4 sm:grid-cols-2">
-          {% include "partials/field.html" with field=form.first_name %}
-          {% include "partials/field.html" with field=form.last_name %}
+          <c-field :field="form.first_name" />
+          <c-field :field="form.last_name" />
         </div>
       </div>
 
       <div class="card mb-6" id="section-contact">
         <h2 class="mb-4 font-medium">{% translate "Contact block" %}</h2>
-        {% include "partials/field.html" with field=form.headline %}
+        <c-field :field="form.headline" />
         <div class="grid gap-x-4 sm:grid-cols-2">
-          {% if form.phone %}{% include "partials/field.html" with field=form.phone %}{% endif %}
-          {% include "partials/field.html" with field=form.location %}
+          {% if form.phone %}<c-field :field="form.phone" />{% endif %}
+          <c-field :field="form.location" />
         </div>
         {% if numbers_kept_back %}
           {% comment %} Said out loud, because a person who cannot see their four numbers
@@ -106,12 +106,12 @@
             {% endblocktranslate %}
           </p>
         {% endif %}
-        {% include "partials/field.html" with field=form.record_language %}
+        <c-field :field="form.record_language" />
         {% comment %} One box per kind of link whose feature is off; the kinds that are on
            are blocks of rows below, and a box and a block writing one primary row would be
            two answers to one question (#189). {% endcomment %}
         {% for field in form.link_boxes %}
-          {% include "partials/field.html" with field=field %}
+          <c-field :field="field" />
         {% endfor %}
         {% for block, count in links_kept_back %}
           <p class="text-sm text-ink-500 dark:text-ink-400">{{ block.kept_back }}</p>
@@ -162,7 +162,7 @@
                 {% endif %}
               </div>
               {% for field in row.visible_fields %}
-                {% include "partials/field_feedback.html" with field=field %}
+                <c-field-feedback :field="field" />
               {% endfor %}
               {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
             </li>

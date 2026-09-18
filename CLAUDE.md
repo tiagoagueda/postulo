@@ -29,6 +29,10 @@ Four commitments are stated in the README and are not negotiable in code:
 - Server-rendered templates with htmx and Tailwind v4 (`npm run build:css`; the compiled
   CSS is committed). All JavaScript lives in `static/js/app.js` and vendored files —
   the CSP forbids inline scripts. Django `{# #}` comments are single-line only.
+- Markup used on more than one page is a component in `templates/cotton/` (django-cotton),
+  called as `<c-field :field="form.name" />`, with a `<c-vars>` line at the top declaring
+  what it takes. `{% include %}` is for a fragment of one page. A component can see the
+  caller's whole context; read only what the tag was given, so the contract stays true.
 - Every `next` redirect goes through `safe_next()`.
 - Never name a side of the page: logical utilities (`ms`/`me`, `ps`/`pe`, `start`/`end`,
   `text-start`/`text-end`) only, and `<bdi>` around typed text that sits inline beside

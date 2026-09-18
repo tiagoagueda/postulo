@@ -29,7 +29,7 @@
       <h2 class="mb-4 font-medium">{% translate "New token" %}</h2>
       <form method="post" action="{% url 'api:token_create' %}" novalidate>
         {% csrf_token %}
-        {% include "partials/field.html" with field=form.name %}
+        <c-field :field="form.name" />
         {% comment %} The fieldset carries the description, not the inputs inside it: Django leaves
      `aria-describedby` off a widget it expects to be drawn as a fieldset, because the group is
      what the help and the errors are about. `aria_describedby` is Django's own computation of
@@ -44,13 +44,13 @@
               </label>
             {% endfor %}
           </div>
-          {% include "partials/field_feedback.html" with field=form.scopes %}
+          <c-field-feedback :field="form.scopes" />
           <p class="field-help">
             {% translate "A browser extension needs only the first. Give an agent read alone until you trust it with write." %}
           </p>
         </fieldset>
         <div class="grid gap-x-4 sm:grid-cols-2">
-          {% include "partials/field.html" with field=form.expires %}
+          <c-field :field="form.expires" />
         </div>
         <button type="submit" class="btn-primary">{% translate "Create" %}</button>
       </form>

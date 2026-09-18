@@ -1,4 +1,8 @@
+<c-vars field errors_only=False />
 {% comment %} A field's help text and its errors, carrying the ids the input already claims.
+
+   `<c-field-feedback :field="form.tags" />`, and `errors-only` for a caller that has already
+   drawn the help itself, above the controls rather than under them, and has put the id on it.
 
    Django renders every widget with `aria-describedby="<auto_id>_helptext <auto_id>_error"`
    and `aria-invalid="true"`, and it is right to. Postulo then drew those two paragraphs
@@ -16,8 +20,6 @@
    these forms come back through a swap, and an error inserted into a live page is exactly
    what the role is for.
 {% endcomment %}
-{% comment %} `errors_only` for a caller that has already drawn the help itself, above the
-   controls rather than under them, and has put the id on it. {% endcomment %}
 {% if field.help_text and not errors_only %}
   <p class="field-help"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text }}</p>
 {% endif %}
