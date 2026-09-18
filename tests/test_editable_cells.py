@@ -12,6 +12,9 @@ section below. The refusal has a decided home rather than an improvised one. Eve
 goes through the form the page already uses, so a cell cannot save something the page would
 have refused. And a column that cannot be edited cannot be edited *by address* either,
 because the declaration is in the table rather than in the template.
+
+A fourth arrived with #252: the value is the record's own link, as a name is in every other
+list, and the pencil beside it is the editor. Clicking a company's name used to rename it.
 """
 
 from __future__ import annotations
@@ -31,6 +34,40 @@ def cell(company, column: str = "name") -> str:
     return reverse("jobs:company_cell", args=[company.pk, column])
 
 
+def links_in(html: str) -> list[dict[str, str]]:
+    """Every anchor's attributes and text, in order."""
+    from html.parser import HTMLParser
+
+    class Anchors(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.found: list[dict[str, str]] = []
+            self.open: dict[str, str] | None = None
+
+        def handle_starttag(self, tag, attrs):
+            if tag == "a":
+                self.open = {key: value or "" for key, value in attrs}
+                self.open["text"] = ""
+
+        def handle_data(self, data):
+            if self.open is not None:
+                self.open["text"] += data
+
+        def handle_endtag(self, tag):
+            if tag == "a" and self.open is not None:
+                self.found.append(self.open)
+                self.open = None
+
+    parser = Anchors()
+    parser.feed(html)
+    return parser.found
+
+
+def the_cell(html: str) -> str:
+    """The name cell of the first row of the companies table."""
+    return html.split('data-cell id="cell-name-')[1].split("</td>")[0]
+
+
 # ------------------------------------------------------- which columns say they can
 
 
@@ -39,8 +76,20 @@ def test_the_declaration_is_in_the_table_and_not_in_the_template():
     columns = {column.key: column for column in CompaniesTable.columns}
 
     assert columns["name"].editable == "name"
+    assert str(columns["name"].edit_label) == "Rename %(what)s", "and what its pencil is called"
     assert columns["postings"].editable == "", "a count is not editable because it is a count"
     assert columns["created"].editable == "", "a date belongs to the row it was taken from"
+
+
+def test_an_editable_column_names_its_pencil_or_is_refused():
+    """The pencil is an icon, and an icon is not a name. A table of controls all called
+    *Edit* is a list of links that all say the same thing, so the name is declared beside
+    `editable`, and a column that leaves it out fails loudly rather than quietly (#252).
+    """
+    from postulo.core.tables import Column
+
+    with pytest.raises(ValueError, match="pencil"):
+        Column("name", "Name", editable="name")
 
 
 def test_a_column_that_cannot_be_edited_cannot_be_edited_by_address(client, user):
@@ -123,7 +172,11 @@ def test_a_good_change_saves_and_comes_back_as_a_value(client, user):
     company.refresh_from_db()
     assert company.name == "Aperture Laboratories"
     assert "Aperture Laboratories" in html
-    assert "<input" not in html.split("data-cell-open")[0], "the editor is gone"
+    assert "<input" not in html, "the editor is gone"
+    name = next(link for link in links_in(html) if "data-cell-value" in link)
+    assert name["href"] == company.get_absolute_url(), "and the name is the company's link again"
+    pencil = next(link for link in links_in(html) if "data-cell-open" in link)
+    assert pencil["aria-label"] == "Rename Aperture Laboratories", "named for what it is now"
 
 
 def test_the_cell_cannot_save_what_the_page_would_refuse(client, user):
@@ -177,20 +230,38 @@ def test_an_unreadable_stamp_does_not_refuse_the_save(client, user):
     assert company.name == "Aperture Laboratories"
 
 
-# --------------------------------------------------------------- and with no script
+# ------------------------------------------------- the name opens, the pencil edits
 
 
-def test_the_cell_is_a_link_to_the_form_when_nothing_enhances_it(client, user):
-    """A complete fallback rather than a degraded one: exactly what the table did before."""
+def test_the_name_opens_the_company_like_every_other_list(client, user):
+    """The assertion that would have caught this: on *Applications* the title opens the
+    application and the company beside it opens the company, and *Companies* was the one
+    list where a record's name did not open the record (#252).
+    """
     company = Company.objects.create(owner=user, name="Aperture Science")
     client.force_login(user)
 
     html = client.get(reverse("jobs:company_list")).content.decode()
-    anchor = html.split("data-cell-open")[1].split(">")[0]
-    row = html.split('data-cell id="cell-name-')[1].split("</span>")[0]
+    name = next(link for link in links_in(the_cell(html)) if "data-cell-value" in link)
 
-    assert f"/jobs/companies/{company.pk}/edit/" in row
-    assert "hx-get" in anchor, "and htmx opens the editor where htmx is there to"
+    assert name["href"] == company.get_absolute_url()
+    assert name["text"].strip() == "Aperture Science"
+    assert "hx-get" not in name, "a plain link: nothing turns it into an editor"
+
+
+def test_the_pencil_opens_the_editor_and_with_no_script_the_form(client, user):
+    """A complete fallback rather than a degraded one: the form is the whole record with
+    every field open, which is exactly what the table linked to before any of this existed.
+    """
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    client.force_login(user)
+
+    html = client.get(reverse("jobs:company_list")).content.decode()
+    pencil = next(link for link in links_in(the_cell(html)) if "data-cell-open" in link)
+
+    assert pencil["href"] == reverse("jobs:company_update", args=[company.pk])
+    assert pencil["hx-get"] == cell(company), "and htmx opens the editor where htmx is there to"
+    assert pencil["aria-label"] == "Rename Aperture Science", "an icon is not a name"
 
 
 def test_the_list_still_renders_every_column_it_did(client, user):

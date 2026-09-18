@@ -44,6 +44,30 @@ def open_the_editor(page: Page, live_server, applicant, name: str = "Aperture Sc
     return company
 
 
+def test_the_name_opens_the_company(page: Page, live_server, applicant):
+    """The gesture every other list uses to open a record used to rename it here (#252)."""
+    company = a_company(applicant)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/")
+
+    page.get_by_role("link", name="Aperture Science", exact=True).click()
+
+    expect(page).to_have_url(f"{live_server.url}/jobs/companies/{company.pk}/")
+
+
+def test_the_pencil_is_announced_by_what_it_does_to_which_row(page: Page, live_server, applicant):
+    """An icon is not a name, so the pencil carries one: what it does, and to what."""
+    a_company(applicant)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/")
+
+    pencil = page.get_by_role("link", name="Rename Aperture Science", exact=True)
+
+    expect(pencil).to_be_visible()
+    pencil.click()
+    expect(page.locator("[data-cell-editor] input:not([type=hidden])")).to_be_visible()
+
+
 def test_the_value_becomes_an_input_where_it_sits(page: Page, live_server, applicant):
     open_the_editor(page, live_server, applicant)
 
@@ -83,7 +107,7 @@ def test_escape_abandons_and_keeps_the_old_value(page: Page, live_server, applic
     field.press("Escape")
 
     expect(page.locator("[data-cell-editor]")).to_have_count(0)
-    expect(page.locator("[data-cell-open]").first).to_contain_text("Aperture Science")
+    expect(page.locator("[data-cell-value]").first).to_contain_text("Aperture Science")
     company.refresh_from_db()
     assert company.name == "Aperture Science"
 
@@ -106,7 +130,7 @@ def test_escape_works_before_htmx_has_wired_the_editor(page: Page, live_server, 
     page.locator("[data-cell-editor] input:not([type=hidden])").press("Escape")
 
     expect(page.locator("[data-cell-editor]")).to_have_count(0)
-    expect(page.locator("[data-cell-open]").first).to_contain_text("Aperture Science")
+    expect(page.locator("[data-cell-value]").first).to_contain_text("Aperture Science")
 
 
 def test_a_refusal_appears_in_the_cell_and_the_value_stays_to_be_fixed(

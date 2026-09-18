@@ -6,6 +6,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🐛 Fixed
+
+- On *Companies*, a company's name opens the company, as a name does in every other list;
+  renaming it where it sits is the pencil beside the name. (#252)
+
 ## [0.3.0] — 2026-09-16
 
 ### 🔒 Security

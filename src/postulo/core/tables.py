@@ -71,6 +71,17 @@ class Column:
     #: read off a posting belongs to the posting, and a status goes through a service that
     #: writes a timeline entry, so a cell that skipped it would be worse than no cell (#135).
     editable: str = ""
+    #: What the pencil that opens the editor is called, with ``%(what)s`` standing for the
+    #: row: *Rename %(what)s*. Required wherever ``editable`` is, because the pencil is an
+    #: icon and an icon is not a name -- and a table of controls all called *Edit* is a list
+    #: of links that all say the same thing (#252).
+    edit_label: str = ""
+
+    def __post_init__(self) -> None:
+        if self.editable and not self.edit_label:
+            raise ValueError(
+                f"column {self.key!r} can be edited in place, but its pencil has no name"
+            )
 
     @property
     def name(self) -> str:

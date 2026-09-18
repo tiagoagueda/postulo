@@ -45,8 +45,16 @@ would be worse than offering nothing.
 stamp has moved is refused rather than applied. Last-write-wins with nobody told is the
 outcome that is hardest to notice and hardest to undo; being told is cheap.
 
-**With no script the cell is a link to the form.** That is a complete fallback rather than a
-degraded one: it is exactly what the table did before this existed.
+**The value is the record's link, and the pencil beside it is the editor.** The first
+version made the value itself the thing to click, and on *Companies* that was the one list
+in Postulo where a name did not open the record: the obvious gesture renamed, and the
+company's own page was not linked from the row at all (#252). So the value links where a
+name links in every other list, and editing in place is a pencil with a name of its own,
+declared on the column, because an icon is not a name.
+
+**With no script the pencil is a link to the form.** That is a complete fallback rather than
+a degraded one: the whole record with every field open at once, which is exactly what the
+table linked to before any of this existed.
 """
 
 from __future__ import annotations
@@ -108,12 +116,21 @@ class EditableCellView(View):
         return narrowed(data=data, instance=instance, user=self.request.user)
 
     def form_url(self, obj) -> str:
-        """Where the cell points when there is no script to open an editor.
+        """Where the pencil points when there is no script to open an editor.
 
         The page the whole value is edited on, which is what the table linked to before any
         of this existed -- so *scripts off* degrades to exactly today rather than to nothing.
         """
         return reverse(self.form_url_name, args=[obj.pk])
+
+    def record_url(self, obj, column) -> str:
+        """Where the value points: the record's own page, which is what a name opens in
+        every other list (#252).
+
+        Empty for a value that is not the record's name, which a subclass says by column;
+        nothing today has one, and a cell told nothing draws its value as plain text.
+        """
+        return obj.get_absolute_url() if hasattr(obj, "get_absolute_url") else ""
 
     def render(self, request, obj, column, form=None, editing=False, message=""):
         """The cell, however it currently is.
@@ -140,6 +157,7 @@ class EditableCellView(View):
                 "stamp": obj.updated_at.isoformat() if hasattr(obj, "updated_at") else "",
                 "cell_url": request.path,
                 "form_url": self.form_url(obj),
+                "record_url": self.record_url(obj, column),
             },
         )
 

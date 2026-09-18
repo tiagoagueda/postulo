@@ -16,11 +16,12 @@
       <td class="px-4 py-3">
         <span class="flex items-center gap-2">
           {% company_logo company %}
-          {% comment %} Changed where it sits, or -- with no script -- a link to the form,
-             which is exactly what this was before (#135). {% endcomment %}
+          {% comment %} The name opens the company, as a name does in every other list; the
+             pencil beside it renames where it sits, or -- with no script -- is a link to
+             the form, which is exactly what the name was before (#135, #252). {% endcomment %}
           {% url 'jobs:company_cell' company.pk 'name' as cell_url %}
           {% url 'jobs:company_update' company.pk as form_url %}
-          {% include "partials/table/cell.html" with object=company value=company.name editing=False message="" cell_url=cell_url form_url=form_url %}
+          {% include "partials/table/cell.html" with object=company value=company.name editing=False message="" cell_url=cell_url form_url=form_url record_url=company.get_absolute_url %}
           {% if company.is_employment_service %}
             <span class="chip py-0 text-xs"><span class="chip-text">{{ company.get_kind_display }}</span></span>
           {% endif %}

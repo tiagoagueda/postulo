@@ -321,6 +321,17 @@ def get_item(mapping, key):
 
 
 @register.filter
+def named(label, what) -> str:
+    """A declared label with its row filled in: ``label % {"what": what}``.
+
+    A column that can be edited where it sits declares what its pencil is called --
+    *Rename %(what)s* -- and the row is only known when the cell is drawn, so the two meet
+    here rather than in a view that the first render never passes through (#252).
+    """
+    return str(label) % {"what": what}
+
+
+@register.filter
 def add_class(field: BoundField, css_classes: str) -> BoundField:
     """Append CSS classes to a form widget.
 

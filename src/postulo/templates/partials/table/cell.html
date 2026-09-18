@@ -9,8 +9,15 @@
   `field_feedback` every other field in Postulo uses, and `aria-invalid` on the input. The
   row is taller while that is true, which it already was, because it is holding an input.
 
-  **With no script this is a link to the form**, which is exactly what the table did before
-  any of this existed. `hx-get` only does something where htmx is there to do it.
+  **The value opens the record; the pencil beside it opens the editor** (#252). The first
+  version made the value the thing to click, which on *Companies* turned the one gesture
+  every other list uses to open a record into a rename. So the value is a plain link to the
+  record's page wherever the caller says where that is, and editing in place is the pencil
+  — named for its row through `Column.edit_label`, because an icon is not a name.
+
+  **With no script the pencil is a link to the form**: the whole record with every field
+  open, which is exactly what the table linked to before any of this existed. `hx-get` only
+  does something where htmx is there to do it.
 
   A span rather than the whole cell, so a column that draws something else beside the value
   — a logo, an icon — keeps it while the value is being changed.
@@ -35,9 +42,17 @@
       </span>
     </form>
   {% else %}
-    <a href="{{ form_url }}" class="font-medium hover:underline" data-cell-open
-       hx-get="{{ cell_url }}" hx-target="closest [data-cell]"
-       hx-swap="outerHTML">{{ value|default:"—" }}</a>
+    <span class="inline-flex items-center gap-1">
+      {% if record_url %}
+        <a href="{{ record_url }}" class="font-medium hover:underline" data-cell-value><bdi>{{ value|default:"—" }}</bdi></a>
+      {% else %}
+        <span class="font-medium" data-cell-value><bdi>{{ value|default:"—" }}</bdi></span>
+      {% endif %}
+      <a href="{{ form_url }}"
+         class="tap-target justify-center rounded text-ink-500 hover:text-ink-900 dark:text-ink-400 dark:hover:text-ink-100"
+         data-cell-open hx-get="{{ cell_url }}" hx-target="closest [data-cell]" hx-swap="outerHTML"
+         aria-label="{{ column.edit_label|named:object }}">{% icon "pencil" class="size-3.5" %}</a>
+    </span>
     {% if message %}
       <span class="mt-1 block text-sm text-amber-700 dark:text-amber-400"
             role="status">{{ message }}</span>

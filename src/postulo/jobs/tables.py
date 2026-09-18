@@ -22,7 +22,8 @@ class CompaniesTable(Table):
         # choosing first: it has a real refusal to place -- two companies of one name
         # in one account -- which is the question #135 exists to answer. The counts
         # cannot be edited because they are counts, and the dates belong to the rows
-        # they are counted from.
+        # they are counted from. The name itself opens the company, as a name does in
+        # every other list; the pencil beside it is what renames (#252).
         Column(
             "name",
             _("Name"),
@@ -31,6 +32,7 @@ class CompaniesTable(Table):
             lookups=("name",),
             default=True,
             editable="name",
+            edit_label=_("Rename %(what)s"),
         ),
         Column(
             "location",
