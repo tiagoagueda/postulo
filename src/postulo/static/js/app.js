@@ -858,6 +858,53 @@
     }
   });
 
+  // A menu's items answer to the arrow keys, as a menu is expected to (#262). The
+  // disclosure already opens on Enter and Space and closes on Escape (above). This adds
+  // ArrowDown and ArrowUp on the summary, which open it onto the first or the last item,
+  // and ArrowDown, ArrowUp, Home and End inside it, which move between the items and wrap.
+  // The items are links and buttons, so Enter and Space act on them with no help. Only a
+  // menu of actions -- `.dropdown-menu`, which carries `role="menu"` -- gets this; the
+  // account disclosure is navigation, where Tab is the right key.
+  function menuItems(menu) {
+    return Array.prototype.slice
+      .call(menu.querySelectorAll('[role="menuitem"]'))
+      .filter(function (item) {
+        return !item.disabled && item.getAttribute("aria-disabled") !== "true";
+      });
+  }
+
+  document.addEventListener("keydown", function (event) {
+    if (["ArrowDown", "ArrowUp", "Home", "End"].indexOf(event.key) === -1) {
+      return;
+    }
+    if (event.altKey || event.ctrlKey || event.metaKey || event.isComposing) {
+      return;
+    }
+    var menu = event.target.closest("details[data-menu].dropdown-menu");
+    if (!menu) {
+      return;
+    }
+    var items = menuItems(menu);
+    if (!items.length) {
+      return;
+    }
+    event.preventDefault();
+    var current = items.indexOf(event.target);
+    var next;
+    if (event.key === "Home" || (event.key === "ArrowDown" && (current === -1 || !menu.open))) {
+      next = 0;
+    } else if (event.key === "End" || (event.key === "ArrowUp" && (current === -1 || !menu.open))) {
+      next = items.length - 1;
+    } else if (event.key === "ArrowDown") {
+      next = (current + 1) % items.length;
+    } else {
+      next = (current - 1 + items.length) % items.length;
+    }
+    closeMenus(menu);
+    menu.open = true;
+    items[next].focus();
+  });
+
   // The language picker, which is a disclosure rather than a <select> because an <option>
   // cannot hold a flag, a language-marked name and a symbol at once (#119).
   //

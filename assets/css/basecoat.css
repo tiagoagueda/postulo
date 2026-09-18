@@ -114,3 +114,44 @@
     outline-offset: 2px;
   }
 }
+
+/* ------------------------------------------------- popover and dropdown menu */
+
+/*
+ * The box every disclosure in this project had been drawing by hand -- the account
+ * menu's `rounded-xl border bg-white py-1 shadow-lg`, copied into the row menus in three
+ * spellings -- painted once on Basecoat's `[data-popover]`, which `components/popover.css`
+ * places from `data-side` and `data-align` and hides while a script says so. Nothing here
+ * says so: the box sits inside a `<details>`, and closed is closed.
+ *
+ * `w-56` is the width the account menu always had, and `max-w-[calc(100vw-2rem)]` is the
+ * screen less its gutter, because Basecoat sizes the box to its widest item on one line
+ * (`w-max`) and an item in Greek is wider than a phone (#113). The items wrap for the same
+ * reason, undoing Basecoat's `truncate`: an entry cut to "Plugins for this…" is an entry
+ * nobody can read. Focus is the outline the rest of the interface uses, inset so the box's
+ * `overflow: hidden` does not clip it, because Basecoat's `outline-hidden` would leave an
+ * item's focus to a background change that reads at barely 1.1:1.
+ */
+@layer components {
+  [data-popover] {
+    @apply w-56 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-popover py-1
+      text-popover-foreground shadow-lg;
+  }
+
+  .dropdown-menu [role="menuitem"] {
+    @apply cursor-pointer gap-2 px-3 py-2 text-start text-sm whitespace-normal text-ink-700
+      hover:bg-accent hover:text-accent-foreground
+      focus-visible:bg-accent focus-visible:text-accent-foreground
+      focus-visible:outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2
+      focus-visible:outline-brand-500
+      dark:text-ink-200;
+  }
+
+  .dropdown-menu [role="menuitem"][data-variant="destructive"] {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  .dropdown-menu [role="separator"] {
+    @apply my-1 border-t border-border;
+  }
+}

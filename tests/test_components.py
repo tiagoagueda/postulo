@@ -215,3 +215,23 @@ def test_isolation_would_run_every_context_processor_once_per_component(db, sett
     assert rendered_with(False) == 1, "the page's own pass, and nothing per component"
     # Three fields, each drawing its feedback as a component of its own: six more passes.
     assert rendered_with(True) == 7, "the page's pass plus one per component, nested ones too"
+
+
+def test_a_dropdown_menu_is_a_disclosure_that_says_it_is_a_menu():
+    """Basecoat's dropdown menu on a `<details>` (#262): the browser opens it with no
+    script, the trigger and the menu share the name, and the items are the caller's."""
+    html = render(
+        '{% cotton dropdown-menu label="Actions for Jo" %}'
+        "{% cotton:slot trigger %}...{% endcotton:slot %}"
+        '<a href="/x" role="menuitem">Edit</a>'
+        "{% endcotton %}"
+    )
+
+    assert '<details class="dropdown-menu" data-menu>' in html
+    assert (
+        '<summary class="btn cursor-pointer" data-variant="ghost" data-size="icon-xs" '
+        'aria-label="Actions for Jo">...</summary>'
+    ) in html
+    assert '<div data-popover data-align="end">' in html
+    assert '<div role="menu" aria-label="Actions for Jo">' in html
+    assert '<a href="/x" role="menuitem">Edit</a>' in html

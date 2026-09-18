@@ -143,14 +143,18 @@
               </form>
               {# The account menu: a disclosure the browser opens and closes itself, with #}
               {# the script only adding "close when the pointer goes elsewhere". #}
-              <details class="relative" data-menu>
+              {% comment %} Basecoat's popover for the box, and no `role="menu"`: this is
+                 navigation -- three links, a switch and sign-out -- and the pattern for that
+                 is a disclosure, where Tab moves between the rows. The people table's row
+                 actions are a menu of actions and are drawn as one (#262). {% endcomment %}
+              <details class="popover" data-menu>
                 <summary class="{% nav_active 'accounts:profile' %} flex cursor-pointer items-center gap-2"
                          aria-label="{% blocktranslate trimmed with name=user.display_name %}Account menu, {{ name }}{% endblocktranslate %}">
                   {% avatar user %}
                   <span class="hidden sm:inline">{{ user.display_name }}</span>
                   {% icon "chevron-down" class="size-4 text-ink-400" %}
                 </summary>
-                <div class="absolute end-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border border-ink-200 bg-white py-1 shadow-lg dark:border-ink-800 dark:bg-ink-900">
+                <div data-popover data-align="end">
                   <a href="{% url 'accounts:profile' %}" class="menu-item">
                     {% icon "user" %}{% translate "Your details" %}
                   </a>

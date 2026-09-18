@@ -10,6 +10,13 @@ import { dirname, join } from "node:path";
 const DESTINATION = "src/postulo/static/js/vendor";
 
 // [source in node_modules, name under DESTINATION]
+//
+// Basecoat's component scripts (`basecoat-css/dist/js/*`) are not in this list on purpose
+// (#262). Its dropdown menu wants a <button> trigger and hides the panel until the script
+// runs, so a menu it drives has no path with scripts off; Postulo puts Basecoat's markup and
+// stylesheet on a <details> the browser opens itself, and app.js adds the arrow keys. Its
+// accordion is a <details> already and needs no script; its tabs would need the no-script
+// shape settled first. Vendor one here the day a component genuinely needs it.
 const FILES = [
   // zxcvbn estimates password strength in the browser, so a password never leaves it
   // before the person submits the form. Core plus the dictionaries it scores against.

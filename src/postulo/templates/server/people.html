@@ -56,43 +56,41 @@
             </td>
             <td class="px-4 py-3" role="cell" data-actions>
               <div class="flex justify-end">
-                <details class="relative" data-menu>
-                  <summary class="btn cursor-pointer" data-variant="ghost" data-size="xs"
-                           aria-label="{% blocktranslate trimmed with name=person.username %}Actions for {{ name }}{% endblocktranslate %}">
-                    {% icon "ellipsis-vertical" %}
-                  </summary>
-                  <div class="absolute end-0 z-20 mt-1 w-56 overflow-hidden rounded-xl border border-ink-200 bg-white py-1 text-start shadow-lg dark:border-ink-800 dark:bg-ink-900">
-                    <a href="{% url 'server:person_username' person.pk %}" class="menu-item">
-                      {% icon "pencil" %}{% translate "Change username" %}
-                    </a>
-                    <a href="{% url 'server:person_plugins' person.pk %}" class="menu-item">
-                      {% icon "settings" %}{% translate "Plugins for this account" %}
-                    </a>
-                    <a href="{% url 'server:person_recovery' person.pk %}" class="menu-item">
-                      {% icon "shield" %}{% translate "Recovery link" %}
-                    </a>
-                    <form method="post" action="{% url 'server:person_admin' person.pk %}">
+                <c-dropdown-menu label="{% blocktranslate trimmed with name=person.username %}Actions for {{ name }}{% endblocktranslate %}">
+                  <c-slot name="trigger">{% icon "ellipsis-vertical" %}</c-slot>
+                  <a href="{% url 'server:person_username' person.pk %}" role="menuitem">
+                    {% icon "pencil" %}{% translate "Change username" %}
+                  </a>
+                  <a href="{% url 'server:person_plugins' person.pk %}" role="menuitem">
+                    {% icon "settings" %}{% translate "Plugins for this account" %}
+                  </a>
+                  <a href="{% url 'server:person_recovery' person.pk %}" role="menuitem">
+                    {% icon "shield" %}{% translate "Recovery link" %}
+                  </a>
+                  {% comment %} `role="none"` on the form, so the menu owns the button and not
+                     a form: a menu's children are its items, and a screen reader that finds
+                     something else in between stops treating it as one. {% endcomment %}
+                  <form method="post" action="{% url 'server:person_admin' person.pk %}" role="none">
+                    {% csrf_token %}
+                    <button type="submit" role="menuitem">
+                      {% icon "shield" %}
+                      {% if person.is_staff %}{% translate "Remove administrator" %}{% else %}{% translate "Make administrator" %}{% endif %}
+                    </button>
+                  </form>
+                  {% if person != user %}
+                    <hr role="separator">
+                    <form method="post" action="{% url 'server:person_active' person.pk %}" role="none">
                       {% csrf_token %}
-                      <button type="submit" class="menu-item">
-                        {% icon "shield" %}
-                        {% if person.is_staff %}{% translate "Remove administrator" %}{% else %}{% translate "Make administrator" %}{% endif %}
+                      <button type="submit" role="menuitem"{% if person.is_active %} data-variant="destructive"{% endif %}>
+                        {% icon "circle-x" %}
+                        {% if person.is_active %}{% translate "Deactivate" %}{% else %}{% translate "Reactivate" %}{% endif %}
                       </button>
                     </form>
-                    {% if person != user %}
-                      <div class="my-1 border-t border-ink-200 dark:border-ink-800" role="separator"></div>
-                      <form method="post" action="{% url 'server:person_active' person.pk %}">
-                        {% csrf_token %}
-                        <button type="submit" class="menu-item {% if person.is_active %}text-red-600 dark:text-red-400{% endif %}">
-                          {% icon "circle-x" %}
-                          {% if person.is_active %}{% translate "Deactivate" %}{% else %}{% translate "Reactivate" %}{% endif %}
-                        </button>
-                      </form>
-                      <a href="{% url 'server:person_delete' person.pk %}" class="menu-item text-red-600 dark:text-red-400">
-                        {% icon "trash-2" %}{% translate "Delete account" %}
-                      </a>
-                    {% endif %}
-                  </div>
-                </details>
+                    <a href="{% url 'server:person_delete' person.pk %}" role="menuitem" data-variant="destructive">
+                      {% icon "trash-2" %}{% translate "Delete account" %}
+                    </a>
+                  {% endif %}
+                </c-dropdown-menu>
               </div>
             </td>
           </tr>

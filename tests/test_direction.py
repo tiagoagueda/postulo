@@ -193,11 +193,18 @@ def test_machine_text_is_isolated_by_the_stylesheet_rather_than_by_markup():
 
 
 def test_the_skip_link_and_the_menus_are_anchored_logically():
-    """The three places that positioned themselves against an edge by name."""
+    """The three places that positioned themselves against an edge by name.
+
+    The account menu is Basecoat's popover now (#262): it names its edge as
+    `data-align="end"`, and what matters is that the stylesheet turns that into a logical
+    inset and never a physical one.
+    """
     base = (TEMPLATES / "base.html").read_text(encoding="utf-8")
     columns = (TEMPLATES / "partials" / "table" / "columns.html").read_text(encoding="utf-8")
+    compiled = (TEMPLATES.parent / "static" / "css" / "app.css").read_text(encoding="utf-8")
 
-    assert "end-0" in base and "right-0" not in base
+    assert 'data-popover data-align="end"' in base and "right-0" not in base
+    assert re.search(r"&\[data-align='end'\]\s*\{\s*inset-inline-end", compiled)
     assert "end-0" in columns and "right-0" not in columns
 
 

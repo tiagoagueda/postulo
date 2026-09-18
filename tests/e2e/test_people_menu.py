@@ -87,14 +87,43 @@ def test_the_menu_opens_and_its_actions_still_work(page: Page, live_server, admi
     row = page.locator(f"tr[data-person='{other.username}']")
     menu = row.locator("details[data-menu]")
 
-    expect(row.get_by_role("link", name="Change username")).to_be_hidden()
+    expect(row.get_by_role("menuitem", name="Change username")).to_be_hidden()
     menu.locator("summary").click()
-    expect(row.get_by_role("link", name="Change username")).to_be_visible()
+    expect(row.get_by_role("menuitem", name="Change username")).to_be_visible()
 
-    row.get_by_role("button", name="Make administrator").click()
+    row.get_by_role("menuitem", name="Make administrator").click()
 
     other.refresh_from_db()
     assert other.is_staff, "the form inside the menu did not submit"
+
+
+def test_the_menu_answers_to_the_arrow_keys(page: Page, live_server, administrator):
+    """It says it is a menu (#262), so it has to behave like one: ArrowDown on the trigger
+    opens it onto the first item, End goes to the last, ArrowDown wraps, and Escape closes
+    it and puts focus back where it came from."""
+    _admin, other = administrator
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/server/people/")
+
+    row = page.locator(f"tr[data-person='{other.username}']")
+    summary = row.locator("details[data-menu] summary")
+    summary.focus()
+    page.keyboard.press("ArrowDown")
+
+    def focused() -> str:
+        return page.evaluate("() => document.activeElement.textContent.trim()")
+
+    expect(row.locator("details[data-menu]")).to_have_attribute("open", "")
+    assert focused() == "Change username"
+    page.keyboard.press("End")
+    assert focused() == "Delete account"
+    page.keyboard.press("ArrowDown")
+    assert focused() == "Change username", "wraps"
+    page.keyboard.press("ArrowUp")
+    assert focused() == "Delete account", "and back"
+    page.keyboard.press("Escape")
+    expect(row.locator("details[data-menu]")).not_to_have_attribute("open", "")
+    assert page.evaluate("() => document.activeElement.tagName") == "SUMMARY"
 
 
 def test_only_one_menu_is_ever_open(page: Page, live_server, administrator):

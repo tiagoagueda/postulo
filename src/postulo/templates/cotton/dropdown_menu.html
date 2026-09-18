@@ -1,0 +1,24 @@
+<c-vars label trigger trigger_class="btn cursor-pointer" trigger_variant="ghost" trigger_size="icon-xs" align="end" />
+{% comment %} A menu of actions on a row or a record: Basecoat's dropdown menu, on a disclosure
+   the browser opens by itself (#262).
+
+   `<c-dropdown-menu label="…">` with the items as its content -- each an `<a role="menuitem">`,
+   a `<button role="menuitem">` inside a `<form role="none">`, or an `<hr role="separator">` --
+   and the trigger's content in a `trigger` slot. `label` names both the trigger and the menu.
+
+   Basecoat's own dropdown menu is a `<button>` and a panel its script shows; with no script
+   the panel stays hidden, and a menu somebody cannot open with scripts off is not one this
+   project ships. So the root is a `<details>` and the trigger its `<summary>`: the browser
+   opens and closes it, `app.js` adds what the platform does not -- close when the pointer
+   goes elsewhere or Escape is pressed, and the arrow keys a menu is expected to answer to --
+   and Basecoat's script is not vendored at all. Its markup and its stylesheet are: the
+   `[data-popover]` box and where it sits, `role="menu"`, and items keyed on their role.
+{% endcomment %}
+<details class="dropdown-menu" data-menu>
+  <summary class="{{ trigger_class }}"{% if trigger_variant %} data-variant="{{ trigger_variant }}"{% endif %}{% if trigger_size %} data-size="{{ trigger_size }}"{% endif %} aria-label="{{ label }}">{{ trigger }}</summary>
+  <div data-popover data-align="{{ align }}">
+    <div role="menu" aria-label="{{ label }}">
+      {{ slot }}
+    </div>
+  </div>
+</details>
