@@ -159,6 +159,46 @@ def test_placeholder_problems_are_named(tool):
     assert any(p.endswith("has 3") for p in tool.problems_in(catalogue, "pl"))
 
 
+def test_a_form_that_also_counts_twenty_one_cannot_spell_out_one(tool):
+    """Slavic, Baltic and Icelandic first forms cover 1, 21, 31 and so on, and Slovene's
+    covers 101. A form that only ever says *one* may drop the count; one that also counts
+    higher may not, or the page says "one application" at twenty-one, which nobody sees
+    until somebody has twenty-one of something (#250).
+    """
+
+    def catalogue(*forms):
+        return tool.Catalogue(
+            header={},
+            messages={
+                (None, "One row ticked."): tool.Message(
+                    msgid="One row ticked.", plural="%(count)s rows ticked.", msgstr=list(forms)
+                )
+            },
+        )
+
+    assert tool.counts_beyond_one("fr-fr") == (False, True), "0 and 1, then everything else"
+    assert tool.counts_beyond_one("bs") == (True, True, True), "the first form counts 21"
+    assert tool.counts_beyond_one("sl") == (True, True, True, True), "and Slovene's 101"
+
+    french = catalogue("Une ligne cochée.", "%(count)s lignes cochées.")
+    assert tool.problems_in(french, "fr-fr") == []
+
+    spelt_out = catalogue(
+        "Jedan red označen.", "%(count)s reda označena.", "%(count)s redova označeno."
+    )
+    problems = tool.problems_in(spelt_out, "bs")
+    assert len(problems) == 1 and "form 0" in problems[0] and "%(count)s" in problems[0]
+
+    counted = catalogue(
+        "%(count)s red označen.", "%(count)s reda označena.", "%(count)s redova označeno."
+    )
+    assert tool.problems_in(counted, "bs") == []
+
+    dual = catalogue("Ena vrstica.", "Dve vrstici.", "%(count)s vrstice.", "%(count)s vrstic.")
+    problems = tool.problems_in(dual, "sl")
+    assert [p for p in problems if "form 0" in p] and [p for p in problems if "form 1" in p]
+
+
 def test_stats_count_drafts_apart_from_reviewed_work(tool):
     catalogue = tool.Catalogue(
         header={},

@@ -135,8 +135,8 @@ uv run python scripts/messages.py stats [--write]  # progress; --write refreshes
 
 `extract` keeps every existing translation and its flags, adds a slot for each new string
 and drops the ones the source no longer has. `check` refuses a translation that lost or
-invented a `%(placeholder)s`, and a plural entry with the wrong number of forms for its
-language. Both run on every push, so a pull request that adds a string without a slot for
+invented a `%(placeholder)s`, a plural entry with the wrong number of forms for its
+language, and a plural form that drops the count where its rule also covers twenty-one. Both run on every push, so a pull request that adds a string without a slot for
 it, or a translation that would raise at render time, does not get in.
 
 Compiled `.mo` files are build artefacts and are not committed; the container image, the
@@ -182,7 +182,11 @@ help rather than fight that.
 - Translate meaning, not words. *Ghosted* describes an employer that stopped replying;
   render it however your language expresses that, even if the wording differs.
 - Keep placeholders such as `%(company)s` intact and in a natural position for your
-  language. A plural form may drop the count where the language does ("one company").
+  language. A plural form may drop the count only where that form never says anything but
+  *one*: French can write "une entreprise", because its first form covers 0 and 1 and
+  nothing else. A Slavic, Baltic or Icelandic first form also covers 21, 31 and 101, so it
+  must keep `%(counter)s`, or the page says "one application" at twenty-one. `check` refuses
+  a form that drops the count where its rule also counts higher.
 - Domain terms worth agreeing on before you start: *application*, *posting*, *listing*,
   *CV*, *cover letter*, *screening*, *offer*, *withdrawn*, *capture*. Stay consistent
   across the catalogue; the drafts already are, so a term you change is worth changing

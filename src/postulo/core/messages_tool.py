@@ -30,6 +30,8 @@ from __future__ import annotations
 
 import argparse
 import ast
+import functools
+import gettext
 import io
 import json
 import re
@@ -698,9 +700,28 @@ def placeholders(text: str) -> list[str]:
     return sorted(m.group(0) for m in PLACEHOLDER.finditer(text) if m.group(0) != "%%")
 
 
+@functools.cache
+def counts_beyond_one(code: str) -> tuple[bool, ...]:
+    """For each plural form of a language, whether its rule also selects a count of two or
+    more.
+
+    A form that only ever says *one* may spell the number out. A form that also counts
+    twenty-one -- the Slavic, Baltic and Icelandic first forms, Slovene's at a hundred and
+    one -- must carry the placeholder, or the page says "one application" at twenty-one,
+    which nobody sees until somebody has twenty-one of something (#250).
+    """
+    header = PLURAL_FORMS.get(code, "nplurals=2; plural=(n != 1);")
+    rule = gettext.c2py(header.split("plural=", 1)[1].strip().rstrip(";"))
+    beyond = [False] * nplurals(code)
+    for n in range(2, 1001):
+        beyond[rule(n)] = True
+    return tuple(beyond)
+
+
 def problems_in(catalogue: Catalogue, code: str) -> list[str]:
     found: list[str] = []
     forms = nplurals(code)
+    beyond = counts_beyond_one(code)
     for message in catalogue.messages.values():
         if not message.translated:
             continue
@@ -709,14 +730,19 @@ def problems_in(catalogue: Catalogue, code: str) -> list[str]:
         sources_ = [message.msgid] if message.plural is None else [message.msgid, message.plural]
         expected = {p for s in sources_ for p in placeholders(s)}
         named = {p for p in expected if p.startswith("%(") or p.startswith("{")}
-        for form in message.msgstr:
+        for index, form in enumerate(message.msgstr):
             got = set(placeholders(form))
-            # A plural form may drop the count ("one application"); a named placeholder
-            # must appear in every form, and nothing may be invented.
+            counts_higher = index < len(beyond) and beyond[index]
+            # A form that only ever says *one* may drop the count ("one application"); a
+            # form that also counts higher must carry every named placeholder; and nothing
+            # may be invented.
             if not got <= expected or (named and message.plural is None and got != expected):
                 found.append(f"{message.msgid!r} → {form!r}: placeholders differ")
-            elif message.plural is not None and named - got and form is message.msgstr[-1]:
-                found.append(f"{message.msgid!r} → {form!r}: named placeholder missing")
+            elif message.plural is not None and named - got and counts_higher:
+                found.append(
+                    f"{message.msgid!r} → {form!r}: form {index} also counts higher than one, "
+                    f"so it cannot drop {sorted(named - got)}"
+                )
     return found
 
 

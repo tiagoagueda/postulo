@@ -8,6 +8,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Nine catalogues wrote *one* in the plural form that also counts twenty-one; they carry the
+  number now, Slovene's dual and Irish's five forms are real, Maltese counts eleven to
+  nineteen in the singular, and a handful of wording and register splits are settled. (#250)
 - On *Companies*, a company's name opens the company, as a name does in every other list;
   renaming it where it sits is the pencil beside the name. (#252)
 
