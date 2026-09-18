@@ -121,6 +121,19 @@ def test_what_is_over_is_drawn_as_over_rather_than_dropped(user, application):
     assert [(e.kind, e.muted) for e in events] == [("reminder", True), ("interview", True)]
 
 
+def test_what_is_over_says_so_to_a_screen_reader_and_is_not_faded(client, user):
+    """The strike says "over" to eyes; the word says it to a screen reader, and the fading
+    that went with the strike took 12-pixel text under 4.5:1 (#274)."""
+    done = Reminder.objects.create(owner=user, summary="Done", due_at=at(2026, 9, 3))
+    done.complete()
+    client.force_login(user)
+
+    html = client.get(reverse(CALENDAR), {"month": "2026-09"}).content.decode()
+
+    assert "Done reminder:" in html
+    assert "line-through" in html and "opacity-60" not in html
+
+
 def test_one_person_never_sees_another(user, other_user):
     Reminder.objects.create(owner=other_user, summary="Theirs", due_at=at(2026, 9, 3))
     assert agenda.events_between(user, dt.date(2026, 9, 1), dt.date(2026, 10, 1)) == []

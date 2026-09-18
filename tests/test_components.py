@@ -56,7 +56,9 @@ def test_a_field_is_its_label_widget_help_and_errors():
     html = render('{% cotton field :field="form.name" / %}', form=form)
 
     assert '<label class="field-label" for="id_name">' in html
-    assert '<span aria-hidden="true" class="text-red-600">*</span>' in html, "required"
+    assert '<span aria-hidden="true" class="text-red-600 dark:text-red-400">*</span>' in html, (
+        "required"
+    )
     assert 'name="name"' in html and 'class="field-input"' in html
     assert '<p class="field-help" id="id_name_helptext">As it appears on your passport.</p>' in html
     assert '<div id="id_name_error" role="alert">' in html

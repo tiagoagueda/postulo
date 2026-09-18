@@ -16,6 +16,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A field's border clears 3:1 in both themes and darkens again for somebody who asked for
+  more contrast, focus on a field is an opaque ring, the section you are in is underlined,
+  weighted and announced, and a done reminder or a cancelled interview says so to a screen
+  reader instead of fading. (#274)
 - The report, *Tags*, *Industries*, an application's documents and the import mapping take
   the screen as every other list does, and a sweep over every page catches the next table
   left in the 1280-pixel column. (#273)

@@ -103,6 +103,9 @@ def test_the_wordmark_says_where_it_goes_once_dashboard_is_hidden(client, user):
     assert 'aria-label="Postulo — dashboard"' in html
     marked = set(re.findall(r'nav-link-active[^>]*data-nav="([^"]+)"', html))
     assert marked == {"applications"}, f"only the page you are on is marked, got {marked}"
+    # And marked for a screen reader as well as by the tint (#274).
+    assert re.search(r'nav-link-active[^>]*aria-current="page"', html)
+    assert html.count('aria-current="page"') == html.count("nav-link-active")
 
 
 def test_a_visitor_who_is_not_signed_in_sees_the_plain_wordmark(client):

@@ -11,11 +11,13 @@
    record as well as a plan. {% endcomment %}
 {% partialdef event %}
   <a href="{{ event.url }}"
-     class="flex min-h-6 items-start gap-1 rounded px-1 py-0.5 text-xs leading-5 hover:underline {% if event.kind == 'interview' %}bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100{% else %}bg-amber-50 text-amber-900 dark:bg-amber-900 dark:text-amber-100{% endif %}{% if event.muted %} line-through opacity-60{% endif %}"
+     class="flex min-h-6 items-start gap-1 rounded px-1 py-0.5 text-xs leading-5 hover:underline {% if event.kind == 'interview' %}bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100{% else %}bg-amber-50 text-amber-900 dark:bg-amber-900 dark:text-amber-100{% endif %}{% if event.muted %} line-through{% endif %}"
      data-event="{{ event.kind }}">
     <span class="shrink-0 tabular-nums">{{ event.local_start|date:"TIME_FORMAT" }}</span>
     <span class="min-w-0 {% if compact %}truncate{% endif %}">
-      <span class="sr-only">{% if event.kind == 'interview' %}{% translate "Interview:" %}{% else %}{% translate "Reminder:" %}{% endif %}</span>
+      {% comment %} The strike says "over" to eyes; the word says it to a screen reader, and
+         the fading that used to go with the strike took 12-pixel text under 4.5:1 (#274). {% endcomment %}
+      <span class="sr-only">{% if event.kind == 'interview' %}{% if event.muted %}{% translate "Cancelled interview:" %}{% else %}{% translate "Interview:" %}{% endif %}{% else %}{% if event.muted %}{% translate "Done reminder:" %}{% else %}{% translate "Reminder:" %}{% endif %}{% endif %}</span>
       {{ event.title }}{% if not compact and event.detail %} <span class="font-light">· {{ event.detail }}</span>{% endif %}
     </span>
   </a>

@@ -117,7 +117,12 @@
   --color-accent-foreground: var(--color-ink-900);
   --color-destructive: var(--color-red-600);
   --color-border: var(--color-ink-200);
-  --color-input: var(--color-ink-300);
+  /* The boundary of a field, and the only thing that says "this is a field". SC 1.4.11
+     wants 3:1 against what is on either side of it; `ink-300` gave 1.5:1 on white, so a
+     shade of its own, at L 0.62, which clears 3:1 against the field and the page in the
+     light theme. The dark value is ink-500's dark value, which already does (#274).
+     `tests/test_contrast.py` computes both from these tokens. */
+  --color-input: oklch(0.62 0.012 250);
   --color-ring: var(--color-brand-500);
 }
 
@@ -152,7 +157,19 @@
       --color-accent-foreground: var(--color-ink-50);
       --color-destructive: var(--color-red-400);
       --color-border: var(--color-ink-800);
+      --color-input: var(--color-ink-500);
+    }
+  }
+
+  /* Somebody who asked their system for more contrast gets a field boundary that is
+     darker again -- ink-700 on the light page, ink-300 on the dark one (#274). */
+  @media (prefers-contrast: more) {
+    :root {
       --color-input: var(--color-ink-700);
+
+      @variant dark {
+        --color-input: var(--color-ink-300);
+      }
     }
   }
 
@@ -305,6 +322,10 @@
    * screen reader still reads the value and the line explaining where it came from. The
    * `disabled` attribute would have given the same look and taken all three away.
    *
+   * The ring is opaque (#274). At 20% alpha it read at about 1.2:1 against white, which
+   * made the controls people type into the faintest focus in the application; every
+   * button, link and summary keeps the base outline, and a field's ring should say as much.
+   *
    * `outline-hidden`, not `outline-none`. They look the same and are not the same thing:
    * `outline-none` compiles to `outline-style: none`, which beats the base `:focus-visible`
    * rule on specificity and leaves the field with a border colour and a box-shadow ring as
@@ -314,11 +335,11 @@
    * the foot of this file then says what it should look like rather than leaving it to a
    * compiler's choice.
    */
-  @apply w-full rounded-lg border border-ink-300 bg-white px-3 py-2 text-sm
+  @apply w-full rounded-lg border border-input bg-white px-3 py-2 text-sm
     text-ink-900 placeholder:text-ink-400
     read-only:cursor-not-allowed read-only:bg-ink-50
-    focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-hidden
-    dark:border-ink-700 dark:bg-ink-950 dark:text-ink-100
+    focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:outline-hidden
+    dark:bg-ink-950 dark:text-ink-100
     dark:read-only:bg-ink-900;
 }
 
@@ -458,8 +479,12 @@
     @apply mt-1.5 text-xs font-medium text-red-600 dark:text-red-400;
   }
 
+  /* Weight and an underline as well as the tint (#274): the tint is 1.1:1 against the
+     header, which is nothing to somebody who does not see colour well and nothing at all
+     under forced colours, where a background is discarded and a text decoration kept. */
   .nav-link-active {
-    @apply nav-link bg-ink-100 text-ink-900 dark:bg-ink-800 dark:text-ink-50;
+    @apply nav-link bg-ink-100 font-semibold text-ink-900 underline decoration-2 underline-offset-4
+      dark:bg-ink-800 dark:text-ink-50;
   }
 
   /*

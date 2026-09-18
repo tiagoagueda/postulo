@@ -5,7 +5,10 @@
 
    `extra` is whatever the caller needs on top of the link's own style -- `block` for the
    stacked copy, so a link fills the panel rather than sitting at its text width. {% endcomment %}
+{% comment %} `aria-current="page"` on the section somebody is in (#274): the tint alone
+   said it, at 1.1:1, and said it to nobody using a screen reader. {% endcomment %}
 {% for item in nav_items %}
-  <a href="{% url item.url_name %}" class="{% nav_active_names item.active_names %} {{ extra }}"
-     data-nav="{{ item.key }}">{{ item.label }}</a>
+  {% nav_active_names item.active_names as css %}
+  <a href="{% url item.url_name %}" class="{{ css }} {{ extra }}"
+     data-nav="{{ item.key }}"{% if css == 'nav-link-active' %} aria-current="page"{% endif %}>{{ item.label }}</a>
 {% endfor %}
