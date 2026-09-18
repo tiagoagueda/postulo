@@ -177,7 +177,7 @@ def test_the_form_renderer_composes_with_the_component_loader(db):
     assert "<input" in html
 
 
-def test_isolation_would_run_every_context_processor_once_per_component(db, monkeypatch):
+def test_isolation_would_run_every_context_processor_once_per_component(db, settings, monkeypatch):
     """Why ``COTTON_ENABLE_CONTEXT_ISOLATION`` is off.
 
     With it on, cotton renders each component in a fresh ``RequestContext``, which runs
@@ -201,15 +201,16 @@ def test_isolation_would_run_every_context_processor_once_per_component(db, monk
     source = '{% cotton field :field="form.name" / %}' * 3
 
     def rendered_with(isolation: bool) -> int:
-        from django.test import override_settings
-
-        # The processor list holds import paths, so the engine is rebuilt to find the
-        # patched function; a settings change does exactly that.
-        with override_settings(COTTON_ENABLE_CONTEXT_ISOLATION=isolation):
-            calls.clear()
-            engine = engines["django"].engine
-            engine.from_string(source).render(RequestContext(request, {"form": NameForm()}))
-            return len(calls)
+        settings.COTTON_ENABLE_CONTEXT_ISOLATION = isolation
+        # The engine imports its processors on the first request-bound render and keeps
+        # them, so a page rendered by an earlier test has already pinned the real function.
+        # Assigning TEMPLATES makes Django throw the engine away and build one that finds
+        # the patched one.
+        settings.TEMPLATES = [dict(settings.TEMPLATES[0])]
+        calls.clear()
+        engine = engines["django"].engine
+        engine.from_string(source).render(RequestContext(request, {"form": NameForm()}))
+        return len(calls)
 
     assert rendered_with(False) == 1, "the page's own pass, and nothing per component"
     # Three fields, each drawing its feedback as a component of its own: six more passes.
