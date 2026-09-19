@@ -292,6 +292,16 @@ class CompanyIdentifierForm(forms.ModelForm):
             self.add_error("scheme", _("Choose what kind of identifier this is."))
         if data.get("scheme") and not data.get("value"):
             self.add_error("value", _("Type the identifier."))
+        # The name means something only for Other, and the display side has always read
+        # it only then. A name typed and then given another kind used to be stored,
+        # invisible everywhere and still in the export; it is blanked now, and an Other
+        # with no name -- which showed as the word "Other", telling nobody anything -- is
+        # refused (#284).
+        if data.get("scheme") == "other":
+            if not (data.get("label") or "").strip():
+                self.add_error("label", _("Say what this identifier is."))
+        else:
+            data["label"] = ""
         return data
 
 

@@ -1,0 +1,43 @@
+{% load i18n postulo %}
+<c-vars row />
+{% comment %} One identifier: what kind, the value, and -- when the kind is Other -- a name
+   for it. The same row on a company's form and on *Your details*, which used to be two
+   byte-identical copies (#284).
+
+   The name box is drawn only when it means something. The display side has always followed
+   that rule (`scheme_label` uses the label only for Other); the form contradicted it with
+   an empty box on every row, the widest thing competing with the value for space. The row
+   knows its kind when it renders, and `:has()` in the stylesheet follows the select as it
+   changes, so no script is needed for the box to appear when Other is chosen. A row that
+   somehow carries a name with another kind -- every row written before this could -- keeps
+   the box, because hiding a value makes it invisible and unremovable; the form blanks such
+   a name on save, so the row cleans itself up the next time it is touched.
+{% endcomment %}
+<li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
+  {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
+  <div class="name-if-other-row grid gap-3 sm:items-end"{% if row.label.value %} data-has-name{% endif %}>
+    <div>
+      <label class="field-label" for="{{ row.scheme.id_for_label }}">{% translate "Kind" %}</label>
+      {{ row.scheme|add_class:"field-input" }}
+    </div>
+    <div>
+      <label class="field-label" for="{{ row.value.id_for_label }}">{% translate "Identifier" %}</label>
+      {{ row.value|add_class:"field-input" }}
+    </div>
+    <div data-name-if-other>
+      <label class="field-label" for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
+      {{ row.label|add_class:"field-input" }}
+    </div>
+    {% if row.instance.pk %}
+      <label class="flex items-center gap-1.5 pb-2 text-sm">
+        {{ row.DELETE }} <span>{% translate "Remove" %}</span>
+      </label>
+    {% else %}
+      <span></span>
+    {% endif %}
+  </div>
+  {% for field in row.visible_fields %}
+    <c-field-feedback :field="field" />
+  {% endfor %}
+  {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+</li>

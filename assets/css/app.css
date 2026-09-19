@@ -655,6 +655,44 @@
    * label's own text stays where it was: this must not move anything, only enlarge what a
    * pointer can land on.
    */
+  /*
+   * A row with a name box that only means something when the kind is Other (#284). The box
+   * is hidden, and its grid track with it so the value takes the space, unless the row's
+   * select has Other chosen -- `:has()` follows the select live, so choosing Other reveals
+   * the box with no script -- or the row already holds a name (`data-has-name`), which is
+   * never hidden. Two shapes: kind, value, name, actions on the identifier rows; kind, name,
+   * actions on the telephone and postal rows.
+   */
+  .name-if-other-row {
+    @apply sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_auto];
+  }
+
+  .name-if-other-row:has(select option[value="other"]:checked),
+  .name-if-other-row[data-has-name] {
+    @apply sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,10rem)_auto];
+  }
+
+  .name-if-other-row-short {
+    @apply sm:grid-cols-[minmax(0,10rem)_auto];
+  }
+
+  .name-if-other-row-short:has(select option[value="other"]:checked),
+  .name-if-other-row-short[data-has-name] {
+    @apply sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_auto];
+  }
+
+  .name-if-other-row [data-name-if-other],
+  .name-if-other-row-short [data-name-if-other] {
+    display: none;
+  }
+
+  .name-if-other-row:has(select option[value="other"]:checked) [data-name-if-other],
+  .name-if-other-row[data-has-name] [data-name-if-other],
+  .name-if-other-row-short:has(select option[value="other"]:checked) [data-name-if-other],
+  .name-if-other-row-short[data-has-name] [data-name-if-other] {
+    display: block;
+  }
+
   .tap-target {
     @apply inline-flex min-h-6 min-w-6 items-center;
   }

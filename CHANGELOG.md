@@ -73,6 +73,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The "Name, if Other" box on identifier, telephone and address rows appears only when the
+  kind is Other, following the choice with no script, and a name given another kind is
+  blanked on save rather than stored invisibly; the identifier row is one component on
+  both pages that draw it. (#284)
 - Every third-party work shipped in the tree carries its notice beside it: zxcvbn's and
   htmx's beside the scripts, Basecoat's beside the stylesheet with a banner in it, copied by
   the sync script rather than remembered; htmx is pinned in `package.json` and synced like

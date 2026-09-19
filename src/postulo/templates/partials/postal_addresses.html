@@ -54,13 +54,14 @@
             {{ row.country|add_class:"field-input" }}
           </div>
         </div>
-        <div class="grid gap-3 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_auto] sm:items-end">
+        {% comment %} The name box only when the kind is Other, as on the other rows (#284). {% endcomment %}
+        <div class="name-if-other-row-short grid gap-3 sm:items-end"{% if row.label.value %} data-has-name{% endif %}>
           <div>
             <label class="field-label" for="{{ row.kind.id_for_label }}">{% translate "Kind" %}</label>
             {{ row.kind|add_class:"field-input" }}
           </div>
-          <div>
-            <label class="field-label" for="{{ row.label.id_for_label }}">{% translate "Name, if Other" %}</label>
+          <div data-name-if-other>
+            <label class="field-label" for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
             {{ row.label|add_class:"field-input" }}
           </div>
           {% comment %} Each its own hit area with room around it: WCAG 2.2 2.5.8 wants 24

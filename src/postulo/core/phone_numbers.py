@@ -312,8 +312,13 @@ class PhoneNumberForm(forms.ModelForm):
 
     def clean(self):
         data = super().clean()
-        if data.get("kind") == PhoneNumber.Kind.OTHER and not (data.get("label") or "").strip():
-            self.add_error("label", _("Say what this number is."))
+        if data.get("kind") == PhoneNumber.Kind.OTHER:
+            if not (data.get("label") or "").strip():
+                self.add_error("label", _("Say what this number is."))
+        else:
+            # A name typed and then given a kind that has one was stored and never shown;
+            # it is blanked with the kind that made it meaningless (#284).
+            data["label"] = ""
         return data
 
 

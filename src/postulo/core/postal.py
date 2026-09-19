@@ -189,8 +189,12 @@ class PostalAddressForm(forms.ModelForm):
 
     def clean(self):
         data = super().clean()
-        if data.get("kind") == PostalAddress.Kind.OTHER and not (data.get("label") or "").strip():
-            self.add_error("label", _("Say what this address is."))
+        if data.get("kind") == PostalAddress.Kind.OTHER:
+            if not (data.get("label") or "").strip():
+                self.add_error("label", _("Say what this address is."))
+        else:
+            # Blanked with the kind that made it meaningless (#284).
+            data["label"] = ""
         return data
 
     #: What this row's own country would usually expect. Filled by `_post_clean`.

@@ -1442,12 +1442,6 @@
     .sm\:grid-cols-\[minmax\(0\,9rem\)_minmax\(0\,1fr\)\] {
       grid-template-columns: minmax(0,9rem) minmax(0,1fr);
     }
-    .sm\:grid-cols-\[minmax\(0\,10rem\)_minmax\(0\,1fr\)_auto\] {
-      grid-template-columns: minmax(0,10rem) minmax(0,1fr) auto;
-    }
-    .sm\:grid-cols-\[minmax\(0\,12rem\)_minmax\(0\,1fr\)_minmax\(0\,10rem\)_auto\] {
-      grid-template-columns: minmax(0,12rem) minmax(0,1fr) minmax(0,10rem) auto;
-    }
     .sm\:grid-cols-\[minmax\(0\,14rem\)_1fr\] {
       grid-template-columns: minmax(0,14rem) 1fr;
     }
@@ -3413,6 +3407,26 @@
       top: calc(var(--spacing) * 2);
       padding-block: 0px;
     }
+  }
+  @media (width >= 40rem) {
+    .name-if-other-row {
+      grid-template-columns: minmax(0,12rem) minmax(0,1fr) auto;
+    }
+    .name-if-other-row:has(select option[value="other"]:checked), .name-if-other-row[data-has-name] {
+      grid-template-columns: minmax(0,12rem) minmax(0,1fr) minmax(0,10rem) auto;
+    }
+    .name-if-other-row-short {
+      grid-template-columns: minmax(0,10rem) auto;
+    }
+    .name-if-other-row-short:has(select option[value="other"]:checked), .name-if-other-row-short[data-has-name] {
+      grid-template-columns: minmax(0,10rem) minmax(0,1fr) auto;
+    }
+  }
+  .name-if-other-row [data-name-if-other], .name-if-other-row-short [data-name-if-other] {
+    display: none;
+  }
+  .name-if-other-row:has(select option[value="other"]:checked) [data-name-if-other], .name-if-other-row[data-has-name] [data-name-if-other], .name-if-other-row-short:has(select option[value="other"]:checked) [data-name-if-other], .name-if-other-row-short[data-has-name] [data-name-if-other] {
+    display: block;
   }
   .tap-target {
     display: inline-flex;

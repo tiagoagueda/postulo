@@ -65,34 +65,7 @@
         {% endif %}
         <ol class="space-y-3">
           {% for row in identifiers %}
-            <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
-              {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
-              <div class="grid gap-3 sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,10rem)_auto] sm:items-end">
-                <div>
-                  <label class="field-label" for="{{ row.scheme.id_for_label }}">{% translate "Kind" %}</label>
-                  {{ row.scheme|add_class:"field-input" }}
-                </div>
-                <div>
-                  <label class="field-label" for="{{ row.value.id_for_label }}">{% translate "Identifier" %}</label>
-                  {{ row.value|add_class:"field-input" }}
-                </div>
-                <div>
-                  <label class="field-label" for="{{ row.label.id_for_label }}">{% translate "Name, if Other" %}</label>
-                  {{ row.label|add_class:"field-input" }}
-                </div>
-                {% if row.instance.pk %}
-                  <label class="flex items-center gap-1.5 pb-2 text-sm">
-                    {{ row.DELETE }} <span>{% translate "Remove" %}</span>
-                  </label>
-                {% else %}
-                  <span></span>
-                {% endif %}
-              </div>
-              {% for field in row.visible_fields %}
-                <c-field-feedback :field="field" />
-              {% endfor %}
-              {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-            </li>
+            <c-identifier-row :row="row" />
           {% endfor %}
         </ol>
         <details class="mt-3 text-sm">
