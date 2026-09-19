@@ -286,13 +286,19 @@ def test_the_sources_widget_shows_the_quiet_column(client, user, company):
 
 
 def email_connection(user, **config):
+    from allauth.account.models import EmailAddress
+
+    # The notifier writes only to the person's own verified addresses since #232.
+    EmailAddress.objects.get_or_create(
+        user=user, email=user.email, defaults={"verified": True, "primary": True}
+    )
     connection = Connection(
         owner=user,
         kind="notifier",
         plugin="email",
         label="Mail me",
         enabled=True,
-        config={"to": "me@example.org", **config},
+        config={"to": user.email, **config},
     )
     connection.save()
     return connection
