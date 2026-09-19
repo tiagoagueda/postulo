@@ -434,25 +434,20 @@ class ProfileForm(forms.ModelForm):
                 avatars.forget_gravatar(profile)
 
 
-class AppearanceForm(forms.ModelForm):
-    """Settings → Appearance: the theme, the navigation, and how the dashboard behaves."""
+class AccessibilityForm(forms.ModelForm):
+    """Settings → Accessibility: what changes how the interface behaves for somebody who
+    needs it to behave differently (#281).
 
-    navigation = forms.MultipleChoiceField(
-        label=_("Show in the navigation"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
-        help_text=_(
-            "Everything here is reachable another way, so leaving one out takes nothing "
-            "away. The Postulo wordmark always goes to the dashboard."
-        ),
-    )
+    Two choices today, both moved from Appearance, where they were filed for want of
+    anywhere else: the order number on a career entry, for somebody who cannot use the
+    arrows (#203), and the way out of the single-key shortcuts, which WCAG 2.1.4 asks for
+    at level A (#227). The section is what makes the next one easy to add.
+    """
 
     class Meta:
         model = Profile
-        fields = ("theme", "quiet_after_days", "show_career_order", "keyboard_shortcuts")
-        widgets = {"theme": forms.RadioSelect}
+        fields = ("show_career_order", "keyboard_shortcuts")
         labels = {
-            "quiet_after_days": _("Consider an application quiet after"),
             "show_career_order": _("Show the order number on each career entry"),
             "keyboard_shortcuts": _("Let a single key do something"),
         }
@@ -468,6 +463,28 @@ class AppearanceForm(forms.ModelForm):
                 "computer, or if a key pressed by accident does more than you meant. "
                 "Shortcuts that need Ctrl go on working either way."
             ),
+        }
+
+
+class AppearanceForm(forms.ModelForm):
+    """Settings → Appearance: the theme, the navigation, and how the dashboard behaves."""
+
+    navigation = forms.MultipleChoiceField(
+        label=_("Show in the navigation"),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text=_(
+            "Everything here is reachable another way, so leaving one out takes nothing "
+            "away. The Postulo wordmark always goes to the dashboard."
+        ),
+    )
+
+    class Meta:
+        model = Profile
+        fields = ("theme", "quiet_after_days")
+        widgets = {"theme": forms.RadioSelect}
+        labels = {
+            "quiet_after_days": _("Consider an application quiet after"),
         }
 
     def __init__(self, *args, **kwargs):

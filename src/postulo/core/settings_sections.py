@@ -41,6 +41,16 @@ BUILTIN: tuple[SettingsSection, ...] = (
         icon="sun-moon",
         order=10,
     ),
+    # The choices that change how the interface behaves for somebody who needs it to
+    # behave differently. They were filed under Appearance for want of anywhere else, and
+    # somebody who needed them had to know to look under light and dark (#281).
+    SettingsSection(
+        slug="accessibility",
+        label=_("Accessibility"),
+        url_name="settings:accessibility",
+        icon="accessibility",
+        order=15,
+    ),
     SettingsSection(
         slug="locale",
         label=_("Language and time"),

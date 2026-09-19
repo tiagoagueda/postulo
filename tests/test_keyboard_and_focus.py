@@ -139,13 +139,17 @@ def test_turning_them_off_is_written_onto_the_body(client, user):
     assert 'data-shortcuts="off"' in html
 
 
-def test_appearance_offers_the_switch_and_saves_it(client, user):
+def test_accessibility_offers_the_switch_and_saves_it(client, user):
+    """Under *Settings -> Accessibility* since #281, where somebody who needs it will look."""
     client.force_login(user)
-    page = client.get(reverse("settings:appearance")).content.decode()
+    page = client.get(reverse("settings:accessibility")).content.decode()
     assert 'name="keyboard_shortcuts"' in page
+    assert "WCAG 2.2" in page and "wiki/Accessibility" in page, (
+        "the page says what it is checked against"
+    )
 
     # A checkbox left unticked posts nothing at all, which is how "off" arrives.
-    response = client.post(reverse("settings:appearance"), {"theme": "system"})
+    response = client.post(reverse("settings:accessibility"), {})
 
     assert response.status_code == 302
     assert Profile.objects.get(user=user).keyboard_shortcuts is False

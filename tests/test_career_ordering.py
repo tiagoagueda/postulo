@@ -257,20 +257,23 @@ def test_the_preference_brings_the_number_back_and_keeps_what_is_typed(client, u
     assert roles(user) == ["Existing", "Typed"]
 
 
-def test_the_preference_is_set_under_appearance_and_travels_with_the_export(client, user):
+def test_the_preference_is_set_under_accessibility_and_travels_with_the_export(client, user):
+    """Under *Accessibility* since #281; it was filed under *Appearance* before."""
     from postulo.core.export import build_document
 
     client.force_login(user)
-    response = client.post(
-        reverse("settings:appearance"), {"theme": "system", "show_career_order": "on"}
-    )
+    response = client.post(reverse("settings:accessibility"), {"show_career_order": "on"})
     assert response.status_code == 302
     assert Profile.objects.get(user=user).show_career_order is True
     assert build_document(user)["account"]["profile"]["show_career_order"] is True
 
-    response = client.post(reverse("settings:appearance"), {"theme": "system"})
+    response = client.post(reverse("settings:accessibility"), {})
     assert response.status_code == 302
     assert Profile.objects.get(user=user).show_career_order is False
 
-    page = client.get(reverse("settings:appearance")).content.decode()
+    page = client.get(reverse("settings:accessibility")).content.decode()
     assert 'name="show_career_order"' in page and "Your career" in page
+    assert (
+        'name="show_career_order"'
+        not in client.get(reverse("settings:appearance")).content.decode()
+    )

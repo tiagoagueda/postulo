@@ -7,6 +7,7 @@ app_name = "settings"
 urlpatterns = [
     path("", views.SettingsIndexView.as_view(), name="index"),
     path("appearance/", views.AppearanceView.as_view(), name="appearance"),
+    path("accessibility/", views.AccessibilityView.as_view(), name="accessibility"),
     path("language/", views.LocaleView.as_view(), name="locale"),
     path("account/", views.AccountView.as_view(), name="account"),
     path("plugins/", views.PluginsView.as_view(), name="plugins"),

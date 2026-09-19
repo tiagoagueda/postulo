@@ -204,7 +204,7 @@ def test_a_single_key_does_nothing_once_it_is_switched_off(page: Page, live_serv
     """WCAG 2.1.4, level A. The switch is under Settings → Appearance."""
     sign_in(page, live_server.url)
 
-    page.goto(f"{live_server.url}/settings/appearance/")
+    page.goto(f"{live_server.url}/settings/accessibility/")
     page.locator("#id_keyboard_shortcuts").uncheck()
     page.get_by_role("button", name="Save").click()
     page.goto(f"{live_server.url}/")

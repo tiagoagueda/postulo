@@ -18,7 +18,7 @@ from django.views.generic import RedirectView, TemplateView, UpdateView
 from postulo.core import site
 
 from . import addresses, passkeys, sso
-from .forms import AccountForm, AppearanceForm, LocaleForm
+from .forms import AccessibilityForm, AccountForm, AppearanceForm, LocaleForm
 from .models import Profile
 
 
@@ -59,6 +59,12 @@ class AppearanceView(ProfileSectionView):
     form_class = AppearanceForm
     template_name = "settings/appearance.html"
     section_title = _("Appearance")
+
+
+class AccessibilityView(ProfileSectionView):
+    form_class = AccessibilityForm
+    template_name = "settings/accessibility.html"
+    section_title = _("Accessibility")
 
 
 class LocaleView(ProfileSectionView):

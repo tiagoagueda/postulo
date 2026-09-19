@@ -57,33 +57,6 @@
         </p>
       </div>
     </div>
-    <div class="card mb-6">
-      <h2 class="mb-1 font-medium">{% translate "Your career" %}</h2>
-      {% comment %} An accessibility choice, beside the others here (#203). {% endcomment %}
-      {% comment %} The help is drawn here rather than by the feedback partial, so it carries
-         the id the checkbox's `aria-describedby` names (#207) -- and outside the label, so
-         the name says what the box is and the description says why. {% endcomment %}
-      <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
-        {{ form.show_career_order }}
-        <span>{{ form.show_career_order.label }}</span>
-      </label>
-      <p class="field-help" id="{{ form.show_career_order.auto_id }}_helptext">{{ form.show_career_order.help_text }}</p>
-      <c-field-feedback :field="form.show_career_order" errors-only />
-    </div>
-    <div class="card mb-6">
-      {% comment %} The way out of the single-key shortcuts, which WCAG 2.1.4 asks for at
-         level A and Postulo did not have: "d" on the capture review discarded a listing
-         straight away, and somebody dictating to their computer presses every letter of the
-         sentence (#227). Beside the other accessibility choices, and the help is drawn here
-         so that it carries the id the checkbox's `aria-describedby` names. {% endcomment %}
-      <h2 class="mb-1 font-medium">{% translate "Keyboard shortcuts" %}</h2>
-      <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
-        {{ form.keyboard_shortcuts }}
-        <span>{{ form.keyboard_shortcuts.label }}</span>
-      </label>
-      <p class="field-help" id="{{ form.keyboard_shortcuts.auto_id }}_helptext">{{ form.keyboard_shortcuts.help_text }}</p>
-      <c-field-feedback :field="form.keyboard_shortcuts" errors-only />
-    </div>
     <button type="submit" class="btn">{% translate "Save" %}</button>
   </form>
 {% endblock %}

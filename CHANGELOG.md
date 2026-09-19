@@ -34,6 +34,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- *Settings* has an *Accessibility* section of its own, holding the order number on career
+  entries and the keyboard-shortcuts switch, which were filed under *Appearance*, and
+  saying what Postulo is checked against and where to tell us when something does not
+  work. A bookmark to *Appearance* no longer shows those two. (#281)
 - `docs/PLAN.md` no longer restates where the project stands, which the tracker and the
   releases answer; it says what the tree holds today, the fifteen shipped plugins, the
   wiki and the sibling repositories, and what became of the open assumptions, and it is

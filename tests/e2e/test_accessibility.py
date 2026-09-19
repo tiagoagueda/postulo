@@ -287,6 +287,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/accounts/2fa/",
         "/settings/",
         "/settings/appearance/",
+        "/settings/accessibility/",
         "/?arrange=1",
         "/settings/language/",
         "/settings/account/",

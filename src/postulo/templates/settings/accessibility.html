@@ -1,0 +1,57 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Accessibility" %}</h1>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that." %}
+  </p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-6">
+      <h2 class="mb-1 font-medium">{% translate "Your career" %}</h2>
+      {% comment %} The number, for somebody who cannot use the arrows (#203). The help is
+         drawn here rather than by the feedback partial, so it carries the id the checkbox's
+         `aria-describedby` names (#207) -- and outside the label, so the name says what the
+         box is and the description says why. Moved here from Appearance (#281). {% endcomment %}
+      <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+        {{ form.show_career_order }}
+        <span>{{ form.show_career_order.label }}</span>
+      </label>
+      <p class="field-help" id="{{ form.show_career_order.auto_id }}_helptext">{{ form.show_career_order.help_text }}</p>
+      <c-field-feedback :field="form.show_career_order" errors-only />
+    </div>
+
+    <div class="card mb-6">
+      {% comment %} The way out of the single-key shortcuts, which WCAG 2.1.4 asks for at
+         level A and Postulo did not have: "d" on the capture review discarded a listing
+         straight away, and somebody dictating to their computer presses every letter of the
+         sentence (#227). Moved here from Appearance (#281). {% endcomment %}
+      <h2 class="mb-1 font-medium">{% translate "Keyboard shortcuts" %}</h2>
+      <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+        {{ form.keyboard_shortcuts }}
+        <span>{{ form.keyboard_shortcuts.label }}</span>
+      </label>
+      <p class="field-help" id="{{ form.keyboard_shortcuts.auto_id }}_helptext">{{ form.keyboard_shortcuts.help_text }}</p>
+      <c-field-feedback :field="form.keyboard_shortcuts" errors-only />
+    </div>
+
+    <button type="submit" class="btn">{% translate "Save" %}</button>
+  </form>
+
+  {% comment %} The conformance target, and where to say when something does not work: the
+     page somebody lands on when the interface does not work for them should say what it is
+     checked against and where to tell us, which is worth more than any one toggle (#281).
+     Reduced motion, more contrast and forced colours are read from the operating system,
+     which is the setting the person already made once for everything. {% endcomment %}
+  <p class="mt-6 text-xs text-ink-500 dark:text-ink-400">
+    {% blocktranslate trimmed with guide="https://source.tiagoagueda.com/postulo/postulo/wiki/Accessibility" %}
+      Postulo is checked against WCAG 2.2 at level AA, in both themes, at 320 pixels and
+      under Windows High Contrast; reduced motion and more contrast follow your system's
+      own setting. What is checked, what is known not to work yet, and how to tell us when
+      something does not work for you is on the
+      <a href="{{ guide }}" class="underline" rel="noopener noreferrer external" target="_blank">Accessibility page<span class="sr-only"> (opens in a new tab)</span></a>.
+    {% endblocktranslate %}
+  </p>
+{% endblock %}
