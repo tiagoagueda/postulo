@@ -417,6 +417,10 @@ POSTULO_TEXT_PER_NUMBER_RATE = env("POSTULO_TEXT_PER_NUMBER_RATE", default="3/h"
 # URL, so this is deliberately low: an administrator helping people back in one at a time
 # never notices it, and a compromised administrator session cannot mint fifty (#103).
 POSTULO_RECOVERY_RATE = env("POSTULO_RECOVERY_RATE", default="10/h")
+# Tests of a connection, and of the instance's mail settings, one account may run in an
+# hour. Each is a real message or a real request at a press of a button, and the button
+# had no bound at all (#232).
+POSTULO_CONNECTION_TEST_RATE = env("POSTULO_CONNECTION_TEST_RATE", default="10/h")
 
 # ---------------------------------------------------------- internationalisation
 

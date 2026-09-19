@@ -23,7 +23,7 @@ from django.views.generic import DeleteView, ListView
 from postulo.core.mixins import OwnedObjectMixin
 
 from . import logos, registry
-from .base import CONNECTED_KINDS
+from .base import CONNECTED_KINDS, call_with_user
 from .forms import ConnectionForm
 from .models import Connection
 from .registry import connected_plugins, find_plugin
@@ -360,6 +360,21 @@ class ConnectionTestView(OwnedObjectMixin, View):
         if plugin is None:
             messages.error(request, _("That plugin is no longer installed."))
             return redirect("connections:list")
+        from postulo.core import throttle
+
+        # A test is a real message, or a real request to somebody's server, at a press of
+        # a button. Bounded per account, as the text transport's sends are (#232).
+        try:
+            throttle.consume(
+                "connection-test", request.user, throttle.rate_for("POSTULO_CONNECTION_TEST_RATE")
+            )
+        except throttle.TooOften as too_often:
+            messages.error(
+                request,
+                _("That is a lot of tests. Try again in %(seconds)d seconds.")
+                % {"seconds": too_often.retry_after},
+            )
+            return redirect("connections:list")
         from . import consent as consent_flow
 
         try:
@@ -369,7 +384,7 @@ class ConnectionTestView(OwnedObjectMixin, View):
             # rather than by editing a field (#150).
             if consent_flow.wanted_by(plugin, connection.config) is not None:
                 consent_flow.access_token(connection)
-            result = plugin.test(connection.full_config)
+            result = call_with_user(plugin.test, connection.full_config, user=request.user)
             ok, message = bool(result.ok), str(result.message or "")
         except consent_flow.ConsentWithdrawn as error:
             ok, message = False, str(error)

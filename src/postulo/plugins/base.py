@@ -343,6 +343,27 @@ def refuse_unreadable(data: bytes) -> None:
         )
 
 
+def call_with_user(method, *args, user):
+    """Call a plugin's hook, handing it ``user`` if its signature asks for one.
+
+    ``config_fields()`` and ``test(config)`` are the contract, and most plugins need
+    nothing more: a server address is the same whoever is typing it. A plugin whose
+    answer depends on the person -- the built-in email notifier, which offers only their
+    own verified addresses -- adds a ``user=None`` keyword and is given the person (#232).
+    Inspected rather than tried, so a hook that raises inside is never called twice.
+    """
+    import inspect
+
+    try:
+        parameters = inspect.signature(method).parameters
+    except (TypeError, ValueError):  # a builtin, or a callable that will not say
+        return method(*args)
+    takes_user = "user" in parameters or any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD for parameter in parameters.values()
+    )
+    return method(*args, user=user) if takes_user else method(*args)
+
+
 @runtime_checkable
 class ImporterPlugin(Protocol):
     """What something that reads a career out of a file must provide.

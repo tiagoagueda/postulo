@@ -28,7 +28,23 @@ PAGE = """<html><head><title>Job</title>
 "jobLocation":{"@type":"Place","address":{"addressLocality":"Lyon"}}}</script></head></html>"""
 
 
-def email_connection(user, to="me@example.org", *, enabled=True, **config):
+def verified(user, address=None) -> str:
+    """Make `address` -- the account's own by default -- one of the person's verified ones."""
+    from allauth.account.models import EmailAddress
+
+    address = address or user.email
+    EmailAddress.objects.get_or_create(
+        user=user,
+        email=address,
+        defaults={"verified": True, "primary": address == user.email},
+    )
+    return address
+
+
+def email_connection(user, to=None, *, enabled=True, **config):
+    # The notifier writes only to the person's own verified addresses since #232, so the
+    # address a test asks for is made one of theirs here.
+    to = verified(user, to)
     connection = Connection(
         owner=user,
         kind="notifier",
@@ -74,6 +90,7 @@ def test_the_email_notifier_ships_in_the_box(client, user):
 
 
 def test_a_notifier_connection_carries_a_switch_per_event(client, user):
+    verified(user)
     client.force_login(user)
     url = reverse("connections:create", args=["notifier", "email"])
     html = client.get(url).content.decode()
@@ -86,7 +103,7 @@ def test_a_notifier_connection_carries_a_switch_per_event(client, user):
         {
             "label": "Mail me",
             "enabled": "on",
-            "plugin_to": "me@example.org",
+            "plugin_to": user.email,
             "plugin_event_reminder_due": "on",
             # capture_received left unticked
         },
@@ -94,11 +111,41 @@ def test_a_notifier_connection_carries_a_switch_per_event(client, user):
     assert response.status_code == 302
     connection = Connection.objects.get(owner=user)
     assert connection.config == {
-        "to": "me@example.org",
+        "to": user.email,
         "event_reminder_due": True,
         "event_capture_received": False,
         "event_went_quiet": False,
     }
+
+
+def test_the_address_is_chosen_among_the_persons_own_and_not_typed(client, user):
+    """A notifier sends to the person, not to anybody they name (#232)."""
+    from allauth.account.models import EmailAddress
+
+    verified(user)
+    verified(user, "second@example.org")
+    EmailAddress.objects.create(user=user, email="unproven@example.org", verified=False)
+    client.force_login(user)
+    url = reverse("connections:create", args=["notifier", "email"])
+
+    html = client.get(url).content.decode()
+    select = re.search(r'<select[^>]*name="plugin_to"[^>]*>(.*?)</select>', html, re.S)
+    assert select, "a choice, not a text field"
+    assert user.email in select.group(1) and "second@example.org" in select.group(1)
+    assert "unproven@example.org" not in select.group(1)
+
+    response = client.post(
+        url, {"label": "Mail", "enabled": "on", "plugin_to": "stranger@example.org"}
+    )
+    assert response.status_code == 200
+    assert "plugin_to" in response.context["form"].errors
+    assert not Connection.objects.filter(owner=user).exists()
+
+
+def test_with_nothing_verified_there_is_no_address_to_choose(client, user):
+    client.force_login(user)
+    html = client.get(reverse("connections:create", args=["notifier", "email"])).content.decode()
+    assert 'name="plugin_to"' not in html
 
 
 # ---------------------------------------------------------------- dispatching
@@ -135,15 +182,57 @@ def test_a_failing_notifier_is_recorded_and_never_fails_the_caller(user, monkeyp
     assert connection.last_error == "ConnectionError: smtp down"
 
 
-def test_the_email_notifier_tests_itself_and_falls_back_to_the_owner(user):
+def test_the_email_notifier_tests_itself_and_falls_back_to_the_primary_address(user):
+    from postulo.plugins.api import ConnectionUnusable
+
     plugin = EmailNotifier()
-    assert plugin.test({}).ok is False
-    result = plugin.test({"to": "me@example.org"})
-    assert result.ok and "me@example.org" in result.message
-    assert mail.outbox[-1].to == ["me@example.org"]
+    refused = plugin.test({"to": user.email}, user=user)
+    assert refused.ok is False and "verified" in refused.message, "nothing verified yet"
+    assert not mail.outbox
+
+    verified(user)
+    verified(user, "second@example.org")
+    result = plugin.test({"to": "second@example.org"}, user=user)
+    assert result.ok and "second@example.org" in result.message
+    assert mail.outbox[-1].to == ["second@example.org"]
 
     plugin.send(Notification(event="reminder_due", title="Ping"), {}, user)
-    assert mail.outbox[-1].to == [user.email], "no address given: the owner's"
+    assert mail.outbox[-1].to == [user.email], "no address given: the primary one"
+
+    # An address that is not theirs -- typed into an old connection, or one they removed
+    # since -- is refused rather than mailed, and the connection is switched off for it.
+    assert plugin.test({"to": "stranger@example.org"}, user=user).ok is False
+    with pytest.raises(ConnectionUnusable, match="no longer one of your verified"):
+        plugin.send(
+            Notification(event="reminder_due", title="Ping"), {"to": "stranger@example.org"}, user
+        )
+    assert mail.outbox[-1].to == [user.email], "nothing went to the stranger"
+
+
+def test_a_title_never_breaks_the_subject_line():
+    from postulo.plugins.email import _subject
+
+    assert _subject("Captured: Engineer\r\nBcc: everyone@example.org") == (
+        "[Postulo] Captured: Engineer Bcc: everyone@example.org"
+    )
+
+
+def test_the_test_button_is_bounded_per_account(client, user, settings):
+    """A test is a real message at a press of a button, and the button had no bound (#232)."""
+    from django.core.cache import cache
+
+    cache.clear()
+    settings.POSTULO_CONNECTION_TEST_RATE = "2/h"
+    connection = email_connection(user)
+    client.force_login(user)
+    url = reverse("connections:test", args=[connection.pk])
+
+    client.post(url)
+    client.post(url)
+    assert len(mail.outbox) == 2
+    response = client.post(url, follow=True)
+    assert "That is a lot of tests" in response.content.decode()
+    assert len(mail.outbox) == 2, "the third press sent nothing"
 
 
 # ---------------------------------------------------------- the capture event

@@ -767,6 +767,19 @@ class EmailTestView(StaffRequiredMixin, View):
             context = view.get_context_data(form=EmailForm(instance=view.object), test_form=form)
             return render(request, EmailView.template_name, context)
         to = form.cleaned_data["to"]
+        from postulo.core import throttle
+
+        try:
+            throttle.consume(
+                "connection-test", request.user, throttle.rate_for("POSTULO_CONNECTION_TEST_RATE")
+            )
+        except throttle.TooOften as too_often:
+            messages.error(
+                request,
+                _("That is a lot of tests. Try again in %(seconds)d seconds.")
+                % {"seconds": too_often.retry_after},
+            )
+            return redirect("server:email")
         try:
             sent = send_mail(
                 subject=str(_("A test message from %(name)s") % {"name": site.instance_name()}),

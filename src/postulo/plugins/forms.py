@@ -7,7 +7,7 @@ import logging
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .base import FieldSpec
+from .base import FieldSpec, call_with_user
 from .models import Connection, PluginRepository
 
 logger = logging.getLogger(__name__)
@@ -145,7 +145,10 @@ class ConnectionForm(forms.ModelForm):
     def __init__(self, plugin, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.plugin = plugin
-        self.specs: list[FieldSpec] = list(plugin.config_fields()) + kind_specs(plugin.kind)
+        owner = getattr(self.instance, "owner", None)
+        self.specs: list[FieldSpec] = list(
+            call_with_user(plugin.config_fields, user=owner)
+        ) + kind_specs(plugin.kind)
         existing_config = dict(self.instance.config) if self.instance.pk else {}
         existing_secrets = self.instance.secrets if self.instance.pk else {}
         for spec in self.specs:

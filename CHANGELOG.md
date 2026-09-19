@@ -19,6 +19,9 @@ All notable changes to Postulo are recorded here. The format follows
   container or another machine, set `POSTULO_TRUSTED_PROXIES` to its network** — *Server
   settings → Overview* shows the address a request arrives from and whether it was trusted.
   Without it, an instance behind TLS redirects itself in a loop. (#232)
+- The email notifier sends only to one of your own verified addresses, chosen from a list
+  rather than typed, and a connection's *Test* button, like the mail settings' one, is
+  bounded by `POSTULO_CONNECTION_TEST_RATE`; a title never breaks a subject line. (#232)
 
 ### 🔧 Changed
 
