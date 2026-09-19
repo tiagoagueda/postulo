@@ -11,12 +11,19 @@ as many words. The assumption underneath was that a proxy is always in front. Pl
 self-hosted instances will not have one: the Compose file publishes a port, and exposing
 it directly is a normal thing for somebody to do on their own network.
 
-So the headers are believed **from a proxy and nowhere else**, and the question of what
-counts as a proxy has an answer that fits how these instances are actually run: something
-on a private network. A reverse proxy in the same Compose project, on the same LAN or on
-the same host is at a private address; a request arriving straight off the internet is
-not. ``POSTULO_TRUSTED_PROXIES`` names the ranges, so an operator whose proxy sits
-somewhere else can say where.
+So the headers are believed **from a proxy and nowhere else**, and a proxy is something
+at an address the operator has named in ``POSTULO_TRUSTED_PROXIES``. Until they name one,
+only this host is trusted: loopback, where a proxy on the same machine arrives from.
+
+The default used to be every private network -- 10/8, 172.16/12, 192.168/16 and their IPv6
+equivalents -- on the reasoning that a self-hosted proxy is a container beside Postulo or
+a box on the same LAN. It is, and so is everything else on that LAN. Because rate limits
+key on ``REMOTE_ADDR`` and this middleware rewrites it from ``X-Forwarded-For``, any host
+on the LAN, or any container on the same bridge, could pick its own rate-limit identity
+and try passwords as fast as it liked; and under rootless Docker or Podman every client on
+the internet arrives from the private gateway address, which made the whole internet a
+proxy. Naming the network is one line in ``.env``, and *Server settings → Overview* shows
+the address a request arrived from, which is the line to write (#232).
 
 Believing ``X-Forwarded-For`` when it comes from a proxy is the other half, and it is not
 only tidiness. Rate limits key on ``REMOTE_ADDR``, which behind a proxy is the proxy for
@@ -31,17 +38,11 @@ from collections.abc import Iterable
 
 from django.conf import settings
 
-#: Where a reverse proxy lives on a self-hosted instance, unless told otherwise. Loopback
-#: for a proxy on the same host, the three private IPv4 ranges for Docker and for a LAN,
-#: and their IPv6 equivalents.
+#: Where a reverse proxy is trusted to be until the operator says otherwise: on this host.
+#: A proxy on a Docker network or a LAN is named in ``POSTULO_TRUSTED_PROXIES`` (#232).
 DEFAULT_TRUSTED_PROXIES = (
     "127.0.0.0/8",
-    "10.0.0.0/8",
-    "172.16.0.0/12",
-    "192.168.0.0/16",
     "::1/128",
-    "fc00::/7",
-    "fe80::/10",
 )
 
 #: Headers a proxy sets about the connection it terminated. Removed outright when the
@@ -82,6 +83,21 @@ def is_trusted(address: str) -> bool:
     except ValueError:
         return False
     return any(parsed in network for network in trusted_networks())
+
+
+def describe(request) -> dict:
+    """Where this request arrived from, and whether that was a proxy Postulo believes.
+
+    For *Server settings → Overview*: an operator whose proxy is not trusted sees the
+    address it arrives from, which is the value to put in ``POSTULO_TRUSTED_PROXIES``,
+    rather than a redirect loop and a guess.
+    """
+    peer = request.META.get("POSTULO_PROXY_ADDR") or request.META.get("REMOTE_ADDR", "")
+    return {
+        "peer": peer,
+        "trusted": is_trusted(peer),
+        "networks": [str(network) for network in trusted_networks()],
+    }
 
 
 def client_address(remote_addr: str, forwarded_for: str) -> str:

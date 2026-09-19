@@ -12,6 +12,13 @@ All notable changes to Postulo are recorded here. The format follows
   token's are, and the link is shown once, on the page that made it; the list of
   invitations no longer shows links, and a copy of the database is no longer a set of
   working invitations. Invitations already issued keep working. (#232)
+- **`X-Forwarded-For` and `X-Forwarded-Proto` are believed only from this host unless you
+  name your proxy.** Every private network used to be trusted, which let any host on the
+  LAN, any container on the same bridge and, under rootless Docker, anybody at all choose
+  the address the sign-in limits count them under. **Upgrading: if your proxy is a
+  container or another machine, set `POSTULO_TRUSTED_PROXIES` to its network** — *Server
+  settings → Overview* shows the address a request arrives from and whether it was trusted.
+  Without it, an instance behind TLS redirects itself in a loop. (#232)
 
 ### 🔧 Changed
 

@@ -39,6 +39,32 @@
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Health check" %}</dt>
           <dd><a href="{{ health_url }}" class="text-brand-600 underline dark:text-brand-400"><code>{{ health_url }}</code></a></dd>
         </div>
+        {% comment %} Which peer this page's own request came from, and whether Postulo
+           believed its forwarding headers. Only this host is trusted until the operator
+           names the proxy's network, and this row is where they read what to name (#232).
+        {% endcomment %}
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Reverse proxy" %}</dt>
+          <dd class="min-w-0 text-end" data-proxy="{% if proxy.trusted %}trusted{% else %}untrusted{% endif %}">
+            {% if proxy.trusted %}
+              {% blocktranslate trimmed with peer=proxy.peer %}
+                This request came through <code>{{ peer }}</code>, which is trusted.
+              {% endblocktranslate %}
+            {% else %}
+              {% blocktranslate trimmed with peer=proxy.peer %}
+                This request came from <code>{{ peer }}</code>, which is not a trusted proxy.
+              {% endblocktranslate %}
+              <span class="block text-xs text-amber-700 dark:text-amber-400">
+                {% blocktranslate trimmed %}
+                  If that is your proxy, name its network in <code>POSTULO_TRUSTED_PROXIES</code>.
+                {% endblocktranslate %}
+              </span>
+            {% endif %}
+            <span class="block text-xs text-ink-500 dark:text-ink-400">
+              {% translate "Trusted:" %} <code>{{ proxy.networks|join:", " }}</code>
+            </span>
+          </dd>
+        </div>
       </dl>
     </div>
 

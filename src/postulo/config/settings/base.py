@@ -73,7 +73,9 @@ INSTALLED_APPS = [
 
 #: Where a reverse proxy may be, for the headers it sets to be believed. See
 #: postulo.core.proxy: anything outside these ranges has its forwarding headers dropped,
-#: so an instance published straight onto a port cannot be told it is behind HTTPS.
+#: so an instance published straight onto a port cannot be told it is behind HTTPS. Only
+#: this host until the operator names the proxy's network; every private network used to be
+#: trusted, and on a LAN or under rootless Docker that was everybody (#232).
 POSTULO_TRUSTED_PROXIES = env.list(
     "POSTULO_TRUSTED_PROXIES", default=list(proxy.DEFAULT_TRUSTED_PROXIES)
 )

@@ -33,7 +33,7 @@ from postulo import __version__
 from postulo.accounts import deletion
 from postulo.plugins.forms import PluginRepositoryForm
 
-from . import site
+from . import proxy, site
 from .mixins import StaffRequiredMixin
 from .models import SiteSettings
 from .server_forms import (
@@ -134,6 +134,9 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 "health_url": reverse("core:healthz"),
                 "platform": platform.platform(),
                 "executable": sys.executable,
+                # Where this very request arrived from, and whether Postulo believed its
+                # forwarding headers: the one fact an operator needs to name their proxy.
+                "proxy": proxy.describe(self.request),
             }
         )
         return context
