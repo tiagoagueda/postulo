@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-19 10:16+0000\n"
+"POT-Creation-Date: 2026-09-19 10:39+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -1248,11 +1248,6 @@ msgstr "«Bestelakoa» identifikatzaileak izen bat behar du."
 msgid "An address, or the link to the call."
 msgstr "Helbide bat, edo deirako esteka."
 
-#: src/postulo/plugins/policy.py:83
-#, draft
-msgid "An administrator decided this for your account."
-msgstr "Hori administratzaile batek erabaki du zure konturako."
-
 #: src/postulo/templates/account/recovery_set_password.html:7
 #, python-format, draft
 msgid ""
@@ -1653,7 +1648,7 @@ msgstr "Automobilgintza"
 msgid "Available — the person chooses"
 msgstr "Erabilgarri — pertsonak aukeratzen du"
 
-#: src/postulo/plugins/policy.py:88
+#: src/postulo/plugins/policy.py:98
 #, draft
 msgid "Available; you have not changed it."
 msgstr "Erabilgarri; ez duzu aldatu."
@@ -2838,11 +2833,6 @@ msgstr "erabakitzailea"
 #, python-format, draft
 msgid "Decided by %(who)s on %(when)s"
 msgstr "%(who)s(e)k erabakia %(when)s"
-
-#: src/postulo/templates/settings/plugins.html:93
-#, python-format, draft
-msgid "Decided by %(who)s."
-msgstr "%(who)s(e)k erabakia."
 
 #: src/postulo/jobs/models.py:722
 #, draft
@@ -4227,7 +4217,7 @@ msgid ""
 msgstr ""
 "Nola bidaltzen duen posta instalazio honek: egiaztatze-estekak, pasahitz-berrezarpenak, oroigarriak. Ezarri hemen, edo ingurunean, eta frogatu bi bideetatik."
 
-#: src/postulo/plugins/policy.py:89
+#: src/postulo/plugins/policy.py:99
 #, draft
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "Nola dabilen instalazio hau, eta ez inoren aukera bat."
@@ -6329,7 +6319,7 @@ msgid ""
 "Nothing installed here reads that file. What is installed reads: %(what)s."
 msgstr ""
 
-#: src/postulo/templates/settings/plugins.html:108
+#: src/postulo/templates/settings/plugins.html:109
 #, draft
 msgid ""
 "Nothing installed on this instance is yours to turn on or off. What Postulo itself ships is behind the mark above."
@@ -6562,7 +6552,7 @@ msgstr ""
 msgid "Off"
 msgstr "Itzalita"
 
-#: src/postulo/templates/settings/plugins.html:76
+#: src/postulo/templates/settings/plugins.html:79
 #, draft
 msgid "off"
 msgstr "desaktibatuta"
@@ -6620,7 +6610,7 @@ msgstr "Ofiziala"
 msgid "older than a week"
 msgstr "astebete baino zaharragoa"
 
-#: src/postulo/templates/settings/plugins.html:76
+#: src/postulo/templates/settings/plugins.html:79
 #, draft
 msgid "on"
 msgstr "aktibatuta"
@@ -8329,7 +8319,7 @@ msgstr "soldata honetara"
 #: src/postulo/templates/server/signin.html:87
 #: src/postulo/templates/settings/appearance.html:92
 #: src/postulo/templates/settings/locale.html:106
-#: src/postulo/templates/settings/plugins.html:103
+#: src/postulo/templates/settings/plugins.html:104
 #, draft
 msgid "Save"
 msgstr "Gorde"
@@ -8635,6 +8625,10 @@ msgid ""
 msgstr ""
 "Inguruneak ezarrita: <code>%(variable)s</code>. Kendu ingurunetik hau hemen aldatzeko."
 
+#: src/postulo/plugins/policy.py:95
+msgid "Set for your account."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html:118
 #, draft
 msgid "set in the environment"
@@ -8679,13 +8673,6 @@ msgstr "Itxita"
 #, draft
 msgid "Shape"
 msgstr "Forma"
-
-#: src/postulo/plugins/policy.py:84
-#, draft
-msgid ""
-"Shipped inside Postulo. An administrator switches it, for you or for everybody."
-msgstr ""
-"Postuloren barruan dator. Administratzaile batek aldatzen du, zuretzat edo guztientzat."
 
 #: src/postulo/plugins/provenance.py:66
 #, draft
@@ -9316,7 +9303,7 @@ msgstr "Zentralita"
 msgid "Switched off for people above, not removed."
 msgstr "Goiko pertsonentzat itzalita, ez kenduta."
 
-#: src/postulo/plugins/policy.py:82
+#: src/postulo/plugins/policy.py:94
 #, draft
 msgid "Switched off for this whole instance."
 msgstr "Instalazio oso honetarako itzalita."
@@ -9328,7 +9315,7 @@ msgid ""
 msgstr ""
 "Plugin bat itzaltzeak bere erabilera gelditzen du. Ez du ezer ezabatzen — konexioak eta haien ezarpenak dauden-daudenean geratzen dira, eta berriro pizteak aldatu gabe itzultzen ditu."
 
-#: src/postulo/templates/settings/plugins.html:113
+#: src/postulo/templates/settings/plugins.html:114
 #, draft
 msgid ""
 "Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
@@ -11304,11 +11291,9 @@ msgid "What is on this portfolio"
 msgstr "Zer dago portfolio honetan"
 
 #: src/postulo/templates/settings/plugins.html:7
-#, draft
 msgid ""
-"What is running for your account, and who decided it. This is per account, not per browser: signing in somewhere else does not change it."
+"What is running for your account. This is per account, not per browser: signing in somewhere else does not change it."
 msgstr ""
-"Zer dabilen zure konturako, eta nork erabaki duen. Hau kontuka da, ez nabigatzaileka: beste nonbait saioa hasteak ez du aldatzen."
 
 #: src/postulo/api/forms.py:27
 #, draft
@@ -11836,7 +11821,7 @@ msgstr ""
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Ezin duzu saioa hasita duzun kontua desaktibatu."
 
-#: src/postulo/plugins/policy.py:87
+#: src/postulo/plugins/policy.py:97
 #, draft
 msgid "You chose this."
 msgstr "Zuk aukeratu duzu."

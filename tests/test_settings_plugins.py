@@ -62,7 +62,8 @@ def test_it_lists_what_was_installed_and_what_postulo_ships_only_when_asked(
     row = row_for(html, PLUGIN)
     assert row and "data-shipped" in row
     assert 'type="checkbox"' not in row, "no switch at all, rather than a disabled one"
-    assert "Shipped inside Postulo" in row
+    # No sentence either, since #287: the mark's own caption says who switches these.
+    assert "Shipped inside Postulo" not in row and "why-" not in row
 
 
 def test_a_source_appears_even_though_it_has_no_connection(client, user, third_party):
@@ -152,7 +153,10 @@ def test_a_decided_row_is_shown_locked_rather_than_hidden(client, user, admin, s
 
     assert row, "a plugin decided for you must still be visible, mark or no mark"
     assert 'type="checkbox"' not in row, "a built-in carries no switch"
-    assert "An administrator decided this" in row
+    assert "Set for your account." in row
+    assert "An administrator decided" not in row and admin.username not in row, (
+        "the attribution went with #287; the administrator's own view still carries it"
+    )
 
 
 @pytest.mark.parametrize("state", [PluginPolicy.State.FORCED_ON, PluginPolicy.State.FORCED_OFF])
@@ -162,18 +166,15 @@ def test_a_decided_installed_row_is_shown_disabled(client, user, admin, state, t
 
     row = row_for(client.get(reverse(URL)).content.decode(), third_party)
 
-    assert row and "disabled" in row and "An administrator decided this" in row
+    assert row and "disabled" in row and "Set for your account." in row
+    # A disabled control still points at a sentence, and the sentence is there.
+    assert f'aria-describedby="why-{third_party}"' in row
+    assert f'id="why-{third_party}"' in row
 
 
-def test_the_person_is_told_who_decided(client, user, admin):
-    """Not merely that somebody did. A permission held over your account should be
-    attributable from your own settings without your having to ask anybody."""
-    PluginPolicy.objects.create(
-        plugin=PLUGIN, person=user, state=PluginPolicy.State.FORCED_OFF, decided_by=admin
-    )
-    client.force_login(user)
-
-    assert admin.username in row_for(client.get(reverse(URL)).content.decode(), PLUGIN)
+# `test_the_person_is_told_who_decided` stood here from #96 until #287: the person's own
+# page no longer names the administrator. `server/person_plugins.html` still does, and
+# `tests/test_server_settings.py` covers that view.
 
 
 def test_unavailable_is_not_shown_at_all(client, user, admin):

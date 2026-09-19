@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-19 10:16+0000\n"
+"POT-Creation-Date: 2026-09-19 10:39+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -1315,11 +1315,6 @@ msgstr "Teastaíonn ainm ó aitheantóir “eile”."
 msgid "An address, or the link to the call."
 msgstr "Seoladh, nó an nasc chuig an nglao."
 
-#: src/postulo/plugins/policy.py:83
-#, draft
-msgid "An administrator decided this for your account."
-msgstr "Shocraigh riarthóir é seo ar son do chuntais."
-
 #: src/postulo/templates/account/recovery_set_password.html:7
 #, python-format, draft
 msgid ""
@@ -1724,7 +1719,7 @@ msgstr "Gluaisteáin"
 msgid "Available — the person chooses"
 msgstr "Ar fáil — roghnaíonn an duine"
 
-#: src/postulo/plugins/policy.py:88
+#: src/postulo/plugins/policy.py:98
 #, draft
 msgid "Available; you have not changed it."
 msgstr "Ar fáil; níor athraigh tú aon rud."
@@ -2911,11 +2906,6 @@ msgstr "socraithe ag"
 #, python-format, draft
 msgid "Decided by %(who)s on %(when)s"
 msgstr "Shocraigh %(who)s é ar %(when)s"
-
-#: src/postulo/templates/settings/plugins.html:93
-#, python-format, draft
-msgid "Decided by %(who)s."
-msgstr "Shocraigh %(who)s é."
 
 #: src/postulo/jobs/models.py:722
 #, draft
@@ -4301,7 +4291,7 @@ msgid ""
 msgstr ""
 "Conas a sheolann an t-ásc seo post: naisc fhíoraithe, athshocruithe pasfhocail, meabhrúcháin. Socraigh anseo é, nó sa timpeallacht, agus cruthaigh é ar aon nós."
 
-#: src/postulo/plugins/policy.py:89
+#: src/postulo/plugins/policy.py:99
 #, draft
 msgid "How this instance works, rather than a choice anybody holds."
 msgstr "An chaoi a n-oibríonn an t-ásc seo, seachas rogha atá ag aon duine."
@@ -6418,7 +6408,7 @@ msgid ""
 "Nothing installed here reads that file. What is installed reads: %(what)s."
 msgstr ""
 
-#: src/postulo/templates/settings/plugins.html:108
+#: src/postulo/templates/settings/plugins.html:109
 #, draft
 msgid ""
 "Nothing installed on this instance is yours to turn on or off. What Postulo itself ships is behind the mark above."
@@ -6653,7 +6643,7 @@ msgstr ""
 msgid "Off"
 msgstr "As"
 
-#: src/postulo/templates/settings/plugins.html:76
+#: src/postulo/templates/settings/plugins.html:79
 #, draft
 msgid "off"
 msgstr "as"
@@ -6710,7 +6700,7 @@ msgstr "Oifigiúil"
 msgid "older than a week"
 msgstr "níos sine ná seachtain"
 
-#: src/postulo/templates/settings/plugins.html:76
+#: src/postulo/templates/settings/plugins.html:79
 #, draft
 msgid "on"
 msgstr "ann"
@@ -8472,7 +8462,7 @@ msgstr "tuarastal go"
 #: src/postulo/templates/server/signin.html:87
 #: src/postulo/templates/settings/appearance.html:92
 #: src/postulo/templates/settings/locale.html:106
-#: src/postulo/templates/settings/plugins.html:103
+#: src/postulo/templates/settings/plugins.html:104
 #, draft
 msgid "Save"
 msgstr "Sábháil"
@@ -8779,6 +8769,10 @@ msgid ""
 msgstr ""
 "Socraithe ag an timpeallacht: <code>%(variable)s</code>. Bain den timpeallacht é chun é seo a athrú anseo."
 
+#: src/postulo/plugins/policy.py:95
+msgid "Set for your account."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html:118
 #, draft
 msgid "set in the environment"
@@ -8823,13 +8817,6 @@ msgstr "Réitithe"
 #, draft
 msgid "Shape"
 msgstr "Cruth"
-
-#: src/postulo/plugins/policy.py:84
-#, draft
-msgid ""
-"Shipped inside Postulo. An administrator switches it, for you or for everybody."
-msgstr ""
-"Seoltar é taobh istigh de Postulo. Athraíonn riarthóir é, duitse nó do chách."
 
 #: src/postulo/plugins/provenance.py:66
 #, draft
@@ -9461,7 +9448,7 @@ msgstr "Lasc-chlár"
 msgid "Switched off for people above, not removed."
 msgstr "Múchta do dhaoine thuas, gan a bhaint."
 
-#: src/postulo/plugins/policy.py:82
+#: src/postulo/plugins/policy.py:94
 #, draft
 msgid "Switched off for this whole instance."
 msgstr "Múchta don ásc iomlán seo."
@@ -9473,7 +9460,7 @@ msgid ""
 msgstr ""
 "Stopann múchadh breiseáin a úsáid. Ní scriosann sé aon rud — fanann naisc agus a gcuid socruithe díreach mar atá siad, agus tugann é a lasadh arís ar ais gan athrú iad."
 
-#: src/postulo/templates/settings/plugins.html:113
+#: src/postulo/templates/settings/plugins.html:114
 #, draft
 msgid ""
 "Switching one off stops it being used and deletes nothing: any connections you have made stay exactly as they are, and turning it back on brings them back unchanged."
@@ -11471,11 +11458,9 @@ msgid "What is on this portfolio"
 msgstr "Cad atá ar an bpunann seo"
 
 #: src/postulo/templates/settings/plugins.html:7
-#, draft
 msgid ""
-"What is running for your account, and who decided it. This is per account, not per browser: signing in somewhere else does not change it."
+"What is running for your account. This is per account, not per browser: signing in somewhere else does not change it."
 msgstr ""
-"Cad atá ag rith do do chuntas, agus cé a shocraigh é. Baineann sé leis an gcuntas, ní leis an mbrabhsálaí: ní athraíonn logáil isteach in áit eile é."
 
 #: src/postulo/api/forms.py:27
 #, draft
@@ -12005,7 +11990,7 @@ msgid "You cannot deactivate the account you are signed in with."
 msgstr ""
 "Ní féidir leat an cuntas a bhfuil tú sínithe isteach leis a dhíghníomhachtú."
 
-#: src/postulo/plugins/policy.py:87
+#: src/postulo/plugins/policy.py:97
 #, draft
 msgid "You chose this."
 msgstr "Roghnaigh tú é seo."

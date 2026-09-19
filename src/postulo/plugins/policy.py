@@ -69,8 +69,10 @@ class Decision:
     #: to show. ``shipped`` is a built-in nobody decided: on, and an administrator's to
     #: switch (#200).
     decided_by: str
-    #: The administrator who decided, where one did and is still an account. A person is
-    #: entitled to know *who*, not merely that somebody did.
+    #: The administrator who decided, where one did and is still an account. Shown on the
+    #: administrator's own view of a person's row (`server/person_plugins.html`), where who
+    #: decided is the point; no longer on the person's page, where on nearly every instance
+    #: it named the reader to themselves (#287).
     who: object = None
 
     @property
@@ -78,12 +80,20 @@ class Decision:
         return self.decided_by in {"administrator", "instance"}
 
     def explain(self):
+        """The sentence under the row on the person's own page, or nothing.
+
+        A built-in gets no sentence: the rows Postulo ships appear only behind a mark whose
+        own caption already says an administrator switches them, and a per-row echo of it
+        was noise (#287). A decision made for the account gets a neutral one, because on
+        nearly every instance the administrator is the person reading, and "an
+        administrator decided this for you" read as the interface explaining them to
+        themselves in the tone of a permission held over them. The row is still shown and
+        still disabled; what is dropped is the attribution, not the visibility.
+        """
         return {
             "instance": _("Switched off for this whole instance."),
-            "administrator": _("An administrator decided this for your account."),
-            "shipped": _(
-                "Shipped inside Postulo. An administrator switches it, for you or for everybody."
-            ),
+            "administrator": _("Set for your account."),
+            "shipped": "",
             "person": _("You chose this."),
             "default": _("Available; you have not changed it."),
             "infrastructure": _("How this instance works, rather than a choice anybody holds."),
@@ -258,7 +268,6 @@ def overview(person, *, internal: bool = False) -> list[dict]:
                     "on": decision.on,
                     "theirs": decision.theirs,
                     "why": decision.explain(),
-                    "who": decision.who,
                 }
             )
     return rows

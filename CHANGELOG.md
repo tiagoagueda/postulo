@@ -34,6 +34,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- *Settings → Plugins* no longer explains somebody else's decision to you: a row an
+  administrator decided says "Set for your account" without naming them, and a row Postulo
+  ships carries no sentence, since the mark that reveals those rows already says who
+  switches them. The administrator's own view of a person's row still says who and when.
+  (#287)
 - The component layer draws on Basecoat: each component's structural file is imported as it
   is adopted and painted in Postulo's own palette, and its names replace ours where the two
   overlap, starting with the button. (#262)
