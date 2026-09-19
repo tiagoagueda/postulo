@@ -240,13 +240,15 @@ uv run ruff format .
 
 ## Licence
 
-[AGPL-3.0-or-later](LICENSE). If you run a modified Postulo as a network service, your
-users are entitled to its source.
+Copyright (C) 2026 Tiago Agueda. [AGPL-3.0-or-later](LICENSE). If you run a modified
+Postulo as a network service, your users are entitled to its source.
 
-The icons are [Lucide](https://lucide.dev), used under the ISC licence, and the country
-flags are [flag-icons](https://github.com/lipis/flag-icons), used under the MIT licence.
-Both are copied into the repository, so nothing is fetched from anybody else's server at
-runtime; the flags carry their notice beside them in `src/postulo/static/flags/`.
+Some of what ships in the repository is somebody else's work under a licence of its own:
+the [Lucide](https://lucide.dev) icons, the [flag-icons](https://github.com/lipis/flag-icons)
+country flags, Tailwind CSS and basecoat-css compiled into the stylesheet, htmx and zxcvbn
+served as scripts. All of it is copied into the repository, so nothing is fetched from
+anybody else's server at runtime, and each carries its notice beside it.
+[THIRD-PARTY.md](THIRD-PARTY.md) is the register.
 
 The **name and the logo** are not covered by that licence. [TRADEMARKS.md](TRADEMARKS.md)
 says what you may do without asking — which is nearly everything, including naming a plugin

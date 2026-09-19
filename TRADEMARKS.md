@@ -1,8 +1,11 @@
 # Trademarks
 
-Postulo's **code** is [AGPL-3.0-or-later](LICENSE). Postulo's **name and logo** are not, and
-this file says what that means — for anybody forking it, for anybody writing a plugin, and
-for the marks belonging to other people that appear in this repository.
+Postulo's **code** is Copyright (C) 2026 Tiago Agueda, [AGPL-3.0-or-later](LICENSE).
+Postulo's **name and logo** are not, and this file says what that means — for anybody forking
+it, for anybody writing a plugin, and for the marks belonging to other people that appear in
+this repository. The third-party *code and artwork* shipped here, and the copyright licences
+they come under, are a different matter and have their own register:
+[THIRD-PARTY.md](THIRD-PARTY.md).
 
 Nothing here restricts the licence. AGPL-3.0 §7 lists the terms a work may add, and clause
 (e) is *"Declining to grant rights under trademark law for use of some trade names,
@@ -62,12 +65,12 @@ project. They are not.
 
 | What | Where | Whose | Under |
 | --- | --- | --- | --- |
-| Lucide icons | `src/postulo/static/icons/` | [Lucide](https://lucide.dev) | ISC; each file keeps its own `@license` comment |
-| flag-icons artwork | `src/postulo/static/flags/` | [lipis/flag-icons](https://github.com/lipis/flag-icons) | MIT; the notice sits beside the files as `LICENSE.txt` |
 | Buy Me a Coffee banner and QR code | `assets/support/` | Buy Me a Coffee | Both published by Buy Me a Coffee for people to use, and used to link to the project's own account. The code is scaled and nothing else. See the notice beside them. |
 
-The first two are copyright licences and are satisfied by carrying their notices. The third
-is a mark, which is not licensed at all — hence this file.
+That is a mark, which is not licensed at all — hence this file. The works shipped here
+under a copyright licence — the Lucide icons, the flag-icons artwork, Tailwind CSS,
+basecoat-css, htmx and zxcvbn — are satisfied by carrying their notices, and
+[THIRD-PARTY.md](THIRD-PARTY.md) says where each notice is.
 
 **National flags** are a category of their own. Some countries regulate how their flag may be
 used. Postulo shows them at about twenty pixels beside a language name, unmodified, to help
@@ -78,10 +81,12 @@ where a language has no uncontested home.
 ### Named in the documentation and the interface
 
 Postulo talks about the software it runs on and the services its plugins reach: Django,
-Python, Docker, PostgreSQL, SQLite, WeasyPrint, WhiteNoise, Tailwind CSS, htmx, Playwright,
-Prometheus, Traefik, Forgejo, GitHub, Europass, Apprise, Paperless, Nextcloud, Telegram,
-Signal, Matrix, Discord, ntfy, Gotify, Pushover, CalDAV, LinkedIn, ORCID, and others. Those
-names belong to their owners and are used to say what Postulo works with.
+Python, Docker, PostgreSQL, SQLite, WeasyPrint, WhiteNoise, Playwright, Prometheus, Traefik,
+Forgejo, GitHub, Europass, Apprise, Paperless, Nextcloud, Telegram, Signal, Matrix, Discord,
+ntfy, Gotify, Pushover, CalDAV, LinkedIn, ORCID, and others. Those names belong to their
+owners and are used to say what Postulo works with. Tailwind CSS, htmx and zxcvbn are not in
+this list, because their code is in this tree rather than merely mentioned; they are in
+[THIRD-PARTY.md](THIRD-PARTY.md).
 
 ## The rule for plugin logos
 

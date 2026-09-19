@@ -56,6 +56,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Every third-party work shipped in the tree carries its notice beside it: zxcvbn's and
+  htmx's beside the scripts, Basecoat's beside the stylesheet with a banner in it, copied by
+  the sync script rather than remembered; htmx is pinned in `package.json` and synced like
+  the rest; `THIRD-PARTY.md` is the register, `TRADEMARKS.md` no longer lists code as a
+  name, and Postulo states whose copyright it is. (#279)
 - The applications and companies tables carry a hidden caption naming them, and discarding
   a capture says where the discarded ones are, with a link, since the fast key is only fast
   if there is a way back. (#260)
