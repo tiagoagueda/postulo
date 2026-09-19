@@ -97,6 +97,10 @@ COLLECT = """() => {
     const menus = [...document.querySelectorAll('details[data-menu]')];
     const inMenu = el.closest('details[data-menu][open]');
     const menu = inMenu && !el.closest('summary') ? menus.indexOf(inMenu) : -1;
+    // A scroll box is a keyboard stop, not something a pointer aims at (#275): it is in
+    // the tab order so the arrow keys can scroll it, and it surrounds every link in its
+    // table, which is not the same as sitting beside one.
+    if (el.classList.contains('scroll-x')) continue;
     const style = getComputedStyle(el);
     if (style.visibility === 'hidden' || style.pointerEvents === 'none') continue;
     // Clipped to nothing: screen-reader-only, and it gets a real box when focused.

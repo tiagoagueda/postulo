@@ -57,7 +57,7 @@ def test_the_page_carries_one_region_for_a_failed_request(client, user):
 
     # The region is the paragraph inside the box, and the dismiss button beside it is
     # outside the region, so the announcement is only ever the words (#275).
-    region = re.search(r'<p role="alert" data-alert-words([^>]*)></p>', html)
+    region = re.search(r'<p role="alert" data-htmx-alert([^>]*)></p>', html)
     assert region, "no empty role=alert region on the page"
     assert html.count("data-htmx-alert") == 1, "one region for the whole application"
 

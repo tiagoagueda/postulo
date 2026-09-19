@@ -70,7 +70,7 @@
    * their keyboard never sees; the next successful swap is the moment it stopped being true.
    */
   function alertRegion() {
-    return document.querySelector("[data-htmx-alert] [data-alert-words]");
+    return document.querySelector("[data-htmx-alert]");
   }
 
   function sayFailure(words) {

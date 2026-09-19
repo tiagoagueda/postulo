@@ -185,9 +185,9 @@ def test_both_shapes_of_the_applications_page_are_in_the_tab_order(
 def test_the_failure_alert_closes_on_escape_and_on_its_button(page: Page, live_server, applicant):
     """A fixed box with no way off the screen sat over the foot of a long table (#275)."""
     sign_in(page, live_server.url)
-    words = page.locator("[data-htmx-alert] [data-alert-words]")
+    words = page.locator("[data-htmx-alert]")
     page.evaluate(
-        "() => { document.querySelector('[data-alert-words]').textContent = 'It failed.' }"
+        "() => { document.querySelector('[data-htmx-alert]').textContent = 'It failed.' }"
     )
     expect(words).to_be_visible()
 
@@ -195,7 +195,7 @@ def test_the_failure_alert_closes_on_escape_and_on_its_button(page: Page, live_s
     expect(words).to_have_text("")
     expect(words).to_be_hidden()
 
-    page.evaluate("() => { document.querySelector('[data-alert-words]').textContent = 'Again.' }")
+    page.evaluate("() => { document.querySelector('[data-htmx-alert]').textContent = 'Again.' }")
     page.get_by_role("button", name="Dismiss").click()
     expect(words).to_have_text("")
 

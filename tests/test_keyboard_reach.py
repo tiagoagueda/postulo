@@ -79,13 +79,13 @@ def test_the_failure_alert_can_be_put_away(client, user):
     alert = html[
         html.index('class="page-alert"') : html.index("</div>", html.index('class="page-alert"'))
     ]
-    assert '<p role="alert" data-alert-words' in alert
+    assert '<p role="alert" data-htmx-alert' in alert
     assert "data-alert-close" in alert and 'aria-label="Dismiss"' in alert
 
     script = (Path(__file__).resolve().parents[1] / "src/postulo/static/js/app.js").read_text(
         "utf-8"
     )
-    assert '"[data-htmx-alert] [data-alert-words]"' in script
+    assert '"[data-htmx-alert]"' in script
     assert "[data-alert-close]" in script
 
 
