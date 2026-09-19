@@ -22,7 +22,7 @@
 {% partialdef table %}
   <div id="companies-table">
     {% if companies %}
-      <div class="card scroll-x p-0">
+      <c-scroll-box class="card p-0" label="{% translate 'Companies' %}">
         <table class="w-full text-start text-sm">
           <c-table.head :table="table" table_id="companies-table" form_id="company-filters" bulk_form_id="companies-bulk" />
           <tbody>
@@ -31,7 +31,7 @@
             {% endfor %}
           </tbody>
         </table>
-      </div>
+      </c-scroll-box>
       {% include "partials/table/pagination.html" with table_id="companies-table" %}
       {% if bulk_industries %}
         {% url 'jobs:company_bulk' as bulk_url %}

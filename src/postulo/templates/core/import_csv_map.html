@@ -69,7 +69,7 @@
       </div>
 
       <h2 class="mb-2 font-medium">{% translate "How the first rows will be read" %}</h2>
-      <div class="card mb-4 scroll-x p-0">
+      <c-scroll-box class="card mb-4 p-0" label="{% translate 'How the first rows will be read' %}">
         <table class="w-full text-start text-sm">
           <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
             <tr>
@@ -104,7 +104,7 @@
             {% endfor %}
           </tbody>
         </table>
-      </div>
+      </c-scroll-box>
       <p class="mb-4 max-w-3xl text-sm text-ink-500 dark:text-ink-400" data-summary>
         {% blocktranslate trimmed with applications=would_import listings=would_list skipped=would_skip %}
           Across the whole file: {{ applications }} applications, {{ listings }} listings, {{ skipped }} rows skipped for want of a company or a role. Rows already recorded are found and skipped as they are imported.

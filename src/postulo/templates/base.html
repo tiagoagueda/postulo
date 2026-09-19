@@ -71,9 +71,17 @@
        follow. It says the status because "it did not work" and "it did not work, 503" are
        different problems, and it says that nothing changed because that is the part a
        person cannot see for themselves. {% endcomment %}
-    <div class="page-alert" role="alert" data-htmx-alert
+    {% comment %} The live region is the paragraph and stays empty until there is something
+       to say; the button beside it is outside the region, so the announcement is only ever
+       the words. It closes on the button and on Escape, because a fixed box with no way off
+       the screen sat over the foot of a long table at 400% zoom (#275). {% endcomment %}
+    <div class="page-alert" data-htmx-alert>
+      <p role="alert" data-alert-words
          data-alert-failed="{% translate 'That did not work — the server answered {status}. Nothing on this page has changed.' %}"
-         data-alert-offline="{% translate 'Postulo could not be reached. Nothing on this page has changed.' %}"></div>
+         data-alert-offline="{% translate 'Postulo could not be reached. Nothing on this page has changed.' %}"></p>
+      <button type="button" class="btn shrink-0" data-variant="ghost" data-size="icon-xs" data-alert-close
+              aria-label="{% translate 'Dismiss' %}">{% icon "x" class="size-4" %}</button>
+    </div>
     {% block chrome %}
       {% comment %} The header floats: `sticky top-0`, so the wordmark, the navigation, the
          search and the account menu are there wherever the page has scrolled to (#195).

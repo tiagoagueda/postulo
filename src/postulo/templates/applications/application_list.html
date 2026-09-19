@@ -28,7 +28,7 @@
     {% if shape == 'board' %}
       {% include "applications/partials/board.html" %}
     {% elif applications %}
-      <div class="card scroll-x p-0">
+      <c-scroll-box class="card p-0" label="{% translate 'Applications' %}">
         <table class="w-full text-start text-sm">
           <c-table.head :table="table" table_id="applications-table" form_id="application-filters" bulk_form_id="applications-bulk" />
           <tbody>
@@ -37,7 +37,7 @@
             {% endfor %}
           </tbody>
         </table>
-      </div>
+      </c-scroll-box>
       {% include "partials/table/pagination.html" with table_id="applications-table" %}
       {% if bulk_tags %}
         {% url 'applications:bulk' as bulk_url %}
@@ -79,8 +79,10 @@
     <div class="ms-auto flex flex-wrap items-center gap-2">
       {% comment %} The shape: a pair of buttons that post the choice, so it is remembered
          with the person's other table preferences and the redirect back keeps every
-         filter, the search and the sort. The one showing is marked, and disabled, since
-         pressing it would change nothing (#102). {% endcomment %}
+         filter, the search and the sort. The one showing is marked as pressed (#102) and
+         stays enabled: disabled took it out of the tab order and drew it at half strength,
+         which reads as *unavailable* rather than *this one* (#275). Pressing it posts the
+         same shape back, which changes nothing. {% endcomment %}
       <div class="flex items-center gap-1" role="group" aria-label="{% translate 'Shape' %}" data-shape-switch>
         {% for key, label in shapes %}
           <form method="post" action="{% url 'core:table_settings' table.name %}">
@@ -88,7 +90,7 @@
             <input type="hidden" name="next" value="{{ switch_next }}">
             <input type="hidden" name="shape" value="{{ key }}">
             <button type="submit" class="btn" data-variant="{% if key == shape %}primary{% else %}outline{% endif %}"
-                    {% if key == shape %}aria-current="true" disabled{% endif %}>{{ label }}</button>
+                    aria-pressed="{% if key == shape %}true{% else %}false{% endif %}">{{ label }}</button>
           </form>
         {% endfor %}
       </div>

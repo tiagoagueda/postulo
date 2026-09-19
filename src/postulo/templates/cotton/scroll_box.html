@@ -1,0 +1,16 @@
+<c-vars label class="" />
+{% comment %} A box whose content is allowed to be wider than the page -- a data table, the
+   board's columns -- made reachable from the keyboard (#275).
+
+   `<c-scroll-box label="…" class="card p-0">…</c-scroll-box>`. `.scroll-x` is the box that
+   scrolls instead of the page (#113); what it never had was a way in. Once a table overflows,
+   the columns off the edge could be reached only by tabbing to a link that happened to be in
+   them, and a plain-text cell never came into view at all. Chromium makes a scroller
+   focusable by itself only when it holds no focusable child, so a table full of links is
+   exactly the case the browser does not rescue. `tabindex="0"` puts the box in the tab order,
+   the arrow keys then scroll it, and `role="region"` with the label says what was reached
+   rather than leaving a screen reader on an unnamed stop.
+{% endcomment %}
+<div class="scroll-x {{ class }}" tabindex="0" role="region" aria-label="{{ label }}"{% if attrs %} {{ attrs }}{% endif %}>
+  {{ slot }}
+</div>

@@ -433,7 +433,7 @@
 
   {# -------------------------------------------------------------- sources #}
   <h2 class="mb-3 font-medium">{% translate "Capture sources this instance has" %}</h2>
-  <div class="card scroll-x p-0">
+  <c-scroll-box class="card p-0" label="{% translate 'Plugins' %}">
     <table class="w-full text-start text-sm">
       <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
         <tr>
@@ -454,7 +454,7 @@
         {% endfor %}
       </tbody>
     </table>
-  </div>
+  </c-scroll-box>
   <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
     {% blocktranslate with group=entry_point_group trimmed %}
       A package registers a source under the <code>{{ group }}</code> entry-point group.

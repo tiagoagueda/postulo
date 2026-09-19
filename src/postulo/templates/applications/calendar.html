@@ -76,7 +76,7 @@
        number is a link to that day, big enough to hit; a cell shows two of its events
        and counts the rest, and the count opens the day. A day outside the month is
        greyed, and today is marked in words as well as in colour. {% endcomment %}
-    <div class="card scroll-x p-0">
+    <c-scroll-box class="card p-0" label="{% translate 'Calendar' %}">
       <table class="w-full table-fixed text-sm" data-calendar="month">
         <caption class="sr-only">{{ page.title }}</caption>
         <thead>
@@ -121,7 +121,7 @@
           {% endfor %}
         </tbody>
       </table>
-    </div>
+    </c-scroll-box>
   {% elif page.view == 'week' %}
     <div class="grid gap-3 lg:grid-cols-7" data-calendar="week">
       {% for day in page.days %}

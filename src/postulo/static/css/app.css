@@ -2923,6 +2923,26 @@
     border-width: 0px;
     background-color: transparent;
     padding: 0px;
+    &::before {
+      content: var(--tw-content);
+      position: absolute;
+    }
+    &::before {
+      content: var(--tw-content);
+      inset-block: calc(var(--spacing) * 2);
+    }
+    &::before {
+      content: var(--tw-content);
+      inset-inline-end: calc(var(--spacing) * 2.5);
+    }
+    &::before {
+      content: var(--tw-content);
+      width: 1px;
+    }
+    &::before {
+      content: var(--tw-content);
+      background-color: var(--color-ink-300);
+    }
     &:hover {
       @media (hover: hover) {
         background-color: color-mix(in srgb, oklch(0.62 0.185 275) 40%, transparent);
@@ -2944,6 +2964,20 @@
     }
     &:focus-visible {
       outline-color: var(--color-brand-600);
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      &::before {
+        content: var(--tw-content);
+        background-color: var(--color-ink-700);
+      }
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        &::before {
+          content: var(--tw-content);
+          background-color: var(--color-ink-700);
+        }
+      }
     }
   }
   .has-col-handle {
@@ -3620,8 +3654,14 @@ details[data-menu] > summary::-webkit-details-marker {
     }
   }
 }
-.page-alert:empty {
+.page-alert:has(> [role="alert"]:empty) {
   display: none;
+}
+.page-alert > [role="alert"] {
+  flex-grow: 1;
+}
+html:has(.page-alert > [role="alert"]:not(:empty)) {
+  scroll-padding-bottom: 6rem;
 }
 @layer components {
   .skip-link {
@@ -3896,6 +3936,11 @@ html {
   inherits: false;
   initial-value: 0;
 }
+@property --tw-content {
+  syntax: "*";
+  initial-value: "";
+  inherits: false;
+}
 @layer properties {
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
     *, ::before, ::after, ::backdrop {
@@ -3949,6 +3994,7 @@ html {
       --tw-translate-x: 0;
       --tw-translate-y: 0;
       --tw-translate-z: 0;
+      --tw-content: "";
     }
   }
 }

@@ -70,7 +70,7 @@
    * their keyboard never sees; the next successful swap is the moment it stopped being true.
    */
   function alertRegion() {
-    return document.querySelector("[data-htmx-alert]");
+    return document.querySelector("[data-htmx-alert] [data-alert-words]");
   }
 
   function sayFailure(words) {
@@ -79,6 +79,22 @@
       region.textContent = words || "";
     }
   }
+
+  // The alert can be put away (#275): the button beside it, or Escape from anywhere while
+  // it is showing. Clearing the words is what hides it, so the region stays in the document
+  // for the next announcement.
+  document.addEventListener("click", function (event) {
+    if (event.target.closest("[data-alert-close]")) {
+      sayFailure("");
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    var region = alertRegion();
+    if (event.key === "Escape" && region && region.textContent) {
+      sayFailure("");
+    }
+  });
 
   function failureWords(name) {
     var region = alertRegion();

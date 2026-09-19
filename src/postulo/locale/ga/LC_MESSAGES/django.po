@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-18 23:51+0000\n"
+"POT-Creation-Date: 2026-09-18 23:56+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Gaeilge\n"
@@ -418,7 +418,7 @@ msgstr "D'athródh %(name)s an méid a bhraitheann Postulo féin air. %(problems
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
 
-#: src/postulo/templates/base.html:110
+#: src/postulo/templates/base.html:119
 #, python-format, draft
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — deais"
@@ -1011,7 +1011,7 @@ msgstr "glactha ag"
 msgid "Account"
 msgstr "Cuntas"
 
-#: src/postulo/templates/base.html:167
+#: src/postulo/templates/base.html:176
 #, python-format, draft
 msgid "Account menu, %(name)s"
 msgstr "Roghchlár cuntais, %(name)s"
@@ -1493,6 +1493,7 @@ msgstr "Iarratas nuashonraithe."
 #: src/postulo/applications/apps.py:9 src/postulo/core/navigation.py:58
 #: src/postulo/core/search.py:390 src/postulo/jobs/tables.py:67
 #: src/postulo/templates/applications/application_list.html:6
+#: src/postulo/templates/applications/application_list.html:32
 #: src/postulo/templates/applications/application_list.html:77
 #: src/postulo/templates/core/export.html:20
 #: src/postulo/templates/core/import_csv_done.html:14
@@ -1797,6 +1798,7 @@ msgid "Biotechnology"
 msgstr "Biteicneolaíocht"
 
 #: src/postulo/applications/tables.py:18
+#: src/postulo/templates/applications/partials/board.html:40
 #, draft
 msgid "Board"
 msgstr "Clár"
@@ -1860,6 +1862,7 @@ msgstr "C2 — oilte"
 #: src/postulo/templates/applications/application_detail.html:275
 #: src/postulo/templates/applications/calendar.html:6
 #: src/postulo/templates/applications/calendar.html:54
+#: src/postulo/templates/applications/calendar.html:83
 #, draft
 msgid "Calendar"
 msgstr "Féilire"
@@ -2312,6 +2315,7 @@ msgstr "Ag teacht"
 #: src/postulo/core/navigation.py:74 src/postulo/core/search.py:392
 #: src/postulo/templates/core/export.html:19
 #: src/postulo/templates/jobs/company_list.html:6
+#: src/postulo/templates/jobs/company_list.html:25
 #: src/postulo/templates/jobs/company_list.html:64
 #, draft
 msgid "Companies"
@@ -3066,6 +3070,10 @@ msgstr "Caite i leataobh"
 msgid "Discarded. It stays in your history and can be restored."
 msgstr "Caite i leataobh. Fanann sé i do stair agus is féidir é a athchóiriú."
 
+#: src/postulo/templates/base.html:91
+msgid "Dismiss"
+msgstr ""
+
 #: src/postulo/templates/applications/partials/bulk_fields.html:7
 #: src/postulo/templates/jobs/partials/bulk_fields.html:7
 #, draft
@@ -3101,6 +3109,7 @@ msgstr "Stórais doiciméad"
 #: src/postulo/templates/applications/application_detail.html:201
 #: src/postulo/templates/documents/application_documents.html:6
 #: src/postulo/templates/documents/application_documents.html:12
+#: src/postulo/templates/documents/rendered_list.html:18
 #, draft
 msgid "Documents"
 msgstr "Doiciméid"
@@ -3528,6 +3537,12 @@ msgid ""
 "Exactly as it appears, including the scheme and any port. If this instance moves, register the new one before anybody tries to connect again."
 msgstr ""
 "Go díreach mar atá sé, an scéim agus aon phort san áireamh. Má bhogann an t-ásc seo, cláraigh an ceann nua sula ndéanann duine iarracht ceangal arís."
+
+#: src/postulo/templates/api/token_list.html:111
+#: src/postulo/templates/api/token_list.html:116
+#: src/postulo/templates/core/export.html:61
+msgid "Example command"
+msgstr ""
 
 #: src/postulo/templates/server/person_plugins.html:9
 #, draft
@@ -4232,6 +4247,7 @@ msgid "How regularly"
 msgstr "Cé chomh rialta"
 
 #: src/postulo/templates/core/import_csv_map.html:72
+#: src/postulo/templates/core/import_csv_map.html:73
 #, draft
 msgid "How the first rows will be read"
 msgstr "Conas a léifear na chéad rónna"
@@ -4485,6 +4501,7 @@ msgstr "seoladh an innéacs"
 #: src/postulo/templates/jobs/company_list.html:72
 #: src/postulo/templates/jobs/industry_list.html:6
 #: src/postulo/templates/jobs/industry_list.html:12
+#: src/postulo/templates/widgets/industries.html:4
 #, draft
 msgid "Industries"
 msgstr "Tionscail"
@@ -4685,6 +4702,7 @@ msgstr "cuirí"
 
 #: src/postulo/templates/accounts/invite_list.html:4
 #: src/postulo/templates/accounts/invite_list.html:9
+#: src/postulo/templates/accounts/invite_list.html:20
 #: src/postulo/templates/server/people.html:12
 #, draft
 msgid "Invitations"
@@ -5256,9 +5274,11 @@ msgid "Listing filters"
 msgstr "Scagairí fógraí"
 
 #: src/postulo/core/navigation.py:45 src/postulo/core/search.py:391
+#: src/postulo/templates/applications/report.html:244
 #: src/postulo/templates/core/import_csv_done.html:15
 #: src/postulo/templates/jobs/listing_list.html:6
 #: src/postulo/templates/jobs/listing_list.html:11
+#: src/postulo/templates/jobs/listing_list.html:82
 #: src/postulo/templates/widgets/shortcuts.html:22
 #, draft
 msgid "Listings"
@@ -5313,6 +5333,7 @@ msgstr "lógó faighte"
 
 #: src/postulo/core/server_sections.py:45 src/postulo/core/server_views.py:433
 #: src/postulo/templates/server/logs.html:5
+#: src/postulo/templates/server/logs.html:82
 #, draft
 msgid "Logs"
 msgstr "Logaí"
@@ -5430,7 +5451,7 @@ msgstr "Iompar an phoist"
 msgid "mail's last error"
 msgstr "earráid dheireanach an phoist"
 
-#: src/postulo/templates/base.html:141 src/postulo/templates/base.html:145
+#: src/postulo/templates/base.html:150 src/postulo/templates/base.html:154
 #, draft
 msgid "Main"
 msgstr "Príomh"
@@ -5531,7 +5552,7 @@ msgstr ""
 msgid "Member"
 msgstr "Ball"
 
-#: src/postulo/templates/base.html:137
+#: src/postulo/templates/base.html:146
 #, draft
 msgid "Menu"
 msgstr "Roghchlár"
@@ -7173,6 +7194,7 @@ msgstr "Ar feitheamh amháin"
 #: src/postulo/core/server_views.py:342 src/postulo/jobs/tables.py:95
 #: src/postulo/templates/jobs/company_detail.html:193
 #: src/postulo/templates/server/people.html:7
+#: src/postulo/templates/server/people.html:26
 #, draft
 msgid "People"
 msgstr "Daoine"
@@ -7321,6 +7343,7 @@ msgstr "stór breiseán"
 #: src/postulo/core/server_sections.py:39 src/postulo/core/server_views.py:805
 #: src/postulo/core/settings_sections.py:88 src/postulo/plugins/apps.py:9
 #: src/postulo/templates/server/plugins.html:5
+#: src/postulo/templates/server/plugins.html:449
 #: src/postulo/templates/settings/plugins.html:5
 #, draft
 msgid "Plugins"
@@ -7483,7 +7506,7 @@ msgstr "Fógraí ar fud ghrúpa %(name)s"
 msgid "Postings read from a page, waiting for you to confirm them."
 msgstr "Fógraí a léadh ó leathanach, ag fanacht ort iad a dheimhniú."
 
-#: src/postulo/templates/base.html:83
+#: src/postulo/templates/base.html:89
 #, draft
 msgid "Postulo could not be reached. Nothing on this page has changed."
 msgstr ""
@@ -7549,7 +7572,7 @@ msgid ""
 msgstr ""
 "Ní stórálann Postulo ach haiseáil de agus ní féidir leis é a thaispeáint arís. Má chailleann tú é, déanann tú ceann eile."
 
-#: src/postulo/templates/base.html:228
+#: src/postulo/templates/base.html:237
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — do chuardach poist, ar do fhreastalaí féin."
@@ -7894,7 +7917,7 @@ msgstr "Taifead"
 #: src/postulo/templates/applications/application_intake.html:4
 #: src/postulo/templates/applications/application_intake.html:8
 #: src/postulo/templates/applications/application_list.html:62
-#: src/postulo/templates/applications/application_list.html:100
+#: src/postulo/templates/applications/application_list.html:102
 #: src/postulo/templates/core/dashboard.html:77
 #, draft
 msgid "Record an application"
@@ -7964,6 +7987,10 @@ msgstr "Taifeadta a bhfuil seolta agat."
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Taifeadta: níor tháinig aon duine."
+
+#: src/postulo/templates/server/person_recovery.html:58
+msgid "Recovery"
+msgstr ""
 
 #: src/postulo/accounts/models.py:434
 #, draft
@@ -8506,7 +8533,7 @@ msgid "Screening"
 msgstr "Scagadh"
 
 #: src/postulo/templates/applications/partials/filters.html:9
-#: src/postulo/templates/base.html:155 src/postulo/templates/core/search.html:4
+#: src/postulo/templates/base.html:164 src/postulo/templates/core/search.html:4
 #: src/postulo/templates/core/search.html:8
 #: src/postulo/templates/core/search.html:16
 #: src/postulo/templates/jobs/company_list.html:83
@@ -8515,12 +8542,12 @@ msgstr "Scagadh"
 msgid "Search"
 msgstr "Cuardaigh"
 
-#: src/postulo/templates/base.html:155
+#: src/postulo/templates/base.html:164
 #, draft
 msgid "Search  /"
 msgstr "Cuardaigh  /"
 
-#: src/postulo/templates/base.html:153
+#: src/postulo/templates/base.html:162
 #: src/postulo/templates/core/search.html:12
 #, draft
 msgid "Search everything"
@@ -8671,7 +8698,7 @@ msgstr "Freastalaí"
 
 #: src/postulo/templates/accounts/invite_form.html:4
 #: src/postulo/templates/accounts/invite_list.html:4
-#: src/postulo/templates/base.html:181 src/postulo/templates/server/base.html:4
+#: src/postulo/templates/base.html:190 src/postulo/templates/server/base.html:4
 #: src/postulo/templates/server/base.html:13
 #, draft
 msgid "Server settings"
@@ -8730,7 +8757,7 @@ msgid "Set when the opening is no longer available."
 msgstr "Socraigh nuair nach bhfuil an folúntas ar fáil a thuilleadh."
 
 #: src/postulo/templates/api/token_list.html:4
-#: src/postulo/templates/base.html:177 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/base.html:186 src/postulo/templates/core/export.html:4
 #: src/postulo/templates/documents/cv_detail.html:24
 #: src/postulo/templates/server/email.html:145
 #: src/postulo/templates/settings/base.html:4
@@ -8749,7 +8776,7 @@ msgstr "Rannáin socruithe"
 msgid "Settled"
 msgstr "Réitithe"
 
-#: src/postulo/templates/applications/application_list.html:86
+#: src/postulo/templates/applications/application_list.html:88
 #, draft
 msgid "Shape"
 msgstr "Cruth"
@@ -8844,7 +8871,7 @@ msgid "Shown in the header and on the sign-in page."
 msgstr "Taispeántar sa cheanntásc agus ar an leathanach sínithe isteach."
 
 #: src/postulo/templates/account/recovery_unusable.html:16
-#: src/postulo/templates/base.html:203 src/postulo/templates/core/home.html:20
+#: src/postulo/templates/base.html:212 src/postulo/templates/core/home.html:20
 #, draft
 msgid "Sign in"
 msgstr "Sínigh isteach"
@@ -8876,7 +8903,7 @@ msgid ""
 msgstr ""
 "Sínigh isteach le méarlorg, le d’aghaidh nó le UAP an ghléis. Faic le clóscríobh, faic scríofa síos, agus faic ar féidir le ríomhphost tú a chur ina choinne."
 
-#: src/postulo/templates/base.html:195
+#: src/postulo/templates/base.html:204
 #, draft
 msgid "Sign out"
 msgstr "Sínigh amach"
@@ -8952,7 +8979,7 @@ msgstr "Áirítear síniú isteach aonair mar an dara fachtóir"
 msgid "single-key shortcuts"
 msgstr "aicearraí aoneochracha"
 
-#: src/postulo/templates/base.html:152
+#: src/postulo/templates/base.html:161
 #, draft
 msgid "Site search"
 msgstr "Cuardach suímh"
@@ -9154,6 +9181,10 @@ msgstr ""
 #, draft
 msgid "source version"
 msgstr "leagan foinse"
+
+#: src/postulo/templates/widgets/sources.html:4
+msgid "Sources"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html:79
 #, draft
@@ -9442,6 +9473,7 @@ msgid "System"
 msgstr "Córas"
 
 #: src/postulo/applications/tables.py:18
+#: src/postulo/templates/allauth/elements/table.html:2
 #, draft
 msgid "Table"
 msgstr "Tábla"
@@ -9639,7 +9671,7 @@ msgstr "Níl an ceangal sin ann a thuilleadh."
 msgid "That department belongs to a different company."
 msgstr "Baineann an roinn sin le cuideachta eile."
 
-#: src/postulo/templates/base.html:82
+#: src/postulo/templates/base.html:88
 #, draft
 msgid ""
 "That did not work — the server answered {status}. Nothing on this page has changed."
@@ -12067,7 +12099,7 @@ msgstr "Do spriocdháta"
 
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:10
-#: src/postulo/templates/base.html:174
+#: src/postulo/templates/base.html:183
 #: src/postulo/templates/widgets/shortcuts.html:34
 #, draft
 msgid "Your details"

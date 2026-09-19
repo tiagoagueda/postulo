@@ -143,6 +143,63 @@ def test_a_button_shows_its_focus_in_forced_colours(page: Page, live_server, app
     assert outline["width"] not in ("", "0px"), "and it has a width to be seen by"
 
 
+def test_a_wide_table_scrolls_from_the_keyboard(page: Page, live_server, companies):
+    """Twenty scroll boxes, none focusable (#275): once a table overflowed, a plain-text cell
+    off the edge could never be brought into view from the keyboard. The box is a named
+    region in the tab order now, and the arrow keys scroll it."""
+    sign_in(page, live_server.url)
+    page.set_viewport_size({"width": 480, "height": 800})
+    page.goto(f"{live_server.url}/jobs/companies/")
+
+    box = page.get_by_role("region", name="Companies")
+    box.focus()
+    assert page.evaluate("() => document.activeElement.getAttribute('aria-label')") == "Companies"
+    assert page.evaluate(
+        "() => document.activeElement.scrollWidth > document.activeElement.clientWidth"
+    )
+    page.keyboard.press("ArrowRight")
+    page.wait_for_function("() => document.activeElement.scrollLeft > 0")
+
+
+def test_both_shapes_of_the_applications_page_are_in_the_tab_order(
+    page: Page, live_server, applicant
+):
+    """The current shape was a disabled button: out of the tab order and drawn at half
+    strength, reading as unavailable while announcing current (#275)."""
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/applications/")
+
+    buttons = page.locator("[data-shape-switch] button")
+    expect(buttons).to_have_count(2)
+    expect(buttons.first).to_be_enabled()
+    expect(buttons.last).to_be_enabled()
+    buttons.first.focus()
+    page.keyboard.press("Tab")
+    assert page.evaluate("() => document.activeElement.closest('[data-shape-switch]') !== null")
+    assert (
+        page.evaluate("() => document.activeElement.textContent.trim()")
+        == buttons.last.text_content().strip()
+    )
+
+
+def test_the_failure_alert_closes_on_escape_and_on_its_button(page: Page, live_server, applicant):
+    """A fixed box with no way off the screen sat over the foot of a long table (#275)."""
+    sign_in(page, live_server.url)
+    words = page.locator("[data-htmx-alert] [data-alert-words]")
+    page.evaluate(
+        "() => { document.querySelector('[data-alert-words]').textContent = 'It failed.' }"
+    )
+    expect(words).to_be_visible()
+
+    page.keyboard.press("Escape")
+    expect(words).to_have_text("")
+    expect(words).to_be_hidden()
+
+    page.evaluate("() => { document.querySelector('[data-alert-words]').textContent = 'Again.' }")
+    page.get_by_role("button", name="Dismiss").click()
+    expect(words).to_have_text("")
+
+
 def test_a_single_key_does_nothing_once_it_is_switched_off(page: Page, live_server, applicant):
     """WCAG 2.1.4, level A. The switch is under Settings → Appearance."""
     sign_in(page, live_server.url)

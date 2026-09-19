@@ -432,9 +432,13 @@
      it, which is what makes it catchable by a finger as well as a mouse. It is pinned to
      the end edge with a logical utility, because the last column is the end edge and not
      the right one -- and the lint that reads this file would catch the other spelling. */
+  /* A hairline at rest, inside the 24-pixel target, so the splitter can be seen before it
+     is hovered: pointer users who do not hover, touch users and keyboard users had no cue
+     that one existed (#275). The hover fill stays for those who do. */
   .col-handle {
     @apply absolute inset-y-0 end-0 w-6 cursor-col-resize touch-none border-0 bg-transparent p-0
-      hover:bg-brand-500/40
+      before:absolute before:inset-y-2 before:end-2.5 before:w-px before:bg-ink-300
+      hover:bg-brand-500/40 dark:before:bg-ink-700
       focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2
       focus-visible:outline-brand-600;
   }
@@ -814,8 +818,20 @@ details[data-menu] > summary::-webkit-details-marker {
     text-red-900 shadow-lg dark:border-red-800 dark:bg-red-950 dark:text-red-100;
 }
 
-.page-alert:empty {
+/* Hidden while the region has nothing to say (#275): the box holds the region and a
+   dismiss button, so it is the region's emptiness that decides, not the box's. */
+.page-alert:has(> [role="alert"]:empty) {
   display: none;
+}
+
+.page-alert > [role="alert"] {
+  @apply grow;
+}
+
+/* While the alert shows, anything scrolled to -- a focused link at the foot of a long
+   table -- lands above it rather than under it (SC 2.4.11, #275). */
+html:has(.page-alert > [role="alert"]:not(:empty)) {
+  scroll-padding-bottom: 6rem;
 }
 
 /* Accessibility: the skip link is visible only when it has focus, and nothing moves for

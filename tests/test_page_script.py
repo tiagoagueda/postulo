@@ -55,7 +55,9 @@ def test_the_page_carries_one_region_for_a_failed_request(client, user):
     client.force_login(user)
     html = client.get(reverse("core:home")).content.decode()
 
-    region = re.search(r'<div class="page-alert" role="alert" data-htmx-alert([^>]*)></div>', html)
+    # The region is the paragraph inside the box, and the dismiss button beside it is
+    # outside the region, so the announcement is only ever the words (#275).
+    region = re.search(r'<p role="alert" data-alert-words([^>]*)></p>', html)
     assert region, "no empty role=alert region on the page"
     assert html.count("data-htmx-alert") == 1, "one region for the whole application"
 
@@ -105,7 +107,7 @@ def test_the_part_being_replaced_says_it_is_busy():
 def test_the_stylesheet_shows_both_states():
     assert '[aria-busy="true"]' in SOURCE_CSS and '[aria-busy="true"]' in COMPILED_CSS
     assert ".page-alert" in SOURCE_CSS and ".page-alert" in COMPILED_CSS
-    assert ".page-alert:empty" in SOURCE_CSS, "empty is what keeps it out of the way"
+    assert '.page-alert:has(> [role="alert"]:empty)' in SOURCE_CSS, "empty keeps it out of the way"
 
 
 # ------------------------------------------------- 2. a session that expired says so

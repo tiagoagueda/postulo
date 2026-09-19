@@ -16,6 +16,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Every table and board that scrolls sideways is a named stop in the tab order the arrow
+  keys scroll, the table-or-board switcher's current choice is pressed rather than
+  disabled, the failure alert has a dismiss button and closes on Escape, and the
+  column-resize handle can be seen before it is hovered. (#275)
 - A field's border clears 3:1 in both themes and darkens again for somebody who asked for
   more contrast, focus on a field is an opaque ring, the section you are in is underlined,
   weighted and announced, and a done reminder or a cancelled interview says so to a screen
