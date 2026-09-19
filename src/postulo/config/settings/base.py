@@ -342,6 +342,15 @@ SOCIALACCOUNT_FORMS = {"signup": "postulo.accounts.forms.SocialSignupForm"}
 # readable by whoever can reach the instance, and the page says exactly that rather than
 # implying they are protected.
 POSTULO_METRICS_ENABLED = env.bool("POSTULO_METRICS_ENABLED", default=False)
+# Whether this instance may ask, once a day from the scheduler and never from a page,
+# whether a newer release exists -- one request to the address below and to nothing else.
+# Off by default, because this application does not make requests on a reader's behalf;
+# on, the Overview can say that a release, and so a security release, is out (#272).
+POSTULO_UPDATE_CHECK = env.bool("POSTULO_UPDATE_CHECK", default=False)
+POSTULO_UPDATE_SOURCE = env(
+    "POSTULO_UPDATE_SOURCE",
+    default="https://source.tiagoagueda.com/api/v1/repos/postulo/postulo/releases/latest",
+)
 POSTULO_METRICS_TOKEN = env("POSTULO_METRICS_TOKEN", default="")
 
 # The log, served at /logs for a collector to scrape. Off, and a 404 rather than a 403

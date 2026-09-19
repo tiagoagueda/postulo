@@ -33,7 +33,7 @@ from postulo import __version__
 from postulo.accounts import deletion
 from postulo.plugins.forms import PluginRepositoryForm
 
-from . import proxy, site
+from . import proxy, site, updates
 from .mixins import StaffRequiredMixin
 from .models import SiteSettings
 from .server_forms import (
@@ -137,6 +137,9 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 # Where this very request arrived from, and whether Postulo believed its
                 # forwarding headers: the one fact an operator needs to name their proxy.
                 "proxy": proxy.describe(self.request),
+                # What the last update check stored, if the operator switched one on; the
+                # page reads it and never asks (#272).
+                "update": updates.status(),
             }
         )
         return context

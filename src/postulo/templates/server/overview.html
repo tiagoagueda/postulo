@@ -22,6 +22,37 @@
       <h2 class="mb-3 font-medium">{% translate "Software" %}</h2>
       <dl class="space-y-2 text-sm">
         <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">Postulo</dt><dd data-version>{{ version }}</dd></div>
+        {% comment %} Whether that number is the newest one, which nothing on any page could
+           say before #272. Off by default and asked by the scheduler, never by this page:
+           what is shown is the last stored answer and its date. {% endcomment %}
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Newest release" %}</dt>
+          <dd class="min-w-0 text-end" data-update="{% if not update.enabled %}off{% elif update.behind %}behind{% elif update.latest %}current{% else %}unknown{% endif %}">
+            {% if not update.enabled %}
+              <span class="text-ink-500 dark:text-ink-400">{% translate "not checked" %}</span>
+              <span class="block text-xs text-ink-500 dark:text-ink-400">
+                {% blocktranslate trimmed %}
+                  Set <code>POSTULO_UPDATE_CHECK=true</code> to let the scheduler ask once a day.
+                {% endblocktranslate %}
+              </span>
+            {% elif update.behind %}
+              <a href="{{ update.url }}" class="text-amber-700 underline dark:text-amber-400" rel="noopener noreferrer external" target="_blank">{{ update.latest }}<span class="sr-only"> {% translate "(opens in a new tab)" %}</span></a>
+              <span class="block text-xs text-amber-700 dark:text-amber-400">{% translate "newer than this instance" %}</span>
+            {% elif update.latest %}
+              <span>{{ update.latest }}</span>
+              <span class="block text-xs text-ink-500 dark:text-ink-400">{% translate "this instance is up to date" %}</span>
+            {% elif update.error %}
+              <span class="text-ink-500 dark:text-ink-400">{% translate "could not check" %}</span>
+              <span class="block text-xs text-ink-500 dark:text-ink-400">{{ update.error|truncatechars:80 }}</span>
+            {% else %}
+              <span class="text-ink-500 dark:text-ink-400">{% translate "not checked yet" %}</span>
+              <span class="block text-xs text-ink-500 dark:text-ink-400">{% translate "The scheduler asks once a day; run manage.py check_for_updates to ask now." %}</span>
+            {% endif %}
+            {% if update.checked_at %}
+              <span class="block text-xs text-ink-500 dark:text-ink-400">{% blocktranslate with when=update.checked_at|timesince trimmed %}checked {{ when }} ago{% endblocktranslate %}</span>
+            {% endif %}
+          </dd>
+        </div>
         <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">Python</dt><dd>{{ python_version }}</dd></div>
         <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">Django</dt><dd>{{ django_version }}</dd></div>
         <div class="flex justify-between gap-4">

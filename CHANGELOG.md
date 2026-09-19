@@ -47,6 +47,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- An instance can learn that a newer release exists: with `POSTULO_UPDATE_CHECK=true` the
+  scheduler asks the project's release address once a day, and nothing else, and *Server
+  settings → Overview* says when one is out; `manage.py check_for_updates` asks now. Off
+  by default, since Postulo makes no request on your behalf unless you say so. (#272)
 - *Settings → Plugins* shows each plugin's logo beside its name, as *Server settings →
   Plugins* has, served by this instance and with an initials tile where a plugin ships none.
   (#288)

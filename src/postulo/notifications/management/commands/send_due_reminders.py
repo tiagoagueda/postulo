@@ -123,6 +123,13 @@ class Command(BaseCommand):
         while True:
             try:
                 self.one_pass(every, budget=options["sync_budget"])
+                # The one outbound request this loop makes on the instance's own behalf,
+                # and only if the operator switched it on: once a day, is there a newer
+                # release (#272). A page never asks; this is where the asking happens.
+                from postulo.core import updates
+
+                if updates.due():
+                    updates.check()
             except Exception:
                 # A pass that ends badly is one pass. Before this, a dropped PostgreSQL
                 # connection or a SQLite lock timeout ended the *process*, and the container
