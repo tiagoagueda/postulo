@@ -14,6 +14,12 @@ All notable changes to Postulo are recorded here. The format follows
 - Markup shared between pages is a component (django-cotton) rather than an include with a
   `with` chain; the form field, its feedback and the table header are the first three. (#263)
 
+### ✨ Added
+
+- The browser suite reads every page under WCAG's text-spacing override and at 200% zoom,
+  and checks that reduced motion means no motion; the calendar's month cells clamp an
+  event to two lines rather than cutting it to one. (#278)
+
 ### 🐛 Fixed
 
 - The applications and companies tables carry a hidden caption naming them, and discarding
