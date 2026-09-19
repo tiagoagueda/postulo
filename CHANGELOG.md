@@ -8,118 +8,73 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
-- An invitation's token is stored as a fingerprint, as a recovery link's and an API
-  token's are, and the link is shown once, on the page that made it; the list of
-  invitations no longer shows links, and a copy of the database is no longer a set of
-  working invitations. Invitations already issued keep working. (#232)
-- **`X-Forwarded-For` and `X-Forwarded-Proto` are believed only from this host unless you
-  name your proxy.** Every private network used to be trusted, which let any host on the
-  LAN, any container on the same bridge and, under rootless Docker, anybody at all choose
-  the address the sign-in limits count them under. **Upgrading: if your proxy is a
-  container or another machine, set `POSTULO_TRUSTED_PROXIES` to its network** — *Server
-  settings → Overview* shows the address a request arrives from and whether it was trusted.
-  Without it, an instance behind TLS redirects itself in a loop. (#232)
-- The email notifier sends only to one of your own verified addresses, chosen from a list
-  rather than typed, and a connection's *Test* button, like the mail settings' one, is
-  bounded by `POSTULO_CONNECTION_TEST_RATE`; a title never breaks a subject line. (#232)
-- The isolation sweep the threat model promised exists: every address that names a record,
-  page and API route alike, is asked for somebody else's and must answer 404, and a new
-  one has to be listed or excused; the calendar, both iCalendar feeds, pictures, logos and
-  the export archive have boundary tests of their own. (#232)
-- The content security policy is set for every settings module rather than production's
-  alone, so the browser suite runs under the policy a visitor gets and fails on any
-  violation; it names `worker-src`, `manifest-src` and `object-src` explicitly. The first
-  thing it caught: a CV or letter preview inlines its theme's stylesheet, which the policy
-  refused, so previews were unstyled in production; the element carries a nonce now. (#232)
+- Invitation tokens are stored as fingerprints and the link is shown once, on the page that
+  made it; links already sent keep working. (#232)
+- **Forwarding headers are believed only from this host unless you name your proxy.
+  Upgrading behind a container or another machine: set `POSTULO_TRUSTED_PROXIES` to its
+  network**, which *Server settings → Overview* now shows. (#232)
+- The email notifier sends only to your own verified addresses, and every *Test* button
+  is bounded by `POSTULO_CONNECTION_TEST_RATE`. (#232)
+- Every address that names a record is swept for another account's, on pages and the
+  API alike, and the feeds, pictures, logos and export have boundary tests. (#232)
+- The content security policy applies in every settings module and the browser suite fails
+  on a violation; CV and letter previews, which it had been refusing to style, carry a
+  nonce. (#232)
 
 ### 🔧 Changed
 
-- *Settings* has an *Accessibility* section of its own, holding the order number on career
-  entries and the keyboard-shortcuts switch, which were filed under *Appearance*, and
-  saying what Postulo is checked against and where to tell us when something does not
-  work. A bookmark to *Appearance* no longer shows those two. (#281)
-- `docs/PLAN.md` no longer restates where the project stands, which the tracker and the
-  releases answer; it says what the tree holds today, the fifteen shipped plugins, the
-  wiki and the sibling repositories, and what became of the open assumptions, and it is
-  revised at each release. (#255)
-- On *Server settings → Plugins* and on a person's row under *People*, each plugin has a
-  switch and a "may change it" box instead of a four-way dropdown, so a dozen rows read
-  down at a glance; the transports and identifier registries appear too, switched on and
-  disabled, with the reason beside them. A plugin hidden entirely stays hidden while it
-  stays off, and switching one off for the instance is what the list above does. (#286)
-- *Settings → Plugins* no longer explains somebody else's decision to you: a row an
-  administrator decided says "Set for your account" without naming them, and a row Postulo
-  ships carries no sentence, since the mark that reveals those rows already says who
-  switches them. The administrator's own view of a person's row still says who and when.
-  (#287)
-- The component layer draws on Basecoat: each component's structural file is imported as it
-  is adopted and painted in Postulo's own palette, and its names replace ours where the two
-  overlap, starting with the button. (#262)
-- Markup shared between pages is a component (django-cotton) rather than an include with a
-  `with` chain; the form field, its feedback and the table header are the first three. (#263)
+- *Settings* has an *Accessibility* section holding the career order number and the
+  keyboard-shortcuts switch, which were under *Appearance*. (#281)
+- `docs/PLAN.md` no longer restates where the project stands and is revised at each
+  release. (#255)
+- A changelog entry is one line ending in its issue, where the reasoning lives; the test
+  suite holds *Unreleased* to that. (#254)
+- Each plugin on the administrator's pages has a switch and a "may change it" box instead
+  of a four-way dropdown; transports and identifier registries appear, fixed on. (#286)
+- *Settings → Plugins* no longer names who decided a plugin for your account, and shipped
+  rows carry no sentence. (#287)
+- The component layer draws on Basecoat, one structural file at a time under Postulo's own
+  paint, starting with the button. (#262)
+- Shared markup is a django-cotton component rather than an include with a `with` chain.
+  (#263)
 
 ### ✨ Added
 
-- A postal address's country chooser shows the chosen country's flag over the closed
-  select, as the telephone field's has, drawn by the server and following the choice. (#214)
-- An instance can learn that a newer release exists: with `POSTULO_UPDATE_CHECK=true` the
-  scheduler asks the project's release address once a day, and nothing else, and *Server
-  settings → Overview* says when one is out; `manage.py check_for_updates` asks now. Off
-  by default, since Postulo makes no request on your behalf unless you say so. (#272)
-- *Settings → Plugins* shows each plugin's logo beside its name, as *Server settings →
-  Plugins* has, served by this instance and with an initials tile where a plugin ships none.
-  (#288)
-- *Server settings → Defaults* shows each language's flag, as the language picker does:
-  beside every checkbox in *Languages this instance offers*, with how its translation was
-  made, and over the closed *Language for new accounts* dropdown, which follows the
-  choice. (#208)
-- Anybody may write an importer: a package registered under `postulo.importers` is held to
-  `ImporterPlugin`, asked before the built-in Europass one, and handed a file only after the
-  kind has refused what it refuses; the `Record` it fills is on the plugin surface and the
-  contract is on the wiki. (#105)
-- The browser suite reads every page under WCAG's text-spacing override and at 200% zoom,
-  and checks that reduced motion means no motion; the calendar's month cells clamp an
-  event to two lines rather than cutting it to one. (#278)
+- A postal address's country chooser shows the chosen flag, as the telephone field does.
+  (#214)
+- `POSTULO_UPDATE_CHECK=true` lets the scheduler ask the project's release address once a
+  day whether a newer Postulo exists, shown on *Server settings → Overview*; off by
+  default. (#272)
+- *Settings → Plugins* shows each plugin's logo. (#288)
+- *Server settings → Defaults* shows each language's flag, as the language picker does.
+  (#208)
+- Anybody may write an importer: `postulo.importers` is an open group, `Record` is on the
+  plugin surface, and the contract is on the wiki. (#105)
+- The browser suite reads every page under WCAG's text-spacing override and at 200% zoom.
+  (#278)
 
 ### 🐛 Fixed
 
-- The "Name, if Other" box on identifier, telephone and address rows appears only when the
-  kind is Other, following the choice with no script, and a name given another kind is
-  blanked on save rather than stored invisibly; the identifier row is one component on
-  both pages that draw it. (#284)
-- Every third-party work shipped in the tree carries its notice beside it: zxcvbn's and
-  htmx's beside the scripts, Basecoat's beside the stylesheet with a banner in it, copied by
-  the sync script rather than remembered; htmx is pinned in `package.json` and synced like
-  the rest; `THIRD-PARTY.md` is the register, `TRADEMARKS.md` no longer lists code as a
-  name, and Postulo states whose copyright it is. (#279)
-- The applications and companies tables carry a hidden caption naming them, and discarding
-  a capture says where the discarded ones are, with a link, since the fast key is only fast
-  if there is a way back. (#260)
-- Under Windows High Contrast every button, menu row and navigation link keeps a border
-  and the funnel bars keep their value, and a page printed from a dark profile comes out
-  as ink on white with its tables whole and the chrome left off the paper. (#277)
-- Row actions say which row they act on, a company's notes, an industry's code and a
-  plugin's provenance are no longer kept in a tooltip, the invitation link is whole and has
-  a Copy button, every link that opens a new tab says so, the fields about you carry their
-  autocomplete purpose, and the small uppercase headers are plain text. (#276)
-- Every table and board that scrolls sideways is a named stop in the tab order the arrow
-  keys scroll, the table-or-board switcher's current choice is pressed rather than
-  disabled, the failure alert has a dismiss button and closes on Escape, and the
-  column-resize handle can be seen before it is hovered. (#275)
-- A field's border clears 3:1 in both themes and darkens again for somebody who asked for
-  more contrast, focus on a field is an opaque ring, the section you are in is underlined,
-  weighted and announced, and a done reminder or a cancelled interview says so to a screen
-  reader instead of fading. (#274)
-- The report, *Tags*, *Industries*, an application's documents and the import mapping take
-  the screen as every other list does, and a sweep over every page catches the next table
-  left in the 1280-pixel column. (#273)
-- The image workflow asks the registry for the three tags it pushed and attaches the bill of
-  materials to the release, instead of an artifact upload this server refuses. (#251)
-- Nine catalogues wrote *one* in the plural form that also counts twenty-one; they carry the
-  number now, Slovene's dual and Irish's five forms are real, Maltese counts eleven to
-  nineteen in the singular, and a handful of wording and register splits are settled. (#250)
-- On *Companies*, a company's name opens the company, as a name does in every other list;
-  renaming it where it sits is the pencil beside the name. (#252)
+- The "Name, if Other" box appears only when the kind is Other, and a name given another
+  kind is blanked on save. (#284)
+- Every third-party work in the tree carries its notice, htmx is pinned and synced like the
+  rest, `THIRD-PARTY.md` is the register, and Postulo states its copyright. (#279)
+- Tables carry a hidden caption, and discarding a capture links to where it went. (#260)
+- Under Windows High Contrast every control keeps a border and the funnel bars their value;
+  a page printed from the dark theme comes out as ink on white. (#277)
+- Row actions name their row, tooltips became text, the invitation link is whole, new-tab
+  links say so, fields about you carry their autocomplete purpose. (#276)
+- Every sideways-scrolling table is a named stop the arrow keys scroll, the failure alert
+  can be dismissed, and the column-resize handle is visible before hover. (#275)
+- A field's border and focus ring clear 3:1 in both themes, the current section is
+  underlined, and nothing is said by colour alone. (#274)
+- Five lists and grids that kept the reading measure now take the screen. (#273)
+- On *Companies*, a company's name opens the company, and renaming it where it sits is the
+  pencil beside the name. (#252)
+- Nine catalogues wrote *one* in the plural that also counts twenty-one; the forms are
+  real now. (#250)
+- The image workflow asks the registry for the tags it pushed and attaches the bill of
+  materials to the release. (#251)
 
 ## [0.3.0] — 2026-09-16
 

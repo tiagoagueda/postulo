@@ -282,8 +282,18 @@ request that touches a boundary answers to it.
 
 ## Writing a changelog entry
 
-An entry says **why**, not what. The diff already says what. Each goes under *Unreleased*,
-in one of six sections, each marked so the file can be scanned rather than read:
+**An entry is one line: what changed, who it affects, and the issue it closes.** The
+reasoning -- why, what was rejected, what broke -- belongs in the issue and in the commit
+message, where it is already written and where the code sits beside it. The changelog
+section becomes the release's notes verbatim, and 0.3.0's ran to forty-seven thousand
+words because every entry carried its reasoning too (#254); a release note somebody
+cannot scan in two minutes is not one. Keep an entry under about three hundred
+characters; `tests/test_changelog.py` holds *Unreleased* to that. A security entry may add
+the one sentence an operator needs to decide whether to hurry, and a breaking change the
+line that says what to do about it, in bold.
+
+Each goes under *Unreleased*, in one of six sections, each marked so the file can be
+scanned rather than read:
 
 | | For |
 | --- | --- |

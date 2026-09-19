@@ -1,10 +1,10 @@
 """The changelog's shape, so a convention stays one rather than becoming a habit.
 
-The entries themselves are long on purpose: each says *why* a thing changed rather than
-what changed, which is the house style and is not something a test can check. What a test
-can check is that the file stays scannable — every section is one of the six kinds Keep a
-Changelog names, each carries its mark, and every release the code claims to have made has
-somewhere to have been written down.
+An entry is one line ending in its issue, where the reasoning lives (#254); 0.3.0's
+entries were essays, and the file is 81% that release. What a test can check is that the
+file stays scannable — every section is one of the six kinds Keep a Changelog names, each
+carries its mark, every *Unreleased* entry is a line that names its issue, and every
+release the code claims to have made has somewhere to have been written down.
 """
 
 from __future__ import annotations
@@ -86,6 +86,34 @@ def test_the_version_the_code_claims_has_a_section():
     assert f"## [{version}]" in TEXT, (
         f"the code says {version} and the changelog has no section for it"
     )
+
+
+#: What one entry may run to, with its whitespace flattened. About three lines of the
+#: file, and room for the sentence a security entry or a breaking change adds (#254).
+ENTRY_LIMIT = 320
+
+
+def unreleased_entries() -> list[str]:
+    """Each `- ` entry under *Unreleased*, flattened to one line."""
+    section = TEXT.split("## [Unreleased]", 1)[1].split("\n## [", 1)[0]
+    entries = re.findall(r"^- (.*?)(?=^- |^### |\Z)", section, re.S | re.M)
+    return [" ".join(entry.split()) for entry in entries]
+
+
+def test_every_unreleased_entry_ends_with_its_issue():
+    """The issue is where the reasoning lives, so an entry without one has nowhere to
+    send a reader who wants it."""
+    orphans = [entry for entry in unreleased_entries() if not re.search(r"\(#\d+\)$", entry)]
+    assert not orphans, "\n".join(orphans)
+
+
+def test_every_unreleased_entry_is_a_line_not_an_essay():
+    """0.3.0's notes were forty-seven thousand words because nothing decided what an
+    entry was for; the convention is one line and this is what keeps it one (#254)."""
+    long = [
+        f"{len(entry)}: {entry[:80]}…" for entry in unreleased_entries() if len(entry) > ENTRY_LIMIT
+    ]
+    assert not long, f"over {ENTRY_LIMIT} characters, which is not a line:\n" + "\n".join(long)
 
 
 def test_the_release_notes_tool_still_finds_a_section():

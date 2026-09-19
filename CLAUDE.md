@@ -65,7 +65,13 @@ A feature ships with its tests, its wiki page (a commit to the `postulo.wiki` re
 beside this one, naming the same issue) and a CHANGELOG
 entry under *Unreleased*, in one of six marked sections — `### ✨ Added`, `### 🔧 Changed`,
 `### 🐛 Fixed`, `### 🔒 Security`, `### ⚠️ Deprecated`, `### 🗑️ Removed` — ending with the
-issue it closes. An entry says why, not what. Commit messages explain why, not what. Never create a release
+issue it closes. **An entry is one line: what changed and who it affects, at most about
+three hundred characters, ending in `(#N)`.** The reasoning, the rejected alternatives
+and the detail belong in the issue and in the commit message, which explain why, not
+what; the changelog section is the release's notes verbatim, and a release note nobody
+can scan in two minutes is not one (#254). A security entry may add the sentence an
+operator needs to decide whether to hurry, and a breaking change the line that says what
+to do; `tests/test_changelog.py` holds *Unreleased* to the length. Never create a release
 tag; releases are a deliberate, separate act.
 
 ## Working with AI
