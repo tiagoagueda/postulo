@@ -26,6 +26,11 @@ All notable changes to Postulo are recorded here. The format follows
   page and API route alike, is asked for somebody else's and must answer 404, and a new
   one has to be listed or excused; the calendar, both iCalendar feeds, pictures, logos and
   the export archive have boundary tests of their own. (#232)
+- The content security policy is set for every settings module rather than production's
+  alone, so the browser suite runs under the policy a visitor gets and fails on any
+  violation; it names `worker-src`, `manifest-src` and `object-src` explicitly. The first
+  thing it caught: a CV or letter preview inlines its theme's stylesheet, which the policy
+  refused, so previews were unstyled in production; the element carries a nonce now. (#232)
 
 ### 🔧 Changed
 

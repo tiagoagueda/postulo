@@ -230,8 +230,12 @@ def contact_details(owner) -> dict:
     return details
 
 
-def render_cv_html(cv: CV) -> str:
+def render_cv_html(cv: CV, *, nonce=None) -> str:
     """Render a CV variant to a complete, self-contained HTML document.
+
+    ``nonce`` is for the preview page alone: the browser's content security policy refuses
+    the theme's inlined `<style>` unless the element carries the request's nonce. The PDF
+    renderer passes none and the attribute is left out (#232).
 
     The kind decides which theme vocabulary sets it: a portfolio leads with the work and a
     CV with the career, and that is a difference in structure rather than in styling (#133).
@@ -252,6 +256,7 @@ def render_cv_html(cv: CV) -> str:
                 "document_language": document_language(cv),
                 "document_direction": document_direction(cv),
                 "document_title": document_title(cv),
+                "csp_nonce": nonce,
             },
         )
 
@@ -324,7 +329,9 @@ def unfilled_placeholders(letter: CoverLetter, application=None) -> list[str]:
     return found
 
 
-def render_letter_html(letter: CoverLetter, application=None, *, mark_empty: bool = False) -> str:
+def render_letter_html(
+    letter: CoverLetter, application=None, *, mark_empty: bool = False, nonce=None
+) -> str:
     """Render a cover letter, with its placeholders filled in.
 
     In the letter's own language, and so is the date it carries (#223). A letter whose
@@ -344,6 +351,7 @@ def render_letter_html(letter: CoverLetter, application=None, *, mark_empty: boo
                 "document_language": document_language(letter),
                 "document_direction": document_direction(letter),
                 "document_title": document_title(letter),
+                "csp_nonce": nonce,
             },
         )
 

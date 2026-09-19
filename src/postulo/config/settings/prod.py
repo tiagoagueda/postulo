@@ -1,7 +1,5 @@
 """Production settings for a self-hosted instance behind HTTPS."""
 
-from django.utils.csp import CSP
-
 from .base import *
 from .base import env
 from .keys import refuse_a_weak_key
@@ -73,18 +71,8 @@ POSTULO_SECURE_COOKIES = env.bool("POSTULO_SECURE_COOKIES", default=True)
 SESSION_COOKIE_SECURE = POSTULO_SECURE_COOKIES
 CSRF_COOKIE_SECURE = POSTULO_SECURE_COOKIES
 
-# Postulo serves no third-party scripts, fonts, or trackers. Say so, and enforce it.
-SECURE_CSP = {
-    "default-src": [CSP.NONE],
-    "script-src": [CSP.SELF],
-    "style-src": [CSP.SELF],
-    "img-src": [CSP.SELF, "data:"],
-    "font-src": [CSP.SELF],
-    "connect-src": [CSP.SELF],
-    "form-action": [CSP.SELF],
-    "frame-ancestors": [CSP.NONE],
-    "base-uri": [CSP.SELF],
-}
+# The content security policy is in `base.py` since #232, so that the browser suite runs
+# under the same one a visitor gets.
 
 # No OPTIONS: they would be frozen at import, and an administrator changing the mail
 # settings has to take effect without restarting the container. Django builds a fresh

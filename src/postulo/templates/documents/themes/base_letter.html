@@ -17,7 +17,10 @@
        file's properties. A letter always carries its sender, so there is no choice to
        respect here as there is on a CV (#235). {% endcomment %}
     <meta name="author" content="{{ contact.name }}">
-    <style>{% block page_styles %}{% endblock %}</style>
+    {% comment %} The nonce is there on the preview page, where a browser's content security
+       policy would otherwise refuse the inlined stylesheet; the PDF renderer is given none
+       and the attribute is left out (#232). {% endcomment %}
+    <style{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>{% block page_styles %}{% endblock %}</style>
   </head>
   <body>
     <header class="sender">

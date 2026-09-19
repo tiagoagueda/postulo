@@ -30,6 +30,14 @@ TEXT_SPACING = """
   p { margin-bottom: 2em !important; }
 """
 
+#: How the override reaches the page: a constructed stylesheet, adopted by the document.
+#: Not a `<style>` element, which the content security policy refuses (#232).
+ADOPT = """css => {
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(css);
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+}"""
+
 #: 200% zoom on a 1280-pixel window is a 640-pixel layout viewport.
 ZOOMED = 640
 
@@ -111,7 +119,7 @@ def test_nothing_is_lost_under_the_text_spacing_override(page: Page, live_server
     sign_in(page, base)
     page.set_viewport_size({"width": 1280, "height": 900})
 
-    failures = walk(page, base, furnished, before=lambda p: p.add_style_tag(content=TEXT_SPACING))
+    failures = walk(page, base, furnished, before=lambda p: p.evaluate(ADOPT, TEXT_SPACING))
 
     assert not failures, (
         f"{len(failures)} box(es) clip their words or push the page sideways under the text "

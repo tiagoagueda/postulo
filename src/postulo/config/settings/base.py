@@ -8,6 +8,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import environ
+from django.utils.csp import CSP
 
 from postulo.accounts.validators import USERNAME_BLACKLIST
 from postulo.config import sqlite
@@ -302,8 +303,8 @@ SOCIALACCOUNT_PROVIDERS = (
     if POSTULO_OIDC_SERVER_URL and POSTULO_OIDC_CLIENT_ID
     else {}
 )
-# The provider round-trip carries its own state; a plain link avoids the production CSP
-# (form-action 'self') silently blocking the redirect a POST form would make.
+# The provider round-trip carries its own state; a plain link avoids the content security
+# policy (form-action 'self') silently blocking the redirect a POST form would make.
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "sso"
 
@@ -558,6 +559,34 @@ TASKS = {
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
+
+# Postulo serves no third-party scripts, fonts, or trackers. Say so, and enforce it -- in
+# every settings module, not only production's. The policy used to be set in `prod.py`
+# alone, so the browser suite and axe ran without it, and an inline script or a `style=`
+# attribute passed CI and broke in production. Every browser test now runs under the same
+# policy a visitor gets, and fails on a violation (#232).
+SECURE_CSP = {
+    "default-src": [CSP.NONE],
+    "script-src": [CSP.SELF],
+    # The nonce is a per-request placeholder that reaches the header only on a response
+    # that used it, and one kind does: a CV or letter preview is the document exactly as
+    # the PDF renderer sees it, with its theme's stylesheet inlined in a `<style>` element
+    # because the renderer must fetch nothing. The policy refused that element, so the
+    # preview came out unstyled in production and nothing said so until the browser suite
+    # ran under the policy (#232). Every other page has no nonce and no inline style.
+    "style-src": [CSP.SELF, CSP.NONCE],
+    "img-src": [CSP.SELF, "data:"],
+    "font-src": [CSP.SELF],
+    "connect-src": [CSP.SELF],
+    # The push service worker at /sw.js, and the web app manifest: both fall back to
+    # `default-src` otherwise, which is `'none'`.
+    "worker-src": [CSP.SELF],
+    "manifest-src": [CSP.SELF],
+    "object-src": [CSP.NONE],
+    "form-action": [CSP.SELF],
+    "frame-ancestors": [CSP.NONE],
+    "base-uri": [CSP.SELF],
+}
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"

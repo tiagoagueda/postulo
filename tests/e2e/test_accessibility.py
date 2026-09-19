@@ -50,7 +50,11 @@ def axe_source() -> str:
 
 
 def violations_on(page: Page, axe_source: str) -> list[dict]:
-    page.add_script_tag(content=axe_source)
+    # Through the DevTools protocol rather than a `<script>` element: the page's content
+    # security policy allows no inline script, and since #232 the suite runs under it.
+    session = page.context.new_cdp_session(page)
+    session.send("Runtime.evaluate", {"expression": axe_source})
+    session.detach()
     results = page.evaluate(
         """async (tags) => {
             const results = await axe.run(document, {

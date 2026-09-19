@@ -159,7 +159,11 @@ def test_axe_finds_nothing_with_an_editor_open(page: Page, live_server, applican
     page.emulate_media(color_scheme=scheme)
     open_the_editor(page, live_server, applicant)
 
-    page.add_script_tag(content=AXE.read_text(encoding="utf-8"))
+    # Through the DevTools protocol rather than a `<script>` element: the content security
+    # policy allows no inline script, and since #232 the suite runs under it.
+    session = page.context.new_cdp_session(page)
+    session.send("Runtime.evaluate", {"expression": AXE.read_text(encoding="utf-8")})
+    session.detach()
     violations = page.evaluate(
         """async (tags) => {
             const results = await axe.run(document, {

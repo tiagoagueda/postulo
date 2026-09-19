@@ -5,6 +5,7 @@ from __future__ import annotations
 from django.contrib import messages
 from django.db import models, transaction
 from django.http import HttpRequest, HttpResponse
+from django.middleware.csp import get_nonce
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -194,6 +195,17 @@ class CVItemMoveView(OwnedObjectMixin, View):
         return redirect(item.cv.get_absolute_url())
 
 
+def _nonce(request: HttpRequest) -> str | None:
+    """The request's content-security-policy nonce, generated.
+
+    Django's nonce is lazy and reaches the header only once something has read it, so a
+    template that asks `{% if csp_nonce %}` before using it would never see one. Reading it
+    here is what puts the same value in the header and on the `<style>` element (#232).
+    """
+    nonce = get_nonce(request)
+    return str(nonce) if nonce is not None else None
+
+
 class CVPreviewView(OwnedObjectMixin, View):
     """The CV as HTML, exactly as the PDF renderer will see it."""
 
@@ -202,7 +214,7 @@ class CVPreviewView(OwnedObjectMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         cv = get_object_or_404(self.get_queryset(), pk=pk)
-        return HttpResponse(render_cv_html(cv))
+        return HttpResponse(render_cv_html(cv, nonce=_nonce(request)))
 
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
@@ -331,7 +343,9 @@ class CoverLetterPreviewView(OwnedObjectMixin, View):
                 .filter(pk=application_id)
                 .first()
             )
-        return HttpResponse(render_letter_html(letter, application, mark_empty=True))
+        return HttpResponse(
+            render_letter_html(letter, application, mark_empty=True, nonce=_nonce(request))
+        )
 
 
 # ----------------------------------------------------------------------- uploads

@@ -131,6 +131,43 @@ def test_every_response_carries_the_defensive_headers(client, person):
     assert response["X-Frame-Options"] == "DENY"
 
 
+def test_the_content_security_policy_is_sent_here_too(client, person):
+    """Not only by production. The policy used to live in `prod.py` alone, so every test,
+    the browser suite included, ran without it; an inline script or a `style=` attribute
+    passed CI and broke in production (#232). Now the test settings send the same one."""
+    client.force_login(person)
+    policy = client.get(reverse("core:home"))["Content-Security-Policy"]
+    assert "default-src 'none'" in policy
+    assert "script-src 'self'" in policy and "style-src 'self'" in policy
+    assert "object-src 'none'" in policy and "worker-src 'self'" in policy
+    assert "frame-ancestors 'none'" in policy
+    assert "unsafe-inline" not in policy
+    assert "nonce-" not in policy, "an ordinary page uses no nonce, so none is sent"
+
+
+def test_a_document_preview_carries_a_nonce_for_its_inlined_stylesheet(client, person):
+    """A CV or letter preview is the document as the PDF renderer sees it, stylesheet
+    inlined in a `<style>` element. The policy refused that element, so the preview came out
+    unstyled in production and nothing said so (#232). The element carries the request's
+    nonce now, the header names the same nonce, and the PDF renderer is given none."""
+    import re
+
+    from postulo.documents.models import CV
+    from postulo.documents.rendering import render_cv_html
+
+    cv = CV.objects.create(owner=person, name="Main")
+    client.force_login(person)
+
+    response = client.get(reverse("documents:cv_preview", args=[cv.pk]))
+    policy = response["Content-Security-Policy"]
+    nonce = re.search(r"style-src 'self' 'nonce-([^']+)'", policy)
+    assert nonce, policy
+    assert f'<style nonce="{nonce.group(1)}">' in response.content.decode()
+    assert "unsafe-inline" not in policy
+
+    assert "nonce=" not in render_cv_html(cv), "what the PDF renderer sees carries none"
+
+
 #: Imported in a subprocess, with the settings printed as JSON. Two reasons, and both were
 #: found the hard way: `postulo.config.settings.base` is already imported by the time any
 #: test runs, so setting an environment variable here and importing `prod` reads a
@@ -159,6 +196,8 @@ def test_the_production_settings_are_what_the_policy_says(production_settings):
     csp = prod["SECURE_CSP"]
     assert csp["default-src"] == ["'none'"] and csp["script-src"] == ["'self'"]
     assert csp["frame-ancestors"] == ["'none'"] and csp["form-action"] == ["'self'"]
+    assert csp["object-src"] == ["'none'"]
+    assert csp["worker-src"] == ["'self'"] and csp["manifest-src"] == ["'self'"]
     assert "'unsafe-inline'" not in str(csp) and "'unsafe-eval'" not in str(csp)
     assert not any("http" in str(v) for v in csp.values()), "no third-party origin, ever"
 
