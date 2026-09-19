@@ -22,6 +22,10 @@ All notable changes to Postulo are recorded here. The format follows
 - The email notifier sends only to one of your own verified addresses, chosen from a list
   rather than typed, and a connection's *Test* button, like the mail settings' one, is
   bounded by `POSTULO_CONNECTION_TEST_RATE`; a title never breaks a subject line. (#232)
+- The isolation sweep the threat model promised exists: every address that names a record,
+  page and API route alike, is asked for somebody else's and must answer 404, and a new
+  one has to be listed or excused; the calendar, both iCalendar feeds, pictures, logos and
+  the export archive have boundary tests of their own. (#232)
 
 ### 🔧 Changed
 
