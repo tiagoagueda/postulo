@@ -1,5 +1,5 @@
 {% extends "settings/base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block content %}
   <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Plugins" %}</h1>
@@ -63,6 +63,12 @@
                      {% if row.on %}checked{% endif %}
                      {% if not row.theirs %}disabled{% if row.why %} aria-describedby="why-{{ row.name }}"{% endif %}{% endif %}>
             {% endif %}
+            {% comment %} The logo, as the server page shows it (#288): a mark somebody
+               recognises is worth more here than there, since this is the list of whose code
+               acts on their behalf. Served by this instance, never by whoever wrote the plugin
+               (#106); decorative, beside the name; an initials tile where there is none. The
+               blank span above keeps its place so the column of boxes stays a column. {% endcomment %}
+            {% plugin_logo row.plugin %}
             <div class="min-w-0 flex-1">
               {% comment %} The checkbox is 13×13 and the browser decides that, so the label
                  that switches it is the target. At 19 pixels high it passed SC 2.5.8 only on the

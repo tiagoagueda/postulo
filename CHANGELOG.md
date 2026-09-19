@@ -47,6 +47,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- *Settings → Plugins* shows each plugin's logo beside its name, as *Server settings →
+  Plugins* has, served by this instance and with an initials tile where a plugin ships none.
+  (#288)
 - *Server settings → Defaults* shows each language's flag, as the language picker does:
   beside every checkbox in *Languages this instance offers*, with how its translation was
   made, and over the closed *Language for new accounts* dropdown, which follows the

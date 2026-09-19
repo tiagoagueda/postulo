@@ -66,6 +66,22 @@ def test_it_lists_what_was_installed_and_what_postulo_ships_only_when_asked(
     assert "Shipped inside Postulo" not in row and "why-" not in row
 
 
+def test_every_row_carries_the_plugins_logo(client, user, third_party):
+    """As the server page has since #106; the row never carried the plugin before (#288).
+    A plugin with no logo gets the initials tile rather than nothing or a broken image."""
+    client.force_login(user)
+    html = client.get(reverse(URL) + "?internal=1").content.decode()
+
+    for name in (third_party, PLUGIN):
+        row = row_for(html, name)
+        assert row, name
+        tile = re.search(r"<(img|span)[^>]*(select-none|object-contain)[^>]*>", row)
+        assert tile, f"{name}: no logo or initials tile in the row"
+        assert 'aria-hidden="true"' in tile.group(0) or 'alt=""' in tile.group(0), (
+            "decorative: it stands beside the name"
+        )
+
+
 def test_a_source_appears_even_though_it_has_no_connection(client, user, third_party):
     """The gap this page fills. A parser that reads a posting off a page needs nothing from
     anybody, so the connections list has never had a reason to mention it."""

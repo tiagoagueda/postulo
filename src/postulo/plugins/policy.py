@@ -256,6 +256,9 @@ def overview(person, *, internal: bool = False) -> list[dict]:
             rows.append(
                 {
                     "name": plugin.name,
+                    # The instance itself, so the template can ask for a logo rather than
+                    # being handed one it has no way to fall back from (#106, #288).
+                    "plugin": plugin,
                     "internal": shipped,
                     "label": base.label_of(plugin),
                     "description": base.description_of(plugin),
