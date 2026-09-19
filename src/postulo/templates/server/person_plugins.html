@@ -62,18 +62,34 @@
               </p>
             {% endif %}
           </div>
-          {% comment %} Full width until there is room for the fixed column: 288 pixels
-             inside a card inside a 320-pixel page does not fit, and `shrink-0` means it
-             will not give way (#113). {% endcomment %}
-          <div class="w-full shrink-0 sm:w-72">
-            <label class="sr-only" for="state-{{ row.name }}">
-              {% blocktranslate with plugin=row.label %}What {{ plugin }} does for this account{% endblocktranslate %}
+          {% comment %} A switch, and whether each person may change it, instead of a
+             four-way menu to open and read one row at a time (#286). Both are real inputs
+             that post with the form, so nothing here needs a script. A row that is nobody's
+             to decide -- a transport, an identifier registry -- shows its switch fixed on
+             and disabled, pointing at the reason: a disabled switch is not an action that
+             will not happen, it is a state in the same vocabulary as every row above it.
+             `row:` is the marker the save reads, since an unticked box submits nothing. {% endcomment %}
+          <div class="flex w-full shrink-0 flex-col gap-2 sm:w-64" data-controls="{{ row.name }}">
+            <label class="tap-target inline-flex items-center gap-3">
+              <input type="checkbox" role="switch" class="input" name="on:{{ row.name }}"
+                     {% if row.on %}checked{% endif %}
+                     {% if row.held %}disabled aria-describedby="why-{{ row.name }}"{% endif %}>
+              <span class="text-sm">{% translate "On" %}<span class="sr-only">: {{ row.label }}</span></span>
             </label>
-            <select name="state:{{ row.name }}" id="state-{{ row.name }}" class="field-input w-full">
-              {% for value, label in states %}
-                <option value="{{ value }}" {% if value == row.state %}selected{% endif %}>{{ label }}</option>
-              {% endfor %}
-            </select>
+            {% if row.held %}
+              <p class="text-xs text-ink-500 dark:text-ink-400" id="why-{{ row.name }}">{{ row.why }}</p>
+            {% else %}
+              <input type="hidden" name="row:{{ row.name }}" value="1">
+              <label class="tap-target inline-flex items-center gap-3">
+                <input type="checkbox" name="free:{{ row.name }}" {% if row.free %}checked{% endif %}>
+                <span class="text-sm">{% translate "This person may change it" %}<span class="sr-only">: {{ row.label }}</span></span>
+              </label>
+              {% if row.hidden %}
+                <p class="text-xs text-ink-500 dark:text-ink-400" data-hidden="{{ row.name }}">
+                  {% translate "Not offered at all, and kept that way while it stays off." %}
+                </p>
+              {% endif %}
+            {% endif %}
           </div>
         </li>
       {% empty %}

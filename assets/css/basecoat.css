@@ -109,6 +109,25 @@
    Unlayered, so it beats the layered rules above whatever they say, and `Highlight` rather
    than a colour the theme discards. */
 @media (forced-colors: active) {
+  /* A track and a knob in system colours, and the state in the knob's side rather than
+     in a fill the theme repaints. */
+  .input[type="checkbox"][role="switch"] {
+    border: 1px solid ButtonText;
+    background-color: Canvas;
+  }
+
+  .input[type="checkbox"][role="switch"]::before {
+    background-color: ButtonText;
+  }
+
+  .input[type="checkbox"][role="switch"]:checked {
+    background-color: Highlight;
+  }
+
+  .input[type="checkbox"][role="switch"]:checked::before {
+    background-color: Canvas;
+  }
+
   .btn:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
@@ -140,6 +159,24 @@
  * `overflow: hidden` does not clip it, because Basecoat's `outline-hidden` would leave an
  * item's focus to a background change that reads at barely 1.1:1.
  */
+/*
+ * The switch (#286): Basecoat's structure is a checkbox with `role="switch"` and a `::before`
+ * knob, and no script. The paint is the track and the knob in the palette, the knob's travel,
+ * and a focus outline said out loud for the reason the button's is (`outline-none` leaves
+ * the style variable at `none`). Disabled keeps Basecoat's opacity and cursor.
+ */
+@layer components {
+  .input[type="checkbox"][role="switch"] {
+    @apply h-5 w-9 cursor-pointer rounded-full bg-ink-300 before:size-4 before:translate-x-0.5
+      before:rounded-full before:bg-white before:shadow-sm checked:bg-brand-600
+      checked:before:translate-x-4 dark:bg-ink-600 dark:checked:bg-brand-500;
+  }
+
+  .input[type="checkbox"][role="switch"]:focus-visible {
+    @apply outline-solid outline-2 outline-offset-2 outline-brand-500;
+  }
+}
+
 @layer components {
   [data-popover] {
     @apply w-56 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-popover py-1

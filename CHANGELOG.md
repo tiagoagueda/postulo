@@ -34,6 +34,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- On *Server settings → Plugins* and on a person's row under *People*, each plugin has a
+  switch and a "may change it" box instead of a four-way dropdown, so a dozen rows read
+  down at a glance; the transports and identifier registries appear too, switched on and
+  disabled, with the reason beside them. A plugin hidden entirely stays hidden while it
+  stays off, and switching one off for the instance is what the list above does. (#286)
 - *Settings → Plugins* no longer explains somebody else's decision to you: a row an
   administrator decided says "Set for your account" without naming them, and a row Postulo
   ships carries no sentence, since the mark that reveals those rows already says who

@@ -13,6 +13,8 @@ a person cannot be given back a choice an administrator took.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -219,7 +221,7 @@ def test_nothing_is_deleted_when_a_plugin_is_switched_off(user):
 def test_an_administrator_sets_the_default_for_everybody(client, admin, user):
     client.force_login(admin)
 
-    client.post(reverse("server:plugin_policy"), {f"state:{PLUGIN}": "off"})
+    client.post(reverse("server:plugin_policy"), {f"row:{PLUGIN}": "1"})
 
     row = PluginPolicy.objects.get(plugin=PLUGIN, person=None)
     assert row.state == PluginPolicy.State.FORCED_OFF
@@ -230,7 +232,10 @@ def test_an_administrator_sets_the_default_for_everybody(client, admin, user):
 def test_an_administrator_sets_an_exception_for_one_account(client, admin, user):
     client.force_login(admin)
 
-    client.post(reverse("server:person_plugins", args=[user.pk]), {f"state:{PLUGIN}": "on"})
+    client.post(
+        reverse("server:person_plugins", args=[user.pk]),
+        {f"row:{PLUGIN}": "1", f"on:{PLUGIN}": "on"},
+    )
 
     row = PluginPolicy.objects.get(plugin=PLUGIN, person=user)
     assert row.state == PluginPolicy.State.FORCED_ON
@@ -243,7 +248,10 @@ def test_setting_it_back_to_available_removes_the_row(client, admin, user):
     PluginPolicy.objects.create(plugin=PLUGIN, person=user, state=PluginPolicy.State.FORCED_OFF)
     client.force_login(admin)
 
-    client.post(reverse("server:person_plugins", args=[user.pk]), {f"state:{PLUGIN}": "available"})
+    client.post(
+        reverse("server:person_plugins", args=[user.pk]),
+        {f"row:{PLUGIN}": "1", f"on:{PLUGIN}": "on", f"free:{PLUGIN}": "on"},
+    )
 
     assert not PluginPolicy.objects.filter(plugin=PLUGIN, person=user).exists()
     assert policy.decide(PLUGIN, user).decided_by == "shipped", "back to nobody's decision"
@@ -266,7 +274,7 @@ def test_only_an_administrator_decides_anything(client, user, route):
     client.force_login(user)
     url = reverse(route, args=[user.pk]) if route == "server:person_plugins" else reverse(route)
 
-    response = client.post(url, {f"state:{PLUGIN}": "off"})
+    response = client.post(url, {f"row:{PLUGIN}": "1"})
 
     assert response.status_code in {302, 403, 404}
     assert not PluginPolicy.objects.exists()
@@ -277,6 +285,68 @@ def test_a_change_is_written_to_the_log(client, admin, user, caplog):
     a trace. Who and when live on the row itself, and the change is logged besides."""
     client.force_login(admin)
 
-    client.post(reverse("server:person_plugins", args=[user.pk]), {f"state:{PLUGIN}": "off"})
+    client.post(reverse("server:person_plugins", args=[user.pk]), {f"row:{PLUGIN}": "1"})
 
     assert any("set to" in record.getMessage() for record in caplog.records)
+
+
+# ------------------------------------------------------------ the switch (#286)
+
+
+def test_each_row_is_a_switch_and_a_choice_not_a_menu(client, admin):
+    client.force_login(admin)
+    html = client.get(reverse("server:plugins")).content.decode()
+
+    assert (
+        "<select"
+        not in html.split("What each plugin does")[1].split("Where plugins may come from")[0]
+    )
+    row = re.search(rf'<li[^>]*data-policy="{PLUGIN}".*?</li>', html, re.S).group(0)
+    assert f'role="switch" class="input" name="on:{PLUGIN}"' in row
+    assert "checked" in row.split('role="switch"')[1].split(">")[0], "available means on"
+    assert f'name="free:{PLUGIN}"' in row and f'name="row:{PLUGIN}" value="1"' in row
+    assert "Each person may change it" in row
+
+
+def test_a_row_that_is_nobodys_to_decide_shows_a_fixed_switch(client, admin):
+    """A transport is instance plumbing: off would mean an account nobody can recover
+    (#104). It was left off the page; it is on it now, switched on and disabled, with the
+    reason the switch points at (#286)."""
+    client.force_login(admin)
+    html = client.get(reverse("server:plugins")).content.decode()
+
+    row = re.search(r'<li[^>]*data-policy="smtp".*?</li>', html, re.S)
+    assert row, "the SMTP transport is on the page"
+    switch = re.search(
+        r'<input type="checkbox" role="switch"[^>]*name="on:smtp"[^>]*>', row.group(0)
+    )
+    assert switch and "checked" in switch.group(0) and "disabled" in switch.group(0)
+    assert 'aria-describedby="why-smtp"' in switch.group(0)
+    assert 'id="why-smtp"' in row.group(0) and "How this instance works" in row.group(0)
+    assert 'name="row:smtp"' not in row.group(0), "never written to"
+
+
+def test_a_row_the_form_did_not_draw_is_left_alone(client, admin, user):
+    """An unticked box submits nothing, so absence from the POST is not off: only a row
+    whose marker arrived is read."""
+    PluginPolicy.objects.create(plugin=PLUGIN, person=None, state=PluginPolicy.State.FORCED_ON)
+    client.force_login(admin)
+
+    client.post(reverse("server:plugin_policy"), {})
+
+    assert PluginPolicy.objects.get(plugin=PLUGIN, person=None).state == "on"
+
+
+def test_a_hidden_plugin_stays_hidden_while_it_stays_off(client, admin):
+    """*Unavailable* is kept but no longer offered: the page shows it off and says so,
+    and saving it off again keeps it hidden rather than turning it into a visible off."""
+    PluginPolicy.objects.create(plugin=PLUGIN, person=None, state=PluginPolicy.State.UNAVAILABLE)
+    client.force_login(admin)
+
+    html = client.get(reverse("server:plugins")).content.decode()
+    assert f'data-hidden="{PLUGIN}"' in html
+    client.post(reverse("server:plugin_policy"), {f"row:{PLUGIN}": "1"})
+    assert PluginPolicy.objects.get(plugin=PLUGIN, person=None).state == "unavailable"
+
+    client.post(reverse("server:plugin_policy"), {f"row:{PLUGIN}": "1", f"on:{PLUGIN}": "on"})
+    assert PluginPolicy.objects.get(plugin=PLUGIN, person=None).state == "on"

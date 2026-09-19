@@ -844,9 +844,7 @@ class PluginsView(ServerSectionMixin, TemplateView):
         context["repositories"] = _repositories()
         context["repository_form"] = kwargs.get("repository_form") or PluginRepositoryForm()
         context["policy_rows"] = _policy_rows()
-        from postulo.plugins.models import PluginPolicy
 
-        context["policy_states"] = PluginPolicy.State.choices
         context["pending"] = self.request.session.get("plugin_pending")
         context["listings"] = self.request.session.get("plugin_listings", [])
         return context
@@ -911,15 +909,38 @@ def _governed_plugins() -> list:
     return sorted(found, key=lambda item: (getattr(item, "kind", "source"), item.name))
 
 
+def _ungoverned_plugins() -> list:
+    """Instance plumbing: the transports and the identifier registries. Shown on the page
+    with a switch that is fixed on, because what the instance can do is the question the
+    page answers (#94), and never written to (#286)."""
+    from postulo.plugins import policy
+    from postulo.plugins.registry import plugins
+
+    found = []
+    for kind in policy.UNGOVERNED_KINDS:
+        found.extend(plugins(kind))
+    return sorted(found, key=lambda item: (getattr(item, "kind", ""), item.name))
+
+
 def _policy_rows(person=None) -> list[dict]:
-    """What is decided for each plugin, and by whom."""
-    from postulo.plugins import base
+    """What is decided for each plugin, and by whom.
+
+    Since #286 each row carries the two controls the page draws instead of a four-way menu:
+    `on`, the switch, and `free`, whether each person may change it. The four stored states
+    map onto them -- *available* is on and free, *forced on* is on and held, *forced off*
+    is off -- and *unavailable* is off with `hidden` set, which the page shows and keeps
+    but no longer offers as a choice: switching a plugin off for the instance is what the
+    plugins list above does, and a hidden-for-one-person exception was the four-way menu's
+    least used answer. A row that is nobody's to decide is `held`, with the reason.
+    """
+    from postulo.plugins import base, policy
     from postulo.plugins.models import PluginPolicy
 
     stored = {row.plugin: row for row in PluginPolicy.objects.filter(person=person)}
     rows = []
     for plugin in _governed_plugins():
         row = stored.get(plugin.name)
+        state = row.state if row else PluginPolicy.State.AVAILABLE
         # The whole manifest, not three fields off it: this is the page an administrator
         # is on when the question is "whose code is running here", and #97 exists because
         # the answer used to be visible on the day of installation and never again.
@@ -934,9 +955,34 @@ def _policy_rows(person=None) -> list[dict]:
                 # The instance itself, so the template can ask for a logo rather than
                 # being handed one it has no way to fall back from (#106).
                 "plugin": plugin,
-                "state": row.state if row else PluginPolicy.State.AVAILABLE,
+                "state": state,
+                "on": state in (PluginPolicy.State.AVAILABLE, PluginPolicy.State.FORCED_ON),
+                "free": state == PluginPolicy.State.AVAILABLE,
+                "hidden": state == PluginPolicy.State.UNAVAILABLE,
+                "held": False,
+                "why": "",
                 "decided_by": row.decided_by if row else None,
                 "decided_at": row.decided_at if row else None,
+            }
+        )
+    for plugin in _ungoverned_plugins():
+        manifest = base.manifest_of(plugin)
+        rows.append(
+            {
+                "name": plugin.name,
+                "label": manifest.label,
+                "description": manifest.description,
+                "kind": manifest.kind or "",
+                "manifest": manifest,
+                "plugin": plugin,
+                "state": PluginPolicy.State.FORCED_ON,
+                "on": True,
+                "free": False,
+                "hidden": False,
+                "held": True,
+                "why": policy.decide(plugin.name, person).explain(),
+                "decided_by": None,
+                "decided_at": None,
             }
         )
     return rows
@@ -950,13 +996,23 @@ def _save_policies(request: HttpRequest, person=None) -> int:
     """
     from postulo.plugins.models import PluginPolicy
 
-    states = {value for value, _label in PluginPolicy.State.choices}
     changed = 0
     for plugin in _governed_plugins():
-        wanted = request.POST.get(f"state:{plugin.name}", "")
-        if wanted not in states:
+        # A checkbox that is not ticked submits nothing, so "off" and "not on the page"
+        # look the same in the POST. The marker each row carries is what tells them apart:
+        # a row the form did not draw is left exactly as it was (#286).
+        if request.POST.get(f"row:{plugin.name}") != "1":
             continue
         existing = PluginPolicy.objects.filter(plugin=plugin.name, person=person).first()
+        on = f"on:{plugin.name}" in request.POST
+        free = f"free:{plugin.name}" in request.POST
+        if on:
+            wanted = PluginPolicy.State.AVAILABLE if free else PluginPolicy.State.FORCED_ON
+        elif existing and existing.state == PluginPolicy.State.UNAVAILABLE:
+            # Kept, not offered: the page shows it as off and says it is hidden.
+            wanted = PluginPolicy.State.UNAVAILABLE
+        else:
+            wanted = PluginPolicy.State.FORCED_OFF
         if wanted == PluginPolicy.State.AVAILABLE:
             if existing:
                 existing.delete()
@@ -1015,13 +1071,11 @@ class PersonPluginsView(StaffRequiredMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs) -> dict:
-        from postulo.plugins.models import PluginPolicy
 
         context = super().get_context_data(**kwargs)
         context["person"] = self.person
         context["rows"] = _policy_rows(self.person)
         context["defaults"] = {row["name"]: row["state"] for row in _policy_rows()}
-        context["states"] = PluginPolicy.State.choices
         context["section_title"] = _("Plugins for %(name)s") % {"name": self.person.username}
         return context
 
