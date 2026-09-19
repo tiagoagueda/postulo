@@ -209,13 +209,29 @@ class LanguageSelect(forms.Select):
 
     Right-to-left languages will want ``dir`` alongside this; that belongs with the rest of
     the layout work rather than here.
+
+    ``flagged`` makes each option carry its flag's URL as well, for a script that draws the
+    chosen language's flag over the closed select -- the telephone field's answer (#88) to
+    an ``<option>`` holding text and nothing else, used by *Server settings -> Defaults*
+    (#208). Per option because static files are served under a content hash, so there is
+    no pattern a script could build one from. Off by default: most language menus have no
+    flag beside them and would only carry the weight.
     """
+
+    def __init__(self, attrs=None, choices=(), *, flagged: bool = False):
+        super().__init__(attrs, choices)
+        self.flagged = flagged
 
     def create_option(self, name, value, *args, **kwargs):
         option = super().create_option(name, value, *args, **kwargs)
         code = str(value or "")
         if code:
             option["attrs"]["lang"] = code
+            if self.flagged:
+                from postulo.core import languages
+                from postulo.core.templatetags.postulo import flag_url
+
+                option["attrs"]["data-flag"] = flag_url(languages.flag_country(code))
         return option
 
 
@@ -709,3 +725,18 @@ class InviteForm(forms.ModelForm):
             "email": _("Email address (optional)"),
             "note": _("Note (optional)"),
         }
+
+
+def language_row(code: str, name, *, current: str = "", status: dict | None = None) -> dict:
+    """One language, ready for a row that shows its flag and how it was made.
+
+    What the locale picker's rows are built from, and since #208 what *Server settings ->
+    Defaults* builds its rows from too, so the same list looks the same on both pages:
+    `code`, `name`, the `country` whose flag stands for it (blank where none is right),
+    `state` and `percent`.
+    """
+    from postulo.core.languages import translation_status
+
+    if status is None:
+        status = translation_status()
+    return LocaleForm._language_option(code, name, current, status)

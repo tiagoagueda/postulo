@@ -42,6 +42,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- *Server settings → Defaults* shows each language's flag, as the language picker does:
+  beside every checkbox in *Languages this instance offers*, with how its translation was
+  made, and over the closed *Language for new accounts* dropdown, which follows the
+  choice. (#208)
 - Anybody may write an importer: a package registered under `postulo.importers` is held to
   `ImporterPlugin`, asked before the built-in Europass one, and handed a file only after the
   kind has refused what it refuses; the `Record` it fills is on the plugin surface and the

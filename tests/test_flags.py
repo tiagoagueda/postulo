@@ -241,3 +241,73 @@ def _block(css: str, opener: str) -> str:
             if depth == 0:
                 return css[start : index + 1]
     return ""
+
+
+# ------------------------------------------------- Server settings -> Defaults (#208)
+
+
+@pytest.fixture
+def administrator(db, django_user_model):
+    return django_user_model.objects.create_user(
+        email="admin@example.org", username="admin", password="x", is_staff=True
+    )
+
+
+@pytest.mark.django_db
+def test_every_offered_language_with_a_home_draws_its_flag(client, administrator):
+    """The checkbox grid looks like the locale picker: flag beside every language that has
+    one, outside the `lang` span, decorative."""
+    from postulo.core import languages
+
+    client.force_login(administrator)
+    html = client.get(reverse("server:defaults")).content.decode()
+
+    rows = re.findall(r"<label[^>]*>(.*?)</label>", html, re.S)
+    by_code = {}
+    for row in rows:
+        code = re.search(r'name="offered_languages" value="([^"]+)"', row)
+        if code:
+            by_code[code.group(1)] = row
+    assert len(by_code) > 30, "the grid"
+
+    flagged = [code for code in by_code if languages.flag_country(code)]
+    assert flagged, "no language with a flag?"
+    for code in flagged:
+        country = languages.flag_country(code).lower()
+        assert f'data-flag="{country}"' in by_code[code], code
+        assert 'aria-hidden="true"' in by_code[code], code
+        # Outside the span marked as being in that language.
+        assert re.search(rf'data-flag[^<]*<[^<]*<span lang="{code}"', by_code[code]), code
+
+    homeless = [code for code in by_code if not languages.flag_country(code)]
+    for code in homeless:
+        assert "<img" not in by_code[code], f"{code} has no single home and should show no flag"
+
+
+@pytest.mark.django_db
+def test_the_default_language_shows_the_chosen_flag_without_a_script(client, administrator):
+    """As the telephone field does (#88): the server draws the saved language's flag over
+    the closed select, and each option carries its own flag's URL for the script."""
+    from postulo.core.models import SiteSettings
+
+    row = SiteSettings.get()
+    row.default_language = "pt-pt"
+    row.save()
+    client.force_login(administrator)
+
+    html = client.get(reverse("server:defaults")).content.decode()
+
+    holder = re.search(r"<span[^>]*data-flag-holder[^>]*>(.*?)</span>", html, re.S)
+    assert holder, "no flag beside the language chooser"
+    assert 'data-flag="pt"' in holder.group(1)
+
+    select = re.search(r'<select[^>]*name="default_language"[^>]*>(.*?)</select>', html, re.S)
+    assert select and "data-flag-select" in select.group(0)
+    options = re.findall(r'<option value="([^"]+)"([^>]*)>', select.group(1))
+    assert len(options) > 30
+    for code, attrs in options:
+        assert f'lang="{code}"' in attrs, code
+        assert "data-flag=" in attrs, code
+    assert 'value="pt-pt"' in select.group(1) and "/flags/pt" in select.group(1)
+    labels = re.findall(r"<option [^>]*>([^<]*)</option>", select.group(1))
+    assert not any(ch in label for label in labels for ch in "\U0001f1e6\U0001f1ff")

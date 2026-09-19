@@ -123,6 +123,26 @@ class OfferedLanguagesForm(forms.ModelForm):
         stored = list(self.instance.offered_languages or [])
         self.fields["offered_languages"].initial = stored or [code for code, _n in self.every]
 
+    def rows(self) -> list[dict]:
+        """Each checkbox with the flag and the translation state the locale picker shows.
+
+        The page used to draw `{{ option.tag }}` and a name, and no flag, while *Settings ->
+        Language and time* showed one beside every language. The rows come from the same
+        helper now, so the two lists look the same (#208); `option` is the checkbox itself.
+        """
+        from postulo.accounts.forms import language_row
+        from postulo.core.languages import translation_status
+
+        status = translation_status()
+        names = dict(self.every)
+        return [
+            {
+                "option": option,
+                **language_row(option.data["value"], names[option.data["value"]], status=status),
+            }
+            for option in self["offered_languages"]
+        ]
+
     def clean_offered_languages(self) -> list[str]:
         chosen = list(self.cleaned_data.get("offered_languages") or [])
         if not chosen:
@@ -156,7 +176,7 @@ class DefaultsForm(forms.ModelForm):
         fields = ("instance_name", "tagline", "default_language", "default_time_zone")
 
     def __init__(self, *args, **kwargs):
-        from postulo.accounts.forms import language_choices, time_zone_choices
+        from postulo.accounts.forms import LanguageSelect, language_choices, time_zone_choices
 
         super().__init__(*args, **kwargs)
         self.fields["default_language"] = forms.ChoiceField(
@@ -164,6 +184,9 @@ class DefaultsForm(forms.ModelForm):
             choices=language_choices,
             required=False,
             help_text=_("What a new account starts with. Each person can change theirs."),
+            # The chosen language's flag sits over the closed select, and the script keeps
+            # it in step; `data-flag-select` is what the script looks for (#208).
+            widget=LanguageSelect(attrs={"data-flag-select": ""}, flagged=True),
         )
         self.fields["default_time_zone"] = forms.ChoiceField(
             label=_("Time zone for new accounts"),

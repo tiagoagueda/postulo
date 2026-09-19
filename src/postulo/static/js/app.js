@@ -262,21 +262,22 @@
     }
   });
 
-  // The flag beside a telephone field's country chooser. An <option> holds text and
-  // nothing else in every browser, so the flag cannot live in the list; it sits over the
-  // closed select instead, and this keeps it pointing at whatever is chosen (#88).
+  // The flag beside a telephone field's country chooser, and beside the language chooser
+  // on Server settings -> Defaults (#208). An <option> holds text and nothing else in
+  // every browser, so the flag cannot live in the list; it sits over the closed select
+  // instead, and this keeps it pointing at whatever is chosen (#88).
   //
-  // The server has already drawn the right flag for the country the field loaded with, so
+  // The server has already drawn the right flag for the value the field loaded with, so
   // with this script blocked or still loading the field is correct -- it simply stops
   // following the select until the form is saved. Each option carries its own URL because
   // static files are served under a content hash, so there is no pattern to build one
   // from.
   document.addEventListener("change", function (event) {
-    var select = event.target.closest("[data-phone-country]");
+    var select = event.target.closest("[data-phone-country], [data-flag-select]");
     if (!select) {
       return;
     }
-    var holder = select.parentNode.querySelector("[data-phone-flag]");
+    var holder = select.parentNode.querySelector("[data-phone-flag], [data-flag-holder]");
     if (!holder) {
       return;
     }

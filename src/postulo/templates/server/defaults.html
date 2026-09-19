@@ -1,5 +1,5 @@
 {% extends "server/base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block content %}
   <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Defaults" %}</h1>
@@ -17,7 +17,20 @@
 
     <div class="card mb-6">
       <h2 class="mb-3 font-medium">{% translate "New accounts" %}</h2>
-      <c-field :field="form.default_language" />
+      {% comment %} Not `<c-field>`: the chosen language's flag sits over the closed select,
+         as the telephone field's country flag does (#88), because an <option> holds text and
+         nothing else. The server draws the saved language's flag, so without a script the
+         field is right; the script keeps it in step with the choice (#208). The space is
+         reserved whether or not a flag is showing, so choosing a language moves nothing. {% endcomment %}
+      <div class="mb-4 wrap-anywhere">
+        <label class="field-label" for="{{ form.default_language.id_for_label }}">{{ form.default_language.label }}</label>
+        <div class="relative">
+          <span class="pointer-events-none absolute inset-y-0 start-2.5 flex items-center"
+                data-flag-holder>{% language_flag form.default_language.value %}</span>
+          {{ form.default_language|add_class:"field-input w-full ps-9" }}
+        </div>
+        <c-field-feedback :field="form.default_language" />
+      </div>
       {% if pinned.default_time_zone %}
         <div class="alert-info mb-4 text-sm" data-pinned="default_time_zone">
           {% blocktranslate with variable=pinned.default_time_zone zone=effective_time_zone trimmed %}
@@ -58,12 +71,18 @@
       </p>
     {% endif %}
     <c-field-feedback :field="languages_form.offered_languages" />
+    {% comment %} The same row the locale picker draws: checkbox, flag, the name in its own
+       language, and how the translation was made, in that order and with the flag outside
+       the `lang` span (#208). The flag's box is there whether or not a flag is -- a language
+       with no single home has none -- so the names line up down the column. {% endcomment %}
     <div class="grid gap-1 sm:grid-cols-2">
-      {% for option in languages_form.offered_languages %}
+      {% for row in languages_form.rows %}
         <label class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm
                       hover:bg-ink-100 dark:hover:bg-ink-800">
-          {{ option.tag }}
-          <span lang="{{ option.data.value }}">{{ option.choice_label }}</span>
+          {{ row.option.tag }}
+          <span class="flex w-5 shrink-0 items-center">{% flag row.country %}</span>
+          <span lang="{{ row.code }}">{{ row.name }}</span>
+          {% include "partials/translation_state.html" with state=row.state percent=row.percent %}
         </label>
       {% endfor %}
     </div>

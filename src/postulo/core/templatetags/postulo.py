@@ -123,6 +123,19 @@ def flag_url(country: str) -> str:
 
 
 @register.simple_tag
+def language_flag(code: str, css_class: str = "flag", **attrs: str) -> str:
+    """The flag that stands for a language: ``{% language_flag "pt-pt" %}``.
+
+    ``flag`` takes a country; this takes a language code and asks `languages.flag_country`
+    whose flag stands for it, which is nothing for a language with no single home -- and
+    then draws nothing, as ``flag`` does for an unknown country (#208).
+    """
+    from postulo.core import languages
+
+    return flag(languages.flag_country(code or ""), css_class, **attrs)
+
+
+@register.simple_tag
 def flag(country: str, css_class: str = "flag", **attrs: str) -> str:
     """A country's flag: ``{% flag "pt" %}``.
 
