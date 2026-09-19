@@ -34,4 +34,4 @@ class InviteAdmin(admin.ModelAdmin):
     list_display = ("__str__", "created_by", "created_at", "expires_at", "accepted_at")
     list_filter = ("accepted_at",)
     search_fields = ("email", "note")
-    readonly_fields = ("token", "created_at", "accepted_at", "accepted_by")
+    readonly_fields = ("token_fingerprint", "created_at", "accepted_at", "accepted_by")

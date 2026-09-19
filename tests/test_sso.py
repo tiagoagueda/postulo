@@ -167,7 +167,7 @@ def test_an_invitation_link_opens_the_door_for_sso_too(rf, configured, user):
     staff = User.objects.create_user(email="s@example.org", password=PASSWORD, is_staff=True)
     invite = Invite.objects.create(created_by=staff, email="new@example.org")
     request = a_request(rf)
-    request.session[INVITE_SESSION_KEY] = invite.token
+    request.session[INVITE_SESSION_KEY] = invite.token_fingerprint
     assert SocialAccountAdapter().is_open_for_signup(request, social_login("new@example.org"))
 
 

@@ -8,7 +8,7 @@
     <div class="grow basis-48">
       <h1 class="text-2xl font-semibold tracking-tight">{% translate "Invitations" %}</h1>
       <p class="text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Each invitation may be used once, and expires on its own." %}
+        {% translate "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made." %}
       </p>
     </div>
     <a href="{% url 'accounts:invite_create' %}" class="btn ms-auto">
@@ -25,7 +25,6 @@
             <th class="px-4 py-3 font-medium">{% translate "For" %}</th>
             <th class="px-4 py-3 font-medium">{% translate "Status" %}</th>
             <th class="px-4 py-3 font-medium">{% translate "Expires" %}</th>
-            <th class="px-4 py-3 font-medium">{% translate "Link" %}</th>
             <th class="px-4 py-3"><span class="sr-only">{% translate "Actions" %}</span></th>
           </tr>
         </thead>
@@ -43,18 +42,8 @@
                 {% endif %}
               </td>
               <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ invite.expires_at|date:"DATE_FORMAT" }}</td>
-              <td class="px-4 py-3">
-                {% if not invite.is_accepted and not invite.is_expired %}
-                  {% comment %} The whole link, wrapped, rather than the first 320 pixels of it with
-                     the rest in a tooltip (#276); the script adds a Copy button beside it, since a
-                     button that does nothing without a script is worse than none. {% endcomment %}
-                  <code class="block max-w-xs wrap-anywhere text-xs text-ink-500 dark:text-ink-400"
-                        data-copy-source data-copy-label="{% translate 'Copy link' %}"
-                        data-copied-label="{% translate 'Copied' %}">{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:invite_accept' invite.token %}</code>
-                {% else %}
-                  <span class="text-ink-400">—</span>
-                {% endif %}
-              </td>
+              {% comment %} No link column. The link was shown once, on the page that made the
+                 invitation; the row keeps a fingerprint of it and cannot show it again (#232). {% endcomment %}
               <td class="px-4 py-3 text-end">
                 {% if not invite.is_accepted %}
                   <form method="post" action="{% url 'accounts:invite_revoke' invite.pk %}">

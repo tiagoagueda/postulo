@@ -465,6 +465,19 @@ def generate_invite_token() -> str:
     return secrets.token_urlsafe(INVITE_TOKEN_BYTES)
 
 
+def fingerprint_of_a_fresh_token() -> str:
+    """What a row made without :meth:`Invite.issue` gets: a link nobody holds.
+
+    The token is made and thrown away here, so the row is a valid invitation that no link
+    opens. That is the right default for a row created any other way -- a test that only
+    needs one to exist, an import -- because the alternative, a blank that the unique
+    constraint would refuse on the second row, is a worse surprise.
+    """
+    from .recovery import fingerprint
+
+    return fingerprint(generate_invite_token())
+
+
 def default_invite_expiry():
     return timezone.now() + DEFAULT_INVITE_VALIDITY
 
@@ -475,10 +488,19 @@ class Invite(models.Model):
     A self-hosted instance is normally closed. Rather than asking an operator to choose
     between "only me" and "anyone on the internet", an invitation grants exactly one
     signup, optionally bound to one email address, and expires on its own.
+
+    **The token is not stored.** Only its SHA-256 fingerprint is, as with a recovery link
+    and an API token, and the link is shown once, on the page that made it. A copy of the
+    database used to be a set of working invitations -- and, for one bound to an address,
+    proof of holding that mailbox, since following the link is what verifies it (#232).
     """
 
-    token = models.CharField(
-        _("token"), max_length=64, unique=True, default=generate_invite_token, editable=False
+    token_fingerprint = models.CharField(
+        _("token"),
+        max_length=64,
+        unique=True,
+        default=fingerprint_of_a_fresh_token,
+        editable=False,
     )
     email = models.EmailField(
         _("email address"),
@@ -519,6 +541,30 @@ class Invite(models.Model):
 
     def __str__(self) -> str:
         return self.email or self.note or f"Invitation {self.pk}"
+
+    @classmethod
+    def issue(cls, *, created_by, **fields) -> tuple[Invite, str]:
+        """Make an invitation, and return it with the one copy of its token.
+
+        The caller shows the token once and forgets it. Nothing else ever has it: not the
+        row, not a log line, not the list of invitations.
+        """
+        from .recovery import fingerprint
+
+        token = generate_invite_token()
+        invite = cls.objects.create(
+            created_by=created_by, token_fingerprint=fingerprint(token), **fields
+        )
+        return invite, token
+
+    @classmethod
+    def find(cls, token: str) -> Invite | None:
+        """The invitation this token opens, valid or not, or nothing."""
+        from .recovery import fingerprint
+
+        if not token:
+            return None
+        return cls.objects.filter(token_fingerprint=fingerprint(token)).first()
 
     @property
     def is_accepted(self) -> bool:

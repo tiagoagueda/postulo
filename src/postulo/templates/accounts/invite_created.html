@@ -1,0 +1,41 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Server settings" %} &gt; {% translate "Invitation created" %}{% endblock %}
+
+{% block content %}
+  <div class="max-w-2xl">
+    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Invitation created" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      {% if invite.email %}
+        {% blocktranslate trimmed with email=invite.email %}
+          For {{ email }}, and usable only by that address. Send the link however you like.
+        {% endblocktranslate %}
+      {% else %}
+        {% translate "Anyone holding the link may use it, once. Send it however you like." %}
+      {% endif %}
+    </p>
+
+    {% comment %} Rendered exactly once, on the response that made it. The row keeps a
+       fingerprint of the token and nothing keeps the token, so leaving this page is the last
+       chance to copy it -- which is what makes a copy of the database not a set of working
+       invitations (#232). The whole link, wrapped, and a Copy button the script adds beside
+       it (#276). {% endcomment %}
+    <div class="alert-success mb-6" role="status" data-invite-link>
+      <p class="mb-2 font-medium">{% translate "Copy this now. It is not shown again." %}</p>
+      <code class="block wrap-anywhere font-mono text-sm"
+            data-copy-source data-copy-label="{% translate 'Copy link' %}"
+            data-copied-label="{% translate 'Copied' %}">{{ token_url }}</code>
+      <p class="mt-3 text-sm">
+        {% blocktranslate trimmed with when=invite.expires_at|date:"DATE_FORMAT" %}
+          It works until {{ when }}, or until it is used or revoked.
+        {% endblocktranslate %}
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a href="{% url 'accounts:invite_list' %}" class="btn">{% translate "Back to invitations" %}</a>
+      <a href="{% url 'accounts:invite_create' %}" class="btn" data-variant="ghost">{% translate "Another invitation" %}</a>
+    </div>
+  </div>
+{% endblock %}

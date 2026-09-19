@@ -39,11 +39,14 @@ def test_the_notes_column_shows_two_lines_rather_than_a_tooltip():
 
 
 def test_the_invitation_link_is_whole_and_marked_for_a_copy_button(client, user):
+    """On the page that made it, since #232; the list no longer has it to show."""
     user.is_staff = True
     user.save()
     client.force_login(user)
-    client.post(reverse("accounts:invite_create"), {"email": "new@example.org", "note": ""})
-    html = client.get(reverse("accounts:invite_list")).content.decode()
+    response = client.post(
+        reverse("accounts:invite_create"), {"email": "new@example.org", "note": ""}
+    )
+    html = response.content.decode()
     tag = re.search(r"<code[^>]*data-copy-source[^>]*>", html)
     assert tag, "the invitation link is not marked for a copy button"
     assert "truncate" not in tag.group(0) and "wrap-anywhere" in tag.group(0)

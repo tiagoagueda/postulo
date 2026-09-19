@@ -254,19 +254,31 @@ class InviteListView(StaffRequiredMixin, ListView):
 
 
 class InviteCreateView(StaffRequiredMixin, CreateView):
+    """Make an invitation, and show its link once.
+
+    The link is rendered on the response that made it and nowhere else, as a recovery link
+    is: the row keeps a fingerprint of the token, so the list cannot show it again, and
+    handing it over is the administrator's job (#232).
+    """
+
     model = Invite
     form_class = InviteForm
     template_name = "accounts/invite_form.html"
-    success_url = reverse_lazy("accounts:invite_list")
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        response = super().form_valid(form)
-        messages.success(
+        invite, token = Invite.issue(created_by=self.request.user, **form.cleaned_data)
+        # Handed to the template rather than to a message, because a message survives into
+        # the next request. This exists for exactly one render.
+        return render(
             self.request,
-            _("Invitation created. Send the person the link shown below; it can be used once."),
+            "accounts/invite_created.html",
+            {
+                "invite": invite,
+                "token_url": self.request.build_absolute_uri(
+                    reverse("accounts:invite_accept", args=[token])
+                ),
+            },
         )
-        return response
 
 
 class InviteRevokeView(StaffRequiredMixin, View):
@@ -292,7 +304,7 @@ class InviteAcceptView(View):
     """
 
     def get(self, request: HttpRequest, token: str) -> HttpResponse:
-        invite = Invite.objects.filter(token=token).first()
+        invite = Invite.find(token)
         if invite is None or not invite.is_valid():
             raise Http404("This invitation is not valid.")
 
@@ -300,7 +312,7 @@ class InviteAcceptView(View):
             messages.info(request, _("You are already signed in."))
             return redirect("core:home")
 
-        request.session[INVITE_SESSION_KEY] = invite.token
+        request.session[INVITE_SESSION_KEY] = invite.token_fingerprint
         if invite.email:
             messages.info(
                 request,

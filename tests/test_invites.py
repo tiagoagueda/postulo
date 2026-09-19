@@ -5,6 +5,7 @@ by default, and an invitation addressed to one person should not be redeemable b
 whoever else ends up holding the link.
 """
 
+import re
 from datetime import timedelta
 
 import pytest
@@ -23,8 +24,19 @@ def staff_user(db, django_user_model):
 
 
 @pytest.fixture
-def invite(db, staff_user):
-    return Invite.objects.create(created_by=staff_user, note="A friend")
+def issued(db, staff_user):
+    """An invitation and the one copy of its token, as the page that made it had them."""
+    return Invite.issue(created_by=staff_user, note="A friend")
+
+
+@pytest.fixture
+def invite(issued):
+    return issued[0]
+
+
+@pytest.fixture
+def token(issued):
+    return issued[1]
 
 
 # --------------------------------------------------------------------- model rules
@@ -61,9 +73,30 @@ def test_an_invitation_bound_to_an_address_rejects_a_different_one(db, staff_use
 
 
 def test_tokens_are_unpredictable(db, staff_user):
-    tokens = {Invite.objects.create(created_by=staff_user).token for _ in range(20)}
+    tokens = {Invite.issue(created_by=staff_user)[1] for _ in range(20)}
     assert len(tokens) == 20
     assert all(len(token) > 30 for token in tokens)
+
+
+def test_the_token_is_not_stored(db, staff_user):
+    """A copy of the database is not a set of working invitations (#232)."""
+    from postulo.accounts.recovery import fingerprint
+
+    invite, token = Invite.issue(created_by=staff_user)
+
+    assert not hasattr(invite, "token")
+    assert invite.token_fingerprint == fingerprint(token)
+    assert token not in str(vars(invite))
+    assert Invite.find(token) == invite
+    assert Invite.find(invite.token_fingerprint) is None, "the fingerprint opens nothing"
+    assert Invite.find("") is None
+
+
+def test_a_row_made_without_issue_has_a_link_nobody_holds(db, staff_user):
+    first = Invite.objects.create(created_by=staff_user)
+    second = Invite.objects.create(created_by=staff_user)
+    assert first.token_fingerprint != second.token_fingerprint
+    assert first.is_valid(), "a valid invitation, that no link opens"
 
 
 def test_pending_excludes_accepted_and_expired(db, staff_user, user):
@@ -95,13 +128,16 @@ def test_signup_is_open_when_the_operator_says_so(client, db, settings):
     assert b'name="password1"' in response.content
 
 
-def test_following_an_invitation_opens_signup(client, invite, settings):
+def test_following_an_invitation_opens_signup(client, invite, token, settings):
     settings.POSTULO_REGISTRATION_OPEN = False
 
-    accept = client.get(reverse("accounts:invite_accept", args=[invite.token]))
+    accept = client.get(reverse("accounts:invite_accept", args=[token]))
     assert accept.status_code == 302
     assert accept["Location"] == reverse("account_signup")
-    assert client.session[INVITE_SESSION_KEY] == invite.token
+    assert client.session[INVITE_SESSION_KEY] == invite.token_fingerprint
+    assert token not in str(dict(client.session)), (
+        "the session holds the fingerprint, not the token"
+    )
 
     signup = client.get(reverse("account_signup"))
     assert b'name="password1"' in signup.content
@@ -109,11 +145,11 @@ def test_following_an_invitation_opens_signup(client, invite, settings):
 
 def test_an_expired_invitation_link_is_not_found(client, db, staff_user, settings):
     settings.POSTULO_REGISTRATION_OPEN = False
-    expired = Invite.objects.create(
+    _expired, token = Invite.issue(
         created_by=staff_user, expires_at=timezone.now() - timedelta(days=1)
     )
 
-    assert client.get(reverse("accounts:invite_accept", args=[expired.token])).status_code == 404
+    assert client.get(reverse("accounts:invite_accept", args=[token])).status_code == 404
 
 
 def test_an_unknown_token_is_not_found(client, db, settings):
@@ -123,9 +159,11 @@ def test_an_unknown_token_is_not_found(client, db, settings):
     assert response.status_code == 404
 
 
-def test_signing_up_through_an_invitation_spends_it(client, invite, settings, django_user_model):
+def test_signing_up_through_an_invitation_spends_it(
+    client, invite, token, settings, django_user_model
+):
     settings.POSTULO_REGISTRATION_OPEN = False
-    client.get(reverse("accounts:invite_accept", args=[invite.token]))
+    client.get(reverse("accounts:invite_accept", args=[token]))
 
     response = client.post(
         reverse("account_signup"),
@@ -153,8 +191,8 @@ def test_signing_up_through_an_invitation_spends_it(client, invite, settings, dj
 
 def test_an_invitation_for_one_address_cannot_be_used_by_another(client, db, staff_user, settings):
     settings.POSTULO_REGISTRATION_OPEN = False
-    bound = Invite.objects.create(created_by=staff_user, email="wanted@example.org")
-    client.get(reverse("accounts:invite_accept", args=[bound.token]))
+    bound, token = Invite.issue(created_by=staff_user, email="wanted@example.org")
+    client.get(reverse("accounts:invite_accept", args=[token]))
 
     response = client.post(
         reverse("account_signup"),
@@ -195,15 +233,24 @@ def test_invitation_management_requires_login(client, db):
     assert reverse("account_login") in response["Location"]
 
 
-def test_staff_can_create_an_invitation(client, staff_user):
+def test_staff_can_create_an_invitation_and_see_its_link_once(client, staff_user):
     client.force_login(staff_user)
     response = client.post(
         reverse("accounts:invite_create"), {"email": "friend@example.org", "note": "A friend"}
     )
 
-    assert response.status_code == 302
+    assert response.status_code == 200
     created = Invite.objects.get(email="friend@example.org")
     assert created.created_by == staff_user
+    html = response.content.decode()
+    assert "Copy this now. It is not shown again." in html
+    link = re.search(r"http://testserver/accounts/invitation/([^/<]+)/", html)
+    assert link, "the link is on the page that made it"
+    assert Invite.find(link.group(1)) == created, "and it is the link that opens it"
+
+    listed = client.get(reverse("accounts:invite_list")).content.decode()
+    assert link.group(1) not in listed, "the list cannot show what is not stored"
+    assert "/accounts/invitation/" not in listed
 
 
 def test_staff_can_revoke_a_pending_invitation(client, staff_user, invite):

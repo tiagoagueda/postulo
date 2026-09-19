@@ -179,8 +179,8 @@ def test_an_unproven_address_cannot_sign_in_yet(client):
 
 def test_an_invitation_to_an_address_is_proof_enough(client, settings, staff_user):
     settings.POSTULO_REGISTRATION_OPEN = False
-    invite = Invite.objects.create(created_by=staff_user, email="alex.morgan@example.org")
-    client.get(reverse("accounts:invite_accept", args=[invite.token]))
+    _invite, token = Invite.issue(created_by=staff_user, email="alex.morgan@example.org")
+    client.get(reverse("accounts:invite_accept", args=[token]))
     response = client.post(reverse("account_signup"), SIGNUP)
     assert response.status_code == 302
     assert response.url != reverse("account_email_verification_sent")
@@ -192,8 +192,8 @@ def test_an_invitation_to_an_address_is_proof_enough(client, settings, staff_use
 
 def test_an_open_invitation_still_needs_the_click(client, settings, staff_user):
     settings.POSTULO_REGISTRATION_OPEN = False
-    invite = Invite.objects.create(created_by=staff_user)
-    client.get(reverse("accounts:invite_accept", args=[invite.token]))
+    _invite, token = Invite.issue(created_by=staff_user)
+    client.get(reverse("accounts:invite_accept", args=[token]))
     response = client.post(reverse("account_signup"), SIGNUP)
     assert response.status_code == 302
     assert response.url == reverse("account_email_verification_sent")

@@ -6,6 +6,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🔒 Security
+
+- An invitation's token is stored as a fingerprint, as a recovery link's and an API
+  token's are, and the link is shown once, on the page that made it; the list of
+  invitations no longer shows links, and a copy of the database is no longer a set of
+  working invitations. Invitations already issued keep working. (#232)
+
 ### 🔧 Changed
 
 - The component layer draws on Basecoat: each component's structural file is imported as it

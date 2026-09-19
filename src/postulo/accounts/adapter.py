@@ -11,15 +11,17 @@ from postulo.core import site
 
 from .models import Invite
 
-INVITE_SESSION_KEY = "postulo_invite_token"
+#: Holds the fingerprint of the invitation followed, never the token: the session is
+#: server-side, so either would do, and the one that opens nothing is the one to keep.
+INVITE_SESSION_KEY = "postulo_invite"
 
 
 def pending_invite(request: HttpRequest) -> Invite | None:
     """Return the still-valid invitation held in this session, if any."""
-    token = request.session.get(INVITE_SESSION_KEY)
-    if not token:
+    held = request.session.get(INVITE_SESSION_KEY)
+    if not held:
         return None
-    invite = Invite.objects.filter(token=token).first()
+    invite = Invite.objects.filter(token_fingerprint=held).first()
     return invite if invite and invite.is_valid() else None
 
 
