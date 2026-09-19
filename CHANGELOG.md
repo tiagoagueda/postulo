@@ -16,6 +16,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Anybody may write an importer: a package registered under `postulo.importers` is held to
+  `ImporterPlugin`, asked before the built-in Europass one, and handed a file only after the
+  kind has refused what it refuses; the `Record` it fills is on the plugin surface and the
+  contract is on the wiki. (#105)
 - The browser suite reads every page under WCAG's text-spacing override and at 200% zoom,
   and checks that reduced motion means no motion; the calendar's month cells clamp an
   event to two lines rather than cutting it to one. (#278)

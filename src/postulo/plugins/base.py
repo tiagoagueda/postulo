@@ -299,8 +299,9 @@ def shipped(*, name: str, label: str, kind: str, description, logo: str = "") ->
 
 # ------------------------------------------------------------------- importers
 
-#: Where an importer registers itself. Nothing publishes here yet — Europass is built in —
-#: and the contract a third party would write against is #105's subject.
+#: Where an importer registers itself. Europass is built in and registers nowhere; a
+#: third party's goes here, is held to :class:`ImporterPlugin`, and is asked before the
+#: built-in one, as a third-party source is (#105).
 IMPORTER_GROUP = "postulo.importers"
 
 #: The most a career file may be. A CV is not a novel, and an unbounded upload handed to a
@@ -350,10 +351,11 @@ class ImporterPlugin(Protocol):
     source reads a *job posting* off a *page*, an importer reads a *person's career* out of
     a *file*. No base class, as everywhere else here.
 
-    ``read`` returns whatever the importing app understands — today a
-    ``postulo.resume.importing.Record``. This protocol does not name that type, because the
-    plugin machinery has no business depending on the resume app, and because the built-in
-    is the only implementation until #105 writes the contract for anybody else's.
+    ``read`` returns a ``Record`` -- the one on the plugin surface, filled in Postulo's
+    terms, which is what the importing app writes from. This protocol does not name that
+    type, because the plugin machinery has no business depending on the resume app; the
+    surface hands it out lazily for the same reason, and the contract is written on the
+    wiki page *Writing a plugin*, under *Importers* (#105).
 
     **An importer does not write anything.** It turns bytes into a record and stops. What
     reaches the database is decided on the review screen, by the person, for the reason

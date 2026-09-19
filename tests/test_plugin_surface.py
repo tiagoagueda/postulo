@@ -84,10 +84,8 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "`identifiers`: the schemes an ORCID in a Europass file is checked against. #109 "
             "would make this a registry of its own"
         ),
-        "postulo.resume.importing": (
-            "`Record`: the career record it fills in. Postulo's shape rather than Europass's, "
-            "which is why Postulo defines it and every importer fills the same one"
-        ),
+        # `Record` used to be reached past the surface as well. It is on it since #105,
+        # because a third-party importer has to fill the same one.
     },
     "postal_rules": {
         "postulo.core": (

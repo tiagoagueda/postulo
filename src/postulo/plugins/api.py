@@ -46,6 +46,7 @@ if TYPE_CHECKING:  # pragma: no cover - the five names `__getattr__` resolves at
     from postulo.core.redirects import safe_next
     from postulo.documents.themes import Kind as ThemeKind
     from postulo.documents.themes import Theme
+    from postulo.resume.importing import Record
 
     from .consent import ACCESS_TOKEN, access_token
     from .http import (
@@ -117,6 +118,7 @@ __all__ = [
     "OutboxPlugin",
     "OwnedModel",
     "OwnedQuerySet",
+    "Record",
     "SourcePlugin",
     "StorePlugin",
     "SyncPlugin",
@@ -157,6 +159,14 @@ def __getattr__(name: str):
         from postulo.core import models
 
         return getattr(models, name)
+    if name == "Record":
+        # What an importer's `read` fills in: a career in Postulo's terms rather than the
+        # file's, so that every importer fills the same one and the review screen and the
+        # writer need to know about none of them. A Django-free dataclass, but it lives in
+        # the resume app, which is why it is looked up here rather than imported (#105).
+        from postulo.resume.importing import Record
+
+        return Record
     if name == "safe_next":
         # Every redirect a plugin makes goes through this, or a plugin becomes a way to
         # bounce somebody off the instance.

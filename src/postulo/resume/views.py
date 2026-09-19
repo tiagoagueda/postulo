@@ -393,11 +393,11 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
                 None,
             )
             if importer is None:
+                # Named from the registry, for the same reason the lookup above is: with a
+                # second importer installed, the sentence has to say so (#105).
                 raise base.ImportRefused(
-                    _(
-                        "Nothing installed here reads that file. Postulo reads the XML the "
-                        "Europass CV editor produced and the JSON europass.europa.eu exports."
-                    )
+                    _("Nothing installed here reads that file. What is installed reads: %(what)s.")
+                    % {"what": ", ".join(str(p.label) for p in registry.plugins("importer"))}
                 )
             record = importer.read(data)
         except base.ImportRefused as error:

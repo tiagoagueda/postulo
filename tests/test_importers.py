@@ -193,3 +193,120 @@ def _upload(name: str, data: bytes):
     from django.core.files.uploadedfile import SimpleUploadedFile
 
     return SimpleUploadedFile(name, data, content_type="application/octet-stream")
+
+
+# ------------------------------------------------------------- third parties (#105)
+
+
+class _Installed:
+    """What a package registered under `postulo.importers` looks like once loaded."""
+
+    name = "hr-xml"
+    version = "2.0"
+    kind = "importer"
+    label = "HR-XML"
+    description = "A test double for somebody else's format."
+
+    def can_handle(self, data: bytes, filename: str = "") -> bool:
+        return data.startswith(b"HRXML")
+
+    def read(self, data: bytes):
+        from postulo.plugins.api import Record
+
+        return Record(source="hr-xml", projects=[{"name": "Read by the third party"}])
+
+
+@pytest.fixture
+def installed(monkeypatch):
+    """`_Installed`, as the registry would find it through its entry point."""
+    monkeypatch.setattr(
+        registry,
+        "_load_third_party",
+        lambda kind: [_Installed()] if kind == "importer" else [],
+    )
+    monkeypatch.setattr(registry, "_cache", {})
+    yield _Installed
+    registry._cache.clear()
+
+
+def test_the_group_is_advertised():
+    """An empty group is how an internal kind is enforced; this one is not empty."""
+    assert base.IMPORTER_GROUP == "postulo.importers"
+    assert registry.GROUPS["importer"] == "postulo.importers"
+
+
+def test_a_third_party_importer_is_loaded_and_asked_first(installed):
+    found = registry.plugins("importer")
+    assert [plugin.name for plugin in found] == ["hr-xml", "europass"]
+    assert isinstance(found[0], base.ImporterPlugin)
+
+
+def test_a_package_that_is_not_an_importer_is_left_out(monkeypatch, caplog):
+    """The `isinstance` check has a protocol to check against, and it is this one."""
+
+    class NotOne:
+        name = "not-one"
+        kind = "importer"
+
+        def read(self, data):  # `can_handle` is missing
+            return None
+
+    class Entry:
+        name = "not-one"
+        dist = None
+
+        def load(self):
+            return NotOne
+
+    monkeypatch.setattr(
+        registry, "entry_points", lambda group: [Entry()] if group == base.IMPORTER_GROUP else []
+    )
+    monkeypatch.setattr(registry, "_cache", {})
+    try:
+        found = registry.plugins("importer")
+    finally:
+        registry._cache.clear()
+    assert [plugin.name for plugin in found] == ["europass"]
+    assert "not-one" in caplog.text
+
+
+def test_the_record_is_on_the_surface():
+    """A third party fills the same record Europass does, so it has to be importable."""
+    from postulo.plugins import api
+    from postulo.resume.importing import Record
+
+    assert api.Record is Record
+    assert "Record" in api.__all__
+
+
+def test_the_page_hands_the_file_to_the_third_party(client, user, installed):
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+
+    client.post(url, {"file": _upload("export.hrxml", b"HRXML <career/>")})
+
+    assert b"Read by the third party" in client.get(url).content
+
+
+def test_the_refusals_run_before_the_third_party_is_asked(client, user, installed, monkeypatch):
+    asked = []
+    monkeypatch.setattr(
+        installed, "can_handle", lambda self, data, filename="": asked.append(data) or True
+    )
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+    bomb = b'<!DOCTYPE x [<!ENTITY e SYSTEM "file:///etc/passwd">]><HRXML>&e;</HRXML>'
+
+    response = client.post(url, {"file": _upload("cv.xml", bomb)}, follow=True)
+
+    assert b"document type declaration" in response.content
+    assert asked == [], "the kind refused it, and no importer was asked"
+
+
+def test_the_refusal_names_what_is_installed(client, user, installed):
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+
+    response = client.post(url, {"file": _upload("holiday.pdf", b"%PDF-1.7 not a CV")}, follow=True)
+
+    assert b"What is installed reads: HR-XML, Europass." in response.content
