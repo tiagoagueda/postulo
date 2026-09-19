@@ -115,6 +115,10 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.i18n",
+                # Puts the request's CSP nonce in every context, which is what Django's
+                # check asks for once the policy names one; the document previews pass it
+                # explicitly because they render without a request (#232).
+                "django.template.context_processors.csp",
                 "postulo.core.context_processors.ui",
                 "postulo.notifications.context_processors.browser_notices",
             ],
