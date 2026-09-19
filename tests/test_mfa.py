@@ -15,7 +15,16 @@ PASSWORD = "a-fairly-long-password-42"
 
 
 def current_code(secret: str) -> str:
-    counter = next(totp.yield_hotp_counters_from_time())
+    """The code an authenticator app would show now.
+
+    The middle of the tolerance window, not its first counter: the generator starts one
+    period *behind* the clock, and a code from there was accepted only because it sat on the
+    edge of what the server allows. When a thirty-second boundary rolled between making the
+    code and checking it, the edge fell outside the window and the sign-in was refused --
+    once in a while, on whichever CI job the clock caught.
+    """
+    counters = list(totp.yield_hotp_counters_from_time())
+    counter = counters[len(counters) // 2]
     return totp.format_hotp_value(totp.hotp_value(secret, counter))
 
 
