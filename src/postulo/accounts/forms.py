@@ -91,8 +91,19 @@ class SignupForm(AllauthSignupForm):
     the same step. Fields are reordered so the form reads as a person would fill it in.
     """
 
-    first_name = forms.CharField(label=_("First name"), max_length=150)
-    last_name = forms.CharField(label=_("Last name"), max_length=150)
+    # `autocomplete` names what the field is for (SC 1.3.5, #276): a browser can fill it and
+    # speech or cognitive tooling can recognise it. These are about the person; a contact's
+    # or a company's fields are about somebody else and carry no token.
+    first_name = forms.CharField(
+        label=_("First name"),
+        max_length=150,
+        widget=forms.TextInput(attrs={"autocomplete": "given-name"}),
+    )
+    last_name = forms.CharField(
+        label=_("Last name"),
+        max_length=150,
+        widget=forms.TextInput(attrs={"autocomplete": "family-name"}),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -226,8 +237,19 @@ class SocialSignupForm(AllauthSocialSignupForm):
     appears when something is missing, and asks for the same things a direct signup does.
     """
 
-    first_name = forms.CharField(label=_("First name"), max_length=150)
-    last_name = forms.CharField(label=_("Last name"), max_length=150)
+    # `autocomplete` names what the field is for (SC 1.3.5, #276): a browser can fill it and
+    # speech or cognitive tooling can recognise it. These are about the person; a contact's
+    # or a company's fields are about somebody else and carry no token.
+    first_name = forms.CharField(
+        label=_("First name"),
+        max_length=150,
+        widget=forms.TextInput(attrs={"autocomplete": "given-name"}),
+    )
+    last_name = forms.CharField(
+        label=_("Last name"),
+        max_length=150,
+        widget=forms.TextInput(attrs={"autocomplete": "family-name"}),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -250,8 +272,19 @@ class ProfileForm(forms.ModelForm):
     Postulo behaves for the person — theme, language, username, addresses — is Settings.
     """
 
-    first_name = forms.CharField(label=_("First name"), max_length=150)
-    last_name = forms.CharField(label=_("Last name"), max_length=150)
+    # `autocomplete` names what the field is for (SC 1.3.5, #276): a browser can fill it and
+    # speech or cognitive tooling can recognise it. These are about the person; a contact's
+    # or a company's fields are about somebody else and carry no token.
+    first_name = forms.CharField(
+        label=_("First name"),
+        max_length=150,
+        widget=forms.TextInput(attrs={"autocomplete": "given-name"}),
+    )
+    last_name = forms.CharField(
+        label=_("Last name"),
+        max_length=150,
+        widget=forms.TextInput(attrs={"autocomplete": "family-name"}),
+    )
     # A plain FileField, not an ImageField: the size and type are checked before anything
     # is decoded, and the decoding is done once, by the same code that stores the result.
     picture = forms.FileField(
@@ -651,6 +684,7 @@ class AccountForm(forms.ModelForm):
         model = get_user_model()
         fields = ("username",)
         labels = {"username": _("Username")}
+        widgets = {"username": forms.TextInput(attrs={"autocomplete": "username"})}
         help_texts = {
             "username": _(
                 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."

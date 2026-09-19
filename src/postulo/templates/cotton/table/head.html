@@ -20,7 +20,7 @@
    refuses an inline script, so a width written into the markup is dropped by the browser
    on a real deployment -- silently, which is the worst way for it to fail.
 {% endcomment %}
-<thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500
+<thead class="border-b border-ink-200 text-xs text-ink-500
               dark:border-ink-800 dark:text-ink-400"
        data-col-settings="{% url 'core:table_settings' table.name %}"
        data-col-here="{{ request.get_full_path }}"
@@ -84,13 +84,13 @@
                    hx-get="{{ request.path }}" hx-include="#{{ form_id }}"
                    hx-trigger="input changed delay:300ms, search"
                    hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                   class="field-input w-full min-w-24 px-2 py-1 text-xs normal-case tracking-normal">
+                   class="field-input w-full min-w-24 px-2 py-1 text-xs">
           {% elif header.column.filter == 'choice' %}
             <select id="{{ header.input_id }}" name="{{ header.column.name }}" form="{{ form_id }}"
                     aria-label="{{ header.filter_label }}"
                     hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
                     hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                    class="field-input w-full min-w-24 px-2 py-1 text-xs normal-case tracking-normal">
+                    class="field-input w-full min-w-24 px-2 py-1 text-xs">
               <option value="">{% translate "Any" %}</option>
               {% for value, label in header.column.choices %}
                 <option value="{{ value }}" {% if value == header.value %}selected{% endif %}>{{ label }}</option>
@@ -105,13 +105,13 @@
                      aria-label="{{ header.filter_label }}: {% translate 'at least' %}" placeholder="{% translate 'at least' %}"
                      hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
                      hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                     class="field-input w-full min-w-20 px-2 py-1 text-xs normal-case tracking-normal">
+                     class="field-input w-full min-w-20 px-2 py-1 text-xs">
               <input type="number" id="{{ header.input_id }}-max" name="{{ header.column.name }}_max"
                      value="{{ header.value_to }}" form="{{ form_id }}" inputmode="numeric" min="0"
                      aria-label="{{ header.filter_label }}: {% translate 'at most' %}" placeholder="{% translate 'at most' %}"
                      hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
                      hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                     class="field-input w-full min-w-20 px-2 py-1 text-xs normal-case tracking-normal">
+                     class="field-input w-full min-w-20 px-2 py-1 text-xs">
             </div>
           {% elif header.column.filter == 'date' %}
             <div class="flex flex-col gap-1">
@@ -120,13 +120,13 @@
                      aria-label="{{ header.filter_label }}: {% translate 'from' %}"
                      hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
                      hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                     class="field-input w-full px-2 py-1 text-xs normal-case tracking-normal">
+                     class="field-input w-full px-2 py-1 text-xs">
               <input type="date" id="{{ header.input_id }}-to" name="{{ header.column.name }}_to"
                      value="{{ header.value_to }}" form="{{ form_id }}"
                      aria-label="{{ header.filter_label }}: {% translate 'to' %}"
                      hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
                      hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                     class="field-input w-full px-2 py-1 text-xs normal-case tracking-normal">
+                     class="field-input w-full px-2 py-1 text-xs">
             </div>
           {% endif %}
         </td>

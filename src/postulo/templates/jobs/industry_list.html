@@ -49,7 +49,7 @@
                      employment office recognises, beside the person's own word for it. {% endcomment %}
                   <span class="ms-1 rounded bg-ink-100 px-1.5 py-0.5 text-xs tabular-nums
                                text-ink-600 dark:bg-ink-800 dark:text-ink-300"
-                        title="{% translate 'NACE division' %}">{{ industry.code }}</span>
+                        title="{% translate 'NACE division' %}"><span class="sr-only">{% translate 'NACE division' %} </span>{{ industry.code }}</span>
                 {% endif %}
               </a>
               <span class="text-xs text-ink-400 tabular-nums">
@@ -60,11 +60,11 @@
                 {% endblocktranslate %}
               </span>
               <a href="{% url 'jobs:industry_update' industry.pk %}" class="btn" data-variant="ghost" data-size="xs">
-                {% translate "Edit or merge" %}
+                {% translate "Edit or merge" %}<span class="sr-only">: <bdi>{{ industry.name }}</bdi></span>
               </a>
               <a href="{% url 'jobs:industry_delete' industry.pk %}"
                  class="btn" data-variant="destructive-ghost" data-size="xs">
-                {% translate "Delete" %}
+                {% translate "Delete" %}<span class="sr-only">: <bdi>{{ industry.name }}</bdi></span>
               </a>
             </li>
           {% endfor %}

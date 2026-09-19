@@ -236,7 +236,7 @@
     {% if report.evidence %}
       <c-scroll-box label="{% translate 'Listings' %}">
         <table class="w-full text-sm">
-          <thead class="border-b border-ink-200 text-xs uppercase tracking-wide text-ink-500 dark:border-ink-800 dark:text-ink-400">
+          <thead class="border-b border-ink-200 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400">
             <tr>
               <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Applied on" %}</th>
               <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Company" %}</th>
@@ -258,7 +258,7 @@
                   {% if row.url %}
                     <a href="{{ row.url }}" rel="noopener noreferrer nofollow" target="_blank"
                        class="ms-1 text-xs text-ink-500 underline dark:text-ink-400">
-                      {% translate "the posting" %}
+                      {% translate "the posting" %}<span class="sr-only"> {% translate "(opens in a new tab)" %}</span>
                     </a>
                   {% endif %}
                 </td>

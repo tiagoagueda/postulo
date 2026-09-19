@@ -16,6 +16,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Row actions say which row they act on, a company's notes, an industry's code and a
+  plugin's provenance are no longer kept in a tooltip, the invitation link is whole and has
+  a Copy button, every link that opens a new tab says so, the fields about you carry their
+  autocomplete purpose, and the small uppercase headers are plain text. (#276)
 - Every table and board that scrolls sideways is a named stop in the tab order the arrow
   keys scroll, the table-or-board switcher's current choice is pressed rather than
   disabled, the failure alert has a dismiss button and closes on Escape, and the

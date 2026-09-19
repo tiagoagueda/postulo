@@ -83,7 +83,7 @@
               {% if interview.is_scheduled %}
                 {% include "applications/partials/interview_outcome.html" with next=request.get_full_path %}
                 <a href="{% url 'applications:interview_update' interview.pk %}" class="btn" data-variant="ghost" data-size="xs">
-                  {% translate "Edit" %}
+                  {% translate "Edit" %}<span class="sr-only">: <bdi>{{ interview.application.posting.title }}</bdi></span>
                 </a>
               {% else %}
                 <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">

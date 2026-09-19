@@ -39,13 +39,15 @@
               {% include "documents/partials/copies.html" with document=document send_url=send_url %}
             </div>
             <div class="flex flex-wrap items-center gap-2">
+              {% comment %} Each action names its row in hidden text (#276): a links list read
+                 "Download, Edit, Delete" three times over with nothing to tell them apart. {% endcomment %}
               <a href="{% url 'documents:upload_download' document.pk %}"
-                 class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}</a>
+                 class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></a>
               <a href="{% url 'documents:upload_update' document.pk %}"
-                 class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}</a>
+                 class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></a>
               <a href="{% url 'documents:upload_delete' document.pk %}"
                  class="btn" data-variant="destructive-ghost" data-size="xs">
-                {% translate "Delete" %}
+                {% translate "Delete" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span>
               </a>
             </div>
           </li>

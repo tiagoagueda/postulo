@@ -80,6 +80,39 @@
     }
   }
 
+  // A Copy button beside anything marked `data-copy-source` -- the invitation link an
+  // administrator has to hand over (#276). Added here rather than written in the template,
+  // because copying needs the clipboard API and a button that does nothing without a
+  // script is worse than none; the link itself is on the page in full either way.
+  function readyCopyButtons() {
+    if (!navigator.clipboard) {
+      return;
+    }
+    document.querySelectorAll("[data-copy-source]").forEach(function (source) {
+      if (source.dataset.copyReady) {
+        return;
+      }
+      source.dataset.copyReady = "1";
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "btn mt-1";
+      button.dataset.variant = "outline";
+      button.dataset.size = "xs";
+      button.textContent = source.dataset.copyLabel || "";
+      button.addEventListener("click", function () {
+        navigator.clipboard.writeText(source.textContent.trim()).then(function () {
+          button.textContent = source.dataset.copiedLabel || button.textContent;
+          window.setTimeout(function () {
+            button.textContent = source.dataset.copyLabel || "";
+          }, 2000);
+        });
+      });
+      source.insertAdjacentElement("afterend", button);
+    });
+  }
+
+  onContentReady(readyCopyButtons);
+
   // The alert can be put away (#275): the button beside it, or Escape from anywhere while
   // it is showing. Clearing the words is what hides it, so the region stays in the document
   // for the next announcement.

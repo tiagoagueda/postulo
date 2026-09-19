@@ -90,8 +90,10 @@
         {% else %}—{% endif %}
       </td>
     {% elif column.key == 'notes' %}
-      <td class="max-w-xs truncate px-4 py-3 text-ink-500 dark:text-ink-400" title="{{ company.notes }}">
-        {{ company.notes|truncatechars:80|default:"—" }}
+      {% comment %} Two visible lines rather than one truncated with the rest in a tooltip
+         a keyboard or a touch never sees (#276); the company's page has the whole of it. {% endcomment %}
+      <td class="max-w-xs px-4 py-3 text-ink-500 dark:text-ink-400">
+        <span class="line-clamp-2">{{ company.notes|default:"—" }}</span>
       </td>
     {% elif column.key == 'last_activity' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">

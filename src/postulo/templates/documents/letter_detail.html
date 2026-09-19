@@ -13,7 +13,7 @@
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
       <a href="{% url 'documents:letter_preview' letter.pk %}" target="_blank" rel="noopener"
-         class="btn" data-variant="outline">{% translate "Preview" %}</a>
+         class="btn" data-variant="outline">{% translate "Preview" %}<span class="sr-only"> {% translate "(opens in a new tab)" %}</span></a>
       <a href="{% url 'documents:letter_update' letter.pk %}" class="btn" data-variant="outline">
         {% translate "Edit" %}
       </a>
@@ -49,7 +49,7 @@
                 </option>
               {% endfor %}
             </select>
-            <button type="submit" class="btn w-full" data-variant="outline">{% translate "Preview" %}</button>
+            <button type="submit" class="btn w-full" data-variant="outline">{% translate "Preview" %}<span class="sr-only"> {% translate "(opens in a new tab)" %}</span></button>
           </form>
         {% else %}
           <p class="text-sm text-ink-500 dark:text-ink-400">

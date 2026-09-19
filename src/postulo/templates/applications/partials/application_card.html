@@ -45,13 +45,13 @@
 
   <div class="mt-3 flex items-center justify-between gap-2">
     {% if application.days_since_applied is not None %}
-      <span class="text-xs text-ink-400">
+      <time class="text-xs text-ink-400" datetime="{{ application.applied_at|date:'Y-m-d' }}">
         {% blocktranslate trimmed count days=application.days_since_applied %}
           {{ days }} day ago
         {% plural %}
           {{ days }} days ago
         {% endblocktranslate %}
-      </span>
+      </time>
     {% else %}
       <span class="text-xs text-ink-400">{% translate "Not sent yet" %}</span>
     {% endif %}

@@ -163,13 +163,24 @@ class PostalAddressForm(forms.ModelForm):
         from postulo.core import phones
 
         # Two rows, because a street address is two lines in plenty of places and one box
-        # of one line quietly asks somebody to leave the second out.
-        self.fields["street"].widget = forms.Textarea(attrs={"rows": 2})
+        # of one line quietly asks somebody to leave the second out. `autocomplete` names
+        # each part's purpose (SC 1.3.5, #276): these are the person's own addresses, and a
+        # browser that knows them can fill them.
+        self.fields["street"].widget = forms.Textarea(
+            attrs={"rows": 2, "autocomplete": "street-address"}
+        )
+        for name, token in (
+            ("postcode", "postal-code"),
+            ("municipality", "address-level2"),
+            ("region", "address-level1"),
+        ):
+            self.fields[name].widget.attrs["autocomplete"] = token
 
         self.fields["country"] = forms.ChoiceField(
             label=_("country"),
             required=False,
             choices=[("", "—"), *phones.country_choices()],
+            widget=forms.Select(attrs={"autocomplete": "country-name"}),
         )
         if not self.instance.pk and default_country:
             self.fields["country"].initial = default_country

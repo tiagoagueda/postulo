@@ -32,7 +32,10 @@ def test_every_scroll_box_is_a_named_stop_in_the_tab_order(path: Path):
         return
     for match in re.finditer(r"<(\w+)[^>]*\bscroll-x\b[^>]*>", text):
         tag = match.group(0)
-        assert 'tabindex="0"' in tag and 'role="region"' in tag and "aria-label=" in tag, (
+        # A command block is a group rather than a region: two on one page would be two
+        # landmarks with one name, which axe refuses, and a landmark is more than it is.
+        named = 'role="region"' in tag or 'role="group"' in tag
+        assert 'tabindex="0"' in tag and named and "aria-label=" in tag, (
             f"{path.name}: a scroll box a keyboard cannot reach: {tag[:80]}"
         )
 

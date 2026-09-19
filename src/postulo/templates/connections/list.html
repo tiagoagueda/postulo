@@ -68,9 +68,9 @@
                             title="{% translate 'Queue every document you already have for this store.' %}">{% translate "Send everything" %}</button>
                   </form>
                 {% endif %}
-                <a href="{% url 'connections:edit' row.connection.pk %}" class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}</a>
+                <a href="{% url 'connections:edit' row.connection.pk %}" class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}<span class="sr-only">: <bdi>{{ row.connection.label }}</bdi></span></a>
               {% endif %}
-              <a href="{% url 'connections:delete' row.connection.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">{% translate "Remove" %}</a>
+              <a href="{% url 'connections:delete' row.connection.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">{% translate "Remove" %}<span class="sr-only">: <bdi>{{ row.connection.label }}</bdi></span></a>
             </div>
           </li>
         {% endfor %}

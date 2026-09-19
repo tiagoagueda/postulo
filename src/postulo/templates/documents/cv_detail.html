@@ -14,7 +14,7 @@
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
       <a href="{% url 'documents:cv_preview' cv.pk %}" target="_blank" rel="noopener"
-         class="btn" data-variant="outline">{% translate "Preview" %}</a>
+         class="btn" data-variant="outline">{% translate "Preview" %}<span class="sr-only"> {% translate "(opens in a new tab)" %}</span></a>
       {# `data-download`: the answer is a PDF, so the button is released again rather than #}
       {# left disabled for the rest of the visit (#226). #}
       <form method="post" action="{% url 'documents:cv_export' cv.pk %}" data-download>
@@ -103,10 +103,10 @@
                             aria-label="{% translate 'Move down' %}"{% if forloop.last %} disabled{% endif %}>↓</button>
                   </form>
                   <a href="{% url 'documents:cv_item_update' item.pk %}"
-                     class="btn" data-variant="ghost" data-size="xs">{% translate "Tailor" %}</a>
+                     class="btn" data-variant="ghost" data-size="xs">{% translate "Tailor" %}<span class="sr-only">: <bdi>{{ item.item }}</bdi></span></a>
                   <a href="{% url 'documents:cv_item_delete' item.pk %}"
                      class="btn" data-variant="destructive-ghost" data-size="xs">
-                    {% translate "Remove" %}
+                    {% translate "Remove" %}<span class="sr-only">: <bdi>{{ item.item }}</bdi></span>
                   </a>
                 </div>
               </li>
@@ -136,7 +136,7 @@
                   {% endif %}
                 </div>
                 <a href="{% url 'documents:rendered_download' render.pk %}"
-                   class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}</a>
+                   class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}<span class="sr-only">: <bdi>{{ render.application.posting.title }}</bdi></span></a>
               </li>
             {% endfor %}
           </ul>
@@ -157,7 +157,7 @@
             <div class="space-y-4">
               {% for group in add_form.groups %}
                 <fieldset>
-                  <legend class="mb-1 text-xs font-medium uppercase tracking-wide text-ink-500 dark:text-ink-400">
+                  <legend class="mb-1 text-xs font-medium text-ink-500 dark:text-ink-400">
                     {{ group.label }}
                   </legend>
                   <div class="space-y-1 text-sm">{{ group.field }}</div>
