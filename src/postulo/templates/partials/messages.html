@@ -1,12 +1,15 @@
 {% if messages %}
   <div class="mb-6 space-y-2">
     {% for message in messages %}
-      <div class="{% if message.tags == 'error' %}alert-error
-                  {% elif message.tags == 'warning' %}alert-warning
-                  {% elif message.tags == 'success' %}alert-success
+      {% comment %} `level_tag` rather than `tags`, which also carries the extra tags a view
+         sets -- `safe`, for a message that holds a link, which the storage would otherwise
+         escape on its way through the session (#260). {% endcomment %}
+      <div class="{% if message.level_tag == 'error' %}alert-error
+                  {% elif message.level_tag == 'warning' %}alert-warning
+                  {% elif message.level_tag == 'success' %}alert-success
                   {% else %}alert-info{% endif %}"
-           role="{% if message.tags == 'error' %}alert{% else %}status{% endif %}">
-        {{ message }}
+           role="{% if message.level_tag == 'error' %}alert{% else %}status{% endif %}">
+        {% if 'safe' in message.extra_tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}
       </div>
     {% endfor %}
   </div>

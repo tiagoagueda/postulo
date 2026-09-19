@@ -16,6 +16,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The applications and companies tables carry a hidden caption naming them, and discarding
+  a capture says where the discarded ones are, with a link, since the fast key is only fast
+  if there is a way back. (#260)
 - Under Windows High Contrast every button, menu row and navigation link keeps a border
   and the funnel bars keep their value, and a page printed from a dark profile comes out
   as ink on white with its tables whole and the chrome left off the paper. (#277)

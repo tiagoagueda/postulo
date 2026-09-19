@@ -20,6 +20,10 @@
    refuses an inline script, so a width written into the markup is dropped by the browser
    on a real deployment -- silently, which is the worst way for it to fail.
 {% endcomment %}
+{% comment %} The table's name, for anything that lists the tables on a page or lands inside
+   one from the keyboard (#260). Screen-reader-only: the heading above already says it to
+   eyes. A caption is the table's first child, so it lives here rather than in the pages. {% endcomment %}
+<caption class="sr-only">{{ table.label }}</caption>
 <thead class="border-b border-ink-200 text-xs text-ink-500
               dark:border-ink-800 dark:text-ink-400"
        data-col-settings="{% url 'core:table_settings' table.name %}"

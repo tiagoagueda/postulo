@@ -140,6 +140,9 @@ class Table:
 
     #: The key the person's choices are stored under, and the settings view's address.
     name: str = ""
+    #: What the table is, for its caption (#260): a screen reader asked to list the tables
+    #: on a page gets this, and somebody landing inside it by keyboard hears it first.
+    label: str = ""
     columns: tuple[Column, ...] = ()
     #: The sort applied when the request names none, with ``-`` for descending.
     default_sort: str = ""

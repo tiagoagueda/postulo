@@ -11,6 +11,7 @@ from .models import CompanyKind
 @register
 class CompaniesTable(Table):
     name = "companies"
+    label = _("Companies")
     default_sort = "name"
     #: `group` narrows to a whole ownership tree rather than one link of it, so it is the
     #: table's half of the company page's *across the group* (#138). Handled by the view

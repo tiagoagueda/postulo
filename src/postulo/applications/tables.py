@@ -12,6 +12,7 @@ from .models import Channel, Priority, Status
 @register
 class ApplicationsTable(Table):
     name = "applications"
+    label = _("Applications")
     default_sort = "-created"
     #: A table or a board of the same rows (#102); the board is drawn by the same view.
     shapes = ("table", "board")

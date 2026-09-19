@@ -16,9 +16,10 @@ from django.contrib import messages
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
@@ -362,6 +363,18 @@ class CaptureReviewView(OwnedObjectMixin, View):
         return redirect(listing.get_absolute_url())
 
 
+def discarded_link():
+    """Where the discarded captures are, for the message that says so (#260).
+
+    Discarding is a status rather than a deletion and the list can show what is not pending,
+    so a wrong key is recoverable; the message is the one place somebody looking for the way
+    back is looking. Sent with the ``safe`` tag, which is what lets a link through the
+    session storage unescaped.
+    """
+    url = reverse("jobs:capture_list") + "?show=all"
+    return format_html('<a href="{}" class="underline">{}</a>', url, _("the discarded captures"))
+
+
 class CaptureDiscardView(OwnedObjectMixin, View):
     def get_queryset(self):
         return Capture.objects.for_user(self.request.user)
@@ -370,7 +383,11 @@ class CaptureDiscardView(OwnedObjectMixin, View):
         capture = get_object_or_404(self.get_queryset(), pk=pk)
         capture.status = CaptureStatus.DISCARDED
         capture.save(update_fields=["status", "updated_at"])
-        messages.success(request, _("Capture discarded."))
+        messages.success(
+            request,
+            format_html(_("Capture discarded. It is in {link}."), link=discarded_link()),
+            extra_tags="safe",
+        )
         if request.POST.get("next"):
             return after_deciding(request, capture)
         return redirect("listings:list")
@@ -396,7 +413,15 @@ class CaptureDiscardSelectedView(OwnedObjectMixin, View):
             .update(status=CaptureStatus.DISCARDED, updated_at=timezone.now())
         )
         if count:
-            messages.success(request, _("Captures discarded: %(count)s.") % {"count": count})
+            messages.success(
+                request,
+                format_html(
+                    _("Captures discarded: {count}. They are in {link}."),
+                    count=count,
+                    link=discarded_link(),
+                ),
+                extra_tags="safe",
+            )
         else:
             messages.info(request, _("Nothing was selected."))
         return redirect("listings:list")
