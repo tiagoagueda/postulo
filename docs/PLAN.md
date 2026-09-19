@@ -1,11 +1,14 @@
 # Postulo — implementation plan
 
-> **Status:** M0-M6 complete and released as v0.1.0; the 0.2.0 milestone complete and
-> unreleased; 0.3.0 onward in progress. This is a living document, revised as milestones
-> land and assumptions meet reality. The [issue tracker][issues] is the authority on what
-> is open — this document says why things are the shape they are.
+> **What this is.** The reasons the code is the shape it is: the mission, the decisions
+> settled before any code was written, the stack, the data model, the plugin architecture,
+> and the assumptions still open. It does not say where the project *is*: the
+> [issue tracker][issues] is the authority on what is open and the [releases][releases] on
+> what has shipped, and a status line here was stale within a week of every one (#255).
+> It is revised at each release, which *Making a release* in `CONTRIBUTING.md` asks for.
 
 [issues]: https://source.tiagoagueda.com/postulo/postulo/issues
+[releases]: https://source.tiagoagueda.com/postulo/postulo/releases
 
 ## 1. Mission
 
@@ -32,7 +35,7 @@ These were settled before any code was written, because each one is expensive to
 | Documents | **Hybrid** | Structured CV content is the source of truth *and* externally authored files can be uploaded and versioned. |
 | AI assistance | **Never inside Postulo** | The application is complete and useful without an API key, and none is ever asked for. Since 0.2.0 the other direction exists instead: [postulo-mcp](https://source.tiagoagueda.com/postulo/postulo-mcp) serves an agent the person already runs through the ordinary API, read-only unless they say otherwise (#19). |
 | Posting capture | **Manual, URL, browser extension, plugin-extensible** | A plugin interface and a capture API exist from M4, so a browser extension is a later addition rather than a rewrite. Since 0.2.0 everything captured or typed lands in *Listings* first — the stage before applications, where a posting is shortlisted, discarded or applied to (#25). |
-| Languages | **en-GB source; every official language of the European Union for 0.2.0; the rest of the world in phases** | Every user-facing string is translatable from the first commit. 0.2.0 ships catalogues for the 24 EU languages (machine-assisted drafts marked fuzzy until a speaker has read them); later releases add the rest of the European continent, then Africa, then Asia, then the remaining world. A right-to-left check happens before phase 3 needs it. |
+| Languages | **en-GB source; every official language of the European Union for 0.2.0; the rest of the world in phases** | Every user-facing string is translatable from the first commit. 0.2.0 ships catalogues for the 24 EU languages (machine-assisted drafts flagged `draft` until a speaker has read them); 0.3.0 added the rest of Europe and the Caucasus, and from there languages arrive in order of how many people speak them rather than by continent (#269), each a catalogue and nothing else. A right-to-left check happens before the first right-to-left language needs it. |
 | Licence | **AGPL-3.0-or-later** | A modified Postulo run as a service must offer its source. |
 | Hosting | **Forgejo primary, GitHub mirror** | CI lives in `.forgejo/`, which GitHub ignores. Issues and pull requests belong on Forgejo. |
 
@@ -162,24 +165,36 @@ postulo/
 ├── manage.py
 ├── pyproject.toml            # uv-managed; extras: postgres, weasyprint, chromium
 ├── docker/                   # Dockerfile, compose files, entrypoint            (M6)
-├── docs/                     # PLAN.md, TRANSLATING.md, INSTALL.md, PLUGINS.md
+├── docs/                     # PLAN.md, THREAT-MODEL.md, TRANSLATING.md; PLUGINS.md
+│                             # only points at the wiki
 ├── src/postulo/
 │   ├── config/               # settings/{base,dev,prod,test}.py, urls, wsgi, asgi
-│   ├── core/                 # OwnedModel, scoped querysets, Tag, layout
+│   ├── core/                 # OwnedModel, scoped querysets, Tag, layout, server settings
 │   ├── locale/               # Postulo's own catalogues, one per language
-│   ├── accounts/             # User, Profile, invites                           (M1)
+│   ├── accounts/             # User, Profile, invites, recovery, the settings pages (M1)
 │   ├── resume/               # structured career content                        (M3)
 │   ├── documents/            # CV variants, cover letters, uploads, rendering   (M3)
-│   ├── jobs/                 # Company, Contact, JobPosting, capture         (M2/M4)
-│   ├── applications/         # Application, events, reminders, analytics    (M2/M5)
-│   ├── plugins/              # registry, api surface, and the seven Postulo ships (M4)
-│   │   ├── builtin/          # each is a package: manifest, locale/, code — nothing
-│   │   ├── email/  smtp/     # of it in core, and a test that says so
-│   │   ├── europass/         # (tests/test_plugin_surface.py)
-│   │   └── localstore/  phone_numbers/
-│   └── api/                  # ninja routers, capture tokens                    (M4)
-└── tests/
+│   ├── jobs/                 # Company, Contact, JobPosting, listings, capture (M2/M4)
+│   ├── applications/         # Application, events, reminders, calendar, insights (M2/M5)
+│   ├── notifications/        # events, the dispatcher, transports, the scheduler
+│   ├── plugins/              # registry, the api surface, policy, installing, and the
+│   │   │                     # fifteen plugins Postulo ships -- each a package with its
+│   │   │                     # manifest, locale/ and code, none of it in core, and
+│   │   │                     # tests/test_plugin_surface.py saying so:
+│   │   ├── builtin/  europass/  email/  smtp/  own_mail/  localstore/  browser/
+│   │   ├── identifiers/  phone_numbers/  postal_rules/  email_addresses/
+│   │   └── social_profiles/  websites/  employer_structure/  repositories/
+│   └── api/                  # ninja routers, tokens, the change feed            (M4)
+└── tests/                    # incl. tests/security/ and the browser suite tests/e2e/
 ```
+
+**What is not in this tree.** The documentation is a repository of its own, the wiki
+(`postulo.wiki`, since #169): installing, configuration, hardening, every feature page,
+and *Writing a plugin*. So are the official plugins that live outside the box --
+`postulo-imap`, `postulo-apprise`, `postulo-dav`, `postulo-paperless`, `postulo-mcp` -- the
+two browser extensions, `postulo-chromium` and `postulo-firefox`, the reference plugin
+`postulo-helloworld`, and `postulo-templates`, the curated document templates. Each follows
+the guide and carries its own catalogues; none is needed to run Postulo.
 
 ## 5. Data model
 
@@ -267,16 +282,16 @@ should be gold-plated.
 
 ### After v0.1.0
 
-The lettered milestones gave way to numbered ones, tracked as Forgejo milestones rather
-than here:
-
-| Milestone | Deliverable | State |
-| --- | --- | --- |
-| **0.2.0** | Every official language of the European Union; passkeys and SSO as a second factor; the security findings of a full audit; dashboard and Insights unified as arrangeable widgets; Europass import; ORCID; a readable log and Prometheus metrics | **Complete, unreleased** |
-| **0.3.0** | Right-to-left layout; the languages of Africa; parent and child companies; reports on the regularity of a search | In progress |
-| **0.4.0** | The languages of Asia and South America, and the fonts to draw them | Open |
-| **0.5.0** | The rest of the world's languages, and the tooling to add one without a developer | Open |
-| **0.6.0** | Readable and usable on a phone rather than merely rendered on one | Open |
+The lettered milestones gave way to numbered ones, tracked as Forgejo milestones and not
+restated here: a table of them in this file said *complete, unreleased* of a version that
+had shipped and *in progress* of one that had closed, and promised 0.3.0 things it did not
+hold (#255). What each milestone holds and where it stands is the tracker's to say; what
+each *shipped* is the changelog's. For the record of shape rather than state: 0.2.0
+(2026-09-07) brought the twenty-four languages of the Union, passkeys and SSO, the audit
+findings, arrangeable widgets, Europass import, ORCID, the log and the metrics; 0.3.0
+(2026-09-16) the rest of Europe, parent and child companies, reports, and the second
+audit's fixes; the languages that were to be Africa's milestone are now ordered by speakers
+(#269) across the releases after it.
 
 **What was "deliberately after v1" and is now built.** The browser extension (two of them,
 Chromium and Firefox, on M4's API as intended), email ingestion (`postulo-imap`) and
@@ -298,14 +313,24 @@ disabled by default and never required.
    default. CI installs Pango so that the one test rendering a real PDF actually runs
    rather than skipping.
 3. **`django-tasks-db` does not yet declare Django 6.1** in its classifiers, although it
-   sets no upper pin and installs and migrates cleanly. Nothing queues work yet, so no
-   worker runs; worth re-checking whenever something does.
+   sets no upper pin and installs and migrates cleanly. It is installed and configured,
+   `core/scheduler.py` holds the lease and the heartbeat the container's health check
+   reads, and `config/sqlite.py` and the document views already reason about not blocking
+   a worker -- and still nothing enqueues a task: the slow work runs in the request or in
+   the scheduler's loop. The assumption said to re-check when something queued work; the
+   answer is that #247 is where that happens, and the queue the Overview counts is
+   structurally empty until it does.
 4. **Translation catalogues depend on contributors** — which turned out to be the wrong
    assumption, and the right one is subtler. Twenty-four languages shipped in 0.2.0
    without waiting for anybody, machine-drafted and each entry flagged `draft` until a
    speaker reads it, because a translation somebody can correct beats an English gap
    nobody notices. What still depends on contributors is **review**: every one of those
-   catalogues is complete and none has been read by a native speaker. The twenty-nine
-   African catalogues (0.3.0) exist and are empty, and a language is not offered until
-   somebody has begun its catalogue — offering a language and handing back English is a
-   promise with nothing behind it.
+   catalogues is complete and none has been read by a native speaker. Since 2026-09-16
+   that review has somewhere to happen -- Weblate at translate.tiagoagueda.com, one
+   component per catalogue set, pulling read-only from Forgejo -- with a consequence the
+   assumption did not foresee: translations now accumulate somewhere that is not the
+   repository, and bringing them back is a step somebody has to take. The twenty-nine
+   African catalogues exist and are empty, and a language is not offered until somebody
+   has begun its catalogue — offering a language and handing back English is a promise
+   with nothing behind it. Which language is begun next is decided by speakers, not by
+   continent (#269).

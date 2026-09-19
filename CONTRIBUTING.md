@@ -311,6 +311,10 @@ End the entry with the issue it closes, in brackets: `(#42)`.
 2. Move the *Unreleased* entries in `CHANGELOG.md` under a new `## [X.Y.Z] — YYYY-MM-DD`
    heading, and leave an empty *Unreleased* above it.
 3. Set the same version in `pyproject.toml` and in `src/postulo/__init__.py`.
+   Re-read `docs/PLAN.md` while there -- the repository layout and the open assumptions
+   in particular -- and revise what the release made untrue. The plan explains why the
+   code is shaped as it is and says nothing about where the project stands, so this is
+   the one moment it is revised (#255).
 4. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree.
 5. Commit, then tag and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
 6. Once the release exists, start *Actions → Image* for the tag, from the tag. It builds

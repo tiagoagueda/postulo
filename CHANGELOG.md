@@ -34,6 +34,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- `docs/PLAN.md` no longer restates where the project stands, which the tracker and the
+  releases answer; it says what the tree holds today, the fifteen shipped plugins, the
+  wiki and the sibling repositories, and what became of the open assumptions, and it is
+  revised at each release. (#255)
 - On *Server settings → Plugins* and on a person's row under *People*, each plugin has a
   switch and a "may change it" box instead of a four-way dropdown, so a dozen rows read
   down at a glance; the transports and identifier registries appear too, switched on and
