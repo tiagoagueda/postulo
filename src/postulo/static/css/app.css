@@ -2330,6 +2330,9 @@
     outline: 2px solid Highlight;
     outline-offset: 2px;
   }
+  .btn, .dropdown-menu [role="menuitem"] {
+    border: 1px solid ButtonText;
+  }
 }
 @layer components {
   [data-popover] {
@@ -3707,6 +3710,57 @@ html {
   .field-input:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
+  }
+  .menu-item, .nav-link, .nav-link-active, .chip-remove {
+    border: 1px solid ButtonText;
+  }
+  .col-handle {
+    border-inline-end: 1px solid ButtonText;
+  }
+  progress.funnel-bar {
+    forced-color-adjust: none;
+    border: 1px solid CanvasText;
+    background-color: Canvas;
+  }
+  progress.funnel-bar::-webkit-progress-bar {
+    background-color: Canvas;
+  }
+  progress.funnel-bar::-webkit-progress-value {
+    forced-color-adjust: none;
+    background-color: Highlight;
+  }
+  progress.funnel-bar::-moz-progress-bar {
+    forced-color-adjust: none;
+    background-color: Highlight;
+  }
+}
+@media print {
+  :root {
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --color-ink-50: oklch(0.13 0.01 250);
+    --color-ink-100: oklch(0.19 0.012 250);
+    --color-ink-200: oklch(0.26 0.014 250);
+    --color-ink-300: oklch(0.36 0.016 250);
+    --color-ink-400: oklch(0.44 0.016 250);
+    --color-ink-600: oklch(0.54 0.012 250);
+    --color-ink-700: oklch(0.86 0.008 250);
+    --color-ink-800: oklch(0.922 0.005 250);
+    --color-ink-900: oklch(0.968 0.003 250);
+    --color-ink-950: oklch(0.985 0.002 250);
+    --color-card: oklch(0.985 0.002 250);
+    --color-popover: oklch(0.985 0.002 250);
+  }
+  :root[data-theme="dark"] body {
+    background: white;
+    color: oklch(0.19 0.012 250);
+  }
+  .scroll-x {
+    overflow: visible;
+  }
+  [data-site-header], .skip-link, footer, .page-alert {
+    display: none;
   }
 }
 @property --tw-border-style {

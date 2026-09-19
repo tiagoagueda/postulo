@@ -891,3 +891,95 @@ html {
     outline-offset: 2px;
   }
 }
+
+/* Forced colours, beyond the fields (#277).
+ *
+ * Preflight zeroes every border and a button has none, so under Windows High Contrast
+ * `Save`, `Download PDF`, `Sign out` and the menu rows were drawn as bare `ButtonText` on
+ * `Canvas`: ordinary words. A border in a system colour is what the theme keeps, so every
+ * control gets one. A progress bar with `appearance: none` is a track and a value that are
+ * both background colours, which the theme repaints to `Canvas`; the bars opt their value
+ * out of the repaint and take `Highlight`, with a `CanvasText` border round the track, so
+ * the funnel and the report's cadence keep their chart as well as their numbers. */
+@media (forced-colors: active) {
+  .menu-item,
+  .nav-link,
+  .nav-link-active,
+  .chip-remove {
+    border: 1px solid ButtonText;
+  }
+
+  .col-handle {
+    border-inline-end: 1px solid ButtonText;
+  }
+
+  /* The bar opts out of the repaint as a whole and paints itself in the system's own
+     colours: a `Canvas` track with a `CanvasText` border and a `Highlight` value. Two
+     value rules rather than one list, because a browser that does not know the other
+     engine's pseudo-element throws the whole list away, and the bar with it. */
+  progress.funnel-bar {
+    forced-color-adjust: none;
+    border: 1px solid CanvasText;
+    background-color: Canvas;
+  }
+
+  progress.funnel-bar::-webkit-progress-bar {
+    background-color: Canvas;
+  }
+
+  progress.funnel-bar::-webkit-progress-value {
+    forced-color-adjust: none;
+    background-color: Highlight;
+  }
+
+  progress.funnel-bar::-moz-progress-bar {
+    forced-color-adjust: none;
+    background-color: Highlight;
+  }
+}
+
+/* Print (#277).
+ *
+ * There was no print stylesheet at all. A dark profile stamps `data-theme` on the root and
+ * browsers drop backgrounds when printing, so an application, a company or the calendar
+ * printed from a dark profile came out as near-white text on white. Every dark rule reads
+ * the ink scale, so on paper the scale is turned over for a dark root -- 100 becomes 900,
+ * 200 becomes 800 -- and the same rules come out as ink on white. The scroll boxes show the
+ * whole of a table rather than the strip that was on the screen, and the chrome -- the
+ * header, the skip link, the footer, the failure alert -- stays off the paper. */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    --color-ink-50: oklch(0.13 0.01 250);
+    --color-ink-100: oklch(0.19 0.012 250);
+    --color-ink-200: oklch(0.26 0.014 250);
+    --color-ink-300: oklch(0.36 0.016 250);
+    --color-ink-400: oklch(0.44 0.016 250);
+    --color-ink-600: oklch(0.54 0.012 250);
+    --color-ink-700: oklch(0.86 0.008 250);
+    --color-ink-800: oklch(0.922 0.005 250);
+    --color-ink-900: oklch(0.968 0.003 250);
+    --color-ink-950: oklch(0.985 0.002 250);
+    --color-card: oklch(0.985 0.002 250);
+    --color-popover: oklch(0.985 0.002 250);
+  }
+
+  :root[data-theme="dark"] body {
+    background: white;
+    color: oklch(0.19 0.012 250);
+  }
+
+  .scroll-x {
+    overflow: visible;
+  }
+
+  [data-site-header],
+  .skip-link,
+  footer,
+  .page-alert {
+    display: none;
+  }
+}

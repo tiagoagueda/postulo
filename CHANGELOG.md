@@ -16,6 +16,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Under Windows High Contrast every button, menu row and navigation link keeps a border
+  and the funnel bars keep their value, and a page printed from a dark profile comes out
+  as ink on white with its tables whole and the chrome left off the paper. (#277)
 - Row actions say which row they act on, a company's notes, an industry's code and a
   plugin's provenance are no longer kept in a tooltip, the invitation link is whole and has
   a Copy button, every link that opens a new tab says so, the fields about you carry their
