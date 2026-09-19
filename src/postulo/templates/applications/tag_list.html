@@ -23,7 +23,10 @@
       <div class="card p-0">
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
           {% for tag in tags %}
-            <li class="flex items-center gap-3 px-4 py-3">
+            {% comment %} `flex-wrap`, as the industries list has: a name, a count and two
+               buttons is one pixel more than 320 allows in Greek, and a row that may not
+               wrap pushes the page sideways instead (CI's fonts found it; #113). {% endcomment %}
+            <li class="flex flex-wrap items-center gap-3 px-4 py-3">
               <span class="flex-1">{{ tag.name }}</span>
               <span class="text-xs text-ink-400">{{ tag.applications.count }}</span>
               <a href="{% url 'applications:tag_update' tag.pk %}" class="btn" data-variant="ghost" data-size="xs">
