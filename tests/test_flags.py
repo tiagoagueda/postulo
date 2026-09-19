@@ -243,6 +243,46 @@ def _block(css: str, opener: str) -> str:
     return ""
 
 
+# --------------------------------------------------------- postal addresses (#214)
+
+
+@pytest.mark.django_db
+def test_an_address_row_shows_the_chosen_countrys_flag_without_a_script(client, user):
+    """As beside a telephone number (#88): the server draws the flag of the country the row
+    loaded with, and every option carries its own flag's URL for the script."""
+    from postulo.core.models import PostalAddress
+
+    PostalAddress.objects.create(
+        owner=user, holder=user.profile, kind="home", street="Rua A", country="PT"
+    )
+    client.force_login(user)
+
+    html = client.get(reverse("accounts:profile")).content.decode()
+
+    holders = re.findall(r"<span[^>]*data-flag-holder[^>]*>(.*?)</span>", html, re.S)
+    assert holders, "no flag beside the country chooser"
+    assert any('data-flag="pt"' in holder for holder in holders), "the stored country's flag"
+    select = re.search(r'<select[^>]*name="[^"]*-country"[^>]*>(.*?)</select>', html, re.S)
+    assert select and "data-flag-select" in select.group(0)
+    options = re.findall(r'<option value="([A-Z]{2})"([^>]*)>', select.group(1))
+    assert len(options) == len(phones.COUNTRIES)
+    for code, attrs in options:
+        assert f"/flags/{code.lower()}" in attrs, code
+
+
+@pytest.mark.django_db
+def test_an_address_row_with_no_country_draws_no_flag(client, user):
+    from postulo.core.models import PostalAddress
+
+    PostalAddress.objects.create(
+        owner=user, holder=user.profile, kind="home", street="Rua A", country=""
+    )
+    client.force_login(user)
+    html = client.get(reverse("accounts:profile")).content.decode()
+    holders = re.findall(r"<span[^>]*data-flag-holder[^>]*>(.*?)</span>", html, re.S)
+    assert holders and all("<img" not in holder for holder in holders)
+
+
 # ------------------------------------------------- Server settings -> Defaults (#208)
 
 

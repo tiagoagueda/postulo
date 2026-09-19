@@ -26,6 +26,24 @@ def sign_in(page: Page, base: str) -> None:
     expect(page).to_have_url(f"{base}/")
 
 
+def test_an_addresss_flag_follows_its_country_too(page: Page, live_server, applicant):
+    """The same script keeps the postal address's chooser in step (#214)."""
+    from postulo.core.models import PostalAddress
+
+    PostalAddress.objects.create(
+        owner=applicant, holder=applicant.profile, kind="home", street="Rua A", country=""
+    )
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    select = page.locator("select[name$='-country'][data-flag-select]").first
+    holder = select.locator("xpath=..").locator("[data-flag-holder]")
+    expect(holder.locator("img")).to_have_count(0)
+    select.select_option("PT")
+    expect(holder.locator("img")).to_have_attribute("data-flag", "pt")
+    select.select_option("DE")
+    expect(holder.locator("img")).to_have_attribute("data-flag", "de")
+
+
 def test_the_flag_appears_and_follows_the_country(page: Page, live_server, applicant):
     """A contact form on an account that has not chosen a language starts with no country
     at all, so there is no flag until one is picked -- which exercises the branch where the

@@ -51,7 +51,14 @@
           </div>
           <div>
             <label class="field-label" for="{{ row.country.id_for_label }}">{% translate "Country" %}</label>
-            {{ row.country|add_class:"field-input" }}
+            {% comment %} The chosen country's flag over the closed select, drawn by the server
+               and kept in step by the script, exactly as beside a telephone number (#88, #214).
+               The space is reserved whether or not a flag shows, so choosing moves nothing. {% endcomment %}
+            <div class="relative">
+              <span class="pointer-events-none absolute inset-y-0 start-2.5 flex items-center"
+                    data-flag-holder>{% flag row.country.value %}</span>
+              {{ row.country|add_class:"field-input w-full ps-9" }}
+            </div>
           </div>
         </div>
         {% comment %} The name box only when the kind is Other, as on the other rows (#284). {% endcomment %}

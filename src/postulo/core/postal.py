@@ -141,6 +141,25 @@ def render(address, *, person=None) -> list[str]:
 # --------------------------------------------------------------- the rows on a page
 
 
+class CountrySelect(forms.Select):
+    """A country dropdown whose options carry their flag for the script beside it.
+
+    An `<option>` holds text and nothing else, so the flag cannot go in the list; it sits
+    over the closed select and follows the choice (#88). Per option because static files
+    are served under a content hash, so there is no pattern a script could build a URL
+    from. The same answer the language menu gives since #208.
+    """
+
+    def create_option(self, name, value, *args, **kwargs):
+        from postulo.core.templatetags.postulo import flag_url
+
+        option = super().create_option(name, value, *args, **kwargs)
+        code = str(value or "")
+        if code:
+            option["attrs"]["data-flag"] = flag_url(code)
+        return option
+
+
 class PostalAddressForm(forms.ModelForm):
     """One row: what kind of address it is, and its parts.
 
@@ -180,7 +199,11 @@ class PostalAddressForm(forms.ModelForm):
             label=_("country"),
             required=False,
             choices=[("", "—"), *phones.country_choices()],
-            widget=forms.Select(attrs={"autocomplete": "country-name"}),
+            # Each option carries its flag's URL and the select is marked for the script
+            # that draws the chosen flag over it, as the telephone field's chooser is
+            # (#88, #214). The server draws the flag the row loaded with, so the field is
+            # right with scripts off.
+            widget=CountrySelect(attrs={"autocomplete": "country-name", "data-flag-select": ""}),
         )
         if not self.instance.pk and default_country:
             self.fields["country"].initial = default_country

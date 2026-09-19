@@ -52,6 +52,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A postal address's country chooser shows the chosen country's flag over the closed
+  select, as the telephone field's has, drawn by the server and following the choice. (#214)
 - An instance can learn that a newer release exists: with `POSTULO_UPDATE_CHECK=true` the
   scheduler asks the project's release address once a day, and nothing else, and *Server
   settings → Overview* says when one is out; `manage.py check_for_updates` asks now. Off
