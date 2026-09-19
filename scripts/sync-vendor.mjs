@@ -70,8 +70,7 @@ for (const [source, to] of NOTICES) {
   mkdirSync(dirname(to), { recursive: true });
   // Verbatim but for the end of the file: a notice that does not end in a newline would be
   // rewritten by the end-of-file hook on every commit, and then differ from what this copies.
-  writeFileSync(to, readFileSync(from, "utf8").replace(/\s*$/, "
-"));
+  writeFileSync(to, readFileSync(from, "utf8").replace(/\s*$/, "\n"));
   console.log(`${to} <- ${source}`);
 }
 process.exit(failed ? 1 : 0);
