@@ -101,7 +101,16 @@ def test_a_passkey_can_be_added_and_then_signs_somebody_in(
     if passwordless.count() and not passwordless.is_checked():
         passwordless.check()
     page.get_by_role("button", name="Add").click()
-    page.wait_for_load_state("networkidle")
+    # Wait for the answer rather than for the network to fall quiet. Pressing *Add* starts
+    # an asynchronous `navigator.credentials.create()`, and the network is idle in the gap
+    # *before* that flow sends anything -- so `networkidle` could return before the
+    # registration had been posted at all, and the assertion below then read the database
+    # before the server had written to it. CI lost that race and said so plainly: the
+    # registration appeared in the teardown log, after the test had already failed.
+    #
+    # Leaving the add page is the server's own answer that it accepted the credential, and
+    # the redirect is sent after the transaction that stored it.
+    page.wait_for_url(lambda url: "/webauthn/add" not in url)
 
     from allauth.mfa.models import Authenticator
 
