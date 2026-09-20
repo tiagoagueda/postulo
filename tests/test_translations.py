@@ -217,6 +217,29 @@ def test_the_catalogues_are_current(name, tool):
         )
 
 
+@pytest.mark.parametrize("name", NAMES)
+def test_the_catalogues_are_what_a_fresh_extraction_writes(name, tool):
+    """Byte for byte, dates aside -- which is a stricter question than the one above.
+
+    The test before this compares the *set* of messages, so a catalogue keeps passing it
+    while the `#:` lines beside every string name source lines that have moved. That is
+    what `scripts/messages.py extract --check` catches, it runs in CI, and it was the only
+    one of the pair the suite did not ask -- so a local run said "no problems" about a tree
+    CI then refused (#292).
+    """
+    from postulo.core.messages_tool import _without_dates
+
+    subject = next(s for s in SETS if s.name == name)
+    extracted = tool.extract_all(subject)
+    for code in CODES:
+        path = tool.po_path(code, subject)
+        current = path.read_text(encoding="utf-8")
+        fresh = tool.dump(tool.merge(extracted, tool.parse(current), code), code, subject)
+        assert _without_dates(current) == _without_dates(fresh), (
+            f"{name} {code}: run scripts/messages.py extract"
+        )
+
+
 def test_a_string_belongs_to_exactly_one_set(tool):
     """Two sets claiming the same source file would translate it twice, differently."""
     seen: dict[str, str] = {}

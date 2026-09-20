@@ -129,3 +129,64 @@ def test_it_is_in_the_sidebar_so_it_can_be_found(client, staff_user):
     client.force_login(staff_user)
     html = client.get(reverse("server:overview")).content.decode()
     assert reverse("server:design") in html
+
+
+# --------------------------------------------------------------- the system's tokens
+
+
+def test_every_rounding_comes_from_the_one_radius(client, staff_user):
+    """There was no radius token at all, so seven rounding decisions disagreed because
+    there was nothing to agree with (#292). The values are unchanged; the rule is new."""
+    theme = CSS[CSS.index("@theme {") : CSS.index("@layer base")]
+
+    assert "--radius: 0.5rem;" in theme
+    for step in ("sm", "md", "lg", "xl"):
+        assert f"--radius-{step}:" in theme
+        derived = re.search(rf"--radius-{step}:\s*([^;]+);", theme).group(1)
+        assert "var(--radius)" in derived, f"--radius-{step} is not derived from the base"
+
+    client.force_login(staff_user)
+    html = client.get(reverse("server:design")).content.decode()
+    for utility, _token in design.RADII:
+        assert utility in html
+
+
+def test_there_are_three_planes_and_each_has_a_border_as_well(client, staff_user):
+    """A shadow is thrown away under forced colours, so it may say what is above what and
+    may never be the only thing saying it."""
+    theme = CSS[CSS.index("@theme {") : CSS.index("@layer base")]
+    assert "--shadow-raised:" in theme and "--shadow-floating:" in theme
+
+    assert "shadow-raised" in CSS[CSS.index(".card {") :][:200], "a card is the raised plane"
+
+    client.force_login(staff_user)
+    html = client.get(reverse("server:design")).content.decode()
+    body = html[html.index("<main") : html.index("</main>")]
+    for utility, _name, _note in design.PLANES:
+        if utility:
+            assert utility in body
+    # Each sample carries a border beside its shadow, which is what survives forced colours.
+    assert body.count("border border-ink-200 bg-white p-3") >= len(design.PLANES)
+
+
+def test_the_masthead_is_raised_only_once_something_is_behind_it(client, staff_user):
+    """With no script it keeps the border it always had, which is the whole fallback."""
+    script = (Path(__file__).resolve().parents[1] / "src/postulo/static/js/app.js").read_text(
+        "utf-8"
+    )
+
+    assert "[data-site-header][data-scrolled]" in CSS
+    assert 'setAttribute("data-scrolled"' in script
+    assert 'removeAttribute("data-scrolled")' in script
+    assert "style.boxShadow" not in script, "the shadow is in the stylesheet, not written in"
+
+
+def test_nothing_floats_by_writing_a_blur_radius_any_more(client, staff_user):
+    """`shadow-lg` meant *a popover* only because somebody wrote `shadow-lg` twice."""
+    from pathlib import Path as P
+
+    root = P(__file__).resolve().parents[1]
+    templates = list((root / "src/postulo/templates").rglob("*.html"))
+    stray = [path.relative_to(root) for path in templates if "shadow-lg" in path.read_text("utf-8")]
+
+    assert not stray, f"these still ask for a blur radius rather than a plane: {stray}"

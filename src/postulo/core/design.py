@@ -106,8 +106,25 @@ class Section:
     entries: tuple = field(default_factory=tuple)
 
 
+#: The rounding scale, every step derived from `--radius` (#292).
+RADII: tuple[tuple[str, str], ...] = (
+    ("rounded-sm", "--radius-sm"),
+    ("rounded-md", "--radius-md"),
+    ("rounded-lg", "--radius-lg"),
+    ("rounded-xl", "--radius-xl"),
+    ("rounded-full", "—"),
+)
+
+#: The three planes. The page is the one without a shadow, which is why it is not a token.
+PLANES: tuple[tuple[str, str, str], ...] = (
+    ("", _("Page"), _("The background. Everything else is above it.")),
+    ("shadow-raised", _("Raised"), _("A card, a table, the masthead once you have scrolled.")),
+    ("shadow-floating", _("Floating"), _("A popover or a menu, over the page rather than in it.")),
+)
+
 SECTIONS: tuple[Section, ...] = (
     Section("colour", _("Colour")),
+    Section("tokens", _("Rounding and depth")),
     Section("type", _("Type")),
     Section("buttons", _("Buttons")),
     Section("fields", _("Fields")),
@@ -122,6 +139,8 @@ def gallery() -> dict:
     return {
         "scales": SCALES,
         "semantic": SEMANTIC,
+        "radii": RADII,
+        "planes": PLANES,
         "tags": TAGS,
         "button_variants": BUTTON_VARIANTS,
         "button_sizes": BUTTON_SIZES,

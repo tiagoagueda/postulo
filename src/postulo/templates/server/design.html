@@ -56,6 +56,40 @@
     </ul>
   </section>
 
+  <!-- ----------------------------------------------------- rounding and depth -->
+  <section id="design-tokens" class="mb-10" aria-labelledby="design-tokens-heading">
+    <h2 id="design-tokens-heading" class="mb-3 font-medium">{% translate "Rounding and depth" %}</h2>
+    <div class="card mb-4">
+      <h3 class="mb-1 text-sm font-medium">{% translate "Rounding" %}</h3>
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Every step derived from one radius, so there is one number to change." %}
+      </p>
+      <ul class="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        {% for utility, token in radii %}
+          <li class="text-xs">
+            <span class="block h-12 border border-ink-300 bg-ink-100 dark:border-ink-700 dark:bg-ink-800 {{ utility }}"></span>
+            <span class="mt-1 block">{{ utility }}</span>
+            <span class="block text-ink-500 dark:text-ink-400">{{ token }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="mb-1 text-sm font-medium">{% translate "Depth" %}</h3>
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Three planes. A shadow is discarded under forced colours, so it may say what is above what and may never be the only thing saying it — each of these has a border too." %}
+      </p>
+      <ul class="grid gap-3 sm:grid-cols-3">
+        {% for utility, name, note in planes %}
+          <li class="rounded-lg border border-ink-200 bg-white p-3 text-xs dark:border-ink-800 dark:bg-ink-900 {{ utility }}">
+            <span class="block font-medium">{{ name }}</span>
+            <span class="mt-1 block text-ink-500 dark:text-ink-400">{{ note }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
   <!-- --------------------------------------------------------------------- type -->
   <section id="design-type" class="mb-10" aria-labelledby="design-type-heading">
     <h2 id="design-type-heading" class="mb-3 font-medium">{% translate "Type" %}</h2>

@@ -139,6 +139,43 @@
      `tests/test_contrast.py` computes both from these tokens. */
   --color-input: oklch(0.62 0.012 250);
   --color-ring: var(--color-brand-500);
+
+  /*
+   * One radius, and every rounding in the interface derived from it (#292).
+   *
+   * There was no radius token at all, so `.card` chose `rounded-xl`, `.btn` chose
+   * `rounded-lg`, `.field-input` chose its own, and the templates chose four more between
+   * them -- not because anybody decided the corners should disagree, but because there was
+   * nothing to agree with. These are Tailwind's own values to the pixel, so this commit
+   * changes no corner anywhere; what it changes is that there is now one number to change.
+   */
+  --radius: 0.5rem;
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: calc(var(--radius) - 0.125rem);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 0.25rem);
+
+  /*
+   * Three planes, where there was one (#292).
+   *
+   * Everything was the same distance from the reader: `.card` carried a `shadow-sm` and a
+   * popover carried `shadow-lg` because somebody wrote `shadow-lg`, and nothing said which
+   * of them was meant to be above the other. Named now, so a surface asks for its plane
+   * rather than for a blur radius:
+   *
+   *   page      the background. No shadow; it is what everything else is above.
+   *   raised    a card, a table, the masthead once the page has scrolled under it.
+   *   floating  a popover, a menu, a panel that appears over the page and must be read
+   *             as detached from it rather than as part of what is underneath.
+   *
+   * Both are soft and low-contrast on purpose: a shadow is discarded outright under forced
+   * colours, so it may say *this is above that* and may never be the only thing saying it.
+   * Every surface here also has a border, which is what survives.
+   */
+  --shadow-raised: 0 1px 2px 0 --alpha(var(--color-ink-950) / 5%);
+  --shadow-floating:
+    0 10px 15px -3px --alpha(var(--color-ink-950) / 10%),
+    0 4px 6px -4px --alpha(var(--color-ink-950) / 10%);
 }
 
 /* --------------------------------------------------------------- base layer */
@@ -465,8 +502,27 @@
     @apply pe-8;
   }
 
+  /*
+   * The masthead, once the page has scrolled under it (#292). Flat against the page while
+   * the page is at the top, and raised the moment something has gone behind it -- which is
+   * the one thing a sticky header has to say and the border alone was saying quietly.
+   *
+   * `data-scrolled` is set by `app.js` on the header it already marks, so a page with no
+   * script keeps the border it always had. The transition is behind
+   * `prefers-reduced-motion`, like the only other one in this stylesheet.
+   */
+  [data-site-header][data-scrolled] {
+    box-shadow: var(--shadow-raised);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [data-site-header] {
+      transition: box-shadow 150ms ease-out;
+    }
+  }
+
   .card {
-    @apply rounded-xl border border-ink-200 bg-white p-6 shadow-sm
+    @apply rounded-xl border border-ink-200 bg-white p-6 shadow-raised
       dark:border-ink-800 dark:bg-ink-900;
   }
 
@@ -877,7 +933,7 @@ details[data-menu] > summary::-webkit-details-marker {
  * gives it the gutter on a phone and a readable measure on a monitor. */
 .page-alert {
   @apply alert fixed inset-x-4 bottom-4 z-50 mx-auto max-w-2xl border-red-200 bg-red-50
-    text-red-900 shadow-lg dark:border-red-800 dark:bg-red-950 dark:text-red-100;
+    text-red-900 shadow-floating dark:border-red-800 dark:bg-red-950 dark:text-red-100;
 }
 
 /* Hidden while the region has nothing to say (#275): the box holds the region and a

@@ -770,6 +770,28 @@
     document.fonts.ready.then(measureHeader);
   }
 
+  /*
+   * The masthead is raised once something has scrolled behind it (#292). A sticky header
+   * has one thing to say -- *the page continues above this* -- and a one-pixel border was
+   * saying it quietly.
+   *
+   * An attribute rather than a style, because `style-src 'self'` refuses an inline style as
+   * firmly as it refuses an inline script; the shadow is in the stylesheet and this only
+   * says when it applies. A page with no script keeps the border it always had, which is
+   * the whole fallback.
+   */
+  function markScrolled() {
+    if (siteHeader) {
+      if (window.scrollY > 0) {
+        siteHeader.setAttribute("data-scrolled", "");
+      } else {
+        siteHeader.removeAttribute("data-scrolled");
+      }
+    }
+  }
+  markScrolled();
+  window.addEventListener("scroll", markScrolled, { passive: true });
+
   // "/" jumps to the search box, as on most sites with one, unless the person is
   // already typing somewhere -- or has switched single-key shortcuts off.
   document.addEventListener("keydown", function (event) {

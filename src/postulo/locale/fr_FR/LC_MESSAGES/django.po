@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-20 14:26+0000\n"
+"POT-Creation-Date: 2026-09-20 14:28+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -642,17 +642,22 @@ msgid "A capture of this address from %(when)s is still waiting for review."
 msgstr ""
 "Une capture de cette adresse datant du %(when)s attend encore d'être relue."
 
-#: src/postulo/templates/server/design.html:142
+#: src/postulo/templates/server/design.html:176
 #, draft
 msgid "A card"
 msgstr "Une carte"
 
-#: src/postulo/templates/server/design.html:178
+#: src/postulo/core/design.py:121
+#, draft
+msgid "A card, a table, the masthead once you have scrolled."
+msgstr "Une carte, un tableau, l'en-tête une fois la page défilée."
+
+#: src/postulo/templates/server/design.html:212
 #, draft
 msgid "A chip"
 msgstr "Une puce"
 
-#: src/postulo/templates/server/design.html:118
+#: src/postulo/templates/server/design.html:152
 #, draft
 msgid "A choice"
 msgstr "Un choix"
@@ -701,12 +706,12 @@ msgid "A deep indigo. Ten steps, of which the interface spends a handful."
 msgstr ""
 "Un indigo profond. Dix niveaux, dont l'interface n'utilise qu'une poignée."
 
-#: src/postulo/templates/server/design.html:131
+#: src/postulo/templates/server/design.html:165
 #, draft
 msgid "A field nobody may change"
 msgstr "Un champ que personne ne peut changer"
 
-#: src/postulo/templates/server/design.html:125
+#: src/postulo/templates/server/design.html:159
 #, draft
 msgid "A field that was refused"
 msgstr "Un champ refusé"
@@ -779,7 +784,7 @@ msgid ""
 msgstr ""
 "Un paquet enregistre une source dans le groupe de points d'entrée <code>%(group)s</code>. Un plugin apparaît dès son installation, dans toutes les parties de cette instance et sans redémarrage. Les points d'entrée sont tout ce qu'il peut apporter : un plugin qui a ses propres pages ou ses propres tables doit être intégré à l'image. Une source qui ne se charge pas est journalisée et laissée de côté, et les sources intégrées continuent de fonctionner."
 
-#: src/postulo/templates/server/design.html:65
+#: src/postulo/templates/server/design.html:99
 #, draft
 msgid "A page title"
 msgstr "Un titre de page"
@@ -840,6 +845,11 @@ msgid ""
 "A plugin's own file is checked against the checksum its catalogue signed. Its requirements are not: those are fetched from PyPI when it is installed, and are whatever is served that day. Trusting a plugin means trusting its list of requirements too. Postulo installs only built wheels, never a source package that would run its own code while installing, and records everything that arrived."
 msgstr ""
 "Le fichier de l’extension elle-même est vérifié par rapport à l’empreinte signée par son catalogue. Pas ses dépendances : celles-ci sont récupérées depuis PyPI au moment de l’installation, et sont ce qui est servi ce jour-là. Faire confiance à une extension, c’est aussi faire confiance à sa liste de dépendances. Postulo n’installe que des paquets construits (wheels), jamais un paquet source qui exécuterait son propre code pendant l’installation, et consigne tout ce qui est arrivé."
+
+#: src/postulo/core/design.py:122
+#, draft
+msgid "A popover or a menu, over the page rather than in it."
+msgstr "Une bulle ou un menu, au-dessus de la page plutôt que dedans."
 
 #: src/postulo/resume/registry.py:71
 #, draft
@@ -909,12 +919,12 @@ msgstr "Un pense-bête pour savoir à qui elle s'adresse."
 msgid "A report on a period"
 msgstr "Un rapport sur une période"
 
-#: src/postulo/templates/server/design.html:158
+#: src/postulo/templates/server/design.html:192
 #, draft
 msgid "A row"
 msgstr "Une ligne"
 
-#: src/postulo/templates/server/design.html:66
+#: src/postulo/templates/server/design.html:100
 #, draft
 msgid "A section heading"
 msgstr "Un titre de section"
@@ -938,7 +948,7 @@ msgid ""
 msgstr ""
 "Un lien à usage unique qui permet à %(name)s de choisir un nouveau mot de passe, valable %(minutes)s minutes. Postulo ne l'envoie nulle part : vous le transmettez vous-même, par le moyen auquel vous vous fiez déjà."
 
-#: src/postulo/templates/server/design.html:179
+#: src/postulo/templates/server/design.html:213
 #, draft
 msgid "A small one"
 msgstr "Une petite"
@@ -950,7 +960,7 @@ msgid ""
 msgstr ""
 "Un statut modifié ici est inscrit sur la chronologie, comme partout ailleurs."
 
-#: src/postulo/templates/server/design.html:149
+#: src/postulo/templates/server/design.html:183
 #, draft
 msgid "A table inside a card"
 msgstr "Un tableau dans une carte"
@@ -974,7 +984,7 @@ msgstr ""
 msgid "A test message from %(name)s"
 msgstr "Un message de test de %(name)s"
 
-#: src/postulo/templates/server/design.html:113
+#: src/postulo/templates/server/design.html:147
 #, draft
 msgid "A text field"
 msgstr "Un champ de texte"
@@ -1294,7 +1304,7 @@ msgstr "Consentir chez le fournisseur"
 msgid "Agreeing with %(provider)s"
 msgstr "Consentement auprès de %(provider)s"
 
-#: src/postulo/core/design.py:116 src/postulo/templates/server/design.html:198
+#: src/postulo/core/design.py:133 src/postulo/templates/server/design.html:232
 #, draft
 msgid "Alerts"
 msgstr "Alertes"
@@ -1373,7 +1383,7 @@ msgid ""
 msgstr ""
 "Une archive peut être importée dans un compte vide depuis la ligne de commande. Ce n'est pas proposé ici parce qu'importer crée des enregistrements au lieu de les fusionner, et c'est une décision qui mérite d'être prise délibérément plutôt que d'un clic."
 
-#: src/postulo/templates/server/design.html:95
+#: src/postulo/templates/server/design.html:129
 #, draft
 msgid "An icon button"
 msgstr "Un bouton icône"
@@ -1417,7 +1427,7 @@ msgstr[1] "et %(counter)s de plus"
 msgid "and %(more)s more"
 msgstr "et %(more)s de plus"
 
-#: src/postulo/templates/server/design.html:162
+#: src/postulo/templates/server/design.html:196
 #, draft
 msgid "And another"
 msgstr "Et une autre"
@@ -1915,7 +1925,7 @@ msgstr "Construire l'archive"
 msgid "built in"
 msgstr "fourni d'origine"
 
-#: src/postulo/core/design.py:112 src/postulo/templates/server/design.html:78
+#: src/postulo/core/design.py:129 src/postulo/templates/server/design.html:112
 #, draft
 msgid "Buttons"
 msgstr "Boutons"
@@ -2245,12 +2255,12 @@ msgstr "somme de contrôle"
 msgid "Checksum"
 msgstr "Somme de contrôle"
 
-#: src/postulo/templates/server/design.html:176
+#: src/postulo/templates/server/design.html:210
 #, draft
 msgid "Chips"
 msgstr "Puces"
 
-#: src/postulo/core/design.py:115 src/postulo/templates/server/design.html:173
+#: src/postulo/core/design.py:132 src/postulo/templates/server/design.html:207
 #, draft
 msgid "Chips and tags"
 msgstr "Puces et étiquettes"
@@ -2403,7 +2413,7 @@ msgstr "Dépôts de code"
 msgid "Code repository"
 msgstr "Dépôt de code"
 
-#: src/postulo/core/design.py:110 src/postulo/templates/server/design.html:27
+#: src/postulo/core/design.py:126 src/postulo/templates/server/design.html:27
 #, draft
 msgid "Colour"
 msgstr "Couleur"
@@ -3128,6 +3138,11 @@ msgstr "services"
 msgid "Depends on"
 msgstr "Dépend de"
 
+#: src/postulo/templates/server/design.html:80
+#, draft
+msgid "Depth"
+msgstr "Profondeur"
+
 #: src/postulo/applications/forms.py:76 src/postulo/core/csv_import.py:54
 #: src/postulo/jobs/tables.py:294
 #: src/postulo/templates/jobs/posting_detail.html:60
@@ -3186,7 +3201,7 @@ msgstr "n'a pas répondu à la dernière vérification"
 msgid "directory (tenant) ID"
 msgstr "ID de l’annuaire (locataire)"
 
-#: src/postulo/templates/server/design.html:99
+#: src/postulo/templates/server/design.html:133
 #, draft
 msgid "Disabled"
 msgstr "Désactivé"
@@ -3667,6 +3682,11 @@ msgid ""
 msgstr ""
 "Chaque poste que vous avez occupé. Écrivez les points forts une fois ; adaptez-les par CV plus tard."
 
+#: src/postulo/templates/server/design.html:67
+#, draft
+msgid "Every step derived from one radius, so there is one number to change."
+msgstr "Chaque niveau dérivé d'un seul rayon : il n'y a qu'un nombre à changer."
+
 #: src/postulo/documents/views.py:491
 #, draft
 msgid "Every store already has this document."
@@ -3900,7 +3920,7 @@ msgstr "Domaine d'activité"
 msgid "field of study"
 msgstr "domaine d'études"
 
-#: src/postulo/core/design.py:113 src/postulo/templates/server/design.html:110
+#: src/postulo/core/design.py:130 src/postulo/templates/server/design.html:144
 #, draft
 msgid "Fields"
 msgstr "Champs"
@@ -3910,7 +3930,7 @@ msgstr "Champs"
 msgid "Figures appear once you have applied for something."
 msgstr "Les chiffres apparaîtront une fois que vous aurez postulé quelque part."
 
-#: src/postulo/templates/server/design.html:72
+#: src/postulo/templates/server/design.html:106
 #, draft
 msgid "Figures line up: 1,024 · 2,048 · 4,096"
 msgstr "Les chiffres s'alignent : 1 024 · 2 048 · 4 096"
@@ -4043,6 +4063,11 @@ msgstr "Première valeur"
 #, draft
 msgid "First, take everything with you"
 msgstr "D'abord, emportez tout avec vous"
+
+#: src/postulo/core/design.py:122
+#, draft
+msgid "Floating"
+msgstr "Flottant"
 
 #: src/postulo/documents/forms.py:39
 #, draft
@@ -4413,7 +4438,7 @@ msgstr "Contrôle de santé"
 msgid "Held"
 msgstr "Tenu"
 
-#: src/postulo/templates/server/design.html:115
+#: src/postulo/templates/server/design.html:149
 #, draft
 msgid "Help under a field says what it is for."
 msgstr "L'aide sous un champ dit à quoi il sert."
@@ -6002,7 +6027,7 @@ msgstr "nom"
 #: src/postulo/templates/partials/phone_numbers.html:47
 #: src/postulo/templates/partials/postal_addresses.html:74
 #: src/postulo/templates/partials/web_links.html:33
-#: src/postulo/templates/server/design.html:152
+#: src/postulo/templates/server/design.html:186
 #: src/postulo/templates/server/people.html:32
 #: src/postulo/templates/server/people.html:45
 #: src/postulo/templates/server/plugins.html:347
@@ -7278,7 +7303,7 @@ msgstr "ORCID"
 msgid "order"
 msgstr "ordre"
 
-#: src/postulo/templates/server/design.html:67
+#: src/postulo/templates/server/design.html:101
 #, draft
 msgid "Ordinary text, which most of the interface is."
 msgstr "Le texte ordinaire, dont l'interface est surtout faite."
@@ -7340,7 +7365,7 @@ msgstr "Résultat"
 msgid "Outcomes"
 msgstr "Résultats"
 
-#: src/postulo/core/design.py:80 src/postulo/templates/server/design.html:102
+#: src/postulo/core/design.py:80 src/postulo/templates/server/design.html:136
 #, draft
 msgid "Outline"
 msgstr "Contour"
@@ -7370,6 +7395,11 @@ msgstr "Paquet"
 #, draft
 msgid "Packing up your data"
 msgstr "Préparation de vos données"
+
+#: src/postulo/core/design.py:120
+#, draft
+msgid "Page"
+msgstr "Page"
 
 #: src/postulo/templates/applications/suggestion_list.html:116
 #: src/postulo/templates/partials/table/pagination.html:21
@@ -7947,7 +7977,7 @@ msgstr "Précédent"
 #: src/postulo/templates/partials/phone_numbers.html:60
 #: src/postulo/templates/partials/postal_addresses.html:85
 #: src/postulo/templates/partials/web_links.html:40
-#: src/postulo/templates/server/design.html:101
+#: src/postulo/templates/server/design.html:135
 #: src/postulo/templates/settings/account.html:58
 #, draft
 msgid "Primary"
@@ -8151,12 +8181,17 @@ msgid_plural "quiet for %(days)s days"
 msgstr[0] "silencieuse depuis %(days)s jour"
 msgstr[1] "silencieuse depuis %(days)s jours"
 
-#: src/postulo/templates/server/design.html:69
+#: src/postulo/templates/server/design.html:103
 #, draft
 msgid ""
 "Quieter text: an explanation under a heading, or a value nobody has filled in."
 msgstr ""
 "Texte discret : une explication sous un titre, ou une valeur que personne n'a remplie."
+
+#: src/postulo/core/design.py:121
+#, draft
+msgid "Raised"
+msgstr "Surélevé"
 
 #: src/postulo/templates/server/people.html:89
 #, draft
@@ -8674,6 +8709,16 @@ msgstr "poste"
 msgid "Role / job title"
 msgstr "Poste / intitulé"
 
+#: src/postulo/templates/server/design.html:65
+#, draft
+msgid "Rounding"
+msgstr "Arrondi"
+
+#: src/postulo/core/design.py:127 src/postulo/templates/server/design.html:63
+#, draft
+msgid "Rounding and depth"
+msgstr "Arrondi et profondeur"
+
 #: src/postulo/templates/partials/table/columns.html:41
 #, draft
 msgid "Rows per page"
@@ -9102,7 +9147,7 @@ msgid ""
 msgstr ""
 "Défini par l'environnement : <code>%(variable)s</code>. Retirez-le de l'environnement pour le modifier ici."
 
-#: src/postulo/templates/server/design.html:132
+#: src/postulo/templates/server/design.html:166
 #, draft
 msgid "Set by the operator"
 msgstr "Défini par l'administrateur"
@@ -9152,7 +9197,7 @@ msgstr "Sections des paramètres"
 msgid "Settled"
 msgstr "Réglée"
 
-#: src/postulo/templates/server/design.html:185
+#: src/postulo/templates/server/design.html:219
 #, draft
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Sept couleurs, chacune réglée à 3:1 sur la carte, dans les deux thèmes."
@@ -9373,7 +9418,7 @@ msgstr "paramètres du site"
 msgid "size"
 msgstr "taille"
 
-#: src/postulo/templates/server/design.html:89
+#: src/postulo/templates/server/design.html:123
 #, draft
 msgid "Sizes"
 msgstr "Tailles"
@@ -9802,7 +9847,7 @@ msgstr "remplacé"
 msgid "Supersedes"
 msgstr "Remplace"
 
-#: src/postulo/core/design.py:114 src/postulo/templates/server/design.html:139
+#: src/postulo/core/design.py:131 src/postulo/templates/server/design.html:173
 #, draft
 msgid "Surfaces"
 msgstr "Surfaces"
@@ -10241,7 +10286,7 @@ msgstr "Ce n'est pas un wheel : Postulo installe des fichiers .whl."
 msgid "That is not a widget Postulo knows about."
 msgstr "Ce n'est pas un widget que Postulo connaît."
 
-#: src/postulo/templates/server/design.html:128
+#: src/postulo/templates/server/design.html:162
 #, draft
 msgid "That is not an address Postulo can use."
 msgstr "Ce n'est pas une adresse que Postulo peut utiliser."
@@ -10440,6 +10485,11 @@ msgid ""
 msgstr ""
 "Les flèches de Votre carrière font passer une entrée devant sa voisine. Si vous ne pouvez pas les utiliser, ou préférez saisir un nombre, le formulaire de chaque entrée affiche sa place sous forme de nombre : le plus petit en premier."
 
+#: src/postulo/core/design.py:120
+#, draft
+msgid "The background. Everything else is above it."
+msgstr "Le fond. Tout le reste est au-dessus."
+
 #: src/postulo/plugins/catalogue.py:186
 #, draft
 msgid "The catalogue is not readable JSON."
@@ -10569,7 +10619,7 @@ msgid ""
 msgstr ""
 "Le fichier lui-même ne peut pas être modifié. Téléversez le nouveau et indiquez qu'il remplace celui-ci, pour que ce que vous avez envoyé désigne toujours le fichier envoyé."
 
-#: src/postulo/templates/server/design.html:120
+#: src/postulo/templates/server/design.html:154
 #, draft
 msgid "The first"
 msgstr "Le premier"
@@ -10826,7 +10876,7 @@ msgstr ""
 msgid "The search in four numbers"
 msgstr "La recherche en quatre chiffres"
 
-#: src/postulo/templates/server/design.html:121
+#: src/postulo/templates/server/design.html:155
 #, draft
 msgid "The second"
 msgstr "Le second"
@@ -10877,7 +10927,7 @@ msgstr "Le site refuse Postulo, ou l'annonce nécessite une connexion"
 msgid "The site's robots.txt is honoured."
 msgstr "Le robots.txt du site est respecté."
 
-#: src/postulo/templates/server/design.html:71
+#: src/postulo/templates/server/design.html:105
 #, draft
 msgid "The smallest size, for a label beside something."
 msgstr "La plus petite taille, pour une étiquette à côté de quelque chose."
@@ -10902,7 +10952,7 @@ msgid ""
 msgstr ""
 "L'interrupteur en haut à droite passe par les trois mêmes ; ceci est la version explicite."
 
-#: src/postulo/templates/server/design.html:183
+#: src/postulo/templates/server/design.html:217
 #, draft
 msgid "The tag palette"
 msgstr "La palette des étiquettes"
@@ -11209,6 +11259,13 @@ msgid ""
 msgstr ""
 "Ceux-là sont activés ou désactivés par un administrateur, pour vous ou pour tout le monde — jamais ici."
 
+#: src/postulo/templates/server/design.html:82
+#, draft
+msgid ""
+"Three planes. A shadow is discarded under forced colours, so it may say what is above what and may never be the only thing saying it — each of these has a border too."
+msgstr ""
+"Trois plans. Une ombre disparaît en contraste élevé : elle peut dire ce qui est au-dessus de quoi, jamais le dire seule — chacun a donc aussi une bordure."
+
 #: src/postulo/templates/settings/account.html:175
 #, python-format, draft
 msgid ""
@@ -11452,7 +11509,7 @@ msgstr ""
 msgid "Two-factor authentication"
 msgstr "Authentification à deux facteurs"
 
-#: src/postulo/core/design.py:111 src/postulo/templates/server/design.html:63
+#: src/postulo/core/design.py:128 src/postulo/templates/server/design.html:97
 #, draft
 msgid "Type"
 msgstr "Typographie"
@@ -11698,7 +11755,7 @@ msgstr "Utiliser un jeton"
 msgid "Utilities"
 msgstr "Services aux collectivités"
 
-#: src/postulo/templates/server/design.html:81
+#: src/postulo/templates/server/design.html:115
 #, draft
 msgid "Variants"
 msgstr "Variantes"
@@ -11890,7 +11947,7 @@ msgid "What a new account starts with. Each person can change theirs."
 msgstr ""
 "Ce avec quoi un nouveau compte démarre. Chacun peut ensuite changer le sien."
 
-#: src/postulo/templates/server/design.html:144
+#: src/postulo/templates/server/design.html:178
 #, draft
 msgid "What almost everything in Postulo sits in."
 msgstr "Ce dans quoi presque tout, dans Postulo, est posé."
@@ -12021,7 +12078,7 @@ msgstr ""
 msgid "What Postulo speaks to you, and whose clock it shows."
 msgstr "La langue dans laquelle Postulo vous parle, et l'horloge qu'il affiche."
 
-#: src/postulo/templates/server/design.html:114
+#: src/postulo/templates/server/design.html:148
 #, draft
 msgid "What somebody typed"
 msgstr "Ce que quelqu'un a saisi"
@@ -12139,7 +12196,7 @@ msgid "when"
 msgstr "quand"
 
 #: src/postulo/templates/documents/rendered_list.html:25
-#: src/postulo/templates/server/design.html:153
+#: src/postulo/templates/server/design.html:187
 #: src/postulo/templates/server/logs.html:87
 #, draft
 msgid "When"
