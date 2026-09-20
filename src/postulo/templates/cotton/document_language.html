@@ -1,0 +1,20 @@
+{% load postulo %}
+<c-vars document />
+{% comment %} Which language a document is written in, beside its kind (#280).
+
+   A flag where one stands for the language, and the language's own name where none does:
+   `flag_country` deliberately answers nothing for the dozen or so with no uncontested home
+   -- Arabic, Swahili, Hausa and the rest -- and no flag beats a wrong flag. So the card
+   reads either way, which is the point rather than a fallback.
+
+   The flag is alone here, with no name beside it, so unlike the language picker it is not
+   decoration: it carries the language's own name as its alternative text. The *language*,
+   never the country -- "Português", never "Portugal".
+
+   The name is marked with `lang` when it is drawn as text, or a screen reader pronounces
+   it with the rules of the interface language and "Kiswahili" is not a word (#64).
+{% endcomment %}
+{% language_flag document.effective_language label=document.language_name as mark %}
+{% if mark %}{{ mark }}
+{% elif document.language_name %}<span lang="{{ document.effective_language }}" class="shrink-0 text-xs text-ink-500 dark:text-ink-400">{{ document.language_name }}</span>
+{% endif %}

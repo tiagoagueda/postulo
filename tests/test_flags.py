@@ -351,3 +351,107 @@ def test_the_default_language_shows_the_chosen_flag_without_a_script(client, adm
     assert 'value="pt-pt"' in select.group(1) and "/flags/pt" in select.group(1)
     labels = re.findall(r"<option [^>]*>([^<]*)</option>", select.group(1))
     assert not any(ch in label for label in labels for ch in "\U0001f1e6\U0001f1ff")
+
+
+# ------------------------------------------------- a document's language (#280)
+
+
+def a_cv(user, **fields):
+    from postulo.documents.models import CV
+
+    return CV.objects.create(owner=user, name=fields.pop("name", "Backend"), **fields)
+
+
+@pytest.mark.django_db
+def test_a_cv_says_which_language_it_is_in(client, user):
+    """A flag beside the kind, and the *language's* own name as its words -- never the
+    country's, because the flag stands alone on a card with no name beside it."""
+    a_cv(user, language="pt-pt")
+    client.force_login(user)
+
+    html = client.get(reverse("documents:cv_list")).content.decode()
+
+    image = re.search(r"<img[^>]*data-flag=\"pt\"[^>]*>", html)
+    assert image, "no flag on the card"
+    assert 'alt="português (Portugal)"' in image.group(0), image.group(0)
+    assert "aria-hidden" not in image.group(0), "it stands alone, so it is not decoration"
+
+
+@pytest.mark.django_db
+def test_a_language_with_no_flag_says_its_name_instead(client, user):
+    """`flag_country` answers nothing for the dozen with no uncontested home, and no flag
+    beats a wrong flag -- so the card reads either way."""
+    from postulo.core import languages
+
+    assert languages.flag_country("sw") == "", "Swahili is one of the flagless ones"
+    a_cv(user, language="sw")
+    client.force_login(user)
+
+    html = client.get(reverse("documents:cv_list")).content.decode()
+
+    assert '<span lang="sw"' in html and "Kiswahili" in html
+    assert "data-flag=" not in html, "no flag at all, rather than a wrong one"
+
+
+@pytest.mark.django_db
+def test_a_blank_language_follows_the_profile_and_is_drawn_the_same(client, user):
+    """Blank means *follow your profile*, and what reaches the employer is the resolved
+    value either way, so it is not drawn differently."""
+    user.profile.language = "de"
+    user.profile.save(update_fields=["language"])
+    cv = a_cv(user, language="")
+    client.force_login(user)
+
+    assert cv.effective_language == "de" and cv.language_name == "Deutsch"
+    html = client.get(reverse("documents:cv_list")).content.decode()
+    assert 'data-flag="de"' in html
+
+
+@pytest.mark.django_db
+def test_a_letter_says_it_too(client, user):
+    from postulo.documents.models import CoverLetter
+
+    CoverLetter.objects.create(owner=user, name="Speculative", body="Dear team", language="fr-fr")
+    client.force_login(user)
+
+    html = client.get(reverse("documents:letter_list")).content.decode()
+
+    assert 'data-flag="fr"' in html and 'alt="français (France)"' in html
+
+
+def _queries_for(client, url) -> int:
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    with CaptureQueriesContext(connection) as captured:
+        client.get(url)
+    return len(captured.captured_queries)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("declared,profile", [("pt-pt", ""), ("", "de")])
+def test_asking_every_card_its_language_costs_no_query_of_its_own(client, user, declared, profile):
+    """Whether the language is the document's own or inherited, the page asks the same
+    number of questions of the database however many cards are on it: the resolution is
+    cached per document, and the owner's profile is joined rather than fetched a row at a
+    time (#280).
+
+    The one case left out is a document with no language whose owner has chosen none
+    either, where the last step of the fallback reads the instance's settings row. That
+    row is re-read all over the application because nothing caches it, which is #231's
+    subject rather than this one.
+    """
+    user.profile.language = profile
+    user.profile.save(update_fields=["language"])
+    for number in range(3):
+        a_cv(user, name=f"CV {number}", language=declared)
+    client.force_login(user)
+    url = reverse("documents:cv_list")
+
+    client.get(url)  # let anything cached per process warm up first
+    before = _queries_for(client, url)
+    for number in range(3, 9):
+        a_cv(user, name=f"CV {number}", language=declared)
+    after = _queries_for(client, url)
+
+    assert after == before, f"{before} queries for three cards, {after} for nine"

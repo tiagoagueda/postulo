@@ -7,9 +7,12 @@
   <div class="mb-6 flex flex-wrap items-start gap-4">
     <div>
       <h1 class="text-2xl font-semibold tracking-tight">{{ letter.name }}</h1>
-      {% if letter.subject %}
-        <p class="text-sm text-ink-500 dark:text-ink-400">{{ letter.subject }}</p>
-      {% endif %}
+      {% comment %} Always drawn, because the language belongs here whether or not the
+         letter carries a subject (#280). {% endcomment %}
+      <p class="flex flex-wrap items-center gap-1.5 text-sm text-ink-500 dark:text-ink-400">
+        <c-document-language :document="letter" />
+        {% if letter.subject %}<span>{{ letter.subject }}</span>{% endif %}
+      </p>
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
       <a href="{% url 'documents:letter_preview' letter.pk %}" target="_blank" rel="noopener"

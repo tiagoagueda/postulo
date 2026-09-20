@@ -38,8 +38,9 @@
               <a href="{{ letter.get_absolute_url }}" class="font-medium hover:underline">
                 {{ letter.name }}
               </a>
-              <p class="truncate text-sm text-ink-500 dark:text-ink-400">
-                {{ letter.get_kind_display }}{% if letter.subject %} · <bdi>{{ letter.subject }}</bdi>{% endif %}
+              <p class="flex items-center gap-1.5 text-sm text-ink-500 dark:text-ink-400">
+                <c-document-language :document="letter" />
+                <span class="truncate">{{ letter.get_kind_display }}{% if letter.subject %} · <bdi>{{ letter.subject }}</bdi>{% endif %}</span>
               </p>
             </div>
             {% if letter.is_template %}

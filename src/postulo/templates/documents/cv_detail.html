@@ -7,9 +7,10 @@
   <div class="mb-6 flex flex-wrap items-start gap-4">
     <div>
       <h1 class="text-2xl font-semibold tracking-tight"><bdi>{{ cv.name }}</bdi></h1>
-      <p class="text-sm text-ink-500 dark:text-ink-400">
-        {{ cv.get_kind_display }} ·
-        <bdi>{{ cv.headline|default:"" }}</bdi>{% if cv.headline %} · {% endif %}{{ cv.theme_label }}
+      <p class="flex flex-wrap items-center gap-1.5 text-sm text-ink-500 dark:text-ink-400">
+        <c-document-language :document="cv" />
+        <span>{{ cv.get_kind_display }} ·
+        <bdi>{{ cv.headline|default:"" }}</bdi>{% if cv.headline %} · {% endif %}{{ cv.theme_label }}</span>
       </p>
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">

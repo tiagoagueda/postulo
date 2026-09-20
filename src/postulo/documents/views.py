@@ -15,7 +15,6 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from postulo.applications.models import Application
 from postulo.applications.services import record_event
-from postulo.core import languages
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
@@ -34,7 +33,6 @@ from .forms import (
 from .models import CV, CoverLetter, CVItem, LetterKind, RenderedDocument, UploadedDocument
 from .pdf import PDFBackendUnavailable, pdf_session
 from .rendering import (
-    document_language,
     render_cv_html,
     render_letter_html,
     snapshot_cv,
@@ -70,7 +68,10 @@ class CVListView(OwnedObjectMixin, ListView):
     context_object_name = "cvs"
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("items")
+        # `owner__profile` because a card asks each CV what language it is in, and a blank
+        # field means "follow your profile" -- without the join that is two queries a row
+        # rather than one for the page (#280).
+        return super().get_queryset().select_related("owner__profile").prefetch_related("items")
 
 
 class CVDetailView(OwnedObjectMixin, DetailView):
@@ -86,9 +87,9 @@ class CVDetailView(OwnedObjectMixin, DetailView):
         # Which entries will print their original text, said here rather than discovered in
         # the PDF an employer already has (#131).
         context["fell_back"] = translating.fallen_back(self.object)
-        context["document_language"] = languages.NATIVE_NAMES.get(
-            translating.normalise(document_language(self.object)), ""
-        )
+        # The same answer the card and the header draw, asked once of the document
+        # itself rather than computed a second way here (#280).
+        context["document_language"] = self.object.language_name
         return context
 
 
@@ -254,7 +255,8 @@ class CoverLetterListView(OwnedObjectMixin, ListView):
     context_object_name = "letters"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        # `owner__profile` for the language each row shows; see CVListView (#280).
+        queryset = super().get_queryset().select_related("owner__profile")
         kind = self.request.GET.get("kind", "")
         if kind in LetterKind.values:
             queryset = queryset.filter(kind=kind)

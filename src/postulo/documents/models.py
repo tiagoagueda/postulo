@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import hashlib
 import posixpath
+from functools import cached_property
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -77,6 +78,35 @@ def renders_of(draft):
     ).order_by("-rendered_at", "pk")
 
 
+class DeclaresALanguage:
+    """The language a document is written in, resolved and named (#280).
+
+    `language` is blank for *follow your profile*, so the answer a reader wants is the
+    resolved one rather than the field: it is what the PDF declares, what a recruiter's
+    screen reader reads the letter out with, and what WeasyPrint hyphenates by (#223).
+    A declared language and an inherited one are drawn exactly the same, because what
+    reaches the employer is the same either way and a distinction here would be about a
+    setting rather than about the document.
+    """
+
+    @cached_property
+    def effective_language(self) -> str:
+        """Cached, because a card asks for the language and then for its name, and the
+        last step of the fallback reads the instance's settings row -- which is not cached
+        itself (#231), so asking three times a card is three reads a card (#280)."""
+        from .rendering import document_language
+
+        return document_language(self)
+
+    @cached_property
+    def language_name(self) -> str:
+        """The language's own name for itself, or nothing for a code nobody offers."""
+        from postulo.core import languages
+        from postulo.resume import translating
+
+        return languages.NATIVE_NAMES.get(translating.normalise(self.effective_language), "")
+
+
 class CVKind(models.TextChoices):
     """What sort of document this selection is, which decides its shape rather than its name.
 
@@ -103,7 +133,7 @@ class CVKind(models.TextChoices):
 CV_THEMES = {CVKind.CV: "plain", CVKind.PORTFOLIO: "plain"}
 
 
-class CV(OwnedModel):
+class CV(DeclaresALanguage, OwnedModel):
     """A named selection of your career, aimed at a particular kind of role."""
 
     name = models.CharField(
@@ -293,7 +323,7 @@ LETTER_THEMES = {
 }
 
 
-class CoverLetter(OwnedModel):
+class CoverLetter(DeclaresALanguage, OwnedModel):
     """A letter, or a template for many letters.
 
     Placeholders are filled in when the letter is rendered against an application. They

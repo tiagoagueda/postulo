@@ -43,6 +43,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Each CV and cover letter says which language it is written in, as a flag beside its kind
+  on the lists and the document's own page, or the language's own name where no flag
+  stands for it. (#280)
 - A postal address's country chooser shows the chosen flag, as the telephone field does.
   (#214)
 - `POSTULO_UPDATE_CHECK=true` lets the scheduler ask the project's release address once a

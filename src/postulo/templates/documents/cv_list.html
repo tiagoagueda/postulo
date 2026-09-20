@@ -30,7 +30,10 @@
         <a href="{{ cv.get_absolute_url }}" class="card hover:border-brand-400">
           <div class="flex flex-wrap items-baseline justify-between gap-2">
             <p class="font-medium"><bdi>{{ cv.name }}</bdi></p>
-            <span class="chip py-0 text-xs"><span class="chip-text">{{ cv.get_kind_display }}</span></span>
+            <span class="flex shrink-0 items-center gap-1.5">
+              <c-document-language :document="cv" />
+              <span class="chip py-0 text-xs"><span class="chip-text">{{ cv.get_kind_display }}</span></span>
+            </span>
           </div>
           {% if cv.headline %}
             <p class="text-sm text-ink-500 dark:text-ink-400">{{ cv.headline }}</p>
