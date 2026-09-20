@@ -43,6 +43,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- The slow things — fetching a posting's page, finding a logo, rendering a PDF, building an
+  export archive, telling your notifiers — can be done by a worker instead of while you
+  wait, with a page that says what is happening. Off by default. (#247)
 - Listings are a table like the other two: sorted by any column, narrowed per column, with
   the columns you choose, and a bar that shortlists or discards everything you ticked in
   one go. The state tabs and their counts stay above it. (#160)

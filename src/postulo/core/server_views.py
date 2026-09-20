@@ -33,7 +33,7 @@ from postulo import __version__
 from postulo.accounts import deletion
 from postulo.plugins.forms import PluginRepositoryForm
 
-from . import proxy, site, updates
+from . import errands, proxy, scheduler, site, updates
 from .mixins import StaffRequiredMixin
 from .models import SiteSettings
 from .server_forms import (
@@ -131,6 +131,12 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 "backup_dir": Path(settings.POSTULO_BACKUP_DIR),
                 "newest_backup": _newest_backup(Path(settings.POSTULO_BACKUP_DIR)),
                 "queued_tasks": _queued_tasks(),
+                # Whether the slow work is sent off at all, and whether whoever was meant
+                # to do it has been round lately (#247). Both, because the interesting
+                # state is the disagreement: a queue switched on and a worker that has
+                # stopped is the one arrangement where a button does nothing.
+                "background_work": errands.worker_expected(),
+                "worker_last_pass": scheduler.worker_last_pass(),
                 "health_url": reverse("core:healthz"),
                 "platform": platform.platform(),
                 "executable": sys.executable,

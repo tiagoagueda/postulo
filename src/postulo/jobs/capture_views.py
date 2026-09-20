@@ -24,12 +24,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
 
-from postulo.core import throttle
+from postulo.core import errands, throttle
 from postulo.core.mixins import OwnedObjectMixin
-from postulo.plugins.base import CaptureError
-from postulo.plugins.fetching import fetch_page
 from postulo.plugins.policy import plugins_for
-from postulo.plugins.registry import parse_page
 
 from .known import known
 from .models import Capture, CaptureStatus
@@ -119,42 +116,17 @@ class CaptureCreateView(OwnedObjectMixin, View):
             messages.error(request, str(too_often))
             return self._render(request, form)
 
-        url = form.cleaned_data["url"]
-        supplied = form.cleaned_data.get("html", "").strip()
-
-        if supplied:
-            # Nothing is fetched: the page came from a browser that was already allowed
-            # to see it, which is also how the future extension will work.
-            page_url, page_html = url, supplied
-        else:
-            try:
-                fetched = fetch_page(url)
-            except CaptureError as exc:
-                # Refusals here are explanations, not failures: the message says what to
-                # do instead, and the form keeps what was typed so it can be acted on.
-                messages.error(request, str(exc))
-                return self._render(request, form)
-            page_url, page_html = fetched.url, fetched.html
-
-        result = parse_page(page_url, page_html)
-        if result is None:
-            messages.error(
-                request,
-                _("Nothing resembling a job posting was found on that page."),
-            )
-            return self._render(request, form)
-
-        data, source = result
-        with transaction.atomic():
-            capture = Capture.objects.create(
-                owner=request.user,
-                url=page_url[:500],
-                source_name=source.name,
-                source_version=getattr(source, "version", ""),
-                origin="web",
-                data=data.model_dump(mode="json"),
-            )
-        return redirect("jobs:capture_review", pk=capture.pk)
+        # The reading happens elsewhere now: `fetching` allows ten seconds for the page
+        # and five more for `robots.txt`, and holding a gunicorn worker for fifteen seconds
+        # of somebody else's slowness is what this stopped doing (#247). The answer is the
+        # page that watches it, which on an instance with no worker is already finished.
+        errand = errands.send(
+            "capture",
+            request.user,
+            url=form.cleaned_data["url"],
+            html=form.cleaned_data.get("html", "").strip(),
+        )
+        return redirect("core:errand", pk=errand.pk)
 
 
 class CaptureListView(OwnedObjectMixin, ListView):

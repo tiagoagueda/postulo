@@ -63,6 +63,25 @@
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Queued tasks" %}</dt>
           <dd>{% if queued_tasks is not None %}{{ queued_tasks }}{% else %}—{% endif %}</dd>
         </div>
+        {% comment %} A queue switched on with nothing emptying it is the one arrangement
+           where a button does nothing, so the page says both halves: whether the work is
+           sent off, and when whoever was meant to do it last went round (#247). {% endcomment %}
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Background work" %}</dt>
+          <dd>
+            {% if background_work %}
+              {% if worker_last_pass %}
+                {% blocktranslate trimmed with when=worker_last_pass|timesince %}
+                  a worker was here {{ when }} ago
+                {% endblocktranslate %}
+              {% else %}
+                <span class="text-red-600 dark:text-red-400">{% translate "queued, but no worker has been here" %}</span>
+              {% endif %}
+            {% else %}
+              {% translate "done as it is asked for" %}
+            {% endif %}
+          </dd>
+        </div>
         {% comment %} What a monitor should poll. It used to be a card of its own at the
            bottom of the page, beside the admin's escape hatch (#116, #183); it is a fact
            about the software, so it lives here (#199). {% endcomment %}

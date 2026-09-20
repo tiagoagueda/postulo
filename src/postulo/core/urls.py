@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import (
     views,
+    views_errands,
     views_export,
     views_import,
     views_logs,
@@ -22,6 +23,14 @@ urlpatterns = [
     path("search/", views_search.search_page, name="search"),
     path("export/", views_export.export_overview, name="export"),
     path("export/download/", views_export.export_download, name="export_download"),
+    path(
+        "export/archive/<int:pk>/",
+        views_export.export_archive,
+        name="export_archive",
+    ),
+    # Where a button that sends work off lands, and the fragment that page polls (#247).
+    path("working/<int:pk>/", views_errands.errand_page, name="errand"),
+    path("working/<int:pk>/state/", views_errands.errand_state, name="errand_state"),
     path("import/", views_import.import_csv, name="import_csv"),
     path("import/template.csv", views_import.import_csv_template, name="import_csv_template"),
     path("import/forget/", views_import.import_csv_forget, name="import_csv_forget"),

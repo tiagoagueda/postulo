@@ -16,9 +16,9 @@
     <div class="ms-auto flex flex-wrap items-center gap-2">
       <a href="{% url 'documents:cv_preview' cv.pk %}" target="_blank" rel="noopener"
          class="btn" data-variant="outline">{% translate "Preview" %}<span class="sr-only"> {% translate "(opens in a new tab)" %}</span></a>
-      {# `data-download`: the answer is a PDF, so the button is released again rather than #}
-      {# left disabled for the rest of the visit (#226). #}
-      <form method="post" action="{% url 'documents:cv_export' cv.pk %}" data-download>
+      {# No longer `data-download`: the answer is the page that watches the drawing, not #}
+      {# the PDF, so the guard waits for the navigation like every other form (#247). #}
+      <form method="post" action="{% url 'documents:cv_export' cv.pk %}">
         {% csrf_token %}
         <button type="submit" class="btn">{% translate "Export PDF" %}</button>
       </form>

@@ -13,6 +13,8 @@ class NotificationsConfig(AppConfig):
         # writes the words, the transport gets those words off this machine. One sits on the
         # other, and merging them would make notification settings and delivery settings the
         # same form (#104).
+        # Registers delivery as a piece of slow work, and the messages it can build (#247).
+        from postulo.notifications import slow  # noqa: F401
         from postulo.plugins.browser import BrowserNotifier
         from postulo.plugins.email import EmailNotifier
         from postulo.plugins.own_mail import OwnMail

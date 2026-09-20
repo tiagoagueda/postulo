@@ -15,6 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
@@ -580,6 +581,141 @@ class WebLink(OwnedModel):
     @property
     def kind_label(self) -> str:
         return str(self.get_kind_display())
+
+
+class ErrandState(models.TextChoices):
+    """Where a piece of slow work stands. Four words, and only four."""
+
+    WAITING = "waiting", _("Waiting")
+    WORKING = "working", _("Working")
+    DONE = "done", _("Done")
+    FAILED = "failed", _("Failed")
+
+
+class Errand(OwnedModel):
+    """A piece of slow work sent off to be done, and somewhere to watch it (#247).
+
+    Not a task result. `django_tasks_db` keeps one of those, holding a function, its
+    arguments and a return value; this holds what a *person* needs, which is a different
+    list: whose it is, what kind of thing it is, what to say while it runs, and where to go
+    when it finishes. Ownership is the reason it cannot be the same row -- a poll is a new
+    address that names a piece of work, and `for_user` is how every other address in Postulo
+    answers *whose is this* (#247).
+
+    **It is also what makes the queue optional.** An instance with no worker runs the work
+    where the request stands and writes the finished errand at once, so the page it answers
+    with is the same page either way, already saying *done*. A button that silently does
+    nothing is worse than a slow button, and a second code path for small installations is
+    how one of them rots.
+
+    The subject is the record the work is about -- a company whose logo is being fetched, a
+    CV being rendered -- kept as a generic link because the five kinds have five different
+    models, and nullable because two of them (a capture from an address, an export of the
+    whole account) are about no record at all. A subject deleted while the work waited leaves
+    the link dangling rather than taking the errand with it: what happened still happened,
+    and the page that asks about it deserves an answer rather than a 404.
+    """
+
+    kind = models.CharField(_("kind"), max_length=40)
+    state = models.CharField(
+        _("state"), max_length=10, choices=ErrandState, default=ErrandState.WAITING
+    )
+    #: What the handler needs, written by the view that asked. Server-side both ways: this
+    #: is never posted by a browser.
+    payload = models.JSONField(_("what was asked"), default=dict, blank=True)
+    #: What the handler answered: a sentence to show and, where there is one, where to go.
+    outcome = models.JSONField(_("what came of it"), default=dict, blank=True)
+    #: Why it failed, in the words the person would have seen had they waited for it.
+    error = models.TextField(_("what went wrong"), blank=True)
+
+    subject_type = models.ForeignKey(ContentType, null=True, blank=True, on_delete=models.SET_NULL)
+    subject_id = models.PositiveBigIntegerField(null=True, blank=True)
+    subject = GenericForeignKey("subject_type", "subject_id")
+
+    started_at = models.DateTimeField(_("started at"), null=True, blank=True)
+    finished_at = models.DateTimeField(_("finished at"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("errand")
+        verbose_name_plural = _("errands")
+        ordering = ("-created_at", "-pk")
+        indexes = [models.Index(fields=("owner", "state"))]
+
+    def __str__(self) -> str:
+        return f"{self.kind} ({self.state})"
+
+    @property
+    def is_finished(self) -> bool:
+        return self.state in (ErrandState.DONE, ErrandState.FAILED)
+
+    @property
+    def message(self) -> str:
+        """The sentence to show, whichever way it went."""
+        if self.state == ErrandState.FAILED:
+            return self.error
+        return str(self.outcome.get("message", ""))
+
+    @property
+    def url(self) -> str:
+        """Where the finished work is, when it is somewhere."""
+        return str(self.outcome.get("url", ""))
+
+
+def archive_path(instance, filename: str) -> str:
+    """Under the owner, as every other personal file is: a stray path reaches one person."""
+    return f"exports/{instance.owner_id}/{timezone.now():%Y/%m}/{filename}"
+
+
+class ExportArchive(OwnedModel):
+    """One export, built by a worker and waiting to be downloaded (#247).
+
+    Building the archive while somebody watched was one long request reading every record
+    and every file in the account; done by a worker it becomes a file, and a file is a thing
+    that has to be looked after. Three answers this model exists to give:
+
+    **Whose it is**, because it holds the whole of one person's job search, and it is served
+    through an ownership-checked view like every other document rather than from the media
+    directory.
+
+    **When it goes**, because one is written per export and nobody downloads all of them.
+    The scheduler deletes what has expired, bytes and row together.
+
+    **Whether it is still there**, because *your export is ready* pointing at a file the
+    reaper has taken is worse than saying it expired.
+    """
+
+    file = models.FileField(_("file"), upload_to=archive_path)
+    filename = models.CharField(_("filename"), max_length=200)
+    size = models.PositiveBigIntegerField(_("size"), default=0)
+    expires_at = models.DateTimeField(_("expires at"), db_index=True)
+
+    class Meta:
+        verbose_name = _("export archive")
+        verbose_name_plural = _("export archives")
+        ordering = ("-created_at", "-pk")
+
+    def __str__(self) -> str:
+        return self.filename
+
+    @property
+    def has_expired(self) -> bool:
+        from django.utils import timezone as when
+
+        return self.expires_at <= when.now()
+
+    def delete(self, *args, **kwargs):
+        """Take the bytes with the row.
+
+        Django leaves the file behind on purpose -- a row deleted in a transaction that then
+        rolls back would otherwise have taken a file with it -- but an export exists only to
+        be downloaded once, and the whole point of the expiry is that nothing is left on
+        disk. Deleted after the row, and a file already gone is not an error.
+        """
+        stored = self.file
+        result = super().delete(*args, **kwargs)
+        if stored:
+            stored.delete(save=False)
+        return result
 
 
 class SiteSettings(models.Model):

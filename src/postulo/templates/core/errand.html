@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ working_label }}{% endblock %}
+
+{% block content %}
+  {% comment %} Where a button that sends work off lands. One card and one sentence: there is
+     nothing else to say until the work says something, and a page of furniture around a
+     spinner is a page that looks broken while it waits (#247).
+
+     The heading names the work rather than the moment, so it is still true once the work has
+     finished -- the line under it is what changes, and it is that line the live region
+     announces.
+  {% endcomment %}
+  <div class="mx-auto max-w-lg">
+    <div class="card py-10 text-center">
+      <h1 class="mb-4 text-2xl font-semibold tracking-tight">{{ working_label }}</h1>
+      {% include "core/partials/errand_state.html" %}
+    </div>
+  </div>
+{% endblock %}

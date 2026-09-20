@@ -333,8 +333,24 @@ def test_downloading_needs_a_post(client, populated):
 
 
 def test_the_download_is_a_usable_archive(client, populated):
+    """Two steps now: the press asks for the archive, the page it lands on has the link.
+
+    With no worker configured -- which is the default, and what these tests run under --
+    the work is done where the request stands, so the page is already finished when it is
+    drawn and the only difference is the extra click (#247).
+    """
+    from postulo.core.models import ExportArchive
+
     client.force_login(populated)
-    response = client.post(reverse("core:export_download"))
+    asked = client.post(reverse("core:export_download"))
+    assert asked.status_code == 302
+
+    page = client.get(asked.url).content.decode()
+    archive_row = ExportArchive.objects.for_user(populated).get()
+    link = reverse("core:export_archive", args=[archive_row.pk])
+    assert link in page, "the finished page points at the file"
+
+    response = client.get(link)
     try:
         assert response.status_code == 200
         assert response["Content-Disposition"].startswith("attachment;")
@@ -405,7 +421,7 @@ def test_the_export_page_does_not_build_the_archive_to_show_the_numbers(client, 
         response = client.get(reverse("core:export"))
 
     assert response.status_code == 200
-    assert b"Download the archive" in response.content
+    assert b"Build the archive" in response.content
 
 
 # ------------------------------------------- a document's language travels (#283)

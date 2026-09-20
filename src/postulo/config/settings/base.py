@@ -567,6 +567,34 @@ TASKS = {
     },
 }
 
+# Whether a worker is running to do the slow work: fetching a page, finding a logo,
+# rendering a PDF, building an export archive, telling notifiers something arrived (#247).
+#
+# **Off by default, and the default has to keep working.** A personal instance is one
+# container, and a queue nobody is emptying turns every one of those buttons into a button
+# that silently does nothing -- which is worse than a slow one. Left off, each piece of work
+# is done where the request stands, exactly as it was before this existed, and the page that
+# reports it is the same page, already saying *done*.
+#
+# Switched on, start a worker beside the web container:
+#   docker compose -f docker/compose.yml --profile worker up -d
+# or run `manage.py work` yourself. The pair must agree: this setting is what the web
+# process believes, and nothing here can see whether the container is really there.
+POSTULO_BACKGROUND_WORK = env.bool("POSTULO_BACKGROUND_WORK", default=False)
+
+# Where the worker records the end of each pass, read by its own container healthcheck and
+# by Server settings in the web one. A file on the shared volume for the reason the
+# scheduler's is one: it is the only thing both containers can see (#221, #247).
+POSTULO_WORKER_HEARTBEAT = env.path(
+    "POSTULO_WORKER_HEARTBEAT", default=REPO_DIR / "data" / "worker-heartbeat"
+)
+
+# How long an export archive waits on disk for somebody to download it. One file per
+# export, holding every document in an account, so it is reaped rather than kept: the
+# scheduler deletes what has expired, and the archive is reachable only through an
+# ownership-checked view like every other personal document (#247).
+POSTULO_EXPORT_KEEP_HOURS = env.int("POSTULO_EXPORT_KEEP_HOURS", default=24)
+
 # --------------------------------------------------------------------- security
 
 SECURE_CONTENT_TYPE_NOSNIFF = True

@@ -183,11 +183,24 @@ def furnished(applicant):
         context={"From": "jobs@blackmesa.test", "Subject": "Interview invitation"},
     )
 
+    # A finished piece of slow work, so the page a press lands on is walked with something
+    # on it rather than as an empty spinner (#247).
+    from postulo.core.models import Errand, ErrandState
+
+    errand = Errand.objects.create(
+        owner=applicant,
+        kind="export",
+        state=ErrandState.DONE,
+        outcome={"message": "Your data is ready to download.", "url": "/settings/export/"},
+        finished_at=timezone.now(),
+    )
+
     applicant.is_staff = True
     applicant.is_superuser = True
     applicant.save()
     return {
         "application": application,
+        "errand": errand,
         "company": company,
         "applicant": applicant,
         "experience": experience,
@@ -243,6 +256,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     posting = it.get("posting", a)
     interview = it.get("interview", a)
     connection = it.get("connection", a)
+    errand = it.get("errand", a)
     return [
         "/",
         "/listings/",
@@ -273,6 +287,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/jobs/companies/{c.pk}/edit/",
         "/jobs/industries/",
         "/jobs/captures/",
+        # The page a button that sends work off lands on, finished (#247).
+        f"/working/{errand.pk}/",
         "/jobs/postings/new/",
         "/documents/cvs/",
         "/documents/cvs/new/",

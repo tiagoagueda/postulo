@@ -149,6 +149,8 @@ class Command(BaseCommand):
     def one_pass(self, every: int, *, budget: int) -> None:
         """Everything the clock has made due, once."""
         from postulo.applications.quiet import announce_quiet_applications
+        from postulo.core import errands
+        from postulo.core.slow import reap_archives
         from postulo.documents.archiving import send_pending
         from postulo.plugins.syncing import run_syncs
 
@@ -162,6 +164,10 @@ class Command(BaseCommand):
             quiet, told = announce_quiet_applications()
             copies_sent, copies_failed = send_pending()
             syncs_ran, syncs_failed = run_syncs(budget=budget)
+            # The two things #247 leaves lying about: an export archive holding a whole
+            # account, and a week of errand rows nobody is watching any more. Reaped on the
+            # pass that already exists rather than by a second timer.
+            reaped = reap_archives() + errands.forget_old()
 
         when = f"{timezone.now():%Y-%m-%d %H:%M}"
         if stamped:
@@ -172,7 +178,11 @@ class Command(BaseCommand):
             self.stdout.write(f"{when} {copies_sent} document copies sent, {copies_failed} failed")
         if syncs_ran:
             self.stdout.write(f"{when} {syncs_ran} syncs ran, {syncs_failed} failed")
-        if self.quiet_pass and not any((stamped, quiet, copies_sent, copies_failed, syncs_ran)):
+        if reaped:
+            self.stdout.write(f"{when} {reaped} finished errands and expired archives removed")
+        if self.quiet_pass and not any(
+            (stamped, quiet, copies_sent, copies_failed, syncs_ran, reaped)
+        ):
             self.stdout.write("Nothing due.")
 
         # Last, and only on a pass that finished: the heartbeat is the answer to "is it

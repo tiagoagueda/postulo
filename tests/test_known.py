@@ -127,7 +127,7 @@ def test_the_form_says_so_before_fetching_and_captures_on_the_second_press(
 ):
     listing = a_listing(user, "https://www.example.org/jobs/1/")
     monkeypatch.setattr(
-        "postulo.jobs.capture_views.fetch_page",
+        "postulo.plugins.fetching.fetch_page",
         lambda url: (_ for _ in ()).throw(AssertionError("nothing should be fetched")),
     )
     client.force_login(user)

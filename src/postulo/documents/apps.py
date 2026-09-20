@@ -12,7 +12,8 @@ class DocumentsConfig(AppConfig):
         from postulo.plugins import registry
         from postulo.plugins.localstore import LocalStore
 
-        from . import kinds, signals  # noqa: F401 - connects the receivers
+        # `slow` registers the two renders that are sent off rather than waited for (#247).
+        from . import kinds, signals, slow  # noqa: F401 - connects the receivers
 
         # What kinds of document exist, said once. Here rather than at import time,
         # because a registry filled while a module loads is a registry that is empty in

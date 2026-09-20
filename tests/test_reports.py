@@ -663,18 +663,21 @@ def test_pressing_download_files_the_report_under_sent_documents(client, user, d
 
     client.force_login(user)
 
+    # The press sends the drawing off and lands on the page that watches it; what the
+    # press means is unchanged, and the finished page points at the filed document (#247).
     response = client.post(reverse(PDF) + "?period=weeks&weeks=8")
 
-    assert response.status_code == 200
-    assert response["Content-Type"] == "application/pdf"
-    assert "attachment" in response["Content-Disposition"]
+    assert response.status_code == 302
     filed = RenderedDocument.objects.for_user(user).get()
     assert filed.kind == DocumentKind.REPORT
     assert filed.title.startswith("Job search report")
     assert filed.source is None and filed.application is None
     assert "<html" in filed.source_text, "the text it was built from, as a CV keeps its own"
     assert filed.checksum and filed.file
-    response.close()
+
+    page = client.get(response.url).content.decode()
+    assert reverse("documents:rendered_download", args=[filed.pk]) in page
+    assert "Filed under Sent documents" in page
 
 
 def test_pressing_twice_on_one_day_files_one_document(client, user, drawn):

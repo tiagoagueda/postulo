@@ -31,11 +31,12 @@
       </a>
       {% comment %} A form rather than a link: the press files the report under Sent
          documents as well as handing it over, and a GET must never leave a record behind
-         (#162). {% endcomment %}
+         (#162). It answers with the page that watches the drawing rather than with the
+         file, so it is not marked as a download any more (#247). {% endcomment %}
       <form method="post" action="{% url 'applications:report_pdf' %}?{{ request.GET.urlencode }}"
-            class="inline" data-download>
+            class="inline">
         {% csrf_token %}
-        <button type="submit" class="btn">{% translate "Download PDF" %}</button>
+        <button type="submit" class="btn">{% translate "File it as a PDF" %}</button>
       </form>
     </div>
   </div>

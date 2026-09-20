@@ -31,14 +31,37 @@
       </p>
     </div>
 
-    {% comment %} `data-download`: the answer to this is a file, so the page it was pressed
-       on is the page it stays on, and the submit guard has to let go of the button again
-       rather than wait for a navigation that never happens (#226). {% endcomment %}
-    <form method="post" action="{% url 'core:export_download' %}" data-download>
+    {% comment %} No longer `data-download`: the answer is a page rather than a file now, so
+       the submit guard waits for the navigation like every other form. Building the archive
+       reads every record and every file in the account, which is a worker's job and not a
+       request's (#247). {% endcomment %}
+    <form method="post" action="{% url 'core:export_download' %}">
       {% csrf_token %}
-      <button type="submit" class="btn">{% translate "Download the archive" %}</button>
+      <button type="submit" class="btn">{% translate "Build the archive" %}</button>
       <span class="ms-3 text-xs text-ink-500 dark:text-ink-400">{{ filename }}</span>
     </form>
+
+    {% if ready and not ready.has_expired %}
+      <div class="card mt-4 flex flex-wrap items-center gap-3">
+        <div class="min-w-0 grow">
+          <p class="font-medium">{% translate "One is already built" %}</p>
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed with name=ready.filename when=ready.expires_at|date:"DATETIME_FORMAT" %}
+              {{ name }}, kept until {{ when }}.
+            {% endblocktranslate %}
+          </p>
+        </div>
+        <a href="{% url 'core:export_archive' ready.pk %}" class="btn">{% translate "Download it" %}</a>
+      </div>
+    {% endif %}
+
+    <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed count hours=keep_hours %}
+        A built archive is kept for one hour and then deleted, because it holds everything.
+      {% plural %}
+        A built archive is kept for {{ hours }} hours and then deleted, because it holds everything.
+      {% endblocktranslate %}
+    </p>
 
     <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
       <h2 class="mb-2 font-medium">{% translate "Bringing a spreadsheet in" %}</h2>

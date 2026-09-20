@@ -178,7 +178,12 @@ def test_a_capture_is_written_in_a_transaction_of_its_own(db, user, monkeypatch)
 
 
 def _create_a_capture_through_the_view(user, monkeypatch) -> None:
-    """Drive `CaptureCreateView.post` with the fetch and the parse stood in for."""
+    """Drive `CaptureCreateView.post` with the fetch and the parse stood in for.
+
+    The fetch and the parse live in `jobs/slow.py` now, and with no worker configured the
+    handler runs where the request stands (#247) -- which is exactly the arrangement this
+    test is about, and the one where holding the write lock would still matter.
+    """
     from django.test import RequestFactory
 
     from postulo.jobs import capture_views
@@ -192,9 +197,10 @@ def _create_a_capture_through_the_view(user, monkeypatch) -> None:
             return {"title": "Research Engineer"}
 
     monkeypatch.setattr(
-        capture_views, "fetch_page", lambda url: type("P", (), {"url": url, "html": "<html>"})()
+        "postulo.plugins.fetching.fetch_page",
+        lambda url: type("P", (), {"url": url, "html": "<html>"})(),
     )
-    monkeypatch.setattr(capture_views, "parse_page", lambda url, html: (Data(), Source()))
+    monkeypatch.setattr("postulo.plugins.registry.parse_page", lambda url, html: (Data(), Source()))
 
     request = RequestFactory().post("/captures/new/", {"url": "https://example.org/job"})
     request.user = user

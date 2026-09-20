@@ -59,6 +59,14 @@ EXCUSED: dict[str, str] = {
     "applications:bulk": "a POST from the table's action bar, which is visited",
     "jobs:company_bulk": "a POST from the table's action bar, which is visited",
     "listings:bulk": "a POST from the table's action bar, which is visited",
+    "core:errand_state": (
+        "the fragment the watching page polls, as a fragment rather than a page. It has no "
+        "layout of its own; `core:errand` is the page it lives in and is walked (#247)"
+    ),
+    "core:export_archive": (
+        "a file download for the person whose account it holds: a `Content-Disposition` "
+        "and bytes, with nothing to check for accessibility (#247)"
+    ),
     "listings:cell": (
         "one cell of the listings table, as a fragment rather than a page. The same "
         "machinery and the same excuse as `jobs:company_cell` below (#160)"

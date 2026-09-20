@@ -904,28 +904,14 @@ class ReportPDFView(LoginRequiredMixin, View):
         return response
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        from postulo.core.files import serve_private_file
-        from postulo.documents.pdf import PDFBackendUnavailable
-        from postulo.documents.rendering import snapshot_report
+        from postulo.core import errands
 
-        report, html = self._html(request)
-        title = str(_("Job search report · %(period)s")) % {"period": report.period.label}
-        try:
-            document = snapshot_report(
-                request.user,
-                title=title,
-                html=html,
-                filename=reports.filename(report, "pdf"),
-            )
-        except PDFBackendUnavailable as unavailable:
-            return self._back_to_the_page(request, report, unavailable)
-        messages.success(
-            request,
-            _("Filed under Sent documents, dated today, so what you handed over is kept."),
-        )
-        return serve_private_file(
-            request, document.file, download_name=document.download_name, as_attachment=True
-        )
+        # Building the report reads the whole record and then a renderer draws it, so the
+        # press sends the work off and lands on the page that watches it (#247). What the
+        # press *means* has not changed: it files the report under Sent documents, where
+        # the finished errand points.
+        errand = errands.send("report_pdf", request.user, query=dict(request.GET.items()))
+        return redirect("core:errand", pk=errand.pk)
 
 
 # --------------------------------------------------------------- suggestions

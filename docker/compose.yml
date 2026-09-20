@@ -78,5 +78,49 @@ services:
       postulo:
         condition: service_healthy
 
+  # Does the slow work: fetching a posting's page, finding a logo, rendering a PDF,
+  # building an export archive, telling your notifiers something arrived. Without it those
+  # are done inside the request that asked, which is how Postulo worked before and still
+  # works — so start this only together with POSTULO_BACKGROUND_WORK=true in .env, and set
+  # that only if this is running. The pair must agree: the web container cannot see whether
+  # this one is here, and a queue with nobody emptying it is a button that does nothing.
+  #   docker compose -f docker/compose.yml --profile worker up -d
+  worker:
+    profiles: ["worker"]
+    # The published image, pinned to a minor: `docker compose pull` takes the next patch
+    # and never a surprise. `build:` above still works for anyone building from source;
+    # it tags the result with the same name.
+    image: source.tiagoagueda.com/postulo/postulo:0.2
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      POSTULO_DATABASE_URL: sqlite:////app/data/postulo.sqlite3
+      POSTULO_SKIP_MIGRATE: "1"
+      # The web container restores the installed plugins on startup. Both doing it at the
+      # same moment means two processes writing one record, so this leaves it to the
+      # container that waited for it (#221).
+      POSTULO_SKIP_PLUGIN_SYNC: "1"
+    volumes:
+      - postulo-data:/app/data
+    command: ["python", "manage.py", "work"]
+    # The image's own healthcheck curls the web port, which this container does not serve,
+    # so without this it is permanently unhealthy and the one thing a healthcheck is for --
+    # noticing that it has stopped -- never happens. The worker writes the time of each
+    # finished pass to this file; passes are seconds apart, so five minutes of silence is
+    # a worker that is not going round.
+    healthcheck:
+      test: ["CMD-SHELL", "find /app/data/worker-heartbeat -mmin -5 | grep -q ."]
+      interval: 60s
+      timeout: 5s
+      start_period: 120s
+      retries: 3
+    depends_on:
+      # Not merely "started": this container skips migrations on purpose, so starting it
+      # against a schema the web container has not finished migrating runs new code on an
+      # old database.
+      postulo:
+        condition: service_healthy
+
 volumes:
   postulo-data:

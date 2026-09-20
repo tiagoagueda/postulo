@@ -296,11 +296,14 @@ def test_a_missing_pdf_backend_is_explained_rather_than_crashing(
     monkeypatch.setattr("postulo.documents.pdf.get_pdf_backend", unavailable)
     client.force_login(user)
 
+    # Freezing is sent off now, so the explanation arrives on the page that was watching
+    # it rather than in a message on the form. Same sentence, same refusal (#247).
     response = client.post(reverse("documents:send", args=[application.pk]), {"cv": cv.pk})
 
-    assert response.status_code == 200
+    assert response.status_code == 302
     assert application.rendered_documents.count() == 0
-    assert any("No PDF backend" in str(m) for m in response.context["messages"])
+    page = client.get(response.url).content.decode()
+    assert "That did not work." in page and "No PDF backend" in page
 
 
 # --------------------------------------------------------------- backend choice

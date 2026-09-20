@@ -37,14 +37,24 @@ def heartbeat_path() -> Path:
     return Path(settings.POSTULO_SCHEDULER_HEARTBEAT)
 
 
-def beat(when=None) -> None:
+def worker_heartbeat_path() -> Path:
+    """The worker's own heartbeat, beside the scheduler's and read the same way (#247).
+
+    A second file rather than a second kind of file: the worker is a second container with
+    the same two readers -- its own healthcheck, which has no port to curl, and the web
+    container, which reports it on Server settings.
+    """
+    return Path(settings.POSTULO_WORKER_HEARTBEAT)
+
+
+def beat(when=None, *, path: Path | None = None) -> None:
     """Record that a pass has just finished.
 
     Written to a temporary file and moved into place, so a reader never sees half a line --
     a healthcheck runs on its own clock and will sooner or later read this mid-write.
     """
     when = when or timezone.now()
-    path = heartbeat_path()
+    path = path or heartbeat_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     handle, temporary = tempfile.mkstemp(dir=path.parent, prefix=".heartbeat-")
     try:
@@ -56,13 +66,13 @@ def beat(when=None) -> None:
         raise
 
 
-def last_pass() -> dt.datetime | None:
+def last_pass(*, path: Path | None = None) -> dt.datetime | None:
     """When the scheduler last finished a pass, or ``None`` if it never has here.
 
     The file's contents are preferred and its modification time is the fallback: a volume
     restored from a backup can carry a file whose text is right and whose timestamp is not.
     """
-    path = heartbeat_path()
+    path = path or heartbeat_path()
     try:
         written = path.read_text(encoding="utf-8").strip()
     except OSError:
@@ -86,3 +96,13 @@ def only_one_pass(seconds: int):
     finally:
         if got_it:
             cache.delete(LEASE_KEY)
+
+
+def worker_beat(when=None) -> None:
+    """Record that the worker has just been round. Its half of the pair above (#247)."""
+    beat(when, path=worker_heartbeat_path())
+
+
+def worker_last_pass() -> dt.datetime | None:
+    """When the worker last finished a pass, or ``None`` if it never has here."""
+    return last_pass(path=worker_heartbeat_path())

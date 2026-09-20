@@ -252,23 +252,30 @@ def test_one_place_says_when_a_page_is_ready():
         "applications/report.html",
     ],
 )
-def test_every_form_whose_answer_is_a_file_says_so(template: str):
-    """`FileResponse(as_attachment=True)` never leaves the page, so `pageshow` never comes
-    and the mark the guard left stayed for the rest of the visit. These were one-shot
-    buttons — including the one on the page that asks you to take a copy of everything
-    before deleting your account.
+def test_no_form_that_now_answers_with_a_page_still_claims_to_be_a_download(template: str):
+    """These four were the buttons whose answer was a file, which never leaves the page --
+    so `pageshow` never came and the guard's mark stayed for the rest of the visit (#226).
+
+    All four send their work off now and answer with the page that watches it, so the
+    navigation the guard is waiting for does happen, and a mark that says otherwise would
+    release the button a second later for no reason (#247). The rule this replaces is kept
+    below, where it still bites: `data-download` and the release that goes with it are
+    still in `app.js`, because a form whose answer *is* a file may exist again.
     """
     source = (ROOT / "src" / "postulo" / "templates" / template).read_text(encoding="utf-8")
 
-    assert "data-download" in source
+    # The attribute, not the word: each of these explains in a comment why it no longer
+    # carries one, and a comment saying so is the opposite of the thing being looked for.
+    assert not re.search(r"\sdata-download[\s>]", source)
 
 
-def test_the_download_pages_render_the_mark(client, user):
-    """Read off the page rather than the template, so a form moved into an include still
-    carries it."""
+def test_the_guard_still_knows_how_to_let_go_of_a_download(client, user):
+    """Nothing renders the mark today; the machinery for it stays, and is checked here so
+    that the next form answering with a file finds it working."""
     client.force_login(user)
 
-    assert "data-download" in client.get(reverse("core:export")).content.decode()
+    assert "data-download" not in client.get(reverse("core:export")).content.decode()
+    assert 'form.hasAttribute("data-download")' in APP_JS
 
 
 def test_the_guard_lets_go_of_a_download_rather_than_exempting_it():

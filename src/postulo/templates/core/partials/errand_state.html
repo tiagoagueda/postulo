@@ -1,0 +1,53 @@
+{% load i18n postulo %}
+{% comment %} What a piece of slow work is doing, and what came of it (#247).
+
+   **A live region, because the change is the whole point.** The state changes under somebody
+   who is not looking at it -- that is what waiting means -- so `aria-live="polite"` announces
+   it rather than merely painting it. `aria-atomic` so the sentence is read whole and not as
+   whichever word changed.
+
+   **The polling stops when the work does.** `hx-trigger` is only on the unfinished states, so
+   a finished errand is a fragment that asks for nothing. Without htmx there is a link saying
+   *Check again*, which is the same request made by hand: this page is watchable with no
+   script at all, and on an instance with no worker it is already finished on its first paint
+   and the link never appears.
+{% endcomment %}
+<div id="errand-state" role="status" aria-live="polite" aria-atomic="true"
+     {% if not errand.is_finished %}
+       hx-get="{% url 'core:errand_state' errand.pk %}"
+       hx-trigger="every {{ poll_seconds }}s"
+       hx-target="#errand-state" hx-swap="outerHTML"
+     {% endif %}>
+  {% if errand.state == 'done' %}
+    <p class="flex items-center gap-2 font-medium">
+      {% icon "check" class="size-4 text-emerald-600 dark:text-emerald-400" %}
+      {{ errand.message }}
+    </p>
+    {% if errand.url %}
+      <a href="{{ errand.url }}" class="btn mt-4">{% translate "Take me to it" %}</a>
+    {% endif %}
+  {% elif errand.state == 'failed' %}
+    <p class="flex items-center gap-2 font-medium">
+      {% icon "triangle-alert" class="size-4 text-amber-600 dark:text-amber-400" %}
+      {% translate "That did not work." %}
+    </p>
+    <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">{{ errand.message }}</p>
+  {% else %}
+    <p class="flex items-center gap-2 font-medium">
+      {% comment %} A spinner that is not the only thing saying so: the sentence beside it is
+         what a screen reader reads, and the mark is `aria-hidden` because two of them saying
+         the same thing is one too many. {% endcomment %}
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-ink-300 border-t-brand-600
+                   dark:border-ink-600 dark:border-t-brand-400" aria-hidden="true"></span>
+      {% blocktranslate trimmed with what=working_label %}{{ what }}…{% endblocktranslate %}
+    </p>
+    <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "You can leave this page. The work carries on without you." %}
+    </p>
+    <noscript>
+      <a href="{% url 'core:errand' errand.pk %}" class="btn mt-4" data-variant="outline">
+        {% translate "Check again" %}
+      </a>
+    </noscript>
+  {% endif %}
+</div>

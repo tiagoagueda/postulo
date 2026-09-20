@@ -187,12 +187,24 @@ def test_the_export_is_a_post_that_holds_only_ones_own_records(client, user, oth
     assert client.get(reverse("core:export_download")).status_code == 405, (
         "not something a prefetching browser may trigger by following a link"
     )
-    response = client.post(reverse("core:export_download"))
+    # The press asks for the archive and lands on the page that watches it; the file has
+    # an address of its own now, served to the person whose account it holds (#247).
+    from postulo.core.models import ExportArchive
+
+    assert client.post(reverse("core:export_download")).status_code == 302
+    theirs = ExportArchive.objects.for_user(user).get()
+    response = client.get(reverse("core:export_archive", args=[theirs.pk]))
     assert response.status_code == 200
     assert response["Cache-Control"] == "private, max-age=0, no-store"
 
     archive = zipfile.ZipFile(io.BytesIO(b"".join(response.streaming_content)))
     response.close()
+
+    client.force_login(other_user)
+    assert client.get(reverse("core:export_archive", args=[theirs.pk])).status_code == 404, (
+        "an archive holds a whole job search, and it is one person's"
+    )
+    client.force_login(user)
     document = json.dumps(json.loads(archive.read("postulo.json")))
     assert "Own visible company" in document
     assert "Secret other company" not in document

@@ -169,7 +169,8 @@ def test_capture_is_counted_even_when_no_page_is_fetched(client, person, monkeyp
     def must_not_be_called(*args, **kwargs):
         raise AssertionError("nothing should have been fetched")
 
-    monkeypatch.setattr("postulo.jobs.capture_views.fetch_page", must_not_be_called)
+    # The fetching moved to the handler; the counting deliberately did not (#247).
+    monkeypatch.setattr("postulo.plugins.fetching.fetch_page", must_not_be_called)
     client.force_login(person)
     capture_once(client)
 

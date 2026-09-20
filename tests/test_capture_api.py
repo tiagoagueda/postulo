@@ -167,7 +167,7 @@ def test_a_preview_says_what_was_read_and_keeps_nothing(client, bearer, user, mo
     def must_not_notify(*args, **kwargs):
         raise AssertionError("a preview tells nobody anything")
 
-    monkeypatch.setattr("postulo.api.api.notify", must_not_notify)
+    monkeypatch.setattr("postulo.notifications.service.notify", must_not_notify)
 
     response = post_preview(client, bearer, url="https://example.org/j/7", html=PAGE)
 
@@ -279,7 +279,8 @@ def announced(monkeypatch):
         # only understands the first records a function and asserts against its repr.
         sent.append(notification() if callable(notification) else notification)
 
-    monkeypatch.setattr("postulo.api.api.notify", recording)
+    # Delivery is an errand now, so the seam is where the handler calls it (#247).
+    monkeypatch.setattr("postulo.notifications.service.notify", recording)
     return sent
 
 
@@ -569,7 +570,7 @@ def test_pasting_the_page_source_skips_fetching_entirely(client, user, monkeypat
     def must_not_be_called(url):
         raise AssertionError("nothing should be fetched when the page is supplied")
 
-    monkeypatch.setattr("postulo.jobs.capture_views.fetch_page", must_not_be_called)
+    monkeypatch.setattr("postulo.plugins.fetching.fetch_page", must_not_be_called)
     client.force_login(user)
 
     response = client.post(
@@ -583,17 +584,20 @@ def test_pasting_the_page_source_skips_fetching_entirely(client, user, monkeypat
     assert fetching  # imported for clarity about what was bypassed
 
 
-def test_a_refused_fetch_keeps_the_form_and_explains(client, user, monkeypatch):
+def test_a_refused_fetch_explains_itself_where_the_fetch_is_watched(client, user, monkeypatch):
+    """The explanation moved with the fetch: a refusal from the far end is not a failure,
+    and it reads the same on the page that was waiting for it as it did on the form (#247)."""
     from postulo.plugins.fetching import FetchFailed
 
     def refuse(url):
         raise FetchFailed("The site refused the request (403). …bot protection…")
 
-    monkeypatch.setattr("postulo.jobs.capture_views.fetch_page", refuse)
+    monkeypatch.setattr("postulo.plugins.fetching.fetch_page", refuse)
     client.force_login(user)
 
     response = client.post(reverse("jobs:capture_create"), {"url": "https://example.org/jobs/1"})
 
-    assert response.status_code == 200
-    assert any("403" in str(m) for m in response.context["messages"])
+    assert response.status_code == 302
+    page = client.get(response.url).content.decode()
+    assert "That did not work." in page and "403" in page
     assert not Capture.objects.for_user(user).exists()

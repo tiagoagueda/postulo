@@ -162,9 +162,9 @@ def test_the_page_lists_what_goes_and_offers_the_export_first(client, person):
     response = client.get(reverse("accounts:delete"))
     assert response.status_code == 200
     html = response.content.decode()
-    assert "Download the archive" in html and reverse("core:export_download") in html
+    assert "Build the archive" in html and reverse("core:export_download") in html
     assert "data-delete-account" in html and "alex@example.org" in html
-    assert html.index("Download the archive") < html.index("data-delete-account"), "export first"
+    assert html.index("Build the archive") < html.index("data-delete-account"), "export first"
 
 
 def test_deleting_needs_a_recent_authentication(client, person):

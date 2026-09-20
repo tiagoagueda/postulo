@@ -35,12 +35,10 @@ from ninja.responses import NinjaJSONEncoder
 from pydantic import AfterValidator, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
 
-from postulo.core import throttle
+from postulo.core import errands, throttle
 from postulo.core.addresses import page_address
 from postulo.jobs.known import known
 from postulo.jobs.models import Capture, CaptureStatus
-from postulo.notifications.base import Notification
-from postulo.notifications.service import notify
 from postulo.plugins.base import CaptureError, JobPostingData
 from postulo.plugins.fetching import fetch_page
 from postulo.plugins.registry import parse_page
@@ -369,35 +367,37 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
     # on the first rather than the last because the last may never come -- a refused one
     # is retried later, on its own -- and a promise of forty is nearer the truth than
     # silence about all of them.
-    review_url = request.build_absolute_uri(reverse("jobs:capture_review", args=[capture.pk]))
-    where = " · ".join(part for part in (data.company_name, data.location) if part)
-    # Worded inside `notify`, in the language the owner reads. A capture arrives through a
-    # token rather than a session, so there is no signed-in person for the middleware to
-    # follow and the request carries whatever `Accept-Language` the extension sent — which
-    # is the language of the browser that found the posting, not a choice anybody made
-    # about Postulo (#223).
+    #
+    # **Sent off rather than delivered here (#247).** `notify` walks every notifier the
+    # account has and each one is a network timeout; a batch of forty from the extension
+    # waited on all of them, forty times, before the fortieth was acknowledged. The words
+    # are still written at delivery, in the owner's language, which is why the errand
+    # carries the pieces and not a sentence: pre-wording it here would use whatever
+    # `Accept-Language` the extension sent -- the language of the browser that found the
+    # posting, not a choice anybody made about Postulo (#223).
     if batch is None:
-        notify(
+        errands.send(
+            "notify",
             owner,
-            lambda: Notification(
-                event="capture_received",
-                title=str(_("Captured: %(title)s") % {"title": data.title}),
-                body=where,
-                url=review_url,
-            ),
+            subject=capture,
+            event="capture_received",
+            capture_id=capture.pk,
+            title=data.title,
+            where=" · ".join(part for part in (data.company_name, data.location) if part),
+            # Where this instance is reached from, as this request knows it. The worker has
+            # no request to ask, and a link nobody can follow is not a link (#247).
+            base=request.build_absolute_uri("/"),
         )
     elif batch.position == 1:
-        notify(
+        errands.send(
+            "notify",
             owner,
-            lambda: Notification(
-                event="capture_received",
-                title=str(
-                    _("Captured %(count)s postings from %(host)s")
-                    % {"count": batch.size, "host": urlsplit(url).hostname or url}
-                ),
-                body=str(_("The first: %(title)s") % {"title": data.title}),
-                url=request.build_absolute_uri(reverse("jobs:capture_list")),
-            ),
+            subject=capture,
+            event="capture_batch",
+            count=batch.size,
+            host=urlsplit(url).hostname or url,
+            title=data.title,
+            base=request.build_absolute_uri("/"),
         )
     body = _as_output(request, capture)
     # Kept before the answer goes out, so that a client which retries because it never saw

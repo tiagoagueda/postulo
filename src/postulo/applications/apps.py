@@ -11,7 +11,9 @@ class ApplicationsConfig(AppConfig):
     def ready(self) -> None:
         # Registers the table with the settings view.
         # Registers this app's dashboard widgets.
+        # Registers the report render as a piece of slow work (#247).
         from . import (
+            slow,  # noqa: F401
             tables,  # noqa: F401
             widgets,  # noqa: F401
         )

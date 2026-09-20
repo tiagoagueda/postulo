@@ -65,6 +65,28 @@ def company(owner):
     return Company.objects.create(owner=owner, name="Somebody else's company")
 
 
+def errand(owner):
+    from postulo.core.models import Errand
+
+    return Errand.objects.create(owner=owner, kind="export")
+
+
+def export_archive(owner):
+    from django.core.files.base import ContentFile
+    from django.utils import timezone
+
+    from postulo.core.models import ExportArchive
+
+    archive = ExportArchive(
+        owner=owner,
+        filename="theirs.zip",
+        size=3,
+        expires_at=timezone.now() + dt.timedelta(hours=1),
+    )
+    archive.file.save("theirs.zip", ContentFile(b"zip"), save=True)
+    return archive
+
+
 def posting(owner):
     from postulo.jobs.models import JobPosting
 
@@ -236,6 +258,10 @@ FACTORIES: dict[str, Callable] = {
     "applications:suggestion_action": pk_of(suggestion, action="dismiss"),
     "applications:tag_delete": pk_of(tag),
     "applications:tag_update": pk_of(tag),
+    # core: a piece of slow work, and the archive it produced (#247)
+    "core:errand": pk_of(errand),
+    "core:errand_state": pk_of(errand),
+    "core:export_archive": pk_of(export_archive),
     # connections
     "connections:backfill": pk_of(connection),
     "connections:consent": pk_of(connection),

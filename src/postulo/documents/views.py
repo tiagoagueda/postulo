@@ -14,7 +14,6 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from postulo.applications.models import Application
-from postulo.applications.services import record_event
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
@@ -31,12 +30,10 @@ from .forms import (
     UploadedDocumentForm,
 )
 from .models import CV, CoverLetter, CVItem, LetterKind, RenderedDocument, UploadedDocument
-from .pdf import PDFBackendUnavailable, pdf_session
+from .pdf import PDFBackendUnavailable
 from .rendering import (
     render_cv_html,
     render_letter_html,
-    snapshot_cv,
-    snapshot_letter,
 )
 
 
@@ -233,15 +230,13 @@ class CVExportView(OwnedObjectMixin, PDFErrorMixin, View):
         return CV.objects.for_user(self.request.user)
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
-        cv = get_object_or_404(self.get_queryset(), pk=pk)
-        try:
-            document = snapshot_cv(cv)
-        except PDFBackendUnavailable as error:
-            self.handle_pdf_error(request, error)
-            return redirect(cv.get_absolute_url())
+        from postulo.core import errands
 
-        messages.success(request, _("PDF created."))
-        return redirect("documents:rendered_download", pk=document.pk)
+        cv = get_object_or_404(self.get_queryset(), pk=pk)
+        # Sent off rather than waited for: on the Chromium backend this is a browser launch
+        # and then a render, and it was holding a request open for all of it (#247).
+        errand = errands.send("cv_pdf", request.user, subject=cv, cv_id=cv.pk)
+        return redirect("core:errand", pk=errand.pk)
 
 
 # ------------------------------------------------------------------ cover letters
@@ -575,57 +570,23 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
                 },
             )
 
-        try:
-            created = self.freeze(form, application)
-        except PDFBackendUnavailable as error:
-            self.handle_pdf_error(request, error)
-            return render(request, self.template_name, {"application": application, "form": form})
+        # The slowest button in Postulo, and it no longer waits for itself (#247). What
+        # gets drawn, what is attached and what the timeline is told are all in the handler,
+        # in the order they were in here: one renderer for both documents, each snapshot
+        # saved as it is made, and one transaction at the end tying the lot together.
+        from postulo.core import errands
 
-        uploads = form.cleaned_data["uploads"]
-        links = form.cleaned_data["links"]
-        created.extend(str(upload) for upload in uploads)
-        created.extend(f"{link.title} — {link.url}" for link in links)
-
-        # Everything the application is told, in one transaction. The two lists and the
-        # timeline entry naming what went with them are one act: a timeline saying documents
-        # were sent, beside an application nothing is attached to, is a record of nothing.
-        # Nothing slow is inside it — the rendering is done, and already filed.
-        if created:
-            with transaction.atomic():
-                if uploads:
-                    application.sent_uploads.add(*uploads)
-                if links:
-                    application.sent_links.add(*links)
-                record_event(
-                    application,
-                    summary=str(_("Documents sent")),
-                    body="\n".join(created),
-                )
-            messages.success(request, _("Recorded what you sent."))
-        return redirect(application.get_absolute_url())
-
-    def freeze(self, form: SendDocumentsForm, application: Application) -> list[str]:
-        """Render whatever was chosen, from one renderer, and name what was made.
-
-        The renderer is opened once, and only when there is something to draw: a *Send* of
-        uploads and links alone should not start a browser. Opening it also settles whether
-        there is a usable backend before the first document is written down, so a missing
-        renderer is still one message and nothing half-done.
-        """
-        cv = form.cleaned_data["cv"]
-        letter = form.cleaned_data["cover_letter"]
-        if not cv and not letter:
-            return []
-
-        created: list[str] = []
-        with pdf_session() as backend:
-            if cv:
-                created.append(snapshot_cv(cv, application=application, backend=backend).title)
-            if letter:
-                created.append(
-                    snapshot_letter(letter, application=application, backend=backend).title
-                )
-        return created
+        errand = errands.send(
+            "sent_documents",
+            request.user,
+            subject=application,
+            application_id=application.pk,
+            cv_id=form.cleaned_data["cv"].pk if form.cleaned_data["cv"] else None,
+            letter_id=letter.pk if letter else None,
+            upload_ids=[upload.pk for upload in form.cleaned_data["uploads"]],
+            link_ids=[link.pk for link in form.cleaned_data["links"]],
+        )
+        return redirect("core:errand", pk=errand.pk)
 
 
 class ApplicationDocumentsView(OwnedObjectMixin, DetailView):

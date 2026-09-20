@@ -17,8 +17,9 @@ class CoreConfig(AppConfig):
         from postulo.plugins.social_profiles import SocialProfilesFeature
         from postulo.plugins.websites import WebsitesFeature
 
-        # Registers the dashboard widgets core owns.
-        from . import widgets_builtin  # noqa: F401
+        # Registers the dashboard widgets core owns, and the export archive as a piece
+        # of slow work (#247).
+        from . import slow, widgets_builtin  # noqa: F401
 
         registry.register_builtin("feature", PhoneNumbersFeature)
         # What a country expects of an address, and what it calls each part (#147).

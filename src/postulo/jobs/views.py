@@ -359,25 +359,23 @@ class CompanyLogoActionView(OwnedObjectMixin, View):
         return Company.objects.for_user(self.request.user)
 
     def post(self, request: HttpRequest, pk: int, action: str) -> HttpResponse:
+        from postulo.core import errands
+
         company = get_object_or_404(self.get_queryset(), pk=pk)
-        try:
-            if action == "website":
-                found = logos.find_on_website(company)
-                messages.success(request, _("Found a logo at %(url)s.") % {"url": found})
-            elif action == "refresh":
-                if not company.logo_source_url:
-                    messages.info(request, _("There is no address to fetch it from again."))
-                else:
-                    logos.from_url(company, company.logo_source_url)
-                    messages.success(request, _("Fetched again."))
-            elif action == "remove":
-                logos.clear(company)
-                messages.success(request, _("The logo is gone."))
-            else:
-                raise Http404
-        except logos.UnusableLogo as error:
-            messages.error(request, str(error))
-        return redirect(safe_next(request, company.get_absolute_url()))
+        # Removing a logo is a database write and nothing else, so it stays here: sending
+        # an instant act off to a worker would be a spinner shown for the sake of symmetry.
+        if action == "remove":
+            logos.clear(company)
+            messages.success(request, _("The logo is gone."))
+            return redirect(safe_next(request, company.get_absolute_url()))
+        if action not in ("website", "refresh"):
+            raise Http404
+        # The other two read the company's site and then try up to six images, one round
+        # trip each, which is not a thing to make somebody sit through (#247).
+        errand = errands.send(
+            "logo", request.user, subject=company, company_id=company.pk, action=action
+        )
+        return redirect("core:errand", pk=errand.pk)
 
 
 class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
