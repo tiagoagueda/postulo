@@ -157,7 +157,11 @@ def test_there_are_three_planes_and_each_has_a_border_as_well(client, staff_user
     theme = CSS[CSS.index("@theme {") : CSS.index("@layer base")]
     assert "--shadow-raised:" in theme and "--shadow-floating:" in theme
 
-    assert "shadow-raised" in CSS[CSS.index(".card {") :][:200], "a card is the raised plane"
+    # The definition, not the first text that looks like it: compact overrides `.card`
+    # earlier in the file, and anchoring on `.card {` found that instead (#292).
+    definition = re.search(r"\n  \.card \{(.+?)\n  \}", CSS, re.S)
+    assert definition, "the card rule has moved"
+    assert "shadow-raised" in definition.group(1), "a card is the raised plane"
 
     client.force_login(staff_user)
     html = client.get(reverse("server:design")).content.decode()

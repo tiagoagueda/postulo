@@ -234,3 +234,60 @@ def test_everything_clickable_is_big_enough_to_hit(live_server, page: Page, furn
         f"{len(found)} target(s) under {MINIMUM}x{MINIMUM} with no exception "
         f"(WCAG 2.2 SC 2.5.8):\n{report}"
     )
+
+
+def test_everything_is_still_big_enough_when_somebody_asks_for_less_room(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+):
+    """Compact is a preference, and a preference may not cost a criterion (#292).
+
+    The point of making density a choice rather than a compromise is that neither answer
+    has to be a little bit of the other -- so the tighter one is held to exactly the same
+    24x24 as the roomier one. What compact tightens is the room *around* things: the
+    padding inside a card and inside a table cell. A cell's padding is the row's height,
+    and a row is not a target; what is clickable inside it carries its own minimum.
+
+    This is the whole walk a second time, which is worth the minute it costs: the failure
+    it guards against is one nobody would see, on whichever page somebody happens to have
+    tightened.
+    """
+    from postulo.accounts.models import Profile
+
+    base = live_server.url
+    sign_in(page, base)
+    page.set_viewport_size({"width": 1280, "height": 900})
+
+    Profile.objects.filter(user=furnished["applicant"]).update(density="compact")
+
+    paths = signed_in_paths(
+        furnished["application"],
+        furnished["company"],
+        furnished["applicant"],
+        furnished["experience"],
+        things=furnished,
+    )
+    found: dict[str, str] = {}
+    for path in paths:
+        page.goto(f"{base}{path}")
+        if "reauthenticate" in page.url:
+            page.locator("input[name=password]").fill(PASSWORD)
+            page.locator("form").get_by_role("button").first.click()
+            page.goto(f"{base}{path}")
+
+        # A preview is the document itself, with the theme's own stylesheet and none of the
+        # interface around it, so it carries no density and never could. Everything else is
+        # checked, because a walk that quietly stopped being compact would prove nothing.
+        if not path.endswith("/preview/"):
+            assert page.locator("body[data-density='compact']").count() == 1, (
+                f"{path} is not drawn compact, so this walk would prove nothing"
+            )
+        for failure in too_small(page):
+            found.setdefault(failure, path)
+
+    report = "\n".join(f"  {where}\n    {what}" for what, where in sorted(found.items()))
+    assert not found, (
+        f"{len(found)} target(s) under {MINIMUM}x{MINIMUM} once the interface is compact "
+        f"(WCAG 2.2 SC 2.5.8):\n{report}"
+    )

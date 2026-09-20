@@ -223,7 +223,11 @@ def test_calendar_sits_beside_reminders_in_the_navigation_and_can_be_hidden(clie
     assert reverse(CALENDAR) in html
     client.post(
         reverse("settings:appearance"),
-        {"theme": "system", "navigation": [k for k in navigation.HIDEABLE if k != "calendar"]},
+        {
+            "theme": "system",
+            "density": "comfortable",
+            "navigation": [k for k in navigation.HIDEABLE if k != "calendar"],
+        },
     )
     html = client.get(reverse("core:home")).content.decode()
     assert 'data-nav="calendar"' not in html

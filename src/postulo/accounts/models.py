@@ -318,6 +318,23 @@ class Profile(models.Model):
     #: also comes back under forced colours whatever this says, because there it is the
     #: only one of the three cues that survives (#289).
     nav_underline = models.BooleanField(_("underline the page you are on"), default=True)
+    #: How much room the interface leaves around things (#292).
+    #:
+    #: **Comfortable is the default and stays the default.** A generous interface is the
+    #: one that is easiest to hit and easiest to read, and it is what the conformance claim
+    #: rests on; compact is somebody asking for more rows on a screen, which is a fair thing
+    #: to want and not a thing to impose. This is why density is a preference rather than a
+    #: compromise: neither answer has to be a little bit of the other.
+    #:
+    #: Compact tightens the padding around a card and inside a table cell, and nothing else.
+    #: It may not shrink a target below 24×24 -- SC 2.5.8 holds whatever anybody chooses,
+    #: and `tests/e2e/test_target_size.py` walks the interface with this on to say so.
+    density = models.CharField(
+        _("density"),
+        max_length=12,
+        choices=(("comfortable", _("Comfortable")), ("compact", _("Compact"))),
+        default="comfortable",
+    )
     #: Plugins this person has switched off for themselves. Stored as what was turned
     #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
     #: later release should be available without anybody having to opt into it.

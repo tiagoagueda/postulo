@@ -54,7 +54,7 @@
      those off; the switch is under Settings → Appearance and its answer is written here, where
      `app.js` reads it before acting on a key. Only "off" is spelled out, so the attribute
      appears when somebody has asked for something and not otherwise (#227). {% endcomment %}
-  <body class="min-h-screen"{% if not keyboard_shortcuts %} data-shortcuts="off"{% endif %}{% if not nav_underline %} data-nav-underline="off"{% endif %}{% if browser_notices %} data-browser-notices="{% url 'notifications:waiting' %}" data-browser-notices-token="{{ csrf_token }}"{% endif %}>
+  <body class="min-h-screen"{% if not keyboard_shortcuts %} data-shortcuts="off"{% endif %}{% if not nav_underline %} data-nav-underline="off"{% endif %}{% if ui_density == "compact" %} data-density="compact"{% endif %}{% if browser_notices %} data-browser-notices="{% url 'notifications:waiting' %}" data-browser-notices-token="{{ csrf_token }}"{% endif %}>
     {# The first thing Tab reaches: past the header, straight to the page. #}
     <a href="#main" class="skip-link">{% translate "Skip to content" %}</a>
     {% comment %} What a failed htmx request says (#226). Every live filter, sort and page

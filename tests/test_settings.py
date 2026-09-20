@@ -47,9 +47,40 @@ def test_every_section_shows_the_sidebar_with_itself_marked(client, user, url_na
 
 def test_appearance_saves_the_theme(client, user):
     client.force_login(user)
-    response = client.post(reverse("settings:appearance"), {"theme": Theme.DARK})
+    # `density` is posted with it because the page posts it: a radio group with a default
+    # always has one checked, exactly as the theme does (#292).
+    response = client.post(
+        reverse("settings:appearance"), {"theme": Theme.DARK, "density": "comfortable"}
+    )
     assert response.status_code == 302
     assert Profile.objects.get(user=user).theme == Theme.DARK
+
+
+def test_appearance_saves_how_much_room_to_leave(client, user):
+    """Comfortable is the default and stays it; compact is somebody asking (#292)."""
+    client.force_login(user)
+    assert Profile.objects.get(user=user).density == "comfortable"
+
+    response = client.post(
+        reverse("settings:appearance"), {"theme": Theme.SYSTEM, "density": "compact"}
+    )
+
+    assert response.status_code == 302
+    assert Profile.objects.get(user=user).density == "compact"
+
+    html = client.get(reverse("core:home")).content.decode()
+    assert 'data-density="compact"' in html, "and the page says so where the stylesheet reads it"
+
+
+def test_a_density_nobody_offers_is_refused(client, user):
+    client.force_login(user)
+
+    response = client.post(
+        reverse("settings:appearance"), {"theme": Theme.SYSTEM, "density": "microscopic"}
+    )
+
+    assert response.status_code == 200
+    assert Profile.objects.get(user=user).density == "comfortable"
 
 
 def test_language_and_time_are_saved(client, user):

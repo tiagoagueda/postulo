@@ -22,6 +22,8 @@ pytestmark = pytest.mark.django_db
 def appearance(client, **overrides):
     values = {
         "theme": "system",
+        # A radio group with a default is always posted by the page that draws it (#292).
+        "density": "comfortable",
         "quiet_after_days": 14,
         "navigation": list(navigation.HIDEABLE),
     }

@@ -43,6 +43,9 @@ def ui(request: HttpRequest) -> dict:
     # Likewise on unless somebody has said otherwise: the default is what the conformance
     # claim rests on, and a stranger has no profile to ask (#289).
     nav_underline = True
+    # Comfortable unless somebody has asked for less, which is also the answer where nobody
+    # is signed in: the generous interface is the one the conformance claim rests on (#292).
+    density = "comfortable"
     user = getattr(request, "user", None)
     if user is not None and user.is_authenticated:
         profile = getattr(user, "profile", None)
@@ -50,6 +53,7 @@ def ui(request: HttpRequest) -> dict:
             choice = profile.theme
             shortcuts = profile.keyboard_shortcuts
             nav_underline = profile.nav_underline
+            density = profile.density
         # "system" means stamp nothing and let the operating system preference apply.
         if choice in {"light", "dark"}:
             theme = choice
@@ -67,6 +71,8 @@ def ui(request: HttpRequest) -> dict:
         "keyboard_shortcuts": shortcuts,
         # Read off <body> by the stylesheet alone; nothing scripts this one.
         "nav_underline": nav_underline,
+        # Likewise: the stylesheet tightens what it tightens and no script is involved.
+        "ui_density": density,
         "nav_items": navigation.visible_items(profile),
         "dashboard_hidden": navigation.dashboard_hidden(profile),
         "registration_open": site.signup_open_now(),

@@ -489,10 +489,21 @@ class AppearanceForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ("theme", "quiet_after_days")
-        widgets = {"theme": forms.RadioSelect}
+        fields = ("theme", "density", "quiet_after_days")
+        widgets = {"theme": forms.RadioSelect, "density": forms.RadioSelect}
         labels = {
             "quiet_after_days": _("Consider an application quiet after"),
+            "density": _("How much room to leave"),
+        }
+        help_texts = {
+            # Under Appearance rather than Accessibility, by the rule #281 set: file a
+            # choice by what somebody is looking for, not by what motivated it. A person
+            # who wants more rows on a screen looks here (#292).
+            "density": _(
+                "Comfortable is the default and the roomier of the two. Compact tightens "
+                "the space around cards and inside tables so that more fits on a screen; "
+                "nothing you can click or tap gets smaller."
+            ),
         }
 
     def __init__(self, *args, **kwargs):

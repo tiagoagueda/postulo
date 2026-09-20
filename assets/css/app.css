@@ -506,6 +506,36 @@
   }
 
   /*
+   * Compact, for somebody who asked for more rows on a screen (#292).
+   *
+   * **What it tightens and what it may not.** The room *around* things: the padding inside
+   * a card, and the padding inside a table cell. Nothing it touches is a target. SC 2.5.8
+   * holds at 24x24 whatever anybody has chosen, and a preference that quietly made the
+   * interface fail a criterion would be the compromise this is meant not to be --
+   * `tests/e2e/test_target_size.py` walks the whole interface with this on and says so.
+   *
+   * A cell's padding is the row's height, and a row's height is not a target: what is
+   * clickable inside it is a link or a button, each of which carries its own minimum
+   * through `tap-target`. Squeezing the cell moves them closer together; it does not make
+   * them smaller, and the spacing between them stays above the 24 pixels the criterion
+   * measures because the targets themselves are that tall.
+   *
+   * Written as a descendant of `<body>` rather than as a variant on each rule, so a new
+   * card or a new table is compact without being told to be.
+   */
+  body[data-density="compact"] .card {
+    @apply p-4;
+  }
+
+  body[data-density="compact"] :is(th, td).px-4 {
+    padding-inline: calc(var(--spacing) * 3);
+  }
+
+  body[data-density="compact"] :is(th, td).py-3 {
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  /*
    * The masthead, once the page has scrolled under it (#292). Flat against the page while
    * the page is at the top, and raised the moment something has gone behind it -- which is
    * the one thing a sticky header has to say and the border alone was saying quietly.

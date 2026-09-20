@@ -140,13 +140,15 @@ def test_the_threshold_is_set_under_appearance(client, user):
     assert "Consider an application quiet after" in page and 'value="21"' in page
 
     response = client.post(
-        reverse("settings:appearance"), {"theme": "system", "quiet_after_days": "14"}
+        reverse("settings:appearance"),
+        {"theme": "system", "density": "comfortable", "quiet_after_days": "14"},
     )
     assert response.status_code == 302
     assert Profile.objects.get(user=user).quiet_after_days == 14
 
     response = client.post(
-        reverse("settings:appearance"), {"theme": "system", "quiet_after_days": "0"}
+        reverse("settings:appearance"),
+        {"theme": "system", "density": "comfortable", "quiet_after_days": "0"},
     )
     assert response.status_code == 200
     assert Profile.objects.get(user=user).quiet_after_days == 14

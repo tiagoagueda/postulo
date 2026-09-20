@@ -225,6 +225,28 @@
     </div>
   </section>
 
+  <!-- ------------------------------------------------------------------ density -->
+  <section id="design-density" class="mb-10" aria-labelledby="design-density-heading">
+    <h2 id="design-density-heading" class="mb-3 font-medium">{% translate "How much room" %}</h2>
+    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Comfortable is the default. Compact tightens the room around cards and inside
+        tables, and nothing else — a preference cannot cost a criterion, so what you can
+        click stays the size it was. Choose it under Settings → Appearance; this page shows
+        whichever you are reading it in.
+      {% endblocktranslate %}
+    </p>
+    <div class="card">
+      <p class="text-sm">
+        {% if ui_density == "compact" %}
+          {% translate "You are reading this compact." %}
+        {% else %}
+          {% translate "You are reading this comfortable." %}
+        {% endif %}
+      </p>
+    </div>
+  </section>
+
   <!-- ------------------------------------------------------------ nothing there -->
   <section id="design-empty" class="mb-10" aria-labelledby="design-empty-heading">
     <h2 id="design-empty-heading" class="mb-3 font-medium">{% translate "Nothing there" %}</h2>
