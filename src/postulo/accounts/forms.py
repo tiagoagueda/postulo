@@ -438,18 +438,19 @@ class AccessibilityForm(forms.ModelForm):
     """Settings → Accessibility: what changes how the interface behaves for somebody who
     needs it to behave differently (#281).
 
-    Two choices today, both moved from Appearance, where they were filed for want of
-    anywhere else: the order number on a career entry, for somebody who cannot use the
+    Three choices today. Two were moved from Appearance, where they were filed for want
+    of anywhere else: the order number on a career entry, for somebody who cannot use the
     arrows (#203), and the way out of the single-key shortcuts, which WCAG 2.1.4 asks for
-    at level A (#227). The section is what makes the next one easy to add.
+    at level A (#227). The third is the first one filed here on purpose (#289).
     """
 
     class Meta:
         model = Profile
-        fields = ("show_career_order", "keyboard_shortcuts")
+        fields = ("show_career_order", "keyboard_shortcuts", "nav_underline")
         labels = {
             "show_career_order": _("Show the order number on each career entry"),
             "keyboard_shortcuts": _("Let a single key do something"),
+            "nav_underline": _("Underline the page you are on"),
         }
         help_texts = {
             "show_career_order": _(
@@ -462,6 +463,13 @@ class AccessibilityForm(forms.ModelForm):
                 "“/” jumps to the search box anywhere. Turn this off if you dictate to your "
                 "computer, or if a key pressed by accident does more than you meant. "
                 "Shortcuts that need Ctrl go on working either way."
+            ),
+            "nav_underline": _(
+                "The link for the page you are on is underlined as well as shaded and set "
+                "in bolder type. Turn the underline off for a quieter header: the weight "
+                "and the shade stay, so the page you are on is never marked by colour "
+                "alone. A high-contrast theme underlines it whatever you choose here, "
+                "because there the shading is discarded and the underline is not."
             ),
         }
 

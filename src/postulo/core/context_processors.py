@@ -40,12 +40,16 @@ def ui(request: HttpRequest) -> dict:
     # On unless somebody has said otherwise, which is also the answer where nobody is signed
     # in: there is no profile to ask, and the pages a stranger sees have no shortcuts (#227).
     shortcuts = True
+    # Likewise on unless somebody has said otherwise: the default is what the conformance
+    # claim rests on, and a stranger has no profile to ask (#289).
+    nav_underline = True
     user = getattr(request, "user", None)
     if user is not None and user.is_authenticated:
         profile = getattr(user, "profile", None)
         if profile:
             choice = profile.theme
             shortcuts = profile.keyboard_shortcuts
+            nav_underline = profile.nav_underline
         # "system" means stamp nothing and let the operating system preference apply.
         if choice in {"light", "dark"}:
             theme = choice
@@ -61,6 +65,8 @@ def ui(request: HttpRequest) -> dict:
         # Read by `app.js` off <body>, and by the pages that document a key so that they do
         # not promise one that is switched off.
         "keyboard_shortcuts": shortcuts,
+        # Read off <body> by the stylesheet alone; nothing scripts this one.
+        "nav_underline": nav_underline,
         "nav_items": navigation.visible_items(profile),
         "dashboard_hidden": navigation.dashboard_hidden(profile),
         "registration_open": site.signup_open_now(),

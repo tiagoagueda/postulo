@@ -493,6 +493,15 @@
       dark:bg-ink-800 dark:text-ink-50;
   }
 
+  /* And the same header without it, for somebody who asked (#289). Only the decoration
+     goes: the weight and the tint stay, so the current page is still marked by something
+     that is not colour, which is what SC 1.4.1 asks of the default and of this. Higher
+     specificity rather than another layer, so the two rules are read together; forced
+     colours puts the underline back further down, unlayered, where it beats both. */
+  body[data-nav-underline="off"] .nav-link-active {
+    text-decoration-line: none;
+  }
+
   /*
    * A country flag, drawn from static/flags/ by the `{% flag %}` tag. flag-icons draws
    * 4:3, so a 20-pixel width gives 15 of height and nothing is squashed.
@@ -947,6 +956,13 @@ html {
   .nav-link-active,
   .chip-remove {
     border: 1px solid ButtonText;
+  }
+
+  /* The preference does not reach this far. A high-contrast theme discards the tint and
+     flattens the weight, so the underline is the only one of the three cues left; turning
+     it off here would leave the current page marked by nothing at all (#289). */
+  body[data-nav-underline="off"] .nav-link-active {
+    text-decoration-line: underline;
   }
 
   .col-handle {

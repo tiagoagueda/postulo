@@ -37,6 +37,20 @@
       <c-field-feedback :field="form.keyboard_shortcuts" errors-only />
     </div>
 
+    <div class="card mb-6">
+      {% comment %} The underline on the current navigation link, which #274 added because the
+         tint alone is 1.1:1 against the header. Off is not a hole: the weight stays, so the
+         current page is still marked by something that is not colour, and forced colours
+         underline it regardless (#289). {% endcomment %}
+      <h2 class="mb-1 font-medium">{% translate "Navigation" %}</h2>
+      <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+        {{ form.nav_underline }}
+        <span>{{ form.nav_underline.label }}</span>
+      </label>
+      <p class="field-help" id="{{ form.nav_underline.auto_id }}_helptext">{{ form.nav_underline.help_text }}</p>
+      <c-field-feedback :field="form.nav_underline" errors-only />
+    </div>
+
     <button type="submit" class="btn">{% translate "Save" %}</button>
   </form>
 

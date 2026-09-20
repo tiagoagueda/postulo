@@ -116,3 +116,39 @@ def test_a_dark_profile_prints_as_ink_on_white(page: Page, live_server, furnishe
     assert seen["background"] in ("rgb(255, 255, 255)", "rgba(0, 0, 0, 0)"), seen
     assert seen["overflow"] == "visible"
     assert seen["header"] == "none" and seen["footer"] == "none"
+
+
+def decoration_of_the_current_link(page: Page) -> str:
+    return page.evaluate(
+        "() => getComputedStyle(document.querySelector('.nav-link-active')).textDecorationLine"
+    )
+
+
+def test_the_navigation_underline_follows_the_preference_but_not_under_forced_colours(
+    page: Page, live_server, applicant
+):
+    """#289: a quieter header for somebody who asked, and the underline back where it is
+    the only cue left. The weight stays either way, so the current page is never marked by
+    colour alone -- which is the reason this could be a preference at all."""
+    from postulo.accounts.models import Profile
+
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/")
+    assert decoration_of_the_current_link(page) == "underline", "the default"
+
+    profile = Profile.objects.get(user=applicant)
+    profile.nav_underline = False
+    profile.save(update_fields=["nav_underline"])
+
+    page.goto(f"{live_server.url}/")
+    assert decoration_of_the_current_link(page) == "none", "switched off"
+    weight = page.evaluate(
+        "() => getComputedStyle(document.querySelector('.nav-link-active')).fontWeight"
+    )
+    assert int(weight) >= 600, "the weight is what keeps this from being colour alone"
+
+    page.emulate_media(forced_colors="active")
+    page.goto(f"{live_server.url}/")
+    assert decoration_of_the_current_link(page) == "underline", (
+        "forced colours discards the tint, so the underline comes back whatever was chosen"
+    )

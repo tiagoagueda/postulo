@@ -13,6 +13,7 @@ import re
 import pytest
 from django.urls import reverse
 
+from postulo.accounts.models import Profile
 from postulo.core import navigation
 
 pytestmark = pytest.mark.django_db
@@ -123,3 +124,58 @@ def test_the_items_are_the_navigation_and_nothing_else():
     for item in navigation.ITEMS:
         assert item.active_names[0] == item.url_name
     assert [key for key, _label in navigation.choices()] == list(navigation.HIDEABLE)
+
+
+# ------------------------------------------- the underline on the current link (#289)
+
+
+def current_link(html: str) -> str:
+    """The masthead's link for the page being shown."""
+    found = re.search(r"<a[^>]*nav-link-active[^>]*>", html)
+    assert found, "no current navigation link on the page"
+    return found.group(0)
+
+
+def test_the_underline_is_on_by_default(client, user):
+    """The default is what the conformance claim rests on, so it stays the marked one."""
+    client.force_login(user)
+    html = client.get(reverse("core:home")).content.decode()
+
+    assert "data-nav-underline" not in html, "nothing to say while it is on"
+    assert 'aria-current="page"' in current_link(html)
+    assert Profile.objects.get(user=user).nav_underline is True
+
+
+def test_turning_it_off_is_written_onto_the_body(client, user):
+    profile = Profile.objects.get(user=user)
+    profile.nav_underline = False
+    profile.save(update_fields=["nav_underline"])
+    client.force_login(user)
+
+    html = client.get(reverse("core:home")).content.decode()
+
+    assert 'data-nav-underline="off"' in html
+    # The row is unchanged: only the stylesheet reads the attribute, and the link keeps
+    # every other cue it had.
+    link = current_link(html)
+    assert "nav-link-active" in link and 'aria-current="page"' in link
+
+
+def test_a_stranger_gets_the_default(client, db):
+    """No profile to ask, and the pages a stranger sees keep the marked default."""
+    assert "data-nav-underline" not in client.get(reverse("account_login")).content.decode()
+
+
+def test_accessibility_offers_the_switch_and_saves_it(client, user):
+    client.force_login(user)
+    page = client.get(reverse("settings:accessibility")).content.decode()
+    assert 'name="nav_underline"' in page and "Underline the page you are on" in page
+
+    # A checkbox left unticked posts nothing at all, which is how "off" arrives.
+    response = client.post(reverse("settings:accessibility"), {})
+    assert response.status_code == 302
+    assert Profile.objects.get(user=user).nav_underline is False
+
+    response = client.post(reverse("settings:accessibility"), {"nav_underline": "on"})
+    assert response.status_code == 302
+    assert Profile.objects.get(user=user).nav_underline is True

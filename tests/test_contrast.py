@@ -87,8 +87,35 @@ def test_focus_on_a_field_is_an_opaque_ring():
 
 
 def test_the_current_navigation_link_is_marked_by_more_than_colour():
+    """The default, which is what the conformance claim rests on."""
     active = CSS[CSS.index(".nav-link-active {") : CSS.index("}", CSS.index(".nav-link-active {"))]
     assert "font-semibold" in active and "underline" in active
+
+
+def test_switching_the_underline_off_takes_only_the_underline():
+    """#289 made it a preference. Off must not leave colour as the only cue, so the rule
+    may drop the decoration and nothing else -- the weight and the tint stay on the class
+    it is layered over."""
+    rule = CSS[
+        CSS.index('body[data-nav-underline="off"] .nav-link-active') : CSS.index(
+            "}", CSS.index('body[data-nav-underline="off"] .nav-link-active')
+        )
+    ]
+    assert "text-decoration-line: none" in rule
+    for cue in ("font-", "background", "color:", "bg-ink"):
+        assert cue not in rule, f"the preference may not touch {cue!r}"
+
+
+def test_forced_colours_underlines_it_whatever_the_preference_says():
+    """There the tint is discarded and the weight is flattened, so the underline is the
+    only cue left; the preference does not reach that far (#289)."""
+    forced = CSS[CSS.index("@media (forced-colors: active)") :]
+    rule = forced[
+        forced.index('body[data-nav-underline="off"] .nav-link-active') : forced.index(
+            "}", forced.index('body[data-nav-underline="off"] .nav-link-active')
+        )
+    ]
+    assert "text-decoration-line: underline" in rule
 
 
 def test_more_contrast_is_answered():

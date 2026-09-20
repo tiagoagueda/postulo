@@ -23,6 +23,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The underline on the current navigation link is a choice under *Settings →
+  Accessibility*; the weight and the shade still mark the page when it is off, and a
+  high-contrast theme underlines it whatever you chose. (#289)
 - *Settings* has an *Accessibility* section holding the career order number and the
   keyboard-shortcuts switch, which were under *Appearance*. (#281)
 - `docs/PLAN.md` no longer restates where the project stands and is revised at each

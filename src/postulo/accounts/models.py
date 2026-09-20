@@ -307,6 +307,17 @@ class Profile(models.Model):
     #: are why that is bearable. The criterion asks for a way out, not for the default.
     #: Shortcuts with a modifier, Ctrl+Enter among them, are outside this and always work.
     keyboard_shortcuts = models.BooleanField(_("single-key shortcuts"), default=True)
+    #: Whether the navigation link for the page you are on is underlined as well as tinted
+    #: and set in bolder type. The underline arrived with #274, because the tint alone is
+    #: 1.1:1 against the header -- nothing to somebody who does not tell those two greys
+    #: apart, and nothing at all under a high-contrast theme, where a background is
+    #: discarded and a text decoration is kept.
+    #:
+    #: On by default, and off is not a hole: the weight stays, so what marks the current
+    #: page is still not colour alone, which is what WCAG 2.2 SC 1.4.1 asks. The underline
+    #: also comes back under forced colours whatever this says, because there it is the
+    #: only one of the three cues that survives (#289).
+    nav_underline = models.BooleanField(_("underline the page you are on"), default=True)
     #: Plugins this person has switched off for themselves. Stored as what was turned
     #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
     #: later release should be available without anybody having to opt into it.
