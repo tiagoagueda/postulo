@@ -8,12 +8,12 @@
     <p class="text-sm text-ink-500 dark:text-ink-400">
       <a href="{{ listing.company.get_absolute_url }}" class="hover:underline">{{ listing.company.name }}</a>
     </p>
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">
+    <c-page-title>
       {% blocktranslate with title=listing.title trimmed %}Apply: {{ title }}{% endblocktranslate %}
-    </h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      <c-slot name="subtitle">
       {% translate "This records the application. The listing leaves your to-decide list and the timeline begins." %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
     {% if listing.has_applications %}
       <div class="alert-info mb-4">

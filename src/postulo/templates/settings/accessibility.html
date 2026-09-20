@@ -2,10 +2,12 @@
 {% load i18n %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Accessibility" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Accessibility" %}
+    <c-slot name="subtitle">
     {% translate "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that." %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   <form method="post" novalidate>
     {% csrf_token %}

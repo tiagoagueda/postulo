@@ -2,10 +2,12 @@
 {% load i18n postulo %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Plugins" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Plugins" %}
+    <c-slot name="subtitle">
     {% translate "What this instance can read a posting with, be notified through, keep documents in, and synchronise with. Postulo's own implementations ship in the box; others are packages you install here." %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   {% comment %} One child, not three. `.alert` is a flex row so an icon can sit beside
      the words; three bare paragraphs became three columns, ~94 pixels each at 320 and

@@ -5,13 +5,15 @@
 
 {% block content %}
   <div class="max-w-2xl">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Export everything" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Export everything" %}
+      <c-slot name="subtitle">
       {% blocktranslate trimmed %}
         Data you cannot walk away with is not really yours. This is one zip holding every
         record in your account and every file in it.
       {% endblocktranslate %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
     <div class="card mb-6">
       <h2 class="mb-4 font-medium">{% translate "What is in it" %}</h2>

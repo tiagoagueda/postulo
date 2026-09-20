@@ -5,13 +5,15 @@
 
 {% block content %}
   <div class="mx-auto max-w-2xl">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Capture a posting" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Capture a posting" %}
+      <c-slot name="subtitle">
       {% blocktranslate trimmed %}
         Paste the address of a job advert. Postulo fetches that one page, reads what it
         can, and shows you the result to correct before anything is saved.
       {% endblocktranslate %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
     {% comment %} Told, not refused (#178): an address already in the listings, or already
        waiting, is said here with a link, before anything is fetched. Pressing the button

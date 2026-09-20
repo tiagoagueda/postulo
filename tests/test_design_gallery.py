@@ -239,3 +239,40 @@ def test_the_gallery_shows_both_kinds_of_nothing(client, staff_user):
 
     assert "design-empty" in body
     assert body.count("empty gap-2") >= 2, "a page with nothing yet, and a filter that missed"
+
+
+# ------------------------------------------------------------------ a page's own name
+
+
+def test_a_page_title_is_written_one_way_now():
+    """Six spellings of the same heading, because there was nothing to agree with (#292).
+
+    The count is held rather than the absence: a handful of pages put a multi-line
+    `blocktranslate` in the heading or space their subtitle differently, and those keep
+    their own markup rather than being bent into the component. What they may not do is
+    choose their own *size*, which is why the assertion below is about the token.
+    """
+    from pathlib import Path as P
+
+    root = P(__file__).resolve().parents[1]
+    templates = list((root / "src/postulo/templates").rglob("*.html"))
+
+    using = [p for p in templates if "<c-page-title" in p.read_text("utf-8")]
+    assert len(using) >= 50, f"only {len(using)} pages use the component"
+
+    # Every page title asks for the token. The survivors are the report's statistics, which
+    # are a different idea with a component of their own still to come.
+    sizes = set()
+    for path in templates:
+        for match in re.finditer(r'class="([^"]*text-2xl[^"]*)"', path.read_text("utf-8")):
+            sizes.add(match.group(1))
+    assert sizes <= {"text-2xl font-semibold tabular-nums"}, (
+        f"a page title still picks its own size: {sorted(sizes)}"
+    )
+
+
+def test_the_title_size_and_the_spacing_rhythm_are_named_once():
+    theme = CSS[CSS.index("@theme {") : CSS.index("@layer base")]
+
+    assert "--text-title:" in theme and "--text-title--line-height:" in theme
+    assert "--spacing:" in theme, "the rhythm every margin is a multiple of"

@@ -3,14 +3,16 @@
 
 {% block content %}
   <div class="mx-auto max-w-2xl">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Recovery link" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Recovery link" %}
+      <c-slot name="subtitle">
       {% blocktranslate trimmed with name=person.get_full_name|default:person.email minutes=lifetime_minutes %}
         A single-use link that lets {{ name }} choose a new password, good for {{ minutes }}
         minutes. Postulo does not send it anywhere: you hand it over yourself, by whatever
         means you already trust.
       {% endblocktranslate %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
     {% comment %} Rendered exactly once, on the response that made it. Nothing stores the
        token, so leaving this page is the last chance to copy it -- which is the property

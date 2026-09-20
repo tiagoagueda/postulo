@@ -5,13 +5,15 @@
 
 {% block content %}
   <div class="mx-auto max-w-3xl">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Import a Europass CV" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Import a Europass CV" %}
+      <c-slot name="subtitle">
       {% blocktranslate trimmed %}
         If you have applied to an EU institution or through a national employment service,
         you already have this file. Rather than type it all again, hand it over.
       {% endblocktranslate %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
     {% if not found %}
       <form method="post" enctype="multipart/form-data" class="card mb-6">

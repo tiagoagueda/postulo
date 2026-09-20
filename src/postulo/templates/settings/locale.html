@@ -2,10 +2,12 @@
 {% load i18n postulo %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Language and time" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Language and time" %}
+    <c-slot name="subtitle">
     {% translate "What Postulo speaks to you, and whose clock it shows." %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   <form method="post" novalidate>
     {% csrf_token %}

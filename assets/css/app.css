@@ -175,6 +175,28 @@
    * colours, so it may say *this is above that* and may never be the only thing saying it.
    * Every surface here also has a border, which is what survives.
    */
+  /*
+   * The rhythm every margin, padding and gap is a multiple of (#292).
+   *
+   * Tailwind already derives them all from this; naming it here is what makes it a rule
+   * somebody can see and change rather than a default nobody mentioned. `p-4` is four of
+   * these, `gap-3` is three, and the compact density subtracts in the same unit.
+   */
+  --spacing: 0.25rem;
+
+  /*
+   * The one type size the interface names for itself: a page's own title (#292).
+   *
+   * The rest of the scale is Tailwind's -- `text-sm` for an explanation, `text-xs` for a
+   * label -- and renaming a thousand of those would be a diff with no reader. This one is
+   * different because it was being written six ways: `mb-1 text-2xl font-semibold
+   * tracking-tight` forty-four times, the same without the margin twenty-five, and four
+   * more spellings after that. `<c-page-title>` is the only thing that asks for it, which
+   * is the point: there is now one place to change what a page's name looks like.
+   */
+  --text-title: 1.5rem;
+  --text-title--line-height: 2rem;
+
   --shadow-raised: 0 1px 2px 0 --alpha(var(--color-ink-950) / 5%);
   --shadow-floating:
     0 10px 15px -3px --alpha(var(--color-ink-950) / 10%),

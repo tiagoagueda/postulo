@@ -2,13 +2,15 @@
 {% load i18n postulo %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Plugins" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Plugins" %}
+    <c-slot name="subtitle">
     {% blocktranslate trimmed %}
       What is running for your account. This is per account, not per browser: signing in
       somewhere else does not change it.
     {% endblocktranslate %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   {% comment %} What Postulo ships is an administrator's to switch, for you or for
      everybody, and is left off this page unless asked for: a dozen locked rows drowned the

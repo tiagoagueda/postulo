@@ -10,10 +10,12 @@
      nothing. They are the real classes, though, drawn from the real stylesheet, because a
      gallery built from copies is a gallery that stops being true.
   {% endcomment %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Design" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Design" %}
+    <c-slot name="subtitle">
     {% translate "Every piece the interface is built from, in the theme you are reading it in. Switch the theme under Settings → Appearance to see the other one." %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   <nav class="mb-8 flex flex-wrap gap-1" aria-label="{% translate 'Sections of this page' %}">
     {% for section in sections %}
@@ -94,7 +96,7 @@
   <section id="design-type" class="mb-10" aria-labelledby="design-type-heading">
     <h2 id="design-type-heading" class="mb-3 font-medium">{% translate "Type" %}</h2>
     <div class="card space-y-3">
-      <p class="text-2xl font-semibold tracking-tight">{% translate "A page title" %}</p>
+      <p class="text-title font-semibold tracking-tight">{% translate "A page title" %}</p>
       <p class="font-medium">{% translate "A section heading" %}</p>
       <p class="text-sm">{% translate "Ordinary text, which most of the interface is." %}</p>
       <p class="text-sm text-ink-500 dark:text-ink-400">

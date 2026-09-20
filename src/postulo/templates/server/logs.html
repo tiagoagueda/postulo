@@ -2,10 +2,12 @@
 {% load i18n %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Logs" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Logs" %}
+    <c-slot name="subtitle">
     {% translate "What this instance has been saying about itself, newest first." %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   {% comment %} Said before anything is shown, not after. A log names people, companies and
      applications in the course of explaining what failed, and an administrator opening this

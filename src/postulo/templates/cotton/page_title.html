@@ -1,0 +1,34 @@
+{% load i18n %}
+<c-vars id="" />
+{% comment %} A page's own name, and the sentence under it (#292).
+
+   `<c-page-title>Accessibility</c-page-title>`
+
+   `<c-page-title>
+      {% translate "Accessibility" %}
+      <c-slot name="subtitle">{% translate "What changes how Postulo behaves for you." %}</c-slot>
+    </c-page-title>`
+
+   It was written six ways: `mb-1 text-2xl font-semibold tracking-tight` forty-four times,
+   the same without the margin twenty-five, `mb-6` nine, `mb-4` twice, `mb-2` once, and a
+   bare one. Nobody decided that pages should disagree about their own name; there was
+   nothing to agree with, and a `class` copied from whichever page was open is how six
+   spellings happened.
+
+   The twelve `text-2xl font-semibold tabular-nums` are not page titles -- they are the
+   report's statistics, which are twelve copies of a different idea and want a component of
+   their own.
+
+   **The heading only, and no wrapper.** Seventeen pages put the title inside a flex row
+   with the actions beside it, and a component with a margin of its own breaks that
+   layout. Where the title stands alone the page keeps its own spacing; what this owns is
+   what the heading *is*, which is the part that was disagreeing.
+
+   The subtitle is a slot rather than an attribute so it can hold a `blocktranslate`, which
+   an attribute cannot.
+{% endcomment %}
+<h1 {% if id %}id="{{ id }}"{% endif %}
+    class="{% if subtitle %}mb-1 {% endif %}text-title font-semibold tracking-tight">{{ slot }}</h1>
+{% if subtitle %}
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">{{ subtitle }}</p>
+{% endif %}

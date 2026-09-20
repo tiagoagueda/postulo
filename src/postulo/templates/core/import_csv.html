@@ -3,10 +3,12 @@
 
 {% block content %}
   <div class="max-w-2xl">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Import from a spreadsheet" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Import from a spreadsheet" %}
+      <c-slot name="subtitle">
       {% translate "Most people track a job search in a spreadsheet until it hurts. Bring it here rather than retyping it: one CSV, any columns, any language of headers. You will see how each column is read before anything is saved." %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
     <form method="post" enctype="multipart/form-data" class="card mb-6" data-csv-upload>
       {% csrf_token %}

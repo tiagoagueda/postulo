@@ -2,10 +2,12 @@
 {% load i18n postulo %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Email" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Email" %}
+    <c-slot name="subtitle">
     {% translate "How this instance sends mail: verification links, password resets, reminders. Set it here, or in the environment, and prove it either way." %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   {% comment %} What is in force, before the form that changes it. The two answer different
      questions -- "what is happening" against "what would I like to happen" -- and an

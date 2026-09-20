@@ -23,7 +23,7 @@
           </a>
         {% endif %}
       </p>
-      <h1 class="text-2xl font-semibold tracking-tight">{{ application.posting.title }}</h1>
+      <c-page-title>{{ application.posting.title }}</c-page-title>
       <div class="mt-2 flex flex-wrap items-center gap-2">
         {% include "partials/status_badge.html" with status=application.status label=application.get_status_display %}
         {% for tag in application.tags.all %}

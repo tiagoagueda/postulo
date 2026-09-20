@@ -6,13 +6,15 @@
 {% block title %}{% translate "Sent documents" %}{% endblock %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Sent documents" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Sent documents" %}
+    <c-slot name="subtitle">
     {% blocktranslate trimmed %}
       Every document exactly as it left, frozen at the moment it was sent. These are
       never regenerated, however much the CV they came from has changed since.
     {% endblocktranslate %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   {% if documents %}
     <c-scroll-box class="card p-0" label="{% translate 'Documents' %}">

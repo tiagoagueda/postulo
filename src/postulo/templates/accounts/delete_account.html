@@ -3,10 +3,12 @@
 
 {% block content %}
   <div class="max-w-2xl">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Delete my account" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Delete my account" %}
+      <c-slot name="subtitle">
       {% translate "Everything goes, at once, and nobody can bring it back. Take your export first." %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
     {% if last_administrator %}
       <div class="alert-warning mb-6" role="status" data-last-administrator>

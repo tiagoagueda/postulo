@@ -5,8 +5,9 @@
 
 {% block content %}
   <div class="max-w-2xl">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Invitation created" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Invitation created" %}
+      <c-slot name="subtitle">
       {% if invite.email %}
         {% blocktranslate trimmed with email=invite.email %}
           For {{ email }}, and usable only by that address. Send the link however you like.
@@ -14,7 +15,8 @@
       {% else %}
         {% translate "Anyone holding the link may use it, once. Send it however you like." %}
       {% endif %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
     {% comment %} Rendered exactly once, on the response that made it. The row keeps a
        fingerprint of the token and nothing keeps the token, so leaving this page is the last

@@ -5,15 +5,17 @@
 
 {% block content %}
   <div>
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "API tokens" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "API tokens" %}
+      <c-slot name="subtitle">
       {% blocktranslate trimmed %}
         A token lets a tool outside Postulo act for you — a browser extension handing over a
         posting, an agent reading your search — and does only what its scopes allow. It is
         not a sign-in: it never reaches the web interface, and two-factor authentication does
         not apply to it.
       {% endblocktranslate %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
     {% if new_token %}
       <div class="alert-success mb-6 flex-col items-start">

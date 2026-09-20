@@ -2,12 +2,12 @@
 {% load i18n %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">
+  <c-page-title>
     {% if connection %}{{ connection.label }}{% else %}{% blocktranslate with plugin=plugin.label trimmed %}Connect {{ plugin }}{% endblocktranslate %}{% endif %}
-  </h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-slot name="subtitle">
     {{ kind_label }} · <bdi>{{ plugin.label }}</bdi> <code class="text-xs">{{ plugin.version }}</code>
-  </p>
+    </c-slot>
+  </c-page-title>
 
   <form method="post" novalidate>
     {% csrf_token %}

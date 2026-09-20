@@ -2,10 +2,12 @@
 {% load i18n %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Add a connection" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Add a connection" %}
+    <c-slot name="subtitle">
     {% translate "Which plugin should this connection be for?" %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   {% if plugins %}
     <div class="card p-0">

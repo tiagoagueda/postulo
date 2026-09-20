@@ -3,13 +3,15 @@
 
 {% block content %}
   <div class="mx-auto max-w-md">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Change username" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Change username" %}
+      <c-slot name="subtitle">
       {% blocktranslate trimmed with name=person.get_full_name|default:person.email current=person.username %}
         {{ name }} signs in as <strong>{{ current }}</strong>. The new username must be free
         on this instance; capitals do not make it different.
       {% endblocktranslate %}
-    </p>
+      </c-slot>
+    </c-page-title>
     <form method="post" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}

@@ -7,8 +7,9 @@
 
 {% block content %}
   <div>
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Your details" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Your details" %}
+      <c-slot name="subtitle">
       {% url 'settings:index' as settings_url %}
       {% blocktranslate trimmed %}
         What Postulo knows about you as a candidate: the name, picture and contact block
@@ -16,7 +17,8 @@
         Postulo behaves for you — theme, language, your account — is under
         <a href="{{ settings_url }}" class="underline">Settings</a>.
       {% endblocktranslate %}
-    </p>
+      </c-slot>
+    </c-page-title>
 
   {% comment %} One record in several parts down one page, so it is navigated rather than
      traversed: the sidebar Settings and Your career use, with the parts as anchors and a

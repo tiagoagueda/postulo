@@ -3,14 +3,16 @@
 
 {% block content %}
   <div class="mx-auto max-w-md">
-    <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Delete account" %}</h1>
-    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    <c-page-title>
+      {% translate "Delete account" %}
+      <c-slot name="subtitle">
       {% blocktranslate trimmed with name=person.get_full_name|default:person.username username=person.username email=person.email %}
         {{ name }} (<strong>{{ username }}</strong>, {{ email }}) and everything the account owns:
         applications, companies, documents and the files behind them, reminders, tokens,
         connections. The files are removed from the disk. Nothing can bring it back.
       {% endblocktranslate %}
-    </p>
+      </c-slot>
+    </c-page-title>
     {% if blocked %}
       <div class="alert-warning mb-6" role="status">{{ blocked }}</div>
       <a href="{% url 'server:people' %}" class="btn" data-variant="ghost">{% translate "Back to People" %}</a>

@@ -2,10 +2,12 @@
 {% load i18n static %}
 
 {% block content %}
-  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Overview" %}</h1>
-  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+  <c-page-title>
+    {% translate "Overview" %}
+    <c-slot name="subtitle">
     {% translate "What this instance is running, and where its data is." %}
-  </p>
+    </c-slot>
+  </c-page-title>
 
   {% comment %} `[&>*]:min-w-0` on the cards, and `min-w-0` on the two values below that
      truncate. `truncate` sets `white-space: nowrap`, which makes a value's smallest
