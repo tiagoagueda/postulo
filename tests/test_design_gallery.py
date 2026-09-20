@@ -190,3 +190,48 @@ def test_nothing_floats_by_writing_a_blur_radius_any_more(client, staff_user):
     stray = [path.relative_to(root) for path in templates if "shadow-lg" in path.read_text("utf-8")]
 
     assert not stray, f"these still ask for a blur radius rather than a plane: {stray}"
+
+
+# ------------------------------------------------------------- a list with nothing in it
+
+
+def test_the_empty_state_is_a_component_rather_than_sixteen_copies(client, staff_user):
+    """Two shapes, written by hand, on sixteen pages: an empty *Applications* and an empty
+    *Tags* looked like pages from different applications (#292)."""
+    from pathlib import Path as P
+
+    root = P(__file__).resolve().parents[1]
+    component = root / "src/postulo/templates/cotton/empty.html"
+    assert component.exists()
+
+    using = [
+        path.relative_to(root)
+        for path in (root / "src/postulo/templates").rglob("*.html")
+        if "<c-empty" in path.read_text("utf-8")
+    ]
+    assert len(using) >= 6, f"only {len(using)} pages use it"
+
+
+def test_the_empty_states_that_are_left_are_the_ones_that_are_different(client, staff_user):
+    """Not a conversion for its own sake: what still writes its own is what the component
+    does not say -- a conditional sentence, a footer of two buttons, a page-specific shape.
+    This holds the number down so the pattern cannot quietly return."""
+    from pathlib import Path as P
+
+    root = P(__file__).resolve().parents[1]
+    by_hand = [
+        path.relative_to(root)
+        for path in (root / "src/postulo/templates").rglob("*.html")
+        if "card py-12 text-center" in path.read_text("utf-8")
+    ]
+
+    assert len(by_hand) <= 12, f"{len(by_hand)} still write their own: {by_hand}"
+
+
+def test_the_gallery_shows_both_kinds_of_nothing(client, staff_user):
+    client.force_login(staff_user)
+    html = client.get(reverse("server:design")).content.decode()
+    body = html[html.index("<main") : html.index("</main>")]
+
+    assert "design-empty" in body
+    assert body.count("empty gap-2") >= 2, "a page with nothing yet, and a filter that missed"

@@ -1,0 +1,39 @@
+{% load i18n postulo %}
+<c-vars icon="" title="" action_url="" action_label="" action_variant="" />
+{% comment %} A list with nothing in it (#292).
+
+   `<c-empty title="…" icon="inbox" action_url="…" action_label="…">what to do</c-empty>`
+
+   There were sixteen of these and they were written two ways: a card with a bold line, a
+   quiet line and a button, or a card with one grey sentence. Neither was wrong and nothing
+   made them agree, so an empty *Applications* and an empty *Tags* looked like pages from
+   different applications.
+
+   Basecoat's `empty` supplies the structure -- a centred column with a header, a body and a
+   footer -- and the paint is this project's. The icon is optional and always decorative: it
+   repeats what the sentence beside it already says, so a screen reader is not told twice.
+
+   The action carries `action_variant` for the one distinction that matters: a page with
+   nothing on it yet offers the thing to do next as a primary button, while a filter that
+   matched nothing offers *Clear* as an outline, because clearing is a way back rather than
+   a way on.
+{% endcomment %}
+<div class="card empty gap-2 py-12">
+  {% if icon %}
+    <figure class="mb-1 text-ink-400 dark:text-ink-500">{% icon icon class="size-8" %}</figure>
+  {% endif %}
+  <header>
+    {% if title %}<p class="font-medium">{{ title }}</p>{% endif %}
+    <p class="text-sm text-ink-500 dark:text-ink-400">{{ slot }}</p>
+  </header>
+  {% if footer %}
+    {% comment %} Where there is more than one thing to do next: the CV list offers the
+       career record and a new CV, which is two buttons and not one. {% endcomment %}
+    <footer class="mt-5 flex flex-wrap items-center justify-center gap-3">{{ footer }}</footer>
+  {% elif action_url %}
+    <footer class="mt-5">
+      <a href="{{ action_url }}" class="btn"
+         {% if action_variant %}data-variant="{{ action_variant }}"{% endif %}>{{ action_label }}</a>
+    </footer>
+  {% endif %}
+</div>
