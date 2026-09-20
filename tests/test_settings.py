@@ -159,6 +159,36 @@ def test_active_section_follows_allauth_pages_too(rf, user):
     assert settings_sections.active_section(request) is None
 
 
+@pytest.mark.parametrize(
+    "url_name", ["settings:appearance", "settings:accessibility", "settings:locale"]
+)
+def test_every_field_a_form_insists_on_has_a_control_on_the_page(client, user, url_name):
+    """A required field with nothing to set it with makes the page unsaveable (#292).
+
+    These templates draw their fields one at a time rather than looping the form, so adding
+    a field to `Meta.fields` puts it in the form and not on the page. It is then required,
+    missing from every submission, and *Appearance* stops saving at all -- the theme, the
+    navigation and the quiet threshold with it. Nothing says so: the page comes back looking
+    normal, because the error belongs to a field that is not drawn.
+
+    Density shipped exactly that way. Three tests broke when the field arrived and were
+    "fixed" by posting it, which is what the page itself could not do -- so the tests were
+    made to pass and the page stayed broken. This asks the question those tests should have.
+    """
+    import re
+
+    client.force_login(user)
+    answer = client.get(reverse(url_name))
+    html = answer.content.decode()
+    form = answer.context.get("form")
+    if form is None:
+        pytest.skip(f"{url_name} draws no form")
+
+    drawn = set(re.findall(r'name="([^"]+)"', html))
+    missing = [name for name, field in form.fields.items() if field.required and name not in drawn]
+    assert not missing, f"{url_name} insists on {missing} and offers no way to set it"
+
+
 def test_everything_a_control_says_describes_it_is_on_the_page(client, user):
     """Django puts `aria-describedby` on a widget with help text; a template that draws the
     help itself has to put the id on it, or a screen reader is told about an element that

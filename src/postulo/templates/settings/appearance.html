@@ -26,6 +26,24 @@
       </fieldset>
     </div>
     <div class="card mb-6">
+      {% comment %} How much room the interface leaves (#292). Beside the theme because it
+         is the same kind of choice -- what the interface looks like to you -- and because
+         somebody who wants more rows on a screen comes looking here. {% endcomment %}
+      <fieldset{% if form.density.aria_describedby %} aria-describedby="{{ form.density.aria_describedby }}"{% endif %}>
+        <legend class="field-label mb-1">{{ form.density.label }}</legend>
+        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.density.auto_id }}_helptext">{{ form.density.help_text }}</p>
+        <div class="space-y-2">
+          {% for choice in form.density %}
+            <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+              {{ choice.tag }}
+              <span>{{ choice.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        <c-field-feedback :field="form.density" errors-only />
+      </fieldset>
+    </div>
+    <div class="card mb-6">
       <fieldset{% if form.navigation.aria_describedby %} aria-describedby="{{ form.navigation.aria_describedby }}"{% endif %}>
         <legend class="field-label mb-1">{{ form.navigation.label }}</legend>
         {% comment %} The help sits above the choices here rather than under them, so it keeps its
