@@ -58,6 +58,11 @@ EXCUSED: dict[str, str] = {
     "api:token_create": "a POST that mints a token and shows it once",
     "applications:bulk": "a POST from the table's action bar, which is visited",
     "jobs:company_bulk": "a POST from the table's action bar, which is visited",
+    "listings:bulk": "a POST from the table's action bar, which is visited",
+    "listings:cell": (
+        "one cell of the listings table, as a fragment rather than a page. The same "
+        "machinery and the same excuse as `jobs:company_cell` below (#160)"
+    ),
     "jobs:company_cell": (
         "one cell of the companies table, as a fragment rather than a page. It has no "
         "layout of its own to check; `tests/e2e/test_editable_cells.py` opens it in the "

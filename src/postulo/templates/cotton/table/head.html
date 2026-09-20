@@ -1,10 +1,14 @@
 {% load i18n postulo %}
-<c-vars table table_id form_id bulk_form_id="" />
+<c-vars table table_id form_id bulk_form_id="" actions_label="" />
 {% comment %} `<c-table.head :table="table" table_id="…" form_id="…" bulk_form_id="…" />` (#263).
    The table it draws, the id of the element the swaps replace, the filter form every input
-   is associated with, and -- only where a bulk form exists -- the id that puts a selection
-   column first. A component rather than an include, so the four things it needs are declared
-   here at the top instead of being whatever the page happened to have in its context.
+   is associated with, the id that -- only where a bulk form exists -- puts a selection
+   column first, and the name of a trailing column of per-row controls, for a page that has
+   some (#160). That last column is not in `table.columns` on purpose: a person choosing
+   columns cannot be allowed to hide the buttons that decide about a row.
+
+   A component rather than an include, so everything it needs is declared here at the top
+   instead of being whatever the page happened to have in its context.
 {% endcomment %}
 {% comment %} The header of a configurable table: sort links, and beneath them the filter inputs.
    Every input is associated with the filter form (`form=`) so the plain Apply button
@@ -75,6 +79,11 @@
         {% endif %}
       </th>
     {% endfor %}
+    {% if actions_label %}
+      <th scope="col" class="px-4 py-3 font-medium">
+        <span class="sr-only">{{ actions_label }}</span>
+      </th>
+    {% endif %}
   </tr>
   {% if table.has_filter_row %}
     <tr class="hidden border-t border-ink-100 md:table-row dark:border-ink-800" data-filter-row>
@@ -135,6 +144,7 @@
           {% endif %}
         </td>
       {% endfor %}
+      {% if actions_label %}<td class="px-2 py-1.5"></td>{% endif %}
     </tr>
   {% endif %}
 </thead>

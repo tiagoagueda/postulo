@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-20 10:00+0000\n"
+"POT-Creation-Date: 2026-09-20 11:11+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: čeština\n"
@@ -235,7 +235,7 @@ msgid ""
 msgstr ""
 "%(label)s stále drží %(count)d záznam(ů) a odinstalováním by zůstaly v tabulce, kterou nic nedokáže číst, exportovat ani obnovit. Nejprve ji vyprázdněte na stránkách samotného pluginu, nebo plugin místo toho vypněte — vypnutí zachová všechno."
 
-#: src/postulo/jobs/models.py:817
+#: src/postulo/jobs/models.py:869
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s až %(high)s"
@@ -504,6 +504,14 @@ msgid_plural "%(total)s highlights"
 msgstr[0] "%(total)s úspěch"
 msgstr[1] "%(total)s úspěchy"
 msgstr[2] "%(total)s úspěchů"
+
+#: src/postulo/templates/jobs/listing_list.html:11
+#, python-format
+msgid "%(total)s listing"
+msgid_plural "%(total)s listings"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/templates/server/plugins.html:281
 #, python-format, draft
@@ -895,7 +903,7 @@ msgstr ""
 msgid "A test message from %(name)s"
 msgstr "Zkušební zpráva od %(name)s"
 
-#: src/postulo/jobs/models.py:689
+#: src/postulo/jobs/models.py:741
 #, draft
 msgid "A three-letter ISO 4217 code, such as EUR, GBP or USD."
 msgstr "Třípísmenný kód ISO 4217, například EUR, GBP nebo USD."
@@ -1000,7 +1008,6 @@ msgstr ""
 "V celém souboru: %(applications)s žádostí, %(listings)s nabídek, %(skipped)s řádků přeskočeno kvůli chybějící firmě nebo pozici. Již zaznamenané řádky se při importu rozpoznají a přeskočí."
 
 #: src/postulo/templates/accounts/invite_list.html:28
-#: src/postulo/templates/jobs/listing_list.html:92
 #: src/postulo/templates/server/people.html:36
 #: src/postulo/templates/server/person_recovery.html:65
 #, draft
@@ -1052,8 +1059,8 @@ msgstr "Přidat jazyk"
 
 #: src/postulo/templates/jobs/listing_form.html:4
 #: src/postulo/templates/jobs/listing_form.html:8
-#: src/postulo/templates/jobs/listing_list.html:18
-#: src/postulo/templates/jobs/listing_list.html:183
+#: src/postulo/templates/jobs/listing_list.html:53
+#: src/postulo/templates/jobs/listing_list.html:80
 #, draft
 msgid "Add a listing"
 msgstr "Přidat nabídku"
@@ -1113,7 +1120,7 @@ msgstr "Přidat do nabídek"
 msgid "Add to the timeline"
 msgstr "Přidat na časovou osu"
 
-#: src/postulo/jobs/tables.py:140
+#: src/postulo/jobs/tables.py:145
 #, draft
 msgid "Added"
 msgstr "Přidáno"
@@ -1140,7 +1147,7 @@ msgstr ""
 msgid "Added to the timeline."
 msgstr "Přidáno na časovou osu."
 
-#: src/postulo/jobs/listing_views.py:110
+#: src/postulo/jobs/listing_views.py:217
 #, draft
 msgid "Added to your listings."
 msgstr "Přidáno do vašich nabídek."
@@ -1150,7 +1157,7 @@ msgstr "Přidáno do vašich nabídek."
 msgid "Added."
 msgstr "Přidáno."
 
-#: src/postulo/applications/reports.py:505
+#: src/postulo/applications/reports.py:505 src/postulo/jobs/tables.py:290
 #: src/postulo/templates/partials/postal_addresses.html:29
 #: src/postulo/templates/partials/web_links.html:28
 #, draft
@@ -1158,7 +1165,7 @@ msgid "Address"
 msgstr "Adresa"
 
 #: src/postulo/core/models.py:413 src/postulo/core/models.py:539
-#: src/postulo/jobs/models.py:854 src/postulo/notifications/models.py:26
+#: src/postulo/jobs/models.py:906 src/postulo/notifications/models.py:26
 #: src/postulo/resume/models.py:264
 #, draft
 msgid "address"
@@ -1345,7 +1352,7 @@ msgstr "Odpovědělo %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:104
+#: src/postulo/templates/cotton/table/head.html:113
 #: src/postulo/templates/partials/table/narrow.html:27
 #, draft
 msgid "Any"
@@ -1406,7 +1413,7 @@ msgstr "Vzhled"
 #: src/postulo/applications/models.py:478
 #: src/postulo/applications/models.py:573
 #: src/postulo/applications/models.py:694 src/postulo/applications/tables.py:21
-#: src/postulo/documents/models.py:605 src/postulo/jobs/models.py:882
+#: src/postulo/documents/models.py:605 src/postulo/jobs/models.py:934
 #: src/postulo/templates/core/import_csv_map.html:99
 #, draft
 msgid "application"
@@ -1415,7 +1422,7 @@ msgstr "žádost"
 #: src/postulo/templates/applications/suggestion_list.html:82
 #: src/postulo/templates/documents/letter_detail.html:48
 #: src/postulo/templates/jobs/capture_list.html:53
-#: src/postulo/templates/jobs/listing_list.html:147
+#: src/postulo/templates/jobs/partials/listing_row.html:122
 #, draft
 msgid "Application"
 msgstr "Žádost"
@@ -1435,7 +1442,7 @@ msgstr "Žádost smazána."
 msgid "Application recorded from the capture."
 msgstr "Žádost zaznamenána ze zachycení."
 
-#: src/postulo/applications/views.py:386 src/postulo/jobs/listing_views.py:170
+#: src/postulo/applications/views.py:386 src/postulo/jobs/listing_views.py:277
 #, draft
 msgid "Application recorded."
 msgstr "Žádost zaznamenána."
@@ -1447,7 +1454,7 @@ msgstr "Žádost aktualizována."
 
 #: src/postulo/applications/apps.py:9 src/postulo/applications/tables.py:15
 #: src/postulo/core/navigation.py:58 src/postulo/core/search.py:390
-#: src/postulo/jobs/tables.py:68
+#: src/postulo/jobs/tables.py:73 src/postulo/jobs/tables.py:283
 #: src/postulo/templates/applications/application_list.html:6
 #: src/postulo/templates/applications/application_list.html:32
 #: src/postulo/templates/applications/application_list.html:77
@@ -1515,7 +1522,7 @@ msgstr "Žádosti s časovými osami"
 
 #: src/postulo/applications/analytics.py:39
 #: src/postulo/applications/models.py:41 src/postulo/applications/tables.py:52
-#: src/postulo/jobs/listing_views.py:28 src/postulo/jobs/models.py:772
+#: src/postulo/jobs/listing_views.py:35 src/postulo/jobs/models.py:824
 #: src/postulo/templates/core/import_csv_map.html:80
 #, draft
 msgid "Applied"
@@ -1560,7 +1567,8 @@ msgstr "odesláno přes"
 
 #: src/postulo/templates/jobs/company_list.html:87
 #: src/postulo/templates/jobs/listing_apply.html:4
-#: src/postulo/templates/jobs/listing_list.html:135
+#: src/postulo/templates/jobs/listing_list.html:164
+#: src/postulo/templates/jobs/partials/listing_row.html:110
 #: src/postulo/templates/jobs/posting_detail.html:44
 #: src/postulo/templates/partials/table/columns.html:49
 #: src/postulo/templates/settings/plugins.html:28
@@ -1625,7 +1633,7 @@ msgstr "Hodnocení"
 msgid "Assessment or test"
 msgstr "Hodnocení nebo test"
 
-#: src/postulo/templates/cotton/table/head.html:116
+#: src/postulo/templates/cotton/table/head.html:125
 #: src/postulo/templates/partials/table/narrow.html:51
 #, draft
 msgid "at least"
@@ -1636,7 +1644,7 @@ msgstr "nejméně"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Musí být nabízen alespoň jeden jazyk, jinak si nikdo nic nepřečte."
 
-#: src/postulo/templates/cotton/table/head.html:122
+#: src/postulo/templates/cotton/table/head.html:131
 #: src/postulo/templates/partials/table/narrow.html:55
 #, draft
 msgid "at most"
@@ -1692,7 +1700,7 @@ msgstr "B2 — vyšší středně pokročilý"
 msgid "Back"
 msgstr "Zpět"
 
-#: src/postulo/jobs/listing_views.py:139
+#: src/postulo/jobs/listing_views.py:246
 #, draft
 msgid "Back in your listings."
 msgstr "Zpět ve vašich nabídkách."
@@ -1898,7 +1906,7 @@ msgstr ""
 msgid "Capture"
 msgstr "Zachytit"
 
-#: src/postulo/jobs/models.py:886
+#: src/postulo/jobs/models.py:938
 #, draft
 msgid "capture"
 msgstr "zachycení"
@@ -1908,7 +1916,7 @@ msgstr "zachycení"
 #: src/postulo/templates/jobs/capture_form.html:8
 #: src/postulo/templates/jobs/capture_list.html:22
 #: src/postulo/templates/jobs/capture_list.html:68
-#: src/postulo/templates/jobs/listing_list.html:17
+#: src/postulo/templates/jobs/listing_list.html:79
 #, draft
 msgid "Capture a posting"
 msgstr "Zachytit inzerát"
@@ -1918,7 +1926,7 @@ msgstr "Zachytit inzerát"
 msgid "Capture a posting from its address and it will appear here."
 msgstr "Zachyťte inzerát z jeho adresy a objeví se zde."
 
-#: src/postulo/templates/jobs/listing_list.html:181
+#: src/postulo/templates/jobs/listing_list.html:51
 #, draft
 msgid ""
 "Capture a posting from its address, or add one by hand, and it waits here for you."
@@ -1944,7 +1952,7 @@ msgstr "Zdroje zachytávání této instance"
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "Zachyceno %(count)s inzerátů z %(host)s"
 
-#: src/postulo/jobs/models.py:858
+#: src/postulo/jobs/models.py:910
 #, draft
 msgid "captured from"
 msgstr "zachyceno z"
@@ -1954,7 +1962,7 @@ msgstr "zachyceno z"
 msgid "Captured: %(title)s"
 msgstr "Zachyceno: %(title)s"
 
-#: src/postulo/jobs/models.py:887
+#: src/postulo/jobs/models.py:939
 #, draft
 msgid "captures"
 msgstr "zachycení"
@@ -1990,7 +1998,7 @@ msgstr "Kariérní oddíly"
 msgid "careers page"
 msgstr "kariérní stránka"
 
-#: src/postulo/jobs/tables.py:106
+#: src/postulo/jobs/tables.py:111
 #: src/postulo/templates/jobs/company_detail.html:91
 #, draft
 msgid "Careers page"
@@ -2164,6 +2172,7 @@ msgstr "Klasický"
 #: src/postulo/templates/applications/partials/filters.html:62
 #: src/postulo/templates/jobs/company_list.html:89
 #: src/postulo/templates/jobs/industry_list.html:35
+#: src/postulo/templates/jobs/listing_list.html:166
 #: src/postulo/templates/server/logs.html:67
 #, draft
 msgid "Clear"
@@ -2173,6 +2182,8 @@ msgstr "Vymazat"
 #: src/postulo/templates/applications/application_list.html:53
 #: src/postulo/templates/jobs/company_list.html:17
 #: src/postulo/templates/jobs/company_list.html:46
+#: src/postulo/templates/jobs/listing_list.html:17
+#: src/postulo/templates/jobs/listing_list.html:45
 #, draft
 msgid "Clear filters"
 msgstr "Vymazat filtry"
@@ -2193,12 +2204,12 @@ msgstr "ID klienta"
 msgid "Client secret"
 msgstr "Tajný klíč klienta"
 
-#: src/postulo/jobs/listing_views.py:29 src/postulo/jobs/models.py:772
+#: src/postulo/jobs/listing_views.py:36 src/postulo/jobs/models.py:824
 #, draft
 msgid "Closed"
 msgstr "Uzavřeno"
 
-#: src/postulo/applications/models.py:264 src/postulo/jobs/models.py:707
+#: src/postulo/applications/models.py:264 src/postulo/jobs/models.py:759
 #, draft
 msgid "closed on"
 msgstr "uzavřeno dne"
@@ -2208,7 +2219,7 @@ msgstr "uzavřeno dne"
 msgid "Closed or already filled"
 msgstr "Uzavřeno nebo už obsazeno"
 
-#: src/postulo/templates/jobs/listing_list.html:90
+#: src/postulo/jobs/tables.py:211
 #: src/postulo/templates/jobs/posting_detail.html:87
 #, draft
 msgid "Closes"
@@ -2219,7 +2230,7 @@ msgstr "Uzavírá se"
 msgid "Closing date"
 msgstr "Datum uzávěrky"
 
-#: src/postulo/jobs/models.py:701
+#: src/postulo/jobs/models.py:753
 #, draft
 msgid "closing date"
 msgstr "datum uzávěrky"
@@ -2275,7 +2286,7 @@ msgid "Coming up"
 msgstr "Nadcházející"
 
 #: src/postulo/core/navigation.py:74 src/postulo/core/search.py:392
-#: src/postulo/jobs/tables.py:14 src/postulo/templates/core/export.html:19
+#: src/postulo/jobs/tables.py:19 src/postulo/templates/core/export.html:19
 #: src/postulo/templates/jobs/company_list.html:6
 #: src/postulo/templates/jobs/company_list.html:25
 #: src/postulo/templates/jobs/company_list.html:64
@@ -2283,7 +2294,7 @@ msgstr "Nadcházející"
 msgid "Companies"
 msgstr "Firmy"
 
-#: src/postulo/jobs/models.py:221 src/postulo/jobs/tables.py:20
+#: src/postulo/jobs/models.py:221 src/postulo/jobs/tables.py:25
 #, draft
 msgid "companies"
 msgstr "firmy"
@@ -2305,19 +2316,19 @@ msgstr "Firmy, kam jste se hlásili"
 
 #: src/postulo/applications/forms.py:43 src/postulo/applications/reports.py:502
 #: src/postulo/applications/tables.py:33 src/postulo/core/csv_import.py:40
+#: src/postulo/jobs/tables.py:194
 #: src/postulo/templates/applications/report.html:249
 #: src/postulo/templates/applications/report_print.html:160
 #: src/postulo/templates/core/import_csv_map.html:78
 #: src/postulo/templates/jobs/company_form.html:4
 #: src/postulo/templates/jobs/company_form.html:8
-#: src/postulo/templates/jobs/listing_list.html:88
 #, draft
 msgid "Company"
 msgstr "Firma"
 
 #: src/postulo/jobs/models.py:220 src/postulo/jobs/models.py:365
 #: src/postulo/jobs/models.py:459 src/postulo/jobs/models.py:487
-#: src/postulo/jobs/models.py:657 src/postulo/jobs/tables.py:20
+#: src/postulo/jobs/models.py:709 src/postulo/jobs/tables.py:25
 #, draft
 msgid "company"
 msgstr "firma"
@@ -2626,7 +2637,7 @@ msgstr "odkaz na doklad"
 msgid "Currency"
 msgstr "Měna"
 
-#: src/postulo/jobs/models.py:684
+#: src/postulo/jobs/models.py:736
 #, draft
 msgid "currency"
 msgstr "měna"
@@ -2856,7 +2867,7 @@ msgstr "rozhodl"
 msgid "Decided by %(who)s on %(when)s"
 msgstr "Rozhodl(a) %(who)s dne %(when)s"
 
-#: src/postulo/jobs/models.py:722
+#: src/postulo/jobs/models.py:774
 #, draft
 msgid "decided on"
 msgstr "rozhodnuto dne"
@@ -2962,12 +2973,13 @@ msgid "Depends on"
 msgstr "Závisí na"
 
 #: src/postulo/applications/forms.py:76 src/postulo/core/csv_import.py:54
+#: src/postulo/jobs/tables.py:294
 #: src/postulo/templates/jobs/posting_detail.html:60
 #, draft
 msgid "Description"
 msgstr "Popis"
 
-#: src/postulo/jobs/models.py:675 src/postulo/resume/models.py:267
+#: src/postulo/jobs/models.py:727 src/postulo/resume/models.py:267
 #, draft
 msgid "description"
 msgstr "popis"
@@ -3003,8 +3015,8 @@ msgid "directory (tenant) ID"
 msgstr "ID adresáře (tenanta)"
 
 #: src/postulo/templates/jobs/capture_list.html:47
-#: src/postulo/templates/jobs/listing_list.html:61
-#: src/postulo/templates/jobs/listing_list.html:131
+#: src/postulo/templates/jobs/listing_list.html:123
+#: src/postulo/templates/jobs/partials/listing_row.html:106
 #: src/postulo/templates/jobs/posting_detail.html:42
 #, draft
 msgid "Discard"
@@ -3015,23 +3027,27 @@ msgstr "Zahodit"
 msgid "Discard and next"
 msgstr "Zahodit a další"
 
-#: src/postulo/templates/jobs/listing_list.html:39
+#: src/postulo/templates/jobs/listing_list.html:101
 #, draft
 msgid "Discard the ticked ones"
 msgstr "Zahodit zaškrtnuté"
+
+#: src/postulo/templates/jobs/partials/listing_bulk_fields.html:16
+msgid "Discard them"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html:148
 #, draft
 msgid "Discard this capture"
 msgstr "Zahodit toto zachycení"
 
-#: src/postulo/jobs/listing_views.py:27 src/postulo/jobs/models.py:580
-#: src/postulo/jobs/models.py:837
+#: src/postulo/jobs/listing_views.py:34 src/postulo/jobs/models.py:580
+#: src/postulo/jobs/models.py:889
 #, draft
 msgid "Discarded"
 msgstr "Zahozeno"
 
-#: src/postulo/jobs/listing_views.py:136
+#: src/postulo/jobs/listing_views.py:243
 #, draft
 msgid "Discarded. It stays in your history and can be restored."
 msgstr "Zahozeno. Zůstává v historii a lze to obnovit."
@@ -3042,6 +3058,7 @@ msgstr ""
 
 #: src/postulo/templates/applications/partials/bulk_fields.html:7
 #: src/postulo/templates/jobs/partials/bulk_fields.html:7
+#: src/postulo/templates/jobs/partials/listing_bulk_fields.html:13
 #, draft
 msgid "Do this"
 msgstr "Udělej toto"
@@ -3296,12 +3313,12 @@ msgstr "Zaměstnavatel"
 msgid "Employment service"
 msgstr "Úřad práce"
 
-#: src/postulo/applications/forms.py:53
+#: src/postulo/applications/forms.py:53 src/postulo/jobs/tables.py:246
 #, draft
 msgid "Employment type"
 msgstr "Typ úvazku"
 
-#: src/postulo/jobs/models.py:665
+#: src/postulo/jobs/models.py:717
 #, draft
 msgid "employment type"
 msgstr "typ úvazku"
@@ -3311,7 +3328,7 @@ msgstr "typ úvazku"
 msgid "Empty"
 msgstr "Prázdné"
 
-#: src/postulo/jobs/models.py:892
+#: src/postulo/jobs/models.py:944
 #, draft
 msgid "Empty capture"
 msgstr "Prázdné zachycení"
@@ -3424,7 +3441,7 @@ msgid ""
 msgstr ""
 "Každý zde uvedený jazyk kromě angličtiny je strojový návrh, který čeká, až ho někdo, kdo jím mluví, přečte a potvrdí. Pokud je jedním z nich ten váš, <a href=\"%(guide)s\" class=\"underline\">Translating</a> popisuje, jak taková revize probíhá."
 
-#: src/postulo/templates/jobs/listing_list.html:13
+#: src/postulo/templates/jobs/listing_list.html:69
 #, draft
 msgid ""
 "Every posting you have noticed, until you decide: shortlist it, discard it, or apply."
@@ -3443,7 +3460,7 @@ msgstr ""
 msgid "Every store already has this document."
 msgstr "Každé úložiště už tento dokument má."
 
-#: src/postulo/jobs/listing_views.py:30
+#: src/postulo/jobs/listing_views.py:37
 #: src/postulo/templates/server/logs.html:44
 #, draft
 msgid "Everything"
@@ -3714,7 +3731,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Vyplní se, když se dopis odešle se žádostí."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:93
+#: src/postulo/templates/cotton/table/head.html:102
 #, draft
 msgid "Filter"
 msgstr "Filtrovat"
@@ -3872,7 +3889,7 @@ msgid "Found on their website"
 msgstr "Nalezeno na jejich webu"
 
 #: src/postulo/applications/forms.py:57 src/postulo/applications/reports.py:504
-#: src/postulo/core/csv_import.py:52
+#: src/postulo/core/csv_import.py:52 src/postulo/jobs/tables.py:231
 #: src/postulo/templates/applications/report.html:251
 #: src/postulo/templates/applications/report_print.html:162
 #: src/postulo/templates/jobs/posting_detail.html:81
@@ -3880,7 +3897,7 @@ msgstr "Nalezeno na jejich webu"
 msgid "Found via"
 msgstr "Nalezeno přes"
 
-#: src/postulo/jobs/models.py:670
+#: src/postulo/jobs/models.py:722
 #, draft
 msgid "found via"
 msgstr "nalezeno přes"
@@ -3907,7 +3924,7 @@ msgstr "Přesto zmrazit"
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:131
+#: src/postulo/templates/cotton/table/head.html:140
 #: src/postulo/templates/partials/table/narrow.html:38
 #, draft
 msgid "from"
@@ -3921,7 +3938,7 @@ msgstr "od"
 msgid "From"
 msgstr "Od"
 
-#: src/postulo/jobs/models.py:822
+#: src/postulo/jobs/models.py:874
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "od %(low)s"
@@ -4471,7 +4488,7 @@ msgstr "Adresa indexu"
 msgid "index address"
 msgstr "adresa indexu"
 
-#: src/postulo/jobs/forms.py:59 src/postulo/jobs/tables.py:49
+#: src/postulo/jobs/forms.py:59 src/postulo/jobs/tables.py:54
 #: src/postulo/templates/jobs/company_list.html:72
 #: src/postulo/templates/jobs/industry_list.html:6
 #: src/postulo/templates/jobs/industry_list.html:12
@@ -4765,12 +4782,12 @@ msgstr "Jeho soubor odpovídá tomu, co podepsal oficiální repozitář."
 msgid "Job board"
 msgstr "Pracovní portál"
 
-#: src/postulo/jobs/models.py:727
+#: src/postulo/jobs/models.py:779
 #, draft
 msgid "job posting"
 msgstr "pracovní inzerát"
 
-#: src/postulo/jobs/models.py:728
+#: src/postulo/jobs/models.py:780
 #, draft
 msgid "job postings"
 msgstr "pracovní inzeráty"
@@ -4877,7 +4894,7 @@ msgstr ""
 msgid "kind"
 msgstr "druh"
 
-#: src/postulo/jobs/tables.py:88
+#: src/postulo/jobs/tables.py:93
 #: src/postulo/templates/applications/report.html:56
 #: src/postulo/templates/cotton/identifier_row.html:20
 #: src/postulo/templates/partials/phone_numbers.html:43
@@ -4988,7 +5005,7 @@ msgid "Largest page read"
 msgstr "Největší přečtená stránka"
 
 #: src/postulo/applications/reports.py:507
-#: src/postulo/applications/tables.py:94 src/postulo/jobs/tables.py:131
+#: src/postulo/applications/tables.py:94 src/postulo/jobs/tables.py:136
 #: src/postulo/templates/applications/report.html:253
 #: src/postulo/templates/applications/report_print.html:164
 #, draft
@@ -5128,7 +5145,7 @@ msgstr "Nechat jedinou klávesu něco dělat"
 msgid "Let this passkey sign me in on its own"
 msgstr "Nechat tento přístupový klíč přihlásit mě samostatně"
 
-#: src/postulo/templates/cotton/table/head.html:35
+#: src/postulo/templates/cotton/table/head.html:39
 #, draft
 msgid "Let {column} size itself"
 msgstr "Nechat sloupec {column} nastavit si šířku sám"
@@ -5236,27 +5253,32 @@ msgstr "Odkazy, na které jste je nasměrovali"
 msgid "listening"
 msgstr "poslech"
 
-#: src/postulo/jobs/models.py:873
+#: src/postulo/jobs/models.py:925 src/postulo/jobs/tables.py:178
 #: src/postulo/templates/core/import_csv_map.html:101
 #, draft
 msgid "listing"
 msgstr "nabídka"
 
-#: src/postulo/templates/jobs/listing_list.html:70
+#: src/postulo/templates/jobs/listing_list.html:137
 #, draft
 msgid "Listing filters"
 msgstr "Filtry nabídek"
 
 #: src/postulo/core/navigation.py:45 src/postulo/core/search.py:391
+#: src/postulo/jobs/tables.py:172
 #: src/postulo/templates/applications/report.html:244
 #: src/postulo/templates/core/import_csv_done.html:15
 #: src/postulo/templates/jobs/listing_list.html:6
-#: src/postulo/templates/jobs/listing_list.html:11
-#: src/postulo/templates/jobs/listing_list.html:82
+#: src/postulo/templates/jobs/listing_list.html:25
+#: src/postulo/templates/jobs/listing_list.html:67
 #: src/postulo/templates/widgets/shortcuts.html:22
 #, draft
 msgid "Listings"
 msgstr "Nabídky"
+
+#: src/postulo/jobs/tables.py:178
+msgid "listings"
+msgstr ""
 
 #: src/postulo/jobs/widgets.py:32
 #, draft
@@ -5271,16 +5293,16 @@ msgstr ""
 "Nabídky, žádosti a jejich časové osy, firmy a lidé, připomínky, text toho, co jste odeslali, dopisy, CV, soubory a váš kariérní záznam — vše, včetně uzavřeného nebo zahozeného, protože hledáte něco, co si pamatujete."
 
 #: src/postulo/accounts/models.py:271 src/postulo/jobs/models.py:198
-#: src/postulo/jobs/models.py:660 src/postulo/resume/models.py:73
+#: src/postulo/jobs/models.py:712 src/postulo/resume/models.py:73
 #: src/postulo/resume/models.py:106
 #, draft
 msgid "location"
 msgstr "místo"
 
 #: src/postulo/applications/forms.py:46 src/postulo/applications/tables.py:41
-#: src/postulo/core/csv_import.py:44 src/postulo/jobs/tables.py:40
+#: src/postulo/core/csv_import.py:44 src/postulo/jobs/tables.py:45
+#: src/postulo/jobs/tables.py:202
 #: src/postulo/templates/applications/application_detail.html:126
-#: src/postulo/templates/jobs/listing_list.html:89
 #, draft
 msgid "Location"
 msgstr "Místo"
@@ -5324,6 +5346,7 @@ msgstr "Nejdelší mezera, ve dnech"
 
 #: src/postulo/templates/applications/application_list.html:51
 #: src/postulo/templates/jobs/company_list.html:44
+#: src/postulo/templates/jobs/listing_list.html:43
 #: src/postulo/templates/server/logs.html:144
 #, draft
 msgid "Loosen one of them, or start again."
@@ -5682,7 +5705,7 @@ msgstr "oddíl NACE"
 msgid "name"
 msgstr "název"
 
-#: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:30
+#: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:35
 #: src/postulo/templates/cotton/identifier_row.html:28
 #: src/postulo/templates/partials/phone_numbers.html:47
 #: src/postulo/templates/partials/postal_addresses.html:74
@@ -5809,7 +5832,6 @@ msgid "Newest release"
 msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html:121
-#: src/postulo/templates/jobs/listing_list.html:172
 #: src/postulo/templates/partials/table/pagination.html:30
 #, draft
 msgid "Next"
@@ -6266,17 +6288,21 @@ msgstr "Poznámka"
 msgid "Note (optional)"
 msgstr "Poznámka (nepovinné)"
 
-#: src/postulo/templates/jobs/listing_list.html:101
+#: src/postulo/jobs/tables.py:222
+msgid "Noted"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/listing_row.html:32
 #, python-format, draft
 msgid "noted %(when)s"
 msgstr "zaznamenáno %(when)s"
 
-#: src/postulo/jobs/models.py:720
+#: src/postulo/jobs/models.py:772
 #, draft
 msgid "noted on"
 msgstr "zaznamenáno dne"
 
-#: src/postulo/core/csv_import.py:55 src/postulo/jobs/tables.py:113
+#: src/postulo/core/csv_import.py:55 src/postulo/jobs/tables.py:118
 #: src/postulo/templates/jobs/company_detail.html:186
 #, draft
 msgid "Notes"
@@ -6317,11 +6343,6 @@ msgid ""
 "Nothing has gone quiet for %(days)s days. Either you are on top of it, or it is time to send out a few more."
 msgstr ""
 "Za %(days)s dní nic neutichlo. Buď to máte pod kontrolou, nebo je čas poslat pár dalších."
-
-#: src/postulo/templates/jobs/listing_list.html:185
-#, draft
-msgid "Nothing here"
-msgstr "Nic tu není"
 
 #: src/postulo/plugins/installing.py:495
 #, draft
@@ -6403,6 +6424,7 @@ msgstr "Na server se neposílá žádné heslo, dokud není zadáno nové."
 
 #: src/postulo/templates/applications/application_list.html:49
 #: src/postulo/templates/jobs/company_list.html:42
+#: src/postulo/templates/jobs/listing_list.html:41
 #, draft
 msgid "Nothing matches these filters"
 msgstr "Těmto filtrům nic neodpovídá"
@@ -6502,7 +6524,7 @@ msgstr "Není komu se připomínat."
 msgid "Nothing to connect to"
 msgstr "Není k čemu se připojit"
 
-#: src/postulo/templates/jobs/listing_list.html:179
+#: src/postulo/templates/jobs/listing_list.html:49
 #, draft
 msgid "Nothing to decide"
 msgstr "Není o čem rozhodovat"
@@ -6731,7 +6753,7 @@ msgstr[0] "Jedna žádost odeslaná v tomto období."
 msgstr[1] "%(counter)s žádosti odeslané v tomto období."
 msgstr[2] "%(counter)s žádostí odeslaných v tomto období."
 
-#: src/postulo/templates/jobs/listing_list.html:25
+#: src/postulo/templates/jobs/listing_list.html:87
 #, python-format, draft
 msgid "One capture waiting for review"
 msgid_plural "%(counter)s captures waiting for review"
@@ -7031,7 +7053,6 @@ msgid "Package"
 msgstr "Balíček"
 
 #: src/postulo/templates/applications/suggestion_list.html:116
-#: src/postulo/templates/jobs/listing_list.html:166
 #: src/postulo/templates/partials/table/pagination.html:21
 #, python-format, draft
 msgid "Page %(current)s of %(total)s"
@@ -7043,7 +7064,6 @@ msgid "Page source"
 msgstr "Zdrojový kód stránky"
 
 #: src/postulo/templates/applications/suggestion_list.html:111
-#: src/postulo/templates/jobs/listing_list.html:160
 #: src/postulo/templates/partials/table/pagination.html:12
 #, draft
 msgid "Pagination"
@@ -7054,7 +7074,7 @@ msgstr "Stránkování"
 msgid "Panel"
 msgstr "Panel"
 
-#: src/postulo/jobs/models.py:863
+#: src/postulo/jobs/models.py:915
 #, draft
 msgid "parsed posting"
 msgstr "zpracovaný inzerát"
@@ -7064,7 +7084,7 @@ msgstr "zpracovaný inzerát"
 msgid "part of"
 msgstr "součást"
 
-#: src/postulo/jobs/tables.py:81
+#: src/postulo/jobs/tables.py:86
 #, draft
 msgid "Part of"
 msgstr "Součást"
@@ -7146,7 +7166,7 @@ msgstr "Jen nevyřízené"
 #: src/postulo/core/search.py:393 src/postulo/core/server_sections.py:15
 #: src/postulo/core/server_views.py:150 src/postulo/core/server_views.py:236
 #: src/postulo/core/server_views.py:253 src/postulo/core/server_views.py:331
-#: src/postulo/core/server_views.py:348 src/postulo/jobs/tables.py:96
+#: src/postulo/core/server_views.py:348 src/postulo/jobs/tables.py:101
 #: src/postulo/templates/jobs/company_detail.html:193
 #: src/postulo/templates/server/people.html:7
 #: src/postulo/templates/server/people.html:26
@@ -7404,7 +7424,11 @@ msgstr "Poštovní adresy"
 msgid "postcode"
 msgstr "PSČ"
 
-#: src/postulo/jobs/models.py:699
+#: src/postulo/jobs/tables.py:264
+msgid "Posted"
+msgstr ""
+
+#: src/postulo/jobs/models.py:751
 #, draft
 msgid "posted on"
 msgstr "zveřejněno dne"
@@ -7440,12 +7464,12 @@ msgstr "Inzerát aktualizován."
 msgid "Posting URL"
 msgstr "URL inzerátu"
 
-#: src/postulo/jobs/models.py:668
+#: src/postulo/jobs/models.py:720
 #, draft
 msgid "posting URL"
 msgstr "URL inzerátu"
 
-#: src/postulo/jobs/tables.py:58
+#: src/postulo/jobs/tables.py:63
 #: src/postulo/templates/jobs/company_detail.html:115
 #, draft
 msgid "Postings"
@@ -7581,7 +7605,6 @@ msgid "Preview"
 msgstr "Náhled"
 
 #: src/postulo/templates/applications/suggestion_list.html:113
-#: src/postulo/templates/jobs/listing_list.html:163
 #: src/postulo/templates/partials/table/pagination.html:18
 #, draft
 msgid "Previous"
@@ -7716,6 +7739,10 @@ msgstr "Veřejný sektor"
 msgid "Publication"
 msgstr "Publikace"
 
+#: src/postulo/templates/jobs/partials/listing_bulk_fields.html:17
+msgid "Put them back"
+msgstr ""
+
 #: src/postulo/templates/core/export.html:53
 #, draft
 msgid "Putting it back"
@@ -7810,7 +7837,7 @@ msgstr "Přečteno jako Europass JSON, formát, který exportuje europass.europa
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Přečteno jako Europass XML, formát, který vytvářel editor životopisu."
 
-#: src/postulo/jobs/models.py:855
+#: src/postulo/jobs/models.py:907
 #, draft
 msgid "read by"
 msgstr "přečetl"
@@ -8135,7 +8162,7 @@ msgstr "Odebrat {label}"
 msgid "removed on the other side"
 msgstr "odstraněno na druhé straně"
 
-#: src/postulo/jobs/tables.py:36
+#: src/postulo/jobs/tables.py:41 src/postulo/jobs/tables.py:190
 #, python-format
 msgid "Rename %(what)s"
 msgstr ""
@@ -8188,7 +8215,7 @@ msgstr "Výzkum"
 msgid "Reset"
 msgstr "Obnovit výchozí"
 
-#: src/postulo/templates/jobs/listing_list.html:141
+#: src/postulo/templates/jobs/partials/listing_row.html:116
 #: src/postulo/templates/jobs/posting_detail.html:49
 #, draft
 msgid "Restore"
@@ -8214,7 +8241,7 @@ msgid "Reverse proxy"
 msgstr ""
 
 #: src/postulo/templates/jobs/capture_list.html:42
-#: src/postulo/templates/jobs/listing_list.html:56
+#: src/postulo/templates/jobs/listing_list.html:118
 #, draft
 msgid "Review"
 msgstr "Zkontrolovat"
@@ -8268,11 +8295,10 @@ msgid "robots.txt is currently ignored."
 msgstr "robots.txt je aktuálně ignorován."
 
 #: src/postulo/applications/reports.py:503
-#: src/postulo/applications/tables.py:25
+#: src/postulo/applications/tables.py:25 src/postulo/jobs/tables.py:184
 #: src/postulo/templates/applications/report.html:250
 #: src/postulo/templates/applications/report_print.html:161
 #: src/postulo/templates/core/import_csv_map.html:79
-#: src/postulo/templates/jobs/listing_list.html:87
 #: src/postulo/templates/server/people.html:35
 #: src/postulo/templates/server/people.html:50
 #, draft
@@ -8321,7 +8347,7 @@ msgstr "Spouštět"
 msgid "Salaries are in"
 msgstr "Platy jsou v"
 
-#: src/postulo/applications/tables.py:85
+#: src/postulo/applications/tables.py:85 src/postulo/jobs/tables.py:257
 #: src/postulo/templates/applications/application_detail.html:138
 #: src/postulo/templates/jobs/posting_detail.html:75
 #, draft
@@ -8338,12 +8364,12 @@ msgstr "Plat (jedna částka nebo rozmezí)"
 msgid "Salary from"
 msgstr "Plat od"
 
-#: src/postulo/jobs/models.py:678
+#: src/postulo/jobs/models.py:730
 #, draft
 msgid "salary from"
 msgstr "plat od"
 
-#: src/postulo/jobs/models.py:692
+#: src/postulo/jobs/models.py:744
 #, draft
 msgid "salary period"
 msgstr "období platu"
@@ -8353,7 +8379,7 @@ msgstr "období platu"
 msgid "Salary to"
 msgstr "Plat do"
 
-#: src/postulo/jobs/models.py:681
+#: src/postulo/jobs/models.py:733
 #, draft
 msgid "salary to"
 msgstr "plat do"
@@ -8538,6 +8564,7 @@ msgstr "Zobrazit nabídky"
 
 #: src/postulo/templates/applications/partials/application_row.html:11
 #: src/postulo/templates/jobs/partials/company_row.html:11
+#: src/postulo/templates/jobs/partials/listing_row.html:17
 #, python-format, draft
 msgid "Select %(what)s"
 msgstr "Vybrat %(what)s"
@@ -8547,7 +8574,7 @@ msgstr "Vybrat %(what)s"
 msgid "Select all on this page"
 msgstr "Vybrat vše na této stránce"
 
-#: src/postulo/templates/cotton/table/head.html:45
+#: src/postulo/templates/cotton/table/head.html:49
 #, draft
 msgid "Selected"
 msgstr "Vybráno"
@@ -8717,7 +8744,7 @@ msgstr "Nastavit heslo"
 msgid "Set up"
 msgstr "Nastavit"
 
-#: src/postulo/jobs/models.py:710
+#: src/postulo/jobs/models.py:762
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Nastavte, když už místo není k dispozici."
@@ -8757,18 +8784,22 @@ msgstr "Součást Postulo. Nelze jej odebrat."
 msgid "Shortcuts"
 msgstr "Zkratky"
 
-#: src/postulo/templates/jobs/listing_list.html:124
+#: src/postulo/templates/jobs/partials/listing_row.html:99
 #: src/postulo/templates/jobs/posting_detail.html:31
 #, draft
 msgid "Shortlist"
 msgstr "Užší výběr"
 
-#: src/postulo/jobs/listing_views.py:26 src/postulo/jobs/models.py:579
+#: src/postulo/templates/jobs/partials/listing_bulk_fields.html:15
+msgid "Shortlist them"
+msgstr ""
+
+#: src/postulo/jobs/listing_views.py:33 src/postulo/jobs/models.py:579
 #, draft
 msgid "Shortlisted"
 msgstr "V užším výběru"
 
-#: src/postulo/jobs/listing_views.py:130
+#: src/postulo/jobs/listing_views.py:237
 #, draft
 msgid "Shortlisted."
 msgstr "Zařazeno do užšího výběru."
@@ -9134,7 +9165,7 @@ msgid ""
 msgstr ""
 "Zdroj je pole „nalezeno přes“ u inzerátu. Vyplňte ho a tato tabulka si začne zasluhovat své místo."
 
-#: src/postulo/jobs/models.py:856
+#: src/postulo/jobs/models.py:908
 #, draft
 msgid "source version"
 msgstr "verze zdroje"
@@ -9195,12 +9226,12 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, po připojení"
 
-#: src/postulo/jobs/models.py:714 src/postulo/plugins/models.py:123
+#: src/postulo/jobs/models.py:766 src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
 msgstr "stav"
 
-#: src/postulo/templates/jobs/listing_list.html:91
+#: src/postulo/jobs/tables.py:219
 #: src/postulo/templates/server/person_recovery.html:64
 #, draft
 msgid "State"
@@ -9208,7 +9239,7 @@ msgstr "Stav"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:252
 #: src/postulo/applications/models.py:717 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:865
+#: src/postulo/jobs/models.py:917
 #, draft
 msgid "status"
 msgstr "stav"
@@ -9754,7 +9785,8 @@ msgstr "To není výsledek, který Postulo zná."
 msgid "That is not something Postulo can do about it."
 msgstr "To s tím Postulo udělat nemůže."
 
-#: src/postulo/applications/views.py:260 src/postulo/jobs/views.py:158
+#: src/postulo/applications/views.py:260 src/postulo/jobs/listing_views.py:168
+#: src/postulo/jobs/views.py:158
 #, draft
 msgid "That is not something Postulo can do to several at once."
 msgstr "To není něco, co Postulo dokáže udělat s několika najednou."
@@ -9910,7 +9942,7 @@ msgstr "Adresa odpověděla %(code)s."
 msgid "The address answered with nothing."
 msgstr "Adresa neodpověděla ničím."
 
-#: src/postulo/jobs/models.py:704
+#: src/postulo/jobs/models.py:756
 #, draft
 msgid "The application deadline, if stated."
 msgstr "Uzávěrka přihlášek, pokud je uvedena."
@@ -10117,7 +10149,7 @@ msgid ""
 "The link for the page you are on is underlined as well as shaded and set in bolder type. Turn the underline off for a quieter header: the weight and the shade stay, so the page you are on is never marked by colour alone. A high-contrast theme underlines it whatever you choose here, because there the shading is discarded and the underline is not."
 msgstr ""
 
-#: src/postulo/jobs/models.py:874
+#: src/postulo/jobs/models.py:926
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr "Nabídka, kterou se toto zachycení po kontrole stalo."
@@ -10222,6 +10254,7 @@ msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Zásuvné moduly dodávané uvnitř Postula. Nic se nestahuje."
 
 #: src/postulo/templates/applications/application_detail.html:122
+#: src/postulo/templates/jobs/partials/listing_row.html:80
 #, draft
 msgid "The posting"
 msgstr "Inzerát"
@@ -10366,7 +10399,7 @@ msgid ""
 msgstr ""
 "Časové pásmo je nastaveno prostředím: <code>%(variable)s</code> = %(zone)s. Odeberte to z prostředí, abyste ho mohli změnit zde."
 
-#: src/postulo/applications/forms.py:83 src/postulo/jobs/forms.py:555
+#: src/postulo/applications/forms.py:83 src/postulo/jobs/forms.py:559
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "Horní částka nemůže být nižší než dolní."
@@ -10664,7 +10697,7 @@ msgstr "Přes %(provider)s: budete požádáni také o kód."
 msgid "Through the employment service"
 msgstr "Přes úřad práce"
 
-#: src/postulo/templates/jobs/listing_list.html:47
+#: src/postulo/templates/jobs/listing_list.html:109
 #, python-format, draft
 msgid "Tick %(title)s"
 msgstr "Zaškrtnout %(title)s"
@@ -10724,7 +10757,7 @@ msgid "timeout in seconds"
 msgstr "časový limit v sekundách"
 
 #: src/postulo/documents/models.py:445 src/postulo/documents/models.py:586
-#: src/postulo/jobs/models.py:659 src/postulo/notifications/models.py:24
+#: src/postulo/jobs/models.py:711 src/postulo/notifications/models.py:24
 #: src/postulo/resume/models.py:263
 #, draft
 msgid "title"
@@ -10745,13 +10778,13 @@ msgstr "TLS od prvního bajtu"
 msgid "To"
 msgstr "Do"
 
-#: src/postulo/templates/cotton/table/head.html:137
+#: src/postulo/templates/cotton/table/head.html:146
 #: src/postulo/templates/partials/table/narrow.html:41
 #, draft
 msgid "to"
 msgstr "do"
 
-#: src/postulo/jobs/listing_views.py:25
+#: src/postulo/jobs/listing_views.py:32
 #, draft
 msgid "To decide"
 msgstr "K rozhodnutí"
@@ -10872,7 +10905,7 @@ msgstr "Zkuste méně slov nebo jiný pravopis."
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Nejdřív zapněte „Používat můj Gravatar“."
 
-#: src/postulo/jobs/models.py:836
+#: src/postulo/jobs/models.py:888
 #, draft
 msgid "Turned into an application"
 msgstr "Přeměněno na žádost"
@@ -10961,7 +10994,7 @@ msgstr ""
 msgid "until"
 msgstr "do"
 
-#: src/postulo/jobs/models.py:824
+#: src/postulo/jobs/models.py:876
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "do %(high)s"
@@ -11187,7 +11220,7 @@ msgstr ""
 msgid "Waiting after this one: %(count)s."
 msgstr "Po této čeká: %(count)s."
 
-#: src/postulo/applications/models.py:655 src/postulo/jobs/models.py:835
+#: src/postulo/applications/models.py:655 src/postulo/jobs/models.py:887
 #, draft
 msgid "Waiting for review"
 msgstr "Čeká na kontrolu"
@@ -11246,7 +11279,7 @@ msgid "web links"
 msgstr "webové odkazy"
 
 #: src/postulo/core/models.py:526 src/postulo/core/web_links.py:113
-#: src/postulo/jobs/tables.py:103
+#: src/postulo/jobs/tables.py:108
 #: src/postulo/templates/jobs/company_detail.html:87
 #, draft
 msgid "Website"
@@ -11470,6 +11503,10 @@ msgstr "Jak se má jmenovat"
 msgid "what to do"
 msgstr "co dělat"
 
+#: src/postulo/templates/jobs/listing_list.html:28
+msgid "What to do about it"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html:17
 #, draft
 msgid ""
@@ -11521,7 +11558,7 @@ msgstr "Kdy"
 msgid "When accepting should also move the application."
 msgstr "Když má přijetí žádost také posunout."
 
-#: src/postulo/jobs/models.py:720
+#: src/postulo/jobs/models.py:772
 #, draft
 msgid "When it entered your listings."
 msgstr "Kdy se dostala do vašich nabídek."
@@ -11600,7 +11637,7 @@ msgid ""
 msgstr ""
 "Kde tento záznam v rámci své sekce leží, se nastavuje šipkami ve <a href=\"%(overview_url)s\" class=\"underline\">Vaší kariéře</a>."
 
-#: src/postulo/jobs/models.py:673
+#: src/postulo/jobs/models.py:725
 #, draft
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Kde jste na to narazili: pracovní portál, doporučení, web firmy."
@@ -11667,7 +11704,7 @@ msgid ""
 msgstr ""
 "V jakém jazyce jsou zapsány vaše zkušenosti, vzdělání a projekty. Životopis v jiném jazyce ukáže, co jste přeložili, a řekne, co nemohl."
 
-#: src/postulo/jobs/models.py:861
+#: src/postulo/jobs/models.py:913
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Která část Postula to vytvořila: webové rozhraní, nebo API."
@@ -11702,7 +11739,11 @@ msgstr "s kým se setkáváte"
 msgid "Why"
 msgstr "Proč"
 
-#: src/postulo/jobs/models.py:717
+#: src/postulo/jobs/tables.py:275
+msgid "Why discarded"
+msgstr ""
+
+#: src/postulo/jobs/models.py:769
 #, draft
 msgid "why it was discarded"
 msgstr "proč bylo zahozeno"
@@ -11712,12 +11753,16 @@ msgstr "proč bylo zahozeno"
 msgid "Why rows were skipped"
 msgstr "Proč byly řádky přeskočeny"
 
+#: src/postulo/templates/jobs/partials/listing_bulk_fields.html:21
+msgid "Why, if discarding"
+msgstr ""
+
 #: src/postulo/accounts/models.py:348
 #, draft
 msgid "widgets already offered"
 msgstr "již nabídnuté widgety"
 
-#: src/postulo/templates/cotton/table/head.html:33
+#: src/postulo/templates/cotton/table/head.html:37
 #, draft
 msgid "Width of {column}"
 msgstr "Šířka sloupce {column}"
@@ -11762,13 +11807,13 @@ msgstr "Práce"
 msgid "worked %(when)s"
 msgstr "fungovalo %(when)s"
 
-#: src/postulo/applications/forms.py:48
+#: src/postulo/applications/forms.py:48 src/postulo/jobs/tables.py:238
 #: src/postulo/templates/applications/application_detail.html:132
 #, draft
 msgid "Working arrangement"
 msgstr "Forma práce"
 
-#: src/postulo/jobs/models.py:662
+#: src/postulo/jobs/models.py:714
 #, draft
 msgid "working arrangement"
 msgstr "forma práce"
@@ -12153,7 +12198,7 @@ msgstr "vaše pozice"
 msgid "Your username has been changed."
 msgstr "Vaše uživatelské jméno bylo změněno."
 
-#: src/postulo/templates/cotton/table/head.html:34
+#: src/postulo/templates/cotton/table/head.html:38
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} pixelů"

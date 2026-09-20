@@ -246,6 +246,9 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     return [
         "/",
         "/listings/",
+        # Sorted and on a tab that is not the usual one, so the walk sees the header row,
+        # the bulk bar and the state column with rows under them (#160).
+        "/listings/?state=all&sort=title",
         "/listings/new/",
         "/applications/",
         "/applications/?company=aperture&sort=applied",

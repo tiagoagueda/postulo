@@ -1,11 +1,16 @@
-"""The companies table: what it can show, sort by and narrow on."""
+"""The tables this app draws: companies, and the listings waiting to be decided."""
 
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.tables import Column, Table, register
 
 from . import identifiers
-from .models import CompanyKind
+from .models import (
+    CompanyKind,
+    DiscardReason,
+    EmploymentType,
+    RemoteType,
+)
 
 
 @register
@@ -144,4 +149,147 @@ class CompaniesTable(Table):
             lookups=("created_at",),
             datetime=True,
         ),
+    )
+
+
+@register
+class ListingsTable(Table):
+    """Every posting noticed and not yet decided about, as a table (#160).
+
+    The page most like a channel list -- many rows, triaged in bulk, mostly discarded --
+    was the one drawing its own rows, so none of what `core/tables.py` gives a list was
+    available on it: no sort, no per-column filter, no chosen columns, no bulk action.
+
+    **The state is a column but not a filter.** Which listings to look at is a workflow --
+    to decide, shortlisted, discarded, applied, closed -- and it has a control of its own
+    above the table, where the counts are. A second `choice` filter for the same question
+    would be two controls disagreeing about which rows are on the page, so the column
+    shows the state and sorts by it and narrows nothing (`state` is in `extra_params`
+    instead, so *Clear* and the empty state still know it is a filter).
+    """
+
+    name = "listings"
+    label = _("Listings")
+    #: Soonest deadline first, which is the order a page for deciding wants: the ones
+    #: with no closing date follow, because `ordering` puts nulls last everywhere.
+    default_sort = "closes"
+    #: The state tabs above the table, which narrow the list without being a column.
+    extra_params = ("state",)
+    noun = (_("listing"), _("listings"))
+    columns = (
+        # The role, which opens the posting; the pencil beside it renames where it sits,
+        # exactly as a company's name does (#135, #252).
+        Column(
+            "title",
+            _("Role"),
+            sort=("title",),
+            filter="text",
+            lookups=("title",),
+            default=True,
+            editable="title",
+            edit_label=_("Rename %(what)s"),
+        ),
+        Column(
+            "company",
+            _("Company"),
+            sort=("company__name",),
+            filter="text",
+            lookups=("company__name",),
+            default=True,
+        ),
+        Column(
+            "location",
+            _("Location"),
+            sort=("location",),
+            filter="text",
+            lookups=("location",),
+            default=True,
+        ),
+        # A day rather than a moment, so the pair narrows on the date column itself.
+        Column(
+            "closes",
+            _("Closes"),
+            sort=("closes_at",),
+            filter="date",
+            lookups=("closes_at",),
+            default=True,
+        ),
+        # Sorted by what the cell says rather than by what the row stores: see
+        # `with_state_order`. Narrowed by the tabs above, not here.
+        Column("state", _("State"), sort=("state_order",), default=True),
+        Column(
+            "noted",
+            _("Noted"),
+            sort=("noted_at",),
+            newest_first=True,
+            filter="date",
+            lookups=("noted_at",),
+            datetime=True,
+        ),
+        Column(
+            "source",
+            _("Found via"),
+            sort=("source",),
+            filter="text",
+            lookups=("source",),
+        ),
+        Column(
+            "remote",
+            _("Working arrangement"),
+            sort=("remote_type",),
+            filter="choice",
+            lookups=("remote_type",),
+            choices=tuple(RemoteType.choices),
+        ),
+        Column(
+            "employment",
+            _("Employment type"),
+            sort=("employment_type",),
+            filter="choice",
+            lookups=("employment_type",),
+            choices=tuple(EmploymentType.choices),
+        ),
+        # Currency first, then the figure brought to a year: see `with_salary_order`. No
+        # filter, because a bound would have to be in some currency and some period, and
+        # the honest version of that control is a question this table is not asking.
+        Column(
+            "salary",
+            _("Salary"),
+            sort=("salary_currency", "salary_year_max", "salary_year_min"),
+            newest_first=True,
+            numeric=True,
+        ),
+        Column(
+            "posted",
+            _("Posted"),
+            sort=("posted_at",),
+            newest_first=True,
+            filter="date",
+            lookups=("posted_at",),
+        ),
+        # Why a discarded one was let go. Off by default -- it says nothing about the rows
+        # on the page most of the time -- and here because "show me everything I turned
+        # down over the pay" is a real question and there was no way to ask it.
+        Column(
+            "discarded",
+            _("Why discarded"),
+            sort=("discard_reason",),
+            filter="choice",
+            lookups=("discard_reason",),
+            choices=tuple(DiscardReason.choices),
+        ),
+        Column(
+            "applications",
+            _("Applications"),
+            sort=("application_count",),
+            newest_first=True,
+            numeric=True,
+            filter="number",
+            lookups=("application_count",),
+        ),
+        Column("url", _("Address"), sort=("url",), filter="text", lookups=("url",)),
+        # Free text: an alphabetical order of a posting's description means nothing, so
+        # there is no sort; the filter matches within it, which is how somebody finds the
+        # three listings that mentioned a technology.
+        Column("description", _("Description"), filter="text", lookups=("description",)),
     )

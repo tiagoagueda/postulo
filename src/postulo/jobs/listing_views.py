@@ -8,7 +8,10 @@ so the record is the same as if it had been typed in one go.
 
 from __future__ import annotations
 
+from functools import cached_property
+
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -16,10 +19,14 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
 
+from postulo.core import tables
+from postulo.core.cells import EditableCellView
 from postulo.core.mixins import OwnedObjectMixin
 from postulo.core.redirects import safe_next
 
+from .forms import JobPostingForm
 from .models import LISTING_FILTERS, Capture, CaptureStatus, DiscardReason, JobPosting, ListingState
+from .tables import ListingsTable
 
 FILTER_LABELS = {
     "undecided": _("To decide"),
@@ -32,10 +39,34 @@ FILTER_LABELS = {
 
 
 class ListingListView(OwnedObjectMixin, ListView):
+    """The triage table: many rows, looked at once, mostly discarded (#160).
+
+    The page drew its own rows until now, so it had none of what `core/tables.py` gives a
+    list -- and it is the page in Postulo that wanted them most. Two kinds of narrowing sit
+    on it, and they are deliberately different controls:
+
+    **The tabs are the workflow.** To decide, shortlisted, discarded, applied, closed. Three
+    of those are not a column at all -- *applied* is read from the applications and *closed*
+    from two dates -- and each carries a count, which is the reason to look at it. They stay
+    a strip of links above the table.
+
+    **The header row is the question.** Role, company, location, when it closes: narrowing
+    within whatever the tabs left. The two compose, and the tab travels in the query string
+    beside the filters, so one link carries both.
+    """
+
     model = JobPosting
     template_name = "jobs/listing_list.html"
     context_object_name = "listings"
-    paginate_by = 50
+
+    @cached_property
+    def table(self) -> ListingsTable:
+        return ListingsTable(
+            self.request, tables.settings_for(self.request.user, ListingsTable.name)
+        )
+
+    def get_paginate_by(self, queryset) -> int:
+        return self.table.page_size
 
     def current_filter(self) -> str:
         wanted = self.request.GET.get("state", "undecided")
@@ -44,20 +75,38 @@ class ListingListView(OwnedObjectMixin, ListView):
         return "undecided"
 
     def get_queryset(self):
-        # Annotating with a count groups the query, and a grouped query drops the model's
-        # default ordering, so every branch orders explicitly: pagination needs it.
-        queryset = super().get_queryset().select_related("company").with_application_count()
+        # The tab first, because `undecided` and `in_state` do their own counting and a
+        # second annotation under the same name is an error rather than a no-op; the
+        # table's ordering and filters second. That ordering always ends in the key, so
+        # pagination over the aggregated rows never repeats a row or skips one.
+        queryset = super().get_queryset()
         current = self.current_filter()
         if current == "undecided":
-            return queryset.undecided().order_by("state", "closes_at", "-noted_at", "-pk")
-        if current == "all":
-            return queryset.order_by("-noted_at", "-pk")
-        return queryset.in_state(current).order_by("-noted_at", "-pk")
+            queryset = queryset.undecided()
+        elif current == "all":
+            queryset = queryset.with_application_count()
+        else:
+            queryset = queryset.in_state(current)
+        queryset = queryset.select_related("company").with_table_data()
+        return self.table.apply(queryset)
+
+    def get_template_names(self) -> list[str]:
+        if self.request.htmx and not self.request.htmx.history_restore_request:
+            return [f"{self.template_name}#htmx"]
+        return [self.template_name]
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         everything = JobPosting.objects.for_user(self.request.user)
         current = self.current_filter()
+        counts = {
+            "undecided": everything.undecided().count(),
+            ListingState.SHORTLISTED: everything.in_state(ListingState.SHORTLISTED).count(),
+            ListingState.DISCARDED: everything.in_state(ListingState.DISCARDED).count(),
+            "applied": everything.in_state("applied").count(),
+            "closed": everything.in_state("closed").count(),
+            "all": everything.count(),
+        }
         context["current_filter"] = current
         context["filters"] = [
             {
@@ -66,20 +115,78 @@ class ListingListView(OwnedObjectMixin, ListView):
                 "active": value == current,
                 "count": count,
             }
-            for value, count in (
-                ("undecided", everything.undecided().count()),
-                (ListingState.SHORTLISTED, everything.in_state(ListingState.SHORTLISTED).count()),
-                (ListingState.DISCARDED, everything.in_state(ListingState.DISCARDED).count()),
-                ("applied", everything.in_state("applied").count()),
-                ("closed", everything.in_state("closed").count()),
-                ("all", everything.count()),
-            )
+            for value, count in counts.items()
         ]
+        # Whether this person has any listings *at all*, which is what decides whether the
+        # page wears its table chrome. A Columns control, a filter row and a bulk bar over
+        # no rows is worse than the sentence that used to be here; an empty *Discarded* tab
+        # belonging to somebody with forty listings is not that, and keeps them (#160).
+        context["has_listings"] = counts["all"] > 0
         context["pending_captures"] = Capture.objects.for_user(self.request.user).filter(
             status=CaptureStatus.PENDING
         )[:20]
         context["discard_reasons"] = DiscardReason.choices
+        context["table"] = self.table
+        context["page_sizes"] = tables.PAGE_SIZES
         return context
+
+
+class ListingCellView(LoginRequiredMixin, EditableCellView):
+    """One cell of the listings table, changed where it sits (#135, #160)."""
+
+    model = JobPosting
+    form_class = JobPostingForm
+    columns = ListingsTable.columns
+    form_url_name = "jobs:posting_update"
+
+
+class ListingBulkView(LoginRequiredMixin, View):
+    """Decide about several listings at once: the gesture this page exists for (#160).
+
+    *Look at forty, keep three* is the shape of the work, and doing it a row at a time was
+    forty round trips. Three actions, every one of them a move between states that any of
+    the others undoes -- there is no bulk delete here, any more than anywhere else (#134).
+
+    **Discard asks for its reason once, in the bar, and gives it to every ticked row.** The
+    alternative was leaving discard out of the bulk actions, which would have left out the
+    thing people do most on this page. Asked once is a fair description of the gesture:
+    somebody sweeping a page is turning those rows down *for the same reason*, and a row
+    whose reason was really another can be discarded again from its own row, which replaces
+    it.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        from postulo.core import bulk
+
+        rows = bulk.chosen_rows(request, JobPosting)
+        if not rows.exists():
+            messages.info(request, bulk.nothing_chosen())
+            return redirect(self._back(request))
+
+        action = request.POST.get(bulk.ACTION, "")
+        if action not in ("shortlist", "discard", "restore"):
+            messages.error(request, _("That is not something Postulo can do to several at once."))
+            return redirect(self._back(request))
+
+        reason = request.POST.get("reason", "")
+        if reason not in DiscardReason.values:
+            reason = DiscardReason.OTHER
+
+        changed = 0
+        for listing in rows:
+            if action == "shortlist":
+                listing.shortlist()
+            elif action == "discard":
+                listing.discard(reason)
+            else:
+                listing.restore()
+            changed += 1
+        messages.success(request, bulk.changed(changed, ListingsTable.noun))
+        return redirect(self._back(request))
+
+    @staticmethod
+    def _back(request: HttpRequest) -> str:
+        return safe_next(request, reverse("listings:list"))
 
 
 class ListingCreateView(OwnedObjectMixin, View):

@@ -1,0 +1,25 @@
+{% load i18n %}
+{% comment %} What can be done to several listings at once (#160).
+
+   Three moves between states, no delete: every one of these is undone by another of them,
+   which is not true of deleting forty postings, and bulk delete has no confirmation worth
+   the name anywhere in Postulo yet (#134).
+
+   The reason belongs to *Discard* and is asked once, for all of them. Leaving discard out
+   of the bulk actions would have left out the thing this page exists for; a row that really
+   went for another reason can be discarded again from its own buttons, which replaces it.
+{% endcomment %}
+<div>
+  <label class="field-label" for="bulk-action">{% translate "Do this" %}</label>
+  <select id="bulk-action" name="bulk-action" class="field-input">
+    <option value="shortlist">{% translate "Shortlist them" %}</option>
+    <option value="discard">{% translate "Discard them" %}</option>
+    <option value="restore">{% translate "Put them back" %}</option>
+  </select>
+</div>
+<div>
+  <label class="field-label" for="bulk-reason">{% translate "Why, if discarding" %}</label>
+  <select id="bulk-reason" name="reason" class="field-input">
+    {% for value, label in discard_reasons %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+  </select>
+</div>

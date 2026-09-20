@@ -349,8 +349,8 @@ def test_the_optional_columns_show_what_they_promise(client, user, search):
     assert "Last activity" in body and "Next reminder" in body and "High" in body
 
 
-def test_the_registry_knows_both_tables_and_nothing_else():
-    assert set(tables.TABLES) == {"applications", "companies"}
+def test_the_registry_knows_the_three_tables_and_nothing_else():
+    assert set(tables.TABLES) == {"applications", "companies", "listings"}
     assert tables.TABLES["applications"] is ApplicationsTable
     with pytest.raises(ValueError, match="needs a name"):
         tables.register(type("Nameless", (tables.Table,), {}))

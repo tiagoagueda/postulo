@@ -14,7 +14,7 @@ from datetime import timedelta
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Max
+from django.db.models import Case, Count, DecimalField, F, IntegerField, Max, Q, Value, When
 from django.db.models.functions import Lower
 from django.urls import reverse
 from django.utils import timezone
@@ -609,6 +609,58 @@ class JobPostingQuerySet(models.QuerySet):
 
     def with_application_count(self) -> JobPostingQuerySet:
         return self.annotate(application_count=models.Count("applications", distinct=True))
+
+    def with_salary_order(self) -> JobPostingQuerySet:
+        """Annotate a yearly figure to sort the salary column by, within a currency.
+
+        The same arithmetic the applications table does on the posting it points at (#224),
+        moved to where the posting is the row. Sorting on the raw number puts an hourly rate
+        below every annual one; the currency is sorted on first, because turning one into
+        another needs a rate, and a wrong rate would be a number Postulo invented and then
+        showed as a fact (#160).
+        """
+        yearly = Case(
+            When(salary_period=SalaryPeriod.HOUR, then=Value(1680)),
+            When(salary_period=SalaryPeriod.DAY, then=Value(220)),
+            When(salary_period=SalaryPeriod.MONTH, then=Value(12)),
+            default=Value(1),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+        return self.annotate(
+            salary_year_max=F("salary_max") * yearly,
+            salary_year_min=F("salary_min") * yearly,
+        )
+
+    def with_state_order(self) -> JobPostingQuerySet:
+        """Annotate the order the *State* column sorts by: the state a row shows.
+
+        `derived_state` is a property over four facts, so a column that sorted on the stored
+        `state` would order by something other than the word in the cell -- an applied
+        listing still stores *new*. The same precedence, expressed once more in SQL, in the
+        order the tabs above the table are in: to decide, applied, closed, discarded (#160).
+        """
+        return self.annotate(
+            state_order=Case(
+                When(application_count__gt=0, then=Value(2)),
+                When(state=ListingState.DISCARDED, then=Value(4)),
+                When(
+                    Q(closed_at__isnull=False) | Q(closes_at__lt=timezone.localdate()),
+                    then=Value(3),
+                ),
+                When(state=ListingState.SHORTLISTED, then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            )
+        )
+
+    def with_table_data(self) -> JobPostingQuerySet:
+        """What the listings table sorts by, over a set that has already been counted.
+
+        Not the count itself: `undecided` and `in_state` annotate it to do their own work,
+        and annotating the same name twice is an error rather than a no-op. The view picks
+        its rows first and asks for this second (#160).
+        """
+        return self.with_salary_order().with_state_order()
 
     def undecided(self) -> JobPostingQuerySet:
         """New or shortlisted, not applied to, and still open: what the person must decide."""

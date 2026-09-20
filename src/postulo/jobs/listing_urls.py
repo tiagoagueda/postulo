@@ -7,6 +7,12 @@ app_name = "listings"
 urlpatterns = [
     path("", views.ListingListView.as_view(), name="list"),
     path("new/", views.ListingCreateView.as_view(), name="create"),
+    path("bulk/", views.ListingBulkView.as_view(), name="bulk"),
+    path(
+        "<int:pk>/cell/<slug:column>/",
+        views.ListingCellView.as_view(),
+        name="cell",
+    ),
     path(
         "<int:pk>/shortlist/",
         views.ListingStateView.as_view(action="shortlist"),

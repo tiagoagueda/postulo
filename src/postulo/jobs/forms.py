@@ -546,7 +546,11 @@ class JobPostingForm(OwnerScopedModelForm):
         }
 
     def scope_querysets(self) -> None:
-        self.fields["company"].queryset = Company.objects.for_user(self.user)
+        # `get`, because a cell editor is this form narrowed to one field, and the field it
+        # was narrowed to is usually not this one (#135, #160).
+        company = self.fields.get("company")
+        if company is not None:
+            company.queryset = Company.objects.for_user(self.user)
 
     def clean(self):
         cleaned = super().clean()

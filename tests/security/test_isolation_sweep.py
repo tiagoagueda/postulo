@@ -282,6 +282,7 @@ FACTORIES: dict[str, Callable] = {
     "jobs:posting_detail": pk_of(posting),
     "jobs:posting_update": pk_of(posting),
     "listings:apply": pk_of(posting),
+    "listings:cell": pk_of(posting, column="title"),
     "listings:discard": pk_of(posting),
     "listings:restore": pk_of(posting),
     "listings:shortlist": pk_of(posting),

@@ -1,0 +1,125 @@
+{% load i18n postulo %}
+{% comment %} One listing, drawn in whichever columns this person chose, and ending in the
+   buttons that decide about it (#160).
+
+   `data-listing-state` stays on the row: it is what says which of the five states a row is
+   in to anything reading the page, and it was here before the page was a table.
+{% endcomment %}
+<tr id="listing-{{ listing.pk }}" data-listing-state="{{ listing.derived_state }}"
+    class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+  {% comment %} Belongs to the bulk form by `form=` rather than by nesting: the table already
+     sits inside the filter form, and one form cannot hold another (#134). {% endcomment %}
+  {% if bulk_form_id %}
+    <td class="px-4 py-3">
+      <label class="tap-target justify-center">
+        <input type="checkbox" name="chosen" value="{{ listing.pk }}" form="{{ bulk_form_id }}"
+               data-bulk-row aria-label="{% blocktranslate trimmed with what=listing.title %}Select {{ what }}{% endblocktranslate %}">
+      </label>
+    </td>
+  {% endif %}
+  {% for column in columns %}
+    {% if column.key == 'title' %}
+      <td class="px-4 py-3">
+        {% comment %} The role opens the posting, as a name does in every other list; the
+           pencil beside it renames where it sits, or -- with no script -- is a link to the
+           form, which is exactly what the title was before (#135, #252). {% endcomment %}
+        {% url 'listings:cell' listing.pk 'title' as cell_url %}
+        {% url 'jobs:posting_update' listing.pk as form_url %}
+        {% include "partials/table/cell.html" with object=listing value=listing.title editing=False message="" cell_url=cell_url form_url=form_url record_url=listing.get_absolute_url %}
+        <p class="text-xs text-ink-500 dark:text-ink-400">
+          {% blocktranslate with when=listing.noted_at|date:"MONTH_DAY_FORMAT" trimmed %}noted {{ when }}{% endblocktranslate %}
+          {% if listing.source %} · <bdi>{{ listing.source }}</bdi>{% endif %}
+        </p>
+      </td>
+    {% elif column.key == 'company' %}
+      <td class="px-4 py-3">
+        <a href="{{ listing.company.get_absolute_url }}" class="hover:underline"><bdi>{{ listing.company.name }}</bdi></a>
+      </td>
+    {% elif column.key == 'location' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ listing.location|default:"—" }}</td>
+    {% elif column.key == 'closes' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ listing.closes_at|date:"DATE_FORMAT"|default:"—" }}
+      </td>
+    {% elif column.key == 'state' %}
+      <td class="px-4 py-3">
+        <span class="chip py-0 text-xs"><span class="chip-text">{{ listing.derived_state_label }}</span></span>
+      </td>
+    {% elif column.key == 'noted' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ listing.noted_at|date:"DATE_FORMAT" }}
+      </td>
+    {% elif column.key == 'source' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400"><bdi>{{ listing.source|default:"—" }}</bdi></td>
+    {% elif column.key == 'remote' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ listing.get_remote_type_display|default:"—" }}</td>
+    {% elif column.key == 'employment' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ listing.get_employment_type_display|default:"—" }}</td>
+    {% elif column.key == 'salary' %}
+      {% comment %} The whole sentence the posting page shows, period included: 30 and 40
+         with no period reads as a year's pay, and an hourly rate shown that way is wrong
+         by about a factor of two thousand (#224). {% endcomment %}
+      <td class="px-4 py-3 text-end text-ink-500 tabular-nums dark:text-ink-400">
+        {{ listing.salary_display|default:"—" }}
+      </td>
+    {% elif column.key == 'posted' %}
+      <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+        {{ listing.posted_at|date:"DATE_FORMAT"|default:"—" }}
+      </td>
+    {% elif column.key == 'discarded' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ listing.get_discard_reason_display|default:"—" }}</td>
+    {% elif column.key == 'applications' %}
+      <td class="px-4 py-3 text-end tabular-nums">{{ listing.application_count }}</td>
+    {% elif column.key == 'url' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">
+        {% if listing.url %}
+          <a href="{{ listing.url }}" rel="noopener noreferrer external" target="_blank"
+             class="text-brand-600 underline dark:text-brand-400">{% translate "The posting" %}</a>
+        {% else %}—{% endif %}
+      </td>
+    {% elif column.key == 'description' %}
+      {% comment %} Two visible lines rather than one truncated with the rest in a tooltip a
+         keyboard or a touch never sees (#276); the posting's page has the whole of it. {% endcomment %}
+      <td class="max-w-xs px-4 py-3 text-ink-500 dark:text-ink-400">
+        <span class="line-clamp-2">{{ listing.description|default:"—" }}</span>
+      </td>
+    {% endif %}
+  {% endfor %}
+  <td class="px-4 py-3">
+    <div class="flex items-center justify-end gap-1">
+      {% if listing.is_undecided %}
+        {% if listing.state != "shortlisted" %}
+          <form method="post" action="{% url 'listings:shortlist' listing.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Shortlist" %}</button>
+          </form>
+        {% endif %}
+        <form method="post" action="{% url 'listings:discard' listing.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs">
+            {% translate "Discard" %}
+          </button>
+        </form>
+        <a href="{% url 'listings:apply' listing.pk %}" class="btn" data-size="xs">
+          {% translate "Apply" %}
+        </a>
+      {% elif listing.derived_state == "discarded" %}
+        <form method="post" action="{% url 'listings:restore' listing.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Restore" %}</button>
+        </form>
+      {% elif listing.derived_state == "applied" %}
+        {% with application=listing.applications.all|first %}
+          {% if application %}
+            <a href="{{ application.get_absolute_url }}" class="btn" data-variant="ghost" data-size="xs">
+              {% translate "Application" %}
+            </a>
+          {% endif %}
+        {% endwith %}
+      {% endif %}
+    </div>
+  </td>
+</tr>

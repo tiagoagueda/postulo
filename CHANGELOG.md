@@ -43,6 +43,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Listings are a table like the other two: sorted by any column, narrowed per column, with
+  the columns you choose, and a bar that shortlists or discards everything you ticked in
+  one go. The state tabs and their counts stay above it. (#160)
 - An upload records which language it is in and a sent PDF records the one it declared when
   it was frozen, so a store no longer files a German certificate under the language its
   owner reads Postulo in, and editing a CV no longer rewrites what was sent. (#283)
