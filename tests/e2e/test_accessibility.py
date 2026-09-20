@@ -325,6 +325,9 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/server/plugins/",
         "/server/capture/",
         "/server/defaults/",
+        # The gallery: every component on one page, which is the point of walking it
+        # here -- a component seen only inside a feature is one axe never sees whole (#292).
+        "/server/design/",
         "/accounts/password/change/",
         # The pages allauth renders, which now sit inside Postulo's own layout. They
         # passed here throughout while being entirely unstyled, which is the limit of

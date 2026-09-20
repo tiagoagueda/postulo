@@ -1,0 +1,203 @@
+{% extends "server/base.html" %}
+{% load i18n postulo %}
+
+{% block content %}
+  {% comment %} The gallery (#292). Every component the interface is made of, on one page, so
+     a change to the paint can be looked at before it is spread across 184 templates -- and
+     so the browser suite has one page where axe sees the lot at once.
+
+     Nothing here is a control that does anything: the buttons go nowhere and the fields save
+     nothing. They are the real classes, though, drawn from the real stylesheet, because a
+     gallery built from copies is a gallery that stops being true.
+  {% endcomment %}
+  <h1 class="mb-1 text-2xl font-semibold tracking-tight">{% translate "Design" %}</h1>
+  <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+    {% translate "Every piece the interface is built from, in the theme you are reading it in. Switch the theme under Settings → Appearance to see the other one." %}
+  </p>
+
+  <nav class="mb-8 flex flex-wrap gap-1" aria-label="{% translate 'Sections of this page' %}">
+    {% for section in sections %}
+      <a href="#design-{{ section.slug }}" class="nav-link">{{ section.label }}</a>
+    {% endfor %}
+  </nav>
+
+  <!-- ------------------------------------------------------------------- colour -->
+  <section id="design-colour" class="mb-10" aria-labelledby="design-colour-heading">
+    <h2 id="design-colour-heading" class="mb-3 font-medium">{% translate "Colour" %}</h2>
+
+    {% for scale in scales %}
+      <h3 class="mb-1 text-sm font-medium">{{ scale.name }}</h3>
+      <p class="mb-2 text-sm text-ink-500 dark:text-ink-400">{{ scale.note }}</p>
+      <ul class="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+        {% for swatch in scale.swatches %}
+          <li class="text-xs">
+            {% comment %} The name goes under the colour rather than on it: a label on a
+               swatch has to clear 4.5:1 against every step of the scale, which is a rule
+               about the palette and not about this page. The border is what makes the
+               lightest steps visible against the card. {% endcomment %}
+            <span class="block h-10 rounded-lg border border-ink-200 dark:border-ink-800 {{ swatch.utility }}"></span>
+            <span class="mt-1 block">{{ swatch.token }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+
+    <h3 class="mb-1 text-sm font-medium">{% translate "What a component asks for" %}</h3>
+    <p class="mb-2 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Semantic names, so a rule copied from Basecoat's documentation comes out in this palette." %}
+    </p>
+    <ul class="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+      {% for swatch in semantic %}
+        <li class="text-xs">
+          <span class="block h-10 rounded-lg border border-ink-200 dark:border-ink-800 {{ swatch.utility }}"></span>
+          <span class="mt-1 block">{{ swatch.token }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <!-- --------------------------------------------------------------------- type -->
+  <section id="design-type" class="mb-10" aria-labelledby="design-type-heading">
+    <h2 id="design-type-heading" class="mb-3 font-medium">{% translate "Type" %}</h2>
+    <div class="card space-y-3">
+      <p class="text-2xl font-semibold tracking-tight">{% translate "A page title" %}</p>
+      <p class="font-medium">{% translate "A section heading" %}</p>
+      <p class="text-sm">{% translate "Ordinary text, which most of the interface is." %}</p>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Quieter text: an explanation under a heading, or a value nobody has filled in." %}
+      </p>
+      <p class="text-xs text-ink-500 dark:text-ink-400">{% translate "The smallest size, for a label beside something." %}</p>
+      <p class="text-sm tabular-nums">{% translate "Figures line up: 1,024 · 2,048 · 4,096" %}</p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------------ buttons -->
+  <section id="design-buttons" class="mb-10" aria-labelledby="design-buttons-heading">
+    <h2 id="design-buttons-heading" class="mb-3 font-medium">{% translate "Buttons" %}</h2>
+    <div class="card space-y-4">
+      <div>
+        <h3 class="mb-2 text-sm font-medium">{% translate "Variants" %}</h3>
+        <div class="flex flex-wrap items-center gap-3">
+          {% for variant, label in button_variants %}
+            <button type="button" class="btn" {% if variant %}data-variant="{{ variant }}"{% endif %}>{{ label }}</button>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <h3 class="mb-2 text-sm font-medium">{% translate "Sizes" %}</h3>
+        <div class="flex flex-wrap items-center gap-3">
+          {% for size, label in button_sizes %}
+            <button type="button" class="btn" data-variant="outline" {% if size %}data-size="{{ size }}"{% endif %}>{{ label }}</button>
+          {% endfor %}
+          <button type="button" class="btn" data-variant="outline" data-size="icon"
+                  aria-label="{% translate 'An icon button' %}">{% icon "settings" %}</button>
+        </div>
+      </div>
+      <div>
+        <h3 class="mb-2 text-sm font-medium">{% translate "Disabled" %}</h3>
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" class="btn" disabled>{% translate "Primary" %}</button>
+          <button type="button" class="btn" data-variant="outline" disabled>{% translate "Outline" %}</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------------- fields -->
+  <section id="design-fields" class="mb-10" aria-labelledby="design-fields-heading">
+    <h2 id="design-fields-heading" class="mb-3 font-medium">{% translate "Fields" %}</h2>
+    <div class="card grid gap-4 sm:grid-cols-2">
+      <div>
+        <label class="field-label" for="design-text">{% translate "A text field" %}</label>
+        <input type="text" id="design-text" class="field-input w-full" value="{% translate 'What somebody typed' %}">
+        <p class="field-help">{% translate "Help under a field says what it is for." %}</p>
+      </div>
+      <div>
+        <label class="field-label" for="design-select">{% translate "A choice" %}</label>
+        <select id="design-select" class="field-input w-full">
+          <option>{% translate "The first" %}</option>
+          <option>{% translate "The second" %}</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label" for="design-refused">{% translate "A field that was refused" %}</label>
+        <input type="text" id="design-refused" class="field-input w-full" aria-invalid="true"
+               aria-describedby="design-refused-error" value="not-an-address">
+        <p class="field-error" id="design-refused-error">{% translate "That is not an address Postulo can use." %}</p>
+      </div>
+      <div>
+        <label class="field-label" for="design-disabled">{% translate "A field nobody may change" %}</label>
+        <input type="text" id="design-disabled" class="field-input w-full" value="{% translate 'Set by the operator' %}" disabled>
+      </div>
+    </div>
+  </section>
+
+  <!-- ----------------------------------------------------------------- surfaces -->
+  <section id="design-surfaces" class="mb-10" aria-labelledby="design-surfaces-heading">
+    <h2 id="design-surfaces-heading" class="mb-3 font-medium">{% translate "Surfaces" %}</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="card">
+        <h3 class="mb-1 font-medium">{% translate "A card" %}</h3>
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% translate "What almost everything in Postulo sits in." %}
+        </p>
+      </div>
+      <div class="card p-0">
+        <table class="w-full text-start text-sm">
+          <caption class="sr-only">{% translate "A table inside a card" %}</caption>
+          <thead class="border-b border-ink-200 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400">
+            <tr>
+              <th scope="col" class="px-4 py-3 font-medium">{% translate "Name" %}</th>
+              <th scope="col" class="px-4 py-3 font-medium">{% translate "When" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+              <td class="px-4 py-3">{% translate "A row" %}</td>
+              <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">2026-09-20</td>
+            </tr>
+            <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+              <td class="px-4 py-3">{% translate "And another" %}</td>
+              <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">2026-09-19</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ chips and tags -->
+  <section id="design-chips" class="mb-10" aria-labelledby="design-chips-heading">
+    <h2 id="design-chips-heading" class="mb-3 font-medium">{% translate "Chips and tags" %}</h2>
+    <div class="card space-y-4">
+      <div>
+        <h3 class="mb-2 text-sm font-medium">{% translate "Chips" %}</h3>
+        <span class="flex flex-wrap items-center gap-1">
+          <span class="chip"><span class="chip-text">{% translate "A chip" %}</span></span>
+          <span class="chip py-0 text-xs"><span class="chip-text">{% translate "A small one" %}</span></span>
+        </span>
+      </div>
+      <div>
+        <h3 class="mb-2 text-sm font-medium">{% translate "The tag palette" %}</h3>
+        <p class="mb-2 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Seven colours, each tuned to 3:1 against the card in both themes." %}
+        </p>
+        <span class="flex flex-wrap items-center gap-1">
+          {% for tag in tags %}
+            <span class="tag tag-{{ tag }}">{{ tag }}</span>
+          {% endfor %}
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------------- alerts -->
+  <section id="design-alerts" class="mb-10" aria-labelledby="design-alerts-heading">
+    <h2 id="design-alerts-heading" class="mb-3 font-medium">{% translate "Alerts" %}</h2>
+    <div class="space-y-3">
+      {% for css_class, text in alerts %}
+        <div class="{{ css_class }}" role="status">{{ text }}</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

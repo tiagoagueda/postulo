@@ -47,4 +47,10 @@ SECTIONS: tuple[SettingsSection, ...] = (
     SettingsSection(
         slug="defaults", label=_("Defaults"), url_name="server:defaults", icon="settings", order=70
     ),
+    # The gallery (#292). Last, because it is a reference rather than a setting: nothing on
+    # it changes anything, and it is here so that whoever changes the interface can see all
+    # of it at once.
+    SettingsSection(
+        slug="design", label=_("Design"), url_name="server:design", icon="eye", order=80
+    ),
 )

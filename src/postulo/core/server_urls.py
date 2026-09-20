@@ -36,6 +36,7 @@ urlpatterns = [
         name="plugin_repository",
     ),
     path("logs/", views.LogsView.as_view(), name="logs"),
+    path("design/", views.DesignView.as_view(), name="design"),
     path("capture/", views.CaptureView.as_view(), name="capture"),
     path("defaults/", views.DefaultsView.as_view(), name="defaults"),
 ]

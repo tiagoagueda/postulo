@@ -32,6 +32,19 @@
 @source "../../src/postulo";
 
 /*
+ * The gallery's swatches (#292). `source(none)` means a class is compiled only where the
+ * scanner can see it written out, and these are built from the token list in Python -- so
+ * `bg-ink-500` existed in an f-string, never in the stylesheet, and every swatch came out
+ * with no background at all. Named here rather than unrolled into the template, because the
+ * list of steps belongs in one place and this is a safelist, not markup.
+ */
+@source inline("bg-ink-{50,100,200,300,400,500,600,700,800,900,950}");
+@source inline("bg-brand-{50,100,200,300,400,500,600,700,800,900}");
+@source inline(
+  "bg-{background,foreground,card,primary,secondary,muted,accent,destructive,border,input,ring}"
+);
+
+/*
  * But not the templates that become PDFs. They carry their own inline stylesheet and never
  * load this one, and the scanner reads the words in that CSS as candidate classes -- which is
  * how `border-collapse` appeared in this file with nothing on any page using it (#164).

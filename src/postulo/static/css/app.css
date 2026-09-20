@@ -122,16 +122,21 @@
     --color-brand-700: oklch(0.47 0.17 275);
     --color-brand-800: oklch(0.39 0.14 275);
     --color-brand-900: oklch(0.32 0.11 275);
+    --color-background: var(--color-ink-50);
+    --color-foreground: var(--color-ink-900);
     --color-card: var(--color-white);
     --color-popover: var(--color-white);
     --color-popover-foreground: var(--color-ink-900);
     --color-primary: var(--color-brand-600);
     --color-primary-foreground: var(--color-white);
+    --color-secondary: var(--color-ink-100);
     --color-muted: var(--color-ink-100);
     --color-accent: var(--color-ink-100);
     --color-accent-foreground: var(--color-ink-900);
+    --color-destructive: var(--color-red-600);
     --color-border: var(--color-ink-200);
     --color-input: oklch(0.62 0.012 250);
+    --color-ring: var(--color-brand-500);
   }
 }
 @layer base {
@@ -453,6 +458,9 @@
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
   }
+  .mb-10 {
+    margin-bottom: calc(var(--spacing) * 10);
+  }
   .alert {
     display: flex;
     align-items: flex-start;
@@ -541,6 +549,9 @@
   }
   .h-7 {
     height: calc(var(--spacing) * 7);
+  }
+  .h-10 {
+    height: calc(var(--spacing) * 10);
   }
   .h-28 {
     height: calc(var(--spacing) * 28);
@@ -999,6 +1010,9 @@
   .border-t-brand-600 {
     border-top-color: var(--color-brand-600);
   }
+  .bg-accent {
+    background-color: var(--color-accent);
+  }
   .bg-amber-50 {
     background-color: var(--color-amber-50);
   }
@@ -1011,17 +1025,47 @@
   .bg-amber-700 {
     background-color: var(--color-amber-700);
   }
+  .bg-background {
+    background-color: var(--color-background);
+  }
+  .bg-border {
+    background-color: var(--color-border);
+  }
   .bg-brand-50 {
     background-color: var(--color-brand-50);
   }
   .bg-brand-100 {
     background-color: var(--color-brand-100);
   }
+  .bg-brand-200 {
+    background-color: var(--color-brand-200);
+  }
+  .bg-brand-300 {
+    background-color: var(--color-brand-300);
+  }
+  .bg-brand-400 {
+    background-color: var(--color-brand-400);
+  }
   .bg-brand-500 {
     background-color: var(--color-brand-500);
   }
   .bg-brand-600 {
     background-color: var(--color-brand-600);
+  }
+  .bg-brand-700 {
+    background-color: var(--color-brand-700);
+  }
+  .bg-brand-800 {
+    background-color: var(--color-brand-800);
+  }
+  .bg-brand-900 {
+    background-color: var(--color-brand-900);
+  }
+  .bg-card {
+    background-color: var(--color-card);
+  }
+  .bg-destructive {
+    background-color: var(--color-destructive);
   }
   .bg-emerald-100 {
     background-color: var(--color-emerald-100);
@@ -1035,6 +1079,9 @@
   .bg-emerald-700 {
     background-color: var(--color-emerald-700);
   }
+  .bg-foreground {
+    background-color: var(--color-foreground);
+  }
   .bg-ink-50 {
     background-color: var(--color-ink-50);
   }
@@ -1047,8 +1094,38 @@
   .bg-ink-300 {
     background-color: var(--color-ink-300);
   }
+  .bg-ink-400 {
+    background-color: var(--color-ink-400);
+  }
+  .bg-ink-500 {
+    background-color: var(--color-ink-500);
+  }
+  .bg-ink-600 {
+    background-color: var(--color-ink-600);
+  }
+  .bg-ink-700 {
+    background-color: var(--color-ink-700);
+  }
+  .bg-ink-800 {
+    background-color: var(--color-ink-800);
+  }
+  .bg-ink-900 {
+    background-color: var(--color-ink-900);
+  }
+  .bg-ink-950 {
+    background-color: var(--color-ink-950);
+  }
+  .bg-input {
+    background-color: var(--color-input);
+  }
+  .bg-muted {
+    background-color: var(--color-muted);
+  }
   .bg-orange-700 {
     background-color: var(--color-orange-700);
+  }
+  .bg-primary {
+    background-color: var(--color-primary);
   }
   .bg-red-100 {
     background-color: var(--color-red-100);
@@ -1056,8 +1133,14 @@
   .bg-red-500 {
     background-color: var(--color-red-500);
   }
+  .bg-ring {
+    background-color: var(--color-ring);
+  }
   .bg-rose-700 {
     background-color: var(--color-rose-700);
+  }
+  .bg-secondary {
+    background-color: var(--color-secondary);
   }
   .bg-sky-700 {
     background-color: var(--color-sky-700);
@@ -1516,6 +1599,9 @@
     }
     .lg\:grid-cols-4 {
       grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .lg\:grid-cols-6 {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
     }
     .lg\:grid-cols-7 {
       grid-template-columns: repeat(7, minmax(0, 1fr));

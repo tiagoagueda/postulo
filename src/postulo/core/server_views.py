@@ -151,6 +151,25 @@ class OverviewView(ServerSectionMixin, TemplateView):
         return context
 
 
+class DesignView(ServerSectionMixin, TemplateView):
+    """The gallery: every component the interface is made of, on one page (#292).
+
+    Here rather than behind a debug flag, because the people who need to look at it are the
+    people who run the instance, and a page that only exists in development is a page whose
+    accessibility nobody checks. The browser suite walks it for exactly that reason.
+    """
+
+    template_name = "server/design.html"
+    section_title = _("Design")
+
+    def get_context_data(self, **kwargs):
+        from . import design
+
+        context = super().get_context_data(**kwargs)
+        context.update(design.gallery())
+        return context
+
+
 class PeopleView(ServerSectionMixin, TemplateView):
     template_name = "server/people.html"
     section_title = _("People")
