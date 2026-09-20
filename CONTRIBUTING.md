@@ -197,6 +197,14 @@ root tells an assistant how this project works; keep it current when the rules c
   `rtl`; `tests/test_template_lint.py` fails on a physical one. Wrap text a person typed
   in `<bdi>` where it sits inline beside other text, so a Latin name inside an Arabic line
   does not throw the punctuation to the wrong end.
+- **What the interface should look like is written down** (#292): the wiki's
+  [Design](https://source.tiagoagueda.com/postulo/postulo/wiki/Design) page says what the
+  tokens are and when to reach for each, and *Server settings -> Design* in a running
+  instance shows every component on one page in both themes. Read the gallery before
+  adding a component; a change to the paint should be visible somewhere before it is
+  spread across 184 templates. The short version: one `--radius` and the roundings derived
+  from it, three planes rather than a blur radius, colour never the only thing saying
+  something, and no motion that was not opted into behind `prefers-reduced-motion`.
 - **Markup used on more than one page is a component**, in `templates/cotton/`, written
   as `<c-field :field="form.name" />` and declaring what it takes in a `<c-vars>` line at
   the top of the file (django-cotton, #263). `{% include %}` is for a fragment of one

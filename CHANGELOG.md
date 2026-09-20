@@ -43,6 +43,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- *Settings → Appearance* offers a compact interface for anybody who wants more rows on a
+  screen. Comfortable stays the default, and nothing you can click gets smaller. (#292)
+- *Server settings → Design* shows every piece the interface is built from, on one page,
+  in whichever theme you are reading it in. (#292)
 - The slow things — fetching a posting's page, finding a logo, rendering a PDF, building an
   export archive, telling your notifiers — can be done by a worker instead of while you
   wait, with a page that says what is happening. Off by default. (#247)
