@@ -432,12 +432,17 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
     # name is the person's own filing — "Backend, English" — and the model's help text says
     # so; it was going into the PDF's `/Title`, which a viewer shows in its title bar and a
     # screen reader announces, and into the file name attached to portals and emails.
-    with translation.override(document_language(cv)):
+    language = document_language(cv)
+    with translation.override(language):
         title = document_title(cv)
 
     document = RenderedDocument(
         owner=cv.owner,
         title=title,
+        # Written down now rather than read back off the source later: the source can be
+        # edited, and is cleared outright when it is deleted, and this is the record of
+        # what an employer actually received (#283).
+        language=language,
         # What the model says it is, rather than a constant: a portfolio filed as a CV is a
         # document an employment office or a store would then mislabel (#133).
         kind=cv.document_kind,
@@ -476,6 +481,9 @@ def snapshot_report(owner, *, title: str, html: str, filename: str, backend=None
         owner=owner,
         title=title,
         kind=DocumentKind.REPORT,
+        # A report has no source document; the language it is in is the one it was just
+        # rendered in, which is the request's (#283).
+        language=translation.get_language() or "",
         source_text=html,
         checksum=RenderedDocument.checksum_for(content),
     )
@@ -488,13 +496,16 @@ def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> R
     html = render_letter_html(letter, application)
     content = html_to_pdf(html, backend=backend)
     # The recipient's name, not the person's own filing name for this draft (#223).
-    with translation.override(document_language(letter)):
+    language = document_language(letter)
+    with translation.override(language):
         title = document_title(letter)
 
     document = RenderedDocument(
         owner=letter.owner,
         title=title,
         kind=letter.document_kind,
+        # Frozen with the document, for the reason `snapshot_cv` gives (#283).
+        language=language,
         source=letter,
         application=application,
         sent_to=sent_to(application),

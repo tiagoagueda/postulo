@@ -41,8 +41,9 @@ from postulo import __version__
 #: ``web_links`` list, each row a kind, an address and whether it is the primary of its
 #: kind (#189). 16 added ``kind`` on a company, which tells the employment service a
 #: person is registered with from an employer (#202), and ``show_career_order`` on the
-#: profile (#203).
-FORMAT_VERSION = 16
+#: profile (#203). 17 added ``language`` on an upload and on a sent document, which each
+#: now record what they are in rather than having it guessed for them (#283).
+FORMAT_VERSION = 17
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -185,7 +186,19 @@ CV_FIELDS = (
     "show_contact_details",
 )
 LETTER_FIELDS = ("id", "name", "kind", "subject", "body", "theme", "is_template", "language")
-UPLOAD_FIELDS = ("id", "title", "kind", "notes", "version", "replaces_id", "created_at")
+UPLOAD_FIELDS = (
+    "id",
+    "title",
+    "kind",
+    "notes",
+    "version",
+    "replaces_id",
+    "created_at",
+    # Format 17 (#283). An archive written before it simply has no key, and the importer
+    # builds the row from what is there, so an older one restores with the field blank --
+    # which is what blank means here anyway: nobody has said.
+    "language",
+)
 SENT_FIELDS = (
     "id",
     "title",
@@ -193,6 +206,7 @@ SENT_FIELDS = (
     "application_id",
     "checksum",
     "rendered_at",
+    "language",
 )
 CAPTURE_FIELDS = (
     "id",

@@ -78,15 +78,31 @@ def renders_of(draft):
     ).order_by("-rendered_at", "pk")
 
 
-class DeclaresALanguage:
-    """The language a document is written in, resolved and named (#280).
+class HasALanguage:
+    """What every document can be asked: which language it is in, and its name.
 
-    `language` is blank for *follow your profile*, so the answer a reader wants is the
-    resolved one rather than the field: it is what the PDF declares, what a recruiter's
-    screen reader reads the letter out with, and what WeasyPrint hyphenates by (#223).
-    A declared language and an inherited one are drawn exactly the same, because what
-    reaches the employer is the same either way and a distinction here would be about a
-    setting rather than about the document.
+    Two answers to the first question, because the four kinds differ in what a blank field
+    means, and that difference is the whole of #283. What they share is the second.
+    """
+
+    @cached_property
+    def language_name(self) -> str:
+        """The language's own name for itself, or nothing where none is known."""
+        from postulo.core import languages
+        from postulo.resume import translating
+
+        code = self.effective_language
+        return languages.NATIVE_NAMES.get(translating.normalise(code), "") if code else ""
+
+
+class DeclaresALanguage(HasALanguage):
+    """A document Postulo writes: blank means *follow your profile* (#280).
+
+    The answer a reader wants is the resolved one rather than the field: it is what the
+    PDF declares, what a recruiter's screen reader reads the letter out with, and what
+    WeasyPrint hyphenates by (#223). A declared language and an inherited one are drawn
+    exactly the same, because what reaches the employer is the same either way and a
+    distinction here would be about a setting rather than about the document.
     """
 
     @cached_property
@@ -98,13 +114,21 @@ class DeclaresALanguage:
 
         return document_language(self)
 
-    @cached_property
-    def language_name(self) -> str:
-        """The language's own name for itself, or nothing for a code nobody offers."""
-        from postulo.core import languages
-        from postulo.resume import translating
 
-        return languages.NATIVE_NAMES.get(translating.normalise(self.effective_language), "")
+class RecordsALanguage(HasALanguage):
+    """A document Postulo did not write: blank means *nobody has said* (#283).
+
+    An upload is a file somebody else made and Postulo has never read, and a render is a
+    PDF frozen at a moment that has passed. Falling back to what its owner happens to read
+    Postulo in would be a claim about contents nobody has examined -- which is how a
+    scanned German certificate came to be filed in Paperless as English, defeating the
+    point of sending it there. Nothing is a better answer than a guess, and it is the
+    prompt to say.
+    """
+
+    @cached_property
+    def effective_language(self) -> str:
+        return (self.language or "").strip()
 
 
 class CVKind(models.TextChoices):
@@ -410,7 +434,7 @@ class DocumentKind(models.TextChoices):
     OTHER = "other", _("Other")
 
 
-class UploadedDocument(OwnedModel):
+class UploadedDocument(RecordsALanguage, OwnedModel):
     """A file you already had: a designed CV, a scanned certificate, a portfolio.
 
     The hybrid half of the model. Not everything worth sending was written in Postulo,
@@ -437,6 +461,21 @@ class UploadedDocument(OwnedModel):
         ],
     )
     notes = models.TextField(_("notes"), blank=True)
+    #: Which language the file is in, said by the person who uploaded it (#283).
+    #:
+    #: **Blank means nobody has said**, not "follow your profile". This is a file Postulo
+    #: has never read: guessing from the reader's own interface language is how a store
+    #: came to be told a German certificate was English. Asked for on the form, left
+    #: blank until somebody answers, and shown as unsaid rather than as nothing.
+    language = models.CharField(
+        _("language"),
+        max_length=10,
+        blank=True,
+        help_text=_(
+            "Which language this file is in. Postulo cannot read it, so nothing is "
+            "assumed; a store files it by this."
+        ),
+    )
 
     #: The file's SHA-256, written once when it arrives.
     #:
@@ -536,7 +575,7 @@ class UploadedDocument(OwnedModel):
         return f"{self.title}{suffix}"
 
 
-class RenderedDocument(OwnedModel):
+class RenderedDocument(RecordsALanguage, OwnedModel):
     """A PDF exactly as it was sent, kept unchanged.
 
     The source text is stored alongside the file. A PDF is awkward to search and
@@ -598,6 +637,16 @@ class RenderedDocument(OwnedModel):
     )
     source_id = models.PositiveBigIntegerField(null=True, blank=True)
     source = GenericForeignKey("source_type", "source_id")
+
+    #: The language this PDF declared when it was frozen, kept beside `sent_to` and the
+    #: checksum and for the same reason (#283).
+    #:
+    #: Written at the snapshot rather than read from the source afterwards. The source can
+    #: be edited later, or deleted -- `signals.py` clears the link so the PDF survives it
+    #: -- and either way the language of what the employer actually received would change
+    #: or vanish under a record whose whole purpose is that it cannot. Not editable, like
+    #: everything else about a frozen document.
+    language = models.CharField(_("language"), max_length=10, blank=True, editable=False)
 
     source_text = models.TextField(_("text as sent"), blank=True)
     checksum = models.CharField(_("checksum"), max_length=64, blank=True, editable=False)

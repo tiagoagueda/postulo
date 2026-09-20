@@ -43,6 +43,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- An upload records which language it is in and a sent PDF records the one it declared when
+  it was frozen, so a store no longer files a German certificate under the language its
+  owner reads Postulo in, and editing a CV no longer rewrites what was sent. (#283)
 - Each CV and cover letter says which language it is written in, as a flag beside its kind
   on the lists and the document's own page, or the language's own name where no flag
   stands for it. (#280)

@@ -180,7 +180,7 @@ def test_the_kind_of_a_company_travels_and_an_older_archive_is_employers(populat
         owner=populated, name="France Travail", kind=CompanyKind.EMPLOYMENT_SERVICE
     )
     _archive, document = read_archive(populated)
-    assert document["postulo"]["format"] == 16
+    assert document["postulo"]["format"] == 17
     kinds = {row["name"]: row["kind"] for row in document["companies"]}
     assert kinds == {"Black Mesa": "employer", "France Travail": "employment_service"}
 
@@ -406,3 +406,55 @@ def test_the_export_page_does_not_build_the_archive_to_show_the_numbers(client, 
 
     assert response.status_code == 200
     assert b"Download the archive" in response.content
+
+
+# ------------------------------------------- a document's language travels (#283)
+
+
+@pytest.mark.django_db
+def test_an_uploads_and_a_snapshots_language_survive_the_round_trip(user, other_user):
+    """Format 17. An archive written before it has no such key, and must still restore --
+    which it does, blank, because blank is what "nobody has said" looks like."""
+    import json
+    import zipfile
+    from io import BytesIO
+
+    from django.core.files.base import ContentFile
+
+    from postulo.core import export as export_module
+    from postulo.core import importer
+    from postulo.documents.models import DocumentKind, RenderedDocument, UploadedDocument
+
+    upload = UploadedDocument(
+        owner=user, title="Diploma", kind=DocumentKind.CERTIFICATE, language="de"
+    )
+    upload.file.save("diploma.pdf", ContentFile(b"%PDF-1.7 x"), save=True)
+    sent = RenderedDocument(
+        owner=user, title="CV", kind=DocumentKind.CV, language="fr-fr", checksum="abc"
+    )
+    sent.file.save("cv.pdf", ContentFile(b"%PDF-1.7 y"), save=True)
+
+    document = export_module.build_document(user)
+    assert document["postulo"]["format"] == 17
+    assert document["documents"]["uploads"][0]["language"] == "de"
+    assert document["documents"]["sent"][0]["language"] == "fr-fr"
+
+    importer.load(other_user, zipfile.ZipFile(export_module.write_archive(user)))
+    assert UploadedDocument.objects.for_user(other_user).get().language == "de"
+    assert RenderedDocument.objects.for_user(other_user).get().language == "fr-fr"
+
+    # The same archive as format 16 wrote it: no language anywhere.
+    UploadedDocument.objects.for_user(other_user).delete()
+    RenderedDocument.objects.for_user(other_user).delete()
+    document["postulo"]["format"] = 16
+    document["documents"]["uploads"][0].pop("language")
+    document["documents"]["sent"][0].pop("language")
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("postulo.json", json.dumps(document, default=str))
+    buffer.seek(0)
+
+    importer.load(other_user, zipfile.ZipFile(buffer))
+
+    assert UploadedDocument.objects.for_user(other_user).get().language == ""
+    assert RenderedDocument.objects.for_user(other_user).get().language == ""

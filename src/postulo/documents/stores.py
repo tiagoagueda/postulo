@@ -47,22 +47,18 @@ def download_path(document) -> str:
 # ---------------------------------------------------------------------- metadata
 
 
-def _language_of(document, profile) -> str:
-    """What language a stored document is in: its own, else its owner's, else nothing.
+def _language_of(document) -> str:
+    """What language a stored document is in: what it says, and nothing else (#283).
 
-    An upload has no language of its own — nobody has told Postulo what is inside it — so
-    it keeps falling back to the person, which is the best available answer for a file
-    they chose themselves.
+    This used to resolve rather than read -- a render's language came from its source at
+    the moment a store asked, and an upload's from whatever its owner happened to read
+    Postulo in. Both were wrong in the same way. A render is frozen and its source can be
+    edited or deleted afterwards, so the answer had to be captured when the PDF was; an
+    upload is a file Postulo has never read, so there is no honest answer but the one
+    somebody gives it. A store told nothing files by its own rules, which beats filing a
+    German certificate under English.
     """
-    from .rendering import document_language
-
-    own = (getattr(document, "language", "") or "").strip()
-    if own:
-        return own
-    source = getattr(document, "source", None)
-    if source is not None:
-        return document_language(source)
-    return getattr(profile, "language", "") or ""
+    return (getattr(document, "language", "") or "").strip()
 
 
 def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
@@ -79,7 +75,6 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
         company = posting.company.name
         role = posting.title
         application_url = absolute_url(application.get_absolute_url())
-    profile = getattr(document.owner, "profile", None)
     size = 0
     if document.file:
         try:
@@ -106,7 +101,7 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
         # The document's language, not the owner's (#223). A French CV filed in Paperless
         # under the language its owner happens to read Postulo in is filed wrongly, and
         # the whole point of sending it there is to find it again.
-        language=_language_of(document, profile),
+        language=_language_of(document),
         tags=("postulo", document.kind),
     )
 

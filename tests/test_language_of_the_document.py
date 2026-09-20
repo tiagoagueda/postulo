@@ -127,14 +127,47 @@ def test_a_render_is_filed_under_the_document_s_language(user, french_cv):
     assert metadata_for(document).language == "fr-fr", "the CV is French whoever owns it"
 
 
-def test_an_upload_has_no_language_of_its_own_so_it_follows_the_person(user):
+def test_an_upload_is_filed_under_what_somebody_said_and_never_a_guess(user):
+    """It used to follow the person, which is how a German certificate uploaded by
+    somebody reading Postulo in Portuguese was handed to a store as Portuguese. Postulo
+    has never read the file; nothing is the honest answer until somebody says (#283)."""
     user.profile.language = "pt-pt"
     user.profile.save(update_fields=["language"])
     upload = UploadedDocument(owner=user, title="Diploma", kind=DocumentKind.CERTIFICATE)
     upload.file.save("diploma.pdf", _a_file(), save=False)
     upload.save()
 
-    assert metadata_for(upload).language == "pt-pt"
+    assert metadata_for(upload).language == "", "no claim about a file nobody has read"
+
+    upload.language = "de"
+    upload.save(update_fields=["language"])
+    assert metadata_for(upload).language == "de", "and what was said is what is sent"
+
+
+def test_a_snapshot_keeps_the_language_it_was_frozen_with(user, french_cv):
+    """The record of what an employer received cannot be rewritten by a later edit. The
+    language used to be read off the source whenever a store asked (#283)."""
+    document = rendering.snapshot_cv(french_cv, backend=_FakeBackend())
+    assert document.language == "fr-fr"
+
+    french_cv.language = "en-gb"
+    french_cv.save(update_fields=["language"])
+    document.refresh_from_db()
+
+    assert document.language == "fr-fr", "what was sent was French, and still is"
+    assert metadata_for(document).language == "fr-fr"
+
+
+def test_a_snapshot_whose_source_is_gone_still_says_what_it_was(user, french_cv):
+    """`signals.py` clears the link so the PDF survives its source being deleted; the
+    language used to go with it, leaving the one document that can never be regenerated
+    as the one whose language was least recoverable (#283)."""
+    document = rendering.snapshot_cv(french_cv, backend=_FakeBackend())
+    french_cv.delete()
+    document.refresh_from_db()
+
+    assert document.source is None
+    assert document.language == "fr-fr" and metadata_for(document).language == "fr-fr"
 
 
 # ------------------------------------------------------------------ the message

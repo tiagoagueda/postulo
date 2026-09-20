@@ -6,6 +6,7 @@ run a real backend when one happens to be available.
 """
 
 import datetime
+import re
 
 import pytest
 from django.contrib.contenttypes.models import ContentType
@@ -959,3 +960,39 @@ def test_a_letter_with_nothing_missing_is_frozen_without_an_extra_press(
 
     assert response.status_code == 302
     assert RenderedDocument.objects.filter(owner=user).count() == 1
+
+
+# ------------------------------------------- saying which language a file is in (#283)
+
+
+@pytest.mark.django_db
+def test_the_upload_form_asks_which_language_and_blank_means_not_said(client, user):
+    """Blank is *nobody has said*, not "follow your profile": this is a file Postulo has
+    never read, and the wording is the whole difference (#283)."""
+    client.force_login(user)
+
+    html = client.get(reverse("documents:upload_create")).content.decode()
+
+    select = re.search(r'<select[^>]*name="language"[^>]*>(.*?)</select>', html, re.S)
+    assert select, "no language picker on the upload form"
+    assert ">Not said<" in select.group(1)
+    assert "Follow your profile" not in select.group(1)
+
+
+@pytest.mark.django_db
+def test_an_upload_says_its_language_or_says_that_nobody_has(client, user):
+    from django.core.files.base import ContentFile
+
+    from postulo.documents.models import DocumentKind, UploadedDocument
+
+    upload = UploadedDocument(owner=user, title="Diploma", kind=DocumentKind.CERTIFICATE)
+    upload.file.save("diploma.pdf", ContentFile(b"%PDF-1.7 x"), save=True)
+    client.force_login(user)
+
+    html = client.get(reverse("documents:upload_list")).content.decode()
+    assert "language not said" in html, "unsaid is the prompt to say"
+
+    upload.language = "de"
+    upload.save(update_fields=["language"])
+    html = client.get(reverse("documents:upload_list")).content.decode()
+    assert 'data-flag="de"' in html and "language not said" not in html

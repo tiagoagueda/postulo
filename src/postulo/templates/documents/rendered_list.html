@@ -31,7 +31,11 @@
             <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
               <td class="px-4 py-3">
                 {{ document.title }}
-                <span class="ms-1 text-xs text-ink-500 dark:text-ink-400">{{ document.get_kind_display }}</span>
+                <span class="ms-1 inline-flex items-center gap-1.5 text-xs text-ink-500 dark:text-ink-400">
+                  {% comment %} What this PDF declared when it was frozen, not what its source
+                     says today -- the source may have been edited since, or deleted (#283).
+                  {% endcomment %}
+                  <c-document-language :document="document" />{{ document.get_kind_display }}</span>
                 {% url 'documents:rendered_archive' document.pk as send_url %}
                 {% include "documents/partials/copies.html" with document=document send_url=send_url %}
               </td>

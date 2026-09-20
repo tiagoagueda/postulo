@@ -217,10 +217,21 @@ class CoverLetterForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelFor
 class UploadedDocumentForm(OwnerScopedModelForm):
     class Meta:
         model = UploadedDocument
-        fields = ("title", "kind", "file", "notes", "replaces")
+        fields = ("title", "kind", "file", "language", "notes", "replaces")
         widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
 
     def scope_querysets(self) -> None:
+        # The same picker the other documents use, with one word changed: blank here means
+        # *nobody has said*, not "follow your profile", because this is a file Postulo has
+        # never read (#283). The model field stays free text, as it is everywhere else, so
+        # a language an instance has since stopped offering still saves.
+        from postulo.accounts.forms import LanguageSelect
+
+        language = self.fields.get("language")
+        if language is not None:
+            language.widget = LanguageSelect(choices=[("", _("Not said")), *language_choices()[1:]])
+            language.required = False
+
         queryset = UploadedDocument.objects.for_user(self.user)
         if self.instance.pk:
             queryset = queryset.exclude(pk=self.instance.pk)

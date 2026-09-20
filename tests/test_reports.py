@@ -15,6 +15,7 @@ two questions the page answers are kept apart rather than added together.
 from __future__ import annotations
 
 import datetime as dt
+import re
 
 import pytest
 from django.urls import reverse
@@ -705,7 +706,9 @@ def test_a_filed_report_is_listed_as_one_and_only_to_its_owner(client, user, oth
     client.post(reverse(PDF)).close()
 
     html = client.get(reverse("documents:rendered_list")).content.decode()
-    assert "Job search report" in html and ">Report<" in html
+    # The kind label no longer closes its own tag: the language the report was rendered
+    # in is drawn beside it, inside the same span (#283).
+    assert "Job search report" in html and re.search(r">\s*Report</span>", html)
 
     client.force_login(other_user)
     assert (

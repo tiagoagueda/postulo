@@ -388,6 +388,9 @@ class LetterOut(Schema):
     subject: str = ""
     is_template: bool
     theme: str
+    #: As `CVOut` has carried all along; the field has been on the model since the
+    #: beginning and only the schema had forgotten it (#283).
+    language: str = ""
     created_at: dt.datetime
     updated_at: dt.datetime
 
@@ -408,6 +411,9 @@ class DocumentOut(Schema):
     source: str = Field(description="'upload' for a file you had; 'rendered' for a snapshot")
     kind: str
     title: str
+    #: Empty means nobody has said, for an upload, or that the snapshot predates the
+    #: column, for a render (#283). Never a guess.
+    language: str = ""
     application_id: int | None = None
     created_at: dt.datetime
     updated_at: dt.datetime
@@ -617,6 +623,7 @@ def document_out(request, document, *, source: str) -> dict:
         "source": source,
         "kind": document.kind,
         "title": document.title,
+        "language": getattr(document, "language", "") or "",
         "application_id": getattr(document, "application_id", None),
         "created_at": document.created_at,
         "updated_at": document.updated_at,

@@ -30,8 +30,13 @@
           <li class="flex flex-wrap items-center gap-3 px-4 py-3 {% if not document.is_current %}opacity-60{% endif %}">
             <div class="min-w-0 grow basis-48">
               <p class="font-medium">{{ document.title }}</p>
-              <p class="text-xs text-ink-500 dark:text-ink-400">
-                {{ document.get_kind_display }} · {% translate "version" %} {{ document.version }}
+              <p class="flex flex-wrap items-center gap-1.5 text-xs text-ink-500 dark:text-ink-400">
+                {% comment %} Unsaid is worth showing as such rather than as a blank: it is
+                   the prompt to say, and a store is told nothing until somebody does (#283).
+                {% endcomment %}
+                {% if document.language %}<c-document-language :document="document" />
+                {% else %}<span class="shrink-0">{% translate "language not said" %}</span>{% endif %}
+                · {{ document.get_kind_display }} · {% translate "version" %} {{ document.version }}
                 · {{ document.created_at|date:"DATE_FORMAT" }}
                 {% if not document.is_current %} · {% translate "superseded" %}{% endif %}
               </p>
