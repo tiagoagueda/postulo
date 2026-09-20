@@ -5,6 +5,11 @@ application, move it along on the board, record what was sent, and take the expo
 Unit tests cover each step in isolation; this one proves the steps still join up after the
 interface changes around them.
 
+Three of those steps are slow enough to be done by a worker rather than while somebody
+waits (#247), and with none configured -- which is how this runs -- the work is done where
+the request stands and the page that reports it is already finished when it is drawn. So
+the story gains one click in three places and loses nothing: *Take me to it*.
+
 Assertions are on what a person sees — headings, labels, button names — rather than on
 markup, so a restyle does not fail the test and a broken page does.
 """
@@ -78,6 +83,12 @@ def test_the_critical_path(live_server, page: Page, applicant) -> None:
     page.locator("textarea[name=html]").fill(POSTING_HTML)
     page.get_by_role("button", name="Read the page").click()
 
+    # Reading the page is a worker's job now, so the press lands on the page that watches
+    # it. Nothing was fetched here -- the HTML came with the form -- but the parse is still
+    # work somebody asked for, and one path through this is easier to trust than two (#247).
+    expect(page.get_by_role("heading", level=1)).to_have_text("Reading the page")
+    page.get_by_role("link", name="Take me to it").click()
+
     # The review screen is the posting form, pre-filled from the page. Saving makes a
     # listing: something noticed, not yet decided about.
     expect(page.locator("#id_title")).to_have_value("Senior Django Developer")
@@ -115,17 +126,27 @@ def test_the_critical_path(live_server, page: Page, applicant) -> None:
     expect(page.get_by_role("heading", level=1)).to_have_text("Record what you sent")
     page.locator("#id_cv").select_option(label="Main CV")
     page.get_by_role("button", name="Freeze and attach").click()
+
+    # The slowest button in Postulo: two documents can mean two renders, and on the
+    # Chromium backend a render is a browser launch. Watched rather than waited for (#247).
+    expect(page.get_by_role("heading", level=1)).to_have_text("Freezing what you sent")
     if pdf_backend_available():
         expect(page.get_by_text("Recorded what you sent.")).to_be_visible()
+        page.get_by_role("link", name="Take me to it").click()
         expect(page.get_by_text("Documents sent")).to_be_visible()
     else:
-        expect(page.get_by_role("heading", level=1)).to_have_text("Record what you sent")
-        expect(page.locator(".alert-error")).to_be_visible()
+        # No renderer is still one explanation and nothing half-done; it arrives on the
+        # page that was watching rather than on the form, in the same words.
+        expect(page.get_by_text("That did not work.")).to_be_visible()
 
-    # The export archive holds everything, readable without Postulo.
+    # The export archive holds everything, readable without Postulo. Built by a worker,
+    # because reading every record and every file in an account is not a request's job, and
+    # then downloaded from an address of its own that checks whose account it holds (#247).
     page.goto(f"{base}/export/")
+    page.get_by_role("button", name="Build the archive").click()
+    expect(page.get_by_role("heading", level=1)).to_have_text("Packing up your data")
     with page.expect_download() as download_info:
-        page.get_by_role("button", name="Download the archive").click()
+        page.get_by_role("link", name="Take me to it").click()
     download = download_info.value
     assert re.search(r"\.zip$", download.suggested_filename)
     with zipfile.ZipFile(download.path()) as archive:
