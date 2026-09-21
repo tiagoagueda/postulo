@@ -9,11 +9,11 @@ names the scope, because the person who made the token needs to know which box t
 from __future__ import annotations
 
 from django.http import JsonResponse
-from ninja.errors import HttpError
 from ninja.security import HttpBearer
 
 from postulo.core import throttle
 
+from . import problems
 from .models import ApiToken
 
 
@@ -27,7 +27,15 @@ def _within_its_allowance(record: ApiToken) -> None:
     try:
         throttle.api(record)
     except throttle.TooOften as too_often:
-        raise HttpError(429, str(too_often)) from None
+        # The same problem type, and the same `Retry-After`, as the handler in `api.py`
+        # gives. Before #296 this path raised a bare 429 and the other carried the wait,
+        # so whether a client was told *when* depended on which layer refused it.
+        raise problems.Refused(
+            429,
+            str(too_often),
+            kind="rate-limited",
+            retry_after=too_often.retry_after,
+        ) from None
 
 
 def lookup(raw: str) -> ApiToken | None:
@@ -69,7 +77,15 @@ class ScopedAuth(HttpBearer):
         if record is None:
             return None
         if not record.has_scope(self.scope):
-            raise HttpError(403, f"This token does not have the '{self.scope}' scope.")
+            # Typed, with the scope beside it: a client refused here has something to do
+            # about it -- ask for a token carrying that scope -- and should not have to
+            # parse the sentence to learn which one it is (#296).
+            raise problems.Refused(
+                403,
+                f"This token does not have the '{self.scope}' scope.",
+                kind="insufficient-scope",
+                scope=self.scope,
+            )
         _within_its_allowance(record)
         record.record_use()
         return record
@@ -102,8 +118,15 @@ def for_readers_of_the_api(view):
         if scheme.lower() == "bearer" and lookup(raw.strip()) is not None:
             return view(request, *args, **kwargs)
         # Word for word what every other refusal without a token says, for the same reason:
-        # confirming that a token exists is itself something not to confirm.
-        return JsonResponse({"detail": "Unauthorized"}, status=401)
+        # confirming that a token exists is itself something not to confirm. Built by hand
+        # rather than raised, because this is a plain Django view and no handler of the
+        # API's runs over it -- which is exactly how it would drift out of shape, so
+        # `tests/test_api.py` compares it against a refusal from a real call (#296).
+        return JsonResponse(
+            problems.document(request, 401, "Unauthorized"),
+            status=401,
+            content_type=problems.CONTENT_TYPE,
+        )
 
     return guarded
 

@@ -23,6 +23,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- API refusals are RFC 9457 problem documents (`application/problem+json`, with `type`, `title` and `status` beside `detail`). **A validation failure's field errors moved from `detail` to `errors`**; a client that iterated `detail` reads `errors` now. (#296)
 - The underline on the current navigation link is a choice under *Settings →
   Accessibility*; the weight and the shade still mark the page when it is off, and a
   high-contrast theme underlines it whatever you chose. (#289)

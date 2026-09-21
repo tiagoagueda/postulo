@@ -361,7 +361,13 @@ def test_the_schema_answers_a_token_or_a_person_and_nobody_else(client, user):
     """
     anonymous = client.get("/api/v1/openapi.json")
     assert anonymous.status_code == 401
-    assert anonymous.json() == {"detail": "Unauthorized"}, "the same refusal as everything else"
+    # The same refusal as everything else -- compared against a real one rather than
+    # written out here, because this view is guarded by hand and nothing else would notice
+    # it drifting out of the shape the API answers with (#296).
+    elsewhere = client.get("/api/v1/applications")
+    assert elsewhere.status_code == 401
+    assert anonymous.json() == {**elsewhere.json(), "instance": "/api/v1/openapi.json"}
+    assert anonymous["Content-Type"] == elsewhere["Content-Type"] == "application/problem+json"
     assert (
         client.get("/api/v1/openapi.json", HTTP_AUTHORIZATION="Bearer nonsense").status_code == 401
     )

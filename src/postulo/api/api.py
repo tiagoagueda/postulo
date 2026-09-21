@@ -43,7 +43,7 @@ from postulo.plugins.base import CaptureError, JobPostingData
 from postulo.plugins.fetching import fetch_page
 from postulo.plugins.registry import parse_page
 
-from . import idempotency
+from . import idempotency, problems
 from .auth import TokenAuth, for_readers_of_the_api, scope
 from .models import ApiToken
 from .paging import UPDATED_SINCE, Page, changed_since
@@ -85,7 +85,19 @@ class Renderer(JSONRenderer):
     encoder_class = WholeMoments
 
 
-api = NinjaAPI(
+class Described(NinjaAPI):
+    """The API, plus a description of what it refuses with (#296).
+
+    django-ninja describes what every call answers with and nothing about what it refuses
+    with, so a client generated from the schema had a type for an application and none for
+    the 401 it meets first. `problems.describe` fills that in for every call at once.
+    """
+
+    def get_openapi_schema(self, *args, **kwargs):
+        return problems.describe(self, super().get_openapi_schema(*args, **kwargs))
+
+
+api = Described(
     renderer=Renderer(),
     title="Postulo API",
     version="1",
@@ -101,6 +113,9 @@ api = NinjaAPI(
 )
 
 
+problems.install(api)
+
+
 @api.exception_handler(throttle.TooOften)
 def _too_often(request, exc: throttle.TooOften):
     """A spent allowance, said the way a client can act on: 429, `detail`, `Retry-After`.
@@ -109,8 +124,14 @@ def _too_often(request, exc: throttle.TooOften):
     a browser extension sending a results page, a script importing a hundred postings --
     and the useful answer to "not yet" is *when*. `TooOften` already knows how long is
     left of the window.
+
+    The wait is in the body as well as the header since #296: RFC 9457 lets a problem type
+    carry its own members, and a client reading the document should not have to reach back
+    out to the headers for the one number that tells it what to do next.
     """
-    response = api.create_response(request, {"detail": str(exc)}, status=429)
+    response = problems.refuse(
+        request, api, 429, str(exc), kind="rate-limited", retry_after=exc.retry_after
+    )
     response["Retry-After"] = str(exc.retry_after)
     return response
 

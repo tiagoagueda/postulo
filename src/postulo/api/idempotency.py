@@ -27,8 +27,8 @@ from contextlib import contextmanager
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from ninja.errors import HttpError
 
+from . import problems
 from .models import IDEMPOTENCY_WINDOW, IdempotentRequest
 
 #: Said to a program, and read by the person debugging it, as every other refusal here is.
@@ -91,12 +91,12 @@ def once(owner, key: str | None, payload):
             # Said whether or not the first one has finished: a key used twice for two
             # different postings is a bug in the client either way, and answering it with
             # somebody else's capture would hide it.
-            raise HttpError(422, str(REUSED)) from None
+            raise problems.Refused(422, str(REUSED), kind="idempotency-key-reused") from None
         if record is None or not record.is_answered:
             # Either the identical request is still being answered, or the row it claimed the
             # key with expired between the sweep above and the lookup here. Both mean the key
             # is spoken for by something unfinished, and neither of them is an answer.
-            raise HttpError(409, str(BUSY)) from None
+            raise problems.Refused(409, str(BUSY), kind="idempotency-key-in-use") from None
         answer.held, answer.held_status = record.body, record.status_code
         yield answer
         return
