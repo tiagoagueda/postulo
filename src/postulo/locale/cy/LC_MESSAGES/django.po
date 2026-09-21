@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-21 15:47+0000\n"
+"POT-Creation-Date: 2026-09-21 16:26+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Cymraeg\n"
@@ -294,17 +294,22 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "Gall %(name)s fewngofnodi eto."
 
-#: src/postulo/plugins/installing.py:462
+#: src/postulo/plugins/installing.py:566
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "Nid yw %(name)s yn datgan unrhyw bwynt mynediad Postulo, felly ni fyddai ei osod yn gwneud dim. Mae ategyn yn cofrestru o dan un o: %(groups)s."
 
-#: src/postulo/plugins/installing.py:581
+#: src/postulo/plugins/installing.py:869
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "Nid yw %(name)s yn cyfateb i'r swm gwirio y cafodd ei gyhoeddi ag ef."
+
+#: src/postulo/plugins/installing.py:903
+#, python-format
+msgid "%(name)s installed but could not be loaded, so it was put back: %(why)s"
+msgstr ""
 
 #: src/postulo/core/server_views.py:229
 #, python-format, draft
@@ -322,12 +327,12 @@ msgstr ""
 msgid "%(name)s is no longer an administrator."
 msgstr "Nid yw %(name)s yn weinyddwr mwyach."
 
-#: src/postulo/plugins/installing.py:661 src/postulo/plugins/installing.py:735
+#: src/postulo/plugins/installing.py:973 src/postulo/plugins/installing.py:1082
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "Nid yw %(name)s wedi'i osod."
 
-#: src/postulo/plugins/installing.py:452
+#: src/postulo/plugins/installing.py:556
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -373,12 +378,12 @@ msgid ""
 msgstr ""
 "%(name)s yw'r iaith y mae cyfrif newydd yn dechrau ynddi, felly ni all beidio â chael ei chynnig. Newidiwch yr iaith ragosodedig yn gyntaf."
 
-#: src/postulo/plugins/installing.py:657
+#: src/postulo/plugins/installing.py:969
 #, python-format, draft
 msgid "%(name)s ships inside Postulo and cannot be removed."
 msgstr "Mae %(name)s yn rhan o Postulo ac ni ellir ei dynnu."
 
-#: src/postulo/plugins/installing.py:719
+#: src/postulo/plugins/installing.py:1066
 #, python-format, draft
 msgid ""
 "%(name)s ships inside Postulo. Switch it off under Server settings → Plugins instead."
@@ -392,11 +397,11 @@ msgid ""
 msgstr ""
 "Mae %(name)s yn mewngofnodi fel <strong>%(current)s</strong>. Rhaid i'r enw defnyddiwr newydd fod yn rhydd ar y gosodiad hwn; nid yw priflythrennau yn ei wneud yn wahanol."
 
-#: src/postulo/plugins/installing.py:472
-#, python-format, draft
-msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
+#: src/postulo/plugins/installing.py:576
+#, python-format
+msgid ""
+"%(name)s would change what something here already depends on. %(problems)s"
 msgstr ""
-"Byddai %(name)s yn newid yr hyn y mae Postulo ei hun yn dibynnu arno. %(problems)s"
 
 #: src/postulo/documents/rendering.py:65
 #, python-format, draft
@@ -424,7 +429,12 @@ msgstr ""
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:407
+#: src/postulo/plugins/installing.py:501
+#, python-format
+msgid "%(package)s: needs %(wanted)s, and %(owner)s has %(have)s."
+msgstr ""
+
+#: src/postulo/plugins/installing.py:503
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: angen %(wanted)s, a chan Postulo mae %(have)s."
@@ -5043,6 +5053,15 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Ni all ddod i ben cyn iddo ddechrau."
 
+#: src/postulo/plugins/installing.py:846
+msgid "it could not be imported"
+msgstr ""
+
+#: src/postulo/plugins/installing.py:836
+#, python-format
+msgid "it did not finish importing within %(seconds)ss"
+msgstr ""
+
 #: src/postulo/documents/views.py:410
 #, python-format, draft
 msgid ""
@@ -6674,7 +6693,7 @@ msgid ""
 msgstr ""
 "Nid oes dim wedi tawelu ers %(days)s diwrnod. Naill ai rydych ar ben pethau, neu mae'n bryd anfon ychydig mwy allan."
 
-#: src/postulo/plugins/installing.py:495
+#: src/postulo/plugins/installing.py:599
 #, draft
 msgid ""
 "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
@@ -7644,6 +7663,11 @@ msgstr ""
 #, draft
 msgid "picture"
 msgstr "llun"
+
+#: src/postulo/plugins/installing.py:472
+#, python-format
+msgid "Pinned by: %(plugins)s."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html:67
 #, draft
@@ -10266,7 +10290,7 @@ msgstr ""
 msgid "That is not a status Postulo recognises."
 msgstr "Nid yw hwnnw'n statws y mae Postulo yn ei adnabod."
 
-#: src/postulo/plugins/installing.py:305
+#: src/postulo/plugins/installing.py:320
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Nid olwyn mo honno: mae Postulo yn gosod ffeiliau .whl."
@@ -10623,12 +10647,12 @@ msgid ""
 "The greys. A warm near-black rather than pure black, easier to read at length."
 msgstr ""
 
-#: src/postulo/plugins/installing.py:551
+#: src/postulo/plugins/installing.py:655
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "Ni ellid rhedeg y gosodwr: %(error)s"
 
-#: src/postulo/plugins/installing.py:555
+#: src/postulo/plugins/installing.py:659
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "Gwrthododd y gosodwr ef: %(error)s"
@@ -10967,7 +10991,7 @@ msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr ""
 "Nid yw'r olwyn yn cyfateb i'r swm gwirio a gyhoeddodd y catalog ar ei chyfer."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Nid oes gan yr olwyn fetadata; efallai ei bod wedi'i difrodi."
@@ -11021,6 +11045,10 @@ msgstr "Nid oes dim ar y cyfeiriad hwnnw (404). Gwiriwch y ddolen."
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Nid oes dim yma, neu nid eich lle chi yw ei weld."
+
+#: src/postulo/plugins/installing.py:776
+msgid "There is nothing to go back to: no plugin has been installed since."
+msgstr ""
 
 #: src/postulo/resume/views.py:420
 #, draft

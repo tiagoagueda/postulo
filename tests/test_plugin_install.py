@@ -167,7 +167,7 @@ def test_a_package_that_is_not_a_plugin_is_refused(tmp_path):
 
 def test_a_dependency_that_would_move_one_of_postulos_own_is_refused(tmp_path):
     wheel = a_wheel(tmp_path, requires=("django==4.2",))
-    with pytest.raises(InstallError, match="would change what Postulo itself depends on"):
+    with pytest.raises(InstallError, match="would change what something here already depends on"):
         installing.check(installing.read_wheel(wheel))
     assert any(pin.startswith("django==") for pin in installing.constraints())
 

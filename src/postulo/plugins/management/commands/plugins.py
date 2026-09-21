@@ -38,6 +38,10 @@ class Command(BaseCommand):
         ):
             parser_for = sub.add_parser(action, help=help_text)
             parser_for.add_argument("name")
+        sub.add_parser(
+            "rollback",
+            help="Undo the last install, putting the directory back as it was before it.",
+        )
         sub.add_parser("sync", help="Reinstall what the record lists and the environment lacks.")
         sub.add_parser("catalogue", help="What the configured catalogues offer.")
 
@@ -113,6 +117,33 @@ class Command(BaseCommand):
         except installing.InstallError as error:
             raise CommandError(str(error)) from error
         self.stdout.write(f"{entry.name} is now {'disabled' if disabled else 'enabled'}.")
+
+    # -------------------------------------------------------------- rollback
+
+    def _rollback(self, options) -> None:
+        """For the install that worked and was wrong.
+
+        An install that fails to import puts itself back (#246); this is for the one that
+        imported cleanly and then turned out to be the wrong version -- which no check at
+        install time could have caught, because nothing about the wheel says so.
+        """
+        before = {entry.name: entry.version for entry in installing.read_record()}
+        try:
+            entries = installing.roll_back()
+        except installing.InstallError as error:
+            raise CommandError(str(error)) from error
+        after = {entry.name: entry.version for entry in entries}
+        for name in sorted(set(before) | set(after)):
+            was, now = before.get(name), after.get(name)
+            if was == now:
+                continue
+            if now is None:
+                self.stdout.write(f"Removed {name} {was}.")
+            elif was is None:
+                self.stdout.write(f"Put {name} {now} back.")
+            else:
+                self.stdout.write(f"{name}: {was} to {now}.")
+        self.stdout.write("There is nothing further to go back to.")
 
     # ------------------------------------------------------------------ sync
 

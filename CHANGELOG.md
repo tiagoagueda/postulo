@@ -23,6 +23,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Installing a plugin keeps the directory as it was, checks that the new one imports before recording it, and puts everything back if it does not; `manage.py plugins rollback` undoes the last install. Removing one takes the dependencies nothing else uses. (#246)
 - API refusals are RFC 9457 problem documents (`application/problem+json`, with `type`, `title` and `status` beside `detail`). **A validation failure's field errors moved from `detail` to `errors`**; a client that iterated `detail` reads `errors` now. (#296)
 - The underline on the current navigation link is a choice under *Settings →
   Accessibility*; the weight and the shade still mark the page when it is off, and a

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-21 15:47+0000\n"
+"POT-Creation-Date: 2026-09-21 16:26+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -269,18 +269,24 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s peut se reconnecter."
 
-#: src/postulo/plugins/installing.py:462
+#: src/postulo/plugins/installing.py:566
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s ne déclare aucun point d'entrée Postulo : l'installer ne ferait rien. Un plugin s'enregistre sous l'un de : %(groups)s."
 
-#: src/postulo/plugins/installing.py:581
+#: src/postulo/plugins/installing.py:869
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr ""
 "%(name)s ne correspond pas à la somme de contrôle avec laquelle il a été publié."
+
+#: src/postulo/plugins/installing.py:903
+#, python-format, draft
+msgid "%(name)s installed but could not be loaded, so it was put back: %(why)s"
+msgstr ""
+"%(name)s s'est installé mais n'a pas pu être chargé ; la version précédente a été rétablie : %(why)s"
 
 #: src/postulo/core/server_views.py:229
 #, python-format, draft
@@ -298,12 +304,12 @@ msgstr ""
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s n'est plus administrateur."
 
-#: src/postulo/plugins/installing.py:661 src/postulo/plugins/installing.py:735
+#: src/postulo/plugins/installing.py:973 src/postulo/plugins/installing.py:1082
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s n'est pas installé."
 
-#: src/postulo/plugins/installing.py:452
+#: src/postulo/plugins/installing.py:556
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -349,12 +355,12 @@ msgid ""
 msgstr ""
 "%(name)s est la langue dans laquelle un nouveau compte démarre : elle ne peut donc pas cesser d'être proposée. Changez d'abord la langue par défaut."
 
-#: src/postulo/plugins/installing.py:657
+#: src/postulo/plugins/installing.py:969
 #, python-format, draft
 msgid "%(name)s ships inside Postulo and cannot be removed."
 msgstr "%(name)s fait partie de Postulo et ne peut pas être supprimé."
 
-#: src/postulo/plugins/installing.py:719
+#: src/postulo/plugins/installing.py:1066
 #, python-format, draft
 msgid ""
 "%(name)s ships inside Postulo. Switch it off under Server settings → Plugins instead."
@@ -368,10 +374,11 @@ msgid ""
 msgstr ""
 "%(name)s se connecte en tant que <strong>%(current)s</strong>. Le nouveau nom d'utilisateur doit être libre sur cette instance ; les majuscules ne le distinguent pas."
 
-#: src/postulo/plugins/installing.py:472
+#: src/postulo/plugins/installing.py:576
 #, python-format, draft
-msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
-msgstr "%(name)s changerait ce dont Postulo lui-même dépend. %(problems)s"
+msgid ""
+"%(name)s would change what something here already depends on. %(problems)s"
+msgstr "%(name)s changerait ce dont quelque chose dépend déjà ici. %(problems)s"
 
 #: src/postulo/documents/rendering.py:65
 #, python-format, draft
@@ -399,7 +406,12 @@ msgstr ""
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:407
+#: src/postulo/plugins/installing.py:501
+#, python-format, draft
+msgid "%(package)s: needs %(wanted)s, and %(owner)s has %(have)s."
+msgstr "%(package)s : exige %(wanted)s, et %(owner)s utilise %(have)s."
+
+#: src/postulo/plugins/installing.py:503
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s : demande %(wanted)s, et Postulo a %(have)s."
@@ -5090,6 +5102,16 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Il ne peut pas se terminer avant d'avoir commencé."
 
+#: src/postulo/plugins/installing.py:846
+#, draft
+msgid "it could not be imported"
+msgstr "il n'a pas pu être importé"
+
+#: src/postulo/plugins/installing.py:836
+#, python-format, draft
+msgid "it did not finish importing within %(seconds)ss"
+msgstr "son importation ne s'est pas terminée en %(seconds)s s"
+
 #: src/postulo/documents/views.py:410
 #, python-format, draft
 msgid ""
@@ -6726,7 +6748,7 @@ msgid ""
 msgstr ""
 "Rien n'est resté silencieux depuis %(days)s jours. Soit vous maîtrisez la situation, soit il est temps d'en envoyer quelques-unes de plus."
 
-#: src/postulo/plugins/installing.py:495
+#: src/postulo/plugins/installing.py:599
 #, draft
 msgid ""
 "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
@@ -7677,6 +7699,11 @@ msgstr ""
 #, draft
 msgid "picture"
 msgstr "image"
+
+#: src/postulo/plugins/installing.py:472
+#, python-format, draft
+msgid "Pinned by: %(plugins)s."
+msgstr "Version fixée par : %(plugins)s."
 
 #: src/postulo/templates/documents/letter_detail.html:67
 #, draft
@@ -10335,7 +10362,7 @@ msgstr ""
 msgid "That is not a status Postulo recognises."
 msgstr "Ce n'est pas un statut que Postulo reconnaît."
 
-#: src/postulo/plugins/installing.py:305
+#: src/postulo/plugins/installing.py:320
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Ce n'est pas un wheel : Postulo installe des fichiers .whl."
@@ -10695,12 +10722,12 @@ msgid ""
 msgstr ""
 "Les gris. Un noir chaud plutôt qu'un noir pur, plus reposant à la lecture."
 
-#: src/postulo/plugins/installing.py:551
+#: src/postulo/plugins/installing.py:655
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "L'installateur n'a pas pu être lancé : %(error)s"
 
-#: src/postulo/plugins/installing.py:555
+#: src/postulo/plugins/installing.py:659
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "L'installateur l'a refusé : %(error)s"
@@ -11046,7 +11073,7 @@ msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr ""
 "Le wheel ne correspond pas à la somme de contrôle publiée par le catalogue."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Le wheel n'a pas de métadonnées ; il est peut-être endommagé."
@@ -11100,6 +11127,11 @@ msgstr "Il n'y a rien à cette adresse (404). Vérifiez le lien."
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Il n'y a rien ici, ou ce n'est pas à vous de le voir."
+
+#: src/postulo/plugins/installing.py:776
+#, draft
+msgid "There is nothing to go back to: no plugin has been installed since."
+msgstr "Il n'y a rien où revenir : aucun plugin n'a été installé depuis."
 
 #: src/postulo/resume/views.py:420
 #, draft

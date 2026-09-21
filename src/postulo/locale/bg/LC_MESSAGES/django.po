@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-21 15:47+0000\n"
+"POT-Creation-Date: 2026-09-21 16:26+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: български\n"
@@ -266,17 +266,22 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s може да влезе отново."
 
-#: src/postulo/plugins/installing.py:462
+#: src/postulo/plugins/installing.py:566
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s не обявява входна точка на Postulo, така че инсталирането му няма да направи нищо. Приставката се регистрира под една от: %(groups)s."
 
-#: src/postulo/plugins/installing.py:581
+#: src/postulo/plugins/installing.py:869
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s не съвпада с контролната сума, с която е публикуван."
+
+#: src/postulo/plugins/installing.py:903
+#, python-format
+msgid "%(name)s installed but could not be loaded, so it was put back: %(why)s"
+msgstr ""
 
 #: src/postulo/core/server_views.py:229
 #, python-format, draft
@@ -293,12 +298,12 @@ msgstr "%(name)s го няма: акаунтът, записите му и %(fil
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s вече не е администратор."
 
-#: src/postulo/plugins/installing.py:661 src/postulo/plugins/installing.py:735
+#: src/postulo/plugins/installing.py:973 src/postulo/plugins/installing.py:1082
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s не е инсталиран."
 
-#: src/postulo/plugins/installing.py:452
+#: src/postulo/plugins/installing.py:556
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -344,12 +349,12 @@ msgid ""
 msgstr ""
 "%(name)s е езикът, с който започва нов акаунт, затова не може да спре да се предлага. Първо сменете езика по подразбиране."
 
-#: src/postulo/plugins/installing.py:657
+#: src/postulo/plugins/installing.py:969
 #, python-format, draft
 msgid "%(name)s ships inside Postulo and cannot be removed."
 msgstr "%(name)s е част от Postulo и не може да бъде премахнат."
 
-#: src/postulo/plugins/installing.py:719
+#: src/postulo/plugins/installing.py:1066
 #, python-format, draft
 msgid ""
 "%(name)s ships inside Postulo. Switch it off under Server settings → Plugins instead."
@@ -363,10 +368,11 @@ msgid ""
 msgstr ""
 "%(name)s влиза като <strong>%(current)s</strong>. Новото потребителско име трябва да е свободно в тази инстанция; главните букви не го различават."
 
-#: src/postulo/plugins/installing.py:472
-#, python-format, draft
-msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
-msgstr "%(name)s би променил това, от което зависи самият Postulo. %(problems)s"
+#: src/postulo/plugins/installing.py:576
+#, python-format
+msgid ""
+"%(name)s would change what something here already depends on. %(problems)s"
+msgstr ""
 
 #: src/postulo/documents/rendering.py:65
 #, python-format, draft
@@ -393,7 +399,12 @@ msgstr "%(ok)d отговориха, %(broken)d не; тези, които не,
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:407
+#: src/postulo/plugins/installing.py:501
+#, python-format
+msgid "%(package)s: needs %(wanted)s, and %(owner)s has %(have)s."
+msgstr ""
+
+#: src/postulo/plugins/installing.py:503
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: изисква %(wanted)s, а Postulo има %(have)s."
@@ -4976,6 +4987,15 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Не може да приключи, преди да е започнало."
 
+#: src/postulo/plugins/installing.py:846
+msgid "it could not be imported"
+msgstr ""
+
+#: src/postulo/plugins/installing.py:836
+#, python-format
+msgid "it did not finish importing within %(seconds)ss"
+msgstr ""
+
 #: src/postulo/documents/views.py:410
 #, python-format, draft
 msgid ""
@@ -6596,7 +6616,7 @@ msgid ""
 msgstr ""
 "Нищо не е замлъкнало от %(days)s дни. Или сте на ниво, или е време да изпратите още няколко."
 
-#: src/postulo/plugins/installing.py:495
+#: src/postulo/plugins/installing.py:599
 #, draft
 msgid ""
 "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
@@ -7535,6 +7555,11 @@ msgstr ""
 #, draft
 msgid "picture"
 msgstr "снимка"
+
+#: src/postulo/plugins/installing.py:472
+#, python-format
+msgid "Pinned by: %(plugins)s."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html:67
 #, draft
@@ -10147,7 +10172,7 @@ msgstr "Това е SVG, който Postulo още не пази. PNG или JPE
 msgid "That is not a status Postulo recognises."
 msgstr "Това не е статус, който Postulo разпознава."
 
-#: src/postulo/plugins/installing.py:305
+#: src/postulo/plugins/installing.py:320
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Това не е wheel: Postulo инсталира .whl файлове."
@@ -10499,12 +10524,12 @@ msgid ""
 "The greys. A warm near-black rather than pure black, easier to read at length."
 msgstr ""
 
-#: src/postulo/plugins/installing.py:551
+#: src/postulo/plugins/installing.py:655
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "Инсталаторът не можа да бъде стартиран: %(error)s"
 
-#: src/postulo/plugins/installing.py:555
+#: src/postulo/plugins/installing.py:659
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "Инсталаторът го отхвърли: %(error)s"
@@ -10836,7 +10861,7 @@ msgstr "Горната сума не може да е под долната."
 msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr "Wheel файлът не съвпада с контролната сума, публикувана от каталога."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Wheel файлът няма метаданни; може да е повреден."
@@ -10890,6 +10915,10 @@ msgstr "На този адрес няма нищо (404). Проверете в�
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Тук няма нищо, или не е ваше да го видите."
+
+#: src/postulo/plugins/installing.py:776
+msgid "There is nothing to go back to: no plugin has been installed since."
+msgstr ""
 
 #: src/postulo/resume/views.py:420
 #, draft

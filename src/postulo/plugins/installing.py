@@ -74,6 +74,21 @@ RECORD_NAME = "plugins.json"
 PURE_PYTHON = "py3-none-any"
 #: How long an install may take before it is called a failure.
 INSTALL_TIMEOUT = 300
+#: How long the check that a new plugin imports may take. Short: it imports the plugin's
+#: modules and nothing else, and a module that takes a minute to import is a module that
+#: will take a minute on every worker start.
+VERIFY_TIMEOUT = 60
+#: Where the directory as it was before the last install is kept. Inside the plugins
+#: directory because that is certainly writable, and hidden behind a dot because nothing
+#: looks for `*.dist-info` below the top level and nothing imports from a dotted name --
+#: so what is in here is kept without being live (#246).
+PREVIOUS_NAME = ".previous"
+#: Where the snapshot from *before* this install waits while one is being taken, so that
+#: an install which fails gives it back rather than spending it (#246).
+HELD_NAME = ".previous.held"
+#: What the snapshot never copies: itself, the one being held, and the scratch file an
+#: install writes.
+NOT_SNAPSHOTTED = (PREVIOUS_NAME, HELD_NAME, ".previous.writing", ".constraints.txt")
 
 
 def plugin_groups() -> tuple[str, ...]:
@@ -372,24 +387,102 @@ def digest_of(path: Path) -> str:
 # --------------------------------------------------------------- the constraint
 
 
-def constraints() -> list[str]:
-    """Every package in the running environment, pinned. A plugin may not move any of them."""
-    pins = []
+def pin_owners(exclude: str = "") -> dict[str, str]:
+    """``package -> what pins it``: a plugin's name, or ``""`` for Postulo itself.
+
+    Two things pin a version in this environment. Postulo's own dependencies, which a
+    plugin may never move -- that check predates this. And **the other installed plugins**,
+    which nothing accounted for at all: installing one could pull a shared dependency to a
+    version another plugin could not use, and nothing refused it and nothing said it had
+    happened. The other plugin simply started failing, at some later import, in a way
+    nobody could trace back to the install that caused it (#246).
+
+    ``exclude`` is the package being installed. Its own pins are left out, or an upgrade
+    would be refused for moving the very versions it exists to move -- including its own:
+    the plugins directory goes on `sys.path` at install time, so `postulo-example==1.0` was
+    in the constraint file while 2.0 was being installed over it.
+    """
+    skip = canonicalise(exclude) if exclude else ""
+    owners: dict[str, str] = {}
     for distribution in metadata.distributions():
         name = distribution.metadata["Name"]
         if name and distribution.version:
-            pins.append(f"{canonicalise(name)}=={distribution.version}")
-    return sorted(set(pins))
+            owners[canonicalise(name)] = ""
+
+    mine: set[str] = set()
+    for entry in read_record():
+        canonical = canonicalise(entry.name)
+        pinned = [f"{entry.name}=={entry.version}", *entry.dependencies]
+        for pin in pinned:
+            package = canonicalise(pin.partition("==")[0])
+            if canonical == skip:
+                mine.add(package)
+            else:
+                owners[package] = entry.name
+
+    # A package this plugin brought and nobody else claims is this plugin's to move.
+    for package in mine:
+        if owners.get(package) == "":
+            owners.pop(package, None)
+    owners.pop(skip, None)
+    return owners
+
+
+def constraints(exclude: str = "") -> list[str]:
+    """Every package that is pinned here, and at what. ``exclude`` may move freely.
+
+    Postulo's own environment, plus every *other* installed plugin and everything each of
+    them brought with it. Handed to the installer, so a plugin that needs a version another
+    plugin has pinned is refused at install rather than discovered later by whichever of
+    the two breaks first.
+    """
+    owners = pin_owners(exclude)
+    versions: dict[str, str] = {}
+    for distribution in metadata.distributions():
+        name = distribution.metadata["Name"]
+        if name and distribution.version and canonicalise(name) in owners:
+            versions[canonicalise(name)] = distribution.version
+    for entry in read_record():
+        if entry.name and owners.get(canonicalise(entry.name)) == entry.name:
+            versions[canonicalise(entry.name)] = entry.version
+        for pin in entry.dependencies:
+            package, _sep, version = pin.partition("==")
+            if version and owners.get(canonicalise(package)) == entry.name:
+                versions[canonicalise(package)] = version
+    return sorted(f"{package}=={version}" for package, version in versions.items())
+
+
+def explain_conflict(message: str, exclude: str = "") -> str:
+    """Name the plugin whose pin a refusal is about, where the refusal named a package.
+
+    A resolver says *"cannot install x==2.0 and x==1.0"* and stops there, which leaves an
+    administrator with a package name and no idea which of their plugins cares about it.
+    The constraint file is built here, so who pinned what is known here (#246).
+    """
+    owners = pin_owners(exclude)
+    named = sorted(
+        {
+            owner
+            for package, owner in owners.items()
+            if owner and re.search(rf"(?<![\w.-]){re.escape(package)}(?![\w.-])", message, re.I)
+        }
+    )
+    if not named:
+        return message
+    return message + " " + str(_("Pinned by: %(plugins)s.")) % {"plugins": ", ".join(named)}
 
 
 def conflicts_with_core(info: PackageInfo) -> list[str]:
-    """Requirements that name one of Postulo's own packages at a version it does not have.
+    """Requirements that name a package already pinned here, at a version it is not pinned at.
 
-    Checked before the installer runs so the refusal names the package rather than
-    quoting a resolver.
+    Checked before the installer runs so the refusal names the package rather than quoting
+    a resolver -- and, since #246, names *who* holds the pin. That used to be Postulo by
+    definition, because Postulo's environment was the whole of the constraint; now another
+    plugin can hold one, and "Postulo has 1.0" would be a wrong answer to "why not".
     """
+    owners = pin_owners(exclude=info.name)
     have = {}
-    for pin in constraints():
+    for pin in constraints(exclude=info.name):
         name, _sep, version = pin.partition("==")
         have[name] = version
     problems = []
@@ -403,9 +496,20 @@ def conflicts_with_core(info: PackageInfo) -> list[str]:
         )
         pinned = re.fullmatch(r"==\s*([\w.!+-]+)", specifier)
         if pinned and pinned.group(1) != version:
+            owner = owners.get(name) or ""
+            wording = (
+                _("%(package)s: needs %(wanted)s, and %(owner)s has %(have)s.")
+                if owner
+                else _("%(package)s: needs %(wanted)s, and Postulo has %(have)s.")
+            )
             problems.append(
-                str(_("%(package)s: needs %(wanted)s, and Postulo has %(have)s."))
-                % {"package": name, "wanted": pinned.group(1), "have": version}
+                str(wording)
+                % {
+                    "package": name,
+                    "wanted": pinned.group(1),
+                    "have": version,
+                    "owner": owner,
+                }
             )
     return problems
 
@@ -469,7 +573,7 @@ def check(info: PackageInfo) -> None:
     problems = conflicts_with_core(info)
     if problems:
         raise InstallError(
-            str(_("%(name)s would change what Postulo itself depends on. %(problems)s"))
+            str(_("%(name)s would change what something here already depends on. %(problems)s"))
             % {"name": info.name, "problems": " ".join(problems)}
         )
 
@@ -558,6 +662,190 @@ def run_install(target: Path, wheel: Path, constraint_file: Path) -> str:
     return (finished.stdout or "").strip()
 
 
+# ------------------------------------------------------- a way back, and a check
+
+
+def previous_dir() -> Path:
+    """Where the plugins directory as it was before the last install is kept."""
+    return plugins_dir() / PREVIOUS_NAME
+
+
+def _copyable(directory: Path) -> list[Path]:
+    return [item for item in directory.iterdir() if item.name not in NOT_SNAPSHOTTED]
+
+
+def take_snapshot() -> None:
+    """Keep the directory as it is now, so the next install has something to go back to.
+
+    The whole directory rather than one plugin's files, because a plugin's dependencies are
+    installed beside it and an upgrade moves those too: putting back only the wheel would
+    leave the new versions of everything it dragged in, which is not the state that worked.
+
+    One snapshot, replaced each time. Keeping a chain would mean deciding how long to keep
+    it and how much of somebody's volume to spend on it; one covers what an administrator
+    actually asks for, which is to undo the thing they just did.
+
+    The snapshot that was there is *held* rather than thrown away, until the install it is
+    being replaced for has worked. An attempt that fails puts the directory back and gives
+    the old snapshot back with it, so a failed upgrade costs nothing: without that, trying
+    a bad wheel would silently spend the way back to the version before the one running.
+    """
+    directory = plugins_dir()
+    directory.mkdir(parents=True, exist_ok=True)
+    previous, held = previous_dir(), directory / HELD_NAME
+    shutil.rmtree(held, ignore_errors=True)
+    if previous.is_dir():
+        previous.rename(held)
+
+    scratch = directory / ".previous.writing"
+    shutil.rmtree(scratch, ignore_errors=True)
+    scratch.mkdir(parents=True)
+    for item in _copyable(directory):
+        if item.name == scratch.name:
+            continue
+        if item.is_dir():
+            shutil.copytree(item, scratch / item.name, symlinks=True)
+        else:
+            shutil.copy2(item, scratch / item.name)
+    # Swapped into place at the end, so an interrupted copy never becomes the thing an
+    # administrator rolls back to.
+    shutil.rmtree(previous, ignore_errors=True)
+    scratch.rename(previous)
+
+
+def keep_snapshot() -> None:
+    """The install worked: the snapshot from before it is no longer the way back."""
+    shutil.rmtree(plugins_dir() / HELD_NAME, ignore_errors=True)
+
+
+def give_back_snapshot() -> None:
+    """The install failed: the way back is where it was before the attempt."""
+    directory = plugins_dir()
+    held = directory / HELD_NAME
+    if not held.is_dir():
+        # Nothing was held, so this was the first install: before it there was no plugin,
+        # and the snapshot just taken is still the right answer to "go back".
+        return
+    shutil.rmtree(previous_dir(), ignore_errors=True)
+    held.rename(previous_dir())
+
+
+def restore_snapshot() -> bool:
+    """Put the directory back as `take_snapshot` left it. False if there is nothing kept."""
+    previous = previous_dir()
+    if not previous.is_dir():
+        return False
+    directory = plugins_dir()
+    for item in _copyable(directory):
+        if item.name == PREVIOUS_NAME:
+            continue
+        if item.is_dir():
+            shutil.rmtree(item, ignore_errors=True)
+        else:
+            item.unlink(missing_ok=True)
+    for item in previous.iterdir():
+        if item.is_dir():
+            shutil.copytree(item, directory / item.name, symlinks=True)
+        else:
+            shutil.copy2(item, directory / item.name)
+    _forget_metadata_cache()
+    return True
+
+
+def can_roll_back() -> bool:
+    return previous_dir().is_dir()
+
+
+def _tidy_snapshots() -> None:
+    """Take away whatever an interrupted snapshot left, so the next one starts clean."""
+    directory = plugins_dir()
+    for name in (".previous.writing", HELD_NAME):
+        shutil.rmtree(directory / name, ignore_errors=True)
+
+
+def roll_back() -> list[Installed]:
+    """Undo the last install. Returns the record as it was before it.
+
+    For the install that succeeded and turned out to be wrong -- a plugin that imports
+    cleanly and then does the wrong thing, which no check here could have caught. The
+    snapshot is spent afterwards: there is one, and rolling back twice would be rolling
+    back to a state nobody kept.
+    """
+    if not can_roll_back():
+        raise InstallError(
+            str(_("There is nothing to go back to: no plugin has been installed since."))
+        )
+    restore_snapshot()
+    shutil.rmtree(previous_dir(), ignore_errors=True)
+    _tidy_snapshots()
+    activate()
+    _forget_metadata_cache()
+    return read_record()
+
+
+#: The program the check below runs. It loads the entry points exactly as the registry
+#: does -- by group, from the directory that was just installed into -- and imports what
+#: each one names. Printing nothing and exiting 0 is the whole of "it loads".
+_VERIFY = """
+import sys, site
+site.addsitedir(sys.argv[1])
+from importlib.metadata import entry_points
+wanted = set(sys.argv[2].split(",")) if sys.argv[2] else set()
+failed = []
+for group in sys.argv[3].split(","):
+    for point in entry_points(group=group):
+        if f"{group}:{point.name}" not in wanted:
+            continue
+        try:
+            point.load()
+        except BaseException as error:
+            failed.append(f"{point.name}: {type(error).__name__}: {error}")
+for line in failed:
+    print(line)
+sys.exit(1 if failed else 0)
+"""
+
+
+def verify_imports(names: list[str]) -> list[str]:
+    """Import every entry point ``names`` lists, in a separate process. What broke, if any.
+
+    **In a subprocess on purpose.** Importing somebody else's module runs somebody else's
+    code, and there is no way to unimport it: doing this in the worker would leave whatever
+    a half-loaded module did behind, in the process that then has to carry on serving. A
+    module that calls `sys.exit` or exhausts memory takes the subprocess with it and
+    nothing else, which is the same reason `registry` catches `BaseException` (#228).
+
+    An empty list means every entry point loaded. It is only ever asked about the plugin
+    just installed, so a plugin that was already broken is not this install's failure.
+    """
+    if not names:
+        return []
+    groups = ",".join(sorted({point.split(":", 1)[0] for point in names}))
+    try:
+        finished = subprocess.run(  # noqa: S603 - the argument list is built here
+            # `-B`: checking that a plugin imports should not leave anything behind,
+            # and an import writes `__pycache__` beside the source unless told not to.
+            [sys.executable, "-B", "-c", _VERIFY, str(plugins_dir()), ",".join(names), groups],
+            capture_output=True,
+            text=True,
+            timeout=VERIFY_TIMEOUT,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return [
+            str(_("it did not finish importing within %(seconds)ss")) % {"seconds": VERIFY_TIMEOUT}
+        ]
+    except (OSError, subprocess.SubprocessError) as error:
+        # The check could not be run, which is not the same as the plugin being broken.
+        # Saying so and going on beats refusing an install over the checker's own trouble.
+        logger.warning("Could not check that the plugin imports: %s", error)
+        return []
+    if finished.returncode == 0:
+        return []
+    said = (finished.stdout or finished.stderr or "").strip().splitlines()
+    return said or [str(_("it could not be imported"))]
+
+
 def install_wheel(
     wheel: Path,
     *,
@@ -586,12 +874,35 @@ def install_wheel(
     target = plugins_dir()
     target.mkdir(parents=True, exist_ok=True)
     before = distributions_in(target)
+    # Kept before anything is written, because what this is protecting against is an
+    # upgrade: `--target --upgrade` writes over the working version, and until #246 there
+    # was nothing to go back to once it had.
+    take_snapshot()
     constraint_file = target / ".constraints.txt"
-    constraint_file.write_text("\n".join(constraints()) + "\n", encoding="utf-8")
+    constraint_file.write_text("\n".join(constraints(exclude=info.name)) + "\n", encoding="utf-8")
     try:
         run_install(target, wheel, constraint_file)
+    except InstallError as error:
+        restore_snapshot()
+        give_back_snapshot()
+        raise InstallError(explain_conflict(str(error), exclude=info.name)) from error
     finally:
         constraint_file.unlink(missing_ok=True)
+
+    # It is on the volume; whether it *loads* is a different question, and the one that
+    # matters. Asked before the record names it, so a plugin that cannot be imported is a
+    # refused install rather than an instance with a line in its record and nothing behind
+    # it (#246).
+    _forget_metadata_cache()
+    if broken := verify_imports(info.entry_points):
+        restore_snapshot()
+        give_back_snapshot()
+        activate()
+        _forget_metadata_cache()
+        raise InstallError(
+            str(_("%(name)s installed but could not be loaded, so it was put back: %(why)s"))
+            % {"name": info.name, "why": " ".join(broken)}
+        )
 
     # What the installer actually brought, as opposed to what the wheel asked for. The
     # two differ: a requirement of a requirement never appears in the wheel's metadata.
@@ -621,6 +932,7 @@ def install_wheel(
     )
     record = [item for item in read_record() if canonicalise(item.name) != canonicalise(info.name)]
     write_record([*record, entry])
+    keep_snapshot()
     activate()
     _forget_metadata_cache()
     return entry
@@ -661,15 +973,40 @@ def remove(name: str) -> Installed:
         raise InstallError(str(_("%(name)s is not installed.")) % {"name": name})
     if refusal := data.refuse_removing(name):
         raise InstallError(refusal)
-    for path in _paths_of(entry.name):
-        if path.is_dir():
-            shutil.rmtree(path, ignore_errors=True)
-        else:
-            path.unlink(missing_ok=True)
+    going = [entry.name, *unshared_dependencies(entry)]
+    for package in going:
+        for path in _paths_of(package):
+            if path.is_dir():
+                shutil.rmtree(path, ignore_errors=True)
+            else:
+                path.unlink(missing_ok=True)
     _prune_empty_directories()
     write_record([item for item in read_record() if canonicalise(item.name) != canonicalise(name)])
     _forget_metadata_cache()
     return entry
+
+
+def unshared_dependencies(entry: Installed) -> list[str]:
+    """What this plugin brought that nothing else installed is using.
+
+    `remove` used to delete the files the plugin's own ``RECORD`` lists and stop, so
+    everything it had dragged in stayed on the volume and stayed importable for ever --
+    growing with every plugin ever tried and removed, and quietly satisfying an import in
+    a plugin that never declared it (#246).
+
+    Counted from the record's `dependencies`, which is what each install wrote down as
+    having arrived with it. A package two plugins both brought is kept while either
+    remains; a package Postulo itself provides is not in the plugins directory at all, so
+    `_paths_of` finds nothing for it and it cannot be removed by this.
+    """
+    mine = {canonicalise(pin.partition("==")[0]) for pin in entry.dependencies}
+    canonical = canonicalise(entry.name)
+    for other in read_record():
+        if canonicalise(other.name) == canonical:
+            continue
+        mine -= {canonicalise(pin.partition("==")[0]) for pin in other.dependencies}
+        mine.discard(canonicalise(other.name))
+    return sorted(mine)
 
 
 def _paths_of(name: str) -> list[Path]:
@@ -697,13 +1034,23 @@ def _paths_of(name: str) -> list[Path]:
 
 
 def _prune_empty_directories() -> None:
-    """Take away the directories a removed plugin's files were in, once they are empty."""
+    """Take away the directories a removed plugin's files were in, once they are empty.
+
+    A directory holding nothing but `__pycache__` counts as empty, because that is a
+    directory of compiled copies of files that are gone. Every worker that imported the
+    plugin wrote one, and none of them is in the `RECORD` the removal works from -- so
+    without this, removing a plugin that had ever been imported left its package directory
+    on the volume for ever, and `postulo_example/` looked installed to anyone who looked
+    (#246).
+    """
     directory = plugins_dir()
     if not directory.is_dir():
         return
     for path in sorted(directory.rglob("*"), key=lambda item: len(item.parts), reverse=True):
-        if path.is_dir() and not any(path.iterdir()):
-            path.rmdir()
+        if not path.is_dir() or path.name in (PREVIOUS_NAME, "__pycache__"):
+            continue  # the snapshot is kept on purpose; a cache goes with its own parent
+        if not [item for item in path.iterdir() if item.name != "__pycache__"]:
+            shutil.rmtree(path, ignore_errors=True)
 
 
 def set_disabled(name: str, disabled: bool) -> Installed:

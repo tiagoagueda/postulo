@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-21 15:47+0000\n"
+"POT-Creation-Date: 2026-09-21 16:26+0000\n"
 "PO-Revision-Date: 2026-09-08 10:23+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: українська\n"
@@ -281,17 +281,22 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s знову може входити."
 
-#: src/postulo/plugins/installing.py:462
+#: src/postulo/plugins/installing.py:566
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s не оголошує жодної точки входу Postulo, тож встановлення нічого б не дало. Додаток реєструється в одній із: %(groups)s."
 
-#: src/postulo/plugins/installing.py:581
+#: src/postulo/plugins/installing.py:869
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s не збігається з контрольною сумою, з якою його опубліковано."
+
+#: src/postulo/plugins/installing.py:903
+#, python-format
+msgid "%(name)s installed but could not be loaded, so it was put back: %(why)s"
+msgstr ""
 
 #: src/postulo/core/server_views.py:229
 #, python-format, draft
@@ -309,12 +314,12 @@ msgstr ""
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s більше не адміністратор."
 
-#: src/postulo/plugins/installing.py:661 src/postulo/plugins/installing.py:735
+#: src/postulo/plugins/installing.py:973 src/postulo/plugins/installing.py:1082
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s не встановлено."
 
-#: src/postulo/plugins/installing.py:452
+#: src/postulo/plugins/installing.py:556
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -360,12 +365,12 @@ msgid ""
 msgstr ""
 "%(name)s — це мова, якою починає новий обліковий запис, тож її не можна перестати пропонувати. Спершу змініть типову мову."
 
-#: src/postulo/plugins/installing.py:657
+#: src/postulo/plugins/installing.py:969
 #, python-format, draft
 msgid "%(name)s ships inside Postulo and cannot be removed."
 msgstr "%(name)s є частиною Postulo, і його не можна вилучити."
 
-#: src/postulo/plugins/installing.py:719
+#: src/postulo/plugins/installing.py:1066
 #, python-format, draft
 msgid ""
 "%(name)s ships inside Postulo. Switch it off under Server settings → Plugins instead."
@@ -379,10 +384,11 @@ msgid ""
 msgstr ""
 "%(name)s входить як <strong>%(current)s</strong>. Нове ім’я користувача має бути вільним у цій інстанції; великі літери не роблять його іншим."
 
-#: src/postulo/plugins/installing.py:472
-#, python-format, draft
-msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
-msgstr "%(name)s змінив би те, від чого залежить сам Postulo. %(problems)s"
+#: src/postulo/plugins/installing.py:576
+#, python-format
+msgid ""
+"%(name)s would change what something here already depends on. %(problems)s"
+msgstr ""
 
 #: src/postulo/documents/rendering.py:65
 #, python-format, draft
@@ -409,7 +415,12 @@ msgstr "%(ok)d відповіли, %(broken)d ні; ті, що ні, кажут�
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:407
+#: src/postulo/plugins/installing.py:501
+#, python-format
+msgid "%(package)s: needs %(wanted)s, and %(owner)s has %(have)s."
+msgstr ""
+
+#: src/postulo/plugins/installing.py:503
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: потребує %(wanted)s, а Postulo має %(have)s."
@@ -5001,6 +5012,15 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Це не може завершитися раніше, ніж почалося."
 
+#: src/postulo/plugins/installing.py:846
+msgid "it could not be imported"
+msgstr ""
+
+#: src/postulo/plugins/installing.py:836
+#, python-format
+msgid "it did not finish importing within %(seconds)ss"
+msgstr ""
+
 #: src/postulo/documents/views.py:410
 #, python-format, draft
 msgid ""
@@ -6625,7 +6645,7 @@ msgid ""
 msgstr ""
 "Нічого не затихло вже %(days)s днів. Або ви все тримаєте під контролем, або час надіслати ще кілька."
 
-#: src/postulo/plugins/installing.py:495
+#: src/postulo/plugins/installing.py:599
 #, draft
 msgid ""
 "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
@@ -7577,6 +7597,11 @@ msgstr ""
 #, draft
 msgid "picture"
 msgstr "зображення"
+
+#: src/postulo/plugins/installing.py:472
+#, python-format
+msgid "Pinned by: %(plugins)s."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html:67
 #, draft
@@ -10188,7 +10213,7 @@ msgstr "Це SVG, який Postulo поки не зберігає. Підійд�
 msgid "That is not a status Postulo recognises."
 msgstr "Такого статусу Postulo не знає."
 
-#: src/postulo/plugins/installing.py:305
+#: src/postulo/plugins/installing.py:320
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Це не колесо: Postulo встановлює файли .whl."
@@ -10541,12 +10566,12 @@ msgid ""
 "The greys. A warm near-black rather than pure black, easier to read at length."
 msgstr ""
 
-#: src/postulo/plugins/installing.py:551
+#: src/postulo/plugins/installing.py:655
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "Не вдалося запустити встановлювач: %(error)s"
 
-#: src/postulo/plugins/installing.py:555
+#: src/postulo/plugins/installing.py:659
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "Встановлювач відмовив: %(error)s"
@@ -10880,7 +10905,7 @@ msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr ""
 "Колесо не відповідає контрольній сумі, яку опублікував для нього каталог."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Колесо не має метаданих; можливо, воно пошкоджене."
@@ -10934,6 +10959,10 @@ msgstr "За тією адресою нічого немає (404). Переві
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Тут нічого немає, або це не для ваших очей."
+
+#: src/postulo/plugins/installing.py:776
+msgid "There is nothing to go back to: no plugin has been installed since."
+msgstr ""
 
 #: src/postulo/resume/views.py:420
 #, draft

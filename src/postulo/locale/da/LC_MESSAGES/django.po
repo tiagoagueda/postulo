@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-21 15:47+0000\n"
+"POT-Creation-Date: 2026-09-21 16:26+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: dansk\n"
@@ -267,17 +267,22 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s kan logge ind igen."
 
-#: src/postulo/plugins/installing.py:462
+#: src/postulo/plugins/installing.py:566
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s angiver intet Postulo-indgangspunkt, så det ville ikke gøre noget at installere det. Et tilføjelsesprogram registrerer sig under en af: %(groups)s."
 
-#: src/postulo/plugins/installing.py:581
+#: src/postulo/plugins/installing.py:869
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s svarer ikke til den kontrolsum, det blev udgivet med."
+
+#: src/postulo/plugins/installing.py:903
+#, python-format
+msgid "%(name)s installed but could not be loaded, so it was put back: %(why)s"
+msgstr ""
 
 #: src/postulo/core/server_views.py:229
 #, python-format, draft
@@ -294,12 +299,12 @@ msgstr "%(name)s er væk: kontoen, dens poster og %(files)s filer på disken."
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s er ikke længere administrator."
 
-#: src/postulo/plugins/installing.py:661 src/postulo/plugins/installing.py:735
+#: src/postulo/plugins/installing.py:973 src/postulo/plugins/installing.py:1082
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s er ikke installeret."
 
-#: src/postulo/plugins/installing.py:452
+#: src/postulo/plugins/installing.py:556
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -345,12 +350,12 @@ msgid ""
 msgstr ""
 "%(name)s er det, en ny konto starter i, så den kan ikke fravælges. Skift standardsproget først."
 
-#: src/postulo/plugins/installing.py:657
+#: src/postulo/plugins/installing.py:969
 #, python-format, draft
 msgid "%(name)s ships inside Postulo and cannot be removed."
 msgstr "%(name)s hører til Postulo og kan ikke fjernes."
 
-#: src/postulo/plugins/installing.py:719
+#: src/postulo/plugins/installing.py:1066
 #, python-format, draft
 msgid ""
 "%(name)s ships inside Postulo. Switch it off under Server settings → Plugins instead."
@@ -364,10 +369,11 @@ msgid ""
 msgstr ""
 "%(name)s logger ind som <strong>%(current)s</strong>. Det nye brugernavn skal være ledigt på denne instans; store bogstaver gør ingen forskel."
 
-#: src/postulo/plugins/installing.py:472
-#, python-format, draft
-msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
-msgstr "%(name)s ville ændre det, Postulo selv afhænger af. %(problems)s"
+#: src/postulo/plugins/installing.py:576
+#, python-format
+msgid ""
+"%(name)s would change what something here already depends on. %(problems)s"
+msgstr ""
 
 #: src/postulo/documents/rendering.py:65
 #, python-format, draft
@@ -395,7 +401,12 @@ msgstr ""
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:407
+#: src/postulo/plugins/installing.py:501
+#, python-format
+msgid "%(package)s: needs %(wanted)s, and %(owner)s has %(have)s."
+msgstr ""
+
+#: src/postulo/plugins/installing.py:503
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: kræver %(wanted)s, og Postulo har %(have)s."
@@ -4977,6 +4988,15 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "Den kan ikke slutte, før den begynder."
 
+#: src/postulo/plugins/installing.py:846
+msgid "it could not be imported"
+msgstr ""
+
+#: src/postulo/plugins/installing.py:836
+#, python-format
+msgid "it did not finish importing within %(seconds)ss"
+msgstr ""
+
 #: src/postulo/documents/views.py:410
 #, python-format, draft
 msgid ""
@@ -6598,7 +6618,7 @@ msgid ""
 msgstr ""
 "Intet er blevet stille i %(days)s dage. Enten har du styr på det, eller også er det tid til at sende et par stykker mere."
 
-#: src/postulo/plugins/installing.py:495
+#: src/postulo/plugins/installing.py:599
 #, draft
 msgid ""
 "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
@@ -7534,6 +7554,11 @@ msgstr ""
 #, draft
 msgid "picture"
 msgstr "billede"
+
+#: src/postulo/plugins/installing.py:472
+#, python-format
+msgid "Pinned by: %(plugins)s."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html:67
 #, draft
@@ -10139,7 +10164,7 @@ msgstr "Det er en SVG, som Postulo endnu ikke gemmer. En PNG eller JPEG virker."
 msgid "That is not a status Postulo recognises."
 msgstr "Det er ikke en status, Postulo kender."
 
-#: src/postulo/plugins/installing.py:305
+#: src/postulo/plugins/installing.py:320
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "Det er ikke en wheel: Postulo installerer .whl-filer."
@@ -10491,12 +10516,12 @@ msgid ""
 "The greys. A warm near-black rather than pure black, easier to read at length."
 msgstr ""
 
-#: src/postulo/plugins/installing.py:551
+#: src/postulo/plugins/installing.py:655
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "Installationsprogrammet kunne ikke køres: %(error)s"
 
-#: src/postulo/plugins/installing.py:555
+#: src/postulo/plugins/installing.py:659
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "Installationsprogrammet afviste den: %(error)s"
@@ -10827,7 +10852,7 @@ msgstr "Det øverste tal kan ikke være lavere end det nederste."
 msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr "Wheel'en svarer ikke til den kontrolsum, kataloget udgav for den."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "Wheel'en har ingen metadata; den er måske beskadiget."
@@ -10881,6 +10906,10 @@ msgstr "Der er intet på den adresse (404). Tjek linket."
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Der er intet her, eller også er det ikke dit at se."
+
+#: src/postulo/plugins/installing.py:776
+msgid "There is nothing to go back to: no plugin has been installed since."
+msgstr ""
 
 #: src/postulo/resume/views.py:420
 #, draft

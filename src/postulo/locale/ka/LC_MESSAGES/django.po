@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-21 15:47+0000\n"
+"POT-Creation-Date: 2026-09-21 16:26+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: ქართული\n"
@@ -267,17 +267,22 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s შეძლებს ხელახლა შესვლას."
 
-#: src/postulo/plugins/installing.py:462
+#: src/postulo/plugins/installing.py:566
 #, python-format, draft
 msgid ""
 "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
 msgstr ""
 "%(name)s არ აცხადებს არცერთ Postulo-ს შესვლის წერტილს, ამიტომ დაყენება ვერაფერს გააკეთებდა. მოდული რეგისტრირდება ერთ-ერთში: %(groups)s."
 
-#: src/postulo/plugins/installing.py:581
+#: src/postulo/plugins/installing.py:869
 #, python-format, draft
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s არ ემთხვევა საკონტროლო ჯამს, რომლითაც გამოქვეყნდა."
+
+#: src/postulo/plugins/installing.py:903
+#, python-format
+msgid "%(name)s installed but could not be loaded, so it was put back: %(why)s"
+msgstr ""
 
 #: src/postulo/core/server_views.py:229
 #, python-format, draft
@@ -294,12 +299,12 @@ msgstr "%(name)s აღარ არის: ანგარიში, მის�
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s აღარ არის ადმინისტრატორი."
 
-#: src/postulo/plugins/installing.py:661 src/postulo/plugins/installing.py:735
+#: src/postulo/plugins/installing.py:973 src/postulo/plugins/installing.py:1082
 #, python-format, draft
 msgid "%(name)s is not installed."
 msgstr "%(name)s არ არის დაყენებული."
 
-#: src/postulo/plugins/installing.py:452
+#: src/postulo/plugins/installing.py:556
 #, python-format, draft
 msgid ""
 "%(name)s is not pure Python. Postulo installs only wheels built for any platform (py3-none-any); this image has no compiler."
@@ -345,12 +350,12 @@ msgid ""
 msgstr ""
 "%(name)s არის ენა, რომლითაც ახალი ანგარიში იწყება, ამიტომ მისი შეთავაზება ვერ შეწყდება. ჯერ შეცვალეთ ნაგულისხმევი ენა."
 
-#: src/postulo/plugins/installing.py:657
+#: src/postulo/plugins/installing.py:969
 #, python-format, draft
 msgid "%(name)s ships inside Postulo and cannot be removed."
 msgstr "%(name)s Postulo-ს ნაწილია და ვერ წაიშლება."
 
-#: src/postulo/plugins/installing.py:719
+#: src/postulo/plugins/installing.py:1066
 #, python-format, draft
 msgid ""
 "%(name)s ships inside Postulo. Switch it off under Server settings → Plugins instead."
@@ -364,11 +369,11 @@ msgid ""
 msgstr ""
 "%(name)s შედის როგორც <strong>%(current)s</strong>. ახალი მომხმარებლის სახელი ამ ინსტალაციაზე თავისუფალი უნდა იყოს; მთავრული ასოები მას განსხვავებულს არ ხდის."
 
-#: src/postulo/plugins/installing.py:472
-#, python-format, draft
-msgid "%(name)s would change what Postulo itself depends on. %(problems)s"
+#: src/postulo/plugins/installing.py:576
+#, python-format
+msgid ""
+"%(name)s would change what something here already depends on. %(problems)s"
 msgstr ""
-"%(name)s შეცვლიდა იმას, რაზეც თავად Postulo არის დამოკიდებული. %(problems)s"
 
 #: src/postulo/documents/rendering.py:65
 #, python-format, draft
@@ -395,7 +400,12 @@ msgstr "%(ok)d უპასუხა, %(broken)d არა; ვინც არ 
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
 
-#: src/postulo/plugins/installing.py:407
+#: src/postulo/plugins/installing.py:501
+#, python-format
+msgid "%(package)s: needs %(wanted)s, and %(owner)s has %(have)s."
+msgstr ""
+
+#: src/postulo/plugins/installing.py:503
 #, python-format, draft
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: სჭირდება %(wanted)s, Postulo-ს კი აქვს %(have)s."
@@ -4982,6 +4992,15 @@ msgstr ""
 msgid "It cannot end before it starts."
 msgstr "ვერ დასრულდება დაწყებამდე."
 
+#: src/postulo/plugins/installing.py:846
+msgid "it could not be imported"
+msgstr ""
+
+#: src/postulo/plugins/installing.py:836
+#, python-format
+msgid "it did not finish importing within %(seconds)ss"
+msgstr ""
+
 #: src/postulo/documents/views.py:410
 #, python-format, draft
 msgid ""
@@ -6603,7 +6622,7 @@ msgid ""
 msgstr ""
 "%(days)s დღეა არაფერი გაჩუმებულა. ან ყველაფერს აკონტროლებთ, ან დროა კიდევ რამდენიმე გაგზავნოთ."
 
-#: src/postulo/plugins/installing.py:495
+#: src/postulo/plugins/installing.py:599
 #, draft
 msgid ""
 "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
@@ -7541,6 +7560,11 @@ msgstr ""
 #, draft
 msgid "picture"
 msgstr "სურათი"
+
+#: src/postulo/plugins/installing.py:472
+#, python-format
+msgid "Pinned by: %(plugins)s."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html:67
 #, draft
@@ -10151,7 +10175,7 @@ msgstr "ეს არის SVG, რომელსაც Postulo ჯერ ა�
 msgid "That is not a status Postulo recognises."
 msgstr "ეს არ არის სტატუსი, რომელსაც Postulo ცნობს."
 
-#: src/postulo/plugins/installing.py:305
+#: src/postulo/plugins/installing.py:320
 #, draft
 msgid "That is not a wheel: Postulo installs .whl files."
 msgstr "ეს ბორბალი არ არის: Postulo .whl ფაილებს აყენებს."
@@ -10502,12 +10526,12 @@ msgid ""
 "The greys. A warm near-black rather than pure black, easier to read at length."
 msgstr ""
 
-#: src/postulo/plugins/installing.py:551
+#: src/postulo/plugins/installing.py:655
 #, python-format, draft
 msgid "The installer could not be run: %(error)s"
 msgstr "დამყენებელი ვერ გაეშვა: %(error)s"
 
-#: src/postulo/plugins/installing.py:555
+#: src/postulo/plugins/installing.py:659
 #, python-format, draft
 msgid "The installer refused it: %(error)s"
 msgstr "დამყენებელმა უარყო: %(error)s"
@@ -10840,7 +10864,7 @@ msgid "The wheel does not match the checksum the catalogue published for it."
 msgstr ""
 "ბორბალი არ ემთხვევა საკონტროლო ჯამს, რომელიც კატალოგმა მისთვის გამოაქვეყნა."
 
-#: src/postulo/plugins/installing.py:310
+#: src/postulo/plugins/installing.py:325
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "ბორბალს მეტამონაცემები არ აქვს; შესაძლოა დაზიანებულია."
@@ -10894,6 +10918,10 @@ msgstr "იმ მისამართზე არაფერია (404). �
 #, draft
 msgid "There is nothing here, or it is not yours to see."
 msgstr "აქ არაფერია, ან ეს თქვენი სანახავი არ არის."
+
+#: src/postulo/plugins/installing.py:776
+msgid "There is nothing to go back to: no plugin has been installed since."
+msgstr ""
 
 #: src/postulo/resume/views.py:420
 #, draft
