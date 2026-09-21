@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import Tag
+from postulo.jobs import recall
 from postulo.jobs.forms import OwnerScopedModelForm
 from postulo.jobs.models import Contact, EmploymentType, RemoteType, SalaryPeriod
 
@@ -40,10 +41,24 @@ class PostingIntakeForm(UserAwareForm):
     created if it is new.
     """
 
-    company_name = forms.CharField(label=_("Company"), max_length=200)
+    #: The three boxes that are typed every single time, and until #261 offered nothing.
+    #: `autocomplete="off"` turns off the *browser's* memory of what was typed into a box
+    #: with this name on any site, which is a different list and a worse one: it is not
+    #: scoped to this account, it carries whatever was typed into a box called "location"
+    #: somewhere else, and it hides the list that is actually about this person's records.
+    company_name = forms.CharField(
+        label=_("Company"),
+        max_length=200,
+        widget=forms.TextInput(attrs={"list": "company-suggestions", "autocomplete": "off"}),
+    )
     title = forms.CharField(label=_("Job title"), max_length=250)
     url = forms.URLField(label=_("Posting URL"), max_length=500, required=False)
-    location = forms.CharField(label=_("Location"), max_length=200, required=False)
+    location = forms.CharField(
+        label=_("Location"),
+        max_length=200,
+        required=False,
+        widget=forms.TextInput(attrs={"list": "location-suggestions", "autocomplete": "off"}),
+    )
     remote_type = forms.ChoiceField(
         label=_("Working arrangement"),
         choices=[("", "—"), *RemoteType.choices],
@@ -54,7 +69,12 @@ class PostingIntakeForm(UserAwareForm):
         choices=[("", "—"), *EmploymentType.choices],
         required=False,
     )
-    source = forms.CharField(label=_("Found via"), max_length=120, required=False)
+    source = forms.CharField(
+        label=_("Found via"),
+        max_length=120,
+        required=False,
+        widget=forms.TextInput(attrs={"list": "source-suggestions", "autocomplete": "off"}),
+    )
 
     salary_min = forms.DecimalField(
         label=_("Salary from"), required=False, max_digits=12, decimal_places=2
@@ -68,6 +88,26 @@ class PostingIntakeForm(UserAwareForm):
     salary_period = forms.ChoiceField(
         label=_("Period"), choices=SalaryPeriod.choices, required=False, initial=SalaryPeriod.YEAR
     )
+
+    @property
+    def datalists(self) -> dict[str, list[str]]:
+        """What each `<datalist>` on this form offers: ``id -> values`` (#261).
+
+        Read by `c-field`, which draws the list beside any widget carrying a ``list``
+        attribute, so the three templates that render this form -- intake, capture review
+        and the listing form -- get it without any of them knowing.
+
+        Built from *this person's* records and nobody else's. A form with no user attached
+        offers nothing rather than everything, which is the safe way round: every route
+        here passes one, and a route that forgets should suggest nothing rather than leak.
+        """
+        if self.user is None:
+            return {}
+        return {
+            "company-suggestions": recall.companies(self.user),
+            "location-suggestions": recall.locations(self.user),
+            "source-suggestions": recall.sources(self.user),
+        }
 
     closes_at = forms.DateField(
         label=_("Closing date"), required=False, widget=forms.DateInput(attrs={"type": "date"})

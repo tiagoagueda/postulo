@@ -45,6 +45,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Company, Location and *Found via* suggest what you have already recorded, on the intake form, the listing form and the capture review. (#261)
 - The plugin surface carries the notifier contract, the records a sync works on and the calls that write to them, and `postulo.plugins.testing` publishes the check that a plugin imports nothing else. (#229)
 - *Settings → Appearance* offers a compact interface for anybody who wants more rows on a
   screen. Comfortable stays the default, and nothing you can click gets smaller. (#292)

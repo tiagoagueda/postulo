@@ -10,6 +10,12 @@
    would read out of its context. The `<c-vars>` line above is the whole contract: what this
    takes, and nothing else it reads.
 
+   A widget carrying a `list` attribute gets its `<datalist>` drawn here, from the form's
+   `datalists` -- so a field that suggests what somebody has already recorded (#261) is one
+   line in the form, and the three templates that render it need to know nothing. A form
+   without that property, or without options for that id, draws no list and the box stays
+   an ordinary text box: offering is never requiring.
+
    `wrap-anywhere` because a widget may put text here that Postulo did not write and cannot
    hyphenate. A bound file field says "Currently: <file name>", and a file name has no spaces
    in it -- the storage path it used to show was 252 unbreakable pixels against the 238 a
@@ -22,5 +28,16 @@
     {% if field.field.required %}<span aria-hidden="true" class="text-red-600 dark:text-red-400">*</span>{% endif %}
   </label>
   {{ field|add_class:"field-input" }}
+  {% with list_id=field.field.widget.attrs.list %}
+    {% if list_id %}
+      {% with options=field.form.datalists|get_item:list_id %}
+        {% if options %}
+          <datalist id="{{ list_id }}">
+            {% for value in options %}<option value="{{ value }}">{% endfor %}
+          </datalist>
+        {% endif %}
+      {% endwith %}
+    {% endif %}
+  {% endwith %}
   <c-field-feedback :field="field" />
 </div>

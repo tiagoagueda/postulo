@@ -1,239 +1,196 @@
-"""Suggestions: what a plugin thinks happened, and the review that decides whether it did."""
+"""The boxes that are typed every time offer what this person already recorded (#261).
+
+`get_or_create_company` matches on `name__iexact`, which catches *Acme*, *acme* and *ACME*
+and nothing else: `Acme Ltd` and `ACME Inc.` become two employers, silently, at the moment
+somebody is busy doing something else. A list of what they have already typed works before
+the record exists rather than reconciling two afterwards.
+
+The isolation test here is the one that matters. A suggestion list built from the instance
+rather than the account is the classic shape of a leak — type `a`, learn every employer
+everybody is applying to — and it is invisible until somebody looks for it.
+"""
 
 from __future__ import annotations
 
-import datetime as dt
-
 import pytest
+from django import forms
 from django.urls import reverse
-from django.utils import timezone
 
-from postulo.applications import suggestions
-from postulo.applications.models import (
-    Application,
-    ApplicationEvent,
-    EventKind,
-    Status,
-    Suggestion,
-    SuggestionStatus,
-)
-from postulo.applications.services import change_status
+from postulo.applications.forms import ApplicationIntakeForm, PostingIntakeForm
+from postulo.applications.models import Application, Priority, Status
+from postulo.jobs import recall
 from postulo.jobs.models import Company, JobPosting
 
 pytestmark = pytest.mark.django_db
 
-
-@pytest.fixture
-def application(user):
-    company = Company.objects.create(owner=user, name="Black Mesa")
-    posting = JobPosting.objects.create(owner=user, company=company, title="Research Engineer")
-    application = Application.objects.create(owner=user, posting=posting, status=Status.DRAFT)
-    change_status(application, Status.APPLIED, occurred_at=timezone.now() - dt.timedelta(days=5))
-    application.refresh_from_db()
-    return application
+#: The least an intake form takes, minus the company the test under it is about.
+INTAKE = {"title": "Engineer", "status": Status.APPLIED, "priority": Priority.NORMAL}
 
 
-def a_suggestion(user, **overrides):
-    values = {
-        "source": "imap",
-        "external_id": "<msg-1@example.org>",
-        "kind": EventKind.EMAIL_RECEIVED,
-        "summary": "Thank you for applying",
-        "body": "We have received your application.",
-        "context": {"From": "jobs@blackmesa.test", "Subject": "Your application"},
-    }
-    values.update(overrides)
-    suggestion, created = suggestions.suggest(user, **values)
-    return suggestion, created
-
-
-# ------------------------------------------------------------------- filing
-
-
-def test_a_suggestion_is_filed_once_per_source_and_identifier(user, application):
-    first, created = a_suggestion(user, application=application)
-    assert created and first.is_pending and first.is_matched
-    assert first.owner == user and first.source == "imap"
-    assert first.context["From"] == "jobs@blackmesa.test"
-
-    again, created = a_suggestion(user, application=application, summary="Different words")
-    assert not created and again.pk == first.pk
-    assert again.summary == "Thank you for applying", "the first reading stands"
-    assert Suggestion.objects.count() == 1
-
-    other, created = a_suggestion(user, external_id="<msg-2@example.org>")
-    assert created and other.pk != first.pk and not other.is_matched
-
-
-def test_the_same_identifier_from_another_source_or_person_is_its_own(user, other_user):
-    first, _ = a_suggestion(user)
-    same_id_other_source, created = a_suggestion(user, source="dav")
-    assert created and same_id_other_source.pk != first.pk
-    theirs, created = a_suggestion(other_user)
-    assert created and theirs.owner == other_user
-    assert Suggestion.objects.count() == 3
-
-
-def test_without_an_identifier_every_call_files_one(user):
-    a_suggestion(user, external_id="")
-    a_suggestion(user, external_id="")
-    assert Suggestion.objects.count() == 2, "a source with nothing to key on gets no idempotence"
-
-
-# ---------------------------------------------------------------- accepting
-
-
-def test_accepting_writes_the_timeline_and_names_the_plugin(user, application):
-    suggestion, _ = a_suggestion(
-        user, application=application, occurred_at=timezone.now() - dt.timedelta(days=1)
+def a_posting(user, company_name="Aperture Science", *, location="Cambridge", source="LinkedIn"):
+    company, _made = Company.objects.get_or_create(owner=user, name=company_name)
+    return JobPosting.objects.create(
+        owner=user,
+        company=company,
+        title="Test Engineer",
+        location=location,
+        source=source,
     )
-    suggestions.accept(suggestion)
-
-    event = ApplicationEvent.objects.get(application=application, kind=EventKind.EMAIL_RECEIVED)
-    assert event.summary == "Thank you for applying"
-    assert event.body == "We have received your application."
-    assert event.actor == "imap", "the record says which plugin put it there"
-    assert event.occurred_at == suggestion.occurred_at
-
-    suggestion.refresh_from_db()
-    assert suggestion.status == SuggestionStatus.ACCEPTED
-    assert suggestion.event == event and suggestion.reviewed_at is not None
-
-    # Accepting twice writes nothing further.
-    suggestions.accept(suggestion)
-    assert ApplicationEvent.objects.filter(kind=EventKind.EMAIL_RECEIVED).count() == 1
 
 
-def test_a_suggestion_that_proposes_a_status_moves_the_application_through_the_log(
-    user, application
-):
-    suggestion, _ = a_suggestion(
-        user,
-        application=application,
-        kind=EventKind.REJECTION,
-        summary="We are moving forward with other candidates",
-        suggested_status=Status.REJECTED,
-    )
-    suggestions.accept(suggestion)
-
-    application.refresh_from_db()
-    assert application.status == Status.REJECTED
-    event = ApplicationEvent.objects.filter(kind=EventKind.STATUS_CHANGE).latest("pk")
-    assert event.to_status == Status.REJECTED and event.actor == "imap"
-    assert "other candidates" in event.body or "other candidates" in event.summary
-    suggestion.refresh_from_db()
-    assert suggestion.event == event
+# ------------------------------------------------------------------ what is offered
 
 
-def test_an_unmatched_suggestion_needs_an_application(user, application):
-    suggestion, _ = a_suggestion(user)
-    with pytest.raises(ValueError, match="needs an application"):
-        suggestions.accept(suggestion)
-    suggestions.accept(suggestion, application=application)
-    suggestion.refresh_from_db()
-    assert suggestion.application == application and suggestion.status == SuggestionStatus.ACCEPTED
+def test_what_has_been_recorded_comes_back(user):
+    a_posting(user)
+
+    assert recall.companies(user) == ["Aperture Science"]
+    assert recall.locations(user) == ["Cambridge"]
+    assert recall.sources(user) == ["LinkedIn"]
 
 
-def test_a_suggestion_cannot_be_accepted_onto_someone_elses_application(user, other_user):
-    company = Company.objects.create(owner=other_user, name="Aperture")
-    posting = JobPosting.objects.create(owner=other_user, company=company, title="Tester")
-    theirs = Application.objects.create(owner=other_user, posting=posting, status=Status.APPLIED)
-    suggestion, _ = a_suggestion(user)
-    with pytest.raises(ValueError, match="belongs to someone else"):
-        suggestions.accept(suggestion, application=theirs)
+def test_the_commonest_answer_comes_first(user):
+    """The list is cut at a limit, so the order decides what survives the cut."""
+    for _ in range(3):
+        a_posting(user, "Black Mesa", location="Lyon", source="A friend")
+    a_posting(user, "Aperture Science", location="Cambridge", source="LinkedIn")
+
+    assert recall.companies(user)[0] == "Black Mesa"
+    assert recall.locations(user)[0] == "Lyon"
+    assert recall.sources(user)[0] == "A friend"
 
 
-def test_declining_writes_nothing_and_is_remembered(user, application):
-    suggestion, _ = a_suggestion(user, application=application)
-    suggestions.decline(suggestion)
-    suggestion.refresh_from_db()
-    assert suggestion.status == SuggestionStatus.DECLINED and suggestion.event is None
-    assert not ApplicationEvent.objects.filter(kind=EventKind.EMAIL_RECEIVED).exists()
+def test_a_company_with_no_posting_yet_is_still_offered(user):
+    """It is on the list because somebody typed it, which is the whole signal here."""
+    Company.objects.create(owner=user, name="Black Mesa")
 
-    again, created = a_suggestion(user, application=application)
-    assert not created and again.status == SuggestionStatus.DECLINED, "never suggested twice"
-    suggestions.accept(again)
-    assert again.status == SuggestionStatus.DECLINED, "a declined one stays declined"
+    assert recall.companies(user) == ["Black Mesa"]
 
 
-# ------------------------------------------------------------------- the page
+def test_nothing_recorded_offers_nothing(user):
+    assert recall.companies(user) == []
+    assert recall.locations(user) == []
+    assert recall.sources(user) == []
 
 
-def test_the_page_shows_what_is_waiting_and_accepts_it(client, user, application):
-    suggestion, _ = a_suggestion(user, application=application)
-    declined, _ = a_suggestion(user, external_id="<msg-9@example.org>", summary="Old news")
-    suggestions.decline(declined)
+def test_a_blank_is_not_a_suggestion(user):
+    """`location` and `source` are optional, so most postings have none."""
+    a_posting(user, location="", source="")
+
+    assert recall.locations(user) == []
+    assert recall.sources(user) == []
+
+
+def test_the_same_answer_is_offered_once(user):
+    a_posting(user, "Aperture Science", location="Cambridge")
+    a_posting(user, "Aperture Science", location="Cambridge")
+
+    assert recall.companies(user) == ["Aperture Science"]
+    assert recall.locations(user) == ["Cambridge"]
+
+
+def test_the_list_is_cut_rather_than_growing_without_end(user, monkeypatch):
+    """A few hundred names is a few kilobytes; past that an endpoint is the answer."""
+    monkeypatch.setattr(recall, "AT_MOST", 3)
+    for number in range(6):
+        a_posting(user, f"Company {number}", location=f"Town {number}")
+
+    assert len(recall.companies(user)) == 3
+    assert len(recall.locations(user)) == 3
+
+
+# ------------------------------------------------------------------- and to nobody else
+
+
+def test_one_person_is_never_offered_anothers_records(user, other_user):
+    """The whole reason this test file exists."""
+    a_posting(other_user, "Black Mesa", location="Lyon", source="A friend")
+    a_posting(user, "Aperture Science", location="Cambridge", source="LinkedIn")
+
+    assert recall.companies(user) == ["Aperture Science"]
+    assert recall.locations(user) == ["Cambridge"]
+    assert recall.sources(user) == ["LinkedIn"]
+
+
+def test_a_form_with_nobody_attached_offers_nothing_rather_than_everything(user):
+    """The safe way round, for a route that forgets to pass the person."""
+    a_posting(user)
+
+    assert PostingIntakeForm().datalists == {}
+
+
+# ----------------------------------------------------------------- on the page itself
+
+
+def test_the_form_declares_a_list_for_each_of_the_three(user):
+    form = PostingIntakeForm(user=user)
+
+    for name, expected in (
+        ("company_name", "company-suggestions"),
+        ("location", "location-suggestions"),
+        ("source", "source-suggestions"),
+    ):
+        attrs = form.fields[name].widget.attrs
+        assert attrs["list"] == expected
+        # The browser's own memory of what was typed into a box with this name *on any
+        # site* is a different list and a worse one; it would sit on top of this one.
+        assert attrs["autocomplete"] == "off"
+
+
+def test_the_field_component_draws_the_list_beside_the_box(user, client):
+    """One place draws it, so intake, capture review and the listing form all have it."""
+    a_posting(user, "Aperture Science", location="Cambridge", source="LinkedIn")
     client.force_login(user)
 
-    html = client.get(reverse("applications:suggestion_list")).content.decode()
-    assert "Thank you for applying" in html and "jobs@blackmesa.test" in html
-    assert "Old news" not in html, "answered ones are out of the way"
-    assert (
-        "Old news"
-        in client.get(reverse("applications:suggestion_list") + "?show=all").content.decode()
-    )
+    page = client.get(reverse("applications:create")).content.decode()
 
-    response = client.post(
-        reverse("applications:suggestion_action", args=[suggestion.pk, "accept"]), follow=True
-    )
-    assert "Added to the timeline" in response.content.decode()
-    suggestion.refresh_from_db()
-    assert suggestion.status == SuggestionStatus.ACCEPTED
-
-    response = client.post(
-        reverse("applications:suggestion_action", args=[suggestion.pk, "accept"]), follow=True
-    )
-    assert "already been answered" in response.content.decode()
+    assert '<datalist id="company-suggestions">' in page
+    assert '<option value="Aperture Science">' in page
+    assert '<option value="Cambridge">' in page
+    assert '<option value="LinkedIn">' in page
 
 
-def test_an_unmatched_one_is_accepted_onto_the_application_chosen(client, user, application):
-    suggestion, _ = a_suggestion(user)
+def test_the_listing_form_and_the_capture_review_get_it_too(user, client):
+    """They render the same form through the same component and were never touched."""
+    a_posting(user, "Aperture Science")
     client.force_login(user)
-    html = client.get(reverse("applications:suggestion_list")).content.decode()
-    assert "Not matched to an application" in html
-    assert f'<option value="{application.pk}">' in html
 
-    response = client.post(
-        reverse("applications:suggestion_action", args=[suggestion.pk, "accept"]), follow=True
+    listing = client.get(reverse("listings:create")).content.decode()
+
+    assert '<datalist id="company-suggestions">' in listing
+    assert '<option value="Aperture Science">' in listing
+
+
+def test_a_page_with_nothing_recorded_draws_no_empty_list(user, client):
+    """An empty `<datalist>` is a control that does nothing, which is worse than none."""
+    client.force_login(user)
+
+    page = client.get(reverse("applications:create")).content.decode()
+
+    assert "<datalist" not in page
+
+
+def test_offering_never_becomes_requiring(user, client):
+    """A company nobody has recorded is what a new application usually is."""
+    a_posting(user, "Aperture Science")
+    client.force_login(user)
+
+    form = ApplicationIntakeForm(
+        INTAKE | {"company_name": "Somewhere Entirely New"},
+        user=user,
     )
-    assert "Choose which application" in response.content.decode()
+
+    assert form.is_valid(), form.errors
+    assert isinstance(form.fields["company_name"], forms.CharField), "a text box, not a select"
+
+
+def test_a_company_typed_that_was_never_offered_is_recorded_as_typed(user, client):
+    client.force_login(user)
 
     client.post(
-        reverse("applications:suggestion_action", args=[suggestion.pk, "accept"]),
-        {"application": application.pk},
+        reverse("applications:create"),
+        INTAKE | {"company_name": "Somewhere Entirely New"},
     )
-    suggestion.refresh_from_db()
-    assert suggestion.application == application and suggestion.status == SuggestionStatus.ACCEPTED
 
-
-def test_declining_from_the_page(client, user, application):
-    suggestion, _ = a_suggestion(user, application=application)
-    client.force_login(user)
-    response = client.post(
-        reverse("applications:suggestion_action", args=[suggestion.pk, "decline"]), follow=True
-    )
-    assert "will not be suggested again" in response.content.decode()
-    suggestion.refresh_from_db()
-    assert suggestion.status == SuggestionStatus.DECLINED
-
-
-def test_suggestions_are_private_to_their_owner(client, user, other_user, application):
-    suggestion, _ = a_suggestion(user, application=application)
-    client.force_login(other_user)
-    assert (
-        "Thank you for applying"
-        not in client.get(reverse("applications:suggestion_list")).content.decode()
-    )
-    for action in ("accept", "decline"):
-        url = reverse("applications:suggestion_action", args=[suggestion.pk, action])
-        assert client.post(url).status_code == 404
-    suggestion.refresh_from_db()
-    assert suggestion.is_pending
-
-
-def test_the_dashboard_says_when_something_is_waiting(client, user, application):
-    client.force_login(user)
-    assert "may have happened" not in client.get(reverse("core:home")).content.decode()
-    a_suggestion(user, application=application)
-    html = client.get(reverse("core:home")).content.decode()
-    assert "may have happened" in html and reverse("applications:suggestion_list") in html
+    assert Application.objects.for_user(user).count() == 1
+    assert Company.objects.for_user(user).get().name == "Somewhere Entirely New"
