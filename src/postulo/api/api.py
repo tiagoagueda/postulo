@@ -387,6 +387,9 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
             # Where this instance is reached from, as this request knows it. The worker has
             # no request to ask, and a link nobody can follow is not a link (#247).
             base=request.build_absolute_uri("/"),
+            # When the posting arrived, which is not when the errand runs: a notifier that
+            # files the message wants the arrival (#229).
+            at=capture.created_at.isoformat(),
         )
     elif batch.position == 1:
         errands.send(
@@ -397,7 +400,9 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
             count=batch.size,
             host=urlsplit(url).hostname or url,
             title=data.title,
+            capture_id=capture.pk,
             base=request.build_absolute_uri("/"),
+            at=capture.created_at.isoformat(),
         )
     body = _as_output(request, capture)
     # Kept before the answer goes out, so that a client which retries because it never saw

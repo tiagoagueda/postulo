@@ -20,6 +20,7 @@ by an older one is the only way that happens, and silence beats an empty message
 
 from __future__ import annotations
 
+import datetime as dt
 from collections.abc import Callable
 
 from django.urls import reverse
@@ -65,6 +66,19 @@ def link(payload: dict, path: str) -> str:
     return f"{base}{path}" if base else absolute_url(path)
 
 
+def when(payload: dict):
+    """When the thing happened, from the errand, since the errand may run much later.
+
+    A queued send is minutes old by the time a notifier sees it, and older still if it was
+    retried; a notifier that files the message wants the arrival, not the delivery (#229).
+    """
+    stamped = payload.get("at") or ""
+    try:
+        return dt.datetime.fromisoformat(stamped) if stamped else None
+    except ValueError:
+        return None
+
+
 @builder("capture_received")
 def a_capture_arrived(payload: dict) -> Notification:
     """One posting came in from outside: the one event a person cannot see coming."""
@@ -73,6 +87,11 @@ def a_capture_arrived(payload: dict) -> Notification:
         title=_("Captured: %(title)s") % {"title": payload.get("title", "")},
         body=payload.get("where", ""),
         url=link(payload, reverse("jobs:capture_review", args=[payload["capture_id"]])),
+        # The capture, not this send: the errand may be retried, and one posting arriving
+        # is one message (#229).
+        key=f"capture:{payload['capture_id']}",
+        occurred_at=when(payload),
+        data={"capture_id": payload["capture_id"], "where": payload.get("where", "")},
     )
 
 
@@ -85,4 +104,11 @@ def a_batch_arrived(payload: dict) -> Notification:
         % {"count": payload.get("count", 0), "host": payload.get("host", "")},
         body=_("The first: %(title)s") % {"title": payload.get("title", "")},
         url=link(payload, reverse("jobs:capture_list")),
+        key=f"capture_batch:{payload.get('capture_id', '')}",
+        occurred_at=when(payload),
+        data={
+            "count": payload.get("count", 0),
+            "host": payload.get("host", ""),
+            "capture_id": payload.get("capture_id", ""),
+        },
     )

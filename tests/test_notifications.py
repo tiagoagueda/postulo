@@ -2,6 +2,7 @@
 
 import datetime as dt
 import re
+from unittest import mock
 
 import pytest
 from django.core import mail
@@ -70,6 +71,85 @@ def test_a_notification_names_a_known_event():
     Notification(event="reminder_due", title="x")
     with pytest.raises(ValueError, match="Unknown notification event"):
         Notification(event="birthday", title="x")
+
+
+def test_a_notification_says_what_it_is_when_it_happened_and_what_it_is_about():
+    """The four fields a notifier needed and had to guess at (#229).
+
+    `key` is what makes two sends of the same thing one thing: the words are translated at
+    the moment of sending and differ between two recipients of the same event, so a notifier
+    deduplicating on the title would deliver twice to a household and never twice to one
+    person who reads Postulo in two languages.
+    """
+    when = timezone.now()
+    notification = Notification(
+        event="reminder_due",
+        title="Chase Aperture",
+        key="reminder:41",
+        occurred_at=when,
+        data={"reminder_id": 41},
+    )
+
+    assert notification.key == "reminder:41"
+    assert notification.occurred_at == when
+    assert notification.data["reminder_id"] == 41
+
+    plain = Notification(event="reminder_due", title="Chase Aperture")
+    assert plain.key == "", "no identity claimed, so nothing may be deduplicated on it"
+    assert plain.language == "" and plain.occurred_at is None
+    assert dict(plain.data) == {}
+
+
+def test_what_a_notification_is_about_cannot_be_written_to_by_a_notifier():
+    """It is handed to every notifier a person has, one after another."""
+    notification = Notification(event="reminder_due", title="x", data={"reminder_id": 41})
+
+    with pytest.raises(TypeError):
+        notification.data["reminder_id"] = 42
+
+
+def test_a_notification_is_stamped_with_the_language_it_came_out_in(user):
+    """Set by `notify` rather than by every sender, because it is the one place that knows.
+
+    A notifier rendering around the words -- a subject line, a footer, a push payload --
+    matches them instead of matching whatever request happens to be in flight (#223, #229).
+    """
+    seen = []
+    email_connection(user)
+    user.profile.language = "pt-PT"
+    user.profile.save(update_fields=["language"])
+
+    def remember(self, notification, config, recipient):
+        seen.append(notification)
+
+    with mock.patch.object(EmailNotifier, "send", remember):
+        notify(user, Notification(event="reminder_due", title="Chase them"))
+
+    assert seen and seen[0].language == "pt-PT"
+
+
+def test_a_reminder_falling_due_is_the_same_message_however_often_it_is_announced(user):
+    """A key a notifier can retry against, built from the reminder rather than the words."""
+    application = an_application(user)
+    reminder = Reminder.objects.create(
+        owner=user, application=application, summary="Chase them", due_at=timezone.now()
+    )
+    seen = []
+    email_connection(user)
+
+    def remember(self, notification, config, recipient):
+        seen.append(notification)
+
+    with mock.patch.object(EmailNotifier, "send", remember):
+        announce_due_reminders()
+        Reminder.objects.filter(pk=reminder.pk).update(notified_at=None)
+        announce_due_reminders()
+
+    assert len(seen) == 2, "announced twice, because the stamp was cleared between passes"
+    assert seen[0].key == seen[1].key == f"reminder:{reminder.pk}"
+    assert seen[0].occurred_at == reminder.due_at, "when it fell due, not when it was sent"
+    assert seen[0].data["reminder_id"] == reminder.pk
+    assert seen[0].data["application_id"] == application.pk
 
 
 def test_links_come_from_the_request_the_public_url_or_stay_bare(rf, settings):

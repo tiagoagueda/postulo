@@ -38,16 +38,21 @@ def notify(user, notification: Notification | Callable[[], Notification]) -> int
     a capture is still captured, a reminder still due — it is logged and shown on the
     connection instead. Returns how many connections took the message.
 
-    All of it happens in the recipient's language. A `Notification` carries words that are
+    All of it happens in the recipient's language, and the notification says which one it
+    came out in by the time a notifier sees it. A `Notification` carries words that are
     already resolved, so switching language at the moment of sending would be too late to
     change them: a caller with something to translate passes a function that builds one
     instead, and it is called here, inside the override. A caller whose text is somebody's
     own typing — a reminder they wrote for themselves — passes the notification as it
     always did (#223).
     """
-    with translation.override(language_for(user)):
+    language = language_for(user)
+    with translation.override(language):
         message = notification() if callable(notification) else notification
-        return _deliver(user, message)
+        # Stamped here rather than by every sender: this is the one place that knows whose
+        # language the words came out in, and a notifier rendering around them needs it
+        # (#229).
+        return _deliver(user, message.but(language=language))
 
 
 def _deliver(user, notification: Notification) -> int:

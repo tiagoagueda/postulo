@@ -456,6 +456,69 @@ def test_a_cancelled_interview_says_so_in_its_calendar(application):
     assert "STATUS:CANCELLED" in ical.calendar([interview])
 
 
+def test_an_event_carries_the_reminder_as_an_alarm_only_when_it_is_asked_for(application):
+    """The feed Postulo serves rings for nobody; a sync writing into somebody's own
+    calendar rings for the reminder they set here (#229).
+
+    A subscription that rings is a decision for whoever subscribes, and their calendar
+    offers it. An event a plugin pushes into their calendar is theirs already.
+    """
+    interview = schedule_interview(
+        application, kind=InterviewKind.VIDEO, starts_at=in_days(5), remind=True
+    )
+    reminder = interview.reminder
+    assert reminder is not None, "scheduling one sets a reminder the day before"
+
+    assert "BEGIN:VALARM" not in ical.event_lines(interview)
+
+    lines = ical.event_lines(interview, alarm=True)
+    assert "BEGIN:VALARM" in lines and "END:VALARM" in lines
+    assert lines[-1] == "END:VEVENT", "the alarm is inside the event"
+    minutes = int((interview.starts_at - reminder.due_at).total_seconds() // 60)
+    assert f"TRIGGER:-PT{minutes}M" in lines
+    assert f"DESCRIPTION:{ical.escape(reminder.summary)}" in lines
+
+
+def test_a_reminder_that_is_done_or_late_is_not_an_alarm(application):
+    """One already ticked off is not something to be woken for, and one after the meeting
+    is not a warning about it."""
+    interview = schedule_interview(
+        application, kind=InterviewKind.VIDEO, starts_at=in_days(5), remind=True
+    )
+    interview.reminder.complete()
+    interview.refresh_from_db()
+    assert ical.alarm_lines(interview) == []
+
+    later = schedule_interview(
+        application, kind=InterviewKind.PHONE, starts_at=in_days(9), remind=True
+    )
+    Reminder.objects.filter(pk=later.reminder.pk).update(
+        due_at=later.starts_at + dt.timedelta(hours=1)
+    )
+    later.refresh_from_db()
+    assert ical.alarm_lines(later) == []
+
+
+def test_an_interview_with_no_reminder_has_no_alarm(application):
+    interview = schedule_interview(
+        application, kind=InterviewKind.VIDEO, starts_at=in_days(5), remind=False
+    )
+    assert ical.alarm_lines(interview) == []
+    assert "BEGIN:VALARM" not in ical.event_lines(interview, alarm=True)
+
+
+def test_the_calendar_status_of_an_outcome_is_asked_for_rather_than_copied(application):
+    """A plugin holding its own table of four outcomes is a table that goes stale the day
+    a fifth is added (#229)."""
+    interview = schedule_interview(application, kind=InterviewKind.VIDEO, starts_at=in_days(2))
+    assert ical.calendar_status(interview) == "CONFIRMED"
+
+    settle_interview(interview, InterviewOutcome.CANCELLED)
+    assert ical.calendar_status(interview) == "CANCELLED"
+
+    assert set(ical.STATUS_OF) == set(InterviewOutcome.values), "every outcome has a word"
+
+
 def test_the_whole_diary_downloads_as_one_file(client, user, application):
     first = schedule_interview(application, kind=InterviewKind.VIDEO, starts_at=in_days(2))
     second = schedule_interview(application, kind=InterviewKind.PANEL, starts_at=in_days(5))

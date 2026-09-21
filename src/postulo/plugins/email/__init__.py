@@ -12,8 +12,14 @@ from django.core.mail import send_mail
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
 
-from postulo.notifications.base import Notification
-from postulo.plugins.api import ConnectionUnusable, FieldSpec, TestResult, declares, shipped
+from postulo.plugins.api import (
+    ConnectionUnusable,
+    FieldSpec,
+    Notification,
+    TestResult,
+    declares,
+    shipped,
+)
 
 
 def _subject(title: str) -> str:

@@ -17,6 +17,11 @@ the surface fails here whether or not the import is ever executed — a lazy
 the top of the file, and is the shape most of the ones below take. Relative imports are
 resolved, because a dependency spelled with a dot is still a dependency.
 
+**The check itself lives in `postulo.plugins.testing`**, so that a plugin written outside
+this repository can run the same one against itself (#229). It was here alone for long
+enough that every official plugin drifted past the surface and a code audit, rather than a
+test, is what found it.
+
 **`REACHING_PAST` is not a list of exemptions.** Every entry is a reason a plugin has to
 depend on Postulo rather than a failure of discipline, and says which. A new entry is a
 decision somebody has to make on purpose, which is the whole point of the test failing on
@@ -25,15 +30,19 @@ one; a stale entry fails too, because one nobody removed hides the next real dep
 
 from __future__ import annotations
 
-import ast
 from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1] / "src" / "postulo"
+from postulo.plugins.testing import (
+    SURFACE,
+    assert_imports_only_the_surface,
+    imports_of,
+    reaching_past_the_surface,
+    unused_allowances,
+)
 
-#: The one module a plugin may import from, and the reason there is exactly one.
-SURFACE = "postulo.plugins.api"
+ROOT = Path(__file__).resolve().parents[1] / "src" / "postulo"
 
 #: Where a plugin Postulo ships has to live. Not a convention — the check below.
 HOME = "postulo.plugins."
@@ -43,7 +52,9 @@ HOME = "postulo.plugins."
 REACHING_PAST: dict[str, dict[str, str]] = {
     "email": {
         "postulo.core": "`site`: the instance's name and from-address, for the message it sends",
-        "postulo.notifications.base": "`Notification`, which is what a notifier is handed",
+        # `Notification` used to be reached past the surface as well — by this plugin and by
+        # every notifier written outside the core, which is what #229 was about. It is on the
+        # surface now, and this plugin imports it from there like anybody else's.
     },
     "browser": {
         "postulo.notifications": (
@@ -139,44 +150,13 @@ def sources_of(module: str) -> list[Path]:
     return sorted(package_of(module).rglob("*.py"))
 
 
-def _package_parts(path: Path) -> list[str]:
-    return ["postulo", *path.relative_to(ROOT).parts[:-1]]
-
-
-def postulo_imports(path: Path, *, mine: str) -> set[str]:
-    """Every `postulo.*` module this file imports, at any depth, read rather than run.
-
-    `mine` is the plugin's own package: reaching into it is not reaching past the surface. A
-    plugin that has become a package has an inside, and `europass` keeping its reader beside
-    its declaration is the point of #129 rather than a violation of it.
-    """
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    package = _package_parts(path)
-    found: set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom):
-            if node.level:
-                base = package[: len(package) - node.level + 1]
-                module = ".".join([*base, node.module] if node.module else base)
-            else:
-                module = node.module or ""
-            names = [module]
-        elif isinstance(node, ast.Import):
-            names = [alias.name for alias in node.names]
-        else:
-            continue
-        for name in names:
-            if name.startswith("postulo") and not (name == mine or name.startswith(f"{mine}.")):
-                found.add(name)
-    return found
-
-
 def reaching(module: str) -> set[str]:
-    """What a whole plugin package imports from Postulo."""
-    found: set[str] = set()
-    for path in sources_of(module):
-        found |= postulo_imports(path, mine=module)
-    return found
+    """What a whole plugin package imports from Postulo.
+
+    `europass` keeping its reader beside its declaration is the point of #129 rather than a
+    violation of it, so a plugin reaching into its own package does not count.
+    """
+    return imports_of(package_of(module), package=module)
 
 
 def names() -> list[str]:
@@ -232,9 +212,9 @@ def test_every_plugin_postulo_ships_carries_its_own_catalogues(module: str):
 @pytest.mark.parametrize("module", names(), ids=short_name)
 def test_a_shipped_plugin_imports_the_surface_or_something_written_down(module: str):
     """The rule, and the only way past it is a line somebody wrote deliberately."""
-    allowed = {SURFACE} | set(REACHING_PAST.get(short_name(module), {}))
+    allowed = REACHING_PAST.get(short_name(module), {})
 
-    past = sorted(reaching(module) - allowed)
+    past = reaching_past_the_surface(package_of(module), package=module, allowed=allowed)
 
     assert not past, (
         f"{shipped()[module]} reaches past the plugin surface: {past}. Either add the name to "
@@ -246,7 +226,9 @@ def test_a_shipped_plugin_imports_the_surface_or_something_written_down(module: 
 @pytest.mark.parametrize("module", names(), ids=short_name)
 def test_nothing_recorded_has_quietly_been_fixed(module: str):
     """A stale entry would let a real dependency back in behind it."""
-    stale = sorted(set(REACHING_PAST.get(short_name(module), {})) - reaching(module))
+    stale = unused_allowances(
+        package_of(module), package=module, allowed=REACHING_PAST.get(short_name(module), {})
+    )
 
     assert not stale, (
         f"{shipped()[module]} no longer imports {stale}. Delete those lines from "
@@ -348,3 +330,129 @@ def test_importing_the_surface_touches_no_database():
     module = importlib.import_module("postulo.plugins.api")
 
     assert module.__all__, "and it still lists what it promises"
+
+
+def test_the_surface_holds_the_notifier_contract():
+    """What `send()` is handed, and what a person switches on per connection (#229).
+
+    Every notifier that exists imported these from `postulo.notifications.base` — the
+    built-in one, the three written outside the core, and the example in the wiki — because
+    there was nowhere else to get them. A promise that the only working notifier is one that
+    breaks the promise is not one.
+    """
+    from postulo.plugins import api
+
+    assert api.NotifierPlugin is not None
+    assert api.Notification is not None
+    assert set(api.EVENTS) == {"reminder_due", "capture_received", "went_quiet"}
+
+
+def test_the_surface_holds_what_a_sync_needs():
+    """A sync is the one kind that cannot be handed its work: it goes and finds it (#229).
+
+    The records, the link that ties one to its twin, the calls that write to a timeline, and
+    the details that hang off a contact. Named individually because each was reached past
+    the surface by `postulo-dav` or `postulo-imap`, and the list is what lets them stop.
+    """
+    from postulo.plugins import api
+
+    for name in (
+        "Application",
+        "Contact",
+        "EventKind",
+        "Interview",
+        "InterviewOutcome",
+        "LinkKind",
+        "Suggestion",
+        "SyncLink",
+        "calendar_status",
+        "event_lines",
+        "get_or_create_company",
+        "phone_number_is_taken",
+        "primary_phone_number",
+        "primary_web_link",
+        "record_event",
+        "reschedule_interview",
+        "save_phone_number",
+        "save_web_link",
+        "settle_interview",
+        "suggest",
+    ):
+        assert getattr(api, name) is not None, name
+
+
+def test_the_surface_hands_over_the_same_object_the_core_uses():
+    """A re-export that is a copy would be a second thing to keep current.
+
+    `SyncLink` reached from the surface and `SyncLink` reached from `plugins.models` have to
+    be one class, or a plugin's rows and Postulo's would be different tables.
+    """
+    from postulo.applications.models import Application
+    from postulo.notifications.base import Notification
+    from postulo.plugins import api
+    from postulo.plugins.models import SyncLink
+
+    assert api.SyncLink is SyncLink
+    assert api.Application is Application
+    assert api.Notification is Notification
+
+
+def test_a_plugin_written_elsewhere_can_run_the_same_check():
+    """The check is published, not just performed here (#229).
+
+    `postulo.plugins.testing` is what a plugin repository imports to assert the same thing
+    about itself. Run against a shipped plugin, it has to agree with the parametrised tests
+    above — otherwise there would be two checks and a plugin could pass the wrong one.
+    """
+    assert_imports_only_the_surface(
+        package_of("postulo.plugins.phone_numbers"), package="postulo.plugins.phone_numbers"
+    )
+
+
+def test_the_published_check_reads_a_lazy_import_too(tmp_path):
+    """The shape most real dependencies take: inside a method, so it never runs in a test."""
+    package = tmp_path / "postulo_elsewhere"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "def send(self):\n    from postulo.core import site\n    return site\n",
+        encoding="utf-8",
+    )
+
+    past = reaching_past_the_surface(package, package="postulo_elsewhere")
+
+    assert past == ["postulo.core"]
+
+
+def test_the_published_check_does_not_mistake_a_plugins_own_package_for_postulo(tmp_path):
+    """`postulo_dav` starts with the same eight letters and is the plugin's own code."""
+    package = tmp_path / "postulo_elsewhere"
+    (package / "inner").mkdir(parents=True)
+    (package / "__init__.py").write_text(
+        "from postulo.plugins.api import FieldSpec\nfrom postulo_elsewhere import inner\n",
+        encoding="utf-8",
+    )
+    (package / "inner" / "__init__.py").write_text("from .. import sibling\n", encoding="utf-8")
+
+    assert_imports_only_the_surface(package, package="postulo_elsewhere")
+
+
+def test_the_published_check_fails_an_allowance_nobody_removed(tmp_path):
+    """A stale line would let the next real dependency in behind it."""
+    package = tmp_path / "postulo_elsewhere"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "from postulo.plugins.api import FieldSpec\n", encoding="utf-8"
+    )
+
+    assert unused_allowances(
+        package, package="postulo_elsewhere", allowed={"postulo.core": "it used to"}
+    ) == ["postulo.core"]
+
+    with pytest.raises(AssertionError, match="no longer imports"):
+        assert_imports_only_the_surface(
+            package, package="postulo_elsewhere", allowed={"postulo.core": "it used to"}
+        )
+
+
+def test_the_published_check_names_the_surface_it_is_checking_against():
+    assert SURFACE == "postulo.plugins.api"

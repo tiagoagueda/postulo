@@ -88,8 +88,45 @@ def fold(line: str) -> list[str]:
     return pieces
 
 
-def event_lines(interview: Interview, *, url: str = "") -> list[str]:
-    """The VEVENT for one interview."""
+def calendar_status(interview: Interview) -> str:
+    """What RFC 5545 calls this interview's outcome: ``CONFIRMED`` or ``CANCELLED``.
+
+    A plugin pushing an interview to a calendar has to write the same word Postulo would,
+    and a plugin holding its own table of four outcomes is a table that goes stale the day
+    a fifth is added (#229).
+    """
+    return STATUS_OF[interview.outcome]
+
+
+def alarm_lines(interview: Interview) -> list[str]:
+    """The VALARM for this interview's reminder, or nothing.
+
+    Only a reminder that is still outstanding and falls before the meeting: one already
+    done is not something to be woken for, and one after the meeting is not a warning about
+    it. The trigger is written as a lead time rather than an absolute moment, so moving the
+    event in a calendar moves the alarm with it.
+    """
+    reminder = getattr(interview, "reminder", None)
+    if reminder is None or reminder.is_done or reminder.due_at >= interview.starts_at:
+        return []
+    minutes = int((interview.starts_at - reminder.due_at).total_seconds() // 60)
+    return [
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        f"DESCRIPTION:{escape(reminder.summary)}",
+        f"TRIGGER:-PT{minutes}M",
+        "END:VALARM",
+    ]
+
+
+def event_lines(interview: Interview, *, url: str = "", alarm: bool = False) -> list[str]:
+    """The VEVENT for one interview, with its reminder as an alarm if ``alarm``.
+
+    The feed Postulo serves carries no alarm: a subscription that rings is a decision for
+    whoever subscribes, and their calendar offers it. A sync plugin writing the event *into*
+    somebody's own calendar is a different matter -- the reminder is theirs and they set it
+    here -- so it asks for one (#229).
+    """
     application = interview.application
     posting = application.posting
     summary = _("%(kind)s: %(title)s at %(company)s") % {
@@ -122,7 +159,7 @@ def event_lines(interview: Interview, *, url: str = "") -> list[str]:
         f"DTSTART:{stamp(interview.starts_at)}",
         f"DTEND:{stamp(interview.ends_at)}",
         f"SUMMARY:{escape(summary)}",
-        f"STATUS:{STATUS_OF[interview.outcome]}",
+        f"STATUS:{calendar_status(interview)}",
         f"CREATED:{stamp(interview.created_at)}",
         f"LAST-MODIFIED:{stamp(interview.updated_at)}",
     ]
@@ -140,6 +177,8 @@ def event_lines(interview: Interview, *, url: str = "") -> list[str]:
             lines.append(
                 f"ATTENDEE;CN={parameter(person.name)};ROLE=REQ-PARTICIPANT:mailto:{address}"
             )
+    if alarm:
+        lines += alarm_lines(interview)
     lines.append("END:VEVENT")
     return lines
 

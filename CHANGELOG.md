@@ -43,6 +43,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- The plugin surface carries the notifier contract, the records a sync works on and the calls that write to them, and `postulo.plugins.testing` publishes the check that a plugin imports nothing else. (#229)
 - *Settings → Appearance* offers a compact interface for anybody who wants more rows on a
   screen. Comfortable stays the default, and nothing you can click gets smaller. (#292)
 - *Server settings → Design* shows every piece the interface is built from, on one page,

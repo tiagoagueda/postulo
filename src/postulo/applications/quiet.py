@@ -139,6 +139,11 @@ def _announcement(applications: list[Application], now) -> Notification:
         % {"count": count},
         body="\n".join(lines),
         url=absolute_url(reverse("applications:list") + "?quiet=1"),
+        # One announcement per person per pass, named by the applications it is about, so
+        # a notifier that retries does not say it twice (#229).
+        key="went_quiet:" + ",".join(str(row.pk) for row in applications),
+        occurred_at=now,
+        data={"application_ids": [row.pk for row in applications], "count": count},
     )
 
 

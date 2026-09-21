@@ -78,7 +78,21 @@ def announce_due_reminders() -> tuple[int, int]:
             else:
                 body = ""
                 url = absolute_url(reverse("applications:reminder_list"))
-            return Notification(event="reminder_due", title=reminder.summary, body=body, url=url)
+            return Notification(
+                event="reminder_due",
+                title=reminder.summary,
+                body=body,
+                url=url,
+                # One reminder falls due once, however many notifiers carry it and however
+                # many times one of them retries (#229).
+                key=f"reminder:{reminder.pk}",
+                occurred_at=reminder.due_at,
+                data={
+                    "reminder_id": reminder.pk,
+                    "due_at": reminder.due_at.isoformat(),
+                    "application_id": application.pk if application is not None else None,
+                },
+            )
 
         try:
             delivered += notify(reminder.owner, announcement)
