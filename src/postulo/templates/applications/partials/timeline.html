@@ -1,0 +1,48 @@
+{% load i18n %}
+{% comment %} What happened, as a region that can be replaced on its own (#257).
+
+   Both of the things that write to a timeline -- a status change and an added entry --
+   send this back beside whatever they were asked to swap, marked `hx-swap-oob` so htmx
+   finds it by id rather than by target. That is why `oob` is a variable and not an
+   attribute written here: the same template draws the region on a full page, where an
+   out-of-band marker would be a lie.
+
+   `aria-live="polite"` because the entry appears somewhere other than where the button
+   was pressed. Somebody reading the screen has no other way to learn that the thing they
+   asked for happened; the alert region #226 renders speaks for failures, and this speaks
+   for the ordinary case.
+{% endcomment %}
+<div id="timeline"{% if oob %} hx-swap-oob="true"{% endif %} aria-live="polite">
+  <h2 class="mb-3 font-medium">{% translate "What happened" %}</h2>
+  {% if events %}
+    <ol class="relative border-s border-ink-200 ps-6 dark:border-ink-800">
+      {% for event in events %}
+        <li class="mb-6 last:mb-0">
+          <span class="absolute -start-1.5 mt-1.5 h-3 w-3 rounded-full
+                       {% if event.kind == 'status_change' %}bg-brand-500{% else %}bg-ink-300 dark:bg-ink-600{% endif %}"></span>
+          <div class="flex flex-wrap items-baseline gap-2">
+            <p class="font-medium">{{ event.summary|default:event.get_kind_display }}</p>
+            <span class="text-xs text-ink-400">{{ event.occurred_at|date:"DATETIME_FORMAT" }}</span>
+            {% if event.actor %}
+              <span class="text-xs text-ink-400" data-actor>
+                {% blocktranslate with actor=event.actor trimmed %}via {{ actor }}{% endblocktranslate %}
+              </span>
+            {% endif %}
+            {% if event.kind != 'status_change' %}
+              <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
+                {{ event.get_kind_display }}
+              </span>
+            {% endif %}
+          </div>
+          {% if event.body %}
+            <p class="mt-1 whitespace-pre-line text-sm text-ink-600 dark:text-ink-300">{{ event.body }}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <div class="card text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Nothing recorded against this one yet." %}
+    </div>
+  {% endif %}
+</div>

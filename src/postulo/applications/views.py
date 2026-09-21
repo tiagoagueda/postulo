@@ -11,6 +11,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -473,12 +474,59 @@ class ApplicationStatusView(OwnedObjectMixin, View):
         else:
             messages.error(request, _("That is not a status Postulo recognises."))
 
+        if wants_a_detail_fragment(request):
+            return detail_fragments(request, application, target="status-card")
         if request.htmx:
             application.refresh_from_db()
             return render(
                 request, "applications/partials/application_row.html", {"application": application}
             )
         return redirect(safe_next(request, application.get_absolute_url()))
+
+
+#: What the detail page's forms name as their swap target. The list page posts to the
+#: same status view and wants a table row, so the two are told apart by what they asked
+#: for rather than by a flag the caller has to remember to set (#257).
+DETAIL_TARGETS = ("status-card", "event-form", "reminders")
+
+
+def wants_a_detail_fragment(request) -> bool:
+    return bool(request.htmx) and request.htmx.target in DETAIL_TARGETS
+
+
+def detail_fragments(request, application, *, target: str, event_form=None):
+    """One region to swap, plus the timeline out of band where the timeline moved.
+
+    Two regions from one request rather than two requests. A status change and an added
+    entry both write to the timeline, and the timeline is not where either button is --
+    so it comes back marked `hx-swap-oob`, which htmx places by id.
+
+    Rendered from fresh reads rather than from what the caller has in hand: `record_event`
+    and `change_status` both write, and a queryset evaluated before them would draw the
+    page as it was a moment ago.
+    """
+    from .forms import EventForm, StatusChangeForm
+
+    application.refresh_from_db()
+    pieces = {
+        "status-card": "applications/partials/status_card.html",
+        "event-form": "applications/partials/event_form.html",
+        "reminders": "applications/partials/reminders.html",
+    }
+    context = {
+        "application": application,
+        "status_form": StatusChangeForm(initial={"status": application.status}),
+        "event_form": event_form if event_form is not None else EventForm(),
+        "reminders": application.reminders.filter(done_at__isnull=True),
+    }
+    html = render_to_string(pieces[target], context, request=request)
+    if target in ("status-card", "event-form"):
+        html += render_to_string(
+            "applications/partials/timeline.html",
+            {"events": application.events.all(), "oob": True},
+            request=request,
+        )
+    return HttpResponse(html)
 
 
 class EventCreateView(OwnedObjectMixin, View):
@@ -499,8 +547,16 @@ class EventCreateView(OwnedObjectMixin, View):
                 occurred_at=form.cleaned_data["occurred_at"],
             )
             messages.success(request, _("Added to the timeline."))
+            if wants_a_detail_fragment(request):
+                # An empty form, because the card it replaces is where the next entry is
+                # typed; the entry just added arrives in the timeline beside it.
+                return detail_fragments(request, application, target="event-form")
         else:
             messages.error(request, _("That entry could not be saved."))
+            if wants_a_detail_fragment(request):
+                # The same card with the errors in it. A swap that answered 422 would be
+                # discarded by htmx and the person would see nothing at all.
+                return detail_fragments(request, application, target="event-form", event_form=form)
         return redirect(application.get_absolute_url())
 
 
@@ -554,6 +610,8 @@ class ReminderCompleteView(OwnedObjectMixin, View):
         reminder = get_object_or_404(self.get_queryset(), pk=pk)
         reminder.complete()
         messages.success(request, _("Marked as done."))
+        if wants_a_detail_fragment(request) and reminder.application_id:
+            return detail_fragments(request, reminder.application, target="reminders")
         return redirect(safe_next(request, reverse("applications:reminder_list")))
 
 

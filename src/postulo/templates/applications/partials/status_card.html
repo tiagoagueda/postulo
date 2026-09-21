@@ -1,0 +1,34 @@
+{% load i18n %}
+{% comment %} Moving an application along, swapped in place (#257).
+
+   This is the one screen somebody uses all day, and recording "I heard back" used to be a
+   full page load: a fresh render of a 347-line template with its prefetches, and the reader
+   returned to the top of a page they were reading the middle of.
+
+   `hx-post` on a real form with a real `action` is progressive by construction -- without
+   the script the form posts and the view redirects exactly as it did, which is the same
+   rule as #134 and #136. `hx-target` names this card; the view reads that name to tell
+   this swap from the list page's, which posts to the same view and wants a table row.
+
+   A status change writes a timeline entry, so the answer carries the timeline as well,
+   out of band. Two regions from one request rather than two requests, and the eye is
+   already on the second one.
+{% endcomment %}
+<div class="card mb-6" id="status-card">
+  <h2 class="mb-4 font-medium">{% translate "Move it along" %}</h2>
+  <form method="post" action="{% url 'applications:status' application.pk %}"
+        hx-post="{% url 'applications:status' application.pk %}"
+        hx-target="#status-card" hx-swap="outerHTML"
+        class="flex flex-wrap items-end gap-3">
+    {% csrf_token %}
+    <div>
+      <label class="field-label" for="id_status">{% translate "Status" %}</label>
+      {{ status_form.status }}
+    </div>
+    <div class="min-w-64 flex-1">
+      <label class="field-label" for="id_note">{% translate "Note (optional)" %}</label>
+      {{ status_form.note }}
+    </div>
+    <button type="submit" class="btn">{% translate "Record" %}</button>
+  </form>
+</div>

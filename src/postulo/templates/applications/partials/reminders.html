@@ -1,0 +1,38 @@
+{% load i18n %}
+{% comment %} What is still outstanding, and the tick that takes one off (#257).
+
+   A reminder's *Done* removes the control that was pressed, which is the shape #227 is
+   about: a control that swaps itself away has to hand focus somewhere, or the next Tab
+   starts again at the skip link. `hx-focus-after` names where -- the next tick if there
+   is one, the heading if that was the last -- and `app.js` does the handing over.
+
+   `aria-live="polite"` for the same reason as the timeline: the row disappearing is the
+   only sign that anything happened, and a disappearance is not something a screen reader
+   announces by itself.
+{% endcomment %}
+<div id="reminders" aria-live="polite" tabindex="-1">
+  {% if reminders %}
+    <ul class="space-y-3">
+      {% for reminder in reminders %}
+        <li class="flex items-start gap-3">
+          <div class="min-w-0 flex-1">
+            <p class="text-sm">{{ reminder.summary }}</p>
+            <p class="text-xs {% if reminder.is_overdue %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
+              {{ reminder.due_at|date:"DATETIME_FORMAT" }}
+            </p>
+          </div>
+          <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}"
+                hx-post="{% url 'applications:reminder_complete' reminder.pk %}"
+                hx-target="#reminders" hx-swap="outerHTML">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ application.get_absolute_url }}">
+            <button type="submit" class="btn" data-variant="ghost" data-size="xs"
+                    data-focus-after="#reminders">{% translate "Done" %}</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "None outstanding." %}</p>
+  {% endif %}
+</div>

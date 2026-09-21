@@ -1,0 +1,23 @@
+{% load i18n %}
+{% comment %} Adding a line to the timeline, swapped in place (#257).
+
+   The card comes back empty on a success, which is what makes a second entry possible
+   without a page load, and comes back with the errors on a failure -- the same form, the
+   same ids, drawn by the same template either way. The timeline itself arrives out of
+   band, because this card is not where the new entry goes.
+{% endcomment %}
+<div class="card mb-6" id="event-form">
+  <h2 class="mb-4 font-medium">{% translate "Add to the timeline" %}</h2>
+  <form method="post" action="{% url 'applications:event_create' application.pk %}"
+        hx-post="{% url 'applications:event_create' application.pk %}"
+        hx-target="#event-form" hx-swap="outerHTML">
+    {% csrf_token %}
+    <div class="grid gap-x-4 sm:grid-cols-2">
+      <c-field :field="event_form.kind" />
+      <c-field :field="event_form.occurred_at" />
+    </div>
+    <c-field :field="event_form.summary" />
+    <c-field :field="event_form.body" />
+    <button type="submit" class="btn" data-variant="outline">{% translate "Add entry" %}</button>
+  </form>
+</div>

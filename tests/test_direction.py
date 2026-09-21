@@ -209,8 +209,15 @@ def test_the_skip_link_and_the_menus_are_anchored_logically():
 
 
 def test_the_timeline_rule_is_on_the_reading_edge():
-    """The line down the left of the event log is down the reading-start edge now."""
-    detail = (TEMPLATES / "applications" / "application_detail.html").read_text(encoding="utf-8")
+    """The line down the left of the event log is down the reading-start edge now.
 
-    assert "border-s" in detail and "ps-6" in detail
-    assert "-start-1.5" in detail
+    Read from the partial since #257: the timeline became a region that can be replaced on
+    its own, and the rule travelled with the markup rather than staying on the page that
+    used to hold it.
+    """
+    timeline = (TEMPLATES / "applications" / "partials" / "timeline.html").read_text(
+        encoding="utf-8"
+    )
+
+    assert "border-s" in timeline and "ps-6" in timeline
+    assert "-start-1.5" in timeline

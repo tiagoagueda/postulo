@@ -50,69 +50,11 @@
 
     <div class="lg:col-span-2">
 
-      <div class="card mb-6">
-        <h2 class="mb-4 font-medium">{% translate "Move it along" %}</h2>
-        <form method="post" action="{% url 'applications:status' application.pk %}"
-              class="flex flex-wrap items-end gap-3">
-          {% csrf_token %}
-          <div>
-            <label class="field-label" for="id_status">{% translate "Status" %}</label>
-            {{ status_form.status }}
-          </div>
-          <div class="min-w-64 flex-1">
-            <label class="field-label" for="id_note">{% translate "Note (optional)" %}</label>
-            {{ status_form.note }}
-          </div>
-          <button type="submit" class="btn">{% translate "Record" %}</button>
-        </form>
-      </div>
+      {% include "applications/partials/status_card.html" %}
 
-      <div class="card mb-6">
-        <h2 class="mb-4 font-medium">{% translate "Add to the timeline" %}</h2>
-        <form method="post" action="{% url 'applications:event_create' application.pk %}">
-          {% csrf_token %}
-          <div class="grid gap-x-4 sm:grid-cols-2">
-            <c-field :field="event_form.kind" />
-            <c-field :field="event_form.occurred_at" />
-          </div>
-          <c-field :field="event_form.summary" />
-          <c-field :field="event_form.body" />
-          <button type="submit" class="btn" data-variant="outline">{% translate "Add entry" %}</button>
-        </form>
-      </div>
+      {% include "applications/partials/event_form.html" %}
 
-      <h2 class="mb-3 font-medium">{% translate "What happened" %}</h2>
-      {% if events %}
-        <ol class="relative border-s border-ink-200 ps-6 dark:border-ink-800">
-          {% for event in events %}
-            <li class="mb-6 last:mb-0">
-              <span class="absolute -start-1.5 mt-1.5 h-3 w-3 rounded-full
-                           {% if event.kind == 'status_change' %}bg-brand-500{% else %}bg-ink-300 dark:bg-ink-600{% endif %}"></span>
-              <div class="flex flex-wrap items-baseline gap-2">
-                <p class="font-medium">{{ event.summary|default:event.get_kind_display }}</p>
-                <span class="text-xs text-ink-400">{{ event.occurred_at|date:"DATETIME_FORMAT" }}</span>
-                {% if event.actor %}
-                  <span class="text-xs text-ink-400" data-actor>
-                    {% blocktranslate with actor=event.actor trimmed %}via {{ actor }}{% endblocktranslate %}
-                  </span>
-                {% endif %}
-                {% if event.kind != 'status_change' %}
-                  <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
-                    {{ event.get_kind_display }}
-                  </span>
-                {% endif %}
-              </div>
-              {% if event.body %}
-                <p class="mt-1 whitespace-pre-line text-sm text-ink-600 dark:text-ink-300">{{ event.body }}</p>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ol>
-      {% else %}
-        <div class="card text-sm text-ink-500 dark:text-ink-400">
-          {% translate "Nothing recorded against this one yet." %}
-        </div>
-      {% endif %}
+      {% include "applications/partials/timeline.html" %}
     </div>
 
     <aside>
@@ -320,27 +262,7 @@
             {% translate "Add" %}
           </a>
         </div>
-        {% if reminders %}
-          <ul class="space-y-3">
-            {% for reminder in reminders %}
-              <li class="flex items-start gap-3">
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm">{{ reminder.summary }}</p>
-                  <p class="text-xs {% if reminder.is_overdue %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
-                    {{ reminder.due_at|date:"DATETIME_FORMAT" }}
-                  </p>
-                </div>
-                <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}">
-                  {% csrf_token %}
-                  <input type="hidden" name="next" value="{{ application.get_absolute_url }}">
-                  <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Done" %}</button>
-                </form>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "None outstanding." %}</p>
-        {% endif %}
+        {% include "applications/partials/reminders.html" %}
       </div>
     </aside>
   </div>
