@@ -523,6 +523,123 @@
     Array.prototype.forEach.call(document.querySelectorAll("form[data-submitted]"), releaseForm);
   });
 
+  /* ------------------------------------------------------- not losing what was typed
+   *
+   * There was nothing here at all, and there is an eighteen-row textarea for a cover
+   * letter. Navigation is a full page load almost everywhere, so the sidebar, the search
+   * box, the back button and every link on the page were one click away from discarding
+   * an hour's writing, silently and with no way back. Nothing in Postulo has ever asked
+   * anybody to retype a letter; it had simply never been tested by somebody who clicked
+   * the wrong thing (#258).
+   *
+   * A form is *dirty* from the first keystroke in it until it is submitted or put back to
+   * what it was. `beforeunload` then asks, and the browser decides what that looks like.
+   *
+   * **The words are the browser's and cannot be ours.** Every engine ignores whatever
+   * string a page supplies and shows its own, in the browser's language rather than
+   * Postulo's -- so there is nothing here to translate, which is unusual enough in this
+   * project to be worth saying where somebody will read it rather than discovering it
+   * after wondering where the message went. A browser also refuses to ask at all unless
+   * the page has been interacted with, which a form that has been typed into always has.
+   *
+   * **Dirtiness is per form, and a submit clears only the form submitted.** The capture
+   * review has two forms on one page: the review itself, and a discard beside it. The `d`
+   * key presses the discard, and a correction typed into the review is exactly what would
+   * be lost -- so submitting the discard does not forgive the review, and the question is
+   * asked. The `j` key is an ordinary link and was never a special case.
+   *
+   * **What is typed is not kept.** A draft -- in this browser's storage or in a row of its
+   * own -- is a larger decision than this one and was left deliberately: it is data with a
+   * lifetime, a place, and an answer for what a half-written letter means in a list of
+   * letters. This guard is worth having on its own and does not prejudge it.
+   */
+  var WATCHED = "input, textarea, select";
+
+  function formsOnThePage() {
+    return Array.prototype.slice.call(document.querySelectorAll("form"));
+  }
+
+  function isDirty(form) {
+    return form.dataset.dirty === "1";
+  }
+
+  function anythingDirty() {
+    return formsOnThePage().some(isDirty);
+  }
+
+  function markDirty(field) {
+    var form = field && field.form;
+    if (!form || isDirty(form)) {
+      return;
+    }
+    // A form the server draws to hold a filter, a sort or a page number is a control, not
+    // work: the list page rewrites the address as somebody narrows it, and asking "are you
+    // sure?" for a sort order would teach everybody to click through the question without
+    // reading it -- which is how a guard stops guarding anything.
+    if ((form.getAttribute("method") || "get").toLowerCase() !== "post") {
+      return;
+    }
+    if (form.hasAttribute("data-no-guard")) {
+      return;
+    }
+    // A control that saves the moment it is finished with has nothing outstanding to lose
+    // -- the board's status menus and the plugins page's switches are the whole form.
+    if (autosubmitControl(field)) {
+      return;
+    }
+    form.dataset.dirty = "1";
+  }
+
+  function watchedField(event) {
+    var field = event.target;
+    return field && field.form && field.matches && field.matches(WATCHED) ? field : null;
+  }
+
+  document.addEventListener("input", function (event) {
+    markDirty(watchedField(event));
+  });
+
+  // A select changes without an `input` event in engines worth supporting, and a chosen
+  // file is a change and never an input at all.
+  document.addEventListener("change", function (event) {
+    markDirty(watchedField(event));
+  });
+
+  document.addEventListener("submit", function (event) {
+    // Only this form. The other forms on the page still hold whatever was typed into
+    // them, and this submit is about to take the page away from all of them.
+    if (event.target && event.target.tagName === "FORM") {
+      delete event.target.dataset.dirty;
+    }
+  });
+
+  // htmx leaves the page where it is, so a form it sends and swaps away is finished with
+  // in the same sense a submitted one is.
+  document.addEventListener("htmx:afterRequest", function (event) {
+    var form = event.target && event.target.closest ? event.target.closest("form") : null;
+    if (form) {
+      delete form.dataset.dirty;
+    }
+  });
+
+  window.addEventListener("beforeunload", function (event) {
+    if (!anythingDirty()) {
+      return;
+    }
+    // Both spellings: `preventDefault` is what the standard says now, `returnValue` is
+    // what older engines act on, and a browser that wants neither ignores both.
+    event.preventDefault();
+    event.returnValue = "";
+  });
+
+  window.addEventListener("pageshow", function () {
+    // Coming back to a page from the cache with yesterday's dirty mark on it would ask a
+    // question about typing nobody has done in this visit.
+    Array.prototype.forEach.call(document.querySelectorAll("form[data-dirty]"), function (form) {
+      delete form.dataset.dirty;
+    });
+  });
+
   document.addEventListener("submit", function (event) {
     var form = event.target.closest("[data-theme-switch]");
     if (!form) {
@@ -1366,6 +1483,43 @@
     if (link) {
       link.focus();
     }
+  });
+
+  /* ------------------------------------------- a control that swaps itself out of existence
+   *
+   * Ticking a reminder off removes the button that was pressed. Focus then belongs to the
+   * document, and the next Tab starts again at the skip link -- which is #227's rule, and
+   * the reminder tick is exactly the shape it describes (#257).
+   *
+   * The button says where focus should go once it is gone. It is read *before* the swap,
+   * because after it the button is not there to ask. Where the region it names is empty
+   * afterwards -- the last reminder -- the region itself takes focus, which is why it is
+   * given `tabindex="-1"`: a heading nobody can reach is not somewhere to land.
+   */
+  var focusAfterSwap = null;
+
+  document.addEventListener("htmx:beforeRequest", function (event) {
+    var source = event.detail && event.detail.elt;
+    var button = source && source.querySelector ? source.querySelector("[data-focus-after]") : null;
+    if (!button && source && source.closest) {
+      button = source.closest("[data-focus-after]");
+    }
+    focusAfterSwap = button ? button.getAttribute("data-focus-after") : null;
+  });
+
+  document.addEventListener("htmx:afterSettle", function () {
+    if (!focusAfterSwap) {
+      return;
+    }
+    var landing = document.querySelector(focusAfterSwap);
+    focusAfterSwap = null;
+    if (!landing) {
+      return;
+    }
+    // The next tick if there is one, so working through a list stays a list of Tab-free
+    // presses; the region itself when that was the last of them.
+    var next = landing.querySelector("[data-focus-after]");
+    (next || landing).focus();
   });
 
   document.addEventListener("keydown", function (event) {
