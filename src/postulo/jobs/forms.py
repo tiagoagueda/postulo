@@ -24,6 +24,47 @@ from .models import (
     JobPosting,
 )
 
+#: What a posting's fields say about themselves, in one place (#205).
+#:
+#: The same thirteen fields are declared three times -- `JobPostingForm` here, and
+#: `PostingIntakeForm` and `ApplicationIntakeForm` in `applications.forms`, which are plain
+#: forms rather than model forms and so inherit nothing. Writing the sentences three times
+#: would be three things to keep true; the ones that drifted would be the ones on the form
+#: nobody looked at.
+POSTING_HELP = {
+    "location": _(
+        "As the posting words it — a city, a region, a country. Free text: nothing is "
+        "looked up anywhere."
+    ),
+    "remote_type": _(
+        "On site is at their address; hybrid is some days there and some not; remote is no "
+        "address of theirs at all."
+    ),
+    "employment_type": _(
+        "Postulo's own words. A board's label may not land exactly on one of them, and the "
+        "nearest is fine — this is for your own sorting."
+    ),
+    "url": _(
+        "The posting's own address, kept so you can go back to it. Postulo reads the page "
+        "when you capture it and never fetches it again."
+    ),
+    "salary_min": _("Gross, before tax. One end on its own is fine — most postings give one."),
+    "salary_max": _("Gross, before tax. Leave it empty if the posting names a single figure."),
+    "salary_currency": _("It means nothing without an amount beside it, and is ignored then."),
+    "salary_period": _(
+        "What the figure is per. It means nothing without an amount beside it, and is ignored then."
+    ),
+    "posted_at": _("When the employer put it up, if the posting says. Empty means unknown."),
+    "closes_at": _(
+        "The employer's own closing date, if the posting gives one. Empty means unknown, "
+        "not open forever."
+    ),
+    "description": _(
+        "Paste the posting's text. It is kept exactly as pasted, and nothing is ever "
+        "fetched from the address above to fill it."
+    ),
+}
+
 
 class OwnerScopedModelForm(forms.ModelForm):
     """A ModelForm that knows whose data it is allowed to offer."""
@@ -60,6 +101,10 @@ class CompanyForm(OwnerScopedModelForm):
         queryset=Industry.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple,
+        help_text=_(
+            "Tick as many as fit. The list is your own — Industries, beside Companies, "
+            "is where it is kept."
+        ),
     )
     new_industries = forms.CharField(
         label=_("Other industries"),
@@ -113,6 +158,18 @@ class CompanyForm(OwnerScopedModelForm):
             "notes",
         )
         widgets = {"notes": forms.Textarea(attrs={"rows": 4})}
+        help_texts = {
+            "kind": _(
+                "An employer is somewhere you might work; an employment service is an "
+                "office or agency that lists other people's openings."
+            ),
+            "website": _(
+                "Used by Find logo, and only when you press it. Postulo fetches nothing "
+                "from here on its own."
+            ),
+            "location": _("Where they are, as you would write it. Nothing is looked up."),
+            "notes": _("Yours. They never appear on a document or go anywhere else."),
+        }
 
     def scope_querysets(self) -> None:
         """Narrow every field this form actually has to this person's own rows.
@@ -434,6 +491,15 @@ class ContactForm(OwnerScopedModelForm):
         model = Contact
         fields = ("name", "role", "company", "email", "notes")
         widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
+        help_texts = {
+            "role": _("Their job title, as they give it themselves."),
+            "company": _("Where they work. Only companies you have recorded are offered."),
+            "email": _(
+                "Used to address them on an interview's calendar file. Postulo never writes "
+                "to it by itself."
+            ),
+            "notes": _("Yours. They never appear on a document or go anywhere else."),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -544,6 +610,9 @@ class JobPostingForm(OwnerScopedModelForm):
             "closes_at": forms.DateInput(attrs={"type": "date"}),
             "description": forms.Textarea(attrs={"rows": 10}),
         }
+        #: `source` is left out: the model's own sentence says it, and a model form takes
+        #: that already. Naming it here would be the same words in a second place.
+        help_texts = POSTING_HELP
 
     def scope_querysets(self) -> None:
         # `get`, because a cell editor is this form narrowed to one field, and the field it

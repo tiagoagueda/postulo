@@ -8,8 +8,14 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import Tag
 from postulo.jobs import recall
-from postulo.jobs.forms import OwnerScopedModelForm
-from postulo.jobs.models import Contact, EmploymentType, RemoteType, SalaryPeriod
+from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm
+from postulo.jobs.models import (
+    Contact,
+    EmploymentType,
+    JobPosting,
+    RemoteType,
+    SalaryPeriod,
+)
 
 from .models import (
     SYSTEM_EVENT_KINDS,
@@ -22,6 +28,23 @@ from .models import (
     Reminder,
     Status,
 )
+
+#: What the person's own fields say, said once (#205). `ApplicationDetailsForm` declares
+#: them as plain fields and `ApplicationForm` is a model form over the same columns, so
+#: neither inherits from the other and both read this.
+APPLICATION_HELP = {
+    "channel": _(
+        "The route it went through. The report counts by this, including how many went "
+        "through the employment service's own board."
+    ),
+    "priority": _("Yours, not the employer's. The list can be sorted and narrowed by it."),
+    "deadline": _(
+        "The date you mean to have sent it by. It is not a reminder — set one of those if "
+        "you want telling."
+    ),
+    "tags": _("Your own words for grouping applications. New ones go in the box below."),
+    "contact": _("The person at the company this went through, where there was one."),
+}
 
 
 class UserAwareForm(forms.Form):
@@ -52,41 +75,68 @@ class PostingIntakeForm(UserAwareForm):
         widget=forms.TextInput(attrs={"list": "company-suggestions", "autocomplete": "off"}),
     )
     title = forms.CharField(label=_("Job title"), max_length=250)
-    url = forms.URLField(label=_("Posting URL"), max_length=500, required=False)
+    url = forms.URLField(
+        label=_("Posting URL"),
+        max_length=500,
+        required=False,
+        help_text=POSTING_HELP["url"],
+    )
     location = forms.CharField(
         label=_("Location"),
         max_length=200,
         required=False,
         widget=forms.TextInput(attrs={"list": "location-suggestions", "autocomplete": "off"}),
+        help_text=POSTING_HELP["location"],
     )
     remote_type = forms.ChoiceField(
         label=_("Working arrangement"),
         choices=[("", "—"), *RemoteType.choices],
         required=False,
+        help_text=POSTING_HELP["remote_type"],
     )
     employment_type = forms.ChoiceField(
         label=_("Employment type"),
         choices=[("", "—"), *EmploymentType.choices],
         required=False,
+        help_text=POSTING_HELP["employment_type"],
     )
     source = forms.CharField(
         label=_("Found via"),
         max_length=120,
         required=False,
         widget=forms.TextInput(attrs={"list": "source-suggestions", "autocomplete": "off"}),
+        # The same sentence the model carries, so the two forms that ask for this read
+        # alike. `JobPostingForm` takes it from the model without being told.
+        help_text=JobPosting._meta.get_field("source").help_text,
     )
 
     salary_min = forms.DecimalField(
-        label=_("Salary from"), required=False, max_digits=12, decimal_places=2
+        label=_("Salary from"),
+        required=False,
+        max_digits=12,
+        decimal_places=2,
+        help_text=POSTING_HELP["salary_min"],
     )
     salary_max = forms.DecimalField(
-        label=_("Salary to"), required=False, max_digits=12, decimal_places=2
+        label=_("Salary to"),
+        required=False,
+        max_digits=12,
+        decimal_places=2,
+        help_text=POSTING_HELP["salary_max"],
     )
     salary_currency = forms.CharField(
-        label=_("Currency"), max_length=3, required=False, initial="EUR"
+        label=_("Currency"),
+        max_length=3,
+        required=False,
+        initial="EUR",
+        help_text=POSTING_HELP["salary_currency"],
     )
     salary_period = forms.ChoiceField(
-        label=_("Period"), choices=SalaryPeriod.choices, required=False, initial=SalaryPeriod.YEAR
+        label=_("Period"),
+        choices=SalaryPeriod.choices,
+        required=False,
+        initial=SalaryPeriod.YEAR,
+        help_text=POSTING_HELP["salary_period"],
     )
 
     @property
@@ -110,10 +160,16 @@ class PostingIntakeForm(UserAwareForm):
         }
 
     closes_at = forms.DateField(
-        label=_("Closing date"), required=False, widget=forms.DateInput(attrs={"type": "date"})
+        label=_("Closing date"),
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text=POSTING_HELP["closes_at"],
     )
     description = forms.CharField(
-        label=_("Description"), required=False, widget=forms.Textarea(attrs={"rows": 8})
+        label=_("Description"),
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 8}),
+        help_text=POSTING_HELP["description"],
     )
 
     def clean(self):
@@ -154,10 +210,17 @@ class ApplicationDetailsForm(UserAwareForm):
 
     status = forms.ChoiceField(label=_("Status"), choices=Status.choices, initial=Status.APPLIED)
     channel = forms.ChoiceField(
-        label=_("Applied through"), choices=[("", "—"), *Channel.choices], required=False
+        label=_("Applied through"),
+        choices=[("", "—"), *Channel.choices],
+        required=False,
+        help_text=APPLICATION_HELP["channel"],
     )
     priority = forms.TypedChoiceField(
-        label=_("Priority"), choices=Priority.choices, coerce=int, initial=Priority.NORMAL
+        label=_("Priority"),
+        choices=Priority.choices,
+        coerce=int,
+        initial=Priority.NORMAL,
+        help_text=APPLICATION_HELP["priority"],
     )
     applied_on = forms.DateField(
         label=_("Applied on"),
@@ -170,10 +233,16 @@ class ApplicationDetailsForm(UserAwareForm):
         ),
     )
     deadline = forms.DateField(
-        label=_("Your deadline"), required=False, widget=forms.DateInput(attrs={"type": "date"})
+        label=_("Your deadline"),
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text=APPLICATION_HELP["deadline"],
     )
     tags = forms.ModelMultipleChoiceField(
-        label=_("Tags"), queryset=Tag.objects.none(), required=False
+        label=_("Tags"),
+        queryset=Tag.objects.none(),
+        required=False,
+        help_text=APPLICATION_HELP["tags"],
     )
     new_tags = forms.CharField(
         label=_("New tags"),
@@ -239,6 +308,7 @@ class ApplicationForm(OwnerScopedModelForm):
         model = Application
         fields = ("status", "channel", "priority", "deadline", "department", "contact", "tags")
         widgets = {"deadline": forms.DateInput(attrs={"type": "date"})}
+        help_texts = APPLICATION_HELP
 
     def save(self, commit: bool = True):
         """Save, then add any tag that was typed rather than ticked.
@@ -302,6 +372,15 @@ class EventForm(forms.ModelForm):
     class Meta:
         model = ApplicationEvent
         fields = ("kind", "occurred_at", "summary", "body")
+        help_texts = {
+            "kind": _(
+                "What sort of thing it was. A status change and an interview write their "
+                "own entries, so neither is offered here."
+            ),
+            "occurred_at": _("When it happened, which is not always when you write it down."),
+            "summary": _("The line the timeline shows."),
+            "body": _("Anything longer worth keeping with it. It sits under the line."),
+        }
         widgets = {
             "occurred_at": forms.DateTimeInput(
                 attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
@@ -329,6 +408,13 @@ class ReminderForm(OwnerScopedModelForm):
     class Meta:
         model = Reminder
         fields = ("summary", "due_at", "application")
+        help_texts = {
+            "summary": _("What to do. It is what the reminder says when it falls due."),
+            "due_at": _(
+                "In your time zone. Any notifier you have switched on is told at that moment."
+            ),
+            "application": _("Which one it is about. Leave it empty for a reminder about none."),
+        }
         widgets = {
             "due_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M")
         }
@@ -356,6 +442,18 @@ class InterviewForm(OwnerScopedModelForm):
     class Meta:
         model = Interview
         fields = ("kind", "starts_at", "ends_at", "location", "contacts", "notes")
+        help_texts = {
+            "starts_at": _(
+                "In your time zone. The calendar file Postulo makes writes it in UTC, so it "
+                "lands at the right moment wherever it is opened."
+            ),
+            "contacts": _(
+                "Who you are meeting. Only the people you have recorded at this company are "
+                "offered."
+            ),
+            "notes": _("Yours, to prepare with. Nothing here is sent to anybody."),
+            "ends_at": _("Left blank, it lasts an hour."),
+        }
         widgets = {
             "starts_at": forms.DateTimeInput(
                 attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
@@ -372,7 +470,6 @@ class InterviewForm(OwnerScopedModelForm):
         self.application = application or (instance.application if instance is not None else None)
         super().__init__(*args, **kwargs)
         self.fields["ends_at"].required = False
-        self.fields["ends_at"].help_text = _("Left blank, it lasts an hour.")
         for name in ("starts_at", "ends_at"):
             self.fields[name].input_formats = DATETIME_INPUT_FORMATS
         if self.instance.pk:

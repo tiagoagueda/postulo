@@ -46,6 +46,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Form fields explain themselves: what goes in the box, in what form, and what Postulo does with it afterwards. (#205)
 - Postulo asks before a page is left with something typed into it and not saved, so a click in the sidebar no longer discards an unsent letter. (#258)
 - Company, Location and *Found via* suggest what you have already recorded, on the intake form, the listing form and the capture review. (#261)
 - The plugin surface carries the notifier contract, the records a sync works on and the calls that write to them, and `postulo.plugins.testing` publishes the check that a plugin imports nothing else. (#229)

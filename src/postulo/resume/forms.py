@@ -23,6 +23,20 @@ from .models import (
 DATE_WIDGET = forms.DateInput(attrs={"type": "date"})
 
 
+#: What the fields every kind of entry shares say about themselves (#205).
+#:
+#: Four models carry a start, an end, a summary and a list of highlights, and none of them
+#: inherits another's form. The sentences are the same in each because the behaviour is:
+#: a CV prints the month and the year, and prints a highlight as a bullet, wherever the
+#: entry came from.
+ENTRY_HELP = {
+    "start_date": _("A CV prints the month and the year, so the day makes no difference."),
+    "end_date": _("Leave it empty while it is still going; a CV then prints “present”."),
+    "summary": _("A line or two. It prints under the dates on a CV."),
+    "highlights": _("One per line. A CV prints them as bullets."),
+}
+
+
 class ResumeItemForm(OwnerScopedModelForm):
     """An entry's form, with the order number hidden unless the person asked for it.
 
@@ -64,6 +78,13 @@ class ExperienceForm(ResumeItemForm):
             "summary": forms.Textarea(attrs={"rows": 3}),
             "highlights": forms.Textarea(attrs={"rows": 6}),
         }
+        #: `end_date` and `highlights` say their piece on the model already, and a model
+        #: form takes that; repeating them here would be the same words twice.
+        help_texts = {
+            "start_date": ENTRY_HELP["start_date"],
+            "summary": ENTRY_HELP["summary"],
+            "location": _("Where the work was, as you would write it on a CV."),
+        }
 
     def clean(self):
         cleaned = super().clean()
@@ -92,6 +113,14 @@ class EducationForm(ResumeItemForm):
             "end_date": DATE_WIDGET,
             "highlights": forms.Textarea(attrs={"rows": 4}),
         }
+        help_texts = {
+            "start_date": ENTRY_HELP["start_date"],
+            "end_date": ENTRY_HELP["end_date"],
+            "highlights": ENTRY_HELP["highlights"],
+            "field_of_study": _("What it was in, where the qualification's name does not say."),
+            "grade": _("As the institution words it. It prints only if you fill it in."),
+            "location": _("Where you studied, as you would write it on a CV."),
+        }
 
 
 class ProjectForm(ResumeItemForm):
@@ -103,6 +132,14 @@ class ProjectForm(ResumeItemForm):
             "end_date": DATE_WIDGET,
             "summary": forms.Textarea(attrs={"rows": 3}),
             "highlights": forms.Textarea(attrs={"rows": 4}),
+        }
+        help_texts = {
+            "start_date": ENTRY_HELP["start_date"],
+            "end_date": ENTRY_HELP["end_date"],
+            "summary": ENTRY_HELP["summary"],
+            "highlights": ENTRY_HELP["highlights"],
+            "role": _("What you did on it — “maintainer”, “contributor”, “designer”."),
+            "url": _("Where it can be seen. A CV prints it beside the name."),
         }
 
 
@@ -116,6 +153,12 @@ class SkillForm(ResumeItemForm):
     class Meta:
         model = Skill
         fields = ("name", "group", "order")
+        help_texts = {
+            "group": _(
+                "How it is gathered on a CV, which prints each group as “Group: one, two, "
+                "three”. Groups are made on the career page."
+            )
+        }
 
     def scope_querysets(self) -> None:
         self.fields["group"].queryset = SkillGroup.objects.for_user(self.user)
@@ -126,18 +169,37 @@ class CertificationForm(ResumeItemForm):
         model = Certification
         fields = ("name", "issuer", "issued_on", "expires_on", "credential_url", "order")
         widgets = {"issued_on": DATE_WIDGET, "expires_on": DATE_WIDGET}
+        help_texts = {
+            "issuer": _("Who awarded it."),
+            "expires_on": _("Leave it empty if it does not expire."),
+            "credential_url": _("Where somebody can check it. A CV prints it as a link."),
+        }
 
 
 class LanguageSkillForm(ResumeItemForm):
     class Meta:
         model = LanguageSkill
         fields = ("name", "proficiency", "order")
+        help_texts = {
+            "proficiency": _(
+                "The Common European Framework levels. “Not stated” prints nothing at all, "
+                "which is the honest answer where you have never been tested — a level is a "
+                "claim somebody may test in an interview."
+            )
+        }
 
 
 class LinkForm(ResumeItemForm):
     class Meta:
         model = Link
         fields = ("title", "url", "kind", "description", "order")
+        help_texts = {
+            "kind": _(
+                "What sort of thing it is, never who hosts it: a portfolio is a portfolio "
+                "wherever it lives."
+            ),
+            "description": _("A few words about it, where the title does not say enough."),
+        }
 
 
 class TranslationForm(forms.Form):

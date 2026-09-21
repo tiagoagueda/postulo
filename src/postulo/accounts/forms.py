@@ -110,6 +110,17 @@ class SignupForm(AllauthSignupForm):
         order = ["first_name", "last_name", "username", "email", "password1", "password2"]
         self.order_fields([name for name in order if name in self.fields])
         with_strength_meter(self)
+        # Said here rather than on the field, which allauth builds from a setting (#205).
+        if "username" in self.fields:
+            self.fields["username"].help_text = _(
+                "You can sign in with this or with your address. Nobody else sees it — "
+                "Postulo shows people your name."
+            )
+        if "email" in self.fields:
+            self.fields["email"].help_text = _(
+                "Where Postulo writes to you, and what a CV prints if you let it show "
+                "contact details."
+            )
 
     def save(self, request):
         user = super().save(request)
@@ -564,6 +575,11 @@ class PersonIdentifierForm(forms.ModelForm):
     class Meta:
         model = PersonIdentifier
         fields = ("scheme", "value", "label")
+        help_texts = {
+            "scheme": _("Which register the number belongs to. What goes where, above, says."),
+            "value": _("Postulo tidies it into the register's own spelling and checks the shape."),
+            "label": _("Only for “Other”: what to call it on a CV."),
+        }
         widgets = {
             "value": forms.TextInput(attrs={"autocomplete": "off", "spellcheck": "false"}),
         }
@@ -728,14 +744,23 @@ class LocaleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Both are rebuilt here rather than taken from the model, so the sentences on
+        # `Meta.help_texts` would be thrown away with the fields; they are set here (#205).
         self.fields["language"] = forms.ChoiceField(
             label=_("Language"),
             choices=language_choices,
             required=False,
             widget=forms.RadioSelect,
+            help_text=_(
+                "What Postulo is in for you, and nothing else. What a CV or a letter is "
+                "written in is that document's own setting."
+            ),
         )
         self.fields["time_zone"] = forms.ChoiceField(
-            label=_("Time zone"), choices=time_zone_choices, required=False
+            label=_("Time zone"),
+            choices=time_zone_choices,
+            required=False,
+            help_text=_("Every date and time on these pages is shown in it."),
         )
 
 

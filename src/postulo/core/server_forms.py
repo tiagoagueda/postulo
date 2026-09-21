@@ -190,6 +190,7 @@ class DefaultsForm(forms.ModelForm):
         )
         self.fields["default_time_zone"] = forms.ChoiceField(
             label=_("Time zone for new accounts"),
+            help_text=_("What a new account starts with. Each person can change theirs."),
             choices=time_zone_choices,
             required=False,
         )
@@ -254,7 +255,11 @@ class EmailForm(forms.ModelForm):
             "at the end of December 2026; after that it needs XOAUTH2."
         ),
     )
-    email_oauth_provider = forms.ChoiceField(label=_("Identity provider"), required=False)
+    email_oauth_provider = forms.ChoiceField(
+        label=_("Identity provider"),
+        required=False,
+        help_text=_("Who issues the token. It decides which of the boxes below are wanted."),
+    )
     email_oauth_grant = forms.ChoiceField(
         label=_("How the token is obtained"),
         required=False,
@@ -332,6 +337,32 @@ class EmailForm(forms.ModelForm):
             del self.fields["email_oauth_client_secret"]
         self.fields["email_host"].widget.attrs.setdefault("placeholder", "smtp.example.org")
         self.fields["email_from"].widget.attrs.setdefault("placeholder", "postulo@example.org")
+        # The form that most needs sentences and had the fewest (#205). Said here rather
+        # than on the columns, because several of these fields are added at run time and
+        # the ones that are not are shared with the person's own mail settings, where the
+        # sentence would be wrong: an operator sets the instance's server, not their own.
+        for name, sentence in {
+            "email_host": _("The server that accepts the mail — its name, not an address."),
+            "email_port": _(
+                "587 with STARTTLS, 465 with TLS, 25 with neither. It has to agree with "
+                "the security chosen below."
+            ),
+            "email_username": _(
+                "Usually the whole address. Leave it empty for a server that wants no "
+                "sign-in — a relay on your own network, most often."
+            ),
+            "email_timeout": _("Seconds to wait for the server before giving up."),
+            "email_from": _(
+                "The address people see it came from. Many servers refuse to send as an "
+                "address they do not host."
+            ),
+            "email_oauth_client_id": _(
+                "The application registered with the provider. Not a secret: it is the "
+                "secret beside it that is."
+            ),
+        }.items():
+            if name in self.fields and not self.fields[name].help_text:
+                self.fields[name].help_text = sentence
 
     def clean(self):
         cleaned = super().clean()

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-21 18:06+0000\n"
+"POT-Creation-Date: 2026-09-21 19:34+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: ქართული\n"
@@ -28,7 +28,7 @@ msgstr ""
 msgid "%(company)s already carries %(scheme)s %(value)s."
 msgstr "%(company)s უკვე ატარებს %(scheme)s %(value)s."
 
-#: src/postulo/jobs/forms.py:342
+#: src/postulo/jobs/forms.py:399
 #, python-format, draft
 msgid "%(company)s already carries this identifier."
 msgstr "%(company)s უკვე ატარებს ამ იდენტიფიკატორს."
@@ -420,7 +420,7 @@ msgstr "%(plugin)s-მა ვერ შეამოწმა ეს პარა
 msgid "%(provider)s does not let an application send on its own."
 msgstr "%(provider)s არ აძლევს აპლიკაციას საკუთარი ძალებით გაგზავნის უფლებას."
 
-#: src/postulo/core/server_forms.py:366
+#: src/postulo/core/server_forms.py:397
 #, python-format, draft
 msgid ""
 "%(provider)s does not let an application send on its own. Choose “Signed in once”."
@@ -571,6 +571,11 @@ msgstr ""
 msgid "(part)"
 msgstr "(ნაწილობრივ)"
 
+#: src/postulo/core/server_forms.py:346
+msgid ""
+"587 with STARTTLS, 465 with TLS, 25 with neither. It has to agree with the security chosen below."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:11
 #, python-format, draft
 msgid ""
@@ -696,8 +701,21 @@ msgstr "კომპანია, პოზიცია, წინადად�
 msgid "A CSV file"
 msgstr "CSV ფაილი"
 
+#: src/postulo/documents/forms.py:110
+msgid ""
+"A CV leads with a career, a portfolio with work. It decides which themes are offered below."
+msgstr ""
+
+#: src/postulo/resume/forms.py:33
+msgid "A CV prints the month and the year, so the day makes no difference."
+msgstr ""
+
 #: src/postulo/core/design.py:53
 msgid "A deep indigo. Ten steps, of which the interface spends a handful."
+msgstr ""
+
+#: src/postulo/resume/forms.py:201
+msgid "A few words about it, where the title does not say enough."
 msgstr ""
 
 #: src/postulo/templates/server/design.html:167
@@ -713,10 +731,14 @@ msgstr ""
 msgid "A hint for the interface, such as “amber” or “sky”."
 msgstr "მინიშნება ინტერფეისისთვის, მაგალითად „ქარვისფერი“ ან „ცისფერი“."
 
-#: src/postulo/jobs/forms.py:50
+#: src/postulo/jobs/forms.py:91
 #, draft
 msgid "A known service"
 msgstr "ცნობილი სამსახური"
+
+#: src/postulo/resume/forms.py:35
+msgid "A line or two. It prints under the dates on a CV."
+msgstr ""
 
 #: src/postulo/core/models.py:741
 #, draft
@@ -791,7 +813,7 @@ msgid ""
 msgstr ""
 "წვდომის გასაღები დაკავშირებულია იმ მისამართთან, სადაც ის შექმენით — აქ ეს არის %(host)s. ამ ინსტალაციასთან სხვა სახელით მისვლა ან მისი გადატანა თქვენს გასაღებებს არ წაიღებს."
 
-#: src/postulo/core/server_forms.py:251
+#: src/postulo/core/server_forms.py:252
 #, draft
 msgid ""
 "A password is right for your own mail server, and for Gmail with an app password. Microsoft 365 stops accepting passwords for sending mail by default at the end of December 2026; after that it needs XOAUTH2."
@@ -897,7 +919,7 @@ msgstr "ჩუმი ჟურნალი სწორედ ის არი�
 msgid "A reminder falls due"
 msgstr "შეხსენების დრო დგება"
 
-#: src/postulo/applications/forms.py:353
+#: src/postulo/applications/forms.py:439
 #, draft
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "შეხსენების დრო დგება ერთი დღით ადრე, როცა ერთი დღით ადრე არსებობს."
@@ -1372,6 +1394,11 @@ msgid ""
 msgstr ""
 "არქივის იმპორტი ცარიელ ანგარიშში ბრძანების ხაზიდან შეიძლება. აქ არ არის შემოთავაზებული, რადგან იმპორტი ჩანაწერებს ქმნის და არ აერთიანებს, ეს კი გადაწყვეტილებაა, რომელიც ღირს შეგნებულად მიღება და არა დაწკაპუნებით."
 
+#: src/postulo/jobs/forms.py:162
+msgid ""
+"An employer is somewhere you might work; an employment service is an office or agency that lists other people's openings."
+msgstr ""
+
 #: src/postulo/templates/server/design.html:131
 msgid "An icon button"
 msgstr ""
@@ -1389,6 +1416,10 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "ინდექსი არის კოდის სია, რომელიც აქ გაეშვება, ამიტომ ის ხელმოწერილი უნდა იყოს და გასაღები თქვენ უნდა გქონდეთ. საცავის მოგვიანებით გამორთვა მისგან ახალ დაყენებებსა და განახლებებს აჩერებს; უკვე დაყენებული მუშაობას აგრძელებს."
+
+#: src/postulo/documents/forms.py:247
+msgid "An older version of the same thing, kept but no longer offered."
+msgstr ""
 
 #: src/postulo/templates/accounts/profile.html:133
 #, draft
@@ -1473,6 +1504,10 @@ msgid ""
 "Anything chosen here is rendered as it stands now and kept unchanged. Months later, when an interviewer asks about a line on your CV, you will have the version they read rather than the version you have edited since."
 msgstr ""
 "ყველაფერი, რაც აქ არჩეულია, აისახება ისე, როგორც ახლაა, და უცვლელად ინახება. თვეების შემდეგ, როცა გამსაუბრებელი თქვენი CV-ის ერთ სტრიქონზე გკითხავთ, ხელთ გექნებათ ის ვერსია, რომელიც მათ წაიკითხეს, და არა ის, რომელიც მას შემდეგ დაარედაქტირეთ."
+
+#: src/postulo/applications/forms.py:382
+msgid "Anything longer worth keeping with it. It sits under the line."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html:55
 #, draft
@@ -1629,7 +1664,7 @@ msgstr "გაგზავნილია"
 msgid "Applied in the last 30 days"
 msgstr "გაგზავნილია ბოლო 30 დღეში"
 
-#: src/postulo/applications/forms.py:163
+#: src/postulo/applications/forms.py:226
 #: src/postulo/applications/reports.py:501
 #: src/postulo/jobs/capture_views.py:200
 #: src/postulo/templates/applications/application_detail.html:96
@@ -1649,7 +1684,7 @@ msgstr "გაგზავნის თარიღი"
 msgid "Applied on an unknown date"
 msgstr "გაგზავნილია უცნობ თარიღში"
 
-#: src/postulo/applications/forms.py:157 src/postulo/applications/tables.py:77
+#: src/postulo/applications/forms.py:213 src/postulo/applications/tables.py:77
 #: src/postulo/core/csv_import.py:51
 #: src/postulo/templates/applications/application_detail.html:90
 #, draft
@@ -1717,6 +1752,15 @@ msgstr "მიმოხილვის მოწესრიგება"
 msgid "Arrange your dashboard"
 msgstr "მოაწესრიგეთ თქვენი მიმოხილვა"
 
+#: src/postulo/resume/forms.py:121
+msgid "As the institution words it. It prints only if you fill it in."
+msgstr ""
+
+#: src/postulo/jobs/forms.py:35
+msgid ""
+"As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
+msgstr ""
+
 #: src/postulo/applications/analytics.py:43
 #: src/postulo/applications/models.py:45
 #, draft
@@ -1772,7 +1816,7 @@ msgstr "ხელმისაწვდომია — ადამიანი 
 msgid "Available; you have not changed it."
 msgstr "ხელმისაწვდომია; თქვენ არ შეგიცვლიათ."
 
-#: src/postulo/accounts/forms.py:197
+#: src/postulo/accounts/forms.py:208
 #, draft
 msgid "Awaiting review by a speaker"
 msgstr "ელოდება მშობლიური მოსაუბრის განხილვას"
@@ -2269,12 +2313,12 @@ msgstr "ჯერ აირჩიეთ იდენტობის პროვ
 msgid "Choose another file"
 msgstr "სხვა ფაილის არჩევა"
 
-#: src/postulo/documents/forms.py:305
+#: src/postulo/documents/forms.py:337
 #, draft
 msgid "Choose at least one document to record."
 msgstr "აირჩიეთ სულ მცირე ერთი დოკუმენტი აღსარიცხად."
 
-#: src/postulo/accounts/forms.py:582 src/postulo/jobs/forms.py:292
+#: src/postulo/accounts/forms.py:598 src/postulo/jobs/forms.py:349
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "აირჩიეთ, რა სახის იდენტიფიკატორია ეს."
@@ -2326,7 +2370,7 @@ msgstr ""
 msgid "client ID"
 msgstr "კლიენტის ID"
 
-#: src/postulo/core/server_forms.py:268
+#: src/postulo/core/server_forms.py:273
 #, draft
 msgid "Client secret"
 msgstr "კლიენტის საიდუმლო"
@@ -2352,7 +2396,7 @@ msgstr "დახურულია ან უკვე შევსებულ
 msgid "Closes"
 msgstr "იხურება"
 
-#: src/postulo/applications/forms.py:113
+#: src/postulo/applications/forms.py:163
 #, draft
 msgid "Closing date"
 msgstr "დახურვის თარიღი"
@@ -2415,7 +2459,7 @@ msgstr "სვეტები შენახულია."
 msgid "Comfortable"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:502
+#: src/postulo/accounts/forms.py:513
 msgid ""
 "Comfortable is the default and the roomier of the two. Compact tightens the space around cards and inside tables so that more fits on a screen; nothing you can click or tap gets smaller."
 msgstr ""
@@ -2463,7 +2507,7 @@ msgstr "შექმნილი კომპანიები"
 msgid "Companies you have applied to"
 msgstr "კომპანიები, სადაც განაცხადი გააკეთეთ"
 
-#: src/postulo/applications/forms.py:50 src/postulo/applications/reports.py:502
+#: src/postulo/applications/forms.py:73 src/postulo/applications/reports.py:502
 #: src/postulo/applications/tables.py:33 src/postulo/core/csv_import.py:40
 #: src/postulo/jobs/tables.py:194
 #: src/postulo/templates/applications/report.html:250
@@ -2581,7 +2625,7 @@ msgstr "კავშირი შენახულია. შეამოწმ
 msgid "connection security"
 msgstr "კავშირის უსაფრთხოება"
 
-#: src/postulo/core/server_forms.py:226
+#: src/postulo/core/server_forms.py:227
 #, draft
 msgid "Connection security"
 msgstr "კავშირის უსაფრთხოება"
@@ -2599,7 +2643,7 @@ msgstr "კავშირები"
 msgid "connections"
 msgstr "კავშირები"
 
-#: src/postulo/accounts/forms.py:495
+#: src/postulo/accounts/forms.py:506
 #, draft
 msgid "Consider an application quiet after"
 msgstr "განაცხადი ჩუმად ჩაითვალოს"
@@ -2780,7 +2824,7 @@ msgstr "შემქმნელი"
 msgid "credential link"
 msgstr "რწმუნებათა ბმული"
 
-#: src/postulo/applications/forms.py:86
+#: src/postulo/applications/forms.py:128
 #: src/postulo/templates/core/import_csv_map.html:58
 #, draft
 msgid "Currency"
@@ -2796,7 +2840,7 @@ msgstr "ვალუტა"
 msgid "Custom"
 msgstr "მორგებული"
 
-#: src/postulo/documents/forms.py:271 src/postulo/documents/kinds.py:138
+#: src/postulo/documents/forms.py:298 src/postulo/documents/kinds.py:138
 #: src/postulo/documents/models.py:151 src/postulo/documents/models.py:189
 #: src/postulo/documents/models.py:246 src/postulo/documents/models.py:426
 #: src/postulo/documents/themes.py:71
@@ -3113,7 +3157,7 @@ msgstr ""
 msgid "department"
 msgstr "განყოფილება"
 
-#: src/postulo/jobs/forms.py:426
+#: src/postulo/jobs/forms.py:483
 #: src/postulo/templates/applications/application_detail.html:108
 #, draft
 msgid "Department"
@@ -3133,7 +3177,7 @@ msgstr "დამოკიდებულია"
 msgid "Depth"
 msgstr ""
 
-#: src/postulo/applications/forms.py:116 src/postulo/core/csv_import.py:54
+#: src/postulo/applications/forms.py:169 src/postulo/core/csv_import.py:54
 #: src/postulo/jobs/tables.py:294
 #: src/postulo/templates/jobs/posting_detail.html:60
 #, draft
@@ -3370,6 +3414,10 @@ msgid ""
 msgstr ""
 "თითოეული საკუთარ ენაზეა დაწერილი, ამიტომ თქვენსას ამის წაკითხვის გარეშე იპოვით."
 
+#: src/postulo/documents/forms.py:307
+msgid "Each one is frozen as it is now, so what they received stays readable."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html:98
 msgid "Each person may change it"
 msgstr ""
@@ -3467,7 +3515,7 @@ msgstr "ელფოსტის მისამართი"
 msgid "Email address"
 msgstr "ელფოსტის მისამართი"
 
-#: src/postulo/accounts/forms.py:771
+#: src/postulo/accounts/forms.py:796
 #, draft
 msgid "Email address (optional)"
 msgstr "ელფოსტის მისამართი (არასავალდებულო)"
@@ -3497,7 +3545,7 @@ msgstr "დამსაქმებელი"
 msgid "Employment service"
 msgstr "დასაქმების სამსახური"
 
-#: src/postulo/applications/forms.py:68 src/postulo/jobs/tables.py:246
+#: src/postulo/applications/forms.py:98 src/postulo/jobs/tables.py:246
 #, draft
 msgid "Employment type"
 msgstr "დასაქმების ტიპი"
@@ -3596,11 +3644,15 @@ msgstr ""
 msgid "Every application, in order"
 msgstr "ყველა განაცხადი, თანმიმდევრობით"
 
-#: src/postulo/jobs/forms.py:372
+#: src/postulo/jobs/forms.py:429
 #, draft
 msgid ""
 "Every company under this industry moves to the one chosen, and this one goes."
 msgstr "ამ დარგის ყველა კომპანია არჩეულში გადადის, ეს კი ქრება."
+
+#: src/postulo/accounts/forms.py:763
+msgid "Every date and time on these pages is shown in it."
+msgstr ""
 
 #: src/postulo/templates/documents/rendered_list.html:12
 #, draft
@@ -3674,7 +3726,7 @@ msgid ""
 msgstr ""
 "ყველაფერი ერთბაშად ქრება და ვერავინ დააბრუნებს. ჯერ თქვენი ექსპორტი აიღეთ."
 
-#: src/postulo/accounts/forms.py:484
+#: src/postulo/accounts/forms.py:495
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
@@ -3952,7 +4004,7 @@ msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
 "ფაილები, რომლებიც უკვე გქონდათ, განსხვავებით Postulo-ს მიერ შექმნილი დოკუმენტებისგან."
 
-#: src/postulo/documents/forms.py:276
+#: src/postulo/documents/forms.py:303
 #, draft
 msgid "Files you have already"
 msgstr "ფაილები, რომლებიც უკვე გაქვთ"
@@ -3997,8 +4049,8 @@ msgstr "თითის ანაბეჭდი"
 msgid "finished at"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:98 src/postulo/accounts/forms.py:260
-#: src/postulo/accounts/forms.py:295
+#: src/postulo/accounts/forms.py:98 src/postulo/accounts/forms.py:271
+#: src/postulo/accounts/forms.py:306
 #, draft
 msgid "First name"
 msgstr "სახელი"
@@ -4109,7 +4161,7 @@ msgstr ""
 msgid "Forget the grant"
 msgstr "ნებართვის დავიწყება"
 
-#: src/postulo/core/server_forms.py:241
+#: src/postulo/core/server_forms.py:242
 #, draft
 msgid "Forget the stored password"
 msgstr "შენახული პაროლის დავიწყება"
@@ -4129,8 +4181,9 @@ msgstr "ლოგო ნაპოვნია მისამართზე %(u
 msgid "Found on their website"
 msgstr "ნაპოვნია მათ ვებგვერდზე"
 
-#: src/postulo/applications/forms.py:73 src/postulo/applications/reports.py:504
-#: src/postulo/core/csv_import.py:52 src/postulo/jobs/tables.py:231
+#: src/postulo/applications/forms.py:104
+#: src/postulo/applications/reports.py:504 src/postulo/core/csv_import.py:52
+#: src/postulo/jobs/tables.py:231
 #: src/postulo/templates/applications/report.html:252
 #: src/postulo/templates/applications/report_print.html:162
 #: src/postulo/templates/jobs/posting_detail.html:81
@@ -4349,6 +4402,14 @@ msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr ""
 "Gravatar-ს თქვენი მისამართისთვის სურათი არ აქვს, ამიტომ თქვენი ინიციალები რჩება."
 
+#: src/postulo/jobs/forms.py:52
+msgid "Gross, before tax. Leave it empty if the posting names a single figure."
+msgstr ""
+
+#: src/postulo/jobs/forms.py:51
+msgid "Gross, before tax. One end on its own is fine — most postings give one."
+msgstr ""
+
 #: src/postulo/resume/models.py:146
 #, draft
 msgid "group"
@@ -4456,6 +4517,15 @@ msgstr "როგორ ჩაიარა?"
 msgid "How far things got"
 msgstr "სადამდე მივიდა საქმე"
 
+#: src/postulo/resume/forms.py:157
+msgid ""
+"How it is gathered on a CV, which prints each group as “Group: one, two, three”. Groups are made on the career page."
+msgstr ""
+
+#: src/postulo/documents/forms.py:117 src/postulo/documents/forms.py:220
+msgid "How it is set on the page. Change it later without touching a word."
+msgstr ""
+
 #: src/postulo/applications/widgets.py:225
 #, draft
 msgid "How long they take"
@@ -4481,7 +4551,7 @@ msgstr "რამდენი კვირა"
 msgid "How much room"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:496
+#: src/postulo/accounts/forms.py:507
 msgid "How much room to leave"
 msgstr ""
 
@@ -4502,7 +4572,7 @@ msgstr "რამდენად რეგულარულად"
 msgid "How the first rows will be read"
 msgstr "როგორ წაიკითხება პირველი სტრიქონები"
 
-#: src/postulo/core/server_forms.py:259
+#: src/postulo/core/server_forms.py:264
 #, draft
 msgid "How the token is obtained"
 msgstr "როგორ მიიღება ტოკენი"
@@ -4603,7 +4673,7 @@ msgstr "თავს წარადგენს როგორც"
 msgid "identity provider"
 msgstr "იდენტობის პროვაიდერი"
 
-#: src/postulo/core/server_forms.py:257
+#: src/postulo/core/server_forms.py:259
 #, draft
 msgid "Identity provider"
 msgstr "იდენტობის პროვაიდერი"
@@ -4731,6 +4801,16 @@ msgstr "%(kind)s-ში, რომელიც %(company)s-ს გაუგზ�
 msgid "In the diary"
 msgstr "დღიურში"
 
+#: src/postulo/applications/forms.py:413
+msgid ""
+"In your time zone. Any notifier you have switched on is told at that moment."
+msgstr ""
+
+#: src/postulo/applications/forms.py:446
+msgid ""
+"In your time zone. The calendar file Postulo makes writes it in UTC, so it lands at the right moment wherever it is opened."
+msgstr ""
+
 #: src/postulo/documents/models.py:183
 #, draft
 msgid "include contact details"
@@ -4751,7 +4831,7 @@ msgstr "ინდექსის მისამართი"
 msgid "index address"
 msgstr "ინდექსის მისამართი"
 
-#: src/postulo/jobs/forms.py:59 src/postulo/jobs/tables.py:54
+#: src/postulo/jobs/forms.py:100 src/postulo/jobs/tables.py:54
 #: src/postulo/templates/jobs/company_list.html:72
 #: src/postulo/templates/jobs/industry_list.html:6
 #: src/postulo/templates/jobs/industry_list.html:12
@@ -4987,7 +5067,7 @@ msgid ""
 msgstr ""
 "მას შეუძლია წაიკითხოს და შეცვალოს ყველაფერი ამ ინსტალაციაზე, თითოეული ადამიანისთვის. დააყენეთ მხოლოდ ის, რაც წაიკითხეთ ან რისი ნდობის საფუძველიც გაქვთ. არაფერი ახლდება ავტომატურად: განახლება კოდის ცვლილებაა, და მასზე ადმინისტრატორი აჭერს."
 
-#: src/postulo/applications/forms.py:394
+#: src/postulo/applications/forms.py:491
 #, draft
 msgid "It cannot end before it starts."
 msgstr "ვერ დასრულდება დაწყებამდე."
@@ -5019,6 +5099,10 @@ msgid ""
 msgstr ""
 "შესაძლოა უკვე გამოყენებულია, ან ვადა გაუვიდა. სთხოვეთ ახალი იმას, ვინც მოგცათ."
 
+#: src/postulo/jobs/forms.py:53
+msgid "It means nothing without an amount beside it, and is ignored then."
+msgstr ""
+
 #: src/postulo/resume/links.py:76
 #, draft
 msgid "It redirects to a private or local address, which was not followed."
@@ -5030,6 +5114,11 @@ msgid ""
 "It refuses to serve anything rather than publishing these records to whoever finds it. Set POSTULO_LOGS_TOKEN, or turn POSTULO_LOGS_ENDPOINT_ENABLED off."
 msgstr ""
 "ის უარს ამბობს რამის გაცემაზე, ვიდრე ეს ჩანაწერები ყველასთვის გამოაქვეყნოს, ვინც მას იპოვის. დააყენეთ POSTULO_LOGS_TOKEN ან გამორთეთ POSTULO_LOGS_ENDPOINT_ENABLED."
+
+#: src/postulo/documents/forms.py:218
+msgid ""
+"It sets the shape the box below starts from, and which themes are offered."
+msgstr ""
 
 #: src/postulo/templates/accounts/invite_created.html:33
 #, python-format
@@ -5077,7 +5166,7 @@ msgstr "სამსახურის ძებნის ანგარიშ�
 msgid "Job search report · %(period)s"
 msgstr "სამსახურის ძებნის ანგარიში · %(period)s"
 
-#: src/postulo/applications/forms.py:54
+#: src/postulo/applications/forms.py:77
 #, draft
 msgid "Job title"
 msgstr "თანამდებობის დასახელება"
@@ -5105,7 +5194,7 @@ msgid ""
 msgstr ""
 "ინახება გამოყენების ან ვადის გასვლის შემდეგაც, რადგან ვინმეს ანგარიშის უკან წართმევა კვალის გარეშე შესაძლებელი არ უნდა იყოს."
 
-#: src/postulo/jobs/forms.py:84
+#: src/postulo/jobs/forms.py:129
 #, draft
 msgid "Kept at 256 pixels square, re-encoded, with nothing else of the file."
 msgstr ""
@@ -5118,14 +5207,14 @@ msgid ""
 msgstr ""
 "ინახება %(file)s-ში და ბრუნავს ზომის მიხედვით, ამიტომ დისკს ვერ შეავსებს. აქაური ყველაფერი კონსოლშიც მიდის, საიდანაც მას <code>docker logs</code> კითხულობს."
 
-#: src/postulo/accounts/forms.py:357 src/postulo/core/phone_numbers.py:305
+#: src/postulo/accounts/forms.py:368 src/postulo/core/phone_numbers.py:305
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
 msgstr ""
 "ინახება საერთაშორისო ფორმით, რომ ყველგან დარეკვა შეიძლებოდეს. ნომერი, რომელიც უკვე +-ით იწყება, უცვლელად აიღება."
 
-#: src/postulo/jobs/forms.py:452
+#: src/postulo/jobs/forms.py:518
 #, draft
 msgid ""
 "Kept in the international form, so you can still ring it from another country. A number that already starts with + is taken as it is."
@@ -5202,7 +5291,7 @@ msgstr "წერილების სახეები"
 msgid "label"
 msgstr "საჩვენებელი სახელი"
 
-#: src/postulo/accounts/forms.py:732 src/postulo/resume/forms.py:208
+#: src/postulo/accounts/forms.py:750 src/postulo/resume/forms.py:270
 #: src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
@@ -5306,8 +5395,8 @@ msgstr "ბოლოს შემოწმდა"
 msgid "last error"
 msgstr "ბოლო შეცდომა"
 
-#: src/postulo/accounts/forms.py:103 src/postulo/accounts/forms.py:265
-#: src/postulo/accounts/forms.py:300
+#: src/postulo/accounts/forms.py:103 src/postulo/accounts/forms.py:276
+#: src/postulo/accounts/forms.py:311
 #, draft
 msgid "Last name"
 msgstr "გვარი"
@@ -5369,7 +5458,7 @@ msgstr "მოგვიანებით"
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "დატოვეთ ველი ცარიელი და ეს სტრიქონი დაიბეჭდება ისე, როგორც ზემოთ წერია."
 
-#: src/postulo/core/server_forms.py:238 src/postulo/core/server_forms.py:271
+#: src/postulo/core/server_forms.py:239 src/postulo/core/server_forms.py:276
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "დატოვეთ ცარიელი, რომ უკვე შენახული დარჩეს."
@@ -5379,12 +5468,20 @@ msgstr "დატოვეთ ცარიელი, რომ უკვე შ�
 msgid "Leave empty if this is your current role."
 msgstr "დატოვეთ ცარიელი, თუ ეს თქვენი ამჟამინდელი პოზიციაა."
 
+#: src/postulo/resume/forms.py:174
+msgid "Leave it empty if it does not expire."
+msgstr ""
+
+#: src/postulo/resume/forms.py:34
+msgid "Leave it empty while it is still going; a CV then prints “present”."
+msgstr ""
+
 #: src/postulo/templates/core/export.html:90
 #, draft
 msgid "Leaving"
 msgstr "ტოვებს"
 
-#: src/postulo/applications/forms.py:375
+#: src/postulo/applications/forms.py:455
 #, draft
 msgid "Left blank, it lasts an hour."
 msgstr "ცარიელად დატოვებული, ერთი საათი გრძელდება."
@@ -5408,7 +5505,7 @@ msgstr ""
 msgid "Legal"
 msgstr "სამართალი"
 
-#: src/postulo/accounts/forms.py:452
+#: src/postulo/accounts/forms.py:463
 #, draft
 msgid "Let a single key do something"
 msgstr "მიეცით ერთ ღილაკს რაიმეს გაკეთების საშუალება"
@@ -5423,7 +5520,7 @@ msgstr "ამ წვდომის გასაღებმა მარტო
 msgid "Let {column} size itself"
 msgstr "მიეცით {column} სვეტს საკუთარი სიგანის არჩევის საშუალება"
 
-#: src/postulo/documents/forms.py:273 src/postulo/documents/themes.py:73
+#: src/postulo/documents/forms.py:300 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "წერილი"
@@ -5516,7 +5613,7 @@ msgid ""
 msgstr ""
 "ბმულები იმ ადგილებზე, სადაც სამსახურის ძიება ბრუნდება: დაფა, CV-ები, კომპანიები."
 
-#: src/postulo/documents/forms.py:282
+#: src/postulo/documents/forms.py:310
 #: src/postulo/templates/documents/application_documents.html:49
 #, draft
 msgid "Links you pointed them at"
@@ -5573,7 +5670,7 @@ msgstr ""
 msgid "location"
 msgstr "ადგილმდებარეობა"
 
-#: src/postulo/applications/forms.py:57 src/postulo/applications/tables.py:41
+#: src/postulo/applications/forms.py:85 src/postulo/applications/tables.py:41
 #: src/postulo/core/csv_import.py:44 src/postulo/jobs/tables.py:45
 #: src/postulo/jobs/tables.py:202
 #: src/postulo/templates/applications/application_detail.html:68
@@ -5586,7 +5683,7 @@ msgstr "ადგილმდებარეობა"
 msgid "logo"
 msgstr "ლოგო"
 
-#: src/postulo/jobs/forms.py:73
+#: src/postulo/jobs/forms.py:118
 #, draft
 msgid "Logo address"
 msgstr "ლოგოს მისამართი"
@@ -5710,7 +5807,7 @@ msgstr "ფოსტის OAuth საიდუმლოებები"
 msgid "mail transport"
 msgstr "ფოსტის ტრანსპორტი"
 
-#: src/postulo/core/server_forms.py:406
+#: src/postulo/core/server_forms.py:437
 #, draft
 msgid "Mail transport"
 msgstr "ფოსტის ტრანსპორტი"
@@ -5826,7 +5923,7 @@ msgstr "წევრი"
 msgid "Menu"
 msgstr "მენიუ"
 
-#: src/postulo/jobs/forms.py:369
+#: src/postulo/jobs/forms.py:426
 #, draft
 msgid "Merge into"
 msgstr "გაერთიანება"
@@ -5836,7 +5933,7 @@ msgstr "გაერთიანება"
 msgid "Merged."
 msgstr "გაერთიანდა."
 
-#: src/postulo/core/server_forms.py:307
+#: src/postulo/core/server_forms.py:312
 #, draft
 msgid ""
 "Microsoft only: the directory the application is registered in. Leave blank for an application that accepts any directory."
@@ -6085,7 +6182,7 @@ msgstr "ახალი მას შემდეგ, რაც ბოლოს 
 msgid "New tag"
 msgstr "ახალი იარლიყი"
 
-#: src/postulo/applications/forms.py:179 src/postulo/applications/forms.py:233
+#: src/postulo/applications/forms.py:248 src/postulo/applications/forms.py:302
 #, draft
 msgid "New tags"
 msgstr "ახალი იარლიყები"
@@ -6477,12 +6574,12 @@ msgstr ""
 msgid "Not on the page — a default. Kept only beside an amount."
 msgstr "გვერდზე არ არის — ნაგულისხმევი. ინახება მხოლოდ თანხის გვერდით."
 
-#: src/postulo/jobs/forms.py:149
+#: src/postulo/jobs/forms.py:206
 #, draft
 msgid "Not one of these"
 msgstr "არცერთი მათგანი"
 
-#: src/postulo/jobs/forms.py:140
+#: src/postulo/jobs/forms.py:197
 #, draft
 msgid "Not part of another company"
 msgstr "სხვა კომპანიის ნაწილი არ არის"
@@ -6494,7 +6591,7 @@ msgstr "სხვა კომპანიის ნაწილი არ ა�
 msgid "Not recorded"
 msgstr "არ აღრიცხულა"
 
-#: src/postulo/documents/forms.py:232
+#: src/postulo/documents/forms.py:259
 msgid "Not said"
 msgstr ""
 
@@ -6518,7 +6615,7 @@ msgstr "არ არის მითითებული"
 msgid "Not set here — the environment or the default applies"
 msgstr "აქ არ არის მითითებული — მოქმედებს გარემო ან ნაგულისხმევი"
 
-#: src/postulo/core/server_forms.py:299
+#: src/postulo/core/server_forms.py:304
 #, draft
 msgid "Not set — the environment decides"
 msgstr "დაუყენებელი — წყვეტს გარემო"
@@ -6556,12 +6653,12 @@ msgstr ""
 msgid "note"
 msgstr "შენიშვნა"
 
-#: src/postulo/applications/forms.py:295 src/postulo/applications/models.py:386
+#: src/postulo/applications/forms.py:365 src/postulo/applications/models.py:386
 #, draft
 msgid "Note"
 msgstr "შენიშვნა"
 
-#: src/postulo/accounts/forms.py:772
+#: src/postulo/accounts/forms.py:797
 #: src/postulo/templates/applications/partials/status_card.html:29
 #, draft
 msgid "Note (optional)"
@@ -6696,7 +6793,7 @@ msgstr "დაყენებული არაფერია, რაზეც
 msgid "Nothing is saved until you have reviewed it."
 msgstr "არაფერი ინახება, სანამ არ გადახედავთ."
 
-#: src/postulo/core/server_forms.py:243
+#: src/postulo/core/server_forms.py:244
 #, draft
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "სერვერს პაროლად არაფერი იგზავნება, სანამ ახალი არ შეიყვანება."
@@ -6978,7 +7075,12 @@ msgstr "ჩართული"
 msgid "On site"
 msgstr "ადგილზე"
 
-#: src/postulo/accounts/forms.py:461
+#: src/postulo/jobs/forms.py:39
+msgid ""
+"On site is at their address; hybrid is some days there and some not; remote is no address of theirs at all."
+msgstr ""
+
+#: src/postulo/accounts/forms.py:472
 #, draft
 msgid ""
 "On the capture review, “d” discards and moves on and “j” skips; “/” jumps to the search box anywhere. Turn this off if you dictate to your computer, or if a key pressed by accident does more than you meant. Shortcuts that need Ctrl go on working either way."
@@ -7114,6 +7216,10 @@ msgstr[0] ""
 msgstr[1] ""
 "%(total)s წვდომის გასაღები ამ ანგარიშზე. ისინი შესვლის საშუალებას გაძლევთ თითის ანაბეჭდით, თქვენი სახით ან PIN-ით, და გასაჟონი პაროლი არ არსებობს."
 
+#: src/postulo/resume/forms.py:36
+msgid "One per line. A CV prints them as bullets."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py:537
 #, python-format, draft
 msgid "One row ticked."
@@ -7180,6 +7286,10 @@ msgid ""
 msgstr ""
 "მხოლოდ იმ პროვაიდერისთვის, რომელიც აღარ იღებს პაროლებს. თქვენს საკუთარ საფოსტო სერვერს აქედან არაფერი სჭირდება."
 
+#: src/postulo/accounts/forms.py:581
+msgid "Only for “Other”: what to call it on a CV."
+msgstr ""
+
 #: src/postulo/core/addresses.py:56 src/postulo/plugins/fetching.py:121
 #, draft
 msgid "Only http and https addresses can be captured."
@@ -7235,7 +7345,7 @@ msgid ""
 msgstr ""
 "არასავალდებულო. თუ საიტი Postulo-ს უარყოფს, გახსენით ვაკანსია თქვენს ბრაუზერში, ნახეთ გვერდის კოდი და ჩასვით აქ. მაშინ არაფერი ჩამოიტვირთება."
 
-#: src/postulo/jobs/forms.py:82
+#: src/postulo/jobs/forms.py:127
 #, draft
 msgid "Or upload one"
 msgstr "ან ატვირთეთ ერთი"
@@ -7280,7 +7390,7 @@ msgstr "თავდაპირველი ვაკანსია"
 msgid "Other"
 msgstr "სხვა"
 
-#: src/postulo/jobs/forms.py:65
+#: src/postulo/jobs/forms.py:110
 #, draft
 msgid "Other industries"
 msgstr "სხვა დარგები"
@@ -7396,7 +7506,7 @@ msgstr "ამ კომპანიის ნაწილი"
 msgid "Part time"
 msgstr "ნახევარი განაკვეთი"
 
-#: src/postulo/accounts/forms.py:199
+#: src/postulo/accounts/forms.py:210
 #, draft
 msgid "Partly translated"
 msgstr "ნაწილობრივ თარგმნილი"
@@ -7416,7 +7526,7 @@ msgstr "წვდომის გასაღებები"
 msgid "password"
 msgstr "პაროლი"
 
-#: src/postulo/core/server_forms.py:235
+#: src/postulo/core/server_forms.py:236
 #: src/postulo/templates/server/email.html:26
 #: src/postulo/templates/settings/account.html:77
 #, draft
@@ -7429,6 +7539,11 @@ msgid ""
 "Paste the address of a job advert. Postulo fetches that one page, reads what it can, and shows you the result to correct before anything is saved."
 msgstr ""
 "ჩასვით სამსახურის განცხადების მისამართი. Postulo ჩამოტვირთავს იმ ერთ გვერდს, წაიკითხავს, რაც შეუძლია, და გაჩვენებთ შედეგს შესასწორებლად, სანამ რამე შეინახება."
+
+#: src/postulo/jobs/forms.py:62
+msgid ""
+"Paste the posting's text. It is kept exactly as pasted, and nothing is ever fetched from the address above to fill it."
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html:70
 #, draft
@@ -7444,6 +7559,11 @@ msgstr "PDF შეიქმნა."
 #, draft
 msgid "PDF renderer"
 msgstr "PDF-ის გამომსახველი"
+
+#: src/postulo/documents/forms.py:241
+msgid ""
+"PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG. Postulo keeps it exactly as uploaded, under a name of its own — what you send is the file you gave it."
+msgstr ""
 
 #: src/postulo/templates/accounts/invite_list.html:41
 #, draft
@@ -7486,7 +7606,7 @@ msgstr "თვეში"
 msgid "Per year"
 msgstr "წელიწადში"
 
-#: src/postulo/applications/forms.py:89
+#: src/postulo/applications/forms.py:135
 #: src/postulo/templates/applications/calendar.html:72
 #, draft
 msgid "Period"
@@ -7527,8 +7647,8 @@ msgstr "პირადი საიტი"
 msgid "Pharmaceuticals"
 msgstr "ფარმაცევტიკა"
 
-#: src/postulo/accounts/forms.py:352 src/postulo/core/phone_numbers.py:302
-#: src/postulo/jobs/forms.py:449
+#: src/postulo/accounts/forms.py:363 src/postulo/core/phone_numbers.py:302
+#: src/postulo/jobs/forms.py:515
 #: src/postulo/templates/partials/phone_numbers.html:35
 #, draft
 msgid "Phone"
@@ -7549,7 +7669,7 @@ msgstr "სატელეფონო გასაუბრება"
 msgid "Pick an application and the placeholders are filled in from it."
 msgstr "აირჩიეთ განაცხადი და ჩანაცვლების ადგილები მისგან შეივსება."
 
-#: src/postulo/jobs/forms.py:52
+#: src/postulo/jobs/forms.py:93
 #, draft
 msgid ""
 "Pick the public employment service you are registered with and leave the name blank; Postulo fills in the name and the website. Anything you type here is kept instead."
@@ -7651,7 +7771,7 @@ msgid ""
 msgstr ""
 "ასევე თქვენი პროფილი, თქვენი კარიერული ჩანაწერი, იარლიყები, ქრონოლოგიის თითოეული ჩანაწერი და თითოეული შეხსენება. არქივი შეიცავს ერთ წასაკითხ JSON ფაილს და მედიის საქაღალდეს."
 
-#: src/postulo/accounts/forms.py:309
+#: src/postulo/accounts/forms.py:320
 #, draft
 msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
@@ -7756,7 +7876,7 @@ msgstr "ვაკანსიის დეტალები"
 msgid "Posting updated."
 msgstr "ვაკანსია განახლდა."
 
-#: src/postulo/applications/forms.py:55 src/postulo/core/csv_import.py:43
+#: src/postulo/applications/forms.py:79 src/postulo/core/csv_import.py:43
 #, draft
 msgid "Posting URL"
 msgstr "ვაკანსიის URL"
@@ -7791,7 +7911,7 @@ msgstr "Postulo-სთან დაკავშირება ვერ მო�
 msgid "Postulo does not know how to do that to a logo."
 msgstr ""
 
-#: src/postulo/jobs/forms.py:76
+#: src/postulo/jobs/forms.py:121
 #, draft
 msgid ""
 "Postulo fetches it once and keeps a copy; the address is never shown to a browser. PNG, JPEG, GIF or WebP."
@@ -7805,7 +7925,7 @@ msgid ""
 msgstr ""
 "Postulo ჩამოტვირთავს ერთ გვერდს, რომელიც ადამიანმა მოითხოვა, და ნაგულისხმევად პატივს სცემს საიტის robots.txt-ს. თქვით დიახ მხოლოდ იმ შემთხვევაში, თუ გადაწყვიტეთ, რომ ეს თავაზიანობა აქ არ ვრცელდება."
 
-#: src/postulo/accounts/forms.py:318
+#: src/postulo/accounts/forms.py:329
 #, draft
 msgid ""
 "Postulo fetches the picture for your primary address from gravatar.com once, keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick it and the copy is deleted."
@@ -7860,10 +7980,19 @@ msgid ""
 msgstr ""
 "Postulo მხოლოდ მის ჰეშს ინახავს და ხელახლა ვერ გაჩვენებთ. თუ დაკარგავთ, სხვას შექმნით."
 
+#: src/postulo/accounts/forms.py:580
+msgid "Postulo tidies it into the register's own spelling and checks the shape."
+msgstr ""
+
 #: src/postulo/templates/base.html:237
 #, draft
 msgid "Postulo — your job search, on your server."
 msgstr "Postulo — თქვენი სამსახურის ძიება, თქვენს სერვერზე."
+
+#: src/postulo/jobs/forms.py:43
+msgid ""
+"Postulo's own words. A board's label may not land exactly on one of them, and the nearest is fine — this is for your own sorting."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html:34
 #, draft
@@ -7931,7 +8060,11 @@ msgstr "მთავარი"
 msgid "primary"
 msgstr "მთავარი"
 
-#: src/postulo/applications/forms.py:160 src/postulo/applications/tables.py:68
+#: src/postulo/documents/forms.py:219
+msgid "Printed at the top. It takes the same placeholders as the body."
+msgstr ""
+
+#: src/postulo/applications/forms.py:219 src/postulo/applications/tables.py:68
 #, draft
 msgid "Priority"
 msgstr "პრიორიტეტი"
@@ -8280,6 +8413,11 @@ msgstr "აღრიცხულია როგორც გაუქმებ�
 msgid "Recorded as held."
 msgstr "აღრიცხულია როგორც ჩატარებული."
 
+#: src/postulo/documents/forms.py:314
+msgid ""
+"Recorded as part of what they were sent. Postulo sends nothing itself — this is the note of what you sent."
+msgstr ""
+
 #: src/postulo/applications/models.py:440
 #, draft
 msgid "recorded by"
@@ -8405,7 +8543,7 @@ msgstr "უარი მიღებულია"
 msgid "Rejections"
 msgstr "უარები"
 
-#: src/postulo/applications/forms.py:350
+#: src/postulo/applications/forms.py:436
 #, draft
 msgid "Remind me the day before"
 msgstr "შემახსენე ერთი დღით ადრე"
@@ -8468,12 +8606,12 @@ msgstr "მოხსნა"
 msgid "Remove administrator"
 msgstr "ადმინისტრატორის მოხსნა"
 
-#: src/postulo/jobs/forms.py:86
+#: src/postulo/jobs/forms.py:131
 #, draft
 msgid "Remove the logo"
 msgstr "ლოგოს მოხსნა"
 
-#: src/postulo/accounts/forms.py:314
+#: src/postulo/accounts/forms.py:325
 #, draft
 msgid "Remove the uploaded picture"
 msgstr "ატვირთული სურათის მოხსნა"
@@ -8583,7 +8721,7 @@ msgstr "განხილვა"
 msgid "Review the capture"
 msgstr "აღების განხილვა"
 
-#: src/postulo/accounts/forms.py:191
+#: src/postulo/accounts/forms.py:202
 #, draft
 msgid "Reviewed by a speaker"
 msgstr "განიხილა მშობლიურმა მოსაუბრემ"
@@ -8698,7 +8836,7 @@ msgstr "ხელფასი"
 msgid "Salary (one figure or a range)"
 msgstr "ხელფასი (ერთი ციფრი ან დიაპაზონი)"
 
-#: src/postulo/applications/forms.py:80 src/postulo/core/csv_import.py:48
+#: src/postulo/applications/forms.py:114 src/postulo/core/csv_import.py:48
 #, draft
 msgid "Salary from"
 msgstr "ხელფასი დან"
@@ -8713,7 +8851,7 @@ msgstr "ხელფასი დან"
 msgid "salary period"
 msgstr "ხელფასის პერიოდი"
 
-#: src/postulo/applications/forms.py:83 src/postulo/core/csv_import.py:49
+#: src/postulo/applications/forms.py:121 src/postulo/core/csv_import.py:49
 #, draft
 msgid "Salary to"
 msgstr "ხელფასი მდე"
@@ -8806,7 +8944,7 @@ msgstr "შენახულია."
 msgid "Say what this address is."
 msgstr "თქვით, რა მისამართია ეს."
 
-#: src/postulo/accounts/forms.py:592 src/postulo/jobs/forms.py:302
+#: src/postulo/accounts/forms.py:608 src/postulo/jobs/forms.py:359
 #: src/postulo/jobs/models.py:421
 #, draft
 msgid "Say what this identifier is."
@@ -8876,6 +9014,10 @@ msgstr "ძებნა  /"
 msgid "Search everything"
 msgstr "ყველგან ძებნა"
 
+#: src/postulo/core/server_forms.py:354
+msgid "Seconds to wait for the server before giving up."
+msgstr ""
+
 #: src/postulo/plugins/models.py:178
 #, draft
 msgid "secrets"
@@ -8937,7 +9079,7 @@ msgstr "ნამდვილი შეტყობინების გაგ�
 msgid "Send a test message"
 msgstr "სატესტო შეტყობინების გაგზავნა"
 
-#: src/postulo/core/server_forms.py:199
+#: src/postulo/core/server_forms.py:200
 #, draft
 msgid "Send a test message to"
 msgstr "სატესტო შეტყობინების გაგზავნა მისამართზე"
@@ -9013,12 +9155,12 @@ msgstr "გაგზავნილია %(to)s-ზე."
 msgid "Sent with"
 msgstr "გაგზავნილია"
 
-#: src/postulo/jobs/forms.py:68
+#: src/postulo/jobs/forms.py:113
 #, draft
 msgid "Separate several with commas. Anything new joins your list."
 msgstr "რამდენიმე მძიმეებით გამოყავით. ყველაფერი ახალი თქვენს სიას ემატება."
 
-#: src/postulo/applications/forms.py:181 src/postulo/applications/forms.py:235
+#: src/postulo/applications/forms.py:250 src/postulo/applications/forms.py:304
 #, draft
 msgid "Separate them with commas. A tag you have already keeps its colour."
 msgstr "გამოყავით ისინი მძიმეებით. უკვე არსებული იარლიყი ინარჩუნებს თავის ფერს."
@@ -9176,7 +9318,7 @@ msgstr "ყველას ჩვენება"
 msgid "Show done too"
 msgstr "დასრულებულებიც აჩვენე"
 
-#: src/postulo/accounts/forms.py:481
+#: src/postulo/accounts/forms.py:492
 #, draft
 msgid "Show in the navigation"
 msgstr "ნავიგაციაში ჩვენება"
@@ -9191,7 +9333,7 @@ msgstr "წარსულებიც აჩვენე"
 msgid "show the order number on career entries"
 msgstr "რიგითი ნომრის ჩვენება კარიერის ჩანაწერებზე"
 
-#: src/postulo/accounts/forms.py:451
+#: src/postulo/accounts/forms.py:462
 #, draft
 msgid "Show the order number on each career entry"
 msgstr "რიგითი ნომრის ჩვენება კარიერის თითოეულ ჩანაწერზე"
@@ -9270,7 +9412,7 @@ msgstr "შესვლის ხერხები"
 msgid "Signed in once, as the mailbox that sends"
 msgstr "ერთხელ შესული, როგორც გამგზავნი საფოსტო ყუთი"
 
-#: src/postulo/core/server_forms.py:261
+#: src/postulo/core/server_forms.py:266
 #, draft
 msgid ""
 "Signed in once: somebody agrees on the provider's consent screen, as the mailbox that sends, and needs no administrator. The application sends on its own: Microsoft only, and needs a tenant administrator to grant the permission."
@@ -9289,7 +9431,7 @@ msgid ""
 msgstr ""
 "შესულია. პროვაიდერს ამის გაუქმება ნებისმიერ დროს შეუძლია — თუ პაროლი შეიცვლება ან ანგარიში თვეობით არ გამოიყენება — და მაშინ ფოსტა ჩერდება. ზემოთ მოცემული გვერდი ამას იტყვის, როგორც კი გაგზავნა ჩაიშლება."
 
-#: src/postulo/core/server_forms.py:249
+#: src/postulo/core/server_forms.py:250
 #, draft
 msgid "Signing in"
 msgstr "შესვლა"
@@ -9593,7 +9735,7 @@ msgstr "სუფთა ფურცლიდან იწყებთ?"
 msgid "starts"
 msgstr "იწყება"
 
-#: src/postulo/core/server_forms.py:228
+#: src/postulo/core/server_forms.py:229
 #, draft
 msgid ""
 "STARTTLS connects and then upgrades, which is what port 587 expects. TLS from the first byte is what port 465 expects. They are not interchangeable: point one at the other's port and each waits for the other to speak."
@@ -9624,7 +9766,7 @@ msgstr "მდგომარეობა"
 msgid "status"
 msgstr "სტატუსი"
 
-#: src/postulo/applications/forms.py:155 src/postulo/applications/forms.py:293
+#: src/postulo/applications/forms.py:211 src/postulo/applications/forms.py:363
 #: src/postulo/applications/reports.py:506
 #: src/postulo/applications/tables.py:49 src/postulo/core/csv_import.py:45
 #: src/postulo/templates/accounts/invite_list.html:26
@@ -9754,7 +9896,7 @@ msgstr "შეჯამება"
 msgid "superseded"
 msgstr "შეცვლილია"
 
-#: src/postulo/documents/forms.py:246
+#: src/postulo/documents/forms.py:273
 #, draft
 msgid "Supersedes"
 msgstr "ცვლის წინას"
@@ -9873,7 +10015,7 @@ msgstr "იარლიყი"
 msgid "tagline"
 msgstr "დევიზი"
 
-#: src/postulo/applications/forms.py:176 src/postulo/applications/tables.py:91
+#: src/postulo/applications/forms.py:242 src/postulo/applications/tables.py:91
 #: src/postulo/core/csv_import.py:53
 #: src/postulo/templates/applications/tag_list.html:6
 #: src/postulo/templates/applications/tag_list.html:12
@@ -10119,12 +10261,12 @@ msgstr "ის ფაილი ცარიელია."
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "ის ფაილი %(limit)s MB-ზე დიდია, ამიტომ არ წაიკითხა."
 
-#: src/postulo/documents/forms.py:252
+#: src/postulo/documents/forms.py:279
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "ის ფაილი %(limit)s MB-ზე დიდია."
 
-#: src/postulo/jobs/forms.py:167 src/postulo/jobs/logos.py:135
+#: src/postulo/jobs/forms.py:224 src/postulo/jobs/logos.py:135
 #: src/postulo/jobs/logos.py:188
 #, draft
 msgid "That file is larger than a logo should be."
@@ -10290,7 +10432,7 @@ msgstr "ის გვერდი %(limit)s MB-ზე დიდია, ამი
 msgid "That page returned %(status)s."
 msgstr "იმ გვერდმა %(status)s დააბრუნა."
 
-#: src/postulo/accounts/forms.py:379
+#: src/postulo/accounts/forms.py:390
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "ის სურათი 5 MB-ზე მეტია. უფრო პატარა, გთხოვთ."
@@ -10365,17 +10507,27 @@ msgstr "მისამართმა უპასუხა %(code)s."
 msgid "The address answered with nothing."
 msgstr "მისამართმა არაფრით უპასუხა."
 
+#: src/postulo/core/server_forms.py:355
+msgid ""
+"The address people see it came from. Many servers refuse to send as an address they do not host."
+msgstr ""
+
 #: src/postulo/jobs/models.py:756
 #, draft
 msgid "The application deadline, if stated."
 msgstr "განაცხადის ვადა, თუ მითითებულია."
+
+#: src/postulo/core/server_forms.py:359
+msgid ""
+"The application registered with the provider. Not a secret: it is the secret beside it that is."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py:66
 #, draft
 msgid "The application sends on its own"
 msgstr "აპლიკაცია თავად აგზავნის"
 
-#: src/postulo/accounts/forms.py:456
+#: src/postulo/accounts/forms.py:467
 #, draft
 msgid ""
 "The arrows on Your career move an entry past its neighbour. If you cannot use them, or would rather type a number, each entry's form shows its place as a number: lower first."
@@ -10413,6 +10565,11 @@ msgid ""
 msgstr ""
 "კლიენტის საიდუმლოს გარემოში აყენებს <code>%(variable)s</code>; შეცვალეთ იქ. აქ ის არასოდეს ჩანს."
 
+#: src/postulo/resume/forms.py:184
+msgid ""
+"The Common European Framework levels. “Not stated” prints nothing at all, which is the honest answer where you have never been tested — a level is a claim somebody may test in an interview."
+msgstr ""
+
 #: src/postulo/templates/applications/application_intake.html:11
 #, draft
 msgid ""
@@ -10447,6 +10604,11 @@ msgid ""
 msgstr ""
 "მიმოხილვა ჩამოთვლის ღია განაცხადებს, სადაც უკვე ხნის განმავლობაში არაფერი მომხდარა და არაფერია დაგეგმილი. თავად რეკრუტერების რჩევები ორ-სამ კვირაზე იყრის თავს."
 
+#: src/postulo/applications/forms.py:41
+msgid ""
+"The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html:43
 #, draft
 msgid ""
@@ -10468,10 +10630,15 @@ msgstr "ჩამოტვირთული გაცილებით დი�
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "წინა ვერსია, რომელსაც ეს ცვლის. ძველი ფაილი ინახება."
 
-#: src/postulo/applications/forms.py:287
+#: src/postulo/applications/forms.py:357
 #, draft
 msgid "The employer as a whole"
 msgstr "დამსაქმებელი მთლიანად"
+
+#: src/postulo/jobs/forms.py:58
+msgid ""
+"The employer's own closing date, if the posting gives one. Empty means unknown, not open forever."
+msgstr ""
 
 #: src/postulo/core/server_views.py:1140 src/postulo/plugins/forms.py:55
 #, python-format, draft
@@ -10548,7 +10715,7 @@ msgid ""
 msgstr ""
 "გასაღები „%(name)s“-ისთვის შეიცვალა. ის გასაღები ერთადერთია, რაც მის ინდექსსა და აქ გასაშვებ კოდს შორის დგას, ამიტომ დარწმუნდით, რომ ის სანდო ადგილიდან მოვიდა."
 
-#: src/postulo/accounts/forms.py:339
+#: src/postulo/accounts/forms.py:350
 #, draft
 msgid "The language you read Postulo in"
 msgstr "ენა, რომელზეც კითხულობთ Postulo-ს"
@@ -10580,7 +10747,16 @@ msgid ""
 msgstr ""
 "ბოლო ათი რამ, რაც ქრონოლოგიამ აღრიცხა, რომელ განაცხადზეც არ უნდა ყოფილიყო."
 
-#: src/postulo/accounts/forms.py:467
+#: src/postulo/applications/forms.py:381
+msgid "The line the timeline shows."
+msgstr ""
+
+#: src/postulo/documents/forms.py:114
+msgid ""
+"The line under your name. Left empty, the one on your profile is printed instead."
+msgstr ""
+
+#: src/postulo/accounts/forms.py:478
 msgid ""
 "The link for the page you are on is underlined as well as shaded and set in bolder type. Turn the underline off for a quieter header: the weight and the shade stay, so the page you are on is never marked by colour alone. A high-contrast theme underlines it whatever you choose here, because there the shading is discarded and the underline is not."
 msgstr ""
@@ -10679,6 +10855,10 @@ msgstr ""
 msgid "The pay"
 msgstr "ანაზღაურება"
 
+#: src/postulo/applications/forms.py:46
+msgid "The person at the company this went through, where there was one."
+msgstr ""
+
 #: src/postulo/documents/models.py:365
 #, draft
 msgid "The person you are writing to, if the application names one"
@@ -10706,6 +10886,11 @@ msgstr "განცხადება"
 #, draft
 msgid "The posting itself"
 msgstr "თავად ვაკანსია"
+
+#: src/postulo/jobs/forms.py:47
+msgid ""
+"The posting's own address, kept so you can go back to it. Postulo reads the page when you capture it and never fetches it again."
+msgstr ""
 
 #: src/postulo/plugins/consent.py:251
 #, python-format, draft
@@ -10743,6 +10928,11 @@ msgstr ""
 msgid "The role"
 msgstr "პოზიცია"
 
+#: src/postulo/applications/forms.py:36
+msgid ""
+"The route it went through. The report counts by this, including how many went through the employment service's own board."
+msgstr ""
+
 #: src/postulo/applications/widgets.py:262
 #, draft
 msgid ""
@@ -10775,6 +10965,10 @@ msgstr ""
 #, python-format, draft
 msgid "The server refused those credentials: %(detail)s"
 msgstr "სერვერმა უარყო ეს რწმუნებები: %(detail)s"
+
+#: src/postulo/core/server_forms.py:345
+msgid "The server that accepts the mail — its name, not an address."
+msgstr ""
 
 #: src/postulo/plugins/fetching.py:89
 #, draft
@@ -10835,7 +11029,7 @@ msgstr ""
 msgid "The tag palette"
 msgstr ""
 
-#: src/postulo/jobs/forms.py:429
+#: src/postulo/jobs/forms.py:486
 #, draft
 msgid ""
 "The team they are in, if you know it. A new name joins the company's list."
@@ -10853,7 +11047,7 @@ msgid ""
 msgstr ""
 "დროის სარტყელს გარემო აყენებს: <code>%(variable)s</code> = %(zone)s. მოხსენით გარემოდან, რომ აქ შეცვალოთ."
 
-#: src/postulo/applications/forms.py:123 src/postulo/jobs/forms.py:559
+#: src/postulo/applications/forms.py:179 src/postulo/jobs/forms.py:628
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "ზედა ციფრი ქვედაზე ნაკლები ვერ იქნება."
@@ -10868,6 +11062,10 @@ msgstr ""
 #, draft
 msgid "The wheel has no metadata; it may be damaged."
 msgstr "ბორბალს მეტამონაცემები არ აქვს; შესაძლოა დაზიანებულია."
+
+#: src/postulo/jobs/forms.py:495
+msgid "Their job title, as they give it themselves."
+msgstr ""
 
 #: src/postulo/accounts/models.py:289 src/postulo/documents/models.py:58
 #, draft
@@ -10999,7 +11197,7 @@ msgstr "ეს ჩანაწერი ყველა CV-ზე ბეჭდ�
 msgid "This Idempotency-Key was already used for a different capture."
 msgstr "ეს Idempotency-Key უკვე გამოყენებულია სხვა აღებისთვის."
 
-#: src/postulo/accounts/forms.py:617 src/postulo/jobs/forms.py:329
+#: src/postulo/accounts/forms.py:633 src/postulo/jobs/forms.py:386
 #: src/postulo/jobs/models.py:410
 #, draft
 msgid "This identifier is already listed."
@@ -11079,7 +11277,7 @@ msgid ""
 msgstr ""
 "ეს თქვენივე ანგარიშია. საკუთარი თავისთვის შექმნილი ბმული დაბრუნების გზა არ არის — მის შესაქმნელად სისტემაში უნდა შესულიყავით. თუ აქ ერთადერთი ადმინისტრატორი ხართ, თქვენ გფარავთ წვდომის გასაღები ან მეორე ადმინისტრატორი."
 
-#: src/postulo/accounts/forms.py:614 src/postulo/jobs/forms.py:324
+#: src/postulo/accounts/forms.py:630 src/postulo/jobs/forms.py:381
 #: src/postulo/jobs/models.py:390
 #, draft
 msgid "This kind of identifier is already listed."
@@ -11165,6 +11363,11 @@ msgstr "დასაქმების სამსახურის მეშ�
 msgid "Tick %(title)s"
 msgstr "მონიშნეთ %(title)s"
 
+#: src/postulo/jobs/forms.py:104
+msgid ""
+"Tick as many as fit. The list is your own — Industries, beside Companies, is where it is kept."
+msgstr ""
+
 #: src/postulo/templates/partials/table/bulk.html:31
 #, draft
 msgid "Tick rows to act on several at once."
@@ -11189,7 +11392,7 @@ msgstr ""
 msgid "tier"
 msgstr "საფეხური"
 
-#: src/postulo/accounts/forms.py:738
+#: src/postulo/accounts/forms.py:760
 #, draft
 msgid "Time zone"
 msgstr "დროის სარტყელი"
@@ -11397,7 +11600,7 @@ msgstr "აკრიფეთ სულ მცირე ორი სიმბ�
 msgid "Type it in instead"
 msgstr "ამის ნაცვლად ხელით აკრიფეთ"
 
-#: src/postulo/accounts/forms.py:584 src/postulo/jobs/forms.py:294
+#: src/postulo/accounts/forms.py:600 src/postulo/jobs/forms.py:351
 #, draft
 msgid "Type the identifier."
 msgstr "აკრიფეთ იდენტიფიკატორი."
@@ -11428,7 +11631,7 @@ msgid "Uncheck to keep the entry on this variant but leave it off the page."
 msgstr ""
 "მოხსენით მონიშვნა, რომ ჩანაწერი ამ ვარიანტში დარჩეს, მაგრამ გვერდზე არ გამოჩნდეს."
 
-#: src/postulo/accounts/forms.py:453
+#: src/postulo/accounts/forms.py:464
 msgid "Underline the page you are on"
 msgstr ""
 
@@ -11489,7 +11692,7 @@ msgstr "განმაახლებელი"
 msgid "Upload a file"
 msgstr "ფაილის ატვირთვა"
 
-#: src/postulo/accounts/forms.py:307
+#: src/postulo/accounts/forms.py:318
 #, draft
 msgid "Upload a picture"
 msgstr "სურათის ატვირთვა"
@@ -11534,12 +11737,12 @@ msgid ""
 msgstr ""
 "გამოიყენეთ 3-დან 32-მდე პატარა ასო, ციფრი, წერტილი, ქვედა ტირე ან ტირე, ასოთი ან ციფრით დაწყებული და დამთავრებული."
 
-#: src/postulo/accounts/forms.py:382
+#: src/postulo/accounts/forms.py:393
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "გამოიყენეთ PNG, JPEG, WebP ან GIF."
 
-#: src/postulo/accounts/forms.py:316
+#: src/postulo/accounts/forms.py:327
 #, draft
 msgid "Use my Gravatar"
 msgstr "ჩემი Gravatar-ის გამოყენება"
@@ -11549,7 +11752,7 @@ msgstr "ჩემი Gravatar-ის გამოყენება"
 msgid "use my Gravatar"
 msgstr "ჩემი Gravatar-ის გამოყენება"
 
-#: src/postulo/accounts/forms.py:189 src/postulo/accounts/forms.py:244
+#: src/postulo/accounts/forms.py:200 src/postulo/accounts/forms.py:255
 #, draft
 msgid "Use the instance default"
 msgstr "ინსტალაციის ნაგულისხმევის გამოყენება"
@@ -11571,10 +11774,20 @@ msgstr "გამოყენებული"
 msgid "used at"
 msgstr "გამოყენებულია"
 
+#: src/postulo/jobs/forms.py:166
+msgid ""
+"Used by Find logo, and only when you press it. Postulo fetches nothing from here on its own."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html:69
 #, draft
 msgid "Used for a month, and for the quarter that month falls in."
 msgstr "გამოიყენება თვისთვის და იმ კვარტალისთვის, რომელშიც ეს თვე ხვდება."
+
+#: src/postulo/jobs/forms.py:497
+msgid ""
+"Used to address them on an interview's calendar file. Postulo never writes to it by itself."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html:65
 #, draft
@@ -11587,7 +11800,7 @@ msgstr ""
 msgid "user"
 msgstr "მომხმარებელი"
 
-#: src/postulo/accounts/forms.py:748 src/postulo/templates/server/email.html:22
+#: src/postulo/accounts/forms.py:773 src/postulo/templates/server/email.html:22
 #: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
@@ -11619,6 +11832,11 @@ msgstr ""
 #, draft
 msgid "Using a token"
 msgstr "ტოკენის გამოყენება"
+
+#: src/postulo/core/server_forms.py:350
+msgid ""
+"Usually the whole address. Leave it empty for a server that wants no sign-in — a relay on your own network, most often."
+msgstr ""
 
 #: src/postulo/jobs/industries.py:79
 #, draft
@@ -11808,7 +12026,7 @@ msgstr "რა სჭირდება %(plugin)s-ს"
 msgid "What a component asks for"
 msgstr ""
 
-#: src/postulo/core/server_forms.py:186
+#: src/postulo/core/server_forms.py:186 src/postulo/core/server_forms.py:193
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr "რითი იწყება ახალი ანგარიში. თითოეულს შეუძლია თავისი შეცვალოს."
@@ -11831,7 +12049,7 @@ msgstr "რა დაბრუნდა ამ პერიოდში"
 msgid "what came of it"
 msgstr ""
 
-#: src/postulo/core/server_forms.py:409
+#: src/postulo/core/server_forms.py:440
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "რა გაიტანს ფოსტას ამ მანქანიდან."
@@ -11914,6 +12132,10 @@ msgstr "რას ამბობს"
 msgid "What it says it is"
 msgstr "რად აცხადებს თავს"
 
+#: src/postulo/resume/forms.py:120
+msgid "What it was in, where the qualification's name does not say."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html:224
 #, draft
 msgid "What kind of employer"
@@ -11924,6 +12146,11 @@ msgstr "როგორი დამსაქმებელი"
 #, draft
 msgid "What needs doing"
 msgstr "რა უნდა გაკეთდეს"
+
+#: src/postulo/accounts/forms.py:754
+msgid ""
+"What Postulo is in for you, and nothing else. What a CV or a letter is written in is that document's own setting."
+msgstr ""
 
 #: src/postulo/templates/accounts/profile.html:14
 #, python-format, draft
@@ -11941,10 +12168,29 @@ msgstr "რა ენაზე გელაპარაკებათ Postulo �
 msgid "What somebody typed"
 msgstr ""
 
+#: src/postulo/resume/forms.py:197
+msgid ""
+"What sort of thing it is, never who hosts it: a portfolio is a portfolio wherever it lives."
+msgstr ""
+
+#: src/postulo/documents/forms.py:240
+msgid "What sort of thing it is, so the lists can be narrowed by it."
+msgstr ""
+
+#: src/postulo/applications/forms.py:376
+msgid ""
+"What sort of thing it was. A status change and an interview write their own entries, so neither is offered here."
+msgstr ""
+
 #: src/postulo/resume/models.py:277
 #, draft
 msgid "what the check found"
 msgstr "რა იპოვა შემოწმებამ"
+
+#: src/postulo/jobs/forms.py:54
+msgid ""
+"What the figure is per. It means nothing without an amount beside it, and is ignored then."
+msgstr ""
 
 #: src/postulo/accounts/models.py:177 src/postulo/jobs/models.py:373
 #, draft
@@ -12003,6 +12249,10 @@ msgstr ""
 msgid "What to do about it, in a sentence."
 msgstr ""
 
+#: src/postulo/applications/forms.py:412
+msgid "What to do. It is what the reminder says when it falls due."
+msgstr ""
+
 #: src/postulo/core/models.py:625
 msgid "what was asked"
 msgstr ""
@@ -12023,12 +12273,16 @@ msgstr ""
 msgid "What will be deleted"
 msgstr "რა წაიშლება"
 
+#: src/postulo/resume/forms.py:141
+msgid "What you did on it — “maintainer”, “contributor”, “designer”."
+msgstr ""
+
 #: src/postulo/jobs/widgets.py:33
 #, draft
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "რა შენიშნეთ და ჯერ არაფერი გიმოქმედიათ, და რა იხურება ამ კვირაში."
 
-#: src/postulo/accounts/forms.py:751
+#: src/postulo/accounts/forms.py:776
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -12039,6 +12293,14 @@ msgstr ""
 #, draft
 msgid "What you type here is what a CV in that language prints instead."
 msgstr "რასაც აქ დაწერთ, სწორედ იმას ბეჭდავს ამ ენაზე შედგენილი CV."
+
+#: src/postulo/documents/forms.py:239
+msgid "What you will look for it under."
+msgstr ""
+
+#: src/postulo/documents/forms.py:217
+msgid "What you will look for it under. It is never printed on the letter."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html:197
 #, python-format, draft
@@ -12069,7 +12331,15 @@ msgstr "როცა მიღებამ განაცხადიც უნ
 msgid "When it entered your listings."
 msgstr "როდის შევიდა თქვენს ვაკანსიებში."
 
-#: src/postulo/applications/forms.py:166
+#: src/postulo/applications/forms.py:380
+msgid "When it happened, which is not always when you write it down."
+msgstr ""
+
+#: src/postulo/jobs/forms.py:57
+msgid "When the employer put it up, if the posting says. Empty means unknown."
+msgstr ""
+
+#: src/postulo/applications/forms.py:229
 #, draft
 msgid ""
 "When you actually sent it. Left empty it is today, which is wrong for a search already under way — and reply times, the months and the report are measured from this date."
@@ -12088,10 +12358,23 @@ msgstr ""
 msgid "where"
 msgstr "სად"
 
+#: src/postulo/resume/forms.py:142
+msgid "Where it can be seen. A CV prints it beside the name."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html:123
 #, draft
 msgid "Where plugins may come from"
 msgstr "საიდან შეიძლება მოვიდეს მოდულები"
+
+#: src/postulo/accounts/forms.py:120
+msgid ""
+"Where Postulo writes to you, and what a CV prints if you let it show contact details."
+msgstr ""
+
+#: src/postulo/resume/forms.py:175
+msgid "Where somebody can check it. A CV prints it as a link."
+msgstr ""
 
 #: src/postulo/jobs/models.py:212
 #, draft
@@ -12116,6 +12399,14 @@ msgid "Where the signed index is published. Its signature sits beside it."
 msgstr ""
 "სად არის გამოქვეყნებული ხელმოწერილი ინდექსი. მისი ხელმოწერა გვერდით დგას."
 
+#: src/postulo/resume/forms.py:86
+msgid "Where the work was, as you would write it on a CV."
+msgstr ""
+
+#: src/postulo/jobs/forms.py:170
+msgid "Where they are, as you would write it. Nothing is looked up."
+msgstr ""
+
 #: src/postulo/applications/widgets.py:249
 #, draft
 msgid "Where they came from"
@@ -12126,6 +12417,10 @@ msgstr "საიდან მოვიდნენ"
 #, draft
 msgid "Where they were found"
 msgstr "სად მოიძებნა"
+
+#: src/postulo/jobs/forms.py:496
+msgid "Where they work. Only companies you have recorded are offered."
+msgstr ""
 
 #: src/postulo/applications/widgets.py:124
 #, draft
@@ -12153,6 +12448,10 @@ msgstr "სად წააწყდით მას: ვაკანსიე�
 #, draft
 msgid "where you live"
 msgstr "სად ცხოვრობთ"
+
+#: src/postulo/resume/forms.py:122
+msgid "Where you studied, as you would write it on a CV."
+msgstr ""
 
 #: src/postulo/templates/core/dashboard.html:52
 #, draft
@@ -12204,12 +12503,16 @@ msgid ""
 msgstr ""
 "რა ენაზეა ეს ვარიანტი დაწერილი. დატოვეთ ცარიელი, რომ თქვენს პროფილს მიჰყვეს."
 
-#: src/postulo/accounts/forms.py:342
+#: src/postulo/accounts/forms.py:353
 #, draft
 msgid ""
 "Which language your experience, education and projects are typed in. A CV in another language shows what you have translated, and says what it could not."
 msgstr ""
 "რომელ ენაზეა ჩაწერილი თქვენი გამოცდილება, განათლება და პროექტები. სხვა ენაზე CV აჩვენებს, რა თარგმნეთ, და ამბობს, რა ვერ შეძლო."
+
+#: src/postulo/applications/forms.py:416
+msgid "Which one it is about. Leave it empty for a reminder about none."
+msgstr ""
 
 #: src/postulo/jobs/models.py:913
 #, draft
@@ -12231,6 +12534,18 @@ msgstr "რომელი პერიოდი"
 msgid "Which plugin should this connection be for?"
 msgstr "რომელი მოდულისთვის უნდა იყოს ეს კავშირი?"
 
+#: src/postulo/accounts/forms.py:579
+msgid "Which register the number belongs to. What goes where, above, says."
+msgstr ""
+
+#: src/postulo/resume/forms.py:173
+msgid "Who awarded it."
+msgstr ""
+
+#: src/postulo/core/server_forms.py:261
+msgid "Who issues the token. It decides which of the boxes below are wanted."
+msgstr ""
+
 #: src/postulo/templates/server/signin.html:8
 #, draft
 msgid "Who may create an account here."
@@ -12240,6 +12555,11 @@ msgstr "ვის შეუძლია აქ ანგარიშის შ�
 #, draft
 msgid "who you are meeting"
 msgstr "ვის ხვდებით"
+
+#: src/postulo/applications/forms.py:450
+msgid ""
+"Who you are meeting. Only the people you have recorded at this company are offered."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html:37
 #, draft
@@ -12318,7 +12638,7 @@ msgstr "იმუშავა %(when)s"
 msgid "Working"
 msgstr ""
 
-#: src/postulo/applications/forms.py:63 src/postulo/jobs/tables.py:238
+#: src/postulo/applications/forms.py:92 src/postulo/jobs/tables.py:238
 #: src/postulo/templates/applications/application_detail.html:74
 #, draft
 msgid "Working arrangement"
@@ -12419,22 +12739,22 @@ msgid ""
 msgstr ""
 "დიახ: ვინც პაროლი დაივიწყა, შეუძლია მოითხოვოს კოდი თავის მთავარ მისამართზე და უკან აკრიფოს. კოდი და არა ბმული, რადგან ფოსტის სკანერები ბმულებს მიჰყვებიან და დახარჯავდნენ მას სანამ ადამიანი წაიკითხავს. ეს არასოდეს არის მეორე ფაქტორი: ავთენტიფიკაციის აპლიკაცია მაინც იკითხება. შემოთავაზებულია მხოლოდ მანამ, სანამ ამ ინსტანციის ფოსტა ნამდვილად აღწევს."
 
-#: src/postulo/jobs/forms.py:246 src/postulo/jobs/forms.py:267
+#: src/postulo/jobs/forms.py:303 src/postulo/jobs/forms.py:324
 #, draft
 msgid "You already have a company with that name."
 msgstr "უკვე გაქვთ ამ სახელის კომპანია."
 
-#: src/postulo/documents/forms.py:130
+#: src/postulo/documents/forms.py:140
 #, draft
 msgid "You already have a CV or portfolio with that name."
 msgstr "ამ სახელით რეზიუმე ან პორტფოლიო უკვე გაქვთ."
 
-#: src/postulo/applications/forms.py:411
+#: src/postulo/applications/forms.py:508
 #, draft
 msgid "You already have a tag with that name."
 msgstr "უკვე გაქვთ ამ სახელის იარლიყი."
 
-#: src/postulo/jobs/forms.py:397
+#: src/postulo/jobs/forms.py:454
 #, draft
 msgid "You already have that industry."
 msgstr "ეს დარგი უკვე გაქვთ."
@@ -12468,6 +12788,11 @@ msgstr ""
 
 #: src/postulo/templates/core/partials/errand_state.html:46
 msgid "You can leave this page. The work carries on without you."
+msgstr ""
+
+#: src/postulo/accounts/forms.py:115
+msgid ""
+"You can sign in with this or with your address. Nobody else sees it — Postulo shows people your name."
 msgstr ""
 
 #: src/postulo/core/server_views.py:220
@@ -12626,7 +12951,7 @@ msgstr "თქვენი მონაცემები"
 msgid "Your data is ready to download."
 msgstr ""
 
-#: src/postulo/applications/forms.py:173
+#: src/postulo/applications/forms.py:236
 #: src/postulo/templates/applications/application_detail.html:102
 #, draft
 msgid "Your deadline"
@@ -12709,6 +13034,10 @@ msgstr "თქვენი საკუთარი სახელი"
 msgid "Your own site, if you have one."
 msgstr "თქვენი საკუთარი საიტი, თუ გაქვთ."
 
+#: src/postulo/applications/forms.py:45
+msgid "Your own words for grouping applications. New ones go in the box below."
+msgstr ""
+
 #: src/postulo/accounts/views.py:483
 #, draft
 msgid "Your password is set. Sign in with it."
@@ -12729,6 +13058,22 @@ msgstr "თქვენი პოზიცია"
 #, draft
 msgid "Your username has been changed."
 msgstr "თქვენი მომხმარებლის სახელი შეიცვალა."
+
+#: src/postulo/applications/forms.py:40
+msgid "Yours, not the employer's. The list can be sorted and narrowed by it."
+msgstr ""
+
+#: src/postulo/applications/forms.py:454
+msgid "Yours, to prepare with. Nothing here is sent to anybody."
+msgstr ""
+
+#: src/postulo/documents/forms.py:246
+msgid "Yours. They go nowhere with the file."
+msgstr ""
+
+#: src/postulo/jobs/forms.py:171 src/postulo/jobs/forms.py:501
+msgid "Yours. They never appear on a document or go anywhere else."
+msgstr ""
 
 #: src/postulo/templates/cotton/table/head.html:38
 #, draft

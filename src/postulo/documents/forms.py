@@ -106,6 +106,16 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             "show_contact_details",
         )
         widgets = {"summary": forms.Textarea(attrs={"rows": 4})}
+        help_texts = {
+            "kind": _(
+                "A CV leads with a career, a portfolio with work. It decides which themes "
+                "are offered below."
+            ),
+            "headline": _(
+                "The line under your name. Left empty, the one on your profile is printed instead."
+            ),
+            "theme": _("How it is set on the page. Change it later without touching a word."),
+        }
 
     @property
     def theme_kind(self) -> str:
@@ -203,6 +213,12 @@ class CoverLetterForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelFor
         model = CoverLetter
         fields = ("name", "kind", "subject", "body", "theme", "is_template", "language")
         widgets = {"body": forms.Textarea(attrs={"rows": 18})}
+        help_texts = {
+            "name": _("What you will look for it under. It is never printed on the letter."),
+            "kind": _("It sets the shape the box below starts from, and which themes are offered."),
+            "subject": _("Printed at the top. It takes the same placeholders as the body."),
+            "theme": _("How it is set on the page. Change it later without touching a word."),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -219,6 +235,17 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         model = UploadedDocument
         fields = ("title", "kind", "file", "language", "notes", "replaces")
         widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
+        help_texts = {
+            "title": _("What you will look for it under."),
+            "kind": _("What sort of thing it is, so the lists can be narrowed by it."),
+            "file": _(
+                "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG. Postulo keeps it "
+                "exactly as uploaded, under a name of its own — what you send is the file "
+                "you gave it."
+            ),
+            "notes": _("Yours. They go nowhere with the file."),
+            "replaces": _("An older version of the same thing, kept but no longer offered."),
+        }
 
     def scope_querysets(self) -> None:
         # The same picker the other documents use, with one word changed: blank here means
@@ -277,12 +304,17 @@ class SendDocumentsForm(forms.Form):
         queryset=UploadedDocument.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple,
+        help_text=_("Each one is frozen as it is now, so what they received stays readable."),
     )
     links = forms.ModelMultipleChoiceField(
         label=_("Links you pointed them at"),
         queryset=Link.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple,
+        help_text=_(
+            "Recorded as part of what they were sent. Postulo sends nothing itself — this "
+            "is the note of what you sent."
+        ),
     )
 
     def __init__(self, *args, user=None, **kwargs):
