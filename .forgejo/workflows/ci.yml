@@ -106,16 +106,20 @@ jobs:
         run: uv run python scripts/messages.py compile
 
       - name: Test
-        # On every core the runner has (#233): the suite is one process per core, and the
-        # in-memory database and the temporary directories are each process's own.
+        # Two processes, not `-n auto` (#233): the three legs of this matrix run at once on
+        # one host, and `auto` gave each of them a worker per host core. Run 539 spent 59
+        # minutes on a suite that takes 4 serially, and starved every other job on the box
+        # -- the postgres leg took 27 minutes over 41 tests, the browser leg 12 minutes to
+        # install Chromium, the image scan an hour -- until the runner's limit ended them.
+        # The in-memory database and the temporary directories are each process's own.
         if: matrix.python-version != '3.14'
-        run: uv run pytest -n auto
+        run: uv run pytest -n 2
 
       - name: Test, and measure what the suite covers
         # On one leg only: measuring slows the run, and three copies of the same number are
         # not three facts. `fail_under` in pyproject.toml is the floor it must clear.
         if: matrix.python-version == '3.14'
-        run: uv run pytest -n auto --cov --cov-report=term-missing
+        run: uv run pytest -n 2 --cov --cov-report=term-missing
 
       - name: Production settings deployment check
         # check --deploy, and collectstatic with the manifest storage the image uses,

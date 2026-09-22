@@ -76,7 +76,7 @@ jobs:
           uv run ruff check .
           uv run manage.py makemigrations --check --dry-run
           uv run python scripts/messages.py compile
-          uv run pytest -n auto
+          uv run pytest -n 2
         env:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
 
