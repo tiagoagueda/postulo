@@ -576,6 +576,10 @@ class OfferForm(OwnerScopedModelForm):
         }
         help_texts = {
             "base_amount": _("The figure as they wrote it, before tax."),
+            "period": _("What the figure covers. Offers are compared by the year."),
+            "equity": _("As it was written: a percentage, a number of options, the vesting."),
+            "holidays": _("Days a year, if it was stated."),
+            "starts_on": _("The start date they proposed, if one was."),
             "notes": _("Anything else worth remembering about it: who made it, what was said."),
         }
 
