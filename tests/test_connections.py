@@ -168,6 +168,9 @@ def test_the_form_is_drawn_from_the_plugin_and_secrets_are_never_echoed(client, 
         "event_capture_received": False,
         "event_went_quiet": False,
         "event_posting_closing": False,
+        "event_status_changed": False,
+        "event_interview_scheduled": False,
+        "event_offer_recorded": False,
     }
     assert connection.secrets == {"token": "s3cret"}
 

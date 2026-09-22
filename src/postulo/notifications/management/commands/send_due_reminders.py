@@ -167,6 +167,7 @@ class Command(BaseCommand):
         from postulo.core.slow import reap_archives
         from postulo.documents.archiving import send_pending
         from postulo.jobs.closing import announce_closing_postings
+        from postulo.notifications import webhooks
         from postulo.plugins import policy
         from postulo.plugins.syncing import run_syncs
 
@@ -186,6 +187,7 @@ class Command(BaseCommand):
             quiet, told = announce_quiet_applications()
             closing, warned = announce_closing_postings()
             copies_sent, copies_failed = send_pending()
+            hooks_sent, hooks_failed = webhooks.send_pending()
             syncs_ran, syncs_failed = run_syncs(budget=budget)
             # The two things #247 leaves lying about: an export archive holding a whole
             # account, and a week of errand rows nobody is watching any more. Reaped on the
@@ -203,10 +205,22 @@ class Command(BaseCommand):
             self.stdout.write(f"{when} {copies_sent} document copies sent, {copies_failed} failed")
         if syncs_ran:
             self.stdout.write(f"{when} {syncs_ran} syncs ran, {syncs_failed} failed")
+        if hooks_sent or hooks_failed:
+            self.stdout.write(f"{when} {hooks_sent} webhooks delivered, {hooks_failed} failed")
         if reaped:
             self.stdout.write(f"{when} {reaped} finished errands and expired archives removed")
         if self.quiet_pass and not any(
-            (stamped, quiet, closing, copies_sent, copies_failed, syncs_ran, reaped)
+            (
+                stamped,
+                quiet,
+                closing,
+                copies_sent,
+                copies_failed,
+                hooks_sent,
+                hooks_failed,
+                syncs_ran,
+                reaped,
+            )
         ):
             self.stdout.write("Nothing due.")
 

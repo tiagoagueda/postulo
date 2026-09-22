@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:56+0000\n"
+"POT-Creation-Date: 2026-09-22 13:23+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: čeština\n"
@@ -222,22 +222,22 @@ msgstr "%(kilobytes)s na disku"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s vytvořeno. Teď vyberte, co v něm bude."
 
-#: src/postulo/applications/services.py:423
+#: src/postulo/applications/services.py:442
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s proběhl"
 
-#: src/postulo/applications/services.py:376
+#: src/postulo/applications/services.py:394
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s přesunut z %(old)s na %(new)s"
 
-#: src/postulo/applications/services.py:434
+#: src/postulo/applications/services.py:453
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(kind)s dne %(when)s zrušen"
 
-#: src/postulo/applications/services.py:343
+#: src/postulo/applications/services.py:360
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s naplánován na %(when)s"
@@ -433,7 +433,7 @@ msgstr ""
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d odpovědělo, %(broken)d ne; ty, které ne, říkají proč."
 
-#: src/postulo/applications/services.py:157
+#: src/postulo/applications/services.py:158
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -448,7 +448,7 @@ msgstr ""
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: potřebuje %(wanted)s a Postulo má %(have)s."
 
-#: src/postulo/plugins/forms.py:203
+#: src/postulo/plugins/forms.py:209
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nemohl tato nastavení zkontrolovat: %(error)s"
@@ -467,6 +467,7 @@ msgstr ""
 
 #: src/postulo/documents/rendering.py:417
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
+#: src/postulo/notifications/slow.py:153
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s ve firmě %(company)s"
@@ -591,6 +592,11 @@ msgstr "%(url)s je mnohem větší, než by katalog měl být."
 #, python-format, draft
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr "%(value)s není kód měny. Použijte tři písmena, například EUR."
+
+#: src/postulo/notifications/slow.py:163
+#, python-format
+msgid "%(what)s: %(status)s"
+msgstr ""
 
 #: src/postulo/templates/core/partials/errand_state.html:43
 #, python-format
@@ -1477,6 +1483,10 @@ msgid ""
 "An administrator made this link for %(name)s. It works once, and this is that once."
 msgstr "Správce vytvořil tento odkaz pro %(name)s. Funguje jednou, a to je teď."
 
+#: src/postulo/notifications/base.py:34
+msgid "An application's status changes"
+msgstr ""
+
 #: src/postulo/templates/core/export.html:80
 #, draft
 msgid ""
@@ -1506,6 +1516,14 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "Index je seznam kódu, který se zde spustí, takže musí být podepsaný a musíte mít klíč. Pozdější vypnutí repozitáře zastaví nové instalace a aktualizace z něj; co je již nainstalováno, funguje dál."
+
+#: src/postulo/notifications/base.py:35
+msgid "An interview is scheduled or moved"
+msgstr ""
+
+#: src/postulo/notifications/base.py:36
+msgid "An offer is recorded"
+msgstr ""
 
 #: src/postulo/documents/forms.py:247
 msgid "An older version of the same thing, kept but no longer offered."
@@ -1555,7 +1573,7 @@ msgstr "Tento Idempotency-Key právě používá jiný požadavek; zkuste to za 
 msgid "answer"
 msgstr "odpověď"
 
-#: src/postulo/applications/services.py:524
+#: src/postulo/applications/services.py:580
 #, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
 msgstr ""
@@ -1683,7 +1701,7 @@ msgstr "žádost"
 msgid "Application"
 msgstr "Žádost"
 
-#: src/postulo/applications/services.py:200
+#: src/postulo/applications/services.py:217
 #, draft
 msgid "Application created"
 msgstr "Žádost vytvořena"
@@ -1928,7 +1946,7 @@ msgstr "Musí být nabízen alespoň jeden jazyk, jinak si nikdo nic nepřečte.
 msgid "at most"
 msgstr "nejvíce"
 
-#: src/postulo/documents/models.py:745
+#: src/postulo/documents/models.py:745 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "pokusy"
@@ -2072,6 +2090,7 @@ msgid "Board"
 msgstr "Nástěnka"
 
 #: src/postulo/documents/models.py:376 src/postulo/notifications/models.py:25
+#: src/postulo/notifications/models.py:69
 #, draft
 msgid "body"
 msgstr "tělo"
@@ -2787,8 +2806,8 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Připojeno. Otestujte to, abyste měli jistotu, že to funguje."
 
-#: src/postulo/documents/models.py:724 src/postulo/plugins/models.py:212
-#: src/postulo/plugins/models.py:293
+#: src/postulo/documents/models.py:724 src/postulo/notifications/models.py:65
+#: src/postulo/plugins/models.py:212 src/postulo/plugins/models.py:293
 #, draft
 msgid "connection"
 msgstr "připojení"
@@ -3835,6 +3854,7 @@ msgstr ""
 
 #: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
+#: src/postulo/notifications/models.py:67
 #, draft
 msgid "event"
 msgstr "událost"
@@ -4106,6 +4126,10 @@ msgstr "Selhalo"
 #, draft
 msgid "Failed without saying why."
 msgstr "Selhalo bez udání důvodu."
+
+#: src/postulo/notifications/models.py:42
+msgid "Failed, will retry"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
@@ -4574,6 +4598,10 @@ msgstr ""
 #, draft
 msgid "Give the token a name and at least one scope."
 msgstr "Dejte tokenu název a alespoň jeden rozsah."
+
+#: src/postulo/notifications/models.py:43
+msgid "Given up"
+msgstr ""
 
 #: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
 #, draft
@@ -5203,6 +5231,11 @@ msgstr "pohovor"
 msgid "Interview cancelled"
 msgstr "Pohovor zrušen"
 
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview moved: %(what)s"
+msgstr ""
+
 #: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
@@ -5218,7 +5251,12 @@ msgstr "Pohovor naplánován"
 msgid "Interview scheduled."
 msgstr "Pohovor naplánován."
 
-#: src/postulo/applications/services.py:294
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview scheduled: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:311
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Pohovor zítra: %(kind)s ve firmě %(company)s, %(time)s"
@@ -5492,7 +5530,7 @@ msgid ""
 msgstr ""
 "Uchováváno v mezinárodním tvaru, abyste mohli volat i z jiné země. Číslo, které už začíná na +, se bere tak, jak je."
 
-#: src/postulo/api/models.py:173
+#: src/postulo/api/models.py:173 src/postulo/notifications/models.py:68
 #, draft
 msgid "key"
 msgstr "klíč"
@@ -5650,7 +5688,11 @@ msgstr "Největší přečtená stránka"
 msgid "Last activity"
 msgstr "Poslední aktivita"
 
-#: src/postulo/documents/models.py:749
+#: src/postulo/notifications/models.py:76
+msgid "last answer"
+msgstr ""
+
+#: src/postulo/documents/models.py:749 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "poslední pokus"
@@ -5665,7 +5707,8 @@ msgstr "poslední kontrola"
 msgid "last checked"
 msgstr "naposledy zkontrolováno"
 
-#: src/postulo/documents/models.py:751 src/postulo/plugins/models.py:204
+#: src/postulo/documents/models.py:751 src/postulo/notifications/models.py:77
+#: src/postulo/plugins/models.py:204
 #, draft
 msgid "last error"
 msgstr "poslední chyba"
@@ -6497,7 +6540,7 @@ msgstr ""
 msgid "Next"
 msgstr "Další"
 
-#: src/postulo/documents/models.py:747
+#: src/postulo/documents/models.py:747 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "další pokus"
@@ -6742,7 +6785,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Zatím zde nikdo není zaznamenán."
 
-#: src/postulo/applications/services.py:444
+#: src/postulo/applications/services.py:463
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Na %(kind)s se nikdo nedostavil"
@@ -7328,7 +7371,7 @@ msgid "offer"
 msgstr ""
 
 #: src/postulo/applications/models.py:440
-#: src/postulo/applications/services.py:518
+#: src/postulo/applications/services.py:574
 #, draft
 msgid "Offer received"
 msgstr "Nabídka obdržena"
@@ -7337,8 +7380,18 @@ msgstr "Nabídka obdržena"
 msgid "Offer recorded."
 msgstr ""
 
-#: src/postulo/applications/services.py:518
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer recorded: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:574
 msgid "Offer revised"
+msgstr ""
+
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer revised: %(what)s"
 msgstr ""
 
 #: src/postulo/applications/views.py:1281
@@ -9555,12 +9608,17 @@ msgstr "Odesílání za sebe"
 msgid "Sending failed: %(error)s"
 msgstr "Odeslání selhalo: %(error)s"
 
+#: src/postulo/notifications/models.py:41
 #: src/postulo/templates/applications/report.html:125
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Odesláno"
+
+#: src/postulo/notifications/models.py:78
+msgid "sent at"
+msgstr ""
 
 #: src/postulo/documents/models.py:678
 #, draft
@@ -10233,7 +10291,7 @@ msgstr "Stav"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
 #: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:1021
+#: src/postulo/jobs/models.py:1021 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
 msgstr "stav"
@@ -10316,7 +10374,7 @@ msgstr "Přestat řadit podle %(column)s"
 msgid "store"
 msgstr "úložiště"
 
-#: src/postulo/plugins/forms.py:115
+#: src/postulo/plugins/forms.py:121
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Uloženo; nechte prázdné, chcete-li zachovat aktuální hodnotu."
@@ -11086,6 +11144,7 @@ msgid "The company you are applying to"
 msgstr "Firma, kam se hlásíte"
 
 #: src/postulo/documents/archiving.py:115
+#: src/postulo/notifications/webhooks.py:121
 #, draft
 msgid "The connection is gone or switched off."
 msgstr "Připojení zmizelo nebo je vypnuté."
@@ -11419,6 +11478,11 @@ msgstr "Poskytovatel to neobnoví. Někdo musí souhlasit znovu."
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "Odpověď poskytovatele se nepodařilo přečíst."
+
+#: src/postulo/notifications/webhooks.py:147
+#, python-format
+msgid "The receiver answered %(status)s."
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html:153
 #, draft
@@ -12441,6 +12505,7 @@ msgstr ""
 "Dobrovolná podpora je jediným příjmem tohoto projektu: píše jej jeden člověk a nic z toho není dluh ani tím nic neodemykáte. Říká se to jednou, zde, tomu, kdo instanci provozuje — nikdy lidem, kteří ji používají k hledání práce, a pro mnohé z nich jsou peníze to nesprávné, co dát."
 
 #: src/postulo/core/models.py:123 src/postulo/core/models.py:713
+#: src/postulo/notifications/models.py:40
 msgid "Waiting"
 msgstr ""
 
@@ -12510,6 +12575,14 @@ msgstr "webový odkaz"
 #, draft
 msgid "web links"
 msgstr "webové odkazy"
+
+#: src/postulo/notifications/models.py:82
+msgid "webhook deliveries"
+msgstr ""
+
+#: src/postulo/notifications/models.py:81
+msgid "webhook delivery"
+msgstr ""
 
 #: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:108

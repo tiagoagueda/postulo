@@ -20,8 +20,12 @@ class NotificationsConfig(AppConfig):
         from postulo.plugins.own_mail import OwnMail
         from postulo.plugins.registry import register_builtin
         from postulo.plugins.smtp import SMTPTransport
+        from postulo.plugins.webhook import WebhookNotifier
 
         register_builtin("notifier", EmailNotifier)
+        # The notifier for a machine: signed JSON to an address, delivered by the scheduler
+        # with backoff, so an automation no longer has to poll the API and diff (#240).
+        register_builtin("notifier", WebhookNotifier)
         # The notifier that needs nothing from the operator: pushed to the browser, or shown
         # by the next open tab (#209).
         register_builtin("notifier", BrowserNotifier)

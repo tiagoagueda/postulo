@@ -112,3 +112,109 @@ def a_batch_arrived(payload: dict) -> Notification:
             "capture_id": payload.get("capture_id", ""),
         },
     )
+
+
+# ---------------------------------------------- what the person did, for a machine (#240)
+
+
+def anybody_wants(owner, event: str) -> bool:
+    """Whether any notifier this person has switched on asks for ``event``.
+
+    Asked before an errand is queued, because the events about what the person did fire on
+    every status change, every interview and every offer, and a person with no webhook -- the
+    ordinary case -- must not collect an errand row per click for a message nobody would
+    receive. One query; the errand and the delivery are the expensive part.
+    """
+    from postulo.plugins.models import Connection
+
+    from .base import wants
+
+    for connection in Connection.objects.for_user(owner).enabled().of_kind("notifier"):
+        plugin = connection.plugin_instance
+        if plugin is not None and wants(connection.config, event, plugin):
+            return True
+    return False
+
+
+def tell(event: str, owner, *, subject=None, **payload) -> None:
+    """Queue the announcement of ``event``, if anybody would hear it."""
+    from django.utils import timezone
+
+    from postulo.core import errands
+
+    if not anybody_wants(owner, event):
+        return
+    errands.send(
+        "notify", owner, subject=subject, event=event, at=timezone.now().isoformat(), **payload
+    )
+
+
+def _role_at(payload: dict) -> str:
+    return _("%(role)s at %(company)s") % {
+        "role": payload.get("role", ""),
+        "company": payload.get("company", ""),
+    }
+
+
+@builder("status_changed")
+def a_status_changed(payload: dict) -> Notification:
+    return Notification(
+        event="status_changed",
+        title=_("%(what)s: %(status)s")
+        % {"what": _role_at(payload), "status": payload.get("status", "")},
+        body=payload.get("note", ""),
+        url=link(payload, reverse("applications:detail", args=[payload["application_id"]])),
+        # The timeline entry, not the application: an application moves many times and each
+        # move is one message; a retry of the same move is not.
+        key=f"status:{payload['application_id']}:{payload.get('event_id', '')}",
+        occurred_at=when(payload),
+        data={
+            "application_id": payload["application_id"],
+            "event_id": payload.get("event_id"),
+            "from_status": payload.get("from_status", ""),
+            "to_status": payload.get("to_status", ""),
+            "actor": payload.get("actor", ""),
+        },
+    )
+
+
+@builder("interview_scheduled")
+def an_interview_was_scheduled(payload: dict) -> Notification:
+    moved = bool(payload.get("moved"))
+    return Notification(
+        event="interview_scheduled",
+        title=(_("Interview moved: %(what)s") if moved else _("Interview scheduled: %(what)s"))
+        % {"what": _role_at(payload)},
+        body=payload.get("starts_at", ""),
+        url=link(payload, reverse("applications:detail", args=[payload["application_id"]])),
+        key=f"interview:{payload['interview_id']}:{payload.get('starts_at', '')}",
+        occurred_at=when(payload),
+        data={
+            "interview_id": payload["interview_id"],
+            "application_id": payload["application_id"],
+            "kind": payload.get("interview_kind", ""),
+            "starts_at": payload.get("starts_at", ""),
+            "ends_at": payload.get("ends_at", ""),
+            "moved": moved,
+        },
+    )
+
+
+@builder("offer_recorded")
+def an_offer_was_recorded(payload: dict) -> Notification:
+    revised = bool(payload.get("revised"))
+    return Notification(
+        event="offer_recorded",
+        title=(_("Offer revised: %(what)s") if revised else _("Offer recorded: %(what)s"))
+        % {"what": _role_at(payload)},
+        body=payload.get("terms", ""),
+        url=link(payload, reverse("applications:detail", args=[payload["application_id"]])),
+        key=f"offer:{payload['offer_id']}:{payload.get('event_id', '')}",
+        occurred_at=when(payload),
+        data={
+            "offer_id": payload["offer_id"],
+            "application_id": payload["application_id"],
+            "terms": payload.get("terms", ""),
+            "revised": revised,
+        },
+    )

@@ -31,7 +31,27 @@ EVENTS = {
     "capture_received": _("A posting arrives through the capture API"),
     "went_quiet": _("Applications go quiet"),
     "posting_closing": _("A listing you are considering closes soon"),
+    "status_changed": _("An application's status changes"),
+    "interview_scheduled": _("An interview is scheduled or moved"),
+    "offer_recorded": _("An offer is recorded"),
 }
+
+#: The events that say what the person *did* rather than what happened *to* them (#240).
+#: The rule for a notifier that reaches a person has been, since the first one, to tell them
+#: what happened to them; a message saying "you moved this to Interviewing" is a message
+#: about something they just watched themselves do. So these are off unless the plugin says
+#: otherwise -- and the webhook notifier says otherwise, because for an automation the
+#: person's own actions are exactly the events worth having.
+ABOUT_WHAT_YOU_DID = frozenset({"status_changed", "interview_scheduled", "offer_recorded"})
+
+
+def default_for(event: str, plugin=None) -> bool:
+    """Whether ``event`` is on for a connection that has not said: the plugin's word, else
+    on for what happens to a person and off for what they did."""
+    declared = getattr(plugin, "event_defaults", None) or {}
+    if event in declared:
+        return bool(declared[event])
+    return event not in ABOUT_WHAT_YOU_DID
 
 
 @dataclass(frozen=True)
@@ -102,23 +122,33 @@ class NotifierPlugin(ConnectedPlugin, Protocol):
     def send(self, notification: Notification, config: dict, user) -> None: ...
 
 
-def event_specs() -> list[FieldSpec]:
-    """The per-event switches every notifier connection carries. All on by default."""
+def event_specs(plugin=None) -> list[FieldSpec]:
+    """The per-event switches every notifier connection carries.
+
+    Each defaults as `default_for` says: on, except the events about what the person did,
+    which a plugin has to ask for -- so the switches a human notifier's form opens with are
+    the ones that will not tell somebody what they just watched themselves do.
+    """
     return [
         FieldSpec(
             f"event_{key}",
             str(label),
             type="boolean",
             required=False,
-            default=True,
+            default=default_for(key, plugin),
         )
         for key, label in EVENTS.items()
     ]
 
 
-def wants(config: dict, event: str) -> bool:
-    """Whether a connection's configuration asks for ``event``. Unset means yes."""
-    return bool(config.get(f"event_{event}", True))
+def wants(config: dict, event: str, plugin=None) -> bool:
+    """Whether a connection's configuration asks for ``event``.
+
+    Unset means the plugin's default, not yes: a connection saved before an event existed
+    has no switch for it, and an email notifier made last month must not start announcing
+    every status change because a switch it never showed is missing (#240).
+    """
+    return bool(config.get(f"event_{event}", default_for(event, plugin)))
 
 
 def absolute_url(path: str, request: HttpRequest | None = None) -> str:

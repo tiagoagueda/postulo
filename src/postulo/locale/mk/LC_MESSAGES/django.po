@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:56+0000\n"
+"POT-Creation-Date: 2026-09-22 13:23+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: македонски\n"
@@ -209,22 +209,22 @@ msgstr "%(kilobytes)s на диск"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s создадено. Сега изберете што ќе биде во него."
 
-#: src/postulo/applications/services.py:423
+#: src/postulo/applications/services.py:442
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s одржано"
 
-#: src/postulo/applications/services.py:376
+#: src/postulo/applications/services.py:394
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s поместено од %(old)s на %(new)s"
 
-#: src/postulo/applications/services.py:434
+#: src/postulo/applications/services.py:453
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(kind)s на %(when)s откажано"
 
-#: src/postulo/applications/services.py:343
+#: src/postulo/applications/services.py:360
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s закажано за %(when)s"
@@ -420,7 +420,7 @@ msgstr ""
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d одговорија, %(broken)d не; оние што не одговорија кажуваат зошто."
 
-#: src/postulo/applications/services.py:157
+#: src/postulo/applications/services.py:158
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -435,7 +435,7 @@ msgstr ""
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: треба %(wanted)s, а Postulo има %(have)s."
 
-#: src/postulo/plugins/forms.py:203
+#: src/postulo/plugins/forms.py:209
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s не можеше да ги провери овие поставки: %(error)s"
@@ -454,6 +454,7 @@ msgstr ""
 
 #: src/postulo/documents/rendering.py:417
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
+#: src/postulo/notifications/slow.py:153
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s во %(company)s"
@@ -572,6 +573,11 @@ msgstr "%(url)s е многу поголем отколку што треба д
 #, python-format, draft
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr "%(value)s не е код на валута. Користете три букви, како EUR."
+
+#: src/postulo/notifications/slow.py:163
+#, python-format
+msgid "%(what)s: %(status)s"
+msgstr ""
 
 #: src/postulo/templates/core/partials/errand_state.html:43
 #, python-format
@@ -1455,6 +1461,10 @@ msgid ""
 msgstr ""
 "Администратор ја направи оваа врска за %(name)s. Работи еднаш, и тоа е сега."
 
+#: src/postulo/notifications/base.py:34
+msgid "An application's status changes"
+msgstr ""
+
 #: src/postulo/templates/core/export.html:80
 #, draft
 msgid ""
@@ -1484,6 +1494,14 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "Индексот е список код што ќе се извршува тука, па мора да биде потпишан и клучот мора да го имате вие. Исклучувањето на складиште подоцна ги запира новите инсталации и ажурирања од него; она што е веќе инсталирано продолжува да работи."
+
+#: src/postulo/notifications/base.py:35
+msgid "An interview is scheduled or moved"
+msgstr ""
+
+#: src/postulo/notifications/base.py:36
+msgid "An offer is recorded"
+msgstr ""
 
 #: src/postulo/documents/forms.py:247
 msgid "An older version of the same thing, kept but no longer offered."
@@ -1533,7 +1551,7 @@ msgstr ""
 msgid "answer"
 msgstr "одговор"
 
-#: src/postulo/applications/services.py:524
+#: src/postulo/applications/services.py:580
 #, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
 msgstr ""
@@ -1661,7 +1679,7 @@ msgstr "пријава"
 msgid "Application"
 msgstr "Пријава"
 
-#: src/postulo/applications/services.py:200
+#: src/postulo/applications/services.py:217
 #, draft
 msgid "Application created"
 msgstr "Пријавата е создадена"
@@ -1906,7 +1924,7 @@ msgstr "Мора да се нуди барем еден јазик, инаку �
 msgid "at most"
 msgstr "најмногу"
 
-#: src/postulo/documents/models.py:745
+#: src/postulo/documents/models.py:745 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "обиди"
@@ -2050,6 +2068,7 @@ msgid "Board"
 msgstr "Табла"
 
 #: src/postulo/documents/models.py:376 src/postulo/notifications/models.py:25
+#: src/postulo/notifications/models.py:69
 #, draft
 msgid "body"
 msgstr "тело"
@@ -2763,8 +2782,8 @@ msgstr "Поврзано на %(host)s:%(port)s. Нема корисничко �
 msgid "Connected. Test it to make sure it works."
 msgstr "Поврзано. Тестирајте за да бидете сигурни дека работи."
 
-#: src/postulo/documents/models.py:724 src/postulo/plugins/models.py:212
-#: src/postulo/plugins/models.py:293
+#: src/postulo/documents/models.py:724 src/postulo/notifications/models.py:65
+#: src/postulo/plugins/models.py:212 src/postulo/plugins/models.py:293
 #, draft
 msgid "connection"
 msgstr "врска"
@@ -3811,6 +3830,7 @@ msgstr ""
 
 #: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
+#: src/postulo/notifications/models.py:67
 #, draft
 msgid "event"
 msgstr "настан"
@@ -4083,6 +4103,10 @@ msgstr "Не успеа"
 #, draft
 msgid "Failed without saying why."
 msgstr "Не успеа, без да каже зошто."
+
+#: src/postulo/notifications/models.py:42
+msgid "Failed, will retry"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
@@ -4551,6 +4575,10 @@ msgstr ""
 #, draft
 msgid "Give the token a name and at least one scope."
 msgstr "Дајте му на токенот име и барем еден опсег."
+
+#: src/postulo/notifications/models.py:43
+msgid "Given up"
+msgstr ""
 
 #: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
 #, draft
@@ -5180,6 +5208,11 @@ msgstr "интервју"
 msgid "Interview cancelled"
 msgstr "Интервјуто е откажано"
 
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview moved: %(what)s"
+msgstr ""
+
 #: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
@@ -5195,7 +5228,12 @@ msgstr "Интервјуто е закажано"
 msgid "Interview scheduled."
 msgstr "Интервјуто е закажано."
 
-#: src/postulo/applications/services.py:294
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview scheduled: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:311
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Интервју утре: %(kind)s во %(company)s, %(time)s"
@@ -5469,7 +5507,7 @@ msgid ""
 msgstr ""
 "Се чува во меѓународна форма, за да можете да се јавите и од друга држава. Број што веќе почнува со + се зема каков што е."
 
-#: src/postulo/api/models.py:173
+#: src/postulo/api/models.py:173 src/postulo/notifications/models.py:68
 #, draft
 msgid "key"
 msgstr "клуч"
@@ -5627,7 +5665,11 @@ msgstr "Најголема прочитана страница"
 msgid "Last activity"
 msgstr "Последна активност"
 
-#: src/postulo/documents/models.py:749
+#: src/postulo/notifications/models.py:76
+msgid "last answer"
+msgstr ""
+
+#: src/postulo/documents/models.py:749 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "последен обид"
@@ -5642,7 +5684,8 @@ msgstr "последна проверка"
 msgid "last checked"
 msgstr "последен пат проверено"
 
-#: src/postulo/documents/models.py:751 src/postulo/plugins/models.py:204
+#: src/postulo/documents/models.py:751 src/postulo/notifications/models.py:77
+#: src/postulo/plugins/models.py:204
 #, draft
 msgid "last error"
 msgstr "последна грешка"
@@ -6472,7 +6515,7 @@ msgstr ""
 msgid "Next"
 msgstr "Напред"
 
-#: src/postulo/documents/models.py:747
+#: src/postulo/documents/models.py:747 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "следен обид"
@@ -6717,7 +6760,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Сè уште никој не е запишан тука."
 
-#: src/postulo/applications/services.py:444
+#: src/postulo/applications/services.py:463
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Никој не се појави на %(kind)s"
@@ -7305,7 +7348,7 @@ msgid "offer"
 msgstr ""
 
 #: src/postulo/applications/models.py:440
-#: src/postulo/applications/services.py:518
+#: src/postulo/applications/services.py:574
 #, draft
 msgid "Offer received"
 msgstr "Примена понуда"
@@ -7314,8 +7357,18 @@ msgstr "Примена понуда"
 msgid "Offer recorded."
 msgstr ""
 
-#: src/postulo/applications/services.py:518
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer recorded: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:574
 msgid "Offer revised"
+msgstr ""
+
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer revised: %(what)s"
 msgstr ""
 
 #: src/postulo/applications/views.py:1281
@@ -9522,12 +9575,17 @@ msgstr "Испраќање во свое име"
 msgid "Sending failed: %(error)s"
 msgstr "Испраќањето не успеа: %(error)s"
 
+#: src/postulo/notifications/models.py:41
 #: src/postulo/templates/applications/report.html:125
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Испратено"
+
+#: src/postulo/notifications/models.py:78
+msgid "sent at"
+msgstr ""
 
 #: src/postulo/documents/models.py:678
 #, draft
@@ -10203,7 +10261,7 @@ msgstr "Состојба"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
 #: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:1021
+#: src/postulo/jobs/models.py:1021 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
 msgstr "статус"
@@ -10287,7 +10345,7 @@ msgstr "Престани да подредуваш по %(column)s"
 msgid "store"
 msgstr "складиште"
 
-#: src/postulo/plugins/forms.py:115
+#: src/postulo/plugins/forms.py:121
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Зачувано; оставете празно за да ја задржите тековната вредност."
@@ -11058,6 +11116,7 @@ msgid "The company you are applying to"
 msgstr "Компанијата кај која се пријавувате"
 
 #: src/postulo/documents/archiving.py:115
+#: src/postulo/notifications/webhooks.py:121
 #, draft
 msgid "The connection is gone or switched off."
 msgstr "Врската ја нема или е исклучена."
@@ -11391,6 +11450,11 @@ msgstr "Давателот нема да го обнови ова. Некој м
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "Одговорот на давателот не можеше да се прочита."
+
+#: src/postulo/notifications/webhooks.py:147
+#, python-format
+msgid "The receiver answered %(status)s."
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html:153
 #, draft
@@ -12418,6 +12482,7 @@ msgstr ""
 "Доброволната поддршка е единствениот приход на овој проект: го пишува една личност, и ништо не се должи ниту се отклучува со ова. Се кажува еднаш, овде, на оној што ја води инстанцата — никогаш на луѓето што го користат за да бараат работа, а за многумина од нив парите се погрешното нешто за давање."
 
 #: src/postulo/core/models.py:123 src/postulo/core/models.py:713
+#: src/postulo/notifications/models.py:40
 msgid "Waiting"
 msgstr ""
 
@@ -12487,6 +12552,14 @@ msgstr "веб врска"
 #, draft
 msgid "web links"
 msgstr "веб врски"
+
+#: src/postulo/notifications/models.py:82
+msgid "webhook deliveries"
+msgstr ""
+
+#: src/postulo/notifications/models.py:81
+msgid "webhook delivery"
+msgstr ""
 
 #: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:108

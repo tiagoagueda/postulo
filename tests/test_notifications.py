@@ -176,7 +176,10 @@ def test_a_notifier_connection_carries_a_switch_per_event(client, user):
     html = client.get(url).content.decode()
     for event in base.EVENTS:
         assert f'name="plugin_event_{event}"' in html
-        assert re.search(rf'name="plugin_event_{event}"[^>]*checked', html), "on by default"
+        # What happens *to* the person is on; what they did is off for a notifier that
+        # reaches them, and on for the webhook (#240).
+        checked = re.search(rf'name="plugin_event_{event}"[^>]*checked', html)
+        assert bool(checked) == (event not in base.ABOUT_WHAT_YOU_DID), event
 
     response = client.post(
         url,
@@ -196,6 +199,9 @@ def test_a_notifier_connection_carries_a_switch_per_event(client, user):
         "event_capture_received": False,
         "event_went_quiet": False,
         "event_posting_closing": False,
+        "event_status_changed": False,
+        "event_interview_scheduled": False,
+        "event_offer_recorded": False,
     }
 
 

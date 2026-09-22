@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:56+0000\n"
+"POT-Creation-Date: 2026-09-22 13:23+0000\n"
 "PO-Revision-Date: 2026-09-08 10:23+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: українська\n"
@@ -225,22 +225,22 @@ msgstr "%(kilobytes)s на диску"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s створено. Тепер оберіть, що в ньому буде."
 
-#: src/postulo/applications/services.py:423
+#: src/postulo/applications/services.py:442
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s відкладено"
 
-#: src/postulo/applications/services.py:376
+#: src/postulo/applications/services.py:394
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s перенесено з %(old)s на %(new)s"
 
-#: src/postulo/applications/services.py:434
+#: src/postulo/applications/services.py:453
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(kind)s %(when)s скасовано"
 
-#: src/postulo/applications/services.py:343
+#: src/postulo/applications/services.py:360
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s заплановано на %(when)s"
@@ -437,7 +437,7 @@ msgstr ""
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d відповіли, %(broken)d ні; ті, що ні, кажуть чому."
 
-#: src/postulo/applications/services.py:157
+#: src/postulo/applications/services.py:158
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -452,7 +452,7 @@ msgstr ""
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: потребує %(wanted)s, а Postulo має %(have)s."
 
-#: src/postulo/plugins/forms.py:203
+#: src/postulo/plugins/forms.py:209
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s не зміг перевірити ці налаштування: %(error)s"
@@ -471,6 +471,7 @@ msgstr ""
 
 #: src/postulo/documents/rendering.py:417
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
+#: src/postulo/notifications/slow.py:153
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s у %(company)s"
@@ -596,6 +597,11 @@ msgstr "%(url)s значно більший, ніж має бути катало
 #, python-format, draft
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr "%(value)s не є кодом валюти. Використайте три літери, як-от EUR."
+
+#: src/postulo/notifications/slow.py:163
+#, python-format
+msgid "%(what)s: %(status)s"
+msgstr ""
 
 #: src/postulo/templates/core/partials/errand_state.html:43
 #, python-format
@@ -1482,6 +1488,10 @@ msgid ""
 msgstr ""
 "Адміністратор створив це посилання для %(name)s. Воно працює один раз, і це зараз."
 
+#: src/postulo/notifications/base.py:34
+msgid "An application's status changes"
+msgstr ""
+
 #: src/postulo/templates/core/export.html:80
 #, draft
 msgid ""
@@ -1511,6 +1521,14 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "Індекс — це перелік коду, який тут виконуватиметься, тож він має бути підписаний, і ключ маєте мати ви. Вимкнення репозиторію згодом зупиняє нові встановлення й оновлення з нього; уже встановлене працює далі."
+
+#: src/postulo/notifications/base.py:35
+msgid "An interview is scheduled or moved"
+msgstr ""
+
+#: src/postulo/notifications/base.py:36
+msgid "An offer is recorded"
+msgstr ""
 
 #: src/postulo/documents/forms.py:247
 msgid "An older version of the same thing, kept but no longer offered."
@@ -1561,7 +1579,7 @@ msgstr ""
 msgid "answer"
 msgstr "відповідь"
 
-#: src/postulo/applications/services.py:524
+#: src/postulo/applications/services.py:580
 #, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
 msgstr ""
@@ -1689,7 +1707,7 @@ msgstr "заявка"
 msgid "Application"
 msgstr "Заявка"
 
-#: src/postulo/applications/services.py:200
+#: src/postulo/applications/services.py:217
 #, draft
 msgid "Application created"
 msgstr "Заявку створено"
@@ -1934,7 +1952,7 @@ msgstr "Має пропонуватися принаймні одна мова, 
 msgid "at most"
 msgstr "не більше"
 
-#: src/postulo/documents/models.py:745
+#: src/postulo/documents/models.py:745 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "спроби"
@@ -2078,6 +2096,7 @@ msgid "Board"
 msgstr "Дошка"
 
 #: src/postulo/documents/models.py:376 src/postulo/notifications/models.py:25
+#: src/postulo/notifications/models.py:69
 #, draft
 msgid "body"
 msgstr "тіло"
@@ -2794,8 +2813,8 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Під'єднано. Перевірте, щоб бути певними, що це працює."
 
-#: src/postulo/documents/models.py:724 src/postulo/plugins/models.py:212
-#: src/postulo/plugins/models.py:293
+#: src/postulo/documents/models.py:724 src/postulo/notifications/models.py:65
+#: src/postulo/plugins/models.py:212 src/postulo/plugins/models.py:293
 #, draft
 msgid "connection"
 msgstr "з’єднання"
@@ -3842,6 +3861,7 @@ msgstr ""
 
 #: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
+#: src/postulo/notifications/models.py:67
 #, draft
 msgid "event"
 msgstr "подія"
@@ -4113,6 +4133,10 @@ msgstr "Не вдалося"
 #, draft
 msgid "Failed without saying why."
 msgstr "Не вдалося, без пояснення чому."
+
+#: src/postulo/notifications/models.py:42
+msgid "Failed, will retry"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
@@ -4581,6 +4605,10 @@ msgstr ""
 #, draft
 msgid "Give the token a name and at least one scope."
 msgstr "Дайте токену назву й хоча б одну область."
+
+#: src/postulo/notifications/models.py:43
+msgid "Given up"
+msgstr ""
 
 #: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
 #, draft
@@ -5211,6 +5239,11 @@ msgstr "співбесіда"
 msgid "Interview cancelled"
 msgstr "Співбесіду скасовано"
 
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview moved: %(what)s"
+msgstr ""
+
 #: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
@@ -5226,7 +5259,12 @@ msgstr "Співбесіду заплановано"
 msgid "Interview scheduled."
 msgstr "Співбесіду заплановано."
 
-#: src/postulo/applications/services.py:294
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview scheduled: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:311
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Співбесіда завтра: %(kind)s у %(company)s, %(time)s"
@@ -5500,7 +5538,7 @@ msgid ""
 msgstr ""
 "Зберігається в міжнародній формі, щоб ви могли зателефонувати навіть з іншої країни. Номер, який уже починається з +, береться як є."
 
-#: src/postulo/api/models.py:173
+#: src/postulo/api/models.py:173 src/postulo/notifications/models.py:68
 #, draft
 msgid "key"
 msgstr "ключ"
@@ -5658,7 +5696,11 @@ msgstr "Найбільша прочитана сторінка"
 msgid "Last activity"
 msgstr "Остання активність"
 
-#: src/postulo/documents/models.py:749
+#: src/postulo/notifications/models.py:76
+msgid "last answer"
+msgstr ""
+
+#: src/postulo/documents/models.py:749 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "остання спроба"
@@ -5673,7 +5715,8 @@ msgstr "остання перевірка"
 msgid "last checked"
 msgstr "востаннє перевірено"
 
-#: src/postulo/documents/models.py:751 src/postulo/plugins/models.py:204
+#: src/postulo/documents/models.py:751 src/postulo/notifications/models.py:77
+#: src/postulo/plugins/models.py:204
 #, draft
 msgid "last error"
 msgstr "остання помилка"
@@ -6505,7 +6548,7 @@ msgstr ""
 msgid "Next"
 msgstr "Далі"
 
-#: src/postulo/documents/models.py:747
+#: src/postulo/documents/models.py:747 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "наступна спроба"
@@ -6750,7 +6793,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Тут ще нікого не записано."
 
-#: src/postulo/applications/services.py:444
+#: src/postulo/applications/services.py:463
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Ніхто не прийшов на %(kind)s"
@@ -7339,7 +7382,7 @@ msgid "offer"
 msgstr ""
 
 #: src/postulo/applications/models.py:440
-#: src/postulo/applications/services.py:518
+#: src/postulo/applications/services.py:574
 #, draft
 msgid "Offer received"
 msgstr "Отримано пропозицію"
@@ -7348,8 +7391,18 @@ msgstr "Отримано пропозицію"
 msgid "Offer recorded."
 msgstr ""
 
-#: src/postulo/applications/services.py:518
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer recorded: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:574
 msgid "Offer revised"
+msgstr ""
+
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer revised: %(what)s"
 msgstr ""
 
 #: src/postulo/applications/views.py:1281
@@ -9568,12 +9621,17 @@ msgstr "Надсилання від себе"
 msgid "Sending failed: %(error)s"
 msgstr "Не вдалося надіслати: %(error)s"
 
+#: src/postulo/notifications/models.py:41
 #: src/postulo/templates/applications/report.html:125
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Надіслано"
+
+#: src/postulo/notifications/models.py:78
+msgid "sent at"
+msgstr ""
 
 #: src/postulo/documents/models.py:678
 #, draft
@@ -10246,7 +10304,7 @@ msgstr "Стан"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
 #: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:1021
+#: src/postulo/jobs/models.py:1021 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
 msgstr "статус"
@@ -10330,7 +10388,7 @@ msgstr "Припинити впорядкування за %(column)s"
 msgid "store"
 msgstr "сховище"
 
-#: src/postulo/plugins/forms.py:115
+#: src/postulo/plugins/forms.py:121
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Зберігається; лишіть порожнім, щоб зберегти нинішнє значення."
@@ -11101,6 +11159,7 @@ msgid "The company you are applying to"
 msgstr "Компанія, до якої ви подаєтеся"
 
 #: src/postulo/documents/archiving.py:115
+#: src/postulo/notifications/webhooks.py:121
 #, draft
 msgid "The connection is gone or switched off."
 msgstr "З’єднання зникло або вимкнене."
@@ -11436,6 +11495,11 @@ msgstr "Постачальник цього не поновить. Хтось м
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "Відповідь постачальника не вдалося прочитати."
+
+#: src/postulo/notifications/webhooks.py:147
+#, python-format
+msgid "The receiver answered %(status)s."
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html:153
 #, draft
@@ -12462,6 +12526,7 @@ msgstr ""
 "Добровільна підтримка — єдиний прибуток цього проєкту: його пише одна людина, і ніщо з цього не створює боргу й нічого не відмикає. Про це кажуть один раз, тут, тому, хто тримає інстанцію, — ніколи тим, хто шукає з нею роботу, а для багатьох із них гроші — не те, що варто віддавати."
 
 #: src/postulo/core/models.py:123 src/postulo/core/models.py:713
+#: src/postulo/notifications/models.py:40
 msgid "Waiting"
 msgstr ""
 
@@ -12531,6 +12596,14 @@ msgstr "вебпосилання"
 #, draft
 msgid "web links"
 msgstr "вебпосилання"
+
+#: src/postulo/notifications/models.py:82
+msgid "webhook deliveries"
+msgstr ""
+
+#: src/postulo/notifications/models.py:81
+msgid "webhook delivery"
+msgstr ""
 
 #: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:108

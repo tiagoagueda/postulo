@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:56+0000\n"
+"POT-Creation-Date: 2026-09-22 13:23+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -211,22 +211,22 @@ msgstr "%(kilobytes)s sur le disque"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s créé. Choisissez maintenant ce qui y figure."
 
-#: src/postulo/applications/services.py:423
+#: src/postulo/applications/services.py:442
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s tenu"
 
-#: src/postulo/applications/services.py:376
+#: src/postulo/applications/services.py:394
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s déplacé du %(old)s au %(new)s"
 
-#: src/postulo/applications/services.py:434
+#: src/postulo/applications/services.py:453
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(kind)s du %(when)s annulé"
 
-#: src/postulo/applications/services.py:343
+#: src/postulo/applications/services.py:360
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s prévu le %(when)s"
@@ -426,7 +426,7 @@ msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr ""
 "%(ok)d ont répondu, %(broken)d non ; celles qui n'ont pas répondu disent pourquoi."
 
-#: src/postulo/applications/services.py:157
+#: src/postulo/applications/services.py:158
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -441,7 +441,7 @@ msgstr "%(package)s : exige %(wanted)s, et %(owner)s utilise %(have)s."
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s : demande %(wanted)s, et Postulo a %(have)s."
 
-#: src/postulo/plugins/forms.py:203
+#: src/postulo/plugins/forms.py:209
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s n'a pas pu vérifier ces réglages : %(error)s"
@@ -460,6 +460,7 @@ msgstr ""
 
 #: src/postulo/documents/rendering.py:417
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
+#: src/postulo/notifications/slow.py:153
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s chez %(company)s"
@@ -579,6 +580,11 @@ msgstr "%(url)s est bien plus gros qu'un catalogue ne devrait l'être."
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr ""
 "%(value)s n’est pas un code de devise. Utilisez trois lettres, comme EUR."
+
+#: src/postulo/notifications/slow.py:163
+#, python-format
+msgid "%(what)s: %(status)s"
+msgstr "%(what)s : %(status)s"
 
 #: src/postulo/templates/core/partials/errand_state.html:43
 #, python-format, draft
@@ -1501,6 +1507,10 @@ msgid ""
 msgstr ""
 "Une administratrice ou un administrateur a créé ce lien pour %(name)s. Il fonctionne une fois, et c'est maintenant."
 
+#: src/postulo/notifications/base.py:34
+msgid "An application's status changes"
+msgstr "Le statut d’une candidature change"
+
 #: src/postulo/templates/core/export.html:80
 #, draft
 msgid ""
@@ -1533,6 +1543,14 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "Un index est une liste de code qui s’exécutera ici : il doit donc être signé et vous devez en détenir la clé. Désactiver un dépôt plus tard empêche toute nouvelle installation ou mise à jour depuis celui-ci ; ce qui est déjà installé continue de fonctionner."
+
+#: src/postulo/notifications/base.py:35
+msgid "An interview is scheduled or moved"
+msgstr "Un entretien est planifié ou déplacé"
+
+#: src/postulo/notifications/base.py:36
+msgid "An offer is recorded"
+msgstr "Une offre est enregistrée"
 
 #: src/postulo/documents/forms.py:247
 #, draft
@@ -1586,7 +1604,7 @@ msgstr ""
 msgid "answer"
 msgstr "réponse"
 
-#: src/postulo/applications/services.py:524
+#: src/postulo/applications/services.py:580
 #, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
 msgstr "Répondre à %(company)s au sujet de son offre avant le %(day)s"
@@ -1720,7 +1738,7 @@ msgstr "candidature"
 msgid "Application"
 msgstr "Candidature"
 
-#: src/postulo/applications/services.py:200
+#: src/postulo/applications/services.py:217
 #, draft
 msgid "Application created"
 msgstr "Candidature créée"
@@ -1972,7 +1990,7 @@ msgstr ""
 msgid "at most"
 msgstr "au plus"
 
-#: src/postulo/documents/models.py:745
+#: src/postulo/documents/models.py:745 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "tentatives"
@@ -2118,6 +2136,7 @@ msgid "Board"
 msgstr "Tableau"
 
 #: src/postulo/documents/models.py:376 src/postulo/notifications/models.py:25
+#: src/postulo/notifications/models.py:69
 #, draft
 msgid "body"
 msgstr "corps"
@@ -2848,8 +2867,8 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Connecté. Testez-le pour vous assurer qu'il fonctionne."
 
-#: src/postulo/documents/models.py:724 src/postulo/plugins/models.py:212
-#: src/postulo/plugins/models.py:293
+#: src/postulo/documents/models.py:724 src/postulo/notifications/models.py:65
+#: src/postulo/plugins/models.py:212 src/postulo/plugins/models.py:293
 #, draft
 msgid "connection"
 msgstr "connexion"
@@ -3922,6 +3941,7 @@ msgstr ""
 
 #: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
+#: src/postulo/notifications/models.py:67
 #, draft
 msgid "event"
 msgstr "événement"
@@ -4203,6 +4223,10 @@ msgstr "Échec"
 #, draft
 msgid "Failed without saying why."
 msgstr "Échec sans explication."
+
+#: src/postulo/notifications/models.py:42
+msgid "Failed, will retry"
+msgstr "Échec, nouvel essai prévu"
 
 #: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
@@ -4682,6 +4706,10 @@ msgstr ""
 #, draft
 msgid "Give the token a name and at least one scope."
 msgstr "Donnez un nom au jeton et au moins une portée."
+
+#: src/postulo/notifications/models.py:43
+msgid "Given up"
+msgstr "Abandonné"
 
 #: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
 #, draft
@@ -5333,6 +5361,11 @@ msgstr "entretien"
 msgid "Interview cancelled"
 msgstr "Entretien annulé"
 
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview moved: %(what)s"
+msgstr "Entretien déplacé : %(what)s"
+
 #: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
@@ -5348,7 +5381,12 @@ msgstr "Entretien planifié"
 msgid "Interview scheduled."
 msgstr "Entretien planifié."
 
-#: src/postulo/applications/services.py:294
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview scheduled: %(what)s"
+msgstr "Entretien planifié : %(what)s"
+
+#: src/postulo/applications/services.py:311
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Entretien demain : %(kind)s chez %(company)s, %(time)s"
@@ -5627,7 +5665,7 @@ msgid ""
 msgstr ""
 "Conservé sous forme internationale, pour que vous puissiez appeler depuis un autre pays. Un numéro qui commence déjà par + est pris tel quel."
 
-#: src/postulo/api/models.py:173
+#: src/postulo/api/models.py:173 src/postulo/notifications/models.py:68
 #, draft
 msgid "key"
 msgstr "clé"
@@ -5786,7 +5824,11 @@ msgstr "Taille maximale d'une page lue"
 msgid "Last activity"
 msgstr "Dernière activité"
 
-#: src/postulo/documents/models.py:749
+#: src/postulo/notifications/models.py:76
+msgid "last answer"
+msgstr "dernière réponse"
+
+#: src/postulo/documents/models.py:749 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "dernière tentative"
@@ -5801,7 +5843,8 @@ msgstr "dernière vérification"
 msgid "last checked"
 msgstr "vérifié le"
 
-#: src/postulo/documents/models.py:751 src/postulo/plugins/models.py:204
+#: src/postulo/documents/models.py:751 src/postulo/notifications/models.py:77
+#: src/postulo/plugins/models.py:204
 #, draft
 msgid "last error"
 msgstr "dernière erreur"
@@ -6640,7 +6683,7 @@ msgstr "Dernière version"
 msgid "Next"
 msgstr "Suivant"
 
-#: src/postulo/documents/models.py:747
+#: src/postulo/documents/models.py:747 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "prochaine tentative"
@@ -6888,7 +6931,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Personne n'est encore enregistré ici."
 
-#: src/postulo/applications/services.py:444
+#: src/postulo/applications/services.py:463
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Personne ne s'est présenté au %(kind)s"
@@ -7486,7 +7529,7 @@ msgid "offer"
 msgstr "offre"
 
 #: src/postulo/applications/models.py:440
-#: src/postulo/applications/services.py:518
+#: src/postulo/applications/services.py:574
 #, draft
 msgid "Offer received"
 msgstr "Offre reçue"
@@ -7495,9 +7538,19 @@ msgstr "Offre reçue"
 msgid "Offer recorded."
 msgstr "Offre enregistrée."
 
-#: src/postulo/applications/services.py:518
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer recorded: %(what)s"
+msgstr "Offre enregistrée : %(what)s"
+
+#: src/postulo/applications/services.py:574
 msgid "Offer revised"
 msgstr "Offre révisée"
+
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer revised: %(what)s"
+msgstr "Offre révisée : %(what)s"
 
 #: src/postulo/applications/views.py:1281
 msgid "Offer updated."
@@ -9744,12 +9797,17 @@ msgstr "Envoyer en votre nom"
 msgid "Sending failed: %(error)s"
 msgstr "Échec de l'envoi : %(error)s"
 
+#: src/postulo/notifications/models.py:41
 #: src/postulo/templates/applications/report.html:125
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Envoyé"
+
+#: src/postulo/notifications/models.py:78
+msgid "sent at"
+msgstr "envoyé le"
 
 #: src/postulo/documents/models.py:678
 #, draft
@@ -10440,7 +10498,7 @@ msgstr "État"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
 #: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:1021
+#: src/postulo/jobs/models.py:1021 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
 msgstr "statut"
@@ -10524,7 +10582,7 @@ msgstr "Ne plus trier par %(column)s"
 msgid "store"
 msgstr "dépôt"
 
-#: src/postulo/plugins/forms.py:115
+#: src/postulo/plugins/forms.py:121
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Enregistré ; laissez vide pour conserver la valeur actuelle."
@@ -11317,6 +11375,7 @@ msgid "The company you are applying to"
 msgstr "L'entreprise où vous postulez"
 
 #: src/postulo/documents/archiving.py:115
+#: src/postulo/notifications/webhooks.py:121
 #, draft
 msgid "The connection is gone or switched off."
 msgstr "La connexion a disparu ou est désactivée."
@@ -11669,6 +11728,11 @@ msgstr ""
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "La réponse du fournisseur était illisible."
+
+#: src/postulo/notifications/webhooks.py:147
+#, python-format
+msgid "The receiver answered %(status)s."
+msgstr "Le destinataire a répondu %(status)s."
 
 #: src/postulo/templates/resume/europass_import.html:153
 #, draft
@@ -12733,6 +12797,7 @@ msgstr ""
 "Le soutien volontaire est le seul revenu de ce projet : une seule personne l'écrit, et rien de tout cela n'est dû ni ne débloque quoi que ce soit. C'est dit une fois, ici, à qui fait tourner l'instance — jamais aux personnes qui s'en servent pour chercher du travail, et pour beaucoup d'entre elles l'argent n'est pas la bonne chose à donner."
 
 #: src/postulo/core/models.py:123 src/postulo/core/models.py:713
+#: src/postulo/notifications/models.py:40
 #, draft
 msgid "Waiting"
 msgstr "En attente"
@@ -12803,6 +12868,14 @@ msgstr "lien web"
 #, draft
 msgid "web links"
 msgstr "liens web"
+
+#: src/postulo/notifications/models.py:82
+msgid "webhook deliveries"
+msgstr "livraisons de webhook"
+
+#: src/postulo/notifications/models.py:81
+msgid "webhook delivery"
+msgstr "livraison de webhook"
 
 #: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:108

@@ -16,6 +16,7 @@ from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.models import Company, JobPosting
+from postulo.notifications import slow
 
 from .models import (
     BOARD_STATUSES,
@@ -150,7 +151,7 @@ def change_status(
 
     application.save(update_fields=changed)
 
-    return record_event(
+    entry = record_event(
         application,
         kind=EventKind.STATUS_CHANGE,
         summary=str(
@@ -166,6 +167,22 @@ def change_status(
         to_status=new_status,
         actor=actor,
     )
+    # For a machine that asked: a person's own notifiers keep this off (#240).
+    slow.tell(
+        "status_changed",
+        application.owner,
+        subject=application,
+        application_id=application.pk,
+        event_id=entry.pk,
+        role=application.posting.title,
+        company=application.posting.company.name,
+        status=str(Status(new_status).label),
+        from_status=previous,
+        to_status=new_status,
+        note=note,
+        actor=actor,
+    )
+    return entry
 
 
 @transaction.atomic
@@ -348,6 +365,7 @@ def schedule_interview(
         actor=actor,
     )
 
+    _tell_interview(interview, moved=False, actor=actor)
     due = starts_at - INTERVIEW_REMINDER_LEAD
     if remind and due > now:
         interview.reminder = Reminder.objects.create(
@@ -383,6 +401,7 @@ def reschedule_interview(interview: Interview, *, starts_at, ends_at, actor: str
         actor=actor,
     )
 
+    _tell_interview(interview, moved=True, actor=actor)
     reminder = interview.reminder
     if reminder is not None and not reminder.is_done:
         due = starts_at - INTERVIEW_REMINDER_LEAD
@@ -514,6 +533,43 @@ def postpone_reminder(reminder: Reminder, due: dt.datetime) -> Reminder:
 ANSWER_REMINDER_LEAD = dt.timedelta(days=1)
 
 
+def _tell_interview(interview: Interview, *, moved: bool, actor: str) -> None:
+    """The interview, for a machine that asked (#240)."""
+    application = interview.application
+    slow.tell(
+        "interview_scheduled",
+        application.owner,
+        subject=application,
+        interview_id=interview.pk,
+        application_id=application.pk,
+        role=application.posting.title,
+        company=application.posting.company.name,
+        interview_kind=interview.kind,
+        starts_at=interview.starts_at.isoformat(),
+        ends_at=interview.ends_at.isoformat(),
+        moved=moved,
+        actor=actor,
+    )
+
+
+def _tell_offer(offer: Offer, entry, *, revised: bool, actor: str) -> None:
+    """The offer, for a machine that asked (#240)."""
+    application = offer.application
+    slow.tell(
+        "offer_recorded",
+        application.owner,
+        subject=application,
+        offer_id=offer.pk,
+        event_id=entry.pk,
+        application_id=application.pk,
+        role=application.posting.title,
+        company=application.posting.company.name,
+        terms=offer.terms,
+        revised=revised,
+        actor=actor,
+    )
+
+
 def _offer_summary(offer: Offer, revised: bool) -> str:
     what = _("Offer revised") if revised else _("Offer received")
     return str(f"{what}: {offer.terms}" if offer.terms else what)
@@ -576,10 +632,11 @@ def record_offer(application: Application, *, actor: str = "", **fields) -> Offe
     not a step backwards.
     """
     offer = Offer.objects.create(owner=application.owner, application=application, **fields)
-    record_event(
+    entry = record_event(
         application, kind=EventKind.OFFER, summary=_offer_summary(offer, revised=False), actor=actor
     )
     _remind_to_answer(offer)
+    _tell_offer(offer, entry, revised=False, actor=actor)
     order = list(BOARD_STATUSES)
     if application.status in order and order.index(application.status) < order.index(Status.OFFER):
         change_status(application, Status.OFFER, actor=actor)
@@ -589,11 +646,12 @@ def record_offer(application: Application, *, actor: str = "", **fields) -> Offe
 @transaction.atomic
 def revise_offer(offer: Offer, *, actor: str = "") -> Offer:
     """After an offer's row has been edited: the revision on the timeline, the reminder moved."""
-    record_event(
+    entry = record_event(
         offer.application,
         kind=EventKind.OFFER,
         summary=_offer_summary(offer, revised=True),
         actor=actor,
     )
     _remind_to_answer(offer)
+    _tell_offer(offer, entry, revised=True, actor=actor)
     return offer

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:56+0000\n"
+"POT-Creation-Date: 2026-09-22 13:23+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Lëtzebuergesch\n"
@@ -209,22 +209,22 @@ msgstr "%(kilobytes)s op der Disk"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s ugeluecht. Wielt elo, wat dropp steet."
 
-#: src/postulo/applications/services.py:423
+#: src/postulo/applications/services.py:442
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s ofgehalen"
 
-#: src/postulo/applications/services.py:376
+#: src/postulo/applications/services.py:394
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s vum %(old)s op de %(new)s geréckelt"
 
-#: src/postulo/applications/services.py:434
+#: src/postulo/applications/services.py:453
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(kind)s vum %(when)s annuléiert"
 
-#: src/postulo/applications/services.py:343
+#: src/postulo/applications/services.py:360
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s fir de %(when)s geplangt"
@@ -423,7 +423,7 @@ msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr ""
 "%(ok)d hunn geäntwert, %(broken)d net; déi, déi net geäntwert hunn, soen firwat."
 
-#: src/postulo/applications/services.py:157
+#: src/postulo/applications/services.py:158
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -438,7 +438,7 @@ msgstr ""
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: brauch %(wanted)s, a Postulo huet %(have)s."
 
-#: src/postulo/plugins/forms.py:203
+#: src/postulo/plugins/forms.py:209
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s konnt dës Astellungen net iwwerpréiwen: %(error)s"
@@ -457,6 +457,7 @@ msgstr ""
 
 #: src/postulo/documents/rendering.py:417
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
+#: src/postulo/notifications/slow.py:153
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s bei %(company)s"
@@ -575,6 +576,11 @@ msgstr "%(url)s ass vill méi grouss, wéi e Katalog soll sinn."
 #, python-format, draft
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr "%(value)s ass kee Währungscode. Benotzt dräi Buschtawen, wéi EUR."
+
+#: src/postulo/notifications/slow.py:163
+#, python-format
+msgid "%(what)s: %(status)s"
+msgstr ""
 
 #: src/postulo/templates/core/partials/errand_state.html:43
 #, python-format
@@ -1462,6 +1468,10 @@ msgid ""
 msgstr ""
 "En Administrateur huet dëse Link fir %(name)s gemaach. Hie funktionéiert eemol, an dat ass elo."
 
+#: src/postulo/notifications/base.py:34
+msgid "An application's status changes"
+msgstr ""
+
 #: src/postulo/templates/core/export.html:80
 #, draft
 msgid ""
@@ -1491,6 +1501,14 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "En Index ass eng Lëscht vu Code, dee hei leeft, also muss en ënnerschriwwe sinn an de Schlëssel muss bei Iech sinn. E Repository méi spéit auszeschalten, stoppt nei Installatiounen an Aktualiséierungen dovun; wat schonn installéiert ass, leeft weider."
+
+#: src/postulo/notifications/base.py:35
+msgid "An interview is scheduled or moved"
+msgstr ""
+
+#: src/postulo/notifications/base.py:36
+msgid "An offer is recorded"
+msgstr ""
 
 #: src/postulo/documents/forms.py:247
 msgid "An older version of the same thing, kept but no longer offered."
@@ -1540,7 +1558,7 @@ msgstr ""
 msgid "answer"
 msgstr "Äntwert"
 
-#: src/postulo/applications/services.py:524
+#: src/postulo/applications/services.py:580
 #, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
 msgstr ""
@@ -1669,7 +1687,7 @@ msgstr "Kandidatur"
 msgid "Application"
 msgstr "Kandidatur"
 
-#: src/postulo/applications/services.py:200
+#: src/postulo/applications/services.py:217
 #, draft
 msgid "Application created"
 msgstr "Kandidatur ugeluecht"
@@ -1915,7 +1933,7 @@ msgstr "Op mannst eng Sprooch muss ugebuede ginn, soss kann keen eppes liesen."
 msgid "at most"
 msgstr "héchstens"
 
-#: src/postulo/documents/models.py:745
+#: src/postulo/documents/models.py:745 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "Versich"
@@ -2059,6 +2077,7 @@ msgid "Board"
 msgstr "Tafel"
 
 #: src/postulo/documents/models.py:376 src/postulo/notifications/models.py:25
+#: src/postulo/notifications/models.py:69
 #, draft
 msgid "body"
 msgstr "Kierper"
@@ -2773,8 +2792,8 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Verbonnen. Testt et fir sécher ze sinn, datt et funktionéiert."
 
-#: src/postulo/documents/models.py:724 src/postulo/plugins/models.py:212
-#: src/postulo/plugins/models.py:293
+#: src/postulo/documents/models.py:724 src/postulo/notifications/models.py:65
+#: src/postulo/plugins/models.py:212 src/postulo/plugins/models.py:293
 #, draft
 msgid "connection"
 msgstr "Verbindung"
@@ -3824,6 +3843,7 @@ msgstr ""
 
 #: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
+#: src/postulo/notifications/models.py:67
 #, draft
 msgid "event"
 msgstr "Evenement"
@@ -4097,6 +4117,10 @@ msgstr "Feelgeschloen"
 #, draft
 msgid "Failed without saying why."
 msgstr "Feelgeschloen, ouni ze soen firwat."
+
+#: src/postulo/notifications/models.py:42
+msgid "Failed, will retry"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
@@ -4566,6 +4590,10 @@ msgstr ""
 #, draft
 msgid "Give the token a name and at least one scope."
 msgstr "Gitt dem Token en Numm an op mannst eng Berechtegung."
+
+#: src/postulo/notifications/models.py:43
+msgid "Given up"
+msgstr ""
 
 #: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
 #, draft
@@ -5197,6 +5225,11 @@ msgstr "Entretien"
 msgid "Interview cancelled"
 msgstr "Entretien annuléiert"
 
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview moved: %(what)s"
+msgstr ""
+
 #: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
@@ -5212,7 +5245,12 @@ msgstr "Entretien geplangt"
 msgid "Interview scheduled."
 msgstr "Entretien geplangt."
 
-#: src/postulo/applications/services.py:294
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview scheduled: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:311
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Entretien muer: %(kind)s bei %(company)s, %(time)s"
@@ -5486,7 +5524,7 @@ msgid ""
 msgstr ""
 "Gëtt an der internationaler Form behalen, sou datt Dir och aus engem anere Land uruffe kënnt. Eng Nummer, déi schonn mat + ufänkt, gëtt esou geholl, wéi se ass."
 
-#: src/postulo/api/models.py:173
+#: src/postulo/api/models.py:173 src/postulo/notifications/models.py:68
 #, draft
 msgid "key"
 msgstr "Schlëssel"
@@ -5644,7 +5682,11 @@ msgstr "Gréisste gelies Säit"
 msgid "Last activity"
 msgstr "Lescht Aktivitéit"
 
-#: src/postulo/documents/models.py:749
+#: src/postulo/notifications/models.py:76
+msgid "last answer"
+msgstr ""
+
+#: src/postulo/documents/models.py:749 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "leschte Versuch"
@@ -5659,7 +5701,8 @@ msgstr "lescht Kontroll"
 msgid "last checked"
 msgstr "fir d'lescht kontrolléiert"
 
-#: src/postulo/documents/models.py:751 src/postulo/plugins/models.py:204
+#: src/postulo/documents/models.py:751 src/postulo/notifications/models.py:77
+#: src/postulo/plugins/models.py:204
 #, draft
 msgid "last error"
 msgstr "leschte Feeler"
@@ -6490,7 +6533,7 @@ msgstr ""
 msgid "Next"
 msgstr "Weider"
 
-#: src/postulo/documents/models.py:747
+#: src/postulo/documents/models.py:747 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "nächste Versuch"
@@ -6736,7 +6779,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Nach keen hei notéiert."
 
-#: src/postulo/applications/services.py:444
+#: src/postulo/applications/services.py:463
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Keen ass beim %(kind)s opgetaucht"
@@ -7324,7 +7367,7 @@ msgid "offer"
 msgstr ""
 
 #: src/postulo/applications/models.py:440
-#: src/postulo/applications/services.py:518
+#: src/postulo/applications/services.py:574
 #, draft
 msgid "Offer received"
 msgstr "Offer kritt"
@@ -7333,8 +7376,18 @@ msgstr "Offer kritt"
 msgid "Offer recorded."
 msgstr ""
 
-#: src/postulo/applications/services.py:518
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer recorded: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:574
 msgid "Offer revised"
+msgstr ""
+
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer revised: %(what)s"
 msgstr ""
 
 #: src/postulo/applications/views.py:1281
@@ -9542,12 +9595,17 @@ msgstr "Als iech selwer schécken"
 msgid "Sending failed: %(error)s"
 msgstr "D'Schécke feelgeschloen: %(error)s"
 
+#: src/postulo/notifications/models.py:41
 #: src/postulo/templates/applications/report.html:125
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Geschéckt"
+
+#: src/postulo/notifications/models.py:78
+msgid "sent at"
+msgstr ""
 
 #: src/postulo/documents/models.py:678
 #, draft
@@ -10221,7 +10279,7 @@ msgstr "Zoustand"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
 #: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:1021
+#: src/postulo/jobs/models.py:1021 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
 msgstr "status"
@@ -10305,7 +10363,7 @@ msgstr "Net méi no %(column)s zortéieren"
 msgid "store"
 msgstr "späicher"
 
-#: src/postulo/plugins/forms.py:115
+#: src/postulo/plugins/forms.py:121
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Gëtt gespäichert; loosst et eidel, fir de bestoende Wäert ze halen."
@@ -11079,6 +11137,7 @@ msgid "The company you are applying to"
 msgstr "D'Firma, bei där Dir Iech bewierft"
 
 #: src/postulo/documents/archiving.py:115
+#: src/postulo/notifications/webhooks.py:121
 #, draft
 msgid "The connection is gone or switched off."
 msgstr "D'Verbindung ass fort oder ausgeschalt."
@@ -11415,6 +11474,11 @@ msgstr "Den Ubidder erneiert dat net. Een muss nach eng Kéier zoustëmmen."
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "D'Äntwert vum Ubidder war net liesbar."
+
+#: src/postulo/notifications/webhooks.py:147
+#, python-format
+msgid "The receiver answered %(status)s."
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html:153
 #, draft
@@ -12446,6 +12510,7 @@ msgstr ""
 "Fräiwëlleg Ënnerstëtzung ass déi eenzeg Recette vun dësem Projet: eng eenzeg Persoun schreift en, an et gëtt dobäi näischt geschëlt an näischt fräigeschalt. Et gëtt eemol gesot, hei, un deen, deen d'Installatioun bedreift — ni un d'Leit, déi se benotzen, fir Aarbecht ze sichen, a fir vill vun hinnen sinn Suen dat Falscht ze ginn."
 
 #: src/postulo/core/models.py:123 src/postulo/core/models.py:713
+#: src/postulo/notifications/models.py:40
 msgid "Waiting"
 msgstr ""
 
@@ -12515,6 +12580,14 @@ msgstr "Weblink"
 #, draft
 msgid "web links"
 msgstr "Weblinken"
+
+#: src/postulo/notifications/models.py:82
+msgid "webhook deliveries"
+msgstr ""
+
+#: src/postulo/notifications/models.py:81
+msgid "webhook delivery"
+msgstr ""
 
 #: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:108

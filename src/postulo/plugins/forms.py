@@ -80,12 +80,18 @@ class PluginRepositoryForm(forms.ModelForm):
 SECRET_PLACEHOLDER = "••••••••"  # noqa: S105 - a display placeholder, not a credential
 
 
-def kind_specs(kind: str) -> list[FieldSpec]:
-    """Fields every connection of a kind carries, whatever the plugin: a notifier's events."""
+def kind_specs(plugin) -> list[FieldSpec]:
+    """Fields every connection of a kind carries, whatever the plugin: a notifier's events.
+
+    Handed the plugin rather than its kind, because a notifier's switches default as the
+    plugin says (#240): the same seven events, on for a person and off for a machine or the
+    other way round.
+    """
+    kind = getattr(plugin, "kind", plugin)
     if kind == "notifier":
         from postulo.notifications.base import event_specs
 
-        return event_specs()
+        return event_specs(plugin if not isinstance(plugin, str) else None)
     if kind == "store":
         from postulo.documents.stores import kind_specs as document_kind_specs
 
@@ -148,7 +154,7 @@ class ConnectionForm(forms.ModelForm):
         owner = getattr(self.instance, "owner", None)
         self.specs: list[FieldSpec] = list(
             call_with_user(plugin.config_fields, user=owner)
-        ) + kind_specs(plugin.kind)
+        ) + kind_specs(plugin)
         existing_config = dict(self.instance.config) if self.instance.pk else {}
         existing_secrets = self.instance.secrets if self.instance.pk else {}
         for spec in self.specs:

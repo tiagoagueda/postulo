@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:56+0000\n"
+"POT-Creation-Date: 2026-09-22 13:23+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: euskara\n"
@@ -209,22 +209,22 @@ msgstr "%(kilobytes)s diskoan"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s sortu da. Aukeratu orain zer joango den bertan."
 
-#: src/postulo/applications/services.py:423
+#: src/postulo/applications/services.py:442
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s egin da"
 
-#: src/postulo/applications/services.py:376
+#: src/postulo/applications/services.py:394
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s %(old)s egunetik %(new)s egunera aldatu da"
 
-#: src/postulo/applications/services.py:434
+#: src/postulo/applications/services.py:453
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(when)s eguneko %(kind)s bertan behera utzi da"
 
-#: src/postulo/applications/services.py:343
+#: src/postulo/applications/services.py:360
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s %(when)s egunerako antolatu da"
@@ -422,7 +422,7 @@ msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr ""
 "%(ok)d(e)k erantzun dute, %(broken)d(e)k ez; erantzun ez dutenek zergatik dioten."
 
-#: src/postulo/applications/services.py:157
+#: src/postulo/applications/services.py:158
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -437,7 +437,7 @@ msgstr ""
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: %(wanted)s behar du, eta Postulok %(have)s du."
 
-#: src/postulo/plugins/forms.py:203
+#: src/postulo/plugins/forms.py:209
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s(e)k ezin izan ditu ezarpen hauek egiaztatu: %(error)s"
@@ -456,6 +456,7 @@ msgstr ""
 
 #: src/postulo/documents/rendering.py:417
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
+#: src/postulo/notifications/slow.py:153
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s %(company)s enpresan"
@@ -574,6 +575,11 @@ msgstr "%(url)s katalogo batek izan behar lukeena baino askoz handiagoa da."
 #, python-format, draft
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr "%(value)s ez da moneta-kode bat. Erabili hiru letra, EUR adibidez."
+
+#: src/postulo/notifications/slow.py:163
+#, python-format
+msgid "%(what)s: %(status)s"
+msgstr ""
 
 #: src/postulo/templates/core/partials/errand_state.html:43
 #, python-format
@@ -1463,6 +1469,10 @@ msgid ""
 msgstr ""
 "Administratzaile batek esteka hau egin du %(name)s(r)entzat. Behin funtzionatzen du, eta hau da behin hori."
 
+#: src/postulo/notifications/base.py:34
+msgid "An application's status changes"
+msgstr ""
+
 #: src/postulo/templates/core/export.html:80
 #, draft
 msgid ""
@@ -1492,6 +1502,14 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "Indizea hemen exekutatuko den kodearen zerrenda da, beraz sinatuta egon behar du eta gakoa zurea izan behar da. Biltegi bat gero itzaltzeak handik datozen instalazio eta eguneratze berriak gelditzen ditu; instalatuta dagoenak funtzionatzen jarraitzen du."
+
+#: src/postulo/notifications/base.py:35
+msgid "An interview is scheduled or moved"
+msgstr ""
+
+#: src/postulo/notifications/base.py:36
+msgid "An offer is recorded"
+msgstr ""
 
 #: src/postulo/documents/forms.py:247
 msgid "An older version of the same thing, kept but no longer offered."
@@ -1541,7 +1559,7 @@ msgstr ""
 msgid "answer"
 msgstr "erantzuna"
 
-#: src/postulo/applications/services.py:524
+#: src/postulo/applications/services.py:580
 #, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
 msgstr ""
@@ -1670,7 +1688,7 @@ msgstr "eskaera"
 msgid "Application"
 msgstr "Eskaera"
 
-#: src/postulo/applications/services.py:200
+#: src/postulo/applications/services.py:217
 #, draft
 msgid "Application created"
 msgstr "Eskaera sortu da"
@@ -1916,7 +1934,7 @@ msgstr ""
 msgid "at most"
 msgstr "gehienez"
 
-#: src/postulo/documents/models.py:745
+#: src/postulo/documents/models.py:745 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "saiakerak"
@@ -2060,6 +2078,7 @@ msgid "Board"
 msgstr "Taula"
 
 #: src/postulo/documents/models.py:376 src/postulo/notifications/models.py:25
+#: src/postulo/notifications/models.py:69
 #, draft
 msgid "body"
 msgstr "gorputza"
@@ -2776,8 +2795,8 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Konektatuta. Probatu ondo dabilela ziurtatzeko."
 
-#: src/postulo/documents/models.py:724 src/postulo/plugins/models.py:212
-#: src/postulo/plugins/models.py:293
+#: src/postulo/documents/models.py:724 src/postulo/notifications/models.py:65
+#: src/postulo/plugins/models.py:212 src/postulo/plugins/models.py:293
 #, draft
 msgid "connection"
 msgstr "konexioa"
@@ -3824,6 +3843,7 @@ msgstr ""
 
 #: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
+#: src/postulo/notifications/models.py:67
 #, draft
 msgid "event"
 msgstr "gertaera"
@@ -4097,6 +4117,10 @@ msgstr "Huts egin du"
 #, draft
 msgid "Failed without saying why."
 msgstr "Huts egin du zergatik esan gabe."
+
+#: src/postulo/notifications/models.py:42
+msgid "Failed, will retry"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
@@ -4564,6 +4588,10 @@ msgstr ""
 #, draft
 msgid "Give the token a name and at least one scope."
 msgstr "Eman tokenari izen bat eta gutxienez esparru bat."
+
+#: src/postulo/notifications/models.py:43
+msgid "Given up"
+msgstr ""
 
 #: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
 #, draft
@@ -5196,6 +5224,11 @@ msgstr "elkarrizketa"
 msgid "Interview cancelled"
 msgstr "Elkarrizketa bertan behera utzi da"
 
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview moved: %(what)s"
+msgstr ""
+
 #: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
@@ -5211,7 +5244,12 @@ msgstr "Elkarrizketa antolatu da"
 msgid "Interview scheduled."
 msgstr "Elkarrizketa antolatu da."
 
-#: src/postulo/applications/services.py:294
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview scheduled: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:311
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Bihar elkarrizketa: %(kind)s %(company)s enpresan, %(time)s"
@@ -5484,7 +5522,7 @@ msgid ""
 msgstr ""
 "Nazioarteko formatuan gordetzen da, beste herrialde batetik ere dei dezazun. Jada + ikurrarekin hasten den zenbakia dagoen bezala hartzen da."
 
-#: src/postulo/api/models.py:173
+#: src/postulo/api/models.py:173 src/postulo/notifications/models.py:68
 #, draft
 msgid "key"
 msgstr "gakoa"
@@ -5642,7 +5680,11 @@ msgstr "Irakurritako orririk handiena"
 msgid "Last activity"
 msgstr "Azken jarduera"
 
-#: src/postulo/documents/models.py:749
+#: src/postulo/notifications/models.py:76
+msgid "last answer"
+msgstr ""
+
+#: src/postulo/documents/models.py:749 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "azken saiakera"
@@ -5657,7 +5699,8 @@ msgstr "azken egiaztapena"
 msgid "last checked"
 msgstr "azkenekoz egiaztatua"
 
-#: src/postulo/documents/models.py:751 src/postulo/plugins/models.py:204
+#: src/postulo/documents/models.py:751 src/postulo/notifications/models.py:77
+#: src/postulo/plugins/models.py:204
 #, draft
 msgid "last error"
 msgstr "azken errorea"
@@ -6488,7 +6531,7 @@ msgstr ""
 msgid "Next"
 msgstr "Hurrengoa"
 
-#: src/postulo/documents/models.py:747
+#: src/postulo/documents/models.py:747 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "hurrengo saiakera"
@@ -6734,7 +6777,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Oraindik ez dago inor jasota hemen."
 
-#: src/postulo/applications/services.py:444
+#: src/postulo/applications/services.py:463
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Inor ez zen agertu %(kind)s ekitaldira"
@@ -7323,7 +7366,7 @@ msgid "offer"
 msgstr ""
 
 #: src/postulo/applications/models.py:440
-#: src/postulo/applications/services.py:518
+#: src/postulo/applications/services.py:574
 #, draft
 msgid "Offer received"
 msgstr "Eskaintza jaso da"
@@ -7332,8 +7375,18 @@ msgstr "Eskaintza jaso da"
 msgid "Offer recorded."
 msgstr ""
 
-#: src/postulo/applications/services.py:518
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer recorded: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:574
 msgid "Offer revised"
+msgstr ""
+
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer revised: %(what)s"
 msgstr ""
 
 #: src/postulo/applications/views.py:1281
@@ -9539,12 +9592,17 @@ msgstr "Zeure buruaren izenean bidaltzea"
 msgid "Sending failed: %(error)s"
 msgstr "Bidalketak huts egin du: %(error)s"
 
+#: src/postulo/notifications/models.py:41
 #: src/postulo/templates/applications/report.html:125
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Bidalita"
+
+#: src/postulo/notifications/models.py:78
+msgid "sent at"
+msgstr ""
 
 #: src/postulo/documents/models.py:678
 #, draft
@@ -10218,7 +10276,7 @@ msgstr "Egoera"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
 #: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:1021
+#: src/postulo/jobs/models.py:1021 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
 msgstr "egoera"
@@ -10302,7 +10360,7 @@ msgstr "Utzi %(column)s arabera ordenatzeari"
 msgid "store"
 msgstr "biltegia"
 
-#: src/postulo/plugins/forms.py:115
+#: src/postulo/plugins/forms.py:121
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Gordeta; utzi hutsik uneko balioa mantentzeko."
@@ -11075,6 +11133,7 @@ msgid "The company you are applying to"
 msgstr "Eskaera egiten ari zaren enpresa"
 
 #: src/postulo/documents/archiving.py:115
+#: src/postulo/notifications/webhooks.py:121
 #, draft
 msgid "The connection is gone or switched off."
 msgstr "Konexioa desagertu da edo itzalita dago."
@@ -11409,6 +11468,11 @@ msgstr "Hornitzaileak ez du hau berrituko. Norbaitek berriro onartu behar du."
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "Hornitzailearen erantzuna ezin izan da irakurri."
+
+#: src/postulo/notifications/webhooks.py:147
+#, python-format
+msgid "The receiver answered %(status)s."
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html:153
 #, draft
@@ -12435,6 +12499,7 @@ msgstr ""
 "Borondatezko laguntza da proiektu honen diru-sarrera bakarra: pertsona bakar batek idazten du, eta honekin ez da ezer zor, ezta ezer desblokeatzen ere. Behin esaten da, hemen, instalazioa darabilenari — inoiz ez lana bilatzeko erabiltzen dutenei, eta horietako askorentzat dirua ez da eman beharrekoa."
 
 #: src/postulo/core/models.py:123 src/postulo/core/models.py:713
+#: src/postulo/notifications/models.py:40
 msgid "Waiting"
 msgstr ""
 
@@ -12504,6 +12569,14 @@ msgstr "web-esteka"
 #, draft
 msgid "web links"
 msgstr "web-estekak"
+
+#: src/postulo/notifications/models.py:82
+msgid "webhook deliveries"
+msgstr ""
+
+#: src/postulo/notifications/models.py:81
+msgid "webhook delivery"
+msgstr ""
 
 #: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:108

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:56+0000\n"
+"POT-Creation-Date: 2026-09-22 13:23+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -209,22 +209,22 @@ msgstr "%(kilobytes)s a lemezen"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s létrehozva. Most válassza ki, mi kerüljön rá."
 
-#: src/postulo/applications/services.py:423
+#: src/postulo/applications/services.py:442
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s megtartva"
 
-#: src/postulo/applications/services.py:376
+#: src/postulo/applications/services.py:394
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s áthelyezve: %(old)s → %(new)s"
 
-#: src/postulo/applications/services.py:434
+#: src/postulo/applications/services.py:453
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(kind)s (%(when)s) lemondva"
 
-#: src/postulo/applications/services.py:343
+#: src/postulo/applications/services.py:360
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s kitűzve: %(when)s"
@@ -421,7 +421,7 @@ msgstr ""
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d válaszolt, %(broken)d nem; amelyek nem, megmondják, miért."
 
-#: src/postulo/applications/services.py:157
+#: src/postulo/applications/services.py:158
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -436,7 +436,7 @@ msgstr ""
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: %(wanted)s kell neki, a Postulónak pedig %(have)s van."
 
-#: src/postulo/plugins/forms.py:203
+#: src/postulo/plugins/forms.py:209
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "A(z) %(plugin)s nem tudta ellenőrizni ezeket a beállításokat: %(error)s"
@@ -455,6 +455,7 @@ msgstr ""
 
 #: src/postulo/documents/rendering.py:417
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
+#: src/postulo/notifications/slow.py:153
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s, %(company)s"
@@ -573,6 +574,11 @@ msgstr "A(z) %(url)s sokkal nagyobb, mint amekkora egy katalógus lehet."
 #, python-format, draft
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr "A(z) %(value)s nem pénznemkód. Használjon három betűt, például EUR."
+
+#: src/postulo/notifications/slow.py:163
+#, python-format
+msgid "%(what)s: %(status)s"
+msgstr ""
 
 #: src/postulo/templates/core/partials/errand_state.html:43
 #, python-format
@@ -1457,6 +1463,10 @@ msgid ""
 msgstr ""
 "Egy adminisztrátor készítette ezt a hivatkozást %(name)s számára. Egyszer működik, és ez az az egyszer."
 
+#: src/postulo/notifications/base.py:34
+msgid "An application's status changes"
+msgstr ""
+
 #: src/postulo/templates/core/export.html:80
 #, draft
 msgid ""
@@ -1486,6 +1496,14 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "Az index az itt futtatandó kód listája, ezért alá kell írni, és a kulcsnak Önnél kell lennie. Egy tároló későbbi kikapcsolása megállítja az új telepítéseket és frissítéseket belőle; ami már telepítve van, tovább működik."
+
+#: src/postulo/notifications/base.py:35
+msgid "An interview is scheduled or moved"
+msgstr ""
+
+#: src/postulo/notifications/base.py:36
+msgid "An offer is recorded"
+msgstr ""
 
 #: src/postulo/documents/forms.py:247
 msgid "An older version of the same thing, kept but no longer offered."
@@ -1535,7 +1553,7 @@ msgstr ""
 msgid "answer"
 msgstr "válasz"
 
-#: src/postulo/applications/services.py:524
+#: src/postulo/applications/services.py:580
 #, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
 msgstr ""
@@ -1663,7 +1681,7 @@ msgstr "jelentkezés"
 msgid "Application"
 msgstr "Jelentkezés"
 
-#: src/postulo/applications/services.py:200
+#: src/postulo/applications/services.py:217
 #, draft
 msgid "Application created"
 msgstr "Jelentkezés létrehozva"
@@ -1910,7 +1928,7 @@ msgstr ""
 msgid "at most"
 msgstr "legfeljebb"
 
-#: src/postulo/documents/models.py:745
+#: src/postulo/documents/models.py:745 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "próbálkozások"
@@ -2054,6 +2072,7 @@ msgid "Board"
 msgstr "Tábla"
 
 #: src/postulo/documents/models.py:376 src/postulo/notifications/models.py:25
+#: src/postulo/notifications/models.py:69
 #, draft
 msgid "body"
 msgstr "törzsszöveg"
@@ -2771,8 +2790,8 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Csatlakoztatva. Tesztelje, hogy biztos legyen benne, hogy működik."
 
-#: src/postulo/documents/models.py:724 src/postulo/plugins/models.py:212
-#: src/postulo/plugins/models.py:293
+#: src/postulo/documents/models.py:724 src/postulo/notifications/models.py:65
+#: src/postulo/plugins/models.py:212 src/postulo/plugins/models.py:293
 #, draft
 msgid "connection"
 msgstr "kapcsolat"
@@ -3820,6 +3839,7 @@ msgstr ""
 
 #: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
+#: src/postulo/notifications/models.py:67
 #, draft
 msgid "event"
 msgstr "esemény"
@@ -4093,6 +4113,10 @@ msgstr "Sikertelen"
 #, draft
 msgid "Failed without saying why."
 msgstr "Sikertelen, indoklás nélkül."
+
+#: src/postulo/notifications/models.py:42
+msgid "Failed, will retry"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
@@ -4562,6 +4586,10 @@ msgstr ""
 #, draft
 msgid "Give the token a name and at least one scope."
 msgstr "Adjon a tokennek nevet és legalább egy hatókört."
+
+#: src/postulo/notifications/models.py:43
+msgid "Given up"
+msgstr ""
 
 #: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
 #, draft
@@ -5191,6 +5219,11 @@ msgstr "interjú"
 msgid "Interview cancelled"
 msgstr "Interjú lemondva"
 
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview moved: %(what)s"
+msgstr ""
+
 #: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
@@ -5206,7 +5239,12 @@ msgstr "Interjú kitűzve"
 msgid "Interview scheduled."
 msgstr "Interjú kitűzve."
 
-#: src/postulo/applications/services.py:294
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview scheduled: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:311
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Interjú holnap: %(kind)s, %(company)s, %(time)s"
@@ -5477,7 +5515,7 @@ msgid ""
 msgstr ""
 "Nemzetközi formában tárolva, hogy más országból is fel tudja hívni. A már +-szal kezdődő számot úgy vesszük, ahogy van."
 
-#: src/postulo/api/models.py:173
+#: src/postulo/api/models.py:173 src/postulo/notifications/models.py:68
 #, draft
 msgid "key"
 msgstr "kulcs"
@@ -5635,7 +5673,11 @@ msgstr "Legnagyobb beolvasott oldal"
 msgid "Last activity"
 msgstr "Utolsó tevékenység"
 
-#: src/postulo/documents/models.py:749
+#: src/postulo/notifications/models.py:76
+msgid "last answer"
+msgstr ""
+
+#: src/postulo/documents/models.py:749 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "utolsó próbálkozás"
@@ -5650,7 +5692,8 @@ msgstr "legutóbbi ellenőrzés"
 msgid "last checked"
 msgstr "legutóbb ellenőrizve"
 
-#: src/postulo/documents/models.py:751 src/postulo/plugins/models.py:204
+#: src/postulo/documents/models.py:751 src/postulo/notifications/models.py:77
+#: src/postulo/plugins/models.py:204
 #, draft
 msgid "last error"
 msgstr "utolsó hiba"
@@ -6481,7 +6524,7 @@ msgstr ""
 msgid "Next"
 msgstr "Következő"
 
-#: src/postulo/documents/models.py:747
+#: src/postulo/documents/models.py:747 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "következő próbálkozás"
@@ -6729,7 +6772,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Itt még senki sincs rögzítve."
 
-#: src/postulo/applications/services.py:444
+#: src/postulo/applications/services.py:463
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Senki sem jelent meg a(z) %(kind)s alkalmon"
@@ -7317,7 +7360,7 @@ msgid "offer"
 msgstr ""
 
 #: src/postulo/applications/models.py:440
-#: src/postulo/applications/services.py:518
+#: src/postulo/applications/services.py:574
 #, draft
 msgid "Offer received"
 msgstr "Ajánlat érkezett"
@@ -7326,8 +7369,18 @@ msgstr "Ajánlat érkezett"
 msgid "Offer recorded."
 msgstr ""
 
-#: src/postulo/applications/services.py:518
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer recorded: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:574
 msgid "Offer revised"
+msgstr ""
+
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer revised: %(what)s"
 msgstr ""
 
 #: src/postulo/applications/views.py:1281
@@ -9535,12 +9588,17 @@ msgstr "Küldés a saját nevében"
 msgid "Sending failed: %(error)s"
 msgstr "A küldés sikertelen: %(error)s"
 
+#: src/postulo/notifications/models.py:41
 #: src/postulo/templates/applications/report.html:125
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Elküldve"
+
+#: src/postulo/notifications/models.py:78
+msgid "sent at"
+msgstr ""
 
 #: src/postulo/documents/models.py:678
 #, draft
@@ -10214,7 +10272,7 @@ msgstr "Állapot"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
 #: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:1021
+#: src/postulo/jobs/models.py:1021 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
 msgstr "állapot"
@@ -10297,7 +10355,7 @@ msgstr "Ne rendezzen %(column)s szerint"
 msgid "store"
 msgstr "tároló"
 
-#: src/postulo/plugins/forms.py:115
+#: src/postulo/plugins/forms.py:121
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Tárolva; hagyja üresen a jelenlegi érték megtartásához."
@@ -11068,6 +11126,7 @@ msgid "The company you are applying to"
 msgstr "A cég, ahová jelentkezik"
 
 #: src/postulo/documents/archiving.py:115
+#: src/postulo/notifications/webhooks.py:121
 #, draft
 msgid "The connection is gone or switched off."
 msgstr "A kapcsolat megszűnt vagy ki van kapcsolva."
@@ -11401,6 +11460,11 @@ msgstr "A szolgáltató ezt nem újítja meg. Valakinek újra bele kell egyeznie
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "A szolgáltató válaszát nem lehetett elolvasni."
+
+#: src/postulo/notifications/webhooks.py:147
+#, python-format
+msgid "The receiver answered %(status)s."
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html:153
 #, draft
@@ -12430,6 +12494,7 @@ msgstr ""
 "Az önkéntes támogatás e projekt egyetlen bevétele: egyetlen ember írja, és ebből semmi nem jár és semmi nem nyílik meg. Egyszer hangzik el, itt, annak, aki a példányt üzemelteti — soha azoknak, akik munkát keresnek vele, és közülük sokak számára a pénz nem az, amit adni kellene."
 
 #: src/postulo/core/models.py:123 src/postulo/core/models.py:713
+#: src/postulo/notifications/models.py:40
 msgid "Waiting"
 msgstr ""
 
@@ -12499,6 +12564,14 @@ msgstr "weblink"
 #, draft
 msgid "web links"
 msgstr "weblinkek"
+
+#: src/postulo/notifications/models.py:82
+msgid "webhook deliveries"
+msgstr ""
+
+#: src/postulo/notifications/models.py:81
+msgid "webhook delivery"
+msgstr ""
 
 #: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:108

@@ -419,6 +419,9 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         # A connection Postulo can offer without one being configured: the kind and the
         # plugin name are in the path, so the form exists whether or not anything is set up.
         "/settings/connections/add/notifier/email/",
+        # The one made for a machine (#240): a password field, a help line each, and the
+        # three events a human notifier keeps off.
+        "/settings/connections/add/notifier/webhook/",
         f"/settings/connections/{connection.pk}/",
         f"/settings/connections/{connection.pk}/delete/",
         *(

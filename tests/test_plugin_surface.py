@@ -84,6 +84,13 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "the guarded backend, which is where the server is allowed to dial (#148)"
         ),
     },
+    "webhook": {
+        "postulo.notifications": (
+            "`webhooks`: where a delivery waits for the scheduler. A plugin holds no rows, and a "
+            "delivery has to outlive the send that left it, scoped to its owner by Postulo rather "
+            "than by the plugin -- the browser notifier's reason, for the same kind of row (#240)"
+        ),
+    },
     "localstore": {
         "postulo.documents.stores": (
             "`download_path`: where Postulo serves a document from, which is Postulo's to "
@@ -349,6 +356,9 @@ def test_the_surface_holds_the_notifier_contract():
         "capture_received",
         "went_quiet",
         "posting_closing",
+        "status_changed",
+        "interview_scheduled",
+        "offer_recorded",
     }
 
 

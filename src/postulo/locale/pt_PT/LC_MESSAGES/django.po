@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:56+0000\n"
+"POT-Creation-Date: 2026-09-22 13:23+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: português (Portugal)\n"
@@ -209,22 +209,22 @@ msgstr "%(kilobytes)s em disco"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s criado. Agora escolha o que vai nele."
 
-#: src/postulo/applications/services.py:423
+#: src/postulo/applications/services.py:442
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s realizada"
 
-#: src/postulo/applications/services.py:376
+#: src/postulo/applications/services.py:394
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s movida de %(old)s para %(new)s"
 
-#: src/postulo/applications/services.py:434
+#: src/postulo/applications/services.py:453
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(kind)s de %(when)s cancelada"
 
-#: src/postulo/applications/services.py:343
+#: src/postulo/applications/services.py:360
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s marcada para %(when)s"
@@ -422,7 +422,7 @@ msgstr "%(name)s, guardado até %(when)s."
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d responderam, %(broken)d não; as que não responderam dizem porquê."
 
-#: src/postulo/applications/services.py:157
+#: src/postulo/applications/services.py:158
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -437,7 +437,7 @@ msgstr "%(package)s: precisa de %(wanted)s, e %(owner)s tem %(have)s."
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: precisa de %(wanted)s, e o Postulo tem %(have)s."
 
-#: src/postulo/plugins/forms.py:203
+#: src/postulo/plugins/forms.py:209
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s não conseguiu verificar estas definições: %(error)s"
@@ -456,6 +456,7 @@ msgstr ""
 
 #: src/postulo/documents/rendering.py:417
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
+#: src/postulo/notifications/slow.py:153
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s na %(company)s"
@@ -573,6 +574,11 @@ msgstr "%(url)s é muito maior do que um catálogo deveria ser."
 #, python-format, draft
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr "%(value)s não é um código de moeda. Use três letras, como EUR."
+
+#: src/postulo/notifications/slow.py:163
+#, python-format
+msgid "%(what)s: %(status)s"
+msgstr "%(what)s: %(status)s"
 
 #: src/postulo/templates/core/partials/errand_state.html:43
 #, python-format, draft
@@ -1491,6 +1497,10 @@ msgid ""
 msgstr ""
 "Uma administradora ou administrador criou esta ligação para %(name)s. Funciona uma vez, e é esta."
 
+#: src/postulo/notifications/base.py:34
+msgid "An application's status changes"
+msgstr "O estado de uma candidatura muda"
+
 #: src/postulo/templates/core/export.html:80
 #, draft
 msgid ""
@@ -1523,6 +1533,14 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "Um índice é uma lista de código para correr aqui, por isso tem de estar assinado e o senhor tem de ter a chave. Desligar um repositório mais tarde impede novas instalações e atualizações a partir dele; o que já está instalado continua a funcionar."
+
+#: src/postulo/notifications/base.py:35
+msgid "An interview is scheduled or moved"
+msgstr "Uma entrevista é marcada ou movida"
+
+#: src/postulo/notifications/base.py:36
+msgid "An offer is recorded"
+msgstr "Uma proposta é registada"
 
 #: src/postulo/documents/forms.py:247
 #, draft
@@ -1575,7 +1593,7 @@ msgstr ""
 msgid "answer"
 msgstr "resposta"
 
-#: src/postulo/applications/services.py:524
+#: src/postulo/applications/services.py:580
 #, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
 msgstr "Responder à %(company)s sobre a proposta até %(day)s"
@@ -1707,7 +1725,7 @@ msgstr "candidatura"
 msgid "Application"
 msgstr "Candidatura"
 
-#: src/postulo/applications/services.py:200
+#: src/postulo/applications/services.py:217
 #, draft
 msgid "Application created"
 msgstr "Candidatura criada"
@@ -1957,7 +1975,7 @@ msgstr "Tem de ser oferecido pelo menos um idioma, ou ninguém consegue ler nada
 msgid "at most"
 msgstr "no máximo"
 
-#: src/postulo/documents/models.py:745
+#: src/postulo/documents/models.py:745 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "tentativas"
@@ -2103,6 +2121,7 @@ msgid "Board"
 msgstr "Quadro"
 
 #: src/postulo/documents/models.py:376 src/postulo/notifications/models.py:25
+#: src/postulo/notifications/models.py:69
 #, draft
 msgid "body"
 msgstr "corpo"
@@ -2834,8 +2853,8 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Ligado. Teste para se certificar de que funciona."
 
-#: src/postulo/documents/models.py:724 src/postulo/plugins/models.py:212
-#: src/postulo/plugins/models.py:293
+#: src/postulo/documents/models.py:724 src/postulo/notifications/models.py:65
+#: src/postulo/plugins/models.py:212 src/postulo/plugins/models.py:293
 #, draft
 msgid "connection"
 msgstr "ligação"
@@ -3905,6 +3924,7 @@ msgstr ""
 
 #: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
+#: src/postulo/notifications/models.py:67
 #, draft
 msgid "event"
 msgstr "evento"
@@ -4186,6 +4206,10 @@ msgstr "Falhou"
 #, draft
 msgid "Failed without saying why."
 msgstr "Falhou sem dizer porquê."
+
+#: src/postulo/notifications/models.py:42
+msgid "Failed, will retry"
+msgstr "Falhou, vai tentar de novo"
 
 #: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
@@ -4664,6 +4688,10 @@ msgstr ""
 #, draft
 msgid "Give the token a name and at least one scope."
 msgstr "Dê um nome ao token e pelo menos um âmbito."
+
+#: src/postulo/notifications/models.py:43
+msgid "Given up"
+msgstr "Desistiu"
 
 #: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
 #, draft
@@ -5312,6 +5340,11 @@ msgstr "entrevista"
 msgid "Interview cancelled"
 msgstr "Entrevista cancelada"
 
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview moved: %(what)s"
+msgstr "Entrevista movida: %(what)s"
+
 #: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
@@ -5327,7 +5360,12 @@ msgstr "Entrevista marcada"
 msgid "Interview scheduled."
 msgstr "Entrevista marcada."
 
-#: src/postulo/applications/services.py:294
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview scheduled: %(what)s"
+msgstr "Entrevista marcada: %(what)s"
+
+#: src/postulo/applications/services.py:311
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Entrevista amanhã: %(kind)s na %(company)s, %(time)s"
@@ -5603,7 +5641,7 @@ msgid ""
 msgstr ""
 "Guardado na forma internacional, para poder telefonar mesmo a partir de outro país. Um número que já comece por + é aceite tal como está."
 
-#: src/postulo/api/models.py:173
+#: src/postulo/api/models.py:173 src/postulo/notifications/models.py:68
 #, draft
 msgid "key"
 msgstr "chave"
@@ -5762,7 +5800,11 @@ msgstr "Maior página lida"
 msgid "Last activity"
 msgstr "Última atividade"
 
-#: src/postulo/documents/models.py:749
+#: src/postulo/notifications/models.py:76
+msgid "last answer"
+msgstr "última resposta"
+
+#: src/postulo/documents/models.py:749 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "última tentativa"
@@ -5777,7 +5819,8 @@ msgstr "última verificação"
 msgid "last checked"
 msgstr "última verificação em"
 
-#: src/postulo/documents/models.py:751 src/postulo/plugins/models.py:204
+#: src/postulo/documents/models.py:751 src/postulo/notifications/models.py:77
+#: src/postulo/plugins/models.py:204
 #, draft
 msgid "last error"
 msgstr "último erro"
@@ -6614,7 +6657,7 @@ msgstr "Versão mais recente"
 msgid "Next"
 msgstr "Seguinte"
 
-#: src/postulo/documents/models.py:747
+#: src/postulo/documents/models.py:747 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "próxima tentativa"
@@ -6860,7 +6903,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Ainda não há ninguém registado aqui."
 
-#: src/postulo/applications/services.py:444
+#: src/postulo/applications/services.py:463
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Ninguém compareceu à %(kind)s"
@@ -7457,7 +7500,7 @@ msgid "offer"
 msgstr "proposta"
 
 #: src/postulo/applications/models.py:440
-#: src/postulo/applications/services.py:518
+#: src/postulo/applications/services.py:574
 #, draft
 msgid "Offer received"
 msgstr "Oferta recebida"
@@ -7466,9 +7509,19 @@ msgstr "Oferta recebida"
 msgid "Offer recorded."
 msgstr "Proposta registada."
 
-#: src/postulo/applications/services.py:518
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer recorded: %(what)s"
+msgstr "Proposta registada: %(what)s"
+
+#: src/postulo/applications/services.py:574
 msgid "Offer revised"
 msgstr "Proposta revista"
+
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer revised: %(what)s"
+msgstr "Proposta revista: %(what)s"
 
 #: src/postulo/applications/views.py:1281
 msgid "Offer updated."
@@ -9708,12 +9761,17 @@ msgstr "Enviar como você"
 msgid "Sending failed: %(error)s"
 msgstr "O envio falhou: %(error)s"
 
+#: src/postulo/notifications/models.py:41
 #: src/postulo/templates/applications/report.html:125
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Enviado"
+
+#: src/postulo/notifications/models.py:78
+msgid "sent at"
+msgstr "enviado em"
 
 #: src/postulo/documents/models.py:678
 #, draft
@@ -10399,7 +10457,7 @@ msgstr "Estado"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
 #: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:1021
+#: src/postulo/jobs/models.py:1021 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
 msgstr "estado"
@@ -10482,7 +10540,7 @@ msgstr "Deixar de ordenar por %(column)s"
 msgid "store"
 msgstr "repositório"
 
-#: src/postulo/plugins/forms.py:115
+#: src/postulo/plugins/forms.py:121
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Guardado; deixe vazio para manter o valor atual."
@@ -11272,6 +11330,7 @@ msgid "The company you are applying to"
 msgstr "A empresa a que se candidata"
 
 #: src/postulo/documents/archiving.py:115
+#: src/postulo/notifications/webhooks.py:121
 #, draft
 msgid "The connection is gone or switched off."
 msgstr "A ligação desapareceu ou está desligada."
@@ -11620,6 +11679,11 @@ msgstr "O fornecedor não vai renovar isto. Alguém tem de consentir de novo."
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "A resposta do fornecedor não era legível."
+
+#: src/postulo/notifications/webhooks.py:147
+#, python-format
+msgid "The receiver answered %(status)s."
+msgstr "O recetor respondeu %(status)s."
 
 #: src/postulo/templates/resume/europass_import.html:153
 #, draft
@@ -12677,6 +12741,7 @@ msgstr ""
 "O apoio voluntário é o único rendimento deste projeto: uma só pessoa o escreve, e nada disto é devido nem desbloqueia o que quer que seja. Diz-se uma vez, aqui, a quem mantém a instância — nunca às pessoas que a usam para procurar trabalho, e para muitas delas dinheiro é a coisa errada a dar."
 
 #: src/postulo/core/models.py:123 src/postulo/core/models.py:713
+#: src/postulo/notifications/models.py:40
 #, draft
 msgid "Waiting"
 msgstr "À espera"
@@ -12747,6 +12812,14 @@ msgstr "ligação web"
 #, draft
 msgid "web links"
 msgstr "ligações web"
+
+#: src/postulo/notifications/models.py:82
+msgid "webhook deliveries"
+msgstr "entregas de webhook"
+
+#: src/postulo/notifications/models.py:81
+msgid "webhook delivery"
+msgstr "entrega de webhook"
 
 #: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:108

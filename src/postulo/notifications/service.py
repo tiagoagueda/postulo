@@ -59,13 +59,14 @@ def _deliver(user, notification: Notification) -> int:
     delivered = 0
     connections = Connection.objects.for_user(user).enabled().of_kind("notifier")
     for connection in connections:
-        if not wants(connection.config, notification.event):
-            continue
         plugin = connection.plugin_instance
         if plugin is None:
             logger.warning(
                 "Connection %s uses %r, which is not installed", connection.pk, connection.plugin
             )
+            continue
+        # The plugin first, because what an unset switch means is the plugin's to say (#240).
+        if not wants(connection.config, notification.event, plugin):
             continue
         try:
             plugin.send(notification, connection.full_config, user)

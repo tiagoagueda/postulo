@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:56+0000\n"
+"POT-Creation-Date: 2026-09-22 13:23+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: eesti\n"
@@ -209,22 +209,22 @@ msgstr "%(kilobytes)s kettal"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s on loodud. Vali nüüd, mis sellele läheb."
 
-#: src/postulo/applications/services.py:423
+#: src/postulo/applications/services.py:442
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s toimus"
 
-#: src/postulo/applications/services.py:376
+#: src/postulo/applications/services.py:394
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s viidi üle: %(old)s → %(new)s"
 
-#: src/postulo/applications/services.py:434
+#: src/postulo/applications/services.py:453
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(kind)s %(when)s tühistati"
 
-#: src/postulo/applications/services.py:343
+#: src/postulo/applications/services.py:360
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s on määratud: %(when)s"
@@ -422,7 +422,7 @@ msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr ""
 "%(ok)d vastas, %(broken)d ei vastanud; need, kes ei vastanud, ütlevad miks."
 
-#: src/postulo/applications/services.py:157
+#: src/postulo/applications/services.py:158
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -437,7 +437,7 @@ msgstr ""
 msgid "%(package)s: needs %(wanted)s, and Postulo has %(have)s."
 msgstr "%(package)s: vajab %(wanted)s, ja Postulol on %(have)s."
 
-#: src/postulo/plugins/forms.py:203
+#: src/postulo/plugins/forms.py:209
 #, python-format, draft
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s ei saanud neid seadeid kontrollida: %(error)s"
@@ -456,6 +456,7 @@ msgstr ""
 
 #: src/postulo/documents/rendering.py:417
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
+#: src/postulo/notifications/slow.py:153
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s, %(company)s"
@@ -574,6 +575,11 @@ msgstr "%(url)s on palju suurem, kui kataloog olema peaks."
 #, python-format, draft
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr "%(value)s ei ole valuutakood. Kasutage kolme tähte, näiteks EUR."
+
+#: src/postulo/notifications/slow.py:163
+#, python-format
+msgid "%(what)s: %(status)s"
+msgstr ""
 
 #: src/postulo/templates/core/partials/errand_state.html:43
 #, python-format
@@ -1457,6 +1463,10 @@ msgid ""
 msgstr ""
 "Administraator tegi selle lingi kasutajale %(name)s. See toimib ühe korra, ja see kord on nüüd."
 
+#: src/postulo/notifications/base.py:34
+msgid "An application's status changes"
+msgstr ""
+
 #: src/postulo/templates/core/export.html:80
 #, draft
 msgid ""
@@ -1486,6 +1496,14 @@ msgid ""
 "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr ""
 "Indeks on siin käivitatava koodi loend, seega peab see olema allkirjastatud ja teil peab olema võti. Hoidla hilisem väljalülitamine peatab uued paigaldused ja uuendused sellest; juba paigaldatu töötab edasi."
+
+#: src/postulo/notifications/base.py:35
+msgid "An interview is scheduled or moved"
+msgstr ""
+
+#: src/postulo/notifications/base.py:36
+msgid "An offer is recorded"
+msgstr ""
 
 #: src/postulo/documents/forms.py:247
 msgid "An older version of the same thing, kept but no longer offered."
@@ -1535,7 +1553,7 @@ msgstr ""
 msgid "answer"
 msgstr "vastus"
 
-#: src/postulo/applications/services.py:524
+#: src/postulo/applications/services.py:580
 #, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
 msgstr ""
@@ -1663,7 +1681,7 @@ msgstr "kandideerimine"
 msgid "Application"
 msgstr "Kandideerimine"
 
-#: src/postulo/applications/services.py:200
+#: src/postulo/applications/services.py:217
 #, draft
 msgid "Application created"
 msgstr "Kandideerimine loodud"
@@ -1909,7 +1927,7 @@ msgstr "Vähemalt üht keelt peab pakkuma, muidu ei saa keegi midagi lugeda."
 msgid "at most"
 msgstr "kõige rohkem"
 
-#: src/postulo/documents/models.py:745
+#: src/postulo/documents/models.py:745 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "katsed"
@@ -2053,6 +2071,7 @@ msgid "Board"
 msgstr "Tahvel"
 
 #: src/postulo/documents/models.py:376 src/postulo/notifications/models.py:25
+#: src/postulo/notifications/models.py:69
 #, draft
 msgid "body"
 msgstr "sisu"
@@ -2769,8 +2788,8 @@ msgstr ""
 msgid "Connected. Test it to make sure it works."
 msgstr "Ühendatud. Katsetage, et olla kindel, et see töötab."
 
-#: src/postulo/documents/models.py:724 src/postulo/plugins/models.py:212
-#: src/postulo/plugins/models.py:293
+#: src/postulo/documents/models.py:724 src/postulo/notifications/models.py:65
+#: src/postulo/plugins/models.py:212 src/postulo/plugins/models.py:293
 #, draft
 msgid "connection"
 msgstr "ühendus"
@@ -3816,6 +3835,7 @@ msgstr ""
 
 #: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
+#: src/postulo/notifications/models.py:67
 #, draft
 msgid "event"
 msgstr "sündmus"
@@ -4087,6 +4107,10 @@ msgstr "Ebaõnnestus"
 #, draft
 msgid "Failed without saying why."
 msgstr "Ebaõnnestus ilma põhjust ütlemata."
+
+#: src/postulo/notifications/models.py:42
+msgid "Failed, will retry"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html:22
 #, draft
@@ -4555,6 +4579,10 @@ msgstr ""
 #, draft
 msgid "Give the token a name and at least one scope."
 msgstr "Andke tõendile nimi ja vähemalt üks ulatus."
+
+#: src/postulo/notifications/models.py:43
+msgid "Given up"
+msgstr ""
 
 #: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
 #, draft
@@ -5182,6 +5210,11 @@ msgstr "intervjuu"
 msgid "Interview cancelled"
 msgstr "Intervjuu tühistatud"
 
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview moved: %(what)s"
+msgstr ""
+
 #: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
@@ -5197,7 +5230,12 @@ msgstr "Intervjuu määratud"
 msgid "Interview scheduled."
 msgstr "Intervjuu määratud."
 
-#: src/postulo/applications/services.py:294
+#: src/postulo/notifications/slow.py:186
+#, python-format
+msgid "Interview scheduled: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:311
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Intervjuu homme: %(kind)s, %(company)s, %(time)s"
@@ -5470,7 +5508,7 @@ msgid ""
 msgstr ""
 "Hoitakse rahvusvahelisel kujul, et saaksite helistada ka teisest riigist. Number, mis juba algab +-ga, võetakse nii nagu on."
 
-#: src/postulo/api/models.py:173
+#: src/postulo/api/models.py:173 src/postulo/notifications/models.py:68
 #, draft
 msgid "key"
 msgstr "võti"
@@ -5628,7 +5666,11 @@ msgstr "Suurim loetud leht"
 msgid "Last activity"
 msgstr "Viimane tegevus"
 
-#: src/postulo/documents/models.py:749
+#: src/postulo/notifications/models.py:76
+msgid "last answer"
+msgstr ""
+
+#: src/postulo/documents/models.py:749 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "viimane katse"
@@ -5643,7 +5685,8 @@ msgstr "viimane kontroll"
 msgid "last checked"
 msgstr "viimati kontrollitud"
 
-#: src/postulo/documents/models.py:751 src/postulo/plugins/models.py:204
+#: src/postulo/documents/models.py:751 src/postulo/notifications/models.py:77
+#: src/postulo/plugins/models.py:204
 #, draft
 msgid "last error"
 msgstr "viimane viga"
@@ -6474,7 +6517,7 @@ msgstr ""
 msgid "Next"
 msgstr "Järgmine"
 
-#: src/postulo/documents/models.py:747
+#: src/postulo/documents/models.py:747 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "järgmine katse"
@@ -6721,7 +6764,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Siia pole veel kedagi salvestatud."
 
-#: src/postulo/applications/services.py:444
+#: src/postulo/applications/services.py:463
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Keegi ei ilmunud: %(kind)s"
@@ -7306,7 +7349,7 @@ msgid "offer"
 msgstr ""
 
 #: src/postulo/applications/models.py:440
-#: src/postulo/applications/services.py:518
+#: src/postulo/applications/services.py:574
 #, draft
 msgid "Offer received"
 msgstr "Pakkumine saadud"
@@ -7315,8 +7358,18 @@ msgstr "Pakkumine saadud"
 msgid "Offer recorded."
 msgstr ""
 
-#: src/postulo/applications/services.py:518
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer recorded: %(what)s"
+msgstr ""
+
+#: src/postulo/applications/services.py:574
 msgid "Offer revised"
+msgstr ""
+
+#: src/postulo/notifications/slow.py:208
+#, python-format
+msgid "Offer revised: %(what)s"
 msgstr ""
 
 #: src/postulo/applications/views.py:1281
@@ -9518,12 +9571,17 @@ msgstr "Iseendana saatmine"
 msgid "Sending failed: %(error)s"
 msgstr "Saatmine ebaõnnestus: %(error)s"
 
+#: src/postulo/notifications/models.py:41
 #: src/postulo/templates/applications/report.html:125
 #: src/postulo/templates/widgets/industries.html:10
 #: src/postulo/templates/widgets/sources.html:10
 #, draft
 msgid "Sent"
 msgstr "Saadetud"
+
+#: src/postulo/notifications/models.py:78
+msgid "sent at"
+msgstr ""
 
 #: src/postulo/documents/models.py:678
 #, draft
@@ -10197,7 +10255,7 @@ msgstr "Olek"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
 #: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:1021
+#: src/postulo/jobs/models.py:1021 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
 msgstr "olek"
@@ -10280,7 +10338,7 @@ msgstr "Lõpeta %(column)s järgi järjestamine"
 msgid "store"
 msgstr "hoidla"
 
-#: src/postulo/plugins/forms.py:115
+#: src/postulo/plugins/forms.py:121
 #, draft
 msgid "Stored; leave blank to keep the current value."
 msgstr "Salvestatud; jätke tühjaks, et praegune väärtus alles jääks."
@@ -11050,6 +11108,7 @@ msgid "The company you are applying to"
 msgstr "Ettevõte, kuhu kandideerite"
 
 #: src/postulo/documents/archiving.py:115
+#: src/postulo/notifications/webhooks.py:121
 #, draft
 msgid "The connection is gone or switched off."
 msgstr "Ühendus on kadunud või välja lülitatud."
@@ -11382,6 +11441,11 @@ msgstr "Teenusepakkuja seda ei uuenda. Keegi peab uuesti nõustuma."
 #, draft
 msgid "The provider's reply was not readable."
 msgstr "Teenusepakkuja vastust ei õnnestunud lugeda."
+
+#: src/postulo/notifications/webhooks.py:147
+#, python-format
+msgid "The receiver answered %(status)s."
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html:153
 #, draft
@@ -12404,6 +12468,7 @@ msgstr ""
 "Vabatahtlik toetus on selle projekti ainus tulu: seda kirjutab üks inimene ja miski siin ei kohusta ega ava midagi. Seda öeldakse üks kord, siin, sellele, kes instantsi haldab — mitte kunagi neile, kes seda tööotsinguks kasutavad, ja paljude jaoks neist on raha vale asi anda."
 
 #: src/postulo/core/models.py:123 src/postulo/core/models.py:713
+#: src/postulo/notifications/models.py:40
 msgid "Waiting"
 msgstr ""
 
@@ -12473,6 +12538,14 @@ msgstr "veebilink"
 #, draft
 msgid "web links"
 msgstr "veebilingid"
+
+#: src/postulo/notifications/models.py:82
+msgid "webhook deliveries"
+msgstr ""
+
+#: src/postulo/notifications/models.py:81
+msgid "webhook delivery"
+msgstr ""
 
 #: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
 #: src/postulo/jobs/tables.py:108
